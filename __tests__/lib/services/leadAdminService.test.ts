@@ -139,6 +139,22 @@ describe('createAdminLead', () => {
     });
   });
 
+  it('marca contactedAt quan el lead manual neix com a CONTACTED', async () => {
+    await createAdminLead({
+      name: 'Manual',
+      email: 'manual@test.com',
+      eventType: 'OTHER',
+      status: 'CONTACTED',
+    });
+
+    expect(mockPrisma.lead.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        status: 'CONTACTED',
+        contactedAt: expect.any(Date),
+      }),
+    });
+  });
+
   it('registra Instagram com a canal real quan el lead neix amb aquest source', async () => {
     mockPrisma.lead.create.mockResolvedValue({
       id: 'ig-1',

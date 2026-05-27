@@ -142,6 +142,28 @@ function getFallback(service: ServiceSlug | undefined, locale: string): PackDefi
   return source.map((pack) => localizeFallbackPack(pack, locale));
 }
 
+function mergeDbPacksWithConfigFallback(
+  dbPacks: PackDefinition[],
+  service: ServiceSlug | undefined,
+  locale: string,
+): PackDefinition[] {
+  const seen = new Set<string>();
+  const merged: PackDefinition[] = [];
+
+  for (const pack of dbPacks) {
+    seen.add(pack.id);
+    seen.add(pack.slug);
+    merged.push(pack);
+  }
+
+  for (const pack of getFallback(service, locale)) {
+    if (seen.has(pack.id) || seen.has(pack.slug)) continue;
+    merged.push(pack);
+  }
+
+  return merged;
+}
+
 export async function getDbPacks(options: { service?: ServiceSlug; locale?: string } = {}) {
   const { service, locale = 'es' } = options;
 
@@ -165,7 +187,11 @@ export async function getDbPacks(options: { service?: ServiceSlug; locale?: stri
       return getFallback(service, locale);
     }
 
-    return packs.map((pack) => mapPack(pack as DbPack, locale));
+    return mergeDbPacksWithConfigFallback(
+      packs.map((pack) => mapPack(pack as DbPack, locale)),
+      service,
+      locale,
+    );
   } catch (error) {
     log.error('Error obtenint packs DB:', error);
     return getFallback(service, locale);

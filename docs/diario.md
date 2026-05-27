@@ -1,3 +1,31 @@
+## 2026-05-27 — Canvi #814: Bingo Musical + Batalla Musical al catàleg web + auto-link client admin + fix tests (claude+codex)
+
+### Context
+Codex havia deixat feina a mitges: nous productes d'animació afegits a `packs-config.ts` i i18n (3 idiomes), millora de `packs-db.ts` per servir packs config com a fallback quan no hi ha DB, auto-link client quan es crea un lead manualment a l'admin, i fixes menors a `SafataClient`. Faltava la resolució i18n per als nous packs i arreglar tests trencats.
+
+### Canvi
+- **`app/config/packs-config.ts`**: afegits `bingo-musical` i `batalla-musical` com a packs de `service: 'discomovil'` (nou a la web pública via UsePacks).
+- **`lib/packs-db.ts`**: `mergeDbPacksWithConfigFallback` — packs del config sense equivalent a DB s'afegeixen al final de la llista (garanteix visibilitat dels nous productes fins que es sincronitzen a DB).
+- **`messages/ca.json`, `es.json`, `en.json`**: claus i18n per `bingo-musical`, `batalla-musical` i badge `animationFeatured` als 3 idiomes.
+- **`lib/pack-i18n.ts`**: correcció bidireccional `services.mobile.X ↔ pages.mobile.X` — tots els packs de discomòbil ara resolen correctament des del config fallback.
+- **`app/api/admin/leads/route.ts`**: POST crea lead com a `CONTACTED` i auto-linka a client existent (coincidència forta) o crea un de nou.
+- **`lib/services/leadAdminService.ts`**: `LeadCreateInput` accepta `status`, posa `contactedAt` si `status === 'CONTACTED'`.
+- **`app/admin/inbox/SafataClient.tsx`**: treu badge de count a la tab Enviats.
+- **`scripts/sync-packs-to-db.ts`**: sync afegeix `code`, `service`, `minGuests`, `maxGuests`.
+- **`__tests__/app/api/admin/leads-route.test.ts`** (NOU): 2 tests per POST — crea client nou + linka existent.
+- **`__tests__/lib/services/leadAdminService.test.ts`**: test `contactedAt` quan status CONTACTED.
+- **`__tests__/app/admin/inbox/InboxSections.test.tsx`**: actualitzats buttons a `'📋 Lead'` / `'👤 Client'`.
+- **`__tests__/lib/utils/dossier-html-builder.test.ts`**: fix assert portada (canviat a `class="portada"` que sí és exclusiu).
+- **`lib/constants/admin.ts`**: counter 813→814.
+
+### Validació
+- `npx tsc --noEmit` 0 errors.
+- 4628 tests verds (era 4625 + 3 nous).
+- `resolvePackI18nKey('services.mobile.discoPacks.bingo-musical.name', 'ca')` retorna `'Bingo Musical'` ✓.
+- Tancat per: claude
+
+---
+
 ## 2026-05-27 — Canvi #813: Safata — refactorització completa (ix-→sf-, SafataClient, safataService) (claude)
 
 ### Context

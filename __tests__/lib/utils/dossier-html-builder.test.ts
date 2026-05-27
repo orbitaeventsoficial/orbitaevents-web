@@ -122,7 +122,7 @@ describe('buildDossierHtml', () => {
 
   it('no inclou portada sense logoDataUri', () => {
     const html = buildDossierHtml(client, [productWithTrams]);
-    expect(html).not.toContain('portada-logo');
+    expect(html).not.toContain('class="portada"');
   });
 
   it('afegeix script autoPrint si cal', () => {

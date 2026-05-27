@@ -31,6 +31,7 @@ type LeadCreateInput = {
   dni?: string;
   assignedTo?: string;
   source?: 'WEBSITE' | 'CONFIGURATOR' | 'PHONE' | 'WHATSAPP' | 'INSTAGRAM' | 'WALLAPOP' | 'REFERRAL' | 'GOOGLE' | 'OTHER';
+  status?: LeadStatus;
   utmSource?: string;
   utmMedium?: string;
   utmCampaign?: string;
@@ -100,6 +101,7 @@ export async function createAdminLead(data: LeadCreateInput) {
       ...data,
       eventDate: data.eventDate ? new Date(data.eventDate) : undefined,
       interestedExtras: data.interestedExtras || [],
+      contactedAt: data.status === 'CONTACTED' ? new Date() : undefined,
     },
   });
 

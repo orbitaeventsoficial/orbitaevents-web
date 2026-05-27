@@ -2869,6 +2869,30 @@
             "We set it all up and take it all down"
           ]
         },
+        "bingo-musical": {
+          "name": "Music Bingo",
+          "tagline": "Bingo played through songs, dancing and shared laughs",
+          "ideal": "Company dinners, local parties, birthdays and after-meal sessions",
+          "features": [
+            "DJ + host to lead the full game",
+            "Music bingo cards and dynamics prepared for the audience",
+            "Professional sound system and microphones included",
+            "Recognisable songs to engage every age group",
+            "Adaptable format for 15 to 160 participants"
+          ]
+        },
+        "batalla-musical": {
+          "name": "The Music Battle",
+          "tagline": "Teams, hits and music challenges to wake up the room",
+          "ideal": "Team building, private parties, camps and participatory celebrations",
+          "features": [
+            "DJ + host with a live game-show rhythm",
+            "Team music challenges with constant participation",
+            "Professional sound system and microphones included",
+            "Hit rounds, music memory and quick challenges",
+            "Adaptable format for 15 to 160 participants"
+          ]
+        },
         "disco-completo": {
           "name": "Party Machine",
           "tagline": "One more hour — because great nights shouldn't end early",
@@ -4563,7 +4587,8 @@
     },
     "packsBadges": {
       "mostPopular": "Most popular",
-      "premium": "Premium"
+      "premium": "Premium",
+      "animationFeatured": "Featured animation"
     },
     "combo": {
       "name": "Full pack",

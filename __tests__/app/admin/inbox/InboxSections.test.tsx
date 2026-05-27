@@ -70,7 +70,7 @@ describe('InboxDetailPane', () => {
   it('manté el CTA cap al lead quan encara no hi ha customerId', () => {
     const { handleOpenLead } = renderDetail(makeLeadEmail());
 
-    fireEvent.click(screen.getByRole('button', { name: '📋 Veure lead' }));
+    fireEvent.click(screen.getByRole('button', { name: '📋 Lead' }));
 
     expect(handleOpenLead).toHaveBeenCalledWith(
       expect.objectContaining({ id: 'lead-1', customerId: null })
@@ -87,7 +87,7 @@ describe('InboxDetailPane', () => {
       })
     );
 
-    fireEvent.click(screen.getByRole('button', { name: '👤 Veure client' }));
+    fireEvent.click(screen.getByRole('button', { name: '👤 Client' }));
 
     expect(handleOpenLead).toHaveBeenCalledWith(
       expect.objectContaining({ id: 'lead-1', customerId: 'cust-1' })

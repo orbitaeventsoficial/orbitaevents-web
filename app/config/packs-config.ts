@@ -267,6 +267,57 @@ const PACKS: PackDefinition[] = [
     capacidadMaxima: 60,
   },
   {
+    id: "bingo-musical",
+    service: "discomovil",
+    slug: "bingo-musical",
+    i18nBaseKey: "services.mobile.discoPacks.bingo-musical",
+    name: "services.mobile.discoPacks.bingo-musical.name",
+    tagline: "services.mobile.discoPacks.bingo-musical.tagline",
+    emotion: "services.mobile.discoPacks.bingo-musical.tagline",
+    price: "250€",
+    priceValue: 250,
+    features: [
+      "services.mobile.discoPacks.bingo-musical.features.f1",
+      "services.mobile.discoPacks.bingo-musical.features.f2",
+      "services.mobile.discoPacks.bingo-musical.features.f3",
+      "services.mobile.discoPacks.bingo-musical.features.f4",
+      "services.mobile.discoPacks.bingo-musical.features.f5",
+    ],
+    ideal: "services.mobile.discoPacks.bingo-musical.ideal",
+    duration: "1h 30min",
+    durationHours: 1.5,
+    highlight: true,
+    popular: true,
+    badge: "packsBadges.animationFeatured",
+    capacidadMinima: 15,
+    capacidadMaxima: 160,
+  },
+  {
+    id: "batalla-musical",
+    service: "discomovil",
+    slug: "batalla-musical",
+    i18nBaseKey: "services.mobile.discoPacks.batalla-musical",
+    name: "services.mobile.discoPacks.batalla-musical.name",
+    tagline: "services.mobile.discoPacks.batalla-musical.tagline",
+    emotion: "services.mobile.discoPacks.batalla-musical.tagline",
+    price: "250€",
+    priceValue: 250,
+    features: [
+      "services.mobile.discoPacks.batalla-musical.features.f1",
+      "services.mobile.discoPacks.batalla-musical.features.f2",
+      "services.mobile.discoPacks.batalla-musical.features.f3",
+      "services.mobile.discoPacks.batalla-musical.features.f4",
+      "services.mobile.discoPacks.batalla-musical.features.f5",
+    ],
+    ideal: "services.mobile.discoPacks.batalla-musical.ideal",
+    duration: "1h 30min",
+    durationHours: 1.5,
+    highlight: true,
+    badge: "packsBadges.animationFeatured",
+    capacidadMinima: 15,
+    capacidadMaxima: 160,
+  },
+  {
     id: "disco-completo",
     service: "discomovil",
     slug: "disco-completo",
@@ -510,5 +561,4 @@ export function getFAQPreciosResumen(): string {
   const empresasMin = Math.min(...PACKS.filter(p => p.service === 'empresas').map(p => p.priceValue));
   return `Festes i discomòbil des de ${discoMin}€, bodes des de ${bodasMin}€, empreses des de ${empresasMin}€. Tots els packs inclouen muntatge, desmuntatge i equip complet.`;
 }
-
 

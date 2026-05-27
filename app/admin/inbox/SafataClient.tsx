@@ -238,7 +238,6 @@ export default function SafataClient({
             )}
             <button type="button" className={`sf__tab${tab === 'enviats' ? ' is-on' : ''}`} onClick={() => handleTabChange('enviats')}>
               Enviats
-              {localSends.length > 0 && <span className="sf__tab-badge sf__tab-badge--muted">{localSends.length}</span>}
             </button>
           </div>
           <a href="/admin/inbox/settings" className="sf__composer-btn" aria-label="Configuració de mail">

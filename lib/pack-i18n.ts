@@ -42,16 +42,16 @@ function normalizeCandidateKeys(value: string): string[] {
   candidates.add(noConfigurator);
   candidates.add(`configurator.${noConfigurator}`);
 
-  // pages.mobile.X → services.mobile.X
+  // pages.mobile.X ↔ services.mobile.X (bidireccional)
   if (noConfigurator.startsWith('pages.mobile.')) {
     const modern = noConfigurator.replace('pages.mobile.', 'services.mobile.');
     candidates.add(modern);
     candidates.add(`configurator.${modern}`);
   }
-
-  // services.mobile.X
-  if (raw.startsWith('services.mobile.')) {
-    candidates.add(raw);
+  if (noConfigurator.startsWith('services.mobile.')) {
+    const legacy = noConfigurator.replace('services.mobile.', 'pages.mobile.');
+    candidates.add(legacy);
+    candidates.add(`configurator.${legacy}`);
   }
 
   // features.fN → features.N-1 (índex basat en 0)

@@ -2869,6 +2869,30 @@
             "Nosotros lo montamos y lo desmontamos todo"
           ]
         },
+        "bingo-musical": {
+          "name": "Bingo Musical",
+          "tagline": "El bingo que se juega cantando, bailando y riendo con todos",
+          "ideal": "Cenas de empresa, fiestas populares, cumpleaños y sobremesas",
+          "features": [
+            "DJ + presentador/a para conducir toda la partida",
+            "Cartones musicales y dinámicas preparadas según el público",
+            "Equipo de sonido profesional y microfonía incluida",
+            "Canciones reconocibles para activar a todas las edades",
+            "Formato adaptable para 15 a 160 participantes"
+          ]
+        },
+        "batalla-musical": {
+          "name": "La Batalla Musical",
+          "tagline": "Equipos, hits y retos musicales para encender la sala",
+          "ideal": "Team building, fiestas privadas, casales y celebraciones participativas",
+          "features": [
+            "DJ + presentador/a con ritmo de concurso en directo",
+            "Pruebas musicales por equipos con participación constante",
+            "Equipo de sonido profesional y microfonía incluida",
+            "Rondas de hits, memoria musical y retos rápidos",
+            "Formato adaptable para 15 a 160 participantes"
+          ]
+        },
         "disco-completo": {
           "name": "Party Machine",
           "tagline": "Una hora más porque las buenas noches no se acaban pronto",
@@ -4563,7 +4587,8 @@
     },
     "packsBadges": {
       "mostPopular": "Más popular",
-      "premium": "Premium"
+      "premium": "Premium",
+      "animationFeatured": "Animación destacada"
     },
     "combo": {
       "name": "Pack completo",

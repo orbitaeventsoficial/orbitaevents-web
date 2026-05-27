@@ -7,7 +7,7 @@ import { safeParseInt } from '@/lib/utils';
 import { z } from 'zod';
 import { getPipelineLeads } from '@/lib/services/leads/pipeline';
 import { countNewAdminLeads, createAdminLead, listAdminLeads } from '@/lib/services/leadAdminService';
-import { dispatchAutoTrigger } from '@/lib/services/automationTriggers';
+import { linkLeadToCustomer, previewLeadCustomerLink } from '@/lib/services/leads/leadCustomerLinkService';
 import { EVENT_TYPE_VALUES, LEAD_SOURCE_VALUES, LEAD_STATUS_VALUES, PRIORITY_VALUES } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
@@ -16,6 +16,39 @@ type LeadStatus = typeof LEAD_STATUS_VALUES[number];
 type EventType = typeof EVENT_TYPE_VALUES[number];
 type Priority = typeof PRIORITY_VALUES[number];
 type LeadSource = typeof LEAD_SOURCE_VALUES[number];
+
+async function linkManualLeadToCustomer(leadId: string) {
+  const preview = await previewLeadCustomerLink(leadId);
+
+  if (preview.kind === 'already-linked') {
+    return { linked: true, created: false, alreadyLinked: true, customerId: preview.customer.customerId };
+  }
+
+  if (preview.kind === 'matches-found') {
+    const strongMatch = preview.matches.find((match) => match.confidence === 'strong');
+    if (strongMatch) {
+      const linked = await linkLeadToCustomer({
+        leadId,
+        action: 'link',
+        customerId: strongMatch.customerId,
+        actor: 'Admin intake',
+      });
+      return linked.ok
+        ? { linked: true, created: false, alreadyLinked: false, customerId: linked.customerId }
+        : { linked: false, created: false, alreadyLinked: false, error: linked.error };
+    }
+  }
+
+  const created = await linkLeadToCustomer({
+    leadId,
+    action: 'create',
+    actor: 'Admin intake',
+  });
+
+  return created.ok
+    ? { linked: true, created: created.created, alreadyLinked: created.alreadyLinked, customerId: created.customerId }
+    : { linked: false, created: false, alreadyLinked: false, error: created.error };
+}
 
 function isValidStatus(value: string | null): value is LeadStatus {
   return value !== null && LEAD_STATUS_VALUES.includes(value as LeadStatus);
@@ -154,14 +187,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const result = await createAdminLead(parsed.data);
+    const result = await createAdminLead({ ...parsed.data, status: 'CONTACTED' });
 
-    // Auto-trigger: welcome email task
+    const customerLink = result?.lead?.id
+      ? await linkManualLeadToCustomer(result.lead.id)
+      : null;
+
+    // Els leads creats manualment a l'admin no disparen automatismes d'entrada externa.
     if (result?.lead?.id) {
-      dispatchAutoTrigger({ type: 'lead.created', leadId: result.lead.id }).catch(() => {});
+      result.lead.customerId = customerLink?.customerId || result.lead.customerId || null;
     }
 
-    return NextResponse.json(result);
+    return NextResponse.json({ ...result, customerLink });
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error);
     log.error('Error creant lead:', { message: errMsg });

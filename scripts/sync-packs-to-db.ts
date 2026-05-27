@@ -58,11 +58,15 @@ async function main() {
           await prisma.pack.update({
             where: { slug: pack.slug },
             data: {
+              code: pack.id,
+              service: pack.service,
               price: pack.priceValue,
               originalPrice: pack.priceOriginalValue || null,
               djHours: pack.durationHours || 4,
               isFeatured: pack.popular || false,
               order: configPacks.indexOf(pack),
+              minGuests: pack.capacidadMinima ?? null,
+              maxGuests: pack.capacidadMaxima ?? null,
             }
           });
 
@@ -101,13 +105,17 @@ async function main() {
           // Crear nuevo pack
           const newPack = await prisma.pack.create({
             data: {
+              code: pack.id,
               slug: pack.slug,
+              service: pack.service,
               price: pack.priceValue,
               originalPrice: pack.priceOriginalValue || null,
               djHours: pack.durationHours || 4,
               isActive: true,
               isFeatured: pack.popular || false,
               order: configPacks.indexOf(pack),
+              minGuests: pack.capacidadMinima ?? null,
+              maxGuests: pack.capacidadMaxima ?? null,
             }
           });
 

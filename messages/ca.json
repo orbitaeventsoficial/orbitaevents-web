@@ -2469,6 +2469,30 @@
             "Nosaltres ho muntem i ho desmontem tot"
           ]
         },
+        "bingo-musical": {
+          "name": "Bingo Musical",
+          "tagline": "El bingo que es juga cantant, ballant i rient amb tothom",
+          "ideal": "Sopars d'empresa, festes populars, aniversaris i sobretaules",
+          "features": [
+            "DJ + presentador/a per conduir tota la partida",
+            "Cartons musicals i dinàmiques preparades segons el públic",
+            "Equip de so professional i microfonia inclosa",
+            "Cançons reconeixibles per activar totes les edats",
+            "Format adaptable per a 15 a 160 participants"
+          ]
+        },
+        "batalla-musical": {
+          "name": "La Batalla Musical",
+          "tagline": "Equips, hits i reptes musicals per encendre la sala",
+          "ideal": "Team building, festes privades, casals i celebracions participatives",
+          "features": [
+            "DJ + presentador/a amb ritme de concurs en directe",
+            "Proves musicals per equips amb participació constant",
+            "Equip de so professional i microfonia inclosa",
+            "Rondes de hits, memòria musical i reptes ràpids",
+            "Format adaptable per a 15 a 160 participants"
+          ]
+        },
         "disco-completo": {
           "name": "Party Machine",
           "tagline": "Una hora més perquè les bones nits no s'acaben aviat",
@@ -4309,7 +4333,8 @@
     },
     "packsBadges": {
       "mostPopular": "Més popular",
-      "premium": "Premium"
+      "premium": "Premium",
+      "animationFeatured": "Animació destacada"
     },
     "combo": {
       "name": "Pack complet",
