@@ -293,6 +293,9 @@ describe('recordEmailSend', () => {
         customerId: null,
         locale: null,
         htmlBody: null,
+        orbitaKind: null,
+        orbitaId: null,
+        orbitaOrigin: null,
       },
       select: { id: true, trackingToken: true },
     });

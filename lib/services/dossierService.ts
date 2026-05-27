@@ -44,8 +44,8 @@ export async function getAllDossiers(limit = 50) {
       CASE WHEN d."leadId" IS NOT NULL THEN
         jsonb_build_object('id', l.id, 'name', l.name, 'status', l.status)
       END AS lead
-    FROM "Dossier" d
-    LEFT JOIN "Lead" l ON l.id = d."leadId"
+    FROM "dossiers" d
+    LEFT JOIN "leads" l ON l.id = d."leadId"
     WHERE d."deletedAt" IS NULL
     ORDER BY d."createdAt" DESC
     LIMIT ${limit}
@@ -57,11 +57,11 @@ export async function getDossierById(id: string) {
 }
 
 export async function softDeleteDossier(id: string) {
-  await prisma.$executeRaw`UPDATE "Dossier" SET "deletedAt" = NOW() WHERE id = ${id}`;
+  await prisma.$executeRaw`UPDATE "dossiers" SET "deletedAt" = NOW() WHERE id = ${id}`;
 }
 
 export async function restoreDossier(id: string) {
-  await prisma.$executeRaw`UPDATE "Dossier" SET "deletedAt" = NULL WHERE id = ${id}`;
+  await prisma.$executeRaw`UPDATE "dossiers" SET "deletedAt" = NULL WHERE id = ${id}`;
 }
 
 export async function purgeDossier(id: string) {
@@ -74,8 +74,8 @@ export async function getDeletedDossiers() {
       CASE WHEN d."leadId" IS NOT NULL THEN
         jsonb_build_object('id', l.id, 'name', l.name, 'status', l.status)
       END AS lead
-    FROM "Dossier" d
-    LEFT JOIN "Lead" l ON l.id = d."leadId"
+    FROM "dossiers" d
+    LEFT JOIN "leads" l ON l.id = d."leadId"
     WHERE d."deletedAt" IS NOT NULL
     ORDER BY d."deletedAt" DESC
   `;
@@ -83,7 +83,7 @@ export async function getDeletedDossiers() {
 
 export async function purgeExpiredDossiers(cutoff: Date): Promise<number> {
   const count = await prisma.$executeRaw`
-    DELETE FROM "Dossier" WHERE "deletedAt" IS NOT NULL AND "deletedAt" <= ${cutoff}
+    DELETE FROM "dossiers" WHERE "deletedAt" IS NOT NULL AND "deletedAt" <= ${cutoff}
   `;
   return count;
 }
@@ -114,11 +114,18 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
   const subject = `Dossier Òrbita Events — ${dossier.nom}`;
 
   try {
-    await sendEmail({
+    // Vinculació X-Orbita: si el dossier ve d'un lead, el client respon i el
+    // reply matcheja directament el lead via In-Reply-To.
+    const orbitaCtx = dossier.leadId
+      ? { kind: 'lead' as const, id: dossier.leadId, origin: `dossier-${id}` }
+      : { kind: 'dossier' as const, id, origin: `dossier-${id}` };
+
+    const sendResult = await sendEmail({
       to: recipientEmail,
       subject,
       html,
       text: `Hola ${dossier.nom},\n\nT'enviem el dossier amb les nostres propostes: ${productsLabel}.\n\nQualsevol dubte, contacta'ns al 654 46 70 87 o info@orbitaevents.com\n\nÒrbita Events`,
+      orbita: orbitaCtx,
     });
 
     const now = new Date();
@@ -127,13 +134,30 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
       data: { sentAt: now, sentTo: recipientEmail },
     });
 
-    await recordEmailSend({
+    const tracking = await recordEmailSend({
       templateKey: 'dossier',
       to: recipientEmail,
       subject,
       leadId: dossier.leadId || null,
       htmlBody: html,
-    }).catch(() => {});
+      orbitaKind: orbitaCtx.kind,
+      orbitaId: orbitaCtx.id ?? null,
+      orbitaOrigin: orbitaCtx.origin ?? null,
+    }).catch(() => null);
+
+    if (tracking?.id) {
+      const { updateEmailSendResult } = await import('@/lib/services/emailTrackingService');
+      await updateEmailSendResult(tracking.id, {
+        smtpAccepted: sendResult.smtp.accepted,
+        smtpRejected: sendResult.smtp.rejected,
+        smtpResponse: sendResult.smtp.response,
+        smtpMessageId: sendResult.smtp.messageId,
+        imapAppendOk: sendResult.imapSent.attempted ? sendResult.imapSent.ok : null,
+        imapSentFolder: sendResult.imapSent.folder,
+        imapSentUid: sendResult.imapSent.uid ?? null,
+        imapError: sendResult.imapSent.error ?? null,
+      });
+    }
 
     return { ok: true };
   } catch (err) {

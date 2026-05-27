@@ -53,9 +53,13 @@ vi.mock('@/lib/site', () => ({
 vi.mock('@/lib/services/imageManagerService', () => ({
   getManagedImageOverride: vi.fn().mockResolvedValue(null),
 }));
-const { mockRecordEmailSend } = vi.hoisted(() => ({ mockRecordEmailSend: vi.fn().mockResolvedValue({ id: 'es-test-1', trackingToken: 'tt-1' }) }));
+const { mockRecordEmailSend, mockUpdateEmailSendResult } = vi.hoisted(() => ({
+  mockRecordEmailSend: vi.fn().mockResolvedValue({ id: 'es-test-1', trackingToken: 'tt-1' }),
+  mockUpdateEmailSendResult: vi.fn().mockResolvedValue(undefined),
+}));
 vi.mock('@/lib/services/emailTrackingService', () => ({
   recordEmailSend: mockRecordEmailSend,
+  updateEmailSendResult: mockUpdateEmailSendResult,
   wrapLinksForTracking: (html: string) => html,
 }));
 vi.mock('@/lib/services/leadActivityService', () => ({
@@ -76,7 +80,13 @@ beforeEach(() => {
   mockPrisma.leadNote.create.mockResolvedValue({});
   mockPrisma.leadActivity.count.mockResolvedValue(0);
   mockPrisma.adminLog.create.mockResolvedValue({});
-  mockSendEmail.mockResolvedValue({});
+  // sendEmail retorna SendEmailResult; donem un default vàlid amb tot OK
+  mockSendEmail.mockResolvedValue({
+    ok: true,
+    smtp: { accepted: ['client@test.com'], rejected: [], response: '250 OK', messageId: '<m1@test>' },
+    imapSent: { attempted: true, ok: true, folder: 'INBOX/Sent', uid: 1 },
+    orbitaMessageId: '<orbita.admin.na.aaa.bbb@orbitaevents.com>',
+  });
   mockTranslate.mockImplementation((text: string) => Promise.resolve(text));
   mockResolveQuotePack.mockResolvedValue({ name: 'Basic', price: 500, djHours: 4, extraHourPrice: 75, description: 'Pack bàsic' });
   mockGetTemplateSettings.mockResolvedValue({ validityDays: 30, introTitle: '', introSubtitle: '', ctaTitle: '', ctaSubtitle: '', conditions: '' });
@@ -231,6 +241,106 @@ describe('sendAdminEmail', () => {
       leadId: 'l1',
       subject: 'Subject',
       emailSendId: 'es-test-1',
+    }));
+  });
+
+  // ─── #821: observabilitat del canal (SMTP info + APPEND) ───────────────────
+  it('passa context orbita=lead a sendEmail i a recordEmailSend quan hi ha leadId', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'L1', preferredLocale: 'ca' });
+    await sendAdminEmail({ to: 'a@test.com', subject: 'S', body: 'B', leadId: 'L1' });
+
+    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+      orbita: expect.objectContaining({ kind: 'lead', id: 'L1' }),
+    }));
+    expect(mockRecordEmailSend).toHaveBeenCalledWith(expect.objectContaining({
+      orbitaKind: 'lead',
+      orbitaId: 'L1',
+      orbitaOrigin: 'admin-compose',
+    }));
+  });
+
+  it('passa context orbita=customer si només hi ha customerId', async () => {
+    mockPrisma.customer.findUnique.mockResolvedValue({ id: 'C2', preferredLocale: 'es' });
+    await sendAdminEmail({ to: 'a@test.com', subject: 'S', body: 'B', customerId: 'C2' });
+
+    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+      orbita: expect.objectContaining({ kind: 'customer', id: 'C2' }),
+    }));
+    expect(mockRecordEmailSend).toHaveBeenCalledWith(expect.objectContaining({
+      orbitaKind: 'customer',
+      orbitaId: 'C2',
+    }));
+  });
+
+  it('passa context orbita=admin si no hi ha lead ni customer', async () => {
+    await sendAdminEmail({ to: 'a@test.com', subject: 'S', body: 'B' });
+    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+      orbita: expect.objectContaining({ kind: 'admin' }),
+    }));
+  });
+
+  it('marca admin-compose-quote com a origin quan hi ha pressupost adjunt', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'L1', preferredLocale: 'ca' });
+    await sendAdminEmail({
+      to: 'a@test.com', subject: 'S', body: 'B', leadId: 'L1',
+      quote: { packId: 'basic', price: 500 },
+    });
+    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+      orbita: expect.objectContaining({ origin: 'admin-compose-quote' }),
+    }));
+  });
+
+  it('persisteix el resultat real del canal (SMTP+IMAP) a l\'EmailSend', async () => {
+    mockSendEmail.mockResolvedValueOnce({
+      ok: true,
+      smtp: {
+        accepted: ['client@test.com'],
+        rejected: [],
+        response: '250 2.0.0 Ok: queued as ABC',
+        messageId: '<m-xyz@test>',
+      },
+      imapSent: { attempted: true, ok: true, folder: 'INBOX/Sent', uid: 42 },
+      orbitaMessageId: '<orbita.admin.na.aa.bb@orbitaevents.com>',
+    });
+
+    await sendAdminEmail({ to: 'client@test.com', subject: 'S', body: 'B' });
+
+    expect(mockUpdateEmailSendResult).toHaveBeenCalledWith('es-test-1', expect.objectContaining({
+      smtpAccepted: ['client@test.com'],
+      smtpRejected: [],
+      smtpResponse: '250 2.0.0 Ok: queued as ABC',
+      smtpMessageId: '<m-xyz@test>',
+      imapAppendOk: true,
+      imapSentFolder: 'INBOX/Sent',
+      imapSentUid: 42,
+      imapError: null,
+    }));
+  });
+
+  it('imapAppendOk=null quan IMAP no està configurat (attempted=false)', async () => {
+    mockSendEmail.mockResolvedValueOnce({
+      ok: true,
+      smtp: { accepted: ['a@b.com'], rejected: [], response: '250 OK', messageId: '<m1>' },
+      imapSent: { attempted: false, ok: false, folder: null },
+      orbitaMessageId: null,
+    });
+    await sendAdminEmail({ to: 'a@b.com', subject: 'S', body: 'B' });
+    expect(mockUpdateEmailSendResult).toHaveBeenCalledWith('es-test-1', expect.objectContaining({
+      imapAppendOk: null,
+    }));
+  });
+
+  it('imapAppendOk=false + imapError quan APPEND ha fallat', async () => {
+    mockSendEmail.mockResolvedValueOnce({
+      ok: true,
+      smtp: { accepted: ['a@b.com'], rejected: [], response: '250 OK', messageId: '<m1>' },
+      imapSent: { attempted: true, ok: false, folder: null, error: "Mailbox doesn't exist: Sent" },
+      orbitaMessageId: null,
+    });
+    await sendAdminEmail({ to: 'a@b.com', subject: 'S', body: 'B' });
+    expect(mockUpdateEmailSendResult).toHaveBeenCalledWith('es-test-1', expect.objectContaining({
+      imapAppendOk: false,
+      imapError: "Mailbox doesn't exist: Sent",
     }));
   });
 });

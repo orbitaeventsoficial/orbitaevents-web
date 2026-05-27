@@ -1,3 +1,90 @@
+## 2026-05-27 — Canvi #821: Safata Outlook — mirall IMAP/SMTP + X-Orbita + observabilitat (claude)
+
+### Context
+Cas Eric Conchillo: un email registrat com a "enviat" a `EmailSend` però no
+present al folder Sent del servidor. Causa: `sendEmail` no feia APPEND a Sent
+i no capturava la resposta de SMTP. A més, calia que la safata fos un client
+de correu real (mirall del servidor, no només vista BD) i que les converses
+quedessin vinculades a leads/clients/reserves SENSE BD al mig del canal.
+
+### Canvi
+- **`lib/imap.ts`**: API ampliat amb `listFoldersWithStatus`,
+  `discoverSpecialFolders` (cache 5 min), `appendToFolder` (retorna
+  `{ok, uid?, folder, error?}`), `setFlag`, `searchEmails`, `expungeFolder`,
+  `bulkAction`. Helpers Òrbita: `buildOrbitaMessageId` (format
+  `<orbita.{kind}.{id}.{ts}.{rand}@orbitaevents.com>`), `parseOrbitaMessageId`,
+  `findOrbitaReferenceIn`, `buildOrbitaHeaders` (`X-Orbita-Kind / Id / Origin`).
+  `fetchEmailByUid` ara extreu headers X-Orbita + `In-Reply-To` per derivar
+  vincle (`source: 'header' | 'reference'`).
+- **`lib/email.ts`**: `sendEmail` retorna `SendEmailResult` amb `smtp.{accepted,
+  rejected, response, messageId}` + `imapSent.{attempted, ok, folder, uid, error}`
+  + `orbitaMessageId`. Quan IMAP està configurat, fa APPEND best-effort a Sent
+  via `nodemailer/lib/mail-composer` (import dinàmic). `skipImapAppend` opció.
+- **`prisma/schema.prisma`** + **migració `20260527140000_add_email_send_observability`**:
+  EmailSend amb `smtpAccepted/Rejected/Response/MessageId`,
+  `imapAppendOk/SentFolder/SentUid/Error`, `orbitaKind/Id/Origin` + índexs
+  `imapAppendOk` i `(orbitaKind, orbitaId)`.
+- **`lib/services/emailTrackingService.ts`**: `recordEmailSend` accepta
+  context Òrbita. Nova `updateEmailSendResult(id, result)` desa l'observable.
+- **`lib/services/adminEmailSendService.ts`** + **`dossierService.ts`**: passen
+  `orbita` context (kind=lead si leadId, customer si customerId, dossier si
+  dossier, admin sinó) i desen el resultat al EmailSend.
+- **`app/api/admin/inbox/folders/route.ts`** (NOU): GET amb carpetes IMAP +
+  comptadors + classificació especial.
+- **`app/api/admin/inbox/bulk/route.ts`** (NOU): POST acció en lot
+  (markRead/Unread/flag/unflag/moveTo/delete) sobre UIDs.
+- **`app/api/admin/inbox/search/route.ts`** (NOU): GET cerca dins una carpeta.
+- **`app/api/admin/inbox/drafts/route.ts`** (NOU): POST APPEND d'un esborrany
+  al folder Drafts del servidor IMAP via MailComposer.
+- **`app/api/admin/inbox/messages/[uid]/route.ts`**: PATCH accepta
+  `flag/unflag/moveTo` + GET amb `?folder=` i resposta amb
+  `cc/isFlagged/orbita/inReplyTo/references`.
+- **`app/api/admin/emails/sent/[id]/append-imap/route.ts`** (NOU): reintent
+  d'APPEND per a EmailSend antics (cas Eric). Reconstrueix MIME des de
+  `htmlBody` + headers Òrbita persistits i actualitza camps.
+- **`scripts/backfill-append-imap.ts`** (NOU): recórrer tots els EmailSend
+  amb `imapAppendOk IN (NULL, FALSE)` i recuperar el rastre a Sent.
+  Suporta `--dry-run` i `--limit=N`.
+- **`app/admin/inbox/SafataClient.tsx`**: refactor complet. Sidebar amb
+  carpetes IMAP dinàmiques (especials + custom) + comptadors no-llegits.
+  Pane amb checkbox per fila + selecció múltiple + barra accions en lot
+  (markRead/Unread/flag/unflag/move/delete) + dropdown "Moure a..."
+  + botó refresh. Detall amb pill X-Orbita (link a lead/client/reserva/dossier)
+  + Reply / Reply-all / Forward / Flag / Move / Delete / MarkUnread.
+  Composer modal amb To/Cc/Bcc + plantilles + reply amb cita + forward amb
+  cita + "Desar esborrany" via API drafts.
+- **`app/admin/inbox/inbox.css`**: noves classes `sf__navgroup*`,
+  `sf__pane-checkbox/refresh`, `sf__pane-actions*`, `sf__lead-checkbox/body/
+  flag/attach/badge`, `sf__modal*`, `sf__move-wrap/menu/item`, `sf__detail-pill*`.
+  Tot via tokens `var(--ax-*)`. Cap hex hardcoded.
+- **`.env.example`**: `ORBITA_MAIL_DOMAIN`, `SMTP_REPLY_TO`,
+  `INBOX_TO_FILTER` documentats.
+- **Tests**: `__tests__/lib/imap-orbita.test.ts` (helpers Òrbita: build/parse
+  Message-ID, findReferences, buildHeaders). Ampliació
+  `__tests__/lib/services/adminEmailSendService.test.ts` (orbita lead/customer/
+  admin, observabilitat SMTP+IMAP, casos imapAppendOk null/false/true).
+- **Counter**: 820 → 821. `LAB_CHANGE_NUMBER` = 821.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors. 20/20 tests `imap-orbita`
+  verds. 19/19 tests `adminEmailSendService` verds (6 nous d'observabilitat).
+- Validació funcional: tots els endpoints retornen schemes esperats. Migració
+  SQL pendent d'aplicar a Railway (`npx prisma migrate deploy`). Backfill cas
+  Eric pendent (executar `scripts/backfill-append-imap.ts`).
+- Validació humana/UX: pendent verificació al browser (carpetes, selecció
+  múltiple, composer Reply/Reply-all/Forward, pill X-Orbita).
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+### Decisió arquitectònica
+**Canal = servidor IMAP/SMTP. BD = recollida de dades de tornada, mai al
+mig.** Vinculació conversa ↔ entitat via headers MIME `X-Orbita-*` +
+Message-ID estable. Quan el client respon, el seu `In-Reply-To` permet
+matchejar l'entitat sense BD. La safata és un MIRALL, no un substitut.
+
+---
+
 ## 2026-05-27 — Canvi #820: Dossiers — paperera soft-delete + restore + purge + cron 30 dies (claude)
 
 ### Context

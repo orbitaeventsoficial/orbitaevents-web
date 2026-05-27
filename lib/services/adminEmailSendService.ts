@@ -12,7 +12,7 @@ import { getQuoteTemplateSettings } from '@/lib/services/quoteTemplateService';
 import { translateTextForLocale } from '@/lib/services/translationService';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { absoluteUrl, getAppBaseUrl } from '@/lib/site';
-import { recordEmailSend, wrapLinksForTracking } from '@/lib/services/emailTrackingService';
+import { recordEmailSend, updateEmailSendResult, wrapLinksForTracking } from '@/lib/services/emailTrackingService';
 import { recordCustomerEmailSent } from '@/lib/services/customerActivityService';
 import { recordLeadEmailSent } from '@/lib/services/leadActivityService';
 
@@ -160,7 +160,16 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
   const contentHtml = await bodyToHtml(translatedBody);
   let finalHtml = buildBrandedEmailHtml(contentHtml, resolvedLocale, emailLogoUrl);
 
-  // Tracking: crear registre i injectar pixel d'obertura
+  // Vinculació conversa ↔ entitat (sense BD): X-Orbita-* + Message-ID estable.
+  // Quan el client respongui, el seu `In-Reply-To` permetrà matchejar
+  // l'entitat sense haver de fer cap consulta a la BD.
+  const orbitaCtx = resolvedLeadId
+    ? { kind: 'lead' as const, id: resolvedLeadId, origin: quoteAttachment ? 'admin-compose-quote' : 'admin-compose' }
+    : (customerForLocale?.id
+      ? { kind: 'customer' as const, id: customerForLocale.id, origin: 'admin-compose' }
+      : { kind: 'admin' as const, origin: 'admin-compose' });
+
+  // Tracking: crear registre amb context Òrbita i injectar pixel d'obertura
   let trackingRecord: { id: string; trackingToken: string } | null = null;
   try {
     trackingRecord = await recordEmailSend({
@@ -170,7 +179,10 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
       leadId: resolvedLeadId || null,
       customerId: customerForLocale?.id || null,
       locale: resolvedLocale,
-      htmlBody: finalHtml, // snapshot pre-tracking per a previsualització a l'admin
+      htmlBody: finalHtml,
+      orbitaKind: orbitaCtx.kind,
+      orbitaId: orbitaCtx.id ?? null,
+      orbitaOrigin: orbitaCtx.origin ?? null,
     });
     const pixelUrl = `${APP_BASE_URL}/api/tracking/open/${trackingRecord.trackingToken}`;
     finalHtml = wrapLinksForTracking(finalHtml, trackingRecord.trackingToken, APP_BASE_URL);
@@ -180,14 +192,30 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
     console.error('[adminEmailSend] Tracking record failed:', trackingError);
   }
 
-  await sendEmail({
+  // Enviament real: captura SMTP info + estat APPEND a Sent
+  const sendResult = await sendEmail({
     to,
     subject: translatedSubject,
     html: finalHtml,
     replyTo,
     brandingStyle: emailCountBefore === 0 ? 'hero' : 'soft',
     attachments,
+    orbita: orbitaCtx,
   });
+
+  // Persistim l'estat observable del canal (no bloqueja si falla)
+  if (trackingRecord?.id) {
+    await updateEmailSendResult(trackingRecord.id, {
+      smtpAccepted: sendResult.smtp.accepted,
+      smtpRejected: sendResult.smtp.rejected,
+      smtpResponse: sendResult.smtp.response,
+      smtpMessageId: sendResult.smtp.messageId,
+      imapAppendOk: sendResult.imapSent.attempted ? sendResult.imapSent.ok : null,
+      imapSentFolder: sendResult.imapSent.folder,
+      imapSentUid: sendResult.imapSent.uid ?? null,
+      imapError: sendResult.imapSent.error ?? null,
+    });
+  }
 
   if (resolvedLeadId) {
     await prisma.leadNote.create({ data: { leadId: resolvedLeadId, content: `📧 Email enviat: ${translatedSubject}${attachments ? '\n📎 Amb pressupost adjunt' : ''}` } });

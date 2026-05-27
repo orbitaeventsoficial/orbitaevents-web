@@ -1468,6 +1468,200 @@
 }
 @keyframes sf-spin { to { transform: rotate(360deg); } }
 
+/* ============================================================================
+   SAFATA — layout tres columnes (sidebar + pane + detall)
+============================================================================ */
+
+/* Override: el contenidor arrel ara és horitzontal */
+.sf {
+  flex-direction: row;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+.sf__sidebar {
+  flex: none;
+  width: 175px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--ax-line);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ax-panel) 60%, var(--ax-canvas)),
+    var(--ax-canvas)
+  );
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.sf__sidebar::-webkit-scrollbar { display: none; }
+
+.sf__sidebar-brand {
+  flex: none;
+  padding: 18px 16px 14px;
+  border-bottom: 1px solid var(--ax-line);
+}
+
+.sf__nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+}
+
+.sf__navitem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ax-t2);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: left;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+  width: 100%;
+}
+.sf__navitem:hover:not(.is-on) {
+  background: var(--ax-panel);
+  color: var(--ax-t);
+}
+.sf__navitem.is-on {
+  background: color-mix(in oklab, var(--ax-gold) 10%, var(--ax-panel));
+  border-color: var(--ax-hair-gold);
+  color: var(--ax-gold-bright);
+}
+
+.sf__navitem-label { flex: 1; }
+
+.sf__navitem-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--ax-gold);
+  color: #000;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.sf__navitem-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--ax-sunk);
+  border: 1px solid var(--ax-line2);
+  color: var(--ax-t3);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.sf__sidebar-foot {
+  flex: none;
+  padding: 8px;
+  border-top: 1px solid var(--ax-line);
+}
+
+/* ── Pane (columna de llista) ────────────────────────────────────────────── */
+.sf__pane {
+  flex: none;
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--ax-line);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sf__pane-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ax-line);
+  background: color-mix(in oklab, var(--ax-panel) 50%, var(--ax-canvas));
+}
+
+.sf__pane-title {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ax-t);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sf__pane-count {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--ax-t3);
+  padding: 2px 7px;
+  border: 1px solid var(--ax-line);
+  border-radius: 5px;
+  background: var(--ax-sunk);
+  font-variant-numeric: tabular-nums;
+}
+
+.sf__pane-list {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ax-line2) transparent;
+}
+
+/* Data als items de la llista (sense uppercase) */
+.sf__lead-date {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--ax-t3);
+}
+
+/* ── iframe per al cos HTML dels emails ──────────────────────────────────── */
+.sf__imap-iframe {
+  display: block;
+  width: 100%;
+  min-height: 480px;
+  flex: 1;
+  border: none;
+  background: #fff;
+  border-radius: 8px;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .sf__pane { width: 260px; }
+  .sf__sidebar { width: 155px; }
+}
+@media (max-width: 768px) {
+  .sf { flex-direction: column; }
+  .sf__sidebar {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--ax-line);
+  }
+  .sf__sidebar-brand { display: none; }
+  .sf__nav { flex-direction: row; padding: 6px; overflow-x: auto; }
+  .sf__sidebar-foot { border-top: none; border-left: 1px solid var(--ax-line); padding: 6px; }
+  .sf__pane { width: 100%; border-right: none; }
+}
+
 /* ── Spinner inline ──────────────────────────────────────────────────────── */
 .sf__spin {
   display: inline-block;
@@ -1553,3 +1747,308 @@
   border-bottom: 1px solid var(--ax-line);
 }
 .sf__compose-cc-toggle:hover { color: var(--ax-t2); }
+
+/* ============================================================================
+   #821 — Outlook-style additions: sidebar grups, selecció múltiple, modal
+   Composer, pill X-Orbita. Tot via tokens (var(--ax-*)). Cap hex.
+============================================================================ */
+
+/* ── Sidebar amb grups col·lapsables (no encara) ───────────────────────── */
+.sf__navgroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 8px 8px;
+}
+.sf__navgroup + .sf__navgroup {
+  border-top: 1px solid var(--ax-line);
+}
+.sf__navgroup-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--ax-gold);
+  opacity: 0.7;
+  padding: 0 8px 6px;
+}
+.sf__navgroup-error {
+  font-size: 11px;
+  color: var(--o-stage-lost);
+  padding: 0 8px 6px;
+  margin: 0;
+}
+.sf__navitem-icon {
+  flex-shrink: 0;
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+  opacity: 0.9;
+}
+
+/* Botó "Nou correu" al peu de la sidebar */
+.sf__compose-trigger--full {
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+/* ── Pane: checkbox global + refresh ───────────────────────────────────── */
+.sf__pane-checkbox {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  accent-color: var(--ax-gold);
+  cursor: pointer;
+  margin-right: 4px;
+}
+.sf__pane-refresh {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid var(--ax-line2);
+  background: transparent;
+  color: var(--ax-t3);
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+}
+.sf__pane-refresh:hover {
+  border-color: var(--ax-hair-gold);
+  color: var(--ax-t);
+  background: var(--ax-raised);
+}
+
+/* ── Barra d'accions en lot ─────────────────────────────────────────────── */
+.sf__pane-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--ax-line);
+  background: color-mix(in oklab, var(--ax-gold) 5%, var(--ax-panel));
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.sf__pane-actions-count {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ax-gold-bright);
+  letter-spacing: 0.05em;
+  padding-right: 6px;
+}
+
+/* ── Llista: checkbox per fila + body + flag + attach + badge X-Orbita ── */
+.sf__lead {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  padding: 12px 12px;
+  border-bottom: 1px solid var(--ax-line);
+  cursor: pointer;
+  transition: background 120ms ease;
+  width: 100%;
+  background: none;
+  border-left: 3px solid transparent;
+  text-align: left;
+  align-items: start;
+}
+.sf__lead-checkbox {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  accent-color: var(--ax-gold);
+  cursor: pointer;
+  margin-top: 2px;
+}
+.sf__lead-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+.sf__lead-flag {
+  flex-shrink: 0;
+  color: var(--ax-gold);
+  font-size: 12px;
+}
+.sf__lead-flag.is-on { color: var(--ax-gold-bright); text-shadow: 0 0 5px var(--ax-gold); }
+.sf__lead-attach {
+  display: inline-block;
+  margin-left: 4px;
+  opacity: 0.7;
+  font-size: 12px;
+}
+.sf__lead-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border: 1px solid var(--ax-hair-gold);
+  border-radius: 5px;
+  background: color-mix(in oklab, var(--ax-gold) 10%, var(--ax-panel));
+  color: var(--ax-gold-bright);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* ── Modal Composer ─────────────────────────────────────────────────────── */
+.sf__modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in oklab, var(--ax-canvas) 80%, #000);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 5vh 20px;
+  z-index: 50;
+  overflow-y: auto;
+}
+.sf__modal {
+  width: 100%;
+  max-width: 720px;
+  background: var(--ax-panel);
+  border: 1px solid var(--ax-hair-gold);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.45);
+  display: flex;
+  flex-direction: column;
+}
+.sf__modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--ax-line);
+  background: color-mix(in oklab, var(--ax-gold) 5%, var(--ax-panel));
+}
+.sf__modal-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ax-t);
+  letter-spacing: -0.005em;
+}
+.sf__modal-body {
+  display: flex;
+  flex-direction: column;
+}
+.sf__modal-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--ax-line);
+  background: color-mix(in oklab, var(--ax-canvas) 92%, #000);
+}
+
+/* ── Dropdown moure ─────────────────────────────────────────────────────── */
+.sf__move-wrap {
+  position: relative;
+  display: inline-block;
+}
+.sf__move-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  min-width: 180px;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--ax-raised);
+  border: 1px solid var(--ax-hair-gold);
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.42);
+  z-index: 3;
+  padding: 4px;
+}
+.sf__move-item {
+  display: block;
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  background: transparent;
+  color: var(--ax-t2);
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 120ms ease, color 120ms ease;
+}
+.sf__move-item:hover {
+  background: color-mix(in oklab, var(--ax-gold) 10%, var(--ax-panel));
+  color: var(--ax-gold-bright);
+}
+
+/* ── Detall: pill X-Orbita ─────────────────────────────────────────────── */
+.sf__detail-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 20px 0;
+  padding: 8px 12px;
+  border: 1px solid var(--ax-hair-gold);
+  border-radius: 9px;
+  background: color-mix(in oklab, var(--ax-gold) 6%, var(--ax-panel));
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ax-t2);
+  width: fit-content;
+}
+.sf__detail-pill.is-static { opacity: 0.85; }
+.sf__detail-pill-link {
+  color: var(--ax-gold-bright);
+  text-decoration: none;
+  font-weight: 700;
+}
+.sf__detail-pill-link:hover { text-decoration: underline; }
+.sf__detail-pill-text {
+  color: var(--ax-t);
+  font-weight: 700;
+}
+.sf__detail-pill-hint {
+  font-size: 10px;
+  color: var(--ax-t3);
+  font-style: italic;
+}
+
+/* ── Detall: meta amb CC ───────────────────────────────────────────────── */
+.sf__imap-cc {
+  display: block;
+  margin-top: 4px;
+  color: var(--ax-t3);
+}
+
+/* ── Responsive modal ──────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .sf__modal { max-width: 100%; border-radius: 12px; }
+  .sf__modal-backdrop { padding: 2vh 8px; }
+  .sf__pane-actions { gap: 4px; }
+  .sf__pane-actions .sf__action-btn--sm { padding: 4px 8px; font-size: 10px; }
+}
+
+/* ── Detall: compactar barra d'accions quan no hi ha amplada ──────────── */
+.sf__detail-headactions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+@media (max-width: 1280px) {
+  .sf__detail-headactions { gap: 4px; }
+  .sf__detail-headactions .sf__action-btn--sm { padding: 5px 8px; font-size: 11px; }
+}

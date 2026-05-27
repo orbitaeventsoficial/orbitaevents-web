@@ -203,6 +203,10 @@ export async function recordEmailSend(params: {
   customerId?: string | null;
   locale?: string | null;
   htmlBody?: string | null;
+  /** Vincle Òrbita (kind/id/origin) per a auditoria del canal. */
+  orbitaKind?: string | null;
+  orbitaId?: string | null;
+  orbitaOrigin?: string | null;
 }): Promise<{ id: string; trackingToken: string }> {
   const record = await prisma.emailSend.create({
     data: {
@@ -213,10 +217,49 @@ export async function recordEmailSend(params: {
       customerId: params.customerId || null,
       locale: params.locale || null,
       htmlBody: params.htmlBody || null,
+      orbitaKind: params.orbitaKind || null,
+      orbitaId: params.orbitaId || null,
+      orbitaOrigin: params.orbitaOrigin || null,
     },
     select: { id: true, trackingToken: true },
   });
   return record;
+}
+
+/**
+ * Actualitza l'EmailSend amb el resultat real del canal (SMTP + APPEND a Sent).
+ * Es crida DESPRÉS de `sendEmail()` perquè la BD reflecteixi l'estat observable
+ * sense bloquejar l'enviament. Si no es crida (cas legacy), els camps queden
+ * NULL i la UI sap que no hi ha traça observable.
+ */
+export async function updateEmailSendResult(id: string, result: {
+  smtpAccepted: string[];
+  smtpRejected: string[];
+  smtpResponse: string;
+  smtpMessageId: string;
+  imapAppendOk: boolean | null;
+  imapSentFolder: string | null;
+  imapSentUid: number | null;
+  imapError: string | null;
+}): Promise<void> {
+  try {
+    await prisma.emailSend.update({
+      where: { id },
+      data: {
+        smtpAccepted: result.smtpAccepted,
+        smtpRejected: result.smtpRejected,
+        smtpResponse: result.smtpResponse || null,
+        smtpMessageId: result.smtpMessageId || null,
+        imapAppendOk: result.imapAppendOk,
+        imapSentFolder: result.imapSentFolder,
+        imapSentUid: result.imapSentUid,
+        imapError: result.imapError,
+      },
+    });
+  } catch (error) {
+    // Tracking no ha de bloquejar res. Log silenciós.
+    console.error('[emailTracking] updateEmailSendResult fallit:', error);
+  }
 }
 
 export async function loadSentEmail(idOrToken: string) {

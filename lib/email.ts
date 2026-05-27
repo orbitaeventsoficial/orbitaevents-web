@@ -9,6 +9,15 @@ import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { absoluteUrl, getAppBaseUrl } from '@/lib/site';
 import { getManagedImageOverride } from '@/lib/services/imageManagerService';
+import { log } from '@/lib/logger';
+import {
+  type OrbitaContext,
+  appendToFolder,
+  buildOrbitaHeaders,
+  buildOrbitaMessageId,
+  discoverSpecialFolders,
+} from '@/lib/imap';
+import { buildMime } from '@/lib/mailComposerLoader';
 
 import { type EmailLocale, normalizeEmailLocale, toIntlLocaleEmail, PRIVACY_REQUEST_LABELS, PRIVACY_COPY, TESTIMONIAL_COPY } from '@/lib/email-i18n';
 
@@ -21,6 +30,19 @@ interface SendEmailOptions {
   text?: string;
   attachments?: nodemailer.SendMailOptions['attachments'];
   brandingStyle?: 'hero' | 'soft';
+  /**
+   * Context Òrbita per a vinculació conversa ↔ entitat sense BD intermèdia.
+   * Si està definit:
+   *   - Injecta `X-Orbita-Kind / Id / Origin` als headers MIME.
+   *   - Genera un Message-ID estable `<orbita.{kind}.{id}.{ts}.{rand}@…>` que
+   *     viatja al `In-Reply-To` de les respostes del client.
+   *   - L'admin podrà extreure el vincle del header sense haver de consultar BD.
+   */
+  orbita?: OrbitaContext;
+  /** En-Headers MIME addicionals (rar — preferir `orbita` per a vinculació). */
+  headers?: Record<string, string>;
+  /** Si true, NO fa append al Sent IMAP. Útil per a campanyes massives no monitoritzades. */
+  skipImapAppend?: boolean;
 }
 
 type BookingEmailTranslation = {
@@ -277,7 +299,38 @@ function createTransporter() {
   return cachedTransporter;
 }
 
-export async function sendEmail(options: SendEmailOptions): Promise<void> {
+/**
+ * Resultat estructurat de l'enviament. Captura l'estat REAL del canal SMTP +
+ * IMAP perquè la safata d'admin pugui mostrar "Acceptat per SMTP + Arxivat a
+ * Sent UID 5" en lloc d'un genèric "Email enviat" que no diu res.
+ *
+ * Tots els callers actuals (18) que feien `await sendEmail(...)` segueixen
+ * funcionant — només ignoren el retorn.
+ */
+export interface SendEmailResult {
+  /** True si SMTP ha acceptat almenys un destinatari. */
+  ok: boolean;
+  smtp: {
+    accepted: string[];
+    rejected: string[];
+    response: string;
+    messageId: string;
+    envelope?: { from: string; to: string[] };
+  };
+  imapSent: {
+    /** True només si s'ha intentat l'APPEND (IMAP configurat + no skip). */
+    attempted: boolean;
+    /** True quan APPEND completat OK (false si fallit, omès si attempted=false). */
+    ok: boolean;
+    folder: string | null;
+    uid?: number;
+    error?: string;
+  };
+  /** Message-ID Òrbita assignat (només si options.orbita). */
+  orbitaMessageId: string | null;
+}
+
+export async function sendEmail(options: SendEmailOptions): Promise<SendEmailResult> {
   const transporter = createTransporter();
 
   const smtpFrom = (process.env.SMTP_FROM || '').trim();
@@ -294,7 +347,12 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
     options.brandingStyle || 'soft'
   );
 
-  await transporter.sendMail({
+  // Headers + Message-ID per a vinculació conversa ↔ entitat (sense BD)
+  const orbitaHeaders = options.orbita ? buildOrbitaHeaders(options.orbita) : {};
+  const orbitaMessageId = options.orbita ? buildOrbitaMessageId(options.orbita) : undefined;
+  const mergedHeaders: Record<string, string> = { ...orbitaHeaders, ...(options.headers || {}) };
+
+  const mailOpts: nodemailer.SendMailOptions = {
     from: fromAddress,
     to: toAddress,
     subject: sanitizeHeader(options.subject),
@@ -302,7 +360,74 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
     text: options.text?.trim() || htmlToText(brandedHtml),
     replyTo: options.replyTo?.trim(),
     attachments: options.attachments,
-  });
+    headers: Object.keys(mergedHeaders).length > 0 ? mergedHeaders : undefined,
+    messageId: orbitaMessageId,
+  };
+
+  const info = await transporter.sendMail(mailOpts);
+
+  const result: SendEmailResult = {
+    ok: Array.isArray(info.accepted) && info.accepted.length > 0,
+    smtp: {
+      accepted: Array.isArray(info.accepted) ? info.accepted.map(String) : [],
+      rejected: Array.isArray(info.rejected) ? info.rejected.map(String) : [],
+      response: typeof info.response === 'string' ? info.response : '',
+      messageId: typeof info.messageId === 'string' ? info.messageId : '',
+      envelope: info.envelope ? {
+        from: String((info.envelope as { from?: unknown }).from || ''),
+        to: Array.isArray((info.envelope as { to?: unknown }).to)
+          ? ((info.envelope as { to: unknown[] }).to).map(String)
+          : [],
+      } : undefined,
+    },
+    imapSent: { attempted: false, ok: false, folder: null },
+    orbitaMessageId: orbitaMessageId || null,
+  };
+
+  // APPEND best-effort al folder Sent IMAP. Així tota comunicació (dossiers,
+  // pressupostos, recordatoris, follow-up…) queda al servidor de correu i no
+  // depèn de la BD per a reflectir-se a la safata d'admin ni a l'app del
+  // client. Fallida no bloqueja l'enviament.
+  if (!options.skipImapAppend && process.env.IMAP_HOST && process.env.IMAP_USER && process.env.IMAP_PASS) {
+    result.imapSent.attempted = true;
+    try {
+      const appendRes = await appendBuiltMimeToSent(mailOpts);
+      result.imapSent.ok = appendRes.ok;
+      result.imapSent.folder = appendRes.folder;
+      result.imapSent.uid = appendRes.uid;
+      if (!appendRes.ok && appendRes.error) {
+        result.imapSent.error = appendRes.error;
+      }
+    } catch (appendError) {
+      const msg = appendError instanceof Error ? appendError.message : String(appendError);
+      result.imapSent.error = msg;
+      log.error('[email] APPEND a Sent IMAP fallit (no bloqueja enviament)',
+        appendError instanceof Error ? appendError : undefined);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Construeix el MIME complet via nodemailer/MailComposer i l'append al folder
+ * Sent. Carregat amb `import()` dinàmic per evitar cost si IMAP no està
+ * configurat. Retorna metadades de l'APPEND (folder real + UID) per al
+ * tracking observable.
+ */
+async function appendBuiltMimeToSent(mailOpts: nodemailer.SendMailOptions): Promise<{
+  ok: boolean;
+  folder: string | null;
+  uid?: number;
+  error?: string;
+}> {
+  const built = await buildMime(mailOpts);
+  const special = await discoverSpecialFolders();
+  if (!special.sent) {
+    return { ok: false, folder: null, error: 'Servidor IMAP sense carpeta Sent reconeguda' };
+  }
+  const res = await appendToFolder(special.sent, built, ['\\Seen']);
+  return { ok: res.ok, folder: res.folder, uid: res.uid, error: res.error };
 }
 
 export async function sendEmailWithTimeout(

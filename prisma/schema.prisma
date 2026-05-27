@@ -1719,9 +1719,27 @@ model EmailSend {
   clickedAt     DateTime?
   clickCount    Int      @default(0)
 
+  // ── Observabilitat real del canal (no posa la BD al canal: només recull
+  //    l'estat del que ha passat al servidor SMTP/IMAP). ────────────────────
+  smtpAccepted   String[] @default([])
+  smtpRejected   String[] @default([])
+  smtpResponse   String?
+  smtpMessageId  String?
+  /// True: APPEND al folder Sent OK. False: APPEND ha fallat. Null: no intentat.
+  imapAppendOk   Boolean?
+  imapSentFolder String?
+  imapSentUid    Int?
+  imapError      String?
+  /// Headers Òrbita (kind/id/origin) per a auditoria si el client respon.
+  orbitaKind     String?
+  orbitaId       String?
+  orbitaOrigin   String?
+
   @@index([templateKey])
   @@index([leadId])
   @@index([sentAt])
+  @@index([imapAppendOk])
+  @@index([orbitaKind, orbitaId])
   @@map("email_sends")
 }
 

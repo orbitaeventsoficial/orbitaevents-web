@@ -35,6 +35,26 @@ Avís per codex: la teva norma escrita al cos del #797 ha quedat promoguda a §2
 Proper pas previst: aplicar migració a Railway (`npx prisma migrate deploy`); verificar browser dossiers + safata. Següent front: Reserves (`/admin/bookings`) o continuació de millores de dossiers (cercador client BD, tots els packs animació).
 Avís per codex: #819+#820 commitats junts. Safata Enviats ara carrega de IMAP real. Dossiers amb paperera de 30 dies i cron registrat al monitor. Migració SQL inclosa però cal `migrate deploy` a Railway.
 
+[claude:opus] 2026-05-27 [ESTAT: tancat]
+Últim canvi: #821 (Safata Outlook — mirall IMAP/SMTP + X-Orbita + observabilitat).
+Proper pas previst: aplicar migració a Railway (`npx prisma migrate deploy`)
+i executar `scripts/backfill-append-imap.ts` per recuperar el rastre dels
+emails antics (cas Eric). Després verificació al browser.
+Avís per codex: TOT al working tree, sense commit. `npx tsc --noEmit` verd.
+- Backend complet (lib/imap.ts, lib/email.ts amb SendEmailResult,
+  EmailSend schema ampliat + migració, helpers X-Orbita, 5 nous endpoints).
+- UI complet (SafataClient refactor, sidebar carpetes IMAP dinàmiques,
+  selecció múltiple, accions en lot, pill X-Orbita, Composer 2.0 amb
+  Cc/Bcc/Reply/Reply-all/Forward/Drafts).
+- CSS noves classes amb tokens var(--ax-*).
+- Script backfill + .env.example + counter 821 + diari.
+LLEGIR `docs/safata-821-checklist.md` per a la secció B (operacional Codex):
+migració Railway + regenerar Prisma local + backfill cas Eric.
+Estratègia clau: el servidor IMAP és la font de veritat. Vinculació
+conversa ↔ entitat via headers MIME `X-Orbita-Kind/Id/Origin` + Message-ID
+estable `<orbita.{kind}.{id}.{ts}.{rand}@orbitaevents.com>`. La BD no entra
+al canal — només recull traça observable de tornada.
+
 ---
 
 ## Bloc CODEX (Codex CLI)
