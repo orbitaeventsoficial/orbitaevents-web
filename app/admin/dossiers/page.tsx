@@ -40,6 +40,21 @@ export default async function DossiersPage({ searchParams }: PageProps) {
       title="Dossiers"
       subtitle="Genera i gestiona els dossiers comercials per als clients."
     >
+      {/* Generador */}
+      <section className="dg__gen-section">
+        <h2 className="dg__section-title">Nou dossier</h2>
+        <DossierGeneratorClient
+          products={ANIMACIO_PRODUCTS}
+          logoDataUri={logoDataUri}
+          leadId={searchParams?.leadId}
+          initialNom={searchParams?.nom}
+          initialEmail={searchParams?.email}
+          initialTelefon={searchParams?.telefon}
+          initialEmpresa={searchParams?.empresa}
+          initialEventDesc={searchParams?.eventDesc}
+        />
+      </section>
+
       {/* Llista de dossiers desats */}
       {dossiers.length > 0 && (
         <section className="dg__list-section">
@@ -84,6 +99,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                       salutacio: d.salutacio ?? undefined,
                     }}
                     alreadySent={!!d.sentAt}
+                    logoDataUri={logoDataUri}
                   />
                 </div>
               );
@@ -92,20 +108,6 @@ export default async function DossiersPage({ searchParams }: PageProps) {
         </section>
       )}
 
-      {/* Generador */}
-      <section className="dg__gen-section">
-        <h2 className="dg__section-title">Nou dossier</h2>
-        <DossierGeneratorClient
-          products={ANIMACIO_PRODUCTS}
-          logoDataUri={logoDataUri}
-          leadId={searchParams?.leadId}
-          initialNom={searchParams?.nom}
-          initialEmail={searchParams?.email}
-          initialTelefon={searchParams?.telefon}
-          initialEmpresa={searchParams?.empresa}
-          initialEventDesc={searchParams?.eventDesc}
-        />
-      </section>
     </AdminPage>
   );
 }

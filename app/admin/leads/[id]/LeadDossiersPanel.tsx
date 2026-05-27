@@ -1,8 +1,19 @@
 import Link from 'next/link';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { getDossiersByLead } from '@/lib/services/dossierService';
 import { ANIMACIO_PRODUCTS } from '@/lib/constants/animacio-products';
 import { formatDateShort } from '@/lib/constants';
 import { LeadDossierActions } from './LeadDossierActions';
+
+function readLogoDataUri(): string {
+  try {
+    const svg = readFileSync(join(process.cwd(), 'public', 'img', 'orbitalockupwhite.svg'), 'utf-8');
+    return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
+  } catch {
+    return '';
+  }
+}
 
 interface Props {
   leadId: string;
@@ -13,6 +24,7 @@ interface Props {
 
 export async function LeadDossiersPanel({ leadId, leadNom, leadEmail, leadTelefon }: Props) {
   const dossiers = await getDossiersByLead(leadId);
+  const logoDataUri = readLogoDataUri();
 
   const newParams = new URLSearchParams();
   newParams.set('leadId', leadId);
@@ -65,6 +77,7 @@ export async function LeadDossiersPanel({ leadId, leadNom, leadEmail, leadTelefo
                     salutacio: d.salutacio ?? undefined,
                   }}
                   alreadySent={!!d.sentAt}
+                  logoDataUri={logoDataUri}
                 />
               </li>
             );

@@ -14,9 +14,10 @@ interface Props {
   productIds: string[];
   clientInfo: DossierClientInfo;
   alreadySent: boolean;
+  logoDataUri?: string;
 }
 
-export function DossierListActions({ dossierId, email, nom, productIds, clientInfo, alreadySent }: Props) {
+export function DossierListActions({ dossierId, email, nom, productIds, clientInfo, alreadySent, logoDataUri }: Props) {
   const toast = useToast();
   const router = useRouter();
   const [sending, setSending] = useState(false);
@@ -24,7 +25,7 @@ export function DossierListActions({ dossierId, email, nom, productIds, clientIn
 
   function preview() {
     const products = ANIMACIO_PRODUCTS.filter((p) => productIds.includes(p.id));
-    const html = buildDossierHtml(clientInfo, products);
+    const html = buildDossierHtml(clientInfo, products, { logoDataUri });
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     window.open(URL.createObjectURL(blob), '_blank', 'noopener,noreferrer');
   }
