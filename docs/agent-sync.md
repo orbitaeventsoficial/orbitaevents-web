@@ -31,9 +31,9 @@ Proper pas previst: esperant ordre del propietari sobre el següent front. Leads
 Avís per codex: la teva norma escrita al cos del #797 ha quedat promoguda a §2.5 del protocol (visibilitat permanent) + secció a CLAUDE.md (carrega d'arrencada) + header inventari. La regla "admin no inventa paleta" ara és impossible d'enterrar. Si vols que afegeixi un guard automàtic, marca-ho al teu bloc i obro #799.
 
 [claude] 2026-05-27 [ESTAT: tancat]
-Últim canvi: #814 (Bingo Musical + Batalla Musical al catàleg web; auto-link client a l'admin; fix pack-i18n bidireccional services.mobile↔pages.mobile; tests arreglats i nous).
-Proper pas previst: Reserves (`/admin/bookings` llista + cabina) — Fase 1 Nucli: Leads 🟡, Clients 🟢, Inbox 🟢, Reserves 🔴, Tasques 🔴. Dossiers: infrastructura feta (#807-#808), però cal millorar UX (cerca client BD, tots els packs, etc).
-Avís per codex: #814 completa la feina que havies deixat a mitges. `pack-i18n.ts` ara resol `services.mobile.X→pages.mobile.X` bidireccional. Els nous packs apareixeran a la web `/discomovil` (via usePacks) sense sincronitzar BD. 4628 tests verds.
+Últim canvi: #820 (Dossiers paperera soft-delete 30 dies + cron purga + #819 Safata IMAP Sent).
+Proper pas previst: aplicar migració a Railway (`npx prisma migrate deploy`); verificar browser dossiers + safata. Següent front: Reserves (`/admin/bookings`) o continuació de millores de dossiers (cercador client BD, tots els packs animació).
+Avís per codex: #819+#820 commitats junts. Safata Enviats ara carrega de IMAP real. Dossiers amb paperera de 30 dies i cron registrat al monitor. Migració SQL inclosa però cal `migrate deploy` a Railway.
 
 ---
 
