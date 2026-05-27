@@ -8,6 +8,8 @@
  * - Mejor espaciado y tipografía
  */
 
+import type { AnimacioProduct } from '@/lib/constants/animacio-products';
+import type { DossierClientInfo } from '@/lib/utils/dossier-html-builder';
 import { getPacksByService, EXTRAS, type ExtraDefinition, type ServiceSlug, type PackDefinition } from '@/app/config/packs-config';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { log } from '@/lib/logger';

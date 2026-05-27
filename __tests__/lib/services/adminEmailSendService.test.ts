@@ -6,6 +6,7 @@ const { mockPrisma, mockSendEmail, mockTranslate, mockResolveQuotePack, mockGetT
     customer: { findUnique: vi.fn() },
     leadNote: { create: vi.fn() },
     leadActivity: { count: vi.fn() },
+    adminLog: { create: vi.fn() },
   },
   mockSendEmail: vi.fn(),
   mockTranslate: vi.fn(),
@@ -52,6 +53,11 @@ vi.mock('@/lib/site', () => ({
 vi.mock('@/lib/services/imageManagerService', () => ({
   getManagedImageOverride: vi.fn().mockResolvedValue(null),
 }));
+const { mockRecordEmailSend } = vi.hoisted(() => ({ mockRecordEmailSend: vi.fn().mockResolvedValue({ id: 'es-test-1', trackingToken: 'tt-1' }) }));
+vi.mock('@/lib/services/emailTrackingService', () => ({
+  recordEmailSend: mockRecordEmailSend,
+  wrapLinksForTracking: (html: string) => html,
+}));
 vi.mock('@/lib/services/leadActivityService', () => ({
   recordLeadEmailSent: vi.fn(),
 }));
@@ -69,6 +75,7 @@ beforeEach(() => {
   mockPrisma.customer.findUnique.mockResolvedValue(null);
   mockPrisma.leadNote.create.mockResolvedValue({});
   mockPrisma.leadActivity.count.mockResolvedValue(0);
+  mockPrisma.adminLog.create.mockResolvedValue({});
   mockSendEmail.mockResolvedValue({});
   mockTranslate.mockImplementation((text: string) => Promise.resolve(text));
   mockResolveQuotePack.mockResolvedValue({ name: 'Basic', price: 500, djHours: 4, extraHourPrice: 75, description: 'Pack bàsic' });
@@ -115,11 +122,11 @@ describe('sendAdminEmail', () => {
     });
 
     expect(mockPrisma.leadNote.create).toHaveBeenCalled();
-    expect(recordLeadEmailSent).toHaveBeenCalledWith({
+    expect(recordLeadEmailSent).toHaveBeenCalledWith(expect.objectContaining({
       leadId: 'l1',
       subject: 'Seguiment',
       hasAttachments: false,
-    });
+    }));
   });
 
   it('registra customerActivity via capa shared si customerId', async () => {
@@ -167,5 +174,63 @@ describe('sendAdminEmail', () => {
         ]),
       })
     );
+  });
+
+  // ─── Bug #799 fix: adminLog COMM_SENT ─────────────────────────────────────
+  it('escriu adminLog COMM_SENT amb entity=lead si hi ha leadId', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', preferredLocale: 'ca' });
+    await sendAdminEmail({ to: 'a@test.com', subject: 'Hola', body: 'Cos', leadId: 'l1' });
+    expect(mockPrisma.adminLog.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        action: 'COMM_SENT',
+        entity: 'lead',
+        entityId: 'l1',
+        details: expect.objectContaining({ to: 'a@test.com', channel: 'email', flow: 'admin_compose' }),
+      }),
+    }));
+  });
+
+  it('escriu adminLog COMM_SENT amb entity=customer si hi ha customerId sense leadId', async () => {
+    mockPrisma.customer.findUnique.mockResolvedValue({ id: 'c1', preferredLocale: 'es' });
+    await sendAdminEmail({ to: 'b@test.com', subject: 'Salut', body: 'Cos', customerId: 'c1' });
+    expect(mockPrisma.adminLog.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        action: 'COMM_SENT',
+        entity: 'customer',
+        entityId: 'c1',
+      }),
+    }));
+  });
+
+  it('escriu adminLog COMM_SENT amb entity=admin_email si no hi ha lead ni customer', async () => {
+    await sendAdminEmail({ to: 'c@test.com', subject: 'Cap', body: 'Cos' });
+    expect(mockPrisma.adminLog.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        action: 'COMM_SENT',
+        entity: 'admin_email',
+        entityId: null,
+      }),
+    }));
+  });
+
+  // ─── #800: snapshot HTML body al EmailSend ─────────────────────────────────
+  it('passa htmlBody (HTML brandejat) a recordEmailSend per a previsualització admin', async () => {
+    await sendAdminEmail({ to: 'a@test.com', subject: 'Subject', body: 'Cos del missatge' });
+    expect(mockRecordEmailSend).toHaveBeenCalledWith(expect.objectContaining({
+      to: 'a@test.com',
+      subject: 'Subject',
+      htmlBody: expect.stringContaining('Cos del missatge'),
+    }));
+  });
+
+  it('vincula emailSendId al leadActivity quan hi ha lead', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', preferredLocale: 'ca' });
+    const { recordLeadEmailSent } = await import('@/lib/services/leadActivityService');
+    await sendAdminEmail({ to: 'a@test.com', subject: 'Subject', body: 'Cos', leadId: 'l1' });
+    expect(recordLeadEmailSent).toHaveBeenCalledWith(expect.objectContaining({
+      leadId: 'l1',
+      subject: 'Subject',
+      emailSendId: 'es-test-1',
+    }));
   });
 });

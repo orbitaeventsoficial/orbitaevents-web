@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { snapshotLeadsBeforeDelete } from '@/lib/services/leadArchiveSnapshot';
 
 type LeadPatchInput = Record<string, unknown>;
 
@@ -148,6 +149,8 @@ export async function deleteLeadIfAllowed(id: string): Promise<LeadRouteResult> 
   }
 
   await prisma.$transaction(async (tx) => {
+    // Snapshot a l'arxiu històric abans del delete (delete manual de leads LOST).
+    await snapshotLeadsBeforeDelete(tx, { leadIds: [id], archivedBy: 'admin' });
     await tx.leadNote.deleteMany({ where: { leadId: id } });
     await tx.leadActivity.deleteMany({ where: { leadId: id } });
     await tx.task.deleteMany({ where: { leadId: id } });

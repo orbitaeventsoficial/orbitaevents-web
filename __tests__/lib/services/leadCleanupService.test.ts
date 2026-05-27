@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-const { mockPrisma, mockMarkLeadAsLost } = vi.hoisted(() => ({
+const { mockPrisma, mockMarkLeadAsLost, mockSnapshotLeads } = vi.hoisted(() => ({
   mockPrisma: {
     lead: {
       findMany: vi.fn(),
@@ -10,14 +10,17 @@ const { mockPrisma, mockMarkLeadAsLost } = vi.hoisted(() => ({
     leadActivity: { deleteMany: vi.fn() },
     task: { deleteMany: vi.fn() },
     leadDocument: { deleteMany: vi.fn() },
+    leadArchive: { createMany: vi.fn() },
     $transaction: vi.fn(),
   },
   mockMarkLeadAsLost: vi.fn(),
+  mockSnapshotLeads: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/logger', () => ({ log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 vi.mock('@/lib/services/leadLossService', () => ({ markLeadAsLost: mockMarkLeadAsLost }));
+vi.mock('@/lib/services/leadArchiveSnapshot', () => ({ snapshotLeadsBeforeDelete: mockSnapshotLeads }));
 
 import { runLeadCleanup } from '@/lib/services/leadCleanupService';
 
@@ -79,6 +82,10 @@ describe('runLeadCleanup', () => {
     const result = await runLeadCleanup();
 
     expect(result.autoDeleted).toBe(2);
+    expect(mockSnapshotLeads).toHaveBeenCalledWith(
+      expect.anything(),
+      { leadIds: ['old1', 'old2'], archivedBy: 'system:lead-cleanup' },
+    );
     expect(mockPrisma.leadNote.deleteMany).toHaveBeenCalled();
     expect(mockPrisma.leadActivity.deleteMany).toHaveBeenCalled();
     expect(mockPrisma.task.deleteMany).toHaveBeenCalled();

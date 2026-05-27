@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockPrisma } = vi.hoisted(() => ({
+const { mockPrisma, mockSnapshotLeads } = vi.hoisted(() => ({
   mockPrisma: {
     lead: {
       findUnique: vi.fn(),
@@ -13,9 +13,11 @@ const { mockPrisma } = vi.hoisted(() => ({
     adminLog: { create: vi.fn() },
     $transaction: vi.fn(),
   },
+  mockSnapshotLeads: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
+vi.mock('@/lib/services/leadArchiveSnapshot', () => ({ snapshotLeadsBeforeDelete: mockSnapshotLeads }));
 
 import {
   getLeadDetail,

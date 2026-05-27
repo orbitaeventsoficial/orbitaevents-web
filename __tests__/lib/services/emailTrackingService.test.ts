@@ -292,6 +292,7 @@ describe('recordEmailSend', () => {
         leadId: 'lead-1',
         customerId: null,
         locale: null,
+        htmlBody: null,
       },
       select: { id: true, trackingToken: true },
     });

@@ -18,6 +18,7 @@ const { mockPrisma } = vi.hoisted(() => ({
     leadNote: { create: vi.fn() },
     leadDocument: { create: vi.fn() },
     leadActivity: { count: vi.fn() },
+    adminLog: { create: vi.fn() },
   },
 }));
 
@@ -148,6 +149,7 @@ beforeEach(() => {
   mockPrisma.leadNote.create.mockResolvedValue({});
   mockPrisma.leadDocument.create.mockResolvedValue({});
   mockPrisma.leadActivity.count.mockResolvedValue(0);
+  mockPrisma.adminLog.create.mockResolvedValue({});
 });
 
 // ═══════════ VALIDACIÓ ═══════════

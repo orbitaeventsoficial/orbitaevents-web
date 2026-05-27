@@ -170,6 +170,7 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
       leadId: resolvedLeadId || null,
       customerId: customerForLocale?.id || null,
       locale: resolvedLocale,
+      htmlBody: finalHtml, // snapshot pre-tracking per a previsualització a l'admin
     });
     const pixelUrl = `${APP_BASE_URL}/api/tracking/open/${trackingRecord.trackingToken}`;
     finalHtml = wrapLinksForTracking(finalHtml, trackingRecord.trackingToken, APP_BASE_URL);
@@ -194,6 +195,7 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
       leadId: resolvedLeadId,
       subject: translatedSubject,
       hasAttachments: Boolean(attachments),
+      emailSendId: trackingRecord?.id || null,
     });
   }
 
@@ -205,6 +207,26 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
       source: 'admin_emails_send',
     });
   }
+
+  // Log unificat a adminLog perquè /admin/activity (Comunicacions) detecti l'enviament.
+  // Sense això, l'email s'envia OK però queda invisible a la vista global d'activitat.
+  await prisma.adminLog.create({
+    data: {
+      action: 'COMM_SENT',
+      entity: resolvedLeadId ? 'lead' : (customerForLocale?.id ? 'customer' : 'admin_email'),
+      entityId: resolvedLeadId || customerForLocale?.id || null,
+      details: {
+        to,
+        subject: translatedSubject,
+        channel: 'email',
+        flow: quoteAttachment ? 'admin_compose_with_quote' : 'admin_compose',
+        hasAttachments: Boolean(attachments),
+        locale: resolvedLocale,
+        templateKey: templateKey || null,
+        trackingId: trackingRecord?.id || null,
+      },
+    },
+  });
 
   return { ok: true as const, status: 200, body: { ok: true } };
 }

@@ -24,6 +24,37 @@ export interface WeatherForecast {
   rainProbability: number; // 0-100
 }
 
+// Per als leads/entries del calendari de temporada (#794). Versió simplificada
+// amb tempMin/tempMax + `kind` mapejat al sistema visual del lab.
+export type EventWeatherKind = 'sun' | 'partly' | 'cloud' | 'rain' | 'storm';
+
+export interface EventWeather {
+  kind: EventWeatherKind;
+  tempMin: number;
+  tempMax: number;
+  description: string;
+  rainProbability: number;
+}
+
+const OWM_KIND_MAP: Record<string, EventWeatherKind> = {
+  Clear: 'sun',
+  Clouds: 'cloud',
+  Rain: 'rain',
+  Drizzle: 'rain',
+  Thunderstorm: 'storm',
+  Snow: 'storm',
+  Mist: 'cloud',
+  Fog: 'cloud',
+  Haze: 'cloud',
+  Dust: 'cloud',
+  Smoke: 'cloud',
+};
+
+export function owmMainToKind(main: string | undefined | null): EventWeatherKind {
+  if (!main) return 'partly';
+  return OWM_KIND_MAP[main] ?? 'partly';
+}
+
 // ─── Cache en memòria (1 hora) ──────────────────────────────────────
 
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hora
@@ -96,6 +127,109 @@ async function fetchWeatherForLocation(
     };
   } catch (error) {
     log.error(`Error obtenint previsió per "${location}"`, error);
+    return null;
+  }
+}
+
+// ─── Cache per location+data (per al calendari de temporada, #794) ─────
+
+const eventWeatherCache = new Map<string, { value: EventWeather | null; cachedAt: number }>();
+
+function eventCacheKey(location: string, eventDate: Date): string {
+  const y = eventDate.getUTCFullYear();
+  const m = String(eventDate.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(eventDate.getUTCDate()).padStart(2, '0');
+  return `${location.toLowerCase()}|${y}-${m}-${d}`;
+}
+
+export async function getWeatherForEvent(
+  location: string,
+  eventDate: Date,
+): Promise<EventWeather | null> {
+  const apiKey = process.env.OPENWEATHERMAP_API_KEY;
+  if (!apiKey) return null;
+
+  // L'API gratuïta d'OWM només dona forecast a 5 dies vista.
+  const now = Date.now();
+  const horizonMs = 5 * 86400000;
+  if (eventDate.getTime() - now > horizonMs) return null;
+  if (eventDate.getTime() < now - 86400000) return null; // events passats: irrellevant
+
+  const key = eventCacheKey(location, eventDate);
+  const cached = eventWeatherCache.get(key);
+  if (cached && now - cached.cachedAt < CACHE_TTL_MS) {
+    return cached.value;
+  }
+
+  try {
+    const url = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(location)}&appid=${apiKey}&units=metric&lang=ca`;
+    const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    if (!response.ok) {
+      log.warn(`getWeatherForEvent: resposta no vàlida per "${location}": ${response.status}`);
+      eventWeatherCache.set(key, { value: null, cachedAt: now });
+      return null;
+    }
+    const data: OWMResponse = await response.json();
+    if (!data.list || data.list.length === 0) {
+      eventWeatherCache.set(key, { value: null, cachedAt: now });
+      return null;
+    }
+
+    // Filtrar tots els data points del dia de l'event (UTC).
+    const eventY = eventDate.getUTCFullYear();
+    const eventM = eventDate.getUTCMonth();
+    const eventD = eventDate.getUTCDate();
+    const sameDayPoints = data.list.filter((p) => {
+      const ts = new Date(p.dt * 1000);
+      return ts.getUTCFullYear() === eventY && ts.getUTCMonth() === eventM && ts.getUTCDate() === eventD;
+    });
+
+    // Si no hi ha punts del dia exacte, fallback al més proper.
+    const points = sameDayPoints.length > 0 ? sameDayPoints : [
+      data.list.reduce((closest, p) => {
+        const diff = Math.abs(p.dt * 1000 - eventDate.getTime());
+        const closestDiff = Math.abs(closest.dt * 1000 - eventDate.getTime());
+        return diff < closestDiff ? p : closest;
+      }, data.list[0]),
+    ];
+
+    const temps = points.map((p) => p.main.temp);
+    const tempMin = Math.round(Math.min(...temps));
+    const tempMax = Math.round(Math.max(...temps));
+    const maxRain = points.reduce((m, p) => Math.max(m, p.pop ?? 0), 0);
+
+    // Kind dominant: el que apareix més vegades; si rain/storm hi és, prevalen.
+    const kindCounts = new Map<EventWeatherKind, number>();
+    for (const p of points) {
+      const kind = owmMainToKind(p.weather[0]?.main);
+      kindCounts.set(kind, (kindCounts.get(kind) ?? 0) + 1);
+    }
+    let dominant: EventWeatherKind = 'partly';
+    if (kindCounts.has('storm')) dominant = 'storm';
+    else if (kindCounts.has('rain')) dominant = 'rain';
+    else {
+      let best = 0;
+      for (const [k, c] of kindCounts.entries()) {
+        if (c > best) { best = c; dominant = k; }
+      }
+    }
+
+    const description = WEATHER_DESCRIPTIONS_CA[points[0].weather[0]?.main || 'Clear']
+      || points[0].weather[0]?.description
+      || 'Sense dades';
+
+    const result: EventWeather = {
+      kind: dominant,
+      tempMin,
+      tempMax,
+      description,
+      rainProbability: Math.round(maxRain * 100),
+    };
+    eventWeatherCache.set(key, { value: result, cachedAt: now });
+    return result;
+  } catch (error) {
+    log.error(`getWeatherForEvent: error per a "${location}"`, error);
+    eventWeatherCache.set(key, { value: null, cachedAt: now });
     return null;
   }
 }

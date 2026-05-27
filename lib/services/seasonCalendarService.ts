@@ -11,6 +11,13 @@ export interface SeasonCalendarLeadRaw {
   eventLocation: string | null;
   guestCount: number | null;
   estimatedValue: number | null;
+  lostReason: string | null;
+  phone: string | null;
+  email: string | null;
+  source: string | null;
+  assignedTo: string | null;
+  contactedAt: Date | null;
+  priority: string | null;
 }
 
 export interface SeasonCalendarBookingRaw {
@@ -43,6 +50,13 @@ export interface SeasonCalendarEntry {
   eventLocation: string | null;
   guestCount: number | null;
   estimatedValue: number | null;
+  lostReason: string | null;
+  phone: string | null;
+  email: string | null;
+  source: string | null;
+  assignedTo: string | null;
+  contactedAt: Date | null;
+  priority: string | null;
 }
 
 export interface SeasonWeekend {
@@ -147,6 +161,13 @@ export function buildSeasonCalendar(input: SeasonCalendarInput): SeasonCalendarR
       eventLocation: lead.eventLocation,
       guestCount: lead.guestCount,
       estimatedValue: lead.estimatedValue,
+      lostReason: lead.lostReason,
+      phone: lead.phone,
+      email: lead.email,
+      source: lead.source,
+      assignedTo: lead.assignedTo,
+      contactedAt: lead.contactedAt,
+      priority: lead.priority,
     };
     if (lead.eventDate) {
       scheduled.push(entry);
@@ -166,6 +187,13 @@ export function buildSeasonCalendar(input: SeasonCalendarInput): SeasonCalendarR
       eventLocation: booking.eventLocation,
       guestCount: booking.guestCount,
       estimatedValue: booking.total,
+      lostReason: null,
+      phone: null,
+      email: null,
+      source: null,
+      assignedTo: null,
+      contactedAt: null,
+      priority: null,
     });
   }
 
@@ -210,10 +238,11 @@ export async function loadSeasonCalendar(
   const [leads, bookings] = await Promise.all([
     prisma.lead.findMany({
       where: {
-        status: { notIn: ['LOST'] },
         OR: [
+          // qualsevol lead amb data dins la finestra (inclou LOST visibles al pipeline)
           { eventDate: { gte: start, lt: end } },
-          { eventDate: null },
+          // unscheduled: sense data i NO perduts (els LOST sense data no es mostren)
+          { eventDate: null, status: { notIn: ['LOST'] } },
         ],
       },
       select: {
@@ -224,6 +253,13 @@ export async function loadSeasonCalendar(
         eventType: true,
         eventLocation: true,
         guestCount: true,
+        lostReason: true,
+        phone: true,
+        email: true,
+        source: true,
+        assignedTo: true,
+        contactedAt: true,
+        priority: true,
         proposals: {
           where: { status: { in: ['SENT', 'ACCEPTED'] } },
           orderBy: { createdAt: 'desc' },
@@ -264,6 +300,13 @@ export async function loadSeasonCalendar(
       eventLocation: l.eventLocation,
       guestCount: l.guestCount,
       estimatedValue: l.proposals[0]?.total ?? null,
+      lostReason: l.lostReason,
+      phone: l.phone,
+      email: l.email,
+      source: l.source,
+      assignedTo: l.assignedTo,
+      contactedAt: l.contactedAt,
+      priority: l.priority as string | null,
     })),
     bookings: bookings.map((b) => ({
       id: b.id,

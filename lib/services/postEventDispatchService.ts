@@ -12,6 +12,7 @@ import {
 } from '@/lib/services/postEventEmailService';
 import { recordBookingCommunicationLog } from '@/lib/services/bookingCommunicationLogService';
 import { recordCustomerPostEventEmailSent } from '@/lib/services/customerActivityService';
+import { recordEmailSend } from '@/lib/services/emailTrackingService';
 
 export type PostEventDispatchResult = {
   bookingId: string;
@@ -110,7 +111,17 @@ export async function sendPostEventEmailForBooking(
     locale,
   });
 
-  await sendEmail({ to: email, subject: getPostEventSubject(locale, name), html: emailHtml });
+  const subject = getPostEventSubject(locale, name);
+  await sendEmail({ to: email, subject, html: emailHtml });
+
+  await recordEmailSend({
+    to: email,
+    subject,
+    templateKey: 'post-event',
+    leadId: booking.lead?.id ?? null,
+    customerId: booking.lead?.customerId ?? null,
+    locale,
+  }).catch(() => { /* no bloquejar si falla el tracking */ });
 
   await prisma.booking.update({
     where: { id: booking.id },

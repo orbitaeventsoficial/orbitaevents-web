@@ -20,6 +20,13 @@ function makeLead(overrides: Partial<SeasonCalendarLeadRaw> = {}): SeasonCalenda
     eventLocation: 'Barcelona',
     guestCount: 80,
     estimatedValue: 2000,
+    lostReason: null,
+    phone: null,
+    email: null,
+    source: null,
+    assignedTo: null,
+    contactedAt: null,
+    priority: null,
     ...overrides,
   };
 }
@@ -162,5 +169,15 @@ describe('buildSeasonCalendar', () => {
     const firstWeekend = result.weekends[0];
     // El primer divendres de juny 2026 és el 05/06/2026
     expect(firstWeekend.weekKey).toBe('2026-06-05');
+  });
+
+  it('propaga priority del lead a l\'entry (i null als bookings)', () => {
+    const lead = makeLead({ id: 'l1', priority: 'HIGH' });
+    const booking = makeBooking({ id: 'b1' });
+    const result = buildSeasonCalendar(makeInput([lead], [booking]));
+    const leadEntry = result.weekends.flatMap((w) => w.entries).find((e) => e.id === 'l1');
+    const bookingEntry = result.weekends.flatMap((w) => w.entries).find((e) => e.id === 'b1');
+    expect(leadEntry?.priority).toBe('HIGH');
+    expect(bookingEntry?.priority).toBeNull();
   });
 });

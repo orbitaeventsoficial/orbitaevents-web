@@ -202,6 +202,7 @@ export async function recordEmailSend(params: {
   leadId?: string | null;
   customerId?: string | null;
   locale?: string | null;
+  htmlBody?: string | null;
 }): Promise<{ id: string; trackingToken: string }> {
   const record = await prisma.emailSend.create({
     data: {
@@ -211,10 +212,35 @@ export async function recordEmailSend(params: {
       leadId: params.leadId || null,
       customerId: params.customerId || null,
       locale: params.locale || null,
+      htmlBody: params.htmlBody || null,
     },
     select: { id: true, trackingToken: true },
   });
   return record;
+}
+
+export async function loadSentEmail(idOrToken: string) {
+  const trimmed = idOrToken.trim();
+  if (!trimmed) return null;
+  return prisma.emailSend.findFirst({
+    where: { OR: [{ id: trimmed }, { trackingToken: trimmed }] },
+    select: {
+      id: true,
+      trackingToken: true,
+      templateKey: true,
+      to: true,
+      subject: true,
+      htmlBody: true,
+      leadId: true,
+      customerId: true,
+      locale: true,
+      sentAt: true,
+      openedAt: true,
+      openCount: true,
+      clickedAt: true,
+      clickCount: true,
+    },
+  });
 }
 
 export async function recordEmailClick(trackingToken: string): Promise<boolean> {

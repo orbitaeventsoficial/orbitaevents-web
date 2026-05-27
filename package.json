@@ -121,6 +121,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.97.1",
     "@google-analytics/data": "^5.2.1",
+    "@google/generative-ai": "^0.24.1",
     "@marsidev/react-turnstile": "^1.4.1",
     "@prisma/client": "^5.22.0",
     "@react-email/components": "1.0.1",

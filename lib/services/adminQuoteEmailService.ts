@@ -334,6 +334,26 @@ export async function sendAdminQuoteEmail(body: AdminQuoteEmailPayload | undefin
     }
   }
 
+  // Log unificat a adminLog perquè /admin/activity (Comunicacions) detecti l'enviament.
+  await prisma.adminLog.create({
+    data: {
+      action: 'COMM_SENT',
+      entity: activeLeadId ? 'lead' : (customer?.id ? 'customer' : 'admin_quote'),
+      entityId: activeLeadId || customer?.id || null,
+      details: {
+        to: recipientEmail,
+        subject: translatedSubject,
+        channel: 'email',
+        flow: 'admin_quote',
+        hasAttachments: false,
+        quoteNumber: quoteData.quoteNumber,
+        total: quoteData.total,
+        locale: resolvedLocale,
+        adminCopySent,
+      },
+    },
+  });
+
   return {
     ok: true as const,
     status: 200,

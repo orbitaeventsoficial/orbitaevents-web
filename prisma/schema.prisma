@@ -439,6 +439,7 @@ model Lead {
   activities     LeadActivity[]
   universalTasks Task[]
   documents      LeadDocument[]
+  dossiers       Dossier[]
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -468,6 +469,80 @@ model Lead {
   @@index([status, updatedAt]) // Per leads actius i frescor de pipeline
   @@index([lostReason]) // Audit trail: query per motiu de pèrdua
   @@map("leads")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DOSSIERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Dossier {
+  id          String    @id @default(cuid())
+  leadId      String?
+  lead        Lead?     @relation(fields: [leadId], references: [id], onDelete: SetNull)
+
+  // Dades del client al moment de la generació
+  nom         String
+  empresa     String?
+  telefon     String?
+  email       String?
+  eventDesc   String?
+  salutacio   String?   @db.Text
+
+  // Productes seleccionats (array d'IDs: 'bingo-musical', 'batalla-musical', 'dj')
+  productIds  String[]
+
+  // Estat d'enviament
+  sentAt      DateTime?
+  sentTo      String?   // email al qual es va enviar
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([leadId])
+  @@index([createdAt])
+  @@map("dossiers")
+}
+
+// Arxiu històric de leads LOST eliminats (snapshot abans de purgar).
+// Snapshot pres a `leadCleanupService` (cron auto-delete >90 dies) i a
+// `leadRouteService.deleteLeadIfAllowed` (delete manual). El registre original
+// de `leads` desapareix; aquest arxiu queda per a stats històriques.
+model LeadArchive {
+  id        String @id @default(cuid())
+  leadId    String // id original del lead a la taula `leads` (referència, no FK)
+
+  // Snapshot dels camps clau del lead al moment de la purga
+  name           String
+  email          String
+  phone          String?
+  eventType      EventType
+  eventDate      DateTime?
+  eventLocation  String?
+  guestCount     Int?
+  source         LeadSource
+  estimatedValue Float? // total del proposal SENT/ACCEPTED més recent, si n'hi havia
+  priority       Priority
+  assignedTo     String?
+
+  // Audit del LOST
+  lostReason String? // motiu canònic (LEAD_LOST_REASONS) o null si LOST sense motiu
+  lostAt     DateTime?
+
+  // Timestamps originals
+  originalCreatedAt DateTime
+  originalUpdatedAt DateTime
+  contactedAt       DateTime?
+
+  // Quan es va arxivar (auto-delete cron o manual)
+  archivedAt DateTime @default(now())
+  archivedBy String? // 'system:lead-cleanup' (cron) o 'admin' (manual)
+
+  @@index([archivedAt])
+  @@index([lostReason])
+  @@index([eventType])
+  @@index([source])
+  @@index([lostAt])
+  @@map("lead_archive")
 }
 
 enum EventType {
@@ -1630,6 +1705,7 @@ model EmailSend {
   templateKey   String? // 'primer-contacte', 'seguiment', etc.
   to            String
   subject       String
+  htmlBody      String?  @db.Text  // Snapshot del HTML enviat (per a previsualització a l'admin)
   leadId        String?
   customerId    String?
   locale        String?

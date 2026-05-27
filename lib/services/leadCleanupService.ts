@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { OPEN_LEAD_STATUSES } from '@/lib/constants';
 import { markLeadAsLost } from '@/lib/services/leadLossService';
+import { snapshotLeadsBeforeDelete } from '@/lib/services/leadArchiveSnapshot';
 
 /**
  * Lead Cleanup Service
@@ -70,6 +71,8 @@ export async function runLeadCleanup(): Promise<{
     const ids = leadsToDelete.map((l) => l.id);
 
     await prisma.$transaction(async (tx) => {
+      // Snapshot a l'arxiu històric ABANS del delete per conservar dades estadístiques
+      await snapshotLeadsBeforeDelete(tx, { leadIds: ids, archivedBy: 'system:lead-cleanup' });
       await tx.leadNote.deleteMany({ where: { leadId: { in: ids } } });
       await tx.leadActivity.deleteMany({ where: { leadId: { in: ids } } });
       await tx.task.deleteMany({ where: { leadId: { in: ids } } });
@@ -78,7 +81,7 @@ export async function runLeadCleanup(): Promise<{
       autoDeleted = deleted.count;
     });
 
-    log.info(`Lead cleanup: ${autoDeleted} leads LOST eliminats (>90 dies)`);
+    log.info(`Lead cleanup: ${autoDeleted} leads LOST eliminats (>90 dies, arxivats a lead_archive)`);
   }
 
   return {

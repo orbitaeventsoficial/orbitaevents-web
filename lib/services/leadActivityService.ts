@@ -36,6 +36,7 @@ export async function recordLeadEmailSent(input: {
   leadId: string;
   subject: string;
   hasAttachments?: boolean;
+  emailSendId?: string | null;
 }) {
   return prisma.leadActivity.create({
     data: {
@@ -43,6 +44,7 @@ export async function recordLeadEmailSent(input: {
       type: 'EMAIL',
       title: 'Email enviat',
       description: `${input.subject}${input.hasAttachments ? ' (amb pressupost)' : ''}`,
+      metadata: input.emailSendId ? { emailSendId: input.emailSendId } : undefined,
       createdBy: 'Admin',
     },
   });
