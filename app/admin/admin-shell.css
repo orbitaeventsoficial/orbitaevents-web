@@ -247,8 +247,8 @@
 
 /* ── Accions primàries al capdamunt del sidebar ───────────────────────────── */
 .ax__sidetop {
-  display: flex; flex-direction: column; gap: 8px;
-  padding-bottom: 14px; border-bottom: 1px solid var(--ax-line);
+  display: flex; flex-direction: row; gap: 6px;
+  padding-bottom: 12px; border-bottom: 1px solid var(--ax-line);
 }
 
 /* ── Items secundaris al submenú ──────────────────────────────────────────── */
@@ -270,8 +270,9 @@
 
 /* Botó d'acció primària: vora de llautó, fons fosc amb sheen */
 .ax__add {
-  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
-  padding: 11px 16px; border-radius: 12px;
+  flex: 1; min-width: 0;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 10px; border-radius: 10px;
   border: 1px solid var(--ax-hair-gold);
   background: linear-gradient(
     180deg,
@@ -279,7 +280,8 @@
     color-mix(in oklab, var(--ax-gold) 5%, var(--ax-panel))
   );
   color: var(--ax-gold-bright);
-  font: inherit; font-size: 14px; font-weight: 750; letter-spacing: 0.01em;
+  font: inherit; font-size: 12px; font-weight: 750; letter-spacing: 0.01em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   cursor: pointer; text-decoration: none;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   transition: transform 130ms ease, border-color 130ms ease, background 130ms ease;
@@ -299,8 +301,9 @@
 
 /* Botó d'accés directe a la safata d'entrada — posició primària al capdamunt */
 .ax__inbox {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 11px 16px; border-radius: 12px;
+  flex: 1; min-width: 0;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 10px; border-radius: 10px;
   border: 1px solid var(--ax-hair-gold);
   background: linear-gradient(
     180deg,
@@ -308,7 +311,8 @@
     color-mix(in oklab, var(--ax-gold) 5%, var(--ax-panel))
   );
   color: var(--ax-gold-bright);
-  font: inherit; font-size: 14px; font-weight: 750;
+  font: inherit; font-size: 12px; font-weight: 750;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   cursor: pointer; text-decoration: none;
   transition: transform 130ms ease, border-color 130ms ease, background 130ms ease;
 }

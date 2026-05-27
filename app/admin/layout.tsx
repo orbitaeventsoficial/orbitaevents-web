@@ -166,10 +166,10 @@ function AdminShell({ children }: { children: React.ReactNode }) {
                 href="/admin/inbox"
                 className={`ax__inbox${pathname?.startsWith('/admin/inbox') ? ' is-on' : ''}`}
               >
-                ✉ Safata d&apos;entrada
+                ✉ Safata
               </Link>
               <Link href="/admin/intake" className="ax__add">
-                Nova entrada
+                + Nova entrada
               </Link>
             </div>
 

@@ -55,14 +55,15 @@ conversa ↔ entitat via headers MIME `X-Orbita-Kind/Id/Origin` + Message-ID
 estable `<orbita.{kind}.{id}.{ts}.{rand}@orbitaevents.com>`. La BD no entra
 al canal — només recull traça observable de tornada.
 
-[claude] 2026-05-27 [ESTAT: tancat]
-Últim canvi: #822+#823 (safata UI millorada + ExtractEmailModal + CustomerContact múltiples contactes per client).
-Proper pas previst: seguir backlog — Reserves `/admin/bookings` o millores de leads. Migració `customer_contacts` ja aplicada a Railway.
-Avís per codex: Commitat. 17 fitxers, 850 insercions.
-- Safata: botons ràpids flag/esborrar en hover; capçalera detall reorganitzada; "✦ Crear lead" per emails entrants.
-- ExtractEmailModal: crea lead preomplert des de l'email (remitent, telèfon regex, tipus event heurística).
-- CustomerContact: model nou, migració aplicada, `customerContactService`, API routes, DTO, fetchCustomerHub, UI ContactsSection a SummaryPanel.
-- 8 tests nous + 6 mocks actualitzats. `validate:core` + `test:run` + `build` → tots verds.
+[claude] 2026-05-28 [ESTAT: tancat]
+Últim canvi: #824 (safata UX — botons compactes en fila, quickacts sempre visibles, footer fix, counter al dia).
+Proper pas previst: continuació del backlog — Reserves `/admin/bookings` o millores de leads. Els canvis WIP de la branca (adjunts IMAP: imap.ts, SafataClient, route attachment) encara no commitats — cal decidir si continuen o s'aparca.
+Avís per codex: Commitat. Canvis visuals purs, cap lògica tocada.
+- admin-shell.css: `.ax__sidetop` fila horitzontal; `.ax__inbox` + `.ax__add` flex:1, compactes.
+- layout.tsx: "Safata d'entrada" → "✉ Safata", "Nova entrada" → "+ Nova entrada".
+- inbox.css: `.sf` height:100dvh (footer sempre visible); `.sf__lead` grid 3 cols; quickacts sempre display:flex, 28×28px.
+- Counter 821 → 824 (cobrint #822+#823 que no el van actualitzar).
+- `validate:core` 60/60 verd.
 
 ---
 

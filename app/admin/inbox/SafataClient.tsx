@@ -59,6 +59,13 @@ type OrbitaLink = {
   source: 'header' | 'reference';
 };
 
+type ImapAttachment = {
+  partKey: string;
+  filename: string;
+  contentType: string;
+  size: number;
+};
+
 type ImapEmail = {
   id: string;
   uid: number;
@@ -73,6 +80,7 @@ type ImapEmail = {
   isRead: boolean;
   isFlagged?: boolean;
   hasAttachments: boolean;
+  attachments?: ImapAttachment[];
   orbita?: OrbitaLink;
   inReplyTo?: string;
   references?: string;
@@ -303,6 +311,16 @@ export default function SafataClient({
     }
   }, [active, emailsByFolder, folderState, loadFolderEmails]);
 
+  /* Quan estem a "Entrada" unificada, carregar el inbox IMAP si configurat */
+  useEffect(() => {
+    if (active.kind !== 'leads') return;
+    if (!imapConfigured || !special?.inbox) return;
+    const path = special.inbox;
+    if (!emailsByFolder[path] && !folderState[path]?.loading) {
+      loadFolderEmails(path, 0);
+    }
+  }, [active.kind, imapConfigured, special, emailsByFolder, folderState, loadFolderEmails]);
+
   /* Invalidar carpeta (refresh manual o post-acció) */
   const invalidateFolder = useCallback((path: string) => {
     setEmailsByFolder(prev => { const cp = { ...prev }; delete cp[path]; return cp; });
@@ -387,6 +405,34 @@ export default function SafataClient({
    * Si el folder és outbound, no auto-marquem com llegit (els enviats ja són
    * "llegits" per definició).
    */
+  /* Seleccionar email IMAP des de la vista d'entrada unificada (usa special.inbox) */
+  const handleSelectImapFromEntry = async (email: ImapEmail) => {
+    const folder = special?.inbox || 'INBOX';
+    setSelectedImap(email);
+    setDetailLoading(true);
+    try {
+      const params = new URLSearchParams({ folder });
+      const res = await fetch(`/api/admin/inbox/messages/${email.uid}?${params.toString()}`, {
+        headers: { 'x-admin': '1' },
+      });
+      const data = await res.json() as { ok: boolean; email?: ImapEmail };
+      if (data.ok && data.email) {
+        setSelectedImap(data.email);
+        if (!email.isRead) {
+          setEmailsByFolder(prev => ({
+            ...prev,
+            [folder]: (prev[folder] || []).map(e => e.uid === email.uid ? { ...e, isRead: true } : e),
+          }));
+          loadFolders();
+        }
+      }
+    } catch (err) {
+      console.error('[Safata] Error carregant email (entrada unificada):', err);
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
   const handleSelectImap = async (email: ImapEmail) => {
     setSelectedImap(email); // mostra capçalera de seguida (UX optimista)
     if (active.kind !== 'folder') return;
@@ -417,36 +463,38 @@ export default function SafataClient({
     }
   };
 
-  const setFlagSingle = async (email: ImapEmail, flag: boolean) => {
-    if (active.kind !== 'folder') return;
+  const setFlagSingle = async (email: ImapEmail, flag: boolean, folderOverride?: string) => {
+    const folder = folderOverride ?? (active.kind === 'folder' ? active.path : null);
+    if (!folder) return;
     try {
       const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.uid}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: flag ? 'flag' : 'unflag', folder: active.path }),
+        body: JSON.stringify({ action: flag ? 'flag' : 'unflag', folder }),
       });
       if (res.ok) {
         setEmailsByFolder(prev => ({
           ...prev,
-          [active.path]: (prev[active.path] || []).map(e => e.uid === email.uid ? { ...e, isFlagged: flag } : e),
+          [folder]: (prev[folder] || []).map(e => e.uid === email.uid ? { ...e, isFlagged: flag } : e),
         }));
         setSelectedImap(prev => prev?.uid === email.uid ? { ...prev, isFlagged: flag } : prev);
       }
     } catch (err) { console.error('[Safata] setFlag error:', err); }
   };
 
-  const markUnread = async (email: ImapEmail) => {
-    if (active.kind !== 'folder') return;
+  const markUnread = async (email: ImapEmail, folderOverride?: string) => {
+    const folder = folderOverride ?? (active.kind === 'folder' ? active.path : null);
+    if (!folder) return;
     try {
       const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.uid}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'markUnread', folder: active.path }),
+        body: JSON.stringify({ action: 'markUnread', folder }),
       });
       if (res.ok) {
         setEmailsByFolder(prev => ({
           ...prev,
-          [active.path]: (prev[active.path] || []).map(e => e.uid === email.uid ? { ...e, isRead: false } : e),
+          [folder]: (prev[folder] || []).map(e => e.uid === email.uid ? { ...e, isRead: false } : e),
         }));
         setSelectedImap(null);
         loadFolders();
@@ -454,16 +502,17 @@ export default function SafataClient({
     } catch (err) { console.error('[Safata] markUnread error:', err); }
   };
 
-  const deleteSingle = async (email: ImapEmail) => {
-    if (active.kind !== 'folder') return;
+  const deleteSingle = async (email: ImapEmail, folderOverride?: string) => {
+    const folder = folderOverride ?? (active.kind === 'folder' ? active.path : null);
+    if (!folder) return;
     try {
-      const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.uid}?folder=${encodeURIComponent(active.path)}`, {
+      const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.uid}?folder=${encodeURIComponent(folder)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'moveToTrash', folder: active.path }),
+        body: JSON.stringify({ action: 'moveToTrash', folder }),
       });
       if (res.ok) {
-        invalidateFolder(active.path);
+        invalidateFolder(folder);
         if (special?.trash) invalidateFolder(special.trash);
         setSelectedImap(null);
         loadFolders();
@@ -471,16 +520,17 @@ export default function SafataClient({
     } catch (err) { console.error('[Safata] delete error:', err); }
   };
 
-  const moveSingle = async (email: ImapEmail, targetFolder: string) => {
-    if (active.kind !== 'folder') return;
+  const moveSingle = async (email: ImapEmail, targetFolder: string, folderOverride?: string) => {
+    const folder = folderOverride ?? (active.kind === 'folder' ? active.path : null);
+    if (!folder) return;
     try {
       const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.uid}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'moveTo', folder: active.path, targetFolder }),
+        body: JSON.stringify({ action: 'moveTo', folder, targetFolder }),
       });
       if (res.ok) {
-        invalidateFolder(active.path);
+        invalidateFolder(folder);
         invalidateFolder(targetFolder);
         setSelectedImap(null);
         loadFolders();
@@ -536,6 +586,36 @@ export default function SafataClient({
     return f?.unread ?? 0;
   }, [folders, special]);
 
+  /* Emails del inbox IMAP per a la vista d'entrada unificada */
+  const inboxEmailsForEntry = useMemo(() => {
+    if (!imapConfigured || !special?.inbox) return [] as ImapEmail[];
+    return (emailsByFolder[special.inbox] || []) as ImapEmail[];
+  }, [imapConfigured, special, emailsByFolder]);
+
+  const filteredInboxEmails = useMemo(() => sortEmails(inboxEmailsForEntry.filter(e => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return e.from.address.toLowerCase().includes(q) || e.from.name.toLowerCase().includes(q) || e.subject.toLowerCase().includes(q);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- emailsByFolder s'accedeix via inboxEmailsForEntry, no cal com a dep directe
+  })), [inboxEmailsForEntry, search, sortBy]);
+
+  /* Llista unificada per a la vista "Entrada" */
+  type UnifiedItem =
+    | { kind: 'lead'; lead: SafataLead; date: Date }
+    | { kind: 'email'; email: ImapEmail; date: Date };
+
+  const unifiedInboxItems = useMemo((): UnifiedItem[] => {
+    if (active.kind !== 'leads') return [];
+    const items: UnifiedItem[] = [
+      ...filteredLeads.map(l => ({ kind: 'lead' as const, lead: l, date: new Date(l.createdAt) })),
+      ...filteredInboxEmails.map(e => ({ kind: 'email' as const, email: e, date: new Date(e.date) })),
+    ];
+    return items.sort((a, b) => b.date.getTime() - a.date.getTime());
+  }, [active.kind, filteredLeads, filteredInboxEmails]);
+
+  /* Comptador d'entrada unificada (leads no llegits + inbox IMAP no llegits) */
+  const entranceUnread = localStats.unreadLeads + (imapConfigured ? inboxUnread : 0);
+
   /* Sidebar groups */
   const specialFolders = useMemo(() => {
     if (!special) return [] as Array<FolderInfo & { iconKey: Exclude<SpecialUse, null> }>;
@@ -557,12 +637,12 @@ export default function SafataClient({
 
   /* Render ───────────────────────────────────────────────────────────────── */
   const paneTitle = active.kind === 'leads'
-    ? 'Entrades web'
+    ? 'Entrada'
     : (specialFolders.find(f => f.path === active.path)?.iconKey
         ? FOLDER_LABELS[specialFolders.find(f => f.path === active.path)!.iconKey]
         : (active.kind === 'folder' ? active.path : ''));
 
-  const paneCount = active.kind === 'leads' ? filteredLeads.length : filteredEmails.length;
+  const paneCount = active.kind === 'leads' ? unifiedInboxItems.length : filteredEmails.length;
   const hasSelected = (active.kind === 'leads' && !!selectedLead) || (active.kind === 'folder' && !!selectedImap);
 
   return (
@@ -577,13 +657,12 @@ export default function SafataClient({
 
         <nav className="sf__nav">
           <div className="sf__navgroup">
-            <span className="sf__navgroup-label">Web</span>
             <button type="button"
               className={`sf__navitem${active.kind === 'leads' ? ' is-on' : ''}`}
               onClick={() => handleTabChange({ kind: 'leads' })}>
-              <span className="sf__navitem-icon">📬</span>
-              <span className="sf__navitem-label">Entrades</span>
-              {localStats.unreadLeads > 0 && <span className="sf__navitem-badge">{localStats.unreadLeads}</span>}
+              <span className="sf__navitem-icon">📥</span>
+              <span className="sf__navitem-label">Entrada</span>
+              {entranceUnread > 0 && <span className="sf__navitem-badge">{entranceUnread}</span>}
             </button>
           </div>
 
@@ -591,7 +670,7 @@ export default function SafataClient({
             <div className="sf__navgroup">
               <span className="sf__navgroup-label">Bústia</span>
               {foldersError && <p className="sf__navgroup-error">{foldersError}</p>}
-              {specialFolders.map(f => (
+              {specialFolders.filter(f => f.iconKey !== 'inbox').map(f => (
                 <button key={f.path} type="button"
                   className={`sf__navitem${active.kind === 'folder' && active.path === f.path ? ' is-on' : ''}`}
                   onClick={() => handleTabChange({ kind: 'folder', path: f.path, specialUse: f.iconKey })}>
@@ -691,26 +770,53 @@ export default function SafataClient({
         </div>
 
         <div className="sf__pane-list">
-          {/* Entrades web */}
+          {/* Entrada unificada: leads web + inbox IMAP */}
           {active.kind === 'leads' && (
-            filteredLeads.length === 0 ? (
+            unifiedInboxItems.length === 0 ? (
               <div className="sf__empty">
                 <span className="sf__empty-icon">📭</span>
                 <p className="sf__empty-title">Cap entrada</p>
               </div>
-            ) : filteredLeads.map(lead => (
-              <button key={lead.id} type="button" onClick={() => handleSelectLead(lead)}
-                className={['sf__lead', selectedLead?.id === lead.id ? 'is-selected' : '', lead.status === 'NEW' ? 'is-unread' : ''].filter(Boolean).join(' ')}>
-                <div className="sf__lead-row">
-                  {lead.status === 'NEW' && <span className="sf__lead-dot" aria-label="Nova" />}
-                  <span className="sf__lead-name">{lead.name}</span>
-                  <span className="sf__lead-date">{formatDateShort(lead.createdAt)}</span>
+            ) : unifiedInboxItems.map(item => {
+              if (item.kind === 'lead') {
+                const lead = item.lead;
+                return (
+                  <button key={`lead-${lead.id}`} type="button" onClick={() => handleSelectLead(lead)}
+                    className={['sf__lead', selectedLead?.id === lead.id ? 'is-selected' : '', lead.status === 'NEW' ? 'is-unread' : ''].filter(Boolean).join(' ')}>
+                    <div className="sf__lead-row">
+                      {lead.status === 'NEW' && <span className="sf__lead-dot" aria-label="Nova" />}
+                      <span className="sf__lead-name">{lead.name}</span>
+                      <span className="sf__entry-type sf__entry-type--web">Web</span>
+                      <span className="sf__lead-date">{formatDateShort(lead.createdAt)}</span>
+                    </div>
+                    <p className="sf__lead-preview">
+                      {lead.eventType ?? '—'}{lead.eventDate ? ` · ${formatDate(lead.eventDate)}` : ''}
+                    </p>
+                  </button>
+                );
+              }
+              const email = item.email;
+              const isSelected = selectedImap?.id === email.id;
+              const pill = email.orbita ? buildOrbitaPill(email.orbita) : null;
+              return (
+                <div key={`email-${email.id}`} className={['sf__lead', isSelected ? 'is-selected' : '', !email.isRead ? 'is-unread' : ''].filter(Boolean).join(' ')}>
+                  <button type="button" onClick={() => handleSelectImapFromEntry(email)} className="sf__lead-body">
+                    <div className="sf__lead-row">
+                      {!email.isRead && <span className="sf__lead-dot" aria-label="No llegit" />}
+                      {email.isFlagged && <span className="sf__lead-flag is-on" aria-label="Marcat">★</span>}
+                      <span className="sf__lead-name">{email.from.name || email.from.address}</span>
+                      <span className="sf__entry-type sf__entry-type--mail">✉</span>
+                      <span className="sf__lead-date">{formatDateShort(email.date)}</span>
+                    </div>
+                    <p className="sf__lead-preview">
+                      {email.subject}
+                      {email.hasAttachments && <span className="sf__lead-attach"> 📎</span>}
+                      {pill && <span className="sf__lead-badge" title={pill.hint}>🔗 {pill.label}</span>}
+                    </p>
+                  </button>
                 </div>
-                <p className="sf__lead-preview">
-                  {lead.eventType ?? '—'}{lead.eventDate ? ` · ${formatDate(lead.eventDate)}` : ''}
-                </p>
-              </button>
-            ))
+              );
+            })
           )}
 
           {/* Carpeta IMAP */}
@@ -787,27 +893,27 @@ export default function SafataClient({
       {active.kind === 'leads' && selectedLead ? (
         <LeadDetail
           lead={selectedLead}
-          onClose={() => setSelectedLead(null)}
+          onClose={() => { setSelectedLead(null); }}
           onStatusChange={updateLocalStatus}
           onCustomerCreated={cid => setSelectedLead(prev => prev ? { ...prev, customerId: cid } : prev)}
           onCompose={() => setComposerOpen({ mode: 'lead-reply', lead: selectedLead })}
         />
-      ) : active.kind === 'folder' && selectedImap ? (
+      ) : (active.kind === 'leads' || active.kind === 'folder') && selectedImap ? (
         <ImapDetail
           email={selectedImap}
-          outbound={outbound}
+          outbound={active.kind === 'folder' ? outbound : false}
           loading={detailLoading}
           folders={folders}
           special={special}
-          currentPath={active.path}
+          currentPath={active.kind === 'folder' ? active.path : (special?.inbox || 'INBOX')}
           onClose={() => setSelectedImap(null)}
           onReply={() => setComposerOpen({ mode: 'reply', email: selectedImap })}
           onReplyAll={() => setComposerOpen({ mode: 'reply-all', email: selectedImap })}
           onForward={() => setComposerOpen({ mode: 'forward', email: selectedImap })}
-          onFlag={(val) => setFlagSingle(selectedImap, val)}
-          onMarkUnread={() => markUnread(selectedImap)}
-          onMove={(target) => moveSingle(selectedImap, target)}
-          onDelete={() => deleteSingle(selectedImap)}
+          onFlag={(val) => setFlagSingle(selectedImap, val, active.kind === 'leads' ? (special?.inbox ?? undefined) : undefined)}
+          onMarkUnread={() => markUnread(selectedImap, active.kind === 'leads' ? (special?.inbox ?? undefined) : undefined)}
+          onMove={(target) => moveSingle(selectedImap, target, active.kind === 'leads' ? (special?.inbox ?? undefined) : undefined)}
+          onDelete={() => deleteSingle(selectedImap, active.kind === 'leads' ? (special?.inbox ?? undefined) : undefined)}
         />
       ) : !hasSelected && !composerOpen ? (
         <div className="sf__detail-blank">
@@ -828,6 +934,7 @@ export default function SafataClient({
           email={composerOpen.email}
           lead={composerOpen.lead}
           draftsAvailable={!!special?.drafts}
+          imapFolder={active.kind === 'folder' ? active.path : (special?.inbox ?? undefined)}
           onClose={() => setComposerOpen(null)}
           onSent={() => {
             setComposerOpen(null);
@@ -1014,12 +1121,13 @@ function MoveDropdown({
 
 /* ── Composer ──────────────────────────────────────────────────────────── */
 function Composer({
-  mode, email, lead, draftsAvailable, onClose, onSent,
+  mode, email, lead, draftsAvailable, imapFolder, onClose, onSent,
 }: {
   mode: 'new' | 'reply' | 'reply-all' | 'forward' | 'lead-reply';
   email?: ImapEmail;
   lead?: SafataLead;
   draftsAvailable: boolean;
+  imapFolder?: string;
   onClose: () => void;
   onSent: () => void;
 }) {
@@ -1069,6 +1177,17 @@ function Composer({
   const [error, setError] = useState('');
   const [success, setSuccess] = useState<null | { ok: boolean; folder: string | null; uid?: number; smtp: string }>(null);
 
+  /* Adjunts reenviats: per defecte tots seleccionats */
+  const forwardAttachments = mode === 'forward' ? (email?.attachments ?? []) : [];
+  const [selectedAttachPartKeys, setSelectedAttachPartKeys] = useState<Set<string>>(
+    () => new Set(forwardAttachments.map(a => a.partKey))
+  );
+  const toggleAttach = (partKey: string) => setSelectedAttachPartKeys(prev => {
+    const next = new Set(prev);
+    if (next.has(partKey)) next.delete(partKey); else next.add(partKey);
+    return next;
+  });
+
   const selectTpl = (key: string) => {
     const t = TPLS.find(x => x.key === key) ?? TPLS[0];
     setTpl(key);
@@ -1103,6 +1222,11 @@ function Composer({
           leadId: lead?.id ?? (orbitaCtx?.kind === 'lead' ? orbitaCtx.id : undefined),
           customerId: lead?.customerId ?? (orbitaCtx?.kind === 'customer' ? orbitaCtx.id : undefined),
           locale: lead?.preferredLocale ?? 'ca',
+          imapAttachments: forwardAttachments.length > 0 && selectedAttachPartKeys.size > 0
+            ? forwardAttachments
+                .filter(a => selectedAttachPartKeys.has(a.partKey))
+                .map(a => ({ uid: email!.uid, folder: imapFolder || 'INBOX', partKey: a.partKey, filename: a.filename, contentType: a.contentType }))
+            : undefined,
         }),
       });
       const data = await res.json() as { ok: boolean; error?: string };
@@ -1187,6 +1311,21 @@ function Composer({
             <button type="button" onClick={() => setShowBcc(true)} className="sf__compose-cc-toggle">+ CCO</button>
           )}
           <input type="text" value={subject} onChange={e => setSubject(e.target.value)} placeholder="Assumpte" aria-label="Assumpte" className="sf__compose-subject" />
+          {forwardAttachments.length > 0 && (
+            <div className="sf__compose-attachrow">
+              <span className="sf__compose-attachlbl">📎 Adjunts:</span>
+              {forwardAttachments.map(a => (
+                <label key={a.partKey} className="sf__compose-attachcheck">
+                  <input
+                    type="checkbox"
+                    checked={selectedAttachPartKeys.has(a.partKey)}
+                    onChange={() => toggleAttach(a.partKey)}
+                  />
+                  <span>{a.filename}</span>
+                </label>
+              ))}
+            </div>
+          )}
           <textarea value={body} onChange={e => setBody(e.target.value)} placeholder="Escriu el missatge..." aria-label="Cos del mail" className="sf__compose-body" />
           {error && <p className="sf__action-error">{error}</p>}
           {success && (
@@ -1315,6 +1454,24 @@ function LeadDetail({
   );
 }
 
+function attachIcon(contentType: string): string {
+  const ct = contentType.toLowerCase();
+  if (ct.startsWith('image/')) return '🖼';
+  if (ct === 'application/pdf') return '📄';
+  if (ct.includes('spreadsheet') || ct.includes('excel') || ct.endsWith('.xlsx') || ct.endsWith('.xls')) return '📊';
+  if (ct.includes('wordprocessing') || ct.includes('word') || ct.endsWith('.docx') || ct.endsWith('.doc')) return '📝';
+  if (ct.startsWith('video/')) return '🎬';
+  if (ct.startsWith('audio/')) return '🎵';
+  if (ct.includes('zip') || ct.includes('rar') || ct.includes('7z') || ct.includes('tar')) return '🗜';
+  return '📎';
+}
+
+function formatAttachSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 /* ── Detall IMAP ───────────────────────────────────────────────────────── */
 function ImapDetail({
   email, outbound, loading, folders, special, currentPath,
@@ -1413,6 +1570,35 @@ function ImapDetail({
             <p className="sf__imap-text-empty">(sense cos de text)</p>
           )}
         </div>
+        {!loading && email.attachments && email.attachments.length > 0 && (
+          <div className="sf__attachments">
+            <p className="sf__attachments-label">📎 Adjunts ({email.attachments.length})</p>
+            <div className="sf__attachments-list">
+              {email.attachments.map(att => {
+                const params = new URLSearchParams({
+                  folder: currentPath,
+                  part: att.partKey,
+                  filename: att.filename,
+                  contentType: att.contentType,
+                });
+                return (
+                  <a
+                    key={att.partKey}
+                    href={`/api/admin/inbox/messages/${email.uid}/attachment?${params.toString()}`}
+                    className="sf__attach-chip"
+                    download={att.filename}
+                  >
+                    <span className="sf__attach-chip-icon">{attachIcon(att.contentType)}</span>
+                    <span className="sf__attach-chip-name">{att.filename}</span>
+                    {att.size > 0 && (
+                      <span className="sf__attach-chip-size">{formatAttachSize(att.size)}</span>
+                    )}
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {extractOpen && (

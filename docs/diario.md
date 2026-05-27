@@ -1,3 +1,29 @@
+## 2026-05-28 — Canvi #824: Safata UX — botons compactes en fila + quickacts sempre visibles + footer fix (claude)
+
+### Context
+L'usuari identificà 4 problemes visuals/UX a la safata:
+1. Dos grans botons daurats idèntics ("Safata d'entrada" i "Nova entrada") apilats verticalment al capdamunt de la sidebar admin.
+2. Els botons flag/delete de les files IMAP (quickacts) amagats per hover — dificulta descobrir la funcionalitat.
+3. "Nou correu" i "Configuració" al peu de la sidebar de la safata quedaven tallats per sota del viewport (`.sf` tenia `min-height` sense `height` explícit).
+4. ESLint disable sense motiu a SafataClient.tsx (línia 599).
+
+### Canvi
+- **`app/admin/admin-shell.css`**: `.ax__sidetop` passa de `flex-direction: column` a `flex-direction: row; gap: 6px`. `.ax__inbox` i `.ax__add` reben `flex: 1; min-width: 0; padding: 8px 10px; font-size: 12px; white-space: nowrap; text-overflow: ellipsis` perquè convisquin compactes en fila.
+- **`app/admin/layout.tsx`**: Etiqueta escurçada de "Safata d'entrada" a "✉ Safata" i "Nova entrada" a "+ Nova entrada" perquè el text cabi en la meitat de l'amplada.
+- **`app/admin/inbox/inbox.css`**: `.sf` canvia `min-height: 100dvh` → `height: 100dvh; overflow: hidden` — el footer queda ancorat. `.sf__lead` passa a `grid-template-columns: auto 1fr auto` per acomodar els quickacts. `.sf__lead-quickacts` ara té `display: flex` sempre (eliminat el toggle `display: none` + `:hover trigger`). `.sf__lead-quickacts .sf__iconbtn` augmentat a 28×28px (de 24×24px).
+- **`app/admin/inbox/SafataClient.tsx`**: Afegit motiu al comentari `eslint-disable-next-line` (línia 599).
+- **`lib/constants/admin.ts`**: Counter actualitzat 821 → 824 (cobrint els #822+#823 que no el van actualitzar).
+
+### Validació
+- `npx tsc --noEmit` → 0 errors
+- `pnpm run validate:core` → 60/60 passes, tots els guards verds
+- Verificació visual al browser (dev server) → botons en fila OK, footer visible OK, quickacts sempre visibles OK, detall + Respondre OK
+
+### Estat
+**TANCAT**
+
+---
+
 ## 2026-05-27 — Canvi #822+#823: Safata UI millorada + extreure lead des d'email + múltiples contactes per client (claude)
 
 ### Context

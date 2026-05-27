@@ -8,7 +8,8 @@
 .sf {
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
   background: var(--ax-canvas);
   color: var(--ax-t);
 }
@@ -758,14 +759,14 @@
 .sf__detail-headactions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
 }
 .sf__compose-trigger {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 14px;
+  padding: 9px 18px;
   border: 1px solid var(--ax-hair-gold);
   border-radius: 9px;
   background: linear-gradient(
@@ -779,6 +780,7 @@
   font-weight: 700;
   cursor: pointer;
   transition: border-color 120ms ease, background 120ms ease;
+  white-space: nowrap;
 }
 .sf__compose-trigger:hover {
   border-color: var(--ax-gold);
@@ -1489,10 +1491,8 @@
     color-mix(in oklab, var(--ax-panel) 60%, var(--ax-canvas)),
     var(--ax-canvas)
   );
-  overflow-y: auto;
-  scrollbar-width: none;
+  overflow: hidden;
 }
-.sf__sidebar::-webkit-scrollbar { display: none; }
 
 .sf__sidebar-brand {
   flex: none;
@@ -1506,7 +1506,11 @@
   flex-direction: column;
   gap: 2px;
   padding: 8px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  min-height: 0;
 }
+.sf__nav::-webkit-scrollbar { display: none; }
 
 .sf__navitem {
   display: flex;
@@ -1847,9 +1851,9 @@
 /* ── Llista: checkbox per fila + body + flag + attach + badge X-Orbita ── */
 .sf__lead {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   gap: 8px;
-  padding: 12px 12px;
+  padding: 10px 10px;
   border-bottom: 1px solid var(--ax-line);
   cursor: pointer;
   transition: background 120ms ease;
@@ -1857,7 +1861,7 @@
   background: none;
   border-left: 3px solid transparent;
   text-align: left;
-  align-items: start;
+  align-items: center;
 }
 .sf__lead-checkbox {
   flex-shrink: 0;
@@ -2049,8 +2053,13 @@
   justify-content: flex-end;
 }
 @media (max-width: 1280px) {
-  .sf__detail-headactions { gap: 4px; }
+  .sf__detail-headactions { gap: 6px; }
   .sf__detail-headactions .sf__action-btn--sm { padding: 5px 8px; font-size: 11px; }
+}
+@media (max-width: 900px) {
+  .sf__compose-trigger { padding: 8px 12px; font-size: 12px; }
+  .sf__extract-btn { padding: 8px 10px; font-size: 12px; }
+  .sf__iconbtn { width: 30px; height: 30px; font-size: 14px; }
 }
 
 /* ── Icones ràpides (flag/delete a la llista + grup accions al detall) ── */
@@ -2058,13 +2067,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
   border: 1px solid transparent;
   background: transparent;
   color: var(--ax-t3);
-  font-size: 13px;
+  font-size: 15px;
   cursor: pointer;
   transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
   flex-shrink: 0;
@@ -2089,31 +2098,27 @@
 .sf__detail-acts-group {
   display: flex;
   align-items: center;
-  gap: 2px;
-  padding: 2px 6px;
+  gap: 3px;
+  padding: 3px 8px;
   border: 1px solid var(--ax-line);
-  border-radius: 9px;
+  border-radius: 10px;
   background: var(--ax-sunk);
 }
 
-/* Icones ràpides a la fila de la llista (flag + delete) */
+/* Icones ràpides a la fila de la llista (flag + delete) — sempre visibles */
 .sf__lead-quickacts {
-  display: none;
+  display: flex;
   flex-direction: column;
   gap: 3px;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  padding-left: 4px;
-}
-.sf__lead:hover .sf__lead-quickacts,
-.sf__lead.is-selected .sf__lead-quickacts {
-  display: flex;
+  padding-left: 2px;
 }
 .sf__lead-quickacts .sf__iconbtn {
-  width: 24px;
-  height: 24px;
-  font-size: 11px;
+  width: 28px;
+  height: 28px;
+  font-size: 13px;
 }
 
 /* ── Barra accions sempre visible si hi ha text de cerca ─────────────── */
@@ -2126,17 +2131,18 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 10px;
+  padding: 9px 14px;
   border: 1px solid color-mix(in oklab, #5bc0de 30%, var(--ax-line));
   border-radius: 8px;
   background: color-mix(in oklab, #5bc0de 8%, var(--ax-panel));
   color: color-mix(in oklab, #5bc0de 80%, var(--ax-t));
   font: inherit;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   transition: background 120ms ease, border-color 120ms ease;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 .sf__extract-btn:hover {
   background: color-mix(in oklab, #5bc0de 15%, var(--ax-panel));
@@ -2196,4 +2202,121 @@
   color: var(--ax-t3);
   border-top: 1px solid var(--ax-line);
   line-height: 1.5;
+}
+
+/* ── Adjunts al composer (mode forward) ───────────────────────────────── */
+.sf__compose-attachrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--ax-line);
+  background: color-mix(in oklab, var(--ax-gold) 3%, var(--ax-panel));
+}
+.sf__compose-attachlbl {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ax-t3);
+  white-space: nowrap;
+}
+.sf__compose-attachcheck {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border: 1px solid var(--ax-line2);
+  border-radius: 6px;
+  background: var(--ax-panel);
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--ax-t2);
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.sf__compose-attachcheck:has(input:checked) {
+  border-color: var(--ax-hair-gold);
+  background: color-mix(in oklab, var(--ax-gold) 8%, var(--ax-panel));
+  color: var(--ax-gold-bright);
+}
+.sf__compose-attachcheck input[type="checkbox"] {
+  accent-color: var(--ax-gold);
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+/* ── Badges de tipus a la llista unificada ────────────────────────────── */
+.sf__entry-type {
+  flex-shrink: 0;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 4px;
+  line-height: 1.6;
+}
+.sf__entry-type--web {
+  background: color-mix(in oklab, var(--ax-gold) 15%, var(--ax-panel));
+  border: 1px solid var(--ax-hair-gold);
+  color: var(--ax-gold-bright);
+}
+.sf__entry-type--mail {
+  background: color-mix(in oklab, #5bc0de 10%, var(--ax-panel));
+  border: 1px solid color-mix(in oklab, #5bc0de 25%, var(--ax-line));
+  color: color-mix(in oklab, #5bc0de 70%, var(--ax-t));
+  font-size: 11px;
+  padding: 0 3px;
+}
+
+/* ── Adjunts al detall del correu ──────────────────────────────────────── */
+.sf__attachments {
+  padding: 14px 20px 20px;
+  border-top: 1px solid var(--ax-line);
+}
+.sf__attachments-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ax-t3);
+  margin: 0 0 10px;
+}
+.sf__attachments-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.sf__attach-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px;
+  border: 1px solid var(--ax-line2);
+  border-radius: 9px;
+  background: var(--ax-panel);
+  color: var(--ax-t2);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  max-width: 240px;
+  transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
+}
+.sf__attach-chip:hover {
+  border-color: var(--ax-hair-gold);
+  background: var(--ax-raised);
+  color: var(--ax-t);
+}
+.sf__attach-chip-icon { flex-shrink: 0; font-size: 15px; }
+.sf__attach-chip-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sf__attach-chip-size {
+  flex-shrink: 0;
+  font-size: 10px;
+  color: var(--ax-t3);
+  font-weight: 500;
 }
