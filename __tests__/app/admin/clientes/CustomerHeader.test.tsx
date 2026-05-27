@@ -61,6 +61,7 @@ function makeCustomerHubData() {
     tasks: [],
     discountCodes: [],
     leads: [],
+  contacts: [],
     followUpSummary: undefined,
     commSummary: {
       total: 0,

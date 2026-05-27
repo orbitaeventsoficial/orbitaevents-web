@@ -221,6 +221,17 @@ export type CustomerInsightsDTO = {
   pendingPaymentTotal: number;
 };
 
+export type CustomerContactDTO = {
+  id: string;
+  name: string;
+  role?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  notes?: string | null;
+  isPrimary: boolean;
+  createdAt: string;
+};
+
 export type CustomerReactivationDTO = {
   reasonLabel: string;
   priority: 'ALTA' | 'MITJANA' | 'BAIXA';
@@ -271,6 +282,7 @@ export type CustomerHubDTO = {
   timeline: TimelineEventDTO[];
   discountCodes: DiscountCodeDTO[];
   leads: LeadDTO[];
+  contacts: CustomerContactDTO[];
   insights: CustomerInsightsDTO;
   reactivation?: CustomerReactivationDTO | null;
 };

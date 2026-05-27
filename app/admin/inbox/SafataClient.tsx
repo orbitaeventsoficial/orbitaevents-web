@@ -755,6 +755,20 @@ export default function SafataClient({
                         {pill && <span className="sf__lead-badge" title={pill.hint}>🔗 {pill.label}</span>}
                       </p>
                     </button>
+                    <div className="sf__lead-quickacts">
+                      <button type="button"
+                        className={`sf__iconbtn${email.isFlagged ? ' is-on' : ''}`}
+                        title={email.isFlagged ? 'Treure marca' : 'Marcar'}
+                        onClick={e => { e.stopPropagation(); setFlagSingle(email, !email.isFlagged); }}>
+                        {email.isFlagged ? '★' : '☆'}
+                      </button>
+                      <button type="button"
+                        className="sf__iconbtn sf__iconbtn--danger"
+                        title="Esborrar"
+                        onClick={e => { e.stopPropagation(); deleteSingle(email); }}>
+                        🗑
+                      </button>
+                    </div>
                   </div>
                 );
               })}
@@ -825,6 +839,136 @@ export default function SafataClient({
           }}
         />
       )}
+    </div>
+  );
+}
+
+/* ── Modal Extreure dades d'email ────────────────────────────────────── */
+const EVENT_TYPES_LABELS: Record<string, string> = {
+  WEDDING: 'Casament', BIRTHDAY: 'Aniversari', CORPORATE: 'Empresa', COMMUNION: 'Comunió',
+  BAPTISM: 'Bateig', GRADUATION: 'Graduació', ANNIVERSARY: 'Aniversari de parella',
+  PRIVATE_PARTY: 'Festa privada', OTHER: 'Altre',
+};
+
+function guessEventType(subject: string, body: string): string {
+  const txt = `${subject} ${body}`.toLowerCase();
+  if (txt.includes('boda') || txt.includes('casament') || txt.includes('wedding')) return 'WEDDING';
+  if (txt.includes('empresa') || txt.includes('corporate') || txt.includes('corporat')) return 'CORPORATE';
+  if (txt.includes('comunió') || txt.includes('comunion') || txt.includes('communion')) return 'COMMUNION';
+  if (txt.includes('bateig') || txt.includes('bautizo') || txt.includes('baptism')) return 'BAPTISM';
+  if (txt.includes('graduació') || txt.includes('graduacion') || txt.includes('graduatio')) return 'GRADUATION';
+  if (txt.includes('fiesta') || txt.includes('festa') || txt.includes('party')) return 'PRIVATE_PARTY';
+  if (txt.includes('cumpleaños') || txt.includes('aniversari') || txt.includes('birthday')) return 'BIRTHDAY';
+  return 'OTHER';
+}
+
+function extractPhoneFromText(text: string): string {
+  const m = text.match(/(?:tel[.:\s]*|phone[.:\s]*|mob[.:\s]*|tlf[.:\s]*|telèfon[:\s]*)?((?:\+34|0034|34)?[\s.-]?[67]\d{2}[\s.-]?\d{3}[\s.-]?\d{3})/i);
+  return m ? m[1].replace(/[\s.-]/g, '') : '';
+}
+
+function ExtractEmailModal({
+  email, onClose, onDone,
+}: {
+  email: ImapEmail;
+  onClose: () => void;
+  onDone: (leadId: string) => void;
+}) {
+  const fromName = email.from.name || '';
+  const fromEmail = email.from.address || '';
+  const guessedPhone = extractPhoneFromText(`${email.bodyText || ''} ${email.subject}`);
+  const guessedEventType = guessEventType(email.subject, email.bodyText || '');
+
+  const [name, setName] = useState(fromName);
+  const [emailVal, setEmailVal] = useState(fromEmail);
+  const [phone, setPhone] = useState(guessedPhone);
+  const [eventType, setEventType] = useState(guessedEventType);
+  const [message, setMessage] = useState((email.bodyText || '').slice(0, 600));
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleCreate = async () => {
+    if (!name.trim() || !emailVal.trim()) return;
+    setSaving(true); setError('');
+    try {
+      const res = await fetchWithCsrf('/api/admin/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: emailVal.trim(),
+          phone: phone.trim() || undefined,
+          eventType,
+          message: message.trim() || undefined,
+          source: 'OTHER',
+        }),
+      });
+      const data = await res.json() as { ok?: boolean; lead?: { id: string }; error?: string };
+      if (!res.ok || !data.lead?.id) {
+        setError(data.error || 'Error creant lead');
+        return;
+      }
+      onDone(data.lead.id);
+    } catch (err) {
+      console.error('[ExtractEmailModal] error:', err);
+      setError('Error de connexió');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="sf__modal-backdrop" role="dialog" aria-modal="true" aria-label="Extreure dades del correu">
+      <div className="sf__modal sf__extract-modal">
+        <div className="sf__modal-head">
+          <span className="sf__modal-title">✦ Crear lead des del correu</span>
+          <button type="button" onClick={onClose} className="sf__detail-close" aria-label="Tancar">✕</button>
+        </div>
+        <div className="sf__modal-body">
+          <div className="sf__extract-fields">
+            <div className="sf__extract-row">
+              <span className="sf__extract-lbl">Nom</span>
+              <input type="text" value={name} onChange={e => setName(e.target.value)} className="sf__extract-input" aria-label="Nom" />
+            </div>
+            <div className="sf__extract-row">
+              <span className="sf__extract-lbl">Email</span>
+              <input type="email" value={emailVal} onChange={e => setEmailVal(e.target.value)} className="sf__extract-input" aria-label="Email" />
+            </div>
+            <div className="sf__extract-row">
+              <span className="sf__extract-lbl">Telèfon</span>
+              <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} className="sf__extract-input" placeholder="Opcional" aria-label="Telèfon" />
+            </div>
+            <div className="sf__extract-row">
+              <span className="sf__extract-lbl">Tipus d&apos;event</span>
+              <select value={eventType} onChange={e => setEventType(e.target.value)} className="sf__extract-select" aria-label="Tipus d'event">
+                {Object.entries(EVENT_TYPES_LABELS).map(([k, v]) => (
+                  <option key={k} value={k}>{v}</option>
+                ))}
+              </select>
+            </div>
+            <div className="sf__extract-row" style={{ gridTemplateColumns: '130px 1fr', alignItems: 'start' }}>
+              <span className="sf__extract-lbl" style={{ paddingTop: 12 }}>Missatge</span>
+              <textarea
+                value={message}
+                onChange={e => setMessage(e.target.value)}
+                className="sf__extract-input"
+                rows={4}
+                aria-label="Missatge"
+              />
+            </div>
+          </div>
+          <p className="sf__extract-hint">
+            Es crearà un lead amb estat CONTACTED i s&apos;intentarà vincular al client existent.
+          </p>
+          {error && <p className="sf__action-error" style={{ padding: '8px 16px' }}>{error}</p>}
+        </div>
+        <div className="sf__modal-footer">
+          <button type="button" onClick={handleCreate} disabled={saving || !name.trim() || !emailVal.trim()} className="sf__action-btn sf__action-btn--primary">
+            {saving ? 'Creant...' : 'Crear lead'}
+          </button>
+          <button type="button" onClick={onClose} className="sf__action-btn sf__action-btn--ghost">Cancel·lar</button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1191,6 +1335,7 @@ function ImapDetail({
   onMove: (target: string) => void;
   onDelete: () => void;
 }) {
+  const [extractOpen, setExtractOpen] = useState(false);
   const display = outbound
     ? ((email.to ?? [])[0]?.name || (email.to ?? [])[0]?.address || '—')
     : (email.from.name || email.from.address);
@@ -1210,20 +1355,27 @@ function ImapDetail({
         </div>
         <div className="sf__detail-headactions">
           {!outbound && (
-            <>
-              <button type="button" onClick={onReply} className="sf__compose-trigger" title="Respondre">✉ Respondre</button>
-              <button type="button" onClick={onReplyAll} className="sf__action-btn sf__action-btn--ghost sf__action-btn--sm" title="Respondre a tothom">↩ Tothom</button>
-            </>
+            <button type="button" onClick={onReply} className="sf__compose-trigger" title="Respondre">✉ Respondre</button>
           )}
-          <button type="button" onClick={onForward} className="sf__action-btn sf__action-btn--ghost sf__action-btn--sm" title="Reenviar">➡ Fwd</button>
-          <button type="button" onClick={() => onFlag(!email.isFlagged)} className="sf__action-btn sf__action-btn--ghost sf__action-btn--sm" title={email.isFlagged ? 'Treure marca' : 'Marcar amb estrella'}>
-            {email.isFlagged ? '★' : '☆'}
-          </button>
-          <MoveDropdown folders={folders} special={special} currentPath={currentPath} onMove={onMove} />
-          {!outbound && (
-            <button type="button" onClick={onMarkUnread} className="sf__action-btn sf__action-btn--ghost sf__action-btn--sm" title="Marcar com no llegit">○</button>
+          {!outbound && !email.orbita && (
+            <button type="button" onClick={() => setExtractOpen(true)} className="sf__extract-btn" title="Crear lead des d'aquest correu">
+              ✦ Crear lead
+            </button>
           )}
-          <button type="button" onClick={onDelete} className="sf__action-btn sf__action-btn--ghost sf__action-btn--sm" title="Esborrar">🗑</button>
+          <div className="sf__detail-acts-group">
+            {!outbound && (
+              <button type="button" onClick={onReplyAll} className="sf__iconbtn" title="Respondre a tothom">↩↩</button>
+            )}
+            <button type="button" onClick={onForward} className="sf__iconbtn" title="Reenviar">➡</button>
+            <button type="button" onClick={() => onFlag(!email.isFlagged)} className={`sf__iconbtn${email.isFlagged ? ' is-on' : ''}`} title={email.isFlagged ? 'Treure marca' : 'Marcar amb estrella'}>
+              {email.isFlagged ? '★' : '☆'}
+            </button>
+            <MoveDropdown folders={folders} special={special} currentPath={currentPath} onMove={onMove} />
+            {!outbound && (
+              <button type="button" onClick={onMarkUnread} className="sf__iconbtn" title="Marcar com no llegit">○</button>
+            )}
+            <button type="button" onClick={onDelete} className="sf__iconbtn sf__iconbtn--danger" title="Esborrar">🗑</button>
+          </div>
           <button type="button" onClick={onClose} className="sf__detail-close" aria-label="Tancar">✕</button>
         </div>
       </div>
@@ -1262,6 +1414,17 @@ function ImapDetail({
           )}
         </div>
       </div>
+
+      {extractOpen && (
+        <ExtractEmailModal
+          email={email}
+          onClose={() => setExtractOpen(false)}
+          onDone={leadId => {
+            setExtractOpen(false);
+            window.open(buildLeadWorkspaceHref(leadId), '_blank', 'noopener,noreferrer');
+          }}
+        />
+      )}
     </div>
   );
 }

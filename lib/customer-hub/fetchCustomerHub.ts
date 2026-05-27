@@ -1,5 +1,6 @@
 import type { CustomerDiscountCode, Proposal } from '@prisma/client';
-import type { CustomerHubDTO, CustomerCommSummaryDTO, CustomerFollowUpSummaryDTO, DiscountCodeDTO, HubStatus, LeadDTO, MessageDTO, TaskDTO } from './dto';
+import type { CustomerContactDTO, CustomerHubDTO, CustomerCommSummaryDTO, CustomerFollowUpSummaryDTO, DiscountCodeDTO, HubStatus, LeadDTO, MessageDTO, TaskDTO } from './dto';
+import { prisma } from '@/lib/prisma';
 import { resolveActiveDocument } from './proposalActive';
 import { buildCustomerActivityTimelineEvents, buildCustomerBusinessTimelineEvents } from './timeline';
 import { buildLeadCommercialBlocker } from './leadCommercialBlocker';
@@ -314,6 +315,21 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
       : undefined,
   }));
 
+  const contactsRaw = await prisma.customerContact.findMany({
+    where: { customerId: resolvedCustomerId },
+    orderBy: [{ isPrimary: 'desc' }, { createdAt: 'asc' }],
+  });
+  const contacts: CustomerContactDTO[] = contactsRaw.map(c => ({
+    id: c.id,
+    name: c.name,
+    role: c.role,
+    email: c.email,
+    phone: c.phone,
+    notes: c.notes,
+    isPrimary: c.isPrimary,
+    createdAt: c.createdAt.toISOString(),
+  }));
+
   const hubBase = {
     customer: {
       id: customerBase.id,
@@ -356,6 +372,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     timeline,
     discountCodes,
     leads: leadsDTO,
+    contacts,
   };
 
   const insights = computeCustomerInsights(hubBase as CustomerHubDTO);

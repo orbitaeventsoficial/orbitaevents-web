@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
+import type { CustomerContactDTO, CustomerHubDTO } from '@/lib/customer-hub/dto';
 import { formatDate, formatDateFull, formatDateShort, formatDateSimple, formatCurrency, formatNumber, getEventLabel, getLeadStatusDisplay } from '@/lib/constants';
 import {
   CUSTOMER_LIFECYCLE_LABELS,
@@ -428,6 +428,8 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
           />
         </div>
       </div>
+
+      <ContactsSection customerId={data.customer.id} contacts={data.contacts ?? []} />
 
       <div className="admin-customer-card admin-customer-card--ops rounded-2xl border p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.operations)}>
         <h2 className="text-lg font-semibold">Resum operatiu</h2>
@@ -1212,6 +1214,170 @@ function CrmStatusBar({
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+/* ── Contactes addicionals ───────────────────────────────────────────── */
+type ContactForm = {
+  name: string;
+  role: string;
+  email: string;
+  phone: string;
+  notes: string;
+  isPrimary: boolean;
+};
+
+const EMPTY_FORM: ContactForm = { name: '', role: '', email: '', phone: '', notes: '', isPrimary: false };
+
+function ContactsSection({ customerId, contacts: initialContacts }: { customerId: string; contacts: CustomerContactDTO[] }) {
+  const [contacts, setContacts] = useState<CustomerContactDTO[]>(initialContacts);
+  const [adding, setAdding] = useState(false);
+  const [form, setForm] = useState<ContactForm>(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [error, setError] = useState('');
+
+  const startEdit = (c: CustomerContactDTO) => {
+    setEditId(c.id);
+    setForm({ name: c.name, role: c.role || '', email: c.email || '', phone: c.phone || '', notes: c.notes || '', isPrimary: c.isPrimary });
+    setAdding(false);
+  };
+
+  const handleSave = async () => {
+    if (!form.name.trim()) return;
+    setSaving(true); setError('');
+    try {
+      const url = editId
+        ? `/api/admin/customers/${customerId}/contacts/${editId}`
+        : `/api/admin/customers/${customerId}/contacts`;
+      const method = editId ? 'PATCH' : 'POST';
+      const res = await fetchWithCsrf(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, email: form.email || null }),
+      });
+      const data = await res.json() as { ok: boolean; contact?: CustomerContactDTO; error?: string };
+      if (!data.ok) { setError(data.error || 'Error'); return; }
+      if (data.contact) {
+        if (editId) {
+          setContacts(prev => prev.map(c => c.id === editId ? data.contact! : c));
+        } else {
+          setContacts(prev => [...prev, data.contact!]);
+        }
+      }
+      setAdding(false);
+      setEditId(null);
+      setForm(EMPTY_FORM);
+    } catch (err) {
+      console.error('[ContactsSection] error:', err);
+      setError('Error de connexió');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    setSaving(true);
+    try {
+      await fetchWithCsrf(`/api/admin/customers/${customerId}/contacts/${id}`, { method: 'DELETE' });
+      setContacts(prev => prev.filter(c => c.id !== id));
+      if (editId === id) { setEditId(null); setForm(EMPTY_FORM); }
+    } catch (err) {
+      console.error('[ContactsSection] delete error:', err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const isEditing = adding || editId !== null;
+
+  return (
+    <div className="rounded-2xl border p-5">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold">Persones de contacte</h2>
+        {!isEditing && (
+          <button
+            type="button"
+            onClick={() => { setAdding(true); setEditId(null); setForm(EMPTY_FORM); }}
+            className="rounded-xl border px-3 py-1.5 text-xs"
+          >
+            + Afegir contacte
+          </button>
+        )}
+      </div>
+
+      {contacts.length === 0 && !adding && (
+        <p className="text-sm opacity-50">Cap contacte addicional registrat.</p>
+      )}
+
+      <div className="flex flex-col gap-3">
+        {contacts.map(c => (
+          <div key={c.id} className="flex items-start justify-between gap-3 rounded-xl border p-3">
+            <div className="flex flex-col gap-0.5 min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-sm">{c.name}</span>
+                {c.isPrimary && <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border border-[var(--ax-hair-gold)] text-[var(--ax-gold-bright)] bg-[color-mix(in_oklab,var(--ax-gold)_10%,var(--ax-panel))]">Principal</span>}
+              </div>
+              {c.role && <span className="text-xs opacity-60">{c.role}</span>}
+              {c.email && <a href={`/admin/inbox/compose?to=${encodeURIComponent(c.email)}&customerId=${customerId}`} className="text-xs text-[var(--ax-gold-bright)]">{c.email}</a>}
+              {c.phone && <a href={`tel:${c.phone}`} className="text-xs opacity-70">{c.phone}</a>}
+              {c.notes && <p className="text-xs opacity-50 mt-1">{c.notes}</p>}
+            </div>
+            <div className="flex gap-1 flex-shrink-0">
+              <button type="button" onClick={() => startEdit(c)} className="rounded-lg border px-2 py-1 text-xs opacity-60 hover:opacity-100">✏</button>
+              <button type="button" onClick={() => handleDelete(c.id)} disabled={saving} className="rounded-lg border px-2 py-1 text-xs opacity-60 hover:opacity-100">🗑</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {isEditing && (
+        <div className="mt-4 rounded-xl border p-4 flex flex-col gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <label htmlFor="contact-name" className="text-xs font-semibold uppercase tracking-wider opacity-60 block mb-1">Nom *</label>
+              <input id="contact-name" type="text" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+                className="w-full rounded-lg border bg-transparent px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label htmlFor="contact-role" className="text-xs font-semibold uppercase tracking-wider opacity-60 block mb-1">Càrrec / rol</label>
+              <input id="contact-role" type="text" value={form.role} onChange={e => setForm(p => ({ ...p, role: e.target.value }))}
+                className="w-full rounded-lg border bg-transparent px-3 py-2 text-sm" placeholder="Director, Responsable..." />
+            </div>
+            <div>
+              <label htmlFor="contact-email" className="text-xs font-semibold uppercase tracking-wider opacity-60 block mb-1">Email</label>
+              <input id="contact-email" type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
+                className="w-full rounded-lg border bg-transparent px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label htmlFor="contact-phone" className="text-xs font-semibold uppercase tracking-wider opacity-60 block mb-1">Telèfon</label>
+              <input id="contact-phone" type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
+                className="w-full rounded-lg border bg-transparent px-3 py-2 text-sm" />
+            </div>
+          </div>
+          <div>
+            <label htmlFor="contact-notes" className="text-xs font-semibold uppercase tracking-wider opacity-60 block mb-1">Notes</label>
+            <textarea id="contact-notes" value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))}
+              className="w-full rounded-lg border bg-transparent px-3 py-2 text-sm" rows={2} />
+          </div>
+          <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="checkbox" checked={form.isPrimary} onChange={e => setForm(p => ({ ...p, isPrimary: e.target.checked }))} className="accent-amber-400" />
+            Contacte principal
+          </label>
+          {error && <p className="text-xs text-red-400">{error}</p>}
+          <div className="flex gap-2">
+            <button type="button" onClick={handleSave} disabled={saving || !form.name.trim()}
+              className="rounded-xl px-4 py-2 text-sm font-semibold border border-[var(--ax-hair-gold)] text-[var(--ax-gold-bright)] disabled:opacity-50">
+              {saving ? 'Desant...' : editId ? 'Desar canvis' : 'Afegir'}
+            </button>
+            <button type="button" onClick={() => { setAdding(false); setEditId(null); setForm(EMPTY_FORM); setError(''); }}
+              className="rounded-xl px-4 py-2 text-sm border opacity-60 hover:opacity-100">
+              Cancel·lar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

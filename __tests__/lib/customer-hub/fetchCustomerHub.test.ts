@@ -9,6 +9,7 @@ const {
   mockBuildCustomerActivityTimelineEvents,
   mockLoadCommTimeline,
   mockFetchCanonicalEventsForCustomer,
+  mockPrisma,
 } = vi.hoisted(() => ({
   mockResolveCustomerHubCustomerId: vi.fn(),
   mockFetchCustomerHubCustomerBase: vi.fn(),
@@ -18,7 +19,10 @@ const {
   mockBuildCustomerActivityTimelineEvents: vi.fn(),
   mockLoadCommTimeline: vi.fn(),
   mockFetchCanonicalEventsForCustomer: vi.fn(),
+  mockPrisma: { customerContact: { findMany: vi.fn() } },
 }));
+
+vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 
 vi.mock('@/lib/customer-hub/data', () => ({
   resolveCustomerHubCustomerId: mockResolveCustomerHubCustomerId,
@@ -45,6 +49,7 @@ import { fetchCustomerHub } from '@/lib/customer-hub/fetchCustomerHub';
 beforeEach(() => {
   vi.clearAllMocks();
 
+  mockPrisma.customerContact.findMany.mockResolvedValue([]);
   mockResolveCustomerHubCustomerId.mockResolvedValue('cust-1');
   mockFetchCustomerHubCustomerBase.mockResolvedValue({
     id: 'cust-1',

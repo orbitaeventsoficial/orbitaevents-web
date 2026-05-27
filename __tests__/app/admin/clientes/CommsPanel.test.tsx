@@ -60,6 +60,7 @@ const HUB: CustomerHubDTO = {
   timeline: [],
   discountCodes: [],
   leads: [],
+  contacts: [],
   insights: {
     nextAction: {
       type: 'FOLLOW_UP',

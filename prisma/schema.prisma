@@ -293,6 +293,7 @@ model Customer {
   consentRecords ConsentRecord[]
   dataRequests   DataRequest[]
   portalAccesses ClientPortalAccess[]
+  contacts       CustomerContact[]
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -306,6 +307,24 @@ model Customer {
   @@index([healthScore])
   @@index([referredById])
   @@map("customers")
+}
+
+model CustomerContact {
+  id         String  @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  name       String
+  role       String? // "Director comercial", "Responsable d'events", etc.
+  email      String?
+  phone      String?
+  notes      String?
+  isPrimary  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([customerId])
+  @@map("customer_contacts")
 }
 
 enum CustomerLifecycle {

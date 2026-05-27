@@ -89,6 +89,7 @@ const HUB: CustomerHubDTO = {
       },
     },
   ],
+  contacts: [],
   insights: {
     nextAction: { type: 'NONE', label: 'Cap', urgency: 'LOW' },
     commercialRisk: { level: 'NONE', label: 'Sense risc comercial actiu' },
@@ -302,6 +303,7 @@ describe('SummaryPanel', () => {
     const reactivationHub: CustomerHubDTO = {
       ...HUB,
       leads: [],
+  contacts: [],
       reactivation: {
         reasonLabel: 'VIP dormant',
         priority: 'ALTA',

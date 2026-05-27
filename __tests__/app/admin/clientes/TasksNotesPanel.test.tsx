@@ -56,6 +56,7 @@ const HUB: CustomerHubDTO = {
   timeline: [],
   discountCodes: [],
   leads: [],
+  contacts: [],
   insights: {
     nextAction: { type: 'NONE', label: 'Cap', urgency: 'LOW' },
     commercialRisk: { level: 'NONE', label: 'Sense risc comercial actiu' },

@@ -2052,3 +2052,148 @@
   .sf__detail-headactions { gap: 4px; }
   .sf__detail-headactions .sf__action-btn--sm { padding: 5px 8px; font-size: 11px; }
 }
+
+/* ── Icones ràpides (flag/delete a la llista + grup accions al detall) ── */
+.sf__iconbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ax-t3);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+  flex-shrink: 0;
+}
+.sf__iconbtn:hover {
+  background: var(--ax-raised);
+  border-color: var(--ax-line2);
+  color: var(--ax-t);
+}
+.sf__iconbtn.is-on {
+  color: var(--ax-gold-bright);
+  background: color-mix(in oklab, var(--ax-gold) 12%, var(--ax-panel));
+  border-color: var(--ax-hair-gold);
+}
+.sf__iconbtn--danger:hover {
+  background: color-mix(in oklab, var(--o-stage-lost) 12%, var(--ax-panel));
+  border-color: color-mix(in oklab, var(--o-stage-lost) 30%, transparent);
+  color: var(--o-stage-lost);
+}
+
+/* Grup d'icones al detall (agrupades amb separació) */
+.sf__detail-acts-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 6px;
+  border: 1px solid var(--ax-line);
+  border-radius: 9px;
+  background: var(--ax-sunk);
+}
+
+/* Icones ràpides a la fila de la llista (flag + delete) */
+.sf__lead-quickacts {
+  display: none;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding-left: 4px;
+}
+.sf__lead:hover .sf__lead-quickacts,
+.sf__lead.is-selected .sf__lead-quickacts {
+  display: flex;
+}
+.sf__lead-quickacts .sf__iconbtn {
+  width: 24px;
+  height: 24px;
+  font-size: 11px;
+}
+
+/* ── Barra accions sempre visible si hi ha text de cerca ─────────────── */
+.sf__pane-actions--search-pinned {
+  border-bottom: 2px solid color-mix(in oklab, var(--ax-gold) 40%, var(--ax-line));
+}
+
+/* ── Panel botó "Extreure dades" a la capçalera del detall ───────────── */
+.sf__extract-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid color-mix(in oklab, #5bc0de 30%, var(--ax-line));
+  border-radius: 8px;
+  background: color-mix(in oklab, #5bc0de 8%, var(--ax-panel));
+  color: color-mix(in oklab, #5bc0de 80%, var(--ax-t));
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+  flex-shrink: 0;
+}
+.sf__extract-btn:hover {
+  background: color-mix(in oklab, #5bc0de 15%, var(--ax-panel));
+  border-color: color-mix(in oklab, #5bc0de 50%, var(--ax-line));
+}
+
+/* ── Modal Extreure client ─────────────────────────────────────────────── */
+.sf__extract-modal {
+  max-width: 560px;
+}
+.sf__extract-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.sf__extract-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  align-items: center;
+  border-bottom: 1px solid var(--ax-line);
+}
+.sf__extract-row:last-child { border-bottom: none; }
+.sf__extract-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ax-t3);
+  padding: 10px 14px;
+  border-right: 1px solid var(--ax-line);
+}
+.sf__extract-input {
+  border: none;
+  background: transparent;
+  color: var(--ax-t);
+  font: inherit;
+  font-size: 13px;
+  padding: 10px 14px;
+  outline: none;
+  width: 100%;
+}
+.sf__extract-input:focus { background: color-mix(in oklab, var(--ax-gold) 4%, var(--ax-panel)); }
+.sf__extract-select {
+  border: none;
+  background: transparent;
+  color: var(--ax-t);
+  font: inherit;
+  font-size: 13px;
+  padding: 10px 14px;
+  outline: none;
+  width: 100%;
+  cursor: pointer;
+}
+.sf__extract-hint {
+  padding: 10px 16px;
+  font-size: 12px;
+  color: var(--ax-t3);
+  border-top: 1px solid var(--ax-line);
+  line-height: 1.5;
+}
