@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { ANIMACIO_PRODUCTS } from '@/lib/constants/animacio-products';
 import { buildDossierHtml, type DossierClientInfo } from '@/lib/utils/dossier-html-builder';
 import { sendEmail } from '@/lib/email';
+import { recordEmailSend } from '@/lib/services/emailTrackingService';
 
 export type CreateDossierInput = {
   leadId?: string;
@@ -83,10 +84,19 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
       text: `Hola ${dossier.nom},\n\nT'enviem el dossier amb les nostres propostes: ${productsLabel}.\n\nQualsevol dubte, contacta'ns al 654 46 70 87 o info@orbitaevents.com\n\nÒrbita Events`,
     });
 
+    const now = new Date();
     await prisma.dossier.update({
       where: { id },
-      data: { sentAt: new Date(), sentTo: recipientEmail },
+      data: { sentAt: now, sentTo: recipientEmail },
     });
+
+    await recordEmailSend({
+      templateKey: 'dossier',
+      to: recipientEmail,
+      subject,
+      leadId: dossier.leadId || null,
+      htmlBody: html,
+    }).catch(() => {});
 
     return { ok: true };
   } catch (err) {
