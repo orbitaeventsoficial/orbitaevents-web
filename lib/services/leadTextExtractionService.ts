@@ -203,7 +203,7 @@ function inferSource(text: string): LeadSource {
   if (/(whatsapp|wa\.me|\bwp\b)/.test(input)) return 'WHATSAPP';
   if (/(instagram|\big\b)/.test(input)) return 'INSTAGRAM';
   if (/(wallapop)/.test(input)) return 'WALLAPOP';
-  if (/(gmail|hotmail|outlook|assumpte|asunto|email|correo)/.test(input) || extractEmail(text)) return 'EMAIL' as LeadSource;
+  if (/(gmail|hotmail|outlook|assumpte|asunto|email|correo)/.test(input) || extractEmail(text)) return 'OTHER';
   if (/(trucada|llamada|telefono|telefon)/.test(input)) return 'PHONE';
   return 'OTHER';
 }
