@@ -2,6 +2,7 @@ import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { extractLeadDataFromText } from '@/lib/services/leadTextExtractionService';
 
 const PROMPT = (text: string) => `Analitza aquesta conversa (pot ser un WhatsApp, email o text) i extreu la informació del CLIENT (no de l'empresa Òrbita Events). Retorna ÚNICAMENT un JSON vàlid sense cap text addicional, amb exactament aquests camps (deixa "" si no trobes la informació):
 
@@ -33,70 +34,8 @@ function classifyGeminiError(err: unknown): 'quota' | 'unavailable' {
   return 'unavailable';
 }
 
-function extractName(text: string): string {
-  const patterns = [
-    /sóc (?:en |la |l')?([A-ZÁÉÍÓÚÀÈÌÒÙÜÏÇÑ][a-záéíóúàèìòùüïçñA-ZÁÉÍÓÚÀÈÌÒÙÜÏÇÑ]{2,}(?:\s[A-ZÁÉÍÓÚÀÈÌÒÙÜÏÇÑ][a-záéíóúàèìòùüïçñ]+)?)/,
-    /soy (?:el |la )?(?:presidente|presidenta|sr\.|sra\.)?\s*([A-ZÁÉÍÓÚÀÈÌÒÙÜÏÇÑ][a-záéíóúàèìòùüïçñ]{2,}(?:\s[A-ZÁÉÍÓÚÀÈÌÒÙÜÏÇÑ][a-záéíóúàèìòùüïçñ]+)?)/i,
-    /em dic ([A-ZÁÉÍÓÚÀÈÌÒÙÜÏÇÑ][a-záéíóúàèìòùüïçñ]{2,}(?:\s[A-ZÁÉÍÓÚÀÈÌÒÙÜÏÇÑ][a-záéíóúàèìòùüïçñ]+)?)/i,
-    /me llamo ([A-ZÁÉÍÓÚÀÈÌÒÙÜÏÇÑ][a-záéíóúàèìòùüïçñ]{2,}(?:\s[A-ZÁÉÍÓÚÀÈÌÒÙÜÏÇÑ][a-záéíóúàèìòùüïçñ]+)?)/i,
-    /soy ([A-ZÁÉÍÓÚÀÈÌÒÙÜÏÇÑ][a-záéíóúàèìòùüïçñ]{2,}(?:\s[A-ZÁÉÍÓÚÀÈÌÒÙÜÏÇÑ][a-záéíóúàèìòùüïçñ]+)?)/,
-    /hola[,.]?\s+(?:sóc|soy)\s+([A-ZÁÉÍÓÚÀÈÌÒÙÜÏÇÑ][a-záéíóúàèìòùüïçñ]{2,})/i,
-  ];
-  for (const pat of patterns) {
-    const m = text.match(pat);
-    if (m?.[1]) return m[1].trim();
-  }
-  return '';
-}
-
 function regexFallback(text: string): Record<string, string> {
-  const emailMatch = text.match(/[\w.+-]+@[\w-]+\.[a-zA-Z]{2,}/);
-  const phoneMatch = text.match(/(?:\+34\s?)?(?:6\d{2}|7[1-9]\d{1}|9\d{2})\s?\d{3}\s?\d{3}/);
-  const dateMatch = text.match(/\b(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})\b/) ||
-                    text.match(/\b(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})\b/);
-
-  let eventDate = '';
-  if (dateMatch) {
-    const full = dateMatch[0];
-    const parts = full.split(/[\/\-]/);
-    if (parts[0].length === 4) {
-      eventDate = `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
-    } else {
-      const y = parts[2].length === 2 ? `20${parts[2]}` : parts[2];
-      eventDate = `${y}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-    }
-  }
-
-  const guestMatch = text.match(/\b(\d{2,4})\s*(?:persones?|convidats?|assistents?|people|guests?)/i);
-
-  const timeMatch = text.match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/);
-  const eventTime = timeMatch ? `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}` : '';
-
-  const lower = text.toLowerCase();
-  let source = 'OTHER';
-  if (lower.includes('whatsapp') || lower.includes('wa.me') || lower.includes('8:') || lower.includes('9:') || lower.includes('Bon dia')) source = 'WHATSAPP';
-  else if (lower.includes('@') && lower.includes('assumpte')) source = 'EMAIL';
-  else if (lower.includes('instagram') || lower.includes('@')) source = 'INSTAGRAM';
-
-  let eventType = 'OTHER';
-  if (/boda|bodes|casament/i.test(text)) eventType = 'WEDDING';
-  else if (/cumple|aniversari|birthday|anys/i.test(text)) eventType = 'BIRTHDAY';
-  else if (/comuni[oó]n|comunió/i.test(text)) eventType = 'COMMUNION';
-  else if (/empresa|corporati|team/i.test(text)) eventType = 'CORPORATE';
-  else if (/baptis|bateig/i.test(text)) eventType = 'BAPTISM';
-
-  return {
-    name: extractName(text),
-    email: emailMatch?.[0] || '',
-    phone: phoneMatch?.[0]?.replace(/\s/g, '') || '',
-    eventType,
-    eventDate,
-    eventTime,
-    eventLocation: '',
-    guestCount: guestMatch?.[1] || '',
-    message: '',
-    source,
-  };
+  return extractLeadDataFromText(text);
 }
 
 export async function POST(req: NextRequest) {
