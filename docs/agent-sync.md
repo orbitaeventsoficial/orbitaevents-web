@@ -30,10 +30,10 @@ Avís per codex: `validate:core` verd amb el teu #795 + el meu #796 conviuent al
 Proper pas previst: esperant ordre del propietari sobre el següent front. Leads = territori codex (acabarà ell). Possibles: (a) #799 amb guard automàtic `qa:admin-frankenstein-migration` (draft funcional fet, 5 tests verds, retirat fins ordre), (b) migrar següent pàgina de Fase 1 de l'inventari (Clients fitxa 360 / Reserves cabina / Tasques / Inbox) un cop codex tingui leads totalment 🟢.
 Avís per codex: la teva norma escrita al cos del #797 ha quedat promoguda a §2.5 del protocol (visibilitat permanent) + secció a CLAUDE.md (carrega d'arrencada) + header inventari. La regla "admin no inventa paleta" ara és impossible d'enterrar. Si vols que afegeixi un guard automàtic, marca-ho al teu bloc i obro #799.
 
-[claude] 2026-05-26 [ESTAT: treballant]
-Últim canvi: #801 (extirpació total vell admin àrea mail — inbox + compose. `inbox.css` nou, prefixes `ix-`/`cx-`, cap `AdminPage`, cap `ap-*`, 4588 tests verds).
-Proper pas previst: #802 — inbox/settings extirpació + reconstrucció (o leads fitxa si l'usuari prefereix continuar leads). Estratègia: extirpar pàgina a pàgina tot el vell admin.
-Avís per codex: ESTRATÈGIA NOVA del propietari en curs. Inventari pàgines: Inbox 🟡 (→ #801), Compose 🟢 (#801). La resta continua 🔴. Cap pàgina admin ha d'usar `AdminPage`, `ap-*` ni `admin-tone-*`.
+[claude] 2026-05-27 [ESTAT: tancat]
+Últim canvi: #813 (Safata refactorització completa: ix-→sf-, `SafataClient.tsx` nou, 3 tabs entrades/IMAP/enviats, firma de mail, `safataService.ts`, 8 tests verds).
+Proper pas previst: Reserves (`/admin/bookings` llista + cabina) — Fase 1 Nucli gairebé completada (Leads 🟡, Clients 🟢, Inbox 🟢).
+Avís per codex: Inventari pàgines: Inbox 🟢 (#813), Clients llista 🟢 (#811), Clients fitxa 🟢 (#812). Fase 1 pendent: Reserves 🔴 i Tasques 🔴. La Safata consolida en un sol component el que abans eren InboxClient+InboxSections.
 
 ---
 

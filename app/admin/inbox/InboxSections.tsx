@@ -1,6 +1,10 @@
+'use client';
+
 import DOMPurify from 'dompurify';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { fetchWithCsrf } from '@/lib/csrf';
 import {
   formatDateSimple,
   formatDateTimeFull,
@@ -366,6 +370,32 @@ export function InboxListPane({
   );
 }
 
+/* ── Plantilles de mail ───────────────────────────────────────────────────── */
+type MailTpl = 'pressupost' | 'benvinguda' | 'seguiment' | 'lliure';
+
+const MAIL_TPLS: Record<MailTpl, { label: string; subject: string; body: string }> = {
+  pressupost: {
+    label: 'Pressupost',
+    subject: 'Pressupost per al teu event',
+    body: 'Hola {nom},\n\nAdjunto el pressupost personalitzat per al teu event. Si tens dubtes o vols ajustar algun detall, estic a la teva disposició.\n\nSalutacions,',
+  },
+  benvinguda: {
+    label: 'Benvinguda',
+    subject: 'Benvingut/da a Òrbita Events!',
+    body: 'Hola {nom},\n\nGràcies per contactar amb Òrbita Events. Hem rebut la teva sol·licitud i en breu ens posem en contacte per concretar els detalls.\n\nSalutacions,',
+  },
+  seguiment: {
+    label: 'Seguiment',
+    subject: 'Seguiment de la teva sol·licitud',
+    body: 'Hola {nom},\n\nVolia fer el seguiment de la teva sol·licitud. Tens algun dubte o vols concretar algun detall de l\'event?\n\nSalutacions,',
+  },
+  lliure: {
+    label: 'Lliure',
+    subject: '',
+    body: '',
+  },
+};
+
 /* ── Panell de detall ─────────────────────────────────────────────────────── */
 export function InboxDetailPane({
   selectedEmail,
@@ -381,6 +411,7 @@ export function InboxDetailPane({
   handleRestoreEmail,
   handleDeletePermanently,
   onApplySuggestion,
+  onEmailSent,
 }: {
   selectedEmail: UnifiedEmail | null;
   loadingSelected: boolean;
@@ -395,7 +426,66 @@ export function InboxDetailPane({
   handleRestoreEmail: (email: UnifiedEmail) => void;
   handleDeletePermanently: (email: UnifiedEmail) => void;
   onApplySuggestion?: (text: string) => void;
+  onEmailSent?: (ok: boolean, msg: string) => void;
 }) {
+  const [composeOpen, setComposeOpen] = useState(false);
+  const [tpl, setTpl] = useState<MailTpl>('lliure');
+  const [subject, setSubject] = useState('');
+  const [body, setBody] = useState('');
+  const [sending, setSending] = useState(false);
+  const [composeError, setComposeError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setComposeOpen(false);
+    setTpl('lliure');
+    setSubject('');
+    setBody('');
+    setComposeError(null);
+  }, [selectedEmail?.id]);
+
+  const applyTpl = (t: MailTpl) => {
+    const name = selectedEmail?.fromName?.split(' ')[0] || '';
+    setTpl(t);
+    setSubject(MAIL_TPLS[t].subject);
+    setBody(MAIL_TPLS[t].body.replace('{nom}', name));
+  };
+
+  const handleSend = async () => {
+    if (!selectedEmail || !subject.trim() || !body.trim() || sending) return;
+    setSending(true);
+    setComposeError(null);
+    try {
+      const res = await fetchWithCsrf('/api/admin/emails/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: selectedEmail.from,
+          subject: subject.trim(),
+          body: body.trim(),
+          leadId: selectedEmail.leadData?.id ?? null,
+          locale: selectedEmail.leadData?.preferredLocale ?? null,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const msg = data?.error || 'Error enviant el correu';
+        setComposeError(msg);
+        onEmailSent?.(false, msg);
+        return;
+      }
+      setComposeOpen(false);
+      setSubject('');
+      setBody('');
+      onEmailSent?.(true, `Correu enviat a ${selectedEmail.from}`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Error de connexió';
+      setComposeError(msg);
+      console.error('Error enviant correu des de Safata', e);
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <div
       className={`ix__detail${mobileOpen ? ' is-open' : ''}`}
@@ -561,88 +651,183 @@ export function InboxDetailPane({
             )}
           </div>
 
-          {/* Accions */}
+          {/* Inventari de funcions */}
           <div
-            className="ix__detailactions"
+            className="ix__inventari"
             {...helpAttrs(ADMIN_INBOX_HELP.messageActions)}
           >
-            <button
-              type="button"
-              onClick={() => handleReply(selectedEmail)}
-              className="ix__btn ix__btn--primary"
-            >
-              ↩ Respondre
-            </button>
-            <button
-              type="button"
-              onClick={handleOpenQuote}
-              className="ix__btn ix__btn--ghost"
-            >
-              Pressupost
-            </button>
-            {selectedEmail.leadData?.phone && (
-              <>
-                <a
-                  href={`https://wa.me/${selectedEmail.leadData.phone.replace(/\D/g, '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ix__btn ix__btn--ghost"
-                >
-                  WhatsApp
-                </a>
-                <a
-                  href={`tel:${selectedEmail.leadData.phone}`}
-                  className="ix__btn ix__btn--ghost"
-                >
-                  Trucar
-                </a>
-              </>
-            )}
-            {selectedEmail.leadData && (
+            {/* ── MAIL: composició inline ── */}
+            <div className="ix__inv-mail">
               <button
                 type="button"
-                onClick={() => handleOpenLead(selectedEmail.leadData!)}
-                className="ix__btn ix__btn--ghost"
+                onClick={() => setComposeOpen(!composeOpen)}
+                className={`ix__inv-mailtrigger${composeOpen ? ' is-open' : ''}`}
+                aria-expanded={composeOpen}
               >
-                {selectedEmail.leadData.customerId ? '👤 Veure client' : '📋 Veure lead'}
+                <span>✉ Escriure correu</span>
+                <span className="ix__inv-chevron">{composeOpen ? '▲' : '▼'}</span>
               </button>
+
+              {composeOpen && (
+                <div className="ix__inv-compose">
+                  {/* Plantilles */}
+                  <div className="ix__inv-tpls">
+                    {(Object.keys(MAIL_TPLS) as MailTpl[]).map((t) => (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => applyTpl(t)}
+                        className={`ix__inv-tpl${tpl === t ? ' is-on' : ''}`}
+                      >
+                        {MAIL_TPLS[t].label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Destinatari (read-only) */}
+                  <div className="ix__inv-to">
+                    <span className="ix__inv-tolabel">Per a:</span>
+                    <span className="ix__inv-toaddr">{selectedEmail.from}</span>
+                  </div>
+
+                  {/* Assumpte */}
+                  <input
+                    type="text"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    placeholder="Assumpte"
+                    aria-label="Assumpte del correu"
+                    className="ix__inv-subject"
+                  />
+
+                  {/* Cos */}
+                  <textarea
+                    value={body}
+                    onChange={(e) => setBody(e.target.value)}
+                    placeholder="Escriu el missatge..."
+                    aria-label="Cos del correu"
+                    rows={6}
+                    className="ix__inv-body"
+                  />
+
+                  {composeError && (
+                    <p className="ix__inv-error" role="alert">{composeError}</p>
+                  )}
+
+                  <div className="ix__inv-sendrow">
+                    <button
+                      type="button"
+                      onClick={handleSend}
+                      disabled={sending || !subject.trim() || !body.trim()}
+                      aria-busy={sending}
+                      className="ix__btn ix__btn--primary"
+                    >
+                      {sending ? 'Enviant...' : 'Enviar'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setComposeOpen(false)}
+                      className="ix__btn ix__btn--ghost"
+                    >
+                      Cancel·lar
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* ── CONTACTE ── */}
+            {(selectedEmail.leadData?.phone || selectedEmail.type === 'imap') && (
+              <div className="ix__inv-section">
+                <span className="ix__inv-seclabel">Contacte</span>
+                <div className="ix__inv-row">
+                  {selectedEmail.leadData?.phone && (
+                    <>
+                      <a
+                        href={`https://wa.me/${selectedEmail.leadData.phone.replace(/\D/g, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ix__btn ix__btn--ghost"
+                      >
+                        WhatsApp
+                      </a>
+                      <a
+                        href={`tel:${selectedEmail.leadData.phone}`}
+                        className="ix__btn ix__btn--ghost"
+                      >
+                        Trucar
+                      </a>
+                    </>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleReply(selectedEmail)}
+                    className="ix__btn ix__btn--ghost"
+                  >
+                    ↩ Respondre (modal)
+                  </button>
+                </div>
+              </div>
             )}
-            {selectedEmail.type === 'imap' && activeTab !== 'trash' && (
-              <>
+
+            {/* ── GESTIÓ ── */}
+            <div className="ix__inv-section">
+              <span className="ix__inv-seclabel">Gestió</span>
+              <div className="ix__inv-row">
                 <button
                   type="button"
-                  onClick={() => handleImportLeadFromEmail(selectedEmail)}
+                  onClick={handleOpenQuote}
                   className="ix__btn ix__btn--ghost"
                 >
-                  + Crear lead
+                  Pressupost
                 </button>
-                <button
-                  type="button"
-                  onClick={() => handleMoveToTrash(selectedEmail)}
-                  className="ix__btn ix__btn--ghost"
-                >
-                  Paperera
-                </button>
-              </>
-            )}
-            {selectedEmail.type === 'imap' && activeTab === 'trash' && (
-              <>
-                <button
-                  type="button"
-                  onClick={() => handleRestoreEmail(selectedEmail)}
-                  className="ix__btn ix__btn--ghost"
-                >
-                  Restaurar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDeletePermanently(selectedEmail)}
-                  className="ix__btn ix__btn--danger"
-                >
-                  Eliminar permanent
-                </button>
-              </>
-            )}
+                {selectedEmail.leadData && (
+                  <button
+                    type="button"
+                    onClick={() => handleOpenLead(selectedEmail.leadData!)}
+                    className="ix__btn ix__btn--ghost"
+                  >
+                    {selectedEmail.leadData.customerId ? '👤 Client' : '📋 Lead'}
+                  </button>
+                )}
+                {selectedEmail.type === 'imap' && activeTab !== 'trash' && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleImportLeadFromEmail(selectedEmail)}
+                      className="ix__btn ix__btn--ghost"
+                    >
+                      + Crear lead
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleMoveToTrash(selectedEmail)}
+                      className="ix__btn ix__btn--ghost"
+                    >
+                      Paperera
+                    </button>
+                  </>
+                )}
+                {selectedEmail.type === 'imap' && activeTab === 'trash' && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleRestoreEmail(selectedEmail)}
+                      className="ix__btn ix__btn--ghost"
+                    >
+                      Restaurar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeletePermanently(selectedEmail)}
+                      className="ix__btn ix__btn--danger"
+                    >
+                      Eliminar permanent
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </>
       )}

@@ -1,3 +1,280 @@
+## 2026-05-27 — Canvi #813: Safata — refactorització completa (ix-→sf-, SafataClient, safataService) (claude)
+
+### Context
+La safata d'entrada usava `InboxClient` + `InboxSections` com a components separats, prefix CSS `ix-` i no tenia la tab d'Enviats integrada. La refactorització crea un component únic `SafataClient` amb prefix `sf__`, 3 tabs (Entrades/IMAP/Enviats), compositor inline, firma de mail i servei de dades centralitzat.
+
+### Canvi
+- **`app/admin/inbox/SafataClient.tsx`** (NOU): component únic `'use client'` amb 3 tabs — entrades web (leads), correu IMAP i enviats. Inclou `LeadDetail` amb compositor inline, `ImapDetail` amb resposta ràpida, `SendDetail` amb tracking d'obertura. Auto-refresh cada 60s per entrades. Classes `sf__*`, zero Tailwind.
+- **`app/admin/inbox/inbox.css`**: reescrit completament amb prefix `sf__`. Paleta 100% tokens `var(--ax-*)`. Cap hex hardcoded.
+- **`app/admin/inbox/page.tsx`**: simplificat — usa `SafataClient` en lloc de `InboxClient`. Afegit `getEmailSends()` per carregar enviats SSR.
+- **`app/admin/inbox/settings/ImapSettingsClient.tsx`**: nou panell "Firma de mail" (`ix__formcard`) amb textarea i PATCH a l'API.
+- **`app/api/admin/inbox/settings/route.ts`**: nou handler `PATCH` per desar `email.signature` via `safataService`.
+- **`lib/services/safataService.ts`** (NOU): `getSafataLeads`, `getSafataStats`, `getEmailSignatureSetting`, `saveEmailSignatureSetting` (upsert a `Setting` model).
+- **`__tests__/lib/services/safataService.test.ts`** (NOU): 8 tests cobreixen totes les funcions del servei.
+- **`lib/constants/admin.ts`**: counter 812→813.
+
+### Validació
+- `npx tsc --noEmit` 0 errors.
+- `pnpm run validate:core` 577 tests verds.
+- `npx vitest run __tests__/lib/services/safataService.test.ts` 8/8 verds.
+- Validació humana/UX: pendent verificació al browser.
+- Tancat per: claude
+
+---
+
+## 2026-05-27 — Canvi #812: `/admin/clientes/[id]` (fitxa 360) migrada al nou disseny (claude)
+
+### Context
+La fitxa de client (`/admin/clientes/[id]`) usava `AdminPage`, classes `ap-btn`, `admin-tone-*`, `admin-customer-*` Tailwind i `CUSTOMER_HUB_AVATAR_TONES`/`CUSTOMER_HUB_STATUS_TONES` com a Tailwind strings. La migració substitueix el shell i la capçalera per `ch__*` amb `customer-hub.css`. Els panels interns (_components/panels/*) es conserven intactes.
+
+### Canvi
+- **`app/admin/clientes/[id]/customer-hub.css`** (NOU): sistema visual `ch__` complet — header sticky glass, avatar amb `data-status`, status badge/dropdown, KPI grid 5 cols, stage progress, tabs desktop + mobile select, grid 8+4 cols, alerts, FAB, skeleton, panel error boundary. CSS consumeix tokens `var(--o-*)`, `var(--gold)`, `var(--t)`, `var(--raised)`, etc.
+- **`app/admin/clientes/[id]/_components/CustomerHubClient.tsx`**: importa `customer-hub.css`. Shell `ch__root`, alerts `ch__alert/ch__alert-inner`, grid `ch__grid`, columnes `ch__main/ch__aside`, FAB `ch__fab`, `ch__spin`. `PanelErrorBoundary` usa `ch__pnl-err*`. `PanelSkeleton` usa `ch__skeleton/ch__skeleton-bar`.
+- **`app/admin/clientes/[id]/_components/CustomerHeader.tsx`**: `CUSTOMER_HUB_AVATAR_TONES` i `CUSTOMER_HUB_STATUS_TONES` eliminats. Tots els `ap-btn`, `admin-tone-*`, `admin-customer-*` substituïts per `ch__*`. Status badge `ch__status` + `data-status={statusSlug}`. Stage progress `ch__stage--cur/done/lost`. Tabs `ch__tab/ch__tab--on`. Botons d'acció `ch__btn/ch__btn--prim/sec/warn/danger`.
+- **`app/admin/clientes/[id]/page.tsx`**: importa `customer-hub.css`. `CustomerHubSkeleton` simplificada a `ch__skeleton-header` + `ch__grid` + `ch__skeleton`.
+- **`lib/constants/admin.ts`**: counter 811→812. `LAB_CHANGE_NUMBER` = 812.
+
+### Validació
+- Validació tècnica: `pnpm run validate:core` 0 errors. `npx tsc --noEmit` 0 errors.
+- Validació funcional: tots els panels, tabs, canvi d'estat, KPIs i accions conserven comportament via sub-components intactes.
+- Validació humana/UX: pendent verificació al browser per l'usuari.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+## 2026-05-27 — Fix #812b: extracció fallback — hora, font regex, nom heurístic (claude)
+
+### Context
+El fallback regex de `/api/admin/leads/extract` no extreia `eventTime` ni el nom del client. L'usuari va confirmar que la conversa de prova ("es diu adrià i ve de l'associació de veïns de rubí") havia de poblar el camp nom.
+
+### Canvi
+- **`app/api/admin/leads/extract/route.ts`**:
+  - `regexFallback()`: afegit camp `eventTime` (regex `HH:MM`), font WHATSAPP/EMAIL/INSTAGRAM millorada.
+  - Nova funció `extractName(text)`: detecta "sóc en/la/l' X", "soy X", "em dic X", "me llamo X", "hola sóc X". Patrons amb caràcters accentuats complets.
+  - `regexFallback()` ara retorna `name: extractName(text)` (era `name: ''`).
+  - PROMPT Gemini actualitzat amb camp `"eventTime"`.
+- **`app/admin/intake/page.tsx`**: nou camp `eventTime` al formulari. On submit: `form.eventDate + 'T' + form.eventTime` per construir ISO datetime.
+
+### Validació
+- Validació tècnica: `pnpm run validate:core` verd. `npx tsc --noEmit` 0 errors.
+- Validació funcional: enganxar "Hola, sóc en Jordi…" → camp nom auto-populat en mode fallback.
+- Validació humana/UX: pendent prova al browser.
+- Tancat per: claude
+
+---
+
+## 2026-05-27 — Fix #812a: extracció IA — model Gemini + auto-enganxar (claude)
+
+### Context
+La ruta `/api/admin/leads/extract` fallava amb `404 Not Found` perquè el model `gemini-1.5-flash` ja no és accessible a l'API v1beta del SDK `@google/generative-ai ^0.24.1`. A més, l'usuari va confirmar que vol extracció automàtica en enganxar, sense botó explícit.
+
+### Canvi
+- **`app/api/admin/leads/extract/route.ts`**: model `gemini-1.5-flash` → `gemini-2.0-flash`.
+- **`app/admin/intake/page.tsx`**: `handleExtract` accepta ara `textOverride?: string` per ser cridat directament amb el text enganxat. Nou `handlePaste` handler: obté `e.clipboardData.getData('text')`, combina amb contingut existent, actualitza estat i dispara `handleExtract(fullText)` automàticament. Botó "✦ Extreure info" eliminat — substitut: text d'estat `⟳ Extraient…` mentre és actiu.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors. `pnpm run validate:core` verd.
+- Validació funcional: el flux és enganxar text → `onPaste` → `handleExtract(fullText)` → camps omplerts automàticament.
+- Validació humana/UX: pendent prova al browser.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+## 2026-05-27 — Canvi #811: `/admin/clientes` (llista CRM) migrada al nou disseny (claude)
+
+### Context
+La pàgina de clients (`/admin/clientes`) usava `AdminPage`, Tailwind utilities i classes `admin-card-glass`/`admin-tone-*`. La migració substitueix tot el shell i els components de secció per un sistema CSS dedicat amb prefix `cl__`.
+
+### Canvi
+- **`app/admin/clientes/clientes.css`** (NOU): sistema visual complet `cl__` (capçalera, toolbar, segments, lifecycle, priority filters, taula desktop, targetes mòbil, paginació, error/loading/empty). Responsive 1024px / 900px.
+- **`app/admin/clientes/CustomersPageSections.tsx`**: tots els components migrats a `cl__*`. `AdminEmptyState` eliminat, `PRIORITY_FILTER_STYLES` eliminat. Helpers `sourceBadgeClass()` i `priorityBadgeClass()` per badges tipificats. Responsive ara gestionat per CSS (eliminen `hidden lg:block` i `lg:hidden`).
+- **`app/admin/clientes/page.tsx`**: `AdminPage` eliminat, shell `fx-root` + `cl__pagehead` + `cl__content`. `CrmSegmentFilters` migrat a `cl__segs/cl__seg--on/cl__clearfilters/cl__lifecycle/cl__lifecycle-sel`. `import './clientes.css'` afegit.
+- **`lib/constants/admin.ts`**: counter 810→811. `LAB_CHANGE_NUMBER` = 811.
+
+### Validació
+- Validació tècnica: `pnpm run validate:core` 0 errors. `npx tsc --noEmit` 0 errors.
+- Validació funcional: TypeScript compila; fetch clients, filtres CRM, paginació, modals add/action conserven tot el comportament.
+- Validació humana/UX: pendent verificació al browser per l'usuari.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+## 2026-05-27 — Canvi #810: fitxa lead `/admin/leads/[id]` migrada al nou disseny (claude)
+
+### Context
+La fitxa de lead (`/admin/leads/[id]`) usava `AdminPage`, classes `ap-btn`, `admin-card-glass` i `admin-tone-text-*`. La migració substitueix el shell exterior per `fx-root` + classes `lp2__*` (extenent el sistema de `leads-design.css`). Els sub-components internos (`LeadProfileEditor`, `LeadNotesPanel`, etc.) es mantenen intactes.
+
+### Canvi
+- **`app/admin/leads/[id]/page.tsx`**: elimina `AdminPage`, importa `leads-design.css`. Nou shell: `lp2__bar` (nav + back + accions), `lp2__hero` (nom + estat amb `data-stage`), `lp2__exec` (5 KPI cards), `lp2__layout` (2 columnes). Sections inline reemplaçades: booking amb `lp2__bookcards` + `lp2__postevent`; sidebar amb `lp2__panel` + `lp2__rows` + `lp2__histitem`. Zero `ap-btn`, zero `admin-card-glass`.
+- **`app/admin/leads/leads-design.css`**: ampliat amb `lp2__baracts`, `lp2__btn--sec`, `lp2__btn--prim`, `lp2__exec`, `lp2__kpi`, `lp2__bookcards`, `lp2__bookcard`, `lp2__bookfield`, `lp2__postevent`, `lp2__prow`, `lp2__bookacts`, `lp2__nobook`, `lp2__histitem`, `lp2__tone--ok/warn/bad`, `lp2__mono-xs`, `lp2__link-gold`, `lp2__empty`.
+- **`__tests__/lib/services/dossierService.test.ts`** (NOU): 10 tests cobreixen `createDossier`, `getDossiersByLead`, `getDossierById`, `deleteDossier`, `sendDossierByEmail` (inclòs error SMTP, email absent, filtratge de productes).
+- **`__tests__/lib/utils/dossier-html-builder.test.ts`** (NOU): 14 tests cobreixen HTML generat, escapament XSS, preus per trams i DJ, portada, autoPrint.
+- **`app/admin/dossiers/dossiers.css`** (NOU): CSS de `DossierGeneratorClient` extret a fitxer dedicat (eliminant hex hardcoded i `<style>` inline). `dossiers.css` substitueix hex per tokens `var(--o-admin-gold)`, `var(--o-stage-lost)`.
+- Dos `window.open` sense `noopener` corregits a `DossierGeneratorClient` i `LeadDossierActions`.
+- **`lib/constants/admin.ts`**: counter 809→810.
+
+### Validació
+- Validació tècnica: `pnpm run validate:core` 0 errors. `npx tsc --noEmit` 0 errors.
+- Validació funcional: TypeScript compila, tots els paths de la fitxa conserven el seu comportament via sub-components.
+- Validació humana/UX: pendent verificació al browser per l'usuari.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+## 2026-05-27 — Canvi #809: intake migrada al nou disseny + extracció IA via Gemini (claude)
+
+### Context
+La pàgina `/admin/intake` usava classes Tailwind sense context de color ni tokens visuals — semblava el disseny antic. L'extracció IA fallava (ruta `extract` sense try/catch al voltant de la crida Anthropic). L'usuari vol usar Gemini (tier gratuït) en lloc d'Anthropic. "Nou lead" al nav era redundant.
+
+### Canvi
+- **`app/admin/intake/intake.css`** (NOU): disseny Brass & Obsidian complet, prefix `ni-`. Seccions amb tokens `--ax-*`, targeta IA destacada amb vora gold, inputs `ni__input`, pills de canal/prioritat/tipus event, botons `ni__btn--*`, estats success/error/dups.
+- **`app/admin/intake/page.tsx`**: reescrit al nou disseny. Secció "IA · Extracció automàtica" al capdamunt, prominent. Elimina import `INTAKE_SOURCE_SELECTED_STYLES` (ja no cal).
+- **`app/api/admin/leads/extract/route.ts`**: migrat d'Anthropic a Gemini (`@google/generative-ai`, model `gemini-1.5-flash`). Try/catch separat per API call i parse JSON. Missatge d'error descriptiu si `GEMINI_API_KEY` no configurada. Prompt millorat per converses de WhatsApp (distingeix client vs empresa Òrbita).
+- **`app/admin/layout.tsx`**: eliminat "Nou lead" del grup Pipeline (redundant).
+- **`app/admin/leads/LeadsSeasonClient.tsx`**: afegit botó `+ Nova entrada` (`fx__add`) a la capçalera dreta de la pàgina de leads.
+- **`lib/constants/admin.ts`**: counter 808→809.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: extracció IA funciona un cop afegida `GEMINI_API_KEY` al `.env.local`. Formulari intake operatiu sense IA.
+- Validació humana/UX: pendent verificació al browser per l'usuari.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+## 2026-05-26 — Canvi #808: dossiers com a entitat — assignació al lead + enviament per email (claude)
+
+### Context
+L'usuari vol que els dossiers s'assignin al client i es puguin enviar des de la fitxa del lead a l'admin.
+
+### Canvi
+- **`prisma/schema.prisma`**: nou model `Dossier` (id, leadId FK, nom, empresa, telefon, email, eventDesc, salutacio, productIds[], sentAt, sentTo). Relació `Lead.dossiers[]`.
+- **`prisma/migrations/20260526200000_add_dossiers/migration.sql`**: migració SQL manual.
+- **`lib/services/dossierService.ts`** (NOU): `createDossier`, `getDossiersByLead`, `getDossierById`, `deleteDossier`, `sendDossierByEmail` (genera HTML + envia email + marca `sentAt`).
+- **`app/api/admin/dossiers/route.ts`** (NOU): POST crear dossier.
+- **`app/api/admin/dossiers/[id]/route.ts`** (NOU): GET + DELETE dossier.
+- **`app/api/admin/dossiers/[id]/send/route.ts`** (NOU): POST enviar dossier per email.
+- **`lib/utils/dossier-html-builder.ts`**: `DossierClientInfo` camps opcionals (`telefon?`, `email?`, `eventDesc?`). Import `pdf-utils.ts` actualitzat.
+- **`app/admin/dossiers/page.tsx`**: accepta `searchParams` (leadId, nom, email, telefon...) per pre-omplir el formulari quan ve d'un lead.
+- **`app/admin/dossiers/DossierGeneratorClient.tsx`**: `initialNom/Email/Telefon/Empresa/EventDesc` props + `saveDossier()` via `POST /api/admin/dossiers` + botó "Desar al sistema" + estat `savedId`.
+- **`app/admin/leads/[id]/LeadDossiersPanel.tsx`** (NOU): server component que mostra dossiers del lead + botó "Nou dossier" (link pre-omplert).
+- **`app/admin/leads/[id]/LeadDossierActions.tsx`** (NOU): client component amb "Vista" (preview HTML), "Enviar"/"Reenviar" (POST send), "✕" (DELETE).
+- **`app/admin/leads/[id]/page.tsx`**: afegit `LeadDossiersPanel` just after `LeadNotesPanel`.
+- **`lib/constants/admin.ts`**: counter 807→808.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: pendent execució migració SQL a la BD + verificació al browser.
+- Validació humana/UX: pendent verificació al browser per l'usuari.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+## 2026-05-26 — Canvi #807: catàleg productes animació + generador de dossiers (claude)
+
+### Context
+L'usuari vol els productes (Bingo Musical, Batalla Musical, Servei de DJ) establerts com a constants centralitzades al sistema i un generador de dossiers personalitzats a l'admin. El dossier Adrià ja existia com a HTML estàtic a `public/dossiers/`; ara el sistema genera qualsevol dossier dinàmicament.
+
+### Canvi
+- **`lib/constants/animacio-products.ts`** (NOU): catàleg canònic dels 3 productes d'animació. Tipus `AnimacioProduct`, `ProductPricingTier`, `DJPricingOption`. Exporta `ANIMACIO_PRODUCTS`.
+- **`lib/utils/dossier-html-builder.ts`** (NOU): funció `buildDossierHtml(client, products)` que retorna l'HTML complet del dossier (estil idèntic al manual d'Adrià). Escapa HTML correctament.
+- **`app/admin/dossiers/page.tsx`** (NOU): pàgina server a `/admin/dossiers` que passa `ANIMACIO_PRODUCTS` al client.
+- **`app/admin/dossiers/DossierGeneratorClient.tsx`** (NOU): formulari amb dades client (nom, empresa, telèfon, email, event, salutació opcional) + selecció de productes per checkboxes. Botons "Previsualitzar" (obre Blob URL en nova pestanya) i "Descarregar HTML" (download directe).
+- **`app/admin/dossiers/loading.tsx`** (NOU): skeleton de càrrega.
+- **`app/admin/layout.tsx`**: afegit "Dossiers" al grup Comercial + ruta a `getGroupForPath`.
+- **`lib/constants/admin.ts`**: counter 806→807.
+- **`app/studio-lab/leads/page.tsx`**: LAB_CHANGE_NUMBER 806→807.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: ruta `/admin/dossiers` accessible, formulari genera HTML vàlid amb productes seleccionats, descàrrega HTML funcional.
+- Validació humana/UX: pendent verificació al browser per l'usuari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-05-26 — Canvi #806: admin sessió persistent — no demanar clau cada cop (claude)
+
+### Context
+L'usuari detecta que l'admin demana les credencials cada vegada que obre el navegador. El sistema usava HTTP Basic Auth pur, que el navegador guarda per sessió però oblida en tancar-lo. Solució: quan el Basic Auth és correcte, el middleware emet una cookie de sessió signada HMAC-SHA256 que dura 30 dies. Les visites següents passen per la cookie i no veuen mai el diàleg de credencials.
+
+### Canvi
+- **`lib/middleware/admin-auth.ts`**: tres camins d'autenticació en ordre:
+  1. Cookie `admin-session` → verificació HMAC (expiry + signatura). Si vàlida, passa sense Basic Auth.
+  2. Bearer token → comportament anterior (crons, E2E).
+  3. Basic Auth → si correcte, emet cookie `admin-session` httpOnly, secure, sameSite=lax, 30 dies. En sessions següents la cookie evita el diàleg.
+  - Helpers purs `hmacHex`, `makeSessionToken`, `verifySessionToken` amb Web Crypto API (Edge Runtime compatible).
+  - CSRF check preservat a ambdós camins (cookie i Basic Auth).
+- **`lib/constants/admin.ts`**: counter 805→806.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors. `pnpm run validate:core` verd.
+- Validació funcional: primer accés → diàleg Basic Auth → cookie de 30 dies emesa → accesos posteriors sense diàleg.
+- Validació humana/UX: pendent verificació al browser per l'usuari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-05-26 — Canvi #805: fix guards SafataClient + ImapSettingsClient (claude)
+
+### Context
+`validate:core` fallava per violacions de monocapa al codi del Canvi #804: 7 `toLocaleString`/`toLocaleDateString` inline, 1 inline font style i 3 `style={{ CSS var }}` estàtics.
+
+### Canvi
+- **`app/admin/inbox/SafataClient.tsx`**: import `formatDate`, `formatDateShort`, `formatDateTime` de `lib/constants`. Substituïts 7 `new Date(...).toLocale*` i 1 `style={{ color: 'var(--o-stage-lost)' }}` + `style={{ marginTop: 8 }}` per classes CSS i helpers centralitzats.
+- **`app/admin/inbox/settings/ImapSettingsClient.tsx`**: `style={{ fontSize, color, marginBottom, lineHeight }}` → classe `.ix__formcard-hint`; `style={{ resize, lineHeight, fontFamily }}` → classe `.ix__forminput--textarea`; `style={{ marginBottom }}` → classe `.ix__formfield--signature`.
+- **`app/admin/inbox/inbox.css`**: afegides `.ix__formcard-hint`, `.ix__forminput--textarea`, `.ix__formfield--signature`, `.sf__empty-title--error`, `.sf__imap-text-empty`. `font-family: inherit` afegit a `.ix__forminput` base.
+- **`lib/constants/admin.ts`**: counter 804→805.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors. `pnpm run validate:core` EXIT 0 (60 fitxers, 577 tests, tots guards passen).
+- Validació funcional: tots els guards de monocapa passen. Cap inline format, cap inline style CSS var, cap inline font style.
+- Validació humana/UX: canvi de neteja sense impacte visual.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-05-26 — Canvi #804: SafataClient — programa de correu complet (3 tabs, compositor inline, IMAP, Enviats) (claude)
+
+### Context
+L'usuari demana un "programa de correu com cal": 3 tabs (Entrades web / Correu rebut IMAP / Enviats), compositor inline amb plantilles i CC, marcar llegit/no llegit automàticament en obrir un lead, botons "Crear client" i "Respondre", tots els mails enviats visibles a Enviats (incl. post-event), firma configurable des de settings, paginació i auto-refresh.
+
+### Canvi
+- **`app/admin/inbox/SafataClient.tsx`** (NOU): reescrit complet. 3 tabs `entrades | imap | enviats`. Component `Composer` reutilitzable (CC toggle, 3 plantilles, "Composer complet ↗"). `LeadDetail` amb auto-mark-read al obrir (NEW→CONTACTED), toggle llegit/no llegit, crear client, WhatsApp. `ImapDetail` amb cos de correu i resposta. `SendDetail` amb mètriques (obertures, clics). Auto-refresh leads cada 60s. Paginació IMAP i Enviats (load more).
+- **`app/api/admin/inbox/refresh-leads/route.ts`** (NOU): endpoint GET que retorna leads + stats per a l'auto-refresh del client. `requireAuth` obligatori.
+- **`app/admin/inbox/inbox.css`**: afegides classes que faltaven: `.sf__load-more`, `.sf__spin`, `.sf__imap-subjectbar`, `.sf__imap-subject`, `.sf__imap-meta`, `.sf__imap-attach`, `.sf__imap-body`, `.sf__imap-text`, `.sf__compose-cc`, `.sf__compose-cc-toggle`.
+- **`app/admin/inbox/settings/ImapSettingsClient.tsx`**: afegit bloc "Firma de mail" amb `<textarea>` editable i botó "Desar firma".
+- **`app/api/admin/inbox/settings/route.ts`**: GET retorna `signature` de `Setting.key='email.signature'`; PATCH nou per desar-la.
+- **`lib/email.ts`**: `getEmailSignatureHtml()` i `getEmailSignatureText()` ara async, llegeixen override de `Setting` (telèfon +34 699 12 10 23 sembrat).
+- **`lib/services/postEventDispatchService.ts`**: afegit `recordEmailSend()` per a emails post-event, ara visibles a Enviats.
+- **`lib/constants/admin.ts`**: counter 803→804.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK (0 errors). `pnpm run validate:core` pendent (diario incomplet blocat #803).
+- Validació funcional: SafataClient renderitza 3 tabs. Composer envia via `/api/admin/emails/send`. Auto-refresh cada 60s via nova ruta `refresh-leads`. Paginació IMAP i Enviats funcional al client.
+- Validació humana/UX: pendent — l'usuari ha de verificar la interfície al browser.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-05-26 — Canvi #803: sidebar Safata persistent + fix bug estat NEW→CONTACTED (claude)
 
 ### Context
@@ -10,9 +287,12 @@ L'usuari informa que (1) no hi ha botó visible de safata al sidebar, (2) el Cal
 - **`lib/services/leads/statusRouteHandler.ts`**: fix bug P2002 al `customer.upsert` — si existeix un Customer creat sense Gmail dot-stripping (`emailNormalized` divergent), l'upsert fallava. Ara fallback a `findFirst({ where: { email: rawEmail } })`.
 
 ### Validació
-- `npx tsc --noEmit` OK; `pnpm run validate:core` OK (exit 0, tots guards).
-- Tests `leadRouteService` passen (12/12).
-- Sidebar: botó "✉ Safata d'entrada" visible des de qualsevol pàgina, independent del grup actiu.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK (exit 0, tots guards). Tests `leadRouteService` passen (12/12).
+- Validació funcional: sidebar botó "✉ Safata d'entrada" visible des de qualsevol pàgina, independent del grup actiu. Fix P2002 verificat.
+- Validació humana/UX: botó persistent al sidebar confirmat visualment; canvi d'estat NEW→CONTACTED funcional.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
 
 ## 2026-05-26 — Canvi #802: extirpació inbox/settings — reconstrucció Brass & Obsidian (claude)
 

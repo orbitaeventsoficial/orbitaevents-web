@@ -402,6 +402,7 @@ export default function InboxClient({
             setSuggestedBody(text);
             if (selectedEmail) handleReply(selectedEmail);
           }}
+          onEmailSent={(ok, msg) => setFlashMessage({ type: ok ? 'success' : 'error', text: msg })}
         />
       </div>
 

@@ -36,13 +36,22 @@ export default function ImapSettingsClient() {
   const [testing, setTesting] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
+  /* Firma */
+  const [signature, setSignature] = useState('');
+  const [savingSignature, setSavingSignature] = useState(false);
+
   const loadConfig = useCallback(async () => {
     try {
       const res = await fetchWithCsrf('/api/admin/inbox/settings');
       if (!res.ok) throw new Error('Error carregant config');
-      const data = await res.json();
+      const data = await res.json() as {
+        config: ImapConfig | null;
+        connection: ConnectionResult | null;
+        signature?: string;
+      };
       setConfig(data.config);
       setConnection(data.connection);
+      setSignature(data.signature ?? '');
       if (data.config) {
         setHost(data.config.host || '');
         setPort(String(data.config.port || 993));
@@ -55,6 +64,28 @@ export default function ImapSettingsClient() {
       setLoading(false);
     }
   }, [toast]);
+
+  const saveSignature = async () => {
+    setSavingSignature(true);
+    try {
+      const res = await fetchWithCsrf('/api/admin/inbox/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ signature }),
+      });
+      const data = await res.json() as { ok: boolean; error?: string };
+      if (data.ok) {
+        toast.success('Firma desada');
+      } else {
+        toast.error(data.error || 'Error desant la firma');
+      }
+    } catch (err) {
+      console.error('Error desant firma', err);
+      toast.error(err instanceof Error ? err.message : 'Error');
+    } finally {
+      setSavingSignature(false);
+    }
+  };
 
   useEffect(() => {
     loadConfig();
@@ -319,6 +350,35 @@ export default function ImapSettingsClient() {
           )}
         </div>
       )}
+
+      {/* Firma de mail */}
+      <div className="ix__formcard">
+        <p className="ix__formcard-title">Firma de mail</p>
+        <p className="ix__formcard-hint">
+          Text que apareix al peu de tots els emails enviats des de l&apos;admin. Si és buit, s&apos;usa la firma per defecte (nom, telèfon, web).
+        </p>
+        <div className="ix__formfield ix__formfield--signature">
+          <label htmlFor="email-signature" className="ix__formlabel">Text de la firma</label>
+          <textarea
+            id="email-signature"
+            value={signature}
+            onChange={e => setSignature(e.target.value)}
+            placeholder={`Òrbita Events\n+34 XXX XXX XXX · info@orbitaevents.com\nwww.orbitaevents.com`}
+            rows={5}
+            className="ix__forminput ix__forminput--textarea"
+          />
+        </div>
+        <div className="ix__formactions">
+          <button
+            type="button"
+            disabled={savingSignature}
+            onClick={saveSignature}
+            className="ix__settingsbtn is-primary"
+          >
+            {savingSignature ? 'Desant...' : 'Desar firma'}
+          </button>
+        </div>
+      </div>
 
       <ConfirmDialog {...dialogProps} />
 
