@@ -288,6 +288,108 @@ export async function fetchEmails(options: {
  *     esperar resposta del servidor IMAP. Si el servidor és lent o no respon
  *     al `LOGOUT`, cap més bloqueig.
  */
+/**
+ * Decodifica un buffer raw segons el seu Content-Transfer-Encoding i charset.
+ * Suporta:
+ *   - 'quoted-printable': =XX → byte, soft line breaks (=\n).
+ *   - 'base64': Buffer.from(str, 'base64').
+ *   - '7bit' / '8bit' / 'binary' / undefined: passa tal qual.
+ *
+ * Aplica després el decoding de charset (utf-8 default, latin1, iso-8859-1).
+ */
+function decodePartBody(raw: Buffer, encoding?: string, charset?: string): string {
+  const enc = (encoding || '').toLowerCase();
+  let decoded: Buffer;
+
+  if (enc === 'quoted-printable') {
+    // Decodifica QP: =XX → byte, =\r\n / =\n → soft break (eliminat)
+    const str = raw.toString('binary');
+    const cleaned = str.replace(/=\r?\n/g, '');
+    const out: number[] = [];
+    for (let i = 0; i < cleaned.length; i++) {
+      if (cleaned[i] === '=' && i + 2 < cleaned.length) {
+        const hex = cleaned.slice(i + 1, i + 3);
+        const byte = parseInt(hex, 16);
+        if (!Number.isNaN(byte)) {
+          out.push(byte);
+          i += 2;
+          continue;
+        }
+      }
+      out.push(cleaned.charCodeAt(i));
+    }
+    decoded = Buffer.from(out);
+  } else if (enc === 'base64') {
+    decoded = Buffer.from(raw.toString('ascii').replace(/\s+/g, ''), 'base64');
+  } else {
+    decoded = raw;
+  }
+
+  const cs = (charset || 'utf-8').toLowerCase().replace(/[_]/g, '-');
+  if (cs === 'utf-8' || cs === 'utf8' || cs === 'us-ascii' || cs === 'ascii') {
+    return decoded.toString('utf8');
+  }
+  if (cs === 'latin1' || cs === 'iso-8859-1' || cs === 'iso-8859-15' || cs === 'windows-1252') {
+    return decoded.toString('latin1');
+  }
+  return decoded.toString('utf8');
+}
+
+type StructTextPart = {
+  partKey: string;
+  type: 'text/plain' | 'text/html';
+  encoding?: string;
+  charset?: string;
+};
+
+/**
+ * Recorre bodyStructure i identifica les parts text (plain + html) que
+ * NO són attachments. Retorna meta per a cada part perquè el caller pugui
+ * decodificar el buffer corresponent amb decodePartBody.
+ */
+function identifyTextParts(bodyStructure: unknown): StructTextPart[] {
+  const out: StructTextPart[] = [];
+  type Node = {
+    type?: string;
+    part?: string;
+    disposition?: string;
+    encoding?: string;
+    parameters?: { charset?: string };
+    childNodes?: Node[];
+  };
+  const walk = (node: Node | null | undefined): void => {
+    if (!node) return;
+    if (node.disposition === 'attachment') return;
+    const t = (node.type || '').toLowerCase();
+    if ((t === 'text/plain' || t === 'text/html') && node.part) {
+      out.push({
+        partKey: node.part,
+        type: t as 'text/plain' | 'text/html',
+        encoding: node.encoding,
+        charset: node.parameters?.charset,
+      });
+    }
+    if (node.childNodes) for (const child of node.childNodes) walk(child);
+  };
+  walk(bodyStructure as Node);
+
+  // Cas missatge single-part (no childNodes, no part): el bodyStructure mateix
+  // és el part, i el buffer ImapFlow l'exposa com a 'text' o '1'.
+  if (out.length === 0 && bodyStructure) {
+    const node = bodyStructure as Node;
+    const t = (node.type || '').toLowerCase();
+    if (t === 'text/plain' || t === 'text/html') {
+      out.push({
+        partKey: 'text',
+        type: t as 'text/plain' | 'text/html',
+        encoding: node.encoding,
+        charset: node.parameters?.charset,
+      });
+    }
+  }
+  return out;
+}
+
 const FETCH_EMAIL_CACHE = new Map<string, EmailMessage>();
 const FETCH_EMAIL_CACHE_MAX = 200;
 
@@ -316,33 +418,61 @@ export async function fetchEmailByUid(uid: number, folder: string = 'INBOX'): Pr
   try {
     const mailbox = await client.getMailboxLock(folder);
     try {
+      // 1 sol fetch IMAP: envelope + bodyStructure + flags + header + un set
+      // genèric de partKeys que cobreix 95% dels casos. ImapFlow retorna
+      // null per a parts que no existeixen, sense cost extra. Amb el
+      // bodyStructure rebut, sabem quins partKeys són text i només
+      // processem aquests. Decodifiquem manualment quoted-printable i
+      // base64 per evitar dependre del MIME multipart wrapping.
+      const DEFAULT_PARTS = ['header', '1', '2', '3', '1.1', '1.2', '1.3', '2.1', '2.2', 'text'];
       for await (const message of client.fetch([uid], {
         uid: true,
         envelope: true,
         bodyStructure: true,
         flags: true,
-        bodyParts: ['HEADER', 'TEXT'],
+        bodyParts: DEFAULT_PARTS,
       }, { uid: true })) {
         const envelope = message.envelope;
+        const bodyStructure: unknown = message.bodyStructure;
+        const flagsPre = message.flags;
+
+        const textParts = identifyTextParts(bodyStructure);
+
+        type StructForAttach = { childNodes?: { disposition?: string }[] };
+        const hasAttachments = (bodyStructure as StructForAttach | null)?.childNodes?.some(
+          n => n.disposition === 'attachment'
+        ) ?? false;
 
         let bodyText = '';
         let bodyHtml = '';
-
-        const headerPart = message.bodyParts?.get('HEADER');
-        const textPart = message.bodyParts?.get('TEXT');
 
         let parsedHeaders: Record<string, string | string[]> = {};
         let parsedInReplyTo: string | undefined;
         let parsedReferences: string | undefined;
         let parsedCc: { name: string; address: string }[] | undefined;
 
-        if (headerPart && textPart) {
+        // Decodificar cada part text segons el seu encoding+charset
+        const headerBuf = message.bodyParts?.get('header');
+        for (const part of textParts) {
+          const raw = message.bodyParts?.get(part.partKey);
+          if (!raw || raw.length === 0) continue;
+          const decoded = decodePartBody(raw, part.encoding, part.charset);
+          if (part.type === 'text/plain' && !bodyText) bodyText = decoded;
+          else if (part.type === 'text/html' && !bodyHtml) bodyHtml = decoded;
+        }
+
+        // Si tenim HTML però no text pla, derivem-lo de l'HTML
+        if (!bodyText && bodyHtml) {
+          bodyText = bodyHtml
+            .replace(/<style[\s\S]*?<\/style>/gi, '')
+            .replace(/<script[\s\S]*?<\/script>/gi, '')
+            .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        }
+
+        // Parsejar header per a metadades (Orbita, references, cc)
+        if (headerBuf) {
           try {
-            const fullSource = Buffer.concat([headerPart, textPart]);
-            const parsed = await simpleParser(fullSource);
-            bodyText = parsed.text || '';
-            bodyHtml = typeof parsed.html === 'string' ? parsed.html : '';
-            // Extracció de headers per a vincle d'entitat Òrbita
+            const parsed = await simpleParser(headerBuf);
             if (parsed.headers && typeof parsed.headers.get === 'function') {
               const kindRaw = parsed.headers.get('x-orbita-kind');
               const idRaw = parsed.headers.get('x-orbita-id');
@@ -362,16 +492,8 @@ export async function fetchEmailByUid(uid: number, folder: string = 'INBOX'): Pr
                 return [];
               });
             }
-          } catch {
-            bodyText = textPart.toString('utf8');
-          }
-        } else if (textPart) {
-          bodyText = textPart.toString('utf8');
+          } catch { /* header malformat: ignorem metadades */ }
         }
-
-        const hasAttachments = message.bodyStructure?.childNodes?.some(
-          (node: { disposition?: string }) => node.disposition === 'attachment'
-        ) || false;
 
         // Derivar vincle Òrbita: header (Sent) > reference (Inbox responses)
         let orbita: EmailMessage['orbita'] | undefined;
@@ -408,8 +530,8 @@ export async function fetchEmailByUid(uid: number, folder: string = 'INBOX'): Pr
           date: envelope?.date || new Date(),
           bodyText,
           bodyHtml,
-          isRead: message.flags?.has('\\Seen') || false,
-          isFlagged: message.flags?.has('\\Flagged') || false,
+          isRead: (flagsPre || message.flags)?.has('\\Seen') || false,
+          isFlagged: (flagsPre || message.flags)?.has('\\Flagged') || false,
           hasAttachments,
           attachments: [],
           orbita,

@@ -8,7 +8,10 @@ import { join } from 'node:path';
  * attachments en base64. Un mail amb un PDF de 2MB es converteix en ~2.7MB
  * de transferència base64, provocant timeouts >25s i 502 a Railway.
  *
- * Solució correcta: `bodyParts: ['HEADER', 'TEXT']` que salta attachments.
+ * Solució correcta (post-#821): demanar `bodyParts` específics. ImapFlow
+ * normalitza les claus a lowercase i les numera segons el bodyStructure
+ * (1, 2, 1.1, 1.2...). Decodifiquem manualment quoted-printable/base64
+ * via `decodePartBody` i `identifyTextParts`.
  *
  * Aquest test no mocka res. Llegeix el fitxer real i verifica el patró.
  */
@@ -41,16 +44,23 @@ describe('lib/imap.ts — fetchEmailByUid no pot regressionar a source: true', (
     expect(body).not.toMatch(/source\s*:\s*true/);
   });
 
-  it('fetchEmailByUid usa bodyParts per descarregar només HEADER+TEXT', () => {
+  it('fetchEmailByUid usa bodyParts amb keys lowercase (header) i parts numerades', () => {
     const body = extractFunction('fetchEmailByUid');
-    expect(body).toMatch(/bodyParts\s*:\s*\[/);
-    expect(body).toContain("'HEADER'");
-    expect(body).toContain("'TEXT'");
+    // bodyParts pot ser inline (`[...]`) o via variable (`DEFAULT_PARTS`)
+    expect(body).toMatch(/bodyParts\s*:\s*(\[|[A-Z_][A-Z0-9_]*)/);
+    // ImapFlow normalitza les keys a lowercase
+    expect(body).toContain("'header'");
+    // Demanem parts numerades genèriques per cobrir multipart/alternative
+    expect(body).toMatch(/'1'/);
+    expect(body).toMatch(/'2'/);
   });
 
-  it("fetchEmailByUid llegeix bodyParts.get('HEADER') i bodyParts.get('TEXT')", () => {
+  it("fetchEmailByUid llegeix bodyParts.get('header') (lowercase) i passa per identifyTextParts", () => {
     const body = extractFunction('fetchEmailByUid');
-    expect(body).toMatch(/bodyParts\?\.get\(['"]HEADER['"]\)/);
-    expect(body).toMatch(/bodyParts\?\.get\(['"]TEXT['"]\)/);
+    expect(body).toMatch(/bodyParts\?\.get\(['"]header['"]\)/);
+    // El descobriment de parts text passa per identifyTextParts (no per get
+    // directe de 'TEXT' que tornaria buit en multipart)
+    expect(body).toContain('identifyTextParts');
+    expect(body).toContain('decodePartBody');
   });
 });

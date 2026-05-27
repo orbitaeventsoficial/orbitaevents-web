@@ -25,6 +25,26 @@ async function main() {
     take: 5,
   });
 
+  const lastFive = await prisma.emailSend.findMany({
+    orderBy: { sentAt: 'desc' },
+    select: {
+      id: true,
+      to: true,
+      subject: true,
+      sentAt: true,
+      htmlBody: true,
+      imapAppendOk: true,
+      imapSentFolder: true,
+      imapSentUid: true,
+      imapError: true,
+      smtpAccepted: true,
+      smtpResponse: true,
+      orbitaKind: true,
+      orbitaId: true,
+    },
+    take: 5,
+  });
+
   console.log('═══ EMAILSEND AUDIT ═══');
   console.log(`Total:           ${total}`);
   console.log(`Amb htmlBody:    ${withHtml}`);
@@ -42,6 +62,22 @@ async function main() {
   console.log('Últims 5 amb htmlBody:');
   for (const e of lastWithHtml) {
     console.log(`  - ${e.id} | ${e.sentAt.toISOString()} | imapAppendOk=${e.imapAppendOk} | ${e.to}`);
+  }
+  console.log('');
+  console.log('Últims 5 EmailSend (ordre cronològic descendent):');
+  for (const e of lastFive) {
+    console.log(`  ─ ${e.id}`);
+    console.log(`    to:        ${e.to}`);
+    console.log(`    subject:   ${e.subject.slice(0, 70)}`);
+    console.log(`    sentAt:    ${e.sentAt.toISOString()}`);
+    console.log(`    htmlBody:  ${e.htmlBody ? `${e.htmlBody.length}b` : 'null'}`);
+    console.log(`    smtp.acc:  ${JSON.stringify(e.smtpAccepted)}`);
+    console.log(`    smtp.resp: ${e.smtpResponse || 'null'}`);
+    console.log(`    imap.ok:   ${e.imapAppendOk}`);
+    console.log(`    imap.fld:  ${e.imapSentFolder} (UID ${e.imapSentUid})`);
+    console.log(`    imap.err:  ${e.imapError || 'null'}`);
+    console.log(`    orbita:    ${e.orbitaKind}/${e.orbitaId}`);
+    console.log('');
   }
 }
 
