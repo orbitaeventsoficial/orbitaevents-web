@@ -33,3 +33,18 @@ html.admin-mode .dg__btn--pdf:hover:not(:disabled) { opacity: 0.88; }
 html.admin-mode .dg__btn--download { background: var(--ax-surface2, rgba(255,255,255,0.08)); color: var(--ax-t1); border: 1px solid var(--ax-border, rgba(255,255,255,0.1)); }
 html.admin-mode .dg__btn--download:hover:not(:disabled) { background: var(--ax-surface3, rgba(255,255,255,0.12)); }
 html.admin-mode .dg__hint { font-size: 12px; color: var(--ax-t3); }
+html.admin-mode .dg__btn--danger { background: var(--o-stage-lost, rgba(220,60,60,0.15)); color: var(--ax-t1); border: 1px solid rgba(220,60,60,0.3); }
+html.admin-mode .dg__btn--danger:hover:not(:disabled) { opacity: 0.8; }
+
+/* Llista de dossiers desats */
+html.admin-mode .dg__list-section { margin-bottom: 32px; }
+html.admin-mode .dg__gen-section { margin-top: 8px; }
+html.admin-mode .dg__list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+html.admin-mode .dg__list-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px; border-radius: 10px; border: 1px solid var(--ax-border, rgba(255,255,255,0.08)); background: var(--ax-surface2, rgba(255,255,255,0.03)); }
+html.admin-mode .dg__list-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+html.admin-mode .dg__list-nom { font-size: 14px; font-weight: 600; color: var(--ax-t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html.admin-mode .dg__list-meta { font-size: 12px; color: var(--ax-t3); }
+html.admin-mode .dg__list-sent { font-size: 11px; color: var(--o-admin-gold, #c8a84b); }
+html.admin-mode .dg__list-lead { font-size: 11px; color: var(--ax-t3); text-decoration: none; opacity: 0.7; }
+html.admin-mode .dg__list-lead:hover { opacity: 1; color: var(--o-admin-gold); }
+html.admin-mode .dg__list-acts { display: flex; align-items: center; gap: 8px; shrink: 0; }

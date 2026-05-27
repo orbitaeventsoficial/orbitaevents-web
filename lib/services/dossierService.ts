@@ -37,6 +37,16 @@ export async function getDossiersByLead(leadId: string) {
   });
 }
 
+export async function getAllDossiers(limit = 50) {
+  return prisma.dossier.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+    include: {
+      lead: { select: { id: true, name: true, status: true } },
+    },
+  });
+}
+
 export async function getDossierById(id: string) {
   return prisma.dossier.findUnique({ where: { id } });
 }
