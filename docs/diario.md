@@ -1,3 +1,34 @@
+## 2026-05-27 — Canvi #822+#823: Safata UI millorada + extreure lead des d'email + múltiples contactes per client (claude)
+
+### Context
+Tres millores funcionals sobre la safata i la fitxa de client:
+1. La safata necessitava accions ràpides sense obrir el detall (flag/esborrar) i la capçalera del detall estava sobrecarregada.
+2. Quan arriba un email d'un possible client, calia poder crear un lead directament des del missatge.
+3. El cas Jardiland: una empresa amb dues persones de contacte — calia suportar múltiples contactes per client.
+
+### Canvi
+- **`app/admin/inbox/SafataClient.tsx`**: botons flag/esborrar a cada fila (apareixen en hover/selecció). Capçalera del detall reorganitzada: "Respondre" queda com a acció principal, resta agrupada en un pill d'icones; "✦ Crear lead" apareix als emails entrants sense lead associat. `ExtractEmailModal` — modal que preomple el formulari de lead amb les dades del remitent (nom, email, telèfon per regex, tipus d'event per heurística de subject/body); en crear el lead s'obre el workspace en nova pestanya via `buildLeadWorkspaceHref`.
+- **`app/admin/inbox/inbox.css`**: `.sf__iconbtn`, `.sf__detail-acts-group`, `.sf__lead-quickacts`, `.sf__extract-btn`, `.sf__extract-modal`, `.sf__extract-row`, `.sf__extract-input`.
+- **`prisma/schema.prisma`** + **migració `20260527160000_add_customer_contacts`**: nou model `CustomerContact` (id, customerId, name, role, email, phone, notes, isPrimary, timestamps). Aplicada a Railway.
+- **`lib/services/customerContactService.ts`**: `listCustomerContacts`, `createCustomerContact` (updateMany si isPrimary), `updateCustomerContact`, `deleteCustomerContact`.
+- **`app/api/admin/customers/[id]/contacts/route.ts`**: GET + POST amb validació zod.
+- **`app/api/admin/customers/[id]/contacts/[cid]/route.ts`**: PATCH + DELETE.
+- **`lib/customer-hub/dto.ts`**: `CustomerContactDTO` + `contacts: CustomerContactDTO[]` a `CustomerHubDTO`.
+- **`lib/customer-hub/fetchCustomerHub.ts`**: query i mapping de contactes inclosos a la resposta del hub.
+- **`app/admin/clientes/[id]/_components/panels/SummaryPanel.tsx`**: `<ContactsSection>` amb CRUD complet, badge "Principal", email via compositor (no `mailto:`), Tailwind arbitrary classes per tokens CSS.
+- **`__tests__/lib/services/customerContactService.test.ts`**: 8 tests nous. Mocks actualitzats a 6 fitxers de test del hub de client.
+
+### Validació
+- `validate:core` → tots els guards passen (prisma-in-routes, service-coverage, admin-no-mailto, customer-inline-href, no-admin-inline-font-styles, no-admin-static-css-var-styles)
+- `pnpm test:run` → 482 fitxers, 4678 tests, tot verd
+- `pnpm build` → build net
+- Migració aplicada a Railway
+
+### Estat
+**TANCAT**
+
+---
+
 ## 2026-05-27 — Canvi #821: Safata Outlook — mirall IMAP/SMTP + X-Orbita + observabilitat (claude)
 
 ### Context

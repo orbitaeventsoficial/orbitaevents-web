@@ -55,6 +55,15 @@ conversa ↔ entitat via headers MIME `X-Orbita-Kind/Id/Origin` + Message-ID
 estable `<orbita.{kind}.{id}.{ts}.{rand}@orbitaevents.com>`. La BD no entra
 al canal — només recull traça observable de tornada.
 
+[claude] 2026-05-27 [ESTAT: tancat]
+Últim canvi: #822+#823 (safata UI millorada + ExtractEmailModal + CustomerContact múltiples contactes per client).
+Proper pas previst: seguir backlog — Reserves `/admin/bookings` o millores de leads. Migració `customer_contacts` ja aplicada a Railway.
+Avís per codex: Commitat. 17 fitxers, 850 insercions.
+- Safata: botons ràpids flag/esborrar en hover; capçalera detall reorganitzada; "✦ Crear lead" per emails entrants.
+- ExtractEmailModal: crea lead preomplert des de l'email (remitent, telèfon regex, tipus event heurística).
+- CustomerContact: model nou, migració aplicada, `customerContactService`, API routes, DTO, fetchCustomerHub, UI ContactsSection a SummaryPanel.
+- 8 tests nous + 6 mocks actualitzats. `validate:core` + `test:run` + `build` → tots verds.
+
 ---
 
 ## Bloc CODEX (Codex CLI)
