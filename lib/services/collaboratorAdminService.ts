@@ -6,8 +6,10 @@ type CollaboratorInput = {
   company?: string | null;
   email?: string | null;
   phone?: string | null;
+  specialty?: string | null;
   commissionPct?: number | string | null;
   pricingModel?: string | null;
+  costPerHour?: number | string | null;
   notes?: string | null;
   isActive?: boolean | null;
 };
@@ -68,8 +70,10 @@ export async function createAdminCollaborator(input: CollaboratorInput) {
       company: input.company?.trim() || null,
       email: input.email?.trim() || null,
       phone: input.phone?.trim() || null,
-      commissionPct: Number(input.commissionPct) || 10,
+      specialty: input.specialty?.trim() || null,
+      commissionPct: Number(input.commissionPct) || 0,
       pricingModel: normalizePricingModel(input.pricingModel),
+      costPerHour: input.costPerHour != null ? Number(input.costPerHour) : null,
       notes: input.notes?.trim() || null,
     },
   });
@@ -114,8 +118,10 @@ export async function updateAdminCollaborator(id: string, input: CollaboratorInp
       ...(input.company !== undefined && { company: input.company?.trim() || null }),
       ...(input.email !== undefined && { email: input.email?.trim() || null }),
       ...(input.phone !== undefined && { phone: input.phone?.trim() || null }),
+      ...(input.specialty !== undefined && { specialty: input.specialty?.trim() || null }),
       ...(input.commissionPct !== undefined && { commissionPct: Number(input.commissionPct) }),
       ...(input.pricingModel !== undefined && { pricingModel: normalizePricingModel(input.pricingModel) }),
+      ...(input.costPerHour !== undefined && { costPerHour: input.costPerHour != null ? Number(input.costPerHour) : null }),
       ...(input.notes !== undefined && { notes: input.notes?.trim() || null }),
       ...(input.isActive !== undefined && { isActive: Boolean(input.isActive) }),
     },

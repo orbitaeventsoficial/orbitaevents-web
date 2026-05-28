@@ -13,8 +13,10 @@ interface Collaborator {
   company: string | null;
   email: string | null;
   phone: string | null;
+  specialty: string | null;
   commissionPct: number;
   pricingModel: 'NET_PLUS_COMMISSION' | 'DISCOUNT';
+  costPerHour: number | null;
   notes: string | null;
   isActive: boolean;
   bookings: CollaboratorBooking[];
@@ -134,8 +136,10 @@ export default function CollaboratorsClient() {
       company: c.company || '',
       email: c.email || '',
       phone: c.phone || '',
+      specialty: c.specialty || '',
       commissionPct: c.commissionPct,
       pricingModel: c.pricingModel,
+      costPerHour: c.costPerHour ?? '',
       notes: c.notes || '',
     });
     setEditingId(c.id);
@@ -316,7 +320,35 @@ export default function CollaboratorsClient() {
               />
             </div>
             <div>
-              <label htmlFor="collab-commission" className="mb-1 block text-sm admin-tone-text-neutral">Comissió %</label>
+              <label htmlFor="collab-specialty" className="mb-1 block text-sm admin-tone-text-neutral">Especialitat</label>
+              <input
+                id="collab-specialty"
+                value={form.specialty}
+                onChange={(e) => setForm({ ...form, specialty: e.target.value })}
+                placeholder="DJ, Presentador, Tècnic de so..."
+                className="ap-input w-full px-4 py-2.5"
+              />
+            </div>
+            <div>
+              <label htmlFor="collab-cost-hour" className="mb-1 block text-sm admin-tone-text-neutral">Cost/hora (€)</label>
+              <input
+                id="collab-cost-hour"
+                type="number"
+                min={0}
+                step={0.01}
+                value={form.costPerHour}
+                onChange={(e) => setForm({ ...form, costPerHour: e.target.value === '' ? '' : Number(e.target.value) })}
+                placeholder="Ex: 133.33"
+                className="ap-input w-full px-4 py-2.5"
+              />
+              {form.costPerHour !== '' && Number(form.costPerHour) > 0 && (
+                <p className="mt-1 text-xs text-white/40">
+                  1,5h → {Math.round(Number(form.costPerHour) * 1.5)}€ · 2h → {Math.round(Number(form.costPerHour) * 2)}€ · 3h → {Math.round(Number(form.costPerHour) * 3)}€
+                </p>
+              )}
+            </div>
+            <div>
+              <label htmlFor="collab-commission" className="mb-1 block text-sm admin-tone-text-neutral">Comissió % (si és revenedor)</label>
               <input
                 id="collab-commission"
                 type="number"
@@ -389,6 +421,8 @@ export default function CollaboratorsClient() {
                     {!c.isActive && <span className="ap-badge">Inactiu</span>}
                   </div>
                   <div className="flex items-center gap-4 text-sm admin-tone-text-neutral">
+                    {c.specialty && <span className="text-amber-400/80 font-medium">{c.specialty}</span>}
+                    {c.costPerHour != null && <span className="text-white/60">{c.costPerHour}€/h</span>}
                     {c.email && <span>{c.email}</span>}
                     {c.phone && <span>{c.phone}</span>}
                     <span>{c.bookings.length} reserves</span>

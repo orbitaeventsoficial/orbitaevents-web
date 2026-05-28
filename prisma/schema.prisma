@@ -1774,8 +1774,10 @@ model Collaborator {
   company       String?
   email         String?
   phone         String?
-  commissionPct Float                    @default(10) // % comissió
-  pricingModel  CollaboratorPricingModel @default(DISCOUNT) // Model de preus
+  specialty     String?                  // Especialitat (DJ, Presentador, Tècnic so...)
+  commissionPct Float                    @default(0)  // % comissió de vendes (0 si és treballador extern)
+  pricingModel  CollaboratorPricingModel @default(DISCOUNT)
+  costPerHour   Float?                   // Cost que ens cobra per hora (calculadora de costos)
   notes         String?                  @db.Text
   isActive      Boolean                  @default(true)
 

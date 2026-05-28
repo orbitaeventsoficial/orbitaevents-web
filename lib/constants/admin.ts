@@ -249,16 +249,20 @@ export const ADMIN_COLLABORATOR_EMPTY_FORM: {
   company: string;
   email: string;
   phone: string;
+  specialty: string;
   commissionPct: number;
   pricingModel: 'NET_PLUS_COMMISSION' | 'DISCOUNT';
+  costPerHour: number | '';
   notes: string;
 } = {
   name: '',
   company: '',
   email: '',
   phone: '',
-  commissionPct: 10,
+  specialty: '',
+  commissionPct: 0,
   pricingModel: 'DISCOUNT',
+  costPerHour: '',
   notes: '',
 };
 
