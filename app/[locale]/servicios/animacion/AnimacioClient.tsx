@@ -10,9 +10,18 @@ export default function AnimacioClient() {
   return (
     <div className="space-y-20 pb-20">
       {/* Hero */}
-      <section className="relative min-h-[55vh] flex items-center overflow-hidden bg-gradient-to-b from-black via-black/90 to-bg-main">
+      <section className="relative min-h-[55vh] flex items-center overflow-hidden">
         <div className="absolute inset-0 -z-10 pointer-events-none">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(251,146,60,0.12)_0%,_transparent_70%)]" />
+          <Image
+            src="/img/animacion/bingo-musical.jpg"
+            alt="Animació musical — Bingo Musical en acció"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/90" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(251,146,60,0.15)_0%,_transparent_60%)]" />
         </div>
 
         <div className="relative z-10 mx-auto max-w-6xl px-4 py-20 text-center">
@@ -78,18 +87,6 @@ export default function AnimacioClient() {
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className="rounded-2xl border border-white/10 bg-white/[0.04] overflow-hidden hover:border-orange-500/30 transition-all"
             >
-              {product.image && (
-                <div className="relative w-full h-48 overflow-hidden">
-                  <Image
-                    src={product.image}
-                    alt={product.nom}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-cover object-center"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                </div>
-              )}
               <div className="p-8">
                 <div className="flex items-start justify-between mb-4">
                   <h3 className="text-2xl font-bold text-white">{product.nom}</h3>
