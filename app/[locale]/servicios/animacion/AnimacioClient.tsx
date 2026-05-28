@@ -10,7 +10,7 @@ export default function AnimacioClient() {
   return (
     <div className="space-y-8 pb-20">
       {/* Hero */}
-      <section className="relative min-h-[85vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[85vh] flex items-start overflow-hidden">
         <div className="absolute inset-0 -z-10 pointer-events-none">
           <Image
             src="/img/animacion/bingo-musical.jpg"
@@ -24,7 +24,7 @@ export default function AnimacioClient() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(251,146,60,0.15)_0%,_transparent_60%)]" />
         </div>
 
-        <div className="relative z-10 mx-auto max-w-6xl px-4 py-20 text-center">
+        <div className="relative z-10 mx-auto max-w-6xl px-4 pt-20 pb-24 text-center">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
