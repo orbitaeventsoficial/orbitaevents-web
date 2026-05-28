@@ -37,6 +37,8 @@ interface FormData {
   // Dades event
   eventType: string;
   eventDate: string;
+  eventStartTime: string;
+  eventEndTime: string;
   location: string;
 
   // Missatge
@@ -126,6 +128,8 @@ export default function ContactFormComplete({
     phone: '',
     eventType: preselectedService || '',
     eventDate: preselectedDate || '',
+    eventStartTime: '',
+    eventEndTime: '',
     location: '',
     message: '',
     acceptPrivacy: false,
@@ -214,6 +218,8 @@ export default function ContactFormComplete({
           phone: formData.phone,
           event: formData.eventType,
           eventDate: formData.eventDate,
+          eventStartTime: formData.eventStartTime || undefined,
+          eventEndTime: formData.eventEndTime || undefined,
           location: formData.location,
           message: formData.message,
           timestamp: new Date().toISOString(),
@@ -426,7 +432,7 @@ export default function ContactFormComplete({
           </div>
 
           {/* Ubicació */}
-          <div className={errors.location && touched.location ? 'error-field' : ''}>
+          <div>
             <label htmlFor="location" className="block text-white/70 text-sm mb-2">
               {t('labels.location')} <span className="text-red-400">*</span>
             </label>
@@ -445,6 +451,36 @@ export default function ContactFormComplete({
             {errors.location && touched.location && (
               <p className="text-red-400 text-sm mt-1">{errors.location}</p>
             )}
+          </div>
+        </div>
+
+        {/* Horari (opcional) */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="eventStartTime" className="block text-white/70 text-sm mb-2">
+              {t('labels.eventStartTime')}
+            </label>
+            <input
+              type="time"
+              id="eventStartTime"
+              name="eventStartTime"
+              value={formData.eventStartTime}
+              onChange={(e) => updateField('eventStartTime', e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-base outline-none transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500"
+            />
+          </div>
+          <div>
+            <label htmlFor="eventEndTime" className="block text-white/70 text-sm mb-2">
+              {t('labels.eventEndTime')}
+            </label>
+            <input
+              type="time"
+              id="eventEndTime"
+              name="eventEndTime"
+              value={formData.eventEndTime}
+              onChange={(e) => updateField('eventEndTime', e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-base outline-none transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500"
+            />
           </div>
         </div>
       </div>

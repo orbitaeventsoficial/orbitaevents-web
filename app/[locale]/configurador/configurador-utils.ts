@@ -8,7 +8,7 @@ import { resolvePackI18nKey } from '@/lib/pack-i18n';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
-export type EventType = 'bodas' | 'discomovil' | 'fiestas' | 'empresas';
+export type EventType = 'bodas' | 'discomovil' | 'fiestas' | 'empresas' | 'animacion';
 
 export interface ConfigState {
   eventType: EventType | null;
@@ -50,14 +50,16 @@ export const EVENT_TYPE_SERVICE_MAP: Record<EventType, ServiceSlug[]> = {
   discomovil: ['discomovil'],
   fiestas: ['fiestas', 'discomovil'],
   empresas: ['empresas'],
+  animacion: ['animacion'],
 };
 
 export const EVENT_TYPE_CARDS: Array<{
   slug: EventType;
   icon: string;
-  idealKey: 'step1.idealBodas' | 'step1.idealFiestas' | 'step1.idealDiscomovil' | 'step1.idealEmpresas';
+  idealKey: 'step1.idealBodas' | 'step1.idealFiestas' | 'step1.idealDiscomovil' | 'step1.idealEmpresas' | 'step1.idealAnimacion';
 }> = [
   { slug: 'bodas', icon: '💒', idealKey: 'step1.idealBodas' },
+  { slug: 'animacion', icon: '🎤', idealKey: 'step1.idealAnimacion' },
   { slug: 'fiestas', icon: '🎉', idealKey: 'step1.idealFiestas' },
   { slug: 'discomovil', icon: '🎵', idealKey: 'step1.idealDiscomovil' },
   { slug: 'empresas', icon: '💼', idealKey: 'step1.idealEmpresas' },
@@ -68,6 +70,7 @@ export const EVENT_AMBIENTS: Record<EventType, { glow: string; gradient: string;
   fiestas: { glow: 'rgba(217,70,239,0.08)', gradient: 'from-purple-500/10 via-fuchsia-500/5 to-transparent', accent: 'text-fuchsia-400', accentBorder: 'border-fuchsia-500/30' },
   discomovil: { glow: 'rgba(34,211,238,0.08)', gradient: 'from-cyan-500/10 via-blue-500/5 to-transparent', accent: 'text-cyan-400', accentBorder: 'border-cyan-500/30' },
   empresas: { glow: 'rgba(59,130,246,0.08)', gradient: 'from-blue-500/10 via-indigo-500/5 to-transparent', accent: 'text-blue-400', accentBorder: 'border-blue-500/30' },
+  animacion: { glow: 'rgba(251,146,60,0.08)', gradient: 'from-orange-500/10 via-amber-500/5 to-transparent', accent: 'text-orange-400', accentBorder: 'border-orange-500/30' },
 };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────

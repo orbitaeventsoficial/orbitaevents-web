@@ -108,13 +108,14 @@ export function getDescripcionIluminacionPRO(): string {
 // 2. TIPUS I ESTRUCTURES
 // ============================================
 
-export type ServiceSlug = 'fiestas' | 'bodas' | 'discomovil' | 'empresas';
+export type ServiceSlug = 'fiestas' | 'bodas' | 'discomovil' | 'empresas' | 'animacion';
 
 export const ALL_SERVICES: ServiceSlug[] = [
   'fiestas',
   'bodas',
   'discomovil',
   'empresas',
+  'animacion',
 ];
 
 export type PackId = string;
@@ -268,7 +269,7 @@ const PACKS: PackDefinition[] = [
   },
   {
     id: "bingo-musical",
-    service: "discomovil",
+    service: "animacion",
     slug: "bingo-musical",
     i18nBaseKey: "services.mobile.discoPacks.bingo-musical",
     name: "services.mobile.discoPacks.bingo-musical.name",
@@ -294,7 +295,7 @@ const PACKS: PackDefinition[] = [
   },
   {
     id: "batalla-musical",
-    service: "discomovil",
+    service: "animacion",
     slug: "batalla-musical",
     i18nBaseKey: "services.mobile.discoPacks.batalla-musical",
     name: "services.mobile.discoPacks.batalla-musical.name",

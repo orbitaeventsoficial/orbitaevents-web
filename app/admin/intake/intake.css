@@ -110,13 +110,26 @@ html.admin-mode .ni__textarea {
 }
 
 html.admin-mode .ni__label {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ax-t2);
   margin-bottom: 5px;
+}
+
+html.admin-mode .ni__label-hint {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--o-admin-gold, #c9a84c);
+  background: color-mix(in oklab, var(--o-admin-gold, #c9a84c) 15%, transparent);
+  border-radius: 4px;
+  padding: 1px 5px;
 }
 
 html.admin-mode .ni__field {

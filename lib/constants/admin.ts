@@ -57,7 +57,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 824;
+export const ADMIN_CHANGE_COUNTER = 828;
 
 export const ADMIN_DETAIL_PAGE_LABELS: Record<string, string> = {
   inventory: 'Fitxa inventari',
@@ -444,6 +444,7 @@ export const ADMIN_EXTRA_SERVICE_LABELS = {
   fiestas: 'Festes',
   discomovil: 'Discomòbil',
   empresas: 'Empreses',
+  animacion: 'Animació',
 } as const;
 
 export const ADMIN_EXTRA_CATEGORY_OPTIONS = [
@@ -543,6 +544,7 @@ export const ADMIN_PDF_STUDIO_SERVICE_LABELS = {
   fiestas: 'Festes',
   discomovil: 'Discomòbil',
   empresas: 'Empreses',
+  animacion: 'Animació',
 } as const;
 
 export const ADMIN_CRON_PREFIXES = [

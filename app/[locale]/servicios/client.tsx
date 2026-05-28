@@ -18,6 +18,7 @@ interface Servicio {
   popular: boolean;
   icon: string;
   emoji: string;
+  novelty?: boolean;
   name: string;
   tagline: string;
   desc: string;
@@ -181,10 +182,17 @@ export default function ServiciosClient({ servicios, texts, heroImage }: Servici
                     }
                   `}
                 >
-                  {servicio.popular && (
+                  {servicio.popular && !servicio.novelty && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                       <span className="bg-gradient-to-r from-amber-500 to-orange-500 text-black px-4 py-1.5 rounded-full text-xs font-bold shadow-lg">
                         {texts.mostPopular}
+                      </span>
+                    </div>
+                  )}
+                  {servicio.novelty && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <span className="bg-gradient-to-r from-orange-500 to-rose-500 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg shadow-orange-500/30 animate-pulse">
+                        ✨ NOU
                       </span>
                     </div>
                   )}

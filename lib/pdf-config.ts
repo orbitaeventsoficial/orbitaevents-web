@@ -52,6 +52,7 @@ export const SERVICE_NAMES: Record<ServiceSlug, { ca: string; es: string; en: st
   fiestas: { ca: 'Festes', es: 'Fiestas', en: 'Parties' },
   discomovil: { ca: 'Discomòbil', es: 'Discomóvil', en: 'Mobile DJ' },
   empresas: { ca: 'Empreses', es: 'Empresas', en: 'Corporate' },
+  animacion: { ca: 'Animació', es: 'Animación', en: 'Animation' },
 };
 
 // ─── Helpers purs ───────────────────────────────────────────────────────────

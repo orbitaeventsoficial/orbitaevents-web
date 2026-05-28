@@ -221,6 +221,8 @@ export const contactSchema = (t: Record<string, string>) => z.object({
   packName: z.string().optional(),
   estimatedPrice: z.number().optional(),
   eventDate: z.string().optional(),
+  eventStartTime: z.string().regex(/^\d{1,2}:\d{2}$/).optional(),
+  eventEndTime: z.string().regex(/^\d{1,2}:\d{2}$/).optional(),
   guests: z.union([z.number(), z.string()]).optional(),
   guestCount: z.union([z.number(), z.string()]).optional(),
   extras: z.array(z.string()).optional(),

@@ -1,4 +1,4 @@
-export type StandaloneServiceKey = 'alquiler' | 'produccion' | 'animacion-infantil';
+export type StandaloneServiceKey = 'alquiler' | 'produccion' | 'animacion-infantil' | 'animacion';
 
 export type StandaloneServiceSeoConfig = {
   metadata: {
@@ -44,6 +44,40 @@ export const STANDALONE_SERVICE_SEO: Record<StandaloneServiceKey, StandaloneServ
       areaServed: ['Barcelona', 'Girona', 'Tarragona', 'Lleida', 'Granollers', 'Sabadell', 'Terrassa', 'Mataró'],
       priceFrom: '600',
       priceCurrency: 'EUR',
+    },
+  },
+  animacion: {
+    metadata: {
+      title: 'Animació Musical d\'Adults Barcelona | Bingo Musical i Batalla Musical | Òrbita Events',
+      description: 'Animació musical professional per a festes i celebracions d\'adults. Bingo Musical i Batalla Musical amb DJ i presentador. Diversió garantida. Desde 250€.',
+      openGraphTitle: 'Animació Musical | Bingo i Batalla Musical per a Festes d\'Adults',
+      openGraphDescription: 'DJ + Presentador + jocs musicals per a tota la festa. Bingo Musical i Batalla Musical. Barcelona i Girona.',
+      openGraphImage: '/api/og?title=Animacio%20Musical%20Adults',
+      openGraphImageAlt: 'Animació musical per a adults amb DJ i presentador',
+      twitterTitle: 'Animació Musical per a Adults | Òrbita Events',
+      twitterDescription: 'Bingo Musical i Batalla Musical amb DJ i presentador professional. Des de 250€.',
+      twitterImage: '/api/og?title=Animacio%20Musical',
+      keywords: [
+        'animació musical adults Barcelona',
+        'bingo musical festes',
+        'batalla musical adults',
+        'animació festes privades Barcelona',
+        'jocs musicals adults',
+        'DJ amb presentador Barcelona',
+        'animació comunió adults',
+        'animació aniversari adults',
+        'bingo musical Girona',
+        'batalla musical Barcelona',
+      ],
+    },
+    jsonLd: {
+      name: 'Animació Musical per a Adults — Bingo i Batalla Musical',
+      description: 'Animació musical professional per a festes i celebracions d\'adults. Bingo Musical (cartrons, gomets, reptes) i Batalla Musical (equips, desafiaments, puntuació) amb DJ professional i presentador/a inclosos.',
+      serviceType: ['Animació adults', 'Bingo musical', 'Batalla musical', 'Jocs musicals festes', 'DJ amb presentador'],
+      areaServed: ['Barcelona', 'Girona', 'Maresme', 'Vallès', 'Garraf', 'Baix Llobregat'],
+      priceFrom: '250',
+      priceCurrency: 'EUR',
+      availability: 'https://schema.org/InStock',
     },
   },
   'animacion-infantil': {

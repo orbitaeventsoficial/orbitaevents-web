@@ -340,7 +340,7 @@
   },
   "hero": {
     "elegant": {
-      "badge": "DJ · Iluminación · Tematización · Producción",
+      "badge": "DJ · Animación · Iluminación · Tematización · Producción",
       "badgeEmoji": "🎵",
       "hook": {
         "line1": "La gente no recuerda el menú.",
@@ -359,8 +359,8 @@
         "EXPERIENCIA ÚNICA.",
         "PURA MAGIA."
       ],
-      "subtitle": "DJ, iluminación y tematización para fiestas que la gente recuerda. Barcelona y Girona. Presupuesto en 2h.",
-      "subtitleAlt": "DJ, iluminación y tematización para fiestas que la gente recuerda. Barcelona y Girona.",
+      "subtitle": "DJ, animación musical e iluminación para fiestas que la gente recuerda. Barcelona y Girona. Presupuesto en 2h.",
+      "subtitleAlt": "DJ, animación musical e iluminación para fiestas que la gente recuerda. Barcelona y Girona.",
       "subtitleLocation": "",
       "subtitleLocationAlt": "",
       "ctaPacks": "Ver packs y precios",
@@ -1504,7 +1504,8 @@
       "djWeddings": "DJ Bodas",
       "privateParties": "Fiestas Privadas",
       "corporateEvents": "Empresas",
-      "discomovil": "Discomóvil"
+      "discomovil": "Discomóvil",
+      "animacion": "Animación Musical"
     },
     "experiences": {
       "monMagic": "Mundo Mágico 🪄",
@@ -1575,6 +1576,8 @@
     "services": {
       "bodas": "DJ Bodas",
       "bodasDesc": "La emotividad que tu día merece",
+      "animacion": "Animación Musical",
+      "animacionDesc": "DJ · Bingo Musical · Batalla Musical",
       "fiestas": "Fiestas Privadas",
       "fiestasDesc": "Cumpleaños, despedidas y celebraciones",
       "empresas": "Eventos Corporativos",
@@ -1725,6 +1728,8 @@
       "phone": "Teléfono",
       "eventType": "Tipo de evento",
       "eventDate": "Fecha aproximada",
+      "eventStartTime": "Hora de inicio (opcional)",
+      "eventEndTime": "Hora de finalización (opcional)",
       "guests": "Número de invitados",
       "location": "Ubicación (ciudad/pueblo)",
       "budget": "Presupuesto aproximado",
@@ -1857,7 +1862,8 @@
         "discomovil": "Discomóvil",
         "empresas": "Eventos corporativos",
         "alquiler": "Alquiler"
-      }
+      },
+      "idealAnimacion": "DJ, animación musical, iluminación y juegos"
     },
     "step2": {
       "changeEvent": "Cambia el tipo de evento",
@@ -2573,6 +2579,18 @@
             "EV + Pioneer + B-150",
             "Con/sin tecnico",
             "Consultar"
+          ]
+        },
+        "animacion": {
+          "name": "Animación",
+          "tagline": "DJ · Animación Musical · Iluminación · Tematización",
+          "desc": "DJ, iluminación y tematización para fiestas que la gente recuerda. Bingo Musical y Batalla Musical incluidos. Barcelona y Girona.",
+          "features": [
+            "Bingo Musical",
+            "Batalla Musical",
+            "DJ profesional",
+            "Iluminación incluida",
+            "Desde 250€"
           ]
         }
       },
@@ -3897,7 +3915,8 @@
       "rental": "Alquiler",
       "corporate": "Empresas",
       "faq": "FAQ",
-      "contact": "Contacto"
+      "contact": "Contacto",
+      "animacion": "Animación Musical"
     }
   },
   "extras": {

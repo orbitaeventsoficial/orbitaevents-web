@@ -8,21 +8,23 @@ export type PublicServiceCatalogItem = {
   emoji: string;
   tier: PublicServiceTier;
   showInServicesPage: boolean;
+  novelty?: boolean;
 };
 
-type PublicCoreServiceKey = 'bodas' | 'discomovil' | 'fiestas' | 'empresas';
+type PublicCoreServiceKey = 'bodas' | 'discomovil' | 'fiestas' | 'empresas' | 'animacion';
 
 export type PublicCoreServiceNavItem = {
   key: PublicCoreServiceKey;
   href: string;
   icon: string;
   headerDescKey: `${PublicCoreServiceKey}Desc`;
-  footerNameKey: 'djWeddings' | 'discomovil' | 'privateParties' | 'corporateEvents';
-  notFoundLabelKey: 'djWeddings' | 'discomovil' | 'parties' | 'corporate';
+  footerNameKey: 'djWeddings' | 'discomovil' | 'privateParties' | 'corporateEvents' | 'animacion';
+  notFoundLabelKey: 'djWeddings' | 'discomovil' | 'parties' | 'corporate' | 'animacion';
 };
 
 export const PUBLIC_SERVICE_CATALOG: PublicServiceCatalogItem[] = [
   { key: 'bodas', href: '/servicios/bodas', popular: true, icon: 'heart', emoji: '💍', tier: 'core', showInServicesPage: true },
+  { key: 'animacion', href: '/servicios/animacion', popular: true, icon: 'mic', emoji: '🎤', tier: 'core', showInServicesPage: true, novelty: true },
   { key: 'discomovil', href: '/servicios/discomovil', popular: true, icon: 'music', emoji: '🎧', tier: 'core', showInServicesPage: true },
   { key: 'fiestas', href: '/servicios/fiestas', popular: false, icon: 'cake', emoji: '🎉', tier: 'core', showInServicesPage: true },
   { key: 'animacionInfantil', href: '/servicios/animacion-infantil', popular: false, icon: 'party', emoji: '🧒', tier: 'satellite', showInServicesPage: true },
@@ -33,6 +35,7 @@ export const PUBLIC_SERVICE_CATALOG: PublicServiceCatalogItem[] = [
 
 const CORE_SERVICE_NAV_META: Record<PublicCoreServiceKey, Omit<PublicCoreServiceNavItem, 'key' | 'href'>> = {
   bodas: { icon: '💍', headerDescKey: 'bodasDesc', footerNameKey: 'djWeddings', notFoundLabelKey: 'djWeddings' },
+  animacion: { icon: '🎤', headerDescKey: 'animacionDesc', footerNameKey: 'animacion', notFoundLabelKey: 'animacion' },
   discomovil: { icon: '🎵', headerDescKey: 'discomovilDesc', footerNameKey: 'discomovil', notFoundLabelKey: 'discomovil' },
   fiestas: { icon: '🎉', headerDescKey: 'fiestasDesc', footerNameKey: 'privateParties', notFoundLabelKey: 'parties' },
   empresas: { icon: '💼', headerDescKey: 'empresasDesc', footerNameKey: 'corporateEvents', notFoundLabelKey: 'corporate' },

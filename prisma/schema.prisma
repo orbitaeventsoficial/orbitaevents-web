@@ -435,6 +435,8 @@ model Lead {
   dni              String?
   eventType        EventType
   eventDate        DateTime?
+  eventStartTime   String?   // "13:00"
+  eventEndTime     String?   // "16:00"
   eventSchedule    String?
   eventLocation    String?
   guestCount       Int?

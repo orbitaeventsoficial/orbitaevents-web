@@ -28,6 +28,7 @@ type FormData = {
   eventType: string;
   eventDate: string;
   eventTime: string;
+  eventEndTime: string;
   eventLocation: string;
   guestCount: string;
   budget: string;
@@ -45,6 +46,7 @@ const INITIAL_FORM: FormData = {
   eventType: 'OTHER',
   eventDate: '',
   eventTime: '',
+  eventEndTime: '',
   eventLocation: '',
   guestCount: '',
   budget: '',
@@ -95,6 +97,7 @@ export default function IntakePage() {
         eventType: data.eventType || prev.eventType,
         eventDate: data.eventDate || prev.eventDate,
         eventTime: data.eventTime || prev.eventTime,
+        eventEndTime: data.eventEndTime || prev.eventEndTime,
         eventLocation: data.eventLocation || prev.eventLocation,
         guestCount: data.guestCount || prev.guestCount,
         budget: data.budget || prev.budget,
@@ -206,6 +209,8 @@ export default function IntakePage() {
         source: form.source || 'OTHER',
         eventType: form.eventType,
         eventDate: eventDateTime,
+        eventStartTime: form.eventTime || undefined,
+        eventEndTime: form.eventEndTime || undefined,
         eventLocation: form.eventLocation.trim() || undefined,
         guestCount: form.guestCount ? parseInt(form.guestCount, 10) : undefined,
         budget: form.budget.trim() || undefined,
@@ -451,7 +456,20 @@ export default function IntakePage() {
               />
             </div>
             <div className="ni__field">
-              <label htmlFor="intake-time" className="ni__label">Hora</label>
+              <label htmlFor="intake-time" className="ni__label">
+                Hora inici
+                {form.eventTime && form.eventEndTime && (() => {
+                  const [sh, sm] = form.eventTime.split(':').map(Number);
+                  const [eh, em] = form.eventEndTime.split(':').map(Number);
+                  const mins = (eh * 60 + em) - (sh * 60 + sm);
+                  if (mins > 0) {
+                    const h = Math.floor(mins / 60);
+                    const m = mins % 60;
+                    return <span className="ni__label-hint">{h > 0 ? `${h}h` : ''}{m > 0 ? `${m}min` : ''}</span>;
+                  }
+                  return null;
+                })()}
+              </label>
               <input
                 id="intake-time"
                 type="time"
@@ -460,6 +478,16 @@ export default function IntakePage() {
                 className="ni__input"
               />
             </div>
+          </div>
+          <div className="ni__field">
+            <label htmlFor="intake-end-time" className="ni__label">Hora fi</label>
+            <input
+              id="intake-end-time"
+              type="time"
+              value={form.eventEndTime}
+              onChange={(e) => updateField('eventEndTime', e.target.value)}
+              className="ni__input"
+            />
           </div>
           <div className="ni__field">
             <label htmlFor="intake-location" className="ni__label">Ubicació</label>

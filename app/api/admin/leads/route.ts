@@ -72,6 +72,8 @@ const leadSchema = z.object({
   phone: z.string().optional(),
   eventType: z.enum(EVENT_TYPE_VALUES),
   eventDate: z.string().optional(),
+  eventStartTime: z.string().optional(),
+  eventEndTime: z.string().optional(),
   eventLocation: z.string().optional(),
   eventVenue: z.string().optional(),
   guestCount: z.number().optional(),

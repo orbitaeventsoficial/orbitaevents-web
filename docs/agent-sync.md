@@ -56,14 +56,9 @@ estable `<orbita.{kind}.{id}.{ts}.{rand}@orbitaevents.com>`. La BD no entra
 al canal — només recull traça observable de tornada.
 
 [claude] 2026-05-28 [ESTAT: tancat]
-Últim canvi: #824 (safata UX — botons compactes en fila, quickacts sempre visibles, footer fix, counter al dia).
-Proper pas previst: continuació del backlog — Reserves `/admin/bookings` o millores de leads. Els canvis WIP de la branca (adjunts IMAP: imap.ts, SafataClient, route attachment) encara no commitats — cal decidir si continuen o s'aparca.
-Avís per codex: Commitat. Canvis visuals purs, cap lògica tocada.
-- admin-shell.css: `.ax__sidetop` fila horitzontal; `.ax__inbox` + `.ax__add` flex:1, compactes.
-- layout.tsx: "Safata d'entrada" → "✉ Safata", "Nova entrada" → "+ Nova entrada".
-- inbox.css: `.sf` height:100dvh (footer sempre visible); `.sf__lead` grid 3 cols; quickacts sempre display:flex, 28×28px.
-- Counter 821 → 824 (cobrint #822+#823 que no el van actualitzar).
-- `validate:core` 60/60 verd.
+Últim canvi: #828 (animació — preus DJ 100/200€ + packPrice 80/160€ + badge ✨NOU + badge hero inclou Animació).
+Proper pas previst: commit #826+#827+#828 + verificació browser. Següent: Reserves (`/admin/bookings`) o millores dossiers.
+Avís per codex: #826 (ingesta 🤝 + hora fi). #827 (animació: nova categoria web). #828 (animació: preus DJ revisats + badge NOU a serveis + hero badge/subtitle actualitzats). `ServiceSlug` inclou 'animacion'. No tocar ServiceSlug sense coordinar.
 
 ---
 

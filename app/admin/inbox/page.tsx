@@ -36,6 +36,8 @@ async function getLeads() {
             budget: true,
             guestCount: true,
             eventDate: true,
+            eventStartTime: true,
+            eventEndTime: true,
             eventLocation: true,
             source: true,
           },

@@ -1,3 +1,137 @@
+## 2026-05-28 — Canvi #828: Animació — preus DJ revisats + badge NOU + badge hero (claude)
+
+### Context
+L'usuari ha revisat la pàgina d'animació i ha detectat:
+- El badge del hero de la homepage no incloïa "Animació".
+- El subtitle del hero tampoc mencionava animació.
+- Bingo Musical no tenia durada indicada (Batalla sí: 1h30).
+- Els preus del complement DJ eren massa alts (150€/250€) → 100€/200€.
+- S'ha afegit preu en pack per combinar animació + DJ (80€/160€).
+- El badge "NOU" per a la targeta d'Animació a la pàgina de serveis no estava renderitzat.
+
+### Canvi
+- **`lib/constants/animacio-products.ts`**: Bingo Musical afegit `durada: '1h30'`. DJ: 1h 150€→100€, 2h 250€→200€. `DJPricingOption` afegit `packPrice?: number | null`. djOptions amb `packPrice: 80` / `packPrice: 160`.
+- **`app/[locale]/servicios/animacion/AnimacioClient.tsx`**: secció DJ mostra preu en pack taronja "80€ en pack" / "160€ en pack" sota el preu standalone.
+- **`messages/ca.json`**: badge hero `"DJ · Il·luminació · Tematització · Producció"` → `"DJ · Animació · Il·luminació · Tematització · Producció"`. subtitle/subtitleAlt "DJ, il·luminació i tematització" → "DJ, animació musical i il·luminació".
+- **`messages/es.json`**: badge i subtítols equivalents en castellà.
+- **`messages/en.json`**: badge i subtítols equivalents en anglès.
+- **`app/[locale]/servicios/client.tsx`**: afegit `novelty?: boolean` a la interfície `Servicio`. Badge "✨ NOU" (taronja, pulse) per a targetes amb `novelty: true`. El badge "Més popular" no apareix si la targeta té `novelty`.
+- **`lib/constants/admin.ts`**: counter 827 → 828.
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` 827 → 828.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` → 0 errors
+- Validació funcional: `validate:core` verd (exit 0)
+- Validació humana/UX: pendent verificació browser
+
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+### Estat
+**TANCAT**
+
+---
+
+## 2026-05-28 — Canvi #827: Animació — nova categoria web + configurador (claude)
+
+### Context
+L'usuari vol Bingo Musical i Batalla Musical com a categoria pròpia ("Animació"), separada de Discomòbil. Cal pàgina pròpia, presència al header/footer/configurador.
+
+### Canvi
+- **`app/config/packs-config.ts`**: afegit `'animacion'` a `ServiceSlug` i `ALL_SERVICES`. Bingo Musical i Batalla Musical: `service: "discomovil"` → `"animacion"`.
+- **`app/[locale]/configurador/configurador-utils.ts`**: afegit `'animacion'` a `EventType`, `EVENT_TYPE_SERVICE_MAP`, `EVENT_TYPE_CARDS` (posició 2, desprès de bodas), `EVENT_AMBIENTS` (taronja).
+- **`lib/standaloneServiceSeo.ts`**: afegit `'animacion'` al tipus i SEO config complet.
+- **`lib/publicServiceCatalog.ts`**: `PublicCoreServiceKey` + `CORE_SERVICE_NAV_META` + `PUBLIC_SERVICE_CATALOG` inclouen `animacion` (posició 2 al catàleg, tier: core).
+- **`app/[locale]/servicios/animacion/page.tsx`**: nova pàgina de servei.
+- **`app/[locale]/servicios/animacion/AnimacioClient.tsx`**: component client — hero taronja, cards Bingo+Batalla (preus per trams), complement DJ, CTA.
+- **`app/sitemap.ts`**: afegida ruta `/servicios/animacion` (priority 0.85).
+- **`lib/constants/admin.ts`**: `ADMIN_EXTRA_SERVICE_LABELS` + `ADMIN_PDF_STUDIO_SERVICE_LABELS` + `animacion: 'Animació'`.
+- **`lib/pdf-config.ts`**: `SERVICE_NAMES` + `animacion`.
+- **`messages/ca.json`**, **`es.json`**, **`en.json`**: `configurator.step1.idealAnimacion`, `pages.servicios.items.animacion`, `header.services.animacion/animacionDesc`, `footerLinks.services.animacion`, `notFound.links.animacion`.
+- Header i footer automàticament inclouen Animació gràcies a `PUBLIC_CORE_SERVICE_NAV`.
+- Pàgina `/servicios`: Animació apareix a la llista (posició 2).
+- **`lib/constants/admin.ts`**: counter 826 → 827.
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` 826 → 827.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` → 0 errors
+- Validació funcional: `validate:core` verd
+- Validació humana/UX: pendent verificació browser
+
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+### Estat
+**TANCAT**
+
+---
+
+## 2026-05-28 — Canvi #826: Ingesta — icona Boca-orella 🤝 + hora fi + comptador hores (claude)
+
+### Context
+- L'emoji 🗣️ (U+1F5E3) no renderitza a Windows — apareix com a quadrat.
+- La ingesta admin (`/admin/intake`) només tenia un camp `Hora`, sense hora de finalització ni durada.
+- L'usuari vol saber quantes hores dura el bolo directament des del formulari d'ingesta.
+
+### Canvi
+- **`lib/constants/index.ts`**: `INTAKE_SOURCE_OPTIONS` REFERRAL icon `🗣️` → `🤝`. `SOURCE_ICONS` REFERRAL `👥` → `🤝`. Uniformitat entre les dues constants.
+- **`app/admin/intake/page.tsx`**: afegit `eventEndTime: string` a `FormData` i `INITIAL_FORM`. Afegit a l'extractor de text. Submit body envia `eventStartTime` (de `eventTime`) i `eventEndTime`. UI: "Hora" → "Hora inici" + badge inline que mostra durada (p.ex. "3h30min") quan ambdós camps estan plens. Nou camp "Hora fi" al grid.
+- **`app/admin/intake/intake.css`**: `.ni__label` passa a `display: flex; align-items: center; gap: 6px`. Nova classe `.ni__label-hint` (badge daurat petit) per mostrar la durada calculada.
+- **`lib/constants/admin.ts`**: counter 825 → 826.
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` 825 → 826.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` → 0 errors
+- Validació funcional: `validate:core` verd
+- Validació humana/UX: icona 🤝 renderitza a Windows; hora fi + comptador visibles al formulari
+
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+### Estat
+**TANCAT**
+
+---
+
+## 2026-05-28 — Canvi #825: Safata — cistella vermella + leads/mails separats + hora inici/fi leads (claude)
+
+### Context
+L'usuari va detectar 4 problemes a la sessió #824:
+1. La cistella (🗑) del detall d'email no es veia per overflow del grup d'icones.
+2. La cistella no era vermella malgrat el CSS (problema d'especificitat).
+3. Leads web i emails IMAP mesclats a "Entrada" — poc clar.
+4. El formulari de contacte no recull hora d'inici/fi — l'admin havia d'extreure'ls manualment del text.
+
+### Canvi
+- **`inbox.css`**: `.sf__iconbtn.sf__iconbtn--standalone` (especificitat doble) → vermell en repòs. Quickacts en fila horitzontal, 32×32px.
+- **`SafataClient.tsx`**: cistella moguda fora del `sf__detail-acts-group`. Sidebar: "Leads web" és el tab propi, "Entrada" IMAP apareix a "Bústia" com a carpeta. `extractTimesFromText` + `displayTime` al `LeadDetail`. Tipus `SafataLead` amb `eventStartTime`/`eventEndTime`.
+- **`prisma/schema.prisma`**: `eventStartTime String?` + `eventEndTime String?` al model `Lead`. `npx prisma db push` aplicat a Railway.
+- **`contactLeadCaptureService.ts`**: nous camps al tipus + upsert/create.
+- **`contact-copy.ts`** + **`app/api/contact/route.ts`**: schema Zod + pas de camps.
+- **`app/api/admin/leads/route.ts`**: `leadSchema` ampliat.
+- **`app/admin/inbox/page.tsx`**: query Prisma selecciona els nous camps.
+- **`ContactFormComplete.tsx`**: 2 inputs `type="time"` opcionals sota la data.
+- **`messages/ca.json`**, **`es.json`**, **`en.json`**: `labels.eventStartTime` + `labels.eventEndTime`.
+- **`studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` → 825.
+- **`lib/constants/admin.ts`**: counter 824 → 825.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` → 0 errors
+- Validació funcional: `validate:core` verd
+- Validació humana/UX: cistella vermella confirmada per l'usuari
+
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+### Estat
+**TANCAT**
+
+---
+
 ## 2026-05-28 — Canvi #824: Safata UX — botons compactes en fila + quickacts sempre visibles + footer fix (claude)
 
 ### Context
@@ -15,9 +149,13 @@ L'usuari identificà 4 problemes visuals/UX a la safata:
 - **`lib/constants/admin.ts`**: Counter actualitzat 821 → 824 (cobrint els #822+#823 que no el van actualitzar).
 
 ### Validació
-- `npx tsc --noEmit` → 0 errors
-- `pnpm run validate:core` → 60/60 passes, tots els guards verds
-- Verificació visual al browser (dev server) → botons en fila OK, footer visible OK, quickacts sempre visibles OK, detall + Respondre OK
+- Validació tècnica: `npx tsc --noEmit` → 0 errors; `pnpm run validate:core` → 60/60 passes
+- Validació funcional: quickacts visibles a les files, footer ancorat, botons en fila
+- Validació humana/UX: verificació visual al browser
+
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
 
 ### Estat
 **TANCAT**

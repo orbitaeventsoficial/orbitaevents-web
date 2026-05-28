@@ -8,6 +8,7 @@ export type DJPricingOption = {
   label: string;
   price: number | null;
   sublabel: string;
+  packPrice?: number | null;
 };
 
 export type AnimacioProduct = {
@@ -25,6 +26,7 @@ export const ANIMACIO_PRODUCTS: AnimacioProduct[] = [
   {
     id: 'bingo-musical',
     nom: 'Bingo Musical',
+    durada: '1h30',
     descripcio: [
       "Els temazos no paren mai. Des del primer moment sonen els hits més coneguts, sempre des de l'estribillo o la part més energètica — uns 15 segons de pur temazo rere temazo, dinamitzats per un presentador que manté l'energia al màxim.",
       "Tots els participants reben el seu cartró i els seus gomets. El joc acumula fins a quatre línies simultànies, i quan les quatre estan plenes, els quatre guanyadors surten al davant per al primer repte musical. Tres rondes d'eliminació, cada cop diferent i més intensa, mentre el públic viu i anima. Al final, un únic guanyador canta bingo.",
@@ -84,8 +86,8 @@ export const ANIMACIO_PRODUCTS: AnimacioProduct[] = [
       'Laptops',
     ],
     djOptions: [
-      { label: '1 hora', price: 150, sublabel: 'Tot inclòs' },
-      { label: '2 hores', price: 250, sublabel: 'Tot inclòs' },
+      { label: '1 hora', price: 100, sublabel: 'Tot inclòs', packPrice: 80 },
+      { label: '2 hores', price: 200, sublabel: 'Tot inclòs', packPrice: 160 },
       { label: 'Més hores', price: null, sublabel: 'Pressupost a mida' },
     ],
   },

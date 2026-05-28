@@ -1,4 +1,4 @@
-// lib/constants/index.ts
+﻿// lib/constants/index.ts
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // ÒRBITA EVENTS - CONSTANTES CENTRALIZADAS
 //
@@ -699,7 +699,7 @@ export const SOURCE_ICONS: Record<string, string> = {
   WHATSAPP: '💬',
   INSTAGRAM: '📸',
   WALLAPOP: '🟣',
-  REFERRAL: '👥',
+  REFERRAL: '🤝',
   GOOGLE: '🔍',
   OTHER: '📩',
 };
@@ -898,7 +898,7 @@ export const INTAKE_SOURCE_OPTIONS = [
   { value: 'WHATSAPP', label: 'WhatsApp', icon: '💬' },
   { value: 'INSTAGRAM', label: 'Instagram', icon: '📸' },
   { value: 'WALLAPOP', label: 'Wallapop', icon: '🟢' },
-  { value: 'REFERRAL', label: 'Boca-orella', icon: '🗣️' },
+  { value: 'REFERRAL', label: 'Boca-orella', icon: '🤝' },
   { value: 'GOOGLE', label: 'Google', icon: '🔍' },
   { value: 'WEBSITE', label: 'Web', icon: '🌐' },
   { value: 'OTHER', label: 'Altre', icon: '📋' },

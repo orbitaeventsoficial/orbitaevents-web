@@ -340,7 +340,7 @@
   },
   "hero": {
     "elegant": {
-      "badge": "DJ · Lighting · Theming · Production",
+      "badge": "DJ · Musical Animation · Lighting · Theming · Production",
       "badgeEmoji": "🎵",
       "hook": {
         "line1": "People don't remember the menu.",
@@ -359,8 +359,8 @@
         "UNIQUE EXPERIENCE.",
         "PURE MAGIC."
       ],
-      "subtitle": "DJ, lighting and theming for parties people actually remember. Barcelona & Girona. Quote in 2h.",
-      "subtitleAlt": "DJ, lighting and theming for parties people actually remember. Barcelona & Girona.",
+      "subtitle": "DJ, musical animation and lighting for parties people actually remember. Barcelona & Girona. Quote in 2h.",
+      "subtitleAlt": "DJ, musical animation and lighting for parties people actually remember. Barcelona & Girona.",
       "subtitleLocation": "",
       "subtitleLocationAlt": "",
       "ctaPacks": "See packs & pricing",
@@ -1504,7 +1504,8 @@
       "djWeddings": "DJ Weddings",
       "privateParties": "Private Parties",
       "corporateEvents": "Companies",
-      "discomovil": "Discommobile"
+      "discomovil": "Discommobile",
+      "animacion": "Musical Animation"
     },
     "experiences": {
       "monMagic": "Magic World 🪄",
@@ -1575,6 +1576,8 @@
     "services": {
       "bodas": "DJ Weddings",
       "bodasDesc": "The emotion that your day deserves",
+      "animacion": "Musical Animation",
+      "animacionDesc": "DJ · Musical Bingo · Musical Battle",
       "fiestas": "Private Parties",
       "fiestasDesc": "Birthdays, farewells and celebrations",
       "empresas": "Corporate Events",
@@ -1725,6 +1728,8 @@
       "phone": "Phone",
       "eventType": "Event type",
       "eventDate": "Approximate date",
+      "eventStartTime": "Start time (optional)",
+      "eventEndTime": "End time (optional)",
       "guests": "Number of guests",
       "location": "Location (city/town)",
       "budget": "Approximate budget",
@@ -1857,7 +1862,8 @@
         "discomovil": "Discommobile",
         "empresas": "Corporate events",
         "alquiler": "Rent"
-      }
+      },
+      "idealAnimacion": "DJ, musical animation, lighting and games"
     },
     "step2": {
       "changeEvent": "Change the type of event",
@@ -2573,6 +2579,18 @@
             "EV + Pioneer + B-150",
             "With/without technician",
             "Ask for details"
+          ]
+        },
+        "animacion": {
+          "name": "Animation",
+          "tagline": "DJ · Musical Animation · Lighting · Theming",
+          "desc": "DJ, lighting and theming for parties people remember. Musical Bingo and Musical Battle included. Barcelona and Girona.",
+          "features": [
+            "Musical Bingo",
+            "Musical Battle",
+            "Professional DJ",
+            "Lighting included",
+            "From 250€"
           ]
         }
       },
@@ -3897,7 +3915,8 @@
       "rental": "Rent",
       "corporate": "Companies",
       "faq": "FAQ",
-      "contact": "Contact"
+      "contact": "Contact",
+      "animacion": "Musical Animation"
     }
   },
   "extras": {

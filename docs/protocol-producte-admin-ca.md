@@ -1395,6 +1395,145 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #828 — 2026-05-28 — claude (FET)
+
+**Animació #828: preus DJ revisats, badge NOU a serveis, badge hero actualitzat.**
+
+- `lib/constants/animacio-products.ts`: Bingo Musical `durada: '1h30'`. DJ: 1h 150→100€, 2h 250→200€. `DJPricingOption` + `packPrice`. djOptions: `packPrice: 80` / `packPrice: 160`.
+- `app/[locale]/servicios/animacion/AnimacioClient.tsx`: DJ mostra preu en pack taronja.
+- `messages/ca.json`: badge hero + subtitle/subtitleAlt inclouen "Animació".
+- `messages/es.json` + `en.json`: ídem en castellà i anglès.
+- `app/[locale]/servicios/client.tsx`: `novelty?: boolean` a `Servicio`. Badge "✨ NOU" (pulse) per a `novelty: true`. "Més popular" exclòs si `novelty`.
+- `lib/constants/admin.ts`: counter 827 → 828.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` 827 → 828.
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: `validate:core` verd.
+- Validació humana/UX: pendent verificació browser.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #827 — 2026-05-28 — claude (FET)
+
+**Animació #827: nova categoria web — pàgina, header, footer, configurador, sitemap.**
+
+- `app/config/packs-config.ts`: `ServiceSlug` + `ALL_SERVICES` inclouen `'animacion'`. Bingo i Batalla: `service: "animacion"`.
+- `app/[locale]/configurador/configurador-utils.ts`: `EventType`, `EVENT_TYPE_SERVICE_MAP`, `EVENT_TYPE_CARDS` (pos.2), `EVENT_AMBIENTS` (taronja).
+- `lib/standaloneServiceSeo.ts`: `StandaloneServiceKey` + SEO config `animacion`.
+- `lib/publicServiceCatalog.ts`: `PublicCoreServiceKey` + `CORE_SERVICE_NAV_META` + `PUBLIC_SERVICE_CATALOG` (pos.2, tier: core).
+- `app/[locale]/servicios/animacion/page.tsx` + `AnimacioClient.tsx`: pàgina nova.
+- `app/sitemap.ts`: `/servicios/animacion` (priority 0.85).
+- `lib/constants/admin.ts`: `ADMIN_EXTRA_SERVICE_LABELS` + `ADMIN_PDF_STUDIO_SERVICE_LABELS` + `animacion`.
+- `lib/pdf-config.ts`: `SERVICE_NAMES` + `animacion`.
+- `messages/*.json`: `configurator.step1.idealAnimacion`, `pages.servicios.items.animacion`, `header.services.animacion/Desc`, `footerLinks.services.animacion`, `notFound.links.animacion`.
+- `lib/constants/admin.ts`: counter 826 → 827.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` 826 → 827.
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: `validate:core` verd.
+- Validació humana/UX: pendent verificació browser.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #826 — 2026-05-28 — claude (FET)
+
+**Ingesta #826: icona Boca-orella 🤝 + hora fi + comptador hores.**
+
+- `lib/constants/index.ts`: `INTAKE_SOURCE_OPTIONS` REFERRAL icon `🗣️` → `🤝`. `SOURCE_ICONS` REFERRAL `👥` → `🤝`. Uniformitat.
+- `app/admin/intake/page.tsx`: `eventEndTime` afegit a `FormData`, `INITIAL_FORM`, extractor i submit body (inclou `eventStartTime`). UI: "Hora" → "Hora inici" + badge inline de durada + nou camp "Hora fi".
+- `app/admin/intake/intake.css`: `.ni__label` flex; nova `.ni__label-hint` badge daurat per mostrar durada calculada.
+- `lib/constants/admin.ts`: counter 825 → 826.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` 825 → 826.
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: `validate:core` verd.
+- Validació humana/UX: icona 🤝 renderitza correctament; hora fi + comptador visibles.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #825 — 2026-05-28 — claude (FET)
+
+**Safata #825: cistella vermella al detall + leads/mails separats + hora inici/fi als leads.**
+
+- `app/admin/inbox/inbox.css`: `.sf__iconbtn.sf__iconbtn--standalone` vermell en repòs (especificitat correcta). Quickacts en fila (no columna), 32×32px.
+- `app/admin/inbox/SafataClient.tsx`: cistella fora del `sf__detail-acts-group` (standalone). "Leads web" separat de "Entrada" IMAP a la sidebar. `extractTimesFromText` + `displayTime` al `LeadDetail`. Tipus `SafataLead` amb `eventStartTime`/`eventEndTime`.
+- `prisma/schema.prisma`: `eventStartTime String?` + `eventEndTime String?` al model `Lead`. `npx prisma db push` aplicat.
+- `lib/services/contactLeadCaptureService.ts`: `PersistContactLeadInput` + upsert/create amb els nous camps.
+- `app/api/contact/contact-copy.ts`: schema Zod ampliat.
+- `app/api/contact/route.ts`: destructurar i passar els nous camps.
+- `app/api/admin/leads/route.ts`: `leadSchema` ampliat.
+- `app/admin/inbox/page.tsx`: query Prisma selecciona `eventStartTime`/`eventEndTime`.
+- `app/components/forms/ContactFormComplete.tsx`: 2 inputs `type="time"` (hora inici / hora fi, opcionals).
+- `messages/ca.json`, `es.json`, `en.json`: claus `labels.eventStartTime` + `labels.eventEndTime`.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` 821 → 824 → 825.
+- `lib/constants/admin.ts`: counter 824 → 825.
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: pendent `validate:core` complet i verificació browser.
+- Validació humana/UX: cistella vermella confirmada per l'usuari.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #824 — 2026-05-28 — claude (FET)
+
+**Safata UX: botons compactes en fila + quickacts sempre visibles + footer fix.**
+
+- `app/admin/admin-shell.css`: `.ax__sidetop` → fila horitzontal. `.ax__inbox` + `.ax__add` compactes.
+- `app/admin/layout.tsx`: "Safata d'entrada" → "✉ Safata", "Nova entrada" → "+ Nova entrada".
+- `app/admin/inbox/inbox.css`: `.sf` `height:100dvh` (footer ancorat). Quickacts sempre visibles (display:flex). Botons més grans. Cistella vermella standalone.
+- `app/admin/inbox/SafataClient.tsx`: leads i emails IMAP separats a la sidebar. Cistella fora del grup d'icones. Detecció horari del missatge (`extractTimesFromText`).
+- `lib/constants/admin.ts`: counter 821 → 824.
+- Validació tècnica: `npx tsc --noEmit` 0 errors. `pnpm run validate:core` 60/60.
+- Validació funcional: quickacts visibles, footer visible, botons en fila, cistella vermella.
+- Validació humana/UX: verificació visual al browser confirmada per l'usuari.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #823 — 2026-05-27 — claude (FET)
+
+**Safata: body buit als emails — bodyParts lowercase + decodificació QP/base64.**
+
+- `lib/imap.ts`: bodyParts lowercase, decodificació QP i base64 robusta.
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: emails mostren cos correctament.
+- Validació humana/UX: verificat al browser.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #822 — 2026-05-27 — claude (FET)
+
+**Safata UI millorada + extreure lead des d'email + múltiples contactes per client.**
+
+- `app/admin/inbox/SafataClient.tsx`: flag/delete a cada fila. `ExtractEmailModal`. Capçalera detall reorganitzada.
+- `app/admin/inbox/inbox.css`: `.sf__iconbtn`, `.sf__detail-acts-group`, `.sf__lead-quickacts`, `.sf__extract-btn`, `.sf__extract-modal`.
+- `prisma/schema.prisma` + `migrations/20260527160000_add_customer_contacts`: model `CustomerContact`.
+- `lib/services/customerContactService.ts`: CRUD contactes.
+- `app/api/admin/customers/[id]/contacts/route.ts` + `[cid]/route.ts`.
+- `app/admin/clientes/[id]/_components/panels/SummaryPanel.tsx`: `<ContactsSection>`.
+- `__tests__/lib/services/customerContactService.test.ts`: 8 tests nous.
+- Validació tècnica: `pnpm test:run` → 482 fitxers, 4678 tests verds. `pnpm build` net.
+- Validació funcional: CRUD contactes OK. Extracció lead des d'email OK.
+- Validació humana/UX: verificat al browser.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
 ### Canvi #821 — 2026-05-27 — claude (FET)
 
 **Safata Outlook: mirall IMAP/SMTP + X-Orbita + observabilitat completa.**

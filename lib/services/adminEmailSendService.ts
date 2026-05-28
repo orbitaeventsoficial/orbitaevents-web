@@ -1,4 +1,5 @@
 import { sendEmail, getEmailSignatureHtml } from '@/lib/email';
+import { fetchAttachmentPart } from '@/lib/imap';
 import { getManagedImageOverride } from '@/lib/services/imageManagerService';
 import { prisma } from '@/lib/prisma';
 import { SITE_CONFIG } from '@/app/config/site-config';
@@ -24,6 +25,14 @@ type QuoteAttachmentInput = {
   eventLocation?: string;
 };
 
+type ImapAttachmentRef = {
+  uid: number;
+  folder: string;
+  partKey: string;
+  filename: string;
+  contentType: string;
+};
+
 type AdminEmailPayload = {
   to?: string;
   subject?: string;
@@ -34,6 +43,7 @@ type AdminEmailPayload = {
   quote?: QuoteAttachmentInput | null;
   locale?: string | null;
   templateKey?: string | null;
+  imapAttachments?: ImapAttachmentRef[];
 };
 
 const APP_BASE_URL = getAppBaseUrl().replace(/\/+$/, '');
@@ -98,7 +108,7 @@ function buildBrandedEmailHtml(contentHtml: string, locale: string, logoUrl: str
 }
 
 export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
-  const { to, subject, body: messageBody, leadId, replyToId, customerId, quote, locale, templateKey } = body || {};
+  const { to, subject, body: messageBody, leadId, replyToId, customerId, quote, locale, templateKey, imapAttachments } = body || {};
   if (!to || !subject || !messageBody) {
     return { ok: false as const, status: 400, body: { error: 'Falten camps obligatoris: to, subject, body' } };
   }
@@ -113,7 +123,20 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
   const quoteAttachment = quote && typeof quote === 'object' ? quote : null;
   const emailCountBefore = resolvedLeadId ? await prisma.leadActivity.count({ where: { leadId: resolvedLeadId, type: 'EMAIL' } }) : 0;
   const leadForQuote = quoteAttachment && resolvedLeadId ? await prisma.lead.findUnique({ where: { id: resolvedLeadId } }) : null;
-  let attachments;
+  let attachments: { filename: string; content: Buffer | string; contentType: string }[] | undefined;
+
+  /* Adjunts reenviats des d'IMAP: baixar cada part i adjuntar-la */
+  if (imapAttachments && imapAttachments.length > 0) {
+    const fetched = await Promise.all(
+      imapAttachments.map(async (ref) => {
+        const buf = await fetchAttachmentPart(ref.uid, ref.partKey, ref.folder);
+        if (!buf) return null;
+        return { filename: ref.filename, content: buf, contentType: ref.contentType };
+      })
+    );
+    const valid = fetched.filter((a): a is { filename: string; content: Buffer; contentType: string } => a !== null);
+    if (valid.length > 0) attachments = valid;
+  }
 
   if (quoteAttachment) {
     const qa = quoteAttachment;
@@ -153,7 +176,8 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
       ctaSubtitle: template.ctaSubtitle,
       conditions: template.conditions,
     });
-    attachments = [{ filename: `pressupost-${quoteData.quoteNumber}.html`, content: quoteHtml, contentType: 'text/html; charset=utf-8' }];
+    const quoteEntry = { filename: `pressupost-${quoteData.quoteNumber}.html`, content: quoteHtml, contentType: 'text/html; charset=utf-8' };
+    attachments = attachments ? [...attachments, quoteEntry] : [quoteEntry];
   }
 
   const emailLogoUrl = await getAdminEmailLogoUrl();

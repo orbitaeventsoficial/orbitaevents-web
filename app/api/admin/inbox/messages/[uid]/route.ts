@@ -60,7 +60,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       isRead: autoMarkRead && !isOutbound ? true : email.isRead,
       isFlagged: email.isFlagged,
       hasAttachments: email.hasAttachments,
-      attachments: [],
+      attachments: email.attachments,
       orbita: email.orbita,
       inReplyTo: email.inReplyTo,
       references: email.references,

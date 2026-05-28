@@ -115,6 +115,7 @@ export interface EmailMessage {
   isFlagged?: boolean;
   hasAttachments: boolean;
   attachments: {
+    partKey: string;
     filename: string;
     contentType: string;
     size: number;
@@ -390,6 +391,48 @@ function identifyTextParts(bodyStructure: unknown): StructTextPart[] {
   return out;
 }
 
+type StructAttachPart = {
+  partKey: string;
+  filename: string;
+  contentType: string;
+  size: number;
+  encoding?: string;
+};
+
+function identifyAttachmentParts(bodyStructure: unknown): StructAttachPart[] {
+  const out: StructAttachPart[] = [];
+  type Node = {
+    type?: string;
+    part?: string;
+    disposition?: string;
+    dispositionParameters?: { filename?: string };
+    parameters?: { name?: string };
+    encoding?: string;
+    size?: number;
+    childNodes?: Node[];
+  };
+  const walk = (node: Node | null | undefined): void => {
+    if (!node) return;
+    if (node.disposition === 'attachment' && node.part) {
+      const filename =
+        node.dispositionParameters?.filename ||
+        node.parameters?.name ||
+        `adjunt-${node.part}`;
+      out.push({
+        partKey: node.part,
+        filename,
+        contentType: (node.type || 'application/octet-stream').toLowerCase(),
+        size: node.size ?? 0,
+        encoding: node.encoding,
+      });
+      return;
+    }
+    if (node.childNodes) for (const child of node.childNodes) walk(child);
+  };
+  walk(bodyStructure as Node);
+  return out;
+}
+
 const FETCH_EMAIL_CACHE = new Map<string, EmailMessage>();
 const FETCH_EMAIL_CACHE_MAX = 200;
 
@@ -437,11 +480,8 @@ export async function fetchEmailByUid(uid: number, folder: string = 'INBOX'): Pr
         const flagsPre = message.flags;
 
         const textParts = identifyTextParts(bodyStructure);
-
-        type StructForAttach = { childNodes?: { disposition?: string }[] };
-        const hasAttachments = (bodyStructure as StructForAttach | null)?.childNodes?.some(
-          n => n.disposition === 'attachment'
-        ) ?? false;
+        const attachParts = identifyAttachmentParts(bodyStructure);
+        const hasAttachments = attachParts.length > 0;
 
         let bodyText = '';
         let bodyHtml = '';
@@ -533,7 +573,12 @@ export async function fetchEmailByUid(uid: number, folder: string = 'INBOX'): Pr
           isRead: (flagsPre || message.flags)?.has('\\Seen') || false,
           isFlagged: (flagsPre || message.flags)?.has('\\Flagged') || false,
           hasAttachments,
-          attachments: [],
+          attachments: attachParts.map(p => ({
+            partKey: p.partKey,
+            filename: p.filename,
+            contentType: p.contentType,
+            size: p.size,
+          })),
           orbita,
           inReplyTo: parsedInReplyTo,
           references: parsedReferences,
@@ -559,6 +604,55 @@ export async function fetchEmailByUid(uid: number, folder: string = 'INBOX'): Pr
     FETCH_EMAIL_CACHE.set(key, result);
   }
 
+  return result;
+}
+
+/**
+ * Baixar la part binària d'un adjunt (per a descàrrega).
+ * Retorna el buffer decodificat (base64/QP → bytes originals).
+ */
+export async function fetchAttachmentPart(
+  uid: number,
+  partKey: string,
+  folder: string = 'INBOX',
+): Promise<Buffer | null> {
+  const client = await connectIMAP();
+  let result: Buffer | null = null;
+  try {
+    const mailbox = await client.getMailboxLock(folder);
+    try {
+      for await (const message of client.fetch([uid], {
+        uid: true,
+        bodyStructure: true,
+        bodyParts: [partKey],
+      }, { uid: true })) {
+        const raw = message.bodyParts?.get(partKey);
+        if (!raw || raw.length === 0) break;
+
+        // Detectar encoding de la part des del bodyStructure
+        type Node = { part?: string; encoding?: string; childNodes?: Node[] };
+        let encoding: string | undefined;
+        const findEnc = (node: Node | null | undefined): void => {
+          if (!node) return;
+          if (node.part === partKey) { encoding = node.encoding; return; }
+          if (node.childNodes) for (const c of node.childNodes) findEnc(c);
+        };
+        findEnc(message.bodyStructure as Node);
+
+        const enc = (encoding || '').toLowerCase();
+        if (enc === 'base64') {
+          result = Buffer.from(raw.toString('ascii').replace(/\s+/g, ''), 'base64');
+        } else {
+          result = raw instanceof Buffer ? raw : Buffer.from(raw);
+        }
+        break;
+      }
+    } finally {
+      mailbox.release();
+    }
+  } finally {
+    try { client.close(); } catch { /* swallow */ }
+  }
   return result;
 }
 

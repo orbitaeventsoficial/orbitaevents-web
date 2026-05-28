@@ -25,6 +25,8 @@ export type SafataLead = {
   budget: string | null;
   guestCount: number | null;
   eventDate: string | Date | null;
+  eventStartTime: string | null;
+  eventEndTime: string | null;
   eventLocation: string | null;
   source: string | null;
 };
@@ -311,15 +313,7 @@ export default function SafataClient({
     }
   }, [active, emailsByFolder, folderState, loadFolderEmails]);
 
-  /* Quan estem a "Entrada" unificada, carregar el inbox IMAP si configurat */
-  useEffect(() => {
-    if (active.kind !== 'leads') return;
-    if (!imapConfigured || !special?.inbox) return;
-    const path = special.inbox;
-    if (!emailsByFolder[path] && !folderState[path]?.loading) {
-      loadFolderEmails(path, 0);
-    }
-  }, [active.kind, imapConfigured, special, emailsByFolder, folderState, loadFolderEmails]);
+  /* Nota: el inbox IMAP es carrega quan l'usuari clica la carpeta "Entrada correu" */
 
   /* Invalidar carpeta (refresh manual o post-acció) */
   const invalidateFolder = useCallback((path: string) => {
@@ -613,8 +607,8 @@ export default function SafataClient({
     return items.sort((a, b) => b.date.getTime() - a.date.getTime());
   }, [active.kind, filteredLeads, filteredInboxEmails]);
 
-  /* Comptador d'entrada unificada (leads no llegits + inbox IMAP no llegits) */
-  const entranceUnread = localStats.unreadLeads + (imapConfigured ? inboxUnread : 0);
+  /* Comptador de leads no llegits (només leads web) */
+  const entranceUnread = localStats.unreadLeads;
 
   /* Sidebar groups */
   const specialFolders = useMemo(() => {
@@ -637,12 +631,12 @@ export default function SafataClient({
 
   /* Render ───────────────────────────────────────────────────────────────── */
   const paneTitle = active.kind === 'leads'
-    ? 'Entrada'
+    ? 'Leads web'
     : (specialFolders.find(f => f.path === active.path)?.iconKey
         ? FOLDER_LABELS[specialFolders.find(f => f.path === active.path)!.iconKey]
         : (active.kind === 'folder' ? active.path : ''));
 
-  const paneCount = active.kind === 'leads' ? unifiedInboxItems.length : filteredEmails.length;
+  const paneCount = active.kind === 'leads' ? filteredLeads.length : filteredEmails.length;
   const hasSelected = (active.kind === 'leads' && !!selectedLead) || (active.kind === 'folder' && !!selectedImap);
 
   return (
@@ -661,7 +655,7 @@ export default function SafataClient({
               className={`sf__navitem${active.kind === 'leads' ? ' is-on' : ''}`}
               onClick={() => handleTabChange({ kind: 'leads' })}>
               <span className="sf__navitem-icon">📥</span>
-              <span className="sf__navitem-label">Entrada</span>
+              <span className="sf__navitem-label">Leads web</span>
               {entranceUnread > 0 && <span className="sf__navitem-badge">{entranceUnread}</span>}
             </button>
           </div>
@@ -670,7 +664,7 @@ export default function SafataClient({
             <div className="sf__navgroup">
               <span className="sf__navgroup-label">Bústia</span>
               {foldersError && <p className="sf__navgroup-error">{foldersError}</p>}
-              {specialFolders.filter(f => f.iconKey !== 'inbox').map(f => (
+              {specialFolders.map(f => (
                 <button key={f.path} type="button"
                   className={`sf__navitem${active.kind === 'folder' && active.path === f.path ? ' is-on' : ''}`}
                   onClick={() => handleTabChange({ kind: 'folder', path: f.path, specialUse: f.iconKey })}>
@@ -770,53 +764,26 @@ export default function SafataClient({
         </div>
 
         <div className="sf__pane-list">
-          {/* Entrada unificada: leads web + inbox IMAP */}
+          {/* Leads web */}
           {active.kind === 'leads' && (
-            unifiedInboxItems.length === 0 ? (
+            filteredLeads.length === 0 ? (
               <div className="sf__empty">
                 <span className="sf__empty-icon">📭</span>
-                <p className="sf__empty-title">Cap entrada</p>
+                <p className="sf__empty-title">Cap lead</p>
               </div>
-            ) : unifiedInboxItems.map(item => {
-              if (item.kind === 'lead') {
-                const lead = item.lead;
-                return (
-                  <button key={`lead-${lead.id}`} type="button" onClick={() => handleSelectLead(lead)}
-                    className={['sf__lead', selectedLead?.id === lead.id ? 'is-selected' : '', lead.status === 'NEW' ? 'is-unread' : ''].filter(Boolean).join(' ')}>
-                    <div className="sf__lead-row">
-                      {lead.status === 'NEW' && <span className="sf__lead-dot" aria-label="Nova" />}
-                      <span className="sf__lead-name">{lead.name}</span>
-                      <span className="sf__entry-type sf__entry-type--web">Web</span>
-                      <span className="sf__lead-date">{formatDateShort(lead.createdAt)}</span>
-                    </div>
-                    <p className="sf__lead-preview">
-                      {lead.eventType ?? '—'}{lead.eventDate ? ` · ${formatDate(lead.eventDate)}` : ''}
-                    </p>
-                  </button>
-                );
-              }
-              const email = item.email;
-              const isSelected = selectedImap?.id === email.id;
-              const pill = email.orbita ? buildOrbitaPill(email.orbita) : null;
-              return (
-                <div key={`email-${email.id}`} className={['sf__lead', isSelected ? 'is-selected' : '', !email.isRead ? 'is-unread' : ''].filter(Boolean).join(' ')}>
-                  <button type="button" onClick={() => handleSelectImapFromEntry(email)} className="sf__lead-body">
-                    <div className="sf__lead-row">
-                      {!email.isRead && <span className="sf__lead-dot" aria-label="No llegit" />}
-                      {email.isFlagged && <span className="sf__lead-flag is-on" aria-label="Marcat">★</span>}
-                      <span className="sf__lead-name">{email.from.name || email.from.address}</span>
-                      <span className="sf__entry-type sf__entry-type--mail">✉</span>
-                      <span className="sf__lead-date">{formatDateShort(email.date)}</span>
-                    </div>
-                    <p className="sf__lead-preview">
-                      {email.subject}
-                      {email.hasAttachments && <span className="sf__lead-attach"> 📎</span>}
-                      {pill && <span className="sf__lead-badge" title={pill.hint}>🔗 {pill.label}</span>}
-                    </p>
-                  </button>
+            ) : filteredLeads.map(lead => (
+              <button key={lead.id} type="button" onClick={() => handleSelectLead(lead)}
+                className={['sf__lead', selectedLead?.id === lead.id ? 'is-selected' : '', lead.status === 'NEW' ? 'is-unread' : ''].filter(Boolean).join(' ')}>
+                <div className="sf__lead-row">
+                  {lead.status === 'NEW' && <span className="sf__lead-dot" aria-label="Nova" />}
+                  <span className="sf__lead-name">{lead.name}</span>
+                  <span className="sf__lead-date">{formatDateShort(lead.createdAt)}</span>
                 </div>
-              );
-            })
+                <p className="sf__lead-preview">
+                  {lead.eventType ?? '—'}{lead.eventDate ? ` · ${formatDate(lead.eventDate)}` : ''}
+                </p>
+              </button>
+            ))
           )}
 
           {/* Carpeta IMAP */}
@@ -967,6 +934,17 @@ function guessEventType(subject: string, body: string): string {
   if (txt.includes('fiesta') || txt.includes('festa') || txt.includes('party')) return 'PRIVATE_PARTY';
   if (txt.includes('cumpleaños') || txt.includes('aniversari') || txt.includes('birthday')) return 'BIRTHDAY';
   return 'OTHER';
+}
+
+function extractTimesFromText(text: string): string | null {
+  if (!text) return null;
+  // Rang complet: "de 13:00 a 16:00", "desde 13:00 hasta 16:00", "13:00 a 16:00", "13:00-16:00", "13:00 - 16:00"
+  const range = text.match(/(?:de(?:sde)?\s+)?(\d{1,2}:\d{2})\s*(?:h(?:oras?)?)?\s*(?:a|hasta|-|–)\s*(\d{1,2}:\d{2})\s*(?:h(?:oras?)?)?/i);
+  if (range) return `${range[1]} – ${range[2]}`;
+  // Hora sola: "a las 13:00", "desde las 13:00"
+  const single = text.match(/(?:a\s+las?|desde\s+las?|a\s+les?|des\s+de\s+les?)\s+(\d{1,2}:\d{2})/i);
+  if (single) return single[1];
+  return null;
 }
 
 function extractPhoneFromText(text: string): string {
@@ -1393,6 +1371,11 @@ function LeadDetail({
     } catch { setCreateError('Error de connexió'); } finally { setCreating(false); }
   };
 
+  const displayTime = lead.eventStartTime
+    ? `${lead.eventStartTime}${lead.eventEndTime ? ` – ${lead.eventEndTime}` : ''}`
+    : extractTimesFromText(`${lead.message ?? ''} ${lead.eventType ?? ''}`);
+
+
   return (
     <div className="sf__detail">
       <div className="sf__detail-head">
@@ -1415,6 +1398,7 @@ function LeadDetail({
         <div className="sf__data-grid">
           {lead.eventType && <div className="sf__data-field"><p className="sf__data-label">Tipus d&apos;event</p><p className="sf__data-value">{lead.eventType}</p></div>}
           {lead.eventDate && <div className="sf__data-field"><p className="sf__data-label">Data</p><p className="sf__data-value">{formatDate(lead.eventDate)}</p></div>}
+          {displayTime && <div className="sf__data-field"><p className="sf__data-label">Horari</p><p className="sf__data-value">{displayTime}</p></div>}
           {lead.eventLocation && <div className="sf__data-field"><p className="sf__data-label">Ubicació</p><p className="sf__data-value">{lead.eventLocation}</p></div>}
           {lead.guestCount != null && <div className="sf__data-field"><p className="sf__data-label">Convidats</p><p className="sf__data-value">{lead.guestCount}</p></div>}
           {lead.budget && <div className="sf__data-field"><p className="sf__data-label">Pressupost</p><p className="sf__data-value">{lead.budget}</p></div>}
@@ -1531,8 +1515,8 @@ function ImapDetail({
             {!outbound && (
               <button type="button" onClick={onMarkUnread} className="sf__iconbtn" title="Marcar com no llegit">○</button>
             )}
-            <button type="button" onClick={onDelete} className="sf__iconbtn sf__iconbtn--danger" title="Esborrar">🗑</button>
           </div>
+          <button type="button" onClick={onDelete} className="sf__iconbtn sf__iconbtn--danger sf__iconbtn--standalone" title="Esborrar">🗑</button>
           <button type="button" onClick={onClose} className="sf__detail-close" aria-label="Tancar">✕</button>
         </div>
       </div>

@@ -340,7 +340,7 @@
   },
   "hero": {
     "elegant": {
-      "badge": "DJ · Il·luminació · Tematització · Producció",
+      "badge": "DJ · Animació · Il·luminació · Tematització · Producció",
       "badgeEmoji": "🎵",
       "hook": {
         "line1": "La gent no recorda el menú.",
@@ -359,8 +359,8 @@
         "EXPERIÈNCIA ÚNICA.",
         "PURA MÀGIA."
       ],
-      "subtitle": "DJ, il·luminació i tematització per a festes que la gent recorda. Barcelona i Girona. Pressupost en 2h.",
-      "subtitleAlt": "DJ, il·luminació i tematització per a festes que la gent recorda. Barcelona i Girona.",
+      "subtitle": "DJ, animació musical i il·luminació per a festes que la gent recorda. Barcelona i Girona. Pressupost en 2h.",
+      "subtitleAlt": "DJ, animació musical i il·luminació per a festes que la gent recorda. Barcelona i Girona.",
       "subtitleLocation": "",
       "subtitleLocationAlt": "",
       "ctaPacks": "Veure packs i preus",
@@ -1390,6 +1390,8 @@
       "phone": "Telèfon",
       "eventType": "Tipus d'event",
       "eventDate": "Data aproximada",
+      "eventStartTime": "Hora d'inici (opcional)",
+      "eventEndTime": "Hora de finalització (opcional)",
       "guests": "Nombre de convidats",
       "location": "Ubicació (ciutat/poble)",
       "budget": "Pressupost aproximat",
@@ -1522,7 +1524,8 @@
         "discomovil": "Discomòbil",
         "empresas": "Esdeveniments corporatius",
         "alquiler": "Lloguer"
-      }
+      },
+      "idealAnimacion": "DJ, animació musical, il·luminació i jocs"
     },
     "step2": {
       "changeEvent": "Canvia el tipus d'esdeveniment",
@@ -2173,6 +2176,18 @@
             "EV + Pioneer + B-150",
             "Amb/sense tècnic",
             "Consultar"
+          ]
+        },
+        "animacion": {
+          "name": "Animació",
+          "tagline": "DJ · Animació Musical · Il·luminació · Tematització",
+          "desc": "DJ, il·luminació i tematització per a festes que la gent recorda. Bingo Musical i Batalla Musical inclosos. Barcelona i Girona.",
+          "features": [
+            "Bingo Musical",
+            "Batalla Musical",
+            "DJ professional",
+            "Il·luminació inclosa",
+            "Des de 250€"
           ]
         }
       },
@@ -3271,6 +3286,8 @@
     "services": {
       "bodas": "DJ Casaments",
       "bodasDesc": "L'emotivitat que el teu dia mereix",
+      "animacion": "Animació Musical",
+      "animacionDesc": "DJ · Bingo Musical · Batalla Musical",
       "fiestas": "Festes Privades",
       "fiestasDesc": "Aniversaris, comiats i celebracions",
       "empresas": "Events Corporatius",
@@ -3337,7 +3354,8 @@
       "djWeddings": "DJ Bodes",
       "privateParties": "Festes Privades",
       "corporateEvents": "Empreses",
-      "discomovil": "Discomòbil"
+      "discomovil": "Discomòbil",
+      "animacion": "Animació Musical"
     },
     "experiences": {
       "monMagic": "Món Màgic 🪄",
@@ -5136,7 +5154,8 @@
       "rental": "Lloguer",
       "corporate": "Empreses",
       "faq": "FAQ",
-      "contact": "Contacte"
+      "contact": "Contacte",
+      "animacion": "Animació Musical"
     }
   },
   "errorPage": {
