@@ -3,14 +3,14 @@
 import Image from 'next/image';
 import { Link } from '@/lib/navigation';
 import { motion } from 'framer-motion';
-import { Mic, Users, Clock, Check, ArrowRight, Star } from 'lucide-react';
+import { Mic, Users, Clock, Check, ArrowRight, Star, ChevronDown } from 'lucide-react';
 import { ANIMACIO_PRODUCTS } from '@/lib/constants/animacio-products';
 
 export default function AnimacioClient() {
   return (
-    <div className="space-y-20 pb-20">
+    <div className="space-y-8 pb-20">
       {/* Hero */}
-      <section className="relative min-h-[55vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[85vh] flex items-center overflow-hidden">
         <div className="absolute inset-0 -z-10 pointer-events-none">
           <Image
             src="/img/animacion/bingo-musical.jpg"
@@ -65,10 +65,26 @@ export default function AnimacioClient() {
             </div>
           </motion.div>
         </div>
+
+        {/* Scroll hint */}
+        <motion.div
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/40"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2, duration: 0.6 }}
+        >
+          <span className="text-xs uppercase tracking-widest">Veure propostes</span>
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut' }}
+          >
+            <ChevronDown className="w-5 h-5" />
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* Productes */}
-      <section className="container mx-auto px-4">
+      <section className="container mx-auto px-4 pt-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Escull la teva proposta
