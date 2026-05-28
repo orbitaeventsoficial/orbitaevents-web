@@ -24,7 +24,7 @@ export default function AnimacioClient() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(251,146,60,0.15)_0%,_transparent_60%)]" />
         </div>
 
-        <div className="relative z-10 mx-auto max-w-6xl px-4 pt-20 pb-24 text-center">
+        <div className="relative z-10 mx-auto max-w-6xl px-4 pt-10 pb-24 text-center">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -68,7 +68,7 @@ export default function AnimacioClient() {
 
         {/* Scroll hint */}
         <motion.div
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/40"
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/60"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2, duration: 0.6 }}
