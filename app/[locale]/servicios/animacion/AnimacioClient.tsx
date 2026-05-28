@@ -10,7 +10,7 @@ export default function AnimacioClient() {
   return (
     <div className="space-y-8 pb-20">
       {/* Hero */}
-      <section className="relative min-h-[85vh] flex items-start overflow-hidden">
+      <section className="relative min-h-[78vh] flex items-start overflow-hidden">
         <div className="absolute inset-0 -z-10 pointer-events-none">
           <Image
             src="/img/animacion/bingo-musical.jpg"
@@ -68,12 +68,12 @@ export default function AnimacioClient() {
 
         {/* Scroll hint */}
         <motion.div
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/60"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/70 z-20"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2, duration: 0.6 }}
         >
-          <span className="text-xs uppercase tracking-widest">Veure propostes</span>
+          <span className="text-sm font-medium tracking-widest uppercase">Veure propostes</span>
           <motion.div
             animate={{ y: [0, 6, 0] }}
             transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut' }}
