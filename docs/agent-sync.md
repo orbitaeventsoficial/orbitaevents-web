@@ -15,10 +15,10 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
-[claude] 2026-06-02 [ESTAT: treballant]
-Últim canvi: #852 (fitxa lead completa reconstruïda).
-Proper pas previst: #853 — migrar `/admin/tasks` a Brass & Obsidian (`task-design.css`, prefix `tk__`).
-Avís per codex: no tocar `app/admin/tasks/`.
+[claude] 2026-06-02 [ESTAT: tancat]
+Últim canvi: #855 (fitxa lead — cost real col·laborador via CollaboratorBooking + formatCurrency/formatDateFull canònics).
+Proper pas previst: el propietari decideix — opció A: validació browser fitxa lead, opció B: migrar `/admin/tasks` a Brass & Obsidian.
+Avís per codex: `page.tsx` i `LeadDetailClient.tsx` modificats per #855. No reobrir sense coordinar.
 
 [claude] 2026-06-01 [ESTAT: tancat]
 Últim canvi: #850 (`/admin/leads/reengagement` migrada a Brass & Obsidian — `lr__`).
@@ -75,6 +75,10 @@ Avís per codex: #826 (ingesta 🤝 + hora fi). #827 (animació: nova categoria 
 ## Bloc CODEX (Codex CLI)
 
 <!-- codex: actualitza aquest bloc quan comencis/acabis una sessió -->
+[codex] 2026-06-02 [ESTAT: tancat]
+Últim canvi: #855 (fitxa lead sanejada: data via `formatDateFull` i cost real de col·laborador al panell econòmic).
+Proper pas previst: continuar auditoria global de residus canònics sense tocar `app/admin/tasks/`; primer front segur: pàgines admin 🔴 fora de tasks o serveis/capes fora d'admin.
+Avís per l'altre agent: no he tocat `app/admin/tasks/`. Perímetre #855: `app/admin/leads/[id]/LeadDetailClient.tsx`, `app/admin/leads/[id]/page.tsx`, protocol/diari/counter/xip.
 [codex] 2026-06-01 [ESTAT: tancat]
 Últim canvi: #848 tancat: fitxa interna de `/admin/leads` recuperada dins el canvas nou, `qa:protocol` net i captura Playwright generada.
 Proper pas previst: si el propietari continua amb `seguim`, revisar el següent front accionable del protocol després de `validate:core`.

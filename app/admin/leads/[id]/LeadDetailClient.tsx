@@ -68,6 +68,7 @@ export type LeadDetailData = {
     cashAmount: number | null;
     total: number;
     totalHours: number;
+    collaboratorCost: { amount: number; name: string } | null;
   } | null;
 };
 
@@ -660,13 +661,13 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
                   </dd>
                 </div>
               )}
-              {lead.booking.cashAmount != null && lead.booking.cashAmount > 0 && lead.owner && (
+              {lead.booking.collaboratorCost && (
                 <div>
-                  <dt>Cost {lead.owner}</dt>
+                  <dt>Cost {lead.booking.collaboratorCost.name}</dt>
                   <dd className="font-semibold text-[var(--o-danger)]">
-                    -{formatCurrency(lead.booking.cashAmount)}
+                    -{formatCurrency(lead.booking.collaboratorCost.amount)}
                     <span className="ml-1 text-[10px] text-[var(--t3)]">
-                      (net {formatCurrency(lead.booking.total - lead.booking.cashAmount)})
+                      (net {formatCurrency(lead.booking.total - lead.booking.collaboratorCost.amount)})
                     </span>
                   </dd>
                 </div>

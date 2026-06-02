@@ -141,6 +141,14 @@ export default async function LeadDetailPage({ params }: Props) {
           clientFeedback: { select: { id: true, sentAt: true, discountCode: true } },
           extraHours: true,
           pack: { select: { djHours: true, extraHourPrice: true } },
+          collaboratorBookings: {
+            select: {
+              commissionAmount: true,
+              collaboratorPrice: true,
+              collaborator: { select: { id: true, name: true } },
+            },
+            take: 1,
+          },
         },
       },
     },
@@ -359,6 +367,12 @@ export default async function LeadDetailPage({ params }: Props) {
             }
             return (lead.booking.pack?.djHours ?? 0) + (lead.booking.extraHours ?? 0);
           })(),
+          collaboratorCost: lead.booking.collaboratorBookings?.[0]
+            ? {
+                amount: Number(lead.booking.collaboratorBookings[0].commissionAmount),
+                name: lead.booking.collaboratorBookings[0].collaborator.name,
+              }
+            : null,
         } : null,
       }} />
   );
