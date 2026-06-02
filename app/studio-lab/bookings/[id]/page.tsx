@@ -87,39 +87,57 @@ export default async function BookingLabPage({ params }: { params: { id: string 
   const MARKET_EUR_PER_HOUR_MIN = 40;
   const MARKET_EUR_PER_HOUR_MAX = 60;
 
-  type Tip = { kind: 'warn' | 'ok' | 'info'; text: string };
-  const tips: Tip[] = [];
+  type Kpi = { value: string; label: string; sublabel: string; kind: 'warn' | 'ok' | 'info' };
+  const kpis: Kpi[] = [];
 
   if (costFloor > 0) {
-    if (margin < 0) {
-      tips.push({ kind: 'warn', text: `Perdem ${formatCurrency(Math.abs(margin))} amb aquest preu. Cost estimat: ${formatCurrency(costFloor)}.` });
-    } else if (marginPct < TARGET_MARGIN_PCT) {
-      tips.push({ kind: 'warn', text: `Marge ${marginPct}% — objectiu mínim ${TARGET_MARGIN_PCT}%.` });
-    } else {
-      tips.push({ kind: 'ok', text: `Marge ${marginPct}% — per sobre l'objectiu del ${TARGET_MARGIN_PCT}%.` });
+    kpis.push({
+      value: `${marginPct}%`,
+      label: 'Marge actual',
+      sublabel: margin < 0
+        ? `⚠ perdent ${formatCurrency(Math.abs(margin))}`
+        : marginPct < TARGET_MARGIN_PCT
+          ? `⚠ sota objectiu del ${TARGET_MARGIN_PCT}%`
+          : `✓ per sobre del ${TARGET_MARGIN_PCT}%`,
+      kind: marginPct < TARGET_MARGIN_PCT ? 'warn' : 'ok',
+    });
+    if (eurPerHour !== null) {
+      const lowRate = eurPerHour < MARKET_EUR_PER_HOUR_MIN;
+      kpis.push({
+        value: `${eurPerHour}€/h`,
+        label: 'Preu per hora',
+        sublabel: lowRate
+          ? `⚠ mercat: ${MARKET_EUR_PER_HOUR_MIN}-${MARKET_EUR_PER_HOUR_MAX}€/h`
+          : `dins mercat (${MARKET_EUR_PER_HOUR_MIN}-${MARKET_EUR_PER_HOUR_MAX}€/h)`,
+        kind: lowRate ? 'warn' : 'ok',
+      });
+    }
+    if (priceFor30 !== null && marginPct < TARGET_MARGIN_PCT) {
+      kpis.push({
+        value: `+${formatCurrency(priceFor30 - total)}`,
+        label: `Per arribar al ${TARGET_MARGIN_PCT}%`,
+        sublabel: `cobrar ${formatCurrency(priceFor30)} en lloc de ${formatCurrency(total)}`,
+        kind: 'info',
+      });
+    }
+    if (travelCost > 0) {
+      kpis.push({
+        value: formatCurrency(travelCost),
+        label: 'Transport',
+        sublabel: isPriceCustom ? 'absorbit al preu pactat' : `${Number(booking.distanceKm ?? 0).toFixed(0)} km`,
+        kind: 'info',
+      });
+    }
+    if (collabCost === 0) {
+      kpis.push({
+        value: '—',
+        label: 'Col·laborador',
+        sublabel: 'sense assignar · marge és teu',
+        kind: 'info',
+      });
     }
   }
-  if (priceFor30 && total < priceFor30) {
-    tips.push({ kind: 'info', text: `Per arribar al ${TARGET_MARGIN_PCT}% de marge: ${formatCurrency(priceFor30)}.` });
-  }
-  if (isPriceCustom && catalogBase > 0) {
-    tips.push({ kind: 'info', text: `Tarifa base del pack: ${formatCurrency(catalogBase)}. Preu pactat: ${formatCurrency(total)} (${total > catalogBase ? '+' : ''}${formatCurrency(total - catalogBase)}).` });
-  }
-  if (travelCost > 0) {
-    const travelCharge = Number(booking.subtotal ?? 0) - catalogBase;
-    if (travelCharge > 0) tips.push({ kind: 'info', text: `Transport inclòs: ${formatCurrency(travelCharge)} (cost real combustible: ${formatCurrency(travelCost)}).` });
-  }
-  if (eurPerHour !== null) {
-    const vsMarket = eurPerHour < MARKET_EUR_PER_HOUR_MIN ? 'per sota' : eurPerHour > MARKET_EUR_PER_HOUR_MAX ? 'per sobre' : 'dins';
-    tips.push({ kind: eurPerHour < MARKET_EUR_PER_HOUR_MIN ? 'warn' : 'info', text: `${formatCurrency(eurPerHour)}/h per ${contractedHours}h de servei — ${vsMarket} rang mercat (${MARKET_EUR_PER_HOUR_MIN}-${MARKET_EUR_PER_HOUR_MAX} €/h).` });
-  }
-  if (collabCost === 0 && costFloor > 0) {
-    tips.push({ kind: 'info', text: `Col·laborador no assignat — el marge real pot ser inferior si hi ha cost de personal.` });
-  }
-  if (booking.paymentMethod === 'CASH' && !booking.invoiceRequired) {
-    tips.push({ kind: 'info', text: `Efectiu sense factura: els ${formatCurrency(total)} van directe, sense IVA ni Holded.` });
-  }
-  const showTips = tips.length > 0 && (isPriceCustom || marginPct < TARGET_MARGIN_PCT || margin < 0);
+  const showTips = kpis.length > 0;
 
   // Semàfor d'alertes — ordre de criticitat
   const flags: { kind: 'crit' | 'warn' | 'info'; title: string; desc: string }[] = [];
@@ -325,21 +343,24 @@ export default async function BookingLabPage({ params }: { params: { id: string 
             </dl>
           </section>
 
-          {/* Panell 5 — Anàlisi de marge i consells */}
+          {/* Panell 5 — Anàlisi econòmica KPI cards */}
           {showTips && (
             <section className="bk2__panel bk2__panel--wide bk2__panel--tips">
               <div className="bk2__ph">
                 <h3>Anàlisi econòmica</h3>
-                <span className="bk2__badge bk2__badge--custom">{tips.filter(t => t.kind === 'warn').length > 0 ? '⚠ Revisa el preu' : 'ℹ Informació'}</span>
+                {kpis.some(k => k.kind === 'warn') && (
+                  <span className="bk2__badge bk2__badge--custom">⚠ Revisa el preu</span>
+                )}
               </div>
-              <ul className="bk2__tips">
-                {tips.map((tip, i) => (
-                  <li key={i} className={`bk2__tip bk2__tip--${tip.kind}`}>
-                    <span className="bk2__tip-ic">{tip.kind === 'warn' ? '⚠' : tip.kind === 'ok' ? '✓' : '→'}</span>
-                    {tip.text}
-                  </li>
+              <div className="bk2__kpis">
+                {kpis.map((k, i) => (
+                  <div key={i} className={`bk2__kpi bk2__kpi--${k.kind}`}>
+                    <div className="bk2__kpi-val">{k.value}</div>
+                    <div className="bk2__kpi-lbl">{k.label}</div>
+                    <div className="bk2__kpi-sub">{k.sublabel}</div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </section>
           )}
 
