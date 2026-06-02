@@ -39,8 +39,25 @@ export default async function BookingLabPage({ params }: { params: { id: string 
   const booking = await prisma.booking.findUnique({
     where: { id: params.id },
     include: {
-      pack: { select: { id: true, slug: true, price: true, djHours: true, translations: { select: { name: true, locale: true }, take: 1 } } },
+      pack: {
+        select: {
+          id: true, slug: true, price: true, djHours: true,
+          translations: { select: { name: true, locale: true }, take: 1 },
+          inventory: {
+            select: {
+              quantity: true,
+              item: { select: { name: true, purchasePrice: true, value: true, expectedLifeHours: true } },
+            },
+          },
+        },
+      },
       extras: { include: { extra: { select: { slug: true, price: true, translations: { select: { name: true, locale: true }, take: 1 } } } } },
+      inventory: {
+        select: {
+          quantity: true,
+          item: { select: { name: true, purchasePrice: true, value: true, expectedLifeHours: true } },
+        },
+      },
       collaboratorBookings: {
         include: { collaborator: { select: { name: true } } },
         take: 1,
@@ -60,11 +77,8 @@ export default async function BookingLabPage({ params }: { params: { id: string 
   const collabCost = booking.collaboratorBookings[0]
     ? Number(booking.collaboratorBookings[0].commissionAmount)
     : 0;
-  // Cost real = transport + col·laborador (pack price és preu client, no cost intern)
-  const costFloor = travelCost + collabCost;
-  const margin = total - costFloor;
-  const marginPct = total > 0 ? Math.round((margin / total) * 100) : 0;
 
+  // Cost real parcial (equipament es calcula un cop tenim contractedHours)
   // Detecta preu personalitzat: total ≠ preu catàleg del pack (diferència > 5€)
   const catalogBase = booking.pack ? Number(booking.pack.price) : 0;
   const isPriceCustom = catalogBase > 0 && Math.abs(total - catalogBase) > 5;
@@ -85,6 +99,22 @@ export default async function BookingLabPage({ params }: { params: { id: string 
     : booking.pack
       ? `${(booking.pack.djHours ?? 0) + (booking.extraHours ?? 0)}h (pack)`
       : null;
+
+  // Amortització equip (ara que tenim contractedHours)
+  const calcAmort = (items: { quantity: number; item: { purchasePrice: number | null; value: number; expectedLifeHours: number | null } }[], h: number) =>
+    items.reduce((sum, bi) => {
+      const cost = Number(bi.item.purchasePrice ?? bi.item.value * 0.6);
+      const life = Number(bi.item.expectedLifeHours ?? 2000);
+      return sum + (life > 0 ? (cost / life) * h * bi.quantity : 0);
+    }, 0);
+  const hours = contractedHours ?? (booking.pack?.djHours ?? 0);
+  const invItems = booking.inventory.length > 0 ? booking.inventory : (booking.pack?.inventory ?? []);
+  const equipCost = hours > 0 ? Math.round(calcAmort(invItems, hours) * 100) / 100 : 0;
+
+  // Cost real = transport + col·laborador + amortització equip
+  const costFloor = travelCost + collabCost + equipCost;
+  const margin = total - costFloor;
+  const marginPct = total > 0 ? Math.round((margin / total) * 100) : 0;
 
   // Anàlisi de marge — tot via pricing-intelligence.ts (0 hardcoded)
   const { margin: M, hourlyRate: H } = PRICING_INTELLIGENCE;
@@ -321,14 +351,17 @@ export default async function BookingLabPage({ params }: { params: { id: string 
               {travelCost > 0 && (
                 <div><dt>Combustible</dt><dd className="bk2__val--muted">-{formatCurrency(travelCost)}</dd></div>
               )}
+              {equipCost > 0 && (
+                <div><dt>Amortització equip</dt><dd className="bk2__val--muted">-{formatCurrency(equipCost)}</dd></div>
+              )}
               {collabCost > 0 && (
                 <div>
                   <dt>{booking.collaboratorBookings[0]?.collaborator.name ?? 'Col·laborador'}</dt>
                   <dd className="bk2__val--muted">-{formatCurrency(collabCost)}</dd>
                 </div>
               )}
-              {costFloor === 0 && collabCost === 0 && (
-                <div><dt>Personal</dt><dd className="bk2__val--muted">Tu · sense cost extern</dd></div>
+              {equipCost === 0 && invItems.length === 0 && (
+                <div><dt>Material</dt><dd className="bk2__val--muted">Sense inventari assignat</dd></div>
               )}
               <div>
                 <dt>Net</dt>
@@ -359,18 +392,24 @@ export default async function BookingLabPage({ params }: { params: { id: string 
               {hoursLabel && (
                 <div><dt>Durada</dt><dd className="bk2__val--gold">{hoursLabel}</dd></div>
               )}
+              {booking.eventStartTime && booking.eventEndTime && (
+                <div><dt>Horari</dt><dd>{booking.eventStartTime} → {booking.eventEndTime}</dd></div>
+              )}
               {booking.pack && (
                 <div><dt>Servei base</dt><dd>{booking.pack.translations[0]?.name ?? booking.pack.slug}</dd></div>
               )}
-              {booking.extras.length > 0
-                ? booking.extras.map((e, i) => (
-                    <div key={i}>
-                      <dt>{e.extra.translations[0]?.name ?? e.extra.slug}</dt>
-                      <dd>{e.quantity > 1 ? `×${e.quantity}` : '+'}</dd>
-                    </div>
-                  ))
-                : !booking.pack && <div><dt>—</dt><dd className="bk2__val--muted">Sense servei assignat</dd></div>
-              }
+              {booking.extras.map((e, i) => (
+                <div key={i}>
+                  <dt>{e.extra.translations[0]?.name ?? e.extra.slug}</dt>
+                  <dd>{e.quantity > 1 ? `×${e.quantity}` : '+'}</dd>
+                </div>
+              ))}
+              {booking.guestCount && (
+                <div><dt>Convidats</dt><dd>{booking.guestCount} pax</dd></div>
+              )}
+              {booking.distanceKm && (
+                <div><dt>Desplaçament</dt><dd>{Number(booking.distanceKm).toFixed(0)} km</dd></div>
+              )}
             </dl>
           </section>
 
