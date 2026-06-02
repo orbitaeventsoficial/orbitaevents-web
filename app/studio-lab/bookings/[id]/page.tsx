@@ -87,39 +87,49 @@ export default async function BookingLabPage({ params }: { params: { id: string 
   const MARKET_EUR_PER_HOUR_MIN = 40;
   const MARKET_EUR_PER_HOUR_MAX = 60;
 
-  type Kpi = { value: string; label: string; sublabel: string; kind: 'warn' | 'ok' | 'info' };
+  type Kpi = { value: string; label: string; sublabel: string; kind: 'danger' | 'warn' | 'ok' | 'info' };
   const kpis: Kpi[] = [];
 
   if (costFloor > 0) {
+    // Marge: vermell si negatiu, ambre si baix, verd si ok
     kpis.push({
       value: `${marginPct}%`,
       label: 'Marge actual',
       sublabel: margin < 0
-        ? `⚠ perdent ${formatCurrency(Math.abs(margin))}`
+        ? `Perdent ${formatCurrency(Math.abs(margin))}`
         : marginPct < TARGET_MARGIN_PCT
-          ? `⚠ sota objectiu del ${TARGET_MARGIN_PCT}%`
-          : `✓ per sobre del ${TARGET_MARGIN_PCT}%`,
-      kind: marginPct < TARGET_MARGIN_PCT ? 'warn' : 'ok',
+          ? `Objectiu mínim: ${TARGET_MARGIN_PCT}%`
+          : `Objectiu ${TARGET_MARGIN_PCT}% assolit`,
+      kind: margin < 0 ? 'danger' : marginPct < TARGET_MARGIN_PCT ? 'warn' : 'ok',
     });
+
+    // €/hora: vermell si molt baix (<30€/h), ambre si baix, verd si ok
     if (eurPerHour !== null) {
-      const lowRate = eurPerHour < MARKET_EUR_PER_HOUR_MIN;
+      const veryLow = eurPerHour < 35;
+      const low = eurPerHour < MARKET_EUR_PER_HOUR_MIN;
       kpis.push({
         value: `${eurPerHour}€/h`,
         label: 'Preu per hora',
-        sublabel: lowRate
-          ? `⚠ mercat: ${MARKET_EUR_PER_HOUR_MIN}-${MARKET_EUR_PER_HOUR_MAX}€/h`
-          : `dins mercat (${MARKET_EUR_PER_HOUR_MIN}-${MARKET_EUR_PER_HOUR_MAX}€/h)`,
-        kind: lowRate ? 'warn' : 'ok',
+        sublabel: veryLow
+          ? `Molt baix · mercat: ${MARKET_EUR_PER_HOUR_MIN}-${MARKET_EUR_PER_HOUR_MAX}€/h`
+          : low
+            ? `Baix · mercat: ${MARKET_EUR_PER_HOUR_MIN}-${MARKET_EUR_PER_HOUR_MAX}€/h`
+            : `Dins mercat (${MARKET_EUR_PER_HOUR_MIN}-${MARKET_EUR_PER_HOUR_MAX}€/h)`,
+        kind: veryLow ? 'danger' : low ? 'warn' : 'ok',
       });
     }
+
+    // Quant falta per arribar al 30%
     if (priceFor30 !== null && marginPct < TARGET_MARGIN_PCT) {
       kpis.push({
         value: `+${formatCurrency(priceFor30 - total)}`,
         label: `Per arribar al ${TARGET_MARGIN_PCT}%`,
-        sublabel: `cobrar ${formatCurrency(priceFor30)} en lloc de ${formatCurrency(total)}`,
-        kind: 'info',
+        sublabel: `cobrar ${formatCurrency(priceFor30)}`,
+        kind: 'warn',
       });
     }
+
+    // Transport
     if (travelCost > 0) {
       kpis.push({
         value: formatCurrency(travelCost),
@@ -128,6 +138,8 @@ export default async function BookingLabPage({ params }: { params: { id: string 
         kind: 'info',
       });
     }
+
+    // Col·laborador
     if (collabCost === 0) {
       kpis.push({
         value: '—',
