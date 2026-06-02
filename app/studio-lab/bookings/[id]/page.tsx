@@ -141,19 +141,32 @@ export default async function BookingLabPage({ params }: { params: { id: string 
       kind: marginTone.kind,
     });
 
-    // €/h + % de desviació respecte el recomanat (informació clara i accionable)
+    // Card 1 — Preu per hora (només l'hora, res de total)
     if (eurPerHour !== null && hourlyTone) {
       const hourlyDeviationPct = eurPerHour < H.RECOMMENDED_MIN_EUR_PER_HOUR
         ? Math.round(((H.RECOMMENDED_MIN_EUR_PER_HOUR - eurPerHour) / H.RECOMMENDED_MIN_EUR_PER_HOUR) * 100)
         : 0;
       kpis.push({
         value: `${eurPerHour}€/h`,
-        label: `Preu per hora${hourlyDeviationPct > 0 ? ` (−${hourlyDeviationPct}%)` : ''}`,
+        label: 'Preu per hora',
         sublabel: hourlyDeviationPct > 0
-          ? `Recomanat: ${H.RECOMMENDED_MIN_EUR_PER_HOUR}€/h · cobrant ${formatCurrency(total - deviation.recommended)} menys`
+          ? `−${hourlyDeviationPct}% · recomanat: ${H.RECOMMENDED_MIN_EUR_PER_HOUR}€/h`
           : `Dins mercat (${H.MIN_MARKET_EUR_PER_HOUR}–${H.MAX_MARKET_EUR_PER_HOUR}€/h)`,
         hex: hourlyTone.hex,
         kind: hourlyTone.kind,
+      });
+    }
+
+    // Card 2 — Desviació del preu total pactat vs recomanat
+    if (deviation.kind !== 'none') {
+      const diff = Math.round(deviation.recommended - total);
+      const isCrit = deviation.kind === 'critical';
+      kpis.push({
+        value: `−${formatCurrency(diff)}`,
+        label: 'Desviació preu total',
+        sublabel: `Pactat ${formatCurrency(total)} · recomanat ${formatCurrency(deviation.recommended)}`,
+        hex: isCrit ? '#ef4444' : '#f87171',
+        kind: isCrit ? 'loss' : 'warn',
       });
     }
 
