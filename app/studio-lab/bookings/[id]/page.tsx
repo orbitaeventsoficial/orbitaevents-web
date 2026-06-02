@@ -59,6 +59,27 @@ export default async function BookingLabPage({ params }: { params: { id: string 
   const margin = total - costFloor;
   const marginPct = total > 0 ? Math.round((margin / total) * 100) : 0;
 
+  // Detecta preu personalitzat: total ≠ preu catàleg del pack (diferència > 5€)
+  const catalogBase = booking.pack ? Number(booking.pack.price) : 0;
+  const isPriceCustom = catalogBase > 0 && Math.abs(total - catalogBase) > 5;
+
+  // Hores reals del servei (inici → fi)
+  const contractedHours = (() => {
+    const s = booking.eventStartTime;
+    const e = booking.eventEndTime;
+    if (!s || !e) return null;
+    const [sh, sm] = s.split(':').map(Number);
+    const [eh, em] = e.split(':').map(Number);
+    let mins = (eh * 60 + em) - (sh * 60 + sm);
+    if (mins < 0) mins += 24 * 60;
+    return Math.round(mins / 60 * 10) / 10;
+  })();
+  const hoursLabel = contractedHours !== null
+    ? `${contractedHours}h`
+    : booking.pack
+      ? `${(booking.pack.djHours ?? 0) + (booking.extraHours ?? 0)}h (pack)`
+      : null;
+
   // Semàfor d'alertes — ordre de criticitat
   const flags: { kind: 'crit' | 'warn' | 'info'; title: string; desc: string }[] = [];
   if (!booking.customerId) flags.push({ kind: 'warn', title: 'Sense client CRM', desc: 'La reserva no està vinculada a cap fitxa de client.' });
@@ -175,7 +196,14 @@ export default async function BookingLabPage({ params }: { params: { id: string 
             <dl className="bk2__rows">
               <div>
                 <dt>Total pactat</dt>
-                <dd className="bk2__val--gold">{formatCurrency(total)}</dd>
+                <dd className="bk2__val--gold">
+                  {formatCurrency(total)}
+                  {isPriceCustom && (
+                    <span className="bk2__val--muted" title={`Tarifa base pack: ${formatCurrency(catalogBase)}`}>
+                      · personalitzat
+                    </span>
+                  )}
+                </dd>
               </div>
               <div>
                 <dt>Senyal ({formatCurrency(deposit)})</dt>
@@ -223,22 +251,36 @@ export default async function BookingLabPage({ params }: { params: { id: string 
             </dl>
           </section>
 
-          {/* Panell 4 — Servei (fila 2, ample complet) */}
+          {/* Panell 4 — Servei contractat (fila 2, ample complet) */}
           <section className="bk2__panel bk2__panel--wide">
-            <div className="bk2__ph"><h3>Servei contractat</h3></div>
+            <div className="bk2__ph">
+              <h3>Servei contractat</h3>
+              {isPriceCustom && (
+                <span className="bk2__badge bk2__badge--custom">Preu personalitzat</span>
+              )}
+            </div>
             <dl className="bk2__rows bk2__rows--cols">
-              {booking.pack ? (
-                <>
-                  <div><dt>Pack</dt><dd>{booking.pack.translations[0]?.name ?? booking.pack.slug}</dd></div>
-                  <div><dt>Preu tarifari</dt><dd className="bk2__val--muted">{formatCurrency(Number(booking.pack.price))}</dd></div>
-                  <div><dt>Hores DJ</dt><dd>{booking.pack.djHours}{booking.extraHours ? ` + ${booking.extraHours}h extra` : ''}</dd></div>
-                </>
-              ) : (
-                <div><dt>Pack</dt><dd className="bk2__val--muted">Sense pack assignat</dd></div>
+              {hoursLabel && (
+                <div><dt>Durada</dt><dd className="bk2__val--gold">{hoursLabel}</dd></div>
+              )}
+              {booking.eventStartTime && booking.eventEndTime && (
+                <div><dt>Horari</dt><dd>{booking.eventStartTime} → {booking.eventEndTime}</dd></div>
+              )}
+              {booking.pack && (
+                <div><dt>Servei base</dt><dd>{booking.pack.translations[0]?.name ?? booking.pack.slug}</dd></div>
               )}
               {booking.extras.map((e, i) => (
-                <div key={i}><dt>{e.extra.translations[0]?.name ?? e.extra.slug}</dt><dd>{e.quantity > 1 ? `×${e.quantity} · ` : ''}{formatCurrency(Number(e.extra.price))}</dd></div>
+                <div key={i}>
+                  <dt>{e.extra.translations[0]?.name ?? e.extra.slug}</dt>
+                  <dd>{e.quantity > 1 ? `×${e.quantity}` : '+'}</dd>
+                </div>
               ))}
+              {booking.guestCount && (
+                <div><dt>Convidats</dt><dd>{booking.guestCount} pax</dd></div>
+              )}
+              {booking.distanceKm && (
+                <div><dt>Desplaçament</dt><dd>{Number(booking.distanceKm).toFixed(0)} km</dd></div>
+              )}
             </dl>
           </section>
 
