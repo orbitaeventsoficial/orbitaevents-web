@@ -6,7 +6,7 @@
 
 @import '../../../../app/studio/orbita-tokens.css';
 
-html, body { margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; background: #09090b; }
 
 /* Overrides locals per visibilitat fora del context admin-mode */
 .bk2__root {
@@ -111,8 +111,7 @@ html, body { margin: 0; padding: 0; }
 /* ── Zona dreta — Panells ────────────────────────────────────────────────── */
 .bk2__main {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 1px;
   background: var(--bk-line);
   align-content: start;
@@ -125,7 +124,18 @@ html, body { margin: 0; padding: 0; }
   padding: 18px 20px;
   border: 1px solid var(--bk-line);
 }
-.bk2__panel--wide { grid-column: span 2; }
+.bk2__panel--wide { grid-column: span 3; }
+
+/* Files en mode columna (panell ample) */
+.bk2__rows--cols {
+  display: flex; flex-wrap: wrap; gap: 0;
+}
+.bk2__rows--cols div {
+  flex: 0 0 auto; min-width: 200px; padding: 6px 20px 6px 0;
+  border-bottom: none; border-right: 1px solid var(--bk-line);
+  margin-right: 20px;
+}
+.bk2__rows--cols div:last-child { border-right: 0; margin-right: 0; }
 
 .bk2__ph {
   display: flex; align-items: baseline; justify-content: space-between;
@@ -134,7 +144,7 @@ html, body { margin: 0; padding: 0; }
   border-bottom: 1px solid var(--bk-line);
 }
 .bk2__ph h3 {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--t3); margin: 0;
 }
 .bk2__ph a, .bk2__ph button {
@@ -151,8 +161,8 @@ html, body { margin: 0; padding: 0; }
   border-bottom: 1px solid var(--bk-line);
 }
 .bk2__rows div:last-child { border-bottom: 0; }
-.bk2__rows dt { font-size: 11px; color: var(--t3); flex-shrink: 0; }
-.bk2__rows dd { font-size: 12px; font-weight: 600; color: var(--t); text-align: right; margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bk2__rows dt { font-size: 13px; color: var(--t3); flex-shrink: 0; }
+.bk2__rows dd { font-size: 14px; font-weight: 600; color: var(--t); text-align: right; margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* Valors destacats */
 .bk2__val--gold   { color: var(--gold, #c9a84c); font-weight: 700; }

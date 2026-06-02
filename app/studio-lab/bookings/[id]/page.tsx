@@ -150,7 +150,7 @@ export default async function BookingLabPage({ params }: { params: { id: string 
 
         </aside>
 
-        {/* ── Zona principal (2 columnes) ── */}
+        {/* ── Zona principal (3 columnes) ── */}
         <main className="bk2__main">
 
           {/* Panell 1 — Bolo */}
@@ -197,35 +197,16 @@ export default async function BookingLabPage({ params }: { params: { id: string 
             </dl>
           </section>
 
-          {/* Panell 3 — Servei */}
-          <section className="bk2__panel">
-            <div className="bk2__ph"><h3>Servei</h3></div>
-            <dl className="bk2__rows">
-              {booking.pack ? (
-                <>
-                  <div><dt>Pack</dt><dd>{booking.pack.translations[0]?.name ?? booking.pack.slug}</dd></div>
-                  <div><dt>Preu tarifari</dt><dd className="bk2__val--muted">{formatCurrency(Number(booking.pack.price))}</dd></div>
-                  <div><dt>Hores DJ</dt><dd>{booking.pack.djHours}{booking.extraHours ? ` + ${booking.extraHours}h extra` : ''}</dd></div>
-                </>
-              ) : (
-                <div><dt>Pack</dt><dd className="bk2__val--muted">Sense pack</dd></div>
-              )}
-              {booking.extras.map((e, i) => (
-                <div key={i}><dt>{e.extra.translations[0]?.name ?? e.extra.slug}</dt><dd>{e.quantity > 1 ? `×${e.quantity} · ` : ''}{formatCurrency(Number(e.extra.price))}</dd></div>
-              ))}
-            </dl>
-          </section>
-
-          {/* Panell 4 — Marge */}
+          {/* Panell 3 — Marge (3a columna, primera fila) */}
           <section className="bk2__panel">
             <div className="bk2__ph"><h3>Marge estimat</h3></div>
             <dl className="bk2__rows">
               <div><dt>Ingrés</dt><dd className="bk2__val--gold">{formatCurrency(total)}</dd></div>
-              {packCost > 0 && <div><dt>Cost pack base</dt><dd className="bk2__val--muted">-{formatCurrency(packCost)}</dd></div>}
-              {travelCost > 0 && <div><dt>Cost desplaçament</dt><dd className="bk2__val--muted">-{formatCurrency(travelCost)}</dd></div>}
+              {packCost > 0 && <div><dt>Pack base</dt><dd className="bk2__val--muted">-{formatCurrency(packCost)}</dd></div>}
+              {travelCost > 0 && <div><dt>Desplaçament</dt><dd className="bk2__val--muted">-{formatCurrency(travelCost)}</dd></div>}
               {collabCost > 0 && (
                 <div>
-                  <dt>Cost {booking.collaboratorBookings[0]?.collaborator.name ?? 'col·laborador'}</dt>
+                  <dt>{booking.collaboratorBookings[0]?.collaborator.name ?? 'Col·laborador'}</dt>
                   <dd className="bk2__val--muted">-{formatCurrency(collabCost)}</dd>
                 </div>
               )}
@@ -238,7 +219,26 @@ export default async function BookingLabPage({ params }: { params: { id: string 
                   </dd>
                 </div>
               )}
-              {costFloor === 0 && <div><dt>—</dt><dd className="bk2__val--muted">Afegeix pack i col·laborador per veure el marge</dd></div>}
+              {costFloor === 0 && <div><dt>—</dt><dd className="bk2__val--muted">Afegeix pack i col·laborador</dd></div>}
+            </dl>
+          </section>
+
+          {/* Panell 4 — Servei (fila 2, ample complet) */}
+          <section className="bk2__panel bk2__panel--wide">
+            <div className="bk2__ph"><h3>Servei contractat</h3></div>
+            <dl className="bk2__rows bk2__rows--cols">
+              {booking.pack ? (
+                <>
+                  <div><dt>Pack</dt><dd>{booking.pack.translations[0]?.name ?? booking.pack.slug}</dd></div>
+                  <div><dt>Preu tarifari</dt><dd className="bk2__val--muted">{formatCurrency(Number(booking.pack.price))}</dd></div>
+                  <div><dt>Hores DJ</dt><dd>{booking.pack.djHours}{booking.extraHours ? ` + ${booking.extraHours}h extra` : ''}</dd></div>
+                </>
+              ) : (
+                <div><dt>Pack</dt><dd className="bk2__val--muted">Sense pack assignat</dd></div>
+              )}
+              {booking.extras.map((e, i) => (
+                <div key={i}><dt>{e.extra.translations[0]?.name ?? e.extra.slug}</dt><dd>{e.quantity > 1 ? `×${e.quantity} · ` : ''}{formatCurrency(Number(e.extra.price))}</dd></div>
+              ))}
             </dl>
           </section>
 
