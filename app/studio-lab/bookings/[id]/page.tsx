@@ -104,7 +104,7 @@ export default async function BookingLabPage({ params }: { params: { id: string 
 
           {/* Canvi d'estat */}
           <div>
-            <div className="bk2__ph"><h3>Estat</h3></div>
+            <h4 className="bk2__sidebar-h">Estat</h4>
             <div className="bk2__statuspick">
               {STATUS_ORDER.map((s) => (
                 <button key={s} className={s === booking.status ? 'is-on' : ''} disabled>
@@ -116,7 +116,7 @@ export default async function BookingLabPage({ params }: { params: { id: string 
 
           {/* Accions primàries */}
           <div>
-            <div className="bk2__ph"><h3>Accions</h3></div>
+            <h4 className="bk2__sidebar-h">Accions</h4>
             <div className="bk2__actions">
               {booking.clientPhone && (
                 <a
