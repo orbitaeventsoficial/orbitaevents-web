@@ -598,9 +598,34 @@
   color: var(--t3); letter-spacing: 0.01em;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-/* kicker i meta — redundants, fora */
-.fx__leadkicker { display: none; }
+/* kicker — visible però petit */
+.fx__leadkicker {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--t3); margin-bottom: 3px;
+}
 .fx__leadmeta { display: none; }
+
+/* icona de prioritat dins el kicker */
+.fx__pri { font-style: normal; font-size: 11px; line-height: 1; }
+.fx__pri[data-pri="URGENT"] { color: var(--o-danger, #e05252); }
+.fx__pri[data-pri="HIGH"]   { color: #e8932a; }
+
+/* accent lateral per prioritat HIGH/URGENT */
+.fx__pipelead[data-priority="HIGH"]   { box-shadow: inset 3px 0 0 #e8932a; }
+.fx__pipelead[data-priority="URGENT"] { box-shadow: inset 3px 0 0 var(--o-danger, #e05252); }
+.fx__pipelead[data-priority="HIGH"].is-active,
+.fx__pipelead[data-priority="URGENT"].is-active { box-shadow: inset 3px 0 0 var(--c), inset 4px 0 0 var(--c); }
+
+/* label de pagament a les targetes */
+.fx__paylabel {
+  display: inline-block; margin-top: 5px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+  padding: 1px 6px; border-radius: 3px;
+}
+.fx__paylabel[data-pay="full"] { color: #35c878; background: color-mix(in oklab, #35c878 12%, transparent); }
+.fx__paylabel[data-pay="part"] { color: #d08f45; background: color-mix(in oklab, #d08f45 12%, transparent); }
+.fx__paylabel[data-pay="none"] { color: var(--o-danger, #e05252); background: color-mix(in oklab, var(--o-danger, #e05252) 10%, transparent); }
 
 /* perdut — retirat */
 .fx__pipelead[data-stage="perdut"] { opacity: 0.56; }
@@ -623,7 +648,10 @@
 .fx__listdate { font-family: var(--mono); font-size: 12px; color: var(--t2); white-space: nowrap; }
 .fx__listname { font-family: var(--display); font-weight: 700; letter-spacing: -0.01em; display: flex; align-items: center; gap: 8px; }
 .fx__listname .fx__dot, .fx__listname .fx__pay { width: 8px; height: 8px; flex: none; }
-.fx__listphase { font-family: var(--mono); font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c); }
+.fx__listphase { font-family: var(--mono); font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c); display: flex; align-items: center; gap: 6px; }
+.fx__listphase[data-pay="full"] { color: #35c878; }
+.fx__listphase[data-pay="part"] { color: #d08f45; }
+.fx__listphase[data-pay="none"] { color: var(--o-danger, #e05252); }
 .fx__listnum { text-align: right; font-family: var(--mono); font-weight: 700; color: var(--gold); white-space: nowrap; font-variant-numeric: tabular-nums; }
 
 /* ── PEÇA 6: Fitxa interna de lead ─────────────────────────────────────── */

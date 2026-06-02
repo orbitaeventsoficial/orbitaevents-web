@@ -650,7 +650,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                   <div className="fx__lanehead">
                     <div className="fx__lanetitle">
                       <h2>{STAGE_LABEL[stage]}</h2>
-                      <small>{laneValue ? euro(laneValue) : '0 €'}</small>
+                      <small>{laneValue ? euro(laneValue) : '—'}</small>
                     </div>
                     <span>{laneLeads.length}</span>
                   </div>
@@ -679,6 +679,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                         type="button"
                         className={`fx__pipelead${l.id === focusId ? ' is-active' : ''}${dragLeadId === l.id ? ' is-dragging' : ''}${pendingId === l.id ? ' is-pending' : ''}`}
                         data-stage={l.stage}
+                        data-priority={l.priority}
                         draggable={draggable && pendingId !== l.id}
                         onDragStart={(e) => {
                           if (!draggable) { e.preventDefault(); return; }
@@ -688,11 +689,12 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                         onDragEnd={() => { setDragLeadId(null); setDropStage(null); }}
                         onClick={() => setPageId(l.id)}
                       >
-                        <span className="fx__leadkicker">{pay ? 'Reserva' : STAGE_LABEL[l.stage]} · {l.type}</span>
+                        <span className="fx__leadkicker">{l.type}{(l.priority === 'URGENT' || l.priority === 'HIGH') && <span className="fx__pri" data-pri={l.priority}>{l.priority === 'URGENT' ? '⚡' : '↑'}</span>}</span>
                         <span className="fx__leadtop">
                           <b>{pay && <span className="fx__pay" data-pay={pay} data-tip={PAY_TOOLTIP[pay]} />}{l.name}</b>
                           <strong>{l.value ? euro(l.value) : '—'}</strong>
                         </span>
+                        {pay && <span className="fx__paylabel" data-pay={pay}>{PAY_LABEL[pay]}</span>}
                         <span className="fx__leadwhen">{l.dateISO ? fullDate(l.dateISO) : '—'}{l.location ? ` · ${l.location}` : ''}</span>
                         <span className="fx__leadmeta">
                           {l.pax ? `${l.pax} pax` : 'Pax pendent'}{l.product ? ` · ${l.product}` : ''}{l.last ? ` · ${l.last}` : ''}
@@ -725,7 +727,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                 <tbody>
                   {sorted.map((l) => {
                     const pay = paymentState(l.booking);
-                    const phase = pay ? (pay === 'full' ? 'Reserva pagada' : pay === 'part' ? 'Reserva · senyal' : 'Reserva · pendent') : STAGE_LABEL[l.stage];
+                    const phase = pay ? (pay === 'full' ? 'Pagada' : pay === 'part' ? 'Senyal' : 'Pendent') : STAGE_LABEL[l.stage];
                     return (
                       <tr key={l.id} className="fx__listrow" data-stage={l.stage}
                         onClick={() => setPageId(l.id)} tabIndex={0}
@@ -734,7 +736,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                         <td className="fx__listname"><span className="fx__dot" data-stage={l.stage} />{pay && <span className="fx__pay" data-pay={pay} />}{l.name}</td>
                         <td>{l.type}</td>
                         <td>{l.location || '—'}</td>
-                        <td className="fx__listphase">{phase}</td>
+                        <td className="fx__listphase" data-pay={pay ?? undefined}>{pay && <span className="fx__pay" data-pay={pay} />}{phase}</td>
                         <td className="fx__listnum">{l.value ? euro(l.value) : '—'}</td>
                       </tr>
                     );
