@@ -142,27 +142,29 @@ export default async function BookingLabPage({ params }: { params: { id: string 
     });
 
     if (eurPerHour !== null && hourlyTone) {
+      // Desviació respecte el recomanat mínim (€/h)
+      const hourlyDeviationPct = eurPerHour < H.RECOMMENDED_MIN_EUR_PER_HOUR
+        ? Math.round(((H.RECOMMENDED_MIN_EUR_PER_HOUR - eurPerHour) / H.RECOMMENDED_MIN_EUR_PER_HOUR) * 100)
+        : 0;
       kpis.push({
         value: `${eurPerHour}€/h`,
         label: 'Preu per hora',
-        sublabel: eurPerHour < H.MIN_MARKET_EUR_PER_HOUR
-          ? `Sòl mercat: ${H.MIN_MARKET_EUR_PER_HOUR}€/h · recomanat: ${H.RECOMMENDED_MIN_EUR_PER_HOUR}€/h`
-          : eurPerHour < H.RECOMMENDED_MIN_EUR_PER_HOUR
-            ? `Recomanat mínim: ${H.RECOMMENDED_MIN_EUR_PER_HOUR}€/h`
-            : `Rang mercat ${H.MIN_MARKET_EUR_PER_HOUR}-${H.MAX_MARKET_EUR_PER_HOUR}€/h`,
+        sublabel: hourlyDeviationPct > 0
+          ? `-${hourlyDeviationPct}% respecte recomanat (${H.RECOMMENDED_MIN_EUR_PER_HOUR}€/h)`
+          : `Dins mercat (${H.MIN_MARKET_EUR_PER_HOUR}-${H.MAX_MARKET_EUR_PER_HOUR}€/h)`,
         hex: hourlyTone.hex,
         kind: hourlyTone.kind,
       });
     }
 
-    // Desviació: preu recomanat vs preu final
+    // Desviació preu recomanat vs final — vermell pur (a pitjor, més brillant)
     if (deviation.kind !== 'none') {
       const isCrit = deviation.kind === 'critical';
       kpis.push({
         value: `-${deviation.deviationPct}%`,
         label: 'Desviació de preu',
-        sublabel: `Recomanat: ${formatCurrency(deviation.recommended)} · revisa els preus`,
-        hex: isCrit ? '#7f1d1d' : '#c2410c',
+        sublabel: `Recomanat: ${formatCurrency(deviation.recommended)}`,
+        hex: isCrit ? '#ef4444' : '#f87171',
         kind: isCrit ? 'loss' : 'warn',
       });
     }
@@ -326,16 +328,14 @@ export default async function BookingLabPage({ params }: { params: { id: string 
               </div>
               <div>
                 <dt>Senyal ({formatCurrency(deposit)})</dt>
-                <dd className={booking.depositPaid ? 'bk2__val--ok' : 'bk2__val--danger'}>
-                  <span className={`bk2__paydot bk2__paydot--${booking.depositPaid ? 'ok' : 'none'}`} />
-                  {booking.depositPaid ? `Pagat${booking.depositPaidAt ? ` · ${formatDateSimple(booking.depositPaidAt.toISOString())}` : ''}` : 'Pendent'}
+                <dd className={booking.depositPaid ? 'bk2__val--ok' : 'bk2__pay--unpaid'}>
+                  {booking.depositPaid ? `✓ Pagat${booking.depositPaidAt ? ` · ${formatDateSimple(booking.depositPaidAt.toISOString())}` : ''}` : '● Pendent'}
                 </dd>
               </div>
               <div>
                 <dt>Resta ({formatCurrency(remaining)})</dt>
-                <dd className={booking.remainingPaid ? 'bk2__val--ok' : pay === 'part' ? 'bk2__val--warn' : 'bk2__val--muted'}>
-                  <span className={`bk2__paydot bk2__paydot--${booking.remainingPaid ? 'ok' : pay === 'part' ? 'part' : 'none'}`} />
-                  {booking.remainingPaid ? `Pagada${booking.remainingPaidAt ? ` · ${formatDateSimple(booking.remainingPaidAt.toISOString())}` : ''}` : 'Pendent'}
+                <dd className={booking.remainingPaid ? 'bk2__val--ok' : pay === 'part' ? 'bk2__val--warn' : 'bk2__pay--unpaid'}>
+                  {booking.remainingPaid ? `✓ Pagada${booking.remainingPaidAt ? ` · ${formatDateSimple(booking.remainingPaidAt.toISOString())}` : ''}` : '● Pendent'}
                 </dd>
               </div>
               <div><dt>Mètode</dt><dd>{booking.paymentMethod === 'CASH' ? 'Efectiu' : booking.paymentMethod === 'TRANSFER' ? 'Transferència' : 'Factura'}</dd></div>

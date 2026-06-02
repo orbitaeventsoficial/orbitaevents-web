@@ -71,15 +71,17 @@ export type PriceTone = { hex: string; name: string; kind: MarginKind };
 // ── Gradient tèrmic de marge (8 tonalitats) ──────────────────────────────────
 // Interpolació natural: vermell fosc (pèrdua) → ambre fosc → or → verd brillant.
 // No hi ha salt brusc: cada tram té el seu hex i nom descriptiu.
+// Escala tèrmica: a pitjor marge → vermell MÉS BRILLANT (no fosc)
+// Fosc = subtil, tranquil. Brillant = alarma, perill real.
 const MARGIN_TONES: { min: number; tone: PriceTone }[] = [
   { min: 60,        tone: { hex: '#16a34a', name: 'Verd brillant',  kind: 'excellent' } },
   { min: 50,        tone: { hex: '#65a30d', name: 'Verd-or',        kind: 'good'      } },
   { min: 42,        tone: { hex: '#a3a30d', name: 'Or',             kind: 'target'    } },
   { min: 34,        tone: { hex: '#ca8a04', name: 'Ambre-or',       kind: 'fair'      } },
   { min: 25,        tone: { hex: '#d97706', name: 'Ambre',          kind: 'low'       } },
-  { min: 15,        tone: { hex: '#c2410c', name: 'Ambre fosc',     kind: 'warn'      } },
+  { min: 15,        tone: { hex: '#ea580c', name: 'Taronja fort',   kind: 'warn'      } },
   { min: 1,         tone: { hex: '#dc2626', name: 'Vermell',        kind: 'critical'  } },
-  { min: -Infinity, tone: { hex: '#7f1d1d', name: 'Vermell fosc',   kind: 'loss'      } },
+  { min: -Infinity, tone: { hex: '#ef4444', name: 'Vermell brillant', kind: 'loss'    } },
 ];
 
 export function getMarginColor(pct: number): PriceTone {
