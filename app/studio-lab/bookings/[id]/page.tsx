@@ -80,6 +80,47 @@ export default async function BookingLabPage({ params }: { params: { id: string 
       ? `${(booking.pack.djHours ?? 0) + (booking.extraHours ?? 0)}h (pack)`
       : null;
 
+  // Anàlisi de marge — suggeriments
+  const TARGET_MARGIN_PCT = 30;
+  const priceFor30 = costFloor > 0 ? Math.ceil(costFloor / (1 - TARGET_MARGIN_PCT / 100)) : null;
+  const eurPerHour = contractedHours && contractedHours > 0 ? Math.round(total / contractedHours) : null;
+  const MARKET_EUR_PER_HOUR_MIN = 40;
+  const MARKET_EUR_PER_HOUR_MAX = 60;
+
+  type Tip = { kind: 'warn' | 'ok' | 'info'; text: string };
+  const tips: Tip[] = [];
+
+  if (costFloor > 0) {
+    if (margin < 0) {
+      tips.push({ kind: 'warn', text: `Perdem ${formatCurrency(Math.abs(margin))} amb aquest preu. Cost estimat: ${formatCurrency(costFloor)}.` });
+    } else if (marginPct < TARGET_MARGIN_PCT) {
+      tips.push({ kind: 'warn', text: `Marge ${marginPct}% — objectiu mínim ${TARGET_MARGIN_PCT}%.` });
+    } else {
+      tips.push({ kind: 'ok', text: `Marge ${marginPct}% — per sobre l'objectiu del ${TARGET_MARGIN_PCT}%.` });
+    }
+  }
+  if (priceFor30 && total < priceFor30) {
+    tips.push({ kind: 'info', text: `Per arribar al ${TARGET_MARGIN_PCT}% de marge: ${formatCurrency(priceFor30)}.` });
+  }
+  if (isPriceCustom && catalogBase > 0) {
+    tips.push({ kind: 'info', text: `Tarifa base del pack: ${formatCurrency(catalogBase)}. Preu pactat: ${formatCurrency(total)} (${total > catalogBase ? '+' : ''}${formatCurrency(total - catalogBase)}).` });
+  }
+  if (travelCost > 0) {
+    const travelCharge = Number(booking.subtotal ?? 0) - catalogBase;
+    if (travelCharge > 0) tips.push({ kind: 'info', text: `Transport inclòs: ${formatCurrency(travelCharge)} (cost real combustible: ${formatCurrency(travelCost)}).` });
+  }
+  if (eurPerHour !== null) {
+    const vsMarket = eurPerHour < MARKET_EUR_PER_HOUR_MIN ? 'per sota' : eurPerHour > MARKET_EUR_PER_HOUR_MAX ? 'per sobre' : 'dins';
+    tips.push({ kind: eurPerHour < MARKET_EUR_PER_HOUR_MIN ? 'warn' : 'info', text: `${formatCurrency(eurPerHour)}/h per ${contractedHours}h de servei — ${vsMarket} rang mercat (${MARKET_EUR_PER_HOUR_MIN}-${MARKET_EUR_PER_HOUR_MAX} €/h).` });
+  }
+  if (collabCost === 0 && costFloor > 0) {
+    tips.push({ kind: 'info', text: `Col·laborador no assignat — el marge real pot ser inferior si hi ha cost de personal.` });
+  }
+  if (booking.paymentMethod === 'CASH' && !booking.invoiceRequired) {
+    tips.push({ kind: 'info', text: `Efectiu sense factura: els ${formatCurrency(total)} van directe, sense IVA ni Holded.` });
+  }
+  const showTips = tips.length > 0 && (isPriceCustom || marginPct < TARGET_MARGIN_PCT || margin < 0);
+
   // Semàfor d'alertes — ordre de criticitat
   const flags: { kind: 'crit' | 'warn' | 'info'; title: string; desc: string }[] = [];
   if (!booking.customerId) flags.push({ kind: 'warn', title: 'Sense client CRM', desc: 'La reserva no està vinculada a cap fitxa de client.' });
@@ -283,6 +324,24 @@ export default async function BookingLabPage({ params }: { params: { id: string 
               )}
             </dl>
           </section>
+
+          {/* Panell 5 — Anàlisi de marge i consells */}
+          {showTips && (
+            <section className="bk2__panel bk2__panel--wide bk2__panel--tips">
+              <div className="bk2__ph">
+                <h3>Anàlisi econòmica</h3>
+                <span className="bk2__badge bk2__badge--custom">{tips.filter(t => t.kind === 'warn').length > 0 ? '⚠ Revisa el preu' : 'ℹ Informació'}</span>
+              </div>
+              <ul className="bk2__tips">
+                {tips.map((tip, i) => (
+                  <li key={i} className={`bk2__tip bk2__tip--${tip.kind}`}>
+                    <span className="bk2__tip-ic">{tip.kind === 'warn' ? '⚠' : tip.kind === 'ok' ? '✓' : '→'}</span>
+                    {tip.text}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
         </main>
       </div>
