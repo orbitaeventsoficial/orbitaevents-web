@@ -117,14 +117,22 @@ export default async function BookingLabPage({ params }: { params: { id: string 
   const marginPct = total > 0 ? Math.round((margin / total) * 100) : 0;
 
   // Anàlisi de marge — tot via pricing-intelligence.ts (0 hardcoded)
-  const { margin: M, hourlyRate: H } = PRICING_INTELLIGENCE;
+  const { margin: M } = PRICING_INTELLIGENCE;
   const TARGET_MARGIN_PCT = M.TARGET_MARGIN_PCT;
   const priceForTarget = costFloor > 0 ? Math.ceil(costFloor / (1 - TARGET_MARGIN_PCT / 100)) : null;
   const eurPerHour = contractedHours && contractedHours > 0 ? Math.round(total / contractedHours) : null;
 
+  // Preu hora estipulat = pack.price ÷ pack.djHours (tarifa catàleg)
+  // TODO: quan existeixi el Price Manager, llegir d'allà en lloc del pack
+  const ourHourlyRate = booking.pack && booking.pack.djHours > 0
+    ? Math.round(Number(booking.pack.price) / booking.pack.djHours)
+    : null;
+
   // Gradient de color (no semàfor binari)
   const marginTone = getMarginColor(marginPct);
-  const hourlyTone = eurPerHour !== null ? getHourlyColor(eurPerHour) : null;
+  const hourlyTone = eurPerHour !== null && ourHourlyRate !== null
+    ? getHourlyColor(eurPerHour < ourHourlyRate ? eurPerHour : eurPerHour)
+    : eurPerHour !== null ? getHourlyColor(eurPerHour) : null;
 
   // Alerta desviació preu recomanat vs preu final
   const deviation = getPriceDeviationAlert(total, contractedHours);
@@ -141,33 +149,38 @@ export default async function BookingLabPage({ params }: { params: { id: string 
       kind: marginTone.kind,
     });
 
-    // Card 1 — Preu per hora (només l'hora, res de total)
+    // Card 1 — Preu per hora vs la nostra tarifa de catàleg
     if (eurPerHour !== null && hourlyTone) {
-      const hourlyDeviationPct = eurPerHour < H.RECOMMENDED_MIN_EUR_PER_HOUR
-        ? Math.round(((H.RECOMMENDED_MIN_EUR_PER_HOUR - eurPerHour) / H.RECOMMENDED_MIN_EUR_PER_HOUR) * 100)
+      const refRate = ourHourlyRate ?? null;
+      const hourlyDeviationPct = refRate && eurPerHour < refRate
+        ? Math.round(((refRate - eurPerHour) / refRate) * 100)
         : 0;
       kpis.push({
         value: `${eurPerHour}€/h`,
         label: 'Preu per hora',
-        sublabel: hourlyDeviationPct > 0
-          ? `−${hourlyDeviationPct}% · recomanat: ${H.RECOMMENDED_MIN_EUR_PER_HOUR}€/h`
-          : `Dins mercat (${H.MIN_MARKET_EUR_PER_HOUR}–${H.MAX_MARKET_EUR_PER_HOUR}€/h)`,
-        hex: hourlyTone.hex,
-        kind: hourlyTone.kind,
+        sublabel: hourlyDeviationPct > 0 && refRate
+          ? `−${hourlyDeviationPct}% · tarifa catàleg: ${refRate}€/h`
+          : refRate
+            ? `Igual o per sobre tarifa catàleg (${refRate}€/h)`
+            : 'Sense pack assignat per calcular tarifa',
+        hex: hourlyDeviationPct > 0 ? hourlyTone.hex : '#35c878',
+        kind: hourlyDeviationPct > 0 ? hourlyTone.kind : ('good' as MarginKind),
       });
     }
 
-    // Card 2 — Desviació del preu total pactat vs recomanat
-    if (deviation.kind !== 'none') {
-      const diff = Math.round(deviation.recommended - total);
-      const isCrit = deviation.kind === 'critical';
-      kpis.push({
-        value: `−${formatCurrency(diff)}`,
-        label: 'Desviació preu total',
-        sublabel: `Pactat ${formatCurrency(total)} · recomanat ${formatCurrency(deviation.recommended)}`,
-        hex: isCrit ? '#ef4444' : '#f87171',
-        kind: isCrit ? 'loss' : 'warn',
-      });
+    // Card 2 — Desviació del preu total pactat vs tarifa catàleg × hores
+    if (ourHourlyRate && contractedHours) {
+      const catalogueTotal = ourHourlyRate * contractedHours;
+      const diff = Math.round(catalogueTotal - total);
+      if (diff > 0) {
+        kpis.push({
+          value: `−${formatCurrency(diff)}`,
+          label: 'vs tarifa catàleg',
+          sublabel: `${ourHourlyRate}€/h × ${contractedHours}h = ${formatCurrency(catalogueTotal)}`,
+          hex: diff > catalogueTotal * 0.3 ? '#ef4444' : '#f87171',
+          kind: diff > catalogueTotal * 0.3 ? 'loss' : 'warn',
+        });
+      }
     }
 
     if (priceForTarget !== null && marginPct < TARGET_MARGIN_PCT) {
