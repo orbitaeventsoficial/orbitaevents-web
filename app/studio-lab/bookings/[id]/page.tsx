@@ -317,7 +317,6 @@ export default async function BookingLabPage({ params }: { params: { id: string 
           <section className="bk2__panel">
             <div className="bk2__ph"><h3>Marge estimat</h3></div>
             <dl className="bk2__rows">
-              <div><dt>Ingrés</dt><dd className="bk2__val--gold">{formatCurrency(total)}</dd></div>
               {packCost > 0 && <div><dt>Pack base</dt><dd className="bk2__val--muted">-{formatCurrency(packCost)}</dd></div>}
               {travelCost > 0 && <div><dt>Desplaçament</dt><dd className="bk2__val--muted">-{formatCurrency(travelCost)}</dd></div>}
               {collabCost > 0 && (
@@ -328,18 +327,18 @@ export default async function BookingLabPage({ params }: { params: { id: string 
               )}
               {costFloor > 0 && (
                 <div>
-                  <dt>Marge net</dt>
-                  <dd className={margin >= 0 ? (marginPct >= 30 ? 'bk2__val--ok' : 'bk2__val--warn') : 'bk2__val--danger'}>
+                  <dt>Net</dt>
+                  <dd style={{ color: marginTone.hex, fontWeight: 700 }}>
                     {formatCurrency(margin)}
                     <span className="bk2__val--muted"> ({marginPct}%)</span>
                   </dd>
                 </div>
               )}
-              {costFloor === 0 && <div><dt>—</dt><dd className="bk2__val--muted">Afegeix pack i col·laborador</dd></div>}
             </dl>
           </section>
 
           {/* Panell 4 — Servei contractat (fila 2, ample complet) */}
+          {/* Horari, convidats i desplaçament ja surten a BOLO — aquí només el servei */}
           <section className="bk2__panel bk2__panel--wide">
             <div className="bk2__ph">
               <h3>Servei contractat</h3>
@@ -351,24 +350,18 @@ export default async function BookingLabPage({ params }: { params: { id: string 
               {hoursLabel && (
                 <div><dt>Durada</dt><dd className="bk2__val--gold">{hoursLabel}</dd></div>
               )}
-              {booking.eventStartTime && booking.eventEndTime && (
-                <div><dt>Horari</dt><dd>{booking.eventStartTime} → {booking.eventEndTime}</dd></div>
-              )}
               {booking.pack && (
                 <div><dt>Servei base</dt><dd>{booking.pack.translations[0]?.name ?? booking.pack.slug}</dd></div>
               )}
-              {booking.extras.map((e, i) => (
-                <div key={i}>
-                  <dt>{e.extra.translations[0]?.name ?? e.extra.slug}</dt>
-                  <dd>{e.quantity > 1 ? `×${e.quantity}` : '+'}</dd>
-                </div>
-              ))}
-              {booking.guestCount && (
-                <div><dt>Convidats</dt><dd>{booking.guestCount} pax</dd></div>
-              )}
-              {booking.distanceKm && (
-                <div><dt>Desplaçament</dt><dd>{Number(booking.distanceKm).toFixed(0)} km</dd></div>
-              )}
+              {booking.extras.length > 0
+                ? booking.extras.map((e, i) => (
+                    <div key={i}>
+                      <dt>{e.extra.translations[0]?.name ?? e.extra.slug}</dt>
+                      <dd>{e.quantity > 1 ? `×${e.quantity}` : '+'}</dd>
+                    </div>
+                  ))
+                : !booking.pack && <div><dt>—</dt><dd className="bk2__val--muted">Sense servei assignat</dd></div>
+              }
             </dl>
           </section>
 

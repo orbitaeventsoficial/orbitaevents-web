@@ -28,7 +28,7 @@ html, body { margin: 0; padding: 0; background: #0a0a0c; }
 /* ── Topbar ─────────────────────────────────────────────────────────────── */
 .bk2__topbar {
   display: flex; align-items: center; gap: 14px;
-  padding: 12px 22px;
+  padding: 8px 20px;
   border-bottom: 1px solid var(--bk-line);
   background: color-mix(in oklab, var(--canvas) 90%, transparent);
   backdrop-filter: blur(16px);
@@ -69,20 +69,20 @@ html, body { margin: 0; padding: 0; background: #0a0a0c; }
 /* ── Sidebar ────────────────────────────────────────────────────────────── */
 .bk2__sidebar {
   border-right: 1px solid var(--bk-line);
-  padding: 20px 18px;
+  padding: 14px 16px;
   display: flex; flex-direction: column; gap: 0;
   overflow-y: auto;
 }
 .bk2__sidebar > * + * {
   border-top: 1px solid var(--bk-line);
-  padding-top: 18px;
-  margin-top: 18px;
+  padding-top: 10px;
+  margin-top: 10px;
 }
 
 /* Alertes */
 .bk2__flags { display: flex; flex-direction: column; gap: 8px; }
 .bk2__flag {
-  font-size: 13px; padding: 10px 12px; border-radius: 6px;
+  font-size: 13px; padding: 7px 10px; border-radius: 6px;
   border-left: 3px solid var(--flag-col);
   background: color-mix(in oklab, var(--flag-col) 8%, transparent);
   color: var(--t2); line-height: 1.45;
@@ -96,7 +96,7 @@ html, body { margin: 0; padding: 0; background: #0a0a0c; }
 .bk2__actions { display: flex; flex-direction: column; gap: 8px; }
 .bk2__btn {
   display: flex; align-items: center; justify-content: center; gap: 7px;
-  width: 100%; padding: 10px 14px; border-radius: 7px;
+  width: 100%; padding: 8px 12px; border-radius: 7px;
   font-size: 14px; font-weight: 600; cursor: pointer; transition: all 120ms;
   border: 1px solid var(--bk-line2); background: none; color: var(--t2);
   text-decoration: none;
@@ -135,7 +135,7 @@ html, body { margin: 0; padding: 0; background: #0a0a0c; }
 }
 .bk2__panel {
   background: var(--canvas);
-  padding: 22px 24px;
+  padding: 14px 18px;
   border-right: 1px solid var(--bk-line);
   border-bottom: 1px solid var(--bk-line);
 }
@@ -145,7 +145,7 @@ html, body { margin: 0; padding: 0; background: #0a0a0c; }
 /* Capçalera de panell */
 .bk2__ph {
   display: flex; align-items: baseline; justify-content: space-between;
-  margin-bottom: 12px; padding-bottom: 10px;
+  margin-bottom: 8px; padding-bottom: 7px;
   border-bottom: 1px solid var(--bk-line);
 }
 .bk2__ph h3 {
@@ -162,7 +162,7 @@ html, body { margin: 0; padding: 0; background: #0a0a0c; }
 .bk2__rows { display: grid; gap: 0; }
 .bk2__rows div {
   display: flex; justify-content: space-between; align-items: baseline;
-  gap: 12px; padding: 7px 0;
+  gap: 10px; padding: 5px 0;
   border-bottom: 1px solid var(--bk-line);
 }
 .bk2__rows div:last-child { border-bottom: 0; }
@@ -210,7 +210,7 @@ html, body { margin: 0; padding: 0; background: #0a0a0c; }
 }
 .bk2__kpi {
   background: var(--canvas);
-  padding: 16px 18px;
+  padding: 12px 16px;
   border-left: 3px solid currentColor;
 }
 /* Color del KPI injectat inline via hex de pricing-intelligence.ts */
@@ -241,7 +241,7 @@ html, body { margin: 0; padding: 0; background: #0a0a0c; }
 
 /* Peu */
 .bk2__footer {
-  padding: 10px 22px; border-top: 1px solid var(--bk-line);
+  padding: 6px 20px; border-top: 1px solid var(--bk-line);
   display: flex; align-items: center; gap: 12px;
   font-size: 12px; color: var(--t3);
 }
