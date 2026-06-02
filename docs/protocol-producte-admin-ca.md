@@ -1418,6 +1418,112 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #860 — 2026-06-02 — codex (FET)
+
+**Handoff bug Kimera — total 300 sense IVA torna a 350,90.**
+
+- Context: el propietari avisa que ahir va canviar diverses vegades la reserva Kimera a `300` sense IVA i sense factura, però la fitxa continua mostrant `350,90`. Com que Claude acabarà la feina, es documenta el bug abans de continuar refeta visual.
+- Nou `docs/booking-kimera-vat-total-bug-handoff.md`: estat BD actual, adminLog rellevant, causa probable en `bookingRouteService`, criteri de fix i tests recomanats.
+- `ADMIN_CHANGE_COUNTER` 859 → 860.
+- `LAB_CHANGE_NUMBER` 859 → 860.
+- Validació tècnica: `pnpm run qa:protocol` OK.
+- Validació funcional: documentació de bug, sense canvi funcional aplicat.
+- Validació humana/UX: pendent Claude/propietari.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #859 — 2026-06-02 — codex (FET)
+
+**Inventari refeta fitxa reserva — Kimera / OE-2026-003.**
+
+- Context: el propietari està a `/admin/bookings/cmpv6tehp0002mittudtg9tui` i demana inventari complet abans de posar pantalla negra i refer la fitxa de reserva peça per peça. S'ha inspeccionat el codi de `/admin/bookings/[id]`, les fonts de dades, els endpoints i la reserva real `OE-2026-003` a BD.
+- Nou `docs/admin-booking-detail-rebuild-inventari.md`: inventari de pantalla actual, fitxers, components, dades reals de Kimera, APIs, constants, alertes i ordre recomanat de reconstrucció.
+- `ADMIN_CHANGE_COUNTER` 858 → 859.
+- `LAB_CHANGE_NUMBER` 858 → 859.
+- Validació tècnica: `pnpm run qa:protocol` OK.
+- Validació funcional: inventari de lectura, sense canvi funcional.
+- Validació humana/UX: pendent propietari abans de començar pantalla negra.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #858 — 2026-06-02 — codex (FET)
+
+**Flux Lead → Reserva torna a Agenda després de crear.**
+
+- Context: el propietari marca que, després de Leads, toca Reserves "des de l'enllaç de leads". La revisió del flux va trobar una regressió clara a `useNewBookingSubmit`: el comentari i l'arquitectura #841 deien que una reserva creada des d'un lead havia de tornar a la fitxa del lead dins Agenda, però el codi sempre enviava a `/admin/bookings/{id}`.
+- `app/admin/bookings/useNewBookingSubmit.ts`: després de crear una reserva amb `leadId`, el submit redirigeix a `buildLeadWorkspaceHref(leadId)`; les reserves sense lead continuen obrint `buildBookingHref(booking.id)`.
+- `__tests__/app/admin/bookings/useNewBookingSubmit.test.tsx`: regressió nova amb 2 casos, lead d'origen → `/admin/leads/{id}` i reserva independent → `/admin/bookings/{id}`.
+- `ADMIN_CHANGE_COUNTER` 857 → 858.
+- `LAB_CHANGE_NUMBER` 857 → 858.
+- Validació tècnica: `pnpm exec vitest run __tests__/app/admin/bookings/useNewBookingSubmit.test.tsx` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: pendent browser del flux complet `/admin/leads` → `Crear reserva` → submit → retorn a fitxa lead.
+- Validació humana/UX: pendent propietari.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #857 — 2026-06-02 — codex (FET)
+
+- Context: continuació de l'auditoria de residus canònics fora de `app/admin/tasks/`. Després de sanejar pàgines admin, `lib/constants/index.ts` encara tenia separadors corromputs i controls C1 amagats enganxats a icones canòniques.
+- `lib/constants/index.ts`: separadors de comentari amb mojibake normalitzats a separadors ASCII.
+- `lib/constants/index.ts`: eliminats controls C1 amagats de les icones canòniques de tipus d'esdeveniment, fonts, estats i navegació.
+- `ADMIN_CHANGE_COUNTER` 856 → 857.
+- `LAB_CHANGE_NUMBER` 856 → 857.
+- Validació tècnica: `rg -n "â|Ã|�" lib/constants/index.ts` sense resultats; scan Node de controls C1 sense resultats; `pnpm run qa:encoding` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: pendent browser, sense canvi funcional esperat.
+- Validació humana/UX: pendent propietari.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #856 — 2026-06-02 — codex (FET)
+
+**Auditoria mojibake admin: Canvas, Pressupostos Studio i Ressenyes deixen de mostrar caràcters corruptes.**
+
+- Context: continuant l'auditoria global fora de `app/admin/tasks/`, una cerca de `â|Ã|�` va localitzar residus visibles i comentaris corruptes en pàgines admin encara 🔴.
+- `app/admin/canvas/CanvasEditorClient.tsx`: labels de capes, alineació, panell i llista de formes passen a text llegible; comentaris separadors sanejats.
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: imports amb `€`, icones fallback, col·lapse de seccions i missatge de validació deixen de mostrar mojibake.
+- `app/admin/presupuestos/studio-utils.ts`: `formatEUR(...)` torna a emetre `€` llegible i comentaris sanejats.
+- `app/admin/ressenyes/page.tsx`: estrelles i fallback de nota mitjana sanejats.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `855` a `856`.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` puja de `855` a `856`.
+- Validació tècnica: `rg -n "â|Ã|�" app/admin/canvas app/admin/presupuestos app/admin/ressenyes` sense resultats; `pnpm run qa:encoding` OK; `pnpm run qa:language` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: pendent browser a `/admin/canvas`, `/admin/presupuestos` i `/admin/ressenyes`.
+- Validació humana/UX: pendent propietari.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #855 — 2026-06-02 — codex (FET)
+
+**Fitxa lead sanejada: dates amb helper canònic i cost real de col·laborador al panell econòmic.**
+
+- Context: després del tall #854 i de `validate:core` verd, quedava un residu curt a la fitxa de lead: format de data local substituït per `formatDateFull(...)` i un diff pendent on el panell econòmic usava efectiu (`cashAmount`) com si fos cost de col·laborador.
+- `app/admin/leads/[id]/LeadDetailClient.tsx`: `fullDate(...)` delega en `formatDateFull(...)`; el contracte `booking` rep `collaboratorCost` explícit i el panell de rendibilitat pinta `Cost {nom}` amb `commissionAmount`.
+- `app/admin/leads/[id]/page.tsx`: la query de reserva inclou `collaboratorBookings` i serialitza `commissionAmount` + nom de col·laborador cap al client.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `854` a `855`.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` puja de `854` a `855` per mantenir el guard `qa:protocol` alineat.
+- Validació tècnica: `pnpm run qa:protocol` OK; `pnpm run validate:core` OK després del registre #855.
+- Validació funcional: pendent browser a `/admin/leads/[id]`.
+- Validació humana/UX: pendent propietari.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
 ### Canvi #854 — 2026-06-02 — codex (FET)
 
 **Auditoria canònica de preus, IVA, senyal i defaults de factura.**

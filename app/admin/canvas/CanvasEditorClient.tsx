@@ -7,7 +7,7 @@ import { CANVAS_COLOR_OPTIONS } from '@/lib/constants';
 import { ADMIN_CANVAS_PRESET_SIZES, ADMIN_CANVAS_TEMPLATES } from '@/lib/constants/admin';
 import { log } from '@/lib/logger';
 
-// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Types ------------------------------------------------------------------
 
 type ElementType = 'text' | 'shape' | 'image';
 
@@ -66,7 +66,7 @@ type OwnerStripConfig = {
   };
 };
 
-// â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Constants --------------------------------------------------------------
 
 const PRESET_SIZES: Record<PresetSize, { width: number; height: number; label: string }> = ADMIN_CANVAS_PRESET_SIZES;
 
@@ -79,7 +79,7 @@ const TEMPLATES: CanvasTemplate[] = ADMIN_CANVAS_TEMPLATES.map((template) => ({
 let nextId = 100;
 function genId() { return `el-${nextId++}`; }
 
-// â”€â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Component --------------------------------------------------------------
 
 export default function CanvasEditorClient() {
   const toast = useToast();
@@ -208,7 +208,7 @@ export default function CanvasEditorClient() {
   const CANVAS_MAX_H = 700;
   const scale = Math.min(CANVAS_MAX_H / canvasSize.height, 500 / canvasSize.width);
 
-  // â”€â”€â”€ Template loading â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // --- Template loading ---------------------------------------------------
 
   function loadTemplate(tpl: CanvasTemplate) {
     setCanvasSize({ width: tpl.width, height: tpl.height });
@@ -222,7 +222,7 @@ export default function CanvasEditorClient() {
     setCanvasSize({ width: s.width, height: s.height });
   }
 
-  // â”€â”€â”€ Element CRUD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // --- Element CRUD -------------------------------------------------------
 
   function addText() {
     const el: CanvasElement = {
@@ -275,7 +275,7 @@ export default function CanvasEditorClient() {
     setElements(prev => prev.map(e => e.id === id ? { ...e, ...patch } : e));
   }
 
-  // â”€â”€â”€ Drag & Drop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // --- Drag & Drop -------------------------------------------------------
 
   const handlePointerDown = useCallback((e: React.PointerEvent, elId: string) => {
     e.stopPropagation();
@@ -323,7 +323,7 @@ export default function CanvasEditorClient() {
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
   }, [elements]);
 
-  // â”€â”€â”€ Keyboard shortcuts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // --- Keyboard shortcuts -------------------------------------------------
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -335,7 +335,7 @@ export default function CanvasEditorClient() {
     return () => window.removeEventListener('keydown', onKey);
   });
 
-  // â”€â”€â”€ Export â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // --- Export -------------------------------------------------------------
 
   async function exportPng() {
     setExporting(true);
@@ -363,7 +363,7 @@ export default function CanvasEditorClient() {
     }
   }
 
-  // â”€â”€â”€ Render element â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // --- Render element -----------------------------------------------------
 
   function renderElement(el: CanvasElement) {
     const isSelected = el.id === selectedId;
@@ -442,7 +442,7 @@ export default function CanvasEditorClient() {
     return null;
   }
 
-  // â”€â”€â”€ UI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // --- UI -----------------------------------------------------------------
 
   return (
     <div className="space-y-6">
@@ -453,7 +453,7 @@ export default function CanvasEditorClient() {
       />
 
       <div className="flex flex-col gap-6 lg:flex-row">
-      {/* LEFT â€” Canvas */}
+      {/* LEFT - Canvas */}
       <div className="flex-1 min-w-0">
         {/* Toolbar */}
         <div id="canvas-toolbar" className="mb-4 flex flex-wrap gap-2">
@@ -465,8 +465,8 @@ export default function CanvasEditorClient() {
           {selectedId && (
             <>
               <button onClick={duplicateSelected} className="ap-btn ap-btn--secondary min-h-[40px] text-sm">Duplicar</button>
-              <button onClick={() => moveLayer('up')} className="ap-btn ap-btn--secondary min-h-[40px] text-sm">â†‘ Capa</button>
-              <button onClick={() => moveLayer('down')} className="ap-btn ap-btn--secondary min-h-[40px] text-sm">â†“ Capa</button>
+              <button onClick={() => moveLayer('up')} className="ap-btn ap-btn--secondary min-h-[40px] text-sm">Pujar Capa</button>
+              <button onClick={() => moveLayer('down')} className="ap-btn ap-btn--secondary min-h-[40px] text-sm">Baixar Capa</button>
               <button onClick={deleteSelected} className="ap-btn min-h-[40px] text-sm admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger">Eliminar</button>
             </>
           )}
@@ -501,7 +501,7 @@ export default function CanvasEditorClient() {
         </p>
       </div>
 
-      {/* RIGHT â€” Panel */}
+      {/* RIGHT - Panel */}
       <div className="w-full lg:w-72 space-y-4">
         {/* Templates */}
         <div id="canvas-templates" className="rounded-xl border p-4 admin-card-glass">
@@ -552,7 +552,7 @@ export default function CanvasEditorClient() {
         {selected && (
           <div id="canvas-properties" className="rounded-xl border p-4 admin-card-glass">
             <h3 className="mb-3 text-sm font-medium">
-              Propietats â€” {selected.type === 'text' ? 'Text' : selected.type === 'shape' ? 'Forma' : 'Imatge'}
+              Propietats - {selected.type === 'text' ? 'Text' : selected.type === 'shape' ? 'Forma' : 'Imatge'}
             </h3>
 
             {/* Position */}
@@ -610,7 +610,7 @@ export default function CanvasEditorClient() {
                     {(['left', 'center', 'right'] as const).map(a => (
                       <button key={a} onClick={() => updateElement(selected.id, { textAlign: a })}
                         className={`flex-1 rounded-lg border px-2 py-1 text-xs ${selected.textAlign === a ? 'admin-tone-soft-info admin-tone-border-info admin-tone-text-info' : 'admin-tone-idle'}`}>
-                        {a === 'left' ? 'â—' : a === 'center' ? 'â—ˆ' : 'â–·'}
+                        {a === 'left' ? 'Esq.' : a === 'center' ? 'Centre' : 'Dreta'}
                       </button>
                     ))}
                   </div>
@@ -667,7 +667,7 @@ export default function CanvasEditorClient() {
                   el.id === selectedId ? 'admin-tone-soft-info admin-tone-border-info admin-tone-text-info' : 'admin-tone-idle'
                 }`}
               >
-                {el.type === 'text' ? `T: ${(el.text || '').slice(0, 25)}` : `â–  ${el.shapeType || 'forma'}`}
+                {el.type === 'text' ? `T: ${(el.text || '').slice(0, 25)}` : `Forma: ${el.shapeType || 'forma'}`}
               </button>
             ))}
             {elements.length === 0 && <p className="text-xs">Sense elements</p>}

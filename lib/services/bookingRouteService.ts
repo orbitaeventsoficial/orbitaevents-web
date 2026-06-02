@@ -8,7 +8,7 @@ import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
 import { applyBookingStatusSideEffects, type ManagedBookingStatus } from '@/lib/services/bookingStatusTransitionService';
 import { syncBookingToGoogleCalendar } from '@/lib/services/googleCalendarSyncService';
 import { mapAdminLogToCanonicalEvent } from '@/lib/services/timelineQueryService';
-import { VAT_RATE_INVOICE, calcDeposit, roundMoney } from '@/lib/constants/pricing';
+import { VAT_RATE_INVOICE, VAT_RATE_NO_INVOICE, calcDeposit, roundMoney } from '@/lib/constants/pricing';
 
 type ExistingBookingRecord = {
   id: string;
@@ -17,6 +17,7 @@ type ExistingBookingRecord = {
   subtotal: number;
   discount: number | null;
   vatRate: number | null;
+  invoiceRequired: boolean | null;
   distanceKm: number | null;
   fuelCostPerKm: number | null;
   guestCount: number | null;
@@ -61,11 +62,53 @@ export async function prepareBookingPatchData(existing: ExistingBookingRecord, i
   if (body.remainingPaidAt && typeof body.remainingPaidAt === 'string') body.remainingPaidAt = new Date(body.remainingPaidAt);
   if (typeof body.startTime === 'string') body.eventStartTime = body.startTime;
   if (typeof body.endTime === 'string') body.eventEndTime = body.endTime;
-  if (typeof body.totalPrice === 'number') body.total = body.totalPrice;
+  // Preu pactat manual: és el total final que paga el client
+  const manualTotalPrice = typeof input.totalPrice === 'number' ? (input.totalPrice as number) : null;
+  delete body.totalPrice;
   delete body.startTime;
   delete body.endTime;
-  delete body.totalPrice;
   delete body.internalNotes;
+
+  const invoiceFieldTouched = Object.prototype.hasOwnProperty.call(body, 'invoiceRequired');
+  const fiscalRecalcNeeded = manualTotalPrice !== null || invoiceFieldTouched;
+
+  if (fiscalRecalcNeeded && !Object.prototype.hasOwnProperty.call(body, 'distanceKm')) {
+    // Determina invoiceRequired definitiu
+    const invoiceRequired = invoiceFieldTouched
+      ? Boolean(body.invoiceRequired)
+      : Boolean(existing.invoiceRequired);
+    const vatRate = invoiceRequired ? VAT_RATE_INVOICE : VAT_RATE_NO_INVOICE;
+
+    if (manualTotalPrice !== null) {
+      // Preu pactat: el total és exactament el que l'usuari escriu
+      const total = roundMoney(manualTotalPrice);
+      // Subtotal = total sense IVA (back-calculate si hi ha factura)
+      const subtotal = invoiceRequired
+        ? roundMoney(total * 100 / (100 + vatRate))
+        : total;
+      const vatAmount = roundMoney(total - subtotal);
+      const depositAmount = calcDeposit(total);
+      body.subtotal  = subtotal;
+      body.vatRate   = vatRate;
+      body.vatAmount = vatAmount;
+      body.total     = total;
+      body.depositAmount   = depositAmount;
+      body.remainingAmount = roundMoney(total - depositAmount);
+    } else {
+      // Només ha canviat invoiceRequired — recalcula des del subtotal existent
+      const subtotal = Number(existing.subtotal);
+      const discount = Number(existing.discount ?? 0);
+      const baseAfterDiscount = Math.max(0, subtotal - discount);
+      const vatAmount = roundMoney(baseAfterDiscount * (vatRate / 100));
+      const total = roundMoney(baseAfterDiscount + vatAmount);
+      const depositAmount = calcDeposit(total);
+      body.vatRate   = vatRate;
+      body.vatAmount = vatAmount;
+      body.total     = total;
+      body.depositAmount   = depositAmount;
+      body.remainingAmount = roundMoney(total - depositAmount);
+    }
+  }
 
   const locationFieldTouched = Object.prototype.hasOwnProperty.call(body, 'eventLocation') || Object.prototype.hasOwnProperty.call(body, 'eventVenue');
   if (locationFieldTouched && !Object.prototype.hasOwnProperty.call(body, 'distanceKm')) {
@@ -100,7 +143,12 @@ export async function prepareBookingPatchData(existing: ExistingBookingRecord, i
     const baseWithoutTravel = Math.max(0, existing.subtotal - calculateTravelCharge(existing.distanceKm || 0));
     const subtotal = baseWithoutTravel + travelCharge;
     const discount = typeof body.discount === 'number' ? body.discount : existing.discount || 0;
-    const vatRate = typeof body.vatRate === 'number' ? body.vatRate : existing.vatRate || VAT_RATE_INVOICE;
+    const invoiceReq = Object.prototype.hasOwnProperty.call(body, 'invoiceRequired')
+      ? Boolean(body.invoiceRequired)
+      : Boolean(existing.invoiceRequired);
+    const vatRate = typeof body.vatRate === 'number'
+      ? body.vatRate
+      : invoiceReq ? VAT_RATE_INVOICE : VAT_RATE_NO_INVOICE;
     const baseAfterDiscount = Math.max(0, subtotal - discount);
     const vatAmount = roundMoney(baseAfterDiscount * (vatRate / 100));
     const total = roundMoney(baseAfterDiscount + vatAmount);

@@ -357,7 +357,7 @@ export default function PresupuestoPdfStudio({
       } catch (error) {
         log.error('Error calculating distance', error);
         setTravelKm(0);
-        setDistanceMessage('No s\'ha pogut calcular la ruta. Cost de desplaçament: 0 â‚¬.');
+        setDistanceMessage('No s\'ha pogut calcular la ruta. Cost de desplaçament: 0 €.');
       } finally {
         setCalculatingDistance(false);
       }
@@ -588,7 +588,7 @@ export default function PresupuestoPdfStudio({
     sectionOrder,
   ]);
 
-  // â”€â”€â”€ Customer search autocomplete â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // --- Customer search autocomplete -------------------------------
   useEffect(() => {
     if (!showCustomerPicker) return;
     const q = customerSearch.trim();
@@ -640,7 +640,7 @@ export default function PresupuestoPdfStudio({
     setClientContact('');
   }
 
-  // â”€â”€â”€ Step validation helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // --- Step validation helpers ----------------------------------
   const sectionStatus = useMemo(() => {
     const clientOk = Boolean(customerId) && clientName.trim().length >= 2;
     const clientWarn = !customerId ? 'Selecciona un client de la base de dades' :
@@ -903,7 +903,7 @@ export default function PresupuestoPdfStudio({
         name: extra.name,
         description: extra.description || 'Extra',
         price: extra.price || 0,
-        icon: extra.icon || 'â€¢',
+        icon: extra.icon || '*',
         category: extra.category || 'other',
       })),
       ...translatedCustomExtras.map((extra) => ({
@@ -911,7 +911,7 @@ export default function PresupuestoPdfStudio({
         name: extra.name,
         description: studioText.customExtraDescription,
         price: extra.price,
-        icon: 'â€¢',
+        icon: '*',
         category: 'other' as const,
       })),
     ];
@@ -1313,8 +1313,8 @@ export default function PresupuestoPdfStudio({
               <label className="text-sm md:col-span-2">Nom visible del pack<input className={inputClass} value={packName} onChange={(e) => setPackName(e.target.value)} /></label>
               <label className="text-sm">Durada (h)<input className={inputClass} type="number" min={1} max={24} value={durationHours} onChange={(e) => setDurationHours(Number(e.target.value) || 1)} /></label>
               <label className="text-sm">Validesa (dies)<input className={inputClass} type="number" min={1} max={90} value={validityDays} onChange={(e) => setValidityDays(Math.max(1, Number(e.target.value) || 15))} /></label>
-              <label className="text-sm">Preu base (â‚¬)<input className={inputClass} type="number" min={0} value={basePrice} onChange={(e) => setBasePrice(Math.max(0, Number(e.target.value) || 0))} /></label>
-              <label className="text-sm">Descompte (â‚¬)<input className={inputClass} type="number" min={0} value={discount} onChange={(e) => setDiscount(Math.max(0, Number(e.target.value) || 0))} /></label>
+              <label className="text-sm">Preu base (€)<input className={inputClass} type="number" min={0} value={basePrice} onChange={(e) => setBasePrice(Math.max(0, Number(e.target.value) || 0))} /></label>
+              <label className="text-sm">Descompte (€)<input className={inputClass} type="number" min={0} value={discount} onChange={(e) => setDiscount(Math.max(0, Number(e.target.value) || 0))} /></label>
               <label className="text-sm">Motiu del descompte<input className={inputClass} value={discountReason} onChange={(e) => setDiscountReason(e.target.value)} /></label>
               <label className="text-sm md:col-span-3">Característiques del pack (una per línia)<textarea rows={6} className={inputClass} value={featuresText} onChange={(e) => setFeaturesText(e.target.value)} /></label>
               <label className="text-sm md:col-span-3">Condicions (una per línia)<textarea rows={4} className={inputClass} value={conditionsText} onChange={(e) => setConditionsText(e.target.value)} /></label>
@@ -1340,7 +1340,7 @@ export default function PresupuestoPdfStudio({
               <label key={extra.id} className="flex items-center gap-2 rounded-xl border px-3 py-2 text-sm">
                 <input type="checkbox" checked={selectedExtras.includes(extra.id)} onChange={() => toggleExtra(extra.id)} />
                 <span className="flex-1">{extra.name}</span>
-                <span className="text-xs">{extra.price ? `+${extra.price}â‚¬${extra.id === OPERATOR_PDF_EXTRA_ID ? '/h' : ''}` : 'Consultar'}</span>
+                <span className="text-xs">{extra.price ? `+${extra.price}€${extra.id === OPERATOR_PDF_EXTRA_ID ? '/h' : ''}` : 'Consultar'}</span>
               </label>
             ))}
           </div>
@@ -1360,7 +1360,7 @@ export default function PresupuestoPdfStudio({
                   <div key={extra.id} className="flex items-center justify-between rounded-xl border px-3 py-2 text-sm">
                     <span>{extra.name}</span>
                     <div className="flex items-center gap-3">
-                      <span>+{extra.price}â‚¬</span>
+                      <span>+{extra.price}€</span>
                       <button type="button" onClick={() => removeCustomExtra(extra.id)} className="rounded-md border px-2 py-1 text-xs">Treure</button>
                     </div>
                   </div>
@@ -1431,7 +1431,7 @@ export default function PresupuestoPdfStudio({
                   <span className="text-white/20 text-sm" aria-hidden>&#9776;</span>
                   <p className="flex-1 text-xs font-semibold uppercase tracking-wide">{SECTION_LABELS[sectionId]}</p>
                   <button type="button" onClick={(e) => { e.stopPropagation(); toggleCollapse(sectionId); }} className="rounded-lg px-2 py-1 text-xs hover:bg-white/5 transition-colors" aria-label={isCollapsed ? 'Expandir secció' : 'Col·lapsar secció'}>
-                    {isCollapsed ? 'â–¸' : 'â–¾'}
+                    {isCollapsed ? '>' : 'v'}
                   </button>
                 </div>
                 {!isCollapsed && <div className="mt-3">{renderSectionContent(sectionId)}</div>}
@@ -1443,7 +1443,7 @@ export default function PresupuestoPdfStudio({
         <div className={`admin-quote-actions rounded-xl border p-3 ${sectionStatus.allOk ? 'border-emerald-500/30' : 'border-amber-500/30'}`}>
           {sectionStatus.allOk ? (
             <div className="mb-3 flex items-center gap-2 rounded-xl px-3 py-2 text-sm">
-              <span>&#10003;</span> Tot correcte â€” el pressupost està llest per generar o enviar.
+              <span>&#10003;</span> Tot correcte - el pressupost està llest per generar o enviar.
             </div>
           ) : (
             <div className="mb-3 rounded-xl px-3 py-2 text-sm">

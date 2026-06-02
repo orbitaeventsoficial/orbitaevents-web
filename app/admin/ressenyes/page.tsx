@@ -39,7 +39,7 @@ function StarRating({ rating }: { rating: number }) {
             key={star}
             className={`text-sm ${fill >= 1 ? 'text-amber-400' : fill > 0 ? 'text-amber-400/50' : 'text-white/10'}`}
           >
-            â˜…
+            ★
           </span>
         );
       })}
@@ -325,7 +325,7 @@ export default function AdminRessenyesPage() {
           <AdminKpi label="Total" value={pending.length + approved.length} />
           <AdminKpi
             label="Nota mitjana"
-            value={avgRating > 0 ? `${avgRating.toFixed(1)} â˜…` : 'â€”'}
+            value={avgRating > 0 ? `${avgRating.toFixed(1)} ★` : '-'}
             tone={avgRating >= 4 ? 'success' : avgRating >= 3 ? 'warning' : 'danger'}
           />
         </AdminKpiRow>

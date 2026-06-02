@@ -76,6 +76,26 @@ Avís per codex: #826 (ingesta 🤝 + hora fi). #827 (animació: nova categoria 
 
 <!-- codex: actualitza aquest bloc quan comencis/acabis una sessió -->
 [codex] 2026-06-02 [ESTAT: tancat]
+Últim canvi: #860 (handoff bug Kimera: total 300 sense IVA/sense factura torna a 350,90 per recàlcul amb `vatRate=21`).
+Proper pas previst: Claude pot aplicar fix a `bookingRouteService` i reparar dades de Kimera segons document `docs/booking-kimera-vat-total-bug-handoff.md`.
+Avís per l'altre agent: no he aplicat el fix funcional per no trepitjar Claude. Evidència: `invoiceRequired=false`, `cashAmount=300`, però `vatRate=21`, `vatAmount=60.90`, `total=350.90`; adminLog mostra updates de total ahir i recàlculs de transport avui que han reescrit total/IVA.
+[codex] 2026-06-02 [ESTAT: tancat]
+Últim canvi: #859 (inventari refeta fitxa reserva: Kimera / OE-2026-003 abans de pantalla negra).
+Proper pas previst: si el propietari valida l'inventari, començar la pantalla negra de `/admin/bookings/[id]` per primer viewport crític.
+Avís per l'altre agent: no he tocat `app/admin/tasks/`. Perímetre #859: document d'inventari `docs/admin-booking-detail-rebuild-inventari.md`, protocol/diari/counter/xip.
+[codex] 2026-06-02 [ESTAT: tancat]
+Últim canvi: #858 (flux Lead → Reserva: nova reserva creada amb `leadId` torna a la fitxa del lead/Agenda).
+Proper pas previst: validació browser del flux complet des de `/admin/leads`; després continuar auditoria de Reserves només si apareix fricció real.
+Avís per l'altre agent: no he tocat `app/admin/tasks/`. Perímetre #858: `app/admin/bookings/useNewBookingSubmit.ts`, test de regressió, protocol/diari/counter/xip.
+[codex] 2026-06-02 [ESTAT: tancat]
+Últim canvi: #857 (constants canòniques sanejades: separadors i icones sense controls C1 amagats).
+Proper pas previst: continuar auditoria de residus canònics fora de `app/admin/tasks/`; candidates següents: moneda/preus en pàgines admin 🔴 o inventari de fonts duplicades.
+Avís per l'altre agent: no he tocat `app/admin/tasks/`. Perímetre #857: `lib/constants/index.ts`, protocol/diari/counter/xip.
+[codex] 2026-06-02 [ESTAT: tancat]
+Últim canvi: #856 (auditoria mojibake admin: Canvas, Pressupostos Studio i Ressenyes sanejats).
+Proper pas previst: continuar auditoria de residus canònics fora de `app/admin/tasks/`; candidates següents: preus/moneda en pàgines 🔴 o inventari de fonts duplicades.
+Avís per l'altre agent: no he tocat `app/admin/tasks/`. Perímetre #856: `app/admin/canvas/CanvasEditorClient.tsx`, `app/admin/presupuestos/PresupuestoPdfStudio.tsx`, `app/admin/presupuestos/studio-utils.ts`, `app/admin/ressenyes/page.tsx`, protocol/diari/counter/xip.
+[codex] 2026-06-02 [ESTAT: tancat]
 Últim canvi: #855 (fitxa lead sanejada: data via `formatDateFull` i cost real de col·laborador al panell econòmic).
 Proper pas previst: continuar auditoria global de residus canònics sense tocar `app/admin/tasks/`; primer front segur: pàgines admin 🔴 fora de tasks o serveis/capes fora d'admin.
 Avís per l'altre agent: no he tocat `app/admin/tasks/`. Perímetre #855: `app/admin/leads/[id]/LeadDetailClient.tsx`, `app/admin/leads/[id]/page.tsx`, protocol/diari/counter/xip.

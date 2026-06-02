@@ -94,7 +94,7 @@ export function useNewBookingSubmit({
       const data = await res.json();
       // Si la reserva neix d'un lead, torna a la fitxa del lead (workspace nou amb
       // banner de reserva activa + semàfor). Si no, fitxa de booking clàssica.
-      router.push(buildBookingHref(data.booking.id));
+      router.push(leadId ? buildLeadWorkspaceHref(leadId) : buildBookingHref(data.booking.id));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconegut');
     } finally {

@@ -650,7 +650,11 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
             </dd></div>
             {lead.booking && (<>
               <div><dt>Total reserva</dt><dd className="fxd__val--gold">
-                <BookingTotalEditor bookingId={lead.booking.id} total={lead.booking.total} />
+                <BookingTotalEditor
+                  bookingId={lead.booking.id}
+                  total={lead.booking.total}
+                  costFloor={lead.booking.collaboratorCost?.amount}
+                />
               </dd></div>
               {lead.booking.totalHours > 0 && (
                 <div>

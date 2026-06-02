@@ -1,5 +1,5 @@
 ﻿// lib/constants/index.ts
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 // ÒRBITA EVENTS - CONSTANTES CENTRALIZADAS
 //
 import type { ExtraDefinition, ServiceSlug } from '@/app/config/packs-config';
@@ -8,7 +8,7 @@ import { SITE_CONFIG } from '@/app/config/site-config';
 import { HERO_MEDIA_DEFAULT_ITEMS } from '@/lib/constants/hero-media';
 import { getAppBaseUrl } from '@/lib/site';
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 
 type StatusTone = {
   bg: string;
@@ -17,18 +17,18 @@ type StatusTone = {
   label: string;
 };
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 // CONTACTO
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 
 export const WHATSAPP_NUMBER = '34699121023';
 export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`;
 export const WHATSAPP_URL_WITH_MESSAGE = (message: string) =>
   `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 // LEAD STATUS (dark theme)
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 
 export const LEAD_STATUS_CONFIG: Record<string, StatusTone> = {
   NEW: { bg: 'admin-tone-bg-info', text: 'admin-tone-text-info', border: 'admin-tone-border-info', label: 'Nova entrada' },
@@ -39,9 +39,9 @@ export const LEAD_STATUS_CONFIG: Record<string, StatusTone> = {
   LOST: { bg: 'admin-tone-bg-slate', text: 'admin-tone-text-slate', border: 'admin-tone-border-slate', label: 'Perdut' },
 };
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 // BOOKING STATUS (dark theme)
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 
 export const BOOKING_STATUS_CONFIG: Record<string, StatusTone> = {
   PENDING: { bg: 'admin-tone-bg-warning', text: 'admin-tone-text-warning', border: 'admin-tone-border-warning', label: 'Pendent' },
@@ -51,9 +51,9 @@ export const BOOKING_STATUS_CONFIG: Record<string, StatusTone> = {
   CANCELLED: { bg: 'admin-tone-bg-danger', text: 'admin-tone-text-danger', border: 'admin-tone-border-danger', label: 'Cancel·lada' },
 };
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 // PROPOSAL STATUS (dark theme)
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 
 export const BOOKING_STATUS_BADGE_DISPLAY: Record<string, { label: string; className: string }> = {
   PENDING: { label: 'Pendent', className: 'admin-tone-soft-warning admin-tone-text-warning' },
@@ -72,9 +72,9 @@ export const PROPOSAL_STATUS_CONFIG: Record<string, StatusTone> = {
   EXPIRED: { bg: 'admin-tone-bg-warning', text: 'admin-tone-text-warning', border: 'admin-tone-border-warning', label: 'Caducat' },
 };
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 // CONTRACT STATUS (dark theme)
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 
 export const CONTRACT_STATUS_CONFIG: Record<string, StatusTone> = {
   DRAFT: { bg: 'admin-tone-bg-neutral', text: 'admin-tone-text-neutral', border: 'admin-tone-border-neutral', label: 'Esborrany' },
@@ -96,9 +96,9 @@ export const INVOICE_STATUS_LABELS: Record<string, string> = Object.fromEntries(
   Object.entries(INVOICE_STATUS_DISPLAY).map(([status, display]) => [status, display.label])
 ) as Record<string, string>;
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 // EVENT TYPES
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 
 /** Emoji + label (default display) */
 export const EVENT_TYPE_LABELS: Record<string, string> = {
@@ -115,7 +115,7 @@ export const EVENT_TYPE_LABELS: Record<string, string> = {
 
 /** Emoji only (for compact views like pipeline cards) */
 export const EVENT_TYPE_ICONS: Record<string, string> = {
-  WEDDING: '💍',
+  WEDDING: '💍',
   BIRTHDAY: '🎂',
   CORPORATE: '🎯',
   COMMUNION: '⛪',
@@ -417,9 +417,9 @@ export const RECENT_FEED_ANONYMOUS_NAMES: Record<string, readonly string[]> = {
   OTHER: ['Client VIP', 'Reserva especial'],
 };
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 // PRIORITY (dark theme)
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 
 export const PRIORITY_CONFIG: Record<string, StatusTone> = {
   LOW: { bg: 'admin-tone-bg-slate', text: 'admin-tone-text-slate', border: 'admin-tone-border-slate', label: 'Baixa' },
@@ -455,9 +455,9 @@ export const LEAD_STATUS_ANALYTICS_LABELS: Record<string, string> = {
   LOST: 'Perduts',
 };
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 // LOCALE MAPPING
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 
 const LOCALE_MAP: Record<string, string> = {
   ca: 'ca-ES',
@@ -471,9 +471,9 @@ export function toIntlLocale(locale: string): string {
   return LOCALE_MAP[locale] ?? locale;
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 // FORMATTING HELPERS
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 
 export const DEFAULT_LOCALE = 'ca-ES';
 
@@ -594,9 +594,9 @@ export function getEventLabel(eventType: string, fallback?: string): string {
   return EVENT_TYPE_PLAIN[eventType] || EVENT_TYPE_PLAIN[eventType.toUpperCase()] || fallback || eventType;
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 // BUSINESS DEFAULTS
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ---------------------------------------------------------------------------
 
 /** Default expected life hours for inventory items */
 export const DEFAULT_EXPECTED_LIFE_HOURS = 2000;
@@ -704,14 +704,14 @@ export const SOURCE_LABELS: Record<string, string> = {
 };
 
 export const SOURCE_ICONS: Record<string, string> = {
-  WEBSITE: '🌐',
-  CONFIGURATOR: '⚙️',
+  WEBSITE: '🌐',
+  CONFIGURATOR: '⚙️',
   PHONE: '📞',
   WHATSAPP: '💬',
   INSTAGRAM: '📸',
   WALLAPOP: '🟣',
   REFERRAL: '🤝',
-  GOOGLE: '🔍',
+  GOOGLE: '🔍',
   OTHER: '📩',
 };
 
@@ -731,7 +731,7 @@ export const LEAD_STATUS_ACTION_OPTIONS = [
   { value: 'NEW', label: 'Nova entrada', tone: 'admin-tone-bg-info', icon: '🆕' },
   { value: 'CONTACTED', label: 'Contactat', tone: 'admin-tone-bg-warning', icon: '📞' },
   { value: 'QUOTE_SENT', label: 'Pressupost enviat', tone: 'admin-tone-bg-neutral', icon: '📄' },
-  { value: 'NEGOTIATING', label: 'En negociació', tone: 'admin-tone-bg-warning', icon: '🤝' },
+  { value: 'NEGOTIATING', label: 'En negociació', tone: 'admin-tone-bg-warning', icon: '🤝' },
   { value: 'WON', label: 'Guanyat!', tone: 'admin-tone-bg-success', icon: '✅' },
   { value: 'LOST', label: 'Perdut', tone: 'admin-tone-bg-danger', icon: '❌' },
 ] as const;
@@ -864,7 +864,7 @@ export const SETTINGS_CATEGORY_CONFIG: Record<string, { label: string; icon: str
   },
   config: {
     label: 'Configuració General',
-    icon: '⚙️',
+    icon: '⚙️',
     description: 'Altres configuracions del sistema',
   },
   social: {
@@ -910,8 +910,8 @@ export const INTAKE_SOURCE_OPTIONS = [
   { value: 'INSTAGRAM', label: 'Instagram', icon: '📸' },
   { value: 'WALLAPOP', label: 'Wallapop', icon: '🟢' },
   { value: 'REFERRAL', label: 'Boca-orella', icon: '🤝' },
-  { value: 'GOOGLE', label: 'Google', icon: '🔍' },
-  { value: 'WEBSITE', label: 'Web', icon: '🌐' },
+  { value: 'GOOGLE', label: 'Google', icon: '🔍' },
+  { value: 'WEBSITE', label: 'Web', icon: '🌐' },
   { value: 'OTHER', label: 'Altre', icon: '📋' },
 ] as const;
 
@@ -994,7 +994,7 @@ export function getFaqCategoryDisplay(category: string) {
 }
 export const ACTIVITY_CATEGORY_OPTIONS = [
   { id: 'all', label: 'Tot', icon: '📊' },
-  { id: 'comms', label: 'Comunicacions', icon: '✉️' },
+  { id: 'comms', label: 'Comunicacions', icon: '✉️' },
   { id: 'automation', label: 'Automatitzacions', icon: '⚡' },
   { id: 'system', label: 'Sistema', icon: '🔄' },
   { id: 'crud', label: 'Operacions', icon: '📝' },
@@ -1039,19 +1039,19 @@ export const EMAIL_ACTIVITY_DISPLAY: Record<string, { label: string; icon: strin
   },
   TESTIMONIAL_SUBMITTED: {
     label: 'Valoració rebuda',
-    icon: '⭐',
+    icon: '⭐',
     bg: 'admin-tone-bg-warning',
     text: 'admin-tone-text-warning',
   },
   DISCOUNT_CODE_GENERATED: {
     label: 'Codi descompte generat',
-    icon: '🎁',
+    icon: '🎁',
     bg: 'admin-tone-bg-success',
     text: 'admin-tone-text-success',
   },
   LEAD_EMAIL_SENT: {
     label: 'Confirmació lead enviada',
-    icon: '✉️',
+    icon: '✉️',
     bg: 'admin-tone-bg-violet',
     text: 'admin-tone-text-violet',
   },
