@@ -69,6 +69,7 @@ export type LeadDetailData = {
     total: number;
     totalHours: number;
     collaboratorCost: { amount: number; name: string } | null;
+    costFloor: number | null;
   } | null;
 };
 
@@ -653,7 +654,7 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
                 <BookingTotalEditor
                   bookingId={lead.booking.id}
                   total={lead.booking.total}
-                  costFloor={lead.booking.collaboratorCost?.amount}
+                  costFloor={lead.booking.costFloor ?? undefined}
                 />
               </dd></div>
               {lead.booking.totalHours > 0 && (

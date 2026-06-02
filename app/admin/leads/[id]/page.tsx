@@ -140,7 +140,9 @@ export default async function LeadDetailPage({ params }: Props) {
           clientSurvey: { select: { id: true, npsScore: true, overallRating: true } },
           clientFeedback: { select: { id: true, sentAt: true, discountCode: true } },
           extraHours: true,
-          pack: { select: { djHours: true, extraHourPrice: true } },
+          travelCost: true,
+          subtotal: true,
+          pack: { select: { djHours: true, extraHourPrice: true, price: true } },
           collaboratorBookings: {
             select: {
               commissionAmount: true,
@@ -373,6 +375,16 @@ export default async function LeadDetailPage({ params }: Props) {
                 name: lead.booking.collaboratorBookings[0].collaborator.name,
               }
             : null,
+          costFloor: (() => {
+            // Pack base + transport + col·laborador = cost mínim estimat
+            const packCost = lead.booking.pack?.price ? Number(lead.booking.pack.price) : 0;
+            const travelCost = lead.booking.travelCost ? Number(lead.booking.travelCost) : 0;
+            const collabCost = lead.booking.collaboratorBookings?.[0]
+              ? Number(lead.booking.collaboratorBookings[0].commissionAmount)
+              : 0;
+            const floor = packCost + travelCost + collabCost;
+            return floor > 0 ? floor : null;
+          })(),
         } : null,
       }} />
   );
