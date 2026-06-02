@@ -1,0 +1,187 @@
+/* ============================================================================
+   STUDIO-LAB — Fitxa reserva v2 (Brass & Obsidian)
+   Prefix: bk2__
+   Una columna estreta a l'esquerra (estat/accions), zona principal a la dreta.
+============================================================================ */
+
+@import '../../../../app/studio/orbita-tokens.css';
+
+html, body { margin: 0; padding: 0; }
+
+/* ── Reset mínim ─────────────────────────────────────────────────────────── */
+.bk2__root *, .bk2__root *::before, .bk2__root *::after { box-sizing: border-box; }
+.bk2__root { display: flex; flex-direction: column; min-height: 100dvh; background: var(--canvas, #09090b); color: var(--t, #ccc8c2); font-family: var(--sans, system-ui, sans-serif); font-size: 14px; }
+
+/* ── Barra superior ──────────────────────────────────────────────────────── */
+.bk2__topbar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--line, rgba(246,243,234,0.1));
+  background: color-mix(in oklab, var(--canvas) 88%, transparent);
+  backdrop-filter: blur(16px);
+  position: sticky; top: 0; z-index: 40;
+}
+.bk2__back {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 600; color: var(--t3);
+  background: none; border: none; cursor: pointer; padding: 4px 8px;
+  border-radius: 5px; transition: color 120ms;
+}
+.bk2__back:hover { color: var(--t); }
+.bk2__ref {
+  font-family: var(--mono, monospace); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.1em; color: var(--gold, #c9a84c); text-transform: uppercase;
+}
+.bk2__client { font-size: 16px; font-weight: 700; color: var(--t); flex: 1; }
+.bk2__status {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 20px; border: 1px solid var(--c, var(--line2));
+  color: var(--c, var(--t2)); background: color-mix(in oklab, var(--c, var(--line2)) 10%, transparent);
+}
+
+/* Colors per estat */
+.bk2__root[data-status="PENDING"]    { --c: #d08f45; }
+.bk2__root[data-status="CONFIRMED"]  { --c: var(--o-stage-contacted, #4db6f0); }
+.bk2__root[data-status="PREPARING"]  { --c: var(--gold, #c9a84c); }
+.bk2__root[data-status="COMPLETED"]  { --c: #35c878; }
+.bk2__root[data-status="CANCELLED"]  { --c: var(--o-danger, #e05252); }
+
+/* ── Zona principal ──────────────────────────────────────────────────────── */
+.bk2__body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 0;
+  min-height: 0;
+}
+
+/* ── Columna esquerra — Semàfor + accions ────────────────────────────────── */
+.bk2__sidebar {
+  border-right: 1px solid var(--line);
+  padding: 20px 16px;
+  display: flex; flex-direction: column; gap: 20px;
+  overflow-y: auto;
+}
+
+/* Semàfor d'alertes */
+.bk2__flags { display: flex; flex-direction: column; gap: 6px; }
+.bk2__flag {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 12px; padding: 8px 10px; border-radius: 6px;
+  border-left: 3px solid var(--flag-col);
+  background: color-mix(in oklab, var(--flag-col) 8%, transparent);
+  color: var(--t2);
+}
+.bk2__flag--crit  { --flag-col: var(--o-danger, #e05252); }
+.bk2__flag--warn  { --flag-col: #d08f45; }
+.bk2__flag--info  { --flag-col: var(--o-info, #4db6f0); }
+.bk2__flag b { display: block; font-size: 11px; font-weight: 700; color: var(--flag-col); margin-bottom: 1px; }
+
+/* Accions primàries */
+.bk2__actions { display: flex; flex-direction: column; gap: 8px; }
+.bk2__btn {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  width: 100%; padding: 9px 14px; border-radius: 7px;
+  font-size: 12px; font-weight: 600; cursor: pointer; transition: all 120ms;
+  border: 1px solid var(--line2); background: var(--raised); color: var(--t);
+  text-decoration: none;
+}
+.bk2__btn:hover { border-color: var(--gold); color: var(--gold); }
+.bk2__btn--primary {
+  background: var(--gold, #c9a84c); border-color: var(--gold); color: #09090b;
+  font-weight: 700;
+}
+.bk2__btn--primary:hover { background: color-mix(in oklab, var(--gold) 85%, white); }
+.bk2__btn--danger { border-color: var(--o-danger, #e05252); color: var(--o-danger, #e05252); }
+.bk2__btn--danger:hover { background: color-mix(in oklab, var(--o-danger) 10%, transparent); }
+.bk2__btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Zona dreta — Panells ────────────────────────────────────────────────── */
+.bk2__main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 1px;
+  background: var(--line);
+  align-content: start;
+  overflow-y: auto;
+}
+
+/* Panell genèric */
+.bk2__panel {
+  background: var(--canvas);
+  padding: 18px 20px;
+}
+.bk2__panel--wide { grid-column: span 2; }
+
+.bk2__ph {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.bk2__ph h3 {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--t3); margin: 0;
+}
+.bk2__ph a, .bk2__ph button {
+  font-size: 11px; color: var(--t3); background: none; border: none;
+  cursor: pointer; padding: 0; text-decoration: none;
+}
+.bk2__ph a:hover, .bk2__ph button:hover { color: var(--gold); }
+
+/* Taula de files dt/dd */
+.bk2__rows { display: grid; gap: 0; }
+.bk2__rows div {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 8px; padding: 5px 0;
+  border-bottom: 1px solid color-mix(in oklab, var(--line) 60%, transparent);
+}
+.bk2__rows div:last-child { border-bottom: 0; }
+.bk2__rows dt { font-size: 11px; color: var(--t3); flex-shrink: 0; }
+.bk2__rows dd { font-size: 12px; font-weight: 600; color: var(--t); text-align: right; margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Valors destacats */
+.bk2__val--gold   { color: var(--gold, #c9a84c); font-weight: 700; }
+.bk2__val--ok     { color: #35c878; font-weight: 600; }
+.bk2__val--warn   { color: #d08f45; font-weight: 600; }
+.bk2__val--danger { color: var(--o-danger, #e05252); font-weight: 600; }
+.bk2__val--muted  { color: var(--t3); font-size: 10px; font-weight: 400; }
+
+/* Semàfor de pagament (dot) */
+.bk2__paydot {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  margin-right: 5px; flex-shrink: 0;
+  box-shadow: 0 0 0 2px color-mix(in oklab, currentColor 20%, transparent);
+}
+.bk2__paydot--full { background: #35c878; color: #35c878; }
+.bk2__paydot--part { background: #d08f45; color: #d08f45; }
+.bk2__paydot--none { background: var(--o-danger, #e05252); color: var(--o-danger, #e05252); }
+
+/* Xip de canvi d'estat */
+.bk2__statuspick { display: flex; flex-wrap: wrap; gap: 6px; }
+.bk2__statuspick button {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 20px; cursor: pointer; transition: all 120ms;
+  border: 1px solid var(--line2); background: none; color: var(--t3);
+}
+.bk2__statuspick button.is-on { border-color: var(--c); color: var(--c); background: color-mix(in oklab, var(--c) 10%, transparent); }
+.bk2__statuspick button:hover:not(.is-on):not(:disabled) { border-color: var(--t2); color: var(--t2); }
+.bk2__statuspick button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Chip label */
+.bk2__chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 20px;
+}
+.bk2__chip--warn { color: #d08f45; background: color-mix(in oklab, #d08f45 12%, transparent); }
+.bk2__chip--ok   { color: #35c878; background: color-mix(in oklab, #35c878 12%, transparent); }
+.bk2__chip--crit { color: var(--o-danger, #e05252); background: color-mix(in oklab, var(--o-danger) 10%, transparent); }
+
+/* Peu de pàgina */
+.bk2__footer {
+  padding: 10px 20px;
+  border-top: 1px solid var(--line);
+  display: flex; align-items: center; gap: 12px;
+  font-size: 11px; color: var(--t3);
+}
+.bk2__counter { font-family: var(--mono); font-weight: 700; color: var(--gold); }
