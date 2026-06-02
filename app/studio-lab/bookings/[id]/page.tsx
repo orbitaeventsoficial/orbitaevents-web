@@ -71,7 +71,7 @@ export default async function BookingLabPage({ params }: { params: { id: string 
   if (!booking.pack) flags.push({ kind: 'info', title: 'Sense pack assignat', desc: 'No s\'ha seleccionat cap servei.' });
 
   return (
-    <div className="bk2__root" data-status={booking.status}>
+    <div className="bk2__root ax-root" data-status={booking.status}>
 
       {/* Barra superior */}
       <header className="bk2__topbar">

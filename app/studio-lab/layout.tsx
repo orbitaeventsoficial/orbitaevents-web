@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import '../studio/orbita-tokens.css';
 
 export const metadata: Metadata = {
   title: 'Studio Lab · Òrbita',

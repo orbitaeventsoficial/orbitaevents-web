@@ -4,15 +4,14 @@
    Una columna estreta a l'esquerra (estat/accions), zona principal a la dreta.
 ============================================================================ */
 
-@import '../../../../app/studio/orbita-tokens.css';
+/* orbita-tokens.css carregat via app/studio-lab/layout.tsx */
 
-html, body { margin: 0; padding: 0; background: #09090b; }
+html, body { margin: 0; padding: 0; background: #0a0a0c; }
 
-/* Overrides locals per visibilitat fora del context admin-mode */
+/* Línies amb opacitat suficient sobre fons negre */
 .bk2__root {
-  --bk-line:   rgba(246,243,234,0.18);
-  --bk-line2:  rgba(246,243,234,0.30);
-  --bk-raised: rgba(246,243,234,0.04);
+  --bk-line:   rgba(246,243,234,0.16);
+  --bk-line2:  rgba(246,243,234,0.28);
 }
 
 /* ── Reset mínim ─────────────────────────────────────────────────────────── */
@@ -164,12 +163,14 @@ html, body { margin: 0; padding: 0; background: #09090b; }
 .bk2__rows dt { font-size: 13px; color: var(--t3); flex-shrink: 0; }
 .bk2__rows dd { font-size: 14px; font-weight: 600; color: var(--t); text-align: right; margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* Valors destacats */
+/* Valors destacats — mai canvien font-size per no trencar consistència de fila */
 .bk2__val--gold   { color: var(--gold, #c9a84c); font-weight: 700; }
 .bk2__val--ok     { color: #35c878; font-weight: 600; }
 .bk2__val--warn   { color: #d08f45; font-weight: 600; }
 .bk2__val--danger { color: var(--o-danger, #e05252); font-weight: 600; }
-.bk2__val--muted  { color: var(--t3); font-size: 10px; font-weight: 400; }
+.bk2__val--muted  { color: var(--t3); font-weight: 400; }
+/* Muted petit: només per spans inline secundaris, no per dd */
+span.bk2__val--muted { font-size: 11px; }
 
 /* Semàfor de pagament (dot) */
 .bk2__paydot {
