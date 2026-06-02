@@ -5,6 +5,7 @@ import './booking-lab.css';
 import { formatCurrency, formatDateFull, formatDateSimple } from '@/lib/constants';
 import { ADMIN_CHANGE_COUNTER } from '@/lib/constants/admin';
 import { VAT_RATE_INVOICE, calcDeposit } from '@/lib/constants/pricing';
+import { PRICING_INTELLIGENCE, type MarginKind } from '@/lib/constants/pricing-intelligence';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -80,51 +81,50 @@ export default async function BookingLabPage({ params }: { params: { id: string 
       ? `${(booking.pack.djHours ?? 0) + (booking.extraHours ?? 0)}h (pack)`
       : null;
 
-  // Anàlisi de marge — suggeriments
-  const TARGET_MARGIN_PCT = 30;
-  const priceFor30 = costFloor > 0 ? Math.ceil(costFloor / (1 - TARGET_MARGIN_PCT / 100)) : null;
+  // Anàlisi de marge — constants de pricing-intelligence.ts (font canònica, res hardcoded)
+  const { margin: M, hourlyRate: H, advice: A } = PRICING_INTELLIGENCE;
+  const TARGET_MARGIN_PCT = M.TARGET_MARGIN_PCT;
+  const priceForTarget = costFloor > 0 ? Math.ceil(costFloor / (1 - TARGET_MARGIN_PCT / 100)) : null;
   const eurPerHour = contractedHours && contractedHours > 0 ? Math.round(total / contractedHours) : null;
-  const MARKET_EUR_PER_HOUR_MIN = 40;
-  const MARKET_EUR_PER_HOUR_MAX = 60;
 
-  type Kpi = { value: string; label: string; sublabel: string; kind: 'danger' | 'warn' | 'ok' | 'info' };
+  type Kpi = { value: string; label: string; sublabel: string; kind: MarginKind };
   const kpis: Kpi[] = [];
 
   if (costFloor > 0) {
-    // Marge: vermell si negatiu, ambre si baix, verd si ok
+    // Marge actual — semàfor canònic
+    const marginKind = PRICING_INTELLIGENCE.marginSemaphore(marginPct, margin < 0);
+    const marginAdvice = margin < 0 ? A.CRITICAL
+      : marginPct < M.LOW_MARGIN_PCT ? A.LOW
+      : marginPct < M.TARGET_MARGIN_PCT ? A.TARGET
+      : A.GOOD;
     kpis.push({
       value: `${marginPct}%`,
       label: 'Marge actual',
-      sublabel: margin < 0
-        ? `Perdent ${formatCurrency(Math.abs(margin))}`
-        : marginPct < TARGET_MARGIN_PCT
-          ? `Objectiu mínim: ${TARGET_MARGIN_PCT}%`
-          : `Objectiu ${TARGET_MARGIN_PCT}% assolit`,
-      kind: margin < 0 ? 'danger' : marginPct < TARGET_MARGIN_PCT ? 'warn' : 'ok',
+      sublabel: marginAdvice,
+      kind: marginKind,
     });
 
-    // €/hora: vermell si molt baix (<30€/h), ambre si baix, verd si ok
+    // €/hora — semàfor canònic
     if (eurPerHour !== null) {
-      const veryLow = eurPerHour < 35;
-      const low = eurPerHour < MARKET_EUR_PER_HOUR_MIN;
+      const hourKind = PRICING_INTELLIGENCE.hourlySemaphore(eurPerHour);
       kpis.push({
         value: `${eurPerHour}€/h`,
         label: 'Preu per hora',
-        sublabel: veryLow
-          ? `Molt baix · mercat: ${MARKET_EUR_PER_HOUR_MIN}-${MARKET_EUR_PER_HOUR_MAX}€/h`
-          : low
-            ? `Baix · mercat: ${MARKET_EUR_PER_HOUR_MIN}-${MARKET_EUR_PER_HOUR_MAX}€/h`
-            : `Dins mercat (${MARKET_EUR_PER_HOUR_MIN}-${MARKET_EUR_PER_HOUR_MAX}€/h)`,
-        kind: veryLow ? 'danger' : low ? 'warn' : 'ok',
+        sublabel: hourKind === 'danger'
+          ? `Sòl mercat: ${H.MIN_MARKET_EUR_PER_HOUR}€/h · recomanat: ${H.RECOMMENDED_MIN_EUR_PER_HOUR}€/h`
+          : hourKind === 'warn'
+            ? `Recomanat mínim: ${H.RECOMMENDED_MIN_EUR_PER_HOUR}€/h`
+            : `Dins rang mercat (${H.MIN_MARKET_EUR_PER_HOUR}-${H.MAX_MARKET_EUR_PER_HOUR}€/h)`,
+        kind: hourKind,
       });
     }
 
-    // Quant falta per arribar al 30%
-    if (priceFor30 !== null && marginPct < TARGET_MARGIN_PCT) {
+    // Diferència fins a l'objectiu
+    if (priceForTarget !== null && marginPct < TARGET_MARGIN_PCT) {
       kpis.push({
-        value: `+${formatCurrency(priceFor30 - total)}`,
+        value: `+${formatCurrency(priceForTarget - total)}`,
         label: `Per arribar al ${TARGET_MARGIN_PCT}%`,
-        sublabel: `cobrar ${formatCurrency(priceFor30)}`,
+        sublabel: `cobrar ${formatCurrency(priceForTarget)}`,
         kind: 'warn',
       });
     }
