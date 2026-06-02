@@ -6,10 +6,13 @@ import { formatCurrency, formatDateFull, formatDateSimple } from '@/lib/constant
 import { ADMIN_CHANGE_COUNTER } from '@/lib/constants/admin';
 import { VAT_RATE_INVOICE, calcDeposit } from '@/lib/constants/pricing';
 import {
-  PRICING_INTELLIGENCE, MARGIN_ADVICE,
+  PRICING_INTELLIGENCE, MARGIN_ADVICE, MARGIN_TONES,
   getMarginColor, getHourlyColor, getPriceDeviationAlert,
+  getEquipmentCostPerHour, computeFullBookingCost,
+  resolveServicePricingKey, SERVICE_HOURLY_RATES,
   type MarginKind,
 } from '@/lib/constants/pricing-intelligence';
+import { getEffectivePricingConfig } from '@/lib/services/pricingConfigService';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -72,16 +75,7 @@ export default async function BookingLabPage({ params }: { params: { id: string 
   const total = Number(booking.total);
   const deposit = Number(booking.depositAmount);
   const remaining = Number(booking.remainingAmount);
-  const catalogPrice = Number(booking.pack?.price ?? 0); // referència catàleg, NO cost
-  const travelCost = Number(booking.travelCost ?? 0);
-  const collabCost = booking.collaboratorBookings[0]
-    ? Number(booking.collaboratorBookings[0].commissionAmount)
-    : 0;
-
-  // Cost real parcial (equipament es calcula un cop tenim contractedHours)
-  // Detecta preu personalitzat: total ≠ preu catàleg del pack (diferència > 5€)
-  const catalogBase = booking.pack ? Number(booking.pack.price) : 0;
-  const isPriceCustom = catalogBase > 0 && Math.abs(total - catalogBase) > 5;
+  const catalogPrice = Number(booking.pack?.price ?? 0);
 
   // Hores reals del servei (inici → fi)
   const contractedHours = (() => {
@@ -100,42 +94,51 @@ export default async function BookingLabPage({ params }: { params: { id: string 
       ? `${(booking.pack.djHours ?? 0) + (booking.extraHours ?? 0)}h (pack)`
       : null;
 
-  // Amortització equip (ara que tenim contractedHours)
-  const calcAmort = (items: { quantity: number; item: { purchasePrice: number | null; value: number; expectedLifeHours: number | null } }[], h: number) =>
-    items.reduce((sum, bi) => {
-      const cost = Number(bi.item.purchasePrice ?? bi.item.value * 0.6);
-      const life = Number(bi.item.expectedLifeHours ?? 2000);
-      return sum + (life > 0 ? (cost / life) * h * bi.quantity : 0);
-    }, 0);
+  // Amortització equip via getEquipmentCostPerHour canònic
   const hours = contractedHours ?? (booking.pack?.djHours ?? 0);
   const invItems = booking.inventory.length > 0 ? booking.inventory : (booking.pack?.inventory ?? []);
-  const equipCost = hours > 0 ? Math.round(calcAmort(invItems, hours) * 100) / 100 : 0;
+  const equipHourlyCost = invItems.reduce((sum, bi) =>
+    sum + getEquipmentCostPerHour(bi.item) * bi.quantity, 0);
 
-  // Cost real = transport + col·laborador + amortització equip
-  const costFloor = travelCost + collabCost + equipCost;
-  const margin = total - costFloor;
-  const marginPct = total > 0 ? Math.round((margin / total) * 100) : 0;
+  // Configuració efectiva (BD amb fallback a constants)
+  const pricingCfg = await getEffectivePricingConfig(booking.eventType);
 
-  // Anàlisi de marge — tot via pricing-intelligence.ts (0 hardcoded)
-  const { margin: M } = PRICING_INTELLIGENCE;
-  const TARGET_MARGIN_PCT = M.TARGET_MARGIN_PCT;
-  const priceForTarget = costFloor > 0 ? Math.ceil(costFloor / (1 - TARGET_MARGIN_PCT / 100)) : null;
+  // computeFullBookingCost — funció pura, tot el càlcul en un sol lloc
+  const costResult = computeFullBookingCost({
+    total,
+    billableHours: contractedHours,
+    eventType: booking.eventType,
+    travelCost: Number(booking.travelCost ?? 0),
+    vehicleCostPerKm: Number(booking.fuelCostPerKm ?? 0),
+    distanceKm: Number(booking.distanceKm ?? 0),
+    equipmentHourlyCost: equipHourlyCost,
+    collaboratorCost: booking.collaboratorBookings[0]
+      ? Number(booking.collaboratorBookings[0].commissionAmount) : 0,
+  });
+
+  const { costTransport: travelCost, costEquip: equipCost, costCollab, costTotal: costFloor,
+    margin, marginPct, marginColor: marginTone, alerts: bookingAlerts } = costResult;
   const eurPerHour = contractedHours && contractedHours > 0 ? Math.round(total / contractedHours) : null;
+  const TARGET_MARGIN_PCT = pricingCfg.targetMarginPct;
+  const priceForTarget = costFloor > 0 ? Math.ceil(costFloor / (1 - TARGET_MARGIN_PCT / 100)) : null;
 
-  // Preu hora estipulat = pack.price ÷ pack.djHours (tarifa catàleg)
-  // TODO: quan existeixi el Price Manager, llegir d'allà en lloc del pack
-  const ourHourlyRate = booking.pack && booking.pack.djHours > 0
-    ? Math.round(Number(booking.pack.price) / booking.pack.djHours)
-    : null;
+  // Detecta preu personalitzat: total ≠ preu catàleg del pack (diferència > 5€)
+  const catalogBase = booking.pack ? Number(booking.pack.price) : 0;
+  const isPriceCustom = catalogBase > 0 && Math.abs(total - catalogBase) > 5;
 
-  // Gradient de color (no semàfor binari)
-  const marginTone = getMarginColor(marginPct);
-  const hourlyTone = eurPerHour !== null && ourHourlyRate !== null
-    ? getHourlyColor(eurPerHour < ourHourlyRate ? eurPerHour : eurPerHour)
-    : eurPerHour !== null ? getHourlyColor(eurPerHour) : null;
+  // Tarifa recomanada (pricingCfg de BD amb fallback)
+  const ourHourlyRate = pricingCfg.rate.recommended;
+  const hourlyTone = eurPerHour !== null ? getHourlyColor(eurPerHour) : null;
 
-  // Alerta desviació preu recomanat vs preu final
-  const deviation = getPriceDeviationAlert(total, contractedHours);
+  // Desviació vs tarifa recomanada configurada (no la genèrica de constants)
+  const recommPrice = contractedHours && contractedHours > 0
+    ? contractedHours * ourHourlyRate : 0;
+  const deviation = recommPrice > 0
+    ? { kind: ((recommPrice - total) / recommPrice * 100) > 30 ? 'critical' as const
+          : ((recommPrice - total) / recommPrice * 100) > 15 ? 'alert' as const : 'none' as const,
+        deviationPct: Math.round((recommPrice - total) / recommPrice * 100),
+        recommended: recommPrice }
+    : { kind: 'none' as const, deviationPct: 0, recommended: 0 };
 
   type Kpi = { value: string; label: string; sublabel: string; hex: string; kind: MarginKind };
   const kpis: Kpi[] = [];
@@ -203,7 +206,7 @@ export default async function BookingLabPage({ params }: { params: { id: string 
       });
     }
 
-    if (collabCost === 0) {
+    if (costCollab === 0) {
       kpis.push({
         value: '—',
         label: 'Col·laborador',
@@ -368,10 +371,10 @@ export default async function BookingLabPage({ params }: { params: { id: string 
               {equipCost > 0 && (
                 <div><dt>Amortització equip</dt><dd className="bk2__val--muted">-{formatCurrency(equipCost)}</dd></div>
               )}
-              {collabCost > 0 && (
+              {costCollab > 0 && (
                 <div>
                   <dt>{booking.collaboratorBookings[0]?.collaborator.name ?? 'Col·laborador'}</dt>
-                  <dd className="bk2__val--muted">-{formatCurrency(collabCost)}</dd>
+                  <dd className="bk2__val--muted">-{formatCurrency(costCollab)}</dd>
                 </div>
               )}
               {equipCost === 0 && invItems.length === 0 && (

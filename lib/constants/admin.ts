@@ -641,12 +641,13 @@ export const ADMIN_DASHBOARD_INSIGHT_COLORS: Record<string, string> = {
 
 // ─── Pricing Tabs ───────────────────────────────────────────────────────
 
-export type PricingTab = 'overview' | 'extras' | 'packs' | 'inventory';
+export type PricingTab = 'overview' | 'tarifes' | 'extras' | 'packs' | 'inventory';
 
 export const ADMIN_PRICING_TABS: ReadonlyArray<{ key: PricingTab; label: string; icon: string }> = [
-  { key: 'overview', label: 'Resum', icon: '📊' },
-  { key: 'extras', label: 'Extras', icon: '✨' },
-  { key: 'packs', label: 'Packs', icon: '📦' },
+  { key: 'overview',  label: 'Resum',     icon: '📊' },
+  { key: 'tarifes',   label: 'Tarifes',   icon: '🎯' },
+  { key: 'extras',    label: 'Extras',    icon: '✨' },
+  { key: 'packs',     label: 'Packs',     icon: '📦' },
   { key: 'inventory', label: 'Inventari', icon: '🔧' },
 ] as const;
 

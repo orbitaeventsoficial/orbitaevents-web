@@ -11,6 +11,7 @@ import { formatCurrency, formatDate, INVENTORY_CATEGORY_OPTIONS } from '@/lib/co
 import { ADMIN_PRICING_TABS, type PricingTab } from '@/lib/constants/admin';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { getInventoryCategoryAdminTone, getInventoryCategoryDisplay, getInventoryStatusDisplay } from '@/lib/inventory-utils';
+import { SERVICE_HOURLY_RATES, MARGIN_TONES, EQUIPMENT_AMORTIZATION, getMarginColor, type ServicePricingKey } from '@/lib/constants/pricing-intelligence';
 
 interface ExtraData {
   id: string;
@@ -100,6 +101,7 @@ type PricingFocus = 'alert' | 'zero-price';
 
 function resolvePricingTab(value?: string | null): PricingTab {
   switch (value) {
+    case 'tarifes':
     case 'extras':
     case 'packs':
     case 'inventory':
@@ -139,6 +141,8 @@ export default function PricingAdminPage() {
   const [editingExtra, setEditingExtra] = useState<string | null>(null);
   const [editPrice, setEditPrice] = useState<number>(0);
   const [saving, setSaving] = useState(false);
+  const [pricingConfig, setPricingConfig] = useState<Record<string, Record<string, number>>>({});
+  const [savingConfig, setSavingConfig] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
@@ -521,6 +525,96 @@ export default function PricingAdminPage() {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'tarifes' && (
+        <div className="space-y-6">
+          {/* Tarifes per servei */}
+          <div className="rounded-xl border border-white/10 p-6 admin-card-glass">
+            <h3 className="text-lg font-bold mb-1">Tarifes per servei (€/h facturable)</h3>
+            <p className="text-sm opacity-50 mb-5">Mercat DJ professional Barcelona. Hores facturables = inici → fi del bolo.</p>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/10">
+                  <th scope="col" className="text-left py-2 opacity-60 font-medium">Servei</th>
+                  <th scope="col" className="text-right py-2 opacity-60 font-medium">Mínim</th>
+                  <th scope="col" className="text-right py-2 opacity-60 font-medium">Recomanat</th>
+                  <th scope="col" className="text-right py-2 opacity-60 font-medium">Premium</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(Object.entries(SERVICE_HOURLY_RATES) as [ServicePricingKey, { min: number; recommended: number; premium: number }][]).map(([key, rates]) => {
+                  const cfg = pricingConfig[key] ?? {};
+                  const recEur = cfg.recommended ?? rates.recommended;
+                  const tone = getMarginColor(recEur >= rates.recommended ? 50 : recEur >= rates.min ? 25 : 10);
+                  const labels: Record<string, string> = {
+                    fiesta_privada: 'Festa privada', boda: 'Boda', empresa: 'Empresa / corporatiu',
+                    animacion_infantil: 'Animació infantil', extra_hora: 'Hora addicional',
+                  };
+                  return (
+                    <tr key={key} className="border-b border-white/5 hover:bg-white/[0.02]">
+                      <td className="py-3 flex items-center gap-2">
+                        <span className="inline-block w-2 h-2 rounded-full flex-shrink-0" style={{ background: tone.hex }} />
+                        {labels[key] ?? key}
+                      </td>
+                      {(['min', 'recommended', 'premium'] as const).map((field) => (
+                        <td key={field} className="py-3 text-right">
+                          <span className="font-mono font-semibold">
+                            {cfg[field] ?? (rates as Record<string, number>)[field]}€/h
+                          </span>
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            <p className="text-xs opacity-40 mt-4">Per editar les tarifes, modifica <code>lib/constants/pricing-intelligence.ts</code> → <code>SERVICE_HOURLY_RATES</code>. Aviat: editable des d'aquí.</p>
+          </div>
+
+          {/* Gradient de marge */}
+          <div className="rounded-xl border border-white/10 p-6 admin-card-glass">
+            <h3 className="text-lg font-bold mb-1">Escala de marge</h3>
+            <p className="text-sm opacity-50 mb-5">A pitjor marge, color més brillant i cridaner.</p>
+            <div className="flex gap-2 flex-wrap">
+              {MARGIN_TONES.map((t) => (
+                <div key={t.tone.kind} className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold border border-white/10"
+                  style={{ borderLeftColor: t.tone.hex, borderLeftWidth: 3, color: t.tone.hex }}>
+                  {t.tone.name}
+                  {t.min > -Infinity && <span className="opacity-50 font-normal">≥{t.min}%</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Cost amortització equip */}
+          <div className="rounded-xl border border-white/10 p-6 admin-card-glass">
+            <h3 className="text-lg font-bold mb-1">Cost real d'amortització per hora</h3>
+            <p className="text-sm opacity-50 mb-5">Fallback per categoria. S'usa si l'ítem d'inventari no té dades de compra.</p>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/10">
+                  <th scope="col" className="text-left py-2 opacity-60 font-medium">Categoria</th>
+                  <th scope="col" className="text-right py-2 opacity-60 font-medium">Cost compra</th>
+                  <th scope="col" className="text-right py-2 opacity-60 font-medium">Vida útil (h)</th>
+                  <th scope="col" className="text-right py-2 opacity-60 font-medium">Cost €/h</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(Object.entries(EQUIPMENT_AMORTIZATION) as [string, { value: number; lifeHours: number }][]).map(([cat, data]) => (
+                  <tr key={cat} className="border-b border-white/5 hover:bg-white/[0.02]">
+                    <td className="py-3 font-mono text-xs opacity-70">{cat}</td>
+                    <td className="py-3 text-right">{formatCurrency(data.value)}</td>
+                    <td className="py-3 text-right">{data.lifeHours.toLocaleString('ca-ES')}h</td>
+                    <td className="py-3 text-right font-semibold" style={{ color: 'var(--oe-gold)' }}>
+                      {(data.value / data.lifeHours).toFixed(2)}€/h
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
