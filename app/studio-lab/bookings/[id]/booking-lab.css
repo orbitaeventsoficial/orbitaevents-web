@@ -82,18 +82,19 @@ html, body { margin: 0; padding: 0; background: #0a0a0c; }
 }
 
 /* Semàfor d'alertes */
-.bk2__flags { display: flex; flex-direction: column; gap: 6px; }
+.bk2__flags { display: flex; flex-direction: column; gap: 8px; }
 .bk2__flag {
   display: flex; align-items: flex-start; gap: 8px;
-  font-size: 12px; padding: 8px 10px; border-radius: 6px;
+  font-size: 13px; padding: 10px 12px; border-radius: 6px;
   border-left: 3px solid var(--flag-col);
   background: color-mix(in oklab, var(--flag-col) 8%, transparent);
   color: var(--t2);
+  line-height: 1.4;
 }
 .bk2__flag--crit  { --flag-col: var(--o-danger, #e05252); }
 .bk2__flag--warn  { --flag-col: #d08f45; }
 .bk2__flag--info  { --flag-col: var(--o-info, #4db6f0); }
-.bk2__flag b { display: block; font-size: 11px; font-weight: 700; color: var(--flag-col); margin-bottom: 1px; }
+.bk2__flag b { display: block; font-size: 13px; font-weight: 700; color: var(--flag-col); margin-bottom: 2px; }
 
 /* Accions primàries */
 .bk2__actions { display: flex; flex-direction: column; gap: 8px; }
