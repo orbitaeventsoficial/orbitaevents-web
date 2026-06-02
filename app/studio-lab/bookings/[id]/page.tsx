@@ -55,12 +55,13 @@ export default async function BookingLabPage({ params }: { params: { id: string 
   const total = Number(booking.total);
   const deposit = Number(booking.depositAmount);
   const remaining = Number(booking.remainingAmount);
-  const packCost = Number(booking.pack?.price ?? 0);
+  const catalogPrice = Number(booking.pack?.price ?? 0); // referència catàleg, NO cost
   const travelCost = Number(booking.travelCost ?? 0);
   const collabCost = booking.collaboratorBookings[0]
     ? Number(booking.collaboratorBookings[0].commissionAmount)
     : 0;
-  const costFloor = packCost + travelCost + collabCost;
+  // Cost real = transport + col·laborador (pack price és preu client, no cost intern)
+  const costFloor = travelCost + collabCost;
   const margin = total - costFloor;
   const marginPct = total > 0 ? Math.round((margin / total) * 100) : 0;
 
@@ -317,21 +318,29 @@ export default async function BookingLabPage({ params }: { params: { id: string 
           <section className="bk2__panel">
             <div className="bk2__ph"><h3>Marge estimat</h3></div>
             <dl className="bk2__rows">
-              {packCost > 0 && <div><dt>Pack base</dt><dd className="bk2__val--muted">-{formatCurrency(packCost)}</dd></div>}
-              {travelCost > 0 && <div><dt>Desplaçament</dt><dd className="bk2__val--muted">-{formatCurrency(travelCost)}</dd></div>}
+              {travelCost > 0 && (
+                <div><dt>Combustible</dt><dd className="bk2__val--muted">-{formatCurrency(travelCost)}</dd></div>
+              )}
               {collabCost > 0 && (
                 <div>
                   <dt>{booking.collaboratorBookings[0]?.collaborator.name ?? 'Col·laborador'}</dt>
                   <dd className="bk2__val--muted">-{formatCurrency(collabCost)}</dd>
                 </div>
               )}
-              {costFloor > 0 && (
+              {costFloor === 0 && collabCost === 0 && (
+                <div><dt>Personal</dt><dd className="bk2__val--muted">Tu · sense cost extern</dd></div>
+              )}
+              <div>
+                <dt>Net</dt>
+                <dd style={{ color: marginTone.hex, fontWeight: 700 }}>
+                  {formatCurrency(margin)}
+                  <span className="bk2__val--muted"> ({marginPct}%)</span>
+                </dd>
+              </div>
+              {catalogPrice > 0 && (
                 <div>
-                  <dt>Net</dt>
-                  <dd style={{ color: marginTone.hex, fontWeight: 700 }}>
-                    {formatCurrency(margin)}
-                    <span className="bk2__val--muted"> ({marginPct}%)</span>
-                  </dd>
+                  <dt>Tarifa catàleg</dt>
+                  <dd className="bk2__val--muted">{formatCurrency(catalogPrice)}</dd>
                 </div>
               )}
             </dl>
