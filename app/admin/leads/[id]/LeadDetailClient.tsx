@@ -333,8 +333,8 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
             </b>
           )}
         </div>
-        <div><span>Prioritat</span><b>{PRIORITY_LABEL[lead.priority] || lead.priority}</b></div>
-        <div><span>Cobrament</span><b>{pay ? PAY_LABEL[pay] : '—'}</b></div>
+        <div><span>Prioritat</span><b className={`fxd__pri--${lead.priority.toLowerCase()}`}>{PRIORITY_LABEL[lead.priority] || lead.priority}</b></div>
+        <div><span>Cobrament</span><b className={pay ? `fxd__pay--${pay}` : undefined}>{pay ? PAY_LABEL[pay] : '—'}</b></div>
       </div>
 
       {/* Grid de panells */}
@@ -649,25 +649,25 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
               )}
             </dd></div>
             {lead.booking && (<>
-              <div><dt>Total reserva</dt><dd className="font-bold text-[var(--gold)]">
+              <div><dt>Total reserva</dt><dd className="fxd__val--gold">
                 <BookingTotalEditor bookingId={lead.booking.id} total={lead.booking.total} />
               </dd></div>
               {lead.booking.totalHours > 0 && (
                 <div>
                   <dt>€/hora</dt>
-                  <dd className="font-bold text-[var(--gold)]">
+                  <dd className="fxd__val--gold">
                     {formatCurrency(lead.booking.total / lead.booking.totalHours)}/h
-                    <span className="ml-1 text-[10px] text-[var(--t3)]">({lead.booking.totalHours}h)</span>
+                    <span className="fxd__val--muted"> ({lead.booking.totalHours}h)</span>
                   </dd>
                 </div>
               )}
               {lead.booking.collaboratorCost && (
                 <div>
                   <dt>Cost {lead.booking.collaboratorCost.name}</dt>
-                  <dd className="font-semibold text-[var(--o-danger)]">
+                  <dd className="fxd__val--danger">
                     -{formatCurrency(lead.booking.collaboratorCost.amount)}
-                    <span className="ml-1 text-[10px] text-[var(--t3)]">
-                      (net {formatCurrency(lead.booking.total - lead.booking.collaboratorCost.amount)})
+                    <span className="fxd__val--muted">
+                      {' '}(net {formatCurrency(lead.booking.total - lead.booking.collaboratorCost.amount)})
                     </span>
                   </dd>
                 </div>
@@ -679,7 +679,7 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
                 {proposals.map((p) => (
                   <dd key={p.id} className="flex justify-between py-0.5 text-[11px] text-[var(--t2)]">
                     <span>{p.reference}</span>
-                    <span style={{ color: p.status === 'SENT' ? 'var(--o-info)' : p.status === 'ACCEPTED' ? 'var(--o-success)' : 'var(--t3)' }}>
+                    <span className={p.status === 'SENT' ? 'fxd__status--sent' : p.status === 'ACCEPTED' ? 'fxd__status--accepted' : 'fxd__status--draft'}>
                       {p.status === 'SENT' ? 'Enviat' : p.status === 'ACCEPTED' ? 'Acceptat' : p.status === 'DRAFT' ? 'Esborrany' : p.status}
                     </span>
                   </dd>
@@ -692,7 +692,7 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
                 {dossiers.map((d) => (
                   <dd key={d.id} className="flex justify-between py-0.5 text-[11px] text-[var(--t2)]">
                     <span>{d.nom}</span>
-                    <span style={{ color: d.estat === 'enviat' ? 'var(--o-info)' : d.estat === 'acceptat' ? 'var(--o-success)' : 'var(--t3)' }}>
+                    <span className={d.estat === 'enviat' ? 'fxd__status--sent' : d.estat === 'acceptat' ? 'fxd__status--accepted' : 'fxd__status--draft'}>
                       {d.estat}
                     </span>
                   </dd>

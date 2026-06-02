@@ -881,6 +881,12 @@ html.admin-mode .lf__root {
 }
 
 /* Fitxa completa — ocupa tota l'àrea del workspace sense scroll */
+/* Stage color tokens per a pàgina completa (fxd__fullpage té data-stage però no és fill de .fx-root) */
+.fxd__fullpage[data-stage="nou"]       { --c: var(--o-stage-new);       --strong: var(--o-stage-new-strong,       var(--o-stage-new)); }
+.fxd__fullpage[data-stage="contactat"] { --c: var(--o-stage-contacted); --strong: var(--o-stage-contacted-strong, var(--o-stage-contacted)); }
+.fxd__fullpage[data-stage="guanyat"]   { --c: var(--o-stage-won);       --strong: var(--o-stage-won-strong,       var(--o-stage-won)); }
+.fxd__fullpage[data-stage="perdut"]    { --c: var(--o-stage-lost);      --strong: var(--o-stage-lost-strong,      var(--o-stage-lost)); }
+
 .fxd__fullpage {
   display: flex; flex-direction: column;
   height: 100dvh;
@@ -943,8 +949,27 @@ html.admin-mode .fxd__grid--page {
 html.admin-mode .fxd__panel--full {
   grid-column: 1 / -1;
 }
-html.admin-mode .fxd__ok  { color: #35c878; font-weight: 600; }
+html.admin-mode .fxd__ok   { color: #35c878; font-weight: 600; }
 html.admin-mode .fxd__pend { color: #d08f45; font-weight: 600; }
+
+/* Semàfor prioritat */
+html.admin-mode .fxd__pri--urgent { color: var(--o-danger, #e05252); font-weight: 700; }
+html.admin-mode .fxd__pri--high   { color: #e8932a; font-weight: 600; }
+html.admin-mode .fxd__pri--medium { color: var(--gold, #c9a84c); }
+html.admin-mode .fxd__pri--low    { color: var(--t3, #635e58); }
+
+/* Semàfor cobrament */
+html.admin-mode .fxd__pay--full { color: #35c878; font-weight: 600; }
+html.admin-mode .fxd__pay--part { color: #d08f45; font-weight: 600; }
+html.admin-mode .fxd__pay--none { color: var(--o-danger, #e05252); font-weight: 600; }
+
+/* Valors econòmics */
+html.admin-mode .fxd__val--gold    { color: var(--gold, #c9a84c); font-weight: 700; }
+html.admin-mode .fxd__val--danger  { color: var(--o-danger, #e05252); font-weight: 600; }
+html.admin-mode .fxd__val--muted   { color: var(--t3, #635e58); font-size: 10px; }
+html.admin-mode .fxd__status--sent     { color: var(--o-info, #4db6f0); }
+html.admin-mode .fxd__status--accepted { color: #35c878; }
+html.admin-mode .fxd__status--draft    { color: var(--t3, #635e58); }
 
 /* Edició inline */
 html.admin-mode .fxd__editval {
