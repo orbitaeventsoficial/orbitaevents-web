@@ -5,7 +5,11 @@ import './booking-lab.css';
 import { formatCurrency, formatDateFull, formatDateSimple } from '@/lib/constants';
 import { ADMIN_CHANGE_COUNTER } from '@/lib/constants/admin';
 import { VAT_RATE_INVOICE, calcDeposit } from '@/lib/constants/pricing';
-import { PRICING_INTELLIGENCE, type MarginKind } from '@/lib/constants/pricing-intelligence';
+import {
+  PRICING_INTELLIGENCE, MARGIN_ADVICE,
+  getMarginColor, getHourlyColor, getPriceDeviationAlert,
+  type MarginKind,
+} from '@/lib/constants/pricing-intelligence';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -81,70 +85,83 @@ export default async function BookingLabPage({ params }: { params: { id: string 
       ? `${(booking.pack.djHours ?? 0) + (booking.extraHours ?? 0)}h (pack)`
       : null;
 
-  // Anàlisi de marge — constants de pricing-intelligence.ts (font canònica, res hardcoded)
-  const { margin: M, hourlyRate: H, advice: A } = PRICING_INTELLIGENCE;
+  // Anàlisi de marge — tot via pricing-intelligence.ts (0 hardcoded)
+  const { margin: M, hourlyRate: H } = PRICING_INTELLIGENCE;
   const TARGET_MARGIN_PCT = M.TARGET_MARGIN_PCT;
   const priceForTarget = costFloor > 0 ? Math.ceil(costFloor / (1 - TARGET_MARGIN_PCT / 100)) : null;
   const eurPerHour = contractedHours && contractedHours > 0 ? Math.round(total / contractedHours) : null;
 
-  type Kpi = { value: string; label: string; sublabel: string; kind: MarginKind };
+  // Gradient de color (no semàfor binari)
+  const marginTone = getMarginColor(marginPct);
+  const hourlyTone = eurPerHour !== null ? getHourlyColor(eurPerHour) : null;
+
+  // Alerta desviació preu recomanat vs preu final
+  const deviation = getPriceDeviationAlert(total, contractedHours);
+
+  type Kpi = { value: string; label: string; sublabel: string; hex: string; kind: MarginKind };
   const kpis: Kpi[] = [];
 
   if (costFloor > 0) {
-    // Marge actual — semàfor canònic
-    const marginKind = PRICING_INTELLIGENCE.marginSemaphore(marginPct, margin < 0);
-    const marginAdvice = margin < 0 ? A.CRITICAL
-      : marginPct < M.LOW_MARGIN_PCT ? A.LOW
-      : marginPct < M.TARGET_MARGIN_PCT ? A.TARGET
-      : A.GOOD;
     kpis.push({
       value: `${marginPct}%`,
       label: 'Marge actual',
-      sublabel: marginAdvice,
-      kind: marginKind,
+      sublabel: MARGIN_ADVICE[marginTone.kind] ?? '',
+      hex: marginTone.hex,
+      kind: marginTone.kind,
     });
 
-    // €/hora — semàfor canònic
-    if (eurPerHour !== null) {
-      const hourKind = PRICING_INTELLIGENCE.hourlySemaphore(eurPerHour);
+    if (eurPerHour !== null && hourlyTone) {
       kpis.push({
         value: `${eurPerHour}€/h`,
         label: 'Preu per hora',
-        sublabel: hourKind === 'danger'
+        sublabel: eurPerHour < H.MIN_MARKET_EUR_PER_HOUR
           ? `Sòl mercat: ${H.MIN_MARKET_EUR_PER_HOUR}€/h · recomanat: ${H.RECOMMENDED_MIN_EUR_PER_HOUR}€/h`
-          : hourKind === 'warn'
+          : eurPerHour < H.RECOMMENDED_MIN_EUR_PER_HOUR
             ? `Recomanat mínim: ${H.RECOMMENDED_MIN_EUR_PER_HOUR}€/h`
-            : `Dins rang mercat (${H.MIN_MARKET_EUR_PER_HOUR}-${H.MAX_MARKET_EUR_PER_HOUR}€/h)`,
-        kind: hourKind,
+            : `Rang mercat ${H.MIN_MARKET_EUR_PER_HOUR}-${H.MAX_MARKET_EUR_PER_HOUR}€/h`,
+        hex: hourlyTone.hex,
+        kind: hourlyTone.kind,
       });
     }
 
-    // Diferència fins a l'objectiu
+    // Desviació: preu recomanat vs preu final
+    if (deviation.kind !== 'none') {
+      const isCrit = deviation.kind === 'critical';
+      kpis.push({
+        value: `-${deviation.deviationPct}%`,
+        label: 'Desviació de preu',
+        sublabel: `Recomanat: ${formatCurrency(deviation.recommended)} · revisa els preus`,
+        hex: isCrit ? '#7f1d1d' : '#c2410c',
+        kind: isCrit ? 'loss' : 'warn',
+      });
+    }
+
     if (priceForTarget !== null && marginPct < TARGET_MARGIN_PCT) {
       kpis.push({
         value: `+${formatCurrency(priceForTarget - total)}`,
         label: `Per arribar al ${TARGET_MARGIN_PCT}%`,
         sublabel: `cobrar ${formatCurrency(priceForTarget)}`,
-        kind: 'warn',
+        hex: '#ca8a04',
+        kind: 'fair',
       });
     }
 
-    // Transport
     if (travelCost > 0) {
       kpis.push({
         value: formatCurrency(travelCost),
         label: 'Transport',
         sublabel: isPriceCustom ? 'absorbit al preu pactat' : `${Number(booking.distanceKm ?? 0).toFixed(0)} km`,
+        hex: '#837c70',
         kind: 'info',
       });
     }
 
-    // Col·laborador
     if (collabCost === 0) {
       kpis.push({
         value: '—',
         label: 'Col·laborador',
         sublabel: 'sense assignar · marge és teu',
+        hex: '#837c70',
         kind: 'info',
       });
     }
@@ -366,8 +383,8 @@ export default async function BookingLabPage({ params }: { params: { id: string 
               </div>
               <div className="bk2__kpis">
                 {kpis.map((k, i) => (
-                  <div key={i} className={`bk2__kpi bk2__kpi--${k.kind}`}>
-                    <div className="bk2__kpi-val">{k.value}</div>
+                  <div key={i} className="bk2__kpi" style={{ borderLeftColor: k.hex }}>
+                    <div className="bk2__kpi-val" style={{ color: k.hex }}>{k.value}</div>
                     <div className="bk2__kpi-lbl">{k.label}</div>
                     <div className="bk2__kpi-sub">{k.sublabel}</div>
                   </div>

@@ -211,12 +211,9 @@ html, body { margin: 0; padding: 0; background: #0a0a0c; }
 .bk2__kpi {
   background: var(--canvas);
   padding: 16px 18px;
-  border-left: 3px solid var(--kpi-col);
+  border-left: 3px solid currentColor;
 }
-.bk2__kpi--danger { --kpi-col: var(--o-danger, #e05252); }
-.bk2__kpi--warn   { --kpi-col: #d08f45; }
-.bk2__kpi--ok     { --kpi-col: #35c878; }
-.bk2__kpi--info   { --kpi-col: var(--t3, #837c70); }
+/* Color del KPI injectat inline via hex de pricing-intelligence.ts */
 .bk2__kpi-val {
   font-size: 24px; font-weight: 800; color: var(--kpi-col);
   letter-spacing: -0.02em; line-height: 1;
