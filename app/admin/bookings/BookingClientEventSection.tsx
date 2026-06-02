@@ -1,5 +1,11 @@
-import Link from 'next/link';
-import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+/* ============================================================================
+   ÒRBITA ADMIN — NewBookingForm · Secció Client + Esdeveniment (Brass & Obsidian)
+   ----------------------------------------------------------------------------
+   Reescrit al sistema visual nb-* (Canvi #842). Sense Tailwind, sense
+   admin-tone-*. Chips de tipus d'event en una sola paleta daurada (no més
+   colors primaris). Mateixos props que abans.
+============================================================================ */
+
 import { EVENT_TYPE_ICONS, EVENT_TYPE_PLAIN, EVENT_TYPE_VALUES } from '@/lib/constants';
 
 interface LeadData {
@@ -36,126 +42,126 @@ interface BookingClientEventSectionProps {
   onFieldChange: (field: 'clientName' | 'clientEmail' | 'clientPhone' | 'eventType' | 'eventDate' | 'eventStartTime' | 'eventEndTime' | 'eventLocation' | 'eventVenue' | 'guestCount', value: string) => void;
 }
 
+// Tradueix l'error tècnic GOOGLE_MAPS_API_KEY_NOT_CONFIGURED en un missatge usable.
+function humaniseDistanceMessage(message: string | null): { text: string; tone: 'ok' | 'warn' | 'info' } | null {
+  if (!message) return null;
+  if (message.includes('GOOGLE_MAPS_API_KEY_NOT_CONFIGURED')) {
+    return { text: "Google Maps no configurat — pots posar la distància manualment.", tone: 'warn' };
+  }
+  if (message.startsWith('Ruta calculada')) {
+    return { text: message, tone: 'ok' };
+  }
+  return { text: message, tone: 'info' };
+}
+
 export default function BookingClientEventSection({
-  leadData,
   form,
   calculatingDistance,
   distanceMessage,
   dateConflicts,
   onFieldChange,
 }: BookingClientEventSectionProps) {
+  const distanceInfo = humaniseDistanceMessage(distanceMessage);
+
   return (
     <>
-      {leadData && (
-        <div className="flex items-center justify-between rounded-xl border p-4">
-          <div className="text-sm">
-            Entrada vinculada: <strong>{leadData.name}</strong> · {leadData.email}
-            {leadData.budget && ` · Pressupost: ${leadData.budget}`}
-          </div>
-          <Link href={buildLeadWorkspaceHref(leadData.id)} className="text-xs">
-            Veure entrada →
-          </Link>
+      <section className="nb__panel">
+        <div className="nb__phead">
+          <h2 className="nb__h2">Dades del client</h2>
         </div>
-      )}
-
-      <div className="rounded-2xl border p-5 space-y-4">
-        <h2 className="text-sm font-semibold">Dades del client</h2>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div>
-            <label htmlFor="nb-name" className="text-xs">Nom *</label>
+        <div className="nb__row nb__row--3">
+          <div className="nb__field">
+            <label htmlFor="nb-name" className="nb__label nb__label--req">Nom</label>
             <input
               id="nb-name"
               type="text"
               value={form.clientName}
               onChange={(e) => onFieldChange('clientName', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
+              className="nb__input"
+              autoComplete="name"
             />
           </div>
-          <div>
-            <label htmlFor="nb-email" className="text-xs">Email *</label>
+          <div className="nb__field">
+            <label htmlFor="nb-email" className="nb__label nb__label--req">Email</label>
             <input
               id="nb-email"
               type="email"
               value={form.clientEmail}
               onChange={(e) => onFieldChange('clientEmail', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
+              className="nb__input"
+              autoComplete="email"
             />
           </div>
-          <div>
-            <label htmlFor="nb-phone" className="text-xs">Telèfon *</label>
+          <div className="nb__field">
+            <label htmlFor="nb-phone" className="nb__label nb__label--req">Telèfon</label>
             <input
               id="nb-phone"
               type="tel"
               value={form.clientPhone}
               onChange={(e) => onFieldChange('clientPhone', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
+              className="nb__input"
+              autoComplete="tel"
             />
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {calculatingDistance && <p className="text-xs">Calculant ruta automàticament...</p>}
-          {distanceMessage && <p className="text-xs">{distanceMessage}</p>}
+      </section>
+
+      <section className="nb__panel">
+        <div className="nb__phead">
+          <h2 className="nb__h2">Detalls de l&apos;esdeveniment</h2>
         </div>
-      </div>
 
-      <div className="rounded-2xl border p-5 space-y-4">
-        <h2 className="text-sm font-semibold">Detalls de l&apos;esdeveniment</h2>
-
-        <div>
-          <span id="nb-event-type-label" className="text-xs">Tipus</span>
-          <div role="group" aria-labelledby="nb-event-type-label" className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-5">
+        <div className="nb__field" style={{ marginBottom: 16 }}>
+          <span id="nb-event-type-label" className="nb__label">Tipus d&apos;event</span>
+          <div role="group" aria-labelledby="nb-event-type-label" className="nb__chips" style={{ marginTop: 6 }}>
             {EVENT_TYPE_VALUES.map((value) => (
               <button
                 key={value}
                 type="button"
                 onClick={() => onFieldChange('eventType', value)}
                 aria-pressed={form.eventType === value}
-                className={`rounded-xl border px-2 py-2 text-xs font-medium transition-all ${
-                  form.eventType === value
-                    ? 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info'
-                    : 'admin-tone-border-neutral admin-tone-bg-neutral admin-tone-text-neutral hover:brightness-105'
-                }`}
+                className={`nb__chip${form.eventType === value ? ' is-on' : ''}`}
               >
-                <span className="text-base leading-none">{EVENT_TYPE_ICONS[value]}</span>
-                <span className="mt-1 block leading-tight">{EVENT_TYPE_PLAIN[value]}</span>
+                <span className="nb__chipic" aria-hidden="true">{EVENT_TYPE_ICONS[value]}</span>
+                {EVENT_TYPE_PLAIN[value]}
               </button>
             ))}
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-4">
-          <div>
-            <label htmlFor="nb-date" className="text-xs">Data *</label>
+        <div className="nb__row nb__row--4">
+          <div className="nb__field">
+            <label htmlFor="nb-date" className="nb__label nb__label--req">Data</label>
             <input
               id="nb-date"
               type="date"
               value={form.eventDate}
               onChange={(e) => onFieldChange('eventDate', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
+              className="nb__input"
             />
           </div>
-          <div>
-            <label htmlFor="nb-start-time" className="text-xs">Hora inici</label>
+          <div className="nb__field">
+            <label htmlFor="nb-start-time" className="nb__label">Hora inici</label>
             <input
               id="nb-start-time"
               type="time"
               value={form.eventStartTime}
               onChange={(e) => onFieldChange('eventStartTime', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
+              className="nb__input"
             />
           </div>
-          <div>
-            <label htmlFor="nb-end-time" className="text-xs">Hora final</label>
+          <div className="nb__field">
+            <label htmlFor="nb-end-time" className="nb__label">Hora final</label>
             <input
               id="nb-end-time"
               type="time"
               value={form.eventEndTime}
               onChange={(e) => onFieldChange('eventEndTime', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
+              className="nb__input"
             />
           </div>
-          <div>
-            <label htmlFor="nb-guests" className="text-xs">Convidats</label>
+          <div className="nb__field">
+            <label htmlFor="nb-guests" className="nb__label">Convidats</label>
             <input
               id="nb-guests"
               type="number"
@@ -163,52 +169,59 @@ export default function BookingClientEventSection({
               onChange={(e) => onFieldChange('guestCount', e.target.value)}
               placeholder="100"
               min={1}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
+              className="nb__input"
             />
           </div>
         </div>
 
         {dateConflicts.length > 0 && (
-          <div className="rounded-xl border-2 p-3">
-            <p className="text-sm font-semibold">
-              Ja {dateConflicts.length === 1 ? 'hi ha 1 reserva' : `hi ha ${dateConflicts.length} reserves`} el {form.eventDate}
-            </p>
-            <ul className="mt-1.5 space-y-0.5">
+          <div className="nb__conflict" role="alert">
+            <div>
+              <strong style={{ display: 'block', marginBottom: 4 }}>
+                Ja {dateConflicts.length === 1 ? 'hi ha 1 reserva' : `hi ha ${dateConflicts.length} reserves`} aquest dia
+              </strong>
               {dateConflicts.map((conflict) => (
-                <li key={conflict.id} className="text-xs">
+                <div key={conflict.id} className="nb__conflict-ref">
                   {conflict.reference} · {conflict.clientName}{conflict.eventStartTime ? ` · ${conflict.eventStartTime}` : ''}
-                </li>
+                </div>
               ))}
-            </ul>
-            <p className="mt-1.5 text-[10px]">Pots continuar si els horaris no es solapen.</p>
+              <small className="nb__conflict-hint">Pots continuar si els horaris no es solapen.</small>
+            </div>
           </div>
         )}
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="nb-location" className="text-xs">Ubicació *</label>
+        <div className="nb__row" style={{ marginTop: 12 }}>
+          <div className="nb__field">
+            <label htmlFor="nb-location" className="nb__label nb__label--req">Ubicació</label>
             <input
               id="nb-location"
               type="text"
               value={form.eventLocation}
               onChange={(e) => onFieldChange('eventLocation', e.target.value)}
               placeholder="Ciutat o comarca"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
+              className="nb__input"
             />
           </div>
-          <div>
-            <label htmlFor="nb-venue" className="text-xs">Espai / Lloc concret</label>
+          <div className="nb__field">
+            <label htmlFor="nb-venue" className="nb__label">Espai / Lloc concret</label>
             <input
               id="nb-venue"
               type="text"
               value={form.eventVenue}
               onChange={(e) => onFieldChange('eventVenue', e.target.value)}
-              placeholder="Nom de la finca, restaurant..."
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
+              placeholder="Nom de la finca, restaurant…"
+              className="nb__input"
             />
           </div>
         </div>
-      </div>
+
+        {(calculatingDistance || distanceInfo) && (
+          <p className={`nb__hint nb__hint--${distanceInfo?.tone ?? 'info'}`} style={{ marginTop: 10 }}>
+            {calculatingDistance && '🛰  Calculant ruta automàticament…'}
+            {!calculatingDistance && distanceInfo && distanceInfo.text}
+          </p>
+        )}
+      </section>
     </>
   );
 }

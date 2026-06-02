@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { getDossiersByLead } from '@/lib/services/dossierService';
-import { ANIMACIO_PRODUCTS } from '@/lib/constants/animacio-products';
+import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
 import { formatDateShort } from '@/lib/constants';
 import { LeadDossierActions } from './LeadDossierActions';
 
@@ -23,7 +23,10 @@ interface Props {
 }
 
 export async function LeadDossiersPanel({ leadId, leadNom, leadEmail, leadTelefon }: Props) {
-  const dossiers = await getDossiersByLead(leadId);
+  const [dossiers, allProducts] = await Promise.all([
+    getDossiersByLead(leadId),
+    getAnimacioProducts('ca'),
+  ]);
   const logoDataUri = readLogoDataUri();
 
   const newParams = new URLSearchParams();
@@ -49,7 +52,7 @@ export async function LeadDossiersPanel({ leadId, leadNom, leadEmail, leadTelefo
       ) : (
         <ul className="flex flex-col gap-3">
           {dossiers.map((d) => {
-            const productNames = ANIMACIO_PRODUCTS
+            const productNames = allProducts
               .filter((p) => d.productIds.includes(p.id))
               .map((p) => p.nom)
               .join(' · ');
@@ -68,6 +71,7 @@ export async function LeadDossiersPanel({ leadId, leadNom, leadEmail, leadTelefo
                   email={d.email ?? undefined}
                   nom={d.nom}
                   productIds={d.productIds}
+                  products={allProducts}
                   clientInfo={{
                     nom: d.nom,
                     empresa: d.empresa ?? undefined,

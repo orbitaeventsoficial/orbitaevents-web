@@ -53,6 +53,13 @@ const updateBookingSchema = z.object({
   distanceKm: z.number().min(0).optional(),
   fuelCostPerKm: z.number().min(0).optional(),
   travelCost: z.number().min(0).optional(),
+  paymentMethod: z.enum(['INVOICE', 'CASH', 'TRANSFER']).optional(),
+  invoiceRequired: z.boolean().optional(),
+  cashAmount: z.number().nullable().optional(),
+  eventPhone: z.string().nullable().optional(),
+  eventAddress: z.string().nullable().optional(),
+  eventStartTime: z.string().nullable().optional(),
+  eventEndTime: z.string().nullable().optional(),
 }).strict();
 
 export async function GET(req: NextRequest, { params }: Params) {

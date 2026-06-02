@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { LEAD_STATUS_ACTION_OPTIONS, formatCurrencyExact } from '@/lib/constants';
 import { ADMIN_MANUAL_SEQUENCE_STEP_OPTIONS, getAdminLeadPackOptions } from '@/lib/constants/admin';
+import { VAT_RATE_INVOICE, calcVatAmount, roundMoney } from '@/lib/constants/pricing';
 import { ADMIN_LEAD_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import { buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
@@ -99,8 +100,8 @@ export default function LeadActionsEnhanced({
 
       setSuccess('Estat actualitzat!');
       startTransition(() => {
-        if (newStatus === 'WON' && customerId) {
-          router.push(buildCustomerHubHref(customerId));
+        if (newStatus === 'WON') {
+          router.push(`/admin/bookings/new?leadId=${encodeURIComponent(leadId)}`);
           return;
         }
         router.refresh();
@@ -399,12 +400,12 @@ export default function LeadActionsEnhanced({
               <span className="font-medium">{effectivePrice}€</span>
             </div>
             <div className="flex justify-between text-sm mt-1">
-              <span className="">IVA (21%):</span>
-              <span className="font-medium">{formatCurrencyExact(effectivePrice * 0.21)}</span>
+              <span className="">IVA ({VAT_RATE_INVOICE}%):</span>
+              <span className="font-medium">{formatCurrencyExact(calcVatAmount(effectivePrice, true))}</span>
             </div>
             <div className="admin-tone-border-neutral mt-2 flex justify-between border-t pt-2 text-sm">
               <span className="font-semibold">Total:</span>
-              <span className="font-bold">{formatCurrencyExact(effectivePrice * 1.21)}</span>
+              <span className="font-bold">{formatCurrencyExact(roundMoney(effectivePrice + calcVatAmount(effectivePrice, true)))}</span>
             </div>
           </div>
 
@@ -490,6 +491,5 @@ export default function LeadActionsEnhanced({
     </div>
   );
 }
-
 
 

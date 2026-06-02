@@ -6,6 +6,7 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import AnimacioClient from './AnimacioClient';
 import { getSiteUrl } from '@/lib/site';
 import { STANDALONE_SERVICE_SEO } from '@/lib/standaloneServiceSeo';
+import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
 
 const SEO = STANDALONE_SERVICE_SEO['animacion'];
 
@@ -43,6 +44,7 @@ type PageProps = {
 export default async function AnimacioPage({ params }: PageProps) {
   const { locale } = await params;
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const products = await getAnimacioProducts(locale);
 
   return (
     <>
@@ -65,7 +67,7 @@ export default async function AnimacioPage({ params }: PageProps) {
         availability={SEO.jsonLd.availability}
       />
 
-      <AnimacioClient />
+      <AnimacioClient products={products} />
     </>
   );
 }

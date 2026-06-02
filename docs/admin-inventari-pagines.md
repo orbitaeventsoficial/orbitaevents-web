@@ -12,18 +12,18 @@
 
 | Pàgina | Ruta | Contingut clau | Estat | Nota |
 |---|---|---|---|---|
-| Leads | `/admin/leads` | Calendari temporada, pipeline kanban, focus zone, fitxa lead | 🟡 | Lab #777 + servei #780 + shell #781 + pàgina #782 + dades reals #783 + canvi estat #784 + drag #785 + delete #786 + badge LOST #787 + WhatsApp/correu #788 + fix LOST #789 + enriquit #790 + arxiu #791-#793 + meteo #794 + prioritat inline #796. **7/8 funcions inventari leads tancades** (#5 suggeriments pendent decisió propietari) |
+| Leads | `/admin/leads` | Calendari temporada, pipeline kanban, focus zone, fitxa lead | 🟡 | Lab #777 + servei #780 + shell #781 + pàgina #782 + dades reals #783 + canvi estat #784 + drag #785 + delete #786 + badge LOST #787 + WhatsApp/correu #788 + fix LOST #789 + enriquit #790 + arxiu #791-#793 + meteo #794 + prioritat inline #796 + reconstrucció Agenda #846 + fitxa interna recuperada #848. **7/8 funcions inventari leads tancades** (#5 suggeriments pendent decisió propietari) |
 | Lead fitxa | `/admin/leads/[id]` | Timeline, tasques, documents, scoring, insights | 🟢 | Canvi #810 — `leads-design.css` ampliat (`lp2__*`), `AdminPage` eliminat, sub-components conservats |
-| Lead re-engagement | `/admin/leads/reengagement` | Candidats a recuperar, WhatsApp/email | 🔴 | |
+| Lead re-engagement | `/admin/leads/reengagement` | Candidats a recuperar, WhatsApp/email | 🟢 | Canvi #850 — `reengagement.css`, prefix `lr__`, `AdminPage` eliminat, `mailto:` substituït per `buildLeadComposeHref` |
 | Clients (llista) | `/admin/clientes` | Llista, segments, filtres | 🟢 | Canvi #811 — `clientes.css`, prefix `cl__`, cap AdminPage |
 | Client fitxa 360 | `/admin/clientes/[id]` | Hub relacional, timeline, comunicacions, tasques | 🟢 | Canvi #812 — `customer-hub.css`, prefix `ch__`, cap AdminPage, cap ap-* |
 | Reactivació | `/admin/clientes/reactivation` | Candidats per reactivar | 🔴 | |
 | Referrals | `/admin/clientes/referrals` | Top referrers, candidats | 🔴 | |
-| Reserves (llista) | `/admin/bookings` | Llista, kanban, filtres | 🔴 | |
-| Reserva detall | `/admin/bookings/[id]` | Cabina operativa, cobraments, checklist, inventari | 🔴 | |
-| Nova reserva | `/admin/bookings/new` | Formulari ràpid | 🔴 | |
-| Calendari | `/admin/calendario` | Calendari de capacitat | 🔴 | Eliminat del nav (#803) — accessible directament per URL |
-| Calendari capacitat | `/admin/calendario/capacity` | Forecast setmanal | 🔴 | |
+| Reserves (llista) | `/admin/bookings` | Absorbida per **Agenda** (#844). El workspace `/admin/leads` mostra leads+reserves+calendari fusionats amb vistes Calendari/Pipeline/Llista. | 🟢 | Canvi #836-#844 — fusió Leads+Reserves+Calendari sota *Agenda*. URL antiga segueix accessible directament. |
+| Reserva detall | `/admin/bookings/[id]` | Fitxa operativa (cobraments, contracte, inventari, checklist, factura, post-event). | 🟢 | Canvi #849 — `booking-detail.css`, prefix `bd__`, `AdminPage` eliminat, `BookingSectionNav` amb `bd__secnav`. Sub-components conservats. |
+| Nova reserva | `/admin/bookings/new` | Formulari ràpid pre-omplit des d'un lead. | 🟢 | Canvi #842+#843 — migrat a Brass & Obsidian (`nb-design.css`, `nb__*`), packs amb prefix de servei, extras humanitzats. |
+| Calendari | `/admin/calendario` | Absorbit per **Agenda** (#844) — el calendari de caps de setmana de leads+reserves substitueix la vista vella. | 🟢 | URL antiga accessible per compatibilitat. |
+| Calendari capacitat | `/admin/calendario/capacity` | Forecast setmanal — pendent decidir si val la pena recuperar-lo dins Agenda. | 🔴 | |
 | Tasques | `/admin/tasks` | Llista/kanban, cues, automatismes | 🔴 | |
 | Nova tasca | `/admin/tasks/new` | Formulari amb assistència | 🔴 | |
 | Inbox | `/admin/inbox` | Safata, missatges, follow-ups | 🟢 | Canvi #801 — `inbox.css`, prefix `ix-`, cap AdminPage |

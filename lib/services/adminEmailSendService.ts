@@ -16,6 +16,7 @@ import { absoluteUrl, getAppBaseUrl } from '@/lib/site';
 import { recordEmailSend, updateEmailSendResult, wrapLinksForTracking } from '@/lib/services/emailTrackingService';
 import { recordCustomerEmailSent } from '@/lib/services/customerActivityService';
 import { recordLeadEmailSent } from '@/lib/services/leadActivityService';
+import { calcVatAmount, roundMoney } from '@/lib/constants/pricing';
 
 type QuoteAttachmentInput = {
   packId?: string;
@@ -148,6 +149,7 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
 
     const template = await getQuoteTemplateSettings();
     const pack = await resolveQuotePack(packId, resolvedLocale);
+    const fallbackVat = calcVatAmount(price, true);
     const quoteData: QuoteData = leadForQuote
       ? createQuoteFromLead(leadForQuote, { ...pack, price })
       : {
@@ -163,8 +165,8 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
           djHours: pack.djHours,
           extraHourPrice: pack.extraHourPrice,
           subtotal: price,
-          iva: price * 0.21,
-          total: price * 1.21,
+          iva: fallbackVat,
+          total: roundMoney(price + fallbackVat),
           quoteNumber: `TMP-${Date.now().toString(36).toUpperCase()}`,
           validUntil: new Date(Date.now() + template.validityDays * 24 * 60 * 60 * 1000),
           notes: undefined,
@@ -282,6 +284,5 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
 
   return { ok: true as const, status: 200, body: { ok: true } };
 }
-
 
 

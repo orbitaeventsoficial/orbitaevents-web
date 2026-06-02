@@ -1,0 +1,391 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   lr__ — Lead Reengagement (/admin/leads/reengagement)
+   Visual: Brass & Obsidian — tokens de app/studio/orbita-tokens.css
+   Canvi #850
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Root ── */
+html.admin-mode .admin-shell .lr__root {
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+html.admin-mode .admin-shell .lr__header {
+  border-bottom: 1px solid var(--o-admin-line);
+  padding: 16px;
+}
+html.admin-mode .admin-shell .lr__hero {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+html.admin-mode .admin-shell .lr__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--t3);
+}
+html.admin-mode .admin-shell .lr__back {
+  color: var(--t3);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+html.admin-mode .admin-shell .lr__back:hover { color: var(--t2); }
+html.admin-mode .admin-shell .lr__bread-sep { color: var(--t3); opacity: 0.4; margin: 0 1px; }
+
+html.admin-mode .admin-shell .lr__toprow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+html.admin-mode .admin-shell .lr__eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin: 0;
+}
+html.admin-mode .admin-shell .lr__h1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--t);
+  margin: 2px 0 0;
+}
+html.admin-mode .admin-shell .lr__subtitle {
+  font-size: 13px;
+  color: var(--t3);
+  margin: 2px 0 0;
+}
+html.admin-mode .admin-shell .lr__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: var(--o-r-lg);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid var(--o-admin-line-2);
+  background: rgba(255,255,255,0.04);
+  color: var(--t2);
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+}
+html.admin-mode .admin-shell .lr__btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.08);
+  color: var(--t);
+}
+
+/* ── Body ── */
+html.admin-mode .admin-shell .lr__body {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 48px;
+}
+
+/* ── KPI cards ── */
+html.admin-mode .admin-shell .lr__kpis {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+@media (min-width: 640px) {
+  html.admin-mode .admin-shell .lr__kpis { grid-template-columns: repeat(4, 1fr); }
+}
+
+html.admin-mode .admin-shell .lr__kpi {
+  padding: 12px 14px;
+  border-radius: var(--o-r-lg);
+  border: 1px solid var(--o-admin-line);
+  background: rgba(255,255,255,0.02);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+html.admin-mode .admin-shell .lr__kpi:hover {
+  background: rgba(255,255,255,0.04);
+}
+html.admin-mode .admin-shell .lr__kpi--on {
+  border-color: rgba(95,183,232,0.40);
+  background: rgba(95,183,232,0.08);
+}
+html.admin-mode .admin-shell .lr__kpi--alta.lr__kpi--on {
+  border-color: rgba(226,89,106,0.40);
+  background: rgba(226,89,106,0.08);
+}
+html.admin-mode .admin-shell .lr__kpi--mitjana.lr__kpi--on {
+  border-color: rgba(232,169,58,0.40);
+  background: rgba(232,169,58,0.08);
+}
+html.admin-mode .admin-shell .lr__kpi--baixa.lr__kpi--on {
+  border-color: var(--o-admin-line-2);
+  background: rgba(255,255,255,0.06);
+}
+
+html.admin-mode .admin-shell .lr__kpi-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--t3);
+  margin: 0;
+}
+html.admin-mode .admin-shell .lr__kpi-val {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--t);
+  margin: 4px 0 0;
+}
+html.admin-mode .admin-shell .lr__kpi--alta   .lr__kpi-val { color: var(--o-danger); }
+html.admin-mode .admin-shell .lr__kpi--mitjana .lr__kpi-val { color: var(--o-warning); }
+
+/* ── Reason filters ── */
+html.admin-mode .admin-shell .lr__reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+html.admin-mode .admin-shell .lr__reason {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: var(--o-r-pill);
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid var(--o-admin-line-2);
+  background: rgba(255,255,255,0.03);
+  color: var(--t3);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+html.admin-mode .admin-shell .lr__reason:hover { background: rgba(255,255,255,0.06); color: var(--t2); }
+html.admin-mode .admin-shell .lr__reason--on {
+  border-color: rgba(95,183,232,0.40);
+  background: rgba(95,183,232,0.08);
+  color: var(--o-info);
+}
+
+/* ── Empty state ── */
+html.admin-mode .admin-shell .lr__empty {
+  border: 1px solid var(--o-admin-line);
+  border-radius: var(--o-r-xl);
+  background: rgba(255,255,255,0.015);
+  padding: 48px 24px;
+  text-align: center;
+}
+html.admin-mode .admin-shell .lr__empty-icon { font-size: 36px; display: block; margin-bottom: 12px; }
+html.admin-mode .admin-shell .lr__empty-title { font-size: 14px; font-weight: 600; color: var(--t2); margin: 0 0 4px; }
+html.admin-mode .admin-shell .lr__empty-sub   { font-size: 12px; color: var(--t3); margin: 0; }
+
+/* ── Candidate cards ── */
+html.admin-mode .admin-shell .lr__cards { display: flex; flex-direction: column; gap: 8px; }
+
+html.admin-mode .admin-shell .lr__card {
+  border: 1px solid var(--o-admin-line);
+  border-radius: var(--o-r-xl);
+  background: rgba(255,255,255,0.018);
+  padding: 14px 16px;
+  transition: background 0.12s;
+}
+html.admin-mode .admin-shell .lr__card:hover { background: rgba(255,255,255,0.028); }
+
+/* Priority left border accent */
+html.admin-mode .admin-shell .lr__card--alta   { border-left: 3px solid var(--o-danger); }
+html.admin-mode .admin-shell .lr__card--mitjana { border-left: 3px solid var(--o-warning); }
+html.admin-mode .admin-shell .lr__card--baixa  { border-left: 3px solid var(--o-admin-line-2); }
+
+html.admin-mode .admin-shell .lr__card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+html.admin-mode .admin-shell .lr__card-main { min-width: 0; flex: 1; }
+
+/* Priority badge */
+html.admin-mode .admin-shell .lr__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--o-r-pill);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  border: 1px solid var(--o-admin-line-2);
+  background: rgba(255,255,255,0.04);
+  color: var(--t3);
+}
+html.admin-mode .admin-shell .lr__badge--alta {
+  border-color: rgba(226,89,106,0.35);
+  background: rgba(226,89,106,0.08);
+  color: var(--o-danger);
+}
+html.admin-mode .admin-shell .lr__badge--mitjana {
+  border-color: rgba(232,169,58,0.35);
+  background: rgba(232,169,58,0.08);
+  color: var(--o-warning);
+}
+
+html.admin-mode .admin-shell .lr__card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 5px;
+}
+html.admin-mode .admin-shell .lr__card-sep { color: var(--t3); opacity: 0.3; }
+html.admin-mode .admin-shell .lr__card-tag {
+  font-size: 10px;
+  color: var(--t3);
+}
+
+html.admin-mode .admin-shell .lr__card-namerow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 3px;
+}
+html.admin-mode .admin-shell .lr__card-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--t);
+  text-decoration: none;
+  transition: color 0.12s;
+}
+html.admin-mode .admin-shell .lr__card-name:hover { color: var(--gold); }
+html.admin-mode .admin-shell .lr__card-contact {
+  font-size: 11px;
+  color: var(--t3);
+}
+
+html.admin-mode .admin-shell .lr__card-eventrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: var(--t3);
+  margin-top: 2px;
+}
+html.admin-mode .admin-shell .lr__card-soon { color: var(--o-warning); }
+
+/* Channels icon group */
+html.admin-mode .admin-shell .lr__channels {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+html.admin-mode .admin-shell .lr__channel-icons { display: flex; gap: 4px; font-size: 14px; }
+html.admin-mode .admin-shell .lr__locale {
+  font-size: 9px;
+  color: var(--t3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Missatge desplegable */
+html.admin-mode .admin-shell .lr__msg-toggle {
+  margin-top: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--t3);
+  cursor: pointer;
+  list-none: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.12s;
+  width: fit-content;
+}
+html.admin-mode .admin-shell .lr__msg-toggle:hover { color: var(--t2); }
+html.admin-mode .admin-shell .lr__msg-box {
+  margin-top: 8px;
+  border: 1px solid var(--o-admin-line-2);
+  border-radius: var(--o-r-lg);
+  background: rgba(0,0,0,0.18);
+  padding: 10px 12px;
+}
+html.admin-mode .admin-shell .lr__msg-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--t3);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin: 0 0 2px;
+}
+html.admin-mode .admin-shell .lr__msg-subject {
+  font-size: 12px;
+  color: var(--t2);
+  margin: 0 0 8px;
+}
+html.admin-mode .admin-shell .lr__msg-body {
+  font-size: 11px;
+  color: var(--t2);
+  white-space: pre-wrap;
+  font-family: inherit;
+  margin: 0;
+  opacity: 0.85;
+}
+
+/* Action buttons */
+html.admin-mode .admin-shell .lr__acts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+html.admin-mode .admin-shell .lr__act {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: var(--o-r-lg);
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid var(--o-admin-line-2);
+  background: rgba(255,255,255,0.04);
+  color: var(--t2);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+html.admin-mode .admin-shell .lr__act:hover:not(:disabled) {
+  background: rgba(255,255,255,0.08);
+  color: var(--t);
+}
+html.admin-mode .admin-shell .lr__act--wa {
+  border-color: rgba(62,197,123,0.35);
+  background: rgba(62,197,123,0.07);
+  color: var(--o-success);
+}
+html.admin-mode .admin-shell .lr__act--wa:hover { background: rgba(62,197,123,0.14); }
+html.admin-mode .admin-shell .lr__act--email {
+  border-color: rgba(95,183,232,0.35);
+  background: rgba(95,183,232,0.07);
+  color: var(--o-info);
+}
+html.admin-mode .admin-shell .lr__act--email:hover { background: rgba(95,183,232,0.14); }
+html.admin-mode .admin-shell .lr__act--dismiss {
+  margin-left: auto;
+  opacity: 0.55;
+  font-size: 10px;
+  border-color: transparent;
+  background: transparent;
+}
+html.admin-mode .admin-shell .lr__act--dismiss:hover { opacity: 1; background: rgba(255,255,255,0.04); }

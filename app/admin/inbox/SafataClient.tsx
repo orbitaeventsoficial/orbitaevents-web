@@ -777,6 +777,7 @@ export default function SafataClient({
                 <div className="sf__lead-row">
                   {lead.status === 'NEW' && <span className="sf__lead-dot" aria-label="Nova" />}
                   <span className="sf__lead-name">{lead.name}</span>
+                  {lead.status === 'NEW' && <span className="sf__lead-badge-new">NOU</span>}
                   <span className="sf__lead-date">{formatDateShort(lead.createdAt)}</span>
                 </div>
                 <p className="sf__lead-preview">

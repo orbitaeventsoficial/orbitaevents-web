@@ -20,9 +20,13 @@ type NavGroup = { id: string; label: string; items: NavItem[] };
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    id: 'pipeline', label: 'Pipeline',
+    id: 'agenda', label: 'Agenda',
     items: [
-      { label: 'Leads', href: '/admin/leads' },
+      // Workspace unificat de bolos (fusió Leads+Reserves+Calendari, #836-#843).
+      // El vell "Reserves" del grup Events queda absorbit aquí; el calendari
+      // de capacitat ja no té entrada de nav pròpia (la finestra de temporada
+      // d'Agenda el substitueix). Vegeu §6.19 i el diari #844.
+      { label: 'Temporada', href: '/admin/leads' },
       { label: 'Dossiers', href: '/admin/dossiers' },
       { label: 'Clients', href: '/admin/clientes' },
       { label: 'Pressupostos', href: '/admin/presupuestos' },
@@ -30,9 +34,8 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    id: 'events', label: 'Events',
+    id: 'events', label: 'Operativa',
     items: [
-      { label: 'Reserves', href: '/admin/bookings' },
       { label: 'Tasques', href: '/admin/tasks' },
       { label: 'Inventari', href: '/admin/inventory' },
     ],
@@ -72,13 +75,15 @@ function getGroupForPath(pathname: string): string {
     pathname.startsWith('/admin/presupuestos') ||
     pathname.startsWith('/admin/intake') ||
     pathname.startsWith('/admin/quick-create') ||
-    pathname.startsWith('/admin/sales-ops')
-  ) return 'pipeline';
-  if (
+    pathname.startsWith('/admin/sales-ops') ||
+    // Workspace fusionat Agenda (#844): bookings i calendari ja no tenen entrada
+    // pròpia al nav, però quan algú hi accedeix per URL marquem Agenda activa.
     pathname.startsWith('/admin/bookings') ||
-    pathname.startsWith('/admin/tasks') ||
-    pathname.startsWith('/admin/inventory') ||
     pathname.startsWith('/admin/calendario')
+  ) return 'agenda';
+  if (
+    pathname.startsWith('/admin/tasks') ||
+    pathname.startsWith('/admin/inventory')
   ) return 'events';
   if (
     pathname.startsWith('/admin/packs') ||

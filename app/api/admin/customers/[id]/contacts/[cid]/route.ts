@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { z } from 'zod';
 import { updateCustomerContact, deleteCustomerContact } from '@/lib/services/customerContactService';
 
@@ -20,6 +21,8 @@ export async function PATCH(
 ) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = await verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   const body = await req.json();
   const parsed = patchSchema.safeParse(body);
@@ -42,6 +45,8 @@ export async function DELETE(
 ) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = await verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   await deleteCustomerContact(params.id, params.cid);
   return NextResponse.json({ ok: true });

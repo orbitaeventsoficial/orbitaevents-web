@@ -425,7 +425,10 @@
   transition: background 120ms ease;
 }
 .sf__lead:hover { background: var(--ax-panel); }
-.sf__lead.is-unread { background: color-mix(in oklab, var(--ax-panel) 70%, var(--ax-canvas)); }
+.sf__lead.is-unread {
+  background: color-mix(in oklab, rgba(215,184,110,0.07) 100%, var(--ax-canvas));
+  border-bottom-color: rgba(215,184,110,0.18);
+}
 
 .sf__lead-row {
   display: flex;
@@ -439,6 +442,23 @@
   border-radius: 50%;
   background: var(--ax-gold);
   box-shadow: 0 0 6px var(--ax-gold);
+  animation: sf-dot-pulse 2s ease-in-out infinite;
+}
+@keyframes sf-dot-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
+}
+.sf__lead-badge-new {
+  flex-shrink: 0;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  color: var(--ax-canvas);
+  background: var(--ax-gold);
+  padding: 1px 5px;
+  border-radius: 4px;
+  line-height: 1.5;
 }
 .sf__lead-name {
   flex: 1;

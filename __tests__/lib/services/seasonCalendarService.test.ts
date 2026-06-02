@@ -1,10 +1,43 @@
 import { describe, it, expect } from 'vitest';
 import {
   buildSeasonCalendar,
+  parseBudgetAmount,
   type SeasonCalendarInput,
   type SeasonCalendarLeadRaw,
   type SeasonCalendarBookingRaw,
 } from '@/lib/services/seasonCalendarService';
+
+describe('parseBudgetAmount', () => {
+  it('null/undefined/buit retornen null', () => {
+    expect(parseBudgetAmount(null)).toBeNull();
+    expect(parseBudgetAmount(undefined)).toBeNull();
+    expect(parseBudgetAmount('')).toBeNull();
+    expect(parseBudgetAmount('   ')).toBeNull();
+  });
+  it('extreu xifres d\'strings amb soroll', () => {
+    expect(parseBudgetAmount('300')).toBe(300);
+    expect(parseBudgetAmount('300€')).toBe(300);
+    expect(parseBudgetAmount('300 EUR')).toBe(300);
+    expect(parseBudgetAmount('uns 300€ aprox.')).toBe(300);
+  });
+  it('format europeu (1.200 = mil dos-cents)', () => {
+    expect(parseBudgetAmount('1.200')).toBe(1200);
+    expect(parseBudgetAmount('1.200€')).toBe(1200);
+  });
+  it('format europeu amb decimal (1.200,50)', () => {
+    expect(parseBudgetAmount('1.200,50')).toBe(1200.5);
+  });
+  it('format americà amb decimal (300.50)', () => {
+    expect(parseBudgetAmount('300.50')).toBe(300.5);
+  });
+  it('format americà amb miler (1,200.50)', () => {
+    expect(parseBudgetAmount('1,200.50')).toBe(1200.5);
+  });
+  it('retorna null per a "no" o text sense xifres', () => {
+    expect(parseBudgetAmount('no ho sé')).toBeNull();
+    expect(parseBudgetAmount('per parlar')).toBeNull();
+  });
+});
 
 // 2026-06-01 és dilluns → primer divendres = 05/06/2026
 const WINDOW_START = new Date('2026-06-01T00:00:00.000Z');
@@ -16,6 +49,7 @@ function makeLead(overrides: Partial<SeasonCalendarLeadRaw> = {}): SeasonCalenda
     status: 'NEW',
     name: 'Anna García',
     eventDate: new Date('2026-06-20T00:00:00.000Z'), // dissabte
+    eventStartTime: null,
     eventType: 'BIRTHDAY',
     eventLocation: 'Barcelona',
     guestCount: 80,
@@ -27,6 +61,7 @@ function makeLead(overrides: Partial<SeasonCalendarLeadRaw> = {}): SeasonCalenda
     assignedTo: null,
     contactedAt: null,
     priority: null,
+    booking: null,
     ...overrides,
   };
 }
@@ -179,5 +214,28 @@ describe('buildSeasonCalendar', () => {
     const bookingEntry = result.weekends.flatMap((w) => w.entries).find((e) => e.id === 'b1');
     expect(leadEntry?.priority).toBe('HIGH');
     expect(bookingEntry?.priority).toBeNull();
+  });
+
+  it('propaga l\'enllaç a la reserva del lead guanyat (i null si no en té)', () => {
+    const wonWithBooking = makeLead({
+      id: 'l1',
+      status: 'WON',
+      eventDate: new Date('2026-06-20T00:00:00.000Z'),
+      booking: { id: 'b9', reference: 'OE-2026-009', status: 'CONFIRMED', depositPaid: true, remainingPaid: false },
+    });
+    const plainLead = makeLead({ id: 'l2', eventDate: new Date('2026-06-19T00:00:00.000Z') });
+    const result = buildSeasonCalendar(makeInput([wonWithBooking, plainLead]));
+    const entries = result.weekends.flatMap((w) => w.entries);
+    const won = entries.find((e) => e.id === 'l1');
+    const plain = entries.find((e) => e.id === 'l2');
+    expect(won?.booking).toEqual({ id: 'b9', reference: 'OE-2026-009', status: 'CONFIRMED', depositPaid: true, remainingPaid: false });
+    expect(plain?.booking).toBeNull();
+  });
+
+  it('els booking entries (lead-less) no porten enllaç de booking propi', () => {
+    const booking = makeBooking({ id: 'b1' });
+    const result = buildSeasonCalendar(makeInput([], [booking]));
+    const bookingEntry = result.weekends.flatMap((w) => w.entries).find((e) => e.id === 'b1');
+    expect(bookingEntry?.booking).toBeNull();
   });
 });

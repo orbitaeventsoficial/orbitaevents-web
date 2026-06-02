@@ -69,7 +69,7 @@ function entryToLead(e: SeasonCalendarEntry, weather: EventWeather | null): Lead
     name: e.name,
     type: typeLabel,
     dateISO: e.eventDate ? toDateISO(e.eventDate) : '',
-    time: '',               // pendent — no al servei actual
+    time: e.eventStartTime ?? '',
     location: e.eventLocation ?? '',
     pax: e.guestCount ?? 0,
     product: typeLabel,
@@ -84,6 +84,7 @@ function entryToLead(e: SeasonCalendarEntry, weather: EventWeather | null): Lead
     channel: kind === 'lead' ? sourceLabel(e.source) : '',
     owner: kind === 'lead' ? (e.assignedTo ?? '') : '',
     last: kind === 'lead' ? relativeLastContact(e.contactedAt) : '',
+    booking: e.booking,
     wx: weather
       ? { kind: weather.kind, tmax: weather.tempMax, tmin: weather.tempMin }
       : { kind: 'partly', tmax: 22, tmin: 14 }, // fallback si no hi ha API key o data fora del rang 5d

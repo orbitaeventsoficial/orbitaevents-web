@@ -7,6 +7,7 @@ import { calculateTravelCharge, calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM
 import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
 import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
 import { ACTIVE_BOOKING_STATUSES } from '@/lib/constants';
+import { calcVatRate, calcDeposit } from '@/lib/constants/pricing';
 
 const OPERATOR_EXTRA_ID = '__operator_extra__';
 const OPERATOR_EXTRA_SLUG = 'operator-support-hour';
@@ -36,6 +37,8 @@ type BookingCreateInput = {
   eventVenue?: string;
   guestCount: number;
   packId: string;
+  customPackPrice?: number;
+  invoiceRequired?: boolean;
   extraHours?: number;
   extras?: BookingExtraInput[];
   discount?: number;
@@ -208,7 +211,9 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
     return { status: 400, body: { error: 'Data de l\'esdeveniment invàlida' } };
   }
 
-  const packPrice = pack.price;
+  const packPrice = data.customPackPrice != null && data.customPackPrice > 0
+    ? data.customPackPrice
+    : pack.price;
   const extraHoursPrice = (data.extraHours || 0) * pack.extraHourPrice;
   const extrasPrice = data.extras?.reduce((sum, e) => sum + e.price * (e.quantity || 1), 0) || 0;
   const subtotalBase = packPrice + extraHoursPrice + extrasPrice;
@@ -235,14 +240,14 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   const travelCharge = distanceKm != null ? calculateTravelCharge(distanceKm) : 0;
   const subtotal = subtotalBase + travelCharge;
   const discount = data.discount || 0;
-  const vatRate = 21;
+  const vatRate = calcVatRate(data.invoiceRequired ?? false);
   const baseAfterDiscount = subtotal - discount;
   // Money es desa com a Float al schema: arrodonir a cèntims evita soroll de
   // coma flotant a BD i desquadres amb Stripe (cobra en cèntims sencers).
   // Mateix patró canònic que publicBookingService.ts.
   const vatAmount = Math.round(baseAfterDiscount * (vatRate / 100) * 100) / 100;
   const total = Math.round((baseAfterDiscount + vatAmount) * 100) / 100;
-  const depositAmount = Math.round(total * 0.3);
+  const depositAmount = calcDeposit(total);
   const reference = await generateReference();
 
   const resolvedExtras = data.extras

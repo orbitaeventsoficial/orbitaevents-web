@@ -1,0 +1,731 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   bd__ — Booking Detail (/admin/bookings/[id])
+   Visual: Brass & Obsidian — tokens de app/studio/orbita-tokens.css
+   Canvi #849
+   ═══════════════════════════════════════════════════════════════════════ */
+
+html.admin-mode .admin-shell .bd__root {
+  min-height: 100vh;
+}
+
+/* ── Header sticky ── */
+html.admin-mode .admin-shell .bd__header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  border-bottom: 1px solid var(--o-admin-line);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(10,10,12,0.90);
+}
+
+html.admin-mode .admin-shell .bd__hero {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Breadcrumb ── */
+html.admin-mode .admin-shell .bd__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--t3);
+}
+html.admin-mode .admin-shell .bd__back {
+  color: var(--t3);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+html.admin-mode .admin-shell .bd__back:hover { color: var(--t2); }
+html.admin-mode .admin-shell .bd__bread-sep { color: var(--t3); opacity: 0.4; margin: 0 1px; }
+
+/* ── Top row (title + actions) ── */
+html.admin-mode .admin-shell .bd__toprow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+html.admin-mode .admin-shell .bd__titlecol {
+  min-width: 0;
+  flex: 1;
+}
+html.admin-mode .admin-shell .bd__eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin: 0;
+}
+html.admin-mode .admin-shell .bd__h1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--t);
+  margin: 2px 0 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+html.admin-mode .admin-shell .bd__h1-ref {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--t3);
+}
+html.admin-mode .admin-shell .bd__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+}
+
+/* ── Chips (status / countdown) ── */
+html.admin-mode .admin-shell .bd__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--o-r-pill);
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--o-admin-line-2);
+  background: rgba(255,255,255,0.05);
+  color: var(--t2);
+}
+html.admin-mode .admin-shell .bd__chip--ok {
+  color: var(--o-success);
+  border-color: rgba(62,197,123,0.35);
+  background: rgba(62,197,123,0.08);
+}
+html.admin-mode .admin-shell .bd__chip--warn {
+  color: var(--o-warning);
+  border-color: rgba(232,169,58,0.35);
+  background: rgba(232,169,58,0.08);
+}
+html.admin-mode .admin-shell .bd__chip--err {
+  color: var(--o-danger);
+  border-color: rgba(226,89,106,0.35);
+  background: rgba(226,89,106,0.08);
+}
+html.admin-mode .admin-shell .bd__chip--info {
+  color: var(--o-info);
+  border-color: rgba(95,183,232,0.35);
+  background: rgba(95,183,232,0.08);
+  animation: bd-pulse 1.5s ease-in-out infinite;
+}
+@keyframes bd-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.55; }
+}
+
+/* ── Header action buttons ── */
+html.admin-mode .admin-shell .bd__acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+html.admin-mode .admin-shell .bd__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: var(--o-r-lg);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid var(--o-admin-line-2);
+  background: rgba(255,255,255,0.04);
+  color: var(--t2);
+  transition: background 0.15s, color 0.15s;
+}
+html.admin-mode .admin-shell .bd__btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.08);
+  color: var(--t);
+}
+html.admin-mode .admin-shell .bd__btn--sec {
+  background: rgba(95,183,232,0.08);
+  border-color: rgba(95,183,232,0.25);
+  color: var(--o-info);
+}
+html.admin-mode .admin-shell .bd__btn--sec:hover:not(:disabled) {
+  background: rgba(95,183,232,0.14);
+}
+
+/* ── KPI bar ── */
+html.admin-mode .admin-shell .bd__kpis {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+@media (min-width: 640px) {
+  html.admin-mode .admin-shell .bd__kpis { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 1024px) {
+  html.admin-mode .admin-shell .bd__kpis { grid-template-columns: repeat(5, 1fr); }
+}
+
+html.admin-mode .admin-shell .bd__kpi {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--o-admin-line);
+  border-radius: var(--o-r-lg);
+  padding: 9px 12px;
+  min-width: 0;
+}
+html.admin-mode .admin-shell .bd__kpi--gold {
+  border-color: var(--o-admin-hair-gold);
+  background: rgba(215,184,110,0.04);
+}
+html.admin-mode .admin-shell .bd__kpi--ok {
+  border-color: rgba(62,197,123,0.28);
+  background: rgba(62,197,123,0.04);
+}
+html.admin-mode .admin-shell .bd__kpi--warn {
+  border-color: rgba(232,169,58,0.28);
+  background: rgba(232,169,58,0.04);
+}
+html.admin-mode .admin-shell .bd__kpi--err {
+  border-color: rgba(226,89,106,0.28);
+  background: rgba(226,89,106,0.04);
+}
+
+html.admin-mode .admin-shell .bd__kpi-head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 3px;
+}
+html.admin-mode .admin-shell .bd__kpi-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+html.admin-mode .admin-shell .bd__kpi-dot--ok     { background: var(--o-success); }
+html.admin-mode .admin-shell .bd__kpi-dot--warn   { background: var(--o-warning); }
+html.admin-mode .admin-shell .bd__kpi-dot--err    { background: var(--o-danger); }
+html.admin-mode .admin-shell .bd__kpi-dot--neutral { background: rgba(255,255,255,0.2); }
+
+html.admin-mode .admin-shell .bd__kpi-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--t3);
+  margin: 0;
+}
+html.admin-mode .admin-shell .bd__kpi-val {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--t);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html.admin-mode .admin-shell .bd__kpi--gold .bd__kpi-val { color: var(--gold); }
+html.admin-mode .admin-shell .bd__kpi--ok   .bd__kpi-val { color: var(--o-success); }
+html.admin-mode .admin-shell .bd__kpi--warn .bd__kpi-val { color: var(--o-warning); }
+html.admin-mode .admin-shell .bd__kpi--err  .bd__kpi-val { color: var(--o-danger); }
+html.admin-mode .admin-shell .bd__kpi-link {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--t);
+  text-decoration: none;
+  transition: color 0.12s;
+}
+html.admin-mode .admin-shell .bd__kpi-link:hover { color: var(--gold); }
+
+/* ── Section nav ── */
+html.admin-mode .admin-shell .bd__secnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 1px solid var(--o-admin-line);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(10,10,12,0.80);
+  overflow-x: auto;
+  padding: 0 16px;
+}
+html.admin-mode .admin-shell .bd__secnav-list {
+  display: flex;
+  gap: 2px;
+  padding: 6px 0;
+  min-width: max-content;
+}
+html.admin-mode .admin-shell .bd__secbtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: var(--o-r-lg);
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: var(--t3);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s, color 0.12s;
+}
+html.admin-mode .admin-shell .bd__secbtn:hover {
+  background: rgba(255,255,255,0.04);
+  color: var(--t2);
+}
+html.admin-mode .admin-shell .bd__secbtn--on {
+  background: rgba(215,184,110,0.10);
+  color: var(--gold);
+  border: 1px solid var(--o-admin-hair-gold);
+}
+
+/* ── Body ── */
+html.admin-mode .admin-shell .bd__body {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 48px;
+}
+
+/* ── Panel / Section ── */
+html.admin-mode .admin-shell .bd__pnl {
+  background: rgba(255,255,255,0.018);
+  border: 1px solid var(--o-admin-line);
+  border-radius: var(--o-r-xl);
+  padding: 18px 20px;
+  scroll-margin-top: 140px;
+}
+
+html.admin-mode .admin-shell .bd__pnl-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 8px;
+}
+html.admin-mode .admin-shell .bd__pnl-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--t);
+  margin: 0;
+}
+html.admin-mode .admin-shell .bd__pnl-count {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: var(--o-r-pill);
+  border: 1px solid var(--o-admin-line-2);
+  background: rgba(255,255,255,0.04);
+  color: var(--t3);
+}
+
+/* ── Data grid ── */
+html.admin-mode .admin-shell .bd__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+@media (min-width: 640px) {
+  html.admin-mode .admin-shell .bd__grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  html.admin-mode .admin-shell .bd__grid { grid-template-columns: repeat(3, 1fr); }
+}
+html.admin-mode .admin-shell .bd__grid--4 {}
+@media (min-width: 768px) {
+  html.admin-mode .admin-shell .bd__grid--4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  html.admin-mode .admin-shell .bd__grid--4 { grid-template-columns: repeat(4, 1fr); }
+}
+html.admin-mode .admin-shell .bd__grid--span2 { grid-column: span 2; }
+
+/* ── Field ── */
+html.admin-mode .admin-shell .bd__field-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--t3);
+  margin: 0 0 2px;
+}
+html.admin-mode .admin-shell .bd__field-val {
+  font-size: 13px;
+  color: var(--t);
+  margin: 0;
+}
+html.admin-mode .admin-shell .bd__field-val--em { font-weight: 600; }
+html.admin-mode .admin-shell .bd__field-link {
+  font-size: 13px;
+  color: var(--t2);
+  text-decoration: none;
+  transition: color 0.12s;
+}
+html.admin-mode .admin-shell .bd__field-link:hover { color: var(--t); text-decoration: underline; }
+
+/* ── Separator ── */
+html.admin-mode .admin-shell .bd__sep {
+  border: none;
+  border-top: 1px solid var(--o-admin-line);
+  margin: 12px 0 0;
+}
+
+/* ── Quick actions row ── */
+html.admin-mode .admin-shell .bd__quickacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+/* ── Pack card ── */
+html.admin-mode .admin-shell .bd__packcard {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--o-admin-line-2);
+  border-radius: var(--o-r-lg);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+html.admin-mode .admin-shell .bd__packcard-info { min-width: 0; flex: 1; }
+html.admin-mode .admin-shell .bd__packcard-type {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--t3);
+  margin: 0 0 3px;
+}
+html.admin-mode .admin-shell .bd__packcard-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--t);
+  text-decoration: none;
+  transition: color 0.12s;
+  display: block;
+}
+html.admin-mode .admin-shell .bd__packcard-name:hover { color: var(--gold); }
+html.admin-mode .admin-shell .bd__packcard-tag {
+  font-size: 12px;
+  color: var(--t2);
+  margin: 2px 0 0;
+}
+html.admin-mode .admin-shell .bd__packcard-meta {
+  font-size: 11px;
+  color: var(--t3);
+  margin: 4px 0 0;
+}
+html.admin-mode .admin-shell .bd__packcard-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+/* ── Extra rows ── */
+html.admin-mode .admin-shell .bd__extras { display: flex; flex-direction: column; gap: 6px; margin-top: 2px; }
+html.admin-mode .admin-shell .bd__extras-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--t2);
+  margin: 0 0 4px;
+}
+html.admin-mode .admin-shell .bd__extrarow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: var(--o-r-md);
+  background: rgba(255,255,255,0.015);
+  border: 1px solid var(--o-admin-line);
+}
+html.admin-mode .admin-shell .bd__extrarow-name { font-size: 13px; color: var(--t); }
+html.admin-mode .admin-shell .bd__extrarow-qty  { font-size: 11px; color: var(--t3); margin-top: 1px; }
+html.admin-mode .admin-shell .bd__extrarow-price { font-size: 13px; font-weight: 600; color: var(--t2); flex-shrink: 0; }
+
+html.admin-mode .admin-shell .bd__extrahours {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: var(--o-r-md);
+  margin-top: 6px;
+  background: rgba(215,184,110,0.04);
+  border: 1px solid var(--o-admin-hair-gold);
+}
+html.admin-mode .admin-shell .bd__extrahours-label { font-size: 13px; color: var(--t2); }
+html.admin-mode .admin-shell .bd__extrahours-val   { font-size: 13px; font-weight: 600; color: var(--gold); }
+
+/* ── Finances ── */
+html.admin-mode .admin-shell .bd__finrows { display: flex; flex-direction: column; gap: 2px; }
+html.admin-mode .admin-shell .bd__finrow {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  font-size: 13px;
+  color: var(--t2);
+}
+html.admin-mode .admin-shell .bd__finrow--total {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gold);
+  border-top: 1px solid var(--o-admin-line);
+  margin-top: 6px;
+  padding-top: 10px;
+}
+
+html.admin-mode .admin-shell .bd__paygrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 14px;
+}
+html.admin-mode .admin-shell .bd__paycell {
+  padding: 12px 14px;
+  border-radius: var(--o-r-lg);
+  border: 1px solid var(--o-admin-line);
+  background: rgba(255,255,255,0.02);
+}
+html.admin-mode .admin-shell .bd__paycell--ok {
+  border-color: rgba(62,197,123,0.28);
+  background: rgba(62,197,123,0.04);
+}
+html.admin-mode .admin-shell .bd__paycell--warn {
+  border-color: rgba(232,169,58,0.28);
+  background: rgba(232,169,58,0.04);
+}
+html.admin-mode .admin-shell .bd__paycell--err {
+  border-color: rgba(226,89,106,0.28);
+  background: rgba(226,89,106,0.04);
+}
+html.admin-mode .admin-shell .bd__paycell-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--t3);
+  margin: 0 0 4px;
+}
+html.admin-mode .admin-shell .bd__paycell-val {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--t);
+  margin: 0 0 3px;
+}
+html.admin-mode .admin-shell .bd__paycell--ok   .bd__paycell-val { color: var(--o-success); }
+html.admin-mode .admin-shell .bd__paycell--warn .bd__paycell-val { color: var(--o-warning); }
+html.admin-mode .admin-shell .bd__paycell--err  .bd__paycell-val { color: var(--o-danger); }
+html.admin-mode .admin-shell .bd__paycell-state {
+  font-size: 11px;
+  color: var(--t3);
+}
+
+/* ── Communication history table ── */
+html.admin-mode .admin-shell .bd__comtbl {
+  width: 100%;
+  border-collapse: collapse;
+  overflow-x: auto;
+  display: block;
+}
+html.admin-mode .admin-shell .bd__comtbl thead { display: table; width: 100%; table-layout: fixed; }
+html.admin-mode .admin-shell .bd__comtbl tbody { display: table; width: 100%; table-layout: fixed; }
+html.admin-mode .admin-shell .bd__comtbl th {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--t3);
+  padding: 4px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--o-admin-line);
+  font-weight: 600;
+}
+html.admin-mode .admin-shell .bd__comtbl td {
+  font-size: 12px;
+  color: var(--t2);
+  padding: 8px;
+  border-bottom: 1px solid var(--o-admin-line);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html.admin-mode .admin-shell .bd__comtbl tr:last-child td { border-bottom: none; }
+html.admin-mode .admin-shell .bd__comtbl tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* ── Timeline entries ── */
+html.admin-mode .admin-shell .bd__entries { display: flex; flex-direction: column; gap: 8px; }
+html.admin-mode .admin-shell .bd__entry {
+  background: rgba(255,255,255,0.018);
+  border: 1px solid var(--o-admin-line);
+  border-radius: var(--o-r-lg);
+  padding: 12px 14px;
+}
+html.admin-mode .admin-shell .bd__entry-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+@media (min-width: 640px) {
+  html.admin-mode .admin-shell .bd__entry-inner {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+html.admin-mode .admin-shell .bd__entry-main { min-width: 0; flex: 1; }
+html.admin-mode .admin-shell .bd__entry-eyebrow {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--t3);
+  margin: 0 0 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+html.admin-mode .admin-shell .bd__entry-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--t);
+  margin: 0;
+}
+html.admin-mode .admin-shell .bd__entry-body {
+  font-size: 12px;
+  color: var(--t3);
+  margin: 3px 0 0;
+}
+html.admin-mode .admin-shell .bd__entry-link {
+  font-size: 11px;
+  color: var(--o-info);
+  text-decoration: none;
+  margin-top: 5px;
+  display: inline-block;
+}
+html.admin-mode .admin-shell .bd__entry-link:hover { text-decoration: underline; }
+html.admin-mode .admin-shell .bd__entry-ts {
+  flex-shrink: 0;
+  text-align: right;
+  font-size: 11px;
+  color: var(--t3);
+}
+html.admin-mode .admin-shell .bd__entry-actor {
+  font-size: 10px;
+  color: var(--t3);
+  margin-top: 2px;
+}
+
+/* ── Post-event cards ── */
+html.admin-mode .admin-shell .bd__postevent {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}
+@media (min-width: 640px) {
+  html.admin-mode .admin-shell .bd__postevent { grid-template-columns: repeat(3, 1fr); }
+}
+html.admin-mode .admin-shell .bd__pecard {
+  padding: 12px 14px;
+  border-radius: var(--o-r-lg);
+  border: 1px solid var(--o-admin-line);
+  background: rgba(255,255,255,0.02);
+}
+html.admin-mode .admin-shell .bd__pecard--ok {
+  border-color: rgba(62,197,123,0.28);
+  background: rgba(62,197,123,0.04);
+}
+html.admin-mode .admin-shell .bd__pecard-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--t);
+  margin: 0 0 3px;
+}
+html.admin-mode .admin-shell .bd__pecard-val {
+  font-size: 12px;
+  color: var(--t3);
+  margin: 0;
+}
+
+/* ── Notes ── */
+html.admin-mode .admin-shell .bd__notes {
+  font-size: 13px;
+  color: var(--t2);
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+/* ── Customer history strip ── */
+html.admin-mode .admin-shell .bd__custstrip {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: var(--o-r-md);
+  background: rgba(255,255,255,0.015);
+  border: 1px solid var(--o-admin-line);
+  font-size: 12px;
+  color: var(--t3);
+}
+
+/* ── Dropdown "Més accions" ── */
+html.admin-mode .admin-shell .bd__dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 20;
+  min-width: 200px;
+  background: var(--raised);
+  border: 1px solid var(--o-admin-line-2);
+  border-radius: var(--o-r-lg);
+  box-shadow: var(--o-shadow-lg);
+  padding: 4px 0;
+}
+html.admin-mode .admin-shell .bd__dropdown-item {
+  display: block;
+  padding: 8px 14px;
+  font-size: 12px;
+  color: var(--t2);
+  text-decoration: none;
+  transition: background 0.12s;
+}
+html.admin-mode .admin-shell .bd__dropdown-item:hover {
+  background: rgba(255,255,255,0.04);
+  color: var(--t);
+}
+
+/* ── Empty state ── */
+html.admin-mode .admin-shell .bd__empty {
+  font-size: 13px;
+  color: var(--t3);
+}
+
+/* ── Page skeleton ── */
+html.admin-mode .admin-shell .bd__skel {
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: bd-skel-pulse 1.8s ease-in-out infinite;
+}
+html.admin-mode .admin-shell .bd__skel-bar {
+  height: 14px;
+  border-radius: var(--o-r-sm);
+  background: rgba(255,255,255,0.06);
+}
+html.admin-mode .admin-shell .bd__skel-bar:nth-child(1) { width: 25%; }
+html.admin-mode .admin-shell .bd__skel-bar:nth-child(2) { width: 55%; }
+html.admin-mode .admin-shell .bd__skel-bar:nth-child(3) { width: 80%; }
+@keyframes bd-skel-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}

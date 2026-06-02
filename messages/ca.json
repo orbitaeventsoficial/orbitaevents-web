@@ -1903,6 +1903,7 @@
     "tab_bodas": "Casaments",
     "tab_festes": "Festes",
     "tab_empresas": "Empresa",
+    "tab_animacio": "Animació",
     "extraHour": "Hora extra"
   },
   "pages": {
@@ -7314,6 +7315,91 @@
     "stats": {
       "yearsLabel": "Des de 2023",
       "responseTime": "2h"
+    }
+  },
+  "animacioProducts": {
+    "bingo-musical": {
+      "nom": "Bingo Musical",
+      "descripcio": [
+        "Els temazos sonen des del primer minut — sempre des de l'estribillo o la part que tothom reconeix, uns 15 segons cada un, rere rere, mentre el presentador porta l'energia.",
+        "Cada participant té el seu cartró i els seus gomets. El joc acumula fins a quatre línies alhora, i quan les quatre estan plenes, els guanyadors surten al davant per als reptes musicals. Tres rondes, cada cop diferent, mentre el públic canta i anima. Al final, un únic guanyador canta bingo.",
+        "Qui prefereixi no participar activament pot fer de jurat i decidir qui guanya els reptes."
+      ],
+      "inclou": [
+        "DJ professional",
+        "Presentador/a",
+        "Altaveus actius (sistema de so)",
+        "Cabina DJ, controladora i portàtil",
+        "Cartrons de bingo",
+        "Gomets per a tots"
+      ],
+      "noInclou": "* No inclou obsequis per als guanyadors — a càrrec de l'organització."
+    },
+    "batalla-musical": {
+      "nom": "Batalla Musical",
+      "descripcio": [
+        "Hora i mitja de competició musical. Els participants es divideixen en equips — noies contra nois, per taules, per edats o totalment aleatori — i s'enfronten en reptes: karaoke col·lectiu, endevina la cançó, ball, preguntes musicals, show talent...",
+        "Cada repte suma punts. Qui decideix qui guanya? El públic amb els aplaudiments, un jurat triat entre els assistents, o el presentador — s'adapta al moment. El qui no vulgui competir pot fer de jurat.",
+        "Al final, un sol equip s'emporta la Batalla Musical."
+      ],
+      "inclou": [
+        "DJ professional",
+        "Presentador/a",
+        "Altaveus actius (sistema de so)",
+        "Cabina DJ, controladora i portàtil",
+        "Materials dels reptes",
+        "Durada: 1h30"
+      ],
+      "noInclou": "* No inclou obsequis per als guanyadors — a càrrec de l'organització."
+    },
+    "dj": {
+      "nom": "Servei de DJ",
+      "descripcio": [
+        "DJ professional amb equip complet de so. Abans de l'event parlem: quin és el públic, quins moments no poden fallar, si hi ha cançons imprescindibles o gèneres a evitar. No treballem amb llistes genèriques.",
+        "Va bé sol (per al coctel o la festa) o com a complement a qualsevol proposta d'animació. Si voleu el DJ per a tot el dia, mireu el pack Boda Sencera."
+      ],
+      "inclou": [
+        "DJ professional",
+        "Altaveus actius (sistema de so)",
+        "Cabina DJ, controladora i portàtil",
+        "Il·luminació bàsica de pista",
+        "Muntatge i desmuntatge"
+      ],
+      "noInclou": ""
+    },
+    "sonoritzacio-cerimonia": {
+      "nom": "Sonorització de Cerimònia",
+      "descripcio": [
+        "El so de la cerimònia és el primer que els convidats escolten — i el que marca el to de tot el dia. Ens encarreguem del micròfon per a l'oficiant, el so ambient i la llista de cançons que haureu triat per a cada moment.",
+        "Entrada, lectura, firma i sortida: cada instant amb el seu so, sense feedback, sense silencis incòmodes, sense improvisació de darrera hora."
+      ],
+      "inclou": [
+        "Sistema de so adaptat a l'espai (interior o exterior)",
+        "Micròfon inalàmbric per a l'oficiant",
+        "Reproducció de llista musical personalitzada",
+        "Tècnic de so durant tota la cerimònia",
+        "Prova de so prèvia a l'arribada dels convidats",
+        "Muntatge i desmuntatge"
+      ],
+      "noInclou": "* No inclou música en directe (instrument/veu). Disponible com a servei addicional — consulteu-nos."
+    },
+    "boda-sencera": {
+      "nom": "Boda Sencera",
+      "descripcio": [
+        "Un sol equip per a tota la música del dia. Des de la cerimònia fins a l'últim ball, sense canvis de proveïdor, sense descoordinació, sense que ningú de vosaltres hagi d'estar pendent de res.",
+        "Cerimònia sonoritzada, coctel amb ambient i festa a tot gas. Si voleu afegir Bingo Musical o Batalla Musical, ho integrem al programa sense que el ritme es perdi.",
+        "Cada boda és diferent. Expliqueu-nos com us imagineu el dia i us fem una proposta a mida."
+      ],
+      "inclou": [
+        "Sonorització de cerimònia (micròfon + so)",
+        "Música de coctel / benvinguda",
+        "DJ per a la festa — cabina, controladora i portàtil",
+        "Il·luminació de pista LED",
+        "Coordinació amb el venue prèvia a l'event",
+        "Un sol punt de contacte per a tot el dia",
+        "Muntatge i desmuntatge"
+      ],
+      "noInclou": "* Bingo Musical o Batalla Musical disponibles com a complement. Descompte en pack — consulteu-nos."
     }
   }
 }

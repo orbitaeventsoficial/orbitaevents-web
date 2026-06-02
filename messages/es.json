@@ -2241,6 +2241,7 @@
     "tab_bodas": "Bodas",
     "tab_festes": "Fiestas",
     "tab_empresas": "Empresa",
+    "tab_animacio": "Animación",
     "extraHour": "Hora extra"
   },
   "experiences": {
@@ -7020,6 +7021,91 @@
     "stats": {
       "yearsLabel": "Desde 2023",
       "responseTime": "2h"
+    }
+  },
+  "animacioProducts": {
+    "bingo-musical": {
+      "nom": "Bingo Musical",
+      "descripcio": [
+        "Los temazos suenan desde el primer minuto — siempre desde el estribillo o la parte que todo el mundo reconoce, unos 15 segundos cada uno, seguido seguido, mientras el presentador lleva la energía.",
+        "Cada participante tiene su cartón y sus gomets. El juego acumula hasta cuatro líneas a la vez, y cuando las cuatro están llenas, los ganadores salen al frente para los retos musicales. Tres rondas, cada vez diferente, mientras el público canta y anima. Al final, un único ganador canta bingo.",
+        "Quien prefiera no participar activamente puede hacer de jurado y decidir quién gana los retos."
+      ],
+      "inclou": [
+        "DJ profesional",
+        "Presentador/a",
+        "Altavoces activos (sistema de sonido)",
+        "Cabina DJ, controladora y portátil",
+        "Cartones de bingo",
+        "Gomets para todos"
+      ],
+      "noInclou": "* No incluye obsequios para los ganadores — a cargo de la organización."
+    },
+    "batalla-musical": {
+      "nom": "Batalla Musical",
+      "descripcio": [
+        "Hora y media de competición musical. Los participantes se dividen en equipos — chicas contra chicos, por mesas, por edades o totalmente aleatorio — y se enfrentan en retos: karaoke colectivo, adivina la canción, baile, preguntas musicales, show talent...",
+        "Cada reto suma puntos. ¿Quién decide quién gana? El público con los aplausos, un jurado elegido entre los asistentes, o el presentador — se adapta al momento. Quien no quiera competir puede hacer de jurado.",
+        "Al final, un solo equipo se lleva la Batalla Musical."
+      ],
+      "inclou": [
+        "DJ profesional",
+        "Presentador/a",
+        "Altavoces activos (sistema de sonido)",
+        "Cabina DJ, controladora y portátil",
+        "Materiales de los retos",
+        "Duración: 1h30"
+      ],
+      "noInclou": "* No incluye obsequios para los ganadores — a cargo de la organización."
+    },
+    "dj": {
+      "nom": "Servicio de DJ",
+      "descripcio": [
+        "DJ profesional con equipo completo de sonido. Antes del evento hablamos: qué público es, qué momentos no pueden fallar, si hay canciones imprescindibles o géneros a evitar. No trabajamos con listas genéricas.",
+        "Funciona solo (para el cóctel o la fiesta) o como complemento a cualquier propuesta de animación. Si queréis el DJ para todo el día, mirad el pack Boda Completa."
+      ],
+      "inclou": [
+        "DJ profesional",
+        "Altavoces activos (sistema de sonido)",
+        "Cabina DJ, controladora y portátil",
+        "Iluminación básica de pista",
+        "Montaje y desmontaje"
+      ],
+      "noInclou": ""
+    },
+    "sonoritzacio-cerimonia": {
+      "nom": "Sonorización de Ceremonia",
+      "descripcio": [
+        "El sonido de la ceremonia es lo primero que los invitados escuchan — y lo que marca el tono de todo el día. Nos encargamos del micrófono para el oficiant, el sonido ambiente y la lista de canciones que habréis elegido para cada momento.",
+        "Entrada, lectura, firma y salida: cada instante con su sonido, sin feedback, sin silencios incómodos, sin improvisación de última hora."
+      ],
+      "inclou": [
+        "Sistema de sonido adaptado al espacio (interior o exterior)",
+        "Micrófono inalámbrico para el oficiant",
+        "Reproducción de lista musical personalizada",
+        "Técnico de sonido durante toda la ceremonia",
+        "Prueba de sonido previa a la llegada de los invitados",
+        "Montaje y desmontaje"
+      ],
+      "noInclou": "* No incluye música en directo (instrumento/voz). Disponible como servicio adicional — consultadnos."
+    },
+    "boda-sencera": {
+      "nom": "Boda Completa",
+      "descripcio": [
+        "Un solo equipo para toda la música del día. Desde la ceremonia hasta el último baile, sin cambios de proveedor, sin descoordinación, sin que ninguno de vosotros tenga que estar pendiente de nada.",
+        "Ceremonia sonorizada, cóctel con ambiente y fiesta a tope. Si queréis añadir Bingo Musical o Batalla Musical, lo integramos en el programa sin que el ritmo se pierda.",
+        "Cada boda es diferente. Contadnos cómo os imagináis el día y os hacemos una propuesta a medida."
+      ],
+      "inclou": [
+        "Sonorización de ceremonia (micrófono + sonido)",
+        "Música de cóctel / bienvenida",
+        "DJ para la fiesta — cabina, controladora y portátil",
+        "Iluminación de pista LED",
+        "Coordinación con el venue previa al evento",
+        "Un solo punto de contacto para todo el día",
+        "Montaje y desmontaje"
+      ],
+      "noInclou": "* Bingo Musical o Batalla Musical disponibles como complemento. Descuento en pack — consultadnos."
     }
   }
 }

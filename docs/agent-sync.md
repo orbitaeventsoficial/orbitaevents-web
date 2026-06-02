@@ -15,6 +15,16 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-02 [ESTAT: treballant]
+Últim canvi: #852 (fitxa lead completa reconstruïda).
+Proper pas previst: #853 — migrar `/admin/tasks` a Brass & Obsidian (`task-design.css`, prefix `tk__`).
+Avís per codex: no tocar `app/admin/tasks/`.
+
+[claude] 2026-06-01 [ESTAT: tancat]
+Últim canvi: #850 (`/admin/leads/reengagement` migrada a Brass & Obsidian — `lr__`).
+Proper pas previst: el domini Leads ja és completament 🟢 (Leads + fitxa + re-engagement). Segueix Tasques o el que indiqui el propietari.
+Avís per codex: reengagement.css + page.tsx + LeadReengagementClient.tsx modificats. Inventari Lead re-engagement 🟢.
+
 [claude] 2026-05-26 [ESTAT: tancat]
 Últim canvi: #794 (meteo real per al calendari de leads: `getWeatherForEvent` a `weatherService`, cache 1h, OWM 5-day forecast, graceful fallback).
 Proper pas previst: pendent decisió propietari — #5 suggeriments (`PipelineSuggestionsPanel`), #6 prioritat inline (`LeadQuickPriority`). Migrar la propera pàgina de l'inventari general (`/admin/bookings`?) o seguir polint `/admin/leads`.
@@ -65,6 +75,10 @@ Avís per codex: #826 (ingesta 🤝 + hora fi). #827 (animació: nova categoria 
 ## Bloc CODEX (Codex CLI)
 
 <!-- codex: actualitza aquest bloc quan comencis/acabis una sessió -->
+[codex] 2026-06-01 [ESTAT: tancat]
+Últim canvi: #848 tancat: fitxa interna de `/admin/leads` recuperada dins el canvas nou, `qa:protocol` net i captura Playwright generada.
+Proper pas previst: si el propietari continua amb `seguim`, revisar el següent front accionable del protocol després de `validate:core`.
+Avís per l'altre agent: perímetre tocat: `app/admin/leads/LeadsSeasonClient.tsx`, `app/admin/leads/leads-design.css`, `app/studio-lab/leads/page.tsx`, protocol/diari/inventari. No he tocat schema ni serveis.
 [codex] 2026-05-25 [ESTAT: tancat]
 Últim canvi: #779 (`/studio` v0.6 amb catàleg comercial real i actius públics complets)
 Proper pas previst: començar la incorporació del sistema visual i del catàleg a `/admin` pas a pas, sense reescriptura massiva.

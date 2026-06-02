@@ -1,5 +1,5 @@
+import './reengagement.css';
 import Link from 'next/link';
-import { AdminPage } from '../../components/AdminPage';
 import { loadReengagementCandidates } from '@/lib/services/leadReengagementService';
 import LeadReengagementClient from './LeadReengagementClient';
 
@@ -12,26 +12,31 @@ export const metadata = {
 export default async function LeadReengagementPage() {
   const candidates = await loadReengagementCandidates();
 
-  // Serialize dates for client component
   const serialized = candidates.map((c) => ({
     ...c,
     eventDate: c.eventDate ? c.eventDate.toISOString() : null,
   }));
 
   return (
-    <AdminPage
-      title="Reengagement de leads"
-      subtitle="Leads dormants, pressupostos sense resposta i negociacions refredades"
-      actions={
-        <Link
-          href="/admin/leads"
-          className="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"
-        >
-          ← Tornar al pipeline
-        </Link>
-      }
-    >
+    <div className="lr__root">
+      <div className="lr__header">
+        <div className="lr__hero">
+          <div className="lr__breadcrumb">
+            <Link href="/admin/leads" className="lr__back">Agenda</Link>
+            <span className="lr__bread-sep">›</span>
+            <span>Reengagement</span>
+          </div>
+          <div className="lr__toprow">
+            <div>
+              <p className="lr__eyebrow">Leads</p>
+              <h1 className="lr__h1">Reengagement</h1>
+              <p className="lr__subtitle">Leads dormants, pressupostos sense resposta i negociacions refredades</p>
+            </div>
+            <Link href="/admin/leads" className="lr__btn">← Tornar al pipeline</Link>
+          </div>
+        </div>
+      </div>
       <LeadReengagementClient initialCandidates={serialized} />
-    </AdminPage>
+    </div>
   );
 }

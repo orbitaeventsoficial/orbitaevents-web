@@ -66,6 +66,8 @@ export async function updateLeadFromInput(id: string, input: LeadPatchInput): Pr
       id: true,
       status: true,
       contactedAt: true,
+      customerId: true,
+      booking: { select: { id: true } },
     },
   });
 
@@ -111,6 +113,36 @@ export async function updateLeadFromInput(id: string, input: LeadPatchInput): Pr
       updatedAt: true,
     },
   });
+
+  // Sincronització automàtica — jerarquia canònica de fonts:
+  //   CONTACTE: Customer.phone/email/name és la font de veritat.
+  //             Lead.phone/email/name sincronitza cap a Customer.
+  //             Booking.clientPhone/clientEmail/clientName és snapshot immutable (no s'actualitza).
+  //   BOLO:     Lead.event* → Booking.event* (sí s'actualitzen).
+  //             Lead.eventPhone és específic del dia del bolo (no és el telèfon del client).
+  const contactFields: Record<string, string> = { name: 'name', email: 'email', phone: 'phone' };
+  const bookingFields: Record<string, string> = {
+    eventDate: 'eventDate', eventStartTime: 'eventStartTime', eventEndTime: 'eventEndTime',
+    eventLocation: 'eventLocation', guestCount: 'guestCount',
+    eventPhone: 'eventPhone', eventAddress: 'eventAddress',
+  };
+
+  const customerUpdate: Record<string, unknown> = {};
+  const bookingUpdate: Record<string, unknown> = {};
+
+  for (const [field, value] of Object.entries(body)) {
+    if (contactFields[field]) customerUpdate[contactFields[field]] = value;
+    if (bookingFields[field]) bookingUpdate[bookingFields[field]] = value;
+  }
+
+  await Promise.all([
+    existing.customerId && Object.keys(customerUpdate).length > 0
+      ? prisma.customer.update({ where: { id: existing.customerId }, data: customerUpdate })
+      : null,
+    existing.booking?.id && Object.keys(bookingUpdate).length > 0
+      ? prisma.booking.update({ where: { id: existing.booking.id }, data: bookingUpdate })
+      : null,
+  ].filter(Boolean));
 
   await prisma.adminLog.create({
     data: {

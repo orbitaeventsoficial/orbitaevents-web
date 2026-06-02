@@ -16,6 +16,7 @@ import { mapLeadEventType, normalizeQuoteLocale, parseDateOrNull } from '@/lib/s
 import { ensureQuoteFollowUpTask } from '@/lib/services/tasks/quoteFollowUp';
 import { recordCustomerQuoteSent } from '@/lib/services/customerActivityService';
 import { recordLeadQuoteSent } from '@/lib/services/leadActivityService';
+import { calcVatAmount, roundMoney } from '@/lib/constants/pricing';
 
 type ExtraInput = {
   name?: string;
@@ -220,6 +221,7 @@ export async function sendAdminQuoteEmail(body: AdminQuoteEmailPayload | undefin
   const packData = { ...packDataBase, price };
   const quoteExtras = await normalizeExtras(extras, resolvedLocale);
 
+  const fallbackVat = calcVatAmount(price, true);
   const quoteData = lead
     ? createQuoteFromLead(lead, packData, quoteExtras)
     : {
@@ -236,8 +238,8 @@ export async function sendAdminQuoteEmail(body: AdminQuoteEmailPayload | undefin
         extraHourPrice: packData.extraHourPrice,
         extras: quoteExtras || [],
         subtotal: price,
-        iva: price * 0.21,
-        total: price * 1.21,
+        iva: fallbackVat,
+        total: roundMoney(price + fallbackVat),
         quoteNumber: '',
         notes: undefined as string | undefined,
         validUntil: new Date(Date.now() + template.validityDays * 24 * 60 * 60 * 1000),

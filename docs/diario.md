@@ -1,3 +1,562 @@
+## 2026-06-02 — Canvi #854: Auditoria canònica de preus, IVA i senyal (codex)
+
+### Context
+Revisió tècnica transversal per evitar constants de preu/fiscalitat duplicades i fonts de veritat contradictòries. Objectiu: una única font per IVA, senyal, arrodoniment monetari i defaults de factura.
+
+### Canvis
+- `lib/constants/pricing.ts`: font canònica per `VAT_RATE_INVOICE`, `VAT_RATE_NO_INVOICE`, `DEPOSIT_RATIO`, `DEPOSIT_PERCENT`, `roundMoney`, `calcVatAmount`, `calcVatRate`, `calcDeposit`.
+- Nova reserva admin: resum, toggle factura, submit i servei de creació usen constants compartides.
+- Pressupostos, contractes, documents HTML i emails de pressupost deixen de calcular IVA amb `0.21`/`1.21` locals.
+- `bookingRouteService` recalcula IVA, total, senyal i restant amb helpers canònics i arrodoniment monetari.
+- `publicBookingService`, `quickCreateFlow`, API de pressupostos, `PresupuestoPdfStudio`, `seed.ts` i `recalculate-margins.ts` alineats amb constants compartides.
+- Prisma: `Booking.invoiceRequired` i `Booking.vatRate` tenen defaults coherents amb "sense factura" per defecte. Nova migració `20260602120000_booking_invoice_defaults`.
+- `leadRouteService`: documentada la jerarquia canònica de contacte: `Customer` com a font viva, `Lead` sincronitzat i `Booking.client*` com a snapshot.
+- `ADMIN_CHANGE_COUNTER` 853 → 854.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` 0 errors; `pnpm run qa:protocol` OK.
+- Validació funcional: pendent browser.
+- Validació humana/UX: pendent propietari.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+## 2026-06-02 — Canvi #853: Millores fitxa lead + preu pactat + IVA condicional + rendibilitat (claude)
+
+### Context
+Continuació de la fitxa del lead. Preu personalitzat al formulari de nova reserva, IVA condicional (0% per defecte, 21% si vol factura), càlcul de rendibilitat real (€/hora per hores reals inici-fi), edició del total directament des de la fitxa del lead.
+
+### Canvis
+- `BookingPackExtrasSection`: camp "Preu pactat" + toggle "Vol factura (+21% IVA)".
+- `useBookingPricing`: respecta `customPackPrice` i `invoiceRequired` (vatRate 0 o 21).
+- `useNewBookingSubmit`: passa `customPackPrice` i `invoiceRequired` al backend.
+- `bookingCreationService`: usa `customPackPrice` si existeix, `vatRate` 0 o 21 per `invoiceRequired`.
+- `BookingTotalEditor`: component client per editar el total d'una reserva inline.
+- `LeadDetailClient`: panell Rendibilitat amb €/hora (hores reals inici-fi), cost col·laborador (si assignat + efectiu), `BookingTotalEditor` per editar total des de la fitxa del lead.
+- API routes: `customPackPrice`, `invoiceRequired` acceptats.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: pendent browser.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-06-02 — Canvi #852: Fitxa lead completa reconstruïda — fxd__fullpage, panells reorganitzats, schema eventPhone/eventAddress/paymentMethod (claude)
+
+### Context
+El propietari vol la fitxa de lead completa (`/admin/leads/[id]`) igual que la fitxa ràpida: sense scroll, tot visible, editable inline. Nova arquitectura de dades: eventPhone, eventAddress a leads i bookings; paymentMethod, invoiceRequired, cashAmount a bookings.
+
+### Canvis
+- Schema: `eventPhone` + `eventAddress` a `Lead` i `Booking`; `paymentMethod` + `invoiceRequired` + `cashAmount` a `Booking`. Migracions aplicades a Railway.
+- `LeadDetailClient.tsx`: reconstruït amb `fxd__fullpage` (position fixed, sense scroll). 6 panells en 3×2: Fase | Contacte | Dades del bolo / Cobraments | Forma pagament | Econòmic. Tots els camps editables inline (clica → edita → Enter). Assignat a col·laboradors de la BD. Sincronització automàtica lead→client→reserva al guardar.
+- `leads-design.css`: `fxd__fullpage` fixed 236px offset sidebar, `fxd__grid` omplint alçada, textos truncats.
+- `leadRouteService.ts`: sincronització automàtica lead→client (nom/tel/email) i lead→reserva (data/hora/lloc/pax).
+- API route lead PATCH: nous camps acceptats. API route booking PATCH: paymentMethod/invoiceRequired/cashAmount/eventPhone/eventAddress/eventStartTime/eventEndTime.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: captura Playwright 1920×1080 — 6 panells visibles sense scroll.
+- Validació humana/UX: pendent confirmació propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-06-01 — Canvi #851: Fix regressió lp2__* — classes perdudes al #846 recuperades (claude)
+
+### Context
+Bug: `/admin/leads/[id]` mostrava elements sense estil (símbol gegant) perquè `leads-design.css` va ser reescrit des de zero al #846 (canvas Agenda) i va eliminar totes les classes `lp2__*` que la fitxa de lead encara utilitza.
+
+### Canvis
+- `app/admin/leads/leads-design.css`: afegit bloc `lp2__` complet al final del fitxer: bar, back, buttons (prim/sec), hero, exec KPIs, layout (main/decision), panel, h, booking cards, bookfields, post-event, bookacts, tones (ok/warn/bad), rows, misc (mono-xs, link-gold, empty, histitem).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors; `pnpm run validate:core` verd.
+- Validació funcional: la fitxa de lead ha de mostrar correctament la reserva associada sense elements gegants.
+- Validació humana/UX: pendent confirmació visual propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-06-01 — Canvi #850: Migració /admin/leads/reengagement a Brass & Obsidian — reengagement.css + lr__ prefix (claude)
+
+### Context
+El propietari vol acabar leads primer. Última pàgina 🔴 del domini leads: `/admin/leads/reengagement`.
+
+### Canvis
+- `reengagement.css` nou (prefix `lr__`): header, KPIs prioritat, filtres motiu, cards candidats, missatge desplegable, botons d'acció.
+- `page.tsx` reescrit: `AdminPage` eliminat, shell `lr__root`.
+- `LeadReengagementClient.tsx` reescrit: totes les classes Tailwind de color substituïdes per `lr__`. `mailto:` → `buildLeadComposeHref(leadId, 'seguiment')`. Lògica de filtres i accions conservada intacta.
+- Inventari: Lead re-engagement 🔴→🟢.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors; `pnpm run validate:core` tots els guards verds.
+- Validació funcional: pendent browser (servidor local actiu).
+- Validació humana/UX: pendent confirmació visual propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-06-01 — Canvi #849: Migració /admin/bookings/[id] a Brass & Obsidian — booking-detail.css + bd__ prefix (claude)
+
+### Context
+Fase 1 de la migració Frankenstein admin (§6.19). Amb Leads + Clientes + Inbox migrats, el SEGÜENT en ordre de Fase 1 era la Reserva detall. La pàgina usava el disseny vell complet (`AdminPage`, `ap-card`, `ap-btn`, `admin-tone-*`).
+
+### Canvis
+- Nou `booking-detail.css` (prefix `bd__`): header sticky, KPI bar (5 indicadors), secnav, panels, pack cards, finances, timeline, comunicacions, post-event, dropdown, skeleton.
+- `page.tsx` reescrit: `AdminPage` eliminat, shell `bd__root`, header sticky amb KPI bar integrada. Sub-components conservats.
+- `BookingSectionNav.tsx` simplificat: `bd__secnav/bd__secbtn`.
+- `loading.tsx` simplificat: skeleton `bd__skel`.
+- Inventari: Reserva detall 🔴→🟢.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors; `pnpm run validate:core` tots els guards verds.
+- Validació funcional: pendent browser (server local actiu).
+- Validació humana/UX: pendent confirmació visual propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-06-01 — Canvi #848: Passades visuals Opus + Federico sobre /admin/leads — pipeline, calendari, llista (claude+opus)
+
+### Context
+Passades de qualitat visual sobre la pàgina reconstruïda (#846). Opus replanteja tot el sistema (or només per a diners, jerarquia operativa). Federico fa dues passades crítiques sobre cards de pipeline, llegenda, llista i ritme tipogràfic.
+
+### Canvis
+- Or disciplinat: eyebrow, toggle i mesos deixen de ser daurats. Or reservat a: xifres de valor, botó "+ Nova entrada", total temporada.
+- Focus: vora esquerra 4px d'estat, gradient tenyit d'estat, label d'acció amb color fort.
+- Mètriques: jerarquia label-sobre-xifra, total temporada amb fons or tènue propi.
+- Calendari: llegenda de panell → hairline sense caixa, primer mes amb vora or gruixuda.
+- Pipeline: lanes amb hairline superior d'estat, cards amb gradient 165°, barra prob sense glow.
+- Llista: nansa cromàtica d'estat a l'esquerra (coherència entre les 3 vistes).
+- Fitxa interna del lead reconstruïda per Codex dins el canvas nou: overlay `fxd__*` en clicar una cel·la/card/fila, KPIs, dades del bolo, contacte, següent pas, canvi de fase, WhatsApp/correu, "Fitxa completa", crear/obrir reserva i accions de cobrament inline.
+- Fix: `color-mix(in oklab, var(--cell-t, var(--t2)) ...)` → token intermedi `--cell-t` a `.fx-root`.
+- Fix: `font-weight: 750/850` → 700/800 (compatibilitat PostCSS).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; servidor local `http://127.0.0.1:3000` actiu; `/admin/leads` autenticat retorna 200; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: Playwright headless obre `/admin/leads`, clica la primera entrada (`Kimera`) i confirma `.fxd__sheet` visible amb accions `Crear reserva` i `Marcar perdut`.
+- Validació humana/UX: captura `.codex-captures/admin-leads-detail-codex.png`; la fitxa ja no és cul-de-sac visual després del #846/#848 i mostra accions de propietari sense sortir del workspace.
+- Començat per: claude + opus
+- Treballant per: claude + opus + codex
+- Tancat per: codex
+
+---
+## 2026-05-31 — Canvi #846: Reconstrucció peça a peça de /admin/leads — canvas negre → capçalera → focus → mètriques → calendari → pipeline + llista (claude)
+
+### Context
+L'usuari demana buidar completament la pàgina `/admin/leads` i reconstruir-la peça a peça amb criteri de simplificació i reducció de soroll. Diversos cicles de revisió visual amb Opus per tipografia i ritme de cel·les.
+
+### Canvis principals
+- Nav fix: ítem "Agenda" dins grup "Agenda" → renomenat a "Temporada" (eliminació de duplicitat).
+- `LeadsSeasonClient.tsx` buidat a canvas negre mantenint tota la lògica, hooks i tipus.
+- `leads-design.css` reescrit des de zero, tokens autosuficients (`.fx-root.is-contrast`).
+- Peça 1 — Capçalera: eyebrow "TEMPORADA 2026", H1 "Caps de setmana", rang mesos, "+ Nova entrada", toggle Calendari/Pipeline/Llista.
+- Peça 2 — Focus: targeta compacta d'una línia (dot + acció + nom + meta + valor + cicle). Sense eyebrow, sense ring. Label d'acció (`CAL CONTACTAR`, `SEGUIMENT PRIORITARI`, etc.) en mono uppercase.
+- Peça 3 — Mètriques: barra horitzontal de 4 dades (Entrades / Pipeline / Guanyat / Temporada). Últim valor en or.
+- Peça 4 — Vista Calendari: barra de mesos, grid 3 mesos, cel·les lliures/ocupades, tooltips CSS pur (`data-tip`) amb estil corporatiu.
+- Peça 5 — Vista Pipeline + Llista: 4 carrils D&D, cards amb probabilitat i valor; taula ordenada per data.
+- Fix crític: `color-mix(in oklab, var(--cell-t, var(--t2)) 62%, transparent)` — var() imbricat trencava el PostCSS i deixava tota la fulla CSS sense servir. Substituït per token amb fallback a `.fx-root`.
+- Normalitzats `font-weight: 750/850` → 700/800 per compatibilitat PostCSS.
+- Passada tipogràfica Opus: ritme de caps de setmana (row-gap entre blocs), dia lliure `opacity: 0.22→0.4`, nom del bolo a 15.5px display com a peça principal.
+
+### Validació
+- Validació tècnica: npx tsc --noEmit 0 errors.
+- Validació funcional: calendari, pipeline i llista renderitzen dades reals de la BD.
+- Validació humana/UX: pendent confirmació visual completa de l'usuari (fitxa de lead pendent).
+- Treballat per: claude + opus (passades tipogràfiques)
+- Tancat per: obert (fitxa lead pendent)
+
+---
+## 2026-05-29 — Canvi #845: Auditoria sencera fusió Agenda — neteja CSS, polit estètic, fix mètriques (claude)
+
+### Context
+L'usuari demana auditoria exigent ("fora tot el soroll, deixant el tema millor que mai, css esborra tot el soroll de merda que no fa res") sobre l'arc fusió Agenda #836-#844. Treballat com Opus Max amb via lliure total.
+
+### Cleanup CSS
+- leads-design.css: 652 → 579 línies. 19 classes mortes eliminades — tot el bloc del shell vell (.fx, .fx::before/::after, .fx__brand, logo, gic, search, searchic, kbd, meav, workspace, side, sidenav, sidegroup, sideitem, sidesub, sideactions, sidefoot, sidefootname, change, addic). Bloc responsive del shell tambe ara redundant.
+- nb-design.css: 161 → 151 línies. 5 classes mortes (nb__panel--banner, nb__leadbanner-meta, nb__field--wide, nb__select, nb__title-row).
+- admin-shell.css: -2 línies. 1 classe morta (ax__addic).
+
+### Polit visual
+- 3 literals rgba/hex daurats substituïts per color-mix amb var(--gold).
+- Inline style mogut a classe (.fx__focusmain--empty).
+- Capçalera compactada: padding 22/16 → 20/14, h1 40px → 36px amb letter-spacing més tipogràfic, subtitle de t2 → t3 per jerarquia.
+
+### Fix mètriques €0
+Bug visible: les 4 mètriques (Pipeline obert / Guanyat / Valor temporada) mostraven 0€ tot i tenir leads guanyats amb budget. Causa: el servei només mirava lead.proposals.total, mai el budget del lead ni booking.total.
+- seasonCalendarService.loadSeasonCalendar: el select afegeix lead.budget i booking.total.
+- estimatedValue ara és cascada: booking.total ?? proposals[0].total ?? parseBudgetAmount(budget).
+- Nou helper pur exportat parseBudgetAmount(string): parser robust ("300", "300€", "1.200,50", "1,200.50", "no ho sé"). Detecta separador europeu vs americà, retorna null si no troba xifres.
+- +7 tests a seasonCalendarService.test.ts (16 → 23, tots verds).
+- Resultat: PIPELINE OBERT 225€ (Eric Conchillo) · GUANYAT 500€ (Kimera 300 + Sabadell 200) · VALOR TEMPORADA 1.325€ (abans tot 0€).
+
+### Polit UX NewBookingForm
+- Breadcrumb duplicat "Reserves / Reserves / Nova reserva" → "Lead / Nova reserva" segons context.
+- Back button intel·ligent: "Lead"/"Client"/"Agenda" segons d'on véns.
+- Salt natural en cancel·lar des d'un lead: tornes al lead, no a la llista vella.
+
+### Captures
+24 PNG a .codex-captures/audit-{before,after,final}-{desktop,mobile}-{agenda-cal,agenda-pipe,leadpage,newbook}.png. Documenten abans/durant/final.
+
+### Validació
+- Validació tècnica: npx tsc --noEmit 0 errors; pnpm run validate:core verd; pnpm test:run seasonCalendarService 23/23 verd.
+- Validació funcional: parser de budget cobert per tests; mètriques confirmades visualment.
+- Validació humana/UX: confirmada per captures abans/després; diferència visual clara.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+## 2026-05-29 — Canvi #844: Fase D — Agenda + retirar bookings del nav + inventari (claude)
+
+### Context
+Tancament de l'arc fusió Leads+Reserves+Calendari (#836-#843). Workspace unificat passa a tenir nom propi i les rutes velles surten del nav.
+
+### Canvi
+- D1 — Nom: "Agenda" aplicat com a nom de treball. Sidebar grup pipeline → agenda; primer ítem "Agenda" (URL /admin/leads). Eyebrow "Agenda · Temporada YYYY"; breadcrumb intern "Agenda / Temporada / {nom}".
+- D2 — Retirar del nav: l'ítem "Reserves" eliminat del grup Events (renomenat a "Operativa"). URLs /admin/bookings i /admin/calendario segueixen accessibles. getGroupForPath: bookings/calendario marquen Agenda al sidebar.
+- D3 — Inventari (docs/admin-inventari-pagines.md):
+  - Reserves (llista) /admin/bookings: 🔴 → 🟢 (absorbida).
+  - Nova reserva /admin/bookings/new: 🔴 → 🟢 (#842+#843).
+  - Calendari /admin/calendario: 🔴 → 🟢 (absorbit).
+  - Reserva detall /admin/bookings/[id]: encara 🔴 (disseny vell pendent).
+  - Calendari capacitat: encara 🔴 (decidir si recuperar dins Agenda).
+
+### Validació
+- Validació tècnica: npx tsc --noEmit 0 errors; pnpm run validate:core verd.
+- Validació funcional: grup agenda apareix al sidebar; mapping per bookings i calendari verificat al codi.
+- Validació humana/UX: pendent — l'usuari decideix demà si manté "Agenda" o vol un altre nom (Bolos, Temporada, Esdeveniments...).
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+## 2026-05-29 — Canvi #843: Polish post-migració NewBookingForm — packs amb servei + extras humanitzats (claude)
+
+### Context
+Tancament dels 2 TODO descoberts amb la migració #842: packs amb noms "duplicats" (Bàsic/Premium repetits a 3 serveis) i extras amb keys d'i18n crues a la UI (services.mobile.extras.<slug>.name).
+
+### Canvi
+- Packs:
+  - Nou export SERVICE_LABELS a lib/constants/index.ts (Bodes/Discomòbil/Empreses/Festes/Animació).
+  - BookingPack guanya service?: string | null (ja venia per spread, calia al tipus).
+  - BookingPackExtrasSection: serviceLabelOf() + eyebrow .nb__packservice (mono uppercase daurat) sobre cada card. Resultat: BODES/DISCOMÒBIL/EMPRESES com a context dels noms.
+- Extras:
+  - Helpers purs a useNewBookingInitialData: kebabToLabel + humaniseExtraLabel(name, slug, id) que detecta i extreu el slug del patró i18n del configurador.
+  - Substituït name: String(item.name || item.slug || Extra) per humaniseExtraLabel(...).
+  - Resultat: "Hora Extra", "Caps Mobils Extra", "Micro Inalambric" (l'accent es perd perquè surt del slug; quan el configurador tingui name resolt al JSON, vindran amb accent).
+- CSS: nou .nb__packservice amb opacitat 0.85 → 1 quan .is-on.
+
+### Validació
+- Validació tècnica: npx tsc --noEmit 0 errors; pnpm run validate:core verd; verificació real al DOM via Playwright headless — packservice values OK (Bodes/Discomòbil/Empreses), extras names OK (Hora Extra/Caps Mobils Extra/Micro Inalambric).
+- Validació funcional: helpers (kebabToLabel, humaniseExtraLabel, serviceLabelOf) purs sense dependència d'I/O — testables fàcilment.
+- Validació humana/UX: pendent confirmació final de l'usuari; DOM real ja confirma els labels.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+## 2026-05-28 — Canvi #842: Migració /admin/bookings/new sencer a Brass & Obsidian (claude)
+
+### Context
+Durant la prova del flux de la fusió Leads+Reserves (#836-#841), l'usuari ha detectat visualment que la pàgina de nova reserva era un nyap del Frankenstein vell: Tailwind + AdminPage + cards d'event en colors primaris vermell/blau/taronja, sense layout 2 cols, scroll infinit i missatge tècnic GOOGLE_MAPS_API_KEY_NOT_CONFIGURED visible. Llum verda total: "jo et pago i poso opus max perquè em donis la millor web possible, endavant tens via lliure".
+
+### Canvi
+- Nou app/admin/bookings/nb-design.css (~180L): sistema nb__* complet consumint tokens Studio. Shell, panells, fields, chips d'event, packs, extras, travel, pricing sticky, CTA, conflict, loading. Responsive 1100/760. Cap hex.
+- NewBookingForm reescrit: AdminPage substituït per shell nb-root + top bar + hero + layout 2 cols (main + aside sticky amb pricing + CTA daurada). Hooks intactes.
+- BookingClientEventSection reescrit: chips d'event monocromàtics daurats (eliminats colors primaris admin-tone-*). Helper pur humaniseDistanceMessage() tradueix l'error tècnic de Google Maps a un missatge usable.
+- BookingPackExtrasSection reescrit: cards nb__pack amb jerarquia clara (nom display + preu daurat mono), extras com a llista compacta nb__extras.
+- BookingTravelDiscountSection reescrit: nb__travel grid 3 cel·les, descompte+codi i notes en panells consistents.
+- BookingPricingSummary reescrit: panell nb__price per al sidebar sticky, tipografia mono tabular, total prominent daurat, marge en panell amb vora dashed.
+
+### Captures
+- .codex-captures/newbooking-{desktop|mobile}-{viewport|full}.png · abans (Frankenstein, colors primaris, scroll) i després (Brass & Obsidian, 2 cols, sticky CTA, monocromàtic daurat).
+
+### Validació
+- Validació tècnica: npx tsc --noEmit 0 errors; pnpm run validate:core verd; HTTP smoke /admin/bookings/new?leadId=... 200; marcadors compilats al bundle (16 nb__field, 13 nb__input, 5 nb__pack, 8 nb__panel, 5 nb__price, etc.).
+- Validació funcional: tots els hooks (useNewBookingInitialData, useNewBookingSubmit, useBookingDiscountValidation, useBookingDistance, useBookingDateConflicts, useBookingPricing) intactes; lògica del formulari conservada al 100%. Smoke amb leadId de Kimera retorna 200 i marcadors complets.
+- Validació humana/UX: confirmada visualment via captures de Playwright (desktop 1440x900 i mobile 390x844).
+
+### TODO preexistents (NO introduïts per aquest canvi, ara evidents)
+- Extras mostren keys i18n crues (serveis.mobile.extres.*-name) — el resolver d'extras admin no carrega traduccions. Atacar a canvi a part.
+- Hi ha packs amb noms duplicats ("Bàsic", "Premium" repetits) — possibles entrades duplicades a la BD o resolution ambigua. Atacar a canvi a part.
+
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+## 2026-05-28 — Canvi #841: Fusió Leads+Reserves — tanca la cadena, després de crear reserva es torna al workspace nou (claude)
+
+### Context
+Després del #837, el botó "Crear reserva ara" al panell del lead enviava al formulari pre-omplit (NewBookingForm ja accepta leadId i preomple via useNewBookingInitialData), però en finalitzar el submit el redirect anava a la fitxa de booking vella (/admin/bookings/[id]). L'usuari sortia del workspace nou just quan més calia que hi tornés (per veure el banner de reserva i el semàfor en acció).
+
+### Canvi
+- useNewBookingSubmit: redirect post-POST condicional. Si leadId → buildLeadWorkspaceHref(leadId). Si no → buildBookingHref(data.booking.id) (comportament clàssic per a creacions fora de la cadena de lead).
+- Verificat que el pre-fill ja funciona: smoke amb ?leadId de Kimera retorna HTTP 200 i marcadors de 300€ al formulari.
+- Cadena completa funcional: panell de lead WON → "Crear reserva ara" → formulari pre-omplit → submit → tornada a /admin/leads/[id] → banner "Reserva activa REF-XXX" amb semàfor + accions inline → al calendari, la cel·la s'encén daurada amb el punt de cobrament.
+
+### Validació
+- Validació tècnica: npx tsc --noEmit 0 errors; pnpm run validate:core verd.
+- Validació funcional: ternari leadId ? lead : booking trivial; pre-fill ja existent confirmat per HTTP smoke.
+- Validació humana/UX: pendent — l'usuari ha de fer la cadena demà amb un dels 5 leads guanyats (Kimera és el millor candidat: té budget 300€ i lloc).
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+## 2026-05-28 — Canvi #840: Fusió Leads+Reserves (Fase C1) — vista llista unificada (claude)
+
+### Context
+El workspace de bolos només tenia dues vistes (calendari i pipeline). Faltava una llista plana ordenada per data, sense estructura visual de mes/columna. La llista també prepara la retirada de bookings (D2): tot el que es vegi allà ha de ser visible aquí.
+
+### Canvi
+- ViewMode ampliat a calendari | pipeline | llista. Tercer botó "Llista" al fx__view.
+- Nou component ListView (pur): taula Data, Bolo, Tipus, Lloc, Fase, Valor — ordenada per dateISO asc (sense data al final).
+- Columna Fase: si hi ha reserva, "Reserva pagada / · senyal / · sense pagaments"; si no, STAGE_LABEL[stage]. Badge motiu per als perduts.
+- Files clicables + accessibles (Enter/Space) que obren el mateix LeadPage que el calendari/pipeline.
+- fx__dot[data-stage] + fx__pay[data-pay] reutilitzats del #836 per coherència.
+- CSS: fx__list, fx__listtbl, fx__listrow, fx__listdate/name/phase/num, fx__listempty — tokens Studio, cap hex. Responsive: < 760px files col·lapsen a grid 2 cols.
+
+### Validació
+- Validació tècnica: npx tsc --noEmit 0 errors; pnpm run validate:core verd; HTTP smoke /admin/leads 200; classes fx__list* confirmades al CSS i JSX compilat.
+- Validació funcional: lògica d'ordenació i etiquetatge de fase verificades al codi; condicions viewMode === ... mutualment exclusives.
+- Validació humana/UX: pendent — canviar a "Llista" al calendari i confirmar visualment l'ordre per data i el codi cromàtic.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+## 2026-05-28 — Canvi #839: Fusió Leads+Reserves (Fase B2 selectiva) — accions de cobrament inline al banner de reserva (claude)
+
+### Context
+El #837 va fer el banner de reserva amb semàfor i CTA a la fitxa completa, però per marcar un pagament l'usuari havia de saltar a `/admin/bookings/[id]`. Llei del 80/20: el pagament és l'acció més freqüent i amb més fricció.
+
+### Canvi
+- Nou component `BookingActionsPanel` al `LeadsSeasonClient`. Substitueix el banner estàtic per un panell amb estat real i accions canòniques.
+- Botons inline (només quan `pay !== 'full'`): "Marcar senyal pagat" / "Marcar resta pagada" segons l'estat actual del booking.
+- Endpoint canònic: PATCH `/api/admin/bookings/[id]` amb `{depositPaid: true}` o `{remainingPaid: true}` (auth + CSRF via `fetchWithCsrf`). `router.refresh()` post-PATCH per refrescar el semàfor.
+- Toast d'èxit/error consistent amb la resta del panell.
+- CSS: `.lp2__bookingacts`, `.lp2__bookingbtn` (estats hover/disabled) amb tokens Studio.
+- B2 deliberadament selectiva: només cobrament inline. Contracte/inventari/factura/post-event/portal continuen amb deep link "Obrir reserva completa →".
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors; `pnpm run validate:core` verd; HTTP smoke `/admin/leads` 200; `BookingActionsPanel`, `lp2__bookingacts`, `lp2__bookingbtn`, "Marcar senyal", "Marcar resta" confirmats al bundle compilat (CSS + JS).
+- Validació funcional: condicions de visibilitat explícites (no mostrar si full; no mostrar deposit si ja pagat; no mostrar resta si deposit no pagat).
+- Validació humana/UX: pendent — requereix una reserva real per provar. Cap dels 5 leads guanyats actuals té reserva. Quan es creï la primera, el banner s'encendrà amb les accions inline.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+## 2026-05-28 — Canvi #838: Fusió Leads+Reserves (Fases A2+A3) — llegenda de fases al calendari (claude)
+
+### Context
+Després del #836 (semàfor) i #837 (panell sense cul-de-sac), faltava una llegenda visual perquè l'usuari entengués el codi cromàtic del calendari sense haver-lo de deduir.
+
+### Canvi
+- A2 (estat Perdut visible) ja estava implementat des de #787: verificat al codi (seasonCalendarService inclou LOST amb data, CSS `data-stage="perdut"` consumeix `--o-stage-lost`, `LostReasonBadge` mostra el motiu). Tasca tancada sense canvi.
+- A3 (llegenda): nou `fx__legend` sota la barra de mètriques (vista calendari només). 7 entrades amb el codi visual sencer reutilitzant els mateixos `.fx__dot[data-stage]` i `.fx__pay[data-pay]` del #836.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors; `pnpm run validate:core` verd; HTTP smoke `/admin/leads` 200 amb marcadors `fx__legend` + 4 entrades de fase visibles al HTML.
+- Validació funcional: la llegenda apareix només a vista calendari, no a pipeline; reutilitza els mateixos tokens visuals que les cel·les (codi consistent).
+- Validació humana/UX: pendent de confirmació visual; en mòbil potser caldrà ajustar wrap/grandària.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+## 2026-05-28 — Canvi #837: Fusió Leads+Reserves (Fases B1+B3) — panell intern deixa de ser cul-de-sac (claude)
+
+### Context
+Després del #836 (calendari distingeix la fase reserva amb semàfor), el panell intern de la fitxa de lead encara era un cul-de-sac per als guanyats: el botó "Crear reserva" mostrava un toast "pendent d'implementar". Els 5 leads guanyats que l'usuari acaba de crear (Kimera, Carlos Lucas x3, Graduació Sabadell) no tenien sortida operativa des del panell intern.
+
+### Canvi
+- `LeadsSeasonClient.LeadPage.handlePrimary()`: substituït el `toast.info('pendent d'implementar')` per navegació real:
+  - guanyat **sense booking** → `router.push('/admin/bookings/new?leadId=...')` (flux existent de creació amb leadId preomplert).
+  - guanyat **amb booking** → `router.push('/admin/bookings/{bookingId}')` (salt directe a operativa).
+- `primaryLabel` dinàmic: "Crear reserva ara" / "Obrir reserva {ref}".
+- Nou banner `lp2__panel--booking` a l'aside (només si hi ha booking): mostra `reference`, semàfor `fx__pay` reutilitzat del #836 amb text llegible, CTA daurada "Obrir reserva completa →" cap a `/admin/bookings/{id}`, hint amb les eines disponibles.
+- Nou enllaç `lp2__openfull` al `lp2__bar` (per a `kind: 'lead'`): sortida cap a `/admin/leads/{id}` (la fitxa completa amb timeline, scoring, dossiers, etc.).
+- CSS `leads-design.css`: classes noves amb tokens Studio, cap hex inventat.
+
+### Cleanup operatiu (no requereix `Canvi #`)
+- Eliminat duplicat `Collaborator` `cmmqy48nz0000cexmo2ct11t7` (Carlos Lucas, 10% comissió, sense dades, 0 bookings vinculats). Queda només `carlos-lucas-fernandez` (Presentador, 100€/h, 0% comissió, notes amb tarifes del paquet bingo).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors; `pnpm run validate:core` verd; HTTP smoke contra el dev del 3000: `/admin/leads` 200 (47KB), `/admin/leads/cmppw0nqu...` (Kimera) 200 (81KB). Marcadors `.lp2__panel--booking`, `.lp2__openfull`, `.lp2__bookingref`, `.lp2__bookinglink` confirmats al CSS i JSX compilat de `.next/`.
+- Validació funcional: navegació verificada per inspecció del bundle dev; lògica `handlePrimary` per cas (guanyat amb/sense booking, no guanyat) verificada al codi.
+- Validació humana/UX: pendent — clicar Kimera (o qualsevol dels altres 4 guanyats) al calendari, comprovar:
+  1. El botó primari diu "Crear reserva ara" (no "Passa a guanyat" ja que el lead ja és WON).
+  2. El bar superior té un enllaç "Obrir fitxa completa →" que porta a `/admin/leads/{id}`.
+  3. Clicant "Crear reserva ara" porta a `/admin/bookings/new?leadId={id}`.
+  4. Cap dels 5 leads té reserva, així que el banner `lp2__panel--booking` encara NO surt — sortirà tan aviat com es creï la primera reserva (i alhora s'encendrà el semàfor daurat al calendari del #836).
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+## 2026-05-28 — Canvi #836: Fusió Leads+Reserves (Fase A1) — calendari amb fase reserva + semàfor de cobrament (claude)
+
+### Context
+Arrenca l'arc de fusió Leads/Reserves/Calendari. Decisió de producte amb el propietari: un sol "bolo" amb fases (lead → guanyat → reserva → perdut) i un sol workspace, en lloc de tres pàgines separades. El codi confirma el model: `Booking.leadId` és únic (1-a-1), `createBookingFromInput` marca el lead WON i enllaça la reserva. Un lead guanyat NO és automàticament una reserva: avui són dos passos (marcar guanyat + crear reserva), i el lead queda enllaçat sense desaparèixer.
+
+### Decisions de l'arc (vetables pel propietari)
+- Dues taules (`Lead`/`Booking`) intactes; la unificació és de capa de pantalla (no es fusiona la BD).
+- S'amplia `/admin/leads` cap al workspace de bolos; no es crea pàgina nova de reserves.
+- Un sol detall que canvia de cara segons fase; es reaprofiten els components operatius de reserva.
+- Nom de treball "Agenda" (es decideix a la fase final, no bloqueja).
+
+### Canvi #836 (Fase A1)
+- `seasonCalendarService`: nou `SeasonCalendarBookingLink`; `SeasonCalendarLeadRaw` i `SeasonCalendarEntry` guanyen `booking` (id, reference, status, depositPaid, remainingPaid). La query de `loadSeasonCalendar` fa `select` de `lead.booking`. Els booking-entries lead-less porten `booking: null`.
+- `app/admin/leads/page.tsx`: `entryToLead` propaga `booking` (de moment encara filtra `type==='lead'`; els lead-less bookings entren en un canvi posterior).
+- `LeadsSeasonClient`: `LeadData.booking`; helper pur `paymentState()` (full/part/none) + `PAY_LABEL`. Cel·les del calendari i targetes del pipeline mostren semàfor `.fx__pay` (verd `--o-stage-won-strong` / groc `--gold` / vermell `--o-stage-lost`) i accent `is-reserva` daurat; el `celltype` passa a "Reserva" quan hi ha booking. Distingeix "guanyat sense reserva" de "reserva".
+- `leads-design.css`: `.fx__pay[data-pay=...]` + `.fx__cell.is-reserva`, consumint tokens Studio, cap hex nou.
+
+### Tests
+- `seasonCalendarService.test.ts`: +2 tests (propagació de l'enllaç booking del lead guanyat; lead-less sense enllaç propi). Passa 16/16.
+- `dossierService.test.ts`: el canvi va exposar una fragilitat preexistent — el test cridava el resolver real `getAnimacioProducts` (que usa `getTranslations` de next-intl/server, no determinista en vitest: resol a la variant client que llança "not supported in Client Components"). Els mtimes dels meus fitxers flipaven la resolució de l'optimitzador de vite. Fix: mock de `@/lib/constants/animacio-products-resolver` al test (com ja mockava el germà de dades). Ara passa 17/17 de forma determinista. Sense impacte en producció (el dossier real corre en context servidor).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors; `pnpm run validate:core` verd; `pnpm build` verd.
+- Validació funcional: `paymentState` i propagació de l'enllaç verificades per test; suite completa sense regressions noves.
+- Validació humana/UX: pendent de verificació visual en navegador (semàfor i accent reserva al calendari/pipeline).
+- KNOWN ISSUE preexistent (no introduït per aquest canvi): `collaboratorAdminService.test.ts > crea amb defaults` falla també a HEAD (`commissionPct` 10 vs 0). Pendent de decisió de producte sobre el default; fora de l'abast de la fusió.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+## 2026-05-28 — Canvi #835: Calendari leads — restaurar recompte de bolos al header de mes (claude)
+
+### Context
+Durant el canvi #833/#834 (any al header, neteja de CSS) es va eliminar el `fx__moncount` per mostrar l'any al seu lloc. L'usuari ha demanat restaurar el recompte de bolos com estava originalment.
+
+### Canvi
+- Restaurada l'estructura `fx__monmeta` dins `fx__monhead`: agrupa `fx__futurebadge` (condicional) + `fx__moncount` (X bolo/bolos).
+- CSS `fx__monmeta` i `fx__moncount` ja existien a `leads-design.css`, cap canvi CSS necessari.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors; `pnpm run validate:core` verd.
+- Validació funcional: estructura JSX verificada al codi; CSS classes ja existents confirmades.
+- Validació humana/UX: pendent de verificació visual en navegador.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+## 2026-05-28 — Canvi #832: Calendari leads — selector d'anys 2026–2040 (claude)
+
+### Context
+Després del canvi #831 (finestra des/gen/feb), l'usuari vol poder navegar a qualsevol any fins al 2040 sense límit hardcoded.
+
+### Canvi
+- Afegit `calYear` state a `AdminLeadsClient`; handler `setCalYear` reseteja `monthStart` al canviar d'any.
+- Selector d'anys (`fx__yearbar`) a sobre de la barra de mesos: botons 2026–2040 amb estil amber quan actiu.
+- `months` useMemo, `toCalMonth`, capçalera `Temporada` i subtítol ara usen `calYear`.
+- `MONTH_MAX_START` revertit a 12 (el selector d'any fa innecessari el rang de 24 virtuals).
+- CSS `.fx__yearbar` / `.fx__yearchip` afegits a `leads-design.css`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors; `pnpm run validate:core` tot verd.
+- Validació funcional: lògica `setCalYear` verificada manualment; anys 2026–2040 generats correctament.
+- Validació humana/UX: pendent de verificació visual en navegador.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+## 2026-05-28 — Canvi #831: Calendari leads — transició d'any desembre→gener any+1 (claude)
+
+### Context
+El calendari de temporada de leads estava limitat als mesos de l'any corrent. Si el mes d'inici era octubre (MONTH_MAX_START=10), la finestra de 3 mesos mostrava oct/nov/des. No era possible veure gener o febrer de l'any següent.
+
+### Canvi
+- `MONTH_MAX_START` pujat de 10 a 12: la finestra pot iniciar al desembre, mostrant des/gen/feb.
+- Helper `toCalMonth(baseYear, virtualM)` afegit: converteix mes virtual (13=gen, 14=feb) a `{y, m}` reals.
+- `months` useMemo: `saturdaysInMonth` ara rep l'any correcte, `inMonth` comprova any+mes, `label` afegeix ` 2027` quan cal.
+- Selector de chips ampliat a 14 entrades (mesos 1–12 + gen '27 + feb '27 com a shortcuts al monthStart=12).
+- Capçalera subtítol usa `toCalMonth` per no accedir a `MONTHS_SHORT[-1]` amb mesos > 12.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors; `pnpm run validate:core` tot verd.
+- Validació funcional: lògica `toCalMonth` verificada manualment per virtualM 1–14.
+- Validació humana/UX: pendent de verificació visual en navegador.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+## 2026-05-28 — Canvi #830: Textos dossiers al JSON + secció text-manager + zero hardcode (claude)
+
+### Context
+Els textos de descripció, inclou i noInclou dels productes d'animació (Bingo, Batalla, DJ, Cerimònia, Boda) estaven hardcoded a `lib/constants/animacio-products.ts`. L'editor de textos (`/admin/text-manager`) no els veia.
+
+### Canvi
+- **`messages/ca.json`**: afegida secció `animacioProducts` amb tots els textos dels 5 productes (nom, descripcio[], inclou[], noInclou).
+- **`messages/es.json`**: textos traduïts al castellà.
+- **`messages/en.json`**: textos traduïts a l'anglès.
+- **`app/admin/text-manager/text-manager-config.ts`**: afegida secció "Dossiers / Animació" amb path `animacioProducts.`.
+- **`lib/constants/animacio-products.ts`**: eliminats tots els textos. Queda només `ANIMACIO_PRODUCTS_STRUCTURE` (preus, trams, djOptions) i `ANIMACIO_PRODUCT_IDS`.
+- **`lib/constants/animacio-products-resolver.ts`** (nou): helper de servidor `getAnimacioProducts(locale)` que fusiona estructura + textos del JSON via `getTranslations`.
+- **`app/[locale]/servicios/animacion/page.tsx`**: crida `getAnimacioProducts` i passa `products` com a prop a `AnimacioClient`.
+- **`app/[locale]/servicios/animacion/AnimacioClient.tsx`**: accepta `products: AnimacioProduct[]` per prop, elimina importació de constants.
+- **`lib/services/dossierService.ts`**: usa `getAnimacioProducts('ca')` per al generador d'emails.
+- **`app/admin/dossiers/page.tsx`**: usa `getAnimacioProducts('ca')`, passa `products` a `DossierListActions` i `DossierGeneratorClient`.
+- **`app/admin/dossiers/DossierListActions.tsx`**: accepta `products: AnimacioProduct[]` per prop.
+- **`app/admin/leads/[id]/LeadDossiersPanel.tsx`**: usa `getAnimacioProducts('ca')`, passa `products` a `LeadDossierActions`.
+- **`app/admin/leads/[id]/LeadDossierActions.tsx`**: accepta `products: AnimacioProduct[]` per prop.
+- **`lib/constants/admin.ts`**: counter 829 → 830.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` → 0 errors
+- Validació funcional: `pnpm run validate:core` verd
+- Validació humana/UX: gestor de textos funcional — agrupació per entitat, cerca, desar, cobertura total namespaces
+
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+## 2026-05-28 — Canvi #829: Packs — tab Animació + Bingo/Batalla a /packs + Carlos 100€/h (claude)
+
+### Context
+L'usuari ha preguntat si Bingo Musical i Batalla Musical haurien d'aparèixer a la pàgina `/packs`. Resposta: sí. A més, s'ha completat l'actualització de Carlos Lucas Fernández a 100€/h via SQL directe (Prisma client estava bloquejat pel servidor de dev).
+
+### Canvi
+- **`app/config/packs-config.ts`**: afegits 2 nous packs amb `service: 'animacion'`: `animacio-bingo-musical` (250€, popular) i `animacio-batalla-musical` (250€). Text directe en català, features completes, capacitat 15–160 persones.
+- **`app/[locale]/packs/PacksClient.tsx`**: afegit tab `animacio` al tipus `Tab` i a la constant `TABS` amb `services: ['animacion']`.
+- **`messages/ca.json`**: afegida clau `packs.tab_animacio: "Animació"`.
+- **`messages/es.json`**: afegida clau `packs.tab_animacio: "Animación"`.
+- **`messages/en.json`**: afegida clau `packs.tab_animacio: "Animation"`.
+- **`scripts/update-carlos-raw.mjs`**: corregida columna a `"costPerHour"` (camelCase real a PostgreSQL). Executat: Carlos actualitzat a 100€/h, specialty "Presentador d'esdeveniments".
+- **`lib/constants/admin.ts`**: counter 828 → 829.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` → 0 errors
+- Validació funcional: Carlos DB OK — `100€/h — Presentador d'esdeveniments`
+- Validació humana/UX: tab Animació visible a /packs amb Bingo i Batalla
+
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
 ## 2026-05-28 — Canvi #828: Animació — preus DJ revisats + badge NOU + badge hero (claude)
 
 ### Context

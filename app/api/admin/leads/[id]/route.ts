@@ -37,6 +37,10 @@ const updateLeadSchema = z.object({
   utmCampaign: nullableString,
   assignedTo: nullableString,
   preferredLocale: nullableString,
+  eventStartTime: nullableString,
+  eventEndTime: nullableString,
+  eventPhone: nullableString,
+  eventAddress: nullableString,
 }).strict();
 
 export async function GET(req: NextRequest, { params }: Params) {

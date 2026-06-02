@@ -1,6 +1,6 @@
 import 'server-only';
 import { prisma } from '@/lib/prisma';
-import { ANIMACIO_PRODUCTS } from '@/lib/constants/animacio-products';
+import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
 import { buildDossierHtml, type DossierClientInfo } from '@/lib/utils/dossier-html-builder';
 import { sendEmail } from '@/lib/email';
 import { recordEmailSend } from '@/lib/services/emailTrackingService';
@@ -98,7 +98,8 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
   if (!dossier) return { ok: false, error: 'Dossier no trobat' };
   if (!dossier.email) return { ok: false, error: 'El dossier no té email de destinatari' };
 
-  const products = ANIMACIO_PRODUCTS.filter((p) => dossier.productIds.includes(p.id));
+  const allProducts = await getAnimacioProducts('ca');
+  const products = allProducts.filter((p) => dossier.productIds.includes(p.id));
   const recipientEmail = dossier.email!;
   const clientInfo: DossierClientInfo = {
     nom: dossier.nom,

@@ -125,11 +125,7 @@ async function seed() {
   eventDate.setDate(15);
 
   const subtotal = 1200;
-  const vatRate = 21;
-  const vatAmount = subtotal * vatRate / 100; // 252
-  const total = subtotal + vatAmount; // 1452 (o sense IVA si és particular)
-  // Per simplificar l'exemple, total sense IVA (particulars)
-  const bookingTotal = 1200;
+  // Exemple particular: sense factura, sense IVA.
 
   const booking = await prisma.booking.create({
     data: {

@@ -1,3 +1,10 @@
+/* ============================================================================
+   ÒRBITA ADMIN — NewBookingForm · Secció Viatge + Descompte (Brass & Obsidian)
+   ----------------------------------------------------------------------------
+   Reescrit al sistema visual nb-* (Canvi #842). Viatge resumit en una graella
+   compacta de 3 cel·les; descompte amb codi i camp de notes.
+============================================================================ */
+
 import { formatCurrencyExact } from '@/lib/constants';
 import type { BookingDiscountValidation, BookingFormData } from './booking-form.types';
 
@@ -32,75 +39,77 @@ export default function BookingTravelDiscountSection({
   onResetDiscountValidation,
   onValidateDiscountCode,
 }: BookingTravelDiscountSectionProps) {
+  const enteredKm = parseFloat(form.distanceKm) || 0;
+
   return (
     <>
-      <div className="rounded-2xl border p-5 space-y-4">
-        <div className="flex items-center gap-2">
-          <h2 className="text-sm font-semibold">Desplaçament</h2>
-          <span className="text-xs">(opcional)</span>
+      <section className="nb__panel">
+        <div className="nb__phead">
+          <h2 className="nb__h2">Desplaçament</h2>
+          <span className="nb__pintro">Opcional</span>
         </div>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div>
-            <label htmlFor="nb-km" className="text-xs">Km totals (anada + tornada)</label>
-            <div className="relative mt-1">
-              <input
-                id="nb-km"
-                type="number"
-                min="0"
-                step="1"
-                value={form.distanceKm}
-                onChange={(e) => onFieldChange('distanceKm', e.target.value)}
-                placeholder="0"
-                className="w-full rounded-xl border px-3 py-2.5 pr-10 text-sm"
-              />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs">km</span>
-            </div>
-            <p className="mt-1 text-[10px]">Inclòs al pack: {includedTravelKm} km (anada + tornada)</p>
+        <div className="nb__row">
+          <div className="nb__field">
+            <label htmlFor="nb-km" className="nb__label">Km totals (anada + tornada)</label>
+            <input
+              id="nb-km"
+              type="number"
+              min={0}
+              step={1}
+              value={form.distanceKm}
+              onChange={(e) => onFieldChange('distanceKm', e.target.value)}
+              placeholder="0"
+              className="nb__input"
+            />
+            <p className="nb__hint">Inclòs al pack: {includedTravelKm} km</p>
           </div>
-          <div>
-            <label className="text-xs">Trams aplicats</label>
-            <div className="mt-1 flex h-[42px] items-center rounded-xl border px-3 py-2.5">
-              <span className="text-sm font-semibold">{travelBlocks}</span>
-            </div>
-            <p className="mt-1 text-[10px]">{travelBlockEur} € per cada {travelBlockKm} km extra</p>
-            {fuelReferenceInfo && <p className="mt-1 text-[10px]">{fuelReferenceInfo}</p>}
-          </div>
-          <div>
-            <label className="text-xs">Cost desplaçament</label>
-            <div className="mt-1 flex h-[42px] items-center rounded-xl border px-3 py-2.5">
-              {travelCharge > 0 ? (
-                <span className="text-sm font-semibold">{formatCurrencyExact(travelCharge)}</span>
-              ) : (
-                <span className="text-sm">— €</span>
-              )}
-            </div>
+          <div className="nb__field">
+            <label className="nb__label">Resum del càrrec</label>
+            <dl className="nb__travel" aria-label="Resum del cost de desplaçament">
+              <div>
+                <dt>Trams aplicats</dt>
+                <dd>{travelBlocks}</dd>
+              </div>
+              <div>
+                <dt>Km facturables</dt>
+                <dd>{billableKm}</dd>
+              </div>
+              <div>
+                <dt>Càrrec</dt>
+                <dd>{travelCharge > 0 ? formatCurrencyExact(travelCharge) : '— €'}</dd>
+              </div>
+            </dl>
             {travelCharge > 0 && (
-              <p className="mt-1 text-[10px]">{billableKm} km extra → {travelBlocks} trams × {travelBlockEur} €</p>
+              <p className="nb__hint">{travelBlockEur} € per cada {travelBlockKm} km extra</p>
             )}
-            {travelCharge === 0 && (parseFloat(form.distanceKm) || 0) > 0 && (
-              <p className="mt-1 text-[10px]">Dins del tram inclòs ({includedTravelKm} km), cost extra 0 €</p>
+            {travelCharge === 0 && enteredKm > 0 && (
+              <p className="nb__hint nb__hint--ok">Dins el tram inclòs · cap cost extra</p>
             )}
+            {fuelReferenceInfo && <p className="nb__hint nb__hint--info">{fuelReferenceInfo}</p>}
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="rounded-2xl border p-5 space-y-4">
-        <h2 className="text-sm font-semibold">Descompte i notes</h2>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div>
-            <label htmlFor="nb-discount" className="text-xs">Descompte (€)</label>
+      <section className="nb__panel">
+        <div className="nb__phead">
+          <h2 className="nb__h2">Descompte i notes</h2>
+        </div>
+        <div className="nb__row">
+          <div className="nb__field">
+            <label htmlFor="nb-discount" className="nb__label">Descompte (€)</label>
             <input
               id="nb-discount"
               type="number"
-              min="0"
+              min={0}
               value={form.discount}
               onChange={(e) => onFieldChange('discount', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
+              className="nb__input"
+              placeholder="0"
             />
           </div>
-          <div>
-            <label htmlFor="nb-discount-code" className="text-xs">Codi descompte</label>
-            <div className="mt-1 flex gap-2">
+          <div className="nb__field">
+            <label htmlFor="nb-discount-code" className="nb__label">Codi descompte</label>
+            <div style={{ display: 'flex', gap: 8 }}>
               <input
                 id="nb-discount-code"
                 type="text"
@@ -110,39 +119,39 @@ export default function BookingTravelDiscountSection({
                   onResetDiscountValidation();
                 }}
                 placeholder="Ex: BODA2026"
-                className="font-mono flex-1 rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+                className="nb__input nb__input--code"
               />
               <button
                 type="button"
                 onClick={onValidateDiscountCode}
                 disabled={validatingCode || !form.discountCode}
-                className="ap-btn ap-btn--secondary px-3 py-2 text-xs disabled:opacity-50"
+                className="nb__btn--sec"
+                style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}
               >
-                {validatingCode ? '...' : 'Validar'}
+                {validatingCode ? 'Validant…' : 'Validar'}
               </button>
             </div>
             {discountValidation && (
-              <p className={`mt-1 text-xs ${discountValidation.valid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
+              <p className={`nb__hint ${discountValidation.valid ? 'nb__hint--ok' : 'nb__hint--warn'}`}>
                 {discountValidation.valid
-                  ? `Vàlid: ${discountValidation.type === 'PERCENTAGE' ? `${discountValidation.value}%` : `${discountValidation.value}€`} (${discountValidation.source})`
+                  ? `Vàlid · ${discountValidation.type === 'PERCENTAGE' ? `${discountValidation.value}%` : `${discountValidation.value}€`} (${discountValidation.source})`
                   : `Invàlid: ${discountValidation.reason}`}
               </p>
             )}
           </div>
-          <div className="sm:col-span-1" />
         </div>
-        <div>
-          <label htmlFor="nb-notes" className="text-xs">Notes internes</label>
+        <div className="nb__field" style={{ marginTop: 12 }}>
+          <label htmlFor="nb-notes" className="nb__label">Notes internes</label>
           <textarea
             id="nb-notes"
             value={form.notes}
             onChange={(e) => onFieldChange('notes', e.target.value)}
             rows={3}
-            placeholder="Notes internes sobre la reserva..."
-            className="mt-1 w-full resize-none rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+            placeholder="Notes internes sobre la reserva (no es mostren al client)…"
+            className="nb__textarea"
           />
         </div>
-      </div>
+      </section>
     </>
   );
 }

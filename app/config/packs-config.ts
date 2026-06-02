@@ -435,6 +435,7 @@ const PACKS: PackDefinition[] = [
     durationHours: 5,
     badge: "packsBadges.premium",
   },
+
 ];
 
 // ============================================

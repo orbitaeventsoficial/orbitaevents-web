@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { z } from 'zod';
 import { listCustomerContacts, createCustomerContact } from '@/lib/services/customerContactService';
 
@@ -25,6 +26,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = await verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   const body = await req.json();
   const parsed = contactSchema.safeParse(body);

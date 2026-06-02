@@ -296,8 +296,6 @@
   );
 }
 .ax__add:active { transform: translateY(0); }
-.ax__addic { display: grid; place-items: center; color: var(--ax-gold); }
-.ax__addic svg { width: 15px; height: 15px; }
 
 /* Botó d'accés directe a la safata d'entrada — posició primària al capdamunt */
 .ax__inbox {

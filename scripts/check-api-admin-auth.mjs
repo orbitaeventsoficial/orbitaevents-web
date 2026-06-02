@@ -108,10 +108,10 @@ for (const filePath of walkRoutes(ADMIN_API_DIR)) {
   if (matches.length === 0) {
     // Route file with no recognizable handler (e.g. re-export). Fall back to a
     // whole-file check so it cannot be silently unprotected.
-    if (!fileHasAuth) {
-      violations.push(`${rel} → cap requireAuth al fitxer`);
-    }
-    continue;
+      if (!fileHasAuth) {
+        violations.push(`${rel} → cap requireAuth al fitxer`);
+      }
+      continue;
   }
 
   for (let i = 0; i < matches.length; i++) {

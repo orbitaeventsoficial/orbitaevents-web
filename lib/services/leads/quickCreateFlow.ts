@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { createAdminLead } from '@/lib/services/leadAdminService';
 import { createAdminProposal } from '@/lib/services/proposalAdminService';
 import { createBookingFromInput } from '@/lib/services/bookingCreationService';
+import { calcVatAmount, VAT_RATE_INVOICE, roundMoney } from '@/lib/constants/pricing';
 
 export type QuickCreateOutcome = 'lead' | 'lead+proposal' | 'lead+proposal+booking';
 
@@ -40,7 +41,6 @@ export type QuickCreateResult =
   | { ok: false; error: string; status: number; stage: 'lead' | 'proposal' | 'booking' };
 
 const PROPOSAL_DEFAULT_VALIDITY = 15;
-const PROPOSAL_VAT_RATE = 21;
 
 export async function quickCreate(input: QuickCreateInput): Promise<QuickCreateResult> {
   const wantProposal =
@@ -95,8 +95,9 @@ export async function quickCreate(input: QuickCreateInput): Promise<QuickCreateR
   let proposalId: string | null = null;
   if (wantProposal) {
     const subtotal = input.proposalSubtotal ?? 0;
-    const vatAmount = subtotal * (PROPOSAL_VAT_RATE / 100);
-    const total = subtotal + vatAmount;
+    const vatRate = VAT_RATE_INVOICE;
+    const vatAmount = calcVatAmount(subtotal, true);
+    const total = roundMoney(subtotal + vatAmount);
     const snapshot = input.proposalSnapshot ?? {
       customer: { name: input.client.name, email: input.client.email },
       event: {
@@ -114,7 +115,7 @@ export async function quickCreate(input: QuickCreateInput): Promise<QuickCreateR
         validityDays: PROPOSAL_DEFAULT_VALIDITY,
         subtotal,
         discount: 0,
-        vatRate: PROPOSAL_VAT_RATE,
+        vatRate,
         vatAmount,
         total,
         snapshot,

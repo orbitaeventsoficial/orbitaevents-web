@@ -170,6 +170,7 @@
     "eslint": "8.57.0",
     "eslint-config-next": "14.2.35",
     "jsdom": "^27.4.0",
+    "pg": "^8.21.0",
     "playwright": "^1.57.0",
     "prisma": "^5.22.0",
     "ts-node": "^10.9.2",

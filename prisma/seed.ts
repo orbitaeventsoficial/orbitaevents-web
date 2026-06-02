@@ -3,6 +3,7 @@
 // Versió 2.0 - Desembre 2024
 
 import { PrismaClient } from '@prisma/client';
+import { DEPOSIT_PERCENT, VAT_RATE_INVOICE } from '../lib/constants/pricing';
 
 const prisma = new PrismaClient();
 
@@ -43,8 +44,8 @@ async function main() {
     { key: 'social.facebook', value: 'https://facebook.com/orbitaevents', type: 'STRING', category: 'social', label: 'Facebook' },
 
     // Preus
-    { key: 'pricing.depositPercent', value: '30', type: 'NUMBER', category: 'pricing', label: 'Percentatge senyal' },
-    { key: 'pricing.vatRate', value: '21', type: 'NUMBER', category: 'pricing', label: 'IVA' },
+    { key: 'pricing.depositPercent', value: String(DEPOSIT_PERCENT), type: 'NUMBER', category: 'pricing', label: 'Percentatge senyal' },
+    { key: 'pricing.vatRate', value: String(VAT_RATE_INVOICE), type: 'NUMBER', category: 'pricing', label: 'IVA' },
     { key: 'pricing.freeKm', value: '25', type: 'NUMBER', category: 'pricing', label: 'Km gratuïts' },
     { key: 'pricing.extraKmRate', value: '0.50', type: 'STRING', category: 'pricing', label: 'Preu km extra' },
     { key: 'pricing.extraHourPrice', value: '75', type: 'NUMBER', category: 'pricing', label: 'Preu hora extra' },

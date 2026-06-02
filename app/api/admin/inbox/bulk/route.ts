@@ -48,6 +48,9 @@ export async function POST(request: NextRequest) {
     if (!ALLOWED_ACTIONS.has(action)) {
       return NextResponse.json({ ok: false, error: `Acció no suportada: ${action}` }, { status: 400 });
     }
+    if (action === 'moveTo' && !targetFolder?.trim()) {
+      return NextResponse.json({ ok: false, error: 'Falta carpeta destí' }, { status: 400 });
+    }
 
     const result = await bulkAction({
       uids,

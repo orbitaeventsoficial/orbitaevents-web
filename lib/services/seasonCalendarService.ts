@@ -2,11 +2,22 @@ import { prisma } from '@/lib/prisma';
 
 // ─── Raw input types (de la BD) ──────────────────────────────────────────────
 
+// Enllaç a la reserva convertida d'un lead guanyat (relació 1-a-1 via booking.leadId).
+// Permet distingir al calendari "guanyat sense reserva" de "reserva" + semàfor de cobrament.
+export interface SeasonCalendarBookingLink {
+  id: string;
+  reference: string;
+  status: string;
+  depositPaid: boolean;
+  remainingPaid: boolean;
+}
+
 export interface SeasonCalendarLeadRaw {
   id: string;
   status: string;
   name: string;
   eventDate: Date | null;
+  eventStartTime: string | null;
   eventType: string | null;
   eventLocation: string | null;
   guestCount: number | null;
@@ -18,6 +29,7 @@ export interface SeasonCalendarLeadRaw {
   assignedTo: string | null;
   contactedAt: Date | null;
   priority: string | null;
+  booking: SeasonCalendarBookingLink | null;
 }
 
 export interface SeasonCalendarBookingRaw {
@@ -46,6 +58,7 @@ export interface SeasonCalendarEntry {
   status: string;
   name: string;
   eventDate: Date | null;
+  eventStartTime: string | null;
   eventType: string | null;
   eventLocation: string | null;
   guestCount: number | null;
@@ -57,6 +70,7 @@ export interface SeasonCalendarEntry {
   assignedTo: string | null;
   contactedAt: Date | null;
   priority: string | null;
+  booking: SeasonCalendarBookingLink | null;
 }
 
 export interface SeasonWeekend {
@@ -80,6 +94,35 @@ export interface SeasonCalendarResult {
     scheduledBookings: number;
     totalValue: number;
   };
+}
+
+// ─── Helpers purs ─────────────────────────────────────────────────────────────
+
+// Parseja el camp `budget` del lead (string lliure: "300", "300€", "300 EUR", "1.200",
+// "1,200", "1.200,50") en un nombre. Retorna null si no es pot extreure cap xifra.
+// Acceptat tant punt com coma com a separador decimal/miler — pren el darrer com a
+// decimal si hi ha 2 dígits darrere.
+export function parseBudgetAmount(budget: string | null | undefined): number | null {
+  if (!budget) return null;
+  const digits = budget.replace(/[^\d.,]/g, '');
+  if (!digits) return null;
+  const lastDot = digits.lastIndexOf('.');
+  const lastComma = digits.lastIndexOf(',');
+  let normalized = digits;
+  if (lastDot > -1 && lastComma > -1) {
+    // Format europeu o americà mixt — el darrer separador és el decimal.
+    if (lastComma > lastDot) normalized = digits.replace(/\./g, '').replace(',', '.');
+    else normalized = digits.replace(/,/g, '');
+  } else if (lastComma > -1) {
+    // Si hi ha 1-2 dígits després de la coma, és decimal; si no, miler.
+    const after = digits.length - lastComma - 1;
+    normalized = after > 0 && after <= 2 ? digits.replace(',', '.') : digits.replace(/,/g, '');
+  } else if (lastDot > -1) {
+    const after = digits.length - lastDot - 1;
+    normalized = after > 0 && after <= 2 ? digits : digits.replace(/\./g, '');
+  }
+  const n = Number(normalized);
+  return Number.isFinite(n) && n > 0 ? n : null;
 }
 
 // ─── Date helpers (UTC-aware, sense dependències externes) ────────────────────
@@ -157,6 +200,7 @@ export function buildSeasonCalendar(input: SeasonCalendarInput): SeasonCalendarR
       status: lead.status,
       name: lead.name,
       eventDate: lead.eventDate,
+      eventStartTime: lead.eventStartTime ?? null,
       eventType: lead.eventType,
       eventLocation: lead.eventLocation,
       guestCount: lead.guestCount,
@@ -168,6 +212,7 @@ export function buildSeasonCalendar(input: SeasonCalendarInput): SeasonCalendarR
       assignedTo: lead.assignedTo,
       contactedAt: lead.contactedAt,
       priority: lead.priority,
+      booking: lead.booking,
     };
     if (lead.eventDate) {
       scheduled.push(entry);
@@ -183,6 +228,7 @@ export function buildSeasonCalendar(input: SeasonCalendarInput): SeasonCalendarR
       status: booking.status,
       name: booking.clientName,
       eventDate: booking.eventDate,
+      eventStartTime: null,
       eventType: booking.eventType,
       eventLocation: booking.eventLocation,
       guestCount: booking.guestCount,
@@ -194,6 +240,7 @@ export function buildSeasonCalendar(input: SeasonCalendarInput): SeasonCalendarR
       assignedTo: null,
       contactedAt: null,
       priority: null,
+      booking: null,
     });
   }
 
@@ -250,9 +297,11 @@ export async function loadSeasonCalendar(
         name: true,
         status: true,
         eventDate: true,
+        eventStartTime: true,
         eventType: true,
         eventLocation: true,
         guestCount: true,
+        budget: true,
         lostReason: true,
         phone: true,
         email: true,
@@ -265,6 +314,10 @@ export async function loadSeasonCalendar(
           orderBy: { createdAt: 'desc' },
           take: 1,
           select: { total: true },
+        },
+        booking: {
+          // Si hi ha booking, el seu `total` és la veritat del valor del bolo.
+          select: { id: true, reference: true, status: true, depositPaid: true, remainingPaid: true, total: true },
         },
       },
       orderBy: { eventDate: 'asc' },
@@ -296,10 +349,14 @@ export async function loadSeasonCalendar(
       name: l.name,
       status: l.status,
       eventDate: l.eventDate,
+      eventStartTime: l.eventStartTime ?? null,
       eventType: l.eventType as string | null,
       eventLocation: l.eventLocation,
       guestCount: l.guestCount,
-      estimatedValue: l.proposals[0]?.total ?? null,
+      // Cascada de valor: total de la reserva (si existeix) → total de proposal SENT/ACCEPTED
+      // → budget del lead parsejat (string lliure tipus "300" o "300€"). Si tot és null,
+      // el lead no compta cap a la suma de Valor temporada.
+      estimatedValue: l.booking?.total ?? l.proposals[0]?.total ?? parseBudgetAmount(l.budget),
       lostReason: l.lostReason,
       phone: l.phone,
       email: l.email,
@@ -307,6 +364,15 @@ export async function loadSeasonCalendar(
       assignedTo: l.assignedTo,
       contactedAt: l.contactedAt,
       priority: l.priority as string | null,
+      booking: l.booking
+        ? {
+            id: l.booking.id,
+            reference: l.booking.reference,
+            status: l.booking.status,
+            depositPaid: l.booking.depositPaid,
+            remainingPaid: l.booking.remainingPaid,
+          }
+        : null,
     })),
     bookings: bookings.map((b) => ({
       id: b.id,

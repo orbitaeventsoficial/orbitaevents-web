@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { AdminPage } from '../components/AdminPage';
 import { DossierGeneratorClient } from './DossierGeneratorClient';
-import { ANIMACIO_PRODUCTS } from '@/lib/constants/animacio-products';
+import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
 import { getAllDossiers, getDeletedDossiers } from '@/lib/services/dossierService';
 import { formatDateShort } from '@/lib/constants';
 import Link from 'next/link';
@@ -42,7 +42,11 @@ type DossierRow = {
 
 export default async function DossiersPage({ searchParams }: PageProps) {
   const logoDataUri = readLogoDataUri();
-  const [dossiers, deletedDossiers] = await Promise.all([getAllDossiers(50), getDeletedDossiers()]) as [DossierRow[], DossierRow[]];
+  const [dossiers, deletedDossiers, allProducts] = await Promise.all([
+    getAllDossiers(50),
+    getDeletedDossiers(),
+    getAnimacioProducts('ca'),
+  ]) as [DossierRow[], DossierRow[], Awaited<ReturnType<typeof getAnimacioProducts>>];
 
   return (
     <AdminPage
@@ -53,7 +57,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
       <section className="dg__gen-section">
         <h2 className="dg__section-title">Nou dossier</h2>
         <DossierGeneratorClient
-          products={ANIMACIO_PRODUCTS}
+          products={allProducts}
           logoDataUri={logoDataUri}
           leadId={searchParams?.leadId}
           initialNom={searchParams?.nom}
@@ -70,7 +74,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
           <h2 className="dg__section-title">Dossiers desats ({dossiers.length})</h2>
           <div className="dg__list">
             {dossiers.map((d) => {
-              const productNames = ANIMACIO_PRODUCTS
+              const productNames = allProducts
                 .filter((p) => d.productIds.includes(p.id))
                 .map((p) => p.nom)
                 .join(' · ');
@@ -99,6 +103,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                     email={d.email ?? undefined}
                     nom={d.nom}
                     productIds={d.productIds}
+                    products={allProducts}
                     clientInfo={{
                       nom: d.nom,
                       empresa: d.empresa ?? undefined,
@@ -124,7 +129,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
           <p className="dg__section-hint">Els dossiers eliminats es purgen automàticament als 30 dies.</p>
           <div className="dg__list">
             {deletedDossiers.map((d) => {
-              const productNames = ANIMACIO_PRODUCTS
+              const productNames = allProducts
                 .filter((p) => d.productIds.includes(p.id))
                 .map((p) => p.nom)
                 .join(' · ');
@@ -143,6 +148,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                     email={d.email ?? undefined}
                     nom={d.nom}
                     productIds={d.productIds}
+                    products={allProducts}
                     clientInfo={{
                       nom: d.nom,
                       empresa: d.empresa ?? undefined,

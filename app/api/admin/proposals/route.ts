@@ -6,6 +6,7 @@ import { getRequestId } from '@/lib/request-context';
 import { ProposalStatus } from '@prisma/client';
 import { z } from 'zod';
 import { createAdminProposal, listAdminProposals } from '@/lib/services/proposalAdminService';
+import { VAT_RATE_INVOICE } from '@/lib/constants/pricing';
 
 const createProposalSchema = z.object({
   customerId: z.string().min(1).optional(),
@@ -17,7 +18,7 @@ const createProposalSchema = z.object({
   validityDays: z.number().int().min(1).max(120).default(15),
   subtotal: z.number().min(0),
   discount: z.number().min(0).default(0),
-  vatRate: z.number().min(0).default(21),
+  vatRate: z.number().min(0).default(VAT_RATE_INVOICE),
   vatAmount: z.number().min(0),
   total: z.number().min(0),
   snapshot: z.record(z.unknown()),

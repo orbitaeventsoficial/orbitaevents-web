@@ -9,6 +9,7 @@ import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge
 import { applyDatePricing } from '@/lib/services/pricing/datePricingService';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_PDF_STUDIO_DEFAULTS } from '@/lib/constants/admin';
+import { DEPOSIT_PERCENT, VAT_RATE_INVOICE, roundMoney, calcVatAmount } from '@/lib/constants/pricing';
 import { log } from '@/lib/logger';
 import SortableList from '@/app/admin/components/SortableList';
 import AiCopySuggestionsInline from '@/app/admin/components/AiCopySuggestionsInline';
@@ -95,7 +96,7 @@ export default function PresupuestoPdfStudio({
   const [companyIBAN, setCompanyIBAN] = useState('');
   const [clientNIF, setClientNIF] = useState('');
   const [clientAddress, setClientAddress] = useState('');
-  const [depositPct, setDepositPct] = useState(30);
+  const [depositPct, setDepositPct] = useState(DEPOSIT_PERCENT);
   const [depositDueDays, setDepositDueDays] = useState(7);
   const [finalPaymentDays, setFinalPaymentDays] = useState(7);
   const [cancellationPolicy, setCancellationPolicy] = useState(ADMIN_PDF_STUDIO_DEFAULTS.cancellationPolicy);
@@ -797,10 +798,10 @@ export default function PresupuestoPdfStudio({
 
     const subtotal = Math.max(0, Number(basePrice) || 0) + seasonSurcharge + extrasPrice + travelCharge;
     const discountSafe = Math.max(0, Number(discount) || 0);
-    const vatRate = 21;
+    const vatRate = VAT_RATE_INVOICE;
     const baseAfterDiscount = Math.max(0, subtotal - discountSafe);
-    const vatAmount = baseAfterDiscount * (vatRate / 100);
-    const finalTotal = baseAfterDiscount + vatAmount;
+    const vatAmount = calcVatAmount(baseAfterDiscount, true);
+    const finalTotal = roundMoney(baseAfterDiscount + vatAmount);
 
     const payload = {
       customerId,
@@ -971,11 +972,11 @@ export default function PresupuestoPdfStudio({
     if (!selectedPack) return null;
     const subtotal = Math.max(0, basePrice + seasonSurcharge + extrasPrice + travelCharge);
     const discountSafe = Math.max(0, discount);
-    const vatRate = 21;
+    const vatRate = VAT_RATE_INVOICE;
     const base = Math.max(0, subtotal - discountSafe);
-    const vatAmount = base * (vatRate / 100);
-    const finalTotal = base + vatAmount;
-    const depositAmount = finalTotal * (depositPct / 100);
+    const vatAmount = calcVatAmount(base, true);
+    const finalTotal = roundMoney(base + vatAmount);
+    const depositAmount = roundMoney(finalTotal * (depositPct / 100));
     const eventDateObj = eventDate ? new Date(eventDate) : new Date();
     const now = new Date();
 
@@ -1379,7 +1380,7 @@ export default function PresupuestoPdfStudio({
             <label className="text-sm md:col-span-2">IBAN<input className={inputClass} value={companyIBAN} onChange={(e) => setCompanyIBAN(e.target.value)} placeholder="ES00 0000 0000 0000 0000 0000" /></label>
             <label className="text-sm">NIF client<input className={inputClass} value={clientNIF} onChange={(e) => setClientNIF(e.target.value)} /></label>
             <label className="text-sm">Adreça client<input className={inputClass} value={clientAddress} onChange={(e) => setClientAddress(e.target.value)} /></label>
-            <label className="text-sm">Dipòsit (%)<input className={inputClass} type="number" min={0} max={100} value={depositPct} onChange={(e) => setDepositPct(Number(e.target.value) || 30)} /></label>
+            <label className="text-sm">Dipòsit (%)<input className={inputClass} type="number" min={0} max={100} value={depositPct} onChange={(e) => setDepositPct(Number(e.target.value) || DEPOSIT_PERCENT)} /></label>
             <label className="text-sm">Dies per pagar dipòsit<input className={inputClass} type="number" min={1} value={depositDueDays} onChange={(e) => setDepositDueDays(Number(e.target.value) || 7)} /></label>
             <label className="text-sm">Dies pagament final (abans event)<input className={inputClass} type="number" min={1} value={finalPaymentDays} onChange={(e) => setFinalPaymentDays(Number(e.target.value) || 7)} /></label>
             <label className="text-sm md:col-span-2">Política de cancel·lació<textarea rows={3} className={inputClass} value={cancellationPolicy} onChange={(e) => setCancellationPolicy(e.target.value)} /></label>

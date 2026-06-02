@@ -467,6 +467,10 @@ model Lead {
   contactedAt DateTime?
   convertedAt DateTime?
 
+  // Contacte específic de l'esdeveniment (pot diferir del client)
+  eventPhone   String? // telèfon de contacte el dia del bolo
+  eventAddress String? // adreça de l'event (venue, domicili, etc.)
+
   // Audit trail de pèrdua: per què i quan s'ha marcat el lead com LOST
   lostReason String?
   lostAt     DateTime?
@@ -735,7 +739,7 @@ model Booking {
   subtotal     Float
   discount     Float   @default(0)
   discountCode String?
-  vatRate      Float   @default(21)
+  vatRate      Float   @default(0)
   vatAmount    Float
   total        Float
 
@@ -748,6 +752,15 @@ model Booking {
   remainingPaid   Boolean   @default(false)
   remainingPaidAt DateTime?
   remainingPaymentUrl String?
+
+  // Contacte específic de l'esdeveniment (pot diferir del client)
+  eventPhone   String? // telèfon de contacte el dia del bolo
+  eventAddress String? // adreça exacta de l'event (venue, domicili, sala, etc.)
+
+  // Cobrament i facturació
+  paymentMethod   String  @default("INVOICE") // INVOICE | CASH | TRANSFER
+  invoiceRequired Boolean @default(false)      // el client vol factura?
+  cashAmount      Float?                       // import cobrat en efectiu (si paymentMethod=CASH)
 
   // Travel / distance tracking
   distanceKm    Float? // km anada i tornada

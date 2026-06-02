@@ -371,6 +371,17 @@ export function getPublicOrganizationJsonLd({
   };
 }
 
+// Etiquetes humanes per als ServiceSlug del catàleg de packs.
+// Usat al formulari de reserva i a qualsevol UI que mostri packs agrupats per servei.
+// Mantenir-ho aquí (capa comuna) — no inventar maps locals.
+export const SERVICE_LABELS: Record<ServiceSlug, string> = {
+  bodas: 'Bodes',
+  discomovil: 'Discomòbil',
+  empresas: 'Empreses',
+  fiestas: 'Festes',
+  animacion: 'Animació',
+};
+
 export const RECENT_FEED_EVENT_TYPE_SERVICE_LABELS: Record<string, string> = {
   WEDDING: 'DJ + Producció Boda',
   BIRTHDAY: 'Festa Aniversari',

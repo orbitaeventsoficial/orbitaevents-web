@@ -6,6 +6,26 @@ import type { BookingExtra, BookingFormData, BookingLeadData, BookingPack, RawEx
 import { INITIAL_BOOKING_FORM } from './booking-form.types';
 import { log } from '@/lib/logger';
 
+// Converteix una clau d'i18n del configurador (`services.mobile.extras.<slug>.name`)
+// o un slug kebab-case (`hora-extra`) en una etiqueta humana ("Hora extra").
+// Necessari perquè l'endpoint /api/admin/extras serveix claus d'i18n del web
+// públic com a `name` i moltes no estan traduïdes encara.
+function kebabToLabel(input: string): string {
+  return input
+    .split('-')
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
+
+function humaniseExtraLabel(name?: string | null, slug?: string | null, id?: string | number | null): string {
+  const raw = String(name || slug || id || 'Extra');
+  const i18nMatch = raw.match(/^services\.mobile\.extras\.(.+?)\.(?:name|label)$/);
+  if (i18nMatch) return kebabToLabel(i18nMatch[1]);
+  if (/^[a-z0-9]+(-[a-z0-9]+)+$/.test(raw)) return kebabToLabel(raw);
+  return raw;
+}
+
 interface UseNewBookingInitialDataOptions {
   leadId: string | null;
   dateParam: string | null;
@@ -47,7 +67,7 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
             slug: String(item.slug || item.id || ''),
             price: Number(item.price || 0),
             priceType: String(item.priceType || 'FIXED'),
-            translations: [{ name: String(item.name || item.slug || 'Extra') }],
+            translations: [{ name: humaniseExtraLabel(item.name, item.slug, item.id) }],
           })).filter((item: BookingExtra) => item.id);
           setExtras(normalizedExtras);
         }

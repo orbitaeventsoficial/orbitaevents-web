@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import type { BookingFormData, BookingLeadData, BookingSelectedExtras } from './booking-form.types';
 
 interface UseNewBookingSubmitOptions {
@@ -13,6 +14,8 @@ interface UseNewBookingSubmitOptions {
   leadData: Pick<BookingLeadData, 'customerId'> | null;
   customerId: string | null;
   internalTravelCost: number;
+  customPackPrice?: number;
+  invoiceRequired?: boolean;
 }
 
 export function useNewBookingSubmit({
@@ -22,6 +25,8 @@ export function useNewBookingSubmit({
   leadData,
   customerId,
   internalTravelCost,
+  customPackPrice,
+  invoiceRequired = false,
 }: UseNewBookingSubmitOptions) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
@@ -59,6 +64,8 @@ export function useNewBookingSubmit({
         eventVenue: form.eventVenue.trim() || undefined,
         guestCount: parseInt(form.guestCount, 10) || 100,
         packId: form.packId,
+        customPackPrice: customPackPrice || undefined,
+        invoiceRequired,
         extraHours: parseInt(form.extraHours, 10) || 0,
         extras: Object.entries(selectedExtras).map(([extraId, extra]) => ({
           extraId,
@@ -85,6 +92,8 @@ export function useNewBookingSubmit({
       }
 
       const data = await res.json();
+      // Si la reserva neix d'un lead, torna a la fitxa del lead (workspace nou amb
+      // banner de reserva activa + semàfor). Si no, fitxa de booking clàssica.
       router.push(buildBookingHref(data.booking.id));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconegut');

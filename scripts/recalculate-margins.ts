@@ -7,11 +7,9 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import { calcDeposit, roundMoney } from '../lib/constants/pricing';
 
 const prisma = new PrismaClient();
-
-const VAT_RATE = 0.21;
-const DEPOSIT_PERCENT = 0.30;
 
 async function main() {
   console.log('💰 Recalculant marges de totes les reserves...\n');
@@ -27,7 +25,7 @@ async function main() {
   const bookings = await prisma.booking.findMany({
     where: { status: { notIn: ['CANCELLED'] } },
     select: {
-      id: true, reference: true, total: true, subtotal: true,
+      id: true, reference: true, total: true, subtotal: true, vatRate: true,
       discount: true, vatAmount: true, depositAmount: true,
       remainingAmount: true, depositPaid: true, remainingPaid: true,
       distanceKm: true,
@@ -41,10 +39,11 @@ async function main() {
     const subtotal = Number(b.subtotal) || 0;
     const discount = Number(b.discount) || 0;
     const netSubtotal = subtotal - discount;
-    const vatAmount = parseFloat((netSubtotal * VAT_RATE).toFixed(2));
-    const total = parseFloat((netSubtotal + vatAmount).toFixed(2));
-    const depositAmount = parseFloat((total * DEPOSIT_PERCENT).toFixed(2));
-    const remainingAmount = parseFloat((total - depositAmount).toFixed(2));
+    const vatRate = Number(b.vatRate) || 0;
+    const vatAmount = roundMoney(netSubtotal * (vatRate / 100));
+    const total = roundMoney(netSubtotal + vatAmount);
+    const depositAmount = calcDeposit(total);
+    const remainingAmount = roundMoney(total - depositAmount);
 
     // Cost desplaçament
     const distanceKm = Number(b.distanceKm) || 0;

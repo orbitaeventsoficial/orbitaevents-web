@@ -41,6 +41,7 @@ export const INITIAL_BOOKING_FORM: BookingFormData = {
 export type BookingPack = {
   id: string;
   slug: string;
+  service?: string | null;
   price: number;
   originalPrice: number | null;
   extraHourPrice: number;

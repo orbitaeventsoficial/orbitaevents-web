@@ -28,6 +28,8 @@ const bookingSchema = z.object({
   eventVenue: z.string().optional(),
   guestCount: z.number().min(1),
   packId: z.string().min(1),
+  customPackPrice: z.number().positive().optional(),
+  invoiceRequired: z.boolean().optional(),
   extraHours: z.number().optional(),
   extras: z.array(z.object({
     extraId: z.string(),

@@ -4,9 +4,9 @@ import Image from 'next/image';
 import { Link } from '@/lib/navigation';
 import { motion } from 'framer-motion';
 import { Mic, Users, Clock, Check, ArrowRight, Star, ChevronDown } from 'lucide-react';
-import { ANIMACIO_PRODUCTS } from '@/lib/constants/animacio-products';
+import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 
-export default function AnimacioClient() {
+export default function AnimacioClient({ products }: { products: AnimacioProduct[] }) {
   return (
     <div className="space-y-8 pb-20">
       {/* Hero */}
@@ -95,7 +95,7 @@ export default function AnimacioClient() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {ANIMACIO_PRODUCTS.filter(p => p.id !== 'dj').map((product, i) => (
+          {products.filter(p => p.id !== 'dj').map((product, i) => (
             <motion.div
               key={product.id}
               initial={{ opacity: 0, y: 20 }}
@@ -179,7 +179,7 @@ export default function AnimacioClient() {
               Ideal com a complement o per tancar la nit.
             </p>
             <div className="flex flex-wrap gap-3">
-              {ANIMACIO_PRODUCTS.find(p => p.id === 'dj')?.djOptions?.map((opt) => (
+              {products.find(p => p.id === 'dj')?.djOptions?.map((opt) => (
                 <div key={opt.label} className="px-4 py-2 rounded-xl border border-white/10 bg-white/5">
                   <p className="text-sm font-semibold text-white">{opt.label}</p>
                   <p className="text-base font-bold text-amber-400">{opt.price !== null ? `${opt.price}€` : 'A mida'}</p>

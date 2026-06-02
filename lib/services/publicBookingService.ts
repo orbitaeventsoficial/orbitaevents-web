@@ -2,6 +2,7 @@ import { EventType, Prisma } from '@prisma/client';
 import { sendBookingConfirmation, sendBookingNotificationToAdmin } from '@/lib/email';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
+import { calcVatAmount, VAT_RATE_INVOICE, roundMoney } from '@/lib/constants/pricing';
 
 type BookingExtraWithTranslations = Prisma.ExtraGetPayload<{ include: { translations: true } }>;
 type BookingPackWithTranslations = Prisma.PackGetPayload<{ include: { translations: true } }>;
@@ -76,9 +77,10 @@ export async function createPublicBooking(body: PublicBookingRequest) {
   }
 
   const discount = 0;
-  const vatRate = 21;
-  const vatAmount = Math.round(subtotal * (vatRate / 100) * 100) / 100;
-  const total = subtotal - discount + vatAmount;
+  const vatRate = VAT_RATE_INVOICE;
+  const baseAfterDiscount = subtotal - discount;
+  const vatAmount = calcVatAmount(baseAfterDiscount, true);
+  const total = roundMoney(baseAfterDiscount + vatAmount);
   const eventDate = new Date(body.eventDate);
 
   const booking = await prisma.$transaction(async (tx) => {

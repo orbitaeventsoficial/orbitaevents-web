@@ -2241,6 +2241,7 @@
     "tab_bodas": "Weddings",
     "tab_festes": "Parties",
     "tab_empresas": "Corporate",
+    "tab_animacio": "Animation",
     "extraHour": "Extra hour"
   },
   "experiences": {
@@ -7020,6 +7021,91 @@
     "stats": {
       "yearsLabel": "Since 2023",
       "responseTime": "2h"
+    }
+  },
+  "animacioProducts": {
+    "bingo-musical": {
+      "nom": "Musical Bingo",
+      "descripcio": [
+        "The hits play from minute one — always from the chorus or the part everyone knows, about 15 seconds each, one after another, while the host keeps the energy going.",
+        "Everyone gets a bingo card and stickers. The game builds up to four simultaneous lines, and when all four are full, the winners come up front for the musical challenges. Three rounds, each one different, while the crowd sings and cheers. In the end, one winner calls bingo.",
+        "Anyone who'd rather not play can be on the jury and decide who wins the challenges."
+      ],
+      "inclou": [
+        "Professional DJ",
+        "Host/MC",
+        "Active speakers (sound system)",
+        "DJ booth, controller and laptop",
+        "Bingo cards",
+        "Stickers for everyone"
+      ],
+      "noInclou": "* Does not include prizes for winners — provided by the organiser."
+    },
+    "batalla-musical": {
+      "nom": "Musical Battle",
+      "descripcio": [
+        "Ninety minutes of musical competition. Participants split into teams — girls vs boys, by table, by age or totally random — and face off in challenges: group karaoke, name that tune, dance-offs, music trivia, show talent...",
+        "Every challenge scores points for the team. Who decides the winner? The crowd with their applause, a jury chosen from the audience, or the host — whatever works in the moment. Those who don't want to compete can be on the jury.",
+        "In the end, one team takes the Batalla Musical."
+      ],
+      "inclou": [
+        "Professional DJ",
+        "Host/MC",
+        "Active speakers (sound system)",
+        "DJ booth, controller and laptop",
+        "Challenge materials",
+        "Duration: 1h30"
+      ],
+      "noInclou": "* Does not include prizes for winners — provided by the organiser."
+    },
+    "dj": {
+      "nom": "DJ Service",
+      "descripcio": [
+        "Professional DJ with full sound equipment. Before the event we talk: who's the crowd, what moments can't go wrong, if there are must-play songs or genres to avoid. We don't work with generic playlists.",
+        "Works on its own (for the cocktail hour or the party) or as a complement to any entertainment package. If you want the DJ for the whole day, check the Full Wedding package."
+      ],
+      "inclou": [
+        "Professional DJ",
+        "Active speakers (sound system)",
+        "DJ booth, controller and laptop",
+        "Basic dance floor lighting",
+        "Setup and teardown"
+      ],
+      "noInclou": ""
+    },
+    "sonoritzacio-cerimonia": {
+      "nom": "Ceremony Sound",
+      "descripcio": [
+        "The ceremony sound is the first thing your guests hear — and it sets the tone for the whole day. We handle the microphone for the officiant, the ambient sound and the song list you've chosen for each moment.",
+        "Processional, readings, signing and recessional: each moment with its sound, no feedback, no awkward silences, no last-minute improvisation."
+      ],
+      "inclou": [
+        "Sound system adapted to the venue (indoor or outdoor)",
+        "Wireless microphone for the officiant",
+        "Playback of personalised song list",
+        "Sound technician throughout the ceremony",
+        "Sound check before guests arrive",
+        "Setup and teardown"
+      ],
+      "noInclou": "* Does not include live music (instrument/voice). Available as an add-on — contact us."
+    },
+    "boda-sencera": {
+      "nom": "Full Wedding",
+      "descripcio": [
+        "One team for all the music of the day. From the ceremony to the last dance, no supplier changes, no miscommunication, nothing for you to worry about.",
+        "Ceremony sound, cocktail hour music and a full party. If you want to add Bingo Musical or Batalla Musical, we fit it into the programme without losing the flow.",
+        "Every wedding is different. Tell us how you picture the day and we'll put together a tailored proposal."
+      ],
+      "inclou": [
+        "Ceremony sound (mic + PA)",
+        "Cocktail hour / welcome music",
+        "DJ for the party — booth, controller and laptop",
+        "LED dance floor lighting",
+        "Pre-event coordination with the venue",
+        "Single point of contact for the whole day",
+        "Setup and teardown"
+      ],
+      "noInclou": "* Musical Bingo or Musical Battle available as add-ons. Pack discount — contact us."
     }
   }
 }

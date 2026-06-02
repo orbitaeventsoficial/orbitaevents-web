@@ -10,9 +10,9 @@ async function main() {
       company: 'Masquerade Events',
       phone: '691748306',
       specialty: 'Presentador d\'esdeveniments',
-      costPerHour: 133.33,
+      costPerHour: 100,
       commissionPct: 0,
-      notes: '200€ per 1,5h (Bingo Musical o Batalla Musical). Cost/hora calculat: 200 ÷ 1,5 = 133,33€/h.',
+      notes: 'Tarifa: 100€/h com a presentador. Per a Bingo Musical o Batalla Musical (1,5h): 150€ Carlos + ~50€ tècnic de so + material = 200€ total. Usable de forma independent per a qualsevol presentació.',
       isActive: true,
     },
     create: {
@@ -21,14 +21,14 @@ async function main() {
       company: 'Masquerade Events',
       phone: '691748306',
       specialty: 'Presentador d\'esdeveniments',
-      costPerHour: 133.33,
+      costPerHour: 100,
       commissionPct: 0,
-      notes: '200€ per 1,5h (Bingo Musical o Batalla Musical). Cost/hora calculat: 200 ÷ 1,5 = 133,33€/h.',
+      notes: 'Tarifa: 100€/h com a presentador. Per a Bingo Musical o Batalla Musical (1,5h): 150€ Carlos + ~50€ tècnic de so + material = 200€ total. Usable de forma independent per a qualsevol presentació.',
       isActive: true,
     },
   });
 
-  console.log('Carlos creat/actualitzat:', carlos.name, '—', carlos.costPerHour, '€/h');
+  console.log(`Carlos: ${carlos.name} — ${carlos.costPerHour}€/h (${carlos.specialty})\n${carlos.notes}`);
 }
 
 main()

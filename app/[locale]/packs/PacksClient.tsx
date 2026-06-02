@@ -5,12 +5,13 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
 import type { PackDefinition, ServiceSlug } from '@/config/packs-config';
 
-type Tab = 'bodas' | 'festes' | 'empresas';
+type Tab = 'bodas' | 'festes' | 'empresas' | 'animacio';
 
 const TABS: { id: Tab; services: ServiceSlug[] }[] = [
   { id: 'festes', services: ['discomovil', 'fiestas'] },
   { id: 'bodas', services: ['bodas'] },
   { id: 'empresas', services: ['empresas'] },
+  { id: 'animacio', services: ['animacion'] },
 ];
 
 export default function PacksClient({ packs }: { packs: PackDefinition[] }) {

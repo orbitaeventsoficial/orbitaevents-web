@@ -8,6 +8,7 @@ import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
 import { applyBookingStatusSideEffects, type ManagedBookingStatus } from '@/lib/services/bookingStatusTransitionService';
 import { syncBookingToGoogleCalendar } from '@/lib/services/googleCalendarSyncService';
 import { mapAdminLogToCanonicalEvent } from '@/lib/services/timelineQueryService';
+import { VAT_RATE_INVOICE, calcDeposit, roundMoney } from '@/lib/constants/pricing';
 
 type ExistingBookingRecord = {
   id: string;
@@ -99,16 +100,17 @@ export async function prepareBookingPatchData(existing: ExistingBookingRecord, i
     const baseWithoutTravel = Math.max(0, existing.subtotal - calculateTravelCharge(existing.distanceKm || 0));
     const subtotal = baseWithoutTravel + travelCharge;
     const discount = typeof body.discount === 'number' ? body.discount : existing.discount || 0;
-    const vatRate = typeof body.vatRate === 'number' ? body.vatRate : existing.vatRate || 21;
+    const vatRate = typeof body.vatRate === 'number' ? body.vatRate : existing.vatRate || VAT_RATE_INVOICE;
     const baseAfterDiscount = Math.max(0, subtotal - discount);
-    const vatAmount = baseAfterDiscount * (vatRate / 100);
-    const total = baseAfterDiscount + vatAmount;
+    const vatAmount = roundMoney(baseAfterDiscount * (vatRate / 100));
+    const total = roundMoney(baseAfterDiscount + vatAmount);
+    const depositAmount = calcDeposit(total);
 
     body.subtotal = subtotal;
     body.vatAmount = vatAmount;
     body.total = total;
-    body.depositAmount = Math.round(total * 0.3);
-    body.remainingAmount = total - Math.round(total * 0.3);
+    body.depositAmount = depositAmount;
+    body.remainingAmount = roundMoney(total - depositAmount);
   }
 
   const oldStatus = existing.status as ManagedBookingStatus;
@@ -226,7 +228,6 @@ export async function deleteBookingIfAllowed(existing: Pick<ExistingBookingRecor
 
   return { ok: true as const, status: 200, body: { ok: true } };
 }
-
 
 
 

@@ -1,16 +1,20 @@
 'use client';
 
-/**
- * FORMULARI NOVA RESERVA - Creació de reserves des de l'admin
- * Carrega packs i extras, calcula preus en temps real
- * Pot pre-omplir des d'un lead (leadId) o client (customerId)
- */
+/* ============================================================================
+   ÒRBITA ADMIN — Nova reserva (Brass & Obsidian)
+   ----------------------------------------------------------------------------
+   Shell `nb-root` amb top bar + hero + layout 2 columnes (main + sidebar
+   sticky). Reaprofita tots els hooks i la lògica existent. Substitueix
+   `<AdminPage>` (vell) i les classes Tailwind del Frankenstein per CSS
+   canònic `nb__*` consumint tokens Studio.
+   Canvi #842.
+============================================================================ */
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { AdminPage } from '../components/AdminPage';
 import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 import { useToast } from '../components/ToastProvider';
 import BookingPricingSummary from './BookingPricingSummary';
@@ -25,6 +29,7 @@ import { useBookingDateConflicts } from './useBookingDateConflicts';
 import { useBookingPricing } from './useBookingPricing';
 import type { BookingExtra, BookingFormData, BookingSelectedExtras } from './booking-form.types';
 import { OPERATOR_EXTRA_ID } from './booking-form.types';
+import './nb-design.css';
 
 export default function NewBookingForm() {
   const toast = useToast();
@@ -32,10 +37,20 @@ export default function NewBookingForm() {
   const leadId = searchParams?.get('leadId') ?? null;
   const customerId = searchParams?.get('customerId') ?? null;
   const dateParam = searchParams?.get('date') ?? null;
-  const customerHubBookingsHref = customerId ? buildCustomerWorkspaceTabHref(customerId, 'bookings') : '/admin/bookings';
+  // Si la reserva ve d'un lead, el back natural és la fitxa del lead (Agenda).
+  // Si ve d'un client, el back és la pestanya Reserves del client. Cas isolat: Agenda.
+  const backHref = customerId
+    ? buildCustomerWorkspaceTabHref(customerId, 'bookings')
+    : leadId
+      ? buildLeadWorkspaceHref(leadId)
+      : '/admin/leads';
+  const backLabel = customerId ? 'Client' : leadId ? 'Lead' : 'Agenda';
+  const crumbContext = customerId ? 'Client' : 'Agenda';
 
   const { form, setForm, packs, extras, loading, leadData, fuelReferenceInfo } = useNewBookingInitialData({ leadId, dateParam });
   const [selectedExtras, setSelectedExtras] = useState<BookingSelectedExtras>({});
+  const [customPackPrice, setCustomPackPrice] = useState('');
+  const [invoiceRequired, setInvoiceRequired] = useState(false);
   const { discountValidation, validatingCode, resetDiscountValidation, validateDiscountCode } = useBookingDiscountValidation({
     packs,
     selectedPackId: form.packId,
@@ -68,6 +83,8 @@ export default function NewBookingForm() {
     packs,
     extras,
     selectedExtras,
+    customPackPrice: customPackPrice ? Number(customPackPrice) : undefined,
+    invoiceRequired,
   });
 
   useEffect(() => {
@@ -85,13 +102,15 @@ export default function NewBookingForm() {
     });
   }, [operatorExtraPrice]);
 
-  const { submitting, error, setError, submit: handleSubmit } = useNewBookingSubmit({
+  const { submitting, error, submit: handleSubmit } = useNewBookingSubmit({
     form,
     selectedExtras,
     leadId,
     leadData,
     customerId,
     internalTravelCost,
+    customPackPrice: customPackPrice ? Number(customPackPrice) : undefined,
+    invoiceRequired,
   });
 
   const toggleExtra = (extra: BookingExtra) => {
@@ -115,109 +134,136 @@ export default function NewBookingForm() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
+      <div className="nb-root">
+        <div className="nb__loading"><span className="nb__spinner" aria-label="Carregant" /></div>
       </div>
     );
   }
 
+  const submitDisabled = submitting || !form.clientName || !form.clientEmail || !form.packId;
+
   return (
-    <AdminPage
-      title="Nova reserva"
-      subtitle={leadData ? `Des de l'entrada de ${leadData.name}` : 'Crear una reserva manualment'}
-      back={{ href: customerHubBookingsHref, label: customerId ? 'Client' : 'Reserves' }}
-      className="max-w-5xl"
-    >
-      {error && (
-        <div className="rounded-xl border p-4">
-          <p className="text-sm">{error}</p>
-        </div>
-      )}
-
-      <BookingClientEventSection
-        leadData={leadData ? {
-          id: leadData.id,
-          name: leadData.name,
-          email: leadData.email,
-          budget: leadData.budget,
-        } : null}
-        form={{
-          clientName: form.clientName,
-          clientEmail: form.clientEmail,
-          clientPhone: form.clientPhone,
-          eventType: form.eventType,
-          eventDate: form.eventDate,
-          eventStartTime: form.eventStartTime,
-          eventEndTime: form.eventEndTime,
-          eventLocation: form.eventLocation,
-          eventVenue: form.eventVenue,
-          guestCount: form.guestCount,
-        }}
-        calculatingDistance={calculatingDistance}
-        distanceMessage={distanceMessage}
-        dateConflicts={dateConflicts}
-        onFieldChange={updateField}
-      />
-
-      <BookingPackExtrasSection
-        packs={packs}
-        displayExtras={displayExtras}
-        selectedExtras={selectedExtras}
-        selectedPackId={form.packId}
-        extraHours={form.extraHours}
-        onPackSelect={(packId) => updateField('packId', packId)}
-        onExtraHoursChange={(value) => updateField('extraHours', value)}
-        onToggleExtra={toggleExtra}
-        onUpdateExtraQuantity={updateExtraQuantity}
-      />
-
-      <BookingTravelDiscountSection
-        form={{
-          distanceKm: form.distanceKm,
-          discount: form.discount,
-          discountCode: form.discountCode,
-          notes: form.notes,
-        }}
-        travelBlocks={travelBlocks}
-        travelCharge={travelCharge}
-        billableKm={billableKm}
-        includedTravelKm={INCLUDED_TRAVEL_KM}
-        travelBlockKm={TRAVEL_BLOCK_KM}
-        travelBlockEur={TRAVEL_BLOCK_EUR}
-        fuelReferenceInfo={fuelReferenceInfo}
-        validatingCode={validatingCode}
-        discountValidation={discountValidation}
-        onFieldChange={updateField}
-        onResetDiscountValidation={resetDiscountValidation}
-        onValidateDiscountCode={() => void validateDiscountCode(form.discountCode)}
-      />
-
-      {pricing && (
-        <BookingPricingSummary
-          pricing={pricing}
-          travelBlocks={travelBlocks}
-          internalTravelCost={internalTravelCost}
-          defaultVehicleCostPerKm={DEFAULT_VEHICLE_COST_PER_KM}
-          marginEstimate={marginEstimate}
-        />
-      )}
-
-      <div className="flex items-center gap-3 pb-8">
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={submitting || !form.clientName || !form.clientEmail || !form.packId}
-          className="ap-btn ap-btn--primary px-6 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {submitting ? 'Creant reserva...' : 'Crear reserva'}
-        </button>
-        <Link
-          href={customerHubBookingsHref}
-          className="ap-btn ap-btn--secondary px-4 py-3 text-sm"
-        >
-          Cancel·lar
+    <div className="nb-root">
+      <div className="nb__bar">
+        <Link href={backHref} className="nb__back">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 12L6 8l4-4" /></svg>
+          {backLabel}
         </Link>
+        <span className="nb__crumb">{crumbContext} <em>/</em> <strong>Nova reserva</strong></span>
       </div>
-    </AdminPage>
+
+      <div className="nb__hero">
+        <span className="nb__eyebrow">Nova reserva</span>
+        <h1 className="nb__h1">{leadData ? leadData.name : 'Crear reserva'}</h1>
+        <p className="nb__sub">
+          {leadData ? (
+            <>
+              Des de l&apos;entrada <Link href={buildLeadWorkspaceHref(leadData.id)} className="nb__leadlink">{leadData.name}</Link>
+              {leadData.budget && <> · Pressupost <b>{leadData.budget}</b></>}
+              {leadData.email && <> · {leadData.email}</>}
+            </>
+          ) : (
+            'Omple les dades del client, l\'esdeveniment i selecciona un pack.'
+          )}
+        </p>
+      </div>
+
+      <div className="nb__layout">
+        <div className="nb__main">
+          {error && (
+            <div className="nb__panel nb__panel--error">
+              <p className="nb__errortext">{error}</p>
+            </div>
+          )}
+
+          <BookingClientEventSection
+            leadData={leadData ? {
+              id: leadData.id,
+              name: leadData.name,
+              email: leadData.email,
+              budget: leadData.budget,
+            } : null}
+            form={{
+              clientName: form.clientName,
+              clientEmail: form.clientEmail,
+              clientPhone: form.clientPhone,
+              eventType: form.eventType,
+              eventDate: form.eventDate,
+              eventStartTime: form.eventStartTime,
+              eventEndTime: form.eventEndTime,
+              eventLocation: form.eventLocation,
+              eventVenue: form.eventVenue,
+              guestCount: form.guestCount,
+            }}
+            calculatingDistance={calculatingDistance}
+            distanceMessage={distanceMessage}
+            dateConflicts={dateConflicts}
+            onFieldChange={updateField}
+          />
+
+          <BookingPackExtrasSection
+            packs={packs}
+            displayExtras={displayExtras}
+            selectedExtras={selectedExtras}
+            selectedPackId={form.packId}
+            extraHours={form.extraHours}
+            customPackPrice={customPackPrice}
+            invoiceRequired={invoiceRequired}
+            onPackSelect={(packId) => { updateField('packId', packId); setCustomPackPrice(''); }}
+            onExtraHoursChange={(value) => updateField('extraHours', value)}
+            onCustomPackPriceChange={setCustomPackPrice}
+            onInvoiceRequiredChange={setInvoiceRequired}
+            onToggleExtra={toggleExtra}
+            onUpdateExtraQuantity={updateExtraQuantity}
+          />
+
+          <BookingTravelDiscountSection
+            form={{
+              distanceKm: form.distanceKm,
+              discount: form.discount,
+              discountCode: form.discountCode,
+              notes: form.notes,
+            }}
+            travelBlocks={travelBlocks}
+            travelCharge={travelCharge}
+            billableKm={billableKm}
+            includedTravelKm={INCLUDED_TRAVEL_KM}
+            travelBlockKm={TRAVEL_BLOCK_KM}
+            travelBlockEur={TRAVEL_BLOCK_EUR}
+            fuelReferenceInfo={fuelReferenceInfo}
+            validatingCode={validatingCode}
+            discountValidation={discountValidation}
+            onFieldChange={updateField}
+            onResetDiscountValidation={resetDiscountValidation}
+            onValidateDiscountCode={() => void validateDiscountCode(form.discountCode)}
+          />
+        </div>
+
+        <aside className="nb__side">
+          {pricing && (
+            <BookingPricingSummary
+              pricing={pricing}
+              travelBlocks={travelBlocks}
+              internalTravelCost={internalTravelCost}
+              defaultVehicleCostPerKm={DEFAULT_VEHICLE_COST_PER_KM}
+              marginEstimate={marginEstimate}
+            />
+          )}
+          <div className="nb__cta">
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={submitDisabled}
+              className="nb__btn--prim"
+            >
+              {submitting ? 'Creant reserva…' : 'Crear reserva'}
+            </button>
+            <Link href={backHref} className="nb__btn--sec">
+              Cancel·lar
+            </Link>
+          </div>
+        </aside>
+      </div>
+    </div>
   );
 }

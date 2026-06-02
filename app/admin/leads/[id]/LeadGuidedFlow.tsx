@@ -77,8 +77,8 @@ export default function LeadGuidedFlow({
       const payload = await patchLeadStatus({ leadId, status: nextStatus });
       const customerId = payload?.lead?.customerId as string | undefined;
       startTransition(() => {
-        if (nextStatus === 'WON' && customerId) {
-          router.push(buildCustomerHubHref(customerId));
+        if (nextStatus === 'WON') {
+          router.push(`/admin/bookings/new?leadId=${encodeURIComponent(leadId)}`);
           return;
         }
         router.refresh();

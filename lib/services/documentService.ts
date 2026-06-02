@@ -6,6 +6,7 @@
 
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { EVENT_TYPE_DOCUMENT_LABELS, getDocumentCompanyInfo } from '@/lib/constants';
+import { VAT_RATE_INVOICE, calcVatAmount, roundMoney } from '@/lib/constants/pricing';
 import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 import { escapeHtml } from '@/lib/utils/sanitize';
 
@@ -421,7 +422,7 @@ export function generateQuoteHTML(data: QuoteData, template: QuoteTemplateOverri
       </div>
       ` : ''}
       <div class="totals-row">
-        <span class="label">IVA (21%)</span>
+        <span class="label">IVA (${VAT_RATE_INVOICE}%)</span>
         <span>${data.iva.toFixed(2)}€</span>
       </div>
       <div class="totals-row total">
@@ -507,8 +508,8 @@ export function createQuoteFromLead(
   extras?: QuoteExtra[]
 ): QuoteData {
   const subtotal = packData.price + (extras?.reduce((sum, e) => sum + e.price * e.quantity, 0) || 0);
-  const iva = subtotal * 0.21;
-  const total = subtotal + iva;
+  const iva = calcVatAmount(subtotal, true);
+  const total = roundMoney(subtotal + iva);
 
   // Validesa: 15 dies
   const validUntil = new Date();

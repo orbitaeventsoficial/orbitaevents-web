@@ -25,6 +25,16 @@ vi.mock('@/lib/constants/animacio-products', () => ({
     { id: 'batalla-musical', nom: 'Batalla Musical', descripcio: [], inclou: [] },
   ],
 }));
+// El resolver real importa 'server-only' + getTranslations (next-intl/server). En
+// vitest, next-intl resol de forma no determinista a la variant client (que llança
+// "not supported in Client Components"). Mockem el resolver perquè el test no depengui
+// de la resolució de next-intl i sigui determinista.
+vi.mock('@/lib/constants/animacio-products-resolver', () => ({
+  getAnimacioProducts: vi.fn(async () => [
+    { id: 'bingo-musical', nom: 'Bingo Musical', descripcio: [], inclou: [] },
+    { id: 'batalla-musical', nom: 'Batalla Musical', descripcio: [], inclou: [] },
+  ]),
+}));
 
 import {
   createDossier,
