@@ -8,6 +8,13 @@
 
 html, body { margin: 0; padding: 0; }
 
+/* Overrides locals per visibilitat fora del context admin-mode */
+.bk2__root {
+  --bk-line:   rgba(246,243,234,0.18);
+  --bk-line2:  rgba(246,243,234,0.30);
+  --bk-raised: rgba(246,243,234,0.04);
+}
+
 /* ── Reset mínim ─────────────────────────────────────────────────────────── */
 .bk2__root *, .bk2__root *::before, .bk2__root *::after { box-sizing: border-box; }
 .bk2__root { display: flex; flex-direction: column; min-height: 100dvh; background: var(--canvas, #09090b); color: var(--t, #ccc8c2); font-family: var(--sans, system-ui, sans-serif); font-size: 14px; }
@@ -16,7 +23,7 @@ html, body { margin: 0; padding: 0; }
 .bk2__topbar {
   display: flex; align-items: center; gap: 12px;
   padding: 10px 20px;
-  border-bottom: 1px solid var(--line, rgba(246,243,234,0.1));
+  border-bottom: 1px solid var(--bk-line);
   background: color-mix(in oklab, var(--canvas) 88%, transparent);
   backdrop-filter: blur(16px);
   position: sticky; top: 0; z-index: 40;
@@ -35,8 +42,8 @@ html, body { margin: 0; padding: 0; }
 .bk2__client { font-size: 16px; font-weight: 700; color: var(--t); flex: 1; }
 .bk2__status {
   font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-  padding: 3px 10px; border-radius: 20px; border: 1px solid var(--c, var(--line2));
-  color: var(--c, var(--t2)); background: color-mix(in oklab, var(--c, var(--line2)) 10%, transparent);
+  padding: 3px 10px; border-radius: 20px; border: 1px solid var(--c, var(--bk-line2));
+  color: var(--c, var(--t2)); background: color-mix(in oklab, var(--c, var(--bk-line2)) 10%, transparent);
 }
 
 /* Colors per estat */
@@ -57,13 +64,13 @@ html, body { margin: 0; padding: 0; }
 
 /* ── Columna esquerra — Semàfor + accions ────────────────────────────────── */
 .bk2__sidebar {
-  border-right: 1px solid var(--line);
+  border-right: 1px solid var(--bk-line);
   padding: 20px 16px;
   display: flex; flex-direction: column; gap: 0;
   overflow-y: auto;
 }
 .bk2__sidebar > * + * {
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--bk-line);
   padding-top: 16px;
   margin-top: 16px;
 }
@@ -88,7 +95,7 @@ html, body { margin: 0; padding: 0; }
   display: flex; align-items: center; justify-content: center; gap: 7px;
   width: 100%; padding: 9px 14px; border-radius: 7px;
   font-size: 12px; font-weight: 600; cursor: pointer; transition: all 120ms;
-  border: 1px solid var(--line2); background: var(--raised); color: var(--t);
+  border: 1px solid var(--bk-line2); background: var(--raised); color: var(--t);
   text-decoration: none;
 }
 .bk2__btn:hover { border-color: var(--gold); color: var(--gold); }
@@ -107,7 +114,7 @@ html, body { margin: 0; padding: 0; }
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto;
   gap: 1px;
-  background: var(--line);
+  background: var(--bk-line);
   align-content: start;
   overflow-y: auto;
 }
@@ -116,7 +123,7 @@ html, body { margin: 0; padding: 0; }
 .bk2__panel {
   background: var(--canvas);
   padding: 18px 20px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--bk-line);
 }
 .bk2__panel--wide { grid-column: span 2; }
 
@@ -124,7 +131,7 @@ html, body { margin: 0; padding: 0; }
   display: flex; align-items: baseline; justify-content: space-between;
   margin-bottom: 10px;
   padding-bottom: 8px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--bk-line);
 }
 .bk2__ph h3 {
   font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
@@ -141,7 +148,7 @@ html, body { margin: 0; padding: 0; }
 .bk2__rows div {
   display: flex; justify-content: space-between; align-items: baseline;
   gap: 8px; padding: 6px 0;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--bk-line);
 }
 .bk2__rows div:last-child { border-bottom: 0; }
 .bk2__rows dt { font-size: 11px; color: var(--t3); flex-shrink: 0; }
@@ -169,7 +176,7 @@ html, body { margin: 0; padding: 0; }
 .bk2__statuspick button {
   font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
   padding: 4px 10px; border-radius: 20px; cursor: pointer; transition: all 120ms;
-  border: 1px solid var(--line2); background: none; color: var(--t3);
+  border: 1px solid var(--bk-line2); background: none; color: var(--t3);
 }
 .bk2__statuspick button.is-on { border-color: var(--c); color: var(--c); background: color-mix(in oklab, var(--c) 10%, transparent); }
 .bk2__statuspick button:hover:not(.is-on):not(:disabled) { border-color: var(--t2); color: var(--t2); }
@@ -188,7 +195,7 @@ html, body { margin: 0; padding: 0; }
 /* Peu de pàgina */
 .bk2__footer {
   padding: 10px 20px;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--bk-line);
   display: flex; align-items: center; gap: 12px;
   font-size: 11px; color: var(--t3);
 }
