@@ -466,34 +466,39 @@
 /* Valor € a la targeta del calendari — al celltop, sempre visible */
 .fx__cval { font-family: var(--mono); font-size: 10px; font-weight: 700; color: color-mix(in oklab, var(--gold) 65%, var(--t2)); }
 
-/* Safata leads sense data d'event */
+/* Safata leads sense data — franja horitzontal compacta */
 .fx__nodate {
-  margin: 8px var(--gutter) 0;
-  border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
+  display: flex; align-items: center; gap: 0;
+  margin: 6px var(--gutter) 0;
+  border: 1px solid color-mix(in oklab, var(--gold) 20%, var(--line));
+  border-radius: 8px; overflow: hidden;
+  background: color-mix(in oklab, var(--gold) 4%, var(--panel));
 }
 .fx__nodatehead {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 14px; border-bottom: 1px solid var(--line);
-  font-family: var(--mono); font-size: 10px; font-weight: 800;
-  letter-spacing: 0.12em; text-transform: uppercase; color: var(--t3);
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-right: 1px solid color-mix(in oklab, var(--gold) 20%, var(--line));
+  font-family: var(--mono); font-size: 9px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: color-mix(in oklab, var(--gold) 60%, var(--t3));
+  white-space: nowrap; flex-shrink: 0;
 }
 .fx__nodatecount {
-  padding: 1px 6px; border-radius: 4px;
-  background: color-mix(in oklab, var(--t) 8%, transparent);
-  color: var(--t2); font-size: 10px;
+  padding: 1px 5px; border-radius: 3px;
+  background: color-mix(in oklab, var(--gold) 15%, transparent);
+  color: var(--gold); font-size: 9px; font-weight: 800;
 }
-.fx__nodatelist { display: flex; flex-direction: column; }
+.fx__nodatelist { display: flex; flex-direction: row; flex-wrap: wrap; flex: 1; gap: 0; }
 .fx__nodaterow {
-  display: flex; align-items: center; gap: 8px;
-  padding: 6px 14px; text-align: left; font: inherit;
-  border-bottom: 1px solid var(--line); cursor: pointer;
+  display: flex; align-items: center; gap: 7px;
+  padding: 5px 14px; text-align: left; font: inherit;
+  border-right: 1px solid var(--line); cursor: pointer;
   transition: background 120ms ease;
 }
-.fx__nodaterow:last-child { border-bottom: 0; }
-.fx__nodaterow:hover { background: color-mix(in oklab, var(--t) 4%, transparent); }
-.fx__nodatename { font-family: var(--ui); font-size: 13px; font-weight: 500; color: var(--t); }
-.fx__nodatemeta { font-family: var(--mono); font-size: 11px; color: var(--t3); margin-left: 4px; flex: 1; }
-.fx__nodaterow .fx__cval { font-size: 11px; margin-left: auto; }
+.fx__nodaterow:last-child { border-right: 0; }
+.fx__nodaterow:hover { background: color-mix(in oklab, var(--gold) 6%, transparent); }
+.fx__nodatename { font-family: var(--ui); font-size: 12.5px; font-weight: 600; color: var(--t); }
+.fx__nodatemeta { font-family: var(--mono); font-size: 10.5px; color: var(--t3); }
+.fx__nodaterow .fx__cval { font-size: 10.5px; }
 
 /* ── Anàlisi econòmica (fitxa completa del lead) ── */
 .fxd__econo {
