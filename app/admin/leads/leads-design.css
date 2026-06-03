@@ -468,38 +468,36 @@
 
 /* Safata leads sense data — franja horitzontal compacta */
 .fx__nodate {
-  display: flex; align-items: center; justify-content: center; gap: 0;
-  margin: 6px var(--gutter) 0;
-  border: 1px solid var(--line2);
-  border-radius: 8px;
-  background: var(--raised);
-  overflow: hidden;
-  background: var(--panel);
+  display: flex; align-items: center; gap: 0;
+  margin: 8px var(--gutter);
+  border: 1px solid var(--o-stage-new-strong);
+  border-radius: 8px; overflow: hidden;
+  background: color-mix(in oklab, var(--o-stage-new) 7%, var(--panel));
 }
 .fx__nodatehead {
-  display: flex; align-items: center; gap: 6px;
-  padding: 5px 12px; border-right: 1px solid var(--line);
+  display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+  padding: 6px 12px; border-right: 1px solid color-mix(in oklab, var(--o-stage-new) 25%, var(--line));
   font-family: var(--mono); font-size: 9px; font-weight: 800;
-  letter-spacing: 0.12em; text-transform: uppercase; color: var(--t3);
-  white-space: nowrap; flex-shrink: 0;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--o-stage-new); white-space: nowrap;
 }
 .fx__nodatecount {
   padding: 1px 5px; border-radius: 3px;
-  background: color-mix(in oklab, var(--t) 10%, transparent);
-  color: var(--t2); font-size: 9px; font-weight: 800;
+  background: color-mix(in oklab, var(--o-stage-new) 20%, transparent);
+  color: var(--o-stage-new); font-size: 9px; font-weight: 800;
 }
-.fx__nodatelist { display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; flex: 1; gap: 0; }
+.fx__nodatelist { display: flex; flex-direction: row; flex-wrap: wrap; flex: 1; }
 .fx__nodaterow {
-  display: flex; align-items: center; gap: 7px;
-  padding: 5px 14px; text-align: left; font: inherit;
-  border-right: 1px solid var(--line); cursor: pointer;
-  transition: background 120ms ease;
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 16px; text-align: left; font: inherit;
+  border-right: 1px solid color-mix(in oklab, var(--o-stage-new) 15%, var(--line));
+  cursor: pointer; transition: background 120ms ease;
 }
 .fx__nodaterow:last-child { border-right: 0; }
-.fx__nodaterow:hover { background: var(--raised); }
-.fx__nodatename { font-family: var(--ui); font-size: 12.5px; font-weight: 600; color: var(--t); }
-.fx__nodatemeta { font-family: var(--mono); font-size: 10.5px; color: var(--t3); }
-.fx__nodaterow .fx__cval { font-size: 10.5px; }
+.fx__nodaterow:hover { background: color-mix(in oklab, var(--o-stage-new) 8%, transparent); }
+.fx__nodatename { font-family: var(--ui); font-size: 13px; font-weight: 600; color: var(--t); }
+.fx__nodatemeta { font-family: var(--mono); font-size: 11px; color: var(--t2); }
+.fx__nodaterow .fx__cval { font-size: 11px; margin-left: auto; }
 
 /* ── Anàlisi econòmica (fitxa completa del lead) ── */
 .fxd__econo {
