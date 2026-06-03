@@ -437,6 +437,7 @@
   transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease, border-color 120ms ease;
 }
 .fx__cell.is-lead:hover {
+  z-index: 10;
   transform: translateY(-1px);
   background: var(--raised);
   border-color: var(--line2);
