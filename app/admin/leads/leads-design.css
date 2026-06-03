@@ -49,7 +49,7 @@
 
 .fx__pagehead {
   display: flex; align-items: flex-end; justify-content: space-between;
-  gap: 12px; padding: 10px var(--gutter) 8px;
+  gap: 12px; padding: 4px var(--gutter) 3px;
   border-bottom: 1px solid var(--line);
   background: color-mix(in oklab, var(--canvas) 88%, transparent);
 }
