@@ -326,7 +326,33 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
         )}
       </section>
 
-      {/* Indicador de preu */}
+      {/* Stats */}
+      <div className="fxd__stats">
+        <div>
+          <span>Valor</span>
+          {editField === 'budget' ? (
+            <span className="fxd__editrow">
+              <input className="fxd__editinput" type="number" min={0} value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
+                autoFocus style={{ width: 90 }} />
+              <span className="text-[11px]">€</span>
+              <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
+              <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
+            </span>
+          ) : (
+            <b className="cursor-pointer border-b border-dashed border-[var(--line2)]" onClick={() => startEdit('budget')}>
+              {fields.budget ? formatCurrency(Number(fields.budget)) : <em className="text-[11px]" style={{ opacity: 0.5 }}>Afegir</em>}
+            </b>
+          )}
+        </div>
+        <div>
+          <span>Durada</span><b>{durationLabel(fields.eventStartTime, fields.eventEndTime)}</b>
+        </div>
+        <div><span>Prioritat</span><b className={`fxd__pri--${lead.priority.toLowerCase()}`}>{PRIORITY_LABEL[lead.priority] || lead.priority}</b></div>
+      </div>
+
+      {/* Indicador de preu — just sota els stats */}
       {(() => {
         const val = fields.budget ? Number(fields.budget) : 0;
         const t = fields.eventStartTime; const e = fields.eventEndTime;
@@ -353,32 +379,6 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
           </div>
         );
       })()}
-
-      {/* Stats */}
-      <div className="fxd__stats">
-        <div>
-          <span>Valor</span>
-          {editField === 'budget' ? (
-            <span className="fxd__editrow">
-              <input className="fxd__editinput" type="number" min={0} value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
-                autoFocus style={{ width: 90 }} />
-              <span className="text-[11px]">€</span>
-              <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
-              <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
-            </span>
-          ) : (
-            <b className="cursor-pointer border-b border-dashed border-[var(--line2)]" onClick={() => startEdit('budget')}>
-              {fields.budget ? formatCurrency(Number(fields.budget)) : <em className="text-[11px]" style={{ opacity: 0.5 }}>Afegir</em>}
-            </b>
-          )}
-        </div>
-        <div>
-          <span>Durada</span><b>{durationLabel(fields.eventStartTime, fields.eventEndTime)}</b>
-        </div>
-        <div><span>Prioritat</span><b className={`fxd__pri--${lead.priority.toLowerCase()}`}>{PRIORITY_LABEL[lead.priority] || lead.priority}</b></div>
-      </div>
 
       {/* Grid de panells */}
       <div className="fxd__grid">

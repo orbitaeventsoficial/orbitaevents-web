@@ -292,7 +292,6 @@ function LeadDetailPanel({
           <div><span>Prioritat</span><b>{PRIORITY_LABEL[lead.priority]}</b></div>
         </div>
         <PriceHint value={lead.value} time={lead.time} endTime={lead.endTime} type={lead.type} />
-
         <div className="fxd__grid">
           <section className="fxd__panel">
             <div className="fxd__panelhead"><span>Següent pas</span></div>
