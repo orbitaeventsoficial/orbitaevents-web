@@ -1418,6 +1418,45 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #865 — 2026-06-03 — claude (FET)
+
+**Poliment calendari zero-scroll, safata sense data, tooltips.**
+
+- Layout zero-scroll: `fx-root` 100dvh + `fx__content` flex:1 overflow-y:auto.
+- Valor € a les targetes del calendari (`fx__cval` a `fx__celltop`).
+- Safata "Sense data assignada" fora del scroll, sempre visible.
+- Tooltips dots: cap avall + z-index:10 hover + overflow:visible al grid.
+- Revert agent Opus Max (114k tokens per 6px padding — error documentat).
+- Validació tècnica: `npx tsc --noEmit` OK. `validate:core` OK.
+- Validació funcional: Playwright, tots els casos verificats.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #864 — 2026-06-03 — claude (FET)
+
+**Anàlisi econòmica KPI cards a la fitxa completa del lead.**
+
+- KPI cards recuperades del booking-lab: marge net, preu/hora, +€ per arribar a tarifa, cost col·lab.
+- `fxd__econo`/`fxd__kpis`/`fxd__kpi` amb semàfor via tokens.
+- Validació tècnica: `npx tsc --noEmit` OK. `validate:core` OK.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #863 — 2026-06-03 — claude (FET)
+
+**Indicador €/h vs mercat a la fitxa ràpida del lead.**
+
+- `PriceHint` sota stats Valor·Durada·Prioritat. Semàfor critical/warn/ok via tokens.
+- Validació tècnica: `npx tsc --noEmit` OK. `validate:core` OK.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #862 — 2026-06-03 — claude (FET)
 
 **Elimina PipelineSuggestionsPanel i ruta /suggestions.**

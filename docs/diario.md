@@ -1,3 +1,94 @@
+## 2026-06-03 — Canvi #865: Poliment calendari zero-scroll, safata, tooltips (claude)
+
+### Context
+Poliment visual del calendari de leads: layout zero-scroll, safata leads sense data sempre visible, valor € a les targetes, tooltips dels dots visibles sense tallar-se.
+
+### Canvis
+- `fx-root`: `height:100dvh; overflow:hidden; display:flex; flex-direction:column`.
+- `fx__content`: `flex:1; overflow-y:auto`. El calendari fa scroll intern; la resta sempre al fold.
+- Valor € a les targetes: `fx__cval` a `fx__celltop` (sempre visible, color or apagat).
+- Safata "Sense data assignada" moguda fora de `fx__content` — no desapareix sota els mesos.
+- Tooltips dots: `top:calc(100%+6px)` (cap avall). `overflow:visible` al `fx__grid`. `z-index:10` a `.fx__cell.is-lead:hover`.
+- Revert agent Opus Max (114k tokens per 6px de padding — error de judici documentat al protocol).
+- `ADMIN_CHANGE_COUNTER` 864 → 865.
+
+### Validació
+- `npx tsc --noEmit` OK
+- `pnpm run validate:core` OK
+- Validació tècnica: TypeScript net. validate:core verd.
+- Validació funcional: capturat amb Playwright — tooltips visibles a esquerra, dreta i entre cel·les veïnes.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 865. Següent canvi ha de ser `#866`.
+
+---
+
+## 2026-06-03 — Canvi #864: Anàlisi econòmica KPI cards a la fitxa completa del lead (claude)
+
+### Context
+Recuperació del panell d'anàlisi econòmica del booking-lab cap a la fitxa completa del lead.
+
+### Canvis
+- KPI cards: marge net/estimat, preu/hora vs tarifa, +€ per arribar a tarifa, cost col·laborador.
+- CSS: `.fxd__econo`, `.fxd__kpis`, `.fxd__kpi` amb data-level critical/warn/ok/info.
+- `PriceHint` eliminat de la fitxa completa (redundant amb les cards).
+
+### Validació
+- `npx tsc --noEmit` OK. `validate:core` OK.
+- Validació tècnica: TypeScript net.
+- Validació funcional: Kimera mostra 13% marge, 30€/h crítics, +1.150€ per arribar a tarifa.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 864.
+
+---
+
+## 2026-06-03 — Canvi #863: Indicador €/h vs mercat a la fitxa ràpida del lead (claude)
+
+### Context
+Sessió de treball contínua sobre `/admin/leads`. Tres blocs principals: (1) indicador de mercat €/h al lead, (2) anàlisi econòmica KPI cards recuperades del booking-lab, (3) poliment visual del calendari (layout zero-scroll, safata leads sense data, tooltips).
+
+### Canvis #863 — Indicador de preu als leads
+- `app/admin/leads/LeadsSeasonClient.tsx` — `PriceHint` a la fitxa ràpida: mostra €/h pactat vs. tarifa de mercat (`SERVICE_HOURLY_RATES`), semàfor critical/warn/ok. Visible sota els stats Valor·Durada·Prioritat.
+- `app/admin/leads/[id]/LeadDetailClient.tsx` — import `SERVICE_HOURLY_RATES`, `resolveServicePricingKey`, `computeFullBookingCost`, `MARGIN_ADVICE`.
+- `app/admin/leads/leads-design.css` — `.fxd__pricehint` + semàfor via tokens (`--o-danger`, `--gold`, `--o-stage-won-strong`).
+
+### Canvis #864 — Anàlisi econòmica KPI cards (booking-lab recuperat)
+- `app/admin/leads/[id]/LeadDetailClient.tsx` — secció `fxd__econo` al final de la fitxa completa: marge net/estimat, preu/hora vs tarifa, +€ per arribar a tarifa, cost col·laborador. Usa dades reals si hi ha reserva (`costFloor`); estimació si és lead pur.
+- `app/admin/leads/leads-design.css` — `.fxd__econo`, `.fxd__kpis`, `.fxd__kpi` amb data-level critical/warn/ok/info. Cards amb vora-esquerra de color semàntic.
+- `PriceHint` eliminat de la fitxa completa (redundant amb les KPI cards).
+
+### Canvis #865 — Poliment calendari zero-scroll i safata leads sense data
+- **Layout zero-scroll**: `fx-root` → `height:100dvh; overflow:hidden; display:flex; flex-direction:column`. `fx__content` → `flex:1; overflow-y:auto`. El calendari fa scroll intern; pagehead/focus/mètriques/safata sempre visibles.
+- **Valor € a les targetes**: `fx__cval` a `fx__celltop` — sempre visible, color or apagat.
+- **Safata "Sense data assignada"**: franja horitzontal fora de `fx__content` (no scrolleja). Leads actius sense `eventDate` sempre visibles entre mètriques i selector de mesos.
+- **Tooltips dots**: surten cap avall (`top: calc(100%+6px)`) dins `.fx__grid`. `overflow:visible` al grid per escapar horitzontalment. `z-index:10` a `.fx__cell.is-lead:hover` perquè cap cel·la veïna tapi el tooltip.
+- **Revert Federico**: s'havia cridat un agent Opus Max (114k tokens) per un canvi CSS trivial. Revertit. El fix real: 6px de padding menys al pagehead.
+
+### Validació
+- `npx tsc --noEmit` OK
+- `pnpm run validate:core` OK — tots els guards en verd
+
+- Validació tècnica: TypeScript net. validate:core verd.
+- Validació funcional: capturat amb Playwright — tooltips visibles, safata sempre al fold, KPI cards correctes per Kimera (30€/h, −79%, marge 13%).
+- Validació humana/UX: pendent propietari (sessió tancada).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 865. Següent canvi ha de ser `#866`.
+
+---
+
 ## 2026-06-03 — Canvi #862: Elimina PipelineSuggestionsPanel i ruta /suggestions (claude)
 
 ### Context
