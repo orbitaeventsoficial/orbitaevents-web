@@ -63,6 +63,12 @@ export const PRICING_INTELLIGENCE = {
 // ── Tarifes €/h per tipus de servei (mercat DJ/animació BCN 2026) ─────────────
 // Franja: min (sòl professional) · recommended (preu sa) · premium (alta gamma)
 export const SERVICE_HOURLY_RATES = {
+  dj:                { min: 100, recommended: 145, premium: 210 }, // DJ professional sense reforç tècnic extra
+  sonorizacion:      { min: 75,  recommended: 110, premium: 160 }, // PA + micro/tècnic, sense sessió DJ
+  dj_sonorizacion:   { min: 125, recommended: 175, premium: 245 }, // DJ + PA/llum bàsica
+  boda_dj:           { min: 150, recommended: 210, premium: 290 }, // festa de boda amb DJ
+  boda_sonorizacion: { min: 95,  recommended: 140, premium: 200 }, // cerimònia/còctel sonoritzat, sense DJ festa
+  boda_completa:     { min: 170, recommended: 240, premium: 330 }, // cerimònia + festa + so
   fiesta_privada:    { min: 95,  recommended: 130, premium: 180 },
   boda:              { min: 160, recommended: 220, premium: 300 }, // cerimònia + festa + so
   empresa:           { min: 150, recommended: 200, premium: 280 }, // corporatiu, factura IVA
@@ -73,15 +79,50 @@ export type ServicePricingKey = keyof typeof SERVICE_HOURLY_RATES;
 
 // Pont EventType Prisma → clau de tarifa. Monocapa: cap mapa local als components.
 export const EVENT_TYPE_TO_PRICING_KEY: Record<string, ServicePricingKey> = {
-  WEDDING: 'boda', BODA: 'boda',
+  WEDDING: 'boda_completa', BODA: 'boda_completa',
   CORPORATE: 'empresa', EMPRESA: 'empresa',
   KIDS: 'animacion_infantil', INFANTIL: 'animacion_infantil', COMUNION: 'animacion_infantil',
   PARTY: 'fiesta_privada', FIESTA: 'fiesta_privada', PRIVATE: 'fiesta_privada',
   PRIVATE_PARTY: 'fiesta_privada', BIRTHDAY: 'fiesta_privada',
 };
-export function resolveServicePricingKey(eventType?: string | null): ServicePricingKey {
-  if (!eventType) return 'fiesta_privada';
-  return EVENT_TYPE_TO_PRICING_KEY[eventType.toUpperCase()] ?? 'fiesta_privada';
+
+export interface ServicePricingResolutionInput {
+  eventType?: string | null;
+  packService?: string | null;
+  packSlug?: string | null;
+  packName?: string | null;
+  extraSlugs?: string[];
+  soundWatts?: number | null;
+  djHours?: number | null;
+}
+
+function hasAnyToken(text: string, tokens: string[]) {
+  return tokens.some((token) => text.includes(token));
+}
+
+// Resol servei real, no només EventType. Manté fallback conservador per dades antigues.
+export function resolveServicePricingKey(input?: string | ServicePricingResolutionInput | null): ServicePricingKey {
+  const ctx: ServicePricingResolutionInput = typeof input === 'string'
+    ? { eventType: input }
+    : input ?? {};
+  const text = [
+    ctx.eventType, ctx.packService, ctx.packSlug, ctx.packName, ...(ctx.extraSlugs ?? []),
+  ].filter(Boolean).join(' ').toLowerCase();
+  const event = ctx.eventType?.toUpperCase();
+  const isWedding = event === 'WEDDING' || event === 'BODA' || hasAnyToken(text, ['boda', 'wedding', 'casament']);
+  const hasDj = Number(ctx.djHours ?? 0) > 0 || hasAnyToken(text, ['dj', 'discomovil', 'discoteca', 'festa', 'fiesta']);
+  const hasSound = Number(ctx.soundWatts ?? 0) > 0 || hasAnyToken(text, [
+    'sonor', 'sonid', 'sound', 'pa ', 'micro', 'cerimon', 'ceremon', 'cocktail', 'coctel',
+  ]);
+
+  if (isWedding && hasDj && hasSound) return 'boda_completa';
+  if (isWedding && hasDj) return 'boda_dj';
+  if (isWedding && hasSound) return 'boda_sonorizacion';
+  if (hasDj && hasSound) return 'dj_sonorizacion';
+  if (hasSound) return 'sonorizacion';
+  if (hasDj) return 'dj';
+  if (!event) return 'fiesta_privada';
+  return EVENT_TYPE_TO_PRICING_KEY[event] ?? 'fiesta_privada';
 }
 
 // ── Cost real €/hora d'equip per amortització ────────────────────────────────
@@ -100,9 +141,10 @@ export const DEFAULT_EQUIPMENT_LIFE_HOURS = 2000; // igual que expectedLifeHours
 /** Retorna el cost €/h d'un ítem d'inventari. Usa dades reals; sinó, fallback per categoria. */
 export function getEquipmentCostPerHour(
   item: { value?: number | null; purchasePrice?: number | null; expectedLifeHours?: number | null; category?: string | null },
+  amortization: Record<string, { value: number; lifeHours: number }> = EQUIPMENT_AMORTIZATION,
 ): number {
-  const cat = (item.category ?? '') as keyof typeof EQUIPMENT_AMORTIZATION;
-  const fb = EQUIPMENT_AMORTIZATION[cat];
+  const cat = item.category ?? '';
+  const fb = amortization[cat];
   const price = Number(item.purchasePrice ?? item.value ?? fb?.value ?? 0);
   const life = Number(item.expectedLifeHours ?? fb?.lifeHours ?? DEFAULT_EQUIPMENT_LIFE_HOURS);
   return life > 0 ? Math.round((price / life) * 100) / 100 : 0;
@@ -150,15 +192,26 @@ export interface FullBookingCostInput {
   total: number;
   billableHours: number | null;
   eventType?: string | null;
+  serviceKey?: ServicePricingKey | null;
+  hourlyRate?: { min: number; recommended: number; premium: number } | null;
+  targetMarginPct?: number | null;
+  alertThresholds?: {
+    priceDeviationAlertPct?: number;
+    priceDeviationCriticalPct?: number;
+    lowMarginPct?: number;
+    criticalMarginPct?: number;
+  } | null;
   distanceKm?: number | null;
   vehicleCostPerKm?: number | null;
   travelCost?: number | null;
   equipmentHourlyCost?: number | null; // suma de getEquipmentCostPerHour de l'inventari
+  extraCost?: number | null;
   collaboratorCost?: number | null;
 }
 export interface FullBookingCostResult {
   costTransport: number;
   costEquip: number;
+  costExtras: number;
   costCollab: number;
   costTotal: number;
   margin: number;
@@ -170,19 +223,49 @@ export interface FullBookingCostResult {
   alerts: PricingAlert[];
 }
 
+export interface CollaboratorCostInput {
+  commissionAmount?: number | null;
+  collaborator?: { costPerHour?: number | null } | null;
+}
+
+export function computeCollaboratorCost(
+  collaborators: CollaboratorCostInput[],
+  billableHours: number | null,
+): { cost: number; source: 'hourly' | 'commission' | 'none' } {
+  const hours = billableHours && billableHours > 0 ? billableHours : 0;
+  let source: 'hourly' | 'commission' | 'none' = 'none';
+  const cost = collaborators.reduce((sum, booking) => {
+    const hourly = Number(booking.collaborator?.costPerHour ?? 0);
+    if (hours > 0 && hourly > 0) {
+      source = 'hourly';
+      return sum + hourly * hours;
+    }
+    const commission = Number(booking.commissionAmount ?? 0);
+    if (commission > 0 && source !== 'hourly') source = 'commission';
+    return sum + Math.max(0, commission);
+  }, 0);
+  return { cost: Math.round(cost * 100) / 100, source };
+}
+
 export function computeFullBookingCost(input: FullBookingCostInput): FullBookingCostResult {
   const hours = input.billableHours && input.billableHours > 0 ? input.billableHours : 0;
-  const key = resolveServicePricingKey(input.eventType);
-  const rate = SERVICE_HOURLY_RATES[key];
+  const key = input.serviceKey ?? resolveServicePricingKey(input.eventType);
+  const rate = input.hourlyRate ?? SERVICE_HOURLY_RATES[key];
   const m = PRICING_INTELLIGENCE.margin;
-  const dev = PRICING_INTELLIGENCE.priceDeviation;
+  const dev = {
+    ALERT_PCT: input.alertThresholds?.priceDeviationAlertPct ?? PRICING_INTELLIGENCE.priceDeviation.ALERT_PCT,
+    CRITICAL_PCT: input.alertThresholds?.priceDeviationCriticalPct ?? PRICING_INTELLIGENCE.priceDeviation.CRITICAL_PCT,
+  };
+  const lowMarginPct = input.alertThresholds?.lowMarginPct ?? m.LOW_MARGIN_PCT;
+  const targetMarginPct = input.targetMarginPct ?? m.TARGET_MARGIN_PCT;
 
   const costTransport = typeof input.travelCost === 'number' && input.travelCost > 0
     ? input.travelCost
     : calculateTravelCost(input.distanceKm ?? 0, input.vehicleCostPerKm ?? DEFAULT_VEHICLE_COST_PER_KM);
   const costEquip = Math.round((input.equipmentHourlyCost ?? 0) * hours * 100) / 100;
+  const costExtras = Math.max(0, Math.round((input.extraCost ?? 0) * 100) / 100);
   const costCollab = Math.max(0, input.collaboratorCost ?? 0);
-  const costTotal = Math.round((costTransport + costEquip + costCollab) * 100) / 100;
+  const costTotal = Math.round((costTransport + costEquip + costExtras + costCollab) * 100) / 100;
 
   const margin = Math.round((input.total - costTotal) * 100) / 100;
   const marginPct = input.total > 0 ? Math.round((margin / input.total) * 100) : 0;
@@ -195,10 +278,10 @@ export function computeFullBookingCost(input: FullBookingCostInput): FullBooking
   const alerts: PricingAlert[] = [];
   if (margin < 0)
     alerts.push({ level: 'critical', code: 'MARGIN_LOSS', message: `Perdent ${Math.abs(margin).toFixed(0)}€. Preu per sota del cost.` });
-  else if (marginPct < m.LOW_MARGIN_PCT)
-    alerts.push({ level: 'critical', code: 'MARGIN_LOW', message: `Marge ${marginPct}% sota el llindar de risc (${m.LOW_MARGIN_PCT}%).` });
-  else if (marginPct < m.TARGET_MARGIN_PCT)
-    alerts.push({ level: 'warn', code: 'MARGIN_BELOW_TARGET', message: `Marge ${marginPct}% sota l'objectiu (${m.TARGET_MARGIN_PCT}%).` });
+  else if (marginPct < lowMarginPct)
+    alerts.push({ level: 'critical', code: 'MARGIN_LOW', message: `Marge ${marginPct}% sota el llindar de risc (${lowMarginPct}%).` });
+  else if (marginPct < targetMarginPct)
+    alerts.push({ level: 'warn', code: 'MARGIN_BELOW_TARGET', message: `Marge ${marginPct}% sota l'objectiu (${targetMarginPct}%).` });
 
   if (hours > 0 && pricePerHour > 0 && pricePerHour < rate.min)
     alerts.push({ level: 'warn', code: 'RATE_BELOW_MIN', message: `${pricePerHour}€/h és sota el mínim per ${key} (${rate.min}€/h).` });
@@ -211,7 +294,7 @@ export function computeFullBookingCost(input: FullBookingCostInput): FullBooking
   if (costCollab > 0 && costCollab > margin && margin > 0)
     alerts.push({ level: 'warn', code: 'COLLAB_HEAVY', message: 'El col·laborador s\'emporta més que el marge net.' });
 
-  return { costTransport, costEquip, costCollab, costTotal, margin, marginPct,
+  return { costTransport, costEquip, costExtras, costCollab, costTotal, margin, marginPct,
     pricePerHour, recommendedPrice, deviationPct, marginColor: getMarginColor(marginPct), alerts };
 }
 

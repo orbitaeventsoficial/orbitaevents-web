@@ -395,11 +395,12 @@ Abans de proposar crear, auditar o modificar qualsevol d'això, consulta primer.
 - Documents de referència: `docs/studio-fitxa-tecnica-handoff.md` (operativa) i `docs/studio-textos.md` (inventari de textos).
 - Tota passa sobre `/studio` (prova o definitiva) ha de quedar **a git** i documentada al diari amb número de canvi. Captura de regressió: `node .dbg-studio.cjs` → `.codex-captures/studio-*.png`.
 
-### `/studio-lab` — laboratori del nou admin (Òrbita Command)
+### `/studio-lab` — retirat
 
-- `app/studio-lab/` és el **laboratori** on es dissenya el nou admin (concepte *Òrbita Command*: pipeline de bolos arrossegable, decisions al centre). Prototip intern `noindex`, dades de mostra.
-- Distinció: `/admin` = admin real a substituir · `/studio` = fitxa tècnica del sistema visual · `/studio-lab` = laboratori del nou admin.
-- Estat i full de ruta a `docs/studio-lab-handoff.md`. Tota passa → git + diari amb número de canvi.
+- `app/studio-lab/` va ser un prototip intern amb dades de mostra i ha estat **eliminat**.
+- No recrear `/studio-lab` ni afegir-hi rutes noves sense ordre explícita del propietari.
+- La distinció activa queda: `/admin` = admin real de producció · `/studio` = fitxa tècnica protegida del sistema visual.
+- La lògica aprofitada del prototip ha de viure en serveis/constants/components canònics de `/admin`, mai en una carpeta de laboratori.
 
 ## Documentació obligatòria
 

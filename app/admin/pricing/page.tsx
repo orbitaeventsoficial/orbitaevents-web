@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AdminPage } from '../components/AdminPage';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
-import { formatCurrency, formatDate, INVENTORY_CATEGORY_OPTIONS } from '@/lib/constants';
+import { formatCurrency, formatDate, formatNumber, INVENTORY_CATEGORY_OPTIONS } from '@/lib/constants';
 import { ADMIN_PRICING_TABS, type PricingTab } from '@/lib/constants/admin';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { getInventoryCategoryAdminTone, getInventoryCategoryDisplay, getInventoryStatusDisplay } from '@/lib/inventory-utils';
@@ -550,6 +550,12 @@ export default function PricingAdminPage() {
                   const recEur = cfg.recommended ?? rates.recommended;
                   const tone = getMarginColor(recEur >= rates.recommended ? 50 : recEur >= rates.min ? 25 : 10);
                   const labels: Record<string, string> = {
+                    dj: 'DJ',
+                    sonorizacion: 'Sonorització',
+                    dj_sonorizacion: 'DJ + sonorització',
+                    boda_dj: 'Boda · DJ festa',
+                    boda_sonorizacion: 'Boda · sonorització cerimònia',
+                    boda_completa: 'Boda completa',
                     fiesta_privada: 'Festa privada', boda: 'Boda', empresa: 'Empresa / corporatiu',
                     animacion_infantil: 'Animació infantil', extra_hora: 'Hora addicional',
                   };
@@ -607,9 +613,9 @@ export default function PricingAdminPage() {
                   <tr key={cat} className="border-b border-white/5 hover:bg-white/[0.02]">
                     <td className="py-3 font-mono text-xs opacity-70">{cat}</td>
                     <td className="py-3 text-right">{formatCurrency(data.value)}</td>
-                    <td className="py-3 text-right">{data.lifeHours.toLocaleString('ca-ES')}h</td>
-                    <td className="py-3 text-right font-semibold" style={{ color: 'var(--oe-gold)' }}>
-                      {(data.value / data.lifeHours).toFixed(2)}€/h
+                    <td className="py-3 text-right">{formatNumber(data.lifeHours)}h</td>
+                    <td className="py-3 text-right font-semibold text-[var(--oe-gold)]">
+                      {formatNumber(data.value / data.lifeHours, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€/h
                     </td>
                   </tr>
                 ))}

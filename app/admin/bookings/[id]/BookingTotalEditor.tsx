@@ -99,8 +99,8 @@ export default function BookingTotalEditor({
       {/* Alerta marge negatiu */}
       {marginAlert && costFloor != null && (
         <span style={{
-          fontSize: 10, fontWeight: 600, color: 'var(--o-danger, #e05252)',
-          background: 'color-mix(in oklab, var(--o-danger, #e05252) 10%, transparent)',
+          fontSize: 10, fontWeight: 600, color: 'var(--o-danger)',
+          background: 'color-mix(in oklab, var(--o-danger) 10%, transparent)',
           borderRadius: 3, padding: '2px 5px', letterSpacing: '0.04em',
         }}>
           ⚠ Cost estimat {formatCurrency(costFloor)} · marge {formatCurrency(displayTotal - costFloor)}

@@ -52,7 +52,40 @@ describe('getEffectivePricingConfig', () => {
     // targetMarginPct null → fallback canònic
     expect(cfg.targetMarginPct).toBe(PRICING_INTELLIGENCE.margin.TARGET_MARGIN_PCT);
     // servei boda sense configuració → fallback SERVICE_HOURLY_RATES
-    expect(cfg.rate.recommended).toBe(SERVICE_HOURLY_RATES.boda.recommended);
+    expect(cfg.rate.recommended).toBe(SERVICE_HOURLY_RATES.boda_completa.recommended);
+  });
+
+  it('resol sonorització de boda separada del DJ', async () => {
+    mockPrisma.pricingConfig.findUnique.mockResolvedValue(null);
+    const cfg = await getEffectivePricingConfig({
+      eventType: 'WEDDING',
+      packName: 'Sonorització cerimònia',
+      packService: 'cerimonia',
+      djHours: 0,
+      soundWatts: 2000,
+    });
+    expect(cfg.serviceKey).toBe('boda_sonorizacion');
+    expect(cfg.rate.recommended).toBe(SERVICE_HOURLY_RATES.boda_sonorizacion.recommended);
+  });
+
+  it('aplica tarifa BD per una clau nova de servei', async () => {
+    mockPrisma.pricingConfig.findUnique.mockResolvedValue({
+      id: 'default',
+      targetMarginPct: 45,
+      ourHourlyRateByService: {
+        sonorizacion: { min: 90, recommended: 125, premium: 180 },
+      },
+      depositPctRecommended: 30,
+      alertThresholds: {},
+      equipmentAmortization: null,
+    });
+    const cfg = await getEffectivePricingConfig({
+      packName: 'Sonorització sala',
+      djHours: 0,
+      soundWatts: 1200,
+    });
+    expect(cfg.serviceKey).toBe('sonorizacion');
+    expect(cfg.rate).toEqual({ min: 90, recommended: 125, premium: 180 });
   });
 
   it('retorna fallback si la BD llança error', async () => {

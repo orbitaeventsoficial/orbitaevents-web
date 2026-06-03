@@ -11,6 +11,7 @@ import {
   SERVICE_HOURLY_RATES,
   EQUIPMENT_AMORTIZATION,
   resolveServicePricingKey,
+  type ServicePricingResolutionInput,
   type ServicePricingKey,
 } from '@/lib/constants/pricing-intelligence';
 
@@ -25,12 +26,12 @@ export interface EffectivePricingConfig {
     lowMarginPct: number;
     criticalMarginPct: number;
   };
-  equipmentAmortization: typeof EQUIPMENT_AMORTIZATION;
+  equipmentAmortization: Record<string, { value: number; lifeHours: number }>;
   source: 'db' | 'fallback';
 }
 
 export async function getEffectivePricingConfig(
-  bookingServiceType: string | null | undefined,
+  bookingServiceType: string | ServicePricingResolutionInput | null | undefined,
 ): Promise<EffectivePricingConfig> {
   const serviceKey = resolveServicePricingKey(bookingServiceType);
   const fallbackRate = SERVICE_HOURLY_RATES[serviceKey];

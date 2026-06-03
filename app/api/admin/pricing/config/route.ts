@@ -41,13 +41,13 @@ export async function PUT(req: NextRequest) {
   if (authError) return authError;
   try {
     const body = await req.json();
-    const parsed = PricingConfigSchema.parse(body);
-    const config = await upsertPricingConfig(parsed);
+    const parsed = PricingConfigSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Dades invàlides', details: parsed.error.errors }, { status: 400 });
+    }
+    const config = await upsertPricingConfig(parsed.data);
     return NextResponse.json(config);
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Dades invàlides', details: error.errors }, { status: 400 });
-    }
     log.error('[pricingConfig PUT]', error);
     return NextResponse.json({ error: 'Error desant configuració' }, { status: 500 });
   }
