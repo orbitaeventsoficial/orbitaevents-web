@@ -172,6 +172,13 @@
 }
 [data-tip]:hover::after { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+/* Tooltips dins el calendari: surten cap avall per no quedar tallats pel scroll */
+.fx__grid [data-tip]::after {
+  bottom: auto; top: calc(100% + 6px);
+  transform: translateX(-50%) translateY(-3px);
+}
+.fx__grid [data-tip]:hover::after { transform: translateX(-50%) translateY(0); }
+
 .fx__focustext { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 
 /* label d'acció = senyal operatiu, en color d'estat */
