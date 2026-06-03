@@ -13,6 +13,8 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import type { CalendarApiDay, CalendarApiResponse } from './calendar-utils';
 import { formatKey, isToday, resolveServiceLabel, HOURS, parseHour, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel } from './calendar-utils';
 
+type CalendarLayer = 'bookings' | 'blocks' | 'leads' | 'tasks' | 'social' | 'followUps';
+
 export default function CalendarDayClient() {
   const toast = useToast();
   const router = useRouter();
@@ -25,10 +27,10 @@ export default function CalendarDayClient() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [blockNote, setBlockNote] = useState('');
   const [showBlockForm, setShowBlockForm] = useState(false);
-  const [visibleLayers, setVisibleLayers] = useState({ bookings: true, blocks: true, tasks: true, social: true, followUps: true });
+  const [visibleLayers, setVisibleLayers] = useState({ bookings: true, blocks: true, leads: true, tasks: true, social: true, followUps: true });
 
   const dateKey = useMemo(() => formatKey(currentDate), [currentDate]);
-  const toggleLayer = useCallback((layer: 'bookings' | 'blocks' | 'tasks' | 'social' | 'followUps') => {
+  const toggleLayer = useCallback((layer: CalendarLayer) => {
     setVisibleLayers((prev) => ({ ...prev, [layer]: !prev[layer] }));
   }, []);
   const nextDay = useMemo(() => {
@@ -38,9 +40,10 @@ export default function CalendarDayClient() {
   }, [currentDate]);
 
   const dayData = useMemo((): CalendarApiDay => {
-    if (!data?.days?.[dateKey]) return { reservas: [], bloqueos: [], tasks: [], socialPosts: [], followUps: [] };
+    if (!data?.days?.[dateKey]) return { leads: [], reservas: [], bloqueos: [], tasks: [], socialPosts: [], followUps: [] };
     return data.days[dateKey];
   }, [data, dateKey]);
+  const dayLeads = dayData.leads ?? [];
 
   const isBlocked = dayData.bloqueos.length > 0;
   const isTodayDate = isToday(currentDate);
@@ -179,6 +182,7 @@ export default function CalendarDayClient() {
         <span className="font-semibold opacity-60">Capes:</span>
         {[
           ['bookings', 'Reserves'],
+          ['leads', 'Entrades'],
           ['blocks', 'Bloquejos'],
           ['tasks', 'Tasques'],
           ['social', 'Social'],
@@ -187,7 +191,7 @@ export default function CalendarDayClient() {
           <button
             key={key}
             type="button"
-            onClick={() => toggleLayer(key as 'bookings' | 'blocks' | 'tasks' | 'social' | 'followUps')}
+            onClick={() => toggleLayer(key as CalendarLayer)}
             className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-white/10 border-white/20' : 'border-white/10 opacity-45'}`}
           >
             {label}
@@ -217,7 +221,7 @@ export default function CalendarDayClient() {
                   {!isBlocked && dayData.reservas.length > 0 && <span className="w-2.5 h-2.5 rounded-full" />}
                   {!isBlocked && dayData.reservas.length === 0 && <span className="h-2.5 w-2.5 rounded-full admin-tone-bg-neutral" />}
                   <span className="text-sm font-medium">
-                    {isBlocked ? 'Dia bloquejat' : `${dayData.reservas.length} reserv${dayData.reservas.length === 1 ? 'a' : 'es'}`}
+                    {isBlocked ? 'Dia bloquejat' : `${dayData.reservas.length} reserv${dayData.reservas.length === 1 ? 'a' : 'es'} · ${dayLeads.length} entrad${dayLeads.length === 1 ? 'a' : 'es'}`}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -339,6 +343,10 @@ export default function CalendarDayClient() {
                   <span className="font-medium">{visibleLayers.bookings ? dayData.reservas.length : 0}</span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="">Entrades</span>
+                  <span className="font-medium">{visibleLayers.leads ? dayLeads.length : 0}</span>
+                </div>
+                <div className="flex justify-between">
                   <span className="">Bloquejos</span>
                   <span className="font-medium">{visibleLayers.blocks ? dayData.bloqueos.length : 0}</span>
                 </div>
@@ -355,6 +363,32 @@ export default function CalendarDayClient() {
               </div>
             </div>
 
+            {visibleLayers.leads && dayLeads.length > 0 && (
+              <div className="rounded-2xl border p-5 admin-card-glass">
+                <h3 className="mb-3 text-sm font-semibold">Entrades del web</h3>
+                <div className="space-y-2">
+                  {dayLeads.map((lead) => (
+                    <Link
+                      key={lead.id}
+                      href={buildLeadCustomerHref({
+                        leadId: lead.id,
+                        customerId: lead.customerId,
+                      })}
+                      className="block rounded-xl border px-3 py-2 admin-tone-soft-info"
+                    >
+                      <div className="truncate text-sm font-medium">Nova entrada · {lead.name}</div>
+                      <div className="mt-1 text-xs opacity-70">
+                        {lead.eventStartTime || '--:--'}{lead.eventEndTime ? ` - ${lead.eventEndTime}` : ''}
+                        {lead.eventType ? ` · ${lead.eventType}` : ''}
+                      </div>
+                      {lead.eventLocation && (
+                        <div className="mt-1 truncate text-xs opacity-70">{lead.eventLocation}</div>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {((visibleLayers.tasks && dayData.tasks.length > 0) || (visibleLayers.social && dayData.socialPosts.length > 0) || (visibleLayers.followUps && dayData.followUps.length > 0)) && (
               <div className="rounded-2xl border p-5 admin-card-glass">
@@ -429,7 +463,7 @@ export default function CalendarDayClient() {
               );
             })}
 
-            {(visibleLayers.bookings ? dayData.reservas.length === 0 : true) && (!visibleLayers.blocks || !isBlocked) && (!visibleLayers.tasks || dayData.tasks.length === 0) && (!visibleLayers.social || dayData.socialPosts.length === 0) && (!visibleLayers.followUps || dayData.followUps.length === 0) && (
+            {(visibleLayers.bookings ? dayData.reservas.length === 0 : true) && (!visibleLayers.blocks || !isBlocked) && (!visibleLayers.leads || dayLeads.length === 0) && (!visibleLayers.tasks || dayData.tasks.length === 0) && (!visibleLayers.social || dayData.socialPosts.length === 0) && (!visibleLayers.followUps || dayData.followUps.length === 0) && (
               <div className="rounded-2xl border p-5 text-center admin-card-glass">
                 <p className="text-sm">Dia lliure</p>
                 <Link

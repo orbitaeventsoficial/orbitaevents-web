@@ -69,9 +69,13 @@ export type BookingLeadData = {
   phone: string | null;
   eventType: string | null;
   eventDate: string | null;
+  eventStartTime?: string | null;
+  eventEndTime?: string | null;
   eventLocation: string | null;
+  eventAddress?: string | null;
   guestCount: number | null;
   budget: string | null;
+  interestedPackId?: string | null;
   customerId: string | null;
 };
 

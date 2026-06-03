@@ -21,6 +21,8 @@ type FormState = {
   dni: string;
   eventType: string;
   eventDate: string;
+  eventStartTime: string;
+  eventEndTime: string;
   eventLocation: string;
   eventVenue: string;
   guestCount: string;
@@ -36,6 +38,8 @@ const INITIAL: FormState = {
   dni: '',
   eventType: 'WEDDING',
   eventDate: '',
+  eventStartTime: '',
+  eventEndTime: '',
   eventLocation: '',
   eventVenue: '',
   guestCount: '',
@@ -108,6 +112,8 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
           event: {
             eventType: form.eventType,
             eventDate: form.eventDate || undefined,
+            eventStartTime: form.eventStartTime || undefined,
+            eventEndTime: form.eventEndTime || undefined,
             eventLocation: form.eventLocation.trim() || undefined,
             eventVenue: form.eventVenue.trim() || undefined,
             guestCount: form.guestCount ? Number(form.guestCount) : undefined,
@@ -229,6 +235,24 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
               type="text"
               value={form.eventLocation}
               onChange={(e) => update('eventLocation', e.target.value)}
+              className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-amber-400/60 focus:outline-none"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="text-xs text-white/60">Inici</span>
+            <input
+              type="time"
+              value={form.eventStartTime}
+              onChange={(e) => update('eventStartTime', e.target.value)}
+              className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-amber-400/60 focus:outline-none"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="text-xs text-white/60">Fi</span>
+            <input
+              type="time"
+              value={form.eventEndTime}
+              onChange={(e) => update('eventEndTime', e.target.value)}
               className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-amber-400/60 focus:outline-none"
             />
           </label>

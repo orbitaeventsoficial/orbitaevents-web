@@ -1,4 +1,5 @@
 // app/admin/bookings/page.tsx
+import './[id]/booking-detail.css';
 import { log } from '@/lib/logger';
 // Pàgina de gestió de reserves
 import { prisma } from '@/lib/prisma';
@@ -11,7 +12,6 @@ import { AdminPage } from '../components/AdminPage';
 import { AdminHelpPanel } from '../components/AdminHelpPanel';
 import BookingActions from './BookingActions';
 import BookingFilters from './BookingFilters';
-import BookingViewToggle from './BookingViewToggle';
 import { BOOKING_OVERVIEW_STATUS_CARDS, formatDate, formatDateShort, formatCurrency, getBookingStatusDisplay, getEventLabel } from '@/lib/constants';
 import { getMarginTone } from '@/lib/margin-utils';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
@@ -297,107 +297,70 @@ export default async function BookingsPage({
         : 'No hi ha senyal calent a la llista actual.';
 
   return (
-    <AdminPage
-      title="Reserves"
-      subtitle={<>{pagination.total} esdeveniments{customerId ? ' del client' : ''} · {formatCurrency(totalRevenue)}</>}
-      back={customerId ? { href: buildCustomerWorkspaceTabHref(customerId, 'bookings'), label: 'Client' } : undefined}
-      actions={<div className="flex gap-2">
-        <ExportCsvButton
-          filename="reserves"
-          headers={['Referència', 'Client', 'Data', 'Tipus', 'Estat', 'Total (€)']}
-          rows={exportRows.map((b) => [
-            b.reference,
-            b.clientName,
-            formatDate(b.eventDate),
-            getEventLabel(b.eventType),
-            b.status,
-            String(b.total),
-          ])}
-        />
-        <Link href="/admin/bookings/new" className="ap-btn ap-btn--primary">+ Nova</Link>
-      </div>}
-    >
+    <div className="bd__root">
 
-      <AdminHelpPanel
-        title="Com treballar reserves"
-        description="Aquí controles l execució real dels esdeveniments. Tens a mà l estat, els imports i el marge per prendre decisions ràpides."
-        items={[
-          {
-            title: 'Estat',
-            body: 'Et diu en quin punt està cada reserva i ajuda a detectar bloquejos.',
-          },
-          {
-            title: 'Marge',
-            body: 'Et deixa veure si una reserva és sana abans que arribi el dia de l esdeveniment.',
-          },
-          {
-            title: 'Vista',
-            body: 'Pots canviar entre llista i kanban segons si vols detall o visió global.',
-          },
-        ]}
-      />
+      {/* ── Header sticky — mateix patró que la fitxa de reserva ── */}
+      <div className="ap-sticky-header">
+        <div className="ap-detail-bar" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '8px 20px' }}>
+          {customerId ? (
+            <Link href={buildCustomerWorkspaceTabHref(customerId, 'bookings')} className="ap-detail-bar-btn">← Client</Link>
+          ) : (
+            <span className="ap-detail-kicker">Agenda</span>
+          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <ExportCsvButton
+              filename="reserves"
+              headers={['Referència', 'Client', 'Data', 'Tipus', 'Estat', 'Total (€)']}
+              rows={exportRows.map((b) => [
+                b.reference,
+                b.clientName,
+                formatDate(b.eventDate),
+                getEventLabel(b.eventType),
+                b.status,
+                String(b.total),
+              ])}
+            />
+            <Link href="/admin/bookings/new" className="ap-detail-bar-btn ap-detail-bar-btn--accent">+ Nova</Link>
+          </div>
+        </div>
+        <div className="ap-detail-hero">
+          <p className="ap-detail-kicker">Reserva · {pagination.total} esdeveniments</p>
+          <h1 className="ap-detail-title">Reserves</h1>
+        </div>
+      </div>
 
       {paymentFilterLabel && (
-        <section className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
-          Focus de cobrament: {paymentFilterLabel}
-          {' · '}
-          <Link href="/admin/bookings" className="font-semibold underline underline-offset-2">
-            veure totes les reserves
-          </Link>
-        </section>
+        <div className="bk-payment-filter-banner ap-detail-stats-cell ap-detail-stats-cell--warn">
+          <span className="ap-detail-stats-label">Focus</span>
+          <span className="ap-detail-stats-val text-sm">{paymentFilterLabel}</span>
+          <Link href="/admin/bookings" className="text-xs opacity-60 hover:opacity-100 ml-auto">Veure totes →</Link>
+        </div>
       )}
 
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què vigila el sistema',
-          tone: 'info',
-          items: automaticSignals,
-          emptyText: 'Sense senyals automàtiques destacades a la cua actual.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'Què et reclama decisió',
-          tone: manualSignals.length > 0 ? 'warning' : 'success',
-          items: manualSignals,
-          emptyText: 'No hi ha cap front manual calent a la llista actual.',
-        }}
-        nextStep={{
-          title: nextStepLabel,
-          detail: nextStepDetail,
-          href: nextStepHref,
-        }}
-      />
+      <div style={{ maxWidth: 1220, margin: '0 auto', padding: '8px 20px', width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
 
-      <section className="admin-bookings-stats flex gap-3 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:overflow-visible">
-        <div className="admin-bookings-stat admin-bookings-stat--total admin-card-glass admin-stagger-item shrink-0 w-28 sm:w-auto rounded-2xl border p-3 sm:p-5">
-          <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Total</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{pagination.total}</p>
-          <p className="text-[10px] sm:text-xs truncate text-center">{formatCurrency(totalRevenue)}</p>
-        </div>
-        {BOOKING_OVERVIEW_STATUS_CARDS.map((card) => (
-          <div
-            key={card.status}
-            className={`${card.className} admin-card-glass admin-stagger-item shrink-0 w-28 sm:w-auto rounded-2xl border p-3 sm:p-5`}
-          >
-            <p className="text-[10px] sm:text-xs font-medium uppercase text-center">{card.label}</p>
-            <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap[card.status]?.count || 0}</p>
+        <div className="bk-stats-bar ap-detail-stats">
+          <div className="ap-detail-stats-cell ap-detail-stats-cell--gold">
+            <span className="ap-detail-stats-label">Total</span>
+            <span className="ap-detail-stats-val">{pagination.total} · {formatCurrency(totalRevenue)}</span>
           </div>
-        ))}
-      </section>
-
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex-1">
-          <BookingFilters />
+          {BOOKING_OVERVIEW_STATUS_CARDS.map((card) => (
+            <div key={card.status} className="ap-detail-stats-cell">
+              <span className="ap-detail-stats-label">{card.label}</span>
+              <span className="ap-detail-stats-val">{statsMap[card.status]?.count || 0}</span>
+            </div>
+          ))}
         </div>
-        <BookingViewToggle />
+
+        <BookingFilters />
+
       </div>
 
       {isKanban && (
         <BookingPipelineViewWrapper />
       )}
 
-      {!isKanban && <>
+      {!isKanban && <div style={{ maxWidth: 1220, margin: '0 auto', padding: '0 20px', width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}><>
       <section className="lg:hidden space-y-3">
         {bookings.length === 0 ? (
           <div className="rounded-2xl border admin-card-glass p-8 text-center">
@@ -509,20 +472,20 @@ export default async function BookingsPage({
         )}
       </section>
 
-      <section className="hidden lg:block rounded-2xl border p-0 admin-card-glass overflow-hidden">
+      <section className="bk-table-section hidden lg:block overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1060px] text-sm" aria-label="Llistat de reserves">
-            <thead className="border-b">
+          <table className="w-full min-w-[1060px]" aria-label="Llistat de reserves">
+            <thead className="bk-table-head">
               <tr>
-                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Ref.</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Client</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Tipus</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Data</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Pack</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Total</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Marge</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Estat</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Accions</th>
+                <th scope="col" className="px-4 py-2.5 text-left bk-th-label">Ref.</th>
+                <th scope="col" className="px-4 py-2.5 text-left bk-th-label">Client</th>
+                <th scope="col" className="px-4 py-2.5 text-left bk-th-label">Tipus</th>
+                <th scope="col" className="px-4 py-2.5 text-left bk-th-label">Data</th>
+                <th scope="col" className="px-4 py-2.5 text-left bk-th-label">Pack</th>
+                <th scope="col" className="px-4 py-2.5 text-left bk-th-label">Total</th>
+                <th scope="col" className="px-4 py-2.5 text-left bk-th-label">Marge</th>
+                <th scope="col" className="px-4 py-2.5 text-left bk-th-label">Estat</th>
+                <th scope="col" className="px-4 py-2.5 text-left bk-th-label">Accions</th>
               </tr>
             </thead>
             <tbody className="divide-y admin-tone-border-subtle">
@@ -543,62 +506,43 @@ export default async function BookingsPage({
                   return (
                     <tr
                       key={booking.id}
-                      className={`transition-colors ${
-                        isPast && booking.status !== 'COMPLETED'
-                          ? 'bg-orange-500/5'
-                          : 'hover:bg-white/[0.03]'
-                      }`}
+                      className={`bk-table-row hover:bg-white/[0.025] transition-colors${isPast && booking.status !== 'COMPLETED' ? ' bk-table-row--past' : ''}`}
                     >
-                      <td className="px-4 py-3 text-center">
-                        <Link href={buildBookingHref(booking.id)} className="hover:opacity-80 transition-opacity">
-                          <code className="text-xs font-mono px-2 py-1 rounded cursor-pointer">{booking.reference}</code>
+                      <td className="px-4 py-3">
+                        <Link href={buildBookingHref(booking.id)} className="font-mono text-xs text-[var(--gold)] hover:opacity-80">
+                          {booking.reference}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         {booking.customerId ? (
-                          <Link href={buildCustomerHubHref(booking.customerId!)} className="font-medium">
+                          <Link href={buildCustomerHubHref(booking.customerId!)} className="font-semibold text-sm hover:text-white">
                             {booking.clientName}
                           </Link>
                         ) : (
-                          <div className="font-medium">{booking.clientName}</div>
-                        )}
-                        <div className="text-xs truncate max-w-[150px]">{booking.eventLocation}</div>
-                        {booking.lead && (
-                          <Link href={buildLeadWorkspaceHref(booking.lead.id)} className="text-[10px] hover:underline">
-                            Entrada: {booking.lead.name}
-                          </Link>
+                          <span className="font-semibold text-sm">{booking.clientName}</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-xs text-center whitespace-nowrap overflow-hidden text-ellipsis">{eventType}</td>
-                      <td className="px-4 py-3 text-center">
-                        <div className="font-medium text-xs">{formatDate(booking.eventDate)}</div>
-                        <div className="flex items-center justify-center gap-1 mt-0.5">
-                          {booking.eventStartTime && (
-                            <span className="text-xs">{booking.eventStartTime}</span>
-                          )}
-                          {!isPast && booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED' && (() => {
-                            const d = Math.ceil((new Date(booking.eventDate).getTime() - Date.now()) / 864e5);
-                            return (
-                              <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${
-                                d === 0 ? 'admin-tone-soft-info' : d <= 7 ? 'admin-tone-bg-warning admin-tone-text-warning' : 'admin-tone-bg-neutral admin-tone-text-neutral'
-                              }`}>
-                                {d === 0 ? 'AVUI' : `${d}d`}
-                              </span>
-                            );
-                          })()}
-                        </div>
+                      <td className="px-4 py-3 text-sm whitespace-nowrap">{eventType}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className="text-sm font-medium">{formatDateShort(booking.eventDate)}</span>
+                        {!isPast && booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED' && (() => {
+                          const d = Math.ceil((new Date(booking.eventDate).getTime() - Date.now()) / 864e5);
+                          return (
+                            <span className={`ml-2 inline-flex rounded-full px-1.5 py-0.5 text-xs font-semibold ${
+                              d === 0 ? 'admin-tone-soft-info' : d <= 7 ? 'admin-tone-bg-warning admin-tone-text-warning' : 'opacity-40'
+                            }`}>
+                              {d === 0 ? 'AVUI' : `${d}d`}
+                            </span>
+                          );
+                        })()}
                       </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className="inline-flex rounded-full px-2 py-0.5 text-xs font-medium">
-                          {getTranslatedPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale)}
-                        </span>
-                        {booking._count.extras > 0 && (
-                          <span className="ml-1 text-xs">+{booking._count.extras}</span>
-                        )}
+                      <td className="px-4 py-3 text-sm">
+                        {getTranslatedPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale)}
+                        {booking._count.extras > 0 && <span className="ml-1 opacity-50 text-xs">+{booking._count.extras}</span>}
                       </td>
-                      <td className="px-4 py-3 font-medium text-center">
-                        {formatCurrency(booking.total)}
-                        <span className={`flex items-center justify-center gap-1 text-[10px] font-medium mt-0.5 ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-text-success' : booking.depositPaid ? 'admin-tone-text-warning' : 'admin-tone-text-danger'}`}>
+                      <td className="px-4 py-3">
+                        <div className="text-sm font-bold tabular-nums">{formatCurrency(booking.total)}</div>
+                        <span className={`inline-flex items-center gap-1 text-xs mt-0.5 ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-text-success' : booking.depositPaid ? 'admin-tone-text-warning' : 'admin-tone-text-danger'}`}>
                           <span className={`inline-block h-1.5 w-1.5 rounded-full ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-bg-success' : booking.depositPaid ? 'admin-tone-bg-warning' : 'admin-tone-bg-danger'}`} />
                           {booking.depositPaid && booking.remainingPaid ? 'Pagat' : booking.depositPaid ? 'Parcial' : 'Pendent'}
                         </span>
@@ -647,7 +591,7 @@ export default async function BookingsPage({
           </table>
         </div>
       </section>
-      </>}
+      </></div>}
 
       {!isKanban && pagination.totalPages > 1 && (
         <section className="flex flex-col items-center justify-center gap-2 rounded-2xl border p-3 text-xs sm:flex-row sm:justify-between">
@@ -707,6 +651,6 @@ export default async function BookingsPage({
           </div>
         </section>
       )}
-    </AdminPage>
+    </div>
   );
 }

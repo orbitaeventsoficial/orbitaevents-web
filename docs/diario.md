@@ -1,3 +1,28 @@
+## 2026-06-04 — Canvi #866: Entrades web al calendari setmana i dia (claude)
+
+### Context
+El calendari mensual ja mostrava leads (entrades web sense reserva) al seu dia. Les vistes setmanal i diària no tenien aquesta capa.
+
+### Canvis
+- `CalendarWeekClient.tsx`: nova capa `leads`, tipus `CalendarLayer`, comptador d'entrades al resum, filtre de capa "Entrades", renderitzat de cada lead com a targeta "Nova entrada · Nom" amb hora i tipus.
+- `CalendarDayClient.tsx`: mateixa capa `leads`, targeta expandida amb hora/tipus/ubicació dins el bloc "Entrades del web".
+- `ADMIN_CHANGE_COUNTER` 865 → 866.
+
+### Validació
+- `npx tsc --noEmit` OK
+- `pnpm run validate:core` OK
+- Validació tècnica: TypeScript net.
+- Validació funcional: leads de dilluns–dijous apareixen a la secció "Dies feiners" sota la graella de caps de setmana del mes corresponent. A més: bug crític corregit — leads amb data de dia feiner eren INVISIBLES a pipeline i llista perquè `seasonCalendarService` no els exportava; ara `weekdays` els captura i `page.tsx` els inclou. Correcció de rgba/CSS-var inline a `bookings/page.tsx` i `LeadDetailClient.tsx`.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 866. Següent canvi ha de ser `#867`.
+
+---
+
 ## 2026-06-03 — Canvi #865: Poliment calendari zero-scroll, safata, tooltips (claude)
 
 ### Context

@@ -89,6 +89,15 @@
   --o-font-mono: var(--font-mono), "SF Mono", Menlo, Consolas, monospace;
   --o-font-display: var(--font-display), var(--font-inter), "Segoe UI", system-ui, sans-serif;
 
+  /* ── Escala tipogràfica admin ── */
+  --o-text-xs:   11px;   /* labels, eyebrows mono uppercase */
+  --o-text-sm:   13px;   /* chips, nav, secundari */
+  --o-text-base: 14px;   /* cos de text, taules */
+  --o-text-md:   15px;   /* valors destacats */
+  --o-text-lg:   18px;   /* KPIs, números */
+  --o-text-xl:   24px;   /* subtítols de secció */
+  --o-text-2xl:  32px;   /* títols de pàgina */
+
   --o-sidebar-w: 200px;
 
   /* Admin / Brass & Obsidian */

@@ -19,8 +19,19 @@ import {
 import type { BookingExtra, BookingFormData, BookingPack, BookingSelectedExtras } from './booking-form.types';
 import { OPERATOR_EXTRA_ID } from './booking-form.types';
 
+function calculateEventDuration(startTime: string | null | undefined, endTime: string | null | undefined): number {
+  if (!startTime || !endTime) return 0;
+  const [startH, startM] = startTime.split(':').map(Number);
+  const [endH, endM] = endTime.split(':').map(Number);
+  if (![startH, startM, endH, endM].every(Number.isFinite)) return 0;
+  const startMinutes = startH * 60 + startM;
+  let endMinutes = endH * 60 + endM;
+  if (endMinutes <= startMinutes) endMinutes += 24 * 60;
+  return (endMinutes - startMinutes) / 60;
+}
+
 interface UseBookingPricingOptions {
-  form: Pick<BookingFormData, 'packId' | 'extraHours' | 'distanceKm' | 'fuelCostPerKm' | 'discount'>;
+  form: Pick<BookingFormData, 'packId' | 'extraHours' | 'eventStartTime' | 'eventEndTime' | 'distanceKm' | 'fuelCostPerKm' | 'discount'>;
   packs: BookingPack[];
   extras: BookingExtra[];
   selectedExtras: BookingSelectedExtras;
@@ -76,7 +87,12 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
     if (!selectedPack) return null;
 
     const packPrice = customPackPrice && customPackPrice > 0 ? customPackPrice : selectedPack.price;
-    const extraHoursCount = parseInt(form.extraHours, 10) || 0;
+    const explicitExtraHours = parseInt(form.extraHours, 10) || 0;
+    const eventHours = calculateEventDuration(form.eventStartTime, form.eventEndTime);
+    const derivedExtraHours = eventHours > selectedPack.djHours
+      ? Math.ceil((eventHours - selectedPack.djHours) * 10) / 10
+      : 0;
+    const extraHoursCount = explicitExtraHours > 0 ? explicitExtraHours : derivedExtraHours;
     const extraHoursPrice = extraHoursCount * selectedPack.extraHourPrice;
     const extrasPrice = Object.values(selectedExtras).reduce((sum, extra) => sum + extra.price * extra.quantity, 0);
     const subtotal = packPrice + extraHoursPrice + extrasPrice + travelCharge;
@@ -88,7 +104,7 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
     const deposit = calcDeposit(total);
 
     return { packPrice, extraHoursPrice, extrasPrice, travelCharge, subtotal, discount, vatRate, vatAmount, total, deposit };
-  }, [form.discount, form.extraHours, selectedExtras, selectedPack, travelCharge]);
+  }, [form.discount, form.eventEndTime, form.eventStartTime, form.extraHours, selectedExtras, selectedPack, travelCharge]);
 
   const marginEstimate = useMemo(() => {
     if (!pricing) return null;

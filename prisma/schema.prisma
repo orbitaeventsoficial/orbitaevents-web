@@ -753,6 +753,10 @@ model Booking {
   remainingPaidAt DateTime?
   remainingPaymentUrl String?
 
+  // Bizum (client declara pagament; admin confirma)
+  depositBizumDeclaredAt   DateTime?
+  remainingBizumDeclaredAt DateTime?
+
   // Contacte específic de l'esdeveniment (pot diferir del client)
   eventPhone   String? // telèfon de contacte el dia del bolo
   eventAddress String? // adreça exacta de l'event (venue, domicili, sala, etc.)

@@ -1418,6 +1418,23 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #866 — 2026-06-04 — claude (FET)
+
+**Leads en dies feiners (Dl–Dj) visibles al calendari de leads.**
+
+- `seasonCalendarService.ts`: nou camp `weekdays: SeasonCalendarEntry[]` — entrades amb data Dl–Dj no capturades per cap cap de setmana.
+- `leads/page.tsx`: inclou `data.weekdays` a les entrades; ara leads de dia feiner apareixen al pipeline i llista.
+- `LeadsSeasonClient.tsx`: tipus `WeekendSlot` + `WeekdaySlot` + `CalSlot`; `MonthBlock.slots` unifica tots dos tipus ordenats cronològicament. Lead feiner ocupa tota l'amplada de la graella al seu lloc cronològic.
+- `leads-design.css`: `.fx__cell--wd` amb `grid-column: 1 / -1` i accent lateral.
+- Correcció `rgba` → CSS vars → classes CSS a `bookings/page.tsx` i `LeadDetailClient.tsx`.
+- Comptador de bolos del mes inclou leads feiners.
+- Validació tècnica: `npx tsc --noEmit` OK. `validate:core` OK.
+- Validació funcional: un lead amb data dimarts apareix a la secció "Dies feiners" del mes.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #865 — 2026-06-03 — claude (FET)
 
 **Poliment calendari zero-scroll, safata sense data, tooltips.**

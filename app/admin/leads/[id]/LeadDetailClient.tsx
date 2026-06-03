@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useTransition, useEffect } from 'react';
+import { useState, useTransition, useEffect, type CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
 import { buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
@@ -58,6 +58,22 @@ function durationLabel(start: string | null, end: string | null): string {
 function sourceLabel(source: string | null): string {
   if (!source) return '—';
   return SOURCE_LABELS[source] ?? source;
+}
+
+function clampScore(value: number): number {
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+function scoreToHue(score: number): number {
+  const clamped = clampScore(score);
+  if (clamped <= 35) return 0;
+  if (clamped <= 70) return Math.round(((clamped - 35) / 35) * 42);
+  return Math.round(42 + ((clamped - 70) / 30) * 88);
+}
+
+function kpiStyle(score?: number): CSSProperties | undefined {
+  if (score === undefined) return undefined;
+  return { '--fxd-kpi-hue': scoreToHue(score) } as CSSProperties;
 }
 
 export type LeadDetailData = {
@@ -123,7 +139,7 @@ function nextStageFor(stage: Stage): Stage | null {
 type EditableField = 'phone' | 'email' | 'eventPhone' | 'eventAddress' | 'eventDate' | 'eventStartTime' | 'eventEndTime' | 'eventLocation' | 'guestCount' | 'budget';
 
 type NoteItem = { id: string; content: string; createdBy: string | null; createdAt: string };
-type ProposalItem = { id: string; reference: string; status: string; createdAt: string };
+type ProposalItem = { id: string; reference: string; status: string; total: number; createdAt: string };
 type DossierItem = { id: string; nom: string; estat: string; createdAt: string };
 
 export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
@@ -311,28 +327,30 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
   return (
     <div className="fxd__fullpage" data-stage={stage}>
 
-      {/* Capçalera */}
-      <header className="fxd__bar">
-        <Link href="/admin/leads" className="fxd__back">← Temporada</Link>
+      {/* Barra superior */}
+      <header className="ap-detail-bar">
+        <Link href="/admin/leads" className="ap-detail-bar-btn">← Temporada</Link>
       </header>
 
       {/* Hero */}
-      <section className="fxd__hero">
-        <span className="fxd__kicker">{STAGE_LABEL[stage]} · {lead.type}</span>
-        <h2>{lead.name}</h2>
-        {lead.lostReason && <span className="fxd__lost">{lead.lostReason}</span>}
-        {lead.wx && (
-          <span className="fxd__wxrow">
-            <WxBadge wx={lead.wx} size="md" />
-            {lead.dateISO && <span className="fxd__wxdate">{fullDate(lead.dateISO.slice(0, 10))}</span>}
-          </span>
-        )}
+      <section className="ap-detail-hero">
+        <p className="ap-detail-kicker">{STAGE_LABEL[stage]} · {lead.type}</p>
+        <div className="ap-detail-meta">
+          <h2 className="ap-detail-title">{lead.name}</h2>
+          {lead.lostReason && <span className="fxd__lost">{lead.lostReason}</span>}
+          {lead.wx && (
+            <span className="fxd__wxrow">
+              <WxBadge wx={lead.wx} size="md" />
+              {lead.dateISO && <span className="fxd__wxdate">{fullDate(lead.dateISO.slice(0, 10))}</span>}
+            </span>
+          )}
+        </div>
       </section>
 
       {/* Stats */}
-      <div className="fxd__stats">
-        <div>
-          <span>Valor</span>
+      <div className="ap-detail-stats">
+        <div className="ap-detail-stats-cell ap-detail-stats-cell--gold">
+          <span className="ap-detail-stats-label">Valor</span>
           {editField === 'budget' ? (
             <span className="fxd__editrow">
               <input className="fxd__editinput" type="number" min={0} value={editValue}
@@ -344,15 +362,19 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
               <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
             </span>
           ) : (
-            <b className="cursor-pointer border-b border-dashed border-[var(--line2)]" onClick={() => startEdit('budget')}>
-              {fields.budget ? formatCurrency(Number(fields.budget)) : <em className="text-[11px]" style={{ opacity: 0.5 }}>Afegir</em>}
+            <b className="ap-detail-stats-val cursor-pointer fxd__budget-editable" onClick={() => startEdit('budget')}>
+              {fields.budget ? formatCurrency(Number(fields.budget)) : <em className="opacity-40 text-[13px]">Afegir</em>}
             </b>
           )}
         </div>
-        <div>
-          <span>Durada</span><b>{durationLabel(fields.eventStartTime, fields.eventEndTime)}</b>
+        <div className="ap-detail-stats-cell">
+          <span className="ap-detail-stats-label">Durada</span>
+          <b className="ap-detail-stats-val">{durationLabel(fields.eventStartTime, fields.eventEndTime)}</b>
         </div>
-        <div><span>Prioritat</span><b className={`fxd__pri--${lead.priority.toLowerCase()}`}>{PRIORITY_LABEL[lead.priority] || lead.priority}</b></div>
+        <div className="ap-detail-stats-cell">
+          <span className="ap-detail-stats-label">Prioritat</span>
+          <b className={`ap-detail-stats-val fxd__pri--${lead.priority.toLowerCase()}`}>{PRIORITY_LABEL[lead.priority] || lead.priority}</b>
+        </div>
       </div>
 
       {/* Grid de panells */}
@@ -361,6 +383,10 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
         {/* Col 1, Fila 1 — Fase + accions */}
         <section className="fxd__panel">
           <div className="fxd__panelhead"><span>Fase</span></div>
+          <div className="fxd__stageactions">
+            <Link href={`/admin/presupuestos?leadId=${lead.id}`} className="fxd__btn">+ Pressupost</Link>
+            <Link href={`/admin/dossiers?leadId=${lead.id}`} className="fxd__btn">+ Dossier</Link>
+          </div>
           <div className="fxd__stagepick">
             {PIPELINE_STAGES.map((s) => (
               <button key={s} type="button" data-stage={s}
@@ -371,10 +397,6 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
                 <span className="fx__dot" data-stage={s} />{STAGE_LABEL[s]}
               </button>
             ))}
-          </div>
-          <div style={{ display: 'flex', gap: 8, marginTop: 'auto', paddingTop: 10 }}>
-            <Link href={`/admin/presupuestos?leadId=${lead.id}`} className="fxd__btn" style={{ flex: 1, justifyContent: 'center', textAlign: 'center' }}>+ Pressupost</Link>
-            <Link href={`/admin/dossiers?leadId=${lead.id}`} className="fxd__btn" style={{ flex: 1, justifyContent: 'center', textAlign: 'center' }}>+ Dossier</Link>
           </div>
           {stage === 'guanyat' && !lead.booking && (
             <Link href={`/admin/bookings/new?leadId=${encodeURIComponent(lead.id)}`} className="fxd__btn fxd__btn--primary" style={{ marginTop: 8 }}>Crear reserva</Link>
@@ -469,7 +491,7 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
           <div className="fxd__panelhead"><span>Contacte</span></div>
           <dl className="fxd__rows fxd__rows--contact">
             {(['phone', 'email'] as EditableField[]).map((f) => (
-              <div key={f} className={f === 'email' ? 'fxd__row--long' : undefined}>
+              <div key={f}>
                 <dt>{f === 'phone' ? 'Telèfon' : 'Email'}</dt>
                 <dd>
                   {editField === f ? (
@@ -675,8 +697,11 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
                 {proposals.map((p) => (
                   <dd key={p.id} className="flex justify-between py-0.5 text-[11px] text-[var(--t2)]">
                     <span>{p.reference}</span>
-                    <span className={p.status === 'SENT' ? 'fxd__status--sent' : p.status === 'ACCEPTED' ? 'fxd__status--accepted' : 'fxd__status--draft'}>
-                      {p.status === 'SENT' ? 'Enviat' : p.status === 'ACCEPTED' ? 'Acceptat' : p.status === 'DRAFT' ? 'Esborrany' : p.status}
+                    <span>
+                      <span className="mr-2 fxd__val--gold">{formatCurrency(p.total)}</span>
+                      <span className={p.status === 'SENT' ? 'fxd__status--sent' : p.status === 'ACCEPTED' ? 'fxd__status--accepted' : 'fxd__status--draft'}>
+                        {p.status === 'SENT' ? 'Enviat' : p.status === 'ACCEPTED' ? 'Acceptat' : p.status === 'DRAFT' ? 'Esborrany' : p.status}
+                      </span>
                     </span>
                   </dd>
                 ))}
@@ -711,7 +736,9 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
       {/* ── Anàlisi econòmica — KPI cards (booking-lab recuperat) ── */}
       {(() => {
         const bk = lead.booking;
-        const total = bk ? bk.total : (fields.budget ? Number(fields.budget) : 0);
+        const latestProposalTotal = proposals.find((p) => Number.isFinite(p.total) && p.total > 0)?.total ?? null;
+        const budgetTotal = fields.budget ? Number(fields.budget) : 0;
+        const total = bk ? bk.total : (latestProposalTotal ?? budgetTotal);
         const hours = bk ? bk.totalHours : (() => {
           const t = fields.eventStartTime; const e = fields.eventEndTime;
           if (!t || !e) return 0;
@@ -723,9 +750,51 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
           if (endMin <= startMin) endMin += 24 * 60;
           return (endMin - startMin) / 60;
         })();
-        if (!total || !hours) return null;
 
         const collabCost = bk?.collaboratorCost?.amount ?? 0;
+        type Kpi = { value: string; label: string; sub: string; level: 'gold' | 'ok' | 'warn' | 'critical' | 'info'; score?: number };
+        const kpis: Kpi[] = [];
+
+        if (!total || !Number.isFinite(total)) {
+          kpis.push({ value: 'Pendent', label: 'Import', sub: 'Afegeix pressupost o proposta', level: 'warn' });
+        } else {
+          kpis.push({
+            value: formatCurrency(total),
+            label: bk ? 'Total reserva' : latestProposalTotal ? 'Ultima proposta' : 'Pressupost lead',
+            sub: bk ? bk.reference : latestProposalTotal ? 'Import recuperat de pressupostos' : 'Estimacio manual',
+            level: 'gold',
+          });
+        }
+
+        if (!hours || !Number.isFinite(hours)) {
+          kpis.push({ value: 'Pendent', label: 'Durada', sub: 'Afegeix hora inici i fi per calcular €/h i marge', level: 'warn' });
+          return (
+            <section className="fxd__econo">
+              <div className="fxd__econohead">
+                <span>Anàlisi econòmica</span>
+                <span className="fxd__econobadge">Falten hores</span>
+                {!bk && <span className="fxd__econonote">estimació sense reserva</span>}
+              </div>
+              <div className="fxd__kpis">
+                {kpis.map((k, i) => (
+                  <div key={i} className="fxd__kpi" data-level={k.level} style={kpiStyle(k.score)}>
+                    <div className="fxd__kpi-val">{k.value}</div>
+                    <div className="fxd__kpi-lbl">{k.label}</div>
+                    <div className="fxd__kpi-sub">{k.sub}</div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          );
+        }
+
+        kpis.push({
+          value: `${hours}h`,
+          label: 'Durada',
+          sub: 'hores facturables',
+          level: 'info',
+        });
+
         const costResult = computeFullBookingCost({
           total,
           billableHours: hours,
@@ -737,32 +806,33 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
         const devPct = rate.recommended > 0
           ? Math.round(((pricePerHour - rate.recommended) / rate.recommended) * 100) : 0;
 
-        type Kpi = { value: string; label: string; sub: string; level: 'ok' | 'warn' | 'critical' | 'info' };
-        const kpis: Kpi[] = [];
-
         if (bk?.costFloor && bk.costFloor > 0) {
           const realMargin = total - bk.costFloor;
           const realPct = Math.round((realMargin / total) * 100);
           const tone = getMarginColor(realPct);
-          kpis.push({ value: `${realPct}%`, label: 'Marge net', sub: MARGIN_ADVICE[tone.kind] ?? formatCurrency(realMargin), level: realPct < 0 ? 'critical' : realPct < 25 ? 'warn' : 'ok' });
+          const marginScore = clampScore((realPct / 45) * 100);
+          kpis.push({ value: `${realPct}%`, label: 'Marge net', sub: MARGIN_ADVICE[tone.kind] ?? formatCurrency(realMargin), level: realPct < 0 ? 'critical' : realPct < 25 ? 'warn' : 'ok', score: marginScore });
         } else if (marginPct !== undefined) {
-          kpis.push({ value: `${marginPct}%`, label: 'Marge estimat', sub: MARGIN_ADVICE[marginColor.kind] ?? '', level: marginPct < 0 ? 'critical' : marginPct < 25 ? 'warn' : 'ok' });
+          const marginScore = clampScore((marginPct / 45) * 100);
+          kpis.push({ value: `${marginPct}%`, label: 'Marge estimat', sub: MARGIN_ADVICE[marginColor.kind] ?? '', level: marginPct < 0 ? 'critical' : marginPct < 25 ? 'warn' : 'ok', score: marginScore });
         }
 
+        const rateScore = clampScore((pricePerHour / rate.recommended) * 100);
         kpis.push({
           value: `${pricePerHour}€/h`,
           label: 'Preu per hora',
           sub: devPct < 0 ? `${devPct}% sota tarifa · recomanat ${rate.recommended}€/h` : `Dins tarifa (recomanat ${rate.recommended}€/h)`,
           level: pricePerHour < rate.min ? 'critical' : pricePerHour < rate.recommended ? 'warn' : 'ok',
+          score: rateScore,
         });
 
         if (devPct < -10) {
           const recTotal = Math.ceil(rate.recommended * hours);
-          kpis.push({ value: `+${formatCurrency(recTotal - total)}`, label: 'Per arribar a tarifa', sub: `cobrar ${formatCurrency(recTotal)}`, level: 'warn' });
+          kpis.push({ value: `+${formatCurrency(recTotal - total)}`, label: 'Per arribar a tarifa', sub: `cobrar ${formatCurrency(recTotal)}`, level: 'warn', score: rateScore });
         }
 
         if (collabCost > 0) {
-          kpis.push({ value: `-${formatCurrency(collabCost)}`, label: `Col·laborador${bk?.collaboratorCost?.name ? ` · ${bk.collaboratorCost.name}` : ''}`, sub: `Net: ${formatCurrency(total - collabCost)}`, level: 'info' });
+          kpis.push({ value: `-${formatCurrency(collabCost)}`, label: `Col·laborador${bk?.collaboratorCost?.name ? ` · ${bk.collaboratorCost.name}` : ''}`, sub: `Net: ${formatCurrency(total - collabCost)}`, level: 'info', score: 45 });
         }
 
         const hasAlerts = alerts.some(a => a.level === 'critical' || a.level === 'warn');
@@ -776,7 +846,7 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
             </div>
             <div className="fxd__kpis">
               {kpis.map((k, i) => (
-                <div key={i} className="fxd__kpi" data-level={k.level}>
+                <div key={i} className="fxd__kpi" data-level={k.level} style={kpiStyle(k.score)}>
                   <div className="fxd__kpi-val">{k.value}</div>
                   <div className="fxd__kpi-lbl">{k.label}</div>
                   <div className="fxd__kpi-sub">{k.sub}</div>

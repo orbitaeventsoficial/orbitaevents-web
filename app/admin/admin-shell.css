@@ -16,9 +16,33 @@
   background: var(--ax-canvas);
   color: var(--ax-t);
   font-family: var(--ui);
+  font-size: 14px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
+
+/* ── Tipografia base admin — tots els elements hereden d'aquí ── */
+html.admin-mode .ax__page {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── Mínim tipogràfic global: cap text sota 12px a l'admin ──
+   Cobreix tots els components que usen Tailwind text-[10px] / text-[11px]
+   sense haver de modificar cada fitxer individualment.               ── */
+html.admin-mode [class*="text-[9px]"],
+html.admin-mode [class*="text-[10px]"],
+html.admin-mode [class*="text-[10.5px]"],
+html.admin-mode [class*="text-[11px]"],
+html.admin-mode [class*="text-[11.5px]"],
+html.admin-mode [class*="text-[11.7px]"],
+html.admin-mode [class*="text-[11.8px]"] {
+  font-size: 12px !important;
+}
+
+/* text-xs (0.75rem = 12px) és el mínim acceptable — no s'escala */
+
 .ax-root *, .ax-root *::before, .ax-root *::after { box-sizing: border-box; }
 
 /* ── Esquelet de l'app ────────────────────────────────────────────────────── */
@@ -207,7 +231,7 @@
   width: 100%; min-height: 46px; padding: 0 13px;
   border: 1px solid transparent; border-radius: 12px;
   background: transparent; color: var(--ax-t2);
-  font: inherit; font-size: 14.5px; font-weight: 700; text-align: left; cursor: pointer;
+  font: inherit; font-size: var(--o-text-md, 15px); font-weight: 700; text-align: left; cursor: pointer;
   transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 .ax__sideitem:hover { background: var(--ax-panel); color: var(--ax-t); border-color: var(--ax-line); }
@@ -235,7 +259,7 @@
   display: flex; align-items: center; min-height: 33px; padding: 0 10px;
   border: 0; border-radius: 9px;
   background: transparent; color: var(--ax-t3);
-  font: inherit; font-size: 13.5px; font-weight: 650; text-align: left;
+  font: inherit; font-size: var(--o-text-sm, 13px); font-weight: 650; text-align: left;
   cursor: pointer; text-decoration: none;
   transition: background 140ms ease, color 140ms ease;
 }
@@ -280,7 +304,7 @@
     color-mix(in oklab, var(--ax-gold) 5%, var(--ax-panel))
   );
   color: var(--ax-gold-bright);
-  font: inherit; font-size: 12px; font-weight: 750; letter-spacing: 0.01em;
+  font: inherit; font-size: var(--o-text-sm, 13px); font-weight: 750; letter-spacing: 0.01em;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   cursor: pointer; text-decoration: none;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -360,7 +384,9 @@
 
 /* ── Animació ─────────────────────────────────────────────────────────────── */
 @keyframes ax-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-.ax__page { animation: ax-rise 360ms cubic-bezier(.2, .7, .2, 1) both; }
+/* ax-rise NO pot anar a ax__page — transform trenca position:sticky dels fills.
+   S'aplica a ax__page-inner si cal animació d'entrada. */
+.ax__page { animation: none; }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
@@ -389,4 +415,229 @@
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PATRÓ CANÒNIC: Capçalera de pàgina de detall (lead, reserva, client, etc.)
+   Prefix: ap-detail-*
+   Ús: qualsevol pàgina /admin/*/[id] que necesiti capçalera consistent.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════════════════════════════════
+   NORMA CANÒNICA — Header sticky de pàgina admin
+   ─────────────────────────────────────────────────────────────────────────
+   Tota pàgina admin que necessiti un header fixat mentre es fa scroll
+   HA D'USAR la classe  ap-sticky-header  com a contenidor arrel del header.
+
+   Estructura esperada:
+     <div className="ap-sticky-header">
+       <div className="ap-detail-bar">       ← barra amb back + accions
+       <div className="ap-detail-hero">      ← kicker + títol
+       [<div className="ap-detail-stats">]   ← KPIs opcionals
+       [<nav className="ap-detail-secnav">]  ← nav seccions opcional
+     </div>
+
+   NO usar position:sticky inline, ni bd__header per a pàgines noves.
+   ════════════════════════════════════════════════════════════════════════════ */
+html.admin-mode .ap-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: rgba(10,10,12,0.94);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+html.admin-mode .ap-detail-bar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Botó genèric de la barra — back, accions, etc. */
+html.admin-mode .ap-detail-bar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 13px;
+  border: 1px solid var(--ax-line2, rgba(255,255,255,0.18));
+  border-radius: 8px;
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.55);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+html.admin-mode .ap-detail-bar-btn:hover {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.9);
+  border-color: rgba(255,255,255,0.28);
+}
+html.admin-mode .ap-detail-bar-btn--accent {
+  border-color: rgba(95,183,232,0.3);
+  background: rgba(95,183,232,0.08);
+  color: var(--o-info, #5fb7e8);
+}
+html.admin-mode .ap-detail-bar-btn--accent:hover {
+  background: rgba(95,183,232,0.14);
+  color: var(--o-info, #5fb7e8);
+}
+
+/* Alias per backward compat */
+html.admin-mode .ap-detail-back { }
+
+html.admin-mode .ap-detail-bar-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+html.admin-mode .ap-detail-hero {
+  padding: 12px 20px 10px;
+  border-bottom: 1px solid var(--ax-line, rgba(255,255,255,0.1));
+}
+
+html.admin-mode .ap-detail-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c, var(--ax-t3));  /* --c = color de fase (lead); ax-t3 = neutre (booking) */
+}
+
+html.admin-mode .ap-detail-title {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.022em;
+  line-height: 1.05;
+  color: rgba(255,255,255,0.88);
+}
+
+html.admin-mode .ap-detail-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* ── KPI cells (stats) ── */
+html.admin-mode .ap-detail-stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border-bottom: 1px solid var(--ax-line, rgba(255,255,255,0.1));
+  background: rgba(255,255,255,0.012);
+}
+@media (max-width: 900px) {
+  html.admin-mode .ap-detail-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* Cel·la: label + valor en la mateixa línia (baseline) */
+html.admin-mode .ap-detail-stats-cell {
+  min-width: 0;
+  padding: 8px 14px;
+  border-right: 1px solid var(--ax-line, rgba(255,255,255,0.1));
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+html.admin-mode .ap-detail-stats-cell:last-child { border-right: 0; }
+
+html.admin-mode .ap-detail-stats-label {
+  flex: none;
+  font-family: var(--mono, monospace);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ax-t3, rgba(255,255,255,0.35));
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+html.admin-mode .ap-detail-stats-val {
+  min-width: 0;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--display, system-ui);
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  color: var(--ax-t, #ece7df);
+  text-decoration: none;
+}
+html.admin-mode .ap-detail-stats-cell--gold .ap-detail-stats-val { color: var(--ax-gold, #d7b86e); }
+html.admin-mode .ap-detail-stats-cell--ok   .ap-detail-stats-val { color: var(--o-success, #3ec57b); }
+html.admin-mode .ap-detail-stats-cell--warn .ap-detail-stats-val { color: var(--o-warning, #e8a93a); }
+html.admin-mode .ap-detail-stats-cell--err  .ap-detail-stats-val { color: var(--o-danger, #e2596a); }
+
+html.admin-mode .ap-detail-stats-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+html.admin-mode .ap-detail-stats-dot--ok   { background: var(--o-success, #3ec57b); }
+html.admin-mode .ap-detail-stats-dot--warn { background: var(--o-warning, #e8a93a); }
+html.admin-mode .ap-detail-stats-dot--err  { background: var(--o-danger, #e2596a); }
+
+/* ── Section nav (específic de reserves però pot reutilitzar-se) ── */
+html.admin-mode .ap-detail-secnav {
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--ax-line, rgba(255,255,255,0.1));
+}
+html.admin-mode .ap-detail-secnav::-webkit-scrollbar { display: none; }
+html.admin-mode .ap-detail-secnav-list {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 24px;
+  min-width: max-content;
+  width: 100%;
+}
+html.admin-mode .ap-detail-secbtn {
+  height: 38px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255,255,255,0.5);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.1s, background 0.1s;
+}
+html.admin-mode .ap-detail-secbtn:hover {
+  color: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.05);
+}
+html.admin-mode .ap-detail-secbtn--on {
+  border: 1px solid var(--ax-hair-gold, rgba(215,184,110,0.22));
+  background: rgba(215,184,110,0.1);
+  color: var(--ax-gold, #d7b86e);
 }

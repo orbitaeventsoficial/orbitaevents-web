@@ -113,7 +113,7 @@ export default async function LeadDetailPage({ params }: Props) {
         },
       },
       proposals: {
-        select: { id: true, reference: true, status: true, createdAt: true },
+        select: { id: true, reference: true, status: true, total: true, createdAt: true },
         orderBy: { createdAt: 'desc' },
         take: 5,
       },
@@ -334,7 +334,7 @@ export default async function LeadDetailPage({ params }: Props) {
   return (
       <LeadDetailClient
         notes={lead.notes.map((n) => ({ id: n.id, content: n.content, createdBy: n.createdBy, createdAt: n.createdAt.toISOString() }))}
-        proposals={lead.proposals.map((p) => ({ id: p.id, reference: p.reference, status: p.status, createdAt: p.createdAt.toISOString() }))}
+        proposals={lead.proposals.map((p) => ({ id: p.id, reference: p.reference, status: p.status, total: Number(p.total), createdAt: p.createdAt.toISOString() }))}
         dossiers={lead.dossiers.map((d) => ({ id: d.id, nom: d.nom, estat: d.sentAt ? 'enviat' : 'esborrany', createdAt: d.createdAt.toISOString() }))}
         lead={{
         id: lead.id,
@@ -402,7 +402,6 @@ export default async function LeadDetailPage({ params }: Props) {
       }} />
   );
 }
-
 
 
 

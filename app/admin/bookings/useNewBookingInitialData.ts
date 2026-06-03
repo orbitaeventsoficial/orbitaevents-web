@@ -96,8 +96,12 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
                 clientPhone: lead.phone || prev.clientPhone,
                 eventType: lead.eventType || prev.eventType,
                 eventDate: lead.eventDate ? lead.eventDate.slice(0, 10) : prev.eventDate,
+                eventStartTime: lead.eventStartTime || prev.eventStartTime,
+                eventEndTime: lead.eventEndTime || prev.eventEndTime,
                 eventLocation: lead.eventLocation || prev.eventLocation,
+                eventVenue: lead.eventAddress || prev.eventVenue,
                 guestCount: lead.guestCount ? String(lead.guestCount) : prev.guestCount,
+                packId: lead.interestedPackId || prev.packId,
               }));
             }
           }

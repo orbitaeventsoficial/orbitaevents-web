@@ -3,6 +3,17 @@ import { prisma } from '@/lib/prisma';
 import { loadPendingFollowUps } from '@/lib/services/responseTrackingService';
 
 type CalendarDay = {
+  leads: {
+    id: string;
+    customerId: string | null;
+    name: string;
+    eventDate: string;
+    eventType: string | null;
+    status: string | null;
+    eventStartTime: string | null;
+    eventEndTime: string | null;
+    eventLocation: string | null;
+  }[];
   reservas: {
     id: string;
     leadId: string | null;
@@ -59,7 +70,33 @@ export async function getAdminCalendarMonth(from?: string | null, to?: string | 
   const fromDate = new Date(from);
   const toDate = new Date(to);
 
-  const [bookings, availabilities, tasks, socialPosts, followUps] = await Promise.all([
+  const [leads, bookings, availabilities, tasks, socialPosts, followUps] = await Promise.all([
+    prisma.lead.findMany({
+      where: {
+        eventDate: {
+          gte: fromDate,
+          lte: toDate,
+        },
+        status: {
+          notIn: ['LOST'],
+        },
+        booking: null,
+      },
+      select: {
+        id: true,
+        customerId: true,
+        name: true,
+        eventDate: true,
+        eventType: true,
+        status: true,
+        eventStartTime: true,
+        eventEndTime: true,
+        eventLocation: true,
+      },
+      orderBy: {
+        eventDate: 'asc',
+      },
+    }),
     prisma.booking.findMany({
       where: {
         eventDate: {
@@ -160,8 +197,26 @@ export async function getAdminCalendarMonth(from?: string | null, to?: string | 
   const currentDate = new Date(fromDate);
   while (currentDate <= toDate) {
     const key = currentDate.toISOString().slice(0, 10);
-    days[key] = { reservas: [], bloqueos: [], tasks: [], socialPosts: [], followUps: [] };
+    days[key] = { leads: [], reservas: [], bloqueos: [], tasks: [], socialPosts: [], followUps: [] };
     currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  for (const lead of leads) {
+    if (!lead.eventDate) continue;
+    const key = lead.eventDate.toISOString().slice(0, 10);
+    if (!days[key]) continue;
+
+    days[key].leads.push({
+      id: lead.id,
+      customerId: lead.customerId ?? null,
+      name: lead.name,
+      eventDate: lead.eventDate.toISOString(),
+      eventType: lead.eventType,
+      status: lead.status,
+      eventStartTime: lead.eventStartTime,
+      eventEndTime: lead.eventEndTime,
+      eventLocation: lead.eventLocation,
+    });
   }
 
   for (const booking of bookings) {

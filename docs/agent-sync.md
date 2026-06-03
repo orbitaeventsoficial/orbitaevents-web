@@ -15,6 +15,12 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-04 [ESTAT: tancat]
+Últim canvi: #866 — leads en dies feiners (Dl–Dj) visibles al calendari i a pipeline/llista.
+Bug crític: leads amb data feiner eren invisibes a tota la pàgina leads. `seasonCalendarService.weekdays` + `page.tsx` ara els capturen.
+Proper pas previst: pendent decisió propietari — tests unitaris del nou camp `weekdays` a `seasonCalendarService`.
+Avís per codex: `seasonCalendarService.ts`, `leads/page.tsx`, `LeadsSeasonClient.tsx`, `leads-design.css`, `CalendarWeekClient.tsx`, `CalendarDayClient.tsx` modificats. No reobrir sense coordinar.
+
 [claude] 2026-06-02 [ESTAT: tancat]
 Últim canvi: #855 (fitxa lead — cost real col·laborador via CollaboratorBooking + formatCurrency/formatDateFull canònics).
 Proper pas previst: el propietari decideix — opció A: validació browser fitxa lead, opció B: migrar `/admin/tasks` a Brass & Obsidian.

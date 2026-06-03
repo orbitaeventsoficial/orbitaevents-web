@@ -6,6 +6,17 @@
 import { EVENT_TYPE_PLAIN, DEFAULT_LOCALE } from '@/lib/constants';
 
 export type CalendarApiDay = {
+  leads?: {
+    id: string;
+    customerId?: string | null;
+    name: string;
+    eventDate: string;
+    eventType?: string | null;
+    status?: string | null;
+    eventStartTime?: string | null;
+    eventEndTime?: string | null;
+    eventLocation?: string | null;
+  }[];
   reservas: {
     id: string;
     leadId?: string | null;

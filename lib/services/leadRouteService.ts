@@ -20,7 +20,11 @@ export async function getLeadDetail(id: string): Promise<LeadRouteResult> {
       dni: true,
       eventType: true,
       eventDate: true,
+      eventStartTime: true,
+      eventEndTime: true,
       eventLocation: true,
+      eventPhone: true,
+      eventAddress: true,
       guestCount: true,
       budget: true,
       message: true,
@@ -208,4 +212,3 @@ export async function deleteLeadIfAllowed(id: string): Promise<LeadRouteResult> 
 
   return { status: 200, body: { ok: true } };
 }
-

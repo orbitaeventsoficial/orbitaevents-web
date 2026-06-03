@@ -18,6 +18,7 @@ import {
 } from '@/lib/clientPortalPayment';
 import { toRgba, resolvePortalAccentHex } from '@/lib/clientPortalUtils';
 import PortalBottomNav from '../PortalBottomNav';
+import BizumPayButton from './BizumPayButton';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -63,20 +64,38 @@ export default async function ClientPortalPaymentsPage({
   const accentBorder = toRgba(accentHex, 0.35) || 'rgba(6,182,212,0.35)';
   const accentBg = toRgba(accentHex, 0.12) || 'rgba(6,182,212,0.12)';
 
-  const paymentSummary = getClientPortalPaymentSummary(access.booking as {
+  const booking = access.booking as {
+    reference: string;
     depositAmount: number;
     depositPaid: boolean;
     depositPaymentUrl?: string | null;
+    depositBizumDeclaredAt?: Date | null;
     remainingAmount: number;
     remainingPaid: boolean;
     remainingPaymentUrl?: string | null;
-  });
+    remainingBizumDeclaredAt?: Date | null;
+  };
+
+  const paymentSummary = getClientPortalPaymentSummary(booking);
+
+  const bizumPhone = process.env.BIZUM_PHONE ?? null;
 
   const nextPaymentLabel = paymentSummary.nextPayment === 'deposit'
     ? t.paymentDeposit
     : paymentSummary.nextPayment === 'remaining'
     ? t.paymentRemaining
     : t.paymentNoAction;
+
+  const bizumLabels = {
+    instruction: t.bizumInstruction,
+    concept: t.bizumConcept,
+    button: t.bizumButton,
+    sending: t.bizumSending,
+    successTitle: t.bizumSuccessTitle,
+    successBody: t.bizumSuccessBody,
+    alreadyDeclared: t.bizumAlreadyDeclared,
+    errorRetry: t.bizumErrorRetry,
+  };
 
   return (
     <main className="min-h-screen pb-24 text-white/90" style={{ background: 'linear-gradient(160deg,#050709 0%,#0a0d12 40%,#060810 100%)' }}>
@@ -90,7 +109,7 @@ export default async function ClientPortalPaymentsPage({
           </Link>
           <p className="text-xs uppercase tracking-widest mb-1" style={{ color: accentHex }}>{t.payments}</p>
           <h1 className="text-2xl font-bold text-white">{t.paymentPageTitle}</h1>
-          <p className="text-sm text-white/40 mt-1">{access.booking.reference}</p>
+          <p className="text-sm text-white/40 mt-1">{booking.reference}</p>
         </header>
 
         {/* Overview */}
@@ -125,6 +144,17 @@ export default async function ClientPortalPaymentsPage({
               >
                 {t.payDepositOnline}
               </a>
+            ) : !paymentSummary.deposit.paid && bizumPhone ? (
+              <BizumPayButton
+                token={params.token}
+                paymentType="deposit"
+                bizumPhone={bizumPhone}
+                amount={formatCurrency(paymentSummary.deposit.amount)}
+                reference={booking.reference}
+                accentHex={accentHex}
+                labels={bizumLabels}
+                alreadyDeclared={!!booking.depositBizumDeclaredAt}
+              />
             ) : (
               <p className="mt-4 text-sm text-white/40">
                 {paymentSummary.deposit.paid ? t.paymentNoAction : t.paymentLinkPending}
@@ -149,6 +179,17 @@ export default async function ClientPortalPaymentsPage({
               >
                 {t.payRemainingOnline}
               </a>
+            ) : !paymentSummary.remaining.paid && bizumPhone && paymentSummary.deposit.paid ? (
+              <BizumPayButton
+                token={params.token}
+                paymentType="remaining"
+                bizumPhone={bizumPhone}
+                amount={formatCurrency(paymentSummary.remaining.amount)}
+                reference={booking.reference}
+                accentHex={accentHex}
+                labels={bizumLabels}
+                alreadyDeclared={!!booking.remainingBizumDeclaredAt}
+              />
             ) : (
               <p className="mt-4 text-sm text-white/40">
                 {paymentSummary.remaining.paid ? t.paymentNoAction : t.paymentLinkPending}

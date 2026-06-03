@@ -25,14 +25,14 @@ export default function BookingSectionNav() {
   }, []);
 
   return (
-    <nav className="bd__secnav" aria-label="Seccions de la reserva">
-      <div className="bd__secnav-list">
+    <nav className="ap-detail-secnav" aria-label="Seccions de la reserva">
+      <div className="ap-detail-secnav-list">
         {BOOKING_DETAIL_SECTIONS.map(({ id, label }) => (
           <button
             key={id}
             type="button"
             onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-            className={`bd__secbtn${active === id ? ' bd__secbtn--on' : ''}`}
+            className={`ap-detail-secbtn${active === id ? ' ap-detail-secbtn--on' : ''}`}
           >
             {label}
           </button>

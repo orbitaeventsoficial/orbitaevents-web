@@ -22,6 +22,9 @@ type InternalPostEventStatus = 'PENDIENTE' | 'EN_PROGRESO' | 'COMPLETO';
 
 type CustomerContext = {
   id: string;
+  name: string;
+  email: string;
+  phone: string | null;
   totalEvents: number;
   totalSpent: number;
   lastEventDate: Date | null;
@@ -109,7 +112,7 @@ async function fetchCustomerContext(
   customerId: string | null,
   clientEmail: string,
 ): Promise<CustomerContext> {
-  const select = { id: true, totalEvents: true, totalSpent: true, lastEventDate: true } as const;
+  const select = { id: true, name: true, email: true, phone: true, totalEvents: true, totalSpent: true, lastEventDate: true } as const;
   if (customerId) {
     return prisma.customer.findUnique({ where: { id: customerId }, select });
   }

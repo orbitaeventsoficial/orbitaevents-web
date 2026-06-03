@@ -150,9 +150,12 @@ const I = {
   phone:  ic(<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.33 1.77.63 2.6a2 2 0 0 1-.45 2.11L8 9.72a16 16 0 0 0 6.28 6.28l1.29-1.29a2 2 0 0 1 2.11-.45c.83.3 1.7.51 2.6.63A2 2 0 0 1 22 16.92z" />),
 };
 
+type WeekendSlot = { type: 'weekend'; friIso: string; days: { iso: string; d: number; inMonth: boolean; lead: LeadData | null }[] };
+type WeekdaySlot = { type: 'weekday'; iso: string; d: number; dow: number; lead: LeadData };
+type CalSlot = WeekendSlot | WeekdaySlot;
 type MonthBlock = {
   m: number; label: string; isFuture: boolean;
-  weekends: { sat: string; days: { iso: string; d: number; inMonth: boolean; lead: LeadData | null }[] }[];
+  slots: CalSlot[];
 };
 
 function parseBillableHours(time: string, endTime: string): number {
@@ -424,15 +427,31 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
   const byDate = useMemo(() => { const m = new Map<string, LeadData>(); for (const l of effectiveLeads) if (l.dateISO) m.set(l.dateISO, l); return m; }, [effectiveLeads]);
   const months = useMemo<MonthBlock[]>(() => visibleMonths.map((vm) => {
     const { y, m } = toCalMonth(year, vm);
-    const weekends = saturdaysInMonth(y, m).map((sat) => ({
-      sat,
+    const weekendSlots: WeekendSlot[] = saturdaysInMonth(y, m).map((sat) => ({
+      type: 'weekend',
+      friIso: shiftIso(sat, -1),
       days: [shiftIso(sat, -1), sat, shiftIso(sat, 1)].map((iso) => {
         const p = parseISO(iso);
         return { iso, d: p.d, inMonth: p.m === m && p.y === y, lead: byDate.get(iso) ?? null };
       }),
     }));
+    const lastDay = new Date(Date.UTC(y, m, 0)).getUTCDate();
+    const weekdaySlots: WeekdaySlot[] = [];
+    for (let d = 1; d <= lastDay; d++) {
+      const dow = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+      if (dow >= 1 && dow <= 4) {
+        const iso = isoDate(y, m, d);
+        const lead = byDate.get(iso);
+        if (lead) weekdaySlots.push({ type: 'weekday', iso, d, dow, lead });
+      }
+    }
+    const slots: CalSlot[] = [...weekendSlots, ...weekdaySlots].sort((a, b) => {
+      const aKey = a.type === 'weekend' ? a.friIso : a.iso;
+      const bKey = b.type === 'weekend' ? b.friIso : b.iso;
+      return aKey.localeCompare(bKey);
+    });
     const displayY = toCalMonth(year, vm).y;
-    return { m: vm, label: `${MONTHS_FULL[m - 1]} ${displayY}`, isFuture: displayY > year, weekends };
+    return { m: vm, label: `${MONTHS_FULL[m - 1]} ${displayY}`, isFuture: displayY > year, slots };
   }), [byDate, visibleMonths, year]);
 
   async function commitMove(leadId: string, target: Stage, previous: Stage) {
@@ -649,7 +668,10 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
             {/* ── Grid de mesos ── */}
             <div className="fx__cal">
               {months.map((month) => {
-                const monthLeads = month.weekends.reduce((n, w) => n + w.days.filter((d) => d.lead && d.inMonth).length, 0);
+                const monthLeads = month.slots.reduce((n, slot) => {
+                  if (slot.type === 'weekend') return n + slot.days.filter((d) => d.lead && d.inMonth).length;
+                  return n + 1;
+                }, 0);
                 return (
                   <article className={`fx__mon${month.isFuture ? ' is-future' : ''}`} key={month.m}>
                     <div className="fx__monhead">
@@ -663,40 +685,71 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                       <span className="fx__gh">Dv</span><span className="fx__gh">Ds</span><span className="fx__gh">Dg</span>
                     </div>
                     <div className="fx__grid">
-                      {month.weekends.map((w) => w.days.map((d) => {
-                        const l = d.lead;
-                        if (!l) return (
-                          <span key={d.iso} className={`fx__cell is-free${d.inMonth ? '' : ' is-out'}`}>
-                            <span className="fx__day">{d.d}</span>
-                            <span className="fx__freelabel">Lliure</span>
-                          </span>
-                        );
-                        const pay = paymentState(l.booking);
-                        return (
-                          <button key={d.iso} type="button"
-                            className={`fx__cell is-lead${d.inMonth ? '' : ' is-out'}${l.id === focusId ? ' is-active' : ''}${pay ? ' is-reserva' : ''}`}
-                            data-stage={l.stage}
-                            onClick={() => setPageId(l.id)}>
-                            <span className="fx__celltop">
-                              <span className="fx__day">{d.d}</span>
-                              {l.value > 0 && <span className="fx__cval">{euro(l.value)}</span>}
-                              <span className="fx__cellmeta">
-                                <WxBadge wx={l.wx} size="sm" />
-                                {pay && <span className="fx__pay" data-pay={pay} data-tip={PAY_TOOLTIP[pay]} />}
-                                <span className="fx__dot" data-stage={l.stage} data-tip={pay ? `Reserva · ${PAY_TOOLTIP[pay]}` : STAGE_TOOLTIP[l.stage]} />
+                      {month.slots.map((slot) => {
+                        if (slot.type === 'weekday') {
+                          const l = slot.lead;
+                          const pay = paymentState(l.booking);
+                          const DOW_LABEL = ['Dg','Dl','Dt','Dc','Dj','Dv','Ds'];
+                          return (
+                            <button key={slot.iso} type="button"
+                              className={`fx__cell fx__cell--wd is-lead${l.id === focusId ? ' is-active' : ''}${pay ? ' is-reserva' : ''}`}
+                              data-stage={l.stage}
+                              onClick={() => setPageId(l.id)}>
+                              <span className="fx__celltop">
+                                <span className="fx__day">{DOW_LABEL[slot.dow]} {slot.d}</span>
+                                {l.value > 0 && <span className="fx__cval">{euro(l.value)}</span>}
+                                <span className="fx__cellmeta">
+                                  <WxBadge wx={l.wx} size="sm" />
+                                  {pay && <span className="fx__pay" data-pay={pay} data-tip={PAY_TOOLTIP[pay]} />}
+                                  <span className="fx__dot" data-stage={l.stage} data-tip={pay ? `Reserva · ${PAY_TOOLTIP[pay]}` : STAGE_TOOLTIP[l.stage]} />
+                                </span>
                               </span>
+                              <span className="fx__celltype">{pay ? 'Reserva' : l.type}</span>
+                              <span className="fx__lname">{l.name}</span>
+                              <span className="fx__cellfoot">
+                                {l.time
+                                  ? <>{l.time} · {l.location || '—'}</>
+                                  : <><span className="fx__nohour">sense hora</span>{l.location ? ` · ${l.location}` : ''}</>
+                                }
+                              </span>
+                            </button>
+                          );
+                        }
+                        return slot.days.map((d) => {
+                          const l = d.lead;
+                          if (!l) return (
+                            <span key={d.iso} className={`fx__cell is-free${d.inMonth ? '' : ' is-out'}`}>
+                              <span className="fx__day">{d.d}</span>
+                              <span className="fx__freelabel">Lliure</span>
                             </span>
-                            <span className="fx__celltype">{pay ? 'Reserva' : l.type}</span>
-                            <span className="fx__lname">{l.name}</span>
-                            <span className="fx__cellfoot">
-                              {l.time
-                                ? <>{l.time} · {l.location || '—'}</>
-                                : <><span className="fx__nohour">sense hora</span>{l.location ? ` · ${l.location}` : ''}</>
-                              }
-                            </span>
-                          </button>
-                        );
-                      }))}
+                          );
+                          const pay = paymentState(l.booking);
+                          return (
+                            <button key={d.iso} type="button"
+                              className={`fx__cell is-lead${d.inMonth ? '' : ' is-out'}${l.id === focusId ? ' is-active' : ''}${pay ? ' is-reserva' : ''}`}
+                              data-stage={l.stage}
+                              onClick={() => setPageId(l.id)}>
+                              <span className="fx__celltop">
+                                <span className="fx__day">{d.d}</span>
+                                {l.value > 0 && <span className="fx__cval">{euro(l.value)}</span>}
+                                <span className="fx__cellmeta">
+                                  <WxBadge wx={l.wx} size="sm" />
+                                  {pay && <span className="fx__pay" data-pay={pay} data-tip={PAY_TOOLTIP[pay]} />}
+                                  <span className="fx__dot" data-stage={l.stage} data-tip={pay ? `Reserva · ${PAY_TOOLTIP[pay]}` : STAGE_TOOLTIP[l.stage]} />
+                                </span>
+                              </span>
+                              <span className="fx__celltype">{pay ? 'Reserva' : l.type}</span>
+                              <span className="fx__lname">{l.name}</span>
+                              <span className="fx__cellfoot">
+                                {l.time
+                                  ? <>{l.time} · {l.location || '—'}</>
+                                  : <><span className="fx__nohour">sense hora</span>{l.location ? ` · ${l.location}` : ''}</>
+                                }
+                              </span>
+                            </button>
+                          );
+                        });
+                      })}
                     </div>
                   </article>
                 );

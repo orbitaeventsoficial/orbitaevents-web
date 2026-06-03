@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
-import { createStripeCheckoutSession, constructStripeEvent, type StripePaymentType } from '@/lib/services/stripeService';
+import { createStripeCheckoutSession, constructStripeEvent, StripeNotConfiguredError, type StripePaymentType } from '@/lib/services/stripeService';
 import { normalizePortalLocale } from '@/lib/services/clientPortalAccess';
 
 function isUniqueConstraintError(error: unknown): boolean {
@@ -70,7 +70,10 @@ export async function createBookingStripeCheckoutLink(input: {
       });
 
       return { status: 200, body: { url: stripeResult.url } };
-    } catch {
+    } catch (error) {
+      if (error instanceof StripeNotConfiguredError) {
+        return { status: 500, body: { error: 'STRIPE_NOT_CONFIGURED' } };
+      }
       return { status: 500, body: { error: 'STRIPE_ERROR' } };
     }
   }
@@ -95,7 +98,10 @@ export async function createBookingStripeCheckoutLink(input: {
     });
 
     return { status: 200, body: { url: stripeResult.url } };
-  } catch {
+  } catch (error) {
+    if (error instanceof StripeNotConfiguredError) {
+      return { status: 500, body: { error: 'STRIPE_NOT_CONFIGURED' } };
+    }
     return { status: 500, body: { error: 'STRIPE_ERROR' } };
   }
 }

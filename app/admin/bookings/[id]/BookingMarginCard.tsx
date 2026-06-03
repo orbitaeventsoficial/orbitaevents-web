@@ -287,74 +287,74 @@ export default function BookingMarginCard({
       </div>
 
       {total > 0 && (
-        <div className="mb-6 admin-booking-margin-panel rounded-xl border p-4" data-help-title="On va cada euro" data-help-desc="Tradueix el marge a pots reals de negoci: combustible, vehicle, equip, operacions i benefici net.">
-          <h3 className="text-sm font-semibold mb-1">On va cada euro d'aquest bolo</h3>
-          <p className="text-[11px] mb-3">Desglossament pràctic del que reserva l'empresa i del que realment queda com a benefici.</p>
-          <div className="space-y-2 text-xs">
-            <div className="flex items-start justify-between gap-2">
+        <div className="mb-6 admin-booking-margin-panel rounded-xl border p-4">
+          <h3 className="text-base font-bold mb-1">{"On va cada euro d'aquest bolo"}</h3>
+          <p className="text-sm mb-4 opacity-70">Desglossament practic de costos i benefici real.</p>
+          <div className="space-y-3 text-sm">
+            <div className="flex items-start justify-between gap-3">
               <div>
-                <span className="font-medium">Combustible</span>
-                <p className="text-[10px]">Pot “Gasolina” per repostar i cobrir ruta</p>
+                <span className="font-semibold">Combustible</span>
+                <p className="text-xs opacity-60 mt-0.5">Pot Gasolina — repostar i cobrir ruta</p>
               </div>
-              <span className="shrink-0 font-semibold">
+              <span className="shrink-0 font-bold tabular-nums">
                 {formatCurrency(distanceKm > 0 ? distanceKm * vehicleCostPerKm * 0.55 : 0)}
               </span>
             </div>
-            <div className="flex items-start justify-between gap-2">
+            <div className="flex items-start justify-between gap-3">
               <div>
-                <span className="font-medium">Manteniment vehicle</span>
-                <p className="text-[10px]">Pot “Vehicle” per rodes, oli, revisions, assegurança i ITV</p>
+                <span className="font-semibold">Manteniment vehicle</span>
+                <p className="text-xs opacity-60 mt-0.5">Pot Vehicle — rodes, oli, revisions, assegurança</p>
               </div>
-              <span className="shrink-0 font-semibold">
+              <span className="shrink-0 font-bold tabular-nums">
                 {formatCurrency(distanceKm > 0 ? distanceKm * vehicleCostPerKm * 0.45 : 0)}
               </span>
             </div>
-            <div className="flex items-start justify-between gap-2">
+            <div className="flex items-start justify-between gap-3">
               <div>
-                <span className="font-medium">Amortització equip</span>
-                <p className="text-[10px]">Pot “Equip” per recanvis i renovació de material</p>
+                <span className="font-semibold">Amortitzacio equip</span>
+                <p className="text-xs opacity-60 mt-0.5">Pot Equip — recanvis i renovacio de material</p>
               </div>
-              <span className="shrink-0 font-semibold">{formatCurrency(packCostUsed)}</span>
+              <span className="shrink-0 font-bold tabular-nums">{formatCurrency(packCostUsed)}</span>
             </div>
-            <div className="flex items-start justify-between gap-2">
+            <div className="flex items-start justify-between gap-3">
               <div>
-                <span className="font-medium">Costos operatius fixos</span>
-                <p className="text-[10px]">Pot “Operacions” per assegurança RC, llicències i fungible</p>
+                <span className="font-semibold">Costos operatius fixos</span>
+                <p className="text-xs opacity-60 mt-0.5">Pot Operacions — assegurança RC, llicencies, fungible</p>
               </div>
-              <span className="shrink-0 font-semibold">{formatCurrency(fixedOperationalCost)}</span>
+              <span className="shrink-0 font-bold tabular-nums">{formatCurrency(fixedOperationalCost)}</span>
             </div>
             {extrasCost > 0 && (
-              <div className="flex items-start justify-between gap-2">
+              <div className="flex items-start justify-between gap-3">
                 <div>
-                  <span className="font-medium">Cost extres</span>
-                  <p className="text-[10px]">Pot “Extres” per material i productes addicionals</p>
+                  <span className="font-semibold">Cost extres</span>
+                  <p className="text-xs opacity-60 mt-0.5">Pot Extres — material i productes adicionals</p>
                 </div>
-                <span className="shrink-0 font-semibold">{formatCurrency(extrasCost)}</span>
+                <span className="shrink-0 font-bold tabular-nums">{formatCurrency(extrasCost)}</span>
               </div>
             )}
             {extraHoursCost > 0 && (
-              <div className="flex items-start justify-between gap-2">
+              <div className="flex items-start justify-between gap-3">
                 <div>
-                  <span className="font-medium">Cost hores extra</span>
-                  <p className="text-[10px]">Pot “Personal” per compensar hores addicionals treballades</p>
+                  <span className="font-semibold">Cost hores extra</span>
+                  <p className="text-xs opacity-60 mt-0.5">Pot Personal — compensar hores addicionals</p>
                 </div>
-                <span className="shrink-0 font-semibold">{formatCurrency(extraHoursCost)}</span>
+                <span className="shrink-0 font-bold tabular-nums">{formatCurrency(extraHoursCost)}</span>
               </div>
             )}
-            <div className="border-t admin-tone-border-neutral pt-2 mt-2">
-              <div className="flex items-start justify-between gap-2">
+            <div className="border-t admin-tone-border-neutral pt-3 mt-1">
+              <div className="flex items-start justify-between gap-3">
                 <div>
-                  <span className="font-bold">Benefici net</span>
-                  <p className="text-[10px]">Compte principal per sou, estalvi i reinversió</p>
+                  <span className="font-bold text-base">Benefici net</span>
+                  <p className="text-xs opacity-60 mt-0.5">Compte principal — sou, estalvi i reinversio</p>
                 </div>
-                <span className={`shrink-0 text-sm font-black ${netMargin >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
+                <span className={`shrink-0 text-base font-black tabular-nums ${netMargin >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
                   {formatCurrency(netMargin)}
                 </span>
               </div>
             </div>
-            <div className="border-t admin-tone-border-neutral pt-2 mt-1">
-              <p className="text-[10px] leading-relaxed">
-                <strong>Consell pràctic:</strong> separa com a mínim els pots de <strong>Gasolina</strong>, <strong>Equip</strong>, <strong>Operacions</strong> i <strong>Benefici</strong>. Després de cada bolo, mou-hi aquests imports i evitaràs tensions de caixa quan toqui manteniment o renovació.
+            <div className="border-t admin-tone-border-neutral pt-3 mt-1">
+              <p className="text-xs leading-relaxed opacity-70">
+                Consell: separa els pots de Gasolina, Equip, Operacions i Benefici. Despres de cada bolo, mou-hi aquests imports.
               </p>
             </div>
           </div>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAuth, requirePermission } from '@/lib/auth';
-import { createBookingStripeCheckoutLink } from '@/lib/services/bookingStripePaymentService';
+import { confirmBizumPayment } from '@/lib/services/bookingBizumService';
 
 const BodySchema = z.object({
   paymentType: z.enum(['deposit', 'remaining']),
@@ -18,16 +18,21 @@ export async function POST(
 
   const body = await req.json().catch(() => null);
   const parsed = BodySchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: 'INVALID_INPUT' }, { status: 400 });
-  if (!process.env.STRIPE_SECRET_KEY) {
-    return NextResponse.json({ error: 'STRIPE_NOT_CONFIGURED' }, { status: 500 });
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'INVALID_INPUT' }, { status: 400 });
   }
 
-  const result = await createBookingStripeCheckoutLink({
+  const result = await confirmBizumPayment({
     bookingId: params.id,
     paymentType: parsed.data.paymentType,
-    baseUrl: process.env.NEXT_PUBLIC_BASE_URL ?? 'https://orbitaevents.com',
   });
 
-  return NextResponse.json(result.body, { status: result.status });
+  if (!result.ok) {
+    const status = result.reason === 'NOT_FOUND' ? 404
+      : result.reason === 'NO_DECLARATION' ? 409
+      : 409;
+    return NextResponse.json({ error: result.reason }, { status });
+  }
+
+  return NextResponse.json({ ok: true });
 }

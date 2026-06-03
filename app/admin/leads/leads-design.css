@@ -393,6 +393,13 @@
   overflow: visible; background: color-mix(in oklab, var(--line) 58%, transparent);
 }
 
+/* Cel·la de dia feiner — ocupa les 3 columnes del grid, intercalada cronològicament */
+.fx__cell--wd {
+  grid-column: 1 / -1;
+  height: 56px;
+  border-left: 3px solid color-mix(in oklab, var(--cell-t, var(--t)) 40%, transparent);
+}
+
 /* Cel·la */
 .fx__cell { position: relative; display: flex; flex-direction: column; gap: 0; padding: 6px 8px 7px; border-radius: 0; text-align: left; font: inherit; }
 .fx__celltop { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
@@ -529,10 +536,11 @@
 .fxd__econonote { color: var(--t3); font-weight: 500; opacity: 0.7; }
 .fxd__kpis {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
 }
 .fxd__kpi {
-  padding: 12px 14px;
+  min-height: 104px;
+  padding: 16px 18px;
   border-right: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
   border-left: 3px solid transparent;
@@ -541,16 +549,25 @@
 .fxd__kpi[data-level="critical"] { border-left-color: var(--o-danger); background: color-mix(in oklab, var(--o-danger) 6%, transparent); }
 .fxd__kpi[data-level="warn"]     { border-left-color: var(--gold); }
 .fxd__kpi[data-level="ok"]       { border-left-color: var(--o-stage-won-strong); }
+.fxd__kpi[data-level="gold"]     { border-left-color: var(--gold); background: linear-gradient(90deg, color-mix(in oklab, var(--gold) 10%, transparent), transparent 78%); }
 .fxd__kpi[data-level="info"]     { border-left-color: var(--line2); }
+.fxd__kpi[style*="--fxd-kpi-hue"] {
+  border-left-color: hsl(var(--fxd-kpi-hue) 86% 57%);
+  background:
+    linear-gradient(90deg, hsl(var(--fxd-kpi-hue) 86% 57% / 0.16), transparent 78%),
+    color-mix(in oklab, var(--panel) 92%, transparent);
+}
 .fxd__kpi-val {
-  font-family: var(--display); font-size: 22px; font-weight: 800;
+  font-family: var(--display); font-size: 27px; font-weight: 800;
   letter-spacing: -0.02em; line-height: 1; color: var(--t);
 }
 .fxd__kpi[data-level="critical"] .fxd__kpi-val { color: var(--o-danger); }
 .fxd__kpi[data-level="warn"]     .fxd__kpi-val { color: var(--gold); }
 .fxd__kpi[data-level="ok"]       .fxd__kpi-val { color: var(--o-stage-won-strong); }
-.fxd__kpi-lbl { margin-top: 4px; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--t2); }
-.fxd__kpi-sub { margin-top: 2px; font-family: var(--mono); font-size: 10px; color: var(--t3); line-height: 1.3; }
+.fxd__kpi[data-level="gold"]     .fxd__kpi-val { color: var(--gold); }
+.fxd__kpi[style*="--fxd-kpi-hue"] .fxd__kpi-val { color: hsl(var(--fxd-kpi-hue) 90% 62%); }
+.fxd__kpi-lbl { margin-top: 7px; font-family: var(--mono); font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--t2); }
+.fxd__kpi-sub { margin-top: 4px; font-family: var(--mono); font-size: 11px; color: var(--t3); line-height: 1.35; }
 
 /* Indicador de preu — semàfor €/h vs. mercat */
 .fxd__pricehint {
@@ -608,9 +625,9 @@
 .fx__lanehead { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px 10px; border-bottom: 1px solid var(--line); }
 .fx__lanetitle { min-width: 0; display: flex; flex-direction: column; gap: 5px; }
 /* la capçalera de columna porta el seu propi punt d'estat: identifica la fase abans de llegir res */
-.fx__lanehead h2 { margin: 0; font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--t2); display: inline-flex; align-items: center; gap: 8px; }
-.fx__lanehead h2::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
-.fx__lanetitle small { font-family: var(--display); font-size: 19px; font-weight: 700; line-height: 1; color: color-mix(in oklab, var(--gold) 72%, var(--t)); letter-spacing: -0.012em; font-variant-numeric: tabular-nums; }
+.fx__lanehead h2 { margin: 0; font-family: var(--mono); font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--t2); display: inline-flex; align-items: center; gap: 8px; }
+.fx__lanehead h2::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+.fx__lanetitle small { font-family: var(--display); font-size: 22px; font-weight: 700; line-height: 1; color: color-mix(in oklab, var(--gold) 72%, var(--t)); letter-spacing: -0.012em; font-variant-numeric: tabular-nums; }
 .fx__lanehead > span {
   min-width: 24px; padding: 2px 6px;
   border: 1px solid var(--line);
@@ -631,8 +648,8 @@
   background: color-mix(in oklab, var(--sunk) 40%, transparent);
   text-align: center; text-decoration: none;
 }
-.fx__laneemptytx { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--t3); }
-.fx__laneemptysub { font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: 0.04em; color: var(--t3); opacity: 0.75; }
+.fx__laneemptytx { font-family: var(--mono); font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--t3); }
+.fx__laneemptysub { font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: 0.03em; color: var(--t3); opacity: 0.75; }
 .fx__laneemptyic { display: grid; place-items: center; width: 30px; height: 30px; margin-bottom: 2px; border-radius: 50%; border: 1px solid var(--hair-gold); color: var(--gold); transition: transform 140ms ease, background 140ms ease, border-color 140ms ease; }
 .fx__laneemptyic svg { width: 15px; height: 15px; }
 
@@ -862,14 +879,16 @@
   flex: 1 1 0; min-height: 0;
   display: grid; grid-template-columns: 1fr 1fr;
   grid-template-rows: minmax(0, .82fr) minmax(0, 1.08fr) auto;
-  gap: 8px; padding: 12px 14px; overflow: hidden;
+  gap: 8px; padding: 12px 14px; overflow: visible;
 }
 .fxd__panel {
+  position: relative; z-index: 1;
   min-width: 0; min-height: 0; padding: 12px 14px; overflow: hidden;
   border: 1px solid var(--line); border-radius: 8px;
   background: var(--panel);
   display: flex; flex-direction: column; gap: 6px;
 }
+.fxd__panel:focus-within { z-index: 10; overflow: visible; }
 .fxd__panel .fxd__rows {
   overflow: hidden; flex: 1 1 auto; min-height: 0;
 }
@@ -923,6 +942,7 @@
 
 .fxd__rows { display: grid; gap: 0; margin: 0; }
 .fxd__rows div { display: flex; justify-content: space-between; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--line); min-width: 0; overflow: hidden; }
+.fxd__rows div:has(.fxd__editinput) { overflow: visible; }
 .fxd__rows div:last-child { border-bottom: 0; }
 .fxd__rows dt {
   flex: none; font-family: var(--mono); font-size: 10px; font-weight: 700;
@@ -933,6 +953,7 @@
   color: var(--t); font-size: 13px; font-weight: 600;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+.fxd__rows dd:has(.fxd__editinput) { overflow: visible; }
 
 .fxd__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 13px; }
 .fxd__sheet .fxd__actions--contact .fxd__btn,
@@ -952,11 +973,19 @@
   gap: 10px;
   overflow: hidden;
 }
+.fxd__sheet .fxd__rows div:has(.fxd__editinput),
+.fxd__fullpage .fxd__rows div:has(.fxd__editinput) {
+  overflow: visible;
+}
 .fxd__sheet .fxd__rows dd,
 .fxd__fullpage .fxd__rows dd {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.fxd__sheet .fxd__rows dd:has(.fxd__editinput),
+.fxd__fullpage .fxd__rows dd:has(.fxd__editinput) {
+  overflow: visible;
 }
 .fxd__sheet .fxd__rows--contact,
 .fxd__sheet .fxd__rows--event,
@@ -1057,6 +1086,18 @@
 }
 .fxd__stagepick button.is-on { border-color: color-mix(in oklab, var(--c) 42%, var(--line2)); color: var(--t); background: color-mix(in oklab, var(--c) 10%, var(--raised)); }
 .fxd__stagepick button:disabled { opacity: .52; cursor: not-allowed; }
+.fxd__stageactions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: -8px 0 10px;
+  flex: 0 0 auto;
+}
+.fxd__stageactions .fxd__btn {
+  min-width: 0;
+  text-align: center;
+  white-space: nowrap;
+}
 .fxd__bookingstate {
   display: inline-flex; align-items: center; gap: 8px;
   color: var(--t); font-family: var(--mono); font-size: 12px; font-weight: 800;
@@ -1125,11 +1166,60 @@ html.admin-mode .lf__root {
   height: 100dvh;
   overflow: hidden;
 }
+.fxd__fullpage .fxd__bar {
+  padding: 7px 14px;
+}
+.fxd__fullpage .fxd__hero {
+  padding: 9px 20px 8px;
+}
+.fxd__fullpage .fxd__hero h2 {
+  font-size: 28px;
+}
+.fxd__fullpage .fxd__stats div {
+  padding: 7px 12px;
+}
 .fxd__fullpage .fxd__grid {
-  flex: 1 1 0 !important; min-height: 0 !important;
+  flex: 0 0 auto !important; min-height: 0 !important;
   grid-template-columns: repeat(3, 1fr) !important;
-  grid-template-rows: repeat(2, 1fr) !important;
-  overflow: hidden !important;
+  grid-template-rows: auto auto !important;
+  align-items: start !important;
+  align-content: start !important;
+  overflow: visible !important;
+  gap: 7px !important;
+  padding: 10px 14px 8px !important;
+}
+.fxd__fullpage .fxd__panel {
+  padding: 10px 13px;
+  gap: 5px;
+}
+.fxd__fullpage .fxd__panelhead {
+  margin-bottom: 5px;
+}
+.fxd__fullpage .fxd__rows div {
+  padding: 3px 0;
+}
+.fxd__fullpage .fxd__rows--contact {
+  gap: 7px 10px;
+}
+.fxd__fullpage .fxd__rows--contact dd {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.fxd__fullpage .fxd__actions--contact {
+  margin-top: 6px;
+}
+.fxd__fullpage .fxd__econo {
+  margin: 6px 14px 10px;
+}
+.fxd__fullpage .fxd__econohead {
+  padding: 7px 13px;
+}
+.fxd__fullpage .fxd__kpi {
+  min-height: 96px;
+  padding: 14px 16px;
+}
+.fxd__fullpage .fxd__kpi-val {
+  font-size: 25px;
 }
 
 /* Adaptacions fxd__ per a pàgina completa (sense overlay) */
@@ -1216,6 +1306,9 @@ html.admin-mode .fxd__editval:hover { border-bottom-color: rgba(255,255,255,0.5)
 html.admin-mode .fxd__empty { font-style: italic; color: var(--t3, #635e58); font-size: 11px; }
 html.admin-mode .fxd__editrow { display: flex; align-items: center; gap: 4px; }
 html.admin-mode .fxd__editinput {
+  position: relative;
+  z-index: 20;
+  top: -3px;
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.2);
   border-radius: 4px;
@@ -1233,6 +1326,9 @@ html.admin-mode .fxd__savebtn {
 html.admin-mode .fxd__cancelbtn {
   background: transparent; border: none; color: var(--t3, #635e58);
   cursor: pointer; font-size: 11px; padding: 2px 4px;
+}
+html.admin-mode .fxd__budget-editable {
+  border-bottom: 1px dashed var(--t3);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════

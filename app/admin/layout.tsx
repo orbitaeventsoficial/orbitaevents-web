@@ -27,6 +27,7 @@ const NAV_GROUPS: NavGroup[] = [
       // de capacitat ja no té entrada de nav pròpia (la finestra de temporada
       // d'Agenda el substitueix). Vegeu §6.19 i el diari #844.
       { label: 'Temporada', href: '/admin/leads' },
+      { label: 'Reserves', href: '/admin/bookings' },
       { label: 'Dossiers', href: '/admin/dossiers' },
       { label: 'Clients', href: '/admin/clientes' },
       { label: 'Pressupostos', href: '/admin/presupuestos' },

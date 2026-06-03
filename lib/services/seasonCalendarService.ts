@@ -88,6 +88,7 @@ export interface SeasonCalendarResult {
   windowStart: Date;
   windowEnd: Date;
   weekends: SeasonWeekend[];
+  weekdays: SeasonCalendarEntry[];   // Entrades amb data Dl–Dj, no capturades per cap cap de setmana
   unscheduled: SeasonCalendarEntry[];
   stats: {
     totalLeads: number;
@@ -257,6 +258,9 @@ export function buildSeasonCalendar(input: SeasonCalendarInput): SeasonCalendarR
     return { ...w, entries, totalValue };
   });
 
+  const weekendEntryIds = new Set(weekendResults.flatMap((w) => w.entries.map((e) => e.id)));
+  const weekdays = scheduled.filter((e) => !weekendEntryIds.has(e.id));
+
   const scheduledLeads = input.leads.filter((l) => l.eventDate !== null).length;
   const scheduledBookings = input.bookings.length;
   const allScheduledEntries = [...scheduled];
@@ -266,6 +270,7 @@ export function buildSeasonCalendar(input: SeasonCalendarInput): SeasonCalendarR
     windowStart,
     windowEnd,
     weekends: weekendResults,
+    weekdays,
     unscheduled,
     stats: {
       totalLeads: input.leads.length,

@@ -100,6 +100,7 @@ export default async function AdminLeadsPage() {
   const seen = new Set<string>();
   const entries = [
     ...data.weekends.flatMap((w) => w.entries),
+    ...data.weekdays,
     ...data.unscheduled,
   ]
     .filter((e) => e.type === 'lead')

@@ -21,8 +21,11 @@ type LeadCreateInput = {
   phone?: string;
   eventType: EventType;
   eventDate?: string;
+  eventStartTime?: string;
+  eventEndTime?: string;
   eventLocation?: string;
   eventVenue?: string;
+  eventAddress?: string;
   guestCount?: number;
   budget?: string;
   message?: string;
@@ -96,12 +99,14 @@ export async function listAdminLeads(input: LeadListInput) {
 }
 
 export async function createAdminLead(data: LeadCreateInput) {
+  const { eventVenue, ...leadData } = data;
   const lead = await prisma.lead.create({
     data: {
-      ...data,
-      eventDate: data.eventDate ? new Date(data.eventDate) : undefined,
-      interestedExtras: data.interestedExtras || [],
-      contactedAt: data.status === 'CONTACTED' ? new Date() : undefined,
+      ...leadData,
+      eventDate: leadData.eventDate ? new Date(leadData.eventDate) : undefined,
+      eventAddress: leadData.eventAddress || eventVenue || undefined,
+      interestedExtras: leadData.interestedExtras || [],
+      contactedAt: leadData.status === 'CONTACTED' ? new Date() : undefined,
     },
   });
 

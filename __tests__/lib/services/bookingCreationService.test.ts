@@ -44,6 +44,7 @@ const MOCK_PACK = {
   id: 'pack-premium',
   price: 1500,
   extraHourPrice: 75,
+  djHours: 2,
   name: 'Premium',
 };
 
@@ -127,7 +128,7 @@ describe('createBookingFromInput', () => {
   });
 
   it('calcula preus correctament: subtotal + IVA 21% + dipòsit 30%', async () => {
-    await createBookingFromInput(BASE_INPUT);
+    await createBookingFromInput({ ...BASE_INPUT, invoiceRequired: true });
 
     const createCall = mockPrisma.booking.create.mock.calls[0][0];
     // Pack price: 1500, no extra hours, no extras, no discount
@@ -162,6 +163,18 @@ describe('createBookingFromInput', () => {
     // extraHoursPrice = 2 * 75 = 150
     // subtotalBase = 1500 + 150 = 1650
     expect(createCall.data.extraHours).toBe(2);
+  });
+
+  it('deriva hores extra quan l’horari supera les hores del pack i creua mitjanit', async () => {
+    await createBookingFromInput({
+      ...BASE_INPUT,
+      eventStartTime: '23:00',
+      eventEndTime: '02:00',
+      extraHours: 0,
+    });
+
+    const createCall = mockPrisma.booking.create.mock.calls[0][0];
+    expect(createCall.data.extraHours).toBe(1);
   });
 
   it('aplica descompte', async () => {

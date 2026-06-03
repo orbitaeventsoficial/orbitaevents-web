@@ -54,23 +54,22 @@ export default function BookingFieldNotesComposer({ bookingId }: { bookingId: st
   };
 
   return (
-    <section className="rounded-xl border p-4 space-y-3">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-wide">Field Notes</p>
-        <h3 className="mt-1 text-base font-semibold">Foto + nota ràpida des del bolo</h3>
-        <p className="mt-1 text-sm opacity-70">
-          Obre la càmera del mòbil, captura una incidència o un moment clau i desa una nota curta a la reserva.
-        </p>
+    <section className="bd__fieldnotes">
+      <div className="bd__fieldnotes-head">
+        <div>
+          <p className="bd__fieldnotes-kicker">Field notes</p>
+          <h3 className="bd__fieldnotes-title">Foto + nota de bolo</h3>
+        </div>
       </div>
 
-      <label className="block space-y-1">
-        <span className="text-xs uppercase tracking-wide opacity-70">Nota curta</span>
+      <label className="bd__fieldnotes-label">
+        <span>Nota curta</span>
         <textarea
           value={note}
           onChange={(event) => setNote(event.target.value)}
-          rows={3}
-          placeholder="Ex.: muntatge llest, canvi d’entrada de càrrega, focus extra, petició del client..."
-          className="w-full rounded-xl border px-3 py-2 text-sm"
+          rows={2}
+          placeholder="Muntatge llest, canvi d'entrada, focus extra..."
+          className="bd__fieldnotes-textarea"
         />
       </label>
 
@@ -83,20 +82,19 @@ export default function BookingFieldNotesComposer({ bookingId }: { bookingId: st
         onChange={handleFileChange}
       />
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="bd__fieldnotes-actions">
         <button
           type="button"
           onClick={handlePickPhoto}
           disabled={sending}
-          className="rounded-xl border px-4 py-2 text-sm font-medium disabled:opacity-50"
+          className="bd__btn bd__btn--gold"
         >
-          {sending ? 'Guardant...' : 'Obrir càmera / pujar foto'}
+          {sending ? 'Guardant...' : '+ Foto'}
         </button>
-        <span className="text-xs opacity-60">La captura queda interna per defecte: no va ni al portal ni al portfolio.</span>
       </div>
 
-      {error && <p className="rounded-xl border border-rose-500/20 px-3 py-2 text-sm text-rose-300">{error}</p>}
-      {success && <p className="rounded-xl border border-emerald-500/20 px-3 py-2 text-sm text-emerald-300">{success}</p>}
+      {error && <p className="bd__fieldnotes-alert bd__fieldnotes-alert--err">{error}</p>}
+      {success && <p className="bd__fieldnotes-alert bd__fieldnotes-alert--ok">{success}</p>}
     </section>
   );
 }

@@ -8,6 +8,7 @@ import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
 import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
 import { ACTIVE_BOOKING_STATUSES } from '@/lib/constants';
 import { calcVatRate, calcDeposit } from '@/lib/constants/pricing';
+import { calculateEventDuration } from '@/lib/inventory-utils';
 
 const OPERATOR_EXTRA_ID = '__operator_extra__';
 const OPERATOR_EXTRA_SLUG = 'operator-support-hour';
@@ -131,6 +132,25 @@ async function resolveExtraId(input: string): Promise<string | null> {
   return bySlug?.id || null;
 }
 
+function deriveExtraHours(input: {
+  explicitExtraHours?: number;
+  eventStartTime?: string;
+  eventEndTime?: string;
+  packDjHours?: number | null;
+}): number {
+  if (typeof input.explicitExtraHours === 'number' && input.explicitExtraHours > 0) {
+    return input.explicitExtraHours;
+  }
+
+  const packHours = Number(input.packDjHours || 0);
+  if (packHours <= 0) return Math.max(0, input.explicitExtraHours || 0);
+
+  const eventHours = calculateEventDuration(input.eventStartTime, input.eventEndTime);
+  if (eventHours <= packHours) return Math.max(0, input.explicitExtraHours || 0);
+
+  return Math.ceil((eventHours - packHours) * 10) / 10;
+}
+
 async function assignPackInventory(bookingId: string, packId: string) {
   try {
     const packInventory = await prisma.packInventory.findMany({
@@ -214,7 +234,13 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   const packPrice = data.customPackPrice != null && data.customPackPrice > 0
     ? data.customPackPrice
     : pack.price;
-  const extraHoursPrice = (data.extraHours || 0) * pack.extraHourPrice;
+  const extraHours = deriveExtraHours({
+    explicitExtraHours: data.extraHours,
+    eventStartTime: data.eventStartTime,
+    eventEndTime: data.eventEndTime,
+    packDjHours: pack.djHours,
+  });
+  const extraHoursPrice = extraHours * pack.extraHourPrice;
   const extrasPrice = data.extras?.reduce((sum, e) => sum + e.price * (e.quantity || 1), 0) || 0;
   const subtotalBase = packPrice + extraHoursPrice + extrasPrice;
 
@@ -280,7 +306,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       eventVenue: data.eventVenue,
       guestCount: data.guestCount,
       packId: data.packId,
-      extraHours: data.extraHours || 0,
+      extraHours,
       distanceKm,
       fuelCostPerKm,
       travelCost,

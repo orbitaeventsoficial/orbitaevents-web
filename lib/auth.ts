@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { timingSafeEqual } from 'crypto';
+import { createHmac, timingSafeEqual } from 'crypto';
 import { verifyCsrf } from '@/lib/csrf';
 
 const ADMIN_USER = process.env.ADMIN_USER;
@@ -15,7 +15,7 @@ export interface AuthResult {
   authenticated: boolean;
   user?: string;
   error?: string;
-  method?: 'basic' | 'bearer';
+  method?: 'basic' | 'bearer' | 'session';
 }
 
 export type AdminRole = 'OWNER' | 'MANAGER' | 'VIEWER';
@@ -30,6 +30,35 @@ const ROLE_PERMISSIONS: Record<AdminRole, AdminPermission[]> = {
   MANAGER: ['read', 'mutate', 'automation'],
   VIEWER: ['read'],
 };
+
+const SESSION_COOKIE = 'admin-session';
+
+function verifySessionAuth(req: NextRequest): AuthResult {
+  const token = req.cookies.get(SESSION_COOKIE)?.value;
+  const secret = ADMIN_PASS;
+  if (!token || !secret) {
+    return { authenticated: false, error: 'No session cookie' };
+  }
+
+  const dot = token.indexOf('.');
+  if (dot < 1) {
+    return { authenticated: false, error: 'Invalid session format' };
+  }
+
+  const expiry = Number(token.slice(0, dot));
+  const signature = token.slice(dot + 1);
+  if (!Number.isFinite(expiry) || Math.floor(Date.now() / 1000) > expiry) {
+    return { authenticated: false, error: 'Session expired' };
+  }
+
+  const expected = createHmac('sha256', secret).update(String(expiry)).digest('hex');
+  const sigMatch = signature.length === expected.length &&
+    timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+
+  return sigMatch
+    ? { authenticated: true, user: 'admin-session', method: 'session' }
+    : { authenticated: false, error: 'Invalid session' };
+}
 
 /**
  * Verificar autenticació Basic Auth
@@ -132,7 +161,8 @@ export function requirePermission(req: NextRequest, permission: AdminPermission)
  */
 export function requireAuth(req: NextRequest): NextResponse | null {
   const bearerAuth = verifyBearerAuth(req);
-  const auth = bearerAuth.authenticated ? bearerAuth : verifyBasicAuth(req);
+  const sessionAuth = bearerAuth.authenticated ? bearerAuth : verifySessionAuth(req);
+  const auth = sessionAuth.authenticated ? sessionAuth : verifyBasicAuth(req);
   if (!auth.authenticated) {
     return unauthorizedResponse(auth.error);
   }

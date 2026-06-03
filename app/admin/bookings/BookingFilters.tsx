@@ -11,6 +11,35 @@ function buildBookingsHref(params: URLSearchParams) {
   return query ? `/admin/bookings?${query}` : '/admin/bookings';
 }
 
+function ViewToggleInline() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const customerId = searchParams?.get('customerId') || '';
+  const current = searchParams?.get('view') || 'list';
+
+  const toggle = (view: string) => {
+    const params = new URLSearchParams(searchParams?.toString() || '');
+    if (view === 'list') params.delete('view'); else params.set('view', view);
+    params.delete('page');
+    const query = params.toString();
+    router.push(customerId
+      ? `${buildCustomerBookingListHref(customerId)}${query ? `?${query}` : ''}`
+      : query ? `/admin/bookings?${query}` : '/admin/bookings'
+    );
+  };
+
+  return (
+    <div role="tablist" aria-label="Vista de reserves" className="flex shrink-0 overflow-hidden rounded-xl border admin-tone-border-neutral admin-tone-bg-neutral">
+      {(['list', 'kanban'] as const).map((v) => (
+        <button key={v} type="button" role="tab" aria-selected={current === v} onClick={() => toggle(v)}
+          className={`px-3 py-2 text-xs font-medium transition-colors ${current === v ? 'admin-tone-bg-info admin-tone-text-info font-semibold' : 'admin-tone-text-neutral hover:brightness-105'}`}>
+          {v === 'list' ? 'Llista' : 'Kanban'}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function BookingFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -70,24 +99,15 @@ export default function BookingFilters() {
   const hasFilters = status || eventType || payment || fromDate || toDate || search;
 
   return (
-    <div className="space-y-3">
-      <div className="relative">
-        <svg
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          />
+    <div className="flex items-center gap-2 flex-wrap">
+      {/* Cerca */}
+      <div className="relative" style={{ width: 260 }}>
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         <input
           type="search"
-          placeholder="Cercar per nom, referència, ubicació..."
+          placeholder="Cercar..."
           aria-label="Cercar reserves"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -95,7 +115,8 @@ export default function BookingFilters() {
         />
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      {/* Filtres */}
+      <div className="flex items-center gap-2 flex-wrap flex-1">
         <select
           value={status}
           onChange={(e) => updateParams({ status: e.target.value })}
@@ -165,10 +186,13 @@ export default function BookingFilters() {
             }}
             className="rounded-xl border px-3 py-1.5 text-xs font-medium transition-colors"
           >
-            Netejar filtres
+            ✕
           </button>
         )}
       </div>
+
+      {/* Toggle vista — al final de la fila */}
+      <ViewToggleInline />
     </div>
   );
 }

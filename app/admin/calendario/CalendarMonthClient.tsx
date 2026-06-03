@@ -64,9 +64,9 @@ export default function CalendarMonthClient() {
   const [blockingDate, setBlockingDate] = useState(false);
   const [blockNote, setBlockNote] = useState('');
   const [showBlockForm, setShowBlockForm] = useState(false);
-  const [visibleLayers, setVisibleLayers] = useState({ bookings: true, blocks: true, tasks: true, social: true, followUps: true });
+  const [visibleLayers, setVisibleLayers] = useState({ leads: true, bookings: true, blocks: true, tasks: true, social: true, followUps: true });
 
-  const toggleLayer = useCallback((layer: 'bookings' | 'blocks' | 'tasks' | 'social' | 'followUps') => {
+  const toggleLayer = useCallback((layer: 'leads' | 'bookings' | 'blocks' | 'tasks' | 'social' | 'followUps') => {
     setVisibleLayers((prev) => ({ ...prev, [layer]: !prev[layer] }));
   }, []);
 
@@ -216,6 +216,7 @@ export default function CalendarMonthClient() {
     if (!cells.length) {
       return {
         totalReservas: 0,
+        totalLeads: 0,
         totalBloqueos: 0,
         freeDays: 0,
         reservaDays: 0,
@@ -228,6 +229,7 @@ export default function CalendarMonthClient() {
     }
 
     let totalReservas = 0;
+    let totalLeads = 0;
     let totalBloqueos = 0;
     let freeDays = 0;
     let reservaDays = 0;
@@ -242,6 +244,7 @@ export default function CalendarMonthClient() {
         data?.days?.[cell.key] ??
         ({
           reservas: [],
+          leads: [],
           bloqueos: [],
           tasks: [],
           socialPosts: [],
@@ -249,10 +252,12 @@ export default function CalendarMonthClient() {
         } as CalendarApiDay);
 
       const hasReservas = dayData.reservas.length > 0;
+      const leadsCount = dayData.leads?.length ?? 0;
       const hasBloqueos = dayData.bloqueos.length > 0;
       const hasWork = dayData.tasks.length > 0 || dayData.socialPosts.length > 0;
 
       totalReservas += dayData.reservas.length;
+      totalLeads += leadsCount;
       totalBloqueos += dayData.bloqueos.length;
       totalTasks += dayData.tasks.length;
       totalSocialPosts += dayData.socialPosts.length;
@@ -271,6 +276,7 @@ export default function CalendarMonthClient() {
 
     return {
       totalReservas,
+      totalLeads,
       totalBloqueos,
       freeDays,
       reservaDays,
@@ -288,7 +294,8 @@ export default function CalendarMonthClient() {
       .map(([layer]) => layer);
     const selectedPayload = selectedDayData.payload;
     const selectedHasItems = selectedPayload
-      ? selectedPayload.reservas.length +
+      ? (selectedPayload.leads?.length ?? 0) +
+          selectedPayload.reservas.length +
           selectedPayload.bloqueos.length +
           selectedPayload.tasks.length +
           selectedPayload.socialPosts.length +
@@ -296,7 +303,7 @@ export default function CalendarMonthClient() {
       : 0;
 
     const systemItems: string[] = [];
-    systemItems.push(`${stats.totalReservas} reserves · ${stats.totalBloqueos} bloquejos al rang visible`);
+    systemItems.push(`${stats.totalReservas} reserves · ${stats.totalLeads} entrades · ${stats.totalBloqueos} bloquejos al rang visible`);
     systemItems.push(`${stats.freeDays} dies lliures · ${stats.mixedDays} dies mixtes · ${stats.workDays} dies amb feina`);
     if (stats.totalTasks > 0 || stats.totalSocialPosts > 0) {
       systemItems.push(`${stats.totalTasks} tasques · ${stats.totalSocialPosts} posts socials`);
@@ -464,6 +471,7 @@ export default function CalendarMonthClient() {
         <span className="font-semibold opacity-60">Capes:</span>
         {[
           ['bookings', 'Reserves'],
+          ['leads', 'Entrades'],
           ['blocks', 'Bloquejos'],
           ['tasks', 'Tasques'],
           ['social', 'Social'],
@@ -472,7 +480,7 @@ export default function CalendarMonthClient() {
           <button
             key={key}
             type="button"
-            onClick={() => toggleLayer(key as 'bookings' | 'blocks' | 'tasks' | 'social' | 'followUps')}
+            onClick={() => toggleLayer(key as 'leads' | 'bookings' | 'blocks' | 'tasks' | 'social' | 'followUps')}
             className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-white/10 border-white/20' : 'border-white/10 opacity-45'}`}
           >
             {label}
@@ -590,9 +598,11 @@ export default function CalendarMonthClient() {
         {cells.map((cell) => {
           const dayData =
             data?.days?.[cell.key] ??
-            ({ reservas: [], bloqueos: [], tasks: [], socialPosts: [], followUps: [] } as CalendarApiDay);
+            ({ leads: [], reservas: [], bloqueos: [], tasks: [], socialPosts: [], followUps: [] } as CalendarApiDay);
 
           const hasReservas = dayData.reservas.length > 0;
+          const dayLeads = dayData.leads ?? [];
+          const hasLeads = dayLeads.length > 0;
           const hasBloqueos = dayData.bloqueos.length > 0;
 
           const tone = getCalendarTone(hasReservas, hasBloqueos);
@@ -682,6 +692,27 @@ export default function CalendarMonthClient() {
                     ))}
                     {dayData.reservas.length > 2 && (
                       <div className="">+{dayData.reservas.length - 2} més</div>
+                    )}
+                  </div>
+                )}
+
+                {visibleLayers.leads && hasLeads && (
+                  <div className="mt-0.5 space-y-0.5 text-[9px] sm:text-[10px] overflow-hidden">
+                    {dayLeads.slice(0, 2).map((leadItem) => (
+                      <Link
+                        key={leadItem.id}
+                        href={buildLeadCustomerHref({
+                          leadId: leadItem.id,
+                          customerId: leadItem.customerId,
+                        })}
+                        onClick={(event) => event.stopPropagation()}
+                        className="block truncate rounded-md px-1 py-0.5 admin-tone-soft-info admin-tone-text-info hover:underline"
+                      >
+                        Entrada · {leadItem.name}
+                      </Link>
+                    ))}
+                    {dayLeads.length > 2 && (
+                      <div>+{dayLeads.length - 2} entrades</div>
                     )}
                   </div>
                 )}
@@ -803,6 +834,45 @@ export default function CalendarMonthClient() {
           )}
 
           <div className="mt-4 grid gap-4 lg:grid-cols-3">
+            {visibleLayers.leads && (
+              <div className="flex flex-col">
+                <h3 className="flex items-center gap-2 text-xs sm:text-sm font-semibold uppercase tracking-wide">
+                  <span className="h-2 w-2 rounded-full" />
+                  Entrades ({selectedDayData.payload?.leads?.length || 0})
+                </h3>
+                <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
+                  {selectedDayData.payload?.leads?.length ? (
+                    selectedDayData.payload.leads.map((leadItem) => (
+                      <Link
+                        key={leadItem.id}
+                        href={buildLeadCustomerHref({
+                          leadId: leadItem.id,
+                          customerId: leadItem.customerId,
+                        })}
+                        className="block rounded-xl border px-3 py-2.5 transition-all admin-card-glass"
+                      >
+                        <div className="truncate text-sm font-medium">{leadItem.name}</div>
+                        <div className="mt-1 text-xs opacity-70">
+                          {(leadItem.eventStartTime || leadItem.eventEndTime)
+                            ? `${leadItem.eventStartTime || '--:--'} - ${leadItem.eventEndTime || '--:--'}`
+                            : resolveWorkTimeLabel(leadItem.eventDate)}
+                          {leadItem.eventType ? ` · ${leadItem.eventType}` : ''}
+                          {leadItem.status ? ` · ${leadItem.status}` : ''}
+                        </div>
+                        {leadItem.eventLocation && (
+                          <div className="mt-1 truncate text-xs opacity-60">{leadItem.eventLocation}</div>
+                        )}
+                      </Link>
+                    ))
+                  ) : (
+                    <div className="rounded-xl border border-dashed px-3 py-4 text-center text-sm">
+                      Cap entrada en aquest dia
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {visibleLayers.bookings && (
               <div className="flex flex-col">
                 <h3 className="flex items-center gap-2 text-xs sm:text-sm font-semibold uppercase tracking-wide">

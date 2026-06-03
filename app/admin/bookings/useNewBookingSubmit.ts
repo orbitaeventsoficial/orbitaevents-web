@@ -66,7 +66,7 @@ export function useNewBookingSubmit({
         packId: form.packId,
         customPackPrice: customPackPrice || undefined,
         invoiceRequired,
-        extraHours: parseInt(form.extraHours, 10) || 0,
+        extraHours: form.extraHours.trim() ? parseInt(form.extraHours, 10) || 0 : undefined,
         extras: Object.entries(selectedExtras).map(([extraId, extra]) => ({
           extraId,
           quantity: extra.quantity,

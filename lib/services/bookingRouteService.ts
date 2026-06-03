@@ -198,6 +198,26 @@ export async function updateBookingDetail(id: string, input: Record<string, unkn
     data: prepared.body,
   });
 
+  // Sincronització canònica: si s'actualitzen dades de contacte i hi ha client vinculat,
+  // propagar els canvis al customer (font de veritat).
+  if (existing.customerId) {
+    const customerPatch: Record<string, unknown> = {};
+    if (typeof input.clientEmail === 'string' && input.clientEmail !== existing.clientEmail) {
+      customerPatch.email = input.clientEmail;
+      customerPatch.emailNormalized = input.clientEmail.toLowerCase().trim();
+    }
+    if (typeof input.clientPhone === 'string' && input.clientPhone !== (existing as { clientPhone?: string }).clientPhone) {
+      customerPatch.phone = input.clientPhone;
+    }
+    if (typeof input.clientName === 'string' && input.clientName !== existing.clientName) {
+      customerPatch.name = input.clientName;
+      customerPatch.nameNormalized = input.clientName.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    }
+    if (Object.keys(customerPatch).length > 0) {
+      await prisma.customer.update({ where: { id: existing.customerId }, data: customerPatch });
+    }
+  }
+
   const calendarSync = prepared.shouldSyncCalendar ? await syncBookingToGoogleCalendar(id) : null;
 
   await prisma.adminLog.create({
