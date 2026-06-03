@@ -17,13 +17,15 @@ import { LEAD_LOST_REASON_LABELS, isLeadLostReason } from '@/lib/constants/leadL
 import { fetchWithCsrf } from '@/lib/csrf';
 import LeadLostStatusPrompt from './LeadLostStatusPrompt';
 import { patchLeadStatus, type LeadStatus } from './leadStatusClient';
+import WxBadge from '@/app/admin/components/WxBadge';
+import type { WxData } from '@/app/admin/components/WxBadge';
 
 /* ── Tipus ──────────────────────────────────────────────────────────────── */
 
 export type LeadPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
 
 export type LeadData = {
-  id: string; name: string; type: string; dateISO: string; time: string;
+  id: string; name: string; type: string; dateISO: string; time: string; endTime: string;
   location: string; pax: number; product: string; value: number;
   stage: 'nou' | 'contactat' | 'guanyat' | 'perdut';
   kind: 'lead' | 'booking';
@@ -34,7 +36,7 @@ export type LeadData = {
   priority: LeadPriority;
   channel: string; owner: string; last: string;
   booking: { id: string; reference: string; status: string; depositPaid: boolean; remainingPaid: boolean } | null;
-  wx: { kind: 'sun' | 'partly' | 'cloud' | 'rain' | 'storm'; tmax: number; tmin: number };
+  wx: WxData;
 };
 
 type PayState = 'full' | 'part' | 'none';
@@ -47,7 +49,7 @@ function paymentState(booking: LeadData['booking']): PayState | null {
 type Stage = LeadData['stage'];
 type ViewMode = 'calendari' | 'pipeline' | 'llista';
 
-/* ── Constants · v846 ───────────────────────────────────────────────────── */
+/* ── Constants · v847 ───────────────────────────────────────────────────── */
 
 const STAGE_LABEL: Record<Stage, string> = {
   nou: 'Nou', contactat: 'Contactat', guanyat: 'Guanyat', perdut: 'Perdut',
@@ -95,6 +97,20 @@ function shiftIso(iso: string, days: number) { const { y, m, d } = parseISO(iso)
 function saturdaysInMonth(y: number, m: number) { const last = new Date(Date.UTC(y, m, 0)).getUTCDate(); const out: string[] = []; for (let d = 1; d <= last; d++) if (new Date(Date.UTC(y, m - 1, d)).getUTCDay() === 6) out.push(isoDate(y, m, d)); return out; }
 function toCalMonth(baseYear: number, virtualM: number) { return { y: baseYear + Math.floor((virtualM - 1) / 12), m: ((virtualM - 1) % 12) + 1 }; }
 function fullDate(iso: string) { if (!iso) return '—'; const { y, m, d } = parseISO(iso); return `${d} de ${MONTHS_FULL[m - 1].toLowerCase()} ${y}`; }
+function durationLabel(start: string, end: string): string {
+  if (!start || !end) return '—';
+  const [sh, sm] = start.split(':').map(Number);
+  const [eh, em] = end.split(':').map(Number);
+  if (![sh, sm, eh, em].every(Number.isFinite)) return '—';
+  const startMin = sh * 60 + sm;
+  let endMin = eh * 60 + em;
+  if (endMin <= startMin) endMin += 24 * 60;
+  const total = endMin - startMin;
+  const hours = Math.floor(total / 60);
+  const minutes = total % 60;
+  if (minutes === 0) return `${hours} h`;
+  return `${hours} h ${minutes} min`;
+}
 function leadSummary(lead: LeadData) {
   if (lead.stage === 'nou') return lead.channel ? `Entrat per ${lead.channel}. Cal primer contacte.` : 'Cal primer contacte.';
   if (lead.stage === 'contactat') return lead.owner ? `Seguiment amb ${lead.owner}${lead.last ? `. Últim contacte: ${lead.last}` : ''}.` : 'En seguiment. Cal avançar.';
@@ -231,15 +247,19 @@ function LeadDetailPanel({
         <section className="fxd__hero">
           <span className="fxd__kicker">{STAGE_LABEL[lead.stage]} · {lead.type}</span>
           <h2>{lead.name}</h2>
-          <p>{lead.dateISO ? fullDate(lead.dateISO) : 'Sense data'}{lead.time ? ` · ${lead.time}` : ''}{lead.location ? ` · ${lead.location}` : ''}</p>
           {reason && <span className="fxd__lost">{reason}</span>}
+          {lead.wx.forecast && (
+            <span className="fxd__wxrow">
+              <WxBadge wx={lead.wx} size="md" />
+              {lead.dateISO && <span className="fxd__wxdate">{fullDate(lead.dateISO)}</span>}
+            </span>
+          )}
         </section>
 
         <div className="fxd__stats">
           <div><span>Valor</span><b>{lead.value ? euro(lead.value) : '—'}</b></div>
-          <div><span>Pax</span><b>{lead.pax || '—'}</b></div>
+          <div><span>Durada</span><b>{durationLabel(lead.time, lead.endTime)}</b></div>
           <div><span>Prioritat</span><b>{PRIORITY_LABEL[lead.priority]}</b></div>
-          <div><span>Cobrament</span><b>{pay ? PAY_LABEL[pay] : '—'}</b></div>
         </div>
 
         <div className="fxd__grid">
@@ -291,22 +311,22 @@ function LeadDetailPanel({
 
           <section className="fxd__panel">
             <div className="fxd__panelhead"><span>Contacte</span></div>
-            <dl className="fxd__rows">
+            <dl className="fxd__rows fxd__rows--contact">
               <div><dt>Telèfon</dt><dd>{lead.phone || '—'}</dd></div>
               <div><dt>Email</dt><dd>{lead.email || '—'}</dd></div>
               <div><dt>Canal</dt><dd>{lead.channel || '—'}</dd></div>
               <div><dt>Últim contacte</dt><dd>{lead.last || '—'}</dd></div>
             </dl>
-            <div className="fxd__actions">
+            <div className="fxd__actions fxd__actions--contact">
               {lead.phone ? (
-                <a href={buildLeadWhatsAppHref(lead.phone, lead.name)} target="_blank" rel="noopener noreferrer" className="fxd__btn">
+                <a href={buildLeadWhatsAppHref(lead.phone, lead.name)} target="_blank" rel="noopener noreferrer" className="fxd__btn fxd__btn--whatsapp">
                   <span>{I.phone}</span>WhatsApp
                 </a>
               ) : (
                 <button type="button" className="fxd__btn" disabled><span>{I.phone}</span>Sense telèfon</button>
               )}
               {lead.kind === 'lead' && (
-                <Link href={buildLeadComposeHref(lead.id, 'seguiment')} className="fxd__btn">
+                <Link href={buildLeadComposeHref(lead.id, 'seguiment')} className="fxd__btn fxd__btn--mail">
                   <span>{I.mail}</span>Correu
                 </Link>
               )}
@@ -315,11 +335,12 @@ function LeadDetailPanel({
 
           <section className="fxd__panel">
             <div className="fxd__panelhead"><span>Dades del bolo</span></div>
-            <dl className="fxd__rows">
-              <div><dt>Producte</dt><dd>{lead.product || '—'}</dd></div>
+            <dl className="fxd__rows fxd__rows--event">
               <div><dt>Data</dt><dd>{lead.dateISO ? fullDate(lead.dateISO) : '—'}</dd></div>
-              <div><dt>Hora</dt><dd>{lead.time || '—'}</dd></div>
-              <div><dt>Lloc</dt><dd>{lead.location || '—'}</dd></div>
+              <div><dt>Pax</dt><dd>{lead.pax || '—'}</dd></div>
+              <div><dt>Inici</dt><dd>{lead.time || '—'}</dd></div>
+              <div><dt>Fi</dt><dd>{lead.endTime || '—'}</dd></div>
+              <div className="fxd__row--long"><dt>Lloc</dt><dd>{lead.location || '—'}</dd></div>
             </dl>
           </section>
 
@@ -604,6 +625,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                             <span className="fx__celltop">
                               <span className="fx__day">{d.d}</span>
                               <span className="fx__cellmeta">
+                                <WxBadge wx={l.wx} size="sm" />
                                 {pay && <span className="fx__pay" data-pay={pay} data-tip={PAY_TOOLTIP[pay]} />}
                                 <span className="fx__dot" data-stage={l.stage} data-tip={pay ? `Reserva · ${PAY_TOOLTIP[pay]}` : STAGE_TOOLTIP[l.stage]} />
                               </span>

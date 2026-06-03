@@ -382,7 +382,7 @@
 .fx__grid {
   display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 76px;
   gap: 1px; border: 1px solid color-mix(in oklab, var(--line) 68%, transparent); border-radius: 0 0 8px 8px;
-  overflow: hidden; background: color-mix(in oklab, var(--line) 58%, transparent);
+  overflow: clip; background: color-mix(in oklab, var(--line) 58%, transparent);
 }
 
 /* Cel·la */
@@ -461,6 +461,10 @@
 .fx__nohour { color: color-mix(in oklab, #e05a4a 55%, var(--t3)); font-weight: 500; font-style: italic; }
 
 .fx__placeholder { color: var(--t3); font-family: var(--mono); font-size: 13px; padding: 40px 0; }
+
+/* Meteo hero — línia data + badge a la fitxa ràpida */
+.fxd__wxrow { display: flex; align-items: center; gap: 7px; margin-top: 5px; }
+.fxd__wxdate { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--t3); }
 
 /* ── PEÇA 5: Pipeline ──────────────────────────────────────────────────── */
 
@@ -660,7 +664,7 @@
 .fxd__shade { position: absolute; inset: 0; background: rgba(8,8,8,.56); backdrop-filter: blur(3px); animation: fx-fade 120ms ease both; }
 .fxd__sheet {
   position: relative; z-index: 1;
-  width: min(780px, calc(100vw - 28px)); height: 100vh; overflow: hidden;
+  width: min(780px, calc(100vw - 28px)); height: 100dvh; overflow: hidden;
   display: flex; flex-direction: column;
   border-left: 1px solid var(--line2);
   background: linear-gradient(180deg, color-mix(in oklab, var(--c) 7%, var(--panel)) 0%, var(--canvas) 360px);
@@ -670,7 +674,7 @@
 .fxd__bar {
   position: sticky; top: 0; z-index: 2; flex-shrink: 0;
   display: flex; align-items: center; gap: 10px;
-  padding: 10px 14px;
+  padding: 8px 14px;
   border-bottom: 1px solid var(--line);
   background: color-mix(in oklab, var(--canvas) 90%, transparent);
   backdrop-filter: blur(10px);
@@ -696,20 +700,20 @@
 .fxd__close { width: 34px; padding: 0; }
 
 .fxd__hero {
-  padding: 14px 20px 12px; border-bottom: 1px solid var(--line);
+  padding: 11px 20px 9px; border-bottom: 1px solid var(--line);
   overflow: hidden; flex-shrink: 0;
   max-width: 100%;
 }
 .fxd__kicker {
   display: inline-flex; align-items: center; gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   font-family: var(--mono); font-size: 11px; font-weight: 700;
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--c);
 }
 .fxd__kicker::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
 .fxd__hero h2 {
   margin: 0; max-width: 100%;
-  font-family: var(--display); font-size: 32px; font-weight: 800;
+  font-family: var(--display); font-size: 30px; font-weight: 800;
   letter-spacing: -0.022em; line-height: 1; color: var(--t);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
@@ -728,21 +732,24 @@
 }
 
 .fxd__stats {
-  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
   border-bottom: 1px solid var(--line);
   background: color-mix(in oklab, var(--panel) 60%, transparent);
   flex-shrink: 0;
 }
-.fxd__stats div { min-width: 0; padding: 12px 16px; border-right: 1px solid var(--line); }
+.fxd__stats div {
+  min-width: 0; padding: 8px 12px; border-right: 1px solid var(--line);
+  display: flex; align-items: baseline; gap: 7px;
+}
 .fxd__stats div:last-child { border-right: 0; }
 .fxd__stats span {
-  display: block; margin-bottom: 4px;
-  font-family: var(--mono); font-size: 9.5px; font-weight: 700;
-  letter-spacing: 0.12em; text-transform: uppercase; color: var(--t3);
+  flex: none; display: block; margin-bottom: 0;
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--t3);
 }
 .fxd__stats b {
-  display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  font-family: var(--display); font-size: 18px; font-weight: 800;
+  min-width: 0; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-family: var(--display); font-size: 16px; font-weight: 800;
   letter-spacing: -0.015em; color: var(--t);
 }
 .fxd__stats div:first-child b { color: var(--gold); }
@@ -750,17 +757,17 @@
 .fxd__grid {
   flex: 1 1 0; min-height: 0;
   display: grid; grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 10px; padding: 14px; overflow: hidden;
+  grid-template-rows: minmax(0, .82fr) minmax(0, 1.08fr) auto;
+  gap: 8px; padding: 12px 14px; overflow: hidden;
 }
 .fxd__panel {
-  min-width: 0; min-height: 0; padding: 14px; overflow: hidden;
+  min-width: 0; min-height: 0; padding: 12px 14px; overflow: hidden;
   border: 1px solid var(--line); border-radius: 8px;
   background: var(--panel);
   display: flex; flex-direction: column; gap: 6px;
 }
 .fxd__panel .fxd__rows {
-  overflow-y: auto; flex: 1; min-height: 0;
+  overflow: hidden; flex: 1 1 auto; min-height: 0;
 }
 .fxd__panel .fxd__rows::-webkit-scrollbar { width: 3px; }
 .fxd__panel .fxd__rows::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 2px; }
@@ -799,7 +806,7 @@
   border-color: color-mix(in oklab, var(--gold) 24%, var(--line));
   background: color-mix(in oklab, var(--gold) 5%, var(--panel));
 }
-.fxd__panelhead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.fxd__panelhead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 7px; }
 .fxd__panelhead span {
   font-family: var(--mono); font-size: 10px; font-weight: 800;
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--t3);
@@ -808,7 +815,7 @@
   font-family: var(--display); font-size: 16px; font-weight: 800;
   color: var(--gold); letter-spacing: -0.01em;
 }
-.fxd__summary { margin: 0; color: var(--t2); font-size: 13.5px; line-height: 1.5; }
+.fxd__summary { margin: 0; color: var(--t2); font-size: 13px; line-height: 1.42; }
 
 .fxd__rows { display: grid; gap: 0; margin: 0; }
 .fxd__rows div { display: flex; justify-content: space-between; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--line); min-width: 0; overflow: hidden; }
@@ -824,6 +831,78 @@
 }
 
 .fxd__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 13px; }
+.fxd__sheet .fxd__actions--contact .fxd__btn,
+.fxd__fullpage .fxd__actions--contact .fxd__btn { flex: 1 1 132px; }
+.fxd__sheet .fxd__actions--contact,
+.fxd__fullpage .fxd__actions--contact {
+  gap: 7px;
+  margin-top: 7px;
+}
+.fxd__sheet .fxd__actions--contact .fxd__btn,
+.fxd__fullpage .fxd__actions--contact .fxd__btn {
+  min-height: 32px;
+}
+.fxd__sheet .fxd__rows div,
+.fxd__fullpage .fxd__rows div {
+  align-items: flex-start;
+  gap: 10px;
+  overflow: hidden;
+}
+.fxd__sheet .fxd__rows dd,
+.fxd__fullpage .fxd__rows dd {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fxd__sheet .fxd__rows--contact,
+.fxd__sheet .fxd__rows--event,
+.fxd__fullpage .fxd__rows--contact,
+.fxd__fullpage .fxd__rows--event {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 10px;
+  flex: 0 0 auto;
+}
+.fxd__sheet .fxd__rows--contact div,
+.fxd__sheet .fxd__rows--event div,
+.fxd__fullpage .fxd__rows--contact div,
+.fxd__fullpage .fxd__rows--event div {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2px;
+  padding: 0 0 5px;
+}
+.fxd__sheet .fxd__rows--contact dt,
+.fxd__sheet .fxd__rows--event dt,
+.fxd__fullpage .fxd__rows--contact dt,
+.fxd__fullpage .fxd__rows--event dt {
+  font-size: 9px;
+  line-height: 1.1;
+}
+.fxd__sheet .fxd__rows--contact dd,
+.fxd__sheet .fxd__rows--event dd,
+.fxd__fullpage .fxd__rows--contact dd,
+.fxd__fullpage .fxd__rows--event dd {
+  text-align: left;
+  font-size: 12.5px;
+  line-height: 1.2;
+}
+.fxd__sheet .fxd__rows .fxd__row--long,
+.fxd__fullpage .fxd__rows .fxd__row--long {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+.fxd__sheet .fxd__rows--event .fxd__row--long,
+.fxd__sheet .fxd__rows--contact .fxd__row--long,
+.fxd__fullpage .fxd__rows--event .fxd__row--long,
+.fxd__fullpage .fxd__rows--contact .fxd__row--long { grid-column: 1 / -1; }
+.fxd__sheet .fxd__rows .fxd__row--long dd,
+.fxd__fullpage .fxd__rows .fxd__row--long dd {
+  text-align: left;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
 .fxd__btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;
   min-height: 36px; padding: 0 12px;
@@ -841,6 +920,28 @@
 }
 .fxd__btn--primary:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
 .fxd__btn--ghost { background: transparent; }
+.fxd__btn--whatsapp {
+  border-color: color-mix(in oklab, var(--o-success) 44%, var(--line));
+  background: color-mix(in oklab, var(--o-success) 12%, var(--raised));
+  color: var(--o-success);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--o-success) 9%, transparent);
+}
+.fxd__btn--whatsapp:hover:not(:disabled) {
+  border-color: var(--o-success);
+  color: var(--o-success);
+  background: color-mix(in oklab, var(--o-success) 16%, var(--raised));
+}
+.fxd__btn--mail {
+  border-color: color-mix(in oklab, var(--o-info) 44%, var(--line));
+  background: color-mix(in oklab, var(--o-info) 10%, var(--raised));
+  color: var(--o-info);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--o-info) 9%, transparent);
+}
+.fxd__btn--mail:hover:not(:disabled) {
+  border-color: var(--o-info);
+  color: var(--o-info);
+  background: color-mix(in oklab, var(--o-info) 14%, var(--raised));
+}
 
 .fxd__stagepick { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .fxd__stagepick button {

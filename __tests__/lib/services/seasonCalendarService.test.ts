@@ -50,6 +50,7 @@ function makeLead(overrides: Partial<SeasonCalendarLeadRaw> = {}): SeasonCalenda
     name: 'Anna García',
     eventDate: new Date('2026-06-20T00:00:00.000Z'), // dissabte
     eventStartTime: null,
+    eventEndTime: null,
     eventType: 'BIRTHDAY',
     eventLocation: 'Barcelona',
     guestCount: 80,

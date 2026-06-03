@@ -18,6 +18,7 @@ export interface SeasonCalendarLeadRaw {
   name: string;
   eventDate: Date | null;
   eventStartTime: string | null;
+  eventEndTime: string | null;
   eventType: string | null;
   eventLocation: string | null;
   guestCount: number | null;
@@ -59,6 +60,7 @@ export interface SeasonCalendarEntry {
   name: string;
   eventDate: Date | null;
   eventStartTime: string | null;
+  eventEndTime: string | null;
   eventType: string | null;
   eventLocation: string | null;
   guestCount: number | null;
@@ -201,6 +203,7 @@ export function buildSeasonCalendar(input: SeasonCalendarInput): SeasonCalendarR
       name: lead.name,
       eventDate: lead.eventDate,
       eventStartTime: lead.eventStartTime ?? null,
+      eventEndTime: lead.eventEndTime ?? null,
       eventType: lead.eventType,
       eventLocation: lead.eventLocation,
       guestCount: lead.guestCount,
@@ -229,6 +232,7 @@ export function buildSeasonCalendar(input: SeasonCalendarInput): SeasonCalendarR
       name: booking.clientName,
       eventDate: booking.eventDate,
       eventStartTime: null,
+      eventEndTime: null,
       eventType: booking.eventType,
       eventLocation: booking.eventLocation,
       guestCount: booking.guestCount,
@@ -298,6 +302,7 @@ export async function loadSeasonCalendar(
         status: true,
         eventDate: true,
         eventStartTime: true,
+        eventEndTime: true,
         eventType: true,
         eventLocation: true,
         guestCount: true,
@@ -350,6 +355,7 @@ export async function loadSeasonCalendar(
       status: l.status,
       eventDate: l.eventDate,
       eventStartTime: l.eventStartTime ?? null,
+      eventEndTime: l.eventEndTime ?? null,
       eventType: l.eventType as string | null,
       eventLocation: l.eventLocation,
       guestCount: l.guestCount,

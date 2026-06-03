@@ -1,5 +1,7 @@
 # Implantació — `/studio-lab/leads` → admin real
 
+> **ESTAT 2026-06-03:** `/studio-lab/leads` ha estat retirat del codi. Aquest checklist queda com a arxiu històric de la migració visual cap a `/admin`, no com a ruta activa.
+
 > Checklist per portar el prototip **"Brass & Obsidian"** (calendari de caps de setmana + pipeline) de `/studio-lab/leads` cap a l'admin real, reutilitzant tot el que ja existeix. Prototip = laboratori amb dades de mostra. Aquest document és el pont cap a producció.
 
 ## 0. Numeració de canvis (perquè TOT vagi lligat)

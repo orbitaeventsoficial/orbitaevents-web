@@ -1418,6 +1418,39 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #862 — 2026-06-03 — claude (FET)
+
+**Elimina PipelineSuggestionsPanel i ruta /suggestions.**
+
+- `app/admin/leads/PipelineSuggestionsPanel.tsx` eliminat (quarantena des de #782, cap importació activa).
+- `app/api/admin/leads/suggestions/route.ts` eliminat.
+- `leadPipelineSuggestionsService` conservat (usat per 4 serveis backend).
+- Inventari ítem #5 → DESCARTAT.
+- Validació tècnica: `npx tsc --noEmit` OK. `validate:core` OK.
+- Validació funcional: Zona Focus intacta. UI de suggeriments eliminada.
+- Validació humana/UX: confirmat propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #861 — 2026-06-03 — claude (FET)
+
+**Previsió meteorològica als 4 punts d'admin + geocoding Nominatim.**
+
+- `app/admin/components/WxBadge.tsx` — component compartit: 5 icones SVG, prop `size sm/md`, retorna null si `forecast:false`. CSS via `.wx-badge` a `admin-theme.css` (tokens, sense hex).
+- Targeta calendari: `WxBadge size="sm"` a `fx__cellmeta`. Tipus `LeadData.wx` → `WxData` del component compartit.
+- Fitxa ràpida: `WxBadge size="md"` + data a `fxd__hero` (`fxd__wxrow` + `fxd__wxdate` CSS).
+- Fitxa completa lead: `wx: WxData|null` a `LeadDetailData`, fetch al server component `leads/[id]/page.tsx`, badge al hero.
+- Reserva: fetch + `WxBadge` al `bd__meta` chips de `bookings/[id]/page.tsx`.
+- `lib/services/weatherService.ts`: `extractOWMCity` per extreure municipi d'adreces completes + `geocodeWithNominatim` (OSM, gratuït, cache 24h) com a primer intent; fallback a `?q=ciudad`. Elimina el 404 que retornava OWM per adreces llargues.
+- `leads-design.css`: `overflow: hidden → overflow: clip` al `.fx__grid` per permetre escapar els tooltips CSS purs.
+- Validació tècnica: `npx tsc --noEmit` OK. `seasonCalendarService.test.ts` OK.
+- Validació funcional: badge ☁ + temperatura visible a targeta Kimera i fitxa ràpida. OWM `?q=Gavà` retorna 200 (20.6°C). Nominatim: "Mas de Sant Lleí" → lat:41.54 lon:2.30 (Vallromanes) ✓; "Kimera Climbing, Gavà" → coordenades Gavà ✓.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #860 — 2026-06-02 — codex (FET)
 
 **Handoff bug Kimera — total 300 sense IVA torna a 350,90.**

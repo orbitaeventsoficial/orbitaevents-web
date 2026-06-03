@@ -15,7 +15,9 @@ function buildLeadWhatsAppHref(phone: string, name: string): string {
 import { patchLeadStatus } from '../leadStatusClient';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
-import { formatCurrency, formatDateFull } from '@/lib/constants';
+import { SOURCE_LABELS, formatCurrency, formatDateFull } from '@/lib/constants';
+import WxBadge from '@/app/admin/components/WxBadge';
+import type { WxData } from '@/app/admin/components/WxBadge';
 
 type Stage = 'nou' | 'contactat' | 'guanyat' | 'perdut';
 type PayState = 'none' | 'part' | 'full' | null;
@@ -33,6 +35,25 @@ const PRIORITY_LABEL: Record<string, string> = {
 
 function fullDate(iso: string) {
   return formatDateFull(iso);
+}
+
+function durationLabel(start: string | null, end: string | null): string {
+  if (!start || !end) return '—';
+  const [sh, sm] = start.split(':').map(Number);
+  const [eh, em] = end.split(':').map(Number);
+  if (![sh, sm, eh, em].every(Number.isFinite)) return '—';
+  const startMin = sh * 60 + sm;
+  let endMin = eh * 60 + em;
+  if (endMin <= startMin) endMin += 24 * 60;
+  const total = endMin - startMin;
+  const hours = Math.floor(total / 60);
+  const minutes = total % 60;
+  return minutes === 0 ? `${hours} h` : `${hours} h ${minutes} min`;
+}
+
+function sourceLabel(source: string | null): string {
+  if (!source) return '—';
+  return SOURCE_LABELS[source] ?? source;
 }
 
 export type LeadDetailData = {
@@ -54,6 +75,7 @@ export type LeadDetailData = {
   last: string | null;
   product: string | null;
   lostReason: string | null;
+  wx: WxData | null;
   eventPhone: string | null;
   eventAddress: string | null;
   booking: {
@@ -295,6 +317,12 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
         <span className="fxd__kicker">{STAGE_LABEL[stage]} · {lead.type}</span>
         <h2>{lead.name}</h2>
         {lead.lostReason && <span className="fxd__lost">{lead.lostReason}</span>}
+        {lead.wx && (
+          <span className="fxd__wxrow">
+            <WxBadge wx={lead.wx} size="md" />
+            {lead.dateISO && <span className="fxd__wxdate">{fullDate(lead.dateISO.slice(0, 10))}</span>}
+          </span>
+        )}
       </section>
 
       {/* Stats */}
@@ -318,24 +346,9 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
           )}
         </div>
         <div>
-          <span>Pax</span>
-          {editField === 'guestCount' ? (
-            <span className="fxd__editrow">
-              <input className="fxd__editinput" type="number" min={1} value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
-                autoFocus style={{ width: 60 }} />
-              <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
-              <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
-            </span>
-          ) : (
-            <b className="cursor-pointer border-b border-dashed border-[var(--line2)]" onClick={() => startEdit('guestCount')}>
-              {fields.guestCount || <em className="text-[11px]" style={{ opacity: 0.5 }}>Afegir</em>}
-            </b>
-          )}
+          <span>Durada</span><b>{durationLabel(fields.eventStartTime, fields.eventEndTime)}</b>
         </div>
         <div><span>Prioritat</span><b className={`fxd__pri--${lead.priority.toLowerCase()}`}>{PRIORITY_LABEL[lead.priority] || lead.priority}</b></div>
-        <div><span>Cobrament</span><b className={pay ? `fxd__pay--${pay}` : undefined}>{pay ? PAY_LABEL[pay] : '—'}</b></div>
       </div>
 
       {/* Grid de panells */}
@@ -364,10 +377,10 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
           )}
         </section>
 
-        {/* Col 2, Fila 1 — Contacte */}
+        {/* Col 2, Fila 1 — Dades del bolo */}
         <section className="fxd__panel">
-          <div className="fxd__panelhead"><span>Contacte</span></div>
-          <dl className="fxd__rows">
+          <div className="fxd__panelhead"><span>Dades del bolo</span></div>
+          <dl className="fxd__rows fxd__rows--event">
             <div><dt>Data</dt><dd>
               {editField === 'eventDate' ? (
                 <span className="fxd__editrow">
@@ -380,6 +393,22 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
               ) : (
                 <button className="fxd__editval" onClick={() => startEdit('eventDate')}>
                   {fields.eventDate ? fullDate(fields.eventDate) : <em className="fxd__empty">Afegir →</em>}
+                </button>
+              )}
+            </dd></div>
+            <div><dt>Pax</dt><dd>
+              {editField === 'guestCount' ? (
+                <span className="fxd__editrow">
+                  <input className="fxd__editinput" type="number" min={1} value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
+                    autoFocus />
+                  <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
+                  <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
+                </span>
+              ) : (
+                <button className="fxd__editval" onClick={() => startEdit('guestCount')}>
+                  {fields.guestCount || <em className="fxd__empty">Afegir →</em>}
                 </button>
               )}
             </dd></div>
@@ -413,7 +442,7 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
                 </button>
               )}
             </dd></div>
-            <div><dt>Lloc</dt><dd>
+            <div className="fxd__row--long"><dt>Lloc</dt><dd>
               {editField === 'eventLocation' ? (
                 <span className="fxd__editrow">
                   <input className="fxd__editinput" value={editValue} autoFocus
@@ -431,13 +460,13 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
           </dl>
         </section>
 
-        {/* Col 3, Fila 1 — Dades del bolo */}
+        {/* Col 3, Fila 1 — Contacte */}
         <section className="fxd__panel">
-          <div className="fxd__panelhead"><span>Dades del bolo</span></div>
-          <dl className="fxd__rows">
+          <div className="fxd__panelhead"><span>Contacte</span></div>
+          <dl className="fxd__rows fxd__rows--contact">
             {(['phone', 'email'] as EditableField[]).map((f) => (
-              <div key={f}>
-                <dt>{f === 'phone' ? 'Telèfon client' : 'Email'}</dt>
+              <div key={f} className={f === 'email' ? 'fxd__row--long' : undefined}>
+                <dt>{f === 'phone' ? 'Telèfon' : 'Email'}</dt>
                 <dd>
                   {editField === f ? (
                     <span className="fxd__editrow">
@@ -460,60 +489,18 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
                 </dd>
               </div>
             ))}
-            <div>
-              <dt>Tel. event</dt>
-              <dd>
-                {editField === 'eventPhone' ? (
-                  <span className="fxd__editrow">
-                    <input
-                      className="fxd__editinput"
-                      value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
-                      autoFocus type="tel"
-                    />
-                    <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
-                    <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
-                  </span>
-                ) : (
-                  <button className="fxd__editval" onClick={() => startEdit('eventPhone')}>
-                    {fields.eventPhone || <em className="fxd__empty">Afegir →</em>}
-                  </button>
-                )}
-              </dd>
-            </div>
-            <div>
-              <dt>Adreça event</dt>
-              <dd>
-                {editField === 'eventAddress' ? (
-                  <span className="fxd__editrow">
-                    <input
-                      className="fxd__editinput"
-                      value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
-                      autoFocus
-                    />
-                    <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
-                    <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
-                  </span>
-                ) : (
-                  <button className="fxd__editval" onClick={() => startEdit('eventAddress')}>
-                    {fields.eventAddress || <em className="fxd__empty">Afegir →</em>}
-                  </button>
-                )}
-              </dd>
-            </div>
+            <div><dt>Canal</dt><dd>{sourceLabel(lead.channel)}</dd></div>
+            <div><dt>Últim contacte</dt><dd>{lead.last || '—'}</dd></div>
           </dl>
-          <div className="fxd__actions">
+          <div className="fxd__actions fxd__actions--contact">
             {fields.phone ? (
-              <a href={buildLeadWhatsAppHref(fields.phone, lead.name)} target="_blank" rel="noopener noreferrer" className="fxd__btn">
+              <a href={buildLeadWhatsAppHref(fields.phone, lead.name)} target="_blank" rel="noopener noreferrer" className="fxd__btn fxd__btn--whatsapp">
                 💬 WhatsApp
               </a>
             ) : (
               <button type="button" className="fxd__btn" disabled>Sense telèfon</button>
             )}
-            <Link href={buildLeadComposeHref(lead.id, 'seguiment')} className="fxd__btn">
+            <Link href={buildLeadComposeHref(lead.id, 'seguiment')} className="fxd__btn fxd__btn--mail">
               ✉️ Correu
             </Link>
           </div>

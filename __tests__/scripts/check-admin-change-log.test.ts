@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 
 const scriptPath = path.resolve('scripts/check-admin-change-log.mjs');
 
-function writeFixture(protocol: string, counter: number, diario?: string, labNumber?: number) {
+function writeFixture(protocol: string, counter: number, diario?: string) {
   const root = mkdtempSync(path.join(tmpdir(), 'oe-protocol-'));
   mkdirSync(path.join(root, 'docs'), { recursive: true });
   mkdirSync(path.join(root, 'lib', 'constants'), { recursive: true });
@@ -22,19 +22,11 @@ function writeFixture(protocol: string, counter: number, diario?: string, labNum
     `export const ADMIN_CHANGE_COUNTER = ${counter};\n`,
     'utf8',
   );
-  if (labNumber !== undefined) {
-    mkdirSync(path.join(root, 'app', 'studio-lab', 'leads'), { recursive: true });
-    writeFileSync(
-      path.join(root, 'app', 'studio-lab', 'leads', 'page.tsx'),
-      `const LAB_CHANGE_NUMBER = ${labNumber};\n`,
-      'utf8',
-    );
-  }
   return root;
 }
 
-function runGuard(protocol: string, counter: number, diario?: string, labNumber?: number) {
-  const cwd = writeFixture(protocol, counter, diario, labNumber);
+function runGuard(protocol: string, counter: number, diario?: string) {
+  const cwd = writeFixture(protocol, counter, diario);
   return spawnSync(process.execPath, [scriptPath], { cwd, encoding: 'utf8' });
 }
 
@@ -152,19 +144,6 @@ describe('check-admin-change-log', () => {
     const result = runGuard(`${change(57, false)}\n`, 57);
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain('missing ownership fields');
-  });
-
-  it('accepts a studio-lab leads chip aligned with the counter', () => {
-    const result = runGuard(`${change(57)}\n${change(58)}\n`, 58, undefined, 58);
-    expect(result.status).toBe(0);
-    expect(result.stdout).toContain('Current: #58');
-  });
-
-  it('rejects a studio-lab leads chip that lags behind the counter', () => {
-    const result = runGuard(`${change(57)}\n${change(58)}\n`, 58, undefined, 57);
-    expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain('LAB_CHANGE_NUMBER=57');
-    expect(result.stderr).toContain('ADMIN_CHANGE_COUNTER=58');
   });
 
   it('rejects literal newline artifacts in the protocol', () => {

@@ -1,5 +1,7 @@
 # Studio Lab · Òrbita Command — handoff
 
+> **ESTAT 2026-06-03:** `/studio-lab` ha estat retirat del codi. Aquest document queda com a arxiu històric del prototip, no com a guia activa. No recrear la ruta sense ordre explícita del propietari.
+
 > **Per continuar sense re-explicar res.** Obre això i sabràs on som i què toca.
 > Superfície: `http://localhost:3000/studio-lab` (intern, `noindex`, sense auth).
 

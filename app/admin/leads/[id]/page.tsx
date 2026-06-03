@@ -22,6 +22,8 @@ import { SITE_CONFIG } from '@/app/config/site-config';
 import InfoTooltip from '@/app/admin/components/InfoTooltip';
 import { ADMIN_HELP } from '@/app/admin/components/adminHelpGlossary';
 import { ADMIN_LEAD_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
+import { getWeatherForEvent } from '@/lib/services/weatherService';
+import type { WxData } from '@/app/admin/components/WxBadge';
 
 export const dynamic = 'force-dynamic';
 
@@ -319,6 +321,16 @@ export default async function LeadDetailPage({ params }: Props) {
     })),
   });
 
+  // Meteo: només si l'event és dins del rang de 5 dies
+  let leadWx: WxData | null = null;
+  if (lead.eventDate && lead.eventLocation) {
+    const diffMs = lead.eventDate.getTime() - Date.now();
+    if (diffMs >= -86400000 && diffMs <= 5 * 86400000) {
+      const weather = await getWeatherForEvent(lead.eventLocation, lead.eventDate).catch(() => null);
+      if (weather) leadWx = { kind: weather.kind, tmax: weather.tempMax, tmin: weather.tempMin, forecast: true };
+    }
+  }
+
   return (
       <LeadDetailClient
         notes={lead.notes.map((n) => ({ id: n.id, content: n.content, createdBy: n.createdBy, createdAt: n.createdAt.toISOString() }))}
@@ -343,6 +355,7 @@ export default async function LeadDetailPage({ params }: Props) {
         last: null,
         product: null,
         lostReason: null,
+        wx: leadWx,
         eventPhone: lead.eventPhone ?? null,
         eventAddress: lead.eventAddress ?? null,
         booking: lead.booking ? {

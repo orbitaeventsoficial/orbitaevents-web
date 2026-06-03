@@ -395,6 +395,17 @@ html.admin-mode .admin-skip-nav:focus {
   outline-offset: 2px;
 }
 
+/* ── WxBadge — previsió meteorològica (leads + reserva) ── */
+html.admin-mode .wx-badge {
+  display: inline-flex; align-items: center; gap: 2px;
+  color: var(--t2);
+}
+html.admin-mode .wx-badge svg { width: 13px; height: 13px; flex-shrink: 0; }
+html.admin-mode .wx-badge > span { font-family: var(--mono); font-size: 10.5px; font-weight: 600; }
+html.admin-mode .wx-badge--md svg { width: 15px; height: 15px; }
+html.admin-mode .wx-badge--md > span { font-size: 12px; }
+html.admin-mode .wx-badge[data-wx="sun"] { color: color-mix(in oklab, var(--gold) 65%, var(--t2)); }
+
 @media (prefers-reduced-motion: reduce) {
   html.admin-mode .admin-drag-placeholder,
   html.admin-mode [data-dragging='true'],

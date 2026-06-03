@@ -14,9 +14,6 @@ const ignoredDirs = new Set([
   // el design system, no catàlegs de domini reutilitzats. Zona protegida
   // (CLAUDE.md §Zones consolidades) amb guard propi `qa:studio-integrity`.
   'app/studio',
-  // Laboratori del nou admin (Òrbita Command): prototip intern noindex amb
-  // dades de mostra per iterar disseny i interaccions. No són catàlegs de domini.
-  'app/studio-lab',
 ]);
 
 const allowedCatalogs = new Set([
@@ -43,7 +40,7 @@ const allowedCatalogs = new Set([
   'lib/services/attributionService.ts::COMM_ACTIVITY_TYPES',
   // Catalan day abbreviations for social performance display — presentation-only, not a shared domain catalog.
   'lib/services/socialPerformanceService.ts::DAY_NAMES',
-  // Season calendar display strings (Brass & Obsidian leads UI) — parallel to studio-lab/leads which is ignored.
+  // Season calendar display strings (Brass & Obsidian leads UI).
   // Catalan month names and local SVG icon builder, purely presentational for the season calendar widget.
   'app/admin/leads/LeadsSeasonClient.tsx::MONTHS_FULL',
   'app/admin/leads/LeadsSeasonClient.tsx::MONTHS_SHORT',
@@ -106,5 +103,4 @@ for (const finding of findings) {
 console.error('');
 console.error('Move declarative catalogs to lib/constants/* or add a deliberate allowlist entry with justification.');
 process.exit(1);
-
 

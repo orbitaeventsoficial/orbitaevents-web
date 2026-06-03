@@ -146,27 +146,6 @@ if (!counterMatch) {
     }
   }
 
-  // ─── Blindatge: el xip visible de /studio-lab/leads ha de reflectir el counter ──
-  // Cada canvi numerat s'ha de veure TANT al diari/protocol/counter COM a la
-  // pàgina (LAB_CHANGE_NUMBER). Sense aquest lligam, una "prova" es pot
-  // documentar com a tancada sense que la pàgina ho reflecteixi: és exactament
-  // el drift real #767↔#773 (proves #768–773 documentades però no a la pàgina/git).
-  const labPagePath = path.join(process.cwd(), 'app', 'studio-lab', 'leads', 'page.tsx');
-  if (fs.existsSync(labPagePath)) {
-    const labSource = fs.readFileSync(labPagePath, 'utf8');
-    const labMatch = labSource.match(/const LAB_CHANGE_NUMBER = (\d+);/);
-    if (!labMatch) {
-      fail('LAB_CHANGE_NUMBER not found in app/studio-lab/leads/page.tsx');
-    } else {
-      const labNumber = Number.parseInt(labMatch[1], 10);
-      if (labNumber !== counter) {
-        fail(
-          `LAB_CHANGE_NUMBER=${labNumber} (xip a /studio-lab/leads) but ADMIN_CHANGE_COUNTER=${counter}. `
-          + 'Cada canvi s\'ha de reflectir al diari I a la pàgina (xip visible).',
-        );
-      }
-    }
-  }
 }
 
 if (process.exitCode) {
@@ -174,6 +153,5 @@ if (process.exitCode) {
 }
 
 console.log(`Admin change-log check clean. Changes: ${changeNumbers.length}. Current: #${Math.max(...changeNumbers)}.`);
-
 
 

@@ -70,6 +70,7 @@ function entryToLead(e: SeasonCalendarEntry, weather: EventWeather | null): Lead
     type: typeLabel,
     dateISO: e.eventDate ? toDateISO(e.eventDate) : '',
     time: e.eventStartTime ?? '',
+    endTime: e.eventEndTime ?? '',
     location: e.eventLocation ?? '',
     pax: e.guestCount ?? 0,
     product: typeLabel,
@@ -86,8 +87,8 @@ function entryToLead(e: SeasonCalendarEntry, weather: EventWeather | null): Lead
     last: kind === 'lead' ? relativeLastContact(e.contactedAt) : '',
     booking: e.booking,
     wx: weather
-      ? { kind: weather.kind, tmax: weather.tempMax, tmin: weather.tempMin }
-      : { kind: 'partly', tmax: 22, tmin: 14 }, // fallback si no hi ha API key o data fora del rang 5d
+      ? { kind: weather.kind, tmax: weather.tempMax, tmin: weather.tempMin, forecast: true }
+      : { kind: 'partly', tmax: 22, tmin: 14, forecast: false }, // forecast:false = fora del rang 5d o sense API key
   };
 }
 

@@ -24,6 +24,9 @@ import BookingFieldNotesComposer from './BookingFieldNotesComposer';
 import BookingCustomerLinkPanel from './BookingCustomerLinkPanel';
 import BookingQuestionnaireSection from './BookingQuestionnaireSection';
 import { getBookingOperationalSnapshot } from '@/lib/services/bookingOperationalService';
+import { getWeatherForEvent } from '@/lib/services/weatherService';
+import WxBadge from '@/app/admin/components/WxBadge';
+import type { WxData } from '@/app/admin/components/WxBadge';
 import BookingTotalEditor from './BookingTotalEditor';
 import { previewBookingCustomerLink } from '@/lib/services/bookings/bookingCustomerLinkService';
 import { getBookingStatusDisplay, getEventLabel, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull } from '@/lib/constants';
@@ -111,6 +114,16 @@ export default async function BookingDetailPage({ params }: PageProps) {
   );
 
   const ops = await getBookingOperationalSnapshot(booking);
+
+  // Meteo: rang 5 dies
+  let bookingWx: WxData | null = null;
+  if (booking.eventDate && booking.eventLocation) {
+    const diffMs = booking.eventDate.getTime() - Date.now();
+    if (diffMs >= -86400000 && diffMs <= 5 * 86400000) {
+      const weather = await getWeatherForEvent(booking.eventLocation, booking.eventDate).catch(() => null);
+      if (weather) bookingWx = { kind: weather.kind, tmax: weather.tempMax, tmin: weather.tempMin, forecast: true };
+    }
+  }
   const { commStatuses, recentCommRows, reviewFlowStatus, internalPostEventStatus, timeline: bookingTimeline, customer, profitabilityConfig, targetMarginPct, inventoryCost } = ops;
   const activePortalAccess = ops.portalAccess as Parameters<typeof ClientPortalAccessPanel>[0]['initialActive'];
 
@@ -221,6 +234,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
                   {statusConf.label}
                 </span>
                 <span className="bd__chip">{eventType} · {formatDate(booking.eventDate)}</span>
+                {bookingWx && <WxBadge wx={bookingWx} size="md" />}
                 {!isPast && !isToday && booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED' && (
                   <span className={`bd__chip ${isSoon ? 'bd__chip--warn' : ''}`}>
                     {daysUntil} {daysUntil === 1 ? 'dia' : 'dies'}

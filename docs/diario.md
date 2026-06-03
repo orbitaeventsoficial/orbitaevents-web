@@ -1,3 +1,82 @@
+## 2026-06-03 — Canvi #862: Elimina PipelineSuggestionsPanel i ruta /suggestions (claude)
+
+### Context
+El propietari no vol panells de suggeriments automàtics (SLA, dies sense contacte, alertes de CRM). La Zona Focus ja cobreix la prioritat per event. El `PipelineSuggestionsPanel` estava en quarantena des del Canvi #782 sense cap importació activa.
+
+### Canvis
+- `app/admin/leads/PipelineSuggestionsPanel.tsx` — eliminat.
+- `app/api/admin/leads/suggestions/route.ts` + directori — eliminats.
+- `docs/admin-leads-funcions-inventari.md` — ítem #5 marcat DESCARTAT amb raó explícita.
+- `lib/services/leadPipelineSuggestionsService.ts` — conservat (usat per nextBestAction, executiveCockpit, dailyBrief, operationalPulse).
+- `ADMIN_CHANGE_COUNTER` 861 → 862.
+
+### Validació
+- `npx tsc --noEmit` OK
+- `pnpm run validate:core` OK
+
+- Validació tècnica: TypeScript net, cap importació activa trencada.
+- Validació funcional: Zona Focus intacta. Suggeriments UI eliminats.
+- Validació humana/UX: confirmat pel propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 862. Següent canvi ha de ser `#863`.
+
+---
+
+## 2026-06-03 — Canvi #861: Previsió meteorològica als 4 punts d'admin (claude)
+
+### Context
+El propietari vol que el símbol del temps aparegui a: la targeta del calendari, la fitxa ràpida (sheet lateral), la fitxa completa del lead i la fitxa de reserva. A més, es corregeix el bug dels tooltips dels dots al calendari (quedaven enterrats per `overflow: hidden`) i s'arregla el geocoding de l'API meteorològica (que fallava per adreces completes).
+
+### Canvis — Nou component compartit
+- `app/admin/components/WxBadge.tsx` — component compartit (`WxBadge`, `WxData`, `WxKind`). 5 icones SVG inline (sol, parcialment ennuvolat, núvol, pluja, tempesta), prop `size: 'sm'|'md'`, retorna `null` si `wx.forecast === false`. Zero hex, zero hardcoded.
+- `app/admin/admin-theme.css` — classe `.wx-badge` + `.wx-badge--sm/md` + color or per sol (`color-mix` amb `--gold`). Accessible a totes les pàgines admin.
+
+### Canvis — 4 superfícies
+- **Targeta calendari** (`LeadsSeasonClient.tsx`): `WxBadge size="sm"` a `fx__cellmeta` (cantonada superior dreta de cada targeta ocupada). Tipus `LeadData.wx` actualitzat a `WxData` (importat del component compartit). Codi inline `WxIcon`/`WX_ARIA` eliminat.
+- **Fitxa ràpida** (`LeadsSeasonClient.tsx`): `WxBadge size="md"` + data de l'event a `fxd__hero`, sota el `<h2>`. Visible quan `wx.forecast === true`. Classe CSS `fxd__wxrow` + `fxd__wxdate` afegides a `leads-design.css`.
+- **Fitxa completa lead** (`app/admin/leads/[id]/`): `wx: WxData | null` afegit a `LeadDetailData`. Fetch al server component `page.tsx` (rang ≤5 dies, `getWeatherForEvent`). `WxBadge` al hero de `LeadDetailClient.tsx`.
+- **Reserva** (`app/admin/bookings/[id]/page.tsx`): fetch idèntic + `WxBadge` al `bd__meta` chips, costat del chip de data.
+
+### Canvis — Fix geocoding weatherService
+- `lib/services/weatherService.ts`:
+  - `extractOWMCity(location)`: extreu nom de municipi de les adreces completes. Estratègia: codi postal espanyol (5 dígits) → nom de municipi; si no, darrer segment de comes no numèric. Exemples: `"Kimera Climbing, ..., 08850 Gavà, Barcelona"` → `"Gavà"`.
+  - `geocodeWithNominatim(location)`: geocoding via Nominatim (OSM). Gratuït, sense clau, 1 req/s màxim. Accepta noms de lloc, establiments i adreces. Cache en memòria 24h (`geoCache`). User-Agent `OrbitaEvents/1.0`. Retorna `{lat, lon}` o `null`. Exemples verificats: "Mas de Sant Lleí" → lat:41.54, lon:2.30 (Vallromanes) ✓; "Kimera Climbing, Gavà" → coordenades correctes ✓.
+  - `getWeatherForEvent`: ara fa primer `geocodeWithNominatim` → si té lat/lon, usa `forecast?lat=&lon=`; si no, cau a `extractOWMCity` + `?q=`. Elimina el problema original on `?q=adreça_completa` retornava 404.
+  - `fetchWeatherForLocation` (reserves): mateix patró geocoding.
+
+### Canvis — Bug tooltip overflow
+- `leads-design.css`: `.fx__grid { overflow: hidden → overflow: clip }`. `overflow: clip` clipeja el contingut no posicionat (preserva border-radius) però permet als elements `position: absolute` (tooltips CSS purs) escapar el contenidor. Soluciona que els tooltips `data-tip` dels dots de les targetes quedessin enterrats.
+
+### Conducta canònica respectada
+- Zero hex hardcoded. Colors via tokens (`--gold`, `color-mix`).
+- Zero codi inline duplicat: `WxIcon` centralitzat al component compartit.
+- `forecast: boolean` al tipus `WxData` — el badge no surt mai per dades de fallback (≥5 dies o sense API).
+- Nominatim: `countrycodes=es` per limitar a Espanya i reduir ambigüitats.
+
+### Validació
+- `npx tsc --noEmit` OK
+- `pnpm test:run -- --run __tests__/lib/services/seasonCalendarService.test.ts` OK
+- `pnpm run validate:core` OK — guards passats
+- Nominatim provat manualment: "Gavà" ✓, "Mas de Sant Lleí" ✓ (Vallromanes), "Kimera Climbing, Gavà" ✓
+- OWM provat manualment amb `?q=Gavà`: status 200, temp 20.6°C, weather Clouds ✓
+- Captura visual: badge ☁ + temperatura a targeta Kimera i fitxa ràpida confirmada
+
+- Validació tècnica: `npx tsc --noEmit` OK. `seasonCalendarService.test.ts` OK. `validate:core` OK.
+- Validació funcional: badge visible amb dades reals. Geocoding Nominatim funcional. Fallback a `extractOWMCity` documentat.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 861. Següent canvi ha de ser `#862`.
+
+---
+
 ## 2026-06-02 — Canvi #860: Handoff bug Kimera — total 300 sense IVA torna a 350,90 (codex)
 
 ### Context

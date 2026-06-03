@@ -88,7 +88,12 @@ async function fetchWeatherForLocation(
   eventDate: Date
 ): Promise<{ temp: number; icon: string; description: string; rainProbability: number } | null> {
   try {
-    const url = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(location)}&appid=${apiKey}&units=metric&lang=ca`;
+    const geo = await geocodeWithNominatim(location);
+    const owmBase = 'https://api.openweathermap.org/data/2.5/forecast';
+    const owmSuffix = `&appid=${apiKey}&units=metric&lang=ca`;
+    const url = geo
+      ? `${owmBase}?lat=${geo.lat}&lon=${geo.lon}${owmSuffix}`
+      : `${owmBase}?q=${encodeURIComponent(extractOWMCity(location))}${owmSuffix}`;
     const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
 
     if (!response.ok) {
@@ -131,6 +136,57 @@ async function fetchWeatherForLocation(
   }
 }
 
+// ─── Extreu nom de ciutat per al paràmetre ?q= d'OWM ───────────────────
+// OWM no accepta adreces completes: "Kimera, Carrer X, 08850 Gavà" → "Gavà"
+function extractOWMCity(location: string): string {
+  // Codi postal espanyol (5 dígits) seguit del nom de municipi
+  const postalMatch = location.match(/\b\d{5}\s+([^,]+)/);
+  if (postalMatch) return postalMatch[1].trim();
+  // Darrer segment de la llista de comes que no comenci per número
+  const parts = location.split(',').map((s) => s.trim()).filter(Boolean);
+  for (let i = parts.length - 1; i >= 0; i--) {
+    if (parts[i] && !/^\d/.test(parts[i]) && parts[i].length > 1) return parts[i];
+  }
+  return location;
+}
+
+// ─── Geocoding via Nominatim (OSM) ─────────────────────────────────────
+// Gratuït, sense clau. Accepta noms de lloc, adreces i establiments.
+// Condicions d'ús: 1 req/s màxim + User-Agent identificatiu.
+
+const GEO_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 h — ubicacions no canvien
+const geoCache = new Map<string, { value: { lat: number; lon: number } | null; cachedAt: number }>();
+
+async function geocodeWithNominatim(location: string): Promise<{ lat: number; lon: number } | null> {
+  const key = location.toLowerCase().trim();
+  const cached = geoCache.get(key);
+  if (cached && Date.now() - cached.cachedAt < GEO_CACHE_TTL_MS) return cached.value;
+
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1&countrycodes=es`;
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'OrbitaEvents/1.0 (admin@orbitaevents.com)' },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) {
+      geoCache.set(key, { value: null, cachedAt: Date.now() });
+      return null;
+    }
+    const data = await res.json() as Array<{ lat: string; lon: string }>;
+    if (!data.length) {
+      geoCache.set(key, { value: null, cachedAt: Date.now() });
+      return null;
+    }
+    const result = { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+    geoCache.set(key, { value: result, cachedAt: Date.now() });
+    return result;
+  } catch (err) {
+    log.warn(`geocodeWithNominatim: error per "${location}"`, { error: String(err) });
+    geoCache.set(key, { value: null, cachedAt: Date.now() });
+    return null;
+  }
+}
+
 // ─── Cache per location+data (per al calendari de temporada, #794) ─────
 
 const eventWeatherCache = new Map<string, { value: EventWeather | null; cachedAt: number }>();
@@ -162,10 +218,17 @@ export async function getWeatherForEvent(
   }
 
   try {
-    const url = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(location)}&appid=${apiKey}&units=metric&lang=ca`;
-    const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    // 1r intent: geocoding precís via Nominatim → lat/lon
+    const geo = await geocodeWithNominatim(location);
+    const owmBase = 'https://api.openweathermap.org/data/2.5/forecast';
+    const owmSuffix = `&appid=${apiKey}&units=metric&lang=ca`;
+    const owmUrl = geo
+      ? `${owmBase}?lat=${geo.lat}&lon=${geo.lon}${owmSuffix}`
+      : `${owmBase}?q=${encodeURIComponent(extractOWMCity(location))}${owmSuffix}`;
+
+    const response = await fetch(owmUrl, { signal: AbortSignal.timeout(5000) });
     if (!response.ok) {
-      log.warn(`getWeatherForEvent: resposta no vàlida per "${location}": ${response.status}`);
+      log.warn(`getWeatherForEvent: sense previsió per "${location}": ${response.status}`);
       eventWeatherCache.set(key, { value: null, cachedAt: now });
       return null;
     }

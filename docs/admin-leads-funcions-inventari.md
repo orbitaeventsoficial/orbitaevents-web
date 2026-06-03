@@ -148,7 +148,7 @@ Les funcions del nou disseny s'apliquen per ordre d'impacte, una a una, per ordr
 | 3 | Flux LOST (motiu obligatori) | `LeadLostStatusPrompt.tsx` | ✅ FET — Canvi #784 (integrat dins del panell de canvi d'estat) |
 | 2.b | Canvi d'estat des del pipeline (drag & drop entre lanes) | `LeadPipelineView.tsx` (D&D) | ✅ FET — Canvi #785 |
 | 4 | Acció eliminar | `LeadActions.tsx` (parcialment) | ✅ FET — Canvi #786 (panell `lp2__panel--danger` + `useConfirmDialog` + restricció LOST) |
-| 5 | Suggeriments pipeline | `PipelineSuggestionsPanel.tsx` | Focus zone del nou disseny (evolució del panell) |
+| 5 | Suggeriments pipeline | `PipelineSuggestionsPanel.tsx` | ❌ DESCARTAT — propietari no vol el panell de SLA/dies sense contacte. Zona Focus ja cobreix la prioritat per event. Ruta `/api/admin/leads/suggestions` i component eliminats al Canvi #862. Servei `leadPipelineSuggestionsService` conservat (usat per nextBestAction, executiveCockpit, dailyBrief, operationalPulse). |
 | 6 | Prioritat inline | `LeadQuickPriority.tsx` | ✅ FET — Canvi #796 (panell "Prioritat" radiogroup de 4 botons a la fitxa, PATCH optimista a `/api/admin/leads/[id]` amb rollback, estètica Brass & Obsidian + dot semàntic per nivell) |
 | 7 | Badge motiu pèrdua | `LeadLostReasonBadge.tsx` | ✅ FET — Canvi #787 (`LostReasonBadge` intern, Brass & Obsidian; pipeline + fitxa; servei propaga `lostReason`) |
 | 8 | WhatsApp / Email | `LeadActions.tsx` (parcialment) | ✅ FET — Canvi #788 (WhatsApp `<a>` amb missatge prefilled si hi ha telèfon; correu via `buildLeadComposeHref` al redactor canònic, sense `mailto:`) |
