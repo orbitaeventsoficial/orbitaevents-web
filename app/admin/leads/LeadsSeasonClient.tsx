@@ -679,6 +679,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                             onClick={() => setPageId(l.id)}>
                             <span className="fx__celltop">
                               <span className="fx__day">{d.d}</span>
+                              {l.value > 0 && <span className="fx__cval">{euro(l.value)}</span>}
                               <span className="fx__cellmeta">
                                 <WxBadge wx={l.wx} size="sm" />
                                 {pay && <span className="fx__pay" data-pay={pay} data-tip={PAY_TOOLTIP[pay]} />}
@@ -692,7 +693,6 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                                 ? <>{l.time} · {l.location || '—'}</>
                                 : <><span className="fx__nohour">sense hora</span>{l.location ? ` · ${l.location}` : ''}</>
                               }
-                              {l.value > 0 && <span className="fx__cval"> · {euro(l.value)}</span>}
                             </span>
                           </button>
                         );
