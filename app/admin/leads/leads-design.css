@@ -462,6 +462,51 @@
 
 .fx__placeholder { color: var(--t3); font-family: var(--mono); font-size: 13px; padding: 40px 0; }
 
+/* ── Anàlisi econòmica (fitxa completa del lead) ── */
+.fxd__econo {
+  margin: 0 14px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.fxd__econohead {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--mono); font-size: 10px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--t3);
+}
+.fxd__econobadge {
+  padding: 1px 6px; border-radius: 4px;
+  background: color-mix(in oklab, var(--gold) 12%, transparent);
+  color: var(--gold); font-size: 10px; font-weight: 700;
+}
+.fxd__econonote { color: var(--t3); font-weight: 500; opacity: 0.7; }
+.fxd__kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+}
+.fxd__kpi {
+  padding: 12px 14px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  border-left: 3px solid transparent;
+}
+.fxd__kpi:last-child { border-right: 0; }
+.fxd__kpi[data-level="critical"] { border-left-color: var(--o-danger); background: color-mix(in oklab, var(--o-danger) 6%, transparent); }
+.fxd__kpi[data-level="warn"]     { border-left-color: var(--gold); }
+.fxd__kpi[data-level="ok"]       { border-left-color: var(--o-stage-won-strong); }
+.fxd__kpi[data-level="info"]     { border-left-color: var(--line2); }
+.fxd__kpi-val {
+  font-family: var(--display); font-size: 22px; font-weight: 800;
+  letter-spacing: -0.02em; line-height: 1; color: var(--t);
+}
+.fxd__kpi[data-level="critical"] .fxd__kpi-val { color: var(--o-danger); }
+.fxd__kpi[data-level="warn"]     .fxd__kpi-val { color: var(--gold); }
+.fxd__kpi[data-level="ok"]       .fxd__kpi-val { color: var(--o-stage-won-strong); }
+.fxd__kpi-lbl { margin-top: 4px; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--t2); }
+.fxd__kpi-sub { margin-top: 2px; font-family: var(--mono); font-size: 10px; color: var(--t3); line-height: 1.3; }
+
 /* Indicador de preu — semàfor €/h vs. mercat */
 .fxd__pricehint {
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;

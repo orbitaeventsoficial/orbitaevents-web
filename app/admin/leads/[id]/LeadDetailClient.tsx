@@ -18,7 +18,10 @@ import { useToast } from '@/app/admin/components/ToastProvider';
 import { SOURCE_LABELS, formatCurrency, formatDateFull } from '@/lib/constants';
 import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
-import { SERVICE_HOURLY_RATES, resolveServicePricingKey } from '@/lib/constants/pricing-intelligence';
+import {
+  SERVICE_HOURLY_RATES, resolveServicePricingKey,
+  computeFullBookingCost, MARGIN_ADVICE, getMarginColor,
+} from '@/lib/constants/pricing-intelligence';
 
 type Stage = 'nou' | 'contactat' | 'guanyat' | 'perdut';
 type PayState = 'none' | 'part' | 'full' | null;
@@ -732,6 +735,86 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
         </section>
 
       </div>
+
+      {/* ── Anàlisi econòmica — KPI cards (booking-lab recuperat) ── */}
+      {(() => {
+        const bk = lead.booking;
+        const total = bk ? bk.total : (fields.budget ? Number(fields.budget) : 0);
+        const hours = bk ? bk.totalHours : (() => {
+          const t = fields.eventStartTime; const e = fields.eventEndTime;
+          if (!t || !e) return 0;
+          const [sh, sm] = t.split(':').map(Number);
+          const [eh, em] = e.split(':').map(Number);
+          if (![sh, sm, eh, em].every(Number.isFinite)) return 0;
+          const startMin = sh * 60 + sm;
+          let endMin = eh * 60 + em;
+          if (endMin <= startMin) endMin += 24 * 60;
+          return (endMin - startMin) / 60;
+        })();
+        if (!total || !hours) return null;
+
+        const collabCost = bk?.collaboratorCost?.amount ?? 0;
+        const costResult = computeFullBookingCost({
+          total,
+          billableHours: hours,
+          eventType: lead.type,
+          collaboratorCost: collabCost,
+        });
+        const { margin, marginPct, marginColor, pricePerHour, alerts } = costResult;
+        const rate = SERVICE_HOURLY_RATES[resolveServicePricingKey({ eventType: lead.type })];
+        const devPct = rate.recommended > 0
+          ? Math.round(((pricePerHour - rate.recommended) / rate.recommended) * 100) : 0;
+
+        type Kpi = { value: string; label: string; sub: string; level: 'ok' | 'warn' | 'critical' | 'info' };
+        const kpis: Kpi[] = [];
+
+        if (bk?.costFloor && bk.costFloor > 0) {
+          const realMargin = total - bk.costFloor;
+          const realPct = Math.round((realMargin / total) * 100);
+          const tone = getMarginColor(realPct);
+          kpis.push({ value: `${realPct}%`, label: 'Marge net', sub: MARGIN_ADVICE[tone.kind] ?? formatCurrency(realMargin), level: realPct < 0 ? 'critical' : realPct < 25 ? 'warn' : 'ok' });
+        } else if (marginPct !== undefined) {
+          kpis.push({ value: `${marginPct}%`, label: 'Marge estimat', sub: MARGIN_ADVICE[marginColor.kind] ?? '', level: marginPct < 0 ? 'critical' : marginPct < 25 ? 'warn' : 'ok' });
+        }
+
+        kpis.push({
+          value: `${pricePerHour}€/h`,
+          label: 'Preu per hora',
+          sub: devPct < 0 ? `${devPct}% sota tarifa · recomanat ${rate.recommended}€/h` : `Dins tarifa (recomanat ${rate.recommended}€/h)`,
+          level: pricePerHour < rate.min ? 'critical' : pricePerHour < rate.recommended ? 'warn' : 'ok',
+        });
+
+        if (devPct < -10) {
+          const recTotal = Math.ceil(rate.recommended * hours);
+          kpis.push({ value: `+${formatCurrency(recTotal - total)}`, label: 'Per arribar a tarifa', sub: `cobrar ${formatCurrency(recTotal)}`, level: 'warn' });
+        }
+
+        if (collabCost > 0) {
+          kpis.push({ value: `-${formatCurrency(collabCost)}`, label: `Col·laborador${bk?.collaboratorCost?.name ? ` · ${bk.collaboratorCost.name}` : ''}`, sub: `Net: ${formatCurrency(total - collabCost)}`, level: 'info' });
+        }
+
+        const hasAlerts = alerts.some(a => a.level === 'critical' || a.level === 'warn');
+
+        return (
+          <section className="fxd__econo">
+            <div className="fxd__econohead">
+              <span>Anàlisi econòmica</span>
+              {hasAlerts && <span className="fxd__econobadge">⚠ Revisa el preu</span>}
+              {!bk && <span className="fxd__econonote">estimació sense reserva</span>}
+            </div>
+            <div className="fxd__kpis">
+              {kpis.map((k, i) => (
+                <div key={i} className="fxd__kpi" data-level={k.level}>
+                  <div className="fxd__kpi-val">{k.value}</div>
+                  <div className="fxd__kpi-lbl">{k.label}</div>
+                  <div className="fxd__kpi-sub">{k.sub}</div>
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      })()}
+
     </div>
   );
 }
