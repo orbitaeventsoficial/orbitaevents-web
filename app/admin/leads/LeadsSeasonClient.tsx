@@ -598,33 +598,33 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
           </div>
         );
       })()}
+      {/* ── Safata: leads sense data — fora del scroll, sempre visible ── */}
+      {viewMode === 'calendari' && (() => {
+        const noDate = effectiveLeads.filter((l) => !l.dateISO && l.stage !== 'perdut');
+        if (!noDate.length) return null;
+        return (
+          <div className="fx__nodate">
+            <div className="fx__nodatehead">
+              <span>Sense data assignada</span>
+              <span className="fx__nodatecount">{noDate.length}</span>
+            </div>
+            <div className="fx__nodatelist">
+              {noDate.map((l) => (
+                <button key={l.id} type="button" className="fx__nodaterow" data-stage={l.stage}
+                  onClick={() => setPageId(l.id)}>
+                  <span className="fx__dot" data-stage={l.stage} aria-hidden="true" />
+                  <span className="fx__nodatename">{l.name}</span>
+                  <span className="fx__nodatemeta">{l.type}{l.pax ? ` · ${l.pax} pax` : ''}</span>
+                  {l.value > 0 && <span className="fx__cval">{euro(l.value)}</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* ── PEÇA 4: Contingut (calendari / pipeline / llista) ── */}
       <div className="fx__content">
-
-        {/* ── Safata: leads sense data d'event ── */}
-        {viewMode === 'calendari' && (() => {
-          const noDate = effectiveLeads.filter((l) => !l.dateISO && l.stage !== 'perdut');
-          if (!noDate.length) return null;
-          return (
-            <div className="fx__nodate">
-              <div className="fx__nodatehead">
-                <span>Sense data assignada</span>
-                <span className="fx__nodatecount">{noDate.length}</span>
-              </div>
-              <div className="fx__nodatelist">
-                {noDate.map((l) => (
-                  <button key={l.id} type="button" className="fx__nodaterow" data-stage={l.stage}
-                    onClick={() => setPageId(l.id)}>
-                    <span className="fx__dot" data-stage={l.stage} aria-hidden="true" />
-                    <span className="fx__nodatename">{l.name}</span>
-                    <span className="fx__nodatemeta">{l.type}{l.pax ? ` · ${l.pax} pax` : ''}</span>
-                    {l.value > 0 && <span className="fx__cval">{euro(l.value)}</span>}
-                  </button>
-                ))}
-              </div>
-            </div>
-          );
-        })()}
 
         {/* ── Llegenda + barra de mesos (només calendari) ── */}
         {viewMode === 'calendari' && (

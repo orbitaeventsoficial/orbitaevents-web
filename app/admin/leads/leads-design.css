@@ -469,22 +469,22 @@
 /* Safata leads sense data — franja horitzontal compacta */
 .fx__nodate {
   display: flex; align-items: center; gap: 0;
-  margin: 8px var(--gutter);
-  border: 1px solid var(--o-stage-new-strong);
+  margin: 6px var(--gutter) 0;
+  border: 1px solid var(--line2);
   border-radius: 8px; overflow: hidden;
-  background: color-mix(in oklab, var(--o-stage-new) 7%, var(--panel));
+  background: var(--raised);
 }
 .fx__nodatehead {
   display: flex; align-items: center; gap: 6px; flex-shrink: 0;
-  padding: 6px 12px; border-right: 1px solid color-mix(in oklab, var(--o-stage-new) 25%, var(--line));
+  padding: 6px 12px; border-right: 1px solid var(--line2);
   font-family: var(--mono); font-size: 9px; font-weight: 800;
   letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--o-stage-new); white-space: nowrap;
+  color: var(--t2); white-space: nowrap;
 }
 .fx__nodatecount {
   padding: 1px 5px; border-radius: 3px;
-  background: color-mix(in oklab, var(--o-stage-new) 20%, transparent);
-  color: var(--o-stage-new); font-size: 9px; font-weight: 800;
+  background: color-mix(in oklab, var(--t) 12%, transparent);
+  color: var(--t); font-size: 9px; font-weight: 800;
 }
 .fx__nodatelist { display: flex; flex-direction: row; flex-wrap: wrap; flex: 1; }
 .fx__nodaterow {
