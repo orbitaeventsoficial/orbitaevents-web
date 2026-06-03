@@ -19,6 +19,7 @@ import LeadLostStatusPrompt from './LeadLostStatusPrompt';
 import { patchLeadStatus, type LeadStatus } from './leadStatusClient';
 import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
+import { SERVICE_HOURLY_RATES, resolveServicePricingKey } from '@/lib/constants/pricing-intelligence';
 
 /* ── Tipus ──────────────────────────────────────────────────────────────── */
 
@@ -154,6 +155,35 @@ type MonthBlock = {
   weekends: { sat: string; days: { iso: string; d: number; inMonth: boolean; lead: LeadData | null }[] }[];
 };
 
+function parseBillableHours(time: string, endTime: string): number {
+  const [sh, sm] = time.split(':').map(Number);
+  const [eh, em] = endTime.split(':').map(Number);
+  if (![sh, sm, eh, em].every(Number.isFinite)) return 0;
+  const startMin = sh * 60 + sm;
+  let endMin = eh * 60 + em;
+  if (endMin <= startMin) endMin += 24 * 60;
+  return (endMin - startMin) / 60;
+}
+
+function PriceHint({ value, time, endTime, type }: { value: number; time: string; endTime: string; type: string }) {
+  if (!value || !time || !endTime) return null;
+  const hours = parseBillableHours(time, endTime);
+  if (hours <= 0) return null;
+  const key = resolveServicePricingKey({ eventType: type });
+  const rate = SERVICE_HOURLY_RATES[key];
+  const perHour = Math.round((value / hours) * 10) / 10;
+  const devPct = Math.round(((perHour - rate.recommended) / rate.recommended) * 100);
+  const level = perHour < rate.min ? 'critical' : perHour < rate.recommended ? 'warn' : 'ok';
+  const sign = devPct >= 0 ? '+' : '';
+  return (
+    <div className="fxd__pricehint" data-level={level}>
+      <span className="fxd__ph-rate">{perHour}€/h</span>
+      <span className="fxd__ph-dev">{sign}{devPct}% vs mercat</span>
+      <span className="fxd__ph-rec">Recomanat: {rate.recommended}€/h</span>
+    </div>
+  );
+}
+
 function BookingInlineActions({ lead }: { lead: LeadData }) {
   const router = useRouter();
   const toast = useToast();
@@ -261,6 +291,7 @@ function LeadDetailPanel({
           <div><span>Durada</span><b>{durationLabel(lead.time, lead.endTime)}</b></div>
           <div><span>Prioritat</span><b>{PRIORITY_LABEL[lead.priority]}</b></div>
         </div>
+        <PriceHint value={lead.value} time={lead.time} endTime={lead.endTime} type={lead.type} />
 
         <div className="fxd__grid">
           <section className="fxd__panel">

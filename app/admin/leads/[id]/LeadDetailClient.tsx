@@ -18,6 +18,7 @@ import { useToast } from '@/app/admin/components/ToastProvider';
 import { SOURCE_LABELS, formatCurrency, formatDateFull } from '@/lib/constants';
 import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
+import { SERVICE_HOURLY_RATES, resolveServicePricingKey } from '@/lib/constants/pricing-intelligence';
 
 type Stage = 'nou' | 'contactat' | 'guanyat' | 'perdut';
 type PayState = 'none' | 'part' | 'full' | null;
@@ -324,6 +325,34 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
           </span>
         )}
       </section>
+
+      {/* Indicador de preu */}
+      {(() => {
+        const val = fields.budget ? Number(fields.budget) : 0;
+        const t = fields.eventStartTime; const e = fields.eventEndTime;
+        if (!val || !t || !e) return null;
+        const [sh, sm] = t.split(':').map(Number);
+        const [eh, em] = e.split(':').map(Number);
+        if (![sh, sm, eh, em].every(Number.isFinite)) return null;
+        const startMin = sh * 60 + sm;
+        let endMin = eh * 60 + em;
+        if (endMin <= startMin) endMin += 24 * 60;
+        const hours = (endMin - startMin) / 60;
+        if (hours <= 0) return null;
+        const key = resolveServicePricingKey({ eventType: lead.type });
+        const rate = SERVICE_HOURLY_RATES[key];
+        const perHour = Math.round((val / hours) * 10) / 10;
+        const devPct = Math.round(((perHour - rate.recommended) / rate.recommended) * 100);
+        const level = perHour < rate.min ? 'critical' : perHour < rate.recommended ? 'warn' : 'ok';
+        const sign = devPct >= 0 ? '+' : '';
+        return (
+          <div className="fxd__pricehint" data-level={level}>
+            <span className="fxd__ph-rate">{perHour}€/h</span>
+            <span className="fxd__ph-dev">{sign}{devPct}% vs mercat</span>
+            <span className="fxd__ph-rec">Recomanat: {rate.recommended}€/h</span>
+          </div>
+        );
+      })()}
 
       {/* Stats */}
       <div className="fxd__stats">

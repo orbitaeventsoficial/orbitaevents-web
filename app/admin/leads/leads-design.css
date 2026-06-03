@@ -462,6 +462,20 @@
 
 .fx__placeholder { color: var(--t3); font-family: var(--mono); font-size: 13px; padding: 40px 0; }
 
+/* Indicador de preu — semàfor €/h vs. mercat */
+.fxd__pricehint {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 6px 14px; border-top: 1px solid var(--line);
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  background: transparent;
+}
+.fxd__pricehint[data-level="critical"] { color: var(--o-danger); background: color-mix(in oklab, var(--o-danger) 8%, transparent); }
+.fxd__pricehint[data-level="warn"]     { color: var(--gold); }
+.fxd__pricehint[data-level="ok"]       { color: color-mix(in oklab, var(--o-stage-won-strong) 80%, var(--t2)); }
+.fxd__ph-rate { font-size: 13px; }
+.fxd__ph-dev  { opacity: 0.85; }
+.fxd__ph-rec  { opacity: 0.55; margin-left: auto; }
+
 /* Meteo hero — línia data + badge a la fitxa ràpida */
 .fxd__wxrow { display: flex; align-items: center; gap: 7px; margin-top: 5px; }
 .fxd__wxdate { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--t3); }
