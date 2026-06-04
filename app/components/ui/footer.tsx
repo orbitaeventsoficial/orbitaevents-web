@@ -14,6 +14,7 @@ import {
   Phone,
   Mail,
   MapPin,
+  Globe,
   Calculator,
   Instagram,
   Linkedin,
@@ -260,6 +261,19 @@ export default function Footer() {
                       <Mail className="w-4 h-4 text-amber-400" />
                     </div>
                     <span className="font-medium break-all">{SITE_CONFIG.business.email}</span>
+                  </a>
+                </li>
+
+                <li>
+                  <a
+                    href={SITE_CONFIG.web.url}
+                    target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-3 text-white/60 hover:text-cyan-400 text-sm transition-colors group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
+                      <Globe className="w-4 h-4 text-cyan-400" />
+                    </div>
+                    <span className="font-medium">{SITE_CONFIG.web.url.replace(/^https?:\/\//, '')}</span>
                   </a>
                 </li>
 
