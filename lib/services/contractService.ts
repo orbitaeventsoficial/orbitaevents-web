@@ -7,6 +7,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { EMAIL_CONTACT } from '@/lib/constants/email';
 import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 import { generateContractPDF, type ContractPdfData } from '@/lib/pdf-utils';
 import { type ContractData } from '@/lib/services/documentService';
@@ -14,7 +15,7 @@ import { log } from '@/lib/logger';
 import { recordLeadContractCancelled, recordLeadContractSent, recordLeadContractSigned } from '@/lib/services/leadActivityService';
 import { uploadFile } from '@/lib/storage';
 
-async function getCompanyConfig() {
+export async function getCompanyConfig() {
   const settings = await prisma.setting.findMany({
     where: { category: 'company' },
   });
@@ -25,8 +26,8 @@ async function getCompanyConfig() {
     nif: map.get('company.nif') || process.env.COMPANY_NIF || '',
     address: [map.get('company.address'), map.get('company.city'), map.get('company.postalCode')].filter(Boolean).join(', ') || 'Granollers, Barcelona',
     iban: map.get('company.iban') || process.env.COMPANY_IBAN || '',
-    phone: SITE_CONFIG.business.phoneDisplay || SITE_CONFIG.business.phone,
-    email: SITE_CONFIG.business.email,
+    phone: EMAIL_CONTACT.phone,
+    email: EMAIL_CONTACT.email,
   };
 }
 
@@ -107,7 +108,7 @@ export function getDefaultTermsAndConditions(locale: SupportedLocale = 'ca'): st
   return terms[locale];
 }
 
-async function renderContractPDF(proposalId: string): Promise<{
+export async function renderContractPDF(proposalId: string): Promise<{
   contractReference: string;
   pdfBuffer: Buffer;
   depositAmount: number;

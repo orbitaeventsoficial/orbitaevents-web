@@ -21,6 +21,7 @@ import { buildMime } from '@/lib/mailComposerLoader';
 
 import { type EmailLocale, normalizeEmailLocale, toIntlLocaleEmail, PRIVACY_REQUEST_LABELS, PRIVACY_COPY, TESTIMONIAL_COPY } from '@/lib/email-i18n';
 import { getEmailSignatureHtml, getEmailSignatureText } from '@/lib/services/signatureService';
+import { EMAIL_CONTACT } from '@/lib/constants/email';
 
 interface SendEmailOptions {
   to: string;
@@ -91,9 +92,6 @@ type BookingEmailModel = {
 
 const APP_BASE_URL = (getAppBaseUrl()).replace(/\/+$/, '');
 const EMAIL_LOGO_URL = `${APP_BASE_URL}/img/logosoloplaneta.png`;
-const EMAIL_CONTACT_PHONE = SITE_CONFIG.business.phoneDisplay || SITE_CONFIG.business.phone;
-const EMAIL_CONTACT_EMAIL = SITE_CONFIG.business.email;
-const EMAIL_CONTACT_WEB = SITE_CONFIG.web.url;
 
 async function getManagedBrandLogoUrl(): Promise<string> {
   const managedLogo = await getManagedImageOverride('layout.logo.admin');
@@ -137,9 +135,9 @@ function hasOrbitaContactInFooter(html: string): boolean {
   const tailChunk = html.slice(-2400).toLowerCase();
   return (
     tailChunk.includes('data-orbita-email-contact') ||
-    tailChunk.includes((EMAIL_CONTACT_EMAIL || '').toLowerCase()) ||
-    tailChunk.includes((EMAIL_CONTACT_PHONE || '').toLowerCase()) ||
-    tailChunk.includes((EMAIL_CONTACT_WEB || '').toLowerCase())
+    tailChunk.includes((EMAIL_CONTACT.email || '').toLowerCase()) ||
+    tailChunk.includes((EMAIL_CONTACT.phone || '').toLowerCase()) ||
+    tailChunk.includes((EMAIL_CONTACT.web || '').toLowerCase())
   );
 }
 
@@ -199,10 +197,10 @@ function ensureOrbitaEmailShell(html: string, logoUrl: string, brandingStyle: 'h
               <td style="padding:18px 24px;border-top:1px solid #e7e5e4;background:#fafaf9;">
                 <div style="font-size:13px;color:#334155;">Gràcies per la teva confiança. Estem a la teva disposició.</div>
                 <div style="margin-top:6px;font-size:12px;color:#64748b;">
-                  ${EMAIL_CONTACT_PHONE} · ${EMAIL_CONTACT_EMAIL}
+                  ${EMAIL_CONTACT.phone} · ${EMAIL_CONTACT.email}
                 </div>
                 <div style="margin-top:6px;font-size:12px;">
-                  <a href="${EMAIL_CONTACT_WEB}" style="color:#0f172a;text-decoration:none;">${EMAIL_CONTACT_WEB}</a>
+                  <a href="${EMAIL_CONTACT.web}" style="color:#0f172a;text-decoration:none;">${EMAIL_CONTACT.web}</a>
                 </div>
               </td>
             </tr>
@@ -240,8 +238,8 @@ function injectOrbitaContactFooter(html: string): string {
   const footerBlock = `
     <div data-orbita-email-contact="true" style="margin-top: 20px; padding: 16px 12px; border-top: 1px solid rgba(255,255,255,0.15); text-align:center; font-size: 12px; line-height:1.5; color: #9ca3af;">
       <div style="margin-bottom: 6px; color: #e5e7eb; font-weight: 700; letter-spacing: 0.2px;">Òrbita Events</div>
-      <div>${EMAIL_CONTACT_PHONE} · ${EMAIL_CONTACT_EMAIL}</div>
-      <div style="margin-top: 4px;"><a href="${EMAIL_CONTACT_WEB}" style="color:#DAA520; text-decoration:none;">${EMAIL_CONTACT_WEB}</a></div>
+      <div>${EMAIL_CONTACT.phone} · ${EMAIL_CONTACT.email}</div>
+      <div style="margin-top: 4px;"><a href="${EMAIL_CONTACT.web}" style="color:#DAA520; text-decoration:none;">${EMAIL_CONTACT.web}</a></div>
     </div>
   `;
 
