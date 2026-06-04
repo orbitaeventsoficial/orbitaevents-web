@@ -1,14 +1,12 @@
-import { COLORS, PAGE, normalizeWebsite } from '@/lib/pdf-config';
-import { SITE_CONFIG } from '@/app/config/site-config';
+import { COLORS, PAGE } from '@/lib/pdf-config';
 import {
   PDF_DESIGN, PDF_BODY_SIZE, PDF_FILL_BOTTOM,
   CHART_COLORS,
-  drawCanonicalPdfFooter,
   drawCanonicalPdfHeader,
   drawCanonicalSectionTitle,
   paintCanonicalPdfPage,
   setStyleLabel, setStyleValue, setStyleBody, setStyleCaption,
-  fillToFooter,
+  drawAllPageFooters,
 } from '@/lib/pdf-header';
 import type { ExecutiveReport } from '@/lib/services/executiveReportService';
 
@@ -514,17 +512,6 @@ export async function exportExecutiveReportPdf(report: ExecutiveReport): Promise
     );
   }
 
-  // Omple fins al peu si hi ha espai
-  if (y < PDF_FILL_BOTTOM - 16) {
-    fillToFooter(doc, y, 'contact');
-  }
-
-  // ── Footers ──────────────────────────────────────────────────────────────
-  const totalPages = doc.internal.pages.length - 1;
-  for (let i = 1; i <= totalPages; i++) {
-    doc.setPage(i);
-    drawCanonicalPdfFooter(doc, i, totalPages, normalizeWebsite(SITE_CONFIG.web.url));
-  }
-
+  drawAllPageFooters(doc, y);
   return doc.output('arraybuffer');
 }

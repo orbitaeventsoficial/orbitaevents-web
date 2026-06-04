@@ -18,9 +18,9 @@ import { toIntlLocale } from '@/lib/constants';
 import { filterCompatibleExtras } from '@/lib/extrasCompatibility';
 import {
   PDF_DESIGN, PDF_BODY_SIZE, PDF_FILL_BOTTOM,
-  drawCanonicalPdfFooter, drawCanonicalPdfHeader, drawCanonicalSectionTitle,
+  drawCanonicalPdfHeader, drawCanonicalSectionTitle,
   setStyleLabel, setStyleValue, setStyleBody, setStyleMuted, setStyleCaption, setStylePrice,
-  spacingDelta, fillToFooter,
+  spacingDelta, fillToFooter, drawAllPageFooters,
 } from '@/lib/pdf-header';
 
 import { type jsPDFType, type PdfBrandingOptions, COLORS, PAGE, SERVICE_NAMES, normalizeWebsite, isDataUrl, getImageFormatFromDataUrl, fitWithin, formatClientDate, formatPdfMoney } from '@/lib/pdf-config';
@@ -57,18 +57,7 @@ function addHeader(doc: jsPDFType, title: string, branding?: PdfBrandingOptions)
   });
 }
 
-function addFooter(doc: jsPDFType, pageNum: number, totalPages: number, branding?: PdfBrandingOptions) {
-  const website = normalizeWebsite(branding?.website?.trim() || SITE_CONFIG.web.url);
-  drawCanonicalPdfFooter(doc, pageNum, totalPages, website);
-}
 
-function addAllFooters(doc: jsPDFType, branding?: PdfBrandingOptions) {
-  const totalPages = doc.internal.pages.length - 1;
-  for (let i = 1; i <= totalPages; i++) {
-    doc.setPage(i);
-    addFooter(doc, i, totalPages, branding);
-  }
-}
 
 export async function generateServiceBrochure(
   service: ServiceSlug,
@@ -213,18 +202,12 @@ export async function generateServiceBrochure(
     y += Math.ceil(compatibleExtras.length / 2) * 10 + PDF_DESIGN.blockGap;
   }
 
-  // Omple fins al peu: value items + bloc de contacte canònic
+  // Omple amb value items si hi ha espai
   if (y < PDF_FILL_BOTTOM - 28) {
     y = fillToFooter(doc, y, 'value');
   }
-  if (y < PDF_FILL_BOTTOM - 24) {
-    fillToFooter(doc, y, 'contact');
-  } else if (y < PDF_FILL_BOTTOM - 8) {
-    const anchorY = PDF_FILL_BOTTOM - 22;
-    if (anchorY > y) fillToFooter(doc, anchorY, 'contact');
-  }
 
-  addAllFooters(doc);
+  drawAllPageFooters(doc, y);
   return doc;
 }
 
@@ -315,6 +298,9 @@ export async function generateQuotePDF(
       validUntilSuffix: 'dies',
       validSeal: 'VÀLID',
       from: 'des de',
+      ctaStep1: 'Accepta el pressupost',
+      ctaStep2: 'Reserva amb dipòsit',
+      ctaStep3: 'El teu event assegurat',
       disclaimer: 'Preus sense IVA.',
       contact: 'Contacte',
       conditions: 'Condicions',
@@ -345,6 +331,9 @@ export async function generateQuotePDF(
       validUntilSuffix: 'dias',
       validSeal: 'VÁLIDO',
       from: 'desde',
+      ctaStep1: 'Acepta el presupuesto',
+      ctaStep2: 'Reserva con señal',
+      ctaStep3: 'Tu evento asegurado',
       disclaimer: 'Precios sin IVA.',
       contact: 'Contacto',
       conditions: 'Condiciones',
@@ -375,6 +364,9 @@ export async function generateQuotePDF(
       validUntilSuffix: 'days',
       validSeal: 'VALID',
       from: 'from',
+      ctaStep1: 'Accept the quote',
+      ctaStep2: 'Reserve with deposit',
+      ctaStep3: 'Your event secured',
       disclaimer: 'Prices excl. VAT.',
       contact: 'Contact',
       conditions: 'Conditions',
@@ -761,9 +753,9 @@ export async function generateQuotePDF(
 
     // CTA 3 passos
     const steps = [
-      { num: '1', label: 'Accepta el pressupost' },
-      { num: '2', label: 'Reserva amb dipòsit' },
-      { num: '3', label: 'El teu event assegurat' },
+      { num: '1', label: t.ctaStep1 },
+      { num: '2', label: t.ctaStep2 },
+      { num: '3', label: t.ctaStep3 },
     ];
     const stepW = (contentWidth - 36) / 3;
     let sx = left + 4;
@@ -791,13 +783,9 @@ export async function generateQuotePDF(
     }
   }
 
-  // Footers
-  const totalPages = doc.internal.pages.length - 1;
-  for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
-    doc.setPage(pageNum);
-    const website = normalizeWebsite(branding?.website?.trim() || SITE_CONFIG.web.url);
-    drawCanonicalPdfFooter(doc, pageNum, totalPages, website);
-  }
+  // Footer canònic (contacte + línia daurada)
+  // Quan hi ha CTA el contingut ja arriba fins a footerZoneStart=258, drawAllPageFooters gestiona l'espai restant
+  drawAllPageFooters(doc, canDrawCta ? footerZoneStart : y);
   return doc;
 }
 
@@ -1316,14 +1304,7 @@ export async function generateContractPDF(
 
   y = providerBoxY + signatureBoxHeight + 6;
 
-  // -- Footer on all pages --
-  const totalPages = doc.internal.pages.length - 1;
-  for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
-    doc.setPage(pageNum);
-    const website = normalizeWebsite(branding?.website?.trim() || SITE_CONFIG.web.url);
-    drawCanonicalPdfFooter(doc, pageNum, totalPages, website);
-  }
-
+  drawAllPageFooters(doc, y);
   return doc;
 }
 
