@@ -489,11 +489,6 @@ export async function generateQuotePDF(
     return y + space <= pageBottom;
   };
 
-  const drawFooter = () => {
-    const website = normalizeWebsite(branding?.website?.trim() || SITE_CONFIG.web.url);
-    drawCanonicalPdfFooter(doc, 1, 1, `${t.disclaimer} · ${website}`);
-  };
-
   drawHeader(false);
 
   ensureSpace(22);
@@ -794,6 +789,14 @@ export async function generateQuotePDF(
       doc.text(labelLines.slice(0, 2), scx, scy + 9, { align: 'center' });
       sx += stepW + 12;
     }
+  }
+
+  // Bloc de contacte ancorat al peu (igual que factura)
+  if (y < PDF_FILL_BOTTOM - 24) {
+    fillToFooter(doc, y, 'contact');
+  } else if (y < PDF_FILL_BOTTOM - 8) {
+    const anchorY = PDF_FILL_BOTTOM - 22;
+    if (anchorY > y) fillToFooter(doc, anchorY, 'contact');
   }
 
   // Footers
@@ -1264,13 +1267,13 @@ export async function generateContractPDF(
   const sigColWidth = (contentWidth - 8) / 2;
   const signatureBoxHeight = 40;
 
-  // Ancora signatures al peu si hi ha espai suficient (mínim 20mm de separació del contingut)
-  const sigAnchorY = PDF_FILL_BOTTOM - signatureBoxHeight - 16;
-  if (doc.internal.pages.length - 1 === 1 && sigAnchorY > y + 20) {
+  // Ancora signatures al peu si hi ha espai suficient
+  const sigAnchorY = PDF_FILL_BOTTOM - signatureBoxHeight - PDF_DESIGN.sectionGap * 2;
+  if (doc.internal.pages.length - 1 === 1 && sigAnchorY > y + PDF_DESIGN.sectionGap * 3) {
     y = sigAnchorY;
   } else {
-    y += 8;
-    ensureSpace(signatureBoxHeight + 16);
+    y += PDF_DESIGN.blockGap;
+    ensureSpace(signatureBoxHeight + PDF_DESIGN.sectionGap * 2);
   }
 
   y = drawCanonicalSectionTitle(doc, y, t.signatures);
@@ -1320,6 +1323,14 @@ export async function generateContractPDF(
   }
 
   y = providerBoxY + signatureBoxHeight + 6;
+
+  // Bloc de contacte ancorat al peu (igual que factura)
+  if (y < PDF_FILL_BOTTOM - 24) {
+    fillToFooter(doc, y, 'contact');
+  } else if (y < PDF_FILL_BOTTOM - 8) {
+    const anchorY = PDF_FILL_BOTTOM - 22;
+    if (anchorY > y) fillToFooter(doc, anchorY, 'contact');
+  }
 
   // -- Footer on all pages --
   const totalPages = doc.internal.pages.length - 1;
