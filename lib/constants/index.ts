@@ -1688,7 +1688,7 @@ export const PUBLIC_MOBILE_CTA_TRUST_BADGES = [
   { icon: '⚡', value: '2h', labelKey: 'badges.response' },
 ] as const;
 
-export const APP_IMMERSIVE_PAGES = ['/sensorial', '/respira'] as const;
+export const APP_IMMERSIVE_PAGES = ['/sensorial', '/respira', '/portal'] as const;
 
 export const API_CANVAS_TESTIMONIAL_PRESETS = {
   instagramStory: {
@@ -2182,3 +2182,15 @@ export * from './customer-crm';
 export * from './social';
 
 export * from '../publicHomeShowcase';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PDF CONTENT CONSTANTS — textos canònics per als documents PDF
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const PDF_VALUE_ITEMS = [
+  { title: 'Equip propi', body: 'So, llum i tècnic certificat inclosos a cada servei.' },
+  { title: 'Pla B garantit', body: 'Material de backup i protocol per a qualsevol imprevist.' },
+  { title: 'Un sol interlocutor', body: 'Des de la reserva fins al muntatge, la mateixa persona.' },
+] as const;
+
+export const PDF_FILL_CONTACT_LABEL = 'Contacta\'ns per reservar la teva data';

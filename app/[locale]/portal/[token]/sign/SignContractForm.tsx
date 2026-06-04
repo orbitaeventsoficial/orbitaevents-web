@@ -121,8 +121,8 @@ export function SignContractForm({
         <span className="text-sm text-white/70">{m.signAcceptTerms} <strong>{contractReference}</strong></span>
       </label>
 
-      <div>
-        <p className="block text-sm text-white/60 mb-2">{m.signaturePadLabel}</p>
+      <div className="pt-3 border-t border-white/10">
+        <p className="block text-sm font-medium text-white/80 mb-3">{m.signaturePadLabel}</p>
         <SignaturePad
           onDataChange={setSignatureBlob}
           clearLabel={m.signaturePadClear}
