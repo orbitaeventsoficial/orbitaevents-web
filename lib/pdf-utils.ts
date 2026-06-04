@@ -84,9 +84,9 @@ export async function generateServiceBrochure(
   const serviceName = SERVICE_NAMES[service][locale];
 
   const t = {
-    ca: { brochure: 'Catàleg de Serveis', ourPacks: 'Els Nostres Packs', duration: 'Durada', hours: 'hores', idealFor: 'Ideal per', popular: 'MÉS POPULAR', premium: 'PREMIUM', extras: 'Extres Disponibles', contactUs: 'Contacta\'ns', contactText: 'Tens dubtes? Escriu-nos sense compromís!' },
-    es: { brochure: 'Catálogo de Servicios', ourPacks: 'Nuestros Packs', duration: 'Duración', hours: 'horas', idealFor: 'Ideal para', popular: 'MÁS POPULAR', premium: 'PREMIUM', extras: 'Extras Disponibles', contactUs: 'Contáctanos', contactText: '¿Tienes dudas? ¡Escríbenos sin compromiso!' },
-    en: { brochure: 'Service Catalog', ourPacks: 'Our Packages', duration: 'Duration', hours: 'hours', idealFor: 'Ideal for', popular: 'MOST POPULAR', premium: 'PREMIUM', extras: 'Available Extras', contactUs: 'Contact Us', contactText: 'Have questions? Contact us with no obligation!' },
+    ca: { brochure: 'Catàleg de Serveis', ourPacks: 'Els Nostres Packs', duration: 'Durada', hours: 'hores', idealFor: 'Ideal per', popular: 'MÉS POPULAR', premium: 'PREMIUM', extras: 'Extres Disponibles', from: 'des de', contactUs: 'Contacta\'ns', contactText: 'Tens dubtes? Escriu-nos sense compromís!' },
+    es: { brochure: 'Catálogo de Servicios', ourPacks: 'Nuestros Packs', duration: 'Duración', hours: 'horas', idealFor: 'Ideal para', popular: 'MÁS POPULAR', premium: 'PREMIUM', extras: 'Extras Disponibles', from: 'desde', contactUs: 'Contáctanos', contactText: '¿Tienes dudas? ¡Escríbenos sin compromiso!' },
+    en: { brochure: 'Service Catalog', ourPacks: 'Our Packages', duration: 'Duration', hours: 'hours', idealFor: 'Ideal for', popular: 'MOST POPULAR', premium: 'PREMIUM', extras: 'Available Extras', from: 'from', contactUs: 'Contact Us', contactText: 'Have questions? Contact us with no obligation!' },
   }[locale];
 
   doc.setFillColor(...COLORS.paperBg);
@@ -155,7 +155,7 @@ export async function generateServiceBrochure(
 
     // Preu destacat + "des de" a la dreta (zona lliure)
     setStyleCaption(doc);
-    doc.text('des de', px + packCardW - 4, py + 6, { align: 'right' });
+    doc.text(t.from, px + packCardW - 4, py + 6, { align: 'right' });
     setStylePrice(doc);
     doc.text(formatPdfMoney(pack.priceValue, locale), px + packCardW - 4, py + 13, { align: 'right' });
 
@@ -322,6 +322,8 @@ export async function generateQuotePDF(
       total: 'Total',
       validUntilPrefix: 'Validesa:',
       validUntilSuffix: 'dies',
+      validSeal: 'VÀLID',
+      from: 'des de',
       disclaimer: 'Preus sense IVA.',
       contact: 'Contacte',
       conditions: 'Condicions',
@@ -350,6 +352,8 @@ export async function generateQuotePDF(
       total: 'Total',
       validUntilPrefix: 'Validez:',
       validUntilSuffix: 'dias',
+      validSeal: 'VÁLIDO',
+      from: 'desde',
       disclaimer: 'Precios sin IVA.',
       contact: 'Contacto',
       conditions: 'Condiciones',
@@ -378,6 +382,8 @@ export async function generateQuotePDF(
       total: 'Total',
       validUntilPrefix: 'Validity:',
       validUntilSuffix: 'days',
+      validSeal: 'VALID',
+      from: 'from',
       disclaimer: 'Prices excl. VAT.',
       contact: 'Contact',
       conditions: 'Conditions',
@@ -752,12 +758,12 @@ export async function generateQuotePDF(
     doc.circle(sealCx, sealCy, 12, 'FD');
     doc.setTextColor(...COLORS.gold);
     setStyleLabel(doc);
-    doc.text('VÀLID', sealCx, sealCy - 3, { align: 'center' });
+    doc.text(t.validSeal, sealCx, sealCy - 3, { align: 'center' });
     setStyleValue(doc);
     doc.setTextColor(...COLORS.gold);
     doc.text(`${validityDays}`, sealCx, sealCy + 3, { align: 'center' });
     setStyleCaption(doc);
-    doc.text('dies', sealCx, sealCy + 7.5, { align: 'center' });
+    doc.text(t.validUntilSuffix, sealCx, sealCy + 7.5, { align: 'center' });
 
     // CTA 3 passos
     const steps = [
