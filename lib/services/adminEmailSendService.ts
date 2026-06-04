@@ -1,4 +1,5 @@
-import { sendEmail, getEmailSignatureHtml } from '@/lib/email';
+import { sendEmail } from '@/lib/email';
+import { getEmailSignatureHtml } from '@/lib/services/signatureService';
 import { fetchAttachmentPart } from '@/lib/imap';
 import { getManagedImageOverride } from '@/lib/services/imageManagerService';
 import { prisma } from '@/lib/prisma';
