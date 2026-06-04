@@ -2189,8 +2189,8 @@ export * from '../publicHomeShowcase';
 
 export const PDF_VALUE_ITEMS = [
   { title: 'Equip propi', body: 'So, llum i tècnic certificat inclosos a cada servei.' },
-  { title: 'Pla B garantit', body: 'Material de backup i protocol per a qualsevol imprevist.' },
-  { title: 'Un sol interlocutor', body: 'Des de la reserva fins al muntatge, la mateixa persona.' },
+  { title: 'Un sol interlocutor', body: 'La mateixa persona des de la reserva fins al muntatge.' },
+  { title: 'Sense sorpreses', body: 'Pressupost tancat. Sense costos ocults ni extres no pactats.' },
 ] as const;
 
 export const PDF_FILL_CONTACT_LABEL = 'Contacta\'ns per reservar la teva data';
