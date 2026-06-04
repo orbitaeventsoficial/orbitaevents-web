@@ -27,6 +27,7 @@ import { useConfiguratorLeadForm } from '@/lib/hooks/useConfiguratorLeadForm';
 import { useUtmParams } from '@/lib/hooks/useUtmParams';
 import { usePacks } from '@/lib/hooks/usePacks';
 import { filterCompatibleExtras } from '@/lib/extrasCompatibility';
+import { resolvePackI18nKey, resolvePackI18nFeatures } from '@/lib/pack-i18n';
 // jspdf carrega lazy — només quan l'usuari clica "Descarregar PDF"
 import TurnstileWidget from '@/components/security/TurnstileWidget';
 import { toIntlLocale } from '@/lib/constants';
@@ -690,7 +691,10 @@ export default function ConfiguradorClient() {
 
         <div className="grid md:grid-cols-3 gap-6">
           {packs.map((pack, packIndex) => {
-            const safeFeatures = pack.features || [];
+            const packName = resolvePackI18nKey(pack.name, locale);
+            const packTagline = resolvePackI18nKey(pack.tagline, locale);
+            const packIdeal = resolvePackI18nKey(pack.ideal, locale);
+            const safeFeatures = resolvePackI18nFeatures(pack.features, locale);
             return (
             <motion.div
               key={pack.id}
@@ -720,11 +724,11 @@ export default function ConfiguradorClient() {
               )}
 
               <div className="text-center mb-5 mt-2">
-                <h3 className="text-2xl font-bold text-white mb-1">{pack.name}</h3>
-                {pack.tagline && <p className="text-white/50 text-sm">{pack.tagline}</p>}
+                <h3 className="text-2xl font-bold text-white mb-1">{packName}</h3>
+                {packTagline && <p className="text-white/50 text-sm">{packTagline}</p>}
               </div>
-              {pack.ideal && (
-                <p className="text-white/40 text-xs mb-4 text-center">👥 {pack.ideal}</p>
+              {packIdeal && (
+                <p className="text-white/40 text-xs mb-4 text-center">👥 {packIdeal}</p>
               )}
 
               <div className="text-center mb-6 pb-5 border-b border-white/[0.06]">
@@ -734,7 +738,7 @@ export default function ConfiguradorClient() {
               </div>
 
               <ul className="space-y-2 mb-6">
-                {safeFeatures.slice(0, 4).map((feature: string, index: number) => (
+                {safeFeatures.slice(0, 4).map((feature, index) => (
                   <li key={`${pack.id}-feature-${index}`} className="flex items-start text-sm text-text-muted">
                     <Check className="w-4 h-4 text-oe-gold mr-2 mt-0.5 flex-shrink-0" />
                     <span>{feature}</span>
