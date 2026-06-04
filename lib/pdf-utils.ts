@@ -213,25 +213,16 @@ export async function generateServiceBrochure(
     y += Math.ceil(compatibleExtras.length / 2) * 10 + PDF_DESIGN.blockGap;
   }
 
-  // Omple fins al peu si hi ha espai
+  // Omple fins al peu: value items + bloc de contacte canònic
   if (y < PDF_FILL_BOTTOM - 28) {
     y = fillToFooter(doc, y, 'value');
   }
-
-  // ── CTA contacte (sempre al peu) ──────────────────────────────────────────
-  const ctaY = Math.min(y + 4, 262);
-  doc.setFillColor(...COLORS.blackSoft);
-  doc.roundedRect(PDF_DESIGN.left, ctaY, PDF_DESIGN.width, 14, 2, 2, 'F');
-  doc.setFillColor(...COLORS.gold);
-  doc.roundedRect(PDF_DESIGN.left, ctaY, 2.5, 14, 0.5, 0.5, 'F');
-  doc.setTextColor(...COLORS.white);
-  doc.setFontSize(PDF_DESIGN.type.section);
-  doc.setFont('helvetica', 'bold');
-  doc.text(t.contactUs, PDF_DESIGN.left + 8, ctaY + 6);
-  doc.setFontSize(PDF_DESIGN.type.small);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...COLORS.gold);
-  doc.text(t.contactText, PDF_DESIGN.left + 8, ctaY + 11.5);
+  if (y < PDF_FILL_BOTTOM - 24) {
+    fillToFooter(doc, y, 'contact');
+  } else if (y < PDF_FILL_BOTTOM - 8) {
+    const anchorY = PDF_FILL_BOTTOM - 22;
+    if (anchorY > y) fillToFooter(doc, anchorY, 'contact');
+  }
 
   addAllFooters(doc);
   return doc;
@@ -743,8 +734,11 @@ export async function generateQuotePDF(
   // Omple l'espai entre el contingut i la banda del CTA
   if (isFirstAndOnlyPage && canDrawCta && y < ctaReservedTop - 14) {
     fillToFooter(doc, y, 'value', undefined, ctaReservedTop);
-  } else if (isFirstAndOnlyPage && !canDrawCta && y < PDF_FILL_BOTTOM - 14) {
-    fillToFooter(doc, y, 'value', undefined, PDF_FILL_BOTTOM);
+  } else if (isFirstAndOnlyPage && !canDrawCta && y < PDF_FILL_BOTTOM - 24) {
+    fillToFooter(doc, y, 'contact');
+  } else if (isFirstAndOnlyPage && !canDrawCta && y < PDF_FILL_BOTTOM - 8) {
+    const anchorY = PDF_FILL_BOTTOM - 22;
+    if (anchorY > y) fillToFooter(doc, anchorY, 'contact');
   }
 
   // ── Segell de validesa + CTA 3 passos ─────────────────────────────────────
@@ -795,14 +789,6 @@ export async function generateQuotePDF(
       doc.text(labelLines.slice(0, 2), scx, scy + 9, { align: 'center' });
       sx += stepW + 12;
     }
-  }
-
-  // Bloc de contacte ancorat al peu (igual que factura)
-  if (y < PDF_FILL_BOTTOM - 24) {
-    fillToFooter(doc, y, 'contact');
-  } else if (y < PDF_FILL_BOTTOM - 8) {
-    const anchorY = PDF_FILL_BOTTOM - 22;
-    if (anchorY > y) fillToFooter(doc, anchorY, 'contact');
   }
 
   // Footers
@@ -1329,14 +1315,6 @@ export async function generateContractPDF(
   }
 
   y = providerBoxY + signatureBoxHeight + 6;
-
-  // Bloc de contacte ancorat al peu (igual que factura)
-  if (y < PDF_FILL_BOTTOM - 24) {
-    fillToFooter(doc, y, 'contact');
-  } else if (y < PDF_FILL_BOTTOM - 8) {
-    const anchorY = PDF_FILL_BOTTOM - 22;
-    if (anchorY > y) fillToFooter(doc, anchorY, 'contact');
-  }
 
   // -- Footer on all pages --
   const totalPages = doc.internal.pages.length - 1;
