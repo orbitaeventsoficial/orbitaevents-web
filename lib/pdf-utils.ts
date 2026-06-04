@@ -12,13 +12,18 @@ import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import type { DossierClientInfo } from '@/lib/utils/dossier-html-builder';
 import { getPacksByService, EXTRAS, type ExtraDefinition, type ServiceSlug, type PackDefinition } from '@/app/config/packs-config';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { resolvePackI18nKey, resolvePackI18nFeatures } from '@/lib/pack-i18n';
 import { log } from '@/lib/logger';
 import { toIntlLocale } from '@/lib/constants';
 import { filterCompatibleExtras } from '@/lib/extrasCompatibility';
-import { ORBITA_LOGO_BASE64 } from './logo-base64';
-import { ORBITA_LOGO_TEXT_DRETA_BASE64 } from './logo-wordmark-base64';
+import {
+  PDF_DESIGN, PDF_BODY_SIZE, PDF_FILL_BOTTOM,
+  drawCanonicalPdfFooter, drawCanonicalPdfHeader, drawCanonicalSectionTitle,
+  setStyleLabel, setStyleValue, setStyleBody, setStyleMuted, setStyleCaption, setStylePrice,
+  spacingDelta, fillToFooter,
+} from '@/lib/pdf-header';
 
-import { type jsPDFType, type PdfBrandingOptions, COLORS, PAGE, SERVICE_NAMES, normalizeWebsite, isDataUrl, getImageFormatFromDataUrl, fitWithin, formatClientDate } from '@/lib/pdf-config';
+import { type jsPDFType, type PdfBrandingOptions, COLORS, PAGE, SERVICE_NAMES, normalizeWebsite, isDataUrl, getImageFormatFromDataUrl, fitWithin, formatClientDate, formatPdfMoney } from '@/lib/pdf-config';
 
 let jsPDFModule: typeof import('jspdf') | null = null;
 
@@ -45,78 +50,16 @@ function checkPageBreak(
 
 function addHeader(doc: jsPDFType, title: string, branding?: PdfBrandingOptions): number {
   const brandName = branding?.brandName?.trim() || 'ÒRBITA EVENTS';
-  const logoSource = branding?.logoDataUrl || ORBITA_LOGO_BASE64;
-
-  doc.setFillColor(...COLORS.blackSoft);
-  doc.rect(0, 0, PAGE.width, 50, 'F');
-  doc.setFillColor(...COLORS.gold);
-  doc.rect(0, 0, 6, 50, 'F');
-  doc.setFillColor(...COLORS.gold);
-  doc.rect(0, 48, PAGE.width, 2, 'F');
-
-  let textStartX = 22;
-  if (logoSource && logoSource.length > 100) {
-    try {
-      doc.addImage(logoSource, 'PNG', 12, 6, 38, 38);
-      textStartX = 55;
-    } catch { /* fallback to text */ }
-  }
-
-  doc.setTextColor(...COLORS.gold);
-  doc.setFontSize(20);
-  doc.setFont('helvetica', 'bold');
-  doc.text(brandName.toUpperCase(), textStartX, 24);
-  doc.setTextColor(...COLORS.grayLight);
-  doc.setFontSize(10);
-  doc.text(title.toUpperCase(), textStartX, 38);
-
-  doc.setFillColor(...COLORS.gold);
-  doc.rect(175, 15, 22, 3, 'F');
-  doc.setFillColor(...COLORS.goldLight);
-  doc.rect(175, 20, 22, 3, 'F');
-  doc.setFillColor(...COLORS.goldDark);
-  doc.rect(175, 25, 22, 3, 'F');
-
-  return PAGE.marginTop;
+  return drawCanonicalPdfHeader(doc, {
+    title,
+    metaLines: [brandName.toUpperCase()],
+    logoDataUrl: branding?.logoDataUrl,
+  });
 }
 
 function addFooter(doc: jsPDFType, pageNum: number, totalPages: number, branding?: PdfBrandingOptions) {
   const website = normalizeWebsite(branding?.website?.trim() || SITE_CONFIG.web.url);
-  const contactEmail = branding?.contactEmail?.trim() || SITE_CONFIG.business.email;
-  const contactPhone = branding?.contactPhone?.trim() || SITE_CONFIG.business.phoneDisplay || SITE_CONFIG.business.phone;
-  const tagline = branding?.tagline?.trim() || "L'Esdeveniment Que La Teva Gent NO Oblidarà";
-
-  const footerY = PAGE.height - 35;
-  doc.setFillColor(...COLORS.bgLight);
-  doc.rect(0, footerY - 5, PAGE.width, 40, 'F');
-  doc.setDrawColor(...COLORS.gold);
-  doc.setLineWidth(0.8);
-  doc.line(PAGE.marginLeft, footerY, PAGE.width - PAGE.marginRight, footerY);
-
-  doc.setTextColor(...COLORS.grayDark);
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'bold');
-  doc.text(website, PAGE.marginLeft, footerY + 10);
-  doc.setFont('helvetica', 'normal');
-  doc.text(contactEmail, PAGE.marginLeft, footerY + 16);
-  doc.text(contactPhone, PAGE.marginLeft, footerY + 22);
-
-  doc.setTextColor(...COLORS.gray);
-  doc.text('Barcelona · Girona · Catalunya', PAGE.width / 2, footerY + 16, { align: 'center' });
-
-  doc.setTextColor(...COLORS.gold);
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'bold');
-  doc.text(`${pageNum}`, PAGE.width - PAGE.marginRight - 10, footerY + 13, { align: 'right' });
-  doc.setTextColor(...COLORS.gray);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.text(`/ ${totalPages}`, PAGE.width - PAGE.marginRight, footerY + 13, { align: 'right' });
-
-  doc.setTextColor(...COLORS.grayDark);
-  doc.setFontSize(7);
-  doc.setFont('helvetica', 'italic');
-  doc.text(tagline, PAGE.width / 2, footerY + 28, { align: 'center' });
+  drawCanonicalPdfFooter(doc, pageNum, totalPages, website);
 }
 
 function addAllFooters(doc: jsPDFType, branding?: PdfBrandingOptions) {
@@ -133,7 +76,11 @@ export async function generateServiceBrochure(
 ): Promise<jsPDFType> {
   const { default: jsPDF } = await getJsPDF();
   const doc = new jsPDF();
-  const packs = getPacksByService(service);
+  const packs = getPacksByService(service).map(p => ({
+    ...p,
+    name: resolvePackI18nKey(p.name, locale) || p.name,
+    features: resolvePackI18nFeatures(p.features, locale),
+  }));
   const serviceName = SERVICE_NAMES[service][locale];
 
   const t = {
@@ -142,124 +89,156 @@ export async function generateServiceBrochure(
     en: { brochure: 'Service Catalog', ourPacks: 'Our Packages', duration: 'Duration', hours: 'hours', idealFor: 'Ideal for', popular: 'MOST POPULAR', premium: 'PREMIUM', extras: 'Available Extras', contactUs: 'Contact Us', contactText: 'Have questions? Contact us with no obligation!' },
   }[locale];
 
-  const headerTitle = `${t.brochure} - ${serviceName}`;
-  let y = addHeader(doc, headerTitle);
-
-  doc.setTextColor(...COLORS.black);
-  doc.setFontSize(32);
-  doc.setFont('helvetica', 'bold');
-  doc.text(serviceName.toUpperCase(), PAGE.width / 2, y + 30, { align: 'center' });
-  doc.setDrawColor(...COLORS.gold);
-  doc.setLineWidth(2);
-  doc.line(60, y + 40, 150, y + 40);
-
-  y = y + 60;
-  doc.setTextColor(...COLORS.gold);
-  doc.setFontSize(18);
-  doc.setFont('helvetica', 'bold');
-  doc.text(t.ourPacks, PAGE.marginLeft, y);
-  y += 15;
-
-  const packCardHeight = 60;
-  packs.forEach((pack) => {
-    y = checkPageBreak(doc, y, packCardHeight + 10, headerTitle);
-    doc.setFillColor(245, 245, 245);
-    doc.roundedRect(15, y - 5, PAGE.contentWidth + 10, packCardHeight, 3, 3, 'F');
-    doc.setFillColor(...COLORS.gold);
-    doc.rect(15, y - 5, 2, packCardHeight, 'F');
-
-    if (pack.popular) {
-      doc.setFillColor(...COLORS.gold);
-      doc.roundedRect(150, y - 3, 40, 8, 2, 2, 'F');
-      doc.setTextColor(...COLORS.black);
-      doc.setFontSize(7);
-      doc.setFont('helvetica', 'bold');
-      doc.text(t.popular, 170, y + 3, { align: 'center' });
-    } else if (pack.highlight || pack.badge === 'Premium') {
-      doc.setFillColor(100, 100, 100);
-      doc.roundedRect(155, y - 3, 35, 8, 2, 2, 'F');
-      doc.setTextColor(...COLORS.white);
-      doc.setFontSize(7);
-      doc.setFont('helvetica', 'bold');
-      doc.text(t.premium, 172, y + 3, { align: 'center' });
-    }
-
-    doc.setFillColor(...COLORS.gold);
-    doc.circle(20, y + 8, 1.2, 'F');
-    doc.setTextColor(...COLORS.black);
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text(pack.name, 24, y + 8);
-    doc.setTextColor(...COLORS.gold);
-    doc.setFontSize(16);
-    doc.text(pack.price, 24, y + 20);
-    doc.setTextColor(...COLORS.gray);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`${t.duration}: ${pack.durationHours} ${t.hours}`, 60, y + 20);
-
-    doc.setTextColor(...COLORS.black);
-    doc.setFontSize(9);
-    pack.features.slice(0, 3).forEach((feature, i) => {
-      const cleanFeature = feature.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim();
-      const featureY = y + 30 + i * 6;
-      doc.setFillColor(...COLORS.gold);
-      doc.circle(20, featureY - 1.3, 1, 'F');
-      doc.setTextColor(...COLORS.black);
-      doc.text(cleanFeature.substring(0, 60), 24, featureY);
-    });
-
-    if (pack.ideal) {
-      doc.setTextColor(...COLORS.gray);
-      doc.setFontSize(8);
-      doc.text(`${t.idealFor}: ${pack.ideal}`, 24, y + 52);
-    }
-    y += packCardHeight + 10;
+  doc.setFillColor(...COLORS.paperBg);
+  doc.rect(0, 0, PAGE.width, PAGE.height, 'F');
+  let y = drawCanonicalPdfHeader(doc, {
+    title: t.brochure,
+    subtitle: serviceName,
+    ref: `SRV-${service.toUpperCase()}`,
   });
 
-  y = checkPageBreak(doc, y, 80, headerTitle);
+  // ── Hero ─────────────────────────────────────────────────────────────────
+  doc.setTextColor(...COLORS.paperText);
+  doc.setFontSize(PDF_DESIGN.type.display);
+  doc.setFont('helvetica', 'bold');
+  doc.text(serviceName, PDF_DESIGN.left, y + 12);
+  doc.setFillColor(...COLORS.gold);
+  doc.rect(PDF_DESIGN.left, y + 15, 28, 0.8, 'F');
+  setStyleMuted(doc);
+  doc.setFont('helvetica', 'italic');
+  doc.text(t.contactText, PDF_DESIGN.left, y + 23);
+  y += 32;
+  y = drawCanonicalSectionTitle(doc, y, t.ourPacks);
+
+  // Targetes de pack — graella horitzontal quan ≤4 packs
+  const packGrid = packs.length <= 4;
+  const packCols = packGrid ? packs.length : 1;
+  const packGap = 4;
+  const packCardW = packGrid
+    ? (PDF_DESIGN.width - packGap * (packCols - 1)) / packCols
+    : PDF_DESIGN.width;
+  const packCardHeight = packGrid ? 58 : 43;
+  const gridRowH = packCardHeight + packGap;
+  const gridRows = Math.ceil(packs.length / packCols);
+
+  y = checkPageBreak(doc, y, gridRows * gridRowH + 4, `${t.brochure} · ${serviceName}`);
+
+  packs.forEach((pack, idx) => {
+    const col = packGrid ? idx % packCols : 0;
+    const row = packGrid ? Math.floor(idx / packCols) : idx;
+    const px = PDF_DESIGN.left + col * (packCardW + packGap);
+    const py = y + row * gridRowH;
+
+    const isPopular = pack.popular;
+    const isPremium = pack.highlight || pack.badge === 'Premium';
+
+    doc.setFillColor(...COLORS.white);
+    doc.setDrawColor(isPopular ? COLORS.gold[0] : COLORS.grayLight[0], isPopular ? COLORS.gold[1] : COLORS.grayLight[1], isPopular ? COLORS.gold[2] : COLORS.grayLight[2]);
+    doc.setLineWidth(isPopular ? 0.5 : 0.25);
+    doc.roundedRect(px, py, packCardW, packCardHeight, 2, 2, 'FD');
+
+    // Banda superior accent
+    doc.setFillColor(...COLORS.gold);
+    doc.roundedRect(px, py, packCardW, 1.5, 0.8, 0.8, 'F');
+
+    // Badge popular/premium — cantonada SUPERIOR ESQUERRA (no xoca amb preu)
+    if (isPopular || isPremium) {
+      const badgeText = isPopular ? t.popular : t.premium;
+      doc.setFontSize(PDF_DESIGN.type.caption);
+      doc.setFont('helvetica', 'bold');
+      const badgeW = doc.getTextWidth(badgeText) + 6;
+      doc.setFillColor(...(isPopular ? COLORS.gold : COLORS.paperText));
+      doc.roundedRect(px + 5, py + 4, badgeW, 5.5, 1.2, 1.2, 'F');
+      doc.setTextColor(...(isPopular ? COLORS.blackSoft : COLORS.white));
+      doc.text(badgeText, px + 5 + badgeW / 2, py + 7.9, { align: 'center' });
+    }
+
+    // Preu destacat + "des de" a la dreta (zona lliure)
+    setStyleCaption(doc);
+    doc.text('des de', px + packCardW - 4, py + 6, { align: 'right' });
+    setStylePrice(doc);
+    doc.text(formatPdfMoney(pack.priceValue, locale), px + packCardW - 4, py + 13, { align: 'right' });
+
+    // Nom pack (baixat per fer lloc al badge si existeix)
+    const nameTopY = (isPopular || isPremium) ? py + 14 : py + 11;
+    setStyleValue(doc);
+    const packNameLines = doc.splitTextToSize(pack.name, packCardW - 10).slice(0, 2);
+    doc.text(packNameLines, px + 5, nameTopY);
+
+    // Durada
+    setStyleCaption(doc);
+    doc.text(`${pack.durationHours} ${t.hours}`, px + 5, nameTopY + packNameLines.length * 5.5);
+
+    // Features amb truncament per amplada real + el·lipsi
+    const featureStart = nameTopY + 12 + (packNameLines.length - 1) * 5.5;
+    const maxF = packGrid ? 4 : 3;
+    const featTextW = packCardW - 14;
+    pack.features.slice(0, maxF).forEach((feature, i) => {
+      const cleanFeature = feature.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim();
+      const fy = featureStart + i * 5.5;
+      doc.setFillColor(...COLORS.gold);
+      doc.circle(px + 6, fy - 1.2, 0.8, 'F');
+      setStyleBody(doc);
+      const featLines = doc.splitTextToSize(cleanFeature, featTextW);
+      let featText = featLines.length > 1
+        ? featLines[0].replace(/\s+\S*$/, '') + '…'
+        : featLines[0];
+      while (featLines.length > 1 && doc.getTextWidth(featText) > featTextW && featText.length > 2) {
+        featText = featText.slice(0, -2) + '…';
+      }
+      doc.text(featText, px + 10, fy);
+    });
+
+    if (!packGrid) y += packCardHeight + PDF_DESIGN.blockGap;
+  });
+
+  if (packGrid) y += gridRows * gridRowH + PDF_DESIGN.blockGap;
+
+  y = checkPageBreak(doc, y, 54, `${t.brochure} · ${serviceName}`);
   const compatibleExtras = filterCompatibleExtras(EXTRAS, service).slice(0, 8);
 
   if (compatibleExtras.length > 0) {
-    doc.setTextColor(...COLORS.gold);
-    doc.setFontSize(16);
-    doc.setFont('helvetica', 'bold');
-    doc.text(t.extras, PAGE.marginLeft, y + 10);
-    y += 25;
-    doc.setTextColor(...COLORS.black);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-
+    y = drawCanonicalSectionTitle(doc, y, t.extras);
     compatibleExtras.forEach((extra, i) => {
-      if (i > 0 && i % 4 === 0) y = checkPageBreak(doc, y, 30, headerTitle);
-      const col = i % 2 === 0 ? PAGE.marginLeft : 110;
-      const row = Math.floor((i % 4) / 2) * 14;
-      const priceText = extra.price ? `${extra.price}€` : 'Consultar';
+      if (i > 0 && i % 4 === 0) y = checkPageBreak(doc, y, 30, `${t.brochure} · ${serviceName}`);
+      const col = i % 2 === 0 ? PDF_DESIGN.left : 108;
+      const row = Math.floor((i % 4) / 2) * 10;
+      const priceText = extra.price ? formatPdfMoney(extra.price, locale) : 'Consultar';
+      const extraName = resolvePackI18nKey(extra.name, locale) || extra.name;
       doc.setFillColor(...COLORS.gold);
-      doc.circle(col, y + row - 1.3, 1, 'F');
-      doc.setTextColor(...COLORS.black);
-      doc.text(`${extra.name} (${priceText})`, col + 4, y + row);
+      doc.circle(col, y + row - 1.3, 0.8, 'F');
+      setStyleBody(doc);
+      doc.text(`${extraName} (${priceText})`, col + 4, y + row);
     });
-    y += Math.ceil(compatibleExtras.length / 2) * 14 + 10;
+    y += Math.ceil(compatibleExtras.length / 2) * 10 + PDF_DESIGN.blockGap;
   }
 
-  y = checkPageBreak(doc, y, 40, headerTitle);
-  const contactY = Math.min(y + 10, PAGE.safeBottom - 35);
+  // Omple fins al peu si hi ha espai
+  if (y < PDF_FILL_BOTTOM - 28) {
+    y = fillToFooter(doc, y, 'value');
+  }
+
+  // ── CTA contacte (sempre al peu) ──────────────────────────────────────────
+  const ctaY = Math.min(y + 4, 262);
+  doc.setFillColor(...COLORS.blackSoft);
+  doc.roundedRect(PDF_DESIGN.left, ctaY, PDF_DESIGN.width, 14, 2, 2, 'F');
   doc.setFillColor(...COLORS.gold);
-  doc.roundedRect(15, contactY, PAGE.contentWidth + 10, 28, 3, 3, 'F');
-  doc.setTextColor(...COLORS.black);
-  doc.setFontSize(12);
+  doc.roundedRect(PDF_DESIGN.left, ctaY, 2.5, 14, 0.5, 0.5, 'F');
+  doc.setTextColor(...COLORS.white);
+  doc.setFontSize(PDF_DESIGN.type.section);
   doc.setFont('helvetica', 'bold');
-  doc.text(t.contactUs, PAGE.width / 2, contactY + 11, { align: 'center' });
-  doc.setFontSize(10);
+  doc.text(t.contactUs, PDF_DESIGN.left + 8, ctaY + 6);
+  doc.setFontSize(PDF_DESIGN.type.small);
   doc.setFont('helvetica', 'normal');
-  doc.text(t.contactText, PAGE.width / 2, contactY + 20, { align: 'center' });
+  doc.setTextColor(...COLORS.gold);
+  doc.text(t.contactText, PDF_DESIGN.left + 8, ctaY + 11.5);
 
   addAllFooters(doc);
   return doc;
 }
 
 export interface QuoteData {
+  reference?: string;
   eventType: string;
   pack: PackDefinition;
   date: string;
@@ -296,6 +275,20 @@ export interface QuoteData {
   whyChooseUs?: string;
   /** Data d'emissió opcional. Si no es proporciona, usa la data actual. */
   issueDate?: string;
+}
+
+type PdfDateInput = Date | string;
+
+function formatPdfDateInput(value: PdfDateInput, locale: 'ca' | 'es' | 'en'): string {
+  if (typeof value === 'string') {
+    const formatted = formatClientDate(value, locale);
+    return formatted === 'Invalid Date' ? value : formatted;
+  }
+  return new Date(value).toLocaleDateString(toIntlLocale(locale), {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 }
 
 export async function generateQuotePDF(
@@ -394,31 +387,50 @@ export async function generateQuotePDF(
     },
   }[locale];
 
-  const neutral = [241, 245, 249] as [number, number, number];
-  const muted = [148, 163, 184] as [number, number, number];
-  const border = [51, 65, 85] as [number, number, number];
-  const surface = [24, 28, 33] as [number, number, number];
-  const surfaceSoft = [29, 34, 40] as [number, number, number];
-  const accent = [212, 175, 55] as [number, number, number];
+  // PDF clar: fons blanc, text fosc, accent or — visible arreu
+  const neutral     = COLORS.paperText;
+  const muted       = COLORS.paperMuted;
+  const border      = COLORS.grayLight;
+  const surface     = COLORS.surfaceWarm;
+  const surfaceSoft = COLORS.white;
+  const accent      = COLORS.gold;
 
-  const left = 14;
-  const contentWidth = 182;
-  const pageBottom = 255;
+
+
+
+
+
+
+  const left = PDF_DESIGN.left;
+  const contentWidth = PDF_DESIGN.width;
+  const pageBottom = PDF_DESIGN.contentBottom;
   const lineHeight = 5;
   let y = 16;
 
-  const quoteRef = `OE-${Date.now().toString(36).toUpperCase()}`;
+  const quoteRef = data.reference || '-';
   const issueDate = data.issueDate
-    ? new Date(data.issueDate).toLocaleDateString(toIntlLocale(locale))
+    ? formatClientDate(data.issueDate, locale)
     : new Date().toLocaleDateString(toIntlLocale(locale));
+
+  // Resolució de claus i18n dels packs
+  const resolvedPack = {
+    ...data.pack,
+    name: resolvePackI18nKey(data.pack.name, locale) || data.pack.name,
+    features: resolvePackI18nFeatures(data.pack.features, locale),
+  };
   const eventTypeName = SERVICE_NAMES[data.eventType as ServiceSlug]?.[locale] || data.eventType;
   const eventDate = formatClientDate(data.date || '-', locale);
   const eventSchedule = data.eventSchedule?.trim() || '-';
   const eventLocation = data.eventLocation?.trim() || '-';
-  const brandName = branding?.brandName?.trim() || 'Orbita Events';
   const validityDays = Math.max(1, Math.round(data.validityDays || 15));
+  const contentDensity =
+    Math.min(6, resolvedPack.features.length) +
+    Math.min(6, data.extras.length) +
+    Math.min(6, data.conditions?.length || 0) +
+    (data.whyChooseUs?.trim() ? 3 : 0);
+  const adaptiveGap = PDF_DESIGN.blockGap;
 
-  doc.setFillColor(18, 20, 24);
+  doc.setFillColor(...COLORS.paperBg);
   doc.rect(0, 0, PAGE.width, PAGE.height, 'F');
 
   const drawLabelValue = (
@@ -429,13 +441,9 @@ export async function generateQuotePDF(
     width: number,
     maxLines = 3
   ): number => {
-    doc.setTextColor(...muted);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7.5);
+    setStyleLabel(doc);
     doc.text(label.toUpperCase(), x, top);
-    doc.setTextColor(...neutral);
-    doc.setFontSize(10.5);
-    doc.setFont('helvetica', 'bold');
+    setStyleValue(doc);
     const lines = doc.splitTextToSize(value || '-', width).slice(0, maxLines);
     doc.text(lines, x, top + 6);
     return lines.length;
@@ -447,71 +455,35 @@ export async function generateQuotePDF(
     width: number,
     height: number,
     rounded = 2,
-    soft = false
+    soft = false,
+    noBar = false,
   ) => {
     doc.setFillColor(...(soft ? surfaceSoft : surface));
     doc.roundedRect(x, top, width, height, rounded, rounded, 'F');
     doc.setDrawColor(...border);
     doc.roundedRect(x, top, width, height, rounded, rounded, 'S');
-    doc.setFillColor(...accent);
-    doc.roundedRect(x, top + 1.5, 1.4, Math.max(2, height - 3), 0.8, 0.8, 'F');
+    if (!noBar) {
+      doc.setFillColor(...accent);
+      doc.roundedRect(x, top + 1.5, 1.2, Math.max(2, height - 3), 0.6, 0.6, 'F');
+    }
   };
 
   const drawHeader = (compact: boolean) => {
-    // Header alt augmentat (26→32mm) perquè el logo càpiga sencer i visible.
-    // Caixa logo de 52×14mm passa a 52×22mm — un planeta quadrat es veu a 22×22 (abans 14×14).
-    const headerHeight = compact ? 16 : 32;
-    drawCard(left, y, contentWidth, headerHeight, 3, true);
-
-    const logoSource = branding?.logoDataUrl || ORBITA_LOGO_TEXT_DRETA_BASE64 || ORBITA_LOGO_BASE64;
-    const hasLogo = typeof logoSource === 'string' && logoSource.length > 100;
-    let logoBlockWidth = 0;
-
-    if (!compact && hasLogo) {
-      try {
-        const fmt = getImageFormatFromDataUrl(logoSource);
-        const props = doc.getImageProperties(logoSource);
-        const fitted = fitWithin(props.width, props.height, 52, 22);
-        const logoX = left + 5;
-        const logoY = y + (headerHeight - fitted.height) / 2;
-        doc.addImage(logoSource, fmt, logoX, logoY, fitted.width, fitted.height);
-        logoBlockWidth = fitted.width + 8;
-      } catch {
-        // Ignore logo errors and keep text branding.
-      }
-    }
-
-    const titleXRaw = hasLogo ? left + Math.max(21, logoBlockWidth + 5) : left + 6;
-    const titleX = Math.min(titleXRaw, left + 96);
-    doc.setTextColor(...neutral);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(compact ? 10.5 : 15);
-    const brandLine = doc.splitTextToSize(brandName, 78)[0] || brandName;
-    doc.text(brandLine, titleX, y + (compact ? 9 : 13));
-    if (!compact) {
-      doc.setTextColor(...accent);
-      doc.setFontSize(10);
-      doc.text(t.quote.toUpperCase(), titleX, y + 22);
-    }
-
-    doc.setTextColor(...muted);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.text(`${t.quoteRef}: ${quoteRef}`, left + contentWidth - 6, y + (compact ? 7 : 10), { align: 'right' });
-    doc.text(`${t.issueDate}: ${issueDate}`, left + contentWidth - 6, y + (compact ? 11 : 16), { align: 'right' });
-    if (!compact) {
-      doc.text(`${t.validUntilPrefix} ${validityDays} ${t.validUntilSuffix}`, left + contentWidth - 6, y + 22, { align: 'right' });
-    }
-
-    y += headerHeight + 8;
+    y = drawCanonicalPdfHeader(doc, {
+      title: t.quote,
+      subtitle: eventTypeName,
+      ref: compact
+        ? `${quoteRef} · ${issueDate}`
+        : `${quoteRef} · ${issueDate} · ${t.validUntilPrefix} ${validityDays} ${t.validUntilSuffix}`,
+      logoDataUrl: branding?.logoDataUrl,
+    });
   };
 
   const ensureSpace = (space: number): boolean => {
     // Never truncate: if content doesn't fit, continue on a new page.
     if (y + space <= pageBottom) return true;
     doc.addPage();
-    // Dark background for the new page
-    doc.setFillColor(18, 20, 24);
+    doc.setFillColor(...COLORS.paperBg);
     doc.rect(0, 0, PAGE.width, PAGE.height, 'F');
     drawHeader(true);
     return y + space <= pageBottom;
@@ -519,15 +491,7 @@ export async function generateQuotePDF(
 
   const drawFooter = () => {
     const website = normalizeWebsite(branding?.website?.trim() || SITE_CONFIG.web.url);
-    const email = branding?.contactEmail?.trim() || SITE_CONFIG.business.email;
-    const phone = branding?.contactPhone?.trim() || SITE_CONFIG.business.phoneDisplay || SITE_CONFIG.business.phone;
-    doc.setDrawColor(...border);
-    doc.line(left, 278, left + contentWidth, 278);
-    doc.setTextColor(...muted);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7);
-    doc.text(`${t.disclaimer} · ${t.validUntilPrefix} ${validityDays} ${t.validUntilSuffix}`, left, 282.5);
-    doc.text(`${website} · ${email} · ${phone}`, left, 286.5);
+    drawCanonicalPdfFooter(doc, 1, 1, `${t.disclaimer} · ${website}`);
   };
 
   drawHeader(false);
@@ -541,7 +505,7 @@ export async function generateQuotePDF(
   drawCard(left, y, contentWidth, clientBoxHeight, 2, true);
   drawLabelValue('Client', clientValue, left + 4, y + 6, 70, 3);
   drawLabelValue(t.contact, contactValue, left + 88, y + 6, 85, 3);
-  y += clientBoxHeight + 8;
+  y += clientBoxHeight + adaptiveGap;
 
   ensureSpace(30);
   const eventDetailsText = [eventTypeName, `${t.location}: ${eventLocation}`, `${t.schedule}: ${eventSchedule}`].join('\n');
@@ -558,30 +522,29 @@ export async function generateQuotePDF(
   drawLabelValue(t.eventDetails, eventDetailsText, left + 4, y + 6, 80, 5);
   const dateUsed = drawLabelValue(t.eventDate, eventDate, left + 88, y + 6, 85, 3);
   drawLabelValue(t.guests, `${Math.max(0, data.guests)}`, left + 88, y + 6 + fieldHeight(dateUsed) + 2.5, 85, 2);
-  y += eventBoxHeight + 7;
+  y += eventBoxHeight + adaptiveGap;
 
-  const packNameLines = doc.splitTextToSize(data.pack.name, 126).slice(0, 2);
+  const packNameLines = doc.splitTextToSize(resolvedPack.name, 126).slice(0, 2);
   const packInfoHeight = 22 + (packNameLines.length - 1) * 4.6;
-  ensureSpace(packInfoHeight + 7);
+  ensureSpace(packInfoHeight + adaptiveGap);
   drawCard(left, y - 3, contentWidth, packInfoHeight + 3, 2, false);
-  doc.setTextColor(...accent);
+  doc.setTextColor(...muted);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10.5);
+  doc.setFontSize(PDF_DESIGN.type.caption);
   doc.text(t.selectedPack.toUpperCase(), left + 4, y + 2);
   y += 7.5;
   doc.setTextColor(...neutral);
-  doc.setFontSize(13);
+  doc.setFontSize(PDF_DESIGN.type.title);
   doc.text(packNameLines, left + 4, y);
-  doc.setFontSize(10);
-  doc.setTextColor(...muted);
-  doc.text(`${data.pack.durationHours} ${t.hours}`, left + 4, y + 7.5 + (packNameLines.length - 1) * 4.6);
+  setStyleMuted(doc);
+  doc.text(`${resolvedPack.durationHours} ${t.hours}`, left + 4, y + 7.5 + (packNameLines.length - 1) * 4.6);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...accent);
-  doc.setFontSize(16);
-  doc.text(`${data.basePrice.toFixed(2)}€`, left + contentWidth - 4, y + 2, { align: 'right' });
+  doc.setTextColor(...neutral);
+  doc.setFontSize(PDF_DESIGN.type.money);
+  doc.text(formatPdfMoney(data.basePrice, locale), left + contentWidth - 4, y + 2, { align: 'right' });
   y += 14.5 + (packNameLines.length - 1) * 4.6;
 
-  const features = data.pack.features
+  const features = resolvedPack.features
     .map((feature) => feature.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim())
     .filter(Boolean)
     .slice(0, 6);
@@ -591,24 +554,17 @@ export async function generateQuotePDF(
     const featureLinesTotal = featureRows.reduce((sum, n) => sum + n, 0);
     const featuresBoxHeight = 12 + featureLinesTotal * lineHeight + 4;
     ensureSpace(featuresBoxHeight + 2);
-    drawCard(left, y - 4, contentWidth, featuresBoxHeight, 2, false);
-    doc.setTextColor(...accent);
-    doc.setFontSize(9.5);
-    doc.setFont('helvetica', 'bold');
-    doc.text(t.features, left + 4, y);
-    y += 6;
-    doc.setTextColor(...neutral);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
+    drawCard(left, y - 4, contentWidth, featuresBoxHeight, 2, false, true);
+    y = drawCanonicalSectionTitle(doc, y - 2, t.features);
     for (const feature of features) {
-      ensureSpace(lineHeight + 1);
       doc.setFillColor(...accent);
       doc.circle(left + 5.5, y - 1.25, 0.95, 'F');
+      setStyleBody(doc);
       const lines = doc.splitTextToSize(feature, 170).slice(0, 2);
       doc.text(lines, left + 9, y);
       y += lineHeight * lines.length;
     }
-    y += 3;
+    y += PDF_DESIGN.blockGap;
   }
 
   if (data.extras.length > 0) {
@@ -617,31 +573,21 @@ export async function generateQuotePDF(
     const extrasLinesTotal = extraLineCounts.reduce((sum, n) => sum + n, 0);
     const extrasBoxHeight = 12 + extrasLinesTotal * lineHeight + 4;
     ensureSpace(extrasBoxHeight + 2);
-    drawCard(left, y - 4, contentWidth, extrasBoxHeight, 2, false);
-    doc.setTextColor(...accent);
-    doc.setFontSize(9.5);
-    doc.setFont('helvetica', 'bold');
-    doc.text(t.extras, left + 4, y);
-    y += 6;
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...neutral);
-    doc.setFontSize(9);
+    drawCard(left, y - 4, contentWidth, extrasBoxHeight, 2, false, true);
+    y = drawCanonicalSectionTitle(doc, y - 2, t.extras);
     for (const extraName of extrasRows) {
       const extra = extrasCatalog.find((item) => item.name === extraName || item.id === extraName);
       const priceText = typeof extra?.price === 'number' ? `+${extra.price}€` : '';
-      ensureSpace(lineHeight + 1);
+      setStyleBody(doc);
       const lines = doc.splitTextToSize(extraName, 145).slice(0, 2);
       doc.text(lines, left + 4, y);
       if (priceText) {
-        doc.setTextColor(...accent);
-        doc.setFont('helvetica', 'bold');
+        setStyleValue(doc);
         doc.text(priceText, left + contentWidth, y, { align: 'right' });
-        doc.setTextColor(...neutral);
-        doc.setFont('helvetica', 'normal');
       }
       y += lineHeight * lines.length;
     }
-    y += 3;
+    y += PDF_DESIGN.blockGap;
   }
 
   const discountReasonLines =
@@ -677,98 +623,97 @@ export async function generateQuotePDF(
   const conditionLinesTotal = conditionLineCounts.reduce((sum, n) => sum + n, 0);
   const conditionHeight = conditions.length > 0 ? 12 + conditionLinesTotal * lineHeight + 4 : 0;
 
-  // Keep summary and conditions together when possible to avoid awkward page splits.
-  ensureSpace(summaryHeight + 7 + (conditionHeight > 0 ? conditionHeight + 2 : 0));
-
+  // El resum pot quedar al primer full encara que les condicions necessitin continuar.
   ensureSpace(summaryHeight + 4);
   drawCard(left, y, contentWidth, summaryHeight, 2, true);
-  doc.setTextColor(...accent);
+  doc.setTextColor(...neutral);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9.5);
-  doc.text(t.priceSummary, left + 4, y + 7);
+  doc.setFontSize(PDF_DESIGN.type.section);
+  doc.text(t.priceSummary.toUpperCase(), left + 4, y + 7);
 
   let priceY = y + summaryTopPadding + 3;
-  doc.setTextColor(...neutral);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
+  setStyleBody(doc);
   doc.text(t.basePack, left + 4, priceY);
-  doc.text(`${data.basePrice.toFixed(2)}€`, left + contentWidth - 4, priceY, { align: 'right' });
+  doc.text(formatPdfMoney(data.basePrice, locale), left + contentWidth - 4, priceY, { align: 'right' });
   priceY += summaryRowGap;
   doc.text(t.extrasTotal, left + 4, priceY);
-  doc.text(`${data.extrasPrice.toFixed(2)}€`, left + contentWidth - 4, priceY, { align: 'right' });
+  doc.text(formatPdfMoney(data.extrasPrice, locale), left + contentWidth - 4, priceY, { align: 'right' });
   if (hasSeason) {
     priceY += summaryRowGap;
+    setStyleBody(doc);
     doc.text(data.seasonLabel!, left + 4, priceY);
-    doc.text(`+${(data.seasonSurcharge ?? 0).toFixed(2)}€`, left + contentWidth - 4, priceY, { align: 'right' });
+    doc.text(`+${formatPdfMoney(data.seasonSurcharge ?? 0, locale)}`, left + contentWidth - 4, priceY, { align: 'right' });
     if (seasonDetailVisible) {
       priceY += 4.2;
-      doc.setTextColor(...muted);
-      doc.setFontSize(7.5);
+      setStyleCaption(doc);
       doc.text(`+${data.seasonPct!.toFixed(0)}% sobre el preu base`, left + 4, priceY);
-      doc.setTextColor(...neutral);
-      doc.setFontSize(9);
+      setStyleBody(doc);
     }
   }
   if (hasTravel) {
     priceY += summaryRowGap;
+    setStyleBody(doc);
     doc.text(t.travel, left + 4, priceY);
-    doc.text(`${(data.travelCharge ?? 0).toFixed(2)}€`, left + contentWidth - 4, priceY, { align: 'right' });
+    doc.text(formatPdfMoney(data.travelCharge ?? 0, locale), left + contentWidth - 4, priceY, { align: 'right' });
     if (travelDetailVisible) {
       priceY += 4.2;
       doc.setTextColor(...muted);
-      doc.setFontSize(7.5);
+      doc.setFontSize(PDF_DESIGN.type.small);
       doc.text(
         t.travelDetail(data.travelKm!, data.billableTravelKm!, data.travelBlocks!),
         left + 4,
         priceY,
       );
-      doc.setTextColor(...neutral);
-      doc.setFontSize(9);
+      setStyleBody(doc);
     }
   }
   if (data.discount > 0) {
     priceY += summaryRowGap;
+    setStyleBody(doc);
+    doc.setTextColor(...COLORS.success);
     doc.text(t.discount, left + 4, priceY);
-    doc.text(`-${data.discount.toFixed(2)}€`, left + contentWidth - 4, priceY, { align: 'right' });
+    doc.text(`-${formatPdfMoney(data.discount, locale)}`, left + contentWidth - 4, priceY, { align: 'right' });
+    doc.setTextColor(...COLORS.paperText);
 
     const reason = data.discountReason?.trim();
     if (reason) {
       priceY += 4.2;
-      doc.setTextColor(...muted);
-      doc.setFontSize(7.5);
+      setStyleCaption(doc);
       const reasonLines = doc.splitTextToSize(reason, 120).slice(0, 2);
       doc.text(reasonLines, left + 4, priceY);
-      doc.setTextColor(...neutral);
-      doc.setFontSize(9);
+      setStyleBody(doc);
       priceY += 3.8 * reasonLines.length;
     }
   }
   priceY += 6;
   doc.setDrawColor(...border);
   doc.line(left + 4, priceY - 3, left + contentWidth - 4, priceY - 3);
-  doc.setFillColor(34, 31, 10);
-  doc.roundedRect(left + 3, priceY - 0.5, contentWidth - 6, 8.5, 1.6, 1.6, 'F');
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(13);
-  doc.setTextColor(...accent);
-  doc.text(t.total.toUpperCase(), left + 6, priceY + 5.4);
-  doc.setFontSize(18);
-  doc.text(`${data.total.toFixed(2)}€`, left + contentWidth - 6, priceY + 5.7, { align: 'right' });
-  y += summaryHeight + 7;
+  // TOTAL: targeta fosca dramàtica
+  doc.setFillColor(...COLORS.blackSoft);
+  doc.roundedRect(left + 3, priceY - 0.5, contentWidth - 6, 10, 1.6, 1.6, 'F');
+  // Banda lateral or
+  doc.setFillColor(...COLORS.gold);
+  doc.roundedRect(left + 3, priceY - 0.5, 2.5, 10, 0.5, 0.5, 'F');
+  setStyleValue(doc);
+  doc.setTextColor(...COLORS.gold);
+  doc.text(t.total.toUpperCase(), left + 9, priceY + 5.8);
+  setStylePrice(doc);
+  doc.setTextColor(...COLORS.white);
+  doc.text(formatPdfMoney(data.total, locale), left + contentWidth - 6, priceY + 7.2, { align: 'right' });
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(PDF_DESIGN.type.small);
+  doc.setTextColor(...COLORS.grayLight);
+  doc.text(t.disclaimer, left + 9, priceY + 11);
+  y += summaryHeight + adaptiveGap;
 
-  if (conditions.length > 0) {
-    ensureSpace(conditionHeight + 2);
-    drawCard(left, y - 4, contentWidth, conditionHeight, 2, false);
-    doc.setTextColor(...accent);
-    doc.setFontSize(9.5);
-    doc.setFont('helvetica', 'bold');
-    doc.text(t.conditions, left + 4, y);
-    y += 6.5;
+  // Les condicions són un resum opcional: no han d'obrir un full gairebé buit.
+  if (conditions.length > 0 && y + conditionHeight + 2 <= pageBottom) {
+    drawCard(left, y - 4, contentWidth, conditionHeight, 2, false, true);
+    y = drawCanonicalSectionTitle(doc, y - 2, t.conditions);
     doc.setTextColor(...neutral);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.2);
+    doc.setFontSize(PDF_BODY_SIZE);
     for (const condition of conditions) {
-      ensureSpace(lineHeight + 1);
       const lines = doc.splitTextToSize(`• ${condition}`, 175).slice(0, 2);
       doc.text(lines, left + 4, y);
       y += lineHeight * lines.length;
@@ -779,24 +724,84 @@ export async function generateQuotePDF(
   if (data.whyChooseUs?.trim()) {
     const whyLines = doc.splitTextToSize(data.whyChooseUs.trim(), 174).slice(0, 3);
     const boxHeight = 12 + whyLines.length * lineHeight;
-    ensureSpace(boxHeight + 1);
-    drawCard(left, y, contentWidth, boxHeight, 2, true);
-    doc.setTextColor(...accent);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9.5);
-    doc.text(t.whyChooseUs, left + 4, y + 6);
-    doc.setTextColor(...neutral);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.2);
-    doc.text(whyLines, left + 4, y + 11);
-    y += boxHeight + 1.5;
+    if (y + boxHeight + 1 <= pageBottom) {
+      drawCard(left, y, contentWidth, boxHeight, 2, true);
+      y = drawCanonicalSectionTitle(doc, y, t.whyChooseUs);
+      setStyleBody(doc);
+      doc.text(whyLines, left + 4, y);
+      y += whyLines.length * lineHeight + 1.5;
+    }
   }
 
-  // Add footer to ALL pages (not just the last one)
+  // CTA 3 passos: banda fixa al peu (y=230..258). Es pinta sempre que cap a la 1a pàg.
+  const isFirstAndOnlyPage = doc.internal.pages.length - 1 === 1;
+  const footerZoneStart = 258;
+  const ctaReservedTop = 230;  // CTA ocupa 230..258 (28mm)
+  const canDrawCta = isFirstAndOnlyPage && y <= ctaReservedTop;
+
+  // Omple l'espai entre el contingut i la banda del CTA
+  if (isFirstAndOnlyPage && canDrawCta && y < ctaReservedTop - 14) {
+    fillToFooter(doc, y, 'value', undefined, ctaReservedTop);
+  } else if (isFirstAndOnlyPage && !canDrawCta && y < PDF_FILL_BOTTOM - 14) {
+    fillToFooter(doc, y, 'value', undefined, PDF_FILL_BOTTOM);
+  }
+
+  // ── Segell de validesa + CTA 3 passos ─────────────────────────────────────
+  if (canDrawCta) {
+    // Segell circular validesa
+    const sealCx = left + contentWidth - 14;
+    const sealCy = footerZoneStart - 12;
+    doc.setFillColor(...COLORS.white);
+    doc.setDrawColor(...COLORS.gold);
+    doc.setLineWidth(0.5);
+    doc.circle(sealCx, sealCy, 12, 'FD');
+    doc.setTextColor(...COLORS.gold);
+    setStyleLabel(doc);
+    doc.text('VÀLID', sealCx, sealCy - 3, { align: 'center' });
+    setStyleValue(doc);
+    doc.setTextColor(...COLORS.gold);
+    doc.text(`${validityDays}`, sealCx, sealCy + 3, { align: 'center' });
+    setStyleCaption(doc);
+    doc.text('dies', sealCx, sealCy + 7.5, { align: 'center' });
+
+    // CTA 3 passos
+    const steps = [
+      { num: '1', label: 'Accepta el pressupost' },
+      { num: '2', label: 'Reserva amb dipòsit' },
+      { num: '3', label: 'El teu event assegurat' },
+    ];
+    const stepW = (contentWidth - 36) / 3;
+    let sx = left + 4;
+    for (let i = 0; i < steps.length; i++) {
+      const scx = sx + stepW / 2;
+      const scy = footerZoneStart - 10;
+      // Cercle numerat
+      doc.setFillColor(...COLORS.gold);
+      doc.circle(scx, scy, 5, 'F');
+      doc.setTextColor(...COLORS.blackSoft);
+      setStyleValue(doc);
+      doc.setTextColor(...COLORS.blackSoft);
+      doc.text(steps[i].num, scx, scy + 2.5, { align: 'center' });
+      // Connector
+      if (i < steps.length - 1) {
+        doc.setDrawColor(...COLORS.grayLight);
+        doc.setLineWidth(0.3);
+        doc.line(scx + 5, scy, scx + stepW + 5, scy);
+      }
+      // Label
+      setStyleCaption(doc);
+      const labelLines = doc.splitTextToSize(steps[i].label, stepW - 2);
+      doc.text(labelLines.slice(0, 2), scx, scy + 9, { align: 'center' });
+      sx += stepW + 12;
+    }
+  }
+
+  // Footers
   const totalPages = doc.internal.pages.length - 1;
   for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
     doc.setPage(pageNum);
-    drawFooter();
+    const website = normalizeWebsite(branding?.website?.trim() || SITE_CONFIG.web.url);
+    drawCanonicalPdfFooter(doc, pageNum, totalPages, website);
   }
   return doc;
 }
@@ -807,7 +812,7 @@ export async function generateQuotePDF(
 
 export interface ContractPdfData {
   contractReference: string;
-  contractDate: Date;
+  contractDate: PdfDateInput;
 
   // Parts
   companyName: string;
@@ -826,7 +831,7 @@ export interface ContractPdfData {
 
   // Servei
   eventType: string;
-  eventDate: Date;
+  eventDate: PdfDateInput;
   eventTime?: string;
   eventEndTime?: string;
   eventLocation: string;
@@ -845,8 +850,8 @@ export interface ContractPdfData {
 
   // Pagament
   depositAmount: number;
-  depositDueDate: Date;
-  finalPaymentDue: Date;
+  depositDueDate: PdfDateInput;
+  finalPaymentDue: PdfDateInput;
 
   // Clàusules
   cancellationPolicy: string;
@@ -1009,27 +1014,23 @@ export async function generateContractPDF(
   }[locale];
 
   // Dark theme colors (same as quote PDF)
-  const neutral = [241, 245, 249] as [number, number, number];
-  const muted = [148, 163, 184] as [number, number, number];
-  const border = [51, 65, 85] as [number, number, number];
-  const surface = [24, 28, 33] as [number, number, number];
-  const surfaceSoft = [29, 34, 40] as [number, number, number];
-  const accent = [212, 175, 55] as [number, number, number];
+  const neutral     = COLORS.paperText;
+  const muted       = COLORS.paperMuted;
+  const border      = COLORS.grayLight;
+  const surface     = COLORS.white;
+  const surfaceSoft = COLORS.surfaceWarm;
+  const accent      = COLORS.gold;
 
-  const left = 14;
-  const contentWidth = 182;
-  const pageBottom = 255;
+  const left = PDF_DESIGN.left;
+  const contentWidth = PDF_DESIGN.width;
+  const pageBottom = PDF_DESIGN.contentBottom;
   const lineHeight = 5;
   let y = 16;
 
-  const fmtDate = (d: Date) =>
-    new Date(d).toLocaleDateString(toIntlLocale(locale), {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
+  // Resol la clau i18n del nom del pack si cal
+  const resolvedPackName = resolvePackI18nKey(data.packName, locale) || data.packName;
 
-  const brandName = branding?.brandName?.trim() || 'Orbita Events';
+  const fmtDate = (d: PdfDateInput) => formatPdfDateInput(d, locale);
 
   // -- Helpers --
   const drawCard = (
@@ -1040,221 +1041,219 @@ export async function generateContractPDF(
     doc.setDrawColor(...border);
     doc.roundedRect(x, top, width, height, rounded, rounded, 'S');
     doc.setFillColor(...accent);
-    doc.roundedRect(x, top + 1.5, 1.4, Math.max(2, height - 3), 0.8, 0.8, 'F');
+    doc.roundedRect(x, top + 1.5, 1.2, Math.max(2, height - 3), 0.6, 0.6, 'F');
   };
 
   const drawSectionTitle = (title: string) => {
-    doc.setTextColor(...accent);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10.5);
-    doc.text(title, left + 4, y);
-    y += 7;
+    y = drawCanonicalSectionTitle(doc, y - 2, title);
   };
 
+  /** Mesura quantes unitats y ocupa una fila (sense dibuixar res). */
+  const measureRow = (value: string): number =>
+    lineHeight * doc.splitTextToSize(value, 120).slice(0, 2).length;
+
   const drawRow = (label: string, value: string, bold = false) => {
-    doc.setTextColor(...muted);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
+    setStyleMuted(doc);
     doc.text(label, left + 6, y);
-    doc.setTextColor(...neutral);
-    if (bold) doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
+    if (bold) { setStyleValue(doc); } else { setStyleBody(doc); }
     const lines = doc.splitTextToSize(value, 120).slice(0, 2);
     doc.text(lines, left + 55, y);
     y += lineHeight * lines.length;
   };
 
+  /**
+   * Calcula l'alçada total d'una llista de valors (les que es posaran a drawRow).
+   * Inclou el títol de secció (13mm) i padding (8mm top+bottom).
+   */
+  const calcSectionHeight = (values: string[], hasSectionTitle = true): number => {
+    const rowsH = values.reduce((acc, v) => acc + measureRow(v), 0);
+    return (hasSectionTitle ? 13 : 0) + rowsH + 8;
+  };
+
   const ensureSpace = (space: number) => {
     if (y + space > pageBottom) {
       doc.addPage();
-      doc.setFillColor(18, 20, 24);
+      doc.setFillColor(...COLORS.paperBg);
       doc.rect(0, 0, 210, 297, 'F');
       drawCompactHeader();
     }
   };
 
   const drawCompactHeader = () => {
-    drawCard(left, 10, contentWidth, 16, 3, true);
-    doc.setTextColor(...neutral);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10.5);
-    doc.text(brandName, left + 6, 19);
-    doc.setTextColor(...muted);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.text(`${t.ref}: ${data.contractReference}`, left + contentWidth - 6, 19, { align: 'right' });
-    y = 34;
+    y = drawCanonicalPdfHeader(doc, {
+      title: t.title,
+      subtitle: 'Prestació de serveis',
+      ref: data.contractReference,
+      logoDataUrl: branding?.logoDataUrl,
+    });
   };
 
-  const drawFooter = () => {
-    const website = normalizeWebsite(branding?.website?.trim() || SITE_CONFIG.web.url);
-    const email = branding?.contactEmail?.trim() || SITE_CONFIG.business.email;
-    const phone = branding?.contactPhone?.trim() || SITE_CONFIG.business.phoneDisplay || SITE_CONFIG.business.phone;
-    doc.setDrawColor(...border);
-    doc.line(left, 282, left + contentWidth, 282);
-    doc.setTextColor(...muted);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7.5);
-    doc.text(`${website} · ${email} · ${phone}`, left, 287);
-  };
-
-  // -- Page 1: Background --
-  doc.setFillColor(18, 20, 24);
+  // Fons paper càlid
+  doc.setFillColor(...COLORS.paperBg);
   doc.rect(0, 0, 210, 297, 'F');
 
-  // -- Header --
-  // Header alt augmentat (26→32mm) per encabir logo planeta sencer.
-  const logoSource = branding?.logoDataUrl || ORBITA_LOGO_TEXT_DRETA_BASE64 || ORBITA_LOGO_BASE64;
-  const hasLogo = typeof logoSource === 'string' && logoSource.length > 100;
-  const contractHeaderHeight = 32;
-  drawCard(left, y, contentWidth, contractHeaderHeight, 3, true);
-  if (hasLogo) {
-    try {
-      const fmt = getImageFormatFromDataUrl(logoSource);
-      const props = doc.getImageProperties(logoSource);
-      const fitted = fitWithin(props.width, props.height, 52, 22);
-      doc.addImage(logoSource, fmt, left + 5, y + (contractHeaderHeight - fitted.height) / 2, fitted.width, fitted.height);
-    } catch { /* fallback */ }
-  }
-  doc.setTextColor(...neutral);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(15);
-  doc.text(brandName, hasLogo ? left + 62 : left + 6, y + 13);
-  doc.setTextColor(...accent);
-  doc.setFontSize(10);
-  doc.text(t.title, hasLogo ? left + 62 : left + 6, y + 22);
-  doc.setTextColor(...muted);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.text(`${t.ref}: ${data.contractReference}`, left + contentWidth - 6, y + 10, { align: 'right' });
-  doc.text(`${t.date}: ${fmtDate(data.contractDate)}`, left + contentWidth - 6, y + 16, { align: 'right' });
-  y += contractHeaderHeight + 8;
+  y = drawCanonicalPdfHeader(doc, {
+    title: t.title,
+    subtitle: 'Prestació de serveis',
+    ref: `${data.contractReference} · ${fmtDate(data.contractDate)}`,
+    logoDataUrl: branding?.logoDataUrl,
+  });
 
   // -- Parts --
   ensureSpace(55);
-  drawCard(left, y - 4, contentWidth, 50, 2, true);
-  drawSectionTitle(t.parties);
+  // Parts: 2 contenidors separats costat a costat
+  const partColW = (contentWidth - PDF_DESIGN.columnGap) / 2;
+  const rightColX = left + partColW + PDF_DESIGN.columnGap;
+  const partTextWidth = partColW - 8;
+  const partLineHeight = 4.5;
+  const measurePartyLines = (lines: string[]) => lines.flatMap((line) => doc.splitTextToSize(line, partTextWidth));
+  const providerLines = measurePartyLines([
+    data.companyLegalName,
+    `${t.nif}: ${data.companyNIF}`,
+    `${t.address}: ${data.companyAddress}`,
+    `${t.email}: ${data.companyEmail}`,
+  ]);
+  const clientLines = measurePartyLines([
+    data.clientName,
+    ...(data.clientNIF ? [`${t.nif}: ${data.clientNIF}`] : []),
+    ...(data.clientAddress ? [data.clientAddress] : []),
+    `${t.email}: ${data.clientEmail}`,
+    ...(data.clientPhone ? [`${t.phone}: ${data.clientPhone}`] : []),
+  ]);
+  const partCardHeight = 11 + Math.max(providerLines.length, clientLines.length) * partLineHeight;
+  ensureSpace(partCardHeight + PDF_DESIGN.blockGap);
 
-  // Provider (left column)
-  doc.setTextColor(...accent);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
-  doc.text(t.provider, left + 6, y);
-  y += 5;
-  doc.setTextColor(...neutral);
-  doc.setFontSize(9);
-  doc.text(data.companyLegalName, left + 6, y);
-  y += 4.5;
-  doc.setTextColor(...muted);
-  doc.setFontSize(8);
-  doc.text(`${t.nif}: ${data.companyNIF}`, left + 6, y);
-  y += 4;
-  doc.text(`${t.address}: ${data.companyAddress}`, left + 6, y);
-  y += 4;
-  doc.text(`${t.email}: ${data.companyEmail}`, left + 6, y);
-  y += 7;
+  // Contenidor Prestador
+  doc.setFillColor(...COLORS.white);
+  doc.setDrawColor(...COLORS.grayLight);
+  doc.setLineWidth(0.2);
+  doc.roundedRect(left, y, partColW, partCardHeight, 2, 2, 'FD');
+  setStyleLabel(doc);
+  doc.text(t.provider.toUpperCase(), left + 4, y + 5);
+  setStyleValue(doc);
+  doc.text(providerLines[0], left + 4, y + 11);
+  setStyleMuted(doc);
+  doc.text(providerLines.slice(1), left + 4, y + 11 + partLineHeight);
 
-  // Client (same column, below)
-  doc.setTextColor(...accent);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
-  doc.text(t.client, left + 6, y);
-  y += 5;
-  doc.setTextColor(...neutral);
-  doc.setFontSize(9);
-  doc.text(data.clientName, left + 6, y);
-  y += 4.5;
-  doc.setTextColor(...muted);
-  doc.setFontSize(8);
-  if (data.clientNIF) { doc.text(`${t.nif}: ${data.clientNIF}`, left + 6, y); y += 4; }
-  if (data.clientAddress) { doc.text(`${t.address}: ${data.clientAddress}`, left + 6, y); y += 4; }
-  doc.text(`${t.email}: ${data.clientEmail}`, left + 6, y);
-  if (data.clientPhone) { doc.text(`${t.phone}: ${data.clientPhone}`, left + 100, y); }
-  y += 8;
+  // Contenidor Client
+  doc.setFillColor(...COLORS.white);
+  doc.setDrawColor(...COLORS.grayLight);
+  doc.setLineWidth(0.2);
+  doc.roundedRect(rightColX, y, partColW, partCardHeight, 2, 2, 'FD');
+  setStyleLabel(doc);
+  doc.text(t.client.toUpperCase(), rightColX + 4, y + 5);
+  setStyleValue(doc);
+  doc.text(clientLines[0], rightColX + 4, y + 11);
+  setStyleMuted(doc);
+  doc.text(clientLines.slice(1), rightColX + 4, y + 11 + partLineHeight);
 
-  // -- Service Details --
-  const extrasCount = data.extras?.length || 0;
-  const serviceBoxHeight = 40 + extrasCount * 5;
-  ensureSpace(serviceBoxHeight + 10);
-  drawCard(left, y - 4, contentWidth, serviceBoxHeight, 2, false);
+  y += partCardHeight + PDF_DESIGN.blockGap;
+  const sectionGap = PDF_DESIGN.blockGap;
+
+  // -- Service Details (alçada dinàmica) --
+  const serviceValues = [
+    data.eventType,
+    fmtDate(data.eventDate),
+    ...(data.eventTime ? [`${data.eventTime}${data.eventEndTime ? ` - ${data.eventEndTime}` : ''}`] : []),
+    data.eventLocation,
+    `${data.guestCount}`,
+    `${resolvedPackName} (${data.djHours}h)`,
+    ...(data.extras?.map(e => `${e.name} — ${formatPdfMoney(e.price * e.quantity, locale)}`) || []),
+  ];
+  const serviceH = calcSectionHeight(serviceValues);
+  ensureSpace(serviceH + sectionGap);
+  drawCard(left, y - 4, contentWidth, serviceH, 2, false);
   drawSectionTitle(t.serviceDetails);
   drawRow(t.eventType, data.eventType);
   drawRow(t.eventDate, fmtDate(data.eventDate));
   if (data.eventTime) drawRow(t.eventTime, `${data.eventTime}${data.eventEndTime ? ` - ${data.eventEndTime}` : ''}`);
   drawRow(t.location, data.eventLocation);
   drawRow(t.guests, `${data.guestCount}`);
-  drawRow(t.pack, `${data.packName} (${data.djHours}h)`, true);
+  drawRow(t.pack, `${resolvedPackName} (${data.djHours}h)`, true);
   if (data.extras && data.extras.length > 0) {
     for (const extra of data.extras) {
-      drawRow(t.extras, `${extra.name} — ${(extra.price * extra.quantity).toFixed(2)}€`);
+      drawRow(t.extras, `${extra.name} — ${formatPdfMoney(extra.price * extra.quantity, locale)}`);
     }
   }
-  y += 4;
+  y += sectionGap;
 
-  // -- Economic Summary --
-  ensureSpace(45);
-  drawCard(left, y - 4, contentWidth, 38 + (data.discount > 0 ? 5 : 0), 2, true);
+  // -- Economic Summary (alçada dinàmica) --
+  const econValues = [
+    formatPdfMoney(data.subtotal, locale),
+    ...(data.discount > 0 ? [`-${formatPdfMoney(data.discount, locale)}`] : []),
+    formatPdfMoney(data.vatAmount, locale),
+    formatPdfMoney(data.total, locale), // fila TOTAL
+  ];
+  const econH = calcSectionHeight(econValues);
+  ensureSpace(econH + sectionGap);
+  drawCard(left, y - 4, contentWidth, econH, 2, true);
   drawSectionTitle(t.economicSummary);
-  drawRow(t.subtotal, `${data.subtotal.toFixed(2)}€`);
-  if (data.discount > 0) drawRow(t.discount, `-${data.discount.toFixed(2)}€`);
-  drawRow(`${t.vat} (${data.vatRate}%)`, `${data.vatAmount.toFixed(2)}€`);
-  doc.setTextColor(...accent);
+  drawRow(t.subtotal, formatPdfMoney(data.subtotal, locale));
+  if (data.discount > 0) drawRow(t.discount, `-${formatPdfMoney(data.discount, locale)}`);
+  drawRow(`${t.vat} (${data.vatRate}%)`, formatPdfMoney(data.vatAmount, locale));
+  doc.setTextColor(...neutral);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(12);
+  doc.setFontSize(PDF_DESIGN.type.section);
   doc.text(t.total, left + 6, y + 2);
-  doc.text(`${data.total.toFixed(2)}€`, left + contentWidth - 6, y + 2, { align: 'right' });
+  doc.text(formatPdfMoney(data.total, locale), left + contentWidth - 6, y + 2, { align: 'right' });
   y += 10;
+  y += sectionGap;
 
-  // -- Payment Terms --
-  ensureSpace(42);
-  drawCard(left, y - 4, contentWidth, 38, 2, false);
+  // -- Payment Terms (alçada dinàmica) --
+  const payValues = [
+    formatPdfMoney(data.depositAmount, locale),
+    fmtDate(data.depositDueDate),
+    formatPdfMoney(data.total - data.depositAmount, locale),
+    fmtDate(data.finalPaymentDue),
+    data.companyIBAN,
+  ];
+  const payH = calcSectionHeight(payValues);
+  ensureSpace(payH + sectionGap);
+  drawCard(left, y - 4, contentWidth, payH, 2, false);
   drawSectionTitle(t.paymentTerms);
-  drawRow(t.deposit, `${data.depositAmount.toFixed(2)}€`);
+  drawRow(t.deposit, formatPdfMoney(data.depositAmount, locale));
   drawRow(t.depositDue, fmtDate(data.depositDueDate));
-  drawRow(t.remaining, `${(data.total - data.depositAmount).toFixed(2)}€`);
+  drawRow(t.remaining, formatPdfMoney(data.total - data.depositAmount, locale));
   drawRow(t.remainingDue, fmtDate(data.finalPaymentDue));
   drawRow(t.iban, data.companyIBAN, true);
-  y += 4;
+  y += sectionGap;
 
-  // -- Cancellation Policy --
+  // -- Cancellation Policy (alçada dinàmica) --
   const cancelLines = doc.splitTextToSize(data.cancellationPolicy, contentWidth - 12).slice(0, 8);
-  const cancelBoxHeight = 14 + cancelLines.length * 4.2;
-  ensureSpace(cancelBoxHeight + 6);
-  drawCard(left, y - 4, contentWidth, cancelBoxHeight, 2, false);
+  const cancelH = 13 + cancelLines.length * 4.2 + 8;
+  ensureSpace(cancelH + sectionGap);
+  drawCard(left, y - 4, contentWidth, cancelH, 2, false);
   drawSectionTitle(t.cancellation);
-  doc.setTextColor(...neutral);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8.2);
+  setStyleBody(doc);
   doc.text(cancelLines, left + 6, y);
-  y += cancelLines.length * 4.2 + 6;
+  y += cancelLines.length * 4.2 + sectionGap;
 
-  // -- Additional Clauses --
+  // -- Additional Clauses (alçada dinàmica) --
   if (data.additionalClauses?.trim()) {
     const addLines = doc.splitTextToSize(data.additionalClauses.trim(), contentWidth - 12).slice(0, 8);
-    const addBoxHeight = 14 + addLines.length * 4.2;
-    ensureSpace(addBoxHeight + 6);
-    drawCard(left, y - 4, contentWidth, addBoxHeight, 2, false);
+    const addH = 13 + addLines.length * 4.2 + 8;
+    ensureSpace(addH + sectionGap);
+    drawCard(left, y - 4, contentWidth, addH, 2, false);
     drawSectionTitle(t.additionalClauses);
-    doc.setTextColor(...neutral);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.2);
+    setStyleBody(doc);
     doc.text(addLines, left + 6, y);
-    y += addLines.length * 4.2 + 6;
+    y += addLines.length * 4.2 + sectionGap;
   }
 
-  // -- Legal Clauses --
+  // -- Legal Clauses (alçada dinàmica) --
   const legalTexts = [t.legalText1, t.legalText2, t.legalText3, t.legalText4, t.legalText5];
-  const allLegalLines = legalTexts.flatMap(txt => doc.splitTextToSize(`• ${txt}`, contentWidth - 12).slice(0, 3));
-  const legalBoxHeight = 14 + allLegalLines.length * 3.8;
-  ensureSpace(legalBoxHeight + 6);
-  drawCard(left, y - 4, contentWidth, legalBoxHeight, 2, false);
+  const allLegalLines = legalTexts.flatMap(txt => doc.splitTextToSize(`• ${txt}`, contentWidth - 12).slice(0, 2));
+  const legalH = 13 + allLegalLines.length * 3.8 + 8;
+  ensureSpace(legalH + sectionGap);
+  drawCard(left, y - 4, contentWidth, legalH, 2, false);
   drawSectionTitle(t.legalClauses);
-  doc.setTextColor(...neutral);
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.5);
+  doc.setFontSize(PDF_DESIGN.type.small);
+  doc.setTextColor(...neutral);
   let legalY = y;
   for (const txt of legalTexts) {
-    const lines = doc.splitTextToSize(`• ${txt}`, contentWidth - 12).slice(0, 3);
+    if (legalY + 5 > pageBottom) { ensureSpace(20); legalY = y; }
+    const lines = doc.splitTextToSize(`• ${txt}`, contentWidth - 12).slice(0, 2);
     doc.text(lines, left + 6, legalY);
     legalY += lines.length * 3.8;
   }
@@ -1262,69 +1261,72 @@ export async function generateContractPDF(
 
   // -- Signatures --
   const hasClientSignature = Boolean(data.signedBy || data.signedAt || data.signatureBlob);
-  const signatureBoxHeight = hasClientSignature ? 58 : 48;
-  ensureSpace(signatureBoxHeight + 7);
-  drawCard(left, y - 4, contentWidth, signatureBoxHeight, 2, true);
-  drawSectionTitle(t.signatures);
+  const sigColWidth = (contentWidth - 8) / 2;
+  const signatureBoxHeight = 40;
 
-  const sigColWidth = (contentWidth - 20) / 2;
-  const providerX = left + 6;
-  const clientX = left + 6 + sigColWidth + 8;
+  // Ancora signatures al peu si hi ha espai suficient (mínim 20mm de separació del contingut)
+  const sigAnchorY = PDF_FILL_BOTTOM - signatureBoxHeight - 16;
+  if (doc.internal.pages.length - 1 === 1 && sigAnchorY > y + 20) {
+    y = sigAnchorY;
+  } else {
+    y += 8;
+    ensureSpace(signatureBoxHeight + 16);
+  }
 
-  // Provider signature
-  doc.setTextColor(...accent);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
-  doc.text(t.signProvider, providerX, y);
-  y += 5;
-  doc.setTextColor(...muted);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.text(`${t.signName}: ${data.companyLegalName}`, providerX, y);
-  doc.text(`${t.signName}: ${data.signedBy || '____________________'}`, clientX, y);
+  y = drawCanonicalSectionTitle(doc, y, t.signatures);
 
-  // Client signature labels
-  doc.setTextColor(...accent);
-  doc.setFont('helvetica', 'bold');
-  doc.text(t.signClient, clientX, y - 5);
+  // Zona prestador
+  const providerBoxY = y;
+  const providerX = left;
+  const clientX = left + sigColWidth + 8;
 
-  y += 8;
-  doc.setTextColor(...muted);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${t.signDate}: ____________________`, providerX, y);
-  doc.text(`${t.signDate}: ${data.signedAt ? fmtDate(data.signedAt) : '____________________'}`, clientX, y);
-  const signatureLineY = y + (hasClientSignature ? 18 : 10);
+  [
+    { x: providerX, label: t.signProvider, name: data.companyLegalName },
+    { x: clientX, label: t.signClient, name: data.signedBy || '' },
+  ].forEach(({ x, label, name }) => {
+    doc.setFillColor(...COLORS.surfaceWarm);
+    doc.roundedRect(x, providerBoxY, sigColWidth, signatureBoxHeight, 2, 2, 'F');
+    doc.setDrawColor(...COLORS.grayLight);
+    doc.setLineWidth(0.2);
+    doc.roundedRect(x, providerBoxY, sigColWidth, signatureBoxHeight, 2, 2, 'S');
+    // Línia de signatura
+    const lineY = providerBoxY + 18;
+    doc.setDrawColor(...COLORS.paperText);
+    doc.setLineWidth(0.4);
+    doc.line(x + 5, lineY, x + sigColWidth - 5, lineY);
+    // Label
+    setStyleCaption(doc);
+    doc.text(label, x + 5, lineY + 5);
+    // Nom
+    setStyleValue(doc);
+    doc.text(name || '____________________', x + 5, lineY + 11);
+    // Data
+    setStyleCaption(doc);
+    doc.text(`${t.signDate}: ____________________`, x + 5, lineY + 17);
+  });
+
+  // Imatge de signatura del client
   if (data.signatureBlob && isDataUrl(data.signatureBlob)) {
     try {
       const fmt = getImageFormatFromDataUrl(data.signatureBlob);
       const props = doc.getImageProperties(data.signatureBlob);
-      const fitted = fitWithin(props.width, props.height, sigColWidth - 12, 12);
-      doc.addImage(data.signatureBlob, fmt, clientX + 4, y + 3, fitted.width, fitted.height);
+      const fitted = fitWithin(props.width, props.height, sigColWidth - 14, 12);
+      doc.addImage(data.signatureBlob, fmt, clientX + 5, providerBoxY + 2, fitted.width, fitted.height);
     } catch {
-      doc.setTextColor(...muted);
+      setStyleMuted(doc);
       doc.setFont('helvetica', 'italic');
-      doc.text(t.signedInline, clientX, y + 9);
+      doc.text(hasClientSignature ? t.signedInline : '', clientX + 5, providerBoxY + 10);
     }
-  } else if (hasClientSignature) {
-    doc.setTextColor(...muted);
-    doc.setFont('helvetica', 'italic');
-    doc.text(t.signedInline, clientX, y + 9);
   }
-  y = signatureLineY;
-  doc.setDrawColor(...border);
-  doc.line(providerX, y, providerX + sigColWidth - 4, y);
-  doc.line(clientX, y, clientX + sigColWidth - 4, y);
-  doc.setTextColor(...muted);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7);
-  doc.text(t.sign, providerX + (sigColWidth - 4) / 2, y + 4, { align: 'center' });
-  doc.text(t.sign, clientX + (sigColWidth - 4) / 2, y + 4, { align: 'center' });
+
+  y = providerBoxY + signatureBoxHeight + 6;
 
   // -- Footer on all pages --
   const totalPages = doc.internal.pages.length - 1;
   for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
     doc.setPage(pageNum);
-    drawFooter();
+    const website = normalizeWebsite(branding?.website?.trim() || SITE_CONFIG.web.url);
+    drawCanonicalPdfFooter(doc, pageNum, totalPages, website);
   }
 
   return doc;
@@ -1360,5 +1362,3 @@ export async function downloadImages(
     await new Promise((resolve) => setTimeout(resolve, 300));
   }
 }
-
-

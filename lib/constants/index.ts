@@ -1688,7 +1688,7 @@ export const PUBLIC_MOBILE_CTA_TRUST_BADGES = [
   { icon: '⚡', value: '2h', labelKey: 'badges.response' },
 ] as const;
 
-export const APP_IMMERSIVE_PAGES = ['/sensorial', '/respira', '/portal'] as const;
+export const APP_IMMERSIVE_PAGES = ['/sensorial', '/respira'] as const;
 
 export const API_CANVAS_TESTIMONIAL_PRESETS = {
   instagramStory: {
