@@ -257,13 +257,13 @@ export default function FiestasClient({ heroImage }: { heroImage: string }) {
       </section>
 
       {/* ═══ QUÈ INCLOU ═══ */}
-      <section className="max-w-5xl mx-auto px-4 py-16">
-        <div className="p-8 md:p-12 rounded-3xl bg-white/[0.03] border border-white/10">
-          <h3 className="text-2xl font-bold text-white text-center mb-8">🎉 {t('importantInfo')}</h3>
-          <div className="grid md:grid-cols-2 gap-8 text-white/70">
+      <section className="max-w-5xl mx-auto px-4 py-8">
+        <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10">
+          <h3 className="text-lg font-bold text-white text-center mb-5">🎉 {t('importantInfo')}</h3>
+          <div className="grid sm:grid-cols-2 gap-6 text-white/70">
             <div>
-              <strong className="text-white block mb-3">✅ {t('allPacksInclude')}</strong>
-              <ul className="space-y-2 text-sm">
+              <strong className="text-white block mb-2 text-sm">✅ {t('allPacksInclude')}</strong>
+              <ul className="space-y-1.5 text-sm">
                 <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{t('packFeatures.transport')}</li>
                 <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{t('packFeatures.techDj')}</li>
                 <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{t('packFeatures.setup')}</li>
@@ -271,8 +271,8 @@ export default function FiestasClient({ heroImage }: { heroImage: string }) {
               </ul>
             </div>
             <div>
-              <strong className="text-white block mb-3">🎨 {t('customization')}</strong>
-              <ul className="space-y-2 text-sm">
+              <strong className="text-white block mb-2 text-sm">🎨 {t('customization')}</strong>
+              <ul className="space-y-1.5 text-sm">
                 <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{t('customFeatures.theming')}</li>
                 <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{t('customFeatures.decoration')}</li>
                 <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{t('customFeatures.lightShow')}</li>
