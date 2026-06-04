@@ -420,7 +420,7 @@ html.admin-mode [class*="text-[11.8px]"] {
 /* ════════════════════════════════════════════════════════════════════════════
    PATRÓ CANÒNIC: Capçalera de pàgina de detall (lead, reserva, client, etc.)
    Prefix: ap-detail-*
-   Ús: qualsevol pàgina /admin/*/[id] que necesiti capçalera consistent.
+   Ús: qualsevol pàgina /admin/<seccio>/<id> que necessiti capçalera consistent.
    ════════════════════════════════════════════════════════════════════════════ */
 
 /* ════════════════════════════════════════════════════════════════════════════
