@@ -15,6 +15,18 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-05 [ESTAT: tancat]
+Últim canvi: #885–#886 — Separació de signatures en servei canonical + consolidació contactes.
+- #885: Crear `lib/services/signatureService.ts` + `lib/constants/email.ts` (EMAIL_CONTACT); moure getEmailSignatureHtml/Text de lib/email.ts.
+- #886: Consolidar contactes a EMAIL_CONTACT canonical; actualitzar lib/email.ts i lib/services/contractService.ts.
+Proper pas previst: pendent demanda propietari sobre extres/footer/contenidor o altres fronts.
+Avís per codex: Tota la lògica de signatures ara viu a signatureService.ts; constants contacte (phone/email/web) a lib/constants/email.ts. Audit "res hardcoded tot canonical responsive" ja estava 100% complet. `validate:core` verd.
+
+[claude] 2026-06-04 [ESTAT: tancat]
+Últim canvi: #869 — fix visual booking-detail: `bd__pnl` border 20%, gradient+4%, títol or.
+Proper pas previst: pendent decisió propietari — continuar migració Frankenstein (Fase 2: Pressupostos / Sales Ops / Reactivació clients) o poliment de booking-detail.
+Avís per codex: `app/admin/bookings/[id]/booking-detail.css` modificat (#869). Cap conflicte amb #867. `app/admin/tasks/` completament migrat (#868).
+
 [claude] 2026-06-04 [ESTAT: tancat]
 Últim canvi: #866 — leads en dies feiners (Dl–Dj) visibles al calendari i a pipeline/llista.
 Bug crític: leads amb data feiner eren invisibes a tota la pàgina leads. `seasonCalendarService.weekdays` + `page.tsx` ara els capturen.
@@ -81,6 +93,15 @@ Avís per codex: #826 (ingesta 🤝 + hora fi). #827 (animació: nova categoria 
 ## Bloc CODEX (Codex CLI)
 
 <!-- codex: actualitza aquest bloc quan comencis/acabis una sessió -->
+[codex] 2026-06-05 [ESTAT: tancat]
+Últim canvi: #884 — protocol normalitzat a `docs/admin-protocol.md` + `docs/admin-diary.md`; previews PDF Studio amb `XXXXXX` per dades contextuals i càlculs canònics.
+Proper pas previst: continuar neteja controlada de temporals i tancar el front `/admin/studio#sec-pdfs` si el propietari ho demana.
+Avís per l'altre agent: els noms històrics `docs/protocol-producte-admin-ca.md` i `docs/diario.md` ja no són la ruta canònica. Els guards principals tenen fallback temporal, però la lectura operativa s'ha de fer sobre `admin-protocol/admin-diary`.
+
+[codex] 2026-06-04 [ESTAT: tancat]
+Últim canvi: #867 — Google Calendar passa a mirall complet cada 15 min amb reconciliació inicial OAuth.
+Proper pas previst: activació operativa pendent que el propietari autoritzi Google Calendar una vegada; després verificar mappings reals a Railway.
+Avís per l'altre agent: perímetre #867 tancat i `validate:core` verd. No he tocat els canvis concurrents de `app/admin/tasks/**`. Suite global/build tenen errors aliens documentats al diari i protocol.
 [codex] 2026-06-02 [ESTAT: tancat]
 Últim canvi: #860 (handoff bug Kimera: total 300 sense IVA/sense factura torna a 350,90 per recàlcul amb `vatRate=21`).
 Proper pas previst: Claude pot aplicar fix a `bookingRouteService` i reparar dades de Kimera segons document `docs/booking-kimera-vat-total-bug-handoff.md`.
@@ -136,4 +157,4 @@ Avís per l'altre agent: `pnpm run validate:core` verd. Norma per Claude: no afe
 
 - Si el teu bloc diu `treballant`, l'altre agent ha d'esperar o triar un canvi que no toqui els mateixos fitxers.
 - El counter `ADMIN_CHANGE_COUNTER` sempre l'actualitza l'agent que tanca el canvi. Si veus que el counter és N+1 però no hi ha entrada #(N+1) al protocol, és un conflicte de timing — posa el counter de tornada a N i afegeix l'entrada que falta.
-- En cas de dubte, consultar `docs/diario.md` i `docs/protocol-producte-admin-ca.md` per veure qui ha fet l'últim canvi.
+- En cas de dubte, consultar `docs/admin-diary.md` i `docs/admin-protocol.md` per veure qui ha fet l'últim canvi.
