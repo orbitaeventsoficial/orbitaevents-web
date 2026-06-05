@@ -912,7 +912,7 @@ export default function StudioShowroom() {
                     </table>
                   </div>
                   <div className="o-dossier-greeting">
-                    Hola Maria, gràcies per contactar amb nosaltres. T’enviem aquestes propostes d’animació pensades per al vostre event.
+                    {'Hola Maria, gràcies per contactar amb nosaltres. T\'enviem aquestes propostes d\'animació pensades per al vostre event.'}
                   </div>
                   <div className="o-dossier-cta"><span>Per confirmar disponibilitat o per a qualsevol dubte</span><strong>+34 699 12 10 23 · info@orbitaevents.com</strong></div>
                 </div>

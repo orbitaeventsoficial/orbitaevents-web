@@ -1369,7 +1369,7 @@
 
 .o-pdf-iframe {
   width: 100%;
-  height: clamp(560px, 72vh, 860px);
+  height: clamp(700px, 80vh, 1100px);
   border: none;
   border-radius: var(--o-r-sm);
   box-shadow: var(--o-shadow-lg);
