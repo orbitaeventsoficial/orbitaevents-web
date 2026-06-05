@@ -73,11 +73,11 @@ function drawCover(doc: jsPDFType, client: DossierClientInfo, logoDataUri?: stri
   doc.setTextColor(...COLORS.textMuted);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7);
-  doc.text('DOSSIER PREPARAT PER A', PAGE.width / 2, 146, { align: 'center', charSpace: 1.2 });
+  doc.text('PER A', PAGE.width / 2, 146, { align: 'center', charSpace: 1.4 });
   doc.setTextColor(...COLORS.textPrimary);
-  doc.setFontSize(24);
+  doc.setFontSize(26);
   const nameLines = doc.splitTextToSize(client.nom, 126);
-  doc.text(nameLines, PAGE.width / 2, 160, { align: 'center' });
+  doc.text(nameLines, PAGE.width / 2, 161, { align: 'center' });
 
   if (client.empresa) {
     doc.setTextColor(...COLORS.gold);
@@ -86,14 +86,15 @@ function drawCover(doc: jsPDFType, client: DossierClientInfo, logoDataUri?: stri
   }
   if (client.eventDesc) {
     doc.setTextColor(...COLORS.textSecondary);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(9);
     doc.text(doc.splitTextToSize(client.eventDesc, 120), PAGE.width / 2, 198, { align: 'center' });
   }
 
-  doc.setTextColor(...COLORS.textMuted);
-  doc.setFontSize(7);
-  doc.text('DOSSIER NARRATIU + FITXES COMERCIALS SELECCIONADES', PAGE.width / 2, 260, { align: 'center', charSpace: 0.6 });
+  doc.setTextColor(...COLORS.gold);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text('Tenim moltes ganes de fer-ho realitat amb vosaltres', PAGE.width / 2, 258, { align: 'center' });
 }
 
 function drawIntro(doc: jsPDFType, client: DossierClientInfo, productCount: number): void {
@@ -105,37 +106,46 @@ function drawIntro(doc: jsPDFType, client: DossierClientInfo, productCount: numb
   doc.setTextColor(...COLORS.gold);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7);
-  doc.text('UNA MIRADA A L\'EXPERIENCIA', PDF_DESIGN.left, y, { charSpace: 0.8 });
+  doc.text('HOLA!', PDF_DESIGN.left, y, { charSpace: 0.8 });
   y += 14;
 
   doc.setTextColor(...COLORS.paperText);
   doc.setFontSize(22);
-  doc.text(doc.splitTextToSize('Un dossier per imaginar l\'esdeveniment abans de parlar de numeros.', 142), PDF_DESIGN.left, y);
-  y += 34;
+  doc.text(doc.splitTextToSize('Mireu què podem portar a la vostra festa.', 150), PDF_DESIGN.left, y);
+  y += 30;
 
   setStyleBody(doc);
   const greeting = client.salutacio ||
-    'Gracies per contactar amb nosaltres. Aquest document explica el to, el ritme i el valor de cada proposta. Les fitxes comercials amb preus i condicions apareixen al final, filtrades segons la seleccio real.';
-  doc.text(doc.splitTextToSize(`Hola ${client.nom},\n\n${greeting}`, 150), PDF_DESIGN.left, y);
-  y += 52;
+    `Hola ${client.nom}, gràcies per pensar en nosaltres! En aquestes pàgines hi trobareu les nostres animacions i espectacles, explicats amb calma. Mireu-los amb tranquil·litat i quedeu-vos amb els que us facin il·lusió per al vostre dia.`;
+  doc.text(doc.splitTextToSize(greeting, 150), PDF_DESIGN.left, y);
+  y += 42;
 
-  y = drawCanonicalSectionTitle(doc, y, 'Resum del document');
-  const rows = [
-    ['Oferta', productCount === 1 ? '1 proposta activada' : `${productCount} propostes activades`],
-    ['Format', 'Dossier narratiu + cataleg comercial filtrat'],
-    ['Objectiu', 'Entendre valor abans de comparar imports'],
+  y = drawCanonicalSectionTitle(doc, y, 'Com està ordenat');
+  const paragraphs = [
+    'Ho hem separat per moments: animació per a adults, animació per als més petits i el suport musical. Així és fàcil veure què va bé per a cada estona de la festa.',
+    'Cada proposta porta el seu preu de referència. Els extres i els detalls els acabem de tancar junts quan sapiguem quanta gent vindrà, els horaris i l\'espai.',
   ];
-  rows.forEach(([label, value], index) => {
-    const top = y + index * 18;
-    doc.setDrawColor(...COLORS.grayLight);
-    doc.roundedRect(PDF_DESIGN.left, top, PDF_DESIGN.width, 13, 1.5, 1.5);
-    setStyleCaption(doc);
-    doc.setTextColor(...COLORS.gold);
-    doc.text(label.toUpperCase(), PDF_DESIGN.left + 5, top + 5);
+  paragraphs.forEach((paragraph) => {
     setStyleBody(doc);
-    doc.setFont('helvetica', 'bold');
-    doc.text(value, PDF_DESIGN.left + 42, top + 5);
+    const lines = doc.splitTextToSize(paragraph, 150);
+    doc.text(lines, PDF_DESIGN.left, y);
+    y += lines.length * 6.2 + 7;
   });
+}
+
+function getCategoryStory(category?: string): string | null {
+  switch (category) {
+    case 'Animació adulta':
+      return 'Propostes pensades per fer participar el grup gran sense trencar el ritme de la festa: música, joc i conducció en directe.';
+    case 'Animació infantil':
+      return 'Formats perquè els infants tinguin el seu moment propi, amb personatges, aventura i dinàmica adaptada a l\'edat.';
+    case 'DJ':
+      return 'La capa musical que sosté el conjunt: entrada, ambient, ball o reforç quan la proposta necessita continuïtat.';
+    case 'DJ i so per a casaments':
+      return 'Solucions per cuidar els moments sonors del dia, des de la cerimònia fins al ball final.';
+    default:
+      return null;
+  }
 }
 
 function drawProductChapter(doc: jsPDFType, product: AnimacioProduct, index: number, locale: SupportedLocale, imageDataUrl?: string | null, categoryLabel?: string): void {
@@ -143,23 +153,26 @@ function drawProductChapter(doc: jsPDFType, product: AnimacioProduct, index: num
   doc.setFillColor(...COLORS.paperBg);
   doc.rect(0, 0, PAGE.width, PAGE.height, 'F');
 
-  // Imatge del producte a la cantonada superior dreta (quadrada). El text flueix a l'esquerra.
+  // Imatge del producte a la cantonada superior dreta sense retallar; el text flueix a l'esquerra.
   let textWidth = 150;
   let imageBottom = 0;
   if (imageDataUrl) {
     try {
-      const imgSize = 56;
-      const imgX = PDF_DESIGN.right - imgSize;
+      const imgBoxW = 62;
+      const imgBoxH = product.id.includes('secret-pirates') ? 74 : 56;
+      const props = doc.getImageProperties(imageDataUrl);
+      const fitted = fitWithin(props.width, props.height, imgBoxW, imgBoxH);
+      const imgX = PDF_DESIGN.right - fitted.width;
       const imgY = 32;
       const format = getImageFormatFromDataUrl(imageDataUrl);
-      doc.addImage(imageDataUrl, format, imgX, imgY, imgSize, imgSize);
+      doc.addImage(imageDataUrl, format, imgX, imgY, fitted.width, fitted.height);
       textWidth = imgX - PDF_DESIGN.left - 6;
-      imageBottom = imgY + imgSize;
+      imageBottom = imgY + fitted.height;
       // Durada sota la imatge (no solapada amb el header)
       if (product.durada) {
         setStyleCaption(doc);
         doc.setTextColor(...COLORS.gold);
-        doc.text(product.durada, imgX + imgSize, imageBottom + 5, { align: 'right' });
+        doc.text(product.durada, imgX + fitted.width, imageBottom + 5, { align: 'right' });
         imageBottom += 7;
       }
     } catch {
@@ -183,7 +196,16 @@ function drawProductChapter(doc: jsPDFType, product: AnimacioProduct, index: num
   if (product.durada && !imageDataUrl) {
     doc.text(product.durada, PDF_DESIGN.right, y, { align: 'right' });
   }
-  y += 13;
+  y += categoryLabel ? 8 : 13;
+
+  const categoryStory = getCategoryStory(categoryLabel);
+  if (categoryStory) {
+    setStyleMuted(doc);
+    doc.text(doc.splitTextToSize(categoryStory, textWidth), PDF_DESIGN.left, y);
+    y += 15;
+  } else if (categoryLabel) {
+    y += 5;
+  }
 
   doc.setTextColor(...COLORS.paperText);
   doc.setFontSize(24);

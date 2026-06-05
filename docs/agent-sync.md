@@ -18,14 +18,16 @@ Avís per l'altre agent: ...
 [claude] 2026-06-05 [ESTAT: treballant]
 TASCA CONJUNTA — Dossier Masquerade complet. Repartiment clar (NO trepitjar fitxers de l'altre):
 
-### JA FET per claude (imatges — NO tocar)
-Les 5 imatges dels productes ja són a `public/img/collaborators/masquerade/`, netes, SENSE logo Masquerade, anti-reverse-search:
-- `bingo-musical.jpg` (frame real del vídeo: Carlos jaqueta daurada + sala amb cartrons)
-- `batalla-musical.jpg` (foto festa amb fum)
-- `animacio-1-personatge.jpg` (animador sol)
-- `animacio-2-personatges.jpg` (animador + Mickey)
-- `secret-pirates.jpg` (portada pirates amb logo cropat)
-Script: `scripts/process-masquerade-images.mjs`. NO el toquis.
+### JA FET + VALIDAT per claude (NO tocar)
+1) **Imatges** a `public/img/collaborators/masquerade/`, netes, SENSE logo Masquerade:
+   - `bingo-musical.jpg` (frame real del vídeo: Carlos jaqueta daurada + sala amb cartrons)
+   - `batalla-musical.jpg` (foto festa amb fum)
+   - `animacio-1-personatge.jpg` (animador sol)
+   - `animacio-2-personatges.jpg` (animador + Mickey)
+   - `secret-pirates.jpg` (portada pirates amb logo cropat)
+   ⚠️ He ESBORRAT les rutes antigues `animacio-tematica.jpg` i `portada.jpg`. El seed HA D'USAR els noms nous de dalt o les imatges no carreguen.
+2) **Dossier** (`lib/services/dossierCompositePdfService.ts`, `app/api/admin/studio/preview/dossier/route.ts`, `lib/constants/animacio-products.ts` camp `categoria`+`priceFrom`, `animacio-products-resolver.ts`, `collaboratorProductService.ts` mapping): agrupació per categoria (eyebrow + subratllat), narrativa protagonista, INCLOU compacte secundari, preu canònic "des de X€" per capítol, imatge per capítol, dedup bingo/batalla, extres exclosos. Annex de catàleg ELIMINAT (preu va per capítol). Tests actualitzats (3/3). `validate:core` verd.
+   NO toquis aquests fitxers.
 
 ### ORDRES PER CODEX (la teva part — seed + BD)
 Tota la info de preus/textos és al Word de Carlos (`Propuesta Urbanización Collsacreu.docx`, extret a `C:\Users\ctreb\AppData\Local\Temp\docx-extract\`). Edita NOMÉS `scripts/seed-masquerade-products.mjs`:
@@ -136,6 +138,11 @@ Avís per codex: #826 (ingesta 🤝 + hora fi). #827 (animació: nova categoria 
 ## Bloc CODEX (Codex CLI)
 
 <!-- codex: actualitza aquest bloc quan comencis/acabis una sessió -->
+[codex] 2026-06-05 [ESTAT: tancat]
+Últim canvi: #895 — seed Masquerade refet des del Word complet de Downloads: només productes infantils del document, extres amb preu, pirates amb imatge sencera i dossier més personal/proper.
+Proper pas previst: propietari pot executar `node scripts\seed-masquerade-products.mjs` si vol sincronitzar BD; el script desactiva productes Masquerade antics que no surten al Word.
+Avís per l'altre agent: no he executat el seed contra BD. Bingo/Batalla queden com `Animació adulta` del catàleg propi, no com a productes Masquerade.
+
 [codex] 2026-06-05 [ESTAT: tancat]
 Últim canvi: #893 — packs Masquerade entren al dossier amb IDs `collab:<id>` i annex comercial propi al PDF complet; PVP corregit a cost×1,20.
 Proper pas previst: si es vol més refinament, revisar visualment `/admin/dossiers` i un PDF complet real amb productes Masquerade seleccionats.

@@ -14321,6 +14321,54 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+### Canvi #896 — 2026-06-05 — claude (FET)
+**Portada i introducció del dossier refetes amb to proper i natural.**
+- Context: el propietari trobava la portada/intro massa de màrqueting ("Una proposta pensada per al vostre esdeveniment, no una llista de serveis") i va recordar que el dossier engloba TOT el catàleg (la selecció de què enviar es fa després). Calia un to càlid i humà, no una proposta a mida fingida.
+- `lib/services/dossierCompositePdfService.ts` (`drawCover`, `drawIntro`): portada amb "PER A" + nom + tancament càlid "Tenim moltes ganes de fer-ho realitat amb vosaltres" (fora la línia tècnica "DOSSIER NARRATIU + FITXES COMERCIALS SELECCIONADES"). Intro "HOLA!" → "Mireu què podem portar a la vostra festa." + salutació natural + secció "Com està ordenat" que convida a triar el que els faci il·lusió. Eliminada la narrativa per-event fingida i el recompte dinàmic de propostes.
+- Validació tècnica: `npx tsc --noEmit` OK.
+- Validació funcional: captura del dossier (portada + intro) amb to proper; coherent amb "el dossier és tot el catàleg, la selecció es fa a l'enviament".
+- Validació humana/UX: to càlid i genuí en català, sense màrqueting ni anglicismes.
+- `ADMIN_CHANGE_COUNTER` puja a `896`; el següent canvi real ha de ser `#897`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #895 — 2026-06-05 — codex (FET)
+**Masquerade queda refet des del Word complet i el dossier passa d'índex fred a proposta propera.**
+- Context: el propietari ha demanat llegir el Word sencer de Downloads abans de continuar. La lectura completa de `Propuesta Urbanización Collsacreu (1).docx` confirma que el document de Carlos només conté animació infantil i extres: Animació temàtica, Animació amb personatge, El secret dels pirates, Pintacares i Globoflèxia. Bingo/Batalla no surten al Word i, per tant, no s'han de sembrar com a productes Masquerade.
+- `scripts/seed-masquerade-products.mjs`: refet segons el Word complet. Sembra només productes infantils i extres amb preu, calcula PVP via `resellPrice()` i desactiva productes antics del col·laborador que no apareixen al Word quan el propietari executi el seed.
+- `scripts/process-masquerade-images.mjs`: rutes alineades amb el Word (`animacio-tematica.jpg`, `animacio-personatge.jpg`, `secret-pirates.jpg`) i pirates sense crop, preservant la portada sencera.
+- `public/img/collaborators/masquerade/secret-pirates.jpg`: regenerada des del Word extret a `D:\tmp\collsacreu-docx-20260605-150528`; queda vertical i completa.
+- `lib/services/dossierCompositePdfService.ts`: la introducció deixa de semblar un índex/llista de compra i passa a carta propera; les imatges dels capítols es dibuixen amb `fitWithin`, sense retallar la portada de pirates.
+- `lib/constants/animacio-products.ts` i `animacio-products-resolver.ts`: categories canòniques per separar `Animació adulta`, `DJ` i so de casaments; el DJ manté preus canònics 100/200 com a complement sense hardcode al PDF.
+- `messages/ca.json`: ajustos puntuals de llenguatge natural en textos d'animació que alimenten el dossier.
+- Efecte: el dossier queda agrupat per moments reals: Animació adulta pròpia d'Òrbita, Animació infantil de Masquerade i suport musical. Masquerade deixa d'arrossegar Bingo/Batalla com si fossin del Word de Carlos.
+- Validació tècnica: `pnpm vitest run __tests__\lib\services\dossierCompositePdfService.test.ts` OK (3 tests); `npx tsc --noEmit --pretty false` OK; `node --check scripts\seed-masquerade-products.mjs` OK; `node --check scripts\process-masquerade-images.mjs` OK.
+- Validació funcional: el Word complet s'ha extret i llegit; el seed no s'ha executat contra BD; quan s'executi, sincronitzarà només el catàleg Masquerade real del Word i desactivarà els productes antics que no hi surten.
+- Validació humana/UX: llenguatge català natural, sense `mood`/`vibe` ni anglicismes al perímetre del dossier; pirates es veu sencer; la introducció és personal i propera.
+- `ADMIN_CHANGE_COUNTER` puja a `895`; el següent canvi real ha de ser `#896`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #894 — 2026-06-05 — claude (FET)
+**Dossier Masquerade: imatges reals per producte, agrupació per categories, narrativa protagonista i neteja d'anglicismes.**
+- Context: el propietari volia que el dossier reflectís tots els productes de Carlos (Masquerade) com a propis d'Òrbita, amb imatges reals, agrupats per categoria, amb la narrativa pesant més que la fitxa tècnica, i sense anglicismes ("som a Catalunya").
+- `scripts/process-masquerade-images.mjs`: mapeig correcte i crop selectiu del logo Masquerade (image3→1 personatge, image4→2 personatges, image1→pirates). 5 imatges netes a `public/img/collaborators/masquerade/` (bingo del frame del vídeo, batalla de foto de festa).
+- `lib/services/dossierCompositePdfService.ts`: agrupació per `categoria` (eyebrow + subratllat), imatge per capítol (carregada del filesystem), preu canònic "des de X€", narrativa protagonista i INCLOU compacte secundari. Annex de catàleg eliminat (preu va per capítol).
+- `lib/constants/animacio-products.ts`: camp `categoria` + `priceFrom` + `resolveAnimacioPriceFrom()`. `animacio-products-resolver.ts` i `collaboratorProductService.ts` propaguen categoria/imatge/preu.
+- `app/api/admin/studio/preview/dossier/route.ts`: carrega tot canònicament (animació + col·laboradors), dedup bingo/batalla, exclou extres.
+- `lib/constants/pricing.ts`: `resellPrice(cost)` = cost+20% arrodonit a l'alça a múltiple de 5 (acabat en 0/5).
+- `messages/ca.json`: anglicismes substituïts — "show de llums"→"espectacle de llums", "Show de Làser"→"Espectacle de Làser", "show talent"→"concurs de talent", "feedback" (àudio)→"acoblaments", "feedback" (opinió)→"comentaris".
+- `__tests__/lib/services/dossierCompositePdfService.test.ts`: tests actualitzats al nou model (sense annex).
+- Validació tècnica: `npx tsc --noEmit` OK · 3 tests dossier OK · `pnpm run validate:core` OK · `pnpm build` EXIT=0.
+- Validació funcional: preview del dossier agrupat per categories amb imatges i preus canònics per capítol; web pública sense anglicismes a català.
+- Validació humana/UX: narrativa protagonista, fitxa tècnica reduïda, productes presentats com a propis d'Òrbita.
+- `ADMIN_CHANGE_COUNTER` puja a `894`; el següent canvi real ha de ser `#895` (codex: seed amb rutes d'imatge noves + categories + preus).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #893 — 2026-06-05 — codex (FET)
 **Packs Masquerade entren al dossier i el PVP de col·laborador queda corregit a `cost × 1,20`.**
 - Context: després del #891, Masquerade ja tenia productes dins `/admin/collaborators`, però el dossier complet només podia annexar serveis del catàleg general. El propietari ha demanat aprofitar el document de Downloads de Masquerade/Collsacreu i generar packs de col·laborador també dins el dossier. Durant el tall, el propietari ha corregit el criteri de preu: no són arrodoniments manuals; el producte de Carlos porta un 20% de profit per Òrbita sobre el cost.

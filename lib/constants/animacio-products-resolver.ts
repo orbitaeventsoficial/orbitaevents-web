@@ -1,6 +1,6 @@
 import 'server-only';
 import { getTranslations } from 'next-intl/server';
-import { ANIMACIO_PRODUCTS_STRUCTURE, ANIMACIO_PRODUCT_IDS, resolveAnimacioPriceFrom, type AnimacioProduct } from './animacio-products';
+import { ANIMACIO_PRODUCTS_STRUCTURE, ANIMACIO_PRODUCT_CATEGORIES, ANIMACIO_PRODUCT_IDS, resolveAnimacioPriceFrom, type AnimacioProduct } from './animacio-products';
 
 /** Retorna els productes d'animació amb textos del JSON i estructura de preus del fitxer de constants. */
 export async function getAnimacioProducts(locale = 'ca'): Promise<AnimacioProduct[]> {
@@ -29,6 +29,7 @@ export async function getAnimacioProducts(locale = 'ca'): Promise<AnimacioProduc
       djOptions,
       durada: 'durada' in structure ? structure.durada : undefined,
       priceFrom: resolveAnimacioPriceFrom({ trams, djOptions }),
+      categoria: ANIMACIO_PRODUCT_CATEGORIES[id],
     } as AnimacioProduct;
   });
 }

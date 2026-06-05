@@ -11,11 +11,10 @@ const product: AnimacioProduct = {
 };
 
 describe('generateDossierCompositePDF', () => {
-  it('genera un sol PDF amb dossier editorial i fitxa de cataleg seleccionada', async () => {
+  it('genera un dossier editorial: portada + introducció + capítol narratiu', async () => {
     const doc = await generateDossierCompositePDF({
       client: {
         nom: 'Joan Pla',
-        email: 'joan@example.com',
         eventDesc: 'Festa privada',
       },
       products: [product],
@@ -23,7 +22,8 @@ describe('generateDossierCompositePDF', () => {
       locale: 'ca',
     });
 
-    expect(doc.internal.pages.length - 1).toBeGreaterThanOrEqual(4);
+    // Portada + introducció + 1 capítol = 3 pàgines (els preus van per capítol, sense annex).
+    expect(doc.internal.pages.length - 1).toBeGreaterThanOrEqual(3);
     expect(doc.output('arraybuffer').byteLength).toBeGreaterThan(1000);
   });
 
@@ -38,7 +38,7 @@ describe('generateDossierCompositePDF', () => {
     expect(doc.internal.pages.length - 1).toBe(3);
   });
 
-  it('afegeix annex comercial per packs de col·laborador', async () => {
+  it('presenta els productes de col·laborador com a capítols propis', async () => {
     const doc = await generateDossierCompositePDF({
       client: { nom: 'Joan Pla' },
       products: [

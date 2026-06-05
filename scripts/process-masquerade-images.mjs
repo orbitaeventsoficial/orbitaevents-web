@@ -1,14 +1,13 @@
 /**
- * Processa les imatges dels productes de Carlos (Masquerade) perquè un reverse image
- * search NO les associï al seu portal i SENSE el logo de Masquerade visible.
+ * Processa les imatges dels productes de Carlos (Masquerade) des del Word original.
  *
  * Mapeig correcte (del Word de Carlos):
- *   image3 → animacio-1-personatge (animador sol)
- *   image4 → animacio-2-personatges (animador + Mickey)
- *   image1 → secret-pirates (portada pirates; crop superior per treure el logo Masquerade)
+ *   image3 → animacio-tematica (animador sol)
+ *   image4 → animacio-personatge (animador + Mickey)
+ *   image1 → secret-pirates (portada pirates sencera)
  *   image2 → NO s'usa (és el logo de l'empresa)
  *
- * Transformacions: crop selectiu (treu logo) + recrop aspect ratio + ajust to/llum
+ * Transformacions: crop selectiu quan cal + ajust to/llum
  * + recompressió JPEG + strip EXIF.
  *
  * Ús: node scripts/process-masquerade-images.mjs [SRC_DIR]
@@ -22,13 +21,11 @@ const SRC_DIR = process.argv[2] || '/tmp/docx-extract/word/media';
 const OUT_DIR = path.join(process.cwd(), 'public', 'img', 'collaborators', 'masquerade');
 
 // cropFrac: regió a conservar [leftFrac, topFrac, widthFrac, heightFrac] sobre l'original.
-// Serveix per treure el logo de Masquerade abans del recrop final.
+// Serveix per reenquadrar les fotos quan cal abans del format final.
 const JOBS = [
-  { src: 'image3.jpg', out: 'animacio-1-personatge.jpg', crop: [0.05, 0.02, 0.90, 0.96], q: 84 },
-  { src: 'image4.jpg', out: 'animacio-2-personatges.jpg', crop: [0.02, 0.02, 0.96, 0.96], q: 84 },
-  // Pirates: el logo Masquerade és a dalt a l'esquerra. Conservem la franja central
-  // (personatges + mar), que l'exclou.
-  { src: 'image1.jpg', out: 'secret-pirates.jpg', crop: [0.0, 0.16, 1.0, 0.52], q: 82 },
+  { src: 'image3.jpg', out: 'animacio-tematica.jpg', crop: [0.05, 0.02, 0.90, 0.96], fit: 'cover', q: 84 },
+  { src: 'image4.jpg', out: 'animacio-personatge.jpg', crop: [0.02, 0.02, 0.96, 0.96], fit: 'cover', q: 84 },
+  { src: 'image1.jpg', out: 'secret-pirates.jpg', crop: [0.0, 0.0, 1.0, 1.0], fit: 'inside', q: 82 },
 ];
 
 async function run() {
@@ -52,9 +49,13 @@ async function run() {
       height: Math.round(H * hf),
     };
 
+    const resizeOptions = job.fit === 'inside'
+      ? { fit: 'inside', withoutEnlargement: true }
+      : { fit: 'cover', position: 'centre' };
+
     await sharp(srcPath)
       .extract(region)
-      .resize(1000, 1000, { fit: 'cover', position: 'centre' })
+      .resize(1000, 1000, resizeOptions)
       .modulate({ brightness: 1.04, saturation: 1.08, hue: 6 })
       .gamma(1.05)
       .jpeg({ quality: job.q, progressive: true, mozjpeg: true })
@@ -63,7 +64,7 @@ async function run() {
     console.log(`✓ ${job.src} → masquerade/${job.out} (crop ${job.crop.join(',')})`);
   }
 
-  console.log('\nFet. Imatges netes, sense logo Masquerade.');
+  console.log('\nFet. Imatges sincronitzades des del Word original.');
 }
 
 run().catch((err) => {

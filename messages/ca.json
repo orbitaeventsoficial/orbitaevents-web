@@ -85,7 +85,7 @@
         "includes": [
           "DJ + tècnic de llums 6 hores",
           "So club 4000W",
-          "Show de llums complet",
+          "Espectacle de llums complet",
           "Fum baix + boira + reforç ambiental",
           "Escenografia total amb 200+ elements",
           "Espurnes fredes + CO2 criogènic",
@@ -1561,7 +1561,7 @@
             "f5": "Fum i efectes que fan que cada moment sigui especial",
             "f6": "Nosaltres ho muntem i ho desmontem tot"
           },
-          "ideal": "Ball amb show de llums i efectes"
+          "ideal": "Ball amb espectacle de llums i efectes"
         },
         "bodas-luxury": {
           "name": "Exclusiu",
@@ -1570,7 +1570,7 @@
             "f1": "DJ + Tècnic de llums dedicat (2 persones, 6 hores)",
             "f2": "Posem la música a cada pas: entrada dels nuvis, passes de plats i begudes, pastís, entregues, regals, entrada al ball i sessió completa",
             "f3": "So audiòfil 4000W — cada cançó sona com ha de sonar",
-            "f4": "Show de llums sincronitzat amb la música (4 caps mòbils 150W)",
+            "f4": "Espectacle de llums sincronitzat amb la música (4 caps mòbils 150W)",
             "f5": "Fum baix per al primer ball — ballareu entre núvols",
             "f6": "Nosaltres ho muntem i ho desmontem tot"
           },
@@ -2332,7 +2332,7 @@
       "customFeatures": {
         "theming": "Tematització disponible (consultar)",
         "decoration": "Decoració personalitzada",
-        "lightShow": "Show especial de llums",
+        "lightShow": "Espectacle especial de llums",
         "consultation": "Consulta sense compromís!"
       },
       "zones": {
@@ -2529,7 +2529,7 @@
           "features": [
             "DJ professional 6 hores — tota la nit al teu servei",
             "So de club (4000W + subwoofer de reforç) — ho sentireu a tot el cos",
-            "Show de llums complet amb caps mòbils sincronitzats",
+            "Espectacle de llums complet amb caps mòbils sincronitzats",
             "Efectes VIP: fum, bombolles, espurnes fredes, confeti",
             "Cabina DJ Pro il·luminada — el centre de la festa"
           ]
@@ -2619,7 +2619,7 @@
           "description": "Neó LED amb missatge personalitzat per a photocall"
         },
         "laser-show": {
-          "name": "Show de Làser",
+          "name": "Espectacle de Làser",
           "description": "Efectes làser sincronitzats amb la música - espectacular"
         },
         "photobooth-360": {
@@ -4682,7 +4682,7 @@
       "emojiMessages": {
         "1": "Oh no! Què va passar?",
         "2": "Entenem, podem millorar",
-        "3": "Gràcies pel feedback!",
+        "3": "Gràcies pels comentaris!",
         "4": "Genial! Ens alegrem!",
         "5": "INCREÏBLE! Això ens fa molt feliços! 🎉"
       },
@@ -7338,7 +7338,7 @@
     "batalla-musical": {
       "nom": "Batalla Musical",
       "descripcio": [
-        "Hora i mitja de competició musical. Els participants es divideixen en equips — noies contra nois, per taules, per edats o totalment aleatori — i s'enfronten en reptes: karaoke col·lectiu, endevina la cançó, ball, preguntes musicals, show talent...",
+        "Hora i mitja de competició musical. Els participants es divideixen en equips — noies contra nois, per taules, per edats o totalment aleatori — i s'enfronten en reptes: karaoke col·lectiu, endevina la cançó, ball, preguntes musicals, concurs de talent...",
         "Cada repte suma punts. Qui decideix qui guanya? El públic amb els aplaudiments, un jurat triat entre els assistents, o el presentador — s'adapta al moment. El qui no vulgui competir pot fer de jurat.",
         "Al final, un sol equip s'emporta la Batalla Musical."
       ],
@@ -7356,7 +7356,7 @@
       "nom": "Servei de DJ",
       "descripcio": [
         "DJ professional amb equip complet de so. Abans de l'event parlem: quin és el públic, quins moments no poden fallar, si hi ha cançons imprescindibles o gèneres a evitar. No treballem amb llistes genèriques.",
-        "Va bé sol (per al coctel o la festa) o com a complement a qualsevol proposta d'animació. Si voleu el DJ per a tot el dia, mireu el pack Boda Sencera."
+        "Va bé sol (per al còctel o la festa) o com a complement a qualsevol proposta d'animació. Si voleu el DJ per a tot el dia, mireu la proposta Boda Sencera."
       ],
       "inclou": [
         "DJ professional",
@@ -7371,7 +7371,7 @@
       "nom": "Sonorització de Cerimònia",
       "descripcio": [
         "El so de la cerimònia és el primer que els convidats escolten — i el que marca el to de tot el dia. Ens encarreguem del micròfon per a l'oficiant, el so ambient i la llista de cançons que haureu triat per a cada moment.",
-        "Entrada, lectura, firma i sortida: cada instant amb el seu so, sense feedback, sense silencis incòmodes, sense improvisació de darrera hora."
+        "Entrada, lectura, firma i sortida: cada instant amb el seu so, sense acoblaments, sense silencis incòmodes, sense improvisació de darrera hora."
       ],
       "inclou": [
         "Sistema de so adaptat a l'espai (interior o exterior)",
@@ -7399,7 +7399,7 @@
         "Un sol punt de contacte per a tot el dia",
         "Muntatge i desmuntatge"
       ],
-      "noInclou": "* Bingo Musical o Batalla Musical disponibles com a complement. Descompte en pack — consulteu-nos."
+      "noInclou": "* Bingo Musical o Batalla Musical disponibles com a complement. Ajust de preu si es contracta conjuntament — consulteu-nos."
     }
   }
 }

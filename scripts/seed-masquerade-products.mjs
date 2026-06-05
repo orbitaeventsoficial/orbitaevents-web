@@ -1,109 +1,86 @@
 /**
  * Sembra el catàleg de productes de Masquerade Events (Carlos Lucas Fernández)
- * com a productes de revenda del col·laborador, amb el nostre marge (PVP).
+ * com a productes de revenda del col·laborador, amb el nostre PVP canònic.
  *
- * Idempotent i segur: si el col·laborador ja té productes, NO els toca
- * (per no sobreescriure edicions de preu fetes des de l'admin).
+ * Idempotent i segur: sincronitza per nom sense duplicar productes.
  *
  * Ús: node scripts/seed-masquerade-products.mjs
  */
 import { PrismaClient } from '@prisma/client';
+import { resellPrice } from '../lib/constants/pricing.ts';
 
 const prisma = new PrismaClient();
 
 const COLLABORATOR_ID = 'carlos-lucas-fernandez';
 const IMG = '/img/collaborators/masquerade';
 const INCLUDES = "Vestuari d'alta qualitat · Desplaçament inclòs · Disponible en català";
-const DEFAULT_MARKUP = 0.20;
+const CHILDREN_CATEGORY = 'Animació infantil';
+const EXTRA_CATEGORY = 'Extra';
 
-function sellPrice(costPrice) {
-  return Math.round(costPrice * (1 + DEFAULT_MARKUP));
+function productPrice(costPrice) {
+  return resellPrice(costPrice);
 }
 
 const PRODUCTS = [
   {
     name: 'Animació temàtica',
-    category: 'Animació infantil',
+    category: CHILDREN_CATEGORY,
     crew: 'Animador + tècnic de so',
     durationLabel: '1h',
     costPrice: 160,
-    sellPrice: sellPrice(160),
+    sellPrice: productPrice(160),
     imageUrl: `${IMG}/animacio-tematica.jpg`,
-    description: 'Els nostres personatges més entranyables venen a ensenyar un nou món de màgia i color. Jocs, balls i música en un show totalment dinàmic. Pregunta pels personatges disponibles.',
+    description: "Els personatges més entranyables obren un món de màgia i color amb jocs, balls i música. És una animació dinàmica, pensada perquè els infants participin en una aventura adaptada a la seva edat. Els personatges disponibles es confirmen segons agenda.",
     includes: INCLUDES,
     sortOrder: 1,
   },
   {
     name: 'Animació amb personatge',
-    category: 'Animació infantil',
-    crew: 'Animador + 1 personatge + tècnic de so',
+    category: CHILDREN_CATEGORY,
+    crew: 'Animador + personatge + tècnic de so',
     durationLabel: '1h',
     costPrice: 250,
-    sellPrice: sellPrice(250),
+    sellPrice: productPrice(250),
     imageUrl: `${IMG}/animacio-personatge.jpg`,
-    description: 'Coneix els personatges preferits dels més petits (Disney, Bluey, Patrulla Canina…). Una vetllada on ajudareu els personatges a través de balls i dinàmiques.',
+    description: "Els infants coneixen els seus personatges preferits i els ajuden a través de balls, jocs i dinàmiques participatives. És un format proper, molt visual i pensat perquè els nens i nenes se sentin dins de la història.",
     includes: INCLUDES,
     sortOrder: 2,
   },
   {
     name: 'El secret dels pirates',
-    category: 'Musical',
+    category: CHILDREN_CATEGORY,
     crew: '2 actors + decoració + tècnic de so',
     durationLabel: '70 min',
     costPrice: 320,
-    sellPrice: sellPrice(320),
+    sellPrice: productPrice(320),
     imageUrl: `${IMG}/secret-pirates.jpg`,
-    description: "Un musical carregat de cançons en directe, balls i música. L'illa Maragda i el tresor de Poseidó, la lluita entre el capità William i la capitana Elissabeth. Valors d'amistat i treball en equip.",
+    description: "A les profunditats del Mediterrani s'amaga l'illa Maragda i el tresor màgic de Poseidó. El capità William i la capitana Elissabeth tenen cadascun una part del mapa i hauran de decidir si competeixen o treballen junts. Un musical amb cançons en directe, balls i valors d'amistat i treball en equip.",
     includes: INCLUDES,
     sortOrder: 3,
   },
   {
     name: 'Pintacares professional',
-    category: 'Extra',
+    category: EXTRA_CATEGORY,
     crew: null,
     durationLabel: '1h',
     costPrice: 70,
-    sellPrice: sellPrice(70),
+    sellPrice: productPrice(70),
     imageUrl: null,
-    description: 'Pintacares professional per complementar qualsevol espectacle.',
+    description: "Extra contractable amb una animació infantil o familiar. Servei de pintacares professional per ampliar l'experiència de la festa.",
     includes: null,
     sortOrder: 4,
   },
   {
     name: 'Globoflèxia',
-    category: 'Extra',
+    category: EXTRA_CATEGORY,
     crew: null,
     durationLabel: null,
     costPrice: 40,
-    sellPrice: sellPrice(40),
+    sellPrice: productPrice(40),
     imageUrl: null,
-    description: 'Globoflèxia al finalitzar el show.',
+    description: "Extra contractable amb una animació infantil o familiar. Globoflèxia en acabar l'espectacle perquè cada infant pugui marxar amb un record.",
     includes: null,
     sortOrder: 5,
-  },
-  {
-    name: 'Bingo musical',
-    category: 'Bingo',
-    crew: 'Presentador + equip propi (so a part)',
-    durationLabel: '1h 30',
-    costPrice: 160,
-    sellPrice: sellPrice(160),
-    imageUrl: null,
-    description: 'El bingo que es juga cantant, ballant i rient amb tothom. Carlos hi ve amb equip propi. El tècnic de so va a part (+40€). Ideal per a sopars d\'empresa, festes populars i aniversaris.',
-    includes: INCLUDES,
-    sortOrder: 6,
-  },
-  {
-    name: 'Tècnic de so (bingo)',
-    category: 'Extra',
-    crew: null,
-    durationLabel: null,
-    costPrice: 40,
-    sellPrice: sellPrice(40),
-    imageUrl: null,
-    description: 'So per al bingo musical. Normalment el cobreix Òrbita (ingrés propi com a tècnic); si no pots, va un tercer (cost 40€).',
-    includes: null,
-    sortOrder: 7,
   },
 ];
 
@@ -140,7 +117,23 @@ async function main() {
     }
     const margin = p.sellPrice - p.costPrice;
     const pct = ((margin / p.costPrice) * 100).toFixed(0);
-    console.log(`${existing ? '↻' : '✓'} ${p.name}: cost ${p.costPrice}€ → PVP ${p.sellPrice}€ (profit +${margin}€ / +${pct}% sobre cost)`);
+    const marginText = p.costPrice > 0
+      ? `cost ${p.costPrice}€ → PVP ${p.sellPrice}€ (profit +${margin}€ / +${pct}% sobre cost)`
+      : 'preu a consultar';
+    console.log(`${existing ? '↻' : '✓'} ${p.name}: ${marginText}`);
+  }
+
+  const canonicalNames = PRODUCTS.map((p) => p.name);
+  const obsolete = await prisma.collaboratorProduct.updateMany({
+    where: {
+      collaboratorId: COLLABORATOR_ID,
+      name: { notIn: canonicalNames },
+      isActive: true,
+    },
+    data: { isActive: false },
+  });
+  if (obsolete.count > 0) {
+    console.log(`\n${obsolete.count} producte(s) antic(s) de Masquerade desactivat(s) perquè no surten al Word.`);
   }
   console.log(`\nFet. ${PRODUCTS.length} productes sincronitzats per a ${collaborator.name}.`);
 }

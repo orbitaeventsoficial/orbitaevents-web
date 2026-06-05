@@ -27,6 +27,14 @@ export type AnimacioProduct = {
   categoria?: string;
 };
 
+export const ANIMACIO_PRODUCT_CATEGORIES: Record<string, string> = {
+  'bingo-musical': 'Animació adulta',
+  'batalla-musical': 'Animació adulta',
+  dj: 'DJ',
+  'sonoritzacio-cerimonia': 'DJ i so per a casaments',
+  'boda-sencera': 'DJ i so per a casaments',
+};
+
 /** Preu "des de" canònic d'un producte: mínim no-nul de trams o djOptions. */
 export function resolveAnimacioPriceFrom(product: { trams?: readonly ProductPricingTier[]; djOptions?: readonly DJPricingOption[] }): number | null {
   const prices: number[] = [];
@@ -65,8 +73,8 @@ export const ANIMACIO_PRODUCTS_STRUCTURE = [
   {
     id: 'dj',
     djOptions: [
-      { label: '1 hora', price: 100, sublabel: 'En pack amb animació', standalonePrice: 150 },
-      { label: '2 hores', price: 200, sublabel: 'En pack amb animació', standalonePrice: 250 },
+      { label: '1 hora', price: 100, sublabel: 'Com a complement d\'animació', standalonePrice: 150 },
+      { label: '2 hores', price: 200, sublabel: 'Com a complement d\'animació', standalonePrice: 250 },
       { label: '3 hores', price: null, sublabel: 'Pressupost a mida' },
     ] as DJPricingOption[],
   },
