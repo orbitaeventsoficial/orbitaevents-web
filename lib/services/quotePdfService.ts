@@ -228,7 +228,7 @@ export async function generateQuotePDF(
     height: number,
     rounded = 2,
     soft = false,
-    noBar = false,
+    noBar = true,
   ) => {
     doc.setFillColor(...(soft ? surfaceSoft : surface));
     doc.roundedRect(x, top, width, height, rounded, rounded, 'F');
@@ -291,25 +291,39 @@ export async function generateQuotePDF(
   drawLabelValue(t.guests, `${Math.max(0, data.guests)}`, left + 88, y + 6 + fieldHeight(dateUsed) + 2.5, 85, 2);
   y += eventBoxHeight + adaptiveGap;
 
-  const packNameLines = doc.splitTextToSize(resolvedPack.name, 126).slice(0, 2);
-  const packInfoHeight = 22 + (packNameLines.length - 1) * 4.6;
-  ensureSpace(packInfoHeight + adaptiveGap);
-  drawCard(left, y - 3, contentWidth, packInfoHeight + 3, 2, false);
+  // ── Pack seleccionat — card amb header negre (estil catàleg) ───────────────
+  const packCardHeaderH = 16;
+  const packNameLines = doc.splitTextToSize(resolvedPack.name, contentWidth - 56).slice(0, 1);
+  const packCardBodyH = 8;
+  const packCardTotalH = packCardHeaderH + packCardBodyH;
+  ensureSpace(packCardTotalH + adaptiveGap);
+  // Cos de la card amb barra or (un dels 2 únics blocs amb barra)
+  drawCard(left, y, contentWidth, packCardTotalH, 2, false, false);
+  // Franja negra superior
+  doc.setFillColor(...COLORS.canvas);
+  doc.roundedRect(left, y, contentWidth, packCardHeaderH, 2, 2, 'F');
+  doc.setFillColor(...COLORS.canvas);
+  doc.rect(left, y + packCardHeaderH / 2, contentWidth, packCardHeaderH / 2, 'F');
+  // Eyebrow "PACK SELECCIONAT" al header
   doc.setTextColor(...muted);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(PDF_DESIGN.type.caption);
-  doc.text(t.selectedPack.toUpperCase(), left + 4, y + 2);
-  y += 7.5;
-  doc.setTextColor(...neutral);
-  doc.setFontSize(PDF_DESIGN.type.title);
-  doc.text(packNameLines, left + 4, y);
-  setStyleMuted(doc);
-  doc.text(`${resolvedPack.durationHours} ${t.hours}`, left + 4, y + 7.5 + (packNameLines.length - 1) * 4.6);
+  doc.text(t.selectedPack.toUpperCase(), left + 6, y + 5, { charSpace: 0.4 });
+  // Nom pack en or bold a l'esquerra
+  doc.setTextColor(...COLORS.gold);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...neutral);
+  doc.setFontSize(PDF_DESIGN.type.title);
+  doc.text(packNameLines, left + 6, y + 12);
+  // Durada en muted sota el nom dins el header
+  setStyleCaption(doc);
+  doc.setTextColor(...COLORS.textMuted);
+  doc.text(`${resolvedPack.durationHours} ${t.hours}`, left + contentWidth - 6, y + 5, { align: 'right' });
+  // Preu gran en blanc a la dreta del header
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...COLORS.white);
   doc.setFontSize(PDF_DESIGN.type.money);
-  doc.text(formatPdfMoney(data.basePrice, locale), left + contentWidth - 4, y + 2, { align: 'right' });
-  y += 14.5 + (packNameLines.length - 1) * 4.6;
+  doc.text(formatPdfMoney(data.basePrice, locale), left + contentWidth - 6, y + 13, { align: 'right' });
+  y += packCardTotalH + adaptiveGap;
 
   const features = resolvedPack.features
     .map((feature) => feature.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim())
@@ -317,21 +331,26 @@ export async function generateQuotePDF(
     .slice(0, 6);
 
   if (features.length > 0) {
-    const featureRows = features.map((feature) => doc.splitTextToSize(feature, 170).slice(0, 2).length);
-    const featureLinesTotal = featureRows.reduce((sum, n) => sum + n, 0);
-    const featuresBoxHeight = 12 + featureLinesTotal * lineHeight + 4;
-    ensureSpace(featuresBoxHeight + 2);
-    drawCard(left, y - 4, contentWidth, featuresBoxHeight, 2, false, true);
-    y = drawCanonicalSectionTitle(doc, y - 2, t.features);
-    for (const feature of features) {
+    // Features en 2 columnes, directament sobre l'ivori (sense card)
+    const colW = contentWidth / 2 - 4;
+    const leftCount = Math.ceil(features.length / 2);
+    const rowsNeeded = leftCount;
+    const featRowH = 5.5;
+    const featuresBlockH = 12 + rowsNeeded * featRowH;
+    ensureSpace(featuresBlockH + 2);
+    const sectionY = drawCanonicalSectionTitle(doc, y - 2, t.features);
+    features.forEach((feature, i) => {
+      const col = i < leftCount ? 0 : 1;
+      const rowIdx = i < leftCount ? i : i - leftCount;
+      const cx = left + 4 + col * (colW + 8);
+      const cy = sectionY + rowIdx * featRowH;
       doc.setFillColor(...accent);
-      doc.circle(left + 5.5, y - 1.25, 0.95, 'F');
+      doc.circle(cx + 1.5, cy - 1.25, 0.95, 'F');
       setStyleBody(doc);
-      const lines = doc.splitTextToSize(feature, 170).slice(0, 2);
-      doc.text(lines, left + 9, y);
-      y += lineHeight * lines.length;
-    }
-    y += PDF_DESIGN.blockGap;
+      const fLine = doc.splitTextToSize(feature, colW - 7).slice(0, 1)[0] || feature;
+      doc.text(fLine, cx + 5, cy);
+    });
+    y = sectionY + rowsNeeded * featRowH + PDF_DESIGN.blockGap * 0.5;
   }
 
   if (data.extras.length > 0) {
@@ -392,7 +411,7 @@ export async function generateQuotePDF(
 
   // El resum pot quedar al primer full encara que les condicions necessitin continuar.
   ensureSpace(summaryHeight + 4);
-  drawCard(left, y, contentWidth, summaryHeight, 2, true);
+  drawCard(left, y, contentWidth, summaryHeight, 2, true, false);
   doc.setTextColor(...neutral);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(PDF_DESIGN.type.section);
@@ -486,7 +505,7 @@ export async function generateQuotePDF(
       doc.text(lines, left + 4, y);
       y += lineHeight * lines.length;
     }
-    y += 3.5;
+    y += PDF_DESIGN.blockGap * 0.5;
   }
 
   if (data.whyChooseUs?.trim()) {

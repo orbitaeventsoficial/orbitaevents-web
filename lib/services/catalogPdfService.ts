@@ -88,8 +88,8 @@ export async function generateServiceBrochure(
     doc.setLineWidth(isPopular ? 0.6 : 0.25);
     doc.roundedRect(px, py, packCardW, packCardHeight, 2.5, 2.5, 'FD');
 
-    // Header negre de la targeta
-    const cardHeaderH = 12;
+    // Header negre de la targeta — més alt perquè nom i preu respirin
+    const cardHeaderH = 14;
     doc.setFillColor(...COLORS.canvas);
     doc.roundedRect(px, py, packCardW, cardHeaderH, 2.5, 2.5, 'F');
     doc.setFillColor(...COLORS.canvas);
@@ -100,11 +100,15 @@ export async function generateServiceBrochure(
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(PDF_DESIGN.type.body);
     const packNameLines = doc.splitTextToSize(pack.name, packCardW - 28).slice(0, 1);
-    doc.text(packNameLines, px + 5, py + 8);
+    doc.text(packNameLines, px + 5, py + 9);
 
-    // Preu gran al header, alineat a la dreta
+    // "des de" + preu junts al header, alineats a la dreta
+    setStyleCaption(doc);
+    doc.setTextColor(...COLORS.textMuted);
+    doc.text(t.from, px + packCardW - 4, py + 5, { align: 'right' });
     setStylePrice(doc);
-    doc.text(formatPdfMoney(pack.priceValue, locale), px + packCardW - 4, py + 9, { align: 'right' });
+    doc.setTextColor(...COLORS.white);
+    doc.text(formatPdfMoney(pack.priceValue, locale), px + packCardW - 4, py + 11.5, { align: 'right' });
 
     // Badge popular — punt or a la cantonada superior dreta (sobre el header)
     if (isPopular) {
@@ -112,12 +116,11 @@ export async function generateServiceBrochure(
       doc.circle(px + packCardW - 3, py + 3, 2, 'F');
     }
 
-    // Durada + label "des de"
+    // Durada sota el header
     const bodyTop = py + cardHeaderH + 4;
     setStyleCaption(doc);
     doc.setTextColor(...COLORS.textMuted);
     doc.text(`${pack.durationHours} ${t.hours}`, px + 5, bodyTop);
-    doc.text(t.from, px + packCardW - 4, bodyTop, { align: 'right' });
 
     // Features amb check circular
     const featureStart = bodyTop + 5;

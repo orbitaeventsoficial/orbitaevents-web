@@ -93,7 +93,7 @@ export function drawCanonicalPdfHeader(
   const displaySubtitle = subtitle || metaLines[0] || '';
   const displayRef = ref || metaLines[1] || '';
 
-  // Eyebrow: identifica el context sense competir amb el títol
+  // Eyebrow: identifica el context sense competir amb el títol (servei, en or)
   if (displaySubtitle) {
     doc.setTextColor(...COLORS.gold);
     doc.setFont('helvetica', 'bold');
@@ -112,12 +112,18 @@ export function drawCanonicalPdfHeader(
   }
   doc.text(titleText, layout.contentX, layout.titleY);
 
-  // Referència / data en una sola línia calmada
+  // Filet or sota el títol — unifica l'estil amb el hero del catàleg
+  doc.setFillColor(...COLORS.gold);
+  doc.rect(layout.contentX, layout.titleY + 3, 28, 0.8, 'F');
+
+  // Referència / metadades en gris — si hi ha 3+ segments, en mostrem 2
   if (displayRef) {
+    const segments = displayRef.split('·').map((part) => part.trim()).filter(Boolean);
+    const refLine = segments.length >= 3 ? segments.slice(0, 2).join(' · ') : displayRef;
     doc.setTextColor(...COLORS.textSecondary);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7);
-    doc.text(displayRef, layout.contentX, layout.refY);
+    doc.text(refLine, layout.contentX, layout.refY);
   }
 
   return layout.contentStartY;
@@ -153,7 +159,7 @@ export function drawCanonicalPdfFooter(
     doc.setTextColor(...COLORS.gold);
     doc.text(contactLine, PDF_DESIGN.left, y + 6);
     doc.setTextColor(...COLORS.paperMuted);
-    doc.text(leftText, PDF_DESIGN.left, y + 13);
+    doc.text(SITE_CONFIG.business.name, PDF_DESIGN.left, y + 13);
     doc.text(`${page} / ${total}`, PDF_DESIGN.right, y + 13, { align: 'right' });
   } else {
     doc.text(leftText, PDF_DESIGN.left, y + 7);
