@@ -35,16 +35,16 @@ export default function RunAutoTasksButton() {
   };
 
   return (
-    <div className="flex flex-col items-end gap-1">
+    <div className="tk__auto-btn">
       <button
         type="button"
         onClick={handleRun}
         disabled={loading}
-        className="inline-flex items-center rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-semibold hover:bg-white/[0.06] transition-colors disabled:opacity-60"
+        className="tk__btn"
       >
         {loading ? 'Executant...' : '⚡ Auto-tasques'}
       </button>
-      {message && <p className="text-[11px] opacity-60">{message}</p>}
+      {message && <p className="tk__auto-msg">{message}</p>}
     </div>
   );
 }

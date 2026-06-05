@@ -24,10 +24,10 @@
   --o-text-3:  #6b7585;
   --o-text-4:  #4a525e;
 
-  --o-accent:        #d4a857;
+  --o-accent:        #d7b86e; /* or canònic de marca — únic accent de color */
   --o-accent-deep:   #b8923f;
-  --o-accent-soft:   rgba(212, 168, 87, 0.12);
-  --o-accent-line:   rgba(212, 168, 87, 0.32);
+  --o-accent-soft:   rgba(215, 184, 110, 0.12); /* or canònic al 12% */
+  --o-accent-line:   rgba(215, 184, 110, 0.32); /* or canònic al 32% */
   --o-accent-ink:    #1a1208;
 
   --o-success:      #3ec57b;
@@ -70,7 +70,7 @@
   --o-doc-surface:   #181c21;
   --o-doc-surface-2: #1d2228;
   --o-doc-border:    #334155;
-  --o-doc-accent:    #d4af37;
+  --o-doc-accent:    #d7b86e;
   --o-doc-text:      #f1f5f9;
   --o-doc-muted:     #94a3b8;
   --o-doc-total-bg:  #221f0a;
@@ -83,58 +83,184 @@
   --o-docl-muted:     #808080;
   --o-docl-muted-2:   #4a4a4a;
   --o-docl-line:      #e5e5e5;
-  --o-docl-accent:    #daa520;
+  --o-docl-accent:   #d7b86e;
+
+  /* ── Tipografia PDF — jerarquia unificada entre tots els documents (#881) ── */
+  --o-pdf-body:    var(--o-text-xs);   /* 11px — cos: valors, llistes, files */
+  --o-pdf-label:   9px;               /* etiquetes uppercase — entre micro i xs */
+  --o-pdf-caption: 8px;               /* peu, notes, subtextos muts */
+  --o-pdf-sec:     var(--o-text-2xs); /* 12px — títols de secció */
+  --o-pdf-price:   var(--o-text-md-2);/* 16px — preus */
 
   --o-font: var(--font-inter), "Segoe UI", system-ui, -apple-system, sans-serif;
-  --o-font-mono: var(--font-mono), "SF Mono", Menlo, Consolas, monospace;
+  --o-font-data: var(--font-inter), "Segoe UI", system-ui, -apple-system, sans-serif;
+  --o-font-mono: var(--o-font-data);
   --o-font-display: var(--font-display), var(--font-inter), "Segoe UI", system-ui, sans-serif;
 
-  /* ── Escala tipogràfica admin ── */
-  --o-text-xs:   11px;   /* labels, eyebrows mono uppercase */
-  --o-text-sm:   13px;   /* chips, nav, secundari */
-  --o-text-base: 14px;   /* cos de text, taules */
-  --o-text-md:   15px;   /* valors destacats */
-  --o-text-lg:   18px;   /* KPIs, números */
-  --o-text-xl:   24px;   /* subtítols de secció */
-  --o-text-2xl:  32px;   /* títols de pàgina */
+  /* ── Escala de font-weight canònica (§17 Lab · Tipografia) ── */
+  --o-fw-normal:    400;  /* cos de text mono, metadades */
+  --o-fw-book:      500;  /* text secundari lleuger */
+  --o-fw-semi:      600;  /* UI secundari, botons ghost */
+  --o-fw-semi-plus: 650;  /* sub-nav, pestanyes */
+  --o-fw-bold:      700;  /* UI primari, títols de secció */
+  --o-fw-cta:       750;  /* botons CTA, accions principals */
+  --o-fw-xbold:     800;  /* display heroic, títols de pàgina */
+  --o-fw-black:     850;  /* display màxim, ús molt puntual */
+
+  /* ── Escala tipogràfica canònica — mapa 1:1 amb Studio §17 ── */
+  /* --o-text-micro eliminat: admin-shell força cap a 12px tots els <12px */
+  --o-text-xs:     11px;   /* eyebrow i labels compactes */
+  --o-text-2xs:    12px;   /* data/ID mono */
+  --o-text-meta:   12.5px; /* focus meta mono (§17: 12.5px / 400 / 0.03em) */
+  --o-text-sm:     13px;   /* sub-títol pàgina mono · text secundari */
+  --o-text-sm-2:   13.5px; /* sub-nav Inter (§17: 13.5px / 650) */
+  --o-text-base:   14px;   /* body meta Inter · botó primari · tables */
+  --o-text-nav:    14.5px; /* sidebar item Inter (§17: 14.5px / 700) */
+  --o-text-md:     15px;   /* nom cel·la display (Jakarta 800) */
+  --o-text-md-2:   16px;   /* nom pipeline display (Jakarta 800) */
+  --o-text-lg:     18px;   /* KPIs, números */
+  --o-text-xl:     22px;   /* subtítols de secció */
+  --o-text-lane:   23px;   /* mes / lane capçalera pipeline (Jakarta 800) */
+  --o-text-xl-2:   24px;   /* valor clau display (Jakarta 800) */
+  --o-text-display: 28px;  /* focus name display (Jakarta 800) */
+  --o-text-2xl:    32px;   /* títols de pàgina */
+  --o-text-3xl:    36px;   /* títols hero admin */
+  --o-text-4xl:    40px;   /* títol principal de pàgina (Jakarta 800) */
+
+  /* ── Line-height canònic — no hardcodar als components ── */
+  --o-lh-tight:  1.30;  /* taules, cel·les, files denses */
+  --o-lh-snug:   1.40;  /* cards, llistes compactes */
+  --o-lh-body:   1.50;  /* cos de text, body meta */
+  --o-lh-loose:  1.65;  /* textos llargs, modals, descripicions */
+
+  /* ── Densitat de files (taules i llistes) ── */
+  --o-row-h:       36px;  /* alçada estàndard de fila de taula */
+  --o-row-h-sm:    28px;  /* fila compacta (logs, activitat) */
+  --o-row-pad-v:    6px;  /* padding vertical fila */
+  --o-row-pad-h:   12px;  /* padding horitzontal fila */
+
+  /* ── Accent secundari d'acció (focus, selecció, enllaços) ── */
+  /* Or = diners + CTA primari. Info = estat focus/seleccionat/acció interactiva */
+  --o-admin-action: var(--o-info);          /* #5fb7e8 — accent fred per a accions */
+  --o-admin-action-soft: var(--o-info-soft); /* suau per a hover/selected states */
+
+  /* ── Letter-spacing canònics §17 — no hardcodar als components ── */
+  --o-ls-tight:   -0.01em;  /* display estàndard (Jakarta títols) */
+  --o-ls-tighter: -0.015em; /* focus name (Jakarta 28px) */
+  --o-ls-wide:     0.03em;  /* focus meta mono */
+  --o-ls-wider:    0.04em;  /* sub-títol pàgina mono */
+  --o-ls-eyebrow:  0.18em;  /* labels eyebrow UPPERCASE mono */
+  --o-ls-nav:      0.01em;  /* botó primari Inter */
+
+  /* ── Escala de border-radius canònica ── */
+  --o-r-xs:    4px;    /* elements molt petits, badges */
+  --o-r-sm:    6px;    /* chips, tags */
+  --o-r-sm-2:  8px;    /* inputs, botons, cards petits */
+  --o-r-md:    10px;   /* cards, panels normals */
+  --o-r-md-2:  12px;   /* cards lleugerament arrodonits */
+  --o-r-lg:    14px;   /* panels grans, modals */
+  --o-r-xl:    20px;   /* cards principals, diàlegs */
+  --o-r-pill:  9999px; /* elements completament rodons */
 
   --o-sidebar-w: 200px;
 
-  /* Admin / Brass & Obsidian */
-  --o-admin-canvas: #0a0a0c;
-  --o-admin-side:   #0d0d10;
-  --o-admin-panel:  #131318;
-  --o-admin-raised: #1d1e25;
-  --o-admin-sunk:   #08080a;
+  /* Admin / Brass & Obsidian — superfícies
+     Canvas aclarit de #0a0a0c → #111116 per reduir halació i fatiga visual
+     en sessions llargues (recomanació expert visual #875). */
+  --o-admin-canvas:   #111116;
+  --o-admin-side:     #0f0f13;
+  --o-admin-panel:    #161619;
+  --o-admin-raised:   #1e1f27;
+  --o-admin-elevated: #252638;
+  --o-admin-sunk:     #0b0b0e;
 
+  /* Línies i fills */
   --o-admin-line:      rgba(236, 233, 227, 0.10);
   --o-admin-line-2:    rgba(236, 233, 227, 0.20);
+  --o-admin-line-3:    rgba(236, 233, 227, 0.30);
   --o-admin-hair-gold: rgba(215, 184, 110, 0.22);
 
-  --o-admin-text:  #ece7df;
-  --o-admin-text-2: #b6aea2;
-  --o-admin-text-3: #837c70;
+  /* Fills blancs (overlays sobre fons fosc) */
+  --o-admin-fill-1: rgba(236, 233, 227, 0.02);
+  --o-admin-fill-2: rgba(236, 233, 227, 0.04);
+  --o-admin-fill-3: rgba(236, 233, 227, 0.06);
+  --o-admin-fill-4: rgba(236, 233, 227, 0.08);
+  --o-admin-fill-5: rgba(236, 233, 227, 0.12);
 
+  /* Gold semitransparent */
+  --o-admin-gold-tint-1: rgba(215, 184, 110, 0.06);
+  --o-admin-gold-tint-2: rgba(215, 184, 110, 0.12);
+  --o-admin-gold-tint-3: rgba(215, 184, 110, 0.22); /* = --o-admin-hair-gold */
+  --o-admin-gold-tint-4: rgba(215, 184, 110, 0.35);
+  --o-admin-gold-tint-5: rgba(215, 184, 110, 0.50);
+
+  /* Texts */
+  --o-admin-text:   #e4ded4;  /* lleugerament rebaixat vs #ece7df: menys halació */
+  --o-admin-text-2: #b6aea2;
+  --o-admin-text-3: #9a9286;  /* pujat de #837c70: contrast AA ~4.2:1 (era ~3.0:1) */
+
+  /* Gold */
   --o-admin-gold:        #d7b86e;
   --o-admin-gold-bright: #f0d99a;
   --o-admin-gold-ink:    #2a210e;
   --o-admin-gold-edge:   #a9863f;
 
-  --o-stage-new: #e0922b;
-  --o-stage-new-strong: #b45309;
-  --o-stage-contacted: #9d83c2;
-  --o-stage-contacted-strong: #6a4f9c;
-  --o-stage-won: #3fa06a;
-  --o-stage-won-strong: #1f7a4c;
-  --o-stage-lost: #8a817a;
-  --o-stage-lost-strong: #5d564f;
+  /* Overlays foscos (per a headers/modals amb backdrop-filter) */
+  --o-admin-overlay-sm: rgba(10, 10, 12, 0.82);
+  --o-admin-overlay-md: rgba(10, 10, 12, 0.92);
+  --o-admin-overlay-lg: rgba(0, 0, 0, 0.50);
+  --o-admin-overlay-xl: rgba(0, 0, 0, 0.88);
+
+  /* Estat: border, bg, strong, text (escala de 4 variants per estat) */
+  --o-admin-success-bg:     rgba(62, 197, 123, 0.07);
+  --o-admin-success-border: rgba(62, 197, 123, 0.28);
+  --o-admin-success-strong: rgba(62, 197, 123, 0.50);
+  --o-admin-success-text:   rgba(140, 230, 175, 0.92);
+
+  --o-admin-warning-bg:     rgba(232, 169, 58, 0.07);
+  --o-admin-warning-border: rgba(232, 169, 58, 0.28);
+  --o-admin-warning-strong: rgba(232, 169, 58, 0.50);
+  --o-admin-warning-text:   rgba(255, 220, 150, 0.92);
+
+  --o-admin-danger-bg:      rgba(226, 89, 106, 0.07);
+  --o-admin-danger-border:  rgba(226, 89, 106, 0.30);
+  --o-admin-danger-strong:  rgba(226, 89, 106, 0.60);
+  --o-admin-danger-text:    rgba(253, 192, 198, 0.92);
+
+  --o-admin-info-bg:        rgba(95, 183, 232, 0.07);
+  --o-admin-info-border:    rgba(95, 183, 232, 0.28);
+  --o-admin-info-strong:    rgba(95, 183, 232, 0.50);
+  --o-admin-info-text:      rgba(167, 218, 245, 0.92);
+
+  /* VIP / purple */
+  --o-admin-vip:      #a5b4fc;
+  --o-admin-vip-soft: rgba(165, 180, 252, 0.12);
+  --o-admin-vip-text: #dbd0ff;
+
+  /* Fills addicionals d'alta opacitat */
+  --o-admin-fill-6:      rgba(255, 255, 255, 0.14);
+  --o-admin-fill-bright: rgba(255, 255, 255, 0.38);
+
+  /* Substituts de negre i blanc absoluts — mai #000 ni #fff en components */
+  --o-admin-ink:   #0a0005;  /* negre profund càlid (text sobre superfície clara) */
+  --o-admin-light: #f5f3ef;  /* blanc càlid (text sobre fons fosc, màxim contrast) */
+
+  /* Stages del pipeline */
+  --o-stage-new:               #e0922b;
+  --o-stage-new-strong:        #b45309;
+  --o-stage-contacted:         #9d83c2;
+  --o-stage-contacted-strong:  #6a4f9c;
+  --o-stage-won:               #3fa06a;
+  --o-stage-won-strong:        #1f7a4c;
+  --o-stage-lost:              #8a817a;
+  --o-stage-lost-strong:       #5d564f;
 }
 
 .ax-root,
 .fx-root.is-contrast {
   --ui:      var(--o-font);
   --display: var(--o-font-display);
-  --mono:    var(--o-font-mono);
+  --mono:    var(--o-font-data);
 
   --canvas: var(--o-admin-canvas);
   --side:   var(--o-admin-side);
@@ -168,22 +294,106 @@
   --cell-name: #f1ece4;
   --cell-val: var(--o-admin-gold-bright);
 
-  --ax-canvas: var(--o-admin-canvas);
-  --ax-side:   var(--o-admin-side);
-  --ax-panel:  var(--o-admin-panel);
-  --ax-raised: var(--o-admin-raised);
-  --ax-sunk:   var(--o-admin-sunk);
+  /* Font-weight (aliases globals) */
+  --fw-normal:    var(--o-fw-normal);
+  --fw-book:      var(--o-fw-book);
+  --fw-semi:      var(--o-fw-semi);
+  --fw-semi-plus: var(--o-fw-semi-plus);
+  --fw-bold:      var(--o-fw-bold);
+  --fw-cta:       var(--o-fw-cta);
+  --fw-xbold:     var(--o-fw-xbold);
+  --fw-black:     var(--o-fw-black);
 
+  /* Superfícies */
+  --ax-canvas:   var(--o-admin-canvas);
+  --ax-side:     var(--o-admin-side);
+  --ax-panel:    var(--o-admin-panel);
+  --ax-raised:   var(--o-admin-raised);
+  --ax-elevated: var(--o-admin-elevated);
+  --ax-sunk:     var(--o-admin-sunk);
+
+  /* Línies i fills */
   --ax-line:      var(--o-admin-line);
   --ax-line2:     var(--o-admin-line-2);
+  --ax-line3:     var(--o-admin-line-3);
   --ax-hair-gold: var(--o-admin-hair-gold);
 
+  --ax-fill-1: var(--o-admin-fill-1);
+  --ax-fill-2: var(--o-admin-fill-2);
+  --ax-fill-3: var(--o-admin-fill-3);
+  --ax-fill-4: var(--o-admin-fill-4);
+  --ax-fill-5: var(--o-admin-fill-5);
+
+  /* Gold semitransparent */
+  --ax-gold-tint-1: var(--o-admin-gold-tint-1);
+  --ax-gold-tint-2: var(--o-admin-gold-tint-2);
+  --ax-gold-tint-3: var(--o-admin-gold-tint-3);
+  --ax-gold-tint-4: var(--o-admin-gold-tint-4);
+  --ax-gold-tint-5: var(--o-admin-gold-tint-5);
+
+  /* Textos */
   --ax-t:  var(--o-admin-text);
   --ax-t2: var(--o-admin-text-2);
   --ax-t3: var(--o-admin-text-3);
 
+  /* Line-height */
+  --ax-lh-tight: var(--o-lh-tight);
+  --ax-lh-snug:  var(--o-lh-snug);
+  --ax-lh-body:  var(--o-lh-body);
+
+  /* Densitat */
+  --ax-row-h:      var(--o-row-h);
+  --ax-row-h-sm:   var(--o-row-h-sm);
+  --ax-row-pad-v:  var(--o-row-pad-v);
+  --ax-row-pad-h:  var(--o-row-pad-h);
+
+  /* Accent d'acció secundari */
+  --ax-action:      var(--o-admin-action);
+  --ax-action-soft: var(--o-admin-action-soft);
+
+  /* Gold */
   --ax-gold:        var(--o-admin-gold);
   --ax-gold-bright: var(--o-admin-gold-bright);
   --ax-gold-ink:    var(--o-admin-gold-ink);
   --ax-gold-edge:   var(--o-admin-gold-edge);
+
+  /* Overlays */
+  --ax-overlay-sm: var(--o-admin-overlay-sm);
+  --ax-overlay-md: var(--o-admin-overlay-md);
+  --ax-overlay-lg: var(--o-admin-overlay-lg);
+  --ax-overlay-xl: var(--o-admin-overlay-xl);
+
+  /* Estat: 4 variants per estat */
+  --ax-success-bg:     var(--o-admin-success-bg);
+  --ax-success-border: var(--o-admin-success-border);
+  --ax-success-strong: var(--o-admin-success-strong);
+  --ax-success-text:   var(--o-admin-success-text);
+
+  --ax-warning-bg:     var(--o-admin-warning-bg);
+  --ax-warning-border: var(--o-admin-warning-border);
+  --ax-warning-strong: var(--o-admin-warning-strong);
+  --ax-warning-text:   var(--o-admin-warning-text);
+
+  --ax-danger-bg:      var(--o-admin-danger-bg);
+  --ax-danger-border:  var(--o-admin-danger-border);
+  --ax-danger-strong:  var(--o-admin-danger-strong);
+  --ax-danger-text:    var(--o-admin-danger-text);
+
+  --ax-info-bg:        var(--o-admin-info-bg);
+  --ax-info-border:    var(--o-admin-info-border);
+  --ax-info-strong:    var(--o-admin-info-strong);
+  --ax-info-text:      var(--o-admin-info-text);
+
+  /* VIP / purple */
+  --ax-vip:      var(--o-admin-vip);
+  --ax-vip-soft: var(--o-admin-vip-soft);
+  --ax-vip-text: var(--o-admin-vip-text);
+
+  /* Fills addicionals */
+  --ax-fill-6:      var(--o-admin-fill-6);
+  --ax-fill-bright: var(--o-admin-fill-bright);
+
+  /* Substituts de #000 i #fff */
+  --ax-ink:   var(--o-admin-ink);
+  --ax-light: var(--o-admin-light);
 }

@@ -7,7 +7,9 @@ const ROOT = process.cwd();
 
 const FILES = {
   doc: path.join(ROOT, 'docs', 'product-operating-system-ca.md'),
-  protocol: path.join(ROOT, 'docs', 'protocol-producte-admin-ca.md'),
+  protocol: fs.existsSync(path.join(ROOT, 'docs', 'admin-protocol.md'))
+    ? path.join(ROOT, 'docs', 'admin-protocol.md')
+    : path.join(ROOT, 'docs', 'protocol-producte-admin-ca.md'),
   adminManual: path.join(ROOT, 'lib', 'constants', 'adminManual.ts'),
   dashboardService: path.join(ROOT, 'lib', 'services', 'adminOperatingCycleService.ts'),
   packageJson: path.join(ROOT, 'package.json'),

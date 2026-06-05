@@ -1,14 +1,24 @@
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { formatCurrency } from '@/lib/constants';
-import { GOOGLE_CALENDAR_BOOKING_REMINDERS, GOOGLE_CALENDAR_BOOKING_REMINDER_SUMMARY, GOOGLE_CALENDAR_SOCIAL_POST_REMINDERS, GOOGLE_CALENDAR_SOCIAL_POST_REMINDER_SUMMARY } from '@/lib/constants/googleCalendar';
+import {
+  GOOGLE_CALENDAR_BOOKING_REMINDERS,
+  GOOGLE_CALENDAR_BOOKING_REMINDER_SUMMARY,
+  GOOGLE_CALENDAR_EVENT_KEY_PREFIXES,
+  GOOGLE_CALENDAR_SETTING_KEYS,
+  GOOGLE_CALENDAR_SOCIAL_POST_REMINDERS,
+  GOOGLE_CALENDAR_SOCIAL_POST_REMINDER_SUMMARY,
+} from '@/lib/constants/googleCalendar';
 
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const GOOGLE_CAL_API = 'https://www.googleapis.com/calendar/v3';
-const REFRESH_TOKEN_KEY = 'integrations.googleCalendar.refreshToken';
-const CALENDAR_ID_KEY = 'integrations.googleCalendar.calendarId';
-const EVENT_KEY_PREFIX = 'integrations.googleCalendar.bookingEvent.';
-const SOCIAL_EVENT_KEY_PREFIX = 'integrations.googleCalendar.socialPostEvent.';
+const REFRESH_TOKEN_KEY = GOOGLE_CALENDAR_SETTING_KEYS.refreshToken;
+const CALENDAR_ID_KEY = GOOGLE_CALENDAR_SETTING_KEYS.calendarId;
+const EVENT_KEY_PREFIX = GOOGLE_CALENDAR_EVENT_KEY_PREFIXES.booking;
+const SOCIAL_EVENT_KEY_PREFIX = GOOGLE_CALENDAR_EVENT_KEY_PREFIXES.socialPost;
+const LEAD_EVENT_KEY_PREFIX = GOOGLE_CALENDAR_EVENT_KEY_PREFIXES.lead;
+const TASK_EVENT_KEY_PREFIX = GOOGLE_CALENDAR_EVENT_KEY_PREFIXES.task;
+const AVAILABILITY_EVENT_KEY_PREFIX = GOOGLE_CALENDAR_EVENT_KEY_PREFIXES.availability;
 
 type SyncStatus = 'synced' | 'deleted' | 'skipped' | 'error';
 type SyncAction = 'upsert' | 'delete';
@@ -42,12 +52,43 @@ type BookingData = {
   remainingPaid: boolean;
 };
 
+type CalendarEventPayload = Record<string, unknown>;
+
+type ReconcileEvent = {
+  entity: 'booking' | 'lead' | 'task' | 'availability' | 'socialPost';
+  entityId: string;
+  settingKey: string;
+  settingLabel: string;
+  payload: CalendarEventPayload;
+};
+
+export type GoogleCalendarReconcileSummary = {
+  connected: boolean;
+  desired: number;
+  synced: number;
+  deleted: number;
+  failed: number;
+  skipped: number;
+};
+
 function eventSettingKey(bookingId: string): string {
   return `${EVENT_KEY_PREFIX}${bookingId}`;
 }
 
 function socialEventSettingKey(postId: string): string {
   return `${SOCIAL_EVENT_KEY_PREFIX}${postId}`;
+}
+
+function leadEventSettingKey(leadId: string): string {
+  return `${LEAD_EVENT_KEY_PREFIX}${leadId}`;
+}
+
+function taskEventSettingKey(taskId: string): string {
+  return `${TASK_EVENT_KEY_PREFIX}${taskId}`;
+}
+
+function availabilityEventSettingKey(availabilityId: string): string {
+  return `${AVAILABILITY_EVENT_KEY_PREFIX}${availabilityId}`;
 }
 
 
@@ -148,6 +189,46 @@ function buildEventPayload(booking: BookingData) {
   };
 }
 
+function buildTimedOrAllDayPayload(input: {
+  summary: string;
+  description: string;
+  date: Date;
+  startTime?: string | null;
+  endTime?: string | null;
+  location?: string | null;
+}): CalendarEventPayload {
+  const start = parseTime(input.date, input.startTime || null);
+  const end = parseTime(input.date, input.endTime || null);
+
+  if (start) {
+    const safeEnd = end ? new Date(end) : new Date(start.getTime() + 60 * 60 * 1000);
+    if (safeEnd.getTime() <= start.getTime()) safeEnd.setDate(safeEnd.getDate() + 1);
+    return {
+      summary: input.summary,
+      description: input.description,
+      location: input.location || undefined,
+      start: { dateTime: start.toISOString(), timeZone: 'Europe/Madrid' },
+      end: { dateTime: safeEnd.toISOString(), timeZone: 'Europe/Madrid' },
+    };
+  }
+
+  const dayStart = new Date(input.date);
+  dayStart.setHours(0, 0, 0, 0);
+  const dayEnd = new Date(dayStart);
+  dayEnd.setDate(dayEnd.getDate() + 1);
+  return {
+    summary: input.summary,
+    description: input.description,
+    location: input.location || undefined,
+    start: { date: getDateOnly(dayStart) },
+    end: { date: getDateOnly(dayEnd) },
+  };
+}
+
+function isCalendarEventSetting(key: string): boolean {
+  return Object.values(GOOGLE_CALENDAR_EVENT_KEY_PREFIXES).some((prefix) => key.startsWith(prefix));
+}
+
 
 function buildSocialPostPayload(post: {
   title: string;
@@ -238,8 +319,248 @@ async function googleCalendarFetch(
 
 function desiredActionForStatus(status: string): SyncAction | null {
   if (status === 'CANCELLED') return 'delete';
-  if (['CONFIRMED', 'PREPARING', 'COMPLETED'].includes(status)) return 'upsert';
+  if (['PENDING', 'CONFIRMED', 'PREPARING', 'COMPLETED'].includes(status)) return 'upsert';
   return null;
+}
+
+async function upsertReconcileEvent(input: {
+  event: ReconcileEvent;
+  previousEventId: string | null;
+  calendarId: string;
+  accessToken: string;
+}): Promise<string | null> {
+  const { event, previousEventId, calendarId, accessToken } = input;
+  let response: Response;
+  if (previousEventId) {
+    response = await googleCalendarFetch(
+      'PATCH',
+      calendarId,
+      `events/${encodeURIComponent(previousEventId)}`,
+      accessToken,
+      event.payload
+    );
+    if (response.status === 404) {
+      response = await googleCalendarFetch('POST', calendarId, 'events', accessToken, event.payload);
+    }
+  } else {
+    response = await googleCalendarFetch('POST', calendarId, 'events', accessToken, event.payload);
+  }
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Google Calendar reconcile upsert failed (${response.status}): ${text}`);
+  }
+
+  const data = await response.json().catch(() => ({} as Record<string, unknown>));
+  const eventId = typeof data.id === 'string' ? data.id : previousEventId;
+  if (eventId) await upsertSetting(event.settingKey, eventId, event.settingLabel);
+  return eventId;
+}
+
+export async function reconcileGoogleCalendar(): Promise<GoogleCalendarReconcileSummary> {
+  const summary: GoogleCalendarReconcileSummary = {
+    connected: false,
+    desired: 0,
+    synced: 0,
+    deleted: 0,
+    failed: 0,
+    skipped: 0,
+  };
+
+  const [settings, bookings, leads, tasks, availabilities, socialPosts] = await Promise.all([
+    prisma.setting.findMany({
+      where: {
+        OR: [
+          { key: { in: [REFRESH_TOKEN_KEY, CALENDAR_ID_KEY] } },
+          ...Object.values(GOOGLE_CALENDAR_EVENT_KEY_PREFIXES).map((prefix) => ({ key: { startsWith: prefix } })),
+        ],
+      },
+      select: { key: true, value: true },
+    }),
+    prisma.booking.findMany({
+      where: { status: { not: 'CANCELLED' } },
+      select: {
+        id: true,
+        reference: true,
+        clientName: true,
+        clientEmail: true,
+        clientPhone: true,
+        eventType: true,
+        eventDate: true,
+        eventStartTime: true,
+        eventEndTime: true,
+        eventLocation: true,
+        eventVenue: true,
+        notes: true,
+        status: true,
+        total: true,
+        depositPaid: true,
+        remainingPaid: true,
+      },
+    }),
+    prisma.lead.findMany({
+      where: { eventDate: { not: null }, status: { not: 'LOST' }, booking: null },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        eventType: true,
+        eventDate: true,
+        eventStartTime: true,
+        eventEndTime: true,
+        eventLocation: true,
+        status: true,
+        priority: true,
+      },
+    }),
+    prisma.task.findMany({
+      where: { dueDate: { not: null }, status: { in: ['OPEN', 'IN_PROGRESS'] } },
+      select: { id: true, title: true, description: true, dueDate: true, status: true, priority: true },
+    }),
+    prisma.availability.findMany({
+      where: { status: 'BLOCKED' },
+      select: { id: true, date: true, note: true },
+    }),
+    prisma.socialPost.findMany({
+      where: { scheduledAt: { not: null }, status: { in: ['DRAFT', 'SCHEDULED'] } },
+      select: {
+        id: true,
+        title: true,
+        platforms: true,
+        contentType: true,
+        status: true,
+        scheduledAt: true,
+        notes: true,
+      },
+    }),
+  ]);
+
+  const settingsMap = Object.fromEntries(settings.map((setting) => [setting.key, setting.value]));
+  const refreshToken = settingsMap[REFRESH_TOKEN_KEY];
+  summary.desired = bookings.length + leads.length + tasks.length + availabilities.length + socialPosts.length;
+  if (!refreshToken) {
+    summary.skipped = summary.desired;
+    return summary;
+  }
+
+  summary.connected = true;
+  const calendarId = settingsMap[CALENDAR_ID_KEY] || process.env.GOOGLE_CALENDAR_ID || 'primary';
+  const accessToken = await getAccessToken(refreshToken);
+  const desiredEvents: ReconcileEvent[] = [
+    ...bookings.map((booking) => ({
+      entity: 'booking' as const,
+      entityId: booking.id,
+      settingKey: eventSettingKey(booking.id),
+      settingLabel: `Google Calendar event id for booking ${booking.reference}`,
+      payload: buildEventPayload(booking),
+    })),
+    ...leads.map((lead) => ({
+      entity: 'lead' as const,
+      entityId: lead.id,
+      settingKey: leadEventSettingKey(lead.id),
+      settingLabel: `Google Calendar event id for lead ${lead.name}`,
+      payload: buildTimedOrAllDayPayload({
+        summary: `Lead · ${lead.name} · ${lead.eventType}`,
+        description: [
+          `Lead: ${lead.name}`,
+          `Email: ${lead.email}`,
+          lead.phone ? `Tel: ${lead.phone}` : null,
+          `Estat CRM: ${lead.status}`,
+          `Prioritat: ${lead.priority}`,
+        ].filter(Boolean).join('\n'),
+        date: lead.eventDate!,
+        startTime: lead.eventStartTime,
+        endTime: lead.eventEndTime,
+        location: lead.eventLocation,
+      }),
+    })),
+    ...tasks.map((task) => ({
+      entity: 'task' as const,
+      entityId: task.id,
+      settingKey: taskEventSettingKey(task.id),
+      settingLabel: `Google Calendar event id for task ${task.title}`,
+      payload: buildTimedOrAllDayPayload({
+        summary: `Tasca · ${task.title}`,
+        description: [
+          `Estat: ${task.status}`,
+          `Prioritat: ${task.priority}`,
+          task.description || null,
+        ].filter(Boolean).join('\n'),
+        date: task.dueDate!,
+      }),
+    })),
+    ...availabilities.map((availability) => ({
+      entity: 'availability' as const,
+      entityId: availability.id,
+      settingKey: availabilityEventSettingKey(availability.id),
+      settingLabel: 'Google Calendar event id for blocked availability',
+      payload: buildTimedOrAllDayPayload({
+        summary: 'Dia bloquejat',
+        description: availability.note || 'Disponibilitat bloquejada des de l’admin',
+        date: availability.date,
+      }),
+    })),
+    ...socialPosts.map((post) => ({
+      entity: 'socialPost' as const,
+      entityId: post.id,
+      settingKey: socialEventSettingKey(post.id),
+      settingLabel: `Google Calendar event id for social post ${post.title}`,
+      payload: buildSocialPostPayload(post),
+    })),
+  ];
+  const desiredSettingKeys = new Set(desiredEvents.map((event) => event.settingKey));
+
+  for (const event of desiredEvents) {
+    try {
+      await upsertReconcileEvent({
+        event,
+        previousEventId: settingsMap[event.settingKey] || null,
+        calendarId,
+        accessToken,
+      });
+      summary.synced += 1;
+    } catch (error) {
+      summary.failed += 1;
+      log.error('Google calendar reconcile event failed', error, {
+        context: { entity: event.entity, entityId: event.entityId },
+      });
+    }
+  }
+
+  const staleMappings = settings.filter(
+    (setting) => isCalendarEventSetting(setting.key) && !desiredSettingKeys.has(setting.key)
+  );
+  for (const setting of staleMappings) {
+    try {
+      const response = await googleCalendarFetch(
+        'DELETE',
+        calendarId,
+        `events/${encodeURIComponent(setting.value)}`,
+        accessToken
+      );
+      if (!response.ok && response.status !== 404) {
+        const text = await response.text();
+        throw new Error(`Google Calendar reconcile delete failed (${response.status}): ${text}`);
+      }
+      await deleteSetting(setting.key);
+      summary.deleted += 1;
+    } catch (error) {
+      summary.failed += 1;
+      log.error('Google calendar reconcile stale event failed', error, {
+        context: { settingKey: setting.key },
+      });
+    }
+  }
+
+  await prisma.adminLog.create({
+    data: {
+      action: 'CALENDAR_RECONCILE',
+      entity: 'system',
+      details: summary,
+    },
+  });
+  return summary;
 }
 
 export async function syncBookingToGoogleCalendar(

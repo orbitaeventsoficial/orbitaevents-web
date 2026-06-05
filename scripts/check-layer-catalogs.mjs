@@ -27,6 +27,9 @@ const allowedCatalogs = new Set([
   'lib/intro.ts::INTRO_BOT_PATTERNS',
   'lib/pdf-config.ts::COLORS',
   'lib/pdf-config.ts::PAGE',
+  // PDF layout constants — coupling with jsPDF generation primitives, not a domain catalog (pdf-header.ts).
+  'lib/pdf-header.ts::PDF_DESIGN',
+  'lib/pdf-header.ts::CHART_COLORS',
   'lib/rate-limit.ts::RATE_LIMITS',
   'app/admin/leads/colorTheme.ts::LEAD_COLOR_OPTIONS',
   'app/admin/bookings/BookingPipelineView.tsx::COLUMNS_DEF',

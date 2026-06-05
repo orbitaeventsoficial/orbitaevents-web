@@ -57,7 +57,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 866;
+export const ADMIN_CHANGE_COUNTER = 884;
 
 export const ADMIN_DETAIL_PAGE_LABELS: Record<string, string> = {
   inventory: 'Fitxa inventari',
@@ -564,6 +564,7 @@ export const ADMIN_CRON_PREFIXES = [
   { id: 'urgentFollowUpAlerts', label: 'Alertes follow-up urgents', prefix: 'alerts.urgentFollowUp', frequency: '4x diari' },
   { id: 'leadReengagement', label: 'Reengagement leads dormants', prefix: 'automation.leadReengagement', frequency: 'Diari' },
   { id: 'dossierTrashPurge', label: 'Purga paperera dossiers', prefix: 'dossier.trash-purge', frequency: 'Diari' },
+  { id: 'calendarSync', label: 'Google Calendar complet', prefix: 'automation.calendarSync', frequency: 'Cada 15 min' },
 ] as const;
 
 export const ADMIN_HEALTH_ACTIVE_LEAD_STATUSES = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] as const;

@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { getSiteUrl } from '@/lib/site';
-import { inter, plusJakarta, jetbrains, cormorant } from '@/app/fonts';
+import { inter, plusJakarta, cormorant } from '@/app/fonts';
 import { getManagedImageOverride } from '@/lib/services/imageManagerService';
 import { getHomeKeywords, getHomeMeta } from '@/lib/home-meta';
 
@@ -108,7 +108,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="ca"
-      className={`${inter.variable} ${plusJakarta.variable} ${jetbrains.variable} ${cormorant.variable} scroll-smooth`}
+      className={`${inter.variable} ${plusJakarta.variable} ${cormorant.variable} scroll-smooth`}
       suppressHydrationWarning
     >
       <head>

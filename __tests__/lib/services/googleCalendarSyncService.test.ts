@@ -2,7 +2,11 @@ import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
 
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
-    booking: { findUnique: vi.fn() },
+    booking: { findUnique: vi.fn(), findMany: vi.fn() },
+    lead: { findMany: vi.fn() },
+    task: { findMany: vi.fn() },
+    availability: { findMany: vi.fn() },
+    socialPost: { findMany: vi.fn() },
     setting: {
       findMany: vi.fn(),
       upsert: vi.fn(),
@@ -20,7 +24,7 @@ vi.mock('@/lib/constants', () => ({
   formatCurrency: (v: number) => `${v.toFixed(2)} €`,
 }));
 
-import { syncBookingToGoogleCalendar } from '@/lib/services/googleCalendarSyncService';
+import { reconcileGoogleCalendar, syncBookingToGoogleCalendar } from '@/lib/services/googleCalendarSyncService';
 
 const originalFetch = globalThis.fetch;
 
@@ -48,6 +52,11 @@ beforeEach(() => {
   mockPrisma.adminLog.create.mockResolvedValue({});
   mockPrisma.setting.upsert.mockResolvedValue({});
   mockPrisma.setting.deleteMany.mockResolvedValue({});
+  mockPrisma.booking.findMany.mockResolvedValue([]);
+  mockPrisma.lead.findMany.mockResolvedValue([]);
+  mockPrisma.task.findMany.mockResolvedValue([]);
+  mockPrisma.availability.findMany.mockResolvedValue([]);
+  mockPrisma.socialPost.findMany.mockResolvedValue([]);
 });
 
 afterAll(() => {
@@ -65,8 +74,8 @@ describe('syncBookingToGoogleCalendar', () => {
     expect(result.error).toContain('no trobada');
   });
 
-  it('retorna skipped si estat no sincronitzable (PENDING)', async () => {
-    mockPrisma.booking.findUnique.mockResolvedValue({ ...mockBooking, status: 'PENDING' });
+  it('retorna skipped si estat no sincronitzable', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({ ...mockBooking, status: 'UNKNOWN' });
 
     const result = await syncBookingToGoogleCalendar('b1');
 
@@ -237,6 +246,122 @@ describe('syncBookingToGoogleCalendar', () => {
 
     expect(result.ok).toBe(true);
     expect(result.status).toBe('synced');
+
+    delete process.env.GOOGLE_OAUTH_CLIENT_ID;
+    delete process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+  });
+});
+
+describe('reconcileGoogleCalendar', () => {
+  it('informa tots els elements pendents quan falta connexió OAuth', async () => {
+    mockPrisma.setting.findMany.mockResolvedValue([]);
+    mockPrisma.booking.findMany.mockResolvedValue([{ id: 'b1' }, { id: 'b2' }]);
+    mockPrisma.lead.findMany.mockResolvedValue([{ id: 'l1' }]);
+    mockPrisma.task.findMany.mockResolvedValue([{ id: 't1' }]);
+    mockPrisma.availability.findMany.mockResolvedValue([{ id: 'a1' }]);
+
+    const result = await reconcileGoogleCalendar();
+
+    expect(result).toEqual({
+      connected: false,
+      desired: 5,
+      synced: 0,
+      deleted: 0,
+      failed: 0,
+      skipped: 5,
+    });
+    expect(globalThis.fetch).not.toHaveBeenCalled();
+  });
+
+  it('sincronitza en una passada reserves, leads, tasques, bloquejos i social', async () => {
+    mockPrisma.setting.findMany.mockResolvedValue([
+      { key: 'integrations.googleCalendar.refreshToken', value: 'rt123' },
+      { key: 'integrations.googleCalendar.calendarId', value: 'cal1' },
+    ]);
+    mockPrisma.booking.findMany.mockResolvedValue([mockBooking]);
+    mockPrisma.lead.findMany.mockResolvedValue([{
+      id: 'l1',
+      name: 'Lead futur',
+      email: 'lead@test.com',
+      phone: '600000000',
+      eventType: 'WEDDING',
+      eventDate: new Date('2026-07-01'),
+      eventStartTime: null,
+      eventEndTime: null,
+      eventLocation: 'Girona',
+      status: 'NEW',
+      priority: 'HIGH',
+    }]);
+    mockPrisma.task.findMany.mockResolvedValue([{
+      id: 't1',
+      title: 'Preparar equip',
+      description: 'Revisar cablejat',
+      dueDate: new Date('2026-06-10'),
+      status: 'OPEN',
+      priority: 'URGENT',
+    }]);
+    mockPrisma.availability.findMany.mockResolvedValue([{
+      id: 'a1',
+      date: new Date('2026-08-01'),
+      note: 'Vacances',
+    }]);
+    mockPrisma.socialPost.findMany.mockResolvedValue([{
+      id: 's1',
+      title: 'Publicació',
+      platforms: ['INSTAGRAM'],
+      contentType: 'REEL',
+      status: 'SCHEDULED',
+      scheduledAt: new Date('2026-06-20T10:00:00Z'),
+      notes: null,
+    }]);
+
+    process.env.GOOGLE_OAUTH_CLIENT_ID = 'test-id';
+    process.env.GOOGLE_OAUTH_CLIENT_SECRET = 'test-secret';
+    globalThis.fetch = vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ access_token: 'at123' }) })
+      .mockResolvedValue({ ok: true, json: () => Promise.resolve({ id: 'event-id' }) });
+
+    const result = await reconcileGoogleCalendar();
+
+    expect(result).toEqual({
+      connected: true,
+      desired: 5,
+      synced: 5,
+      deleted: 0,
+      failed: 0,
+      skipped: 0,
+    });
+    expect(mockPrisma.setting.upsert).toHaveBeenCalledTimes(5);
+    expect(mockPrisma.adminLog.create).toHaveBeenCalledWith({
+      data: {
+        action: 'CALENDAR_RECONCILE',
+        entity: 'system',
+        details: result,
+      },
+    });
+
+    delete process.env.GOOGLE_OAUTH_CLIENT_ID;
+    delete process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+  });
+
+  it('elimina de Google els mappings que ja no existeixen al calendari operatiu', async () => {
+    mockPrisma.setting.findMany.mockResolvedValue([
+      { key: 'integrations.googleCalendar.refreshToken', value: 'rt123' },
+      { key: 'integrations.googleCalendar.calendarId', value: 'cal1' },
+      { key: 'integrations.googleCalendar.taskEvent.old-task', value: 'old-event' },
+    ]);
+    process.env.GOOGLE_OAUTH_CLIENT_ID = 'test-id';
+    process.env.GOOGLE_OAUTH_CLIENT_SECRET = 'test-secret';
+    globalThis.fetch = vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ access_token: 'at123' }) })
+      .mockResolvedValueOnce({ ok: true, status: 204 });
+
+    const result = await reconcileGoogleCalendar();
+
+    expect(result.deleted).toBe(1);
+    expect(mockPrisma.setting.deleteMany).toHaveBeenCalledWith({
+      where: { key: 'integrations.googleCalendar.taskEvent.old-task' },
+    });
 
     delete process.env.GOOGLE_OAUTH_CLIENT_ID;
     delete process.env.GOOGLE_OAUTH_CLIENT_SECRET;

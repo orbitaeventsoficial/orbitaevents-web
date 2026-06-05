@@ -1,3 +1,475 @@
+## 2026-06-05 — Normalització documental a `admin-protocol`/`admin-diary` i previews PDF amb `XXXXXX` (Canvi #884, codex)
+
+### Context
+El propietari ha demanat posar ordre al protocol de treball: massa noms històrics i massa dispersió entre protocol, diari, agent-sync i estat. El tall també recull el criteri viu de `/admin/studio#sec-pdfs`: les previews no han de contenir dades personals o contextuals inventades; han de mostrar `XXXXXX`, però els packs, hores i càlculs han de continuar venint de fonts reals/canòniques.
+
+### Canvis
+- `docs/protocol-producte-admin-ca.md` passa a `docs/admin-protocol.md`.
+- `docs/diario.md` passa a `docs/admin-diary.md`.
+- `scripts/check-admin-change-log.mjs` i guards relacionats llegeixen primer els noms normalitzats i mantenen fallback als noms antics per compatibilitat de fixtures.
+- `/admin/docs/protocol` i `/admin/manual` llegeixen `docs/admin-protocol.md`.
+- `CLAUDE.md`, `docs/admin-inventari-pagines.md` i `docs/agent-sync.md` apunten als noms nous.
+- `lib/services/pdfPreviewService.ts` fa servir `XXXXXX` per a referències, client, contacte, localització, horari i dates contextuals de preview.
+- `lib/pdf-utils.ts` i `lib/services/invoicePdfService.ts` accepten dates textuals per a previews sense canviar els fluxos reals amb `Date`.
+- `__tests__/lib/services/pdfPreviewService.test.ts`: cobertura del servei de preview per blindar placeholders `XXXXXX` i càlculs canònics de pack/extres/IVA/bestreta.
+- `docs/admin-protocol.md` §6.14: apuntat a `MÉS ENDAVANT` el checklist de neteja controlada del worktree, amb baseline 95 entrades totals i 18 untracked després d'eliminar 110 temporals regenerables.
+- Dossier queda fora del tall.
+- `ADMIN_CHANGE_COUNTER` 883 → 884.
+
+### Validació
+- Validació tècnica: `pnpm run validate:core` OK · `npx vitest run __tests__/lib/services/pdfPreviewService.test.ts` OK (3 tests) · `pnpm run qa:pdf-preview-real-data` OK · `pnpm run qa:protocol` OK. `validate:core` manté només els avisos estàtics coneguts de `qa:visual-overflow` a Bookings i surt amb exit 0.
+- Validació funcional: les dues fonts canòniques noves funcionen amb guards i UI interna; les previews PDF no necessiten dades reals de factura/pressupost i no mostren fixtures personals inventades.
+- Validació humana/UX: respon a l'ordre explícita de normalitzar el protocol de treball en un esquema de dos arxius.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 884. Següent canvi ha de ser `#885`.
+
+---
+
+## 2026-06-04 — Canvi #883: PDFs redeseny complet + Factura + fixes visuals (claude+opus)
+
+### Context
+Redisseny PDF premium: capçalera fosca canònica, logo petit+separador, seccions eyebrow or (sense quadret lateral), descompte verd, TOTAL fosc full-width, factura nova, contracte 2 col·lumnes, respiració entre header i contingut, text desbordaments corregits.
+
+### Canvis
+- `lib/pdf-header.ts`: logo 88→52mm, separador x=62→76, títol 17pt auto-shrink, subtítol 10pt, `drawCanonicalSectionTitle` eyebrow or+hairline sense quadret, `fillToFooter` amb paràmetre `ceiling`.
+- `lib/pdf-utils.ts`: pressupost CTA/segell amb banda reservada fixa, descompte en verd, badge catàleg a l'esquerra dinàmic, features el·lipsi, contracte 2 columnes, respiració header+4mm, clàusules legals max 2 línies per clausula.
+- `lib/services/invoicePdfService.ts`: nou document Factura complet. TOTAL full-width fosc. Respiració header+4mm.
+- `app/api/admin/studio/preview/factura/route.ts`: endpoint preview factura.
+- `lib/constants/pdfDocuments.ts`: entrada factura afegida.
+- `app/studio/StudioShowroom.tsx`: botó Factura + iframe preview.
+- `middleware.ts`: endpoints preview permeten iframe SAMEORIGIN.
+- `__tests__/lib/services/invoicePdfService.test.ts`: 5 tests nous.
+- `ADMIN_CHANGE_COUNTER` 882 → 883.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `validate:core` OK · 5 tests factura OK.
+- Validació funcional: PDFs visibles al Studio, textos i18n resolts, logo net.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 883. Següent canvi ha de ser `#884`.
+
+---
+
+## 2026-06-04 — Canvi #882: Zero hardcoded als PDFs — constants canòniques + norma endurita (claude)
+
+### Context
+Auditoria i eliminació de tots els valors hardcoded restants als generadors PDF. Textos de CTA a lib/constants, SITE_CONFIG per a contacte, tokens CSS de document a orbita-tokens.css, CLAUDE.md amb norma absoluta.
+
+### Canvis
+- `lib/constants/index.ts`: `PDF_VALUE_ITEMS`, `PDF_FILL_CONTACT_LABEL` afegits.
+- `lib/pdf-header.ts`: `fillToFooter` usa `PDF_VALUE_ITEMS` i `PDF_FILL_CONTACT_LABEL`. Footer usa `SITE_CONFIG.web.url` com a default.
+- `lib/services/executiveReportPdfService.ts`: footer usa `SITE_CONFIG.web.url`.
+- `app/studio/orbita-tokens.css`: `--o-pdf-body/label/caption/sec/price` token system per als documents PDF.
+- `app/studio/studio.css`: `.o-pdfdoc` usa `--o-pdf-*` de orbita-tokens.css.
+- `CLAUDE.md`: norma absoluta zero hardcoded endurita.
+- `ADMIN_CHANGE_COUNTER` 881 → 882.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `validate:core` OK.
+- Validació funcional: pendent reinici servidor.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 882. Següent canvi ha de ser `#883`.
+
+---
+
+## 2026-06-04 — Canvi #881: PDFs unificació tipografia + farciment pàgina + signatura contracte (claude)
+
+### Context
+Tipografia unificada entre tots els PDFs. Logo corregit (logoplanetatextdreta.svg, text blanc transparent). Zones de signatura visuals al contracte. fillToFooter per omplir pàgina. Norma Opus compactada.
+
+### Canvis
+- `lib/logo-lockup-light-base64.ts`: generat des de `logoplanetatextdreta.svg` via sharp (text blanc, fons transparent).
+- `lib/pdf-header.ts`: helpers `setStyleLabel/Value/Body/Muted/Caption`, `PDF_BODY_SIZE=8.5`, `PDF_FILL_BOTTOM=262`, `spacingDelta()`, `fillToFooter('value'|'contact')`.
+- `lib/pdf-utils.ts`: pressupost, catàleg i contracte usen `setStyle*` centralitzats. Contracte: `drawSignatureZone` (caixa amb línia 60mm, label, nom, data). Catàleg+pressupost: `fillToFooter` quan hi ha espai. Contracte: signatures ancorades al peu.
+- `lib/services/executiveReportPdfService.ts`: taules i gràfiques usen `setStyle*`. `fillToFooter('contact')` al final.
+- `CLAUDE.md`: norma Opus compactada (400 paraules, context mínim).
+- `ADMIN_CHANGE_COUNTER` 880 → 881.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `validate:core` OK.
+- Validació funcional: pendent reinici servidor.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 881. Següent canvi ha de ser `#882`.
+
+---
+
+## 2026-06-04 — Canvi #880: PDFs premium — capçalera fosca canònica + gràfiques informe + layouts redesenyats (claude)
+
+### Context
+Redisseny premium complet dels 5 documents PDF (excepte dossier): capçalera fosca canònica idèntica per a tots, Pressupost amb TOTAL dramàtic + segell validesa + CTA 3 passos, Catàleg amb hero i packs en graella horitzontal, Informe executiu amb gràfica de línies + barres + donut, Contracte amb subtítol/ref. Studio actualitzat per reflectir la veritat canònica.
+
+### Canvis
+- `lib/pdf-header.ts`: capçalera fosca (blackSoft) amb hairline or, subtítol or, ref grisenc. Footer amb franja paper + hairline or. `CHART_COLORS` paleta càlida per a gràfiques. `PDF_HEADER_LAYOUT.canonical.height` 38→44.
+- `lib/constants/pdfDocuments.ts`: `contentStartY` 47→46, height 38→44.
+- `lib/services/executiveReportPdfService.ts`: reescrit complet — KPI strip 7 cel·les, gràfica de línies (3 sèries), gràfica de barres (embut), donut chart (orígens), taules marge+recurrència.
+- `lib/pdf-utils.ts`: pressupost fons paperBg, header amb subtitle/ref, TOTAL fosc dramàtic, segell validesa circular, CTA 3 passos; catàleg hero + packs en graella horitzontal, CTA fosc; contracte fons paperBg + subtitle/ref.
+- `app/studio/StudioShowroom.tsx`: `PdfPreviewHeader` redissenyat per capçalera fosca, informe amb KPI strip + mockups gràfiques, pressupost TOTAL fosc + CTA 3 passos.
+- `app/studio/studio.css`: nous estils `.o-pdfdoc__header--dark`, `.o-pdfdoc__total--dark`, `.o-pdfdoc__cta-steps`, `.o-pdfdoc__kpi-strip`, `.o-pdfdoc__chart-*`, `.o-pdfdoc__donut-*`.
+- `scripts/check-layer-catalogs.mjs`: allowlist per a `PDF_DESIGN` i `CHART_COLORS`.
+- `docs/protocol-producte-admin-ca.md`: fix format ownership fields #879.
+- `ADMIN_CHANGE_COUNTER` 879 → 880.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK · tests executiveReportPdfService OK.
+- Validació funcional: gràfiques renderitzen sense errors, capçalera fosca present, formats correctes.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 880. Següent canvi ha de ser `#881`.
+
+---
+
+## 2026-06-04 — Canvi #879: PDF logo fix + TOTAL negre + eliminar pressupostos (claude)
+
+### Context
+Logo PDF tallat (mides incorrectes), TOTAL volia en negre, botó eliminar i menú accions sense "v" nativa.
+
+### Canvis
+- `lib/logo-lockup-light-base64.ts`: nou PNG del logo horitzontal (planeta+text) sobre fons paper, generat a proporcions correctes (1980×540px).
+- `lib/pdf-utils.ts`: logo usa `fitWithin(props.width, props.height, 75, 19)`. TOTAL usa `COLORS.paperText` (negre fosc càlid). PDF fons `COLORS.paperBg` (blanc càlid). Variables locals del quote i contract → paleta càlida.
+- `app/admin/presupuestos/ProposalsList.tsx`: menú `<details>` eliminat → botons inline (Editar, Client, Enviat, **Eliminar**). `useConfirmDialog` per al delete.
+- `app/api/admin/proposals/[id]/route.ts`: handler `DELETE` afegit.
+- `lib/services/proposalAdminService.ts`: `deleteAdminProposal()` afegit.
+- `ADMIN_CHANGE_COUNTER` 878 → 879.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK.
+- Validació funcional: logo generat correctament, botó eliminar amb confirmació.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 879. Següent canvi ha de ser `#880`.
+
+---
+
+## 2026-06-04 — Canvi #878: Monocapa or + tagline + Studio sidebar fix (claude)
+
+### Context
+Auditoria experta detecta 4 ors divergents al repo. Monocapa: col·lapsar tot a #d7b86e. Tagline faltava a site-config. Studio sidebar refet com a `position:fixed`.
+
+### Canvis
+- `orbita-tokens.css`: `--o-accent #d4a857` → `#d7b86e`, `--o-doc-accent #d4af37` → `#d7b86e`, `--o-docl-accent #daa520` → `#d7b86e`. `--o-accent-soft/line` rgba actualitzats a 215,184,110.
+- `site-config.ts`: afegit `tagline: "DJ i animació per a casaments i events"` a `business`.
+- `studio.css`: `o-spec-shell` → `display:block; margin-left:240px`. `o-spec-toc` → `position:fixed; top:0; left:236px; width:240px; height:100dvh`. TOC fix confirmat per Playwright (y=0 a 4000px scroll).
+- `ADMIN_CHANGE_COUNTER` 877 → 878.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK.
+- Validació funcional: or unificat, TOC fix, tagline existent.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 878. Següent canvi ha de ser `#879`.
+
+---
+
+## 2026-06-04 — Canvi #877: Redisseny PDFs — paleta Brass & Obsidian canònica (claude)
+
+### Context
+Els PDFs (pressupost, contracte, brochure) usaven l'or antic `[218,165,32]` (#daa520), greys slate freds `[51,65,85]` i un header amb 3 rectangles decoratius. El propietari els troba desfasats. Refet des de zero amb la paleta canònica de marca.
+
+### Canvis
+- `lib/pdf-config.ts`: paleta COLORS completament revisada. Or canònic `[215,184,110]` (#d7b86e) + variants goldLight/goldDark. Greys slate eliminats → textos càlids (textPrimary/textSecondary/textMuted). Superfícies obsidiana càlida (canvas/surface/raised). Footer paper càlid (#f7f5f0). Aliases legacy mantinguts per compatibilitat.
+- `lib/pdf-utils.ts`: `addHeader` refet — banda obsidiana càlida, hairline or fina (1px), accent lateral esquerre fi (2px), sense rectangles decoratius. `addFooter` refet — fons paper càlid, hairline or, contacte + tagline + paginació. Variables locals `neutral/muted/border/surface/surfaceSoft/accent` del quote ara deriven de COLORS en lloc de hardcoded. Fons pàgina `[18,20,24]` → `COLORS.canvas`. Total bg → `COLORS.totalBg`.
+- `ADMIN_CHANGE_COUNTER` 876 → 877.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK.
+- Validació funcional: TypeScript net, paleta consistent.
+- Validació humana/UX: pendent generar PDF real i revisar amb propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 877. Següent canvi ha de ser `#878`.
+
+---
+
+## 2026-06-04 — Canvi #876: Studio sidebar fix (sticky) (claude)
+
+### Context
+El propietari detecta que el menú lateral de Studio no queda fix mentre es fa scroll. El shell tenia `min-height: 100vh` + scroll del body, de manera que el `position: sticky` no funcionava.
+
+### Canvis
+- `studio.css`: `.o-shell` passa a `height: 100dvh; overflow: hidden`. `.o-sidebar` passa a `height: 100dvh; overflow-y: auto`. `.o-main` passa a `height: 100dvh; overflow-y: auto`. El sidebar queda fix; el main fa scroll independent.
+- `ADMIN_CHANGE_COUNTER` 875 → 876.
+
+### Validació
+- Validació tècnica: `pnpm run validate:core` OK.
+- Validació funcional: captura Playwright confirma sidebar fix visible mentre la pàgina scrolleja.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 876. Següent canvi ha de ser `#877`.
+
+---
+
+## 2026-06-04 — Canvi #875: Expert visual Opus — millores Studio + protocol consultor (claude)
+
+### Context
+Auditoria visual completa per expert Opus Max (tipografia, colors, ergonomia, layout). 5 millores aplicades. Comportament "consultor visual expert" documentat al protocol com a norma permanent.
+
+### Canvis
+- `orbita-tokens.css`: canvas `#0a0a0c`→`#111116` (fatiga), T3 `#837c70`→`#9a9286` (contrast AA), T1 `#ece7df`→`#e4ded4` (halació). Nous tokens: `--o-lh-*` (leading), `--o-row-h/pad-*` (densitat), `--ax-action/action-soft` (accent secundari).
+- `CLAUDE.md`: secció "Consultor visual expert" — quan activar, perfil, atributs, tokens de referència.
+- `ADMIN_CHANGE_COUNTER` 874 → 875.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK.
+- Validació funcional: tokens aplicats correctament a Studio.
+- Validació humana/UX: pendent propietari (revisió visual canvas i T3).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 875. Següent canvi ha de ser `#876`.
+
+---
+
+## 2026-06-04 — Canvi #874: Auditoria tipogràfica Opus + tokens letter-spacing + feiner fix (claude)
+
+### Context
+Auditoria expert (Opus Max) de l'escala tipogràfica de Studio §17. Afegits tokens `--o-text-nav`, `--o-text-meta`, escala `--o-ls-*` i eliminat `--o-text-micro` (enganyós per admin). Fix targeta Alejandro García (feiner cel·la 56px → 72px min-height, ring or suprimit).
+
+### Canvis
+- `orbita-tokens.css`: afegits `--o-text-nav: 14.5px`, `--o-text-meta: 12.5px`, `--o-ls-tight/tighter/wide/wider/eyebrow/nav`. Eliminat `--o-text-micro`. Netejats comentaris duplicats.
+- `leads-design.css`: `fx__cell--wd` de `height: 56px` → `min-height: 72px` + `max-width: 360px`. Cel·la feiner activa: ring or eliminat (massa ampla).
+- `studio.css §17`: `o-spec-type-name` 12px→14px, `o-spec-type-spec` 10px→12px, `o-spec-type-use` 10px→12px. Col·lumna meta: 200px→240px.
+- `StudioShowroom.tsx §17`: "Body meta" corregit de 13px→14px.
+- `ADMIN_CHANGE_COUNTER` 873 → 874.
+
+### Validació
+- Validació tècnica: `pnpm run validate:core` OK.
+- Validació funcional: targeta feiner caben tots els camps; Studio §17 llegible.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 874. Següent canvi ha de ser `#875`.
+
+---
+
+## 2026-06-04 — Canvi #873: Tokens de font-weight i font-family a Studio + migració (claude)
+
+### Context
+Studio §17 defineix l'escala tipogràfica canònica amb pesos semàntics (400–850) i tres famílies amb rol separat. Cap CSS admin havia tokenitzat els font-weight fins ara.
+
+### Canvis
+- `orbita-tokens.css`: `--o-fw-normal` (400) → `--o-fw-black` (850). Aliases `--fw-*` a `.ax-root`. "Body meta" Inter corregit de 13px→14px (`--o-text-base`). Escala font-size ampliada: `--o-text-2xl` (28px), `--o-text-3xl` (32px), `--o-text-4xl` (36px), `--o-text-5xl` (40px).
+- `StudioShowroom.tsx §17`: "Body meta" spec actualitzat a `14px / 400`.
+- 11 fitxers CSS admin: `font-weight: 400-850` → `var(--o-fw-*)`. `font-family: 'JetBrains Mono', monospace` → `var(--mono)`.
+- Resultat: **font-weight literals: 0 · font-family literals: 0**.
+- `ADMIN_CHANGE_COUNTER` 872 → 873.
+
+### Validació
+- Validació tècnica: `pnpm run validate:core` OK.
+- Validació funcional: tots els pesos tipogràfics de l'admin consumeixen tokens de Studio.
+- Validació humana/UX: mida H1 pàgina (40px) pendent revisió — propietari la troba petita.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+*(Continuació en #874: Studio §17 tokens ampliats i targeta feiner corregida.)*
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 873. Següent canvi ha de ser `#874`.
+
+---
+
+## 2026-06-04 — Canvi #872: Migració CSS admin a tokens canònics de Studio (claude)
+
+### Context
+Tots els valors hardcoded (hex, rgba, font-size, border-radius) dels CSS admin han estat substituïts pels tokens de `orbita-tokens.css`. Studio és ara la font de veritat que trepitja tot.
+
+### Canvis
+- `app/studio/orbita-tokens.css`: +42 tokens nous (superfícies, fills, gold semi, overlays, estats×4 variants, VIP, ink/light, font-size, border-radius).
+- 10 fitxers CSS admin migrats: 319 substitucions en total. Resultat: **HEX 0 · rgba 0 · font-size px 0 · border-radius px 0**.
+- `scripts/migrate-css-to-tokens.mjs`: script de migració reutilitzable per a futures passes.
+- `ADMIN_CHANGE_COUNTER` 871 → 872.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK.
+- Validació funcional: tots els CSS admin consumeixen exclusivament tokens de Studio.
+- Validació humana/UX: pendent propietari (revisió visual dels valors canviats).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 872. Següent canvi ha de ser `#873`.
+
+---
+
+## 2026-06-04 — Canvi #871: Norma CSS monocapa — guard, cleanup, CLAUDE.md (claude)
+
+### Context
+El CSS de l'admin tenia un problema estructural doble: (1) selectors amb `.admin-shell` fantasma que mai coincidien, fent que tots els estils `bd__*`, `tk__*`, etc. fos codi mort; (2) blocs duplicats amb `!important` que tapaven canvis legítims. La norma estava escrita però no tenia dents.
+
+### Canvis
+- `scripts/check-css-monocapa.mjs`: nou guard. Detecta `.admin-shell` en selectors i `!important` en classes pròpies fora de `@media`. Afegit a `validate:core`.
+- `booking-detail.css`: 420 línies de codi duplicat eliminat. 162 ocurrències de `.admin-shell` esborrades. `bd__pnl` ara té una sola definició canònica (`#252638`, vora or, shadow).
+- `tasks.css`, `customer-hub.css`, `reengagement.css`: `.admin-shell` eliminat de tots els selectors.
+- 9 `!important` innecessaris en classes pròpies eliminats de `booking-detail.css` i `leads-design.css`.
+- `CLAUDE.md`: norma CSS monocapa endurita: selector canònic, zero duplicats, zero `!important` propi, responsiu obligatori, reinici servidor obligatori.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 870 → 871.
+
+### Validació
+- `npx tsc --noEmit` OK.
+- `pnpm run validate:core` OK (incl. nou `qa:css-monocapa` verd).
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `qa:css-monocapa` OK.
+- Validació funcional: panell `bd__pnl` visible al navegador per primera vegada.
+- Validació humana/UX: pendent propietari (visual final dels panells).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 871. Següent canvi ha de ser `#872`.
+
+---
+
+## 2026-06-04 — Canvi #870: Fix taula reserves — sense scroll horitzontal (claude)
+
+### Context
+La taula de `/admin/bookings` forçava scroll horitzontal perquè la columna Accions tenia 5 elements i la taula tenia `min-w-[1060px]`.
+
+### Canvis
+- `BookingActions.tsx`: nou prop `compact?: boolean`. En mode compact: mostra només el select d'estat + "Veure →". Fora del mode compact (targetes mòbil): comportament idèntic a l'anterior.
+- `bookings/page.tsx`: taula desktop: eliminat `min-w-[1060px]` i `overflow-x-auto`. Afegit amplades `w-[X%]` a les columnes. Padding reduït de `px-4 py-3` a `px-3 py-2.5`. Client i Pack amb `truncate max-w-[X]` per evitar desbordament. `BookingActions` ara amb `compact`.
+- `ADMIN_CHANGE_COUNTER` 869 → 870.
+
+### Validació
+- `npx tsc --noEmit` OK. `pnpm run validate:core` OK.
+- Validació funcional: taula sense scroll, tots els botons plens a les targetes mòbil.
+- Validació humana/UX: pendent confirmació propietari.
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 870. Següent canvi ha de ser `#871`.
+
+---
+
+## 2026-06-04 — Canvi #869: Fix visual booking-detail — contenidors més definits (claude)
+
+### Context
+El propietari detecta que els contenidors de `/admin/bookings/[id]` no estan prou definits (la línia o el color massa febles).
+
+### Canvis
+- `booking-detail.css`: `bd__pnl` — border `var(--o-admin-line)` (10%) → `var(--o-admin-line-2)` (20%); background gradient de 2.6%/1.2% a 4.5%/2.2% d'opacitat.
+- `bd__pnl-head`: afegit `border-bottom: 1px solid var(--o-admin-line)` i `padding-bottom: 10px` per separar capçalera del contingut del panell.
+- `bd__pnl-title`: font-size 13px→11px, color `var(--t)` → `var(--ax-gold)` amb `opacity: 0.75` — títol de panell amb l'accent or de l'Brass & Obsidian.
+- `ADMIN_CHANGE_COUNTER` 868 → 869.
+
+### Validació
+- `npx tsc --noEmit` OK. `pnpm run validate:core` OK.
+- Validació humana/UX: pendent confirmació propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 869. Següent canvi ha de ser `#870`.
+
+---
+
+## 2026-06-04 — Canvi #868: Migració `/admin/tasks` i `/admin/tasks/new` — Brass & Obsidian (claude)
+
+### Context
+Migració de les pàgines de tasques al sistema visual Brass & Obsidian. `AdminPage`, classes `ap-*`, Tailwind de color i hex hardcoded eliminats. Part del §6.19 de la migració Frankenstein.
+
+### Canvis
+- `app/admin/tasks/tasks.css`: nou fitxer CSS (prefix `tk__`). Cobreix: root 100dvh, header, botons (`tk__btn/--prim/--sm`), view toggle, queue banner amb `data-queue` (VENÇUT/AVUI/VIP/BLOQUEJAT), filtres, llista de tasques amb `tk__row/--overdue`, empty state, paginació, kanban (dots, board, columnes amb `data-status`, targetes amb `data-status`, botons mòbil), spinner, i formulari nova tasca (`tk__form-*`).
+- `app/admin/tasks/page.tsx`: `AdminPage` eliminat. Shell `tk__root` + `tk__header` + `tk__body`. Import `tasks.css`.
+- `app/admin/tasks/TaskPageSections.tsx`: `AdminSection`, `AdminEmptyState`, `ap-btn`, `ap-subtitle` eliminats. Usats `tk__view-toggle`, `tk__view-btn`, `tk__filters`, `tk__list`, `tk__row`, `tk__btn--prim`, etc.
+- `app/admin/tasks/TaskKanbanView.tsx`: Tailwind de color eliminat. `getDueDateColor` retorna ara classes `tk__card-date--overdue/--today`. Columnes i targetes amb `data-status` per al CSS.
+- `app/admin/tasks/TaskQueueBanner.tsx`: hardcoded color classes eliminades. `tk__queue`, `tk__queue-pill` amb `data-queue` i `.is-active`. Cap hex ni Tailwind de color.
+- `app/admin/tasks/TaskRowActions.tsx`: `rounded border px-2 py-1` → `tk__btn tk__btn--sm`.
+- `app/admin/tasks/GenerateDailyChecklistButton.tsx`: `admin-tasks-action inline-flex...` → `tk__btn`. `tk__auto-btn` + `tk__auto-msg`.
+- `app/admin/tasks/RunAutoTasksButton.tsx`: Tailwind eliminat → `tk__btn`. `tk__auto-btn` + `tk__auto-msg`.
+- `app/admin/tasks/new/page.tsx`: `AdminPage` eliminat. `tk__form-shell`, `tk__form-header`, `tk__form-body`, `tk__form-card`. `htmlFor`/`id` a tots els camps. `aria-label` al select de prioritat.
+- `docs/admin-inventari-pagines.md`: Tasques 🔴→🟢 + Nova tasca 🔴→🟢.
+- `ADMIN_CHANGE_COUNTER` 867 → 868.
+
+### Validació
+- `npx tsc --noEmit` OK (0 errors).
+- `pnpm run validate:core` OK (tots els guards verds, inclòs `admin-mode-prefix`, `no-admin-slate-gray`, `check-inline-hex`, `check-inline-rgba`).
+- Validació funcional: TypeScript net, guards estructurals verds.
+- Validació humana/UX: pendent propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 868. Següent canvi ha de ser `#869`.
+
+---
+
+## 2026-06-04 — Canvi #867: Google Calendar automàtic i complet (codex)
+
+### Context
+El propietari informa que no té res a Google Calendar i exigeix sincronització automàtica de tot. La consulta només de lectura a Railway confirma la causa: zero settings `integrations.googleCalendar.*`, per tant no hi ha refresh token, calendarId ni mappings d'events. També confirma el volum pendent: 3 reserves, 9 leads amb data sense reserva, 18 tasques obertes amb venciment, 1 bloqueig i 0 posts socials programats.
+
+### Canvis
+- `googleCalendarSyncService.ts`: nova reconciliació canònica completa amb una sola renovació de token per passada. Sincronitza reserves no cancel·lades incloses `PENDING`, leads amb data sense reserva, tasques obertes, dies bloquejats i posts socials programats; elimina events obsolets.
+- `lib/constants/googleCalendar.ts`: settings i prefixes d'events a monocapa canònica.
+- Nova ruta protegida `/api/cron/calendar-sync`, registrada al monitor de crons com `automation.calendarSync`.
+- `.github/workflows/daily-crons.yml`: reconciliació cada 15 minuts sense disparar la resta de crons diaris.
+- Callback OAuth: primera reconciliació immediata després de connectar el compte.
+- Integracions admin: copy actualitzat amb el contracte real de mirall complet.
+- Tests: ampliat `googleCalendarSyncService.test.ts` i nova suite `calendar-sync-route.test.ts`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; proves focalitzades 15/15 OK; `pnpm run qa:api-cron-auth` OK; `pnpm run validate:core` OK.
+- Validació funcional: una passada de test crea els cinc tipus d'event, reutilitza mappings i elimina mappings obsolets; sense OAuth informa tots els elements com a pendents.
+- Validació humana/UX: `/admin/settings/integrations` deixa clar què se sincronitza i amb quina freqüència.
+- Suite global: `pnpm test:run` falla en 6 tests aliens preexistents de col·laboradors, Stripe i booking route.
+- Build: `pnpm build` bloquejat per canvi concurrent aliè a `app/admin/tasks/new/page.tsx` i per accés EACCES del sandbox a Google Fonts.
+
+### Activació operativa pendent
+Google exigeix consentiment humà una vegada. OAuth està configurat, però Railway encara no té token. Després d'autoritzar el compte, el callback omplirà el calendari immediatament i el cron el mantindrà reconciliat cada 15 minuts.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 867. Següent canvi ha de ser `#868`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
 ## 2026-06-04 — Canvi #866: Entrades web al calendari setmana i dia (claude)
 
 ### Context

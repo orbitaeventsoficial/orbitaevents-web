@@ -24,7 +24,7 @@ interface PageProps {
 
 function readLogoDataUri(): string {
   try {
-    const svgPath = join(process.cwd(), 'public', 'img', 'orbitalockupwhite.svg');
+    const svgPath = join(process.cwd(), 'public', 'img', 'logoplanetatextdreta.svg');
     const svg = readFileSync(svgPath, 'utf-8');
     return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
   } catch {

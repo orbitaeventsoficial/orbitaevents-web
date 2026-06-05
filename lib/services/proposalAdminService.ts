@@ -276,3 +276,7 @@ export async function reassignProposalOwner(
     },
   };
 }
+
+export async function deleteAdminProposal(id: string): Promise<void> {
+  await prisma.proposal.delete({ where: { id } });
+}

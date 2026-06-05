@@ -25,7 +25,9 @@ const ROADMAP_AREA_WORKSPACE: Record<string, { href: string; label: string }> = 
 
 async function loadProtocolCanvisIndex(): Promise<Map<number, ProtocolCanviMeta>> {
   try {
-    const filePath = path.join(process.cwd(), 'docs', 'protocol-producte-admin-ca.md');
+    const canonicalPath = path.join(process.cwd(), 'docs', 'admin-protocol.md');
+    const legacyPath = path.join(process.cwd(), 'docs', 'protocol-producte-admin-ca.md');
+    const filePath = await fs.access(canonicalPath).then(() => canonicalPath).catch(() => legacyPath);
     const raw = await fs.readFile(filePath, 'utf-8');
     return indexProtocolCanvisByNumber(parseProtocolCanvis(raw));
   } catch {

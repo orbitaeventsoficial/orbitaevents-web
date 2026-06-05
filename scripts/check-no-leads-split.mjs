@@ -64,6 +64,6 @@ if (violations.length === 0) {
   );
   for (const v of violations) process.stderr.write(`  ${v}\n`);
   process.stderr.write('\nLead and commercial pipeline functionality belongs in app/admin/leads/.\n');
-  process.stderr.write('See §6.6 in docs/protocol-producte-admin-ca.md.\n');
+  process.stderr.write('See §6.6 in docs/admin-protocol.md.\n');
   process.exit(1);
 }

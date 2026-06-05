@@ -84,7 +84,7 @@ describe('check-admin-change-log', () => {
       diarioEntry(57),
     );
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain('docs/diario.md missing entry for current change #58');
+    expect(result.stderr).toContain('docs/admin-diary.md missing entry for current change #58');
   });
 
   it('rejects current diario entries without ownership fields', () => {
@@ -101,7 +101,7 @@ describe('check-admin-change-log', () => {
       ].join('\n'),
     );
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain('docs/diario.md current entry #58 missing ownership fields');
+    expect(result.stderr).toContain('docs/admin-diary.md current entry #58 missing ownership fields');
   });
 
   it('rejects current diario entries without validation layers', () => {
@@ -118,7 +118,7 @@ describe('check-admin-change-log', () => {
       ].join('\n'),
     );
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain('docs/diario.md current entry #58 missing validation layers');
+    expect(result.stderr).toContain('docs/admin-diary.md current entry #58 missing validation layers');
   });
 
   it('rejects current protocol entries without validation layers', () => {

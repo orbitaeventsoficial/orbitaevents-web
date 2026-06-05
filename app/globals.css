@@ -530,8 +530,8 @@
   }
 
   .text-mono {
-    font-family: var(--font-mono), monospace;
-    font-feature-settings: 'tnum';
+    font-family: var(--font-inter), "Inter", system-ui, sans-serif;
+    font-variant-numeric: tabular-nums;
   }
 
   /* ─────────────────────────────────────────────────────────────────────────
@@ -1111,7 +1111,7 @@ html:not(.admin-mode) .btn-secondary:hover {
 .stat-number,
 [class*="stat"] span[class*="number"],
 [class*="Stats"] .number {
-  font-family: 'JetBrains Mono', 'Sora', monospace !important;
+  font-family: var(--font-inter), 'Inter', system-ui, sans-serif !important;
   font-weight: 700 !important;
   font-variant-numeric: tabular-nums !important;
 }
@@ -1145,7 +1145,8 @@ button {
 [class*="countdown"],
 [class*="timer"],
 [class*="stat"] {
-  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
 }
 
 /* -----------------------------------------------------------------------------
@@ -2417,7 +2418,8 @@ html.admin-mode .admin-shell .admin-css-editor {
   background: var(--at-input);
   border-color: var(--at-border);
   color: var(--at-text);
-  font-family: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  font-family: var(--font-inter), "Inter", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   font-size: 13px;
 }
 
@@ -3095,4 +3097,3 @@ html.admin-mode .ap-empty-action {
   html.admin-mode .ap-card-body { padding: 1rem 1.125rem; }
   html.admin-mode .ap-page { gap: 1.25rem; }
 }
-

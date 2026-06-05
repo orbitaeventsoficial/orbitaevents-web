@@ -23,8 +23,8 @@ html.admin-mode .ni__head {
 }
 
 html.admin-mode .ni__eyebrow {
-  font-size: 10px;
-  font-weight: 700;
+  font-size: var(--o-text-micro);
+  font-weight: var(--o-fw-bold);
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--ax-gold);
@@ -33,15 +33,15 @@ html.admin-mode .ni__eyebrow {
 
 html.admin-mode .ni__h1 {
   margin: 0;
-  font-size: 26px;
-  font-weight: 800;
+  font-size: var(--o-text-xl-2);
+  font-weight: var(--o-fw-xbold);
   letter-spacing: -0.015em;
   color: var(--ax-t);
   line-height: 1.1;
 }
 
 html.admin-mode .ni__sub {
-  font-size: 13px;
+  font-size: var(--o-text-sm);
   color: var(--ax-t3);
   margin-top: 2px;
 }
@@ -49,7 +49,7 @@ html.admin-mode .ni__sub {
 /* ── Seccions targeta ────────────────────────────────────────────────────── */
 html.admin-mode .ni__card {
   border: 1px solid var(--ax-line);
-  border-radius: 16px;
+  border-radius: var(--o-r-lg);
   background: var(--ax-panel);
   padding: 22px 24px;
 }
@@ -61,8 +61,8 @@ html.admin-mode .ni__card--ai {
 }
 
 html.admin-mode .ni__card-title {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--o-text-xs);
+  font-weight: var(--o-fw-bold);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--ax-t2);
@@ -74,7 +74,7 @@ html.admin-mode .ni__card--ai .ni__card-title {
 }
 
 html.admin-mode .ni__card-hint {
-  font-size: 12px;
+  font-size: var(--o-text-2xs);
   color: var(--ax-t3);
   margin-bottom: 12px;
   line-height: 1.5;
@@ -84,11 +84,11 @@ html.admin-mode .ni__card-hint {
 html.admin-mode .ni__input {
   width: 100%;
   border: 1px solid var(--ax-line);
-  border-radius: 10px;
+  border-radius: var(--o-r-md);
   background: var(--ax-sunk);
   color: var(--ax-t);
   padding: 9px 12px;
-  font-size: 14px;
+  font-size: var(--o-text-base);
   font-family: inherit;
   transition: border-color 140ms ease;
 }
@@ -113,8 +113,8 @@ html.admin-mode .ni__label {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: var(--o-text-xs);
+  font-weight: var(--o-fw-semi);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ax-t2);
@@ -122,13 +122,13 @@ html.admin-mode .ni__label {
 }
 
 html.admin-mode .ni__label-hint {
-  font-size: 10px;
-  font-weight: 500;
+  font-size: var(--o-text-micro);
+  font-weight: var(--o-fw-book);
   letter-spacing: 0;
   text-transform: none;
-  color: var(--o-admin-gold, #c9a84c);
-  background: color-mix(in oklab, var(--o-admin-gold, #c9a84c) 15%, transparent);
-  border-radius: 4px;
+  color: var(--o-admin-gold, var(--ax-gold));
+  background: color-mix(in oklab, var(--o-admin-gold, var(--ax-gold)) 15%, transparent);
+  border-radius: var(--o-r-xs);
   padding: 1px 5px;
 }
 
@@ -165,12 +165,12 @@ html.admin-mode .ni__pill {
   gap: 6px;
   padding: 7px 13px;
   border: 1px solid var(--ax-line);
-  border-radius: 10px;
+  border-radius: var(--o-r-md);
   background: var(--ax-sunk);
   color: var(--ax-t2);
   font: inherit;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-semi);
   cursor: pointer;
   transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
 }
@@ -187,7 +187,7 @@ html.admin-mode .ni__pill--on {
 }
 
 html.admin-mode .ni__pill-icon {
-  font-size: 16px;
+  font-size: var(--o-text-md-2);
   line-height: 1;
 }
 
@@ -207,12 +207,12 @@ html.admin-mode .ni__tile {
   min-width: 72px;
   padding: 10px 12px;
   border: 1px solid var(--ax-line);
-  border-radius: 12px;
+  border-radius: var(--o-r-md-2);
   background: var(--ax-sunk);
   color: var(--ax-t2);
   font: inherit;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-semi);
   cursor: pointer;
   transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
 }
@@ -229,7 +229,7 @@ html.admin-mode .ni__tile--on {
 }
 
 html.admin-mode .ni__tile-icon {
-  font-size: 22px;
+  font-size: var(--o-text-xl);
   line-height: 1;
 }
 
@@ -240,10 +240,10 @@ html.admin-mode .ni__btn {
   justify-content: center;
   gap: 8px;
   padding: 10px 20px;
-  border-radius: 10px;
+  border-radius: var(--o-r-md);
   font: inherit;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-bold);
   cursor: pointer;
   border: 1px solid transparent;
   transition: opacity 130ms ease, transform 130ms ease, border-color 130ms ease;
@@ -290,7 +290,7 @@ html.admin-mode .ni__btn--ai:hover:not(:disabled) {
 
 html.admin-mode .ni__btn--submit {
   padding: 12px 28px;
-  font-size: 14px;
+  font-size: var(--o-text-base);
   background: color-mix(in oklab, var(--ax-gold) 14%, var(--ax-raised));
   border-color: var(--ax-hair-gold);
   color: var(--ax-gold-bright);
@@ -312,14 +312,14 @@ html.admin-mode .ni__actions {
 /* ── Missatges d'estat ───────────────────────────────────────────────────── */
 html.admin-mode .ni__success {
   border: 1px solid color-mix(in oklab, var(--o-stage-won) 40%, transparent);
-  border-radius: 14px;
+  border-radius: var(--o-r-lg);
   background: color-mix(in oklab, var(--o-stage-won) 8%, var(--ax-panel));
   padding: 18px 22px;
 }
 
 html.admin-mode .ni__success-title {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: var(--o-text-base);
+  font-weight: var(--o-fw-bold);
   color: var(--o-stage-won-strong);
   margin-bottom: 12px;
 }
@@ -332,24 +332,24 @@ html.admin-mode .ni__success-btns {
 
 html.admin-mode .ni__error {
   border: 1px solid color-mix(in oklab, var(--o-stage-lost) 40%, transparent);
-  border-radius: 12px;
+  border-radius: var(--o-r-md-2);
   background: color-mix(in oklab, var(--o-stage-lost) 8%, var(--ax-panel));
   padding: 14px 18px;
-  font-size: 13px;
+  font-size: var(--o-text-sm);
   color: var(--o-stage-lost);
 }
 
 /* ── Duplicats ───────────────────────────────────────────────────────────── */
 html.admin-mode .ni__dups {
   border: 1px solid color-mix(in oklab, var(--ax-gold) 25%, transparent);
-  border-radius: 14px;
+  border-radius: var(--o-r-lg);
   background: color-mix(in oklab, var(--ax-gold) 5%, var(--ax-panel));
   padding: 16px 20px;
 }
 
 html.admin-mode .ni__dups-title {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-bold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ax-gold);
@@ -365,7 +365,7 @@ html.admin-mode .ni__dup-row {
   justify-content: space-between;
   padding: 10px 12px;
   border: 1px solid var(--ax-line);
-  border-radius: 10px;
+  border-radius: var(--o-r-md);
   background: var(--ax-sunk);
   text-decoration: none;
   color: inherit;
@@ -378,22 +378,22 @@ html.admin-mode .ni__dup-row:hover {
 }
 
 html.admin-mode .ni__dup-name {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-semi);
   color: var(--ax-t);
 }
 
 html.admin-mode .ni__dup-meta {
-  font-size: 11px;
+  font-size: var(--o-text-xs);
   color: var(--ax-t3);
   margin-top: 2px;
 }
 
 html.admin-mode .ni__dup-badge {
   padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 700;
+  border-radius: var(--o-r-pill);
+  font-size: var(--o-text-xs);
+  font-weight: var(--o-fw-bold);
 }
 
 html.admin-mode .ni__dup-badge--high {

@@ -124,36 +124,6 @@ export default function PresupuestoPdfStudio({
   }, [isCustomerScoped, initialPreferredLocale, draftLoaded]);
 
   useEffect(() => {
-    if (logoDataUrl) return;
-
-    const candidates = [
-      '/img/logosoloplaneta.png',
-    ];
-
-    const tryLoadLogo = async () => {
-      for (const url of candidates) {
-        try {
-          const res = await fetchWithCsrf(url);
-          if (!res.ok) continue;
-          const blob = await res.blob();
-          const dataUrl = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(String(reader.result));
-            reader.onerror = () => reject(new Error('Failed to read logo blob'));
-            reader.readAsDataURL(blob);
-          });
-          setLogoDataUrl(dataUrl);
-          return;
-        } catch (error) {
-          log.warn('Failed to load logo candidate', { error: error instanceof Error ? error.message : String(error) });
-        }
-      }
-    };
-
-    void tryLoadLogo();
-  }, [logoDataUrl]);
-
-  useEffect(() => {
     let cancelled = false;
 
     const loadPricingCatalog = async () => {

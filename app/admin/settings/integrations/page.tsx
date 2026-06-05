@@ -179,7 +179,7 @@ export default async function IntegrationsPage() {
             <h2 className="text-lg font-semibold">Sincronització Google Calendar</h2>
             <BoolBadge ok={googleCalendarConnected} />
           </div>
-          <p className="mt-2 text-sm">Sincronització automàtica de reserves confirmades/preparació, baixa automàtica en cancel·lar i alarmes pròpies 7 dies, 24 h i 2 h abans.</p>
+          <p className="mt-2 text-sm">Mirall automàtic complet cada 15 minuts: reserves, leads amb data, tasques obertes, dies bloquejats i publicacions socials. La primera connexió omple el calendari immediatament.</p>
           <p className="mt-1 text-xs">
             Calendari: {map['integrations.googleCalendar.calendarId'] || process.env.GOOGLE_CALENDAR_ID || 'primary'} · Compte: {map['integrations.googleCalendar.connectedEmail'] || '-'}
           </p>

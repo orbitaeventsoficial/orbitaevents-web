@@ -23,6 +23,7 @@ export const SITE_CONFIG = {
   business: {
     name: 'Òrbita Events',
     legalName: 'Òrbita Events',
+    tagline: "DJ i animació per a casaments i events",
     cif: '',
 
     // Contacto principal (unificado)

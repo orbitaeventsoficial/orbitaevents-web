@@ -3,22 +3,22 @@
    Visual: Brass & Obsidian — tokens de app/studio/orbita-tokens.css
    ═══════════════════════════════════════════════════════════════════════ */
 
-html.admin-mode .admin-shell .ch__root {
+html.admin-mode .ch__root {
   min-height: 100vh;
 }
 
 /* ── Header ── */
-html.admin-mode .admin-shell .ch__header {
+html.admin-mode .ch__header {
   position: sticky;
   top: 0;
   z-index: 30;
   border-bottom: 1px solid var(--o-admin-line);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  background: rgba(10,10,12,0.88);
+  background: var(--ax-overlay-sm);
 }
 
-html.admin-mode .admin-shell .ch__hero {
+html.admin-mode .ch__hero {
   max-width: 1200px;
   margin: 0 auto;
   padding: 14px 16px 12px;
@@ -28,7 +28,7 @@ html.admin-mode .admin-shell .ch__hero {
 }
 
 /* ── Top row: info + actions ── */
-html.admin-mode .admin-shell .ch__toprow {
+html.admin-mode .ch__toprow {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
@@ -36,7 +36,7 @@ html.admin-mode .admin-shell .ch__toprow {
   gap: 12px;
 }
 
-html.admin-mode .admin-shell .ch__leftcol {
+html.admin-mode .ch__leftcol {
   display: flex;
   align-items: flex-start;
   gap: 14px;
@@ -44,48 +44,48 @@ html.admin-mode .admin-shell .ch__leftcol {
   flex: 1;
 }
 
-html.admin-mode .admin-shell .ch__avatar {
+html.admin-mode .ch__avatar {
   width: 54px;
   height: 54px;
   border-radius: var(--o-r-xl);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  font-weight: 700;
+  font-size: var(--o-text-lg);
+  font-weight: var(--o-fw-bold);
   color: var(--t);
   flex-shrink: 0;
   box-shadow: var(--o-shadow-md);
   border: 1px solid var(--o-admin-line);
-  background: rgba(255,255,255,0.05);
+  background: var(--ax-fill-3);
 }
 @media (max-width: 639px) {
-  html.admin-mode .admin-shell .ch__avatar { display: none; }
+  html.admin-mode .ch__avatar { display: none; }
 }
 
-html.admin-mode .admin-shell .ch__avatar[data-status="confirmed"] {
-  background: linear-gradient(135deg, rgba(62,197,123,0.28), rgba(62,197,123,0.07));
-  border-color: rgba(62,197,123,0.24);
+html.admin-mode .ch__avatar[data-status="confirmed"] {
+  background: linear-gradient(135deg, var(--ax-success-bg), var(--ax-success-bg));
+  border-color: var(--ax-success-bg);
 }
-html.admin-mode .admin-shell .ch__avatar[data-status="negotiation"] {
-  background: linear-gradient(135deg, rgba(232,169,58,0.28), rgba(232,169,58,0.07));
-  border-color: rgba(232,169,58,0.24);
+html.admin-mode .ch__avatar[data-status="negotiation"] {
+  background: linear-gradient(135deg, var(--ax-warning-bg), var(--ax-warning-bg));
+  border-color: var(--ax-warning-bg);
 }
-html.admin-mode .admin-shell .ch__avatar[data-status="postevent"] {
-  background: linear-gradient(135deg, rgba(99,102,241,0.28), rgba(99,102,241,0.07));
-  border-color: rgba(99,102,241,0.24);
+html.admin-mode .ch__avatar[data-status="postevent"] {
+  background: linear-gradient(135deg, var(--ax-vip-soft), var(--ax-vip-soft));
+  border-color: var(--ax-vip-soft);
 }
-html.admin-mode .admin-shell .ch__avatar[data-status="lost"] {
-  background: linear-gradient(135deg, rgba(226,89,106,0.28), rgba(226,89,106,0.07));
-  border-color: rgba(226,89,106,0.24);
+html.admin-mode .ch__avatar[data-status="lost"] {
+  background: linear-gradient(135deg, var(--ax-danger-bg), var(--ax-danger-bg));
+  border-color: var(--ax-danger-bg);
 }
 
-html.admin-mode .admin-shell .ch__namecol {
+html.admin-mode .ch__namecol {
   min-width: 0;
   flex: 1;
 }
 
-html.admin-mode .admin-shell .ch__navrow {
+html.admin-mode .ch__navrow {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -93,29 +93,29 @@ html.admin-mode .admin-shell .ch__navrow {
   margin-bottom: 3px;
 }
 
-html.admin-mode .admin-shell .ch__back {
-  font-size: 12px;
+html.admin-mode .ch__back {
+  font-size: var(--o-text-2xs);
   color: var(--t3);
   text-decoration: none;
   transition: color 0.15s;
 }
-html.admin-mode .admin-shell .ch__back:hover { color: var(--t2); }
+html.admin-mode .ch__back:hover { color: var(--t2); }
 
-html.admin-mode .admin-shell .ch__navmeta {
-  font-size: 10px;
+html.admin-mode .ch__navmeta {
+  font-size: var(--o-text-micro);
   color: var(--t3);
 }
 
 /* ── Status badge ── */
-html.admin-mode .admin-shell .ch__statuswrap { position: relative; }
+html.admin-mode .ch__statuswrap { position: relative; }
 
-html.admin-mode .admin-shell .ch__status {
-  font-size: 11px;
-  font-weight: 600;
+html.admin-mode .ch__status {
+  font-size: var(--o-text-xs);
+  font-weight: var(--o-fw-semi);
   padding: 2px 8px;
   border-radius: var(--o-r-pill);
   border: 1px solid var(--o-admin-line-2);
-  background: rgba(255,255,255,0.06);
+  background: var(--ax-fill-3);
   color: var(--t2);
   cursor: pointer;
   transition: opacity 0.15s;
@@ -123,31 +123,31 @@ html.admin-mode .admin-shell .ch__status {
   align-items: center;
   gap: 4px;
 }
-html.admin-mode .admin-shell .ch__status:hover:not(:disabled) { opacity: 0.8; }
-html.admin-mode .admin-shell .ch__status:disabled { opacity: 0.6; cursor: default; }
+html.admin-mode .ch__status:hover:not(:disabled) { opacity: 0.8; }
+html.admin-mode .ch__status:disabled { opacity: 0.6; cursor: default; }
 
-html.admin-mode .admin-shell .ch__status[data-status="confirmed"] {
+html.admin-mode .ch__status[data-status="confirmed"] {
   color: var(--o-success);
-  border-color: rgba(62,197,123,0.40);
-  background: rgba(62,197,123,0.10);
+  border-color: var(--ax-success-strong);
+  background: var(--ax-success-bg);
 }
-html.admin-mode .admin-shell .ch__status[data-status="negotiation"] {
+html.admin-mode .ch__status[data-status="negotiation"] {
   color: var(--o-warning);
-  border-color: rgba(232,169,58,0.40);
-  background: rgba(232,169,58,0.10);
+  border-color: var(--ax-warning-strong);
+  background: var(--ax-warning-bg);
 }
-html.admin-mode .admin-shell .ch__status[data-status="postevent"] {
-  color: #a5b4fc;
-  border-color: rgba(99,102,241,0.40);
-  background: rgba(99,102,241,0.10);
+html.admin-mode .ch__status[data-status="postevent"] {
+  color: var(--ax-vip);
+  border-color: var(--ax-vip);
+  background: var(--ax-vip-soft);
 }
-html.admin-mode .admin-shell .ch__status[data-status="lost"] {
+html.admin-mode .ch__status[data-status="lost"] {
   color: var(--o-danger);
-  border-color: rgba(226,89,106,0.40);
-  background: rgba(226,89,106,0.10);
+  border-color: var(--ax-danger-strong);
+  background: var(--ax-danger-bg);
 }
 
-html.admin-mode .admin-shell .ch__statusmenu {
+html.admin-mode .ch__statusmenu {
   position: absolute;
   left: 0;
   top: calc(100% + 4px);
@@ -159,209 +159,209 @@ html.admin-mode .admin-shell .ch__statusmenu {
   box-shadow: var(--o-shadow-lg);
   padding: 4px 0;
 }
-html.admin-mode .admin-shell .ch__statusopt {
+html.admin-mode .ch__statusopt {
   width: 100%;
   padding: 6px 12px;
   text-align: left;
-  font-size: 12px;
+  font-size: var(--o-text-2xs);
   background: transparent;
   border: none;
   cursor: pointer;
   color: var(--t2);
   transition: background 0.12s;
 }
-html.admin-mode .admin-shell .ch__statusopt:hover { background: rgba(255,255,255,0.05); }
-html.admin-mode .admin-shell .ch__statusopt[data-status="confirmed"] { color: var(--o-success); }
-html.admin-mode .admin-shell .ch__statusopt[data-status="negotiation"] { color: var(--o-warning); }
-html.admin-mode .admin-shell .ch__statusopt[data-status="postevent"] { color: #a5b4fc; }
-html.admin-mode .admin-shell .ch__statusopt[data-status="lost"] { color: var(--o-danger); }
-html.admin-mode .admin-shell .ch__statusopt:disabled {
-  background: rgba(255,255,255,0.05);
-  font-weight: 700;
+html.admin-mode .ch__statusopt:hover { background: var(--ax-fill-3); }
+html.admin-mode .ch__statusopt[data-status="confirmed"] { color: var(--o-success); }
+html.admin-mode .ch__statusopt[data-status="negotiation"] { color: var(--o-warning); }
+html.admin-mode .ch__statusopt[data-status="postevent"] { color: var(--ax-vip); }
+html.admin-mode .ch__statusopt[data-status="lost"] { color: var(--o-danger); }
+html.admin-mode .ch__statusopt:disabled {
+  background: var(--ax-fill-3);
+  font-weight: var(--o-fw-bold);
   cursor: default;
   opacity: 1;
 }
 
 /* ── Customer name & contact ── */
-html.admin-mode .admin-shell .ch__h1 {
-  font-size: 20px;
-  font-weight: 600;
+html.admin-mode .ch__h1 {
+  font-size: var(--o-text-lg);
+  font-weight: var(--o-fw-semi);
   color: var(--t);
   margin: 2px 0 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-html.admin-mode .admin-shell .ch__h1-num {
-  font-size: 13px;
+html.admin-mode .ch__h1-num {
+  font-size: var(--o-text-sm);
   font-family: var(--mono);
   color: var(--t3);
   margin-right: 6px;
 }
 
-html.admin-mode .admin-shell .ch__contact {
+html.admin-mode .ch__contact {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: var(--o-text-sm);
   color: var(--t2);
   margin-top: 4px;
 }
-html.admin-mode .admin-shell .ch__contact a {
+html.admin-mode .ch__contact a {
   color: var(--t2);
   text-decoration: none;
   transition: color 0.15s;
 }
-html.admin-mode .admin-shell .ch__contact a:hover { color: var(--t); }
-html.admin-mode .admin-shell .ch__contact-sep { color: var(--t3); }
+html.admin-mode .ch__contact a:hover { color: var(--t); }
+html.admin-mode .ch__contact-sep { color: var(--t3); }
 
 /* ── Action buttons ── */
-html.admin-mode .admin-shell .ch__acts {
+html.admin-mode .ch__acts {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   align-items: flex-start;
 }
 
-html.admin-mode .admin-shell .ch__btn {
+html.admin-mode .ch__btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 7px 12px;
   border-radius: var(--o-r-lg);
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-semi);
   text-decoration: none;
   cursor: pointer;
   border: 1px solid var(--o-admin-line-2);
-  background: rgba(255,255,255,0.04);
+  background: var(--ax-fill-2);
   color: var(--t2);
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
-html.admin-mode .admin-shell .ch__btn:hover:not(:disabled) {
-  background: rgba(255,255,255,0.08);
+html.admin-mode .ch__btn:hover:not(:disabled) {
+  background: var(--ax-fill-4);
   color: var(--t);
 }
-html.admin-mode .admin-shell .ch__btn:disabled { opacity: 0.5; cursor: default; }
+html.admin-mode .ch__btn:disabled { opacity: 0.5; cursor: default; }
 
-html.admin-mode .admin-shell .ch__btn--prim {
-  background: rgba(215,184,110,0.10);
+html.admin-mode .ch__btn--prim {
+  background: var(--ax-gold-tint-2);
   border-color: var(--o-admin-hair-gold);
   color: var(--gold);
 }
-html.admin-mode .admin-shell .ch__btn--prim:hover:not(:disabled) {
-  background: rgba(215,184,110,0.18);
+html.admin-mode .ch__btn--prim:hover:not(:disabled) {
+  background: var(--ax-gold-tint-2);
   color: var(--gold-bright);
   border-color: var(--o-admin-hair-gold);
 }
 
-html.admin-mode .admin-shell .ch__btn--sec {
-  background: rgba(95,183,232,0.08);
-  border-color: rgba(95,183,232,0.25);
+html.admin-mode .ch__btn--sec {
+  background: var(--ax-info-bg);
+  border-color: var(--ax-info-bg);
   color: var(--o-info);
 }
-html.admin-mode .admin-shell .ch__btn--sec:hover:not(:disabled) {
-  background: rgba(95,183,232,0.15);
+html.admin-mode .ch__btn--sec:hover:not(:disabled) {
+  background: var(--ax-info-bg);
 }
 
-html.admin-mode .admin-shell .ch__btn--warn {
-  background: rgba(232,169,58,0.08);
-  border-color: rgba(232,169,58,0.25);
+html.admin-mode .ch__btn--warn {
+  background: var(--ax-warning-bg);
+  border-color: var(--ax-warning-bg);
   color: var(--o-warning);
 }
-html.admin-mode .admin-shell .ch__btn--warn:hover:not(:disabled) {
-  background: rgba(232,169,58,0.15);
+html.admin-mode .ch__btn--warn:hover:not(:disabled) {
+  background: var(--ax-warning-bg);
 }
 
-html.admin-mode .admin-shell .ch__btn--danger {
-  background: rgba(226,89,106,0.10);
-  border-color: rgba(226,89,106,0.30);
+html.admin-mode .ch__btn--danger {
+  background: var(--ax-danger-bg);
+  border-color: var(--ax-danger-border);
   color: var(--o-danger);
 }
-html.admin-mode .admin-shell .ch__btn--danger:hover:not(:disabled) {
-  background: rgba(226,89,106,0.18);
+html.admin-mode .ch__btn--danger:hover:not(:disabled) {
+  background: var(--ax-danger-bg);
 }
 
-html.admin-mode .admin-shell .ch__btn-label {
+html.admin-mode .ch__btn-label {
   display: none;
 }
 @media (min-width: 640px) {
-  html.admin-mode .admin-shell .ch__btn-label { display: inline; }
+  html.admin-mode .ch__btn-label { display: inline; }
 }
 
 /* ── KPIs ── */
-html.admin-mode .admin-shell .ch__kpis {
+html.admin-mode .ch__kpis {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
 }
 @media (min-width: 640px) {
-  html.admin-mode .admin-shell .ch__kpis { grid-template-columns: repeat(3, 1fr); }
+  html.admin-mode .ch__kpis { grid-template-columns: repeat(3, 1fr); }
 }
 @media (min-width: 1024px) {
-  html.admin-mode .admin-shell .ch__kpis { grid-template-columns: repeat(5, 1fr); }
+  html.admin-mode .ch__kpis { grid-template-columns: repeat(5, 1fr); }
 }
 
-html.admin-mode .admin-shell .ch__kpi {
-  background: rgba(255,255,255,0.025);
+html.admin-mode .ch__kpi {
+  background: var(--ax-fill-1);
   border: 1px solid var(--o-admin-line);
   border-radius: var(--o-r-lg);
   padding: 10px 12px;
 }
-html.admin-mode .admin-shell .ch__kpi--hi {
+html.admin-mode .ch__kpi--hi {
   border-color: var(--o-admin-hair-gold);
-  background: rgba(215,184,110,0.04);
+  background: var(--ax-gold-tint-1);
 }
-html.admin-mode .admin-shell .ch__kpi-label {
-  font-size: 10px;
+html.admin-mode .ch__kpi-label {
+  font-size: var(--o-text-micro);
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: var(--t3);
   margin: 0;
 }
-html.admin-mode .admin-shell .ch__kpi-val {
-  font-size: 14px;
-  font-weight: 600;
+html.admin-mode .ch__kpi-val {
+  font-size: var(--o-text-base);
+  font-weight: var(--o-fw-semi);
   color: var(--t);
   margin: 3px 0 0;
 }
-html.admin-mode .admin-shell .ch__kpi--hi .ch__kpi-val { color: var(--gold); }
+html.admin-mode .ch__kpi--hi .ch__kpi-val { color: var(--gold); }
 
 /* ── Stage progress ── */
-html.admin-mode .admin-shell .ch__rail { /* wrapper per helpAttrs */ }
+html.admin-mode .ch__rail { /* wrapper per helpAttrs */ }
 
-html.admin-mode .admin-shell .ch__stagebar {
-  background: rgba(255,255,255,0.02);
+html.admin-mode .ch__stagebar {
+  background: var(--ax-fill-1);
   border: 1px solid var(--o-admin-line);
   border-radius: var(--o-r-lg);
   padding: 10px 12px;
 }
-html.admin-mode .admin-shell .ch__stagebar-title {
-  font-size: 10px;
-  font-weight: 600;
+html.admin-mode .ch__stagebar-title {
+  font-size: var(--o-text-micro);
+  font-weight: var(--o-fw-semi);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--t3);
   margin: 0 0 8px;
 }
-html.admin-mode .admin-shell .ch__stagebar-row {
+html.admin-mode .ch__stagebar-row {
   display: flex;
   align-items: center;
   overflow-x: auto;
 }
 
-html.admin-mode .admin-shell .ch__stagepipe {
+html.admin-mode .ch__stagepipe {
   height: 1px;
   width: 28px;
   flex-shrink: 0;
   background: var(--o-admin-line);
 }
-html.admin-mode .admin-shell .ch__stagepipe--done { background: rgba(62,197,123,0.28); }
+html.admin-mode .ch__stagepipe--done { background: var(--ax-success-bg); }
 
-html.admin-mode .admin-shell .ch__stage {
-  font-size: 11px;
-  font-weight: 600;
+html.admin-mode .ch__stage {
+  font-size: var(--o-text-xs);
+  font-weight: var(--o-fw-semi);
   padding: 4px 10px;
   border-radius: var(--o-r-pill);
   border: 1px solid var(--o-admin-line);
@@ -369,75 +369,75 @@ html.admin-mode .admin-shell .ch__stage {
   white-space: nowrap;
   background: transparent;
 }
-html.admin-mode .admin-shell .ch__stage--cur {
+html.admin-mode .ch__stage--cur {
   color: var(--o-info);
-  border-color: rgba(95,183,232,0.40);
-  background: rgba(95,183,232,0.10);
-  box-shadow: 0 0 0 3px rgba(95,183,232,0.06);
+  border-color: var(--ax-info-strong);
+  background: var(--ax-info-bg);
+  box-shadow: 0 0 0 3px var(--ax-info-bg);
 }
-html.admin-mode .admin-shell .ch__stage--done {
+html.admin-mode .ch__stage--done {
   color: var(--o-success);
-  border-color: rgba(62,197,123,0.30);
-  background: rgba(62,197,123,0.06);
+  border-color: var(--ax-success-border);
+  background: var(--ax-success-bg);
 }
-html.admin-mode .admin-shell .ch__stage--lost {
+html.admin-mode .ch__stage--lost {
   color: var(--o-danger);
-  border-color: rgba(226,89,106,0.30);
-  background: rgba(226,89,106,0.06);
+  border-color: var(--ax-danger-border);
+  background: var(--ax-danger-bg);
 }
 
 /* ── Tabs ── */
-html.admin-mode .admin-shell .ch__tabs {
+html.admin-mode .ch__tabs {
   display: none;
   flex-wrap: wrap;
   gap: 4px;
   padding-bottom: 6px;
 }
 @media (min-width: 768px) {
-  html.admin-mode .admin-shell .ch__tabs { display: flex; }
+  html.admin-mode .ch__tabs { display: flex; }
 }
 
-html.admin-mode .admin-shell .ch__tab {
+html.admin-mode .ch__tab {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
   border-radius: var(--o-r-lg);
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-book);
   border: none;
   background: transparent;
   color: var(--t3);
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
-html.admin-mode .admin-shell .ch__tab:hover {
-  background: rgba(255,255,255,0.04);
+html.admin-mode .ch__tab:hover {
+  background: var(--ax-fill-2);
   color: var(--t2);
 }
-html.admin-mode .admin-shell .ch__tab--on {
-  background: rgba(255,255,255,0.90);
-  color: #111117;
+html.admin-mode .ch__tab--on {
+  background: var(--ax-fill-bright);
+  color: var(--ax-panel);
   box-shadow: var(--o-shadow-sm);
 }
-html.admin-mode .admin-shell .ch__tab--on:hover { background: rgba(255,255,255,0.96); }
+html.admin-mode .ch__tab--on:hover { background: var(--ax-fill-bright); }
 
-html.admin-mode .admin-shell .ch__tab-icon { font-size: 14px; }
+html.admin-mode .ch__tab-icon { font-size: var(--o-text-base); }
 
-html.admin-mode .admin-shell .ch__tab-badge {
-  font-size: 10px;
-  font-weight: 700;
+html.admin-mode .ch__tab-badge {
+  font-size: var(--o-text-micro);
+  font-weight: var(--o-fw-bold);
   padding: 1px 5px;
   border-radius: var(--o-r-pill);
-  background: rgba(232,169,58,0.14);
+  background: var(--ax-warning-bg);
   color: var(--o-warning);
 }
-html.admin-mode .admin-shell .ch__tab--on .ch__tab-badge {
-  background: rgba(95,183,232,0.14);
+html.admin-mode .ch__tab--on .ch__tab-badge {
+  background: var(--ax-info-bg);
   color: var(--o-info);
 }
 
-html.admin-mode .admin-shell .ch__sel {
+html.admin-mode .ch__sel {
   display: block;
   width: 100%;
   border-radius: var(--o-r-lg);
@@ -445,17 +445,17 @@ html.admin-mode .admin-shell .ch__sel {
   background: var(--raised);
   color: var(--t);
   padding: 10px 12px;
-  font-size: 13px;
+  font-size: var(--o-text-sm);
   appearance: none;
   -webkit-appearance: none;
   margin-bottom: 6px;
 }
 @media (min-width: 768px) {
-  html.admin-mode .admin-shell .ch__sel { display: none; }
+  html.admin-mode .ch__sel { display: none; }
 }
 
 /* ── Main content layout ── */
-html.admin-mode .admin-shell .ch__grid {
+html.admin-mode .ch__grid {
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
@@ -465,43 +465,43 @@ html.admin-mode .admin-shell .ch__grid {
   padding-bottom: 40px;
 }
 @media (min-width: 1024px) {
-  html.admin-mode .admin-shell .ch__grid {
+  html.admin-mode .ch__grid {
     grid-template-columns: 1fr 360px;
   }
 }
-html.admin-mode .admin-shell .ch__main { min-width: 0; }
-html.admin-mode .admin-shell .ch__aside { min-width: 0; }
+html.admin-mode .ch__main { min-width: 0; }
+html.admin-mode .ch__aside { min-width: 0; }
 
 /* ── Alerts ── */
-html.admin-mode .admin-shell .ch__alert {
+html.admin-mode .ch__alert {
   max-width: 1200px;
   margin: 8px auto 0;
   padding: 0 16px;
 }
-html.admin-mode .admin-shell .ch__alert-inner {
+html.admin-mode .ch__alert-inner {
   border: 1px solid var(--o-admin-line-2);
-  background: rgba(255,255,255,0.03);
+  background: var(--ax-fill-2);
   border-radius: var(--o-r-lg);
   padding: 8px 16px;
-  font-size: 13px;
+  font-size: var(--o-text-sm);
   color: var(--t2);
   display: flex;
   align-items: center;
   gap: 8px;
 }
-html.admin-mode .admin-shell .ch__alert-btn {
+html.admin-mode .ch__alert-btn {
   background: none;
   border: none;
   color: var(--gold);
-  font-size: 13px;
+  font-size: var(--o-text-sm);
   cursor: pointer;
   text-decoration: underline;
   padding: 0;
 }
-html.admin-mode .admin-shell .ch__alert-btn:hover { text-decoration: none; }
+html.admin-mode .ch__alert-btn:hover { text-decoration: none; }
 
 /* ── Floating refresh ── */
-html.admin-mode .admin-shell .ch__fab {
+html.admin-mode .ch__fab {
   position: fixed;
   bottom: 80px;
   right: 16px;
@@ -515,68 +515,68 @@ html.admin-mode .admin-shell .ch__fab {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: var(--o-text-lg);
   cursor: pointer;
   transition: transform 0.15s, opacity 0.15s;
 }
-html.admin-mode .admin-shell .ch__fab:hover:not(:disabled) { transform: scale(1.06); }
-html.admin-mode .admin-shell .ch__fab:active { transform: scale(0.95); }
-html.admin-mode .admin-shell .ch__fab:disabled { opacity: 0.5; cursor: default; }
+html.admin-mode .ch__fab:hover:not(:disabled) { transform: scale(1.06); }
+html.admin-mode .ch__fab:active { transform: scale(0.95); }
+html.admin-mode .ch__fab:disabled { opacity: 0.5; cursor: default; }
 @media (min-width: 1024px) {
-  html.admin-mode .admin-shell .ch__fab { display: none; }
+  html.admin-mode .ch__fab { display: none; }
 }
 
 /* ── Panel error boundary ── */
-html.admin-mode .admin-shell .ch__pnl-err {
+html.admin-mode .ch__pnl-err {
   border: 1px solid var(--o-admin-line-2);
   border-radius: var(--o-r-xl);
-  background: rgba(255,255,255,0.02);
+  background: var(--ax-fill-1);
   padding: 20px;
 }
-html.admin-mode .admin-shell .ch__pnl-err-title {
-  font-size: 14px;
-  font-weight: 600;
+html.admin-mode .ch__pnl-err-title {
+  font-size: var(--o-text-base);
+  font-weight: var(--o-fw-semi);
   color: var(--t);
   margin: 0 0 4px;
 }
-html.admin-mode .admin-shell .ch__pnl-err-msg {
-  font-size: 12px;
+html.admin-mode .ch__pnl-err-msg {
+  font-size: var(--o-text-2xs);
   color: var(--t3);
   margin: 0 0 12px;
 }
-html.admin-mode .admin-shell .ch__pnl-err-btn {
+html.admin-mode .ch__pnl-err-btn {
   border: 1px solid var(--o-admin-line-2);
   background: transparent;
   color: var(--t2);
   border-radius: var(--o-r-md);
   padding: 6px 12px;
-  font-size: 12px;
+  font-size: var(--o-text-2xs);
   cursor: pointer;
   transition: background 0.15s;
 }
-html.admin-mode .admin-shell .ch__pnl-err-btn:hover { background: rgba(255,255,255,0.05); }
+html.admin-mode .ch__pnl-err-btn:hover { background: var(--ax-fill-3); }
 
 /* ── Panel skeleton ── */
-html.admin-mode .admin-shell .ch__skeleton {
+html.admin-mode .ch__skeleton {
   border: 1px solid var(--o-admin-line);
   border-radius: var(--o-r-xl);
-  background: rgba(255,255,255,0.015);
+  background: var(--ax-fill-1);
   padding: 20px;
   animation: ch-pulse 1.8s ease-in-out infinite;
 }
-html.admin-mode .admin-shell .ch__skeleton-bar {
+html.admin-mode .ch__skeleton-bar {
   height: 12px;
   border-radius: var(--o-r-sm);
-  background: rgba(255,255,255,0.06);
+  background: var(--ax-fill-3);
   margin-bottom: 8px;
   width: 100%;
 }
-html.admin-mode .admin-shell .ch__skeleton-bar:nth-child(2) { width: 72%; }
-html.admin-mode .admin-shell .ch__skeleton-bar:nth-child(3) { width: 48%; }
-html.admin-mode .admin-shell .ch__skeleton-bar:nth-child(4) { width: 65%; }
+html.admin-mode .ch__skeleton-bar:nth-child(2) { width: 72%; }
+html.admin-mode .ch__skeleton-bar:nth-child(3) { width: 48%; }
+html.admin-mode .ch__skeleton-bar:nth-child(4) { width: 65%; }
 
 /* Page-level skeleton */
-html.admin-mode .admin-shell .ch__skeleton-header {
+html.admin-mode .ch__skeleton-header {
   border-bottom: 1px solid var(--o-admin-line);
   padding: 20px 16px;
   display: flex;
@@ -584,14 +584,14 @@ html.admin-mode .admin-shell .ch__skeleton-header {
   gap: 12px;
   animation: ch-pulse 1.8s ease-in-out infinite;
 }
-html.admin-mode .admin-shell .ch__skeleton-header-bar {
+html.admin-mode .ch__skeleton-header-bar {
   height: 14px;
   border-radius: var(--o-r-sm);
-  background: rgba(255,255,255,0.06);
+  background: var(--ax-fill-3);
 }
-html.admin-mode .admin-shell .ch__skeleton-header-bar:nth-child(1) { width: 30%; }
-html.admin-mode .admin-shell .ch__skeleton-header-bar:nth-child(2) { width: 55%; }
-html.admin-mode .admin-shell .ch__skeleton-header-bar:nth-child(3) { width: 80%; }
+html.admin-mode .ch__skeleton-header-bar:nth-child(1) { width: 30%; }
+html.admin-mode .ch__skeleton-header-bar:nth-child(2) { width: 55%; }
+html.admin-mode .ch__skeleton-header-bar:nth-child(3) { width: 80%; }
 
 @keyframes ch-pulse {
   0%, 100% { opacity: 1; }
@@ -602,4 +602,4 @@ html.admin-mode .admin-shell .ch__skeleton-header-bar:nth-child(3) { width: 80%;
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
-html.admin-mode .admin-shell .ch__spin { display: inline-block; animation: ch-spin 1s linear infinite; }
+html.admin-mode .ch__spin { display: inline-block; animation: ch-spin 1s linear infinite; }

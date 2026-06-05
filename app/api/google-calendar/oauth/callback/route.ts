@@ -7,6 +7,7 @@ import {
   upsertIntegrationSettings,
   verifyGoogleOAuthState,
 } from '@/lib/services/googleOAuthService';
+import { reconcileGoogleCalendar } from '@/lib/services/googleCalendarSyncService';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,10 +30,11 @@ export async function GET(req: NextRequest) {
   const state = req.nextUrl.searchParams.get('state');
   const error = req.nextUrl.searchParams.get('error');
   const successUrl = '/admin/settings/integrations?gcal=connected';
+  const appBaseUrl = getAppBaseUrl();
 
   if (error) {
     return NextResponse.redirect(
-      new URL(`/admin/settings/integrations?gcal=error&reason=${encodeURIComponent(error)}`, req.url)
+      new URL(`/admin/settings/integrations?gcal=error&reason=${encodeURIComponent(error)}`, appBaseUrl)
     );
   }
 
@@ -97,13 +99,18 @@ export async function GET(req: NextRequest) {
     ];
 
     await upsertIntegrationSettings(entries);
+    try {
+      await reconcileGoogleCalendar();
+    } catch (syncError) {
+      log.error('Google Calendar initial reconcile failed:', syncError as Error);
+    }
 
-    return NextResponse.redirect(new URL(successUrl, req.url));
+    return NextResponse.redirect(new URL(successUrl, appBaseUrl));
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     log.error('Google Calendar OAuth callback error:', err as Error);
     return NextResponse.redirect(
-      new URL(`/admin/settings/integrations?gcal=error&reason=${encodeURIComponent(message)}`, req.url)
+      new URL(`/admin/settings/integrations?gcal=error&reason=${encodeURIComponent(message)}`, appBaseUrl)
     );
   }
 }

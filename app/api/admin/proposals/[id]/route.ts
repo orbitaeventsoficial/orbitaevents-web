@@ -4,7 +4,7 @@ import { requireAuth } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
 import { getRequestId } from '@/lib/request-context';
 import { ProposalStatus } from '@prisma/client';
-import { getAdminProposalById, updateAdminProposal } from '@/lib/services/proposalAdminService';
+import { getAdminProposalById, updateAdminProposal, deleteAdminProposal } from '@/lib/services/proposalAdminService';
 import { dispatchAutoTrigger } from '@/lib/services/automationTriggers';
 import { z } from 'zod';
 
@@ -79,3 +79,21 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   }
 }
 
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
+  const csrfError = await verifyCsrf(req);
+  if (csrfError) return csrfError;
+
+  try {
+    await deleteAdminProposal(params.id);
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    log.error('Error eliminant pressupost', error, { context: { proposalId: params.id } });
+    return NextResponse.json({ ok: false, error: 'Error eliminant pressupost' }, { status: 500 });
+  }
+}

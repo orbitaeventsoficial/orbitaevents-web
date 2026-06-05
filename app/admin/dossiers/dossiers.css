@@ -3,69 +3,69 @@ html.admin-mode .dg__grid { display: grid; gap: 20px; grid-template-columns: 1fr
 @media (min-width: 900px) {
   html.admin-mode .dg__grid { grid-template-columns: 1fr 1fr; }
 }
-html.admin-mode .dg__section-title { font-size: 15px; font-weight: 700; color: var(--ax-t1); margin-bottom: 16px; }
-html.admin-mode .dg__section-hint { font-size: 13px; color: var(--ax-t3); margin-bottom: 16px; }
+html.admin-mode .dg__section-title { font-size: var(--o-text-md); font-weight: var(--o-fw-bold); color: var(--ax-t1); margin-bottom: 16px; }
+html.admin-mode .dg__section-hint { font-size: var(--o-text-sm); color: var(--ax-t3); margin-bottom: 16px; }
 html.admin-mode .dg__fields { display: flex; flex-direction: column; gap: 14px; }
 html.admin-mode .dg__field { display: flex; flex-direction: column; gap: 6px; }
 html.admin-mode .dg__field--full { grid-column: 1 / -1; }
-html.admin-mode .dg__label { font-size: 12px; font-weight: 600; color: var(--ax-t2); text-transform: uppercase; letter-spacing: 0.06em; display: flex; align-items: center; gap: 8px; }
-html.admin-mode .dg__label-hint { font-size: 11px; font-weight: 400; color: var(--ax-t3); text-transform: none; letter-spacing: 0; }
+html.admin-mode .dg__label { font-size: var(--o-text-2xs); font-weight: var(--o-fw-semi); color: var(--ax-t2); text-transform: uppercase; letter-spacing: 0.06em; display: flex; align-items: center; gap: 8px; }
+html.admin-mode .dg__label-hint { font-size: var(--o-text-xs); font-weight: var(--o-fw-normal); color: var(--ax-t3); text-transform: none; letter-spacing: 0; }
 html.admin-mode .dg__products { display: flex; flex-direction: column; gap: 10px; }
-html.admin-mode .dg__product-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 10px; border: 1px solid var(--ax-border, rgba(255,255,255,0.08)); background: var(--ax-surface2, rgba(255,255,255,0.04)); cursor: pointer; transition: border-color 0.15s, background 0.15s; }
-html.admin-mode .dg__product-card--active { border-color: var(--o-admin-gold); background: rgba(255,255,255,0.04); }
+html.admin-mode .dg__product-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: var(--o-r-md); border: 1px solid var(--ax-border, var(--ax-fill-4)); background: var(--ax-surface2, var(--ax-fill-2)); cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+html.admin-mode .dg__product-card--active { border-color: var(--o-admin-gold); background: var(--ax-fill-2); }
 html.admin-mode .dg__product-card:hover { border-color: var(--o-admin-gold); }
 html.admin-mode .dg__product-checkbox { position: absolute; opacity: 0; pointer-events: none; }
 html.admin-mode .dg__product-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-html.admin-mode .dg__product-name { font-size: 14px; font-weight: 600; color: var(--ax-t1); }
-html.admin-mode .dg__product-price { font-size: 12px; color: var(--ax-t3); }
-html.admin-mode .dg__product-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--ax-border, rgba(255,255,255,0.15)); display: flex; align-items: center; justify-content: center; font-size: 12px; color: transparent; transition: all 0.15s; }
-html.admin-mode .dg__product-check--on { border-color: var(--o-admin-gold); background: var(--o-admin-gold); color: #fff; }
-html.admin-mode .dg__warn { font-size: 13px; color: var(--o-stage-lost); margin-top: 8px; }
+html.admin-mode .dg__product-name { font-size: var(--o-text-base); font-weight: var(--o-fw-semi); color: var(--ax-t1); }
+html.admin-mode .dg__product-price { font-size: var(--o-text-2xs); color: var(--ax-t3); }
+html.admin-mode .dg__product-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--ax-border, var(--ax-fill-6)); display: flex; align-items: center; justify-content: center; font-size: var(--o-text-2xs); color: transparent; transition: all 0.15s; }
+html.admin-mode .dg__product-check--on { border-color: var(--o-admin-gold); background: var(--o-admin-gold); color: var(--ax-light); }
+html.admin-mode .dg__warn { font-size: var(--o-text-sm); color: var(--o-stage-lost); margin-top: 8px; }
 html.admin-mode .dg__actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-html.admin-mode .dg__btn { padding: 11px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: opacity 0.15s; }
+html.admin-mode .dg__btn { padding: 11px 24px; border-radius: var(--o-r-sm-2); font-size: var(--o-text-base); font-weight: var(--o-fw-semi); cursor: pointer; border: none; transition: opacity 0.15s; }
 html.admin-mode .dg__btn:disabled { opacity: 0.4; cursor: not-allowed; }
-html.admin-mode .dg__btn--preview { background: var(--ax-surface2, rgba(255,255,255,0.08)); color: var(--ax-t1); border: 1px solid var(--ax-border, rgba(255,255,255,0.1)); }
-html.admin-mode .dg__btn--preview:hover:not(:disabled) { background: var(--ax-surface3, rgba(255,255,255,0.12)); }
-html.admin-mode .dg__btn--save { background: var(--ax-surface2, rgba(255,255,255,0.08)); color: var(--ax-t1); border: 1px solid var(--o-admin-gold); }
+html.admin-mode .dg__btn--preview { background: var(--ax-surface2, var(--ax-fill-4)); color: var(--ax-t1); border: 1px solid var(--ax-border, var(--ax-fill-5)); }
+html.admin-mode .dg__btn--preview:hover:not(:disabled) { background: var(--ax-surface3, var(--ax-fill-5)); }
+html.admin-mode .dg__btn--save { background: var(--ax-surface2, var(--ax-fill-4)); color: var(--ax-t1); border: 1px solid var(--o-admin-gold); }
 html.admin-mode .dg__btn--save:hover:not(:disabled) { background: var(--ax-sunk); }
 html.admin-mode .dg__btn--pdf { background: var(--o-admin-gold); color: var(--ax-canvas); }
 html.admin-mode .dg__btn--pdf:hover:not(:disabled) { opacity: 0.88; }
-html.admin-mode .dg__btn--download { background: var(--ax-surface2, rgba(255,255,255,0.08)); color: var(--ax-t1); border: 1px solid var(--ax-border, rgba(255,255,255,0.1)); }
-html.admin-mode .dg__btn--download:hover:not(:disabled) { background: var(--ax-surface3, rgba(255,255,255,0.12)); }
-html.admin-mode .dg__hint { font-size: 12px; color: var(--ax-t3); }
-html.admin-mode .dg__btn--danger { background: var(--o-stage-lost, rgba(220,60,60,0.15)); color: var(--ax-t1); border: 1px solid rgba(220,60,60,0.3); }
+html.admin-mode .dg__btn--download { background: var(--ax-surface2, var(--ax-fill-4)); color: var(--ax-t1); border: 1px solid var(--ax-border, var(--ax-fill-5)); }
+html.admin-mode .dg__btn--download:hover:not(:disabled) { background: var(--ax-surface3, var(--ax-fill-5)); }
+html.admin-mode .dg__hint { font-size: var(--o-text-2xs); color: var(--ax-t3); }
+html.admin-mode .dg__btn--danger { background: var(--o-stage-lost, var(--ax-danger-bg)); color: var(--ax-t1); border: 1px solid var(--ax-danger-bg); }
 html.admin-mode .dg__btn--danger:hover:not(:disabled) { opacity: 0.8; }
 
 /* Llista de dossiers desats */
 html.admin-mode .dg__list-section { margin-bottom: 32px; }
 html.admin-mode .dg__gen-section { margin-top: 8px; }
 html.admin-mode .dg__list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
-html.admin-mode .dg__list-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px; border-radius: 10px; border: 1px solid var(--ax-border, rgba(255,255,255,0.08)); background: var(--ax-surface2, rgba(255,255,255,0.03)); }
+html.admin-mode .dg__list-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px; border-radius: var(--o-r-md); border: 1px solid var(--ax-border, var(--ax-fill-4)); background: var(--ax-surface2, var(--ax-fill-2)); }
 html.admin-mode .dg__list-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
-html.admin-mode .dg__list-nom { font-size: 14px; font-weight: 600; color: var(--ax-t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-html.admin-mode .dg__list-meta { font-size: 12px; color: var(--ax-t3); }
-html.admin-mode .dg__list-sent { font-size: 11px; color: var(--o-admin-gold, #c8a84b); }
-html.admin-mode .dg__list-lead { font-size: 11px; color: var(--ax-t3); text-decoration: none; opacity: 0.7; }
+html.admin-mode .dg__list-nom { font-size: var(--o-text-base); font-weight: var(--o-fw-semi); color: var(--ax-t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html.admin-mode .dg__list-meta { font-size: var(--o-text-2xs); color: var(--ax-t3); }
+html.admin-mode .dg__list-sent { font-size: var(--o-text-xs); color: var(--o-admin-gold, var(--ax-gold)); }
+html.admin-mode .dg__list-lead { font-size: var(--o-text-xs); color: var(--ax-t3); text-decoration: none; opacity: 0.7; }
 html.admin-mode .dg__list-lead:hover { opacity: 1; color: var(--o-admin-gold); }
 html.admin-mode .dg__list-acts { display: flex; align-items: center; gap: 8px; shrink: 0; }
 
 /* Cercador de leads */
 html.admin-mode .dg__search-wrap { position: relative; margin-bottom: 20px; }
 html.admin-mode .dg__search-field { display: flex; flex-direction: column; gap: 6px; position: relative; }
-html.admin-mode .dg__search-spinner { font-size: 12px; color: var(--ax-t3); position: absolute; right: 12px; top: 38px; }
-html.admin-mode .dg__search-results { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 50; background: var(--ax-panel, #1a1a2e); border: 1px solid var(--ax-border, rgba(255,255,255,0.12)); border-radius: 10px; overflow: hidden; list-style: none; padding: 4px; margin: 0; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
-html.admin-mode .dg__search-result { width: 100%; text-align: left; background: none; border: none; padding: 10px 12px; cursor: pointer; border-radius: 6px; display: flex; flex-direction: column; gap: 2px; transition: background 0.1s; }
-html.admin-mode .dg__search-result:hover { background: rgba(255,255,255,0.06); }
-html.admin-mode .dg__sr-nom { font-size: 14px; font-weight: 600; color: var(--ax-t1); }
-html.admin-mode .dg__sr-meta { font-size: 12px; color: var(--ax-t3); }
-html.admin-mode .dg__search-empty { font-size: 13px; color: var(--ax-t3); padding: 10px 12px; border: 1px solid var(--ax-border, rgba(255,255,255,0.08)); border-radius: 8px; margin-top: 4px; }
-html.admin-mode .dg__linked-lead { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--o-admin-gold, #c8a84b); background: rgba(200,168,75,0.06); flex-wrap: wrap; }
-html.admin-mode .dg__linked-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--o-admin-gold, #c8a84b); }
-html.admin-mode .dg__linked-nom { font-size: 14px; font-weight: 600; color: var(--ax-t1); }
-html.admin-mode .dg__linked-email { font-size: 12px; color: var(--ax-t3); }
-html.admin-mode .dg__linked-clear { margin-left: auto; font-size: 12px; color: var(--ax-t3); background: none; border: 1px solid var(--ax-border, rgba(255,255,255,0.1)); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
-html.admin-mode .dg__linked-clear:hover { color: var(--ax-t1); border-color: rgba(255,255,255,0.25); }
+html.admin-mode .dg__search-spinner { font-size: var(--o-text-2xs); color: var(--ax-t3); position: absolute; right: 12px; top: 38px; }
+html.admin-mode .dg__search-results { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 50; background: var(--ax-panel, var(--ax-raised)); border: 1px solid var(--ax-border, var(--ax-fill-5)); border-radius: var(--o-r-md); overflow: hidden; list-style: none; padding: 4px; margin: 0; box-shadow: 0 8px 24px var(--ax-overlay-lg); }
+html.admin-mode .dg__search-result { width: 100%; text-align: left; background: none; border: none; padding: 10px 12px; cursor: pointer; border-radius: var(--o-r-sm); display: flex; flex-direction: column; gap: 2px; transition: background 0.1s; }
+html.admin-mode .dg__search-result:hover { background: var(--ax-fill-3); }
+html.admin-mode .dg__sr-nom { font-size: var(--o-text-base); font-weight: var(--o-fw-semi); color: var(--ax-t1); }
+html.admin-mode .dg__sr-meta { font-size: var(--o-text-2xs); color: var(--ax-t3); }
+html.admin-mode .dg__search-empty { font-size: var(--o-text-sm); color: var(--ax-t3); padding: 10px 12px; border: 1px solid var(--ax-border, var(--ax-fill-4)); border-radius: var(--o-r-sm-2); margin-top: 4px; }
+html.admin-mode .dg__linked-lead { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--o-r-md); border: 1px solid var(--o-admin-gold, var(--ax-gold)); background: var(--ax-gold-tint-1); flex-wrap: wrap; }
+html.admin-mode .dg__linked-label { font-size: var(--o-text-xs); font-weight: var(--o-fw-bold); text-transform: uppercase; letter-spacing: 0.08em; color: var(--o-admin-gold, var(--ax-gold)); }
+html.admin-mode .dg__linked-nom { font-size: var(--o-text-base); font-weight: var(--o-fw-semi); color: var(--ax-t1); }
+html.admin-mode .dg__linked-email { font-size: var(--o-text-2xs); color: var(--ax-t3); }
+html.admin-mode .dg__linked-clear { margin-left: auto; font-size: var(--o-text-2xs); color: var(--ax-t3); background: none; border: 1px solid var(--ax-border, var(--ax-fill-5)); border-radius: var(--o-r-sm); padding: 4px 10px; cursor: pointer; }
+html.admin-mode .dg__linked-clear:hover { color: var(--ax-t1); border-color: var(--ax-fill-bright); }
 
 /* Paperera de dossiers */
 html.admin-mode .dg__section-title--trash { color: var(--ax-t2); }
-html.admin-mode .dg__list-row--deleted { opacity: 0.7; border-color: rgba(220,60,60,0.15); }
+html.admin-mode .dg__list-row--deleted { opacity: 0.7; border-color: var(--ax-danger-bg); }

@@ -46,7 +46,9 @@ function getAuthorStyle(author: string): string {
 }
 
 async function readProtocolMarkdown(): Promise<string> {
-  const filePath = path.join(process.cwd(), 'docs', 'protocol-producte-admin-ca.md');
+  const canonicalPath = path.join(process.cwd(), 'docs', 'admin-protocol.md');
+  const legacyPath = path.join(process.cwd(), 'docs', 'protocol-producte-admin-ca.md');
+  const filePath = await fs.access(canonicalPath).then(() => canonicalPath).catch(() => legacyPath);
   return fs.readFile(filePath, 'utf-8');
 }
 
@@ -100,7 +102,7 @@ export default async function AdminProtocolPage({
   return (
     <AdminPage
       title="Protocol — §9 Canvis registrats"
-      subtitle="Història canònica del producte, llegida directament de docs/protocol-producte-admin-ca.md. Cada Canvi #N és aquí la font de veritat."
+      subtitle="Història canònica del producte, llegida directament de docs/admin-protocol.md. Cada Canvi #N és aquí la font de veritat."
       back={{ href: '/admin/manual', label: 'Manual de possibilitats' }}
     >
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
@@ -206,7 +208,7 @@ export default async function AdminProtocolPage({
       {focusedSection ? (
         <AdminSection
           title={`§${focusedSection.id} — ${focusedSection.title}`}
-          description="Secció oberta des d'un CTA del manual. Aquí veus el contingut canònic; el text complet és a docs/protocol-producte-admin-ca.md."
+          description="Secció oberta des d'un CTA del manual. Aquí veus el contingut canònic; el text complet és a docs/admin-protocol.md."
         >
           <div id={focusedSection.anchorId} className="rounded-2xl border border-amber-500/40 bg-amber-500/[0.04] p-4">
             <pre className="overflow-x-auto whitespace-pre-wrap text-xs leading-relaxed opacity-90">

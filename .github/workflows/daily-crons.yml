@@ -2,13 +2,28 @@ name: Daily Cron Jobs
 
 on:
   schedule:
-    # Cada dia a les 3:00 UTC
+    # Reconciliació freqüent per mantenir Google Calendar al dia.
+    - cron: '*/15 * * * *'
+    # Passada diària completa a les 3:00 UTC.
     - cron: '0 3 * * *'
   workflow_dispatch: # Permet execució manual
 
 jobs:
+  calendar-sync:
+    name: Reconcile Google Calendar
+    runs-on: ubuntu-latest
+    steps:
+      - name: calendar-sync
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://orbitaevents.com/api/cron/calendar-sync")
+          echo "calendar-sync: $status"
+          [ "$status" = "200" ] || exit 1
+
   crons:
     name: Run all cron jobs
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 3 * * *'
     runs-on: ubuntu-latest
     steps:
       - name: lead-cleanup
@@ -104,6 +119,7 @@ jobs:
   # excepte els dilluns (o via workflow_dispatch manual).
   weekly-benchmark:
     name: Weekly benchmark (Monday only)
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 3 * * *'
     runs-on: ubuntu-latest
     steps:
       - name: Check if Monday

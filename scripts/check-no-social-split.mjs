@@ -63,6 +63,6 @@ if (violations.length === 0) {
   );
   for (const v of violations) process.stderr.write(`  ${v}\n`);
   process.stderr.write('\nSocial, editorial and content-calendar functionality belongs in app/admin/social/.\n');
-  process.stderr.write('See §6.8 in docs/protocol-producte-admin-ca.md.\n');
+  process.stderr.write('See §6.8 in docs/admin-protocol.md.\n');
   process.exit(1);
 }

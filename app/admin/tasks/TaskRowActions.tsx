@@ -45,18 +45,15 @@ export default function TaskRowActions({
   };
 
   return (
-    <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-      <Link
-        href={destinationHref}
-        className="rounded border px-2 py-1 text-center text-xs font-medium whitespace-normal break-words sm:whitespace-nowrap"
-      >
+    <div className="tk__row-acts">
+      <Link href={destinationHref} className="tk__btn tk__btn--sm">
         Obrir destí
       </Link>
       <button
         type="button"
         onClick={toggleStatus}
         disabled={saving}
-        className="rounded border px-2 py-1 text-xs font-medium whitespace-normal break-words sm:whitespace-nowrap disabled:opacity-60"
+        className="tk__btn tk__btn--sm"
       >
         {saving ? 'Desant...' : isDone ? 'Reobrir' : 'Marcar feta'}
       </button>

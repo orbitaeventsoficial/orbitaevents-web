@@ -23,23 +23,21 @@ type KanbanTask = {
 type KanbanColumn = {
   status: 'OPEN' | 'IN_PROGRESS' | 'DONE';
   label: string;
-  toneClass?: string;
-  cardTone: string;
   tasks: KanbanTask[];
 };
 
-const COLUMNS_DEF: Omit<KanbanColumn, 'tasks'>[] = [...TASK_KANBAN_COLUMNS];
+const COLUMNS_DEF: Omit<KanbanColumn, 'tasks'>[] = TASK_KANBAN_COLUMNS.map(({ status, label }) => ({ status, label }));
 
-function getDueDateColor(dueDate: string | null): string {
+function getDueDateClass(dueDate: string | null): string {
   if (!dueDate) return '';
   const due = new Date(dueDate);
   const now = new Date();
   now.setHours(0, 0, 0, 0);
   due.setHours(0, 0, 0, 0);
   const diffDays = Math.floor((due.getTime() - now.getTime()) / 86400000);
-  if (diffDays < 0) return 'text-rose-400 font-semibold';
-  if (diffDays === 0) return 'text-amber-400 font-semibold';
-  return 'text-white/40';
+  if (diffDays < 0) return 'tk__card-date--overdue';
+  if (diffDays === 0) return 'tk__card-date--today';
+  return '';
 }
 
 function getDueDateSuffix(dueDate: string): string {
@@ -151,15 +149,15 @@ export default function TaskKanbanView() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
+      <div className="tk__loading">
+        <div className="tk__spinner" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-center gap-1.5 md:hidden" aria-label="Columnes del kanban de tasques">
+    <div className="tk__kanban-wrap">
+      <div className="tk__dots" aria-label="Columnes del kanban de tasques">
         {columns.map((col, index) => (
           <button
             key={col.status}
@@ -168,43 +166,38 @@ export default function TaskKanbanView() {
               const column = boardRef.current?.querySelector<HTMLElement>(`[data-task-column="${col.status}"]`);
               column?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
             }}
-            className={`h-2.5 rounded-full transition-all ${index === activeColumnIndex ? 'w-6 bg-[var(--admin-accent)]' : 'w-2.5 bg-white/20'}`}
+            className={`tk__dot${index === activeColumnIndex ? ' tk__dot--active' : ''}`}
             aria-label={`Anar a ${col.label}`}
             aria-pressed={index === activeColumnIndex}
           />
         ))}
       </div>
 
-      <div ref={boardRef} onScroll={handleBoardScroll} className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:overflow-visible md:pb-0">
+      <div ref={boardRef} onScroll={handleBoardScroll} className="tk__board">
         {columns.map((col, index) => (
           <div
             key={col.status}
             data-task-column={col.status}
+            data-status={col.status}
             onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setDragOverStatus(col.status); }}
             onDragLeave={() => { if (dragOverStatus === col.status) setDragOverStatus(null); }}
             onDrop={(e) => { e.preventDefault(); handleDrop(col.status); }}
-            className={`min-w-[86vw] shrink-0 snap-center rounded-2xl border flex min-h-[320px] flex-col transition-all md:min-w-0 ${col.toneClass} ${
-              dragOverStatus === col.status ? 'admin-drop-active' : ''
-            }`}
+            className={`tk__col${dragOverStatus === col.status ? ' admin-drop-active' : ''}`}
           >
-            <div className="px-3 py-2.5 border-b">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold">{col.label}</h3>
-                <span className="rounded-full border px-2 py-0.5 text-[10px] font-bold">{col.tasks.length}</span>
+            <div className="tk__col-head">
+              <div>
+                <h3 className="tk__col-label">{col.label}</h3>
+                <p className="tk__col-hint md:hidden">Columna {index + 1} de {columns.length}</p>
               </div>
-              <p className="mt-1 text-[11px] opacity-60 md:hidden">Columna {index + 1} de {columns.length}</p>
+              <span className="tk__col-count">{col.tasks.length}</span>
             </div>
 
-            <div className="flex-1 p-2 space-y-2">
+            <div className="tk__col-body">
               {dragOverStatus === col.status && (
-                <div className="admin-drag-placeholder rounded-xl px-2 py-3 text-center text-[10px]">
-                  Deixa anar aquí
-                </div>
+                <div className="tk__placeholder">Deixa anar aquí</div>
               )}
               {col.tasks.length === 0 && !dragOverStatus && (
-                <div className="rounded-xl border border-dashed p-4 text-center text-xs">
-                  Cap tasca
-                </div>
+                <div className="tk__col-empty">Cap tasca</div>
               )}
               {col.tasks.map((task) => (
                 <div
@@ -213,36 +206,37 @@ export default function TaskKanbanView() {
                   onDragStart={(e) => { e.dataTransfer.setData('text/plain', task.id); e.dataTransfer.effectAllowed = 'move'; setDraggingId(task.id); }}
                   onDragEnd={() => { setDraggingId(null); setDragOverStatus(null); }}
                   data-dragging={draggingId === task.id || undefined}
-                  className={`admin-drag-item rounded-xl border p-3 transition-all hover:brightness-105 cursor-grab active:cursor-grabbing ${col.cardTone}`}
+                  data-status={task.status}
+                  className="tk__card"
                 >
-                  <p className="text-sm font-semibold line-clamp-2">{task.title}</p>
+                  <p className="tk__card-title">{task.title}</p>
 
-                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px]">
+                  <div className="tk__card-links">
                     {task.customerId && (
-                      <Link href={buildCustomerHubHref(task.customerId)} className="hover:underline" onClick={(e) => e.stopPropagation()}>
+                      <Link href={buildCustomerHubHref(task.customerId)} className="tk__card-link" onClick={(e) => e.stopPropagation()}>
                         👤 {task.customerName || 'Client'}
                       </Link>
                     )}
                     {task.leadId && (
-                      <Link href={buildLeadWorkspaceHref(task.leadId)} className="hover:underline" onClick={(e) => e.stopPropagation()}>
+                      <Link href={buildLeadWorkspaceHref(task.leadId)} className="tk__card-link" onClick={(e) => e.stopPropagation()}>
                         👥 {task.leadName || 'Entrada'}
                       </Link>
                     )}
                   </div>
 
                   {task.dueDate && (
-                    <p className={`mt-1 text-[10px] ${getDueDateColor(task.dueDate)}`}>
+                    <p className={`tk__card-date ${getDueDateClass(task.dueDate)}`}>
                       📅 {formatDateShort(task.dueDate)}{getDueDateSuffix(task.dueDate)}
                     </p>
                   )}
 
-                  <div className="mt-2 flex gap-1 md:hidden">
+                  <div className="tk__card-btns">
                     {COLUMNS_DEF.filter((c) => c.status !== col.status).map((target) => (
                       <button
                         key={target.status}
                         type="button"
                         onClick={() => moveTask(task.id, target.status)}
-                        className="flex-1 rounded-xl border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-medium transition-colors hover:bg-white/10 active:bg-white/20"
+                        className="tk__card-move-btn"
                       >
                         {target.label}
                       </button>

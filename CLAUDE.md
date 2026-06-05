@@ -6,7 +6,7 @@ Aquest fitxer és la constitució del repo. Conté normes estables de treball, p
 
 Per estat funcional i peces consolidades:
 - `docs/estat-admin.md` → dossier viu de l'admin
-- `docs/diario.md` → registre cronològic del que s'ha fet i amb quina validació
+- `docs/admin-diary.md` → registre cronològic del que s'ha fet i amb quina validació
 
 ## Stack
 
@@ -42,9 +42,9 @@ Per estat funcional i peces consolidades:
 
 1. Llegir `CLAUDE.md`.
 2. Llegir `docs/agent-sync.md` — llegir el bloc de l'altre agent i actualitzar el propi amb estat `treballant` i el proper canvi previst.
-3. Llegir `docs/diario.md`.
+3. Llegir `docs/admin-diary.md`.
 4. Si la tasca és d'admin o toca una zona ja consolidada, llegir `docs/estat-admin.md`.
-5. Si la tasca és d'admin o toca una zona consolidada, llegir també `docs/protocol-producte-admin-ca.md`, el tram rellevant del `§6` i el final del `§9` abans de començar.
+5. Si la tasca és d'admin o toca una zona consolidada, llegir també `docs/admin-protocol.md`, el tram rellevant del `§6` i el final del `§9` abans de començar.
 6. Si existeix una guia específica de la iniciativa, usar-la només com a context del tall concret.
 
 Cap agent pot començar feina real al repo sense haver fet aquesta lectura mínima.
@@ -56,7 +56,7 @@ Cap agent pot començar feina real al repo sense haver fet aquesta lectura míni
 - No hardcodejar dades estables al JSX o dins serveis si poden anar a constants, traduccions o CSS compartit.
 - No tocar lògica de negoci, SEO, infra o components consolidats sense una raó explícita.
 - No prometre verificacions que no s'han executat.
-- Si una passada queda incompleta, s'ha d'explicar netament al `docs/diario.md`.
+- Si una passada queda incompleta, s'ha d'explicar netament al `docs/admin-diary.md`.
 - Si una passada no està realment tancada, no es pot presentar com a "gran", "quasi acabada" o "només queda el detall final". Cal dir explícitament si està `tancada` o `pendent`.
 - Queda prohibit reservar feina crítica o estructural per a una suposada passada "fina" posterior si això no s'ha advertit abans. No s'admet el patró de l'"últim 10-15%" descobert després.
 - Si s'elimina una feature, grep TOT el repo: component → hook → servei → API route → test → constants → i18n keys.
@@ -89,6 +89,13 @@ Exemples: coordenades calculades, amplades dinàmiques, transform puntual.
 
 ## Hardcode i monocapa
 
+- **NORMA ABSOLUTA — ZERO HARDCODED EN TOT EL REPO**: Ni hex de color, ni mides de font en px/pt, ni strings de contacte, ni URLs, ni telèfons, ni emails, ni textos reutilitzats, ni `true`/`false` per a flags de domini. Tot ve de:
+  - Colors → tokens CSS `--o-*` o COLORS de `lib/pdf-config.ts`
+  - Mides de font → tokens `--o-text-*`, `PDF_DESIGN.type.*` o helpers `setStyle*()`
+  - Contacte/web → `SITE_CONFIG` de `app/config/site-config.ts`
+  - Textos reutilitzats → `lib/constants/` o `messages/*.json`
+  - Mides de layout → `PDF_DESIGN.*`, `PAGE.*` o tokens CSS
+  - Violar aquesta norma és un bug de producte que s'ha de revertir immediatament.
 - Zero hex hardcoded a components i pàgines, tret dels casos tècnics acceptats: definició de variables globals, canvas, APIs d'imatge, emails HTML.
 - Dates, moneda, locale i formats passen per helpers centralitzats (`formatDate`, `formatCurrency`, `formatDateTime`, `toIntlLocale` de `lib/constants/index.ts`).
 - Si una dada apareix en més d'un lloc, queda prohibit resoldre-la localment.
@@ -233,6 +240,15 @@ Formularis validats          → client + servidor
 - **Bookings**: Només PENDING o CANCELLED. Backend valida a `bookingRouteService.ts`.
 - **Clients**: Smart GDPR — si té reserves/pressupostos → anonimitza. Si no → elimina.
 
+
+## Consultor visual expert
+
+Quan el propietari demani un canvi visual significant, consultar via `Agent(model: 'opus')`. El prompt ha de ser concís i el context mínim necessari: Opus ha de sintetitzar i donar ordres concretes directament implementables, no filosofia ni explicacions llargues.
+
+**Quan activar:** canvis a `orbita-tokens.css`, tipografia admin, nous components visuals importants.
+
+**Tokens de referència (#874+#875):** canvas `#111116`, T3 `#9a9286`, `--o-lh-*`, `--o-row-h`, `--ax-action`.
+
 ## CSS architecture admin
 
 ### Regla canònica de sistema visual (2026-05-26)
@@ -256,11 +272,30 @@ Formularis validats          → client + servidor
 - admin-theme.css NO pot competir amb globals.css a mateixa especificitat — Next.js no garanteix ordre de chunks.
 - Si una propietat visual es defineix a globals.css, canviar-la allà directament, no intentar override des d'admin-theme.css.
 
+### Selector canònic (norma 2026-06-04)
+
+**Format obligatori**: `html.admin-mode .nomclasse { }` — sense `.admin-shell` ni cap classe intermediària fictícia.
+
+- `.admin-shell` **no existeix al DOM**. El layout usa `.ax-root > .ax__workspace > .ax__page`. Cap selector CSS pot incloure `.admin-shell` com a part del camí.
+- Selector vàlid: `html.admin-mode .bd__pnl { }` ✓
+- Selector mort: `html.admin-mode .admin-shell .bd__pnl { }` ✗ (mai coincideix)
+- Si un CSS antic té `.admin-shell`, fer `sed -i 's/html\.admin-mode \.admin-shell /html.admin-mode /g'` al fitxer.
+
+### Norma CSS monocapa i canònica (norma 2026-06-04)
+
+Tot fitxer CSS d'admin nou o modificat ha de complir:
+
+1. **Zero hex hardcoded** — usar sempre `var(--ax-*)` o `var(--o-admin-*)` de `orbita-tokens.css`. Excepció: valors tècnics puntuals a `rgba()` quan el token no existeix.
+2. **Zero duplicats** — cada selector apareix una sola vegada per fitxer. Dues definicions del mateix selector → la primera és codi mort. Eliminar-la.
+3. **Zero `!important`** — prohibit tret de compatibilitat legacy explícitament justificada en comentari. Un `!important` que afecti una classe pròpia (`bd__*`, `tk__*`, etc.) és un error.
+4. **Responsiu obligatori** — tot component nou ha de tenir `@media` per a mòbil (≥375px), tablet i desktop. No lliurar sense haver comprovat els tres punts de ruptura.
+5. **Monocapa** — si un valor o regla visual s'usa en més d'un lloc, va a `orbita-tokens.css` o a `admin-shell.css`. Cap fitxer de pàgina reinventa tokens globals.
+6. **Reinici de servidor obligatori** — Next.js dev NO hot-recarga fitxers CSS existents modificats. Després de qualsevol canvi CSS: `Get-Process node | Stop-Process -Force` + esborrar `.next` + `pnpm dev`. Sense reinici, els canvis no apliquen i la pàgina segueix mostrant l'estil antic.
+
 ### Paleta admin (tokens)
 
 - La paleta nova surt de `app/studio/orbita-tokens.css`: `--o-admin-canvas`, `--o-admin-panel`, `--o-admin-raised`, `--o-admin-gold`, `--o-stage-*`.
-- Colors: tokens de Studio o sistema `white/opacity` sobre fons fosc. MAI `slate-*`, `gray-*`, ni hex custom als components.
-- Glass cards: `.admin-card-glass`. Focus: `focus:ring-1 focus:ring-cyan-500/50`. Table hover: `hover:bg-white/[0.03]`.
+- Colors: tokens de Studio o sistema `rgba(255,255,255,X)` sobre fons fosc. MAI `slate-*`, `gray-*`, ni hex custom als components.
 - Gradients: MAI Tailwind gradient classes directes. Usar `.admin-gradient--*`.
 - Stagger: `.admin-stagger-item` amb `prefers-reduced-motion` respectat.
 
@@ -404,6 +439,6 @@ Abans de proposar crear, auditar o modificar qualsevol d'això, consulta primer.
 
 ## Documentació obligatòria
 
-- `docs/diario.md` s'ha d'actualitzar quan es tanca una passada rellevant.
+- `docs/admin-diary.md` s'ha d'actualitzar quan es tanca una passada rellevant.
 - El diari ha d'explicar què s'ha fet, amb quin criteri i quina validació real s'ha passat.
 - No escriure "final", "tot net" o equivalents si no està realment verificat.

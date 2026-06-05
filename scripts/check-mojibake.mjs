@@ -47,7 +47,7 @@ function shouldSkip(filePath) {
   if (normalized.includes('/coverage/')) return true;
   if (normalized.includes('/dist/')) return true;
   if (normalized.endsWith('/scripts/check-mojibake.mjs')) return true;
-  if (normalized.endsWith('/docs/diario.md')) return true;
+  if (normalized.endsWith('/docs/admin-diary.md') || normalized.endsWith('/docs/diario.md')) return true;
   return false;
 }
 

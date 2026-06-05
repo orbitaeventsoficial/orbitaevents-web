@@ -6,11 +6,11 @@
 // JERARQUIA:
 // - Plus Jakarta Sans: Títols (moderna, elegant, amb personalitat)
 // - Inter: Text de cos (llegible, neta, professional)  
-// - JetBrains Mono: Números/stats (monospace elegant)
+// - Inter tabular: Números, dates, imports i IDs amb zeros nets
 //
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { Inter, Plus_Jakarta_Sans, JetBrains_Mono, Cormorant_Garamond } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans, Cormorant_Garamond } from "next/font/google";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // FONT PRINCIPAL - TEXT DE COS
@@ -39,19 +39,6 @@ export const plusJakarta = Plus_Jakarta_Sans({
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// FONT MONOSPACE - NÚMEROS I STATS
-// JetBrains Mono: Elegant per números alineats
-// ═══════════════════════════════════════════════════════════════════════════
-export const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-mono",
-  weight: ["400", "700"],
-  fallback: ["Consolas", "Monaco", "monospace"],
-  preload: false,
-});
-
-// ═══════════════════════════════════════════════════════════════════════════
 // FONT SERIF - PÀGINES TEMÀTIQUES (Món Màgic, etc.)
 // Cormorant Garamond: Elegant, clàssica, perfecta per a ambients màgics
 // ═══════════════════════════════════════════════════════════════════════════
@@ -64,4 +51,3 @@ export const cormorant = Cormorant_Garamond({
   fallback: ["Georgia", "Times New Roman", "serif"],
   preload: false,
 });
-

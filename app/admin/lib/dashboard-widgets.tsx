@@ -146,7 +146,7 @@ export function RadialProgress({
           strokeDasharray={circumference} strokeDashoffset={offset} className="admin-radial-ring"
           style={{ '--ring-circumference': circumference, '--ring-offset': offset, filter: `drop-shadow(0 0 4px ${color.glow})`, transform: 'rotate(-90deg)', transformOrigin: '50% 50%' } as React.CSSProperties}
         />
-        <text x={center} y={center} textAnchor="middle" dominantBaseline="central" fill="currentColor" fontSize={size * 0.22} fontFamily="var(--font-mono, monospace)" fontWeight="700">
+        <text x={center} y={center} textAnchor="middle" dominantBaseline="central" fill="currentColor" fontSize={size * 0.22} fontFamily="Inter, system-ui, sans-serif" fontWeight="700">
           {clamped}%
         </text>
       </svg>
@@ -285,7 +285,7 @@ export function MonthlyBarChart({ data, height = 160 }: { data: BarData[]; heigh
                 <rect x={x} y={height - prevH} width={innerW} height={prevH} rx="1.5" fill="url(#bar-grad-prev)" />
               )}
               <rect x={hasPrevious ? x + innerW + 0.6 : x} y={height - currentH} width={innerW} height={currentH} rx="1.5" fill="url(#bar-grad-current)" />
-              <text x={x + usable / 2} y={height - 2} textAnchor="middle" fill={ADMIN_SVG_COLORS.axisLabel} fontSize="3.2" fontFamily="var(--font-mono, monospace)">
+              <text x={x + usable / 2} y={height - 2} textAnchor="middle" fill={ADMIN_SVG_COLORS.axisLabel} fontSize="3.2" fontFamily="Inter, system-ui, sans-serif">
                 {d.label}
               </text>
             </g>
@@ -340,7 +340,7 @@ export function DonutChart({ segments, size = 120 }: { segments: DonutSegment[];
             />
           );
         })}
-        <text x={center} y={center} textAnchor="middle" dominantBaseline="central" fill="currentColor" fontSize={size * 0.16} fontWeight="700" fontFamily="var(--font-mono, monospace)">
+        <text x={center} y={center} textAnchor="middle" dominantBaseline="central" fill="currentColor" fontSize={size * 0.16} fontWeight="700" fontFamily="Inter, system-ui, sans-serif">
           {total}
         </text>
       </svg>
@@ -394,6 +394,5 @@ export function MiniLineChart({ series, height = 56 }: { series: Series[]; heigh
     </div>
   );
 }
-
 
 

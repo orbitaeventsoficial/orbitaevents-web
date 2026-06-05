@@ -10,15 +10,15 @@
 /* Shell i layout */
 html.admin-mode .nb-root { color-scheme: dark; min-height: 100vh; background: var(--canvas); color: var(--t); font-family: var(--ui); }
 html.admin-mode .nb__bar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 16px; padding: 14px 30px; border-bottom: 1px solid var(--line); background: color-mix(in oklab, var(--canvas) 92%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
-html.admin-mode .nb__back { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border: 1px solid var(--hair-gold); border-radius: 10px; background: color-mix(in oklab, var(--gold) 6%, transparent); color: var(--gold); font-family: var(--ui); font-size: 13px; font-weight: 700; text-decoration: none; cursor: pointer; transition: color 140ms ease, background 140ms ease, border-color 140ms ease; }
+html.admin-mode .nb__back { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border: 1px solid var(--hair-gold); border-radius: var(--o-r-md); background: color-mix(in oklab, var(--gold) 6%, transparent); color: var(--gold); font-family: var(--ui); font-size: var(--o-text-sm); font-weight: var(--o-fw-bold); text-decoration: none; cursor: pointer; transition: color 140ms ease, background 140ms ease, border-color 140ms ease; }
 html.admin-mode .nb__back:hover { color: var(--gold-bright); border-color: var(--gold); background: color-mix(in oklab, var(--gold) 12%, transparent); }
-html.admin-mode .nb__crumb { flex: 1; font-family: var(--mono); font-size: 13px; color: var(--t3); }
+html.admin-mode .nb__crumb { flex: 1; font-family: var(--mono); font-size: var(--o-text-sm); color: var(--t3); }
 html.admin-mode .nb__crumb em { margin: 0 6px; font-style: normal; opacity: 0.6; }
-html.admin-mode .nb__crumb strong { color: var(--t); font-weight: 700; }
+html.admin-mode .nb__crumb strong { color: var(--t); font-weight: var(--o-fw-bold); }
 html.admin-mode .nb__hero { padding: 24px 30px 8px; }
-html.admin-mode .nb__eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-bright); }
-html.admin-mode .nb__h1 { margin: 8px 0 6px; font-family: var(--display); font-size: 36px; line-height: 1.05; letter-spacing: -0.02em; font-weight: 700; color: var(--t); }
-html.admin-mode .nb__sub { margin: 0; color: var(--t2); font-size: 14px; }
+html.admin-mode .nb__eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-bold); letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-bright); }
+html.admin-mode .nb__h1 { margin: 8px 0 6px; font-family: var(--display); font-size: var(--o-text-3xl); line-height: 1.05; letter-spacing: -0.02em; font-weight: var(--o-fw-bold); color: var(--t); }
+html.admin-mode .nb__sub { margin: 0; color: var(--t2); font-size: var(--o-text-base); }
 html.admin-mode .nb__leadlink { color: var(--gold-bright); text-decoration: none; border-bottom: 1px dashed color-mix(in oklab, var(--gold) 40%, transparent); }
 html.admin-mode .nb__leadlink:hover { color: var(--gold); border-bottom-color: var(--gold); }
 
@@ -27,11 +27,11 @@ html.admin-mode .nb__main { display: grid; gap: 18px; min-width: 0; }
 html.admin-mode .nb__side { position: sticky; top: 80px; display: grid; gap: 14px; align-self: start; }
 
 /* Panells */
-html.admin-mode .nb__panel { border: 1px solid var(--line); border-top: 1px solid var(--hair-gold); border-radius: 16px; padding: 20px 22px; background: linear-gradient(180deg, var(--panel), color-mix(in oklab, var(--panel) 86%, var(--canvas))); box-shadow: 0 24px 50px -40px rgba(0, 0, 0, 0.8); }
+html.admin-mode .nb__panel { border: 1px solid var(--line); border-top: 1px solid var(--hair-gold); border-radius: var(--o-r-lg); padding: 20px 22px; background: linear-gradient(180deg, var(--panel), color-mix(in oklab, var(--panel) 86%, var(--canvas))); box-shadow: 0 24px 50px -40px var(--ax-overlay-xl); }
 html.admin-mode .nb__panel--error { border-color: var(--o-stage-lost); border-left: 3px solid var(--o-stage-lost); }
 html.admin-mode .nb__phead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 0 14px; }
-html.admin-mode .nb__h2 { margin: 0; font-family: var(--display); font-size: 17px; font-weight: 700; color: var(--t); letter-spacing: -0.005em; }
-html.admin-mode .nb__pintro { margin: 0; color: var(--t3); font-size: 12.5px; font-family: var(--mono); }
+html.admin-mode .nb__h2 { margin: 0; font-family: var(--display); font-size: var(--o-text-md-2); font-weight: var(--o-fw-bold); color: var(--t); letter-spacing: -0.005em; }
+html.admin-mode .nb__pintro { margin: 0; color: var(--t3); font-size: var(--o-text-2xs); font-family: var(--mono); }
 
 /* Fields */
 html.admin-mode .nb__row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
@@ -39,93 +39,93 @@ html.admin-mode .nb__row--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); 
 html.admin-mode .nb__row--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 html.admin-mode .nb__row + .nb__row { margin-top: 12px; }
 html.admin-mode .nb__field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-html.admin-mode .nb__label { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--t3); display: flex; align-items: center; gap: 6px; }
+html.admin-mode .nb__label { font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-bold); letter-spacing: 0.1em; text-transform: uppercase; color: var(--t3); display: flex; align-items: center; gap: 6px; }
 html.admin-mode .nb__label--req::after { content: "*"; color: var(--gold); }
 html.admin-mode .nb__input,
-html.admin-mode .nb__textarea { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: color-mix(in oklab, var(--canvas) 85%, var(--panel)); color: var(--t); font: inherit; font-size: 14px; font-weight: 600; transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease; -webkit-appearance: none; appearance: none; }
+html.admin-mode .nb__textarea { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--o-r-md); background: color-mix(in oklab, var(--canvas) 85%, var(--panel)); color: var(--t); font: inherit; font-size: var(--o-text-base); font-weight: var(--o-fw-semi); transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease; -webkit-appearance: none; appearance: none; }
 html.admin-mode .nb__textarea { resize: vertical; min-height: 80px; }
 html.admin-mode .nb__input:focus,
 html.admin-mode .nb__textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px color-mix(in oklab, var(--gold) 16%, transparent); background: color-mix(in oklab, var(--canvas) 78%, var(--panel)); }
 html.admin-mode .nb__input::placeholder,
-html.admin-mode .nb__textarea::placeholder { color: var(--t3); font-weight: 500; }
-html.admin-mode .nb__hint { font-size: 11.5px; color: var(--t3); line-height: 1.4; }
+html.admin-mode .nb__textarea::placeholder { color: var(--t3); font-weight: var(--o-fw-book); }
+html.admin-mode .nb__hint { font-size: var(--o-text-xs); color: var(--t3); line-height: 1.4; }
 html.admin-mode .nb__hint--ok { color: var(--o-stage-won-strong); }
 html.admin-mode .nb__hint--warn { color: var(--gold); }
 html.admin-mode .nb__hint--info { color: var(--t2); }
 
 /* Event type — chips (sense colors primaris, Brass & Obsidian) */
 html.admin-mode .nb__chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
-html.admin-mode .nb__chip { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 10px; border: 1px solid var(--line); border-radius: 11px; background: color-mix(in oklab, var(--panel) 92%, transparent); color: var(--t2); font: inherit; font-size: 13.5px; font-weight: 650; cursor: pointer; transition: border-color 140ms ease, background 140ms ease, color 140ms ease, transform 140ms ease; }
+html.admin-mode .nb__chip { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 10px; border: 1px solid var(--line); border-radius: var(--o-r-md); background: color-mix(in oklab, var(--panel) 92%, transparent); color: var(--t2); font: inherit; font-size: var(--o-text-sm); font-weight: var(--o-fw-semi-plus); cursor: pointer; transition: border-color 140ms ease, background 140ms ease, color 140ms ease, transform 140ms ease; }
 html.admin-mode .nb__chip:hover { border-color: var(--hair-gold); color: var(--t); background: color-mix(in oklab, var(--gold) 5%, var(--panel)); transform: translateY(-1px); }
 html.admin-mode .nb__chip.is-on { border-color: var(--gold); background: linear-gradient(180deg, color-mix(in oklab, var(--gold) 14%, var(--panel)), color-mix(in oklab, var(--gold) 6%, var(--panel))); color: var(--gold-bright); box-shadow: inset 0 0 0 1px var(--gold); }
 html.admin-mode .nb__chipic { display: inline-grid; place-items: center; color: var(--gold); opacity: 0.85; }
 html.admin-mode .nb__chip.is-on .nb__chipic { color: var(--gold-bright); opacity: 1; }
 
 /* Pricing summary (sticky a la sidebar) */
-html.admin-mode .nb__price { border: 1px solid var(--line); border-top: 1px solid var(--hair-gold); border-radius: 16px; background: linear-gradient(180deg, color-mix(in oklab, var(--gold) 4%, var(--panel)), color-mix(in oklab, var(--panel) 92%, var(--canvas))); padding: 18px 18px 8px; box-shadow: 0 24px 50px -40px rgba(0, 0, 0, 0.8); }
+html.admin-mode .nb__price { border: 1px solid var(--line); border-top: 1px solid var(--hair-gold); border-radius: var(--o-r-lg); background: linear-gradient(180deg, color-mix(in oklab, var(--gold) 4%, var(--panel)), color-mix(in oklab, var(--panel) 92%, var(--canvas))); padding: 18px 18px 8px; box-shadow: 0 24px 50px -40px var(--ax-overlay-xl); }
 html.admin-mode .nb__pricehead { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
-html.admin-mode .nb__pricehead h3 { margin: 0; font-family: var(--display); font-size: 15px; font-weight: 700; color: var(--t); letter-spacing: 0.005em; }
-html.admin-mode .nb__pricehead span { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--t3); }
+html.admin-mode .nb__pricehead h3 { margin: 0; font-family: var(--display); font-size: var(--o-text-md); font-weight: var(--o-fw-bold); color: var(--t); letter-spacing: 0.005em; }
+html.admin-mode .nb__pricehead span { font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-bold); letter-spacing: 0.12em; text-transform: uppercase; color: var(--t3); }
 html.admin-mode .nb__pricerows { display: flex; flex-direction: column; gap: 8px; }
-html.admin-mode .nb__prow { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 6px 0; font-family: var(--ui); font-size: 13px; color: var(--t2); border-bottom: 1px solid color-mix(in oklab, var(--line) 50%, transparent); }
+html.admin-mode .nb__prow { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 6px 0; font-family: var(--ui); font-size: var(--o-text-sm); color: var(--t2); border-bottom: 1px solid color-mix(in oklab, var(--line) 50%, transparent); }
 html.admin-mode .nb__prow:last-child { border-bottom: 0; }
-html.admin-mode .nb__prow b { color: var(--t); font-weight: 700; font-variant-numeric: tabular-nums; font-family: var(--mono); }
-html.admin-mode .nb__prow--muted { color: var(--t3); font-size: 12px; }
+html.admin-mode .nb__prow b { color: var(--t); font-weight: var(--o-fw-bold); font-variant-numeric: tabular-nums; font-family: var(--mono); }
+html.admin-mode .nb__prow--muted { color: var(--t3); font-size: var(--o-text-2xs); }
 html.admin-mode .nb__prow--muted b { color: var(--t2); }
-html.admin-mode .nb__prow--total { padding: 12px 0 4px; margin-top: 6px; border-top: 1px solid var(--hair-gold); font-size: 14px; color: var(--gold-bright); font-weight: 700; }
-html.admin-mode .nb__prow--total b { color: var(--gold-bright); font-size: 22px; font-family: var(--display); font-weight: 800; letter-spacing: -0.01em; }
-html.admin-mode .nb__pricehint { padding: 8px 0; font-size: 11.5px; color: var(--t3); font-family: var(--mono); line-height: 1.45; }
-html.admin-mode .nb__pricemargin { margin-top: 8px; padding: 12px 14px; border: 1px dashed var(--hair-gold); border-radius: 10px; background: color-mix(in oklab, var(--gold) 4%, transparent); display: flex; justify-content: space-between; align-items: baseline; }
-html.admin-mode .nb__pricemargin span { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--t3); }
-html.admin-mode .nb__pricemargin b { font-family: var(--display); font-size: 16px; font-weight: 700; color: var(--gold-bright); font-variant-numeric: tabular-nums; }
+html.admin-mode .nb__prow--total { padding: 12px 0 4px; margin-top: 6px; border-top: 1px solid var(--hair-gold); font-size: var(--o-text-base); color: var(--gold-bright); font-weight: var(--o-fw-bold); }
+html.admin-mode .nb__prow--total b { color: var(--gold-bright); font-size: var(--o-text-xl); font-family: var(--display); font-weight: var(--o-fw-xbold); letter-spacing: -0.01em; }
+html.admin-mode .nb__pricehint { padding: 8px 0; font-size: var(--o-text-xs); color: var(--t3); font-family: var(--mono); line-height: 1.45; }
+html.admin-mode .nb__pricemargin { margin-top: 8px; padding: 12px 14px; border: 1px dashed var(--hair-gold); border-radius: var(--o-r-md); background: color-mix(in oklab, var(--gold) 4%, transparent); display: flex; justify-content: space-between; align-items: baseline; }
+html.admin-mode .nb__pricemargin span { font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-bold); letter-spacing: 0.1em; text-transform: uppercase; color: var(--t3); }
+html.admin-mode .nb__pricemargin b { font-family: var(--display); font-size: var(--o-text-md-2); font-weight: var(--o-fw-bold); color: var(--gold-bright); font-variant-numeric: tabular-nums; }
 
 /* CTA principal + secundària dins la sidebar (sota el pricing) */
 html.admin-mode .nb__cta { display: grid; gap: 8px; }
-html.admin-mode .nb__btn--prim { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 16px; border: 1px solid var(--gold); border-radius: 12px; background: var(--gold); color: var(--canvas); font: inherit; font-size: 14px; font-weight: 750; text-decoration: none; cursor: pointer; transition: filter 140ms ease, transform 140ms ease; }
+html.admin-mode .nb__btn--prim { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 16px; border: 1px solid var(--gold); border-radius: var(--o-r-md-2); background: var(--gold); color: var(--canvas); font: inherit; font-size: var(--o-text-base); font-weight: var(--o-fw-cta); text-decoration: none; cursor: pointer; transition: filter 140ms ease, transform 140ms ease; }
 html.admin-mode .nb__btn--prim:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
 html.admin-mode .nb__btn--prim:disabled { opacity: 0.5; cursor: not-allowed; }
-html.admin-mode .nb__btn--sec { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 16px; border: 1px solid var(--hair-gold); border-radius: 12px; background: transparent; color: var(--t); font: inherit; font-size: 13px; font-weight: 650; text-decoration: none; cursor: pointer; transition: border-color 140ms ease, background 140ms ease, color 140ms ease; }
+html.admin-mode .nb__btn--sec { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 16px; border: 1px solid var(--hair-gold); border-radius: var(--o-r-md-2); background: transparent; color: var(--t); font: inherit; font-size: var(--o-text-sm); font-weight: var(--o-fw-semi-plus); text-decoration: none; cursor: pointer; transition: border-color 140ms ease, background 140ms ease, color 140ms ease; }
 html.admin-mode .nb__btn--sec:hover { border-color: var(--gold); color: var(--gold-bright); background: color-mix(in oklab, var(--gold) 6%, transparent); }
 
 /* Pack cards */
 html.admin-mode .nb__packs { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
-html.admin-mode .nb__pack { display: flex; flex-direction: column; gap: 6px; padding: 14px 14px; border: 1px solid var(--line); border-radius: 12px; background: color-mix(in oklab, var(--panel) 92%, transparent); color: var(--t); cursor: pointer; text-align: left; font: inherit; transition: border-color 140ms ease, background 140ms ease, transform 140ms ease; }
+html.admin-mode .nb__pack { display: flex; flex-direction: column; gap: 6px; padding: 14px 14px; border: 1px solid var(--line); border-radius: var(--o-r-md-2); background: color-mix(in oklab, var(--panel) 92%, transparent); color: var(--t); cursor: pointer; text-align: left; font: inherit; transition: border-color 140ms ease, background 140ms ease, transform 140ms ease; }
 html.admin-mode .nb__pack:hover { border-color: var(--hair-gold); background: color-mix(in oklab, var(--gold) 5%, var(--panel)); transform: translateY(-1px); }
 html.admin-mode .nb__pack.is-on { border-color: var(--gold); background: linear-gradient(180deg, color-mix(in oklab, var(--gold) 14%, var(--panel)), color-mix(in oklab, var(--gold) 6%, var(--panel))); box-shadow: inset 0 0 0 1px var(--gold); }
-html.admin-mode .nb__packservice { font-family: var(--mono); font-size: 10.5px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: var(--gold); opacity: 0.85; }
+html.admin-mode .nb__packservice { font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); letter-spacing: 0.13em; text-transform: uppercase; color: var(--gold); opacity: 0.85; }
 html.admin-mode .nb__pack.is-on .nb__packservice { color: var(--gold-bright); opacity: 1; }
-html.admin-mode .nb__packname { font-family: var(--display); font-size: 15px; font-weight: 700; color: var(--t); }
-html.admin-mode .nb__packprice { font-family: var(--mono); font-size: 18px; font-weight: 800; color: var(--gold-bright); font-variant-numeric: tabular-nums; }
-html.admin-mode .nb__packdesc { font-size: 12px; color: var(--t3); line-height: 1.4; }
-html.admin-mode .nb__packmeta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; font-family: var(--mono); font-size: 10.5px; color: var(--t3); }
+html.admin-mode .nb__packname { font-family: var(--display); font-size: var(--o-text-md); font-weight: var(--o-fw-bold); color: var(--t); }
+html.admin-mode .nb__packprice { font-family: var(--mono); font-size: var(--o-text-lg); font-weight: var(--o-fw-xbold); color: var(--gold-bright); font-variant-numeric: tabular-nums; }
+html.admin-mode .nb__packdesc { font-size: var(--o-text-2xs); color: var(--t3); line-height: 1.4; }
+html.admin-mode .nb__packmeta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3); }
 html.admin-mode .nb__input--code { font-family: var(--mono); text-transform: uppercase; }
 /* Utility classes locals (sense Tailwind) — usat per evitar inline fontSize/color */
-html.admin-mode .nb__conflict-ref { font-size: 12px; color: var(--t2); }
+html.admin-mode .nb__conflict-ref { font-size: var(--o-text-2xs); color: var(--t2); }
 html.admin-mode .nb__conflict-hint { display: block; margin-top: 6px; color: var(--t3); }
-html.admin-mode .nb__req { color: var(--gold); font-size: 14px; }
-html.admin-mode .nb__pricemargin-pct { font-size: 12px; color: var(--t3); font-weight: 600; }
-html.admin-mode .nb__errortext { margin: 0; font-size: 13px; color: var(--t); }
+html.admin-mode .nb__req { color: var(--gold); font-size: var(--o-text-base); }
+html.admin-mode .nb__pricemargin-pct { font-size: var(--o-text-2xs); color: var(--t3); font-weight: var(--o-fw-semi); }
+html.admin-mode .nb__errortext { margin: 0; font-size: var(--o-text-sm); color: var(--t); }
 
 /* Extras list */
-html.admin-mode .nb__extras { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+html.admin-mode .nb__extras { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--line); border-radius: var(--o-r-md-2); overflow: hidden; }
 html.admin-mode .nb__extra { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid color-mix(in oklab, var(--line) 50%, transparent); background: color-mix(in oklab, var(--panel) 94%, transparent); transition: background 140ms ease; }
 html.admin-mode .nb__extra:last-child { border-bottom: 0; }
 html.admin-mode .nb__extra:hover { background: color-mix(in oklab, var(--gold) 4%, var(--panel)); }
 html.admin-mode .nb__extra-cbx { width: 16px; height: 16px; accent-color: var(--gold); cursor: pointer; flex: none; }
-html.admin-mode .nb__extra-name { flex: 1; min-width: 0; font-size: 13.5px; color: var(--t); }
-html.admin-mode .nb__extra-name small { display: block; color: var(--t3); font-size: 11.5px; font-family: var(--mono); margin-top: 2px; }
-html.admin-mode .nb__extra-price { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--gold-bright); font-variant-numeric: tabular-nums; }
-html.admin-mode .nb__extra-qty { width: 60px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 7px; background: color-mix(in oklab, var(--canvas) 85%, var(--panel)); color: var(--t); font: inherit; font-size: 13px; text-align: center; }
+html.admin-mode .nb__extra-name { flex: 1; min-width: 0; font-size: var(--o-text-sm); color: var(--t); }
+html.admin-mode .nb__extra-name small { display: block; color: var(--t3); font-size: var(--o-text-xs); font-family: var(--mono); margin-top: 2px; }
+html.admin-mode .nb__extra-price { font-family: var(--mono); font-size: var(--o-text-sm); font-weight: var(--o-fw-bold); color: var(--gold-bright); font-variant-numeric: tabular-nums; }
+html.admin-mode .nb__extra-qty { width: 60px; padding: 5px 8px; border: 1px solid var(--line); border-radius: var(--o-r-sm); background: color-mix(in oklab, var(--canvas) 85%, var(--panel)); color: var(--t); font: inherit; font-size: var(--o-text-sm); text-align: center; }
 html.admin-mode .nb__extra-qty:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 2px color-mix(in oklab, var(--gold) 16%, transparent); }
 
 /* Travel summary box */
-html.admin-mode .nb__travel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--line); margin-top: 4px; }
+html.admin-mode .nb__travel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; overflow: hidden; border: 1px solid var(--line); border-radius: var(--o-r-md-2); background: var(--line); margin-top: 4px; }
 html.admin-mode .nb__travel > div { padding: 12px 14px; background: color-mix(in oklab, var(--panel) 94%, transparent); display: flex; flex-direction: column; gap: 4px; }
-html.admin-mode .nb__travel dt { font-family: var(--mono); font-size: 10.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--t3); }
-html.admin-mode .nb__travel dd { margin: 0; font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--t); font-variant-numeric: tabular-nums; }
+html.admin-mode .nb__travel dt { font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); letter-spacing: 0.09em; text-transform: uppercase; color: var(--t3); }
+html.admin-mode .nb__travel dd { margin: 0; font-family: var(--mono); font-size: var(--o-text-sm); font-weight: var(--o-fw-bold); color: var(--t); font-variant-numeric: tabular-nums; }
 
 /* Date conflict warning */
-html.admin-mode .nb__conflict { display: flex; gap: 10px; padding: 12px 14px; border: 1px solid var(--gold); border-radius: 10px; background: color-mix(in oklab, var(--gold) 10%, var(--panel)); color: var(--t); font-size: 13px; line-height: 1.45; margin-top: 8px; }
+html.admin-mode .nb__conflict { display: flex; gap: 10px; padding: 12px 14px; border: 1px solid var(--gold); border-radius: var(--o-r-md); background: color-mix(in oklab, var(--gold) 10%, var(--panel)); color: var(--t); font-size: var(--o-text-sm); line-height: 1.45; margin-top: 8px; }
 html.admin-mode .nb__conflict::before { content: "⚠"; color: var(--gold-bright); flex: none; }
 
 /* Loading state */
@@ -141,7 +141,7 @@ html.admin-mode .nb__spinner { width: 32px; height: 32px; border: 2px solid var(
 @media (max-width: 760px) {
   html.admin-mode .nb__bar { padding: 12px 16px; }
   html.admin-mode .nb__hero { padding: 18px 16px 6px; }
-  html.admin-mode .nb__h1 { font-size: 28px; }
+  html.admin-mode .nb__h1 { font-size: var(--o-text-xl-2); }
   html.admin-mode .nb__layout { padding: 14px 16px 30px; gap: 16px; }
   html.admin-mode .nb__panel { padding: 16px 16px; }
   html.admin-mode .nb__row,

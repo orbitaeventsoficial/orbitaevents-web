@@ -473,19 +473,18 @@ export default async function BookingsPage({
       </section>
 
       <section className="bk-table-section hidden lg:block overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[1060px]" aria-label="Llistat de reserves">
+          <table className="w-full" aria-label="Llistat de reserves">
             <thead className="bk-table-head">
               <tr>
-                <th scope="col" className="px-4 py-2.5 text-left bk-th-label">Ref.</th>
-                <th scope="col" className="px-4 py-2.5 text-left bk-th-label">Client</th>
-                <th scope="col" className="px-4 py-2.5 text-left bk-th-label">Tipus</th>
-                <th scope="col" className="px-4 py-2.5 text-left bk-th-label">Data</th>
-                <th scope="col" className="px-4 py-2.5 text-left bk-th-label">Pack</th>
-                <th scope="col" className="px-4 py-2.5 text-left bk-th-label">Total</th>
-                <th scope="col" className="px-4 py-2.5 text-left bk-th-label">Marge</th>
-                <th scope="col" className="px-4 py-2.5 text-left bk-th-label">Estat</th>
-                <th scope="col" className="px-4 py-2.5 text-left bk-th-label">Accions</th>
+                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[9%]">Ref.</th>
+                <th scope="col" className="px-3 py-2 text-left bk-th-label">Client</th>
+                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[11%]">Tipus</th>
+                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[11%]">Data</th>
+                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[9%]">Pack</th>
+                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[10%]">Total</th>
+                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[7%]">Marge</th>
+                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[9%]">Estat</th>
+                <th scope="col" className="px-3 py-2 text-right bk-th-label w-[18%]">Accions</th>
               </tr>
             </thead>
             <tbody className="divide-y admin-tone-border-subtle">
@@ -508,27 +507,27 @@ export default async function BookingsPage({
                       key={booking.id}
                       className={`bk-table-row hover:bg-white/[0.025] transition-colors${isPast && booking.status !== 'COMPLETED' ? ' bk-table-row--past' : ''}`}
                     >
-                      <td className="px-4 py-3">
-                        <Link href={buildBookingHref(booking.id)} className="font-mono text-xs text-[var(--gold)] hover:opacity-80">
+                      <td className="px-3 py-2.5">
+                        <Link href={buildBookingHref(booking.id)} className="font-mono text-xs text-[var(--gold)] hover:opacity-80 whitespace-nowrap">
                           {booking.reference}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-3 py-2.5">
                         {booking.customerId ? (
-                          <Link href={buildCustomerHubHref(booking.customerId!)} className="font-semibold text-sm hover:text-white">
+                          <Link href={buildCustomerHubHref(booking.customerId!)} className="font-semibold text-sm hover:text-white truncate block max-w-[160px]">
                             {booking.clientName}
                           </Link>
                         ) : (
-                          <span className="font-semibold text-sm">{booking.clientName}</span>
+                          <span className="font-semibold text-sm truncate block max-w-[160px]">{booking.clientName}</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-sm whitespace-nowrap">{eventType}</td>
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-3 py-2.5 text-sm">{eventType}</td>
+                      <td className="px-3 py-2.5 whitespace-nowrap">
                         <span className="text-sm font-medium">{formatDateShort(booking.eventDate)}</span>
                         {!isPast && booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED' && (() => {
                           const d = Math.ceil((new Date(booking.eventDate).getTime() - Date.now()) / 864e5);
                           return (
-                            <span className={`ml-2 inline-flex rounded-full px-1.5 py-0.5 text-xs font-semibold ${
+                            <span className={`ml-1 inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
                               d === 0 ? 'admin-tone-soft-info' : d <= 7 ? 'admin-tone-bg-warning admin-tone-text-warning' : 'opacity-40'
                             }`}>
                               {d === 0 ? 'AVUI' : `${d}d`}
@@ -536,18 +535,20 @@ export default async function BookingsPage({
                           );
                         })()}
                       </td>
-                      <td className="px-4 py-3 text-sm">
-                        {getTranslatedPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale)}
-                        {booking._count.extras > 0 && <span className="ml-1 opacity-50 text-xs">+{booking._count.extras}</span>}
+                      <td className="px-3 py-2.5 text-sm">
+                        <span className="truncate block max-w-[100px]">
+                          {getTranslatedPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale)}
+                        </span>
+                        {booking._count.extras > 0 && <span className="opacity-50 text-xs">+{booking._count.extras}</span>}
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="text-sm font-bold tabular-nums">{formatCurrency(booking.total)}</div>
-                        <span className={`inline-flex items-center gap-1 text-xs mt-0.5 ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-text-success' : booking.depositPaid ? 'admin-tone-text-warning' : 'admin-tone-text-danger'}`}>
+                      <td className="px-3 py-2.5">
+                        <div className="text-sm font-bold tabular-nums whitespace-nowrap">{formatCurrency(booking.total)}</div>
+                        <span className={`inline-flex items-center gap-1 text-[10px] mt-0.5 ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-text-success' : booking.depositPaid ? 'admin-tone-text-warning' : 'admin-tone-text-danger'}`}>
                           <span className={`inline-block h-1.5 w-1.5 rounded-full ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-bg-success' : booking.depositPaid ? 'admin-tone-bg-warning' : 'admin-tone-bg-danger'}`} />
                           {booking.depositPaid && booking.remainingPaid ? 'Pagat' : booking.depositPaid ? 'Parcial' : 'Pendent'}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-3 py-2.5 text-center">
                         {(() => {
                           const extrasTotal = booking.extras.reduce((sum, e) => sum + e.price * e.quantity, 0);
                           const marginPct = computeSimpleMarginPct(
@@ -570,17 +571,18 @@ export default async function BookingsPage({
                           );
                         })()}
                       </td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-3 py-2.5 text-center">
                         <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusConf.bg} ${statusConf.text}`}>
                           {statusConf.label}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-3 py-2.5">
                         <BookingActions
                           id={booking.id}
                           status={booking.status}
                           eventDate={booking.eventDate.toISOString()}
                           customerId={booking.customerId}
+                          compact
                         />
                       </td>
                     </tr>
@@ -589,7 +591,6 @@ export default async function BookingsPage({
               )}
             </tbody>
           </table>
-        </div>
       </section>
       </></div>}
 

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import ConfirmDialog, { useConfirmDialog } from '@/app/admin/components/ConfirmDialog';
 import { getProposalStatusDisplay, PROPOSAL_FILTERABLE_STATUSES, formatDate, formatCurrency } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { buildCustomerProposalHref, buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
@@ -61,6 +62,8 @@ export default function ProposalsList({
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [actionMsg, setActionMsg] = useState<string | null>(null);
   const [sendingId, setSendingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const { confirm, dialogProps } = useConfirmDialog();
 
   const filtered = proposals.filter((proposal) => {
     if (statusFilter && proposal.status !== statusFilter) return false;
@@ -112,6 +115,29 @@ export default function ProposalsList({
       setTimeout(() => setActionMsg(null), 4000);
     } finally {
       setSendingId(null);
+    }
+  }
+
+  async function handleDelete(proposalId: string) {
+    const ok = await confirm({ title: 'Eliminar pressupost', message: 'Aquesta acció no es pot desfer.', variant: 'danger', confirmLabel: 'Eliminar' });
+    if (!ok) return;
+    setDeletingId(proposalId);
+    try {
+      const res = await fetchWithCsrf(`/api/admin/proposals/${proposalId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setActionMsg('Pressupost eliminat');
+        setTimeout(() => setActionMsg(null), 3000);
+        router.refresh();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setActionMsg(data?.error || 'Error eliminant');
+        setTimeout(() => setActionMsg(null), 4000);
+      }
+    } catch {
+      setActionMsg('Error de connexió');
+      setTimeout(() => setActionMsg(null), 4000);
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -346,67 +372,42 @@ export default function ProposalsList({
                     {relativeDate(proposal.createdAt)}
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <details className="relative inline-block">
-                      <summary className="list-none cursor-pointer rounded-xl px-3 py-2 transition-colors hover:bg-white/10">
-                        <span aria-hidden="true">⋯</span>
-                        <span className="sr-only">Accions</span>
-                      </summary>
-                      <div className="absolute right-0 top-full z-10 mt-1 w-48 rounded-xl border bg-black/95 p-1 shadow-xl backdrop-blur-sm">
+                    <div className="flex items-center justify-end gap-1">
+                      <Link
+                        href={getProposalHref(proposal)}
+                        className="rounded-lg px-2.5 py-1.5 text-xs transition-colors hover:bg-white/10"
+                        title="Editar / generar PDF"
+                      >
+                        Editar
+                      </Link>
+                      {proposal.customerId && (
                         <Link
-                          href={getProposalHref(proposal)}
-                          className="block rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10"
+                          href={buildCustomerHubHref(proposal.customerId)}
+                          className="rounded-lg px-2.5 py-1.5 text-xs opacity-60 transition-colors hover:bg-white/10 hover:opacity-100"
+                          title="Fitxa client"
                         >
-                          ✏️ Editar
+                          Client
                         </Link>
-                        {proposal.status === 'DRAFT' && (
-                          <button
-                            onClick={() => handleSend(proposal.id)}
-                            disabled={sendingId === proposal.id}
-                            className="w-full rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10 disabled:opacity-50"
-                          >
-                            {sendingId === proposal.id ? '⏳ Enviant...' : '📧 Marcar enviat'}
-                          </button>
-                        )}
-                        {proposal.status === 'SENT' && (
-                          <>
-                            <button
-                              onClick={() => handleStatus(proposal.id, 'ACCEPTED')}
-                              className="w-full rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10"
-                            >
-                              ✅ Acceptat
-                            </button>
-                            <button
-                              onClick={() => handleStatus(proposal.id, 'REJECTED')}
-                              className="w-full rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10"
-                            >
-                              ❌ Rebutjat
-                            </button>
-                          </>
-                        )}
-                        {proposal.customer && proposal.customerId && (
-                          <Link
-                            href={buildCustomerHubHref(proposal.customerId)}
-                            className="block rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10"
-                          >
-                            👤 Fitxa client
-                          </Link>
-                        )}
-                        <Link
-                          href={getProposalDetailHref(proposal)}
-                          className="block rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10"
+                      )}
+                      {proposal.status === 'DRAFT' && (
+                        <button
+                          onClick={() => handleSend(proposal.id)}
+                          disabled={sendingId === proposal.id}
+                          className="rounded-lg px-2.5 py-1.5 text-xs opacity-60 transition-colors hover:bg-white/10 hover:opacity-100 disabled:opacity-30"
+                          title="Marcar enviat"
                         >
-                          🔗 Re-assignar vincles
-                        </Link>
-                        {proposal.leadId && (
-                          <Link
-                            href={buildLeadWorkspaceHref(proposal.leadId)}
-                            className="block rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10"
-                          >
-                            📋 Entrada
-                          </Link>
-                        )}
-                      </div>
-                    </details>
+                          {sendingId === proposal.id ? '...' : 'Enviat'}
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleDelete(proposal.id)}
+                        disabled={deletingId === proposal.id}
+                        className="rounded-lg px-2.5 py-1.5 text-xs text-red-400/70 transition-colors hover:bg-red-500/10 hover:text-red-300 disabled:opacity-30"
+                        title="Eliminar pressupost"
+                      >
+                        {deletingId === proposal.id ? '...' : 'Eliminar'}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -442,6 +443,7 @@ export default function ProposalsList({
           </div>
         </details>
       )}
+      <ConfirmDialog {...dialogProps} />
     </section>
   );
 }

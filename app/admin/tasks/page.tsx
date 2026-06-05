@@ -1,6 +1,6 @@
 import { TASK_QUEUE_VALUES, TASK_STATUS_VALUES } from '@/lib/constants';
 import type { TaskStatus } from '@/lib/services/tasks/leadScopedTaskService';
-import { AdminPage } from '@/app/admin/components/AdminPage';
+import './tasks.css';
 import {
   TaskFiltersSection,
   TaskKanbanSection,
@@ -146,48 +146,60 @@ export default async function TasksPage({
   };
 
   return (
-    <AdminPage
-      title="Tasques"
-      subtitle={`${total} tasques${customerId ? ' del client' : ''}`}
-      back={customerId ? { href: buildCustomerWorkspaceTabHref(customerId!, 'tasks'), label: 'Client' } : undefined}
-      actions={<TaskPageToolbar isKanban={isKanban} status={status} customerId={customerId} />}
-    >
-      {!isKanban && (
-        <OwnerControlStrip
-          system={{
-            eyebrow: 'Automàtic',
-            title: 'Què vigila el sistema',
-            tone: 'info',
-            items: automaticSignals,
-            emptyText: 'Sense senyals automàtiques destacades ara mateix.',
-          }}
-          manual={{
-            eyebrow: 'Manual',
-            title: 'Què et reclama decisió',
-            tone: manualSignals.length > 0 ? 'warning' : 'success',
-            items: manualSignals,
-            emptyText: 'No hi ha cap front manual calent a la cua actual.',
-          }}
-          nextStep={{
-            title: nextStepLabel,
-            detail: nextStepDetail,
-            href: nextStepHref,
-          }}
-        />
-      )}
-      {!isKanban && queueSummary.total > 0 && (
-        <TaskQueueBanner queues={queueSummary.queues} total={queueSummary.total} />
-      )}
-      {isKanban ? (
-        <TaskKanbanSection />
-      ) : (
-        <>
-          <TaskFiltersSection status={status} customerId={customerId} />
-          <TaskListSection tasks={tasks} resolveDestination={resolveDestination} />
-        </>
-      )}
-      {!isKanban && <TaskPagination page={page} totalPages={totalPages} buildHref={buildHref} />}
-    </AdminPage>
+    <div className="tk__root">
+      <header className="tk__header">
+        <div className="tk__header-left">
+          <span className="tk__eyebrow">Operativa</span>
+          <h1 className="tk__title">Tasques</h1>
+          <p className="tk__subtitle">{total} tasques{customerId ? ' del client' : ''}</p>
+        </div>
+        <div className="tk__header-right">
+          <TaskPageToolbar isKanban={isKanban} status={status} customerId={customerId} />
+        </div>
+      </header>
+
+      <div className="tk__body">
+        {!isKanban && (
+          <div className="tk__strip">
+            <OwnerControlStrip
+              system={{
+                eyebrow: 'Automàtic',
+                title: 'Què vigila el sistema',
+                tone: 'info',
+                items: automaticSignals,
+                emptyText: 'Sense senyals automàtiques destacades ara mateix.',
+              }}
+              manual={{
+                eyebrow: 'Manual',
+                title: 'Què et reclama decisió',
+                tone: manualSignals.length > 0 ? 'warning' : 'success',
+                items: manualSignals,
+                emptyText: 'No hi ha cap front manual calent a la cua actual.',
+              }}
+              nextStep={{
+                title: nextStepLabel,
+                detail: nextStepDetail,
+                href: nextStepHref,
+              }}
+            />
+          </div>
+        )}
+        {!isKanban && queueSummary.total > 0 && (
+          <div className="tk__section">
+            <TaskQueueBanner queues={queueSummary.queues} total={queueSummary.total} />
+          </div>
+        )}
+        {isKanban ? (
+          <TaskKanbanSection />
+        ) : (
+          <>
+            <TaskFiltersSection status={status} customerId={customerId} />
+            <TaskListSection tasks={tasks} resolveDestination={resolveDestination} />
+          </>
+        )}
+        {!isKanban && <TaskPagination page={page} totalPages={totalPages} buildHref={buildHref} />}
+      </div>
+    </div>
   );
 }
 

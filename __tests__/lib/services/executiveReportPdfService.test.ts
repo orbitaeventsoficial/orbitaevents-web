@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 
-vi.mock('@/lib/logo-base64', () => ({
-  ORBITA_LOGO_BASE64: 'data:image/png;base64,fake',
+vi.mock('@/lib/logo-lockup-light-base64', () => ({
+  ORBITA_LOGO_LOCKUP_LIGHT_BASE64: 'data:image/png;base64,fake',
 }));
 
 import { exportExecutiveReportPdf } from '@/lib/services/executiveReportPdfService';

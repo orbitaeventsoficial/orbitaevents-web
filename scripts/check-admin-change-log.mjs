@@ -1,8 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const PROTOCOL_PATH = path.join(process.cwd(), 'docs', 'protocol-producte-admin-ca.md');
-const DIARIO_PATH = path.join(process.cwd(), 'docs', 'diario.md');
+function resolveDocPath(primaryName, legacyName) {
+  const primaryPath = path.join(process.cwd(), 'docs', primaryName);
+  if (fs.existsSync(primaryPath)) return primaryPath;
+  return path.join(process.cwd(), 'docs', legacyName);
+}
+
+const PROTOCOL_PATH = resolveDocPath('admin-protocol.md', 'protocol-producte-admin-ca.md');
+const DIARIO_PATH = resolveDocPath('admin-diary.md', 'diario.md');
 const ADMIN_CONSTANTS_PATH = path.join(process.cwd(), 'lib', 'constants', 'admin.ts');
 
 function fail(message) {
@@ -114,7 +120,7 @@ if (!counterMatch) {
   const diarioCurrentChangeRegex = new RegExp(`^## [^\\n]*Canvi #${counter}\\b`, 'm');
   const diarioCurrentMatch = diarioCurrentChangeRegex.exec(diario);
   if (!diarioCurrentMatch) {
-    fail(`docs/diario.md missing entry for current change #${counter}`);
+    fail(`docs/admin-diary.md missing entry for current change #${counter}`);
   } else {
     const nextDiarioEntryRegex = /^## [^\n]*Canvi #\d+\b/mg;
     nextDiarioEntryRegex.lastIndex = diarioCurrentMatch.index + diarioCurrentMatch[0].length;
@@ -129,7 +135,7 @@ if (!counterMatch) {
       || !currentDiarioBody.includes(OWN_CLOSED)
     ) {
       fail(
-        `docs/diario.md current entry #${counter} missing ownership fields. `
+        `docs/admin-diary.md current entry #${counter} missing ownership fields. `
         + `Required fields: ${OWN_COMMENCED}, ${OWN_WORKING}, ${OWN_CLOSED}`
       );
     }
@@ -140,7 +146,7 @@ if (!counterMatch) {
       || !currentDiarioBody.includes('- Validació humana/UX:')
     ) {
       fail(
-        `docs/diario.md current entry #${counter} missing validation layers. `
+        `docs/admin-diary.md current entry #${counter} missing validation layers. `
         + 'Required fields: - Validació tècnica:, - Validació funcional:, - Validació humana/UX:'
       );
     }
@@ -153,5 +159,4 @@ if (process.exitCode) {
 }
 
 console.log(`Admin change-log check clean. Changes: ${changeNumbers.length}. Current: #${Math.max(...changeNumbers)}.`);
-
 

@@ -16,11 +16,13 @@ export default function BookingActions({
   status,
   eventDate,
   customerId,
+  compact = false,
 }: {
   id: string;
   status: string;
   eventDate?: string;
   customerId?: string | null;
+  compact?: boolean;
 }) {
   const router = useRouter();
   const toast = useToast();
@@ -81,6 +83,29 @@ export default function BookingActions({
       setIsUpdatingStatus(false);
     }
   };
+
+  if (compact) {
+    return (
+      <div className="flex items-center justify-end gap-2">
+        <select
+          value={status}
+          onChange={(e) => handleStatusChange(e.target.value)}
+          disabled={isUpdatingStatus}
+          className="ap-input px-2 py-1 text-xs"
+          aria-label={ADMIN_ACTIONS_HELP.booking.status.title}
+          {...helpAttrs(ADMIN_ACTIONS_HELP.booking.status)}
+        >
+          {BOOKING_STATUS_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>{option.label}</option>
+          ))}
+        </select>
+        <Link href={buildBookingHref(id)} className="ap-btn ap-btn--secondary px-2 py-1 text-xs whitespace-nowrap" {...helpAttrs(ADMIN_ACTIONS_HELP.booking.view)}>
+          Veure →
+        </Link>
+        <ConfirmDialog {...dialogProps} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-end gap-2">

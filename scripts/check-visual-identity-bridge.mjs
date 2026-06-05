@@ -7,7 +7,9 @@ const ROOT = process.cwd();
 
 const FILES = {
   bridge: path.join(ROOT, 'docs', 'visual-identity-bridge-ca.md'),
-  protocol: path.join(ROOT, 'docs', 'protocol-producte-admin-ca.md'),
+  protocol: fs.existsSync(path.join(ROOT, 'docs', 'admin-protocol.md'))
+    ? path.join(ROOT, 'docs', 'admin-protocol.md')
+    : path.join(ROOT, 'docs', 'protocol-producte-admin-ca.md'),
   packageJson: path.join(ROOT, 'package.json'),
 };
 

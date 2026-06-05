@@ -283,6 +283,7 @@ Es tracta de conservar el que ja té valor, cosir el que avui està dispers, exp
 | `tasks-auto` | Diari | Generació automàtica de tasques operatives |
 | `weekly-benchmark` | Setmanal (dl) | Email comparatiu setmanal |
 | `urgent-followup-alerts` | Diari | Alertes seguiment urgent leads/reserves |
+| `calendar-sync` | Cada 15 min | Mirall complet Google Calendar: reserves, leads, tasques, bloquejos i social |
 
 ## Serveis clau (lib/services/)
 
@@ -396,7 +397,6 @@ Sèrie de talls per drenar tots els `MÉS ENDAVANT` factuals del Master Checklis
 | A1 | **Insights narratius** — fins a 5 insights prioritzats en català al dashboard | `dashboardInsightsService.ts` | ✅ |
 | A5 | **Timeline unificat** — email+WhatsApp+trucades+notes en un fil, icones per canal | `TimelinePanel.tsx` | ✅ |
 | A6 | **Auto-triggers** — proposal→contracte, lead→welcome, booking→checklist | `automationTriggers.ts` | ✅ |
-
 
 
 

@@ -82,7 +82,28 @@ const nextConfig = {
       },
     ];
 
+    // Headers per als endpoints de preview del Studio — permeten embedding en iframe 'self'
+    const studioPreviewHeaders = securityHeaders
+      .filter(h => h.key !== 'X-Frame-Options')
+      .map(h => {
+        if (h.key === 'Content-Security-Policy') {
+          return { key: h.key, value: h.value.replace("frame-ancestors 'none'", "frame-ancestors 'self'") };
+        }
+        return h;
+      })
+      .concat([{ key: 'X-Frame-Options', value: 'SAMEORIGIN' }]);
+
     return [
+      // Endpoints preview Studio: embedding permès des de 'self'
+      {
+        source: '/api/admin/studio/preview/:path*',
+        headers: studioPreviewHeaders,
+      },
+      // Endpoint informe executiu: també embeddable des de Studio
+      {
+        source: '/api/admin/reports/executive/export-pdf',
+        headers: studioPreviewHeaders,
+      },
       // Security headers para todas las paginas
       {
         source: '/:path*',

@@ -1,0 +1,930 @@
+/* ============================================================================
+   ÒRBITA ADMIN — Tasques
+   Prefix: tk__ (tasks)
+   Paleta: tokens ax-* de orbita-tokens.css. Cap hex hardcoded.
+============================================================================ */
+
+/* ── Shell arrel ─────────────────────────────────────────────────────────── */
+html.admin-mode .tk__root {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--ax-canvas);
+  color: var(--ax-t);
+}
+
+/* ── Capçalera ───────────────────────────────────────────────────────────── */
+html.admin-mode .tk__header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 24px 16px;
+  border-bottom: 1px solid var(--ax-line);
+}
+
+html.admin-mode .tk__header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+html.admin-mode .tk__eyebrow {
+  font-size: var(--o-text-micro);
+  font-weight: var(--o-fw-bold);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ax-gold);
+  opacity: 0.72;
+}
+
+html.admin-mode .tk__title {
+  margin: 0;
+  font-size: var(--o-text-xl);
+  font-weight: var(--o-fw-xbold);
+  letter-spacing: -0.015em;
+  color: var(--ax-t);
+  line-height: 1.1;
+}
+
+html.admin-mode .tk__subtitle {
+  font-size: var(--o-text-2xs);
+  color: var(--ax-t3);
+  margin-top: 2px;
+}
+
+html.admin-mode .tk__header-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* ── Botó genèric ────────────────────────────────────────────────────────── */
+html.admin-mode .tk__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: var(--o-r-md);
+  border: 1px solid var(--ax-line2);
+  background: transparent;
+  color: var(--ax-t2);
+  font: inherit;
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-semi);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+html.admin-mode .tk__btn:hover {
+  background: var(--ax-fill-3);
+  color: var(--ax-t);
+}
+
+html.admin-mode .tk__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+html.admin-mode .tk__btn--prim {
+  border-color: var(--ax-gold-edge);
+  background: var(--ax-gold-tint-2);
+  color: var(--ax-gold);
+}
+
+html.admin-mode .tk__btn--prim:hover {
+  background: var(--ax-gold-tint-2);
+  color: var(--ax-gold-bright);
+}
+
+html.admin-mode .tk__btn--sm {
+  padding: 5px 10px;
+  font-size: var(--o-text-xs);
+  border-radius: var(--o-r-sm-2);
+}
+
+/* ── View toggle ─────────────────────────────────────────────────────────── */
+html.admin-mode .tk__view-toggle {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--ax-line2);
+  border-radius: var(--o-r-md);
+  background: var(--ax-sunk);
+}
+
+html.admin-mode .tk__view-btn {
+  padding: 5px 12px;
+  border-radius: var(--o-r-sm-2);
+  border: none;
+  background: transparent;
+  color: var(--ax-t3);
+  font: inherit;
+  font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-bold);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+html.admin-mode .tk__view-btn--active {
+  background: var(--ax-fill-5);
+  color: var(--ax-t);
+}
+
+/* ── Botó auto (acció ràpida al header) ──────────────────────────────────── */
+html.admin-mode .tk__auto-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+html.admin-mode .tk__auto-msg {
+  font-size: var(--o-text-xs);
+  color: var(--ax-t3);
+  text-align: right;
+  max-width: 220px;
+}
+
+/* ── Cos scrollable ──────────────────────────────────────────────────────── */
+html.admin-mode .tk__body {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Secció genèrica ─────────────────────────────────────────────────────── */
+html.admin-mode .tk__section {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--ax-line);
+}
+
+html.admin-mode .tk__section--flush {
+  padding: 0;
+  border-bottom: none;
+}
+
+/* ── Strip de propietari ─────────────────────────────────────────────────── */
+html.admin-mode .tk__strip {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--ax-line);
+}
+
+/* ── Queue banner ────────────────────────────────────────────────────────── */
+html.admin-mode .tk__queue {
+  margin: 0 24px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--ax-line);
+  border-radius: var(--o-r-md-2);
+  background: var(--ax-fill-1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+html.admin-mode .tk__queue-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+html.admin-mode .tk__queue-label {
+  font-size: var(--o-text-micro);
+  font-weight: var(--o-fw-bold);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ax-t3);
+}
+
+html.admin-mode .tk__queue-clear {
+  font-size: var(--o-text-micro);
+  color: var(--ax-t3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+
+html.admin-mode .tk__queue-clear:hover {
+  color: var(--ax-t2);
+}
+
+html.admin-mode .tk__queue-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+html.admin-mode .tk__queue-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--o-r-sm-2);
+  border: 1px solid transparent;
+  background: none;
+  font: inherit;
+  font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-semi);
+  cursor: pointer;
+  transition: transform 120ms ease, background 120ms ease;
+}
+
+html.admin-mode .tk__queue-pill:hover {
+  transform: scale(1.02);
+}
+
+html.admin-mode .tk__queue-pill[data-queue="VENÇUT"] {
+  border-color: var(--ax-danger-border);
+  background: var(--ax-danger-bg);
+  color: var(--ax-danger-text);
+}
+
+html.admin-mode .tk__queue-pill[data-queue="VENÇUT"].is-active {
+  border-color: var(--ax-danger-strong);
+  background: var(--ax-danger-bg);
+  color: var(--ax-danger-text);
+  box-shadow: 0 0 0 1px var(--ax-danger-strong);
+}
+
+html.admin-mode .tk__queue-pill[data-queue="AVUI"] {
+  border-color: var(--ax-warning-border);
+  background: var(--ax-warning-bg);
+  color: var(--ax-warning-text);
+}
+
+html.admin-mode .tk__queue-pill[data-queue="AVUI"].is-active {
+  border-color: var(--ax-warning-strong);
+  background: var(--ax-warning-bg);
+  color: var(--ax-warning-text);
+  box-shadow: 0 0 0 1px var(--ax-warning-strong);
+}
+
+html.admin-mode .tk__queue-pill[data-queue="VIP"] {
+  border-color: var(--o-stage-contacted);
+  background: var(--o-stage-contacted);
+  color: var(--ax-vip-text);
+}
+
+html.admin-mode .tk__queue-pill[data-queue="VIP"].is-active {
+  border-color: var(--o-stage-contacted);
+  background: var(--o-stage-contacted);
+  color: var(--ax-vip-text);
+  box-shadow: 0 0 0 1px var(--o-stage-contacted);
+}
+
+html.admin-mode .tk__queue-pill[data-queue="BLOQUEJAT"] {
+  border-color: var(--ax-line2);
+  background: var(--ax-fill-2);
+  color: var(--ax-t3);
+}
+
+html.admin-mode .tk__queue-pill[data-queue="BLOQUEJAT"].is-active {
+  border-color: var(--ax-line3);
+  background: var(--ax-fill-4);
+  color: var(--ax-t2);
+  box-shadow: 0 0 0 1px var(--ax-line2);
+}
+
+html.admin-mode .tk__queue-count {
+  padding: 1px 7px;
+  border-radius: var(--o-r-pill);
+  background: var(--ax-fill-5);
+  font-size: var(--o-text-micro);
+  font-weight: var(--o-fw-xbold);
+}
+
+html.admin-mode .tk__queue-pill.is-active .tk__queue-count {
+  background: var(--ax-line2);
+}
+
+html.admin-mode .tk__queue-normal {
+  font-size: var(--o-text-xs);
+  color: var(--ax-t3);
+  padding: 0 8px;
+}
+
+/* ── Filtres ─────────────────────────────────────────────────────────────── */
+html.admin-mode .tk__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--ax-line);
+}
+
+html.admin-mode .tk__filter-label {
+  font-size: var(--o-text-2xs);
+  color: var(--ax-t3);
+  font-weight: var(--o-fw-semi);
+}
+
+html.admin-mode .tk__filter-select {
+  padding: 5px 10px;
+  border-radius: var(--o-r-sm-2);
+  border: 1px solid var(--ax-line2);
+  background: var(--ax-sunk);
+  color: var(--ax-t2);
+  font: inherit;
+  font-size: var(--o-text-2xs);
+  cursor: pointer;
+}
+
+/* ── Llista de tasques ───────────────────────────────────────────────────── */
+html.admin-mode .tk__list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 24px 24px;
+}
+
+html.admin-mode .tk__row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--o-r-md-2);
+  border: 1px solid var(--ax-line);
+  background: var(--ax-fill-1);
+  transition: background 120ms ease;
+}
+
+@media (min-width: 640px) {
+  html.admin-mode .tk__row {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+html.admin-mode .tk__row:hover {
+  background: var(--ax-fill-2);
+}
+
+html.admin-mode .tk__row--overdue {
+  border-left: 2px solid var(--ax-danger-strong);
+}
+
+html.admin-mode .tk__row-main {
+  flex: 1;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+html.admin-mode .tk__row-title {
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-semi);
+  color: var(--ax-t);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+html.admin-mode .tk__row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 3px;
+}
+
+html.admin-mode .tk__row-sub {
+  font-size: var(--o-text-xs);
+  color: var(--ax-t3);
+}
+
+html.admin-mode .tk__row-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border-radius: var(--o-r-pill);
+  border: 1px solid var(--ax-warning-border);
+  background: var(--ax-warning-bg);
+  font-size: var(--o-text-micro);
+  font-weight: var(--o-fw-semi);
+  color: var(--ax-warning-text);
+}
+
+html.admin-mode .tk__row-side {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  html.admin-mode .tk__row-side {
+    width: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+}
+
+html.admin-mode .tk__row-date {
+  font-size: var(--o-text-xs);
+  color: var(--ax-t3);
+}
+
+html.admin-mode .tk__row-date--overdue {
+  color: var(--ax-danger-text);
+  font-weight: var(--o-fw-bold);
+}
+
+html.admin-mode .tk__row-acts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  html.admin-mode .tk__row-acts {
+    flex-direction: row;
+    align-items: center;
+    width: auto;
+  }
+}
+
+/* ── Estat buit ──────────────────────────────────────────────────────────── */
+html.admin-mode .tk__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 56px 24px;
+  text-align: center;
+  color: var(--ax-t3);
+}
+
+html.admin-mode .tk__empty-icon {
+  font-size: var(--o-text-2xl);
+  opacity: 0.5;
+}
+
+html.admin-mode .tk__empty-title {
+  font-size: var(--o-text-md);
+  font-weight: var(--o-fw-bold);
+  color: var(--ax-t2);
+  margin: 0;
+}
+
+html.admin-mode .tk__empty-desc {
+  font-size: var(--o-text-sm);
+  margin: 0;
+}
+
+/* ── Paginació ───────────────────────────────────────────────────────────── */
+html.admin-mode .tk__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px 20px;
+  font-size: var(--o-text-2xs);
+  color: var(--ax-t3);
+}
+
+html.admin-mode .tk__pagination-btns {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Kanban ──────────────────────────────────────────────────────────────── */
+html.admin-mode .tk__kanban-wrap {
+  flex: 1;
+  padding: 16px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+}
+
+html.admin-mode .tk__dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+@media (min-width: 768px) {
+  html.admin-mode .tk__dots {
+    display: none;
+  }
+}
+
+html.admin-mode .tk__dot {
+  height: 10px;
+  border-radius: var(--o-r-pill);
+  width: 10px;
+  background: var(--ax-line2);
+  border: none;
+  cursor: pointer;
+  transition: width 150ms ease, background 150ms ease;
+}
+
+html.admin-mode .tk__dot--active {
+  width: 24px;
+  background: var(--ax-gold);
+}
+
+html.admin-mode .tk__board {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 8px;
+  flex: 1;
+}
+
+@media (min-width: 768px) {
+  html.admin-mode .tk__board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    overflow-x: visible;
+    overflow-y: visible;
+    padding-bottom: 0;
+  }
+}
+
+/* ── Columna kanban ──────────────────────────────────────────────────────── */
+html.admin-mode .tk__col {
+  min-width: 86vw;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  border-radius: var(--o-r-lg);
+  border: 1px solid var(--ax-line);
+  background: var(--ax-fill-1);
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+@media (min-width: 768px) {
+  html.admin-mode .tk__col {
+    min-width: 0;
+  }
+}
+
+html.admin-mode .tk__col.admin-drop-active {
+  border-color: var(--ax-gold-edge);
+  background: var(--ax-gold-tint-1);
+}
+
+html.admin-mode .tk__col-head {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--ax-line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+html.admin-mode .tk__col-label {
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-bold);
+  color: var(--ax-t2);
+  margin: 0;
+}
+
+html.admin-mode .tk__col[data-status="OPEN"] .tk__col-label {
+  color: var(--ax-info-text);
+}
+
+html.admin-mode .tk__col[data-status="IN_PROGRESS"] .tk__col-label {
+  color: var(--ax-warning-text);
+}
+
+html.admin-mode .tk__col[data-status="DONE"] .tk__col-label {
+  color: var(--ax-success-text);
+}
+
+html.admin-mode .tk__col-count {
+  padding: 2px 8px;
+  border-radius: var(--o-r-pill);
+  border: 1px solid var(--ax-line2);
+  font-size: var(--o-text-micro);
+  font-weight: var(--o-fw-xbold);
+  color: var(--ax-t3);
+}
+
+html.admin-mode .tk__col-hint {
+  font-size: var(--o-text-xs);
+  color: var(--ax-t3);
+  opacity: 0.60;
+  margin-top: 3px;
+}
+
+html.admin-mode .tk__col-body {
+  flex: 1;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+html.admin-mode .tk__placeholder {
+  border-radius: var(--o-r-md-2);
+  border: 1px dashed var(--ax-gold-edge);
+  background: var(--ax-gold-tint-1);
+  padding: 12px;
+  text-align: center;
+  font-size: var(--o-text-micro);
+  color: var(--ax-gold);
+  opacity: 0.70;
+}
+
+html.admin-mode .tk__col-empty {
+  border-radius: var(--o-r-md-2);
+  border: 1px dashed var(--ax-line2);
+  padding: 16px;
+  text-align: center;
+  font-size: var(--o-text-2xs);
+  color: var(--ax-t3);
+}
+
+/* ── Targeta kanban ──────────────────────────────────────────────────────── */
+html.admin-mode .tk__card {
+  border-radius: var(--o-r-md-2);
+  border: 1px solid var(--ax-line2);
+  padding: 10px 12px;
+  cursor: grab;
+  transition: opacity 120ms ease, box-shadow 120ms ease;
+}
+
+html.admin-mode .tk__card:active {
+  cursor: grabbing;
+}
+
+html.admin-mode .tk__card[data-dragging] {
+  opacity: 0.45;
+}
+
+html.admin-mode .tk__card[data-status="OPEN"] {
+  background: var(--ax-info-bg);
+  border-color: var(--ax-info-bg);
+}
+
+html.admin-mode .tk__card[data-status="IN_PROGRESS"] {
+  background: var(--ax-warning-bg);
+  border-color: var(--ax-warning-bg);
+}
+
+html.admin-mode .tk__card[data-status="DONE"] {
+  background: var(--ax-success-bg);
+  border-color: var(--ax-success-bg);
+}
+
+html.admin-mode .tk__card-title {
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-bold);
+  color: var(--ax-t);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+html.admin-mode .tk__card-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+html.admin-mode .tk__card-link {
+  font-size: var(--o-text-micro);
+  color: var(--ax-t3);
+  text-decoration: none;
+  transition: color 120ms ease;
+}
+
+html.admin-mode .tk__card-link:hover {
+  color: var(--ax-t2);
+}
+
+html.admin-mode .tk__card-date {
+  margin-top: 4px;
+  font-size: var(--o-text-micro);
+  color: var(--ax-t3);
+}
+
+html.admin-mode .tk__card-date--overdue {
+  color: var(--ax-danger-text);
+  font-weight: var(--o-fw-bold);
+}
+
+html.admin-mode .tk__card-date--today {
+  color: var(--ax-warning-text);
+  font-weight: var(--o-fw-bold);
+}
+
+html.admin-mode .tk__card-btns {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+@media (min-width: 768px) {
+  html.admin-mode .tk__card-btns {
+    display: none;
+  }
+}
+
+html.admin-mode .tk__card-move-btn {
+  flex: 1;
+  border-radius: var(--o-r-md);
+  border: 1px solid var(--ax-line);
+  background: var(--ax-fill-2);
+  color: var(--ax-t3);
+  font: inherit;
+  font-size: var(--o-text-micro);
+  font-weight: var(--o-fw-semi);
+  padding: 5px 8px;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+html.admin-mode .tk__card-move-btn:hover {
+  background: var(--ax-fill-4);
+  color: var(--ax-t2);
+}
+
+/* ── Spinner de càrrega ──────────────────────────────────────────────────── */
+html.admin-mode .tk__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+}
+
+html.admin-mode .tk__spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--ax-line2);
+  border-top-color: var(--ax-gold);
+  border-radius: 50%;
+  animation: tk-spin 0.7s linear infinite;
+}
+
+@keyframes tk-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Formulari nova tasca ────────────────────────────────────────────────── */
+html.admin-mode .tk__form-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--ax-canvas);
+  color: var(--ax-t);
+}
+
+html.admin-mode .tk__form-header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--ax-line);
+}
+
+html.admin-mode .tk__form-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--o-text-2xs);
+  color: var(--ax-t3);
+  text-decoration: none;
+  transition: color 120ms ease;
+}
+
+html.admin-mode .tk__form-back:hover {
+  color: var(--ax-t2);
+}
+
+html.admin-mode .tk__form-head-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+html.admin-mode .tk__form-title {
+  margin: 0;
+  font-size: var(--o-text-lg);
+  font-weight: var(--o-fw-xbold);
+  letter-spacing: -0.012em;
+  color: var(--ax-t);
+}
+
+html.admin-mode .tk__form-sub {
+  font-size: var(--o-text-2xs);
+  color: var(--ax-t3);
+  margin: 0;
+}
+
+html.admin-mode .tk__form-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+html.admin-mode .tk__form-card {
+  width: 100%;
+  max-width: 680px;
+  border: 1px solid var(--ax-line);
+  border-radius: var(--o-r-lg);
+  padding: 24px;
+  background: var(--ax-fill-1);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-self: flex-start;
+}
+
+html.admin-mode .tk__form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+html.admin-mode .tk__form-label {
+  font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-bold);
+  color: var(--ax-t2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+html.admin-mode .tk__form-input,
+html.admin-mode .tk__form-textarea,
+html.admin-mode .tk__form-select {
+  padding: 9px 12px;
+  border-radius: var(--o-r-md);
+  border: 1px solid var(--ax-line2);
+  background: var(--ax-sunk);
+  color: var(--ax-t);
+  font: inherit;
+  font-size: var(--o-text-sm);
+  transition: border-color 150ms ease;
+}
+
+html.admin-mode .tk__form-input:focus,
+html.admin-mode .tk__form-textarea:focus,
+html.admin-mode .tk__form-select:focus {
+  outline: none;
+  border-color: var(--ax-gold-edge);
+}
+
+html.admin-mode .tk__form-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+html.admin-mode .tk__form-2col {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  html.admin-mode .tk__form-2col {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+html.admin-mode .tk__form-err {
+  padding: 9px 12px;
+  border-radius: var(--o-r-md);
+  border: 1px solid var(--ax-danger-border);
+  background: var(--ax-danger-bg);
+  font-size: var(--o-text-2xs);
+  color: var(--ax-danger-text);
+}
+
+html.admin-mode .tk__form-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

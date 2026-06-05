@@ -7,7 +7,9 @@ const ROOT = process.cwd();
 
 const FILES = {
   claude: path.join(ROOT, 'CLAUDE.md'),
-  protocol: path.join(ROOT, 'docs', 'protocol-producte-admin-ca.md'),
+  protocol: fs.existsSync(path.join(ROOT, 'docs', 'admin-protocol.md'))
+    ? path.join(ROOT, 'docs', 'admin-protocol.md')
+    : path.join(ROOT, 'docs', 'protocol-producte-admin-ca.md'),
   runtimePolicy: path.join(ROOT, 'docs', 'agent-runtime-policy.json'),
   packageJson: path.join(ROOT, 'package.json'),
 };

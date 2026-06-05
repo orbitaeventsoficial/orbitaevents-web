@@ -4,7 +4,7 @@
 > Ordre: pàgines de negoci primer, sistema al final.
 > Estat: 🔴 old (disseny original) · 🟡 en curs · 🟢 migrada al nou disseny
 >
-> **Aquest fitxer és el mapa canònic de la migració**. Quan una pàgina passa a 🟡 o 🟢, ha de portar a la columna "Nota" la referència explícita al `Canvi #NNN` que ho documenta. El guard `qa:admin-frankenstein-migration` valida l'alineament protocol ↔ inventari. Vegeu també `§Migració del Frankenstein` al `docs/protocol-producte-admin-ca.md`.
+> **Aquest fitxer és el mapa canònic de la migració**. Quan una pàgina passa a 🟡 o 🟢, ha de portar a la columna "Nota" la referència explícita al `Canvi #NNN` que ho documenta. El guard `qa:admin-frankenstein-migration` valida l'alineament protocol ↔ inventari. Vegeu també `§Migració del Frankenstein` al `docs/admin-protocol.md`.
 
 ---
 
@@ -24,8 +24,8 @@
 | Nova reserva | `/admin/bookings/new` | Formulari ràpid pre-omplit des d'un lead. | 🟢 | Canvi #842+#843 — migrat a Brass & Obsidian (`nb-design.css`, `nb__*`), packs amb prefix de servei, extras humanitzats. |
 | Calendari | `/admin/calendario` | Absorbit per **Agenda** (#844) — el calendari de caps de setmana de leads+reserves substitueix la vista vella. | 🟢 | URL antiga accessible per compatibilitat. |
 | Calendari capacitat | `/admin/calendario/capacity` | Forecast setmanal — pendent decidir si val la pena recuperar-lo dins Agenda. | 🔴 | |
-| Tasques | `/admin/tasks` | Llista/kanban, cues, automatismes | 🔴 | |
-| Nova tasca | `/admin/tasks/new` | Formulari amb assistència | 🔴 | |
+| Tasques | `/admin/tasks` | Llista/kanban, cues, automatismes | 🟢 | Canvi #868 — `tasks.css`, prefix `tk__`, `AdminPage` eliminat, `ap-*` eliminat, queue banner amb data attrs, kanban amb CSS `data-status` |
+| Nova tasca | `/admin/tasks/new` | Formulari amb assistència | 🟢 | Canvi #868 — `tk__form-*`, `AdminPage` eliminat, inputs amb id/label, `aria-label` al select |
 | Inbox | `/admin/inbox` | Safata, missatges, follow-ups | 🟢 | Canvi #801 — `inbox.css`, prefix `ix-`, cap AdminPage |
 | Compose | `/admin/inbox/compose` | Redactor d'email | 🟢 | Canvi #801 — `cx-` prefix, cap AdminPage, cap ap-* |
 | Inbox settings | `/admin/inbox/settings` | Configuració IMAP | 🟢 | Canvi #802 — ix__settings*, cap AdminPage, cap ap-* |

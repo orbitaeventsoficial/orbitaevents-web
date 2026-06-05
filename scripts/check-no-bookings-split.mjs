@@ -61,6 +61,6 @@ if (violations.length === 0) {
   );
   for (const v of violations) process.stderr.write(`  ${v}\n`);
   process.stderr.write('\nBooking and event management functionality belongs in app/admin/bookings/.\n');
-  process.stderr.write('See §6.7 in docs/protocol-producte-admin-ca.md.\n');
+  process.stderr.write('See §6.7 in docs/admin-protocol.md.\n');
   process.exit(1);
 }

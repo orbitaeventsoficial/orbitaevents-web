@@ -8,7 +8,7 @@ import { LeadDossierActions } from './LeadDossierActions';
 
 function readLogoDataUri(): string {
   try {
-    const svg = readFileSync(join(process.cwd(), 'public', 'img', 'orbitalockupwhite.svg'), 'utf-8');
+    const svg = readFileSync(join(process.cwd(), 'public', 'img', 'logoplanetatextdreta.svg'), 'utf-8');
     return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
   } catch {
     return '';

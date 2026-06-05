@@ -55,8 +55,8 @@ module.exports = {
         // Títols - Plus Jakarta Sans
         display: ['var(--font-display)', 'system-ui', 'sans-serif'],
         
-        // Números - JetBrains Mono
-        mono: ['var(--font-mono)', 'JetBrains Mono', 'Consolas', 'Monaco', 'monospace'],
+        // Dades, dates, imports i IDs - Inter amb numerals tabulars
+        mono: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
 
         // Serif - Cormorant Garamond (pàgines temàtiques)
         serif: ['var(--font-serif)', 'Georgia', 'Times New Roman', 'serif'],

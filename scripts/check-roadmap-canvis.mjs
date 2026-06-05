@@ -3,7 +3,9 @@ import path from 'node:path';
 
 const repoRoot = process.cwd();
 const roadmapPath = path.join(repoRoot, 'lib', 'constants', 'adminManual.ts');
-const protocolPath = path.join(repoRoot, 'docs', 'protocol-producte-admin-ca.md');
+const protocolPath = fs.existsSync(path.join(repoRoot, 'docs', 'admin-protocol.md'))
+  ? path.join(repoRoot, 'docs', 'admin-protocol.md')
+  : path.join(repoRoot, 'docs', 'protocol-producte-admin-ca.md');
 
 function readFileOrFail(filePath, label) {
   if (!fs.existsSync(filePath)) {
@@ -43,7 +45,7 @@ function extractProtocolCanvis(protocolSource) {
 }
 
 const roadmapSource = readFileOrFail(roadmapPath, 'lib/constants/adminManual.ts');
-const protocolSource = readFileOrFail(protocolPath, 'docs/protocol-producte-admin-ca.md');
+const protocolSource = readFileOrFail(protocolPath, 'docs/admin-protocol.md');
 
 const doneEntries = extractDoneCanvis(roadmapSource);
 const fetCanvis = extractProtocolCanvis(protocolSource);

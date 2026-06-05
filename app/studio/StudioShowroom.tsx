@@ -20,6 +20,8 @@ import { useState, type ReactNode } from 'react';
 import { CLIENT_LOGOS } from '@/config/client-logos';
 import { EXTRAS, INVENTARIO, getAllPacks, type PackDefinition, type ServiceSlug } from '@/config/packs-config';
 import { PORTFOLIO_CATEGORIES } from '@/config/portfolio-images';
+import { PDF_DOCUMENT_CATALOG, type PdfDocumentId } from '@/lib/constants/pdfDocuments';
+import { ORBITA_LOGO_LOCKUP_LIGHT_BASE64 } from '@/lib/logo-lockup-light-base64';
 import './orbita-tokens.css';
 import './studio.css';
 
@@ -104,7 +106,7 @@ const TYPE_SCALE: { name: string; spec: string; sample: string; use: string; sty
   { name: 'Body', spec: '14 / 400', sample: 'Exemple · Boda · 120 pax · 14 jun', use: 'Text llarg', style: { fontSize: 14, fontWeight: 400 } },
   { name: 'Small', spec: '12 / 500', sample: 'Última actualització fa 3 minuts', use: 'Meta, hints', style: { fontSize: 12, fontWeight: 500 } },
   { name: 'Caption', spec: '11 / 700 / 0.06em UP', sample: 'PIPELINE · 8 LEADS', use: 'Labels, eyebrows', style: { fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' } },
-  { name: 'Mono', spec: 'JetBrains Mono · 12', sample: '14 jun · 120 pax · 22:00', use: 'Dades, codis, IDs', style: { fontSize: 12, fontFamily: 'var(--o-font-mono)' } },
+  { name: 'Dades', spec: 'Inter tabular · 12', sample: '14 jun · 120 pax · 22:00', use: 'Dades, dates, imports i IDs', style: { fontSize: 12, fontFamily: 'var(--o-font-data)', fontVariantNumeric: 'tabular-nums' } },
 ];
 
 /* ── 03 · Spacing & Radii ─────────────────────────────────────────────────── */
@@ -248,6 +250,8 @@ const serviceCapacity = (packs: PackDefinition[]) => {
   if (!mins.length && !maxs.length) return 'capacitat flexible';
   return `${mins.length ? Math.min(...mins) : 0}-${maxs.length ? Math.max(...maxs) : '∞'} pax`;
 };
+const STUDIO_BROCHURE_PACKS = servicePacks('bodas');
+const STUDIO_BROCHURE_EXTRAS = PUBLIC_EXTRAS.filter((extra) => extra.compatibleWith?.includes('bodas'));
 
 /* ── 16 · Lab · Paleta Obsidiana ─────────────────────────────────────────── */
 const LAB_PALETTE_GROUPS: { group: string; items: { name: string; token: string; hex: string; use: string }[] }[] = [
@@ -317,27 +321,26 @@ const LAB_TYPE_GROUPS: {
       { role: 'Sidebar item', spec: '14.5px / 700', sample: 'Leads · Pipeline', use: 'Ítem de menú lateral', style: { fontSize: 14.5, fontWeight: 700, fontFamily: 'var(--font-inter)' } },
       { role: 'Sub-nav', spec: '13.5px / 650', sample: 'Primavera 2026', use: 'Subítem de menú, pestanya', style: { fontSize: 13.5, fontWeight: 650, fontFamily: 'var(--font-inter)' } },
       { role: 'Botó primari', spec: '14px / 750 / 0.01em', sample: '+ Nova entrada', use: 'CTA del sidebar (botó de vora)', style: { fontSize: 14, fontWeight: 750, letterSpacing: '0.01em', fontFamily: 'var(--font-inter)' } },
-      { role: 'Body meta', spec: '13px / 400', sample: 'Casament · 120 pax · Vallromanes', use: 'Metadades del bolo, body de fitxa', style: { fontSize: 13, fontFamily: 'var(--font-inter)' } },
+      { role: 'Body meta', spec: '14px / 400', sample: 'Casament · 120 pax · Vallromanes', use: 'Metadades del bolo, body de fitxa', style: { fontSize: 14, fontFamily: 'var(--font-inter)' } },
     ],
   },
   {
-    group: 'JetBrains Mono — dades · labels · codis · identitat de dades',
+    group: 'Inter tabular — dades · dates · imports · IDs',
     entries: [
-      { role: 'Eyebrow / label', spec: '11px / 700 / 0.18em UP', sample: 'LEADS OBERTS', use: 'Eyebrow, captions, labels de secció', style: { fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' } },
-      { role: 'Focus meta', spec: '12.5px / 400 / 0.03em', sample: '14 jun 2026 · 120 pax · Vallromanes', use: 'Metadades al Focus Card', style: { fontSize: 12.5, letterSpacing: '0.03em', fontFamily: 'var(--font-mono)' } },
-      { role: 'Sub-títol pàgina', spec: '13px / 400 / 0.04em', sample: 'Jun – Ago 2026 · caps de setmana', use: 'Subtítol de pàgina i períodes', style: { fontSize: 13, letterSpacing: '0.04em', fontFamily: 'var(--font-mono)' } },
-      { role: 'Data / ID', spec: '12px / 400', sample: 'OE-LX9K2A · 2026-05-25', use: 'IDs, dates, codis de referència', style: { fontSize: 12, fontFamily: 'var(--font-mono)' } },
+      { role: 'Eyebrow / label', spec: '11px / 700 / 0.14em UP', sample: 'LEADS OBERTS', use: 'Eyebrow, captions, labels de secció', style: { fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', fontFamily: 'var(--o-font-data)', fontVariantNumeric: 'tabular-nums' } },
+      { role: 'Focus meta', spec: '12.5px / 500 / tabular', sample: '14 jun 2026 · 120 pax · Vallromanes', use: 'Metadades al Focus Card', style: { fontSize: 12.5, fontWeight: 500, fontFamily: 'var(--o-font-data)', fontVariantNumeric: 'tabular-nums' } },
+      { role: 'Sub-títol pàgina', spec: '13px / 500 / tabular', sample: 'Jun – Ago 2026 · caps de setmana', use: 'Subtítol de pàgina i períodes', style: { fontSize: 13, fontWeight: 500, fontFamily: 'var(--o-font-data)', fontVariantNumeric: 'tabular-nums' } },
+      { role: 'Data / ID', spec: '12px / 500 / tabular', sample: 'OE-LX9K2A · 2026-05-25', use: 'IDs, dates, codis de referència', style: { fontSize: 12, fontWeight: 500, fontFamily: 'var(--o-font-data)', fontVariantNumeric: 'tabular-nums' } },
     ],
   },
 ];
 
 /* ── 15 · Documents PDF — índex ───────────────────────────────────────────── */
 const PDF_DOCS = [
-  { name: 'Pressupost', gen: 'generateQuotePDF · tema fosc' },
-  { name: 'Contracte', gen: 'generateContractPDF · tema fosc' },
-  { name: 'Catàleg de serveis', gen: 'generateServiceBrochure · tema clar' },
-  { name: 'Informe executiu', gen: 'exportExecutiveReportPdf · tema clar' },
-  { name: 'Factura', gen: 'generada via Holded (integració externa)' },
+  ...PDF_DOCUMENT_CATALOG.map((document) => ({
+    name: document.name,
+    gen: `${document.generator} · ${document.theme}`,
+  })),
 ];
 
 /* ── Menú lateral (TOC) — 16 seccions ─────────────────────────────────────── */
@@ -364,7 +367,7 @@ const SECTIONS: { num: string; id: string; label: string }[] = [
   { num: '19', id: 'cataleg-comercial', label: 'Catàleg comercial' },
 ];
 
-type PdfId = 'pressupost' | 'contracte' | 'cataleg' | 'informe';
+type PdfId = PdfDocumentId;
 
 function SectionHead({ num, title, intro }: { num: string; title: string; intro: string }) {
   return (
@@ -376,9 +379,25 @@ function SectionHead({ num, title, intro }: { num: string; title: string; intro:
   );
 }
 
+function PdfPreviewHeader({ title, subtitle, docRef }: { title: string; subtitle?: string; docRef?: string }) {
+  return (
+    <div className="o-pdfdoc__header o-pdfdoc__header--dark">
+      <div className="o-pdfdoc__brand">
+        <img src={ORBITA_LOGO_LOCKUP_LIGHT_BASE64} alt="Òrbita Events" />
+      </div>
+      <div className="o-pdfdoc__meta">
+        <strong className="o-pdfdoc__header-title">{title}</strong>
+        {subtitle && <span className="o-pdfdoc__header-subtitle">{subtitle}</span>}
+        {docRef && <span className="o-pdfdoc__header-ref">{docRef}</span>}
+      </div>
+    </div>
+  );
+}
+
 export default function StudioShowroom() {
   const [openComm, setOpenComm] = useState<string | null>('welcome');
   const [pdf, setPdf] = useState<PdfId>('pressupost');
+  const activePdfDocument = PDF_DOCUMENT_CATALOG.find((document) => document.id === pdf) ?? PDF_DOCUMENT_CATALOG[0];
 
   return (
     <div className="o-studio-root">
@@ -493,7 +512,7 @@ export default function StudioShowroom() {
 
           {/* 02 · Tipografia */}
           <section className="o-spec-section" id="sec-tipografia">
-            <SectionHead num="02" title="Tipografia" intro="Inter (UI) · JetBrains Mono (dades) · 7 nivells · numerals tabulars" />
+            <SectionHead num="02" title="Tipografia" intro="Inter (UI i dades) · Plus Jakarta Sans (display) · numerals tabulars amb zeros nets" />
             <div className="o-spec-types">
               {TYPE_SCALE.map((t) => (
                 <div className="o-spec-type-row" key={t.name}>
@@ -826,144 +845,76 @@ export default function StudioShowroom() {
 
           {/* 15 · PDFs */}
           <section className="o-spec-section" id="sec-pdfs">
-            <SectionHead num="15" title="Documents PDF" intro="Previsualització fidel del contingut real · reprodueix lib/pdf-utils.ts (tema fosc + or / clar, A4)" />
-            <div className="o-pdf-switch">
-              <button type="button" aria-pressed={pdf === 'pressupost'} onClick={() => setPdf('pressupost')}>Pressupost</button>
-              <button type="button" aria-pressed={pdf === 'contracte'} onClick={() => setPdf('contracte')}>Contracte</button>
-              <button type="button" aria-pressed={pdf === 'cataleg'} onClick={() => setPdf('cataleg')}>Catàleg de serveis</button>
-              <button type="button" aria-pressed={pdf === 'informe'} onClick={() => setPdf('informe')}>Informe executiu</button>
+            <SectionHead num="15" title="Documents PDF" intro="Catàleg canònic únic · paper ivori càlid · accent de marca · previsualització A4 responsive · gràfiques amb primitives jsPDF" />
+            <div className="o-pdf-switch" role="tablist" aria-label="Documents PDF">
+              {PDF_DOCUMENT_CATALOG.map((document) => (
+                <button
+                  key={document.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={pdf === document.id}
+                  aria-controls="pdf-preview"
+                  onClick={() => setPdf(document.id)}
+                >
+                  {document.name}
+                </button>
+              ))}
             </div>
 
-            <div className="o-pdfdoc-wrap">
-              {pdf === 'pressupost' && (
-                <div className="o-pdfdoc">
-                  <div className="o-pdfdoc__header">
-                    <div className="o-pdfdoc__brand">
-                      <span className="o-pdfdoc__brandname">Òrbita Events</span>
-                      <span className="o-pdfdoc__title">Pressupost</span>
-                    </div>
-                    <div className="o-pdfdoc__meta">
-                      Referència <b>OE-LX9K2A</b><br />Data <b>22/05/2026</b><br />Validesa <b>15 dies</b>
-                    </div>
-                  </div>
-                  <div className="o-pdfdoc__card">
-                    <div className="o-pdfdoc__grid2">
-                      <div className="o-pdfdoc__field"><span className="o-pdfdoc__label">Client</span><span className="o-pdfdoc__value">Marta Soler i Jordi Vila</span><span className="o-pdfdoc__muted">marta.soler@email.com · 612 345 678</span></div>
-                      <div className="o-pdfdoc__field"><span className="o-pdfdoc__label">Event</span><span className="o-pdfdoc__value">Casament · 120 convidats</span><span className="o-pdfdoc__muted">14 juny 2026 · 18:00–02:00 · Mas de Sant Lleí, Vallromanes</span></div>
-                    </div>
-                  </div>
-                  <div className="o-pdfdoc__card o-pdfdoc__card--soft">
-                    <div className="o-pdfdoc__packrow">
-                      <div><span className="o-pdfdoc__eyebrow">Pack seleccionat</span><div className="o-pdfdoc__value">Pack Premium Boda · 8 hores</div></div>
-                      <span className="o-pdfdoc__packprice">1.890,00€</span>
-                    </div>
-                    <div className="o-pdfdoc__list">
-                      {['DJ professional tota la nit', 'Equip de so line-array', 'Il·luminació intel·ligent + focus mòbils', 'Photocall amb attrezzo', 'Màquina de fum de terra', 'Tècnic present tot l\'event'].map((x) => (
-                        <div className="o-pdfdoc__li" key={x}>{x}</div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="o-pdfdoc__card">
-                    <span className="o-pdfdoc__eyebrow">Resum econòmic</span>
-                    <div className="o-pdfdoc__sumrow"><span>Pack base</span><span>1.890,00€</span></div>
-                    <div className="o-pdfdoc__sumrow"><span>Extres (photobooth + saxo)</span><span>630,00€</span></div>
-                    <div className="o-pdfdoc__sumrow"><span>Desplaçament</span><span>90,00€</span></div>
-                    <div className="o-pdfdoc__sumrow"><span>Descompte (reserva anticipada)</span><span>-120,00€</span></div>
-                    <div className="o-pdfdoc__divider" />
-                    <div className="o-pdfdoc__total"><span className="o-pdfdoc__total-label">Total</span><span className="o-pdfdoc__total-value">2.490,00€</span></div>
-                  </div>
-                  <div className="o-pdfdoc__footer">Preus sense IVA · Validesa 15 dies · orbitaevents.com · info@orbitaevents.com · +34 699 12 10 23</div>
-                </div>
-              )}
+            <div className="o-pdf-canonical">
+              <div>
+                <span>Generador canònic</span>
+                <strong>{activePdfDocument.generator}</strong>
+              </div>
+              <div>
+                <span>Seccions obligatòries</span>
+                <strong>{activePdfDocument.sections.join(' · ')}</strong>
+              </div>
+              <div>
+                <span>Seccions opcionals</span>
+                <strong>{activePdfDocument.optionalSections.join(' · ') || 'Cap'}</strong>
+              </div>
+              <div>
+                <span>Paginació</span>
+                <strong>{activePdfDocument.pagination}</strong>
+              </div>
+            </div>
 
-              {pdf === 'contracte' && (
-                <div className="o-pdfdoc">
-                  <div className="o-pdfdoc__header">
-                    <div className="o-pdfdoc__brand">
-                      <span className="o-pdfdoc__brandname">Òrbita Events</span>
-                      <span className="o-pdfdoc__title">Contracte de prestació de serveis</span>
-                    </div>
-                    <div className="o-pdfdoc__meta">Referència <b>OE-C-2026-014</b><br />Data <b>22/05/2026</b></div>
-                  </div>
-                  <div className="o-pdfdoc__card">
-                    <div className="o-pdfdoc__grid2">
-                      <div className="o-pdfdoc__field"><span className="o-pdfdoc__label">Prestador</span><span className="o-pdfdoc__value">Òrbita Events</span><span className="o-pdfdoc__muted">NIF B-00000000 · info@orbitaevents.com</span></div>
-                      <div className="o-pdfdoc__field"><span className="o-pdfdoc__label">Client</span><span className="o-pdfdoc__value">Marta Soler i Jordi Vila</span><span className="o-pdfdoc__muted">NIF 00000000X · 612 345 678</span></div>
-                    </div>
-                  </div>
-                  <div className="o-pdfdoc__card o-pdfdoc__card--soft">
-                    <span className="o-pdfdoc__eyebrow">Detalls del servei</span>
-                    <div className="o-pdfdoc__muted">Casament · 14 juny 2026 · 18:00–02:00 · Mas de Sant Lleí · 120 convidats · Pack Premium Boda (8h)</div>
-                  </div>
-                  <div className="o-pdfdoc__card">
-                    <span className="o-pdfdoc__eyebrow">Resum econòmic</span>
-                    <div className="o-pdfdoc__sumrow"><span>Subtotal</span><span>2.490,00€</span></div>
-                    <div className="o-pdfdoc__sumrow"><span>IVA (21%)</span><span>522,90€</span></div>
-                    <div className="o-pdfdoc__divider" />
-                    <div className="o-pdfdoc__total"><span className="o-pdfdoc__total-label">Total</span><span className="o-pdfdoc__total-value">3.012,90€</span></div>
-                    <div className="o-pdfdoc__sumrow o-pdfdoc__sumrow--reason">Aval (dipòsit) 903,87€ · Resta 2.109,03€ · IBAN ES00 0000 0000 0000 0000 0000</div>
-                  </div>
-                  <div className="o-pdfdoc__footer">Controvèrsies: jutjats de Granollers · Dades segons RGPD (UE) 2016/679 i LOPDGDD 3/2018 · Signat digitalment</div>
-                </div>
+            <div className="o-pdfdoc-wrap" id="pdf-preview" role="tabpanel">
+              {activePdfDocument.previewUrl && (
+                <iframe
+                  className="o-pdf-iframe"
+                  src={activePdfDocument.previewUrl}
+                  title={activePdfDocument.previewTitle}
+                />
               )}
-
-              {pdf === 'cataleg' && (
-                <div className="o-pdfdoc o-pdfdoc--light">
-                  <div className="o-pdfdoc__band">
-                    <div><span className="o-pdfdoc__band-title">Catàleg de serveis</span><div className="o-pdfdoc__band-sub">Casaments</div></div>
+              {pdf === 'dossier' && (
+                <div className="o-pdfdoc o-pdfdoc--dossier">
+                  <div className="o-dossier-cover">
+                    <img src="/img/logoplanetatextdreta.svg" alt="Òrbita Events" />
+                    <div className="o-dossier-cover__line" />
+                    <strong>Maria Garcia</strong>
+                    <span>Dossier de propostes · Òrbita Events</span>
                   </div>
-                  <div className="o-pdfdoc__card">
-                    <span className="o-pdfdoc__sec-title">Els nostres packs</span>
-                    <div className="o-broc-pack">
-                      <div className="o-broc-pack__top"><span className="o-broc-pack__name">Pack Essencial</span><span className="o-broc-pack__price">990€</span></div>
-                      <span className="o-broc-pack__dur">5 hores</span>
-                      <div className="o-broc-pack__feats">{['DJ professional', 'Equip de so i micròfon', 'Il·luminació de pista'].map((f) => <span className="o-broc-pack__feat" key={f}>{f}</span>)}</div>
-                      <span className="o-broc-pack__ideal">Ideal per: celebracions íntimes</span>
+                  <div className="o-dossier-proposal">
+                    <div className="o-dossier-proposal__header"><img src="/img/logoplanetatextdreta.svg" alt="Òrbita Events" /></div>
+                    <div className="o-dossier-proposal__title"><span>Proposta 01</span><strong>Bingo musical</strong></div>
+                    <p>Descripció comercial editable i adaptada a la proposta seleccionada.</p>
+                    <div className="o-dossier-includes">
+                      {['Presentador/a i DJ', 'Material de joc', 'Equip de so', 'Durada 1h30'].map((item) => <span key={item}>{item}</span>)}
                     </div>
-                    <div className="o-broc-pack">
-                      <div className="o-broc-pack__top"><span className="o-broc-pack__name">Pack Premium Boda <span className="o-broc-badge">Més popular</span></span><span className="o-broc-pack__price">1.890€</span></div>
-                      <span className="o-broc-pack__dur">8 hores</span>
-                      <div className="o-broc-pack__feats">{['DJ + tècnic tota la nit', 'So line-array + il·luminació intel·ligent', 'Photocall amb attrezzo'].map((f) => <span className="o-broc-pack__feat" key={f}>{f}</span>)}</div>
-                      <span className="o-broc-pack__ideal">Ideal per: casaments de 80 a 150 convidats</span>
-                    </div>
-                    <div className="o-broc-pack">
-                      <div className="o-broc-pack__top"><span className="o-broc-pack__name">Pack Estrella <span className="o-broc-badge o-broc-badge--premium">Premium</span></span><span className="o-broc-pack__price">2.690€</span></div>
-                      <span className="o-broc-pack__dur">10 hores</span>
-                      <div className="o-broc-pack__feats">{['Tot el Premium + cabina DJ premium', 'Espectacle de llum i efectes', 'Coordinació musical personalitzada'].map((f) => <span className="o-broc-pack__feat" key={f}>{f}</span>)}</div>
-                      <span className="o-broc-pack__ideal">Ideal per: grans esdeveniments</span>
-                    </div>
-                  </div>
-                  <div className="o-broc-contact"><b>Tens dubtes? Escriu-nos sense compromís!</b><span>Barcelona · Girona · Catalunya · info@orbitaevents.com · +34 699 12 10 23</span></div>
-                </div>
-              )}
-
-              {pdf === 'informe' && (
-                <div className="o-pdfdoc o-pdfdoc--light">
-                  <div className="o-pdfdoc__band">
-                    <div><span className="o-pdfdoc__band-title">Informe executiu</span><div className="o-pdfdoc__band-sub">Generat el 22 de maig de 2026</div></div>
-                  </div>
-                  <div className="o-pdfdoc__card">
-                    <span className="o-pdfdoc__sec-title">Indicadors principals</span>
-                    <div className="o-rep-kpis">
-                      <div className="o-rep-kpi"><div className="o-rep-kpi__label">Clients</div><div className="o-rep-kpi__value">248</div></div>
-                      <div className="o-rep-kpi"><div className="o-rep-kpi__label">Leads oberts</div><div className="o-rep-kpi__value">32</div></div>
-                      <div className="o-rep-kpi o-rep-kpi--accent"><div className="o-rep-kpi__label">Reserves</div><div className="o-rep-kpi__value">41</div></div>
-                      <div className="o-rep-kpi o-rep-kpi--accent"><div className="o-rep-kpi__label">Ingressos €</div><div className="o-rep-kpi__value">86.400</div></div>
-                    </div>
-                  </div>
-                  <div className="o-pdfdoc__card">
-                    <span className="o-pdfdoc__sec-title">Conversió per origen</span>
-                    <table className="o-rep-table">
-                      <thead><tr><th scope="col">Origen</th><th scope="col">Leads</th><th scope="col">Guanyats</th><th scope="col">Conversió</th></tr></thead>
+                    <table className="o-dossier-table">
+                      <thead><tr><th scope="col">Participants</th><th scope="col">Equip</th><th scope="col">Preu</th></tr></thead>
                       <tbody>
-                        <tr><td>Web</td><td>64</td><td>21</td><td>32,8%</td></tr>
-                        <tr><td>Instagram</td><td>48</td><td>14</td><td>29,2%</td></tr>
-                        <tr><td>Referits</td><td>22</td><td>11</td><td>50,0%</td></tr>
-                        <tr><td>Google</td><td>31</td><td>9</td><td>29,0%</td></tr>
+                        <tr><td>15–60 persones</td><td>DJ + Presentador/a</td><td>250€</td></tr>
+                        <tr><td>61–110 persones</td><td>DJ + Presentador/a + assistent/a</td><td>300€</td></tr>
                       </tbody>
                     </table>
                   </div>
-                  <div className="o-pdfdoc__footer o-pdfdoc__footer--light">Marge brut 44.700,00€ · Taxa marge 51,7% · Òrbita Events · Informe intern</div>
+                  <div className="o-dossier-greeting">
+                    Hola Maria, gràcies per contactar amb nosaltres. T’enviem aquestes propostes d’animació pensades per al vostre event.
+                  </div>
+                  <div className="o-dossier-cta"><span>Per confirmar disponibilitat o per a qualsevol dubte</span><strong>+34 699 12 10 23 · info@orbitaevents.com</strong></div>
                 </div>
               )}
             </div>
@@ -1046,7 +997,7 @@ export default function StudioShowroom() {
 
           {/* 17 · Lab · Tipografia */}
           <section className="o-spec-section" id="sec-lab-tipografia">
-            <SectionHead num="17" title="Lab · Tipografia" intro="Tres fonts amb rol separat: Plus Jakarta Sans (display heroic, caràcter) · Inter (UI funcional, navegació) · JetBrains Mono (dades, labels, identitat de dades). Font-weight 650–800 al tram display." />
+            <SectionHead num="17" title="Lab · Tipografia" intro="Dues famílies amb rol clar: Plus Jakarta Sans per display i Inter per UI, dades, dates, imports i IDs. Numerals tabulars sense zero barrat." />
             {LAB_TYPE_GROUPS.map((g) => (
               <div className="o-spec-group" key={g.group}>
                 <h3 className="o-spec-group__title">{g.group}</h3>

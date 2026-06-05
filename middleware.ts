@@ -40,6 +40,19 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url, 301);
   }
 
+  // 4a. Preview endpoints del Studio: sobrescriu headers per permetre embedding en iframe
+  if (
+    pathname.startsWith('/api/admin/studio/preview/') ||
+    pathname === '/api/admin/reports/executive/export-pdf'
+  ) {
+    const authResponse = await handleAdminAuth(req);
+    if (authResponse && authResponse.status !== 200) return authResponse;
+    const res = NextResponse.next();
+    res.headers.set('X-Frame-Options', 'SAMEORIGIN');
+    res.headers.set('Content-Security-Policy', "frame-ancestors 'self'");
+    return res;
+  }
+
   // 4. Admin auth (UI + API)
   const isProtected = PROTECTED_PATHS.some(
     (p) => pathname === p || pathname.startsWith(p + '/')

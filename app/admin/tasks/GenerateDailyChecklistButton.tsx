@@ -19,13 +19,13 @@ export default function GenerateDailyChecklistButton() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) {
-        throw new Error(data?.error || 'No s’ha pogut generar');
+        throw new Error(data?.error || "No s'ha pogut generar");
       }
       if ((data.considered ?? 0) === 0) {
-        setMessage(`Checklist d’avui: cap tasca pendent real. Netejades ${data.staleCancelled ?? 0} antigues.`);
+        setMessage(`Checklist d'avui: cap tasca pendent real. Netejades ${data.staleCancelled ?? 0} antigues.`);
       } else {
         setMessage(
-          `Checklist d’avui: ${data.created} creats, ${data.skipped} ja existien, ${data.todayCancelled ?? 0} desactivades.`
+          `Checklist d'avui: ${data.created} creats, ${data.skipped} ja existien, ${data.todayCancelled ?? 0} desactivades.`
         );
       }
       router.refresh();
@@ -37,16 +37,16 @@ export default function GenerateDailyChecklistButton() {
   };
 
   return (
-    <div className="flex flex-col items-end gap-1">
+    <div className="tk__auto-btn">
       <button
         type="button"
         onClick={handleGenerate}
         disabled={loading}
-        className="admin-tasks-action inline-flex items-center rounded-xl border px-3 py-2 text-xs sm:text-sm font-semibold disabled:opacity-60"
+        className="tk__btn"
       >
-        {loading ? 'Generant...' : 'Generar checklist d’avui'}
+        {loading ? 'Generant...' : "Checklist d'avui"}
       </button>
-      {message && <p className="text-[11px]">{message}</p>}
+      {message && <p className="tk__auto-msg">{message}</p>}
     </div>
   );
 }

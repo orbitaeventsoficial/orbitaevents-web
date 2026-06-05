@@ -9,13 +9,11 @@ const QUEUE_CONFIG: Array<{
   key: TaskQueue;
   label: string;
   icon: string;
-  color: string;
-  activeColor: string;
 }> = [
-  { key: 'VENÇUT', label: 'Vençudes', icon: '🔴', color: 'border-rose-500/30 bg-rose-500/[0.06] text-rose-200', activeColor: 'border-rose-500/60 bg-rose-500/[0.15] text-rose-100 ring-1 ring-rose-500/40' },
-  { key: 'AVUI', label: 'Avui', icon: '🟡', color: 'border-amber-500/30 bg-amber-500/[0.06] text-amber-200', activeColor: 'border-amber-500/60 bg-amber-500/[0.15] text-amber-100 ring-1 ring-amber-500/40' },
-  { key: 'VIP', label: 'VIP', icon: '⭐', color: 'border-purple-500/30 bg-purple-500/[0.06] text-purple-200', activeColor: 'border-purple-500/60 bg-purple-500/[0.15] text-purple-100 ring-1 ring-purple-500/40' },
-  { key: 'BLOQUEJAT', label: 'Bloquejades', icon: '🧊', color: 'border-white/15 bg-white/[0.06] text-white/60', activeColor: 'border-white/30 bg-white/[0.08] text-white/70 ring-1 ring-white/20' },
+  { key: 'VENÇUT', label: 'Vençudes', icon: '🔴' },
+  { key: 'AVUI', label: 'Avui', icon: '🟡' },
+  { key: 'VIP', label: 'VIP', icon: '⭐' },
+  { key: 'BLOQUEJAT', label: 'Bloquejades', icon: '🧊' },
 ];
 
 export default function TaskQueueBanner({
@@ -48,41 +46,36 @@ export default function TaskQueueBanner({
   };
 
   return (
-    <div className="rounded-xl border border-white/10 p-3 admin-card-glass space-y-2">
-      <div className="flex items-center justify-between">
-        <p className="text-[10px] font-semibold uppercase tracking-wider opacity-50">Queue operativa</p>
+    <div className="tk__queue">
+      <div className="tk__queue-top">
+        <span className="tk__queue-label">Queue operativa</span>
         {activeQueue && (
-          <button
-            onClick={handleClearAll}
-            className="text-[10px] opacity-50 hover:opacity-80 transition-opacity"
-          >
+          <button type="button" onClick={handleClearAll} className="tk__queue-clear">
             Mostrar totes ({total})
           </button>
         )}
       </div>
-      <div className="flex flex-wrap gap-2">
-        {QUEUE_CONFIG.map(({ key, label, icon, color, activeColor }) => {
+      <div className="tk__queue-pills">
+        {QUEUE_CONFIG.map(({ key, label, icon }) => {
           const count = queues[key];
           if (count === 0 && activeQueue !== key) return null;
           const isActive = activeQueue === key;
           return (
             <button
               key={key}
+              type="button"
               onClick={() => handleClick(key)}
-              className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${isActive ? activeColor : color} hover:scale-[1.02]`}
+              data-queue={key}
+              className={`tk__queue-pill${isActive ? ' is-active' : ''}`}
             >
               <span>{icon}</span>
               <span>{label}</span>
-              <span className={`ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${isActive ? 'bg-white/20' : 'bg-white/10'}`}>
-                {count}
-              </span>
+              <span className="tk__queue-count">{count}</span>
             </button>
           );
         })}
         {queues['NORMAL'] > 0 && (
-          <span className="flex items-center gap-1 text-[11px] opacity-40 px-2">
-            + {queues['NORMAL']} normals
-          </span>
+          <span className="tk__queue-normal">+ {queues['NORMAL']} normals</span>
         )}
       </div>
     </div>

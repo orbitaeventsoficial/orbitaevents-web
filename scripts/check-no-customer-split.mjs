@@ -69,6 +69,6 @@ if (violations.length === 0) {
   );
   for (const v of violations) process.stderr.write(`  ${v}\n`);
   process.stderr.write('\nCustomer hub, analytics and CRM functionality belongs in app/admin/clientes/.\n');
-  process.stderr.write('See §6.5 in docs/protocol-producte-admin-ca.md.\n');
+  process.stderr.write('See §6.5 in docs/admin-protocol.md.\n');
   process.exit(1);
 }
