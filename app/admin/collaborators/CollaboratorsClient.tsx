@@ -6,6 +6,7 @@ import { ADMIN_COLLABORATOR_EMPTY_FORM } from '@/lib/constants/admin';
 import { useToast } from '../components/ToastProvider';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
+import CollaboratorProductsPanel, { type CollaboratorProduct } from './CollaboratorProductsPanel';
 
 interface Collaborator {
   id: string;
@@ -20,6 +21,7 @@ interface Collaborator {
   notes: string | null;
   isActive: boolean;
   bookings: CollaboratorBooking[];
+  products: CollaboratorProduct[];
 }
 
 interface CollaboratorBooking {
@@ -45,14 +47,16 @@ interface KPIs {
   totalRevenue: number;
   totalCommissions: number;
   pendingCommissions: number;
+  totalProducts: number;
+  catalogValue: number;
 }
 
 const KPI_ITEMS = (kpis: KPIs) => [
   { label: 'Total', value: kpis.total, tone: '' },
   { label: 'Actius', value: kpis.active, tone: 'ap-kpi--success' },
   { label: 'Reserves', value: kpis.totalBookings, tone: 'ap-kpi--info' },
-  { label: 'Facturat via collab', value: `${kpis.totalRevenue}€`, tone: '' },
-  { label: 'Comissions totals', value: `${kpis.totalCommissions}€`, tone: '' },
+  { label: 'Productes', value: kpis.totalProducts, tone: '' },
+  { label: 'Valor catàleg', value: `${kpis.catalogValue}€`, tone: 'ap-kpi--info' },
   {
     label: 'Comissions pendents',
     value: `${kpis.pendingCommissions}€`,
@@ -474,6 +478,12 @@ export default function CollaboratorsClient() {
                   </div>
                 </div>
               )}
+
+              <CollaboratorProductsPanel
+                collaboratorId={c.id}
+                products={c.products || []}
+                onChanged={load}
+              />
             </div>
           ))}
         </div>

@@ -4,6 +4,10 @@ import { AdminPage } from '../components/AdminPage';
 import { DossierGeneratorClient } from './DossierGeneratorClient';
 import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
 import { getAllDossiers, getDeletedDossiers } from '@/lib/services/dossierService';
+import {
+  collaboratorProductToAnimacioProduct,
+  listDossierCollaboratorProducts,
+} from '@/lib/services/collaboratorProductService';
 import { formatDateShort } from '@/lib/constants';
 import Link from 'next/link';
 import { DossierListActions } from './DossierListActions';
@@ -42,11 +46,21 @@ type DossierRow = {
 
 export default async function DossiersPage({ searchParams }: PageProps) {
   const logoDataUri = readLogoDataUri();
-  const [dossiers, deletedDossiers, allProducts] = await Promise.all([
+  const [dossiers, deletedDossiers, animacioProducts, collaboratorProducts] = await Promise.all([
     getAllDossiers(50),
     getDeletedDossiers(),
     getAnimacioProducts('ca'),
-  ]) as [DossierRow[], DossierRow[], Awaited<ReturnType<typeof getAnimacioProducts>>];
+    listDossierCollaboratorProducts(),
+  ]) as [
+    DossierRow[],
+    DossierRow[],
+    Awaited<ReturnType<typeof getAnimacioProducts>>,
+    Awaited<ReturnType<typeof listDossierCollaboratorProducts>>,
+  ];
+  const allProducts = [
+    ...animacioProducts,
+    ...collaboratorProducts.map(collaboratorProductToAnimacioProduct),
+  ];
 
   return (
     <AdminPage

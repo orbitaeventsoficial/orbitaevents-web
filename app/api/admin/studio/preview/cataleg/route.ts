@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { requireAuth } from '@/lib/auth';
-import { generateServiceBrochure } from '@/lib/pdf-utils';
+import { generateFullCatalogPDF, generateServiceBrochure } from '@/lib/services/catalogPdfService';
 import type { ServiceSlug } from '@/app/config/packs-config';
 import { renderPdfPreviewResponse } from '../previewResponse';
 
@@ -10,9 +10,13 @@ export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
 
-  const service = (req.nextUrl.searchParams.get('service') || 'bodas') as ServiceSlug;
+  const service = req.nextUrl.searchParams.get('service') as ServiceSlug | null;
+  const locale = (req.nextUrl.searchParams.get('locale') || 'ca') as 'ca' | 'es' | 'en';
+
   return renderPdfPreviewResponse('cataleg', async () => {
-    const doc = await generateServiceBrochure(service, 'ca');
+    const doc = service
+      ? await generateServiceBrochure(service, locale)
+      : await generateFullCatalogPDF(undefined, locale);
     return Buffer.from(doc.output('arraybuffer'));
   });
 }

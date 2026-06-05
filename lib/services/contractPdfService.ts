@@ -438,7 +438,7 @@ export async function generateContractPDF(
 
   // -- Additional Clauses (alçada dinàmica) --
   if (data.additionalClauses?.trim()) {
-    const addLines = doc.splitTextToSize(data.additionalClauses.trim(), contentWidth - 12).slice(0, 8);
+    const addLines = doc.splitTextToSize(data.additionalClauses.trim(), contentWidth - 12);
     const addH = 13 + addLines.length * 4.2 + 8;
     ensureSpace(addH + sectionGap);
     drawCard(left, y - 4, contentWidth, addH, 2, false);

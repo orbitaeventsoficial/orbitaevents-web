@@ -31,6 +31,10 @@ export function LeadDossierActions({ dossierId, email, nom, productIds, products
     window.open(URL.createObjectURL(blob), '_blank', 'noopener,noreferrer');
   }
 
+  function openCompositePdf() {
+    window.open(`/api/admin/dossiers/${dossierId}/composite`, '_blank', 'noopener,noreferrer');
+  }
+
   async function send() {
     if (!email) {
       toast.error('El dossier no té email de destinatari');
@@ -75,6 +79,14 @@ export function LeadDossierActions({ dossierId, email, nom, productIds, products
         title="Previsualitzar"
       >
         Vista
+      </button>
+      <button
+        type="button"
+        onClick={openCompositePdf}
+        className="ap-btn ap-btn--ghost text-xs px-2 py-1"
+        title="Obrir dossier + fitxes en un sol PDF"
+      >
+        PDF complet
       </button>
       {email && (
         <button

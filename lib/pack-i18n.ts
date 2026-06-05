@@ -55,14 +55,21 @@ function normalizeCandidateKeys(value: string): string[] {
   }
 
   // features.fN → features.N-1 (índex basat en 0)
+  // Aplica la conversió a TOTES les variants de prefix (services↔pages)
   if (noConfigurator.includes('.features.f')) {
     const match = noConfigurator.match(/^(.*)\.features\.f(\d+)$/);
     if (match) {
       const base = match[1];
       const numeric = Number.parseInt(match[2], 10);
       if (Number.isFinite(numeric) && numeric > 0) {
-        candidates.add(`${base}.features.${numeric - 1}`);
-        candidates.add(`configurator.${base}.features.${numeric - 1}`);
+        const idx = numeric - 1;
+        const bases = [base];
+        if (base.startsWith('services.mobile.')) bases.push(base.replace('services.mobile.', 'pages.mobile.'));
+        if (base.startsWith('pages.mobile.')) bases.push(base.replace('pages.mobile.', 'services.mobile.'));
+        for (const b of bases) {
+          candidates.add(`${b}.features.${idx}`);
+          candidates.add(`configurator.${b}.features.${idx}`);
+        }
       }
     }
   }
@@ -72,8 +79,13 @@ function normalizeCandidateKeys(value: string): string[] {
   if (numericMatch) {
     const base = numericMatch[1];
     const idx = Number.parseInt(numericMatch[2], 10);
-    candidates.add(`${base}.features.f${idx + 1}`);
-    candidates.add(`configurator.${base}.features.f${idx + 1}`);
+    const bases = [base];
+    if (base.startsWith('services.mobile.')) bases.push(base.replace('services.mobile.', 'pages.mobile.'));
+    if (base.startsWith('pages.mobile.')) bases.push(base.replace('pages.mobile.', 'services.mobile.'));
+    for (const b of bases) {
+      candidates.add(`${b}.features.f${idx + 1}`);
+      candidates.add(`configurator.${b}.features.f${idx + 1}`);
+    }
   }
 
   return Array.from(candidates);

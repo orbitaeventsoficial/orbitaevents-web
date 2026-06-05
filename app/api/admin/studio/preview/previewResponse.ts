@@ -5,9 +5,7 @@ import {
   type PdfDocumentId,
 } from '@/lib/constants/pdfDocuments';
 
-type PreviewablePdfDocumentId = Exclude<PdfDocumentId, 'dossier'>;
-
-export function pdfPreviewResponse(documentId: PreviewablePdfDocumentId, buffer: Buffer | ArrayBuffer): NextResponse {
+export function pdfPreviewResponse(documentId: PdfDocumentId, buffer: Buffer | ArrayBuffer): NextResponse {
   const filename = PDF_PREVIEW_FILENAMES[documentId];
   return new NextResponse(buffer, {
     headers: {
@@ -20,7 +18,7 @@ export function pdfPreviewResponse(documentId: PreviewablePdfDocumentId, buffer:
 }
 
 export async function renderPdfPreviewResponse(
-  documentId: PreviewablePdfDocumentId,
+  documentId: PdfDocumentId,
   render: () => Promise<Buffer | ArrayBuffer>,
 ): Promise<NextResponse> {
   try {

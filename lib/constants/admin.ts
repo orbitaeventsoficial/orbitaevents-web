@@ -57,7 +57,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 884;
+export const ADMIN_CHANGE_COUNTER = 893;
 
 export const ADMIN_DETAIL_PAGE_LABELS: Record<string, string> = {
   inventory: 'Fitxa inventari',
@@ -264,6 +264,35 @@ export const ADMIN_COLLABORATOR_EMPTY_FORM: {
   pricingModel: 'DISCOUNT',
   costPerHour: '',
   notes: '',
+};
+
+// Marge per defecte sobre el cost net en revendre productes de col·laboradors.
+export const COLLABORATOR_DEFAULT_MARKUP = 0.20;
+
+// Categoria dels productes de col·laborador que són extres (no s'oferten com a capítol
+// propi al dossier: pintacares, globoflèxia, tècnic de so... van inclosos o com a afegit).
+export const COLLABORATOR_EXTRA_CATEGORY = 'Extra';
+
+export const ADMIN_COLLABORATOR_PRODUCT_EMPTY_FORM: {
+  name: string;
+  category: string;
+  crew: string;
+  durationLabel: string;
+  costPrice: number | '';
+  sellPrice: number | '';
+  includes: string;
+  imageUrl: string;
+  isActive: boolean;
+} = {
+  name: '',
+  category: '',
+  crew: '',
+  durationLabel: '',
+  costPrice: '',
+  sellPrice: '',
+  includes: '',
+  imageUrl: '',
+  isActive: true,
 };
 
 export const ADMIN_FEATURE_DEFINITIONS = [

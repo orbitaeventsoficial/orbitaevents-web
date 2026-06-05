@@ -1799,11 +1799,38 @@ model Collaborator {
   isActive      Boolean                  @default(true)
 
   bookings CollaboratorBooking[]
+  products CollaboratorProduct[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("collaborators")
+}
+
+// Catàleg de productes/serveis que ofereix un col·laborador (revenda amb marge).
+// costPrice = cost net que ens cobra el col·laborador; sellPrice = el nostre PVP.
+model CollaboratorProduct {
+  id             String       @id @default(cuid())
+  collaboratorId String
+  collaborator   Collaborator @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
+
+  name          String
+  description   String? @db.Text
+  category      String? // "Animació infantil", "Musical", "Extra", "Bingo"...
+  crew          String? // "Animador + tècnic de so"
+  durationLabel String? // "1h", "70 min"
+  costPrice     Float // Cost net que ens cobra el col·laborador (sense IVA)
+  sellPrice     Float // El nostre PVP (cost + marge)
+  imageUrl      String?
+  includes      String? @db.Text // Què inclou el producte
+  sortOrder     Int     @default(0)
+  isActive      Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([collaboratorId])
+  @@map("collaborator_products")
 }
 
 model CollaboratorBooking {

@@ -34,6 +34,10 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
     window.open(URL.createObjectURL(blob), '_blank', 'noopener,noreferrer');
   }
 
+  function openCompositePdf() {
+    window.open(`/api/admin/dossiers/${dossierId}/composite`, '_blank', 'noopener,noreferrer');
+  }
+
   async function send() {
     if (!email) { toast.error('El dossier no té email de destinatari'); return; }
     setSending(true);
@@ -109,6 +113,9 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
         <button type="button" onClick={preview} className="dg__btn dg__btn--preview" title="Previsualitzar">
           Vista
         </button>
+        <button type="button" onClick={openCompositePdf} className="dg__btn dg__btn--pdf" title="Obrir dossier + fitxes en un sol PDF">
+          PDF complet
+        </button>
         <button type="button" onClick={restore} disabled={restoring} className="dg__btn dg__btn--save" title="Restaurar de la paperera">
           {restoring ? '…' : '↩ Restaurar'}
         </button>
@@ -123,6 +130,9 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
     <div className="dg__list-acts">
       <button type="button" onClick={preview} className="dg__btn dg__btn--preview" title="Previsualitzar">
         Vista
+      </button>
+      <button type="button" onClick={openCompositePdf} className="dg__btn dg__btn--pdf" title="Obrir dossier + fitxes en un sol PDF">
+        PDF complet
       </button>
       {email && (
         <button

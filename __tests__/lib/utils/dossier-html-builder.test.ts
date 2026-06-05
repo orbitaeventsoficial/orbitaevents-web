@@ -59,16 +59,18 @@ describe('buildDossierHtml', () => {
     expect(html).toContain('Bingo Musical');
   });
 
-  it('inclou taula de preus si hi ha trams', () => {
+  it('no duplica taules de preus dins el dossier editorial', () => {
     const html = buildDossierHtml(client, [productWithTrams]);
-    expect(html).toContain('50-100');
-    expect(html).toContain('900€');
+    expect(html).toContain('Bingo Musical');
+    expect(html).not.toContain('900€');
+    expect(html).not.toContain('50-100');
+    expect(html).not.toContain('<table>');
   });
 
-  it('inclou grid DJ si hi ha djOptions', () => {
+  it('no duplica opcions DJ de preu dins el dossier editorial', () => {
     const html = buildDossierHtml(client, [productWithDjOptions]);
-    expect(html).toContain('dj-grid');
-    expect(html).toContain('600€');
+    expect(html).not.toContain('dj-grid');
+    expect(html).not.toContain('600€');
   });
 
   it('inclou noInclou si existeix', () => {
@@ -106,23 +108,25 @@ describe('buildDossierHtml', () => {
     expect(html).toContain('info@orbitaevents.com');
   });
 
-  it('numera les propostes des de 01', () => {
+  it('numera els capítols des de 01', () => {
     const html = buildDossierHtml(client, [productWithTrams, productWithDjOptions]);
-    expect(html).toContain('Proposta 01');
-    expect(html).toContain('Proposta 02');
+    expect(html).toContain('Capítol 01');
+    expect(html).toContain('Capítol 02');
   });
 
-  it('inclou portada si es proporciona logoDataUri', () => {
+  it('inclou portada carbon amb logo si es proporciona logoDataUri', () => {
     const html = buildDossierHtml(client, [productWithTrams], {
       logoDataUri: 'data:image/png;base64,abc',
     });
     expect(html).toContain('portada');
     expect(html).toContain('data:image/png;base64,abc');
+    expect(html).toContain('Dossier preparat per a');
   });
 
-  it('no inclou portada sense logoDataUri', () => {
+  it('inclou portada carbon també sense logoDataUri', () => {
     const html = buildDossierHtml(client, [productWithTrams]);
-    expect(html).not.toContain('class="portada"');
+    expect(html).toContain('class="portada"');
+    expect(html).toContain('portada-wordmark');
   });
 
   it('afegeix script autoPrint si cal', () => {

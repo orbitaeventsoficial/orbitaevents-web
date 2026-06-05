@@ -1,3 +1,181 @@
+## 2026-06-05 — Packs Masquerade al dossier i PVP corregit a cost + 20% (Canvi #893, codex)
+
+### Context
+Després del #891, els productes de Masquerade ja existien a `/admin/collaborators`, però el dossier complet només sabia annexar serveis del catàleg general. El propietari ha demanat aprofitar el document de Downloads de Masquerade/Collsacreu i fer que aquests productes entrin també com a packs de col·laborador al dossier. Durant la revisió, el propietari ha corregit el criteri de preu: els productes de Carlos no han d'anar amb arrodoniments manuals, sinó amb `cost × 1,20` perquè Òrbita hi afegeix un 20% de profit.
+
+### Canvis
+- `lib/services/collaboratorProductService.ts`: afegits IDs de dossier `collab:<id>`, conversió de `CollaboratorProduct` a producte narratiu de dossier i lectura dels productes actius de col·laboradors per al generador.
+- `app/admin/dossiers/page.tsx` i `app/admin/leads/[id]/LeadDossiersPanel.tsx`: el generador i les llistes de dossier carreguen una única llista combinada amb productes d'animació propis + packs de col·laborador actius.
+- `app/api/admin/dossiers/[id]/composite/route.ts` i `lib/services/dossierService.ts`: els dossiers desats i els enviaments HTML resolen també `collab:*`, de manera que Masquerade no desapareix en obrir o enviar el dossier.
+- `lib/services/dossierCompositePdfService.ts`: el PDF complet afegeix annex comercial propi per als packs de col·laborador seleccionats, amb nom, col·laborador, durada, descripció i PVP.
+- `app/api/admin/studio/preview/dossier/route.ts`: preview de Studio amb exemple Masquerade (`El secret dels pirates`) dins el dossier compost.
+- `scripts/seed-masquerade-products.mjs`: sincronització idempotent per nom i PVP canònic `cost × 1,20`. Executat contra la BD: Animació temàtica 160→192, Animació amb personatge 250→300, Pirates 320→384, Pintacares 70→84, Globoflèxia 40→48, Bingo musical 160→192 i Tècnic de so 40→48. Bingo + so queda 200 de cost → 240 PVP.
+- `app/admin/collaborators/CollaboratorProductsPanel.tsx` i `computeProductMargin`: el percentatge visible passa a ser profit sobre cost, no marge sobre PVP, perquè la regla de negoci és `+20% sobre cost`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm vitest run __tests__/lib/services/collaboratorProductService.test.ts __tests__/lib/services/dossierCatalogSelectionService.test.ts __tests__/lib/services/dossierCompositePdfService.test.ts` OK (23 tests) · `pnpm run validate:core` OK.
+- Validació funcional: `node scripts\seed-masquerade-products.mjs` executat i 7 productes Masquerade sincronitzats amb PVP `cost + 20%`; els IDs `collab:*` entren al generador i al PDF complet amb annex comercial propi.
+- Validació humana/UX: el preu del bingo deixa de sortir com 250; el pack combinat bingo + so queda en 240, alineat amb 200 + 20%.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 893. Següent canvi ha de ser `#894`.
+
+---
+
+## 2026-06-05 — Fix visual catàleg PDF: badge "MÉS POPULAR" no tapa el preu (Canvi #892, claude)
+
+### Context
+Al catàleg PDF, el badge "MÉS POPULAR" es dibuixava al peu del header a la dreta i tapava parcialment el preu del pack (ex: "500€" del Premium). El propietari ho va detectar a les captures.
+
+### Canvis
+- `lib/services/catalogPdfService.ts`: badge popular mogut sota el nom, a l'esquerra del header (`px+5`, `py+9.5`); nom puja a `py+7.5`. El preu queda sol a la dreta.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · 6 tests de `catalogPdfService` OK.
+- Validació funcional: captures de les 5 pàgines del catàleg; preu llegible complet a totes les targetes populars (Premium 500€, Bingo 250€).
+- Validació humana/UX: badge sota el nom, sense solapar el preu.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 892. Següent canvi ha de ser `#893`.
+
+---
+
+## 2026-06-05 — Catàleg de productes de col·laboradors + Masquerade Events (Canvi #891, claude)
+
+### Context
+La secció `/admin/collaborators` era una llista plana (sense catàleg de productes). El propietari volia incorporar-hi els productes de Masquerade Events (Carlos Lucas Fernández, col·laborador mutu) amb el nostre marge, a partir del seu dossier (Word). Decisió d'abast confirmada pel propietari: **només a /admin/collaborators** (vista interna de cost/marge), no al catàleg públic ni al dossier.
+
+### Canvis
+- `prisma/schema.prisma`: nou model `CollaboratorProduct` (name, description, category, crew, durationLabel, costPrice, sellPrice, imageUrl, includes, sortOrder, isActive) + relació `products` a `Collaborator`. Migració `20260605101200_add_collaborator_products` aplicada a Railway.
+- `lib/services/collaboratorProductService.ts`: CRUD + `computeProductMargin`. `collaboratorAdminService.ts` inclou `products` i KPIs `totalProducts`/`catalogValue`.
+- `app/api/admin/collaborators/[id]/products/route.ts` (GET/POST) + `[productId]/route.ts` (PATCH/DELETE).
+- `app/admin/collaborators/CollaboratorProductsPanel.tsx`: catàleg per col·laborador amb imatge (`next/image`), cost·PVP·marge (€ i %), CRUD inline, PVP autocompletat a cost×1,20 editable. Integrat a `CollaboratorsClient.tsx`.
+- `lib/constants/admin.ts`: `COLLABORATOR_DEFAULT_MARKUP = 0.20` + `ADMIN_COLLABORATOR_PRODUCT_EMPTY_FORM`.
+- `scripts/process-masquerade-images.mjs`: processa les 4 imatges del Word amb sharp (recrop + mirall + ajust to + recompressió + strip EXIF) anti-reverse-search → `public/img/collaborators/masquerade/`.
+- `scripts/seed-masquerade-products.mjs`: sembra idempotent 7 productes (marge 20%, bingo en 2 línies). **Pendent d'executar pel propietari** (escriu a producció, bloquejat per classificador).
+- `__tests__/lib/services/collaboratorProductService.test.ts`: 11 tests.
+
+### Productes Masquerade (cost → PVP)
+Animació temàtica 160→190 · Animació amb personatge 250→300 · El secret dels pirates 320→385 · Pintacares 70→85 · Globoflèxia 40→50 · Bingo musical 160→200 · Tècnic de so (bingo) 40→50. El bingo va separat del so perquè el propietari cobra com a venedor (bingo) i com a tècnic (so); 200+50 = 250€ al client.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK · 11 tests de `collaboratorProductService` OK.
+- Validació funcional: seed executat — 7 productes a Railway; `/admin/collaborators` mostra el catàleg amb KPIs nous (Productes/Valor catàleg) i CRUD operatiu.
+- Validació humana/UX: captura de la pàgina amb formulari de producte i marge en viu; imatges processades amb md5 i dimensions diferents de les originals (anti-reverse-search verificat).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 891. Següent canvi ha de ser `#892`.
+
+---
+
+## 2026-06-05 — PDF complet de dossier amb catàleg comercial filtrat (Canvi #890, codex)
+
+### Context
+Després del #888, el dossier ja era una peça editorial sense preus duplicats, però encara faltava el flux complet que havia demanat el propietari: un sol PDF amb el dossier bonic primer i, a continuació, les fitxes comercials només dels serveis seleccionats. El catàleg de Claude (#887 + #889) ja tenia el contingut i les features correctes; calia una capa compositora que el pogués afegir darrere del dossier.
+
+### Canvis
+- `lib/services/catalogPdfService.ts`: afegida `appendCatalogServicesToPdf()` per poder inserir fitxes de catàleg dins un `jsPDF` existent sense canviar el disseny intern del catàleg.
+- `lib/services/dossierCatalogSelectionService.ts`: nova capa pura que resol `productIds` del dossier cap a serveis de catàleg (`bingo-musical`/productes d'animació → `animacion`; slugs directes o prefixats → servei corresponent).
+- `lib/services/dossierCompositePdfService.ts`: nou generador `generateDossierCompositePDF()` amb portada carbon, introducció, capítols editorials sense preus i annex de catàleg filtrat dins el mateix PDF.
+- `app/api/admin/dossiers/[id]/composite/route.ts`: nova ruta admin autenticada que retorna `application/pdf` per al dossier complet desat.
+- `app/admin/dossiers/DossierListActions.tsx` i `app/admin/leads/[id]/LeadDossierActions.tsx`: botó `PDF complet` per obrir el document compost.
+- `app/studio/StudioShowroom.tsx` i `app/studio/studio.css`: el preview del dossier ja no mostra la taula/preus antics; mostra capítol editorial i annex de fitxa comercial filtrada.
+- `lib/constants/pdfDocuments.ts`: la fitxa Studio apunta ara a `generateDossierCompositePDF` i descriu el catàleg filtrat dins el mateix PDF.
+- `__tests__/lib/services/dossierCompositePdfService.test.ts` i `__tests__/lib/services/dossierCatalogSelectionService.test.ts`: cobertura nova del PDF compost i del mapping de serveis.
+- `ADMIN_CHANGE_COUNTER` 889 → 890.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `npx vitest run __tests__/lib/services/dossierCompositePdfService.test.ts __tests__/lib/services/dossierCatalogSelectionService.test.ts __tests__/lib/services/catalogPdfService.test.ts __tests__/lib/utils/dossier-html-builder.test.ts` OK (29 tests); `pnpm run qa:service-coverage`, `qa:api-admin-auth`, `qa:studio-integrity`, `qa:language`, `qa:patches` i `qa:pdf-preview-real-data` OK.
+- Validació funcional: un dossier desat pot obrir ara `/api/admin/dossiers/[id]/composite` i obtenir un sol PDF amb narrativa de dossier + fitxes del catàleg filtrades segons la selecció.
+- Validació humana/UX: Studio i els botons admin expliquen el flux correcte: primer dossier premium i després la informació comercial concreta, sense duplicar preus dins la narrativa.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 890. Següent canvi ha de ser `#891`.
+
+---
+
+## 2026-06-05 — Fix i18n: features pack Discomòbil/Festes/Animació resoltes al PDF (Canvi #889, claude)
+
+### Context
+Features dels packs Discomòbil, Festes i Animació no sortien al catàleg PDF. `normalizeCandidateKeys` no generava el candidat combinat (`services.mobile→pages.mobile` + `fN→N-1`). A partir d'ara, si s'afegeix un pack nou amb features a `pages.mobile.discoPacks.*`, apareix automàticament sense cap configuració extra.
+
+### Canvis
+- `lib/pack-i18n.ts`: `normalizeCandidateKeys` aplica conversió `services↔pages` a TOTS els candidats generats per `fN→N-1`, no només al base.
+- `ADMIN_CHANGE_COUNTER` 888 → 889.
+
+### Validació
+- Validació tècnica: `pnpm run validate:core` verd segons registre de tancament del tall.
+- Validació funcional: Festes, Discomòbil i Animació mostren ara les features correctes al catàleg PDF.
+- Validació humana/UX: el catàleg deixa de mostrar fitxes incompletes quan els packs tenen features definides a i18n.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 889. Següent canvi ha de ser `#890`.
+
+---
+
+## 2026-06-05 — Dossier editorial amb portada carbon i preus separats del catàleg (Canvi #888, codex)
+
+### Context
+El propietari ha concretat el criteri del dossier: la primera pàgina ha de ser com un llibre, amb fons carbon/negre, logo i nom de la persona; després han de venir les explicacions. El dossier no ha de competir amb la fitxa de preus: el catàleg comercial adjunt és qui ha de portar imports, condicions i fitxes seleccionades.
+
+### Canvis
+- `lib/utils/dossier-html-builder.ts`: la portada passa a ser obligatòria, amb logo si existeix i wordmark fallback si no hi ha `logoDataUri`; inclou nom, empresa i descripció d'esdeveniment quan venen informats.
+- `lib/utils/dossier-html-builder.ts`: afegida pàgina introductòria editorial abans dels capítols, amb salutació, resum de proposta i criteri explícit dossier narratiu + catàleg comercial seleccionat.
+- `lib/utils/dossier-html-builder.ts`: les propostes passen de "Proposta" a "Capítol", amb títol gran, descripció i llista de valor; s'eliminen taules de preus i cards DJ del dossier per no duplicar el catàleg.
+- `lib/constants/pdfDocuments.ts`: la fitxa Studio del dossier descriu ara portada carbon, cos editorial i separació de preus/condicions cap al catàleg comercial adjunt o filtrat.
+- `__tests__/lib/utils/dossier-html-builder.test.ts`: tests actualitzats per blindar portada sempre present, capítols numerats i absència de preus/taules dins el dossier.
+- `ADMIN_CHANGE_COUNTER` 887 → 888.
+
+### Validació
+- Validació tècnica: `pnpm vitest run __tests__/lib/utils/dossier-html-builder.test.ts` OK (16 tests) · `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: el dossier generat obre sempre amb portada carbon i separa la narrativa de valor de la fitxa comercial; el generador manté selecció múltiple, de manera que pot renderitzar tota l'oferta activa o només els elements triats.
+- Validació humana/UX: el primer impacte passa a ser de llibre premium amb el nom del client; després s'explica l'oferta abans de parlar de números, alineat amb el criteri del propietari.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 888. Següent canvi ha de ser `#889`.
+
+---
+
+## 2026-06-05 — Catàleg PDF complet: tots els serveis al visor Studio (Canvi #887, claude)
+
+### Context
+El propietari ha demanat que el preview del catàleg de serveis al visor Studio mostri tots els serveis (Festes, Casaments, Discomòbil, Empreses, Animació) exactament com apareixeran al document real, no una mostra d'un sol servei. Quan es genera un catàleg per un client real (`generateServiceBrochure`), s'envia únicament el servei rellevant.
+
+### Canvis
+- `lib/services/catalogPdfService.ts`: extreta la lògica de dibuix de contingut a `drawServiceBrochureContent()` (funció interna). Nova funció pública `generateFullCatalogPDF(services?, locale?)` que genera un PDF multi-pàgina amb tots els serveis: una pàgina per servei, numeració global, bloc de contacte a l'última pàgina. `generateServiceBrochure` segueix igual per a l'ús real (un servei per document).
+- `app/api/admin/studio/preview/cataleg/route.ts`: sense `?service=` → genera catàleg complet (`generateFullCatalogPDF`); amb `?service=X` → catàleg d'un sol servei (`generateServiceBrochure`). Afegit paràmetre `?locale=`.
+- `__tests__/lib/services/catalogPdfService.test.ts`: 2 tests nous per `generateFullCatalogPDF` (tots els serveis ≥5 pàgines; subconjunt de serveis ≥2 pàgines).
+- `ADMIN_CHANGE_COUNTER` 884 → 887.
+
+### Validació
+- `pnpm vitest run __tests__/lib/services/catalogPdfService.test.ts` → 6/6 OK.
+- `pnpm run validate:core` → verd.
+- `npx tsc --noEmit` → 0 errors.
+- Preview browser: PDF generat 520KB, 5 pàgines (1/5 Festes → 5/5 Animació), numeració global, bloc contacte pàgina 5.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 887. Següent canvi ha de ser `#888`.
+
+---
+
 ## 2026-06-05 — Normalització documental a `admin-protocol`/`admin-diary` i previews PDF amb `XXXXXX` (Canvi #884, codex)
 
 ### Context

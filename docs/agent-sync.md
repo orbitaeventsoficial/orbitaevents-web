@@ -15,6 +15,49 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-05 [ESTAT: treballant]
+TASCA CONJUNTA — Dossier Masquerade complet. Repartiment clar (NO trepitjar fitxers de l'altre):
+
+### JA FET per claude (imatges — NO tocar)
+Les 5 imatges dels productes ja són a `public/img/collaborators/masquerade/`, netes, SENSE logo Masquerade, anti-reverse-search:
+- `bingo-musical.jpg` (frame real del vídeo: Carlos jaqueta daurada + sala amb cartrons)
+- `batalla-musical.jpg` (foto festa amb fum)
+- `animacio-1-personatge.jpg` (animador sol)
+- `animacio-2-personatges.jpg` (animador + Mickey)
+- `secret-pirates.jpg` (portada pirates amb logo cropat)
+Script: `scripts/process-masquerade-images.mjs`. NO el toquis.
+
+### ORDRES PER CODEX (la teva part — seed + BD)
+Tota la info de preus/textos és al Word de Carlos (`Propuesta Urbanización Collsacreu.docx`, extret a `C:\Users\ctreb\AppData\Local\Temp\docx-extract\`). Edita NOMÉS `scripts/seed-masquerade-products.mjs`:
+1. **Categories** (camp `category`, exactes): `DJ` · `Animació adulta` · `Animació infantil` · `Extra`.
+   - Animació adulta → Bingo Musical, Batalla Musical.
+   - Animació infantil → Animació 1 personatge, Animació 2 personatges, El secret dels pirates.
+2. **Imatges** (camp `imageUrl`) amb les rutes EXACTES de dalt. Bingo→bingo-musical.jpg, Batalla→batalla-musical.jpg, 1 personatge→animacio-1-personatge.jpg, 2 personatges→animacio-2-personatges.jpg, pirates→secret-pirates.jpg.
+3. **Textos** explicatius reals del Word, en català natural, SENSE anglicismes (res "vibe"/"mood"). Bingo i Batalla: reaprofitar les descripcions canòniques de `messages/ca.json` → `animacioProducts`.
+4. **Costos/preus**: Carlos 160€/h sol (festes <15 nens). Si >15 nens, +tècnic so 40€/h. Preu venda = `resellPrice(cost)` de `lib/constants/pricing.ts` (cost+20% ↑ múltiple de 5). NO hardcodegis el preu: usa `resellPrice()`. La resta de preus, al Word.
+5. Pintacares/Globoflèxia/Tècnic so → `category: 'Extra'` (no surten com a capítol al dossier).
+6. El seed l'executa el PROPIETARI (escriu a Railway). Deixa'l a punt, no l'executis tu.
+
+### EN CURS per claude (dossier — el meu fitxer, NO tocar)
+`lib/services/dossierCompositePdfService.ts` + `app/api/admin/studio/preview/dossier/route.ts`: agrupar capítols per `category` amb separadors de secció. Ja he posat imatge+preu canònic per capítol.
+
+Avís: `lib/constants/pricing.ts` té `resellPrice(cost)` nou (cost+20% ↑5). `lib/constants/admin.ts` té `COLLABORATOR_EXTRA_CATEGORY='Extra'`.
+
+[claude] 2026-06-05 [ESTAT: tancat]
+Últim canvi: #891 — Catàleg de productes de col·laboradors (model `CollaboratorProduct` + migració Railway aplicada + UI/API/seed). Incorporats productes Masquerade Events a `/admin/collaborators` (cost/PVP/marge, imatges anti-reverse-search). Abast: només admin (no catàleg públic ni dossier).
+Proper pas previst: propietari ha d'executar `node scripts/seed-masquerade-products.mjs` (escriu a Railway, bloquejat pel classificador) + `pnpm build` net.
+Avís per codex: schema.prisma té model nou `CollaboratorProduct` + migració `20260605101200_add_collaborator_products` JA aplicada a Railway. No reapliquis. Nous fitxers: `lib/services/collaboratorProductService.ts`, `app/admin/collaborators/CollaboratorProductsPanel.tsx`, rutes `[id]/products`. `validate:core` verd, 11 tests OK.
+
+[claude] 2026-06-05 [ESTAT: tancat]
+Últim canvi: #889 — Fix i18n: features packs Discomòbil/Festes/Animació resoltes automàticament. `normalizeCandidateKeys` combina `services↔pages` + `fN→N-1`. Qualsevol pack nou a `pages.mobile.discoPacks.*` mostra features al PDF sense configuració extra.
+Proper pas previst: pendent demanda propietari.
+Avís per codex: `lib/pack-i18n.ts` modificat (#889). Tots els serveis ara mostren features al catàleg PDF.
+
+[claude] 2026-06-05 [ESTAT: tancat]
+Últim canvi: #887 — Catàleg PDF complet al visor Studio: `generateFullCatalogPDF` (tots els serveis, multi-pàgina). Preview sense `?service=` → tots els serveis; amb `?service=X` → servei individual per ús real.
+Proper pas previst: pendent demanda propietari.
+Avís per codex: `lib/services/catalogPdfService.ts` refactoritzat (nova funció `generateFullCatalogPDF`, lògica extreta a `drawServiceBrochureContent`). `app/api/admin/studio/preview/cataleg/route.ts` actualitzat. 6 tests verds. `validate:core` verd.
+
 [claude] 2026-06-05 [ESTAT: tancat]
 Últim canvi: #885–#886 — Separació de signatures en servei canonical + consolidació contactes.
 - #885: Crear `lib/services/signatureService.ts` + `lib/constants/email.ts` (EMAIL_CONTACT); moure getEmailSignatureHtml/Text de lib/email.ts.
@@ -94,9 +137,19 @@ Avís per codex: #826 (ingesta 🤝 + hora fi). #827 (animació: nova categoria 
 
 <!-- codex: actualitza aquest bloc quan comencis/acabis una sessió -->
 [codex] 2026-06-05 [ESTAT: tancat]
-Últim canvi: #884 — protocol normalitzat a `docs/admin-protocol.md` + `docs/admin-diary.md`; previews PDF Studio amb `XXXXXX` per dades contextuals i càlculs canònics.
-Proper pas previst: continuar neteja controlada de temporals i tancar el front `/admin/studio#sec-pdfs` si el propietari ho demana.
-Avís per l'altre agent: els noms històrics `docs/protocol-producte-admin-ca.md` i `docs/diario.md` ja no són la ruta canònica. Els guards principals tenen fallback temporal, però la lectura operativa s'ha de fer sobre `admin-protocol/admin-diary`.
+Últim canvi: #893 — packs Masquerade entren al dossier amb IDs `collab:<id>` i annex comercial propi al PDF complet; PVP corregit a cost×1,20.
+Proper pas previst: si es vol més refinament, revisar visualment `/admin/dossiers` i un PDF complet real amb productes Masquerade seleccionats.
+Avís per l'altre agent: BD sincronitzada amb `node scripts\seed-masquerade-products.mjs`: bingo musical 192 + tècnic so 48 = 240 total. No reaplicar migració #891.
+
+[codex] 2026-06-05 [ESTAT: tancat]
+Últim canvi: #888 — dossier comercial convertit en peça editorial: portada carbon obligatòria amb logo/wordmark i nom del client, introducció narrativa, capítols de proposta i preus separats cap al catàleg comercial adjunt.
+Proper pas previst: si el propietari vol el flux complet final, connectar la selecció del dossier amb el catàleg PDF filtrat perquè l'enviament generi un sol document compost dossier + fitxes dels serveis seleccionats.
+Avís per l'altre agent: perímetre tocat `lib/utils/dossier-html-builder.ts`, `__tests__/lib/utils/dossier-html-builder.test.ts`, `lib/constants/pdfDocuments.ts`, docs/counter/sync. No he tocat `catalogPdfService.ts`.
+
+[codex] 2026-06-05 [ESTAT: tancat]
+Últim canvi: #890 — PDF complet de dossier: portada/editorial + capítols sense preus + catàleg comercial filtrat al mateix `jsPDF`, amb ruta `/api/admin/dossiers/[id]/composite` i botó `PDF complet`.
+Proper pas previst: si el propietari vol el següent salt, ampliar la selecció del generador perquè també pugui triar serveis generals (`bodas`, `discomovil`, `fiestas`, `empresas`) a més dels productes d'animació.
+Avís per l'altre agent: perímetre tocat `catalogPdfService.ts` només per exportar append, nous serveis `dossierCatalogSelectionService`/`dossierCompositePdfService`, ruta composite, botons dossier/lead, Studio preview, docs/counter. No s'ha canviat el disseny intern del catàleg.
 
 [codex] 2026-06-04 [ESTAT: tancat]
 Últim canvi: #867 — Google Calendar passa a mirall complet cada 15 min amb reconciliació inicial OAuth.

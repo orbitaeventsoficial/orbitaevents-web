@@ -888,31 +888,30 @@ export default function StudioShowroom() {
                   title={activePdfDocument.previewTitle}
                 />
               )}
-              {pdf === 'dossier' && (
+              {pdf === 'dossier' && !activePdfDocument.previewUrl && (
                 <div className="o-pdfdoc o-pdfdoc--dossier">
                   <div className="o-dossier-cover">
                     <img src="/img/logoplanetatextdreta.svg" alt="Òrbita Events" />
                     <div className="o-dossier-cover__line" />
                     <strong>Maria Garcia</strong>
-                    <span>Dossier de propostes · Òrbita Events</span>
+                    <em>Dossier preparat per a</em>
+                    <span>Dossier narratiu + fitxes comercials seleccionades</span>
+                  </div>
+                  <div className="o-dossier-greeting">
+                    {'Hola Maria, aquest dossier explica el to, el ritme i el valor de cada proposta abans de parlar de numeros. Les fitxes comercials filtrades apareixen al final del mateix PDF.'}
                   </div>
                   <div className="o-dossier-proposal">
                     <div className="o-dossier-proposal__header"><img src="/img/logoplanetatextdreta.svg" alt="Òrbita Events" /></div>
-                    <div className="o-dossier-proposal__title"><span>Proposta 01</span><strong>Bingo musical</strong></div>
-                    <p>Descripció comercial editable i adaptada a la proposta seleccionada.</p>
+                    <div className="o-dossier-proposal__title"><span>Capítol 01</span><strong>Bingo musical</strong></div>
+                    <p>Explicació editorial de l'experiència, el ritme de la sessió i el valor que aporta al grup.</p>
                     <div className="o-dossier-includes">
                       {['Presentador/a i DJ', 'Material de joc', 'Equip de so', 'Durada 1h30'].map((item) => <span key={item}>{item}</span>)}
                     </div>
-                    <table className="o-dossier-table">
-                      <thead><tr><th scope="col">Participants</th><th scope="col">Equip</th><th scope="col">Preu</th></tr></thead>
-                      <tbody>
-                        <tr><td>15–60 persones</td><td>DJ + Presentador/a</td><td>250€</td></tr>
-                        <tr><td>61–110 persones</td><td>DJ + Presentador/a + assistent/a</td><td>300€</td></tr>
-                      </tbody>
-                    </table>
                   </div>
-                  <div className="o-dossier-greeting">
-                    {'Hola Maria, gràcies per contactar amb nosaltres. T\'enviem aquestes propostes d\'animació pensades per al vostre event.'}
+                  <div className="o-dossier-catalog">
+                    <span>Fitxa comercial annexa</span>
+                    <strong>Catàleg Animació filtrat</strong>
+                    <p>Packs, condicions, extres i imports viuen aquí, després del dossier bonic.</p>
                   </div>
                   <div className="o-dossier-cta"><span>Per confirmar disponibilitat o per a qualsevol dubte</span><strong>+34 699 12 10 23 · info@orbitaevents.com</strong></div>
                 </div>

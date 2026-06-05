@@ -3,6 +3,10 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { getDossiersByLead } from '@/lib/services/dossierService';
 import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
+import {
+  collaboratorProductToAnimacioProduct,
+  listDossierCollaboratorProducts,
+} from '@/lib/services/collaboratorProductService';
 import { formatDateShort } from '@/lib/constants';
 import { LeadDossierActions } from './LeadDossierActions';
 
@@ -23,10 +27,15 @@ interface Props {
 }
 
 export async function LeadDossiersPanel({ leadId, leadNom, leadEmail, leadTelefon }: Props) {
-  const [dossiers, allProducts] = await Promise.all([
+  const [dossiers, animacioProducts, collaboratorProducts] = await Promise.all([
     getDossiersByLead(leadId),
     getAnimacioProducts('ca'),
+    listDossierCollaboratorProducts(),
   ]);
+  const allProducts = [
+    ...animacioProducts,
+    ...collaboratorProducts.map(collaboratorProductToAnimacioProduct),
+  ];
   const logoDataUri = readLogoDataUri();
 
   const newParams = new URLSearchParams();

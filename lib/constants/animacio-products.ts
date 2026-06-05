@@ -21,7 +21,24 @@ export type AnimacioProduct = {
   trams?: ProductPricingTier[];
   djOptions?: DJPricingOption[];
   durada?: string;
+  /** Preu canònic "des de" (mínim de trams/djOptions o sellPrice del col·laborador). Mai hardcoded. */
+  priceFrom?: number | null;
+  /** Categoria per agrupar al dossier (DJ, Animació adulta, Animació infantil...). */
+  categoria?: string;
 };
+
+/** Preu "des de" canònic d'un producte: mínim no-nul de trams o djOptions. */
+export function resolveAnimacioPriceFrom(product: { trams?: readonly ProductPricingTier[]; djOptions?: readonly DJPricingOption[] }): number | null {
+  const prices: number[] = [];
+  for (const tram of product.trams ?? []) {
+    if (typeof tram.price === 'number') prices.push(tram.price);
+  }
+  for (const option of product.djOptions ?? []) {
+    if (typeof option.price === 'number') prices.push(option.price);
+    if (typeof option.standalonePrice === 'number') prices.push(option.standalonePrice);
+  }
+  return prices.length > 0 ? Math.min(...prices) : null;
+}
 
 /** Dades estructurals (preus, trams, opcions DJ). Textos editables via /admin/text-manager. */
 export const ANIMACIO_PRODUCTS_STRUCTURE = [

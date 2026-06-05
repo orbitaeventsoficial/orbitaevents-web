@@ -4,6 +4,10 @@ import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver'
 import { buildDossierHtml, type DossierClientInfo } from '@/lib/utils/dossier-html-builder';
 import { sendEmail } from '@/lib/email';
 import { recordEmailSend } from '@/lib/services/emailTrackingService';
+import {
+  collaboratorProductToAnimacioProduct,
+  getDossierCollaboratorProductsByIds,
+} from '@/lib/services/collaboratorProductService';
 
 export type CreateDossierInput = {
   leadId?: string;
@@ -99,7 +103,11 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
   if (!dossier.email) return { ok: false, error: 'El dossier no té email de destinatari' };
 
   const allProducts = await getAnimacioProducts('ca');
-  const products = allProducts.filter((p) => dossier.productIds.includes(p.id));
+  const collaboratorProducts = await getDossierCollaboratorProductsByIds(dossier.productIds);
+  const products = [
+    ...allProducts.filter((p) => dossier.productIds.includes(p.id)),
+    ...collaboratorProducts.map(collaboratorProductToAnimacioProduct),
+  ];
   const recipientEmail = dossier.email!;
   const clientInfo: DossierClientInfo = {
     nom: dossier.nom,

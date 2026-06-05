@@ -28,6 +28,20 @@ export function roundMoney(amount: number): number {
   return Math.round(amount * 100) / 100;
 }
 
+/** Increment per defecte de revenda de serveis de proveïdor (sobre el cost). */
+export const RESELL_MARKUP = 0.20;
+
+/** Arrodoneix un import a l'alça al múltiple de `step` (per defecte 5 → preus acabats en 0 o 5). */
+export function ceilToStep(amount: number, step = 5): number {
+  if (step <= 0) return amount;
+  return Math.ceil(amount / step) * step;
+}
+
+/** Preu de venda canònic d'un servei revenut: cost + marge, arrodonit a l'alça a múltiple de 5. */
+export function resellPrice(cost: number, markup = RESELL_MARKUP, step = 5): number {
+  return ceilToStep(cost * (1 + markup), step);
+}
+
 export function calcDeposit(total: number): number {
   return Math.round(total * DEPOSIT_RATIO);
 }

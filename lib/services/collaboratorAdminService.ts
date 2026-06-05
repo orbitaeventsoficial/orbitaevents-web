@@ -36,10 +36,17 @@ export async function listAdminCollaborators() {
           },
         },
       },
+      products: {
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+      },
     },
   });
 
   const allBookings = collaborators.flatMap((collaborator) => collaborator.bookings);
+  const allProducts = collaborators.flatMap((collaborator) => collaborator.products);
+  const catalogValue = allProducts
+    .filter((product) => product.isActive)
+    .reduce((sum, product) => sum + (product.sellPrice || 0), 0);
   const totalCommissions = allBookings.reduce((sum, collaboratorBooking) => sum + collaboratorBooking.commissionAmount, 0);
   const totalRevenue = allBookings.reduce((sum, collaboratorBooking) => sum + (collaboratorBooking.booking.total || 0), 0);
   const pendingCommissions = allBookings
@@ -55,6 +62,8 @@ export async function listAdminCollaborators() {
       totalRevenue: Math.round(totalRevenue),
       totalCommissions: Math.round(totalCommissions),
       pendingCommissions: Math.round(pendingCommissions),
+      totalProducts: allProducts.length,
+      catalogValue: Math.round(catalogValue),
     },
   };
 }

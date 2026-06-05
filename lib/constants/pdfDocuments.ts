@@ -1,19 +1,19 @@
 export const PDF_HEADER_LAYOUT = {
   canonical: {
-    height: 44,
+    height: 36,
     logoWidth: 52,
     logoHeight: 14,
-    logoTop: 9,
-    brandMetaY: 34,
+    logoTop: 7,
+    brandMetaY: 28,
     contentX: 82,
     contentRight: 192,
-    eyebrowY: 11,
-    titleY: 23,
-    refY: 34,
+    eyebrowY: 9,
+    titleY: 20,
+    refY: 9,
     titleMaxSize: 16,
     titleMinSize: 11,
     contentGap: 6,
-    contentStartY: 50,
+    contentStartY: 42,
   },
 } as const;
 
@@ -43,8 +43,8 @@ export const PDF_DOCUMENT_CATALOG = [
   {
     id: 'cataleg',
     name: 'Catàleg de serveis',
-    generator: 'generateServiceBrochure',
-    previewUrl: '/api/admin/studio/preview/cataleg?service=bodas',
+    generator: 'generateFullCatalogPDF',
+    previewUrl: '/api/admin/studio/preview/cataleg',
     previewTitle: 'Catàleg PDF real',
     theme: 'paper clar + or',
     sections: ['Servei', 'Packs', 'Característiques', 'Extres compatibles', 'Contacte'],
@@ -76,24 +76,25 @@ export const PDF_DOCUMENT_CATALOG = [
   {
     id: 'dossier',
     name: 'Dossier comercial',
-    generator: 'buildDossierHtml',
-    previewUrl: null,
-    previewTitle: 'Dossier comercial',
-    theme: 'portada fosca + cos clar + or',
-    sections: ['Portada amb logo i nom', 'Propostes', 'Què inclou', 'Preus', 'Nota personalitzada', 'Contacte'],
+    generator: 'generateDossierCompositePDF',
+    previewUrl: '/api/admin/studio/preview/dossier',
+    previewTitle: 'Dossier comercial PDF real',
+    theme: 'portada carbon + cos editorial clar + or',
+    sections: ['Portada amb logo i nom del client', 'Introducció editorial', 'Explicació de propostes', 'Què aporta cada servei', 'Nota personalitzada', 'Contacte'],
     optionalSections: ['Empresa', 'Descripció de l’esdeveniment', 'Què no inclou'],
-    pagination: 'La portada ocupa la primera pàgina; cada producte ofertat comença en una pàgina nova amb el lockup horitzontal al header.',
+    pagination: 'La portada ocupa la primera pàgina com un llibre; després ve la narrativa de valor. Les fitxes de preus i condicions s\'afegeixen al mateix PDF amb el catàleg comercial filtrat.',
   },
 ] as const;
 
 export type PdfDocumentId = (typeof PDF_DOCUMENT_CATALOG)[number]['id'];
 
-export const PDF_PREVIEW_FILENAMES: Record<Exclude<PdfDocumentId, 'dossier'>, string> = {
+export const PDF_PREVIEW_FILENAMES: Record<PdfDocumentId, string> = {
   pressupost: 'preview-pressupost.pdf',
   contracte: 'preview-contracte.pdf',
   cataleg: 'preview-cataleg.pdf',
   informe: 'preview-informe.pdf',
   factura: 'preview-factura.pdf',
+  dossier: 'preview-dossier-comercial.pdf',
 } as const;
 
 export const PDF_PREVIEW_RESPONSE_HEADERS = {
