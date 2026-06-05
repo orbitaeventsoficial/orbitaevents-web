@@ -14321,6 +14321,19 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+### Canvi #897 — 2026-06-05 — claude (FET)
+**Dossier composite: fix duplicació de productes de col·laborador + extres opcionals + DJ/so al final.**
+- Context: en generar el dossier real per a un client (Cristina Rey), els productes de col·laborador sortien DUPLICATS (la ruta composite els passava a `products` ja mapejats I a `collaboratorProducts`; el generador fusionava els dos). A més calia oferir extres puntuals (màquina de bombolles 50€) i que el DJ anés al final com a opcional.
+- `app/api/admin/dossiers/[id]/composite/route.ts`: `products` només conté els productes propis d'animació; els de col·laborador entren NOMÉS via `collaboratorProducts`. Nou paràmetre `?extras=Nom:preu,...` per a extres opcionals.
+- `lib/services/dossierCompositePdfService.ts`: nou tipus `DossierExtra` + `drawExtras()` (secció "Extres opcionals" al final). Ordre canònic de categories: animació primer, DJ/so al final (CATEGORY_PRIORITY).
+- Validació tècnica: `npx tsc --noEmit` OK.
+- Validació funcional: dossier real per a Cristina Rey generat (9 pàgines: portada + intro + 5 animacions amb imatge/preu/explicació + DJ opcional + màquina de bombolles 50€), sense duplicats, encoding correcte.
+- Validació humana/UX: DJ presentat com a complement opcional al final; extres com a detalls per arrodonir.
+- `ADMIN_CHANGE_COUNTER` puja a `897`; el següent canvi real ha de ser `#898`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #896 — 2026-06-05 — claude (FET)
 **Portada i introducció del dossier refetes amb to proper i natural.**
 - Context: el propietari trobava la portada/intro massa de màrqueting ("Una proposta pensada per al vostre esdeveniment, no una llista de serveis") i va recordar que el dossier engloba TOT el catàleg (la selecció de què enviar es fa després). Calia un to càlid i humà, no una proposta a mida fingida.

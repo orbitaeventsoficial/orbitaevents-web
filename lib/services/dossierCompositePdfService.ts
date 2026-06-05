@@ -39,11 +39,14 @@ async function loadImageDataUrl(imageUrl?: string | null): Promise<string | null
   }
 }
 
+export type DossierExtra = { nom: string; preu: number };
+
 export type GenerateDossierCompositePdfInput = {
   client: DossierClientInfo;
   products: AnimacioProduct[];
   productIds: string[];
   collaboratorProducts?: DossierCollaboratorProduct[];
+  extras?: DossierExtra[];
   locale?: SupportedLocale;
   logoDataUri?: string;
 };
@@ -259,6 +262,45 @@ function drawProductChapter(doc: jsPDFType, product: AnimacioProduct, index: num
   }
 }
 
+function drawExtras(doc: jsPDFType, extras: DossierExtra[], locale: SupportedLocale): void {
+  if (extras.length === 0) return;
+  doc.addPage();
+  doc.setFillColor(...COLORS.paperBg);
+  doc.rect(0, 0, PAGE.width, PAGE.height, 'F');
+
+  let y = 40;
+  doc.setTextColor(...COLORS.gold);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.text('PER ARRODONIR-HO', PDF_DESIGN.left, y, { charSpace: 0.8 });
+  y += 13;
+
+  doc.setTextColor(...COLORS.paperText);
+  doc.setFontSize(24);
+  doc.text('Extres opcionals', PDF_DESIGN.left, y);
+  y += 14;
+
+  setStyleMuted(doc);
+  doc.text(doc.splitTextToSize('Petits detalls que podeu afegir si us fan il·lusió. No cal decidir-ho ara.', 150), PDF_DESIGN.left, y);
+  y += 14;
+
+  const moneyLocale = locale === 'ca' ? 'ca-ES' : locale;
+  extras.forEach((extra) => {
+    doc.setDrawColor(...COLORS.grayLight);
+    doc.setLineWidth(0.2);
+    doc.roundedRect(PDF_DESIGN.left, y, PDF_DESIGN.width, 13, 1.5, 1.5);
+    doc.setFillColor(...COLORS.gold);
+    doc.circle(PDF_DESIGN.left + 5, y + 6.5, 1.1, 'F');
+    setStyleBody(doc);
+    doc.setTextColor(...COLORS.paperText);
+    doc.text(extra.nom, PDF_DESIGN.left + 10, y + 8);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...COLORS.gold);
+    doc.text(formatCurrency(extra.preu, moneyLocale), PDF_DESIGN.right - 4, y + 8, { align: 'right' });
+    y += 17;
+  });
+}
+
 function drawFootersExceptCover(doc: jsPDFType): void {
   const totalPages = doc.internal.pages.length - 1;
   const website = normalizeWebsite(SITE_CONFIG.web.url);
@@ -280,11 +322,18 @@ export async function generateDossierCompositePDF(input: GenerateDossierComposit
   // Agrupa per categoria preservant l'ordre de primera aparició. Els productes sense
   // categoria queden a "Els nostres serveis".
   const fallbackCategory = 'Els nostres serveis';
+  // Ordre canònic: animació primer; el suport musical (DJ/so) va al final (opcional).
+  const CATEGORY_PRIORITY = ['Animació adulta', 'Animació infantil', 'DJ', 'DJ i so per a casaments'];
   const categoryOrder: string[] = [];
   for (const product of merged) {
     const cat = product.categoria || fallbackCategory;
     if (!categoryOrder.includes(cat)) categoryOrder.push(cat);
   }
+  categoryOrder.sort((a, b) => {
+    const ia = CATEGORY_PRIORITY.indexOf(a);
+    const ib = CATEGORY_PRIORITY.indexOf(b);
+    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+  });
   const allChapters = categoryOrder.flatMap((cat) =>
     merged.filter((product) => (product.categoria || fallbackCategory) === cat),
   );
@@ -300,6 +349,8 @@ export async function generateDossierCompositePDF(input: GenerateDossierComposit
     drawProductChapter(doc, product, index, locale, chapterImages[index], isNewCategory ? category : undefined);
     lastCategory = category;
   });
+
+  drawExtras(doc, input.extras ?? [], locale);
 
   drawFootersExceptCover(doc);
   return doc;

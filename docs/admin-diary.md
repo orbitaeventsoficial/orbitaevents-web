@@ -1,3 +1,25 @@
+## 2026-06-05 — Dossier composite: fix duplicació + extres + DJ al final (Canvi #897, claude)
+
+### Context
+Generant el dossier real per a Cristina Rey, els productes de col·laborador sortien duplicats (bug de la ruta composite). Calia també extres opcionals (màquina de bombolles 50€) i DJ al final com a opcional.
+
+### Canvis
+- `app/api/admin/dossiers/[id]/composite/route.ts`: `products` només animació pròpia; col·laboradors només via `collaboratorProducts` (fix duplicats). Nou `?extras=Nom:preu`.
+- `lib/services/dossierCompositePdfService.ts`: `DossierExtra` + `drawExtras()` (secció final). Ordre canònic de categories (animació primer, DJ/so al final).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK.
+- Validació funcional: dossier real Cristina Rey (9 pàgines, sense duplicats, DJ al final, bombolles 50€, encoding correcte). Desat a Downloads.
+- Validació humana/UX: DJ opcional al final; extres per arrodonir.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 897. Següent canvi ha de ser `#898`.
+
+---
+
 ## 2026-06-05 — Portada i intro del dossier amb to proper i natural (Canvi #896, claude)
 
 ### Context

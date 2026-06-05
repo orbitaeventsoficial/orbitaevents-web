@@ -5,10 +5,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
 import { getDossierById } from '@/lib/services/dossierService';
 import { generateDossierCompositePDF } from '@/lib/services/dossierCompositePdfService';
-import {
-  collaboratorProductToAnimacioProduct,
-  getDossierCollaboratorProductsByIds,
-} from '@/lib/services/collaboratorProductService';
+import { getDossierCollaboratorProductsByIds } from '@/lib/services/collaboratorProductService';
 import type { DossierClientInfo } from '@/lib/utils/dossier-html-builder';
 
 function readLogoDataUri(): string | undefined {
@@ -30,10 +27,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
   const allProducts = await getAnimacioProducts('ca');
   const collaboratorProducts = await getDossierCollaboratorProductsByIds(dossier.productIds);
-  const products = [
-    ...allProducts.filter((product) => dossier.productIds.includes(product.id)),
-    ...collaboratorProducts.map(collaboratorProductToAnimacioProduct),
-  ];
+  // Només productes propis d'animació aquí; els de col·laborador entren via
+  // `collaboratorProducts` (el generador ja els converteix). Evita duplicats.
+  const products = allProducts.filter((product) => dossier.productIds.includes(product.id));
   const client: DossierClientInfo = {
     nom: dossier.nom,
     empresa: dossier.empresa ?? undefined,
@@ -43,11 +39,24 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     salutacio: dossier.salutacio ?? undefined,
   };
 
+  // Extres opcionals via query: ?extras=Nom:preu,Nom2:preu2
+  const extrasParam = req.nextUrl.searchParams.get('extras');
+  const extras = (extrasParam ? extrasParam.split(',') : [])
+    .map((entry) => {
+      const idx = entry.lastIndexOf(':');
+      if (idx < 0) return null;
+      const nom = entry.slice(0, idx).trim();
+      const preu = Number(entry.slice(idx + 1).trim());
+      return nom && Number.isFinite(preu) ? { nom, preu } : null;
+    })
+    .filter((extra): extra is { nom: string; preu: number } => extra !== null);
+
   const doc = await generateDossierCompositePDF({
     client,
     products,
     productIds: dossier.productIds,
     collaboratorProducts,
+    extras,
     locale: 'ca',
     logoDataUri: readLogoDataUri(),
   });
