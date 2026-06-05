@@ -101,6 +101,17 @@ export function drawCanonicalPdfHeader(
     doc.text(displaySubtitle.toUpperCase(), layout.contentX, layout.eyebrowY, { charSpace: 0.45 });
   }
 
+  // Referència alineada amb l'eyebrow però a la dreta del contingut:
+  // metadada discreta que no competeix amb el títol ni s'amaga al peu.
+  if (displayRef) {
+    const segments = displayRef.split('·').map((part) => part.trim()).filter(Boolean);
+    const refLine = segments.length >= 3 ? segments.slice(0, 2).join(' · ') : displayRef;
+    doc.setTextColor(...COLORS.textMuted);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6.5);
+    doc.text(refLine, layout.contentRight, layout.eyebrowY, { align: 'right', charSpace: 0.3 });
+  }
+
   // Títol principal alineat a l'esquerra, amb auto-shrink per a noms llargs
   doc.setTextColor(...COLORS.textPrimary);
   doc.setFont('helvetica', 'bold');
@@ -115,16 +126,6 @@ export function drawCanonicalPdfHeader(
   // Filet or sota el títol — unifica l'estil amb el hero del catàleg
   doc.setFillColor(...COLORS.gold);
   doc.rect(layout.contentX, layout.titleY + 3, 28, 0.8, 'F');
-
-  // Referència / metadades en gris — si hi ha 3+ segments, en mostrem 2
-  if (displayRef) {
-    const segments = displayRef.split('·').map((part) => part.trim()).filter(Boolean);
-    const refLine = segments.length >= 3 ? segments.slice(0, 2).join(' · ') : displayRef;
-    doc.setTextColor(...COLORS.textSecondary);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7);
-    doc.text(refLine, layout.contentX, layout.refY);
-  }
 
   return layout.contentStartY;
 }

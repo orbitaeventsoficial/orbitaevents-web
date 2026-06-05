@@ -82,7 +82,8 @@ function fmtDate(d: Date | string, locale = 'ca'): string {
 }
 
 function statusDot(paid: boolean): [number, number, number] {
-  return paid ? COLORS.success : COLORS.danger;
+  // Pagat → or de marca · Pendent → gris neutre (mai vermell d'alarma)
+  return paid ? COLORS.gold : COLORS.grayLight;
 }
 
 // ── Generador ────────────────────────────────────────────────────────────────
