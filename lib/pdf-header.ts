@@ -82,12 +82,12 @@ export function drawCanonicalPdfHeader(
     doc.text('EVENTS', PDF_DESIGN.left, layout.logoTop + 13);
   }
 
-  // Web discret sota el lockup; la resta de contacte viu al footer.
+  // Web discreta just sota el logo, alineada a l'esquerra amb ell
   const contactWeb = normalizeWebsite(SITE_CONFIG.web.url);
   doc.setTextColor(...COLORS.textMuted);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(5.8);
-  doc.text(contactWeb, PDF_DESIGN.left, layout.brandMetaY);
+  doc.text(contactWeb, PDF_DESIGN.left, layout.logoTop + layout.logoHeight + 3);
 
   const titleWidth = layout.contentRight - layout.contentX;
   const displaySubtitle = subtitle || metaLines[0] || '';
@@ -273,7 +273,7 @@ export function fillToFooter(
 
   const left = PDF_DESIGN.left;
   const width = PDF_DESIGN.width;
-  const blockH = Math.min(remaining - 4, 46);
+  const blockH = Math.min(remaining - 4, 32);
   const top = currentY + 2;
 
   if (mode === 'value') {
@@ -339,19 +339,21 @@ export function drawAllPageFooters(
   contentEndY: number,
   contactLabel?: string,
 ): void {
-  // Bloc de contacte: intenta pintar-lo si hi ha espai
+  // Bloc de contacte: sempre que hi hagi mínim 10mm disponibles
   const items = contactLabel ? [{ title: contactLabel, body: '' }] : undefined;
-  const hasContactBlock = contentEndY < PDF_FILL_BOTTOM - 20;
-  const hasContactBlockSmall = !hasContactBlock && contentEndY < PDF_FILL_BOTTOM - 8;
+  const spaceAvailable = PDF_FILL_BOTTOM - contentEndY;
+  const hasContactBlock = spaceAvailable >= 20;
+  const hasContactBlockSmall = !hasContactBlock && spaceAvailable >= 10;
 
   if (hasContactBlock) {
     fillToFooter(doc, contentEndY, 'contact', items);
   } else if (hasContactBlockSmall) {
-    const anchorY = PDF_FILL_BOTTOM - 18;
-    if (anchorY > contentEndY) fillToFooter(doc, anchorY, 'contact', items);
+    // Bloc mínim ancorat just a dalt del footer
+    const anchorY = PDF_FILL_BOTTOM - 14;
+    if (anchorY >= contentEndY) fillToFooter(doc, anchorY, 'contact', items);
   }
 
-  // Línia daurada: si no hi ha espai per al bloc, posa el contacte dins la línia
+  // Línia daurada: si no hi ha cap espai (>= 10mm), integra el contacte
   const showContactInFooter = !hasContactBlock && !hasContactBlockSmall;
   const totalPages = doc.internal.pages.length - 1;
   const website = normalizeWebsite(SITE_CONFIG.web.url);

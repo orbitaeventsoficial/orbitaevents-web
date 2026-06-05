@@ -129,13 +129,9 @@ export async function generateServiceBrochure(
     pack.features.slice(0, maxF).forEach((feature, i) => {
       const cleanFeature = feature.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim();
       const fy = featureStart + i * 5.5;
-      // Check circular
+      // Punt or
       doc.setFillColor(...COLORS.gold);
-      doc.circle(px + 6, fy - 1.2, 1.2, 'F');
-      doc.setFillColor(...COLORS.canvas);
-      doc.setLineWidth(0.5);
-      doc.line(px + 4.8, fy - 1.2, px + 5.6, fy - 0.4);
-      doc.line(px + 5.6, fy - 0.4, px + 7.2, fy - 2.2);
+      doc.circle(px + 5.5, fy - 1.2, 1.0, 'F');
       setStyleBody(doc);
       doc.setTextColor(...COLORS.paperText);
       const featLines = doc.splitTextToSize(cleanFeature, featTextW);

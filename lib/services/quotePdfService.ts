@@ -291,67 +291,74 @@ export async function generateQuotePDF(
   drawLabelValue(t.guests, `${Math.max(0, data.guests)}`, left + 88, y + 6 + fieldHeight(dateUsed) + 2.5, 85, 2);
   y += eventBoxHeight + adaptiveGap;
 
-  // ── Pack seleccionat — card amb header negre (estil catàleg) ───────────────
-  const packCardHeaderH = 16;
-  const packNameLines = doc.splitTextToSize(resolvedPack.name, contentWidth - 56).slice(0, 1);
-  const packCardBodyH = 8;
-  const packCardTotalH = packCardHeaderH + packCardBodyH;
-  ensureSpace(packCardTotalH + adaptiveGap);
-  // Cos de la card amb barra or (un dels 2 únics blocs amb barra)
-  drawCard(left, y, contentWidth, packCardTotalH, 2, false, false);
-  // Franja negra superior
-  doc.setFillColor(...COLORS.canvas);
-  doc.roundedRect(left, y, contentWidth, packCardHeaderH, 2, 2, 'F');
-  doc.setFillColor(...COLORS.canvas);
-  doc.rect(left, y + packCardHeaderH / 2, contentWidth, packCardHeaderH / 2, 'F');
-  // Eyebrow "PACK SELECCIONAT" al header
-  doc.setTextColor(...muted);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(PDF_DESIGN.type.caption);
-  doc.text(t.selectedPack.toUpperCase(), left + 6, y + 5, { charSpace: 0.4 });
-  // Nom pack en or bold a l'esquerra
-  doc.setTextColor(...COLORS.gold);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(PDF_DESIGN.type.title);
-  doc.text(packNameLines, left + 6, y + 12);
-  // Durada en muted sota el nom dins el header
-  setStyleCaption(doc);
-  doc.setTextColor(...COLORS.textMuted);
-  doc.text(`${resolvedPack.durationHours} ${t.hours}`, left + contentWidth - 6, y + 5, { align: 'right' });
-  // Preu gran en blanc a la dreta del header
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...COLORS.white);
-  doc.setFontSize(PDF_DESIGN.type.money);
-  doc.text(formatPdfMoney(data.basePrice, locale), left + contentWidth - 6, y + 13, { align: 'right' });
-  y += packCardTotalH + adaptiveGap;
-
+  // ── Pack seleccionat — card unificada: header negre + features dins la card ─
   const features = resolvedPack.features
     .map((feature) => feature.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim())
     .filter(Boolean)
     .slice(0, 6);
 
+  const packCardHeaderH = 16;
+  const packNameLines = doc.splitTextToSize(resolvedPack.name, contentWidth - 56).slice(0, 1);
+  const featColW = contentWidth / 2 - 4;
+  const featRowH = 5.5;
+  const featLeftCount = Math.ceil(features.length / 2);
+  const featRows = features.length > 0 ? featLeftCount : 0;
+  const featuresBodyH = features.length > 0 ? 13 + featRows * featRowH + 6 : 8;
+  const packCardTotalH = packCardHeaderH + featuresBodyH;
+
+  ensureSpace(packCardTotalH + adaptiveGap);
+  // Card unificada amb barra or
+  drawCard(left, y, contentWidth, packCardTotalH, 2, false, false);
+  // Header negre
+  doc.setFillColor(...COLORS.canvas);
+  doc.roundedRect(left, y, contentWidth, packCardHeaderH, 2, 2, 'F');
+  doc.setFillColor(...COLORS.canvas);
+  doc.rect(left, y + packCardHeaderH / 2, contentWidth, packCardHeaderH / 2, 'F');
+  // Eyebrow
+  doc.setTextColor(...muted);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(PDF_DESIGN.type.caption);
+  doc.text(t.selectedPack.toUpperCase(), left + 6, y + 5, { charSpace: 0.4 });
+  // Nom pack en or bold
+  doc.setTextColor(...COLORS.gold);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(PDF_DESIGN.type.title);
+  doc.text(packNameLines, left + 6, y + 12);
+  // Durada i preu a la dreta
+  setStyleCaption(doc);
+  doc.setTextColor(...COLORS.textMuted);
+  doc.text(`${resolvedPack.durationHours} ${t.hours}`, left + contentWidth - 6, y + 5, { align: 'right' });
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...COLORS.white);
+  doc.setFontSize(PDF_DESIGN.type.money);
+  doc.text(formatPdfMoney(data.basePrice, locale), left + contentWidth - 6, y + 13, { align: 'right' });
+
+  // Features dins la card (cos ivori)
   if (features.length > 0) {
-    // Features en 2 columnes, directament sobre l'ivori (sense card)
-    const colW = contentWidth / 2 - 4;
-    const leftCount = Math.ceil(features.length / 2);
-    const rowsNeeded = leftCount;
-    const featRowH = 5.5;
-    const featuresBlockH = 12 + rowsNeeded * featRowH;
-    ensureSpace(featuresBlockH + 2);
-    const sectionY = drawCanonicalSectionTitle(doc, y - 2, t.features);
+    const featBodyTop = y + packCardHeaderH;
+    // Títol de secció dins la card
+    doc.setTextColor(...COLORS.gold);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(PDF_DESIGN.type.section);
+    doc.text(t.features.toUpperCase(), left + 6, featBodyTop + 7, { charSpace: 0.4 });
+    doc.setDrawColor(...COLORS.gold);
+    doc.setLineWidth(0.4);
+    doc.line(left + 6, featBodyTop + 9.5, left + 28, featBodyTop + 9.5);
+    const featStartY = featBodyTop + 14;
     features.forEach((feature, i) => {
-      const col = i < leftCount ? 0 : 1;
-      const rowIdx = i < leftCount ? i : i - leftCount;
-      const cx = left + 4 + col * (colW + 8);
-      const cy = sectionY + rowIdx * featRowH;
+      const col = i < featLeftCount ? 0 : 1;
+      const rowIdx = i < featLeftCount ? i : i - featLeftCount;
+      const cx = left + 6 + col * (featColW + 8);
+      const cy = featStartY + rowIdx * featRowH;
       doc.setFillColor(...accent);
       doc.circle(cx + 1.5, cy - 1.25, 0.95, 'F');
       setStyleBody(doc);
-      const fLine = doc.splitTextToSize(feature, colW - 7).slice(0, 1)[0] || feature;
+      const fLine = doc.splitTextToSize(feature, featColW - 7).slice(0, 1)[0] || feature;
       doc.text(fLine, cx + 5, cy);
     });
-    y = sectionY + rowsNeeded * featRowH + PDF_DESIGN.blockGap * 0.5;
   }
+
+  y += packCardTotalH + adaptiveGap;
 
   if (data.extras.length > 0) {
     const extrasRows = data.extras.slice(0, 6);
@@ -411,7 +418,7 @@ export async function generateQuotePDF(
 
   // El resum pot quedar al primer full encara que les condicions necessitin continuar.
   ensureSpace(summaryHeight + 4);
-  drawCard(left, y, contentWidth, summaryHeight, 2, true, false);
+  drawCard(left, y, contentWidth, summaryHeight, 2, true, true);
   doc.setTextColor(...neutral);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(PDF_DESIGN.type.section);
