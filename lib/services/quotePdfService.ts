@@ -467,11 +467,12 @@ export async function generateQuotePDF(
   setStylePrice(doc);
   doc.setTextColor(...COLORS.white);
   doc.text(formatPdfMoney(data.total, locale), left + contentWidth - 6, priceY + 7.2, { align: 'right' });
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(PDF_DESIGN.type.small);
-  doc.setTextColor(...COLORS.grayLight);
-  doc.text(t.disclaimer, left + 9, priceY + 11);
   y += summaryHeight + adaptiveGap;
+  // Disclaimer fora del quadre negre — visible en ivori
+  setStyleCaption(doc);
+  doc.setTextColor(...COLORS.textMuted);
+  doc.text(t.disclaimer, left + 4, y);
+  y += 5;
 
   // Les condicions són un resum opcional: no han d'obrir un full gairebé buit.
   if (conditions.length > 0 && y + conditionHeight + 2 <= pageBottom) {

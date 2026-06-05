@@ -129,11 +129,13 @@ export function drawCanonicalPdfFooter(
   total: number,
   leftText = normalizeWebsite(SITE_CONFIG.web.url),
   centerText = '',
+  showContact = false,
 ): void {
-  const y = 282;
+  const y = showContact ? 276 : 282;
+  const h = showContact ? 22 : 16;
   // Franja paper càlida
   doc.setFillColor(...COLORS.paperBg);
-  doc.rect(0, y - 1, PAGE.width, 16, 'F');
+  doc.rect(0, y - 1, PAGE.width, h, 'F');
   // Hairline or
   doc.setDrawColor(...COLORS.gold);
   doc.setLineWidth(0.35);
@@ -142,11 +144,24 @@ export function drawCanonicalPdfFooter(
   doc.setTextColor(...COLORS.paperMuted);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(PDF_DESIGN.type.caption);
-  doc.text(leftText, PDF_DESIGN.left, y + 7);
-  if (centerText) {
-    doc.text(centerText, PAGE.width / 2, y + 7, { align: 'center' });
+  if (showContact) {
+    const contactLine = [
+      normalizeWebsite(SITE_CONFIG.web.url),
+      SITE_CONFIG.business.email,
+      SITE_CONFIG.business.phoneDisplay || SITE_CONFIG.business.phone,
+    ].filter(Boolean).join('  ·  ');
+    doc.setTextColor(...COLORS.gold);
+    doc.text(contactLine, PDF_DESIGN.left, y + 6);
+    doc.setTextColor(...COLORS.paperMuted);
+    doc.text(leftText, PDF_DESIGN.left, y + 13);
+    doc.text(`${page} / ${total}`, PDF_DESIGN.right, y + 13, { align: 'right' });
+  } else {
+    doc.text(leftText, PDF_DESIGN.left, y + 7);
+    if (centerText) {
+      doc.text(centerText, PAGE.width / 2, y + 7, { align: 'center' });
+    }
+    doc.text(`${page} / ${total}`, PDF_DESIGN.right, y + 7, { align: 'right' });
   }
-  doc.text(`${page} / ${total}`, PDF_DESIGN.right, y + 7, { align: 'right' });
 }
 
 export function drawCanonicalSectionTitle(doc: jsPDFType, y: number, title: string): number {
@@ -317,20 +332,24 @@ export function drawAllPageFooters(
   contentEndY: number,
   contactLabel?: string,
 ): void {
-  // Bloc de contacte: genèric si no hi ha label, amb CTA si n'hi ha
+  // Bloc de contacte: intenta pintar-lo si hi ha espai
   const items = contactLabel ? [{ title: contactLabel, body: '' }] : undefined;
-  if (contentEndY < PDF_FILL_BOTTOM - 20) {
+  const hasContactBlock = contentEndY < PDF_FILL_BOTTOM - 20;
+  const hasContactBlockSmall = !hasContactBlock && contentEndY < PDF_FILL_BOTTOM - 8;
+
+  if (hasContactBlock) {
     fillToFooter(doc, contentEndY, 'contact', items);
-  } else if (contentEndY < PDF_FILL_BOTTOM - 8) {
+  } else if (hasContactBlockSmall) {
     const anchorY = PDF_FILL_BOTTOM - 18;
     if (anchorY > contentEndY) fillToFooter(doc, anchorY, 'contact', items);
   }
 
-  // Línia daurada + paginació en totes les pàgines
+  // Línia daurada: si no hi ha espai per al bloc, posa el contacte dins la línia
+  const showContactInFooter = !hasContactBlock && !hasContactBlockSmall;
   const totalPages = doc.internal.pages.length - 1;
   const website = normalizeWebsite(SITE_CONFIG.web.url);
   for (let page = 1; page <= totalPages; page++) {
     doc.setPage(page);
-    drawCanonicalPdfFooter(doc, page, totalPages, website);
+    drawCanonicalPdfFooter(doc, page, totalPages, website, '', showContactInFooter);
   }
 }
