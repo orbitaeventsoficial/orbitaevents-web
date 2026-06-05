@@ -500,74 +500,69 @@ export async function generateQuotePDF(
     }
   }
 
-  // CTA 3 passos: banda fixa al peu (y=230..258). Es pinta sempre que cap a la 1a pàg.
+  // CTA 3 passos: banda horitzontal compacta de 18mm, ancorada al peu
   const isFirstAndOnlyPage = doc.internal.pages.length - 1 === 1;
-  const footerZoneStart = 258;
-  const ctaReservedTop = 230;  // CTA ocupa 230..258 (28mm)
-  const canDrawCta = isFirstAndOnlyPage && y <= ctaReservedTop;
+  const ctaH = 18;
+  const ctaTop = PDF_FILL_BOTTOM - ctaH; // ~244
+  const canDrawCta = isFirstAndOnlyPage && y <= ctaTop - 8;
 
-  // Omple l'espai entre el contingut i la banda del CTA
-  if (isFirstAndOnlyPage && canDrawCta && y < ctaReservedTop - 14) {
-    fillToFooter(doc, y, 'value', undefined, ctaReservedTop);
-  } else if (isFirstAndOnlyPage && !canDrawCta && y < PDF_FILL_BOTTOM - 24) {
-    fillToFooter(doc, y, 'contact');
-  } else if (isFirstAndOnlyPage && !canDrawCta && y < PDF_FILL_BOTTOM - 8) {
-    const anchorY = PDF_FILL_BOTTOM - 22;
-    if (anchorY > y) fillToFooter(doc, anchorY, 'contact');
+  // Omple l'espai entre contingut i CTA
+  if (isFirstAndOnlyPage && canDrawCta && y < ctaTop - 14) {
+    fillToFooter(doc, y, 'value', undefined, ctaTop);
+  } else if (!canDrawCta && y < PDF_FILL_BOTTOM - 20) {
+    fillToFooter(doc, y, 'contact', [{ title: PDF_FILL_CONTACT_LABEL, body: '' }]);
   }
 
-  // ── Segell de validesa + CTA 3 passos ─────────────────────────────────────
   if (canDrawCta) {
-    // Segell circular validesa
-    const sealCx = left + contentWidth - 14;
-    const sealCy = footerZoneStart - 12;
-    doc.setFillColor(...COLORS.white);
-    doc.setDrawColor(...COLORS.gold);
-    doc.setLineWidth(0.5);
-    doc.circle(sealCx, sealCy, 12, 'FD');
-    doc.setTextColor(...COLORS.gold);
-    setStyleLabel(doc);
-    doc.text(t.validSeal, sealCx, sealCy - 3, { align: 'center' });
-    setStyleValue(doc);
-    doc.setTextColor(...COLORS.gold);
-    doc.text(`${validityDays}`, sealCx, sealCy + 3, { align: 'center' });
-    setStyleCaption(doc);
-    doc.text(t.validUntilSuffix, sealCx, sealCy + 7.5, { align: 'center' });
-
-    // CTA 3 passos
     const steps = [
       { num: '1', label: t.ctaStep1 },
       { num: '2', label: t.ctaStep2 },
       { num: '3', label: t.ctaStep3 },
     ];
-    const stepW = (contentWidth - 36) / 3;
-    let sx = left + 4;
-    for (let i = 0; i < steps.length; i++) {
-      const scx = sx + stepW / 2;
-      const scy = footerZoneStart - 10;
+    // Franja de fons
+    doc.setFillColor(...COLORS.blackSoft);
+    doc.roundedRect(left, ctaTop, contentWidth, ctaH, 2, 2, 'F');
+    doc.setFillColor(...COLORS.gold);
+    doc.roundedRect(left, ctaTop, 2, ctaH, 0.5, 0.5, 'F');
+
+    // Segell inline a la dreta: "15 dies"
+    const sealCx = left + contentWidth - 10;
+    const sealCy = ctaTop + ctaH / 2;
+    doc.setFillColor(...COLORS.canvas);
+    doc.setDrawColor(...COLORS.gold);
+    doc.setLineWidth(0.4);
+    doc.circle(sealCx, sealCy, 7, 'FD');
+    doc.setTextColor(...COLORS.gold);
+    setStyleLabel(doc);
+    doc.text(t.validSeal, sealCx, sealCy - 1.5, { align: 'center' });
+    setStyleCaption(doc);
+    doc.text(`${validityDays} ${t.validUntilSuffix}`, sealCx, sealCy + 3.5, { align: 'center' });
+
+    // 3 passos en fila
+    const stepsWidth = contentWidth - 26;
+    const stepW = stepsWidth / 3;
+    steps.forEach((step, i) => {
+      const sx = left + 6 + i * stepW;
+      const cy = ctaTop + ctaH / 2;
       // Cercle numerat
       doc.setFillColor(...COLORS.gold);
-      doc.circle(scx, scy, 5, 'F');
+      doc.circle(sx + 4, cy, 4, 'F');
       doc.setTextColor(...COLORS.blackSoft);
       setStyleValue(doc);
-      doc.setTextColor(...COLORS.blackSoft);
-      doc.text(steps[i].num, scx, scy + 2.5, { align: 'center' });
+      doc.text(step.num, sx + 4, cy + 1.5, { align: 'center' });
       // Connector
-      if (i < steps.length - 1) {
-        doc.setDrawColor(...COLORS.grayLight);
-        doc.setLineWidth(0.3);
-        doc.line(scx + 5, scy, scx + stepW + 5, scy);
+      if (i < 2) {
+        doc.setDrawColor(...COLORS.gold);
+        doc.setLineWidth(0.25);
+        doc.line(sx + 8, cy, sx + stepW - 2, cy);
       }
       // Label
       setStyleCaption(doc);
-      const labelLines = doc.splitTextToSize(steps[i].label, stepW - 2);
-      doc.text(labelLines.slice(0, 2), scx, scy + 9, { align: 'center' });
-      sx += stepW + 12;
-    }
+      doc.setTextColor(...COLORS.textMuted);
+      doc.text(step.label, sx + 10, cy + 1.5);
+    });
   }
 
-  // Footer canònic (contacte + línia daurada)
-  // Quan hi ha CTA el contingut ja arriba fins a footerZoneStart=258, drawAllPageFooters gestiona l'espai restant
-  drawAllPageFooters(doc, canDrawCta ? footerZoneStart : y, canDrawCta ? undefined : PDF_FILL_CONTACT_LABEL);
+  drawAllPageFooters(doc, canDrawCta ? ctaTop + ctaH : y, canDrawCta ? undefined : PDF_FILL_CONTACT_LABEL);
   return doc;
 }

@@ -82,56 +82,59 @@ export async function generateServiceBrochure(
     const isPopular = pack.popular;
     const isPremium = pack.highlight || pack.badge === 'Premium';
 
-    doc.setFillColor(...COLORS.white);
-    doc.setDrawColor(isPopular ? COLORS.gold[0] : COLORS.grayLight[0], isPopular ? COLORS.gold[1] : COLORS.grayLight[1], isPopular ? COLORS.gold[2] : COLORS.grayLight[2]);
-    doc.setLineWidth(isPopular ? 0.5 : 0.25);
-    doc.roundedRect(px, py, packCardW, packCardHeight, 2, 2, 'FD');
+    // Cos de la targeta: fons ivori + vora or si popular
+    doc.setFillColor(...COLORS.paperBg);
+    doc.setDrawColor(...(isPopular ? COLORS.gold : COLORS.grayLight));
+    doc.setLineWidth(isPopular ? 0.6 : 0.25);
+    doc.roundedRect(px, py, packCardW, packCardHeight, 2.5, 2.5, 'FD');
 
-    // Banda superior accent
-    doc.setFillColor(...COLORS.gold);
-    doc.roundedRect(px, py, packCardW, 1.5, 0.8, 0.8, 'F');
+    // Header negre de la targeta
+    const cardHeaderH = 12;
+    doc.setFillColor(...COLORS.canvas);
+    doc.roundedRect(px, py, packCardW, cardHeaderH, 2.5, 2.5, 'F');
+    doc.setFillColor(...COLORS.canvas);
+    doc.rect(px, py + cardHeaderH / 2, packCardW, cardHeaderH / 2, 'F');
 
-    // Badge popular/premium — cantonada SUPERIOR ESQUERRA (no xoca amb preu)
-    if (isPopular || isPremium) {
-      const badgeText = isPopular ? t.popular : t.premium;
-      doc.setFontSize(PDF_DESIGN.type.caption);
-      doc.setFont('helvetica', 'bold');
-      const badgeW = doc.getTextWidth(badgeText) + 6;
-      doc.setFillColor(...(isPopular ? COLORS.gold : COLORS.paperText));
-      doc.roundedRect(px + 5, py + 4, badgeW, 5.5, 1.2, 1.2, 'F');
-      doc.setTextColor(...(isPopular ? COLORS.blackSoft : COLORS.white));
-      doc.text(badgeText, px + 5 + badgeW / 2, py + 7.9, { align: 'center' });
-    }
-
-    // Preu destacat + "des de" a la dreta (zona lliure)
-    setStyleCaption(doc);
-    doc.text(t.from, px + packCardW - 4, py + 6, { align: 'right' });
-    setStylePrice(doc);
-    doc.text(formatPdfMoney(pack.priceValue, locale), px + packCardW - 4, py + 13, { align: 'right' });
-
-    // Nom pack (baixat per fer lloc al badge si existeix)
-    const nameTopY = (isPopular || isPremium) ? py + 14 : py + 11;
-    // setStyleValue equivalent inline (no exported from pdf-header)
-    doc.setTextColor(...COLORS.paperText);
+    // Nom pack al header negre
+    doc.setTextColor(...COLORS.gold);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(PDF_DESIGN.type.body);
-    const packNameLines = doc.splitTextToSize(pack.name, packCardW - 10).slice(0, 2);
-    doc.text(packNameLines, px + 5, nameTopY);
+    const packNameLines = doc.splitTextToSize(pack.name, packCardW - 28).slice(0, 1);
+    doc.text(packNameLines, px + 5, py + 8);
 
-    // Durada
+    // Preu gran al header, alineat a la dreta
+    setStylePrice(doc);
+    doc.text(formatPdfMoney(pack.priceValue, locale), px + packCardW - 4, py + 9, { align: 'right' });
+
+    // Badge popular — punt or a la cantonada superior dreta (sobre el header)
+    if (isPopular) {
+      doc.setFillColor(...COLORS.gold);
+      doc.circle(px + packCardW - 3, py + 3, 2, 'F');
+    }
+
+    // Durada + label "des de"
+    const bodyTop = py + cardHeaderH + 4;
     setStyleCaption(doc);
-    doc.text(`${pack.durationHours} ${t.hours}`, px + 5, nameTopY + packNameLines.length * 5.5);
+    doc.setTextColor(...COLORS.textMuted);
+    doc.text(`${pack.durationHours} ${t.hours}`, px + 5, bodyTop);
+    doc.text(t.from, px + packCardW - 4, bodyTop, { align: 'right' });
 
-    // Features amb truncament per amplada real + el·lipsi
-    const featureStart = nameTopY + 12 + (packNameLines.length - 1) * 5.5;
-    const maxF = packGrid ? 4 : 3;
+    // Features amb check circular
+    const featureStart = bodyTop + 5;
+    const maxF = packGrid ? 3 : 3;
     const featTextW = packCardW - 14;
     pack.features.slice(0, maxF).forEach((feature, i) => {
       const cleanFeature = feature.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim();
       const fy = featureStart + i * 5.5;
+      // Check circular
       doc.setFillColor(...COLORS.gold);
-      doc.circle(px + 6, fy - 1.2, 0.8, 'F');
+      doc.circle(px + 6, fy - 1.2, 1.2, 'F');
+      doc.setFillColor(...COLORS.canvas);
+      doc.setLineWidth(0.5);
+      doc.line(px + 4.8, fy - 1.2, px + 5.6, fy - 0.4);
+      doc.line(px + 5.6, fy - 0.4, px + 7.2, fy - 2.2);
       setStyleBody(doc);
+      doc.setTextColor(...COLORS.paperText);
       const featLines = doc.splitTextToSize(cleanFeature, featTextW);
       let featText = featLines.length > 1
         ? featLines[0].replace(/\s+\S*$/, '') + '…'

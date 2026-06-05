@@ -492,25 +492,31 @@ export async function generateContractPDF(
     { x: providerX, label: t.signProvider, name: data.companyLegalName },
     { x: clientX, label: t.signClient, name: data.signedBy || '' },
   ].forEach(({ x, label, name }) => {
-    doc.setFillColor(...COLORS.surfaceWarm);
-    doc.roundedRect(x, providerBoxY, sigColWidth, signatureBoxHeight, 2, 2, 'F');
+    // Cos ivori + vora gris subtil
+    doc.setFillColor(...COLORS.paperBg);
     doc.setDrawColor(...COLORS.grayLight);
-    doc.setLineWidth(0.2);
-    doc.roundedRect(x, providerBoxY, sigColWidth, signatureBoxHeight, 2, 2, 'S');
-    // Línia de signatura
-    const lineY = providerBoxY + 18;
-    doc.setDrawColor(...COLORS.paperText);
-    doc.setLineWidth(0.4);
-    doc.line(x + 5, lineY, x + sigColWidth - 5, lineY);
-    // Label
-    setStyleCaption(doc);
-    doc.text(label, x + 5, lineY + 5);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(x, providerBoxY, sigColWidth, signatureBoxHeight, 2.5, 2.5, 'FD');
+    // Barra d'accent lateral esquerra
+    doc.setFillColor(...COLORS.gold);
+    doc.roundedRect(x, providerBoxY, 1.2, signatureBoxHeight, 0.5, 0.5, 'F');
+    // Label rol (eyebrow)
+    doc.setTextColor(...COLORS.textMuted);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(PDF_DESIGN.type.caption);
+    doc.text(label.toUpperCase(), x + 6, providerBoxY + 7);
     // Nom
     setStyleValue(doc);
-    doc.text(name || '____________________', x + 5, lineY + 11);
-    // Data
+    doc.setTextColor(...COLORS.paperText);
+    doc.text(name || '—', x + 6, providerBoxY + 13);
+    // Línia de signatura
+    const lineY = providerBoxY + 22;
+    doc.setDrawColor(...COLORS.grayLight);
+    doc.setLineWidth(0.4);
+    doc.line(x + 6, lineY, x + sigColWidth - 6, lineY);
     setStyleCaption(doc);
-    doc.text(`${t.signDate}: ____________________`, x + 5, lineY + 17);
+    doc.setTextColor(...COLORS.textMuted);
+    doc.text(`${t.signDate}: ____________________`, x + 6, lineY + 5);
   });
 
   // Imatge de signatura del client
