@@ -280,23 +280,30 @@ export function fillToFooter(
   }
 
   // mode === 'contact'
-  const h = Math.min(remaining - 4, 22);
   const contactLine = [
     normalizeWebsite(SITE_CONFIG.web.url),
     SITE_CONFIG.business.email,
     SITE_CONFIG.business.phoneDisplay || SITE_CONFIG.business.phone,
   ].filter(Boolean).join('  ·  ');
+  const hasLabel = Boolean(items?.[0]?.title);
+  const h = Math.min(remaining - 4, hasLabel ? 22 : 14);
   doc.setFillColor(...COLORS.blackSoft);
   doc.roundedRect(left, top, width, h, 2, 2, 'F');
   doc.setFillColor(...COLORS.gold);
   doc.roundedRect(left, top, 2.5, h, 0.5, 0.5, 'F');
-  doc.setTextColor(...COLORS.white);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(PDF_DESIGN.type.section);
-  doc.text(PDF_FILL_CONTACT_LABEL, left + 8, top + 7);
-  setStyleCaption(doc);
-  doc.setTextColor(...COLORS.gold);
-  doc.text(contactLine, left + 8, top + 13);
+  if (hasLabel) {
+    doc.setTextColor(...COLORS.white);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(PDF_DESIGN.type.section);
+    doc.text(items![0].title, left + 8, top + 7);
+    setStyleCaption(doc);
+    doc.setTextColor(...COLORS.gold);
+    doc.text(contactLine, left + 8, top + 13);
+  } else {
+    setStyleCaption(doc);
+    doc.setTextColor(...COLORS.gold);
+    doc.text(contactLine, left + 8, top + 8);
+  }
   return top + h;
 }
 
@@ -308,13 +315,15 @@ export function fillToFooter(
 export function drawAllPageFooters(
   doc: jsPDFType,
   contentEndY: number,
+  contactLabel?: string,
 ): void {
-  // Bloc de contacte: ancorat al peu si hi ha espai
-  if (contentEndY < PDF_FILL_BOTTOM - 24) {
-    fillToFooter(doc, contentEndY, 'contact');
+  // Bloc de contacte: genèric si no hi ha label, amb CTA si n'hi ha
+  const items = contactLabel ? [{ title: contactLabel, body: '' }] : undefined;
+  if (contentEndY < PDF_FILL_BOTTOM - 20) {
+    fillToFooter(doc, contentEndY, 'contact', items);
   } else if (contentEndY < PDF_FILL_BOTTOM - 8) {
-    const anchorY = PDF_FILL_BOTTOM - 22;
-    if (anchorY > contentEndY) fillToFooter(doc, anchorY, 'contact');
+    const anchorY = PDF_FILL_BOTTOM - 18;
+    if (anchorY > contentEndY) fillToFooter(doc, anchorY, 'contact', items);
   }
 
   // Línia daurada + paginació en totes les pàgines

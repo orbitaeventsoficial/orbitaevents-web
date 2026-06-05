@@ -5,7 +5,7 @@
 
 import { EXTRAS, type ExtraDefinition, type ServiceSlug, type PackDefinition } from '@/app/config/packs-config';
 import { resolvePackI18nKey, resolvePackI18nFeatures } from '@/lib/pack-i18n';
-import { toIntlLocale } from '@/lib/constants';
+import { toIntlLocale, PDF_FILL_CONTACT_LABEL } from '@/lib/constants';
 import {
   PDF_DESIGN, PDF_BODY_SIZE, PDF_FILL_BOTTOM,
   drawCanonicalPdfHeader, drawCanonicalSectionTitle,
@@ -568,6 +568,6 @@ export async function generateQuotePDF(
 
   // Footer canònic (contacte + línia daurada)
   // Quan hi ha CTA el contingut ja arriba fins a footerZoneStart=258, drawAllPageFooters gestiona l'espai restant
-  drawAllPageFooters(doc, canDrawCta ? footerZoneStart : y);
+  drawAllPageFooters(doc, canDrawCta ? footerZoneStart : y, canDrawCta ? undefined : PDF_FILL_CONTACT_LABEL);
   return doc;
 }

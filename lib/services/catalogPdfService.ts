@@ -6,6 +6,7 @@
 import { getPacksByService, EXTRAS, type ServiceSlug } from '@/app/config/packs-config';
 import { resolvePackI18nKey, resolvePackI18nFeatures } from '@/lib/pack-i18n';
 import { filterCompatibleExtras } from '@/lib/extrasCompatibility';
+import { PDF_FILL_CONTACT_LABEL } from '@/lib/constants';
 import {
   PDF_DESIGN, PDF_FILL_BOTTOM,
   drawCanonicalPdfHeader, drawCanonicalSectionTitle,
@@ -170,6 +171,6 @@ export async function generateServiceBrochure(
     y = fillToFooter(doc, y, 'value');
   }
 
-  drawAllPageFooters(doc, y);
+  drawAllPageFooters(doc, y, PDF_FILL_CONTACT_LABEL);
   return doc;
 }
