@@ -99,7 +99,7 @@ export async function generateServiceBrochure(
     doc.setTextColor(...COLORS.gold);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(PDF_DESIGN.type.body);
-    const packNameLines = doc.splitTextToSize(pack.name, packCardW - 28).slice(0, 1);
+    const packNameLines = doc.splitTextToSize(pack.name, packCardW - 32).slice(0, 1);
     doc.text(packNameLines, px + 5, py + 9);
 
     // "des de" + preu junts al header, alineats a la dreta

@@ -236,7 +236,7 @@ export async function generateQuotePDF(
     doc.roundedRect(x, top, width, height, rounded, rounded, 'S');
     if (!noBar) {
       doc.setFillColor(...accent);
-      doc.roundedRect(x, top + 1.5, 1.2, Math.max(2, height - 3), 0.6, 0.6, 'F');
+      doc.roundedRect(x, top + 1.5, 2.5, Math.max(2, height - 3), 0.8, 0.8, 'F');
     }
   };
 
