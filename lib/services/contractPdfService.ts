@@ -82,7 +82,7 @@ export async function generateContractPDF(
 
   const t = {
     ca: {
-      title: 'CONTRACTE DE PRESTACIÓ DE SERVEIS',
+      title: 'CONTRACTE DE SERVEIS',
       ref: 'Referència',
       date: 'Data',
       parties: 'LES PARTS',
@@ -128,7 +128,7 @@ export async function generateContractPDF(
       signedInline: 'Signat digitalment',
     },
     es: {
-      title: 'CONTRATO DE PRESTACIÓN DE SERVICIOS',
+      title: 'CONTRATO DE SERVICIOS',
       ref: 'Referencia',
       date: 'Fecha',
       parties: 'LAS PARTES',

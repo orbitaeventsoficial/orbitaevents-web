@@ -67,7 +67,7 @@ export async function generateServiceBrochure(
   const packCardW = packGrid
     ? (PDF_DESIGN.width - packGap * (packCols - 1)) / packCols
     : PDF_DESIGN.width;
-  const packCardHeight = packGrid ? 58 : 43;
+  const packCardHeight = packGrid ? 52 : 43;
   const gridRowH = packCardHeight + packGap;
   const gridRows = Math.ceil(packs.length / packCols);
 

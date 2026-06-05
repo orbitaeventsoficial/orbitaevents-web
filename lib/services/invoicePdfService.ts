@@ -135,7 +135,7 @@ export async function generateInvoicePDF(
   const left = PDF_DESIGN.left;
   const right = PDF_DESIGN.right;
   const width = PDF_DESIGN.width;
-  const colW = (width - 8) / 2;
+  const colW = (width - PDF_DESIGN.columnGap) / 2;
 
   // ── Header ────────────────────────────────────────────────────────────────
   let y = drawCanonicalPdfHeader(doc, {
@@ -145,7 +145,7 @@ export async function generateInvoicePDF(
   });
 
   // ── Parts: De / A ─────────────────────────────────────────────────────────
-  const partyContentWidth = colW - 8;
+  const partyContentWidth = colW - 6;
   const partyLineHeight = 4.5;
   const measureParty = (name: string, fields: Array<[string, string | undefined]>) => {
     const nameLines = doc.splitTextToSize(name, partyContentWidth);
