@@ -92,66 +92,47 @@ export default function BookingPackExtrasSection({
         </div>
 
         {selectedPackId && (
-          <div style={{ display: 'flex', gap: 16, marginTop: 16, flexWrap: 'wrap' }}>
-            <div className="nb__field" style={{ maxWidth: 180 }}>
-              <label htmlFor="nb-extra-hours" className="nb__label">Hores extra</label>
-              <input
-                id="nb-extra-hours"
-                type="number"
-                min={0}
-                max={10}
-                value={extraHours}
-                onChange={(e) => onExtraHoursChange(e.target.value)}
-                className="nb__input"
-              />
+          <div className="nb__pack-tune">
+            <p className="nb__pack-tune-title">Personalitza aquest pack</p>
+            <div className="nb__pack-tune-grid">
+              <div className="nb__field nb__field--narrow">
+                <label htmlFor="nb-extra-hours" className="nb__label">Hores extra</label>
+                <input
+                  id="nb-extra-hours" type="number" min={0} max={10}
+                  value={extraHours} onChange={(e) => onExtraHoursChange(e.target.value)}
+                  className="nb__input"
+                />
+              </div>
+              <div className="nb__field nb__field--narrow">
+                <label htmlFor="nb-custom-price" className="nb__label">Preu del pack</label>
+                <input
+                  id="nb-custom-price" type="number" min={0} placeholder="tarifa per defecte"
+                  value={customPackPrice} onChange={(e) => onCustomPackPriceChange(e.target.value)}
+                  className="nb__input"
+                />
+                <span className="nb__field-hint">si has pactat un preu diferent al de tarifa</span>
+              </div>
+              <div className="nb__field nb__field--narrow">
+                <label htmlFor="nb-manual-total" className="nb__label">Total tancat amb el client</label>
+                <input
+                  id="nb-manual-total" type="number" min={0} placeholder="Ex. 340"
+                  value={manualTotalPrice} onChange={(e) => onManualTotalPriceChange(e.target.value)}
+                  className="nb__input"
+                />
+                <span className="nb__field-hint">preu final pactat; substitueix el càlcul automàtic</span>
+              </div>
             </div>
-            <div className="nb__field" style={{ maxWidth: 180 }}>
-              <label htmlFor="nb-custom-price" className="nb__label">
-                Preu base pactat <span className="text-[11px] font-normal text-[var(--t3)]">(només pack)</span>
+            <div className="nb__invoice-row">
+              <label className="nb__invoice-check">
+                <input
+                  type="checkbox" checked={invoiceRequired}
+                  onChange={(e) => onInvoiceRequiredChange(e.target.checked)}
+                  role="switch" aria-checked={invoiceRequired}
+                />
+                Vol factura
+                {invoiceRequired && <span className="nb__vat-flag">+{VAT_RATE_INVOICE}% IVA</span>}
               </label>
-              <input
-                id="nb-custom-price"
-                type="number"
-                min={0}
-                placeholder="Preu del pack"
-                value={customPackPrice}
-                onChange={(e) => onCustomPackPriceChange(e.target.value)}
-                className="nb__input"
-              />
             </div>
-          </div>
-        )}
-
-        <div style={{ display: 'flex', gap: 16, marginTop: 16, flexWrap: 'wrap' }}>
-          <div className="nb__field" style={{ maxWidth: 190 }}>
-            <label htmlFor="nb-manual-total" className="nb__label">
-              Total final acordat <span className="text-[11px] font-normal text-[var(--t3)]">(guanya sobre tot)</span>
-            </label>
-            <input
-              id="nb-manual-total"
-              type="number"
-              min={0}
-              placeholder="Ex. 340"
-              value={manualTotalPrice}
-              onChange={(e) => onManualTotalPriceChange(e.target.value)}
-              className="nb__input"
-            />
-          </div>
-        </div>
-
-        {selectedPackId && (
-          <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
-            <label className="flex cursor-pointer items-center gap-2 text-[13px] text-[var(--t2)]">
-              <input
-                type="checkbox"
-                checked={invoiceRequired}
-                onChange={(e) => onInvoiceRequiredChange(e.target.checked)}
-                role="switch"
-                aria-checked={invoiceRequired}
-              />
-              Vol factura
-              {invoiceRequired && <span className="ml-1 text-[11px] text-[var(--o-warning)]">+{VAT_RATE_INVOICE}% IVA</span>}
-            </label>
           </div>
         )}
       </section>

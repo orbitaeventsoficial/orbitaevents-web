@@ -167,3 +167,22 @@ html.admin-mode .nb__spinner { width: 32px; height: 32px; border: 2px solid var(
   .nb__sl-label, .nb__sl-num, .nb__sl-qty { flex: 1 1 100%; }
   .nb__sl-del { flex: 1 1 100%; }
 }
+
+/* Capçalera de secció amb toggle (Origen i facturació plegable) */
+.nb__phead--toggle { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.nb__toggle { flex: none; min-height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--o-r-sm-2); background: transparent; color: var(--t2); font: inherit; font-size: var(--o-text-2xs); font-weight: var(--o-fw-semi); cursor: pointer; transition: border-color 130ms ease, color 130ms ease; }
+.nb__toggle:hover { border-color: var(--gold); color: var(--gold); }
+
+/* Personalització del pack (agrupada) */
+.nb__pack-tune { margin-top: 16px; padding: 14px; border: 1px solid var(--line); border-radius: var(--o-r-md-2); background: color-mix(in oklab, var(--panel) 60%, transparent); }
+.nb__pack-tune-title { margin: 0 0 10px; font-size: var(--o-text-2xs); font-weight: var(--o-fw-semi); text-transform: uppercase; letter-spacing: 0.04em; color: var(--t3); }
+.nb__pack-tune-grid { display: flex; gap: 16px; flex-wrap: wrap; }
+.nb__field--narrow { max-width: 200px; flex: 1 1 160px; }
+.nb__field-hint { margin-top: 4px; font-size: var(--o-text-2xs); font-weight: var(--o-fw-regular); color: var(--t3); }
+.nb__invoice-row { margin-top: 12px; display: flex; align-items: center; gap: 10px; }
+.nb__invoice-check { display: flex; cursor: pointer; align-items: center; gap: 8px; font-size: var(--o-text-sm); color: var(--t2); }
+.nb__vat-flag { margin-left: 4px; font-size: var(--o-text-2xs); color: var(--o-warning); }
+
+/* Selectors d'afegir línia de servei */
+.nb__sl-adder { max-width: 220px; flex: 1 1 180px; }
+.nb__sl-adder--wide { max-width: 260px; }

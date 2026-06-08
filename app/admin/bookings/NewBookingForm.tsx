@@ -64,6 +64,10 @@ export default function NewBookingForm() {
   const [invoiceRequired, setInvoiceRequired] = useState(false);
   const [sourceCollaboratorId, setSourceCollaboratorId] = useState('');
   const [billedCollaboratorId, setBilledCollaboratorId] = useState('');
+  const [showSourceBilling, setShowSourceBilling] = useState(false);
+  useEffect(() => {
+    if (sourceCollaboratorId || billedCollaboratorId) setShowSourceBilling(true);
+  }, [sourceCollaboratorId, billedCollaboratorId]);
   const { discountValidation, validatingCode, resetDiscountValidation, validateDiscountCode } = useBookingDiscountValidation({
     packs,
     selectedPackId: form.packId,
@@ -220,46 +224,6 @@ export default function NewBookingForm() {
             onFieldChange={updateField}
           />
 
-          <section className="nb__panel">
-            <div className="nb__phead">
-              <h2 className="nb__h2">Origen i facturació</h2>
-              <span className="nb__pintro">Qui ens passa el bolo i qui el paga</span>
-            </div>
-            <div className="grid gap-3 md:grid-cols-2">
-              <label className="nb__field">
-                <span className="nb__label">Bolo passat per</span>
-                <select
-                  value={sourceCollaboratorId}
-                  onChange={(e) => setSourceCollaboratorId(e.target.value)}
-                  className="nb__input"
-                >
-                  <option value="">Client directe (ningú)</option>
-                  {partners.map((partner) => (
-                    <option key={partner.id} value={partner.id}>
-                      {partner.company ? `${partner.name} · ${partner.company}` : partner.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="nb__field">
-                <span className="nb__label">Qui paga el bolo</span>
-                <select
-                  value={billedCollaboratorId}
-                  onChange={(e) => setBilledCollaboratorId(e.target.value)}
-                  className="nb__input"
-                >
-                  <option value="">El client final</option>
-                  {partners.map((partner) => (
-                    <option key={partner.id} value={partner.id}>
-                      Factura a: {partner.company ? `${partner.name} · ${partner.company}` : partner.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            <p className="nb__hint">Els serveis i productes del bolo (DJ, tècnic, animació…) s&apos;afegeixen a baix, a «Serveis i productes».</p>
-          </section>
-
           <BookingPackExtrasSection
             packs={packs}
             displayExtras={displayExtras}
@@ -282,6 +246,52 @@ export default function NewBookingForm() {
             lines={serviceLines}
             onChange={setServiceLines}
           />
+
+          <section className="nb__panel">
+            <div className="nb__phead nb__phead--toggle">
+              <div>
+                <h2 className="nb__h2">Origen i facturació</h2>
+                <span className="nb__pintro">
+                  {(() => {
+                    const src = partners.find((p) => p.id === sourceCollaboratorId);
+                    const bill = partners.find((p) => p.id === billedCollaboratorId);
+                    const origin = src ? `Ve de ${src.company || src.name}` : 'Client directe';
+                    const billing = bill ? `factura a ${bill.company || bill.name}` : 'factura al client final';
+                    return `${origin} · ${billing}`;
+                  })()}
+                </span>
+              </div>
+              <button type="button" className="nb__toggle" onClick={() => setShowSourceBilling((v) => !v)}>
+                {showSourceBilling ? 'Amagar' : 'Ajustar'}
+              </button>
+            </div>
+            {showSourceBilling && (
+              <div className="grid gap-3 md:grid-cols-2">
+                <label className="nb__field">
+                  <span className="nb__label">D&apos;on ve el bolo</span>
+                  <select value={sourceCollaboratorId} onChange={(e) => setSourceCollaboratorId(e.target.value)} className="nb__input">
+                    <option value="">Client directe (cap intermediari)</option>
+                    {partners.map((partner) => (
+                      <option key={partner.id} value={partner.id}>
+                        {partner.company ? `${partner.name} · ${partner.company}` : partner.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="nb__field">
+                  <span className="nb__label">A qui facturem</span>
+                  <select value={billedCollaboratorId} onChange={(e) => setBilledCollaboratorId(e.target.value)} className="nb__input">
+                    <option value="">Al client final</option>
+                    {partners.map((partner) => (
+                      <option key={partner.id} value={partner.id}>
+                        {partner.company ? `${partner.name} · ${partner.company}` : partner.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            )}
+          </section>
 
           <BookingTravelDiscountSection
             form={{

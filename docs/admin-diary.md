@@ -1,3 +1,29 @@
+## 2026-06-08 — Redisseny UX nova reserva (Canvi #906, claude)
+
+### Resum
+Disseny d'Opus. La pantalla de nova reserva flueix: Pack (nucli) → Serveis i productes → Origen i facturació (plegable, progressive disclosure) → Desplaçament. Personalització del pack agrupada sota «Personalitza aquest pack». Tot amb classes (zero inline/hardcoded nou).
+
+### HANDOFF per a la pròxima sessió de Claude — LLEGIR
+**Estat git**: tot a `main` fins el commit d'aquest #906. Dev local s'engega amb `pnpm dev` (port 3000, auth Basic `orbita`).
+
+**Insight estratègic del propietari (PENDENT de decidir/dissenyar)**: "Per molts packs que tingui, tothom agafa sempre el més econòmic. La gent fa cas a un DOSSIER personalitzat amb extres i ofertes, no als packs establerts." → Implicació: el flux comercial no ha de ser pack-cèntric; el **dossier personalitzat** és la veritable eina de venda. Cal repensar amb Opus si la nova reserva/pressupost ha de partir d'un dossier/oferta personalitzada en comptes del pack rígid. Els packs queden com a base/catàleg, no com a centre. NO s'ha implementat encara — és la propera decisió de producte gran.
+
+**Pendents oberts**:
+1. Validació visual del propietari de la nova reserva redissenyada (TANCAT CHARLIE).
+2. Decisió dossier-cèntric vs pack-cèntric (insight de dalt) — cridar Opus.
+3. Migració visual de la resta de pàgines admin 🔴 (`docs/admin-migration-checklist.md`).
+4. `TEAM_MEMBERS` = només `Carles` (confirmat pel propietari).
+5. Partners: provar a la UI afegir membres (Carlos Lucas BOSS, Jonathan mag) a Masquerade.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm build` OK.
+- Validació funcional: lògica de preu/marge intacta; només reordre + UX.
+- Validació humana/UX: pendent validació visual del propietari.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-08 — Productes fora de pack + fitxa de proveïdor amb membres + neteja Supabase (Canvi #905, claude)
 
 ### Resum
@@ -12,13 +38,18 @@ Sessió llarga amb el propietari. Disseny per Opus (2 passades). Tot a `main` (c
 - **Fixes**: adjunts IMAP tolerants, perf fitxa lead (Promise.all), neteja total de Supabase (codi 0 rastres; guia obsoleta i credencial morta tretes).
 
 ### Validació
-- `npx tsc --noEmit` OK · `pnpm build` OK · tests: bookingCreation 31, contractService 44, leadRouteService 14, partnerHubService 3, collaboratorMemberService 7.
-- Migracions `20260608113000` i `20260608170000` desplegades a Railway.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm build` OK · tests: bookingCreation 31, contractService 44, leadRouteService 14, partnerHubService 3, collaboratorMemberService 7. Migracions `20260608113000` i `20260608170000` desplegades a Railway.
+- Validació funcional: cas Cristina introduïble end-to-end; Partner Hub amb membres operatiu; captures a `.codex-captures/`.
+- Validació humana/UX: pendent validació visual final del propietari (TANCAT CHARLIE per pàgina).
 
 ### Pendent
 - Validació visual del propietari (TANCAT CHARLIE per pàgina).
 - «Tot el sistema igual»: migració visual de la resta de pàgines admin 🔴 (`docs/admin-migration-checklist.md`) — multi-sessió.
 - `ADMIN_CHANGE_COUNTER` = 905. Següent canvi real ha de ser `#906`.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
 
 ## 2026-06-08 — Migració dry-run per Lliçà cap a BookingServiceLine (Canvi #904, codex)
 

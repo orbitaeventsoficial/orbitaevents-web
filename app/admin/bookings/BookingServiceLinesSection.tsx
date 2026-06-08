@@ -58,14 +58,17 @@ export default function BookingServiceLinesSection({ lines, onChange, leadHints 
   const addFreeLine = () => onChange([...lines, { kind: 'OTHER', label: '', revenueAmount: 0, quantity: 1 }]);
 
   return (
-    <section className="nb__section">
-      <h3 className="nb__section-title">Serveis i productes (fora de pack)</h3>
+    <section className="nb__panel">
+      <div className="nb__phead">
+        <h2 className="nb__h2">Serveis i productes</h2>
+        <span className="nb__pintro">DJ extra, tècnic, animació, lloguers…</span>
+      </div>
       {leadHints && leadHints.length > 0 && (
         <p className="nb__hint">El lead havia mostrat interès en: {leadHints.join(', ')}</p>
       )}
 
       <div className="nb__sl-adders">
-        <label className="nb__field" style={{ maxWidth: 220 }}>
+        <label className="nb__field nb__sl-adder">
           <span className="nb__label">+ Servei d&apos;Òrbita</span>
           <select className="nb__input" value="" onChange={(e) => { addOrbitaService(e.target.value); e.target.value = ''; }} aria-label="Afegir servei d'Òrbita">
             <option value="">Tria…</option>
@@ -74,7 +77,7 @@ export default function BookingServiceLinesSection({ lines, onChange, leadHints 
             ))}
           </select>
         </label>
-        <label className="nb__field" style={{ maxWidth: 260 }}>
+        <label className="nb__field nb__sl-adder nb__sl-adder--wide">
           <span className="nb__label">+ Producte de partner</span>
           <select className="nb__input" value="" onChange={(e) => { addPartnerProduct(e.target.value); e.target.value = ''; }} aria-label="Afegir producte de partner">
             <option value="">{partnerProducts.length ? 'Tria…' : 'Cap producte actiu'}</option>

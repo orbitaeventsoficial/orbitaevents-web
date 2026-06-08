@@ -1384,6 +1384,25 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #906 — 2026-06-08 — claude (FET)
+
+**Redisseny UX de la nova reserva (Opus): pack com a nucli + serveis sota + origen/facturació plegable.**
+
+- Context: el propietari va dir que la secció comercial de la nova reserva era massa personalitzada (lletja) i, després de simplificar-la massa, que quedava pitjor (dos selects orfes). Opus redissenya la pantalla perquè flueixi.
+- `NewBookingForm.tsx`: nou ordre Pack → Serveis i productes → **Origen i facturació (plegable)** → Desplaçament. Treta la nota orfe. «Origen i facturació» amb progressive disclosure (resum-estat + botó Ajustar/Amagar); microcopy «D'on ve el bolo» / «A qui facturem».
+- `BookingPackExtrasSection.tsx`: personalització del pack agrupada sota «Personalitza aquest pack» (preu del pack, hores extra, total tancat amb el client, vol factura) amb microcopy clar; eliminats inline styles → classes a `nb-design.css`.
+- `BookingServiceLinesSection.tsx`: alineat al patró `nb__panel`/`nb__phead`; inline styles → classes.
+- `nb-design.css`: classes noves (`nb__pack-tune*`, `nb__field-hint`, `nb__invoice-*`, `nb__phead--toggle`, `nb__toggle`, `nb__sl-adder*`). Zero hardcoded nou.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `905` a `906`.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm build` OK.
+- Validació funcional: la nova reserva manté origen/facturació + serveis + personalització de pack sense canviar la lògica de preu/marge.
+- Validació humana/UX: pendent validació visual del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #905 — 2026-06-08 — claude (FET)
 
 **Productes/serveis fora de pack end-to-end + fitxa de proveïdor amb membres + neteja Supabase.**

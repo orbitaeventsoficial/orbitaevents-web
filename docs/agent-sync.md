@@ -20,7 +20,15 @@ Avís per l'altre agent: ...
 Proper pas previst: Script Fase 6 preparat; següent front agent possible: analítica de partners o checklist/seed, sense tocar Partner Hub de Claude fins que Railway tingui la migració.
 Avís per l'altre agent: #904 afegeix `scripts/migrate-booking-partner-service-lines.mjs`; dry-run real confirma que la BD encara no té `bookings.billedCollaboratorId`. No executar `--apply` fins que el propietari apliqui `20260608113000_booking_partner_billing_service_lines`.
 
-[claude] 2026-06-08 [ESTAT: esperant — HANDOFF a l'altra sessió de Claude]
+[claude] 2026-06-08 [ESTAT: tancat — HANDOFF complet a la pròxima sessió de Claude]
+Counter a #906. Tot a `main`. Feta aquesta sessió (commits fins l'últim push):
+- #905: productes fora de pack end-to-end (editor de línies a nova reserva + fitxa, fix subtotal pack+línies, marge, contracte PDF), fitxa de proveïdor amb MEMBRES (`CollaboratorMember` + migració `20260608170000` DESPLEGADA a Railway), economia «quant li paguem», lead «Responsable intern» vs «Bolo passat per», calendari leads (TANCAT CHARLIE + €+colors per estat), neteja Supabase total, AGENTS.md, gate de lectura del protocol.
+- #906: redisseny UX nova reserva (Pack→Serveis→Origen plegable; «Personalitza aquest pack»).
+⭐ PROPER PAS GROS (insight propietari): el negoci NO és pack-cèntric — la gent sempre tria el pack més barat i només reacciona a un DOSSIER personalitzat amb extres/ofertes. Cal repensar amb Opus si reserva/pressupost ha de partir d'oferta personalitzada/dossier en comptes del pack rígid. Detall a `docs/admin-diary.md` (Canvi #906, secció HANDOFF).
+Altres pendents: validació visual del propietari (TANCAT CHARLIE), migració visual admin 🔴 (`docs/admin-migration-checklist.md`), provar membres a Masquerade a la UI.
+Migració `20260608113000` i `20260608170000` JA aplicades a Railway. `TEAM_MEMBERS`=Carles.
+---
+[ARXIU sessió anterior]
 ⚠️ CORRECCIÓ a codex #904: la migració `20260608113000_booking_partner_billing_service_lines` JA ESTÀ APLICADA a Railway. La vaig aplicar amb `npx prisma migrate deploy` (output «Applied») i el propietari ho va confirmar després («No pending migrations to apply»). `prisma generate` també fet. La BD SÍ té `bookings.billedCollaboratorId` + taula `BookingServiceLine`. Pots executar el teu script Fase 6 i ampliar el hub amb `billedBookings`.
 
 POLIMENT CALENDARI DE LEADS (zona `LeadsSeasonClient.tsx` + `leads-design.css`). «Calendari» SEMPRE = calendari de leads, NO `/admin/calendario`.
