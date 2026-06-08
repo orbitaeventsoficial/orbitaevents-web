@@ -21,6 +21,8 @@ interface UseNewBookingSubmitOptions {
   /** Línies de servei explícites (editor obert). Si s'informen, tenen prioritat
    *  sobre les derivades del relationshipContext (sistema antic). */
   serviceLines?: BookingServiceLineFormInput[];
+  /** Partner que factura el bolo (si no és el client final). */
+  billedCollaboratorId?: string;
   relationshipContext?: {
     mode: string;
     partnerId?: string;
@@ -78,6 +80,7 @@ export function useNewBookingSubmit({
   manualTotalPrice,
   invoiceRequired = false,
   serviceLines: explicitServiceLines,
+  billedCollaboratorId: explicitBilledCollaboratorId,
   relationshipContext,
 }: UseNewBookingSubmitOptions) {
   const router = useRouter();
@@ -97,11 +100,6 @@ export function useNewBookingSubmit({
       setError('Data i ubicació són obligatoris');
       return;
     }
-    if (relationshipContext && relationshipContext.mode !== 'DIRECT_CLIENT' && !relationshipContext.partnerId) {
-      setError('Selecciona el partner de la relació comercial');
-      return;
-    }
-
     setSubmitting(true);
     setError(null);
 
@@ -109,9 +107,8 @@ export function useNewBookingSubmit({
       const serviceLines = explicitServiceLines && explicitServiceLines.length > 0
         ? explicitServiceLines
         : buildServiceLines(relationshipContext);
-      const billedCollaboratorId = relationshipContext?.mode === 'PARTNER_HIRES_ORBITA'
-        ? relationshipContext.partnerId || undefined
-        : undefined;
+      const billedCollaboratorId = explicitBilledCollaboratorId
+        ?? (relationshipContext?.mode === 'PARTNER_HIRES_ORBITA' ? relationshipContext.partnerId || undefined : undefined);
       const notes = form.notes.trim();
       const body = {
         leadId: leadId || undefined,
@@ -167,7 +164,7 @@ export function useNewBookingSubmit({
     } finally {
       setSubmitting(false);
     }
-  }, [customerId, form, internalTravelCost, leadData, leadId, manualTotalPrice, relationshipContext, router, selectedExtras, sourceCollaboratorId, customPackPrice, invoiceRequired, explicitServiceLines]);
+  }, [customerId, form, internalTravelCost, leadData, leadId, manualTotalPrice, relationshipContext, router, selectedExtras, sourceCollaboratorId, customPackPrice, invoiceRequired, explicitServiceLines, explicitBilledCollaboratorId]);
 
   return {
     submitting,

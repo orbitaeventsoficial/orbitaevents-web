@@ -62,13 +62,8 @@ export default function NewBookingForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- només ha de reaccionar quan arriba leadData, no a manualTotalPrice
   }, [leadData]);
   const [invoiceRequired, setInvoiceRequired] = useState(false);
-  const [relationshipMode, setRelationshipMode] = useState('DIRECT_CLIENT');
   const [sourceCollaboratorId, setSourceCollaboratorId] = useState('');
-  const [relationshipPartnerId, setRelationshipPartnerId] = useState('');
-  const [partnerRole, setPartnerRole] = useState('');
-  const [orbitaDjAmount, setOrbitaDjAmount] = useState('');
-  const [orbitaTechAmount, setOrbitaTechAmount] = useState('');
-  const [partnerCostAmount, setPartnerCostAmount] = useState('');
+  const [billedCollaboratorId, setBilledCollaboratorId] = useState('');
   const { discountValidation, validatingCode, resetDiscountValidation, validateDiscountCode } = useBookingDiscountValidation({
     packs,
     selectedPackId: form.packId,
@@ -86,12 +81,6 @@ export default function NewBookingForm() {
   const updateField = (field: keyof BookingFormData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
-  const relationshipPartner = partners.find((partner) => partner.id === relationshipPartnerId);
-  const relationshipPartnerLabel = relationshipPartner
-    ? relationshipPartner.company
-      ? `${relationshipPartner.name} · ${relationshipPartner.company}`
-      : relationshipPartner.name
-    : '';
 
   const {
     internalTravelCost,
@@ -140,15 +129,7 @@ export default function NewBookingForm() {
     manualTotalPrice: manualTotalPrice ? Number(manualTotalPrice) : undefined,
     invoiceRequired,
     serviceLines: serviceLines.length > 0 ? serviceLines : undefined,
-    relationshipContext: {
-      mode: relationshipMode,
-      partnerId: relationshipPartnerId,
-      partnerLabel: relationshipPartnerLabel,
-      orbitaDjAmount: orbitaDjAmount.trim(),
-      orbitaTechAmount: orbitaTechAmount.trim(),
-      partnerRole: partnerRole.trim(),
-      partnerCostAmount: partnerCostAmount.trim(),
-    },
+    billedCollaboratorId: billedCollaboratorId || undefined,
   });
 
   const toggleExtra = (extra: BookingExtra) => {
@@ -241,46 +222,18 @@ export default function NewBookingForm() {
 
           <section className="nb__panel">
             <div className="nb__phead">
-              <h2 className="nb__h2">Relació comercial</h2>
-              <span className="nb__pintro">Direcció del negoci</span>
+              <h2 className="nb__h2">Origen i facturació</h2>
+              <span className="nb__pintro">Qui ens passa el bolo i qui el paga</span>
             </div>
             <div className="grid gap-3 md:grid-cols-2">
-              <label className="nb__field md:col-span-2">
+              <label className="nb__field">
                 <span className="nb__label">Bolo passat per</span>
                 <select
                   value={sourceCollaboratorId}
                   onChange={(e) => setSourceCollaboratorId(e.target.value)}
                   className="nb__input"
                 >
-                  <option value="">Sense partner d'origen</option>
-                  {partners.map((partner) => (
-                    <option key={partner.id} value={partner.id}>
-                      {partner.company ? `${partner.name} · ${partner.company}` : partner.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="nb__field md:col-span-2">
-                <span className="nb__label">Qui contracta a qui</span>
-                <select
-                  value={relationshipMode}
-                  onChange={(e) => setRelationshipMode(e.target.value)}
-                  className="nb__input"
-                >
-                  <option value="DIRECT_CLIENT">Client final contracta Òrbita</option>
-                  <option value="PARTNER_HIRES_ORBITA">Partner/proveïdor contracta Òrbita</option>
-                  <option value="ORBITA_HIRES_PARTNER">Òrbita contracta partner/proveïdor</option>
-                  <option value="MIXED_PARTNER">Relació mixta en el mateix bolo</option>
-                </select>
-              </label>
-              <label className="nb__field">
-                <span className="nb__label">Partner implicat</span>
-                <select
-                  value={relationshipPartnerId}
-                  onChange={(e) => setRelationshipPartnerId(e.target.value)}
-                  className="nb__input"
-                >
-                  <option value="">Selecciona partner</option>
+                  <option value="">Client directe (ningú)</option>
                   {partners.map((partner) => (
                     <option key={partner.id} value={partner.id}>
                       {partner.company ? `${partner.name} · ${partner.company}` : partner.name}
@@ -289,49 +242,22 @@ export default function NewBookingForm() {
                 </select>
               </label>
               <label className="nb__field">
-                <span className="nb__label">Import DJ Òrbita</span>
-                <input
-                  type="number"
-                  min={0}
-                  value={orbitaDjAmount}
-                  onChange={(e) => setOrbitaDjAmount(e.target.value)}
-                  placeholder="Ex. 300"
+                <span className="nb__label">Qui paga el bolo</span>
+                <select
+                  value={billedCollaboratorId}
+                  onChange={(e) => setBilledCollaboratorId(e.target.value)}
                   className="nb__input"
-                />
-              </label>
-              <label className="nb__field">
-                <span className="nb__label">Import tècnic Òrbita</span>
-                <input
-                  type="number"
-                  min={0}
-                  value={orbitaTechAmount}
-                  onChange={(e) => setOrbitaTechAmount(e.target.value)}
-                  placeholder="Ex. 40"
-                  className="nb__input"
-                />
-              </label>
-              <label className="nb__field md:col-span-2">
-                <span className="nb__label">Què fa el partner si intervé</span>
-                <input
-                  type="text"
-                  value={partnerRole}
-                  onChange={(e) => setPartnerRole(e.target.value)}
-                  placeholder="Animació, pintacares, mag, presentador..."
-                  className="nb__input"
-                />
-              </label>
-              <label className="nb__field">
-                <span className="nb__label">Cost partner / proveïdor</span>
-                <input
-                  type="number"
-                  min={0}
-                  value={partnerCostAmount}
-                  onChange={(e) => setPartnerCostAmount(e.target.value)}
-                  placeholder="Cost intern si el subcontractes"
-                  className="nb__input"
-                />
+                >
+                  <option value="">El client final</option>
+                  {partners.map((partner) => (
+                    <option key={partner.id} value={partner.id}>
+                      Factura a: {partner.company ? `${partner.name} · ${partner.company}` : partner.name}
+                    </option>
+                  ))}
+                </select>
               </label>
             </div>
+            <p className="nb__hint">Els serveis i productes del bolo (DJ, tècnic, animació…) s&apos;afegeixen a baix, a «Serveis i productes».</p>
           </section>
 
           <BookingPackExtrasSection
