@@ -1575,3 +1575,6 @@ html.admin-mode .lp2__histitem {
 }
 html.admin-mode .lp2__histitem:hover { color: var(--t); }
 html.admin-mode .lp2__histitem:last-child { border-bottom: none; }
+
+/* Pista inline als labels de relació (responsable intern / bolo passat per) */
+.fxd__hint-inline { display: block; font-weight: var(--o-fw-regular); font-size: var(--o-text-2xs); color: var(--t3); margin-top: 1px; }

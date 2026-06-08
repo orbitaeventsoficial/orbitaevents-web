@@ -276,6 +276,11 @@ export const COLLABORATOR_ROLE_OPTIONS = [
   { value: 'CREW', label: 'Equip / tècnic / DJ extern' },
 ] as const;
 
+// Equip intern d'Òrbita que pot ser responsable d'un lead. Negoci petit: llista
+// tancada. NO hi van col·laboradors externs (això és "Bolo passat per").
+// Ajustar amb els noms reals de l'equip.
+export const TEAM_MEMBERS = ['Carles', 'Sergi'] as const;
+
 // Marge per defecte sobre el cost net en revendre productes de col·laboradors.
 export const COLLABORATOR_DEFAULT_MARKUP = 0.20;
 

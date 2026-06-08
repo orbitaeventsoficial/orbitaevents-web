@@ -17,6 +17,7 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import ConfirmDialog, { useConfirmDialog } from '@/app/admin/components/ConfirmDialog';
 import { SOURCE_LABELS, formatCurrency, formatDateFull } from '@/lib/constants';
+import { TEAM_MEMBERS } from '@/lib/constants/admin';
 import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
 import {
@@ -157,7 +158,8 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
   const [pending, setPending] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [payPending, setPayPending] = useState(false);
-  const [collaborators, setCollaborators] = useState<{ id: string; name: string }[]>([]);
+  // Només col·laboradors amb rol REFERRER (els que ens passen bolos).
+  const [referrers, setReferrers] = useState<{ id: string; name: string }[]>([]);
   const [editField, setEditField] = useState<EditableField | null>(null);
   const [editValue, setEditValue] = useState('');
   const [savePending, setSavePending] = useState(false);
@@ -179,8 +181,13 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
     fetch('/api/admin/collaborators')
       .then((r) => r.json())
       .then((data) => {
-        if (Array.isArray(data)) setCollaborators(data.map((c: { id: string; name: string }) => ({ id: c.id, name: c.name })));
-        else if (Array.isArray(data?.collaborators)) setCollaborators(data.collaborators.map((c: { id: string; name: string }) => ({ id: c.id, name: c.name })));
+        const list = Array.isArray(data) ? data : Array.isArray(data?.collaborators) ? data.collaborators : [];
+        // Només els que poden derivar bolos (rol REFERRER).
+        setReferrers(
+          list
+            .filter((c: { roles?: string[] }) => Array.isArray(c.roles) && c.roles.includes('REFERRER'))
+            .map((c: { id: string; name: string }) => ({ id: c.id, name: c.name }))
+        );
       })
       .catch((error) => {
         console.error('[LeadDetailClient] Error loading collaborators', error);
@@ -763,18 +770,21 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
                 ))}
               </div>
             )}
-            <div><dt>Assignat a</dt><dd>
-              <select className="fxd__editinput" value={lead.owner ?? ''} onChange={(e) => saveAssignedTo(e.target.value)} aria-label="Assignat a">
+            <div><dt>Responsable intern <small className="fxd__hint-inline">qui d&apos;Òrbita el porta</small></dt><dd>
+              <select className="fxd__editinput" value={lead.owner ?? ''} onChange={(e) => saveAssignedTo(e.target.value)} aria-label="Responsable intern del lead">
                 <option value="">— Sense assignar</option>
-                {collaborators.map((c) => (
-                  <option key={c.id} value={c.name}>{c.name}</option>
+                {TEAM_MEMBERS.map((m) => (
+                  <option key={m} value={m}>{m}</option>
                 ))}
+                {lead.owner && !TEAM_MEMBERS.includes(lead.owner as typeof TEAM_MEMBERS[number]) && (
+                  <option value={lead.owner}>{lead.owner}</option>
+                )}
               </select>
             </dd></div>
-            <div><dt>Bolo passat per</dt><dd>
-              <select className="fxd__editinput" value={lead.sourceCollaboratorId ?? ''} onChange={(e) => saveSourceCollaborator(e.target.value)} aria-label="Partner que ha passat el bolo">
-                <option value="">— Ningú / directe</option>
-                {collaborators.map((c) => (
+            <div><dt>Bolo passat per <small className="fxd__hint-inline">col·laborador que ens deriva el client</small></dt><dd>
+              <select className="fxd__editinput" value={lead.sourceCollaboratorId ?? ''} onChange={(e) => saveSourceCollaborator(e.target.value)} aria-label="Col·laborador que ha derivat el bolo">
+                <option value="">— Ningú / client directe</option>
+                {referrers.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
