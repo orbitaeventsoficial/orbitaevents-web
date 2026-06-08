@@ -27,17 +27,14 @@ Per estat funcional i peces consolidades:
 - **Verificació real**: no donar res per acabat només perquè compila.
 - **Conservar el que ja funciona**: si una zona està tancada o consolidada, no reobrir-la sense motiu real.
 
-## Norma de tot canvi (obligatòria, sense excepció)
+## Norma de tot canvi (resum — el detall ja viu a les seccions corresponents)
 
-Cada canvi, per petit que sigui, ha de complir TOT això abans de considerar-se fet:
+Cada canvi, per petit que sigui, ha de complir TOT això abans de considerar-se fet (no es repeteixen aquí les regles; es citen on viuen):
 
-1. **Documentat**: entrada al `docs/admin-diary.md` + `### Canvi #N` al `docs/admin-protocol.md` + `ADMIN_CHANGE_COUNTER`.
-2. **Reflectit al web/admin**: el canvi ha de quedar visible i operatiu a la interfície real, no només al codi. Una funció que no es veu ni s'usa no compta com a feta.
-3. **Canònic**: res hardcodejat. Colors→tokens, textos públics→`messages/*.json`, dades estables→`lib/constants/*`. Zero hex, zero strings reutilitzats inline, zero `style={{}}` de color.
-4. **Responsiu**: comprovat a mòbil (375px), tablet i desktop.
-5. **i18n complet** si és web pública: clau nova → als 3 (o N) JSONs d'idioma. Mai text públic incrustat al JSX.
-
-> **0 hardcoded és inviolable.** Afegir qualsevol valor hardcoded nou és un bug que s'ha de revertir, encara que "funcioni".
+1. **Documentat** → vegeu `## Documentació obligatòria` + `### Canvi #N` al protocol + `ADMIN_CHANGE_COUNTER`.
+2. **Reflectit al web/admin** → el canvi ha de quedar **visible i operatiu a la interfície real**, no només al codi. Una funció importada però no renderitzada, o que no s'usa, NO compta com a feta.
+3. **0 hardcoded** → vegeu `## Hardcode i monocapa` (inviolable).
+4. **Responsiu + i18n + a11y** → vegeu `## Checklist pre-lliurament` i `## i18n`.
 
 ## Protocol d'autonomia
 
@@ -60,7 +57,11 @@ Cada canvi, per petit que sigui, ha de complir TOT això abans de considerar-se 
 5. Si la tasca és d'admin o toca una zona consolidada, llegir també `docs/admin-protocol.md`, el tram rellevant del `§6` i el final del `§9` abans de començar.
 6. Si existeix una guia específica de la iniciativa, usar-la només com a context del tall concret.
 
-Cap agent pot començar feina real al repo sense haver fet aquesta lectura mínima.
+**Cap IA ni agent (Claude, Codex o qualsevol altre) pot començar feina real al repo sense haver fet aquesta lectura mínima.** No és opcional ni es pot saltar "perquè el canvi és petit". Una IA que comenci a editar sense haver llegit i confirmat aquest flux està incomplint el protocol i la seva passada s'ha de revertir.
+
+- **Senyal d'arrencada obligatori**: la primera acció de qualsevol sessió és declarar que s'ha llegit `CLAUDE.md` + `docs/agent-sync.md` + `docs/admin-diary.md` (i, si toca admin, `estat-admin.md` + `admin-protocol.md`), i actualitzar el bloc propi a `docs/agent-sync.md` a `treballant`.
+- **Reforç automàtic (Claude Code)**: el hook `SessionStart` (`scripts/hooks/session-start.mjs`) injecta a cada sessió l'estat viu del protocol (counter + blocs d'agent-sync + recordatori del flux). Connexió via `node scripts/hooks/install-hooks.mjs`.
+- **Altres eines (Codex, etc.)**: han de llegir aquest fitxer igualment; si l'eina suporta un fitxer d'arrencada propi (p. ex. `AGENTS.md`), ha d'apuntar aquí.
 
 ## Regles operatives
 

@@ -48,11 +48,13 @@ const blockLine = blocks.length
   : '';
 
 const context =
-  `📋 Protocol Òrbita — estat viu. ADMIN_CHANGE_COUNTER actual: #${counter} ` +
-  `(el següent canvi real ha de ser #${Number.isNaN(+counter) ? '?' : +counter + 1}).\n` +
-  `Flux obligatori abans de tocar res: CLAUDE.md → docs/agent-sync.md ` +
-  `(llegir l'altre agent + actualitzar el teu bloc) → docs/admin-diary.md. ` +
-  `Si és admin: també estat-admin.md + admin-protocol §6/§9.${blockLine}`;
+  `🛑 ATURA'T ABANS DE TOCAR RES. Protocol Òrbita obligatori.\n` +
+  `Cap edició real és vàlida fins que hagis LLEGIT i confirmat: CLAUDE.md → ` +
+  `docs/agent-sync.md (llegir l'altre agent + posar el teu bloc a 'treballant') → ` +
+  `docs/admin-diary.md. Si és admin: també estat-admin.md + admin-protocol §6/§9.\n` +
+  `Norma de tot canvi: documentat + reflectit al web + 0 hardcoded + responsiu + i18n.\n` +
+  `ADMIN_CHANGE_COUNTER actual: #${counter} ` +
+  `(el següent canvi real ha de ser #${Number.isNaN(+counter) ? '?' : +counter + 1}).${blockLine}`;
 
 process.stdout.write(
   JSON.stringify({
