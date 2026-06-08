@@ -141,3 +141,8 @@ Cas real: Cristina Rey ens contracta animació+pintacares (de Masquerade, +20%) 
 - **/admin/packs**: secció read-only "Serveis solts d'Òrbita" (de ORBITA_SERVICES).
 - **Lead hints**: mostrar `interestedExtras` del lead com a pista a l'editor (cal afegir `interestedExtras` a BookingLeadData + prefill).
 - Cap migració nova (tot ja a Railway).
+
+---
+## Fase 7 — estat 2026-06-08 (pushejat fins 86e0fb40)
+✅ Serveis propis (orbita-services.ts) · editor de línies a nova reserva · API collaborator-products · fix subtotal+submit (cas Cristina) · marge en viu + fitxa amb serviceLinesCost · contracte PDF desglossa línies · Partner Hub "quant li paguem" (comissions+subcontractació) · línies visibles a fitxa reserva · secció "Serveis solts" a /admin/packs · separació Responsable intern / Bolo passat per al lead.
+⬜ PENDENT: editor EDITABLE de línies post-creació a la fitxa de reserva (ara lectura; PATCH ja ho suporta) · hints interestedExtras a l'editor · confirmar noms reals TEAM_MEMBERS · nexe inventari equip propi.
