@@ -25,6 +25,9 @@ export async function fetchPartnerHub(id: string) {
       products: {
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
       },
+      members: {
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+      },
       bookings: {
         orderBy: { createdAt: 'desc' },
         include: {
@@ -77,7 +80,7 @@ export async function fetchPartnerHub(id: string) {
   const serviceLinesPaid = round(serviceLinesAgg._sum.costAmount || 0);
   const serviceLinesCount = serviceLinesAgg._count;
 
-  const { products, bookings: contractedBookings, sourcedLeads, sourcedBookings, ...core } = partner;
+  const { products, members, bookings: contractedBookings, sourcedLeads, sourcedBookings, ...core } = partner;
 
   const activeProducts = products.filter((product) => product.isActive);
 
@@ -113,6 +116,7 @@ export async function fetchPartnerHub(id: string) {
 
   return {
     partner: core,
+    members,
     sourcedLeads,
     sourcedBookings,
     contractedBookings,

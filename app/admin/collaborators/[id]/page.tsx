@@ -39,6 +39,14 @@ export default async function PartnerDetailPage({ params }: Props) {
       isActive: hub.partner.isActive,
     },
     economics: hub.economics,
+    members: hub.members.map((m) => ({
+      id: m.id,
+      name: m.name,
+      role: m.role,
+      phone: m.phone,
+      email: m.email,
+      isActive: m.isActive,
+    })),
     sourcedLeads: hub.sourcedLeads.map((lead) => ({
       id: lead.id,
       name: lead.name,

@@ -1843,6 +1843,7 @@ model Collaborator {
 
   bookings CollaboratorBooking[]
   products CollaboratorProduct[]
+  members CollaboratorMember[]
   sourcedLeads Lead[] @relation("LeadSourceCollaborator")
   sourcedBookings Booking[] @relation("BookingSourceCollaborator")
   billedBookings Booking[] @relation("BookingBilledCollaborator")
@@ -1852,6 +1853,28 @@ model Collaborator {
   updatedAt DateTime @updatedAt
 
   @@map("collaborators")
+}
+
+// Persones dins d'un proveïdor (p.ex. Masquerade → Carlos Lucas BOSS, Jonathan mag).
+// El proveïdor és el Collaborator; els membres són les persones que hi treballen.
+model CollaboratorMember {
+  id             String       @id @default(cuid())
+  collaboratorId String
+  collaborator   Collaborator @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
+
+  name      String
+  role      String  @default("OTHER") // BOSS, MAGICIAN, ANIMATOR, DJ, TECH, OTHER
+  phone     String?
+  email     String?
+  isActive  Boolean @default(true)
+  notes     String? @db.Text
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([collaboratorId])
+  @@map("collaborator_members")
 }
 
 // Catàleg de productes/serveis que ofereix un col·laborador (revenda amb marge).

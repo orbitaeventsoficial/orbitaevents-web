@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { fetchWithCsrf } from '@/lib/csrf';
+import { useToast } from '@/app/admin/components/ToastProvider';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { formatCurrency, formatDate } from '@/lib/constants';
-import { COLLABORATOR_ROLE_OPTIONS } from '@/lib/constants/admin';
+import { COLLABORATOR_ROLE_OPTIONS, COLLABORATOR_MEMBER_ROLE_OPTIONS, getCollaboratorMemberRoleLabel } from '@/lib/constants/admin';
 
 interface SourcedLead {
   id: string;
@@ -46,7 +49,17 @@ interface PartnerProduct {
   isActive: boolean;
 }
 
+interface PartnerMember {
+  id: string;
+  name: string;
+  role: string;
+  phone: string | null;
+  email: string | null;
+  isActive: boolean;
+}
+
 interface PartnerHubData {
+  members: PartnerMember[];
   partner: {
     id: string;
     name: string;
@@ -82,10 +95,11 @@ interface PartnerHubData {
   products: PartnerProduct[];
 }
 
-type TabKey = 'resum' | 'passa' | 'contractem' | 'cataleg' | 'economia' | 'notes';
+type TabKey = 'resum' | 'membres' | 'passa' | 'contractem' | 'cataleg' | 'economia' | 'notes';
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'resum', label: 'Resum' },
+  { key: 'membres', label: 'Equip / membres' },
   { key: 'passa', label: 'Bolos que ens passa' },
   { key: 'contractem', label: 'Bolos on el contractem' },
   { key: 'cataleg', label: 'Material i catàleg' },
@@ -102,8 +116,46 @@ function Empty({ text }: { text: string }) {
 }
 
 export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
+  const router = useRouter();
+  const toast = useToast();
   const [tab, setTab] = useState<TabKey>('resum');
+  const [newName, setNewName] = useState('');
+  const [newRole, setNewRole] = useState('OTHER');
+  const [adding, setAdding] = useState(false);
   const { partner, economics } = data;
+
+  async function addMember() {
+    if (!newName.trim()) { toast.error('El nom és obligatori'); return; }
+    setAdding(true);
+    try {
+      const res = await fetchWithCsrf(`/api/admin/collaborators/${partner.id}/members`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newName.trim(), role: newRole }),
+      });
+      if (!res.ok) throw new Error('No s\'ha pogut afegir');
+      setNewName(''); setNewRole('OTHER');
+      toast.success('Membre afegit.');
+      router.refresh();
+    } catch (e) {
+      console.error('[PartnerHub] addMember', e);
+      toast.error('Error afegint el membre.');
+    } finally {
+      setAdding(false);
+    }
+  }
+
+  async function removeMember(memberId: string) {
+    try {
+      const res = await fetchWithCsrf(`/api/admin/collaborators/${partner.id}/members/${memberId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('No s\'ha pogut eliminar');
+      toast.success('Membre eliminat.');
+      router.refresh();
+    } catch (e) {
+      console.error('[PartnerHub] removeMember', e);
+      toast.error('Error eliminant el membre.');
+    }
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -145,6 +197,44 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
             </div>
           </section>
         </div>
+      )}
+
+      {tab === 'membres' && (
+        <section className="ap-card p-5">
+          <h2 className="text-lg font-semibold mb-1">Equip / membres</h2>
+          <p className="ap-muted text-sm mb-4">Persones dins d&apos;aquest proveïdor (p. ex. el cap, mags, animadors…).</p>
+
+          <div className="flex flex-wrap items-end gap-2 mb-4">
+            <input
+              className="ap-input" placeholder="Nom de la persona"
+              value={newName} onChange={(e) => setNewName(e.target.value)}
+              aria-label="Nom del membre"
+            />
+            <select className="ap-input" value={newRole} onChange={(e) => setNewRole(e.target.value)} aria-label="Rol del membre">
+              {COLLABORATOR_MEMBER_ROLE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+            <button type="button" className="ap-btn ap-btn--primary" onClick={addMember} disabled={adding}>
+              {adding ? 'Afegint…' : '+ Afegir membre'}
+            </button>
+          </div>
+
+          {data.members.length === 0 ? <Empty text="Encara no hi ha membres. Afegeix el cap i l'equip." /> : (
+            <table className="w-full text-sm">
+              <thead><tr className="text-left ap-muted"><th scope="col" className="py-2">Nom</th><th scope="col">Rol</th><th scope="col">Contacte</th><th scope="col">Estat</th><th scope="col"></th></tr></thead>
+              <tbody>
+                {data.members.map((m) => (
+                  <tr key={m.id}>
+                    <td className="py-2">{m.name}</td>
+                    <td><span className="ap-badge ap-badge--info">{getCollaboratorMemberRoleLabel(m.role)}</span></td>
+                    <td>{m.phone || m.email || '—'}</td>
+                    <td><span className={`ap-badge ${m.isActive ? 'ap-badge--success' : ''}`}>{m.isActive ? 'Actiu' : 'Inactiu'}</span></td>
+                    <td className="text-right"><button type="button" className="ap-link" onClick={() => removeMember(m.id)} aria-label={`Eliminar ${m.name}`}>Eliminar</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </section>
       )}
 
       {tab === 'passa' && (

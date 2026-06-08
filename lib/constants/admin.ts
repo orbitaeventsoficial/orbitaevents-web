@@ -281,6 +281,20 @@ export const COLLABORATOR_ROLE_OPTIONS = [
 // Ajustar amb els noms reals de l'equip.
 export const TEAM_MEMBERS = ['Carles'] as const;
 
+// Rol d'una persona DINS d'un proveïdor (no confondre amb els roles del proveïdor).
+export const COLLABORATOR_MEMBER_ROLE_OPTIONS = [
+  { value: 'BOSS', label: 'Cap / responsable' },
+  { value: 'MAGICIAN', label: 'Mag' },
+  { value: 'ANIMATOR', label: 'Animador/a' },
+  { value: 'DJ', label: 'DJ' },
+  { value: 'TECH', label: 'Tècnic/a' },
+  { value: 'OTHER', label: 'Altres' },
+] as const;
+
+export function getCollaboratorMemberRoleLabel(role: string): string {
+  return COLLABORATOR_MEMBER_ROLE_OPTIONS.find((option) => option.value === role)?.label || role;
+}
+
 // Marge per defecte sobre el cost net en revendre productes de col·laboradors.
 export const COLLABORATOR_DEFAULT_MARKUP = 0.20;
 
