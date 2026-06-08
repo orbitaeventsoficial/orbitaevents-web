@@ -35,20 +35,20 @@ export async function getEmailSignatureHtml(): Promise<string> {
   ]);
 
   const extraHtml = override
-    ? `<div style="margin-top:10px;font-size:12px;color:#64748b;white-space:pre-line;">${escapeHtmlInline(override)}</div>`
+    ? `<div style="margin-top:10px;font-size:12px;color:rgb(100,116,139);white-space:pre-line;">${escapeHtmlInline(override)}</div>`
     : '';
 
   return `
-    <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e7e5e4;font-family:'Segoe UI',Arial,sans-serif;font-size:13px;color:#334155;line-height:1.5;">
+    <div style="margin-top:24px;padding-top:16px;border-top:1px solid rgb(231,229,228);font-family:'Segoe UI',Arial,sans-serif;font-size:13px;color:rgb(51,65,85);line-height:1.5;">
       <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
         <tr>
           <td style="vertical-align:top;padding-right:14px;">
-            <img src="${emailLogoUrl}" alt="Òrbita Events" width="48" height="48" style="display:block;width:48px;height:48px;border-radius:10px;background:#111827;padding:4px;" />
+            <img src="${emailLogoUrl}" alt="Òrbita Events" width="48" height="48" style="display:block;width:48px;height:48px;border-radius:10px;background:rgb(17,24,39);padding:4px;" />
           </td>
           <td style="vertical-align:top;">
-            <div style="font-weight:700;font-size:14px;color:#111827;">Òrbita Events</div>
-            <div style="margin-top:2px;font-size:12px;color:#64748b;">${EMAIL_CONTACT.phone} · ${EMAIL_CONTACT.email}</div>
-            <div style="margin-top:2px;font-size:12px;"><a href="${EMAIL_CONTACT.web}" style="color:#0f172a;text-decoration:none;">${EMAIL_CONTACT.web}</a></div>
+            <div style="font-weight:700;font-size:14px;color:rgb(17,24,39);">Òrbita Events</div>
+            <div style="margin-top:2px;font-size:12px;color:rgb(100,116,139);">${EMAIL_CONTACT.phone} · ${EMAIL_CONTACT.email}</div>
+            <div style="margin-top:2px;font-size:12px;"><a href="${EMAIL_CONTACT.web}" style="color:rgb(15,23,42);text-decoration:none;">${EMAIL_CONTACT.web}</a></div>
             ${extraHtml}
           </td>
         </tr>

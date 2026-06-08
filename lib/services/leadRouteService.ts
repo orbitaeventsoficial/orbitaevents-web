@@ -31,6 +31,8 @@ export async function getLeadDetail(id: string): Promise<LeadRouteResult> {
       interestedPackId: true,
       interestedExtras: true,
       source: true,
+      sourceCollaboratorId: true,
+      sourceCollaborator: { select: { id: true, name: true, company: true, roles: true } },
       landingPage: true,
       utmSource: true,
       utmMedium: true,
@@ -129,6 +131,7 @@ export async function updateLeadFromInput(id: string, input: LeadPatchInput): Pr
     eventDate: 'eventDate', eventStartTime: 'eventStartTime', eventEndTime: 'eventEndTime',
     eventLocation: 'eventLocation', guestCount: 'guestCount',
     eventPhone: 'eventPhone', eventAddress: 'eventAddress',
+    sourceCollaboratorId: 'sourceCollaboratorId',
   };
 
   const customerUpdate: Record<string, unknown> = {};

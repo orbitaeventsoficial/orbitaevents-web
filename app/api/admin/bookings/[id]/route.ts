@@ -37,6 +37,8 @@ const updateBookingSchema = z.object({
   status: z.enum(['PENDING', 'CONFIRMED', 'PREPARING', 'COMPLETED', 'CANCELLED']).optional(),
   eventDate: z.string().optional(),
   eventLocation: z.string().optional(),
+  sourceCollaboratorId: z.string().nullable().optional(),
+  billedCollaboratorId: z.string().nullable().optional(),
   guestCount: z.number().optional(),
   eventVenue: z.string().optional(),
   totalPrice: z.number().optional(),
@@ -60,6 +62,18 @@ const updateBookingSchema = z.object({
   eventAddress: z.string().nullable().optional(),
   eventStartTime: z.string().nullable().optional(),
   eventEndTime: z.string().nullable().optional(),
+  serviceLines: z.array(z.object({
+    collaboratorId: z.string().nullable().optional(),
+    sortOrder: z.number().int().optional(),
+    partyType: z.string().nullable().optional(),
+    kind: z.enum(['DJ', 'SOUND_TECH', 'PROVIDER_SERVICE', 'EQUIPMENT', 'OTHER']).optional(),
+    label: z.string().min(1),
+    revenueAmount: z.number().min(0).nullable().optional(),
+    costAmount: z.number().min(0).nullable().optional(),
+    quantity: z.number().int().positive().nullable().optional(),
+    hours: z.number().positive().nullable().optional(),
+    notes: z.string().nullable().optional(),
+  })).optional(),
 }).strict();
 
 export async function GET(req: NextRequest, { params }: Params) {
@@ -150,6 +164,4 @@ export async function DELETE(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: 'Error eliminant reserva' }, { status: 500 });
   }
 }
-
-
 

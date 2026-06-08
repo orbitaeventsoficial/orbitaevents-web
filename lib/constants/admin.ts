@@ -57,7 +57,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 897;
+export const ADMIN_CHANGE_COUNTER = 904;
 
 export const ADMIN_DETAIL_PAGE_LABELS: Record<string, string> = {
   inventory: 'Fitxa inventari',
@@ -250,6 +250,7 @@ export const ADMIN_COLLABORATOR_EMPTY_FORM: {
   email: string;
   phone: string;
   specialty: string;
+  roles: string[];
   commissionPct: number;
   pricingModel: 'NET_PLUS_COMMISSION' | 'DISCOUNT';
   costPerHour: number | '';
@@ -260,11 +261,20 @@ export const ADMIN_COLLABORATOR_EMPTY_FORM: {
   email: '',
   phone: '',
   specialty: '',
+  roles: ['PROVIDER'],
   commissionPct: 0,
   pricingModel: 'DISCOUNT',
   costPerHour: '',
   notes: '',
 };
+
+export const COLLABORATOR_ROLE_OPTIONS = [
+  { value: 'PROVIDER', label: 'Proveïdor / servei extern' },
+  { value: 'REFERRER', label: 'Porta bolos' },
+  { value: 'EQUIPMENT_RENTAL', label: 'Lloguer de material' },
+  { value: 'CLIENT_PARTNER', label: 'Ens contracta com a partner' },
+  { value: 'CREW', label: 'Equip / tècnic / DJ extern' },
+] as const;
 
 // Marge per defecte sobre el cost net en revendre productes de col·laboradors.
 export const COLLABORATOR_DEFAULT_MARKUP = 0.20;

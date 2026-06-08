@@ -364,6 +364,25 @@ describe('costEngine', () => {
       );
     });
 
+    it('suma cost de línies de servei al directCost sense duplicar comissions de CollaboratorBooking', () => {
+      const input = baseInput({
+        total: 340,
+        packPrice: 0,
+        extrasTotal: 0,
+        extraHours: 0,
+        extraHourPrice: 0,
+        distanceKm: 0,
+        serviceLinesRevenue: 340,
+        serviceLinesCost: 120,
+      });
+      const result = computeBookingFinancialSummary(input, defaultConfig);
+
+      expect(result.serviceLinesRevenue).toBe(340);
+      expect(result.serviceLinesCost).toBe(120);
+      expect(result.directCost).toBe(result.fixedOperationalCost + 120);
+      expect(result.total).toBe(340);
+    });
+
     // --- Config personalitzada ---
 
     it('config personalitzada: canvia els ratis i el cost fix', () => {
@@ -418,7 +437,8 @@ describe('costEngine', () => {
         result.extrasCost +
         result.extraHoursCost +
         result.fixedOperationalCost +
-        result.travelCost;
+        result.travelCost +
+        result.serviceLinesCost;
 
       expect(result.directCost).toBeCloseTo(expectedDirectCost, 2);
     });

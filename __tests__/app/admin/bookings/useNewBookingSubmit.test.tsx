@@ -71,4 +71,73 @@ describe('useNewBookingSubmit', () => {
 
     await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/admin/bookings/booking-1'));
   });
+
+  it('envia billedCollaboratorId i línies de servei quan el partner contracta Òrbita', async () => {
+    const { result } = renderHook(() => useNewBookingSubmit({
+      form: validForm(),
+      selectedExtras: {},
+      leadId: null,
+      leadData: null,
+      customerId: 'customer-1',
+      internalTravelCost: 0,
+      relationshipContext: {
+        mode: 'PARTNER_HIRES_ORBITA',
+        partnerId: 'partner-masquerade',
+        partnerLabel: 'Masquerade Events',
+        orbitaDjAmount: '300',
+        orbitaTechAmount: '40',
+      },
+    }));
+
+    await act(async () => {
+      await result.current.submit();
+    });
+
+    const [, init] = mockFetchWithCsrf.mock.calls[0];
+    const body = JSON.parse(String(init?.body));
+    expect(body.billedCollaboratorId).toBe('partner-masquerade');
+    expect(body.customerId).toBe('customer-1');
+    expect(body.notes).toBeUndefined();
+    expect(body.serviceLines).toEqual([
+      { kind: 'DJ', label: 'DJ Orbita', revenueAmount: 300, quantity: 1 },
+      { kind: 'SOUND_TECH', label: 'Tecnic de so Orbita', revenueAmount: 40, quantity: 1 },
+    ]);
+  });
+
+  it('envia cost de partner com a BookingServiceLine sense convertir-lo en notes', async () => {
+    const form = { ...validForm(), notes: 'Observació humana' };
+    const { result } = renderHook(() => useNewBookingSubmit({
+      form,
+      selectedExtras: {},
+      leadId: null,
+      leadData: null,
+      customerId: null,
+      internalTravelCost: 0,
+      relationshipContext: {
+        mode: 'ORBITA_HIRES_PARTNER',
+        partnerId: 'partner-masquerade',
+        partnerLabel: 'Masquerade Events',
+        partnerRole: 'Animació',
+        partnerCostAmount: '180',
+      },
+    }));
+
+    await act(async () => {
+      await result.current.submit();
+    });
+
+    const [, init] = mockFetchWithCsrf.mock.calls[0];
+    const body = JSON.parse(String(init?.body));
+    expect(body.billedCollaboratorId).toBeUndefined();
+    expect(body.notes).toBe('Observació humana');
+    expect(body.serviceLines).toEqual([
+      {
+        collaboratorId: 'partner-masquerade',
+        kind: 'PROVIDER_SERVICE',
+        label: 'Animació',
+        costAmount: 180,
+        quantity: 1,
+      },
+    ]);
+  });
 });

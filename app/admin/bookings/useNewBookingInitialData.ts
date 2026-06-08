@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
-import type { BookingExtra, BookingFormData, BookingLeadData, BookingPack, RawExtraConfig } from './booking-form.types';
+import type { BookingExtra, BookingFormData, BookingLeadData, BookingPack, BookingPartnerOption, RawExtraConfig } from './booking-form.types';
 import { INITIAL_BOOKING_FORM } from './booking-form.types';
 import { log } from '@/lib/logger';
 
@@ -37,14 +37,16 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
   const [extras, setExtras] = useState<BookingExtra[]>([]);
   const [loading, setLoading] = useState(true);
   const [leadData, setLeadData] = useState<BookingLeadData | null>(null);
+  const [partners, setPartners] = useState<BookingPartnerOption[]>([]);
   const [fuelReferenceInfo, setFuelReferenceInfo] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
       try {
-        const [packsRes, extrasRes] = await Promise.all([
+        const [packsRes, extrasRes, partnersRes] = await Promise.all([
           fetchWithCsrf('/api/admin/packs'),
           fetchWithCsrf('/api/admin/extras'),
+          fetchWithCsrf('/api/admin/collaborators'),
         ]);
 
         if (packsRes.ok) {
@@ -70,6 +72,19 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
             translations: [{ name: humaniseExtraLabel(item.name, item.slug, item.id) }],
           })).filter((item: BookingExtra) => item.id);
           setExtras(normalizedExtras);
+        }
+
+        if (partnersRes.ok) {
+          const partnerData = await partnersRes.json();
+          const list = Array.isArray(partnerData?.collaborators) ? partnerData.collaborators : [];
+          setPartners(list
+            .filter((partner: BookingPartnerOption & { isActive?: boolean }) => partner.isActive !== false)
+            .map((partner: BookingPartnerOption) => ({
+              id: partner.id,
+              name: partner.name,
+              company: partner.company || null,
+              roles: partner.roles || [],
+            })));
         }
 
         const fuelRes = await fetchWithCsrf('/api/admin/fuel/reference');
@@ -127,6 +142,7 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
     extras,
     loading,
     leadData,
+    partners,
     fuelReferenceInfo,
   };
 }

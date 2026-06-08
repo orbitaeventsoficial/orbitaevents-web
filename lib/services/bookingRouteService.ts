@@ -13,6 +13,7 @@ import { VAT_RATE_INVOICE, VAT_RATE_NO_INVOICE, calcDeposit, roundMoney } from '
 type ExistingBookingRecord = {
   id: string;
   customerId: string | null;
+  leadId: string | null;
   status: ManagedBookingStatus;
   subtotal: number;
   discount: number | null;
@@ -30,7 +31,45 @@ type ExistingBookingRecord = {
   preferredLocale: string | null;
   clientEmail: string | null;
   clientName: string;
+  clientPhone: string | null;
+  eventPhone: string | null;
+  eventAddress: string | null;
 };
+
+type BookingServiceLinePatchInput = {
+  collaboratorId?: string | null;
+  sortOrder?: number;
+  partyType?: string | null;
+  kind?: 'DJ' | 'SOUND_TECH' | 'PROVIDER_SERVICE' | 'EQUIPMENT' | 'OTHER';
+  label: string;
+  revenueAmount?: number | null;
+  costAmount?: number | null;
+  quantity?: number | null;
+  hours?: number | null;
+  notes?: string | null;
+};
+
+function sanitizeMoney(value?: number | null): number | null {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return null;
+  return Math.max(0, Math.round(value * 100) / 100);
+}
+
+function normalizeServiceLines(lines: BookingServiceLinePatchInput[]) {
+  return lines
+    .map((line, index) => ({
+      collaboratorId: line.collaboratorId || null,
+      sortOrder: typeof line.sortOrder === 'number' ? line.sortOrder : index,
+      partyType: line.partyType?.trim() || null,
+      kind: line.kind || 'OTHER',
+      label: line.label?.trim(),
+      revenueAmount: sanitizeMoney(line.revenueAmount),
+      costAmount: sanitizeMoney(line.costAmount),
+      quantity: typeof line.quantity === 'number' && line.quantity > 0 ? Math.floor(line.quantity) : null,
+      hours: typeof line.hours === 'number' && line.hours > 0 ? Math.round(line.hours * 100) / 100 : null,
+      notes: line.notes?.trim() || null,
+    }))
+    .filter((line) => Boolean(line.label));
+}
 
 export async function getBookingDetail(id: string) {
   const booking = await prisma.booking.findUnique({
@@ -40,6 +79,11 @@ export async function getBookingDetail(id: string) {
       extras: { include: { extra: { include: { translations: true } } } },
       inventory: { include: { item: true } },
       lead: true,
+      billedCollaborator: true,
+      serviceLines: {
+        include: { collaborator: true },
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+      },
       postEventReport: true,
       clientSurvey: true,
       clientFeedback: true,
@@ -55,6 +99,7 @@ export async function getBookingDetail(id: string) {
 
 export async function prepareBookingPatchData(existing: ExistingBookingRecord, input: Record<string, unknown>) {
   const body: Record<string, unknown> = { ...input };
+  delete body.serviceLines;
   const shouldSyncCalendar = Object.keys(body).some((key) => (BOOKING_CALENDAR_SYNC_FIELDS as readonly string[]).includes(key));
 
   if (body.eventDate && typeof body.eventDate === 'string') body.eventDate = new Date(body.eventDate);
@@ -198,6 +243,16 @@ export async function updateBookingDetail(id: string, input: Record<string, unkn
     data: prepared.body,
   });
 
+  if (Array.isArray(input.serviceLines)) {
+    const serviceLines = normalizeServiceLines(input.serviceLines as BookingServiceLinePatchInput[]);
+    await prisma.bookingServiceLine.deleteMany({ where: { bookingId: id } });
+    if (serviceLines.length > 0) {
+      await prisma.bookingServiceLine.createMany({
+        data: serviceLines.map((line) => ({ ...line, bookingId: id })),
+      });
+    }
+  }
+
   // Sincronització canònica: si s'actualitzen dades de contacte i hi ha client vinculat,
   // propagar els canvis al customer (font de veritat).
   if (existing.customerId) {
@@ -215,6 +270,34 @@ export async function updateBookingDetail(id: string, input: Record<string, unkn
     }
     if (Object.keys(customerPatch).length > 0) {
       await prisma.customer.update({ where: { id: existing.customerId }, data: customerPatch });
+    }
+  }
+
+  if (existing.leadId) {
+    const leadPatch: Record<string, unknown> = {};
+    const syncKeys = [
+      'eventDate',
+      'eventStartTime',
+      'eventEndTime',
+      'eventLocation',
+      'eventPhone',
+      'eventAddress',
+      'guestCount',
+      'eventType',
+      'sourceCollaboratorId',
+    ] as const;
+
+    for (const key of syncKeys) {
+      if (Object.prototype.hasOwnProperty.call(prepared.body, key)) {
+        leadPatch[key] = prepared.body[key];
+      }
+    }
+
+    if (Object.keys(leadPatch).length > 0) {
+      await prisma.lead.update({
+        where: { id: existing.leadId },
+        data: leadPatch,
+      });
     }
   }
 
@@ -296,8 +379,3 @@ export async function deleteBookingIfAllowed(existing: Pick<ExistingBookingRecor
 
   return { ok: true as const, status: 200, body: { ok: true } };
 }
-
-
-
-
-

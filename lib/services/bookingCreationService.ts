@@ -7,7 +7,7 @@ import { calculateTravelCharge, calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM
 import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
 import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
 import { ACTIVE_BOOKING_STATUSES } from '@/lib/constants';
-import { calcVatRate, calcDeposit } from '@/lib/constants/pricing';
+import { calcVatRate, calcDeposit, roundMoney } from '@/lib/constants/pricing';
 import { calculateEventDuration } from '@/lib/inventory-utils';
 
 const OPERATOR_EXTRA_ID = '__operator_extra__';
@@ -24,9 +24,24 @@ type BookingExtraInput = {
   price: number;
 };
 
+type BookingServiceLineInput = {
+  collaboratorId?: string | null;
+  sortOrder?: number;
+  partyType?: string | null;
+  kind?: 'DJ' | 'SOUND_TECH' | 'PROVIDER_SERVICE' | 'EQUIPMENT' | 'OTHER';
+  label: string;
+  revenueAmount?: number | null;
+  costAmount?: number | null;
+  quantity?: number | null;
+  hours?: number | null;
+  notes?: string | null;
+};
+
 type BookingCreateInput = {
   leadId?: string;
   customerId?: string;
+  sourceCollaboratorId?: string | null;
+  billedCollaboratorId?: string | null;
   clientName: string;
   clientEmail: string;
   clientPhone: string;
@@ -39,6 +54,7 @@ type BookingCreateInput = {
   guestCount: number;
   packId: string;
   customPackPrice?: number;
+  manualTotalPrice?: number;
   invoiceRequired?: boolean;
   extraHours?: number;
   extras?: BookingExtraInput[];
@@ -48,6 +64,7 @@ type BookingCreateInput = {
   distanceKm?: number;
   fuelCostPerKm?: number;
   travelCost?: number;
+  serviceLines?: BookingServiceLineInput[];
 };
 
 type BookingCreationResult = {
@@ -151,6 +168,38 @@ function deriveExtraHours(input: {
   return Math.ceil((eventHours - packHours) * 10) / 10;
 }
 
+function sanitizeMoney(value?: number | null): number | null {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return null;
+  return Math.max(0, Math.round(value * 100) / 100);
+}
+
+function normalizeServiceLines(lines?: BookingServiceLineInput[]) {
+  if (!Array.isArray(lines)) return [];
+
+  return lines
+    .map((line, index) => ({
+      collaboratorId: line.collaboratorId || null,
+      sortOrder: typeof line.sortOrder === 'number' ? line.sortOrder : index,
+      partyType: line.partyType?.trim() || null,
+      kind: line.kind || 'OTHER',
+      label: line.label?.trim(),
+      revenueAmount: sanitizeMoney(line.revenueAmount),
+      costAmount: sanitizeMoney(line.costAmount),
+      quantity: typeof line.quantity === 'number' && line.quantity > 0 ? Math.floor(line.quantity) : null,
+      hours: typeof line.hours === 'number' && line.hours > 0 ? Math.round(line.hours * 100) / 100 : null,
+      notes: line.notes?.trim() || null,
+    }))
+    .filter((line) => Boolean(line.label));
+}
+
+async function resolveBilledPartner(id?: string | null) {
+  if (!id) return null;
+  return prisma.collaborator.findUnique({
+    where: { id },
+    select: { id: true, name: true, company: true, email: true, phone: true },
+  });
+}
+
 async function assignPackInventory(bookingId: string, packId: string) {
   try {
     const packInventory = await prisma.packInventory.findMany({
@@ -204,16 +253,24 @@ async function assignPackInventory(bookingId: string, packId: string) {
 
 export async function createBookingFromInput(data: BookingCreateInput): Promise<BookingCreationResult> {
   let linkedCustomerId: string | null = data.customerId || null;
+  let sourceCollaboratorId: string | null = data.sourceCollaboratorId || null;
+  const billedPartner = await resolveBilledPartner(data.billedCollaboratorId || null);
+  const billedCollaboratorId = billedPartner?.id || null;
 
-  if (!linkedCustomerId && data.leadId) {
+  if (data.leadId) {
     const lead = await prisma.lead.findUnique({
       where: { id: data.leadId },
-      select: { customerId: true },
+      select: { customerId: true, sourceCollaboratorId: true },
     });
-    linkedCustomerId = lead?.customerId || null;
+    if (!linkedCustomerId) {
+      linkedCustomerId = lead?.customerId || null;
+    }
+    sourceCollaboratorId = sourceCollaboratorId || lead?.sourceCollaboratorId || null;
   }
 
-  if (!linkedCustomerId) {
+  if (billedCollaboratorId) {
+    linkedCustomerId = null;
+  } else if (!linkedCustomerId) {
     const byEmail = await prisma.customer.findUnique({
       where: { emailNormalized: data.clientEmail.trim().toLowerCase() },
       select: { id: true },
@@ -242,7 +299,9 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   });
   const extraHoursPrice = extraHours * pack.extraHourPrice;
   const extrasPrice = data.extras?.reduce((sum, e) => sum + e.price * (e.quantity || 1), 0) || 0;
-  const subtotalBase = packPrice + extraHoursPrice + extrasPrice;
+  const serviceLines = normalizeServiceLines(data.serviceLines);
+  const serviceLinesRevenue = serviceLines.reduce((sum, line) => sum + (line.revenueAmount || 0), 0);
+  const subtotalBase = (serviceLinesRevenue > 0 ? serviceLinesRevenue : packPrice + extraHoursPrice) + extrasPrice;
 
   let distanceKm = data.distanceKm != null ? sanitizeNonNegative(data.distanceKm, 0) : null;
   if (distanceKm == null) {
@@ -264,15 +323,27 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   );
   const travelCost = distanceKm != null ? calculateTravelCost(distanceKm, fuelCostPerKm) : null;
   const travelCharge = distanceKm != null ? calculateTravelCharge(distanceKm) : 0;
-  const subtotal = subtotalBase + travelCharge;
+  const subtotalCalculated = subtotalBase + travelCharge;
   const discount = data.discount || 0;
   const vatRate = calcVatRate(data.invoiceRequired ?? false);
-  const baseAfterDiscount = subtotal - discount;
+  const manualTotal = data.manualTotalPrice != null && data.manualTotalPrice > 0
+    ? roundMoney(data.manualTotalPrice)
+    : null;
+  const subtotal = manualTotal !== null
+    ? data.invoiceRequired
+      ? roundMoney(manualTotal * 100 / (100 + vatRate))
+      : manualTotal
+    : subtotalCalculated;
+  const baseAfterDiscount = manualTotal !== null ? subtotal : subtotal - discount;
   // Money es desa com a Float al schema: arrodonir a cèntims evita soroll de
   // coma flotant a BD i desquadres amb Stripe (cobra en cèntims sencers).
   // Mateix patró canònic que publicBookingService.ts.
-  const vatAmount = Math.round(baseAfterDiscount * (vatRate / 100) * 100) / 100;
-  const total = Math.round((baseAfterDiscount + vatAmount) * 100) / 100;
+  const vatAmount = manualTotal !== null
+    ? roundMoney(manualTotal - subtotal)
+    : Math.round(baseAfterDiscount * (vatRate / 100) * 100) / 100;
+  const total = manualTotal !== null
+    ? manualTotal
+    : Math.round((baseAfterDiscount + vatAmount) * 100) / 100;
   const depositAmount = calcDeposit(total);
   const reference = await generateReference();
 
@@ -295,9 +366,11 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       reference,
       leadId: data.leadId,
       customerId: linkedCustomerId,
-      clientName: data.clientName,
-      clientEmail: data.clientEmail,
-      clientPhone: data.clientPhone,
+      sourceCollaboratorId,
+      billedCollaboratorId,
+      clientName: billedPartner?.company || billedPartner?.name || data.clientName,
+      clientEmail: billedPartner?.email || data.clientEmail,
+      clientPhone: billedPartner?.phone || data.clientPhone,
       eventType: normalizeEventType(data.eventType),
       eventDate,
       eventStartTime: data.eventStartTime,
@@ -311,7 +384,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       fuelCostPerKm,
       travelCost,
       subtotal,
-      discount,
+      discount: manualTotal !== null ? 0 : discount,
       discountCode: data.discountCode,
       vatRate,
       vatAmount,
@@ -320,6 +393,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       remainingAmount: Math.round((total - depositAmount) * 100) / 100,
       notes: data.notes,
       extras: resolvedExtras.length > 0 ? { create: resolvedExtras } : undefined,
+      serviceLines: serviceLines.length > 0 ? { create: serviceLines } : undefined,
     },
     include: {
       pack: true,
@@ -364,6 +438,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       data: {
         status: 'WON',
         convertedAt: new Date(),
+        sourceCollaboratorId,
       },
     });
   }

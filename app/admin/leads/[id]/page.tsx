@@ -99,6 +99,7 @@ export default async function LeadDetailPage({ params }: Props) {
       eventAddress: true,
       eventStartTime: true,
       eventEndTime: true,
+      sourceCollaboratorId: true,
       customer: {
         select: {
           id: true,
@@ -352,6 +353,7 @@ export default async function LeadDetailPage({ params }: Props) {
         email: lead.email,
         channel: lead.source,
         owner: lead.assignedTo,
+        sourceCollaboratorId: lead.sourceCollaboratorId ?? null,
         last: null,
         product: null,
         lostReason: null,

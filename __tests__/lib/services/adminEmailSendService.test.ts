@@ -44,6 +44,9 @@ vi.mock('@/app/config/site-config', () => ({
       phone: '+34600000000',
       phoneDisplay: '+34 600 000 000',
     },
+    web: {
+      url: 'https://test.orbita.events',
+    },
   },
 }));
 vi.mock('@/lib/site', () => ({

@@ -24,10 +24,12 @@ interface BookingPackExtrasSectionProps {
   selectedPackId: string;
   extraHours: string;
   customPackPrice: string;
+  manualTotalPrice: string;
   invoiceRequired: boolean;
   onPackSelect: (packId: string) => void;
   onExtraHoursChange: (value: string) => void;
   onCustomPackPriceChange: (value: string) => void;
+  onManualTotalPriceChange: (value: string) => void;
   onInvoiceRequiredChange: (value: boolean) => void;
   onToggleExtra: (extra: BookingExtra) => void;
   onUpdateExtraQuantity: (extraId: string, qty: number) => void;
@@ -40,10 +42,12 @@ export default function BookingPackExtrasSection({
   selectedPackId,
   extraHours,
   customPackPrice,
+  manualTotalPrice,
   invoiceRequired,
   onPackSelect,
   onExtraHoursChange,
   onCustomPackPriceChange,
+  onManualTotalPriceChange,
   onInvoiceRequiredChange,
   onToggleExtra,
   onUpdateExtraQuantity,
@@ -103,7 +107,7 @@ export default function BookingPackExtrasSection({
             </div>
             <div className="nb__field" style={{ maxWidth: 180 }}>
               <label htmlFor="nb-custom-price" className="nb__label">
-                Preu pactat <span className="text-[11px] font-normal text-[var(--t3)]">(deixa buit per usar el del pack)</span>
+                Preu base pactat <span className="text-[11px] font-normal text-[var(--t3)]">(només pack)</span>
               </label>
               <input
                 id="nb-custom-price"
@@ -112,6 +116,20 @@ export default function BookingPackExtrasSection({
                 placeholder="Preu del pack"
                 value={customPackPrice}
                 onChange={(e) => onCustomPackPriceChange(e.target.value)}
+                className="nb__input"
+              />
+            </div>
+            <div className="nb__field" style={{ maxWidth: 190 }}>
+              <label htmlFor="nb-manual-total" className="nb__label">
+                Total final acordat <span className="text-[11px] font-normal text-[var(--t3)]">(guanya sobre tot)</span>
+              </label>
+              <input
+                id="nb-manual-total"
+                type="number"
+                min={0}
+                placeholder="Ex. 340"
+                value={manualTotalPrice}
+                onChange={(e) => onManualTotalPriceChange(e.target.value)}
                 className="nb__input"
               />
             </div>

@@ -54,7 +54,8 @@ const booking = {
 describe('POST /api/admin/bookings/[id]/stripe-checkout', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue({ user: { id: 'admin-1' } });
+    process.env.STRIPE_SECRET_KEY = 'sk_test_mock';
+    mockRequireAuth.mockReturnValue(null);
     mockRequirePermission.mockReturnValue(null);
     mockPrisma.booking.findUnique.mockResolvedValue(booking);
     mockPrisma.booking.update.mockResolvedValue({});

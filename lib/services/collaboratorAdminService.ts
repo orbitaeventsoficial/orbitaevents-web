@@ -7,6 +7,7 @@ type CollaboratorInput = {
   email?: string | null;
   phone?: string | null;
   specialty?: string | null;
+  roles?: string[] | null;
   commissionPct?: number | string | null;
   pricingModel?: string | null;
   costPerHour?: number | string | null;
@@ -39,11 +40,17 @@ export async function listAdminCollaborators() {
       products: {
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
       },
+      _count: {
+        select: {
+          sourcedLeads: true,
+          sourcedBookings: true,
+        },
+      },
     },
   });
 
-  const allBookings = collaborators.flatMap((collaborator) => collaborator.bookings);
-  const allProducts = collaborators.flatMap((collaborator) => collaborator.products);
+  const allBookings = collaborators.flatMap((collaborator) => collaborator.bookings || []);
+  const allProducts = collaborators.flatMap((collaborator) => collaborator.products || []);
   const catalogValue = allProducts
     .filter((product) => product.isActive)
     .reduce((sum, product) => sum + (product.sellPrice || 0), 0);
@@ -52,6 +59,8 @@ export async function listAdminCollaborators() {
   const pendingCommissions = allBookings
     .filter((collaboratorBooking) => !collaboratorBooking.isPaid)
     .reduce((sum, collaboratorBooking) => sum + collaboratorBooking.commissionAmount, 0);
+  const totalSourcedLeads = collaborators.reduce((sum, collaborator) => sum + (collaborator._count?.sourcedLeads || 0), 0);
+  const totalSourcedBookings = collaborators.reduce((sum, collaborator) => sum + (collaborator._count?.sourcedBookings || 0), 0);
 
   return {
     collaborators,
@@ -64,6 +73,8 @@ export async function listAdminCollaborators() {
       pendingCommissions: Math.round(pendingCommissions),
       totalProducts: allProducts.length,
       catalogValue: Math.round(catalogValue),
+      totalSourcedLeads,
+      totalSourcedBookings,
     },
   };
 }
@@ -80,6 +91,7 @@ export async function createAdminCollaborator(input: CollaboratorInput) {
       email: input.email?.trim() || null,
       phone: input.phone?.trim() || null,
       specialty: input.specialty?.trim() || null,
+      roles: Array.isArray(input.roles) && input.roles.length > 0 ? input.roles : ['PROVIDER'],
       commissionPct: Number(input.commissionPct) || 0,
       pricingModel: normalizePricingModel(input.pricingModel),
       costPerHour: input.costPerHour != null ? Number(input.costPerHour) : null,
@@ -128,6 +140,7 @@ export async function updateAdminCollaborator(id: string, input: CollaboratorInp
       ...(input.email !== undefined && { email: input.email?.trim() || null }),
       ...(input.phone !== undefined && { phone: input.phone?.trim() || null }),
       ...(input.specialty !== undefined && { specialty: input.specialty?.trim() || null }),
+      ...(input.roles !== undefined && { roles: Array.isArray(input.roles) && input.roles.length > 0 ? input.roles : [] }),
       ...(input.commissionPct !== undefined && { commissionPct: Number(input.commissionPct) }),
       ...(input.pricingModel !== undefined && { pricingModel: normalizePricingModel(input.pricingModel) }),
       ...(input.costPerHour !== undefined && { costPerHour: input.costPerHour != null ? Number(input.costPerHour) : null }),

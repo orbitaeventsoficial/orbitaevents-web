@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
-import type { BookingFormData, BookingLeadData, BookingSelectedExtras } from './booking-form.types';
+import type { BookingFormData, BookingLeadData, BookingSelectedExtras, BookingServiceLineFormInput } from './booking-form.types';
 
 interface UseNewBookingSubmitOptions {
   form: BookingFormData;
@@ -13,9 +13,54 @@ interface UseNewBookingSubmitOptions {
   leadId: string | null;
   leadData: Pick<BookingLeadData, 'customerId'> | null;
   customerId: string | null;
+  sourceCollaboratorId?: string | null;
   internalTravelCost: number;
   customPackPrice?: number;
+  manualTotalPrice?: number;
   invoiceRequired?: boolean;
+  relationshipContext?: {
+    mode: string;
+    partnerId?: string;
+    partnerLabel?: string;
+    orbitaDjAmount?: string;
+    orbitaTechAmount?: string;
+    partnerRole?: string;
+    partnerCostAmount?: string;
+  };
+}
+
+function parsePositiveMoney(value?: string) {
+  const amount = Number(String(value || '').replace(',', '.'));
+  return Number.isFinite(amount) && amount > 0 ? amount : undefined;
+}
+
+function buildServiceLines(input?: UseNewBookingSubmitOptions['relationshipContext']): BookingServiceLineFormInput[] {
+  if (!input || input.mode === 'DIRECT_CLIENT') return [];
+  const lines: BookingServiceLineFormInput[] = [];
+  const djAmount = parsePositiveMoney(input.orbitaDjAmount);
+  const techAmount = parsePositiveMoney(input.orbitaTechAmount);
+  const partnerCost = parsePositiveMoney(input.partnerCostAmount);
+  const partnerLabel = input.partnerLabel || 'Partner';
+
+  if ((input.mode === 'PARTNER_HIRES_ORBITA' || input.mode === 'MIXED_PARTNER') && djAmount) {
+    lines.push({ kind: 'DJ', label: 'DJ Orbita', revenueAmount: djAmount, quantity: 1 });
+  }
+
+  if ((input.mode === 'PARTNER_HIRES_ORBITA' || input.mode === 'MIXED_PARTNER') && techAmount) {
+    lines.push({ kind: 'SOUND_TECH', label: 'Tecnic de so Orbita', revenueAmount: techAmount, quantity: 1 });
+  }
+
+  if ((input.mode === 'ORBITA_HIRES_PARTNER' || input.mode === 'MIXED_PARTNER') && partnerCost) {
+    lines.push({
+      collaboratorId: input.partnerId || undefined,
+      kind: 'PROVIDER_SERVICE',
+      label: input.partnerRole || `Servei ${partnerLabel}`,
+      costAmount: partnerCost,
+      quantity: 1,
+    });
+  }
+
+  return lines;
 }
 
 export function useNewBookingSubmit({
@@ -24,9 +69,12 @@ export function useNewBookingSubmit({
   leadId,
   leadData,
   customerId,
+  sourceCollaboratorId,
   internalTravelCost,
   customPackPrice,
+  manualTotalPrice,
   invoiceRequired = false,
+  relationshipContext,
 }: UseNewBookingSubmitOptions) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
@@ -45,14 +93,25 @@ export function useNewBookingSubmit({
       setError('Data i ubicació són obligatoris');
       return;
     }
+    if (relationshipContext && relationshipContext.mode !== 'DIRECT_CLIENT' && !relationshipContext.partnerId) {
+      setError('Selecciona el partner de la relació comercial');
+      return;
+    }
 
     setSubmitting(true);
     setError(null);
 
     try {
+      const serviceLines = buildServiceLines(relationshipContext);
+      const billedCollaboratorId = relationshipContext?.mode === 'PARTNER_HIRES_ORBITA'
+        ? relationshipContext.partnerId || undefined
+        : undefined;
+      const notes = form.notes.trim();
       const body = {
         leadId: leadId || undefined,
         customerId: leadData?.customerId || customerId || undefined,
+        sourceCollaboratorId: sourceCollaboratorId || undefined,
+        billedCollaboratorId,
         clientName: form.clientName.trim(),
         clientEmail: form.clientEmail.trim(),
         clientPhone: form.clientPhone.trim(),
@@ -65,6 +124,7 @@ export function useNewBookingSubmit({
         guestCount: parseInt(form.guestCount, 10) || 100,
         packId: form.packId,
         customPackPrice: customPackPrice || undefined,
+        manualTotalPrice: manualTotalPrice || undefined,
         invoiceRequired,
         extraHours: form.extraHours.trim() ? parseInt(form.extraHours, 10) || 0 : undefined,
         extras: Object.entries(selectedExtras).map(([extraId, extra]) => ({
@@ -74,7 +134,8 @@ export function useNewBookingSubmit({
         })),
         discount: parseFloat(form.discount) || 0,
         discountCode: form.discountCode.trim() || undefined,
-        notes: form.notes.trim() || undefined,
+        notes: notes || undefined,
+        serviceLines: serviceLines.length > 0 ? serviceLines : undefined,
         distanceKm: parseFloat(form.distanceKm) || undefined,
         fuelCostPerKm: parseFloat(form.fuelCostPerKm) || undefined,
         travelCost: internalTravelCost || undefined,
@@ -100,7 +161,7 @@ export function useNewBookingSubmit({
     } finally {
       setSubmitting(false);
     }
-  }, [customerId, form, internalTravelCost, leadData, leadId, router, selectedExtras]);
+  }, [customerId, form, internalTravelCost, leadData, leadId, manualTotalPrice, relationshipContext, router, selectedExtras, sourceCollaboratorId, customPackPrice, invoiceRequired]);
 
   return {
     submitting,

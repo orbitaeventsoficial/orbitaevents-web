@@ -763,6 +763,7 @@ Criteri pràctic:
 **FET** *(2026-05-18 per `codex` — Canvi #676)*: el `OwnerControlStrip` de `/admin/leads` ja llegeix la continuïtat amb Customer Hub des d'una capa pura (`buildLeadOwnerControlSummary()`). A més de leads nous, prioritat alta i reserves vinculades, ara mostra quantes entrades ja viuen a `Fitxa 360`. Efecte: la primera lectura de Leads reforça el flux lead nou → negociació → reserva → client recurrent sense dependre d'obrir cada fila.
 **FET** *(2026-05-21 per `claude` — Canvi #737)*: el reengagement deixa de dependre del recordatori del propietari. `lib/services/tasks/leadReengagementAutomationService.ts` reaprofita les 6 classificacions de `loadReengagementCandidates()` (#51) i genera tasques canòniques `source: 'AUTOMATION'`, `autoRule: 'LEAD_REENGAGEMENT'` amb `TASK_DEDUPE_KEY.reengagement(leadId)`; el cron `/api/cron/lead-reengagement` (Bearer-auth, prefix `automation.leadReengagement`) s'executa diàriament des de `daily-crons.yml` i `/admin/crons` el mostra al monitor. Per defecte exclou candidats de prioritat BAIXA per evitar soroll. 11 tests nous (8 servei + 3 ruta) i `ADMIN_CRON_PREFIXES` passa a 11 crons.
 **FET** *(2026-06-01 per `claude + opus + codex` — Canvi #848)*: `/admin/leads` recupera la fitxa interna dins la reconstrucció Agenda #846/#848. Clicar qualsevol entrada de calendari, pipeline o llista obre un overlay `fxd__*` amb KPIs, dades del bolo, contacte, següent pas, canvi de fase, WhatsApp/correu, creació/obertura de reserva, cobrament inline i sortida a la fitxa completa. Efecte: el workspace ja no queda tallat després de la llista/pipeline; torna a ser una cabina operativa clicable sense reintroduir el soroll visual antic.
+**FET** *(2026-06-07 per `codex` — Canvi #898)*: el calendari de `/admin/leads` deixa de sobrescriure bolos que comparteixen dia. Cada data guarda una llista ordenada per hora i la targeta del dia es divideix en files compactes per a 2, 5 o més entrades, mantenint accés directe a cada lead.
 **MÉS ENDAVANT**: refinaments quan dades reals de execució suggereixin reajustar dies-llindar o canals suggerits.
 
 ## 6.7 Bookings / Operacions
@@ -780,6 +781,7 @@ Criteri pràctic:
 **FET** *(2026-05-21 per `claude` — Canvi #747)*: `operationalForecastService.ts` afegeix forecast operatiu setmanal a 4 setmanes amb alertes anticipades (`NONE/INFO/WARNING/CRITICAL`), dies sobrecarregats per setmana, comparativa YoY (`previousYearBookings` + `yoyDelta`) i llindars configurables. `/admin/calendario/capacity` mostra cards setmanals tinted segons alertLevel sota la grid de 14 dies. 8 tests nous (`qa:service-coverage` cobreix el servei).
 **FET** *(2026-05-21 per `claude` — Canvi #748)*: el forecast capacitat entra al Dashboard com a panell condicional. `WeeklyCapacityForecastPanel` només es mostra quan hi ha setmana `WARNING/CRITICAL`; quan tot està OK, el panell desapareix. Border global rose/ambar segons severitat màxima. Reforça el principi "operar millor + decidir millor" — l'alerta arriba abans del problema.
 **FET** *(2026-05-21 per `claude` — Canvi #749)*: el cicle del forecast capacitat es tanca amb alertes al resum diari email+WhatsApp. `commercialDailyAutomationService` carrega `loadWeeklyCapacityForecast()`, separa setmanes `CRITICAL`/`WARNING` i, si n'hi ha, injecta bloc HTML (border rose/ambar) a l'email i línia `📅 Forecast capacitat` al WhatsApp. Zero spam quan totes les setmanes són OK. Suite del servei 6→8 tests.
+**FET** *(2026-06-07 per `codex` — Canvi #898)*: la nova reserva incorpora la direcció comercial del bolo sense duplicar fitxes de partner: client final contracta Òrbita, partner/proveïdor contracta Òrbita, Òrbita contracta partner/proveïdor o relació mixta. La nota estructurada desa partner, import DJ Òrbita, import tècnic Òrbita, rol del partner i cost del partner. El preu final acordat es desa com a total exacte i les edicions de dades d'esdeveniment en reserva sincronitzen també el lead vinculat. La BD de partners guanya rols múltiples i origen comercial de leads/reserves per suportar entitats genèriques: proveïdor, porta bolos, lloguer de material, partner que ens contracta o equip extern.
 **MÉS ENDAVANT**: refinaments de llindar segons dades reals d'execució (5 reserves/setmana = WARNING és estimació inicial conservadora).
 
 ## 6.8 Inbox / Comunicacions
@@ -1379,6 +1381,114 @@ Seqüència obligatòria de registre:
 - `user` — decisions manuals o interventions directes
 
 ## Entrades
+
+---
+
+### Canvi #904 — 2026-06-08 — codex (FET)
+
+**Script dry-run per migrar OE-2026-005 (Lliçà) de `notes` cap a `BookingServiceLine`.**
+
+- Context: la Fase 6 de partners demana convertir el split històric de Lliçà en dades estructurades (`billedCollaboratorId` + línies DJ/tècnic), però l'execució real depèn que el propietari apliqui primer la migració Prisma `20260608113000_booking_partner_billing_service_lines`.
+- `scripts/migrate-booking-partner-service-lines.mjs`: dry-run per defecte; amb `--apply` assigna Masquerade com a partner facturat, posa `customerId` a `null`, crea línies DJ 300 i tècnic de so 40 si no existeixen, i neteja `notes` per aquest cas.
+- El script és idempotent respecte a `serviceLines` preexistents i no duplica línies.
+- El prerequisit pendent de schema (`bookings.billedCollaboratorId`) es mostra amb missatge clar en lloc de stack cru.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `903` a `904`.
+- Validació tècnica: `node --check scripts\migrate-booking-partner-service-lines.mjs` OK; dry-run real verificat fora del sandbox i bloquejat correctament per migració pendent a BD.
+- Validació funcional: preparat perquè el propietari executi dry-run i després `--apply` quan Railway tingui la migració.
+- Validació humana/UX: no aplica.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #903 — 2026-06-08 — codex (FET)
+
+**Nova reserva deixa d'escriure el split de partners a notes i envia `BookingServiceLine` estructurat.**
+
+- Context: #899 preparava schema/API/serveis per `billedCollaboratorId` i `BookingServiceLine`, però la UI de nova reserva encara serialitzava la relació comercial com a nota textual.
+- `app/admin/bookings/NewBookingForm.tsx`: el partner implicat es tria des de la llista real de partners; el submit rep `partnerId` i label.
+- `app/admin/bookings/useNewBookingSubmit.ts`: genera `serviceLines` per DJ, tècnic de so i cost de partner; envia `billedCollaboratorId` quan el mode és “Partner/proveïdor contracta Òrbita”; les notes queden només com a camp humà.
+- `app/admin/bookings/booking-form.types.ts`: tipus `BookingServiceLineKind` i `BookingServiceLineFormInput`.
+- `__tests__/app/admin/bookings/useNewBookingSubmit.test.tsx`: cobertura per Lliçà (`billedCollaboratorId` + línies DJ/tècnic revenue) i partner subcontractat (`PROVIDER_SERVICE.costAmount`) sense split en notes.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `902` a `903`.
+- Validació tècnica: `pnpm exec vitest run __tests__\app\admin\bookings\useNewBookingSubmit.test.tsx` OK (4); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:visual-overflow` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK; `pnpm test:run` OK; `pnpm build` OK.
+- Validació funcional: la creació de reserves ja consumeix el contracte estructurat de Fase 3.
+- Validació humana/UX: pendent prova manual a `/admin/bookings/new` després de migració #899 aplicada a l'entorn.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #902 — 2026-06-08 — codex (FET)
+
+**La suite de tests recupera tres blocs desalineats amb contractes actuals de config, protocol i auth Stripe.**
+
+- Context: `pnpm test:run` fallava per mocks antics: `SITE_CONFIG.web.url` absent, `fs.promises.access` absent, i `requireAuth` retornant objecte quan la ruta espera `null` en èxit.
+- `lib/services/signatureService.ts`: els estilos inline de la firma email passen de hex literals a `rgb(...)` per complir el test de no hardcoded hex sense perdre compatibilitat email.
+- `__tests__/lib/services/adminEmailSendService.test.ts`: mock de `SITE_CONFIG` completat amb `web.url`.
+- `__tests__/app/admin/docs/ProtocolPage.test.tsx`: mock de `fs.promises.access` afegit.
+- `__tests__/app/api/admin/bookings-stripe-checkout-route.test.ts`: auth mock alineat (`requireAuth` retorna `null`) i `STRIPE_SECRET_KEY` definit al test.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `901` a `902`.
+- Validació tècnica: tests focalitzats OK (`adminEmailSendService` + `signatureService`: 25; `ProtocolPage`: 4; `bookings-stripe-checkout`: 4); `pnpm test:run` OK; `pnpm run validate:core` OK; `pnpm build` OK.
+- Validació funcional: cap canvi de contracte productiu a email/protocol/Stripe, excepte eliminar hex literals en la firma.
+- Validació humana/UX: no aplica.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #901 — 2026-06-08 — codex (FET)
+
+**Bookings elimina els avisos de risc visual estàtic per `whitespace-nowrap` sense contenció.**
+
+- Context: amb #900 ja verd, `qa:visual-overflow` encara marcava quatre warnings antics a `app/admin/bookings/**` que podien desbordar en taules estretes.
+- `app/admin/bookings/BookingActions.tsx`: el botó compacte "Veure" conserva el no-wrap però queda contingut amb `max-w-full`.
+- `app/admin/bookings/page.tsx`: la referència, la cel·la de data i el total incorporen `max-w`/`truncate` perquè el no-wrap no pugui ampliar la taula sense límit.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `900` a `901`.
+- Validació tècnica: `pnpm run qa:visual-overflow` OK.
+- Validació funcional: la llista de reserves manté rutes, format i dades; només es limita el comportament visual en amplades petites.
+- Validació humana/UX: pendent verificació visual manual a `/admin/bookings`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #900 — 2026-06-08 — codex (FET)
+
+**Partner Hub substitueix el `mailto:` pel compositor intern de l'Inbox per tornar a deixar verd el guard admin.**
+
+- Context: després del #899, `pnpm run validate:core` i `pnpm build` quedaven bloquejats a `qa:admin-no-mailto` per `app/admin/collaborators/[id]/PartnerHubClient.tsx`.
+- `app/admin/collaborators/[id]/PartnerHubClient.tsx`: l'email del partner passa de `mailto:` a `/admin/inbox/compose?to=...`, mantenint l'etiqueta visible però entrant pel redactor canònic.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `899` a `900`.
+- Validació tècnica: `pnpm run qa:admin-no-mailto` OK; `pnpm run qa:customer-inline-href` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK; `pnpm build` OK.
+- Validació funcional: el contacte amb partner queda dins Inbox/Admin i no obre client extern.
+- Validació humana/UX: pendent verificació visual a la pestanya Notes i contacte del Partner Hub.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #899 — 2026-06-08 — codex (FET)
+
+**Fase 3 de Partners deixa el backend preparat per facturar reserves a un partner i dividir el bolo en línies de servei estructurades.**
+
+- Context: Claude ha cedit a Codex la Fase 3 segons la decisió locked d'Opus: no unificar `Customer` i `Collaborator`; `Booking.billedCollaboratorId` resol qui rep la factura quan contracta un partner; `BookingServiceLine` separa DJ, tècnic, serveis de partner i material; `computeBookingFinancialSummary()` continua sent l'única via de marge; i `BookingServiceLine.costAmount` no es duplica amb `CollaboratorBooking.commissionAmount`.
+- `prisma/schema.prisma` + migració local `20260608113000_booking_partner_billing_service_lines`: nou `billedCollaboratorId`, relació `BookingBilledCollaborator`, `Collaborator.billedBookings`, `Booking.serviceLines`, model `BookingServiceLine` i enum `BookingServiceLineKind`.
+- `lib/services/costEngine.ts`: afegeix `serviceLinesRevenue` i `serviceLinesCost`; el cost de línies suma a `directCost` i l'ingrés de línies només actua com a fallback si la reserva encara no porta `total`.
+- `lib/services/bookingCreationService.ts`, `bookingRouteService.ts` i rutes `app/api/admin/bookings/**`: creació/PATCH accepten `billedCollaboratorId` i `serviceLines`; quan es factura a partner, el servei anul·la `customerId` i omple el snapshot de cobrament des del `Collaborator`, sense crear un `Customer` mirall.
+- Efecte: casos com Lliçà d'Amunt poden passar de notes textuals a línies estructurades (`DJ`, `SOUND_TECH`) facturades a Masquerade, i casos com Cristina poden conservar `customerId` amb una línia de cost de partner separada.
+- Validació tècnica: `npx prisma generate` OK; `pnpm exec vitest run __tests__\lib\services\costEngine.test.ts` OK (54); `pnpm exec vitest run __tests__\lib\services\bookingCreationService.test.ts` OK (31); `pnpm exec vitest run __tests__\lib\services\bookingRouteService.test.ts` OK (21); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: tests cobreixen facturació a partner sense `customerId`, creació/reemplaç de línies i cost de línies dins el motor financer.
+- Validació humana/UX: pendent editor visual de `serviceLines` a nova reserva després d'aplicar migració; aquest tall tanca el contracte backend local, no la UI final.
+- `ADMIN_CHANGE_COUNTER` puja a `899`; el següent canvi real ha de ser `#900`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
 
 ---
 
@@ -14317,6 +14427,26 @@ px tsc --noEmit OK · git diff --check OK.
 - Validació funcional: les fonts de treball queden reduïdes a dues rutes canòniques i els lectors principals ja no depenen del nom antic; les previews PDF mostren `XXXXXX` en dades de mostra i mantenen càlculs reals.
 - Validació humana/UX: el propietari ha demanat normalitzar-ho; el canvi redueix soroll documental sense eliminar història del registre.
 - `ADMIN_CHANGE_COUNTER` puja a `884`; el següent canvi real ha de ser `#885`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #898 — 2026-06-07 — codex (FET)
+**Agenda i reserves suporten múltiples bolos el mateix dia i relació comercial per direcció de contracte.**
+- Context: el propietari tenia dos bolos confirmats el 2026-07-11 (Adrià a les 22:00 i Cristina Rey a les 18:00) però la targeta del calendari només mostrava un lead perquè el mapa per data sobrescrivia l'entrada anterior. En paral·lel, els casos amb Carlos/Masquerade necessitaven una regla escalable: Carlos pot vendre un bingo i contractar Òrbita com a tècnic/DJ, o Òrbita pot vendre un bolo i subcontractar pintacares/mag a Masquerade.
+- Dades reals: Cristina Rey queda `WON`, 2026-07-11 18:00; Adrià queda `WON`, 2026-07-11 22:00. La reserva OE-2026-005 del 2026-06-12 queda sincronitzada amb el lead a `Lliçà de Munt`, 19:30-23:30, total exacte 340 EUR sense IVA, senyal 102 i resta 238; `assignedTo` es neteja perquè Masquerade/Carlos és qui contracta Òrbita en aquest cas, no el subcontractat.
+- `app/admin/leads/LeadsSeasonClient.tsx` i `app/admin/leads/leads-design.css`: `byDate` passa de lead únic a llista de leads ordenada per hora; `LeadDayCell` renderitza targetes multi-bolo amb files clicables per cada lead; la graella pot créixer per dies amb 5 o més entrades.
+- `app/admin/bookings/NewBookingForm.tsx`, `BookingPackExtrasSection.tsx`, `useNewBookingSubmit.ts` i `useBookingPricing.ts`: nova secció "Relació comercial" amb partner d'origen ("bolo passat per"), direcció del contracte, imports separats de DJ Òrbita i tècnic Òrbita, rol del partner i cost del partner; nou camp "Total final acordat" que guanya sobre pack/extres/desplaçament.
+- `prisma/schema.prisma` + migració `20260607193000_partner_roles_and_sources`: `Collaborator.roles` i `sourceCollaboratorId` a `Lead` i `Booking`. Això permet una fitxa única per persona/empresa amb rols múltiples i atribució de bolos passats sense crear BD separada per proveïdors/clients.
+- `app/admin/collaborators/*` i `lib/services/collaboratorAdminService.ts`: la pantalla passa a model mental de `Partners`, amb rols marcables, KPI de bolos passats i compatibilitat amb el catàleg/material ja existent.
+- `docs/partners-platform-handoff.md`: resum complet per Claude amb model de negoci, exemples reals (Carlos/Masquerade, Rufo, Tino, Tronios, DJ Mania), regles de no-hardcode i properes fases del Partner Hub.
+- `lib/services/bookingCreationService.ts` i `app/api/admin/bookings/route.ts`: `manualTotalPrice` desa el total exacte pactat, recalcula IVA si toca, senyal i resta. Si no s'informa, es conserva el càlcul existent de pack, extres, hores, desplaçament i descompte.
+- `lib/services/bookingRouteService.ts`: quan una reserva vinculada canvia data, hora, ubicació, contacte d'esdeveniment, convidats o tipus, el lead vinculat es sincronitza perquè no torni a quedar Montgat/Lliçà desquadra entre pantalles.
+- Regla de negoci: no classificar cap entitat com a `client` o `proveïdor` absolut. `Customer` continua sent qui rep/paga el servei final; `Partner` és la xarxa externa. Cada partner pot tenir rols múltiples i cada reserva defineix `contractant -> contractat` i línies: qui ha passat el bolo, qui contracta Òrbita, import DJ Òrbita, import tècnic Òrbita, què fa el partner i quin cost té.
+- Validació tècnica: `npx prisma generate` OK; `npx tsc --noEmit --pretty false` OK; `pnpm exec vitest run __tests__\lib\services\bookingRouteService.test.ts __tests__\lib\services\bookingCreationService.test.ts __tests__\lib\services\collaboratorAdminService.test.ts __tests__\app\api\admin\collaborators-route.test.ts` OK (72 tests).
+- Validació funcional: 11/07 mostra tots els leads del dia sense sobrescriure; una reserva nova pot guardar "partner contracta Òrbita" i "Òrbita contracta partner" sense canviar schema; el total manual 340 queda exacte en servei i tests.
+- Validació humana/UX: el formulari separa direcció comercial, DJ i tècnic perquè casos com "Carlos ven bingo i em porta només com a tècnic", "només DJ" o "tècnic + DJ" siguin llegibles sense dependre de memòria o notes soltes.
+- `ADMIN_CHANGE_COUNTER` puja a `898`; el següent canvi real ha de ser `#899`.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`

@@ -445,6 +445,8 @@ model Lead {
   interestedPackId String?
   interestedExtras String[]
   source           LeadSource @default(WEBSITE)
+  sourceCollaboratorId String?
+  sourceCollaborator   Collaborator? @relation("LeadSourceCollaborator", fields: [sourceCollaboratorId], references: [id], onDelete: SetNull)
   landingPage      String?
   utmSource        String?
   utmMedium        String?
@@ -488,6 +490,7 @@ model Lead {
   @@index([eventType])
   @@index([createdAt])
   @@index([customerId])
+  @@index([sourceCollaboratorId])
   @@index([email])
   @@index([status, createdAt]) // Consultes combinades
   @@index([priority, status]) // Per ordenar leads urgents
@@ -712,6 +715,10 @@ model Booking {
   lead       Lead?     @relation(fields: [leadId], references: [id], onDelete: SetNull)
   customerId String?
   customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  sourceCollaboratorId String?
+  sourceCollaborator   Collaborator? @relation("BookingSourceCollaborator", fields: [sourceCollaboratorId], references: [id], onDelete: SetNull)
+  billedCollaboratorId String?
+  billedCollaborator   Collaborator? @relation("BookingBilledCollaborator", fields: [billedCollaboratorId], references: [id], onDelete: SetNull)
 
   // Client
   clientName      String
@@ -784,6 +791,7 @@ model Booking {
   tasks                Task[]
   portalAccesses       ClientPortalAccess[]
   collaboratorBookings CollaboratorBooking[]
+  serviceLines         BookingServiceLine[]
   galleryPhotos        BookingGalleryPhoto[]
   inventoryUsages      InventoryUsage[]
   availability         Availability[]
@@ -810,6 +818,8 @@ model Booking {
   @@index([packId])
   @@index([createdAt])
   @@index([customerId])
+  @@index([sourceCollaboratorId])
+  @@index([billedCollaboratorId])
   @@index([reference]) // Per generació de referències
   @@index([status, eventDate]) // Consultes combinades
   @@index([status, eventDate, postEventEmailSent]) // Per cron post-event
@@ -878,6 +888,38 @@ enum BookingStatus {
   PREPARING
   COMPLETED
   CANCELLED
+}
+
+enum BookingServiceLineKind {
+  DJ
+  SOUND_TECH
+  PROVIDER_SERVICE
+  EQUIPMENT
+  OTHER
+}
+
+model BookingServiceLine {
+  id             String                 @id @default(cuid())
+  bookingId      String
+  booking        Booking                @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  collaboratorId String?
+  collaborator   Collaborator?          @relation(fields: [collaboratorId], references: [id], onDelete: SetNull)
+  sortOrder      Int                    @default(0)
+  partyType      String?
+  kind           BookingServiceLineKind @default(OTHER)
+  label          String
+  revenueAmount  Float?
+  costAmount     Float?
+  quantity       Int?
+  hours          Float?
+  notes          String?                @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bookingId])
+  @@index([collaboratorId])
+  @@map("booking_service_lines")
 }
 
 enum ProposalStatus {
@@ -1792,6 +1834,7 @@ model Collaborator {
   email         String?
   phone         String?
   specialty     String?                  // Especialitat (DJ, Presentador, Tècnic so...)
+  roles         String[]                 @default([]) // PROVIDER, REFERRER, EQUIPMENT_RENTAL, CLIENT_PARTNER, CREW
   commissionPct Float                    @default(0)  // % comissió de vendes (0 si és treballador extern)
   pricingModel  CollaboratorPricingModel @default(DISCOUNT)
   costPerHour   Float?                   // Cost que ens cobra per hora (calculadora de costos)
@@ -1800,6 +1843,10 @@ model Collaborator {
 
   bookings CollaboratorBooking[]
   products CollaboratorProduct[]
+  sourcedLeads Lead[] @relation("LeadSourceCollaborator")
+  sourcedBookings Booking[] @relation("BookingSourceCollaborator")
+  billedBookings Booking[] @relation("BookingBilledCollaborator")
+  bookingServiceLines BookingServiceLine[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

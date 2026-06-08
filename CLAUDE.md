@@ -152,6 +152,8 @@ Després de cada ronda de canvis, grep actiu de residus:
 - `style={{` — inline styles que haurien de ser classes CSS
 - `rgba(` — colors inline que haurien de ser tokens
 
+Aquest grep està **automatitzat** via hook `PostToolUse` (`scripts/hooks/check-residue.mjs`): després de cada `Write`/`Edit` d'un `.tsx`/`.css` sota `app/`/`components/` injecta els residus trobats. És advisori, no bloqueja, i respecta l'allowlist de fitxers de tokens. Connexió local via `node scripts/hooks/install-hooks.mjs` (`.claude/settings.json` és gitignorat; els scripts sí van a git). Veure `docs/admin-diary.md`.
+
 ## Testing
 
 - Codi nou de negoci o utilitat nova ha de sortir amb el seu test.

@@ -1,7 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
-const { mockReadFile, mockLoadCanviValidations } = vi.hoisted(() => ({
+const { mockAccess, mockReadFile, mockLoadCanviValidations } = vi.hoisted(() => ({
+  mockAccess: vi.fn(),
   mockReadFile: vi.fn(),
   mockLoadCanviValidations: vi.fn(),
 }));
@@ -10,10 +11,12 @@ vi.mock('fs', () => ({
   __esModule: true,
   default: {
     promises: {
+      access: mockAccess,
       readFile: mockReadFile,
     },
   },
   promises: {
+    access: mockAccess,
     readFile: mockReadFile,
   },
 }));
@@ -63,6 +66,7 @@ const PROTOCOL_MD = [
 describe('AdminProtocolPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockAccess.mockResolvedValue(undefined);
     mockReadFile.mockResolvedValue(PROTOCOL_MD);
   });
 

@@ -26,6 +26,10 @@ interface BookingCostInput {
   source?: string | null;
   /** Cost real del pack calculat des d'inventari (amortització + labor) */
   inventoryCostReal?: number | null;
+  /** Ingrés explícit de línies del bolo quan la reserva es construeix per línies. */
+  serviceLinesRevenue?: number | null;
+  /** Cost explícit de línies del bolo. No duplicar amb CollaboratorBooking. */
+  serviceLinesCost?: number | null;
 }
 
 interface BookingFinancialSummary {
@@ -36,6 +40,8 @@ interface BookingFinancialSummary {
   extraHoursCost: number;
   fixedOperationalCost: number;
   travelCost: number;
+  serviceLinesRevenue: number;
+  serviceLinesCost: number;
   directCost: number;
   // CAC
   acquisitionCost: number;
@@ -77,8 +83,17 @@ export function computeBookingFinancialSummary(
       ? input.travelCost
       : calculateTravelCost(input.distanceKm, effectiveVehicleCostPerKm);
 
+  const serviceLinesRevenue =
+    typeof input.serviceLinesRevenue === 'number' && input.serviceLinesRevenue > 0
+      ? input.serviceLinesRevenue
+      : 0;
+  const serviceLinesCost =
+    typeof input.serviceLinesCost === 'number' && input.serviceLinesCost > 0
+      ? input.serviceLinesCost
+      : 0;
+
   const directCost =
-    packCost + extrasCost + extraHoursCost + fixedOperationalCost + travelCost;
+    packCost + extrasCost + extraHoursCost + fixedOperationalCost + travelCost + serviceLinesCost;
 
   // CAC
   const acquisitionCost =
@@ -86,8 +101,9 @@ export function computeBookingFinancialSummary(
     config.channelCac.UNKNOWN ??
     20;
 
-  const netMargin = input.total - directCost - acquisitionCost;
-  const marginPct = input.total > 0 ? (netMargin / input.total) * 100 : 0;
+  const total = input.total > 0 ? input.total : serviceLinesRevenue;
+  const netMargin = total - directCost - acquisitionCost;
+  const marginPct = total > 0 ? (netMargin / total) * 100 : 0;
   const marginTone = getMarginTone(marginPct);
 
   return {
@@ -97,12 +113,14 @@ export function computeBookingFinancialSummary(
     extraHoursCost,
     fixedOperationalCost,
     travelCost,
+    serviceLinesRevenue,
+    serviceLinesCost,
     directCost,
     acquisitionCost,
     netMargin,
     marginPct,
     marginTone,
-    total: input.total,
+    total,
   };
 }
 

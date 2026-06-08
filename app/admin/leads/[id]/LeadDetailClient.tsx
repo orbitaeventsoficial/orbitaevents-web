@@ -92,6 +92,7 @@ export type LeadDetailData = {
   email: string | null;
   channel: string | null;
   owner: string | null;
+  sourceCollaboratorId: string | null;
   last: string | null;
   product: string | null;
   lostReason: string | null;
@@ -197,6 +198,21 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
     } catch (error) {
       console.error('[LeadDetailClient] Error saving assignee', error);
       toast.error('Error desant l\'assignació.');
+    }
+  }
+
+  async function saveSourceCollaborator(id: string) {
+    try {
+      await fetchWithCsrf(`/api/admin/leads/${lead.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sourceCollaboratorId: id || null }),
+      });
+      toast.success('Origen del bolo desat.');
+      startTransition(() => router.refresh());
+    } catch (error) {
+      console.error('[LeadDetailClient] Error saving source collaborator', error);
+      toast.error('Error desant l\'origen del bolo.');
     }
   }
 
@@ -725,6 +741,14 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
                 <option value="">— Sense assignar</option>
                 {collaborators.map((c) => (
                   <option key={c.id} value={c.name}>{c.name}</option>
+                ))}
+              </select>
+            </dd></div>
+            <div><dt>Bolo passat per</dt><dd>
+              <select className="fxd__editinput" value={lead.sourceCollaboratorId ?? ''} onChange={(e) => saveSourceCollaborator(e.target.value)} aria-label="Partner que ha passat el bolo">
+                <option value="">— Ningú / directe</option>
+                {collaborators.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
             </dd></div>

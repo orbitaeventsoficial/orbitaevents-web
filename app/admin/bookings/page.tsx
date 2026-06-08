@@ -508,7 +508,7 @@ export default async function BookingsPage({
                       className={`bk-table-row hover:bg-white/[0.025] transition-colors${isPast && booking.status !== 'COMPLETED' ? ' bk-table-row--past' : ''}`}
                     >
                       <td className="px-3 py-2.5">
-                        <Link href={buildBookingHref(booking.id)} className="font-mono text-xs text-[var(--gold)] hover:opacity-80 whitespace-nowrap">
+                        <Link href={buildBookingHref(booking.id)} className="block max-w-[7rem] truncate font-mono text-xs text-[var(--gold)] hover:opacity-80 whitespace-nowrap">
                           {booking.reference}
                         </Link>
                       </td>
@@ -522,7 +522,7 @@ export default async function BookingsPage({
                         )}
                       </td>
                       <td className="px-3 py-2.5 text-sm">{eventType}</td>
-                      <td className="px-3 py-2.5 whitespace-nowrap">
+                      <td className="px-3 py-2.5 max-w-[8rem] whitespace-nowrap">
                         <span className="text-sm font-medium">{formatDateShort(booking.eventDate)}</span>
                         {!isPast && booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED' && (() => {
                           const d = Math.ceil((new Date(booking.eventDate).getTime() - Date.now()) / 864e5);
@@ -542,7 +542,7 @@ export default async function BookingsPage({
                         {booking._count.extras > 0 && <span className="opacity-50 text-xs">+{booking._count.extras}</span>}
                       </td>
                       <td className="px-3 py-2.5">
-                        <div className="text-sm font-bold tabular-nums whitespace-nowrap">{formatCurrency(booking.total)}</div>
+                        <div className="max-w-[7rem] truncate text-sm font-bold tabular-nums whitespace-nowrap">{formatCurrency(booking.total)}</div>
                         <span className={`inline-flex items-center gap-1 text-[10px] mt-0.5 ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-text-success' : booking.depositPaid ? 'admin-tone-text-warning' : 'admin-tone-text-danger'}`}>
                           <span className={`inline-block h-1.5 w-1.5 rounded-full ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-bg-success' : booking.depositPaid ? 'admin-tone-bg-warning' : 'admin-tone-bg-danger'}`} />
                           {booking.depositPaid && booking.remainingPaid ? 'Pagat' : booking.depositPaid ? 'Parcial' : 'Pendent'}

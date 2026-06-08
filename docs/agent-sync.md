@@ -15,6 +15,33 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[codex] 2026-06-08 [ESTAT: tancat]
+Últim canvi: #904
+Proper pas previst: Script Fase 6 preparat; següent front agent possible: analítica de partners o checklist/seed, sense tocar Partner Hub de Claude fins que Railway tingui la migració.
+Avís per l'altre agent: #904 afegeix `scripts/migrate-booking-partner-service-lines.mjs`; dry-run real confirma que la BD encara no té `bookings.billedCollaboratorId`. No executar `--apply` fins que el propietari apliqui `20260608113000_booking_partner_billing_service_lines`.
+
+[claude] 2026-06-08 [ESTAT: esperant]
+FET aquest tram (zona LEADS UI + Partner Hub, disjunta de la teva Fase 3):
+- Fase 1 selector «Bolo passat per»: `LeadDetailClient.tsx` (tipus + `saveSourceCollaborator` + select) + `page.tsx` (query+objecte) + **test** `leadRouteService.test.ts` (+2 casos, 14 verds). `tsc` global OK.
+- Partner Hub: enllaç «Obrir fitxa» a `CollaboratorsClient.tsx`.
+He vist que has tancat la Fase 3 (#899: `billedCollaboratorId` + `BookingServiceLine` + costEngine + booking services). El meu `fetchPartnerHub` segueix vàlid (camps additius).
+BLOQUEIG documentat: ampliar el hub amb `billedBookings` (cas Lliçà) espera que el PROPIETARI desplegui la teva migració `20260608113000` a Railway; fins llavors petaria a runtime.
+PENDENT propietari: `pnpm build` (dev viu ara), validació visual `/admin/leads/[id]` (funció nova), desplegar migració #899.
+NO he tocat counter (#899 és teu). NO he tocat schema/costEngine/booking services.
+---
+Groundwork Partners Platform SOBRE el #898 de codex (working tree, sense commit). Fet:
+- `lib/services/partnerHubService.ts` (`fetchPartnerHub`) + test (3 verds).
+- `app/admin/collaborators/[id]/`: `page.tsx` + `PartnerHubClient.tsx` (6 pestanyes) + `loading.tsx` — Partner Hub FUNCIONAL (reutilitza `ap-*`; poliment 🟢 pendent amb dev viu).
+- `app/admin/collaborators/CollaboratorsClient.tsx`: enllaç «Obrir fitxa» per targeta.
+- `scripts/seed-partners.mjs` (idempotent, no destructiu; l'executa el propietari).
+- Docs: `partners-platform-handoff.md` (reescrit), `partners-platform-checklist.md`, `admin-migration-checklist.md`, `admin-build-method.md` (mètode + marca `TANCAT CHARLIE`).
+- Hooks de protocol (mateix dia): `scripts/hooks/*` + `.claude/settings.json`.
+DECISIÓ ARQUITECTURA (Opus, LOCKED): NO unificar `Customer`+`Collaborator`; afegir `Booking.billedCollaboratorId` + model `BookingServiceLine` (Fase 3, necessita migració del propietari); marge sempre via `computeBookingFinancialSummary()`; no doble-comptar cost (`serviceLine` vs `CollaboratorBooking`).
+Validació: `tsc` OK, test 3/3, `node --check` seed OK. PENDENT: `pnpm build`, verificació visual, Fase 3.
+NO he tocat schema (cap drift). NO he bumpat counter (segueix #898).
+Proper pas: Fase 1 (selector «Bolo passat per» dins `LeadDetailClient`, amb dev viu) → poliment visual hub → Fase 3.
+Avís per codex: migració `20260607193000_partner_roles_and_sources` JA desplegada a Railway pel propietari. `partnerHubService.ts` és NOU (no el dupliquis). La migració de Fase 3 encara NO existeix.
+
 [claude] 2026-06-05 [ESTAT: treballant]
 TASCA CONJUNTA — Dossier Masquerade complet. Repartiment clar (NO trepitjar fitxers de l'altre):
 
@@ -138,6 +165,16 @@ Avís per codex: #826 (ingesta 🤝 + hora fi). #827 (animació: nova categoria 
 ## Bloc CODEX (Codex CLI)
 
 <!-- codex: actualitza aquest bloc quan comencis/acabis una sessió -->
+[codex] 2026-06-08 [ESTAT: treballant]
+Últim canvi: #898 base de Partners; obro continuació coordinada per Fase 3 segons decisió Opus locked.
+Proper pas previst: implementar localment `Booking.billedCollaboratorId` + `BookingServiceLine`, reconnectar `bookingCreationService`/`bookingRouteService` i `computeBookingFinancialSummary()` sense doble comptar `CollaboratorBooking`.
+Avís per l'altre agent: NO tocaré `app/admin/collaborators/[id]/**`, `lib/services/partnerHubService.ts` ni `scripts/seed-partners.mjs`; això queda per Claude. Migració Railway i seed els executa el propietari. Risc principal: `BookingServiceLine.costAmount` i `CollaboratorBooking.commissionAmount` no poden representar el mateix cost alhora.
+
+[codex] 2026-06-07 [ESTAT: tancat]
+Últim canvi: #898 — agenda multi-bolo, total manual exacte, relació comercial DJ/tècnic i base escalable de Partners amb rols i `sourceCollaboratorId`.
+Proper pas previst: Claude ha de llegir `docs/partners-platform-handoff.md`; després aplicar migració pendent i construir el Partner Hub operatiu a `/admin/collaborators/[id]`.
+Avís per l'altre agent: no personalitzar Rufo/Tino/Carlos/Tronios/DJ Mania al codi. Són dades. `sourceCollaboratorId` és qui passa el bolo; `CollaboratorBooking` és qui es contracta dins la reserva. Migració `20260607193000_partner_roles_and_sources` creada localment, no desplegada. Abans de continuar, llegir l'apartat "Estat final abans de pausa" de `docs/partners-platform-handoff.md`.
+
 [codex] 2026-06-05 [ESTAT: tancat]
 Últim canvi: #895 — seed Masquerade refet des del Word complet de Downloads: només productes infantils del document, extres amb preu, pirates amb imatge sencera i dossier més personal/proper.
 Proper pas previst: propietari pot executar `node scripts\seed-masquerade-products.mjs` si vol sincronitzar BD; el script desactiva productes Masquerade antics que no surten al Word.

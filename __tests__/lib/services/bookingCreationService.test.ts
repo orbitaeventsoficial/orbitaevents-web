@@ -5,6 +5,7 @@ const { mockPrisma, mockCalculateGoogleMapsDistance, mockGetFuelCostPerKmReferen
     booking: { create: vi.fn(), findFirst: vi.fn(), findUnique: vi.fn() },
     lead: { findUnique: vi.fn(), update: vi.fn() },
     customer: { findUnique: vi.fn() },
+    collaborator: { findUnique: vi.fn() },
     pack: { findUnique: vi.fn() },
     extra: { findUnique: vi.fn(), create: vi.fn() },
     packInventory: { findMany: vi.fn() },
@@ -66,6 +67,7 @@ function setupDefaults() {
     extras: [],
   });
   mockPrisma.customer.findUnique.mockResolvedValue(null);
+  mockPrisma.collaborator.findUnique.mockResolvedValue(null);
   mockPrisma.lead.findUnique.mockResolvedValue(null);
   mockPrisma.lead.update.mockResolvedValue({});
   mockPrisma.extra.findUnique.mockResolvedValue(null);
@@ -187,6 +189,85 @@ describe('createBookingFromInput', () => {
     const createCall = mockPrisma.booking.create.mock.calls[0][0];
     expect(createCall.data.discount).toBe(200);
     expect(createCall.data.discountCode).toBe('PROMO');
+  });
+
+  it('respecta el total final acordat com a import exacte', async () => {
+    await createBookingFromInput({
+      ...BASE_INPUT,
+      manualTotalPrice: 340,
+      customPackPrice: 300,
+      extraHours: 2,
+      discount: 25,
+      invoiceRequired: false,
+    });
+
+    const createCall = mockPrisma.booking.create.mock.calls[0][0];
+    expect(createCall.data.total).toBe(340);
+    expect(createCall.data.subtotal).toBe(340);
+    expect(createCall.data.discount).toBe(0);
+    expect(createCall.data.vatAmount).toBe(0);
+    expect(createCall.data.depositAmount).toBe(102);
+    expect(createCall.data.remainingAmount).toBe(238);
+  });
+
+  it('factura la reserva a un partner sense crear vincle Customer mirall', async () => {
+    mockPrisma.collaborator.findUnique.mockResolvedValue({
+      id: 'partner-1',
+      name: 'Carlos Lucas',
+      company: 'Masquerade Events',
+      email: 'carlos@example.com',
+      phone: '600111222',
+    });
+
+    await createBookingFromInput({
+      ...BASE_INPUT,
+      customerId: 'cust-ignored',
+      billedCollaboratorId: 'partner-1',
+      manualTotalPrice: 340,
+    });
+
+    const createCall = mockPrisma.booking.create.mock.calls[0][0];
+    expect(createCall.data.customerId).toBeNull();
+    expect(createCall.data.billedCollaboratorId).toBe('partner-1');
+    expect(createCall.data.clientName).toBe('Masquerade Events');
+    expect(createCall.data.clientEmail).toBe('carlos@example.com');
+    expect(createCall.data.clientPhone).toBe('600111222');
+    expect(mockPrisma.customer.findUnique).not.toHaveBeenCalled();
+  });
+
+  it('desa línies de servei estructurades dins la reserva', async () => {
+    await createBookingFromInput({
+      ...BASE_INPUT,
+      manualTotalPrice: 340,
+      serviceLines: [
+        { kind: 'SOUND_TECH', label: 'Tècnic de so Òrbita', revenueAmount: 40, costAmount: 0, hours: 1 },
+        { kind: 'DJ', label: 'DJ Òrbita', revenueAmount: 300, costAmount: 0, hours: 3 },
+        { kind: 'PROVIDER_SERVICE', label: 'Animació partner', collaboratorId: 'partner-1', costAmount: 120 },
+      ],
+    });
+
+    const createCall = mockPrisma.booking.create.mock.calls[0][0];
+    expect(createCall.data.serviceLines).toEqual({
+      create: [
+        expect.objectContaining({ kind: 'SOUND_TECH', label: 'Tècnic de so Òrbita', revenueAmount: 40, costAmount: 0 }),
+        expect.objectContaining({ kind: 'DJ', label: 'DJ Òrbita', revenueAmount: 300, costAmount: 0 }),
+        expect.objectContaining({ kind: 'PROVIDER_SERVICE', collaboratorId: 'partner-1', costAmount: 120 }),
+      ],
+    });
+  });
+
+  it('back-calcula IVA quan el total final acordat porta factura', async () => {
+    await createBookingFromInput({
+      ...BASE_INPUT,
+      manualTotalPrice: 121,
+      invoiceRequired: true,
+    });
+
+    const createCall = mockPrisma.booking.create.mock.calls[0][0];
+    expect(createCall.data.total).toBe(121);
+    expect(createCall.data.subtotal).toBe(100);
+    expect(createCall.data.vatRate).toBe(21);
+    expect(createCall.data.vatAmount).toBe(21);
   });
 
   it('resol customerId des del lead', async () => {

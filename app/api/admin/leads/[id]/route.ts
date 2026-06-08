@@ -22,6 +22,7 @@ const updateLeadSchema = z.object({
   status: z.enum(['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST']).optional(),
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).optional(),
   source: nullableString,
+  sourceCollaboratorId: nullableString,
   budget: nullableString,
   message: nullableString,
   dni: nullableString,

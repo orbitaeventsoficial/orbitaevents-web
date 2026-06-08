@@ -7,6 +7,9 @@ const { mockPrisma, mockApplySideEffects, mockSyncCalendar, mockCalcGmapsDistanc
       update: vi.fn(),
       delete: vi.fn(),
     },
+    lead: { update: vi.fn() },
+    customer: { update: vi.fn() },
+    bookingServiceLine: { deleteMany: vi.fn(), createMany: vi.fn() },
     availability: { updateMany: vi.fn() },
     bookingExtra: { deleteMany: vi.fn() },
     adminLog: { create: vi.fn() },
@@ -51,14 +54,18 @@ const MOCK_BOOKING = {
   reference: 'OE-2026-ABCD',
   status: 'PENDING',
   customerId: 'cust-1',
+  leadId: 'lead-1',
   clientName: 'Maria',
   clientEmail: 'maria@test.com',
+  clientPhone: '600000000',
   eventType: 'BIRTHDAY',
   eventDate: new Date('2026-09-15'),
   eventLocation: 'Barcelona',
   eventVenue: null,
   eventStartTime: '21:00',
   eventEndTime: '04:00',
+  eventPhone: null,
+  eventAddress: null,
   guestCount: 80,
   subtotal: 400,
   discount: 0,
@@ -80,6 +87,10 @@ beforeEach(() => {
   mockPrisma.booking.findUnique.mockResolvedValue(MOCK_BOOKING);
   mockPrisma.booking.update.mockResolvedValue(MOCK_BOOKING);
   mockPrisma.booking.delete.mockResolvedValue({});
+  mockPrisma.lead.update.mockResolvedValue({});
+  mockPrisma.customer.update.mockResolvedValue({});
+  mockPrisma.bookingServiceLine.deleteMany.mockResolvedValue({ count: 0 });
+  mockPrisma.bookingServiceLine.createMany.mockResolvedValue({ count: 0 });
   mockPrisma.availability.updateMany.mockResolvedValue({ count: 1 });
   mockPrisma.bookingExtra.deleteMany.mockResolvedValue({});
   mockPrisma.adminLog.create.mockResolvedValue({});
@@ -149,6 +160,46 @@ describe('updateBookingDetail', () => {
     await updateBookingDetail('booking-1', { clientName: 'Nou nom' });
 
     expect(mockSyncCalendar).not.toHaveBeenCalled();
+  });
+
+  it('sincronitza dades d’esdeveniment cap al lead vinculat', async () => {
+    await updateBookingDetail('booking-1', {
+      eventLocation: 'Lliçà de Munt',
+      startTime: '19:30',
+      endTime: '23:30',
+      guestCount: 120,
+    });
+
+    expect(mockPrisma.lead.update).toHaveBeenCalledWith({
+      where: { id: 'lead-1' },
+      data: expect.objectContaining({
+        eventLocation: 'Lliçà de Munt',
+        eventStartTime: '19:30',
+        eventEndTime: '23:30',
+        guestCount: 120,
+      }),
+    });
+  });
+
+  it('reemplaça línies de servei sense enviar-les a booking.update', async () => {
+    await updateBookingDetail('booking-1', {
+      serviceLines: [
+        { kind: 'DJ', label: 'DJ Òrbita', revenueAmount: 300, costAmount: 0, hours: 3 },
+        { kind: 'PROVIDER_SERVICE', label: 'Animador partner', collaboratorId: 'partner-1', costAmount: 120 },
+      ],
+    });
+
+    expect(mockPrisma.booking.update).toHaveBeenCalledWith({
+      where: { id: 'booking-1' },
+      data: {},
+    });
+    expect(mockPrisma.bookingServiceLine.deleteMany).toHaveBeenCalledWith({ where: { bookingId: 'booking-1' } });
+    expect(mockPrisma.bookingServiceLine.createMany).toHaveBeenCalledWith({
+      data: [
+        expect.objectContaining({ bookingId: 'booking-1', kind: 'DJ', revenueAmount: 300, costAmount: 0 }),
+        expect.objectContaining({ bookingId: 'booking-1', kind: 'PROVIDER_SERVICE', collaboratorId: 'partner-1', costAmount: 120 }),
+      ],
+    });
   });
 });
 

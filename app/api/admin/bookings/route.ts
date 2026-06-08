@@ -14,6 +14,8 @@ export const dynamic = 'force-dynamic';
 const bookingSchema = z.object({
   leadId: z.string().optional(),
   customerId: z.string().optional(),
+  sourceCollaboratorId: z.string().nullable().optional(),
+  billedCollaboratorId: z.string().nullable().optional(),
   clientName: z.string().min(1),
   clientEmail: z.string().email(),
   clientPhone: z.string().min(1),
@@ -29,6 +31,7 @@ const bookingSchema = z.object({
   guestCount: z.number().min(1),
   packId: z.string().min(1),
   customPackPrice: z.number().positive().optional(),
+  manualTotalPrice: z.number().positive().optional(),
   invoiceRequired: z.boolean().optional(),
   extraHours: z.number().optional(),
   extras: z.array(z.object({
@@ -42,6 +45,18 @@ const bookingSchema = z.object({
   distanceKm: z.number().min(0).optional(),
   fuelCostPerKm: z.number().min(0).optional(),
   travelCost: z.number().min(0).optional(),
+  serviceLines: z.array(z.object({
+    collaboratorId: z.string().nullable().optional(),
+    sortOrder: z.number().int().optional(),
+    partyType: z.string().nullable().optional(),
+    kind: z.enum(['DJ', 'SOUND_TECH', 'PROVIDER_SERVICE', 'EQUIPMENT', 'OTHER']).optional(),
+    label: z.string().min(1),
+    revenueAmount: z.number().min(0).nullable().optional(),
+    costAmount: z.number().min(0).nullable().optional(),
+    quantity: z.number().int().positive().nullable().optional(),
+    hours: z.number().positive().nullable().optional(),
+    notes: z.string().nullable().optional(),
+  })).optional(),
 });
 
 export async function GET(req: NextRequest) {

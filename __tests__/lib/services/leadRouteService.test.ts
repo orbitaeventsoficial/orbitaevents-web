@@ -6,6 +6,8 @@ const { mockPrisma, mockSnapshotLeads } = vi.hoisted(() => ({
       findUnique: vi.fn(),
       update: vi.fn(),
     },
+    customer: { update: vi.fn() },
+    booking: { update: vi.fn() },
     leadNote: { deleteMany: vi.fn() },
     leadActivity: { deleteMany: vi.fn() },
     leadDocument: { deleteMany: vi.fn() },
@@ -117,6 +119,43 @@ describe('updateLeadFromInput', () => {
         data: expect.objectContaining({ contactedAt: expect.any(Date) }),
       })
     );
+  });
+
+  it('desa sourceCollaboratorId i el propaga al booking vinculat', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({
+      id: 'l1', status: 'NEW', contactedAt: null, customerId: null, booking: { id: 'b1' },
+    });
+
+    await updateLeadFromInput('l1', { sourceCollaboratorId: 'col_masquerade' });
+
+    // S'escriu al lead
+    expect(mockPrisma.lead.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ sourceCollaboratorId: 'col_masquerade' }),
+      })
+    );
+    // Es propaga al booking (qui ha passat el bolo també queda al booking)
+    expect(mockPrisma.booking.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'b1' },
+        data: expect.objectContaining({ sourceCollaboratorId: 'col_masquerade' }),
+      })
+    );
+  });
+
+  it('accepta sourceCollaboratorId null (origen directe) sense booking', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({
+      id: 'l1', status: 'NEW', contactedAt: null, customerId: null, booking: null,
+    });
+
+    await updateLeadFromInput('l1', { sourceCollaboratorId: null });
+
+    expect(mockPrisma.lead.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ sourceCollaboratorId: null }),
+      })
+    );
+    expect(mockPrisma.booking.update).not.toHaveBeenCalled();
   });
 });
 

@@ -36,14 +36,18 @@ describe('listAdminCollaborators', () => {
     mockPrisma.collaborator.findMany.mockResolvedValue([
       {
         id: 'c1', isActive: true,
+        _count: { sourcedLeads: 2, sourcedBookings: 1 },
         bookings: [
           { commissionAmount: 100, isPaid: false, booking: { total: 1000 } },
           { commissionAmount: 200, isPaid: true, booking: { total: 2000 } },
         ],
+        products: [],
       },
       {
         id: 'c2', isActive: false,
+        _count: { sourcedLeads: 1, sourcedBookings: 0 },
         bookings: [],
+        products: [],
       },
     ]);
 
@@ -55,6 +59,8 @@ describe('listAdminCollaborators', () => {
     expect(result.kpis.totalRevenue).toBe(3000);
     expect(result.kpis.totalCommissions).toBe(300);
     expect(result.kpis.pendingCommissions).toBe(100);
+    expect(result.kpis.totalSourcedLeads).toBe(3);
+    expect(result.kpis.totalSourcedBookings).toBe(1);
   });
 });
 
@@ -71,8 +77,9 @@ describe('createAdminCollaborator', () => {
     expect(mockPrisma.collaborator.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
         name: 'Nou Col·laborador',
-        commissionPct: 10,
+        commissionPct: 0,
         pricingModel: 'DISCOUNT',
+        roles: ['PROVIDER'],
       }),
     });
   });

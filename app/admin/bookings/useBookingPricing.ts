@@ -36,10 +36,11 @@ interface UseBookingPricingOptions {
   extras: BookingExtra[];
   selectedExtras: BookingSelectedExtras;
   customPackPrice?: number;
+  manualTotalPrice?: number;
   invoiceRequired?: boolean;
 }
 
-export function useBookingPricing({ form, packs, extras, selectedExtras, customPackPrice, invoiceRequired = false }: UseBookingPricingOptions) {
+export function useBookingPricing({ form, packs, extras, selectedExtras, customPackPrice, manualTotalPrice, invoiceRequired = false }: UseBookingPricingOptions) {
   const internalTravelCost = useMemo(() => {
     const km = parseFloat(form.distanceKm) || 0;
     const rate = parseFloat(form.fuelCostPerKm) || DEFAULT_VEHICLE_COST_PER_KM;
@@ -99,12 +100,15 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
     const discount = parseFloat(form.discount) || 0;
     const baseAfterDiscount = subtotal - discount;
     const vatRate = calcVatRate(invoiceRequired);
-    const vatAmount = baseAfterDiscount * (vatRate / 100);
-    const total = baseAfterDiscount + vatAmount;
+    const manualTotal = manualTotalPrice && manualTotalPrice > 0 ? manualTotalPrice : null;
+    const total = manualTotal ?? baseAfterDiscount + baseAfterDiscount * (vatRate / 100);
+    const vatAmount = manualTotal !== null
+      ? invoiceRequired ? total - total * 100 / (100 + vatRate) : 0
+      : baseAfterDiscount * (vatRate / 100);
     const deposit = calcDeposit(total);
 
     return { packPrice, extraHoursPrice, extrasPrice, travelCharge, subtotal, discount, vatRate, vatAmount, total, deposit };
-  }, [form.discount, form.eventEndTime, form.eventStartTime, form.extraHours, selectedExtras, selectedPack, travelCharge]);
+  }, [customPackPrice, form.discount, form.eventEndTime, form.eventStartTime, form.extraHours, invoiceRequired, manualTotalPrice, selectedExtras, selectedPack, travelCharge]);
 
   const marginEstimate = useMemo(() => {
     if (!pricing) return null;

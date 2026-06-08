@@ -136,6 +136,101 @@ function lostReasonLabel(reason: string | null): string | null {
   return isLeadLostReason(reason) ? LEAD_LOST_REASON_LABELS[reason] : null;
 }
 
+function leadCellFoot(lead: LeadData): ReactNode {
+  if (lead.time) return <>{lead.time} · {lead.location || '—'}</>;
+  return <><span className="fx__nohour">sense hora</span>{lead.location ? ` · ${lead.location}` : ''}</>;
+}
+
+function LeadDayCell({
+  dayLabel,
+  leads,
+  inMonth = true,
+  focusId,
+  onOpen,
+  weekday,
+}: {
+  dayLabel: string;
+  leads: LeadData[];
+  inMonth?: boolean;
+  focusId: string | null;
+  onOpen: (id: string) => void;
+  weekday?: boolean;
+}) {
+  const firstLead = leads[0];
+  if (!firstLead) {
+    return (
+      <span className={`fx__cell is-free${inMonth ? '' : ' is-out'}`}>
+        <span className="fx__day">{dayLabel}</span>
+        <span className="fx__freelabel">Lliure</span>
+      </span>
+    );
+  }
+
+  if (leads.length === 1) {
+    const pay = paymentState(firstLead.booking);
+    return (
+      <button
+        type="button"
+        className={`fx__cell${weekday ? ' fx__cell--wd' : ''} is-lead${inMonth ? '' : ' is-out'}${firstLead.id === focusId ? ' is-active' : ''}${pay ? ' is-reserva' : ''}`}
+        data-stage={firstLead.stage}
+        onClick={() => onOpen(firstLead.id)}
+      >
+        <span className="fx__celltop">
+          <span className="fx__day">{dayLabel}</span>
+          {firstLead.value > 0 && <span className="fx__cval">{euro(firstLead.value)}</span>}
+          <span className="fx__cellmeta">
+            <WxBadge wx={firstLead.wx} size="sm" />
+            {pay && <span className="fx__pay" data-pay={pay} data-tip={PAY_TOOLTIP[pay]} />}
+            <span className="fx__dot" data-stage={firstLead.stage} data-tip={pay ? `Reserva · ${PAY_TOOLTIP[pay]}` : STAGE_TOOLTIP[firstLead.stage]} />
+          </span>
+        </span>
+        <span className="fx__celltype">{pay ? 'Reserva' : firstLead.type}</span>
+        <span className="fx__lname">{firstLead.name}</span>
+        <span className="fx__cellfoot">{leadCellFoot(firstLead)}</span>
+      </button>
+    );
+  }
+
+  const active = leads.some((lead) => lead.id === focusId);
+  const hasReservation = leads.some((lead) => paymentState(lead.booking));
+
+  return (
+    <div
+      className={`fx__cell${weekday ? ' fx__cell--wd' : ''} fx__cell--multi is-lead${inMonth ? '' : ' is-out'}${active ? ' is-active' : ''}${hasReservation ? ' is-reserva' : ''}`}
+      data-stage={firstLead.stage}
+    >
+      <span className="fx__multiday">
+        <span className="fx__day">{dayLabel}</span>
+        <span className="fx__multicount">{leads.length} bolos</span>
+      </span>
+      <span className="fx__multiparts">
+        {leads.map((lead) => {
+          const pay = paymentState(lead.booking);
+          return (
+            <button
+              key={lead.id}
+              type="button"
+              className={`fx__cellpart${lead.id === focusId ? ' is-active' : ''}`}
+              data-stage={lead.stage}
+              onClick={() => onOpen(lead.id)}
+            >
+              <span className="fx__partmain">
+                <span className="fx__lname">{lead.name}</span>
+                <span className="fx__cellmeta">
+                  <WxBadge wx={lead.wx} size="sm" />
+                  {pay && <span className="fx__pay" data-pay={pay} data-tip={PAY_TOOLTIP[pay]} />}
+                  <span className="fx__dot" data-stage={lead.stage} data-tip={pay ? `Reserva · ${PAY_TOOLTIP[pay]}` : STAGE_TOOLTIP[lead.stage]} />
+                </span>
+              </span>
+              <span className="fx__cellfoot">{leadCellFoot(lead)}</span>
+            </button>
+          );
+        })}
+      </span>
+    </div>
+  );
+}
+
 /* ── Icones ─────────────────────────────────────────────────────────────── */
 
 const ic = (d: ReactNode) => (
@@ -150,8 +245,8 @@ const I = {
   phone:  ic(<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.33 1.77.63 2.6a2 2 0 0 1-.45 2.11L8 9.72a16 16 0 0 0 6.28 6.28l1.29-1.29a2 2 0 0 1 2.11-.45c.83.3 1.7.51 2.6.63A2 2 0 0 1 22 16.92z" />),
 };
 
-type WeekendSlot = { type: 'weekend'; friIso: string; days: { iso: string; d: number; inMonth: boolean; lead: LeadData | null }[] };
-type WeekdaySlot = { type: 'weekday'; iso: string; d: number; dow: number; lead: LeadData };
+type WeekendSlot = { type: 'weekend'; friIso: string; days: { iso: string; d: number; inMonth: boolean; leads: LeadData[] }[] };
+type WeekdaySlot = { type: 'weekday'; iso: string; d: number; dow: number; leads: LeadData[] };
 type CalSlot = WeekendSlot | WeekdaySlot;
 type MonthBlock = {
   m: number; label: string; isFuture: boolean;
@@ -424,7 +519,24 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
   const activeLead = pageId ? effectiveLeads.find((l) => l.id === pageId) ?? null : null;
 
   const visibleMonths = useMemo(() => Array.from({ length: MONTH_WINDOW }, (_, i) => monthStart + i), [monthStart]);
-  const byDate = useMemo(() => { const m = new Map<string, LeadData>(); for (const l of effectiveLeads) if (l.dateISO) m.set(l.dateISO, l); return m; }, [effectiveLeads]);
+  const byDate = useMemo(() => {
+    const m = new Map<string, LeadData[]>();
+    for (const l of effectiveLeads) {
+      if (!l.dateISO) continue;
+      const dayLeads = m.get(l.dateISO) ?? [];
+      dayLeads.push(l);
+      m.set(l.dateISO, dayLeads);
+    }
+    for (const dayLeads of m.values()) {
+      dayLeads.sort((a, b) => {
+        const aTime = a.time || '99:99';
+        const bTime = b.time || '99:99';
+        if (aTime !== bTime) return aTime.localeCompare(bTime);
+        return a.name.localeCompare(b.name);
+      });
+    }
+    return m;
+  }, [effectiveLeads]);
   const months = useMemo<MonthBlock[]>(() => visibleMonths.map((vm) => {
     const { y, m } = toCalMonth(year, vm);
     const weekendSlots: WeekendSlot[] = saturdaysInMonth(y, m).map((sat) => ({
@@ -432,7 +544,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
       friIso: shiftIso(sat, -1),
       days: [shiftIso(sat, -1), sat, shiftIso(sat, 1)].map((iso) => {
         const p = parseISO(iso);
-        return { iso, d: p.d, inMonth: p.m === m && p.y === y, lead: byDate.get(iso) ?? null };
+        return { iso, d: p.d, inMonth: p.m === m && p.y === y, leads: byDate.get(iso) ?? [] };
       }),
     }));
     const lastDay = new Date(Date.UTC(y, m, 0)).getUTCDate();
@@ -441,8 +553,8 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
       const dow = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
       if (dow >= 1 && dow <= 4) {
         const iso = isoDate(y, m, d);
-        const lead = byDate.get(iso);
-        if (lead) weekdaySlots.push({ type: 'weekday', iso, d, dow, lead });
+        const leadsForDay = byDate.get(iso) ?? [];
+        if (leadsForDay.length > 0) weekdaySlots.push({ type: 'weekday', iso, d, dow, leads: leadsForDay });
       }
     }
     const slots: CalSlot[] = [...weekendSlots, ...weekdaySlots].sort((a, b) => {
@@ -669,8 +781,8 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
             <div className="fx__cal">
               {months.map((month) => {
                 const monthLeads = month.slots.reduce((n, slot) => {
-                  if (slot.type === 'weekend') return n + slot.days.filter((d) => d.lead && d.inMonth).length;
-                  return n + 1;
+                  if (slot.type === 'weekend') return n + slot.days.reduce((sum, d) => sum + (d.inMonth ? d.leads.length : 0), 0);
+                  return n + slot.leads.length;
                 }, 0);
                 return (
                   <article className={`fx__mon${month.isFuture ? ' is-future' : ''}`} key={month.m}>
@@ -687,66 +799,28 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                     <div className="fx__grid">
                       {month.slots.map((slot) => {
                         if (slot.type === 'weekday') {
-                          const l = slot.lead;
-                          const pay = paymentState(l.booking);
                           const DOW_LABEL = ['Dg','Dl','Dt','Dc','Dj','Dv','Ds'];
                           return (
-                            <button key={slot.iso} type="button"
-                              className={`fx__cell fx__cell--wd is-lead${l.id === focusId ? ' is-active' : ''}${pay ? ' is-reserva' : ''}`}
-                              data-stage={l.stage}
-                              onClick={() => setPageId(l.id)}>
-                              <span className="fx__celltop">
-                                <span className="fx__day">{DOW_LABEL[slot.dow]} {slot.d}</span>
-                                {l.value > 0 && <span className="fx__cval">{euro(l.value)}</span>}
-                                <span className="fx__cellmeta">
-                                  <WxBadge wx={l.wx} size="sm" />
-                                  {pay && <span className="fx__pay" data-pay={pay} data-tip={PAY_TOOLTIP[pay]} />}
-                                  <span className="fx__dot" data-stage={l.stage} data-tip={pay ? `Reserva · ${PAY_TOOLTIP[pay]}` : STAGE_TOOLTIP[l.stage]} />
-                                </span>
-                              </span>
-                              <span className="fx__celltype">{pay ? 'Reserva' : l.type}</span>
-                              <span className="fx__lname">{l.name}</span>
-                              <span className="fx__cellfoot">
-                                {l.time
-                                  ? <>{l.time} · {l.location || '—'}</>
-                                  : <><span className="fx__nohour">sense hora</span>{l.location ? ` · ${l.location}` : ''}</>
-                                }
-                              </span>
-                            </button>
+                            <LeadDayCell
+                              key={slot.iso}
+                              dayLabel={`${DOW_LABEL[slot.dow]} ${slot.d}`}
+                              leads={slot.leads}
+                              focusId={focusId}
+                              onOpen={setPageId}
+                              weekday
+                            />
                           );
                         }
                         return slot.days.map((d) => {
-                          const l = d.lead;
-                          if (!l) return (
-                            <span key={d.iso} className={`fx__cell is-free${d.inMonth ? '' : ' is-out'}`}>
-                              <span className="fx__day">{d.d}</span>
-                              <span className="fx__freelabel">Lliure</span>
-                            </span>
-                          );
-                          const pay = paymentState(l.booking);
                           return (
-                            <button key={d.iso} type="button"
-                              className={`fx__cell is-lead${d.inMonth ? '' : ' is-out'}${l.id === focusId ? ' is-active' : ''}${pay ? ' is-reserva' : ''}`}
-                              data-stage={l.stage}
-                              onClick={() => setPageId(l.id)}>
-                              <span className="fx__celltop">
-                                <span className="fx__day">{d.d}</span>
-                                {l.value > 0 && <span className="fx__cval">{euro(l.value)}</span>}
-                                <span className="fx__cellmeta">
-                                  <WxBadge wx={l.wx} size="sm" />
-                                  {pay && <span className="fx__pay" data-pay={pay} data-tip={PAY_TOOLTIP[pay]} />}
-                                  <span className="fx__dot" data-stage={l.stage} data-tip={pay ? `Reserva · ${PAY_TOOLTIP[pay]}` : STAGE_TOOLTIP[l.stage]} />
-                                </span>
-                              </span>
-                              <span className="fx__celltype">{pay ? 'Reserva' : l.type}</span>
-                              <span className="fx__lname">{l.name}</span>
-                              <span className="fx__cellfoot">
-                                {l.time
-                                  ? <>{l.time} · {l.location || '—'}</>
-                                  : <><span className="fx__nohour">sense hora</span>{l.location ? ` · ${l.location}` : ''}</>
-                                }
-                              </span>
-                            </button>
+                            <LeadDayCell
+                              key={d.iso}
+                              dayLabel={String(d.d)}
+                              leads={d.leads}
+                              inMonth={d.inMonth}
+                              focusId={focusId}
+                              onOpen={setPageId}
+                            />
                           );
                         });
                       })}

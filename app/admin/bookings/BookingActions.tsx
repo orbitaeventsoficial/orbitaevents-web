@@ -99,7 +99,7 @@ export default function BookingActions({
             <option key={option.value} value={option.value}>{option.label}</option>
           ))}
         </select>
-        <Link href={buildBookingHref(id)} className="ap-btn ap-btn--secondary px-2 py-1 text-xs whitespace-nowrap" {...helpAttrs(ADMIN_ACTIONS_HELP.booking.view)}>
+        <Link href={buildBookingHref(id)} className="ap-btn ap-btn--secondary max-w-full px-2 py-1 text-xs whitespace-nowrap" {...helpAttrs(ADMIN_ACTIONS_HELP.booking.view)}>
           Veure →
         </Link>
         <ConfirmDialog {...dialogProps} />

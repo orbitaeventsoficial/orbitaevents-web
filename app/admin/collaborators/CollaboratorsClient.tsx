@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { fetchWithCsrf } from '@/lib/csrf';
-import { ADMIN_COLLABORATOR_EMPTY_FORM } from '@/lib/constants/admin';
+import { ADMIN_COLLABORATOR_EMPTY_FORM, COLLABORATOR_ROLE_OPTIONS } from '@/lib/constants/admin';
 import { useToast } from '../components/ToastProvider';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
@@ -15,6 +16,7 @@ interface Collaborator {
   email: string | null;
   phone: string | null;
   specialty: string | null;
+  roles: string[];
   commissionPct: number;
   pricingModel: 'NET_PLUS_COMMISSION' | 'DISCOUNT';
   costPerHour: number | null;
@@ -22,6 +24,10 @@ interface Collaborator {
   isActive: boolean;
   bookings: CollaboratorBooking[];
   products: CollaboratorProduct[];
+  _count?: {
+    sourcedLeads?: number;
+    sourcedBookings?: number;
+  };
 }
 
 interface CollaboratorBooking {
@@ -49,12 +55,15 @@ interface KPIs {
   pendingCommissions: number;
   totalProducts: number;
   catalogValue: number;
+  totalSourcedLeads: number;
+  totalSourcedBookings: number;
 }
 
 const KPI_ITEMS = (kpis: KPIs) => [
   { label: 'Total', value: kpis.total, tone: '' },
   { label: 'Actius', value: kpis.active, tone: 'ap-kpi--success' },
   { label: 'Reserves', value: kpis.totalBookings, tone: 'ap-kpi--info' },
+  { label: 'Bolos passats', value: kpis.totalSourcedLeads + kpis.totalSourcedBookings, tone: 'ap-kpi--success' },
   { label: 'Productes', value: kpis.totalProducts, tone: '' },
   { label: 'Valor catàleg', value: `${kpis.catalogValue}€`, tone: 'ap-kpi--info' },
   {
@@ -141,6 +150,7 @@ export default function CollaboratorsClient() {
       email: c.email || '',
       phone: c.phone || '',
       specialty: c.specialty || '',
+      roles: c.roles || [],
       commissionPct: c.commissionPct,
       pricingModel: c.pricingModel,
       costPerHour: c.costPerHour ?? '',
@@ -178,6 +188,15 @@ export default function CollaboratorsClient() {
       console.error("Error actualitzant estat col·laborador", error);
       toast.error(error instanceof Error ? error.message : "No s'ha pogut actualitzar l'estat del col·laborador");
     }
+  };
+
+  const toggleRole = (role: string) => {
+    setForm((prev) => {
+      const current = new Set(prev.roles || []);
+      if (current.has(role)) current.delete(role);
+      else current.add(role);
+      return { ...prev, roles: Array.from(current) };
+    });
   };
 
   if (loading) {
@@ -220,6 +239,9 @@ export default function CollaboratorsClient() {
             collaboratorsWithBookings > 0
               ? `${collaboratorsWithBookings} col·laboradors ja tenen reserves vinculades.`
               : 'Cap col·laborador té reserves vinculades encara.',
+            kpis
+              ? `${kpis.totalSourcedLeads + kpis.totalSourcedBookings} bolos tenen partner d'origen assignat.`
+              : "Encara no hi ha lectura d'origen comercial.",
           ],
           emptyText: 'Sense col·laboradors no hi ha lectura automàtica del canal.',
         }}
@@ -247,7 +269,7 @@ export default function CollaboratorsClient() {
           title: nextStepTitle,
           detail: nextStepDetail,
           href: '/admin/collaborators',
-          ctaLabel: collaborators.length === 0 ? 'Crear col·laborador' : 'Revisar col·laboradors',
+          ctaLabel: collaborators.length === 0 ? 'Crear partner' : 'Revisar partners',
           secondaryAction: showForm ? { href: '/admin/collaborators', label: 'Tornar a la llista' } : undefined,
         }}
       />
@@ -277,13 +299,13 @@ export default function CollaboratorsClient() {
           }}
           className="ap-btn ap-btn--primary"
         >
-          {showForm ? 'Cancel·lar' : '+ Nou col·laborador'}
+          {showForm ? 'Cancel·lar' : '+ Nou partner'}
         </button>
       </div>
 
       {showForm && (
         <form onSubmit={handleSubmit} className="ap-card space-y-4 rounded-xl p-6">
-          <h3 className="text-lg font-bold">{editingId ? 'Editar col·laborador' : 'Nou col·laborador'}</h3>
+          <h3 className="text-lg font-bold">{editingId ? 'Editar partner' : 'Nou partner'}</h3>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label htmlFor="collab-name" className="mb-1 block text-sm admin-tone-text-neutral">Nom *</label>
@@ -332,6 +354,21 @@ export default function CollaboratorsClient() {
                 placeholder="DJ, Presentador, Tècnic de so..."
                 className="ap-input w-full px-4 py-2.5"
               />
+            </div>
+            <div className="md:col-span-2">
+              <p className="mb-2 block text-sm admin-tone-text-neutral">Rols del partner</p>
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {COLLABORATOR_ROLE_OPTIONS.map((role) => (
+                  <label key={role.value} className="flex cursor-pointer items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-sm text-white/80">
+                    <input
+                      type="checkbox"
+                      checked={(form.roles || []).includes(role.value)}
+                      onChange={() => toggleRole(role.value)}
+                    />
+                    <span>{role.label}</span>
+                  </label>
+                ))}
+              </div>
             </div>
             <div>
               <label htmlFor="collab-cost-hour" className="mb-1 block text-sm admin-tone-text-neutral">Cost/hora (€)</label>
@@ -426,7 +463,15 @@ export default function CollaboratorsClient() {
                   </div>
                   <div className="flex items-center gap-4 text-sm admin-tone-text-neutral">
                     {c.specialty && <span className="text-amber-400/80 font-medium">{c.specialty}</span>}
+                    {(c.roles || []).map((role) => (
+                      <span key={role} className="ap-badge">{COLLABORATOR_ROLE_OPTIONS.find((option) => option.value === role)?.label || role}</span>
+                    ))}
                     {c.costPerHour != null && <span className="text-white/60">{c.costPerHour}€/h</span>}
+                    {((c._count?.sourcedLeads || 0) + (c._count?.sourcedBookings || 0)) > 0 && (
+                      <span className="text-emerald-300/80">
+                        {(c._count?.sourcedLeads || 0) + (c._count?.sourcedBookings || 0)} bolos passats
+                      </span>
+                    )}
                     {c.email && <span>{c.email}</span>}
                     {c.phone && <span>{c.phone}</span>}
                     <span>{c.bookings.length} reserves</span>
@@ -436,6 +481,9 @@ export default function CollaboratorsClient() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Link href={`/admin/collaborators/${c.id}`} className="ap-btn ap-btn--primary">
+                    Obrir fitxa
+                  </Link>
                   <button onClick={() => handleToggleActive(c)} className="ap-btn ap-btn--secondary">
                     {c.isActive ? 'Desactivar' : 'Activar'}
                   </button>

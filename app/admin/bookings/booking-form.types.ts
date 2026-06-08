@@ -77,6 +77,26 @@ export type BookingLeadData = {
   budget: string | null;
   interestedPackId?: string | null;
   customerId: string | null;
+  sourceCollaboratorId?: string | null;
+};
+
+export type BookingPartnerOption = {
+  id: string;
+  name: string;
+  company: string | null;
+  roles?: string[];
+};
+
+export type BookingServiceLineKind = 'DJ' | 'SOUND_TECH' | 'PROVIDER_SERVICE' | 'EQUIPMENT' | 'OTHER';
+
+export type BookingServiceLineFormInput = {
+  collaboratorId?: string;
+  kind: BookingServiceLineKind;
+  label: string;
+  revenueAmount?: number;
+  costAmount?: number;
+  quantity?: number;
+  notes?: string;
 };
 
 export type RawExtraConfig = {

@@ -1,3 +1,147 @@
+## 2026-06-08 — Migració dry-run per Lliçà cap a BookingServiceLine (Canvi #904, codex)
+
+### Context
+La Fase 6 del pla de partners demana migrar OE-2026-005 (Lliçà) des del split en `notes` cap a `billedCollaboratorId` + `BookingServiceLine`. El propietari encara ha d'aplicar la migració `20260608113000_booking_partner_billing_service_lines` a Railway, així que calia deixar un script segur i idempotent preparat, no executar canvis destructius.
+
+### Canvis
+- `scripts/migrate-booking-partner-service-lines.mjs`: nou script dry-run per defecte; amb `--apply` actualitza OE-2026-005, assigna Masquerade com a `billedCollaboratorId`, posa `customerId` a `null`, crea les línies DJ (300) i tècnic de so (40) si encara no existeixen, i neteja `notes` per aquest cas.
+- El script detecta el prerequisit pendent de schema (`bookings.billedCollaboratorId`) i mostra missatge operatiu en lloc d'un stack cru de Prisma.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de 903 a 904.
+
+### Validació
+- Validació tècnica: `node --check scripts\migrate-booking-partner-service-lines.mjs` OK.
+- Dry-run real: bloquejat correctament perquè la BD configurada encara no té la migració `20260608113000_booking_partner_billing_service_lines`; missatge verificat fora del sandbox.
+- Validació funcional: el script és idempotent respecte a `serviceLines` existents i no escriu res sense `--apply`.
+- Validació humana/UX: no aplica.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 904. Següent canvi ha de ser `#905`.
+
+---
+
+## 2026-06-08 — Nova reserva: service lines estructurades en lloc de split a notes (Canvi #903, codex)
+
+### Context
+La Fase 3 de Partners (#899) ja tenia backend per `Booking.billedCollaboratorId` i `BookingServiceLine`, però la UI de nova reserva encara convertia la relació comercial en text dins `notes`. Calia que casos com Lliçà i Cristina surtin del formulari com a dades estructurades.
+
+### Canvis
+- `app/admin/bookings/NewBookingForm.tsx`: el camp “Partner / empresa” passa a selector real de partner carregat de `/api/admin/collaborators`; la relació comercial envia `partnerId`/label al submit.
+- `app/admin/bookings/useNewBookingSubmit.ts`: elimina la nota automàtica `[Relacio comercial]`; genera `serviceLines` per DJ, tècnic de so i cost de partner; envia `billedCollaboratorId` quan el partner contracta Òrbita.
+- `app/admin/bookings/booking-form.types.ts`: tipus `BookingServiceLineKind` i `BookingServiceLineFormInput`.
+- `__tests__/app/admin/bookings/useNewBookingSubmit.test.tsx`: casos Lliçà (`billedCollaboratorId` + DJ/tècnic revenue) i Cristina/partner contractat (`PROVIDER_SERVICE.costAmount`) sense contaminar `notes`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de 902 a 903.
+
+### Validació
+- Validació tècnica: `pnpm exec vitest run __tests__\app\admin\bookings\useNewBookingSubmit.test.tsx` OK (4 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:visual-overflow` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK; `pnpm test:run` OK; `pnpm build` OK.
+- Validació funcional: nova reserva ja pot crear línies estructurades per facturació a partner i subcontractació, mantenint `notes` només per observacions humanes.
+- Validació humana/UX: pendent provar manualment `/admin/bookings/new` després d'aplicar la migració #899 a l'entorn de dades.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 903. Següent canvi ha de ser `#904`.
+
+---
+
+## 2026-06-08 — Test suite: mocks actualitzats i firma email sense hex inline (Canvi #902, codex)
+
+### Context
+Amb `validate:core` i `build` verds, `pnpm test:run` encara fallava en tres blocs antics: mock incomplet de `SITE_CONFIG` a `adminEmailSendService`, mock de `fs.promises` sense `access` a la pàgina de protocol, i mock d'auth Stripe que retornava usuari quan la ruta espera `null` si no hi ha error.
+
+### Canvis
+- `lib/services/signatureService.ts`: la firma HTML conserva estilos inline per compatibilitat email, però substitueix hex literals per `rgb(...)`.
+- `__tests__/lib/services/adminEmailSendService.test.ts`: mock de `SITE_CONFIG.web.url` completat.
+- `__tests__/app/admin/docs/ProtocolPage.test.tsx`: mock de `fs.promises.access` alineat amb `readProtocolMarkdown()`.
+- `__tests__/app/api/admin/bookings-stripe-checkout-route.test.ts`: `requireAuth` passa amb `null` i el test defineix `STRIPE_SECRET_KEY`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de 901 a 902.
+
+### Validació
+- Validació tècnica: `pnpm exec vitest run __tests__\lib\services\adminEmailSendService.test.ts __tests__\lib\services\signatureService.test.ts` OK (25 tests); `pnpm exec vitest run __tests__\app\admin\docs\ProtocolPage.test.tsx` OK (4 tests); `pnpm exec vitest run __tests__\app\api\admin\bookings-stripe-checkout-route.test.ts` OK (4 tests); `pnpm test:run` OK; `pnpm run validate:core` OK; `pnpm build` OK.
+- Validació funcional: no canvia la lògica d'enviament, protocol ni Stripe; només alinea tests i elimina hex inline de la firma.
+- Validació humana/UX: no aplica.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 902. Següent canvi ha de ser `#903`.
+
+---
+
+## 2026-06-08 — Bookings: contenció nowrap sense risc d'overflow (Canvi #901, codex)
+
+### Context
+Després de deixar `validate:core` i `pnpm build` verds al #900, el guard `qa:visual-overflow` encara avisava de quatre punts antics a bookings amb `whitespace-nowrap` sense cap límit o overflow guard. No fallaven build, però eren deute visual admin detectat pel protocol.
+
+### Canvis
+- `app/admin/bookings/BookingActions.tsx`: el botó compacte "Veure" manté `nowrap` però queda limitat amb `max-w-full`.
+- `app/admin/bookings/page.tsx`: referència de reserva, cel·la de data i total tenen `max-w`/`truncate` on calia per evitar desbordaments estàtics.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de 900 a 901.
+
+### Validació
+- Validació tècnica: `pnpm run qa:visual-overflow` OK.
+- Validació funcional: la taula de reserves conserva els enllaços i dades existents, només afegeix contenció visual.
+- Validació humana/UX: pendent verificació visual en viewport estret de `/admin/bookings`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 901. Següent canvi ha de ser `#902`.
+
+---
+
+## 2026-06-08 — Partner Hub: contacte email via compositor intern (Canvi #900, codex)
+
+### Context
+El tall #899 deixava `validate:core` i `pnpm build` bloquejats per `qa:admin-no-mailto`: el Partner Hub nou de Claude contenia un enllaç `mailto:` a la pestanya de notes/contacte. Tot i ser zona de Claude, el propietari ha demanat continuar tot admin sense parar i aquest guard impedeix tancar la validació global.
+
+### Canvis
+- `app/admin/collaborators/[id]/PartnerHubClient.tsx`: l'email del partner ja no obre `mailto:`; ara envia al compositor canònic `/admin/inbox/compose?to=...`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de 899 a 900.
+
+### Validació
+- Validació tècnica: `pnpm run qa:admin-no-mailto` OK; `pnpm run qa:customer-inline-href` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK; `pnpm build` OK.
+- Validació funcional: el contacte per email queda dins del flux Inbox/Admin i no surt del sistema.
+- Validació humana/UX: pendent verificació visual del link a `/admin/collaborators/[id]`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 900. Següent canvi ha de ser `#901`.
+
+---
+
+## 2026-06-08 — Fase 3 Partners: facturació a partner i línies de servei estructurades (Canvi #899, codex)
+
+### Context
+Claude ha cedit a Codex la Fase 3 segons la decisió locked d'Opus: no unificar `Customer` i `Collaborator`; afegir `Booking.billedCollaboratorId` i `BookingServiceLine`; marge sempre via `computeBookingFinancialSummary()`; i no doble-comptar costos entre `BookingServiceLine.costAmount` i `CollaboratorBooking.commissionAmount`.
+
+### Canvis
+- `prisma/schema.prisma` + migració local `20260608113000_booking_partner_billing_service_lines`: `Booking.billedCollaboratorId`, relació `BookingBilledCollaborator`, model `BookingServiceLine` i enum `BookingServiceLineKind`.
+- `lib/services/costEngine.ts`: afegeix `serviceLinesRevenue` i `serviceLinesCost`; `serviceLinesCost` suma a `directCost` i l'ingrés de línies només és fallback si `total` no ve informat.
+- `lib/services/bookingCreationService.ts`: accepta `billedCollaboratorId` i `serviceLines`; si es factura a partner, no crea ni conserva `customerId` mirall i omple nom/email/telèfon des del partner.
+- `app/api/admin/bookings/route.ts`, `app/api/admin/bookings/[id]/route.ts` i `lib/services/bookingRouteService.ts`: contracte API per línies estructurades i reemplaç de línies en PATCH sense tocar `CollaboratorBooking`.
+
+### Validació
+- Validació tècnica: `npx prisma generate` OK · `pnpm exec vitest run __tests__\lib\services\costEngine.test.ts` OK (54 tests) · `pnpm exec vitest run __tests__\lib\services\bookingCreationService.test.ts` OK (31 tests) · `pnpm exec vitest run __tests__\lib\services\bookingRouteService.test.ts` OK (21 tests) · `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: el backend ja pot representar Lliçà com a reserva facturada a Masquerade amb línies DJ/tècnic, i Cristina com a client final amb cost de partner en línia separada.
+- Validació humana/UX: encara no hi ha editor visual de `serviceLines` dins la nova reserva; queda pendent connectar UI després del deploy de migració.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 899. Següent canvi ha de ser `#900`.
+- Pendent propietari: aplicar la migració local `20260608113000_booking_partner_billing_service_lines` a l'entorn corresponent abans d'usar les pantalles que llegeixin els camps nous.
+
+---
+
 ## 2026-06-05 — Dossier composite: fix duplicació + extres + DJ al final (Canvi #897, claude)
 
 ### Context
@@ -21000,3 +21144,59 @@ Entre #437 i #446 vaig tancar 6 ítems del backlog d'auditoria CRMs (§6.18 — 
 
 ### Tancament
 - `ADMIN_CHANGE_COUNTER` = 447. Següent canvi real ha de ser `#448` (atacar B.8 — auto-suggeriment de pack).
+
+## 2026-06-07 — Tooling: hooks de Claude Code per automatitzar guardes del protocol (claude, sense counter)
+
+### Context
+El protocol depèn que l'agent recordi regles manuals (grep de residus després de cada ronda; flux de lectura obligatori). Es converteixen dues d'aquestes regles en hooks que el harness executa sol, en comptes de prosa que es pot oblidar. És tooling/infra, no un canvi de producte → **no consumeix `ADMIN_CHANGE_COUNTER`**.
+
+### Canvi
+- `scripts/hooks/check-residue.mjs` — hook **PostToolUse** (matcher `Write|Edit`). Després de cada edició d'un `.tsx`/`.css` sota `app/`/`components/`, grep de `#hex`, `style={{` i `rgba(` (rgba només a TSX). Injecta troballes amb nº de línia via `additionalContext`. Advisori (mai bloqueja), salta comentaris, respecta allowlist de fitxers de tokens (`orbita-tokens.css`, `globals.css`, `admin-theme.css`, `admin-shell.css`, `control-room.css`, `studio.css`), límit 15 troballes.
+- `scripts/hooks/session-start.mjs` — hook **SessionStart**. Injecta estat viu: `ADMIN_CHANGE_COUNTER` actual + següent, últims blocs de `agent-sync.md` i recordatori del flux obligatori de lectura.
+- `scripts/hooks/install-hooks.mjs` — instal·lador idempotent que fusiona els hooks a `.claude/settings.json` preservant permisos i hooks preexistents (amb `.bak`). El llança el propietari (`! node scripts/hooks/install-hooks.mjs`) perquè el harness bloqueja que el model editi la seva pròpia config en mode `dontAsk`.
+- `CLAUDE.md` §Validació mínima — nota que el grep de residus està automatitzat pel hook.
+
+### Notes
+- `.claude/settings.json` és **gitignorat** → la connexió és local a la màquina del propietari; els scripts sí van a git (versionats, testejables). Codex (Codex CLI) no els consumeix.
+- No toca codi de producte, schema, serveis ni i18n.
+
+### Validació
+- Pipe-tests reals de cada hook: detecció correcta (hex/style/rgba amb línia), silenci en fitxers de tokens/serveis/payload buit, JSON de sortida vàlid.
+- Instal·lador provat en sandbox: fusió preserva permisos + hook preexistent, idempotent en segona execució.
+- Propietari ha executat l'instal·lador i recarregat amb `/hooks`: `settings.json` verificat amb els dos hooks.
+
+## 2026-06-07 — Agenda multi-bolo i relació comercial per direcció de contracte (Canvi #898, codex)
+
+### Context
+El propietari tenia dos bolos confirmats el 2026-07-11, però el calendari de leads només mostrava una targeta perquè el mapa per data sobrescrivia una entrada amb l'altra. En paral·lel, els casos Carlos/Masquerade demanaven separar quan un partner contracta Òrbita de quan Òrbita subcontracta un partner. Exemple canònic: Carlos ven un bingo i porta Òrbita només com a tècnic, només com a DJ, o com a tècnic + DJ.
+
+### Canvis
+- Dades reals corregides: Cristina Rey queda `WON` el 2026-07-11 a les 18:00; Adrià queda `WON` el 2026-07-11 a les 22:00. La reserva OE-2026-005 queda a `Lliçà de Munt`, 19:30-23:30, total exacte 340 EUR sense IVA, senyal 102 i resta 238; el lead vinculat queda sincronitzat i `assignedTo` net.
+- `/admin/leads`: el calendari guarda llista de leads per data, ordenada per hora, i pinta targeta multi-bolo amb files clicables per cada entrada.
+- Nova reserva: secció "Relació comercial" amb direcció del contracte, partner, import DJ Òrbita, import tècnic Òrbita, rol del partner i cost del partner.
+- Nova reserva: camp "Total final acordat" que desa el total exacte pactat i recalcula IVA/senyal/resta.
+- Edició de reserva: data, hora, ubicació, contacte d'esdeveniment, convidats i tipus sincronitzen també el lead vinculat.
+- BD de partners: rols múltiples a la fitxa de partner i origen comercial (`sourceCollaboratorId`) a leads/reserves. La pantalla `/admin/collaborators` passa a model mental de `Partners`, amb rols marcables i KPI de bolos passats.
+- Document de traspàs per Claude: `docs/partners-platform-handoff.md`, amb la regla de base única de partners, exemples reals i properes fases del Partner Hub.
+
+### Regla de negoci
+No es classifica cap entitat com a client o proveïdor absolut. `Customer` és qui rep/paga el servei final; `Partner` és la xarxa externa. La mateixa fitxa pot fer de partner extern, però cada reserva defineix la direcció `contractant -> contractat` i les línies pròpies: qui ha passat el bolo, DJ Òrbita, tècnic Òrbita, rol/cost del partner. Això cobreix partners que només lloguen material, partners que porten bolos, i partners que també subcontractes.
+
+### Validació
+- Validació tècnica: `npx prisma generate` OK; `npx tsc --noEmit --pretty false` OK; `pnpm exec vitest run __tests__\lib\services\bookingRouteService.test.ts __tests__\lib\services\bookingCreationService.test.ts __tests__\lib\services\collaboratorAdminService.test.ts __tests__\app\api\admin\collaborators-route.test.ts` OK (72 tests).
+- Validació funcional: el 2026-07-11 ja conserva els dos bolos; el total manual 340 queda exacte; reserva i lead ja no queden desquadrats quan s'edita el lloc/hora des de reserva.
+- Validació humana/UX: el formulari parla de direcció comercial i imports separats DJ/tècnic, no de "Carlos" com a cas especial.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 898. Següent canvi real ha de ser `#899`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Pausa operativa 2026-06-08
+- El propietari marxa a dormir i demana deixar-ho tot documentat.
+- Estat exacte centralitzat a `docs/partners-platform-handoff.md`, apartat "Estat final abans de pausa".
+- No s'ha desplegat la migració de partners.
+- No s'ha fet commit ni push.
+- Working tree brut esperat: canvis del #898 + tooling Claude existent (`CLAUDE.md`, `.claude/`, `scripts/hooks/`). No revertir aquests canvis aliens.
+- `git status` final mostra també `lib/services/partnerHubService.ts` i `__tests__/lib/services/partnerHubService.test.ts` no rastrejats; possible feina concurrent/no validada. No assumir que el Partner Hub està acabat sense revisar-los i provar-los.
