@@ -472,6 +472,34 @@ export default async function BookingDetailPage({ params }: PageProps) {
           />
         </div>
 
+        {booking.serviceLines && booking.serviceLines.length > 0 && (
+          <section className="bd__pnl">
+            <div className="bd__pnl-head"><h2 className="bd__pnl-title">Serveis i productes (fora de pack)</h2></div>
+            <div className="bd__table-wrap">
+              <table className="bd__table" aria-label="Línies de servei">
+                <thead>
+                  <tr>
+                    <th scope="col">Concepte</th>
+                    <th scope="col">Qt</th>
+                    <th scope="col">PVP</th>
+                    <th scope="col">Cost</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {booking.serviceLines.map((line: { id: string; label: string; quantity?: number | null; revenueAmount?: number | null; costAmount?: number | null }) => (
+                    <tr key={line.id}>
+                      <td>{line.label}</td>
+                      <td>{line.quantity ?? 1}</td>
+                      <td>{formatCurrency(Number(line.revenueAmount || 0))}</td>
+                      <td>{line.costAmount ? formatCurrency(Number(line.costAmount)) : '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+
         {booking.notes && (
           <section className="bd__pnl">
             <div className="bd__pnl-head"><h2 className="bd__pnl-title">Notes</h2></div>

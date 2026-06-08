@@ -1321,3 +1321,10 @@ html.admin-mode .bd__fieldnotes-alert--ok {
     justify-content: flex-start;
   }
 }
+
+/* Taula de línies de servei (productes fora de pack) a la fitxa */
+html.admin-mode .bd__table-wrap { overflow-x: auto; }
+html.admin-mode .bd__table { width: 100%; border-collapse: collapse; font-size: var(--o-text-sm); }
+html.admin-mode .bd__table th { text-align: left; padding: 6px 10px; color: var(--t3); font-weight: var(--o-fw-semi); border-bottom: 1px solid var(--o-admin-line); }
+html.admin-mode .bd__table td { padding: 8px 10px; color: var(--t); border-bottom: 1px solid var(--o-admin-line); }
+html.admin-mode .bd__table tr:last-child td { border-bottom: 0; }
