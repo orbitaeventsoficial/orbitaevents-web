@@ -38,13 +38,13 @@ El sistema té **una base d'enginyeria seriosa** (tests, guards, schema, serveis
 1. La URL del proxy Railway (`tramway.proxy.rlwy.net:57035`) ha rotat — Railway sol fer-ho cada poques setmanes.
 2. La DB està en mode "sleep" (Railway Hobby plan).
 3. Xarxa local bloqueja port 57035.
-4. La DB s'ha mogut a un altre servei (Supabase apareix als settings.local.json — pot ser la nova).
+
+> NOTA (2026-06-08): la BD és **exclusivament Railway**. No s'usa Supabase (es va migrar fora fa temps). Qualsevol referència antiga a Supabase és obsoleta.
 
 **Acció recomanada (TU, 5 min):**
 - Obrir Railway dashboard → comprovar URL actual del Postgres.
 - Provar `DATABASE_URL="<URL nova>" npx prisma migrate status` per veure si connecta.
-- Si Railway ja no s'usa: actualitzar `.env.local` amb la URL de Supabase (sembla que ja hi ha credencials).
-- Si Railway segueix: comprovar que el servei estigui despert i no en `sleep mode`.
+- Comprovar que el servei Railway estigui despert i no en `sleep mode`.
 
 **Sense això, qualsevol altre canvi visual / UX queda invisible.**
 
