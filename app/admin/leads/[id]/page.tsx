@@ -202,34 +202,37 @@ export default async function LeadDetailPage({ params }: Props) {
     interestedPackId: lead.interestedPackId,
     source: lead.source,
   });
-  const customerLinkPreview = await previewLeadCustomerLink(lead.id);
-  const relatedLeads = await prisma.lead.findMany({
-    where: {
-      id: { not: lead.id },
-      OR: [
-        ...(lead.customerId ? [{ customerId: lead.customerId }] : []),
-        { email: lead.email },
-      ],
-    },
-    select: {
-      id: true,
-      eventType: true,
-      status: true,
-      eventDate: true,
-      createdAt: true,
-      booking: {
-        select: {
-          id: true,
-          reference: true,
-          eventDate: true,
-          status: true,
-          total: true,
+  // Independents → en paral·lel (abans seqüencials, sumaven latència).
+  const [customerLinkPreview, relatedLeads] = await Promise.all([
+    previewLeadCustomerLink(lead.id),
+    prisma.lead.findMany({
+      where: {
+        id: { not: lead.id },
+        OR: [
+          ...(lead.customerId ? [{ customerId: lead.customerId }] : []),
+          { email: lead.email },
+        ],
+      },
+      select: {
+        id: true,
+        eventType: true,
+        status: true,
+        eventDate: true,
+        createdAt: true,
+        booking: {
+          select: {
+            id: true,
+            reference: true,
+            eventDate: true,
+            status: true,
+            total: true,
+          },
         },
       },
-    },
-    orderBy: { createdAt: 'desc' },
-    take: 20,
-  });
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    }),
+  ]);
   const technicalSnapshot = buildLeadTechnicalSnapshot({
     lead: {
       id: lead.id,
