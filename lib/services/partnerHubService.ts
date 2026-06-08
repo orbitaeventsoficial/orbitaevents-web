@@ -68,6 +68,15 @@ export async function fetchPartnerHub(id: string) {
 
   if (!partner) return null;
 
+  // Cost que paguem al partner via línies de servei (subcontractació nova).
+  const serviceLinesAgg = await prisma.bookingServiceLine.aggregate({
+    where: { collaboratorId: id },
+    _sum: { costAmount: true },
+    _count: true,
+  });
+  const serviceLinesPaid = round(serviceLinesAgg._sum.costAmount || 0);
+  const serviceLinesCount = serviceLinesAgg._count;
+
   const { products, bookings: contractedBookings, sourcedLeads, sourcedBookings, ...core } = partner;
 
   const activeProducts = products.filter((product) => product.isActive);
@@ -94,6 +103,12 @@ export async function fetchPartnerHub(id: string) {
     productsCount: activeProducts.length,
     catalogValue: round(activeProducts.reduce((sum, product) => sum + (product.sellPrice || 0), 0)),
     catalogCost: round(activeProducts.reduce((sum, product) => sum + (product.costPrice || 0), 0)),
+    // Quant li paguem: comissions + cost de serveis subcontractats
+    serviceLinesPaid,
+    serviceLinesCount,
+    totalPaidToPartner: round(
+      contractedBookings.reduce((sum, item) => sum + item.commissionAmount, 0) + serviceLinesPaid,
+    ),
   };
 
   return {

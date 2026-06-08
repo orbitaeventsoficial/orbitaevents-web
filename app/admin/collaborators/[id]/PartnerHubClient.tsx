@@ -72,6 +72,9 @@ interface PartnerHubData {
     productsCount: number;
     catalogValue: number;
     catalogCost: number;
+    serviceLinesPaid: number;
+    serviceLinesCount: number;
+    totalPaidToPartner: number;
   };
   sourcedLeads: SourcedLead[];
   sourcedBookings: SourcedBooking[];
@@ -231,13 +234,17 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
       {tab === 'economia' && (
         <section className="ap-card p-5">
           <h2 className="text-lg font-semibold mb-3">Economia</h2>
+          <div className="ap-kpi-row mb-4">
+            <div className="ap-kpi ap-kpi--success"><span className="ap-kpi__label">Quant li paguem (total)</span><span className="ap-kpi__value">{formatCurrency(economics.totalPaidToPartner)}</span></div>
+            <div className="ap-kpi"><span className="ap-kpi__label">Ingrés que ens genera</span><span className="ap-kpi__value">{formatCurrency(economics.sourcedRevenue)}</span></div>
+          </div>
           <div className="grid gap-4 md:grid-cols-2 text-sm">
             <div><span className="ap-muted">Ingrés generat (bolos que ens passa)</span><div className="text-lg font-semibold">{formatCurrency(economics.sourcedRevenue)}</div></div>
             <div><span className="ap-muted">Volum on el contractem</span><div className="text-lg font-semibold">{formatCurrency(economics.contractedRevenue)}</div></div>
-            <div><span className="ap-muted">Comissions totals</span><div className="text-lg font-semibold">{formatCurrency(economics.totalCommissions)}</div></div>
-            <div><span className="ap-muted">Comissions pendents</span><div className="text-lg font-semibold">{formatCurrency(economics.pendingCommissions)}</div></div>
+            <div><span className="ap-muted">Comissions que li paguem</span><div className="text-lg font-semibold">{formatCurrency(economics.totalCommissions)}</div></div>
+            <div><span className="ap-muted">Comissions pendents de pagar</span><div className="text-lg font-semibold">{formatCurrency(economics.pendingCommissions)}</div></div>
+            <div><span className="ap-muted">Pagat en serveis subcontractats ({economics.serviceLinesCount})</span><div className="text-lg font-semibold">{formatCurrency(economics.serviceLinesPaid)}</div></div>
             <div><span className="ap-muted">Valor del catàleg (PVP)</span><div className="text-lg font-semibold">{formatCurrency(economics.catalogValue)}</div></div>
-            <div><span className="ap-muted">Cost del catàleg</span><div className="text-lg font-semibold">{formatCurrency(economics.catalogCost)}</div></div>
           </div>
         </section>
       )}

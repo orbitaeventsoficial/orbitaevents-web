@@ -2,7 +2,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { fetchPartnerHub } from '@/lib/services/partnerHubService';
 
 const { mockPrisma } = vi.hoisted(() => ({
-  mockPrisma: { collaborator: { findUnique: vi.fn() } },
+  mockPrisma: {
+    collaborator: { findUnique: vi.fn() },
+    bookingServiceLine: { aggregate: vi.fn() },
+  },
 }));
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 
@@ -35,6 +38,8 @@ function buildPartner(overrides: Record<string, unknown> = {}) {
 describe('fetchPartnerHub', () => {
   beforeEach(() => {
     mockPrisma.collaborator.findUnique.mockReset();
+    mockPrisma.bookingServiceLine.aggregate.mockReset();
+    mockPrisma.bookingServiceLine.aggregate.mockResolvedValue({ _sum: { costAmount: 0 }, _count: 0 });
   });
 
   it('retorna null si el partner no existeix', async () => {
@@ -44,6 +49,7 @@ describe('fetchPartnerHub', () => {
 
   it('separa els tres conceptes i calcula economia agregada', async () => {
     mockPrisma.collaborator.findUnique.mockResolvedValue(buildPartner());
+    mockPrisma.bookingServiceLine.aggregate.mockResolvedValue({ _sum: { costAmount: 160 }, _count: 2 });
     const hub = await fetchPartnerHub('col_1');
 
     expect(hub).not.toBeNull();
@@ -68,6 +74,9 @@ describe('fetchPartnerHub', () => {
     expect(e.productsCount).toBe(1); // només p1 actiu
     expect(e.catalogValue).toBe(200); // sellPrice del p1
     expect(e.catalogCost).toBe(160); // costPrice del p1
+    expect(e.serviceLinesPaid).toBe(160); // cost subcontractat
+    expect(e.serviceLinesCount).toBe(2);
+    expect(e.totalPaidToPartner).toBe(260); // 100 comissions + 160 serveis
   });
 
   it('gestiona partner sense relacions (empty state)', async () => {
