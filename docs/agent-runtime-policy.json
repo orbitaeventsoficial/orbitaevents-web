@@ -4,6 +4,13 @@
   "defaultWorkspacePath": "D:\\orbitaevents",
   "defaultCommand": "go",
   "mode": "nonstop_until_end",
+  "budgetPolicy": {
+    "neverAskAboutBudget": true,
+    "neverStopOrWarnForLowTokens": true,
+    "rule": "Treballar a tope sense preguntar ni avisar pel pressupost/tokens. No oferir parar per estalviar tokens. Si s'acaben els tokens és problema del propietari, no de l'agent. Acció directa sempre, sense preàmbuls sobre el cost.",
+    "setBy": "owner",
+    "date": "2026-06-08"
+  },
   "finalResponsePolicy": {
     "afterGreenCutWithActionableBacklog": "forbidden",
     "allowedWhen": [

@@ -301,7 +301,10 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   const extrasPrice = data.extras?.reduce((sum, e) => sum + e.price * (e.quantity || 1), 0) || 0;
   const serviceLines = normalizeServiceLines(data.serviceLines);
   const serviceLinesRevenue = serviceLines.reduce((sum, line) => sum + (line.revenueAmount || 0), 0);
-  const subtotalBase = (serviceLinesRevenue > 0 ? serviceLinesRevenue : packPrice + extraHoursPrice) + extrasPrice;
+  // El pack, les hores extra, els extres i les línies de servei se SUMEN tots
+  // (les línies són serveis addicionals, no substitueixen el pack). El total
+  // manual (manualTotalPrice), si s'informa, guanya sobre aquest càlcul més avall.
+  const subtotalBase = packPrice + extraHoursPrice + extrasPrice + serviceLinesRevenue;
 
   let distanceKm = data.distanceKm != null ? sanitizeNonNegative(data.distanceKm, 0) : null;
   if (distanceKm == null) {

@@ -121,7 +121,7 @@ export async function renderContractPDF(proposalId: string): Promise<{
     where: { id: proposalId },
     include: {
       customer: true,
-      booking: { include: { pack: { include: { translations: true } }, extras: { include: { extra: { include: { translations: true } } } } } },
+      booking: { include: { pack: { include: { translations: true } }, extras: { include: { extra: { include: { translations: true } } } }, serviceLines: { orderBy: { sortOrder: 'asc' } } } },
     },
   });
   if (!proposal.customer) {
@@ -173,6 +173,16 @@ export async function renderContractPDF(proposalId: string): Promise<{
     };
   });
 
+  // Línies de servei fora de pack (animació, DJ extra, tècnic...). Al contracte
+  // només hi va l'import de venda (revenueAmount), mai el cost intern.
+  const serviceLines = proposal.booking?.serviceLines
+    ?.filter(line => (line.revenueAmount || 0) > 0)
+    .map(line => ({
+      name: line.label,
+      price: line.revenueAmount || 0,
+      quantity: line.quantity || 1,
+    }));
+
   const pdfData: ContractPdfData = {
     contractReference,
     contractDate: now,
@@ -198,6 +208,7 @@ export async function renderContractPDF(proposalId: string): Promise<{
     packPrice: (snapshot.packPrice as number) || proposal.booking?.pack?.price || 0,
     djHours: (snapshot.djHours as number) || proposal.booking?.pack?.djHours || 0,
     extras,
+    serviceLines,
     subtotal: proposal.subtotal,
     discount: proposal.discount,
     vatRate: proposal.vatRate,

@@ -40,6 +40,8 @@ interface BookingMarginProps {
   extraHourCostRatio: number;
   fixedOperationalCost: number;
   targetMarginPct: number;
+  /** Cost de subcontractació de les línies de servei (animació, pintacares...). */
+  serviceLinesCost?: number;
 }
 
 export default function BookingMarginCard({
@@ -62,6 +64,7 @@ export default function BookingMarginCard({
   extraHourCostRatio,
   fixedOperationalCost,
   targetMarginPct,
+  serviceLinesCost = 0,
 }: BookingMarginProps) {
   const router = useRouter();
   const toast = useToast();
@@ -94,7 +97,8 @@ export default function BookingMarginCard({
     extrasCost +
     extraHoursCost +
     fixedOperationalCost +
-    calculatedTravelCost;
+    calculatedTravelCost +
+    serviceLinesCost;
 
   const netMargin = total - directCost;
   const marginPct = total > 0 ? (netMargin / total) * 100 : 0;
@@ -259,6 +263,9 @@ export default function BookingMarginCard({
           <div className="flex justify-between"><span>Cost hores extra</span><span>{formatCurrency(extraHoursCost)}</span></div>
           <div className="flex justify-between"><span>Cost operacional fix</span><span>{formatCurrency(fixedOperationalCost)}</span></div>
           <div className="flex justify-between"><span title="Inclou benzina, manteniment, assegurança i amortització. Valor recomanat: 0.35-0.50 €/km">Cost vehicle</span><span>{formatCurrency(calculatedTravelCost)}</span></div>
+          {serviceLinesCost > 0 && (
+            <div className="flex justify-between"><span>Cost serveis externs</span><span>{formatCurrency(serviceLinesCost)}</span></div>
+          )}
           <div className="flex justify-between border-t admin-tone-border-neutral pt-1.5"><span>Cost directe total</span><span className="font-semibold">{formatCurrency(directCost)}</span></div>
           <div className="flex justify-between"><span>Ingressos reserva</span><span>{formatCurrency(total)}</span></div>
           <div className="flex justify-between"><span>Diferencial de marge</span><span className={marginColor}>{formatCurrency(netMargin)}</span></div>

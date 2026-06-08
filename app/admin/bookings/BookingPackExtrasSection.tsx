@@ -119,22 +119,25 @@ export default function BookingPackExtrasSection({
                 className="nb__input"
               />
             </div>
-            <div className="nb__field" style={{ maxWidth: 190 }}>
-              <label htmlFor="nb-manual-total" className="nb__label">
-                Total final acordat <span className="text-[11px] font-normal text-[var(--t3)]">(guanya sobre tot)</span>
-              </label>
-              <input
-                id="nb-manual-total"
-                type="number"
-                min={0}
-                placeholder="Ex. 340"
-                value={manualTotalPrice}
-                onChange={(e) => onManualTotalPriceChange(e.target.value)}
-                className="nb__input"
-              />
-            </div>
           </div>
         )}
+
+        <div style={{ display: 'flex', gap: 16, marginTop: 16, flexWrap: 'wrap' }}>
+          <div className="nb__field" style={{ maxWidth: 190 }}>
+            <label htmlFor="nb-manual-total" className="nb__label">
+              Total final acordat <span className="text-[11px] font-normal text-[var(--t3)]">(guanya sobre tot)</span>
+            </label>
+            <input
+              id="nb-manual-total"
+              type="number"
+              min={0}
+              placeholder="Ex. 340"
+              value={manualTotalPrice}
+              onChange={(e) => onManualTotalPriceChange(e.target.value)}
+              className="nb__input"
+            />
+          </div>
+        </div>
 
         {selectedPackId && (
           <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 10 }}>

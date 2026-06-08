@@ -143,6 +143,24 @@ export async function listDossierCollaboratorProducts(): Promise<DossierCollabor
   return products.map(collaboratorProductToDossierProduct);
 }
 
+/** Productes actius de partners actius, format pla per a l'editor de línies de reserva. */
+export async function listActiveCollaboratorProductsForBooking() {
+  const products = await prisma.collaboratorProduct.findMany({
+    where: { isActive: true, collaborator: { isActive: true } },
+    include: { collaborator: { select: { name: true, company: true } } },
+    orderBy: [{ collaborator: { company: 'asc' } }, { sortOrder: 'asc' }, { createdAt: 'asc' }],
+  });
+  return products.map((p) => ({
+    id: p.id,
+    name: p.name,
+    category: p.category,
+    costPrice: p.costPrice,
+    sellPrice: p.sellPrice,
+    collaboratorId: p.collaboratorId,
+    collaboratorName: p.collaborator.company || p.collaborator.name,
+  }));
+}
+
 export async function getDossierCollaboratorProductsByIds(productIds: string[]): Promise<DossierCollaboratorProduct[]> {
   const ids = productIds
     .map(parseDossierCollaboratorProductId)

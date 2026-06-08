@@ -64,6 +64,14 @@
   margin: 0; font-family: var(--display); font-size: var(--o-text-2xl);
   font-weight: var(--o-fw-xbold); letter-spacing: -0.018em; line-height: 1; color: var(--t);
 }
+.fx__charlie {
+  display: inline-block; vertical-align: middle; margin-left: 10px;
+  padding: 2px 8px; border-radius: 999px;
+  border: 1px solid var(--hair-gold); color: var(--gold);
+  background: color-mix(in oklab, var(--gold) 8%, transparent);
+  font-family: var(--mono); font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold);
+  letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap;
+}
 .fx__sub { font-family: var(--mono); font-size: var(--o-text-sm); color: var(--t3); letter-spacing: 0.015em; }
 .fx__headright { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
 
@@ -501,6 +509,7 @@
   background: color-mix(in oklab, var(--raised) 78%, var(--panel));
   text-align: left; cursor: pointer;
   transition: background 120ms ease, border-color 120ms ease;
+  border-left: 3px solid var(--c, var(--line2));
 }
 .fx__cellpart:hover,
 .fx__cellpart.is-active {
@@ -531,7 +540,7 @@
 .fx__placeholder { color: var(--t3); font-family: var(--mono); font-size: var(--o-text-sm); padding: 40px 0; }
 
 /* Valor € a la targeta del calendari — al celltop, sempre visible */
-.fx__cval { font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); color: color-mix(in oklab, var(--gold) 65%, var(--t2)); }
+.fx__cval { font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); color: color-mix(in oklab, var(--gold) 65%, var(--t2)); white-space: nowrap; flex: none; font-variant-numeric: tabular-nums; }
 
 /* Safata leads sense data — franja horitzontal compacta */
 .fx__nodate {
@@ -1098,6 +1107,12 @@
 }
 .fxd__btn:hover:not(:disabled) { border-color: var(--line2); color: var(--t); transform: translateY(-1px); }
 .fxd__btn:disabled { opacity: .45; cursor: not-allowed; }
+.fxd__btn--danger {
+  border-color: color-mix(in oklab, var(--o-stage-lost) 45%, var(--line));
+  color: var(--o-stage-lost);
+  background: color-mix(in oklab, var(--o-stage-lost) 8%, var(--raised));
+}
+.fxd__btn--danger:hover:not(:disabled) { border-color: var(--o-stage-lost); color: var(--o-stage-lost); background: color-mix(in oklab, var(--o-stage-lost) 14%, var(--raised)); }
 .fxd__btn--primary {
   border-color: var(--hair-gold);
   background: color-mix(in oklab, var(--gold) 10%, var(--raised));

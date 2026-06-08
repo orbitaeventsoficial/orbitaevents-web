@@ -118,3 +118,26 @@ Validació dels dos casos reals amb el model:
 - No personalitzar Rufo/Tino/Carlos/Tronios/DJ Mania al codi: són **dades**.
 - No barrejar els tres conceptes: `sourceCollaboratorId` (porta-bolos) ≠ `CollaboratorBooking` (contractat) ≠ `BookingServiceLine` (línia del bolo).
 - `next dev` està aturat (s'han matat els node per resoldre l'EPERM de Prisma). Reaixecar amb `pnpm dev`.
+
+---
+## Fase 7 — Productes/serveis FORA DE PACK (disseny Opus 2026-06-08) — EN CURS
+Cas real: Cristina Rey ens contracta animació+pintacares (de Masquerade, +20%) + DJ 1h (100€) + tècnic (40€, opcional). Cap a packs.
+
+### ✅ FET i validat (tsc + 52 tests)
+- `lib/constants/orbita-services.ts`: serveis propis (DJ/h 100€, tècnic 40€ opcional) com a dades.
+- FIX `bookingCreationService.ts`: subtotal SUMA pack+hores+extres+línies (abans descartava el pack si hi havia línies).
+- FIX `useNewBookingSubmit.ts`: accepta `serviceLines` explícites → DIRECT_CLIENT (Cristina) ja pot tenir línies (abans buildServiceLines les descartava).
+- `BookingServiceLinesSection.tsx` (editor: servei Òrbita / producte partner del catàleg amb cost+PVP auto / línia lliure) + ruta `GET /api/admin/collaborator-products` + CSS responsiu a nb-design.css.
+- `useBookingPricing.ts`: total i marge en viu sumen serviceLinesRevenue/Cost (marge pel patró del hook, no inline).
+
+### ✅ FET addicional (2026-06-08)
+- Contracte PDF (contractService + contractPdfService + i18n ca/es/en): desglossa serviceLines (només revenueAmount). 44 tests verds.
+- Marge fitxa reserva: BookingMarginCard + [id]/page.tsx sumen serviceLinesCost al cost directe (desglossament «Cost serveis externs»). Bug «marge fals» resolt.
+
+### ⬜ PENDENT
+- **BookingMarginCard / fitxa reserva [id]**: el marge de la fitxa calcula inline i ignora línies (Opus). Cal passar serviceLinesRevenue/Cost al càlcul.
+- **Editor de línies a la fitxa de reserva** `[id]` (afegir/editar/eliminar post-creació; el route service ja fa deleteMany+create).
+- **Contracte PDF** (`contractPdfService.ts` + `contractService.ts`): desglossar serviceLines (només revenueAmount, mai cost) + i18n "Serveis".
+- **/admin/packs**: secció read-only "Serveis solts d'Òrbita" (de ORBITA_SERVICES).
+- **Lead hints**: mostrar `interestedExtras` del lead com a pista a l'editor (cal afegir `interestedExtras` a BookingLeadData + prefill).
+- Cap migració nova (tot ja a Railway).

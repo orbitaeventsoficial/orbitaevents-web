@@ -1,5 +1,12 @@
 'use client';
 
+// ─────────────────────────────────────────────────────────
+// ✅ TANCAT CHARLIE — validat pel propietari (2026-06-08)
+// Calendari de leads (Agenda). Patró de referència. A prop de
+// final (no 100%). La resta de pàgines s'ha de construir fidel
+// a aquest model. Poliment pendent: docs/calendar-polish-pending.md
+// ─────────────────────────────────────────────────────────
+
 /* ============================================================================
    ÒRBITA ADMIN — Leads · Agenda · Client (Brass & Obsidian)
    Canvas negre. Reconstruïm peça a peça.
@@ -657,7 +664,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
       <header className="fx__pagehead">
         <div className="fx__tt">
           <span className="fx__eyebrow">Temporada {currentYear}</span>
-          <h1 className="fx__h1">Caps de setmana</h1>
+          <h1 className="fx__h1">Caps de setmana <span className="fx__charlie" title="Validat pel propietari — patró de referència">✓ TANCAT CHARLIE</span></h1>
         </div>
         <div className="fx__headright">
           <span className="fx__sub">

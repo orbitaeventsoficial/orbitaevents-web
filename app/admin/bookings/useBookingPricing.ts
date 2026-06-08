@@ -16,7 +16,7 @@ import {
   TRAVEL_BLOCK_EUR,
   TRAVEL_BLOCK_KM,
 } from '@/lib/services/travelCost';
-import type { BookingExtra, BookingFormData, BookingPack, BookingSelectedExtras } from './booking-form.types';
+import type { BookingExtra, BookingFormData, BookingPack, BookingSelectedExtras, BookingServiceLineFormInput } from './booking-form.types';
 import { OPERATOR_EXTRA_ID } from './booking-form.types';
 
 function calculateEventDuration(startTime: string | null | undefined, endTime: string | null | undefined): number {
@@ -38,9 +38,10 @@ interface UseBookingPricingOptions {
   customPackPrice?: number;
   manualTotalPrice?: number;
   invoiceRequired?: boolean;
+  serviceLines?: BookingServiceLineFormInput[];
 }
 
-export function useBookingPricing({ form, packs, extras, selectedExtras, customPackPrice, manualTotalPrice, invoiceRequired = false }: UseBookingPricingOptions) {
+export function useBookingPricing({ form, packs, extras, selectedExtras, customPackPrice, manualTotalPrice, invoiceRequired = false, serviceLines = [] }: UseBookingPricingOptions) {
   const internalTravelCost = useMemo(() => {
     const km = parseFloat(form.distanceKm) || 0;
     const rate = parseFloat(form.fuelCostPerKm) || DEFAULT_VEHICLE_COST_PER_KM;
@@ -96,7 +97,9 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
     const extraHoursCount = explicitExtraHours > 0 ? explicitExtraHours : derivedExtraHours;
     const extraHoursPrice = extraHoursCount * selectedPack.extraHourPrice;
     const extrasPrice = Object.values(selectedExtras).reduce((sum, extra) => sum + extra.price * extra.quantity, 0);
-    const subtotal = packPrice + extraHoursPrice + extrasPrice + travelCharge;
+    const serviceLinesRevenue = serviceLines.reduce((sum, l) => sum + (l.revenueAmount || 0) * (l.quantity || 1), 0);
+    const serviceLinesCost = serviceLines.reduce((sum, l) => sum + (l.costAmount || 0) * (l.quantity || 1), 0);
+    const subtotal = packPrice + extraHoursPrice + extrasPrice + travelCharge + serviceLinesRevenue;
     const discount = parseFloat(form.discount) || 0;
     const baseAfterDiscount = subtotal - discount;
     const vatRate = calcVatRate(invoiceRequired);
@@ -107,8 +110,8 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
       : baseAfterDiscount * (vatRate / 100);
     const deposit = calcDeposit(total);
 
-    return { packPrice, extraHoursPrice, extrasPrice, travelCharge, subtotal, discount, vatRate, vatAmount, total, deposit };
-  }, [customPackPrice, form.discount, form.eventEndTime, form.eventStartTime, form.extraHours, invoiceRequired, manualTotalPrice, selectedExtras, selectedPack, travelCharge]);
+    return { packPrice, extraHoursPrice, extrasPrice, travelCharge, subtotal, discount, vatRate, vatAmount, total, deposit, serviceLinesRevenue, serviceLinesCost };
+  }, [customPackPrice, form.discount, form.eventEndTime, form.eventStartTime, form.extraHours, invoiceRequired, manualTotalPrice, selectedExtras, selectedPack, travelCharge, serviceLines]);
 
   const marginEstimate = useMemo(() => {
     if (!pricing) return null;
@@ -117,7 +120,8 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
     const extraHoursCost = pricing.extraHoursPrice * PROFITABILITY_MODEL_DEFAULTS.extraHourCostRatio;
     const fixedCost = PROFITABILITY_MODEL_DEFAULTS.fixedOperationalCost;
     const travelCostEst = internalTravelCost;
-    const directCost = packCost + extrasCost + extraHoursCost + fixedCost + travelCostEst;
+    const serviceLinesCost = pricing.serviceLinesCost || 0;
+    const directCost = packCost + extrasCost + extraHoursCost + fixedCost + travelCostEst + serviceLinesCost;
     const netMargin = pricing.total - directCost;
     const marginPct = pricing.total > 0 ? (netMargin / pricing.total) * 100 : 0;
     const tone: 'emerald' | 'amber' | 'rose' = marginPct >= 50 ? 'emerald' : marginPct >= 30 ? 'amber' : 'rose';

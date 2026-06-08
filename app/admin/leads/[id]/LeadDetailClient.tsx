@@ -15,6 +15,7 @@ function buildLeadWhatsAppHref(phone: string, name: string): string {
 import { patchLeadStatus } from '../leadStatusClient';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
+import ConfirmDialog, { useConfirmDialog } from '@/app/admin/components/ConfirmDialog';
 import { SOURCE_LABELS, formatCurrency, formatDateFull } from '@/lib/constants';
 import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
@@ -151,6 +152,7 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
 }) {
   const router = useRouter();
   const toast = useToast();
+  const { confirm, dialogProps } = useConfirmDialog();
   const [stage, setStage] = useState<Stage>(lead.stage);
   const [pending, setPending] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -198,6 +200,28 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
     } catch (error) {
       console.error('[LeadDetailClient] Error saving assignee', error);
       toast.error('Error desant l\'assignació.');
+    }
+  }
+
+  async function handleDeleteLead() {
+    const ok = await confirm({
+      title: 'Eliminar lead',
+      message: `Segur que vols eliminar "${lead.name}"? S'eliminaran notes, activitats, tasques i documents associats. Acció irreversible.`,
+      variant: 'danger',
+      confirmLabel: 'Eliminar',
+    });
+    if (!ok) return;
+    try {
+      const res = await fetchWithCsrf(`/api/admin/leads/${lead.id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'No s\'ha pogut eliminar');
+      }
+      toast.success('Lead eliminat.');
+      router.push('/admin/leads');
+    } catch (error) {
+      console.error('[LeadDetailClient] Error eliminant lead', error);
+      toast.error(error instanceof Error ? error.message : 'Error eliminant el lead.');
     }
   }
 
@@ -402,6 +426,9 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
           <div className="fxd__stageactions">
             <Link href={`/admin/presupuestos?leadId=${lead.id}`} className="fxd__btn">+ Pressupost</Link>
             <Link href={`/admin/dossiers?leadId=${lead.id}`} className="fxd__btn">+ Dossier</Link>
+            {stage === 'perdut' && (
+              <button type="button" className="fxd__btn fxd__btn--danger" onClick={handleDeleteLead}>Eliminar lead</button>
+            )}
           </div>
           <div className="fxd__stagepick">
             {PIPELINE_STAGES.map((s) => (
@@ -881,6 +908,7 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
         );
       })()}
 
+      <ConfirmDialog {...dialogProps} />
     </div>
   );
 }

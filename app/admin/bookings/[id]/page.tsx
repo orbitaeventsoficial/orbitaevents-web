@@ -75,6 +75,7 @@ async function getBooking(id: string) {
       include: {
         pack: { include: { translations: true, inventory: { include: { item: true } } } },
         extras: { include: { extra: { include: { translations: true } } } },
+        serviceLines: { orderBy: { sortOrder: 'asc' } },
         inventory: { include: { item: true } },
         lead: true,
         proposals: {
@@ -143,6 +144,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
   const bookingCompat       = booking as BookingNumericCompat;
   const packPrice           = booking.pack?.price ? Number(booking.pack.price) : 0;
   const extrasTotal         = booking.extras?.reduce((s: number, e: { price?: number | null; quantity?: number | null }) => s + Number(e.price || 0) * (e.quantity || 1), 0) ?? 0;
+  const serviceLinesCost    = booking.serviceLines?.reduce((s: number, l: { costAmount?: number | null; quantity?: number | null }) => s + Number(l.costAmount || 0) * (l.quantity || 1), 0) ?? 0;
   const extraHours          = typeof bookingCompat.extraHours === 'number' ? bookingCompat.extraHours : 0;
   const extraHourPrice      = booking.pack?.extraHourPrice ? Number(booking.pack.extraHourPrice) : 0;
   const inventoryCostReal   = inventoryCost.totalCost;
@@ -466,6 +468,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
             extraHourCostRatio={profitabilityConfig.extraHourCostRatio}
             fixedOperationalCost={profitabilityConfig.fixedOperationalCost}
             targetMarginPct={targetMarginPct}
+            serviceLinesCost={serviceLinesCost}
           />
         </div>
 

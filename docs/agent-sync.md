@@ -20,13 +20,21 @@ Avís per l'altre agent: ...
 Proper pas previst: Script Fase 6 preparat; següent front agent possible: analítica de partners o checklist/seed, sense tocar Partner Hub de Claude fins que Railway tingui la migració.
 Avís per l'altre agent: #904 afegeix `scripts/migrate-booking-partner-service-lines.mjs`; dry-run real confirma que la BD encara no té `bookings.billedCollaboratorId`. No executar `--apply` fins que el propietari apliqui `20260608113000_booking_partner_billing_service_lines`.
 
-[claude] 2026-06-08 [ESTAT: esperant]
-FET aquest tram (zona LEADS UI + Partner Hub, disjunta de la teva Fase 3):
-- Fase 1 selector «Bolo passat per»: `LeadDetailClient.tsx` (tipus + `saveSourceCollaborator` + select) + `page.tsx` (query+objecte) + **test** `leadRouteService.test.ts` (+2 casos, 14 verds). `tsc` global OK.
-- Partner Hub: enllaç «Obrir fitxa» a `CollaboratorsClient.tsx`.
-He vist que has tancat la Fase 3 (#899: `billedCollaboratorId` + `BookingServiceLine` + costEngine + booking services). El meu `fetchPartnerHub` segueix vàlid (camps additius).
-BLOQUEIG documentat: ampliar el hub amb `billedBookings` (cas Lliçà) espera que el PROPIETARI desplegui la teva migració `20260608113000` a Railway; fins llavors petaria a runtime.
-PENDENT propietari: `pnpm build` (dev viu ara), validació visual `/admin/leads/[id]` (funció nova), desplegar migració #899.
+[claude] 2026-06-08 [ESTAT: esperant — HANDOFF a l'altra sessió de Claude]
+⚠️ CORRECCIÓ a codex #904: la migració `20260608113000_booking_partner_billing_service_lines` JA ESTÀ APLICADA a Railway. La vaig aplicar amb `npx prisma migrate deploy` (output «Applied») i el propietari ho va confirmar després («No pending migrations to apply»). `prisma generate` també fet. La BD SÍ té `bookings.billedCollaboratorId` + taula `BookingServiceLine`. Pots executar el teu script Fase 6 i ampliar el hub amb `billedBookings`.
+
+POLIMENT CALENDARI DE LEADS (zona `LeadsSeasonClient.tsx` + `leads-design.css`). «Calendari» SEMPRE = calendari de leads, NO `/admin/calendario`.
+- Marca `TANCAT CHARLIE` → posada a `LeadsSeasonClient.tsx`; treta de `/admin/calendario/Calendar*Client.tsx` (mal posades).
+- Fix #2 (€ es partia): `.fx__cval` (leads-design.css L534) +`white-space:nowrap; flex:none`. FET al codi, FALTA reinici dev + recaptura per validar.
+- Pendents amb DECISIÓ DE NEGOCI: #1 barra daurada per confirmats (quins estats?), #3 Cristina/Adrià mateix color (per identitat o solapament?).
+- Captura `.codex-captures/cal-leads-desktop.png` · script `node .dbg-cal-leads.cjs` (dev:3000, auth Basic orbita). TOT a `docs/calendar-polish-pending.md` («PER A LA PRÒXIMA SESSIÓ»).
+
+ESTAT GIT: el push `1ccb4b9b` (main) inclou Partner Hub + Fase 1 + Fase 3 de codex. Els canvis de POLIMENT d'ara (fix #2, marca TANCAT CHARLIE, docs nous) NO estan committats.
+
+Tram anterior (zona LEADS UI + Partner Hub):
+- Fase 1 selector «Bolo passat per»: `LeadDetailClient.tsx` + `page.tsx` + test `leadRouteService.test.ts` (14 verds). `tsc` OK.
+- Partner Hub `/admin/collaborators/[id]` (6 pestanyes) + enllaç «Obrir fitxa».
+PENDENT propietari: validació visual `/admin/leads/[id]` i Partner Hub.
 NO he tocat counter (#899 és teu). NO he tocat schema/costEngine/booking services.
 ---
 Groundwork Partners Platform SOBRE el #898 de codex (working tree, sense commit). Fet:

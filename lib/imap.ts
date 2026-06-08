@@ -225,9 +225,7 @@ export async function fetchEmails(options: {
       }, { uid: true })) {
         const envelope = message.envelope;
 
-        const hasAttachments = message.bodyStructure?.childNodes?.some(
-          (node: { disposition?: string }) => node.disposition === 'attachment'
-        ) || false;
+        const hasAttachments = identifyAttachmentParts(message.bodyStructure).length > 0;
 
         emails.push({
           id: `imap-${message.uid}`,
@@ -413,19 +411,24 @@ function identifyAttachmentParts(bodyStructure: unknown): StructAttachPart[] {
   };
   const walk = (node: Node | null | undefined): void => {
     if (!node) return;
-    if (node.disposition === 'attachment' && node.part) {
-      const filename =
-        node.dispositionParameters?.filename ||
-        node.parameters?.name ||
-        `adjunt-${node.part}`;
+    const disp = (node.disposition || '').toLowerCase();
+    const type = (node.type || '').toLowerCase();
+    const filename = node.dispositionParameters?.filename || node.parameters?.name;
+    // Un adjunt és qualsevol part amb `part` que NO sigui multipart ni text del cos:
+    //  - disposition 'attachment' o 'inline', O
+    //  - sense disposition però amb nom de fitxer (cas Gmail i altres clients).
+    const isAttachmentLike =
+      !!node.part &&
+      type !== 'multipart' && !type.startsWith('multipart/') &&
+      (disp === 'attachment' || disp === 'inline' || (!disp && !!filename && !type.startsWith('text/')));
+    if (isAttachmentLike && node.part) {
       out.push({
         partKey: node.part,
-        filename,
+        filename: filename || `adjunt-${node.part}`,
         contentType: (node.type || 'application/octet-stream').toLowerCase(),
         size: node.size ?? 0,
         encoding: node.encoding,
       });
-      return;
     }
     if (node.childNodes) for (const child of node.childNodes) walk(child);
   };
@@ -1199,9 +1202,7 @@ export async function searchEmails(opts: {
         flags: true,
       }, { uid: true })) {
         const envelope = message.envelope;
-        const hasAttachments = message.bodyStructure?.childNodes?.some(
-          (node: { disposition?: string }) => node.disposition === 'attachment'
-        ) || false;
+        const hasAttachments = identifyAttachmentParts(message.bodyStructure).length > 0;
 
         emails.push({
           id: `imap-${message.uid}`,

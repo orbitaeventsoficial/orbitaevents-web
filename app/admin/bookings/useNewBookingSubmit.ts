@@ -18,6 +18,9 @@ interface UseNewBookingSubmitOptions {
   customPackPrice?: number;
   manualTotalPrice?: number;
   invoiceRequired?: boolean;
+  /** Línies de servei explícites (editor obert). Si s'informen, tenen prioritat
+   *  sobre les derivades del relationshipContext (sistema antic). */
+  serviceLines?: BookingServiceLineFormInput[];
   relationshipContext?: {
     mode: string;
     partnerId?: string;
@@ -74,6 +77,7 @@ export function useNewBookingSubmit({
   customPackPrice,
   manualTotalPrice,
   invoiceRequired = false,
+  serviceLines: explicitServiceLines,
   relationshipContext,
 }: UseNewBookingSubmitOptions) {
   const router = useRouter();
@@ -102,7 +106,9 @@ export function useNewBookingSubmit({
     setError(null);
 
     try {
-      const serviceLines = buildServiceLines(relationshipContext);
+      const serviceLines = explicitServiceLines && explicitServiceLines.length > 0
+        ? explicitServiceLines
+        : buildServiceLines(relationshipContext);
       const billedCollaboratorId = relationshipContext?.mode === 'PARTNER_HIRES_ORBITA'
         ? relationshipContext.partnerId || undefined
         : undefined;
@@ -161,7 +167,7 @@ export function useNewBookingSubmit({
     } finally {
       setSubmitting(false);
     }
-  }, [customerId, form, internalTravelCost, leadData, leadId, manualTotalPrice, relationshipContext, router, selectedExtras, sourceCollaboratorId, customPackPrice, invoiceRequired]);
+  }, [customerId, form, internalTravelCost, leadData, leadId, manualTotalPrice, relationshipContext, router, selectedExtras, sourceCollaboratorId, customPackPrice, invoiceRequired, explicitServiceLines]);
 
   return {
     submitting,

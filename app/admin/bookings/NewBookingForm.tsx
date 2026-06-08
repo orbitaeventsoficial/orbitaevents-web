@@ -23,6 +23,8 @@ import BookingTravelDiscountSection from './BookingTravelDiscountSection';
 import BookingClientEventSection from './BookingClientEventSection';
 import { useNewBookingInitialData } from './useNewBookingInitialData';
 import { useNewBookingSubmit } from './useNewBookingSubmit';
+import BookingServiceLinesSection from './BookingServiceLinesSection';
+import type { BookingServiceLineFormInput } from './booking-form.types';
 import { useBookingDiscountValidation } from './useBookingDiscountValidation';
 import { useBookingDistance } from './useBookingDistance';
 import { useBookingDateConflicts } from './useBookingDateConflicts';
@@ -51,6 +53,14 @@ export default function NewBookingForm() {
   const [selectedExtras, setSelectedExtras] = useState<BookingSelectedExtras>({});
   const [customPackPrice, setCustomPackPrice] = useState('');
   const [manualTotalPrice, setManualTotalPrice] = useState('');
+  const [serviceLines, setServiceLines] = useState<BookingServiceLineFormInput[]>([]);
+  // Arrossega el pressupost del lead com a punt de partida del preu acordat.
+  useEffect(() => {
+    if (!leadData?.budget || manualTotalPrice) return;
+    const parsed = String(leadData.budget).replace(/[^\d]/g, '');
+    if (parsed) setManualTotalPrice(parsed);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- només ha de reaccionar quan arriba leadData, no a manualTotalPrice
+  }, [leadData]);
   const [invoiceRequired, setInvoiceRequired] = useState(false);
   const [relationshipMode, setRelationshipMode] = useState('DIRECT_CLIENT');
   const [sourceCollaboratorId, setSourceCollaboratorId] = useState('');
@@ -100,6 +110,7 @@ export default function NewBookingForm() {
     customPackPrice: customPackPrice ? Number(customPackPrice) : undefined,
     manualTotalPrice: manualTotalPrice ? Number(manualTotalPrice) : undefined,
     invoiceRequired,
+    serviceLines,
   });
 
   useEffect(() => {
@@ -128,6 +139,7 @@ export default function NewBookingForm() {
     customPackPrice: customPackPrice ? Number(customPackPrice) : undefined,
     manualTotalPrice: manualTotalPrice ? Number(manualTotalPrice) : undefined,
     invoiceRequired,
+    serviceLines: serviceLines.length > 0 ? serviceLines : undefined,
     relationshipContext: {
       mode: relationshipMode,
       partnerId: relationshipPartnerId,
@@ -338,6 +350,11 @@ export default function NewBookingForm() {
             onInvoiceRequiredChange={setInvoiceRequired}
             onToggleExtra={toggleExtra}
             onUpdateExtraQuantity={updateExtraQuantity}
+          />
+
+          <BookingServiceLinesSection
+            lines={serviceLines}
+            onChange={setServiceLines}
           />
 
           <BookingTravelDiscountSection

@@ -37,6 +37,7 @@ Per estat funcional i peces consolidades:
 - Aquesta regla també viu en format executable a `docs/agent-runtime-policy.json`: `repository=orbitaevents`, `defaultWorkspacePath=D:\orbitaevents`, `mode=nonstop_until_end`. El guard `pnpm run qa:nonstop-protocol` ha de fallar si el JSON, aquest fitxer o el protocol deixen d'estar alineats.
 - No interrompre el treball per preguntes que es poden resoldre llegint el protocol, el diari o el codi.
 - Reportar l'estat final quan no quedi cap ítem pendent, no en cada canvi.
+- **Pressupost/tokens (ordre del propietari 2026-06-08)**: treballar a tope SENSE preguntar ni avisar mai pel pressupost o els tokens. Prohibit oferir parar per estalviar tokens o condicionar la feina al pressupost. Si s'esgoten els tokens és problema del propietari. Acció directa sempre. Veure `budgetPolicy` a `docs/agent-runtime-policy.json`.
 
 ## Flux obligatori abans de tocar res
 

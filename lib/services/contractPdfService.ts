@@ -48,6 +48,7 @@ export interface ContractPdfData {
   packPrice: number;
   djHours: number;
   extras?: { name: string; price: number; quantity: number }[];
+  serviceLines?: { name: string; price: number; quantity: number }[];
 
   // Econòmic
   subtotal: number;
@@ -100,6 +101,7 @@ export async function generateContractPDF(
       guests: 'Convidats',
       pack: 'Pack contractat',
       extras: 'Extres',
+      services: 'Serveis',
       economicSummary: 'RESUM ECONÒMIC',
       subtotal: 'Subtotal',
       discount: 'Descompte',
@@ -146,6 +148,7 @@ export async function generateContractPDF(
       guests: 'Invitados',
       pack: 'Pack contratado',
       extras: 'Extras',
+      services: 'Servicios',
       economicSummary: 'RESUMEN ECONÓMICO',
       subtotal: 'Subtotal',
       discount: 'Descuento',
@@ -192,6 +195,7 @@ export async function generateContractPDF(
       guests: 'Guests',
       pack: 'Selected package',
       extras: 'Extras',
+      services: 'Services',
       economicSummary: 'ECONOMIC SUMMARY',
       subtotal: 'Subtotal',
       discount: 'Discount',
@@ -367,6 +371,7 @@ export async function generateContractPDF(
     `${data.guestCount}`,
     `${resolvedPackName} (${data.djHours}h)`,
     ...(data.extras?.map(e => `${e.name} — ${formatPdfMoney(e.price * e.quantity, locale)}`) || []),
+    ...(data.serviceLines?.map(s => `${s.name} — ${formatPdfMoney(s.price * s.quantity, locale)}`) || []),
   ];
   const serviceH = calcSectionHeight(serviceValues);
   ensureSpace(serviceH + sectionGap);
@@ -381,6 +386,11 @@ export async function generateContractPDF(
   if (data.extras && data.extras.length > 0) {
     for (const extra of data.extras) {
       drawRow(t.extras, `${extra.name} — ${formatPdfMoney(extra.price * extra.quantity, locale)}`);
+    }
+  }
+  if (data.serviceLines && data.serviceLines.length > 0) {
+    for (const line of data.serviceLines) {
+      drawRow(t.services, `${line.name} — ${formatPdfMoney(line.price * line.quantity, locale)}`);
     }
   }
   y += sectionGap;
