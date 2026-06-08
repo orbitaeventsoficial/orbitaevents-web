@@ -10,6 +10,7 @@ import { computePackPricingHealth, getPackPricingModelConfig, type PackPricingHe
 import { AdminPage } from '../components/AdminPage';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { PACK_SERVICE_OPTIONS, formatCurrencyExact } from '@/lib/constants';
+import { ORBITA_SERVICES } from '@/lib/constants/orbita-services';
 import { calculateCostPerHour } from '@/lib/inventory-utils';
 import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
 
@@ -729,6 +730,27 @@ export default async function PacksPage({
           <p className="text-sm">{activeFocusLabel ? 'Canvia el focus o torna a la vista completa.' : 'Executa el seed per carregar dades inicials'}</p>
         </div>
       )}
+
+      <section className="mt-8 rounded-2xl border admin-card-glass p-5">
+        <h2 className="text-lg font-semibold">Serveis solts d&apos;Òrbita</h2>
+        <p className="mt-1 text-sm admin-tone-text-neutral">
+          Serveis propis que s&apos;afegeixen a una reserva fora de pack (p. ex. DJ extra, tècnic de so).
+          Es gestionen com a dades al codi; els productes de col·laboradors van al seu catàleg.
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {ORBITA_SERVICES.map((service) => (
+            <div key={service.id} className="rounded-xl border admin-tone-border-neutral p-4">
+              <div className="flex items-center justify-between gap-3">
+                <span className="font-medium">{service.label}</span>
+                <span className="font-bold text-amber-400/90">
+                  {formatCurrencyExact(service.defaultPrice)}{service.unit === 'hour' ? '/h' : ''}
+                </span>
+              </div>
+              {service.optional && <span className="mt-2 inline-block ap-badge">Opcional</span>}
+            </div>
+          ))}
+        </div>
+      </section>
     </AdminPage>
   );
 }
