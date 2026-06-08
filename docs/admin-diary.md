@@ -1,3 +1,20 @@
+## 2026-06-08 — Autosave d'esborranys de formularis admin (Canvi #907, claude)
+
+### Resum
+Hook canònic `useFormAutosave` (localStorage + debounce + TTL 7 dies) per no perdre mai el que s'omple. Aplicat a intake (nova entrada) i nova reserva (hora/lloc/tot). Banner «esborrany recuperat» + neteja en desar.
+
+### Per estendre (proper Claude)
+Aplicar el mateix patró a la resta de formularis llargs: `ComposeForm`, `BlogEditorForm`, `FaqEditorForm`, `NewPackForm`, `quick-create`, editors d'inventari/email-templates. Patró: `const { restored, clear } = useFormAutosave('key-unica', form, setForm)` + banner + `clear()` al submit OK.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm build` OK · test `useFormAutosave` 5 verds.
+- Validació funcional: recàrrega d'intake/nova reserva recupera l'esborrany; desat correcte el neteja.
+- Validació humana/UX: pendent validació visual del propietari.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-08 — Redisseny UX nova reserva (Canvi #906, claude)
 
 ### Resum

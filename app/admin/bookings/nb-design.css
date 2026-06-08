@@ -186,3 +186,6 @@ html.admin-mode .nb__spinner { width: 32px; height: 32px; border: 2px solid var(
 /* Selectors d'afegir línia de servei */
 .nb__sl-adder { max-width: 220px; flex: 1 1 180px; }
 .nb__sl-adder--wide { max-width: 260px; }
+
+/* Esborrany autosave recuperat */
+.nb__autosave { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; padding: 12px 16px; border: 1px solid color-mix(in oklab, var(--gold) 35%, transparent); border-radius: var(--o-r-md-2); background: color-mix(in oklab, var(--gold) 8%, var(--panel)); font-size: var(--o-text-sm); color: var(--t2); }

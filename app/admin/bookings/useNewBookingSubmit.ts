@@ -32,6 +32,8 @@ interface UseNewBookingSubmitOptions {
     partnerRole?: string;
     partnerCostAmount?: string;
   };
+  /** Callback en desat correcte (p. ex. netejar l'esborrany autosave). */
+  onSuccess?: () => void;
 }
 
 function parsePositiveMoney(value?: string) {
@@ -81,6 +83,7 @@ export function useNewBookingSubmit({
   invoiceRequired = false,
   serviceLines: explicitServiceLines,
   billedCollaboratorId: explicitBilledCollaboratorId,
+  onSuccess,
   relationshipContext,
 }: UseNewBookingSubmitOptions) {
   const router = useRouter();
@@ -156,6 +159,7 @@ export function useNewBookingSubmit({
       }
 
       const data = await res.json();
+      onSuccess?.();
       // Si la reserva neix d'un lead, torna a la fitxa del lead (workspace nou amb
       // banner de reserva activa + semàfor). Si no, fitxa de booking clàssica.
       router.push(leadId ? buildLeadWorkspaceHref(leadId) : buildBookingHref(data.booking.id));

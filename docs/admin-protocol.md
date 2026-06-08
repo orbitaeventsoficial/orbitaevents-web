@@ -1384,6 +1384,25 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #907 — 2026-06-08 — claude (FET)
+
+**Autosave d'esborranys de formularis admin (hook canònic) — intake i nova reserva.**
+
+- Context: el propietari ha hagut de reescriure la mateixa info diverses vegades (p. ex. Collsacreu/lloc i hora a Cristina Rey) perquè els formularis no guardaven res fins al desat final. Cal una xarxa de seguretat local.
+- `lib/hooks/useFormAutosave.ts`: hook genèric reutilitzable. Desa l'estat del formulari a `localStorage` (prefix `orbita.autosave.`) amb debounce (600ms), restaura en muntar, caduca a 7 dies, exposa `restored` + `clear()`. Best-effort (no substitueix el desat al servidor). Test `__tests__/lib/hooks/useFormAutosave.test.ts` (5 verds).
+- `app/admin/intake/page.tsx`: autosave del formulari de nova entrada (key `intake-lead`) + banner «esborrany recuperat» amb opció de descartar + `clear()` en crear el lead. Classe `.ni__autosave` a `intake.css` (tokens).
+- `app/admin/bookings/NewBookingForm.tsx`: autosave de la nova reserva (hora, lloc, tot; key per lead/client) actiu només després del prefill (`enabled: !loading`) per no xocar amb les dades del lead; banner + `clear()` via nou `onSuccess` a `useNewBookingSubmit`. Classe `.nb__autosave`.
+- Patró per estendre a la resta de formularis admin: importar `useFormAutosave`, passar `(key, form, setForm)` i cridar `clear()` al desat correcte.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `906` a `907`.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm build` OK; test del hook 5 verds.
+- Validació funcional: en recarregar intake o nova reserva, es recupera el que s'estava omplint; en desar correctament, l'esborrany es neteja.
+- Validació humana/UX: pendent validació visual del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #906 — 2026-06-08 — claude (FET)
 
 **Redisseny UX de la nova reserva (Opus): pack com a nucli + serveis sota + origen/facturació plegable.**

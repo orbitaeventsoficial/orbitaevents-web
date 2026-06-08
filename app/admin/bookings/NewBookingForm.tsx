@@ -29,6 +29,7 @@ import { useBookingDiscountValidation } from './useBookingDiscountValidation';
 import { useBookingDistance } from './useBookingDistance';
 import { useBookingDateConflicts } from './useBookingDateConflicts';
 import { useBookingPricing } from './useBookingPricing';
+import { useFormAutosave } from '@/lib/hooks/useFormAutosave';
 import type { BookingExtra, BookingFormData, BookingSelectedExtras } from './booking-form.types';
 import { OPERATOR_EXTRA_ID } from './booking-form.types';
 import './nb-design.css';
@@ -50,6 +51,12 @@ export default function NewBookingForm() {
   const crumbContext = customerId ? 'Client' : 'Agenda';
 
   const { form, setForm, packs, extras, loading, leadData, partners, fuelReferenceInfo } = useNewBookingInitialData({ leadId, dateParam });
+  // Autosave de l'esborrany de reserva (hora, lloc, tot). Només actiu un cop
+  // carregat el prefill del lead, perquè no machaqui ni el sobreescrigui.
+  const autosaveKey = `booking-new-${leadId || customerId || 'lliure'}`;
+  const { restored: bookingDraftRestored, clear: clearBookingDraft } = useFormAutosave(
+    autosaveKey, form, setForm, { enabled: !loading },
+  );
   const [selectedExtras, setSelectedExtras] = useState<BookingSelectedExtras>({});
   const [customPackPrice, setCustomPackPrice] = useState('');
   const [manualTotalPrice, setManualTotalPrice] = useState('');
@@ -122,6 +129,7 @@ export default function NewBookingForm() {
   }, [operatorExtraPrice]);
 
   const { submitting, error, submit: handleSubmit } = useNewBookingSubmit({
+    onSuccess: clearBookingDraft,
     form,
     selectedExtras,
     leadId,
@@ -196,6 +204,13 @@ export default function NewBookingForm() {
           {error && (
             <div className="nb__panel nb__panel--error">
               <p className="nb__errortext">{error}</p>
+            </div>
+          )}
+
+          {bookingDraftRestored && (
+            <div className="nb__autosave" role="status">
+              <span>S&apos;ha recuperat un esborrany d&apos;aquesta reserva.</span>
+              <button type="button" className="nb__toggle" onClick={clearBookingDraft}>Descartar esborrany</button>
             </div>
           )}
 

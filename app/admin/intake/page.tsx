@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/app/admin/components/ToastProvider';
+import { useFormAutosave } from '@/lib/hooks/useFormAutosave';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
@@ -67,6 +68,7 @@ export default function IntakePage() {
   const [success, setSuccess] = useState<{ id: string; name: string } | null>(null);
   const [pasteText, setPasteText] = useState('');
   const [extracting, setExtracting] = useState(false);
+  const { restored: autosaveRestored, clear: clearAutosave } = useFormAutosave('intake-lead', form, setForm);
 
   const handleExtract = useCallback(async (textOverride?: string) => {
     const text = textOverride ?? pasteText;
@@ -232,6 +234,7 @@ export default function IntakePage() {
       const data = await res.json();
       setSuccess({ id: data.lead.id, name: data.lead.name });
       toast.success(`Entrada creada per a ${data.lead.name}`);
+      clearAutosave();
       setForm((prev) => ({ ...INITIAL_FORM, source: prev.source }));
       setDuplicates([]);
     } catch (err) {
@@ -286,6 +289,20 @@ export default function IntakePage() {
               Crear una altra
             </button>
           </div>
+        </div>
+      )}
+
+      {/* ── Esborrany recuperat ──────────────────────────────────────────── */}
+      {autosaveRestored && !success && (
+        <div className="ni__autosave" role="status">
+          <span>S&apos;ha recuperat un esborrany d&apos;aquest formulari.</span>
+          <button
+            type="button"
+            className="ni__btn ni__btn--ghost"
+            onClick={() => { clearAutosave(); setForm((prev) => ({ ...INITIAL_FORM, source: prev.source })); }}
+          >
+            Descartar i començar de nou
+          </button>
         </div>
       )}
 

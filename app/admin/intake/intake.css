@@ -339,6 +339,21 @@ html.admin-mode .ni__error {
   color: var(--o-stage-lost);
 }
 
+/* ── Esborrany autosave recuperat ────────────────────────────────────────── */
+html.admin-mode .ni__autosave {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  border: 1px solid color-mix(in oklab, var(--gold) 35%, transparent);
+  border-radius: var(--o-r-md-2);
+  background: color-mix(in oklab, var(--gold) 8%, var(--ax-panel));
+  padding: 12px 16px;
+  font-size: var(--o-text-sm);
+  color: var(--t2);
+}
+
 /* ── Duplicats ───────────────────────────────────────────────────────────── */
 html.admin-mode .ni__dups {
   border: 1px solid color-mix(in oklab, var(--ax-gold) 25%, transparent);
