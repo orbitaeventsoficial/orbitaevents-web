@@ -1384,6 +1384,32 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #905 — 2026-06-08 — claude (FET)
+
+**Productes/serveis fora de pack end-to-end + fitxa de proveïdor amb membres + neteja Supabase.**
+
+- Context: el propietari necessita modelar bolos amb serveis solts (DJ extra, tècnic) i productes de partners (animació, pintacares de Masquerade), fora del sistema de packs; i una fitxa de proveïdor potent on un proveïdor (Masquerade) tingui membres dins (Carlos Lucas BOSS, Jonathan mag). Disseny dictat per Opus en passades dedicades.
+- `lib/constants/orbita-services.ts`: serveis propis d'Òrbita com a dades (DJ/h 100€, tècnic 40€ opcional).
+- `BookingServiceLinesSection` + `BookingServiceLinesEditor`: editor de línies (servei Òrbita / producte partner del catàleg amb cost+PVP +20% auto / línia lliure) a nova reserva i a la fitxa. Ruta `GET /api/admin/collaborator-products`.
+- FIX `bookingCreationService`: subtotal suma pack+hores+extres+línies (abans descartava el pack). FIX `useNewBookingSubmit`: accepta serviceLines explícites (cas DIRECT_CLIENT / Cristina).
+- `useBookingPricing` + `BookingMarginCard` + fitxa `[id]`: total i marge compten serviceLinesRevenue/Cost (sense doble-comptar `CollaboratorBooking`).
+- Contracte PDF (`contractService` + `contractPdfService` + i18n ca/es/en): desglossa línies (només PVP).
+- Reserva: assignació simplificada a «Origen i facturació» substituint el bloc «Relació comercial» massa personalitzat.
+- Fitxa de lead: «Responsable intern» (`TEAM_MEMBERS`=Carles) separat de «Bolo passat per» (rol REFERRER) + botó eliminar.
+- Partners: model `CollaboratorMember` (+ migració `20260608170000_collaborator_members` desplegada a Railway) + servei + rutes CRUD + pestanya «Equip / membres» al Partner Hub. Economia: «Quant li paguem» (comissions + serveis subcontractats).
+- Calendari de leads: badge `TANCAT CHARLIE` visible, fix import € en línia, color de targeta per estat.
+- IMAP: detecció d'adjunts tolerant. Perf: paral·lelitzades queries independents de la fitxa de lead.
+- Neteja Supabase: guia obsoleta corregida a `audit/diagnosi-visual.md`; credencial morta treta de `.claude/settings.local.json`. Codi/config/deps: 0 rastres. BD exclusivament Railway.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `904` a `905`.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm build` OK; tests verds (bookingCreation 31, contractService 44, leadRouteService 14, partnerHubService 3, collaboratorMemberService 7); migracions `20260608113000` i `20260608170000` desplegades a Railway.
+- Validació funcional: cas Cristina introduïble end-to-end; Partner Hub amb membres operatiu; captures a `.codex-captures/`.
+- Validació humana/UX: pendent validació visual final del propietari (TANCAT CHARLIE per pàgina).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #904 — 2026-06-08 — codex (FET)
 
 **Script dry-run per migrar OE-2026-005 (Lliçà) de `notes` cap a `BookingServiceLine`.**

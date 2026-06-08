@@ -27,6 +27,18 @@ Per estat funcional i peces consolidades:
 - **Verificació real**: no donar res per acabat només perquè compila.
 - **Conservar el que ja funciona**: si una zona està tancada o consolidada, no reobrir-la sense motiu real.
 
+## Norma de tot canvi (obligatòria, sense excepció)
+
+Cada canvi, per petit que sigui, ha de complir TOT això abans de considerar-se fet:
+
+1. **Documentat**: entrada al `docs/admin-diary.md` + `### Canvi #N` al `docs/admin-protocol.md` + `ADMIN_CHANGE_COUNTER`.
+2. **Reflectit al web/admin**: el canvi ha de quedar visible i operatiu a la interfície real, no només al codi. Una funció que no es veu ni s'usa no compta com a feta.
+3. **Canònic**: res hardcodejat. Colors→tokens, textos públics→`messages/*.json`, dades estables→`lib/constants/*`. Zero hex, zero strings reutilitzats inline, zero `style={{}}` de color.
+4. **Responsiu**: comprovat a mòbil (375px), tablet i desktop.
+5. **i18n complet** si és web pública: clau nova → als 3 (o N) JSONs d'idioma. Mai text públic incrustat al JSX.
+
+> **0 hardcoded és inviolable.** Afegir qualsevol valor hardcoded nou és un bug que s'ha de revertir, encara que "funcioni".
+
 ## Protocol d'autonomia
 
 - Treballar en mode completament autònom: no demanar confirmació, no demanar "segueix?", no esperar input.

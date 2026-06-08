@@ -1,3 +1,25 @@
+## 2026-06-08 — Productes fora de pack + fitxa de proveïdor amb membres + neteja Supabase (Canvi #905, claude)
+
+### Resum
+Sessió llarga amb el propietari. Disseny per Opus (2 passades). Tot a `main` (commits 8701124d→15ce0da2) i validat amb tsc+build+tests+captures.
+
+### Fet
+- **Productes/serveis fora de pack** (cas Cristina Rey end-to-end): `orbita-services.ts` (DJ/h, tècnic opcional), editor de línies a nova reserva i a la fitxa (`BookingServiceLinesSection`/`Editor`), ruta `collaborator-products`, fix subtotal (pack+línies) i fix DIRECT_CLIENT, marge en viu+fitxa, contracte PDF desglossat (i18n ca/es/en).
+- **Reserva**: assignació simplificada «Origen i facturació» (treta la «Relació comercial» massa custom).
+- **Lead**: «Responsable intern» (`TEAM_MEMBERS`=Carles) vs «Bolo passat per» (REFERRER) + botó eliminar.
+- **Partners**: `CollaboratorMember` (membres dins del proveïdor: Carlos Lucas BOSS, Jonathan mag) + servei + rutes CRUD + pestanya «Equip / membres» + economia «Quant li paguem». Migració `20260608170000` desplegada a Railway.
+- **Calendari leads**: badge TANCAT CHARLIE visible, € en línia, color per estat.
+- **Fixes**: adjunts IMAP tolerants, perf fitxa lead (Promise.all), neteja total de Supabase (codi 0 rastres; guia obsoleta i credencial morta tretes).
+
+### Validació
+- `npx tsc --noEmit` OK · `pnpm build` OK · tests: bookingCreation 31, contractService 44, leadRouteService 14, partnerHubService 3, collaboratorMemberService 7.
+- Migracions `20260608113000` i `20260608170000` desplegades a Railway.
+
+### Pendent
+- Validació visual del propietari (TANCAT CHARLIE per pàgina).
+- «Tot el sistema igual»: migració visual de la resta de pàgines admin 🔴 (`docs/admin-migration-checklist.md`) — multi-sessió.
+- `ADMIN_CHANGE_COUNTER` = 905. Següent canvi real ha de ser `#906`.
+
 ## 2026-06-08 — Migració dry-run per Lliçà cap a BookingServiceLine (Canvi #904, codex)
 
 ### Context
