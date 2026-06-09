@@ -289,10 +289,31 @@ export default function NewBookingForm() {
             onChange={setServiceLines}
           />
 
+          <BookingTravelDiscountSection
+            form={{
+              distanceKm: form.distanceKm,
+              discount: form.discount,
+              discountCode: form.discountCode,
+              notes: form.notes,
+            }}
+            travelBlocks={travelBlocks}
+            travelCharge={travelCharge}
+            billableKm={billableKm}
+            includedTravelKm={INCLUDED_TRAVEL_KM}
+            travelBlockKm={TRAVEL_BLOCK_KM}
+            travelBlockEur={TRAVEL_BLOCK_EUR}
+            fuelReferenceInfo={fuelReferenceInfo}
+            validatingCode={validatingCode}
+            discountValidation={discountValidation}
+            onFieldChange={updateField}
+            onResetDiscountValidation={resetDiscountValidation}
+            onValidateDiscountCode={() => void validateDiscountCode(form.discountCode)}
+          />
+
           <section className="nb__panel">
             <div className="nb__phead">
-              <h2 className="nb__h2">Preu i facturació</h2>
-              <span className="nb__pintro">Total pactat i factura</span>
+              <h2 className="nb__h2">Preu acordat</h2>
+              <span className="nb__pintro">Resum econòmic del bolo</span>
             </div>
             <div className="nb__pack-tune-grid">
               <div className="nb__field nb__field--narrow">
@@ -403,26 +424,6 @@ export default function NewBookingForm() {
             )}
           </section>
 
-          <BookingTravelDiscountSection
-            form={{
-              distanceKm: form.distanceKm,
-              discount: form.discount,
-              discountCode: form.discountCode,
-              notes: form.notes,
-            }}
-            travelBlocks={travelBlocks}
-            travelCharge={travelCharge}
-            billableKm={billableKm}
-            includedTravelKm={INCLUDED_TRAVEL_KM}
-            travelBlockKm={TRAVEL_BLOCK_KM}
-            travelBlockEur={TRAVEL_BLOCK_EUR}
-            fuelReferenceInfo={fuelReferenceInfo}
-            validatingCode={validatingCode}
-            discountValidation={discountValidation}
-            onFieldChange={updateField}
-            onResetDiscountValidation={resetDiscountValidation}
-            onValidateDiscountCode={() => void validateDiscountCode(form.discountCode)}
-          />
         </div>
 
         <aside className="nb__side">
