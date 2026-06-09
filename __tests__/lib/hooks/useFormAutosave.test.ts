@@ -52,6 +52,21 @@ describe('useFormAutosave', () => {
     expect(result.current.restored).toBe(false);
   });
 
+  it('desa quan enabled passa de false a true (cas prefill async: !loading)', () => {
+    const onRestore = vi.fn();
+    const { rerender } = renderHook(
+      ({ v, en }) => useFormAutosave(KEY, v, onRestore, { enabled: en, debounceMs: 500 }),
+      { initialProps: { v: { name: '' }, en: false } },
+    );
+    // loading acaba → enabled true
+    rerender({ v: { name: '' }, en: true });
+    // usuari escriu
+    rerender({ v: { name: 'Collsacreu' }, en: true });
+    act(() => { vi.advanceTimersByTime(500); });
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) as string);
+    expect(stored.value).toEqual({ name: 'Collsacreu' });
+  });
+
   it('no fa res si enabled=false', () => {
     const onRestore = vi.fn();
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ savedAt: Date.now(), value: { name: 'x' } }));
