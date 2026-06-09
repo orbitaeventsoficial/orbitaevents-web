@@ -1384,6 +1384,26 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #912 — 2026-06-09 — claude (FET)
+
+**Configurador del bolo (catàleg→bolo) + DJ al centre + enfoc de preus orientatius.**
+
+- Context: el propietari va replantejar la secció de muntar el bolo. Decisió de producte acordada: el preu de venda el pacta ell amb el client (camp «preu acordat»); el software NO automatitza preus-complement. El catàleg dona **preus orientatius editables** i el sistema clava **cost + marge**.
+- `BookingServiceLinesSection.tsx`: convertit en **configurador de 2 columnes** — esquerra «El bolo» (línies editables + total viu + línia lliure), dreta catàleg col·lapsable agrupat per font («Serveis d'Òrbita Events» + «Serveis de {proveïdor}»). Clic a un ítem → s'afegeix al bolo. Patró reutilitzable per a futures comandes.
+- `lib/constants/orbita-services.ts`: DJ com a producte principal al catàleg (DJ 2h 250 · DJ 1h 150 · hora extra 100 · tècnic 40), preus orientatius editables. Sense lògica de preus-complement (descartada per acord: complica sense valor; el preu el pacta l'usuari).
+- `nb-design.css`: estils `nb__cfg*` del configurador (tokens).
+- `NewBookingForm.tsx`: «Serveis i productes» ja és el configurador; pack queda secundari col·lapsat.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `911` a `912`.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm build` OK; captures Playwright.
+- Validació funcional: catàleg dreta → bolo esquerra; DJ destacat; preus editables; marge a la sidebar.
+- Validació humana/UX: pendent validació visual del propietari.
+- **PENDENT documentat**: cost tècnic Masquerade vs Òrbita al bingo (toggle de cost → marge); preus orientatius de bodes/discomòbil si el propietari els vol al catàleg; drag&drop real (ara clic-per-afegir).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #911 — 2026-06-09 — claude (FET)
 
 **Redisseny del qüestionari de nova reserva (Opus A+C+D-PC): grups + ordre + unificació econòmica.**

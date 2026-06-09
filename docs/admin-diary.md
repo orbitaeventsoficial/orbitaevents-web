@@ -1,3 +1,23 @@
+## 2026-06-09 — Configurador del bolo (catàleg→bolo) + DJ al centre (Canvi #912, claude)
+
+### Resum
+"Serveis i productes" passa a configurador de 2 columnes: dreta = catàleg col·lapsable agrupat per font (Serveis d'Òrbita Events + Serveis de cada proveïdor), esquerra = el bolo que construeixes. DJ com a producte principal al catàleg. ENFOC ACORDAT amb el propietari: preus orientatius editables, el preu de venda el pacta ell (preu acordat); el sistema clava cost+marge. Descartada la maquinària de preus-complement automàtics (complicava sense valor real).
+
+### Pendent (proper Claude / propietari)
+- Cost del tècnic al bingo/batalla: Masquerade el posa (cost 200, marge 20%) vs Òrbita el posa (més marge). Toggle de cost a la línia → marge. Preu al client sempre 240.
+- Preus orientatius de bodes i discomòbil al catàleg si el propietari els vol (té 2 preus: sol/complement — però amb l'enfoc acordat, n'hi ha prou amb el preu sol editable).
+- Drag&drop visual real (ara és clic-per-afegir, que fa el mateix).
+- Patró catàleg→bolo reutilitzable per a comandes futures al web (idea del propietari).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm build` OK · captures Playwright.
+- Validació funcional: catàleg→bolo operatiu; DJ destacat; preus editables; marge a sidebar.
+- Validació humana/UX: pendent validació visual del propietari.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-09 — Redisseny qüestionari nova reserva + autosave robust + SW dev (Canvi #911, claude)
 
 ### Resum
