@@ -1384,6 +1384,26 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #911 — 2026-06-09 — claude (FET)
+
+**Redisseny del qüestionari de nova reserva (Opus A+C+D-PC): grups + ordre + unificació econòmica.**
+
+- Context: el propietari va demanar replantejar format i contingut de la nova reserva; Opus va proposar 4 opcions; decisió A+C amb D per a PC.
+- `NewBookingForm.tsx`: 3 capçaleres de grup (`nb__group`): **Qui i quan · Què contractem · Preu i tancament**. Serveis i productes passa abans del pack (no pack-cèntric). Panell «Preu acordat» simplificat: input pactat + factura + línia compacta de diferencial; eliminat el panell econòmic duplicat.
+- `BookingPricingSummary.tsx` (sidebar): única veritat econòmica viva — afegit «Cost directe» + to de salut al marge (`data-tone`).
+- `nb-design.css`: `nb__group`, `nb__econ-diff`, to del marge.
+- Resolts en paral·lel: autosave robust (prefill no sobreescriu esborrany, sense banner), neteja SW en dev (codi vell cachejat), preu sense pack.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `910` a `911`.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm build` OK; captures Playwright a `.codex-captures/`.
+- Validació funcional: flux de qüestionari de dalt a baix; econòmic sense duplicar; autosave manté dades en recarregar.
+- Validació humana/UX: pendent validació visual del propietari (cal netejar cache PWA: DevTools → Clear site data).
+- **PENDENT documentat**: capa D completa (dues columnes a desktop) i C completa (blocs col·lapsables amb línia-resum) si el propietari els vol després de veure A.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #910 — 2026-06-09 — claude (FET)
 
 **Revisió econòmica de la nova reserva (Opus Fase 1): cost DJ real, arrodoniment a 5, cost-partner amagat, panell econòmic.**

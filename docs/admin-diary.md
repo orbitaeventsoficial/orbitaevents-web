@@ -1,3 +1,23 @@
+## 2026-06-09 — Redisseny qüestionari nova reserva + autosave robust + SW dev (Canvi #911, claude)
+
+### Resum
+Redisseny d'Opus (A+C, PC) de la nova reserva: 3 grups (Qui i quan · Què contractem · Preu i tancament), serveis abans del pack, econòmic unificat a la sidebar (cost directe + marge amb to), panell del cos només input pactat + diferencial compacte. A més: autosave robust (el prefill del lead ja no sobreescriu l'esborrany; sense banner; camps nets en crear), i neteja del Service Worker en dev (servia codi vell → causa que el propietari "no veia els canvis").
+
+### Pendent (proper Claude / propietari)
+- Validació visual del propietari — IMPORTANT: netejar cache PWA (DevTools → Application → Clear site data) per veure el codi nou.
+- Capa D completa (dues columnes desktop) i C completa (blocs col·lapsables amb resum) si es volen després de veure A.
+- Confirmar `orbitaServiceCostRatio` = 0.25 (cost intern DJ).
+- Decisió pendent: wizard multi-pas literal (B) — descartat per Opus per a usuari expert, però disponible si es vol.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm build` OK · captures Playwright.
+- Validació funcional: qüestionari ordenat; econòmic sense duplicar; autosave verificat amb Playwright (es desa i restaura).
+- Validació humana/UX: pendent validació visual del propietari (amb cache neta).
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-09 — Revisió econòmica nova reserva (Canvi #910, claude)
 
 ### Resum
