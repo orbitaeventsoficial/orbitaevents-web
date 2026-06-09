@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { ORBITA_SERVICES } from '@/lib/constants/orbita-services';
-import type { BookingServiceLineFormInput } from './booking-form.types';
+import { CUSTOM_BOOKING_PACK_SLUG } from '@/lib/constants/pricing';
+import type { BookingServiceLineFormInput, BookingPack } from './booking-form.types';
 
 interface PartnerProductOption {
   id: string;
@@ -17,11 +18,32 @@ interface PartnerProductOption {
 interface BookingServiceLinesSectionProps {
   lines: BookingServiceLineFormInput[];
   onChange: (lines: BookingServiceLineFormInput[]) => void;
+  /** Packs de catàleg (base excloent del bolo). Opcional: a la fitxa de reserva
+   *  ja existents el pack es gestiona a part, així que el grup no es mostra. */
+  packs?: BookingPack[];
+  selectedPackId?: string;
+  onPackSelect?: (packId: string) => void;
+  customPackPrice?: string;
+  onCustomPackPriceChange?: (value: string) => void;
   /** Interessos del lead (interestedExtras) com a pista informativa. */
   leadHints?: string[];
 }
 
-export default function BookingServiceLinesSection({ lines, onChange, leadHints }: BookingServiceLinesSectionProps) {
+function packLabel(pack: BookingPack): string {
+  return pack.translations?.[0]?.name || pack.slug;
+}
+
+export default function BookingServiceLinesSection({
+  lines,
+  onChange,
+  packs = [],
+  selectedPackId = '',
+  onPackSelect,
+  customPackPrice = '',
+  onCustomPackPriceChange,
+  leadHints,
+}: BookingServiceLinesSectionProps) {
+  const packsEnabled = !!onPackSelect;
   const [partnerProducts, setPartnerProducts] = useState<PartnerProductOption[]>([]);
 
   useEffect(() => {
@@ -57,18 +79,26 @@ export default function BookingServiceLinesSection({ lines, onChange, leadHints 
 
   const addFreeLine = () => onChange([...lines, { kind: 'OTHER', label: '', revenueAmount: 0, quantity: 1 }]);
 
-  // Catàleg agrupat per font (dreta): Òrbita Events + cada proveïdor extern.
+  // Packs de catàleg (sense el tècnic "Personalitzat", que és la base buida).
+  const catalogPacks = packs.filter((p) => p.slug !== CUSTOM_BOOKING_PACK_SLUG);
+  const selectedPack = packs.find((p) => p.id === selectedPackId) || null;
+  const packPrice = selectedPack
+    ? (customPackPrice ? Number(customPackPrice) : selectedPack.price)
+    : 0;
+
+  // Catàleg agrupat per proveïdor extern.
   const partnersByName = partnerProducts.reduce<Record<string, PartnerProductOption[]>>((acc, p) => {
     (acc[p.collaboratorName] ||= []).push(p);
     return acc;
   }, {});
   const linesTotal = lines.reduce((s, l) => s + (l.revenueAmount || 0) * (l.quantity || 1), 0);
+  const boloTotal = packPrice + linesTotal;
 
   return (
     <section className="nb__panel">
       <div className="nb__phead">
-        <h2 className="nb__h2">Serveis i productes</h2>
-        <span className="nb__pintro">Munta el bolo des del catàleg de la dreta</span>
+        <h2 className="nb__h2">El bolo</h2>
+        <span className="nb__pintro">Tria un pack base i afegeix-hi serveis des del catàleg →</span>
       </div>
       {leadHints && leadHints.length > 0 && (
         <p className="nb__hint">El lead havia mostrat interès en: {leadHints.join(', ')}</p>
@@ -79,11 +109,28 @@ export default function BookingServiceLinesSection({ lines, onChange, leadHints 
         <div className="nb__cfg-bolo">
           <div className="nb__cfg-bolohead">
             <span className="nb__cfg-bolotitle">El bolo</span>
-            {lines.length > 0 && <span className="nb__cfg-bolototal">{linesTotal}€</span>}
+            {boloTotal > 0 && <span className="nb__cfg-bolototal">{boloTotal}€</span>}
           </div>
-          {lines.length === 0 ? (
-            <p className="nb__cfg-empty">Encara buit. Afegeix serveis des del catàleg de la dreta →</p>
+
+          {/* Pack base (excloent) — només al flux de nova reserva */}
+          {packsEnabled && (selectedPack ? (
+            <div className="nb__sl-row nb__sl-row--pack">
+              <span className="nb__sl-label nb__sl-packname">★ {packLabel(selectedPack)}</span>
+              <input
+                className="nb__input nb__sl-num" type="number" min={0}
+                placeholder={String(selectedPack.price)}
+                value={customPackPrice} onChange={(e) => onCustomPackPriceChange?.(e.target.value)}
+                aria-label="Preu del pack"
+              />
+              <span className="nb__sl-packhint">preu del pack</span>
+              <button type="button" className="nb__sl-del" onClick={() => onPackSelect?.('')} aria-label="Treure el pack">✕</button>
+            </div>
           ) : (
+            <p className="nb__cfg-empty">Sense pack base · muntar-lo personalitzat amb serveis</p>
+          ))}
+
+          {/* Línies de servei (sumables) */}
+          {lines.length > 0 && (
             <div className="nb__sl-list">
               {lines.map((line, idx) => (
                 <div key={idx} className="nb__sl-row">
@@ -122,10 +169,38 @@ export default function BookingServiceLinesSection({ lines, onChange, leadHints 
           <button type="button" className="nb__btn-ghost nb__cfg-free" onClick={addFreeLine}>+ Línia lliure</button>
         </div>
 
-        {/* DRETA — catàleg disponible, agrupat per font */}
+        {/* DRETA — catàleg disponible */}
         <aside className="nb__cfg-cat">
+          {/* 1. Packs (excloent) — només al flux de nova reserva */}
+          {packsEnabled && (
           <details className="nb__cfg-grp" open>
-            <summary>Serveis d&apos;Òrbita Events</summary>
+            <summary>Packs d&apos;Òrbita Events</summary>
+            <div className="nb__cfg-items">
+              {catalogPacks.map((pack) => (
+                <button
+                  type="button" key={pack.id}
+                  className={`nb__cfg-item${selectedPackId === pack.id ? ' is-on' : ''}`}
+                  onClick={() => onPackSelect?.(selectedPackId === pack.id ? '' : pack.id)}
+                >
+                  <span className="nb__cfg-itemname">{packLabel(pack)}</span>
+                  <span className="nb__cfg-itemprice">{pack.price}€</span>
+                </button>
+              ))}
+              <button
+                type="button"
+                className={`nb__cfg-item${!selectedPackId ? ' is-on' : ''}`}
+                onClick={() => onPackSelect?.('')}
+              >
+                <span className="nb__cfg-itemname">Pack personalitzat (munta&apos;l tu)</span>
+                <span className="nb__cfg-itemprice">—</span>
+              </button>
+            </div>
+          </details>
+          )}
+
+          {/* 2. Complements d'Òrbita (sumables) */}
+          <details className="nb__cfg-grp">
+            <summary>Complements d&apos;Òrbita Events</summary>
             <div className="nb__cfg-items">
               {ORBITA_SERVICES.map((s) => (
                 <button type="button" key={s.id} className="nb__cfg-item" onClick={() => addOrbitaService(s.id)}>
@@ -136,6 +211,7 @@ export default function BookingServiceLinesSection({ lines, onChange, leadHints 
             </div>
           </details>
 
+          {/* 3. Serveis de proveïdors (sumables) */}
           {Object.entries(partnersByName).map(([name, prods]) => (
             <details className="nb__cfg-grp" key={name}>
               <summary>Serveis de {name}</summary>
@@ -149,10 +225,6 @@ export default function BookingServiceLinesSection({ lines, onChange, leadHints 
               </div>
             </details>
           ))}
-
-          {Object.keys(partnersByName).length === 0 && (
-            <p className="nb__hint">Cap proveïdor amb productes actius.</p>
-          )}
         </aside>
       </div>
     </section>

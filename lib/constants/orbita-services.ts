@@ -32,10 +32,11 @@ export interface OrbitaService {
 // Preus ORIENTATIUS i editables. El preu final el pacta el propietari amb el
 // client (camp "preu acordat"); aquests només acceleren. Ordenats amb el DJ
 // (producte principal d'Òrbita) primer. Afegir-ne de nous = només una línia aquí.
+// Regla normalitzada del DJ: 1a hora 150€, cada hora addicional 100€.
+//   1h = 150 · 2h = 250 · hora extra (tot muntat, p. ex. després d'animació) = 100.
 export const ORBITA_SERVICES: OrbitaService[] = [
-  { id: 'dj-2h', kind: 'DJ', label: 'DJ · 2 hores', defaultPrice: 250, unit: 'unit', optional: false },
-  { id: 'dj-1h', kind: 'DJ', label: 'DJ · 1 hora', defaultPrice: 150, unit: 'unit', optional: false },
-  { id: 'dj-hora-extra', kind: 'DJ', label: 'DJ · hora extra (amb tot muntat)', defaultPrice: 100, unit: 'hour', optional: false },
+  { id: 'dj-primera-hora', kind: 'DJ', label: 'DJ · 1a hora', defaultPrice: 150, unit: 'unit', optional: false },
+  { id: 'dj-hora-addicional', kind: 'DJ', label: 'DJ · hora addicional', defaultPrice: 100, unit: 'hour', optional: false },
   { id: 'tecnic-so', kind: 'SOUND_TECH', label: 'Tècnic de so (Òrbita)', defaultPrice: 40, unit: 'unit', optional: true },
 ];
 

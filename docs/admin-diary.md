@@ -1,3 +1,23 @@
+## 2026-06-10 — El BOLO viu al lead, Fase 1 backend (Canvi #913, claude)
+
+### Resum
+Arrencada de l'arquitectura del BOLO (vegeu `docs/bolo-flux.md`, decidida amb el propietari): 1 lead = 1 bolo viu. Fase 1 backend: taula `LeadServiceLine` (mirall de BookingServiceLine) + servei replace-all + API GET/PUT + test (5 verds). Migració desplegada a Railway. Regla DJ normalitzada (150 1a hora, +100/h).
+
+### SEGÜENT (full de ruta a docs/bolo-flux.md)
+- Fase 1.4: muntar el configurador a la fitxa del lead (carrega/desa LeadServiceLine).
+- Fase 2: en reservar, copiar línies del lead → BookingServiceLine.
+- Fase 3: generador unificat des del bolo (dossier amb pressu / pressu sol) + Dossier.lineSnapshot.
+- Fase 4: fulla d'economia del bolo (net per bolo, reusant costEngine).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm build` OK · leadServiceLineService 5 verds · migració `20260609140000` desplegada.
+- Validació funcional: API del bolo del lead operativa (UI pendent Fase 1.4).
+- Validació humana/UX: pendent (UI a continuació).
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-09 — Configurador del bolo (catàleg→bolo) + DJ al centre (Canvi #912, claude)
 
 ### Resum

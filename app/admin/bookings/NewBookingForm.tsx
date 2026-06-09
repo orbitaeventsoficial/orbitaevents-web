@@ -269,6 +269,11 @@ export default function NewBookingForm() {
           <BookingServiceLinesSection
             lines={serviceLines}
             onChange={setServiceLines}
+            packs={packs}
+            selectedPackId={form.packId}
+            onPackSelect={(packId) => { updateField('packId', packId); setCustomPackPrice(''); }}
+            customPackPrice={customPackPrice}
+            onCustomPackPriceChange={setCustomPackPrice}
           />
 
           <BookingPackExtrasSection

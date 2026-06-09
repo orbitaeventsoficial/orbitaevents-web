@@ -1384,6 +1384,26 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #913 — 2026-06-10 — claude (FET)
+
+**El BOLO viu al lead — Fase 1 backend (LeadServiceLine + servei + API).**
+
+- Context: decisió d'arquitectura amb el propietari (vegeu `docs/bolo-flux.md`): 1 lead = 1 bolo viu que evoluciona (dossier→pressupost→reserva). Fase 1 = el bolo viu al lead.
+- Schema: model `LeadServiceLine` (mirall de `BookingServiceLine`, reusa enum `BookingServiceLineKind`) + relació a `Lead.serviceLines` i `Collaborator.leadServiceLines`. Migració `20260609140000_lead_service_lines` desplegada a Railway.
+- `lib/services/leadServiceLineService.ts`: `listLeadServiceLines` + `replaceLeadServiceLines` (replace-all transaccional, mateix patró que el booking editor). Test (5 verds).
+- API `GET`/`PUT /api/admin/leads/[id]/service-lines` (requireAuth).
+- Regla DJ normalitzada a `orbita-services.ts`: DJ 1a hora 150 · hora addicional 100 · tècnic 40.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `912` a `913`.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm build` OK; leadServiceLineService 5 tests verds; migració desplegada.
+- Validació funcional: el bolo del lead es pot llegir/desar via API (pendent muntar la UI al lead = Fase 1.4).
+- Validació humana/UX: pendent (la UI ve a continuació).
+- **SEGÜENT**: Fase 1.4 (muntar el configurador a la fitxa del lead) → Fase 2 (propagació lead→reserva) → Fase 3 (generador unificat) → Fase 4 (economia). Vegeu `docs/bolo-flux.md`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #912 — 2026-06-09 — claude (FET)
 
 **Configurador del bolo (catàleg→bolo) + DJ al centre + enfoc de preus orientatius.**

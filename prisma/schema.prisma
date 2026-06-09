@@ -463,6 +463,7 @@ model Lead {
   universalTasks Task[]
   documents      LeadDocument[]
   dossiers       Dossier[]
+  serviceLines   LeadServiceLine[]
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -920,6 +921,32 @@ model BookingServiceLine {
   @@index([bookingId])
   @@index([collaboratorId])
   @@map("booking_service_lines")
+}
+
+// Línies del BOLO viu al lead (mirall de BookingServiceLine). El bolo es munta al
+// configurador i evoluciona; en reservar es copien a BookingServiceLine.
+model LeadServiceLine {
+  id             String                 @id @default(cuid())
+  leadId         String
+  lead           Lead                   @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  collaboratorId String?
+  collaborator   Collaborator?          @relation(fields: [collaboratorId], references: [id], onDelete: SetNull)
+  sortOrder      Int                    @default(0)
+  partyType      String?
+  kind           BookingServiceLineKind @default(OTHER)
+  label          String
+  revenueAmount  Float?
+  costAmount     Float?
+  quantity       Int?
+  hours          Float?
+  notes          String?                @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([leadId])
+  @@index([collaboratorId])
+  @@map("lead_service_lines")
 }
 
 enum ProposalStatus {
@@ -1849,6 +1876,7 @@ model Collaborator {
   sourcedBookings Booking[] @relation("BookingSourceCollaborator")
   billedBookings Booking[] @relation("BookingBilledCollaborator")
   bookingServiceLines BookingServiceLine[]
+  leadServiceLines    LeadServiceLine[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
