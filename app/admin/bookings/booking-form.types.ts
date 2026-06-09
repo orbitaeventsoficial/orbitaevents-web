@@ -134,3 +134,8 @@ export type BookingDiscountValidation = {
 };
 
 export const OPERATOR_EXTRA_ID = '__operator_extra__';
+
+/** Key d'autosave de la nova reserva (compartida entre el hook i el prefill). */
+export function bookingAutosaveKey(leadId?: string | null, customerId?: string | null): string {
+  return `booking-new-${leadId || customerId || 'lliure'}`;
+}

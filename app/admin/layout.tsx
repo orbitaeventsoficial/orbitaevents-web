@@ -138,8 +138,12 @@ function AdminShell({ children }: { children: React.ReactNode }) {
     if (!('serviceWorker' in navigator)) return;
     const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
     if (isLocal) {
+      // En dev: desregistrar el SW I esborrar les caches, perquè no serveixi
+      // chunks JS vells (causa de "veig el codi d'abans" en desenvolupament).
       navigator.serviceWorker.getRegistrations()
         .then((regs) => Promise.all(regs.map((r) => r.unregister())))
+        .then(() => (typeof caches !== 'undefined' ? caches.keys() : []))
+        .then((keys) => Promise.all((keys as string[]).map((k) => caches.delete(k))))
         .catch((e) => log.warn('SW cleanup', { error: String(e) }));
       return;
     }

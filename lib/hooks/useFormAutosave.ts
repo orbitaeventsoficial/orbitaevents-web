@@ -22,6 +22,22 @@ const PREFIX = 'orbita.autosave.';
 const DEFAULT_DEBOUNCE_MS = 600;
 const DEFAULT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
+/**
+ * True si hi ha un esborrany d'autosave vàlid (no caducat) per a aquesta key.
+ * Útil perquè un prefill async NO sobreescrigui un esborrany que es restaurarà.
+ */
+export function hasFormAutosaveDraft(key: string, ttlMs = DEFAULT_TTL_MS): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const raw = localStorage.getItem(`${PREFIX}${key}`);
+    if (!raw) return false;
+    const parsed = JSON.parse(raw) as { savedAt: number };
+    return Date.now() - parsed.savedAt <= ttlMs;
+  } catch {
+    return false;
+  }
+}
+
 interface AutosaveOptions {
   debounceMs?: number;
   ttlMs?: number;

@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { BookingExtra, BookingFormData, BookingLeadData, BookingPack, BookingPartnerOption, RawExtraConfig } from './booking-form.types';
-import { INITIAL_BOOKING_FORM } from './booking-form.types';
+import { INITIAL_BOOKING_FORM, bookingAutosaveKey } from './booking-form.types';
+import { hasFormAutosaveDraft } from '@/lib/hooks/useFormAutosave';
 import { log } from '@/lib/logger';
 
 // Converteix una clau d'i18n del configurador (`services.mobile.extras.<slug>.name`)
@@ -98,6 +99,11 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
           }
         }
 
+        // Si ja hi ha un esborrany d'autosave, NO sobreescriguis el formulari amb el
+        // prefill del lead: l'esborrany ja conté el que l'usuari estava omplint
+        // (incloent el que va venir del lead la primera vegada). Evita la cursa
+        // prefill↔restore. Igualment carreguem leadData per a la resta de la UI.
+        const hasDraft = hasFormAutosaveDraft(bookingAutosaveKey(leadId, null));
         if (leadId) {
           const leadRes = await fetchWithCsrf(`/api/admin/leads/${leadId}`);
           if (leadRes.ok) {
@@ -105,7 +111,7 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
             const lead = lData.lead || lData.data;
             if (lead) {
               setLeadData(lead);
-              setForm((prev) => ({
+              if (!hasDraft) setForm((prev) => ({
                 ...prev,
                 clientName: lead.name || prev.clientName,
                 clientEmail: lead.email || prev.clientEmail,
@@ -123,7 +129,7 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
           }
         }
 
-        if (dateParam) {
+        if (dateParam && !hasDraft) {
           setForm((prev) => ({ ...prev, eventDate: dateParam }));
         }
       } catch (error) {
