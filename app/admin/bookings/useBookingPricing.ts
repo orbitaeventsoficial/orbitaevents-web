@@ -87,16 +87,24 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
   }, [extras, operatorExtraPrice, selectedPack]);
 
   const pricing = useMemo(() => {
-    if (!selectedPack) return null;
+    // Bolo dossier-cèntric: pot no tenir pack (només serveis/productes). Si no hi
+    // ha pack ni línies ni total, no hi ha res a mostrar.
+    const hasLines = serviceLines.length > 0;
+    const hasManual = !!(manualTotalPrice && manualTotalPrice > 0);
+    if (!selectedPack && !hasLines && !hasManual) return null;
 
-    const packPrice = customPackPrice && customPackPrice > 0 ? customPackPrice : selectedPack.price;
+    const packPrice = selectedPack
+      ? (customPackPrice && customPackPrice > 0 ? customPackPrice : selectedPack.price)
+      : 0;
+    const packDjHours = selectedPack?.djHours ?? 0;
+    const packExtraHourPrice = selectedPack?.extraHourPrice ?? 0;
     const explicitExtraHours = parseInt(form.extraHours, 10) || 0;
     const eventHours = calculateEventDuration(form.eventStartTime, form.eventEndTime);
-    const derivedExtraHours = eventHours > selectedPack.djHours
-      ? Math.ceil((eventHours - selectedPack.djHours) * 10) / 10
+    const derivedExtraHours = eventHours > packDjHours
+      ? Math.ceil((eventHours - packDjHours) * 10) / 10
       : 0;
     const extraHoursCount = explicitExtraHours > 0 ? explicitExtraHours : derivedExtraHours;
-    const extraHoursPrice = extraHoursCount * selectedPack.extraHourPrice;
+    const extraHoursPrice = extraHoursCount * packExtraHourPrice;
     const extrasPrice = Object.values(selectedExtras).reduce((sum, extra) => sum + extra.price * extra.quantity, 0);
     const serviceLinesRevenue = serviceLines.reduce((sum, l) => sum + (l.revenueAmount || 0) * (l.quantity || 1), 0);
     // Cost de cada línia: el cost explícit (partners porten costAmount del catàleg);
