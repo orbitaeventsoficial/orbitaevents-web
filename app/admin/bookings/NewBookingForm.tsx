@@ -266,6 +266,7 @@ export default function NewBookingForm() {
 
           <div className="nb__group"><span className="nb__group-label">Què contractem</span></div>
 
+          <div className="nb__cols2">
           <BookingServiceLinesSection
             lines={serviceLines}
             onChange={setServiceLines}
@@ -286,6 +287,7 @@ export default function NewBookingForm() {
             onToggleExtra={toggleExtra}
             onUpdateExtraQuantity={updateExtraQuantity}
           />
+          </div>
 
           <BookingTravelDiscountSection
             form={{
