@@ -202,3 +202,8 @@ html.admin-mode .nb__spinner { width: 32px; height: 32px; border: 2px solid var(
 .nb__econ-val--gold { color: var(--gold); }
 .nb__econ-val--ok { color: var(--o-stage-won, var(--gold)); }
 .nb__econ-val--warn { color: var(--o-warning); }
+
+/* Capçaleres de grup del qüestionari de reserva (Qui i quan · Què contractem · Preu) */
+.nb__group { margin: 26px 0 6px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.nb__group:first-child { margin-top: 0; }
+.nb__group-label { font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold); text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); }

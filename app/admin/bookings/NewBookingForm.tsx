@@ -237,6 +237,8 @@ export default function NewBookingForm() {
             </div>
           )}
 
+          <div className="nb__group"><span className="nb__group-label">Qui i quan</span></div>
+
           <BookingClientEventSection
             leadData={leadData ? {
               id: leadData.id,
@@ -262,6 +264,13 @@ export default function NewBookingForm() {
             onFieldChange={updateField}
           />
 
+          <div className="nb__group"><span className="nb__group-label">Què contractem</span></div>
+
+          <BookingServiceLinesSection
+            lines={serviceLines}
+            onChange={setServiceLines}
+          />
+
           <BookingPackExtrasSection
             packs={packs}
             displayExtras={displayExtras}
@@ -276,11 +285,6 @@ export default function NewBookingForm() {
             onCustomPackPriceChange={setCustomPackPrice}
             onToggleExtra={toggleExtra}
             onUpdateExtraQuantity={updateExtraQuantity}
-          />
-
-          <BookingServiceLinesSection
-            lines={serviceLines}
-            onChange={setServiceLines}
           />
 
           <BookingTravelDiscountSection
@@ -303,6 +307,8 @@ export default function NewBookingForm() {
             onResetDiscountValidation={resetDiscountValidation}
             onValidateDiscountCode={() => void validateDiscountCode(form.discountCode)}
           />
+
+          <div className="nb__group"><span className="nb__group-label">Preu i tancament</span></div>
 
           <section className="nb__panel">
             <div className="nb__phead">
