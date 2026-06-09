@@ -1,3 +1,21 @@
+## 2026-06-09 — Nova reserva dossier-cèntrica (Canvi #908, claude)
+
+### Resum
+Insight propietari: la gent sempre tria el pack més barat; ven el bolo personalitzat. Pack passa a opcional + col·lapsable; la reserva es munta primer per Serveis i productes. Sense migració (pack tècnic «Personalitzat» auto-creat, opció b d'Opus).
+
+### Pendent (proper Claude / propietari)
+- Donar una volta més al COPY de «Serveis i productes» i «Origen i facturació» (el propietari ho troba massa «personalitzat», vol més genèric). La feina funciona; és poliment de redacció.
+- Validació visual del propietari.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm build` OK · bookingCreationService 33 verds.
+- Validació funcional: reserva sense pack (només serveis+total) creable; cas Cristina OK.
+- Validació humana/UX: pendent validació visual + copy del propietari.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-08 — Autosave d'esborranys de formularis admin (Canvi #907, claude)
 
 ### Resum

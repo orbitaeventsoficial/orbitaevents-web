@@ -1384,6 +1384,27 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #908 — 2026-06-09 — claude (FET)
+
+**Nova reserva dossier-cèntrica: pack opcional i col·lapsable, bolo muntat per serveis.**
+
+- Context: insight del propietari — la gent sempre tria el pack més barat; el que ven és el bolo personalitzat. El pack ja no pot ser la primera opció ni obligatori.
+- Decisió Opus (opció b, sense migració): pack tècnic «Personalitzat» (slug `personalitzat`, preu 0, 0h, `isActive:false`) auto-creat idempotent (`ensureCustomBookingPackId`, patró d'`ensureOperatorSupportExtraId`). El bolo sense pack de catàleg s'hi recolza; el preu surt de serviceLines + extres + manualTotal.
+- `lib/constants/pricing.ts`: `CUSTOM_BOOKING_PACK_SLUG` + `CUSTOM_BOOKING_PACK_MARKER`.
+- `bookingCreationService.ts`: `ensureCustomBookingPackId` + resol marker abans del `findUnique`; `packId` de la reserva = resolt. Cap canvi al càlcul de preu/marge.
+- `useNewBookingSubmit.ts`: treta l'obligació de pack; nova validació «bolo no buit» (pack o serveis/extres o total); envia marker quan no hi ha pack.
+- `NewBookingForm.tsx`: nou ordre Serveis i productes → Preu i facturació (manualTotal + factura, sempre visibles) → Partir d'un pack (col·lapsable, plegat per defecte) → Extres → Origen → Desplaçament. `submitDisabled` ja no exigeix pack.
+- `BookingPackExtrasSection.tsx`: capçalera col·lapsable (`collapsed`/`onToggleCollapsed`), filtra el pack tècnic per slug, treu el `*` obligatori, treu manualTotal/invoice (pugen al form), botó «Gestionar extres ↗» a `/admin/packs/extras`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `907` a `908`.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm build` OK; bookingCreationService 33 tests verds (2 nous: marker reusa / crea pack tècnic).
+- Validació funcional: es pot crear una reserva sense triar pack (només serveis + total); el cas Cristina segueix funcionant.
+- Validació humana/UX: pendent — el propietari vol donar una volta més al copy de «Serveis i productes» i «Origen i facturació».
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #907 — 2026-06-08 — claude (FET)
 
 **Autosave d'esborranys de formularis admin (hook canònic) — intake i nova reserva.**

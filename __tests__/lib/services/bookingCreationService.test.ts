@@ -6,7 +6,7 @@ const { mockPrisma, mockCalculateGoogleMapsDistance, mockGetFuelCostPerKmReferen
     lead: { findUnique: vi.fn(), update: vi.fn() },
     customer: { findUnique: vi.fn() },
     collaborator: { findUnique: vi.fn() },
-    pack: { findUnique: vi.fn() },
+    pack: { findUnique: vi.fn(), create: vi.fn() },
     extra: { findUnique: vi.fn(), create: vi.fn() },
     packInventory: { findMany: vi.fn() },
     bookingInventory: { count: vi.fn(), upsert: vi.fn(), groupBy: vi.fn() },
@@ -479,5 +479,47 @@ describe('createBookingFromInput', () => {
     await createBookingFromInput(BASE_INPUT);
 
     expect(mockPrisma.bookingInventory.upsert).not.toHaveBeenCalled();
+  });
+
+  describe('bolo personalitzat (sense pack de catàleg)', () => {
+    it('amb packId marker reusa el pack tècnic existent per slug', async () => {
+      setupDefaults();
+      // El pack tècnic ja existeix.
+      mockPrisma.pack.findUnique.mockImplementation(({ where }: { where: { slug?: string; id?: string } }) => {
+        if (where.slug === 'personalitzat') return Promise.resolve({ id: 'pack-custom' });
+        if (where.id === 'pack-custom') return Promise.resolve({ ...MOCK_PACK, id: 'pack-custom', price: 0, djHours: 0, extraHourPrice: 0 });
+        return Promise.resolve(null);
+      });
+
+      const result = await createBookingFromInput({
+        ...BASE_INPUT,
+        packId: '__custom__',
+        manualTotalPrice: 340,
+        serviceLines: [{ kind: 'DJ', label: 'DJ Òrbita', revenueAmount: 300, quantity: 1 }],
+      });
+
+      expect(result.status).toBe(200);
+      expect(mockPrisma.pack.create).not.toHaveBeenCalled(); // ja existia
+      expect(mockPrisma.booking.create).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ packId: 'pack-custom' }) })
+      );
+    });
+
+    it('amb packId marker crea el pack tècnic si no existeix', async () => {
+      setupDefaults();
+      mockPrisma.pack.findUnique.mockImplementation(({ where }: { where: { slug?: string; id?: string } }) => {
+        if (where.slug === 'personalitzat') return Promise.resolve(null); // no existeix encara
+        if (where.id === 'pack-custom-new') return Promise.resolve({ ...MOCK_PACK, id: 'pack-custom-new', price: 0, djHours: 0, extraHourPrice: 0 });
+        return Promise.resolve(null);
+      });
+      mockPrisma.pack.create.mockResolvedValue({ id: 'pack-custom-new' });
+
+      const result = await createBookingFromInput({ ...BASE_INPUT, packId: '__custom__', manualTotalPrice: 200 });
+
+      expect(result.status).toBe(200);
+      expect(mockPrisma.pack.create).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ slug: 'personalitzat', price: 0 }) })
+      );
+    });
   });
 });

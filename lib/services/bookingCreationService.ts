@@ -7,11 +7,46 @@ import { calculateTravelCharge, calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM
 import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
 import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
 import { ACTIVE_BOOKING_STATUSES } from '@/lib/constants';
-import { calcVatRate, calcDeposit, roundMoney } from '@/lib/constants/pricing';
+import { calcVatRate, calcDeposit, roundMoney, CUSTOM_BOOKING_PACK_SLUG, CUSTOM_BOOKING_PACK_MARKER } from '@/lib/constants/pricing';
 import { calculateEventDuration } from '@/lib/inventory-utils';
 
 const OPERATOR_EXTRA_ID = '__operator_extra__';
 const OPERATOR_EXTRA_SLUG = 'operator-support-hour';
+
+/**
+ * Pack tècnic "Personalitzat" (preu 0, 0h, sense inventari) per a bolos muntats
+ * per línies de servei sense triar un pack de catàleg. Idempotent per slug.
+ * Mateix patró que ensureOperatorSupportExtraId. NO és visible al catàleg públic
+ * (isActive false) ni a la graella de packs (filtrat per slug).
+ */
+async function ensureCustomBookingPackId(): Promise<string> {
+  const existing = await prisma.pack.findUnique({
+    where: { slug: CUSTOM_BOOKING_PACK_SLUG },
+    select: { id: true },
+  });
+  if (existing) return existing.id;
+
+  const created = await prisma.pack.create({
+    data: {
+      slug: CUSTOM_BOOKING_PACK_SLUG,
+      price: 0,
+      djHours: 0,
+      extraHourPrice: 0,
+      soundWatts: 0,
+      includesFog: false,
+      isActive: false,
+      translations: {
+        create: [
+          { locale: 'ca', name: 'Personalitzat', description: 'Bolo muntat a mida per serveis i productes' },
+          { locale: 'es', name: 'Personalizado', description: 'Bolo a medida por servicios y productos' },
+          { locale: 'en', name: 'Custom', description: 'Custom booking built from services and products' },
+        ],
+      },
+    },
+    select: { id: true },
+  });
+  return created.id;
+}
 
 function normalizeEventType(eventType: string): EventType {
   return Object.values(EventType).includes(eventType as EventType) ? (eventType as EventType) : EventType.OTHER;
@@ -278,7 +313,11 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
     linkedCustomerId = byEmail?.id || null;
   }
 
-  const pack = await prisma.pack.findUnique({ where: { id: data.packId } });
+  // Bolo personalitzat (sense pack de catàleg): resol el pack tècnic 0€.
+  const resolvedPackId = (data.packId === CUSTOM_BOOKING_PACK_MARKER || !data.packId)
+    ? await ensureCustomBookingPackId()
+    : data.packId;
+  const pack = await prisma.pack.findUnique({ where: { id: resolvedPackId } });
   if (!pack) {
     return { status: 404, body: { error: 'Pack no trobat' } };
   }
@@ -381,7 +420,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       eventLocation: data.eventLocation,
       eventVenue: data.eventVenue,
       guestCount: data.guestCount,
-      packId: data.packId,
+      packId: resolvedPackId,
       extraHours,
       distanceKm,
       fuelCostPerKm,

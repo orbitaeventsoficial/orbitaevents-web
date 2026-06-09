@@ -6,7 +6,7 @@
 ============================================================================ */
 
 import { SERVICE_LABELS } from '@/lib/constants';
-import { VAT_RATE_INVOICE } from '@/lib/constants/pricing';
+import { CUSTOM_BOOKING_PACK_SLUG } from '@/lib/constants/pricing';
 import type { ServiceSlug } from '@/app/config/packs-config';
 import type { BookingExtra, BookingPack, BookingSelectedExtras } from './booking-form.types';
 
@@ -24,13 +24,11 @@ interface BookingPackExtrasSectionProps {
   selectedPackId: string;
   extraHours: string;
   customPackPrice: string;
-  manualTotalPrice: string;
-  invoiceRequired: boolean;
+  collapsed: boolean;
+  onToggleCollapsed: () => void;
   onPackSelect: (packId: string) => void;
   onExtraHoursChange: (value: string) => void;
   onCustomPackPriceChange: (value: string) => void;
-  onManualTotalPriceChange: (value: string) => void;
-  onInvoiceRequiredChange: (value: boolean) => void;
   onToggleExtra: (extra: BookingExtra) => void;
   onUpdateExtraQuantity: (extraId: string, qty: number) => void;
 }
@@ -42,25 +40,30 @@ export default function BookingPackExtrasSection({
   selectedPackId,
   extraHours,
   customPackPrice,
-  manualTotalPrice,
-  invoiceRequired,
+  collapsed,
+  onToggleCollapsed,
   onPackSelect,
   onExtraHoursChange,
   onCustomPackPriceChange,
-  onManualTotalPriceChange,
-  onInvoiceRequiredChange,
   onToggleExtra,
   onUpdateExtraQuantity,
 }: BookingPackExtrasSectionProps) {
+  const catalogPacks = packs.filter((pack) => pack.slug !== CUSTOM_BOOKING_PACK_SLUG);
   return (
     <>
       <section className="nb__panel">
-        <div className="nb__phead">
-          <h2 className="nb__h2">Pack <span className="nb__req">*</span></h2>
-          <span className="nb__pintro">Tria 1</span>
+        <div className="nb__phead nb__phead--toggle">
+          <div>
+            <h2 className="nb__h2">Partir d&apos;un pack</h2>
+            <span className="nb__pintro">Opcional · una tarifa tancada de catàleg</span>
+          </div>
+          <button type="button" className="nb__toggle" onClick={onToggleCollapsed}>
+            {collapsed ? 'Triar pack' : 'Amagar'}
+          </button>
         </div>
+        {!collapsed && (
         <div className="nb__packs">
-          {packs.map((pack) => {
+          {catalogPacks.map((pack) => {
             const name = pack.translations[0]?.name || pack.slug;
             const desc = pack.translations[0]?.description || '';
             const serviceLbl = serviceLabelOf(pack.service);
@@ -90,8 +93,9 @@ export default function BookingPackExtrasSection({
             );
           })}
         </div>
+        )}
 
-        {selectedPackId && (
+        {!collapsed && selectedPackId && (
           <div className="nb__pack-tune">
             <p className="nb__pack-tune-title">Personalitza aquest pack</p>
             <div className="nb__pack-tune-grid">
@@ -112,26 +116,6 @@ export default function BookingPackExtrasSection({
                 />
                 <span className="nb__field-hint">si has pactat un preu diferent al de tarifa</span>
               </div>
-              <div className="nb__field nb__field--narrow">
-                <label htmlFor="nb-manual-total" className="nb__label">Total tancat amb el client</label>
-                <input
-                  id="nb-manual-total" type="number" min={0} placeholder="Ex. 340"
-                  value={manualTotalPrice} onChange={(e) => onManualTotalPriceChange(e.target.value)}
-                  className="nb__input"
-                />
-                <span className="nb__field-hint">preu final pactat; substitueix el càlcul automàtic</span>
-              </div>
-            </div>
-            <div className="nb__invoice-row">
-              <label className="nb__invoice-check">
-                <input
-                  type="checkbox" checked={invoiceRequired}
-                  onChange={(e) => onInvoiceRequiredChange(e.target.checked)}
-                  role="switch" aria-checked={invoiceRequired}
-                />
-                Vol factura
-                {invoiceRequired && <span className="nb__vat-flag">+{VAT_RATE_INVOICE}% IVA</span>}
-              </label>
             </div>
           </div>
         )}
@@ -139,9 +123,12 @@ export default function BookingPackExtrasSection({
 
       {displayExtras.length > 0 && (
         <section className="nb__panel">
-          <div className="nb__phead">
-            <h2 className="nb__h2">Extres</h2>
-            <span className="nb__pintro">Opcionals</span>
+          <div className="nb__phead nb__phead--toggle">
+            <div>
+              <h2 className="nb__h2">Extres</h2>
+              <span className="nb__pintro">Opcionals</span>
+            </div>
+            <a href="/admin/packs/extras" target="_blank" rel="noopener noreferrer" className="nb__toggle">Gestionar extres ↗</a>
           </div>
           <div className="nb__extras">
             {displayExtras.map((extra) => {

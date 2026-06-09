@@ -23,6 +23,12 @@ export const OPERATOR_EXTRA_MIN_PRICE = 25;
 /** Factor sobre preu hora extra del pack per calcular preu operari */
 export const OPERATOR_EXTRA_FACTOR   = 0.6;
 
+/** Slug canònic del pack tècnic "Personalitzat" (bolo muntat per línies, sense pack de catàleg). */
+export const CUSTOM_BOOKING_PACK_SLUG = 'personalitzat';
+
+/** Marcador que el formulari de nova reserva envia quan no es tria cap pack de catàleg. */
+export const CUSTOM_BOOKING_PACK_MARKER = '__custom__';
+
 /** Helpers derivats */
 export function roundMoney(amount: number): number {
   return Math.round(amount * 100) / 100;

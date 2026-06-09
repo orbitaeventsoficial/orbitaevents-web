@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { CUSTOM_BOOKING_PACK_MARKER } from '@/lib/constants/pricing';
 import type { BookingFormData, BookingLeadData, BookingSelectedExtras, BookingServiceLineFormInput } from './booking-form.types';
 
 interface UseNewBookingSubmitOptions {
@@ -95,12 +96,16 @@ export function useNewBookingSubmit({
       setError('Nom, email i telèfon són obligatoris');
       return;
     }
-    if (!form.packId) {
-      setError('Selecciona un pack');
-      return;
-    }
     if (!form.eventDate || !form.eventLocation) {
       setError('Data i ubicació són obligatoris');
+      return;
+    }
+    // El bolo no pot ser buit: cal un pack de catàleg, o serveis/productes, o un total pactat.
+    const hasLines = (explicitServiceLines && explicitServiceLines.length > 0)
+      || Object.keys(selectedExtras).length > 0;
+    const hasTotal = typeof manualTotalPrice === 'number' && manualTotalPrice > 0;
+    if (!form.packId && !hasLines && !hasTotal) {
+      setError('Afegeix almenys un servei al bolo o tria un pack');
       return;
     }
     setSubmitting(true);
@@ -128,7 +133,7 @@ export function useNewBookingSubmit({
         eventLocation: form.eventLocation.trim(),
         eventVenue: form.eventVenue.trim() || undefined,
         guestCount: parseInt(form.guestCount, 10) || 100,
-        packId: form.packId,
+        packId: form.packId || CUSTOM_BOOKING_PACK_MARKER,
         customPackPrice: customPackPrice || undefined,
         manualTotalPrice: manualTotalPrice || undefined,
         invoiceRequired,

@@ -11,6 +11,7 @@
 ============================================================================ */
 
 import { useEffect, useState } from 'react';
+import { VAT_RATE_INVOICE } from '@/lib/constants/pricing';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
@@ -69,6 +70,8 @@ export default function NewBookingForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- només ha de reaccionar quan arriba leadData, no a manualTotalPrice
   }, [leadData]);
   const [invoiceRequired, setInvoiceRequired] = useState(false);
+  const [showPack, setShowPack] = useState(false);
+  useEffect(() => { if (form.packId) setShowPack(true); }, [form.packId]);
   const [sourceCollaboratorId, setSourceCollaboratorId] = useState('');
   const [billedCollaboratorId, setBilledCollaboratorId] = useState('');
   const [showSourceBilling, setShowSourceBilling] = useState(false);
@@ -171,7 +174,9 @@ export default function NewBookingForm() {
     );
   }
 
-  const submitDisabled = submitting || !form.clientName || !form.clientEmail || !form.packId;
+  // El bolo no pot ser buit: pack de catàleg, o serveis/productes, o total pactat.
+  const boloNotEmpty = !!form.packId || serviceLines.length > 0 || Object.keys(selectedExtras).length > 0 || (!!manualTotalPrice && Number(manualTotalPrice) > 0);
+  const submitDisabled = submitting || !form.clientName || !form.clientEmail || !boloNotEmpty;
 
   return (
     <div className="nb-root">
@@ -239,6 +244,41 @@ export default function NewBookingForm() {
             onFieldChange={updateField}
           />
 
+          <BookingServiceLinesSection
+            lines={serviceLines}
+            onChange={setServiceLines}
+          />
+
+          <section className="nb__panel">
+            <div className="nb__phead">
+              <h2 className="nb__h2">Preu i facturació</h2>
+              <span className="nb__pintro">Total pactat i factura</span>
+            </div>
+            <div className="nb__pack-tune-grid">
+              <div className="nb__field nb__field--narrow">
+                <label htmlFor="nb-manual-total" className="nb__label">Total tancat amb el client</label>
+                <input
+                  id="nb-manual-total" type="number" min={0} placeholder="Ex. 340"
+                  value={manualTotalPrice} onChange={(e) => setManualTotalPrice(e.target.value)}
+                  className="nb__input"
+                />
+                <span className="nb__field-hint">preu final pactat; substitueix el càlcul automàtic</span>
+              </div>
+              <div className="nb__field nb__field--narrow">
+                <span className="nb__label">Factura</span>
+                <label className="nb__invoice-check">
+                  <input
+                    type="checkbox" checked={invoiceRequired}
+                    onChange={(e) => setInvoiceRequired(e.target.checked)}
+                    role="switch" aria-checked={invoiceRequired}
+                  />
+                  Vol factura
+                  {invoiceRequired && <span className="nb__vat-flag">+{VAT_RATE_INVOICE}% IVA</span>}
+                </label>
+              </div>
+            </div>
+          </section>
+
           <BookingPackExtrasSection
             packs={packs}
             displayExtras={displayExtras}
@@ -246,20 +286,13 @@ export default function NewBookingForm() {
             selectedPackId={form.packId}
             extraHours={form.extraHours}
             customPackPrice={customPackPrice}
-            manualTotalPrice={manualTotalPrice}
-            invoiceRequired={invoiceRequired}
-            onPackSelect={(packId) => { updateField('packId', packId); setCustomPackPrice(''); setManualTotalPrice(''); }}
+            collapsed={!showPack}
+            onToggleCollapsed={() => setShowPack((v) => !v)}
+            onPackSelect={(packId) => { updateField('packId', packId); setCustomPackPrice(''); }}
             onExtraHoursChange={(value) => updateField('extraHours', value)}
             onCustomPackPriceChange={setCustomPackPrice}
-            onManualTotalPriceChange={setManualTotalPrice}
-            onInvoiceRequiredChange={setInvoiceRequired}
             onToggleExtra={toggleExtra}
             onUpdateExtraQuantity={updateExtraQuantity}
-          />
-
-          <BookingServiceLinesSection
-            lines={serviceLines}
-            onChange={setServiceLines}
           />
 
           <section className="nb__panel">
