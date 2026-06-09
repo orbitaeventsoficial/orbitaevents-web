@@ -1384,6 +1384,23 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #914 — 2026-06-10 — claude (FET)
+
+**El BOLO a la fitxa del lead — Fase 1.4 (configurador dins `/admin/leads/[id]`).**
+
+- `app/admin/leads/[id]/LeadBoloSection.tsx`: secció «El bolo» dins la fitxa del lead. Reutilitza el configurador (`BookingServiceLinesSection`): catàleg dreta (packs + complements Òrbita + serveis de proveïdors) → bolo esquerra. Carrega/desa contra `/api/admin/leads/[id]/service-lines` (GET/PUT). El pack triat es desa com una línia més del bolo (label «Pack: X»).
+- `LeadDetailClient.tsx`: render de `<LeadBoloSection>` després del grid de panells, abans de l'anàlisi econòmica (ample, fora de columnes).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `913` a `914`.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm build` OK; captura de la fitxa amb el bolo.
+- Validació funcional: el bolo es munta i es desa des de la fitxa del lead; el catàleg agrupat hi és.
+- Validació humana/UX: pendent validació visual del propietari.
+- **SEGÜENT**: Fase 2 (en reservar, copiar línies del lead → BookingServiceLine) → Fase 3 (generador unificat dossier/pressupost des del bolo) → Fase 4 (economia). Vegeu `docs/bolo-flux.md`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #913 — 2026-06-10 — claude (FET)
 
 **El BOLO viu al lead — Fase 1 backend (LeadServiceLine + servei + API).**

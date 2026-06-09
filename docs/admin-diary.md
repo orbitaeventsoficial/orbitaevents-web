@@ -1,3 +1,22 @@
+## 2026-06-10 — El BOLO a la fitxa del lead, Fase 1.4 UI (Canvi #914, claude)
+
+### Resum
+Secció «El bolo» dins `/admin/leads/[id]` (`LeadBoloSection`): el configurador (catàleg dreta → bolo esquerra) viu a la fitxa del lead, carrega/desa LeadServiceLine via API. El pack triat = una línia més del bolo. Validat amb captura.
+
+### SEGÜENT (docs/bolo-flux.md)
+- Fase 2: copiar línies del lead → BookingServiceLine en reservar.
+- Fase 3: generador unificat (dossier amb pressu / pressu sol) des del bolo + Dossier.lineSnapshot.
+- Fase 4: fulla d'economia del bolo (net per bolo).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm build` OK · captura.
+- Validació funcional: bolo muntable/desable des de la fitxa del lead.
+- Validació humana/UX: pendent validació visual del propietari.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-10 — El BOLO viu al lead, Fase 1 backend (Canvi #913, claude)
 
 ### Resum

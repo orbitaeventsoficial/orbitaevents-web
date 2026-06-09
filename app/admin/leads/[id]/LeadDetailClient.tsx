@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import LeadNotesPanel from './LeadNotesPanel';
+import LeadBoloSection from './LeadBoloSection';
 import BookingTotalEditor from '../../bookings/[id]/BookingTotalEditor';
 
 function buildLeadWhatsAppHref(phone: string, name: string): string {
@@ -793,6 +794,9 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
         </section>
 
       </div>
+
+      {/* ── El bolo (configurador dins la fitxa del lead) ── */}
+      <LeadBoloSection leadId={lead.id} />
 
       {/* ── Anàlisi econòmica — KPI cards (booking-lab recuperat) ── */}
       {(() => {
