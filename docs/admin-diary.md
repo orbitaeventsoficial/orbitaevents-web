@@ -1,3 +1,22 @@
+## 2026-06-09 — Revisió econòmica nova reserva (Canvi #910, claude)
+
+### Resum
+Fase 1 de la revisió sencera d'Opus del flux lead→reserva: cost DJ real (rati config, no 0), arrodoniment de preus de venda a múltiple de 5 amunt, cost-a-partner amagat de la reserva (es veu al Partner Hub), i panell econòmic compacte (calculat/pactat/diferencial/marge).
+
+### PENDENT (proper Claude — amb dev viu + captura)
+- **Reordre lògic de seccions** de la nova reserva (Opus): Client → Pack → Serveis → Extres → Desplaçament → Preu acordat → Descompte → Origen. No fet aquí perquè Extres i Desplaçament viuen dins de components combinats (`BookingPackExtrasSection`, `BookingTravelDiscountSection`); cal separar-los amb cura i validar visualment.
+- **Fase 2 d'Opus (gran)**: fusionar packs amb el configurador públic = extreure component de selecció de pack compartit. Risc real (toca pricing públic). Decisió del propietari sobre quina pantalla mana.
+- Confirmar el valor de `orbitaServiceCostRatio` (ara 0.25 per defecte).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm build` OK.
+- Validació funcional: marge amb cost DJ real; panell mostra diferencial pactat vs calculat.
+- Validació humana/UX: pendent validació visual del propietari.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-09 — Partners favorits + decisions pendents del propietari (Canvi #909, claude)
 
 ### Resum

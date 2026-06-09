@@ -57,7 +57,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 909;
+export const ADMIN_CHANGE_COUNTER = 910;
 
 export const ADMIN_DETAIL_PAGE_LABELS: Record<string, string> = {
   inventory: 'Fitxa inventari',
@@ -478,6 +478,9 @@ export const PROFITABILITY_MODEL_DEFAULTS = {
   packCostRatio: 0.36,
   extraCostRatio: 0.28,
   extraHourCostRatio: 0.2,
+  // Cost intern dels serveis propis d'Òrbita (DJ, tècnic...) sobre el seu preu de
+  // venda: temps, equip i operativa. El DJ no és cost 0; el marge ha de ser real.
+  orbitaServiceCostRatio: 0.25,
   fixedOperationalCost: 45,
   channelCac: {
     WEBSITE: 22,

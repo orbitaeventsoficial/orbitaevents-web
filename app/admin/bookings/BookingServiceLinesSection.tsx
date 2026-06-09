@@ -108,12 +108,18 @@ export default function BookingServiceLinesSection({ lines, onChange, leadHints 
                 onChange={(e) => update(idx, { revenueAmount: e.target.value ? Number(e.target.value) : undefined })}
                 aria-label="Preu de venda"
               />
-              <input
-                className="nb__input nb__sl-num" type="number" min={0} placeholder="Cost"
-                value={line.costAmount ?? ''}
-                onChange={(e) => update(idx, { costAmount: e.target.value ? Number(e.target.value) : undefined })}
-                aria-label="Cost"
-              />
+              {line.collaboratorId ? (
+                <span className="nb__sl-partnercost" title="El cost a pagar al partner es gestiona a la seva fitxa">
+                  cost a partner ↗
+                </span>
+              ) : (
+                <input
+                  className="nb__input nb__sl-num" type="number" min={0} placeholder="Cost"
+                  value={line.costAmount ?? ''}
+                  onChange={(e) => update(idx, { costAmount: e.target.value ? Number(e.target.value) : undefined })}
+                  aria-label="Cost intern"
+                />
+              )}
               <input
                 className="nb__input nb__sl-qty" type="number" min={1} placeholder="Qt"
                 value={line.quantity ?? 1}

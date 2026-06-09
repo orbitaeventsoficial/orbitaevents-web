@@ -12,6 +12,7 @@
 
 import { useEffect, useState } from 'react';
 import { VAT_RATE_INVOICE } from '@/lib/constants/pricing';
+import { formatCurrency } from '@/lib/constants';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
@@ -300,6 +301,52 @@ export default function NewBookingForm() {
                 </label>
               </div>
             </div>
+
+            {pricing && (() => {
+              const calculat = Math.max(0, pricing.subtotal - pricing.discount);
+              const pactat = manualTotalPrice ? Number(manualTotalPrice) : null;
+              const diff = pactat != null ? pactat - calculat : null;
+              const diffPct = pactat != null && calculat > 0 ? (diff! / calculat) * 100 : null;
+              const marginTone = marginEstimate
+                ? (marginEstimate.tone === 'emerald' ? 'nb__econ-val--ok' : marginEstimate.tone === 'rose' ? 'nb__econ-val--warn' : '')
+                : '';
+              return (
+                <div className="nb__econ">
+                  <div className="nb__econ-grid">
+                    <div className="nb__econ-cell">
+                      <span className="nb__econ-label">Calculat</span>
+                      <span className="nb__econ-val">{formatCurrency(calculat)}</span>
+                    </div>
+                    <div className="nb__econ-cell">
+                      <span className="nb__econ-label">Pactat</span>
+                      <span className="nb__econ-val nb__econ-val--gold">{pactat != null ? formatCurrency(pactat) : '—'}</span>
+                    </div>
+                    {diff != null && (
+                      <div className="nb__econ-cell">
+                        <span className="nb__econ-label">Diferencial</span>
+                        <span className={`nb__econ-val ${diff < 0 ? 'nb__econ-val--warn' : 'nb__econ-val--ok'}`}>
+                          {diff > 0 ? '+' : ''}{formatCurrency(diff)}{diffPct != null ? ` (${diffPct > 0 ? '+' : ''}${diffPct.toFixed(0)}%)` : ''}
+                        </span>
+                      </div>
+                    )}
+                    {marginEstimate && (
+                      <>
+                        <div className="nb__econ-cell">
+                          <span className="nb__econ-label">Cost directe</span>
+                          <span className="nb__econ-val">{formatCurrency(marginEstimate.directCost)}</span>
+                        </div>
+                        <div className="nb__econ-cell">
+                          <span className="nb__econ-label">Marge</span>
+                          <span className={`nb__econ-val ${marginTone}`}>
+                            {formatCurrency(marginEstimate.netMargin)} ({marginEstimate.marginPct.toFixed(0)}%)
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
           </section>
 
           <BookingPackExtrasSection

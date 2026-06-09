@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import {
-  calcVatRate, calcDeposit,
+  calcVatRate, calcDeposit, ceilToStep,
   OPERATOR_EXTRA_MIN_PRICE, OPERATOR_EXTRA_FACTOR,
 } from '@/lib/constants/pricing';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
@@ -68,8 +68,9 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
   const operatorExtraPrice = useMemo(() => {
     if (!selectedPack) return 0;
     const recommended = Number(selectedPack.recommendedOperatorExtraHourPrice || 0);
-    if (recommended > 0) return Number(recommended.toFixed(2));
-    return Number(Math.max(OPERATOR_EXTRA_MIN_PRICE, selectedPack.extraHourPrice * OPERATOR_EXTRA_FACTOR).toFixed(2));
+    // Preu de venda → arrodonit a múltiple de 5 amunt (ordre del propietari).
+    if (recommended > 0) return ceilToStep(recommended, 5);
+    return ceilToStep(Math.max(OPERATOR_EXTRA_MIN_PRICE, selectedPack.extraHourPrice * OPERATOR_EXTRA_FACTOR), 5);
   }, [selectedPack]);
 
   const displayExtras = useMemo<BookingExtra[]>(() => {
@@ -98,7 +99,15 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
     const extraHoursPrice = extraHoursCount * selectedPack.extraHourPrice;
     const extrasPrice = Object.values(selectedExtras).reduce((sum, extra) => sum + extra.price * extra.quantity, 0);
     const serviceLinesRevenue = serviceLines.reduce((sum, l) => sum + (l.revenueAmount || 0) * (l.quantity || 1), 0);
-    const serviceLinesCost = serviceLines.reduce((sum, l) => sum + (l.costAmount || 0) * (l.quantity || 1), 0);
+    // Cost de cada línia: el cost explícit (partners porten costAmount del catàleg);
+    // les línies pròpies d'Òrbita sense cost explícit imputen cost intern via rati
+    // (el DJ no és cost 0 — temps/equip/operativa).
+    const serviceLinesCost = serviceLines.reduce((sum, l) => {
+      const qty = l.quantity || 1;
+      const explicitCost = (l.costAmount || 0) * qty;
+      if (explicitCost > 0 || l.collaboratorId) return sum + explicitCost;
+      return sum + (l.revenueAmount || 0) * qty * PROFITABILITY_MODEL_DEFAULTS.orbitaServiceCostRatio;
+    }, 0);
     const subtotal = packPrice + extraHoursPrice + extrasPrice + travelCharge + serviceLinesRevenue;
     const discount = parseFloat(form.discount) || 0;
     const baseAfterDiscount = subtotal - discount;

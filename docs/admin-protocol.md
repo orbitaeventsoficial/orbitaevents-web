@@ -1384,6 +1384,26 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #910 — 2026-06-09 — claude (FET)
+
+**Revisió econòmica de la nova reserva (Opus Fase 1): cost DJ real, arrodoniment a 5, cost-partner amagat, panell econòmic.**
+
+- Context: revisió sencera del flux lead→reserva demanada pel propietari. Punts econòmics d'Opus (Fase 1).
+- **Cost DJ propi ≠ 0**: `PROFITABILITY_MODEL_DEFAULTS.orbitaServiceCostRatio = 0.25`. `useBookingPricing.marginEstimate` imputa cost a línies pròpies d'Òrbita (sense `collaboratorId`, sense cost explícit) = `revenue × ratio`. El marge del DJ deixa de ser fals 100%.
+- **Arrodoniment a múltiple de 5 amunt**: `operatorExtraPrice` usa `ceilToStep(…,5)` (abans `toFixed(2)`).
+- **Cost a partner amagat de la reserva** (punt 2): a `BookingServiceLinesSection`, les línies amb `collaboratorId` no mostren input de cost editable (nota «cost a partner ↗»); el cost segueix viatjant a BD i es veu al Partner Hub («quant li paguem»). Sense tocar submit ni schema.
+- **Panell econòmic** (punt 7) a «Preu i facturació»: Calculat · Pactat · Diferencial (€ i %) · Cost directe · Marge (€ i %), tot derivat de `pricing`/`marginEstimate` (cap càlcul de marge inline).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `909` a `910`.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm build` OK.
+- Validació funcional: el marge reflecteix cost real del DJ; el panell mostra diferencial pactat vs calculat.
+- Validació humana/UX: pendent validació visual del propietari.
+- **PENDENT (no fet en aquesta passada, documentat)**: reordre lògic complet de seccions (Pack→Serveis→Extres→Desplaçament→Preu acordat→Origen) — cal fer-ho amb dev viu i captura perquè Extres/Desplaçament viuen dins components combinats. Fase 2 d'Opus: fusionar packs amb el configurador públic (component de selecció compartit) — gran, separada.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #909 — 2026-06-09 — claude (FET)
 
 **Partners favorits: desplegables de reserva nets (favorits a dalt, material no molesta).**
