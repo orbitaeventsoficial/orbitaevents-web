@@ -268,6 +268,22 @@ export default function NewBookingForm() {
             onFieldChange={updateField}
           />
 
+          <BookingPackExtrasSection
+            packs={packs}
+            displayExtras={displayExtras}
+            selectedExtras={selectedExtras}
+            selectedPackId={form.packId}
+            extraHours={form.extraHours}
+            customPackPrice={customPackPrice}
+            collapsed={!showPack}
+            onToggleCollapsed={() => setShowPack((v) => !v)}
+            onPackSelect={(packId) => { updateField('packId', packId); setCustomPackPrice(''); }}
+            onExtraHoursChange={(value) => updateField('extraHours', value)}
+            onCustomPackPriceChange={setCustomPackPrice}
+            onToggleExtra={toggleExtra}
+            onUpdateExtraQuantity={updateExtraQuantity}
+          />
+
           <BookingServiceLinesSection
             lines={serviceLines}
             onChange={setServiceLines}
@@ -348,22 +364,6 @@ export default function NewBookingForm() {
               );
             })()}
           </section>
-
-          <BookingPackExtrasSection
-            packs={packs}
-            displayExtras={displayExtras}
-            selectedExtras={selectedExtras}
-            selectedPackId={form.packId}
-            extraHours={form.extraHours}
-            customPackPrice={customPackPrice}
-            collapsed={!showPack}
-            onToggleCollapsed={() => setShowPack((v) => !v)}
-            onPackSelect={(packId) => { updateField('packId', packId); setCustomPackPrice(''); }}
-            onExtraHoursChange={(value) => updateField('extraHours', value)}
-            onCustomPackPriceChange={setCustomPackPrice}
-            onToggleExtra={toggleExtra}
-            onUpdateExtraQuantity={updateExtraQuantity}
-          />
 
           <section className="nb__panel">
             <div className="nb__phead nb__phead--toggle">
