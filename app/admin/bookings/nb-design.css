@@ -207,3 +207,11 @@ html.admin-mode .nb__spinner { width: 32px; height: 32px; border: 2px solid var(
 .nb__group { margin: 26px 0 6px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
 .nb__group:first-child { margin-top: 0; }
 .nb__group-label { font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold); text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); }
+
+/* Línia compacta de diferencial pactat (el resum complet viu a la sidebar) */
+.nb__econ-diff { margin-top: 10px; font-size: var(--o-text-2xs); color: var(--t2); }
+.nb__econ-diff-hint { color: var(--t3); }
+
+/* To del marge a la sidebar segons salut */
+.nb__pricemargin[data-tone="emerald"] b { color: var(--o-stage-won, var(--gold)); }
+.nb__pricemargin[data-tone="rose"] b { color: var(--o-warning); }

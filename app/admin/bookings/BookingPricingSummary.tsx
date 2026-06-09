@@ -98,10 +98,16 @@ export default function BookingPricingSummary({
         </p>
       )}
       {marginEstimate && (
-        <div className="nb__pricemargin">
-          <span>Marge net</span>
-          <b>{formatCurrency(marginEstimate.netMargin)} <small className="nb__pricemargin-pct">· {marginEstimate.marginPct.toFixed(0)}%</small></b>
-        </div>
+        <>
+          <div className="nb__prow nb__prow--muted">
+            <span>Cost directe</span>
+            <b>{formatCurrencyExact(marginEstimate.directCost)}</b>
+          </div>
+          <div className="nb__pricemargin" data-tone={marginEstimate.tone}>
+            <span>Marge net</span>
+            <b>{formatCurrency(marginEstimate.netMargin)} <small className="nb__pricemargin-pct">· {marginEstimate.marginPct.toFixed(0)}%</small></b>
+          </div>
+        </>
       )}
     </div>
   );

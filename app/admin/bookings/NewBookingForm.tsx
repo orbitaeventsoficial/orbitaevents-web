@@ -339,49 +339,18 @@ export default function NewBookingForm() {
               </div>
             </div>
 
-            {pricing && (() => {
+            {pricing && manualTotalPrice && (() => {
               const calculat = Math.max(0, pricing.subtotal - pricing.discount);
-              const pactat = manualTotalPrice ? Number(manualTotalPrice) : null;
-              const diff = pactat != null ? pactat - calculat : null;
-              const diffPct = pactat != null && calculat > 0 ? (diff! / calculat) * 100 : null;
-              const marginTone = marginEstimate
-                ? (marginEstimate.tone === 'emerald' ? 'nb__econ-val--ok' : marginEstimate.tone === 'rose' ? 'nb__econ-val--warn' : '')
-                : '';
+              const pactat = Number(manualTotalPrice);
+              const diff = pactat - calculat;
+              const diffPct = calculat > 0 ? (diff / calculat) * 100 : null;
+              if (!diff) return null;
               return (
-                <div className="nb__econ">
-                  <div className="nb__econ-grid">
-                    <div className="nb__econ-cell">
-                      <span className="nb__econ-label">Calculat</span>
-                      <span className="nb__econ-val">{formatCurrency(calculat)}</span>
-                    </div>
-                    <div className="nb__econ-cell">
-                      <span className="nb__econ-label">Pactat</span>
-                      <span className="nb__econ-val nb__econ-val--gold">{pactat != null ? formatCurrency(pactat) : '—'}</span>
-                    </div>
-                    {diff != null && (
-                      <div className="nb__econ-cell">
-                        <span className="nb__econ-label">Diferencial</span>
-                        <span className={`nb__econ-val ${diff < 0 ? 'nb__econ-val--warn' : 'nb__econ-val--ok'}`}>
-                          {diff > 0 ? '+' : ''}{formatCurrency(diff)}{diffPct != null ? ` (${diffPct > 0 ? '+' : ''}${diffPct.toFixed(0)}%)` : ''}
-                        </span>
-                      </div>
-                    )}
-                    {marginEstimate && (
-                      <>
-                        <div className="nb__econ-cell">
-                          <span className="nb__econ-label">Cost directe</span>
-                          <span className="nb__econ-val">{formatCurrency(marginEstimate.directCost)}</span>
-                        </div>
-                        <div className="nb__econ-cell">
-                          <span className="nb__econ-label">Marge</span>
-                          <span className={`nb__econ-val ${marginTone}`}>
-                            {formatCurrency(marginEstimate.netMargin)} ({marginEstimate.marginPct.toFixed(0)}%)
-                          </span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
+                <p className="nb__econ-diff">
+                  Pactat {diff > 0 ? '+' : ''}{formatCurrency(diff)} sobre el calculat ({formatCurrency(calculat)})
+                  {diffPct != null ? ` · ${diffPct > 0 ? '+' : ''}${diffPct.toFixed(0)}%` : ''}
+                  <span className="nb__econ-diff-hint"> · el marge i el total complet són al resum de la dreta</span>
+                </p>
               );
             })()}
           </section>
