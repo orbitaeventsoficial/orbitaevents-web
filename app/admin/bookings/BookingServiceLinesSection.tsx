@@ -57,80 +57,104 @@ export default function BookingServiceLinesSection({ lines, onChange, leadHints 
 
   const addFreeLine = () => onChange([...lines, { kind: 'OTHER', label: '', revenueAmount: 0, quantity: 1 }]);
 
+  // Catàleg agrupat per font (dreta): Òrbita Events + cada proveïdor extern.
+  const partnersByName = partnerProducts.reduce<Record<string, PartnerProductOption[]>>((acc, p) => {
+    (acc[p.collaboratorName] ||= []).push(p);
+    return acc;
+  }, {});
+  const linesTotal = lines.reduce((s, l) => s + (l.revenueAmount || 0) * (l.quantity || 1), 0);
+
   return (
     <section className="nb__panel">
       <div className="nb__phead">
         <h2 className="nb__h2">Serveis i productes</h2>
-        <span className="nb__pintro">DJ extra, tècnic, animació, lloguers…</span>
+        <span className="nb__pintro">Munta el bolo des del catàleg de la dreta</span>
       </div>
       {leadHints && leadHints.length > 0 && (
         <p className="nb__hint">El lead havia mostrat interès en: {leadHints.join(', ')}</p>
       )}
 
-      <div className="nb__sl-adders">
-        <label className="nb__field nb__sl-adder">
-          <span className="nb__label">+ Servei d&apos;Òrbita</span>
-          <select className="nb__input" value="" onChange={(e) => { addOrbitaService(e.target.value); e.target.value = ''; }} aria-label="Afegir servei d'Òrbita">
-            <option value="">Tria…</option>
-            {ORBITA_SERVICES.map((s) => (
-              <option key={s.id} value={s.id}>{s.label} · {s.defaultPrice}€{s.unit === 'hour' ? '/h' : ''}</option>
-            ))}
-          </select>
-        </label>
-        <label className="nb__field nb__sl-adder nb__sl-adder--wide">
-          <span className="nb__label">+ Producte de partner</span>
-          <select className="nb__input" value="" onChange={(e) => { addPartnerProduct(e.target.value); e.target.value = ''; }} aria-label="Afegir producte de partner">
-            <option value="">{partnerProducts.length ? 'Tria…' : 'Cap producte actiu'}</option>
-            {partnerProducts.map((p) => (
-              <option key={p.id} value={p.id}>{p.collaboratorName} · {p.name} · {p.sellPrice}€</option>
-            ))}
-          </select>
-        </label>
-        <button type="button" className="nb__btn-ghost" onClick={addFreeLine}>+ Línia lliure</button>
-      </div>
-
-      {lines.length === 0 ? (
-        <p className="nb__hint">Cap servei addicional. Afegeix DJ extra, tècnic, animació o pintacares.</p>
-      ) : (
-        <div className="nb__sl-list">
-          {lines.map((line, idx) => (
-            <div key={idx} className="nb__sl-row">
-              <input
-                className="nb__input nb__sl-label"
-                placeholder="Descripció"
-                value={line.label}
-                onChange={(e) => update(idx, { label: e.target.value })}
-                aria-label="Descripció de la línia"
-              />
-              <input
-                className="nb__input nb__sl-num" type="number" min={0} placeholder="PVP"
-                value={line.revenueAmount ?? ''}
-                onChange={(e) => update(idx, { revenueAmount: e.target.value ? Number(e.target.value) : undefined })}
-                aria-label="Preu de venda"
-              />
-              {line.collaboratorId ? (
-                <span className="nb__sl-partnercost" title="El cost a pagar al partner es gestiona a la seva fitxa">
-                  cost a partner ↗
-                </span>
-              ) : (
-                <input
-                  className="nb__input nb__sl-num" type="number" min={0} placeholder="Cost"
-                  value={line.costAmount ?? ''}
-                  onChange={(e) => update(idx, { costAmount: e.target.value ? Number(e.target.value) : undefined })}
-                  aria-label="Cost intern"
-                />
-              )}
-              <input
-                className="nb__input nb__sl-qty" type="number" min={1} placeholder="Qt"
-                value={line.quantity ?? 1}
-                onChange={(e) => update(idx, { quantity: e.target.value ? Number(e.target.value) : 1 })}
-                aria-label="Quantitat"
-              />
-              <button type="button" className="nb__sl-del" onClick={() => remove(idx)} aria-label="Eliminar línia">✕</button>
+      <div className="nb__cfg">
+        {/* ESQUERRA — el bolo */}
+        <div className="nb__cfg-bolo">
+          <div className="nb__cfg-bolohead">
+            <span className="nb__cfg-bolotitle">El bolo</span>
+            {lines.length > 0 && <span className="nb__cfg-bolototal">{linesTotal}€</span>}
+          </div>
+          {lines.length === 0 ? (
+            <p className="nb__cfg-empty">Encara buit. Afegeix serveis des del catàleg de la dreta →</p>
+          ) : (
+            <div className="nb__sl-list">
+              {lines.map((line, idx) => (
+                <div key={idx} className="nb__sl-row">
+                  <input
+                    className="nb__input nb__sl-label" placeholder="Descripció"
+                    value={line.label} onChange={(e) => update(idx, { label: e.target.value })}
+                    aria-label="Descripció de la línia"
+                  />
+                  <input
+                    className="nb__input nb__sl-num" type="number" min={0} placeholder="PVP"
+                    value={line.revenueAmount ?? ''}
+                    onChange={(e) => update(idx, { revenueAmount: e.target.value ? Number(e.target.value) : undefined })}
+                    aria-label="Preu de venda"
+                  />
+                  {line.collaboratorId ? (
+                    <span className="nb__sl-partnercost" title="El cost a pagar al partner es gestiona a la seva fitxa">cost a partner ↗</span>
+                  ) : (
+                    <input
+                      className="nb__input nb__sl-num" type="number" min={0} placeholder="Cost"
+                      value={line.costAmount ?? ''}
+                      onChange={(e) => update(idx, { costAmount: e.target.value ? Number(e.target.value) : undefined })}
+                      aria-label="Cost intern"
+                    />
+                  )}
+                  <input
+                    className="nb__input nb__sl-qty" type="number" min={1} placeholder="Qt"
+                    value={line.quantity ?? 1}
+                    onChange={(e) => update(idx, { quantity: e.target.value ? Number(e.target.value) : 1 })}
+                    aria-label="Quantitat"
+                  />
+                  <button type="button" className="nb__sl-del" onClick={() => remove(idx)} aria-label="Eliminar línia">✕</button>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
+          <button type="button" className="nb__btn-ghost nb__cfg-free" onClick={addFreeLine}>+ Línia lliure</button>
         </div>
-      )}
+
+        {/* DRETA — catàleg disponible, agrupat per font */}
+        <aside className="nb__cfg-cat">
+          <details className="nb__cfg-grp" open>
+            <summary>Serveis d&apos;Òrbita Events</summary>
+            <div className="nb__cfg-items">
+              {ORBITA_SERVICES.map((s) => (
+                <button type="button" key={s.id} className="nb__cfg-item" onClick={() => addOrbitaService(s.id)}>
+                  <span className="nb__cfg-itemname">{s.label}</span>
+                  <span className="nb__cfg-itemprice">{s.defaultPrice}€{s.unit === 'hour' ? '/h' : ''}</span>
+                </button>
+              ))}
+            </div>
+          </details>
+
+          {Object.entries(partnersByName).map(([name, prods]) => (
+            <details className="nb__cfg-grp" key={name}>
+              <summary>Serveis de {name}</summary>
+              <div className="nb__cfg-items">
+                {prods.map((p) => (
+                  <button type="button" key={p.id} className="nb__cfg-item" onClick={() => addPartnerProduct(p.id)}>
+                    <span className="nb__cfg-itemname">{p.name}</span>
+                    <span className="nb__cfg-itemprice">{p.sellPrice}€</span>
+                  </button>
+                ))}
+              </div>
+            </details>
+          ))}
+
+          {Object.keys(partnersByName).length === 0 && (
+            <p className="nb__hint">Cap proveïdor amb productes actius.</p>
+          )}
+        </aside>
+      </div>
     </section>
   );
 }

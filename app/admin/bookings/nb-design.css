@@ -221,3 +221,26 @@ html.admin-mode .nb__cols2 { display: grid; grid-template-columns: 1fr 1fr; gap:
 @media (max-width: 1100px) {
   html.admin-mode .nb__cols2 { grid-template-columns: 1fr; }
 }
+
+/* ── Configurador del bolo: bolo (esquerra) + catàleg disponible (dreta) ── */
+html.admin-mode .nb__cfg { display: grid; grid-template-columns: 1fr 300px; gap: 16px; align-items: start; margin-top: 6px; }
+@media (max-width: 1100px) { html.admin-mode .nb__cfg { grid-template-columns: 1fr; } }
+
+html.admin-mode .nb__cfg-bolo { display: flex; flex-direction: column; gap: 10px; min-width: 0; border: 1px solid var(--line); border-radius: var(--o-r-md-2); padding: 14px; background: color-mix(in oklab, var(--panel) 60%, transparent); }
+html.admin-mode .nb__cfg-bolohead { display: flex; align-items: center; justify-content: space-between; }
+html.admin-mode .nb__cfg-bolotitle { font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold); text-transform: uppercase; letter-spacing: 0.05em; color: var(--t3); }
+html.admin-mode .nb__cfg-bolototal { font-size: var(--o-text-md); font-weight: var(--o-fw-bold); color: var(--gold); font-variant-numeric: tabular-nums; }
+html.admin-mode .nb__cfg-empty { padding: 18px 6px; color: var(--t3); font-size: var(--o-text-sm); text-align: center; }
+html.admin-mode .nb__cfg-free { align-self: flex-start; }
+
+html.admin-mode .nb__cfg-cat { display: flex; flex-direction: column; gap: 8px; }
+html.admin-mode .nb__cfg-grp { border: 1px solid var(--line); border-radius: var(--o-r-sm-2); overflow: hidden; }
+html.admin-mode .nb__cfg-grp > summary { cursor: pointer; padding: 9px 12px; font-size: var(--o-text-2xs); font-weight: var(--o-fw-semi); color: var(--t2); background: color-mix(in oklab, var(--raised) 70%, var(--panel)); list-style: none; }
+html.admin-mode .nb__cfg-grp > summary::-webkit-details-marker { display: none; }
+html.admin-mode .nb__cfg-grp[open] > summary { color: var(--gold); border-bottom: 1px solid var(--line); }
+html.admin-mode .nb__cfg-items { display: flex; flex-direction: column; }
+html.admin-mode .nb__cfg-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 8px 12px; border: 0; border-top: 1px solid color-mix(in oklab, var(--line) 50%, transparent); background: transparent; color: var(--t); font: inherit; font-size: var(--o-text-sm); cursor: pointer; text-align: left; transition: background 120ms ease; }
+html.admin-mode .nb__cfg-item:first-child { border-top: 0; }
+html.admin-mode .nb__cfg-item:hover { background: color-mix(in oklab, var(--gold) 10%, transparent); }
+html.admin-mode .nb__cfg-itemname { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html.admin-mode .nb__cfg-itemprice { flex: none; color: var(--gold); font-weight: var(--o-fw-semi); font-variant-numeric: tabular-nums; }
