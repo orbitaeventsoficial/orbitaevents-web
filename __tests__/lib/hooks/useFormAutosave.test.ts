@@ -67,6 +67,24 @@ describe('useFormAutosave', () => {
     expect(stored.value).toEqual({ name: 'Collsacreu' });
   });
 
+  it('restaura l\'esborrany quan enabled passa de false a true (cas booking amb prefill)', () => {
+    // Esborrany previ (el que l'usuari havia escrit).
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ savedAt: Date.now(), value: { loc: 'Collsacreu', pax: 150 } }));
+    const restored: unknown[] = [];
+    const onRestore = (v: unknown) => restored.push(v);
+    // Munta amb enabled=false (loading) i value buit; després el prefill posa dades del lead
+    // i enabled passa a true.
+    const { rerender } = renderHook(
+      ({ v, en }) => useFormAutosave(KEY, v, onRestore, { enabled: en, debounceMs: 500 }),
+      { initialProps: { v: { loc: '', pax: 0 }, en: false } },
+    );
+    expect(restored).toHaveLength(0); // encara no (loading)
+    // prefill: dades del lead + loading acaba
+    rerender({ v: { loc: 'lead-loc', pax: 100 }, en: true });
+    // ha de restaurar l'esborrany de l'usuari (guanya sobre el prefill)
+    expect(restored).toEqual([{ loc: 'Collsacreu', pax: 150 }]);
+  });
+
   it('no fa res si enabled=false', () => {
     const onRestore = vi.fn();
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ savedAt: Date.now(), value: { name: 'x' } }));
