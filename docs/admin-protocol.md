@@ -1384,6 +1384,25 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #909 — 2026-06-09 — claude (FET)
+
+**Partners favorits: desplegables de reserva nets (favorits a dalt, material no molesta).**
+
+- Context: el propietari vol que als desplegables «D'on ve el bolo»/«A qui facturem» surtin els típics (Masquerade) i no els proveïdors de material (Tronios, DJ Mania). Demana marcar favorits a la fitxa de proveïdor.
+- `Collaborator.isFavorite Boolean @default(false)` + migració `20260609090000_collaborator_favorite` (desplegada a Railway).
+- `collaboratorAdminService.updateAdminCollaborator`: accepta `isFavorite`.
+- `NewBookingForm`: helper `renderPartnerOptions` agrupa amb `<optgroup>` Favorits / Altres (no amaga ningú, prioritza). `BookingPartnerOption.isFavorite` + mapeig a `useNewBookingInitialData`.
+- `PartnerHubClient`: botó «★ Favorit / ☆ Marcar com a favorit» al Resum (PATCH a `/api/admin/collaborators/[id]`).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `908` a `909`.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm build` OK; collaboratorAdminService 9 tests verds; migració desplegada a Railway.
+- Validació funcional: marcar favorit a la fitxa → surt a l'optgroup «Favorits» del desplegable de reserva.
+- Validació humana/UX: pendent validació visual del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #908 — 2026-06-09 — claude (FET)
 
 **Nova reserva dossier-cèntrica: pack opcional i col·lapsable, bolo muntat per serveis.**

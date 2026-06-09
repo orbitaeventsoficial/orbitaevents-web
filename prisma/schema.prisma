@@ -1840,6 +1840,7 @@ model Collaborator {
   costPerHour   Float?                   // Cost que ens cobra per hora (calculadora de costos)
   notes         String?                  @db.Text
   isActive      Boolean                  @default(true)
+  isFavorite    Boolean                  @default(false) // Surt als desplegables ràpids de reserva (origen/facturació)
 
   bookings CollaboratorBooking[]
   products CollaboratorProduct[]

@@ -37,6 +37,7 @@ export default async function PartnerDetailPage({ params }: Props) {
       costPerHour: hub.partner.costPerHour,
       notes: hub.partner.notes,
       isActive: hub.partner.isActive,
+      isFavorite: hub.partner.isFavorite,
     },
     economics: hub.economics,
     members: hub.members.map((m) => ({

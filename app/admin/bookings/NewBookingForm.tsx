@@ -31,9 +31,32 @@ import { useBookingDistance } from './useBookingDistance';
 import { useBookingDateConflicts } from './useBookingDateConflicts';
 import { useBookingPricing } from './useBookingPricing';
 import { useFormAutosave } from '@/lib/hooks/useFormAutosave';
-import type { BookingExtra, BookingFormData, BookingSelectedExtras } from './booking-form.types';
+import type { BookingExtra, BookingFormData, BookingSelectedExtras, BookingPartnerOption } from './booking-form.types';
 import { OPERATOR_EXTRA_ID } from './booking-form.types';
 import './nb-design.css';
+
+// Opcions del desplegable de partners agrupades: Favorits primer, Altres després.
+// Així els típics (Masquerade) queden a dalt i els de material (Tronios, DJ Mania)
+// no molesten sense desaparèixer. El propietari marca favorits a la fitxa de partner.
+function renderPartnerOptions(partners: BookingPartnerOption[]) {
+  const label = (p: BookingPartnerOption) => (p.company ? `${p.name} · ${p.company}` : p.name);
+  const favs = partners.filter((p) => p.isFavorite);
+  const rest = partners.filter((p) => !p.isFavorite);
+  return (
+    <>
+      {favs.length > 0 && (
+        <optgroup label="Favorits">
+          {favs.map((p) => <option key={p.id} value={p.id}>{label(p)}</option>)}
+        </optgroup>
+      )}
+      {rest.length > 0 && (
+        <optgroup label={favs.length > 0 ? 'Altres' : 'Tots els partners'}>
+          {rest.map((p) => <option key={p.id} value={p.id}>{label(p)}</option>)}
+        </optgroup>
+      )}
+    </>
+  );
+}
 
 export default function NewBookingForm() {
   const toast = useToast();
@@ -319,22 +342,14 @@ export default function NewBookingForm() {
                   <span className="nb__label">D&apos;on ve el bolo</span>
                   <select value={sourceCollaboratorId} onChange={(e) => setSourceCollaboratorId(e.target.value)} className="nb__input">
                     <option value="">Client directe (cap intermediari)</option>
-                    {partners.map((partner) => (
-                      <option key={partner.id} value={partner.id}>
-                        {partner.company ? `${partner.name} · ${partner.company}` : partner.name}
-                      </option>
-                    ))}
+                    {renderPartnerOptions(partners)}
                   </select>
                 </label>
                 <label className="nb__field">
                   <span className="nb__label">A qui facturem</span>
                   <select value={billedCollaboratorId} onChange={(e) => setBilledCollaboratorId(e.target.value)} className="nb__input">
                     <option value="">Al client final</option>
-                    {partners.map((partner) => (
-                      <option key={partner.id} value={partner.id}>
-                        {partner.company ? `${partner.name} · ${partner.company}` : partner.name}
-                      </option>
-                    ))}
+                    {renderPartnerOptions(partners)}
                   </select>
                 </label>
               </div>

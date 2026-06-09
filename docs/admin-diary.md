@@ -1,3 +1,27 @@
+## 2026-06-09 — Partners favorits + decisions pendents del propietari (Canvi #909, claude)
+
+### Resum
+`Collaborator.isFavorite` + toggle a la fitxa + optgroup «Favorits/Altres» als desplegables de reserva. Tronios/DJ Mania (material) queden sota «Altres», Masquerade (favorit) a dalt. Migració desplegada a Railway.
+
+### ⚠️ DECISIONS PENDENTS DEL PROPIETARI (no tocar sense la seva confirmació)
+1. **Preu bingo/batalla musical — CONTRADICCIÓ DE DADES**: el propietari diu «no són 195, són 240, i sempre van amb tècnic sense desglossar». Però hi ha DUES fonts de preu que no quadren:
+   - `lib/constants/animacio-products.ts`: bingo/batalla per trams 250/300/350 € (DJ+Presentador, segons participants).
+   - `scripts/seed-masquerade-products.mjs`: NO conté bingo/batalla (té animació temàtica 160, personatge 250, pirates 320, pintacares 70, globoflèxia 40).
+   - Hipòtesi del 240: cost 200 (bingo 160 + tècnic 40) → `resellPrice(200)` = 240. I 195 = `resellPrice(160)` sense tècnic.
+   - **CAL que el propietari confirmi**: preu real del bingo amb tècnic inclòs i a quina font viu, abans de tocar res. NO s'ha modificat cap preu (inventar-lo seria pitjor).
+2. **Marcar Masquerade com a favorit per defecte**: el seed `scripts/seed-partners.mjs` es podria actualitzar perquè Masquerade neixi `isFavorite:true`. Pendent confirmar.
+3. **Buscador de partners a la BD** (combobox al desplegable per trobar no-favorits): demanat però és UI gran; de moment l'optgroup «Altres» els manté accessibles. Pendent disseny.
+4. **Autosave nova reserva**: el hook funciona (test transició verd). El problema reportat («surt en blanc») és integració amb el prefill async del lead o cache del navegador. CAL provar amb hard-refresh (Ctrl+F5) i, si persisteix, fer el restore robust contra el prefill.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm build` OK · collaboratorAdminService 9 verds. Migració `20260609090000` desplegada.
+- Validació funcional: toggle favorit → optgroup Favorits al desplegable.
+- Validació humana/UX: pendent validació visual del propietari.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-09 — Nova reserva dossier-cèntrica (Canvi #908, claude)
 
 ### Resum

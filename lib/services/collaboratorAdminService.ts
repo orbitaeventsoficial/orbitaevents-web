@@ -13,6 +13,7 @@ type CollaboratorInput = {
   costPerHour?: number | string | null;
   notes?: string | null;
   isActive?: boolean | null;
+  isFavorite?: boolean | null;
 };
 
 function normalizePricingModel(value?: string | null): CollaboratorPricingModel {
@@ -146,6 +147,7 @@ export async function updateAdminCollaborator(id: string, input: CollaboratorInp
       ...(input.costPerHour !== undefined && { costPerHour: input.costPerHour != null ? Number(input.costPerHour) : null }),
       ...(input.notes !== undefined && { notes: input.notes?.trim() || null }),
       ...(input.isActive !== undefined && { isActive: Boolean(input.isActive) }),
+      ...(input.isFavorite !== undefined && { isFavorite: Boolean(input.isFavorite) }),
     },
   });
 

@@ -84,6 +84,7 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
               name: partner.name,
               company: partner.company || null,
               roles: partner.roles || [],
+              isFavorite: !!partner.isFavorite,
             })));
         }
 

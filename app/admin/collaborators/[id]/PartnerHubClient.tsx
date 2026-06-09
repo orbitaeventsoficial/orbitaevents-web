@@ -73,6 +73,7 @@ interface PartnerHubData {
     costPerHour: number | null;
     notes: string | null;
     isActive: boolean;
+    isFavorite: boolean;
   };
   economics: {
     sourcedLeadsCount: number;
@@ -145,6 +146,22 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
     }
   }
 
+  async function toggleFavorite() {
+    try {
+      const res = await fetchWithCsrf(`/api/admin/collaborators/${partner.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isFavorite: !partner.isFavorite }),
+      });
+      if (!res.ok) throw new Error('No s\'ha pogut desar');
+      toast.success(partner.isFavorite ? 'Tret de favorits.' : 'Marcat com a favorit. Sortirà als desplegables de reserva.');
+      router.refresh();
+    } catch (e) {
+      console.error('[PartnerHub] toggleFavorite', e);
+      toast.error('Error desant el favorit.');
+    }
+  }
+
   async function removeMember(memberId: string) {
     try {
       const res = await fetchWithCsrf(`/api/admin/collaborators/${partner.id}/members/${memberId}`, { method: 'DELETE' });
@@ -194,6 +211,12 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
               {partner.roles.length > 0
                 ? partner.roles.map((role) => <span key={role} className="ap-badge ap-badge--info">{roleLabel(role)}</span>)
                 : <Empty text="Sense rols assignats." />}
+            </div>
+            <div className="mt-4 flex items-center gap-3">
+              <button type="button" className={`ap-btn ${partner.isFavorite ? 'ap-btn--primary' : ''}`} onClick={toggleFavorite}>
+                {partner.isFavorite ? '★ Favorit' : '☆ Marcar com a favorit'}
+              </button>
+              <span className="ap-muted text-sm">Els favorits surten als desplegables ràpids de la nova reserva.</span>
             </div>
           </section>
         </div>

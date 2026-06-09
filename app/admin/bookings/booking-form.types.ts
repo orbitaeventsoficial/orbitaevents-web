@@ -85,6 +85,7 @@ export type BookingPartnerOption = {
   name: string;
   company: string | null;
   roles?: string[];
+  isFavorite?: boolean;
 };
 
 export type BookingServiceLineKind = 'DJ' | 'SOUND_TECH' | 'PROVIDER_SERVICE' | 'EQUIPMENT' | 'OTHER';
