@@ -46,3 +46,23 @@
 
 ## Decisió oberta (producte, no risc)
 - Al Lead, el grup "Packs base excloent" actiu o només al Booking? El component ja ho fa opcional.
+
+---
+## PENDENT — Unificació de packs (decisió de negoci NO presa encara)
+
+El propietari vol simplificar els packs (idea: potser només 2 — **Bàsic** i **Complet** —
+amb preus unificats per HORES, no per tipus d'event; un bolo no és més car "per ser boda").
+Regla de preu acordada: DJ 1a hora 150 + 100/hora addicional → Bàsic 2h = 250€.
+El preu/hores del "Complet" encara NO està decidit.
+
+⚠️ IMPACTE GROS (per això NO s'ha tocat): els packs viuen a `app/config/packs-config.ts`
+i es consumeixen a ~60 fitxers, incloent:
+- Web pública: `/configurador`, `/packs`, `/servicios/*` i **~30 landings SEO**
+  (dj-bodas-girona, discomovil-maresme, etc.) que mostren packs i preus per ciutat.
+- i18n: 9 claus de nom/preu de packs als 3 `messages/*.json`.
+- BD: taula `Pack` sincronitzada des del config (`getAllPacks` / packAdminService sync).
+- Admin: configurador del bolo, dossiers, pressupostos, catàleg PDF.
+
+QUAN ES DECIDEIXI: cridar Opus per al pla de migració segura del catàleg (web+SEO+BD+i18n)
+sense trencar el posicionament de les landings. NO fer-ho a la cua d'una sessió ni a trossos.
+Estat actual: preus divergents (bodes 350/500/1000 · discomòbil i empreses 250/400/600).
