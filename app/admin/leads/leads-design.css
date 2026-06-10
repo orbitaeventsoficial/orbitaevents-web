@@ -1578,3 +1578,6 @@ html.admin-mode .lp2__histitem:last-child { border-bottom: none; }
 
 /* Pista inline als labels de relació (responsable intern / bolo passat per) */
 .fxd__hint-inline { display: block; font-weight: var(--o-fw-regular); font-size: var(--o-text-2xs); color: var(--t3); margin-top: 1px; }
+
+/* Barra d'accions del bolo (crear dossier / pressupost / reserva) */
+.fxd__bolo-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }

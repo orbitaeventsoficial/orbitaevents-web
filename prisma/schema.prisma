@@ -520,6 +520,12 @@ model Dossier {
   // Productes seleccionats (array d'IDs: 'bingo-musical', 'batalla-musical', 'dj')
   productIds  String[]
 
+  // Foto del bolo en el moment de generar (línies + preus acordats). Coherent amb
+  // "cada document = foto del bolo". JSON perquè el bolo viu pot canviar després.
+  lineSnapshot Json?
+  // Mode de sortida: 'full' (dossier complet) o 'quote' (pressupost sol).
+  mode         String?
+
   // Estat d'enviament
   sentAt      DateTime?
   sentTo      String?   // email al qual es va enviar

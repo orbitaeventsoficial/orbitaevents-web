@@ -103,6 +103,26 @@ export default function LeadBoloSection({ leadId }: { leadId: string }) {
     }
   };
 
+  // Desa el bolo (si cal) i després executa l'acció de generació.
+  const generate = async (mode: 'full' | 'quote') => {
+    if (dirty) await handleSave();
+    setSaving(true);
+    try {
+      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/generate-dossier`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode }),
+      });
+      if (!res.ok) throw new Error('No s\'ha pogut generar');
+      toast.success(mode === 'quote' ? 'Pressupost creat.' : 'Dossier creat.');
+    } catch (e) {
+      console.error('[LeadBolo] generar', e);
+      toast.error('Error generant el document.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) {
     return (
       <section className="fxd__panel">
@@ -129,6 +149,18 @@ export default function LeadBoloSection({ leadId }: { leadId: string }) {
         customPackPrice={customPackPrice}
         onCustomPackPriceChange={(v) => { setCustomPackPrice(v); setDirty(true); }}
       />
+
+      <div className="fxd__bolo-actions">
+        <button type="button" className="fxd__btn" onClick={() => generate('full')} disabled={saving}>
+          Crear dossier
+        </button>
+        <button type="button" className="fxd__btn" onClick={() => generate('quote')} disabled={saving}>
+          Crear pressupost
+        </button>
+        <a className="fxd__btn fxd__btn--primary" href={`/admin/bookings/new?leadId=${encodeURIComponent(leadId)}`}>
+          Crear reserva
+        </a>
+      </div>
     </section>
   );
 }

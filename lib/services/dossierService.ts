@@ -35,6 +35,56 @@ export async function createDossier(input: CreateDossierInput) {
   });
 }
 
+/**
+ * Crea un dossier (o pressupost) DES DEL BOLO del lead: llegeix les línies
+ * (`LeadServiceLine`), en deriva els productIds (les que són productes de
+ * proveïdor) per al generador de PDF existent, i guarda la FOTO del bolo
+ * (`lineSnapshot`) per fidelitat encara que el bolo canviï després.
+ *
+ * `mode`: 'full' (dossier complet) o 'quote' (pressupost sol).
+ */
+export async function createDossierFromBolo(leadId: string, mode: 'full' | 'quote' = 'full') {
+  const lead = await prisma.lead.findUnique({
+    where: { id: leadId },
+    select: {
+      name: true, email: true, phone: true, eventType: true, eventLocation: true,
+      serviceLines: {
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+        select: { collaboratorId: true, kind: true, label: true, revenueAmount: true, quantity: true },
+      },
+    },
+  });
+  if (!lead) return { status: 404, body: { error: 'Lead no trobat' } };
+
+  const lines = lead.serviceLines || [];
+  // ProductIds per al generador PDF existent: línies amb collaboratorId (productes
+  // de proveïdor). Les línies pròpies/lliures viuen al snapshot, no com a productId.
+  const productIds = lines
+    .filter((l) => !!l.collaboratorId)
+    .map((l) => l.collaboratorId as string);
+
+  const snapshot = lines.map((l) => ({
+    label: l.label,
+    price: (l.revenueAmount || 0) * (l.quantity || 1),
+    quantity: l.quantity || 1,
+    kind: l.kind,
+  }));
+
+  const dossier = await prisma.dossier.create({
+    data: {
+      leadId,
+      nom: lead.name,
+      email: lead.email || null,
+      telefon: lead.phone || null,
+      eventDesc: lead.eventLocation || null,
+      productIds,
+      lineSnapshot: snapshot,
+      mode,
+    },
+  });
+  return { status: 200, body: { ok: true, dossier } };
+}
+
 export async function getDossiersByLead(leadId: string) {
   return prisma.dossier.findMany({
     where: { leadId },

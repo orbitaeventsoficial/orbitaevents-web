@@ -1384,6 +1384,25 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #916 — 2026-06-10 — claude (FET)
+
+**Generar dossier/pressupost/reserva des del bolo — Fase 3 (3 botons a la fitxa del lead).**
+
+- Schema: `Dossier.lineSnapshot Json?` + `Dossier.mode String?` (foto del bolo + mode). Migració `20260610100000_dossier_line_snapshot` desplegada a Railway.
+- `dossierService.createDossierFromBolo(leadId, mode)`: llegeix `LeadServiceLine`, deriva productIds (línies amb collaboratorId) per al generador PDF EXISTENT (validat pel propietari, no es toca), i guarda `lineSnapshot` + `mode` ('full'=dossier complet, 'quote'=pressupost sol).
+- API `POST /api/admin/leads/[id]/generate-dossier`.
+- `LeadBoloSection`: barra d'accions «Crear dossier · Crear pressupost · Crear reserva» (desa el bolo abans de generar; reserva via `/admin/bookings/new?leadId=`).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `915` a `916`.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm build` OK; captura amb els 3 botons.
+- Validació funcional: des del bolo del lead es pot crear dossier/pressupost (registre + snapshot) i reserva (bolo heretat). El render PDF reaprofita el generador validat.
+- Validació humana/UX: **pendent repassada visual conjunta** (propietari ho farà al final; aspecte es refarà a la fase "pantalla negra").
+- **SEGÜENT**: Fase 4 (fulla d'economia: net per bolo). Després: repassada visual + "pantalla negra" (refer aspecte). Vegeu `docs/bolo-flux.md`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #915 — 2026-06-10 — claude (FET)
 
 **El bolo del lead s'hereta a la reserva — Fase 2 (LeadServiceLine → BookingServiceLine).**

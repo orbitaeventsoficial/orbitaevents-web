@@ -1,3 +1,24 @@
+## 2026-06-10 — Generar dossier/pressupost/reserva des del bolo, Fase 3 (Canvi #916, claude)
+
+### Resum
+Tanca el cercle lead→bolo→document. 3 botons a la secció «El bolo» de la fitxa del lead: Crear dossier · Crear pressupost · Crear reserva. `Dossier.lineSnapshot`+`mode` (migració desplegada). `createDossierFromBolo` deriva productIds per al generador PDF existent (validat, no es toca) i guarda la foto. Reserva via flux existent amb bolo heretat (Fase 2).
+
+### Nota mètode (acord propietari)
+Primer FUNCIONALITAT (això), després "pàgina negra" = refer l'aspecte des de zero. No patir per l'estètica ara. Repassada visual conjunta al final.
+
+### SEGÜENT (docs/bolo-flux.md)
+- Fase 4: fulla d'economia (net per bolo).
+- Després: repassada visual + pantalla negra (aspecte).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm build` OK · migració `20260610100000` desplegada · captura 3 botons.
+- Validació funcional: dossier/pressupost (registre+snapshot) i reserva des del bolo.
+- Validació humana/UX: pendent repassada conjunta del propietari.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-10 — El bolo del lead s'hereta a la reserva, Fase 2 (Canvi #915, claude)
 
 ### Resum
