@@ -481,6 +481,43 @@ describe('createBookingFromInput', () => {
     expect(mockPrisma.bookingInventory.upsert).not.toHaveBeenCalled();
   });
 
+  describe('herència del bolo del lead (Fase 2)', () => {
+    it('si el payload no porta línies, hereta les del lead (LeadServiceLine → BookingServiceLine)', async () => {
+      setupDefaults();
+      mockPrisma.lead.findUnique.mockResolvedValue({
+        customerId: null,
+        sourceCollaboratorId: null,
+        serviceLines: [
+          { collaboratorId: null, kind: 'DJ', label: 'DJ · 2 hores', revenueAmount: 250, costAmount: null, quantity: 1, hours: null, notes: null },
+          { collaboratorId: 'col1', kind: 'PROVIDER_SERVICE', label: 'Animació', revenueAmount: 240, costAmount: 200, quantity: 1, hours: null, notes: null },
+        ],
+      });
+
+      await createBookingFromInput({ ...BASE_INPUT, leadId: 'lead1' });
+
+      const createArg = mockPrisma.booking.create.mock.calls[0][0];
+      expect(createArg.data.serviceLines?.create).toHaveLength(2);
+      expect(createArg.data.serviceLines.create[0]).toMatchObject({ kind: 'DJ', label: 'DJ · 2 hores' });
+    });
+
+    it('si el payload porta línies, tenen prioritat sobre les del lead', async () => {
+      setupDefaults();
+      mockPrisma.lead.findUnique.mockResolvedValue({
+        customerId: null, sourceCollaboratorId: null,
+        serviceLines: [{ collaboratorId: null, kind: 'DJ', label: 'del lead', revenueAmount: 250, costAmount: null, quantity: 1, hours: null, notes: null }],
+      });
+
+      await createBookingFromInput({
+        ...BASE_INPUT, leadId: 'lead1',
+        serviceLines: [{ kind: 'OTHER', label: 'del payload', revenueAmount: 100, quantity: 1 }],
+      });
+
+      const createArg = mockPrisma.booking.create.mock.calls[0][0];
+      expect(createArg.data.serviceLines.create).toHaveLength(1);
+      expect(createArg.data.serviceLines.create[0]).toMatchObject({ label: 'del payload' });
+    });
+  });
+
   describe('bolo personalitzat (sense pack de catàleg)', () => {
     it('amb packId marker reusa el pack tècnic existent per slug', async () => {
       setupDefaults();

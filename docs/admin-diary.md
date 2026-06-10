@@ -1,3 +1,21 @@
+## 2026-06-10 — El bolo del lead s'hereta a la reserva, Fase 2 (Canvi #915, claude)
+
+### Resum
+`bookingCreationService`: en crear reserva des d'un lead sense `serviceLines` al payload, hereta el bolo del lead (LeadServiceLine → BookingServiceLine). Si el payload en porta, prioritat al payload. 2 tests nous (35 verds). El bolo ja no es perd entre lead i reserva.
+
+### SEGÜENT (docs/bolo-flux.md)
+- Fase 3: generador unificat (dossier amb pressu / pressu sol) des del bolo + Dossier.lineSnapshot.
+- Fase 4: fulla d'economia del bolo (net per bolo).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm build` OK · bookingCreationService 35 verds.
+- Validació funcional: bolo lead → reserva sense remuntar.
+- Validació humana/UX: pendent validació visual del propietari.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-10 — El BOLO a la fitxa del lead, Fase 1.4 UI (Canvi #914, claude)
 
 ### Resum

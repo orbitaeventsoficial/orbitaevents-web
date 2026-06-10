@@ -292,15 +292,33 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   const billedPartner = await resolveBilledPartner(data.billedCollaboratorId || null);
   const billedCollaboratorId = billedPartner?.id || null;
 
+  let leadBoloLines: BookingServiceLineInput[] = [];
   if (data.leadId) {
     const lead = await prisma.lead.findUnique({
       where: { id: data.leadId },
-      select: { customerId: true, sourceCollaboratorId: true },
+      select: {
+        customerId: true,
+        sourceCollaboratorId: true,
+        serviceLines: {
+          orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+          select: { collaboratorId: true, kind: true, label: true, revenueAmount: true, costAmount: true, quantity: true, hours: true, notes: true },
+        },
+      },
     });
     if (!linkedCustomerId) {
       linkedCustomerId = lead?.customerId || null;
     }
     sourceCollaboratorId = sourceCollaboratorId || lead?.sourceCollaboratorId || null;
+    leadBoloLines = (lead?.serviceLines || []).map((l) => ({
+      collaboratorId: l.collaboratorId || undefined,
+      kind: l.kind,
+      label: l.label,
+      revenueAmount: l.revenueAmount ?? undefined,
+      costAmount: l.costAmount ?? undefined,
+      quantity: l.quantity ?? undefined,
+      hours: l.hours ?? undefined,
+      notes: l.notes ?? undefined,
+    }));
   }
 
   if (billedCollaboratorId) {
@@ -338,7 +356,10 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   });
   const extraHoursPrice = extraHours * pack.extraHourPrice;
   const extrasPrice = data.extras?.reduce((sum, e) => sum + e.price * (e.quantity || 1), 0) || 0;
-  const serviceLines = normalizeServiceLines(data.serviceLines);
+  // Si el payload no porta línies però el lead té un bolo muntat, s'hereten (Fase 2).
+  const serviceLines = normalizeServiceLines(
+    (data.serviceLines && data.serviceLines.length > 0) ? data.serviceLines : leadBoloLines
+  );
   const serviceLinesRevenue = serviceLines.reduce((sum, line) => sum + (line.revenueAmount || 0), 0);
   // El pack, les hores extra, els extres i les línies de servei se SUMEN tots
   // (les línies són serveis addicionals, no substitueixen el pack). El total

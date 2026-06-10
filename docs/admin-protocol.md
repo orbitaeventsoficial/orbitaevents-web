@@ -1384,6 +1384,23 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #915 — 2026-06-10 — claude (FET)
+
+**El bolo del lead s'hereta a la reserva — Fase 2 (LeadServiceLine → BookingServiceLine).**
+
+- `bookingCreationService.createBookingFromInput`: quan es crea una reserva des d'un lead i el payload NO porta `serviceLines`, s'hereten les del bolo del lead (`LeadServiceLine`) i es creen com a `BookingServiceLine`. Si el payload en porta, tenen prioritat. Còpia camp a camp (mateix enum).
+- Tests: 2 nous (herència del lead / prioritat del payload). 35 verds.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `914` a `915`.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm build` OK; bookingCreationService 35 verds.
+- Validació funcional: el bolo muntat al lead arriba a la reserva sense remuntar-lo.
+- Validació humana/UX: pendent validació visual del propietari.
+- **SEGÜENT**: Fase 3 (generador unificat dossier/pressupost des del bolo) → Fase 4 (economia). Vegeu `docs/bolo-flux.md`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #914 — 2026-06-10 — claude (FET)
 
 **El BOLO a la fitxa del lead — Fase 1.4 (configurador dins `/admin/leads/[id]`).**
