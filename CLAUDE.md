@@ -305,8 +305,9 @@ Tot fitxer CSS d'admin nou o modificat ha de complir:
 2. **Zero duplicats** — cada selector apareix una sola vegada per fitxer. Dues definicions del mateix selector → la primera és codi mort. Eliminar-la.
 3. **Zero `!important`** — prohibit tret de compatibilitat legacy explícitament justificada en comentari. Un `!important` que afecti una classe pròpia (`bd__*`, `tk__*`, etc.) és un error.
 4. **Responsiu obligatori** — tot component nou ha de tenir `@media` per a mòbil (≥375px), tablet i desktop. No lliurar sense haver comprovat els tres punts de ruptura.
-5. **Monocapa** — si un valor o regla visual s'usa en més d'un lloc, va a `orbita-tokens.css` o a `admin-shell.css`. Cap fitxer de pàgina reinventa tokens globals.
-6. **Reinici de servidor obligatori** — Next.js dev NO hot-recarga fitxers CSS existents modificats. Després de qualsevol canvi CSS: `Get-Process node | Stop-Process -Force` + esborrar `.next` + `pnpm dev`. Sense reinici, els canvis no apliquen i la pàgina segueix mostrant l'estil antic.
+5. **Zero maquetació a píxel en admin nou/modificat** — no fixar layouts amb `px` locals (`width`, `max-width`, `min-width`, `height`, `max-height`, `grid-template-columns`, `flex-basis`, breakpoints, gaps/paddings repetits). Usar tokens (`--o-*`), `rem`, `ch`, `%`, `fr`, `dvh/dvw`, `clamp()`, `min()`, `max()` i `minmax()` perquè la peça sigui reutilitzable i responsiva. Excepcions: hairlines `1px`, SVG/canvas, captures/previews tècnics i definició centralitzada de tokens a `orbita-tokens.css`.
+6. **Monocapa** — si un valor o regla visual s'usa en més d'un lloc, va a `orbita-tokens.css` o a `admin-shell.css`. Cap fitxer de pàgina reinventa tokens globals.
+7. **Reinici de servidor obligatori** — Next.js dev NO hot-recarga fitxers CSS existents modificats. Després de qualsevol canvi CSS: `Get-Process node | Stop-Process -Force` + esborrar `.next` + `pnpm dev`. Sense reinici, els canvis no apliquen i la pàgina segueix mostrant l'estil antic.
 
 ### Paleta admin (tokens)
 

@@ -1,3 +1,24 @@
+## 2026-06-11 — Pantalla negra fitxa lead: tipografia, contacte i bolo responsiu (Canvi #922, codex)
+
+### Resum
+Tancada la passada visual sobre `/admin/leads/cmpwudznj00g3vigky4altclu` sense obrir nous fronts: la fitxa deixa de semblar una taula mecànica i passa a una composició més editorial i reusable. El contacte puja al costat del nom, el net del bolo es mostra com a segona xifra protagonista i les dades del bolo usen cos natural en lloc de mono dominant.
+
+### Què s'ha fet
+- Tipografia canònica de pantalla negra: Manrope per cos de fitxa, Bricolage per títols i JetBrains Mono només per dades on aporta lectura numèrica; exposat via tokens a `orbita-tokens.css`.
+- Header de lead refet: nom + telèfon/email + WhatsApp/Correu inline, stats compactes i targeta `Net del bolo` alimentada des de `LeadBoloSection`.
+- Dades del bolo i rendibilitat menys robòtiques: labels en sans, valors amb pes moderat, documents clicables amb classes pròpies i sense inline styles nous.
+- Bolo encastat més compacte i responsiu amb `rem`, `%`, `fr`, `dvh/dvw`, `clamp()` i `minmax()`; norma escrita contra maquetació nova a píxel a l'admin.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK.
+- Validació funcional: captura real desktop `.codex-captures/fitxa-full.png`; captures responsive `.codex-captures/fitxa-full-mobile.png` i `.codex-captures/fitxa-full-tablet.png`.
+- Validació responsive: mobile 390 i tablet 820 sense overflow horitzontal (`scrollWidth == clientWidth`).
+- Validació humana/UX: pendent ull final del propietari; visualment la pantalla queda llegible i el contacte ja és al header.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-10 — Cuadrant operatiu + Repartiment de pasta (Canvi #921, claude)
 
 ### Resum

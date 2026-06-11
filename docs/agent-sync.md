@@ -186,10 +186,10 @@ Avís per codex: #826 (ingesta 🤝 + hora fi). #827 (animació: nova categoria 
 ## Bloc CODEX (Codex CLI)
 
 <!-- codex: actualitza aquest bloc quan comencis/acabis una sessió -->
-[codex] 2026-06-08 [ESTAT: treballant]
-Últim canvi: #898 base de Partners; obro continuació coordinada per Fase 3 segons decisió Opus locked.
-Proper pas previst: implementar localment `Booking.billedCollaboratorId` + `BookingServiceLine`, reconnectar `bookingCreationService`/`bookingRouteService` i `computeBookingFinancialSummary()` sense doble comptar `CollaboratorBooking`.
-Avís per l'altre agent: NO tocaré `app/admin/collaborators/[id]/**`, `lib/services/partnerHubService.ts` ni `scripts/seed-partners.mjs`; això queda per Claude. Migració Railway i seed els executa el propietari. Risc principal: `BookingServiceLine.costAmount` i `CollaboratorBooking.commissionAmount` no poden representar el mateix cost alhora.
+[codex] 2026-06-11 [ESTAT: tancat]
+Últim canvi: #922.
+Proper pas previst: pendent validació visual del propietari sobre la fitxa del lead; següent millora només si demana un retoc concret.
+Avís per l'altre agent: #922 remata la pantalla negra de `/admin/leads/cmpwudznj00g3vigky4altclu`: contacte al header, net del bolo al hero, tipografia Manrope/JetBrains/Bricolage via tokens, dades menys mecàniques i compactació responsiva sense maquetació nova a píxel. No he entrat a Cuadrant/Repartiment, CrewBlock, schema ni serveis operatius.
 
 [codex] 2026-06-07 [ESTAT: tancat]
 Últim canvi: #898 — agenda multi-bolo, total manual exacte, relació comercial DJ/tècnic i base escalable de Partners amb rols i `sourceCollaboratorId`.

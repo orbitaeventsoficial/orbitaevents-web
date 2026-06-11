@@ -93,6 +93,34 @@ per poble (dj-bodas-girona, etc.), NO el preu. Conseqüència de producte:
   cerimònia + llums + xispes…). La «Boda completa» (550) NO és un pack fix: és un bolo típic configurat.
 - Això redueix els packs a un ancoratge d'entrada per servei i alinea tot amb el lead→bolo ja fet.
 
+### Regla DJ CONFIRMADA (2026-06-11): 1a hora 150 · següents 100
+Norma tancada i validada (eficient, versàtil, defendible, lògica econòmica, bon marge). Marge
+alt per defecte si ho fa el propietari; quan se subcontracta, l'Economia del bolo + el Repartiment
+(#921) mostren el net real de cada bolo.
+
+**L'equip de so + cabina + muntatge va INCLÒS a la 1a hora (150€)** — el sobrepreu de la 1a
+hora vs les extres (150 vs 100) ÉS precisament transport + muntatge + equip propi (en un
+bingo→DJ, el Carlos porta l'equip de bingo, però els altaveus/cabina/controladora de DJ els
+porta el propietari). NO es fa una línia separada d'«equip» (seria doble cobrament). Es mostra
+a la descripció: «DJ · 1a hora 150€ (inclou equip de so + cabina + muntatge)». Línia a part
+NOMÉS per a material EXTRA no estàndard: pont de llums 120, més altaveus, xispes 350, fum baix 75.
+
+### Regla DJ — «encetar» vs «allargar» (aclarit 2026-06-11)
+La 1a hora de DJ sempre **150€**, encara que abans hi hagi hagut un bingo/animació. El DJ és un
+servei DIFERENT (so de ball, controladora, llums) → encetar-lo = 1a hora = 150. Els **100€/hora**
+són per **ALLARGAR** un DJ que ja sona, no per encetar-lo. No es perden 50€: el bingo té el seu
+preu a part i no subvenciona el DJ. Regla sense excepcions = defendible. El preu és orientatiu:
+al bolo es pot pactar a la baixa manualment si es vol fer un detall, però el default és 150.
+
+### Tàctica «esquer» tècnic de so → DJ (2026-06-11)
+Quan el propietari fa un bingo amb el SEU material, cobra només **40€ com a tècnic de so**, amb
+la condició que després **es queda de DJ** (150 1a hora + 100/h). El 40€ és un preu-ham
+deliberat per assegurar les hores de DJ, que és on hi ha el marge. Com que ho fa tot ell amb
+equip propi, el cost ≈ 0 → 40 + 150 + 100/h gairebé tot marge. L'equip ja muntat del bingo fa
+que la 1a hora de DJ sigui marge encara més net, PERÒ es manté a 150 (el descompte ja és el 40€
+del so; baixar també el DJ seria regalar dos cops). Al bolo = 2 línies (Tècnic so 40 + DJ); és
+una regla comercial del propietari, no una restricció del sistema.
+
 ### PRINCIPI: DIRECTE I DEFENDIBLE (propietari 2026-06-10)
 El preu ha de ser **directe** (un sol ancoratge «des de 250€» a tot arreu) i **defendible**
 (cada euro justificat: base 2h DJ 250 + cada extra amb preu clar). El total = suma del que el

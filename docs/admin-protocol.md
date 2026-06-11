@@ -190,6 +190,7 @@ Passar d'un admin amb moltes eines a un sistema operatiu comercial i d'operacion
 ## 2.1.0 Característiques exigides del repo
 - **Monocapa real**: cada valor de domini, label, acció, to, icona o regla viu en un sol lloc i la resta importa.
 - **Responsiu de debò**: tot el que es fa a web i admin ha de funcionar bé a desktop i mòbil.
+- **Admin sense maquetació a píxel local**: cap pantalla admin nova o modificada pot fixar layouts amb `px` locals per amplades, alçades, columnes, breakpoints, `gap`, `padding` o `flex-basis`. Cal usar tokens del sistema, unitats relatives (`rem`, `ch`, `%`, `fr`, `dvh/dvw`) i funcions responsives (`clamp()`, `min()`, `max()`, `minmax()`). Excepcions: hairlines `1px`, SVG/canvas, previews/captures tècniques i definició centralitzada de tokens a Studio.
 - **0 hardcoded visible** quan el text sigui compartit, traduïble o semàntic.
 - **0 mojibake**: cap text corrupte, cap charset trencat, cap nom intern visible a UI.
 - **TypeScript en verd** al perímetre tocat com a mínim.
@@ -1381,6 +1382,27 @@ Seqüència obligatòria de registre:
 - `user` — decisions manuals o interventions directes
 
 ## Entrades
+
+---
+
+### Canvi #922 — 2026-06-11 — codex (FET)
+
+**Pantalla negra de la fitxa del lead: tipografia, contacte al header, net del bolo protagonista i layout responsiu sense maquetació nova a píxel.**
+
+- Perímetre: `/admin/leads/cmpwudznj00g3vigky4altclu`, fitxa comercial del lead i CSS associat. No toca Cuadrant/Repartiment, CrewBlock, schema ni serveis operatius.
+- `app/fonts.ts` + `app/layout.tsx` + `app/studio/orbita-tokens.css`: incorporats tokens tipogràfics de pantalla negra. Manrope = cos de la fitxa, Bricolage Grotesque = títols, JetBrains Mono = dades numèriques/refs; el canvi és monocapa i scopat des de `.fxd__fullpage`.
+- `LeadDetailClient.tsx`: el contacte puja al costat del nom (telèfon, email, WhatsApp, Correu), les stats queden compactes i el `Net del bolo` es mostra al hero. `LeadBoloSection` eleva l'economia via callback tipat `BoloEconomia`.
+- `leads-design.css`: labels de Dades/Rendibilitat en Manrope, mono reservada per valors on ajuda; configurador encastat compactat amb unitats relatives (`rem`, `%`, `fr`, `dvh`, `clamp`, `minmax`) i sense inline styles nous al perímetre.
+- Norma nova escrita a `CLAUDE.md` i §2.1.0: l'admin nou/modificat no fixa layout amb `px` locals, excepte hairlines, SVG/canvas, previews tècnics i tokens centrals.
+- `docs/bolo-flux.md`: recull la regla comercial DJ confirmada (1a hora 150, extres 100, equip inclòs i tàctica tècnic so → DJ) perquè el criteri del bolo no quedi oral.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `921` a `922`.
+- Validació tècnica: `npx tsc --noEmit` OK.
+- Validació funcional: captura desktop `.codex-captures/fitxa-full.png`; captures responsive `.codex-captures/fitxa-full-mobile.png` i `.codex-captures/fitxa-full-tablet.png`.
+- Validació responsive: mobile 390 i tablet 820 sense overflow horitzontal (`scrollWidth == clientWidth`).
+- Validació humana/UX: pendent confirmació del propietari, però la pantalla ja mostra contacte al header, dades menys mecàniques i bolo dominant.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
 
 ---
 

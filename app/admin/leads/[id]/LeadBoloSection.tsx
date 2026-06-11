@@ -15,7 +15,9 @@ import { formatCurrency } from '@/lib/constants';
  * `LeadServiceLine` via /api/admin/leads/[id]/service-lines. El pack base és una
  * línia més del bolo (kind especial gestionat al configurador).
  */
-export default function LeadBoloSection({ leadId, source }: { leadId: string; source?: string | null }) {
+export interface BoloEconomia { net: number; marginPct: number; total: number; tone: 'emerald' | 'amber' | 'orange' | 'rose'; label: string; }
+
+export default function LeadBoloSection({ leadId, source, onEconomiaChange }: { leadId: string; source?: string | null; onEconomiaChange?: (e: BoloEconomia | null) => void }) {
   const toast = useToast();
   const [lines, setLines] = useState<BookingServiceLineFormInput[]>([]);
   const [packs, setPacks] = useState<BookingPack[]>([]);
@@ -103,6 +105,14 @@ export default function LeadBoloSection({ leadId, source }: { leadId: string; so
       source: source ?? null,
     }, PROFITABILITY_MODEL_DEFAULTS);
   }, [buildAllLines, source]);
+
+  // Eleva el net al contenidor (perquè visqui al hero de la fitxa, no enterrat a baix).
+  useEffect(() => {
+    if (!onEconomiaChange) return;
+    onEconomiaChange(economia
+      ? { net: economia.netMargin, marginPct: economia.marginPct, total: economia.total, tone: economia.marginTone.tone, label: economia.marginTone.label }
+      : null);
+  }, [economia, onEconomiaChange]);
 
   // Marge → nivell visual reutilitzant els tons existents (.fxd__kpi data-level).
   const netLevel = !economia

@@ -94,8 +94,14 @@
 
   --o-font: var(--font-inter), "Segoe UI", system-ui, -apple-system, sans-serif;
   --o-font-data: var(--font-inter), "Segoe UI", system-ui, -apple-system, sans-serif;
-  --o-font-mono: var(--o-font-data);
+  /* Mono REAL per a dades (imports, dates, hores, refs). Abans apuntava a Inter. */
+  --o-font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
   --o-font-display: var(--font-display), var(--font-inter), "Segoe UI", system-ui, sans-serif;
+  /* Heading "pantalla negra" (Bricolage Grotesque). Token nou: es consumeix on convingui
+     (fitxa lead i endavant), sense alterar --o-font-display de la resta de l'admin. */
+  --o-font-heading: var(--font-bricolage), var(--font-display), var(--font-inter), system-ui, sans-serif;
+  /* Cos "pantalla negra" (Manrope). Es consumeix via --ui scope a la fitxa, sense canviar Inter global. */
+  --o-font-body-admin: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
 
   /* ── Escala de font-weight canònica (§17 Lab · Tipografia) ── */
   --o-fw-normal:    400;  /* cos de text mono, metadades */
@@ -108,7 +114,8 @@
   --o-fw-black:     850;  /* display màxim, ús molt puntual */
 
   /* ── Escala tipogràfica canònica — mapa 1:1 amb Studio §17 ── */
-  /* --o-text-micro eliminat: admin-shell força cap a 12px tots els <12px */
+  /* alias restaurat: encara referenciat (p.ex. fitxa lead). admin-shell força ≥12px. */
+  --o-text-micro:  var(--o-text-2xs);
   --o-text-xs:     11px;   /* eyebrow i labels compactes */
   --o-text-2xs:    12px;   /* data/ID mono */
   --o-text-meta:   12.5px; /* focus meta mono (§17: 12.5px / 400 / 0.03em) */
