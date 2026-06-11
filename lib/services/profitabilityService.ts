@@ -7,6 +7,9 @@ export type ProfitabilityConfig = {
   packCostRatio: number;
   extraCostRatio: number;
   extraHourCostRatio: number;
+  /** Cost intern imputat als serveis propis d'Òrbita (DJ, tècnic…) sobre el seu PVP.
+   *  Opcional al tipus: en runtime sempre el proveeixen els defaults i `normalizeProfitabilityConfig`. */
+  orbitaServiceCostRatio?: number;
   fixedOperationalCost: number;
   channelCac: Record<string, number>;
 };
@@ -61,6 +64,7 @@ export function normalizeProfitabilityConfig(rawInput: unknown): ProfitabilityCo
     packCostRatio: clampRatio(raw.packCostRatio, DEFAULT_CONFIG.packCostRatio),
     extraCostRatio: clampRatio(raw.extraCostRatio, DEFAULT_CONFIG.extraCostRatio),
     extraHourCostRatio: clampRatio(raw.extraHourCostRatio, DEFAULT_CONFIG.extraHourCostRatio),
+    orbitaServiceCostRatio: clampRatio(raw.orbitaServiceCostRatio, PROFITABILITY_MODEL_DEFAULTS.orbitaServiceCostRatio),
     fixedOperationalCost: parseNumber(raw.fixedOperationalCost, DEFAULT_CONFIG.fixedOperationalCost),
     channelCac,
   };

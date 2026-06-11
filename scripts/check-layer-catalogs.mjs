@@ -54,6 +54,11 @@ const allowedCatalogs = new Set([
   'lib/services/customerActivityService.ts::EMAIL_ACTIVITY_ACTIONS',
   // Inline composer quick-templates for SafataClient — 3 presentational presets (primer-contacte, seguiment, lliure) used only inside this component, not a shared domain catalog (Canvi #804).
   'app/admin/inbox/SafataClient.tsx::TPLS',
+  // Cuadrant: opcions presentacionals de mida de finestra (7/14/30/90 dies), no un catàleg de domini.
+  'app/admin/cuadrant/page.tsx::WINDOWS',
+  // Subconjunts de filtre locals de LeadStatus/BookingStatus ("actius" per al cuadrant: sense LOST / sense CANCELLED), segueix el precedent EMAIL_ACTIVITY_ACTIONS.
+  'lib/services/crewScheduleService.ts::LEAD_STATUSES_ACTIVE',
+  'lib/services/crewScheduleService.ts::BOOKING_STATUSES_ACTIVE',
 ]);
 
 const suspiciousConst = /^(?:export\s+)?const\s+([A-Z0-9_]+)\s*=\s*(\[|\{|new Set\(|Object\.freeze\()/gm;

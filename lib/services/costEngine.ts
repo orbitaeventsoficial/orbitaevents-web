@@ -53,6 +53,40 @@ interface BookingFinancialSummary {
   total: number;
 }
 
+/** Línia de servei mínima per agregar ingrés/cost (bolo del lead o reserva). */
+export interface ServiceLineLike {
+  revenueAmount?: number | null;
+  costAmount?: number | null;
+  quantity?: number | null;
+  collaboratorId?: string | null;
+}
+
+// ─── Agregació de línies ──────────────────────────────────────────────────────
+
+/**
+ * Suma l'ingrés i el cost d'un conjunt de línies de servei.
+ * Font ÚNICA de la regla de cost per línia (no duplicar inline):
+ * - cost explícit si la línia en porta (partners → costAmount del catàleg) o té
+ *   `collaboratorId` (el cost es gestiona a la seva fitxa, mai imputat);
+ * - si és una línia pròpia d'Òrbita sense cost, s'imputa cost intern via
+ *   `orbitaServiceCostRatio` (el DJ/tècnic no és cost 0: temps, equip, operativa).
+ */
+export function aggregateServiceLines(
+  lines: ServiceLineLike[],
+  ownCostRatio: number = PROFITABILITY_MODEL_DEFAULTS.orbitaServiceCostRatio,
+): { revenue: number; cost: number } {
+  let revenue = 0;
+  let cost = 0;
+  for (const l of lines) {
+    const qty = l.quantity || 1;
+    const rev = (l.revenueAmount || 0) * qty;
+    revenue += rev;
+    const explicit = (l.costAmount || 0) * qty;
+    cost += explicit > 0 || l.collaboratorId ? explicit : rev * ownCostRatio;
+  }
+  return { revenue, cost };
+}
+
 // ─── Core ───────────────────────────────────────────────────────────────────
 
 /**

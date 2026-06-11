@@ -34,7 +34,9 @@ import {
   computeBookingFinancialSummary,
   computeSimpleMarginPct,
   computeCollaboratorNetMargin,
+  aggregateServiceLines,
 } from '@/lib/services/costEngine';
+import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import type { ProfitabilityConfig } from '@/lib/services/profitabilityService';
 import { DEFAULT_PROFITABILITY_CONFIG } from '@/lib/services/profitabilityService';
 
@@ -753,5 +755,52 @@ describe('costEngine', () => {
       expect(result).toHaveProperty('collaboratorPrice');
       expect(result).toHaveProperty('marginPctAfterCommission');
     });
+  });
+});
+
+describe('aggregateServiceLines', () => {
+  const ratio = PROFITABILITY_MODEL_DEFAULTS.orbitaServiceCostRatio; // 0.25
+
+  it('línia buida → 0 ingrés i 0 cost', () => {
+    expect(aggregateServiceLines([])).toEqual({ revenue: 0, cost: 0 });
+  });
+
+  it('línia pròpia d\'Òrbita sense cost → imputa cost via orbitaServiceCostRatio', () => {
+    const r = aggregateServiceLines([{ revenueAmount: 200, quantity: 1 }]);
+    expect(r.revenue).toBe(200);
+    expect(r.cost).toBe(200 * ratio); // 50
+  });
+
+  it('línia amb cost explícit → usa el cost explícit, no l\'imputat', () => {
+    const r = aggregateServiceLines([{ revenueAmount: 300, costAmount: 120, quantity: 1 }]);
+    expect(r.revenue).toBe(300);
+    expect(r.cost).toBe(120);
+  });
+
+  it('línia de partner (collaboratorId) sense costAmount → cost 0 (es gestiona a la seva fitxa)', () => {
+    const r = aggregateServiceLines([{ revenueAmount: 400, collaboratorId: 'col_1', quantity: 1 }]);
+    expect(r.revenue).toBe(400);
+    expect(r.cost).toBe(0);
+  });
+
+  it('multiplica per quantitat tant ingrés com cost', () => {
+    const r = aggregateServiceLines([{ revenueAmount: 100, costAmount: 40, quantity: 3 }]);
+    expect(r.revenue).toBe(300);
+    expect(r.cost).toBe(120);
+  });
+
+  it('barreja de línies (pròpia imputada + partner + explícita)', () => {
+    const r = aggregateServiceLines([
+      { revenueAmount: 350, quantity: 1 },                          // pròpia → 350*0.25 = 87.5
+      { revenueAmount: 400, collaboratorId: 'c', quantity: 1 },     // partner → 0
+      { revenueAmount: 200, costAmount: 80, quantity: 2 },          // explícita → 160, rev 400
+    ]);
+    expect(r.revenue).toBe(350 + 400 + 400);
+    expect(r.cost).toBeCloseTo(87.5 + 0 + 160, 5);
+  });
+
+  it('respecta un ownCostRatio personalitzat', () => {
+    const r = aggregateServiceLines([{ revenueAmount: 100, quantity: 1 }], 0.4);
+    expect(r.cost).toBe(40);
   });
 });

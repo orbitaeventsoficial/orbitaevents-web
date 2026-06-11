@@ -177,7 +177,7 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
   return (
     <div className="flex flex-col gap-4">
       {/* Navegació de pestanyes */}
-      <nav className="flex flex-wrap gap-2" aria-label="Seccions del partner">
+      <nav className="flex flex-wrap items-center gap-2" aria-label="Seccions del partner">
         {TABS.map((item) => (
           <button
             key={item.key}
@@ -189,6 +189,9 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
             {item.label}
           </button>
         ))}
+        <Link href="/admin/cuadrant" className="ap-btn px-3 py-2 text-sm ml-auto">
+          Veure al cuadrant →
+        </Link>
       </nav>
 
       {tab === 'resum' && (

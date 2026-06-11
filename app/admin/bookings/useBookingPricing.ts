@@ -6,6 +6,7 @@ import {
   OPERATOR_EXTRA_MIN_PRICE, OPERATOR_EXTRA_FACTOR,
 } from '@/lib/constants/pricing';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
+import { aggregateServiceLines } from '@/lib/services/costEngine';
 import {
   calculateBillableTravelKm,
   calculateTravelBlocks,
@@ -106,16 +107,9 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
     const extraHoursCount = explicitExtraHours > 0 ? explicitExtraHours : derivedExtraHours;
     const extraHoursPrice = extraHoursCount * packExtraHourPrice;
     const extrasPrice = Object.values(selectedExtras).reduce((sum, extra) => sum + extra.price * extra.quantity, 0);
-    const serviceLinesRevenue = serviceLines.reduce((sum, l) => sum + (l.revenueAmount || 0) * (l.quantity || 1), 0);
-    // Cost de cada línia: el cost explícit (partners porten costAmount del catàleg);
-    // les línies pròpies d'Òrbita sense cost explícit imputen cost intern via rati
-    // (el DJ no és cost 0 — temps/equip/operativa).
-    const serviceLinesCost = serviceLines.reduce((sum, l) => {
-      const qty = l.quantity || 1;
-      const explicitCost = (l.costAmount || 0) * qty;
-      if (explicitCost > 0 || l.collaboratorId) return sum + explicitCost;
-      return sum + (l.revenueAmount || 0) * qty * PROFITABILITY_MODEL_DEFAULTS.orbitaServiceCostRatio;
-    }, 0);
+    // Ingrés i cost de les línies via la font única (aggregateServiceLines):
+    // cost explícit (partners) o imputat al rati propi d'Òrbita per línies pròpies.
+    const { revenue: serviceLinesRevenue, cost: serviceLinesCost } = aggregateServiceLines(serviceLines);
     const subtotal = packPrice + extraHoursPrice + extrasPrice + travelCharge + serviceLinesRevenue;
     const discount = parseFloat(form.discount) || 0;
     const baseAfterDiscount = subtotal - discount;

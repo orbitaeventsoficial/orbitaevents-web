@@ -1230,8 +1230,7 @@ html.admin-mode .lf__root {
 
 .fxd__fullpage {
   display: flex; flex-direction: column;
-  height: 100dvh;
-  overflow: hidden;
+  min-height: 100dvh;
 }
 .fxd__fullpage .fxd__bar {
   padding: 7px 14px;
@@ -1254,6 +1253,59 @@ html.admin-mode .lf__root {
   overflow: visible;
   gap: 7px;
   padding: 10px 14px 8px;
+}
+
+/* ── Àrea de treball: info (esquerra) + bolo (dreta) en 2 columnes ──
+   Redistribució #920 perquè la fitxa càpiga a una sola pantalla. */
+.fxd__fullpage .fxd__work {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+  padding: 8px 14px;
+}
+/* Info en 2 columnes amb flux dens: els panells simples (Fase, Contacte) van
+   aparellats; els que tenen selects i text llarg (Dades, Rendibilitat) ocupen
+   tot l'ample (.fxd__panel--wide) per ser llegibles, sense deixar buits. */
+.fxd__fullpage .fxd__work > .fxd__grid {
+  grid-template-columns: 1fr 1fr;
+  grid-auto-flow: row dense;
+  padding: 0;
+  gap: 7px;
+}
+/* Columna dreta: bolo + economia apilats. */
+.fxd__boloside {
+  display: flex; flex-direction: column; gap: 7px; min-width: 0;
+}
+/* Contacte va a mitja columna (no és --wide): apila les seves dades en 1 columna
+   perquè email i etiquetes (ÚLTIM CONTACTE) no es tallin a sub-cel·les estretes. */
+.fxd__fullpage .fxd__work > .fxd__grid > .fxd__panel:not(.fxd__panel--wide) .fxd__rows--contact {
+  grid-template-columns: 1fr;
+}
+/* El bolo encastat ja té el títol del panell «El bolo»: amaga l'eyebrow intern
+   duplicat del configurador (es conserva el total). */
+.fxd__fullpage .nb__cfg-bolotitle { display: none; }
+/* Files amb select i pista llarga (Responsable intern, Bolo passat per): el select
+   ocupa tot l'ample sota l'etiqueta perquè el text de l'opció no es talli. */
+.fxd__fullpage .fxd__rows .fxd__row--long select.fxd__editinput { width: 100%; }
+/* Enllaç a la fitxa d'un pressupost/dossier des de la llista de Rendibilitat. */
+.fxd__doclink { cursor: pointer; transition: color 120ms ease; }
+.fxd__doclink:hover { color: var(--t); }
+.fxd__doclink:hover > span:first-child { text-decoration: underline; text-underline-offset: 2px; }
+/* El catàleg del bolo scrolleja internament perquè no estiri el panell. */
+.fxd__fullpage .nb__cfg-cat {
+  max-height: 300px; overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+@media (max-width: 1100px) {
+  .fxd__fullpage .fxd__work { grid-template-columns: 1fr; }
+  .fxd__fullpage .fxd__work > .fxd__grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 680px) {
+  .fxd__fullpage .fxd__work > .fxd__grid { grid-template-columns: 1fr; }
+  .fxd__fullpage .nb__cfg-cat { max-height: none; }
 }
 .fxd__fullpage .fxd__panel {
   padding: 10px 13px;

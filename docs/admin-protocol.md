@@ -1384,6 +1384,110 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #921 — 2026-06-10 — claude (FET)
+
+**Cuadrant operatiu + Repartiment de pasta (iniciativa nova, F0–F4). Vegeu `docs/cuadrant-repartiment-concept.md`.**
+
+Separa de la fitxa comercial del lead les dues vistes OPERATIVES que demanava el propietari: qui treballa quan (solapaments/disponibilitat) i qui cobra què. Zero duplicació de dades: creua les línies del bolo (`LeadServiceLine`+`BookingServiceLine` — porten `collaboratorId`/`hours`/`costAmount`) amb la data/hora de l'event.
+
+- **F0 — Servei** `lib/services/crewScheduleService.ts` (funcions pures + loaders): `deriveInterval` (start/end en minuts, hours→fi, creua mitjanit), `intervalsOverlap`, `buildCrewSchedule` (agrupa per persona = `collaboratorId` o `OWNER`; detecta solapaments per persona+dia; línies del MATEIX event NO són conflicte), `buildPayoutSummary` (caixa: col·laborador cobra `costAmount`; propietari = ingrés − pagat a tercers, amb línia explícita «Marge de revenda»). 23 tests.
+- **F1 — Cuadrant** `/admin/cuadrant` (server) + `GET /api/admin/cuadrant`: persona × dia, panell d'alertes de solapaments, badges, selector de finestra (7/14/30/90 dies). Entrada al nav (Operacions).
+- **F2 — Repartiment** `/admin/cuadrant/repartiment` + `GET /api/admin/cuadrant/repartiment`: agregació per col·laborador × mes (selector), totals (facturat / a col·laboradors / la teva part).
+- **F3 — Disponibilitat**: model `CrewBlock` (bloquejos manuals; `collaboratorId?` null=propietari) + migració `20260610200000_add_crew_blocks` (PENDENT desplegar a Railway) + `GET/POST/DELETE /api/admin/cuadrant/blocks` (via servei, no prisma a la ruta) + UI `CrewBlockManager`. Càrrega GRACEFUL: si la taula encara no existeix, retorna [] sense petar.
+- **F4 — Integració**: enllaç «Veure al cuadrant» a la capçalera del Partner Hub.
+- Diners: el repartiment és FLUX DE CAIXA real (`costAmount`), no marge; el marge/net segueix a `costEngine`. `aggregateServiceLines` ja existent.
+- `arch:layer:check`: allowlist ampliada (WINDOWS presentacional + subconjunts LEAD/BOOKING_STATUSES_ACTIVE, precedent EMAIL_ACTIVITY_ACTIONS).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 920 → 921.
+- Validació: `tsc` OK · `validate:core` OK · **suite completa 504 fitxers / 4852 tests verds** · captures `.codex-captures/cuadrant.png` + `repartiment.png`. Comprovat amb el bolo de Cristina (client 380€ → Carlos 230€ → propietari 150€ = 100€ DJ + 50€ marge revenda).
+- **PENDENT propietari**: desplegar migració `20260610200000_add_crew_blocks` a Railway (`npx prisma migrate deploy`) per activar els bloquejos de disponibilitat. La resta funciona sense.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK · suite completa 504 fitxers / 4852 tests verds (23 nous de `crewScheduleService`).
+- Validació funcional: cuadrant i repartiment comprovats en viu amb el bolo de Cristina (380€ → Carlos 230€ → propietari 150€); captures `.codex-captures/cuadrant.png` + `repartiment.png`.
+- Validació humana/UX: **pendent repassada del propietari** + desplegament de la migració.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #920 — 2026-06-10 — claude (FET)
+
+**Redistribució de la fitxa completa del lead (`/admin/leads/[id]`) — pantalla negra (layout): de pila vertical a 2 columnes per cabre a una sola pantalla.**
+
+- Problema: tot anava apilat verticalment (≈1588px @900): info (grid 6 panells) → bolo (configurador) → economia → anàlisi. Massa scroll.
+- Redistribució: nova àrea `.fxd__work` en **2 columnes** — **esquerra** = panells d'info en 2 columnes amb **flux dens** (`grid-auto-flow: dense`): els simples (Fase, Contacte) van aparellats; els que tenen selects i text llarg (**Dades del bolo**, **Rendibilitat**) reben `.fxd__panel--wide` (ocupen tot l'ample de la columna) per ser llegibles, sense buits. **dreta** = bolo (`.fxd__boloside`: configurador + «Economia del bolo» apilats). L'**Anàlisi econòmica** queda a tot l'ample a baix.
+- El **catàleg del bolo scrolleja internament** (`.fxd__fullpage .nb__cfg-cat { max-height:300px; overflow-y:auto }`) perquè la llarga llista de packs no estiri el panell. Scoped a la fitxa del lead — no afecta `/admin/bookings/new`.
+- Resultat: **1588px → 955px** (−40%); a 1080p cap d'una sola pantalla. L'scroll (#918) segueix com a xarxa per a viewports més baixos.
+- JSX (`LeadDetailClient`): embolcall `.fxd__work` al voltant de `.fxd__grid` + `<LeadBoloSection>` (l'anàlisi queda fora). `LeadBoloSection` ara retorna un contenidor `.fxd__boloside` (abans fragment) perquè bolo+economia ocupin junts la columna dreta.
+- Responsiu: `@media ≤1100px` → 1 columna (info a 2 col); `@media ≤680px` → info a 1 col + catàleg sense cap d'alçada. 0 hex/0 hardcoded nou (només layout); colors intactes.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `919` a `920`.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK · mesures Playwright (work 617 / info 467 / boloside equilibrada) · captura `.codex-captures/lead-fullpage.png`.
+- Validació funcional: 2 columnes correctes; catàleg amb scroll intern; economia i anàlisi visibles; res trencat ni estret.
+- Validació humana/UX: **pendent OK del propietari** (primer pas de la pantalla negra del bolo/fitxa lead).
+- **SEGÜENT**: seguir la pantalla negra element per element (estètica de cada peça) si el propietari valida la nova distribució.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #919 — 2026-06-10 — claude (FET)
+
+**Fulla d'economia del bolo (net per bolo) — Fase 4 de `docs/bolo-flux.md`.**
+
+- A la fitxa del lead, sota el configurador del bolo, nova secció **«Economia del bolo»** amb 3 KPIs: **Ingrés del bolo**, **Cost directe** (línies + operatiu) i **Net per bolo** (€ + % marge + to del semàfor). Es recalcula en viu a mesura que es munta el bolo. La secció **es mostra sempre** (descobribilitat); amb el bolo buit ensenya una pista «Afegeix un pack o línies al bolo per veure el net».
+- La pasta NO viu al configurador (regla de `bolo-flux.md`): cada línia porta el cost amagat i alimenta SOLA aquesta fulla. La fulla és una secció separada (`.fxd__econo`/`.fxd__kpi` ja existents), no part del configurador.
+- **Font única de marge**: els agregats passen per `computeBookingFinancialSummary` (no es calcula marge inline). Verificat: pack Bàsic 350€ → Ingrés 350€, Cost directe 133€ (88€ línies imputats al 25% + 45€ operatiu), Net 196€ (56%, «Excel·lent»).
+- **Monocapa**: la regla de cost per línia (cost explícit dels partners / collaboratorId, o imputat via `orbitaServiceCostRatio` per a línies pròpies d'Òrbita) vivia duplicada a `useBookingPricing.ts`. Extreta a `aggregateServiceLines()` a `costEngine.ts` (font única) i consumida tant per `useBookingPricing` com per `LeadBoloSection`. 7 tests nous.
+- **Fix col·lateral (test preexistent trencat)**: `normalizeProfitabilityConfig({})` no preservava `orbitaServiceCostRatio` (afegit a `PROFITABILITY_MODEL_DEFAULTS` però no al tipus `ProfitabilityConfig` ni al normalitzador). Afegit el camp (opcional al tipus per no forçar construccions literals externes) + línia al normalitzador. El test `objecte buit → defaults` torna a passar.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `918` a `919`.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK · **suite completa 503 fitxers / 4829 tests verds** (abans 1 trencat preexistent) · captura `.codex-captures/bolo-economia.png`.
+- Validació funcional: economia en viu seleccionant pack/línies; coexisteix amb la «Anàlisi econòmica» existent (vista de deal) sense xocar.
+- Validació humana/UX: **pendent repassada conjunta** (part de la fase "pantalla negra").
+- **SEGÜENT**: pantalla negra (redisseny visual element per element) del bolo + economia, ja completes funcionalment. Vegeu `docs/bolo-flux.md`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #918 — 2026-06-10 — claude (FET)
+
+**Fix bug: la fitxa completa del lead (`/admin/leads/[id]`) no podia scrollar — el bolo i l'anàlisi econòmica quedaven retallats i inabastables.**
+
+- Arrel del problema: `.fxd__fullpage` (root de la fitxa completa) era `height: 100dvh; overflow: hidden` — un dashboard d'alçada fixa pensat per a panells compactes. Quan el #914 va afegir `LeadBoloSection` (configurador alt) i l'anàlisi econòmica **com a germans per sota del `.fxd__grid`**, tot el que sobresortia dels 100dvh quedava clipat sense cap scroll possible (ni ratolí, ni teclat, ni barra). El document estava clavat a l'alçada del viewport.
+- Fix: `.fxd__fullpage` passa de `height: 100dvh; overflow: hidden` → `min-height: 100dvh` (sense override d'overflow). El contenidor creix amb el contingut i el document scrolleja de forma nativa. La `.fxd__bar` ja és `position: sticky; top: 0`, així que la capçalera es manté visible.
+- **No es toca** el calaix `.fxd__sheet` (drawer compacte), que manté el seu comportament d'alçada fixa amb scroll intern de panells.
+- 0 hardcoded: només es canvia una propietat de layout (`height`→`min-height`) i s'elimina l'`overflow:hidden`. Cap token ni color tocat.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `917` a `918`.
+- Validació tècnica: cadena de scroll verificada amb `.dbg-scroll.cjs` (Playwright) → `HTML` és el `scrollingElement`, `clientHeight 1000` < `scrollHeight 1438`, `scrollTop` assoleix 438 (fons real). Captura `.codex-captures/lead-scroll-bottom.png` (bolo + catàleg + anàlisi econòmica abastables baixant). `npx tsc --noEmit` no aplica (canvi només CSS).
+- Validació funcional: la pàgina scrolleja amb teclat/barra/roda; bolo i KPIs econòmics arribables.
+- Validació humana/UX: **pendent confirmació del propietari** (ja pot fer scroll sense el botó central del ratolí).
+- **SEGÜENT**: redisseny visual «pantalla negra» del bolo (ja estilat i ara accessible) + Fase 4 (fulla d'economia). Vegeu `docs/bolo-flux.md`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #917 — 2026-06-10 — claude (FET)
+
+**El configurador del bolo carrega el seu CSS allà on s'usi (fix visual a la fitxa del lead) + mode `embedded`.**
+
+- Arrel del problema: `app/admin/bookings/nb-design.css` només l'importava `NewBookingForm.tsx`. El configurador compartit (`BookingServiceLinesSection`) també viu a la fitxa del lead via `LeadBoloSection`, però allà el CSS no es carregava → catàleg i línies sortien com un mur de text enganxat sense estil.
+- Fix: `BookingServiceLinesSection.tsx` importa `./nb-design.css` directament (component compartit porta el seu CSS; webpack el dedupe amb el de `NewBookingForm`).
+- Nova prop `embedded?: boolean`: quan el configurador viu dins un altre panell (fitxa del lead), no renderitza el seu propi `nb__panel` + capçalera «El bolo» (eliminava el títol duplicat). `LeadBoloSection` passa `embedded`.
+- 0 hardcoded nou; només wiring de CSS + condicional de wrapper. Tokens `nb__*` ja existents.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `916` a `917`.
+- Validació tècnica: `npx tsc --noEmit` OK; captura `.codex-captures/bolo-focus.png` (abans: mur de text · després: catàleg en files netes amb preus en or).
+- Validació funcional: el configurador es renderitza estilat a la fitxa del lead igual que a nova reserva; sense títol «El bolo» duplicat.
+- Validació humana/UX: **pendent repassada visual conjunta** (part de la fase "pantalla negra").
+- **SEGÜENT**: redisseny visual «pantalla negra» element per element (començant pel bolo, ja estilat de base) + Fase 4 (fulla d'economia). Vegeu `docs/bolo-flux.md`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #916 — 2026-06-10 — claude (FET)
 
 **Generar dossier/pressupost/reserva des del bolo — Fase 3 (3 botons a la fitxa del lead).**

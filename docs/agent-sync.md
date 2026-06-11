@@ -15,6 +15,11 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-10 [ESTAT: treballant — fase "pantalla negra" (redisseny visual)]
+Últim canvi: #921
+Proper pas previst: repassada visual del propietari del Cuadrant/Repartiment + fitxa del lead; desplegar migració CrewBlock a Railway.
+Avís per l'altre agent: #921 = INICIATIVA NOVA Cuadrant operatiu + Repartiment de pasta. NOU `lib/services/crewScheduleService.ts`, pàgines `/admin/cuadrant` + `/admin/cuadrant/repartiment`, API `/api/admin/cuadrant[/repartiment|/blocks]`, model `CrewBlock` + migració `20260610200000_add_crew_blocks` (PENDENT Railway, càrrega graceful si la taula no existeix). Reusa `aggregateServiceLines` de costEngine. NO toca la fitxa comercial del lead ni costEngine. 504/4852 tests verds. · #920 = REDISTRIBUCIÓ fitxa lead `/admin/leads/[id]` a 2 columnes (`.fxd__work`: info esquerra | bolo+economia dreta; anàlisi a baix). `LeadBoloSection` ara retorna `.fxd__boloside` (no fragment). Catàleg del bolo amb scroll intern scoped a `.fxd__fullpage` (NO afecta nova reserva). 1588→955px. tsc+validate:core verds. · #919 = FASE 4 economia del bolo. NOU helper `aggregateServiceLines()` a `costEngine.ts` (font única de la regla de cost per línia) — consumit per `useBookingPricing.ts` (refactor, mateixa lògica) i `LeadBoloSection`. Fulla «Economia del bolo» a la fitxa del lead via `computeBookingFinancialSummary`. TOCAT `lib/services/profitabilityService.ts`: `orbitaServiceCostRatio` ara és camp (opcional) de `ProfitabilityConfig` + al `normalizeProfitabilityConfig` (arregla 1 test preexistent trencat). Suite completa 4829 verds. · #918 = FIX SCROLL `.fxd__fullpage` (height:100dvh→min-height). · #917 = FIX VISUAL configurador. tsc + validate:core + suite completa verds. `pnpm build` ajornat (dev viu). NO committat encara.
+
 [codex] 2026-06-08 [ESTAT: tancat]
 Últim canvi: #904
 Proper pas previst: Script Fase 6 preparat; següent front agent possible: analítica de partners o checklist/seed, sense tocar Partner Hub de Claude fins que Railway tingui la migració.

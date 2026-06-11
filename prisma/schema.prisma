@@ -1883,11 +1883,30 @@ model Collaborator {
   billedBookings Booking[] @relation("BookingBilledCollaborator")
   bookingServiceLines BookingServiceLine[]
   leadServiceLines    LeadServiceLine[]
+  crewBlocks          CrewBlock[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("collaborators")
+}
+
+// Bloqueig manual de disponibilitat per al cuadrant operatiu. L'ocupació real ja
+// deriva dels bolos (LeadServiceLine/BookingServiceLine); això són absències/bloquejos
+// que el propietari marca a mà. collaboratorId null = el propietari (Òrbita).
+model CrewBlock {
+  id             String        @id @default(cuid())
+  collaboratorId String?
+  collaborator   Collaborator? @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
+  date           DateTime // dia del bloqueig (a 00:00 UTC)
+  startTime      String? // "HH:MM" opcional (null = tot el dia)
+  endTime        String?
+  reason         String?
+  createdAt      DateTime      @default(now())
+
+  @@index([collaboratorId, date])
+  @@index([date])
+  @@map("crew_blocks")
 }
 
 // Persones dins d'un proveïdor (p.ex. Masquerade → Carlos Lucas BOSS, Jonathan mag).

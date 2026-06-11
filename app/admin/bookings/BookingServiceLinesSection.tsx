@@ -1,5 +1,6 @@
 'use client';
 
+import './nb-design.css';
 import { useEffect, useState } from 'react';
 import { ORBITA_SERVICES } from '@/lib/constants/orbita-services';
 import { CUSTOM_BOOKING_PACK_SLUG } from '@/lib/constants/pricing';
@@ -27,6 +28,8 @@ interface BookingServiceLinesSectionProps {
   onCustomPackPriceChange?: (value: string) => void;
   /** Interessos del lead (interestedExtras) com a pista informativa. */
   leadHints?: string[];
+  /** Encastat dins un altre panell (ex. fitxa del lead): sense panell ni capçalera pròpia. */
+  embedded?: boolean;
 }
 
 function packLabel(pack: BookingPack): string {
@@ -42,6 +45,7 @@ export default function BookingServiceLinesSection({
   customPackPrice = '',
   onCustomPackPriceChange,
   leadHints,
+  embedded = false,
 }: BookingServiceLinesSectionProps) {
   const packsEnabled = !!onPackSelect;
   const [partnerProducts, setPartnerProducts] = useState<PartnerProductOption[]>([]);
@@ -94,12 +98,8 @@ export default function BookingServiceLinesSection({
   const linesTotal = lines.reduce((s, l) => s + (l.revenueAmount || 0) * (l.quantity || 1), 0);
   const boloTotal = packPrice + linesTotal;
 
-  return (
-    <section className="nb__panel">
-      <div className="nb__phead">
-        <h2 className="nb__h2">El bolo</h2>
-        <span className="nb__pintro">Tria un pack base i afegeix-hi serveis des del catàleg →</span>
-      </div>
+  const body = (
+    <>
       {leadHints && leadHints.length > 0 && (
         <p className="nb__hint">El lead havia mostrat interès en: {leadHints.join(', ')}</p>
       )}
@@ -227,6 +227,18 @@ export default function BookingServiceLinesSection({
           ))}
         </aside>
       </div>
+    </>
+  );
+
+  if (embedded) return body;
+
+  return (
+    <section className="nb__panel">
+      <div className="nb__phead">
+        <h2 className="nb__h2">El bolo</h2>
+        <span className="nb__pintro">Tria un pack base i afegeix-hi serveis des del catàleg →</span>
+      </div>
+      {body}
     </section>
   );
 }

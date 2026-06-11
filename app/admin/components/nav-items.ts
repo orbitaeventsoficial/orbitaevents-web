@@ -42,6 +42,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: '🎁', label: 'Referrals', href: '/admin/clientes/referrals', description: 'Top referrers, valor generat i candidats per preguntar.' },
       { icon: '📣', label: 'Campanyes', href: '/admin/campaigns', description: 'Comunicacions massives suggerides per segment CRM (dormants, upsell, temporada).' },
       { icon: '📊', label: 'Capacitat', href: '/admin/calendario/capacity', description: 'Visió global de càrrega operativa per dia amb col·lisions i disponibilitat.' },
+      { icon: '🗓️', label: 'Cuadrant', href: '/admin/cuadrant', description: 'Qui treballa cada bolo, hores ocupades, solapaments i repartiment de pasta.' },
       { icon: '⚡', label: 'Entrada ràpida', href: '/admin/intake', description: 'Crea una nova entrada ràpidament quan reps una consulta fora del flux habitual.' },
     ],
   },

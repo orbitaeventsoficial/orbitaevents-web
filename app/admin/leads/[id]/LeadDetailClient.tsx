@@ -5,6 +5,7 @@ import { useState, useTransition, useEffect, type CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
 import { buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
 import LeadNotesPanel from './LeadNotesPanel';
 import LeadBoloSection from './LeadBoloSection';
 import BookingTotalEditor from '../../bookings/[id]/BookingTotalEditor';
@@ -425,6 +426,9 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
         </div>
       </div>
 
+      {/* Àrea de treball: info (esquerra) + bolo (dreta) en 2 columnes */}
+      <div className="fxd__work">
+
       {/* Grid de panells */}
       <div className="fxd__grid">
 
@@ -455,7 +459,7 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
         </section>
 
         {/* Col 2, Fila 1 — Dades del bolo */}
-        <section className="fxd__panel">
+        <section className="fxd__panel fxd__panel--wide">
           <div className="fxd__panelhead"><span>Dades del bolo</span></div>
           <dl className="fxd__rows fxd__rows--event">
             <div><dt>Data</dt><dd>
@@ -694,25 +698,10 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
         )}
 
         {/* Col 3, Fila 2 — Rendibilitat */}
-        <section className="fxd__panel">
+        <section className="fxd__panel fxd__panel--wide">
           <div className="fxd__panelhead"><span>Rendibilitat</span></div>
           <dl className="fxd__rows">
-            <div><dt>Pressupost</dt><dd>
-              {editField === 'budget' ? (
-                <span className="fxd__editrow">
-                  <input className="fxd__editinput" type="number" min={0} value={editValue} autoFocus style={{ width: 90 }}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} />
-                  <span className="text-[11px] text-[var(--t3)]">€</span>
-                  <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
-                  <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
-                </span>
-              ) : (
-                <button className="fxd__editval" onClick={() => startEdit('budget')}>
-                  {fields.budget ? `${fields.budget}€` : <em className="fxd__empty">Afegir →</em>}
-                </button>
-              )}
-            </dd></div>
+            {/* El pressupost (budget) ja viu als stats «Valor» — no es duplica aquí. */}
             {lead.booking && (<>
               <div><dt>Total reserva</dt><dd className="fxd__val--gold">
                 <BookingTotalEditor
@@ -746,14 +735,16 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
               <div className="col-span-full mt-1 border-t border-[var(--line)] pt-2">
                 <dt style={{ marginBottom: 4 }}>Pressupostos</dt>
                 {proposals.map((p) => (
-                  <dd key={p.id} className="flex justify-between py-0.5 text-[11px] text-[var(--t2)]">
-                    <span>{p.reference}</span>
-                    <span>
-                      <span className="mr-2 fxd__val--gold">{formatCurrency(p.total)}</span>
-                      <span className={p.status === 'SENT' ? 'fxd__status--sent' : p.status === 'ACCEPTED' ? 'fxd__status--accepted' : 'fxd__status--draft'}>
-                        {p.status === 'SENT' ? 'Enviat' : p.status === 'ACCEPTED' ? 'Acceptat' : p.status === 'DRAFT' ? 'Esborrany' : p.status}
+                  <dd key={p.id} className="py-0.5">
+                    <Link href={buildProposalHref(p.id)} className="fxd__doclink flex justify-between text-[11px] text-[var(--t2)]">
+                      <span>{p.reference}</span>
+                      <span>
+                        <span className="mr-2 fxd__val--gold">{formatCurrency(p.total)}</span>
+                        <span className={p.status === 'SENT' ? 'fxd__status--sent' : p.status === 'ACCEPTED' ? 'fxd__status--accepted' : 'fxd__status--draft'}>
+                          {p.status === 'SENT' ? 'Enviat' : p.status === 'ACCEPTED' ? 'Acceptat' : p.status === 'DRAFT' ? 'Esborrany' : p.status}
+                        </span>
                       </span>
-                    </span>
+                    </Link>
                   </dd>
                 ))}
               </div>
@@ -762,16 +753,18 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
               <div className="col-span-full mt-1 border-t border-[var(--line)] pt-2">
                 <dt style={{ marginBottom: 4 }}>Dossiers</dt>
                 {dossiers.map((d) => (
-                  <dd key={d.id} className="flex justify-between py-0.5 text-[11px] text-[var(--t2)]">
-                    <span>{d.nom}</span>
-                    <span className={d.estat === 'enviat' ? 'fxd__status--sent' : d.estat === 'acceptat' ? 'fxd__status--accepted' : 'fxd__status--draft'}>
-                      {d.estat}
-                    </span>
+                  <dd key={d.id} className="py-0.5">
+                    <a href={`/api/admin/dossiers/${d.id}/composite`} target="_blank" rel="noopener noreferrer" className="fxd__doclink flex justify-between text-[11px] text-[var(--t2)]">
+                      <span>{d.nom}</span>
+                      <span className={d.estat === 'enviat' ? 'fxd__status--sent' : d.estat === 'acceptat' ? 'fxd__status--accepted' : 'fxd__status--draft'}>
+                        {d.estat}
+                      </span>
+                    </a>
                   </dd>
                 ))}
               </div>
             )}
-            <div><dt>Responsable intern <small className="fxd__hint-inline">qui d&apos;Òrbita el porta</small></dt><dd>
+            <div className="fxd__row--long"><dt>Responsable intern <small className="fxd__hint-inline">qui d&apos;Òrbita el porta</small></dt><dd>
               <select className="fxd__editinput" value={lead.owner ?? ''} onChange={(e) => saveAssignedTo(e.target.value)} aria-label="Responsable intern del lead">
                 <option value="">— Sense assignar</option>
                 {TEAM_MEMBERS.map((m) => (
@@ -782,7 +775,7 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
                 )}
               </select>
             </dd></div>
-            <div><dt>Bolo passat per <small className="fxd__hint-inline">col·laborador que ens deriva el client</small></dt><dd>
+            <div className="fxd__row--long"><dt>Bolo passat per <small className="fxd__hint-inline">col·laborador que ens deriva el client</small></dt><dd>
               <select className="fxd__editinput" value={lead.sourceCollaboratorId ?? ''} onChange={(e) => saveSourceCollaborator(e.target.value)} aria-label="Col·laborador que ha derivat el bolo">
                 <option value="">— Ningú / client directe</option>
                 {referrers.map((c) => (
@@ -796,7 +789,9 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
       </div>
 
       {/* ── El bolo (configurador dins la fitxa del lead) ── */}
-      <LeadBoloSection leadId={lead.id} />
+      <LeadBoloSection leadId={lead.id} source={lead.channel} />
+
+      </div>{/* /fxd__work */}
 
       {/* ── Anàlisi econòmica — KPI cards (booking-lab recuperat) ── */}
       {(() => {
@@ -853,13 +848,7 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
           );
         }
 
-        kpis.push({
-          value: `${hours}h`,
-          label: 'Durada',
-          sub: 'hores facturables',
-          level: 'info',
-        });
-
+        // La durada ja es mostra als stats de capçalera — aquí només s'usa per al càlcul.
         const costResult = computeFullBookingCost({
           total,
           billableHours: hours,
