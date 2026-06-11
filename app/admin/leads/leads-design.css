@@ -1239,21 +1239,25 @@ html.admin-mode .lf__root {
   font-family: var(--ui);
 }
 
+/* Command bar més baixa (scoped a la fitxa, no afecta altres pàgines de detall) */
+.fxd__fullpage .ap-detail-bar { padding-block: 0.3rem; }
+.fxd__fullpage .ap-detail-bar-btn { min-height: 1.75rem; }
+
 /* ═══ BAND 1 · Identitat (pantalla negra) — nom+stats | NET del bolo ═══ */
 .fxd__id {
   display: grid; grid-template-columns: minmax(0, 1fr);
-  gap: 0.45rem;
-  padding: 0.65rem 0.9rem 0.7rem;
+  gap: 0.35rem;
+  padding: 0.5rem 0.9rem;
   border-bottom: 1px solid var(--line);
 }
-.fxd__id-main { min-width: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+.fxd__id-main { min-width: 0; display: flex; flex-direction: column; gap: 0.25rem; }
 .fxd__id-eyebrow {
   margin: 0; font-family: var(--ui); font-size: var(--o-text-xs); font-weight: var(--o-fw-semi);
   letter-spacing: 0; color: var(--c);
 }
 .fxd__id-titlerow { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.65rem; min-width: 0; }
 .fxd__id-name {
-  margin: 0; font-family: var(--heading); font-size: var(--o-text-xl-2); font-weight: var(--o-fw-xbold);
+  margin: 0; font-family: var(--heading); font-size: var(--o-text-xl); font-weight: var(--o-fw-xbold);
   letter-spacing: -0.03em; line-height: 1; color: var(--t);
 }
 /* Contacte ràpid al header */
@@ -1270,10 +1274,10 @@ html.admin-mode .lf__root {
 .fxd__id-contactvalue { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .fxd__btn--sm { min-height: 1.85rem; padding: 0 0.7rem; font-size: var(--o-text-xs); }
 /* Dades del bolo compactes al header (data/hora/lloc/pax editables) */
-.fxd__id-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.5rem; margin-top: 0.15rem; }
+.fxd__id-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.5rem; margin-top: 0; }
 .fxd__metachip {
   display: inline-flex; align-items: center; gap: 0.3rem; min-width: 0;
-  padding: 0.25rem 0.55rem; border: 1px solid var(--line); border-radius: var(--o-r-pill);
+  padding: 0.18rem 0.5rem; border: 1px solid var(--line); border-radius: var(--o-r-pill);
   background: color-mix(in oklab, var(--panel) 50%, transparent);
   font-family: var(--ui); font-size: var(--o-text-2xs); font-weight: var(--o-fw-semi);
   color: var(--t2); cursor: pointer; transition: border-color 120ms ease, color 120ms ease;
@@ -1282,8 +1286,8 @@ html.admin-mode .lf__root {
 .fxd__metachip-ic { font-size: var(--o-text-xs); opacity: 0.85; }
 .fxd__statchips { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.05rem; }
 .fxd__statchip {
-  display: flex; flex-direction: column; gap: 0.15rem; min-width: 0;
-  padding: 0.38rem 0.7rem; border: 1px solid var(--line); border-radius: var(--o-r-sm-2);
+  display: flex; flex-direction: column; gap: 0.1rem; min-width: 0;
+  padding: 0.28rem 0.6rem; border: 1px solid var(--line); border-radius: var(--o-r-sm-2);
   background: color-mix(in oklab, var(--panel) 60%, transparent);
 }
 .fxd__statchip-lbl {
@@ -1291,7 +1295,7 @@ html.admin-mode .lf__root {
   color: var(--t3);
 }
 .fxd__statchip-val {
-  font-family: var(--heading); font-size: var(--o-text-lg); font-weight: var(--o-fw-bold);
+  font-family: var(--heading); font-size: var(--o-text-md-2); font-weight: var(--o-fw-bold);
   letter-spacing: -0.01em; color: var(--t);
 }
 .fxd__statchip--gold .fxd__statchip-val { color: var(--gold); cursor: pointer; }
@@ -1351,18 +1355,28 @@ html.admin-mode .lf__root {
   display: grid;
   grid-template-columns:
     minmax(min(100%, 18rem), 0.72fr)
-    minmax(0, 1.72fr)
-    minmax(min(100%, 15rem), 0.58fr);
+    minmax(0, 1.72fr);
   align-items: start;
   gap: 0.55rem;
   padding: 0.45rem 0.75rem;
+}
+/* Economia + tarifa al footer (tot l'ample, en fila). */
+.fxd__fullpage .fxd__econofooter {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  align-items: start;
+  gap: 0.55rem;
+  padding: 0.4rem 0.75rem 0.5rem;
+  border-top: 1px solid var(--line);
+  margin-top: 0.15rem;
 }
 /* BAND 2 · les dades viuen en un aside estret (1 columna): el bolo és el
    protagonista ample. Cada panell apilat, llegible. */
 .fxd__fullpage .fxd__work > .fxd__grid {
   grid-template-columns: 1fr;
   padding: 0;
-  gap: 0.45rem;
+  gap: 0.35rem;
 }
 /* Columna dreta: bolo + economia apilats. */
 .fxd__boloside {
@@ -1415,14 +1429,14 @@ html.admin-mode .lf__root {
   .fxd__fullpage .nb__cfg-cat { max-height: none; }
 }
 .fxd__fullpage .fxd__panel {
-  padding: 0.58rem 0.72rem;
-  gap: 0.3rem;
+  padding: 0.45rem 0.65rem;
+  gap: 0.25rem;
 }
 .fxd__fullpage .fxd__panelhead {
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.25rem;
 }
 .fxd__fullpage .fxd__rows div {
-  padding: 0.2rem 0;
+  padding: 0.12rem 0;
 }
 .fxd__fullpage .fxd__rows--contact {
   gap: 0.45rem 0.65rem;
@@ -1450,13 +1464,6 @@ html.admin-mode .lf__root {
 
 .fxd__stage-create { margin-top: 0.5rem; }
 
-/* Rail financer: substitueix les dues franges grosses per una lectura vertical compacta. */
-.fxd__moneyrail {
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-  min-width: 0;
-}
 .fxd__moneycard {
   display: flex;
   flex-direction: column;
@@ -1530,26 +1537,40 @@ html.admin-mode .lf__root {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
 }
-.fxd__moneyrail .fxd__econo {
+/* Footer compacte: la card d'economia passa de vertical a horitzontal (KPIs en fila). */
+.fxd__econofooter .fxd__moneycard {
+  flex-direction: row; flex-wrap: wrap; align-items: center;
+  gap: 1rem; padding: 0.5rem 0.8rem;
+}
+.fxd__econofooter .fxd__moneyrows {
+  display: flex; flex-flow: row wrap; gap: 0.35rem 1.1rem;
+}
+.fxd__econofooter .fxd__moneyrows div {
+  border-top: 0; padding-block: 0.1rem;
+  flex-direction: column; align-items: flex-start; gap: 0;
+}
+.fxd__econofooter .fxd__moneyhero strong { font-size: var(--o-text-lg); }
+
+.fxd__econofooter .fxd__econo {
   margin: 0;
 }
-.fxd__moneyrail .fxd__econohead {
+.fxd__econofooter .fxd__econohead {
   padding: 0.45rem 0.65rem;
 }
-.fxd__moneyrail .fxd__kpis {
+.fxd__econofooter .fxd__kpis {
   grid-template-columns: 1fr;
 }
-.fxd__moneyrail .fxd__kpi {
+.fxd__econofooter .fxd__kpi {
   min-height: auto;
   padding: 0.6rem 0.7rem;
 }
-.fxd__moneyrail .fxd__kpi-val {
+.fxd__econofooter .fxd__kpi-val {
   font-size: var(--o-text-lg);
 }
-.fxd__moneyrail .fxd__kpi-lbl {
+.fxd__econofooter .fxd__kpi-lbl {
   margin-top: 0.3rem;
 }
-.fxd__moneyrail .fxd__kpi-sub {
+.fxd__econofooter .fxd__kpi-sub {
   margin-top: 0.15rem;
 }
 

@@ -411,6 +411,39 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
                 <a href={buildLeadWhatsAppHref(fields.phone, lead.name)} target="_blank" rel="noopener noreferrer" className="fxd__btn fxd__btn--whatsapp fxd__btn--sm">WhatsApp</a>
               )}
               <Link href={buildLeadComposeHref(lead.id, 'seguiment')} className="fxd__btn fxd__btn--mail fxd__btn--sm">Correu</Link>
+              <span className="fxd__statchip fxd__statchip--gold">
+                <span className="fxd__statchip-lbl">Valor</span>
+                {editField === 'budget' ? (
+                  <span className="fxd__editrow">
+                    <input className="fxd__editinput fxd__statchip-input" type="number" min={0} value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
+                      autoFocus />
+                    <span className="fxd__statchip-cur">€</span>
+                    <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
+                    <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
+                  </span>
+                ) : (
+                  <b className="fxd__statchip-val fxd__budget-editable" onClick={() => startEdit('budget')}>
+                    {boloEcon?.total
+                      ? formatCurrency(boloEcon.total)
+                      : fields.budget
+                        ? formatCurrency(Number(fields.budget))
+                        : (() => {
+                            const prop = proposals.find((p) => Number.isFinite(p.total) && p.total > 0)?.total;
+                            return prop ? formatCurrency(prop) : <em className="fxd__empty">Afegir</em>;
+                          })()}
+                  </b>
+                )}
+              </span>
+              <span className="fxd__statchip">
+                <span className="fxd__statchip-lbl">Durada</span>
+                <b className="fxd__statchip-val">{durationLabel(fields.eventStartTime, fields.eventEndTime)}</b>
+              </span>
+              <span className="fxd__statchip">
+                <span className="fxd__statchip-lbl">Prioritat</span>
+                <b className={`fxd__statchip-val fxd__pri--${lead.priority.toLowerCase()}`}>{PRIORITY_LABEL[lead.priority] || lead.priority}</b>
+              </span>
             </div>
             {lead.lostReason && <span className="fxd__lost">{lead.lostReason}</span>}
             {lead.wx && (
@@ -444,41 +477,6 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
                 </button>
               )
             ))}
-          </div>
-          <div className="fxd__statchips">
-            <div className="fxd__statchip fxd__statchip--gold">
-              <span className="fxd__statchip-lbl">Valor</span>
-              {editField === 'budget' ? (
-                <span className="fxd__editrow">
-                  <input className="fxd__editinput fxd__statchip-input" type="number" min={0} value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
-                    autoFocus />
-                  <span className="fxd__statchip-cur">€</span>
-                  <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
-                  <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
-                </span>
-              ) : (
-                <b className="fxd__statchip-val fxd__budget-editable" onClick={() => startEdit('budget')}>
-                  {boloEcon?.total
-                    ? formatCurrency(boloEcon.total)
-                    : fields.budget
-                      ? formatCurrency(Number(fields.budget))
-                      : (() => {
-                          const prop = proposals.find((p) => Number.isFinite(p.total) && p.total > 0)?.total;
-                          return prop ? formatCurrency(prop) : <em className="fxd__empty">Afegir</em>;
-                        })()}
-                </b>
-              )}
-            </div>
-            <div className="fxd__statchip">
-              <span className="fxd__statchip-lbl">Durada</span>
-              <b className="fxd__statchip-val">{durationLabel(fields.eventStartTime, fields.eventEndTime)}</b>
-            </div>
-            <div className="fxd__statchip">
-              <span className="fxd__statchip-lbl">Prioritat</span>
-              <b className={`fxd__statchip-val fxd__pri--${lead.priority.toLowerCase()}`}>{PRIORITY_LABEL[lead.priority] || lead.priority}</b>
-            </div>
           </div>
         </div>
       </section>
@@ -719,8 +717,10 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
 
       {/* ── El bolo (configurador dins la fitxa del lead) ── */}
       <LeadBoloSection leadId={lead.id} source={lead.channel} onEconomiaChange={handleEconomia} compactEconomia />
+      </div>{/* /fxd__work */}
 
-      <aside className="fxd__moneyrail">
+      {/* ── Economia + tarifa al footer (tot l'ample, a baix) ── */}
+      <footer className="fxd__econofooter">
         <section className="fxd__moneycard" data-tone={boloEcon ? boloEcon.tone : 'none'}>
           <div className="fxd__moneyhead">
             <span>Economia del bolo</span>
@@ -842,8 +842,7 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
         );
       })()}
 
-      </aside>
-      </div>{/* /fxd__work */}
+      </footer>{/* /fxd__econofooter */}
 
       <ConfirmDialog {...dialogProps} />
     </div>
