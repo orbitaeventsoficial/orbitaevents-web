@@ -1,3 +1,26 @@
+## 2026-06-11 — Reforma de preus: gamma unificada «des de 250€» + 100/hora (Canvi #923, claude)
+
+### Resum
+Executada la reforma de preus decidida a `docs/bolo-flux.md`. Principi: la feina és la mateixa → el preu és el mateix per a tothom (bodes/empreses/festes). Base 2h = **250€** («des de 250€» a totes les landings), +**100€/hora extra**, Complet 5h = **550€**. 2 packs per servei (eliminats luxury 650 / completo 350 / evento 350). Extres: fum baix 75, xispes 350.
+
+### Per què era segur (SEO)
+Els preus de les ~30 landings es DERIVEN de `getMinPriceByService` (no hardcoded) → canviar el config + sync BD propaga sol; el mínim de cada servei segueix sent 250 → «des de 250€» uniforme sense tocar cap landing. Meta del home actualitzat als 3 idiomes.
+
+### BD
+`i18n:packs:sync` millorat: ara propaga `extraHourPrice` i desactiva (no esborra) els packs orfes. 8 actius + 3 desactivats. Cap 404 (els packs són targetes, no URLs).
+
+### Validació
+- Validació tècnica: `tsc` OK · `i18n:packs:guard` OK · `validate:core` OK · sync OK · catàleg verificat al DOM (250/550/150/100).
+- Validació funcional: configurador del bolo amb preus nous; gamma de 2 packs/servei.
+- Validació humana/UX: pendent repassada propietari (web /packs + landings amb `pnpm build`).
+
+### PENDENT propietari
+- `pnpm build` per regenerar landings estàtiques amb «des de 250€».
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-11 — Pantalla negra fitxa lead: tipografia, contacte i bolo responsiu (Canvi #922, codex)
 
 ### Resum

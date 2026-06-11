@@ -48,7 +48,13 @@
 - Al Lead, el grup "Packs base excloent" actiu o només al Booking? El component ja ho fa opcional.
 
 ---
-## PENDENT — Unificació de packs (decisió de negoci NO presa encara)
+## ✅ EXECUTADA (Canvi #923, 2026-06-11) — Reforma de preus unificada
+Aplicada: base 2h **250€** + **100€/hora extra** per a tots els serveis. 2 packs/servei
+(Bàsic 250 · Complet 5h 550). Eliminats luxury/completo/evento. Extres: fum baix 75, xispes 350.
+Preus derivats (SEO segur) → «des de 250€» a totes les landings sense tocar-les. BD sincronitzada
+(`PACK_EXTRA_HOUR_PRICE=100` a `packs-config.ts`). PENDENT: `pnpm build` per a les landings estàtiques.
+
+## PENDENT — Unificació de packs (HISTÒRIC — vegeu reforma executada a dalt)
 
 El propietari vol simplificar els packs (idea: potser només 2 — **Bàsic** i **Complet** —
 amb preus unificats per HORES, no per tipus d'event; un bolo no és més car "per ser boda").

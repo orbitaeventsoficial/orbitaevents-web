@@ -63,7 +63,9 @@ async function main() {
               price: pack.priceValue,
               originalPrice: pack.priceOriginalValue || null,
               djHours: pack.durationHours || 4,
+              extraHourPrice: pack.extraHourPrice ?? 100,
               isFeatured: pack.popular || false,
+              isActive: true, // reactiva si tornava a estar al config
               order: configPacks.indexOf(pack),
               minGuests: pack.capacidadMinima ?? null,
               maxGuests: pack.capacidadMaxima ?? null,
@@ -111,6 +113,7 @@ async function main() {
               price: pack.priceValue,
               originalPrice: pack.priceOriginalValue || null,
               djHours: pack.durationHours || 4,
+              extraHourPrice: pack.extraHourPrice ?? 100,
               isActive: true,
               isFeatured: pack.popular || false,
               order: configPacks.indexOf(pack),
@@ -142,6 +145,17 @@ async function main() {
         console.error(`${colors.red}✗${colors.reset} Error con pack ${pack.slug}:`, err);
         errors++;
       }
+    }
+
+    // Desactivar packs que ja NO són al config (eliminats de la gamma). No s'esborren
+    // (poden tenir reserves/pressupostos històrics), només deixen de sortir al catàleg.
+    const configSlugs = configPacks.map((p) => p.slug);
+    const orphaned = await prisma.pack.updateMany({
+      where: { slug: { notIn: configSlugs }, isActive: true },
+      data: { isActive: false },
+    });
+    if (orphaned.count > 0) {
+      console.log(`${colors.yellow}⊘${colors.reset} Packs desactivats (fora de la gamma): ${orphaned.count}`);
     }
 
     console.log(`\n${colors.cyan}═══════════════════════════════════════════════════${colors.reset}`);

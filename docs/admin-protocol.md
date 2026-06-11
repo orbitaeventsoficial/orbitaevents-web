@@ -1385,6 +1385,27 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #923 — 2026-06-11 — claude (FET)
+
+**Reforma de preus: gamma unificada «des de 250€» (2h) + 100€/hora extra per a tots els serveis. 2 packs per servei.**
+
+Principi de negoci (propietari): la feina és la mateixa → el preu és el mateix. Bodes, empreses i festes paguen igual pel mateix servei; el preu depèn d'HORES, no del tipus d'event.
+
+- **`app/config/packs-config.ts`** (font de veritat): regla DJ 1a hora 150 + **`PACK_EXTRA_HOUR_PRICE = 100`**. Cada servei queda amb **2 packs**: Bàsic 2h **250€** · Complet 5h **550€** (250 + 3×100). Eliminats del config els 3 packs intermedis/top (bodas-luxury 650, disco-completo 350, empresas-evento 350). `extraHourPrice: 100` a tots els packs. Animació (bingo/batalla) intacta.
+- **Extres actualitzats**: fum baix 150→**75**, xispes fredes 150→**350** (2 màquines, lloguer Tino). Pont de llums 120 i bombolles 50 ja correctes.
+- **SEO segur**: els preus de les ~30 landings es DERIVEN de `getMinPriceByService` (no hardcoded) → mínim de cada servei = **250** → totes diuen «des de 250€» sense tocar cap landing. Meta del home (ca/es/en) actualitzat (treta la forquilla vella 350–1.000€).
+- **BD sincronitzada**: `i18n:packs:sync` millorat → ara també propaga `extraHourPrice` i **desactiva (isActive=false, no esborra)** els packs orfes fora de la gamma. 8 packs actius + 3 desactivats. Cap 404 (els packs no tenen URL pròpia).
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 922 → 923.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run i18n:packs:guard` OK (11 packs/3 idiomes) · `pnpm run validate:core` OK · sync BD OK · catàleg del bolo verificat (Bàsic 250 · Premium/Complet 550 · DJ 1a 150 · extra 100).
+- Validació funcional: catàleg del configurador del bolo mostra els preus nous; gamma de 2 packs per servei.
+- Validació humana/UX: **pendent repassada del propietari** (web pública /packs i landings amb `pnpm build`).
+- **PENDENT propietari**: aplicar el sync a producció/Railway si la BD de prod és diferent; `pnpm build` per regenerar les landings estàtiques amb el «des de 250€».
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #922 — 2026-06-11 — codex (FET)
 
 **Pantalla negra de la fitxa del lead: tipografia, contacte al header, net del bolo protagonista i layout responsiu sense maquetació nova a píxel.**
