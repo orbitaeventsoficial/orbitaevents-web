@@ -732,10 +732,10 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
             <small>{boloEcon ? `${Math.round(boloEcon.marginPct)}% · ${boloEcon.label}` : 'munta el bolo per veure el net'}</small>
           </div>
           <dl className="fxd__moneyrows">
-            <div><dt>Ingrés</dt><dd>{boloEcon ? formatCurrency(boloEcon.total) : '—'}</dd></div>
+            <div><dt>Ingrés (client)</dt><dd>{boloEcon ? formatCurrency(boloEcon.total) : '—'}</dd></div>
             <div><dt>Cost directe</dt><dd>{boloEcon ? formatCurrency(boloEcon.directCost) : '—'}</dd></div>
-            <div><dt>Línies</dt><dd>{boloEcon ? formatCurrency(boloEcon.serviceLinesCost) : '—'}</dd></div>
-            <div><dt>Operatiu</dt><dd>{boloEcon ? formatCurrency(boloEcon.fixedOperationalCost) : '—'}</dd></div>
+            <div className="fxd__moneyrow--sub"><dt>· Serveis (proveïdors + DJ)</dt><dd>{boloEcon ? formatCurrency(boloEcon.serviceLinesCost) : '—'}</dd></div>
+            <div className="fxd__moneyrow--sub"><dt>· Operativa (desplaçament, equip)</dt><dd>{boloEcon ? formatCurrency(boloEcon.fixedOperationalCost) : '—'}</dd></div>
           </dl>
         </section>
 

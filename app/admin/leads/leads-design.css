@@ -1518,12 +1518,17 @@ html.admin-mode .lf__root {
   color: var(--t3);
   font-size: var(--o-text-xs);
 }
+/* Sub-files: desglossament del Cost directe (indentat, tènue) */
+.fxd__moneyrow--sub dt { padding-left: 0.5rem; color: var(--t4, var(--t3)); opacity: 0.85; }
+.fxd__moneyrow--sub dd { font-weight: var(--o-fw-semi); color: var(--t2); }
 .fxd__moneyrows dd {
   margin: 0;
   color: var(--t);
-  font-family: var(--mono);
-  font-size: var(--o-text-xs);
-  font-weight: var(--o-fw-semi);
+  font-family: var(--ui);
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-bold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }
 .fxd__moneyrail .fxd__econo {
   margin: 0;

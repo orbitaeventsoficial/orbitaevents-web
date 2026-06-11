@@ -1385,6 +1385,26 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #924 — 2026-06-11 — claude (FET)
+
+**Veritat absoluta del preu (font única) + configurador del bolo sense packs (1a hora 150 obligatòria + extres).**
+
+Resol la pregunta del propietari «qui té la veritat absoluta?»: abans el 100€ vivia a 2 llocs i els 250/550 estaven escrits a mà → podien divergir. Ara un sol amo.
+
+- **`lib/constants/orbita-services.ts`** = **VERITAT ABSOLUTA**: `DJ_FIRST_HOUR_PRICE = 150`, `DJ_EXTRA_HOUR_PRICE = 100` + helper `djPriceForHours(h) = 150 + (h−1)×100`. `ORBITA_SERVICES` deriva els seus preus d'aquestes constants (cap número repetit).
+- **`app/config/packs-config.ts`**: `PACK_EXTRA_HOUR_PRICE = DJ_EXTRA_HOUR_PRICE` (ja no és una còpia). Els packs de serveis DJ (bodas/discomovil/empresas/fiestas) **deriven** `priceValue`/`price` de `djPriceForHours(durationHours)` via post-procés de `RAW_PACKS`→`PACKS`. L'animació (Masquerade) manté preu propi. Verificat: 2h→250, 5h→550, mínim de tots = 250 («des de 250€»). Canviar la regla a un sol lloc actualitza serveis + packs + web + BD.
+- **Configurador del bolo (admin)**: `LeadBoloSection` deixa de passar `packs`/`onPackSelect` → el catàleg del bolo ja **no mostra la secció de packs** (només «Complements d'Òrbita» + «Serveis de Masquerade»). El bolo es munta amb serveis. NO afecta la web pública (component separat).
+- **Regla DJ al configurador** (`BookingServiceLinesSection.addOrbitaService`): la **1a hora (150) sempre és obligatòria**; afegir una hora addicional (100) sense la 1a afegeix les dues. No es pot tenir una hora extra sola. Detecció robusta via `kind:'DJ'`+`unit` (no ids hardcoded).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 923 → 924.
+- Validació tècnica: `tsc` OK · `validate:core` OK · sync BD OK (8 packs) · preus derivats verificats per script.
+- Validació funcional: catàleg del bolo amb 2 grups (sense packs); preus de packs derivats de la regla.
+- Validació humana/UX: **pendent repassada del propietari**.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #923 — 2026-06-11 — claude (FET)
 
 **Reforma de preus: gamma unificada «des de 250€» (2h) + 100€/hora extra per a tots els serveis. 2 packs per servei.**

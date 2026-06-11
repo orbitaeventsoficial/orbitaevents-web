@@ -1,3 +1,21 @@
+## 2026-06-11 — Veritat absoluta del preu + bolo sense packs (Canvi #924, claude)
+
+### Resum
+Resposta a «qui té la veritat absoluta dels preus?». Abans: el 100€ a 2 fitxers, els 250/550 escrits a mà → divergència possible. Ara FONT ÚNICA a `lib/constants/orbita-services.ts`: `DJ_FIRST_HOUR_PRICE=150`, `DJ_EXTRA_HOUR_PRICE=100`, `djPriceForHours(h)`. `packs-config.ts` deriva els preus dels packs DJ d'aquesta regla (no els escriu); l'animació manté preu propi. Canviar la regla a un sol lloc → tot (serveis + packs + web + BD).
+
+### Configurador del bolo (admin)
+- Sense secció de packs (`LeadBoloSection` ja no passa packs). Es munta amb serveis. NO toca la web pública.
+- Regla DJ: la 1a hora (150) sempre obligatòria; afegir hora extra (100) sense la 1a afegeix les dues. No es pot tenir extra sola.
+
+### Validació
+- Validació tècnica: `tsc` OK · `validate:core` OK · sync BD OK · preus derivats verificats (2h→250, 5h→550, mins=250).
+- Validació funcional: catàleg del bolo amb 2 grups, sense packs.
+- Validació humana/UX: pendent repassada propietari.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-11 — Reforma de preus: gamma unificada «des de 250€» + 100/hora (Canvi #923, claude)
 
 ### Resum

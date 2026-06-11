@@ -65,7 +65,22 @@ export default function BookingServiceLinesSection({
   const addOrbitaService = (id: string) => {
     const svc = ORBITA_SERVICES.find((s) => s.id === id);
     if (!svc) return;
-    onChange([...lines, { kind: svc.kind, label: svc.label, revenueAmount: svc.defaultPrice, quantity: 1 }]);
+    const newLine = { kind: svc.kind, label: svc.label, revenueAmount: svc.defaultPrice, quantity: 1 };
+    // Regla DJ: la 1a hora (150€) sempre és obligatòria abans d'una hora addicional (100€).
+    // No es pot afegir una hora extra sola. Si encara no hi ha 1a hora, s'afegeixen les dues.
+    const isDjExtra = svc.kind === 'DJ' && svc.unit === 'hour';
+    if (isDjExtra) {
+      const firstHour = ORBITA_SERVICES.find((s) => s.kind === 'DJ' && s.unit === 'unit');
+      const hasFirstHour = firstHour && lines.some((l) => l.label === firstHour.label);
+      if (firstHour && !hasFirstHour) {
+        onChange([...lines,
+          { kind: firstHour.kind, label: firstHour.label, revenueAmount: firstHour.defaultPrice, quantity: 1 },
+          newLine,
+        ]);
+        return;
+      }
+    }
+    onChange([...lines, newLine]);
   };
 
   const addPartnerProduct = (id: string) => {

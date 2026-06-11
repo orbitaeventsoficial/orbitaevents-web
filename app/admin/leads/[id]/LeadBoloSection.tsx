@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import BookingServiceLinesSection from '@/app/admin/bookings/BookingServiceLinesSection';
-import type { BookingServiceLineFormInput, BookingPack } from '@/app/admin/bookings/booking-form.types';
+import type { BookingServiceLineFormInput } from '@/app/admin/bookings/booking-form.types';
 import { computeBookingFinancialSummary, aggregateServiceLines } from '@/lib/services/costEngine';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { formatCurrency } from '@/lib/constants';
@@ -39,9 +39,6 @@ export default function LeadBoloSection({
 }) {
   const toast = useToast();
   const [lines, setLines] = useState<BookingServiceLineFormInput[]>([]);
-  const [packs, setPacks] = useState<BookingPack[]>([]);
-  const [selectedPackId, setSelectedPackId] = useState('');
-  const [customPackPrice, setCustomPackPrice] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -50,10 +47,7 @@ export default function LeadBoloSection({
     let alive = true;
     (async () => {
       try {
-        const [linesRes, packsRes] = await Promise.all([
-          fetchWithCsrf(`/api/admin/leads/${leadId}/service-lines`),
-          fetchWithCsrf('/api/admin/packs'),
-        ]);
+        const linesRes = await fetchWithCsrf(`/api/admin/leads/${leadId}/service-lines`);
         if (!alive) return;
         if (linesRes.ok) {
           const d = await linesRes.json();
@@ -71,11 +65,6 @@ export default function LeadBoloSection({
           }));
           setLines(loaded);
         }
-        if (packsRes.ok) {
-          const p = await packsRes.json();
-          const packList = (p.packs || p.data || []) as BookingPack[];
-          setPacks(packList.filter((x) => x.translations?.length));
-        }
       } catch (e) {
         console.error('[LeadBolo] càrrega', e);
       } finally {
@@ -89,24 +78,9 @@ export default function LeadBoloSection({
     setLines(next);
     setDirty(true);
   }, []);
-  const onPackSelect = useCallback((packId: string) => {
-    setSelectedPackId(packId);
-    setCustomPackPrice('');
-    setDirty(true);
-  }, []);
 
-  // El pack triat es desa com una línia més del bolo (kind OTHER, label del pack).
-  const buildAllLines = useCallback((): BookingServiceLineFormInput[] => {
-    const pack = packs.find((p) => p.id === selectedPackId);
-    if (!pack) return lines;
-    const packLine: BookingServiceLineFormInput = {
-      kind: 'OTHER',
-      label: `Pack: ${pack.translations?.[0]?.name || pack.slug}`,
-      revenueAmount: customPackPrice ? Number(customPackPrice) : pack.price,
-      quantity: 1,
-    };
-    return [packLine, ...lines];
-  }, [packs, selectedPackId, customPackPrice, lines]);
+  // El bolo es munta amb serveis (DJ 1a hora 150 + extres), sense pack base.
+  const buildAllLines = useCallback((): BookingServiceLineFormInput[] => lines, [lines]);
 
   // Fulla d'economia del bolo (Fase 4 de docs/bolo-flux.md). La pasta NO viu al
   // configurador: cada línia porta el cost amagat i alimenta SOLA aquesta fulla.
@@ -210,11 +184,6 @@ export default function LeadBoloSection({
           embedded
           lines={lines}
           onChange={onLinesChange}
-          packs={packs}
-          selectedPackId={selectedPackId}
-          onPackSelect={onPackSelect}
-          customPackPrice={customPackPrice}
-          onCustomPackPriceChange={(v) => { setCustomPackPrice(v); setDirty(true); }}
         />
 
         <div className="fxd__bolo-actions">

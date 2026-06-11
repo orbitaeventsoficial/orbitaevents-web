@@ -10,6 +10,8 @@
  * Aquest fitxer serveix de fallback robust.
  */
 
+import { DJ_EXTRA_HOUR_PRICE, djPriceForHours } from '@/lib/constants/orbita-services';
+
 // ============================================
 // 1. INVENTARI REAL D'EQUIPAMENT
 // ============================================
@@ -168,12 +170,14 @@ export interface ExtraDefinition {
 // ============================================
 
 // Regla de preu unificada (propietari 2026-06-11): MATEIX preu per a tothom (bodes,
-// empreses, festes...). La feina és la mateixa → el preu és el mateix. DJ 1a hora 150,
-// cada hora extra +100. Pack base públic = 2h = 250€ («des de 250€» a totes les landings).
-// Complet = 5h = 250 + 3×100 = 550€. Tot es construeix amb hores + extres.
-export const PACK_EXTRA_HOUR_PRICE = 100;
+// empreses, festes...). La VERITAT ABSOLUTA viu a lib/constants/orbita-services.ts
+// (DJ 1a hora 150 + 100/hora). Aquí NO es repeteixen números: el preu base es DERIVA.
+export const PACK_EXTRA_HOUR_PRICE = DJ_EXTRA_HOUR_PRICE;
 
-const PACKS: PackDefinition[] = [
+// Serveis amb preu derivat de la regla DJ (per hores). L'animació té preu propi (Masquerade).
+const DJ_PRICED_SERVICES: ServiceSlug[] = ['bodas', 'discomovil', 'empresas', 'fiestas'];
+
+const RAW_PACKS: PackDefinition[] = [
   // ── BODES ─────────────────────────────────────────
   {
     id: "bodas-basico",
@@ -377,6 +381,14 @@ const PACKS: PackDefinition[] = [
   },
 
 ];
+
+// Els packs de serveis DJ DERIVEN el preu de la regla canònica (djPriceForHours):
+// el valor numèric viu a un sol lloc. L'animació (Masquerade) manté el seu preu propi.
+const PACKS: PackDefinition[] = RAW_PACKS.map((p) => {
+  if (!DJ_PRICED_SERVICES.includes(p.service)) return p;
+  const derived = djPriceForHours(p.durationHours);
+  return { ...p, priceValue: derived, price: `${derived}€` };
+});
 
 // ============================================
 // 5. EXTRAS — NOMÉS EL QUE TENIM
