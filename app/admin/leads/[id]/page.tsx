@@ -5,7 +5,6 @@ import LeadDetailClient from './LeadDetailClient';
 import LeadActionsEnhanced from './LeadActionsEnhanced';
 import LeadProfileEditor from './LeadProfileEditor';
 import LeadWorkspace from './LeadWorkspace';
-import LeadNotesPanel from './LeadNotesPanel';
 import LeadGuidedFlow from './LeadGuidedFlow';
 import { scoreLead } from '@/lib/services/commercialScoring';
 import { computeLeadInsights } from '@/lib/services/leadInsightsService';
@@ -337,7 +336,6 @@ export default async function LeadDetailPage({ params }: Props) {
 
   return (
       <LeadDetailClient
-        notes={lead.notes.map((n) => ({ id: n.id, content: n.content, createdBy: n.createdBy, createdAt: n.createdAt.toISOString() }))}
         proposals={lead.proposals.map((p) => ({ id: p.id, reference: p.reference, status: p.status, total: Number(p.total), createdAt: p.createdAt.toISOString() }))}
         dossiers={lead.dossiers.map((d) => ({ id: d.id, nom: d.nom, estat: d.sentAt ? 'enviat' : 'esborrany', createdAt: d.createdAt.toISOString() }))}
         lead={{
@@ -407,7 +405,6 @@ export default async function LeadDetailPage({ params }: Props) {
       }} />
   );
 }
-
 
 
 

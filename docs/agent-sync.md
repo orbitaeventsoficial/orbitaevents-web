@@ -15,7 +15,12 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
-[claude] 2026-06-10 [ESTAT: treballant — fase "pantalla negra" (redisseny visual)]
+[claude] 2026-06-11 [ESTAT: tancat — relleu del handoff #925 de codex (fitxa lead zenit)]
+Últim canvi: #925 (obert per codex, tancat per claude). Counter es manté a #925.
+Proper pas previst: esperant repassada visual del propietari de la fitxa zenit. Següent front accionable segons §6 quan el propietari validi.
+Avís per l'altre agent: #925 TANCAT. Únic canvi de codi del relleu: `leads-design.css` — reanomenat `.fxd__bolo-economyfooter` → `.fxd__zenith-footer` (el footer de marge sortia sense estil perquè el JSX ja usava la classe nova) + adaptació a footer de pàgina + breakpoint mòbil. `LeadDetailClient.tsx`/`LeadBoloSection.tsx`/`BookingServiceLinesSection.tsx` ja estaven correctes (rail dret sense economia duplicada, proveïdors data-driven de `CollaboratorProduct`). tsc + validate:core + qa:protocol verds; captures `.codex-captures/lead-zenit-footer-{desktop,tablet,mobile}.png` sense overflow.
+
+[claude] 2026-06-10 [ESTAT: tancat — fase "pantalla negra" (redisseny visual)]
 Últim canvi: #921
 Proper pas previst: repassada visual del propietari del Cuadrant/Repartiment + fitxa del lead; desplegar migració CrewBlock a Railway.
 Avís per l'altre agent: #921 = INICIATIVA NOVA Cuadrant operatiu + Repartiment de pasta. NOU `lib/services/crewScheduleService.ts`, pàgines `/admin/cuadrant` + `/admin/cuadrant/repartiment`, API `/api/admin/cuadrant[/repartiment|/blocks]`, model `CrewBlock` + migració `20260610200000_add_crew_blocks` (PENDENT Railway, càrrega graceful si la taula no existeix). Reusa `aggregateServiceLines` de costEngine. NO toca la fitxa comercial del lead ni costEngine. 504/4852 tests verds. · #920 = REDISTRIBUCIÓ fitxa lead `/admin/leads/[id]` a 2 columnes (`.fxd__work`: info esquerra | bolo+economia dreta; anàlisi a baix). `LeadBoloSection` ara retorna `.fxd__boloside` (no fragment). Catàleg del bolo amb scroll intern scoped a `.fxd__fullpage` (NO afecta nova reserva). 1588→955px. tsc+validate:core verds. · #919 = FASE 4 economia del bolo. NOU helper `aggregateServiceLines()` a `costEngine.ts` (font única de la regla de cost per línia) — consumit per `useBookingPricing.ts` (refactor, mateixa lògica) i `LeadBoloSection`. Fulla «Economia del bolo» a la fitxa del lead via `computeBookingFinancialSummary`. TOCAT `lib/services/profitabilityService.ts`: `orbitaServiceCostRatio` ara és camp (opcional) de `ProfitabilityConfig` + al `normalizeProfitabilityConfig` (arregla 1 test preexistent trencat). Suite completa 4829 verds. · #918 = FIX SCROLL `.fxd__fullpage` (height:100dvh→min-height). · #917 = FIX VISUAL configurador. tsc + validate:core + suite completa verds. `pnpm build` ajornat (dev viu). NO committat encara.
@@ -186,10 +191,10 @@ Avís per codex: #826 (ingesta 🤝 + hora fi). #827 (animació: nova categoria 
 ## Bloc CODEX (Codex CLI)
 
 <!-- codex: actualitza aquest bloc quan comencis/acabis una sessió -->
-[codex] 2026-06-11 [ESTAT: treballant]
-Últim canvi: #922.
-Proper pas previst: refer des de zero el visual de `/admin/leads/cmpwudznj00g3vigky4altclu`, amb captures inicials, detecció de duplicats i objectiu de cabre en una sola pàgina desktop.
-Avís per l'altre agent: entro només a composició visual/mides/ordre de la fitxa comercial del lead i CSS associat. No tocaré lògica, schema, Cuadrant/Repartiment, CrewBlock ni serveis operatius.
+[codex] 2026-06-11 [ESTAT: esperant relleu Claude]
+Últim canvi: #925.
+Proper pas previst: Claude ha d'acabar la passada #925 a `/admin/leads/cmpwudznj00g3vigky4altclu` seguint el handoff del protocol: footer llarg de marge fora d'`El bolo`, sense economia/tarifa duplicada al rail dret, configurador amb serveis propis/extres i proveïdors externs activables per dades.
+Avís per l'altre agent: #925 està OBERT/pendent de relleu. Canvis ja fets: composició `fxd__zenith`, retirada de `LeadNotesPanel` de la fitxa i eliminació del fitxer, `LeadBoloSection` passa `acquisitionCost`. Pendent crític: revisar que `LeadDetailClient.tsx` compila després del moviment del footer, adaptar `.fxd__zenith-footer` a `leads-design.css`, eliminar residus de "Economia del bolo" compacta i "Tarifa per hora", i refer `BookingServiceLinesSection` perquè Masquerade/Tino/altres proveïdors surtin de `CollaboratorProduct` i només apareguin quan s'activen. No hardcodejar Tino ni Masquerade al component; si cal seed, llegir `docs/bolo-flux.md` i fer-lo idempotent. Validació final: `npx tsc --noEmit --pretty false`, `pnpm run qa:protocol`, `git diff --check`, captura autenticada de la ruta real sense overflow.
 
 [codex] 2026-06-07 [ESTAT: tancat]
 Últim canvi: #898 — agenda multi-bolo, total manual exacte, relació comercial DJ/tècnic i base escalable de Partners amb rols i `sourceCollaboratorId`.

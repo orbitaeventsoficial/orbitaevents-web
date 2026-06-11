@@ -743,6 +743,7 @@ Criteri pràctic:
 
 ## 6.6 Leads / Pipeline comercial
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
+**EN MARXA** *(2026-06-11 per `codex` → relleu `claude` — Canvi #925)*: fitxa tècnica `/admin/leads/cmpwudznj00g3vigky4altclu` en reconstrucció zenit. Ruta exacta de tancament: footer llarg "Marge del bolo" fora d'`El bolo`; cap panell de notes/context antic; cap targeta compacta "Economia del bolo" ni "Tarifa per hora" duplicada al rail dret; configurador amb serveis propis/extres i proveïdors externs activables des de `CollaboratorProduct` (`Masquerade`, `Tino`, altres) sense hardcode; captura autenticada nova sense overflow i amb tipografia llegible.
 **FET**: LeadWorkspace reforçat. Timeline del lead coherent. Tasques en model canònic.
 **FET**: conversió del workspace en cabina comercial real consolidada. El pendent viu ja no és la cabina comercial base sinó la seva integració conceptual amb Customer Hub dins un flux únic.
 **FET** *(2026-04-09 per `claude` — Canvi #17)*: `leadInsightsService.ts` — next action, loss risk, commercial context. Integrat a lead detail page.
@@ -1382,6 +1383,30 @@ Seqüència obligatòria de registre:
 - `user` — decisions manuals o interventions directes
 
 ## Entrades
+
+---
+
+### Canvi #925 — 2026-06-11 — codex (EN MARXA · relleu Claude pendent)
+
+**La fitxa comercial del lead es reconstrueix en una sola pantalla: govern · bolo · economia, amb header airejat i ample aprofitat.**
+
+- Context: el propietari demana buidar la pàgina i tornar-la a construir fins al zenit, no només fer-la més fosca. El tall és UI i queda acotat a `/admin/leads/[id]`: no toca lògica de preus #923/#924, schema, Cuadrant/Repartiment, CrewBlock ni serveis operatius.
+- `app/admin/leads/[id]/LeadDetailClient.tsx`: es retira l'estructura anterior `work + footer` i es crea `fxd__zenith` en tres zones semàntiques: rail esquerre per govern del lead, centre per configuració del bolo, rail dret per rendibilitat/anàlisi.
+- `app/admin/leads/[id]/page.tsx` + `LeadDetailClient.tsx`: es retira `LeadNotesPanel` de la fitxa reconstruïda; el panell de notes no surt ni al DOM ni al bundle d'aquesta pàgina.
+- `app/admin/leads/[id]/LeadNotesPanel.tsx`: eliminat del repo perquè ja no tenia ús viu després de la reconstrucció.
+- `app/admin/leads/[id]/LeadBoloSection.tsx`: s'exposa `acquisitionCost` dins `BoloEconomia`; el component llarg de marge s'ha de conservar però el propietari ha corregit que ha d'anar al footer de pàgina, fora d'`El bolo`. El `58 €` s'ha d'explicar com `380 - 300 - 22`.
+- `app/admin/leads/leads-design.css`: nova capa de pantalla zenit amb altura de viewport, scroll intern només a llistes que poden créixer, header amb més aire i ús real de l'ample (nom protagonista a l'esquerra, contacte/stats a la dreta, metadades en línia). El perímetre nou i la família immediata `fxd__page` queden sense mides en `px`.
+- Decisió posterior del propietari dins el mateix tall: el rail dret NO ha de contenir la targeta compacta "Economia del bolo" ni "Tarifa per hora"; el marge llarg viu al footer de pàgina. Si encara queda `.fxd__bolo-economyfooter`, s'ha de passar a `.fxd__zenith-footer`.
+- Configurador del bolo: "Complements d'Òrbita Events" s'ha de replantejar com serveis propis/extres, i els serveis/material externs han de ser activables per proveïdor. `Masquerade`, `Tino` o qualsevol altre proveïdor han de venir de `CollaboratorProduct`; no poden quedar hardcoded ni aparèixer sempre al configurador.
+- Ruta exacta de relleu per Claude: acabar `/admin/leads/cmpwudznj00g3vigky4altclu`, revisar `LeadDetailClient.tsx`, `LeadBoloSection.tsx`, `leads-design.css`, `BookingServiceLinesSection.tsx` i `nb-design.css`; fer captura nova autenticada i comprovar `scrollWidth == clientWidth`, fonts llegibles, sense notes/context antic, sense economia compacta duplicada, sense tarifa per hora i amb scroll intern correcte.
+- Tino: tractar-lo com a proveïdor de lloguer de material imputable al bolo; si cal afegir productes, fer seed/dada idempotent després de llegir `docs/bolo-flux.md`, sense inventar preus i sense codificar-lo al component.
+- Validació tècnica: anteriorment `npx tsc --noEmit --pretty false` OK · `git diff --check` OK · `rg LeadNotesPanel app lib` sense usos abans de les darreres correccions de footer/rail. Cal repetir després del relleu.
+- Validació funcional: captura autenticada anterior `.codex-captures/lead-zenit-desktop-v5-readable-margin.png`; obsoleta com a final perquè encara situava el marge dins del bolo. Cal captura nova.
+- Validació humana/UX: pendent ull final del propietari sobre la nova composició després de la captura nova.
+- `ADMIN_CHANGE_COUNTER` queda a `925` mentre aquest tall es tanca; el següent canvi real només ha de ser `#926` quan #925 estigui complet.
+- Començat per: `codex`
+- Treballant per: `codex` → relleu `claude`
+- Tancat per: pendent
 
 ---
 

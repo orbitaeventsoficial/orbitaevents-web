@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
-import LeadNotesPanel from './LeadNotesPanel';
 import LeadBoloSection, { type BoloEconomia } from './LeadBoloSection';
 import BookingTotalEditor from '../../bookings/[id]/BookingTotalEditor';
 
@@ -22,10 +21,6 @@ import { SOURCE_LABELS, formatCurrency, formatDateFull } from '@/lib/constants';
 import { TEAM_MEMBERS } from '@/lib/constants/admin';
 import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
-import {
-  SERVICE_HOURLY_RATES, resolveServicePricingKey,
-  computeFullBookingCost, MARGIN_ADVICE, getMarginColor,
-} from '@/lib/constants/pricing-intelligence';
 
 type Stage = 'nou' | 'contactat' | 'guanyat' | 'perdut';
 type PayState = 'none' | 'part' | 'full' | null;
@@ -62,22 +57,6 @@ function durationLabel(start: string | null, end: string | null): string {
 function sourceLabel(source: string | null): string {
   if (!source) return '—';
   return SOURCE_LABELS[source] ?? source;
-}
-
-function clampScore(value: number): number {
-  return Math.max(0, Math.min(100, Math.round(value)));
-}
-
-function scoreToHue(score: number): number {
-  const clamped = clampScore(score);
-  if (clamped <= 35) return 0;
-  if (clamped <= 70) return Math.round(((clamped - 35) / 35) * 42);
-  return Math.round(42 + ((clamped - 70) / 30) * 88);
-}
-
-function kpiStyle(score?: number): CSSProperties | undefined {
-  if (score === undefined) return undefined;
-  return { '--fxd-kpi-hue': scoreToHue(score) } as CSSProperties;
 }
 
 export type LeadDetailData = {
@@ -143,13 +122,11 @@ function nextStageFor(stage: Stage): Stage | null {
 
 type EditableField = 'phone' | 'email' | 'eventPhone' | 'eventAddress' | 'eventDate' | 'eventStartTime' | 'eventEndTime' | 'eventLocation' | 'guestCount' | 'budget';
 
-type NoteItem = { id: string; content: string; createdBy: string | null; createdAt: string };
 type ProposalItem = { id: string; reference: string; status: string; total: number; createdAt: string };
 type DossierItem = { id: string; nom: string; estat: string; createdAt: string };
 
-export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
+export default function LeadDetailClient({ lead, proposals, dossiers }: {
   lead: LeadDetailData;
-  notes: NoteItem[];
   proposals: ProposalItem[];
   dossiers: DossierItem[];
 }) {
@@ -481,11 +458,10 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
         </div>
       </section>
 
-      {/* Àrea de treball: info (esquerra) + bolo (dreta) en 2 columnes */}
-      <div className="fxd__work">
+      {/* Àrea zenit: govern esquerra · bolo centre · economia dreta */}
+      <div className="fxd__zenith">
 
-      {/* Grid de panells */}
-      <div className="fxd__grid">
+      <aside className="fxd__rail fxd__rail--left" aria-label="Govern del lead">
 
         {/* Col 1, Fila 1 — Fase + accions */}
         <section className="fxd__panel">
@@ -512,8 +488,6 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
             <Link href={`/admin/bookings/new?leadId=${encodeURIComponent(lead.id)}`} className="fxd__btn fxd__btn--primary fxd__stage-create">Crear reserva</Link>
           )}
         </section>
-
-        {/* Dades del bolo (data/pax/inici/fi/lloc) i contacte han pujat al header (BAND 1). */}
 
         {/* Forma de cobrament */}
         {lead.booking && (
@@ -623,8 +597,14 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
             </div>
           </section>
         )}
+      </aside>
 
-        {/* Col 3, Fila 2 — Rendibilitat */}
+      <main className="fxd__zenith-main" aria-label="Configuració del bolo">
+        <LeadBoloSection leadId={lead.id} source={lead.channel} onEconomiaChange={handleEconomia} compactEconomia />
+      </main>
+
+      <aside className="fxd__rail fxd__rail--right" aria-label="Economia i documents">
+        {/* Rendibilitat i documents */}
         <section className="fxd__panel fxd__panel--wide">
           <div className="fxd__panelhead"><span>Rendibilitat</span></div>
           <dl className="fxd__rows">
@@ -712,137 +692,50 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
             </dd></div>
           </dl>
         </section>
+      </aside>
+      </div>{/* /fxd__zenith */}
 
-      </div>
-
-      {/* ── El bolo (configurador dins la fitxa del lead) ── */}
-      <LeadBoloSection leadId={lead.id} source={lead.channel} onEconomiaChange={handleEconomia} compactEconomia />
-      </div>{/* /fxd__work */}
-
-      {/* ── Economia + tarifa al footer (tot l'ample, a baix) ── */}
-      <footer className="fxd__econofooter">
-        <section className="fxd__moneycard" data-tone={boloEcon ? boloEcon.tone : 'none'}>
-          <div className="fxd__moneyhead">
-            <span>Economia del bolo</span>
-            <small>real des de les línies</small>
-          </div>
-          <div className="fxd__moneyhero">
-            <span>Net</span>
-            <strong>{boloEcon ? formatCurrency(boloEcon.net) : '—'}</strong>
-            <small>{boloEcon ? `${Math.round(boloEcon.marginPct)}% · ${boloEcon.label}` : 'munta el bolo per veure el net'}</small>
-          </div>
-          <dl className="fxd__moneyrows">
-            <div><dt>Ingrés (client)</dt><dd>{boloEcon ? formatCurrency(boloEcon.total) : '—'}</dd></div>
-            <div><dt>Cost directe</dt><dd>{boloEcon ? formatCurrency(boloEcon.directCost) : '—'}</dd></div>
-            <div className="fxd__moneyrow--sub"><dt>· Serveis (proveïdors + DJ)</dt><dd>{boloEcon ? formatCurrency(boloEcon.serviceLinesCost) : '—'}</dd></div>
-            <div className="fxd__moneyrow--sub"><dt>· Operativa (desplaçament, equip)</dt><dd>{boloEcon ? formatCurrency(boloEcon.fixedOperationalCost) : '—'}</dd></div>
-          </dl>
-        </section>
-
-      {/* ── Anàlisi econòmica — KPI cards (booking-lab recuperat) ── */}
-      {(() => {
-        const bk = lead.booking;
-        const latestProposalTotal = proposals.find((p) => Number.isFinite(p.total) && p.total > 0)?.total ?? null;
-        const budgetTotal = fields.budget ? Number(fields.budget) : 0;
-        // Prioritat al bolo VIU (el que mostra el moneycard) per no mostrar xifres antigues.
-        const total = bk ? bk.total : (boloEcon?.total ?? latestProposalTotal ?? budgetTotal);
-        const hours = bk ? bk.totalHours : (() => {
-          const t = fields.eventStartTime; const e = fields.eventEndTime;
-          if (!t || !e) return 0;
-          const [sh, sm] = t.split(':').map(Number);
-          const [eh, em] = e.split(':').map(Number);
-          if (![sh, sm, eh, em].every(Number.isFinite)) return 0;
-          const startMin = sh * 60 + sm;
-          let endMin = eh * 60 + em;
-          if (endMin <= startMin) endMin += 24 * 60;
-          return (endMin - startMin) / 60;
-        })();
-
-        const collabCost = bk?.collaboratorCost?.amount ?? 0;
-        type Kpi = { value: string; label: string; sub: string; level: 'gold' | 'ok' | 'warn' | 'critical' | 'info'; score?: number };
-        const kpis: Kpi[] = [];
-
-        // L'import (ingrés) i el net ja viuen al moneycard «Economia del bolo»; aquí
-        // NOMÉS la perspectiva de tarifa per hora, que és l'única dada no duplicada.
-        if (!hours || !Number.isFinite(hours)) {
-          kpis.push({ value: 'Pendent', label: 'Durada', sub: 'Afegeix hora inici i fi per calcular €/h i marge', level: 'warn' });
-          return (
-            <section className="fxd__econo">
-              <div className="fxd__econohead">
-                <span>Tarifa per hora</span>
-                <span className="fxd__econobadge">Falten hores</span>
-                {!bk && <span className="fxd__econonote">estimació sense reserva</span>}
-              </div>
-              <div className="fxd__kpis">
-                {kpis.map((k, i) => (
-                  <div key={i} className="fxd__kpi" data-level={k.level} style={kpiStyle(k.score)}>
-                    <div className="fxd__kpi-val">{k.value}</div>
-                    <div className="fxd__kpi-lbl">{k.label}</div>
-                    <div className="fxd__kpi-sub">{k.sub}</div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          );
-        }
-
-        // La durada ja es mostra als stats de capçalera — aquí només s'usa per al càlcul.
-        const costResult = computeFullBookingCost({
-          total,
-          billableHours: hours,
-          eventType: lead.type,
-          collaboratorCost: collabCost,
-        });
-        const { margin, marginPct, marginColor, pricePerHour, alerts } = costResult;
-        const rate = SERVICE_HOURLY_RATES[resolveServicePricingKey({ eventType: lead.type })];
-        const devPct = rate.recommended > 0
-          ? Math.round(((pricePerHour - rate.recommended) / rate.recommended) * 100) : 0;
-
-        // El marge ja viu (real, des de les línies) al moneycard «Economia del bolo».
-        // Aquí NO es repeteix cap marge per evitar la doble vista contradictòria.
-        void margin; void marginColor;
-
-        const rateScore = clampScore((pricePerHour / rate.recommended) * 100);
-        kpis.push({
-          value: `${pricePerHour}€/h`,
-          label: 'Preu per hora',
-          sub: devPct < 0 ? `${devPct}% sota tarifa · recomanat ${rate.recommended}€/h` : `Dins tarifa (recomanat ${rate.recommended}€/h)`,
-          level: pricePerHour < rate.min ? 'critical' : pricePerHour < rate.recommended ? 'warn' : 'ok',
-          score: rateScore,
-        });
-
-        if (devPct < -10) {
-          const recTotal = Math.ceil(rate.recommended * hours);
-          kpis.push({ value: `+${formatCurrency(recTotal - total)}`, label: 'Per arribar a tarifa', sub: `cobrar ${formatCurrency(recTotal)}`, level: 'warn', score: rateScore });
-        }
-
-        if (collabCost > 0) {
-          kpis.push({ value: `-${formatCurrency(collabCost)}`, label: `Col·laborador${bk?.collaboratorCost?.name ? ` · ${bk.collaboratorCost.name}` : ''}`, sub: `Net: ${formatCurrency(total - collabCost)}`, level: 'info', score: 45 });
-        }
-
-        const hasAlerts = alerts.some(a => a.level === 'critical' || a.level === 'warn');
-
-        return (
-          <section className="fxd__econo">
-            <div className="fxd__econohead">
-              <span>Tarifa per hora</span>
-              {hasAlerts && <span className="fxd__econobadge">⚠ Revisa el preu</span>}
-              {!bk && <span className="fxd__econonote">estimació sense reserva</span>}
-            </div>
+      <footer className="fxd__zenith-footer" aria-label="Marge del bolo">
+        <div className="fxd__econohead">
+          <span>Marge del bolo</span>
+          <span className="fxd__econonote">net = ingrés - cost directe - origen</span>
+        </div>
+        {!boloEcon ? (
+          <p className="fxd__econonote">Afegeix línies al bolo per veure el marge.</p>
+        ) : (
+          <>
             <div className="fxd__kpis">
-              {kpis.map((k, i) => (
-                <div key={i} className="fxd__kpi" data-level={k.level} style={kpiStyle(k.score)}>
-                  <div className="fxd__kpi-val">{k.value}</div>
-                  <div className="fxd__kpi-lbl">{k.label}</div>
-                  <div className="fxd__kpi-sub">{k.sub}</div>
+              <div className="fxd__kpi" data-level="gold">
+                <div className="fxd__kpi-val">{formatCurrency(boloEcon.total)}</div>
+                <div className="fxd__kpi-lbl">Ingrés</div>
+                <div className="fxd__kpi-sub">suma de les línies</div>
+              </div>
+              <div className="fxd__kpi" data-level="info">
+                <div className="fxd__kpi-val">{formatCurrency(boloEcon.directCost)}</div>
+                <div className="fxd__kpi-lbl">Cost directe</div>
+                <div className="fxd__kpi-sub">
+                  {formatCurrency(boloEcon.serviceLinesCost)} serveis + {formatCurrency(boloEcon.fixedOperationalCost)} operativa
                 </div>
-              ))}
+              </div>
+              <div className="fxd__kpi" data-level="info">
+                <div className="fxd__kpi-val">{formatCurrency(boloEcon.acquisitionCost)}</div>
+                <div className="fxd__kpi-lbl">Origen</div>
+                <div className="fxd__kpi-sub">cost comercial imputat</div>
+              </div>
+              <div className="fxd__kpi" data-level={boloEcon.tone === 'rose' ? 'critical' : boloEcon.tone === 'orange' || boloEcon.tone === 'amber' ? 'warn' : 'ok'}>
+                <div className="fxd__kpi-val">{formatCurrency(boloEcon.net)}</div>
+                <div className="fxd__kpi-lbl">Net</div>
+                <div className="fxd__kpi-sub">
+                  {Math.round(boloEcon.marginPct)}% marge · {boloEcon.label}
+                </div>
+              </div>
             </div>
-          </section>
-        );
-      })()}
-
-      </footer>{/* /fxd__econofooter */}
+            <div className="fxd__marginmeter" data-tone={boloEcon.tone} style={{ '--fxd-margin-pct': `${Math.max(0, Math.min(100, boloEcon.marginPct))}%` } as CSSProperties}>
+              <span />
+            </div>
+          </>
+        )}
+      </footer>
 
       <ConfirmDialog {...dialogProps} />
     </div>

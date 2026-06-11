@@ -20,6 +20,7 @@ export interface BoloEconomia {
   marginPct: number;
   total: number;
   directCost: number;
+  acquisitionCost: number;
   serviceLinesCost: number;
   fixedOperationalCost: number;
   tone: 'emerald' | 'amber' | 'orange' | 'rose';
@@ -108,6 +109,7 @@ export default function LeadBoloSection({
           marginPct: economia.marginPct,
           total: economia.total,
           directCost: economia.directCost,
+          acquisitionCost: economia.acquisitionCost,
           serviceLinesCost: economia.serviceLinesCost,
           fixedOperationalCost: economia.fixedOperationalCost,
           tone: economia.marginTone.tone,

@@ -1,3 +1,40 @@
+## 2026-06-11 — Fitxa lead zenit en una sola pantalla (Canvi #925, codex → relleu Claude pendent)
+
+### Resum
+Refeta real de la composició visual de `/admin/leads/cmpwudznj00g3vigky4altclu`: la pàgina deixa l'apilat anterior i passa a una estructura de tres zones en el primer viewport — govern del lead a l'esquerra, construcció del bolo al centre, economia/rendibilitat a la dreta. El header guanya aire i aprofita l'ample: nom protagonista, contacte/stats a la dreta i metadades del bolo en línia.
+
+### Què s'ha fet
+- `LeadDetailClient.tsx`: buidada la composició antiga de `work + footer` i reconstruïda com `fxd__zenith` amb rails semàntics (`left/main/right`).
+- `page.tsx` + `LeadDetailClient.tsx`: eliminat el residu de `LeadNotesPanel` de la fitxa; el panell de notes no es renderitza ni entra al bundle d'aquesta pàgina.
+- `LeadNotesPanel.tsx`: eliminat del repo perquè ja no tenia ús viu en la fitxa reconstruïda.
+- `leads-design.css`: nova capa responsive de fitxa zenit amb altura de viewport, scroll només intern on cal, tipografia més compacta i header més ample; el perímetre nou i la família immediata `fxd__page` queden sense mides en `px`.
+- `LeadBoloSection.tsx`: exposa `acquisitionCost` a `BoloEconomia`; el component llarg de marge s'ha de conservar, però el propietari ha corregit que ha d'anar al footer de pàgina, fora d'`El bolo`.
+- Decisió posterior del propietari: retirar del rail dret la targeta compacta "Economia del bolo" i "Tarifa per hora"; el rail dret ha de quedar per rendibilitat/anàlisi sense duplicar el footer.
+- Configurador: "Complements d'Òrbita Events" s'ha de replantejar com serveis propis/extres; els proveïdors externs (`Masquerade`, `Tino`, altres) no han d'aparèixer sempre, sinó activar-se des de dades de `CollaboratorProduct`.
+
+### Handoff exacte per Claude
+- Ruta a acabar: `/admin/leads/cmpwudznj00g3vigky4altclu`.
+- No obrir canvi nou si només es tanca aquesta passada: mantenir #925 i `ADMIN_CHANGE_COUNTER = 925`.
+- Revisar `LeadDetailClient.tsx` després del moviment del footer i assegurar que ja no queda "Economia del bolo" compacta ni "Tarifa per hora".
+- Renombrar/adaptar CSS del footer llarg a `.fxd__zenith-footer` si encara queda `.fxd__bolo-economyfooter`; no afegir mides locals en `px`.
+- Refer `BookingServiceLinesSection.tsx`: proveïdors externs agrupats per `collaboratorName`, selector/toggle per activar proveïdor, render només del proveïdor actiu o dels ja seleccionats.
+- Afegir Tino només com a dada/seed idempotent si hi ha productes/preus confirmats a `docs/bolo-flux.md`; no hardcodejar-lo al JSX.
+
+### Relleu Claude (tancament 2026-06-11)
+- Gap real detectat: el footer renderitzava `.fxd__zenith-footer` però el CSS encara només estilava `.fxd__bolo-economyfooter` → el footer de marge sortia **sense estil**. Reanomenat el bloc a `.fxd__zenith-footer` a `leads-design.css` i adaptat al context de footer de pàgina (a tot l'ample sota la graella zenit: `flex:0 0 auto`, `margin:0 1rem 0.85rem`, sense `px` de maquetació) + breakpoint mòbil (`@media 40rem` → 2 columnes de KPI).
+- Verificat que el rail dret («Rendibilitat») NO conté la targeta compacta «Economia del bolo» ni «Tarifa per hora» (la compacta queda amagada via `compactEconomia` a `LeadBoloSection`; el marge llarg viu només al footer).
+- Verificat que `BookingServiceLinesSection` ja és data-driven: proveïdors externs agrupats per `collaboratorName` des de `/api/admin/collaborator-products` (origen `CollaboratorProduct`), sense hardcode de Tino/Masquerade al JSX.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK (#925 coherent) · `git diff --check` net · cap residu `.fxd__bolo-economyfooter` al codi (només a docs).
+- Validació funcional: captura autenticada nova `.codex-captures/lead-zenit-footer-desktop.png` (footer «Marge del bolo» estilat: Ingrés/Cost directe/Origen/Net + barra de marge).
+- Validació responsive: `.codex-captures/lead-zenit-footer-tablet.png` i `lead-zenit-footer-mobile.png`; sense overflow horitzontal als 3 viewports (`scrollW == clientW` a 1440/820/390).
+- Validació humana/UX: pendent ull final del propietari.
+
+- Començat per: `codex`
+- Treballant per: `codex` → relleu `claude`
+- Tancat per: `claude`
+
 ## 2026-06-11 — Veritat absoluta del preu + bolo sense packs (Canvi #924, claude)
 
 ### Resum
