@@ -165,7 +165,7 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
   const [editField, setEditField] = useState<EditableField | null>(null);
   const [editValue, setEditValue] = useState('');
   const [savePending, setSavePending] = useState(false);
-  // Net del bolo elevat des de LeadBoloSection per mostrar-lo protagonista al hero.
+  // Economia del bolo elevada des de LeadBoloSection per al rail financer compacte.
   const [boloEcon, setBoloEcon] = useState<BoloEconomia | null>(null);
   const handleEconomia = useCallback((e: BoloEconomia | null) => setBoloEcon(e), []);
 
@@ -420,6 +420,31 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
               </span>
             )}
           </div>
+          {/* Dades del bolo compactes al header (editables inline) */}
+          <div className="fxd__id-meta">
+            {([
+              { f: 'eventDate' as EditableField, ic: '📅', type: 'date', show: (v: string) => v ? fullDate(v) : '' },
+              { f: 'eventStartTime' as EditableField, ic: '🕐', type: 'time', show: (v: string) => v },
+              { f: 'eventEndTime' as EditableField, ic: '→', type: 'time', show: (v: string) => v },
+              { f: 'eventLocation' as EditableField, ic: '📍', type: 'text', show: (v: string) => v },
+              { f: 'guestCount' as EditableField, ic: '👥', type: 'number', show: (v: string) => v ? `${v} pax` : '' },
+            ]).map(({ f, ic, type, show }) => (
+              editField === f ? (
+                <span key={f} className="fxd__editrow">
+                  <input className="fxd__editinput" type={type} value={editValue} autoFocus min={type === 'number' ? 1 : undefined}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} />
+                  <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
+                  <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
+                </span>
+              ) : (
+                <button key={f} type="button" className="fxd__metachip" onClick={() => startEdit(f)}>
+                  <span className="fxd__metachip-ic">{ic}</span>
+                  {show(String(fields[f] ?? '')) || <em className="fxd__empty">+</em>}
+                </button>
+              )
+            ))}
+          </div>
           <div className="fxd__statchips">
             <div className="fxd__statchip fxd__statchip--gold">
               <span className="fxd__statchip-lbl">Valor</span>
@@ -435,12 +460,14 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
                 </span>
               ) : (
                 <b className="fxd__statchip-val fxd__budget-editable" onClick={() => startEdit('budget')}>
-                  {fields.budget
-                    ? formatCurrency(Number(fields.budget))
-                    : (() => {
-                        const prop = proposals.find((p) => Number.isFinite(p.total) && p.total > 0)?.total;
-                        return prop ? formatCurrency(prop) : <em className="fxd__empty">Afegir</em>;
-                      })()}
+                  {boloEcon?.total
+                    ? formatCurrency(boloEcon.total)
+                    : fields.budget
+                      ? formatCurrency(Number(fields.budget))
+                      : (() => {
+                          const prop = proposals.find((p) => Number.isFinite(p.total) && p.total > 0)?.total;
+                          return prop ? formatCurrency(prop) : <em className="fxd__empty">Afegir</em>;
+                        })()}
                 </b>
               )}
             </div>
@@ -453,13 +480,6 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
               <b className={`fxd__statchip-val fxd__pri--${lead.priority.toLowerCase()}`}>{PRIORITY_LABEL[lead.priority] || lead.priority}</b>
             </div>
           </div>
-        </div>
-        <div className="fxd__netbox" data-tone={boloEcon ? boloEcon.tone : 'none'}>
-          <span className="fxd__netbox-lbl">Net del bolo</span>
-          <span className="fxd__netbox-val">{boloEcon ? formatCurrency(boloEcon.net) : '—'}</span>
-          <span className="fxd__netbox-sub">
-            {boloEcon ? `${Math.round(boloEcon.marginPct)}% marge · ${boloEcon.label}` : 'munta el bolo per veure el net'}
-          </span>
         </div>
       </section>
 
@@ -495,90 +515,7 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
           )}
         </section>
 
-        {/* Col 2, Fila 1 — Dades del bolo */}
-        <section className="fxd__panel fxd__panel--wide">
-          <div className="fxd__panelhead"><span>Dades del bolo</span></div>
-          <dl className="fxd__rows fxd__rows--event">
-            <div><dt>Data</dt><dd>
-              {editField === 'eventDate' ? (
-                <span className="fxd__editrow">
-                  <input className="fxd__editinput" type="date" value={editValue} autoFocus
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} />
-                  <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
-                  <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
-                </span>
-              ) : (
-                <button className="fxd__editval" onClick={() => startEdit('eventDate')}>
-                  {fields.eventDate ? fullDate(fields.eventDate) : <em className="fxd__empty">Afegir →</em>}
-                </button>
-              )}
-            </dd></div>
-            <div><dt>Pax</dt><dd>
-              {editField === 'guestCount' ? (
-                <span className="fxd__editrow">
-                  <input className="fxd__editinput" type="number" min={1} value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
-                    autoFocus />
-                  <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
-                  <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
-                </span>
-              ) : (
-                <button className="fxd__editval" onClick={() => startEdit('guestCount')}>
-                  {fields.guestCount || <em className="fxd__empty">Afegir →</em>}
-                </button>
-              )}
-            </dd></div>
-            <div><dt>Inici</dt><dd>
-              {editField === 'eventStartTime' ? (
-                <span className="fxd__editrow">
-                  <input className="fxd__editinput" type="time" value={editValue} autoFocus
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} />
-                  <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
-                  <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
-                </span>
-              ) : (
-                <button className="fxd__editval" onClick={() => startEdit('eventStartTime')}>
-                  {fields.eventStartTime || <em className="fxd__empty">Afegir →</em>}
-                </button>
-              )}
-            </dd></div>
-            <div><dt>Fi</dt><dd>
-              {editField === 'eventEndTime' ? (
-                <span className="fxd__editrow">
-                  <input className="fxd__editinput" type="time" value={editValue} autoFocus
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} />
-                  <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
-                  <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
-                </span>
-              ) : (
-                <button className="fxd__editval" onClick={() => startEdit('eventEndTime')}>
-                  {fields.eventEndTime || <em className="fxd__empty">Afegir →</em>}
-                </button>
-              )}
-            </dd></div>
-            <div className="fxd__row--long"><dt>Lloc</dt><dd>
-              {editField === 'eventLocation' ? (
-                <span className="fxd__editrow">
-                  <input className="fxd__editinput" value={editValue} autoFocus
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} />
-                  <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
-                  <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
-                </span>
-              ) : (
-                <button className="fxd__editval" onClick={() => startEdit('eventLocation')}>
-                  {fields.eventLocation || <em className="fxd__empty">Afegir →</em>}
-                </button>
-              )}
-            </dd></div>
-          </dl>
-        </section>
-
-        {/* El contacte (telèfon/email/WhatsApp/Correu) ha pujat al header (BAND 1). */}
+        {/* Dades del bolo (data/pax/inici/fi/lloc) i contacte han pujat al header (BAND 1). */}
 
         {/* Forma de cobrament */}
         {lead.booking && (
@@ -781,16 +718,34 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
       </div>
 
       {/* ── El bolo (configurador dins la fitxa del lead) ── */}
-      <LeadBoloSection leadId={lead.id} source={lead.channel} onEconomiaChange={handleEconomia} />
+      <LeadBoloSection leadId={lead.id} source={lead.channel} onEconomiaChange={handleEconomia} compactEconomia />
 
-      </div>{/* /fxd__work */}
+      <aside className="fxd__moneyrail">
+        <section className="fxd__moneycard" data-tone={boloEcon ? boloEcon.tone : 'none'}>
+          <div className="fxd__moneyhead">
+            <span>Economia del bolo</span>
+            <small>real des de les línies</small>
+          </div>
+          <div className="fxd__moneyhero">
+            <span>Net</span>
+            <strong>{boloEcon ? formatCurrency(boloEcon.net) : '—'}</strong>
+            <small>{boloEcon ? `${Math.round(boloEcon.marginPct)}% · ${boloEcon.label}` : 'munta el bolo per veure el net'}</small>
+          </div>
+          <dl className="fxd__moneyrows">
+            <div><dt>Ingrés</dt><dd>{boloEcon ? formatCurrency(boloEcon.total) : '—'}</dd></div>
+            <div><dt>Cost directe</dt><dd>{boloEcon ? formatCurrency(boloEcon.directCost) : '—'}</dd></div>
+            <div><dt>Línies</dt><dd>{boloEcon ? formatCurrency(boloEcon.serviceLinesCost) : '—'}</dd></div>
+            <div><dt>Operatiu</dt><dd>{boloEcon ? formatCurrency(boloEcon.fixedOperationalCost) : '—'}</dd></div>
+          </dl>
+        </section>
 
       {/* ── Anàlisi econòmica — KPI cards (booking-lab recuperat) ── */}
       {(() => {
         const bk = lead.booking;
         const latestProposalTotal = proposals.find((p) => Number.isFinite(p.total) && p.total > 0)?.total ?? null;
         const budgetTotal = fields.budget ? Number(fields.budget) : 0;
-        const total = bk ? bk.total : (latestProposalTotal ?? budgetTotal);
+        // Prioritat al bolo VIU (el que mostra el moneycard) per no mostrar xifres antigues.
+        const total = bk ? bk.total : (boloEcon?.total ?? latestProposalTotal ?? budgetTotal);
         const hours = bk ? bk.totalHours : (() => {
           const t = fields.eventStartTime; const e = fields.eventEndTime;
           if (!t || !e) return 0;
@@ -807,23 +762,14 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
         type Kpi = { value: string; label: string; sub: string; level: 'gold' | 'ok' | 'warn' | 'critical' | 'info'; score?: number };
         const kpis: Kpi[] = [];
 
-        if (!total || !Number.isFinite(total)) {
-          kpis.push({ value: 'Pendent', label: 'Import', sub: 'Afegeix pressupost o proposta', level: 'warn' });
-        } else {
-          kpis.push({
-            value: formatCurrency(total),
-            label: bk ? 'Total reserva' : latestProposalTotal ? 'Ultima proposta' : 'Pressupost lead',
-            sub: bk ? bk.reference : latestProposalTotal ? 'Import recuperat de pressupostos' : 'Estimacio manual',
-            level: 'gold',
-          });
-        }
-
+        // L'import (ingrés) i el net ja viuen al moneycard «Economia del bolo»; aquí
+        // NOMÉS la perspectiva de tarifa per hora, que és l'única dada no duplicada.
         if (!hours || !Number.isFinite(hours)) {
           kpis.push({ value: 'Pendent', label: 'Durada', sub: 'Afegeix hora inici i fi per calcular €/h i marge', level: 'warn' });
           return (
             <section className="fxd__econo">
               <div className="fxd__econohead">
-                <span>Anàlisi econòmica</span>
+                <span>Tarifa per hora</span>
                 <span className="fxd__econobadge">Falten hores</span>
                 {!bk && <span className="fxd__econonote">estimació sense reserva</span>}
               </div>
@@ -852,16 +798,9 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
         const devPct = rate.recommended > 0
           ? Math.round(((pricePerHour - rate.recommended) / rate.recommended) * 100) : 0;
 
-        if (bk?.costFloor && bk.costFloor > 0) {
-          const realMargin = total - bk.costFloor;
-          const realPct = Math.round((realMargin / total) * 100);
-          const tone = getMarginColor(realPct);
-          const marginScore = clampScore((realPct / 45) * 100);
-          kpis.push({ value: `${realPct}%`, label: 'Marge net', sub: MARGIN_ADVICE[tone.kind] ?? formatCurrency(realMargin), level: realPct < 0 ? 'critical' : realPct < 25 ? 'warn' : 'ok', score: marginScore });
-        } else if (marginPct !== undefined) {
-          const marginScore = clampScore((marginPct / 45) * 100);
-          kpis.push({ value: `${marginPct}%`, label: 'Marge estimat', sub: MARGIN_ADVICE[marginColor.kind] ?? '', level: marginPct < 0 ? 'critical' : marginPct < 25 ? 'warn' : 'ok', score: marginScore });
-        }
+        // El marge ja viu (real, des de les línies) al moneycard «Economia del bolo».
+        // Aquí NO es repeteix cap marge per evitar la doble vista contradictòria.
+        void margin; void marginColor;
 
         const rateScore = clampScore((pricePerHour / rate.recommended) * 100);
         kpis.push({
@@ -886,7 +825,7 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
         return (
           <section className="fxd__econo">
             <div className="fxd__econohead">
-              <span>Anàlisi econòmica</span>
+              <span>Tarifa per hora</span>
               {hasAlerts && <span className="fxd__econobadge">⚠ Revisa el preu</span>}
               {!bk && <span className="fxd__econonote">estimació sense reserva</span>}
             </div>
@@ -902,6 +841,9 @@ export default function LeadDetailClient({ lead, notes, proposals, dossiers }: {
           </section>
         );
       })()}
+
+      </aside>
+      </div>{/* /fxd__work */}
 
       <ConfirmDialog {...dialogProps} />
     </div>

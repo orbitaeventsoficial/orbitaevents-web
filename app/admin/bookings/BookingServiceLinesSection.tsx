@@ -146,7 +146,7 @@ export default function BookingServiceLinesSection({
                     aria-label="Preu de venda"
                   />
                   {line.collaboratorId ? (
-                    <span className="nb__sl-partnercost" title="El cost a pagar al partner es gestiona a la seva fitxa">cost a partner ↗</span>
+                    <span className="nb__sl-partnercost" title="El cost a pagar al partner es gestiona a la seva fitxa">cost</span>
                   ) : (
                     <input
                       className="nb__input nb__sl-num" type="number" min={0} placeholder="Cost"

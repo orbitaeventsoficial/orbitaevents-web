@@ -15,9 +15,28 @@ import { formatCurrency } from '@/lib/constants';
  * `LeadServiceLine` via /api/admin/leads/[id]/service-lines. El pack base és una
  * línia més del bolo (kind especial gestionat al configurador).
  */
-export interface BoloEconomia { net: number; marginPct: number; total: number; tone: 'emerald' | 'amber' | 'orange' | 'rose'; label: string; }
+export interface BoloEconomia {
+  net: number;
+  marginPct: number;
+  total: number;
+  directCost: number;
+  serviceLinesCost: number;
+  fixedOperationalCost: number;
+  tone: 'emerald' | 'amber' | 'orange' | 'rose';
+  label: string;
+}
 
-export default function LeadBoloSection({ leadId, source, onEconomiaChange }: { leadId: string; source?: string | null; onEconomiaChange?: (e: BoloEconomia | null) => void }) {
+export default function LeadBoloSection({
+  leadId,
+  source,
+  onEconomiaChange,
+  compactEconomia = false,
+}: {
+  leadId: string;
+  source?: string | null;
+  onEconomiaChange?: (e: BoloEconomia | null) => void;
+  compactEconomia?: boolean;
+}) {
   const toast = useToast();
   const [lines, setLines] = useState<BookingServiceLineFormInput[]>([]);
   const [packs, setPacks] = useState<BookingPack[]>([]);
@@ -110,7 +129,16 @@ export default function LeadBoloSection({ leadId, source, onEconomiaChange }: { 
   useEffect(() => {
     if (!onEconomiaChange) return;
     onEconomiaChange(economia
-      ? { net: economia.netMargin, marginPct: economia.marginPct, total: economia.total, tone: economia.marginTone.tone, label: economia.marginTone.label }
+      ? {
+          net: economia.netMargin,
+          marginPct: economia.marginPct,
+          total: economia.total,
+          directCost: economia.directCost,
+          serviceLinesCost: economia.serviceLinesCost,
+          fixedOperationalCost: economia.fixedOperationalCost,
+          tone: economia.marginTone.tone,
+          label: economia.marginTone.label,
+        }
       : null);
   }, [economia, onEconomiaChange]);
 
@@ -203,7 +231,7 @@ export default function LeadBoloSection({ leadId, source, onEconomiaChange }: { 
       </section>
 
       {/* ── Fulla d'economia del bolo (net per bolo) — Fase 4 ── */}
-      <section className="fxd__econo">
+      {!compactEconomia && <section className="fxd__econo">
         <div className="fxd__econohead">
           <span>Economia del bolo</span>
           <span className="fxd__econonote">net per bolo · preus orientatius</span>
@@ -233,7 +261,7 @@ export default function LeadBoloSection({ leadId, source, onEconomiaChange }: { 
             </div>
           </div>
         )}
-      </section>
+      </section>}
     </div>
   );
 }

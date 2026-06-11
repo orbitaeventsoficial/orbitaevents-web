@@ -186,10 +186,10 @@ Avís per codex: #826 (ingesta 🤝 + hora fi). #827 (animació: nova categoria 
 ## Bloc CODEX (Codex CLI)
 
 <!-- codex: actualitza aquest bloc quan comencis/acabis una sessió -->
-[codex] 2026-06-11 [ESTAT: tancat]
+[codex] 2026-06-11 [ESTAT: treballant]
 Últim canvi: #922.
-Proper pas previst: pendent validació visual del propietari sobre la fitxa del lead; següent millora només si demana un retoc concret.
-Avís per l'altre agent: #922 remata la pantalla negra de `/admin/leads/cmpwudznj00g3vigky4altclu`: contacte al header, net del bolo al hero, tipografia Manrope/JetBrains/Bricolage via tokens, dades menys mecàniques i compactació responsiva sense maquetació nova a píxel. No he entrat a Cuadrant/Repartiment, CrewBlock, schema ni serveis operatius.
+Proper pas previst: refer des de zero el visual de `/admin/leads/cmpwudznj00g3vigky4altclu`, amb captures inicials, detecció de duplicats i objectiu de cabre en una sola pàgina desktop.
+Avís per l'altre agent: entro només a composició visual/mides/ordre de la fitxa comercial del lead i CSS associat. No tocaré lògica, schema, Cuadrant/Repartiment, CrewBlock ni serveis operatius.
 
 [codex] 2026-06-07 [ESTAT: tancat]
 Últim canvi: #898 — agenda multi-bolo, total manual exacte, relació comercial DJ/tècnic i base escalable de Partners amb rols i `sourceCollaboratorId`.
