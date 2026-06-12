@@ -15,6 +15,11 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-12 [ESTAT: tancat — bolo (tècnic per-proveïdor + Tino) + redistribució fitxa]
+Últim canvi: #926
+Proper pas previst: repassada visual del propietari; pendents = tematització del bolo, pèrdua per amortització, CAC real Google Ads (bloquejat Google).
+Avís per l'altre agent: #926 toca `lib/constants/orbita-services.ts` (font única tècnic de so `SOUND_TECH_PRICE`/`productIncludesSoundTech` + bombolles/caps mòbils), `BookingServiceLinesSection.tsx` (selector tècnic Masquerade/Òrbita per-línia, proveïdors activables per chips), `collaboratorProductService.ts` (exposa `crew`), `app/admin/leads/[id]/LeadDetailClient.tsx` + `leads-design.css` (redistribució total d'Opus: header ledger + 2 col + Marge KPIs al rail, sense scroll). NOU seed `scripts/seed-tino-products.ts` (Tino EQUIPMENT_RENTAL, JA aplicat a Railway). tsc + validate:core + 4859 tests verds.
+
 [claude] 2026-06-11 [ESTAT: tancat — relleu del handoff #925 de codex (fitxa lead zenit)]
 Últim canvi: #925 (obert per codex, tancat per claude). Counter es manté a #925.
 Proper pas previst: esperant repassada visual del propietari de la fitxa zenit. Següent front accionable segons §6 quan el propietari validi.

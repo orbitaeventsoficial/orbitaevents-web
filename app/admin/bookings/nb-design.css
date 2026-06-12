@@ -161,10 +161,11 @@ html.admin-mode .nb__spinner { width: 32px; height: 32px; border: 2px solid var(
 .nb__sl-label { flex: 1 1 200px; min-width: 0; }
 .nb__sl-num { flex: 0 0 92px; }
 .nb__sl-qty { flex: 0 0 64px; }
+.nb__sl-payer { flex: 0 1 10rem; min-width: 0; }
 .nb__sl-del { flex: 0 0 36px; min-height: 36px; border: 1px solid color-mix(in oklab, var(--o-stage-lost) 40%, var(--line)); border-radius: var(--o-r-sm-2); background: transparent; color: var(--o-stage-lost); cursor: pointer; font-size: var(--o-text-sm); transition: background 130ms ease; }
 .nb__sl-del:hover { background: color-mix(in oklab, var(--o-stage-lost) 12%, transparent); }
 @media (max-width: 560px) {
-  .nb__sl-label, .nb__sl-num, .nb__sl-qty { flex: 1 1 100%; }
+  .nb__sl-label, .nb__sl-num, .nb__sl-qty, .nb__sl-payer { flex: 1 1 100%; }
   .nb__sl-del { flex: 1 1 100%; }
 }
 
@@ -234,6 +235,21 @@ html.admin-mode .nb__cfg-empty { padding: 18px 6px; color: var(--t3); font-size:
 html.admin-mode .nb__cfg-free { align-self: flex-start; }
 
 html.admin-mode .nb__cfg-cat { display: flex; flex-direction: column; gap: 8px; }
+/* Activador de proveïdors: no surten per defecte, l'usuari els activa amb un chip. */
+html.admin-mode .nb__cfg-providers { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
+html.admin-mode .nb__cfg-providerslbl { font-size: var(--o-text-2xs); font-weight: var(--o-fw-semi); color: var(--t3); text-transform: uppercase; letter-spacing: 0.06em; margin-inline-end: 0.15rem; }
+html.admin-mode .nb__cfg-providerchip {
+  padding: 0.28rem 0.6rem; border: 1px solid var(--line); border-radius: var(--o-r-pill);
+  background: color-mix(in oklab, var(--panel) 50%, transparent);
+  font-size: var(--o-text-2xs); font-weight: var(--o-fw-semi); color: var(--t2);
+  cursor: pointer; transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+}
+html.admin-mode .nb__cfg-providerchip:hover { border-color: var(--line2); color: var(--t); }
+html.admin-mode .nb__cfg-providerchip.is-on {
+  border-color: color-mix(in oklab, var(--gold) 55%, var(--line));
+  background: color-mix(in oklab, var(--gold) 14%, transparent);
+  color: var(--gold);
+}
 html.admin-mode .nb__cfg-grp { border: 1px solid var(--line); border-radius: var(--o-r-sm-2); overflow: hidden; }
 html.admin-mode .nb__cfg-grp > summary { cursor: pointer; padding: 9px 12px; font-size: var(--o-text-2xs); font-weight: var(--o-fw-semi); color: var(--t2); background: color-mix(in oklab, var(--raised) 70%, var(--panel)); list-style: none; }
 html.admin-mode .nb__cfg-grp > summary::-webkit-details-marker { display: none; }

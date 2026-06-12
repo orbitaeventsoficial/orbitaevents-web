@@ -154,6 +154,7 @@ export async function listActiveCollaboratorProductsForBooking() {
     id: p.id,
     name: p.name,
     category: p.category,
+    crew: p.crew,
     costPrice: p.costPrice,
     sellPrice: p.sellPrice,
     collaboratorId: p.collaboratorId,

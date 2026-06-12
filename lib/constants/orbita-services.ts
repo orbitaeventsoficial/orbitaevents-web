@@ -38,6 +38,22 @@ export interface OrbitaService {
 export const DJ_FIRST_HOUR_PRICE = 150;
 export const DJ_EXTRA_HOUR_PRICE = 100;
 
+// Tècnic de so d'Òrbita: 40 € per 1,5 h. Font única del cost del tècnic, sigui
+// que es vengui sol o que substitueixi el tècnic inclòs en un producte de
+// proveïdor (animació/bingo de Masquerade). Un sol número per a tot el sistema.
+export const SOUND_TECH_PRICE = 40;
+export const SOUND_TECH_DURATION = '1,5 h';
+
+/**
+ * Detecta si un producte de proveïdor porta tècnic de so intrínsec (a partir
+ * del camp `crew`, p. ex. «Animador + tècnic de so»). No hardcodeja cap
+ * proveïdor: només llegeix la composició de l'equip que ja és dada del producte.
+ */
+export function productIncludesSoundTech(crew?: string | null): boolean {
+  if (!crew) return false;
+  return /t[eè]cnic\s+de\s+so/i.test(crew);
+}
+
 /** Preu derivat d'un servei de DJ per a N hores (≥1). Font única de qualsevol preu base. */
 export function djPriceForHours(hours: number): number {
   const h = Math.max(1, Math.round(hours));
@@ -51,7 +67,9 @@ export function djPriceForHours(hours: number): number {
 export const ORBITA_SERVICES: OrbitaService[] = [
   { id: 'dj-primera-hora', kind: 'DJ', label: 'DJ · 1a hora', defaultPrice: DJ_FIRST_HOUR_PRICE, unit: 'unit', optional: false },
   { id: 'dj-hora-addicional', kind: 'DJ', label: 'DJ · hora addicional', defaultPrice: DJ_EXTRA_HOUR_PRICE, unit: 'hour', optional: false },
-  { id: 'tecnic-so', kind: 'SOUND_TECH', label: 'Tècnic de so (Òrbita)', defaultPrice: 40, unit: 'unit', optional: true },
+  { id: 'tecnic-so', kind: 'SOUND_TECH', label: `Tècnic de so · ${SOUND_TECH_DURATION}`, defaultPrice: SOUND_TECH_PRICE, unit: 'unit', optional: true },
+  { id: 'bombolles', kind: 'EQUIPMENT', label: 'Màquina de bombolles', defaultPrice: 50, unit: 'unit', optional: true },
+  { id: 'caps-mobils', kind: 'EQUIPMENT', label: 'Caps mòbils (llum)', defaultPrice: 120, unit: 'unit', optional: true },
 ];
 
 export function getOrbitaService(id: string): OrbitaService | undefined {

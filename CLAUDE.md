@@ -307,7 +307,7 @@ Tot fitxer CSS d'admin nou o modificat ha de complir:
 4. **Responsiu obligatori** — tot component nou ha de tenir `@media` per a mòbil (≥375px), tablet i desktop. No lliurar sense haver comprovat els tres punts de ruptura.
 5. **Zero maquetació a píxel en admin nou/modificat** — no fixar layouts amb `px` locals (`width`, `max-width`, `min-width`, `height`, `max-height`, `grid-template-columns`, `flex-basis`, breakpoints, gaps/paddings repetits). Usar tokens (`--o-*`), `rem`, `ch`, `%`, `fr`, `dvh/dvw`, `clamp()`, `min()`, `max()` i `minmax()` perquè la peça sigui reutilitzable i responsiva. Excepcions: hairlines `1px`, SVG/canvas, captures/previews tècnics i definició centralitzada de tokens a `orbita-tokens.css`.
 6. **Monocapa** — si un valor o regla visual s'usa en més d'un lloc, va a `orbita-tokens.css` o a `admin-shell.css`. Cap fitxer de pàgina reinventa tokens globals.
-7. **Reinici de servidor obligatori** — Next.js dev NO hot-recarga fitxers CSS existents modificats. Després de qualsevol canvi CSS: `Get-Process node | Stop-Process -Force` + esborrar `.next` + `pnpm dev`. Sense reinici, els canvis no apliquen i la pàgina segueix mostrant l'estil antic.
+7. **Refresc del navegador després de canvi CSS** — Next.js 14 (Fast Refresh) SÍ recarrega el CSS modificat; el servidor serveix l'estil nou a cada càrrega. Si una pàgina segueix mostrant l'estil antic, el primer pas és un **refresc fort al navegador** (`Ctrl+Shift+R`), no reiniciar el servidor. El reinici complet (`Get-Process node | Stop-Process -Force` + esborrar `.next` + `pnpm dev`) queda reservat **només** per al cas residual en què el refresc fort no n'hi hagi prou (corrupció de `.next`), que és poc freqüent.
 
 ### Paleta admin (tokens)
 

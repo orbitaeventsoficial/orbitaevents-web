@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useTransition, useEffect, useCallback, type CSSProperties } from 'react';
+import { useState, useTransition, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
@@ -361,86 +361,52 @@ export default function LeadDetailClient({ lead, proposals, dossiers }: {
         <Link href="/admin/leads" className="ap-detail-bar-btn">← Temporada</Link>
       </header>
 
-      {/* BAND 1 · Identitat (nom + meta + stats inline · NET del bolo protagonista) */}
-      <section className="fxd__id">
-        <div className="fxd__id-main">
-          <p className="fxd__id-eyebrow">{STAGE_LABEL[stage]} · {lead.type} · {sourceLabel(lead.channel)}</p>
-          <div className="fxd__id-titlerow">
-            <h2 className="fxd__id-name">{lead.name}</h2>
-            <div className="fxd__id-contact" aria-label="Contacte ràpid">
-              {(['phone', 'email'] as EditableField[]).map((f) => (
-                editField === f ? (
-                  <span key={f} className="fxd__editrow">
-                    <input className="fxd__editinput" value={editValue} type={f === 'email' ? 'email' : 'tel'}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} autoFocus />
-                    <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
-                    <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
-                  </span>
-                ) : (
-                  <button key={f} type="button" className="fxd__id-contactitem" onClick={() => startEdit(f)}>
-                    <span className="fxd__id-contactlabel">{f === 'phone' ? 'Tel.' : 'Email'}</span>
-                    <span className="fxd__id-contactvalue">{fields[f] || <em className="fxd__empty">Afegir</em>}</span>
-                  </button>
-                )
-              ))}
+      {/* BAND 1 · Identitat refeta — nom protagonista sol + rail de fets horitzontal */}
+      <section className="fxd__hd">
+        <div className="fxd__hd-top">
+          <div className="fxd__hd-ident">
+            <p className="fxd__hd-eyebrow">{STAGE_LABEL[stage]} · {lead.type} · {sourceLabel(lead.channel)}</p>
+            <h2 className="fxd__hd-name">{lead.name}</h2>
+          </div>
+          <div className="fxd__hd-reach" aria-label="Contacte ràpid">
+            {(['phone', 'email'] as EditableField[]).map((f) => (
+              editField === f ? (
+                <span key={f} className="fxd__editrow fxd__hd-reachedit">
+                  <input className="fxd__editinput" value={editValue} type={f === 'email' ? 'email' : 'tel'}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} autoFocus />
+                  <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
+                  <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
+                </span>
+              ) : (
+                <button key={f} type="button" className="fxd__hd-reachitem" onClick={() => startEdit(f)}>
+                  <span className="fxd__hd-reachlbl">{f === 'phone' ? 'Tel.' : 'Email'}</span>
+                  <span className="fxd__hd-reachval">{fields[f] || <em className="fxd__empty">Afegir</em>}</span>
+                </button>
+              )
+            ))}
+            <span className="fxd__hd-reachbtns">
               {fields.phone && (
                 <a href={buildLeadWhatsAppHref(fields.phone, lead.name)} target="_blank" rel="noopener noreferrer" className="fxd__btn fxd__btn--whatsapp fxd__btn--sm">WhatsApp</a>
               )}
               <Link href={buildLeadComposeHref(lead.id, 'seguiment')} className="fxd__btn fxd__btn--mail fxd__btn--sm">Correu</Link>
-              <span className="fxd__statchip fxd__statchip--gold">
-                <span className="fxd__statchip-lbl">Valor</span>
-                {editField === 'budget' ? (
-                  <span className="fxd__editrow">
-                    <input className="fxd__editinput fxd__statchip-input" type="number" min={0} value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
-                      autoFocus />
-                    <span className="fxd__statchip-cur">€</span>
-                    <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
-                    <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
-                  </span>
-                ) : (
-                  <b className="fxd__statchip-val fxd__budget-editable" onClick={() => startEdit('budget')}>
-                    {boloEcon?.total
-                      ? formatCurrency(boloEcon.total)
-                      : fields.budget
-                        ? formatCurrency(Number(fields.budget))
-                        : (() => {
-                            const prop = proposals.find((p) => Number.isFinite(p.total) && p.total > 0)?.total;
-                            return prop ? formatCurrency(prop) : <em className="fxd__empty">Afegir</em>;
-                          })()}
-                  </b>
-                )}
-              </span>
-              <span className="fxd__statchip">
-                <span className="fxd__statchip-lbl">Durada</span>
-                <b className="fxd__statchip-val">{durationLabel(fields.eventStartTime, fields.eventEndTime)}</b>
-              </span>
-              <span className="fxd__statchip">
-                <span className="fxd__statchip-lbl">Prioritat</span>
-                <b className={`fxd__statchip-val fxd__pri--${lead.priority.toLowerCase()}`}>{PRIORITY_LABEL[lead.priority] || lead.priority}</b>
-              </span>
-            </div>
-            {lead.lostReason && <span className="fxd__lost">{lead.lostReason}</span>}
-            {lead.wx && (
-              <span className="fxd__wxrow">
-                <WxBadge wx={lead.wx} size="md" />
-                {lead.dateISO && <span className="fxd__wxdate">{fullDate(lead.dateISO.slice(0, 10))}</span>}
-              </span>
-            )}
+            </span>
           </div>
-          {/* Dades del bolo compactes al header (editables inline) */}
-          <div className="fxd__id-meta">
-            {([
-              { f: 'eventDate' as EditableField, ic: '📅', type: 'date', show: (v: string) => v ? fullDate(v) : '' },
-              { f: 'eventStartTime' as EditableField, ic: '🕐', type: 'time', show: (v: string) => v },
-              { f: 'eventEndTime' as EditableField, ic: '→', type: 'time', show: (v: string) => v },
-              { f: 'eventLocation' as EditableField, ic: '📍', type: 'text', show: (v: string) => v },
-              { f: 'guestCount' as EditableField, ic: '👥', type: 'number', show: (v: string) => v ? `${v} pax` : '' },
-            ]).map(({ f, ic, type, show }) => (
-              editField === f ? (
-                <span key={f} className="fxd__editrow">
+        </div>
+
+        {/* Rail de fets — una sola línia ledger amb columnes separades per hairline */}
+        <div className="fxd__hd-rail" aria-label="Dades del bolo">
+          {([
+            { f: 'eventDate' as EditableField, lbl: 'Data', type: 'date', show: (v: string) => v ? fullDate(v) : '' },
+            { f: 'eventStartTime' as EditableField, lbl: 'Inici', type: 'time', show: (v: string) => v },
+            { f: 'eventEndTime' as EditableField, lbl: 'Fi', type: 'time', show: (v: string) => v },
+            { f: 'eventLocation' as EditableField, lbl: 'Lloc', type: 'text', show: (v: string) => v },
+            { f: 'guestCount' as EditableField, lbl: 'Pax', type: 'number', show: (v: string) => v ? `${v}` : '' },
+          ]).map(({ f, lbl, type, show }) => (
+            <div key={f} className="fxd__fact">
+              <span className="fxd__fact-lbl">{lbl}</span>
+              {editField === f ? (
+                <span className="fxd__editrow">
                   <input className="fxd__editinput" type={type} value={editValue} autoFocus min={type === 'number' ? 1 : undefined}
                     onChange={(e) => setEditValue(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} />
@@ -448,14 +414,56 @@ export default function LeadDetailClient({ lead, proposals, dossiers }: {
                   <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
                 </span>
               ) : (
-                <button key={f} type="button" className="fxd__metachip" onClick={() => startEdit(f)}>
-                  <span className="fxd__metachip-ic">{ic}</span>
+                <button type="button" className="fxd__fact-val" onClick={() => startEdit(f)}>
                   {show(String(fields[f] ?? '')) || <em className="fxd__empty">+</em>}
                 </button>
-              )
-            ))}
+              )}
+            </div>
+          ))}
+          <div className="fxd__fact">
+            <span className="fxd__fact-lbl">Durada</span>
+            <span className="fxd__fact-val fxd__fact-val--ro">{durationLabel(fields.eventStartTime, fields.eventEndTime)}</span>
+          </div>
+          <div className="fxd__fact">
+            <span className="fxd__fact-lbl">Prioritat</span>
+            <span className={`fxd__fact-val fxd__fact-val--ro fxd__pri--${lead.priority.toLowerCase()}`}>{PRIORITY_LABEL[lead.priority] || lead.priority}</span>
+          </div>
+          {lead.wx && (
+            <div className="fxd__fact">
+              <span className="fxd__fact-lbl">Temps</span>
+              <span className="fxd__fact-val fxd__fact-val--ro fxd__fact-wx">
+                <WxBadge wx={lead.wx} size="sm" />
+                {lead.dateISO && <span className="fxd__fact-wxdate">{fullDate(lead.dateISO.slice(0, 10))}</span>}
+              </span>
+            </div>
+          )}
+          <div className="fxd__fact fxd__fact--value">
+            <span className="fxd__fact-lbl">Valor</span>
+            {editField === 'budget' ? (
+              <span className="fxd__editrow">
+                <input className="fxd__editinput" type="number" min={0} value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
+                  autoFocus />
+                <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
+                <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
+              </span>
+            ) : (
+              <button type="button" className="fxd__fact-val fxd__fact-val--big" onClick={() => startEdit('budget')}>
+                {boloEcon?.total
+                  ? formatCurrency(boloEcon.total)
+                  : fields.budget
+                    ? formatCurrency(Number(fields.budget))
+                    : (() => {
+                        const prop = proposals.find((p) => Number.isFinite(p.total) && p.total > 0)?.total;
+                        return prop ? formatCurrency(prop) : <em className="fxd__empty">Afegir</em>;
+                      })()}
+              </button>
+            )}
           </div>
         </div>
+
+        {lead.lostReason && <p className="fxd__hd-lost">{lead.lostReason}</p>}
       </section>
 
       {/* Àrea zenit: govern esquerra · bolo centre · economia dreta */}
@@ -597,14 +605,8 @@ export default function LeadDetailClient({ lead, proposals, dossiers }: {
             </div>
           </section>
         )}
-      </aside>
 
-      <main className="fxd__zenith-main" aria-label="Configuració del bolo">
-        <LeadBoloSection leadId={lead.id} source={lead.channel} onEconomiaChange={handleEconomia} compactEconomia />
-      </main>
-
-      <aside className="fxd__rail fxd__rail--right" aria-label="Economia i documents">
-        {/* Rendibilitat i documents */}
+        {/* Rendibilitat — sota Fase, mateixa columna esquerra */}
         <section className="fxd__panel fxd__panel--wide">
           <div className="fxd__panelhead"><span>Rendibilitat</span></div>
           <dl className="fxd__rows">
@@ -692,20 +694,19 @@ export default function LeadDetailClient({ lead, proposals, dossiers }: {
             </dd></div>
           </dl>
         </section>
-      </aside>
-      </div>{/* /fxd__zenith */}
 
-      <footer className="fxd__zenith-footer" aria-label="Marge del bolo">
-        <div className="fxd__econohead">
-          <span>Marge del bolo</span>
-          <span className="fxd__econonote">net = ingrés - cost directe - origen</span>
-        </div>
-        {!boloEcon ? (
-          <p className="fxd__econonote">Afegeix línies al bolo per veure el marge.</p>
-        ) : (
-          <>
+        {/* Marge del bolo — viu al peu de la columna de govern (omple el buit que
+            abans quedava sota la Rendibilitat) i estira fins a baix de tot. */}
+        <section className="fxd__panel fxd__panel--wide fxd__panel--margin" aria-label="Marge del bolo">
+          <div className="fxd__panelhead">
+            <span>Marge del bolo</span>
+            <span className="fxd__econonote">net = ingrés − cost − origen</span>
+          </div>
+          {!boloEcon ? (
+            <p className="fxd__econonote">Afegeix línies al bolo per veure el marge.</p>
+          ) : (
             <div className="fxd__kpis">
-              <div className="fxd__kpi" data-level="gold">
+              <div className="fxd__kpi" data-level="info">
                 <div className="fxd__kpi-val">{formatCurrency(boloEcon.total)}</div>
                 <div className="fxd__kpi-lbl">Ingrés</div>
                 <div className="fxd__kpi-sub">suma de les línies</div>
@@ -730,12 +731,14 @@ export default function LeadDetailClient({ lead, proposals, dossiers }: {
                 </div>
               </div>
             </div>
-            <div className="fxd__marginmeter" data-tone={boloEcon.tone} style={{ '--fxd-margin-pct': `${Math.max(0, Math.min(100, boloEcon.marginPct))}%` } as CSSProperties}>
-              <span />
-            </div>
-          </>
-        )}
-      </footer>
+          )}
+        </section>
+      </aside>
+
+      <main className="fxd__zenith-main" aria-label="Configuració del bolo">
+        <LeadBoloSection leadId={lead.id} source={lead.channel} onEconomiaChange={handleEconomia} compactEconomia />
+      </main>
+      </div>{/* /fxd__zenith */}
 
       <ConfirmDialog {...dialogProps} />
     </div>

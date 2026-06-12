@@ -1113,6 +1113,8 @@ Criteri pràctic:
 **FET** *(2026-05-11 per `codex` — Canvi #540)*: el mateix guard ja no accepta proves buides o decoratives al tracker. Cada entrada de `ADMIN_MARKETING_PHASE_EVIDENCE` ha de portar `proof`, `whereToCheck` i `unlockSignal` amb contingut mínim; el test del guard reprodueix una prova buida i falla amb el missatge específic.
 **FET** *(2026-05-11 per `codex` — Canvi #544)*: el manual ja no deixa la tria de Fase 1 com a consell obert. `ADMIN_MARKETING_CHANNEL_DECISION_MATRIX` defineix cinc opcions gratuïtes de Fase 1 amb quan començar, primer moviment, senyal d'èxit, condició de parada i enllaç admin; `/admin/manual` ho mostra com "Matriu d’un sol canal" dins el pla de captació, i `qa:admin-manual-consistency` exigeix que cada opció referenciï accions `FASE_1`, tingui textos accionables i apunti a `/admin`.
 
+**PENDENT (bloqueig extern Google) — CAC real per canal** *(2026-06-12, propietari)*: l'«Origen» del marge del bolo (CAC) surt avui de la taula d'estimacions `channelCac` (`lib/constants/admin.ts`). El propietari vol substituir-ho per CAC real (`despesa / conversions` per canal). La integració de lectura ja existeix al codi (`lib/analytics/google-ads.ts` → `getGoogleAdsReport()` exposa `cost_micros` + `conversions`), però **bloquejada**: falta `GOOGLE_ADS_DEVELOPER_TOKEN` + `GOOGLE_ADS_CUSTOMER_ID` al `.env`. El developer token només s'obté des d'un compte gestor (MCC) i el propietari no pot crear-ne cap ara («límit de comptes de gestor»); a més Google triga 1-3 dies a aprovar l'accés «Basic». Acció del propietari: desbloquejar/crear MCC → API Center → developer token → passar token + Customer ID per posar-los al `.env`. Script de comprovació llest: `.dbg-ads.ts`. Coherent amb el gate de Fase 0/2: no obrir Google Ads de pagament fins que la captació gratuïta estigui treballada. Detall a memòria `project-cac-real-pendent`.
+
 ### Fase 0 — Fundació (abans de gastar res)
 - **Definir 1 client ideal clar** (ICP): tipus d'event (bodes? corporatius? festes privades?), ubicació, pressupost mig, què busquen.
 - **Proposta de valor en 1 frase**: "Ajudem a [X] a [Y] sense [dolor]". Si no la tens clara, res funcionarà.
@@ -1385,6 +1387,21 @@ Seqüència obligatòria de registre:
 ## Entrades
 
 ---
+
+### Canvi #926 — 2026-06-12 — claude (TANCAT)
+
+**Bolo: tècnic de so per-proveïdor, proveïdors activables i Tino; + redistribució total de la fitxa (Opus).**
+
+- Font única del tècnic de so a `lib/constants/orbita-services.ts`: `SOUND_TECH_PRICE = 40`, `SOUND_TECH_DURATION = '1,5 h'`, helper `productIncludesSoundTech(crew)` (detecta tècnic intrínsec pel camp `crew`, sense hardcodejar cap proveïdor). Afegits al catàleg propi: bombolles 50 €, caps mòbils 120 €. «Productes d'Òrbita» queda com un sol grup.
+- `BookingServiceLinesSection.tsx`: en afegir un producte de proveïdor amb tècnic, es desdobla en producte (cost − 40) + línia `SOUND_TECH` (40) amb `<select>` Masquerade/Òrbita que reassigna `collaboratorId`. Total invariant; canvia qui factura. Proveïdors externs NO surten per defecte: chips d'activació (`.nb__cfg-providers`), només es mostra el grup activat.
+- `collaboratorProductService.ts`: exposa `crew`. NOU `scripts/seed-tino-products.ts` (Tino, rol `EQUIPMENT_RENTAL`, PVP via `resellPrice`: fum 60→75, xispes 250→300, micro 30→40) JA aplicat a Railway. Spec a `docs/tino-lloguer-seed.md`.
+- Redistribució total de `/admin/leads/[id]` (disseny d'Opus): header «ledger», tipografia coherent header↔footer, semàfor només al Net (carbassa `--o-warning`, no daurat), layout 2 columnes amb «Marge del bolo» (KPIs 2×2) omplint el buit del govern, bolo ample. Una pantalla **sense scroll** a 1080p/1440×900/1366×768. CSS mort del header antic i del footer eliminat. Norma de servidor relaxada a `CLAUDE.md` (refresc fort, no reinici, després de canvi CSS).
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `pnpm test:run` 4859 verds (+9 `orbita-services.test.ts`).
+- Validació funcional: selector tècnic provat end-to-end (`.codex-captures/lead-tecnic.png`); seed Tino aplicat a Railway amb sortida confirmada; redistribució «CAP sense scroll» a 3 resolucions.
+- Validació humana/UX: repassada visual del propietari en curs.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
 
 ### Canvi #925 — 2026-06-11 — codex (EN MARXA · relleu Claude pendent)
 

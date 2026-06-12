@@ -645,8 +645,6 @@
 .fxd__ph-rec  { opacity: 0.55; margin-left: auto; }
 
 /* Meteo hero — línia data + badge a la fitxa ràpida */
-.fxd__wxrow { display: flex; align-items: center; gap: 7px; margin-top: 5px; }
-.fxd__wxdate { font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-semi); color: var(--t3); }
 
 /* ── PEÇA 5: Pipeline ──────────────────────────────────────────────────── */
 
@@ -904,6 +902,10 @@
   font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t3); line-height: 1.3;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+
+/* fxd__lost / fxd__wxrow / fxd__wxdate — usats per LeadsSeasonClient (no pel header de la fitxa) */
+.fxd__wxrow { display: flex; align-items: center; gap: 0.44rem; margin-top: 0.3rem; }
+.fxd__wxdate { font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-semi); color: var(--t3); }
 .fxd__lost {
   display: inline-flex; margin-top: 12px; padding: 5px 9px;
   border: 1px solid color-mix(in oklab, var(--c) 34%, var(--line));
@@ -1244,86 +1246,7 @@ html.admin-mode .lf__root {
 .fxd__fullpage .ap-detail-bar-btn { min-height: 1.75rem; }
 
 /* ═══ BAND 1 · Identitat (pantalla negra) — nom+stats | NET del bolo ═══ */
-.fxd__id {
-  display: grid; grid-template-columns: minmax(0, 1fr);
-  gap: 0.35rem;
-  padding: 0.5rem 0.9rem;
-  border-bottom: 1px solid var(--line);
-}
-.fxd__id-main { min-width: 0; display: flex; flex-direction: column; gap: 0.25rem; }
-.fxd__id-eyebrow {
-  margin: 0; font-family: var(--ui); font-size: var(--o-text-xs); font-weight: var(--o-fw-semi);
-  letter-spacing: 0; color: var(--c);
-}
-.fxd__id-titlerow { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.65rem; min-width: 0; }
-.fxd__id-name {
-  margin: 0; font-family: var(--heading); font-size: var(--o-text-xl); font-weight: var(--o-fw-xbold);
-  letter-spacing: -0.03em; line-height: 1; color: var(--t);
-}
-/* Contacte ràpid al header */
-.fxd__id-contact { display: inline-flex; flex: 999 1 24rem; flex-wrap: wrap; align-items: center; gap: 0.35rem; min-width: min(100%, 18rem); }
-.fxd__id-contactitem {
-  display: inline-flex; align-items: baseline; gap: 0.35rem; min-width: 0; max-width: min(100%, 22rem);
-  padding: 0.3rem 0.65rem; border: 1px solid var(--line); border-radius: var(--o-r-sm-2);
-  background: color-mix(in oklab, var(--panel) 60%, transparent);
-  font-family: var(--ui); font-size: var(--o-text-xs); font-weight: var(--o-fw-book);
-  color: var(--t2); cursor: pointer; transition: border-color 120ms ease, color 120ms ease;
-}
-.fxd__id-contactitem:hover { border-color: var(--line2); color: var(--t); }
-.fxd__id-contactlabel { color: var(--t3); font-size: var(--o-text-2xs); }
-.fxd__id-contactvalue { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.fxd__btn--sm { min-height: 1.85rem; padding: 0 0.7rem; font-size: var(--o-text-xs); }
-/* Dades del bolo compactes al header (data/hora/lloc/pax editables) */
-.fxd__id-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.5rem; margin-top: 0; }
-.fxd__metachip {
-  display: inline-flex; align-items: center; gap: 0.3rem; min-width: 0;
-  padding: 0.18rem 0.5rem; border: 1px solid var(--line); border-radius: var(--o-r-pill);
-  background: color-mix(in oklab, var(--panel) 50%, transparent);
-  font-family: var(--ui); font-size: var(--o-text-2xs); font-weight: var(--o-fw-semi);
-  color: var(--t2); cursor: pointer; transition: border-color 120ms ease, color 120ms ease;
-}
-.fxd__metachip:hover { border-color: var(--line2); color: var(--t); }
-.fxd__metachip-ic { font-size: var(--o-text-xs); opacity: 0.85; }
-.fxd__statchips { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.05rem; }
-.fxd__statchip {
-  display: flex; flex-direction: column; gap: 0.1rem; min-width: 0;
-  padding: 0.28rem 0.6rem; border: 1px solid var(--line); border-radius: var(--o-r-sm-2);
-  background: color-mix(in oklab, var(--panel) 60%, transparent);
-}
-.fxd__statchip-lbl {
-  font-family: var(--ui); font-size: var(--o-text-2xs); font-weight: var(--o-fw-normal);
-  color: var(--t3);
-}
-.fxd__statchip-val {
-  font-family: var(--heading); font-size: var(--o-text-md-2); font-weight: var(--o-fw-bold);
-  letter-spacing: -0.01em; color: var(--t);
-}
-.fxd__statchip--gold .fxd__statchip-val { color: var(--gold); cursor: pointer; }
-.fxd__statchip-input { width: 6em; }
-.fxd__statchip-cur { font-family: var(--mono); font-size: var(--o-text-sm); color: var(--t3); }
-/* NET del bolo — segona xifra protagonista */
-.fxd__netbox {
-  flex: 0 1 clamp(14rem, 22vi, 22rem); display: flex; flex-direction: column; justify-content: center; gap: 0.2rem;
-  padding: 0.85rem 1.1rem; border: 1px solid var(--hair-gold); border-radius: var(--o-r-md);
-  background: linear-gradient(180deg, color-mix(in oklab, var(--panel) 88%, var(--canvas)), var(--canvas));
-}
-.fxd__netbox-lbl {
-  font-family: var(--ui); font-size: var(--o-text-xs); font-weight: var(--o-fw-normal);
-  letter-spacing: 0; color: var(--t3);
-}
-.fxd__netbox-val {
-  font-family: var(--heading); font-size: var(--o-text-display); font-weight: var(--o-fw-xbold);
-  letter-spacing: -0.02em; line-height: 1; color: var(--t2); font-variant-numeric: tabular-nums;
-}
-.fxd__netbox-sub { font-family: var(--ui); font-size: var(--o-text-xs); color: var(--t3); }
-.fxd__netbox[data-tone="emerald"] .fxd__netbox-val { color: var(--o-success); }
-.fxd__netbox[data-tone="amber"]   .fxd__netbox-val { color: var(--gold); }
-.fxd__netbox[data-tone="orange"]  .fxd__netbox-val { color: var(--o-stage-contacted-strong); }
-.fxd__netbox[data-tone="rose"]    .fxd__netbox-val { color: var(--o-stage-lost); }
-
-@media (max-width: 44rem) {
-  .fxd__netbox { flex: 1 1 100%; }
-}
+.fxd__btn--sm { min-height: 1.85rem; padding: 0 0.7rem; font-size: var(--o-text-sm); }
 
 .fxd__fullpage .fxd__bar {
   padding: 0.45rem 0.9rem;
@@ -1464,116 +1387,6 @@ html.admin-mode .lf__root {
 
 .fxd__stage-create { margin-top: 0.5rem; }
 
-.fxd__moneycard {
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-  padding: 0.65rem 0.75rem;
-  border: 1px solid var(--hair-gold);
-  border-radius: var(--o-r-md);
-  background: linear-gradient(180deg, color-mix(in oklab, var(--panel) 88%, var(--canvas)), var(--canvas));
-}
-.fxd__moneyhead {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  color: var(--t);
-  font-family: var(--heading);
-  font-size: var(--o-text-md);
-  font-weight: var(--o-fw-bold);
-}
-.fxd__moneyhead small,
-.fxd__moneyhero small {
-  font-family: var(--ui);
-  font-size: var(--o-text-2xs);
-  font-weight: var(--o-fw-normal);
-  color: var(--t3);
-}
-.fxd__moneyhero {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-}
-.fxd__moneyhero span {
-  font-size: var(--o-text-xs);
-  color: var(--t3);
-}
-.fxd__moneyhero strong {
-  font-family: var(--heading);
-  font-size: var(--o-text-xl-2);
-  line-height: 1;
-  color: var(--t2);
-  font-variant-numeric: tabular-nums;
-}
-.fxd__moneycard[data-tone="emerald"] .fxd__moneyhero strong { color: var(--o-success); }
-.fxd__moneycard[data-tone="amber"] .fxd__moneyhero strong { color: var(--gold); }
-.fxd__moneycard[data-tone="orange"] .fxd__moneyhero strong { color: var(--o-stage-contacted-strong); }
-.fxd__moneycard[data-tone="rose"] .fxd__moneyhero strong { color: var(--o-stage-lost); }
-.fxd__moneyrows {
-  display: grid;
-  gap: 0;
-  margin: 0;
-}
-.fxd__moneyrows div {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.6rem;
-  padding-block: 0.22rem;
-  border-top: 1px solid var(--line);
-}
-.fxd__moneyrows dt {
-  color: var(--t3);
-  font-size: var(--o-text-xs);
-}
-/* Sub-files: desglossament del Cost directe (indentat, tènue) */
-.fxd__moneyrow--sub dt { padding-left: 0.5rem; color: var(--t4, var(--t3)); opacity: 0.85; }
-.fxd__moneyrow--sub dd { font-weight: var(--o-fw-semi); color: var(--t2); }
-.fxd__moneyrows dd {
-  margin: 0;
-  color: var(--t);
-  font-family: var(--ui);
-  font-size: var(--o-text-sm);
-  font-weight: var(--o-fw-bold);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
-}
-/* Footer compacte: la card d'economia passa de vertical a horitzontal (KPIs en fila). */
-.fxd__econofooter .fxd__moneycard {
-  flex-direction: row; flex-wrap: wrap; align-items: center;
-  gap: 1rem; padding: 0.5rem 0.8rem;
-}
-.fxd__econofooter .fxd__moneyrows {
-  display: flex; flex-flow: row wrap; gap: 0.35rem 1.1rem;
-}
-.fxd__econofooter .fxd__moneyrows div {
-  border-top: 0; padding-block: 0.1rem;
-  flex-direction: column; align-items: flex-start; gap: 0;
-}
-.fxd__econofooter .fxd__moneyhero strong { font-size: var(--o-text-lg); }
-
-.fxd__econofooter .fxd__econo {
-  margin: 0;
-}
-.fxd__econofooter .fxd__econohead {
-  padding: 0.45rem 0.65rem;
-}
-.fxd__econofooter .fxd__kpis {
-  grid-template-columns: 1fr;
-}
-.fxd__econofooter .fxd__kpi {
-  min-height: auto;
-  padding: 0.6rem 0.7rem;
-}
-.fxd__econofooter .fxd__kpi-val {
-  font-size: var(--o-text-lg);
-}
-.fxd__econofooter .fxd__kpi-lbl {
-  margin-top: 0.3rem;
-}
-.fxd__econofooter .fxd__kpi-sub {
-  margin-top: 0.15rem;
-}
-
 /* Configurador encastat a fitxa lead: compactació proporcional, no maquetada a píxel. */
 html.admin-mode .fxd__fullpage .nb__cfg {
   grid-template-columns: minmax(0, 1fr) minmax(min(100%, 10.5rem), 0.34fr);
@@ -1649,82 +1462,215 @@ html.admin-mode .fxd__fullpage .ap-detail-bar-btn {
   padding-inline: 0.65rem;
   font-size: var(--o-text-2xs);
 }
-html.admin-mode .fxd__id {
+/* ── BAND 1 · Header refet (#925) — nom protagonista sol + rail de fets ──
+   Concepte: dues bandes horitzontals. A dalt, identitat (nom gran = únic focus)
+   amb el contacte discret a la dreta. A baix, un rail ledger d'una línia amb
+   tots els fets del bolo en columnes separades per hairline. Valor a l'extrem
+   dret amb pes propi però SENSE or (l'or queda reservat al resultat del footer). */
+html.admin-mode .fxd__hd {
   flex: 0 0 auto;
-  padding: 0.7rem 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 0.95rem clamp(0.9rem, 2.4vi, 1.5rem) 0.85rem;
   border-bottom: thin solid color-mix(in oklab, var(--line) 74%, transparent);
   background:
-    linear-gradient(90deg, color-mix(in oklab, var(--c) 7%, transparent), transparent 38rem),
-    color-mix(in oklab, var(--canvas) 88%, transparent);
+    linear-gradient(180deg, color-mix(in oklab, var(--raised) 40%, transparent), transparent 70%),
+    color-mix(in oklab, var(--canvas) 92%, transparent);
 }
-html.admin-mode .fxd__id-eyebrow {
+/* Banda superior: identitat | contacte */
+html.admin-mode .fxd__hd-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.6rem 1.5rem;
+}
+html.admin-mode .fxd__hd-ident {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+html.admin-mode .fxd__hd-eyebrow {
+  margin: 0;
+  font-family: var(--ui);
   font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-semi);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--t3);
 }
-html.admin-mode .fxd__id-titlerow {
-  display: grid;
-  grid-template-columns: minmax(19rem, 0.78fr) minmax(28rem, 1.42fr) auto;
+html.admin-mode .fxd__hd-name {
+  margin: 0;
+  font-family: var(--heading);
+  font-size: clamp(var(--o-text-2xl), 3.4vi, var(--o-text-3xl));
+  font-weight: var(--o-fw-xbold);
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  color: var(--t);
+}
+/* Contacte discret a la dreta, alineat a la base del nom */
+html.admin-mode .fxd__hd-reach {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem 0.9rem;
+  gap: 0.35rem 0.5rem;
+  min-width: 0;
 }
-html.admin-mode .fxd__id-name {
-  font-size: clamp(var(--o-text-2xl), 2.85vi, var(--o-text-3xl));
-  line-height: 0.98;
+html.admin-mode .fxd__hd-reachedit { flex: 1 1 14rem; min-width: 0; }
+html.admin-mode .fxd__hd-reachitem {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  min-width: 0;
+  max-width: min(100%, 22rem);
+  padding: 0.32rem 0.7rem;
+  border: thin solid var(--line);
+  border-radius: var(--o-r-sm-2);
+  background: color-mix(in oklab, var(--panel) 45%, transparent);
+  font-family: var(--mono);
+  font-size: var(--o-text-xs);
+  color: var(--t2);
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
 }
-html.admin-mode .fxd__id-contact {
-  justify-content: flex-end;
-  gap: 0.25rem;
+html.admin-mode .fxd__hd-reachitem:hover {
+  border-color: var(--line2);
+  color: var(--t);
+  background: color-mix(in oklab, var(--panel) 70%, transparent);
 }
-html.admin-mode .fxd__id-contactitem,
-html.admin-mode .fxd__metachip,
-html.admin-mode .fxd__statchip {
-  background: color-mix(in oklab, var(--panel) 36%, transparent);
-}
-html.admin-mode .fxd__id-contactitem {
-  min-height: 1.95rem;
-  padding: 0.34rem 0.62rem;
+html.admin-mode .fxd__hd-reachlbl {
+  font-family: var(--ui);
   font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-semi);
+  letter-spacing: 0.02em;
+  color: var(--t3);
 }
-html.admin-mode .fxd__metachip {
-  padding: 0.2rem 0.55rem;
+html.admin-mode .fxd__hd-reachval {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html.admin-mode .fxd__hd-reachbtns {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-inline-start: 0.15rem;
+}
+
+/* Banda inferior: rail ledger — columnes separades per hairline intern */
+html.admin-mode .fxd__hd-rail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  border: thin solid color-mix(in oklab, var(--line) 80%, transparent);
+  border-radius: var(--o-r-md);
+  background: color-mix(in oklab, var(--panel) 30%, transparent);
+  overflow: hidden;
+}
+html.admin-mode .fxd__fact {
+  flex: 1 1 auto;
+  min-width: max-content;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.45rem clamp(0.55rem, 1.4vi, 0.95rem);
+  border-inline-start: thin solid color-mix(in oklab, var(--line) 55%, transparent);
+}
+html.admin-mode .fxd__fact:first-child { border-inline-start: 0; }
+html.admin-mode .fxd__fact-lbl {
+  font-family: var(--ui);
   font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-semi);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--t3);
 }
-html.admin-mode .fxd__statchip {
-  min-width: 4.8rem;
-  padding: 0.28rem 0.55rem;
-  gap: 0.06rem;
-}
-html.admin-mode .fxd__id-meta {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, auto));
-  justify-content: start;
-  gap: 0.38rem 0.55rem;
-  margin-top: 0.55rem;
-}
-html.admin-mode .fxd__statchip-lbl {
-  font-size: var(--o-text-micro);
-}
-html.admin-mode .fxd__statchip-val {
-  font-size: var(--o-text-sm);
-}
-html.admin-mode .fxd__statchip--gold .fxd__statchip-val {
+html.admin-mode .fxd__fact-val {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--heading);
   font-size: var(--o-text-base);
+  font-weight: var(--o-fw-bold);
+  letter-spacing: -0.01em;
+  color: var(--t);
+  text-align: start;
+  white-space: nowrap;
+}
+button.fxd__fact-val { cursor: pointer; transition: color 120ms ease; }
+button.fxd__fact-val:hover { color: var(--o-warning); }
+html.admin-mode .fxd__fact-val--ro { cursor: default; }
+/* Valor: empès a la dreta, pes propi, però sense or (or = resultat footer) */
+html.admin-mode .fxd__fact--value {
+  margin-inline-start: auto;
+  background: color-mix(in oklab, var(--raised) 50%, transparent);
+}
+html.admin-mode .fxd__fact-val--big {
+  font-family: var(--heading);
+  font-size: var(--o-text-xl);
+  font-weight: var(--o-fw-xbold);
+  letter-spacing: -0.02em;
+}
+html.admin-mode .fxd__fact-wx { gap: 0.4rem; }
+html.admin-mode .fxd__fact-wxdate {
+  font-family: var(--mono);
+  font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-semi);
+  color: var(--t3);
+}
+/* Motiu de pèrdua — avís carbassa, ample complet sota el rail */
+html.admin-mode .fxd__hd-lost {
+  margin: 0;
+  padding: 0.45rem 0.7rem;
+  border: thin solid color-mix(in oklab, var(--o-warning) 40%, var(--line));
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--o-warning) 9%, transparent);
+  font-family: var(--mono);
+  font-size: var(--o-text-xs);
+  font-weight: var(--o-fw-semi);
+  color: var(--o-warning);
+}
+
+/* Mòbil: rail a graella de 2 columnes, valor a tot l'ample */
+@media (max-width: 40rem) {
+  html.admin-mode .fxd__hd-top { align-items: flex-start; }
+  html.admin-mode .fxd__hd-rail {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  html.admin-mode .fxd__fact {
+    min-width: 0;
+    border-block-start: thin solid color-mix(in oklab, var(--line) 45%, transparent);
+  }
+  html.admin-mode .fxd__fact:nth-child(-n+2) { border-block-start: 0; }
+  html.admin-mode .fxd__fact:nth-child(odd) { border-inline-start: 0; }
+  html.admin-mode .fxd__fact--value {
+    grid-column: 1 / -1;
+    margin-inline-start: 0;
+  }
+  html.admin-mode .fxd__fact-val { white-space: normal; }
 }
 html.admin-mode .fxd__btn--sm {
-  min-height: 1.65rem;
-  padding-inline: 0.55rem;
+  min-height: 1.95rem;
+  padding-inline: 0.7rem;
 }
 
 html.admin-mode .fxd__zenith {
   flex: 1 1 auto;
-  min-height: 0;
   display: grid;
   grid-template-columns:
-    minmax(12.5rem, 0.58fr)
-    minmax(32rem, 1.88fr)
-    minmax(16.5rem, 0.82fr);
+    minmax(26rem, 1.18fr)
+    minmax(30rem, 1.82fr);
   grid-template-rows: minmax(0, 1fr);
+  align-items: stretch;
   gap: 0.65rem;
-  padding: 0.75rem 1rem 0.85rem;
+  padding: 0.75rem 1rem 0.45rem;
   overflow: hidden;
 }
 html.admin-mode .fxd__rail,
@@ -1732,24 +1678,77 @@ html.admin-mode .fxd__zenith-main {
   min-width: 0;
   min-height: 0;
 }
-html.admin-mode .fxd__rail {
-  display: flex;
-  flex-direction: column;
-  gap: 0.52rem;
-  overflow: hidden;
-}
+/* Govern (esquerra): graella densa de panells que omple tota l'alçada disponible.
+   Els panells curts (Fase, Cobrament, Cobraments) viuen en 2 columnes; la
+   Rendibilitat (amb documents i selects llargs) ocupa tota l'amplada a baix i
+   s'expandeix per absorbir l'espai sobrant — zero buit mort a la cantonada. */
 html.admin-mode .fxd__rail--left {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: min-content;
+  align-content: stretch;
+  gap: 0.5rem;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
   padding-right: 0.12rem;
 }
-html.admin-mode .fxd__rail--right {
-  display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
-  gap: 0.52rem;
-  padding-left: 0.12rem;
+html.admin-mode .fxd__rail--left > .fxd__panel { min-width: 0; }
+/* Rendibilitat: ample complet. */
+html.admin-mode .fxd__rail--left > .fxd__panel--wide {
+  grid-column: 1 / -1;
+}
+/* Marge del bolo: ample complet i absorbeix l'espai vertical sobrant del govern
+   (abans el buit mort de la cantonada inferior esquerra). */
+html.admin-mode .fxd__rail--left > .fxd__panel--margin {
+  grid-column: 1 / -1;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+}
+html.admin-mode .fxd__rail--left > .fxd__panel--margin .fxd__kpis {
+  flex: 1 1 auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: stretch;
+  border: thin solid color-mix(in oklab, var(--line) 70%, transparent);
+  border-radius: var(--o-r-sm);
+  overflow: hidden;
+}
+html.admin-mode .fxd__rail--left > .fxd__panel--margin .fxd__kpi {
+  min-height: 0;
+  padding: 0.55rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-bottom: thin solid color-mix(in oklab, var(--line) 55%, transparent);
+}
+html.admin-mode .fxd__rail--left > .fxd__panel--margin .fxd__kpi:nth-last-child(-n+2) {
+  border-bottom: 0;
+}
+html.admin-mode .fxd__rail--left > .fxd__panel--margin .fxd__kpi-val {
+  font-family: var(--heading);
+  font-size: var(--o-text-lg);
+  font-weight: var(--o-fw-xbold);
+}
+html.admin-mode .fxd__rail--left > .fxd__panel--margin .fxd__kpi-lbl {
+  margin-top: 0.2rem;
+  font-family: var(--ui);
+  font-size: var(--o-text-2xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+html.admin-mode .fxd__rail--left > .fxd__panel--margin .fxd__kpi[data-level="warn"] { border-left-color: var(--o-warning); }
+html.admin-mode .fxd__rail--left > .fxd__panel--margin .fxd__kpi[data-level="warn"] .fxd__kpi-val { color: var(--o-warning); }
+/* Quan només hi ha el panell de Fase (lead sense reserva), que ocupi l'ample
+   complet en lloc de quedar mig buit a l'esquerra. */
+html.admin-mode .fxd__rail--left > .fxd__panel:first-child:nth-last-child(3) {
+  grid-column: 1 / -1;
 }
 html.admin-mode .fxd__zenith-main {
   display: flex;
+  align-self: stretch;
   align-items: stretch;
+  min-height: 0;
   overflow: hidden;
 }
 html.admin-mode .fxd__zenith-main > .fxd__boloside {
@@ -1761,7 +1760,6 @@ html.admin-mode .fxd__zenith-main > .fxd__boloside > .fxd__panel {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  min-height: 0;
   height: 100%;
   border-color: color-mix(in oklab, var(--gold) 22%, var(--line));
   background:
@@ -1780,7 +1778,7 @@ html.admin-mode .fxd__zenith-main .nb__cfg {
   min-height: 0;
   height: auto;
   max-height: none;
-  grid-template-columns: minmax(0, 1fr) minmax(10.75rem, 0.36fr);
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 0.46fr);
   gap: 0.62rem;
   margin-top: 0;
 }
@@ -1823,56 +1821,11 @@ html.admin-mode .fxd__zenith-main .nb__input {
 html.admin-mode .fxd__zenith-main .nb__sl-del {
   min-height: 2rem;
 }
-/* Footer de marge a tot l'ample de pàgina (sota la graella zenit). */
-html.admin-mode .fxd__zenith-footer {
-  flex: 0 0 auto;
-  margin: 0 1rem 0.85rem;
-  border: thin solid color-mix(in oklab, var(--line) 76%, transparent);
-  border-radius: var(--o-r-sm);
-  overflow: hidden;
-  background: color-mix(in oklab, var(--panel) 78%, transparent);
-}
-html.admin-mode .fxd__zenith-footer .fxd__econohead {
-  padding: 0.55rem 0.7rem;
-}
-html.admin-mode .fxd__zenith-footer .fxd__kpis {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-html.admin-mode .fxd__zenith-footer .fxd__kpi {
-  min-height: 4.65rem;
-  padding: 0.62rem 0.72rem;
-}
-html.admin-mode .fxd__zenith-footer .fxd__kpi-val {
-  font-size: var(--o-text-xl);
-}
-html.admin-mode .fxd__zenith-footer .fxd__kpi-lbl,
-html.admin-mode .fxd__zenith-footer .fxd__kpi-sub {
-  font-size: var(--o-text-sm);
-}
-html.admin-mode .fxd__zenith-footer .fxd__econonote {
-  font-size: var(--o-text-sm);
-}
-@media (max-width: 40rem) {
-  html.admin-mode .fxd__zenith-footer .fxd__kpis {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-html.admin-mode .fxd__marginmeter {
-  --fxd-margin-pct: 0%;
-  height: 0.42rem;
-  background:
-    linear-gradient(90deg,
-      color-mix(in oklab, var(--o-danger) 72%, transparent) 0 18%,
-      color-mix(in oklab, var(--gold) 70%, transparent) 18% 35%,
-      color-mix(in oklab, var(--o-stage-contacted-strong) 64%, transparent) 35% 50%,
-      color-mix(in oklab, var(--o-stage-won-strong) 68%, transparent) 50% 100%);
-}
-html.admin-mode .fxd__marginmeter span {
-  display: block;
-  width: var(--fxd-margin-pct);
-  height: 100%;
-  background: color-mix(in oklab, white 34%, transparent);
-}
+/* Semàfor del «Net» a la graella de marge del govern: el «critical»/«ok» segueix
+   el to; el to «warn» (just) és carbassa (--o-warning), no daurat. */
+html.admin-mode .fxd__rail--left > .fxd__panel--margin .fxd__kpi[data-level="critical"] .fxd__kpi-sub { color: var(--o-danger); }
+html.admin-mode .fxd__rail--left > .fxd__panel--margin .fxd__kpi[data-level="warn"] .fxd__kpi-sub { color: var(--o-warning); }
+html.admin-mode .fxd__rail--left > .fxd__panel--margin .fxd__kpi[data-level="ok"] .fxd__kpi-sub { color: var(--o-stage-won-strong); }
 html.admin-mode .fxd__zenith-main .fxd__bolo-actions {
   flex: 0 0 auto;
   gap: 0.45rem;
@@ -1928,68 +1881,6 @@ html.admin-mode .fxd__fullpage .fxd__btn {
   font-size: var(--o-text-2xs);
 }
 
-html.admin-mode .fxd__rail--right .fxd__moneycard {
-  gap: 0.48rem;
-  padding: 0.62rem 0.68rem;
-  border-radius: var(--o-r-sm);
-  background:
-    linear-gradient(180deg, color-mix(in oklab, var(--gold) 6%, transparent), transparent 5rem),
-    color-mix(in oklab, var(--panel) 78%, transparent);
-}
-html.admin-mode .fxd__moneyhead {
-  font-size: var(--o-text-sm);
-}
-html.admin-mode .fxd__moneyhero strong {
-  font-size: var(--o-text-2xl);
-}
-html.admin-mode .fxd__moneyrows {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.15rem 0.55rem;
-}
-html.admin-mode .fxd__moneyrows div {
-  border-top: thin solid color-mix(in oklab, var(--line) 65%, transparent);
-  padding-block: 0.12rem;
-  flex-direction: column;
-  gap: 0;
-}
-html.admin-mode .fxd__moneyrows dt,
-html.admin-mode .fxd__moneyrows dd {
-  font-size: var(--o-text-2xs);
-}
-html.admin-mode .fxd__moneyrow--sub dt {
-  padding-left: 0;
-}
-html.admin-mode .fxd__rail--right .fxd__econo {
-  margin: 0;
-}
-html.admin-mode .fxd__rail--right .fxd__econohead {
-  padding: 0.38rem 0.52rem;
-  font-size: var(--o-text-sm);
-}
-html.admin-mode .fxd__rail--right .fxd__kpis {
-  grid-template-columns: 1fr;
-}
-html.admin-mode .fxd__rail--right .fxd__kpi {
-  min-height: 0;
-  padding: 0.55rem 0.62rem;
-}
-html.admin-mode .fxd__rail--right .fxd__kpi-val {
-  font-size: var(--o-text-lg);
-}
-html.admin-mode .fxd__rail--right .fxd__kpi-lbl,
-html.admin-mode .fxd__rail--right .fxd__kpi-sub {
-  font-size: var(--o-text-2xs);
-  margin-top: 0.12rem;
-}
-html.admin-mode .fxd__rail--right .fxd__panel--wide {
-  min-height: 0;
-  overflow: hidden;
-}
-html.admin-mode .fxd__rail--right .fxd__panel--wide .fxd__rows {
-  min-height: 0;
-  overflow-y: auto;
-  scrollbar-width: thin;
-}
 html.admin-mode .fxd__docgroup {
   margin-top: 0.12rem;
   padding-top: 0.25rem;
@@ -2004,7 +1895,7 @@ html.admin-mode .fxd__doclink--row {
 
 @media (max-width: 80rem) {
   html.admin-mode .fxd__zenith {
-    grid-template-columns: minmax(11rem, 0.62fr) minmax(0, 1.5fr) minmax(13rem, 0.78fr);
+    grid-template-columns: minmax(22rem, 1fr) minmax(0, 1.78fr);
   }
 }
 @media (max-width: 68.75rem) {
@@ -2020,6 +1911,10 @@ html.admin-mode .fxd__doclink--row {
   html.admin-mode .fxd__rail,
   html.admin-mode .fxd__zenith-main {
     overflow: visible;
+  }
+  /* En apilat, el govern torna a una sola columna (panells llegibles a mòbil). */
+  html.admin-mode .fxd__rail--left {
+    grid-template-columns: 1fr;
   }
   html.admin-mode .fxd__zenith-main > .fxd__boloside > .fxd__panel {
     height: auto;

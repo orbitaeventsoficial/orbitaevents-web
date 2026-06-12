@@ -2,7 +2,7 @@
 
 import './nb-design.css';
 import { useEffect, useState } from 'react';
-import { ORBITA_SERVICES } from '@/lib/constants/orbita-services';
+import { ORBITA_SERVICES, SOUND_TECH_PRICE, SOUND_TECH_DURATION, productIncludesSoundTech } from '@/lib/constants/orbita-services';
 import { CUSTOM_BOOKING_PACK_SLUG } from '@/lib/constants/pricing';
 import type { BookingServiceLineFormInput, BookingPack } from './booking-form.types';
 
@@ -10,6 +10,7 @@ interface PartnerProductOption {
   id: string;
   name: string;
   category: string | null;
+  crew: string | null;
   costPrice: number;
   sellPrice: number;
   collaboratorId: string;
@@ -49,6 +50,11 @@ export default function BookingServiceLinesSection({
 }: BookingServiceLinesSectionProps) {
   const packsEnabled = !!onPackSelect;
   const [partnerProducts, setPartnerProducts] = useState<PartnerProductOption[]>([]);
+  // Els proveïdors externs NO surten per defecte: l'usuari activa els que entren en
+  // aquest bolo. Cap grup de proveïdor visible fins que se selecciona.
+  const [activeProviders, setActiveProviders] = useState<string[]>([]);
+  const toggleProvider = (name: string) =>
+    setActiveProviders((prev) => (prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]));
 
   useEffect(() => {
     fetch('/api/admin/collaborator-products', { headers: { 'x-admin': '1' } })
@@ -86,14 +92,33 @@ export default function BookingServiceLinesSection({
   const addPartnerProduct = (id: string) => {
     const p = partnerProducts.find((x) => x.id === id);
     if (!p) return;
-    onChange([...lines, {
+    // Si el producte porta tècnic de so intrínsec, el separem com a línia pròpia
+    // (cost SOUND_TECH_PRICE) perquè es pugui triar qui el cobra: el proveïdor
+    // (per defecte) o Òrbita. El total no canvia: el producte baixa el cost del
+    // tècnic i la línia de tècnic el recupera.
+    const hasTech = productIncludesSoundTech(p.crew);
+    const productCost = hasTech ? Math.max(0, p.costPrice - SOUND_TECH_PRICE) : p.costPrice;
+    const productLine: BookingServiceLineFormInput = {
       collaboratorId: p.collaboratorId,
       kind: 'PROVIDER_SERVICE',
       label: `${p.name} (${p.collaboratorName})`,
       revenueAmount: p.sellPrice,
-      costAmount: p.costPrice,
+      costAmount: productCost,
       quantity: 1,
-    }]);
+    };
+    if (!hasTech) {
+      onChange([...lines, productLine]);
+      return;
+    }
+    const techLine: BookingServiceLineFormInput = {
+      collaboratorId: p.collaboratorId, // per defecte el tècnic el posa el proveïdor
+      kind: 'SOUND_TECH',
+      label: `Tècnic de so · ${SOUND_TECH_DURATION}`,
+      revenueAmount: 0, // ja inclòs al PVP del producte
+      costAmount: SOUND_TECH_PRICE,
+      quantity: 1,
+    };
+    onChange([...lines, productLine, techLine]);
   };
 
   const addFreeLine = () => onChange([...lines, { kind: 'OTHER', label: '', revenueAmount: 0, quantity: 1 }]);
@@ -110,6 +135,10 @@ export default function BookingServiceLinesSection({
     (acc[p.collaboratorName] ||= []).push(p);
     return acc;
   }, {});
+  // Qui pot cobrar un tècnic de so: Òrbita (sense id) o qualsevol proveïdor del catàleg.
+  const soundTechPayers = Array.from(
+    new Map(partnerProducts.map((p) => [p.collaboratorId, p.collaboratorName])).entries()
+  ).map(([id, name]) => ({ id, name }));
   const linesTotal = lines.reduce((s, l) => s + (l.revenueAmount || 0) * (l.quantity || 1), 0);
   const boloTotal = packPrice + linesTotal;
 
@@ -160,6 +189,20 @@ export default function BookingServiceLinesSection({
                     onChange={(e) => update(idx, { revenueAmount: e.target.value ? Number(e.target.value) : undefined })}
                     aria-label="Preu de venda"
                   />
+                  {line.kind === 'SOUND_TECH' && (
+                    <select
+                      className="nb__input nb__sl-payer"
+                      value={line.collaboratorId ?? ''}
+                      onChange={(e) => update(idx, { collaboratorId: e.target.value || undefined })}
+                      aria-label="Qui cobra el tècnic de so"
+                      title="Qui posa (i cobra) el tècnic de so"
+                    >
+                      <option value="">Tècnic: Òrbita</option>
+                      {soundTechPayers.map((p) => (
+                        <option key={p.id} value={p.id}>Tècnic: {p.name}</option>
+                      ))}
+                    </select>
+                  )}
                   {line.collaboratorId ? (
                     <span className="nb__sl-partnercost" title="El cost a pagar al partner es gestiona a la seva fitxa">cost</span>
                   ) : (
@@ -213,9 +256,9 @@ export default function BookingServiceLinesSection({
           </details>
           )}
 
-          {/* 2. Complements d'Òrbita (sumables) */}
-          <details className="nb__cfg-grp">
-            <summary>Complements d&apos;Òrbita Events</summary>
+          {/* 2. Productes propis d'Òrbita (sumables) — tot junt */}
+          <details className="nb__cfg-grp" open>
+            <summary>Productes d&apos;Òrbita</summary>
             <div className="nb__cfg-items">
               {ORBITA_SERVICES.map((s) => (
                 <button type="button" key={s.id} className="nb__cfg-item" onClick={() => addOrbitaService(s.id)}>
@@ -226,20 +269,37 @@ export default function BookingServiceLinesSection({
             </div>
           </details>
 
-          {/* 3. Serveis de proveïdors (sumables) */}
-          {Object.entries(partnersByName).map(([name, prods]) => (
-            <details className="nb__cfg-grp" key={name}>
-              <summary>Serveis de {name}</summary>
-              <div className="nb__cfg-items">
-                {prods.map((p) => (
-                  <button type="button" key={p.id} className="nb__cfg-item" onClick={() => addPartnerProduct(p.id)}>
-                    <span className="nb__cfg-itemname">{p.name}</span>
-                    <span className="nb__cfg-itemprice">{p.sellPrice}€</span>
-                  </button>
-                ))}
-              </div>
-            </details>
-          ))}
+          {/* 3. Proveïdors externs — NO surten per defecte; l'usuari els activa */}
+          {Object.keys(partnersByName).length > 0 && (
+            <div className="nb__cfg-providers">
+              <span className="nb__cfg-providerslbl">Proveïdors</span>
+              {Object.keys(partnersByName).map((name) => (
+                <button
+                  type="button" key={name}
+                  className={`nb__cfg-providerchip${activeProviders.includes(name) ? ' is-on' : ''}`}
+                  onClick={() => toggleProvider(name)}
+                  aria-pressed={activeProviders.includes(name)}
+                >
+                  {name}
+                </button>
+              ))}
+            </div>
+          )}
+          {Object.entries(partnersByName)
+            .filter(([name]) => activeProviders.includes(name))
+            .map(([name, prods]) => (
+              <details className="nb__cfg-grp" key={name} open>
+                <summary>Serveis de {name}</summary>
+                <div className="nb__cfg-items">
+                  {prods.map((p) => (
+                    <button type="button" key={p.id} className="nb__cfg-item" onClick={() => addPartnerProduct(p.id)}>
+                      <span className="nb__cfg-itemname">{p.name}</span>
+                      <span className="nb__cfg-itemprice">{p.sellPrice}€</span>
+                    </button>
+                  ))}
+                </div>
+              </details>
+            ))}
         </aside>
       </div>
     </>

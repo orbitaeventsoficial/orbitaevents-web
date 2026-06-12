@@ -1,3 +1,30 @@
+## 2026-06-12 — Bolo: tècnic de so per-proveïdor, proveïdors activables, Tino + redistribució de la fitxa (Canvi #926, claude)
+
+### Resum
+Iteració de producte sobre el configurador del bolo i el layout de `/admin/leads/[id]`, demanada pel propietari pas a pas.
+
+### Què s'ha fet
+- **Font única del tècnic de so** a `lib/constants/orbita-services.ts`: `SOUND_TECH_PRICE = 40`, `SOUND_TECH_DURATION = '1,5 h'` + helper `productIncludesSoundTech(crew)` (detecta el tècnic intrínsec d'un producte de proveïdor pel camp `crew`, tolerant a accents; cap proveïdor hardcodejat).
+- **Selector «qui cobra el tècnic»**: en afegir un producte de proveïdor amb tècnic (animació/bingo de Masquerade), `BookingServiceLinesSection` el desdobla en producte (cost − 40) + línia `SOUND_TECH` (40), amb un `<select>` Masquerade/Òrbita que reassigna el `collaboratorId` de la línia. Total invariant; només canvia qui factura els 40 € (visible al Repartiment).
+- **Productes d'Òrbita** en un sol grup (s'elimina la separació «Complements»/«Extres»). Afegits **Màquina de bombolles 50 €** i **Caps mòbils 120 €** al catàleg propi.
+- **Proveïdors externs activables**: ja no surten per defecte; chips d'activació (`.nb__cfg-providers`) i només es mostren els grups activats per l'usuari.
+- **Tino (lloguer de material)**: `scripts/seed-tino-products.ts` (idempotent, PVP via `resellPrice`) — fum baix 2500 W 60→75, xispes fredes 2 màq. 250→300, micròfon Shure 30→40. Rol `EQUIPMENT_RENTAL`. Aplicat a Railway. Spec a `docs/tino-lloguer-seed.md`. `collaboratorProductService` exposa `crew`.
+- **Redistribució total de la fitxa** (disseny d'Opus, consultor visual): header «ledger» (nom + rail de fets), tipografia coherent header↔footer, semàfor només al Net (carbassa `--o-warning` per «just», no daurat), i layout a 2 columnes — govern complet a l'esquerra amb el «Marge del bolo» (KPIs 2×2) omplint el buit inferior, bolo ample a la dreta. Una pantalla **sense scroll** a 1080p/1440×900/1366×768. CSS mort del header antic i del footer eliminat.
+- Norma de servidor relaxada a `CLAUDE.md` (refresc fort del navegador, no reinici, després de canvi CSS).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK (tots els guards) · `pnpm test:run` 4859 tests verds (+9 de `orbita-services.test.ts`).
+- Validació funcional: selector tècnic provat end-to-end (captura `.codex-captures/lead-tecnic.png`); seed Tino aplicat amb sortida confirmada; redistribució «CAP sense scroll» a 3 resolucions.
+- Validació responsive: sense overflow horitzontal a 1440/820/390.
+- Validació humana/UX: repassada visual del propietari en curs.
+
+### PENDENT
+- Tematització del bolo · pèrdua per amortització (documentada, assumible) · CAC real Google Ads (bloquejat per Google, a §6.16).
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-11 — Fitxa lead zenit en una sola pantalla (Canvi #925, codex → relleu Claude pendent)
 
 ### Resum
