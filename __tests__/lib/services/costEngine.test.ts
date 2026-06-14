@@ -35,6 +35,8 @@ import {
   computeSimpleMarginPct,
   computeCollaboratorNetMargin,
   aggregateServiceLines,
+  classifyBoloLines,
+  computeSupportableTravelKm,
 } from '@/lib/services/costEngine';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import type { ProfitabilityConfig } from '@/lib/services/profitabilityService';
@@ -802,5 +804,61 @@ describe('aggregateServiceLines', () => {
   it('respecta un ownCostRatio personalitzat', () => {
     const r = aggregateServiceLines([{ revenueAmount: 100, quantity: 1 }], 0.4);
     expect(r.cost).toBe(40);
+  });
+});
+
+describe('classifyBoloLines', () => {
+  it('Masquerade sol (PROVIDER_SERVICE + tècnic) → cap equip propi ni lloguer', () => {
+    const r = classifyBoloLines([
+      { collaboratorId: 'carlos', kind: 'PROVIDER_SERVICE' },
+      { collaboratorId: 'carlos', kind: 'SOUND_TECH' },
+    ]);
+    expect(r.hasOwnEquipment).toBe(false);
+    expect(r.hasEquipmentRental).toBe(false);
+  });
+
+  it('DJ propi → equip propi (dispara cost fix)', () => {
+    const r = classifyBoloLines([{ kind: 'DJ' }]);
+    expect(r.hasOwnEquipment).toBe(true);
+    expect(r.hasEquipmentRental).toBe(false);
+  });
+
+  it('material propi (EQUIPMENT sense collaboratorId) → equip propi', () => {
+    const r = classifyBoloLines([{ kind: 'EQUIPMENT' }]);
+    expect(r.hasOwnEquipment).toBe(true);
+  });
+
+  it('lloguer (EQUIPMENT amb collaboratorId, p.ex. Tino) → lloguer, no equip propi', () => {
+    const r = classifyBoloLines([{ collaboratorId: 'tino', kind: 'EQUIPMENT' }]);
+    expect(r.hasOwnEquipment).toBe(false);
+    expect(r.hasEquipmentRental).toBe(true);
+  });
+
+  it('DJ propi + lloguer Tino → tots dos costos s\'acumulen', () => {
+    const r = classifyBoloLines([
+      { kind: 'DJ' },
+      { collaboratorId: 'tino', kind: 'EQUIPMENT' },
+    ]);
+    expect(r.hasOwnEquipment).toBe(true);
+    expect(r.hasEquipmentRental).toBe(true);
+  });
+});
+
+describe('computeSupportableTravelKm', () => {
+  it('net positiu → km que aguanta el marge fins a net = 0', () => {
+    expect(computeSupportableTravelKm(28, 0.19)).toBe(Math.floor(28 / 0.19)); // 147
+  });
+
+  it('net ≤ 0 → 0 km (ja no guanya)', () => {
+    expect(computeSupportableTravelKm(0, 0.19)).toBe(0);
+    expect(computeSupportableTravelKm(-17, 0.19)).toBe(0);
+  });
+
+  it('cost/km no vàlid → fallback al cost per km per defecte', () => {
+    expect(computeSupportableTravelKm(38, 0)).toBe(Math.floor(38 / 0.19));
+  });
+
+  it('cost/km més alt (benzina cara) → menys km assumibles', () => {
+    expect(computeSupportableTravelKm(28, 0.23)).toBe(Math.floor(28 / 0.23)); // 121
   });
 });

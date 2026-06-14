@@ -29,6 +29,11 @@ export default function PresupuestoPdfStudio({
   initialCustomerId = '',
   initialCustomerName = '',
   initialCustomerEmail = '',
+  initialCustomerPhone = '',
+  initialEventDate = '',
+  initialEventSchedule = '',
+  initialEventLocation = '',
+  initialGuests = 80,
   initialLeadId = '',
   initialProposalId = '',
   initialPreferredLocale = 'ca',
@@ -46,7 +51,7 @@ export default function PresupuestoPdfStudio({
   const [clientContact, setClientContact] = useState('');
   const [clientName, setClientName] = useState(initialCustomerName || STUDIO_COPY.ca.defaultClientName);
   const [clientEmail, setClientEmail] = useState(initialCustomerEmail || '');
-  const [clientPhone, setClientPhone] = useState('');
+  const [clientPhone, setClientPhone] = useState(initialCustomerPhone || '');
   const [customerId, setCustomerId] = useState(initialCustomerId);
   const [leadId] = useState(initialLeadId);
   const [customerSearch, setCustomerSearch] = useState('');
@@ -55,14 +60,14 @@ export default function PresupuestoPdfStudio({
   const [searchingCustomers, setSearchingCustomers] = useState(false);
   const [proposalId, setProposalId] = useState(initialProposalId);
   const [issueDate, setIssueDate] = useState(() => new Date().toISOString().split('T')[0]);
-  const [eventDate, setEventDate] = useState('');
-  const [eventSchedule, setEventSchedule] = useState('');
-  const [eventLocation, setEventLocation] = useState('');
+  const [eventDate, setEventDate] = useState(initialEventDate || '');
+  const [eventSchedule, setEventSchedule] = useState(initialEventSchedule || '');
+  const [eventLocation, setEventLocation] = useState(initialEventLocation || '');
   const [travelKm, setTravelKm] = useState(0);
   const [distanceMessage, setDistanceMessage] = useState<string | null>(null);
   const [calculatingDistance, setCalculatingDistance] = useState(false);
   const lastDistanceDestinationRef = useRef('');
-  const [guests, setGuests] = useState(80);
+  const [guests, setGuests] = useState(initialGuests);
   const [validityDays, setValidityDays] = useState(15);
   const [conditionsText, setConditionsText] = useState(ADMIN_PDF_STUDIO_DEFAULTS.conditionsText);
   const [whyChooseUs, setWhyChooseUs] = useState(ADMIN_PDF_STUDIO_DEFAULTS.whyChooseUs);
@@ -338,6 +343,10 @@ export default function PresupuestoPdfStudio({
 
   useEffect(() => {
     if (typeof window === 'undefined' || draftLoaded) return;
+    if (initialLeadId || initialProposalId) {
+      setDraftLoaded(true);
+      return;
+    }
     try {
       const raw = window.localStorage.getItem(STUDIO_DRAFT_KEY);
       if (!raw) {
@@ -394,7 +403,7 @@ export default function PresupuestoPdfStudio({
     } finally {
       setDraftLoaded(true);
     }
-  }, [draftLoaded]);
+  }, [draftLoaded, initialLeadId, initialProposalId]);
 
   // Load existing proposal from API when opened with proposalId
   useEffect(() => {

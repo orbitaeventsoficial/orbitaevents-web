@@ -71,6 +71,46 @@ function normalizeServiceLines(lines: BookingServiceLinePatchInput[]) {
     .filter((line) => Boolean(line.label));
 }
 
+function serviceLinesRevenue(lines: Array<{ revenueAmount?: number | null; quantity?: number | null }>) {
+  return lines.reduce((sum, line) => sum + Number(line.revenueAmount || 0) * (line.quantity || 1), 0);
+}
+
+async function applyServiceLineTotalDelta(
+  existing: ExistingBookingRecord,
+  preparedBody: Record<string, unknown>,
+  inputLines: BookingServiceLinePatchInput[],
+) {
+  if (Object.prototype.hasOwnProperty.call(preparedBody, 'total')) return;
+
+  const oldLines = await prisma.bookingServiceLine.findMany({
+    where: { bookingId: existing.id },
+    select: { revenueAmount: true, quantity: true },
+  });
+  const nextLines = normalizeServiceLines(inputLines);
+  const delta = roundMoney(serviceLinesRevenue(nextLines) - serviceLinesRevenue(oldLines));
+  if (delta === 0) return;
+
+  const subtotal = roundMoney(Number(preparedBody.subtotal ?? existing.subtotal) + delta);
+  const discount = Number(preparedBody.discount ?? existing.discount ?? 0);
+  const invoiceRequired = Object.prototype.hasOwnProperty.call(preparedBody, 'invoiceRequired')
+    ? Boolean(preparedBody.invoiceRequired)
+    : Boolean(existing.invoiceRequired);
+  const vatRate = typeof preparedBody.vatRate === 'number'
+    ? preparedBody.vatRate
+    : invoiceRequired ? VAT_RATE_INVOICE : VAT_RATE_NO_INVOICE;
+  const baseAfterDiscount = Math.max(0, subtotal - discount);
+  const vatAmount = roundMoney(baseAfterDiscount * (vatRate / 100));
+  const total = roundMoney(baseAfterDiscount + vatAmount);
+  const depositAmount = calcDeposit(total);
+
+  preparedBody.subtotal = subtotal;
+  preparedBody.vatRate = vatRate;
+  preparedBody.vatAmount = vatAmount;
+  preparedBody.total = total;
+  preparedBody.depositAmount = depositAmount;
+  preparedBody.remainingAmount = roundMoney(total - depositAmount);
+}
+
 export async function getBookingDetail(id: string) {
   const booking = await prisma.booking.findUnique({
     where: { id },
@@ -238,6 +278,9 @@ export async function updateBookingDetail(id: string, input: Record<string, unkn
   }
 
   const prepared = await prepareBookingPatchData(existing, input);
+  if (Array.isArray(input.serviceLines)) {
+    await applyServiceLineTotalDelta(existing, prepared.body, input.serviceLines as BookingServiceLinePatchInput[]);
+  }
   const booking = await prisma.booking.update({
     where: { id },
     data: prepared.body,

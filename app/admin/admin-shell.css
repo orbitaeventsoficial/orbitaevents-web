@@ -74,6 +74,134 @@ html.admin-mode [class*="text-[11.8px]"] {
 
 .ax__page { position: relative; z-index: 1; min-width: 0; }
 
+/* ── Històric comercial compartit (lead + reserva) ─────────────────────── */
+html.admin-mode .cdh {
+  border: 1px solid var(--ax-line);
+  border-radius: var(--o-r-md);
+  background: color-mix(in oklab, var(--ax-panel) 82%, var(--ax-canvas));
+  padding: 1rem;
+  color: var(--ax-t);
+}
+
+html.admin-mode .cdh__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: .85rem;
+}
+
+html.admin-mode .cdh__title {
+  margin: 0;
+  font-size: var(--o-text-base);
+  font-weight: var(--o-fw-bold);
+  letter-spacing: 0;
+}
+
+html.admin-mode .cdh__subtitle {
+  margin: .2rem 0 0;
+  color: var(--ax-t3);
+  font-size: var(--o-text-xs);
+}
+
+html.admin-mode .cdh__count {
+  display: inline-flex;
+  min-width: 2rem;
+  justify-content: center;
+  border: 1px solid var(--ax-line2);
+  border-radius: var(--o-r-sm);
+  padding: .15rem .45rem;
+  color: var(--ax-t2);
+  font-size: var(--o-text-xs);
+}
+
+html.admin-mode .cdh__empty {
+  margin: 0;
+  border: 1px dashed var(--ax-line2);
+  border-radius: var(--o-r-sm);
+  padding: .85rem;
+  color: var(--ax-t3);
+  font-size: var(--o-text-sm);
+}
+
+html.admin-mode .cdh__list {
+  display: grid;
+  gap: .5rem;
+}
+
+html.admin-mode .cdh__item {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, .6fr) minmax(0, 1.35fr) minmax(7rem, auto);
+  gap: .75rem;
+  align-items: center;
+  border: 1px solid var(--ax-line2);
+  border-radius: var(--o-r-sm);
+  background: var(--ax-sunk);
+  padding: .7rem .8rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+html.admin-mode .cdh__item--link:hover {
+  border-color: var(--ax-hair-gold);
+  background: color-mix(in oklab, var(--ax-gold) 7%, var(--ax-sunk));
+}
+
+html.admin-mode .cdh__kind {
+  color: var(--ax-gold-bright);
+  font-size: var(--o-text-xs);
+  font-weight: var(--o-fw-bold);
+}
+
+html.admin-mode .cdh__main {
+  min-width: 0;
+  display: grid;
+  gap: .1rem;
+}
+
+html.admin-mode .cdh__main strong,
+html.admin-mode .cdh__main span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.admin-mode .cdh__main span,
+html.admin-mode .cdh__meta,
+html.admin-mode .cdh__side em {
+  color: var(--ax-t3);
+  font-size: var(--o-text-xs);
+  font-style: normal;
+}
+
+html.admin-mode .cdh__side {
+  display: grid;
+  justify-items: end;
+  gap: .1rem;
+}
+
+html.admin-mode .cdh__side strong {
+  color: var(--ax-gold-bright);
+}
+
+html.admin-mode .cdh__meta {
+  grid-column: 2 / -1;
+}
+
+@media (max-width: 760px) {
+  html.admin-mode .cdh__item {
+    grid-template-columns: 1fr;
+  }
+
+  html.admin-mode .cdh__side {
+    justify-items: start;
+  }
+
+  html.admin-mode .cdh__meta {
+    grid-column: auto;
+  }
+}
+
 /* ── Error boundary admin ────────────────────────────────────────────────── */
 .ax__error {
   min-height: 60vh;

@@ -21,6 +21,20 @@ function normalizeKind(value?: string | null): BookingServiceLineKind {
 
 /** Línies del bolo d'un lead, ordenades. */
 export async function listLeadServiceLines(leadId: string) {
+  const lead = await prisma.lead.findUnique({
+    where: { id: leadId },
+    select: {
+      booking: {
+        select: {
+          serviceLines: {
+            orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+          },
+        },
+      },
+    },
+  });
+  if (lead?.booking) return { status: 200, body: { lines: lead.booking.serviceLines } };
+
   const lines = await prisma.leadServiceLine.findMany({
     where: { leadId },
     orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
@@ -33,7 +47,10 @@ export async function listLeadServiceLines(leadId: string) {
  * Esborra les actuals i crea les noves dins una transacció.
  */
 export async function replaceLeadServiceLines(leadId: string, inputLines: LeadServiceLineInput[]) {
-  const lead = await prisma.lead.findUnique({ where: { id: leadId }, select: { id: true } });
+  const lead = await prisma.lead.findUnique({
+    where: { id: leadId },
+    select: { id: true, booking: { select: { id: true } } },
+  });
   if (!lead) return { status: 404, body: { error: 'Lead no trobat' } };
 
   const clean = (Array.isArray(inputLines) ? inputLines : [])
@@ -51,6 +68,22 @@ export async function replaceLeadServiceLines(leadId: string, inputLines: LeadSe
       partyType: l.partyType?.trim() || null,
       sortOrder: idx,
     }));
+
+  if (lead.booking) {
+    await prisma.$transaction([
+      prisma.bookingServiceLine.deleteMany({ where: { bookingId: lead.booking.id } }),
+      ...(clean.length > 0
+        ? [prisma.bookingServiceLine.createMany({
+            data: clean.map(({ leadId: _leadId, ...line }) => ({
+              ...line,
+              bookingId: lead.booking!.id,
+            })),
+          })]
+        : []),
+    ]);
+
+    return { status: 200, body: { ok: true, count: clean.length, bookingId: lead.booking.id } };
+  }
 
   await prisma.$transaction([
     prisma.leadServiceLine.deleteMany({ where: { leadId } }),

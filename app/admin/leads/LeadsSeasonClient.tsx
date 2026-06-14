@@ -290,36 +290,13 @@ function PriceHint({ value, time, endTime, type }: { value: number; time: string
 }
 
 function BookingInlineActions({ lead }: { lead: LeadData }) {
-  const router = useRouter();
-  const toast = useToast();
-  const [busy, setBusy] = useState<'deposit' | 'remaining' | null>(null);
   const booking = lead.booking;
   if (!booking) return null;
   const pay = paymentState(booking);
 
-  async function patchPayment(kind: 'deposit' | 'remaining') {
-    if (!booking || busy) return;
-    setBusy(kind);
-    try {
-      const res = await fetchWithCsrf(`/api/admin/bookings/${booking.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(kind === 'deposit' ? { depositPaid: true } : { remainingPaid: true }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data?.error || "No s'ha pogut actualitzar el cobrament.");
-      }
-      toast.success(kind === 'deposit' ? 'Senyal marcat com a pagat.' : 'Resta marcada com a pagada.');
-      router.refresh();
-    } catch (err) {
-      console.error('[admin/leads] booking payment patch', err);
-      toast.error(err instanceof Error ? err.message : "No s'ha pogut actualitzar el cobrament.");
-    } finally {
-      setBusy(null);
-    }
-  }
-
+  // Els cobraments NO es gestionen al lead: la reserva n'és la font de veritat
+  // (doctrina canònica, vegeu docs/fitxes-tipus.md i docs/bolo-flux.md). El drawer
+  // només mostra l'estat i obre la reserva.
   return (
     <section className="fxd__panel fxd__panel--booking">
       <div className="fxd__panelhead">
@@ -331,16 +308,6 @@ function BookingInlineActions({ lead }: { lead: LeadData }) {
         <span>{pay ? PAY_LABEL[pay] : 'Reserva vinculada'}</span>
       </div>
       <div className="fxd__actions">
-        {pay !== 'full' && !booking.depositPaid && (
-          <button type="button" className="fxd__btn" disabled={busy !== null} onClick={() => { void patchPayment('deposit'); }}>
-            {busy === 'deposit' ? 'Marcant...' : 'Marcar senyal'}
-          </button>
-        )}
-        {pay !== 'full' && booking.depositPaid && !booking.remainingPaid && (
-          <button type="button" className="fxd__btn" disabled={busy !== null} onClick={() => { void patchPayment('remaining'); }}>
-            {busy === 'remaining' ? 'Marcant...' : 'Marcar resta'}
-          </button>
-        )}
         <Link href={buildBookingHref(booking.id)} className="fxd__btn fxd__btn--ghost">Obrir reserva</Link>
       </div>
     </section>

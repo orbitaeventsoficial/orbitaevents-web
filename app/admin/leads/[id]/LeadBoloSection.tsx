@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, type MouseEvent } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import BookingServiceLinesSection from '@/app/admin/bookings/BookingServiceLinesSection';
 import type { BookingServiceLineFormInput } from '@/app/admin/bookings/booking-form.types';
-import { computeBookingFinancialSummary, aggregateServiceLines } from '@/lib/services/costEngine';
+import { computeBookingFinancialSummary, aggregateServiceLines, classifyBoloLines } from '@/lib/services/costEngine';
+import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { formatCurrency } from '@/lib/constants';
 
@@ -29,12 +30,34 @@ export interface BoloEconomia {
 
 export default function LeadBoloSection({
   leadId,
+  documentContext,
+  contractedProducts = [],
   source,
+  vehicleCostPerKm = DEFAULT_VEHICLE_COST_PER_KM,
   onEconomiaChange,
   compactEconomia = false,
 }: {
   leadId: string;
+  documentContext: {
+    name: string;
+    email?: string | null;
+    phone?: string | null;
+    eventDate?: string | null;
+    eventStartTime?: string | null;
+    eventEndTime?: string | null;
+    eventLocation?: string | null;
+    eventAddress?: string | null;
+    guestCount?: string | number | null;
+  };
+  contractedProducts?: Array<{
+    kind: string;
+    label: string;
+    quantity: number;
+    amount: number | null;
+    meta?: string | null;
+  }>;
   source?: string | null;
+  vehicleCostPerKm?: number;
   onEconomiaChange?: (e: BoloEconomia | null) => void;
   compactEconomia?: boolean;
 }) {
@@ -82,6 +105,15 @@ export default function LeadBoloSection({
 
   // El bolo es munta amb serveis (DJ 1a hora 150 + extres), sense pack base.
   const buildAllLines = useCallback((): BookingServiceLineFormInput[] => lines, [lines]);
+  const baseLines = useMemo<BookingServiceLineFormInput[]>(() => contractedProducts
+    .filter((item) => item.kind === 'PACK' || item.kind === 'EXTRA' || item.kind === 'EXTRA_HOURS')
+    .map((item) => ({
+      kind: 'OTHER',
+      label: item.meta ? `${item.label} · ${item.meta}` : item.label,
+      revenueAmount: item.amount ?? 0,
+      quantity: item.quantity || 1,
+    })), [contractedProducts]);
+  const buildVisibleLines = useCallback((): BookingServiceLineFormInput[] => [...baseLines, ...lines], [baseLines, lines]);
 
   // Fulla d'economia del bolo (Fase 4 de docs/bolo-flux.md). La pasta NO viu al
   // configurador: cada línia porta el cost amagat i alimenta SOLA aquesta fulla.
@@ -89,16 +121,31 @@ export default function LeadBoloSection({
   // sense cost, s'imputa cost intern via `orbitaServiceCostRatio` (el DJ no és cost 0).
   // Els agregats passen a `computeBookingFinancialSummary` (font única de marge).
   const economia = useMemo(() => {
-    const { revenue, cost } = aggregateServiceLines(buildAllLines());
+    const allLines = buildVisibleLines();
+    // ownCostRatio = 0: un servei propi (DJ) NO imputa cost sobre el seu preu.
+    // El cost real de l'equip propi (desgast + amortització + consumibles) ja
+    // viu al cost fix operatiu; imputar a més un % seria comptar-lo dos cops.
+    const { revenue, cost } = aggregateServiceLines(allLines, 0);
     if (revenue <= 0) return null;
-    return computeBookingFinancialSummary({
+    // Cost operatiu real (vegeu docs/bolo-flux.md):
+    // - cost fix (desgast + amortització + consumibles) NOMÉS si el bolo porta
+    //   equip propi d'Òrbita (DJ o material propi); Masquerade sol → 0.
+    // - el transport d'anar a buscar material de lloguer (Tino) el carrega la
+    //   pròpia línia de lloguer, sumat al seu cost.
+    const { hasOwnEquipment, hasEquipmentRental } = classifyBoloLines(allLines);
+    const rentalTransport = hasEquipmentRental ? EQUIPMENT_RENTAL_TRANSPORT_KM * vehicleCostPerKm : 0;
+    const summary = computeBookingFinancialSummary({
       total: revenue,
       packPrice: 0, extrasTotal: 0, extraHours: 0, extraHourPrice: 0,
       distanceKm: 0, travelCost: 0,
-      serviceLinesRevenue: revenue, serviceLinesCost: cost,
+      serviceLinesRevenue: revenue, serviceLinesCost: cost + rentalTransport,
       source: source ?? null,
-    }, PROFITABILITY_MODEL_DEFAULTS);
-  }, [buildAllLines, source]);
+    }, {
+      ...PROFITABILITY_MODEL_DEFAULTS,
+      fixedOperationalCost: hasOwnEquipment ? PROFITABILITY_MODEL_DEFAULTS.fixedOperationalCost : 0,
+    });
+    return summary;
+  }, [buildVisibleLines, source, vehicleCostPerKm]);
 
   // Eleva el net al contenidor (perquè visqui al hero de la fitxa, no enterrat a baix).
   useEffect(() => {
@@ -125,7 +172,7 @@ export default function LeadBoloSection({
     : economia.marginTone.tone === 'orange' ? 'warn'
     : 'ok';
 
-  const handleSave = async () => {
+  const handleSave = async (): Promise<boolean> => {
     setSaving(true);
     try {
       const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/service-lines`, {
@@ -136,33 +183,51 @@ export default function LeadBoloSection({
       if (!res.ok) throw new Error('No s\'ha pogut desar');
       toast.success('Bolo desat.');
       setDirty(false);
+      return true;
     } catch (e) {
       console.error('[LeadBolo] desar', e);
       toast.error('Error desant el bolo.');
+      return false;
     } finally {
       setSaving(false);
     }
   };
 
-  // Desa el bolo (si cal) i després executa l'acció de generació.
-  const generate = async (mode: 'full' | 'quote') => {
-    if (dirty) await handleSave();
-    setSaving(true);
-    try {
-      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/generate-dossier`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode }),
-      });
-      if (!res.ok) throw new Error('No s\'ha pogut generar');
-      toast.success(mode === 'quote' ? 'Pressupost creat.' : 'Dossier creat.');
-    } catch (e) {
-      console.error('[LeadBolo] generar', e);
-      toast.error('Error generant el document.');
-    } finally {
-      setSaving(false);
-    }
+  const buildDossierHref = () => {
+    const params = new URLSearchParams({ leadId });
+    params.set('nom', documentContext.name);
+    if (documentContext.email) params.set('email', documentContext.email);
+    if (documentContext.phone) params.set('telefon', documentContext.phone);
+    const eventParts = [
+      documentContext.eventDate,
+      documentContext.eventStartTime && documentContext.eventEndTime
+        ? `${documentContext.eventStartTime}-${documentContext.eventEndTime}`
+        : documentContext.eventStartTime,
+      documentContext.eventLocation,
+      documentContext.eventAddress,
+      documentContext.guestCount ? `${documentContext.guestCount} pax` : null,
+    ].filter(Boolean);
+    if (eventParts.length > 0) params.set('eventDesc', eventParts.join(' · '));
+    const productIds = buildAllLines()
+      .map((line) => line.collaboratorId)
+      .filter((id): id is string => Boolean(id))
+      .map((id) => id.startsWith('collab:') ? id : `collab:${id}`);
+    if (productIds.length > 0) params.set('productIds', Array.from(new Set(productIds)).join(','));
+    return `/admin/dossiers?${params.toString()}`;
   };
+
+  const openBuilder = async (
+    event: MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) => {
+    if (!dirty) return;
+    event.preventDefault();
+    const saved = await handleSave();
+    if (saved) window.location.assign(href);
+  };
+
+  const quoteHref = `/admin/presupuestos?leadId=${encodeURIComponent(leadId)}`;
+  const dossierHref = buildDossierHref();
 
   if (loading) {
     return (
@@ -184,20 +249,27 @@ export default function LeadBoloSection({
         </div>
         <BookingServiceLinesSection
           embedded
+          baseLines={baseLines}
           lines={lines}
           onChange={onLinesChange}
         />
 
-        <div className="fxd__bolo-actions">
-          <button type="button" className="fxd__btn" onClick={() => generate('full')} disabled={saving}>
-            Crear dossier
-          </button>
-          <button type="button" className="fxd__btn" onClick={() => generate('quote')} disabled={saving}>
-            Crear pressupost
-          </button>
-          <a className="fxd__btn fxd__btn--primary" href={`/admin/bookings/new?leadId=${encodeURIComponent(leadId)}`}>
-            Crear reserva
-          </a>
+        <div className="fxd__bolo-footer">
+          <div className="fxd__bolo-total" aria-label="Total del bolo">
+            <span>Total bolo</span>
+            <strong>{economia ? formatCurrency(economia.total) : '0€'}</strong>
+          </div>
+          <div className="fxd__bolo-actions">
+            <a className="fxd__btn" href={dossierHref} onClick={(event) => openBuilder(event, dossierHref)} aria-disabled={saving}>
+              Crear dossier
+            </a>
+            <a className="fxd__btn" href={quoteHref} onClick={(event) => openBuilder(event, quoteHref)} aria-disabled={saving}>
+              Crear pressupost
+            </a>
+            <a className="fxd__btn fxd__btn--primary" href={`/admin/bookings/new?leadId=${encodeURIComponent(leadId)}`}>
+              Crear reserva
+            </a>
+          </div>
         </div>
       </section>
 

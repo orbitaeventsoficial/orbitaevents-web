@@ -365,6 +365,60 @@ const SECTIONS: { num: string; id: string; label: string }[] = [
   { num: '17', id: 'lab-tipografia', label: 'Lab · Tipografia' },
   { num: '18', id: 'lab-components', label: 'Lab · Components' },
   { num: '19', id: 'cataleg-comercial', label: 'Catàleg comercial' },
+  { num: '20', id: 'fitxes-tipus', label: 'Fitxes tipus' },
+];
+
+/** Fitxes tipus canòniques: patrons de pàgina sencers, comparables i evolutius.
+ *  S'evoluciona comparant i millorant. Vegeu docs/fitxes-tipus.md. */
+const TYPE_PAGES: {
+  domain: string;
+  views: { name: string; file: string; role: string; state: 'canonica' | 'alinear' }[];
+}[] = [
+  {
+    domain: 'Leads',
+    views: [
+      { name: 'Calendari', file: 'LeadsSeasonClient.tsx', role: 'Vista de temporada: tots els leads pel mapa de caps de setmana. Revisada i tancada pel propietari.', state: 'canonica' },
+      { name: 'Fitxa compacta', file: '.fxd__sheet (drawer)', role: 'Resum ràpid del lead seleccionat + porta a la fitxa completa. Cobrament tret (va a la reserva).', state: 'canonica' },
+      { name: 'Fitxa completa', file: 'leads/[id]/LeadDetailClient.tsx', role: 'Govern del lead + configurador del bolo en una pantalla.', state: 'canonica' },
+    ],
+  },
+  {
+    domain: 'Reserves',
+    views: [
+      { name: 'Fitxa de reserva', file: 'bookings/[id]/BookingMarginCard.tsx', role: 'Veritat contractual: productes, marge real, cobraments. Mateix configurador que el lead.', state: 'alinear' },
+    ],
+  },
+  {
+    domain: 'Clients',
+    views: [
+      { name: 'Hub de client', file: 'clientes/[id]/page.tsx', role: 'Fitxa 360 del client (fetchCustomerHub): historial, reserves, comunicacions.', state: 'alinear' },
+    ],
+  },
+  {
+    domain: 'Proveïdors',
+    views: [
+      { name: 'Partner Hub', file: 'collaborators/[id]/PartnerHubClient.tsx', role: 'Fitxa del col·laborador: productes, bolos derivats, economia.', state: 'alinear' },
+    ],
+  },
+];
+
+/** Anatomia (de dalt a baix) de la fitxa completa canònica — model «Cristina». */
+const CANONICAL_ANATOMY: { zone: string; detail: string }[] = [
+  { zone: 'Capçalera d’identitat', detail: 'Nom protagonista + rail de fets (data, hora, lloc, pax, prioritat, valor).' },
+  { zone: 'Barra d’estats + govern', detail: 'Nou · Contactat · Guanyat · Perdut a l’esquerra; Responsable / Derivat per a la dreta.' },
+  { zone: 'Marge', detail: 'Sense reserva: marge del bolo (provisional). Amb reserva: marge REAL de la reserva.' },
+  { zone: 'El bolo (ample)', detail: 'Configurador a tot l’ample. Si hi ha reserva, base contractada com a lectura no editable.' },
+  { zone: 'Històric comercial', detail: 'Tira fina al peu: pressupostos, dossiers, contractes, factures.' },
+];
+
+/** Criteris amb què es mesura i compara qualsevol fitxa tipus. */
+const COMPARISON_CRITERIA: { criteri: string; estandard: string }[] = [
+  { criteri: 'Una sola pantalla', estandard: 'scrollH = clientH a 1440×900 (sense scroll vertical).' },
+  { criteri: 'Protagonista clar', estandard: 'L’element de treball (el bolo) mana i ocupa l’ample.' },
+  { criteri: 'Catàleg a la dreta', estandard: 'Allò que es pot afegir viu a la dreta del configurador.' },
+  { criteri: 'Històric al peu', estandard: 'Seguiment secundari, mai al mig de la fitxa.' },
+  { criteri: 'Font de dades per context', estandard: 'Pre-reserva → LeadServiceLine · Post-reserva → Booking.' },
+  { criteri: 'Un sol component', estandard: 'Parametritzat per dades; mai codi per-registre concret.' },
 ];
 
 type PdfId = PdfDocumentId;
@@ -1250,8 +1304,62 @@ export default function StudioShowroom() {
             </div>
           </section>
 
+          <section className="o-spec-section" id="sec-fitxes-tipus">
+            <SectionHead num="20" title="Fitxes tipus" intro="Patrons de pàgina sencers, canònics i comparables. S'evolucionen comparant i millorant les fitxes i els passos. Cada domini té les seves vistes; una és la canònica de referència." />
+
+            <div className="o-spec-group">
+              <h3 className="o-spec-group__title">Domini Leads · vistes comparables</h3>
+              <div className="o-typepages">
+                {TYPE_PAGES.map((domain) => (
+                  <div className="o-typepages__domain" key={domain.domain}>
+                    <span className="o-typepages__domainname">{domain.domain}</span>
+                    <div className="o-typepages__views">
+                      {domain.views.map((v) => (
+                        <article className="o-typepages__view" key={v.name} data-state={v.state}>
+                          <div className="o-typepages__viewhead">
+                            <strong>{v.name}</strong>
+                            <span className="o-typepages__badge" data-state={v.state}>
+                              {v.state === 'canonica' ? '● canònica' : '○ a alinear'}
+                            </span>
+                          </div>
+                          <code className="o-typepages__file">{v.file}</code>
+                          <p>{v.role}</p>
+                        </article>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="o-spec-group">
+              <h3 className="o-spec-group__title">Anatomia de la fitxa completa canònica (model «Cristina»)</h3>
+              <ol className="o-typeanatomy">
+                {CANONICAL_ANATOMY.map((row, i) => (
+                  <li className="o-typeanatomy__row" key={row.zone}>
+                    <span className="o-typeanatomy__step">{i + 1}</span>
+                    <strong>{row.zone}</strong>
+                    <span>{row.detail}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            <div className="o-spec-group">
+              <h3 className="o-spec-group__title">Criteris de comparació (estàndard que ha de complir qualsevol fitxa tipus)</h3>
+              <div className="o-typecriteria">
+                {COMPARISON_CRITERIA.map((c) => (
+                  <div className="o-typecriteria__row" key={c.criteri}>
+                    <strong>{c.criteri}</strong>
+                    <span>{c.estandard}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
           <footer className="o-spec-footer">
-            Òrbita Studio · sistema visual v0.6 · 20 seccions · 8 comunicacions · 5 documents
+            Òrbita Studio · sistema visual v0.6 · 21 seccions · 8 comunicacions · 5 documents
           </footer>
         </main>
       </div>

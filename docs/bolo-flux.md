@@ -3,6 +3,45 @@
 > Decidit amb el propietari (2026-06-09) i dissenyat per Opus. Aquest document és la
 > font de veritat del flux comercial. Llegir abans de tocar el configurador.
 
+## Doctrina canònica del configurador (2026-06-13 — decisió del propietari)
+
+**Un sol configurador canònic (`BoloConfigurator`), reutilitzat a Lead i Reserva.**
+Mateixa UI, mateix catàleg, mateixa jerarquia, mateixa lògica de productes. L'única cosa
+que canvia és la **font de dades segons el context** (adaptadors). La UI NO ha de fer notar
+a l'usuari quina taula hi ha sota: un lead sense reserva (Cristina) i un lead amb reserva
+(Alejandro) es veuen i s'editen igual — esquerra «El bolo», mateix llenguatge.
+
+### Font de dades per context
+- **Lead sense reserva** (cuina comercial / previ) → llegeix/escriu `LeadServiceLine`.
+- **Lead amb reserva** i **fitxa de reserva** (contractual / operatiu) → llegeix/escriu la
+  veritat de `Booking` (`Booking.pack` + `extras` + `extraHours` + `BookingServiceLine`).
+
+### Regla d'or
+- El **Lead** és el configurador comercial PREVI (intenció, conversa, pressupost, bolo provisional).
+- El **Booking** és la veritat contractual/operativa (productes contractats, imports, cobraments, execució).
+- **La reserva viu a la reserva, no al lead.** Quan un lead ja té `Booking`, el lead NO és una
+  segona reserva: és una **finestra/porta** cap a la reserva. El configurador del lead pot continuar
+  visible, però **qualsevol edició escriu a `Booking`**, mai crea un mirall ni duplica imports.
+- **Canonicitat ≠ mateixa taula sempre.** Vol dir **mateixa veritat operacional i mateixa manera de
+  treballar**, no la mateixa taula a tot arreu.
+
+### On es modifica un document segons la fase
+| Estat del document | On es modifica |
+|---|---|
+| Pressupost no convertit en reserva | **Lead** / configurador comercial |
+| Pressupost enviat, encara negociant | **Lead** (encara és fase comercial) |
+| Pressupost acceptat o ja convertit en reserva | **Reserva** (compromís operatiu) |
+| Qualsevol canvi post-reserva | **Reserva** (el lead només l'obre o en mostra resum) |
+
+**Resum**: Leads = cuina comercial. Booking = veritat contractual/operativa. Els pressupostos viuen
+al flux comercial fins que es converteixen; després mana la reserva. Un sol `BoloConfigurator` amb
+adaptadors per lead i booking — ni dos configuradors, ni dues maneres de pensar, ni dues veritats.
+
+> Implementació en curs (codex): #933 (històric comercial compartit + el lead obre els configuradors
+> canònics de pressupost/dossier), #934 («Productes contractats» de la reserva visibles al lead, font =
+> `Booking`), #935 (post-reserva el configurador del lead edita `BookingServiceLine`, no un mirall).
+> Aquesta secció fixa la doctrina perquè la resta de la implementació hi convergeixi.
+
 ## Model de negoci (la veritat)
 - Entren leads: web (pack o info) o via partners (Masquerade/Rufo/Tino), entrats a mà.
 - Flux: **Lead → BOLO → (Dossier i/o Pressupost) → Reserva**.

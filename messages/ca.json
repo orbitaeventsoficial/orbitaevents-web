@@ -7317,6 +7317,73 @@
       "responseTime": "2h"
     }
   },
+  "dossier": {
+    "portada": {
+      "eyebrow": "Fem-ho a la vostra manera",
+      "clientLabel": "Hem preparat aquest dossier per a",
+      "bottom": "Les nostres propostes · Òrbita Events"
+    },
+    "intro": {
+      "kicker": "Imaginem-ho junts",
+      "title": "Un tast del que podem viure plegats, abans de parlar de números.",
+      "greetingDefault": "Gràcies per pensar en nosaltres! Hem preparat aquestes pàgines perquè us imagineu com seria la vostra festa amb tranquil·litat, sense haver de mirar encara els preus.\n\nA cada pàgina us expliquem una proposta: què és, com es viu i què hi trobareu. Quedeu-vos amb les que us facin més il·lusió i, quan ho tingueu clar, us passem el pressupost a mida només amb el que trieu.",
+      "offerCountOne": "1 proposta per a vosaltres",
+      "offerCountMany": "{count} propostes per a vosaltres",
+      "summaryOfferLabel": "Què us proposem",
+      "summaryFormatLabel": "Com ho hem fet",
+      "summaryFormatValue": "Cada proposta explicada, amb un resum de preus al final",
+      "summaryGoalLabel": "La idea",
+      "summaryGoalValue": "Que us imagineu la festa abans de mirar el preu"
+    },
+    "chapter": {
+      "eyebrow": "Proposta",
+      "priceLabel": "Preu",
+      "priceFromPrefix": "des de",
+      "priceCustom": "a mida",
+      "durationLabel": "Quant dura",
+      "includesTitle": "Què hi trobareu",
+      "noteLabel": "Bo de saber"
+    },
+    "resum": {
+      "kicker": "En resum",
+      "title": "Tot el que us proposem",
+      "lead": "Aquí teniu, d'un cop d'ull, tot el que hem pensat per a vosaltres. Els preus són un punt de partida —el «des de»—, encara sense extres ni desplaçament; ho acabem de tancar junts quan sapiguem tots els detalls.",
+      "totalLabel": "La proposta, a partir de",
+      "customSuffix": "+ propostes a mida"
+    },
+    "cta": {
+      "label": "Qualsevol dubte o per mirar dates, escriviu-nos quan vulgueu"
+    },
+    "ownProducts": {
+      "dj-primera-hora": {
+        "nom": "DJ professional",
+        "descripcio": [
+          "Un DJ professional que porta la música de tota la festa, del primer ball fins a l'últim.",
+          "El muntem per hores: {first} la primera hora i {extra} cada hora de més, segons fins on vulgueu allargar la nit."
+        ],
+        "inclou": [
+          "DJ professional",
+          "Primera hora ({first})",
+          "Cada hora de més (+{extra})"
+        ]
+      },
+      "bombolles": {
+        "nom": "Màquina de bombolles",
+        "descripcio": ["Bombolles per als moments més bonics: l'entrada, el primer ball o les fotos de record."],
+        "inclou": ["Màquina de bombolles", "La fem anar nosaltres durant la festa"]
+      },
+      "pont-llums-caps-mobils": {
+        "nom": "Pont de llums + caps mòbils",
+        "descripcio": ["Un joc de llums i caps mòbils que omple la pista de color i li dona vida quan arriba l'hora de ballar."],
+        "inclou": ["Pont de llums", "Caps mòbils"]
+      },
+      "operari-extra": {
+        "nom": "Una mà extra",
+        "descripcio": ["Una persona més per al muntatge i el suport tècnic, perquè tot vagi rodat i no us hàgiu de preocupar de res."],
+        "inclou": ["Operari de suport"]
+      }
+    }
+  },
   "animacioProducts": {
     "bingo-musical": {
       "nom": "Bingo Musical",

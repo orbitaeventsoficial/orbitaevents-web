@@ -37,6 +37,7 @@ export type BookingInvoiceRow = {
   total: number;
   holdedInvoiceUrl: string | null;
   holdedSyncError: string | null;
+  pdfUrl?: string | null;
   createdAt: Date;
 };
 

@@ -124,7 +124,7 @@ export function generateQuoteHTML(data: QuoteData, template: QuoteTemplateOverri
         "Reserva: la data queda confirmada amb el pagament del 30% d'aval.",
         "Pagament final: el 70% restant s'abona 7 dies abans de l'esdeveniment.",
         "Cancel·lació: >60 dies, 100% retorn de l'aval; 30-60 dies, 50% retorn; <30 dies, l'aval no és reemborsable.",
-        `Desplaçament: inclòs fins a ${INCLUDED_TRAVEL_KM} km de Granollers. Per a distàncies superiors, et passarem pressupost.`,
+        `Desplaçament: inclòs fins a ${INCLUDED_TRAVEL_KM / 2} km des de Granollers. Per a distàncies superiors, et passarem pressupost.`,
         "Hores extres: si l'esdeveniment s'allarga, es facturaran al preu indicat.",
       ];
 

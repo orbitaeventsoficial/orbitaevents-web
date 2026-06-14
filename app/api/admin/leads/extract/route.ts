@@ -13,6 +13,7 @@ const PROMPT = (text: string) => `Analitza aquesta conversa (pot ser un WhatsApp
   "eventType": "un de: WEDDING | BIRTHDAY | CORPORATE | COMMUNION | BAPTISM | OTHER",
   "eventDate": "format YYYY-MM-DD o buit",
   "eventTime": "format HH:MM (hora inici) o buit",
+  "eventEndTime": "format HH:MM (hora final) o buit",
   "eventLocation": "lloc de l'event",
   "guestCount": "número aproximat de convidats o buit",
   "message": "resum breu de la petició del client en 1-2 frases",

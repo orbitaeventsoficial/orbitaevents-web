@@ -160,10 +160,29 @@ html.admin-mode .nb__spinner { width: 32px; height: 32px; border: 2px solid var(
 .nb__sl-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .nb__sl-label { flex: 1 1 200px; min-width: 0; }
 .nb__sl-num { flex: 0 0 92px; }
-.nb__sl-qty { flex: 0 0 64px; }
+.nb__sl-qty { flex: 0 0 64px; text-align: center; }
+/* Sense spinners natius del number: en camps estrets (quantitat) tapaven el valor. */
+.nb__sl-num::-webkit-outer-spin-button,
+.nb__sl-num::-webkit-inner-spin-button,
+.nb__sl-qty::-webkit-outer-spin-button,
+.nb__sl-qty::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.nb__sl-num, .nb__sl-qty { -moz-appearance: textfield; appearance: textfield; }
 .nb__sl-payer { flex: 0 1 10rem; min-width: 0; }
+/* Cost d'equip propi (DJ / material): no és cost de línia, ja viu a l'Operatiu. */
+.nb__sl-owncost { flex: 0 0 92px; display: inline-flex; align-items: center; justify-content: center; font-size: var(--o-text-2xs); color: var(--t3); font-style: italic; }
 .nb__sl-del { flex: 0 0 36px; min-height: 36px; border: 1px solid color-mix(in oklab, var(--o-stage-lost) 40%, var(--line)); border-radius: var(--o-r-sm-2); background: transparent; color: var(--o-stage-lost); cursor: pointer; font-size: var(--o-text-sm); transition: background 130ms ease; }
 .nb__sl-del:hover { background: color-mix(in oklab, var(--o-stage-lost) 12%, transparent); }
+/* Base contractada (pack/extres/hores de la reserva): lectura dins el bolo, NO editable
+   ni sumada a serviceLines (la reserva ja la conté). Distingida amb to or discret. */
+.nb__sl-list--base { gap: 6px; margin-bottom: 4px; }
+.nb__sl-row--base {
+  border: 1px solid color-mix(in oklab, var(--gold) 24%, var(--line));
+  border-radius: var(--o-r-sm-2);
+  background: color-mix(in oklab, var(--gold) 6%, transparent);
+  padding: 6px 10px;
+}
+.nb__sl-readonly { flex: 0 0 92px; display: inline-flex; align-items: center; justify-content: flex-end; font-size: var(--o-text-sm); font-weight: var(--o-fw-semi); color: var(--t); }
+.nb__sl-del--ghost { border: none; background: transparent; color: var(--t3); opacity: 0.45; cursor: default; }
 @media (max-width: 560px) {
   .nb__sl-label, .nb__sl-num, .nb__sl-qty, .nb__sl-payer { flex: 1 1 100%; }
   .nb__sl-del { flex: 1 1 100%; }
@@ -235,25 +254,61 @@ html.admin-mode .nb__cfg-empty { padding: 18px 6px; color: var(--t3); font-size:
 html.admin-mode .nb__cfg-free { align-self: flex-start; }
 
 html.admin-mode .nb__cfg-cat { display: flex; flex-direction: column; gap: 8px; }
-/* Activador de proveïdors: no surten per defecte, l'usuari els activa amb un chip. */
-html.admin-mode .nb__cfg-providers { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
-html.admin-mode .nb__cfg-providerslbl { font-size: var(--o-text-2xs); font-weight: var(--o-fw-semi); color: var(--t3); text-transform: uppercase; letter-spacing: 0.06em; margin-inline-end: 0.15rem; }
-html.admin-mode .nb__cfg-providerchip {
-  padding: 0.28rem 0.6rem; border: 1px solid var(--line); border-radius: var(--o-r-pill);
-  background: color-mix(in oklab, var(--panel) 50%, transparent);
-  font-size: var(--o-text-2xs); font-weight: var(--o-fw-semi); color: var(--t2);
-  cursor: pointer; transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+/* Etiqueta de secció del catàleg (p. ex. «Proveïdors»). */
+html.admin-mode .nb__cfg-grouplbl {
+  margin-top: 0.25rem;
+  font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-semi);
+  color: var(--t3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
-html.admin-mode .nb__cfg-providerchip:hover { border-color: var(--line2); color: var(--t); }
-html.admin-mode .nb__cfg-providerchip.is-on {
-  border-color: color-mix(in oklab, var(--gold) 55%, var(--line));
-  background: color-mix(in oklab, var(--gold) 14%, transparent);
-  color: var(--gold);
+/* Menú en cascada: no empeny el bolo; obre una capa amb scroll intern. */
+html.admin-mode .nb__cfg-grp--menu {
+  position: relative;
+  overflow: visible;
+}
+html.admin-mode .nb__cfg-grp--menu[open] > summary {
+  border-bottom: 0;
+}
+html.admin-mode .nb__cfg-grp--menu[open] .nb__cfg-items {
+  position: absolute;
+  z-index: 35;
+  top: calc(100% + 0.28rem);
+  left: 0;
+  right: 0;
+  max-height: min(16rem, 38vh);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  border: 1px solid var(--line);
+  border-radius: var(--o-r-sm-2);
+  background: color-mix(in oklab, var(--panel) 96%, var(--canvas));
+  box-shadow: 0 18px 42px var(--ax-overlay-lg);
+}
+html.admin-mode .nb__cfg-grp--menu > summary::before {
+  content: "▸";
+  margin-inline-end: 0.4rem;
+  font-size: var(--o-text-micro);
+  opacity: 0.6;
+}
+html.admin-mode .nb__cfg-grp--menu[open] > summary::before {
+  content: "▾";
+}
+html.admin-mode .nb__cfg-grp--provider > summary::before {
+  content: "▸";
+  margin-inline-end: 0.4rem;
+  font-size: var(--o-text-micro);
+  opacity: 0.6;
+}
+html.admin-mode .nb__cfg-grp--provider[open] > summary::before {
+  content: "▾";
 }
 html.admin-mode .nb__cfg-grp { border: 1px solid var(--line); border-radius: var(--o-r-sm-2); overflow: hidden; }
 html.admin-mode .nb__cfg-grp > summary { cursor: pointer; padding: 9px 12px; font-size: var(--o-text-2xs); font-weight: var(--o-fw-semi); color: var(--t2); background: color-mix(in oklab, var(--raised) 70%, var(--panel)); list-style: none; }
 html.admin-mode .nb__cfg-grp > summary::-webkit-details-marker { display: none; }
 html.admin-mode .nb__cfg-grp[open] > summary { color: var(--gold); border-bottom: 1px solid var(--line); }
+html.admin-mode .nb__cfg-grp--menu { position: relative; overflow: visible; }
+html.admin-mode .nb__cfg-grp--menu[open] > summary { border-bottom: 0; }
 html.admin-mode .nb__cfg-items { display: flex; flex-direction: column; }
 html.admin-mode .nb__cfg-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 8px 12px; border: 0; border-top: 1px solid color-mix(in oklab, var(--line) 50%, transparent); background: transparent; color: var(--t); font: inherit; font-size: var(--o-text-sm); cursor: pointer; text-align: left; transition: background 120ms ease; }
 html.admin-mode .nb__cfg-item:first-child { border-top: 0; }

@@ -15,6 +15,7 @@ const COLLABORATOR_ID = 'carlos-lucas-fernandez';
 const IMG = '/img/collaborators/masquerade';
 const INCLUDES = "Vestuari d'alta qualitat · Desplaçament inclòs · Disponible en català";
 const CHILDREN_CATEGORY = 'Animació infantil';
+const ADULTS_CATEGORY = 'Animació adulta';
 const EXTRA_CATEGORY = 'Extra';
 
 function productPrice(costPrice) {
@@ -30,19 +31,20 @@ const PRODUCTS = [
     costPrice: 160,
     sellPrice: productPrice(160),
     imageUrl: `${IMG}/animacio-tematica.jpg`,
-    description: "Els personatges més entranyables obren un món de màgia i color amb jocs, balls i música. És una animació dinàmica, pensada perquè els infants participin en una aventura adaptada a la seva edat. Els personatges disponibles es confirmen segons agenda.",
+    // Sinopsi adaptada literalment del dossier del proveïdor (to natural, en català).
+    description: "Els nostres personatges més entranyables vénen a descobrir-te un nou món de màgia i de color. Una animació on els jocs i els balls són els protagonistes, en un xou totalment dinàmic i ple de música. Pregunta'ns pels personatges disponibles!",
     includes: INCLUDES,
     sortOrder: 1,
   },
   {
     name: 'Animació amb personatge',
     category: CHILDREN_CATEGORY,
-    crew: 'Animador + personatge + tècnic de so',
+    crew: 'Animador + 1 personatge + tècnic de so',
     durationLabel: '1h',
     costPrice: 250,
     sellPrice: productPrice(250),
     imageUrl: `${IMG}/animacio-personatge.jpg`,
-    description: "Els infants coneixen els seus personatges preferits i els ajuden a través de balls, jocs i dinàmiques participatives. És un format proper, molt visual i pensat perquè els nens i nenes se sentin dins de la història.",
+    description: "T'agradaria conèixer els teus personatges preferits? Disney, Bluey, Patrulla Canina… amb nosaltres és possible! Gaudeix de les nostres animacions amb els vostres personatges favorits, en una vetllada on els haureu d'ajudar a través de balls i dinàmiques. Esteu a punt per ballar amb ells?",
     includes: INCLUDES,
     sortOrder: 2,
   },
@@ -54,9 +56,23 @@ const PRODUCTS = [
     costPrice: 320,
     sellPrice: productPrice(320),
     imageUrl: `${IMG}/secret-pirates.jpg`,
-    description: "A les profunditats del Mediterrani s'amaga l'illa Maragda i el tresor màgic de Poseidó. El capità William i la capitana Elissabeth tenen cadascun una part del mapa i hauran de decidir si competeixen o treballen junts. Un musical amb cançons en directe, balls i valors d'amistat i treball en equip.",
+    description: "Diuen les llegendes que a les profunditats del mar Mediterrani s'amaga l'illa Maragda, creada pel déu del mar, Poseidó. Allà, amagat sota la terra, hi ha el seu tresor: un tresor màgic que es transforma en allò que més desitja qui el troba. El capità William té el vent a favor per arribar-hi, però tot canvia quan es topa amb la capitana Elissabeth a l'illa i descobreix que ella guarda l'altra meitat del mapa. Arribaran a treballar junts o lluitaran per ser el pirata més ràpid? Un musical ple de cançons en directe, balls i música, on l'amistat i el treball en equip són els pilars de l'espectacle.",
     includes: INCLUDES,
     sortOrder: 3,
+  },
+  {
+    name: 'Animació adults 1h',
+    category: ADULTS_CATEGORY,
+    crew: 'Animador',
+    durationLabel: '1h',
+    // Cost real del col·laborador (animador sol, 1 hora). PVP derivat amb el
+    // helper canònic resellPrice (cost +20% arrodonit a múltiple de 5).
+    costPrice: 160,
+    sellPrice: productPrice(160),
+    imageUrl: null,
+    description: "Animació en directe pensada per al grup gran: conducció, jocs i dinàmiques participatives que mantenen el ritme de la festa sense parar-la. Un animador professional condueix l'estona perquè els adults s'hi impliquin i passin una bona estona.",
+    includes: INCLUDES,
+    sortOrder: 6,
   },
   {
     name: 'Pintacares professional',
@@ -66,7 +82,7 @@ const PRODUCTS = [
     costPrice: 70,
     sellPrice: productPrice(70),
     imageUrl: null,
-    description: "Extra contractable amb una animació infantil o familiar. Servei de pintacares professional per ampliar l'experiència de la festa.",
+    description: "Pintacares professional per ampliar l'experiència de la festa. Es contracta amb una animació infantil o familiar.",
     includes: null,
     sortOrder: 4,
   },
@@ -78,7 +94,7 @@ const PRODUCTS = [
     costPrice: 40,
     sellPrice: productPrice(40),
     imageUrl: null,
-    description: "Extra contractable amb una animació infantil o familiar. Globoflèxia en acabar l'espectacle perquè cada infant pugui marxar amb un record.",
+    description: "Globoflèxia en acabar l'espectacle perquè cada infant marxi amb un record. Es contracta amb una animació infantil o familiar.",
     includes: null,
     sortOrder: 5,
   },

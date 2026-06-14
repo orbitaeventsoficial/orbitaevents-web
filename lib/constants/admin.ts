@@ -57,7 +57,84 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 926;
+export const ADMIN_CHANGE_COUNTER = 958;
+
+export const ADMIN_DOSSIER_GENERATOR_COPY = {
+  page: {
+    kicker: 'Dossier directe',
+    title: 'Configuració del bolo',
+    description: 'Lead o client, serveis i enviament.',
+    railCustomer: 'Lead/client',
+    railCatalog: 'serveis',
+    railSaved: 'dossiers',
+  },
+  client: {
+    title: 'Dades del client',
+    hint: 'Tria un lead, un client existent o omple les dades abans de crear el flux CRM.',
+    leadSearchLabel: 'Cerca lead existent',
+    customerSearchLabel: 'Cerca client existent',
+    linkedLeadLabel: 'Lead vinculat',
+    linkedCustomerLabel: 'Client vinculat',
+    changeLeadAction: 'Canviar lead',
+    changeCustomerAction: 'Canviar client',
+    intakeTitle: 'Text rebut',
+    intakeHint: 'Enganxa un WhatsApp, email o nota comercial i omplo els camps abans de crear res.',
+    intakeLabel: 'WhatsApp / email / nota',
+    intakePlaceholder: 'Ex: Hola, soc la Cristina. Necessitem DJ el 11/07/2026 de 18:00 a 20:00 a Arenys de Munt per 150 persones. Tel...',
+    intakeAction: 'Extreure dades',
+    intakeWorking: 'Extraient...',
+    intakeEmpty: 'Enganxa primer el text rebut.',
+    intakeSuccess: 'Dades extretes. Revisa-les abans de crear el dossier.',
+    intakeFallbackQuota: 'Extracció local parcial: quota IA limitada ara mateix.',
+    intakeFallbackUnavailable: 'Extracció local parcial: IA no disponible.',
+    eventSummaryLabel: 'Resum del bolo',
+    eventSummaryPlaceholder: '2026-07-11 · 18:00-20:00 · Arenys de Munt · 150 pax',
+    introLabel: 'Missatge d’obertura',
+    introHint: 'opcional',
+    introPlaceholder: 'Gràcies per contactar amb nosaltres...',
+  },
+  conflict: {
+    kicker: 'Possible client existent',
+    body: 'No es crearà cap client nou ni cap lead nou fins que triïs què s’ha de fer.',
+    noContact: 'Client sense contacte principal',
+    linkAction: 'Vincular aquest client',
+    reviewAction: 'Revisar coincidència',
+    toast: 'Aquest client ja existeix. Tria què vols fer abans de crear el dossier.',
+  },
+  bolo: {
+    title: 'El bolo',
+    hint: 'Serveis contractats i imports orientatius abans de crear el dossier.',
+    totalLabel: 'Total bolo',
+    empty: 'Cap servei seleccionat.',
+  },
+  catalog: {
+    title: 'Catàleg disponible',
+    hint: 'Tria només els serveis que formaran part del dossier final.',
+    groups: {
+      orbita: {
+        title: 'Serveis d’Òrbita',
+        subtitle: 'Serveis propis i formats comercials base.',
+      },
+      masquerade: {
+        title: 'Serveis de Masquerade',
+        subtitle: 'Animació, personatges i extres presencials de Masquerade.',
+      },
+      tino: {
+        title: 'Serveis lloguer Tino',
+        subtitle: 'Material de lloguer gestionat per Òrbita.',
+      },
+      altres: {
+        title: 'Altres proveïdors',
+        subtitle: 'Productes d’altres col·laboradors homologats.',
+      },
+    },
+  },
+  actions: {
+    createCrmFlow: 'Crear lead i client en desar',
+    createLeadForCustomer: 'Crear lead vinculat al client',
+    sendOnSave: 'Enviar per email en desar',
+  },
+} as const;
 
 export const ADMIN_DETAIL_PAGE_LABELS: Record<string, string> = {
   inventory: 'Fitxa inventari',
@@ -304,6 +381,7 @@ export const COLLABORATOR_EXTRA_CATEGORY = 'Extra';
 
 export const ADMIN_COLLABORATOR_PRODUCT_EMPTY_FORM: {
   name: string;
+  description: string;
   category: string;
   crew: string;
   durationLabel: string;
@@ -314,6 +392,7 @@ export const ADMIN_COLLABORATOR_PRODUCT_EMPTY_FORM: {
   isActive: boolean;
 } = {
   name: '',
+  description: '',
   category: '',
   crew: '',
   durationLabel: '',
@@ -675,7 +754,7 @@ export const ADMIN_PACK_EDITOR_TABS: ReadonlyArray<{ id: PackEditorTab; label: s
 // ─── PDF Studio Defaults ────────────────────────────────────────────────
 
 export const ADMIN_PDF_STUDIO_DEFAULTS: Record<string, string> = {
-  conditionsText: `Reserva amb 30% per bloquejar la data.\nPagament final 7 dies abans de l'esdeveniment.\nDesplaçament inclòs fins a 40 km.`,
+  conditionsText: `Reserva amb 30% per bloquejar la data.\nPagament final 7 dies abans de l'esdeveniment.\nDesplaçament inclòs fins a 20 km des de Granollers.`,
   whyChooseUs: 'Equip tecnic professional, resposta rapida i proposta adaptada perque tot surti perfecte sense complicacions.',
   brandTagline: 'El teu esdeveniment. El teu estil. La teva nit perfecta.',
   cancellationPolicy: 'Cancel·lació fins a 30 dies: 100% devolució. 15-30 dies: 50%. Menys de 15 dies: no reemborsable.',

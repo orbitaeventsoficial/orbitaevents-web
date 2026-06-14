@@ -46,8 +46,19 @@ describe('extractLeadDataFromText', () => {
     expect(result.eventLocation).toBe('Masia Can Roda, Girona');
     expect(result.eventDate).toBe('2026-06-20');
     expect(result.eventTime).toBe('20:00');
+    expect(result.eventEndTime).toBe('03:00');
     expect(result.guestCount).toBe('120');
     expect(result.budget).toContain('1500');
     expect(result.eventType).toBe('WEDDING');
+  });
+
+  it('extreu hora final de rang en text de WhatsApp', () => {
+    const result = extractLeadDataFromText(`
+      Hola, soc la Cristina.
+      Necessitem DJ el 11/07/2026 de 18:00 a 20:00 a Arenys de Munt per 150 persones.
+    `);
+
+    expect(result.eventTime).toBe('18:00');
+    expect(result.eventEndTime).toBe('20:00');
   });
 });

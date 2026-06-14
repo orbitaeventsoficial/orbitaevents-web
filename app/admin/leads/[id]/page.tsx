@@ -22,6 +22,10 @@ import InfoTooltip from '@/app/admin/components/InfoTooltip';
 import { ADMIN_HELP } from '@/app/admin/components/adminHelpGlossary';
 import { ADMIN_LEAD_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import { getWeatherForEvent } from '@/lib/services/weatherService';
+import { getEffectiveVehicleCostPerKm } from '@/lib/services/fuelReferenceService';
+import { DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
+import { computeBookingFinancialSummary } from '@/lib/services/costEngine';
+import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 import type { WxData } from '@/app/admin/components/WxBadge';
 
 export const dynamic = 'force-dynamic';
@@ -113,12 +117,25 @@ export default async function LeadDetailPage({ params }: Props) {
         },
       },
       proposals: {
-        select: { id: true, reference: true, status: true, total: true, createdAt: true },
+        select: {
+          id: true,
+          reference: true,
+          status: true,
+          total: true,
+          sentAt: true,
+          acceptedAt: true,
+          createdAt: true,
+          pdfUrl: true,
+          contractReference: true,
+          contractStatus: true,
+          contractPdfUrl: true,
+          contractSignedAt: true,
+        },
         orderBy: { createdAt: 'desc' },
         take: 5,
       },
       dossiers: {
-        select: { id: true, nom: true, sentAt: true, createdAt: true },
+        select: { id: true, nom: true, mode: true, sentAt: true, sentTo: true, createdAt: true },
         orderBy: { createdAt: 'desc' },
         take: 5,
         where: { deletedAt: null },
@@ -144,7 +161,40 @@ export default async function LeadDetailPage({ params }: Props) {
           extraHours: true,
           travelCost: true,
           subtotal: true,
-          pack: { select: { djHours: true, extraHourPrice: true, price: true } },
+          pack: {
+            select: {
+              code: true,
+              service: true,
+              price: true,
+              djHours: true,
+              extraHourPrice: true,
+              translations: { select: { locale: true, name: true } },
+            },
+          },
+          extras: {
+            select: {
+              quantity: true,
+              price: true,
+              extra: {
+                select: {
+                  slug: true,
+                  translations: { select: { locale: true, name: true } },
+                },
+              },
+            },
+          },
+          serviceLines: {
+            orderBy: { sortOrder: 'asc' },
+            select: {
+              kind: true,
+              label: true,
+              revenueAmount: true,
+              costAmount: true,
+              quantity: true,
+              collaboratorId: true,
+              collaborator: { select: { name: true } },
+            },
+          },
           collaboratorBookings: {
             select: {
               commissionAmount: true,
@@ -334,10 +384,91 @@ export default async function LeadDetailPage({ params }: Props) {
     }
   }
 
+  // Cost/km real del vehicle (benzina MITECO + consum + manteniment) per al
+  // càlcul de «Km assumibles» del bolo. Fallback al valor pla si el servei falla.
+  const vehicleCostPerKm = await getEffectiveVehicleCostPerKm()
+    .then((v) => (v.costPerKm > 0 ? v.costPerKm : DEFAULT_VEHICLE_COST_PER_KM))
+    .catch(() => DEFAULT_VEHICLE_COST_PER_KM);
+
+  // Economia REAL del lead quan ja té reserva: la veritat econòmica viu a la
+  // reserva (`Booking`), no al bolo provisional. Es calcula amb la MATEIXA font
+  // canònica que la fitxa de reserva (`computeBookingFinancialSummary`), per no
+  // mostrar un marge inflat (la base contractada té cost real, no només ingrés).
+  let bookingEconomia: {
+    net: number; marginPct: number; total: number; directCost: number;
+    acquisitionCost: number; serviceLinesCost: number; fixedOperationalCost: number;
+    tone: 'emerald' | 'amber' | 'orange' | 'rose'; label: string;
+  } | null = null;
+  if (lead.booking) {
+    const b = lead.booking;
+    const profitabilityConfig = await getProfitabilityConfig().catch(() => null);
+    if (profitabilityConfig) {
+      const extrasTotal = (b.extras ?? []).reduce(
+        (s, e) => s + Number(e.price || 0) * (e.quantity || 1), 0);
+      const slRevenue = (b.serviceLines ?? []).reduce(
+        (s, l) => s + Number(l.revenueAmount || 0) * (l.quantity || 1), 0);
+      const slCost = (b.serviceLines ?? []).reduce(
+        (s, l) => s + Number(l.costAmount || 0) * (l.quantity || 1), 0);
+      const summary = computeBookingFinancialSummary({
+        total: Number(b.total),
+        packPrice: b.pack?.price ? Number(b.pack.price) : 0,
+        extrasTotal,
+        extraHours: b.extraHours ?? 0,
+        extraHourPrice: b.pack?.extraHourPrice ? Number(b.pack.extraHourPrice) : 0,
+        distanceKm: 0,
+        travelCost: b.travelCost ? Number(b.travelCost) : 0,
+        serviceLinesRevenue: slRevenue,
+        serviceLinesCost: slCost,
+        source: lead.source,
+      }, profitabilityConfig);
+      bookingEconomia = {
+        net: summary.netMargin,
+        marginPct: summary.marginPct,
+        total: summary.total,
+        directCost: summary.directCost,
+        acquisitionCost: summary.acquisitionCost,
+        serviceLinesCost: summary.serviceLinesCost,
+        fixedOperationalCost: summary.fixedOperationalCost,
+        tone: summary.marginTone.tone,
+        label: summary.marginTone.label,
+      };
+    }
+  }
+
   return (
       <LeadDetailClient
-        proposals={lead.proposals.map((p) => ({ id: p.id, reference: p.reference, status: p.status, total: Number(p.total), createdAt: p.createdAt.toISOString() }))}
-        dossiers={lead.dossiers.map((d) => ({ id: d.id, nom: d.nom, estat: d.sentAt ? 'enviat' : 'esborrany', createdAt: d.createdAt.toISOString() }))}
+        vehicleCostPerKm={vehicleCostPerKm}
+        bookingEconomia={bookingEconomia}
+        proposals={lead.proposals.map((p) => ({
+          id: p.id,
+          reference: p.reference,
+          status: p.status,
+          total: Number(p.total),
+          sentAt: p.sentAt ? p.sentAt.toISOString() : null,
+          acceptedAt: p.acceptedAt ? p.acceptedAt.toISOString() : null,
+          createdAt: p.createdAt.toISOString(),
+          pdfUrl: p.pdfUrl,
+          contractReference: p.contractReference,
+          contractStatus: p.contractStatus,
+          contractPdfUrl: p.contractPdfUrl,
+          contractSignedAt: p.contractSignedAt ? p.contractSignedAt.toISOString() : null,
+        }))}
+        dossiers={lead.dossiers.map((d) => ({
+          id: d.id,
+          nom: d.nom,
+          estat: d.sentAt ? 'enviat' : 'esborrany',
+          mode: d.mode,
+          sentAt: d.sentAt ? d.sentAt.toISOString() : null,
+          sentTo: d.sentTo,
+          createdAt: d.createdAt.toISOString(),
+        }))}
+        documents={serializedDocuments.map((doc) => ({
+          id: doc.id,
+          type: doc.type,
+          title: doc.title,
+          fileUrl: doc.fileUrl,
+          createdAt: doc.createdAt,
+        }))}
         lead={{
         id: lead.id,
         name: lead.name,
@@ -385,6 +516,55 @@ export default async function LeadDetailPage({ params }: Props) {
             }
             return (lead.booking.pack?.djHours ?? 0) + (lead.booking.extraHours ?? 0);
           })(),
+          contractedProducts: (() => {
+            const pickName = (translations?: Array<{ locale: string; name: string }>) =>
+              translations?.find((t) => t.locale === 'ca')?.name ||
+              translations?.find((t) => t.locale === 'es')?.name ||
+              translations?.find((t) => t.locale === 'en')?.name ||
+              null;
+            const products: Array<{ id: string; kind: string; label: string; quantity: number; amount: number | null; meta?: string | null }> = [];
+            if (lead.booking.pack) {
+              products.push({
+                id: 'pack',
+                kind: 'PACK',
+                label: pickName(lead.booking.pack.translations) || lead.booking.pack.code || 'Pack contractat',
+                quantity: 1,
+                amount: Number(lead.booking.pack.price),
+                meta: lead.booking.pack.service,
+              });
+            }
+            for (const extraRow of lead.booking.extras || []) {
+              products.push({
+                id: `extra-${extraRow.extra.slug}`,
+                kind: 'EXTRA',
+                label: pickName(extraRow.extra.translations) || extraRow.extra.slug,
+                quantity: extraRow.quantity || 1,
+                amount: Number(extraRow.price || 0),
+                meta: 'extra',
+              });
+            }
+            for (const line of lead.booking.serviceLines || []) {
+              products.push({
+                id: `line-${products.length}`,
+                kind: line.kind,
+                label: line.label,
+                quantity: line.quantity || 1,
+                amount: line.revenueAmount !== null && line.revenueAmount !== undefined ? Number(line.revenueAmount) : null,
+                meta: line.collaborator?.name || line.kind,
+              });
+            }
+            if (lead.booking.extraHours && lead.booking.extraHours > 0 && lead.booking.pack?.extraHourPrice) {
+              products.push({
+                id: 'extra-hours',
+                kind: 'EXTRA_HOURS',
+                label: 'Hores extra',
+                quantity: lead.booking.extraHours,
+                amount: Number(lead.booking.pack.extraHourPrice),
+                meta: 'temps ampliat',
+              });
+            }
+            return products;
+          })(),
           collaboratorCost: lead.booking.collaboratorBookings?.[0]
             ? {
                 amount: Number(lead.booking.collaboratorBookings[0].commissionAmount),
@@ -405,6 +585,3 @@ export default async function LeadDetailPage({ params }: Props) {
       }} />
   );
 }
-
-
-

@@ -929,8 +929,8 @@ model BookingServiceLine {
   @@map("booking_service_lines")
 }
 
-// Línies del BOLO viu al lead (mirall de BookingServiceLine). El bolo es munta al
-// configurador i evoluciona; en reservar es copien a BookingServiceLine.
+// Línies del BOLO viu al lead mentre encara no hi ha reserva. Quan el lead ja té
+// Booking vinculada, la font de veritat passa a ser BookingServiceLine.
 model LeadServiceLine {
   id             String                 @id @default(cuid())
   leadId         String

@@ -87,6 +87,11 @@ export type StudioProps = {
   initialCustomerId?: string;
   initialCustomerName?: string;
   initialCustomerEmail?: string;
+  initialCustomerPhone?: string;
+  initialEventDate?: string;
+  initialEventSchedule?: string;
+  initialEventLocation?: string;
+  initialGuests?: number;
   initialLeadId?: string;
   initialProposalId?: string;
   initialPreferredLocale?: string;

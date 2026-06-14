@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '../../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
-import { buildDossierHtml, type DossierClientInfo } from '@/lib/utils/dossier-html-builder';
+import { buildDossierHtml, type DossierClientInfo, type DossierCopy } from '@/lib/utils/dossier-html-builder';
 
 interface Props {
   dossierId: string;
@@ -14,11 +14,12 @@ interface Props {
   productIds: string[];
   products: AnimacioProduct[];
   clientInfo: DossierClientInfo;
+  dossierCopy: DossierCopy;
   alreadySent: boolean;
   logoDataUri?: string;
 }
 
-export function LeadDossierActions({ dossierId, email, nom, productIds, products, clientInfo, alreadySent, logoDataUri }: Props) {
+export function LeadDossierActions({ dossierId, email, nom, productIds, products, clientInfo, dossierCopy, alreadySent, logoDataUri }: Props) {
   const toast = useToast();
   const router = useRouter();
   const [sending, setSending] = useState(false);
@@ -26,7 +27,7 @@ export function LeadDossierActions({ dossierId, email, nom, productIds, products
 
   function preview() {
     const filteredProducts = products.filter((p) => productIds.includes(p.id));
-    const html = buildDossierHtml(clientInfo, filteredProducts, { logoDataUri });
+    const html = buildDossierHtml(clientInfo, filteredProducts, dossierCopy, { logoDataUri, locale: 'ca-ES' });
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     window.open(URL.createObjectURL(blob), '_blank', 'noopener,noreferrer');
   }

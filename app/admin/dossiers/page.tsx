@@ -2,8 +2,12 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { AdminPage } from '../components/AdminPage';
 import { DossierGeneratorClient } from './DossierGeneratorClient';
+import { ADMIN_DOSSIER_GENERATOR_COPY } from '@/lib/constants/admin';
+import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
+import { getDossierCopy, getOrbitaDossierProducts } from '@/lib/constants/dossier-copy';
 import { getAllDossiers, getDeletedDossiers } from '@/lib/services/dossierService';
+import { listLeadServiceLines } from '@/lib/services/leadServiceLineService';
 import {
   collaboratorProductToAnimacioProduct,
   listDossierCollaboratorProducts,
@@ -23,6 +27,7 @@ interface PageProps {
     telefon?: string;
     empresa?: string;
     eventDesc?: string;
+    productIds?: string;
   };
 }
 
@@ -44,22 +49,47 @@ type DossierRow = {
   lead?: { id: string; name: string; status: string } | null;
 };
 
+function toDossierProductId(id: string): string {
+  return id.startsWith('collab:') ? id : `collab:${id}`;
+}
+
+async function resolveInitialProductIds(leadId?: string, explicitProductIds?: string): Promise<string | undefined> {
+  if (explicitProductIds?.trim()) return explicitProductIds;
+  if (!leadId) return undefined;
+  const result = await listLeadServiceLines(leadId);
+  const ids = (result.body.lines ?? [])
+    .map((line: { collaboratorId?: string | null }) => line.collaboratorId)
+    .filter((id): id is string => Boolean(id))
+    .map(toDossierProductId);
+  return ids.length > 0 ? Array.from(new Set(ids)).join(',') : undefined;
+}
+
 export default async function DossiersPage({ searchParams }: PageProps) {
   const logoDataUri = readLogoDataUri();
-  const [dossiers, deletedDossiers, animacioProducts, collaboratorProducts] = await Promise.all([
+  const [dossiers, deletedDossiers, legacyAnimacioProducts, collaboratorProducts, orbitaProducts, dossierCopy, initialProductIds] = await Promise.all([
     getAllDossiers(50),
     getDeletedDossiers(),
     getAnimacioProducts('ca'),
     listDossierCollaboratorProducts(),
+    getOrbitaDossierProducts('ca'),
+    getDossierCopy('ca'),
+    resolveInitialProductIds(searchParams?.leadId, searchParams?.productIds),
   ]) as [
     DossierRow[],
     DossierRow[],
     Awaited<ReturnType<typeof getAnimacioProducts>>,
     Awaited<ReturnType<typeof listDossierCollaboratorProducts>>,
+    Awaited<ReturnType<typeof getOrbitaDossierProducts>>,
+    Awaited<ReturnType<typeof getDossierCopy>>,
+    string | undefined,
   ];
-  const allProducts = [
-    ...animacioProducts,
+  const generatorProducts = [
+    ...orbitaProducts,
     ...collaboratorProducts.map(collaboratorProductToAnimacioProduct),
+  ];
+  const lookupProducts = [
+    ...generatorProducts,
+    ...legacyAnimacioProducts,
   ];
 
   return (
@@ -69,9 +99,21 @@ export default async function DossiersPage({ searchParams }: PageProps) {
     >
       {/* Generador */}
       <section className="dg__gen-section">
-        <h2 className="dg__section-title">Nou dossier</h2>
+        <header className="dg__hero">
+          <div>
+            <span className="dg__hero-kicker">{ADMIN_DOSSIER_GENERATOR_COPY.page.kicker}</span>
+            <h2 className="dg__hero-title">{ADMIN_DOSSIER_GENERATOR_COPY.page.title}</h2>
+            <p className="dg__hero-copy">{ADMIN_DOSSIER_GENERATOR_COPY.page.description}</p>
+          </div>
+          <div className="dg__hero-rail" aria-label="Estat del generador">
+            <span>{ADMIN_DOSSIER_GENERATOR_COPY.page.railCustomer}</span>
+            <span>{generatorProducts.length} {ADMIN_DOSSIER_GENERATOR_COPY.page.railCatalog}</span>
+            <span>{dossiers.length} {ADMIN_DOSSIER_GENERATOR_COPY.page.railSaved}</span>
+          </div>
+        </header>
         <DossierGeneratorClient
-          products={allProducts}
+          products={generatorProducts}
+          dossierCopy={dossierCopy}
           logoDataUri={logoDataUri}
           leadId={searchParams?.leadId}
           initialNom={searchParams?.nom}
@@ -79,6 +121,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
           initialTelefon={searchParams?.telefon}
           initialEmpresa={searchParams?.empresa}
           initialEventDesc={searchParams?.eventDesc}
+          initialProductIds={initialProductIds}
         />
       </section>
 
@@ -88,7 +131,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
           <h2 className="dg__section-title">Dossiers desats ({dossiers.length})</h2>
           <div className="dg__list">
             {dossiers.map((d) => {
-              const productNames = allProducts
+              const productNames = lookupProducts
                 .filter((p) => d.productIds.includes(p.id))
                 .map((p) => p.nom)
                 .join(' · ');
@@ -117,7 +160,8 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                     email={d.email ?? undefined}
                     nom={d.nom}
                     productIds={d.productIds}
-                    products={allProducts}
+                    products={lookupProducts}
+                    dossierCopy={dossierCopy}
                     clientInfo={{
                       nom: d.nom,
                       empresa: d.empresa ?? undefined,
@@ -143,7 +187,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
           <p className="dg__section-hint">Els dossiers eliminats es purgen automàticament als 30 dies.</p>
           <div className="dg__list">
             {deletedDossiers.map((d) => {
-              const productNames = allProducts
+              const productNames = lookupProducts
                 .filter((p) => d.productIds.includes(p.id))
                 .map((p) => p.nom)
                 .join(' · ');
@@ -162,7 +206,8 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                     email={d.email ?? undefined}
                     nom={d.nom}
                     productIds={d.productIds}
-                    products={allProducts}
+                    products={lookupProducts}
+                    dossierCopy={dossierCopy}
                     clientInfo={{
                       nom: d.nom,
                       empresa: d.empresa ?? undefined,

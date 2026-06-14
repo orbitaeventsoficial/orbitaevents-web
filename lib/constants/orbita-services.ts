@@ -70,6 +70,7 @@ export const ORBITA_SERVICES: OrbitaService[] = [
   { id: 'tecnic-so', kind: 'SOUND_TECH', label: `Tècnic de so · ${SOUND_TECH_DURATION}`, defaultPrice: SOUND_TECH_PRICE, unit: 'unit', optional: true },
   { id: 'bombolles', kind: 'EQUIPMENT', label: 'Màquina de bombolles', defaultPrice: 50, unit: 'unit', optional: true },
   { id: 'caps-mobils', kind: 'EQUIPMENT', label: 'Caps mòbils (llum)', defaultPrice: 120, unit: 'unit', optional: true },
+  { id: 'operari-extra', kind: 'OTHER', label: 'Operari extra', defaultPrice: 50, unit: 'unit', optional: true },
 ];
 
 export function getOrbitaService(id: string): OrbitaService | undefined {

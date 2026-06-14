@@ -9,7 +9,7 @@ const { mockPrisma, mockApplySideEffects, mockSyncCalendar, mockCalcGmapsDistanc
     },
     lead: { update: vi.fn() },
     customer: { update: vi.fn() },
-    bookingServiceLine: { deleteMany: vi.fn(), createMany: vi.fn() },
+    bookingServiceLine: { findMany: vi.fn(), deleteMany: vi.fn(), createMany: vi.fn() },
     availability: { updateMany: vi.fn() },
     bookingExtra: { deleteMany: vi.fn() },
     adminLog: { create: vi.fn() },
@@ -89,6 +89,7 @@ beforeEach(() => {
   mockPrisma.booking.delete.mockResolvedValue({});
   mockPrisma.lead.update.mockResolvedValue({});
   mockPrisma.customer.update.mockResolvedValue({});
+  mockPrisma.bookingServiceLine.findMany.mockResolvedValue([]);
   mockPrisma.bookingServiceLine.deleteMany.mockResolvedValue({ count: 0 });
   mockPrisma.bookingServiceLine.createMany.mockResolvedValue({ count: 0 });
   mockPrisma.availability.updateMany.mockResolvedValue({ count: 1 });
@@ -181,7 +182,7 @@ describe('updateBookingDetail', () => {
     });
   });
 
-  it('reemplaça línies de servei sense enviar-les a booking.update', async () => {
+  it('reemplaça línies de servei i recalcula totals', async () => {
     await updateBookingDetail('booking-1', {
       serviceLines: [
         { kind: 'DJ', label: 'DJ Òrbita', revenueAmount: 300, costAmount: 0, hours: 3 },
@@ -191,7 +192,14 @@ describe('updateBookingDetail', () => {
 
     expect(mockPrisma.booking.update).toHaveBeenCalledWith({
       where: { id: 'booking-1' },
-      data: {},
+      data: expect.objectContaining({
+        subtotal: 700,
+        vatRate: 0,
+        vatAmount: 0,
+        total: 700,
+        depositAmount: 210,
+        remainingAmount: 490,
+      }),
     });
     expect(mockPrisma.bookingServiceLine.deleteMany).toHaveBeenCalledWith({ where: { bookingId: 'booking-1' } });
     expect(mockPrisma.bookingServiceLine.createMany).toHaveBeenCalledWith({

@@ -4,10 +4,9 @@ import Link from 'next/link';
 import { useState, useTransition, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
-import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
 import LeadBoloSection, { type BoloEconomia } from './LeadBoloSection';
-import BookingTotalEditor from '../../bookings/[id]/BookingTotalEditor';
+import CommercialDocumentsHistory, { type CommercialDocumentHistoryItem } from '@/app/admin/components/CommercialDocumentsHistory';
 
 function buildLeadWhatsAppHref(phone: string, name: string): string {
   const msg = `Hola ${name}! Et contactem des d'Òrbita Events per la teva sol·licitud.`;
@@ -17,8 +16,9 @@ import { patchLeadStatus } from '../leadStatusClient';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import ConfirmDialog, { useConfirmDialog } from '@/app/admin/components/ConfirmDialog';
-import { SOURCE_LABELS, formatCurrency, formatDateFull } from '@/lib/constants';
+import { SOURCE_LABELS, formatCurrency, formatDateFull, getContractStatusLabel, getProposalStatusDisplay } from '@/lib/constants';
 import { TEAM_MEMBERS } from '@/lib/constants/admin';
+import { INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR } from '@/lib/services/travelCost';
 import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
 
@@ -94,6 +94,14 @@ export type LeadDetailData = {
     cashAmount: number | null;
     total: number;
     totalHours: number;
+    contractedProducts: Array<{
+      id: string;
+      kind: string;
+      label: string;
+      quantity: number;
+      amount: number | null;
+      meta?: string | null;
+    }>;
     collaboratorCost: { amount: number; name: string } | null;
     costFloor: number | null;
   } | null;
@@ -122,13 +130,33 @@ function nextStageFor(stage: Stage): Stage | null {
 
 type EditableField = 'phone' | 'email' | 'eventPhone' | 'eventAddress' | 'eventDate' | 'eventStartTime' | 'eventEndTime' | 'eventLocation' | 'guestCount' | 'budget';
 
-type ProposalItem = { id: string; reference: string; status: string; total: number; createdAt: string };
-type DossierItem = { id: string; nom: string; estat: string; createdAt: string };
+type ProposalItem = {
+  id: string;
+  reference: string;
+  status: string;
+  total: number;
+  sentAt: string | null;
+  acceptedAt?: string | null;
+  createdAt: string;
+  pdfUrl?: string | null;
+  contractReference?: string | null;
+  contractStatus?: string | null;
+  contractPdfUrl?: string | null;
+  contractSignedAt?: string | null;
+};
+type DossierItem = { id: string; nom: string; estat: string; mode: string | null; sentAt: string | null; sentTo?: string | null; createdAt: string };
+type LeadDocumentItem = { id: string; type: string; title: string; fileUrl: string; createdAt: string };
 
-export default function LeadDetailClient({ lead, proposals, dossiers }: {
+export default function LeadDetailClient({ lead, proposals, dossiers, documents, vehicleCostPerKm, bookingEconomia = null }: {
   lead: LeadDetailData;
   proposals: ProposalItem[];
   dossiers: DossierItem[];
+  documents: LeadDocumentItem[];
+  vehicleCostPerKm: number;
+  /** Economia REAL de la reserva vinculada (font canònica). Quan existeix, mana
+   *  sobre el `boloEcon` provisional del configurador (el lead amb reserva mostra
+   *  la veritat de la reserva, no el bolo). */
+  bookingEconomia?: BoloEconomia | null;
 }) {
   const router = useRouter();
   const toast = useToast();
@@ -136,7 +164,6 @@ export default function LeadDetailClient({ lead, proposals, dossiers }: {
   const [stage, setStage] = useState<Stage>(lead.stage);
   const [pending, setPending] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [payPending, setPayPending] = useState(false);
   // Només col·laboradors amb rol REFERRER (els que ens passen bolos).
   const [referrers, setReferrers] = useState<{ id: string; name: string }[]>([]);
   const [editField, setEditField] = useState<EditableField | null>(null);
@@ -145,6 +172,58 @@ export default function LeadDetailClient({ lead, proposals, dossiers }: {
   // Economia del bolo elevada des de LeadBoloSection per al rail financer compacte.
   const [boloEcon, setBoloEcon] = useState<BoloEconomia | null>(null);
   const handleEconomia = useCallback((e: BoloEconomia | null) => setBoloEcon(e), []);
+  // Si el lead té reserva, mana l'economia REAL de la reserva (font canònica del
+  // servidor); si no, el net provisional del configurador del bolo (cas Cristina).
+  const econ = bookingEconomia ?? boloEcon;
+
+  const documentHistoryItems: CommercialDocumentHistoryItem[] = [
+    ...proposals.flatMap((p) => {
+      const items: CommercialDocumentHistoryItem[] = [{
+        id: `proposal-${p.id}`,
+        kindLabel: 'Pressupost',
+        title: p.reference,
+        reference: p.reference,
+        statusLabel: getProposalStatusDisplay(p.status).label,
+        amount: p.total,
+        createdAt: p.createdAt,
+        sentAt: p.sentAt,
+        href: buildProposalHref(p.id),
+      }];
+      if (p.contractReference || p.contractStatus || p.contractPdfUrl) {
+        items.push({
+          id: `contract-${p.id}`,
+          kindLabel: 'Contracte',
+          title: p.contractReference || p.reference,
+          reference: p.contractReference || null,
+          statusLabel: getContractStatusLabel(p.contractStatus ?? null),
+          amount: p.total,
+          createdAt: p.contractSignedAt || p.sentAt || p.createdAt,
+          href: p.contractPdfUrl || buildProposalHref(p.id),
+          targetBlank: Boolean(p.contractPdfUrl),
+        });
+      }
+      return items;
+    }),
+    ...dossiers.map((d) => ({
+      id: `dossier-${d.id}`,
+      kindLabel: d.mode === 'quote' ? 'Pressupost dossier' : 'Dossier',
+      title: d.nom,
+      statusLabel: d.estat,
+      createdAt: d.createdAt,
+      sentAt: d.sentAt,
+      href: `/api/admin/dossiers/${d.id}/composite`,
+      targetBlank: true,
+    })),
+    ...documents.map((doc) => ({
+      id: `lead-document-${doc.id}`,
+      kindLabel: doc.type === 'QUOTE' ? 'Pressupost antic' : doc.type === 'CONTRACT' ? 'Contracte antic' : 'Document',
+      title: doc.title,
+      statusLabel: doc.type,
+      createdAt: doc.createdAt,
+      href: doc.fileUrl,
+      targetBlank: true,
+    })),
+  ];
 
   const [fields, setFields] = useState({
     phone: lead.phone ?? '',
@@ -293,65 +372,6 @@ export default function LeadDetailClient({ lead, proposals, dossiers }: {
     }
   }
 
-  const [bookingPayment, setBookingPayment] = useState({
-    paymentMethod: lead.booking?.paymentMethod ?? 'INVOICE',
-    invoiceRequired: lead.booking?.invoiceRequired ?? false,
-    cashAmount: lead.booking?.cashAmount ? String(lead.booking.cashAmount) : '',
-  });
-
-  async function saveBookingPayment(field: string, value: unknown) {
-    if (!lead.booking) return;
-    try {
-      await fetchWithCsrf(`/api/admin/bookings/${lead.booking.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ [field]: value }),
-      });
-      toast.success('Desat.');
-      startTransition(() => router.refresh());
-    } catch (error) {
-      console.error('[LeadDetailClient] Error saving booking payment', error);
-      toast.error('Error desant.');
-    }
-  }
-
-  async function markDepositPaid() {
-    if (!lead.booking || payPending) return;
-    setPayPending(true);
-    try {
-      await fetchWithCsrf(`/api/admin/bookings/${lead.booking.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ depositPaid: true }),
-      });
-      toast.success('Senyal marcat com a pagat.');
-      startTransition(() => router.refresh());
-    } catch (error) {
-      console.error('[LeadDetailClient] Error marking deposit paid', error);
-      toast.error('Error marcant el pagament.');
-    } finally {
-      setPayPending(false);
-    }
-  }
-
-  async function markRemainingPaid() {
-    if (!lead.booking || payPending) return;
-    setPayPending(true);
-    try {
-      await fetchWithCsrf(`/api/admin/bookings/${lead.booking.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ remainingPaid: true }),
-      });
-      toast.success('Resta marcada com a pagada.');
-      startTransition(() => router.refresh());
-    } catch (error) {
-      console.error('[LeadDetailClient] Error marking remaining paid', error);
-      toast.error('Error marcant el pagament.');
-    } finally {
-      setPayPending(false);
-    }
-  }
 
   return (
     <div className="fxd__fullpage" data-stage={stage}>
@@ -450,12 +470,12 @@ export default function LeadDetailClient({ lead, proposals, dossiers }: {
               </span>
             ) : (
               <button type="button" className="fxd__fact-val fxd__fact-val--big" onClick={() => startEdit('budget')}>
-                {boloEcon?.total
-                  ? formatCurrency(boloEcon.total)
-                  : fields.budget
+                {fields.budget
                     ? formatCurrency(Number(fields.budget))
                     : (() => {
-                        const prop = proposals.find((p) => Number.isFinite(p.total) && p.total > 0)?.total;
+                        // Només un pressupost REALMENT enviat compta com a valor del lead;
+                        // un esborrany (DRAFT, sense sentAt) no és un valor real.
+                        const prop = proposals.find((p) => p.sentAt && Number.isFinite(p.total) && p.total > 0)?.total;
                         return prop ? formatCurrency(prop) : <em className="fxd__empty">Afegir</em>;
                       })()}
               </button>
@@ -464,27 +484,13 @@ export default function LeadDetailClient({ lead, proposals, dossiers }: {
         </div>
 
         {lead.lostReason && <p className="fxd__hd-lost">{lead.lostReason}</p>}
-      </section>
 
-      {/* Àrea zenit: govern esquerra · bolo centre · economia dreta */}
-      <div className="fxd__zenith">
-
-      <aside className="fxd__rail fxd__rail--left" aria-label="Govern del lead">
-
-        {/* Col 1, Fila 1 — Fase + accions */}
-        <section className="fxd__panel">
-          <div className="fxd__panelhead"><span>Fase</span></div>
-          <div className="fxd__stageactions">
-            <Link href={`/admin/presupuestos?leadId=${lead.id}`} className="fxd__btn">+ Pressupost</Link>
-            <Link href={`/admin/dossiers?leadId=${lead.id}`} className="fxd__btn">+ Dossier</Link>
-            {stage === 'perdut' && (
-              <button type="button" className="fxd__btn fxd__btn--danger" onClick={handleDeleteLead}>Eliminar lead</button>
-            )}
-          </div>
+        <div className="fxd__phasebar" aria-label="Fase del lead">
           <div className="fxd__stagepick">
             {PIPELINE_STAGES.map((s) => (
               <button key={s} type="button" data-stage={s}
                 className={s === stage ? 'is-on' : ''}
+                aria-current={s === stage ? 'step' : undefined}
                 disabled={pending || s === stage || (s === 'guanyat' && !!lead.booking)}
                 onClick={() => moveLead(s)}
               >
@@ -492,253 +498,109 @@ export default function LeadDetailClient({ lead, proposals, dossiers }: {
               </button>
             ))}
           </div>
-          {stage === 'guanyat' && !lead.booking && (
-            <Link href={`/admin/bookings/new?leadId=${encodeURIComponent(lead.id)}`} className="fxd__btn fxd__btn--primary fxd__stage-create">Crear reserva</Link>
-          )}
-        </section>
-
-        {/* Forma de cobrament */}
-        {lead.booking && (
-          <section className="fxd__panel">
-            <div className="fxd__panelhead"><span>Forma de cobrament</span></div>
-            <dl className="fxd__rows">
-              <div>
-                <dt>Mètode</dt>
-                <dd>
-                  <select
-                    className="fxd__editinput"
-                    value={bookingPayment.paymentMethod}
-                    onChange={(e) => {
-                      setBookingPayment((p) => ({ ...p, paymentMethod: e.target.value }));
-                      saveBookingPayment('paymentMethod', e.target.value);
-                    }}
-                    aria-label="Mètode de pagament"
-                  >
-                    <option value="INVOICE">Factura</option>
-                    <option value="CASH">Efectiu</option>
-                    <option value="TRANSFER">Transferència</option>
-                  </select>
-                </dd>
-              </div>
-              <div>
-                <dt>Vol factura?</dt>
-                <dd>
-                  <label className="fxd__checkrow">
-                    <input
-                      type="checkbox"
-                      checked={bookingPayment.invoiceRequired}
-                      onChange={(e) => {
-                        setBookingPayment((p) => ({ ...p, invoiceRequired: e.target.checked }));
-                        saveBookingPayment('invoiceRequired', e.target.checked);
-                      }}
-                    />
-                    <span className="text-xs">{bookingPayment.invoiceRequired ? 'Sí' : 'No — sense factura'}</span>
-                  </label>
-                </dd>
-              </div>
-              {bookingPayment.paymentMethod === 'CASH' && (
-                <div>
-                  <dt>Import efectiu</dt>
-                  <dd>
-                    {editField === ('cashAmount' as EditableField) ? (
-                      <span className="fxd__editrow">
-                        <input className="fxd__editinput" type="number" min={0} value={editValue}
-                          onChange={(e) => setEditValue(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') { saveBookingPayment('cashAmount', parseFloat(editValue) || null); setBookingPayment((p) => ({ ...p, cashAmount: editValue })); cancelEdit(); }
-                            if (e.key === 'Escape') cancelEdit();
-                          }}
-                          autoFocus />
-                        <span className="fxd__editunit">€</span>
-                        <button className="fxd__savebtn" onClick={() => { saveBookingPayment('cashAmount', parseFloat(editValue) || null); setBookingPayment((p) => ({ ...p, cashAmount: editValue })); cancelEdit(); }} disabled={savePending}>✓</button>
-                        <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
-                      </span>
-                    ) : (
-                      <button className="fxd__editval" onClick={() => { setEditField('cashAmount' as EditableField); setEditValue(bookingPayment.cashAmount); }}>
-                        {bookingPayment.cashAmount ? `${bookingPayment.cashAmount}€` : <em className="fxd__empty">Afegir →</em>}
-                      </button>
-                    )}
-                  </dd>
-                </div>
-              )}
-            </dl>
-            {bookingPayment.paymentMethod === 'CASH' && !bookingPayment.invoiceRequired && (
-              <p className="fxd__payment-note">
-                Efectiu sense factura — no es genera a Holded. Queda registrat aquí.
-              </p>
+          <div className="fxd__phaseright">
+            {stage === 'perdut' && (
+              <button type="button" className="fxd__btn fxd__btn--danger" onClick={handleDeleteLead}>Eliminar lead</button>
             )}
-          </section>
-        )}
-
-        {/* Cobraments (si hi ha reserva) */}
-        {lead.booking && (
-          <section className="fxd__panel">
-            <div className="fxd__panelhead"><span>Cobraments</span></div>
-            <dl className="fxd__rows">
-              <div>
-                <dt>Senyal ({formatCurrency(lead.booking.depositAmount)})</dt>
-                <dd className={lead.booking.depositPaid ? 'fxd__ok' : 'fxd__pend'}>
-                  {lead.booking.depositPaid ? 'Pagat' : 'Pendent'}
-                </dd>
-              </div>
-              <div>
-                <dt>Resta ({formatCurrency(lead.booking.remainingAmount)})</dt>
-                <dd className={lead.booking.remainingPaid ? 'fxd__ok' : 'fxd__pend'}>
-                  {lead.booking.remainingPaid ? 'Pagada' : 'Pendent'}
-                </dd>
-              </div>
-            </dl>
-            <div className="fxd__actions">
-              {!lead.booking.depositPaid && (
-                <button type="button" className="fxd__btn fxd__btn--primary" disabled={payPending} onClick={markDepositPaid}>
-                  Marcar senyal pagat
-                </button>
-              )}
-              {lead.booking.depositPaid && !lead.booking.remainingPaid && (
-                <button type="button" className="fxd__btn fxd__btn--primary" disabled={payPending} onClick={markRemainingPaid}>
-                  Marcar resta pagada
-                </button>
-              )}
-              <Link href={buildBookingHref(lead.booking.id)} className="fxd__btn">
-                Reserva completa →
-              </Link>
+            <div className="fxd__profitmanage" aria-label="Gestió del lead">
+              <label className="fxd__profitfield">
+                <span>Responsable</span>
+                <select className="fxd__editinput" value={lead.owner ?? ''} onChange={(e) => saveAssignedTo(e.target.value)} aria-label="Responsable intern del lead">
+                  <option value="">Sense assignar</option>
+                  {TEAM_MEMBERS.map((m) => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                  {lead.owner && !TEAM_MEMBERS.includes(lead.owner as typeof TEAM_MEMBERS[number]) && (
+                    <option value={lead.owner}>{lead.owner}</option>
+                  )}
+                </select>
+              </label>
+              <label className="fxd__profitfield">
+                <span>Derivat per</span>
+                <select className="fxd__editinput" value={lead.sourceCollaboratorId ?? ''} onChange={(e) => saveSourceCollaborator(e.target.value)} aria-label="Col·laborador que ha derivat el bolo">
+                  <option value="">Client directe</option>
+                  {referrers.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </label>
             </div>
-          </section>
-        )}
-
-        {/* Rendibilitat — sota Fase, mateixa columna esquerra */}
-        <section className="fxd__panel fxd__panel--wide">
-          <div className="fxd__panelhead"><span>Rendibilitat</span></div>
-          <dl className="fxd__rows">
-            {/* El pressupost (budget) ja viu als stats «Valor» — no es duplica aquí. */}
-            {lead.booking && (<>
-              <div><dt>Total reserva</dt><dd className="fxd__val--gold">
-                <BookingTotalEditor
-                  bookingId={lead.booking.id}
-                  total={lead.booking.total}
-                  costFloor={lead.booking.costFloor ?? undefined}
-                />
-              </dd></div>
-              {lead.booking.totalHours > 0 && (
-                <div>
-                  <dt>€/hora</dt>
-                  <dd className="fxd__val--gold">
-                    {formatCurrency(lead.booking.total / lead.booking.totalHours)}/h
-                    <span className="fxd__val--muted"> ({lead.booking.totalHours}h)</span>
-                  </dd>
-                </div>
-              )}
-              {lead.booking.collaboratorCost && (
-                <div>
-                  <dt>Cost {lead.booking.collaboratorCost.name}</dt>
-                  <dd className="fxd__val--danger">
-                    -{formatCurrency(lead.booking.collaboratorCost.amount)}
-                    <span className="fxd__val--muted">
-                      {' '}(net {formatCurrency(lead.booking.total - lead.booking.collaboratorCost.amount)})
-                    </span>
-                  </dd>
-                </div>
-              )}
-            </>)}
-            {proposals.length > 0 && (
-              <div className="fxd__docgroup">
-                <dt className="fxd__docgroup-title">Pressupostos</dt>
-                {proposals.map((p) => (
-                  <dd key={p.id} className="fxd__docitem">
-                    <Link href={buildProposalHref(p.id)} className="fxd__doclink fxd__doclink--row">
-                      <span className="min-w-0 truncate">{p.reference}</span>
-                      <span className="flex flex-none items-center gap-2">
-                        <span className="fxd__val--gold">{formatCurrency(p.total)}</span>
-                        <span className={p.status === 'SENT' ? 'fxd__status--sent' : p.status === 'ACCEPTED' ? 'fxd__status--accepted' : 'fxd__status--draft'}>
-                          {p.status === 'SENT' ? 'Enviat' : p.status === 'ACCEPTED' ? 'Acceptat' : p.status === 'DRAFT' ? 'Esborrany' : p.status}
-                        </span>
-                      </span>
-                    </Link>
-                  </dd>
-                ))}
-              </div>
-            )}
-            {dossiers.length > 0 && (
-              <div className="fxd__docgroup">
-                <dt className="fxd__docgroup-title">Dossiers</dt>
-                {dossiers.map((d) => (
-                  <dd key={d.id} className="fxd__docitem">
-                    <a href={`/api/admin/dossiers/${d.id}/composite`} target="_blank" rel="noopener noreferrer" className="fxd__doclink fxd__doclink--row">
-                      <span className="min-w-0 truncate">{d.nom}</span>
-                      <span className={`flex-none ${d.estat === 'enviat' ? 'fxd__status--sent' : d.estat === 'acceptat' ? 'fxd__status--accepted' : 'fxd__status--draft'}`}>
-                        {d.estat}
-                      </span>
-                    </a>
-                  </dd>
-                ))}
-              </div>
-            )}
-            <div className="fxd__row--long"><dt>Responsable intern <small className="fxd__hint-inline">qui d&apos;Òrbita el porta</small></dt><dd>
-              <select className="fxd__editinput" value={lead.owner ?? ''} onChange={(e) => saveAssignedTo(e.target.value)} aria-label="Responsable intern del lead">
-                <option value="">— Sense assignar</option>
-                {TEAM_MEMBERS.map((m) => (
-                  <option key={m} value={m}>{m}</option>
-                ))}
-                {lead.owner && !TEAM_MEMBERS.includes(lead.owner as typeof TEAM_MEMBERS[number]) && (
-                  <option value={lead.owner}>{lead.owner}</option>
-                )}
-              </select>
-            </dd></div>
-            <div className="fxd__row--long"><dt>Bolo passat per <small className="fxd__hint-inline">col·laborador que ens deriva el client</small></dt><dd>
-              <select className="fxd__editinput" value={lead.sourceCollaboratorId ?? ''} onChange={(e) => saveSourceCollaborator(e.target.value)} aria-label="Col·laborador que ha derivat el bolo">
-                <option value="">— Ningú / client directe</option>
-                {referrers.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
-            </dd></div>
-          </dl>
-        </section>
-
-        {/* Marge del bolo — viu al peu de la columna de govern (omple el buit que
-            abans quedava sota la Rendibilitat) i estira fins a baix de tot. */}
-        <section className="fxd__panel fxd__panel--wide fxd__panel--margin" aria-label="Marge del bolo">
-          <div className="fxd__panelhead">
-            <span>Marge del bolo</span>
-            <span className="fxd__econonote">net = ingrés − cost − origen</span>
           </div>
-          {!boloEcon ? (
-            <p className="fxd__econonote">Afegeix línies al bolo per veure el marge.</p>
+        </div>
+
+        <div className="fxd__profitbar" aria-label="Marge del bolo i rendibilitat">
+          <span className="fxd__profitbar-title">
+            {bookingEconomia ? 'Marge de la reserva' : 'Marge del bolo'}
+          </span>
+          {econ ? (
+            <>
+              <span className="fxd__profitpill">
+                <span>Cost serveis</span>
+                <strong>{formatCurrency(econ.serviceLinesCost)}</strong>
+              </span>
+              <span className="fxd__profitpill">
+                <span>Operatiu</span>
+                <strong>{formatCurrency(econ.fixedOperationalCost)}</strong>
+              </span>
+              <span className="fxd__profitpill">
+                <span>Cost origen</span>
+                <strong>{formatCurrency(econ.acquisitionCost)}</strong>
+              </span>
+              <span className="fxd__profitpill" data-tone={econ.tone}>
+                <span>{bookingEconomia ? 'Net real' : 'Net estimat'}</span>
+                <strong>{formatCurrency(econ.net)}</strong>
+              </span>
+              <span className="fxd__profitpill" data-tone={econ.tone}>
+                <span>Marge</span>
+                <strong>{Math.round(econ.marginPct)}%</strong>
+              </span>
+              <span className="fxd__profitpill" title={`El pack base inclou ${INCLUDED_TRAVEL_KM / 2} km per sentit des de Granollers. A partir d'aquí, cada ${TRAVEL_BLOCK_KM} km de més es cobren a ${TRAVEL_BLOCK_EUR} € i se sumen al pressupost per trams.`}>
+                <span>Desplaçament</span>
+                <strong>{INCLUDED_TRAVEL_KM / 2} km incl. · +{TRAVEL_BLOCK_EUR}€/{TRAVEL_BLOCK_KM}km</strong>
+              </span>
+            </>
           ) : (
-            <div className="fxd__kpis">
-              <div className="fxd__kpi" data-level="info">
-                <div className="fxd__kpi-val">{formatCurrency(boloEcon.total)}</div>
-                <div className="fxd__kpi-lbl">Ingrés</div>
-                <div className="fxd__kpi-sub">suma de les línies</div>
-              </div>
-              <div className="fxd__kpi" data-level="info">
-                <div className="fxd__kpi-val">{formatCurrency(boloEcon.directCost)}</div>
-                <div className="fxd__kpi-lbl">Cost directe</div>
-                <div className="fxd__kpi-sub">
-                  {formatCurrency(boloEcon.serviceLinesCost)} serveis + {formatCurrency(boloEcon.fixedOperationalCost)} operativa
-                </div>
-              </div>
-              <div className="fxd__kpi" data-level="info">
-                <div className="fxd__kpi-val">{formatCurrency(boloEcon.acquisitionCost)}</div>
-                <div className="fxd__kpi-lbl">Origen</div>
-                <div className="fxd__kpi-sub">cost comercial imputat</div>
-              </div>
-              <div className="fxd__kpi" data-level={boloEcon.tone === 'rose' ? 'critical' : boloEcon.tone === 'orange' || boloEcon.tone === 'amber' ? 'warn' : 'ok'}>
-                <div className="fxd__kpi-val">{formatCurrency(boloEcon.net)}</div>
-                <div className="fxd__kpi-lbl">Net</div>
-                <div className="fxd__kpi-sub">
-                  {Math.round(boloEcon.marginPct)}% marge · {boloEcon.label}
-                </div>
-              </div>
-            </div>
+            <span className="fxd__profitpill">
+              <span>Net estimat</span>
+              <strong>pendent</strong>
+            </span>
           )}
-        </section>
-      </aside>
+        </div>
+
+      </section>
+
+      {/* Àrea zenit CANÒNICA: igual per a TOTS els leads (com Cristina). El bolo
+          ocupa tot l'ample. Els cobraments NO viuen al lead: es gestionen a la
+          fitxa de reserva (accés des de l'històric comercial al peu). */}
+      <div className="fxd__zenith fxd__zenith--solo">
 
       <main className="fxd__zenith-main" aria-label="Configuració del bolo">
-        <LeadBoloSection leadId={lead.id} source={lead.channel} onEconomiaChange={handleEconomia} compactEconomia />
+        <LeadBoloSection
+          leadId={lead.id}
+          documentContext={{
+            name: lead.name,
+            email: fields.email,
+            phone: fields.phone,
+            eventDate: fields.eventDate,
+            eventStartTime: fields.eventStartTime,
+            eventEndTime: fields.eventEndTime,
+            eventLocation: fields.eventLocation,
+            eventAddress: fields.eventAddress,
+            guestCount: fields.guestCount,
+          }}
+          contractedProducts={lead.booking?.contractedProducts ?? []}
+          source={lead.channel}
+          vehicleCostPerKm={vehicleCostPerKm}
+          onEconomiaChange={handleEconomia}
+          compactEconomia
+        />
       </main>
       </div>{/* /fxd__zenith */}
+
+      <CommercialDocumentsHistory
+        items={documentHistoryItems}
+        className="fxd__document-history"
+      />
 
       <ConfirmDialog {...dialogProps} />
     </div>

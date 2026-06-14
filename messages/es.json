@@ -7023,6 +7023,73 @@
       "responseTime": "2h"
     }
   },
+  "dossier": {
+    "portada": {
+      "eyebrow": "Lo hacemos a vuestra manera",
+      "clientLabel": "Hemos preparado este dossier para",
+      "bottom": "Nuestras propuestas · Òrbita Events"
+    },
+    "intro": {
+      "kicker": "Imaginémoslo juntos",
+      "title": "Un anticipo de lo que podemos vivir juntos, antes de hablar de números.",
+      "greetingDefault": "¡Gracias por pensar en nosotros! Hemos preparado estas páginas para que os imaginéis cómo sería vuestra fiesta con calma, sin tener que mirar todavía los precios.\n\nEn cada página os explicamos una propuesta: qué es, cómo se vive y qué encontraréis. Quedaos con las que más ilusión os hagan y, cuando lo tengáis claro, os pasamos el presupuesto a medida solo con lo que elijáis.",
+      "offerCountOne": "1 propuesta para vosotros",
+      "offerCountMany": "{count} propuestas para vosotros",
+      "summaryOfferLabel": "Qué os proponemos",
+      "summaryFormatLabel": "Cómo lo hemos hecho",
+      "summaryFormatValue": "Cada propuesta explicada, con un resumen de precios al final",
+      "summaryGoalLabel": "La idea",
+      "summaryGoalValue": "Que os imaginéis la fiesta antes de mirar el precio"
+    },
+    "chapter": {
+      "eyebrow": "Propuesta",
+      "priceLabel": "Precio",
+      "priceFromPrefix": "desde",
+      "priceCustom": "a medida",
+      "durationLabel": "Cuánto dura",
+      "includesTitle": "Qué encontraréis",
+      "noteLabel": "Bueno saber"
+    },
+    "resum": {
+      "kicker": "En resumen",
+      "title": "Todo lo que os proponemos",
+      "lead": "Aquí tenéis, de un vistazo, todo lo que hemos pensado para vosotros. Los precios son un punto de partida —el «desde»—, todavía sin extras ni desplazamiento; lo acabamos de cerrar juntos cuando sepamos todos los detalles.",
+      "totalLabel": "La propuesta, a partir de",
+      "customSuffix": "+ propuestas a medida"
+    },
+    "cta": {
+      "label": "Cualquier duda o para mirar fechas, escribidnos cuando queráis"
+    },
+    "ownProducts": {
+      "dj-primera-hora": {
+        "nom": "DJ profesional",
+        "descripcio": [
+          "Un DJ profesional que lleva la música de toda la fiesta, del primer baile hasta el último.",
+          "Lo montamos por horas: {first} la primera hora y {extra} cada hora de más, según hasta dónde queráis alargar la noche."
+        ],
+        "inclou": [
+          "DJ profesional",
+          "Primera hora ({first})",
+          "Cada hora de más (+{extra})"
+        ]
+      },
+      "bombolles": {
+        "nom": "Máquina de burbujas",
+        "descripcio": ["Burbujas para los momentos más bonitos: la entrada, el primer baile o las fotos de recuerdo."],
+        "inclou": ["Máquina de burbujas", "La manejamos nosotros durante la fiesta"]
+      },
+      "pont-llums-caps-mobils": {
+        "nom": "Puente de luces + cabezas móviles",
+        "descripcio": ["Un juego de luces y cabezas móviles que llena la pista de color y le da vida cuando llega la hora de bailar."],
+        "inclou": ["Puente de luces", "Cabezas móviles"]
+      },
+      "operari-extra": {
+        "nom": "Una mano extra",
+        "descripcio": ["Una persona más para el montaje y el soporte técnico, para que todo salga rodado y no tengáis que preocuparos de nada."],
+        "inclou": ["Operario de apoyo"]
+      }
+    }
+  },
   "animacioProducts": {
     "bingo-musical": {
       "nom": "Bingo Musical",

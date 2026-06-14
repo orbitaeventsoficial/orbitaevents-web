@@ -87,6 +87,47 @@ export function aggregateServiceLines(
   return { revenue, cost };
 }
 
+/** Línia mínima per classificar el tipus de cost operatiu que genera. */
+export interface BoloLineLike {
+  collaboratorId?: string | null;
+  kind?: string | null;
+}
+
+/**
+ * Classifica les línies del bolo per decidir el cost operatiu REAL d'Òrbita:
+ * - **Equip propi** (`DJ` o material propi `EQUIPMENT` SENSE `collaboratorId`):
+ *   Òrbita hi va amb cotxe i equip propis → s'aplica el cost fix (desgast +
+ *   amortització + consumibles).
+ * - **Lloguer de material** (`EQUIPMENT` AMB `collaboratorId`, p.ex. Tino):
+ *   s'ha d'anar a buscar i tornar; el transport el carrega la pròpia línia.
+ * - **Servei presencial** (`PROVIDER_SERVICE`, Masquerade) o **tècnic de so**
+ *   (`SOUND_TECH`): Òrbita no mou res seu → cap cost operatiu propi.
+ */
+export function classifyBoloLines(lines: BoloLineLike[]): {
+  hasOwnEquipment: boolean;
+  hasEquipmentRental: boolean;
+} {
+  let hasOwnEquipment = false;
+  let hasEquipmentRental = false;
+  for (const l of lines) {
+    const kind = l.kind || '';
+    if (!l.collaboratorId && (kind === 'DJ' || kind === 'EQUIPMENT')) hasOwnEquipment = true;
+    if (l.collaboratorId && kind === 'EQUIPMENT') hasEquipmentRental = true;
+  }
+  return { hasOwnEquipment, hasEquipmentRental };
+}
+
+/**
+ * Km de desplaçament que el marge del bolo pot assumir abans de deixar de
+ * guanyar (net = 0). El desplaçament va EN CONTRA del marge a `costPerKm` real
+ * (benzina MITECO + consum + manteniment). Retorna km totals (anada+tornada).
+ */
+export function computeSupportableTravelKm(netMargin: number, costPerKm: number): number {
+  const rate = costPerKm > 0 ? costPerKm : DEFAULT_VEHICLE_COST_PER_KM;
+  if (netMargin <= 0) return 0;
+  return Math.floor(netMargin / rate);
+}
+
 // ─── Core ───────────────────────────────────────────────────────────────────
 
 /**

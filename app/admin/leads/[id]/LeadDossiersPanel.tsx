@@ -3,6 +3,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { getDossiersByLead } from '@/lib/services/dossierService';
 import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
+import { getDossierCopy, getOrbitaDossierProducts } from '@/lib/constants/dossier-copy';
 import {
   collaboratorProductToAnimacioProduct,
   listDossierCollaboratorProducts,
@@ -27,12 +28,15 @@ interface Props {
 }
 
 export async function LeadDossiersPanel({ leadId, leadNom, leadEmail, leadTelefon }: Props) {
-  const [dossiers, animacioProducts, collaboratorProducts] = await Promise.all([
+  const [dossiers, animacioProducts, collaboratorProducts, orbitaProducts, dossierCopy] = await Promise.all([
     getDossiersByLead(leadId),
     getAnimacioProducts('ca'),
     listDossierCollaboratorProducts(),
+    getOrbitaDossierProducts('ca'),
+    getDossierCopy('ca'),
   ]);
   const allProducts = [
+    ...orbitaProducts,
     ...animacioProducts,
     ...collaboratorProducts.map(collaboratorProductToAnimacioProduct),
   ];
@@ -89,6 +93,7 @@ export async function LeadDossiersPanel({ leadId, leadNom, leadEmail, leadTelefo
                     eventDesc: d.eventDesc ?? undefined,
                     salutacio: d.salutacio ?? undefined,
                   }}
+                  dossierCopy={dossierCopy}
                   alreadySent={!!d.sentAt}
                   logoDataUri={logoDataUri}
                 />

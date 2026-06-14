@@ -7023,6 +7023,73 @@
       "responseTime": "2h"
     }
   },
+  "dossier": {
+    "portada": {
+      "eyebrow": "We do it your way",
+      "clientLabel": "We've prepared this dossier for",
+      "bottom": "Our proposals · Òrbita Events"
+    },
+    "intro": {
+      "kicker": "Let's picture it together",
+      "title": "A taste of what we can enjoy together, before talking numbers.",
+      "greetingDefault": "Thank you for thinking of us! We've put these pages together so you can picture your party with no rush, without having to look at prices just yet.\n\nOn each page we explain a proposal: what it is, how it feels and what you'll find. Keep the ones you love most and, once you're sure, we'll send you a tailored quote with only what you choose.",
+      "offerCountOne": "1 proposal for you",
+      "offerCountMany": "{count} proposals for you",
+      "summaryOfferLabel": "What we propose",
+      "summaryFormatLabel": "How we've done it",
+      "summaryFormatValue": "Each proposal explained, with a price summary at the end",
+      "summaryGoalLabel": "The idea",
+      "summaryGoalValue": "Picture the party before looking at the price"
+    },
+    "chapter": {
+      "eyebrow": "Proposal",
+      "priceLabel": "Price",
+      "priceFromPrefix": "from",
+      "priceCustom": "bespoke",
+      "durationLabel": "How long",
+      "includesTitle": "What you'll find",
+      "noteLabel": "Good to know"
+    },
+    "resum": {
+      "kicker": "In short",
+      "title": "Everything we propose",
+      "lead": "Here's everything we've thought up for you, at a glance. The figures are a starting point —the \"from\"—, still without extras or travel; we finalise it together once we know all the details.",
+      "totalLabel": "The proposal, from",
+      "customSuffix": "+ bespoke proposals"
+    },
+    "cta": {
+      "label": "Any questions or to check dates, write to us whenever you like"
+    },
+    "ownProducts": {
+      "dj-primera-hora": {
+        "nom": "Professional DJ",
+        "descripcio": [
+          "A professional DJ who carries the music through the whole party, from the first dance to the last.",
+          "We build it by the hour: {first} the first hour and {extra} each extra hour, depending on how far into the night you want to go."
+        ],
+        "inclou": [
+          "Professional DJ",
+          "First hour ({first})",
+          "Each extra hour (+{extra})"
+        ]
+      },
+      "bombolles": {
+        "nom": "Bubble machine",
+        "descripcio": ["Bubbles for the loveliest moments: the entrance, the first dance or the photos to remember."],
+        "inclou": ["Bubble machine", "We run it for you during the party"]
+      },
+      "pont-llums-caps-mobils": {
+        "nom": "Lighting bridge + moving heads",
+        "descripcio": ["A set of lights and moving heads that fills the dance floor with colour and brings it to life when it's time to dance."],
+        "inclou": ["Lighting bridge", "Moving heads"]
+      },
+      "operari-extra": {
+        "nom": "An extra hand",
+        "descripcio": ["One more person for the setup and technical support, so everything runs smoothly and you don't have to worry about a thing."],
+        "inclou": ["Support operator"]
+      }
+    }
+  },
   "animacioProducts": {
     "bingo-musical": {
       "nom": "Musical Bingo",

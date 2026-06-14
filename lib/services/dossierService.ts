@@ -1,6 +1,7 @@
 import 'server-only';
 import { prisma } from '@/lib/prisma';
 import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
+import { getDossierCopy, getOrbitaDossierProducts } from '@/lib/constants/dossier-copy';
 import { buildDossierHtml, type DossierClientInfo } from '@/lib/utils/dossier-html-builder';
 import { sendEmail } from '@/lib/email';
 import { recordEmailSend } from '@/lib/services/emailTrackingService';
@@ -152,9 +153,14 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
   if (!dossier) return { ok: false, error: 'Dossier no trobat' };
   if (!dossier.email) return { ok: false, error: 'El dossier no té email de destinatari' };
 
-  const allProducts = await getAnimacioProducts('ca');
+  const [allProducts, orbitaProducts, dossierCopy] = await Promise.all([
+    getAnimacioProducts('ca'),
+    getOrbitaDossierProducts('ca'),
+    getDossierCopy('ca'),
+  ]);
   const collaboratorProducts = await getDossierCollaboratorProductsByIds(dossier.productIds);
   const products = [
+    ...orbitaProducts.filter((p) => dossier.productIds.includes(p.id)),
     ...allProducts.filter((p) => dossier.productIds.includes(p.id)),
     ...collaboratorProducts.map(collaboratorProductToAnimacioProduct),
   ];
@@ -167,7 +173,7 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
     eventDesc: dossier.eventDesc ?? undefined,
     salutacio: dossier.salutacio ?? undefined,
   };
-  const html = buildDossierHtml(clientInfo, products);
+  const html = buildDossierHtml(clientInfo, products, dossierCopy, { locale: 'ca-ES' });
 
   const productsLabel = products.map((p) => p.nom).join(', ');
   const subject = `Dossier Òrbita Events — ${dossier.nom}`;

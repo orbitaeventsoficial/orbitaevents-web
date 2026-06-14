@@ -24,6 +24,7 @@ export type CollaboratorProductInput = {
 
 type CollaboratorProductForDossier = {
   id: string;
+  collaboratorId?: string;
   name: string;
   description: string | null;
   category: string | null;
@@ -42,6 +43,7 @@ type CollaboratorProductForDossier = {
 export type DossierCollaboratorProduct = {
   id: string;
   sourceProductId: string;
+  sourceProviderId?: string;
   nom: string;
   categoria?: string;
   durada?: string;
@@ -71,6 +73,69 @@ function splitIncludes(value?: string | null): string[] {
     .filter(Boolean);
 }
 
+function normalizeCatalogName(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+/**
+ * Marques/noms de prove\u00efdor que MAI poden apar\u00e8ixer al text client-facing del
+ * dossier: tot es presenta com a \u00d2rbita. S'apliquen a descripcions, inclou i
+ * nom de producte abans de muntar el `DossierCollaboratorProduct`, de manera que
+ * tots dos renderitzadors (HTML builder + jsPDF) reben el text ja sanititzat.
+ */
+const PROVIDER_BRAND_PATTERNS: RegExp[] = [
+  /\bmasquerade(\s+events)?\b/gi,
+  /\bcarlos(\s+lucas(\s+fern[a\u00e1\u00e0]ndez)?)?\b/gi,
+];
+
+/** Elimina qualsevol menci\u00f3 de marca de prove\u00efdor d'un text client-facing. */
+export function stripProviderBrand(text: string): string {
+  let out = text;
+  for (const pattern of PROVIDER_BRAND_PATTERNS) {
+    out = out.replace(pattern, '');
+  }
+  // Neteja residus de puntuaci\u00f3/espais que deixa l'eliminaci\u00f3 de marca.
+  return out
+    .replace(/\(\s*\)/g, '')
+    // Separadors "\u00b7" duplicats (marca eliminada entre dos punts volats).
+    .replace(/\u00b7\s*\u00b7/g, '\u00b7')
+    .replace(/\s+([.,;:])/g, '$1')
+    .replace(/\s{2,}/g, ' ')
+    // "\u00b7" orfe al principi o al final (marca eliminada en un extrem).
+    .replace(/^\s*\u00b7\s*/, '')
+    .replace(/\s*\u00b7\s*$/, '')
+    .trim();
+}
+
+function isMasqueradeProduct(product: CollaboratorProductForDossier): boolean {
+  const collaboratorName = product.collaborator.company || product.collaborator.name;
+  return normalizeCatalogName(collaboratorName).includes('masquerade');
+}
+
+function shouldShowDossierCollaboratorProduct(product: CollaboratorProductForDossier): boolean {
+  if (!isMasqueradeProduct(product)) return true;
+  // Capítols que poden sortir al dossier (noms canònics del catàleg del proveïdor).
+  // Els extres (pintacares, globoflèxia) es filtren a part per categoria, no aquí.
+  const name = normalizeCatalogName(product.name);
+  return [
+    'animacio tematica',
+    'animacio amb personatge',
+    'el secret dels pirates',
+    'animacio adults 1h',
+  ].includes(name);
+}
+
+function dossierProductDisplayName(product: CollaboratorProductForDossier): string {
+  // El nom del catàleg ja és client-facing (es presenta com a Òrbita). La marca
+  // del proveïdor es neteja amb stripProviderBrand al mapeig.
+  return product.name;
+}
+
 export function toDossierCollaboratorProductId(productId: string): string {
   return `${DOSSIER_COLLABORATOR_PRODUCT_PREFIX}${productId}`;
 }
@@ -84,20 +149,26 @@ export function parseDossierCollaboratorProductId(value: string): string | null 
 
 export function collaboratorProductToDossierProduct(product: CollaboratorProductForDossier): DossierCollaboratorProduct {
   const collaboratorName = product.collaborator.company || product.collaborator.name;
+  // Tot el text que veu el client es presenta com a Òrbita: cap marca de proveïdor.
   const includes = [
     ...(product.crew ? [product.crew] : []),
     ...splitIncludes(product.includes),
-  ];
+  ]
+    .map(stripProviderBrand)
+    .filter(Boolean);
+
+  const description = product.description ? stripProviderBrand(product.description) : '';
 
   return {
     id: toDossierCollaboratorProductId(product.id),
     sourceProductId: product.id,
-    nom: product.name,
+    sourceProviderId: product.collaboratorId,
+    nom: stripProviderBrand(dossierProductDisplayName(product)),
     categoria: product.category || undefined,
     durada: product.durationLabel || undefined,
     colaborador: collaboratorName,
-    descripcio: product.description ? [product.description] : [`Proposta de col·laborador gestionada per ${collaboratorName}.`],
-    inclou: includes.length > 0 ? includes : ['Servei gestionat per col·laborador homologat'],
+    descripcio: description ? [description] : ['Proposta seleccionada i gestionada per Òrbita Events.'],
+    inclou: includes.length > 0 ? includes : ['Servei gestionat per Òrbita Events'],
     sellPrice: product.sellPrice,
     imageUrl: product.imageUrl || undefined,
   };
@@ -114,6 +185,9 @@ export function collaboratorProductToAnimacioProduct(product: DossierCollaborato
     priceFrom: product.sellPrice,
     image: product.imageUrl,
     categoria: product.categoria,
+    sourceProviderName: product.colaborador,
+    sourceProviderId: product.sourceProviderId,
+    sourceProductId: product.sourceProductId,
   };
 }
 
@@ -140,14 +214,16 @@ export async function listDossierCollaboratorProducts(): Promise<DossierCollabor
     ],
   });
 
-  return products.map(collaboratorProductToDossierProduct);
+  return products
+    .filter(shouldShowDossierCollaboratorProduct)
+    .map(collaboratorProductToDossierProduct);
 }
 
 /** Productes actius de partners actius, format pla per a l'editor de línies de reserva. */
 export async function listActiveCollaboratorProductsForBooking() {
   const products = await prisma.collaboratorProduct.findMany({
     where: { isActive: true, collaborator: { isActive: true } },
-    include: { collaborator: { select: { name: true, company: true } } },
+    include: { collaborator: { select: { name: true, company: true, roles: true } } },
     orderBy: [{ collaborator: { company: 'asc' } }, { sortOrder: 'asc' }, { createdAt: 'asc' }],
   });
   return products.map((p) => ({
@@ -159,6 +235,7 @@ export async function listActiveCollaboratorProductsForBooking() {
     sellPrice: p.sellPrice,
     collaboratorId: p.collaboratorId,
     collaboratorName: p.collaborator.company || p.collaborator.name,
+    roles: p.collaborator.roles,
   }));
 }
 

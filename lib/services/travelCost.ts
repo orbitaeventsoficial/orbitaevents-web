@@ -1,7 +1,15 @@
-export const INCLUDED_TRAVEL_KM = 50;
+/** Km inclosos al preu (anada+tornada). 40 a/t = 20 km per sentit des de Granollers. */
+export const INCLUDED_TRAVEL_KM = 40;
 export const DEFAULT_VEHICLE_COST_PER_KM = 0.19;
-export const TRAVEL_BLOCK_KM = 40;
-export const TRAVEL_BLOCK_EUR = 20;
+/**
+ * Km totals (anar a buscar + tornar) per recollir material de lloguer extern
+ * (p.ex. Tino a Granollers ↔ base a Sentmenat, 2 anades-i-tornades). El transport
+ * el carrega la pròpia línia de lloguer, no l'operatiu general del bolo.
+ */
+export const EQUIPMENT_RENTAL_TRANSPORT_KM = 56;
+/** Tram de desplaçament facturable: 20 km (10 anada + 10 tornada) a 10 € = 0,50 €/km. */
+export const TRAVEL_BLOCK_KM = 20;
+export const TRAVEL_BLOCK_EUR = 10;
 export const DEFAULT_VEHICLE_CONSUMPTION_L100 = 8.5;
 export const DEFAULT_MAINTENANCE_COST_PER_KM = 0.12;
 

@@ -88,6 +88,7 @@ const leadSchema = z.object({
   utmMedium: z.string().optional(),
   utmCampaign: z.string().optional(),
   priority: z.enum(PRIORITY_VALUES).optional(),
+  customerId: z.string().optional(),
 });
 
 export async function GET(req: NextRequest) {
@@ -189,15 +190,32 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const result = await createAdminLead({ ...parsed.data, status: 'CONTACTED' });
+    const { customerId, ...leadInput } = parsed.data;
+    const result = await createAdminLead({ ...leadInput, status: 'CONTACTED' });
 
     const customerLink = result?.lead?.id
-      ? await linkManualLeadToCustomer(result.lead.id)
+      ? customerId
+        ? await linkLeadToCustomer({
+            leadId: result.lead.id,
+            action: 'link',
+            customerId,
+            actor: 'Admin intake',
+          })
+        : await linkManualLeadToCustomer(result.lead.id)
       : null;
+
+    if (customerId && customerLink && 'ok' in customerLink && !customerLink.ok) {
+      return NextResponse.json(
+        { error: customerLink.error, lead: result.lead, customerLink },
+        { status: customerLink.status },
+      );
+    }
 
     // Els leads creats manualment a l'admin no disparen automatismes d'entrada externa.
     if (result?.lead?.id) {
-      result.lead.customerId = customerLink?.customerId || result.lead.customerId || null;
+      result.lead.customerId = customerLink && 'customerId' in customerLink
+        ? customerLink.customerId || result.lead.customerId || null
+        : result.lead.customerId || null;
     }
 
     return NextResponse.json({ ...result, customerLink });

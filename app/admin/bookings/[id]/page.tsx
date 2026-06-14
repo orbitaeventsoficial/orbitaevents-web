@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { buildLeadComposeHref, buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildCustomerComposeHref, buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
+import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
 import { notFound } from 'next/navigation';
 import { BookingStatusChanger } from './BookingStatusChanger';
 import CommunicationPanel from './CommunicationPanel';
@@ -31,12 +32,13 @@ import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
 import BookingTotalEditor from './BookingTotalEditor';
 import { previewBookingCustomerLink } from '@/lib/services/bookings/bookingCustomerLinkService';
-import { getBookingStatusDisplay, getLeadStatusDisplay, getEventLabel, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull } from '@/lib/constants';
+import { getBookingStatusDisplay, getLeadStatusDisplay, getEventLabel, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull, getContractStatusLabel, getInvoiceStatusLabel, getProposalStatusDisplay } from '@/lib/constants';
 import { ADMIN_BOOKING_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import type { BookingExtraRow, BookingProposalRow, BookingInvoiceRow, BookingNumericCompat } from './booking-utils';
 import { buildGoogleCalendarUrl, getPackTranslation } from './booking-utils';
 import type { CanonicalTimelineEvent } from '@/lib/services/timelineQueryService';
 import MobileQuickActions from '@/app/admin/components/MobileQuickActions';
+import CommercialDocumentsHistory, { type CommercialDocumentHistoryItem } from '@/app/admin/components/CommercialDocumentsHistory';
 
 export const dynamic = 'force-dynamic';
 
@@ -79,17 +81,29 @@ async function getBooking(id: string) {
         extras: { include: { extra: { include: { translations: true } } } },
         serviceLines: { orderBy: { sortOrder: 'asc' } },
         inventory: { include: { item: true } },
-        lead: true,
+        lead: {
+          include: {
+            dossiers: {
+              where: { deletedAt: null },
+              orderBy: { createdAt: 'desc' },
+              select: { id: true, nom: true, mode: true, sentAt: true, createdAt: true },
+            },
+            documents: {
+              orderBy: { createdAt: 'desc' },
+              select: { id: true, type: true, title: true, fileUrl: true, createdAt: true },
+            },
+          },
+        },
         proposals: {
           select: {
-            id: true, reference: true, status: true, pdfUrl: true,
+            id: true, reference: true, status: true, total: true, createdAt: true, sentAt: true, acceptedAt: true, pdfUrl: true,
             contractStatus: true, contractReference: true, contractPdfUrl: true, contractSignedAt: true,
             contractSignedBy: true, contractSignatureIp: true, contractSignatureUa: true, contractSignatureBlob: true,
           },
           orderBy: { createdAt: 'desc' },
         },
         invoices: {
-          select: { id: true, reference: true, status: true, total: true, holdedInvoiceUrl: true, holdedSyncError: true, createdAt: true },
+          select: { id: true, reference: true, status: true, total: true, holdedInvoiceUrl: true, holdedSyncError: true, pdfUrl: true, createdAt: true },
           orderBy: { createdAt: 'desc' },
         },
         postEventReport: true,
@@ -177,6 +191,65 @@ export default async function BookingDetailPage({ params }: PageProps) {
   const peKpiClass = internalPostEventStatus === 'COMPLETO' ? 'bd__kpi--ok' : internalPostEventStatus === 'EN_PROGRESO' ? 'bd__kpi--warn' : '';
   const peDotClass = internalPostEventStatus === 'COMPLETO' ? 'bd__kpi-dot--ok' : internalPostEventStatus === 'EN_PROGRESO' ? 'bd__kpi-dot--warn' : 'bd__kpi-dot--neutral';
   const peLabel    = internalPostEventStatus === 'COMPLETO' ? 'Completat' : internalPostEventStatus === 'EN_PROGRESO' ? 'En progrés' : 'Pendent';
+  const documentHistoryItems: CommercialDocumentHistoryItem[] = [
+    ...booking.proposals.flatMap((p) => {
+      const items: CommercialDocumentHistoryItem[] = [{
+        id: `proposal-${p.id}`,
+        kindLabel: 'Pressupost',
+        title: p.reference,
+        reference: p.reference,
+        statusLabel: getProposalStatusDisplay(p.status).label,
+        amount: Number(p.total),
+        createdAt: p.createdAt,
+        sentAt: p.sentAt,
+        href: buildProposalHref(p.id),
+      }];
+      if (p.contractReference || p.contractStatus || p.contractPdfUrl) {
+        items.push({
+          id: `contract-${p.id}`,
+          kindLabel: 'Contracte',
+          title: p.contractReference || p.reference,
+          reference: p.contractReference || null,
+          statusLabel: getContractStatusLabel(p.contractStatus ?? null),
+          amount: Number(p.total),
+          createdAt: p.contractSignedAt || p.sentAt || p.createdAt,
+          href: p.contractPdfUrl || buildProposalHref(p.id),
+          targetBlank: Boolean(p.contractPdfUrl),
+        });
+      }
+      return items;
+    }),
+    ...booking.invoices.map((inv) => ({
+      id: `invoice-${inv.id}`,
+      kindLabel: 'Factura',
+      title: inv.reference,
+      reference: inv.reference,
+      statusLabel: getInvoiceStatusLabel(inv.status),
+      amount: Number(inv.total),
+      createdAt: inv.createdAt,
+      href: inv.holdedInvoiceUrl || inv.pdfUrl || null,
+      targetBlank: Boolean(inv.holdedInvoiceUrl || inv.pdfUrl),
+    })),
+    ...(booking.lead?.dossiers || []).map((d) => ({
+      id: `dossier-${d.id}`,
+      kindLabel: d.mode === 'quote' ? 'Pressupost dossier' : 'Dossier',
+      title: d.nom,
+      statusLabel: d.sentAt ? 'enviat' : 'esborrany',
+      createdAt: d.createdAt,
+      sentAt: d.sentAt,
+      href: `/api/admin/dossiers/${d.id}/composite`,
+      targetBlank: true,
+    })),
+    ...(booking.lead?.documents || []).map((doc) => ({
+      id: `lead-document-${doc.id}`,
+      kindLabel: doc.type === 'QUOTE' ? 'Pressupost antic' : doc.type === 'CONTRACT' ? 'Contracte antic' : 'Document',
+      title: doc.title,
+      statusLabel: doc.type,
+      createdAt: doc.createdAt,
+      href: doc.fileUrl,
+      targetBlank: true,
+    })),
+  ];
 
   return (
     <div className="bd__root" style={{ minHeight: '100vh', background: '#000' }}>
@@ -499,6 +572,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
         <div className="bd__sec-divider" id="sec-documents"><span>Documents</span></div>
         <div>
+          <CommercialDocumentsHistory items={documentHistoryItems} />
           <DocumentFlowSection
             proposals={(booking.proposals as BookingProposalRow[]).map((p) => ({
               id: p.id, reference: p.reference, status: p.status, pdfUrl: p.pdfUrl,

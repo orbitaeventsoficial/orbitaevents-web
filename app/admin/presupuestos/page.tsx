@@ -23,6 +23,15 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
+function toDateInputValue(date: Date | null | undefined): string {
+  return date ? date.toISOString().slice(0, 10) : '';
+}
+
+function buildSchedule(start?: string | null, end?: string | null): string {
+  if (start && end) return `${start}-${end}`;
+  return start || end || '';
+}
+
 export default async function PresupuestosPage({
   searchParams,
 }: {
@@ -38,7 +47,35 @@ export default async function PresupuestosPage({
   const customer = customerId
     ? await prisma.customer.findUnique({
         where: { id: customerId },
-        select: { id: true, name: true, email: true, preferredLocale: true },
+        select: { id: true, name: true, email: true, phone: true, preferredLocale: true },
+      })
+    : null;
+
+  const leadForEditor = leadId
+    ? await prisma.lead.findUnique({
+        where: { id: leadId },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          eventDate: true,
+          eventStartTime: true,
+          eventEndTime: true,
+          eventLocation: true,
+          eventAddress: true,
+          guestCount: true,
+          preferredLocale: true,
+          customer: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phone: true,
+              preferredLocale: true,
+            },
+          },
+        },
       })
     : null;
 
@@ -311,12 +348,17 @@ export default async function PresupuestosPage({
       }
     >
       <PresupuestoPdfStudio
-        initialCustomerId={customer?.id || ''}
-        initialCustomerName={customer?.name || ''}
-        initialCustomerEmail={customer?.email || ''}
+        initialCustomerId={customer?.id || leadForEditor?.customer?.id || ''}
+        initialCustomerName={customer?.name || leadForEditor?.customer?.name || leadForEditor?.name || ''}
+        initialCustomerEmail={customer?.email || leadForEditor?.customer?.email || leadForEditor?.email || ''}
+        initialCustomerPhone={customer?.phone || leadForEditor?.customer?.phone || leadForEditor?.phone || ''}
+        initialEventDate={toDateInputValue(leadForEditor?.eventDate)}
+        initialEventSchedule={buildSchedule(leadForEditor?.eventStartTime, leadForEditor?.eventEndTime)}
+        initialEventLocation={leadForEditor?.eventAddress || leadForEditor?.eventLocation || ''}
+        initialGuests={leadForEditor?.guestCount || 80}
         initialLeadId={leadId}
         initialProposalId={proposalId}
-        initialPreferredLocale={customer?.preferredLocale || 'ca'}
+        initialPreferredLocale={customer?.preferredLocale || leadForEditor?.customer?.preferredLocale || leadForEditor?.preferredLocale || 'ca'}
         initialBrandName={String(brandSettings['quotes.brandName'] || 'Òrbita Events')}
         initialBrandWebsite={String(brandSettings['quotes.brandWebsite'] || 'orbitaevents.com')}
         initialBrandEmail={String(brandSettings['quotes.brandEmail'] || '')}

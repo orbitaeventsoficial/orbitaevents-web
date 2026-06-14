@@ -9,6 +9,7 @@ export type ExtractedLeadTextData = {
   eventType: EventType;
   eventDate: string;
   eventTime: string;
+  eventEndTime: string;
   eventLocation: string;
   guestCount: string;
   budget: string;
@@ -158,6 +159,11 @@ function extractEventTime(text: string): string {
   return range ? `${range[1].padStart(2, '0')}:${range[2]}` : '';
 }
 
+function extractEventEndTime(text: string): string {
+  const range = text.match(/\b(?:[01]?\d|2[0-3])[:.][0-5]\d\s*(?:h)?\s*(?:-|a|to|hasta)\s*([01]?\d|2[0-3])[:.]([0-5]\d)\b/i);
+  return range ? `${range[1].padStart(2, '0')}:${range[2]}` : '';
+}
+
 function extractGuestCount(text: string): string {
   const match = text.match(
     /\b(?:unes?|aprox(?:imadament|imadamente)?\s*)?(\d{1,4})\s*(?:persones?|personas?|convidats?|invitad[oa]s?|assistents?|asistentes?|guests?|people)\b/i
@@ -236,6 +242,7 @@ export function extractLeadDataFromText(text: string): ExtractedLeadTextData {
     eventType: inferEventType(cleaned),
     eventDate: extractEventDate(cleaned),
     eventTime: extractEventTime(cleaned),
+    eventEndTime: extractEventEndTime(cleaned),
     eventLocation: extractLocation(cleaned),
     guestCount: extractGuestCount(cleaned),
     budget: extractBudget(cleaned),

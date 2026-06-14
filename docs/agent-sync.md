@@ -15,6 +15,65 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-15 [ESTAT: tancat — DOSSIER GENÈRIC, PACKS FORA #958 (decisió Opus) · apilat sobre #946–#957]
+Counter 957 → 958. Opus va decidir: treure els packs del dossier (5 iguals = soroll) + genèric sense temàtica. #958 reverteix la part visible del #955: eliminat `packDossierService.ts`+test, grup «Packs» fora del generador, descablejat page/lead/email, grep net. NO tocat `packs-config.ts` ni packs web. tsc + validate:core + 38 tests verds. SENSE commit.
+RESUM SESSIÓ DOSSIERS (#952–#958): PDF refet+Opus+camp text (#952), textos canònics a messages/text-manager (#953), selector hores DJ (#954), packs al dossier (#955) → REVERTIT (#958), Masquerade literal del Word (#956, seed executat a Railway), textos càlids (#957), dossier genèric sense packs (#958).
+⚠️ codex: el generador de dossier ja NO té grup «Packs» ni `packDossierService`. No el recreïs.
+
+[claude] 2026-06-15 [ESTAT: tancat — TEXTOS DOSSIER CÀLIDS #957 · apilat sobre #946–#956]
+Counter 956 → 957. #957 = textos `dossier.*` (3 idiomes) reescrits amb to càlid/proper (client-facing). 3 JSON OK + validate:core verd.
+
+[claude] 2026-06-15 [ESTAT: tancat — MASQUERADE LITERAL DEL WORD #956 · apilat sobre #946–#955]
+Counter 955 → 956. #956 = adaptació literal del Word de Masquerade: `seed-masquerade-products.mjs` (sinopsis reals + cost del Word; PVP via resellPrice) + `collaboratorProductService.ts` (allowlist del dossier sincronitzada amb noms reals; abans tenia noms vells que no es mostraven). node --check + tsc + validate:core + 17 tests verds. SENSE commit.
+⚠️ El propietari ha d'executar `node scripts/seed-masquerade-products.mjs` (Railway) perquè els textos nous arribin a BD. «Animadors extra (a consultar)» no afegit (sense preu fix).
+RESUM SESSIÓ DOSSIERS (#952–#956): refet PDF + redisseny Opus + camp «Text del dossier» (#952), textos canònics a messages + text-manager (#953), selector hores DJ (#954), packs ofertables al dossier (#955), Masquerade literal del Word (#956).
+
+[claude] 2026-06-14 [ESTAT: tancat — PACKS AL DOSSIER #955 · apilat sobre #946–#954]
+Counter 954 → 955. #955 = packs ofertables al dossier (`packDossierService.ts` nou + grup «Packs» al generador + cablejat page/lead/email). tsc + validate:core + 45 tests verds.
+⚠️ codex: `DossierGeneratorClient` té grup «Packs» (`pack:` ids); page/LeadDossiersPanel/dossierService resolen `listDossierPackProducts`. No revertir.
+
+[claude] 2026-06-14 [ESTAT: tancat — SELECTOR HORES DJ #954 · apilat sobre #946–#953]
+Counter 953 → 954 (meu). #954 = stepper d'hores de DJ al generador (`DossierGeneratorClient.tsx` + `dossiers.css`): preu/durada/total/línies via `djPriceForHours` (canònic), restauració d'hores en carregar lead (`djHoursFromServiceLines`). tsc + validate:core + 38 tests verds. SENSE commit.
+⚠️ codex: `DossierGeneratorClient` ara té estat `djHours`; `productPriceValue`/`productToServiceLine` reben arg `djHours`. No revertir.
+
+[claude] 2026-06-14 [ESTAT: tancat — TEXTOS DOSSIER CANÒNICS #953 · apilat sobre #946–#952]
+Counter 952 → 953 (meu). #953 = tots els textos del dossier a `messages.dossier.*` (font única) + editables a /admin/text-manager (secció Dossiers) + resolver server-only `dossier-copy.ts` + builder rep `copy` (zero hardcoded). Toca zona /admin/dossiers (compartida amb codex #946–#952): `page.tsx`, `DossierGeneratorClient`, `DossierListActions`, `LeadDossiersPanel`/`LeadDossierActions`, `dossierService`, builder, text-manager-config, 3 messages. Additiu i verd (tsc + validate:core + 58 tests).
+SEGÜENT (#954): canonitzar jsPDF `dossierCompositePdfService.ts` amb el mateix namespace + packs ofertables al dossier amb `description`.
+⚠️ codex: si toques DossierGeneratorClient/page.tsx, ara reben prop `dossierCopy` (de page server) i buildDossierHtml té signatura nova (client, products, copy, options). No revertir-ho.
+Què he tocat (per ordre del propietari, amb 2 agents Opus): `lib/utils/dossier-html-builder.ts` (preu per capítol + redisseny editorial premium + nova secció «Resum de la proposta» amb TOTAL via formatCurrency), `lib/services/dossierCompositePdfService.ts` (coherència), `lib/services/collaboratorProductService.ts` (nou `stripProviderBrand()` → ZERO «Masquerade» client-facing + allowlist «animacio adults 1h»), `app/admin/dossiers/page.tsx` (`orbitaDossierProducts()`: capítol DJ únic amb model horari, hora extra fusionada — ja NO és producte a part), `app/admin/dossiers/DossierGeneratorClient.tsx` (eliminada lògica morta de l'hora extra), `app/admin/collaborators/CollaboratorProductsPanel.tsx` + `lib/constants/admin.ts` (nou camp «Text del dossier» = `description` al form de producte), `scripts/seed-masquerade-products.mjs` (nou producte «Animació adults 1h», cost 160 → PVP resellPrice=195€), tests dossier/collaborator.
+⚠️ AVÍS CRÍTIC codex: hem editat els MATEIXOS fitxers de /admin/dossiers en paral·lel. Ara mateix tot conviu i és VERD (validate:core EXIT 0 + 41/41 tests). NO he tocat el counter ni el diari per evitar duplicar el #952 amb tu. Si encara estàs viu sobre dossiers, coordinem abans de commit per no clobberar-nos. La meva feina és additiva sobre la teva (#946–#951).
+
+[claude] 2026-06-13 [ESTAT: tancat — fitxa compacta alineada + Studio #20 tots els dominis (#939)]
+Últim canvi: #939 (comptador 938→939).
+Proper pas previst: canonitzar les fitxes 🟡 de Studio #20 (Calendari de leads, Fitxa de reserva, Hub de client, Partner Hub) aplicant els criteris d'estàndard. A criteri del propietari.
+Avís per l'altre agent: #939 toca `LeadsSeasonClient.tsx` (zona teva) — el drawer `BookingInlineActions` deixa de marcar cobrament (`patchPayment`/`busy` eliminats); només mostra estat + «Obrir reserva», per doctrina (cobraments a la reserva). Canvi mínim i alineat. També `StudioShowroom.tsx` (`TYPE_PAGES` 1→4 dominis) i `docs/fitxes-tipus.md`. tsc + qa:studio-integrity + validate:core verds. SENSE commit.
+
+[claude] 2026-06-13 [ESTAT: tancat — fitxa lead canònica + marge real + Studio #20 (#938)]
+Últim canvi: #938 (comptador 937→938).
+Proper pas previst: alinear les altres 2 vistes del domini Leads (Calendari + Fitxa compacta) a la canònica, i afegir més dominis a Studio #20 (reserva, client, proveïdor). A criteri del propietari.
+Avís per l'altre agent: #938 toca `LeadDetailClient.tsx` (zenith SEMPRE `--solo`; rail de cobrament eliminat → els cobraments es gestionen a la fitxa de RESERVA, no al lead; profitbar usa `bookingEconomia` real quan hi ha reserva), `leads/[id]/page.tsx` (calcula `bookingEconomia` amb `computeBookingFinancialSummary`+`getProfitabilityConfig`; `costAmount`/`collaboratorId` afegits al select de `serviceLines`), `StudioShowroom.tsx`+`studio.css` (NOVA secció #20 «Fitxes tipus», additiva — no toca #00–#19), nou `docs/fitxes-tipus.md`. NO toco serveis de dades de reserva (`leadServiceLineService`/`bookingRouteService`). Resol l'OBSERVACIÓ del #937: el marge d'Alejandro ja és real (62%, no 98%). tsc + qa:studio-integrity + validate:core verds. SENSE commit.
+
+[claude] 2026-06-13 [ESTAT: tancat — relleu del bolo canònic dins configurador (#937)]
+Últim canvi: #937 (relleu del teu handoff `docs/lead-booking-canonical-bolo-roadmap.md`; comptador 936→937, que m'havies reservat).
+Proper pas previst: decisió del propietari sobre l'OBSERVACIÓ econòmica (sota). Següent peça del full de ruta si el propietari vol.
+Avís per l'altre agent: #937 = (1) CSS de la base contractada a `nb-design.css` (`.nb__sl-list--base`/`.nb__sl-row--base` to or/`.nb__sl-readonly`/`.nb__sl-del--ghost`); (2) `LeadDetailClient.tsx` retira el panell lateral «Productes contractats» (ja viu al configurador com a base; `contractedProducts` segueix alimentant `baseLines`); (3) doctrina canònica escrita a `docs/bolo-flux.md`. El teu wiring (#934/#935) FUNCIONA: Alejandro es veu com Cristina (validat Playwright, scrollH 900, tsc + validate:core + bookingRouteService 21/21 verds). NO he tocat `Booking.pack`→`BookingServiceLine` (respecto la regla). OBSERVACIÓ pendent (decisió propietari, no abast): header Alejandro «Marge 98% · Net 342€» (economia compta revenue de la base 350€ sense cost) i «Total bolo 350€» ≠ total reserva 445€; la veritat econòmica viu a la reserva. SENSE commit.
+
+[claude] 2026-06-13 [ESTAT: tancat — fitxa lead compactada en una pantalla (#936)]
+Últim canvi: #936 (comptador 935→936; tu havies tancat #933/#934/#935).
+Proper pas previst: repassada visual del propietari de la fitxa compactada. PENDENT obert: alinear reserves (`useBookingPricing`) amb el "sense doble compte" i decidir si el CAC es mostra separat del net.
+Avís per l'altre agent: #936 toca `LeadDetailClient.tsx` (el teu `<CommercialDocumentsHistory>` mogut de dalt del bolo a SOTA de `.fxd__zenith`; `.fxd__profitmanage` mogut de `.fxd__profitbar` a un nou `.fxd__phaseright` dins `.fxd__phasebar`) i `leads-design.css` (regles SCOPED `.fxd__document-history` per aprimar-lo NOMÉS al lead — NO toco el component compartit `.cdh` d'admin-shell.css, així la teva fitxa de reserva queda igual; nou `.fxd__phaseright`). Objectiu del propietari: pantalla única (scrollH 900). tsc + validate:core verds. SENSE commit.
+
+[claude] 2026-06-13 [ESTAT: tancat — fitxa lead: claredat cost + desplaçament (#932)]
+Últim canvi: #932 (comptador el gestiona codex a #933; va saltar el #932 per a mi — gràcies per respectar la col·lisió).
+Proper pas previst: repassada visual del propietari. PENDENT obert encara: alinear reserves (`useBookingPricing`) amb el "sense doble compte" i decidir si el CAC es mostra separat del net (criteri del propietari).
+Avís per l'altre agent: #932 toca `BookingServiceLinesSection.tsx` (línies d'equip propi → etiqueta «a operatiu» en comptes d'input Cost), `nb-design.css` (spinners number amagats + `.nb__sl-owncost`), `LeadDetailClient.tsx` (pill «Desplaçament» = política de trams, abans «Km assumibles»), `LeadBoloSection.tsx` (`supportableKm` retirat de la cadena). `computeSupportableTravelKm` a `costEngine.ts` queda com a helper testat sense consumidor UI. Convivim bé amb el teu #933 (CommercialDocumentsHistory + documentContext); tsc verd amb tots dos talls apilats. SENSE commit.
+
+[claude] 2026-06-12 [ESTAT: tancat — model de cost del bolo complet: #928→#931]
+Últim canvi: #931.
+Proper pas previst: esperant el propietari. PENDENT possible: alinear també les reserves (`useBookingPricing`) amb el "sense doble compte" (#931 només l'aplica al bolo del lead; les reserves mantenen `orbitaServiceCostRatio=0.25`) i decidir si el CAC es mostra separat del net. Tot a criteri del propietari.
+Avís per l'altre agent #931: `travelCost.ts` (INCLUDED 50→40, BLOCK 40→20km, EUR 20→10€), `travelCost.test.ts` (35 tests), `documentService.ts`/`quoteTemplateService.ts`/`admin.ts` (textos desplaçament a `/2` = "20 km des de Granollers"), `LeadBoloSection.tsx` (`aggregateServiceLines(lines, 0)` treu el doble compte). NO he tocat `aggregateServiceLines` (default 0.25 intacte) → reserves sense canvi de marge.
+Avís per l'altre agent: #928 = proposals `sentAt` (header "Valor"/"Històric" només enviats). #929 = pill "Cost serveis"→`serviceLinesCost` + pill "Operatiu". #930 = model de cost operatiu del bolo per tipus de línia + "Km assumibles". TOCATS: `costEngine.ts` (NOUS helpers purs `classifyBoloLines`/`computeSupportableTravelKm`, additius — NO he tocat `aggregateServiceLines`/`computeBookingFinancialSummary`), `travelCost.ts` (`EQUIPMENT_RENTAL_TRANSPORT_KM`), `LeadBoloSection.tsx`, `LeadDetailClient.tsx`, `leads/[id]/page.tsx`, `collaboratorProductService.ts` (`listActiveCollaboratorProductsForBooking` exposa `roles`), `BookingServiceLinesSection.tsx` (línia lloguer→`kind EQUIPMENT`). El path de reserves (`useBookingPricing`) NO canvia de marge. Counter 927→930. Tot SENSE commit (apilat sobre el teu #927; el propietari farà els commits).
+
 [claude] 2026-06-12 [ESTAT: tancat — bolo (tècnic per-proveïdor + Tino) + redistribució fitxa]
 Últim canvi: #926
 Proper pas previst: repassada visual del propietari; pendents = tematització del bolo, pèrdua per amortització, CAC real Google Ads (bloquejat Google).
@@ -196,6 +255,66 @@ Avís per codex: #826 (ingesta 🤝 + hora fi). #827 (animació: nova categoria 
 ## Bloc CODEX (Codex CLI)
 
 <!-- codex: actualitza aquest bloc quan comencis/acabis una sessió -->
+[codex] 2026-06-14 [ESTAT: tancat — dossiers zenit text rebut/extracció (#951)]
+Últim canvi: #951 (comptador 950→951).
+Proper pas previst: repassada visual del propietari a `/admin/dossiers`; si es vol més zenit, següent tall natural = detectar serveis del text rebut i preseleccionar productes del bolo, reusant catàleg existent.
+Avís per l'altre agent: `/admin/dossiers` ara té bloc `Text rebut` que reutilitza `/api/admin/leads/extract`, omple client + `Resum del bolo` i no crea res (`leadPostCalled:false` validat). `leadTextExtractionService` ara retorna `eventEndTime` i té test. No he creat parser nou ni endpoint nou.
+
+[codex] 2026-06-14 [ESTAT: tancat — dossiers copy clar i header simplificat (#950)]
+Últim canvi: #950 (comptador 949→950).
+Proper pas previst: repassada visual del propietari a `/admin/dossiers`; si encara grinyola, següent tall només de copy/layout, sense tocar regles CRM.
+Avís per l'altre agent: canvia només copy del generador directe: `Dossier solidari amb lead` → `Lead vinculat`, botons `Canviar lead/client`, header més curt (`Dossier directe`, `Lead o client, serveis i enviament.`). Textos a `ADMIN_DOSSIER_GENERATOR_COPY`.
+
+[codex] 2026-06-14 [ESTAT: tancat — dossiers duplicat client bloquejat (#949)]
+Últim canvi: #949 (comptador 948→949).
+Proper pas previst: repassada visual del propietari a `/admin/dossiers`; si es vol més paritat, el següent tall hauria de reaprofitar directament `BookingServiceLinesSection` en lloc de mantenir el configurador propi del dossier.
+Avís per l'altre agent: toca `DossierGeneratorClient.tsx`, `dossiers.css`, `dossiers/page.tsx` i `lib/constants/admin.ts`. El generador directe ara bloqueja coincidències fortes de client per email/telèfon abans de crear lead/client i centralitza copy principal a `ADMIN_DOSSIER_GENERATOR_COPY`. Validat amb tsc i Playwright mockejat (`leadPostCalled:false`).
+
+[codex] 2026-06-14 [ESTAT: tancat — dossiers header generador directe (#948)]
+Últim canvi: #948.
+Proper pas previst: revisió humana del propietari sobre header + layout; si cal, poliment visual fi sobre la mateixa pantalla.
+Avís per l'altre agent: #948 només millora el header de `/admin/dossiers`: `Generador directe`, `Nou dossier solidari`, cadena client→lead→configuració→dossier→email i indicadors. Sense canvi de negoci. Validat amb `tsc`, `qa:protocol` i captura `dossier-direct-header-solidari.png`.
+
+[codex] 2026-06-14 [ESTAT: tancat — dossiers layout client top + compra/possibilitats (#947)]
+Últim canvi: #947.
+Proper pas previst: revisió humana del propietari sobre la nova disposició; si cal, poliment visual fi sobre la mateixa pàgina, no crear rutes noves.
+Avís per l'altre agent: #947 només reorganitza UX de `/admin/dossiers`: dades client full-width a dalt; sota, llista de compra/accions a l'esquerra i possibilitats a la dreta. No canvia regles CRM del #946. Validat amb `tsc`, `qa:protocol` i captures `dossier-direct-layout-top-client.png` / `dossier-cristina-layout-top-client.png`.
+
+[codex] 2026-06-14 [ESTAT: tancat — dossiers directes solidaris client/lead (#946)]
+Últim canvi: #946.
+Proper pas previst: revisió humana del propietari del flux directe; següent front natural si ho demana = producte final/PDF compost i email final, no una pàgina nova.
+Avís per l'altre agent: #946 toca `/admin/dossiers`, `POST /api/admin/leads`, `collaboratorProductService`, `AnimacioProduct` i docs/counter. El generador directe ara permet triar client existent, crear lead vinculat o crear lead/client nou via flux existent, sincronitza línies al lead nou i pot enviar en desar. Validat amb `tsc`, 19 tests focalitzats i captures `.codex-captures/dossier-direct-solidari.png`, `dossier-direct-customer-search.png`, `dossier-direct-customer-selected.png`.
+
+[codex] 2026-06-14 [ESTAT: tancat — generador dossiers catàleg real (#945)]
+Últim canvi: #945.
+Proper pas previst: revisió humana del propietari sobre el generador; següent front natural = producte final/PDF compost si el propietari ho demana.
+Avís per l'altre agent: #945 toca `app/admin/dossiers/page.tsx`, `DossierGeneratorClient.tsx`, `dossiers.css`, `lib/constants/orbita-services.ts`, `lib/constants/animacio-products.ts`, `lib/services/collaboratorProductService.ts` i documentació/counter. Catàleg visible: Òrbita = `Primera hora DJ`, `1h extra DJ`, `Bombolles`, `Pont de llums + caps mòbils`, `Operari extra`; Masquerade = Bingo, Batalla, Pirates, 1 presentador/personatge, presentador/personatge + segon personatge no presentador; Tino separat. `animacioProducts` públics només queden com lookup per dossiers antics. Validat amb `npx tsc --noEmit --pretty false`, captures `.codex-captures/dossier-cristina-generator.png` i `.codex-captures/dossier-direct-generator.png`. No he entrat al PDF compost.
+
+[codex] 2026-06-13 [ESTAT: esperant relleu Claude — bolo canònic dins configurador]
+Últim canvi: #935 tancat per codex; #936 tancat per Claude després. Tall nou NO tancat formalment.
+Proper pas previst: Claude ha de continuar el full de ruta `docs/lead-booking-canonical-bolo-roadmap.md` i tancar el següent canvi formal (probablement #937) quan estigui validat.
+Avís per l'altre agent: el propietari vol que Alejandro es presenti com Cristina: el pack/extres/hores de `Booking` s'han d'extreure i mostrar dins l'esquerra del configurador del bolo, amb la dreta de productes disponibles. Ja he començat codi parcial: `BookingServiceLinesSection` prop `baseLines`, `LeadBoloSection` prop `contractedProducts`, `LeadDetailClient` passa `lead.booking?.contractedProducts`. No està validat ni documentat com a canvi formal. Important: NO convertir `Booking.pack` en `BookingServiceLine`; s'ha de mostrar com a base contractada no editable per evitar doble compte. Les ampliacions sí van a `BookingServiceLine`.
+
+[codex] 2026-06-13 [ESTAT: tancat — bolo canònic post-reserva (#935)]
+Últim canvi: #935.
+Proper pas previst: validació visual del propietari editant/ampliant el bolo des del lead d'una reserva vinculada i comprovant que la reserva reflecteix les mateixes línies.
+Avís per l'altre agent: `LeadServiceLine` només és estat viu pre-reserva. Quan un lead ja té `Booking`, `/api/admin/leads/:id/service-lines` llegeix/escriu `BookingServiceLine` de la reserva vinculada, i `bookingRouteService` recalcula totals quan es reemplacen línies. No tornar a crear miralls post-reserva.
+
+[codex] 2026-06-13 [ESTAT: tancat — productes contractats de reserva visibles al lead (#934)]
+Últim canvi: #934.
+Proper pas previst: validació visual del propietari obrint el lead vinculat a la reserva d'Alejandro (`cmpyhlaox0001puw1jpc8cvad`) i comprovant "Productes contractats".
+Avís per l'altre agent: `LeadDetailClient` mostra ara un panell "Productes contractats" quan `lead.booking` existeix. `page.tsx` carrega `Booking.pack` amb traduccions, `extras`, `serviceLines` i `extraHours`; la font de veritat és `Booking`, no una còpia del bolo. Cas Alejandro 2026-06-23 validat: `OE-2026-004` -> `Party Starter`.
+
+[codex] 2026-06-13 [ESTAT: tancat — històric comercial solidari + configuradors normals (#933)]
+Últim canvi: #933.
+Proper pas previst: validació visual humana del propietari a `/admin/leads/cmpwudznj00g3vigky4altclu` i una reserva vinculada; Claude continua tenint #932 obert sobre claredat de cost/desplaçament.
+Avís per l'altre agent: no he reactivat el generador ràpid. `LeadBoloSection` ara enllaça a `/admin/presupuestos?leadId=...` i `/admin/dossiers?...` amb context del lead; `/admin/presupuestos` preomple lead/client i ignora l'esborrany local quan ve amb `leadId`/`proposalId`. Nou shared `CommercialDocumentsHistory` consumit per fitxa lead i reserva. El document que el propietari havia creat per Cristina continua sent `Dossier` `cmqc3p6520005o161j8slv45d` amb `mode='quote'`.
+
+[codex] 2026-06-12 [ESTAT: tancat — fitxa lead zenith scroll/proveïdors]
+Últim canvi: #927.
+Proper pas previst: propietari pot revisar `/admin/leads/cmpwudznj00g3vigky4altclu` al navegador local; si valida visualment, el tall està llest per commit.
+Avís per l'altre agent: #927 tanca el residual del #926. Proveïdors externs ara són desplegables tancats per defecte (nom un sol cop), el cas base no fa scroll a 1080p/1440x900/1366x768/1536x864 i obrir `Masquerade Events` empeny avall i torna en tancar. Validat amb Playwright, `npx tsc --noEmit --pretty false`, `git diff --check`, `pnpm run qa:protocol` i `pnpm run validate:core`.
+
 [codex] 2026-06-11 [ESTAT: esperant relleu Claude]
 Últim canvi: #925.
 Proper pas previst: Claude ha d'acabar la passada #925 a `/admin/leads/cmpwudznj00g3vigky4altclu` seguint el handoff del protocol: footer llarg de marge fora d'`El bolo`, sense economia/tarifa duplicada al rail dret, configurador amb serveis propis/extres i proveïdors externs activables per dades.

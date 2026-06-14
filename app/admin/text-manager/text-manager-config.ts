@@ -47,9 +47,9 @@ export const SECTIONS: Section[] = [
     id: 'dossiers',
     name: 'Dossiers / Animació',
     icon: '🎤',
-    description: 'Bingo, Batalla, DJ, Cerimònia, Boda — textos dels productes',
+    description: 'Textos del dossier (portada, intro, capítols, resum) + productes Bingo, Batalla, DJ, Cerimònia, Boda',
     color: 'from-orange-500 to-red-500',
-    paths: ['animacioProducts.'],
+    paths: ['dossier.', 'animacioProducts.'],
   },
   {
     id: 'hero',

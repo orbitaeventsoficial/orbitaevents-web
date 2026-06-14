@@ -6,10 +6,13 @@ vi.mock('@/app/config/site-config', () => ({
       phoneDisplay: '654 46 70 87',
       email: 'info@orbitaevents.com',
     },
+    web: {
+      url: 'https://www.orbitaevents.com',
+    },
   },
 }));
 
-import { buildDossierHtml, type DossierClientInfo } from '@/lib/utils/dossier-html-builder';
+import { buildDossierHtml, type DossierClientInfo, type DossierCopy } from '@/lib/utils/dossier-html-builder';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 
 const client: DossierClientInfo = {
@@ -17,6 +20,48 @@ const client: DossierClientInfo = {
   email: 'joan@example.com',
   telefon: '600123456',
 };
+
+// Còpia canònica de prova (mirall de messages.dossier.* en català).
+const copy: DossierCopy = {
+  portada: { eyebrow: 'Esdeveniments a mida', clientLabel: 'Dossier preparat per a', bottom: 'Dossier de propostes · Òrbita Events' },
+  intro: {
+    kicker: "Una mirada a l'experiència",
+    title: "Un dossier per imaginar l'esdeveniment abans de parlar de números.",
+    greetingDefault: 'Gràcies per contactar amb nosaltres.',
+    offerCountOne: '1 proposta activada',
+    offerCountMany: '{count} propostes activades',
+    summaryOfferLabel: 'Oferta',
+    summaryFormatLabel: 'Format',
+    summaryFormatValue: 'Dossier narratiu + resum econòmic',
+    summaryGoalLabel: 'Objectiu',
+    summaryGoalValue: 'Sentir el valor abans de comparar preus',
+  },
+  chapter: {
+    eyebrow: 'Capítol',
+    priceLabel: 'Inversió',
+    priceFromPrefix: 'des de',
+    priceCustom: 'a mida',
+    durationLabel: 'Durada orientativa',
+    includesTitle: "Què aporta a l'experiència",
+    noteLabel: 'Bo de saber',
+  },
+  resum: {
+    kicker: 'El conjunt',
+    title: 'Resum de la proposta',
+    lead: 'Una mirada de conjunt.',
+    totalLabel: 'Inversió orientativa de la proposta',
+    customSuffix: '+ propostes a mida',
+  },
+  cta: { label: 'Per confirmar disponibilitat o per a qualsevol dubte' },
+};
+
+function build(
+  c: DossierClientInfo,
+  products: AnimacioProduct[],
+  options?: { autoPrint?: boolean; logoDataUri?: string; locale?: string },
+): string {
+  return buildDossierHtml(c, products, copy, { locale: 'ca-ES', ...options });
+}
 
 const productWithTrams: AnimacioProduct = {
   id: 'bingo-musical',
@@ -44,23 +89,23 @@ const productWithDjOptions: AnimacioProduct = {
 
 describe('buildDossierHtml', () => {
   it('genera HTML vàlid amb DOCTYPE', () => {
-    const html = buildDossierHtml(client, [productWithTrams]);
+    const html = build(client, [productWithTrams]);
     expect(html).toContain('<!DOCTYPE html>');
     expect(html).toContain('<html lang="ca">');
   });
 
   it('inclou el nom del client', () => {
-    const html = buildDossierHtml(client, [productWithTrams]);
+    const html = build(client, [productWithTrams]);
     expect(html).toContain('Joan Pla');
   });
 
   it('inclou el nom del producte', () => {
-    const html = buildDossierHtml(client, [productWithTrams]);
+    const html = build(client, [productWithTrams]);
     expect(html).toContain('Bingo Musical');
   });
 
   it('no duplica taules de preus dins el dossier editorial', () => {
-    const html = buildDossierHtml(client, [productWithTrams]);
+    const html = build(client, [productWithTrams]);
     expect(html).toContain('Bingo Musical');
     expect(html).not.toContain('900€');
     expect(html).not.toContain('50-100');
@@ -68,28 +113,28 @@ describe('buildDossierHtml', () => {
   });
 
   it('no duplica opcions DJ de preu dins el dossier editorial', () => {
-    const html = buildDossierHtml(client, [productWithDjOptions]);
+    const html = build(client, [productWithDjOptions]);
     expect(html).not.toContain('dj-grid');
     expect(html).not.toContain('600€');
   });
 
   it('inclou noInclou si existeix', () => {
-    const html = buildDossierHtml(client, [productWithTrams]);
+    const html = build(client, [productWithTrams]);
     expect(html).toContain('No inclou desplaçament');
   });
 
   it('mostra empresa si es proporciona', () => {
-    const html = buildDossierHtml({ ...client, empresa: 'Empresa SA' }, [productWithTrams]);
+    const html = build({ ...client, empresa: 'Empresa SA' }, [productWithTrams]);
     expect(html).toContain('Empresa SA');
   });
 
   it('mostra eventDesc si es proporciona', () => {
-    const html = buildDossierHtml({ ...client, eventDesc: 'Aniversari 50è' }, [productWithTrams]);
+    const html = build({ ...client, eventDesc: 'Aniversari 50è' }, [productWithTrams]);
     expect(html).toContain('Aniversari 50è');
   });
 
   it('usa salutació personalitzada si es proporciona', () => {
-    const html = buildDossierHtml(
+    const html = build(
       { ...client, salutacio: 'Benvingut al dossier exclusiu.' },
       [productWithTrams],
     );
@@ -97,25 +142,25 @@ describe('buildDossierHtml', () => {
   });
 
   it('escapeja caràcters HTML perillosos', () => {
-    const html = buildDossierHtml({ ...client, nom: '<script>alert("xss")</script>' }, [productWithTrams]);
+    const html = build({ ...client, nom: '<script>alert("xss")</script>' }, [productWithTrams]);
     expect(html).not.toContain('<script>');
     expect(html).toContain('&lt;script&gt;');
   });
 
   it('inclou telèfon i email de contacte de SITE_CONFIG', () => {
-    const html = buildDossierHtml(client, [productWithTrams]);
+    const html = build(client, [productWithTrams]);
     expect(html).toContain('654 46 70 87');
     expect(html).toContain('info@orbitaevents.com');
   });
 
   it('numera els capítols des de 01', () => {
-    const html = buildDossierHtml(client, [productWithTrams, productWithDjOptions]);
+    const html = build(client, [productWithTrams, productWithDjOptions]);
     expect(html).toContain('Capítol 01');
     expect(html).toContain('Capítol 02');
   });
 
   it('inclou portada carbon amb logo si es proporciona logoDataUri', () => {
-    const html = buildDossierHtml(client, [productWithTrams], {
+    const html = build(client, [productWithTrams], {
       logoDataUri: 'data:image/png;base64,abc',
     });
     expect(html).toContain('portada');
@@ -124,18 +169,89 @@ describe('buildDossierHtml', () => {
   });
 
   it('inclou portada carbon també sense logoDataUri', () => {
-    const html = buildDossierHtml(client, [productWithTrams]);
+    const html = build(client, [productWithTrams]);
     expect(html).toContain('class="portada"');
     expect(html).toContain('portada-wordmark');
   });
 
   it('afegeix script autoPrint si cal', () => {
-    const html = buildDossierHtml(client, [productWithTrams], { autoPrint: true });
+    const html = build(client, [productWithTrams], { autoPrint: true });
     expect(html).toContain('window.print()');
   });
 
+  it('pinta el preu canònic "des de X €" quan el producte té priceFrom', () => {
+    const djProduct: AnimacioProduct = {
+      id: 'orbita:dj-primera-hora',
+      nom: 'DJ professional',
+      descripcio: ['Servei base de DJ.'],
+      inclou: ['DJ professional'],
+      priceFrom: 150,
+      categoria: 'DJ',
+    };
+    const html = build(client, [djProduct]);
+    expect(html).toContain('class="producte-preu"');
+    expect(html).toContain('des de');
+    expect(html).toContain('150');
+  });
+
+  it('marca el preu del capítol "a mida" quan el producte no té priceFrom', () => {
+    const html = build(client, [productWithTrams]);
+    // Sense priceFrom el capítol mostra la inversió com a "a mida" (no s'amaga el bloc),
+    // i mai pinta el preu cru d'un tram.
+    expect(html).toContain('producte-preu--mida');
+    expect(html).not.toContain('900€');
+  });
+
+  it('inclou el resum econòmic amb total "des de" sumant els priceFrom', () => {
+    const a: AnimacioProduct = {
+      id: 'orbita:dj-base',
+      nom: 'DJ base',
+      descripcio: ['Servei base de DJ.'],
+      inclou: ['DJ professional'],
+      priceFrom: 150,
+    };
+    const b: AnimacioProduct = {
+      id: 'orbita:photocall',
+      nom: 'Photocall',
+      descripcio: ['Racó fotogràfic.'],
+      inclou: ['Atrezzo'],
+      priceFrom: 200,
+    };
+    const html = build(client, [a, b]);
+    expect(html).toContain('Resum de la proposta');
+    expect(html).toContain('class="resum-total"');
+    expect(html).toContain('resum-total-value');
+    // 150 + 200 = 350 → total formatat amb formatCurrency
+    expect(html).toContain('350');
+    // El total és sempre "des de"
+    expect(html).toMatch(/resum-total-value">des de/);
+  });
+
+  it('el total marca "+ propostes a mida" si algun producte no té priceFrom', () => {
+    const amb: AnimacioProduct = {
+      id: 'orbita:dj-base',
+      nom: 'DJ base',
+      descripcio: ['Servei base de DJ.'],
+      inclou: ['DJ professional'],
+      priceFrom: 150,
+    };
+    const html = build(client, [amb, productWithTrams]);
+    // productWithTrams no té priceFrom → contribueix com "a mida"
+    expect(html).toContain('resum-total-mida');
+    expect(html).toContain('propostes a mida');
+    // El total només suma els priceFrom coneguts (150), mai els preus de trams
+    expect(html).toContain('150');
+    expect(html).not.toContain('900€');
+  });
+
+  it('no pinta el resum econòmic amb llista de productes buida', () => {
+    const html = build(client, []);
+    expect(html).not.toContain('class="resum-page"');
+    expect(html).not.toContain('class="resum-total"');
+  });
+
   it('funciona amb llista de productes buida', () => {
-    const html = buildDossierHtml(client, []);
+    const html = build(client, []);
     expect(html).toContain('<!DOCTYPE html>');
     expect(html).toContain('Joan Pla');
   });

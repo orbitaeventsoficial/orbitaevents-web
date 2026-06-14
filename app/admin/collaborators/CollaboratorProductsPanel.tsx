@@ -99,6 +99,7 @@ export default function CollaboratorProductsPanel({ collaboratorId, products, on
   const handleEdit = (p: CollaboratorProduct) => {
     setForm({
       name: p.name,
+      description: p.description || '',
       category: p.category || '',
       crew: p.crew || '',
       durationLabel: p.durationLabel || '',
@@ -183,6 +184,13 @@ export default function CollaboratorProductsPanel({ collaboratorId, products, on
                 Actiu
               </label>
             </div>
+          </div>
+          <div>
+            <label htmlFor="prod-description" className="mb-1 block text-xs admin-tone-text-neutral">
+              Text del dossier
+              <span className="ml-2 text-white/40">Narrativa que es mostra al capítol del dossier comercial</span>
+            </label>
+            <textarea id="prod-description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={4} placeholder="Explica l'experiència en to comercial. La marca del proveïdor es neteja automàticament: tot es presenta com a Òrbita." className="ap-input w-full px-3 py-2" />
           </div>
           <div>
             <label htmlFor="prod-includes" className="mb-1 block text-xs admin-tone-text-neutral">Què inclou</label>

@@ -35,6 +35,21 @@ vi.mock('@/lib/constants/animacio-products-resolver', () => ({
     { id: 'batalla-musical', nom: 'Batalla Musical', descripcio: [], inclou: [] },
   ]),
 }));
+// El resolver de textos del dossier també importa 'server-only' + next-intl/server.
+// El mockem perquè el test sigui determinista (buildDossierHtml ja està mockejat).
+vi.mock('@/lib/constants/dossier-copy', () => ({
+  getDossierCopy: vi.fn(async () => ({
+    portada: { eyebrow: '', clientLabel: '', bottom: '' },
+    intro: {
+      kicker: '', title: '', greetingDefault: '', offerCountOne: '', offerCountMany: '',
+      summaryOfferLabel: '', summaryFormatLabel: '', summaryFormatValue: '', summaryGoalLabel: '', summaryGoalValue: '',
+    },
+    chapter: { eyebrow: '', priceLabel: '', priceFromPrefix: '', priceCustom: '', durationLabel: '', includesTitle: '', noteLabel: '' },
+    resum: { kicker: '', title: '', lead: '', totalLabel: '', customSuffix: '' },
+    cta: { label: '' },
+  })),
+  getOrbitaDossierProducts: vi.fn(async () => []),
+}));
 
 import {
   createDossier,
@@ -237,6 +252,8 @@ describe('sendDossierByEmail', () => {
     expect(mockBuildHtml).toHaveBeenCalledWith(
       expect.objectContaining({ nom: 'Joan Pla' }),
       expect.arrayContaining([expect.objectContaining({ id: 'bingo-musical' })]),
+      expect.anything(),
+      expect.anything(),
     );
   });
 });

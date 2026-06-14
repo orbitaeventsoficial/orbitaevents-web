@@ -1,5 +1,6 @@
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { formatCurrency } from '@/lib/constants';
 
 export type DossierClientInfo = {
   nom: string;
@@ -10,6 +11,38 @@ export type DossierClientInfo = {
   salutacio?: string;
 };
 
+/**
+ * Tots els textos marc del dossier. Font única canònica: `messages.dossier.*`
+ * (editables a /admin/text-manager → secció Dossiers). El builder no porta cap
+ * string hardcoded; sempre rep aquest objecte resolt al servidor.
+ */
+export type DossierCopy = {
+  portada: { eyebrow: string; clientLabel: string; bottom: string };
+  intro: {
+    kicker: string;
+    title: string;
+    greetingDefault: string;
+    offerCountOne: string;
+    offerCountMany: string;
+    summaryOfferLabel: string;
+    summaryFormatLabel: string;
+    summaryFormatValue: string;
+    summaryGoalLabel: string;
+    summaryGoalValue: string;
+  };
+  chapter: {
+    eyebrow: string;
+    priceLabel: string;
+    priceFromPrefix: string;
+    priceCustom: string;
+    durationLabel: string;
+    includesTitle: string;
+    noteLabel: string;
+  };
+  resum: { kicker: string; title: string; lead: string; totalLabel: string; customSuffix: string };
+  cta: { label: string };
+};
+
 function escHtml(s: string): string {
   return s
     .replace(/&/g, '&amp;')
@@ -18,11 +51,17 @@ function escHtml(s: string): string {
     .replace(/"/g, '&quot;');
 }
 
-function formatOfferCount(count: number): string {
-  return count === 1 ? '1 proposta activada' : `${count} propostes activades`;
+function formatOfferCount(copy: DossierCopy, count: number): string {
+  const template = count === 1 ? copy.intro.offerCountOne : copy.intro.offerCountMany;
+  return template.replace('{count}', String(count));
 }
 
-function buildProductBlock(product: AnimacioProduct, num: number, logoDataUri?: string, isLast = false): string {
+/** Numeral editorial gran per a la portada del capítol (01 → I, etc. → fem servir el número amb zero). */
+function chapterLabel(num: number): string {
+  return String(num).padStart(2, '0');
+}
+
+function buildProductBlock(product: AnimacioProduct, num: number, copy: DossierCopy, locale: string, logoDataUri?: string, isLast = false): string {
   const descripcio = product.descripcio
     .map((p) => `<p>${escHtml(p)}</p>`)
     .join('\n      ');
@@ -32,49 +71,135 @@ function buildProductBlock(product: AnimacioProduct, num: number, logoDataUri?: 
     .join('\n      ');
 
   const noInclou = product.noInclou
-    ? `<div class="dossier-note"><span>Nota</span><p>${escHtml(product.noInclou)}</p></div>`
+    ? `<div class="dossier-note"><span>${escHtml(copy.chapter.noteLabel)}</span><p>${escHtml(product.noInclou)}</p></div>`
     : '';
 
-  const duration = product.durada ? `<span>${escHtml(product.durada)}</span>` : '';
+  const duration = product.durada
+    ? `<div class="producte-durada"><span>${escHtml(copy.chapter.durationLabel)}</span><strong>${escHtml(product.durada)}</strong></div>`
+    : '';
+
+  const categoria = product.categoria
+    ? `<span class="producte-categoria">${escHtml(product.categoria)}</span>`
+    : '';
+
+  // Preu canònic "des de X €" (de priceFrom; mai hardcoded). Consistent amb el jsPDF.
+  const priceValue =
+    typeof product.priceFrom === 'number'
+      ? `<p class="producte-preu">${escHtml(copy.chapter.priceFromPrefix)} ${escHtml(formatCurrency(product.priceFrom, locale))}</p>`
+      : `<p class="producte-preu producte-preu--mida">${escHtml(copy.chapter.priceCustom)}</p>`;
+  const priceHtml = `<div class="producte-preu-wrap"><span class="producte-preu-label">${escHtml(copy.chapter.priceLabel)}</span>${priceValue}</div>`;
 
   return `
   <section class="product-page${isLast ? ' product-page--last' : ''}">
-  ${logoDataUri ? `<div class="product-page-header"><img src="${logoDataUri}" alt="Òrbita Events"></div>` : ''}
-  <div class="producte">
-    <div class="producte-header">
-      <div>
-        <span class="producte-num">Capítol ${String(num).padStart(2, '0')}</span>
+  ${logoDataUri ? `<div class="product-page-header"><img src="${logoDataUri}" alt="Òrbita Events"><span class="product-page-header-tag">${escHtml(copy.portada.bottom)}</span></div>` : ''}
+  <article class="producte">
+    <header class="producte-header">
+      <div class="producte-marker">
+        <span class="producte-marker-num">${chapterLabel(num)}</span>
+        <span class="producte-marker-rule"></span>
+      </div>
+      <div class="producte-head-main">
+        <span class="producte-num">${escHtml(copy.chapter.eyebrow)} ${chapterLabel(num)}</span>
+        ${categoria}
         <h2 class="producte-nom">${escHtml(product.nom)}</h2>
       </div>
-      ${duration}
+    </header>
+    <div class="producte-body">
+      <div class="producte-desc">
+        ${descripcio}
+      </div>
+      <aside class="producte-aside">
+        ${priceHtml}
+        ${duration}
+      </aside>
     </div>
-    <div class="producte-desc">
-      ${descripcio}
+    <div class="producte-inclou-block">
+      <h3>${escHtml(copy.chapter.includesTitle)}</h3>
+      <ul class="producte-inclou">
+        ${inclou}
+      </ul>
     </div>
-    <h3>Què aporta a l'experiència</h3>
-    <ul class="producte-inclou">
-      ${inclou}
-    </ul>
     ${noInclou}
-  </div>
+  </article>
+  </section>`;
+}
+
+/**
+ * Resum econòmic de la proposta. Suma els priceFrom no-nuls (mai hardcoded → formatCurrency).
+ * Si algun producte no té priceFrom, el total es marca "des de {suma} + a mida".
+ */
+function buildResumBlock(products: AnimacioProduct[], copy: DossierCopy, locale: string): string {
+  if (products.length === 0) return '';
+
+  let suma = 0;
+  let hasMida = false;
+  const fromPrefix = escHtml(copy.chapter.priceFromPrefix);
+
+  const rows = products
+    .map((p, i) => {
+      const num = chapterLabel(i + 1);
+      const nom = escHtml(p.nom);
+      const cat = p.categoria ? `<span class="resum-row-cat">${escHtml(p.categoria)}</span>` : '';
+      if (typeof p.priceFrom === 'number') {
+        suma += p.priceFrom;
+        return `<li class="resum-row">
+          <span class="resum-row-num">${num}</span>
+          <span class="resum-row-nom">${nom}${cat}</span>
+          <span class="resum-row-dots" aria-hidden="true"></span>
+          <span class="resum-row-preu">${fromPrefix} ${escHtml(formatCurrency(p.priceFrom, locale))}</span>
+        </li>`;
+      }
+      hasMida = true;
+      return `<li class="resum-row">
+        <span class="resum-row-num">${num}</span>
+        <span class="resum-row-nom">${nom}${cat}</span>
+        <span class="resum-row-dots" aria-hidden="true"></span>
+        <span class="resum-row-preu resum-row-preu--mida">${escHtml(copy.chapter.priceCustom)}</span>
+      </li>`;
+    })
+    .join('\n      ');
+
+  const totalValue = `${fromPrefix} ${escHtml(formatCurrency(suma, locale))}`;
+  const totalSuffix = hasMida ? `<span class="resum-total-mida">${escHtml(copy.resum.customSuffix)}</span>` : '';
+
+  return `
+  <section class="resum-page">
+    <div class="resum-kicker">${escHtml(copy.resum.kicker)}</div>
+    <h2 class="resum-title">${escHtml(copy.resum.title)}</h2>
+    <p class="resum-lead">${escHtml(copy.resum.lead)}</p>
+    <ul class="resum-list">
+      ${rows}
+    </ul>
+    <div class="resum-total">
+      <div class="resum-total-left">
+        <span class="resum-total-label">${escHtml(copy.resum.totalLabel)}</span>
+        <span class="resum-total-hint">${formatOfferCount(copy, products.length)}</span>
+      </div>
+      <div class="resum-total-right">
+        <span class="resum-total-value">${totalValue}</span>
+        ${totalSuffix}
+      </div>
+    </div>
   </section>`;
 }
 
 export function buildDossierHtml(
   client: DossierClientInfo,
   products: AnimacioProduct[],
-  options: { autoPrint?: boolean; logoDataUri?: string } = {},
+  copy: DossierCopy,
+  options: { autoPrint?: boolean; logoDataUri?: string; locale?: string } = {},
 ): string {
+  const locale = options.locale || 'ca-ES';
   const nomPrincipal = escHtml(client.nom);
   const empresa = client.empresa ? escHtml(client.empresa) : '';
   const eventDesc = client.eventDesc ? escHtml(client.eventDesc) : '';
-  const salutacio =
-    client.salutacio ||
-    `Gràcies per contactar amb nosaltres. T'enviem aquest dossier com una primera mirada editorial a les experiències que podem activar per al vostre esdeveniment.\n\nEl dossier explica el to, el ritme i el valor de cada proposta. La fitxa comercial amb preus, condicions i extres es pot adjuntar a continuació amb només els serveis seleccionats per a l'oferta real.`;
+  const salutacio = client.salutacio || copy.intro.greetingDefault;
 
   const producteBlocs = products
-    .map((p, i) => buildProductBlock(p, i + 1, options.logoDataUri, i === products.length - 1))
+    .map((p, i) => buildProductBlock(p, i + 1, copy, locale, options.logoDataUri, false))
     .join('\n');
+
+  const resumBloc = buildResumBlock(products, copy, locale);
 
   const salutacioHtml = escHtml(salutacio).replace(/\n\n/g, '<br><br>');
 
@@ -85,60 +210,300 @@ export function buildDossierHtml(
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dossier Òrbita Events — ${nomPrincipal}</title>
   <style>
+    :root {
+      --o-ink: #211d16;
+      --o-ink-soft: #4f493f;
+      --o-ink-mute: #7a7264;
+      --o-gold: #a9863f;
+      --o-gold-bright: #d7b86e;
+      --o-gold-deep: #b8860b;
+      --o-paper: #fbf8f1;
+      --o-paper-card: #f6f1e6;
+      --o-line: #e3dccd;
+      --o-line-soft: #ece5d6;
+      --o-carbon: #0c0b0a;
+      --o-carbon-2: #16140f;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Inter, Arial, sans-serif; background: #fff; color: #2a261e; font-size: 14px; line-height: 1.55; font-variant-numeric: tabular-nums; }
-    .page { max-width: 794px; margin: 0 auto; padding: 54px 60px 64px; }
-    .intro-page { min-height: 100vh; page-break-after: always; break-after: page; }
-    .intro-kicker { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #a9863f; margin-bottom: 22px; }
-    .intro-title { font-size: 38px; line-height: 1.04; font-weight: 700; max-width: 620px; margin-bottom: 28px; color: #191713; }
-    .salutacio { border-top: 2px solid #d7b86e; padding-top: 24px; font-size: 15px; color: #4f493f; line-height: 1.85; max-width: 620px; }
-    .intro-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 42px; }
-    .intro-summary div { border: 1px solid #ded7ca; padding: 16px; min-height: 92px; }
-    .intro-summary span { display: block; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #a9863f; margin-bottom: 8px; font-weight: 700; }
-    .intro-summary strong { display: block; font-size: 15px; line-height: 1.35; color: #2a261e; }
-    .product-page { page-break-after: always; break-after: page; }
-    .product-page--last { page-break-after: auto; break-after: auto; }
-    .product-page-header { background: #1a1a1a; border-bottom: 2px solid #d7b86e; padding: 14px 18px; margin-bottom: 30px; }
-    .product-page-header img { display: block; width: 220px; max-width: 48%; height: auto; }
-    .producte { margin-bottom: 44px; page-break-inside: avoid; }
-    .producte-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 24px; border-bottom: 1px solid #ded7ca; padding-bottom: 18px; }
-    .producte-header > span { color: #a9863f; border: 1px solid #d7b86e; padding: 6px 10px; font-size: 12px; font-weight: 700; white-space: nowrap; }
-    .producte-num { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #a9863f; }
-    .producte-nom { font-size: 34px; line-height: 1.08; font-weight: 700; color: #2a261e; margin-top: 6px; }
-    .producte-desc { font-size: 15px; color: #4f493f; line-height: 1.85; margin-bottom: 30px; max-width: 620px; }
-    .producte-desc p + p { margin-top: 14px; }
-    .producte h3 { font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #a9863f; margin-bottom: 16px; }
-    .producte-inclou { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 28px; font-size: 13.5px; margin-bottom: 24px; list-style: none; }
-    .producte-inclou li { display: flex; align-items: flex-start; gap: 8px; color: #2a261e; }
-    .producte-inclou li::before { content: '•'; color: #d7b86e; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
-    .dossier-note { border-left: 2px solid #d7b86e; padding-left: 14px; margin-top: 22px; color: #6a6256; }
-    .dossier-note span { display: block; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #a9863f; font-weight: 700; margin-bottom: 5px; }
-    .dossier-note p { font-size: 13px; font-style: italic; }
-    .cta { background: #fff; color: #2a261e; border: 1px solid #d7b86e; padding: 18px 24px; border-radius: 5px; margin-top: 36px; text-align: center; }
-    .cta p { font-size: 13px; color: #6a6256; margin-bottom: 6px; }
-    .cta strong { font-size: 15px; color: #2a261e; display: block; }
-    .peu { margin-top: 56px; border-top: 1px solid #e0d8c8; padding-top: 24px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 13px; color: #888; }
-    .peu-marca { font-size: 15px; font-weight: 700; color: #1a1a1a; letter-spacing: 0.04em; }
-    .peu-web { margin-top: 4px; }
-    .peu-contact { text-align: right; line-height: 1.7; }
-    .peu-contact a { color: #b8860b; text-decoration: none; }
-    .portada { background: #050505; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; page-break-after: always; break-after: page; padding: 80px 60px 60px; position: relative; color: #fff; }
-    .portada::before { content: ''; position: absolute; inset: 32px; border: 1px solid rgba(215,184,110,0.28); pointer-events: none; }
-    .portada-logo { width: 300px; max-width: 70vw; display: block; margin: 0 auto 52px; }
-    .portada-wordmark { font-size: 28px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #fff; margin-bottom: 52px; }
-    .portada-divider { width: 56px; height: 2px; background: #b8860b; margin: 0 auto 44px; }
+    body {
+      font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+      background: var(--o-paper);
+      color: var(--o-ink);
+      font-size: 15px;
+      line-height: 1.6;
+      font-variant-numeric: tabular-nums;
+      -webkit-font-smoothing: antialiased;
+    }
+    .sans { font-family: 'Inter', Arial, sans-serif; }
+    .page { max-width: 820px; margin: 0 auto; padding: 0 60px 70px; }
+
+    /* ---------- PORTADA ---------- */
+    .portada {
+      background:
+        radial-gradient(120% 80% at 50% 0%, rgba(215,184,110,0.10), transparent 55%),
+        radial-gradient(90% 60% at 50% 100%, rgba(184,134,11,0.08), transparent 60%),
+        linear-gradient(160deg, var(--o-carbon-2), var(--o-carbon));
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      page-break-after: always;
+      break-after: page;
+      padding: 90px 60px 70px;
+      position: relative;
+      color: #fff;
+      overflow: hidden;
+    }
+    .portada::before {
+      content: '';
+      position: absolute; inset: 30px;
+      border: 1px solid rgba(215,184,110,0.30);
+      pointer-events: none;
+    }
+    .portada::after {
+      content: '';
+      position: absolute; inset: 38px;
+      border: 1px solid rgba(215,184,110,0.12);
+      pointer-events: none;
+    }
+    .portada-corner {
+      position: absolute; width: 26px; height: 26px;
+      border-color: var(--o-gold-bright); border-style: solid; border-width: 0;
+      opacity: 0.85;
+    }
+    .portada-corner--tl { top: 30px; left: 30px; border-top-width: 2px; border-left-width: 2px; }
+    .portada-corner--tr { top: 30px; right: 30px; border-top-width: 2px; border-right-width: 2px; }
+    .portada-corner--bl { bottom: 30px; left: 30px; border-bottom-width: 2px; border-left-width: 2px; }
+    .portada-corner--br { bottom: 30px; right: 30px; border-bottom-width: 2px; border-right-width: 2px; }
+    .portada-eyebrow {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.42em; text-transform: uppercase;
+      color: rgba(215,184,110,0.78); margin-bottom: 46px;
+    }
+    .portada-logo { width: 300px; max-width: 64vw; display: block; margin: 0 auto 46px; }
+    .portada-wordmark {
+      font-size: 46px; font-weight: 600; letter-spacing: 0.04em;
+      color: #fff; margin-bottom: 46px; font-family: 'Cormorant Garamond', Georgia, serif;
+    }
+    .portada-divider {
+      width: 64px; height: 0; border-top: 1px solid var(--o-gold-deep);
+      margin: 0 auto 40px; position: relative;
+    }
+    .portada-divider::before {
+      content: '✦'; position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%); color: var(--o-gold-bright);
+      font-size: 13px; background: var(--o-carbon); padding: 0 10px;
+    }
     .portada-client { text-align: center; }
-    .portada-client-label { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.42); margin-bottom: 18px; }
-    .portada-client-nom { font-size: 42px; line-height: 1.05; font-weight: 700; letter-spacing: 0.02em; color: #fff; margin-bottom: 12px; font-family: Inter, Arial, sans-serif; }
-    .portada-client-empresa { font-size: 16px; color: #b8860b; margin-bottom: 16px; letter-spacing: 0.02em; }
-    .portada-client-event { font-size: 14px; color: rgba(255,255,255,0.55); }
-    .portada-bottom { position: absolute; bottom: 52px; left: 0; right: 0; text-align: center; font-size: 11px; color: rgba(255,255,255,0.25); letter-spacing: 0.18em; text-transform: uppercase; }
+    .portada-client-label {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 10px; letter-spacing: 0.34em; text-transform: uppercase;
+      color: rgba(255,255,255,0.45); margin-bottom: 22px;
+    }
+    .portada-client-nom {
+      font-size: 56px; line-height: 1.02; font-weight: 600; letter-spacing: 0.01em;
+      color: #fff; margin-bottom: 18px;
+    }
+    .portada-client-empresa {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 14px; color: var(--o-gold-bright); margin-bottom: 14px;
+      letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500;
+    }
+    .portada-client-event { font-size: 19px; color: rgba(255,255,255,0.62); font-style: italic; }
+    .portada-bottom {
+      position: absolute; bottom: 50px; left: 0; right: 0; text-align: center;
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 10px; color: rgba(255,255,255,0.30); letter-spacing: 0.30em; text-transform: uppercase;
+    }
+
+    /* ---------- INTRO ---------- */
+    .intro-page { min-height: 100vh; page-break-after: always; break-after: page; padding-top: 64px; }
+    .intro-kicker {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.34em; text-transform: uppercase;
+      color: var(--o-gold); margin-bottom: 26px;
+    }
+    .intro-title {
+      font-size: 50px; line-height: 1.06; font-weight: 600; max-width: 660px;
+      margin-bottom: 36px; color: #16130d; letter-spacing: -0.005em;
+    }
+    .intro-title em { font-style: italic; color: var(--o-gold-deep); }
+    .salutacio {
+      border-top: 1px solid var(--o-gold-bright); padding-top: 28px;
+      font-size: 17px; color: var(--o-ink-soft); line-height: 1.9; max-width: 640px;
+    }
+    .salutacio strong { color: var(--o-ink); font-weight: 600; }
+    .intro-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-top: 52px; border: 1px solid var(--o-line); }
+    .intro-summary div { padding: 22px 20px; border-right: 1px solid var(--o-line); }
+    .intro-summary div:last-child { border-right: 0; }
+    .intro-summary span {
+      display: block; font-family: 'Inter', Arial, sans-serif;
+      font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--o-gold); margin-bottom: 12px; font-weight: 600;
+    }
+    .intro-summary strong { display: block; font-size: 17px; line-height: 1.4; color: var(--o-ink); font-weight: 600; }
+
+    /* ---------- CAPÍTOLS ---------- */
+    .product-page { page-break-after: always; break-after: page; padding-top: 60px; }
+    .product-page--last { page-break-after: auto; break-after: auto; }
+    .product-page-header {
+      background: linear-gradient(120deg, var(--o-carbon-2), var(--o-carbon));
+      border-bottom: 1px solid var(--o-gold-bright);
+      padding: 16px 22px; margin: 0 0 38px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .product-page-header img { display: block; width: 210px; max-width: 46%; height: auto; }
+    .product-page-header-tag {
+      font-family: 'Inter', Arial, sans-serif; font-size: 9px; letter-spacing: 0.26em;
+      text-transform: uppercase; color: rgba(215,184,110,0.7);
+    }
+    .producte { page-break-inside: avoid; }
+    .producte-header { display: flex; align-items: flex-start; gap: 26px; margin-bottom: 30px; }
+    .producte-marker { display: flex; flex-direction: column; align-items: center; padding-top: 6px; }
+    .producte-marker-num {
+      font-size: 58px; font-weight: 600; color: var(--o-gold-bright); line-height: 0.9;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+    }
+    .producte-marker-rule { width: 1px; flex: 1; min-height: 24px; background: var(--o-line); margin-top: 12px; }
+    .producte-head-main { flex: 1; }
+    .producte-num {
+      display: inline-block; font-family: 'Inter', Arial, sans-serif;
+      font-size: 9px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--o-gold); margin-bottom: 4px;
+    }
+    .producte-categoria {
+      display: inline-block; margin-left: 12px; font-family: 'Inter', Arial, sans-serif;
+      font-size: 9px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--o-ink-mute); border: 1px solid var(--o-line); padding: 3px 9px; vertical-align: middle;
+    }
+    .producte-nom { font-size: 42px; line-height: 1.05; font-weight: 600; color: var(--o-ink); margin-top: 8px; letter-spacing: -0.01em; }
+    .producte-body { display: grid; grid-template-columns: 1fr 200px; gap: 34px; margin-bottom: 32px; align-items: start; }
+    .producte-desc { font-size: 17px; color: var(--o-ink-soft); line-height: 1.92; }
+    .producte-desc p + p { margin-top: 16px; }
+    .producte-desc p:first-child::first-letter {
+      font-size: 50px; font-weight: 600; float: left; line-height: 0.82;
+      padding: 6px 12px 0 0; color: var(--o-gold-deep);
+    }
+    .producte-aside { border-left: 1px solid var(--o-gold-bright); padding-left: 20px; }
+    .producte-preu-wrap { margin-bottom: 20px; }
+    .producte-preu-label, .producte-durada span {
+      display: block; font-family: 'Inter', Arial, sans-serif;
+      font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--o-gold);
+      font-weight: 600; margin-bottom: 6px;
+    }
+    .producte-preu { font-size: 24px; font-weight: 600; color: var(--o-ink); letter-spacing: 0.005em; }
+    .producte-preu--mida { color: var(--o-ink-mute); font-style: italic; }
+    .producte-durada strong { font-size: 17px; font-weight: 600; color: var(--o-ink); }
+    .producte-inclou-block { border-top: 1px solid var(--o-line); padding-top: 26px; }
+    .producte h3 {
+      font-family: 'Inter', Arial, sans-serif; font-size: 10px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--o-gold); margin-bottom: 18px; font-weight: 600;
+    }
+    .producte-inclou { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 30px; font-size: 15px; list-style: none; }
+    .producte-inclou li { display: flex; align-items: flex-start; gap: 10px; color: var(--o-ink); line-height: 1.5; }
+    .producte-inclou li::before { content: '✦'; color: var(--o-gold-bright); font-size: 10px; flex-shrink: 0; margin-top: 4px; }
+    .dossier-note { border-left: 2px solid var(--o-gold-bright); background: var(--o-paper-card); padding: 16px 18px; margin-top: 28px; color: var(--o-ink-soft); }
+    .dossier-note span {
+      display: block; font-family: 'Inter', Arial, sans-serif; font-size: 9px; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--o-gold); font-weight: 600; margin-bottom: 6px;
+    }
+    .dossier-note p { font-size: 15px; font-style: italic; }
+
+    /* ---------- RESUM ECONÒMIC ---------- */
+    .resum-page { page-break-inside: avoid; page-break-before: always; break-before: page; padding-top: 60px; margin-bottom: 56px; }
+    .resum-kicker {
+      font-family: 'Inter', Arial, sans-serif; font-size: 10px; font-weight: 600;
+      letter-spacing: 0.34em; text-transform: uppercase; color: var(--o-gold); margin-bottom: 22px;
+    }
+    .resum-title { font-size: 46px; font-weight: 600; color: var(--o-ink); letter-spacing: -0.01em; margin-bottom: 18px; }
+    .resum-lead { font-size: 16px; color: var(--o-ink-soft); line-height: 1.85; max-width: 640px; margin-bottom: 38px; }
+    .resum-list { list-style: none; margin-bottom: 34px; }
+    .resum-row { display: flex; align-items: baseline; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--o-line-soft); }
+    .resum-row-num {
+      font-family: 'Inter', Arial, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+      color: var(--o-gold); min-width: 24px;
+    }
+    .resum-row-nom { font-size: 19px; font-weight: 600; color: var(--o-ink); flex-shrink: 0; }
+    .resum-row-cat {
+      display: inline-block; margin-left: 12px; font-family: 'Inter', Arial, sans-serif;
+      font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--o-ink-mute); font-weight: 600;
+    }
+    .resum-row-dots { flex: 1; border-bottom: 1px dotted var(--o-line); transform: translateY(-4px); min-width: 18px; }
+    .resum-row-preu { font-size: 18px; font-weight: 600; color: var(--o-ink); white-space: nowrap; }
+    .resum-row-preu--mida { color: var(--o-ink-mute); font-style: italic; }
+    .resum-total {
+      display: flex; align-items: center; justify-content: space-between; gap: 24px;
+      background: linear-gradient(120deg, var(--o-carbon-2), var(--o-carbon));
+      color: #fff; padding: 28px 32px; border: 1px solid var(--o-gold-deep); position: relative;
+    }
+    .resum-total::before {
+      content: ''; position: absolute; inset: 5px; border: 1px solid rgba(215,184,110,0.22); pointer-events: none;
+    }
+    .resum-total-label {
+      display: block; font-family: 'Inter', Arial, sans-serif; font-size: 10px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: rgba(215,184,110,0.85); font-weight: 600; margin-bottom: 8px;
+    }
+    .resum-total-hint { display: block; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: rgba(255,255,255,0.55); }
+    .resum-total-right { text-align: right; }
+    .resum-total-value { display: block; font-size: 40px; font-weight: 600; color: var(--o-gold-bright); letter-spacing: 0.005em; }
+    .resum-total-mida { display: block; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: rgba(255,255,255,0.6); font-style: italic; margin-top: 4px; }
+
+    /* ---------- CTA + PEU ---------- */
+    .cta {
+      background: var(--o-paper-card); color: var(--o-ink); border: 1px solid var(--o-gold-bright);
+      padding: 26px 28px; margin-top: 44px; text-align: center; position: relative;
+    }
+    .cta-icon { color: var(--o-gold-bright); font-size: 16px; margin-bottom: 12px; }
+    .cta p { font-family: 'Inter', Arial, sans-serif; font-size: 11px; letter-spacing: 0.06em; color: var(--o-ink-mute); margin-bottom: 8px; text-transform: uppercase; }
+    .cta strong { font-size: 22px; color: var(--o-ink); display: block; font-weight: 600; }
+    .peu { margin-top: 56px; border-top: 1px solid var(--o-line); padding-top: 26px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .peu-marca { font-size: 19px; font-weight: 600; color: var(--o-ink); letter-spacing: 0.02em; }
+    .peu-web { margin-top: 4px; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: var(--o-gold-deep); letter-spacing: 0.04em; }
+    .peu-contact { text-align: right; line-height: 1.8; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: var(--o-ink-mute); }
+    .peu-contact a { color: var(--o-gold-deep); text-decoration: none; }
+
+    @media (max-width: 640px) {
+      .page { padding: 0 22px 48px; }
+      .intro-title { font-size: 34px; }
+      .intro-summary { grid-template-columns: 1fr; }
+      .intro-summary div { border-right: 0; border-bottom: 1px solid var(--o-line); }
+      .intro-summary div:last-child { border-bottom: 0; }
+      .producte-nom { font-size: 30px; }
+      .producte-body { grid-template-columns: 1fr; gap: 22px; }
+      .producte-aside { border-left: 0; border-top: 1px solid var(--o-gold-bright); padding-left: 0; padding-top: 18px; }
+      .producte-inclou { grid-template-columns: 1fr; }
+      .producte-marker-num { font-size: 44px; }
+      .portada-client-nom { font-size: 38px; }
+      .portada-wordmark { font-size: 34px; }
+      .resum-title { font-size: 32px; }
+      .resum-row { flex-wrap: wrap; }
+      .resum-row-dots { display: none; }
+      .resum-row-preu { margin-left: auto; }
+      .resum-total { flex-direction: column; align-items: flex-start; gap: 14px; }
+      .resum-total-right { text-align: left; }
+      .resum-total-value { font-size: 32px; }
+    }
+
     @media print {
-      body { font-size: 13px; }
-      .portada { background: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .product-page-header { background: #1a1a1a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .page { padding: 24px 32px; }
-      .cta { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      body { font-size: 13px; background: #fff; }
+      .page { padding: 0 32px 30px; }
+      .portada {
+        background: linear-gradient(160deg, #16140f, #0c0b0a) !important;
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+      .product-page-header {
+        background: #16140f !important;
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+      .resum-total {
+        background: #16140f !important;
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+      .cta, .dossier-note, .intro-summary {
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+      .product-page, .resum-page { padding-top: 0; }
+      .producte, .resum-total, .resum-row, .cta, .peu { page-break-inside: avoid; }
     }
   </style>
   ${options.autoPrint ? '<script>window.addEventListener("load", function(){ window.print(); });</script>' : ''}
@@ -146,21 +511,26 @@ export function buildDossierHtml(
 <body>
 
 <div class="portada">
+  <span class="portada-corner portada-corner--tl"></span>
+  <span class="portada-corner portada-corner--tr"></span>
+  <span class="portada-corner portada-corner--bl"></span>
+  <span class="portada-corner portada-corner--br"></span>
+  <div class="portada-eyebrow">${escHtml(copy.portada.eyebrow)}</div>
   ${options.logoDataUri ? `<img class="portada-logo" src="${options.logoDataUri}" alt="Òrbita Events" />` : '<div class="portada-wordmark">Òrbita Events</div>'}
   <div class="portada-divider"></div>
   <div class="portada-client">
-    <div class="portada-client-label">Dossier preparat per a</div>
+    <div class="portada-client-label">${escHtml(copy.portada.clientLabel)}</div>
     <div class="portada-client-nom">${nomPrincipal}</div>
     ${empresa ? `<div class="portada-client-empresa">${empresa}</div>` : ''}
     ${eventDesc ? `<div class="portada-client-event">${eventDesc}</div>` : ''}
   </div>
-  <div class="portada-bottom">Dossier de propostes · Òrbita Events</div>
+  <div class="portada-bottom">${escHtml(copy.portada.bottom)}</div>
 </div>
 
 <div class="page">
   <section class="intro-page">
-    <div class="intro-kicker">Una mirada a l'experiència</div>
-    <h1 class="intro-title">Un dossier per imaginar l'esdeveniment abans de parlar de números.</h1>
+    <div class="intro-kicker">${escHtml(copy.intro.kicker)}</div>
+    <h1 class="intro-title">${escHtml(copy.intro.title)}</h1>
 
   <div class="salutacio">
     Hola ${nomPrincipal},<br><br>
@@ -168,16 +538,19 @@ export function buildDossierHtml(
   </div>
 
     <div class="intro-summary">
-      <div><span>Oferta</span><strong>${formatOfferCount(products.length)}</strong></div>
-      <div><span>Format</span><strong>Dossier narratiu + catàleg comercial seleccionat</strong></div>
-      <div><span>Objectiu</span><strong>Fer que el client entengui valor abans de comparar preus</strong></div>
+      <div><span>${escHtml(copy.intro.summaryOfferLabel)}</span><strong>${formatOfferCount(copy, products.length)}</strong></div>
+      <div><span>${escHtml(copy.intro.summaryFormatLabel)}</span><strong>${escHtml(copy.intro.summaryFormatValue)}</strong></div>
+      <div><span>${escHtml(copy.intro.summaryGoalLabel)}</span><strong>${escHtml(copy.intro.summaryGoalValue)}</strong></div>
     </div>
   </section>
 
   ${producteBlocs}
 
+  ${resumBloc}
+
   <div class="cta">
-    <p>Per confirmar disponibilitat o per a qualsevol dubte</p>
+    <div class="cta-icon">✦</div>
+    <p>${escHtml(copy.cta.label)}</p>
     <strong>${SITE_CONFIG.business.phoneDisplay} · ${SITE_CONFIG.business.email}</strong>
   </div>
 
@@ -187,7 +560,7 @@ export function buildDossierHtml(
       <div class="peu-web">www.orbitaevents.com</div>
     </div>
     <div class="peu-contact">
-      Dossier preparat per a ${nomPrincipal}${empresa ? `<br>${empresa}` : ''}${eventDesc ? `<br>${eventDesc}` : ''}
+      ${escHtml(copy.portada.clientLabel)} ${nomPrincipal}${empresa ? `<br>${empresa}` : ''}${eventDesc ? `<br>${eventDesc}` : ''}
     </div>
   </div>
 

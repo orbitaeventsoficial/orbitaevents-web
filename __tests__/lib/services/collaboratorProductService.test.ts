@@ -25,10 +25,23 @@ import {
   createCollaboratorProduct,
   updateCollaboratorProduct,
   deleteCollaboratorProduct,
+  stripProviderBrand,
 } from '@/lib/services/collaboratorProductService';
 
 beforeEach(() => {
   vi.clearAllMocks();
+});
+
+describe('stripProviderBrand', () => {
+  it('elimina la marca i el nom del proveïdor i neteja residus', () => {
+    expect(stripProviderBrand('Espectacle de Masquerade Events per a tothom')).toBe('Espectacle de per a tothom');
+    expect(stripProviderBrand('Gestionat per Carlos Lucas Fernández')).toBe('Gestionat per');
+    expect(stripProviderBrand('Vestuari Masquerade · Desplaçament')).toBe('Vestuari · Desplaçament');
+  });
+
+  it('deixa intacte el text sense marca', () => {
+    expect(stripProviderBrand('Animació en directe per a adults')).toBe('Animació en directe per a adults');
+  });
 });
 
 describe('computeProductMargin', () => {
@@ -86,6 +99,19 @@ describe('dossier collaborator product mapping', () => {
     expect(product.inclou).toContain('2 actors + tècnic de so');
     expect(product.inclou).toContain('Disponible en català');
     expect(product.sellPrice).toBe(385);
+  });
+
+  it('sanititza qualsevol menció de marca de proveïdor del text client-facing', () => {
+    const branded = {
+      ...rawProduct,
+      description: 'Els personatges més entranyables de Masquerade obren un món de màgia. Gestionat per Carlos Lucas Fernández.',
+      includes: 'Vestuari Masquerade · Desplaçament inclòs',
+    };
+    const product = collaboratorProductToDossierProduct(branded);
+    const allText = [...product.descripcio, ...product.inclou, product.nom].join(' ');
+    expect(allText).not.toMatch(/masquerade/i);
+    expect(allText).not.toMatch(/carlos/i);
+    expect(allText).toContain('Desplaçament inclòs');
   });
 
   it('converteix el pack a format narratiu compatible amb el dossier', () => {

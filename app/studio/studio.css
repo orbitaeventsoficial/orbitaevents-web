@@ -4810,3 +4810,59 @@ html.admin-mode .o-pdfdoc__donut-item span { width: 8px; height: 8px; border-rad
   width: 3px; border-radius: 0 3px 3px 0;
   background: var(--lab-gold);
 }
+
+/* ── #20 Fitxes tipus (patrons de pàgina canònics i comparables) ── */
+.o-typepages { display: flex; flex-direction: column; gap: 1rem; }
+.o-typepages__domainname {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--o-accent);
+}
+.o-typepages__views {
+  margin-top: 0.6rem;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 0.75rem;
+}
+.o-typepages__view {
+  display: flex; flex-direction: column; gap: 0.4rem;
+  padding: 0.85rem; border-radius: 12px;
+  border: 1px solid var(--o-text-4); background: var(--o-elev-1);
+}
+.o-typepages__view[data-state="canonica"] {
+  border-color: var(--o-accent-line); background: color-mix(in oklab, var(--o-accent) 6%, var(--o-elev-1));
+}
+.o-typepages__viewhead { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.o-typepages__viewhead strong { font-size: 14px; color: var(--o-text); }
+.o-typepages__badge { font-size: 10px; font-weight: 600; color: var(--o-text-3); white-space: nowrap; }
+.o-typepages__badge[data-state="canonica"] { color: var(--o-success); }
+.o-typepages__file {
+  font-family: var(--o-mono, monospace); font-size: 11px; color: var(--o-text-3);
+  word-break: break-all;
+}
+.o-typepages__view p { font-size: 12px; color: var(--o-text-2); margin: 0; }
+
+.o-typeanatomy { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.o-typeanatomy__row {
+  display: grid; grid-template-columns: auto minmax(9rem, 0.4fr) 1fr; gap: 0.7rem; align-items: center;
+  padding: 0.6rem 0.75rem; border-radius: 10px;
+  border: 1px solid var(--o-text-4); background: var(--o-elev-1);
+}
+.o-typeanatomy__step {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.5rem; height: 1.5rem; border-radius: 50%;
+  background: var(--o-accent-soft); color: var(--o-accent);
+  font-size: 12px; font-weight: 700;
+}
+.o-typeanatomy__row strong { font-size: 13px; color: var(--o-text); }
+.o-typeanatomy__row > span:last-child { font-size: 12px; color: var(--o-text-2); }
+
+.o-typecriteria { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0.6rem; }
+.o-typecriteria__row {
+  display: flex; flex-direction: column; gap: 0.25rem;
+  padding: 0.7rem 0.8rem; border-radius: 10px;
+  border: 1px solid var(--o-text-4); background: var(--o-elev-1);
+}
+.o-typecriteria__row strong { font-size: 13px; color: var(--o-text); }
+.o-typecriteria__row span { font-size: 12px; color: var(--o-text-3); }
+@media (max-width: 48rem) {
+  .o-typeanatomy__row { grid-template-columns: auto 1fr; }
+  .o-typeanatomy__row > span:last-child { grid-column: 2; }
+}

@@ -1,3 +1,5 @@
+import { DJ_EXTRA_HOUR_PRICE, DJ_FIRST_HOUR_PRICE, djPriceForHours } from './orbita-services';
+
 export type ProductPricingTier = {
   participants: string;
   team: string;
@@ -9,6 +11,7 @@ export type DJPricingOption = {
   price: number | null;
   sublabel: string;
   standalonePrice?: number | null;
+  requiresFirstHour?: boolean;
 };
 
 export type AnimacioProduct = {
@@ -25,6 +28,12 @@ export type AnimacioProduct = {
   priceFrom?: number | null;
   /** Categoria per agrupar al dossier (DJ, Animació adulta, Animació infantil...). */
   categoria?: string;
+  /** Origen comercial del producte quan ve d'un proveïdor/col·laborador. */
+  sourceProviderName?: string;
+  /** ID del proveïdor/col·laborador quan el producte ve de catàleg extern. */
+  sourceProviderId?: string;
+  /** ID del producte original quan el producte ve de catàleg extern. */
+  sourceProductId?: string;
 };
 
 export const ANIMACIO_PRODUCT_CATEGORIES: Record<string, string> = {
@@ -35,15 +44,16 @@ export const ANIMACIO_PRODUCT_CATEGORIES: Record<string, string> = {
   'boda-sencera': 'DJ i so per a casaments',
 };
 
-/** Preu "des de" canònic d'un producte: mínim no-nul de trams o djOptions. */
+/** Preu "des de" canònic d'un producte: mínim no-nul de trams o primera opció autònoma de DJ. */
 export function resolveAnimacioPriceFrom(product: { trams?: readonly ProductPricingTier[]; djOptions?: readonly DJPricingOption[] }): number | null {
   const prices: number[] = [];
   for (const tram of product.trams ?? []) {
     if (typeof tram.price === 'number') prices.push(tram.price);
   }
   for (const option of product.djOptions ?? []) {
-    if (typeof option.price === 'number') prices.push(option.price);
+    if (option.requiresFirstHour) continue;
     if (typeof option.standalonePrice === 'number') prices.push(option.standalonePrice);
+    else if (typeof option.price === 'number') prices.push(option.price);
   }
   return prices.length > 0 ? Math.min(...prices) : null;
 }
@@ -73,9 +83,10 @@ export const ANIMACIO_PRODUCTS_STRUCTURE = [
   {
     id: 'dj',
     djOptions: [
-      { label: '1 hora', price: 100, sublabel: 'Com a complement d\'animació', standalonePrice: 150 },
-      { label: '2 hores', price: 200, sublabel: 'Com a complement d\'animació', standalonePrice: 250 },
-      { label: '3 hores', price: null, sublabel: 'Pressupost a mida' },
+      { label: '1a hora', price: DJ_FIRST_HOUR_PRICE, sublabel: 'Preu base obligatori' },
+      { label: 'Hora extra', price: DJ_EXTRA_HOUR_PRICE, sublabel: 'Només després de la primera hora', requiresFirstHour: true },
+      { label: '2 hores', price: djPriceForHours(2), sublabel: '1a hora + 1 hora extra' },
+      { label: '3 hores', price: djPriceForHours(3), sublabel: '1a hora + 2 hores extra' },
     ] as DJPricingOption[],
   },
   {

@@ -15,11 +15,15 @@ interface PartnerProductOption {
   sellPrice: number;
   collaboratorId: string;
   collaboratorName: string;
+  roles: string[];
 }
 
 interface BookingServiceLinesSectionProps {
   lines: BookingServiceLineFormInput[];
   onChange: (lines: BookingServiceLineFormInput[]) => void;
+  /** Productes que ja formen part de la reserva com a base canònica (pack/extres).
+   *  Es mostren dins el bolo però no s'envien com a serviceLines per no duplicar imports. */
+  baseLines?: BookingServiceLineFormInput[];
   /** Packs de catàleg (base excloent del bolo). Opcional: a la fitxa de reserva
    *  ja existents el pack es gestiona a part, així que el grup no es mostra. */
   packs?: BookingPack[];
@@ -40,6 +44,7 @@ function packLabel(pack: BookingPack): string {
 export default function BookingServiceLinesSection({
   lines,
   onChange,
+  baseLines = [],
   packs = [],
   selectedPackId = '',
   onPackSelect,
@@ -50,11 +55,6 @@ export default function BookingServiceLinesSection({
 }: BookingServiceLinesSectionProps) {
   const packsEnabled = !!onPackSelect;
   const [partnerProducts, setPartnerProducts] = useState<PartnerProductOption[]>([]);
-  // Els proveïdors externs NO surten per defecte: l'usuari activa els que entren en
-  // aquest bolo. Cap grup de proveïdor visible fins que se selecciona.
-  const [activeProviders, setActiveProviders] = useState<string[]>([]);
-  const toggleProvider = (name: string) =>
-    setActiveProviders((prev) => (prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]));
 
   useEffect(() => {
     fetch('/api/admin/collaborator-products', { headers: { 'x-admin': '1' } })
@@ -98,9 +98,13 @@ export default function BookingServiceLinesSection({
     // tècnic i la línia de tècnic el recupera.
     const hasTech = productIncludesSoundTech(p.crew);
     const productCost = hasTech ? Math.max(0, p.costPrice - SOUND_TECH_PRICE) : p.costPrice;
+    // Una línia de lloguer de material (col·laborador EQUIPMENT_RENTAL, p.ex. Tino)
+    // és `EQUIPMENT`: això activa el transport d'anar a buscar-lo al càlcul del bolo.
+    // La resta de proveïdors presencials (Masquerade) són `PROVIDER_SERVICE`.
+    const isRental = Array.isArray(p.roles) && p.roles.includes('EQUIPMENT_RENTAL');
     const productLine: BookingServiceLineFormInput = {
       collaboratorId: p.collaboratorId,
-      kind: 'PROVIDER_SERVICE',
+      kind: isRental ? 'EQUIPMENT' : 'PROVIDER_SERVICE',
       label: `${p.name} (${p.collaboratorName})`,
       revenueAmount: p.sellPrice,
       costAmount: productCost,
@@ -140,7 +144,8 @@ export default function BookingServiceLinesSection({
     new Map(partnerProducts.map((p) => [p.collaboratorId, p.collaboratorName])).entries()
   ).map(([id, name]) => ({ id, name }));
   const linesTotal = lines.reduce((s, l) => s + (l.revenueAmount || 0) * (l.quantity || 1), 0);
-  const boloTotal = packPrice + linesTotal;
+  const baseLinesTotal = baseLines.reduce((s, l) => s + (l.revenueAmount || 0) * (l.quantity || 1), 0);
+  const boloTotal = packPrice + baseLinesTotal + linesTotal;
 
   const body = (
     <>
@@ -151,10 +156,12 @@ export default function BookingServiceLinesSection({
       <div className="nb__cfg">
         {/* ESQUERRA — el bolo */}
         <div className="nb__cfg-bolo">
-          <div className="nb__cfg-bolohead">
-            <span className="nb__cfg-bolotitle">El bolo</span>
-            {boloTotal > 0 && <span className="nb__cfg-bolototal">{boloTotal}€</span>}
-          </div>
+          {!embedded && (
+            <div className="nb__cfg-bolohead">
+              <span className="nb__cfg-bolotitle">El bolo</span>
+              {boloTotal > 0 && <span className="nb__cfg-bolototal">{boloTotal}€</span>}
+            </div>
+          )}
 
           {/* Pack base (excloent) — només al flux de nova reserva */}
           {packsEnabled && (selectedPack ? (
@@ -172,6 +179,20 @@ export default function BookingServiceLinesSection({
           ) : (
             <p className="nb__cfg-empty">Sense pack base · muntar-lo personalitzat amb serveis</p>
           ))}
+
+          {baseLines.length > 0 && (
+            <div className="nb__sl-list nb__sl-list--base" aria-label="Base contractada">
+              {baseLines.map((line, idx) => (
+                <div key={`base-${idx}`} className="nb__sl-row nb__sl-row--base">
+                  <span className="nb__sl-label nb__sl-packname">{line.label}</span>
+                  <span className="nb__sl-num nb__sl-readonly">{line.revenueAmount ?? 0}€</span>
+                  <span className="nb__sl-owncost">contractat</span>
+                  <span className="nb__sl-qty">{line.quantity ?? 1}</span>
+                  <span className="nb__sl-del nb__sl-del--ghost" aria-hidden="true">•</span>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Línies de servei (sumables) */}
           {lines.length > 0 && (
@@ -205,6 +226,8 @@ export default function BookingServiceLinesSection({
                   )}
                   {line.collaboratorId ? (
                     <span className="nb__sl-partnercost" title="El cost a pagar al partner es gestiona a la seva fitxa">cost</span>
+                  ) : (line.kind === 'DJ' || line.kind === 'EQUIPMENT') ? (
+                    <span className="nb__sl-owncost" title="Cost d'equip propi (DJ / material): ja inclòs al cost operatiu fix del bolo. No es compta per línia (es duplicaria).">a operatiu</span>
                   ) : (
                     <input
                       className="nb__input nb__sl-num" type="number" min={0} placeholder="Cost"
@@ -257,7 +280,7 @@ export default function BookingServiceLinesSection({
           )}
 
           {/* 2. Productes propis d'Òrbita (sumables) — tot junt */}
-          <details className="nb__cfg-grp" open>
+          <details className="nb__cfg-grp nb__cfg-grp--menu">
             <summary>Productes d&apos;Òrbita</summary>
             <div className="nb__cfg-items">
               {ORBITA_SERVICES.map((s) => (
@@ -269,37 +292,24 @@ export default function BookingServiceLinesSection({
             </div>
           </details>
 
-          {/* 3. Proveïdors externs — NO surten per defecte; l'usuari els activa */}
+          {/* 3. Proveïdors externs — un desplegable per proveïdor, tancat per
+              defecte (no surt fins que el cliques). El nom apareix un sol cop. */}
           {Object.keys(partnersByName).length > 0 && (
-            <div className="nb__cfg-providers">
-              <span className="nb__cfg-providerslbl">Proveïdors</span>
-              {Object.keys(partnersByName).map((name) => (
-                <button
-                  type="button" key={name}
-                  className={`nb__cfg-providerchip${activeProviders.includes(name) ? ' is-on' : ''}`}
-                  onClick={() => toggleProvider(name)}
-                  aria-pressed={activeProviders.includes(name)}
-                >
-                  {name}
-                </button>
-              ))}
-            </div>
+            <span className="nb__cfg-grouplbl">Proveïdors</span>
           )}
-          {Object.entries(partnersByName)
-            .filter(([name]) => activeProviders.includes(name))
-            .map(([name, prods]) => (
-              <details className="nb__cfg-grp" key={name} open>
-                <summary>Serveis de {name}</summary>
-                <div className="nb__cfg-items">
-                  {prods.map((p) => (
-                    <button type="button" key={p.id} className="nb__cfg-item" onClick={() => addPartnerProduct(p.id)}>
-                      <span className="nb__cfg-itemname">{p.name}</span>
-                      <span className="nb__cfg-itemprice">{p.sellPrice}€</span>
-                    </button>
-                  ))}
-                </div>
-              </details>
-            ))}
+          {Object.entries(partnersByName).map(([name, prods]) => (
+            <details className="nb__cfg-grp nb__cfg-grp--menu nb__cfg-grp--provider" key={name}>
+              <summary>{name}</summary>
+              <div className="nb__cfg-items">
+                {prods.map((p) => (
+                  <button type="button" key={p.id} className="nb__cfg-item" onClick={() => addPartnerProduct(p.id)}>
+                    <span className="nb__cfg-itemname">{p.name}</span>
+                    <span className="nb__cfg-itemprice">{p.sellPrice}€</span>
+                  </button>
+                ))}
+              </div>
+            </details>
+          ))}
         </aside>
       </div>
     </>
