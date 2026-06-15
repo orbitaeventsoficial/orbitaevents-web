@@ -23,25 +23,28 @@ html.admin-mode {
   --at-muted: #a8b5c4;
   --at-subtle: #7889a0;
 
-  /* ── Gold (brand accent) ── */
-  --at-gold: #e8b040;
-  --at-gold-glow: rgba(232, 176, 64, 0.32);
-  --at-gold-dim: rgba(232, 176, 64, 0.18);
-  --at-gold-text: #f5c958;
+  /* ── Colors semàntics REAPUNTATS a la sèrie Òrbita (--o-*), font de la fitxa
+     de leads/Cristina. Canonització #980: la capa legacy ja no inventa color,
+     només deriva de la sèrie. Els fons (--at-bg/panel/raised) es deixen intactes
+     (estructura), es canonitzaran pàgina per pàgina. ── */
+  --at-gold: var(--o-admin-gold);
+  --at-gold-glow: color-mix(in oklab, var(--o-admin-gold) 32%, transparent);
+  --at-gold-dim: color-mix(in oklab, var(--o-admin-gold) 18%, transparent);
+  --at-gold-text: var(--o-admin-gold);
 
-  /* ── Functional accents ── */
-  --at-blue: #5a9ee0;
-  --at-blue-dim: rgba(90, 158, 224, 0.16);
-  --at-green: #45b868;
-  --at-green-dim: rgba(69, 184, 104, 0.16);
-  --at-orange: #e09830;
-  --at-orange-dim: rgba(224, 152, 48, 0.16);
-  --at-red: #e05060;
-  --at-red-dim: rgba(224, 80, 96, 0.16);
-  --at-violet: #b080ff;
-  --at-violet-dim: rgba(176, 128, 255, 0.16);
-  --at-cyan: #40d0e0;
-  --at-cyan-dim: rgba(64, 208, 224, 0.16);
+  /* ── Functional accents (deriven de la sèrie) ── */
+  --at-blue: var(--o-info);
+  --at-blue-dim: color-mix(in oklab, var(--o-info) 16%, transparent);
+  --at-green: var(--o-success);
+  --at-green-dim: color-mix(in oklab, var(--o-success) 16%, transparent);
+  --at-orange: var(--o-warning);
+  --at-orange-dim: color-mix(in oklab, var(--o-warning) 16%, transparent);
+  --at-red: var(--o-danger);
+  --at-red-dim: color-mix(in oklab, var(--o-danger) 16%, transparent);
+  --at-violet: var(--o-stage-contacted);
+  --at-violet-dim: color-mix(in oklab, var(--o-stage-contacted) 16%, transparent);
+  --at-cyan: var(--o-info);
+  --at-cyan-dim: color-mix(in oklab, var(--o-info) 16%, transparent);
 
   /* ── Semantic aliases ── */
   --at-info: var(--at-blue);

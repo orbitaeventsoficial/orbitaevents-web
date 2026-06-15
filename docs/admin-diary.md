@@ -1,3 +1,27 @@
+## 2026-06-16 — Color canònic: la capa legacy --at-* deriva de la sèrie Òrbita (Cristina) (Canvi #980, claude)
+
+### Resum
+El propietari recorda que la migració TANCAT CHARLIE havia de crear el CSS nou (sèrie Òrbita `--o-*`, el de la fitxa de leads/Cristina) i eliminar la resta — però `admin-theme.css` (paleta legacy `--at-*`, 90 tokens, 420 línies) seguia VIU i carregat al layout, consumit per 86 fitxers, pintant colors que NO són els de la sèrie (`--at-green` #45b868 ≠ `--o-success` #3ec57b). La migració havia quedat a mitges: nou creat, vell no eliminat.
+
+### Què s'ha fet (canonització d'un sol cop, baix risc)
+- `app/admin/admin-theme.css`: els tokens de COLOR SEMÀNTIC `--at-*` REAPUNTATS a la sèrie `--o-*`: `--at-gold/gold-text`→`--o-admin-gold`, `--at-green`→`--o-success`, `--at-red`→`--o-danger`, `--at-orange`→`--o-warning`, `--at-blue/cyan`→`--o-info`, `--at-violet`→`--o-stage-contacted`. Els `-dim` derivats amb `color-mix` del nou color. Resultat: la capa legacy ja NO inventa color, només deriva de la sèrie → TOT l'admin que usa `admin-tone-*` o `--at-*` (inclòs el que vaig tokenitzar #977–#979) passa al color EXACTE de Cristina sense re-migrar res.
+- **NO tocats els fons** (`--at-bg/panel/raised`): són estructura; es canonitzaran pàgina per pàgina (l'embut) per no canviar contrastos a cegues.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: els estats (èxit/error/avís/daurat/contacte) de tot l'admin ara són els tokens de la sèrie.
+- Validació humana/UX: pendent del propietari (refrescar qualsevol pàgina; els accents han de coincidir amb la fitxa de Cristina). Reversible en 1 commit si cal.
+
+### Pla acordat
+A partir d'aquí, **tancar pàgina per pàgina**: cada pàgina migra els seus colors directes a tokens de sèrie + es valida. Els fons legacy es retiren a mesura que cada pàgina passa l'embut.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 979 → 980. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-15 — Economia tokenitzat (KpiCards + helpers de marge centralitzats) (Canvi #979, claude)
 
 ### Resum

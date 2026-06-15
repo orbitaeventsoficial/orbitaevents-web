@@ -42,13 +42,13 @@ export const CUSTOMER_LIFECYCLE_LABELS: Record<CustomerLifecycleValue, string> =
 };
 
 export const CUSTOMER_LIFECYCLE_COLORS: Record<CustomerLifecycleValue, string> = {
-  NEW: 'border-sky-500/30 bg-sky-500/10 text-sky-200',
-  PROSPECT: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-200',
-  FIRST_TIME: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200',
-  RETURNING: 'border-violet-500/30 bg-violet-500/10 text-violet-200',
-  VIP: 'border-amber-500/30 bg-amber-500/10 text-amber-200',
-  DORMANT: 'border-orange-500/30 bg-orange-500/10 text-orange-200',
-  CHURNED: 'border-rose-500/30 bg-rose-500/10 text-rose-200',
+  NEW: 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan',
+  PROSPECT: 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan',
+  FIRST_TIME: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
+  RETURNING: 'admin-tone-border-violet admin-tone-bg-violet admin-tone-text-violet',
+  VIP: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+  DORMANT: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+  CHURNED: 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger',
 };
 
 export const CUSTOMER_LIFECYCLE_ICONS: Record<CustomerLifecycleValue, string> = {
@@ -75,14 +75,14 @@ export const CUSTOMER_TAG_PRESETS = [
 export const CUSTOMER_TAG_DEFAULT_COLOR = 'border-white/10 bg-white/5 text-white/70';
 
 export const CUSTOMER_TAG_COLORS: Record<string, string> = {
-  VIP: 'border-amber-500/30 bg-amber-500/10 text-amber-200',
-  Corporatiu: 'border-sky-500/30 bg-sky-500/10 text-sky-200',
-  Recurrent: 'border-violet-500/30 bg-violet-500/10 text-violet-200',
-  'Alt valor': 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200',
-  Dormant: 'border-orange-500/30 bg-orange-500/10 text-orange-200',
-  Referit: 'border-fuchsia-500/30 bg-fuchsia-500/10 text-fuchsia-200',
-  'Pagament lent': 'border-rose-500/30 bg-rose-500/10 text-rose-200',
-  'Molt satisfet': 'border-teal-500/30 bg-teal-500/10 text-teal-200',
+  VIP: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+  Corporatiu: 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan',
+  Recurrent: 'admin-tone-border-violet admin-tone-bg-violet admin-tone-text-violet',
+  'Alt valor': 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
+  Dormant: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+  Referit: 'admin-tone-border-violet admin-tone-bg-violet admin-tone-text-violet',
+  'Pagament lent': 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger',
+  'Molt satisfet': 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan',
 };
 
 export function getHealthLabel(score: number | null | undefined): string {
@@ -95,10 +95,10 @@ export function getHealthLabel(score: number | null | undefined): string {
 
 export function getHealthColor(score: number | null | undefined): string {
   if (score == null) return 'text-white/40';
-  if (score >= 80) return 'text-emerald-300';
-  if (score >= 60) return 'text-cyan-300';
-  if (score >= 40) return 'text-amber-300';
-  return 'text-rose-300';
+  if (score >= 80) return 'admin-tone-text-success';
+  if (score >= 60) return 'admin-tone-text-cyan';
+  if (score >= 40) return 'admin-tone-text-warning';
+  return 'admin-tone-text-danger';
 }
 
 export const EXECUTION_PRIORITY_HINTS = {

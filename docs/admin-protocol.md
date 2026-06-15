@@ -1453,6 +1453,24 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #980 — 2026-06-16 — claude (TANCAT)
+
+**Color canònic: la capa legacy `--at-*` deriva de la sèrie Òrbita (`--o-*`, fitxa Cristina).**
+
+- Context: la migració TANCAT CHARLIE havia de deixar només la sèrie `--o-*` i eliminar la resta, però `admin-theme.css` (`--at-*`) seguia viu (86 consumidors) amb colors propis ≠ sèrie.
+- `app/admin/admin-theme.css`: tokens de color semàntic `--at-*` reapuntats a `--o-*` (gold→o-admin-gold, green→o-success, red→o-danger, orange→o-warning, blue/cyan→o-info, violet→o-stage-contacted); `-dim` via `color-mix`. La capa legacy deixa d'inventar color. NO tocats els fons (estructura, es migren per pàgina).
+- Efecte: tot l'admin (`admin-tone-*`/`--at-*`) passa al color de la sèrie d'un cop, sense re-migrar.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 979 -> 980.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: accents = tokens de sèrie.
+- Validació humana/UX: pendent del propietari (reversible en 1 commit).
+- Pla: tancar pàgina per pàgina (fons legacy fora a mesura que passen l'embut).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #979 — 2026-06-15 — claude (TANCAT)
 
 **Economia tokenitzat (helpers de marge centralitzats + KpiCards).**
