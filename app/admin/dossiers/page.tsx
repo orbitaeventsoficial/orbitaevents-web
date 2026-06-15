@@ -90,6 +90,9 @@ export default async function DossiersPage({ searchParams }: PageProps) {
     Awaited<ReturnType<typeof getDossierCopy>>,
     string | undefined,
   ];
+  // Bingo/Batalla Musical són productes de MASQUERADE (col·laborador), no propis:
+  // surten via `collaboratorProducts`. (El #968 els havia afegit com a propis per
+  // error; corregit al #969 — la causa real és que el seed #956 els va desactivar.)
   const generatorProducts = [
     ...orbitaProducts,
     ...collaboratorProducts.map(collaboratorProductToAnimacioProduct),

@@ -10,12 +10,12 @@
  * 2. QUILÒMETRES FACTURABLES: Tot el que superi els 50 km inclosos.
  *    Ex: Si la ruta total és 90 km → 90 - 50 = 40 km facturables.
  *
- * 3. TRAMS: Els km facturables es divideixen en blocs de 40 km.
+ * 3. TRAMS: Els km facturables es divideixen en blocs de 20 km.
  *    Cada tram que comenci es cobra sencer (arrodoniment cap amunt).
- *    Ex: 41 km facturables → 2 trams (un de 40 + un que s'ha iniciat).
+ *    Ex: 21 km facturables → 2 trams (un de 20 + un que s'ha iniciat).
  *
- * 4. PREU CLIENT: Cada tram costa 20 € al client.
- *    Ex: 2 trams × 20 € = 40 € de suplement transport.
+ * 4. PREU CLIENT: Cada tram costa 10 € al client.
+ *    Ex: 2 trams × 10 € = 20 € de suplement transport.
  *
  * 5. COST INTERN VEHICLE: El cost real per km del vehicle (benzina +
  *    manteniment + assegurança + amortització). Per defecte 0.19 €/km.
@@ -92,16 +92,16 @@ describe('travelCost', () => {
       expect(calculateBillableTravelKm(40)).toBe(0);
     });
 
-    it('menys de 40 km → 0 facturables', () => {
+    it('menys de 50 km → 0 facturables', () => {
       expect(calculateBillableTravelKm(30)).toBe(0);
     });
 
-    it('90 km → 50 km facturables (90 - 40 inclosos)', () => {
-      expect(calculateBillableTravelKm(90)).toBe(50);
+    it('90 km → 40 km facturables (90 - 50 inclosos)', () => {
+      expect(calculateBillableTravelKm(90)).toBe(40);
     });
 
-    it('41 km → 1 km facturable', () => {
-      expect(calculateBillableTravelKm(41)).toBe(1);
+    it('51 km → 1 km facturable (just passats els 50 inclosos)', () => {
+      expect(calculateBillableTravelKm(51)).toBe(1);
     });
 
     it('un valor negatiu retorna 0 (impossible fer km negatius)', () => {
@@ -114,24 +114,24 @@ describe('travelCost', () => {
   // Cada tram que comenci es cobra sencer (arrodoniment cap amunt).
 
   describe('calculateTravelBlocks', () => {
-    it('40 km → 0 trams (tot inclòs)', () => {
-      expect(calculateTravelBlocks(40)).toBe(0);
+    it('50 km → 0 trams (tot inclòs)', () => {
+      expect(calculateTravelBlocks(50)).toBe(0);
     });
 
-    it('60 km → 1 tram (20 km facturables = exactament 1 tram)', () => {
-      expect(calculateTravelBlocks(60)).toBe(1);
+    it('70 km → 1 tram (20 km facturables = exactament 1 tram)', () => {
+      expect(calculateTravelBlocks(70)).toBe(1);
     });
 
-    it('61 km → 2 trams (21 km facturables, el segon tram ja ha començat)', () => {
-      expect(calculateTravelBlocks(61)).toBe(2);
+    it('71 km → 2 trams (21 km facturables, el segon tram ja ha començat)', () => {
+      expect(calculateTravelBlocks(71)).toBe(2);
     });
 
-    it('80 km → 2 trams (40 km facturables = exactament 2 trams)', () => {
-      expect(calculateTravelBlocks(80)).toBe(2);
+    it('90 km → 2 trams (40 km facturables = exactament 2 trams)', () => {
+      expect(calculateTravelBlocks(90)).toBe(2);
     });
 
-    it('81 km → 3 trams (41 km facturables, el tercer ha començat)', () => {
-      expect(calculateTravelBlocks(81)).toBe(3);
+    it('91 km → 3 trams (41 km facturables, el tercer ha començat)', () => {
+      expect(calculateTravelBlocks(91)).toBe(3);
     });
 
     it('0 km → 0 trams', () => {
@@ -167,20 +167,20 @@ describe('travelCost', () => {
   // Depèn dels trams (blocs de 20 km) × preu per tram (10 €).
 
   describe('calculateTravelCharge', () => {
-    it('40 km → 0 € (tot inclòs, no es cobra res)', () => {
-      expect(calculateTravelCharge(40)).toBe(0);
+    it('50 km → 0 € (tot inclòs, no es cobra res)', () => {
+      expect(calculateTravelCharge(50)).toBe(0);
     });
 
-    it('60 km → 10 € (1 tram × 10 €)', () => {
-      expect(calculateTravelCharge(60)).toBe(10);
+    it('70 km → 10 € (1 tram × 10 €)', () => {
+      expect(calculateTravelCharge(70)).toBe(10);
     });
 
-    it('61 km → 20 € (2 trams × 10 €, perquè el 2n tram ja s\'ha iniciat)', () => {
-      expect(calculateTravelCharge(61)).toBe(20);
+    it('71 km → 20 € (2 trams × 10 €, perquè el 2n tram ja s\'ha iniciat)', () => {
+      expect(calculateTravelCharge(71)).toBe(20);
     });
 
-    it('81 km → 30 € (3 trams × 10 €)', () => {
-      expect(calculateTravelCharge(81)).toBe(30);
+    it('91 km → 30 € (3 trams × 10 €)', () => {
+      expect(calculateTravelCharge(91)).toBe(30);
     });
 
     it('0 km → 0 € (sense viatge)', () => {
@@ -205,8 +205,8 @@ describe('travelCost', () => {
   // ─── Constants ──────────────────────────────────────────────────────────────
 
   describe('constants', () => {
-    it('els km inclosos per defecte són 40 (anada+tornada)', () => {
-      expect(INCLUDED_TRAVEL_KM).toBe(40);
+    it('els km inclosos per defecte són 50 (anada+tornada = 25 km/sentit)', () => {
+      expect(INCLUDED_TRAVEL_KM).toBe(50);
     });
 
     it('el cost vehicle per defecte és 0.19 €/km', () => {

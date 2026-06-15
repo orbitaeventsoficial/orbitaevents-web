@@ -144,7 +144,9 @@ html.admin-mode .dg__linked-lead--customer { border-color: var(--ax-border, var(
 html.admin-mode .dg__linked-label { font-size: var(--o-text-xs); font-weight: var(--o-fw-bold); text-transform: uppercase; letter-spacing: 0.08em; color: var(--o-admin-gold, var(--ax-gold)); }
 html.admin-mode .dg__linked-nom { font-size: var(--o-text-base); font-weight: var(--o-fw-semi); color: var(--ax-t1); }
 html.admin-mode .dg__linked-email { font-size: var(--o-text-2xs); color: var(--ax-t3); }
-html.admin-mode .dg__linked-clear { margin-left: auto; font-size: var(--o-text-2xs); color: var(--ax-t3); background: none; border: 1px solid var(--ax-border, var(--ax-fill-5)); border-radius: var(--o-r-sm); padding: 0.25rem 0.625rem; cursor: pointer; }
+html.admin-mode .dg__linked-open { margin-left: auto; font-size: var(--o-text-2xs); font-weight: var(--o-fw-semi); color: var(--o-admin-gold, var(--ax-gold)); text-decoration: none; border: 1px solid var(--o-admin-gold, var(--ax-gold)); border-radius: var(--o-r-sm); padding: 0.25rem 0.625rem; }
+html.admin-mode .dg__linked-open:hover { background: var(--ax-gold-tint-1); }
+html.admin-mode .dg__linked-clear { font-size: var(--o-text-2xs); color: var(--ax-t3); background: none; border: 1px solid var(--ax-border, var(--ax-fill-5)); border-radius: var(--o-r-sm); padding: 0.25rem 0.625rem; cursor: pointer; }
 html.admin-mode .dg__linked-clear:hover { color: var(--ax-t1); border-color: var(--ax-fill-bright); }
 html.admin-mode .dg__customer-conflict { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; padding: 0.875rem 1rem; border: 1px solid var(--o-admin-gold); border-radius: var(--o-r-sm); background: var(--ax-gold-tint-1); }
 html.admin-mode .dg__conflict-body { min-width: 0; display: flex; flex-direction: column; gap: 0.1875rem; }

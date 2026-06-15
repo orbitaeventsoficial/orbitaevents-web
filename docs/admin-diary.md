@@ -1,3 +1,249 @@
+## 2026-06-15 — Partners 100% tokenitzat (colors no-Òrbita → tokens) + mesura del deute global (Canvi #977, claude)
+
+### Resum
+Acabar `/admin/collaborators` canònic del tot: tokenitzar els colors Tailwind no-Òrbita restants. I el propietari demana «tokenitzar tot l'admin» → mesurat el deute real per abordar-ho amb mètode (no a cegues).
+
+### Què s'ha fet
+- `CollaboratorsClient.tsx`: error box `border-red-500/20 bg-red-500/5 text-red-300` → classe canònica `ap-inline-alert ap-inline-alert--danger`; `text-amber-400/80` → `text-[color:var(--ax-gold)]`; `text-emerald-300/80` → `text-[color:var(--ax-success)]`.
+- `CollaboratorProductsPanel.tsx`: `text-amber-400/80` → `text-[color:var(--ax-gold)]`.
+- Resultat: `/admin/collaborators` sense cap color Tailwind no-Òrbita (grep net). Tot via tokens `--ax-*` o classes canòniques + `white/X` acceptat sobre fons fosc.
+
+### Mesura del deute global (per al pla, NO fet a cegues)
+Escaneig de `app/admin/**`: **95 fitxers** amb colors Tailwind no-Òrbita (amber/emerald/red/sky/cyan/slate/gray/violet/teal/orange/…), **1.461 ocurrències**. Top: `manual` (105), `economia` (32), `quick-create` (27), `page.tsx` dashboard (23), `reporting` (22). NO es pot fer amb un find-replace cec: cada color té semàntica (error/estat/daurat de marca) i el token correcte depèn del context; un replace massiu trencaria la UI i no es podria validar. S'ha d'anar per dominis (embut) o amb un guard que ho redueixi per fases.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: grep de collaborators sense colors no-Òrbita.
+- Validació humana/UX: pendent del propietari (refrescar partners).
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 976 → 977. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-15 — Erradicat OwnerControlStrip de tot l'admin (panell «Automàtic/Manual/Següent pas») (Canvi #976, claude)
+
+### Resum
+El propietari està fart del panell «Automàtic / Manual / Següent pas» (`OwnerControlStrip`) que surt a sobre de moltes pàgines admin, i del seu CSS no-Òrbita. Demana erradicar-lo de TOT l'admin.
+
+### Què s'ha fet
+- `app/admin/components/OwnerControlStrip.tsx`: el component ara retorna **`null`** (erradicat de cop a les ~34 pàgines que el renderitzaven). Era un infractor flagrant de la norma de sèrie: colors `cyan/sky/amber/emerald/white/black` tots hardcodejats. Es manté la signatura de props perquè els ~37 consumidors no es trenquin (tsc verd); eliminat el sub-component mort `OwnerSignalCard`.
+- 4 skeletons de loading (`AdminLoadingSkeleton{List,Dashboard,Inbox,Kanban}`): tret el placeholder orfe de l'strip, perquè el loading sigui fidel al que es renderitza.
+
+### Pendent de neteja (seguiment, sense impacte UI)
+Treure l'import + el bloc JSX `<OwnerControlStrip .../>` dels ~37 fitxers consumidors (ara passen props a un component que les ignora = codi mort latent). No urgent: la UI ja no el mostra. Es farà en passades per domini quan cada pàgina passi l'embut.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: l'strip desapareix de tota la UI admin; els skeletons ja no prometen un bloc que no existeix.
+- Validació humana/UX: pendent que el propietari refresqui qualsevol pàgina admin (ja no veurà «Revisar partners» ni cap variant).
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 975 → 976. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-15 — Partners: inputs canònics .adm-input (classe morta .ap-input → fora) (Canvi #975, claude)
+
+### Resum
+El propietari demana passada forta a `/admin/collaborators`: canònic, responsiu, monocapa, sèrie Òrbita, 0 hardcoded. Auditoria: troballa important — **`.ap-input` és una classe MORTA** (no existeix a cap CSS, tot i usar-se a 30 fitxers admin); els inputs anaven «nus», amb forma només pel padding Tailwind hardcodejat (`px-4 py-2.5`/`px-3 py-2`).
+
+### Què s'ha fet
+- `CollaboratorsClient.tsx` (9) + `CollaboratorProductsPanel.tsx` (9) → tots els inputs/select/textarea migrats de `.ap-input w-full px-* py-*` (classe morta + px) a **`.adm-input`** canònic (#961, tokenitzat: `var(--ax-line/sunk/t)`, focus daurat, padding en `rem`). Textarea amb `.adm-input--textarea`. Resultat: estil real + 0 px hardcodejat + monocapa + sèrie.
+
+### Troballes detectades NO tocades (per a la revisió del propietari / decisió)
+- **D-nou: `.ap-input` morta a ~28 fitxers admin més** — mateix problema a tot l'admin; cal migració global a `.adm-input` (o definir `.ap-input` com a àlies a admin-shell). Gran, fora de l'abast d'aquesta pàgina.
+- **Vocabulari «Partner» ↔ «Col·laborador» barrejat** (title «Partners», toasts «Col·laborador creat»…). Decisió de marca del propietari.
+- KPI row `lg:grid-cols-6` amb 7 items (l'últim baixa de línia).
+- Colors puntuals `text-amber-400/80`, `text-emerald-300/80` (no tokens) a la llista.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0. Sense `.ap-input` ni px d'input a collaborators.
+- Validació funcional: els inputs ara tenen vora/fons/focus canònics de la sèrie.
+- Validació humana/UX: el propietari entrarà a mirar; les troballes de dalt esperen la seva decisió.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 974 → 975. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-15 — Dossier: «Obrir fitxa» del lead (nova pestanya) + extres Masquerade ofertables (Canvi #974, claude)
+
+### Resum
+Dues friccions del propietari treballant el dossier de la Rose: (1) des del generador no podia anar a la fitxa completa del lead sense perdre el dossier en curs (no hi ha autosave del dossier mig fet); (2) faltaven Pintacares i Globoflèxia (extres Masquerade) al catàleg del generador.
+
+### Què s'ha fet
+- **Cable lead→fitxa sense perdre el dossier**: `DossierGeneratorClient.tsx` — quan hi ha lead vinculat, nou enllaç **«Obrir fitxa ↗»** (`buildLeadWorkspaceHref`, `target="_blank" rel="noopener noreferrer"`) → obre la fitxa completa en pestanya nova, el dossier en curs es conserva intacte. CSS `.dg__linked-open` tokenitzat.
+- **Extres ofertables**: `collaboratorProductService.shouldShowDossierCollaboratorProduct` ara inclou `pintacares professional` i `globoflexia` (cat «Extra», PVP 85/50). Abans es filtraven fora del dossier per decisió editorial (#956); ara que el dossier té pressupost desglossat, tenen sentit com a línia seleccionable.
+
+### Notes per al propietari
+- **Mag (manual)**: es crea a `/admin/collaborators` → Masquerade → Productes → + Producte (nom, categoria, «Text del dossier», durada, cost, PVP). ⚠️ perquè surti al dossier cal afegir el seu nom a l'allowlist `shouldShowDossierCollaboratorProduct` (guany de seguretat); quan el creï, afegir-lo allà.
+- **Col·laboradors a Catàleg?**: pregunta oberta del propietari. Ara és al grup «Comercial» (#967); moure'l a «Catàleg» és defensable (té catàleg de productes propi). Pendent de decisió.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `vitest collaboratorProductService` 17/17 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: noms normalitzats de pintacares/globoflèxia confirmats a BD; l'enllaç obre la fitxa en pestanya nova.
+- Validació humana/UX: pendent del propietari (refrescar dossier).
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 973 → 974. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-15 — Dossier: pressupost desglossat al final amb desplaçament per emplaçament (Canvi #973, claude)
+
+### Resum
+El propietari vol que el dossier acabi amb un pressupost desglossat que inclogui el desplaçament segons l'emplaçament del lead, perquè el client tingui tota la informació clara i sense sorpreses.
+
+### Què s'ha fet
+- `lib/utils/dossier-html-builder.ts`: nova secció `buildBudgetBlock` després del «Resum» — serveis seleccionats (línies + preu), bloc de **desplaçament desglossat** (km totals, km inclosos, km a facturar, trams × preu, suplement) i **total** = subtotal serveis + suplement transport. Tot canònic via helpers de `travelCost` (`calculateBillableTravelKm`/`calculateTravelBlocks`/`calculateTravelCharge`, `INCLUDED_TRAVEL_KM`, `TRAVEL_BLOCK_KM/EUR`); zero números hardcoded. Nou tipus `DossierCopy.budget`; opcions `travelKm`/`location` al builder. CSS `.bud-*` tokenitzat + responsive + print. Només es pinta si `travelKm > 0`.
+- `messages/{ca,es,en}.json`: namespace `dossier.budget` (3 idiomes).
+- `lib/constants/dossier-copy.ts`: resol `budget`.
+- `app/admin/dossiers/DossierGeneratorClient.tsx`: nou camp «Km desplaçament (anada+tornada)»; passa `travelKm` + `location` (eventDesc) al builder.
+- Tests: fixture `copy.budget` + 3 tests nous (no pinta sense km; total = serveis+suplement amb 90km→20€; «sense suplement» a 40km).
+
+### Nota
+Preomplir el camp de km automàticament des de `lead.distanceKm` queda per a una millora següent (el `LeadResult` de cerca no porta `distanceKm`; caldria ampliar l'API de cerca de leads). Ara el comercial el posa a mà.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `vitest dossier-html-builder` 24/24 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: amb km>0 surt el pressupost amb total = serveis + transport; dins els km inclosos marca «sense suplement».
+- Validació humana/UX: pendent que el propietari ompli els km i previsualitzi.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 972 → 973. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-15 — Dossier: eventType traduït («BIRTHDAY»→«Aniversari»), mai el codi cru (Canvi #972, claude)
+
+### Resum
+El propietari detecta que al dossier (portada de la Rose) surt «BIRTHDAY · 2026-09-09»: el codi cru de l'enum `eventType` en comptes del label en l'idioma del lead.
+
+### Què s'ha fet
+- `app/admin/dossiers/DossierGeneratorClient.tsx`: a `selectLead`, el `eventDesc` ara usa `getEventLabel(lead.eventType)` (font canònica `EVENT_TYPE_PLAIN` de `lib/constants`: BIRTHDAY→«Aniversari», WEDDING→«Boda»…) en comptes de `lead.eventType` cru. El dossier es genera en català (locale del document), així que el label hi va coherent.
+- Afegit import `getEventLabel` de `@/lib/constants`.
+
+### Nota
+El dossier de la Rose ja desat manté el text antic a BD; en re-seleccionar el lead o regenerar el dossier, l'eventDesc surt amb «Aniversari». El fix evita el codi cru a tots els dossiers nous. (Suport per-idioma del client complet quedaria lligat a fer el dossier multiidioma segons `preferredLocale`, avui tot en català.)
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: en seleccionar un lead BIRTHDAY, l'eventDesc mostra «Aniversari · data · lloc».
+- Validació humana/UX: pendent que el propietari re-seleccioni la Rose / generi de nou.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 971 → 972. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-15 — Km inclosos unificats a 25/sentit (decisió del propietari) — una sola veritat (Canvi #971, claude)
+
+### Resum
+Resolta la divergència del #970 (20 vs 25 km). El propietari decideix **25 km** (criteri econòmic: ~5€/bolo de diferència, però el web ja promet 25 i és més atractiu). S'unifica TOT a la constant canònica.
+
+### Què s'ha fet
+- `lib/services/travelCost.ts`: `INCLUDED_TRAVEL_KM` 40 → **50** (a/t = 25 km/sentit). És la **font única**: tots els consumidors deriven (`/2` o helpers) → contracte, documents, pressupostos, portal, fitxa de reserva (`BookingMarginCard`, `LeadDetailClient`), `useBookingPricing` → ara diuen 25 automàticament. El web FAQ/blog ja deien 25 → ara coherents.
+- `lib/constants/admin.ts`: l'únic literal hardcodejat (`conditionsText` del PDF studio) 20 → 25.
+- `scripts/seed-masquerade-products.mjs`: ja derivava de `getIncludedTravelOneWayKm()` → reexecutat a Railway, ara «...fins a 25 km» (confirmat a BD).
+- `__tests__/lib/services/travelCost.test.ts`: 35 tests recalculats amb included=50 (billable/blocks/charge) + capçal i constants alineats (model 50 inclosos · trams 20 km · 10€).
+- **Impacte de model de cost**: amb 25 km/sentit inclosos es factura menys desplaçament al client en bolos llunyans (regalem 5 km/sentit més respecte a 20). Marge lleugerament inferior en aquests casos, però coherent amb la promesa pública.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `vitest` travelCost+costEngine+documentService+contractService+bookingRouteService → 201/201 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: query BD confirma «fins a 25 km» al catàleg; tots els textos del repo deriven de la constant.
+- Validació humana/UX: pendent del propietari (ara web, pressupost, contracte i catàleg diuen el mateix: 25 km).
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 970 → 971. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-15 — «Desplaçament inclòs fins a 20 km» canònic al catàleg Masquerade + divergència 20/25 detectada (Canvi #970, claude)
+
+### Resum
+El propietari demana revisar el «Desplaçament inclòs» dels productes: ha de dir «fins a X km» i amb el valor correcte. Revisat: el catàleg Masquerade deia «Desplaçament inclòs» sense límit; i hi ha una INCOHERÈNCIA real al repo entre 20 km (canònic) i 25 km (web).
+
+### Què s'ha fet
+- `scripts/seed-masquerade-products.mjs`: `INCLUDES` ara és «Vestuari d'alta qualitat · Desplaçament inclòs fins a {X} km · Disponible en català», on X surt de `getIncludedTravelOneWayKm()` de `travelCost` (font única, avui **20 km/sentit** des de Granollers). Zero hardcoded del número. **Seed executat a Railway**; confirmat a BD: «...Desplaçament inclòs fins a 20 km...».
+- Aplicat a tots els productes Masquerade (infantil, adults, bingo, batalla, secret pirates, extres).
+
+### Divergència detectada (DECISIÓ del propietari, NO tocada)
+El valor de km inclosos NO és coherent al repo:
+- **20 km**: `travelCost.INCLUDED_TRAVEL_KM=40` (a/t) → 20/sentit · `admin.ts conditionsText` (text legal de pressupostos) «fins a 20 km des de Granollers».
+- **25 km**: `messages/ca.json` i `es.json` FAQ («fins a 25 km de Granollers») · `prisma/seed-blog.ts` («25 km»).
+→ El client al web llegeix 25 km; el pressupost diu 20 km. Cal que el propietari fixi EL valor real i unificar-ho tot a la constant. NO tocat (decisió de negoci + risc SEO).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `vitest collaboratorProductService` 17/17 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: query BD confirma el text nou amb 20 km.
+- Validació humana/UX: pendent del propietari (refrescar dossier + decidir 20 vs 25 km).
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 969 → 970. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-15 — Bingo/Batalla Musical són de Masquerade: reactivats al seed + allowlist (Canvi #969, claude)
+
+### Resum
+El propietari corregeix: Bingo i Batalla Musical són de **Masquerade** (col·laborador), no productes propis. Causa real que faltessin al dossier: el seed #956 (adaptació del Word, que no els tenia) els va **desactivar** a BD i els va treure de l'allowlist. El #968 (afegir-los com a propis) era l'enfocament equivocat.
+
+### Què s'ha fet
+- **Verificat a BD**: existien «Bingo Musical» i «Batalla Musical» de Masquerade (cat «Animació adulta», cost 200 → PVP 240) però INACTIUS.
+- `scripts/seed-masquerade-products.mjs`: afegits Bingo Musical i Batalla Musical (cost 200, PVP `resellPrice`=240, cat «Animació adulta», crew «DJ + Presentador/a», 1h30, `isActive: true` per reactivar-los, descripcions adaptades). **Seed executat a Railway** → tots dos ACTIUS (confirmat per query).
+- `lib/services/collaboratorProductService.ts`: reposats `bingo musical` + `batalla musical` a l'allowlist `shouldShowDossierCollaboratorProduct`.
+- `app/admin/dossiers/page.tsx`: **revertit el #968** — l'animació pròpia ja no s'afegeix al generador; Bingo/Batalla surten via `collaboratorProducts` (Masquerade), com toca.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `vitest collaboratorProductService` 17/17 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: query a BD confirma Bingo/Batalla actius (PVP 240); surten al grup «Serveis de Masquerade» del generador.
+- Validació humana/UX: pendent que el propietari refresqui `/admin/dossiers` i els vegi sota Masquerade.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 968 → 969 (corregeix l'enfocament del #968). SENSE commit (el #968 tampoc estava pujat).
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-15 — Bingo/Batalla Musical (i animació pròpia) ofertables al generador de dossiers (Canvi #968, claude)
+
+### Resum
+El propietari detecta que a `/admin/dossiers` falten el Bingo Musical i la Batalla Musical. Causa: els productes propis d'animació (`getAnimacioProducts` → bingo-musical, batalla-musical, dj, sonoritzacio-cerimonia, boda-sencera) només alimentaven `lookupProducts` (noms de dossiers desats), NO `generatorProducts` (l'oferta del generador). Quedaven fora del catàleg seleccionable.
+
+### Què s'ha fet
+- `app/admin/dossiers/page.tsx`: `generatorProducts` ara inclou els productes propis d'animació ofertables. S'exclou `dj` (ja cobert per «DJ professional» d'`orbitaProducts`, evita duplicat) i s'aplica dedup per nom contra els productes de col·laborador (si un dia un partner té el mateix nom, preval el de col·laborador — mateixa lògica que el studio preview). Bingo Musical i Batalla Musical (categoria «Animació adulta», preu des de 250€ via trams) ja surten al catàleg.
+- `lookupProducts` intacte (noms de dossiers desats).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: bingo-musical/batalla-musical entren a `generatorProducts` amb `priceFrom` (250) i categoria; el generador els agrupa a «Serveis d'Òrbita» amb badge «Adults».
+- Validació humana/UX: pendent que el propietari refresqui `/admin/dossiers` i els seleccioni.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 967 → 968. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-15 — Sidebar: grup «Agenda»→«Comercial», reordenat pel flux + Col·laboradors connectat (Canvi #967, claude)
 
 ### Resum

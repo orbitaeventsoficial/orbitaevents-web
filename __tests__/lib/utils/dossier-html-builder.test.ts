@@ -52,13 +52,30 @@ const copy: DossierCopy = {
     totalLabel: 'Inversió orientativa de la proposta',
     customSuffix: '+ propostes a mida',
   },
+  budget: {
+    kicker: 'El pressupost',
+    title: 'Pressupost orientatiu',
+    lead: 'Desglossament amb desplaçament fins a {includedKm} km.',
+    servicesLabel: 'Serveis seleccionats',
+    travelTitle: 'Desplaçament',
+    travelTo: 'Fins a {location}',
+    travelTotalKm: '{km} km (anada i tornada)',
+    travelIncludedKm: '{km} km inclosos',
+    travelBillableKm: '{km} km a facturar',
+    travelBlocks: '{blocks} tram(s) × {price}',
+    travelIncludedAll: 'Desplaçament inclòs — sense suplement',
+    travelLine: 'Suplement de desplaçament',
+    travelNote: 'Inclòs fins a {includedKm} km; després {blockPrice} per {blockKm} km.',
+    totalLabel: 'Total orientatiu',
+    vatNote: "Preus orientatius; l'IVA es tanca a la proposta.",
+  },
   cta: { label: 'Per confirmar disponibilitat o per a qualsevol dubte' },
 };
 
 function build(
   c: DossierClientInfo,
   products: AnimacioProduct[],
-  options?: { autoPrint?: boolean; logoDataUri?: string; locale?: string },
+  options?: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; location?: string },
 ): string {
   return buildDossierHtml(c, products, copy, { locale: 'ca-ES', ...options });
 }
@@ -248,6 +265,36 @@ describe('buildDossierHtml', () => {
     const html = build(client, []);
     expect(html).not.toContain('class="resum-page"');
     expect(html).not.toContain('class="resum-total"');
+  });
+
+  // ─── Pressupost desglossat amb desplaçament ──────────────────────────────────
+
+  it('NO pinta el pressupost desglossat si no hi ha travelKm', () => {
+    const a: AnimacioProduct = { id: 'orbita:dj', nom: 'DJ', descripcio: ['x'], inclou: ['x'], priceFrom: 150 };
+    const html = build(client, [a]);
+    expect(html).not.toContain('class="bud-page"');
+  });
+
+  it('pinta el pressupost desglossat amb total = serveis + suplement de desplaçament', () => {
+    const a: AnimacioProduct = { id: 'orbita:dj', nom: 'DJ', descripcio: ['x'], inclou: ['x'], priceFrom: 200 };
+    // 90 km totals: 50 inclosos → 40 facturables → 2 trams × 10€ = 20€ suplement.
+    const html = build(client, [a], { travelKm: 90, location: 'Arenys de Munt' });
+    expect(html).toContain('class="bud-page"');
+    expect(html).toContain('Pressupost orientatiu');
+    expect(html).toContain('Arenys de Munt');
+    // Total = 200 (servei) + 20 (transport) = 220
+    expect(html).toContain('bud-total-value');
+    expect(html).toContain('220');
+  });
+
+  it('marca "desplaçament inclòs sense suplement" si la distància és dins els km inclosos', () => {
+    const a: AnimacioProduct = { id: 'orbita:dj', nom: 'DJ', descripcio: ['x'], inclou: ['x'], priceFrom: 150 };
+    // 40 km totals < 50 inclosos → 0 suplement.
+    const html = build(client, [a], { travelKm: 40 });
+    expect(html).toContain('class="bud-page"');
+    expect(html).toContain('sense suplement');
+    // Total = només el servei (150), sense transport.
+    expect(html).toContain('150');
   });
 
   it('funciona amb llista de productes buida', () => {

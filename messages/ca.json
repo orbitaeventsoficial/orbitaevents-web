@@ -7351,6 +7351,23 @@
       "totalLabel": "La proposta, a partir de",
       "customSuffix": "+ propostes a mida"
     },
+    "budget": {
+      "kicker": "El pressupost",
+      "title": "Pressupost orientatiu",
+      "lead": "Aquí teniu el desglossament amb el desplaçament inclòs fins a {includedKm} km des de Granollers. Com que ja sabem on serà la festa, us mostrem tota la informació, clara i sense sorpreses.",
+      "servicesLabel": "Serveis seleccionats",
+      "travelTitle": "Desplaçament",
+      "travelTo": "Fins a {location}",
+      "travelTotalKm": "{km} km (anada i tornada)",
+      "travelIncludedKm": "{km} km inclosos",
+      "travelBillableKm": "{km} km a facturar",
+      "travelBlocks": "{blocks} tram(s) × {price}",
+      "travelIncludedAll": "Desplaçament inclòs — sense suplement",
+      "travelLine": "Suplement de desplaçament",
+      "travelNote": "Inclòs fins a {includedKm} km des de Granollers; després, {blockPrice} per cada {blockKm} km.",
+      "totalLabel": "Total orientatiu",
+      "vatNote": "Preus orientatius. L'IVA i els ajustos finals es tanquen a la proposta definitiva."
+    },
     "cta": {
       "label": "Qualsevol dubte o per mirar dates, escriviu-nos quan vulgueu"
     },

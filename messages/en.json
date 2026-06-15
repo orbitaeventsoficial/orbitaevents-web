@@ -7057,6 +7057,23 @@
       "totalLabel": "The proposal, from",
       "customSuffix": "+ bespoke proposals"
     },
+    "budget": {
+      "kicker": "The quote",
+      "title": "Indicative quote",
+      "lead": "Here's the breakdown with travel included up to {includedKm} km from Granollers. Since we already know where the party is, we show you all the information, clear and with no surprises.",
+      "servicesLabel": "Selected services",
+      "travelTitle": "Travel",
+      "travelTo": "To {location}",
+      "travelTotalKm": "{km} km (round trip)",
+      "travelIncludedKm": "{km} km included",
+      "travelBillableKm": "{km} km to bill",
+      "travelBlocks": "{blocks} block(s) × {price}",
+      "travelIncludedAll": "Travel included — no surcharge",
+      "travelLine": "Travel surcharge",
+      "travelNote": "Included up to {includedKm} km from Granollers; after that, {blockPrice} per {blockKm} km.",
+      "totalLabel": "Indicative total",
+      "vatNote": "Indicative prices. VAT and final adjustments are set in the definitive proposal."
+    },
     "cta": {
       "label": "Any questions or to check dates, write to us whenever you like"
     },

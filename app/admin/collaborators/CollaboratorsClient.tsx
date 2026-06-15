@@ -275,7 +275,7 @@ export default function CollaboratorsClient() {
       />
 
       {loadError && (
-        <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-300">
+        <div className="ap-inline-alert ap-inline-alert--danger">
           {loadError}
         </div>
       )}
@@ -313,7 +313,7 @@ export default function CollaboratorsClient() {
                 id="collab-name"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="ap-input w-full px-4 py-2.5"
+                className="adm-input"
                 required
               />
             </div>
@@ -323,7 +323,7 @@ export default function CollaboratorsClient() {
                 id="collab-company"
                 value={form.company}
                 onChange={(e) => setForm({ ...form, company: e.target.value })}
-                className="ap-input w-full px-4 py-2.5"
+                className="adm-input"
               />
             </div>
             <div>
@@ -333,7 +333,7 @@ export default function CollaboratorsClient() {
                 type="email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="ap-input w-full px-4 py-2.5"
+                className="adm-input"
               />
             </div>
             <div>
@@ -342,7 +342,7 @@ export default function CollaboratorsClient() {
                 id="collab-phone"
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                className="ap-input w-full px-4 py-2.5"
+                className="adm-input"
               />
             </div>
             <div>
@@ -352,7 +352,7 @@ export default function CollaboratorsClient() {
                 value={form.specialty}
                 onChange={(e) => setForm({ ...form, specialty: e.target.value })}
                 placeholder="DJ, Presentador, Tècnic de so..."
-                className="ap-input w-full px-4 py-2.5"
+                className="adm-input"
               />
             </div>
             <div className="md:col-span-2">
@@ -380,7 +380,7 @@ export default function CollaboratorsClient() {
                 value={form.costPerHour}
                 onChange={(e) => setForm({ ...form, costPerHour: e.target.value === '' ? '' : Number(e.target.value) })}
                 placeholder="Ex: 133.33"
-                className="ap-input w-full px-4 py-2.5"
+                className="adm-input"
               />
               {form.costPerHour !== '' && Number(form.costPerHour) > 0 && (
                 <p className="mt-1 text-xs text-white/40">
@@ -398,7 +398,7 @@ export default function CollaboratorsClient() {
                 step={0.5}
                 value={form.commissionPct}
                 onChange={(e) => setForm({ ...form, commissionPct: Number(e.target.value) })}
-                className="ap-input w-full px-4 py-2.5"
+                className="adm-input"
               />
             </div>
             <div>
@@ -407,7 +407,7 @@ export default function CollaboratorsClient() {
                 id="collab-model"
                 value={form.pricingModel}
                 onChange={(e) => setForm({ ...form, pricingModel: e.target.value as 'NET_PLUS_COMMISSION' | 'DISCOUNT' })}
-                className="ap-input w-full px-4 py-2.5"
+                className="adm-input"
               >
                 <option value="DISCOUNT">Descompte (li fem X% menys)</option>
                 <option value="NET_PLUS_COMMISSION">Preu net (ell afegeix comissió)</option>
@@ -421,7 +421,7 @@ export default function CollaboratorsClient() {
               value={form.notes}
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
               rows={2}
-              className="ap-input w-full px-4 py-2.5"
+              className="adm-input adm-input--textarea"
             />
           </div>
           <div className="flex items-center gap-4 pt-2">
@@ -462,13 +462,13 @@ export default function CollaboratorsClient() {
                     {!c.isActive && <span className="ap-badge">Inactiu</span>}
                   </div>
                   <div className="flex items-center gap-4 text-sm admin-tone-text-neutral">
-                    {c.specialty && <span className="text-amber-400/80 font-medium">{c.specialty}</span>}
+                    {c.specialty && <span className="font-medium text-[color:var(--ax-gold)]">{c.specialty}</span>}
                     {(c.roles || []).map((role) => (
                       <span key={role} className="ap-badge">{COLLABORATOR_ROLE_OPTIONS.find((option) => option.value === role)?.label || role}</span>
                     ))}
                     {c.costPerHour != null && <span className="text-white/60">{c.costPerHour}€/h</span>}
                     {((c._count?.sourcedLeads || 0) + (c._count?.sourcedBookings || 0)) > 0 && (
-                      <span className="text-emerald-300/80">
+                      <span className="text-[color:var(--ax-success)]">
                         {(c._count?.sourcedLeads || 0) + (c._count?.sourcedBookings || 0)} bolos passats
                       </span>
                     )}

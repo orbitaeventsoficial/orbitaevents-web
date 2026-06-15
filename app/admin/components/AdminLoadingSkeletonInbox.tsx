@@ -1,9 +1,6 @@
 export default function AdminLoadingSkeletonInbox() {
   return (
     <div className="animate-pulse space-y-4">
-      {/* OwnerControlStrip placeholder */}
-      <div className="h-14 rounded-2xl border border-white/10 bg-white/[0.03]" />
-
       {/* Two-panel layout */}
       <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
         {/* Left: email list */}

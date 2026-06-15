@@ -8,9 +8,6 @@ const COLUMNS = [
 export default function AdminLoadingSkeletonKanban() {
   return (
     <div className="animate-pulse space-y-4">
-      {/* OwnerControlStrip placeholder */}
-      <div className="h-14 rounded-2xl border border-white/10 bg-white/[0.03]" />
-
       {/* Filter bar */}
       <div className="flex gap-2">
         <div className="h-9 w-48 rounded-xl border border-white/10 bg-white/[0.03]" />

@@ -8,12 +8,15 @@
  */
 import { PrismaClient } from '@prisma/client';
 import { resellPrice } from '../lib/constants/pricing.ts';
+import { getIncludedTravelOneWayKm } from '../lib/services/travelCost.ts';
 
 const prisma = new PrismaClient();
 
 const COLLABORATOR_ID = 'carlos-lucas-fernandez';
 const IMG = '/img/collaborators/masquerade';
-const INCLUDES = "Vestuari d'alta qualitat · Desplaçament inclòs · Disponible en català";
+// Km inclosos canònics (font única: travelCost). Avui 20 km/sentit des de Granollers.
+const INCLUDED_KM = getIncludedTravelOneWayKm();
+const INCLUDES = `Vestuari d'alta qualitat · Desplaçament inclòs fins a ${INCLUDED_KM} km · Disponible en català`;
 const CHILDREN_CATEGORY = 'Animació infantil';
 const ADULTS_CATEGORY = 'Animació adulta';
 const EXTRA_CATEGORY = 'Extra';
@@ -73,6 +76,34 @@ const PRODUCTS = [
     description: "Animació en directe pensada per al grup gran: conducció, jocs i dinàmiques participatives que mantenen el ritme de la festa sense parar-la. Un animador professional condueix l'estona perquè els adults s'hi impliquin i passin una bona estona.",
     includes: INCLUDES,
     sortOrder: 6,
+  },
+  {
+    name: 'Bingo Musical',
+    category: ADULTS_CATEGORY,
+    crew: 'DJ + Presentador/a',
+    durationLabel: '1h 30',
+    // Cost real de Masquerade (recuperat de BD); PVP via resellPrice. isActive
+    // explícit per reactivar-lo (el seed #956 l'havia desactivat: no era al Word).
+    costPrice: 200,
+    sellPrice: productPrice(200),
+    imageUrl: `${IMG}/bingo-musical.jpg`,
+    description: "Els temazos sonen des del primer minut, sempre des de la part que tothom reconeix, mentre el presentador porta l'energia. Cada participant té el seu cartró i els seus gomets; el joc acumula línies i, quan s'omplen, els guanyadors surten al davant per als reptes musicals. Tres rondes, cada cop diferent, mentre el públic canta i anima fins que algú canta bingo.",
+    includes: INCLUDES,
+    isActive: true,
+    sortOrder: 7,
+  },
+  {
+    name: 'Batalla Musical',
+    category: ADULTS_CATEGORY,
+    crew: 'DJ + Presentador/a',
+    durationLabel: '1h 30',
+    costPrice: 200,
+    sellPrice: productPrice(200),
+    imageUrl: `${IMG}/batalla-musical.jpg`,
+    description: "Hora i mitja de competició musical. Els participants es divideixen en equips i s'enfronten en reptes: karaoke col·lectiu, endevina la cançó, ball, preguntes musicals, concurs de talent… Cada repte suma punts i, al final, un sol equip s'emporta la Batalla Musical. Qui no vulgui competir pot fer de jurat.",
+    includes: INCLUDES,
+    isActive: true,
+    sortOrder: 8,
   },
   {
     name: 'Pintacares professional',

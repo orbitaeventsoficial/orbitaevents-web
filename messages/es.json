@@ -7057,6 +7057,23 @@
       "totalLabel": "La propuesta, a partir de",
       "customSuffix": "+ propuestas a medida"
     },
+    "budget": {
+      "kicker": "El presupuesto",
+      "title": "Presupuesto orientativo",
+      "lead": "Aquí tenéis el desglose con el desplazamiento incluido hasta {includedKm} km desde Granollers. Como ya sabemos dónde será la fiesta, os mostramos toda la información, clara y sin sorpresas.",
+      "servicesLabel": "Servicios seleccionados",
+      "travelTitle": "Desplazamiento",
+      "travelTo": "Hasta {location}",
+      "travelTotalKm": "{km} km (ida y vuelta)",
+      "travelIncludedKm": "{km} km incluidos",
+      "travelBillableKm": "{km} km a facturar",
+      "travelBlocks": "{blocks} tramo(s) × {price}",
+      "travelIncludedAll": "Desplazamiento incluido — sin suplemento",
+      "travelLine": "Suplemento de desplazamiento",
+      "travelNote": "Incluido hasta {includedKm} km desde Granollers; después, {blockPrice} por cada {blockKm} km.",
+      "totalLabel": "Total orientativo",
+      "vatNote": "Precios orientativos. El IVA y los ajustes finales se cierran en la propuesta definitiva."
+    },
     "cta": {
       "label": "Cualquier duda o para mirar fechas, escribidnos cuando queráis"
     },

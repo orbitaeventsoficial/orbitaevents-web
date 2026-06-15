@@ -5,9 +5,6 @@
 export default function AdminLoadingSkeletonList() {
   return (
     <div className="animate-pulse space-y-5">
-      {/* OwnerControlStrip placeholder */}
-      <div className="h-14 rounded-2xl border border-white/10 bg-white/[0.03]" />
-
       {/* Pipeline suggestions placeholder */}
       <div className="h-20 rounded-2xl border border-white/10 bg-white/[0.03]" />
 

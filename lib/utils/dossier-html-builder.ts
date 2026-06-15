@@ -1,6 +1,14 @@
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { formatCurrency } from '@/lib/constants';
+import {
+  INCLUDED_TRAVEL_KM,
+  TRAVEL_BLOCK_KM,
+  TRAVEL_BLOCK_EUR,
+  calculateBillableTravelKm,
+  calculateTravelBlocks,
+  calculateTravelCharge,
+} from '@/lib/services/travelCost';
 
 export type DossierClientInfo = {
   nom: string;
@@ -40,6 +48,23 @@ export type DossierCopy = {
     noteLabel: string;
   };
   resum: { kicker: string; title: string; lead: string; totalLabel: string; customSuffix: string };
+  budget: {
+    kicker: string;
+    title: string;
+    lead: string;
+    servicesLabel: string;
+    travelTitle: string;
+    travelTo: string;
+    travelTotalKm: string;
+    travelIncludedKm: string;
+    travelBillableKm: string;
+    travelBlocks: string;
+    travelIncludedAll: string;
+    travelLine: string;
+    travelNote: string;
+    totalLabel: string;
+    vatNote: string;
+  };
   cta: { label: string };
 };
 
@@ -183,11 +208,93 @@ function buildResumBlock(products: AnimacioProduct[], copy: DossierCopy, locale:
   </section>`;
 }
 
+/**
+ * Pressupost desglossat amb el desplaçament calculat segons l'emplaçament del
+ * lead. Tot canònic: km inclosos i suplement surten dels helpers de travelCost
+ * (mai hardcoded). Només es pinta si hi ha distància coneguda (`travelKm`).
+ * Els serveis sense `priceFrom` (a mida) no entren al total.
+ */
+function buildBudgetBlock(
+  products: AnimacioProduct[],
+  copy: DossierCopy,
+  locale: string,
+  travelKm: number,
+  location?: string,
+): string {
+  if (products.length === 0 || travelKm <= 0) return '';
+
+  const money = (n: number) => escHtml(formatCurrency(n, locale));
+  const includedOneWay = Math.round(INCLUDED_TRAVEL_KM / 2);
+  const fill = (tpl: string, vars: Record<string, string>) =>
+    escHtml(Object.entries(vars).reduce((s, [k, v]) => s.split(`{${k}}`).join(v), tpl));
+
+  // Serveis amb preu → línies + subtotal.
+  const priced = products.filter((p) => typeof p.priceFrom === 'number');
+  let servicesSubtotal = 0;
+  const serviceRows = priced
+    .map((p) => {
+      servicesSubtotal += p.priceFrom as number;
+      return `<li class="bud-row">
+        <span class="bud-row-nom">${escHtml(p.nom)}</span>
+        <span class="bud-row-dots" aria-hidden="true"></span>
+        <span class="bud-row-val">${money(p.priceFrom as number)}</span>
+      </li>`;
+    })
+    .join('\n      ');
+
+  // Desplaçament (helpers canònics).
+  const billableKm = calculateBillableTravelKm(travelKm);
+  const blocks = calculateTravelBlocks(travelKm);
+  const travelCharge = calculateTravelCharge(travelKm);
+  const total = servicesSubtotal + travelCharge;
+
+  const travelDetail = travelCharge > 0
+    ? `<li class="bud-row bud-row--sub">
+        <span class="bud-row-nom">${fill(copy.budget.travelBillableKm, { km: String(billableKm) })} · ${fill(copy.budget.travelBlocks, { blocks: String(blocks), price: money(TRAVEL_BLOCK_EUR) })}</span>
+        <span class="bud-row-dots" aria-hidden="true"></span>
+        <span class="bud-row-val">${money(travelCharge)}</span>
+      </li>`
+    : `<li class="bud-row bud-row--sub">
+        <span class="bud-row-nom">${escHtml(copy.budget.travelIncludedAll)}</span>
+        <span class="bud-row-dots" aria-hidden="true"></span>
+        <span class="bud-row-val">${money(0)}</span>
+      </li>`;
+
+  return `
+  <section class="bud-page">
+    <div class="bud-kicker">${escHtml(copy.budget.kicker)}</div>
+    <h2 class="bud-title">${escHtml(copy.budget.title)}</h2>
+    <p class="bud-lead">${fill(copy.budget.lead, { includedKm: String(includedOneWay) })}</p>
+
+    <div class="bud-group-label">${escHtml(copy.budget.servicesLabel)}</div>
+    <ul class="bud-list">
+      ${serviceRows}
+    </ul>
+
+    <div class="bud-group-label">${escHtml(copy.budget.travelTitle)}</div>
+    <ul class="bud-list">
+      <li class="bud-row">
+        <span class="bud-row-nom">${location ? fill(copy.budget.travelTo, { location }) : escHtml(copy.budget.travelTitle)} · ${fill(copy.budget.travelTotalKm, { km: String(travelKm) })}</span>
+        <span class="bud-row-dots" aria-hidden="true"></span>
+        <span class="bud-row-val bud-row-val--mute">${fill(copy.budget.travelIncludedKm, { km: String(INCLUDED_TRAVEL_KM) })}</span>
+      </li>
+      ${travelDetail}
+    </ul>
+
+    <div class="bud-total">
+      <span class="bud-total-label">${escHtml(copy.budget.totalLabel)}</span>
+      <span class="bud-total-value">${money(total)}</span>
+    </div>
+    <p class="bud-note">${fill(copy.budget.travelNote, { includedKm: String(includedOneWay), blockPrice: money(TRAVEL_BLOCK_EUR), blockKm: String(TRAVEL_BLOCK_KM) })}</p>
+    <p class="bud-note">${escHtml(copy.budget.vatNote)}</p>
+  </section>`;
+}
+
 export function buildDossierHtml(
   client: DossierClientInfo,
   products: AnimacioProduct[],
   copy: DossierCopy,
-  options: { autoPrint?: boolean; logoDataUri?: string; locale?: string } = {},
+  options: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; location?: string } = {},
 ): string {
   const locale = options.locale || 'ca-ES';
   const nomPrincipal = escHtml(client.nom);
@@ -200,6 +307,7 @@ export function buildDossierHtml(
     .join('\n');
 
   const resumBloc = buildResumBlock(products, copy, locale);
+  const budgetBloc = buildBudgetBlock(products, copy, locale, options.travelKm ?? 0, options.location);
 
   const salutacioHtml = escHtml(salutacio).replace(/\n\n/g, '<br><br>');
 
@@ -448,6 +556,24 @@ export function buildDossierHtml(
     .resum-total-value { display: block; font-size: 40px; font-weight: 600; color: var(--o-gold-bright); letter-spacing: 0.005em; }
     .resum-total-mida { display: block; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: rgba(255,255,255,0.6); font-style: italic; margin-top: 4px; }
 
+    /* ---------- PRESSUPOST DESGLOSSAT ---------- */
+    .bud-page { page-break-inside: avoid; page-break-before: always; break-before: page; padding-top: 60px; margin-bottom: 56px; }
+    .bud-kicker { font-family: 'Inter', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.34em; text-transform: uppercase; color: var(--o-gold); margin-bottom: 22px; }
+    .bud-title { font-size: 46px; font-weight: 600; color: var(--o-ink); letter-spacing: -0.01em; margin-bottom: 18px; }
+    .bud-lead { font-size: 16px; color: var(--o-ink-soft); line-height: 1.85; max-width: 640px; margin-bottom: 34px; }
+    .bud-group-label { font-family: 'Inter', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--o-gold); margin: 26px 0 10px; }
+    .bud-list { list-style: none; margin: 0 0 8px; }
+    .bud-row { display: flex; align-items: baseline; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--o-line-soft); }
+    .bud-row--sub .bud-row-nom { color: var(--o-ink-mute); font-size: 15px; }
+    .bud-row-nom { font-size: 17px; color: var(--o-ink); flex-shrink: 0; }
+    .bud-row-dots { flex: 1; border-bottom: 1px dotted var(--o-line); transform: translateY(-4px); min-width: 18px; }
+    .bud-row-val { font-size: 17px; font-weight: 600; color: var(--o-ink); white-space: nowrap; }
+    .bud-row-val--mute { color: var(--o-ink-mute); font-weight: 400; font-style: italic; }
+    .bud-total { display: flex; align-items: center; justify-content: space-between; gap: 24px; background: linear-gradient(120deg, var(--o-carbon-2), var(--o-carbon)); color: #fff; padding: 24px 28px; border: 1px solid var(--o-gold-deep); margin-top: 22px; }
+    .bud-total-label { font-family: 'Inter', Arial, sans-serif; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(215,184,110,0.85); font-weight: 600; }
+    .bud-total-value { font-size: 36px; font-weight: 600; color: var(--o-gold-bright); }
+    .bud-note { font-family: 'Inter', Arial, sans-serif; font-size: 11px; color: var(--o-ink-mute); margin-top: 12px; line-height: 1.6; }
+
     /* ---------- CTA + PEU ---------- */
     .cta {
       background: var(--o-paper-card); color: var(--o-ink); border: 1px solid var(--o-gold-bright);
@@ -482,6 +608,12 @@ export function buildDossierHtml(
       .resum-total { flex-direction: column; align-items: flex-start; gap: 14px; }
       .resum-total-right { text-align: left; }
       .resum-total-value { font-size: 32px; }
+      .bud-title { font-size: 32px; }
+      .bud-row { flex-wrap: wrap; }
+      .bud-row-dots { display: none; }
+      .bud-row-val { margin-left: auto; }
+      .bud-total { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .bud-total-value { font-size: 30px; }
     }
 
     @media print {
@@ -495,15 +627,15 @@ export function buildDossierHtml(
         background: #16140f !important;
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
       }
-      .resum-total {
+      .resum-total, .bud-total {
         background: #16140f !important;
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
       }
       .cta, .dossier-note, .intro-summary {
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
       }
-      .product-page, .resum-page { padding-top: 0; }
-      .producte, .resum-total, .resum-row, .cta, .peu { page-break-inside: avoid; }
+      .product-page, .resum-page, .bud-page { padding-top: 0; }
+      .producte, .resum-total, .resum-row, .bud-total, .bud-row, .cta, .peu { page-break-inside: avoid; }
     }
   </style>
   ${options.autoPrint ? '<script>window.addEventListener("load", function(){ window.print(); });</script>' : ''}
@@ -547,6 +679,8 @@ export function buildDossierHtml(
   ${producteBlocs}
 
   ${resumBloc}
+
+  ${budgetBloc}
 
   <div class="cta">
     <div class="cta-icon">✦</div>

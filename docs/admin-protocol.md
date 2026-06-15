@@ -1453,6 +1453,181 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #977 — 2026-06-15 — claude (TANCAT)
+
+**Partners 100% tokenitzat + mesura del deute de color global.**
+
+- `CollaboratorsClient.tsx` + `CollaboratorProductsPanel.tsx`: colors no-Òrbita → tokens (`ap-inline-alert--danger`, `text-[color:var(--ax-gold)]`, `text-[color:var(--ax-success)]`). Grep de collaborators net.
+- Mesura global (no fet a cegues): 95 fitxers admin / 1.461 ocurrències de colors Tailwind no-Òrbita. Cal mètode per dominis o guard; un replace massiu trencaria la UI (semàntica per context).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 976 -> 977.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: collaborators sense colors no-Òrbita.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #976 — 2026-06-15 — claude (TANCAT)
+
+**Erradicat OwnerControlStrip de tot l'admin (panell «Automàtic/Manual/Següent pas»).**
+
+- Context: el propietari fart del panell i del seu CSS no-Òrbita (cyan/sky/amber/emerald/white/black hardcodejats). Erradicar de tot l'admin.
+- `app/admin/components/OwnerControlStrip.tsx`: retorna `null` (desapareix de ~34 pàgines d'un cop, risc zero); signatura mantinguda perquè ~37 consumidors no es trenquin; eliminat `OwnerSignalCard` mort.
+- 4 skeletons (`AdminLoadingSkeleton{List,Dashboard,Inbox,Kanban}`): tret el placeholder orfe de l'strip.
+- Pendent neteja (sense impacte UI): treure import+JSX dels ~37 consumidors, en passades per domini.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 975 -> 976.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: strip fora de tota la UI; skeletons fidels.
+- Validació humana/UX: pendent del propietari (refrescar qualsevol pàgina admin).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #975 — 2026-06-15 — claude (TANCAT)
+
+**Partners: inputs canònics `.adm-input` (classe morta `.ap-input` fora).**
+
+- Context: passada canònica a `/admin/collaborators`. Troballa: `.ap-input` és classe MORTA (no existeix al CSS, usada a 30 fitxers); inputs nus + padding px hardcodejat.
+- `CollaboratorsClient.tsx` (9) + `CollaboratorProductsPanel.tsx` (9): inputs/select/textarea → `.adm-input` (+`--textarea`), tokenitzat, 0 px.
+- Troballes NO tocades (decisió propietari): `.ap-input` morta a ~28 fitxers admin més (migració global pendent); vocabulari Partner/Col·laborador; KPI grid 6 cols/7 items; colors amber/emerald puntuals.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 974 -> 975.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: inputs amb vora/fons/focus de la sèrie.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #974 — 2026-06-15 — claude (TANCAT)
+
+**Dossier: «Obrir fitxa» del lead (nova pestanya) + extres Masquerade ofertables.**
+
+- `DossierGeneratorClient.tsx`: enllaç «Obrir fitxa ↗» (`buildLeadWorkspaceHref`, target=_blank) quan hi ha lead vinculat → fitxa completa sense perdre el dossier en curs. CSS `.dg__linked-open`.
+- `collaboratorProductService.shouldShowDossierCollaboratorProduct`: + `pintacares professional` + `globoflexia` (extres ara seleccionables al dossier amb pressupost desglossat).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 973 -> 974.
+- Pendents (propietari): Mag manual (crear + afegir a allowlist); Col·laboradors a Catàleg?
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `vitest collaboratorProductService` 17/17 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: noms BD confirmats; enllaç a pestanya nova.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #973 — 2026-06-15 — claude (TANCAT)
+
+**Dossier: pressupost desglossat al final amb desplaçament per emplaçament.**
+
+- `lib/utils/dossier-html-builder.ts`: `buildBudgetBlock` (serveis + desplaçament desglossat + total) via helpers canònics de `travelCost`; tipus `DossierCopy.budget`; opcions `travelKm`/`location`; CSS `.bud-*` + responsive + print. Només si `travelKm>0`.
+- `messages/{ca,es,en}.json`: `dossier.budget`. `lib/constants/dossier-copy.ts`: resol `budget`.
+- `app/admin/dossiers/DossierGeneratorClient.tsx`: camp «Km desplaçament» → builder.
+- Tests: fixture `budget` + 3 nous (24/24).
+- Pendent: preomplir km des de `lead.distanceKm` (ampliar API cerca leads).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 972 -> 973.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `vitest dossier-html-builder` 24/24 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: total = serveis + suplement; «sense suplement» dins km inclosos.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #972 — 2026-06-15 — claude (TANCAT)
+
+**Dossier: eventType traduït («BIRTHDAY»→«Aniversari»), mai el codi cru.**
+
+- Context: la portada del dossier mostrava «BIRTHDAY» (codi enum) en comptes del label.
+- `app/admin/dossiers/DossierGeneratorClient.tsx`: `selectLead` usa `getEventLabel(lead.eventType)` (font `EVENT_TYPE_PLAIN`) per a l'`eventDesc`; import afegit.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 971 -> 972.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: lead BIRTHDAY → eventDesc «Aniversari · …».
+- Validació humana/UX: pendent del propietari (re-seleccionar/regenerar dossier de la Rose).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #971 — 2026-06-15 — claude (TANCAT)
+
+**Km inclosos unificats a 25/sentit (decisió del propietari) — una sola veritat.**
+
+- Context: resolta la divergència 20 vs 25 del #970. El propietari decideix 25 km.
+- `lib/services/travelCost.ts`: `INCLUDED_TRAVEL_KM` 40 → 50 (25/sentit). Font única; tots els consumidors deriven (`/2`) → web FAQ/blog (ja 25) + contracte + documents + pressupostos + portal + fitxa reserva, tots coherents.
+- `lib/constants/admin.ts`: literal `conditionsText` 20 → 25.
+- `scripts/seed-masquerade-products.mjs`: reexecutat (deriva de la constant) → «fins a 25 km» a BD.
+- `__tests__/lib/services/travelCost.test.ts`: 35 tests recalculats (billable/blocks/charge) + capçal alineat.
+- Impacte: amb 25 km/sentit inclosos es factura menys desplaçament en bolos llunyans (coherent amb promesa pública).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 970 -> 971.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `vitest` 5 fitxers travel/cost → 201/201 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: query BD confirma 25 km; tot deriva de la constant.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #970 — 2026-06-15 — claude (TANCAT)
+
+**«Desplaçament inclòs fins a 20 km» canònic al catàleg Masquerade + divergència 20/25 detectada.**
+
+- Context: el propietari demana que «Desplaçament inclòs» digui «fins a X km» amb el valor correcte.
+- `scripts/seed-masquerade-products.mjs`: `INCLUDES` usa `getIncludedTravelOneWayKm()` de `travelCost` (20 km/sentit, font única; zero hardcoded). Executat a Railway; confirmat a BD.
+- DIVERGÈNCIA detectada (decisió del propietari, NO tocada): 20 km (travelCost + admin.ts conditionsText) vs 25 km (messages FAQ ca/es + seed-blog). Cal unificar a la constant quan el propietari fixi el valor real.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 969 -> 970.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `vitest collaboratorProductService` 17/17 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: query BD confirma «...fins a 20 km...».
+- Validació humana/UX: pendent del propietari (decidir 20 vs 25 km).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #969 — 2026-06-15 — claude (TANCAT)
+
+**Bingo/Batalla Musical són de Masquerade: reactivats al seed + allowlist (corregeix #968).**
+
+- Context: el propietari corregeix que Bingo/Batalla són de Masquerade, no propis. El seed #956 els havia desactivat (no eren al Word) + trets de l'allowlist.
+- Verificat a BD: «Bingo Musical»/«Batalla Musical» de Masquerade (cat Animació adulta, cost 200→240) INACTIUS.
+- `scripts/seed-masquerade-products.mjs`: + Bingo/Batalla (cost 200, PVP 240, `isActive:true`). **Executat a Railway** (tots dos actius, confirmat).
+- `lib/services/collaboratorProductService.ts`: + `bingo musical`/`batalla musical` a l'allowlist.
+- `app/admin/dossiers/page.tsx`: revertit #968 (l'animació pròpia ja no va al generador; Bingo/Batalla via col·laborador).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 968 -> 969.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `vitest collaboratorProductService` 17/17 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: query BD confirma Bingo/Batalla actius (PVP 240).
+- Validació humana/UX: pendent del propietari a `/admin/dossiers`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #968 — 2026-06-15 — claude (TANCAT)
+
+**Bingo/Batalla Musical (animació pròpia) ofertables al generador de dossiers.**
+
+- Context: faltaven Bingo i Batalla Musical a `/admin/dossiers`. Els productes propis d'animació només eren a `lookupProducts`, no a `generatorProducts`.
+- `app/admin/dossiers/page.tsx`: `generatorProducts` inclou ara l'animació pròpia (exclou `dj` duplicat + dedup per nom contra col·laboradors). Bingo/Batalla surten amb preu (250) i categoria «Animació adulta».
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 967 -> 968.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: bingo-musical/batalla-musical a `generatorProducts`.
+- Validació humana/UX: pendent del propietari (refrescar i seleccionar).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #967 — 2026-06-15 — claude (TANCAT)
 
 **Sidebar: grup «Agenda»→«Comercial», reordenat pel flux + Col·laboradors connectat.**

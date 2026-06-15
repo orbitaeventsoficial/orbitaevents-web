@@ -57,7 +57,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 967;
+export const ADMIN_CHANGE_COUNTER = 977;
 
 export const ADMIN_DOSSIER_GENERATOR_COPY = {
   page: {
@@ -754,7 +754,7 @@ export const ADMIN_PACK_EDITOR_TABS: ReadonlyArray<{ id: PackEditorTab; label: s
 // ─── PDF Studio Defaults ────────────────────────────────────────────────
 
 export const ADMIN_PDF_STUDIO_DEFAULTS: Record<string, string> = {
-  conditionsText: `Reserva amb 30% per bloquejar la data.\nPagament final 7 dies abans de l'esdeveniment.\nDesplaçament inclòs fins a 20 km des de Granollers.`,
+  conditionsText: `Reserva amb 30% per bloquejar la data.\nPagament final 7 dies abans de l'esdeveniment.\nDesplaçament inclòs fins a 25 km des de Granollers.`,
   whyChooseUs: 'Equip tecnic professional, resposta rapida i proposta adaptada perque tot surti perfecte sense complicacions.',
   brandTagline: 'El teu esdeveniment. El teu estil. La teva nit perfecta.',
   cancellationPolicy: 'Cancel·lació fins a 30 dies: 100% devolució. 15-30 dies: 50%. Menys de 15 dies: no reemborsable.',

@@ -1,5 +1,5 @@
-/** Km inclosos al preu (anada+tornada). 40 a/t = 20 km per sentit des de Granollers. */
-export const INCLUDED_TRAVEL_KM = 40;
+/** Km inclosos al preu (anada+tornada). 50 a/t = 25 km per sentit des de Granollers. */
+export const INCLUDED_TRAVEL_KM = 50;
 export const DEFAULT_VEHICLE_COST_PER_KM = 0.19;
 /**
  * Km totals (anar a buscar + tornar) per recollir material de lloguer extern

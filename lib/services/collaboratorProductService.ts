@@ -119,14 +119,19 @@ function isMasqueradeProduct(product: CollaboratorProductForDossier): boolean {
 
 function shouldShowDossierCollaboratorProduct(product: CollaboratorProductForDossier): boolean {
   if (!isMasqueradeProduct(product)) return true;
-  // Capítols que poden sortir al dossier (noms canònics del catàleg del proveïdor).
-  // Els extres (pintacares, globoflèxia) es filtren a part per categoria, no aquí.
+  // Productes de Masquerade ofertables al dossier (noms canònics). Inclou els
+  // extres (pintacares, globoflèxia): ara són seleccionables al generador i entren
+  // al pressupost desglossat com a línia.
   const name = normalizeCatalogName(product.name);
   return [
     'animacio tematica',
     'animacio amb personatge',
     'el secret dels pirates',
     'animacio adults 1h',
+    'bingo musical',
+    'batalla musical',
+    'pintacares professional',
+    'globoflexia',
   ].includes(name);
 }
 

@@ -21,6 +21,7 @@ export async function getDossierCopy(locale = 'ca'): Promise<DossierCopy> {
     intro: t.raw('intro') as DossierCopy['intro'],
     chapter: t.raw('chapter') as DossierCopy['chapter'],
     resum: t.raw('resum') as DossierCopy['resum'],
+    budget: t.raw('budget') as DossierCopy['budget'],
     cta: t.raw('cta') as DossierCopy['cta'],
   };
 }

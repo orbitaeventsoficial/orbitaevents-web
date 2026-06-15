@@ -152,31 +152,31 @@ export default function CollaboratorProductsPanel({ collaboratorId, products, on
           <div className="grid gap-3 md:grid-cols-2">
             <div>
               <label htmlFor="prod-name" className="mb-1 block text-xs admin-tone-text-neutral">Nom *</label>
-              <input id="prod-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="ap-input w-full px-3 py-2" required />
+              <input id="prod-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="adm-input" required />
             </div>
             <div>
               <label htmlFor="prod-category" className="mb-1 block text-xs admin-tone-text-neutral">Categoria</label>
-              <input id="prod-category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} placeholder="Animació infantil, Musical, Extra..." className="ap-input w-full px-3 py-2" />
+              <input id="prod-category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} placeholder="Animació infantil, Musical, Extra..." className="adm-input" />
             </div>
             <div>
               <label htmlFor="prod-crew" className="mb-1 block text-xs admin-tone-text-neutral">Equip / crew</label>
-              <input id="prod-crew" value={form.crew} onChange={(e) => setForm({ ...form, crew: e.target.value })} placeholder="Animador + tècnic de so" className="ap-input w-full px-3 py-2" />
+              <input id="prod-crew" value={form.crew} onChange={(e) => setForm({ ...form, crew: e.target.value })} placeholder="Animador + tècnic de so" className="adm-input" />
             </div>
             <div>
               <label htmlFor="prod-duration" className="mb-1 block text-xs admin-tone-text-neutral">Durada</label>
-              <input id="prod-duration" value={form.durationLabel} onChange={(e) => setForm({ ...form, durationLabel: e.target.value })} placeholder="1h, 70 min..." className="ap-input w-full px-3 py-2" />
+              <input id="prod-duration" value={form.durationLabel} onChange={(e) => setForm({ ...form, durationLabel: e.target.value })} placeholder="1h, 70 min..." className="adm-input" />
             </div>
             <div>
               <label htmlFor="prod-cost" className="mb-1 block text-xs admin-tone-text-neutral">Cost net (€) *</label>
-              <input id="prod-cost" type="number" min={0} step={0.01} value={form.costPrice} onChange={(e) => handleCostChange(e.target.value)} className="ap-input w-full px-3 py-2" required />
+              <input id="prod-cost" type="number" min={0} step={0.01} value={form.costPrice} onChange={(e) => handleCostChange(e.target.value)} className="adm-input" required />
             </div>
             <div>
               <label htmlFor="prod-sell" className="mb-1 block text-xs admin-tone-text-neutral">El nostre PVP (€) *</label>
-              <input id="prod-sell" type="number" min={0} step={0.01} value={form.sellPrice} onChange={(e) => setForm({ ...form, sellPrice: e.target.value === '' ? '' : Number(e.target.value) })} className="ap-input w-full px-3 py-2" required />
+              <input id="prod-sell" type="number" min={0} step={0.01} value={form.sellPrice} onChange={(e) => setForm({ ...form, sellPrice: e.target.value === '' ? '' : Number(e.target.value) })} className="adm-input" required />
             </div>
             <div>
               <label htmlFor="prod-image" className="mb-1 block text-xs admin-tone-text-neutral">Imatge (ruta)</label>
-              <input id="prod-image" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} placeholder="/img/collaborators/masquerade/..." className="ap-input w-full px-3 py-2" />
+              <input id="prod-image" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} placeholder="/img/collaborators/masquerade/..." className="adm-input" />
             </div>
             <div className="flex items-end gap-2">
               <label htmlFor="prod-active" className="flex items-center gap-2 text-xs admin-tone-text-neutral">
@@ -190,11 +190,11 @@ export default function CollaboratorProductsPanel({ collaboratorId, products, on
               Text del dossier
               <span className="ml-2 text-white/40">Narrativa que es mostra al capítol del dossier comercial</span>
             </label>
-            <textarea id="prod-description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={4} placeholder="Explica l'experiència en to comercial. La marca del proveïdor es neteja automàticament: tot es presenta com a Òrbita." className="ap-input w-full px-3 py-2" />
+            <textarea id="prod-description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={4} placeholder="Explica l'experiència en to comercial. La marca del proveïdor es neteja automàticament: tot es presenta com a Òrbita." className="adm-input adm-input--textarea" />
           </div>
           <div>
             <label htmlFor="prod-includes" className="mb-1 block text-xs admin-tone-text-neutral">Què inclou</label>
-            <textarea id="prod-includes" value={form.includes} onChange={(e) => setForm({ ...form, includes: e.target.value })} rows={2} className="ap-input w-full px-3 py-2" />
+            <textarea id="prod-includes" value={form.includes} onChange={(e) => setForm({ ...form, includes: e.target.value })} rows={2} className="adm-input adm-input--textarea" />
           </div>
           <div className="flex items-center justify-between gap-4">
             {liveMargin && (
@@ -226,7 +226,7 @@ export default function CollaboratorProductsPanel({ collaboratorId, products, on
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-bold">{p.name}</p>
-                      {p.category && <p className="text-xs text-amber-400/80">{p.category}</p>}
+                      {p.category && <p className="text-xs text-[color:var(--ax-gold)]">{p.category}</p>}
                     </div>
                     {!p.isActive && <span className="ap-badge">Inactiu</span>}
                   </div>

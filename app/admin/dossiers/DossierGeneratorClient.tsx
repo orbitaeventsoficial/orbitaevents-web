@@ -4,9 +4,11 @@ import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_DOSSIER_GENERATOR_COPY } from '@/lib/constants/admin';
+import { getEventLabel } from '@/lib/constants';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import { DJ_EXTRA_HOUR_PRICE, DJ_FIRST_HOUR_PRICE, djPriceForHours } from '@/lib/constants/orbita-services';
 import { buildDossierHtml, type DossierCopy } from '@/lib/utils/dossier-html-builder';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import './dossiers.css';
 
 const DJ_FIRST_PRODUCT_ID = 'orbita:dj-primera-hora';
@@ -291,6 +293,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
   const [telefon, setTelefon] = useState(initialTelefon ?? '');
   const [email, setEmail] = useState(initialEmail ?? '');
   const [eventDesc, setEventDesc] = useState(initialEventDesc ?? '');
+  const [travelKm, setTravelKm] = useState('');
   const [salutacio, setSalutacio] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(
     new Set(parseInitialProductIds(initialProductIds).filter((id) => validProductIds.has(id))),
@@ -442,7 +445,8 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
     setEmail(lead.email ?? '');
     setTelefon(lead.phone ?? '');
     const parts: string[] = [];
-    if (lead.eventType && lead.eventType !== 'OTHER') parts.push(lead.eventType);
+    // Label traduït (BIRTHDAY → «Aniversari»), mai el codi cru de l'enum.
+    if (lead.eventType && lead.eventType !== 'OTHER') parts.push(getEventLabel(lead.eventType));
     if (lead.eventDate) parts.push(lead.eventDate.slice(0, 10));
     if (lead.eventLocation) parts.push(lead.eventLocation);
     setEventDesc(parts.join(' · '));
@@ -568,7 +572,14 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
         email: email.trim(), eventDesc: eventDesc.trim(),
         salutacio: salutacio.trim() || undefined,
       };
-      const html = buildDossierHtml(clientInfo, selected, dossierCopy, { autoPrint: mode === 'pdf', logoDataUri, locale: 'ca-ES' });
+      const km = Number(travelKm);
+      const html = buildDossierHtml(clientInfo, selected, dossierCopy, {
+        autoPrint: mode === 'pdf',
+        logoDataUri,
+        locale: 'ca-ES',
+        travelKm: Number.isFinite(km) && km > 0 ? km : undefined,
+        location: eventDesc.trim() || undefined,
+      });
       const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       if (mode === 'download') {
@@ -711,6 +722,15 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
               <span className="dg__linked-label">{ADMIN_DOSSIER_GENERATOR_COPY.client.linkedLeadLabel}</span>
               <span className="dg__linked-nom">{nom}</span>
               {email && <span className="dg__linked-email">{email}</span>}
+              <a
+                href={buildLeadWorkspaceHref(linkedLeadId)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="dg__linked-open"
+                title="Obre la fitxa completa del lead en una pestanya nova (no perds el dossier en curs)"
+              >
+                Obrir fitxa ↗
+              </a>
               <button type="button" className="dg__linked-clear" onClick={clearLinkedLead} aria-label="Desvincula el lead">
                 {ADMIN_DOSSIER_GENERATOR_COPY.client.changeLeadAction}
               </button>
@@ -843,6 +863,10 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
             <div className="dg__field dg__field--full">
               <label htmlFor="dg-event" className="dg__label">{ADMIN_DOSSIER_GENERATOR_COPY.client.eventSummaryLabel}</label>
               <input id="dg-event" type="text" className="adm-input" value={eventDesc} onChange={(e) => setEventDesc(e.target.value)} placeholder={ADMIN_DOSSIER_GENERATOR_COPY.client.eventSummaryPlaceholder} autoComplete="off" />
+            </div>
+            <div className="dg__field">
+              <label htmlFor="dg-travel-km" className="dg__label">Km desplaçament (anada + tornada)</label>
+              <input id="dg-travel-km" type="number" min={0} step={1} className="adm-input" value={travelKm} onChange={(e) => setTravelKm(e.target.value)} placeholder="Ex: 70" autoComplete="off" />
             </div>
             <div className="dg__field dg__field--full">
               <label htmlFor="dg-salutacio" className="dg__label">
