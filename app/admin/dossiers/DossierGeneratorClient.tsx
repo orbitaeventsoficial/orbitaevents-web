@@ -580,6 +580,9 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
       } else {
         window.open(url, '_blank', 'noopener,noreferrer');
       }
+    } catch (err) {
+      console.error('[DossierGenerator] generate error:', err);
+      toast.error('No he pogut generar el dossier.');
     } finally {
       setGenerating(false);
     }
@@ -656,7 +659,11 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
       setSavedId(data.id);
       if (sendOnSave) {
         const sendRes = await fetchWithCsrf(`/api/admin/dossiers/${data.id}/send`, { method: 'POST' });
-        if (!sendRes.ok) throw new Error('Error enviant');
+        if (!sendRes.ok) {
+          // El dossier ja s'ha desat: l'error és només d'enviament, no de desat.
+          toast.error('Dossier desat, però no s\'ha pogut enviar. Reenvia\'l des de la llista.');
+          return;
+        }
         toast.success('Dossier desat i enviat correctament');
       } else {
         toast.success('Dossier desat correctament');
@@ -691,7 +698,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
           <label htmlFor="dg-received-text" className="dg__label">{ADMIN_DOSSIER_GENERATOR_COPY.client.intakeLabel}</label>
           <textarea
             id="dg-received-text"
-            className="ix__forminput ix__forminput--textarea dg__intake-textarea"
+            className="adm-input adm-input--textarea dg__intake-textarea"
             value={receivedText}
             onChange={(event) => setReceivedText(event.target.value)}
             placeholder={ADMIN_DOSSIER_GENERATOR_COPY.client.intakePlaceholder}
@@ -714,7 +721,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
               <input
                 id="dg-search"
                 type="search"
-                className="ix__forminput"
+                className="adm-input"
                 placeholder="Nom, email o telèfon..."
                 value={searchQuery}
                 onChange={handleSearchChange}
@@ -760,7 +767,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
                   <input
                     id="dg-customer-search"
                     type="search"
-                    className="ix__forminput"
+                    className="adm-input"
                     placeholder="Nom, email o telèfon del client..."
                     value={customerQuery}
                     onChange={handleCustomerSearchChange}
@@ -819,30 +826,30 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
           <div className="dg__fields">
             <div className="dg__field">
               <label htmlFor="dg-nom" className="dg__label">Nom *</label>
-              <input id="dg-nom" type="text" className="ix__forminput" value={nom} onChange={(e) => { setNom(e.target.value); setCustomerConflict(null); }} placeholder="Adrià" autoComplete="off" />
+              <input id="dg-nom" type="text" className="adm-input" value={nom} onChange={(e) => { setNom(e.target.value); setCustomerConflict(null); }} placeholder="Adrià" autoComplete="off" />
             </div>
             <div className="dg__field">
               <label htmlFor="dg-empresa" className="dg__label">Empresa / Associació</label>
-              <input id="dg-empresa" type="text" className="ix__forminput" value={empresa} onChange={(e) => setEmpresa(e.target.value)} placeholder="Associació de Veïns de Rubí" autoComplete="off" />
+              <input id="dg-empresa" type="text" className="adm-input" value={empresa} onChange={(e) => setEmpresa(e.target.value)} placeholder="Associació de Veïns de Rubí" autoComplete="off" />
             </div>
             <div className="dg__field">
               <label htmlFor="dg-telefon" className="dg__label">Telèfon</label>
-              <input id="dg-telefon" type="tel" className="ix__forminput" value={telefon} onChange={(e) => { setTelefon(e.target.value); setCustomerConflict(null); }} placeholder="+34 654 46 70 87" autoComplete="off" />
+              <input id="dg-telefon" type="tel" className="adm-input" value={telefon} onChange={(e) => { setTelefon(e.target.value); setCustomerConflict(null); }} placeholder="+34 654 46 70 87" autoComplete="off" />
             </div>
             <div className="dg__field">
               <label htmlFor="dg-email" className="dg__label">Email</label>
-              <input id="dg-email" type="email" className="ix__forminput" value={email} onChange={(e) => { setEmail(e.target.value); setCustomerConflict(null); }} placeholder="client@exemple.com" autoComplete="off" />
+              <input id="dg-email" type="email" className="adm-input" value={email} onChange={(e) => { setEmail(e.target.value); setCustomerConflict(null); }} placeholder="client@exemple.com" autoComplete="off" />
             </div>
             <div className="dg__field dg__field--full">
               <label htmlFor="dg-event" className="dg__label">{ADMIN_DOSSIER_GENERATOR_COPY.client.eventSummaryLabel}</label>
-              <input id="dg-event" type="text" className="ix__forminput" value={eventDesc} onChange={(e) => setEventDesc(e.target.value)} placeholder={ADMIN_DOSSIER_GENERATOR_COPY.client.eventSummaryPlaceholder} autoComplete="off" />
+              <input id="dg-event" type="text" className="adm-input" value={eventDesc} onChange={(e) => setEventDesc(e.target.value)} placeholder={ADMIN_DOSSIER_GENERATOR_COPY.client.eventSummaryPlaceholder} autoComplete="off" />
             </div>
             <div className="dg__field dg__field--full">
               <label htmlFor="dg-salutacio" className="dg__label">
                 {ADMIN_DOSSIER_GENERATOR_COPY.client.introLabel}
                 <span className="dg__label-hint">{ADMIN_DOSSIER_GENERATOR_COPY.client.introHint}</span>
               </label>
-              <textarea id="dg-salutacio" className="ix__forminput ix__forminput--textarea" value={salutacio} onChange={(e) => setSalutacio(e.target.value)} placeholder={ADMIN_DOSSIER_GENERATOR_COPY.client.introPlaceholder} rows={4} />
+              <textarea id="dg-salutacio" className="adm-input adm-input--textarea" value={salutacio} onChange={(e) => setSalutacio(e.target.value)} placeholder={ADMIN_DOSSIER_GENERATOR_COPY.client.introPlaceholder} rows={4} />
             </div>
           </div>
       </section>
@@ -948,6 +955,11 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
         <section className="dg__panel dg__catalog-panel">
           <h2 className="dg__section-title">{ADMIN_DOSSIER_GENERATOR_COPY.catalog.title}</h2>
           <p className="dg__section-hint">{ADMIN_DOSSIER_GENERATOR_COPY.catalog.hint}</p>
+          {productGroups.length === 0 && (
+            <p className="dg__catalog-empty">
+              Encara no hi ha cap servei al catàleg. Activa productes a Òrbita o als col·laboradors per poder muntar el dossier.
+            </p>
+          )}
           <div className="dg__product-groups">
             {productGroups.map(({ group, items }) => (
               <section key={group} className="dg__product-group">

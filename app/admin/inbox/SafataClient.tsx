@@ -136,6 +136,12 @@ const TPLS = [
   },
 ];
 
+/* Missatges d'error del compositor (copy local únic; no és catàleg de domini) */
+const ERR_SEND_TIMEOUT = 'No s\'ha pogut connectar amb el servidor de correu (timeout SMTP). El missatge NO s\'ha enviat. Torna-ho a provar d\'aquí uns segons o revisa la configuració.';
+const ERR_SEND_GENERIC = 'No s\'ha pogut enviar el correu. El missatge NO s\'ha enviat; pots reintentar-ho.';
+const ERR_NETWORK = 'Error de connexió amb el servidor. El missatge NO s\'ha enviat; comprova la xarxa i torna-ho a provar.';
+const ERR_DRAFT = 'No s\'ha pogut desar l\'esborrany. Torna-ho a provar.';
+
 const ICONS: Record<Exclude<SpecialUse, null> | 'custom', string> = {
   inbox: '📥',
   sent: '📤',
@@ -217,6 +223,15 @@ export default function SafataClient({
   const [selectedImap, setSelectedImap] = useState<ImapEmail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [selectedUids, setSelectedUids] = useState<Set<number>>(new Set());
+  /* Feedback transitori d'accions de bústia (bulk/individuals) */
+  const [actionFeedback, setActionFeedback] = useState<{ type: 'error' | 'ok'; text: string } | null>(null);
+  const feedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const flashFeedback = useCallback((type: 'error' | 'ok', text: string) => {
+    setActionFeedback({ type, text });
+    if (feedbackTimer.current) clearTimeout(feedbackTimer.current);
+    feedbackTimer.current = setTimeout(() => setActionFeedback(null), 4500);
+  }, []);
+  useEffect(() => () => { if (feedbackTimer.current) clearTimeout(feedbackTimer.current); }, []);
   const [composerOpen, setComposerOpen] = useState<null | {
     mode: 'new' | 'reply' | 'reply-all' | 'forward' | 'lead-reply';
     email?: ImapEmail;
@@ -377,9 +392,12 @@ export default function SafataClient({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ uids, folder, action, targetFolder }),
       });
-      const data = await res.json() as { ok: boolean; error?: string };
-      if (!data.ok) {
+      const data = await res.json().catch(() => ({})) as { ok?: boolean; error?: string };
+      if (!res.ok || !data.ok) {
         console.error('[Safata] Bulk action error:', data.error);
+        flashFeedback('error', data.error || `No s'ha pogut completar l'acció sobre ${uids.length} correu${uids.length === 1 ? '' : 's'}.`);
+        // Recarrega per restaurar l'estat real del servidor (rollback de l'optimisme).
+        invalidateFolder(folder);
         return;
       }
       // Invalida tant la carpeta origen com la target
@@ -388,8 +406,11 @@ export default function SafataClient({
       clearSelection();
       setSelectedImap(null);
       loadFolders(); // refresh comptadors
+      flashFeedback('ok', `${uids.length} correu${uids.length === 1 ? '' : 's'} actualitzat${uids.length === 1 ? '' : 's'}.`);
     } catch (err) {
       console.error('[Safata] Bulk action error:', err);
+      flashFeedback('error', 'Error de connexió en l\'acció en lot. Cap canvi aplicat.');
+      invalidateFolder(folder);
     }
   };
 
@@ -472,8 +493,13 @@ export default function SafataClient({
           [folder]: (prev[folder] || []).map(e => e.uid === email.uid ? { ...e, isFlagged: flag } : e),
         }));
         setSelectedImap(prev => prev?.uid === email.uid ? { ...prev, isFlagged: flag } : prev);
+      } else {
+        flashFeedback('error', flag ? 'No s\'ha pogut marcar el correu.' : 'No s\'ha pogut treure la marca.');
       }
-    } catch (err) { console.error('[Safata] setFlag error:', err); }
+    } catch (err) {
+      console.error('[Safata] setFlag error:', err);
+      flashFeedback('error', 'Error de connexió en marcar el correu.');
+    }
   };
 
   const markUnread = async (email: ImapEmail, folderOverride?: string) => {
@@ -492,8 +518,13 @@ export default function SafataClient({
         }));
         setSelectedImap(null);
         loadFolders();
+      } else {
+        flashFeedback('error', 'No s\'ha pogut marcar com a no llegit.');
       }
-    } catch (err) { console.error('[Safata] markUnread error:', err); }
+    } catch (err) {
+      console.error('[Safata] markUnread error:', err);
+      flashFeedback('error', 'Error de connexió.');
+    }
   };
 
   const deleteSingle = async (email: ImapEmail, folderOverride?: string) => {
@@ -510,8 +541,14 @@ export default function SafataClient({
         if (special?.trash) invalidateFolder(special.trash);
         setSelectedImap(null);
         loadFolders();
+        flashFeedback('ok', 'Correu mogut a la paperera.');
+      } else {
+        flashFeedback('error', 'No s\'ha pogut esborrar el correu.');
       }
-    } catch (err) { console.error('[Safata] delete error:', err); }
+    } catch (err) {
+      console.error('[Safata] delete error:', err);
+      flashFeedback('error', 'Error de connexió en esborrar.');
+    }
   };
 
   const moveSingle = async (email: ImapEmail, targetFolder: string, folderOverride?: string) => {
@@ -528,8 +565,14 @@ export default function SafataClient({
         invalidateFolder(targetFolder);
         setSelectedImap(null);
         loadFolders();
+        flashFeedback('ok', 'Correu mogut de carpeta.');
+      } else {
+        flashFeedback('error', 'No s\'ha pogut moure el correu.');
       }
-    } catch (err) { console.error('[Safata] move error:', err); }
+    } catch (err) {
+      console.error('[Safata] move error:', err);
+      flashFeedback('error', 'Error de connexió en moure.');
+    }
   };
 
   /* Ordenació */
@@ -738,6 +781,17 @@ export default function SafataClient({
           <span className="sf__pane-count">{paneCount}</span>
         </div>
 
+        {actionFeedback && (
+          <div
+            className={`sf__pane-feedback${actionFeedback.type === 'error' ? ' is-error' : ' is-ok'}`}
+            role={actionFeedback.type === 'error' ? 'alert' : 'status'}
+          >
+            <span className="sf__pane-feedback-text">{actionFeedback.text}</span>
+            <button type="button" className="sf__pane-feedback-close" aria-label="Tancar avís"
+              onClick={() => setActionFeedback(null)}>✕</button>
+          </div>
+        )}
+
         {active.kind === 'folder' && selectedUids.size > 0 && (
           <div className="sf__pane-actions" role="toolbar" aria-label="Accions en lot">
             <span className="sf__pane-actions-count">{selectedUids.size} seleccionat{selectedUids.size === 1 ? '' : 's'}</span>
@@ -833,12 +887,15 @@ export default function SafataClient({
                       <button type="button"
                         className={`sf__iconbtn${email.isFlagged ? ' is-on' : ''}`}
                         title={email.isFlagged ? 'Treure marca' : 'Marcar'}
+                        aria-label={email.isFlagged ? 'Treure marca' : 'Marcar'}
+                        aria-pressed={email.isFlagged}
                         onClick={e => { e.stopPropagation(); setFlagSingle(email, !email.isFlagged); }}>
                         {email.isFlagged ? '★' : '☆'}
                       </button>
                       <button type="button"
                         className="sf__iconbtn sf__iconbtn--danger"
                         title="Esborrar"
+                        aria-label="Esborrar correu"
                         onClick={e => { e.stopPropagation(); deleteSingle(email); }}>
                         🗑
                       </button>
@@ -1032,8 +1089,8 @@ function ExtractEmailModal({
                 ))}
               </select>
             </div>
-            <div className="sf__extract-row" style={{ gridTemplateColumns: '130px 1fr', alignItems: 'start' }}>
-              <span className="sf__extract-lbl" style={{ paddingTop: 12 }}>Missatge</span>
+            <div className="sf__extract-row sf__extract-row--msg">
+              <span className="sf__extract-lbl">Missatge</span>
               <textarea
                 value={message}
                 onChange={e => setMessage(e.target.value)}
@@ -1046,7 +1103,7 @@ function ExtractEmailModal({
           <p className="sf__extract-hint">
             Es crearà un lead amb estat CONTACTED i s&apos;intentarà vincular al client existent.
           </p>
-          {error && <p className="sf__action-error" style={{ padding: '8px 16px' }}>{error}</p>}
+          {error && <p className="sf__action-error sf__action-error--padded">{error}</p>}
         </div>
         <div className="sf__modal-footer">
           <button type="button" onClick={handleCreate} disabled={saving || !name.trim() || !emailVal.trim()} className="sf__action-btn sf__action-btn--primary">
@@ -1208,9 +1265,12 @@ function Composer({
             : undefined,
         }),
       });
-      const data = await res.json() as { ok: boolean; error?: string };
-      if (!data.ok) {
-        setError(data.error || 'Error enviant');
+      const data = await res.json().catch(() => ({})) as { ok?: boolean; error?: string };
+      if (!res.ok || !data.ok) {
+        // L'API retorna 504 amb missatge clar per timeout SMTP; la resta, 500.
+        const serverMsg = data.error
+          || (res.status === 504 ? ERR_SEND_TIMEOUT : ERR_SEND_GENERIC);
+        setError(serverMsg);
         setSending(false);
         return;
       }
@@ -1218,7 +1278,7 @@ function Composer({
       setTimeout(onSent, 1200);
     } catch (err) {
       console.error('[Composer] Error:', err);
-      setError('Error de connexió');
+      setError(ERR_NETWORK);
     } finally {
       setSending(false);
     }
@@ -1242,12 +1302,12 @@ function Composer({
           orbita: orbitaCtx,
         }),
       });
-      const data = await res.json() as { ok: boolean; error?: string };
-      if (!data.ok) { setError(data.error || 'Error desant esborrany'); return; }
+      const data = await res.json().catch(() => ({})) as { ok?: boolean; error?: string };
+      if (!res.ok || !data.ok) { setError(data.error || ERR_DRAFT); return; }
       onClose();
     } catch (err) {
       console.error('[Composer] Draft error:', err);
-      setError('Error de connexió');
+      setError(ERR_NETWORK);
     } finally {
       setSavingDraft(false);
     }
@@ -1506,18 +1566,18 @@ function ImapDetail({
           )}
           <div className="sf__detail-acts-group">
             {!outbound && (
-              <button type="button" onClick={onReplyAll} className="sf__iconbtn" title="Respondre a tothom">↩↩</button>
+              <button type="button" onClick={onReplyAll} className="sf__iconbtn" title="Respondre a tothom" aria-label="Respondre a tothom">↩↩</button>
             )}
-            <button type="button" onClick={onForward} className="sf__iconbtn" title="Reenviar">➡</button>
-            <button type="button" onClick={() => onFlag(!email.isFlagged)} className={`sf__iconbtn${email.isFlagged ? ' is-on' : ''}`} title={email.isFlagged ? 'Treure marca' : 'Marcar amb estrella'}>
+            <button type="button" onClick={onForward} className="sf__iconbtn" title="Reenviar" aria-label="Reenviar">➡</button>
+            <button type="button" onClick={() => onFlag(!email.isFlagged)} className={`sf__iconbtn${email.isFlagged ? ' is-on' : ''}`} title={email.isFlagged ? 'Treure marca' : 'Marcar amb estrella'} aria-label={email.isFlagged ? 'Treure marca' : 'Marcar amb estrella'} aria-pressed={email.isFlagged}>
               {email.isFlagged ? '★' : '☆'}
             </button>
             <MoveDropdown folders={folders} special={special} currentPath={currentPath} onMove={onMove} />
             {!outbound && (
-              <button type="button" onClick={onMarkUnread} className="sf__iconbtn" title="Marcar com no llegit">○</button>
+              <button type="button" onClick={onMarkUnread} className="sf__iconbtn" title="Marcar com no llegit" aria-label="Marcar com a no llegit">○</button>
             )}
           </div>
-          <button type="button" onClick={onDelete} className="sf__iconbtn sf__iconbtn--danger sf__iconbtn--standalone" title="Esborrar">🗑</button>
+          <button type="button" onClick={onDelete} className="sf__iconbtn sf__iconbtn--danger sf__iconbtn--standalone" title="Esborrar" aria-label="Esborrar correu">🗑</button>
           <button type="button" onClick={onClose} className="sf__detail-close" aria-label="Tancar">✕</button>
         </div>
       </div>

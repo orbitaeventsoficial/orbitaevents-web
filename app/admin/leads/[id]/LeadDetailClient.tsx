@@ -1,5 +1,17 @@
 'use client';
 
+// ─────────────────────────────────────────────────────────
+// ✅ TANCAT CHARLIE — validat pel propietari (2026-06-15)
+// Fitxa de lead (/admin/leads/[id]). Zenit: header ledger en
+// una sola pantalla (nom protagonista + rail de fets + marge
+// real via computeBookingFinancialSummary), bolo canònic
+// (BoloConfigurator), cobraments gestionats a la fitxa de
+// RESERVA (no al lead), històric comercial al peu. Helpers
+// monocapa (formatCurrency, buildLeadWhatsAppHref). A11y:
+// aria-label a inputs/botons d'icona. Patró de referència per
+// a la resta de fitxes de l'admin. Millorar sense reobrir.
+// ─────────────────────────────────────────────────────────
+
 import Link from 'next/link';
 import { useState, useTransition, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -7,11 +19,7 @@ import { buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
 import LeadBoloSection, { type BoloEconomia } from './LeadBoloSection';
 import CommercialDocumentsHistory, { type CommercialDocumentHistoryItem } from '@/app/admin/components/CommercialDocumentsHistory';
-
-function buildLeadWhatsAppHref(phone: string, name: string): string {
-  const msg = `Hola ${name}! Et contactem des d'Òrbita Events per la teva sol·licitud.`;
-  return `https://wa.me/${phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(msg)}`;
-}
+import { buildLeadWhatsAppHref } from '../leadWhatsApp';
 import { patchLeadStatus } from '../leadStatusClient';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
@@ -393,22 +401,26 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
               editField === f ? (
                 <span key={f} className="fxd__editrow fxd__hd-reachedit">
                   <input className="fxd__editinput" value={editValue} type={f === 'email' ? 'email' : 'tel'}
+                    aria-label={f === 'phone' ? 'Telèfon del lead' : 'Email del lead'}
                     onChange={(e) => setEditValue(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} autoFocus />
-                  <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
-                  <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
+                  <button type="button" className="fxd__savebtn" onClick={saveEdit} disabled={savePending} aria-label="Desar">✓</button>
+                  <button type="button" className="fxd__cancelbtn" onClick={cancelEdit} aria-label="Cancel·lar">✕</button>
                 </span>
               ) : (
-                <button key={f} type="button" className="fxd__hd-reachitem" onClick={() => startEdit(f)}>
+                <button key={f} type="button" className="fxd__hd-reachitem" onClick={() => startEdit(f)} aria-label={f === 'phone' ? 'Editar telèfon' : 'Editar email'}>
                   <span className="fxd__hd-reachlbl">{f === 'phone' ? 'Tel.' : 'Email'}</span>
                   <span className="fxd__hd-reachval">{fields[f] || <em className="fxd__empty">Afegir</em>}</span>
                 </button>
               )
             ))}
             <span className="fxd__hd-reachbtns">
-              {fields.phone && (
-                <a href={buildLeadWhatsAppHref(fields.phone, lead.name)} target="_blank" rel="noopener noreferrer" className="fxd__btn fxd__btn--whatsapp fxd__btn--sm">WhatsApp</a>
-              )}
+              {(() => {
+                const waHref = buildLeadWhatsAppHref(fields.phone, lead.name);
+                return waHref ? (
+                  <a href={waHref} target="_blank" rel="noopener noreferrer" className="fxd__btn fxd__btn--whatsapp fxd__btn--sm">WhatsApp</a>
+                ) : null;
+              })()}
               <Link href={buildLeadComposeHref(lead.id, 'seguiment')} className="fxd__btn fxd__btn--mail fxd__btn--sm">Correu</Link>
             </span>
           </div>
@@ -428,13 +440,14 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
               {editField === f ? (
                 <span className="fxd__editrow">
                   <input className="fxd__editinput" type={type} value={editValue} autoFocus min={type === 'number' ? 1 : undefined}
+                    aria-label={lbl}
                     onChange={(e) => setEditValue(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }} />
-                  <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
-                  <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
+                  <button type="button" className="fxd__savebtn" onClick={saveEdit} disabled={savePending} aria-label="Desar">✓</button>
+                  <button type="button" className="fxd__cancelbtn" onClick={cancelEdit} aria-label="Cancel·lar">✕</button>
                 </span>
               ) : (
-                <button type="button" className="fxd__fact-val" onClick={() => startEdit(f)}>
+                <button type="button" className="fxd__fact-val" onClick={() => startEdit(f)} aria-label={`Editar ${lbl}`}>
                   {show(String(fields[f] ?? '')) || <em className="fxd__empty">+</em>}
                 </button>
               )}
@@ -462,14 +475,15 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
             {editField === 'budget' ? (
               <span className="fxd__editrow">
                 <input className="fxd__editinput" type="number" min={0} value={editValue}
+                  aria-label="Valor del lead"
                   onChange={(e) => setEditValue(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit(); }}
                   autoFocus />
-                <button className="fxd__savebtn" onClick={saveEdit} disabled={savePending}>✓</button>
-                <button className="fxd__cancelbtn" onClick={cancelEdit}>✕</button>
+                <button type="button" className="fxd__savebtn" onClick={saveEdit} disabled={savePending} aria-label="Desar">✓</button>
+                <button type="button" className="fxd__cancelbtn" onClick={cancelEdit} aria-label="Cancel·lar">✕</button>
               </span>
             ) : (
-              <button type="button" className="fxd__fact-val fxd__fact-val--big" onClick={() => startEdit('budget')}>
+              <button type="button" className="fxd__fact-val fxd__fact-val--big" onClick={() => startEdit('budget')} aria-label="Editar valor">
                 {fields.budget
                     ? formatCurrency(Number(fields.budget))
                     : (() => {

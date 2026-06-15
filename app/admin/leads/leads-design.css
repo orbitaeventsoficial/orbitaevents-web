@@ -539,6 +539,23 @@
 
 .fx__placeholder { color: var(--t3); font-family: var(--mono); font-size: var(--o-text-sm); padding: 40px 0; }
 
+/* Empty state global del calendari — cap lead a tota la temporada */
+.fx__calempty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.5rem; text-align: center;
+  margin-bottom: 0.75rem; padding: clamp(1.5rem, 5vi, 2.75rem) 1rem;
+  border: 1px dashed var(--line2); border-radius: var(--o-r-md);
+  background: color-mix(in oklab, var(--sunk) 45%, transparent);
+}
+.fx__calempty-tx {
+  font-family: var(--display); font-size: var(--o-text-lg); font-weight: var(--o-fw-bold);
+  letter-spacing: -0.01em; color: var(--t2);
+}
+.fx__calempty-sub {
+  font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t3);
+  margin-bottom: 0.35rem;
+}
+
 /* Valor € a la targeta del calendari — al celltop, sempre visible */
 .fx__cval { font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); color: color-mix(in oklab, var(--gold) 65%, var(--t2)); white-space: nowrap; flex: none; font-variant-numeric: tabular-nums; }
 

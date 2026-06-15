@@ -1,3 +1,218 @@
+## 2026-06-15 — Sidebar: grup «Agenda»→«Comercial», reordenat pel flux + Col·laboradors connectat (Canvi #967, claude)
+
+### Resum
+El propietari pregunta «per què Dossiers viu a Agenda?» i demana «la millor opció possible» per redistribuir la nav amb lògica. El grup del sidebar es deia «Agenda» (sona temporal) però conté tot el nucli comercial → nom confús. Pas segur i de valor visible immediat; la unificació tècnica de les 3 fonts de nav (D9, toca cercador + test) es deixa per fer amb el propietari present.
+
+### Què s'ha fet
+- `app/admin/layout.tsx` `NAV_GROUPS`: el grup `agenda` es renombra a **«Comercial»** (id intacte per no trencar `getGroupForPath`), items reordenats pel flux (Temporada → Reserves → Pressupostos → Dossiers → Clients → Col·laboradors → Arxiu), i **Col·laboradors connectat** al grup (abans era cable solt, només accessible per enllaços interns/cercador).
+- `getGroupForPath`: `/admin/collaborators` mapejat al grup comercial (es marca actiu en obrir la fitxa de partner).
+- Canvi mínim de DADES (el render accordion del sidebar no es toca). Resol la queixa directa («Dossiers a Agenda»).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: el sidebar és accordion (grups desplegables); amb el dev net (reinici post-.next-corromput) torna a desplegar-se.
+- Validació humana/UX: pendent repassada del propietari del nou grup «Comercial».
+
+### Pendent (D9 complet — amb el propietari present)
+Unificar les TRES fonts de nav (`layout.tsx NAV_GROUPS` + `nav-items.ts NAV_SECTIONS` + protocol §4) en `lib/admin/admin-nav.ts` (monocapa real; toca cercador `AdminSearchModal` + test `adminCommandPaletteService.test.ts`). Reordenar la resta de grups (Operativa/Catàleg/Creixement/Sistema) i decidir desplegables. Requereix validació visual.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 966 → 967. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-15 — Atles v2 (auditoria de cablejat) + costura dossiers→.adm-input tancada (Canvi #966, claude + Opus)
+
+### Resum
+Agent Opus d'auditoria de cablejat de tot l'admin (per ordre del propietari: «revisar cada connexió, fer un mapa, cable per cable»). Va caure pel límit de sessió però va deixar l'atles v2 escrit i un fix aplicat. S'integra i es valida.
+
+### Què s'ha fet (per l'agent Opus, validat per claude)
+- **`docs/admin-organisme-atles.md` v2 — auditoria de cablejat** (revalidada fitxer:línia): veredicte (el cablejat profund del nucli comercial està ben cosit; el que desafina és la NAVEGACIÓ i poques costures CSS/labels); **D9** (la nav té TRES fonts divergents: `layout.tsx NAV_GROUPS` + `nav-items.ts NAV_SECTIONS` + protocol §4 → proposa font única `lib/admin/admin-nav.ts`); **D10** (labels de lead duplicats; `PAY_LABEL` divergeix «Pagat» vs «Pagada»); **D11** (costura CSS: (a) dossiers usava `.ix__forminput` d'inbox — RESOLT; (b) `BookingTotalEditor` usa `.fxd__savebtn/cancelbtn` de leads — proposat). Va descartar 2 falsos positius d'un informe extern (cables `?to=`/`?proposalId=` SÍ es consumeixen).
+- **D11(a) APLICAT**: `dossiers/DossierGeneratorClient.tsx` migrat de `.ix__forminput` (9 usos) → `.adm-input` canònic. La cara de dossiers ja no depèn del CSS de l'inbox (el #961 ja n'havia mogut la definició a `admin-shell.css`). L'àlies `.ix__forminput` es manté per inbox/settings.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0. `ix__forminput` a dossiers = 0; àlies a admin-shell intacte (5).
+- Validació funcional: cap cable trencat crític segons l'auditoria; nucli comercial ben cosit.
+- Validació humana/UX: pendent del propietari les decisions de D9 (unificar nav: ordre/noms/desplegables), D10 (copy «Pagat» vs «Pagada»), D11(b) (botó canònic).
+
+### Pendents que necessiten DECISIÓ del propietari (de l'atles v2)
+- **D9**: unificar les 3 fonts de nav en `lib/admin/admin-nav.ts` (sidebar + cercador + getGroupForPath) — i el nou ordre/noms (renombrar «Agenda»→«Comercial», desplegables?).
+- **D10**: fixar el copy `PAY_LABEL` («Pagat» o «Pagada») abans de centralitzar els labels.
+- **D11(b)** + capçaleres unificades sota `AdminPage`: refactors a planificar.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Agent Opus caigut per límit (reset 13:10) després de deixar l'atles v2. Counter 965 → 966. SENSE commit.
+
+- Començat per: `claude` (+ agent `opus`)
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-15 — Esquema absolut de cables + Atles/Esquema/Full de ruta al sidebar (Canvi #965, claude)
+
+### Resum
+El propietari vol un esquema/diagrama ABSOLUT de tot —cada òrgan amb la seva alçada (jerarquia), prioritat, temps i funció, i totes les connexions «pam de cable per pam de cable»— encara que sigui imperfecte («ja ho millorarem»). I que tot estigui disponible a l'admin. Descoberta prèvia (gràcies a la seva pregunta «per què Dossiers viu a Agenda?»): la navegació està DUPLICADA (D9) entre `layout.tsx::NAV_GROUPS` (sidebar real) i `nav-items.ts` (cercador) → no es va revisar a l'auditoria.
+
+### Què s'ha fet
+- **`docs/admin-esquema-absolut.md` (NOU)**: radiografia v0 generada per **extracció real del codi** (no a ull): diagrama del flux vital, taula mestra d'òrgans (alçada H1/H2/H3 · prioritat · temps · funció), cables de navegació (top destins reals via grep de href/router), cables UI→API (endpoints cridats), funcions de negoci (serveis CORE vs suport amb la seva alçada), i llista de cables solts/trencats (D9, Safata/Col·laboradors fora del sidebar, grup «Agenda» mal anomenat, `getGroupForPath` sense `/admin/docs`).
+- **Accés admin**: nova pàgina `/admin/docs/esquema` (reutilitza el `MarkdownView` + `docs-view.css` compartits del #963).
+- **Sidebar real (`layout.tsx::NAV_GROUPS` grup Sistema)**: afegides Atles + Esquema absolut + Full de ruta com a secondary (abans «Atles»/«Full de ruta» només eren a `nav-items.ts` → cercador, NO sidebar; error corregit). Pendent: unificar la nav (D9) — feina de l'agent d'auditoria en curs + validació del propietari.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: l'esquema es genera de dades reals del codi (greps de href/fetch/imports).
+- Validació humana/UX: pendent repassada del propietari a `/admin/docs/esquema`; és v0 explícitament imperfecte.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Agent Opus d'auditoria de cablejat en marxa (escriu a `admin-organisme-atles.md` v2). Counter 964 → 965. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-15 — Full de ruta ajustat a la realitat de negoci: sense banc, passarel·la aparcada (Canvi #964, claude)
+
+### Resum
+El propietari informa d'una restricció clau: Òrbita NO té estructura legal/fiscal/bancària formal (sense autònom, sense empresa, sense mitjans bancaris ni passarel·la). Avui el sistema és una eina interna de gestió/conversió, no una plataforma transaccional. La passarel·la de pagament «no és important ara».
+
+### Què s'ha fet
+- `docs/producte-zenit-full-de-ruta.md` (v1.1): nova secció **§0 RESTRICCIÓ DE REALITAT DE NEGOCI** que re-prioritza tot el document — APARCAT (fins formalització): pagament al portal, passarel·la, facturació IVA; el cobrament es marca MANUALMENT (semàfor `depositPaid`/`remainingPaid` existent). SÍ aporten valor ara (no depenen de banc): captació, proposta/dossier, automatització de SEGUIMENT, pipeline ponderat, execució/capacitat, CRM/recurrència, reviews.
+- Fase 1A reescrita: «Proposta → acceptació → reserva (SENSE pagament)»; el pagament passa a **1A-bis APARCAT**.
+- §7 decisions: passarel·la tatxada (es reactiva quan el propietari es formalitzi).
+- Confirmat: atles + full de ruta accessibles des de l'admin (`/admin/docs/organisme`, `/admin/docs/full-de-ruta`).
+
+### Validació
+- Validació tècnica: només document (.md); `pnpm run qa:protocol` OK (counter alineat). Sense canvi de codi → no cal validate:core/build.
+- Validació funcional: el full de ruta ja no recomana construir cobrament/passarel·la impossibles.
+- Validació humana/UX: pendent repassada del propietari del document ajustat.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 963 → 964. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-15 — Meta + Full de ruta (fusió visió expert) accessible des de l'admin (Canvi #963, claude)
+
+### Resum
+El propietari demana, a més de la radiografia (atles), una META (idealització del producte final segons el que disposa) i un FULL DE RUTA per arribar-hi, fets per un expert en software de gestió d'esdeveniments. Llançat un Opus expert (event-SaaS) que va lliurar `docs/producte-visio-expert.md`. Encàrrec: esperar-lo i fusionar-ho tot.
+
+### Què s'ha fet
+- **Fusió en un sol document mestre** `docs/producte-zenit-full-de-ruta.md`: base = visió de l'expert (diagnòstic sense complaença, «un dia al zenit», capacitats que falten, fases per impacte conversió→execució→cobrament→recurrència, quick wins vs apostes, riscos) + aportació del draft (principi de l'embut, ritme de treball, decisions obertes consolidades en una sola llista). **Eliminat `producte-visio-expert.md`** (absorbit; la norma anti-duplicació també val per als docs).
+- **Accessible des de l'admin**: nova pàgina `/admin/docs/full-de-ruta` + entrada de nav «🎯 Meta + Full de ruta».
+- **Renderer Markdown compartit (monocapa)**: mogut `MarkdownView.tsx` + CSS d'`/admin/docs/organisme/` a nivell compartit `app/admin/docs/` (`MarkdownView.tsx` + `docs-view.css`); les 2 pàgines (organisme + full-de-ruta) el consumeixen. Eliminats els duplicats per-pàgina. loading.tsx d'ambdues importa el CSS compartit.
+
+### Diagnòstic clau de l'expert (per al propietari)
+Òrbita ja té el difícil d'un event-SaaS de primer nivell (marge real amb dièsel, SEO de municipi, IMAP real, sistema visual) però avui és un «arxipèlag d'illes excel·lents» amb 8 duplicacions. Sostre 9,5/10 assolible CONNECTANT i AUTOMATITZANT, no construint. Les 3 capacitats que més l'elevarien: (1) proposta→signatura→pagament al portal, (2) automatització de seguiments, (3) pipeline ponderat + forecasting. Risc nº1: SMTP/IMAP de producció no fiable.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: les 2 pàgines de docs renderitzen amb el renderer compartit; cap duplicat.
+- Validació humana/UX: pendent repassada del propietari a `/admin/docs/full-de-ruta` + validació de la META i decisions obertes (§7 del document).
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 962 → 963. SENSE commit.
+
+- Començat per: `claude` (+ agent `opus` expert)
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-15 — Atles accessible des de l'admin + renderitzador Markdown propi (Canvi #962, claude)
+
+### Resum
+El propietari demana poder consultar l'atles (`docs/admin-organisme-atles.md`) des de l'admin, no com a fitxer. Es replica el patró existent `/admin/docs/protocol`.
+
+### Què s'ha fet
+- **`/admin/docs/organisme`** (NOU): `page.tsx` (server, llegeix el .md amb fs + `AdminPage` canònic), `MarkdownView.tsx` (renderitzador de Markdown mínim ZERO-DEPENDENCY, retorna React: headings, taules amb `scope=col`, llistes, blockquote, code fence, hr, inline negreta/codi), `loading.tsx` (skeleton tokenitzat + reduced-motion), `organisme.css` (tokens de la sèrie, `html.admin-mode`, rem, taula amb scroll a mòbil, zero hex).
+- `nav-items.ts`: entrada «🗺️ Atles organisme» al grup Sistema, al costat del Manual.
+- Decisió zero-dep: el repo no té cap renderitzador de Markdown; en comptes d'afegir `react-markdown` es fa un helper propi acotat (norma de dependències del repo).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0 (loading.tsx present, css-monocapa/admin-mode verds).
+- Validació funcional: la pàgina llegeix l'atles i el renderitza; empty state si falta el fitxer.
+- Validació humana/UX: pendent repassada del propietari a `/admin/docs/organisme`.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 961 → 962. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-15 — Atles de l'organisme + 1r tall d'embut: input canònic (Canvi #961, claude)
+
+### Resum
+El propietari endureix la norma (protocol §0.1.1: l'embut + atles + estudi de dinamització + màxim exponent del possible + «tot relacionat mirant òrgans veïns»), demana un estudi/auditoria del programa SENCER (front + back, un sol element) i dóna via lliure (codex fora fins 18/06; claude responsable únic). Els 2 agents Opus llançats per fer l'atles van caure per límit de sessió → l'atles el faig jo.
+
+### Què s'ha fet
+- **`docs/admin-organisme-atles.md` (NOU)**: atles viu de l'organisme. Inventari complet (~90 rutes admin + ~45 públiques), funció+eix de negoci per òrgan, mapa de la frontissa front↔back, **estudi de dinamització (8 duplicacions/triplicacions D1–D8 amb font única recomanada)**, arquitectura objectiu (5 famílies + cablejat del nucli comercial), pla de pas per l'embut, i deute transversal del diagnòstic del director de disseny (coherència 5,5/10 «Frankenstein elegant»).
+- **1r tall d'embut — costura nº1 morta**: `.ix__forminput` (consumida per /admin/dossiers en 9 inputs però DEFINIDA dins `inbox.css` → dependència creuada fràgil en càrrega directa). Mogut a `admin-shell.css` (capa compartida, sempre carregada) com a `.adm-input` canònic, amb `.ix__forminput` com a àlies del mateix bloc → consumidors existents (dossiers + inbox/settings) funcionen sense tocar cap TSX; eliminada la definició d'`inbox.css`. Padding `9px 12px` → `rem`. Monocapa restaurada.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0 (guards CSS + studio-integrity verds). Cap definició òrfena de `.ix__forminput`.
+- Validació funcional: tots els consumidors reben l'estil des de la capa global; desapareix la dependència creuada dossiers→inbox.
+- Validació humana/UX: pendent repassada del propietari (l'estil de l'input és idèntic, només canvia d'ubicació).
+
+### Pendent immediat (anotat, no fet)
+- **Mostra a Studio**: la norma vol les mides/mostres/formats a `/admin/studio`. NO he afegit la mostra de `.adm-input` a Studio perquè és ZONA PROTEGIDA i el propietari és fora; es farà amb cura en una passada dedicada.
+- Migrar gradualment els consumidors d'`.ix__forminput` → `.adm-input` (l'àlies permet fer-ho sense pressa).
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 960 → 961. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-15 — Auditoria de cablejat del sistema + norma «Sèrie Òrbita Events» (Canvi #960, claude)
+
+### Resum
+Continuació del #959. El propietari precisa l'encàrrec: els òrgans admin estan «intrínsecament lligats, cablejats i linkats» → cal revisar i comprovar TOT el cablejat real entre ells (no peça a peça). I fixa el llistó final: tot ha de semblar una «sèrie Òrbita Events feta pel mateix dissenyador» — visual, coherència, canònic, monocapa, responsiu, corporatiu i tècnic. Vol que aquesta norma reguli les actuacions futures al codi.
+
+### Què s'ha fet
+- **Norma recollida (vinculant)**: `CLAUDE.md` (secció sistema visual admin) recull la norma «Sèrie Òrbita Events — fet pel mateix dissenyador» amb els 7 eixos, citant el detall a `docs/admin-build-method.md` §0.2 (monocapa). `admin-build-method.md` §0–§0.2 desenvolupa els 7 eixos + la regla d'or («no es noti la costura entre òrgans»).
+- **Auditoria de cablejat (flux lead↔dossier↔inbox↔reserva↔client)** — arestes verificades extrem a extrem: Lead→Dossier (params emesos=llegits) ✓; Lead→Nova reserva→torna a la fitxa (`buildLeadWorkspaceHref`) ✓; Dossier desat→Lead ✓; Client→compose (via `customerId`) ✓; `CommercialDocumentsHistory` compartit (rep href per prop) ✓.
+- **CABLE TRENCAT trobat i ARREGLAT**: PartnerHub (`/admin/inbox/compose?to=email` sense customerId) → el compose ignorava el param `to` → camp «Per a» buit. Ara `compose/page.tsx` llegeix `to` i el passa com `initialTo`; `ComposeForm` accepta `initialTo` i inicialitza l'estat. Cable complet.
+- **Troballa anotada (deute, eix tècnic)**: `ComposeForm.tsx` té 5 inline `style={{}}` preexistents (no introduïts aquí) → pendents de tokenitzar en un tall d'inbox dedicat.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: arestes del flux comercial verificades; el cable PartnerHub→compose ara pre-omple el destinatari.
+- Validació humana/UX: pendent que el propietari provi «escriure email» des de la fitxa de partner.
+
+### Coordinació
+Apilat sobre #959 (codex). Counter 959 → 960. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-15 — Auditoria orgànica admin: òrgans dins un sistema més gran (Canvi #959, codex + Opus)
+
+### Resum
+El propietari corregeix el criteri: l'encàrrec no és tractar `/admin/dossiers`, `/admin/leads`, `/admin/leads/cmpwudznj00g3vigky4altclu` i `/admin/inbox` com a pàgines soltes, sinó com a **òrgans d'un sistema més gran**. La pregunta no és si cada pantalla està polida en solitari, sinó si cada òrgan compleix la seva funció dins el cos admin i comparteix criteri amb els altres òrgans ja tancats pel propietari. Si un òrgan està al zenit dins del sistema, es pot marcar `TANCAT CHARLIE`; si funciona sol però no encaixa amb el conjunt, no està tancat.
+
+### Què s'ha fet
+- `docs/admin-build-method.md`: afegit el principi rector "l'admin és un tot — òrgans d'un organisme" com a criteri de futures auditories i tancaments `TANCAT CHARLIE`; ampliat amb la revalidació de pàgines ja tancades pel propietari des del criteri de sistema.
+- `/admin/dossiers`: millorat feedback d'errors al generador i a la previsualització, empty state de catàleg, skeleton tokenitzat i neteja CSS (`flex-shrink`, token fantasma `--ax-surface3`). La pàgina queda marcada `TANCAT CHARLIE`.
+- `/admin/leads` + fitxa de lead: eliminat helper duplicat de WhatsApp i creat `app/admin/leads/leadWhatsApp.ts` com a font única; moneda via `formatCurrency`; empty state global de temporada; a11y en controls d'edició. La fitxa de lead queda marcada `TANCAT CHARLIE`; el calendari ja tenia la marca prèvia.
+- `/admin/inbox`: millor gestió d'errors i feedback visible en accions de bústia, rollback/invalidate quan una acció falla, missatges més clars quan SMTP falla, a11y en botons d'icona i retirada d'inline styles del modal d'extracció. NO es marca `TANCAT CHARLIE` perquè el runtime de Railway encara mostra timeout SMTP en enviaments de seguiment; la pàgina és millor, però l'òrgan correu no està completament sa fins que la infra de correu respongui.
+- Afegit test `leadWhatsApp.test.ts` per blindar el helper compartit.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `git diff --check` OK · tests focalitzats 45/45 verds.
+- Validació funcional: dossiers gestionen errors sense deixar l'usuari a cegues; leads comparteix un únic helper WhatsApp i formats de moneda canònics; inbox mostra si una acció falla i no simula èxit quan servidor/SMTP no respon.
+- Validació humana/UX: criteri sistèmic aplicat; dossiers + fitxa lead poden funcionar com a òrgans de referència dins el flux comercial; inbox queda pendent de salut SMTP abans de considerar-lo òrgan tancat del sistema.
+
+### Coordinació
+Apilat sobre #958. Integració de resultats Opus amb revisió Codex del conjunt. Counter 958 → 959. SENSE commit.
+
+- Començat per: `claude` + agents `opus`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-15 — Dossier genèric: packs fora del generador (decisió d'Opus) (Canvi #958, claude)
 
 ### Resum

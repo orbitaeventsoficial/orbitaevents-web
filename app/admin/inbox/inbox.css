@@ -757,6 +757,7 @@
   font-size: var(--o-text-2xs);
   color: var(--o-stage-lost);
 }
+.sf__action-error--padded { padding: 0.5rem 1rem; }
 
 /* ── Detall buit (estat no-selection) ────────────────────────────────────── */
 .sf__detail-blank {
@@ -1445,18 +1446,13 @@
 @media (min-width: 540px) { .ix__formgrid { grid-template-columns: 1fr 1fr; } }
 .ix__formfield { display: flex; flex-direction: column; gap: 5px; }
 .ix__formlabel { font-size: var(--o-text-2xs); font-weight: var(--o-fw-book); color: var(--ax-t2); }
-.ix__forminput {
-  width: 100%; border: 1px solid var(--ax-line); border-radius: var(--o-r-md);
-  background: var(--ax-sunk); color: var(--ax-t);
-  padding: 9px 12px; font-size: var(--o-text-base); font-family: inherit;
-  transition: border-color 140ms ease;
-}
-.ix__forminput--textarea { resize: vertical; line-height: 1.6; }
+/* `.ix__forminput` (+ --textarea, :focus) s'han mogut a admin-shell.css com a
+   `.adm-input` canònic (#961): eren consumits també per /admin/dossiers i no
+   podien viure en un CSS d'òrgan. Aquí queden com a àlies via la capa compartida. */
 .ix__formcard-hint { font-size: var(--o-text-2xs); color: var(--ax-t3); margin-bottom: 12px; line-height: 1.5; }
 .ix__formfield--signature { margin-bottom: 12px; }
 .sf__empty-title--error { color: var(--o-stage-lost); }
 .sf__imap-text-empty { color: var(--ax-t3); padding: 20px; font-style: italic; }
-.ix__forminput:focus { outline: none; border-color: var(--ax-hair-gold); }
 .ix__formactions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
 
 .ix__settingsbtn {
@@ -1868,6 +1864,42 @@
   padding-right: 6px;
 }
 
+/* ── Feedback transitori d'accions de bústia ───────────────────────────── */
+.sf__pane-feedback {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.5625rem 0.75rem;
+  border-bottom: 1px solid var(--ax-line);
+  font-size: var(--o-text-2xs);
+  font-weight: var(--o-fw-semi-plus);
+  line-height: 1.45;
+}
+.sf__pane-feedback.is-error {
+  background: var(--o-danger-soft);
+  border-bottom-color: color-mix(in oklab, var(--o-danger) 30%, var(--ax-line));
+  color: var(--o-danger);
+}
+.sf__pane-feedback.is-ok {
+  background: color-mix(in oklab, var(--o-stage-done) 10%, var(--ax-canvas));
+  border-bottom-color: color-mix(in oklab, var(--o-stage-done) 25%, var(--ax-line));
+  color: var(--o-stage-done);
+}
+.sf__pane-feedback-text { flex: 1; min-width: 0; }
+.sf__pane-feedback-close {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: var(--o-text-xs);
+  cursor: pointer;
+  opacity: 0.7;
+  padding: 0 0.125rem;
+  transition: opacity 120ms ease;
+}
+.sf__pane-feedback-close:hover { opacity: 1; }
+
 /* ── Llista: checkbox per fila + body + flag + attach + badge X-Orbita ── */
 .sf__lead {
   display: grid;
@@ -2199,6 +2231,8 @@
   border-bottom: 1px solid var(--ax-line);
 }
 .sf__extract-row:last-child { border-bottom: none; }
+.sf__extract-row--msg { align-items: start; }
+.sf__extract-row--msg .sf__extract-lbl { padding-top: 0.75rem; }
 .sf__extract-lbl {
   font-size: var(--o-text-xs);
   font-weight: var(--o-fw-bold);

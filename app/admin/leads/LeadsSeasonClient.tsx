@@ -21,9 +21,10 @@ import { useToast } from '@/app/admin/components/ToastProvider';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildLeadComposeHref, buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { LEAD_LOST_REASON_LABELS, isLeadLostReason } from '@/lib/constants/leadLoss';
-import { fetchWithCsrf } from '@/lib/csrf';
+import { formatCurrency } from '@/lib/constants';
 import LeadLostStatusPrompt from './LeadLostStatusPrompt';
 import { patchLeadStatus, type LeadStatus } from './leadStatusClient';
+import { buildLeadWhatsAppHref } from './leadWhatsApp';
 import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
 import { SERVICE_HOURLY_RATES, resolveServicePricingKey } from '@/lib/constants/pricing-intelligence';
@@ -98,7 +99,6 @@ const MONTHS_SHORT = ['gen','feb','març','abr','mai','jun','jul','ago','set','o
 
 /* ── Helpers ────────────────────────────────────────────────────────────── */
 
-function euro(n: number): string { return `${n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} €`; }
 function parseISO(iso: string) { const [y, m, d] = iso.split('-').map(Number); return { y, m, d }; }
 function isoDate(y: number, m: number, d: number) { return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
 function shiftIso(iso: string, days: number) { const { y, m, d } = parseISO(iso); const t = new Date(Date.UTC(y, m - 1, d + days)); return isoDate(t.getUTCFullYear(), t.getUTCMonth() + 1, t.getUTCDate()); }
@@ -133,11 +133,6 @@ function focusActionLabel(lead: LeadData): string {
   if (lead.priority === 'URGENT') return 'Seguiment urgent';
   if (lead.priority === 'HIGH')   return 'Seguiment prioritari';
   return 'En seguiment';
-}
-function buildLeadWhatsAppHref(phone: string, name: string): string {
-  const digits = phone.replace(/[^\d]/g, '');
-  const text = encodeURIComponent(`Hola ${name}! Soc d'Orbita Events, gracies per la vostra consulta.`);
-  return `https://wa.me/${digits}?text=${text}`;
 }
 function lostReasonLabel(reason: string | null): string | null {
   return isLeadLostReason(reason) ? LEAD_LOST_REASON_LABELS[reason] : null;
@@ -184,7 +179,7 @@ function LeadDayCell({
       >
         <span className="fx__celltop">
           <span className="fx__day">{dayLabel}</span>
-          {firstLead.value > 0 && <span className="fx__cval">{euro(firstLead.value)}</span>}
+          {firstLead.value > 0 && <span className="fx__cval">{formatCurrency(firstLead.value)}</span>}
           <span className="fx__cellmeta">
             <WxBadge wx={firstLead.wx} size="sm" />
             {pay && <span className="fx__pay" data-pay={pay} data-tip={PAY_TOOLTIP[pay]} />}
@@ -359,7 +354,7 @@ function LeadDetailPanel({
         </section>
 
         <div className="fxd__stats">
-          <div><span>Valor</span><b>{lead.value ? euro(lead.value) : '—'}</b></div>
+          <div><span>Valor</span><b>{lead.value ? formatCurrency(lead.value) : '—'}</b></div>
           <div><span>Durada</span><b>{durationLabel(lead.time, lead.endTime)}</b></div>
           <div><span>Prioritat</span><b>{PRIORITY_LABEL[lead.priority]}</b></div>
         </div>
@@ -420,13 +415,16 @@ function LeadDetailPanel({
               <div><dt>Últim contacte</dt><dd>{lead.last || '—'}</dd></div>
             </dl>
             <div className="fxd__actions fxd__actions--contact">
-              {lead.phone ? (
-                <a href={buildLeadWhatsAppHref(lead.phone, lead.name)} target="_blank" rel="noopener noreferrer" className="fxd__btn fxd__btn--whatsapp">
-                  <span>{I.phone}</span>WhatsApp
-                </a>
-              ) : (
-                <button type="button" className="fxd__btn" disabled><span>{I.phone}</span>Sense telèfon</button>
-              )}
+              {(() => {
+                const waHref = buildLeadWhatsAppHref(lead.phone, lead.name);
+                return waHref ? (
+                  <a href={waHref} target="_blank" rel="noopener noreferrer" className="fxd__btn fxd__btn--whatsapp">
+                    <span>{I.phone}</span>WhatsApp
+                  </a>
+                ) : (
+                  <button type="button" className="fxd__btn" disabled><span>{I.phone}</span>Sense telèfon</button>
+                );
+              })()}
               {lead.kind === 'lead' && (
                 <Link href={buildLeadComposeHref(lead.id, 'seguiment')} className="fxd__btn fxd__btn--mail">
                   <span>{I.mail}</span>Correu
@@ -658,7 +656,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                 {focus.type}{focus.dateISO ? ` · ${fullDate(focus.dateISO)}` : ''}{focus.location ? ` · ${focus.location}` : ''}{focus.pax ? ` · ${focus.pax} pax` : ''}
               </span>
             </span>
-            <span className="fx__focusval">{focus.value ? euro(focus.value) : '—'}</span>
+            <span className="fx__focusval">{focus.value ? formatCurrency(focus.value) : '—'}</span>
           </button>
         ) : (
           <span className="fx__focusrow fx__focusrow--empty">
@@ -690,15 +688,15 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
             </div>
             <div className="fx__metric">
               <span>Pipeline</span>
-              <b>{euro(openValue)}</b>
+              <b>{formatCurrency(openValue)}</b>
             </div>
             <div className="fx__metric">
               <span>Guanyat</span>
-              <b>{euro(wonValue)}</b>
+              <b>{formatCurrency(wonValue)}</b>
             </div>
             <div className="fx__metric">
               <span>Temporada {currentYear}</span>
-              <b>{euro(totalValue)}</b>
+              <b>{formatCurrency(totalValue)}</b>
             </div>
           </div>
         );
@@ -720,7 +718,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                   <span className="fx__dot" data-stage={l.stage} aria-hidden="true" />
                   <span className="fx__nodatename">{l.name}</span>
                   <span className="fx__nodatemeta">{l.type}{l.pax ? ` · ${l.pax} pax` : ''}</span>
-                  {l.value > 0 && <span className="fx__cval">{euro(l.value)}</span>}
+                  {l.value > 0 && <span className="fx__cval">{formatCurrency(l.value)}</span>}
                 </button>
               ))}
             </div>
@@ -750,6 +748,15 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
               </div>
               <button type="button" className="fx__calnav" onClick={() => setMonthStart((s) => Math.min(MONTH_MAX_START, s + 1))} disabled={monthStart >= MONTH_MAX_START} aria-label="Mesos següents">{I.arrow}</button>
             </div>
+
+            {/* ── Empty state global: cap lead a tota la temporada ── */}
+            {effectiveLeads.length === 0 && (
+              <div className="fx__calempty" role="status">
+                <span className="fx__calempty-tx">Cap entrada aquesta temporada</span>
+                <span className="fx__calempty-sub">Quan entri un lead apareixerà al cap de setmana corresponent.</span>
+                <Link href="/admin/intake" className="fx__add"><span className="fx__addic">{I.plus}</span>Nova entrada</Link>
+              </div>
+            )}
 
             {/* ── Grid de mesos ── */}
             <div className="fx__cal">
@@ -829,7 +836,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                   <div className="fx__lanehead">
                     <div className="fx__lanetitle">
                       <h2>{STAGE_LABEL[stage]}</h2>
-                      <small>{laneValue ? euro(laneValue) : '—'}</small>
+                      <small>{laneValue ? formatCurrency(laneValue) : '—'}</small>
                     </div>
                     <span>{laneLeads.length}</span>
                   </div>
@@ -871,7 +878,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                         <span className="fx__leadkicker">{l.type}{(l.priority === 'URGENT' || l.priority === 'HIGH') && <span className="fx__pri" data-pri={l.priority}>{l.priority === 'URGENT' ? '⚡' : '↑'}</span>}</span>
                         <span className="fx__leadtop">
                           <b>{pay && <span className="fx__pay" data-pay={pay} data-tip={PAY_TOOLTIP[pay]} />}{l.name}</b>
-                          <strong>{l.value ? euro(l.value) : '—'}</strong>
+                          <strong>{l.value ? formatCurrency(l.value) : '—'}</strong>
                         </span>
                         {pay && <span className="fx__paylabel" data-pay={pay}>{PAY_LABEL[pay]}</span>}
                         <span className="fx__leadwhen">{l.dateISO ? fullDate(l.dateISO) : '—'}{l.location ? ` · ${l.location}` : ''}</span>
@@ -916,7 +923,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                         <td>{l.type}</td>
                         <td>{l.location || '—'}</td>
                         <td className="fx__listphase" data-pay={pay ?? undefined}>{pay && <span className="fx__pay" data-pay={pay} />}{phase}</td>
-                        <td className="fx__listnum">{l.value ? euro(l.value) : '—'}</td>
+                        <td className="fx__listnum">{l.value ? formatCurrency(l.value) : '—'}</td>
                       </tr>
                     );
                   })}

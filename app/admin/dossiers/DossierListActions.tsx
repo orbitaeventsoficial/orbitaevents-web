@@ -29,10 +29,15 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
   const [purging, setPurging] = useState(false);
 
   function preview() {
-    const filteredProducts = products.filter((p) => productIds.includes(p.id));
-    const html = buildDossierHtml(clientInfo, filteredProducts, dossierCopy, { logoDataUri, locale: 'ca-ES' });
-    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-    window.open(URL.createObjectURL(blob), '_blank', 'noopener,noreferrer');
+    try {
+      const filteredProducts = products.filter((p) => productIds.includes(p.id));
+      const html = buildDossierHtml(clientInfo, filteredProducts, dossierCopy, { logoDataUri, locale: 'ca-ES' });
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      window.open(URL.createObjectURL(blob), '_blank', 'noopener,noreferrer');
+    } catch (err) {
+      console.error('[DossierListActions] preview error:', err);
+      toast.error('No he pogut obrir la previsualització.');
+    }
   }
 
   function openCompositePdf() {

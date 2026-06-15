@@ -43,6 +43,7 @@ interface Props {
     preferredLocale: string | null;
   };
   initialTemplate?: string;
+  initialTo?: string;
   initialSegmentAudience?: BulkComposeSegmentAudience;
 }
 
@@ -53,13 +54,14 @@ export default function ComposeForm({
   initialLeadId,
   initialCustomer,
   initialTemplate,
+  initialTo,
   initialSegmentAudience,
 }: Props) {
   const router = useRouter();
   const lastAppliedTemplateRef = useRef<{ key: string; subject: string; body: string } | null>(null);
   const [mode, setMode] = useState<'email' | 'quote'>('email');
   const [selectedLeadId, setSelectedLeadId] = useState(initialLeadId || '');
-  const [to, setTo] = useState('');
+  const [to, setTo] = useState(initialTo || '');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [activeTemplateKey, setActiveTemplateKey] = useState<string | null>(null);

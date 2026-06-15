@@ -89,6 +89,8 @@ export const NAV_SECTIONS: NavSection[] = [
     defaultOpen: false,
     items: [
       { icon: '📖', label: 'Manual', href: '/admin/manual', description: 'Guia de possibilitats per entendre què pot fer tota la maquinària i on actuar.' },
+      { icon: '🗺️', label: 'Atles organisme', href: '/admin/docs/organisme', description: 'Mapa viu del sistema sencer (front + back): òrgans, connexions i estudi de dinamització.' },
+      { icon: '🎯', label: 'Meta + Full de ruta', href: '/admin/docs/full-de-ruta', description: 'La idealització del producte (zenit) i el camí per fases per arribar-hi.' },
       { icon: '⚙️', label: 'General', href: '/admin/settings', description: "Ajusta la configuració base del sistema i del comportament global de l'admin." },
       { icon: '📊', label: 'Estadístiques web', href: '/admin/stats', description: 'Segueix mètriques públiques del web sense entrar a eines externes.' },
       { icon: '🗺️', label: 'Cobertura', href: '/admin/coverage', description: "Defineix on opera l'empresa i com es trasllada això a filtres i vendes." },

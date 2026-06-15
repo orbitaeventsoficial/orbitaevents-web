@@ -20,17 +20,17 @@ type NavGroup = { id: string; label: string; items: NavItem[] };
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    id: 'agenda', label: 'Agenda',
+    id: 'agenda', label: 'Comercial',
     items: [
-      // Workspace unificat de bolos (fusió Leads+Reserves+Calendari, #836-#843).
-      // El vell "Reserves" del grup Events queda absorbit aquí; el calendari
-      // de capacitat ja no té entrada de nav pròpia (la finestra de temporada
-      // d'Agenda el substitueix). Vegeu §6.19 i el diari #844.
+      // Nucli comercial pel flux: captar → proposar → reservar → client.
+      // (Renombrat «Agenda»→«Comercial» #967: el grup conté tot el comercial,
+      // no només calendari. Col·laboradors connectat aquí, abans cable solt.)
       { label: 'Temporada', href: '/admin/leads' },
       { label: 'Reserves', href: '/admin/bookings' },
+      { label: 'Pressupostos', href: '/admin/presupuestos' },
       { label: 'Dossiers', href: '/admin/dossiers' },
       { label: 'Clients', href: '/admin/clientes' },
-      { label: 'Pressupostos', href: '/admin/presupuestos' },
+      { label: 'Col·laboradors', href: '/admin/collaborators' },
       { label: 'Arxiu', href: '/admin/leads/arxiu', secondary: true },
     ],
   },
@@ -64,6 +64,9 @@ const NAV_GROUPS: NavGroup[] = [
       { label: 'Configuració', href: '/admin/settings' },
       { label: 'Studio', href: '/admin/studio' },
       { label: 'Manual', href: '/admin/manual' },
+      { label: 'Atles', href: '/admin/docs/organisme', secondary: true },
+      { label: 'Esquema absolut', href: '/admin/docs/esquema', secondary: true },
+      { label: 'Full de ruta', href: '/admin/docs/full-de-ruta', secondary: true },
     ],
   },
 ];
@@ -73,6 +76,7 @@ function getGroupForPath(pathname: string): string {
     pathname.startsWith('/admin/leads') ||
     pathname.startsWith('/admin/dossiers') ||
     pathname.startsWith('/admin/clientes') ||
+    pathname.startsWith('/admin/collaborators') ||
     pathname.startsWith('/admin/presupuestos') ||
     pathname.startsWith('/admin/intake') ||
     pathname.startsWith('/admin/quick-create') ||

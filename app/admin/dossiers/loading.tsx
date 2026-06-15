@@ -1,8 +1,31 @@
+import './dossiers.css';
+
 export default function DossiersLoading() {
   return (
-    <div className="ap-card rounded-2xl p-8 animate-pulse">
-      <div className="h-6 w-48 rounded bg-white/10 mb-4" />
-      <div className="h-4 w-80 rounded bg-white/5" />
+    <div className="dg__skel dg__skel-pulse" aria-hidden="true">
+      <div className="dg__skel-hero">
+        <div className="dg__skel-bar dg__skel-bar--w-third" />
+        <div className="dg__skel-bar dg__skel-bar--lg dg__skel-bar--w-half" />
+        <div className="dg__skel-bar dg__skel-bar--w-two-thirds" />
+      </div>
+      <div className="dg__skel-panel">
+        <div className="dg__skel-bar dg__skel-bar--w-third" />
+        <div className="dg__skel-bar" />
+        <div className="dg__skel-bar dg__skel-bar--w-two-thirds" />
+      </div>
+      <div className="dg__skel-grid">
+        <div className="dg__skel-panel">
+          <div className="dg__skel-bar dg__skel-bar--w-half" />
+          <div className="dg__skel-bar" />
+          <div className="dg__skel-bar dg__skel-bar--w-two-thirds" />
+        </div>
+        <div className="dg__skel-panel">
+          <div className="dg__skel-bar dg__skel-bar--w-third" />
+          <div className="dg__skel-bar" />
+          <div className="dg__skel-bar" />
+          <div className="dg__skel-bar dg__skel-bar--w-half" />
+        </div>
+      </div>
     </div>
   );
 }

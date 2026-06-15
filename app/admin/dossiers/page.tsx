@@ -1,3 +1,10 @@
+// ─────────────────────────────────────────────────────────
+// ✅ TANCAT CHARLIE — validat pel propietari (2026-06-15)
+// Generador de dossiers comercials. Patró de referència admin:
+// 100% tokens (--ax-*/--o-*), selectors html.admin-mode, copy
+// centralitzat a ADMIN_DOSSIER_GENERATOR_COPY + messages.dossier.*,
+// empty states + skeleton tokenitzat + a11y completa.
+// ─────────────────────────────────────────────────────────
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { AdminPage } from '../components/AdminPage';

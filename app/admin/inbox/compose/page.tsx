@@ -99,12 +99,14 @@ export default async function ComposePage({
     leadId?: string;
     template?: string;
     segment?: string;
+    to?: string;
   };
 }) {
   const customerId = searchParams?.customerId || '';
   const leadId = searchParams?.leadId || '';
   const template = searchParams?.template || '';
   const segmentKey = searchParams?.segment || '';
+  const to = searchParams?.to || '';
 
   const [{ leads, packs, customer }, segmentAudience] = await Promise.all([
     getLeadsAndPacks(customerId || undefined, leadId || undefined),
@@ -165,6 +167,7 @@ export default async function ComposePage({
               : undefined
           }
           initialTemplate={template}
+          initialTo={to || undefined}
           initialSegmentAudience={segmentAudience || undefined}
         />
       </div>

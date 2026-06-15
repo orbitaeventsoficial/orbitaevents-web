@@ -126,6 +126,7 @@ Vegeu `protocol-producte-admin-ca.md` §2.5 (Migració del Frankenstein admin). 
 - Si falta un color, estat o component, **primer s'amplia `/admin/studio` i/o `orbita-tokens.css`**, després es consumeix des de l'admin. Mai a l'inrevés.
 - CSS local d'una pàgina admin queda restringit a **layout específic** (grid, gaps, posició, ordre de columnes). Decisions cromàtiques o tipogràfiques no viuen a fitxers `app/admin/**.css`.
 - `docs/admin-inventari-pagines.md` és el **mapa de la migració** peça a peça: 🔴 old · 🟡 en curs · 🟢 migrada. Cada estat 🟡/🟢 ha de citar el `Canvi #NNN` a la nota.
+- **Norma «Sèrie Òrbita Events — fet pel mateix dissenyador» (vinculant, propietari 2026-06-15)**: l'admin NO són pàgines independents, és UN organisme; cada pantalla és un òrgan d'una mateixa sèrie de marca. Tota actuació al codi admin s'avalua contra 7 eixos alhora — **visual, coherència, canònic, monocapa, responsiu, corporatiu i tècnic** (inclou el cablejat real entre òrgans: enllaços/params/context han de fluir i tenir sentit). El detall i el test d'avaluació viuen a `docs/admin-build-method.md` §0–§0.2. Cap pàgina és `TANCAT CHARLIE` si, al costat de les altres, sembla feta per una altra mà.
 
 ## Dependències
 

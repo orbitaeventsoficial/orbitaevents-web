@@ -5,6 +5,61 @@
 
 ---
 
+## 0. Principi rector: l'admin és UN TOT — òrgans d'un organisme (paràmetre d'avaluació, propietari 2026-06-15)
+
+**L'admin NO és un conjunt de pàgines independents. És un organisme, i cada pàgina (dossiers, leads, fitxa de lead, safata/inbox, reserves, clients, packs…) és un ÒRGAN del mateix cos.** No s'audita ni es construeix cap pàgina mirant-la aïllada: es mira com a part del tot.
+
+Conseqüències pràctiques (i criteri d'avaluació per a tota auditoria/TANCAT CHARLIE futur):
+
+1. **Mateixa sang** — tots els òrgans comparteixen el sistema visual únic (`/admin/studio` + `orbita-tokens.css`): tokens, tipografia, estats, components. Cap òrgan inventa paleta, hex, gradients, patrons de layout ni copy local propi. Si falta una peça, primer s'amplia el sistema compartit, després es consumeix (norma §2.5).
+2. **Mateix llenguatge** — copy, labels, estats, llindars i microcòpia segueixen el mateix to i viuen a la capa comuna (`lib/constants/*`, `messages/*`). Dos òrgans que fan el mateix gest l'anomenen igual.
+3. **Òrgans connectats, no illes** — els fluxos del negoci travessen òrgans (lead → dossier → safata → reserva → client). Els punts de connexió (enllaços, transicions, dades i context compartit entre seccions) són tan importants com cada òrgan per separat. Una pàgina que no enllaça amb el seu context està incompleta.
+4. **Coherència del conjunt** — el resultat ha de sentir-se un sol cos. En revisar diverses pàgines alhora, la pregunta no és «cada una està bé?», sinó «se senten part del mateix organisme?».
+
+**Test d'avaluació (aplicar a cada pàgina abans de donar-la per tancada):**
+- (a) Consumeix el sistema compartit sense inventar res local?
+- (b) Parla el mateix llenguatge visual i de copy que la resta de l'admin?
+- (c) Connecta bé amb els òrgans veïns (entrades/sortides del flux)?
+- (d) Posada al costat de les altres, el conjunt sembla dissenyat per una sola mà?
+
+Si una pàgina falla (a)–(d), no és `TANCAT CHARLIE` per molt polida que estigui en solitari.
+
+### 0.1 Revalidació de pàgines ja tancades pel propietari
+
+Quan el propietari demana revisar pàgines que "teòricament ja estan tancades", la feina principal NO és tornar a fer-les ni buscar detalls decoratius. La feina principal és **unificar criteri entre les pàgines validades**:
+
+- una mateixa jerarquia visual per llegir estat, risc, valor i següent acció;
+- els mateixos patrons de feedback, empty state, loading i error;
+- formats canònics compartits (moneda, dates, WhatsApp, enllaços a òrgans veïns);
+- mateixa densitat, mateix to i mateixa manera de decidir què és protagonista i què és secundari;
+- cap dependència estranya d'un òrgan sobre CSS/copy intern d'un altre.
+
+Una pàgina pot continuar sent `TANCAT CHARLIE` només si, posada al costat de les altres pàgines tancades pel propietari, sembla part del mateix sistema i no una peça feta amb un criteri diferent.
+
+### 0.2 «Sèrie Òrbita Events» — fet pel mateix dissenyador (criteri d'autor, propietari 2026-06-15)
+
+Tot l'admin ha de semblar una **sèrie d'una sola marca, dissenyada per la mateixa mà**. No quatre pàgines que funcionen: una col·lecció coherent «Òrbita Events». Cada òrgan s'avalua contra aquests SET eixos, alhora:
+
+1. **Visual** — mateixa qualitat d'acabat: espaiat, ritme, alineació, jerarquia, densitat. Cap pàgina «pobre» al costat d'una «rica».
+2. **Coherència** — mateixos patrons per al mateix gest (botons, feedback, empty state, loading, error, capçaleres, taules, modals). Si una pàgina ho fa d'una manera, totes igual.
+3. **Canònic** — consumeix el sistema (`/admin/studio` + `orbita-tokens.css`); res inventat localment. Si falta, s'amplia el sistema primer.
+4. **Monocapa** — cada decisió (color, copy, label, format, llindar) viu a UN sol lloc compartit; zero duplicats locals.
+5. **Responsiu** — 375px / tablet / desktop comprovats a cada peça; res que es trenqui a mòbil.
+6. **Corporatiu** — to i identitat Òrbita: seriós, net, premium, en català; copy amb veu de marca, no argot intern ni text de farciment.
+7. **Tècnic** — sòlid sota el capó: tipat estricte, a11y, sense codi mort, sense residus (hex/px/`!important`/inline), tests del que és nou, i **cablejat real entre òrgans verificat** (els enllaços/params/context flueixen i tenen sentit).
+
+**Regla d'or:** si un usuari passés per `/admin/dossiers`, `/admin/leads`, la fitxa, `/admin/inbox`… i notés que «aquesta pantalla la va fer una altra persona», la sèrie no està tancada. L'objectiu és que no es noti la costura entre òrgans.
+
+### 0.3 Les mides, mostres i formats de la sèrie viuen a `/admin/studio` (propietari 2026-06-15)
+
+Tota decisió canònica de la sèrie —**mides** (escala tipogràfica, espaiats, alçades de fila, radis), **mostres** (com es veu cada component: botons, capçaleres, empty states, badges, taules, cards) i **formats** (patrons de feedback, loading, error, densitat)— s'ha de **deixar exposada a `/admin/studio`** com a fitxa tècnica viva, a més dels tokens a `app/studio/orbita-tokens.css`.
+
+- Studio és el **mostrari** de la sèrie: el lloc on es veu el patró canònic abans de consumir-lo des d'un òrgan.
+- Quan una passada canonitza un patró nou (p. ex. una capçalera estàndard, un empty state compartit, una variant de botó), s'**afegeix a Studio** la mostra + la mida/format de referència. Additiu: mai buidar Studio (guard `qa:studio-integrity`).
+- Cap òrgan inventa una mida/format que no tingui reflex a Studio. Si el necessita, primer s'amplia Studio, després es consumeix.
+
+---
+
 ## 1. La marca `TANCAT CHARLIE`
 
 Significa: **pàgina validada pel propietari** («Charlie»). A prop de final, no 100% acabada, però **és el model de referència** al qual la resta s'ha de semblar.
