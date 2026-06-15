@@ -33,7 +33,7 @@ function renderPackInventoryPreview(pack: Awaited<ReturnType<typeof getPacks>>[n
         {pack.inventory.slice(0, 4).map((row) => (
           <span
             key={row.item.code}
-            className="inline-flex items-center rounded-full border border-cyan-400/25 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-semibold text-cyan-100"
+            className="inline-flex items-center rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-0.5 text-[10px] font-semibold admin-tone-text-cyan"
           >
             {row.item.name}
             {row.quantity > 1 ? ` ×${row.quantity}` : ''}
@@ -301,7 +301,7 @@ export default async function PacksPage({
         <>
           Gestiona els packs de serveis i els seus preus
           {activeFocusLabel && (
-            <span className="mt-2 inline-flex items-center gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-sm text-amber-100">
+            <span className="mt-2 inline-flex items-center gap-2 rounded-md border admin-tone-border-warning admin-tone-bg-warning px-3 py-1 text-sm admin-tone-text-warning">
               Focus de salut: {activeFocusLabel} · {filteredPacks.length} pack{filteredPacks.length === 1 ? '' : 's'}
               <Link href="/admin/packs" className="font-semibold underline underline-offset-2">
                 veure tots
@@ -389,8 +389,8 @@ export default async function PacksPage({
             {filteredPacks.reduce((sum, p) => sum + p._count.bookings, 0)}
           </p>
         </div>
-        <div className={`rounded-2xl border p-4 ${pricingAlertsCount > 0 ? 'border-rose-500/30 bg-rose-500/10' : 'border-emerald-500/30 bg-emerald-500/10'}`}>
-          <p className={`text-xs font-medium uppercase ${pricingAlertsCount > 0 ? 'text-rose-300' : 'text-emerald-300'}`}>Alertes de preu pack</p>
+        <div className={`rounded-2xl border p-4 ${pricingAlertsCount > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : 'admin-tone-border-success admin-tone-bg-success'}`}>
+          <p className={`text-xs font-medium uppercase ${pricingAlertsCount > 0 ? 'admin-tone-text-danger' : 'admin-tone-text-success'}`}>Alertes de preu pack</p>
           <p className="mt-2 text-3xl font-bold">{pricingAlertsCount}</p>
         </div>
       </section>
@@ -407,16 +407,16 @@ export default async function PacksPage({
               const health = pricingHealthByPack.get(pack.id);
               const divergence = health?.divergencePct ?? 0;
               const divergenceColor = health?.hasAlert
-                ? 'text-rose-300 border-rose-400/35 bg-rose-950/20'
+                ? 'admin-tone-text-danger admin-tone-border-danger admin-tone-bg-danger'
                 : Math.abs(divergence) >= pricingConfig.alertDivergencePct * 0.5
-                  ? 'text-orange-300 border-orange-400/35 bg-orange-950/20'
-                  : 'text-emerald-300 border-emerald-400/35 bg-emerald-950/20';
+                  ? 'admin-tone-text-warning admin-tone-border-warning admin-tone-bg-warning'
+                  : 'admin-tone-text-success admin-tone-border-success admin-tone-bg-success';
               return (
                 <div
                   key={pack.id}
                   className={`rounded-2xl border admin-card-glass overflow-hidden ${
                     pack.isFeatured
-                      ? 'ring-1 ring-amber-500/20 border-amber-500/30'
+                      ? 'ring-1 admin-tone-border-warning'
                       : 'border-white/10'
                   }`}
                 >
@@ -524,7 +524,7 @@ export default async function PacksPage({
                     <div className="flex items-center justify-between text-xs pt-2 border-t">
                       <span>{pack._count.bookings} reserves · {pack.leadsCount} consultes</span>
                       {pack.leadsCount > 0 && (
-                        <span className={`font-semibold ${Math.round((pack._count.bookings / pack.leadsCount) * 100) >= 30 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                        <span className={`font-semibold ${Math.round((pack._count.bookings / pack.leadsCount) * 100) >= 30 ? 'admin-tone-text-success' : 'admin-tone-text-warning'}`}>
                           {Math.round((pack._count.bookings / pack.leadsCount) * 100)}% conv.
                         </span>
                       )}
@@ -571,16 +571,16 @@ export default async function PacksPage({
               const health = pricingHealthByPack.get(pack.id);
               const divergence = health?.divergencePct ?? 0;
               const divergenceColor = health?.hasAlert
-                ? 'text-rose-300 border-rose-400/35 bg-rose-950/20'
+                ? 'admin-tone-text-danger admin-tone-border-danger admin-tone-bg-danger'
                 : Math.abs(divergence) >= pricingConfig.alertDivergencePct * 0.5
-                  ? 'text-orange-300 border-orange-400/35 bg-orange-950/20'
-                  : 'text-emerald-300 border-emerald-400/35 bg-emerald-950/20';
+                  ? 'admin-tone-text-warning admin-tone-border-warning admin-tone-bg-warning'
+                  : 'admin-tone-text-success admin-tone-border-success admin-tone-bg-success';
               return (
                 <div
                   key={pack.id}
                   className={`rounded-2xl border admin-card-glass overflow-hidden ${
                     pack.isFeatured
-                      ? 'ring-1 ring-amber-500/20 border-amber-500/30'
+                      ? 'ring-1 admin-tone-border-warning'
                       : 'border-white/10'
                   }`}
                 >
@@ -688,7 +688,7 @@ export default async function PacksPage({
                     <div className="flex items-center justify-between text-xs pt-2 border-t">
                       <span>{pack._count.bookings} reserves · {pack.leadsCount} consultes</span>
                       {pack.leadsCount > 0 && (
-                        <span className={`font-semibold ${Math.round((pack._count.bookings / pack.leadsCount) * 100) >= 30 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                        <span className={`font-semibold ${Math.round((pack._count.bookings / pack.leadsCount) * 100) >= 30 ? 'admin-tone-text-success' : 'admin-tone-text-warning'}`}>
                           {Math.round((pack._count.bookings / pack.leadsCount) * 100)}% conv.
                         </span>
                       )}
@@ -742,7 +742,7 @@ export default async function PacksPage({
             <div key={service.id} className="rounded-xl border admin-tone-border-neutral p-4">
               <div className="flex items-center justify-between gap-3">
                 <span className="font-medium">{service.label}</span>
-                <span className="font-bold text-amber-400/90">
+                <span className="font-bold admin-tone-text-warning">
                   {formatCurrencyExact(service.defaultPrice)}{service.unit === 'hour' ? '/h' : ''}
                 </span>
               </div>

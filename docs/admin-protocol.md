@@ -1453,6 +1453,22 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #983 — 2026-06-16 — claude (TANCAT)
+
+**Packs tokenitzat (page + EditPackForm pro).**
+
+- `packs/page.tsx`: divergenceColor, ring, card alertes, badges → `admin-tone-*`.
+- `packs/[id]/EditPackForm.tsx`: `semClass`/`getMarginSignal`/input compartit→`.adm-input`/tabs/composer/dropzones/badges → tokens de sèrie. Grep no-Òrbita = 0 als dos.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 982 -> 983.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: estats de marge/preu i inputs amb to de sèrie; grep no-Òrbita = 0.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #982 — 2026-06-16 — claude (TANCAT)
 
 **Dashboard tokenitzat (dots + cards d'estat a sèrie Òrbita).**

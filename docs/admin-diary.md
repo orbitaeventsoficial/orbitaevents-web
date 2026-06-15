@@ -1,3 +1,24 @@
+## 2026-06-16 — Packs tokenitzat (page + EditPackForm pro) (Canvi #983, claude)
+
+### Resum
+Tancament del domini Packs: `packs/page.tsx` (15 colors) + `packs/[id]/EditPackForm.tsx` (17, l'editor pro amb drag&drop). Tots dos amb molts estats de marge/divergència.
+
+### Què s'ha fet
+- `packs/page.tsx`: `divergenceColor` (×2), ring destacat, card d'alertes de preu, badges i ratis de conversió → `admin-tone-*`. Grep no-Òrbita = 0.
+- `packs/[id]/EditPackForm.tsx`: helper `semClass` + `getMarginSignal` (cards verd/taronja/roig) → `admin-tone-*`; input compartit `const input` → `.adm-input`; tabs, toggle preu automàtic, cards de compositor (base/extra), lots (indigo→violet), dropzones (disponibles=danger / inclosos=success), badge «Obligatori» → tokens de sèrie. Grep no-Òrbita = 0.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: estats de marge/preu amb semàntica preservada; inputs amb focus de sèrie.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 982 → 983. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-16 — Dashboard tokenitzat (dots + cards d'estat a sèrie Òrbita) (Canvi #982, claude)
 
 ### Resum
