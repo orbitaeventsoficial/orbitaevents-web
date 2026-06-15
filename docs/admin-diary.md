@@ -1,3 +1,23 @@
+## 2026-06-16 — Social tokenitzat (estats, calendari, modal + inputs canònics) (Canvi #985, claude)
+
+### Resum
+`/admin/social` (SocialClient, 16 colors). Calendari editorial + modal de publicació.
+
+### Què s'ha fet
+- `SocialClient.tsx`: `STATUS_TONE` (draft/scheduled/published → warning/cyan/success), pols editorial, flash, panell d'idees (purple→violet), pills hashtags/publicat/alarma, ring del dia actual (`ring-cyan`→`ring-[var(--ax-hair-gold)]`), modal (error, platform actiu, botó eliminar) → `admin-tone-*`/tokens. 8 inputs/select/textarea `.ap-input` (classe morta) → `.adm-input` (+`--textarea`). Grep no-Òrbita + ap-input = 0.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: estats socials amb to de sèrie; inputs canònics.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 984 → 985. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-16 — Clientes (SummaryPanel) + Inventory editor tokenitzats (Canvi #984, claude)
 
 ### Resum

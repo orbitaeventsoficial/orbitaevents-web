@@ -1453,6 +1453,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #985 — 2026-06-16 — claude (TANCAT)
+
+**Social tokenitzat (estats, calendari, modal + inputs canònics).**
+
+- `SocialClient.tsx`: STATUS_TONE, pols/flash/idees(purple→violet)/pills/ring del dia → `admin-tone-*`/tokens; 8 inputs `.ap-input`(morta)→`.adm-input`. Grep no-Òrbita + ap-input = 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 984 -> 985.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: estats amb to de sèrie; inputs canònics.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #984 — 2026-06-16 — claude (TANCAT)
 
 **Clientes (SummaryPanel) + Inventory editor tokenitzats.**

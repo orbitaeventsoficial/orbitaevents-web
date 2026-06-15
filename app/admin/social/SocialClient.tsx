@@ -101,9 +101,9 @@ const IDEA_SOURCE_LABEL: Record<SerializedIdea['source'], string> = {
 
 const STATUS_TONE: Record<string, string> = {
   IDEA: 'bg-white/[0.08] border-white/15 text-white/60',
-  DRAFT: 'bg-amber-500/15 border-amber-500/30 text-amber-300',
-  SCHEDULED: 'bg-cyan-500/15 border-cyan-500/30 text-cyan-300',
-  PUBLISHED: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300',
+  DRAFT: 'admin-tone-bg-warning admin-tone-border-warning admin-tone-text-warning',
+  SCHEDULED: 'admin-tone-bg-cyan admin-tone-border-cyan admin-tone-text-cyan',
+  PUBLISHED: 'admin-tone-bg-success admin-tone-border-success admin-tone-text-success',
   ARCHIVED: 'bg-white/[0.03] border-white/10 text-white/40',
 };
 
@@ -373,7 +373,7 @@ export default function SocialClient({
       </section>
 
       <section className="grid gap-3 lg:grid-cols-4">
-        <article className={`admin-card-glass rounded-2xl border p-4 ${pulseRisk ? 'border-amber-500/30 bg-amber-500/[0.05]' : 'border-emerald-500/25 bg-emerald-500/[0.04]'}`}>
+        <article className={`admin-card-glass rounded-2xl border p-4 ${pulseRisk ? 'admin-tone-border-warning admin-tone-bg-warning' : 'admin-tone-border-success admin-tone-bg-success'}`}>
           <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">Pols editorial</p>
           <h2 className="mt-2 text-base font-black leading-snug">{pulse.isActive ? 'Actiu' : 'Aturat'}</h2>
           <p className="mt-2 text-xs leading-relaxed text-white/65">{pulseSummary}</p>
@@ -439,7 +439,7 @@ export default function SocialClient({
       </div>
 
       {flash && (
-        <div className={`rounded-xl border px-4 py-2 text-sm ${flash.type === 'success' ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border-rose-500/30 bg-rose-500/10 text-rose-300'}`}>
+        <div className={`rounded-xl border px-4 py-2 text-sm ${flash.type === 'success' ? 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success' : 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger'}`}>
           {flash.text}
           <button onClick={() => setFlash(null)} type="button" className="ml-3 text-xs opacity-60">✕</button>
         </div>
@@ -447,13 +447,13 @@ export default function SocialClient({
 
       {/* Ideas Panel — auto-generades des de bookings, testimonials, portfolio i events futurs */}
       {ideas.length > 0 && (
-        <div className="rounded-xl border border-purple-500/20 bg-purple-500/[0.04] p-4 admin-card-glass">
+        <div className="rounded-xl border admin-tone-border-violet admin-tone-bg-violet p-4 admin-card-glass">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h3 className="text-sm font-semibold flex items-center gap-2">
                 <span>💡</span>
                 <span>Idees suggerides</span>
-                <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-[10px] text-purple-200">{ideas.length}</span>
+                <span className="rounded-full admin-tone-bg-violet admin-tone-text-violet px-2 py-0.5 text-[10px]">{ideas.length}</span>
               </h3>
               <p className="mt-0.5 text-[11px] opacity-50">Generades automàticament des de bookings, testimonials, portfolio i esdeveniments propers.</p>
             </div>
@@ -498,7 +498,7 @@ export default function SocialClient({
                     <button
                       onClick={() => handleUseIdea(idea)}
                       type="button"
-                      className="flex-1 rounded border border-cyan-500/30 bg-cyan-500/10 px-2 py-1 text-[10px] font-medium text-cyan-200 hover:bg-cyan-500/20"
+                      className="flex-1 rounded border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-1 text-[10px] font-medium admin-tone-text-cyan hover:opacity-80"
                     >
                       Usar aquesta idea
                     </button>
@@ -548,16 +548,16 @@ export default function SocialClient({
                     <p className="mt-1.5 font-semibold text-sm truncate">{post.title}</p>
                     {post.caption && <p className="mt-0.5 text-xs opacity-60 line-clamp-2">{post.caption}</p>}
                     {post.hashtags.length > 0 && (
-                      <p className="mt-1 text-[11px] text-cyan-400/60">{post.hashtags.map((h) => `#${h}`).join(' ')}</p>
+                      <p className="mt-1 text-[11px] admin-tone-text-cyan">{post.hashtags.map((h) => `#${h}`).join(' ')}</p>
                     )}
                   </div>
                   <div className="flex flex-col gap-2 text-left sm:max-w-none sm:shrink-0 sm:items-end sm:text-right max-w-full">
                     <span className="text-[11px] opacity-50">
                       {post.scheduledAt ? `Programat: ${formatDateTime(post.scheduledAt)}` : formatDate(post.createdAt)}
                     </span>
-                    {post.publishedAt && <span className="text-[10px] text-emerald-400/60">Publicat: {formatDate(post.publishedAt)}</span>}
+                    {post.publishedAt && <span className="text-[10px] admin-tone-text-success">Publicat: {formatDate(post.publishedAt)}</span>}
                     {!post.publishedAt && post.scheduledAt && ['DRAFT', 'SCHEDULED'].includes(post.status) && (
-                      <span className="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-2 py-0.5 text-[10px] text-cyan-200">⏰ Alarma Calendar</span>
+                      <span className="rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-0.5 text-[10px] admin-tone-text-cyan">⏰ Alarma Calendar</span>
                     )}
                     <div className="mt-1 flex flex-wrap items-center gap-1">
                       <select
@@ -579,7 +579,7 @@ export default function SocialClient({
                       <button
                         onClick={() => handleDelete(post.id)}
                         type="button"
-                        className="rounded border border-white/10 px-1.5 py-0.5 text-[10px] hover:bg-rose-500/20"
+                        className="rounded border border-white/10 px-1.5 py-0.5 text-[10px] hover:admin-tone-bg-danger"
                       >
                         🗑️
                       </button>
@@ -633,9 +633,9 @@ export default function SocialClient({
               return (
                 <div
                   key={day.date}
-                  className={`min-h-[80px] border-t border-white/5 p-1.5 ${day.isCurrentMonth ? 'bg-white/[0.02]' : 'bg-transparent opacity-30'} ${isToday ? 'ring-1 ring-inset ring-cyan-500/40' : ''}`}
+                  className={`min-h-[80px] border-t border-white/5 p-1.5 ${day.isCurrentMonth ? 'bg-white/[0.02]' : 'bg-transparent opacity-30'} ${isToday ? 'ring-1 ring-inset ring-[var(--ax-hair-gold)]' : ''}`}
                 >
-                  <p className={`text-[11px] font-medium ${isToday ? 'text-cyan-300' : 'opacity-60'}`}>{day.day}</p>
+                  <p className={`text-[11px] font-medium ${isToday ? 'admin-tone-text-cyan' : 'opacity-60'}`}>{day.day}</p>
                   <div className="mt-0.5 space-y-0.5">
                     {dayPosts.slice(0, 3).map((p) => (
                       <button
@@ -784,11 +784,11 @@ function SocialPostModal({
       >
         <h2 className="text-lg font-semibold">{post ? 'Editar publicació' : 'Nova publicació'}</h2>
 
-        {error && <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">{error}</p>}
+        {error && <p className="rounded-lg border admin-tone-border-danger admin-tone-bg-danger px-3 py-2 text-sm admin-tone-text-danger">{error}</p>}
 
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wider opacity-70 mb-1">Títol *</label>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} required maxLength={200} className="ap-input w-full" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} required maxLength={200} className="adm-input" />
         </div>
 
         <div>
@@ -799,7 +799,7 @@ function SocialPostModal({
                 key={val}
                 type="button"
                 onClick={() => togglePlatform(val)}
-                className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${platforms.includes(val) ? 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300' : 'border-white/10 hover:bg-white/5'}`}
+                className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${platforms.includes(val) ? 'admin-tone-bg-cyan admin-tone-border-cyan admin-tone-text-cyan' : 'border-white/10 hover:bg-white/5'}`}
               >
                 {PLATFORM_ICON[val]} {SOCIAL_PLATFORM_LABELS[val as SocialPlatform]}
               </button>
@@ -810,7 +810,7 @@ function SocialPostModal({
         <div className="grid gap-3 sm:grid-cols-3">
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider opacity-70 mb-1">Estat</label>
-            <select value={status} onChange={(e) => setStatus(e.target.value)} className="ap-input w-full">
+            <select value={status} onChange={(e) => setStatus(e.target.value)} className="adm-input">
               {Object.entries(SOCIAL_POST_STATUSES).map(([, val]) => (
                 <option key={val} value={val}>{SOCIAL_POST_STATUS_LABELS[val]}</option>
               ))}
@@ -818,7 +818,7 @@ function SocialPostModal({
           </div>
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider opacity-70 mb-1">Tipus</label>
-            <select value={contentType} onChange={(e) => setContentType(e.target.value)} className="ap-input w-full">
+            <select value={contentType} onChange={(e) => setContentType(e.target.value)} className="adm-input">
               {Object.entries(SOCIAL_CONTENT_TYPES).map(([, val]) => (
                 <option key={val} value={val}>{SOCIAL_CONTENT_TYPE_LABELS[val]}</option>
               ))}
@@ -826,7 +826,7 @@ function SocialPostModal({
           </div>
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider opacity-70 mb-1">Categoria</label>
-            <select value={category} onChange={(e) => setCategory(e.target.value)} className="ap-input w-full">
+            <select value={category} onChange={(e) => setCategory(e.target.value)} className="adm-input">
               <option value="">— Cap —</option>
               {Object.entries(SOCIAL_CATEGORIES).map(([, val]) => (
                 <option key={val} value={val}>{SOCIAL_CATEGORY_LABELS[val]}</option>
@@ -837,12 +837,12 @@ function SocialPostModal({
 
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wider opacity-70 mb-1">Data programada</label>
-          <input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} className="ap-input w-full" />
+          <input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} className="adm-input" />
         </div>
 
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wider opacity-70 mb-1">Descripció / Caption</label>
-          <textarea value={caption} onChange={(e) => setCaption(e.target.value)} rows={3} className="ap-input w-full" />
+          <textarea value={caption} onChange={(e) => setCaption(e.target.value)} rows={3} className="adm-input adm-input--textarea" />
           <AiCopySuggestionsInline
             type="social-caption"
             context={title.trim() ? `Títol: ${title}, Tipus: ${contentType}` : ''}
@@ -853,12 +853,12 @@ function SocialPostModal({
 
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wider opacity-70 mb-1">Hashtags (separats per comes)</label>
-          <input value={hashtags} onChange={(e) => setHashtags(e.target.value)} placeholder="events, wedding, dj" className="ap-input w-full" />
+          <input value={hashtags} onChange={(e) => setHashtags(e.target.value)} placeholder="events, wedding, dj" className="adm-input" />
         </div>
 
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wider opacity-70 mb-1">Notes internes</label>
-          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className="ap-input w-full" />
+          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className="adm-input adm-input--textarea" />
         </div>
 
         <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-end">
