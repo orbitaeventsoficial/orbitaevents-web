@@ -28,7 +28,7 @@ function FunnelBar({ label, value, max }: { label: string; value: number; max: n
       <span className="w-28 text-right text-[11px] font-medium opacity-70 shrink-0">{label}</span>
       <div className="flex-1 h-5 rounded bg-white/5 overflow-hidden">
         <div
-          className="h-full rounded bg-cyan-500/30"
+          className="h-full rounded admin-tone-bg-cyan"
           style={{ width: `${width}%` }}
         />
       </div>
@@ -137,9 +137,9 @@ export default async function ReportingPage() {
             <div className="mt-3 space-y-2">
               {insights.slice(1).map((insight, i) => {
                 const badgeClass: Record<InsightPriority, string> = {
-                  critical: 'bg-rose-500/20 text-rose-300',
-                  warning: 'bg-amber-500/20 text-amber-300',
-                  positive: 'bg-emerald-500/20 text-emerald-300',
+                  critical: 'admin-tone-bg-danger admin-tone-text-danger',
+                  warning: 'admin-tone-bg-warning admin-tone-text-warning',
+                  positive: 'admin-tone-bg-success admin-tone-text-success',
                 };
                 return (
                   <div
@@ -178,25 +178,25 @@ export default async function ReportingPage() {
             <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Leads oberts</p>
             <p className="mt-1 text-xl font-bold">{report.headline.openLeads}</p>
           </div>
-          <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] p-3">
+          <div className="rounded-xl border admin-tone-border-success admin-tone-bg-success p-3">
             <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Reserves tancades</p>
-            <p className="mt-1 text-xl font-bold text-emerald-300">{report.headline.bookingsClosed}</p>
+            <p className="mt-1 text-xl font-bold admin-tone-text-success">{report.headline.bookingsClosed}</p>
           </div>
-          <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] p-3">
+          <div className="rounded-xl border admin-tone-border-success admin-tone-bg-success p-3">
             <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Ingressos</p>
-            <p className="mt-1 text-xl font-bold text-emerald-300">{currency(report.headline.revenueClosed)}</p>
+            <p className="mt-1 text-xl font-bold admin-tone-text-success">{currency(report.headline.revenueClosed)}</p>
           </div>
-          <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/[0.04] p-3">
+          <div className="rounded-xl border admin-tone-border-cyan admin-tone-bg-cyan p-3">
             <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Pipeline brut</p>
-            <p className="mt-1 text-xl font-bold text-cyan-300">{currency(report.headline.pipelineRaw)}</p>
+            <p className="mt-1 text-xl font-bold admin-tone-text-cyan">{currency(report.headline.pipelineRaw)}</p>
           </div>
-          <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/[0.04] p-3">
+          <div className="rounded-xl border admin-tone-border-cyan admin-tone-bg-cyan p-3">
             <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Previsió ponderada</p>
-            <p className="mt-1 text-xl font-bold text-cyan-300">{currency(report.headline.forecastWeighted)}</p>
+            <p className="mt-1 text-xl font-bold admin-tone-text-cyan">{currency(report.headline.forecastWeighted)}</p>
           </div>
-          <div className={`rounded-xl border p-3 ${report.headline.slaBroken > 0 ? 'border-rose-500/30 bg-rose-500/[0.06]' : 'border-white/10 bg-white/[0.03]'}`}>
+          <div className={`rounded-xl border p-3 ${report.headline.slaBroken > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : 'border-white/10 bg-white/[0.03]'}`}>
             <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">SLA trencats</p>
-            <p className={`mt-1 text-xl font-bold ${report.headline.slaBroken > 0 ? 'text-rose-300' : ''}`}>{report.headline.slaBroken}</p>
+            <p className={`mt-1 text-xl font-bold ${report.headline.slaBroken > 0 ? 'admin-tone-text-danger' : ''}`}>{report.headline.slaBroken}</p>
           </div>
         </div>
 
@@ -229,11 +229,11 @@ export default async function ReportingPage() {
                 </div>
                 <div>
                   <p className="text-[10px] opacity-60">Marge brut</p>
-                  <p className="text-lg font-bold text-emerald-300">{currency(report.margin.grossMargin)}</p>
+                  <p className="text-lg font-bold admin-tone-text-success">{currency(report.margin.grossMargin)}</p>
                 </div>
                 <div>
                   <p className="text-[10px] opacity-60">Taxa de marge</p>
-                  <p className="text-lg font-bold text-emerald-300">{pct(report.margin.marginRate)}</p>
+                  <p className="text-lg font-bold admin-tone-text-success">{pct(report.margin.marginRate)}</p>
                 </div>
               </div>
             </section>
@@ -313,17 +313,17 @@ export default async function ReportingPage() {
               <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Emails enviats</p>
               <p className="mt-1 text-xl font-bold">{emailTracking.totalSent}</p>
             </div>
-            <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/[0.04] p-3">
+            <div className="rounded-xl border admin-tone-border-cyan admin-tone-bg-cyan p-3">
               <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Open rate global</p>
-              <p className="mt-1 text-xl font-bold text-cyan-300">{emailTracking.globalOpenRate}%</p>
+              <p className="mt-1 text-xl font-bold admin-tone-text-cyan">{emailTracking.globalOpenRate}%</p>
             </div>
-            <div className="rounded-xl border border-violet-500/20 bg-violet-500/[0.04] p-3">
+            <div className="rounded-xl border admin-tone-border-violet admin-tone-bg-violet p-3">
               <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Click rate global</p>
-              <p className="mt-1 text-xl font-bold text-violet-300">{emailTracking.globalClickRate}%</p>
+              <p className="mt-1 text-xl font-bold admin-tone-text-violet">{emailTracking.globalClickRate}%</p>
             </div>
-            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] p-3">
+            <div className="rounded-xl border admin-tone-border-success admin-tone-bg-success p-3">
               <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Reply rate global</p>
-              <p className="mt-1 text-xl font-bold text-emerald-300">{emailTracking.globalReplyRate}%</p>
+              <p className="mt-1 text-xl font-bold admin-tone-text-success">{emailTracking.globalReplyRate}%</p>
             </div>
           </div>
 

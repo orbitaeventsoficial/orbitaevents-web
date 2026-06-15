@@ -169,45 +169,45 @@ export function pct(value: number) {
 
 export function marginColor(pctValue: number): string {
   const p = pctValue * 100;
-  if (p >= 50) return 'text-emerald-400';
-  if (p >= 30) return 'text-amber-300';
-  if (p >= 15) return 'text-orange-400';
-  return 'text-rose-400';
+  if (p >= 50) return 'admin-tone-text-success';
+  if (p >= 30) return 'admin-tone-text-warning';
+  if (p >= 15) return 'admin-tone-text-warning';
+  return 'admin-tone-text-danger';
 }
 
 export function marginBg(pctValue: number): string {
   const p = pctValue * 100;
-  if (p >= 50) return 'bg-emerald-500';
-  if (p >= 30) return 'bg-amber-500';
-  if (p >= 15) return 'bg-orange-500';
-  return 'bg-rose-500';
+  if (p >= 50) return 'admin-tone-bg-success';
+  if (p >= 30) return 'admin-tone-bg-warning';
+  if (p >= 15) return 'admin-tone-bg-warning';
+  return 'admin-tone-bg-danger';
 }
 
 export function paymentStateBadge(paid: boolean) {
   return paid
-    ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-200'
-    : 'border-rose-500/40 bg-rose-500/15 text-rose-200';
+    ? 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success'
+    : 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger';
 }
 
 export function packMarginBadge(marginPct: number, targetMarginPct: number) {
   if (marginPct >= targetMarginPct) {
     return {
       label: 'Sa',
-      cls: 'border-emerald-500/40 bg-emerald-500/15 text-emerald-200',
-      dot: 'bg-emerald-400',
+      cls: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
+      dot: 'admin-tone-bg-success',
     };
   }
   if (marginPct >= (targetMarginPct - 0.08)) {
     return {
       label: 'Vigilar',
-      cls: 'border-amber-500/40 bg-amber-500/15 text-amber-200',
-      dot: 'bg-amber-400',
+      cls: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+      dot: 'admin-tone-bg-warning',
     };
   }
   return {
     label: 'Crític',
-    cls: 'border-rose-500/40 bg-rose-500/15 text-rose-200',
-    dot: 'bg-rose-400',
+    cls: 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger',
+    dot: 'admin-tone-bg-danger',
   };
 }
 

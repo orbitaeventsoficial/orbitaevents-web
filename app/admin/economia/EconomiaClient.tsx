@@ -211,27 +211,27 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     label="Pendent fora de termini"
                     value={money(props.overdueTotal)}
                     sub={props.atRiskRows.length > 0 ? `${props.atRiskRows.length} cobraments amb retard` : undefined}
-                    color="text-rose-300"
-                    borderColor="border-rose-500/30"
-                    bgColor="bg-rose-500/10"
+                    color="admin-tone-text-danger"
+                    borderColor="admin-tone-border-danger"
+                    bgColor="admin-tone-bg-danger"
                     delay={0.1}
                   />
                   <KpiCard
                     label="Cobrat aquest mes"
                     value={money(props.monthCollected)}
                     sub="Ingressos ja cobrats"
-                    color="text-emerald-300"
-                    borderColor="border-emerald-500/30"
-                    bgColor="bg-emerald-500/10"
+                    color="admin-tone-text-success"
+                    borderColor="admin-tone-border-success"
+                    bgColor="admin-tone-bg-success"
                     delay={0.15}
                   />
                   <KpiCard
                     label="Vencen en 7 dies"
                     value={money(props.dueSoonTotal)}
                     sub={props.upcomingDueRows.length > 0 ? `${props.upcomingDueRows.length} cobraments pròxims` : undefined}
-                    color="text-amber-300"
-                    borderColor="border-amber-500/30"
-                    bgColor="bg-amber-500/10"
+                    color="admin-tone-text-warning"
+                    borderColor="admin-tone-border-warning"
+                    bgColor="admin-tone-bg-warning"
                     delay={0.2}
                   />
                 </div>
@@ -257,9 +257,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     label="Marge net realitzat"
                     value={money(props.realized.netMargin)}
                     sub={`Mitjà ${pct(props.realized.avgMarginPct)}`}
-                    color="text-emerald-300"
-                    borderColor="border-emerald-400/30"
-                    bgColor="bg-emerald-950/30"
+                    color="admin-tone-text-success"
+                    borderColor="admin-tone-border-success"
+                    bgColor="admin-tone-bg-success"
                     delay={0.1}
                   />
                   <KpiCard
@@ -275,9 +275,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     label="Marge previst"
                     value={money(props.forecast.netMargin)}
                     sub={`Mitjà ${pct(props.forecast.avgMarginPct)}`}
-                    color="text-amber-300"
-                    borderColor="border-amber-400/30"
-                    bgColor="bg-amber-950/30"
+                    color="admin-tone-text-warning"
+                    borderColor="admin-tone-border-warning"
+                    bgColor="admin-tone-bg-warning"
                     delay={0.2}
                   />
                 </div>
@@ -443,9 +443,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
             <>
               <div className="grid gap-3 grid-cols-2 xl:grid-cols-4">
                 <KpiCard label="Total pendent de cobrar" value={money(props.outstandingTotal)} color="text-white/90" borderColor="border-white/10" bgColor="bg-white/[0.03]" />
-                <KpiCard label="Pendent fora de termini" value={money(props.overdueTotal)} color="text-rose-300" borderColor="border-rose-500/30" bgColor="bg-rose-500/10" delay={0.05} />
-                <KpiCard label="Vencen en 7 dies" value={money(props.dueSoonTotal)} color="text-amber-300" borderColor="border-amber-500/30" bgColor="bg-amber-500/10" delay={0.1} />
-                <KpiCard label="Cobrat aquest mes" value={money(props.monthCollected)} color="text-emerald-300" borderColor="border-emerald-500/30" bgColor="bg-emerald-500/10" delay={0.15} />
+                <KpiCard label="Pendent fora de termini" value={money(props.overdueTotal)} color="admin-tone-text-danger" borderColor="admin-tone-border-danger" bgColor="admin-tone-bg-danger" delay={0.05} />
+                <KpiCard label="Vencen en 7 dies" value={money(props.dueSoonTotal)} color="admin-tone-text-warning" borderColor="admin-tone-border-warning" bgColor="admin-tone-bg-warning" delay={0.1} />
+                <KpiCard label="Cobrat aquest mes" value={money(props.monthCollected)} color="admin-tone-text-success" borderColor="admin-tone-border-success" bgColor="admin-tone-bg-success" delay={0.15} />
               </div>
 
               {/* Filtres + Accions massives */}
@@ -521,20 +521,20 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                             </Link>
                           </div>
                           <div className="mb-3 grid gap-2 sm:grid-cols-2">
-                            <div className={`rounded-xl border p-3 ${row.depositPaid ? 'border-emerald-500/25 bg-emerald-500/8' : 'border-rose-500/20 bg-rose-500/5'}`}>
+                            <div className={`rounded-xl border p-3 ${row.depositPaid ? 'admin-tone-border-success admin-tone-bg-success' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
                               <div className="flex items-center justify-between mb-1">
-                                <p className={`text-xs font-semibold ${row.depositPaid ? 'text-emerald-300' : 'text-rose-300'}`}>Bestreta</p>
-                                <p className={`text-sm font-bold ${row.depositPaid ? 'text-emerald-200' : 'text-rose-200'}`}>{money(row.depositAmount)}</p>
+                                <p className={`text-xs font-semibold ${row.depositPaid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>Bestreta</p>
+                                <p className={`text-sm font-bold ${row.depositPaid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>{money(row.depositAmount)}</p>
                               </div>
                               <p className="text-[11px] mb-2">
                                 Venciment: {formatDateSimple(row.depositDueAt)}
                               </p>
                               <PaymentToggleButton bookingId={row.id} field="depositPaid" currentValue={row.depositPaid} />
                             </div>
-                            <div className={`rounded-xl border p-3 ${row.remainingPaid ? 'border-emerald-500/25 bg-emerald-500/8' : 'border-rose-500/20 bg-rose-500/5'}`}>
+                            <div className={`rounded-xl border p-3 ${row.remainingPaid ? 'admin-tone-border-success admin-tone-bg-success' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
                               <div className="flex items-center justify-between mb-1">
-                                <p className={`text-xs font-semibold ${row.remainingPaid ? 'text-emerald-300' : 'text-rose-300'}`}>Saldo restant</p>
-                                <p className={`text-sm font-bold ${row.remainingPaid ? 'text-emerald-200' : 'text-rose-200'}`}>{money(row.remainingAmount)}</p>
+                                <p className={`text-xs font-semibold ${row.remainingPaid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>Saldo restant</p>
+                                <p className={`text-sm font-bold ${row.remainingPaid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>{money(row.remainingAmount)}</p>
                               </div>
                               <p className="text-[11px] mb-2">
                                 Venciment: {formatDateSimple(row.remainingDueAt)}
@@ -616,9 +616,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 <>
                   <div className="grid gap-3 grid-cols-2 xl:grid-cols-4">
                     <KpiCard label="Ingressos realitzats" value={money(props.realized.revenue)} sub={`${props.realized.bookings} completats`} color="text-white/90" borderColor="border-white/10" bgColor="bg-white/[0.03]" />
-                    <KpiCard label="Marge net realitzat" value={money(props.realized.netMargin)} sub={`Mitjà ${pct(props.realized.avgMarginPct)}`} color="text-emerald-300" borderColor="border-emerald-400/30" bgColor="bg-emerald-950/30" delay={0.05} />
+                    <KpiCard label="Marge net realitzat" value={money(props.realized.netMargin)} sub={`Mitjà ${pct(props.realized.avgMarginPct)}`} color="admin-tone-text-success" borderColor="admin-tone-border-success" bgColor="admin-tone-bg-success" delay={0.05} />
                     <KpiCard label="Previsió d'ingressos" value={money(props.forecast.revenue)} sub={`${props.forecast.bookings} en pipeline`} color="text-white/90" borderColor="border-white/10" bgColor="bg-white/[0.03]" delay={0.1} />
-                    <KpiCard label="Previsió de marge" value={money(props.forecast.netMargin)} sub={`Mitjà ${pct(props.forecast.avgMarginPct)}`} color="text-amber-300" borderColor="border-amber-400/30" bgColor="bg-amber-950/30" delay={0.15} />
+                    <KpiCard label="Previsió de marge" value={money(props.forecast.netMargin)} sub={`Mitjà ${pct(props.forecast.avgMarginPct)}`} color="admin-tone-text-warning" borderColor="admin-tone-border-warning" bgColor="admin-tone-bg-warning" delay={0.15} />
                   </div>
 
                   {/* Top + Risc */}
@@ -771,10 +771,10 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                             <td className="px-3 py-2 font-medium">{row.month}</td>
                             <td className="px-3 py-2 text-right">{money(row.income)}</td>
                             <td className="px-3 py-2 text-right">{money(row.costs)}</td>
-                            <td className={`px-3 py-2 text-right font-semibold ${row.netFlow >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
+                            <td className={`px-3 py-2 text-right font-semibold ${row.netFlow >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
                               {money(row.netFlow)}
                             </td>
-                            <td className={`px-3 py-2 text-right font-bold ${row.cumulative >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            <td className={`px-3 py-2 text-right font-bold ${row.cumulative >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
                               {money(row.cumulative)}
                             </td>
                           </tr>
@@ -824,9 +824,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                           const yoyToneClass = yoyDelta == null
                             ? 'opacity-50'
                             : yoyDelta >= 0.1
-                              ? 'text-emerald-300'
+                              ? 'admin-tone-text-success'
                               : yoyDelta <= -0.1
-                                ? 'text-rose-300'
+                                ? 'admin-tone-text-danger'
                                 : 'opacity-70';
                           return (
                             <tr key={row.month} className="hover:bg-white/[0.03]">
@@ -980,11 +980,11 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                             </td>
                             <td className="px-3 py-2 text-right">{money(row.price)}</td>
                             <td className="px-3 py-2 text-right">{money(row.directCost)}</td>
-                            <td className={`px-3 py-2 text-right font-semibold ${row.profit >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>{money(row.profit)}</td>
+                            <td className={`px-3 py-2 text-right font-semibold ${row.profit >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>{money(row.profit)}</td>
                             <td className="px-3 py-2 text-right">{pct(row.marginPct)}</td>
                             <td className="px-3 py-2 text-right">{money(row.extraHourPrice)}</td>
                             <td className="px-3 py-2 text-right">{money(row.extraHourCostEstimated)}</td>
-                            <td className={`px-3 py-2 text-right font-semibold ${row.extraHourProfit >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>{money(row.extraHourProfit)}</td>
+                            <td className={`px-3 py-2 text-right font-semibold ${row.extraHourProfit >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>{money(row.extraHourProfit)}</td>
                             <td className="px-3 py-2 text-right">{pct(row.extraHourMarginPct)}</td>
                           </tr>
                         );

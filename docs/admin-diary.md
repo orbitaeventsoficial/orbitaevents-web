@@ -1,3 +1,51 @@
+## 2026-06-15 — Economia tokenitzat (KpiCards + helpers de marge centralitzats) (Canvi #979, claude)
+
+### Resum
+Tercera pàgina de la tokenització per dominis. `/admin/economia` tenia 32 colors Tailwind no-Òrbita. Bona part venien de **helpers centralitzats** a `economia-types.ts` (`marginColor`, `marginBg`, `paymentStateBadge`, `packMarginBadge`) → tokenitzar-los allà arregla TOTS els consumidors d'un sol cop (monocapa real).
+
+### Què s'ha fet
+- `economia-types.ts`: `marginColor`/`marginBg` (4 escalons → success/warning/warning/danger; el taronja cau a warning), `paymentStateBadge` i `packMarginBadge` → classes `admin-tone-*`. Font única; afecta economia + qualsevol altre consumidor.
+- `EconomiaClient.tsx`: KpiCards (props color/border/bg) i classes condicionals inline (bestreta/saldo pagat, cash flow net/acumulat, YoY) → `admin-tone-{text,bg,border}-{success,warning,danger}`. Mapeig 1:1 semàntic; els tints 500/950/400 cauen tots a la mateixa tona canònica. Grep no-Òrbita = 0 (Client + types).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0. 0 colors no-Òrbita a economia.
+- Validació funcional: semàntica preservada (verd=sa/cobrat, ambre=vigilar/proper, vermell=crític/vençut).
+- Validació humana/UX: pendent del propietari (refrescar `/admin/economia`).
+
+### Progrés tokenització global
+Fets: collaborators (#977), reporting (#978), economia (#979). Patró sòlid: tokenitzar primer els **helpers centralitzats** (com economia-types) rendeix molt — arregla N consumidors d'un cop.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 978 → 979. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-15 — Reporting tokenitzat (colors d'estat → admin-tone-*) (Canvi #978, claude)
+
+### Resum
+Primera pàgina de la tokenització global per dominis (poc a poc, el CSS marca el camí). `/admin/reporting` tenia 22 colors Tailwind no-Òrbita (rose/amber/emerald/cyan/violet amb opacitats). Mapeig 1:1 net a la família canònica `admin-tone-{bg,border,text}-*` (ja tokenitzada a admin-theme.css).
+
+### Què s'ha fet
+- `app/admin/reporting/page.tsx`: rose→danger, amber→warning, emerald→success, cyan→cyan, violet→violet. Badges d'insight, headline KPIs (reserves/ingressos/pipeline/previsió), SLA condicional, cards de tracking d'email i marge → classes `admin-tone-*`. Barra de funnel `bg-cyan-500/30` → `admin-tone-bg-cyan`. Grep de colors no-Òrbita = 0.
+- L'`OwnerControlStrip` (ja retorna null, #976) es deixa al codi per a la neteja global de seguiment; no s'ha tocat la seva cadena de dades (evita orfes).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0. 0 colors no-Òrbita a reporting.
+- Validació funcional: estats mantenen la semàntica (verd=bo, ambre=avís, vermell=crític) via tokens.
+- Validació humana/UX: pendent del propietari (refrescar `/admin/reporting`).
+
+### Progrés tokenització global
+Deute: 95 fitxers / 1.461 colors. Fets: collaborators (#977) + reporting (#978). Patró validat: family `admin-tone-*` per estats; `text-[color:var(--ax-*)]` per daurat/èxit puntual; `ap-inline-alert--*` per alertes.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 977 → 978. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-15 — Partners 100% tokenitzat (colors no-Òrbita → tokens) + mesura del deute global (Canvi #977, claude)
 
 ### Resum

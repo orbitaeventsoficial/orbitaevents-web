@@ -1453,6 +1453,39 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #979 — 2026-06-15 — claude (TANCAT)
+
+**Economia tokenitzat (helpers de marge centralitzats + KpiCards).**
+
+- `economia-types.ts`: `marginColor`/`marginBg`/`paymentStateBadge`/`packMarginBadge` → `admin-tone-*` (font única, arregla tots els consumidors).
+- `EconomiaClient.tsx`: 32 colors no-Òrbita → `admin-tone-{text,bg,border}-{success,warning,danger}` (KpiCards + condicionals). Grep no-Òrbita = 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 978 -> 979.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàntica preservada.
+- Validació humana/UX: pendent del propietari.
+- Progrés: collaborators + reporting + economia (de 94 fitxers).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #978 — 2026-06-15 — claude (TANCAT)
+
+**Reporting tokenitzat (colors d'estat → `admin-tone-*`).**
+
+- `app/admin/reporting/page.tsx`: 22 colors Tailwind no-Òrbita → família canònica `admin-tone-{bg,border,text}-{danger,warning,success,cyan,violet}` (1:1 semàntic). Grep no-Òrbita = 0. OwnerControlStrip (null, #976) deixat per a neteja global.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 977 -> 978.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: estats amb semàntica preservada via tokens.
+- Validació humana/UX: pendent del propietari.
+- Progrés tokenització global: fets collaborators + reporting (de 95 fitxers).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #977 — 2026-06-15 — claude (TANCAT)
 
 **Partners 100% tokenitzat + mesura del deute de color global.**
