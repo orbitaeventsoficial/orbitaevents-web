@@ -1,3 +1,24 @@
+## 2026-06-16 — Clientes (SummaryPanel) + Inventory editor tokenitzats (Canvi #984, claude)
+
+### Resum
+Non-stop. Dos fitxers densos: `clientes/[id]/.../SummaryPanel.tsx` (18) i `inventory/[id]/InventoryItemEditor.tsx` (17).
+
+### Què s'ha fet
+- `SummaryPanel.tsx`: alertes (warning/success/info), `StatCard` i `QuickAction` colorStyles (indigo→violet, slate intacte), distance pill, focus ring (`ring-cyan`→`ring-[var(--ax-hair-gold)]`), errors → `admin-tone-*`. Grep no-Òrbita = 0.
+- `InventoryItemEditor.tsx`: `STATUS_TONE`/`CONDITION_TONE` (available/in_use/maintenance/retired → success/cyan/warning/danger), `inputClass`→`.adm-input`, toggles actius, error/success cards, botó desar (`bg-cyan-600`→`bg-[var(--o-info)]`), botó eliminar → tokens. Grep no-Òrbita = 0.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: estats d'inventari/client amb semàntica i to de sèrie; inputs canònics.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 983 → 984. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-16 — Packs tokenitzat (page + EditPackForm pro) (Canvi #983, claude)
 
 ### Resum

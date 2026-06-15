@@ -306,10 +306,10 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
               key={i}
               className={`rounded-xl border px-3 py-2 text-sm ${
                 alert.type === 'warning'
-                  ? 'border-amber-500/40 bg-amber-500/10 text-amber-200'
+                  ? 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning'
                   : alert.type === 'success'
-                    ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200'
-                    : 'border-sky-500/40 bg-sky-500/10 text-sky-200'
+                    ? 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success'
+                    : 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan'
               }`}
             >
               {alert.type === 'warning' && '⚠️ '}
@@ -597,7 +597,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                   </p>
                 )}
                 {topLeadPaymentRisk && (
-                  <p className="mt-1 text-[11px] text-amber-300">
+                  <p className="mt-1 text-[11px] admin-tone-text-warning">
                     {topLeadPaymentRisk}
                   </p>
                 )}
@@ -859,11 +859,11 @@ function InfoField({ label, value, editing, type = 'text', options, onChange }: 
 
 function StatCard({ label, value, detail, color }: { label: string; value: number; detail?: string; color: 'cyan' | 'indigo' | 'amber' | 'emerald' | 'violet'; }) {
   const colorStyles = {
-    cyan: 'border-cyan-500/30 bg-cyan-500/5',
-    indigo: 'border-indigo-500/30 bg-indigo-500/5',
-    amber: 'border-amber-500/30 bg-amber-500/5',
-    emerald: 'border-emerald-500/30 bg-emerald-500/5',
-    violet: 'border-violet-500/30 bg-violet-500/5',
+    cyan: 'admin-tone-border-cyan admin-tone-bg-cyan',
+    indigo: 'admin-tone-border-violet admin-tone-bg-violet',
+    amber: 'admin-tone-border-warning admin-tone-bg-warning',
+    emerald: 'admin-tone-border-success admin-tone-bg-success',
+    violet: 'admin-tone-border-violet admin-tone-bg-violet',
   };
 
   return (
@@ -889,10 +889,10 @@ function ActionCard({ title, isEmpty, emptyText, content, action }: { title: str
 
 function QuickAction({ href, label, color, external }: { href: string; label: string; color: 'cyan' | 'amber' | 'emerald' | 'indigo' | 'slate'; external?: boolean; }) {
   const colorStyles = {
-    cyan: 'border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/10',
-    amber: 'border-amber-500/40 text-amber-300 hover:bg-amber-500/10',
-    emerald: 'border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/10',
-    indigo: 'border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/10',
+    cyan: 'admin-tone-border-cyan admin-tone-text-cyan hover:bg-white/5',
+    amber: 'admin-tone-border-warning admin-tone-text-warning hover:bg-white/5',
+    emerald: 'admin-tone-border-success admin-tone-text-success hover:bg-white/5',
+    indigo: 'admin-tone-border-violet admin-tone-text-violet hover:bg-white/5',
     slate: 'border-white/15 text-white/60 hover:bg-white/10',
   };
 
@@ -995,7 +995,7 @@ function RouteSnapshotCard({
       <p className="text-sm font-medium">{venue || location}</p>
       {venue && location && <p className="mt-1 text-xs">{location}</p>}
       <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
-        {distanceLabel && <span className="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-2 py-0.5 text-cyan-200">🚗 {distanceLabel}</span>}
+        {distanceLabel && <span className="rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-0.5 admin-tone-text-cyan">🚗 {distanceLabel}</span>}
         {oneWayLabel && <span className="rounded-full border border-white/10 px-2 py-0.5">{oneWayLabel}</span>}
         {liveRoute?.durationText && <span className="rounded-full border border-white/10 px-2 py-0.5">⏱️ {liveRoute.durationText}</span>}
       </div>
@@ -1005,7 +1005,7 @@ function RouteSnapshotCard({
         <p className="mt-1 text-[11px] opacity-60">Destí resolt: {liveRoute.destinationResolved}</p>
       )}
       {loading && <p className="mt-2 text-[11px] opacity-70">Calculant ruta real...</p>}
-      {!loading && routeError && <p className="mt-2 text-[11px] text-amber-300">{routeError}</p>}
+      {!loading && routeError && <p className="mt-2 text-[11px] admin-tone-text-warning">{routeError}</p>}
       <div className="mt-3 flex flex-wrap gap-3 text-[11px]">
         <a href={mapsHref} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:underline">
           Obrir a Google Maps
@@ -1186,7 +1186,7 @@ function CrmStatusBar({
                 if (e.key === 'Escape') { setAddingTag(false); setNewTag(''); }
               }}
               placeholder="Nou tag..."
-              className="w-24 rounded-lg border border-white/20 bg-transparent px-2 py-0.5 text-[11px] text-white/80 placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+              className="w-24 rounded-lg border border-white/20 bg-transparent px-2 py-0.5 text-[11px] text-white/80 placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-[var(--ax-hair-gold)]"
               autoFocus
               disabled={saving}
               list="tag-presets"
@@ -1200,7 +1200,7 @@ function CrmStatusBar({
               type="button"
               onClick={() => handleAddTag(newTag)}
               disabled={saving || !newTag.trim()}
-              className="text-[11px] text-cyan-400 hover:text-cyan-300 disabled:opacity-30"
+              className="text-[11px] admin-tone-text-cyan hover:opacity-80 disabled:opacity-30"
             >
               {saving ? '...' : '✓'}
             </button>
@@ -1365,7 +1365,7 @@ function ContactsSection({ customerId, contacts: initialContacts }: { customerId
             <input type="checkbox" checked={form.isPrimary} onChange={e => setForm(p => ({ ...p, isPrimary: e.target.checked }))} className="accent-amber-400" />
             Contacte principal
           </label>
-          {error && <p className="text-xs text-red-400">{error}</p>}
+          {error && <p className="text-xs admin-tone-text-danger">{error}</p>}
           <div className="flex gap-2">
             <button type="button" onClick={handleSave} disabled={saving || !form.name.trim()}
               className="rounded-xl px-4 py-2 text-sm font-semibold border border-[var(--ax-hair-gold)] text-[var(--ax-gold-bright)] disabled:opacity-50">

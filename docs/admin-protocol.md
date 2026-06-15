@@ -1453,6 +1453,22 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #984 — 2026-06-16 — claude (TANCAT)
+
+**Clientes (SummaryPanel) + Inventory editor tokenitzats.**
+
+- `SummaryPanel.tsx`: alertes, StatCard/QuickAction, pills, focus ring, errors → `admin-tone-*`/tokens. Grep = 0.
+- `InventoryItemEditor.tsx`: STATUS/CONDITION_TONE, inputClass→`.adm-input`, toggles, cards, botons → tokens. Grep = 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 983 -> 984.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: estats amb semàntica i to de sèrie; inputs canònics.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #983 — 2026-06-16 — claude (TANCAT)
 
 **Packs tokenitzat (page + EditPackForm pro).**

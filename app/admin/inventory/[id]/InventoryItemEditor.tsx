@@ -36,21 +36,20 @@ interface InventoryItemEditorProps {
 }
 
 const STATUS_TONE: Record<string, string> = {
-  AVAILABLE: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-100',
-  IN_USE: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-100',
-  MAINTENANCE: 'border-amber-500/30 bg-amber-500/10 text-amber-100',
-  RETIRED: 'border-rose-500/30 bg-rose-500/10 text-rose-100',
+  AVAILABLE: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
+  IN_USE: 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan',
+  MAINTENANCE: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+  RETIRED: 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger',
 };
 
 const CONDITION_TONE: Record<string, string> = {
-  EXCELLENT: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-100',
-  GOOD: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-100',
-  FAIR: 'border-amber-500/30 bg-amber-500/10 text-amber-100',
-  POOR: 'border-rose-500/30 bg-rose-500/10 text-rose-100',
+  EXCELLENT: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
+  GOOD: 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan',
+  FAIR: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+  POOR: 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger',
 };
 
-const inputClass =
-  'mt-1 w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white/90 placeholder:text-white/35 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50';
+const inputClass = 'adm-input mt-1';
 
 const formatEuro = formatCurrencyExact;
 
@@ -202,7 +201,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-100">
+              <span className="inline-flex items-center rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-3 py-1 text-xs font-semibold admin-tone-text-cyan">
                 {mode === 'create' ? 'Nou element' : 'Fitxa inventari'}
               </span>
               {statusMeta && (
@@ -247,12 +246,12 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
       </section>
 
       {error && (
-        <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-rose-100">
+        <div className="rounded-xl border admin-tone-border-danger admin-tone-bg-danger p-3 admin-tone-text-danger">
           <p className="text-sm">{error}</p>
         </div>
       )}
       {success && (
-        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-emerald-100">
+        <div className="rounded-xl border admin-tone-border-success admin-tone-bg-success p-3 admin-tone-text-success">
           <p className="text-sm">Canvis desats correctament</p>
         </div>
       )}
@@ -293,7 +292,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
                       onClick={() => updateField('status', status.value)}
                       className={`rounded-xl border px-2 py-1.5 text-[10px] font-medium transition-all ${
                         form.status === status.value
-                          ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200'
+                          ? 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan'
                           : 'border-white/10 text-white/40 hover:bg-white/5'
                       }`}
                     >
@@ -341,7 +340,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
                       onClick={() => updateField('condition', condition.value)}
                       className={`flex-1 rounded-xl border px-2 py-1.5 text-[10px] font-medium transition-all ${
                         form.condition === condition.value
-                          ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200'
+                          ? 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan'
                           : 'border-white/10 text-white/40 hover:bg-white/5'
                       }`}
                     >
@@ -509,7 +508,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
             </div>
           </section>
 
-          <section className="rounded-2xl border border-cyan-400/20 bg-cyan-500/5 p-5">
+          <section className="rounded-2xl border admin-tone-border-cyan admin-tone-bg-cyanp-5">
             <h2 className="text-sm font-semibold text-white">Checklist d’edició</h2>
             <ul className="mt-3 space-y-2 text-sm text-white/75">
               <li>Nom i descripció prou clars per identificar el material sense obrir cap altra pantalla.</li>
@@ -526,7 +525,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
           type="button"
           onClick={handleSave}
           disabled={saving || !form.name || !form.value}
-          className="rounded-xl bg-cyan-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:bg-cyan-500 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-xl bg-[var(--o-info)] px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {saving ? 'Desant...' : mode === 'create' ? 'Crear element' : 'Desar canvis'}
         </button>
@@ -535,7 +534,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
           <button
             type="button"
             onClick={handleDelete}
-            className="rounded-xl border border-rose-500/30 px-4 py-3 text-sm text-rose-100 transition-colors hover:bg-rose-500/10"
+            className="rounded-xl border admin-tone-border-danger px-4 py-3 text-sm admin-tone-text-danger transition-colors hover:bg-white/5"
           >
             Eliminar
           </button>
