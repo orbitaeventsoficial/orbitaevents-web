@@ -169,7 +169,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
               required
               value={form.name}
               onChange={(e) => update('name', e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-amber-400/60 focus:outline-none"
+              className="adm-input mt-1"
             />
           </label>
           <label className="block text-sm">
@@ -179,7 +179,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
               required
               value={form.email}
               onChange={(e) => update('email', e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-amber-400/60 focus:outline-none"
+              className="adm-input mt-1"
             />
           </label>
           <label className="block text-sm">
@@ -188,7 +188,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
               type="tel"
               value={form.phone}
               onChange={(e) => update('phone', e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-amber-400/60 focus:outline-none"
+              className="adm-input mt-1"
             />
           </label>
           <label className="block text-sm">
@@ -197,7 +197,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
               type="text"
               value={form.dni}
               onChange={(e) => update('dni', e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-amber-400/60 focus:outline-none"
+              className="adm-input mt-1"
             />
           </label>
         </div>
@@ -211,7 +211,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             <select
               value={form.eventType}
               onChange={(e) => update('eventType', e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-amber-400/60 focus:outline-none"
+              className="adm-input mt-1"
             >
               {EVENT_TYPE_VALUES.map((value) => (
                 <option key={value} value={value}>
@@ -226,7 +226,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
               type="date"
               value={form.eventDate}
               onChange={(e) => update('eventDate', e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-amber-400/60 focus:outline-none"
+              className="adm-input mt-1"
             />
           </label>
           <label className="block text-sm">
@@ -235,7 +235,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
               type="text"
               value={form.eventLocation}
               onChange={(e) => update('eventLocation', e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-amber-400/60 focus:outline-none"
+              className="adm-input mt-1"
             />
           </label>
           <label className="block text-sm">
@@ -244,7 +244,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
               type="time"
               value={form.eventStartTime}
               onChange={(e) => update('eventStartTime', e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-amber-400/60 focus:outline-none"
+              className="adm-input mt-1"
             />
           </label>
           <label className="block text-sm">
@@ -253,7 +253,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
               type="time"
               value={form.eventEndTime}
               onChange={(e) => update('eventEndTime', e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-amber-400/60 focus:outline-none"
+              className="adm-input mt-1"
             />
           </label>
           <label className="block text-sm">
@@ -262,7 +262,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
               type="text"
               value={form.eventVenue}
               onChange={(e) => update('eventVenue', e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-amber-400/60 focus:outline-none"
+              className="adm-input mt-1"
             />
           </label>
           <label className="block text-sm">
@@ -272,7 +272,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
               min={0}
               value={form.guestCount}
               onChange={(e) => update('guestCount', e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-amber-400/60 focus:outline-none"
+              className="adm-input mt-1"
             />
           </label>
           <label className="block text-sm">
@@ -282,7 +282,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
               placeholder="ex. 800-1200€"
               value={form.budget}
               onChange={(e) => update('budget', e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-amber-400/60 focus:outline-none"
+              className="adm-input mt-1"
             />
           </label>
           <label className="block text-sm sm:col-span-2">
@@ -290,7 +290,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             <select
               value={form.packId}
               onChange={(e) => update('packId', e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-amber-400/60 focus:outline-none"
+              className="adm-input mt-1"
             >
               <option value="">— Sense pack —</option>
               {packs.map((p) => (
@@ -301,16 +301,16 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             </select>
           </label>
           {canSuggest && suggestion && (
-            <div className="sm:col-span-2 rounded-xl border border-cyan-400/20 bg-cyan-500/[0.06] p-4 text-sm">
+            <div className="sm:col-span-2 rounded-xl border admin-tone-border-cyan admin-tone-bg-cyan p-4 text-sm">
               {suggestedPack && !suggestion.unmatched ? (
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-cyan-100 font-semibold">Suggeriment automàtic</span>
-                    <span className="rounded-full border border-cyan-300/30 bg-cyan-400/10 px-2 py-0.5 text-[11px] uppercase tracking-wide text-cyan-100">
+                    <span className="admin-tone-text-cyan font-semibold">Suggeriment automàtic</span>
+                    <span className="rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-0.5 text-[11px] uppercase tracking-wide admin-tone-text-cyan">
                       Confiança {bestSuggestion ? getConfidenceLabel(bestSuggestion.confidence) : ''}
                     </span>
                     {form.packId === suggestedPack.id ? (
-                      <span className="rounded-full border border-emerald-300/30 bg-emerald-400/10 px-2 py-0.5 text-[11px] uppercase tracking-wide text-emerald-100">
+                      <span className="rounded-full border admin-tone-border-success admin-tone-bg-success px-2 py-0.5 text-[11px] uppercase tracking-wide admin-tone-text-success">
                         Aplicat
                       </span>
                     ) : null}
@@ -319,12 +319,12 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
                     <span className="font-semibold">{suggestedPack.code}</span> · {suggestedPack.price}€
                   </p>
                   {bestSuggestion && bestSuggestion.reasons.length > 0 ? (
-                    <p className="text-xs text-cyan-50/80">
+                    <p className="text-xs admin-tone-text-cyan">
                       {bestSuggestion.reasons.slice(0, 2).join(' · ')}
                     </p>
                   ) : null}
                   {bestSuggestion && bestSuggestion.warnings.length > 0 ? (
-                    <p className="text-xs text-amber-100/80">
+                    <p className="text-xs admin-tone-text-warning">
                       {bestSuggestion.warnings.slice(0, 1).join(' · ')}
                     </p>
                   ) : null}
@@ -337,7 +337,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
                     <button
                       type="button"
                       onClick={() => update('packId', suggestedPack.id)}
-                      className="rounded-lg border border-cyan-300/30 bg-cyan-400/10 px-3 py-2 text-xs font-medium text-cyan-50 hover:bg-cyan-400/20"
+                      className="rounded-lg border admin-tone-border-cyan admin-tone-bg-cyan px-3 py-2 text-xs font-medium admin-tone-text-cyan hover:opacity-80"
                     >
                       Aplicar suggeriment
                     </button>
@@ -345,7 +345,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
                 </div>
               ) : (
                 <div className="space-y-1">
-                  <p className="font-semibold text-cyan-100">Sense suggeriment clar</p>
+                  <p className="font-semibold admin-tone-text-cyan">Sense suggeriment clar</p>
                   <p className="text-xs text-white/65">
                     Amb les dades actuals no hi ha cap pack amb encaix prou net. Ajusta invitats,
                     pressupost o tria el pack manualment.
@@ -360,14 +360,14 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
               rows={3}
               value={form.message}
               onChange={(e) => update('message', e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-amber-400/60 focus:outline-none"
+              className="adm-input mt-1"
             />
           </label>
         </div>
       </fieldset>
 
-      <fieldset className="rounded-xl border border-amber-400/30 bg-amber-500/[0.04] p-5 space-y-3">
-        <legend className="px-2 text-sm font-semibold text-amber-200">Què vols crear?</legend>
+      <fieldset className="rounded-xl border admin-tone-border-warning admin-tone-bg-warning p-5 space-y-3">
+        <legend className="px-2 text-sm font-semibold admin-tone-text-warning">Què vols crear?</legend>
         <div className="grid sm:grid-cols-3 gap-2">
           <button
             type="button"
@@ -382,7 +382,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             type="button"
             onClick={() => void submit('lead+proposal')}
             disabled={submitting !== null}
-            className="rounded-lg border border-amber-400/40 bg-amber-500/10 px-4 py-3 text-sm font-medium hover:bg-amber-500/20 disabled:opacity-60"
+            className="rounded-lg border admin-tone-border-warning admin-tone-bg-warning px-4 py-3 text-sm font-medium hover:opacity-80 disabled:opacity-60"
           >
             <div className="font-semibold">Lead + pressupost</div>
             <div className="text-xs text-white/70 mt-1">DRAFT</div>
@@ -391,14 +391,14 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             type="button"
             onClick={() => void submit('lead+proposal+booking')}
             disabled={submitting !== null}
-            className="rounded-lg border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 text-sm font-medium hover:bg-emerald-500/20 disabled:opacity-60"
+            className="rounded-lg border admin-tone-border-success admin-tone-bg-success px-4 py-3 text-sm font-medium hover:opacity-80 disabled:opacity-60"
           >
             <div className="font-semibold">Tot d&apos;un cop</div>
             <div className="text-xs text-white/70 mt-1">+ Reserva PENDING</div>
           </button>
         </div>
         {submitting && (
-          <p className="text-xs text-amber-200/80">Creant {submitting}…</p>
+          <p className="text-xs admin-tone-text-warning">Creant {submitting}…</p>
         )}
         {!form.packId && suggestedPack ? (
           <p className="text-xs text-white/55">

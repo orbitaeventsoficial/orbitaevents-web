@@ -1,3 +1,49 @@
+## 2026-06-16 — Dashboard tokenitzat (dots + cards d'estat a sèrie Òrbita) (Canvi #982, claude)
+
+### Resum
+Tancament de `/admin/page.tsx` (dashboard, 23 colors no-Òrbita), la pàgina més vista. Conviu amb el seu sistema propi `admin-cr-*` (control-room); el que desafinava eren els dots i algunes cards/text amb Tailwind directe.
+
+### Què s'ha fet
+- `app/admin/page.tsx`: dots (`bg-rose/amber/emerald/cyan-400`) → `bg-[var(--o-danger|warning|success|info)]` (color sòlid de sèrie). Cards d'estat (`operatingCycleTone`, next-event border, salut summary) i text → `admin-tone-*` (sèrie des de #980). Barra de progrés d'ingressos → `bg-[var(--o-*)]`. Grep no-Òrbita = 0. No s'ha tocat el sistema `admin-cr-*` (ja canònic via tokens).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: dots/estats amb el to de la sèrie; semàntica preservada.
+- Validació humana/UX: pendent del propietari (refrescar dashboard).
+
+### Progrés tokenització
+Fets: collaborators, reporting, economia, customer-crm, #980 global, quick-create, dashboard. bookings ja estava net (CSS propi).
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 981 → 982. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — Quick-create tokenitzat (inputs .adm-input + estats sèrie) (Canvi #981, claude)
+
+### Resum
+Tancament de `/admin/quick-create` (27 colors no-Òrbita). Pàgina d'entrada ràpida lead/proposta/reserva.
+
+### Què s'ha fet
+- `QuickCreateForm.tsx`: 13 inputs/select/textarea amb `border-white/10 bg-black/40 focus:border-amber-400/60` → **`.adm-input`** canònic (focus daurat de sèrie inclòs). Bloc de suggeriment de pack (cyan), fieldset «Què vols crear?» i botons (amber/emerald) → classes `admin-tone-*` (que des del #980 ja són color de la sèrie Òrbita). Grep no-Òrbita = 0.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: inputs i estats amb el to de la sèrie.
+- Validació humana/UX: pendent del propietari.
+
+### Progrés tokenització
+Fets: collaborators, reporting, economia + customer-crm (helper), canonització global #980, quick-create. Pàgines pendents amb color: ~89.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 980 → 981. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-16 — Color canònic: la capa legacy --at-* deriva de la sèrie Òrbita (Cristina) (Canvi #980, claude)
 
 ### Resum

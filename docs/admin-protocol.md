@@ -1453,6 +1453,36 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #982 — 2026-06-16 — claude (TANCAT)
+
+**Dashboard tokenitzat (dots + cards d'estat a sèrie Òrbita).**
+
+- `app/admin/page.tsx`: dots → `bg-[var(--o-*)]`; cards/text d'estat → `admin-tone-*` (sèrie des de #980); barra de progrés → `bg-[var(--o-*)]`. Sistema `admin-cr-*` intacte. Grep no-Òrbita = 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 981 -> 982.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: dots/estats amb to de sèrie; grep no-Òrbita = 0.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #981 — 2026-06-16 — claude (TANCAT)
+
+**Quick-create tokenitzat (inputs `.adm-input` + estats sèrie).**
+
+- `QuickCreateForm.tsx`: 13 inputs → `.adm-input`; suggeriment/botons (cyan/amber/emerald) → `admin-tone-*` (sèrie des de #980). Grep no-Òrbita = 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 980 -> 981.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: inputs i estats amb el to de la sèrie; grep no-Òrbita = 0.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #980 — 2026-06-16 — claude (TANCAT)
 
 **Color canònic: la capa legacy `--at-*` deriva de la sèrie Òrbita (`--o-*`, fitxa Cristina).**

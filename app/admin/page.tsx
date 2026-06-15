@@ -132,9 +132,9 @@ export default async function AdminDashboard() {
     postEventPending: d.postEventPending,
   });
   const operatingCycleTone: Record<AdminOperatingCycleTone, string> = {
-    success: 'border-emerald-500/25 bg-emerald-500/[0.04] text-emerald-100',
-    warning: 'border-amber-500/25 bg-amber-500/[0.05] text-amber-100',
-    info: 'border-cyan-500/25 bg-cyan-500/[0.05] text-cyan-100',
+    success: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
+    warning: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+    info: 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan',
   };
   const nextPriorityHref = d.alerts[0]?.href || '/admin/tasks';
   const nextPriorityTitle = d.alerts[0]?.title || (d.upcomingTasks[0]?.title ? d.upcomingTasks[0].title : 'Revisar la cua de tasques');
@@ -146,12 +146,12 @@ export default async function AdminDashboard() {
         const tone = driver.priority === 'CRITICAL'
           ? {
               card: 'admin-cr-radar-card--rose',
-              dot: 'bg-rose-400',
+              dot: 'bg-[var(--o-danger)]',
               value: 'admin-cr-tone-rose',
             }
           : {
               card: 'admin-cr-radar-card--amber',
-              dot: 'bg-amber-400',
+              dot: 'bg-[var(--o-warning)]',
               value: 'admin-cr-tone-amber',
             };
         return {
@@ -173,7 +173,7 @@ export default async function AdminDashboard() {
           value: d.staleLeadsCount,
           detail: 'Leads amb més de 24h sense avançar.',
           cardClass: d.staleLeadsCount > 0 ? 'admin-cr-radar-card--rose' : 'admin-cr-radar-card--emerald',
-          dotClass: d.staleLeadsCount > 0 ? 'bg-rose-400' : 'bg-emerald-400',
+          dotClass: d.staleLeadsCount > 0 ? 'bg-[var(--o-danger)]' : 'bg-[var(--o-success)]',
           valueClass: d.staleLeadsCount > 0 ? 'admin-cr-tone-rose' : 'admin-cr-tone-emerald',
         },
         {
@@ -183,7 +183,7 @@ export default async function AdminDashboard() {
           value: d.hotLeadsCount,
           detail: 'Prioritat alta/urgent.',
           cardClass: d.hotLeadsCount > 0 ? 'admin-cr-radar-card--amber' : 'admin-cr-radar-card--emerald',
-          dotClass: d.hotLeadsCount > 0 ? 'bg-amber-400' : 'bg-emerald-400',
+          dotClass: d.hotLeadsCount > 0 ? 'bg-[var(--o-warning)]' : 'bg-[var(--o-success)]',
           valueClass: d.hotLeadsCount > 0 ? 'admin-cr-tone-amber' : 'admin-cr-tone-emerald',
         },
         {
@@ -193,7 +193,7 @@ export default async function AdminDashboard() {
           value: d.quotesInFlightCount,
           detail: 'Enviats o negociant.',
           cardClass: d.quotesInFlightCount > 0 ? 'admin-cr-radar-card--cyan' : 'admin-cr-radar-card--emerald',
-          dotClass: d.quotesInFlightCount > 0 ? 'bg-cyan-400' : 'bg-emerald-400',
+          dotClass: d.quotesInFlightCount > 0 ? 'bg-[var(--o-info)]' : 'bg-[var(--o-success)]',
           valueClass: d.quotesInFlightCount > 0 ? 'admin-cr-tone-cyan' : 'admin-cr-tone-emerald',
         },
       ];
@@ -308,21 +308,21 @@ export default async function AdminDashboard() {
         <Link href={buildBookingHref(d.nextEvent.id)} className="block">
           <section className={`rounded-2xl border-2 p-5 sm:p-6 transition-all admin-card-glass ${
             d.nextEvent.daysUntil <= 1
-              ? 'border-amber-500/50 admin-glow-pulse'
+              ? 'admin-tone-border-warning admin-glow-pulse'
               : d.nextEvent.daysUntil <= 3
-                ? 'border-cyan-500/30'
+                ? 'admin-tone-border-cyan'
                 : 'border-white/10'
           }`}>
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <span className={`text-xs font-bold uppercase tracking-wider ${
-                    d.nextEvent.daysUntil <= 1 ? 'text-amber-400' : 'text-cyan-400'
+                    d.nextEvent.daysUntil <= 1 ? 'admin-tone-text-warning' : 'admin-tone-text-cyan'
                   }`}>
                     {d.nextEvent.daysUntil === 0 ? 'AVUI' : d.nextEvent.daysUntil === 1 ? 'DEMÀ' : `D'aquí ${d.nextEvent.daysUntil} dies`}
                   </span>
                   <span className={`inline-block w-2 h-2 rounded-full ${
-                    d.nextEvent.daysUntil <= 1 ? 'bg-amber-400 animate-pulse' : 'bg-cyan-400'
+                    d.nextEvent.daysUntil <= 1 ? 'bg-[var(--o-warning)] animate-pulse' : 'bg-[var(--o-info)]'
                   }`} />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-bold truncate">{d.nextEvent.clientName}</h2>
@@ -340,7 +340,7 @@ export default async function AdminDashboard() {
                 <p className="text-xs opacity-70 mt-0.5">{d.nextEvent.packName}</p>
                 <div className="flex items-center justify-end gap-1.5 mt-2">
                   <Tooltip text={d.nextEvent.depositPaid && d.nextEvent.remainingPaid ? 'Tot pagat' : d.nextEvent.depositPaid ? 'Falta pagament final' : 'Sense cap pagament'}>
-                    <span className={`inline-block w-2.5 h-2.5 rounded-full ${d.nextEvent.depositPaid && d.nextEvent.remainingPaid ? 'bg-emerald-400' : d.nextEvent.depositPaid ? 'bg-amber-400' : 'bg-rose-400'}`} />
+                    <span className={`inline-block w-2.5 h-2.5 rounded-full ${d.nextEvent.depositPaid && d.nextEvent.remainingPaid ? 'bg-[var(--o-success)]' : d.nextEvent.depositPaid ? 'bg-[var(--o-warning)]' : 'bg-[var(--o-danger)]'}`} />
                   </Tooltip>
                   <span className="text-xs">
                     {d.nextEvent.depositPaid && d.nextEvent.remainingPaid ? 'Pagat' : d.nextEvent.depositPaid ? 'Parcial' : 'Pendent'}
@@ -386,7 +386,7 @@ export default async function AdminDashboard() {
             <div className="w-full h-2 rounded-full bg-white/5 overflow-hidden mt-2">
               <div
                 className={`h-full rounded-full admin-progress-animated ${
-                  d.revenueMonthPct >= 100 ? 'bg-emerald-500' : d.revenueMonthPct >= 60 ? 'bg-amber-500' : 'bg-rose-500'
+                  d.revenueMonthPct >= 100 ? 'bg-[var(--o-success)]' : d.revenueMonthPct >= 60 ? 'bg-[var(--o-warning)]' : 'bg-[var(--o-danger)]'
                 }`}
                 style={{ width: `${Math.min(100, d.revenueMonthPct)}%` }}
               />
@@ -603,20 +603,20 @@ export default async function AdminDashboard() {
             <>
               <div className="flex items-center gap-4 mb-3">
                 {d.salutSnapshot.summary.critical > 0 && (
-                  <span className="flex items-center gap-1.5 text-sm font-semibold text-rose-400">
-                    <span className="inline-block w-2.5 h-2.5 rounded-full bg-rose-400" />
+                  <span className="flex items-center gap-1.5 text-sm font-semibold admin-tone-text-danger">
+                    <span className="inline-block w-2.5 h-2.5 rounded-full bg-[var(--o-danger)]" />
                     {d.salutSnapshot.summary.critical} crític{d.salutSnapshot.summary.critical > 1 ? 's' : ''}
                   </span>
                 )}
                 {d.salutSnapshot.summary.warning > 0 && (
-                  <span className="flex items-center gap-1.5 text-sm font-semibold text-amber-400">
-                    <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-400" />
+                  <span className="flex items-center gap-1.5 text-sm font-semibold admin-tone-text-warning">
+                    <span className="inline-block w-2.5 h-2.5 rounded-full bg-[var(--o-warning)]" />
                     {d.salutSnapshot.summary.warning} avís{d.salutSnapshot.summary.warning > 1 ? 'os' : ''}
                   </span>
                 )}
                 {d.salutSnapshot.summary.critical === 0 && d.salutSnapshot.summary.warning === 0 && (
-                  <span className="flex items-center gap-1.5 text-sm font-semibold text-emerald-400">
-                    <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                  <span className="flex items-center gap-1.5 text-sm font-semibold admin-tone-text-success">
+                    <span className="inline-block w-2.5 h-2.5 rounded-full bg-[var(--o-success)]" />
                     Tot correcte
                   </span>
                 )}
@@ -625,7 +625,7 @@ export default async function AdminDashboard() {
                 {d.salutSnapshot.sections.map((section) => {
                   const hasCritical = section.counts.critical > 0;
                   const hasWarning = section.counts.warning > 0;
-                  const dot = hasCritical ? 'bg-rose-400' : hasWarning ? 'bg-amber-400' : 'bg-emerald-400';
+                  const dot = hasCritical ? 'bg-[var(--o-danger)]' : hasWarning ? 'bg-[var(--o-warning)]' : 'bg-[var(--o-success)]';
                   const tone = hasCritical ? 'admin-cr-tone-rose' : hasWarning ? 'admin-cr-tone-amber' : 'admin-cr-tone-emerald';
                   const count = hasCritical ? section.counts.critical : hasWarning ? section.counts.warning : 0;
                   const href = hasCritical ? '/admin/salut?status=critical' : hasWarning ? '/admin/salut?status=warning' : '/admin/salut';
@@ -651,7 +651,7 @@ export default async function AdminDashboard() {
                   <div className="mt-3 space-y-2" {...helpAttrs(ADMIN_DASHBOARD_HELP.priorityIssues)}>
                     {topItems.map((item) => (
                       <Link key={item.id} href={item.href} className="flex items-start gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-white/[0.04]" data-help-title={item.title} data-help-desc={item.reason}>
-                        <span className={`mt-0.5 inline-block w-2 h-2 rounded-full shrink-0 ${item.status === 'critical' ? 'bg-rose-400' : 'bg-amber-400'}`} />
+                        <span className={`mt-0.5 inline-block w-2 h-2 rounded-full shrink-0 ${item.status === 'critical' ? 'bg-[var(--o-danger)]' : 'bg-[var(--o-warning)]'}`} />
                         <div className="min-w-0">
                           <p className="text-sm font-medium text-white/90 truncate">{item.title}</p>
                           <p className="text-xs text-white/50 line-clamp-1">{item.reason}</p>
@@ -665,7 +665,7 @@ export default async function AdminDashboard() {
           ) : (
             <div className="admin-cr-health-grid">
               {d.healthItems.map((item) => {
-                const dot = item.status === 'OK' ? 'bg-emerald-400' : item.status === 'ERROR' ? 'bg-rose-400' : 'bg-amber-400';
+                const dot = item.status === 'OK' ? 'bg-[var(--o-success)]' : item.status === 'ERROR' ? 'bg-[var(--o-danger)]' : 'bg-[var(--o-warning)]';
                 return (
                   <div key={item.label} className="admin-cr-health-item">
                     <span className={`inline-block w-2 h-2 rounded-full ${dot}`} />
