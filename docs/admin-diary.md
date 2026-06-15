@@ -1,3 +1,23 @@
+## 2026-06-16 — AttributionPanel tokenitzat (atribució multi-touch) (Canvi #986, claude)
+
+### Resum
+`app/admin/components/AttributionPanel.tsx` (21 colors). Panell d'atribució multi-touch (first/assist/last touch per canal).
+
+### Què s'ha fet
+- Mapeig semàntic dels 3 moments: first touch→cyan, assist→warning, last touch→success. Badges, StageStat tones, barres de share (`bg-[var(--o-*)]` per width dinàmic), JourneyCard timeline, card de veredicte i llegenda → `admin-tone-*`/tokens. Grep no-Òrbita = 0.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: atribució amb to de sèrie; semàntica de canal preservada.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 985 → 986. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-16 — Social tokenitzat (estats, calendari, modal + inputs canònics) (Canvi #985, claude)
 
 ### Resum

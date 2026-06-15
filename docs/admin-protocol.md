@@ -1453,6 +1453,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #986 — 2026-06-16 — claude (TANCAT)
+
+**AttributionPanel tokenitzat (atribució multi-touch).**
+
+- `AttributionPanel.tsx`: first→cyan/assist→warning/last→success; badges, StageStat, barres (`bg-[var(--o-*)]`), timeline, llegenda → `admin-tone-*`/tokens. Grep no-Òrbita = 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 985 -> 986.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàntica de canal preservada amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #985 — 2026-06-16 — claude (TANCAT)
 
 **Social tokenitzat (estats, calendari, modal + inputs canònics).**
