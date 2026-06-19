@@ -361,8 +361,8 @@ export default function SocialClient({
       <section className="admin-card-glass rounded-2xl border border-white/10 p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">Bucle social únic</p>
-            <h2 className="mt-2 text-base font-black leading-snug">{operatingLoop.title}</h2>
+            <p className="text-xs font-bold uppercase tracking-wider text-white/50">Bucle social únic</p>
+            <h2 className="mt-2 text-base font-bold leading-snug">{operatingLoop.title}</h2>
             <p className="mt-2 max-w-3xl text-sm leading-relaxed text-white/65">{operatingLoop.focus}</p>
           </div>
           <div className="flex flex-wrap gap-2 text-xs lg:justify-end">
@@ -374,23 +374,23 @@ export default function SocialClient({
 
       <section className="grid gap-3 lg:grid-cols-4">
         <article className={`admin-card-glass rounded-2xl border p-4 ${pulseRisk ? 'admin-tone-border-warning admin-tone-bg-warning' : 'admin-tone-border-success admin-tone-bg-success'}`}>
-          <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">Pols editorial</p>
-          <h2 className="mt-2 text-base font-black leading-snug">{pulse.isActive ? 'Actiu' : 'Aturat'}</h2>
+          <p className="text-xs font-bold uppercase tracking-wider text-white/50">Pols editorial</p>
+          <h2 className="mt-2 text-base font-bold leading-snug">{pulse.isActive ? 'Actiu' : 'Aturat'}</h2>
           <p className="mt-2 text-xs leading-relaxed text-white/65">{pulseSummary}</p>
         </article>
         <article className="admin-card-glass rounded-2xl border border-white/10 p-4">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">Cadència</p>
-          <p className="mt-2 text-2xl font-black">{pulse.consistencyScore}%</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-white/50">Cadència</p>
+          <p className="mt-2 text-2xl font-bold">{pulse.consistencyScore}%</p>
           <p className="mt-1 text-xs text-white/60">{pulse.postsLast30d} peces creades · {pulse.scheduledUpcoming} programades</p>
         </article>
         <article className="admin-card-glass rounded-2xl border border-white/10 p-4">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">Cua editorial</p>
-          <p className="mt-2 text-2xl font-black">{pulse.draftsPending}</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-white/50">Cua editorial</p>
+          <p className="mt-2 text-2xl font-bold">{pulse.draftsPending}</p>
           <p className="mt-1 text-xs text-white/60">esborranys pendents de decisió</p>
         </article>
         <article className="admin-card-glass rounded-2xl border border-white/10 p-4">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">Instagram → pipeline</p>
-          <p className="mt-2 text-2xl font-black">{pulse.instagramLeadCount}</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-white/50">Instagram → pipeline</p>
+          <p className="mt-2 text-2xl font-bold">{pulse.instagramLeadCount}</p>
           <p className="mt-1 text-xs text-white/60">{pulse.instagramWonCount} guanyats · {instagramConversionRate}% conversió</p>
         </article>
       </section>
@@ -402,9 +402,9 @@ export default function SocialClient({
             key={key}
             onClick={() => setStatusFilter(statusFilter === key ? 'all' : key)}
             type="button"
-            className={`admin-stagger-item rounded-xl border p-3 text-left transition-colors ${statusFilter === key ? STATUS_TONE[key] : 'border-white/10 admin-card-glass hover:bg-white/[0.06]'}`}
+            className={`admin-stagger-item rounded-xl border p-3 text-left transition-colors ${statusFilter === key ? STATUS_TONE[key] : 'border-white/10 admin-card-glass adm-row-hover'}`}
           >
-            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-60">{label}</p>
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-60">{label}</p>
             <p className="mt-1 text-xl font-bold">{counts[key as SocialPostStatus]}</p>
           </button>
         ))}
@@ -453,14 +453,14 @@ export default function SocialClient({
               <h3 className="text-sm font-semibold flex items-center gap-2">
                 <span>💡</span>
                 <span>Idees suggerides</span>
-                <span className="rounded-full admin-tone-bg-violet admin-tone-text-violet px-2 py-0.5 text-[10px]">{ideas.length}</span>
+                <span className="rounded-full admin-tone-bg-violet admin-tone-text-violet px-2 py-0.5 text-xs">{ideas.length}</span>
               </h3>
-              <p className="mt-0.5 text-[11px] opacity-50">Generades automàticament des de bookings, testimonials, portfolio i esdeveniments propers.</p>
+              <p className="mt-0.5 text-xs opacity-50">Generades automàticament des de bookings, testimonials, portfolio i esdeveniments propers.</p>
             </div>
             <button
               onClick={() => setShowIdeas((v) => !v)}
               type="button"
-              className="rounded-lg border border-white/10 px-2 py-1 text-[11px] hover:bg-white/5 sm:self-auto self-start"
+              className="rounded-lg border border-white/10 px-2 py-1 text-xs hover:bg-white/5 sm:self-auto self-start"
             >
               {showIdeas ? 'Amagar' : 'Mostrar'}
             </button>
@@ -471,26 +471,26 @@ export default function SocialClient({
               {ideas.map((idea) => (
                 <div
                   key={idea.id}
-                  className="admin-stagger-item rounded-lg border border-white/10 admin-card-glass p-3 hover:bg-white/[0.05] transition-colors"
+                  className="admin-stagger-item rounded-lg border border-white/10 admin-card-glass p-3 adm-row-hover transition-colors"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5 text-[10px] opacity-60">
+                      <div className="flex items-center gap-1.5 text-xs opacity-60">
                         <span>{IDEA_SOURCE_ICON[idea.source]}</span>
                         <span>{IDEA_SOURCE_LABEL[idea.source]}</span>
                         <span>·</span>
                         <span>{SOCIAL_CATEGORY_LABELS[idea.category as SocialCategory] || idea.category}</span>
                       </div>
                       <p className="mt-1 text-sm font-semibold truncate">{idea.title}</p>
-                      <p className="mt-0.5 text-[11px] opacity-60 line-clamp-2">{idea.caption}</p>
+                      <p className="mt-0.5 text-xs opacity-60 line-clamp-2">{idea.caption}</p>
                       <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
                         {idea.platforms.map((p) => (
                           <span key={p} className="text-xs opacity-70" title={SOCIAL_PLATFORM_LABELS[p as SocialPlatform]}>
                             {PLATFORM_ICON[p] || p}
                           </span>
                         ))}
-                        <span className="text-[9px] opacity-40">·</span>
-                        <span className="text-[9px] opacity-50">{idea.reason}</span>
+                        <span className="text-xs opacity-40">·</span>
+                        <span className="text-xs opacity-50">{idea.reason}</span>
                       </div>
                     </div>
                   </div>
@@ -498,14 +498,14 @@ export default function SocialClient({
                     <button
                       onClick={() => handleUseIdea(idea)}
                       type="button"
-                      className="flex-1 rounded border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-1 text-[10px] font-medium admin-tone-text-cyan hover:opacity-80"
+                      className="flex-1 rounded border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-1 text-xs font-medium admin-tone-text-cyan hover:opacity-80"
                     >
                       Usar aquesta idea
                     </button>
                     <button
                       onClick={() => handleDismissIdea(idea.id)}
                       type="button"
-                      className="rounded border border-white/10 px-2 py-1 text-[10px] opacity-60 hover:bg-white/5"
+                      className="rounded border border-white/10 px-2 py-1 text-xs opacity-60 hover:bg-white/5"
                     >
                       Descartar
                     </button>
@@ -521,18 +521,18 @@ export default function SocialClient({
       {view === 'list' && (
         <div className="space-y-2">
           {filteredPosts.length === 0 ? (
-            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-12 text-center">
+            <div className="ap-card p-12 text-center">
               <p className="text-4xl">📱</p>
               <p className="mt-3 text-sm font-semibold opacity-80">Cap publicació {statusFilter !== 'all' ? `amb estat "${SOCIAL_POST_STATUS_LABELS[statusFilter as SocialPostStatus]}"` : ''}</p>
               <p className="mt-1 text-xs opacity-50">Crea la primera publicació per començar el calendari editorial.</p>
             </div>
           ) : (
             filteredPosts.map((post) => (
-              <div key={post.id} className="admin-stagger-item rounded-xl border border-white/10 admin-card-glass p-4 hover:bg-white/[0.04] transition-colors">
+              <div key={post.id} className="admin-stagger-item rounded-xl border border-white/10 admin-card-glass p-4 adm-row-hover transition-colors">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${STATUS_TONE[post.status]}`}>
+                      <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${STATUS_TONE[post.status]}`}>
                         {SOCIAL_POST_STATUS_LABELS[post.status as SocialPostStatus] || post.status}
                       </span>
                       {post.platforms.map((p) => (
@@ -541,29 +541,29 @@ export default function SocialClient({
                         </span>
                       ))}
                       {post.category && (
-                        <span className="text-[10px] opacity-50">{SOCIAL_CATEGORY_LABELS[post.category as SocialCategory] || post.category}</span>
+                        <span className="text-xs opacity-50">{SOCIAL_CATEGORY_LABELS[post.category as SocialCategory] || post.category}</span>
                       )}
-                      <span className="text-[10px] opacity-40">{SOCIAL_CONTENT_TYPE_LABELS[post.contentType as SocialContentType]}</span>
+                      <span className="text-xs opacity-40">{SOCIAL_CONTENT_TYPE_LABELS[post.contentType as SocialContentType]}</span>
                     </div>
                     <p className="mt-1.5 font-semibold text-sm truncate">{post.title}</p>
                     {post.caption && <p className="mt-0.5 text-xs opacity-60 line-clamp-2">{post.caption}</p>}
                     {post.hashtags.length > 0 && (
-                      <p className="mt-1 text-[11px] admin-tone-text-cyan">{post.hashtags.map((h) => `#${h}`).join(' ')}</p>
+                      <p className="mt-1 text-xs admin-tone-text-cyan">{post.hashtags.map((h) => `#${h}`).join(' ')}</p>
                     )}
                   </div>
                   <div className="flex flex-col gap-2 text-left sm:max-w-none sm:shrink-0 sm:items-end sm:text-right max-w-full">
-                    <span className="text-[11px] opacity-50">
+                    <span className="text-xs opacity-50">
                       {post.scheduledAt ? `Programat: ${formatDateTime(post.scheduledAt)}` : formatDate(post.createdAt)}
                     </span>
-                    {post.publishedAt && <span className="text-[10px] admin-tone-text-success">Publicat: {formatDate(post.publishedAt)}</span>}
+                    {post.publishedAt && <span className="text-xs admin-tone-text-success">Publicat: {formatDate(post.publishedAt)}</span>}
                     {!post.publishedAt && post.scheduledAt && ['DRAFT', 'SCHEDULED'].includes(post.status) && (
-                      <span className="rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-0.5 text-[10px] admin-tone-text-cyan">⏰ Alarma Calendar</span>
+                      <span className="rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-0.5 text-xs admin-tone-text-cyan">⏰ Alarma Calendar</span>
                     )}
                     <div className="mt-1 flex flex-wrap items-center gap-1">
                       <select
                         value={post.status}
                         onChange={(e) => handleStatusChange(post.id, e.target.value)}
-                        className="min-w-0 rounded border border-white/10 bg-transparent px-1.5 py-0.5 text-[10px]"
+                        className="min-w-0 rounded border border-white/10 bg-transparent px-1.5 py-0.5 text-xs"
                       >
                         {Object.entries(SOCIAL_POST_STATUSES).map(([, val]) => (
                           <option key={val} value={val}>{SOCIAL_POST_STATUS_LABELS[val]}</option>
@@ -572,14 +572,14 @@ export default function SocialClient({
                       <button
                         onClick={() => { setEditingPost(post); setShowCreate(true); }}
                         type="button"
-                        className="rounded border border-white/10 px-1.5 py-0.5 text-[10px] hover:bg-white/10"
+                        className="rounded border border-white/10 px-1.5 py-0.5 text-xs hover:bg-white/10"
                       >
                         ✏️
                       </button>
                       <button
                         onClick={() => handleDelete(post.id)}
                         type="button"
-                        className="rounded border border-white/10 px-1.5 py-0.5 text-[10px] hover:admin-tone-bg-danger"
+                        className="rounded border border-white/10 px-1.5 py-0.5 text-xs hover:admin-tone-bg-danger"
                       >
                         🗑️
                       </button>
@@ -623,7 +623,7 @@ export default function SocialClient({
           <div className="overflow-x-auto rounded-xl">
             <div className="grid min-w-[720px] grid-cols-7 gap-px overflow-x-auto rounded-xl border border-white/10 overflow-hidden admin-card-glass">
             {['Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds', 'Dg'].map((d) => (
-              <div key={d} className="bg-white/[0.05] p-2 text-center text-[10px] font-semibold uppercase tracking-wider opacity-50">
+              <div key={d} className="bg-white/[0.05] p-2 text-center text-xs font-semibold uppercase tracking-wider opacity-50">
                 {d}
               </div>
             ))}
@@ -635,20 +635,20 @@ export default function SocialClient({
                   key={day.date}
                   className={`min-h-[80px] border-t border-white/5 p-1.5 ${day.isCurrentMonth ? 'bg-white/[0.02]' : 'bg-transparent opacity-30'} ${isToday ? 'ring-1 ring-inset ring-[var(--ax-hair-gold)]' : ''}`}
                 >
-                  <p className={`text-[11px] font-medium ${isToday ? 'admin-tone-text-cyan' : 'opacity-60'}`}>{day.day}</p>
+                  <p className={`text-xs font-medium ${isToday ? 'admin-tone-text-cyan' : 'opacity-60'}`}>{day.day}</p>
                   <div className="mt-0.5 space-y-0.5">
                     {dayPosts.slice(0, 3).map((p) => (
                       <button
                         key={p.id}
                         onClick={() => { setEditingPost(p); setShowCreate(true); }}
                         type="button"
-                        className={`w-full rounded px-1 py-0.5 text-left text-[9px] font-medium truncate ${STATUS_TONE[p.status]}`}
+                        className={`w-full rounded px-1 py-0.5 text-left text-xs font-medium truncate ${STATUS_TONE[p.status]}`}
                       >
                         {p.platforms.map((pl) => PLATFORM_ICON[pl] || '').join('')} {p.title}{!p.publishedAt && p.scheduledAt && ['DRAFT', 'SCHEDULED'].includes(p.status) ? ' ⏰' : ''}
                       </button>
                     ))}
                     {dayPosts.length > 3 && (
-                      <p className="text-[9px] opacity-40">+{dayPosts.length - 3} més</p>
+                      <p className="text-xs opacity-40">+{dayPosts.length - 3} més</p>
                     )}
                   </div>
                 </div>

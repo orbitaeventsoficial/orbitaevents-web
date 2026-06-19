@@ -133,7 +133,7 @@ export default function ExtrasConfiguratorClient() {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+            className="ap-btn ap-btn--primary"
           >
             {saving ? 'Desant…' : 'Desar canvis'}
           </button>
@@ -275,7 +275,7 @@ export default function ExtrasConfiguratorClient() {
                       className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                         active
                           ? 'border-emerald-400/50 bg-emerald-500/20 text-emerald-200'
-                          : 'border-white/10 bg-white/5/60 text-white/70 hover:bg-white/5/60'
+                          : 'border-white/10 bg-white/5 text-white/70 hover:bg-white/10'
                       }`}
                     >
                       {SERVICE_LABELS[service]}

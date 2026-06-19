@@ -260,7 +260,7 @@ export default function ServiciosClient({ servicios, texts, heroImage }: Servici
               <a
                 href={WHATSAPP_URL_WITH_MESSAGE(texts.ctaWhatsappMessage)}
                 target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-3 px-8 py-5 bg-[#25D366] hover:bg-[#20BD5A] rounded-2xl transition-all hover:shadow-[0_8px_30px_rgba(37,211,102,0.4)] text-white font-bold text-lg"
+                className="inline-flex items-center justify-center gap-3 px-8 py-5 bg-[var(--oe-whatsapp)] hover:bg-[var(--oe-whatsapp-strong)] rounded-2xl transition-all hover:shadow-[0_8px_30px_rgba(var(--oe-whatsapp-rgb),0.4)] text-white font-bold text-lg"
               >
                 <Icons.WhatsApp />
                 <span>{texts.ctaWhatsappButton}</span>

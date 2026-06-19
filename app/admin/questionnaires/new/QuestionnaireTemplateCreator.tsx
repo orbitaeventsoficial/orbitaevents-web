@@ -59,7 +59,7 @@ export default function QuestionnaireTemplateCreator() {
         <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm text-red-300">{error}</p>
       )}
 
-      <div className="space-y-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+      <div className="space-y-4 ap-card p-4">
         <div>
           <label htmlFor="new-tpl-title" className="block text-xs text-white/50 mb-1">Títol</label>
           <input
@@ -95,7 +95,7 @@ export default function QuestionnaireTemplateCreator() {
       <div className="space-y-3">
         <h2 className="text-sm font-semibold text-white/70">Preguntes</h2>
         {questions.map((q, idx) => (
-          <div key={q.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-4 space-y-3">
+          <div key={q.id} className="ap-card p-4 space-y-3">
             <div className="flex items-center justify-between">
               <p className="text-xs text-white/40">Pregunta {idx + 1}</p>
               {questions.length > 1 && (
@@ -166,7 +166,7 @@ export default function QuestionnaireTemplateCreator() {
           onClick={handleCreate}
           disabled={saving}
           type="button"
-          className="inline-flex rounded-lg bg-cyan-500 px-5 py-2 text-sm font-semibold text-black hover:bg-cyan-400 disabled:opacity-50"
+          className="ap-btn ap-btn--primary"
         >
           {saving ? 'Creant...' : 'Crear plantilla'}
         </button>

@@ -96,7 +96,7 @@ html.admin-mode .bd__btn:hover:not(:disabled) {
   color: var(--t);
 }
 html.admin-mode .bd__btn--sec:hover:not(:disabled) {
-  background: var(--ax-info-bg);
+  background: color-mix(in oklab, var(--ax-t) 8%, var(--ax-raised));
 }
 
 /* ── KPI bar ── */
@@ -445,6 +445,8 @@ html.admin-mode .bd__root {
   --bd-sidebar-offset: 236px;
   --bd-secnav-h: 44px;
   min-height: 100vh;
+  /* Fons carbó canònic (abans heretava negre absolut del pare). */
+  background: var(--ax-canvas);
   color: var(--t2);
 }
 
@@ -698,10 +700,11 @@ html.admin-mode .bd__back {
   text-decoration: none;
 }
 
+/* #1014: era blau (--ax-info-bg + --o-info) — fora del canon. Botó secundari = ghost neutre. */
 html.admin-mode .bd__btn--sec {
-  border-color: var(--ax-info-bg);
-  background: var(--ax-info-bg);
-  color: var(--o-info);
+  border-color: var(--ax-line2);
+  background: var(--ax-raised);
+  color: var(--ax-t);
 }
 
 html.admin-mode .bd__kpis {

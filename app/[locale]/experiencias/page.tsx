@@ -191,7 +191,7 @@ export default async function ExperienciasPage() {
               <a
                 href={WHATSAPP_URL_WITH_MESSAGE(tWhatsapp('experiencias'))}
                 target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#25D366] hover:bg-[#20BD5A] text-white font-bold rounded-2xl transition-all hover:shadow-[0_8px_30px_rgba(37,211,102,0.4)]"
+                className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-[var(--oe-whatsapp)] hover:bg-[var(--oe-whatsapp-strong)] text-white font-bold rounded-2xl transition-all hover:shadow-[0_8px_30px_rgba(var(--oe-whatsapp-rgb),0.4)]"
               >
                 <WhatsAppIcon className="w-5 h-5" />
                 WhatsApp

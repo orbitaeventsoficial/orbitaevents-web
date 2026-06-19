@@ -245,7 +245,7 @@ function Step4LeadForm({
           href={getLocalizedWhatsAppUrl(locale, 'configurador', { packName: packName ?? undefined, precio: finalPrice })}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#25D366] text-white font-bold hover:bg-[#20BD5A] transition-colors"
+          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[var(--oe-whatsapp)] text-white font-bold hover:bg-[var(--oe-whatsapp-strong)] transition-colors"
           onClick={onWhatsAppClick}
         >
           💬 {t('step4.contactWhatsApp')}

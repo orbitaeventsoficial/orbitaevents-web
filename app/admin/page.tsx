@@ -264,7 +264,7 @@ export default async function AdminDashboard() {
       <section className="rounded-2xl border border-white/10 p-4 admin-card-glass">
         <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/50">Cicle operatiu</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/50">Cicle operatiu</p>
             <h2 className="mt-1 text-lg font-semibold text-white">On està viu el sistema ara</h2>
           </div>
           <Link href="/admin/manual" className="shrink-0 rounded-xl border border-white/10 px-3 py-2 text-xs font-semibold text-white/70 transition-colors hover:bg-white/5">
@@ -276,19 +276,19 @@ export default async function AdminDashboard() {
             <Link
               key={item.step}
               href={item.href}
-              className={`rounded-2xl border p-3 transition-colors hover:bg-white/[0.04] ${operatingCycleTone[item.tone]}`}
+              className={`rounded-2xl border p-3 transition-colors adm-row-hover ${operatingCycleTone[item.tone]}`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-wider opacity-60">Pas {item.step}</p>
+                  <p className="text-xs font-bold uppercase tracking-wider opacity-60">Pas {item.step}</p>
                   <h3 className="mt-1 text-sm font-black text-white">{item.title}</h3>
                 </div>
-                <span className="shrink-0 rounded-full border border-white/10 bg-black/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide">
+                <span className="shrink-0 rounded-full border border-white/10 bg-black/10 px-2 py-1 text-xs font-bold uppercase tracking-wide">
                   {item.metric}
                 </span>
               </div>
               <p className="mt-3 text-xs leading-relaxed text-white/70">{item.detail}</p>
-              <p className="mt-3 text-[11px] font-semibold text-white/55">{item.cta}</p>
+              <p className="mt-3 text-xs font-semibold text-white/55">{item.cta}</p>
             </Link>
           ))}
         </div>
@@ -559,7 +559,7 @@ export default async function AdminDashboard() {
 
       {/* ─── Insights narratius ─────────────────────────────────────── */}
       {insights.length > 0 && (
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5 space-y-3">
+        <div className="ap-card p-5 space-y-3">
           <p className="text-xs font-bold text-white/50 uppercase tracking-wider mb-2">Què necessites saber avui</p>
           {insights.map((insight) => (
               <div key={insight.id} className={`flex items-start gap-3 px-4 py-3 rounded-xl border ${ADMIN_DASHBOARD_INSIGHT_COLORS[insight.type] || ''}`}>
@@ -650,7 +650,7 @@ export default async function AdminDashboard() {
                 return (
                   <div className="mt-3 space-y-2" {...helpAttrs(ADMIN_DASHBOARD_HELP.priorityIssues)}>
                     {topItems.map((item) => (
-                      <Link key={item.id} href={item.href} className="flex items-start gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-white/[0.04]" data-help-title={item.title} data-help-desc={item.reason}>
+                      <Link key={item.id} href={item.href} className="flex items-start gap-2 rounded-lg px-3 py-2 transition-colors adm-row-hover" data-help-title={item.title} data-help-desc={item.reason}>
                         <span className={`mt-0.5 inline-block w-2 h-2 rounded-full shrink-0 ${item.status === 'critical' ? 'bg-[var(--o-danger)]' : 'bg-[var(--o-warning)]'}`} />
                         <div className="min-w-0">
                           <p className="text-sm font-medium text-white/90 truncate">{item.title}</p>

@@ -134,10 +134,10 @@ export default function NewReportPage() {
                 <span className="text-xs font-mono font-bold">{item.inventoryItem.code}</span>
                 <span className="text-sm flex-1 truncate">{item.inventoryItem.name}</span>
                 {item.checkedIn && (
-                  <span className="text-[10px] rounded-full px-2 py-0.5">Retornat</span>
+                  <span className="text-xs rounded-full px-2 py-0.5">Retornat</span>
                 )}
                 {item.conditionAfter && item.conditionAfter !== item.inventoryItem.condition && (
-                  <span className="text-[10px] rounded-full px-2 py-0.5">
+                  <span className="text-xs rounded-full px-2 py-0.5">
                     {item.conditionAfter}
                   </span>
                 )}

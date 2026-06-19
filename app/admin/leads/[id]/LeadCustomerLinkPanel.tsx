@@ -78,19 +78,19 @@ export default function LeadCustomerLinkPanel({
   if (preview.kind === 'already-linked') {
     return (
       <section
-        className="rounded-xl border border-emerald-400/30 bg-emerald-500/[0.06] p-6"
+        className="rounded-xl border admin-tone-border-success admin-tone-bg-success p-6"
         aria-label="Lead vinculat al Customer Hub"
       >
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-200/80">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] admin-tone-text-success">
           Customer Hub
         </p>
-        <h3 className="mt-2 text-sm font-semibold text-emerald-100">
+        <h3 className="mt-2 text-sm font-semibold admin-tone-text-success">
           Aquest lead ja forma part del client
         </h3>
-        <p className="mt-2 text-xs text-emerald-50/75">
+        <p className="mt-2 text-xs admin-tone-text-success opacity-90">
           Continua el flux comercial des del Customer Hub per veure entrades, tasques, comunicacions i reserves en una sola fitxa.
         </p>
-        <div className="mt-4 rounded-lg border border-white/10 bg-black/20 p-3 text-sm">
+        <div className="mt-4 rounded-lg border border-white/10 bg-[var(--sunk)] p-3 text-sm">
           <div className="font-semibold">{preview.customer.customerName}</div>
           <div className="text-xs text-white/60 break-all">{preview.customer.customerEmail}</div>
           {preview.customer.customerPhone && (
@@ -100,7 +100,7 @@ export default function LeadCustomerLinkPanel({
         <div className="mt-4 flex flex-wrap gap-2">
           <Link
             href={buildCustomerWorkspaceTabHref(preview.customer.customerId, 'summary')}
-            className="text-xs px-3 py-1.5 rounded-lg bg-emerald-500/90 text-zinc-950 font-semibold hover:bg-emerald-400"
+            className="text-xs px-3 py-1.5 rounded-lg bg-[var(--o-success)] text-[var(--o-admin-ink)] font-semibold hover:brightness-110"
           >
             Obrir Customer Hub
           </Link>
@@ -118,13 +118,13 @@ export default function LeadCustomerLinkPanel({
   if (preview.kind === 'matches-found') {
     return (
       <section
-        className="rounded-xl border border-amber-400/40 bg-amber-500/[0.06] p-6"
+        className="rounded-xl border admin-tone-border-warning admin-tone-bg-warning p-6"
         aria-label="Coincidencies de client"
       >
-        <h3 className="text-sm font-semibold mb-1 text-amber-200">
+        <h3 className="text-sm font-semibold mb-1 admin-tone-text-warning">
           Aquest lead ja sembla un client
         </h3>
-        <p className="text-xs text-amber-100/70 mb-4">
+        <p className="text-xs admin-tone-text-warning opacity-80 mb-4">
           Hem trobat {preview.matches.length === 1 ? 'una coincidència' : `${preview.matches.length} coincidències`} a la base de clients. Vincula’l per evitar duplicats.
         </p>
         <ul className="space-y-3">
@@ -134,7 +134,7 @@ export default function LeadCustomerLinkPanel({
             return (
               <li
                 key={match.customerId}
-                className="rounded-lg border border-white/10 bg-black/20 p-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                className="rounded-lg border border-white/10 bg-[var(--sunk)] p-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="text-sm">
                   <div className="font-semibold">{match.customerName}</div>
@@ -145,7 +145,7 @@ export default function LeadCustomerLinkPanel({
                   {match.customerDni && (
                     <div className="text-xs text-white/50">DNI: {match.customerDni}</div>
                   )}
-                  <div className="mt-1 text-[11px] uppercase tracking-wide text-amber-200/80">
+                  <div className="mt-1 text-xs uppercase tracking-wide admin-tone-text-warning">
                     {match.confidence === 'strong' ? 'Coincidència forta' : 'Coincidència parcial'}
                     {match.matchedBy.length > 0 && ` · ${formatMatchedBy(match.matchedBy)}`}
                   </div>
@@ -163,7 +163,7 @@ export default function LeadCustomerLinkPanel({
                       void submit('link', { customerId: match.customerId, pendingId })
                     }
                     disabled={isSubmitting || submitting !== null}
-                    className="text-xs px-3 py-1.5 rounded-lg bg-amber-500/90 text-zinc-900 font-semibold hover:bg-amber-400 disabled:opacity-60"
+                    className="text-xs px-3 py-1.5 rounded-lg bg-[var(--o-warning)] text-[var(--o-admin-ink)] font-semibold hover:brightness-110 disabled:opacity-60"
                   >
                     {isSubmitting ? 'Vinculant…' : 'Vincular'}
                   </button>
@@ -181,7 +181,7 @@ export default function LeadCustomerLinkPanel({
   const isSubmitting = submitting === pendingId;
   return (
     <section
-      className="rounded-xl border border-white/10 bg-black/20 p-6"
+      className="rounded-xl border border-white/10 bg-[var(--sunk)] p-6"
       aria-label="Crear client des del lead"
     >
       <h3 className="text-sm font-semibold mb-1">Aquest lead encara no és un client</h3>
@@ -192,7 +192,7 @@ export default function LeadCustomerLinkPanel({
         type="button"
         onClick={() => void submit('create', { pendingId })}
         disabled={isSubmitting || submitting !== null}
-        className="text-xs px-3 py-1.5 rounded-lg bg-emerald-500/90 text-zinc-900 font-semibold hover:bg-emerald-400 disabled:opacity-60"
+        className="text-xs px-3 py-1.5 rounded-lg bg-[var(--o-success)] text-[var(--o-admin-ink)] font-semibold hover:brightness-110 disabled:opacity-60"
       >
         {isSubmitting ? 'Creant client…' : 'Crear client nou'}
       </button>

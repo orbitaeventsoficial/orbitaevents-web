@@ -198,7 +198,7 @@ export default function FeaturesPage() {
                 role="switch"
                 aria-checked={feature.enabled}
                 aria-busy={saving === feature.key}
-                className={`admin-feature-toggle relative inline-flex h-9 min-w-[88px] items-center rounded-full border px-2 text-[11px] font-bold uppercase tracking-wide transition-colors ${
+                className={`admin-feature-toggle relative inline-flex h-9 min-w-[88px] items-center rounded-full border px-2 text-xs font-bold uppercase tracking-wide transition-colors ${
                   feature.enabled
                     ? 'border-emerald-400/70 bg-emerald-500/85 text-emerald-950'
                     : 'border-rose-400/70 bg-rose-500/85 text-rose-950'
@@ -206,7 +206,7 @@ export default function FeaturesPage() {
               >
                 <span className="pr-2">{feature.enabled ? 'ON' : 'OFF'}</span>
                 <div
-                  className={`pointer-events-none absolute left-1 top-1 h-7 w-7 rounded-full bg-white transition-transform ${
+                  className={`pointer-events-none absolute left-1 top-1 h-7 w-7 rounded-full bg-[var(--o-admin-light)] transition-transform ${
                     feature.enabled ? 'translate-x-[50px]' : 'translate-x-0'
                   }`}
                 />

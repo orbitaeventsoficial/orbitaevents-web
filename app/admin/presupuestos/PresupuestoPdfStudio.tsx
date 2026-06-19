@@ -1218,7 +1218,7 @@ export default function PresupuestoPdfStudio({
           <>
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                {sectionStatus.clientOk ? (<span className="rounded-full px-2 py-0.5 text-[10px]">OK</span>) : sectionStatus.clientWarn ? (<span className="rounded-full px-2 py-0.5 text-[10px]">{sectionStatus.clientWarn}</span>) : null}
+                {sectionStatus.clientOk ? (<span className="rounded-full px-2 py-0.5 text-xs">OK</span>) : sectionStatus.clientWarn ? (<span className="rounded-full px-2 py-0.5 text-xs">{sectionStatus.clientWarn}</span>) : null}
               </div>
               {!isCustomerScoped && (<button type="button" onClick={() => setShowCustomerPicker(!showCustomerPicker)} className="flex items-center gap-1 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-white/5">+ Cercar client</button>)}
               {isCustomerScoped && !initialCustomerId && (<button type="button" onClick={clearSelectedCustomer} className="rounded-xl border px-3 py-1.5 text-xs transition-colors hover:bg-white/5">Canviar client</button>)}
@@ -1255,7 +1255,7 @@ export default function PresupuestoPdfStudio({
               <label className="text-sm">Telèfon del client<input className={inputClass} value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} readOnly={isCustomerScoped} /></label>
               <div className="md:col-span-2 mt-2 flex items-center gap-2">
                 <span className="text-xs font-semibold uppercase tracking-wide">Esdeveniment</span>
-                {sectionStatus.eventOk ? (<span className="rounded-full px-2 py-0.5 text-[10px]">OK</span>) : sectionStatus.eventWarn ? (<span className="rounded-full px-2 py-0.5 text-[10px]">{sectionStatus.eventWarn}</span>) : null}
+                {sectionStatus.eventOk ? (<span className="rounded-full px-2 py-0.5 text-xs">OK</span>) : sectionStatus.eventWarn ? (<span className="rounded-full px-2 py-0.5 text-xs">{sectionStatus.eventWarn}</span>) : null}
               </div>
               <label className="text-sm">Data d&apos;emissió<input className={inputClass} type="date" value={issueDate} onChange={(e) => setIssueDate(e.target.value)} /></label>
               <label className="text-sm">Data de l&apos;esdeveniment<input className={inputClass} type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} /></label>
@@ -1270,7 +1270,7 @@ export default function PresupuestoPdfStudio({
         return (
           <>
             <div className="mb-3 flex items-center gap-2">
-              {sectionStatus.brandOk ? (<span className="rounded-full px-2 py-0.5 text-[10px]">OK</span>) : sectionStatus.brandWarn ? (<span className="rounded-full px-2 py-0.5 text-[10px]">{sectionStatus.brandWarn}</span>) : null}
+              {sectionStatus.brandOk ? (<span className="rounded-full px-2 py-0.5 text-xs">OK</span>) : sectionStatus.brandWarn ? (<span className="rounded-full px-2 py-0.5 text-xs">{sectionStatus.brandWarn}</span>) : null}
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <label className="text-sm">Marca / Empresa<input className={inputClass} value={brandName} onChange={(e) => setBrandName(e.target.value)} readOnly={isCustomerScoped && !allowBrandOverride} /></label>
@@ -1286,7 +1286,7 @@ export default function PresupuestoPdfStudio({
         return (
           <>
             <div className="mb-3 flex items-center gap-2">
-              {sectionStatus.packOk ? (<span className="rounded-full px-2 py-0.5 text-[10px]">OK</span>) : sectionStatus.packWarn ? (<span className="rounded-full px-2 py-0.5 text-[10px]">{sectionStatus.packWarn}</span>) : null}
+              {sectionStatus.packOk ? (<span className="rounded-full px-2 py-0.5 text-xs">OK</span>) : sectionStatus.packWarn ? (<span className="rounded-full px-2 py-0.5 text-xs">{sectionStatus.packWarn}</span>) : null}
             </div>
             <div className="grid gap-4 md:grid-cols-3">
               <label className="text-sm md:col-span-2">Nom visible del pack<input className={inputClass} value={packName} onChange={(e) => setPackName(e.target.value)} /></label>
@@ -1388,7 +1388,7 @@ export default function PresupuestoPdfStudio({
           <div className="rounded-xl border px-3 py-2 text-xs">
             Mode client actiu. Aquest pressupost es guarda automàticament a la fitxa del client.
             {autosaving ? ' Desant...' : autosaveTick > 0 ? ' Desat.' : ''}
-            <div className="mt-2 flex items-center gap-2 text-[11px]">
+            <div className="mt-2 flex items-center gap-2 text-xs">
               <input id="brand-override" type="checkbox" checked={allowBrandOverride} onChange={(e) => setAllowBrandOverride(e.target.checked)} />
               <label htmlFor="brand-override" className="cursor-pointer">Permetre override de marca/logo només per aquest pressupost</label>
             </div>

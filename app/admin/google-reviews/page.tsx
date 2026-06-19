@@ -87,7 +87,7 @@ export default function GoogleReviewsAdminPage() {
     >
 
       {loadError && (
-        <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-300">
+        <div className="rounded-xl border admin-tone-border-danger admin-tone-bg-danger px-4 py-3 text-sm admin-tone-text-danger">
           {loadError}
         </div>
       )}
@@ -137,7 +137,7 @@ export default function GoogleReviewsAdminPage() {
           <button
             onClick={syncReviews}
             disabled={syncing}
-            className="mt-2 text-xs px-3 py-1 border rounded-xl text-white transition-colors disabled:opacity-50"
+            className="ap-btn ap-btn--xs mt-2"
           >
             {syncing ? 'Actualitzant...' : 'Refrescar'}
           </button>
@@ -155,7 +155,7 @@ export default function GoogleReviewsAdminPage() {
             <p className="mb-4">Encara no hi ha ressenyes de 5 estrelles</p>
             <button
               onClick={syncReviews}
-              className="px-6 py-3 border rounded-xl text-white font-medium transition-colors"
+              className="ap-btn ap-btn--primary"
             >
               Refrescar ressenyes
             </button>
@@ -213,7 +213,7 @@ export default function GoogleReviewsAdminPage() {
           href={SITE_CONFIG.reviews.googleReviewUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-4 inline-flex items-center gap-2 px-4 py-2 border rounded-xl text-white font-medium transition-colors"
+          className="ap-btn ap-btn--primary mt-4"
         >
           <GoogleGIcon width={16} height={16} />
           Veure pàgina de Google Business

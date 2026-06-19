@@ -51,7 +51,7 @@ export default function SyncButton() {
         disabled={syncing}
         type="button"
         aria-busy={syncing}
-        className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="ap-btn ap-btn--primary"
       >
         {syncing ? (
           <>

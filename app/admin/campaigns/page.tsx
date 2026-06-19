@@ -12,7 +12,7 @@ export const metadata = {
 const URGENCY_TONE: Record<string, string> = {
   HIGH: 'border-rose-500/30 bg-rose-500/10 text-rose-300',
   MEDIUM: 'border-amber-500/30 bg-amber-500/10 text-amber-300',
-  LOW: 'border-white/15 bg-white/[0.06] text-white/60',
+  LOW: 'border-[var(--line)] bg-[var(--panel)] text-white/60',
 };
 
 const URGENCY_LABEL: Record<string, string> = {
@@ -37,14 +37,14 @@ const CHANNEL_ICON: Record<string, string> = {
 
 function CampaignCard({ campaign }: { campaign: Campaign }) {
   return (
-    <article className="rounded-xl border border-white/10 bg-white/[0.02] p-5 hover:bg-white/[0.04] transition-colors">
+    <article className="ap-card p-5 adm-row-hover transition-colors">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-lg">{TYPE_ICON[campaign.type] || '📋'}</span>
           <h3 className="text-sm font-semibold">{campaign.name}</h3>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${URGENCY_TONE[campaign.urgency]}`}>
+          <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${URGENCY_TONE[campaign.urgency]}`}>
             {URGENCY_LABEL[campaign.urgency]}
           </span>
           <span className="text-xs opacity-60" title={campaign.channel}>
@@ -55,7 +55,7 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
 
       <p className="mt-2 text-xs opacity-70">{campaign.description}</p>
 
-      <div className="mt-3 flex items-center gap-3 flex-wrap text-[11px] opacity-60">
+      <div className="mt-3 flex items-center gap-3 flex-wrap text-xs opacity-60">
         <span>Segment: <strong>{campaign.segment}</strong></span>
         <span>·</span>
         <span>Audiència: <strong>{campaign.audienceSize}</strong></span>
@@ -64,15 +64,15 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
       </div>
 
       <details className="mt-3 group">
-        <summary className="cursor-pointer text-[11px] font-semibold opacity-70 hover:opacity-100 list-none">
+        <summary className="cursor-pointer text-xs font-semibold opacity-70 hover:opacity-100 list-none">
           <span className="group-open:hidden">▶ Veure plantilla del missatge</span>
           <span className="hidden group-open:inline">▼ Amagar plantilla</span>
         </summary>
-        <div className="mt-2 rounded-lg border border-white/10 bg-black/20 p-3">
-          <p className="text-[11px] font-semibold opacity-70">Assumpte</p>
+        <div className="mt-2 rounded-lg border border-white/10 bg-[var(--sunk)] p-3">
+          <p className="text-xs font-semibold opacity-70">Assumpte</p>
           <p className="mt-0.5 text-xs">{campaign.subject}</p>
-          <p className="mt-2 text-[11px] font-semibold opacity-70">Cos del missatge</p>
-          <pre className="mt-0.5 text-[11px] whitespace-pre-wrap font-sans opacity-80">{campaign.bodyTemplate}</pre>
+          <p className="mt-2 text-xs font-semibold opacity-70">Cos del missatge</p>
+          <pre className="mt-0.5 text-xs whitespace-pre-wrap font-sans opacity-80">{campaign.bodyTemplate}</pre>
         </div>
       </details>
     </article>
@@ -159,20 +159,20 @@ export default async function CampaignsPage() {
 
         {/* KPIs */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Campanyes suggerides</p>
+          <div className="ap-card p-3">
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Campanyes suggerides</p>
             <p className="mt-1 text-xl font-bold">{campaigns.length}</p>
           </div>
           <div className="rounded-xl border border-rose-500/20 bg-rose-500/[0.04] p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Urgència alta</p>
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Urgència alta</p>
             <p className="mt-1 text-xl font-bold text-rose-300">{highCount}</p>
           </div>
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Audiència total</p>
+          <div className="ap-card p-3">
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Audiència total</p>
             <p className="mt-1 text-xl font-bold">{totalAudience}</p>
           </div>
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Canals</p>
+          <div className="ap-card p-3">
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Canals</p>
             <p className="mt-1 text-xl font-bold">
               {campaigns.some((c) => c.channel === 'whatsapp') ? '💬' : ''}
               {campaigns.some((c) => c.channel === 'email') ? ' ✉️' : ''}
@@ -181,7 +181,7 @@ export default async function CampaignsPage() {
         </div>
 
         {campaigns.length === 0 ? (
-          <div className="rounded-xl border border-white/10 bg-white/[0.02] p-12 text-center">
+          <div className="ap-card p-12 text-center">
             <p className="text-4xl">📭</p>
             <p className="mt-3 text-sm font-semibold opacity-80">Cap campanya suggerida ara mateix</p>
             <p className="mt-1 text-xs opacity-50">
@@ -196,9 +196,9 @@ export default async function CampaignsPage() {
           </div>
         )}
 
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+        <div className="ap-card p-4">
           <h3 className="text-xs font-semibold opacity-70">Com funcionen les campanyes</h3>
-          <p className="mt-1 text-[11px] opacity-50">
+          <p className="mt-1 text-xs opacity-50">
             Les campanyes es generen automàticament basant-se en els segments CRM actuals.
             Cada campanya suggereix un segment, canal, missatge i impacte estimat.
             Per executar-les, copia la plantilla i envia-la manualment via WhatsApp o email.

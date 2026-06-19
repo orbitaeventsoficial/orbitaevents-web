@@ -49,7 +49,7 @@ export default function StudioPreview(props: StudioPreviewProps) {
           ? 'text-orange-300 border-orange-400/30 bg-orange-950/20'
           : props.marginTone === 'rose'
             ? 'text-rose-300 border-rose-400/30 bg-rose-950/20'
-            : 'text-white border-white/10 bg-white/[0.02]';
+            : 'text-white border-[var(--line)] bg-[var(--panel)]';
 
   return (
     <aside className="admin-quote-studio-preview h-fit rounded-2xl border p-5">

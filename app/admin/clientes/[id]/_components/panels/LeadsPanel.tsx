@@ -8,9 +8,9 @@ import { buildLeadContinuity } from '@/lib/customer-hub/leadContinuity';
 import { getTopCustomerHubLead, sortCustomerHubLeads } from '@/lib/customer-hub/topLead';
 
 const BLOCKER_TONE_CLASS: Record<'DANGER' | 'WARNING' | 'INFO', string> = {
-  DANGER: 'border-rose-500/20 bg-rose-500/10 text-rose-200',
-  WARNING: 'border-amber-500/20 bg-amber-500/10 text-amber-100',
-  INFO: 'border-cyan-500/20 bg-cyan-500/10 text-cyan-100',
+  DANGER: 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger',
+  WARNING: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+  INFO: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
 };
 
 export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
@@ -29,13 +29,13 @@ export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
       </div>
       {topLead && (
         <div className="mt-4 rounded-xl border p-3">
-          <p className="text-[10px] uppercase tracking-wider opacity-60">Lead prioritària</p>
+          <p className="text-xs uppercase tracking-wider opacity-60">Lead prioritària</p>
           <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
             <span className="font-semibold">{topLead.name}</span>
-            <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${getLeadStatusDisplay(topLead.status).bg} ${getLeadStatusDisplay(topLead.status).text}`}>
+            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getLeadStatusDisplay(topLead.status).bg} ${getLeadStatusDisplay(topLead.status).text}`}>
               {getLeadStatusDisplay(topLead.status).label}
             </span>
-            <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${getLeadPriorityColorDisplay(topLead.priority).badgeClass}`}>
+            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getLeadPriorityColorDisplay(topLead.priority).badgeClass}`}>
               {getLeadPriorityColorDisplay(topLead.priority).label}
             </span>
           </div>
@@ -76,8 +76,8 @@ export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-semibold">{lead.name}</p>
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${statusConf.bg} ${statusConf.text}`}>{statusConf.label}</span>
-                    <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${priorityConf.badgeClass}`}>{priorityConf.label}</span>
+                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusConf.bg} ${statusConf.text}`}>{statusConf.label}</span>
+                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${priorityConf.badgeClass}`}>{priorityConf.label}</span>
                   </div>
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
@@ -94,7 +94,7 @@ export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
                 <p className="mt-2 text-xs opacity-75">
                   {continuity.stageLabel} · {continuity.narrative}
                 </p>
-                <p className="mt-1 text-[11px]">Creada {formatDateSimple(lead.createdAt)}</p>
+                <p className="mt-1 text-xs">Creada {formatDateSimple(lead.createdAt)}</p>
               </Link>
               <div className="mt-3 flex flex-wrap gap-2">
                 {actionLink && (

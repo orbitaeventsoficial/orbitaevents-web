@@ -691,7 +691,7 @@ export function buildDossierHtml(
   <div class="peu">
     <div>
       <div class="peu-marca">Òrbita Events</div>
-      <div class="peu-web">www.orbitaevents.com</div>
+      <div class="peu-web">www.${SITE_CONFIG.web.domain}</div>
     </div>
     <div class="peu-contact">
       ${escHtml(copy.portada.clientLabel)} ${nomPrincipal}${empresa ? `<br>${empresa}` : ''}${eventDesc ? `<br>${eventDesc}` : ''}

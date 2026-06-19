@@ -117,6 +117,24 @@ Exemples: coordenades calculades, amplades dinàmiques, transform puntual.
 - Si tens dubte entre local i compartit, per defecte va a la capa comuna.
 - Anti-patrons prohibits: `Object.keys(...)` locals per opcions compartides, maps locals de labels, `Set(...)` locals per regles de domini, arrays derivats locals per categories/status.
 
+## Canon visual admin — HIPERSEMBLANÇA (norma vinculant, propietari 2026-06-17)
+
+**Principi: «un CSS, una veritat, un canònic». Totes les pàgines admin han de ser HIPERSEMBLANTS — fetes pel mateix dissenyador, no diferents.** La decisió visual viu a UNA capa (CSS/tokens), mai repartida pel JSX. «Merda fora»: zero Tailwind ad-hoc que dupliqui el que ja governa una classe canònica.
+
+### Regles dures (es validen amb `pnpm run qa:admin-canon`)
+1. **Color = carbó + or.** El blau/violeta NO existeix com a superfície ni com a text de marca. Estat (verd/ambre/vermell) només via `admin-tone-{bg/text/border}-{success/warning/danger}`, mai Tailwind cru (`bg-emerald-500/X`).
+2. **Cap botó-void:** un botó/Link sempre consumeix `.ap-btn`/`.ap-btn--primary`/`--xs`. Mai `text-white` + padding sense fons.
+3. **Cap blanc/negre absolut:** ni `bg-white` sòlid, ni `text-black`, ni `#000`/`#fff`, ni `style={{background:'#000'}}`. Substituts: `--o-admin-light`, `--gold-ink`, `--o-admin-ink`.
+4. **Superfícies = classe canònica.** Cards/panells → `.ap-card`. Inputs/selects/textarea → `.adm-input`/`.ap-input`. KPIs → `.ap-kpi` o gramàtica de Cristina (label `--mono`, número `--display`). Prohibit reinventar amb `bg-white/[0.0x] border-white/10 rounded-* ` a mà.
+5. **Tipografia de token.** Mides via `--o-text-*` (o `text-xs`+, que admin força ≥12px). Prohibit `text-[Npx]` i `font-black` als números (usar `font-bold`/`--display`).
+6. **Radi únic.** Totes les cards tenen el MATEIX radi (`--o-r-md`). Normalitzat a una capa: `html.admin-mode [class*="rounded-xl|2xl|3xl"]` → `--o-r-md` (admin-shell.css). No barrejar radis de card.
+7. **Responsiu amb la mateixa importància que el canon.** Tot component admin nou/modificat ha de funcionar a 375px (mòbil), tablet i desktop. Verificar amb captura als 3 breakpoints abans de tancar.
+
+### Referència i prevenció
+- **Òrgan de referència NET:** la fitxa de lead (`app/admin/leads/[id]`, cas «Cristina») i el calendari. Tota pàgina nova ha de semblar germana d'aquestes.
+- **Font de veritat de tokens:** `app/studio/orbita-tokens.css`. Studio (`/admin/studio`) n'és el mirall FIDEL — si Studio i l'admin divergeixen, és un bug del mirall.
+- **Prevenció (es munta bé a la primera):** el guard `scripts/check-admin-canon.mjs` corre a `validate:core --strict` i BLOQUEJA botó-void/blau/blanc-negre/font-black nous. Cap codi no-canònic pot entrar. Si falla, eradica abans de continuar — no s'afegeix excepció.
+
 ## Sistema visual admin — norma canònica `/admin/studio`
 
 Vegeu `protocol-producte-admin-ca.md` §2.5 (Migració del Frankenstein admin). Resum operatiu:

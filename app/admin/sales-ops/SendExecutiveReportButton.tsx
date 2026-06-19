@@ -34,7 +34,7 @@ export default function SendExecutiveReportButton() {
         type="button"
         onClick={sendReport}
         disabled={sending}
-        className="rounded-xl px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+        className="ap-btn ap-btn--primary"
       >
         {sending ? 'Enviant...' : 'Envia informe executiu'}
       </button>

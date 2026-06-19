@@ -439,13 +439,13 @@ function CategorySection({
             <AdminHelpLegend title="Ordre" body="L'ordre controla la galeria pública. Arrossega targetes per canviar-lo sense tocar codi." />
           </div>
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
-            <button type="button" onClick={() => fileRef.current?.click()} className="rounded-2xl border-2 border-dashed border-white/15 p-8 text-left transition-colors hover:border-white/30 hover:bg-white/[0.03]">
+            <button type="button" onClick={() => fileRef.current?.click()} className="rounded-2xl border-2 border-dashed border-white/15 p-8 text-left transition-colors hover:border-white/30 adm-row-hover">
               <span className="mb-3 block text-3xl">ï¼‹</span>
               <p className="text-sm font-medium text-white/90">Afegir media a {name}</p>
               <p className="mt-1 text-xs text-white/50">Puja des de l'admin. El backend converteix imatges a AVIF, conserva l'ordre i deixa traça a la BBDD.</p>
               <p className="mt-2 text-xs text-white/35">{uploading ? 'Pujant...' : `Límit imatge: ${PORTFOLIO_MEDIA_IMAGE_MAX_SIZE / (1024 * 1024)}MB · vídeo: ${PORTFOLIO_MEDIA_VIDEO_MAX_SIZE / (1024 * 1024)}MB`}</p>
             </button>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+            <div className="ap-card p-4">
               <p className="text-xs font-medium uppercase tracking-[0.2em] text-white/40">Events d'aquesta categoria</p>
               <div className="mt-3 space-y-2">
                 {categoryEvents.length === 0 ? <p className="text-sm text-white/45">Encara no hi ha events creats per aquesta categoria.</p> : categoryEvents.map((eventItem) => <div key={eventItem.id} className="rounded-xl border border-white/10 px-3 py-2"><p className="text-sm font-medium text-white/90">{eventItem.title}</p><p className="text-xs text-white/45">Portada actual: {eventItem.coverImage ? 'assignada' : 'pendent'}</p></div>)}
@@ -461,12 +461,12 @@ function CategorySection({
               {media.map((item) => {
                 const coverRefs = coverMap.get(item.mediaUrl) || [];
                 return (
-                  <div key={item.id} draggable={!item.isStatic} onDragStart={() => !item.isStatic && setDraggingId(item.id)} onDragOver={(event) => !item.isStatic && event.preventDefault()} onDrop={() => !item.isStatic && void handleDrop(item.id)} className={`overflow-hidden rounded-2xl border bg-white/[0.02] transition-colors ${draggingId === item.id ? 'border-cyan-400/40' : 'border-white/10 hover:border-white/20'}`}>
+                  <div key={item.id} draggable={!item.isStatic} onDragStart={() => !item.isStatic && setDraggingId(item.id)} onDragOver={(event) => !item.isStatic && event.preventDefault()} onDrop={() => !item.isStatic && void handleDrop(item.id)} className={`overflow-hidden rounded-2xl border bg-white/[0.02] transition-colors ${draggingId === item.id ? 'border-[var(--hair-gold)]' : 'border-white/10 hover:border-white/20'}`}>
                     <div className="grid gap-0 md:grid-cols-[18rem_minmax(0,1fr)]">
                       <button type="button" onClick={() => onOpenPreview({ url: item.mediaUrl, type: item.mediaType, alt: item.caption || `${name} media` })} className="relative aspect-[4/3] bg-black">
                         {item.mediaType === 'image' ? <Image src={item.mediaUrl} alt={item.caption || `${name} media`} fill sizes="(max-width: 768px) 100vw, 288px" className="object-cover" /> : <video src={item.mediaUrl} className="h-full w-full object-cover" muted playsInline preload="metadata" />}
-                        <div className="absolute left-3 top-3 rounded-full bg-black/60 px-2 py-1 text-[11px] text-white/90">{item.mediaType === 'image' ? 'Imatge' : 'Vídeo'} · #{item.sortOrder + 1}</div>
-                        <div className="absolute bottom-3 left-3 rounded-full bg-black/60 px-2 py-1 text-[11px] text-white/90">Clic per ampliar</div>
+                        <div className="absolute left-3 top-3 rounded-full bg-black/60 px-2 py-1 text-xs text-white/90">{item.mediaType === 'image' ? 'Imatge' : 'Vídeo'} · #{item.sortOrder + 1}</div>
+                        <div className="absolute bottom-3 left-3 rounded-full bg-black/60 px-2 py-1 text-xs text-white/90">Clic per ampliar</div>
                       </button>
                       <div className="space-y-4 p-4">
                         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -476,18 +476,18 @@ function CategorySection({
                           </div>
                           <div className="flex items-center gap-2 text-xs text-white/45">
                             <span className="rounded-full border border-white/10 px-2 py-1">{item.isStatic ? 'Catàleg públic actual' : 'Drag & drop'}</span>
-                            {item.event ? <span className="rounded-full border border-cyan-500/30 px-2 py-1 text-cyan-200">Vinculat a {item.event.title}</span> : <span className="rounded-full border border-white/10 px-2 py-1">Sense event</span>}
+                            {item.event ? <span className="rounded-full border admin-tone-border-info px-2 py-1 admin-tone-text-info">Vinculat a {item.event.title}</span> : <span className="rounded-full border border-white/10 px-2 py-1">Sense event</span>}
                           </div>
                         </div>
                         <div>
                           <label className="mb-1 block text-xs text-white/40">Llegenda / codi intern</label>
-                          <input defaultValue={item.caption || ''} disabled={item.isStatic} onBlur={(event) => { if ((item.caption || '') !== event.target.value) { void handleCaptionSave(item, event.target.value); } }} className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white/85 disabled:cursor-not-allowed disabled:opacity-60" placeholder="Ex: entrada-cerimonia" />
+                          <input defaultValue={item.caption || ''} disabled={item.isStatic} onBlur={(event) => { if ((item.caption || '') !== event.target.value) { void handleCaptionSave(item, event.target.value); } }} className="w-full ap-card px-3 py-2 text-sm text-white/85 disabled:cursor-not-allowed disabled:opacity-60" placeholder="Ex: entrada-cerimonia" />
                           <p className="mt-1 text-xs text-white/35">{item.isStatic ? 'Aquesta peça ve del catàleg públic actual. Per editar-la o reordenar-la, primer cal migrar-la al portfolio de BBDD.' : "Aquesta etiqueta t'ajuda a saber què és la peça sense obrir-la."}</p>
                         </div>
                         <div className="grid gap-3 md:grid-cols-2">
                           <div>
                             <label className="mb-1 block text-xs text-white/40">Assignar a event</label>
-                            <select value={item.event?.id || ''} disabled={item.isStatic} onChange={(event) => void handleAssignEvent(item, event.target.value)} className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white/85 disabled:cursor-not-allowed disabled:opacity-60">
+                            <select value={item.event?.id || ''} disabled={item.isStatic} onChange={(event) => void handleAssignEvent(item, event.target.value)} className="w-full ap-card px-3 py-2 text-sm text-white/85 disabled:cursor-not-allowed disabled:opacity-60">
                               <option value="">Sense assignació</option>
                               {categoryEvents.map((eventItem) => <option key={eventItem.id} value={eventItem.id}>{eventItem.title}</option>)}
                             </select>
@@ -603,23 +603,23 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
         <AdminHelpLegend title="Relació amb media" body="La galeria no es guarda aquí: cada peça es vincula des de la pestanya Media per mantenir-ho monocapa." />
       </div>
       {showForm ? (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+        <div className="ap-card p-5">
           <div className="grid gap-4 md:grid-cols-2">
-            <input value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value, slug: event.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/g, '') }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85" placeholder="Títol de l'event" />
-            <input value={form.slug} onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85" placeholder="Slug URL" />
-            <select value={form.categorySlug} onChange={(event) => setForm((current) => ({ ...current, categorySlug: event.target.value }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85">{PORTFOLIO_CATEGORIES.map((category) => <option key={category.slug} value={category.slug}>{category.name}</option>)}</select>
-            <input value={form.coverImage} onChange={(event) => setForm((current) => ({ ...current, coverImage: event.target.value }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85" placeholder="URL de portada" />
-            <input value={form.subtitle} onChange={(event) => setForm((current) => ({ ...current, subtitle: event.target.value }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85" placeholder="Subtítol" />
-            <input value={form.venue} onChange={(event) => setForm((current) => ({ ...current, venue: event.target.value }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85" placeholder="Venue" />
-            <input value={form.location} onChange={(event) => setForm((current) => ({ ...current, location: event.target.value }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85" placeholder="Ubicació" />
-            <input type="date" value={form.eventDate} onChange={(event) => setForm((current) => ({ ...current, eventDate: event.target.value }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85" />
-            <input type="number" min={0} value={form.guestCount} onChange={(event) => setForm((current) => ({ ...current, guestCount: event.target.value }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85" placeholder="Convidats" />
-            <input value={form.services} onChange={(event) => setForm((current) => ({ ...current, services: event.target.value }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85 md:col-span-2" placeholder="Serveis separats per coma" />
-            <textarea value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} rows={4} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85 md:col-span-2" placeholder="Descripció" />
+            <input value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value, slug: event.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/g, '') }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="Títol de l'event" />
+            <input value={form.slug} onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="Slug URL" />
+            <select value={form.categorySlug} onChange={(event) => setForm((current) => ({ ...current, categorySlug: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85">{PORTFOLIO_CATEGORIES.map((category) => <option key={category.slug} value={category.slug}>{category.name}</option>)}</select>
+            <input value={form.coverImage} onChange={(event) => setForm((current) => ({ ...current, coverImage: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="URL de portada" />
+            <input value={form.subtitle} onChange={(event) => setForm((current) => ({ ...current, subtitle: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="Subtítol" />
+            <input value={form.venue} onChange={(event) => setForm((current) => ({ ...current, venue: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="Venue" />
+            <input value={form.location} onChange={(event) => setForm((current) => ({ ...current, location: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="Ubicació" />
+            <input type="date" value={form.eventDate} onChange={(event) => setForm((current) => ({ ...current, eventDate: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" />
+            <input type="number" min={0} value={form.guestCount} onChange={(event) => setForm((current) => ({ ...current, guestCount: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="Convidats" />
+            <input value={form.services} onChange={(event) => setForm((current) => ({ ...current, services: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85 md:col-span-2" placeholder="Serveis separats per coma" />
+            <textarea value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} rows={4} className="ap-card px-3 py-2.5 text-sm text-white/85 md:col-span-2" placeholder="Descripció" />
           </div>
           <div className="mt-4 flex items-center justify-between">
             <label className="flex items-center gap-2 text-sm text-white/80"><input type="checkbox" checked={form.published} onChange={(event) => setForm((current) => ({ ...current, published: event.target.checked }))} />Publicat</label>
-            <button type="button" onClick={() => void handleSubmit()} disabled={saving} className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black disabled:opacity-50">{saving ? 'Guardant...' : 'Crear event'}</button>
+            <button type="button" onClick={() => void handleSubmit()} disabled={saving} className="ap-btn ap-btn--primary">{saving ? 'Guardant...' : 'Crear event'}</button>
           </div>
         </div>
       ) : null}
@@ -629,7 +629,7 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
             <div className="flex flex-col gap-4 md:flex-row md:items-center">
               <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black">{eventItem.coverImage ? <Image src={eventItem.coverImage} alt={eventItem.title} fill className="object-cover" sizes="96px" /> : null}</div>
               <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2"><p className="text-sm font-semibold text-white/90">{eventItem.title}</p><span className={`rounded-full px-2 py-1 text-[11px] ${eventItem.published ? 'bg-emerald-500/15 text-emerald-200' : 'bg-white/10 text-white/60'}`}>{eventItem.published ? 'Publicat' : 'Esborrany'}</span></div>
+                <div className="flex flex-wrap items-center gap-2"><p className="text-sm font-semibold text-white/90">{eventItem.title}</p><span className={`rounded-full px-2 py-1 text-xs ${eventItem.published ? 'bg-emerald-500/15 text-emerald-200' : 'bg-white/10 text-white/60'}`}>{eventItem.published ? 'Publicat' : 'Esborrany'}</span></div>
                 <p className="mt-1 text-xs text-white/45">/{eventItem.categorySlug}/{eventItem.slug} · {eventItem._count?.media || 0} elements vinculats</p>
                 <p className="mt-1 text-xs text-white/35">Portada: {eventItem.coverImage || 'pendent'}</p>
               </div>
@@ -802,7 +802,7 @@ export default function AdminPortfolioPage() {
       </div>
       {tab === 'media' ? (
         <div className="space-y-3">
-          {eventsLoading ? <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-sm text-white/50">Carregant events i assignacions...</div> : PORTFOLIO_CATEGORIES.map((category) => <CategorySection key={category.slug} slug={category.slug} name={category.name} events={events} onEventsRefresh={loadEvents} onOpenPreview={setPreview} />)}
+          {eventsLoading ? <div className="ap-card p-6 text-sm text-white/50">Carregant events i assignacions...</div> : PORTFOLIO_CATEGORIES.map((category) => <CategorySection key={category.slug} slug={category.slug} name={category.name} events={events} onEventsRefresh={loadEvents} onOpenPreview={setPreview} />)}
         </div>
       ) : (
         <EventsManager events={events} onEventsRefresh={loadEvents} />

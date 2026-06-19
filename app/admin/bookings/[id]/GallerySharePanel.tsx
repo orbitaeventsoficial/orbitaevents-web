@@ -106,7 +106,7 @@ export default function GallerySharePanel({ bookingId }: Props) {
           </svg>
           <span className="text-sm font-medium">Link de galeria compartida</span>
           {info?.token && info.passwordProtected && (
-            <span className="ap-badge text-[9px]">Amb contrasenya</span>
+            <span className="ap-badge text-xs">Amb contrasenya</span>
           )}
         </div>
 
@@ -142,7 +142,7 @@ export default function GallerySharePanel({ bookingId }: Props) {
       </div>
 
       {info?.token && shareUrl && (
-        <p className="text-xs text-white/40 break-all font-mono bg-white/[0.03] rounded-lg px-3 py-2">
+        <p className="text-xs text-white/40 break-all font-mono bg-[var(--panel)] rounded-lg px-3 py-2">
           {shareUrl}
         </p>
       )}
@@ -165,7 +165,7 @@ export default function GallerySharePanel({ bookingId }: Props) {
               type="button"
               onClick={handleCreate}
               disabled={working}
-              className="rounded-xl bg-cyan-500/10 border border-cyan-500/30 px-4 py-2 text-xs font-semibold text-cyan-400 hover:bg-cyan-500/20 transition-colors disabled:opacity-50 min-h-[36px]"
+              className="rounded-xl admin-tone-bg-info border admin-tone-border-info px-4 py-2 text-xs font-semibold admin-tone-text-info hover:admin-tone-bg-info transition-colors disabled:opacity-50 min-h-[36px]"
             >
               {working ? 'Generant...' : 'Crear'}
             </button>

@@ -20,14 +20,14 @@ export default async function QuestionnairesPage() {
         </p>
         <Link
           href="/admin/questionnaires/new"
-          className="inline-flex rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-black hover:bg-cyan-400"
+          className="ap-btn ap-btn--primary"
         >
           Nova plantilla
         </Link>
       </div>
 
       {templates.length === 0 ? (
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-8 text-center text-sm text-white/40">
+        <div className="ap-card p-8 text-center text-sm text-white/40">
           Cap qüestionari creat encara.
         </div>
       ) : (
@@ -35,7 +35,7 @@ export default async function QuestionnairesPage() {
           {templates.map((tpl) => (
             <li
               key={tpl.id}
-              className="rounded-xl border border-white/10 bg-white/[0.03] p-4 flex flex-wrap items-start justify-between gap-3"
+              className="ap-card p-4 flex flex-wrap items-start justify-between gap-3"
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-2">

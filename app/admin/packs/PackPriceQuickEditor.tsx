@@ -11,9 +11,9 @@ function divergencePct(publicPrice: number, recommendedPrice: number): number {
 
 function badgeClass(value: number, threshold: number): string {
   const abs = Math.abs(value);
-  if (abs >= threshold) return 'border-rose-400/40 bg-rose-950/20 text-rose-300';
-  if (abs >= threshold * 0.5) return 'border-orange-400/40 bg-orange-950/20 text-orange-300';
-  return 'border-emerald-400/40 bg-emerald-950/20 text-emerald-300';
+  if (abs >= threshold) return 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger';
+  if (abs >= threshold * 0.5) return 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning';
+  return 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success';
 }
 
 export default function PackPriceQuickEditor({
@@ -70,7 +70,7 @@ export default function PackPriceQuickEditor({
     }
   }
 
-  const inputClass = 'w-full rounded-xl border border-white/10 bg-black/60 px-2 py-1 text-sm text-white/90';
+  const inputClass = 'adm-input w-full text-sm';
 
   return (
     <>
@@ -90,11 +90,11 @@ export default function PackPriceQuickEditor({
             type="button"
             onClick={save}
             disabled={saving}
-            className="rounded-md border border-white/20 bg-white/10 px-2.5 py-1 text-[11px] font-semibold hover:bg-white/20 disabled:opacity-60"
+            className="rounded-md border border-white/20 bg-white/10 px-2.5 py-1 text-xs font-semibold hover:bg-white/20 disabled:opacity-60"
           >
             {saving ? 'Desant...' : 'Desar PVP'}
           </button>
-          {msg && <span className="text-[11px]">{msg}</span>}
+          {msg && <span className="text-xs">{msg}</span>}
         </div>
       </div>
     </>

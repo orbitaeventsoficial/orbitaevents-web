@@ -1453,6 +1453,533 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1018 — 2026-06-18 — claude (TANCAT)
+
+**Verd WhatsApp a token (`--oe-whatsapp`) — eradicat hardcoded a ~10 CTAs públics.**
+
+- Auditoria de residu a tot el repo: el verd de marca WhatsApp estava hardcoded ~24 cops com a hex (`#25D366`) + 3 hovers DIVERGENTS (`#20BD5A`, `#20BA5A`, `#20b858` — tres verds foscos diferents per al MATEIX hover) + `#1da051` (active) + `rgba(37,211,102,X)` (glows) a 8 fitxers públics (CTAFinal, ExitIntentModal, FloatingCTAs, configurador, contacto, experiencias, faq, servicios). Cap token → violació de monocapa.
+- Nous tokens a `app/globals.css` `:root`: `--oe-whatsapp: #25D366`, `--oe-whatsapp-strong: #20BA5A` (hover unificat a UN verd fosc), `--oe-whatsapp-rgb: 37, 211, 102` (per glows). Totes les formes substituïdes (perl): `bg-/text-/hover:/active:` → var; `shadow-[#hex]/X` i `rgba(37,211,102,X)` → `rgba(var(--oe-whatsapp-rgb),X)`. 0 verds hardcoded restants.
+- Verificat al browser (`/ca/experiencias`): token resol `#25D366`, el CTA WhatsApp renderitza `rgb(37,211,102)`, 0 page errors.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 1017 -> 1018.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm build` EXIT 0 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: verd WhatsApp d'una sola font; hover unificat; cap hex de marca dispers.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1017 — 2026-06-18 — claude (TANCAT)
+
+**Contacte client-facing centralitzat: telèfons divergents (654/623) → `EMAIL_CONTACT` canònic.**
+
+- Auditoria de residu: DOS telèfons DIFERENTS hardcoded en documents cara al client, cap = el canònic (`SITE_CONFIG.business.phone +34699121023`): `dossierService.ts` (email de dossier) deia `654 46 70 87`; `emailTemplateService.ts` (peu de la plantilla d'email per defecte) deia `623 15 28 60`. Bug d'integritat de dades: clients rebien números equivocats i inconsistents.
+- Centralitzats a `EMAIL_CONTACT` (deriva de `SITE_CONFIG`): telèfon + email al text del dossier; telèfon + email + web (`SITE_CONFIG.web.domain`) al peu de l'email. `dossier-html-builder.ts` peu-web hardcoded → `SITE_CONFIG.web.domain`. Placeholder viciat `+34 654 46 70 87` al camp telèfon del client de `DossierGeneratorClient` → exemple genèric.
+- ⚠️ El número mostrat al client passa de 654/623 → **+34 699 12 10 23** (el canònic). Si 654/623 eren línies reals alternatives, cal corregir-ho a `SITE_CONFIG` (ara hi ha UN sol lloc).
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0 · tests dossier/email/builder/route 76/76 verds (vitest directe; la suite completa té flakiness de worker-pool no relacionada).
+- Validació funcional: cap telèfon vell al codi; contacte d'una sola font.
+- Validació humana/UX: pendent del propietari (confirmar que 699 és el número correcte per a aquests documents).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1016 — 2026-06-18 — claude (TANCAT)
+
+**`KpiCard` net: eliminats props morts `borderColor`/`bgColor`/`delay` (codi mort — «merda fora»).**
+
+- L'ítem de backlog P2 «KPIs a mà → `.ap-kpi`» JA estava satisfet: `KpiCard` (`economia-components.tsx`) ja renderitza `.ap-card p-4` canònic amb la gramàtica de Cristina (label mono, número display, card carbó plana). L'únic residu eren props `borderColor`/`bgColor`/`delay` que el component **acceptava però ignorava** des de la canonització.
+- Eliminats els 3 props de la signatura de `KpiCard` + tots els call-sites d'`EconomiaClient.tsx` (32 atributs morts, dues sintaxis multi-línia i una línia). tsc marca tot call-site residual → 0 errors després.
+- Sense canvi visual ni funcional (props ja ignorats). Reducció de soroll del guard: `superficie-adhoc` 76 → 70.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 1015 -> 1016.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: KPIs d'economia idèntics (card carbó canònica); zero referències mortes.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1015 — 2026-06-18 — claude (TANCAT)
+
+**Hover canònic de fila/llista: token `--o-admin-hover` + classe `.adm-row-hover` (monocapa + hipersemblança).**
+
+- Deute P2 anotat al #1012/#1014: la mateixa interacció (ressaltat de fila de taula/ítem de llista) es pintava amb `hover:bg-white/[0.0x]` i opacitats divergents (0.02–0.08) repartides per 29 fitxers → no hipersemblant.
+- Fix d'ARREL en una capa: nou token semàntic `--o-admin-hover: var(--o-admin-fill-2)` (`rgba(236,233,227,0.04)`, to càlid de la sèrie) a `app/studio/orbita-tokens.css` + classe canònica `html.admin-mode .adm-row-hover:hover { background: var(--o-admin-hover) }` a `admin-shell.css`.
+- Substituïdes **54 ocurrències** de `hover:bg-white/[0.0x]` per `.adm-row-hover` (perl documentat). Els `bg-white/[0.0x]` ESTÀTICS (skeletons de loader, tracks de barres, hairlines, cel·les de calendari) NO es toquen — són legítims/decoratius.
+- Guard `qa:admin-canon`: `superficie-adhoc` 130 → 76 (54 menys), 0 P1.
+- Verificat al browser (`/admin/inventory`, 51 files): token resol `rgba(236,233,227,0.04)` sobre `.ax-root` i hereta a la fila; regla `:hover` carregada; 0 page errors; captures desktop+mòbil de l'estat de repòs intactes.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 1014 -> 1015.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0 · `pnpm build` EXIT 0.
+- Validació funcional: hover idèntic a tot l'admin via una sola classe/token; estat de repòs sense canvi.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1014 — 2026-06-17 — claude (TANCAT)
+
+**Auditoria responsiva mòbil (375px) + botons blau de la fitxa de reserva → or.**
+
+- Auditoria 375px de ~16 pàgines + 2 fitxes amb detector d'overflow: CAP overflow horitzontal; adaptació correcta (KPIs 2-3col, taules→card, formularis 1col).
+- Troballa (blau al CSS, no caçat pel guard): `.ap-detail-bar-btn--accent` (`rgba 95,183,232`) i `.bd__btn--sec` (`--ax-info-bg`/`--o-info`) → or/neutre. Afecta totes les fitxes de reserva.
+- Verificat amb recaptura mòbil.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 1013 -> 1014.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: zero overflow mòbil; botons fitxa reserva en or.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1013 — 2026-06-17 — claude (TANCAT)
+
+**HIPERSEMBLANÇA: migració massiva a canon (superfícies/tipografia/radis) + norma escrita.**
+
+- Ordre propietari: codi net tots els fitxers, pàgines hipersemblants, radis/headers/tipografia normalitzats, responsiu igual, norma escrita.
+- Superfícies→`.ap-card` (50 fitxers, una veritat al CSS); `bg-white/[0.0x]`→tokens (376→130, resta skeletons). Tipografia 770 `text-[9-11px]`→`text-xs` (ja forçats a 12px, canvi neutre). Radis: regla única `admin-shell.css` `[class*=rounded-xl|2xl|3xl]`→`--o-r-md` (cards mateix radi d'una capa).
+- Norma escrita a `CLAUDE.md` §«Canon visual admin — HIPERSEMBLANÇA» (7 regles + Cristina referència + guard).
+- Verificat amb captures; `qa:admin-canon` P1=0; TSC=0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 1012 -> 1013.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: superfícies/tipografia/radis d'una capa; pàgines hipersemblants.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1012 — 2026-06-17 — claude (TANCAT)
+
+**Violet→neutre + classes malformades + inputs bg-black (auditoria operativa/resta-a).**
+
+- 2 agents auditoria pendents rellançats → `docs/audit/admin-operativa.md`+`admin-resta-a.md`. Correccions:
+- Fix monocapa `admin-tone-*-violet`→neutre (~7 consumidors); StripePaymentPanel badge violet→or.
+- Classes malformades (typos): `admin-tone-bg-cyanp-5`, `bg-white/10/50`, `bg-white/5/60`, `bg-white/5/70`→corregides.
+- Inputs `bg-black` sense `.adm-input`→`.adm-input` (PackPriceQuickEditor, CrewBlockManager, QuickCreateForm).
+- Guard ampliat: `text-(cyan/violet/blue)` també; 3 residuals→`admin-tone-text-cyan`.
+- `qa:admin-canon --strict`: 0 troballes.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 1011 -> 1012.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: cap violet/classe malformada; inputs carbó.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1011 — 2026-06-17 — claude (TANCAT)
+
+**Guard `qa:admin-canon` + eradicació en lot de 29 P1 (botó-void/blau/blanc-negre).**
+
+- Presupuestos (obert pel propietari): `ProposalsList` (KPIs→display/mono, botó «+Nou» invisible→`.ap-btn--primary`, accions quasi-negres→`.ap-btn`/or, thead hairline) + `ProposalOwnerPanel` (`bg-zinc-950`→`--panel`, inputs/botons canònics).
+- Guard nou `scripts/check-admin-canon.mjs` (`--strict` a `validate:core`): botó-void, blau/violeta superfície, blanc/negre absolut, `font-black`. Impedeix reentrada.
+- Fix monocapa `.admin-card-glass` (163 usos): selector mort `.admin-layout-shell`→viu + carbó; `--at-glass-bg` blau→carbó.
+- Eradicats 29 P1: 18 botó-void→`.ap-btn`, 7 blanc/negre (knobs→`--o-admin-light`, text→`--gold-ink`), 4 blau/violeta→or/warning, 17 `font-black`→`font-bold`.
+- `qa:admin-canon --strict`: 0 troballes (era 29 P1).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 1010 -> 1011.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: 0 botons invisibles/blau/blanc-negre; cards glass carbó.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1010 — 2026-06-17 — claude (TANCAT)
+
+**Economia 100% canònica: pack-model fantasma, inputs blancs, color cru.**
+
+- `PackPricingModelEditor`: `.admin-pack-model*` fantasma/sota `.admin-shell` mort (semàfors sense color) → `.ap-card`/`admin-tone-*`/`CHIP_BASE`. `ProfitabilityConfigHistory`+`PackPricingModelHistory`: inputs sense bg (fons blanc)→`.adm-input`, seccions→`.ap-card`, botons→`.ap-btn`. `economia-components`: HealthScore/PaymentTimelineBar/filtres/cel·les color cru→`admin-tone-*`/`bg-[var(--o-*)]`/`--gold`. `ProfitabilityConfigEditor` ratioBadge→`admin-tone-*`. `sales-ops` social: pink→neutre, estats→tones.
+- Verificat captura: semàfors de packs amb color, inputs carbó.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 1009 -> 1010.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: economia canònica; semàfors visibles.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1009 — 2026-06-17 — claude (TANCAT)
+
+**Panells IA (violeta→or) + maps d'estat dashboard → admin-tone-*.**
+
+- Panells IA `NBAExplainPanel`/`AiCopySuggestionsInline`/`inbox/AiReplySuggestions`: violeta → `--panel`/`--hair-gold`/`--gold` (IA = or, no lila). Maps d'estat: `ToastProvider`, `AnomalyPanel`, `CapacityConflictPanel` (orange inexistent→warning), `WeeklyCapacityForecastPanel` → `admin-tone-*`/`bg-[var(--o-*)]`.
+- `/admin/presupuestos` verificat per consulta del propietari: net (`.ap-card`+tones+estats centralitzats); cap problema.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 1008 -> 1009.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: panells IA or; estats de sèrie.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1008 — 2026-06-16 — claude (TANCAT)
+
+**Studio unificat a carbó (mirall fidel) + botons invisibles + blanc/negre absolut.**
+
+- ARREL: `orbita-tokens.css` tenia 2 paletes de fons — `--o-bg/surface/elev-*` blau-slate (només studio.css, 72×) vs `--o-admin-*` carbó (admin). Studio es renderitzava blau i ho mostrava com a «Paleta». Reapuntats a carbó (`#0b0b0e`→`#25252a`); `--o-text*` fred→càlid; `--o-line*` cream. Una sola paleta. `StudioShowroom` labels obsoletes→reals. Admin no usa aquests tokens directe (zero risc). `qa:studio-integrity` OK.
+- Botons invisibles (`text-white` sense fons): PaymentReminderActions(4), sales-ops(3), stats Desar, portfolio «Crear event» (`bg-white text-black`) → `.ap-btn`. image-manager títol/tabs (`text-black`→`--gold-ink`). TimelinePanel `bg-white text-black`→`--raised`/`--t`.
+- 5/9 informes auditoria a `docs/audit/RESUM.md` (4 pendents >23h).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 1007 -> 1008.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: Studio carbó fidel; botons visibles.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1007 — 2026-06-16 — claude (TANCAT)
+
+**Canvas: selecció blau→or + auditoria exhaustiva del repo amb 9 agents.**
+
+- `CanvasEditorClient.tsx`: indicadors de selecció UI `#06b6d4` (handles/outline/swatch actiu) → `var(--gold)`. Resta de hex = dades de disseny de l'usuari (cas canvas acceptat). Admin sense hex de color real hardcoded.
+- Llançats 9 agents `general-purpose` per auditar cada línia (admin+front) contra monocapa/responsiu/0-hardcoded/canònic → informes a `docs/audit/*.md`. Pendent consolidar `RESUM.md` i corregir per severitat.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 1006 -> 1007.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: selecció canvas en or.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1006 — 2026-06-16 — claude (TANCAT)
+
+**Fitxa de reserva: negre absolut + blau eradicats (4 capes) + blau-superfície admin a ZERO.**
+
+- Diagnòstic per color computat (CDP), no grep. 4 capes: (1) `page.tsx` `style={{background:'#000'}}` inline al `bd__root` (NEGRE, guanyava sobre el CSS) → eliminat; (2) `--o-admin-elevated #252638` blau-slate → `#25252a` carbó; (3) `--o-admin-info-*` cyan → neutres; (4) `.bd__root` +`background: var(--ax-canvas)`.
+- `bd__root`: rgb(0,0,0)→rgb(17,17,22) verificat.
+- Blau-superfície admin 43→0: questionnaires (botó blau→`.ap-btn--primary`), packs/discount/sales-ops/photo/cuadrant/manual/docs + 7 components → `admin-tone-*`; `ConfirmDialog` info→or (mai blau).
+- Lliçó: el negre era inline duplicat; davant color fora del grep CSS → inspeccionar DOM computat.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 1005 -> 1006.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0 (dev reiniciat net).
+- Validació funcional: fitxa reserva carbó; 0 blau-superfície.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1005 — 2026-06-16 — claude (TANCAT)
+
+**Panells dashboard/llistes: blau-superfície → estat de sèrie.**
+
+- `CaptureHealthPanel` (STATUS_STYLE + barra), `DailyBriefPanel` (ALERT_TONE + KPIs), `InventoryListSections` (toggle/badges), `LossBreakdownPanel`, `ReactivationClient`: `bg-cyan/blue` Tailwind → `admin-tone-*` (info=neutre) / tokens (`--gold`, `--o-admin-gold-tint-3`). Blau-superfície admin: 43→~25 (resta = manual/docs).
+- Verificat amb captures inventory/sales-ops.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 1004 -> 1005.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: estats amb to de sèrie, cap card blava.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1004 — 2026-06-16 — claude (TANCAT)
+
+**EditorControlStrip (triada transversal ~10 pàgines) → carbó pla, fora el blau.**
+
+- La triada superior (blog/faq/email-templates/image-manager/css-manager/…) tenia Tailwind directe: `tone:'info'`→`bg-cyan-500` (tint blau), success/warning fons plens, `text-2xl font-black text-white`, `admin-card-glass`. No el tocava el #999 (usava Tailwind, no `admin-tone-*`).
+- Canon Cristina: cards carbó pla (`--panel`/`--line`), estat a l'accent (info→neutre, mai blau), tipografia `--mono`/`--display`/`--t`. Pills→`--sunk`, radis→`--o-r-md`.
+- Verificat amb captures blog/faq: triada carbó sense blau.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 1003 -> 1004.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: triada de ~10 pàgines a carbó de sèrie.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1003 — 2026-06-16 — claude (TANCAT)
+
+**Auditoria de classes fantasma + botons-void primaris → canònic.**
+
+- Auditoria creuada classes usades (TSX) vs definides (CSS). Majoria de candidats (`admin-calendar-*`, `admin-reviews-tab`, `admin-feature-toggle`…) porten utilitats Tailwind → no són problemes (verificat amb captures). Calendari/leads = referència, no tocats.
+- Botons-void reals (classe fantasma o `text-white` sense bg) → `.ap-btn ap-btn--primary`: `PackPricingModelEditor` (Desar model packs), `BookingsPanel` (Nova reserva), `ProposalsPanel` (×2), `TasksNotesPanel` (Nova tasca).
+- Pendent: ~26 botons ghost `border` sense bg (es veuen raonables) → passades de detall.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 1002 -> 1003.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: CTAs primaris de fitxa client consumeixen botó canònic.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1002 — 2026-06-16 — claude (TANCAT)
+
+**`.ap-input` definida al canònic: 104 inputs gris-clar → carbó (monocapa).**
+
+- `.ap-input` (104 usos) no existia a cap CSS → inputs amb fons gris/blanc per defecte del navegador (vist a settings/company). `admin-shell.css`: afegida com a àlies de `.adm-input` (canònic Cristina). 1 definició → 104 inputs.
+- `PackPricingModelEditor.tsx`: `admin-pack-model-input` (inexistent) → `.adm-input`. `EconomiaClient.tsx`: valor inventari → display de sèrie; link «Veure detall» → `.ap-btn--xs`.
+- Verificat amb captures: settings/company i economia/Config inputs carbó; cap regressió.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 1001 -> 1002.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: inputs de tot l'admin passen a carbó.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1001 — 2026-06-16 — claude (TANCAT)
+
+**Eradicació del negre absolut + economia consumint el canònic. Principi: «CSS mana» (Cristina/calendari construeixen el canònic, la resta el consumeix).**
+
+- CSS arrel: sidebar gradient `#000`→`--o-admin-ink`; `.admin-nav-badge`/`.admin-recent-chip`/control-room `border: 1px solid;` sense color → `--at-border`; definides `.admin-economia-tab--active/--idle` (sortien blanc absolut) a l'estil segmentat de Cristina (actiu=neutre `--ax-raised`).
+- Botons (globals.css, monocapa): `.ap-btn` base sense color/fons (void negre) → ghost neutra; `.ap-btn--primary` or 22% (semblava negre) → outline or de Cristina.
+- Economia: franja «Com llegir» → nota carbó; `ConfirmDialog` card `bg-black`→`--panel`; `ProfitabilityConfigEditor` input→`.adm-input`, botó void→`.ap-btn--primary`, pous `bg-black/20`→`--sunk`.
+- Verificat amb captures: economia net; calendari + Cristina intactes.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 1000 -> 1001.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: negre/blanc absolut fora del CSS admin i botons.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1000 — 2026-06-16 — claude (TANCAT)
+
+**Economia amb la gramàtica de Cristina (KPI/HealthScore/seccions).**
+
+- Carbó (post-#999) no n'hi havia prou: faltava l'ofici de leads. `economia-components.tsx`: `KpiCard`+`HealthScore` → card carbó PLA (`--panel`/`--line`/`--o-r-md`, sense glass/shadow), label `--mono` `--t3`, valor `--display` pes 700 (no black), estat només al color del número (no fons). `EconomiaClient.tsx`: tots els wrappers de secció → carbó sense ombra (`rounded-2xl`=0).
+- Verificat amb captura Playwright vs `dbg-cristina-leads.png`: mateix ADN.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 999 -> 1000.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: jerarquia de la sèrie; estat preservat com a color de número.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #999 — 2026-06-16 — claude (TANCAT)
+
+**ARREL: fons `--at-*` canonitzats a carbó Òrbita (tot l'admin de cop).**
+
+- Causa de «tot blau menys Cristina»: `admin-theme.css` deixava els fons en blau-slate (`--at-panel: #1c2334`, `--at-raised: #283045`, `--at-border: #3a4560`) mentre Cristina usa `--o-admin-*` carbó directe. Nota del #980 «pàgina per pàgina» = mai s'arreglava.
+- `admin-theme.css` (monocapa): `--at-bg/surface`→`--o-admin-canvas`; `--at-panel`→`--o-admin-panel`; `--at-raised`→`--o-admin-raised`; `--at-border(-s)`→`--o-admin-line(-2)`; `--at-text/muted/subtle`→`--o-admin-text/-2/-3`. A més, tons `-cyan/-info` (eren blau #5fb7e8) → neutre carbó (canon Cristina: actiu=neutre, or=diners/accions).
+- Verificat amb captures Playwright: reporting/sales-ops/analytics/clientes/packs/settings carbó; leads (Cristina) intacta.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 998 -> 999.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: admin sencer passa a carbó d'una capa; Cristina no es toca.
+- Validació humana/UX: pendent de refresc del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #998 — 2026-06-16 — claude (REVERTIT)
+
+**Economia `.ap-*` — REVERTIT** (sortia blau-slate + tipografia alterada, «està fatal»). 2 fitxers tornats a HEAD via `git checkout`. El problema de fons resolt bé al #999 (capa de token).
+
+- Causa: economia es fabricava superfícies a mà (`bg-white/[0.03]`, `admin-card-glass`, `rounded-2xl`, `text-2xl font-black`) → divergia de Cristina. Norma «no canònic → fora» = també superfície/tipografia/radi, no només color.
+- `economia-components.tsx`: `KpiCard`→`.ap-kpi` (carbó + `.ap-kpi-value` + tons, `tone` derivat) → 16 usos canònics sense tocar call-sites; `HealthScore`→`.ap-kpi`+`.ap-kpi-label`.
+- `EconomiaClient.tsx`: seccions→`.ap-card` a TOTES les pestanyes (`rounded-2xl`=0), alertes→`.ap-card--danger/--warning`, botons→`.ap-btn`, valors→`.ap-kpi-value`; props morts de `KpiCard` eliminats.
+- PENDENT menor: 5 hovers de fila de taula, 2 `shadow-*` (tab actiu+badge), tipografia de cel·la puntual.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 997 -> 998.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: KPIs/alertes en carbó + tipografia de token; tons preservats.
+- Validació humana/UX: pendent de refresc del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #997 — 2026-06-16 — claude (TANCAT)
+
+**InsightsBanner tokenitzat (salut relacional/risc).**
+
+- `clientes/[id]/_components/InsightsBanner.tsx`: `HEALTH_CONFIG`, `URGENCY_COLOR`, `COMMERCIAL_RISK_COLOR` → `admin-tone-*` (EXCELLENT→success, GOOD→cyan, AT_RISK/MEDIUM→warning, LOST/HIGH→danger, NONE→success). Grep no-Òrbita = 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 996 -> 997.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàntica de salut/risc preservada amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #996 — 2026-06-16 — claude (TANCAT)
+
+**Referrals tokenitzat (prioritats/CTAs contacte).**
+
+- `clientes/referrals/ReferralsClient.tsx`: `PRIORITY_TONE` (ALTA→danger, MITJANA→warning), KPIs, filtre, CTAs WhatsApp→success/Email→info → `admin-tone-*`. Grep no-Òrbita = 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 995 -> 996.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: prioritats i CTAs preservats amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #995 — 2026-06-16 — claude (TANCAT)
+
+**Cuadrant operatiu tokenitzat (finestres/owner/solapaments).**
+
+- `cuadrant/page.tsx`: finestra activa + owner→cyan, CTA repartiment→warning, solapaments/conflictes→danger → `admin-tone-*`/`bg-[var(--o-*)]`. Grep no-Òrbita = 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 994 -> 995.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàntica de conflicte/owner preservada amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #994 — 2026-06-16 — claude (TANCAT)
+
+**Economia (components) tokenitzat (score/timeline pagaments).**
+
+- `economia/economia-components.tsx`: score ring (text + `stroke-[var(--o-*)]`), barres timeline pagament, chip filtre, columnes diposit/restant → `admin-tone-*`/`bg-[var(--o-*)]`. Grep no-Òrbita = 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 993 -> 994.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàfor de pagament i score preservats amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #993 — 2026-06-16 — claude (TANCAT)
+
+**Marketing Hub tokenitzat (diagnòstic/mesura).**
+
+- `marketing/page.tsx`: `diagnosticTone`, `measurementGapTone` (ready→success, missing→warning, blocked→danger), bloc «Sortida», integracions → `admin-tone-*`. Grep no-Òrbita = 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 992 -> 993.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàntica de diagnòstic/mesura preservada amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #992 — 2026-06-16 — claude (TANCAT)
+
+**Capacitat operativa tokenitzada (càrrega/alertes).**
+
+- `calendario/capacity/page.tsx`: `LOAD_CONFIG`/`ALERT_CONFIG` (LIGHT→cyan, FULL→warning, OVERLOADED→danger), KPIs, YoY → `admin-tone-*`/`bg-[var(--o-*)]`. Grep no-Òrbita = 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 991 -> 992.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàntica de càrrega/alertes preservada amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #991 — 2026-06-16 — claude (TANCAT)
+
+**LeadCustomerLinkPanel tokenitzat (vincle lead↔client).**
+
+- `LeadCustomerLinkPanel.tsx`: ja-vinculat→success, coincidències→warning, sense-match→neutre → `admin-tone-*`; CTAs sòlids → `bg-[var(--o-success/warning)]` + `text-[var(--o-admin-ink)]`. Grep no-Òrbita = 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 990 -> 991.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàntica dels 3 estats preservada amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #990 — 2026-06-16 — claude (TANCAT)
+
+**Text-manager tokenitzat (estats modificat/error/èxit).**
+
+- `text-manager/page.tsx`: modificat→warning (toggle/dot/grup/label/textarea), error→danger, èxit→success, botó «Desar» → `bg-[var(--o-success)]`. Grep no-Òrbita = 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 989 -> 990.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàntica d'estats preservada amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #989 — 2026-06-16 — claude (TANCAT)
+
+**Històric comercial: negre carbó (fix del negre heretat) a la fitxa de lead.**
+
+- `leads-design.css` (scoped `.fxd__document-history`, NO toca `.cdh` compartit): fons del bloc → `var(--ax-canvas)` (carbó #111116); items `.cdh__item` `--ax-sunk`→`--ax-panel` + `border-color: var(--ax-line2)`. Detectat pel propietari: heretava el negre profund `--ax-sunk`, no el carbó de Cristina.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 988 -> 989.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: bloc scoped; fitxa de reserva (`.cdh` compartit) intacta.
+- Validació humana/UX: pendent de refresc fort del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #988 — 2026-06-16 — claude (TANCAT)
+
+**OperationalPulsePanel tokenitzat (nivells de pols).**
+
+- `OperationalPulsePanel.tsx`: `LEVEL_COLOR`/`LEVEL_BG`/`LEVEL_DOT` (EXCELLENT→success, GOOD→cyan, WARNING→warning, CRITICAL→danger) → `admin-tone-*`/`bg-[var(--o-*)]`. Grep no-Òrbita = 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 987 -> 988.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàntica de nivells preservada amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #987 — 2026-06-16 — claude (TANCAT)
+
+**Playbook post-event tokenitzat (estats/prioritats).**
+
+- `post-event/playbook/page.tsx`: `STATUS_TONE`/`PRIORITY_TONE`, KPIs, barra (`bg-[var(--o-*)]`), hint «Següent» → `admin-tone-*`/tokens. Grep no-Òrbita = 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 986 -> 987.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàntica d'estats/prioritats preservada amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #986 — 2026-06-16 — claude (TANCAT)
 
 **AttributionPanel tokenitzat (atribució multi-touch).**

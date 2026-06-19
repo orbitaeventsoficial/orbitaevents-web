@@ -3,9 +3,9 @@ import type { WeeklyCapacityForecast, WeekAlertLevel } from '@/lib/services/oper
 
 const ALERT_STYLE: Record<WeekAlertLevel, { border: string; bg: string; tone: string; icon: string; label: string }> = {
   NONE: { border: 'border-white/10', bg: 'bg-white/[0.03]', tone: 'text-white/50', icon: '·', label: 'Sense reserves' },
-  INFO: { border: 'border-cyan-500/20', bg: 'bg-cyan-500/[0.06]', tone: 'text-cyan-300', icon: '·', label: 'Normal' },
-  WARNING: { border: 'border-amber-500/30', bg: 'bg-amber-500/[0.08]', tone: 'text-amber-300', icon: '!', label: 'Intensa' },
-  CRITICAL: { border: 'border-rose-500/40', bg: 'bg-rose-500/[0.08]', tone: 'text-rose-300', icon: '!!', label: 'Al límit' },
+  INFO: { border: 'admin-tone-border-info', bg: 'admin-tone-bg-info', tone: 'admin-tone-text-info', icon: '·', label: 'Normal' },
+  WARNING: { border: 'admin-tone-border-warning', bg: 'admin-tone-bg-warning', tone: 'admin-tone-text-warning', icon: '!', label: 'Intensa' },
+  CRITICAL: { border: 'admin-tone-border-danger', bg: 'admin-tone-bg-danger', tone: 'admin-tone-text-danger', icon: '!!', label: 'Al límit' },
 };
 
 export default function WeeklyCapacityForecastPanel({ forecast }: { forecast: WeeklyCapacityForecast[] }) {
@@ -13,7 +13,7 @@ export default function WeeklyCapacityForecastPanel({ forecast }: { forecast: We
   if (flagged.length === 0) return null;
 
   const hasCritical = flagged.some((w) => w.alertLevel === 'CRITICAL');
-  const headerBorder = hasCritical ? 'border-rose-500/30' : 'border-amber-500/30';
+  const headerBorder = hasCritical ? 'admin-tone-border-danger' : 'admin-tone-border-warning';
 
   return (
     <section className={`rounded-2xl border ${headerBorder} p-5 admin-card-glass space-y-3`}>
@@ -29,7 +29,7 @@ export default function WeeklyCapacityForecastPanel({ forecast }: { forecast: We
         </div>
         <Link
           href="/admin/calendario/capacity"
-          className="shrink-0 rounded-lg border border-white/10 px-3 py-2 text-[11px] font-bold transition-colors hover:bg-white/10"
+          className="shrink-0 rounded-lg border border-white/10 px-3 py-2 text-xs font-bold transition-colors hover:bg-white/10"
         >
           Capacitat →
         </Link>
@@ -43,21 +43,21 @@ export default function WeeklyCapacityForecastPanel({ forecast }: { forecast: We
               className={`admin-stagger-item rounded-xl border p-3 ${style.border} ${style.bg}`}
             >
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] font-semibold opacity-80">
+                <span className="text-xs font-semibold opacity-80">
                   {week.weekStart.slice(5)} → {week.weekEnd.slice(5)}
                 </span>
-                <span className={`text-[10px] font-bold ${style.tone}`}>{style.label}</span>
+                <span className={`text-xs font-bold ${style.tone}`}>{style.label}</span>
               </div>
               <p className="text-xl font-bold">{week.bookingsCount}</p>
-              <p className="text-[10px] opacity-50">
+              <p className="text-xs opacity-50">
                 {week.bookingsCount === 1 ? 'reserva' : 'reserves'}
                 {week.overloadedDays > 0 && (
-                  <span className="ml-1 text-rose-300">· {week.overloadedDays}d sobrec.</span>
+                  <span className="ml-1 admin-tone-text-danger">· {week.overloadedDays}d sobrec.</span>
                 )}
               </p>
               {week.previousYearBookings > 0 && week.yoyDelta != null && (
-                <p className="text-[10px] opacity-60 mt-1">
-                  <span className={week.yoyDelta >= 0 ? 'text-emerald-300' : 'text-rose-300'}>
+                <p className="text-xs opacity-60 mt-1">
+                  <span className={week.yoyDelta >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}>
                     {week.yoyDelta >= 0 ? '+' : ''}{Math.round(week.yoyDelta * 100)}%
                   </span>
                   <span className="ml-1 opacity-50">vs. any anterior</span>

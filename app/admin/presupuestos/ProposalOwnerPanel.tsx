@@ -161,7 +161,7 @@ export default function ProposalOwnerPanel({
 
   return (
     <section
-      className="rounded-xl border border-white/10 bg-black/20 p-6"
+      className="ap-card p-6"
       aria-label="Re-assignar pressupost"
     >
       <h3 className="text-sm font-semibold mb-1">Vincles del pressupost</h3>
@@ -172,10 +172,10 @@ export default function ProposalOwnerPanel({
         {ownerRows.map((row) => (
           <li
             key={row.kind}
-            className="rounded-lg border border-white/10 bg-black/20 p-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+            className="rounded-lg border border-[var(--line)] bg-[var(--sunk)] p-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="text-sm">
-              <div className="text-[11px] uppercase tracking-wide text-white/50">{row.label}</div>
+              <div className="text-xs uppercase tracking-wide text-white/50">{row.label}</div>
               {row.currentId ? (
                 <>
                   <div className="font-semibold">{row.currentLabel || row.currentId}</div>
@@ -191,7 +191,7 @@ export default function ProposalOwnerPanel({
               {row.href && (
                 <Link
                   href={row.href}
-                  className="text-xs px-3 py-1.5 rounded-lg border border-white/15 hover:bg-white/10"
+                  className="ap-btn ap-btn--xs"
                 >
                   Veure
                 </Link>
@@ -200,7 +200,7 @@ export default function ProposalOwnerPanel({
                 type="button"
                 onClick={() => setOpen(row.kind)}
                 disabled={submitting}
-                className="text-xs px-3 py-1.5 rounded-lg bg-amber-500/90 text-zinc-900 font-semibold hover:bg-amber-400 disabled:opacity-60"
+                className="ap-btn ap-btn--primary ap-btn--xs"
               >
                 {row.currentId ? 'Canviar' : 'Vincular'}
               </button>
@@ -209,7 +209,7 @@ export default function ProposalOwnerPanel({
                   type="button"
                   onClick={() => void submitChange({ [`${row.kind}Id`]: null })}
                   disabled={submitting}
-                  className="text-xs px-3 py-1.5 rounded-lg border border-rose-400/40 text-rose-200 hover:bg-rose-500/10 disabled:opacity-60"
+                  className="ap-btn ap-btn--xs admin-tone-border-danger admin-tone-text-danger"
                 >
                   Desvincular
                 </button>
@@ -227,7 +227,7 @@ export default function ProposalOwnerPanel({
           onClick={() => setOpen(null)}
         >
           <div
-            className="w-full max-w-md rounded-2xl border border-white/10 bg-zinc-950 p-5 shadow-2xl"
+            className="w-full max-w-md ap-card p-5 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h4 className="text-sm font-semibold">{config.title}</h4>
@@ -237,7 +237,7 @@ export default function ProposalOwnerPanel({
               placeholder={config.placeholder}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="mt-3 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-amber-400/60 focus:outline-none"
+              className="adm-input mt-3"
             />
             <div className="mt-3 max-h-64 overflow-y-auto">
               {loading ? (
@@ -266,7 +266,7 @@ export default function ProposalOwnerPanel({
               <button
                 type="button"
                 onClick={() => setOpen(null)}
-                className="text-xs px-3 py-1.5 rounded-lg border border-white/15 hover:bg-white/10"
+                className="ap-btn ap-btn--xs"
               >
                 Cancel·lar
               </button>

@@ -43,7 +43,7 @@ export default function LeadQuickPriority({
       value={currentPriority}
       onChange={(e) => onChange(e.target.value as LeadPriority)}
       disabled={saving}
-      className="rounded-xl border px-2 py-1 text-[11px]"
+      className="rounded-xl border px-2 py-1 text-xs"
       title="Canviar prioritat"
       aria-label="Canviar prioritat"
     >

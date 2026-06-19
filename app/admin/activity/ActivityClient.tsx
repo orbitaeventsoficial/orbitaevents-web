@@ -241,7 +241,7 @@ export default function ActivityClient() {
             key={key}
             onClick={() => setCategory(category === key ? 'all' : key)}
             className={`admin-stagger-item rounded-2xl border border-white/10 p-4 text-left transition-all ${
-              category === key ? cardTone : 'admin-card-glass hover:bg-white/[0.03]'
+              category === key ? cardTone : 'admin-card-glass adm-row-hover'
             }`}
           >
             <div className="mb-2 flex items-center justify-between">
@@ -361,7 +361,7 @@ export default function ActivityClient() {
                 const entityLabel = getEntityLabel(entry);
 
                 return (
-                  <article key={entry.id} className="admin-stagger-item admin-card-glass block rounded-2xl border border-white/10 p-4 transition-colors hover:bg-white/[0.03]">
+                  <article key={entry.id} className="admin-stagger-item admin-card-glass block rounded-2xl border border-white/10 p-4 transition-colors adm-row-hover">
                     <div className="mb-2 flex items-start justify-between gap-3">
                       <span className={`${meta.tone} text-sm font-medium`}>
                         {meta.icon} {meta.label}
@@ -371,7 +371,7 @@ export default function ActivityClient() {
                       </span>
                     </div>
 
-                    <div className="mb-2 flex flex-wrap gap-2 text-[11px] uppercase tracking-wide admin-tone-text-neutral">
+                    <div className="mb-2 flex flex-wrap gap-2 text-xs uppercase tracking-wide admin-tone-text-neutral">
                       <span>{sourceLabel}</span>
                       <span>·</span>
                       <span>{kindLabel}</span>

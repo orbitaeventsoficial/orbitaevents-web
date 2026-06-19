@@ -17,7 +17,7 @@ function PaymentIndicator({ booking }: { booking: BookingDTO }) {
   const remaining = total - deposit;
 
   return (
-    <div className="mt-2 flex flex-wrap gap-2 text-[11px]" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.payment)}>
+    <div className="mt-2 flex flex-wrap gap-2 text-xs" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.payment)}>
       {deposit > 0 && (
         <span className={`rounded-full px-2 py-0.5 ${booking.depositPaid ? 'bg-emerald-500/15 text-emerald-300' : 'bg-rose-500/15 text-rose-300'}`}>
           Dipòsit {formatNumber(deposit)} € {booking.depositPaid ? '✓' : '✗'}
@@ -45,7 +45,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
           <h2 className="text-lg font-semibold">Reserves / Dates</h2>
           <p className="text-sm">{data.bookings.length} total · {upcoming.length} properes · {past.length} passades</p>
         </div>
-        <Link href={customerBookingCreateHref} className="rounded-xl px-3 py-2 text-xs font-semibold text-white" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.newBooking)}>
+        <Link href={customerBookingCreateHref} className="ap-btn ap-btn--primary ap-btn--xs" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.newBooking)}>
           Nova reserva
         </Link>
       </div>
@@ -63,7 +63,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
                 <div key={booking.id} className="rounded-xl border p-4" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.card(reference))}>
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="text-sm font-semibold">{reference}</p>
-                    <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${statusColor}`}>{labelEstatReserva(booking.status)}</span>
+                    <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusColor}`}>{labelEstatReserva(booking.status)}</span>
                   </div>
 
                   <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
@@ -71,7 +71,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
                     <span>{booking.date ? formatDateFull(booking.date) : 'Sense data'}</span>
                     {booking.date && new Date(booking.date) >= now && booking.status !== 'CANCELLED' && (() => {
                       const days = Math.ceil((new Date(booking.date).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-                      return <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${days <= 7 ? 'bg-amber-500/20 text-amber-300' : 'bg-white/10 text-white/50'}`}>{days === 0 ? 'AVUI' : `${days}d`}</span>;
+                      return <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${days <= 7 ? 'bg-amber-500/20 text-amber-300' : 'bg-white/10 text-white/50'}`}>{days === 0 ? 'AVUI' : `${days}d`}</span>;
                     })()}
                     {(booking.startTime || booking.endTime) && <span>{booking.startTime || '?'} – {booking.endTime || '?'}</span>}
                   </div>
@@ -79,9 +79,9 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
                   {(booking.location || booking.venue) && <p className="mt-1 text-xs">📍 {booking.venue || booking.location}</p>}
 
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {booking.packName && <span className="rounded-md px-2 py-0.5 text-[11px]">🎵 {booking.packName}</span>}
-                    {booking.guestCount && <span className="rounded-md px-2 py-0.5 text-[11px]">👥 {booking.guestCount} convidats</span>}
-                    {booking.discountCode && <span className="rounded-md px-2 py-0.5 text-[11px]">🏷️ {booking.discountCode}</span>}
+                    {booking.packName && <span className="rounded-md px-2 py-0.5 text-xs">🎵 {booking.packName}</span>}
+                    {booking.guestCount && <span className="rounded-md px-2 py-0.5 text-xs">👥 {booking.guestCount} convidats</span>}
+                    {booking.discountCode && <span className="rounded-md px-2 py-0.5 text-xs">🏷️ {booking.discountCode}</span>}
                   </div>
 
                   {(booking.depositAmount || booking.totalAmount) && <PaymentIndicator booking={booking} />}
@@ -101,7 +101,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
                 <div key={booking.id} className="rounded-xl border border-white/5 p-4 opacity-60">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="text-sm font-semibold">{booking.reference || booking.id.slice(0, 8)}</p>
-                    <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${statusColor}`}>{labelEstatReserva(booking.status)}</span>
+                    <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusColor}`}>{labelEstatReserva(booking.status)}</span>
                   </div>
                   <p className="mt-1 text-xs">{booking.date ? formatDateFull(booking.date) : 'Sense data'}</p>
                   <div className="mt-2 border-t border-white/5 pt-2">

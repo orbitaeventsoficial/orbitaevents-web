@@ -45,10 +45,10 @@ export default function AiCopySuggestionsInline({ type, context, onApply, label 
           type="button"
           onClick={handleGenerate}
           disabled={loading || !context.trim()}
-          className="flex items-center gap-1.5 rounded-lg border border-violet-500/30 bg-violet-500/5 px-3 py-1.5 text-xs font-medium text-violet-300/80 transition-colors hover:bg-violet-500/15 disabled:opacity-40"
+          className="flex items-center gap-1.5 rounded-lg border border-[var(--hair-gold)] bg-[var(--panel)] px-3 py-1.5 text-xs font-medium text-[var(--gold)] transition-colors hover:bg-[var(--raised)] disabled:opacity-40"
         >
           {loading ? (
-            <span className="inline-block h-3 w-3 animate-spin rounded-full border border-violet-400 border-t-transparent" />
+            <span className="inline-block h-3 w-3 animate-spin rounded-full border border-[var(--gold)] border-t-transparent" />
           ) : (
             '✨'
           )}
@@ -57,15 +57,15 @@ export default function AiCopySuggestionsInline({ type, context, onApply, label 
       )}
 
       {fetched && suggestions.length > 0 && (
-        <div className="mt-2 rounded-xl border border-violet-500/20 bg-violet-500/5 p-3">
+        <div className="mt-2 rounded-[var(--o-r-md)] border border-[var(--hair-gold)] bg-[var(--panel)] p-3">
           <div className="mb-2 flex items-center justify-between">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-violet-300/70">
+            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--gold)]">
               ✨ Opcions IA
             </p>
             <button
               type="button"
               onClick={() => { setSuggestions([]); setFetched(false); }}
-              className="text-[11px] text-white/30 hover:text-white/60"
+              className="text-xs text-white/30 hover:text-white/60"
             >
               ✕
             </button>
@@ -76,9 +76,9 @@ export default function AiCopySuggestionsInline({ type, context, onApply, label 
                 key={i}
                 type="button"
                 onClick={() => onApply(text)}
-                className="rounded-lg border border-white/10 bg-white/[0.03] p-3 text-left text-sm transition-colors hover:border-violet-500/40 hover:bg-violet-500/10"
+                className="ap-card p-3 text-left text-sm transition-colors hover:border-[var(--hair-gold)] hover:bg-[var(--raised)]"
               >
-                <span className="mr-2 text-[11px] text-violet-400/70">{i + 1}.</span>
+                <span className="mr-2 text-xs text-[var(--gold)]">{i + 1}.</span>
                 {text}
               </button>
             ))}
@@ -87,7 +87,7 @@ export default function AiCopySuggestionsInline({ type, context, onApply, label 
       )}
 
       {fetched && suggestions.length === 0 && (
-        <p className="mt-1 text-[11px] text-white/30">Sense suggeriments disponibles.</p>
+        <p className="mt-1 text-xs text-white/30">Sense suggeriments disponibles.</p>
       )}
     </div>
   );

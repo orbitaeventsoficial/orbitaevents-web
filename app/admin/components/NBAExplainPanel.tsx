@@ -11,9 +11,9 @@ type NBAExplainData = {
 };
 
 const URGENCY_CHIP: Record<string, string> = {
-  CRITICAL: 'border-rose-500/40 bg-rose-500/10 text-rose-200',
-  HIGH: 'border-amber-500/40 bg-amber-500/10 text-amber-200',
-  MEDIUM: 'border-sky-500/40 bg-sky-500/10 text-sky-200',
+  CRITICAL: 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger',
+  HIGH: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+  MEDIUM: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
   LOW: 'border-white/20 bg-white/5 text-white/55',
 };
 
@@ -35,7 +35,7 @@ export default function NBAExplainPanel() {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 animate-pulse">
+      <div className="ap-card p-4 animate-pulse">
         <div className="mb-3 h-2.5 w-32 rounded bg-white/10" />
         <div className="space-y-2">
           <div className="h-3 w-full rounded bg-white/[0.06]" />
@@ -47,12 +47,12 @@ export default function NBAExplainPanel() {
   }
 
   return (
-    <section className="rounded-2xl border border-violet-500/25 bg-violet-500/[0.05] p-4">
+    <section className="rounded-[var(--o-r-md)] border border-[var(--hair-gold)] bg-[var(--panel)] p-4">
       <div className="mb-3 flex items-center gap-2">
-        <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-violet-300/80">
+        <span className="font-[family-name:var(--mono)] text-xs font-bold uppercase tracking-[0.16em] text-[var(--gold)]">
           Anàlisi IA · Prioritats d&apos;avui
         </span>
-        <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-violet-400" />
+        <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--gold)]" />
       </div>
       <p className="text-sm leading-relaxed text-white/85">{data!.explanation}</p>
       {data!.actions.length > 0 && (

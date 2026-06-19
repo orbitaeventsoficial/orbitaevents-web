@@ -5,23 +5,27 @@
    ========================================================================== */
 
 html.admin-mode {
-  /* ── Backgrounds ── */
-  --at-bg: #0b0f16;
-  --at-surface: #141b28;
-  --at-panel: #1c2334;
-  --at-raised: #283045;
-  --at-input: #111827;
+  /* ── Backgrounds — CANONITZATS a la sèrie Òrbita (carbó), font de Cristina/leads.
+     Abans eren blau-slate (#1c2334/#283045/#3a4560) i tintaven TOT l'admin de blau
+     menys la fitxa de leads (que ja usava --o-admin-* directe). El #980 va deixar
+     aquests fons pendents «pàgina per pàgina»; aquí es fa a la capa de token =
+     tot l'admin passa a carbó de cop. ── */
+  --at-bg: var(--o-admin-canvas);      /* #111116 */
+  --at-surface: var(--o-admin-canvas); /* #111116 */
+  --at-panel: var(--o-admin-panel);    /* #161619 */
+  --at-raised: var(--o-admin-raised);  /* #1e1f27 */
+  --at-input: var(--o-admin-canvas);
 
-  /* ── Borders ── */
-  --at-border: #3a4560;
-  --at-border-s: #506080;
-  --at-border-sub: #2a3040;
+  /* ── Borders — hairlines neutres de la sèrie (no blau-gris) ── */
+  --at-border: var(--o-admin-line);      /* rgba blanc 0.10 */
+  --at-border-s: var(--o-admin-line-2);  /* rgba blanc 0.20 */
+  --at-border-sub: var(--o-admin-line);
   --at-glass-border: rgba(255, 255, 255, 0.12);
 
   /* ── Text ── */
-  --at-text: #f0f4f8;
-  --at-muted: #a8b5c4;
-  --at-subtle: #7889a0;
+  --at-text: var(--o-admin-text);
+  --at-muted: var(--o-admin-text-2);
+  --at-subtle: var(--o-admin-text-3);
 
   /* ── Colors semàntics REAPUNTATS a la sèrie Òrbita (--o-*), font de la fitxa
      de leads/Cristina. Canonització #980: la capa legacy ja no inventa color,
@@ -41,8 +45,11 @@ html.admin-mode {
   --at-orange-dim: color-mix(in oklab, var(--o-warning) 16%, transparent);
   --at-red: var(--o-danger);
   --at-red-dim: color-mix(in oklab, var(--o-danger) 16%, transparent);
-  --at-violet: var(--o-stage-contacted);
-  --at-violet-dim: color-mix(in oklab, var(--o-stage-contacted) 16%, transparent);
+  /* #1014: --at-violet era violeta (--o-stage-contacted) i el control-room (revival
+     dels selectors .admin-shell morts) el feia servir. Reapuntat a OR: el dashboard
+     no torna a sortir lila d'una sola capa. */
+  --at-violet: var(--at-gold);
+  --at-violet-dim: color-mix(in oklab, var(--at-gold) 16%, transparent);
   --at-cyan: var(--o-info);
   --at-cyan-dim: color-mix(in oklab, var(--o-info) 16%, transparent);
 
@@ -52,8 +59,11 @@ html.admin-mode {
   --at-brand-vivid: var(--at-gold-text);
   --at-border-strong: var(--at-border-s);
 
-  /* ── Glass + Shadows ── */
-  --at-glass-bg: rgba(18, 24, 38, 0.88);
+  /* ── Glass + Shadows ──
+     #1011: --at-glass-bg era rgba(18,24,38,.88) = blau-slate fred (el consumeixen
+     les 163 cards `.admin-card-glass`). Reapuntat a carbó càlid (panel sòlid) →
+     les cards glass deixen de tenyir de blau d'una sola capa. */
+  --at-glass-bg: var(--o-admin-panel);
   --at-shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
   --at-shadow-md: 0 4px 20px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06);
   --at-shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.07);
@@ -81,36 +91,40 @@ html.admin-mode {
   --at-cr-pilot-border: #3ea07e;
   --at-cr-pilot-text: #c9ffe8;
 
-  --at-cr-sky: #5a98c0;
-  --at-cr-sky-border: #4a7ca6;
-  --at-cr-sky-deep: #3f7c99;
-  --at-cr-sky-soft: rgba(90, 152, 192, 0.15);
-  --at-cr-sky-text: #8ecbff;
-  --at-cr-sky-bg: #1a3040;
-  --at-cr-cyan-border: #4aa6d4;
-  --at-cr-cyan-text: #67d6ff;
-  --at-cr-cyan-light: #9ed8ff;
+  /* #1014: bloc Control Room era blau-slate hardcoded (#5a98c0 sky, #111a2a bg…).
+     Reapuntat al canon: sky/cyan → or (accent), fons → carbó (--o-admin-*),
+     violet → or. Estat (rose/amber/emerald a dalt) es manté. Una capa → tot el
+     dashboard Control Room passa a carbó+or quan els selectors reviuen. */
+  --at-cr-sky: var(--at-gold);
+  --at-cr-sky-border: var(--at-gold-edge, var(--at-gold));
+  --at-cr-sky-deep: var(--at-gold);
+  --at-cr-sky-soft: color-mix(in oklab, var(--at-gold) 15%, transparent);
+  --at-cr-sky-text: var(--at-gold-text);
+  --at-cr-sky-bg: var(--o-admin-raised);
+  --at-cr-cyan-border: var(--at-gold);
+  --at-cr-cyan-text: var(--at-gold-text);
+  --at-cr-cyan-light: var(--at-gold-bright, var(--at-gold-text));
 
-  --at-cr-violet-border: #6f5aa0;
-  --at-cr-violet-bg: #2b1f3d;
+  --at-cr-violet-border: var(--at-gold);
+  --at-cr-violet-bg: var(--o-admin-raised);
 
-  --at-cr-bg-deep: #111a2a;
-  --at-cr-bg-card: #172135;
-  --at-cr-bg-head: #1a2437;
-  --at-cr-bg-hover: #1d2940;
-  --at-cr-bg-input: #121826;
-  --at-cr-bg-action: #20324b;
-  --at-cr-bg-action-h: #2a3f5e;
-  --at-cr-bg-ghost-h: #1e2f49;
+  --at-cr-bg-deep: var(--o-admin-canvas);
+  --at-cr-bg-card: var(--o-admin-panel);
+  --at-cr-bg-head: var(--o-admin-raised);
+  --at-cr-bg-hover: var(--o-admin-raised);
+  --at-cr-bg-input: var(--o-admin-sunk);
+  --at-cr-bg-action: var(--o-admin-raised);
+  --at-cr-bg-action-h: var(--o-admin-elevated);
+  --at-cr-bg-ghost-h: var(--o-admin-raised);
 
-  --at-cr-meta: #8ea6c6;
-  --at-cr-divide: #2f4463;
-  --at-cr-avatar-bg: #263245;
-  --at-cr-avatar-border: #465b79;
+  --at-cr-meta: var(--o-admin-text-3);
+  --at-cr-divide: var(--o-admin-line-2);
+  --at-cr-avatar-bg: var(--o-admin-raised);
+  --at-cr-avatar-border: var(--o-admin-line-2);
 
   --at-cr-btn-primary: #ffcf6b;
   --at-cr-btn-primary-h: #ffde9f;
-  --at-cr-btn-primary-t: #1a2538;
+  --at-cr-btn-primary-t: var(--o-admin-ink);
   --at-cr-btn-border: #ffd98d;
 
   /* ── Layout ── */
@@ -163,13 +177,16 @@ html.admin-mode .admin-layout-shell {
   --admin-cat-status-cancelled-text: var(--at-text);
 }
 
-/* ── Component utilities ── */
-html.admin-mode .admin-layout-shell .admin-card-glass {
-  background: var(--at-glass-bg);
-  border-color: var(--at-glass-border);
+/* ── Component utilities ──
+   #1011: el selector era `.admin-layout-shell .admin-card-glass` però el layout
+   real usa `.ax-root` → selector MORT: les 163 cards `.admin-card-glass` no rebien
+   cap fons (transparents). Reescrit amb selector viu + superfície carbó canònica
+   (com `.ap-card`), perquè totes les cards glass tinguin card real d'una sola capa. */
+html.admin-mode .admin-card-glass {
+  background: var(--o-admin-panel);
+  border-color: var(--o-admin-line);
+  border-radius: var(--o-r-md);
   box-shadow: var(--at-shadow-sm);
-  backdrop-filter: blur(10px) saturate(1.2);
-  -webkit-backdrop-filter: blur(10px) saturate(1.2);
 }
 
 html.admin-mode .admin-tone-soft-danger {
@@ -194,9 +211,15 @@ html.admin-mode .admin-tone-soft-warning {
 
 html.admin-mode .admin-tone-bg-neutral { background: var(--at-raised); }
 html.admin-mode .admin-tone-bg-slate { background: color-mix(in oklab, var(--at-muted) 16%, var(--at-panel) 84%); }
-html.admin-mode .admin-tone-bg-info { background: var(--at-blue-dim); }
-html.admin-mode .admin-tone-bg-cyan { background: var(--at-cyan-dim); }
-html.admin-mode .admin-tone-bg-violet { background: var(--at-violet-dim); }
+/* Canon Òrbita (Cristina/leads): NO hi ha blau de superfície. «Info/cyan/actiu»
+   = neutre carbó elevat, com el control actiu de la fitxa (`.fx__view button.is-on`
+   → --raised, sense or). L'or queda reservat a diners/accions. Redefinició monocapa:
+   abans aquestes 6 classes resolien a blau (#5fb7e8) i tintaven cards arreu. */
+html.admin-mode .admin-tone-bg-info { background: var(--at-raised); }
+html.admin-mode .admin-tone-bg-cyan { background: var(--at-raised); }
+/* #1011: violet de superfície fora del canon (carbó+or). Reapuntat a neutre carbó
+   (com cyan/info a #999). Els ~7 consumidors deixen de tenyir de lila d'una capa. */
+html.admin-mode .admin-tone-bg-violet { background: var(--at-raised); }
 html.admin-mode .admin-tone-bg-success { background: var(--at-green-dim); }
 html.admin-mode .admin-tone-bg-teal { background: color-mix(in oklab, var(--at-green) 14%, var(--at-blue) 10%, var(--at-panel) 76%); }
 html.admin-mode .admin-tone-bg-warning { background: var(--at-orange-dim); }
@@ -204,9 +227,9 @@ html.admin-mode .admin-tone-bg-danger { background: var(--at-red-dim); }
 
 html.admin-mode .admin-tone-text-neutral { color: var(--at-muted); }
 html.admin-mode .admin-tone-text-slate { color: var(--at-muted); }
-html.admin-mode .admin-tone-text-info { color: var(--at-blue); }
-html.admin-mode .admin-tone-text-cyan { color: var(--at-info); }
-html.admin-mode .admin-tone-text-violet { color: var(--at-violet); }
+html.admin-mode .admin-tone-text-info { color: var(--at-text); }
+html.admin-mode .admin-tone-text-cyan { color: var(--at-text); }
+html.admin-mode .admin-tone-text-violet { color: var(--at-text); }
 html.admin-mode .admin-tone-text-success { color: var(--at-green); }
 html.admin-mode .admin-tone-text-teal { color: color-mix(in oklab, var(--at-green) 55%, var(--at-blue) 45%); }
 html.admin-mode .admin-tone-text-warning { color: var(--at-gold-text); }
@@ -214,9 +237,9 @@ html.admin-mode .admin-tone-text-danger { color: var(--at-red); }
 
 html.admin-mode .admin-tone-border-neutral { border-color: var(--at-border); }
 html.admin-mode .admin-tone-border-slate { border-color: color-mix(in oklab, var(--at-muted) 35%, var(--at-border) 65%); }
-html.admin-mode .admin-tone-border-info { border-color: color-mix(in oklab, var(--at-blue) 40%, var(--at-border) 60%); }
-html.admin-mode .admin-tone-border-cyan { border-color: color-mix(in oklab, var(--at-info) 40%, var(--at-border) 60%); }
-html.admin-mode .admin-tone-border-violet { border-color: color-mix(in oklab, var(--at-violet) 40%, var(--at-border) 60%); }
+html.admin-mode .admin-tone-border-info { border-color: var(--at-border-s); }
+html.admin-mode .admin-tone-border-cyan { border-color: var(--at-border-s); }
+html.admin-mode .admin-tone-border-violet { border-color: var(--at-border-s); }
 html.admin-mode .admin-tone-border-success { border-color: color-mix(in oklab, var(--at-green) 40%, var(--at-border) 60%); }
 html.admin-mode .admin-tone-border-teal { border-color: color-mix(in oklab, var(--at-green) 30%, var(--at-blue) 30%, var(--at-border) 40%); }
 html.admin-mode .admin-tone-border-warning { border-color: color-mix(in oklab, var(--at-orange) 40%, var(--at-border) 60%); }
@@ -354,7 +377,7 @@ html.admin-mode .admin-gradient--fab:hover {
   background: linear-gradient(135deg, #fbbf24, #fb923c);
 }
 html.admin-mode .admin-gradient--progress-emerald {
-  background: linear-gradient(to right, #10b981, #34d399);
+  background: linear-gradient(to right, var(--o-success), color-mix(in oklab, var(--o-success) 70%, white));
 }
 
 /* ── Stagger animation global (totes les pàgines admin, no només dashboard) ──
@@ -383,7 +406,7 @@ html.admin-mode .admin-skip-nav {
   left: 0;
   z-index: 10000;
   padding: 8px 16px;
-  background: var(--at-surface, #141b28);
+  background: var(--at-surface, var(--o-admin-canvas));
   color: var(--at-text, #f0f4f8);
   border: 1px solid var(--at-border-s, #506080);
   border-radius: 0 0 8px 0;

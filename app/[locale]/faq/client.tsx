@@ -203,7 +203,7 @@ export default function FAQClient({
             <a
               href={WHATSAPP_URL_WITH_MESSAGE(ctaWhatsappMessage)}
               target="_blank" rel="noopener noreferrer"
-              className="inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-[#25D366] px-8 py-4 font-bold text-white transition-all hover:scale-105 hover:bg-[#20BD5A] hover:shadow-[0_8px_30px_rgba(37,211,102,0.4)] sm:w-auto"
+              className="inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-[var(--oe-whatsapp)] px-8 py-4 font-bold text-white transition-all hover:scale-105 hover:bg-[var(--oe-whatsapp-strong)] hover:shadow-[0_8px_30px_rgba(var(--oe-whatsapp-rgb),0.4)] sm:w-auto"
             >
               <WhatsAppIcon className="w-6 h-6" />
               {ctaButton}

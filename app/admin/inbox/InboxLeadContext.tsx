@@ -57,26 +57,26 @@ export default function InboxLeadContext({ lead }: { lead: LeadData }) {
   const URGENCY_BG: Record<string, string> = {
     HIGH: 'border-rose-500/40 bg-rose-500/10',
     MEDIUM: 'border-amber-500/40 bg-amber-500/10',
-    LOW: 'border-white/10 bg-white/[0.03]',
+    LOW: 'border-[var(--line)] bg-[var(--panel)]',
   };
 
   return (
     <div className="grid gap-2 sm:grid-cols-2 mb-6">
       {/* Smart Action */}
       <div className={`rounded-xl border p-3 ${URGENCY_BG[hint.urgency]}`}>
-        <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Acció recomanada</p>
+        <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Acció recomanada</p>
         <p className="mt-1 text-sm font-semibold">{hint.label}</p>
         <div className="mt-2 flex flex-wrap gap-2">
           <Link
             href={buildLeadWorkspaceHref(lead.id)}
-            className="inline-flex rounded-lg border px-2.5 py-1 text-[11px] font-semibold hover:bg-white/10 transition-colors"
+            className="inline-flex rounded-lg border px-2.5 py-1 text-xs font-semibold hover:bg-white/10 transition-colors"
           >
             Obrir lead complet
           </Link>
           {lead.customerId && (
             <Link
               href={buildCustomerWorkspaceTabHref(lead.customerId, 'comms')}
-              className="inline-flex rounded-lg border px-2.5 py-1 text-[11px] font-semibold hover:bg-white/10 transition-colors"
+              className="inline-flex rounded-lg border px-2.5 py-1 text-xs font-semibold hover:bg-white/10 transition-colors"
             >
               Obrir Customer Hub
             </Link>
@@ -86,11 +86,11 @@ export default function InboxLeadContext({ lead }: { lead: LeadData }) {
 
       {/* Score + Context */}
       <div className={`rounded-xl border p-3 ${band.bg}`}>
-        <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Puntuació comercial</p>
+        <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Puntuació comercial</p>
         <p className={`mt-1 text-lg font-bold ${band.color}`}>
           {score.score} · {band.label}
         </p>
-        <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] opacity-70">
+        <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs opacity-70">
           <span>Creat fa {daysOld}d</span>
           {daysUntilEvent != null && daysUntilEvent >= 0 && <span>Event en {daysUntilEvent}d</span>}
           {daysUntilEvent != null && daysUntilEvent < 0 && <span className="text-rose-300">Event ja passat</span>}

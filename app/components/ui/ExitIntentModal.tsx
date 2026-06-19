@@ -108,7 +108,7 @@ export default function ExitIntentModal() {
         {/* CTA */}
         <button
           onClick={handleWhatsApp}
-          className="w-full flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#20b858] active:bg-[#1da051] text-white font-semibold py-3.5 px-6 rounded-xl transition-colors shadow-lg shadow-[#25D366]/20 mb-3"
+          className="w-full flex items-center justify-center gap-3 bg-[var(--oe-whatsapp)] hover:bg-[var(--oe-whatsapp-strong)] active:bg-[var(--oe-whatsapp-strong)] text-white font-semibold py-3.5 px-6 rounded-xl transition-colors shadow-lg shadow-[rgba(var(--oe-whatsapp-rgb),0.2)] mb-3"
         >
           {/* WhatsApp icon */}
           <WhatsAppIcon width={22} height={22} />

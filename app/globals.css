@@ -52,6 +52,11 @@
     --oe-orange: #ea580c;
     --oe-purple: #8b5cf6;
     --oe-green: #22c55e;
+    /* WhatsApp brand (font única — abans hardcoded #25D366 + 3 hovers divergents
+       a ~10 fitxers de CTAs públics). El hover s'unifica a UN verd fosc. */
+    --oe-whatsapp: #25D366;
+    --oe-whatsapp-strong: #20BA5A;
+    --oe-whatsapp-rgb: 37, 211, 102;
 
     /* ─────────────────────────────────────────────────────────────────────────
        GRADIENTS
@@ -1573,7 +1578,7 @@ html.admin-mode .admin-nav-badge {
   border-radius: 9999px;
   font-size: 11px;
   font-weight: 700;
-  border: 1px solid;
+  border: 1px solid var(--at-border);
 }
 
 html.admin-mode .admin-nav-badge--orange {
@@ -1606,7 +1611,7 @@ html.admin-mode .admin-recent-chip {
   padding: 0.2rem 0.5rem;
   font-size: 11px;
   font-weight: 600;
-  border: 1px solid;
+  border: 1px solid var(--at-border);
   transition: var(--at-transition);
 }
 
@@ -2995,7 +3000,12 @@ html.admin-mode .ap-btn {
   gap: 0.375rem;
   padding: 0.45rem 0.875rem;
   border-radius: 0.625rem;
-  border: 1px solid;
+  /* Base neutra real (abans `border: 1px solid` sense color ni fons → botó
+     transparent amb vora invisible = «negre absolut buit»). Canon Cristina:
+     botó ghost neutre, vora hairline, text llegible. */
+  border: 1px solid var(--at-border);
+  background: transparent;
+  color: var(--at-text);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -3003,6 +3013,11 @@ html.admin-mode .ap-btn {
   text-decoration: none;
   white-space: nowrap;
   line-height: 1.4;
+}
+
+html.admin-mode .ap-btn:hover {
+  border-color: var(--at-border-s);
+  background: color-mix(in oklab, var(--at-text) 5%, transparent);
 }
 
 html.admin-mode .ap-btn:active {
@@ -3014,15 +3029,17 @@ html.admin-mode .ap-btn:disabled {
   pointer-events: none;
 }
 
+/* Acció primària = outline or de Cristina (`.fx__add`): fons transparent, vora
+   hairline d'or, text or. Abans era or 22% sobre panel = massa fosc, semblava negre. */
 html.admin-mode .ap-btn--primary {
-  background: color-mix(in oklab, var(--at-gold) 22%, var(--at-panel) 78%);
+  background: transparent;
   border-color: var(--at-gold);
   color: var(--at-gold-text);
 }
 
 html.admin-mode .ap-btn--primary:hover {
-  background: color-mix(in oklab, var(--at-gold) 34%, var(--at-panel) 66%);
-  box-shadow: 0 0 14px color-mix(in oklab, var(--at-gold) 20%, transparent 80%);
+  background: color-mix(in oklab, var(--at-gold) 8%, transparent);
+  border-color: var(--at-gold);
 }
 
 html.admin-mode .ap-btn--secondary {

@@ -8,10 +8,10 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 type ToastType = 'success' | 'error' | 'warning' | 'info';
 
 const TOAST_STYLES: Record<ToastType, { bg: string; icon: string }> = {
-  success: { bg: 'bg-emerald-500/20 border-emerald-500/30', icon: '✅' },
-  error: { bg: 'bg-rose-500/20 border-rose-500/30', icon: '❌' },
-  warning: { bg: 'bg-amber-500/20 border-amber-500/30', icon: '⚠️' },
-  info: { bg: 'bg-sky-500/20 border-sky-500/30', icon: 'ℹ️' },
+  success: { bg: 'admin-tone-bg-success admin-tone-border-success', icon: '✅' },
+  error: { bg: 'admin-tone-bg-danger admin-tone-border-danger', icon: '❌' },
+  warning: { bg: 'admin-tone-bg-warning admin-tone-border-warning', icon: '⚠️' },
+  info: { bg: 'admin-tone-bg-info admin-tone-border-info', icon: 'ℹ️' },
 };
 
 function Toast({ type, message, onClose }: { type: ToastType; message: string; onClose?: () => void }) {

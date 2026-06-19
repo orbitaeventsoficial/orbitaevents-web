@@ -32,17 +32,17 @@ export const dynamic = 'force-dynamic';
 const STATUS_STYLE: Record<ProtocolCanviStatus, string> = {
   FET: 'border-emerald-500/40 bg-emerald-500/[0.08] text-emerald-200',
   'EN MARXA': 'border-amber-500/40 bg-amber-500/[0.08] text-amber-200',
-  PENDENT: 'border-cyan-500/40 bg-cyan-500/[0.08] text-cyan-200',
-  UNKNOWN: 'border-white/15 bg-white/[0.04] text-white/70',
+  PENDENT: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
+  UNKNOWN: 'border-[var(--line)] bg-[var(--panel)] text-white/70',
 };
 
 const AUTHOR_STYLE: Record<string, string> = {
-  claude: 'border-violet-500/40 bg-violet-500/[0.08] text-violet-200',
-  codex: 'border-cyan-500/40 bg-cyan-500/[0.08] text-cyan-200',
+  claude: 'border-[var(--hair-gold)] bg-[var(--panel)] text-[var(--gold)]',
+  codex: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
 };
 
 function getAuthorStyle(author: string): string {
-  return AUTHOR_STYLE[author.toLowerCase()] ?? 'border-white/15 bg-white/[0.04] text-white/70';
+  return AUTHOR_STYLE[author.toLowerCase()] ?? 'border-[var(--line)] bg-[var(--panel)] text-white/70';
 }
 
 async function readProtocolMarkdown(): Promise<string> {
@@ -107,23 +107,23 @@ export default async function AdminProtocolPage({
     >
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <div className="admin-card-glass rounded-2xl border border-white/10 p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wider opacity-50">Canvis registrats</p>
-          <p className="mt-2 text-3xl font-black">{allCanvis.length}</p>
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Canvis registrats</p>
+          <p className="mt-2 text-3xl font-bold">{allCanvis.length}</p>
           <p className="mt-1 text-xs opacity-60">{totalFet} FET · {allCanvis.length - totalFet} altres estats.</p>
         </div>
         <div className="admin-card-glass rounded-2xl border border-white/10 p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wider opacity-50">Seccions del protocol</p>
-          <p className="mt-2 text-3xl font-black">{allSections.length}</p>
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Seccions del protocol</p>
+          <p className="mt-2 text-3xl font-bold">{allSections.length}</p>
           <p className="mt-1 text-xs opacity-60">§X.Y agrupades per àrea de producte.</p>
         </div>
         <div className="admin-card-glass rounded-2xl border border-white/10 p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wider opacity-50">Darrer canvi</p>
-          <p className="mt-2 text-3xl font-black">#{allCanvis[0]?.n ?? '—'}</p>
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Darrer canvi</p>
+          <p className="mt-2 text-3xl font-bold">#{allCanvis[0]?.n ?? '—'}</p>
           <p className="mt-1 text-xs opacity-60">{lastDate} · {allCanvis[0]?.author ?? '—'}</p>
         </div>
         <div className="admin-card-glass rounded-2xl border border-white/10 p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wider opacity-50">Validats humans</p>
-          <p className="mt-2 text-3xl font-black">{validationSummary.validatedCount}</p>
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Validats humans</p>
+          <p className="mt-2 text-3xl font-bold">{validationSummary.validatedCount}</p>
           <p className="mt-1 text-xs opacity-60">
             {validationSummary.validatedPercent}% · {validationSummary.pendingCount} pendents.
           </p>
@@ -135,8 +135,8 @@ export default async function AdminProtocolPage({
           </p>
         </div>
         <div className="admin-card-glass rounded-2xl border border-white/10 p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wider opacity-50">Filtre actiu</p>
-          <p className="mt-2 text-3xl font-black">{filtered.length}</p>
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Filtre actiu</p>
+          <p className="mt-2 text-3xl font-bold">{filtered.length}</p>
           <p className="mt-1 text-xs font-semibold uppercase tracking-wide opacity-50">
             {validationFilterMeta.label}
           </p>
@@ -155,12 +155,12 @@ export default async function AdminProtocolPage({
             defaultValue={query}
             placeholder="Cerca per #462, claude, audit trail..."
             aria-label="Cercar al protocol"
-            className="flex-1 min-w-[240px] rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm placeholder:text-white/40 focus:border-amber-500/50 focus:outline-none"
+            className="flex-1 min-w-[240px] ap-card px-3 py-2 text-sm placeholder:text-white/40 focus:border-amber-500/50 focus:outline-none"
           />
           <select
             name="validation"
             defaultValue={validationFilter}
-            className="min-w-[180px] rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm focus:border-amber-500/50 focus:outline-none"
+            className="min-w-[180px] ap-card px-3 py-2 text-sm focus:border-amber-500/50 focus:outline-none"
           >
             <option value="all">Tots els canvis</option>
             <option value="validated">Només validats</option>
@@ -226,7 +226,7 @@ export default async function AdminProtocolPage({
           description={sectionResultsMeta.description}
         >
           {filteredSections.length === 0 ? (
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <div className="ap-card p-4">
               <p className="text-sm font-semibold">{sectionEmptyStateMeta.title}</p>
               <p className="mt-1 text-sm opacity-70">{sectionEmptyStateMeta.description}</p>
             </div>
@@ -238,7 +238,7 @@ export default async function AdminProtocolPage({
                   href={`/admin/docs/protocol?seccio=${section.id}#${section.anchorId}`}
                   className="admin-card-glass flex flex-col gap-1 rounded-xl border border-white/10 p-3 transition hover:border-amber-500/40"
                 >
-                  <span className="text-[11px] font-semibold uppercase tracking-wider opacity-50">§{section.id}</span>
+                  <span className="text-xs font-semibold uppercase tracking-wider opacity-50">§{section.id}</span>
                   <span className="text-sm font-bold leading-snug">{section.title}</span>
                 </Link>
               ))}
@@ -253,7 +253,7 @@ export default async function AdminProtocolPage({
       >
         <div className="flex flex-col gap-2">
           {filtered.length === 0 ? (
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <div className="ap-card p-4">
               <p className="text-sm font-semibold">{emptyStateMeta.title}</p>
               <p className="mt-1 text-sm opacity-70">{emptyStateMeta.description}</p>
             </div>
@@ -271,16 +271,16 @@ export default async function AdminProtocolPage({
                   }`}
                 >
                   <summary className="flex cursor-pointer flex-wrap items-center gap-2 list-none">
-                    <span className="text-base font-black">Canvi #{canvi.n}</span>
+                    <span className="text-base font-bold">Canvi #{canvi.n}</span>
                     <span className="text-xs opacity-60">{canvi.date}</span>
-                    <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${getAuthorStyle(canvi.author)}`}>
+                    <span className={`rounded-full border px-2 py-0.5 text-xs font-bold uppercase tracking-wide ${getAuthorStyle(canvi.author)}`}>
                       {canvi.author}
                     </span>
-                    <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${STATUS_STYLE[canvi.status]}`}>
+                    <span className={`rounded-full border px-2 py-0.5 text-xs font-bold uppercase tracking-wide ${STATUS_STYLE[canvi.status]}`}>
                       {canvi.status}
                     </span>
                     <span
-                      className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
+                      className={`rounded-full border px-2 py-0.5 text-xs font-bold uppercase tracking-wide ${
                         validation ? ADMIN_PROTOCOL_VALIDATION_STYLE.validated : ADMIN_PROTOCOL_VALIDATION_STYLE.pending
                       }`}
                     >

@@ -1150,16 +1150,18 @@
   color: var(--o-success);
   background: color-mix(in oklab, var(--o-success) 16%, var(--raised));
 }
+/* #1014: el botó Correu era blau (--o-info), fora del canon carbó+or. → or (acció).
+   WhatsApp es manté verd (--o-success): reconeixement de marca universal, acceptat. */
 .fxd__btn--mail {
-  border-color: color-mix(in oklab, var(--o-info) 44%, var(--line));
-  background: color-mix(in oklab, var(--o-info) 10%, var(--raised));
-  color: var(--o-info);
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--o-info) 9%, transparent);
+  border-color: color-mix(in oklab, var(--gold) 44%, var(--line));
+  background: color-mix(in oklab, var(--gold) 10%, var(--raised));
+  color: var(--gold);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--gold) 9%, transparent);
 }
 .fxd__btn--mail:hover:not(:disabled) {
-  border-color: var(--o-info);
-  color: var(--o-info);
-  background: color-mix(in oklab, var(--o-info) 14%, var(--raised));
+  border-color: var(--gold);
+  color: var(--gold);
+  background: color-mix(in oklab, var(--gold) 14%, var(--raised));
 }
 
 .fxd__stagepick { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -2082,7 +2084,8 @@ html.admin-mode .fxd__doclink--row {
 html.admin-mode .fxd__document-history {
   margin: 0 1rem 0.5rem;
   padding: 0.45rem 0.6rem;
-  background: color-mix(in oklab, var(--ax-panel) 60%, var(--ax-canvas));
+  /* Negre carbó de la fitxa (no el sunk heretat): el bloc es fon amb la pàgina. */
+  background: var(--ax-canvas);
 }
 html.admin-mode .fxd__document-history .cdh__head {
   margin-bottom: 0.35rem;
@@ -2094,6 +2097,9 @@ html.admin-mode .fxd__document-history .cdh__list { gap: 0.3rem; }
 html.admin-mode .fxd__document-history .cdh__item {
   padding: 0.3rem 0.55rem;
   gap: 0.6rem;
+  /* Carta sobre carbó com els panells germans (--ax-panel), no el negre sunk heretat. */
+  background: var(--ax-panel);
+  border-color: var(--ax-line2);
 }
 /* Una sola línia per document: la data/enviament queda al document obert. */
 html.admin-mode .fxd__document-history .cdh__meta { display: none; }

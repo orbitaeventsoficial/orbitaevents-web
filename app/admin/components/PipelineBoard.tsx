@@ -232,7 +232,7 @@ export default function PipelineBoard<T>({
             <div className="border-b px-3 py-2.5">
               <div className="flex items-center justify-between">
                 <h3 className="truncate text-sm font-semibold">{col.label}</h3>
-                <span className="rounded-full border px-2 py-0.5 text-[10px] font-bold">
+                <span className="rounded-full border px-2 py-0.5 text-xs font-bold">
                   {col.items.length}
                 </span>
               </div>
@@ -257,7 +257,7 @@ export default function PipelineBoard<T>({
             >
               <div className="space-y-2">
                 {dragOverStatus === col.status && (
-                  <div className="admin-drag-placeholder rounded-xl px-2 py-3 text-center text-[10px]">
+                  <div className="admin-drag-placeholder rounded-xl px-2 py-3 text-center text-xs">
                     {dropText}
                   </div>
                 )}
@@ -357,7 +357,7 @@ export default function PipelineBoard<T>({
                       next.add(col.status);
                       return next;
                     })}
-                    className="w-full rounded-xl border border-dashed px-2 py-2.5 text-[11px] font-medium transition-colors hover:brightness-110"
+                    className="w-full rounded-xl border border-dashed px-2 py-2.5 text-xs font-medium transition-colors hover:brightness-110"
                   >
                     Mostrar {hiddenCount} més
                   </button>

@@ -51,7 +51,7 @@ export default function PostEventEmailButton({ bookingId }: { bookingId: string 
         {sent ? '✓ Enviat!' : sending ? 'Enviant...' : 'Envia post-event al client'}
       </button>
       {error && (
-        <span className="admin-tone-text-danger mt-1 text-[10px]">{error}</span>
+        <span className="admin-tone-text-danger mt-1 text-xs">{error}</span>
       )}
     </div>
   );

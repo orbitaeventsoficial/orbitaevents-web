@@ -156,19 +156,19 @@ export default function CronsClient() {
       {/* Resum */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-2xl border p-3 sm:p-4">
-          <div className="text-[10px] sm:text-xs uppercase tracking-wide text-white/50">Correctes</div>
+          <div className="text-xs sm:text-xs uppercase tracking-wide text-white/50">Correctes</div>
           <div className="text-2xl sm:text-3xl font-bold">{healthCounts.ok}</div>
         </div>
         <div className="rounded-2xl border p-3 sm:p-4">
-          <div className="text-[10px] sm:text-xs uppercase tracking-wide text-white/50">Retardats</div>
+          <div className="text-xs sm:text-xs uppercase tracking-wide text-white/50">Retardats</div>
           <div className="text-2xl sm:text-3xl font-bold">{healthCounts.warning}</div>
         </div>
         <div className="rounded-2xl border p-3 sm:p-4">
-          <div className="text-[10px] sm:text-xs uppercase tracking-wide text-white/50">Errors</div>
+          <div className="text-xs sm:text-xs uppercase tracking-wide text-white/50">Errors</div>
           <div className="text-2xl sm:text-3xl font-bold">{healthCounts.error}</div>
         </div>
         <div className="rounded-2xl border p-3 sm:p-4">
-          <div className="text-[10px] sm:text-xs uppercase tracking-wide text-white/50">Mai executat</div>
+          <div className="text-xs sm:text-xs uppercase tracking-wide text-white/50">Mai executat</div>
           <div className="text-2xl sm:text-3xl font-bold text-white/30">{healthCounts.unknown}</div>
         </div>
       </div>
@@ -204,7 +204,7 @@ export default function CronsClient() {
                     <div className="text-xs font-medium">
                       {config.label}
                     </div>
-                    <div className="text-[10px] text-white/40">
+                    <div className="text-xs text-white/40">
                       {cron.lastRun ? formatTimeAgo(cron.lastRun) : 'Mai'}
                     </div>
                   </div>

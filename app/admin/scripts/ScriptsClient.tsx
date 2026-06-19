@@ -351,18 +351,18 @@ export default function ScriptsClient() {
                       </div>
                       <p className="mt-1 text-xs leading-relaxed admin-tone-text-neutral">{s.description}</p>
                       <div className="mt-2 flex items-center gap-2">
-                        <code className="ap-badge rounded-lg border px-2 py-1 font-mono text-[11px]">{s.command}</code>
-                        <button type="button" onClick={() => copyCommand(s.command)} className="ap-btn ap-btn--secondary px-2 py-1 text-[10px]" title="Copiar comanda">
+                        <code className="ap-badge rounded-lg border px-2 py-1 font-mono text-xs">{s.command}</code>
+                        <button type="button" onClick={() => copyCommand(s.command)} className="ap-btn ap-btn--secondary px-2 py-1 text-xs" title="Copiar comanda">
                           {copiedCommand === s.command ? 'Copiat' : 'Copiar'}
                         </button>
                       </div>
                       {s.args && (
-                        <div className="mt-1 text-[10px] admin-tone-text-slate">
+                        <div className="mt-1 text-xs admin-tone-text-slate">
                           Arguments opcionals: <code className="font-mono">{s.args}</code>
                         </div>
                       )}
                     </div>
-                    <div className="flex-shrink-0 font-mono text-[10px] admin-tone-text-slate">{s.file}</div>
+                    <div className="flex-shrink-0 font-mono text-xs admin-tone-text-slate">{s.file}</div>
                   </div>
                 </div>
               ))}

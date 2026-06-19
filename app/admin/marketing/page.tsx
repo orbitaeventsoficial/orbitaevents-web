@@ -27,15 +27,15 @@ const integrationLabel: Record<MarketingHubIntegrationStatus, string> = {
 };
 
 const diagnosticTone = {
-  success: 'border-emerald-500/20 bg-emerald-500/[0.06] text-emerald-100',
-  warning: 'border-amber-500/20 bg-amber-500/[0.06] text-amber-100',
-  info: 'border-cyan-500/20 bg-cyan-500/[0.06] text-cyan-100',
+  success: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
+  warning: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+  info: 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan',
 } as const;
 
 const measurementGapTone: Record<MarketingHubMeasurementGap['status'], string> = {
-  ready: 'border-emerald-500/20 bg-emerald-500/[0.06]',
-  missing: 'border-amber-500/20 bg-amber-500/[0.06]',
-  blocked: 'border-rose-500/20 bg-rose-500/[0.06]',
+  ready: 'admin-tone-border-success admin-tone-bg-success',
+  missing: 'admin-tone-border-warning admin-tone-bg-warning',
+  blocked: 'admin-tone-border-danger admin-tone-bg-danger',
 };
 
 const measurementGapLabel: Record<MarketingHubMeasurementGap['status'], string> = {
@@ -194,14 +194,14 @@ export default async function MarketingPage() {
           <p className="mt-2 text-sm admin-tone-text-neutral">{summary.activeChannel.rule}</p>
           <div className="mt-4 space-y-2">
             {summary.activeChannel.allowedMoves.map((move) => (
-              <div key={move} className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm">
+              <div key={move} className="ap-card px-3 py-2 text-sm">
                 {move}
               </div>
             ))}
           </div>
-          <div className="mt-4 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.06] p-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-200">Sortida</p>
-            <ul className="mt-2 space-y-1 text-sm text-emerald-50/85">
+          <div className="mt-4 rounded-xl border admin-tone-border-success admin-tone-bg-success p-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] admin-tone-text-success">Sortida</p>
+            <ul className="mt-2 space-y-1 text-sm admin-tone-text-success opacity-90">
               {summary.activeChannel.exitSignals.map((signal) => (
                 <li key={signal}>{signal}</li>
               ))}
@@ -214,14 +214,14 @@ export default async function MarketingPage() {
           <h2 className="mt-2 text-xl font-semibold">Estat de mesura per canal</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {summary.integrationStates.map((integration) => (
-              <div key={integration.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <div key={integration.id} className="ap-card p-4">
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="font-semibold">{integration.label}</h3>
                   <span className={integrationTone[integration.status]}>{integrationLabel[integration.status]}</span>
                 </div>
                 <p className="mt-2 text-sm admin-tone-text-neutral">{integration.detail}</p>
                 {integration.missing && integration.missing.length > 0 && (
-                  <p className="mt-2 text-xs text-amber-200">{integration.missing.join(', ')}</p>
+                  <p className="mt-2 text-xs admin-tone-text-warning">{integration.missing.join(', ')}</p>
                 )}
               </div>
             ))}
@@ -241,7 +241,7 @@ export default async function MarketingPage() {
         </div>
         <div className="mt-4 space-y-3">
           {capture.sources.length === 0 && (
-            <p className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm admin-tone-text-neutral">
+            <p className="ap-card p-4 text-sm admin-tone-text-neutral">
               Encara no hi ha fonts de captació registrades al CRM.
             </p>
           )}

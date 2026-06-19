@@ -1,17 +1,17 @@
 import type { OperationalPulse, PulseLevel } from '@/lib/services/operationalPulseService';
 
 const LEVEL_COLOR: Record<PulseLevel, string> = {
-  EXCELLENT: 'text-emerald-300',
-  GOOD: 'text-cyan-300',
-  WARNING: 'text-amber-300',
-  CRITICAL: 'text-rose-300',
+  EXCELLENT: 'admin-tone-text-success',
+  GOOD: 'admin-tone-text-cyan',
+  WARNING: 'admin-tone-text-warning',
+  CRITICAL: 'admin-tone-text-danger',
 };
 
 const LEVEL_BG: Record<PulseLevel, string> = {
-  EXCELLENT: 'bg-emerald-500/15 border-emerald-500/30',
-  GOOD: 'bg-cyan-500/15 border-cyan-500/30',
-  WARNING: 'bg-amber-500/15 border-amber-500/30',
-  CRITICAL: 'bg-rose-500/15 border-rose-500/30',
+  EXCELLENT: 'admin-tone-bg-success admin-tone-border-success',
+  GOOD: 'admin-tone-bg-cyan admin-tone-border-cyan',
+  WARNING: 'admin-tone-bg-warning admin-tone-border-warning',
+  CRITICAL: 'admin-tone-bg-danger admin-tone-border-danger',
 };
 
 const LEVEL_LABEL: Record<PulseLevel, string> = {
@@ -22,10 +22,10 @@ const LEVEL_LABEL: Record<PulseLevel, string> = {
 };
 
 const LEVEL_DOT: Record<PulseLevel, string> = {
-  EXCELLENT: 'bg-emerald-400',
-  GOOD: 'bg-cyan-400',
-  WARNING: 'bg-amber-400',
-  CRITICAL: 'bg-rose-400',
+  EXCELLENT: 'bg-[var(--o-success)]',
+  GOOD: 'bg-[var(--o-info)]',
+  WARNING: 'bg-[var(--o-warning)]',
+  CRITICAL: 'bg-[var(--o-danger)]',
 };
 
 export default function OperationalPulsePanel({ pulse }: { pulse: OperationalPulse }) {
@@ -35,7 +35,7 @@ export default function OperationalPulsePanel({ pulse }: { pulse: OperationalPul
         <div className="flex items-center gap-2">
           <span className={`inline-block h-2.5 w-2.5 rounded-full ${LEVEL_DOT[pulse.overallLevel]} ${pulse.overallLevel === 'CRITICAL' ? 'animate-pulse' : ''}`} />
           <h2 className="text-sm font-semibold">Pols operatiu</h2>
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${LEVEL_COLOR[pulse.overallLevel]}`}>
+          <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${LEVEL_COLOR[pulse.overallLevel]}`}>
             {pulse.overallScore}/100 · {LEVEL_LABEL[pulse.overallLevel]}
           </span>
         </div>
@@ -45,13 +45,13 @@ export default function OperationalPulsePanel({ pulse }: { pulse: OperationalPul
         {pulse.metrics.map((m) => (
           <div
             key={m.key}
-            className="rounded-lg border border-white/10 bg-white/[0.04] px-2 py-1.5 text-center"
+            className="ap-card px-2 py-1.5 text-center"
           >
-            <p className="text-[8px] font-semibold uppercase tracking-wider opacity-50 truncate">{m.label}</p>
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-50 truncate">{m.label}</p>
             <p className={`text-sm font-bold ${LEVEL_COLOR[m.level]}`}>
               {m.value}{m.unit}
             </p>
-            <p className="text-[8px] opacity-30">{m.target}</p>
+            <p className="text-xs opacity-30">{m.target}</p>
           </div>
         ))}
       </div>
@@ -59,7 +59,7 @@ export default function OperationalPulsePanel({ pulse }: { pulse: OperationalPul
       {pulse.pipelineDrivers.length > 0 && (
         <div className="mt-3 rounded-xl border border-white/10 bg-black/10 p-3">
           <div className="flex items-center gap-2">
-            <span className="inline-block h-2 w-2 rounded-full bg-amber-400" />
+            <span className="inline-block h-2 w-2 rounded-full bg-[var(--o-warning)]" />
             <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Què degrada el pipeline</p>
           </div>
           <div className="mt-2 space-y-2">
@@ -67,14 +67,14 @@ export default function OperationalPulsePanel({ pulse }: { pulse: OperationalPul
               <a
                 key={`${driver.type}:${driver.href}`}
                 href={driver.href}
-                className="block rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 transition-colors hover:bg-white/[0.06]"
+                className="block ap-card px-3 py-2 transition-colors adm-row-hover"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-sm font-medium">{driver.title}</p>
                     <p className="mt-1 text-xs opacity-70">{driver.detail}</p>
                   </div>
-                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${LEVEL_COLOR[driver.priority === 'CRITICAL' ? 'CRITICAL' : 'WARNING']}`}>
+                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${LEVEL_COLOR[driver.priority === 'CRITICAL' ? 'CRITICAL' : 'WARNING']}`}>
                     {driver.priority}
                   </span>
                 </div>

@@ -48,7 +48,7 @@ export default function StatusQuickSelect({
       value={currentStatus}
       onChange={(event) => onChange(event.target.value)}
       disabled={saving}
-      className="rounded-xl border px-2 py-1 text-[11px]"
+      className="rounded-xl border px-2 py-1 text-xs"
       title={title}
       aria-label={title}
       {...helpAttrs(ADMIN_SHARED_HELP.statusQuickSelect(title))}

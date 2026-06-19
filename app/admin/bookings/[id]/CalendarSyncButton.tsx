@@ -52,7 +52,7 @@ export default function CalendarSyncButton({ bookingId }: { bookingId: string })
         {loading ? 'Sincronitzant...' : 'Sincronitza Google Calendar ara'}
       </button>
       {message && (
-        <p className={`text-[11px] ${isError ? 'admin-tone-text-danger' : 'admin-tone-text-success'}`}>
+        <p className={`text-xs ${isError ? 'admin-tone-text-danger' : 'admin-tone-text-success'}`}>
           {message}
         </p>
       )}

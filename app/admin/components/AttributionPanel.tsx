@@ -27,11 +27,11 @@ function StageStat({
   tone: string;
 }) {
   return (
-    <div className="rounded-lg border border-white/10 bg-white/[0.03] p-2">
-      <p className="text-[10px] font-semibold uppercase tracking-wider opacity-50">{label}</p>
+    <div className="ap-card p-2">
+      <p className="text-xs font-semibold uppercase tracking-wider opacity-50">{label}</p>
       <div className="mt-1 flex items-baseline justify-between gap-2">
-        <p className={`text-lg font-black ${tone}`}>{value}</p>
-        <span className="text-[10px] text-white/45">{formatPct(value, total)}</span>
+        <p className={`text-lg font-bold ${tone}`}>{value}</p>
+        <span className="text-xs text-white/45">{formatPct(value, total)}</span>
       </div>
     </div>
   );
@@ -50,15 +50,15 @@ function ChannelCard({
   const intensity = maxTouchpoints > 0 ? (channel.totalTouchpoints / maxTouchpoints) * 100 : 0;
 
   return (
-    <article className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+    <article className="ap-card p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-sm font-semibold text-white/90">{channel.label}</p>
-          <p className="mt-1 text-[11px] text-white/45">
+          <p className="mt-1 text-xs text-white/45">
             {channel.totalTouchpoints} touchpoints · {channel.firstTouchCount + channel.lastTouchCount} moments clau
           </p>
         </div>
-        <div className="rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2.5 py-1 text-[10px] font-bold admin-tone-text-cyan">
+        <div className="rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2.5 py-1 text-xs font-bold admin-tone-text-cyan">
           {formatPct(channel.totalTouchpoints, maxTouchpoints || 1)} del top
         </div>
       </div>
@@ -106,22 +106,22 @@ function JourneyCard({ journey }: { journey: LeadJourney }) {
   ];
 
   return (
-    <article className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+    <article className="ap-card p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-white/90">Lead {journey.leadId.slice(0, 8)}</p>
-          <p className="mt-1 text-[11px] text-white/45">
+          <p className="mt-1 text-xs text-white/45">
             {journey.touchpointCount} touchpoints · {journey.status} · {formatMoment(journey.firstTouch.timestamp)}
           </p>
         </div>
-        <div className="rounded-full border border-white/10 px-2.5 py-1 text-[10px] font-bold text-white/70">
+        <div className="rounded-full border border-white/10 px-2.5 py-1 text-xs font-bold text-white/70">
           {formatEuro(journey.revenue)}
         </div>
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
         {timeline.map((step, index) => (
-          <div key={`${step.label}-${step.channel}-${index}`} className={`rounded-full border px-2.5 py-1 text-[11px] font-medium ${step.tone}`}>
+          <div key={`${step.label}-${step.channel}-${index}`} className={`rounded-full border px-2.5 py-1 text-xs font-medium ${step.tone}`}>
             <span className="opacity-65">{step.label}:</span> {step.channel}
           </div>
         ))}
@@ -132,7 +132,7 @@ function JourneyCard({ journey }: { journey: LeadJourney }) {
 
 function EmptyState({ hasLeads }: { hasLeads: boolean }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 text-sm text-white/65">
+    <div className="ap-card p-4 text-sm text-white/65">
       {hasLeads
         ? 'Hi ha leads al període, però encara no hi ha conversions guanyades per construir el journey multi-touch.'
         : 'Sense leads al període. Quan entrin conversions, aquí es veurà quin canal obre, acompanya i tanca cada venda.'}
@@ -165,31 +165,31 @@ export default function AttributionPanel({ report }: { report: MultiTouchReport 
             Llegeix quin canal obre el lead, quin el manté viu i quin acaba tancant la venda als últims {report.windowDays} dies.
           </p>
         </div>
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2 text-[11px] text-white/65">
+        <div className="ap-card px-3 py-2 text-xs text-white/65">
           {report.totalLeads} leads analitzats · {report.wonLeads} guanyats
         </div>
       </div>
 
       <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wider opacity-55">Canal que porta</p>
-          <p className="mt-1 text-lg font-black admin-tone-text-cyan">{topFirst?.label ?? '—'}</p>
-          <p className="mt-1 text-[11px] opacity-55">{topFirst ? `${topFirst.firstTouchCount} primers contactes` : 'Sense dades'}</p>
+        <div className="ap-card p-3">
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-55">Canal que porta</p>
+          <p className="mt-1 text-lg font-bold admin-tone-text-cyan">{topFirst?.label ?? '—'}</p>
+          <p className="mt-1 text-xs opacity-55">{topFirst ? `${topFirst.firstTouchCount} primers contactes` : 'Sense dades'}</p>
         </div>
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wider opacity-55">Canal que acompanya</p>
-          <p className="mt-1 text-lg font-black admin-tone-text-warning">{topAssist?.label ?? '—'}</p>
-          <p className="mt-1 text-[11px] opacity-55">{topAssist ? `${topAssist.assistCount} assists` : 'Sense assists registrats'}</p>
+        <div className="ap-card p-3">
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-55">Canal que acompanya</p>
+          <p className="mt-1 text-lg font-bold admin-tone-text-warning">{topAssist?.label ?? '—'}</p>
+          <p className="mt-1 text-xs opacity-55">{topAssist ? `${topAssist.assistCount} assists` : 'Sense assists registrats'}</p>
         </div>
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wider opacity-55">Canal que tanca</p>
-          <p className="mt-1 text-lg font-black admin-tone-text-success">{topLast?.label ?? '—'}</p>
-          <p className="mt-1 text-[11px] opacity-55">{topLast ? `${topLast.lastTouchCount} últims contactes` : 'Sense tancaments registrats'}</p>
+        <div className="ap-card p-3">
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-55">Canal que tanca</p>
+          <p className="mt-1 text-lg font-bold admin-tone-text-success">{topLast?.label ?? '—'}</p>
+          <p className="mt-1 text-xs opacity-55">{topLast ? `${topLast.lastTouchCount} últims contactes` : 'Sense tancaments registrats'}</p>
         </div>
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wider opacity-55">Journey mitjà</p>
-          <p className="mt-1 text-lg font-black text-white">{avgJourneyTouches > 0 ? avgJourneyTouches : '—'}</p>
-          <p className="mt-1 text-[11px] opacity-55">{hasWins ? 'touchpoints per venda guanyada' : 'pendent de conversions'}</p>
+        <div className="ap-card p-3">
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-55">Journey mitjà</p>
+          <p className="mt-1 text-lg font-bold text-white">{avgJourneyTouches > 0 ? avgJourneyTouches : '—'}</p>
+          <p className="mt-1 text-xs opacity-55">{hasWins ? 'touchpoints per venda guanyada' : 'pendent de conversions'}</p>
         </div>
       </div>
 
@@ -205,10 +205,10 @@ export default function AttributionPanel({ report }: { report: MultiTouchReport 
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">Mapa de crèdit</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Mapa de crèdit</p>
                   <h3 className="mt-1 text-base font-semibold text-white/90">Qui obre, qui escalfa i qui tanca</h3>
                 </div>
-                <div className="flex flex-wrap gap-2 text-[10px]">
+                <div className="flex flex-wrap gap-2 text-xs">
                   <span className="rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-1 admin-tone-text-cyan">First touch</span>
                   <span className="rounded-full border admin-tone-border-warning admin-tone-bg-warning px-2 py-1 admin-tone-text-warning">Assist</span>
                   <span className="rounded-full border admin-tone-border-success admin-tone-bg-success px-2 py-1 admin-tone-text-success">Last touch</span>
@@ -222,37 +222,37 @@ export default function AttributionPanel({ report }: { report: MultiTouchReport 
             </div>
 
             <div className="space-y-3">
-              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">Lectures clau</p>
+              <div className="ap-card p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Lectures clau</p>
                 <div className="mt-3 space-y-2">
                   {(report.insights.length > 0 ? report.insights : ['Encara no hi ha prou varietat de touchpoints per extreure una lectura més fina.']).map((insight) => (
-                    <div key={insight} className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/75">
+                    <div key={insight} className="ap-card px-3 py-2 text-sm text-white/75">
                       {insight}
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">Snapshot ràpid</p>
+              <div className="ap-card p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Snapshot ràpid</p>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
                   <div className="rounded-lg border border-white/10 bg-black/10 p-3">
-                    <p className="text-[10px] uppercase tracking-wider opacity-50">Canals actius</p>
-                    <p className="mt-1 text-2xl font-black">{report.byChannel.length}</p>
+                    <p className="text-xs uppercase tracking-wider opacity-50">Canals actius</p>
+                    <p className="mt-1 text-2xl font-bold">{report.byChannel.length}</p>
                   </div>
                   <div className="rounded-lg border border-white/10 bg-black/10 p-3">
-                    <p className="text-[10px] uppercase tracking-wider opacity-50">Touchpoints totals</p>
-                    <p className="mt-1 text-2xl font-black">{report.byChannel.reduce((sum, channel) => sum + channel.totalTouchpoints, 0)}</p>
+                    <p className="text-xs uppercase tracking-wider opacity-50">Touchpoints totals</p>
+                    <p className="mt-1 text-2xl font-bold">{report.byChannel.reduce((sum, channel) => sum + channel.totalTouchpoints, 0)}</p>
                   </div>
                   <div className="rounded-lg border border-white/10 bg-black/10 p-3">
-                    <p className="text-[10px] uppercase tracking-wider opacity-50">Ingressos first touch</p>
-                    <p className="mt-1 text-xl font-black admin-tone-text-cyan">
+                    <p className="text-xs uppercase tracking-wider opacity-50">Ingressos first touch</p>
+                    <p className="mt-1 text-xl font-bold admin-tone-text-cyan">
                       {formatEuro(report.byChannel.reduce((sum, channel) => sum + channel.firstTouchRevenue, 0))}
                     </p>
                   </div>
                   <div className="rounded-lg border border-white/10 bg-black/10 p-3">
-                    <p className="text-[10px] uppercase tracking-wider opacity-50">Ingressos last touch</p>
-                    <p className="mt-1 text-xl font-black admin-tone-text-success">
+                    <p className="text-xs uppercase tracking-wider opacity-50">Ingressos last touch</p>
+                    <p className="mt-1 text-xl font-bold admin-tone-text-success">
                       {formatEuro(report.byChannel.reduce((sum, channel) => sum + channel.lastTouchRevenue, 0))}
                     </p>
                   </div>
@@ -263,7 +263,7 @@ export default function AttributionPanel({ report }: { report: MultiTouchReport 
 
           <div className="space-y-3">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">Journeys recents</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Journeys recents</p>
               <h3 className="mt-1 text-base font-semibold text-white/90">Mostra curta de vendes guanyades</h3>
             </div>
             <div className="grid gap-3 lg:grid-cols-2">

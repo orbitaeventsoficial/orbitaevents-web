@@ -151,9 +151,9 @@ export default function BookingPipelineView() {
           const conf = BOOKING_STATUS_CONFIG[col.status];
           return (
             <div key={col.status} className="rounded-xl border p-2 text-center">
-              <p className={`text-[10px] uppercase font-medium ${conf?.text || ''}`}>{col.label}</p>
+              <p className={`text-xs uppercase font-medium ${conf?.text || ''}`}>{col.label}</p>
               <p className="text-lg font-bold">{col.count}</p>
-              <p className="text-[10px]">{formatCurrency(col.total)}</p>
+              <p className="text-xs">{formatCurrency(col.total)}</p>
             </div>
           );
         })}
@@ -204,7 +204,7 @@ export default function BookingPipelineView() {
           gridClassName="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 md:grid md:grid-cols-2 md:overflow-visible md:pb-0 xl:grid-cols-4"
           columnClassName="min-w-[86vw] shrink-0 snap-center md:min-w-0"
           renderColumnHeaderExtra={(_col, colIndex, total) => (
-            <p className="mt-1 text-[11px] opacity-70 md:hidden">
+            <p className="mt-1 text-xs opacity-70 md:hidden">
               Columna {colIndex + 1} de {total}
             </p>
           )}
@@ -264,7 +264,7 @@ function BookingCard({
                 type="button"
                 onClick={() => onMoveStatus(booking.id, COLUMNS_DEF[statusIndex - 1].status)}
                 disabled={isUpdating}
-                className="rounded px-1 py-0.5 text-[10px] hover:bg-black/20 transition-colors disabled:opacity-50"
+                className="rounded px-1 py-0.5 text-xs hover:bg-black/20 transition-colors disabled:opacity-50"
                 title={help.title}
                 aria-label={help.title}
                 {...helpAttrs(help)}
@@ -280,7 +280,7 @@ function BookingCard({
                 type="button"
                 onClick={() => onMoveStatus(booking.id, COLUMNS_DEF[statusIndex + 1].status)}
                 disabled={isUpdating}
-                className="rounded px-1 py-0.5 text-[10px] hover:bg-black/20 transition-colors disabled:opacity-50"
+                className="rounded px-1 py-0.5 text-xs hover:bg-black/20 transition-colors disabled:opacity-50"
                 title={help.title}
                 aria-label={help.title}
                 {...helpAttrs(help)}
@@ -301,15 +301,15 @@ function BookingCard({
       </p>
 
       <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-        <span className="text-[10px]">{formatDateShort(booking.eventDate)}</span>
-        <span className="font-semibold text-[10px]">{formatCurrency(booking.total)}</span>
+        <span className="text-xs">{formatDateShort(booking.eventDate)}</span>
+        <span className="font-semibold text-xs">{formatCurrency(booking.total)}</span>
         {booking.marginPct !== null && (
-          <span className={`text-[10px] font-semibold ${getMarginColor(booking.marginPct)}`}>
+          <span className={`text-xs font-semibold ${getMarginColor(booking.marginPct)}`}>
             {booking.marginPct.toFixed(0)}%
           </span>
         )}
         {!booking.depositPaid && (
-          <span className="inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium">
+          <span className="inline-flex items-center rounded-full border px-1.5 py-0.5 text-xs font-medium">
             Paga pendent
           </span>
         )}

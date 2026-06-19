@@ -109,7 +109,7 @@ export default function LossBreakdownPanel({
     <section className="ap-card rounded-2xl p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/55">Pèrdues de lead</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">Pèrdues de lead</p>
           <h2 className="mt-2 text-lg font-semibold">Per què es refreda l&apos;embut</h2>
           <p className="mt-1 max-w-3xl text-sm admin-tone-text-neutral">
             Lectura dels últims {days} dies sobre el motiu de pèrdua, els canals afectats i la tendència mensual.
@@ -117,10 +117,10 @@ export default function LossBreakdownPanel({
         </div>
         <div className="flex items-center gap-2">
           <span
-            className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
+            className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${
               status === 'error'
                 ? 'border-rose-500/30 bg-rose-500/10 text-rose-200'
-                : 'border-cyan-500/25 bg-cyan-500/10 text-cyan-100'
+                : 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info'
             }`}
           >
             {status === 'refreshing' ? 'Actualitzant dades' : status === 'error' ? 'Mostrant snapshot inicial' : 'Dades sincronitzades'}
@@ -137,36 +137,36 @@ export default function LossBreakdownPanel({
       </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50">Motiu principal</p>
+        <div className="ap-card p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/50">Motiu principal</p>
           <p className="mt-2 text-lg font-semibold text-white">{summary.topReason?.label ?? 'Sense patró comercial clar'}</p>
           <p className="mt-1 text-xs admin-tone-text-neutral">
             {summary.topReason ? `${summary.topReason.count} leads · ${summary.topReason.share}% del total` : 'Cap motiu comercial domina la mostra actual.'}
           </p>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50">Leads perduts</p>
+        <div className="ap-card p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/50">Leads perduts</p>
           <p className="mt-2 text-2xl font-semibold text-white">{summary.total}</p>
           <p className="mt-1 text-xs admin-tone-text-neutral">{summary.commercialTotal} comercials · {summary.autoTotal} automàtics</p>
         </div>
         <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[0.06] p-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-100/80">Auto-descartats</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-100/80">Auto-descartats</p>
           <p className="mt-2 text-2xl font-semibold text-amber-200">{summary.autoTotal}</p>
           <p className="mt-1 text-xs text-amber-50/75">Leads amb `EVENT_PASSED` fora del càlcul del motiu comercial principal.</p>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50">Sense classificar</p>
+        <div className="ap-card p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/50">Sense classificar</p>
           <p className="mt-2 text-2xl font-semibold text-white">{summary.uncategorized}</p>
           <p className="mt-1 text-xs admin-tone-text-neutral">Pèrdues sense motiu canònic o amb dades antigues encara no sanejades.</p>
         </div>
       </div>
 
-      <div className="mt-4 rounded-2xl border border-cyan-500/20 bg-cyan-500/[0.05] p-4">
-        <p className="text-sm text-cyan-50/90">{narrative}</p>
+      <div className="mt-4 rounded-2xl border admin-tone-border-info admin-tone-bg-info p-4">
+        <p className="text-sm admin-tone-text-info">{narrative}</p>
       </div>
 
       <div className="mt-5 grid gap-4 xl:grid-cols-[1.1fr_1fr_1fr]">
-        <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+        <article className="ap-card p-4">
           <div className="flex items-center justify-between gap-3">
             <div>
               <h3 className="text-sm font-semibold text-white">Mix de motius</h3>
@@ -183,7 +183,7 @@ export default function LossBreakdownPanel({
               >
                 <div className="m-auto mt-7 flex h-24 w-24 items-center justify-center rounded-full border border-white/10 admin-donut-hole text-center">
                   <div>
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-white/45">Leads</p>
+                    <p className="text-xs uppercase tracking-[0.18em] text-white/45">Leads</p>
                     <p className="mt-1 text-2xl font-semibold text-white">{summary.total}</p>
                   </div>
                 </div>
@@ -210,7 +210,7 @@ export default function LossBreakdownPanel({
           )}
         </article>
 
-        <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+        <article className="ap-card p-4">
           <h3 className="text-sm font-semibold text-white">Canals més afectats</h3>
           <p className="mt-1 text-xs admin-tone-text-neutral">On es concentren més pèrdues dins la finestra actual.</p>
 
@@ -225,7 +225,7 @@ export default function LossBreakdownPanel({
                       <span className="text-white/60">{entry.count} · {entry.share}%</span>
                     </div>
                     <div className="h-2 rounded-full bg-white/8">
-                      <div className="h-2 rounded-full bg-cyan-300/80" style={{ width: `${width}%` }} />
+                      <div className="h-2 rounded-full admin-tone-bg-info" style={{ width: `${width}%` }} />
                     </div>
                   </div>
                 );
@@ -236,7 +236,7 @@ export default function LossBreakdownPanel({
           )}
         </article>
 
-        <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+        <article className="ap-card p-4">
           <h3 className="text-sm font-semibold text-white">Tendència mensual</h3>
           <p className="mt-1 text-xs admin-tone-text-neutral">Evolució dels leads perduts per mes natural.</p>
 

@@ -492,10 +492,10 @@ export default function CalendarMonthClient() {
         <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-success admin-tone-border-success">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide admin-tone-text-success">Reserves</span>
+              <span className="text-xs uppercase tracking-wide admin-tone-text-success">Reserves</span>
               <span className="text-xl sm:text-2xl font-bold admin-tone-text-success">{stats.totalReservas}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-[10px] font-medium admin-tone-soft-success admin-tone-border-success admin-tone-text-success">
+            <span className="rounded-full px-2 py-0.5 text-xs font-medium admin-tone-soft-success admin-tone-border-success admin-tone-text-success">
               {stats.reservaDays + stats.mixedDays} dies
             </span>
           </div>
@@ -504,10 +504,10 @@ export default function CalendarMonthClient() {
         <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-danger admin-tone-border-danger">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide admin-tone-text-danger">Bloquejos</span>
+              <span className="text-xs uppercase tracking-wide admin-tone-text-danger">Bloquejos</span>
               <span className="text-xl sm:text-2xl font-bold admin-tone-text-danger">{stats.totalBloqueos}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-[10px] font-medium admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger">
+            <span className="rounded-full px-2 py-0.5 text-xs font-medium admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger">
               {stats.bloqueadoDays + stats.mixedDays} dies
             </span>
           </div>
@@ -516,10 +516,10 @@ export default function CalendarMonthClient() {
         <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-info admin-tone-border-info">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide admin-tone-text-info">Dies lliures</span>
+              <span className="text-xs uppercase tracking-wide admin-tone-text-info">Dies lliures</span>
               <span className="text-xl sm:text-2xl font-bold admin-tone-text-info">{stats.freeDays}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-[10px] font-medium admin-tone-soft-info admin-tone-border-info admin-tone-text-info">
+            <span className="rounded-full px-2 py-0.5 text-xs font-medium admin-tone-soft-info admin-tone-border-info admin-tone-text-info">
               Disponibles
             </span>
           </div>
@@ -528,10 +528,10 @@ export default function CalendarMonthClient() {
         <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-warning admin-tone-border-warning">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide admin-tone-text-warning">Dies mixtes</span>
+              <span className="text-xs uppercase tracking-wide admin-tone-text-warning">Dies mixtes</span>
               <span className="text-xl sm:text-2xl font-bold admin-tone-text-warning">{stats.mixedDays}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-[10px] font-medium admin-tone-soft-warning admin-tone-border-warning admin-tone-text-warning">
+            <span className="rounded-full px-2 py-0.5 text-xs font-medium admin-tone-soft-warning admin-tone-border-warning admin-tone-text-warning">
               Reserva + bloqueig
             </span>
           </div>
@@ -540,10 +540,10 @@ export default function CalendarMonthClient() {
         <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-info admin-tone-border-info">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide admin-tone-text-info">Tasques</span>
+              <span className="text-xs uppercase tracking-wide admin-tone-text-info">Tasques</span>
               <span className="text-xl sm:text-2xl font-bold admin-tone-text-info">{stats.totalTasks}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-[10px] font-medium admin-tone-soft-info admin-tone-border-info admin-tone-text-info">
+            <span className="rounded-full px-2 py-0.5 text-xs font-medium admin-tone-soft-info admin-tone-border-info admin-tone-text-info">
               {stats.workDays} dies
             </span>
           </div>
@@ -552,10 +552,10 @@ export default function CalendarMonthClient() {
         <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-warning admin-tone-border-warning">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide admin-tone-text-warning">Social</span>
+              <span className="text-xs uppercase tracking-wide admin-tone-text-warning">Social</span>
               <span className="text-xl sm:text-2xl font-bold admin-tone-text-warning">{stats.totalSocialPosts}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-[10px] font-medium admin-tone-soft-warning admin-tone-border-warning admin-tone-text-warning">
+            <span className="rounded-full px-2 py-0.5 text-xs font-medium admin-tone-soft-warning admin-tone-border-warning admin-tone-text-warning">
               Posts
             </span>
           </div>
@@ -585,7 +585,7 @@ export default function CalendarMonthClient() {
       {/* Capçalera + graella amb scroll controlat en mòbil */}
       <div className="overflow-x-auto rounded-2xl">
         <div className="min-w-[720px]">
-          <div className="grid grid-cols-7 overflow-x-auto text-center text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+          <div className="grid grid-cols-7 overflow-x-auto text-center text-xs sm:text-xs font-semibold uppercase tracking-wider">
             {weekdayLabels.map((label) => (
               <div key={label} className="py-2">
                 {label}
@@ -653,7 +653,7 @@ export default function CalendarMonthClient() {
               </div>
               <div className="mt-1 flex-1 min-h-0 min-w-0 overflow-hidden">
                 {visibleLayers.bookings && hasReservas && (
-                  <div className="space-y-0.5 text-[9px] sm:text-[10px] overflow-hidden">
+                  <div className="space-y-0.5 text-xs sm:text-xs overflow-hidden">
                     {dayData.reservas.slice(0, 2).map((r) => (
                       <div
                         key={r.id}
@@ -697,7 +697,7 @@ export default function CalendarMonthClient() {
                 )}
 
                 {visibleLayers.leads && hasLeads && (
-                  <div className="mt-0.5 space-y-0.5 text-[9px] sm:text-[10px] overflow-hidden">
+                  <div className="mt-0.5 space-y-0.5 text-xs sm:text-xs overflow-hidden">
                     {dayLeads.slice(0, 2).map((leadItem) => (
                       <Link
                         key={leadItem.id}
@@ -718,7 +718,7 @@ export default function CalendarMonthClient() {
                 )}
 
                 {visibleLayers.blocks && hasBloqueos && (
-                  <div className="line-clamp-1 text-[9px] sm:text-[10px] mt-0.5 admin-tone-text-danger/80">
+                  <div className="line-clamp-1 text-xs sm:text-xs mt-0.5 admin-tone-text-danger/80">
                     {dayData.bloqueos[0].motivo || 'Bloquejat'}
                     {dayData.bloqueos.length > 1
                       ? ` (+${dayData.bloqueos.length - 1})`
@@ -727,19 +727,19 @@ export default function CalendarMonthClient() {
                 )}
 
                 {visibleLayers.tasks && dayData.tasks.length > 0 && (
-                  <div className="mt-0.5 truncate rounded-md px-1 py-0.5 text-[9px] sm:text-[10px] admin-tone-soft-info admin-tone-text-info">
+                  <div className="mt-0.5 truncate rounded-md px-1 py-0.5 text-xs sm:text-xs admin-tone-soft-info admin-tone-text-info">
                     ✓ {dayData.tasks[0].title}{dayData.tasks.length > 1 ? ` +${dayData.tasks.length - 1}` : ''}
                   </div>
                 )}
 
                 {visibleLayers.social && dayData.socialPosts.length > 0 && (
-                  <div className="mt-0.5 truncate rounded-md px-1 py-0.5 text-[9px] sm:text-[10px] admin-tone-soft-warning admin-tone-text-warning">
+                  <div className="mt-0.5 truncate rounded-md px-1 py-0.5 text-xs sm:text-xs admin-tone-soft-warning admin-tone-text-warning">
                     📣 {dayData.socialPosts[0].title}{dayData.socialPosts.length > 1 ? ` +${dayData.socialPosts.length - 1}` : ''}
                   </div>
                 )}
 
                 {visibleLayers.followUps && dayData.followUps.length > 0 && (
-                  <div className="mt-0.5 truncate rounded-md border border-rose-500/30 bg-rose-500/10 px-1 py-0.5 text-[9px] sm:text-[10px] text-rose-200">
+                  <div className="mt-0.5 truncate rounded-md border border-rose-500/30 bg-rose-500/10 px-1 py-0.5 text-xs sm:text-xs text-rose-200">
                     ☎ {dayData.followUps[0].name}{dayData.followUps.length > 1 ? ` +${dayData.followUps.length - 1}` : ''}
                   </div>
                 )}
@@ -774,7 +774,7 @@ export default function CalendarMonthClient() {
                 </Link>
                 <Link
                   href={`/admin/bookings/new?date=${selectedDayData.key}`}
-                  className="inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium text-white shadow-lg transition-all active:scale-[0.98] sm:w-auto sm:px-4 sm:text-sm"
+                  className="ap-btn ap-btn--primary w-full justify-center sm:w-auto"
                 >
                   + Nova reserva
                 </Link>
@@ -886,7 +886,7 @@ export default function CalendarMonthClient() {
                         <div className="flex items-center justify-between gap-2">
                           <div className="font-medium text-sm">{r.clientName ?? 'Client sense nom'}</div>
                           {r.estado && (
-                            <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+                            <span className="rounded-full px-2 py-0.5 text-xs font-semibold uppercase tracking-wide">
                               {r.estado}
                             </span>
                           )}
@@ -896,7 +896,7 @@ export default function CalendarMonthClient() {
                           {resolveTimeLabel(r)} · {resolveServiceLabel(r)}
                         </div>
                         <div className="mt-2 flex flex-wrap items-center gap-2">
-                          <Link href={buildBookingHref(r.id)} onClick={(e) => e.stopPropagation()} className="text-[10px] font-medium hover:underline">
+                          <Link href={buildBookingHref(r.id)} onClick={(e) => e.stopPropagation()} className="text-xs font-medium hover:underline">
                             Reserva →
                           </Link>
                           {r.leadId && (
@@ -906,7 +906,7 @@ export default function CalendarMonthClient() {
                                 customerId: r.customerId,
                               })}
                               onClick={(e) => e.stopPropagation()}
-                              className="text-[10px] font-medium hover:underline"
+                              className="text-xs font-medium hover:underline"
                             >
                               {r.customerId ? 'Workspace →' : 'Entrada →'}
                             </Link>
@@ -915,7 +915,7 @@ export default function CalendarMonthClient() {
                             <Link
                               href={buildCustomerWorkspaceTabHref(r.customerId, 'bookings')}
                               onClick={(e) => e.stopPropagation()}
-                              className="text-[10px] font-medium hover:underline"
+                              className="text-xs font-medium hover:underline"
                             >
                               👤 Client →
                             </Link>
@@ -924,7 +924,7 @@ export default function CalendarMonthClient() {
                             <input
                               type="date"
                               autoFocus
-                              className="ap-input px-2 py-0.5 text-[10px]"
+                              className="ap-input px-2 py-0.5 text-xs"
                               defaultValue={r.fechaEvento.slice(0, 10)}
                               onBlur={() => setChangingDateForBooking(null)}
                               onChange={(e) => {
@@ -936,7 +936,7 @@ export default function CalendarMonthClient() {
                               }}
                             />
                           ) : (
-                            <button onClick={() => setChangingDateForBooking(r.id)} className="rounded-xl border px-2 py-0.5 text-[10px] font-medium transition-colors admin-tone-idle">
+                            <button onClick={() => setChangingDateForBooking(r.id)} className="rounded-xl border px-2 py-0.5 text-xs font-medium transition-colors admin-tone-idle">
                               Canviar data
                             </button>
                           )}
@@ -1006,7 +1006,7 @@ export default function CalendarMonthClient() {
                       <div key={b.id} className="rounded-xl border px-3 py-2.5">
                         <div className="flex items-center justify-between gap-2">
                           <div className="font-medium text-sm">Bloqueig</div>
-                          <button type="button" onClick={() => unblockDay(b.fecha.slice(0, 10))} className="rounded-lg border px-2 py-0.5 text-[10px] font-medium transition-colors admin-tone-idle">
+                          <button type="button" onClick={() => unblockDay(b.fecha.slice(0, 10))} className="rounded-lg border px-2 py-0.5 text-xs font-medium transition-colors admin-tone-idle">
                             Desbloquejar
                           </button>
                         </div>

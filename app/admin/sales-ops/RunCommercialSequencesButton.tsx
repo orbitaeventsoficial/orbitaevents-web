@@ -35,7 +35,7 @@ export default function RunCommercialSequencesButton() {
         type="button"
         onClick={run}
         disabled={running}
-        className="rounded-xl px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+        className="ap-btn ap-btn--primary"
       >
         {running ? 'Executant...' : 'Executar seqüències comercials'}
       </button>

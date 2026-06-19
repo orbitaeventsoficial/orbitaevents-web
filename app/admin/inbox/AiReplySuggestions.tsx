@@ -49,7 +49,7 @@ export default function AiReplySuggestions({ email, onApply }: Props) {
   if (loading) {
     return (
       <div className="mb-4 rounded-xl border border-white/10 p-3">
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider opacity-40">Suggeriments IA</p>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wider opacity-40">Suggeriments IA</p>
         <div className="flex flex-col gap-2">
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-8 animate-pulse rounded-lg bg-white/5" />
@@ -62,8 +62,8 @@ export default function AiReplySuggestions({ email, onApply }: Props) {
   if (!suggestions.length) return null;
 
   return (
-    <div className="mb-4 rounded-xl border border-violet-500/20 bg-violet-500/5 p-3">
-      <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-violet-300/70">
+    <div className="mb-4 rounded-[var(--o-r-md)] border border-[var(--hair-gold)] bg-[var(--panel)] p-3">
+      <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--gold)]">
         ✨ Suggeriments de resposta IA
       </p>
       <div className="flex flex-col gap-2">
@@ -72,9 +72,9 @@ export default function AiReplySuggestions({ email, onApply }: Props) {
             key={i}
             type="button"
             onClick={() => onApply(text)}
-            className="rounded-lg border border-white/10 bg-white/[0.03] p-3 text-left text-sm transition-colors hover:border-violet-500/40 hover:bg-violet-500/10"
+            className="ap-card p-3 text-left text-sm transition-colors hover:border-[var(--hair-gold)] hover:bg-[var(--raised)]"
           >
-            <span className="mr-2 text-violet-400/70 text-xs">{i + 1}.</span>
+            <span className="mr-2 text-[var(--gold)] text-xs">{i + 1}.</span>
             {text}
           </button>
         ))}

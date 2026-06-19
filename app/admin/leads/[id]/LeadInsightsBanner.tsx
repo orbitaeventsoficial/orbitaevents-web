@@ -13,7 +13,7 @@ import { formatCurrency } from '@/lib/constants';
 const URGENCY_COLOR: Record<string, string> = {
   HIGH: 'border-rose-500/40 bg-rose-500/10',
   MEDIUM: 'border-amber-500/40 bg-amber-500/10',
-  LOW: 'border-white/10 bg-white/[0.03]',
+  LOW: 'border-[var(--line)] bg-[var(--panel)]',
 };
 
 const RISK_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
@@ -52,7 +52,7 @@ export default function LeadInsightsBanner({
     <div className="grid gap-2 sm:grid-cols-3">
       {/* Next Action */}
       <div className={`rounded-xl border p-3 ${urgencyBorder}`}>
-        <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Acció recomanada</p>
+        <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Acció recomanada</p>
         <p className="mt-1 text-sm font-semibold">{insights.nextAction.label}</p>
         {insights.nextAction.context && (
           <p className="mt-0.5 text-xs opacity-70">{insights.nextAction.context}</p>
@@ -60,7 +60,7 @@ export default function LeadInsightsBanner({
         {cta && insights.nextAction.type !== 'NONE' && (
           <Link
             href={cta.href({ leadId, customerId, bookingId })}
-            className="mt-2 inline-flex rounded-lg border px-2.5 py-1 text-[11px] font-semibold hover:bg-white/10 transition-colors"
+            className="mt-2 inline-flex rounded-lg border px-2.5 py-1 text-xs font-semibold hover:bg-white/10 transition-colors"
           >
             {cta.label}
           </Link>
@@ -69,10 +69,10 @@ export default function LeadInsightsBanner({
 
       {/* Loss Risk */}
       <div className={`rounded-xl border p-3 ${risk.bg}`}>
-        <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Risc de pèrdua</p>
+        <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Risc de pèrdua</p>
         <p className={`mt-1 text-lg font-bold ${risk.color}`}>{risk.label}</p>
         {insights.lossRisk.reasons.length > 0 && (
-          <ul className="mt-1 space-y-0.5 text-[11px] opacity-70">
+          <ul className="mt-1 space-y-0.5 text-xs opacity-70">
             {insights.lossRisk.reasons.slice(0, 3).map((r) => (
               <li key={r} className="flex items-start gap-1">
                 <span className="mt-0.5 shrink-0">·</span>
@@ -84,12 +84,12 @@ export default function LeadInsightsBanner({
       </div>
 
       {/* Commercial Context */}
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-        <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Context comercial</p>
+      <div className="ap-card p-3">
+        <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Context comercial</p>
         <p className="mt-1 text-lg font-bold">{formatCurrency(insights.commercial.estimatedDealValue)}</p>
-        <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] opacity-70">
+        <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs opacity-70">
           {insights.commercial.isRecurringClient && (
-            <span className="text-cyan-300">Client recurrent ({insights.commercial.previousEventsCount}x)</span>
+            <span className="admin-tone-text-cyan">Client recurrent ({insights.commercial.previousEventsCount}x)</span>
           )}
           {insights.commercial.previousTotalSpent > 0 && (
             <span>Històric: {formatCurrency(insights.commercial.previousTotalSpent)}</span>

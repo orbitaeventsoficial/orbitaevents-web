@@ -230,7 +230,7 @@ export default async function SalesOpsPage() {
         }}
       />
 
-      <section className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+      <section className="ap-card p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
             <h2 className="text-sm font-semibold">Contingut social</h2>
@@ -241,31 +241,31 @@ export default async function SalesOpsPage() {
           </Link>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Posts 30 dies</p>
+          <div className="ap-card p-3">
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Posts 30 dies</p>
             <p className="mt-1 text-xl font-bold">{socialPulse.postsLast30d}</p>
-            <p className="mt-0.5 text-[10px] opacity-50">{socialPulse.publishedLast30d} publicats</p>
+            <p className="mt-0.5 text-xs opacity-50">{socialPulse.publishedLast30d} publicats</p>
           </div>
-          <div className={`rounded-xl border p-3 ${socialPulse.scheduledUpcoming > 0 ? 'border-cyan-500/20 bg-cyan-500/[0.04]' : 'border-white/10 bg-white/[0.03]'}`}>
-            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Programats</p>
-            <p className={`mt-1 text-xl font-bold ${socialPulse.scheduledUpcoming > 0 ? 'text-cyan-300' : ''}`}>{socialPulse.scheduledUpcoming}</p>
-            <p className="mt-0.5 text-[10px] opacity-50">{socialPulse.draftsPending} esborranys</p>
+          <div className={`rounded-xl border p-3 ${socialPulse.scheduledUpcoming > 0 ? 'admin-tone-border-info admin-tone-bg-info' : 'border-[var(--line)] bg-[var(--panel)]'}`}>
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Programats</p>
+            <p className={`mt-1 text-xl font-bold ${socialPulse.scheduledUpcoming > 0 ? 'admin-tone-text-info' : ''}`}>{socialPulse.scheduledUpcoming}</p>
+            <p className="mt-0.5 text-xs opacity-50">{socialPulse.draftsPending} esborranys</p>
           </div>
-          <div className={`rounded-xl border p-3 ${socialPulse.consistencyScore >= 60 ? 'border-emerald-500/20 bg-emerald-500/[0.04]' : socialPulse.consistencyScore >= 30 ? 'border-amber-500/20 bg-amber-500/[0.04]' : 'border-rose-500/20 bg-rose-500/[0.06]'}`}>
-            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Consistència</p>
-            <p className={`mt-1 text-xl font-bold ${socialPulse.consistencyScore >= 60 ? 'text-emerald-300' : socialPulse.consistencyScore >= 30 ? 'text-amber-300' : 'text-rose-300'}`}>{socialPulse.consistencyScore}%</p>
-            <p className="mt-0.5 text-[10px] opacity-50">{socialPulse.daysSinceLastPost !== null ? `Fa ${socialPulse.daysSinceLastPost}d` : 'Mai publicat'}</p>
+          <div className={`rounded-xl border p-3 ${socialPulse.consistencyScore >= 60 ? 'admin-tone-border-success admin-tone-bg-success' : socialPulse.consistencyScore >= 30 ? 'admin-tone-border-warning admin-tone-bg-warning' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Consistència</p>
+            <p className={`mt-1 text-xl font-bold ${socialPulse.consistencyScore >= 60 ? 'admin-tone-text-success' : socialPulse.consistencyScore >= 30 ? 'admin-tone-text-warning' : 'admin-tone-text-danger'}`}>{socialPulse.consistencyScore}%</p>
+            <p className="mt-0.5 text-xs opacity-50">{socialPulse.daysSinceLastPost !== null ? `Fa ${socialPulse.daysSinceLastPost}d` : 'Mai publicat'}</p>
           </div>
-          <div className="rounded-xl border border-pink-500/20 bg-pink-500/[0.04] p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Leads Instagram</p>
-            <p className="mt-1 text-xl font-bold text-pink-300">{socialPulse.instagramLeadCount}</p>
-            <p className="mt-0.5 text-[10px] opacity-50">{socialPulse.instagramWonCount} tancats</p>
+          <div className="ap-card p-3">
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Leads Instagram</p>
+            <p className="mt-1 text-xl font-bold text-[var(--gold)]">{socialPulse.instagramLeadCount}</p>
+            <p className="mt-0.5 text-xs opacity-50">{socialPulse.instagramWonCount} tancats</p>
           </div>
         </div>
         {!socialPulse.isActive && (
-          <div className="mt-3 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
-            <p className="text-xs text-amber-200">Sense posts publicats en {socialPulse.windowDays} dies. El contingut social alimenta el pipeline d&apos;Instagram — activar-lo genera entrades orgàniques.</p>
-            <Link href="/admin/social" className="mt-2 inline-flex rounded border border-amber-400/30 px-2.5 py-1 text-[10px] font-semibold text-amber-200 hover:bg-amber-400/10">
+          <div className="mt-3 rounded-lg border admin-tone-border-warning admin-tone-bg-warning p-3">
+            <p className="text-xs admin-tone-text-warning">Sense posts publicats en {socialPulse.windowDays} dies. El contingut social alimenta el pipeline d&apos;Instagram — activar-lo genera entrades orgàniques.</p>
+            <Link href="/admin/social" className="ap-btn ap-btn--xs mt-2">
               Crear primer post →
             </Link>
           </div>

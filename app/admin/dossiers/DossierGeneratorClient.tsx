@@ -854,7 +854,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
             </div>
             <div className="dg__field">
               <label htmlFor="dg-telefon" className="dg__label">Telèfon</label>
-              <input id="dg-telefon" type="tel" className="adm-input" value={telefon} onChange={(e) => { setTelefon(e.target.value); setCustomerConflict(null); }} placeholder="+34 654 46 70 87" autoComplete="off" />
+              <input id="dg-telefon" type="tel" className="adm-input" value={telefon} onChange={(e) => { setTelefon(e.target.value); setCustomerConflict(null); }} placeholder="+34 600 00 00 00" autoComplete="off" />
             </div>
             <div className="dg__field">
               <label htmlFor="dg-email" className="dg__label">Email</label>

@@ -50,7 +50,7 @@ function FilterChip({ label, active, onClick }: { label: string; active: boolean
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium transition-colors whitespace-nowrap ${
+      className={`rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors whitespace-nowrap ${
         active
           ? 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info'
           : 'admin-tone-border-neutral admin-tone-text-neutral hover:brightness-105'
@@ -249,7 +249,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
               <button
                 type="button"
                 onClick={() => { setLocalSearch(''); setLocalPriority(null); setLocalEventType(null); setLocalSource(null); }}
-                className="rounded-full border px-2.5 py-0.5 text-[10px] font-medium transition-colors"
+                className="rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors"
                 {...helpAttrs(ADMIN_PIPELINE_HELP.lead.clearLocalFilters)}
               >
                 Netejar
@@ -277,7 +277,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
             <div className="rounded-xl border border-dashed p-4 text-center text-xs">
               <p className="mb-1">Cap entrada</p>
               {col.status === 'NEW' && (
-                <Link href="/admin/leads" className="text-[10px] font-medium hover:underline">
+                <Link href="/admin/leads" className="text-xs font-medium hover:underline">
                   + Afegir entrada
                 </Link>
               )}
@@ -294,19 +294,19 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
 
       <section className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4" {...helpAttrs(ADMIN_PIPELINE_HELP.lead.metrics)}>
         <div className="admin-leads-metric admin-leads-metric--open rounded-xl border p-3">
-          <p className="admin-leads-metric-label text-[10px] uppercase tracking-wide">Obertes</p>
+          <p className="admin-leads-metric-label text-xs uppercase tracking-wide">Obertes</p>
           <p className="admin-leads-metric-value mt-1 text-lg font-bold">{openLeads}</p>
         </div>
         <div className="admin-leads-metric admin-leads-metric--won rounded-xl border p-3">
-          <p className="admin-leads-metric-label text-[10px] uppercase tracking-wide">Guanyades</p>
+          <p className="admin-leads-metric-label text-xs uppercase tracking-wide">Guanyades</p>
           <p className="admin-leads-metric-value mt-1 text-lg font-bold">{wonLeads}</p>
         </div>
         <div className="admin-leads-metric admin-leads-metric--lost rounded-xl border p-3">
-          <p className="admin-leads-metric-label text-[10px] uppercase tracking-wide">Perdudes</p>
+          <p className="admin-leads-metric-label text-xs uppercase tracking-wide">Perdudes</p>
           <p className="admin-leads-metric-value mt-1 text-lg font-bold">{lostLeads}</p>
         </div>
         <div className="admin-leads-metric admin-leads-metric--winrate rounded-xl border p-3">
-          <p className="admin-leads-metric-label text-[10px] uppercase tracking-wide">Taxa guany</p>
+          <p className="admin-leads-metric-label text-xs uppercase tracking-wide">Taxa guany</p>
           <p className="admin-leads-metric-value mt-1 text-lg font-bold">{winRate}%</p>
         </div>
       </section>
@@ -368,7 +368,7 @@ function PipelineCard({
                 type="button"
                 onClick={() => onMoveStatus(lead.id, prevStatus)}
                 disabled={isUpdating}
-                className="rounded px-1 py-0.5 text-[10px] hover:bg-black/20 hover:text-white transition-colors disabled:opacity-50"
+                className="rounded px-1 py-0.5 text-xs hover:bg-black/20 hover:text-white transition-colors disabled:opacity-50"
                 title={help.title}
                 aria-label={help.title}
                 {...helpAttrs(help)}
@@ -384,7 +384,7 @@ function PipelineCard({
                 type="button"
                 onClick={() => onMoveStatus(lead.id, nextStatus)}
                 disabled={isUpdating}
-                className="rounded px-1 py-0.5 text-[10px] hover:bg-black/20 transition-colors disabled:opacity-50"
+                className="rounded px-1 py-0.5 text-xs hover:bg-black/20 transition-colors disabled:opacity-50"
                 title={help.title}
                 aria-label={help.title}
                 {...helpAttrs(help)}
@@ -411,7 +411,7 @@ function PipelineCard({
               : 'admin-tone-soft-danger admin-tone-border-danger';
           return (
             <span
-              className={`inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-bold ${scoreColor}`}
+              className={`inline-flex items-center rounded-full border px-1.5 py-0.5 text-xs font-bold ${scoreColor}`}
               title={ADMIN_PIPELINE_HELP.lead.qualityScore.title}
               {...helpAttrs(ADMIN_PIPELINE_HELP.lead.qualityScore)}
             >
@@ -425,24 +425,24 @@ function PipelineCard({
             daysSince <= 5 ? 'admin-tone-bg-warning admin-tone-text-warning admin-tone-border-warning' :
             'admin-tone-soft-danger admin-tone-border-danger';
           return (
-            <span className={`inline-flex items-center gap-0.5 rounded-full border px-1.5 py-0.5 text-[10px] font-medium ${daysColor}`}>
+            <span className={`inline-flex items-center gap-0.5 rounded-full border px-1.5 py-0.5 text-xs font-medium ${daysColor}`}>
               {daysSince}d
             </span>
           );
         })()}
         {lead.budget && (
-          <span className="inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-semibold">
+          <span className="inline-flex items-center rounded-full border px-1.5 py-0.5 text-xs font-semibold">
             {lead.budget}
           </span>
         )}
         {lead.eventDate && (
-          <span className="inline-flex items-center gap-0.5 text-[10px]">
+          <span className="inline-flex items-center gap-0.5 text-xs">
             📅 {formatDateShort(lead.eventDate)}
           </span>
         )}
       </div>
 
-      <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px]">
+      <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs">
         <span>{EVENT_TYPE_ICONS[lead.eventType] || lead.eventType}</span>
         <span>{getSourceDisplay(lead.source).label}</span>
       </div>
@@ -455,14 +455,14 @@ function PipelineCard({
 
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
         {lead.customerId && (
-          <Link href={continuityTarget.href} className="text-[10px] hover:underline" title={continuityTarget.title}>
+          <Link href={continuityTarget.href} className="text-xs hover:underline" title={continuityTarget.title}>
             {continuityTarget.label}
           </Link>
         )}
         {lead.booking && (
           <Link
             href={buildBookingHref(lead.booking.id)}
-            className="inline-flex items-center gap-0.5 rounded-full border px-1.5 py-0.5 text-[10px] font-semibold"
+            className="inline-flex items-center gap-0.5 rounded-full border px-1.5 py-0.5 text-xs font-semibold"
           >
             📋 {lead.booking.reference}
           </Link>

@@ -1,3 +1,821 @@
+## 2026-06-18 — Verd WhatsApp a token `--oe-whatsapp` (eradicat hardcoded a CTAs públics) (Canvi #1018, claude)
+
+### Context (passada de residu a tot el repo, ordre del propietari «entra a cada codi, busca hardcoded/merda»)
+Bateria de detecció a front + back. El front estava majoritàriament net (SVG, doc de /studio, temàtiques tancades), però va sortir UNA violació clara de monocapa: el verd de marca **WhatsApp hardcoded ~24 cops** com a hex a 8 fitxers públics de CTAs, amb **3 verds de hover DIVERGENTS** (`#20BD5A`, `#20BA5A`, `#20b858`) — la mateixa marca pintada de tres maneres.
+
+### Què s'ha fet
+- Tokens nous a `app/globals.css` `:root` (secció BRAND ACCENTS): `--oe-whatsapp: #25D366`, `--oe-whatsapp-strong: #20BA5A` (hover unificat), `--oe-whatsapp-rgb: 37, 211, 102`.
+- Substituïdes totes les formes (perl) a CTAFinal, ExitIntentModal, FloatingCTAs, configurador, contacto, experiencias, faq, servicios: `bg-[#25D366]`→var; hovers/active→`--oe-whatsapp-strong`; `text-[#25D366]`→var; `shadow-[#25D366]/X` i `rgba(37,211,102,X)`→`rgba(var(--oe-whatsapp-rgb),X)`. 0 verds hardcoded restants.
+
+### Verificació
+- Browser `/ca/experiencias`: token resol `#25D366`, CTA WhatsApp renderitza `rgb(37,211,102)`, 0 page errors. `pnpm build` EXIT 0 (Tailwind genera bé els arbitraris amb var).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm build` EXIT 0 · `pnpm run validate:core` EXIT 0.
+- Validació funcional: verd WhatsApp d'una sola font, hover unificat.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 1017 → 1018. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-18 — Contacte client-facing centralitzat: telèfons divergents 654/623 → EMAIL_CONTACT (Canvi #1017, claude)
+
+### Context (passada de residu, troballa REAL)
+El lens de contacte de la bateria va destapar **dos telèfons DIFERENTS hardcoded** en documents cara al client, i cap coincidia amb el canònic (`SITE_CONFIG.business.phone = +34699121023`):
+- `lib/services/dossierService.ts` (cos de l'email de dossier): **`654 46 70 87`**.
+- `lib/services/emailTemplateService.ts` (peu de la plantilla d'email per defecte, fallback quan la BD no té plantilla): **`623 15 28 60`**.
+Bug d'integritat: els clients rebien números equivocats i inconsistents entre documents.
+
+### Què s'ha fet
+- `dossierService.ts`: text de contacte → `${EMAIL_CONTACT.phone} o ${EMAIL_CONTACT.email}`.
+- `emailTemplateService.ts`: peu → `${EMAIL_CONTACT.phone} · ${EMAIL_CONTACT.email} · ${SITE_CONFIG.web.domain}` (els hex/rgba inline del shell d'email es queden — cas tècnic acceptat per a HTML d'email).
+- `dossier-html-builder.ts`: peu-web `www.orbitaevents.com` → `www.${SITE_CONFIG.web.domain}`.
+- `DossierGeneratorClient.tsx`: placeholder del camp telèfon del client `+34 654 46 70 87` (número de negoci viciat com a exemple) → `+34 600 00 00 00` genèric.
+
+### ⚠️ Nota per al propietari
+El número que veu el client passa de 654/623 → **+34 699 12 10 23** (el canònic de `SITE_CONFIG`). Si 654/623 eren línies reals alternatives, ara hi ha UN sol lloc per corregir-ho (`SITE_CONFIG`), no tres valors divergents.
+
+### Verificació
+- tsc EXIT 0. Tests dels 4 fitxers afectats (dossierService, emailTemplateService, dossier-html-builder, email-templates-route) **76/76 verds** amb vitest directe. (La suite completa va mostrar 4 fallats per timeout del worker-pool de vitest — flakiness d'infraestructura d'una corrida de 82 min, no relacionada; cap test referencia els telèfons vells.)
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0 · 76 tests focalitzats verds.
+- Validació funcional: cap telèfon vell al codi; contacte d'una sola font.
+- Validació humana/UX: pendent del propietari (confirmar 699 com a número correcte).
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 1016 → 1017. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-18 — `KpiCard` net: props morts `borderColor`/`bgColor`/`delay` fora (Canvi #1016, claude)
+
+### Context
+Tancant el backlog P2, l'ítem «KPIs a mà → `.ap-kpi`» resulta JA satisfet: no existeix cap `.ap-kpi` perquè el canon de KPI ÉS el component `KpiCard` (`app/admin/economia/economia-components.tsx`), que des de la canonització ja renderitza `.ap-card p-4` amb la gramàtica de Cristina (label mono apagat, número en display, card de carbó plana, estat només al color del número). L'únic residu eren props `borderColor`/`bgColor`/`delay` que el component acceptava però IGNORAVA (codi mort) i que els call-sites antics seguien passant — alguns amb `bg-white/[0.03]` que el guard caçava.
+
+### Què s'ha fet
+- Eliminats `borderColor`/`bgColor`/`delay` de la signatura de `KpiCard` (i el comentari que explicava que s'ignoraven). Així tsc marca qualsevol call-site que els passi.
+- Nets els 32 atributs morts d'`EconomiaClient.tsx` (dues sintaxis: multi-línia i una sola línia) amb perl per línia + strip inline. 0 referències residuals.
+- Sense canvi visual ni funcional (els props ja no feien res). Guard `superficie-adhoc` 76 → 70.
+
+### Verificació
+- `npx tsc --noEmit --pretty false` EXIT 0 (la signatura aprimada hauria trencat qualsevol call-site oblidat → cap error). Call-sites ara només passen `label`/`value`/`sub`/`color`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: KPIs d'economia idèntics (card carbó canònica); zero codi mort als call-sites.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 1015 → 1016. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-18 — Hover canònic de fila/llista: token `--o-admin-hover` + classe `.adm-row-hover` (Canvi #1015, claude)
+
+### Context (backlog P2 monocapa)
+El #1012/#1014 van deixar anotat el deute P2: superfícies ad-hoc i hover dispersos. Auditat el residu real del guard `qa:admin-canon`: el gruix de `superficie-adhoc` que quedava NO eren superfícies estàtiques (ja resoltes al #1013) sinó **estats de hover** `hover:bg-white/[0.0x]` amb opacitats divergents (0.02, 0.03, 0.04, 0.06, 0.08) repartits per 29 fitxers. La mateixa interacció (ressaltar una fila) es pintava diferent a cada pàgina → trencava la hipersemblança.
+
+### Què s'ha fet (fix d'arrel, una capa)
+- **Token nou** `--o-admin-hover: var(--o-admin-fill-2)` (`rgba(236,233,227,0.04)` — to càlid de la sèrie, no `rgba(255,255,255,X)`) a `app/studio/orbita-tokens.css`, dins l'escala `--o-admin-fill-*` existent.
+- **Classe canònica** `html.admin-mode .adm-row-hover` + `:hover { background: var(--o-admin-hover) }` a `admin-shell.css` (al costat de `.adm-input`).
+- **54 ocurrències** de `hover:bg-white/[0.0x]` substituïdes per `.adm-row-hover` (perl documentat, un sol patró per a totes les opacitats) a 29 fitxers. Tot l'admin ressalta files IDÈNTIC.
+- **Intactes** (no són el mateix deute): `bg-white/[0.0x]` ESTÀTICS = skeletons de loader, tracks de barres de progrés, hairlines de 1px, mapes de config d'estat (pills) i cel·les de calendari. El deute «KPIs a mà → `.ap-kpi`» (props `bgColor` de `KpiCard` a EconomiaClient) queda per a una passada pròpia.
+
+### Verificació
+- Browser `/admin/inventory` (51 files amb la classe): `--o-admin-hover` resol `rgba(236,233,227,0.04)` sobre `.ax-root` i hereta a la fila; regla `.adm-row-hover:hover` carregada al stylesheet; 0 page errors. Captures de l'estat de repòs desktop + mòbil intactes.
+- Guard `qa:admin-canon`: `superficie-adhoc` 130 → 76, 0 P1.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0 · `pnpm build` EXIT 0.
+- Validació funcional: hover de fila idèntic a tot l'admin via una sola classe/token; estat de repòs sense canvi visual.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 1014 → 1015. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-17 — Auditoria responsiva mòbil (375px) + botons blau de la fitxa de reserva → or (Canvi #1014, claude)
+
+### Resum
+Auditoria responsiva a 375px de tot l'admin (ordre: «responsiu a la mateixa importància que el canon»). Detecció automàtica d'overflow horitzontal + revisió visual de captures mòbil.
+
+### Què s'ha fet
+- **Auditoria mòbil 375px** (script `.dbg-mobile.cjs` amb detector d'overflow): economia, presupuestos, clientes, reporting, calendario, inventory, cuadrant, packs, settings, sales-ops, marketing, analytics, dossiers, social + fitxes de reserva i Cristina. **CAP overflow horitzontal.** Adaptació correcta: KPIs passen a 2-3 col, taules a mode card, formularis a columna única, botons grans. La fitxa de Cristina i la de reserva impecables a mòbil.
+- **Botons blau de la fitxa de reserva → or** (blau que el guard no caça perquè viu al CSS): `.ap-detail-bar-btn--accent` (`rgba 95,183,232`) i `.bd__btn--sec` (`--ax-info-bg`/`--o-info`) → or/ghost neutre.
+- **Botó «Correu» de Cristina** (`.fxd__btn--mail`) era blau (`--o-info`) → or. WhatsApp es manté verd (`--o-success`): reconeixement de marca universal, decisió de director acceptada.
+- **ILLOT CONTROL ROOM ERADICAT (el darrer focus de blau estructural)**: `control-room.css` tenia 366 selectors `.admin-shell` MORTS (el layout usa `.ax-root`) → el CSS del dashboard no s'aplicava i el JSX queia a fallback. Revivit amb `perl s/html.admin-mode .admin-shell /html.admin-mode /` (sed documentat al CLAUDE.md). PERÒ el CSS portava `--at-violet` + bloc `--at-cr-*` blau-slate hardcoded (#5a98c0 sky, #111a2a/#172135/#1a2437 fons, #8ecbff/#67d6ff text). Reapuntats a la capa de tokens (admin-theme.css): `--at-violet`→or, `--at-cr-sky/cyan`→or, `--at-cr-bg-*`→carbó (`--o-admin-*`), `--at-cr-meta/divide/avatar`→tokens; gradient emerald hardcoded + fallback `#141b28` + `--at-cr-btn-primary-t #1a2538`→tokens. Una capa → tot el dashboard Control Room reviu EN CARBÓ+OR. Verificat amb captura: dashboard carbó, botó «+Nou lead» or, zero blau/violet.
+
+### Verificació
+- Recaptura mòbil de la fitxa de reserva: botons «Client» i «Fitxa client 360» ara or/neutre, no blau. `.codex-captures/dbg-m-*.png`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: zero overflow mòbil a l'admin; botons de la fitxa de reserva en or.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 1013 → 1014. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-17 — HIPERSEMBLANÇA: migració massiva a canon (superfícies/tipografia/radis) + norma escrita (Canvi #1013, claude)
+
+### Context (ordre del propietari)
+«Codi net de tots els fitxers, sense condicionants, canònics sí, merda fora. Les pàgines han de ser hipersemblants, no diferents. Normalitzar radis, headers, tipografia, tamany — tot responsiu a la mateixa importància. Deixa una norma escrita. Supleix la meva manca amb el teu coneixement.» Mesura inicial: 770 font-px, 376 superfícies ad-hoc, radis dispersos (737 xl / 320 2xl / 162 lg / 7 3xl).
+
+### Què s'ha fet (transformacions en lot, validades amb tsc a cada pas)
+1. **Superfícies → `.ap-card`** (una veritat al CSS): 50 fitxers migrats de `rounded-* border border-[var(--line)] bg-[var(--panel)]` → classe `.ap-card`. Si cal canviar el panell, es toca 1 lloc. Restants 22 = pills (`rounded-full`) i radi-gran intencional, ja consumeixen tokens.
+2. **Superfícies token**: `border-white/10 bg-white/[0.0x]` → `bg-[var(--panel)]`/`bg-[var(--sunk)]` (pas previ a `.ap-card`). 376→130 (resta = skeletons de loader, legítims).
+3. **Tipografia px → token**: 770 `text-[9/10/11px]` → `text-xs`. Eren TOTS ja forçats a 12px per la regla `admin-shell.css:31` (`!important`); `text-xs`=12px → canvi visualment NEUTRE. Queda 1 (display).
+4. **Radis normalitzats (HIPERSEMBLANÇA)**: regla única a `admin-shell.css` — `html.admin-mode [class*="rounded-xl|2xl|3xl"]` → `var(--o-r-md)`. Totes les cards mateix radi d'una capa. Pills/chips no tocats.
+5. **Norma escrita** a `CLAUDE.md` §«Canon visual admin — HIPERSEMBLANÇA» (7 regles dures + referència Cristina + guard preventiu).
+6. **Guard ampliat** amb mètriques de deute (superficie-adhoc, font-px) per veure baixar a 0.
+
+### Verificació
+- Captures Playwright (presupuestos, economia Config, image-manager, inventory, dashboard): radis uniformes, superfícies carbó, tipografia coherent. Migració `.ap-card` visualment transparent (presupuestos idèntic abans/després).
+- `qa:admin-canon` P1 = 0. TSC = 0 a cada passada.
+
+### Pendent (properes passades cap a 0 absolut)
+~130 `bg-white/[0.0x]` skeletons (loaders, decoratius), headers fets a mà en algunes pàgines (`<h1>` propi vs `AdminPage`), responsiu 375px per verificar pàgina a pàgina amb captura mòbil.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: superfícies/tipografia/radis canònics d'una capa; pàgines hipersemblants.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 1012 → 1013. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-17 — Violet→neutre + classes malformades + inputs bg-black (auditoria operativa/resta-a) (Canvi #1012, claude)
+
+### Context
+Rellançats els 2 agents d'auditoria pendents (operativa + resta-a) ara que el límit s'ha reposat → informes a `docs/audit/admin-operativa.md` (27 troballes, 3 P1) i `admin-resta-a.md` (44, 8 P1). Aplicades les correccions.
+
+### Què s'ha fet
+- **Fix monocapa `admin-tone-*-violet`** → neutre carbó (era violeta `--at-violet`; el lila no és canon). Un canvi → ~7 consumidors (BookingGallery, SummaryPanel, EmailStatsCards, EditPackForm, reporting, SettingsClient, SocialClient). `StripePaymentPanel` badge `--at-violet`→`--at-gold`.
+- **Classes MALFORMADES (typos que trenquen el render)**: `admin-tone-bg-cyanp-5` (error meu d'un perl #1005)→`admin-tone-bg-info p-5`; `hover:bg-white/10/50`×2, `bg-white/5/60`, `bg-white/5/70` (doble slash preexistent)→corregides. A InventoryListSections, InventoryItemEditor, ExtrasConfiguratorClient, EditPackForm.
+- **Inputs `bg-black` sense `.adm-input`** → `.adm-input`: PackPriceQuickEditor, CrewBlockManager (5 inputs); QuickCreateForm fieldsets→`.ap-card`, botó→`.ap-btn--secondary`.
+- **Guard ampliat**: `text-(cyan/violet/blue/sky)` també detectat (abans només bg/border). 3 residuals (BookingQuestionnaireSection, WeatherWidget, LeadInsightsBanner)→`admin-tone-text-cyan` (neutre).
+
+### Resultat
+`qa:admin-canon --strict`: 0 troballes. TSC OK.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: cap violet de superfície, cap classe malformada, inputs carbó.
+- Validació humana/UX: pendent del propietari.
+
+### Pendent (P2 dels informes, deute monocapa no visual)
+Superfícies `bg-white/[0.03]` ad-hoc → `.ap-card` i KPIs a mà → `.ap-kpi` a packs/pricing/discount-codes/coverage/google-reviews/post-event/cost-calculator/inventory editor/cuadrant-repartiment. Renderitzen carbó correcte; deute de monocapa per a properes passades.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 1011 → 1012. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-17 — Guard `qa:admin-canon` + eradicació en lot de 29 P1 (botó-void/blau/blanc-negre) (Canvi #1011, claude)
+
+### Context (ordre del propietari)
+«Però si has tirat agents i tot, s'ha d'eradicar». Raó: l'auditoria amb 9 agents va fer INFORMES (i 4 zones van quedar pendents per límit de sessió), no va eradicar. Pàgines com `presupuestos/ProposalsList` mai es van tocar → «a la que obro una, torna a sortir». Solució de fons: guard automàtic que detecti els patrons i bloquegi, + eradicació en lot.
+
+### Què s'ha fet
+**1. Presupuestos (el que el propietari va obrir):**
+- `ProposalOwnerPanel`: modal `bg-zinc-950` (gris-blau)→`--panel`; input→`.adm-input`; botons amber/zinc/rose→`.ap-btn`/`admin-tone-*`; seccions→`.ap-card`/`--sunk`.
+- `ProposalsList`: KPIs `text-2xl font-bold`→display+label mono; botó «+ Nou pressupost» INVISIBLE (`text-white` sense fons)→`.ap-btn--primary`; input→`.adm-input`; botons d'acció (Editar/Client/Enviat) quasi-negres→`.ap-btn`/outline or; Eliminar→danger; thead «línia gruixuda»→hairline+capçalera mono.
+
+**2. Guard nou `scripts/check-admin-canon.mjs`** (a `validate:core`, mode `--strict`): detecta botó-void (`text-white`+padding sense fons), blau/violeta de superfície, blanc/negre absolut (`bg-white`/`text-black`), tipografia `font-black`+`text-{2xl..}`. Exempts: css-manager/email-templates/canvas/PdfStudio.
+
+**3. Fix monocapa `.admin-card-glass`** (163 usos): el selector era `.admin-layout-shell .admin-card-glass` però el layout usa `.ax-root` → SELECTOR MORT (les 163 cards sense fons, transparents). Reescrit amb selector viu + carbó (`--o-admin-panel`/`--o-admin-line`/`--o-r-md`). A més `--at-glass-bg` blau-slate→carbó. Una capa → 163 cards reben card real.
+
+**4. Eradicació en lot dels 29 P1** (guiada pel guard, validada): 18 botó-void→`.ap-btn--primary` (BookingStatusChanger, SummaryPanel, ClientesModals, coverage, emails, FaqEditorForm, packs SyncButton/EditPack×2/extras, pricing, CalendarTokenManager, CalendarMonth/Week, google-reviews×3); badge alertes economia→fons danger; 7 blanc/negre (knobs toggle `bg-white`→`--o-admin-light`, `text-black`→`--gold-ink`); 4 blau/violeta (DiscountsPanel/docs-autor violet→warning/or, portfolio cyan→or). 17 `font-black`→`font-bold`. CaptureHealthPanel TREND_COLOR→`admin-tone-*`.
+
+### Resultat
+`qa:admin-canon --strict`: **0 troballes** (era 29 P1 + 180 P2). El guard ara impedeix que tornin a entrar.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0 (inclou `qa:admin-canon`).
+- Validació funcional: cap botó invisible, cap blau de superfície, cap blanc/negre absolut a l'admin; cards glass amb superfície carbó.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 1010 → 1011. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-17 — Economia 100% canònica: pack-model fantasma, inputs blancs, color cru (Canvi #1010, claude)
+
+### Resum
+Tancats els P1 d'economia de l'auditoria: classes fantasma, inputs sense `.adm-input` (fons blanc), color cru d'estat. Economia (Config inclosa) ara consumeix íntegrament la capa canònica.
+
+### Què s'ha fet
+- **`PackPricingModelEditor`**: `.admin-pack-model`/`-aside`/`-note` (inexistents al CSS) → `.ap-card`/`--sunk`; `statusBadge`/`divergenceClass` usaven `.admin-pack-model-chip--*` sota selector mort `.admin-shell` (semàfors Sa/Vigilar/Crític SENSE color) → `admin-tone-*` amb `CHIP_BASE`. Ara els semàfors es veuen.
+- **`ProfitabilityConfigHistory` + `PackPricingModelHistory`**: selects/inputs `date`/`text` amb `rounded-md border` SENSE bg → queien al fons blanc del navegador → `.adm-input`; seccions `shadow-sm`→`.ap-card`; botons→`.ap-btn--xs`.
+- **`economia-components`**: `HealthScore` (ring SVG + score + label `emerald/amber/rose-400` cru → `admin-tone-*`/`stroke-[var(--o-*)]`), `PaymentTimelineBar` (segments+dots `bg-emerald/rose/amber-500`→`bg-[var(--o-*)]`), chip filtre + `accent-amber-500`→`--gold`, cel·les diposit/resta → `admin-tone-text-*`.
+- **`ProfitabilityConfigEditor`**: `ratioBadge`/`fixedState` (`bg-rose-500/15 text-rose-300`...) → `admin-tone-*`.
+- **`sales-ops/page` secció social**: Consistència→success/warning/danger, Leads Instagram (**pink**, no és tone)→neutre carbó+`--gold`, alerta→warning, botó→`.ap-btn--xs`.
+
+### Verificació
+- Captura `/admin/economia` Config: semàfors de packs amb color (abans sense), inputs carbó, badges canònics. `/admin/sales-ops` net. `.codex-captures/dbg-eco-configuraci.png`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: economia sencera canònica; semàfors visibles; inputs carbó (no blanc).
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 1009 → 1010. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-17 — Panells IA (violeta→or) + maps d'estat dashboard → admin-tone-* (Canvi #1009, claude)
+
+### Resum
+P1 de l'auditoria: panells IA amb accent VIOLETA (fora carbó+or) i panells de dashboard amb maps d'estat locals de fons Tailwind plens (no `admin-tone-*`).
+
+### Què s'ha fet
+- **Panells IA → carbó+or** (el lila era senyal "IA"; el canon vol or): `NBAExplainPanel` (superfície violeta→`--panel`+`--hair-gold`, accent→`--gold`, URGENCY_CHIP CRITICAL/HIGH→danger/warning), `AiCopySuggestionsInline`, `inbox/AiReplySuggestions`. Zero violet a admin/components.
+- **Maps d'estat dashboard → `admin-tone-*`**: `ToastProvider` (success/error/warning eren emerald/rose/amber plens → tones; transversal a totes les notificacions), `AnomalyPanel` (POSITIVE→success, NEGATIVE→danger; barra `bg-[var(--o-*)]`; wrapper glass→`--panel`), `CapacityConflictPanel` (severitat rose/amber/**orange** —que ni existeix com a tone— → danger/warning), `WeeklyCapacityForecastPanel` (WARNING/CRITICAL + YoY → tones).
+- **Verificat `/admin/presupuestos`** (consulta del propietari): carbó coherent, `.ap-card`+`admin-tone-*`+estats centralitzats (`getProposalStatusDisplay`); `bg-white` són overlays `/10` acceptats. CAP problema — pàgina canònica.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: panells IA en or; estats de dashboard amb to de sèrie; presupuestos confirmat net.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 1008 → 1009. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — Studio unificat a carbó (mirall fidel) + botons invisibles + blanc/negre absolut (Canvi #1008, claude)
+
+### Troballa clau (resposta a «Studio és el mirall del CSS?»)
+Studio NO era mirall fidel: `orbita-tokens.css` tenia DUES paletes de fons. (1) `--o-bg/surface/elev-1/2/3` = **blau-slate** (`#0e1219`/`#1c2230`/`#252b3a`) usada NOMÉS per `studio.css` (72×) → Studio es renderitzava blau. (2) `--o-admin-*` = carbó càlid, la que usa l'admin real. Studio mostrava la blava com a «Secció 01 · Paleta». Per això el mirall i la realitat s'havien separat i el blau s'amagava.
+
+### Unificació (ordre del propietari: «Studio = eina única que composa el repo, la resta no existeix» + «permís a tot arreu»)
+- `orbita-tokens.css`: `--o-bg/surface/elev-*` reapuntats al carbó de l'admin (`#0b0b0e`/`#111116`/`#161619`/`#1e1f27`/`#25252a`); `--o-text*` de fred (`#f5f7fa`/`#a2acba`/`#6b7585`/`#4a525e`) a càlid (`#e4ded4`/`#b6aea2`/`#9a9286`/`#6b6459`); `--o-line*` rgba blanc→cream. Una sola paleta carbó a tot el repo.
+- `StudioShowroom.tsx`: labels hex de la secció Paleta corregides (eren obsoletes, pre-#874: deien `#0a0a0c`/`#131318`/`#d4a857`...) → valors reals. El mirall ara diu la veritat.
+- Verificat: admin NO usa `var(--o-text/surface/elev-*)` directe → zero risc de regressió. Captura `/admin/studio`: tot carbó, secció Paleta en carbó. `qa:studio-integrity` OK (zona protegida intacta, 16 seccions).
+
+### Botons invisibles (BUG funcional) + blanc/negre absolut → `.ap-btn`/token
+- `economia/PaymentReminderActions` (4 botons `text-white` sense fons), `sales-ops/RunCommercialSequences`+`SendExecutiveReport`+`SlaAutomation` (3), `stats/page` Desar, `economia/PaymentToggleButton` (pendent), `portfolio/page` «Crear event» (`bg-white text-black` absolut) → `.ap-btn ap-btn--primary`/`--xs`.
+- `image-manager/page`: títol `font-black text-white`→`font-bold text-[var(--t)]`; tabs `bg-amber-500 text-black`→`bg-[var(--gold)] text-[var(--gold-ink)]`.
+- `clientes/[id]/TimelinePanel:197`: filtre actiu `bg-white text-black`→`bg-[var(--raised)] text-[var(--t)] ring`.
+
+### Auditoria (context)
+5 de 9 informes consolidats a `docs/audit/RESUM.md` (4 pendents per límit sessió → rellançar >23h). Aquest tall ataca els P1 «botons invisibles» i «blanc/negre absolut» + l'arrel de Studio.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0 (inclou `qa:studio-integrity`).
+- Validació funcional: Studio carbó fidel; botons visibles; cap blanc/negre absolut als punts corregits.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 1007 → 1008. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — Canvas: indicadors de selecció blau → or + llançada auditoria exhaustiva amb agents (Canvi #1007, claude)
+
+### Resum
+Últim hardcoded de color real a l'admin (`CanvasEditorClient.tsx`): els indicadors de SELECCIÓ UI (handles de redimensionament, outline d'element seleccionat, vora del swatch actiu) eren `#06b6d4` (cyan/blau hardcoded inline). Color de selecció canònic a Òrbita = or → `var(--gold)`.
+
+### Què s'ha fet
+- `canvas/CanvasEditorClient.tsx`: 4 ocurrències de `#06b6d4` d'UI chrome (2 handles, 1 outline, 1 border de swatch seleccionat) → `var(--gold)`. La resta de hex del fitxer són DADES de disseny de l'usuari (color del text/forma que crea, fons del llenç, placeholders) = cas «canvas» tècnic acceptat pel CLAUDE.md, NO chrome.
+- Verificat: admin sense hex de color real hardcoded (els 157 de `css-manager` són contingut editable; resta = números de canvi `#NNN` en comentaris).
+
+### Auditoria exhaustiva (ordre del propietari)
+Llançats 9 agents `general-purpose` en paral·lel per auditar CADA línia del repo (admin + front office) contra monocapa/responsiu/0-hardcoded/canònic. Cada un escriu informe a `docs/audit/<zona>.md`. Zones: css · admin-components · admin-economia · admin-operativa · admin-fitxes · admin-resta-a · admin-resta-b · front-pagines · front-components. Referència canònica: fitxa Cristina (`leads/[id]`) + calendari + `orbita-tokens.css`. PENDENT: consolidar a `docs/audit/RESUM.md` prioritzat i corregir per severitat.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: selecció del canvas en or; auditoria en curs.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 1006 → 1007. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — Fitxa de reserva: negre absolut + blau eradicats (4 capes) + blau-superfície a ZERO (Canvi #1006, claude)
+
+### Resum
+El propietari obre `/admin/bookings/[id]` i és «blau, negre i blanc». Diagnòstic real (color computat al navegador via CDP, no grep): el negre i el blau venien de **4 capes duplicades**, la més greu un style inline al JSX que cap grep de CSS trobava.
+
+### Causa arrel (4 capes, ordenades per culpabilitat)
+1. **`page.tsx:255`**: `<div className="bd__root" style={{ minHeight:'100vh', background:'#000' }}>` → NEGRE ABSOLUT inline, guanyava sobre tot el CSS. Capa redundant (el CSS `.bd__root` ja fa `min-height:100vh`). **Eliminat l'`style` sencer.**
+2. **`orbita-tokens.css` `--o-admin-elevated: #252638`** → blau-slate (B=56≫R=37), l'únic fons fora del to carbó; tintava cards de la fitxa de reserva i tot el que usa `--ax-elevated`. **→ `#25252a` carbó neutre.**
+3. **`orbita-tokens.css` `--o-admin-info-bg/border/strong/text`** → cyan (95,183,232). **→ neutres cream (canon: info no és superfície blava).**
+4. **`booking-detail.css .bd__root`**: sense fons → heretava negre. **+`background: var(--ax-canvas)`** (defensa; ara redundant amb l'inline fora, però correcte).
+
+### Verificació (color computat)
+- `bd__root` background-color: `rgb(0,0,0)` → `rgb(17,17,22)` (#111116 carbó). Captura `.codex-captures/dbg-booking.png`: fitxa carbó coherent, sense negre ni blau.
+
+### A més (tancament de la campanya del blau)
+Blau-superfície (`bg-cyan/blue`) a TOT l'admin: **43 → 0**. Netejats en aquesta tanda: questionnaires ×3 (botó blau sòlid→`.ap-btn--primary`), packs/[id], discount-codes, sales-ops, InventoryPhotoUpload, CrewBlockManager, manual, docs/protocol, WeeklyCapacityForecastPanel, ToastProvider, NBAExplainPanel, AdminSearchModal, LeadsPanel, GallerySharePanel → `admin-tone-*`/tokens. `ConfirmDialog` botons via `--o-danger/--o-warning/--gold` (info→or, mai blau).
+
+### Lliçó (capes / simplificació, ordre del propietari)
+El negre era un **inline duplicat** sobre el CSS. Davant un color que no surt al grep de CSS → inspeccionar color computat del DOM (CDP), no endevinar al codi. Menys capes: un sol origen per superfície.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0. Dev reiniciat net (.next esborrat) per descartar cache.
+- Validació funcional: fitxa de reserva carbó; blau-superfície admin = 0.
+- Validació humana/UX: pendent del propietari (refresc fort, dev :3000).
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 1005 → 1006. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — Panells de dashboard/llistes: blau-superfície → estat de sèrie (Canvi #1005, claude)
+
+### Resum
+Neteja del blau de superfície (`bg-cyan/blue` Tailwind directe) a 5 components/pàgines que tintaven de blau cards d'estat. Consumeixen ara les classes `admin-tone-*` (info→neutre carbó post-#999) o tokens.
+
+### Què s'ha fet
+- `components/CaptureHealthPanel.tsx`: `STATUS_STYLE` (DROUGHT/FAMINE→danger, LOW→warning, HEALTHY/GROWING→success; GROWING era cyan/blau→success). Barra de fonts `bg-cyan-500/30`→`--o-admin-gold-tint-3`.
+- `components/DailyBriefPanel.tsx`: `ALERT_TONE` (INFO era cyan→`admin-tone-*-info` neutre); KPI «Previsió» cyan→`--gold`; KPI Cobraments→`admin-tone-*-warning`.
+- `inventory/InventoryListSections.tsx`: toggle vista actiu + badges cyan → `admin-tone-*-info`.
+- `sales-ops/LossBreakdownPanel.tsx` i `clientes/reactivation/ReactivationClient.tsx`: cyan/blue → `admin-tone-*-info`.
+
+### Verificació
+- Captures Playwright inventory/sales-ops: cards d'estat neutres/de sèrie, sense blau. Blau-superfície a l'admin: 43 → ~25 (restant majoritàriament 1/fitxer + manual/docs = documentació).
+- `.codex-captures/dbg-{inventory,sales-ops}.png`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: estats preservats amb to de sèrie; cap fons blau de card.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 1004 → 1005. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — EditorControlStrip (triada transversal) → carbó pla, fora el blau (Canvi #1004, claude)
+
+### Resum
+`EditorControlStrip` és la triada superior (overview/status/action, eyebrows COBERTURA/ESTAT/ACCIÓ) que apareix a ~10 pàgines: blog, faq, email-templates, image-manager, css-manager, cost-calculator, scripts… Tenia colors **Tailwind directes hardcoded**: `tone:'info'` → `bg-cyan-500/[0.06]` (= el tint BLAU de la triada), `tone:'success/warning'` → fons emerald/amber plens, números `text-2xl font-bold text-white`, `admin-card-glass`. El fix #999 (capa `admin-tone-*`) NO l'afectava perquè usava Tailwind directe.
+
+### Què s'ha fet (1 component → ~10 pàgines)
+- Canon de Cristina: cards de **carbó PLA** (`--panel`/`--line`), l'estat viu a l'**accent** (eyebrow): warning→gold, success→green, **info→neutre `--t3` (mai blau)**. Fora els fons tintats cyan/emerald/amber.
+- Tipografia de sèrie: eyebrows `--mono`, números `--display` 22px (no `text-2xl font-black`), textos `--t`/`--t2`/`--t3` (no `text-white/X`).
+- Pills d'acció `bg-white/[0.04]` → `--sunk`. Radis `rounded-2xl`→`--o-r-md`. Fora `admin-card-glass`.
+
+### Verificació
+- Captures Playwright `/admin/blog` i `/admin/faq`: triada carbó pla uniforme, sense tint blau, eyebrows mono, números display, botó outline or. `.codex-captures/dbg-{blog,faq}.png`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: triada de ~10 pàgines passa a carbó de sèrie; estat preservat a l'accent.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 1003 → 1004. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — Auditoria de classes fantasma + botons-void primaris → canònic (Canvi #1003, claude)
+
+### Resum
+Auditoria creuada: classes de sistema (`admin-*`/`ap-*`/`adm-*`) usades als TSX vs definides al CSS. Objectiu: caçar «classes fantasma» (usades, inexistents al CSS → cauen a defaults del navegador), que és el patró arrel de les desentonacions (com `ap-input` #1002, `.ap-btn` #1001).
+
+### Troballa i criteri
+- La majoria de candidats (`admin-calendar-*`, `admin-reviews-tab`, `admin-feature-toggle`, `admin-radial-*`, `admin-leads-metric-*`) **porten utilitats Tailwind** que les fan funcionar visualment → NO són problemes reals. Verificat amb captures (calendari/privacy/features/stats: carbó coherent). **Calendari i leads són referència: NO tocats.**
+- Problemes reals = classe fantasma SENSE utilitats de fons/color (botó-void): text/padding però cap `bg`.
+
+### Què s'ha fet
+- `economia/PackPricingModelEditor.tsx`: botó «Desar model packs» amb `admin-pack-model-save` (inexistent) → `.ap-btn ap-btn--primary`.
+- Botons primaris void (`text-white` sense `bg`) als panells de la fitxa de client → `.ap-btn ap-btn--primary`:
+  - `clientes/[id]/_components/panels/BookingsPanel.tsx` («Nova reserva»)
+  - `ProposalsPanel.tsx` («+ Nou pressupost» + «Crear primer pressupost»)
+  - `TasksNotesPanel.tsx` («Nova tasca»)
+
+### Verificació
+- Captures Playwright: calendario/privacy/features/stats carbó coherent, sense classes trencades visibles. `.codex-captures/dbg-*.png`.
+- TSC + validate:core verds.
+
+### Pendent honest
+Resten ~26 botons «ghost» amb `rounded border px-N` sense bg (vora Tailwind visible, es veuen raonables però no consumeixen `.ap-btn`). No són voids cridaners; es migraran a `.ap-btn` en passades de detall. No s'han tocat els botons de calendari/leads (referència).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: CTAs primaris de la fitxa de client + Desar model packs consumeixen el botó canònic.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 1002 → 1003. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — `.ap-input` definida al canònic: 104 inputs gris-clar → carbó (Canvi #1002, claude)
+
+### Resum
+**Troballa gran.** La classe `.ap-input` (104 usos a tot l'admin) NO estava definida a cap CSS → els inputs queien al fons gris/blanc per defecte del navegador, desentonant del carbó (vist a /admin/settings/company: «Nom comercial», «NIF», «IBAN»… gris clar). Mateix patró que els botons-void del #1001: classe usada al TSX però inexistent al CSS.
+
+### Què s'ha fet (monocapa, 1 definició → 104 inputs)
+- `admin-shell.css`: afegit `.ap-input` (+`:focus`) com a **àlies de `.adm-input`** (el canònic de la sèrie, fons `--ax-sunk`, vora `--ax-line`, focus `--ax-hair-gold`). Igual que ja ho era `.ix__forminput`. Tot el repo consumeix ara el mateix input de Cristina.
+- `economia/PackPricingModelEditor.tsx`: `inputClass` usava `admin-pack-model-input` (inexistent al CSS → fons blanc als inputs del «Model econòmic de packs») → `.adm-input`.
+- `economia/EconomiaClient.tsx`: valor d'inventari `text-2xl font-black` → display 22px de la sèrie; link «Veure detall» (card Tailwind) → `.ap-btn ap-btn--xs`.
+
+### Verificació (captures Playwright)
+- `/admin/settings/company` abans/després: inputs de Dades fiscals passen de gris clar a carbó `--ax-sunk` integrat. `/admin/economia` (Config): inputs del Model econòmic carbó. Pestanyes Cobraments/Rendibilitat/Tresoreria/Config revisades: carbó coherent. `.codex-captures/dbg-*.png`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: 104 inputs `ap-input` + Model econòmic passen a carbó; cap regressió a settings/economia.
+- Validació humana/UX: pendent del propietari (refresc fort, dev :3000).
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 1001 → 1002. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — Eradicació del negre absolut + economia consumint el canònic (Canvi #1001, claude)
+
+### Principi (ordre del propietari)
+**CSS mana.** Cristina (leads) i calendari CONSTRUEIXEN el canònic al CSS; la resta del repo el CONSUMEIX, no inventa Tailwind propi. El canon prohibeix `#000`/`#fff` en components (substituts: `--o-admin-ink` #0a0005, `--o-admin-light`). leads-design.css té zero negre/blanc absolut → és la referència neta.
+
+### Què s'ha fet
+**CSS (arrel del negre absolut):**
+- `admin-shell.css`: gradient del sidebar mesclava amb `#000` → `var(--o-admin-ink)`.
+- `globals.css`: `.admin-nav-badge` i `.admin-recent-chip` tenien `border: 1px solid;` SENSE color (vora invisible = «negre buit») → `var(--at-border)`.
+- `control-room.css`: `.admin-cr-pill/-chip/-alert` `border: 1px solid;` → `var(--at-border)`.
+- `admin-shell.css`: definides les classes inexistents `.admin-economia-tab--active/--idle` (la pestanya activa sortia BLANC absolut perquè no tenien estil) → estil del control segmentat de Cristina (`.fx__view`): actiu = neutre `--ax-raised` + ring `--ax-line2`, no or ni blanc.
+
+**Botons canònics (globals.css, monocapa → tot l'admin):**
+- `.ap-btn` base tenia `border: 1px solid;` sense color ni fons → botons transparents amb vora invisible («negre absolut buit»). Ara base ghost neutra (`--at-border`/transparent/`--at-text`) + hover.
+- `.ap-btn--primary` era or 22% sobre panel (massa fosc, semblava negre) → outline or de Cristina (transparent + vora `--at-gold` + text or).
+
+**Economia consumeix el canònic:**
+- `EconomiaClient.tsx`: franja «Com llegir» (transparent + vora invisible) → nota carbó `--panel`/`--line`/`--t3`. Nav de pestanyes: fora `admin-card-glass`/`shadow-md`/`border` solt.
+- `ConfirmDialog.tsx` (diàleg de tot l'admin): card `bg-black` SÒLID → `bg-[var(--panel)]` + `border-[var(--line)]`.
+- `ProfitabilityConfigEditor.tsx`: input `bg-black/60 border-stone-300 focus:border-cyan-500` → `.adm-input` canònic; botó «Desar» sense fons (void negre) → `.ap-btn ap-btn--primary`; secció + 4 pous `bg-black/20` → `--panel`/`--sunk` canònics.
+
+### Verificació (captures Playwright)
+- `/admin/economia`: pestanyes neutres, franja carbó, botons outline, KPIs carbó. `/admin/calendario` i `/admin/leads` (Cristina): INTACTES, sense regressió. `.codex-captures/dbg-*.png`.
+
+### Pendent honest
+Resten `bg-black/X` translúcids en altres pàgines: scrims de modal (backdrop, acceptable) i overlays sobre fotos (legibilitat). No són «superfícies negres absolutes». S'aniran fent consumir tokens en passades validades.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: negre/blanc absolut eradicat del CSS admin i dels botons; economia consumeix el canònic.
+- Validació humana/UX: pendent del propietari (refresc fort, dev :3000).
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 1000 → 1001. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — Economia amb la gramàtica de Cristina (KPI/HealthScore/seccions) (Canvi #1000, claude)
+
+### Resum
+El propietari: economia era carbó (post-#999) PERÒ «no té el carinyo de Cristina». Carbó ≠ ofici. Faltava la gramàtica de la fitxa de leads: cards de carbó PLA (mai omplertes de color), labels **mono** apagats, números **display** continguts, l'estat només al color del número (no fons), sense glass ni shadow.
+
+### Què s'ha fet
+- `economia-components.tsx`:
+  - `KpiCard` refet: card `bg-[var(--panel)]` + `border-[var(--line)]` + `rounded-[var(--o-r-md)]` (carbó pla, sense glass/shadow). Label `font-[family-name:var(--mono)]` 11px uppercase `--t3`. Valor `font-[family-name:var(--display)]` 22px pes 700 (no `font-black`); l'estat viu al `color` del número, no al fons. `borderColor`/`bgColor` (que tintaven la card) ara s'ignoren.
+  - `HealthScore`: mateixa superfície carbó; label mono `--t3`; score display 26px; etiqueta mono uppercase.
+- `EconomiaClient.tsx`: tots els wrappers de secció `rounded-2xl/xl border … shadow-*` → `rounded-[var(--o-r-md)] border-[var(--line)] bg-[var(--panel)]` (carbó, sense ombra). `rounded-2xl`=0.
+- Vocabulari pres de `leads-design.css` (Cristina): `--panel`/`--line`/`--t3`/`--mono`/`--display`/`--o-r-md`, disponibles a `.ax-root` (embolcalla tot l'admin).
+
+### Verificació
+- Captura Playwright `/admin/economia` (`.codex-captures/dbg-economia.png`): KPIs amb label mono + número display contingut, cards carbó planes, anella or, seccions netes. Comparat amb `dbg-cristina-leads.png`: mateix ADN.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: jerarquia/tipografia de la sèrie; estat preservat com a color de número.
+- Validació humana/UX: pendent del propietari (refresc fort, dev :3000).
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 999 → 1000. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — ARREL: fons `--at-*` canonitzats a carbó Òrbita (tot l'admin) (Canvi #999, claude)
+
+### Resum
+**Causa real de «tot l'admin es veu blau menys Cristina».** `admin-theme.css` reapuntava els colors semàntics a la sèrie al #980 PERÒ deixava els **fons i vores en blau-slate** (`--at-panel: #1c2334`, `--at-raised: #283045`, `--at-border: #3a4560`, `--at-border-s: #506080`) amb la nota «es canonitzaran pàgina per pàgina». Com que la fitxa de Cristina/leads usa `--o-admin-*` (carbó) directe, ella es veia bé i la resta blava. Fer-ho «pàgina per pàgina» és per què mai s'arreglava.
+
+### Què s'ha fet (monocapa, 1 sol fitxer → tot l'admin)
+- `admin-theme.css`: `--at-bg`/`--at-surface`→`--o-admin-canvas` (#111116); `--at-panel`→`--o-admin-panel` (#161619); `--at-raised`→`--o-admin-raised` (#1e1f27); `--at-input`→canvas; `--at-border`→`--o-admin-line`; `--at-border-s`→`--o-admin-line-2`; `--at-text/muted/subtle`→`--o-admin-text/-2/-3`.
+- Corregit també el meu error de les «targetes blaves»: les classes `admin-tone-bg-cyan/-info`, `border-cyan/-info`, `text-cyan/-info` resolien a blau (#5fb7e8). Canon de Cristina: el control actiu és NEUTRE carbó (`.fx__view button.is-on`→`--raised`, «sense or; l'or és per diners/accions»). Redefinides a neutre (`--at-raised`/`--at-border-s`/`--at-text`).
+- Economia #998 REVERTIT (veure sota): el refactor `.ap-card` introduïa bandes `--at-raised` (que ABANS eren blau-slate). Amb aquest fix d'arrel ja no cal.
+
+### Verificació (captures Playwright, dev viu)
+- `/admin/reporting`, `/admin/sales-ops`, `/admin/analytics`, `/admin/clientes`, `/admin/packs`, `/admin/settings` → carbó complet, accent or, estat com a punt/text. `/admin/leads` (Cristina) INTACTA (usa `--o-admin-*` directe). Captures a `.codex-captures/dbg-*.png`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: tot l'admin passa de blau-slate a carbó Òrbita d'una sola capa; Cristina no es toca.
+- Validació humana/UX: pendent de refresc fort del propietari (dev viu a :3000).
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 998 → 999. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — Economia (Resum) `.ap-*` — REVERTIT (Canvi #998, claude)
+
+> ⚠️ **REVERTIT.** Aquest canvi (refactor d'economia a `.ap-card`/`.ap-kpi`) feia que la pàgina sortís plena de bandes blau-slate i amb tipografia/mida alterada (el propietari: «està fatal»). Causa: `.ap-card` usava `--at-raised`, que aleshores era blau-slate. Els 2 fitxers (`EconomiaClient.tsx` + `economia-components.tsx`) s'han tornat a `HEAD` via `git checkout`. El problema de fons (fons blau-slate) s'ha resolt correctament al #999 a la capa de token. El comptador i aquesta entrada es conserven per traçabilitat.
+
+### Resum (original, ja NO vigent)
+
+### Resum
+El propietari detecta que `/admin/economia` divergeix de l'òrgan de referència (fitxa de Cristina): el negre i la tipografia NO són els canònics. Causa real: economia es fabricava les superfícies a mà (`bg-white/[0.03]`, `admin-card-glass`, `rounded-2xl`, `text-2xl font-black`) en lloc de consumir el sistema `AdminPage`/`.ap-*`. La norma «el que no és canònic, FORA» no és només color de paleta: també superfície, tipografia i radi.
+
+### Què s'ha fet (pestanya Resum, la visible)
+- `economia-components.tsx`: `KpiCard` reescrit al markup canònic `.ap-kpi` (carbó `--at-panel` + `.ap-kpi-value` tipografia de token + tons `.ap-kpi--{tone}`), derivant `tone` del `color` que ja rep → els **16 usos** passen a canònic sense tocar call-sites. `HealthScore` (anella «Salut financera»): superfície `border-white/10 + admin-card-glass` → `.ap-kpi`; label → `.ap-kpi-label`.
+- `EconomiaClient.tsx` (Resum): secció «Progrés de cobrament», «Valor d'inventari» (+ valor → `.ap-kpi-value`, botó → `.ap-btn`), banner «Com llegir», «Top 5» → `.ap-card`; alertes «Cobraments vençuts»→`.ap-card--danger`, «Marge baix»→`.ap-card--warning`; botons → `.ap-btn`. Fora `bg-white/[0.03]`/`rounded-2xl`/`shadow-*`/`text-2xl font-black` del Resum.
+
+### Abast estès (totes les pestanyes)
+A més del Resum, s'han canonicalitzat **tots els wrappers de secció de totes les pestanyes** (Cobraments/Rendibilitat/Tresoreria/Previsions/Config): `rounded-2xl border … shadow-*` → `.ap-card` (12 ocurrències; `rounded-2xl` ara = 0). Props morts `borderColor`/`bgColor`/`delay` de `KpiCard` eliminats + signatura simplificada.
+
+### Pendent honest (NO tancat)
+Resten residus menors NO crítics: 5 hovers de fila de taula (`hover:bg-white/[0.02-0.03]`), 2 `shadow-*` (tab actiu + badge de compte) i tipografia Tailwind de cel·les de taula (`text-lg/xl` puntuals). Es netejaran en passada de detall.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: KPIs i alertes amb superfície de carbó i tipografia de token; semàntica de tons preservada.
+- Validació humana/UX: pendent de refresc fort del propietari (dev viu a :3000).
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 997 → 998. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — InsightsBanner tokenitzat (salut relacional/risc) (Canvi #997, claude)
+
+### Resum
+`app/admin/clientes/[id]/_components/InsightsBanner.tsx` (10 colors). Banner d'insights del client: salut relacional, urgència d'acció i risc comercial.
+
+### Què s'ha fet
+- `HEALTH_CONFIG` (EXCELLENT→success, GOOD→cyan, AT_RISK→warning, COLD→neutre, LOST→danger), `URGENCY_COLOR` (HIGH→danger, MEDIUM→warning), `COMMERCIAL_RISK_COLOR` (HIGH→danger, MEDIUM→warning, NONE→success), pendent de pagament→warning. Tot via `admin-tone-*`. Grep no-Òrbita = 0.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàntica de salut/risc preservada amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 996 → 997. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — Referrals tokenitzat (prioritats/CTAs contacte) (Canvi #996, claude)
+
+### Resum
+`app/admin/clientes/referrals/ReferralsClient.tsx` (10 colors). Programa de referrals: prioritats de candidats, KPIs i CTAs de contacte (WhatsApp/Email).
+
+### Què s'ha fet
+- `PRIORITY_TONE` (ALTA→danger, MITJANA→warning, BAIXA→neutre). KPIs «clients referits»→success, «valor»→cyan, hover nom→cyan, filtre actiu→cyan. CTAs: WhatsApp→success, Email→info. Tot via `admin-tone-*`. Grep no-Òrbita = 0.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: prioritats i CTAs preservats amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 995 → 996. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — Cuadrant operatiu tokenitzat (finestres/owner/solapaments) (Canvi #995, claude)
+
+### Resum
+`app/admin/cuadrant/page.tsx` (10 colors). Quadrant per persona: finestres de temps, ressaltat de l'owner, alertes de solapament/conflicte.
+
+### Què s'ha fet
+- Mapeig: finestra activa + ressaltat owner→cyan (dot owner `bg-[var(--o-info)]`), CTA «Repartiment de pasta»→warning (família gold), panell de solapaments + assignacions en conflicte + etiquetes «⚠ conflicte»→danger. Tot via `admin-tone-*`/`bg-[var(--o-*)]`. Grep no-Òrbita = 0.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàntica de conflicte/owner preservada amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 994 → 995. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — Economia (components) tokenitzat (score/timeline pagaments) (Canvi #994, claude)
+
+### Resum
+`app/admin/economia/economia-components.tsx` (10 colors). Score de salut financera (ring SVG), barres de timeline de pagament i columnes de la taula d'economia.
+
+### Què s'ha fet
+- Score ≥75→success, ≥50→warning, <50→danger (text + `stroke-[var(--o-*)]` del ring SVG). Barres `PaymentTimelineBar` (pagat→success, overdue→danger, dueSoon→warning) → `bg-[var(--o-*)]`. Chip de filtre actiu → `admin-tone-*-warning` (mateixa família gold). Columnes diposit/restant → `admin-tone-text-success/danger`. Width de barres manté `style={{ width }}` dinàmic. Grep no-Òrbita = 0.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàfor de pagament i score preservats amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 993 → 994. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — Marketing Hub tokenitzat (diagnòstic/mesura) (Canvi #993, claude)
+
+### Resum
+`app/admin/marketing/page.tsx` (10 colors). Hub de màrqueting: tons de diagnòstic, gaps de mesura per canal i bloc «Sortida».
+
+### Què s'ha fet
+- `diagnosticTone` (success/warning/info) i `measurementGapTone` (ready→success, missing→warning, blocked→danger) → `admin-tone-*`. Bloc «Sortida» (emerald) + integracions «falta dada» (amber) → tons de sèrie. La barra de % manté `style={{ width }}` dinàmic amb `admin-tone-bg-info`. Grep no-Òrbita = 0.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàntica de diagnòstic/mesura preservada amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 992 → 993. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — Capacitat operativa tokenitzada (càrrega/alertes) (Canvi #992, claude)
+
+### Resum
+`app/admin/calendario/capacity/page.tsx` (11 colors). Capacitat operativa: nivells de càrrega per dia (`LOAD_CONFIG`) i alertes setmanals (`ALERT_CONFIG`).
+
+### Què s'ha fet
+- Mapeig: LIGHT/INFO→cyan, FULL/WARNING→warning, OVERLOADED/CRITICAL→danger, FREE/NONE→neutre, dies lliures→success, YoY±→success/danger. Records de config (color/bg/dot/border/tone) + KPIs + alertes → `admin-tone-*`/`bg-[var(--o-*)]`. Grep no-Òrbita = 0.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàntica de càrrega/alertes preservada amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 991 → 992. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — LeadCustomerLinkPanel tokenitzat (vincle lead↔client) (Canvi #991, claude)
+
+### Resum
+`app/admin/leads/[id]/LeadCustomerLinkPanel.tsx` (11 colors). Panell de vinculació lead→Customer Hub amb 3 estats (ja vinculat / coincidències / sense match).
+
+### Què s'ha fet
+- Mapeig: ja-vinculat→success (emerald), coincidències→warning (amber), sense-match→neutre. Vores/fons/textos → `admin-tone-*`. Botons sòlids d'acció (Obrir Hub, Vincular, Crear client) → `bg-[var(--o-success/warning)]` + text `text-[var(--o-admin-ink)]` (negre per a superfície clara, en lloc de `text-zinc-9XX`). Grep no-Òrbita = 0.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàntica dels 3 estats preservada; CTAs amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 990 → 991. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — Text-manager tokenitzat (estats modificat/error/èxit) (Canvi #990, claude)
+
+### Resum
+`app/admin/text-manager/page.tsx` (12 colors). Gestor de textos amb estats de camp modificat, missatges d'error/èxit i botó de desar.
+
+### Què s'ha fet
+- Mapeig: «modificat»→warning (toggle, dot de secció, vora/fons de grup, label de camp, textarea), error→danger, èxit→success, botó «Desar» actiu (sòlid) → `bg-[var(--o-success)]`. Pantalla d'error de càrrega amber→`admin-tone-text-warning`. Tot via `admin-tone-*`/`bg-[var(--o-*)]`. Grep no-Òrbita = 0.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàntica d'estats (modificat/error/èxit) preservada amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 989 → 990. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — Històric comercial: negre carbó (fix del negre heretat) a la fitxa de lead (Canvi #989, claude)
+
+### Resum
+El propietari detecta que el bloc «Històric comercial» de la fitxa de lead (pressupostos/dossiers) mostrava un negre que NO és el de Cristina: heretava `--ax-sunk` (#0b0b0e), un negre més profund/fred que el carbó canònic.
+
+### Què s'ha fet
+- `leads-design.css`, SCOPED a `.fxd__document-history` (NO toca el `.cdh` compartit → fitxa de reserva intacta):
+  - Fons del bloc `color-mix(panel 60%, canvas)` → `var(--ax-canvas)` (negre carbó #111116): el bloc es fon amb la pàgina com la resta de la fitxa.
+  - Items `.cdh__item` heretaven `--ax-sunk` → ara `var(--ax-panel)` (#161619) + `border-color: var(--ax-line2)`, igual que els panells germans `.fxd__panel`. Cartes sobre carbó, no negre profund heretat.
+- Convenció confirmada de la fitxa: pàgina = carbó `--ax-canvas`, cartes = `--ax-panel`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: bloc scoped; fitxa de reserva (`.cdh` compartit) intacta.
+- Validació humana/UX: pendent de refresc fort del propietari (servidor dev viu a :3000).
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 988 → 989. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — OperationalPulsePanel tokenitzat (nivells de pols) (Canvi #988, claude)
+
+### Resum
+`app/admin/components/OperationalPulsePanel.tsx` (13 colors). Pols operatiu amb nivells EXCELLENT/GOOD/WARNING/CRITICAL.
+
+### Què s'ha fet
+- `LEVEL_COLOR`/`LEVEL_BG`/`LEVEL_DOT` (EXCELLENT→success, GOOD→cyan, WARNING→warning, CRITICAL→danger) → `admin-tone-*` (text/bg/border) i `bg-[var(--o-*)]` per als punts. Dot de «què degrada el pipeline» → `bg-[var(--o-warning)]`. Grep no-Òrbita = 0.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: semàntica de nivells preservada amb to de sèrie.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure. Counter 987 → 988. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-16 — Playbook post-event tokenitzat (estats/prioritats) (Canvi #987, claude)
+
+### Resum
+`app/admin/post-event/playbook/page.tsx` (17 colors). Playbook de seguiment post-event amb estats d'acció i prioritats.
+
+### Què s'ha fet
+- `STATUS_TONE` (DONE→success, PENDING→warning, OVERDUE→danger, NOT_APPLICABLE→neutre) i `PRIORITY_TONE` (ALTA→danger, MITJANA→warning, BAIXA→cyan, DONE→success) → `admin-tone-*`. KPIs (completats/overdue/progrés global), barra de progrés (`bg-[var(--o-*)]` per width dinàmic), hover de nom, hint «Següent» → tokens/`admin-tone-*`. Grep no-Òrbita = 0.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: estats/prioritats amb to de sèrie; semàntica preservada.
+- Validació humana/UX: pendent del propietari (servidor dev viu a :3000).
+
+### Coordinació
+Via lliure (codex fora fins 18/06). Counter 986 → 987. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-16 — AttributionPanel tokenitzat (atribució multi-touch) (Canvi #986, claude)
 
 ### Resum

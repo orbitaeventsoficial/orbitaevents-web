@@ -412,7 +412,7 @@ export default function TemplateEditorClient({
                   </span>
                   <div>
                     <div className="text-sm font-medium">{cat.label}</div>
-                    <div className="text-[10px] admin-tone-text-slate">{cat.category}</div>
+                    <div className="text-xs admin-tone-text-slate">{cat.category}</div>
                   </div>
                 </div>
               ))}
@@ -436,7 +436,7 @@ export default function TemplateEditorClient({
                         toast.error("No s'ha pogut copiar la variable");
                       }
                     }}
-                    className="ap-badge font-mono text-[10px]"
+                    className="ap-badge font-mono text-xs"
                     title={`Clic per copiar {{${v}}}`}
                   >
                     {`{{${v}}}`}
@@ -478,7 +478,7 @@ export default function TemplateEditorClient({
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-xs font-medium">{catInfo?.label}</div>
-                    <div className="truncate text-[10px] admin-tone-text-slate">
+                    <div className="truncate text-xs admin-tone-text-slate">
                       {block.data.text || block.data.rows?.split('\n')[0] || block.type}
                     </div>
                   </div>

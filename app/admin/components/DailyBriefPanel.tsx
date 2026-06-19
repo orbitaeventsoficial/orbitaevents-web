@@ -3,9 +3,9 @@ import type { DailyBrief, AlertLevel } from '@/lib/services/dailyBriefService';
 import { formatNumber } from '@/lib/constants';
 
 const ALERT_TONE: Record<AlertLevel, string> = {
-  CRITICAL: 'border-rose-500/30 bg-rose-500/[0.06] text-rose-200',
-  WARNING: 'border-amber-500/30 bg-amber-500/[0.06] text-amber-200',
-  INFO: 'border-cyan-500/30 bg-cyan-500/[0.06] text-cyan-200',
+  CRITICAL: 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger',
+  WARNING: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+  INFO: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
 };
 
 export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
@@ -21,7 +21,7 @@ export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
         </div>
         <Link
           href="/admin/reporting"
-          className="rounded-lg border border-white/10 px-2.5 py-1 text-[10px] hover:bg-white/5"
+          className="rounded-lg border border-white/10 px-2.5 py-1 text-xs hover:bg-white/5"
         >
           Reporting →
         </Link>
@@ -29,29 +29,29 @@ export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
 
       {/* KPIs inline */}
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
-        <div className="rounded-lg border border-white/10 bg-white/[0.03] p-2 text-center">
-          <p className="text-[9px] font-semibold uppercase tracking-wider opacity-60">Entrades avui</p>
+        <div className="ap-card p-2 text-center">
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Entrades avui</p>
           <p className="text-lg font-bold">{brief.kpis.newLeadsToday}</p>
         </div>
-        <div className="rounded-lg border border-white/10 bg-white/[0.03] p-2 text-center">
-          <p className="text-[9px] font-semibold uppercase tracking-wider opacity-60">Leads oberts</p>
+        <div className="ap-card p-2 text-center">
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Leads oberts</p>
           <p className="text-lg font-bold">{brief.kpis.openLeads}</p>
         </div>
-        <div className={`rounded-lg border p-2 text-center ${brief.kpis.overdueTasksCount > 0 ? 'border-rose-500/30 bg-rose-500/[0.04]' : 'border-white/10 bg-white/[0.03]'}`}>
-          <p className="text-[9px] font-semibold uppercase tracking-wider opacity-60">Vençudes</p>
+        <div className={`rounded-lg border p-2 text-center ${brief.kpis.overdueTasksCount > 0 ? 'border-rose-500/30 bg-rose-500/[0.04]' : 'border-[var(--line)] bg-[var(--panel)]'}`}>
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Vençudes</p>
           <p className={`text-lg font-bold ${brief.kpis.overdueTasksCount > 0 ? 'text-rose-300' : ''}`}>{brief.kpis.overdueTasksCount}</p>
         </div>
-        <div className="rounded-lg border border-white/10 bg-white/[0.03] p-2 text-center">
-          <p className="text-[9px] font-semibold uppercase tracking-wider opacity-60">Reserves 7d</p>
+        <div className="ap-card p-2 text-center">
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Reserves 7d</p>
           <p className="text-lg font-bold">{brief.kpis.upcomingBookings7d}</p>
         </div>
-        <div className={`rounded-lg border p-2 text-center ${brief.kpis.pendingPaymentsCount > 0 ? 'border-amber-500/30 bg-amber-500/[0.04]' : 'border-white/10 bg-white/[0.03]'}`}>
-          <p className="text-[9px] font-semibold uppercase tracking-wider opacity-60">Cobraments</p>
-          <p className={`text-lg font-bold ${brief.kpis.pendingPaymentsCount > 0 ? 'text-amber-300' : ''}`}>{brief.kpis.pendingPaymentsCount}</p>
+        <div className={`rounded-lg border p-2 text-center ${brief.kpis.pendingPaymentsCount > 0 ? 'admin-tone-border-warning admin-tone-bg-warning' : 'border-[var(--line)] bg-[var(--panel)]'}`}>
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Cobraments</p>
+          <p className={`text-lg font-bold ${brief.kpis.pendingPaymentsCount > 0 ? 'admin-tone-text-warning' : ''}`}>{brief.kpis.pendingPaymentsCount}</p>
         </div>
-        <div className="rounded-lg border border-cyan-500/20 bg-cyan-500/[0.04] p-2 text-center">
-          <p className="text-[9px] font-semibold uppercase tracking-wider opacity-60">Previsió</p>
-          <p className="text-lg font-bold text-cyan-300">{formatNumber(Math.round(brief.kpis.forecastWeighted))}€</p>
+        <div className="rounded-lg border border-[var(--line)] bg-[var(--sunk)] p-2 text-center">
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Previsió</p>
+          <p className="text-lg font-bold text-[var(--gold)]">{formatNumber(Math.round(brief.kpis.forecastWeighted))}€</p>
         </div>
       </div>
 
@@ -69,7 +69,7 @@ export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
                 <span className="font-semibold">{alert.title}</span>
                 <span className="ml-1.5 opacity-70">{alert.detail}</span>
               </div>
-              <span className="text-[10px] opacity-50 shrink-0">→</span>
+              <span className="text-xs opacity-50 shrink-0">→</span>
             </Link>
           ))}
         </div>
@@ -78,13 +78,13 @@ export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
       {/* Actions */}
       {brief.actions.length > 0 && (
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider opacity-50 mb-1.5">Accions prioritàries</p>
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-50 mb-1.5">Accions prioritàries</p>
           <div className="flex flex-wrap gap-1.5">
             {brief.actions.slice(0, 5).map((action, i) => (
               <Link
                 key={i}
                 href={action.href}
-                className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[11px] hover:bg-white/[0.06] transition-colors"
+                className="ap-card px-3 py-1.5 text-xs adm-row-hover transition-colors"
               >
                 <span className="font-medium">{action.label}</span>
                 <span className="ml-1 opacity-50">({action.detail})</span>
@@ -96,7 +96,7 @@ export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
 
       {/* Top campaigns */}
       {brief.topCampaigns.length > 0 && (
-        <div className="flex items-center gap-2 text-[10px] opacity-50">
+        <div className="flex items-center gap-2 text-xs opacity-50">
           <span>📣 Campanyes suggerides:</span>
           {brief.topCampaigns.map((c, i) => (
             <span key={i}>{c.name} ({c.audienceSize})</span>

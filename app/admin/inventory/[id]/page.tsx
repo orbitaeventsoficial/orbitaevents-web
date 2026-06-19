@@ -196,7 +196,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
                   <span className="font-medium underline decoration-white/20">{packName}</span>
                   <span className="">x{pi.quantity}</span>
                   {pi.isRequired && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded">obligatori</span>
+                    <span className="text-xs px-1.5 py-0.5 rounded">obligatori</span>
                   )}
                 </Link>
               );
@@ -234,7 +234,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
               </thead>
               <tbody className="divide-y admin-tone-border-subtle">
                 {item.bookingItems.map((bi) => (
-                  <tr key={bi.id} className="transition-colors hover:bg-white/[0.03]">
+                  <tr key={bi.id} className="transition-colors adm-row-hover">
                     <td className="px-4 py-3">
                       <Link
                         href={buildBookingHref(bi.booking.id)}
@@ -300,7 +300,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
               </thead>
               <tbody className="divide-y admin-tone-border-subtle">
                 {item.usageHistory.map((usage) => (
-                  <tr key={usage.id} className="transition-colors hover:bg-white/[0.03]">
+                  <tr key={usage.id} className="transition-colors adm-row-hover">
                     <td className="px-4 py-3">{formatDate(usage.usedAt)}</td>
                     <td className="px-4 py-3 font-medium">
                       {usage.hoursUsed ? `${usage.hoursUsed}h` : '—'}

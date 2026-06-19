@@ -32,23 +32,24 @@ type EditorAction = {
   secondaryPills?: string[];
 };
 
-function getStatToneClass(tone: EditorStat['tone']) {
-  if (tone === 'success') return 'border-emerald-500/20 bg-emerald-500/[0.05]';
-  if (tone === 'warning') return 'border-amber-500/20 bg-amber-500/[0.05]';
-  return 'border-white/10 bg-white/[0.03]';
+// Canon Òrbita (Cristina): cards de carbó PLA; l'estat viu a l'ACCENT (eyebrow),
+// no com a fons tintat. `info` = neutre (mai blau). Abans eren fons Tailwind
+// cyan/amber/emerald directes (el tint blau de la triada a blog/faq/etc.).
+const PANEL_BASE = 'border-[var(--line)] bg-[var(--panel)]';
+
+function getStatToneClass(_tone: EditorStat['tone']) {
+  return PANEL_BASE;
 }
 
 function getPanelToneClass(tone: EditorPanel['tone']) {
-  if (tone === 'info') return { panel: 'border-cyan-500/25 bg-cyan-500/[0.06]', accent: 'text-cyan-200/80' };
-  if (tone === 'warning') return { panel: 'border-amber-500/25 bg-amber-500/[0.06]', accent: 'text-amber-200/80' };
-  if (tone === 'success') return { panel: 'border-emerald-500/25 bg-emerald-500/[0.06]', accent: 'text-emerald-200/80' };
-  return { panel: 'admin-card-glass', accent: 'text-white/55' };
+  if (tone === 'warning') return { panel: PANEL_BASE, accent: 'admin-tone-text-warning' };
+  if (tone === 'success') return { panel: PANEL_BASE, accent: 'admin-tone-text-success' };
+  return { panel: PANEL_BASE, accent: 'text-[var(--t3)]' };
 }
 
 function getActionToneClass(tone: EditorAction['tone']) {
-  if (tone === 'warning') return { panel: 'border-amber-500/25 bg-amber-500/[0.06]', accent: 'text-amber-200/80' };
-  if (tone === 'info') return { panel: 'border-cyan-500/25 bg-cyan-500/[0.06]', accent: 'text-cyan-200/80' };
-  return { panel: 'border-emerald-500/25 bg-emerald-500/[0.06]', accent: 'text-emerald-200/80' };
+  if (tone === 'warning') return { panel: PANEL_BASE, accent: 'admin-tone-text-warning' };
+  return { panel: PANEL_BASE, accent: 'admin-tone-text-success' };
 }
 
 function renderPanel(panel: EditorPanel) {
@@ -59,23 +60,23 @@ function renderPanel(panel: EditorPanel) {
       : 'sm:grid-cols-3';
 
   return (
-    <article className={`rounded-2xl border p-5 ${toneClass.panel}`}>
-      <p className={`text-[11px] font-semibold uppercase tracking-[0.18em] ${toneClass.accent}`}>{panel.eyebrow}</p>
-      <h2 className="mt-2 text-lg font-semibold text-white/90">{panel.title}</h2>
-      {panel.description ? <p className="mt-2 text-sm text-white/75">{panel.description}</p> : null}
+    <article className={`rounded-[var(--o-r-md)] border p-5 ${toneClass.panel}`}>
+      <p className={`font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.16em] ${toneClass.accent}`}>{panel.eyebrow}</p>
+      <h2 className="mt-2 text-lg font-semibold text-[var(--t)]">{panel.title}</h2>
+      {panel.description ? <p className="mt-2 text-sm text-[var(--t2)]">{panel.description}</p> : null}
       {panel.stats && panel.stats.length > 0 ? (
         <div className={`mt-4 grid gap-3 ${statsGridClass}`}>
           {panel.stats.map((stat) => (
-            <div key={stat.label} className={`rounded-xl border p-3 ${getStatToneClass(stat.tone)}`}>
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">{stat.label}</p>
-              <p className="mt-1 text-2xl font-bold text-white">{stat.value}</p>
-              {stat.hint ? <p className="text-xs text-white/60">{stat.hint}</p> : null}
+            <div key={stat.label} className={`rounded-[var(--o-r-md)] border p-3 ${getStatToneClass(stat.tone)}`}>
+              <p className="font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-wide text-[var(--t3)]">{stat.label}</p>
+              <p className="mt-1 font-[family-name:var(--display)] text-[22px] font-bold leading-none text-[var(--t)]">{stat.value}</p>
+              {stat.hint ? <p className="text-xs text-[var(--t3)]">{stat.hint}</p> : null}
             </div>
           ))}
         </div>
       ) : null}
       {panel.items && panel.items.length > 0 ? (
-        <div className="mt-4 space-y-2 text-sm text-white/75">
+        <div className="mt-4 space-y-2 text-sm text-[var(--t2)]">
           {panel.items.map((item) => (
             <p key={item}>{item}</p>
           ))}
@@ -101,10 +102,10 @@ export function EditorControlStrip({
     <section className={`grid gap-3 lg:grid-cols-[1.1fr_1fr_1fr] ${className}`}>
       {renderPanel(overview)}
       {renderPanel(status)}
-      <article className={`rounded-2xl border p-5 ${actionTone.panel}`}>
-        <p className={`text-[11px] font-semibold uppercase tracking-[0.18em] ${actionTone.accent}`}>{action.eyebrow}</p>
-        <h2 className="mt-2 text-lg font-semibold text-white">{action.title}</h2>
-        <p className="mt-2 text-sm text-white/75">{action.description}</p>
+      <article className={`rounded-[var(--o-r-md)] border p-5 ${actionTone.panel}`}>
+        <p className={`font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.16em] ${actionTone.accent}`}>{action.eyebrow}</p>
+        <h2 className="mt-2 text-lg font-semibold text-[var(--t)]">{action.title}</h2>
+        <p className="mt-2 text-sm text-[var(--t2)]">{action.description}</p>
         {action.primaryAction ? (
           <div className="mt-4 flex flex-wrap gap-2">
             <Link href={action.primaryAction.href} className="ap-btn ap-btn--primary text-sm">
@@ -116,7 +117,7 @@ export function EditorControlStrip({
               </Link>
             ) : null}
             {action.secondaryPills?.map((pill) => (
-              <span key={pill} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white/80">
+              <span key={pill} className="rounded-[var(--o-r-sm-2)] border border-[var(--line)] bg-[var(--sunk)] px-3 py-2 text-sm text-[var(--t2)]">
                 {pill}
               </span>
             ))}
@@ -124,7 +125,7 @@ export function EditorControlStrip({
         ) : action.secondaryPills && action.secondaryPills.length > 0 ? (
           <div className="mt-4 flex flex-wrap gap-2">
             {action.secondaryPills.map((pill) => (
-              <span key={pill} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white/80">
+              <span key={pill} className="rounded-[var(--o-r-sm-2)] border border-[var(--line)] bg-[var(--sunk)] px-3 py-2 text-sm text-[var(--t2)]">
                 {pill}
               </span>
             ))}

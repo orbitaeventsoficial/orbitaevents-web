@@ -288,7 +288,7 @@ export default function PricingAdminPage() {
   if (!stats && message?.type === 'error') {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <p className="text-amber-400 text-lg font-medium">{message.text}</p>
+        <p className="admin-tone-text-warning text-lg font-medium">{message.text}</p>
         <button type="button" onClick={loadData} className="ap-btn ap-btn--primary">Reintentar</button>
       </div>
     );
@@ -386,7 +386,7 @@ export default function PricingAdminPage() {
       </div>
 
       {activeFocusLabel && (
-        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+        <div className="rounded-2xl border admin-tone-border-warning admin-tone-bg-warning px-4 py-3 text-sm admin-tone-text-warning">
           Focus de salut: {activeFocusLabel}
           {' · '}
           <button
@@ -560,7 +560,7 @@ export default function PricingAdminPage() {
                     animacion_infantil: 'Animació infantil', extra_hora: 'Hora addicional',
                   };
                   return (
-                    <tr key={key} className="border-b border-white/5 hover:bg-white/[0.02]">
+                    <tr key={key} className="border-b border-white/5 adm-row-hover">
                       <td className="py-3 flex items-center gap-2">
                         <span className="inline-block w-2 h-2 rounded-full flex-shrink-0" style={{ background: tone.hex }} />
                         {labels[key] ?? key}
@@ -610,7 +610,7 @@ export default function PricingAdminPage() {
               </thead>
               <tbody>
                 {(Object.entries(EQUIPMENT_AMORTIZATION) as [string, { value: number; lifeHours: number }][]).map(([cat, data]) => (
-                  <tr key={cat} className="border-b border-white/5 hover:bg-white/[0.02]">
+                  <tr key={cat} className="border-b border-white/5 adm-row-hover">
                     <td className="py-3 font-mono text-xs opacity-70">{cat}</td>
                     <td className="py-3 text-right">{formatCurrency(data.value)}</td>
                     <td className="py-3 text-right">{formatNumber(data.lifeHours)}h</td>
@@ -681,7 +681,7 @@ export default function PricingAdminPage() {
                             </div>
                             <div>
                               <span className="">Marge:</span>
-                              <span className={`font-semibold ml-1 ${((extra.price - extra.costPerUnit) / extra.price) < 0.35 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                              <span className={`font-semibold ml-1 ${((extra.price - extra.costPerUnit) / extra.price) < 0.35 ? 'admin-tone-text-danger' : 'admin-tone-text-success'}`}>
                                 {formatCurrency(extra.price - extra.costPerUnit)} ({Math.round(((extra.price - extra.costPerUnit) / extra.price) * 100)}%)
                               </span>
                             </div>
@@ -689,7 +689,7 @@ export default function PricingAdminPage() {
                         )}
                         {extra.costPerUnit == null && extra.price > 0 && (
                           <div>
-                            <span className="text-amber-400 text-xs">⚠ Sense cost definit</span>
+                            <span className="admin-tone-text-warning text-xs">⚠ Sense cost definit</span>
                           </div>
                         )}
                       </div>
@@ -711,7 +711,7 @@ export default function PricingAdminPage() {
                           </div>
                           <div className="flex gap-2">
                             <button type="button" onClick={() => setEditingExtra(null)} className="px-3 py-1.5 text-sm rounded-xl transition-colors">Cancel·lar</button>
-                            <button type="button" onClick={() => savePrice(extra.id)} disabled={saving} className="px-4 py-1.5 text-sm text-white rounded-xl font-medium transition-colors disabled:opacity-50">
+                            <button type="button" onClick={() => savePrice(extra.id)} disabled={saving} className="ap-btn ap-btn--primary">
                               {saving ? '...' : '✓ Desar'}
                             </button>
                           </div>

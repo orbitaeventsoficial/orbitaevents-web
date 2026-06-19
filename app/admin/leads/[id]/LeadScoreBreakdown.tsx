@@ -46,18 +46,18 @@ export default function LeadScoreBreakdown({
   const band = BAND_CONFIG[breakdown.band] || BAND_CONFIG.LOW;
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+    <div className="ap-card p-3">
       <button
         onClick={() => setExpanded(!expanded)}
         className="w-full text-left"
       >
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-50">Scoring</p>
-            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${band.bg} ${band.color}`}>
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Scoring</p>
+            <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${band.bg} ${band.color}`}>
               {breakdown.score}/100 · {band.label}
             </span>
-            <span className="text-[10px] opacity-40">
+            <span className="text-xs opacity-40">
               ({(breakdown.probability * 100).toFixed(0)}% prob.)
             </span>
           </div>
@@ -73,7 +73,7 @@ export default function LeadScoreBreakdown({
           {breakdown.factors.map((factor, i) => (
             <div
               key={i}
-              className={`flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[11px] ${
+              className={`flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs ${
                 factor.type === 'NEGATIVE'
                   ? 'bg-rose-500/[0.06] text-rose-200'
                   : factor.type === 'POSITIVE'
@@ -96,7 +96,7 @@ export default function LeadScoreBreakdown({
               </span>
             </div>
           ))}
-          <div className="flex items-center justify-between border-t border-white/10 pt-1.5 text-[11px]">
+          <div className="flex items-center justify-between border-t border-white/10 pt-1.5 text-xs">
             <span className="opacity-50">Positius / Negatius</span>
             <span>
               <span className="text-emerald-300">+{breakdown.positiveTotal}</span>

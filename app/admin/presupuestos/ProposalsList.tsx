@@ -164,10 +164,10 @@ export default function ProposalsList({
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         <button
           onClick={() => setStatusFilter('')}
-          className={`rounded-xl border p-3 text-left transition-colors ${!statusFilter ? 'border-white/20 bg-white/10' : 'admin-tone-idle'}`}
+          className={`rounded-[var(--o-r-md)] border p-3 text-left transition-colors ${!statusFilter ? 'border-[var(--hair-gold)] bg-[var(--raised)]' : 'border-[var(--line)] bg-[var(--panel)] hover:border-[var(--line2)]'}`}
         >
-          <p className="text-2xl font-bold">{stats.total}</p>
-          <p className="text-xs opacity-60">Total</p>
+          <p className="font-[family-name:var(--display)] text-[22px] font-bold leading-none">{stats.total}</p>
+          <p className="mt-1 font-[family-name:var(--mono)] text-xs uppercase tracking-[0.12em] text-[var(--t3)]">Total</p>
         </button>
         {PROPOSAL_FILTERABLE_STATUSES.map((status) => {
           const cfg = getProposalStatusDisplay(status);
@@ -178,10 +178,10 @@ export default function ProposalsList({
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className={`rounded-xl border p-3 text-left transition-colors ${isActive ? `${cfg.border} ${cfg.bg}` : 'admin-tone-idle'}`}
+              className={`rounded-[var(--o-r-md)] border p-3 text-left transition-colors ${isActive ? 'border-[var(--hair-gold)] bg-[var(--raised)]' : 'border-[var(--line)] bg-[var(--panel)] hover:border-[var(--line2)]'}`}
             >
-              <p className="text-2xl font-bold">{count}</p>
-              <p className="text-xs opacity-60">{cfg.label}{status === 'DRAFT' ? 's' : 's'}</p>
+              <p className="font-[family-name:var(--display)] text-[22px] font-bold leading-none">{count}</p>
+              <p className="mt-1 font-[family-name:var(--mono)] text-xs uppercase tracking-[0.12em] text-[var(--t3)]">{cfg.label}{status === 'DRAFT' ? 's' : 's'}</p>
             </button>
           );
         })}
@@ -205,20 +205,20 @@ export default function ProposalsList({
           placeholder="Cerca per client, referència..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="min-w-[200px] flex-1 rounded-xl border bg-white/5 px-4 py-2 text-sm"
+          className="adm-input min-w-[200px] flex-1"
           aria-label="Cercar pressupostos"
         />
         {statusFilter && (
           <button
             onClick={() => setStatusFilter('')}
-            className="rounded-full border px-3 py-1 text-xs transition-colors hover:bg-white/10"
+            className="ap-btn ap-btn--xs"
           >
             Netejar filtre
           </button>
         )}
         <Link
           href="/admin/presupuestos"
-          className="rounded-xl px-4 py-2 text-sm font-medium text-white transition-colors"
+          className="ap-btn ap-btn--primary"
         >
           + Nou pressupost
         </Link>
@@ -324,13 +324,13 @@ export default function ProposalsList({
       <div className="hidden overflow-hidden overflow-x-auto rounded-2xl border lg:block">
         <table className="w-full min-w-[600px] text-sm" aria-label="Llistat de pressupostos">
           <thead>
-            <tr className="border-b admin-tone-bg-neutral">
-              <th scope="col" className="px-4 py-3 text-left font-medium opacity-70">Ref.</th>
-              <th scope="col" className="px-4 py-3 text-left font-medium opacity-70">Client</th>
-              <th scope="col" className="hidden px-4 py-3 text-left font-medium opacity-70 sm:table-cell">Estat</th>
-              <th scope="col" className="px-4 py-3 text-right font-medium opacity-70">Import</th>
-              <th scope="col" className="hidden px-4 py-3 text-right font-medium opacity-70 md:table-cell">Data</th>
-              <th scope="col" className="px-4 py-3 text-right font-medium opacity-70">Accions</th>
+            <tr className="border-b border-[var(--line)] bg-[var(--sunk)]">
+              <th scope="col" className="px-4 py-3 text-left font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.12em] text-[var(--t3)]">Ref.</th>
+              <th scope="col" className="px-4 py-3 text-left font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.12em] text-[var(--t3)]">Client</th>
+              <th scope="col" className="hidden px-4 py-3 text-left font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.12em] text-[var(--t3)] sm:table-cell">Estat</th>
+              <th scope="col" className="px-4 py-3 text-right font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.12em] text-[var(--t3)]">Import</th>
+              <th scope="col" className="hidden px-4 py-3 text-right font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.12em] text-[var(--t3)] md:table-cell">Data</th>
+              <th scope="col" className="px-4 py-3 text-right font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.12em] text-[var(--t3)]">Accions</th>
             </tr>
           </thead>
           <tbody className="divide-y admin-tone-border-subtle">
@@ -342,7 +342,7 @@ export default function ProposalsList({
               </tr>
             ) : (
               filtered.map((proposal) => (
-                <tr key={proposal.id} className="transition-colors hover:bg-white/[0.03]">
+                <tr key={proposal.id} className="transition-colors adm-row-hover">
                   <td className="px-4 py-3">
                     <Link
                       href={getProposalHref(proposal)}
@@ -375,7 +375,7 @@ export default function ProposalsList({
                     <div className="flex items-center justify-end gap-1">
                       <Link
                         href={getProposalHref(proposal)}
-                        className="rounded-lg px-2.5 py-1.5 text-xs transition-colors hover:bg-white/10"
+                        className="ap-btn ap-btn--primary ap-btn--xs"
                         title="Editar / generar PDF"
                       >
                         Editar
@@ -383,7 +383,7 @@ export default function ProposalsList({
                       {proposal.customerId && (
                         <Link
                           href={buildCustomerHubHref(proposal.customerId)}
-                          className="rounded-lg px-2.5 py-1.5 text-xs opacity-60 transition-colors hover:bg-white/10 hover:opacity-100"
+                          className="ap-btn ap-btn--xs"
                           title="Fitxa client"
                         >
                           Client
@@ -393,7 +393,7 @@ export default function ProposalsList({
                         <button
                           onClick={() => handleSend(proposal.id)}
                           disabled={sendingId === proposal.id}
-                          className="rounded-lg px-2.5 py-1.5 text-xs opacity-60 transition-colors hover:bg-white/10 hover:opacity-100 disabled:opacity-30"
+                          className="ap-btn ap-btn--xs"
                           title="Marcar enviat"
                         >
                           {sendingId === proposal.id ? '...' : 'Enviat'}
@@ -402,7 +402,7 @@ export default function ProposalsList({
                       <button
                         onClick={() => handleDelete(proposal.id)}
                         disabled={deletingId === proposal.id}
-                        className="rounded-lg px-2.5 py-1.5 text-xs text-red-400/70 transition-colors hover:bg-red-500/10 hover:text-red-300 disabled:opacity-30"
+                        className="ap-btn ap-btn--xs admin-tone-text-danger admin-tone-border-danger"
                         title="Eliminar pressupost"
                       >
                         {deletingId === proposal.id ? '...' : 'Eliminar'}

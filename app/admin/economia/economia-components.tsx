@@ -18,27 +18,23 @@ import { ADMIN_ECONOMY_HELP, helpAttrs } from '@/app/admin/components/adminHelpC
 import { type PaymentRow, money, paymentStateBadge } from './economia-types';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 
-export function KpiCard({ label, value, sub, color, borderColor, bgColor, delay = 0 }: {
+// Gramàtica de Cristina/leads: card de carbó PLA (mai omplerta de color), label mono
+// apagat, número en display; l'estat viu només al color del número, no al fons.
+export function KpiCard({ label, value, sub, color }: {
   label: string;
   value: string;
   sub?: string;
   color: string;
-  borderColor: string;
-  bgColor: string;
-  delay?: number;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay }}
-      className={`rounded-xl border ${borderColor} ${bgColor} p-4 shadow-md admin-card-glass`}
+    <div
+      className="ap-card p-4"
       {...helpAttrs(ADMIN_ECONOMY_HELP.kpiCard(label, sub))}
     >
-      <p className="text-xs font-medium uppercase tracking-wider">{label}</p>
-      <p className={`mt-1 text-2xl font-black tracking-tight ${color}`}>{value}</p>
-      {sub && <p className={`mt-0.5 text-xs ${color} opacity-80`}>{sub}</p>}
-    </motion.div>
+      <p className="font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.16em] text-[var(--t3)]">{label}</p>
+      <p className={`mt-2 font-[family-name:var(--display)] text-[22px] font-bold leading-none tracking-[-0.01em] ${color}`}>{value}</p>
+      {sub && <p className="mt-1.5 font-[family-name:var(--mono)] text-xs text-[var(--t3)]">{sub}</p>}
+    </div>
   );
 }
 
@@ -62,8 +58,8 @@ export function HealthScore({ overdueTotal, outstandingTotal, marginPct }: { ove
   const paymentScore = 1 - overdueRatio;
   const score = Math.round((marginScore * 0.6 + paymentScore * 0.4) * 100);
 
-  const color = score >= 75 ? 'text-emerald-400' : score >= 50 ? 'text-amber-400' : 'text-rose-400';
-  const ringColor = score >= 75 ? 'stroke-emerald-400' : score >= 50 ? 'stroke-amber-400' : 'stroke-rose-400';
+  const color = score >= 75 ? 'admin-tone-text-success' : score >= 50 ? 'admin-tone-text-warning' : 'admin-tone-text-danger';
+  const ringColor = score >= 75 ? 'stroke-[var(--o-success)]' : score >= 50 ? 'stroke-[var(--o-warning)]' : 'stroke-[var(--o-danger)]';
   const label = score >= 75 ? 'Excel·lent' : score >= 50 ? 'Acceptable' : 'Atenció';
 
   const circumference = 2 * Math.PI * 45;
@@ -74,10 +70,10 @@ export function HealthScore({ overdueTotal, outstandingTotal, marginPct }: { ove
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
-      className="flex flex-col items-center justify-center rounded-2xl border border-white/10 p-6 shadow-lg admin-card-glass"
+      className="flex flex-col items-center justify-center ap-card p-6"
       {...helpAttrs(ADMIN_ECONOMY_HELP.healthScore)}
     >
-      <p className="text-xs font-medium uppercase tracking-wider mb-3">Salut financera</p>
+      <p className="font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.16em] text-[var(--t3)] mb-3">Salut financera</p>
       <div className="relative w-28 h-28">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
           <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8" className="text-white/5" />
@@ -91,10 +87,10 @@ export function HealthScore({ overdueTotal, outstandingTotal, marginPct }: { ove
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className={`text-2xl font-black ${color}`}>{score}</span>
+          <span className={`font-[family-name:var(--display)] text-[26px] font-bold ${color}`}>{score}</span>
         </div>
       </div>
-      <p className={`mt-2 text-sm font-bold ${color}`} {...helpAttrs(ADMIN_ECONOMY_HELP.healthLabel(label))}>{label}</p>
+      <p className={`mt-2 font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.14em] ${color}`} {...helpAttrs(ADMIN_ECONOMY_HELP.healthLabel(label))}>{label}</p>
     </motion.div>
   );
 }
@@ -105,19 +101,19 @@ export function PaymentTimelineBar({ row }: { row: PaymentRow }) {
   const remainingPct = 100 - depositPct;
 
   const depositColor = row.depositPaid
-    ? 'bg-emerald-500'
+    ? 'bg-[var(--o-success)]'
     : row.overdueDeposit
-      ? 'bg-rose-500'
+      ? 'bg-[var(--o-danger)]'
       : row.dueSoonDeposit
-        ? 'bg-amber-500'
+        ? 'bg-[var(--o-warning)]'
         : 'bg-white/15';
 
   const remainingColor = row.remainingPaid
-    ? 'bg-emerald-500'
+    ? 'bg-[var(--o-success)]'
     : row.overdueRemaining
-      ? 'bg-rose-500'
+      ? 'bg-[var(--o-danger)]'
       : row.dueSoonRemaining
-        ? 'bg-amber-500'
+        ? 'bg-[var(--o-warning)]'
         : 'bg-white/15';
 
   const depositLabel = `Diposit: ${money(row.depositAmount)} ${row.depositPaid ? '(pagat)' : '(pendent)'}`;
@@ -137,7 +133,7 @@ export function PaymentTimelineBar({ row }: { row: PaymentRow }) {
           aria-label={depositLabel}
           {...helpAttrs(ADMIN_ECONOMY_HELP.paymentTimelineSegment(depositLabel))}
         >
-          <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold text-white/80 opacity-0 group-hover:opacity-100 transition-opacity">
+          <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white/80 opacity-0 group-hover:opacity-100 transition-opacity">
             {depositPct > 15 ? `${Math.round(depositPct)}%` : ''}
           </span>
         </div>
@@ -152,12 +148,12 @@ export function PaymentTimelineBar({ row }: { row: PaymentRow }) {
           aria-label={remainingLabel}
           {...helpAttrs(ADMIN_ECONOMY_HELP.paymentTimelineSegment(remainingLabel))}
         >
-          <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold text-white/80 opacity-0 group-hover:opacity-100 transition-opacity">
+          <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white/80 opacity-0 group-hover:opacity-100 transition-opacity">
             {remainingPct > 15 ? `${Math.round(remainingPct)}%` : ''}
           </span>
         </div>
       </div>
-      <div className="flex justify-between text-[9px] text-white/40">
+      <div className="flex justify-between text-xs text-white/40">
         <span className="flex items-center gap-1">
           <span className={`inline-block w-1.5 h-1.5 rounded-full ${depositColor}`} />
           Diposit {row.depositPaid ? '✓' : ''}
@@ -328,14 +324,14 @@ export function CobramentFiltersSection({
               onClick={() => setFilter(chip.id)}
               className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                 filter === chip.id
-                  ? 'border-amber-500/50 bg-amber-500/15 text-amber-200'
+                  ? 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning'
                   : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10'
               }`}
               {...helpAttrs(ADMIN_ECONOMY_HELP.filterChip(chip.label))}
             >
               {chip.label}
               {chip.count !== undefined && (
-                <span className="ml-1.5 text-[10px] opacity-70">({chip.count})</span>
+                <span className="ml-1.5 text-xs opacity-70">({chip.count})</span>
               )}
             </button>
           ))}
@@ -384,7 +380,7 @@ export function CobramentFiltersSection({
                   type="checkbox"
                   checked={selected.size === filteredRows.length && filteredRows.length > 0}
                   onChange={toggleAll}
-                  className="accent-amber-500"
+                  className="accent-[var(--gold)]"
                 />
               </th>
               <th scope="col" className="px-2 py-2">Referència</th>
@@ -406,13 +402,13 @@ export function CobramentFiltersSection({
               </tr>
             )}
             {filteredRows.map((row) => (
-              <tr key={row.id} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
+              <tr key={row.id} className="border-b border-white/5 adm-row-hover transition-colors">
                 <td className="px-2 py-2">
                   <input
                     type="checkbox"
                     checked={selected.has(row.id)}
                     onChange={() => toggleSelect(row.id)}
-                    className="accent-amber-500"
+                    className="accent-[var(--gold)]"
                   />
                 </td>
                 <td className="px-2 py-2 font-mono text-xs font-semibold">{row.reference}</td>
@@ -422,12 +418,12 @@ export function CobramentFiltersSection({
                   <PaymentTimelineBar row={row} />
                 </td>
                 <td className="px-2 py-2 text-right">
-                  <span className={`text-xs font-medium ${row.depositPaid ? 'text-emerald-400' : row.overdueDeposit ? 'text-rose-400' : 'text-white/60'}`}>
+                  <span className={`text-xs font-medium ${row.depositPaid ? 'admin-tone-text-success' : row.overdueDeposit ? 'admin-tone-text-danger' : 'text-white/60'}`}>
                     {money(row.depositAmount)}
                   </span>
                 </td>
                 <td className="px-2 py-2 text-right">
-                  <span className={`text-xs font-medium ${row.remainingPaid ? 'text-emerald-400' : row.overdueRemaining ? 'text-rose-400' : 'text-white/60'}`}>
+                  <span className={`text-xs font-medium ${row.remainingPaid ? 'admin-tone-text-success' : row.overdueRemaining ? 'admin-tone-text-danger' : 'text-white/60'}`}>
                     {money(row.remainingAmount)}
                   </span>
                 </td>

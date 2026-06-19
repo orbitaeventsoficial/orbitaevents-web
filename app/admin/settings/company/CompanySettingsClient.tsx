@@ -109,7 +109,7 @@ export default function CompanySettingsClient({ initial }: { initial: Record<str
                 placeholder={field.placeholder}
                 className={INPUT}
               />
-              {field.description && <p className="mt-1 text-[11px]">{field.description}</p>}
+              {field.description && <p className="mt-1 text-xs">{field.description}</p>}
             </div>
           ))}
         </div>
@@ -141,7 +141,7 @@ export default function CompanySettingsClient({ initial }: { initial: Record<str
             }`}
           >
             <span
-              className={`inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+              className={`inline-block h-5 w-5 rounded-full bg-[var(--o-admin-light)] shadow-sm transition-transform duration-200 ${
                 holdedEnabled ? 'translate-x-6' : 'translate-x-1'
               }`}
             />
@@ -161,12 +161,12 @@ export default function CompanySettingsClient({ initial }: { initial: Record<str
             <button
               type="button"
               onClick={() => setShowApiKey(!showApiKey)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-[11px] transition-colors admin-tone-idle"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-xs transition-colors admin-tone-idle"
             >
               {showApiKey ? 'Amagar' : 'Mostrar'}
             </button>
           </div>
-          <p className="mt-1 text-[11px]">{HOLDED_API_FIELD.description}</p>
+          <p className="mt-1 text-xs">{HOLDED_API_FIELD.description}</p>
         </div>
 
         <div className="mt-4">

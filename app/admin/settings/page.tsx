@@ -108,7 +108,7 @@ export default async function SettingsPage() {
       <section className="rounded-2xl border admin-card-glass p-5">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/55">Accessos directes</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">Accessos directes</p>
             <h2 className="mt-1 text-lg font-semibold text-white/90">Canvis que acostumen a tenir més impacte</h2>
             <p className="mt-1 text-sm text-white/65">Entrades ràpides a les peces de configuració que més afecten venda, marca i operativa.</p>
           </div>
@@ -116,7 +116,7 @@ export default async function SettingsPage() {
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Link
           href="/admin/presupuestos"
-          className="rounded-2xl border bg-white/[0.03] p-6 transition-all hover:bg-white/[0.06]"
+          className="ap-card p-6 transition-all adm-row-hover"
         >
           <div className="text-2xl mb-2">🧾</div>
           <h3 className="font-semibold">Editor PDF de pressupost</h3>
@@ -125,7 +125,7 @@ export default async function SettingsPage() {
 
         <Link
           href="/admin/settings/quotes"
-          className="rounded-2xl border bg-white/[0.03] p-6 transition-all hover:bg-white/[0.06]"
+          className="ap-card p-6 transition-all adm-row-hover"
         >
           <div className="text-2xl mb-2">📄</div>
           <h3 className="font-semibold">Plantilla de pressupostos</h3>
@@ -134,7 +134,7 @@ export default async function SettingsPage() {
 
         <Link
           href="/admin/catalog?tab=packs"
-          className="rounded-2xl border bg-white/[0.03] p-6 transition-all hover:bg-white/[0.06]"
+          className="ap-card p-6 transition-all adm-row-hover"
         >
           <div className="text-2xl mb-2">📦</div>
           <h3 className="font-semibold">Catàleg</h3>
@@ -143,7 +143,7 @@ export default async function SettingsPage() {
 
         <Link
           href="/admin/text-manager"
-          className="rounded-2xl border bg-white/[0.03] p-6 transition-all hover:bg-white/[0.06]"
+          className="ap-card p-6 transition-all adm-row-hover"
         >
           <div className="text-2xl mb-2">🌐</div>
           <h3 className="font-semibold">Traduccions</h3>
@@ -152,7 +152,7 @@ export default async function SettingsPage() {
 
         <Link
           href="/admin/settings/company"
-          className="rounded-2xl border bg-white/[0.03] p-6 transition-all hover:bg-white/[0.06]"
+          className="ap-card p-6 transition-all adm-row-hover"
         >
           <div className="text-2xl mb-2">🏢</div>
           <h3 className="font-semibold">Empresa i Holded</h3>
@@ -161,7 +161,7 @@ export default async function SettingsPage() {
 
         <Link
           href="/admin/faq"
-          className="rounded-2xl border bg-white/[0.03] p-6 transition-all hover:bg-white/[0.06]"
+          className="ap-card p-6 transition-all adm-row-hover"
         >
           <div className="text-2xl mb-2">❓</div>
           <h3 className="font-semibold">FAQs</h3>

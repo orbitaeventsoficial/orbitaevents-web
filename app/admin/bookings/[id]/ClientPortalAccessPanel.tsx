@@ -247,7 +247,7 @@ export default function ClientPortalAccessPanel({
 
       {generatedUrl && (
         <div className="ap-card mt-3 p-3">
-          <p className="mb-1 text-[11px] uppercase tracking-wide">Enllaç generat</p>
+          <p className="mb-1 text-xs uppercase tracking-wide">Enllaç generat</p>
           <p className="break-all text-xs">{generatedUrl}</p>
         </div>
       )}

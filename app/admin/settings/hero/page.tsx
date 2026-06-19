@@ -46,14 +46,14 @@ export default function HeroMediaAdmin() {
         <AdminHelpLegend title="Sense duplicats" body="Això evita tenir un panell separat per al hero i un altre per a la resta d’imatges." />
       </div>
 
-      <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 space-y-4">
+      <div className="rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-6 space-y-4">
         <h2 className="text-lg font-semibold text-white">On s’ha mogut?</h2>
         <p className="text-sm text-white/65">
           Obre el gestor d’imatges i treballa la col·lecció manual del placement <span className="font-mono text-white">home.hero.slides</span>.
         </p>
         <Link
           href="/admin/image-manager"
-          className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-5 py-2.5 text-sm font-bold text-black"
+          className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-5 py-2.5 text-sm font-bold text-[var(--gold-ink)]"
         >
           Anar al gestor d’imatges
         </Link>

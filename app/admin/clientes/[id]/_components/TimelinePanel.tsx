@@ -137,7 +137,7 @@ export default function TimelinePanel({
           <h2 className="text-sm font-semibold uppercase tracking-wide">
             Cronologia
           </h2>
-          <p className="text-[11px]">
+          <p className="text-xs">
             {filteredTimeline.length} esdeveniments
           </p>
         </div>
@@ -148,17 +148,17 @@ export default function TimelinePanel({
         <div className="mt-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-300/80">
+              <p className="text-xs font-semibold uppercase tracking-wider text-amber-300/80">
                 Estat comercial actual
               </p>
               <p className="mt-1 text-sm font-medium text-amber-100">
                 {commercialPriority.title}
               </p>
-              <p className="mt-1 text-[11px] leading-relaxed text-amber-50/80">
+              <p className="mt-1 text-xs leading-relaxed text-amber-50/80">
                 {commercialPriority.detail}
               </p>
               {commercialPriority.footnote && (
-                <p className="mt-2 text-[10px] uppercase tracking-wide text-amber-200/60">
+                <p className="mt-2 text-xs uppercase tracking-wide text-amber-200/60">
                   {commercialPriority.footnote}
                 </p>
               )}
@@ -169,14 +169,14 @@ export default function TimelinePanel({
                   href={commercialRiskLink.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="shrink-0 rounded-full border border-amber-400/30 px-2.5 py-1 text-[10px] font-medium text-amber-200 transition-colors hover:bg-amber-500/10"
+                  className="shrink-0 rounded-full border border-amber-400/30 px-2.5 py-1 text-xs font-medium text-amber-200 transition-colors hover:bg-amber-500/10"
                 >
                   {commercialRiskLink.label}
                 </a>
               ) : (
                 <Link
                   href={commercialRiskLink.href}
-                  className="shrink-0 rounded-full border border-amber-400/30 px-2.5 py-1 text-[10px] font-medium text-amber-200 transition-colors hover:bg-amber-500/10"
+                  className="shrink-0 rounded-full border border-amber-400/30 px-2.5 py-1 text-xs font-medium text-amber-200 transition-colors hover:bg-amber-500/10"
                 >
                   {commercialRiskLink.label}
                 </Link>
@@ -192,9 +192,9 @@ export default function TimelinePanel({
             key={opt.key}
             type="button"
             onClick={() => setFilter(opt.key)}
-            className={`rounded-full px-2 py-0.5 text-[10px] font-medium transition-colors ${
+            className={`rounded-full px-2 py-0.5 text-xs font-medium transition-colors ${
               filter === opt.key
-                ? 'bg-white text-black'
+                ? 'bg-[var(--raised)] text-[var(--t)] ring-1 ring-inset ring-[var(--line2)]'
                 : 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white/80'
             }`}
           >
@@ -212,7 +212,7 @@ export default function TimelinePanel({
             <div key={group.date}>
               {/* Day header */}
               <div className="sticky top-0 z-10 py-1">
-                <p className="text-[10px] font-semibold uppercase tracking-wider">
+                <p className="text-xs font-semibold uppercase tracking-wider">
                   {group.label}
                 </p>
               </div>
@@ -267,16 +267,16 @@ function EventCard({ event }: { event: TimelineEventDTO }) {
           <p className="text-xs font-medium break-words">
             {sanitizeEventTitle(event.title)}
           </p>
-          <p className="mt-0.5 text-[10px]">
+          <p className="mt-0.5 text-xs">
             {formatTime(event.at)}
           </p>
           {commMeta && (
-            <p className="mt-0.5 text-[10px] uppercase tracking-wide opacity-50 break-words">
+            <p className="mt-0.5 text-xs uppercase tracking-wide opacity-50 break-words">
               {commMeta}
             </p>
           )}
           {preview && preview !== event.title && (
-            <p className="mt-1 text-[11px] leading-relaxed opacity-75 break-words">
+            <p className="mt-1 text-xs leading-relaxed opacity-75 break-words">
               {preview}
             </p>
           )}
@@ -286,7 +286,7 @@ function EventCard({ event }: { event: TimelineEventDTO }) {
       {event.link && (
         <Link
           href={event.link.href}
-          className="mt-1.5 inline-block max-w-full truncate text-[10px] transition-colors"
+          className="mt-1.5 inline-block max-w-full truncate text-xs transition-colors"
         >
           {event.link.label} →
         </Link>

@@ -280,7 +280,7 @@ export default function StatsPage() {
                   disabled={saving}
                   type="button"
                   aria-busy={saving}
-                  className="px-6 py-2 text-white rounded-xl font-medium disabled:opacity-50"
+                  className="ap-btn ap-btn--primary"
                 >
                   {saving ? 'Desant...' : 'Desar'}
                 </button>

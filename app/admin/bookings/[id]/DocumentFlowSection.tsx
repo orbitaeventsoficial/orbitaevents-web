@@ -76,15 +76,15 @@ export default function DocumentFlowSection({ proposals, invoices }: { proposals
           <div key={i} className={`${step.style.card} rounded-xl p-3.5 transition-all`}>
             <div className="mb-2 flex items-center gap-1.5">
               <span className="text-sm">{step.icon}</span>
-              <p className={`text-[11px] font-semibold uppercase tracking-wider ${step.style.label}`}>{step.label}</p>
+              <p className={`text-xs font-semibold uppercase tracking-wider ${step.style.label}`}>{step.label}</p>
             </div>
 
             {step.ref && <p className="truncate font-mono text-sm font-semibold">{step.ref}</p>}
-            {step.status && <span className={`mt-1.5 inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium ${step.style.badge}`}>{step.status}</span>}
+            {step.status && <span className={`mt-1.5 inline-block rounded-full border px-2 py-0.5 text-xs font-medium ${step.style.badge}`}>{step.status}</span>}
             {step.empty && <p className="mt-1 text-xs admin-tone-text-slate">{step.empty}</p>}
-            {step.link && <a href={step.link.href} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-[10px] font-medium transition-colors admin-tone-text-info">{step.link.label}</a>}
+            {step.link && <a href={step.link.href} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-xs font-medium transition-colors admin-tone-text-info">{step.link.label}</a>}
             {i === 1 && contractSigned && (
-              <div className="mt-3 space-y-1 rounded-lg border border-emerald-400/30 bg-emerald-500/10 p-2 text-[10px] leading-snug admin-tone-text-success">
+              <div className="mt-3 space-y-1 rounded-lg border admin-tone-border-success admin-tone-bg-success p-2 text-xs leading-snug admin-tone-text-success">
                 {activeProposal?.contractSignedBy && <p>Signat per {activeProposal.contractSignedBy}</p>}
                 {contractSignedAt && <p>{contractSignedAt}</p>}
                 {activeProposal?.contractSignatureIp && <p>IP {activeProposal.contractSignatureIp}</p>}
@@ -94,7 +94,7 @@ export default function DocumentFlowSection({ proposals, invoices }: { proposals
                   <img
                     src={activeProposal.contractSignatureBlob}
                     alt="Signatura manuscrita capturada"
-                    className="mt-2 max-h-16 rounded border border-emerald-300/30 bg-black/20 object-contain"
+                    className="mt-2 max-h-16 rounded border admin-tone-border-success bg-[var(--sunk)] object-contain"
                   />
                 )}
               </div>

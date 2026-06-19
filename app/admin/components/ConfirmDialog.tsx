@@ -17,17 +17,19 @@ interface ConfirmDialogProps {
   onCancel: () => void;
 }
 
+// Botons de confirmació via token de la sèrie. danger/warning mantenen la convenció
+// UX destructiva (vermell/ambre) però des de --o-*; info = or de sèrie (mai blau).
 const VARIANT_STYLES: Record<ConfirmVariant, { button: string; icon: string }> = {
   danger: {
-    button: 'bg-rose-600 hover:bg-rose-500 focus:ring-rose-500/50',
+    button: 'bg-[var(--o-danger)] text-white hover:brightness-110 focus:ring-[var(--o-danger)]/50',
     icon: '⚠️',
   },
   warning: {
-    button: 'bg-amber-600 hover:bg-amber-500 focus:ring-amber-500/50',
+    button: 'bg-[var(--o-warning)] text-[var(--o-admin-ink)] hover:brightness-110 focus:ring-[var(--o-warning)]/50',
     icon: '⚡',
   },
   info: {
-    button: 'bg-cyan-600 hover:bg-cyan-500 focus:ring-cyan-500/50',
+    button: 'bg-[var(--gold)] text-[var(--o-admin-ink)] hover:brightness-110 focus:ring-[var(--gold)]/50',
     icon: 'ℹ️',
   },
 };
@@ -170,7 +172,7 @@ export default function ConfirmDialog({
           />
 
           <motion.div
-            className="relative w-full max-w-sm rounded-2xl border border-white/10 bg-black p-6 shadow-2xl"
+            className="relative w-full max-w-sm ap-card p-6 shadow-2xl"
             initial={{ opacity: 0, scale: scaleTo }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: scaleTo }}

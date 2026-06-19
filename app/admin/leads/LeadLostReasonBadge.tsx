@@ -12,7 +12,7 @@ export default function LeadLostReasonBadge({ lostReason, className = '' }: Lead
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${
         auto
           ? 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning'
           : 'admin-tone-border-slate admin-tone-bg-slate admin-tone-text-slate'

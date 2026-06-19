@@ -225,11 +225,11 @@ function renderHealthCard(item: AdminHealthItem, sectionLabel: string) {
 
       <div className="mt-4 space-y-3 text-sm text-white/72">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-white/45">Què passa</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Què passa</p>
           <p>{item.reason}</p>
         </div>
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-white/45">Per què importa</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Per què importa</p>
           <p>{item.impact}</p>
         </div>
       </div>
@@ -378,13 +378,13 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
         </div>
         <div className="mt-4 space-y-3">
           <div>
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-white/45">Estat</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/45">Estat</p>
             <div className="flex flex-wrap gap-2">
               {ADMIN_SALUT_STATUS_FILTER_OPTIONS.map((option) => renderFilterChip(option.label, buildFilterHref(option.id, activeFocus), activeStatus === option.id))}
             </div>
           </div>
           <div>
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-white/45">Focus</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/45">Focus</p>
             <div className="flex flex-wrap gap-2">
               {ADMIN_SALUT_FOCUS_FILTER_OPTIONS.map((option) => renderFilterChip(option.label, buildFilterHref(activeStatus, option.id), activeFocus === option.id))}
             </div>

@@ -235,7 +235,7 @@ export default async function MensajesPage() {
             const statusConfig = getLeadStatusDisplay(lead.status);
             const sourceIcon = getSourceDisplay(lead.source).icon;
             return (
-              <div key={lead.id} className="p-4 transition-colors hover:bg-white/[0.03]">
+              <div key={lead.id} className="p-4 transition-colors adm-row-hover">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-semibold admin-tone-soft-info admin-tone-text-info">
                     {lead.name.charAt(0)}

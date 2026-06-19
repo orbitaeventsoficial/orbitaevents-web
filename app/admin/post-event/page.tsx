@@ -269,7 +269,7 @@ export default async function PostEventPage() {
             const packName =
               getTranslatedPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale);
             return (
-              <div key={booking.id} className="flex items-center justify-between p-4 transition-colors hover:bg-white/[0.03]">
+              <div key={booking.id} className="flex items-center justify-between p-4 transition-colors adm-row-hover">
                 <div>
                   <p className="font-medium">{booking.clientName}</p>
                   <p className="text-sm admin-tone-text-neutral">

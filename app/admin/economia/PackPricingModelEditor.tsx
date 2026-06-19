@@ -8,10 +8,13 @@ function pct(value: number) {
   return `${(value * 100).toFixed(1)}%`;
 }
 
+// Chips canònics: les classes `.admin-pack-model-chip--*` només existien sota el
+// selector mort `.admin-shell` → els semàfors queien sense color. Ara `admin-tone-*`.
+const CHIP_BASE = 'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold';
 function statusBadge(value: number, warn: number, danger: number) {
-  if (value >= danger) return 'admin-pack-model-chip admin-pack-model-chip--danger';
-  if (value >= warn) return 'admin-pack-model-chip admin-pack-model-chip--warn';
-  return 'admin-pack-model-chip admin-pack-model-chip--ok';
+  if (value >= danger) return `${CHIP_BASE} admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger`;
+  if (value >= warn) return `${CHIP_BASE} admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning`;
+  return `${CHIP_BASE} admin-tone-border-success admin-tone-bg-success admin-tone-text-success`;
 }
 
 export default function PackPricingModelEditor({ initial }: { initial: PackPricingModelConfig }) {
@@ -55,18 +58,20 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
     }, 120);
   }
 
-  const inputClass = 'admin-pack-model-input w-full rounded-xl border px-3 py-2 text-sm';
+  // Input canònic de la sèrie (admin-shell.css). Abans `admin-pack-model-input`
+  // no existia al CSS → els inputs queien al fons blanc per defecte del navegador.
+  const inputClass = 'adm-input w-full';
   const marginClass = statusBadge(form.marginTargetPct, 0.6, 0.75);
   const ssClass = statusBadge(form.socialSecurityPct, 0.38, 0.5);
   const irpfClass = statusBadge(form.withholdingPct, 0.18, 0.26);
   const divergenceClass = form.alertDivergencePct >= 30
-    ? 'admin-pack-model-chip admin-pack-model-chip--danger'
+    ? `${CHIP_BASE} admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger`
     : form.alertDivergencePct >= 20
-      ? 'admin-pack-model-chip admin-pack-model-chip--warn'
-      : 'admin-pack-model-chip admin-pack-model-chip--ok';
+      ? `${CHIP_BASE} admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning`
+      : `${CHIP_BASE} admin-tone-border-success admin-tone-bg-success admin-tone-text-success`;
 
   return (
-    <section className="admin-pack-model rounded-2xl border p-5 shadow-sm">
+    <section className="ap-card p-5">
       <h2 className="text-lg font-semibold">Model econòmic de packs</h2>
       <p className="mt-1 text-xs">
         Aquesta configuració calcula PVP recomanat, hora extra recomanada i alertes de divergència a packs.
@@ -142,7 +147,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
               type="button"
               onClick={save}
               disabled={saving}
-              className="admin-pack-model-save rounded-xl px-4 py-2 text-sm font-semibold disabled:opacity-60"
+              className="ap-btn ap-btn--primary"
             >
               {saving ? 'Desant...' : 'Desar model packs'}
             </button>
@@ -150,10 +155,10 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
           </div>
         </div>
 
-        <aside className="admin-pack-model-aside rounded-xl border p-4">
+        <aside className="rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] p-4">
           <h3 className="text-sm font-semibold">Lectura ràpida de coeficients</h3>
           <div className="mt-3 space-y-2 text-xs">
-            <div className="admin-pack-model-note rounded-xl border p-3">
+            <div className="rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] p-3">
               <p className="font-semibold">Objectiu marge: {pct(form.marginTargetPct)}</p>
               <button
                 type="button"
@@ -163,7 +168,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
                 Semàfor marge
               </button>
             </div>
-            <div className="admin-pack-model-note rounded-xl border p-3">
+            <div className="rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] p-3">
               <p className="font-semibold">SS: {pct(form.socialSecurityPct)} · IRPF: {pct(form.withholdingPct)}</p>
               <button
                 type="button"
@@ -180,7 +185,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
                 Semàfor IRPF
               </button>
             </div>
-            <div className="admin-pack-model-note rounded-xl border p-3">
+            <div className="rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] p-3">
               <p className="font-semibold">Llindar alerta: {form.alertDivergencePct.toFixed(0)}%</p>
               <button
                 type="button"
@@ -190,7 +195,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
                 Semàfor divergència
               </button>
             </div>
-            <div className="admin-pack-model-note rounded-xl border p-3">
+            <div className="rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] p-3">
               <p>Cost equip/hora usat al càlcul = inventari/h + personal/h + cost fix.</p>
               <p className="mt-1">PVP recomanat = cost / (1 - objectiu marge).</p>
             </div>

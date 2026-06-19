@@ -4,7 +4,7 @@ export default function AdminLoadingSkeletonInbox() {
       {/* Two-panel layout */}
       <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
         {/* Left: email list */}
-        <div className="space-y-2 rounded-2xl border border-white/10 bg-white/[0.02] p-3">
+        <div className="space-y-2 ap-card p-3">
           {/* Toolbar */}
           <div className="flex gap-2 pb-1">
             <div className="h-8 flex-1 rounded-lg bg-white/[0.04]" />
@@ -27,7 +27,7 @@ export default function AdminLoadingSkeletonInbox() {
         </div>
 
         {/* Right: email reader */}
-        <div className="space-y-4 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+        <div className="space-y-4 ap-card p-5">
           {/* From / subject */}
           <div className="space-y-2 border-b border-white/[0.06] pb-4">
             <div className="h-6 w-2/3 rounded-lg bg-white/[0.05]" />
@@ -50,8 +50,8 @@ export default function AdminLoadingSkeletonInbox() {
 
           {/* Action buttons */}
           <div className="flex gap-2 pt-2">
-            <div className="h-9 w-24 rounded-xl border border-white/10 bg-white/[0.03]" />
-            <div className="h-9 w-20 rounded-xl border border-white/10 bg-white/[0.03]" />
+            <div className="h-9 w-24 ap-card" />
+            <div className="h-9 w-20 ap-card" />
           </div>
         </div>
       </div>

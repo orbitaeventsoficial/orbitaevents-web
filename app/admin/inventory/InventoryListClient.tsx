@@ -436,7 +436,7 @@ export default function InventoryListClient() {
   if (fetchError) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <p className="text-amber-400 text-lg font-medium">{fetchError}</p>
+        <p className="admin-tone-text-warning text-lg font-medium">{fetchError}</p>
         <button type="button" onClick={() => { setLoading(true); fetchData(); }} className="ap-btn ap-btn--primary">
           Reintentar
         </button>

@@ -25,7 +25,7 @@ function FunnelBar({ label, value, max }: { label: string; value: number; max: n
   const width = max > 0 ? Math.max(2, (value / max) * 100) : 0;
   return (
     <div className="flex items-center gap-3">
-      <span className="w-28 text-right text-[11px] font-medium opacity-70 shrink-0">{label}</span>
+      <span className="w-28 text-right text-xs font-medium opacity-70 shrink-0">{label}</span>
       <div className="flex-1 h-5 rounded bg-white/5 overflow-hidden">
         <div
           className="h-full rounded admin-tone-bg-cyan"
@@ -130,7 +130,7 @@ export default async function ReportingPage() {
         />
 
         {insights.length > 1 && (
-          <section className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+          <section className="ap-card p-4">
             <h2 className="text-xs font-semibold uppercase tracking-wider opacity-60">
               Alertes i oportunitats ({insights.length - 1} addicional{insights.length - 1 !== 1 ? 's' : ''})
             </h2>
@@ -147,17 +147,17 @@ export default async function ReportingPage() {
                     className="flex items-start gap-3 rounded-lg border border-white/5 bg-white/[0.015] p-3"
                   >
                     <span
-                      className={`mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${badgeClass[insight.priority]}`}
+                      className={`mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-xs font-bold uppercase tracking-wider ${badgeClass[insight.priority]}`}
                     >
                       {insight.area}
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="text-xs font-semibold">{insight.headline}</p>
-                      <p className="mt-0.5 text-[11px] opacity-60">{insight.detail}</p>
+                      <p className="mt-0.5 text-xs opacity-60">{insight.detail}</p>
                     </div>
                     <a
                       href={insight.href}
-                      className="shrink-0 rounded border border-white/10 px-2 py-0.5 text-[10px] hover:bg-white/10"
+                      className="shrink-0 rounded border border-white/10 px-2 py-0.5 text-xs hover:bg-white/10"
                     >
                       {insight.ctaLabel}
                     </a>
@@ -170,39 +170,39 @@ export default async function ReportingPage() {
 
         {/* Headline KPIs */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-7">
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Clients</p>
+          <div className="ap-card p-3">
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Clients</p>
             <p className="mt-1 text-xl font-bold">{report.headline.customers}</p>
           </div>
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Leads oberts</p>
+          <div className="ap-card p-3">
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Leads oberts</p>
             <p className="mt-1 text-xl font-bold">{report.headline.openLeads}</p>
           </div>
           <div className="rounded-xl border admin-tone-border-success admin-tone-bg-success p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Reserves tancades</p>
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Reserves tancades</p>
             <p className="mt-1 text-xl font-bold admin-tone-text-success">{report.headline.bookingsClosed}</p>
           </div>
           <div className="rounded-xl border admin-tone-border-success admin-tone-bg-success p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Ingressos</p>
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Ingressos</p>
             <p className="mt-1 text-xl font-bold admin-tone-text-success">{currency(report.headline.revenueClosed)}</p>
           </div>
           <div className="rounded-xl border admin-tone-border-cyan admin-tone-bg-cyan p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Pipeline brut</p>
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Pipeline brut</p>
             <p className="mt-1 text-xl font-bold admin-tone-text-cyan">{currency(report.headline.pipelineRaw)}</p>
           </div>
           <div className="rounded-xl border admin-tone-border-cyan admin-tone-bg-cyan p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Previsió ponderada</p>
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Previsió ponderada</p>
             <p className="mt-1 text-xl font-bold admin-tone-text-cyan">{currency(report.headline.forecastWeighted)}</p>
           </div>
-          <div className={`rounded-xl border p-3 ${report.headline.slaBroken > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : 'border-white/10 bg-white/[0.03]'}`}>
-            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">SLA trencats</p>
+          <div className={`rounded-xl border p-3 ${report.headline.slaBroken > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : 'border-[var(--line)] bg-[var(--panel)]'}`}>
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">SLA trencats</p>
             <p className={`mt-1 text-xl font-bold ${report.headline.slaBroken > 0 ? 'admin-tone-text-danger' : ''}`}>{report.headline.slaBroken}</p>
           </div>
         </div>
 
         <div className="grid gap-6 xl:grid-cols-2">
           {/* Funnel */}
-          <section className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+          <section className="ap-card p-5">
             <h2 className="text-sm font-semibold">Embut comercial</h2>
             <div className="mt-4 space-y-2">
               <FunnelBar label="Nous" value={report.funnel.NEW} max={funnelMax} />
@@ -216,41 +216,41 @@ export default async function ReportingPage() {
 
           {/* Margin + Recurrence */}
           <div className="space-y-6">
-            <section className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+            <section className="ap-card p-5">
               <h2 className="text-sm font-semibold">Marge brut</h2>
               <div className="mt-3 grid grid-cols-2 gap-3">
                 <div>
-                  <p className="text-[10px] opacity-60">Ingressos totals</p>
+                  <p className="text-xs opacity-60">Ingressos totals</p>
                   <p className="text-lg font-bold">{currency(report.margin.totalRevenue)}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] opacity-60">Cost directe (desplaçament)</p>
+                  <p className="text-xs opacity-60">Cost directe (desplaçament)</p>
                   <p className="text-lg font-bold">{currency(report.margin.totalCost)}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] opacity-60">Marge brut</p>
+                  <p className="text-xs opacity-60">Marge brut</p>
                   <p className="text-lg font-bold admin-tone-text-success">{currency(report.margin.grossMargin)}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] opacity-60">Taxa de marge</p>
+                  <p className="text-xs opacity-60">Taxa de marge</p>
                   <p className="text-lg font-bold admin-tone-text-success">{pct(report.margin.marginRate)}</p>
                 </div>
               </div>
             </section>
 
-            <section className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+            <section className="ap-card p-5">
               <h2 className="text-sm font-semibold">Recurrència</h2>
               <div className="mt-3 grid grid-cols-2 gap-3">
                 <div>
-                  <p className="text-[10px] opacity-60">Clients recurrents</p>
+                  <p className="text-xs opacity-60">Clients recurrents</p>
                   <p className="text-lg font-bold">{report.recurrence.returning} / {report.recurrence.totalCustomers}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] opacity-60">Taxa recurrència</p>
+                  <p className="text-xs opacity-60">Taxa recurrència</p>
                   <p className="text-lg font-bold">{pct(report.recurrence.returningRate)}</p>
                 </div>
                 <div className="col-span-2">
-                  <p className="text-[10px] opacity-60">Mitjana events per client</p>
+                  <p className="text-xs opacity-60">Mitjana events per client</p>
                   <p className="text-lg font-bold">{report.recurrence.avgEventsPerCustomer.toFixed(1)}</p>
                 </div>
               </div>
@@ -259,12 +259,12 @@ export default async function ReportingPage() {
         </div>
 
         {/* Conversion by Source */}
-        <section className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+        <section className="ap-card p-5">
           <h2 className="text-sm font-semibold">Conversió per origen (CAC)</h2>
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-sm" aria-label="Conversió per origen">
               <thead>
-                <tr className="border-b border-white/10 text-left text-[10px] font-semibold uppercase tracking-wider opacity-60">
+                <tr className="border-b border-white/10 text-left text-xs font-semibold uppercase tracking-wider opacity-60">
                   <th scope="col" className="py-2 pr-4">Origen</th>
                   <th scope="col" className="py-2 pr-4">Total leads</th>
                   <th scope="col" className="py-2 pr-4">Tancats</th>
@@ -290,7 +290,7 @@ export default async function ReportingPage() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+        <section className="ap-card p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <h2 className="text-sm font-semibold">Tracking d&apos;email per plantilla</h2>
@@ -309,33 +309,33 @@ export default async function ReportingPage() {
           </div>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Emails enviats</p>
+            <div className="ap-card p-3">
+              <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Emails enviats</p>
               <p className="mt-1 text-xl font-bold">{emailTracking.totalSent}</p>
             </div>
             <div className="rounded-xl border admin-tone-border-cyan admin-tone-bg-cyan p-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Open rate global</p>
+              <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Open rate global</p>
               <p className="mt-1 text-xl font-bold admin-tone-text-cyan">{emailTracking.globalOpenRate}%</p>
             </div>
             <div className="rounded-xl border admin-tone-border-violet admin-tone-bg-violet p-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Click rate global</p>
+              <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Click rate global</p>
               <p className="mt-1 text-xl font-bold admin-tone-text-violet">{emailTracking.globalClickRate}%</p>
             </div>
             <div className="rounded-xl border admin-tone-border-success admin-tone-bg-success p-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Reply rate global</p>
+              <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Reply rate global</p>
               <p className="mt-1 text-xl font-bold admin-tone-text-success">{emailTracking.globalReplyRate}%</p>
             </div>
           </div>
 
           <div className="mt-4 grid gap-3 xl:grid-cols-2">
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-              <p className="text-[10px] font-semibold uppercase tracking-wider opacity-60">Millor performer</p>
+            <div className="ap-card p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Millor performer</p>
               <p className="mt-2 text-sm font-semibold">
                 {emailTracking.bestPerformer || 'Sense prou mostra'}
               </p>
             </div>
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-              <p className="text-[10px] font-semibold uppercase tracking-wider opacity-60">Pitjor performer</p>
+            <div className="ap-card p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Pitjor performer</p>
               <p className="mt-2 text-sm font-semibold">
                 {emailTracking.worstPerformer || 'Sense prou mostra'}
               </p>
@@ -345,7 +345,7 @@ export default async function ReportingPage() {
           <div className="mt-4 overflow-x-auto">
             <table className="w-full text-sm" aria-label="Tracking email per plantilla">
               <thead>
-                <tr className="border-b border-white/10 text-left text-[10px] font-semibold uppercase tracking-wider opacity-60">
+                <tr className="border-b border-white/10 text-left text-xs font-semibold uppercase tracking-wider opacity-60">
                   <th scope="col" className="py-2 pr-4">Plantilla</th>
                   <th scope="col" className="py-2 pr-4">Enviats</th>
                   <th scope="col" className="py-2 pr-4">Oberts</th>
@@ -380,12 +380,12 @@ export default async function ReportingPage() {
         </section>
 
         {/* Monthly Trend */}
-        <section className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+        <section className="ap-card p-5">
           <h2 className="text-sm font-semibold">Tendència mensual (6 mesos)</h2>
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-sm" aria-label="Tendència mensual">
               <thead>
-                <tr className="border-b border-white/10 text-left text-[10px] font-semibold uppercase tracking-wider opacity-60">
+                <tr className="border-b border-white/10 text-left text-xs font-semibold uppercase tracking-wider opacity-60">
                   <th scope="col" className="py-2 pr-4">Mes</th>
                   <th scope="col" className="py-2 pr-4">Leads</th>
                   <th scope="col" className="py-2 pr-4">Reserves</th>
@@ -408,20 +408,20 @@ export default async function ReportingPage() {
 
         {/* Risk Leads */}
         {report.topRiskLeads.length > 0 && (
-          <section className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+          <section className="ap-card p-5">
             <h2 className="text-sm font-semibold">Leads en risc (Top 20)</h2>
             <div className="mt-3 space-y-2">
               {report.topRiskLeads.slice(0, 10).map((lead) => (
                 <div key={lead.id} className="flex items-center justify-between gap-3 rounded-lg border border-white/5 bg-white/[0.02] p-3">
                   <div>
                     <p className="text-xs font-semibold">{lead.name}</p>
-                    <p className="text-[10px] opacity-50">{lead.status} · {lead.source} · score {lead.score}</p>
+                    <p className="text-xs opacity-50">{lead.status} · {lead.source} · score {lead.score}</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="text-xs opacity-60">{currency(lead.weightedAmount)}</span>
                     <Link
                       href={buildLeadWorkspaceHref(lead.id)}
-                      className="rounded border border-white/10 px-2 py-0.5 text-[10px] hover:bg-white/10"
+                      className="rounded border border-white/10 px-2 py-0.5 text-xs hover:bg-white/10"
                     >
                       Obrir
                     </Link>

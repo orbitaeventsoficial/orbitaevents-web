@@ -65,10 +65,10 @@ export default async function CuadrantPage({ searchParams }: { searchParams: { d
             <Link
               key={w.days}
               href={`/admin/cuadrant?days=${w.days}`}
-              className={`rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-colors ${
+              className={`rounded-lg border px-2.5 py-1 text-xs font-semibold transition-colors ${
                 days === w.days
-                  ? 'border-cyan-500/40 bg-cyan-500/[0.12] text-cyan-200'
-                  : 'border-white/10 bg-white/[0.03] text-white/60 hover:bg-white/[0.06]'
+                  ? 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan'
+                  : 'border-[var(--line)] bg-[var(--panel)] text-white/60 adm-row-hover'
               }`}
             >
               {w.label}
@@ -77,7 +77,7 @@ export default async function CuadrantPage({ searchParams }: { searchParams: { d
         </div>
         <Link
           href="/admin/cuadrant/repartiment"
-          className="rounded-lg border border-amber-500/30 bg-amber-500/[0.08] px-3 py-1 text-[11px] font-semibold text-amber-200 hover:bg-amber-500/[0.14] transition-colors"
+          className="rounded-lg border admin-tone-border-warning admin-tone-bg-warning px-3 py-1 text-xs font-semibold admin-tone-text-warning hover:opacity-80 transition-opacity"
         >
           Repartiment de pasta →
         </Link>
@@ -85,13 +85,13 @@ export default async function CuadrantPage({ searchParams }: { searchParams: { d
 
       {/* Panell d'alertes de solapaments */}
       {overlapCount > 0 && (
-        <section className="mb-5 rounded-xl border border-rose-500/30 bg-rose-500/[0.07] p-3">
-          <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-rose-200">
+        <section className="mb-5 rounded-xl border admin-tone-border-danger admin-tone-bg-danger p-3">
+          <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider admin-tone-text-danger">
             ⚠ {overlapCount} {overlapCount === 1 ? 'solapament' : 'solapaments'}
           </h2>
           <ul className="space-y-1.5">
             {schedule.overlaps.map((o, i) => (
-              <li key={i} className="text-[11px] text-rose-100/90">
+              <li key={i} className="text-xs admin-tone-text-danger opacity-90">
                 <span className="font-semibold">{o.personName}</span> · {formatDateKey(o.dateKey)}:{' '}
                 <span className="opacity-80">{o.a.parentRef}</span> ({o.a.startLabel}–{o.a.endLabel}) xoca amb{' '}
                 <span className="opacity-80">{o.b.parentRef}</span> ({o.b.startLabel}–{o.b.endLabel})
@@ -103,7 +103,7 @@ export default async function CuadrantPage({ searchParams }: { searchParams: { d
 
       {/* Cuadrant per persona */}
       {schedule.people.length === 0 ? (
-        <p className="rounded-xl border border-white/10 bg-white/[0.03] p-6 text-center text-sm opacity-50">
+        <p className="ap-card p-6 text-center text-sm opacity-50">
           Cap assignació en aquesta finestra. Munta bolos amb data i serveis per veure'ls aquí.
         </p>
       ) : (
@@ -121,25 +121,25 @@ export default async function CuadrantPage({ searchParams }: { searchParams: { d
               <section
                 key={person.personKey}
                 className={`rounded-xl border p-3 ${
-                  person.isOwner ? 'border-cyan-500/25 bg-cyan-500/[0.04]' : 'border-white/10 bg-white/[0.03]'
+                  person.isOwner ? 'admin-tone-border-cyan admin-tone-bg-cyan' : 'border-[var(--line)] bg-[var(--panel)]'
                 }`}
               >
                 <div className="mb-2 flex items-center justify-between">
                   <h3 className="flex items-center gap-2 text-sm font-bold">
-                    <span className={`inline-block h-2 w-2 rounded-full ${person.isOwner ? 'bg-cyan-400' : 'bg-white/40'}`} />
+                    <span className={`inline-block h-2 w-2 rounded-full ${person.isOwner ? 'bg-[var(--o-info)]' : 'bg-white/40'}`} />
                     {person.personName}
-                    {person.isOwner && <span className="text-[10px] font-normal opacity-50">(tu)</span>}
+                    {person.isOwner && <span className="text-xs font-normal opacity-50">(tu)</span>}
                   </h3>
-                  <span className="text-[10px] opacity-50">
+                  <span className="text-xs opacity-50">
                     {person.assignments.length} {person.assignments.length === 1 ? 'feina' : 'feines'}
-                    {personOverlaps > 0 && <span className="ml-1 text-rose-300">· {personOverlaps} en conflicte</span>}
+                    {personOverlaps > 0 && <span className="ml-1 admin-tone-text-danger">· {personOverlaps} en conflicte</span>}
                   </span>
                 </div>
 
                 <div className="space-y-2">
                   {[...byDay.entries()].map(([dateKey, dayAssignments]) => (
                     <div key={dateKey} className="flex gap-2">
-                      <div className="w-10 flex-none pt-1 text-[11px] font-semibold tabular-nums opacity-60">
+                      <div className="w-10 flex-none pt-1 text-xs font-semibold tabular-nums opacity-60">
                         {formatDateKey(dateKey)}
                       </div>
                       <div className="flex-1 space-y-1">
@@ -147,8 +147,8 @@ export default async function CuadrantPage({ searchParams }: { searchParams: { d
                           <Link
                             key={a.lineId}
                             href={assignmentHref(a)}
-                            className={`block rounded-lg border px-2.5 py-1.5 text-[11px] transition-colors hover:bg-white/[0.08] ${
-                              a.overlaps ? 'border-rose-500/40 bg-rose-500/[0.06]' : 'border-white/10 bg-white/[0.04]'
+                            className={`block rounded-lg border px-2.5 py-1.5 text-xs transition-colors adm-row-hover ${
+                              a.overlaps ? 'admin-tone-border-danger admin-tone-bg-danger' : 'border-[var(--line)] bg-[var(--panel)]'
                             }`}
                           >
                             <div className="flex items-center justify-between gap-2">
@@ -158,12 +158,12 @@ export default async function CuadrantPage({ searchParams }: { searchParams: { d
                               </span>
                             </div>
                             <div className="flex items-center gap-2 opacity-55">
-                              <span className="rounded bg-white/10 px-1.5 text-[9px] font-semibold uppercase tracking-wide">
+                              <span className="rounded bg-white/10 px-1.5 text-xs font-semibold uppercase tracking-wide">
                                 {KIND_LABEL[a.kind]}
                               </span>
                               <span className="truncate">{a.label}</span>
                               {a.location && <span className="truncate opacity-70">· {a.location}</span>}
-                              {a.overlaps && <span className="flex-none font-semibold text-rose-300">⚠ conflicte</span>}
+                              {a.overlaps && <span className="flex-none font-semibold admin-tone-text-danger">⚠ conflicte</span>}
                             </div>
                           </Link>
                         ))}

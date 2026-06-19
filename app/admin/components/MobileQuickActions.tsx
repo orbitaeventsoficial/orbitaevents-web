@@ -31,7 +31,7 @@ export default function MobileQuickActions({
 
   return (
     <section className="md:hidden rounded-2xl border border-white/10 p-3 admin-card-glass">
-      <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.24em] opacity-60">
+      <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] opacity-60">
         Accions ràpides
       </p>
       <div className="grid grid-cols-2 gap-2">

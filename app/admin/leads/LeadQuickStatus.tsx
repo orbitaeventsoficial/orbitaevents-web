@@ -68,7 +68,7 @@ export default function LeadQuickStatus({
         value={currentStatus}
         onChange={(e) => onChange(e.target.value as LeadStatus)}
         disabled={saving}
-        className="rounded-xl border px-2 py-1 text-[11px]"
+        className="rounded-xl border px-2 py-1 text-xs"
         title="Canviar estat"
         aria-label="Canviar estat"
       >

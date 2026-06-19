@@ -159,7 +159,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
         void submit('lead');
       }}
     >
-      <fieldset className="rounded-xl border border-white/10 bg-black/20 p-5 space-y-3">
+      <fieldset className="ap-card p-5 space-y-3">
         <legend className="px-2 text-sm font-semibold">Client</legend>
         <div className="grid sm:grid-cols-2 gap-3">
           <label className="block text-sm">
@@ -203,7 +203,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
         </div>
       </fieldset>
 
-      <fieldset className="rounded-xl border border-white/10 bg-black/20 p-5 space-y-3">
+      <fieldset className="ap-card p-5 space-y-3">
         <legend className="px-2 text-sm font-semibold">Esdeveniment</legend>
         <div className="grid sm:grid-cols-2 gap-3">
           <label className="block text-sm">
@@ -306,11 +306,11 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="admin-tone-text-cyan font-semibold">Suggeriment automàtic</span>
-                    <span className="rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-0.5 text-[11px] uppercase tracking-wide admin-tone-text-cyan">
+                    <span className="rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-0.5 text-xs uppercase tracking-wide admin-tone-text-cyan">
                       Confiança {bestSuggestion ? getConfidenceLabel(bestSuggestion.confidence) : ''}
                     </span>
                     {form.packId === suggestedPack.id ? (
-                      <span className="rounded-full border admin-tone-border-success admin-tone-bg-success px-2 py-0.5 text-[11px] uppercase tracking-wide admin-tone-text-success">
+                      <span className="rounded-full border admin-tone-border-success admin-tone-bg-success px-2 py-0.5 text-xs uppercase tracking-wide admin-tone-text-success">
                         Aplicat
                       </span>
                     ) : null}
@@ -373,7 +373,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             type="button"
             onClick={() => void submit('lead')}
             disabled={submitting !== null}
-            className="rounded-lg border border-white/10 bg-black/30 px-4 py-3 text-sm font-medium hover:bg-white/5 disabled:opacity-60"
+            className="ap-btn ap-btn--secondary"
           >
             <div className="font-semibold">Només lead</div>
             <div className="text-xs text-white/60 mt-1">Captura inicial</div>

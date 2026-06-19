@@ -724,7 +724,7 @@ export default function AdminPrivacyPage() {
                             {c.customer?.email || c.email}
                           </p>
                         </div>
-                        <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-medium ${
+                        <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${
                           c.revokedAt ? 'admin-tone-bg-danger admin-tone-text-danger' : 'admin-tone-soft-success'
                         }`}>
                           {c.revokedAt ? 'Revocat' : 'Actiu'}
@@ -769,7 +769,7 @@ export default function AdminPrivacyPage() {
                     </thead>
                     <tbody className="divide-y admin-tone-border-subtle">
                       {consents.map((c) => (
-                        <tr key={c.id} className="transition-colors hover:bg-white/[0.03]">
+                        <tr key={c.id} className="transition-colors adm-row-hover">
                           <td className="px-4 py-3">
                             {c.customer ? (
                               <Link href={buildCustomerHubHref(c.customer.id)} className="hover:underline">
@@ -843,7 +843,7 @@ export default function AdminPrivacyPage() {
                 </thead>
                 <tbody className="divide-y admin-tone-border-subtle">
                   {auditLogs.map((log) => (
-                    <tr key={log.id} className="transition-colors hover:bg-white/[0.03]">
+                    <tr key={log.id} className="transition-colors adm-row-hover">
                       <td className="px-4 py-3">
                         <span className="text-sm font-medium">{PRIVACY_AUDIT_ACTION_LABELS[log.action] || log.action}</span>
                         {log.legalBasis && (

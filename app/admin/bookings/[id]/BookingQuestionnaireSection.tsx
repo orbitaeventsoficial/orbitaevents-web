@@ -18,19 +18,19 @@ export default async function BookingQuestionnaireSection({ bookingId }: { booki
       </div>
 
       {!data ? (
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+        <div className="ap-card p-4">
           <p className="text-sm text-white/50">Cap plantilla de qüestionari activa.</p>
           <Link
             href="/admin/questionnaires/new"
-            className="mt-2 inline-block text-cyan-400 hover:underline text-xs"
+            className="mt-2 inline-block admin-tone-text-cyan hover:underline text-xs"
           >
             Crear primera plantilla
           </Link>
         </div>
       ) : !data.response ? (
-        <div className="rounded-xl border border-amber-400/20 bg-amber-950/10 p-4">
+        <div className="rounded-xl border admin-tone-border-warning admin-tone-bg-warning p-4">
           <div className="flex items-center gap-2 mb-1">
-            <span className="inline-block w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+            <span className="inline-block w-2 h-2 rounded-full admin-tone-bg-warning shrink-0" />
             <p className="text-sm font-medium">Pendent de resposta</p>
           </div>
           <p className="text-xs text-white/50">
@@ -43,8 +43,8 @@ export default async function BookingQuestionnaireSection({ bookingId }: { booki
       ) : (
         <div>
           <div className="flex flex-wrap items-center gap-3 mb-4">
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-            <p className="text-sm font-medium text-emerald-300">Qüestionari completat</p>
+            <span className="inline-block w-2 h-2 rounded-full admin-tone-bg-success shrink-0" />
+            <p className="text-sm font-medium admin-tone-text-success">Qüestionari completat</p>
             {data.response.submittedAt && (
               <span className="text-xs text-white/40">
                 {formatDateSimple(data.response.submittedAt)}
@@ -58,7 +58,7 @@ export default async function BookingQuestionnaireSection({ bookingId }: { booki
                 ? answer.join(', ') || '—'
                 : (answer as string) || '—';
               return (
-                <div key={q.id} className="rounded-lg border border-white/10 bg-white/[0.02] p-3">
+                <div key={q.id} className="ap-card p-3">
                   <dt className="text-xs text-white/40 uppercase tracking-wide">{q.label}</dt>
                   <dd className="mt-1 text-sm text-white/85">{displayAnswer}</dd>
                 </div>

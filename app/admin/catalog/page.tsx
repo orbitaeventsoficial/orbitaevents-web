@@ -370,7 +370,7 @@ export default async function CatalogPage({
                           <p className="font-semibold">{pack.name}</p>
                           <p className="text-xs mt-0.5">{pack.slug} · {pack.service}</p>
                         </div>
-                        <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold ${pack.semaforo.badgeClass}`}>
+                        <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold ${pack.semaforo.badgeClass}`}>
                           <span className={`inline-block h-2 w-2 rounded-full ${pack.semaforo.dotClass}`} />
                           {pack.semaforo.label}
                         </span>
@@ -500,7 +500,7 @@ export default async function CatalogPage({
                             )}
                           </td>
                           <td className="px-3 py-2">
-                            <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold ${row.semaforo.badgeClass}`}>
+                            <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold ${row.semaforo.badgeClass}`}>
                               <span className={`inline-block h-2 w-2 rounded-full ${row.semaforo.dotClass}`} />
                               {row.semaforo.label}
                             </span>

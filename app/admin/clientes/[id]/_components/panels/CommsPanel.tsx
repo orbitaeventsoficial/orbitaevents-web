@@ -86,7 +86,7 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
             <p className="mt-1 text-sm font-semibold">{communicationSpine.stateLabel}</p>
             <p className="mt-1 text-xs opacity-75">{communicationSpine.detail}</p>
           </div>
-          <span className="rounded-full border px-2 py-1 text-[11px]">{communicationSpine.ownerLabel}</span>
+          <span className="rounded-full border px-2 py-1 text-xs">{communicationSpine.ownerLabel}</span>
         </div>
         <div className="mt-3 flex flex-wrap gap-2 text-xs">
           <Link href={communicationSpine.hubHref} className="rounded border px-2 py-1">
@@ -140,25 +140,25 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
       </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-xl border p-3">
-          <p className="text-[10px] uppercase tracking-wider opacity-60">Últim contacte</p>
+          <p className="text-xs uppercase tracking-wider opacity-60">Últim contacte</p>
           <p className="mt-1 text-sm font-semibold">
             {commSummary.lastContactAt ? formatDateTime(commSummary.lastContactAt) : 'Sense contacte'}
           </p>
         </article>
         <article className="rounded-xl border p-3">
-          <p className="text-[10px] uppercase tracking-wider opacity-60">Dies sense contacte</p>
+          <p className="text-xs uppercase tracking-wider opacity-60">Dies sense contacte</p>
           <p className="mt-1 text-sm font-semibold">
             {commSummary.daysSinceLastContact ?? '—'}
           </p>
         </article>
         <article className="rounded-xl border p-3">
-          <p className="text-[10px] uppercase tracking-wider opacity-60">Gap resposta</p>
+          <p className="text-xs uppercase tracking-wider opacity-60">Gap resposta</p>
           <p className="mt-1 text-sm font-semibold">
             {commSummary.responseGap != null ? `${commSummary.responseGap} h` : '—'}
           </p>
         </article>
         <article className="rounded-xl border p-3">
-          <p className="text-[10px] uppercase tracking-wider opacity-60">Volum comunicació</p>
+          <p className="text-xs uppercase tracking-wider opacity-60">Volum comunicació</p>
           <p className="mt-1 text-sm font-semibold">{commSummary.total}</p>
         </article>
       </div>
@@ -178,7 +178,7 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
                 {followUpSummary.total} pendent{followUpSummary.total > 1 ? 's' : ''} · {followUpSummary.urgent} urgent{followUpSummary.urgent > 1 ? 's' : ''}
               </p>
             </div>
-            <span className="rounded-full border px-2 py-1 text-[11px]">
+            <span className="rounded-full border px-2 py-1 text-xs">
               {followUpSummary.topItem.urgency} · {followUpSummary.topItem.daysSinceOutbound}d
             </span>
           </div>
@@ -245,10 +245,10 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
           <article key={message.id} className="rounded-xl border p-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-xs font-semibold">{formatMessageTitle(message.subject, message.channel)}</p>
-              <span className="rounded-full border px-2 py-0.5 text-[10px] opacity-70">{formatMessageChannel(message.channel)}</span>
+              <span className="rounded-full border px-2 py-0.5 text-xs opacity-70">{formatMessageChannel(message.channel)}</span>
             </div>
             {message.bodyPreview && <p className="mt-1 text-xs">{message.bodyPreview}</p>}
-            <p className="mt-1 text-[11px]">{formatDateTime(message.createdAt)}</p>
+            <p className="mt-1 text-xs">{formatDateTime(message.createdAt)}</p>
           </article>
         ))}
       </div>

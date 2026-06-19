@@ -213,7 +213,7 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
             </div>
           </div>
           {sizeInfo && (
-            <p className="text-[10px] text-center">{sizeInfo}</p>
+            <p className="text-xs text-center">{sizeInfo}</p>
           )}
         </div>
       ) : (
@@ -224,8 +224,8 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
           onClick={() => fileRef.current?.click()}
           className={`aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all ${
             dragActive
-              ? 'border-cyan-400 bg-cyan-500/10'
-              : 'border-white/10 bg-white/[0.02] hover:border-white/20'
+              ? 'admin-tone-border-info admin-tone-bg-info'
+              : 'border-[var(--line)] bg-[var(--panel)] hover:border-white/20'
           }`}
         >
           {uploading ? (
@@ -237,7 +237,7 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
             <>
               <span className="text-4xl mb-2">📷</span>
               <p className="text-sm">Arrossega una foto o fes clic</p>
-              <p className="text-[10px] mt-1">Qualsevol format · Auto-converteix a WebP</p>
+              <p className="text-xs mt-1">Qualsevol format · Auto-converteix a WebP</p>
             </>
           )}
         </div>

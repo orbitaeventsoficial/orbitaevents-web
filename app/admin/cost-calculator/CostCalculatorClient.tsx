@@ -270,7 +270,7 @@ export default function CostCalculatorClient() {
 
                     {/* Quantity */}
                     <div className="flex flex-col items-center gap-0.5">
-                      <label className="text-[10px] text-white/30 uppercase">{unit === 'km' ? 'Km' : 'Uds'}</label>
+                      <label className="text-xs text-white/30 uppercase">{unit === 'km' ? 'Km' : 'Uds'}</label>
                       <input
                         type="number" min={1} value={comp.quantity}
                         onChange={(e) => updateComponent(comp.id, 'quantity', Math.max(1, Number(e.target.value)))}
@@ -281,7 +281,7 @@ export default function CostCalculatorClient() {
                     {/* Hours (only for hora units) */}
                     {unit === 'hora' && (
                       <div className="flex flex-col items-center gap-0.5">
-                        <label className="text-[10px] text-white/30 uppercase">Hores</label>
+                        <label className="text-xs text-white/30 uppercase">Hores</label>
                         <input
                           type="number" min={1} value={comp.hours}
                           onChange={(e) => updateComponent(comp.id, 'hours', Math.max(1, Number(e.target.value)))}
@@ -292,7 +292,7 @@ export default function CostCalculatorClient() {
 
                     {/* Unit cost */}
                     <div className="flex flex-col items-center gap-0.5">
-                      <label className="text-[10px] text-white/30 uppercase">€/{unit}</label>
+                      <label className="text-xs text-white/30 uppercase">€/{unit}</label>
                       <input
                         type="number" min={0} step={0.01} value={comp.unitCost}
                         onChange={(e) => updateComponent(comp.id, 'unitCost', Math.max(0, Number(e.target.value)))}
@@ -325,7 +325,7 @@ export default function CostCalculatorClient() {
             <div className="grid md:grid-cols-4 gap-6 mb-6">
               <div>
                 <div className="text-xs admin-tone-text-slate mb-1">Cost total</div>
-                <div className="text-3xl font-black text-white">{totals.totalCost}€</div>
+                <div className="text-3xl font-bold text-white">{totals.totalCost}€</div>
               </div>
               <div>
                 <div className="text-xs admin-tone-text-slate mb-1">Marge</div>
@@ -340,11 +340,11 @@ export default function CostCalculatorClient() {
               </div>
               <div>
                 <div className="text-xs admin-tone-text-slate mb-1">Benefici</div>
-                <div className="text-3xl font-black">{totals.margin}€</div>
+                <div className="text-3xl font-bold">{totals.margin}€</div>
               </div>
               <div>
                 <div className="text-xs admin-tone-text-slate mb-1">Preu suggerit</div>
-                <div className="text-3xl font-black">{totals.suggestedPrice}€</div>
+                <div className="text-3xl font-bold">{totals.suggestedPrice}€</div>
               </div>
             </div>
 
@@ -363,7 +363,7 @@ export default function CostCalculatorClient() {
                 />
                 <button
                   onClick={handleSave} disabled={saving}
-                  className="px-6 py-2.5 rounded-xl text-black font-bold transition-colors disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-xl text-[var(--gold-ink)] font-bold transition-colors disabled:opacity-50"
                 >
                   {saving ? 'Desant...' : 'Desar pressupost'}
                 </button>

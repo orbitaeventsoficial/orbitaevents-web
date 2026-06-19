@@ -47,12 +47,12 @@ export default function PendingFollowUpsPanel() {
             <span>📬</span>
             <span>Seguiment pendent</span>
             {data.urgent > 0 && (
-              <span className="rounded-full bg-rose-500/20 px-2 py-0.5 text-[10px] text-rose-200">
+              <span className="rounded-full bg-rose-500/20 px-2 py-0.5 text-xs text-rose-200">
                 {data.urgent} urgent{data.urgent > 1 ? 's' : ''}
               </span>
             )}
           </h3>
-          <p className="mt-0.5 text-[11px] opacity-50">
+          <p className="mt-0.5 text-xs opacity-50">
             {data.total} lead{data.total > 1 ? 's' : ''} contactat{data.total > 1 ? 's' : ''} sense resposta
           </p>
         </div>
@@ -78,7 +78,7 @@ export default function PendingFollowUpsPanel() {
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${style.bg} ${style.text}`}>
+                  <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${style.bg} ${style.text}`}>
                     {style.label} · {item.daysSinceOutbound}d
                   </span>
                   <Link
@@ -87,14 +87,14 @@ export default function PendingFollowUpsPanel() {
                   >
                     {item.name}
                   </Link>
-                  <span className="text-[10px] opacity-50">{item.email}</span>
+                  <span className="text-xs opacity-50">{item.email}</span>
                 </div>
-                <p className="mt-1 text-[11px] opacity-60">{item.suggestedAction}</p>
+                <p className="mt-1 text-xs opacity-60">{item.suggestedAction}</p>
               </div>
               <div className="flex shrink-0 items-center gap-1.5">
                 <Link
                   href={composeHref}
-                  className="rounded border border-white/10 px-2 py-1 text-[10px] hover:bg-white/5"
+                  className="rounded border border-white/10 px-2 py-1 text-xs hover:bg-white/5"
                 >
                   ✉️ Email
                 </Link>
@@ -103,14 +103,14 @@ export default function PendingFollowUpsPanel() {
                     href={`https://wa.me/${item.phone.replace(/[^\d]/g, '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded border border-white/10 px-2 py-1 text-[10px] hover:bg-white/5"
+                    className="rounded border border-white/10 px-2 py-1 text-xs hover:bg-white/5"
                   >
                     💬 WhatsApp
                   </a>
                 )}
                 <Link
                   href={workspaceHref}
-                  className="rounded border border-white/10 px-2 py-1 text-[10px] hover:bg-white/5"
+                  className="rounded border border-white/10 px-2 py-1 text-xs hover:bg-white/5"
                 >
                   Obrir
                 </Link>
@@ -124,7 +124,7 @@ export default function PendingFollowUpsPanel() {
         <button
           onClick={() => setExpanded(!expanded)}
           type="button"
-          className="mt-2 w-full text-center text-[11px] opacity-50 hover:opacity-80 transition-opacity"
+          className="mt-2 w-full text-center text-xs opacity-50 hover:opacity-80 transition-opacity"
         >
           {expanded ? 'Mostrar menys' : `Veure tots (${data.total})`}
         </button>

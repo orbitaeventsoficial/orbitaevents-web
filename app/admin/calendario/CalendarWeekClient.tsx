@@ -265,7 +265,7 @@ export default function CalendarWeekClient() {
                   <button
                     type="button"
                     onClick={() => unblockDay(key)}
-                    className="rounded-lg border px-2 py-0.5 text-[10px] font-medium transition-colors"
+                    className="rounded-lg border px-2 py-0.5 text-xs font-medium transition-colors"
                   >
                     Desbloquejar
                   </button>
@@ -273,7 +273,7 @@ export default function CalendarWeekClient() {
                   <button
                     type="button"
                     onClick={() => setBlockingDate(blockingDate === key ? null : key)}
-                    className="rounded-lg border px-2 py-0.5 text-[10px] font-medium transition-colors admin-tone-idle"
+                    className="rounded-lg border px-2 py-0.5 text-xs font-medium transition-colors admin-tone-idle"
                   >
                     Bloquejar
                   </button>
@@ -294,14 +294,14 @@ export default function CalendarWeekClient() {
                     <button
                       type="button"
                       onClick={() => blockDay(key, blockNote)}
-                      className="flex-1 rounded-lg px-2 py-1 text-[10px] font-medium text-white"
+                      className="ap-btn ap-btn--primary ap-btn--xs flex-1 justify-center"
                     >
                       Confirmar
                     </button>
                     <button
                       type="button"
                       onClick={() => { setBlockingDate(null); setBlockNote(''); }}
-                      className="ap-btn ap-btn--secondary text-[10px]"
+                      className="ap-btn ap-btn--secondary text-xs"
                     >
                       No
                     </button>
@@ -331,7 +331,7 @@ export default function CalendarWeekClient() {
                     className="block rounded-xl border px-2.5 py-2 transition-all admin-card-glass admin-tone-soft-info"
                   >
                     <div className="truncate text-xs font-semibold">✓ {task.title}</div>
-                    <div className="mt-0.5 text-[10px] opacity-70">{resolveWorkTimeLabel(task.dueDate)} · {task.priority}</div>
+                    <div className="mt-0.5 text-xs opacity-70">{resolveWorkTimeLabel(task.dueDate)} · {task.priority}</div>
                   </Link>
                 ))}
                 {visibleLayers.social && dayData.socialPosts.map((post) => (
@@ -341,7 +341,7 @@ export default function CalendarWeekClient() {
                     className="block rounded-xl border px-2.5 py-2 transition-all admin-card-glass admin-tone-soft-warning"
                   >
                     <div className="truncate text-xs font-semibold">📣 {post.title}</div>
-                    <div className="mt-0.5 text-[10px] opacity-70">{resolveWorkTimeLabel(post.scheduledAt)} · {post.platforms.join(', ')}</div>
+                    <div className="mt-0.5 text-xs opacity-70">{resolveWorkTimeLabel(post.scheduledAt)} · {post.platforms.join(', ')}</div>
                   </Link>
                 ))}
                 {visibleLayers.followUps && dayData.followUps.map((item) => (
@@ -355,7 +355,7 @@ export default function CalendarWeekClient() {
                     className="block rounded-xl border border-rose-500/20 bg-rose-500/[0.05] px-2.5 py-2 transition-all"
                   >
                     <div className="truncate text-xs font-semibold">☎ {item.name}</div>
-                    <div className="mt-0.5 text-[10px] opacity-70">{item.urgency}</div>
+                    <div className="mt-0.5 text-xs opacity-70">{item.urgency}</div>
                   </Link>
                 ))}
                 {visibleLayers.leads && dayLeads.map((lead) => (
@@ -368,7 +368,7 @@ export default function CalendarWeekClient() {
                     className="block rounded-xl border px-2.5 py-2 transition-all admin-card-glass admin-tone-soft-info"
                   >
                     <div className="truncate text-xs font-semibold">Nova entrada · {lead.name}</div>
-                    <div className="mt-0.5 text-[10px] opacity-70">
+                    <div className="mt-0.5 text-xs opacity-70">
                       {lead.eventStartTime || '--:--'}{lead.eventEndTime ? ` - ${lead.eventEndTime}` : ''}
                       {lead.eventType ? ` · ${lead.eventType}` : ''}
                     </div>
@@ -385,17 +385,17 @@ export default function CalendarWeekClient() {
                         {r.clientName || 'Client'}
                       </span>
                       {r.estado && (
-                        <span className="rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase admin-tone-idle">
+                        <span className="rounded-full px-1.5 py-0.5 text-xs font-semibold uppercase admin-tone-idle">
                           {r.estado}
                         </span>
                       )}
                     </div>
                     {resolveTimeLabel(r) && (
-                      <div className="mt-0.5 text-[10px]">
+                      <div className="mt-0.5 text-xs">
                         {resolveTimeLabel(r)}
                       </div>
                     )}
-                    <div className="mt-0.5 truncate text-[10px]">
+                    <div className="mt-0.5 truncate text-xs">
                       {resolveServiceLabel(r)}
                       {r.ubicacion ? ` · ${r.ubicacion}` : ''}
                     </div>
@@ -412,7 +412,7 @@ export default function CalendarWeekClient() {
               <div className="mt-2 pt-2 border-t border-white/5 flex gap-1">
                 <Link
                   href={`/admin/bookings/new?date=${key}`}
-                  className="flex-1 rounded-lg border py-1 text-center text-[10px] font-medium transition-colors admin-tone-idle"
+                  className="flex-1 rounded-lg border py-1 text-center text-xs font-medium transition-colors admin-tone-idle"
                 >
                   + Reserva
                 </Link>

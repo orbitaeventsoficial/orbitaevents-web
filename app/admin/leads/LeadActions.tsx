@@ -128,7 +128,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
   return (
     <div className="flex flex-col items-end gap-1">
       {actionError && (
-        <div className="ap-card admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger flex items-center gap-2 px-2 py-1 text-[10px]" {...helpAttrs(ADMIN_ACTIONS_HELP.lead.error)}>
+        <div className="ap-card admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger flex items-center gap-2 px-2 py-1 text-xs" {...helpAttrs(ADMIN_ACTIONS_HELP.lead.error)}>
           <span>{actionError}</span>
           <button type="button" onClick={() => setActionError(null)} aria-label="Tancar error">✕</button>
         </div>

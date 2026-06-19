@@ -439,7 +439,7 @@ export default function LeadWorkspace({
               <div key={activity.id} className="ap-card p-3">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <div className="mb-1 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-wide admin-tone-text-neutral">
+                    <div className="mb-1 flex flex-wrap items-center gap-2 text-xs uppercase tracking-wide admin-tone-text-neutral">
                       <span>{activity.timeline?.source === 'leadActivity' ? 'Lead' : 'Activitat'}</span>
                       <span>·</span>
                       <span>{getActivityKindLabel(activity.timeline?.kind)}</span>

@@ -9,20 +9,24 @@
 .o-studio-root,
 .ax-root,
 .fx-root.is-contrast {
-  --o-bg:        #07090d;
-  --o-surface:   #0e1219;
-  --o-elev-1:    #141923;
-  --o-elev-2:    #1c2230;
-  --o-elev-3:    #252b3a;
+  /* Unificació monocapa (#1008): aquesta paleta era blau-slate (#0e1219/#1c2230/
+     #252b3a) i només la consumia studio.css → Studio es renderitzava blau mentre
+     l'admin usa carbó (--o-admin-*). Reapuntada al MATEIX carbó càlid de l'admin
+     perquè Studio sigui un mirall fidel: una sola paleta a tot el repo. */
+  --o-bg:        #0b0b0e;   /* = --o-admin-sunk */
+  --o-surface:   #111116;   /* = --o-admin-canvas */
+  --o-elev-1:    #161619;   /* = --o-admin-panel */
+  --o-elev-2:    #1e1f27;   /* = --o-admin-raised */
+  --o-elev-3:    #25252a;   /* = --o-admin-elevated */
 
-  --o-line:        rgba(255, 255, 255, 0.06);
-  --o-line-soft:   rgba(255, 255, 255, 0.03);
-  --o-line-strong: rgba(255, 255, 255, 0.12);
+  --o-line:        rgba(236, 233, 227, 0.06);
+  --o-line-soft:   rgba(236, 233, 227, 0.03);
+  --o-line-strong: rgba(236, 233, 227, 0.12);
 
-  --o-text:    #f5f7fa;
-  --o-text-2:  #a2acba;
-  --o-text-3:  #6b7585;
-  --o-text-4:  #4a525e;
+  --o-text:    #e4ded4;   /* = --o-admin-text (càlid, no #f5f7fa fred) */
+  --o-text-2:  #b6aea2;   /* = --o-admin-text-2 */
+  --o-text-3:  #9a9286;   /* = --o-admin-text-3 */
+  --o-text-4:  #6b6459;   /* càlid (era #4a525e fred) */
 
   --o-accent:        #d7b86e; /* or canònic de marca — únic accent de color */
   --o-accent-deep:   #b8923f;
@@ -178,7 +182,10 @@
   --o-admin-side:     #0f0f13;
   --o-admin-panel:    #161619;
   --o-admin-raised:   #1e1f27;
-  --o-admin-elevated: #252638;
+  /* #252638 era blau-slate (B=56 ≫ R=37): l'únic fons fora del to carbó de la
+     sèrie, tintava de blau la fitxa de reserva i tot el que usa --ax-elevated.
+     Corregit a carbó elevat coherent amb la progressió canvas→panel→raised. */
+  --o-admin-elevated: #25252a;
   --o-admin-sunk:     #0b0b0e;
 
   /* Línies i fills */
@@ -193,6 +200,12 @@
   --o-admin-fill-3: rgba(236, 233, 227, 0.06);
   --o-admin-fill-4: rgba(236, 233, 227, 0.08);
   --o-admin-fill-5: rgba(236, 233, 227, 0.12);
+
+  /* Hover canònic de fila/llista interactiva (font única — hipersemblança):
+     tota fila de taula o ítem de llista de l'admin ressalta IDÈNTIC via
+     `.adm-row-hover`. Abans cada pàgina feia `hover:bg-white/[0.0x]` amb
+     opacitats divergents (0.02–0.08). Valor mitjà de l'escala càlida. */
+  --o-admin-hover: var(--o-admin-fill-2);
 
   /* Gold semitransparent */
   --o-admin-gold-tint-1: rgba(215, 184, 110, 0.06);
@@ -234,10 +247,12 @@
   --o-admin-danger-strong:  rgba(226, 89, 106, 0.60);
   --o-admin-danger-text:    rgba(253, 192, 198, 0.92);
 
-  --o-admin-info-bg:        rgba(95, 183, 232, 0.07);
-  --o-admin-info-border:    rgba(95, 183, 232, 0.28);
-  --o-admin-info-strong:    rgba(95, 183, 232, 0.50);
-  --o-admin-info-text:      rgba(167, 218, 245, 0.92);
+  /* «Info» = neutre carbó (canon Òrbita: el blau no és superfície). Fons/vora
+     neutres com raised/line; es manté un text lleugerament fred només per matís. */
+  --o-admin-info-bg:        rgba(236, 233, 227, 0.05);
+  --o-admin-info-border:    rgba(236, 233, 227, 0.20);
+  --o-admin-info-strong:    rgba(236, 233, 227, 0.35);
+  --o-admin-info-text:      rgba(236, 233, 227, 0.82);
 
   /* VIP / purple */
   --o-admin-vip:      #a5b4fc;

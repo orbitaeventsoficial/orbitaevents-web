@@ -78,7 +78,7 @@ export default function PackPricingModelHistory({ entries }: { entries: PackHist
   }
 
   return (
-    <section className="rounded-2xl border border-white/10 p-5 shadow-sm">
+    <section className="ap-card p-5">
       <h2 className="text-lg font-semibold">Històric model econòmic packs</h2>
       <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         <label className="text-xs">
@@ -86,7 +86,7 @@ export default function PackPricingModelHistory({ entries }: { entries: PackHist
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value as 'ALL' | 'OWNER' | 'MANAGER' | 'VIEWER')}
-            className="mt-1 w-full rounded-md border px-2 py-1.5 text-xs"
+            className="adm-input mt-1 w-full text-xs"
           >
             <option value="ALL">Tots</option>
             <option value="OWNER">OWNER</option>
@@ -96,15 +96,15 @@ export default function PackPricingModelHistory({ entries }: { entries: PackHist
         </label>
         <label className="text-xs">
           Des de
-          <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="mt-1 w-full rounded-md border px-2 py-1.5 text-xs" />
+          <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="adm-input mt-1 w-full text-xs" />
         </label>
         <label className="text-xs">
           Fins a
-          <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="mt-1 w-full rounded-md border px-2 py-1.5 text-xs" />
+          <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="adm-input mt-1 w-full text-xs" />
         </label>
         <label className="text-xs">
           Cercar canvis
-          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="marge, operari, especialista..." className="mt-1 w-full rounded-md border px-2 py-1.5 text-xs" />
+          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="marge, operari, especialista..." className="adm-input mt-1 w-full text-xs" />
         </label>
       </div>
 
@@ -120,7 +120,7 @@ export default function PackPricingModelHistory({ entries }: { entries: PackHist
                   type="button"
                   onClick={() => restore(entry)}
                   disabled={restoringId === entry.id}
-                  className="rounded-md border border-white/10 px-2 py-1 text-xs font-semibold hover:bg-white/5 disabled:opacity-60"
+                  className="ap-btn ap-btn--xs"
                 >
                   {restoringId === entry.id ? 'Restaurant...' : 'Restaurar'}
                 </button>

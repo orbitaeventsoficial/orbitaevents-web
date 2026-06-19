@@ -120,7 +120,7 @@ export default function CTAFinal() {
                 trackWhatsAppClick('cta_final');
                 trackCTAClick('cta_final_whatsapp_primary', 'cta_final');
               }}
-              className="group relative inline-flex items-center justify-center gap-3 px-8 py-5 bg-[#25D366] rounded-2xl transition-all overflow-hidden hover:scale-[1.03] active:scale-[0.98]"
+              className="group relative inline-flex items-center justify-center gap-3 px-8 py-5 bg-[var(--oe-whatsapp)] rounded-2xl transition-all overflow-hidden hover:scale-[1.03] active:scale-[0.98]"
             >
               {/* Glow de fondo al hover */}
               <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

@@ -182,12 +182,12 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
   const dropzoneClasses = `
     relative flex cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed
     transition-colors
-    ${dragOver ? 'border-amber-400 bg-amber-500/10' : 'border-white/15 bg-black/20 hover:border-white/30'}
+    ${dragOver ? 'border-amber-400 bg-amber-500/10' : 'border-white/15 bg-[var(--sunk)] hover:border-white/30'}
     ${isCollection && hasItems ? 'h-28' : 'h-40'}
   `;
 
   return (
-    <article className="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
+    <article className="rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-5">
       <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
         <div>
           <h2 className="text-lg font-bold text-white">{placement.label}</h2>
@@ -214,7 +214,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
       {isCollection && hasItems && (
         <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {items.map((item, idx) => (
-            <div key={item.id} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/20">
+            <div key={item.id} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[var(--sunk)]">
               <div className="relative h-32">
                 <Image
                   src={item.src}
@@ -270,7 +270,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
 
       {!isCollection && hasItems && (
         <div className="mb-4 grid gap-4 lg:grid-cols-[180px_1fr]">
-          <div className="relative h-40 overflow-hidden rounded-2xl border border-white/10 bg-black/20">
+          <div className="relative h-40 overflow-hidden rounded-2xl border border-white/10 bg-[var(--sunk)]">
             <Image
               src={items[0].src}
               alt={items[0].alt || placement.label}
@@ -299,7 +299,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
                 <input
                   defaultValue={items[0].alt || ''}
                   placeholder="Text alternatiu"
-                  className="flex-1 rounded-2xl border border-white/10 bg-black/20 px-4 py-2.5 text-sm text-white outline-none placeholder:text-white/35"
+                  className="flex-1 rounded-2xl border border-white/10 bg-[var(--sunk)] px-4 py-2.5 text-sm text-white outline-none placeholder:text-white/35"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       handleSaveAlt(items[0].id, (e.target as HTMLInputElement).value);
@@ -371,7 +371,7 @@ function AltEditor({ initial, onSave, onCancel }: { initial: string; onSave: (v:
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="Alt text"
-        className="flex-1 rounded-lg border border-white/10 bg-black/30 px-2 py-1 text-xs text-white outline-none placeholder:text-white/30"
+        className="flex-1 rounded-lg border border-white/10 bg-[var(--sunk)] px-2 py-1 text-xs text-white outline-none placeholder:text-white/30"
         autoFocus
         onKeyDown={(e) => {
           if (e.key === 'Enter') onSave(value);

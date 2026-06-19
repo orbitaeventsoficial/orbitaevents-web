@@ -252,7 +252,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
   ];
 
   return (
-    <div className="bd__root" style={{ minHeight: '100vh', background: '#000' }}>
+    <div className="bd__root">
 
       {/* ── HEADER ── */}
       <div className="ap-sticky-header">

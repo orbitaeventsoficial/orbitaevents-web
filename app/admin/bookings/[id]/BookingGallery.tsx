@@ -214,7 +214,7 @@ export default function BookingGallery({ bookingId }: Props) {
           {photos.map((photo) => (
             <div key={photo.id} className={`group relative aspect-square rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${selectedId === photo.id ? 'admin-tone-border-info admin-tone-bg-info' : 'admin-tone-border-neutral hover:admin-tone-border-slate'}`} onClick={() => setSelectedId(selectedId === photo.id ? null : photo.id)} {...helpAttrs(ADMIN_BOOKING_HELP.gallery.photo)}>
               <Image src={photo.photoUrl} alt={photo.caption || 'Foto event'} fill className="object-cover" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" />
-              <div className="absolute top-2 left-2 flex gap-1">{photo.isPortal && <span className="ap-badge ap-badge--info text-[9px]">Portal</span>}{photo.isPortfolio && <span className="ap-badge text-[9px]">Portfolio</span>}</div>
+              <div className="absolute top-2 left-2 flex gap-1">{photo.isPortal && <span className="ap-badge ap-badge--info text-xs">Portal</span>}{photo.isPortfolio && <span className="ap-badge text-xs">Portfolio</span>}</div>
               <button type="button" onClick={(e) => { e.stopPropagation(); deletePhoto(photo.id); }} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-red-600/80 text-white rounded-full p-1.5 transition-opacity min-h-[32px] min-w-[32px] flex items-center justify-center" title={ADMIN_BOOKING_HELP.gallery.delete.title} aria-label={ADMIN_BOOKING_HELP.gallery.delete.title} {...helpAttrs(ADMIN_BOOKING_HELP.gallery.delete)}>
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
@@ -253,13 +253,13 @@ export default function BookingGallery({ bookingId }: Props) {
           <label className="flex items-center justify-between gap-3" {...helpAttrs(ADMIN_BOOKING_HELP.gallery.portal)}>
             <span className="text-sm">Visible al portal client</span>
             <button type="button" role="switch" aria-checked={selected.isPortal} onClick={() => toggleFlag(selected, 'isPortal')} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${selected.isPortal ? 'admin-tone-bg-info' : 'admin-tone-bg-neutral'}`}>
-              <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${selected.isPortal ? 'translate-x-6' : 'translate-x-1'}`} />
+              <span className={`inline-block h-4 w-4 rounded-full bg-[var(--o-admin-light)] transition-transform ${selected.isPortal ? 'translate-x-6' : 'translate-x-1'}`} />
             </button>
           </label>
           <label className="flex items-center justify-between gap-3" {...helpAttrs(ADMIN_BOOKING_HELP.gallery.portfolio)}>
             <span className="text-sm">Visible al portfolio públic</span>
             <button type="button" role="switch" aria-checked={selected.isPortfolio} onClick={() => { if (!selected.isPortfolio) { toggleFlag(selected, 'isPortfolio', selected.portfolioSlug || BOOKING_GALLERY_PORTFOLIO_CATEGORIES[0].slug); } else { toggleFlag(selected, 'isPortfolio'); } }} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${selected.isPortfolio ? 'admin-tone-bg-violet' : 'admin-tone-bg-neutral'}`}>
-              <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${selected.isPortfolio ? 'translate-x-6' : 'translate-x-1'}`} />
+              <span className={`inline-block h-4 w-4 rounded-full bg-[var(--o-admin-light)] transition-transform ${selected.isPortfolio ? 'translate-x-6' : 'translate-x-1'}`} />
             </button>
           </label>
           {selected.isPortfolio && (

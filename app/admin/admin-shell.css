@@ -43,6 +43,17 @@ html.admin-mode [class*="text-[11.8px]"] {
 
 /* text-xs (0.75rem = 12px) és el mínim acceptable — no s'escala */
 
+/* ── Radis normalitzats: HIPERSEMBLANÇA entre pàgines («sèrie, mateix dissenyador»).
+   El repo tenia radis dispersos (rounded-xl 12px / 2xl 16px / 3xl 24px barrejats).
+   Aquesta capa única els convergeix al radi de card canònic (--o-r-md, 10px) perquè
+   totes les superfícies de l'admin tinguin EL MATEIX radi. Una veritat, un CSS.
+   Els rounded-full (pills/avatars) i rounded-sm/md (chips/barres) NO es toquen.  ── */
+html.admin-mode [class*="rounded-xl"]:not([class*="rounded-full"]),
+html.admin-mode [class*="rounded-2xl"],
+html.admin-mode [class*="rounded-3xl"] {
+  border-radius: var(--o-r-md);
+}
+
 .ax-root *, .ax-root *::before, .ax-root *::after { box-sizing: border-box; }
 
 /* ── Esquelet de l'app ────────────────────────────────────────────────────── */
@@ -327,8 +338,8 @@ html.admin-mode .cdh__meta {
   border-right: 1px solid var(--ax-line);
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, var(--ax-side) 98%, #000),
-    color-mix(in oklab, var(--ax-canvas) 96%, #000)
+    color-mix(in oklab, var(--ax-side) 98%, var(--o-admin-ink)),
+    color-mix(in oklab, var(--ax-canvas) 96%, var(--o-admin-ink))
   );
   box-shadow: 18px 0 48px -42px rgba(0, 0, 0, 0.96);
 }
@@ -611,14 +622,15 @@ html.admin-mode .ap-detail-bar-btn:hover {
   color: rgba(255,255,255,0.9);
   border-color: rgba(255,255,255,0.28);
 }
+/* #1014: era blau cyan (rgba 95,183,232) — fora del canon. Accent d'acció = OR. */
 html.admin-mode .ap-detail-bar-btn--accent {
-  border-color: rgba(95,183,232,0.3);
-  background: rgba(95,183,232,0.08);
-  color: var(--o-info, #5fb7e8);
+  border-color: var(--ax-hair-gold);
+  background: color-mix(in oklab, var(--ax-gold) 8%, transparent);
+  color: var(--ax-gold);
 }
 html.admin-mode .ap-detail-bar-btn--accent:hover {
-  background: rgba(95,183,232,0.14);
-  color: var(--o-info, #5fb7e8);
+  background: color-mix(in oklab, var(--ax-gold) 14%, transparent);
+  color: var(--ax-gold);
 }
 
 /* Alias per backward compat */
@@ -777,7 +789,11 @@ html.admin-mode .ap-detail-secbtn--on {
    Ara viu a la capa compartida (admin-shell, sempre carregada via layout).
    `.ix__forminput` es manté com a àlies perquè els consumidors existents
    funcionin sense tocar-los; NOU codi ha d'usar `.adm-input`. */
+/* `.ap-input` (104 usos a l'admin) NO estava definida → els inputs queien al fons
+   gris/blanc per defecte del navegador, desentonant del carbó. S'afegeix com a àlies
+   del canònic perquè tot el repo consumeixi el mateix input de la sèrie (monocapa). */
 html.admin-mode .adm-input,
+html.admin-mode .ap-input,
 html.admin-mode .ix__forminput {
   width: 100%;
   border: 1px solid var(--ax-line);
@@ -792,4 +808,31 @@ html.admin-mode .ix__forminput {
 html.admin-mode .adm-input--textarea,
 html.admin-mode .ix__forminput--textarea { resize: vertical; line-height: 1.6; }
 html.admin-mode .adm-input:focus,
+html.admin-mode .ap-input:focus,
 html.admin-mode .ix__forminput:focus { outline: none; border-color: var(--ax-hair-gold); }
+
+/* ── Hover canònic de fila/ítem interactiu (font única — hipersemblança):
+   tota fila de taula, ítem de llista o card clicable de l'admin ressalta
+   IDÈNTIC. Substitueix els `hover:bg-white/[0.0x]` dispersos amb opacitats
+   divergents. Consumeix `--o-admin-hover`. ────────────────────────────────── */
+html.admin-mode .adm-row-hover { transition: background-color .15s ease; }
+html.admin-mode .adm-row-hover:hover { background: var(--o-admin-hover); }
+
+/* ── Selector segmentat d'economia — estil canònic de Cristina (`.fx__view`):
+   actiu = NEUTRE carbó elevat (no or, no blanc), idle = text apagat. Abans
+   `admin-economia-tab--active/--idle` no existien → la pestanya activa sortia
+   blanc absolut. ───────────────────────────────────────────────────────────── */
+html.admin-mode .admin-economia-tab {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ax-t3);
+}
+html.admin-mode .admin-economia-tab--idle:hover {
+  color: var(--ax-t);
+  background: color-mix(in oklab, var(--ax-t) 4%, transparent);
+}
+html.admin-mode .admin-economia-tab--active {
+  background: var(--ax-raised);
+  color: var(--ax-t);
+  box-shadow: inset 0 0 0 1px var(--ax-line2);
+}

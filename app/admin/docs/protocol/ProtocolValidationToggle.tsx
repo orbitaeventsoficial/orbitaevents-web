@@ -62,10 +62,10 @@ export default function ProtocolValidationToggle({
   };
 
   return (
-    <section className={`mt-3 rounded-xl border p-3 ${isValidated ? 'border-emerald-500/20 bg-emerald-500/[0.05]' : 'border-white/10 bg-white/[0.03]'}`}>
+    <section className={`mt-3 rounded-xl border p-3 ${isValidated ? 'border-emerald-500/20 bg-emerald-500/[0.05]' : 'border-[var(--line)] bg-[var(--panel)]'}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wider opacity-60">Validació humana</p>
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Validació humana</p>
           {validation ? (
             <p className="text-sm text-emerald-200">
               Validat per {validation.validatedBy} · {formatDateTimeFull(validation.validatedAt)}
@@ -85,14 +85,14 @@ export default function ProtocolValidationToggle({
       </div>
 
       <label className="mt-3 block">
-        <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wider opacity-60">Nota curta</span>
+        <span className="mb-1 block text-xs font-semibold uppercase tracking-wider opacity-60">Nota curta</span>
         <textarea
           value={note}
           onChange={(event) => setNote(event.target.value)}
           rows={2}
           maxLength={500}
           placeholder="Ex.: revisat en mòbil, CTA clar, flux entenedor, text OK..."
-          className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm placeholder:text-white/35"
+          className="w-full rounded-xl border border-white/10 bg-[var(--sunk)] px-3 py-2 text-sm placeholder:text-white/35"
         />
       </label>
 

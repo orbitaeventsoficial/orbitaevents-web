@@ -122,7 +122,7 @@ export function ContactDesktop() {
                   className="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-zinc-900 border border-white/10 rounded-lg px-4 py-2 whitespace-nowrap pointer-events-none"
                 >
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="w-2 h-2 bg-[#25D366] rounded-full animate-pulse" />
+                    <span className="w-2 h-2 bg-[var(--oe-whatsapp)] rounded-full animate-pulse" />
                     <span className="text-white/80">
                       {businessHours ? t('floatingCTA.responseTime') : t(getOffHoursKey())}
                     </span>
@@ -150,9 +150,9 @@ export function ContactDesktop() {
             >
               {/* Pulse ring — solo en horario de atención */}
               {businessHours && (
-                <span className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-30" />
+                <span className="absolute inset-0 rounded-full bg-[var(--oe-whatsapp)] animate-ping opacity-30" />
               )}
-              <div className="relative w-14 h-14 bg-[#25D366] hover:bg-[#20BA5A] rounded-full flex items-center justify-center shadow-lg shadow-[#25D366]/30 group-hover:shadow-[#25D366]/50 group-hover:scale-110 transition-all duration-300">
+              <div className="relative w-14 h-14 bg-[var(--oe-whatsapp)] hover:bg-[var(--oe-whatsapp-strong)] rounded-full flex items-center justify-center shadow-lg shadow-[rgba(var(--oe-whatsapp-rgb),0.3)] group-hover:shadow-[rgba(var(--oe-whatsapp-rgb),0.5)] group-hover:scale-110 transition-all duration-300">
                 <WhatsAppIcon className="w-7 h-7 text-white" />
               </div>
             </a>
@@ -275,7 +275,7 @@ export function BottomBarMobile() {
                       'floating_cta_mobile'
                     );
                   }}
-                  className="flex-1 bg-[#25D366] hover:bg-[#20BA5A] text-white font-bold py-3.5 rounded-xl text-center active:scale-[0.98] transition-transform flex items-center justify-center gap-2 shadow-lg shadow-[#25D366]/25"
+                  className="flex-1 bg-[var(--oe-whatsapp)] hover:bg-[var(--oe-whatsapp-strong)] text-white font-bold py-3.5 rounded-xl text-center active:scale-[0.98] transition-transform flex items-center justify-center gap-2 shadow-lg shadow-[rgba(var(--oe-whatsapp-rgb),0.25)]"
                 >
                   <WhatsAppIcon className="w-5 h-5 shrink-0" />
                   {t('buttons.whatsapp')}

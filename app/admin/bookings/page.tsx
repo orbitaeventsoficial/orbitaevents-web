@@ -390,9 +390,9 @@ export default async function BookingsPage({
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <Link href={buildBookingHref(booking.id)}>
-                        <code className="text-[10px] font-mono px-1.5 py-0.5 rounded">{booking.reference}</code>
+                        <code className="text-xs font-mono px-1.5 py-0.5 rounded">{booking.reference}</code>
                       </Link>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${statusConf.bg} ${statusConf.text}`}>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusConf.bg} ${statusConf.text}`}>
                         {statusConf.label}
                       </span>
                     </div>
@@ -410,7 +410,7 @@ export default async function BookingsPage({
                   </div>
                   <div className="text-right shrink-0">
                     <p className="font-bold">{formatCurrency(booking.total)}</p>
-                    <span className={`inline-flex items-center gap-1 text-[10px] font-medium mt-0.5 ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-text-success' : booking.depositPaid ? 'admin-tone-text-warning' : 'admin-tone-text-danger'}`}>
+                    <span className={`inline-flex items-center gap-1 text-xs font-medium mt-0.5 ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-text-success' : booking.depositPaid ? 'admin-tone-text-warning' : 'admin-tone-text-danger'}`}>
                       <span className={`inline-block h-1.5 w-1.5 rounded-full ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-bg-success' : booking.depositPaid ? 'admin-tone-bg-warning' : 'admin-tone-bg-danger'}`} />
                       {booking.depositPaid && booking.remainingPaid ? 'Pagat' : booking.depositPaid ? 'Parcial' : 'Pendent'}
                     </span>
@@ -430,7 +430,7 @@ export default async function BookingsPage({
                       );
                       const tone = getMarginTone(marginPct);
                       return (
-                        <span className={`inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[10px] font-semibold mt-1 ${tone.bg} ${tone.color}`}>
+                        <span className={`inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-xs font-semibold mt-1 ${tone.bg} ${tone.color}`}>
                           {marginPct.toFixed(0)}% marge
                         </span>
                       );
@@ -440,7 +440,7 @@ export default async function BookingsPage({
                 <div className="mt-3 pt-3 border-t flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
                     <span className="">{eventType}</span>
-                    <span className="px-1.5 py-0.5 rounded text-[10px] font-medium">
+                    <span className="px-1.5 py-0.5 rounded text-xs font-medium">
                       {getTranslatedPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale)}
                     </span>
                   </div>
@@ -449,7 +449,7 @@ export default async function BookingsPage({
                     {!isPast && booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED' && (() => {
                       const d = Math.ceil((new Date(booking.eventDate).getTime() - Date.now()) / 864e5);
                       return (
-                        <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${
+                        <span className={`rounded-full px-1.5 py-0.5 text-xs font-semibold ${
                           d === 0 ? 'admin-tone-soft-info' : d <= 7 ? 'admin-tone-bg-warning admin-tone-text-warning' : 'admin-tone-bg-neutral admin-tone-text-neutral'
                         }`}>
                           {d === 0 ? 'AVUI' : `${d}d`}
@@ -527,7 +527,7 @@ export default async function BookingsPage({
                         {!isPast && booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED' && (() => {
                           const d = Math.ceil((new Date(booking.eventDate).getTime() - Date.now()) / 864e5);
                           return (
-                            <span className={`ml-1 inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
+                            <span className={`ml-1 inline-flex rounded-full px-1.5 py-0.5 text-xs font-semibold ${
                               d === 0 ? 'admin-tone-soft-info' : d <= 7 ? 'admin-tone-bg-warning admin-tone-text-warning' : 'opacity-40'
                             }`}>
                               {d === 0 ? 'AVUI' : `${d}d`}
@@ -543,7 +543,7 @@ export default async function BookingsPage({
                       </td>
                       <td className="px-3 py-2.5">
                         <div className="max-w-[7rem] truncate text-sm font-bold tabular-nums whitespace-nowrap">{formatCurrency(booking.total)}</div>
-                        <span className={`inline-flex items-center gap-1 text-[10px] mt-0.5 ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-text-success' : booking.depositPaid ? 'admin-tone-text-warning' : 'admin-tone-text-danger'}`}>
+                        <span className={`inline-flex items-center gap-1 text-xs mt-0.5 ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-text-success' : booking.depositPaid ? 'admin-tone-text-warning' : 'admin-tone-text-danger'}`}>
                           <span className={`inline-block h-1.5 w-1.5 rounded-full ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-bg-success' : booking.depositPaid ? 'admin-tone-bg-warning' : 'admin-tone-bg-danger'}`} />
                           {booking.depositPaid && booking.remainingPaid ? 'Pagat' : booking.depositPaid ? 'Parcial' : 'Pendent'}
                         </span>

@@ -146,9 +146,9 @@ export default async function EditPackPage({ params }: { params: Promise<{ id: s
                   <span className="text-xs opacity-60">{formatDateSimple(b.eventDate)}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`rounded-full px-2 py-0.5 text-[10px] ${
+                  <span className={`rounded-full px-2 py-0.5 text-xs ${
                     b.status === 'COMPLETED' ? 'bg-emerald-500/20 text-emerald-400' :
-                    b.status === 'CONFIRMED' ? 'bg-blue-500/20 text-blue-400' :
+                    b.status === 'CONFIRMED' ? 'admin-tone-bg-info admin-tone-text-info' :
                     b.status === 'CANCELLED' ? 'bg-red-500/20 text-red-400' :
                     'bg-amber-500/20 text-amber-400'
                   }`}>

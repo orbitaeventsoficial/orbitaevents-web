@@ -199,7 +199,7 @@ export default function FaqEditorForm({
           type="button"
           onClick={onSubmit}
           disabled={saving || !canSubmit}
-          className="rounded-xl px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+          className="ap-btn ap-btn--primary"
         >
           {saving ? 'Desant...' : mode === 'create' ? 'Crear FAQ' : 'Desar canvis'}
         </button>

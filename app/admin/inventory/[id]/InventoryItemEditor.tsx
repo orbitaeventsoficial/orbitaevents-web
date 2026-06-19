@@ -197,7 +197,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
 
   return (
     <div className="space-y-4">
-      <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+      <section className="rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-5 sm:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
@@ -227,16 +227,16 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[28rem]">
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-              <p className="text-[11px] uppercase tracking-wide text-white/45">Categoria</p>
+            <div className="ap-card p-4">
+              <p className="text-xs uppercase tracking-wide text-white/45">Categoria</p>
               <p className="mt-2 text-sm font-semibold text-white">{categoryMeta ? `${categoryMeta.icon} ${categoryMeta.label}` : form.category}</p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-              <p className="text-[11px] uppercase tracking-wide text-white/45">Valor actual</p>
+            <div className="ap-card p-4">
+              <p className="text-xs uppercase tracking-wide text-white/45">Valor actual</p>
               <p className="mt-2 text-sm font-semibold text-white">{currentValue > 0 ? formatEuro(currentValue) : 'Per definir'}</p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-              <p className="text-[11px] uppercase tracking-wide text-white/45">{form.isConsumable ? 'Estoc' : 'Cost/hora'}</p>
+            <div className="ap-card p-4">
+              <p className="text-xs uppercase tracking-wide text-white/45">{form.isConsumable ? 'Estoc' : 'Cost/hora'}</p>
               <p className="mt-2 text-sm font-semibold text-white">
                 {form.isConsumable ? stockSummary : hourlyCost > 0 ? `${hourlyCost.toFixed(2)}€/h` : 'Sense amortització'}
               </p>
@@ -258,14 +258,14 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(18rem,0.85fr)]">
         <div className="space-y-4">
-          <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 space-y-4">
+          <section className="ap-card p-5 space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-sm font-semibold text-white">{mode === 'create' ? 'Identitat de l’element' : 'Dades principals'}</h2>
                 <p className="mt-1 text-xs text-white/55">Això és el que consumirà la resta del sistema quan aquest material entri a packs o càlculs.</p>
               </div>
               {categoryMeta && (
-                <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/70">
+                <span className="inline-flex items-center rounded-full border border-[var(--line)] bg-[var(--panel)] px-3 py-1 text-xs text-white/70">
                   {categoryMeta.icon} {categoryMeta.label}
                 </span>
               )}
@@ -290,7 +290,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
                       key={status.value}
                       type="button"
                       onClick={() => updateField('status', status.value)}
-                      className={`rounded-xl border px-2 py-1.5 text-[10px] font-medium transition-all ${
+                      className={`rounded-xl border px-2 py-1.5 text-xs font-medium transition-all ${
                         form.status === status.value
                           ? 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan'
                           : 'border-white/10 text-white/40 hover:bg-white/5'
@@ -338,7 +338,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
                       key={condition.value}
                       type="button"
                       onClick={() => updateField('condition', condition.value)}
-                      className={`flex-1 rounded-xl border px-2 py-1.5 text-[10px] font-medium transition-all ${
+                      className={`flex-1 rounded-xl border px-2 py-1.5 text-xs font-medium transition-all ${
                         form.condition === condition.value
                           ? 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan'
                           : 'border-white/10 text-white/40 hover:bg-white/5'
@@ -377,13 +377,13 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
             </div>
           </section>
 
-          <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 space-y-4">
+          <section className="ap-card p-5 space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-sm font-semibold text-white">Estoc i consum</h2>
                 <p className="mt-1 text-xs text-white/55">Només activa aquesta part quan realment controles unitats fungibles o reposició.</p>
               </div>
-              <label className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white/85">
+              <label className="flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--panel)] px-3 py-2 text-sm text-white/85">
                 <input
                   type="checkbox"
                   checked={form.isConsumable}
@@ -420,13 +420,13 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
                 </div>
               </div>
             ) : (
-              <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-4 text-sm text-white/60">
+              <div className="rounded-2xl border border-dashed border-[var(--line)] bg-[var(--panel)] p-4 text-sm text-white/60">
                 Aquest element no es controla per estoc. Si és reposició, consumible o material fungible, activa el toggle.
               </div>
             )}
           </section>
 
-          <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 space-y-4">
+          <section className="ap-card p-5 space-y-4">
             <div>
               <h2 className="text-sm font-semibold text-white">Amortització i cost</h2>
               <p className="mt-1 text-xs text-white/55">La compra i la vida útil defineixen el cost/hora que després llegeixen els packs.</p>
@@ -468,7 +468,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
             </div>
           </section>
 
-          <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+          <section className="ap-card p-5">
             <label htmlFor="inv-notes" className="text-xs">Notes internes</label>
             <textarea
               id="inv-notes"
@@ -481,16 +481,16 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
         </div>
 
         <aside className="space-y-4">
-          <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+          <section className="ap-card p-5">
             <h2 className="text-sm font-semibold text-white">Lectura ràpida</h2>
             <div className="mt-4 space-y-3">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-                <p className="text-[11px] uppercase tracking-wide text-white/45">Cost per hora estimat</p>
+              <div className="ap-card p-4">
+                <p className="text-xs uppercase tracking-wide text-white/45">Cost per hora estimat</p>
                 <p className="mt-2 text-lg font-semibold text-white">{hourlyCost > 0 ? `${hourlyCost.toFixed(2)}€/h` : 'No calculable'}</p>
                 <p className="mt-1 text-xs text-white/55">Compra ÷ vida útil. Si queda buit, el marge dels packs serà menys fiable.</p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-                <p className="text-[11px] uppercase tracking-wide text-white/45">Consum i estoc</p>
+              <div className="ap-card p-4">
+                <p className="text-xs uppercase tracking-wide text-white/45">Consum i estoc</p>
                 <p className="mt-2 text-lg font-semibold text-white">{stockSummary}</p>
                 <p className="mt-1 text-xs text-white/55">
                   {form.isConsumable
@@ -498,8 +498,8 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
                     : 'Sense control d’estoc perquè aquest element no és consumible.'}
                 </p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-                <p className="text-[11px] uppercase tracking-wide text-white/45">Categoria i estat</p>
+              <div className="ap-card p-4">
+                <p className="text-xs uppercase tracking-wide text-white/45">Categoria i estat</p>
                 <p className="mt-2 text-sm font-semibold text-white">{categoryMeta ? `${categoryMeta.icon} ${categoryMeta.label}` : form.category}</p>
                 <p className="mt-1 text-xs text-white/55">
                   {statusMeta?.label || form.status} · {conditionMeta?.label || form.condition}
@@ -508,7 +508,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
             </div>
           </section>
 
-          <section className="rounded-2xl border admin-tone-border-cyan admin-tone-bg-cyanp-5">
+          <section className="rounded-2xl border admin-tone-border-cyan admin-tone-bg-info p-5">
             <h2 className="text-sm font-semibold text-white">Checklist d’edició</h2>
             <ul className="mt-3 space-y-2 text-sm text-white/75">
               <li>Nom i descripció prou clars per identificar el material sense obrir cap altra pantalla.</li>

@@ -374,7 +374,7 @@ export default function CanvasEditorClient() {
       width: el.width * scale,
       height: el.height * scale,
       cursor: dragging?.id === el.id ? 'grabbing' : 'grab',
-      outline: isSelected ? '2px solid #06b6d4' : 'none',
+      outline: isSelected ? '2px solid var(--gold)' : 'none',
       outlineOffset: 2,
       zIndex: isSelected ? 50 : undefined,
     };
@@ -404,7 +404,7 @@ export default function CanvasEditorClient() {
           {el.text}
           {isSelected && (
             <div
-              style={{ position: 'absolute', right: -4, bottom: -4, width: 10, height: 10, background: '#06b6d4', cursor: 'nwse-resize', borderRadius: 2 }}
+              style={{ position: 'absolute', right: -4, bottom: -4, width: 10, height: 10, background: 'var(--gold)', cursor: 'nwse-resize', borderRadius: 2 }}
               onPointerDown={e => handleResizeStart(e, el.id)}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
@@ -429,7 +429,7 @@ export default function CanvasEditorClient() {
         >
           {isSelected && (
             <div
-              style={{ position: 'absolute', right: -4, bottom: -4, width: 10, height: 10, background: '#06b6d4', cursor: 'nwse-resize', borderRadius: 2 }}
+              style={{ position: 'absolute', right: -4, bottom: -4, width: 10, height: 10, background: 'var(--gold)', cursor: 'nwse-resize', borderRadius: 2 }}
               onPointerDown={e => handleResizeStart(e, el.id)}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
@@ -514,7 +514,7 @@ export default function CanvasEditorClient() {
                 className="rounded-xl border px-3 py-2 text-left text-xs transition-colors admin-tone-idle"
               >
                 {tpl.name}
-                <span className="block text-[10px]">{tpl.width}×{tpl.height}</span>
+                <span className="block text-xs">{tpl.width}×{tpl.height}</span>
               </button>
             ))}
           </div>
@@ -558,22 +558,22 @@ export default function CanvasEditorClient() {
             {/* Position */}
                 <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
               <div>
-                <label className="mb-0.5 block text-[10px]">X</label>
+                <label className="mb-0.5 block text-xs">X</label>
                 <input type="number" min={0} value={selected.x} onChange={e => updateElement(selected.id, { x: +e.target.value })}
                   className="ap-input px-2 py-1 text-xs" />
               </div>
               <div>
-                <label className="mb-0.5 block text-[10px]">Y</label>
+                <label className="mb-0.5 block text-xs">Y</label>
                 <input type="number" min={0} value={selected.y} onChange={e => updateElement(selected.id, { y: +e.target.value })}
                   className="ap-input px-2 py-1 text-xs" />
               </div>
               <div>
-                <label className="mb-0.5 block text-[10px]">Ample</label>
+                <label className="mb-0.5 block text-xs">Ample</label>
                 <input type="number" value={selected.width} onChange={e => updateElement(selected.id, { width: +e.target.value })} min={10}
                   className="ap-input px-2 py-1 text-xs" />
               </div>
               <div>
-                <label className="mb-0.5 block text-[10px]">Alt</label>
+                <label className="mb-0.5 block text-xs">Alt</label>
                 <input type="number" value={selected.height} onChange={e => updateElement(selected.id, { height: +e.target.value })} min={10}
                   className="ap-input px-2 py-1 text-xs" />
               </div>
@@ -582,7 +582,7 @@ export default function CanvasEditorClient() {
             {/* Text properties */}
             {selected.type === 'text' && (
               <>
-                <label className="mb-0.5 block text-[10px]">Text</label>
+                <label className="mb-0.5 block text-xs">Text</label>
                 <textarea
                   value={selected.text || ''}
                   onChange={e => updateElement(selected.id, { text: e.target.value })}
@@ -591,12 +591,12 @@ export default function CanvasEditorClient() {
                 />
                 <div className="grid grid-cols-2 gap-2 mb-2">
                   <div>
-                    <label className="mb-0.5 block text-[10px]">Mida</label>
+                    <label className="mb-0.5 block text-xs">Mida</label>
                     <input type="number" value={selected.fontSize || 48} onChange={e => updateElement(selected.id, { fontSize: +e.target.value })} min={8} max={300}
                       className="ap-input px-2 py-1 text-xs" />
                   </div>
                   <div>
-                    <label className="mb-0.5 block text-[10px]">Pes</label>
+                    <label className="mb-0.5 block text-xs">Pes</label>
                     <select value={selected.fontWeight || 'normal'} onChange={e => updateElement(selected.id, { fontWeight: e.target.value })}
                       className="ap-input px-2 py-1 text-xs" aria-label="Pes de la font">
                       <option value="normal">Normal</option>
@@ -605,7 +605,7 @@ export default function CanvasEditorClient() {
                   </div>
                 </div>
                 <div className="mb-2">
-                  <label className="mb-0.5 block text-[10px]">Alineació</label>
+                  <label className="mb-0.5 block text-xs">Alineació</label>
                   <div className="grid grid-cols-3 gap-1">
                     {(['left', 'center', 'right'] as const).map(a => (
                       <button key={a} onClick={() => updateElement(selected.id, { textAlign: a })}
@@ -619,7 +619,7 @@ export default function CanvasEditorClient() {
             )}
 
             {/* Color */}
-            <label className="mb-0.5 block text-[10px]">
+            <label className="mb-0.5 block text-xs">
               {selected.type === 'text' ? 'Color text' : 'Color fons'}
             </label>
             <div className="flex flex-wrap gap-1 mb-2">
@@ -630,7 +630,7 @@ export default function CanvasEditorClient() {
                   className="w-6 h-6 rounded-full border-2 transition-transform hover:scale-110"
                   style={{
                     background: c,
-                    borderColor: (selected.type === 'text' ? selected.color : selected.fill) === c ? '#06b6d4' : 'rgba(255,255,255,0.1)',
+                    borderColor: (selected.type === 'text' ? selected.color : selected.fill) === c ? 'var(--gold)' : 'rgba(255,255,255,0.1)',
                   }}
                   aria-label={`Color ${c}`}
                 />
@@ -647,7 +647,7 @@ export default function CanvasEditorClient() {
             {/* Border radius for shapes */}
             {selected.type === 'shape' && selected.shapeType === 'rect' && (
               <div className="mt-2">
-                <label className="mb-0.5 block text-[10px]">Cantonades</label>
+                <label className="mb-0.5 block text-xs">Cantonades</label>
                 <input type="number" value={selected.borderRadius || 0} onChange={e => updateElement(selected.id, { borderRadius: +e.target.value })} min={0}
                   className="ap-input px-2 py-1 text-xs" />
               </div>

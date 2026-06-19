@@ -69,8 +69,8 @@ export default function CommSummaryPanel({
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-        <p className="text-[10px] font-semibold uppercase tracking-wider opacity-50">Comunicació</p>
+      <div className="ap-card p-3">
+        <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Comunicació</p>
         <p className="mt-1 text-xs opacity-30 animate-pulse">Carregant...</p>
       </div>
     );
@@ -78,8 +78,8 @@ export default function CommSummaryPanel({
 
   if (!timeline || timeline.total === 0) {
     return (
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-        <p className="text-[10px] font-semibold uppercase tracking-wider opacity-50">Comunicació</p>
+      <div className="ap-card p-3">
+        <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Comunicació</p>
         <p className="mt-1 text-xs opacity-50">Sense comunicacions registrades</p>
       </div>
     );
@@ -89,10 +89,10 @@ export default function CommSummaryPanel({
     .filter((ch) => timeline.channels[ch] > 0);
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 space-y-2">
+    <div className="ap-card p-3 space-y-2">
       <div className="flex items-center justify-between">
-        <p className="text-[10px] font-semibold uppercase tracking-wider opacity-50">Comunicació</p>
-        <span className="text-[10px] opacity-40">{timeline.total} interaccions</span>
+        <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Comunicació</p>
+        <span className="text-xs opacity-40">{timeline.total} interaccions</span>
       </div>
 
       {/* Channel counters */}
@@ -100,7 +100,7 @@ export default function CommSummaryPanel({
         {activeChannels.map((ch) => (
           <span
             key={ch}
-            className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-2 py-1 text-[10px]"
+            className="flex items-center gap-1 ap-card px-2 py-1 text-xs"
           >
             <span>{CHANNEL_ICON[ch]}</span>
             <span>{CHANNEL_LABEL[ch]}</span>
@@ -110,7 +110,7 @@ export default function CommSummaryPanel({
       </div>
 
       {/* Meta */}
-      <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] opacity-50">
+      <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs opacity-50">
         {timeline.daysSinceLastContact != null && (
           <span>Últim contacte fa {timeline.daysSinceLastContact}d</span>
         )}
@@ -124,7 +124,7 @@ export default function CommSummaryPanel({
         {timeline.entries.slice(0, 3).map((entry) => (
           <div
             key={entry.id}
-            className="flex items-start gap-1.5 text-[11px] opacity-70"
+            className="flex items-start gap-1.5 text-xs opacity-70"
           >
             <span className="shrink-0">{CHANNEL_ICON[entry.channel]}</span>
             <span className="shrink-0 opacity-50">{DIRECTION_ICON[entry.direction]}</span>

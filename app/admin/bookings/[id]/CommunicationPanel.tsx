@@ -80,7 +80,7 @@ export default function CommunicationPanel({
                   {status.lastChannel ? `· últim canal ${status.lastChannel}` : ''}
                 </p>
               </div>
-              <div className="mt-1 text-[11px]">
+              <div className="mt-1 text-xs">
                 <span>Últim enviament: {formatDateTime(status.sentAt)}</span>
                 <span className="mx-2">·</span>
                 <span>Última resposta: {formatDateTime(status.respondedAt)}</span>

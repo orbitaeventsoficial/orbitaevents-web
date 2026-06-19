@@ -255,7 +255,7 @@ export default function CoveragePage() {
             disabled={adding || !newCity.trim()}
             type="button"
             aria-busy={adding}
-            className="px-6 py-2 rounded-xl text-white font-medium shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="ap-btn ap-btn--primary"
           >
             {adding ? 'Afegint...' : '+ Afegir'}
           </button>

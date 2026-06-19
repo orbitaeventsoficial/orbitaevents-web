@@ -436,7 +436,7 @@ export default function DiscountCodesPage() {
                   onClick={() => updateField('type', 'PERCENTAGE')}
                   className={`flex-1 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all ${
                     form.type === 'PERCENTAGE'
-                      ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200'
+                      ? 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info'
                       : 'admin-tone-idle'
                   }`}
                 >
@@ -447,7 +447,7 @@ export default function DiscountCodesPage() {
                   onClick={() => updateField('type', 'FIXED_AMOUNT')}
                   className={`flex-1 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all ${
                     form.type === 'FIXED_AMOUNT'
-                      ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200'
+                      ? 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info'
                       : 'admin-tone-idle'
                   }`}
                 >
@@ -569,7 +569,7 @@ export default function DiscountCodesPage() {
                   <span className="font-bold text-lg">
                     {c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}â‚¬`}
                   </span>
-                  <span className={`block mt-0.5 rounded-full px-2 py-0.5 text-[10px] font-medium text-center ${
+                  <span className={`block mt-0.5 rounded-full px-2 py-0.5 text-xs font-medium text-center ${
                     active ? 'admin-tone-soft-success' : 'bg-white/5 text-white/40'
                   }`}>
                     {active ? 'Actiu' : 'Inactiu'}
@@ -579,7 +579,7 @@ export default function DiscountCodesPage() {
               <div className="mt-3 flex items-center justify-between border-t pt-3 admin-tone-border-neutral text-xs">
                 <div className="flex items-center gap-3">
                   <span>{c.type === 'PERCENTAGE' ? 'Percentatge' : 'Import fix'}</span>
-                  <span className={expired ? 'text-rose-400' : ''}>
+                  <span className={expired ? 'admin-tone-text-danger' : ''}>
                     {formatDateSimple(c.validUntil)}{expired ? ' (caducat)' : ''}
                   </span>
                   <span>{c.currentUses}{c.maxUses ? ` / ${c.maxUses}` : ''} usos</span>
@@ -624,20 +624,20 @@ export default function DiscountCodesPage() {
                 const expired = isExpired(c.validUntil);
                 const maxReached = c.maxUses != null && c.currentUses >= c.maxUses;
                 return (
-                  <tr key={c.id} className="transition-colors hover:bg-white/[0.03]">
+                  <tr key={c.id} className="transition-colors adm-row-hover">
                     <td className="px-4 py-3">
                       <code className="text-xs font-mono px-2 py-1 rounded">{c.code}</code>
-                      {c.description && <p className="text-[10px] mt-0.5">{c.description}</p>}
+                      {c.description && <p className="text-xs mt-0.5">{c.description}</p>}
                     </td>
                     <td className="px-4 py-3">{c.type === 'PERCENTAGE' ? 'Percentatge' : 'Import fix'}</td>
                     <td className="px-4 py-3 font-semibold">{c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}â‚¬`}</td>
-                    <td className={`px-4 py-3 ${expired ? 'text-rose-400' : 'text-white/60'}`}>
+                    <td className={`px-4 py-3 ${expired ? 'admin-tone-text-danger' : 'text-white/60'}`}>
                       {formatDateSimple(c.validUntil)}
-                      {expired && <span className="block text-[10px]">Caducat</span>}
+                      {expired && <span className="block text-xs">Caducat</span>}
                     </td>
                     <td className="px-4 py-3">
                       {c.currentUses}{c.maxUses ? ` / ${c.maxUses}` : ''}
-                      {maxReached && <span className="block text-[10px]">Exhaurit</span>}
+                      {maxReached && <span className="block text-xs">Exhaurit</span>}
                     </td>
                     <td className="px-4 py-3">
                       <span

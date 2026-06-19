@@ -33,19 +33,19 @@ function renderPackInventoryPreview(pack: Awaited<ReturnType<typeof getPacks>>[n
         {pack.inventory.slice(0, 4).map((row) => (
           <span
             key={row.item.code}
-            className="inline-flex items-center rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-0.5 text-[10px] font-semibold admin-tone-text-cyan"
+            className="inline-flex items-center rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-0.5 text-xs font-semibold admin-tone-text-cyan"
           >
             {row.item.name}
             {row.quantity > 1 ? ` ×${row.quantity}` : ''}
           </span>
         ))}
         {pack.inventory.length > 4 && (
-          <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-white/70">
+          <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-xs font-semibold text-white/70">
             +{pack.inventory.length - 4} més
           </span>
         )}
       </div>
-      <p className="text-[11px] text-white/55">
+      <p className="text-xs text-white/55">
         {pack.inventory.filter((row) => row.isRequired).length} obligatoris · {pack.inventory.reduce((sum, row) => sum + Math.max(1, row.quantity), 0)} unitats totals
       </p>
     </div>
@@ -320,7 +320,7 @@ export default async function PacksPage({
           <SyncButton />
           <Link
             href="/admin/packs/new"
-            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-black transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-[var(--gold-ink)] transition-colors"
           >
             + Nou Pack
           </Link>
@@ -478,15 +478,15 @@ export default async function PacksPage({
                           <p className="text-sm font-semibold">{formatCurrencyExact(health.recommendedExtraHourPrice)}</p>
                         </div>
                         <div className={`col-span-2 rounded-xl border p-2 ${divergenceColor}`}>
-                          <p className="text-[11px]">Llindar alerta: {pricingConfig.alertDivergencePct}%</p>
+                          <p className="text-xs">Llindar alerta: {pricingConfig.alertDivergencePct}%</p>
                         </div>
-                        <div className="col-span-2 rounded-xl border p-2 text-[11px]">
+                        <div className="col-span-2 rounded-xl border p-2 text-xs">
                           Equip tècnic: {health.specialistCount} especialista + {health.operatorCount} operari · {health.laborNetCostPerHourUsed.toFixed(2)}€/h net · {health.laborCostPerHourUsed.toFixed(2)}€/h brut (SS {(health.socialSecurityPct * 100).toFixed(1)}%)
                         </div>
-                        <div className="col-span-2 rounded-xl border p-2 text-[11px]">
+                        <div className="col-span-2 rounded-xl border p-2 text-xs">
                           IRPF {(health.withholdingPct * 100).toFixed(1)}% → net estimat percebut: {health.laborNetAfterWithholdingPerHourUsed.toFixed(2)}€/h
                         </div>
-                        <div className="col-span-2 rounded-xl border p-2 text-[11px]">
+                        <div className="col-span-2 rounded-xl border p-2 text-xs">
                           Operari extra sempre disponible: {health.recommendedOperatorExtraHourPrice.toFixed(2)}€/h (recomanat)
                         </div>
                       </div>
@@ -529,7 +529,7 @@ export default async function PacksPage({
                         </span>
                       )}
                     </div>
-                    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs">
+                    <div className="ap-card p-3 text-xs">
                       <div className="mb-2 flex items-center justify-between gap-2">
                         <span className="font-semibold text-white/80">Equip del pack</span>
                         <span className="text-white/55">{pack.inventory.length} elements</span>
@@ -642,15 +642,15 @@ export default async function PacksPage({
                           <p className="text-sm font-semibold">{formatCurrencyExact(health.recommendedExtraHourPrice)}</p>
                         </div>
                         <div className={`col-span-2 rounded-xl border p-2 ${divergenceColor}`}>
-                          <p className="text-[11px]">Llindar alerta: {pricingConfig.alertDivergencePct}%</p>
+                          <p className="text-xs">Llindar alerta: {pricingConfig.alertDivergencePct}%</p>
                         </div>
-                        <div className="col-span-2 rounded-xl border p-2 text-[11px]">
+                        <div className="col-span-2 rounded-xl border p-2 text-xs">
                           Equip tècnic: {health.specialistCount} especialista + {health.operatorCount} operari · {health.laborNetCostPerHourUsed.toFixed(2)}€/h net · {health.laborCostPerHourUsed.toFixed(2)}€/h brut (SS {(health.socialSecurityPct * 100).toFixed(1)}%)
                         </div>
-                        <div className="col-span-2 rounded-xl border p-2 text-[11px]">
+                        <div className="col-span-2 rounded-xl border p-2 text-xs">
                           IRPF {(health.withholdingPct * 100).toFixed(1)}% → net estimat percebut: {health.laborNetAfterWithholdingPerHourUsed.toFixed(2)}€/h
                         </div>
-                        <div className="col-span-2 rounded-xl border p-2 text-[11px]">
+                        <div className="col-span-2 rounded-xl border p-2 text-xs">
                           Operari extra sempre disponible: {health.recommendedOperatorExtraHourPrice.toFixed(2)}€/h (recomanat)
                         </div>
                       </div>
@@ -693,7 +693,7 @@ export default async function PacksPage({
                         </span>
                       )}
                     </div>
-                    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs">
+                    <div className="ap-card p-3 text-xs">
                       <div className="mb-2 flex items-center justify-between gap-2">
                         <span className="font-semibold text-white/80">Equip del pack</span>
                         <span className="text-white/55">{pack.inventory.length} elements</span>

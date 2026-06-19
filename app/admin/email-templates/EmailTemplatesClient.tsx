@@ -170,7 +170,7 @@ export default function EmailTemplatesClient() {
             {t.variables.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1">
                 {t.variables.map((v) => (
-                  <span key={v} className="ap-badge font-mono text-[10px]">
+                  <span key={v} className="ap-badge font-mono text-xs">
                     {`{{${v}}}`}
                   </span>
                 ))}

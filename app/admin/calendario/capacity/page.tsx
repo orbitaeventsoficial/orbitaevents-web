@@ -14,16 +14,16 @@ export const metadata = {
 
 const LOAD_CONFIG: Record<DayLoadLevel, { label: string; color: string; bg: string; dot: string }> = {
   FREE: { label: 'Lliure', color: 'text-white/50', bg: 'bg-white/[0.02]', dot: 'bg-white/40' },
-  LIGHT: { label: 'Lleuger', color: 'text-cyan-300', bg: 'bg-cyan-500/[0.06]', dot: 'bg-cyan-400' },
-  FULL: { label: 'Ple', color: 'text-amber-300', bg: 'bg-amber-500/[0.06]', dot: 'bg-amber-400' },
-  OVERLOADED: { label: 'Sobrecarregat', color: 'text-rose-300', bg: 'bg-rose-500/[0.06]', dot: 'bg-rose-400' },
+  LIGHT: { label: 'Lleuger', color: 'admin-tone-text-cyan', bg: 'admin-tone-bg-cyan', dot: 'bg-[var(--o-info)]' },
+  FULL: { label: 'Ple', color: 'admin-tone-text-warning', bg: 'admin-tone-bg-warning', dot: 'bg-[var(--o-warning)]' },
+  OVERLOADED: { label: 'Sobrecarregat', color: 'admin-tone-text-danger', bg: 'admin-tone-bg-danger', dot: 'bg-[var(--o-danger)]' },
 };
 
 const ALERT_CONFIG: Record<WeekAlertLevel, { label: string; border: string; bg: string; tone: string }> = {
   NONE: { label: 'Sense reserves', border: 'border-white/10', bg: 'bg-white/[0.03]', tone: 'text-white/50' },
-  INFO: { label: 'Activitat normal', border: 'border-cyan-500/20', bg: 'bg-cyan-500/[0.06]', tone: 'text-cyan-300' },
-  WARNING: { label: 'Setmana intensa', border: 'border-amber-500/30', bg: 'bg-amber-500/[0.08]', tone: 'text-amber-300' },
-  CRITICAL: { label: 'Capacitat al límit', border: 'border-rose-500/40', bg: 'bg-rose-500/[0.08]', tone: 'text-rose-300' },
+  INFO: { label: 'Activitat normal', border: 'admin-tone-border-cyan', bg: 'admin-tone-bg-cyan', tone: 'admin-tone-text-cyan' },
+  WARNING: { label: 'Setmana intensa', border: 'admin-tone-border-warning', bg: 'admin-tone-bg-warning', tone: 'admin-tone-text-warning' },
+  CRITICAL: { label: 'Capacitat al límit', border: 'admin-tone-border-danger', bg: 'admin-tone-bg-danger', tone: 'admin-tone-text-danger' },
 };
 
 export default async function CapacityPage() {
@@ -41,20 +41,20 @@ export default async function CapacityPage() {
     >
       {/* Summary KPIs */}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 mb-4">
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-center">
-          <p className="text-[9px] font-semibold uppercase tracking-wider opacity-50">Total reserves</p>
+        <div className="ap-card p-3 text-center">
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Total reserves</p>
           <p className="text-xl font-bold">{capacity.totalBookings}</p>
         </div>
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-center">
-          <p className="text-[9px] font-semibold uppercase tracking-wider opacity-50">Dies lliures</p>
-          <p className="text-xl font-bold text-emerald-300">{capacity.freeCount}</p>
+        <div className="ap-card p-3 text-center">
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Dies lliures</p>
+          <p className="text-xl font-bold admin-tone-text-success">{capacity.freeCount}</p>
         </div>
-        <div className={`rounded-xl border p-3 text-center ${capacity.overloadedCount > 0 ? 'border-rose-500/30 bg-rose-500/[0.06]' : 'border-white/10 bg-white/[0.03]'}`}>
-          <p className="text-[9px] font-semibold uppercase tracking-wider opacity-50">Sobrecarregats</p>
-          <p className={`text-xl font-bold ${capacity.overloadedCount > 0 ? 'text-rose-300' : ''}`}>{capacity.overloadedCount}</p>
+        <div className={`rounded-xl border p-3 text-center ${capacity.overloadedCount > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : 'border-[var(--line)] bg-[var(--panel)]'}`}>
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Sobrecarregats</p>
+          <p className={`text-xl font-bold ${capacity.overloadedCount > 0 ? 'admin-tone-text-danger' : ''}`}>{capacity.overloadedCount}</p>
         </div>
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-center">
-          <p className="text-[9px] font-semibold uppercase tracking-wider opacity-50">Dia més ocupat</p>
+        <div className="ap-card p-3 text-center">
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Dia més ocupat</p>
           <p className="text-sm font-bold">{capacity.busiestDay ?? '—'}</p>
         </div>
       </div>
@@ -73,7 +73,7 @@ export default async function CapacityPage() {
                   <span className={`inline-block h-2 w-2 rounded-full ${config.dot}`} />
                   <span className="text-xs font-semibold">{ADMIN_WEEKDAY_SHORT_LABELS[day.dayOfWeek]} {day.date.slice(8)}</span>
                 </div>
-                <span className={`text-[10px] font-semibold ${config.color}`}>{config.label}</span>
+                <span className={`text-xs font-semibold ${config.color}`}>{config.label}</span>
               </div>
 
               {day.bookings.length > 0 ? (
@@ -82,7 +82,7 @@ export default async function CapacityPage() {
                     <Link
                       key={b.id}
                       href={buildBookingHref(b.id)}
-                      className="block rounded-lg border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] hover:bg-white/[0.08] transition-colors"
+                      className="block ap-card px-2 py-1 text-xs adm-row-hover transition-colors"
                     >
                       <p className="font-medium truncate">{b.clientName}</p>
                       <div className="flex items-center gap-2 opacity-60">
@@ -95,11 +95,11 @@ export default async function CapacityPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-[10px] opacity-30 mt-1">Sense reserves</p>
+                <p className="text-xs opacity-30 mt-1">Sense reserves</p>
               )}
 
               {day.totalGuests > 0 && (
-                <p className="text-[9px] opacity-40 mt-1">{day.totalGuests} convidats total</p>
+                <p className="text-xs opacity-40 mt-1">{day.totalGuests} convidats total</p>
               )}
             </div>
           );
@@ -107,7 +107,7 @@ export default async function CapacityPage() {
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-3 mt-4 text-[10px] opacity-50">
+      <div className="flex flex-wrap gap-3 mt-4 text-xs opacity-50">
         {Object.entries(LOAD_CONFIG).map(([key, c]) => (
           <span key={key} className="flex items-center gap-1">
             <span className={`inline-block h-2 w-2 rounded-full ${c.dot}`} />
@@ -133,31 +133,31 @@ export default async function CapacityPage() {
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-semibold opacity-80">{week.weekStart} → {week.weekEnd.slice(8)}</span>
-                  <span className={`text-[10px] font-semibold ${config.tone}`}>{config.label}</span>
+                  <span className={`text-xs font-semibold ${config.tone}`}>{config.label}</span>
                 </div>
                 <p className="text-2xl font-bold">{week.bookingsCount}</p>
-                <p className="text-[10px] opacity-50 mb-2">
+                <p className="text-xs opacity-50 mb-2">
                   {week.bookingsCount === 1 ? 'reserva' : 'reserves'} · {week.totalGuests} convidats
                 </p>
                 {week.overloadedDays > 0 && (
-                  <p className="text-[10px] text-rose-300 mb-1">
+                  <p className="text-xs admin-tone-text-danger mb-1">
                     {week.overloadedDays} {week.overloadedDays === 1 ? 'dia sobrecarregat' : 'dies sobrecarregats'}
                   </p>
                 )}
                 {week.previousYearBookings > 0 ? (
-                  <p className="text-[10px] opacity-60">
+                  <p className="text-xs opacity-60">
                     Any anterior: {week.previousYearBookings}
                     {week.yoyDelta != null && (
-                      <span className={`ml-1 ${week.yoyDelta >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
+                      <span className={`ml-1 ${week.yoyDelta >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
                         ({week.yoyDelta >= 0 ? '+' : ''}{Math.round(week.yoyDelta * 100)}%)
                       </span>
                     )}
                   </p>
                 ) : (
-                  <p className="text-[10px] opacity-40">Sense referència any anterior</p>
+                  <p className="text-xs opacity-40">Sense referència any anterior</p>
                 )}
                 {week.alertMessage && (
-                  <p className={`text-[10px] mt-2 ${config.tone}`}>{week.alertMessage}</p>
+                  <p className={`text-xs mt-2 ${config.tone}`}>{week.alertMessage}</p>
                 )}
               </div>
             );

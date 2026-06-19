@@ -74,7 +74,7 @@ export default function CrewBlockManager({
   };
 
   return (
-    <section className="mt-6 rounded-xl border border-white/10 bg-white/[0.02] p-3">
+    <section className="mt-6 ap-card p-3">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -87,30 +87,30 @@ export default function CrewBlockManager({
       {open && (
         <div className="mt-3">
           {/* Formulari */}
-          <div className="flex flex-wrap items-end gap-2 rounded-lg border border-white/10 bg-white/[0.03] p-2.5">
-            <label className="flex flex-col gap-0.5 text-[10px] opacity-60">
+          <div className="flex flex-wrap items-end gap-2 ap-card p-2.5">
+            <label className="flex flex-col gap-0.5 text-xs opacity-60">
               Persona
-              <select value={person} onChange={(e) => setPerson(e.target.value)} className="rounded border border-white/15 bg-black/30 px-2 py-1 text-[11px] text-white" aria-label="Persona del bloqueig">
+              <select value={person} onChange={(e) => setPerson(e.target.value)} className="rounded adm-input text-xs" aria-label="Persona del bloqueig">
                 {people.map((p) => <option key={p.key} value={p.key}>{p.name}</option>)}
               </select>
             </label>
-            <label className="flex flex-col gap-0.5 text-[10px] opacity-60">
+            <label className="flex flex-col gap-0.5 text-xs opacity-60">
               Dia
-              <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="rounded border border-white/15 bg-black/30 px-2 py-1 text-[11px] text-white" />
+              <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="rounded adm-input text-xs" />
             </label>
-            <label className="flex flex-col gap-0.5 text-[10px] opacity-60">
+            <label className="flex flex-col gap-0.5 text-xs opacity-60">
               De (opc.)
-              <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="rounded border border-white/15 bg-black/30 px-2 py-1 text-[11px] text-white" />
+              <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="rounded adm-input text-xs" />
             </label>
-            <label className="flex flex-col gap-0.5 text-[10px] opacity-60">
+            <label className="flex flex-col gap-0.5 text-xs opacity-60">
               A (opc.)
-              <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="rounded border border-white/15 bg-black/30 px-2 py-1 text-[11px] text-white" />
+              <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="rounded adm-input text-xs" />
             </label>
-            <label className="flex flex-1 flex-col gap-0.5 text-[10px] opacity-60">
+            <label className="flex flex-1 flex-col gap-0.5 text-xs opacity-60">
               Motiu (opc.)
-              <input type="text" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Vacances, altre bolo…" className="rounded border border-white/15 bg-black/30 px-2 py-1 text-[11px] text-white" />
+              <input type="text" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Vacances, altre bolo…" className="rounded adm-input text-xs" />
             </label>
-            <button type="button" onClick={add} disabled={saving} className="rounded-lg border border-cyan-500/40 bg-cyan-500/[0.12] px-3 py-1.5 text-[11px] font-semibold text-cyan-200 hover:bg-cyan-500/[0.2] disabled:opacity-50">
+            <button type="button" onClick={add} disabled={saving} className="rounded-lg border admin-tone-border-info admin-tone-bg-info px-3 py-1.5 text-xs font-semibold admin-tone-text-info hover:admin-tone-bg-info disabled:opacity-50">
               {saving ? 'Desant…' : 'Afegir'}
             </button>
           </div>
@@ -119,7 +119,7 @@ export default function CrewBlockManager({
           {blocks.length > 0 && (
             <ul className="mt-2 space-y-1">
               {blocks.map((b) => (
-                <li key={b.id} className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px]">
+                <li key={b.id} className="flex items-center justify-between ap-card px-2.5 py-1 text-xs">
                   <span className="opacity-80">
                     <span className="font-semibold">{b.personName}</span> · {b.dateKey.slice(8)}/{b.dateKey.slice(5, 7)} ·{' '}
                     {b.allDay ? 'tot el dia' : `${b.startLabel}–${b.endLabel ?? '?'}`}

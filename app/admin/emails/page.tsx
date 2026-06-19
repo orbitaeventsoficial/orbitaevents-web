@@ -284,7 +284,7 @@ export default async function EmailsAdminPage() {
             Estat: {stats.cronLastStatus || '—'}
           </p>
           {stats.cronLastMessage && (
-            <p className="text-[10px] mt-1">
+            <p className="text-xs mt-1">
               {stats.cronLastMessage}
             </p>
           )}
@@ -371,7 +371,7 @@ export default async function EmailsAdminPage() {
             <a
               href={SITE_CONFIG.reviews.googleReviewUrl}
               target="_blank" rel="noopener noreferrer"
-              className="mt-4 block w-full text-center px-4 py-2 rounded-xl text-white shadow-lg transition-colors text-sm font-medium"
+              className="ap-btn ap-btn--primary mt-4 w-full justify-center"
             >
               🔗 Obrir enllaç Google
             </a>

@@ -15,6 +15,35 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-19 [ESTAT: tancat — COMMIT + PUSH de l'arbre acumulat #987–#1018 (canon admin) a main]
+Ordre del propietari: arrancar dev local + commit + push. El working tree acumulava #987–#1018 (eradicació canon admin carbó+or, guard `qa:admin-canon`, hover monocapa, residu contacte/WhatsApp) — 170 modificats + 29 sense rastrejar (debug scripts `.dbg-*.cjs` que el repo JA rastreja + `scripts/check-admin-canon.mjs` + `docs/audit/`). Origin/main estava a #986. Verificació real: `pnpm run validate:core` EXIT 0 (qa:admin-canon 0 P1, només P3 advisori). Commit únic + push a `origin/main`. Dev viu a :3000.
+
+[claude] 2026-06-18 [ESTAT: tancat — PASSADA DE RESIDU TOT EL REPO #1017–#1018 (contacte + verd WhatsApp)]
+Bateria de detecció de hardcoded/merda a front + back (ordre del propietari). Front net (SVG/studio/temàtiques tancades); back net (auth 184/184 + middleware, 0 SQLi, 0 secrets). DUES troballes reals:
+- #1017: DOS telèfons divergents hardcoded cara al client (dossierService `654 46 70 87`, emailTemplateService `623 15 28 60`; canònic = +34699121023) → centralitzats a EMAIL_CONTACT/SITE_CONFIG. ⚠️ el número mostrat al client passa a 699; si 654/623 eren reals, corregir a SITE_CONFIG (ara 1 sol lloc).
+- #1018: verd WhatsApp `#25D366` hardcoded ~24× amb 3 hovers divergents a 8 CTAs públics → tokens `--oe-whatsapp(-strong/-rgb)` a globals.css. 0 verds hardcoded.
+tsc + validate:core + build EXIT 0; 76 tests focalitzats verds; verificat al browser (token WhatsApp resol #25D366). Counter 1016→1018. SENSE commit.
+Avís per l'altre agent: contacte client-facing SEMPRE via EMAIL_CONTACT; verd WhatsApp via `--oe-whatsapp`/`--oe-whatsapp-strong`. No reintroduir hex/telèfons hardcoded. Residu menor pendent (no tocat): `text-[#1a1a1a]` ×2 (MobileHomePage/opiniones), accent portal client `#06b6d4` (decisió de producte), handles socials inconsistents `@orbitaevents` vs `@orbitaeventsoficial`.
+
+[claude] 2026-06-18 [ESTAT: tancat — KpiCard NET #1016 (props morts borderColor/bgColor/delay fora)]
+Tancant backlog P2 «KPIs a mà → .ap-kpi»: JA estava satisfet (KpiCard ja és `.ap-card` canònic, gramàtica de Cristina). Únic residu = props ignorats. Eliminats de la signatura + 32 atributs morts a EconomiaClient. Sense canvi visual. Guard superficie-adhoc 76→70. tsc + validate:core EXIT 0. Counter 1015→1016. SENSE commit.
+Avís per l'altre agent: `KpiCard` (economia-components.tsx) ja NO accepta borderColor/bgColor/delay — només label/value/sub/color. No els reintrodueixis; la card és sempre carbó canònica.
+
+[claude] 2026-06-18 [ESTAT: tancat — HOVER CANÒNIC monocapa #1015 (token --o-admin-hover + .adm-row-hover)]
+Llegit CLAUDE.md + agent-sync (claude/codex) + admin-diary. Deute P2 del #1012/#1014: el residu real de `superficie-adhoc` del guard NO eren superfícies estàtiques (resoltes al #1013) sinó ESTATS DE HOVER `hover:bg-white/[0.0x]` amb opacitats divergents (0.02–0.08) a 29 fitxers → no hipersemblant.
+Fix d'arrel en una capa: token `--o-admin-hover: var(--o-admin-fill-2)` (orbita-tokens.css) + classe `.adm-row-hover` (admin-shell.css) + 54 substitucions per perl. Guard `superficie-adhoc` 130→76, 0 P1. Verificat al browser (inventory: token resol rgba(236,233,227,0.04), 0 page errors). tsc + validate:core + build EXIT 0. Counter 1014→1015. SENSE commit.
+Avís per l'altre agent: NOVA classe canònica `.adm-row-hover` per a tot ressaltat de fila/llista — usa-la, no reintrodueixis `hover:bg-white/[0.0x]`. Restant (passada pròpia): KPIs a mà (`bgColor` de KpiCard a EconomiaClient) → `.ap-kpi`; tracks/hairlines/skeletons estàtics es queden (legítims).
+
+[claude] 2026-06-17 [ESTAT: tancat — ERADICACIÓ CANON ADMIN #987–#1012 + guard qa:admin-canon]
+Sessió llarga de canonització de TOT l'admin al llenguatge carbó+or de Cristina. Fites clau (no pintura pàgina-a-pàgina, sinó fixos d'ARREL a la capa de tokens):
+- #999: `--at-*` fons eren blau-slate hardcoded → reapuntats a carbó (`--o-admin-*`). Tot l'admin a carbó d'una capa.
+- #1006: fitxa de reserva tenia `style={{background:'#000'}}` inline (negre absolut) + `--o-admin-elevated #252638` blau + `--o-admin-info-bg` cyan → eradicats. Diagnòstic per color computat (CDP), no grep.
+- #1008: Studio tenia paleta `--o-bg/surface/elev-*` blau-slate (només studio.css) mentre l'admin usa carbó → unificat. Studio ara mirall fidel. + botons invisibles (`text-white` sense fons) → `.ap-btn`.
+- #1011: GUARD `scripts/check-admin-canon.mjs` (a `validate:core --strict`) que detecta botó-void/blau/blanc-negre/font-black i BLOQUEJA reentrada. Eradicats 29 P1. Fix monocapa `.admin-card-glass` (selector mort `.admin-layout-shell`→viu+carbó, 163 cards). Presupuestos refet (ProposalsList+OwnerPanel).
+- #1012: `admin-tone-*-violet`→neutre; classes malformades (typos `bg-white/5/60`, `admin-tone-bg-cyanp-5`); inputs `bg-black`→`.adm-input`.
+ESTAT: `qa:admin-canon --strict` = 0 P1. `validate:core` EXIT 0. Counter #1012. SENSE commit (working tree acumula molt; revisar abans del proper push).
+PENDENT (P2, deute monocapa NO visual): superfícies `bg-white/[0.03]` ad-hoc→`.ap-card` i KPIs a mà→`.ap-kpi` a packs/pricing/discount-codes/coverage/google-reviews/post-event/cost-calculator/inventory-editor/cuadrant-repartiment. Informes a `docs/audit/*.md`. Front office NO tocat (revisat a part per ordre del propietari).
+
 [claude] 2026-06-15 [ESTAT: tancat — AUDITORIA DE CABLEJAT CABLE-PER-CABLE → ATLES v2]
 Arquitecte de sistema. Escrita secció «v2 — auditoria de cablejat» a `docs/admin-organisme-atles.md` (NO buidat, ampliat). Troballes verificades fitxer:línia: D9 = TRES fonts de nav divergents (no dues): `layout.tsx NAV_GROUPS` (sidebar) + `nav-items.ts NAV_SECTIONS` (cercador) + protocol §4 (paper); el sidebar exposa ~20 destins de ~90 pàgines reals → cobertura asimètrica. Proposta única de nav (`lib/admin/admin-nav.ts` que alimenti sidebar+cercador+getGroupForPath; 6 grups Comercial/Operativa/Catàleg/Creixement/Mesura/Sistema) deixada PROPOSADA (decisió propietari, NO aplicada). El cablejat d'ENTITATS està ben canonitzat (11 helpers `lib/admin/*Href`); cap cable trencat crític. Duplicacions noves: D9(nav), D10(labels lead STAGE/PRIORITY/PAY repetits a LeadDetailClient+LeadsSeasonClient; PAY_LABEL divergeix Pagat/Pagada), D11(costures CSS creuades). APLICAT (baix risc): migrat `dossiers/DossierGeneratorClient.tsx` de `.ix__forminput` (inbox) → `.adm-input` canònic (9 usos) — costura nº1 morta també a la cara. Descartades 2 afirmacions falses de l'agent extern (cables `?to=` i `?proposalId=` SÍ es consumeixen). NO tocat counter/diari/protocol/full-de-ruta. tsc --noEmit EXIT 0. next dev viu → res de build.
 

@@ -60,17 +60,17 @@ function PaletteRow({
       type="button"
       onClick={() => onSelect(item)}
       className={`flex w-full items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left text-sm transition ${
-        selected ? 'border-cyan-400/60 bg-cyan-400/10' : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.06]'
+        selected ? 'admin-tone-border-info admin-tone-bg-info' : 'border-[var(--line)] bg-[var(--panel)] adm-row-hover'
       }`}
     >
       <div className="flex min-w-0 items-center gap-3">
         <span className="shrink-0 text-base">{item.icon}</span>
         <div className="min-w-0">
           <p className="truncate">{item.label}</p>
-          <p className="truncate text-[11px] opacity-60">{item.meta}</p>
+          <p className="truncate text-xs opacity-60">{item.meta}</p>
         </div>
       </div>
-      <span className="shrink-0 text-[10px] uppercase tracking-wider opacity-55">{item.type}</span>
+      <span className="shrink-0 text-xs uppercase tracking-wider opacity-55">{item.type}</span>
     </button>
   );
 }
@@ -92,7 +92,7 @@ function RecentItems({
 
   return (
     <div className="border-t border-white/10 px-4 py-3" {...helpAttrs(ADMIN_SHARED_HELP.recentItems)}>
-      <p className="text-[11px] uppercase tracking-wider opacity-60">Visitats recentment</p>
+      <p className="text-xs uppercase tracking-wider opacity-60">Visitats recentment</p>
       <div className="mt-2 space-y-1">
         {entries.map((item, index) => (
           <PaletteRow
@@ -278,7 +278,7 @@ export default function AdminSearchModal({
             className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/45"
             {...helpAttrs(ADMIN_SHARED_HELP.searchInput)}
           />
-          <div className="hidden rounded-lg border border-white/10 px-2 py-1 text-[11px] opacity-60 sm:block">↑↓ moure · Enter obrir</div>
+          <div className="hidden rounded-lg border border-white/10 px-2 py-1 text-xs opacity-60 sm:block">↑↓ moure · Enter obrir</div>
           <button type="button" onClick={closeAndReset} className="rounded-xl px-2 py-1 text-xs opacity-70 transition hover:opacity-100">Esc</button>
         </div>
 
@@ -296,7 +296,7 @@ export default function AdminSearchModal({
 
           {commandEntries.length > 0 && (
             <div className="border-t border-white/10 px-4 py-3">
-              <p className="text-[11px] uppercase tracking-wider opacity-60">Comandes</p>
+              <p className="text-xs uppercase tracking-wider opacity-60">Comandes</p>
               <div className="mt-2 space-y-1">
                 {commandEntries.map((item, index) => {
                   const offset = isSearchingEntities ? 0 : recentEntries.length;
@@ -308,7 +308,7 @@ export default function AdminSearchModal({
 
           {isSearchingEntities && leadEntries.length > 0 && (
             <div className="border-t border-white/10 px-4 py-3">
-              <p className="text-[11px] uppercase tracking-wider opacity-60">Entrades</p>
+              <p className="text-xs uppercase tracking-wider opacity-60">Entrades</p>
               <div className="mt-2 space-y-1">
                 {leadEntries.map((item, index) => (
                   <PaletteRow key={item.key} item={item} selected={selectedIndex === commandEntries.length + index} onSelect={handleSelect} />
@@ -319,7 +319,7 @@ export default function AdminSearchModal({
 
           {isSearchingEntities && bookingEntries.length > 0 && (
             <div className="border-t border-white/10 px-4 py-3">
-              <p className="text-[11px] uppercase tracking-wider opacity-60">Reserves</p>
+              <p className="text-xs uppercase tracking-wider opacity-60">Reserves</p>
               <div className="mt-2 space-y-1">
                 {bookingEntries.map((item, index) => {
                   const start = commandEntries.length + leadEntries.length;
@@ -331,7 +331,7 @@ export default function AdminSearchModal({
 
           {isSearchingEntities && customerEntries.length > 0 && (
             <div className="border-t border-white/10 px-4 py-3">
-              <p className="text-[11px] uppercase tracking-wider opacity-60">Clients</p>
+              <p className="text-xs uppercase tracking-wider opacity-60">Clients</p>
               <div className="mt-2 space-y-1">
                 {customerEntries.map((item, index) => {
                   const start = commandEntries.length + leadEntries.length + bookingEntries.length;
@@ -347,7 +347,7 @@ export default function AdminSearchModal({
 
           {!isSearchingEntities && (
             <div className="border-t border-white/10 px-4 py-4">
-              <p className="mb-2 text-[11px] uppercase tracking-wider opacity-60">Dreceres de teclat</p>
+              <p className="mb-2 text-xs uppercase tracking-wider opacity-60">Dreceres de teclat</p>
               <div className="grid gap-1.5 text-xs sm:grid-cols-2">
                 {[
                   { keys: 'Ctrl/Cmd+K', desc: 'Obrir command palette' },
@@ -359,7 +359,7 @@ export default function AdminSearchModal({
                   { keys: 'Alt+N', desc: 'Accions ràpides (+)' },
                 ].map((shortcut) => (
                   <div key={shortcut.keys} className="flex items-center gap-2">
-                    <kbd className="rounded border border-white/10 px-1.5 py-0.5 font-mono text-[10px]">{shortcut.keys}</kbd>
+                    <kbd className="rounded border border-white/10 px-1.5 py-0.5 font-mono text-xs">{shortcut.keys}</kbd>
                     <span>{shortcut.desc}</span>
                   </div>
                 ))}

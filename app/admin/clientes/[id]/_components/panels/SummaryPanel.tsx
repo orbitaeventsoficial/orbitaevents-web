@@ -378,7 +378,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                 type="button"
                 onClick={handleSave}
                 disabled={saving}
-                className="rounded-xl px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                className="ap-btn ap-btn--primary ap-btn--xs"
                 {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.save)}
               >
                 {saving ? 'Desant...' : 'Desa'}
@@ -534,10 +534,10 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
               <>
                 <p className="text-sm font-medium">{topLead.name}</p>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${getLeadStatusDisplay(topLead.status).bg} ${getLeadStatusDisplay(topLead.status).text}`}>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getLeadStatusDisplay(topLead.status).bg} ${getLeadStatusDisplay(topLead.status).text}`}>
                     {getLeadStatusDisplay(topLead.status).label}
                   </span>
-                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${getLeadPriorityColorDisplay(topLead.priority).badgeClass}`}>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getLeadPriorityColorDisplay(topLead.priority).badgeClass}`}>
                     {getLeadPriorityColorDisplay(topLead.priority).label}
                   </span>
                 </div>
@@ -545,89 +545,89 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                   {topLead.commercialBlocker?.label || 'Sense bloqueig comercial actiu'}
                   {topLead.commercialBlocker?.context ? ` · ${topLead.commercialBlocker.context}` : ''}
                 </p>
-                <p className="mt-2 text-[11px] opacity-70">
+                <p className="mt-2 text-xs opacity-70">
                   {getEventLabel(topLead.eventType)}
                   {topLead.eventDate ? ` · ${formatDateSimple(topLead.eventDate)}` : ''}
                 </p>
-                <p className="mt-1 text-[11px] opacity-60">
+                <p className="mt-1 text-xs opacity-60">
                   Lead oberta {formatDateSimple(topLead.createdAt)}
                   {topLead.booking ? ` · Reserva ${topLead.booking.reference}` : ''}
                 </p>
-                <p className="mt-1 text-[11px] opacity-60">
+                <p className="mt-1 text-xs opacity-60">
                   {topLead.booking ? `Conversió: reserva vinculada (${topLead.booking.reference})` : 'Conversió: sense reserva vinculada'}
                 </p>
                 {topLead.booking && (
-                  <p className="mt-1 text-[11px] opacity-60">
+                  <p className="mt-1 text-xs opacity-60">
                     Estat de la reserva: {topLead.booking.status === 'CONFIRMED' ? 'Confirmada' : topLead.booking.status}
                   </p>
                 )}
                 {topLead.booking?.date && (
-                  <p className="mt-1 text-[11px] opacity-60">
+                  <p className="mt-1 text-xs opacity-60">
                     Data de la reserva: {formatDateSimple(topLead.booking.date)}
                   </p>
                 )}
                 {topLead.booking?.date && (
-                  <p className="mt-1 text-[11px] opacity-60">
+                  <p className="mt-1 text-xs opacity-60">
                     Dies fins a la reserva: {getDaysUntil(topLead.booking.date)}
                   </p>
                 )}
                 {topLead.booking?.location && (
-                  <p className="mt-1 text-[11px] opacity-60">
+                  <p className="mt-1 text-xs opacity-60">
                     Ubicació: {topLead.booking.location}
                   </p>
                 )}
                 {topLead.booking?.venue && (
-                  <p className="mt-1 text-[11px] opacity-60">
+                  <p className="mt-1 text-xs opacity-60">
                     Recinte: {topLead.booking.venue}
                   </p>
                 )}
                 {typeof topLead.booking?.depositAmount === 'number' && (
-                  <p className="mt-1 text-[11px] opacity-60">
+                  <p className="mt-1 text-xs opacity-60">
                     Bestreta prevista: {formatCurrency(topLead.booking.depositAmount)}
                   </p>
                 )}
                 {typeof topLead.booking?.remainingAmount === 'number' && (
-                  <p className="mt-1 text-[11px] opacity-60">
+                  <p className="mt-1 text-xs opacity-60">
                     Pendent de cobrament: {formatCurrency(topLead.booking.remainingAmount)}
                   </p>
                 )}
                 {topLeadPaymentSummary && (
-                  <p className="mt-1 text-[11px] opacity-60">
+                  <p className="mt-1 text-xs opacity-60">
                     {topLeadPaymentSummary}
                   </p>
                 )}
                 {topLeadPaymentRisk && (
-                  <p className="mt-1 text-[11px] admin-tone-text-warning">
+                  <p className="mt-1 text-xs admin-tone-text-warning">
                     {topLeadPaymentRisk}
                   </p>
                 )}
                 {topLead.booking?.discountCode && (
-                  <p className="mt-1 text-[11px] opacity-60">
+                  <p className="mt-1 text-xs opacity-60">
                     Descompte aplicat: {topLead.booking.discountCode}
                   </p>
                 )}
                 {topLead.booking?.eventType && (
-                  <p className="mt-1 text-[11px] opacity-60">
+                  <p className="mt-1 text-xs opacity-60">
                     Tipus de reserva: {getEventLabel(topLead.booking.eventType)}
                   </p>
                 )}
                 {(topLead.booking?.startTime || topLead.booking?.endTime) && (
-                  <p className="mt-1 text-[11px] opacity-60">
+                  <p className="mt-1 text-xs opacity-60">
                     Horari: {topLead.booking?.startTime || '—'}{topLead.booking?.endTime ? ` - ${topLead.booking.endTime}` : ''}
                   </p>
                 )}
                 {typeof topLead.booking?.guestCount === 'number' && (
-                  <p className="mt-1 text-[11px] opacity-60">
+                  <p className="mt-1 text-xs opacity-60">
                     Aforament previst: {topLead.booking.guestCount} convidats
                   </p>
                 )}
                 {topLead.booking && (
-                  <p className="mt-1 text-[11px] opacity-60">
+                  <p className="mt-1 text-xs opacity-60">
                     Valor de la reserva: {formatCurrency(topLead.booking.total)}
                   </p>
                 )}
                 {topLead.booking && (
-                  <p className="mt-1 text-[11px] opacity-60">
+                  <p className="mt-1 text-xs opacity-60">
                     Cobrament: {topLead.booking.depositPaid && topLead.booking.remainingPaid
                       ? 'Pagada'
                       : topLead.booking.depositPaid
@@ -636,19 +636,19 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                   </p>
                 )}
                 {topLeadActionChannel && (
-                  <p className="mt-1 text-[11px] opacity-60">{topLeadActionChannel}</p>
+                  <p className="mt-1 text-xs opacity-60">{topLeadActionChannel}</p>
                 )}
                 {topLeadActionUrgency && (
-                  <p className="mt-1 text-[11px] opacity-60">{topLeadActionUrgency}</p>
+                  <p className="mt-1 text-xs opacity-60">{topLeadActionUrgency}</p>
                 )}
                 <a
                   href={buildCustomerWorkspaceTabHref(data.customer.id, 'comms')}
-                  className="mt-3 inline-flex text-[11px] opacity-70 underline-offset-2 hover:underline"
+                  className="mt-3 inline-flex text-xs opacity-70 underline-offset-2 hover:underline"
                 >
                   Anar a Comunicacions
                 </a>
                 {topLead.booking && (
-                  <a href={buildBookingHref(topLead.booking.id)} className="mt-2 inline-flex text-[11px] opacity-70 underline-offset-2 hover:underline">
+                  <a href={buildBookingHref(topLead.booking.id)} className="mt-2 inline-flex text-xs opacity-70 underline-offset-2 hover:underline">
                     Obrir reserva vinculada
                   </a>
                 )}
@@ -681,7 +681,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                 <p className="text-sm font-medium">{commercialPriority.title}</p>
                 <p className="mt-1 text-xs">{commercialPriority.detail}</p>
                 {commercialPriority.footnote && (
-                  <p className="mt-2 text-[11px] opacity-70">{commercialPriority.footnote}</p>
+                  <p className="mt-2 text-xs opacity-70">{commercialPriority.footnote}</p>
                 )}
               </>
             )
@@ -714,7 +714,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                   <p className="mt-1 text-xs">Venciment: {formatDateSimple(nextTask.dueDate)}</p>
                 )}
                 {nextTask.priority === 'HIGH' && (
-                  <span className="mt-2 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold">URGENT</span>
+                  <span className="mt-2 inline-block rounded-full px-2 py-0.5 text-xs font-semibold">URGENT</span>
                 )}
               </>
             )
@@ -740,14 +740,14 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                     ? ` · últim contacte fa ${data.reactivation.daysSinceLastContact} dies`
                     : ''}
                 </p>
-                <p className="mt-2 text-[11px] opacity-70">
+                <p className="mt-2 text-xs opacity-70">
                   Canal suggerit: {data.reactivation.suggestedChannels.join(' · ') || 'email'}
                 </p>
-                <p className="mt-1 text-[11px] opacity-60">
+                <p className="mt-1 text-xs opacity-60">
                   La reactivació queda en mode assistit: obrim esborrany, no enviament automàtic.
                 </p>
                 {reactivationTaskHref && (
-                  <a href={reactivationTaskHref} className="mt-3 inline-flex text-[11px] opacity-70 underline-offset-2 hover:underline">
+                  <a href={reactivationTaskHref} className="mt-3 inline-flex text-xs opacity-70 underline-offset-2 hover:underline">
                     Crear tasca de reactivació
                   </a>
                 )}
@@ -788,10 +788,10 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                   <div key={ev.id} className="rounded-xl border p-2">
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-medium">{ev.reference || 'Reserva'}</p>
-                      <a href={buildBookingHref(ev.id)} className="text-[11px]">Obrir →</a>
+                      <a href={buildBookingHref(ev.id)} className="text-xs">Obrir →</a>
                     </div>
                     <p className="mt-0.5 text-xs">{ev.date && formatDateFull(ev.date)}{ev.startTime && ` · ${ev.startTime}`}</p>
-                    {ev.location && <p className="text-[11px]">📍 {ev.location}</p>}
+                    {ev.location && <p className="text-xs">📍 {ev.location}</p>}
                   </div>
                 ))}
               </div>
@@ -870,7 +870,7 @@ function StatCard({ label, value, detail, color }: { label: string; value: numbe
     <div className={`admin-customer-stat rounded-xl border p-3 ${colorStyles[color]}`} {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.stat(label))}>
       <p className="text-xs">{label}</p>
       <p className="mt-1 text-2xl font-semibold">{value}</p>
-      {detail && <p className="mt-0.5 text-[11px]">{detail}</p>}
+      {detail && <p className="mt-0.5 text-xs">{detail}</p>}
     </div>
   );
 }
@@ -994,19 +994,19 @@ function RouteSnapshotCard({
     <>
       <p className="text-sm font-medium">{venue || location}</p>
       {venue && location && <p className="mt-1 text-xs">{location}</p>}
-      <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
+      <div className="mt-3 flex flex-wrap gap-2 text-xs">
         {distanceLabel && <span className="rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-0.5 admin-tone-text-cyan">🚗 {distanceLabel}</span>}
         {oneWayLabel && <span className="rounded-full border border-white/10 px-2 py-0.5">{oneWayLabel}</span>}
         {liveRoute?.durationText && <span className="rounded-full border border-white/10 px-2 py-0.5">⏱️ {liveRoute.durationText}</span>}
       </div>
-      {sourceLabel && <p className="mt-2 text-[11px] opacity-70">{sourceLabel}</p>}
-      {liveRoute?.originResolved && <p className="mt-1 text-[11px] opacity-60">Base Òrbita: {liveRoute.originResolved}</p>}
+      {sourceLabel && <p className="mt-2 text-xs opacity-70">{sourceLabel}</p>}
+      {liveRoute?.originResolved && <p className="mt-1 text-xs opacity-60">Base Òrbita: {liveRoute.originResolved}</p>}
       {liveRoute?.destinationResolved && liveRoute.destinationResolved !== destination && (
-        <p className="mt-1 text-[11px] opacity-60">Destí resolt: {liveRoute.destinationResolved}</p>
+        <p className="mt-1 text-xs opacity-60">Destí resolt: {liveRoute.destinationResolved}</p>
       )}
-      {loading && <p className="mt-2 text-[11px] opacity-70">Calculant ruta real...</p>}
-      {!loading && routeError && <p className="mt-2 text-[11px] admin-tone-text-warning">{routeError}</p>}
-      <div className="mt-3 flex flex-wrap gap-3 text-[11px]">
+      {loading && <p className="mt-2 text-xs opacity-70">Calculant ruta real...</p>}
+      {!loading && routeError && <p className="mt-2 text-xs admin-tone-text-warning">{routeError}</p>}
+      <div className="mt-3 flex flex-wrap gap-3 text-xs">
         <a href={mapsHref} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:underline">
           Obrir a Google Maps
         </a>
@@ -1153,7 +1153,7 @@ function CrmStatusBar({
         {tags.map((tag) => (
           <span
             key={tag}
-            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${CUSTOMER_TAG_COLORS[tag] || CUSTOMER_TAG_DEFAULT_COLOR}`}
+            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${CUSTOMER_TAG_COLORS[tag] || CUSTOMER_TAG_DEFAULT_COLOR}`}
           >
             {tag}
             <button
@@ -1171,7 +1171,7 @@ function CrmStatusBar({
           <button
             type="button"
             onClick={() => setAddingTag(true)}
-            className="rounded-full border border-dashed border-white/20 px-2.5 py-0.5 text-[11px] text-white/40 hover:text-white/60 hover:border-white/30 transition-colors"
+            className="rounded-full border border-dashed border-white/20 px-2.5 py-0.5 text-xs text-white/40 hover:text-white/60 hover:border-white/30 transition-colors"
           >
             + tag
           </button>
@@ -1186,7 +1186,7 @@ function CrmStatusBar({
                 if (e.key === 'Escape') { setAddingTag(false); setNewTag(''); }
               }}
               placeholder="Nou tag..."
-              className="w-24 rounded-lg border border-white/20 bg-transparent px-2 py-0.5 text-[11px] text-white/80 placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-[var(--ax-hair-gold)]"
+              className="w-24 rounded-lg border border-white/20 bg-transparent px-2 py-0.5 text-xs text-white/80 placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-[var(--ax-hair-gold)]"
               autoFocus
               disabled={saving}
               list="tag-presets"
@@ -1200,14 +1200,14 @@ function CrmStatusBar({
               type="button"
               onClick={() => handleAddTag(newTag)}
               disabled={saving || !newTag.trim()}
-              className="text-[11px] admin-tone-text-cyan hover:opacity-80 disabled:opacity-30"
+              className="text-xs admin-tone-text-cyan hover:opacity-80 disabled:opacity-30"
             >
               {saving ? '...' : '✓'}
             </button>
             <button
               type="button"
               onClick={() => { setAddingTag(false); setNewTag(''); }}
-              className="text-[11px] text-white/40 hover:text-white/60"
+              className="text-xs text-white/40 hover:text-white/60"
             >
               ×
             </button>
@@ -1317,7 +1317,7 @@ function ContactsSection({ customerId, contacts: initialContacts }: { customerId
             <div className="flex flex-col gap-0.5 min-w-0">
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-sm">{c.name}</span>
-                {c.isPrimary && <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border border-[var(--ax-hair-gold)] text-[var(--ax-gold-bright)] bg-[color-mix(in_oklab,var(--ax-gold)_10%,var(--ax-panel))]">Principal</span>}
+                {c.isPrimary && <span className="text-xs font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border border-[var(--ax-hair-gold)] text-[var(--ax-gold-bright)] bg-[color-mix(in_oklab,var(--ax-gold)_10%,var(--ax-panel))]">Principal</span>}
               </div>
               {c.role && <span className="text-xs opacity-60">{c.role}</span>}
               {c.email && <a href={`/admin/inbox/compose?to=${encodeURIComponent(c.email)}&customerId=${customerId}`} className="text-xs text-[var(--ax-gold-bright)]">{c.email}</a>}

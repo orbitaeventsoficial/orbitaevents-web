@@ -6,7 +6,7 @@ export default function AdminLoadingSkeletonList() {
   return (
     <div className="animate-pulse space-y-5">
       {/* Pipeline suggestions placeholder */}
-      <div className="h-20 rounded-2xl border border-white/10 bg-white/[0.03]" />
+      <div className="h-20 ap-card" />
 
       {/* Filter bar */}
       <div className="flex items-center gap-3">
@@ -17,7 +17,7 @@ export default function AdminLoadingSkeletonList() {
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] overflow-hidden">
+      <div className="ap-card overflow-hidden">
         {/* Header */}
         <div className="flex items-center gap-4 border-b border-white/10 px-4 py-3">
           {[60, 120, 80, 100, 80, 80].map((w, i) => (

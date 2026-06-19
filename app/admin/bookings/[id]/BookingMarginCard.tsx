@@ -212,15 +212,15 @@ export default function BookingMarginCard({
     >
       <div className="admin-booking-margin-hero mb-6">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] opacity-70">Cabina econòmica</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] opacity-70">Cabina econòmica</p>
           <h2 className="mt-2 text-lg font-semibold">Marge i costos</h2>
           <p className="mt-1 text-sm opacity-80">
             Llegeix en un cop d'ull què deixa la reserva, on marxa cada euro i si el desplaçament està ben cobert.
           </p>
         </div>
         <div className="admin-booking-margin-badge">
-          <span className={`text-xl font-black ${marginColor}`}>{marginPct.toFixed(1)}%</span>
-          <span className="text-[11px] uppercase tracking-wide opacity-70">Marge actual</span>
+          <span className={`text-xl font-bold ${marginColor}`}>{marginPct.toFixed(1)}%</span>
+          <span className="text-xs uppercase tracking-wide opacity-70">Marge actual</span>
         </div>
       </div>
 
@@ -245,8 +245,8 @@ export default function BookingMarginCard({
           <Tooltip text="Calculat pel motor de cost: pack, extres, transport i cost operacional.">
             <p className="text-xs font-medium uppercase">% marge</p>
           </Tooltip>
-          <p className={`text-2xl font-black ${marginColor}`}>{marginPct.toFixed(1)}%</p>
-          <p className={`text-[11px] mt-0.5 ${marginColor}`}>
+          <p className={`font-[family-name:var(--display)] text-[22px] font-bold leading-none ${marginColor}`}>{marginPct.toFixed(1)}%</p>
+          <p className={`text-xs mt-0.5 ${marginColor}`}>
             {marginPct >= 50 ? 'Excel·lent. Marge sa.' :
              marginPct >= 30 ? 'Acceptable. Encara hi ha marge per optimitzar.' :
              marginPct >= 15 ? 'Vigilar. Revisa descomptes i transport.' :
@@ -354,7 +354,7 @@ export default function BookingMarginCard({
                   <span className="font-bold text-base">Benefici net</span>
                   <p className="text-xs opacity-60 mt-0.5">Compte principal — sou, estalvi i reinversio</p>
                 </div>
-                <span className={`shrink-0 text-base font-black tabular-nums ${netMargin >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
+                <span className={`shrink-0 text-base font-bold tabular-nums ${netMargin >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
                   {formatCurrency(netMargin)}
                 </span>
               </div>
@@ -438,28 +438,28 @@ export default function BookingMarginCard({
             <div className="ap-card px-3 py-2 text-sm font-bold">
               {formatCurrency(calculatedTravelCost)}
             </div>
-            <p className="mt-1 text-[11px]">
+            <p className="mt-1 text-xs">
               {travelBlocks} trams · {TRAVEL_BLOCK_EUR} €
             </p>
           </div>
         </div>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           <div className="admin-booking-travel-card ap-card rounded-xl p-3">
-            <p className="text-[11px] uppercase tracking-wide" title="Inclou benzina, manteniment, assegurança i amortització. Valor recomanat: 0.35-0.50 €/km">Cost vehicle per km</p>
+            <p className="text-xs uppercase tracking-wide" title="Inclou benzina, manteniment, assegurança i amortització. Valor recomanat: 0.35-0.50 €/km">Cost vehicle per km</p>
             <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCost)}</p>
-            <p className="text-[11px]">{distanceKm.toFixed(1)} km · {vehicleCostPerKm.toFixed(2)} €/km</p>
+            <p className="text-xs">{distanceKm.toFixed(1)} km · {vehicleCostPerKm.toFixed(2)} €/km</p>
           </div>
           <div className="admin-booking-travel-card ap-card rounded-xl p-3">
-            <p className="text-[11px] uppercase tracking-wide">Ingressos transport</p>
+            <p className="text-xs uppercase tracking-wide">Ingressos transport</p>
             <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCharge)}</p>
-            <p className="text-[11px]">{travelBlocks} trams · {TRAVEL_BLOCK_EUR} €</p>
+            <p className="text-xs">{travelBlocks} trams · {TRAVEL_BLOCK_EUR} €</p>
           </div>
           <div className={`admin-booking-travel-card rounded-xl border p-3 ${travelMarginCardBorder} ${travelMarginCardBg}`}>
-            <p className="text-[11px] uppercase tracking-wide">Marge real transport</p>
+            <p className="text-xs uppercase tracking-wide">Marge real transport</p>
             <p className={`text-sm font-semibold ${travelMarginColor}`}>
               {formatCurrency(travelNetMargin)}
             </p>
-            <p className="text-[11px]">
+            <p className="text-xs">
               {calculatedTravelCharge > 0 ? `${travelMarginPct.toFixed(1)}% de marge` : 'Sense suplement aplicat'}
             </p>
           </div>

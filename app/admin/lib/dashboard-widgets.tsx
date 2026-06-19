@@ -150,7 +150,7 @@ export function RadialProgress({
           {clamped}%
         </text>
       </svg>
-      {label && <span className="text-[10px] uppercase tracking-wider opacity-50">{label}</span>}
+      {label && <span className="text-xs uppercase tracking-wider opacity-50">{label}</span>}
     </div>
   );
 }
@@ -292,7 +292,7 @@ export function MonthlyBarChart({ data, height = 160 }: { data: BarData[]; heigh
           );
         })}
       </svg>
-      <div className="mt-2 flex gap-4 text-[10px]">
+      <div className="mt-2 flex gap-4 text-xs">
         <div className="flex items-center gap-1.5">
           <span className="inline-block h-2 w-2 rounded-full" />
           <span className="opacity-50">Any actual</span>
@@ -344,7 +344,7 @@ export function DonutChart({ segments, size = 120 }: { segments: DonutSegment[];
           {total}
         </text>
       </svg>
-      <div className="flex flex-col gap-1.5 text-[11px]">
+      <div className="flex flex-col gap-1.5 text-xs">
         {segments.map((seg) => (
           <div key={seg.label} className="flex items-center gap-2">
             <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: seg.color }} />
@@ -382,11 +382,11 @@ export function MiniLineChart({ series, height = 56 }: { series: Series[]; heigh
           );
         })}
       </svg>
-      <div className="mt-2 flex flex-wrap gap-3 text-[11px]">
+      <div className="mt-2 flex flex-wrap gap-3 text-xs">
         {series.map((s, idx) => (
           <div key={`${s.label || 'legend'}-${idx}`} className="flex items-center gap-2">
             <span className="inline-flex h-2 w-2 rounded-full" style={{ background: s.stroke }} />
-            <span className="uppercase tracking-wide text-[10px]">{s.label}</span>
+            <span className="uppercase tracking-wide text-xs">{s.label}</span>
             {s.value !== undefined && <span className="font-medium">{s.value}</span>}
           </div>
         ))}

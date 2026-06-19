@@ -4,6 +4,7 @@ import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver'
 import { getDossierCopy, getOrbitaDossierProducts } from '@/lib/constants/dossier-copy';
 import { buildDossierHtml, type DossierClientInfo } from '@/lib/utils/dossier-html-builder';
 import { sendEmail } from '@/lib/email';
+import { EMAIL_CONTACT } from '@/lib/constants/email';
 import { recordEmailSend } from '@/lib/services/emailTrackingService';
 import {
   collaboratorProductToAnimacioProduct,
@@ -189,7 +190,7 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
       to: recipientEmail,
       subject,
       html,
-      text: `Hola ${dossier.nom},\n\nT'enviem el dossier amb les nostres propostes: ${productsLabel}.\n\nQualsevol dubte, contacta'ns al 654 46 70 87 o info@orbitaevents.com\n\nÒrbita Events`,
+      text: `Hola ${dossier.nom},\n\nT'enviem el dossier amb les nostres propostes: ${productsLabel}.\n\nQualsevol dubte, contacta'ns al ${EMAIL_CONTACT.phone} o ${EMAIL_CONTACT.email}\n\nÒrbita Events`,
       orbita: orbitaCtx,
     });
 

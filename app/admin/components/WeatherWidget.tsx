@@ -68,7 +68,7 @@ export default function WeatherWidget() {
   if (loadError || forecasts.length === 0) return null;
 
   return (
-    <section className="rounded-xl border border-white/10 bg-white/[0.02] p-4 sm:p-5">
+    <section className="ap-card p-4 sm:p-5">
       <p className="text-xs font-bold text-white/50 uppercase tracking-wider mb-3">
         Temps pròxims events
       </p>
@@ -86,14 +86,14 @@ export default function WeatherWidget() {
             </div>
             <p className="text-xs font-medium text-white/70 truncate">{f.description}</p>
             {f.rainProbability > 0 && (
-              <p className="text-xs text-cyan-400/80 mt-0.5">
+              <p className="text-xs admin-tone-text-cyan mt-0.5">
                 {'\uD83D\uDCA7'} {f.rainProbability}% pluja
               </p>
             )}
             <div className="mt-2 pt-2 border-t border-white/5">
               <p className="text-xs font-medium text-white/80 truncate">{f.clientName}</p>
-              <p className="text-[11px] text-white/40 truncate">{f.location}</p>
-              <p className="text-[11px] text-white/40 mt-0.5">{formatShortDate(f.eventDate)}</p>
+              <p className="text-xs text-white/40 truncate">{f.location}</p>
+              <p className="text-xs text-white/40 mt-0.5">{formatShortDate(f.eventDate)}</p>
             </div>
           </div>
         ))}

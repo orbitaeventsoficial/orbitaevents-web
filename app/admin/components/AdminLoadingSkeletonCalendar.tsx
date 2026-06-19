@@ -7,15 +7,15 @@ export default function AdminLoadingSkeletonCalendar() {
       {/* Top bar: month title + nav + view toggle */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg border border-white/10 bg-white/[0.03]" />
+          <div className="h-8 w-8 ap-card" />
           <div className="h-7 w-36 rounded-lg bg-white/[0.03]" />
-          <div className="h-8 w-8 rounded-lg border border-white/10 bg-white/[0.03]" />
+          <div className="h-8 w-8 ap-card" />
         </div>
         <div className="flex gap-1">
-          <div className="h-8 w-14 rounded-lg border border-white/10 bg-white/[0.03]" />
-          <div className="h-8 w-20 rounded-lg border border-white/10 bg-white/[0.05]" />
-          <div className="h-8 w-20 rounded-lg border border-white/10 bg-white/[0.03]" />
-          <div className="h-8 w-16 rounded-lg border border-white/10 bg-white/[0.03]" />
+          <div className="h-8 w-14 ap-card" />
+          <div className="h-8 w-20 ap-card" />
+          <div className="h-8 w-20 ap-card" />
+          <div className="h-8 w-16 ap-card" />
         </div>
       </div>
 
@@ -34,7 +34,7 @@ export default function AdminLoadingSkeletonCalendar() {
           {Array.from({ length: COLS * ROWS }).map((_, i) => (
             <div
               key={i}
-              className="h-20 rounded-lg border border-white/[0.06] bg-white/[0.02] p-1.5"
+              className="h-20 ap-card p-1.5"
             >
               <div className="h-5 w-5 rounded-full bg-white/[0.04]" />
               {i % 4 === 0 && (

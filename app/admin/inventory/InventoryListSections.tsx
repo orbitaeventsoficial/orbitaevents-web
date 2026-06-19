@@ -40,8 +40,8 @@ export function InventoryToolbar({
         onClick={() => toggleView('list')}
         className={`px-3 py-2 text-xs font-medium transition-colors ${
           viewMode === 'list'
-            ? 'bg-cyan-500/20 text-cyan-200'
-            : 'bg-white/5 text-white/40 hover:bg-white/10/50'
+            ? 'admin-tone-bg-info admin-tone-text-info'
+            : 'bg-white/5 text-white/40 hover:bg-white/10'
         }`}
       >
         Llista
@@ -53,8 +53,8 @@ export function InventoryToolbar({
         onClick={() => toggleView('grid')}
         className={`px-3 py-2 text-xs font-medium transition-colors ${
           viewMode === 'grid'
-            ? 'bg-cyan-500/20 text-cyan-200'
-            : 'bg-white/5 text-white/40 hover:bg-white/10/50'
+            ? 'admin-tone-bg-info admin-tone-text-info'
+            : 'bg-white/5 text-white/40 hover:bg-white/10'
         }`}
       >
         Graella
@@ -97,7 +97,7 @@ function InventoryKpiCard({ label, value }: { label: string; value: string }) {
 
 function InventoryPackLinks({ item, compact = false }: { item: InventoryItem; compact?: boolean }) {
   if (item.packItems.length === 0) {
-    return <span className="text-[11px] text-white/40">Sense pack</span>;
+    return <span className="text-xs text-white/40">Sense pack</span>;
   }
 
   return (
@@ -106,13 +106,13 @@ function InventoryPackLinks({ item, compact = false }: { item: InventoryItem; co
         <Link
           key={packItem.id}
           href={buildPackHref(packItem.pack.id, 'content')}
-          className="inline-flex max-w-full items-center rounded-full border border-cyan-400/25 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-semibold text-cyan-100 transition-colors hover:bg-cyan-500/20"
+          className="inline-flex max-w-full items-center rounded-full border admin-tone-border-info admin-tone-bg-info px-2 py-0.5 text-xs font-semibold admin-tone-text-info transition-colors hover:admin-tone-bg-info"
         >
           <span className="truncate">{packItem.pack.slug}</span>
         </Link>
       ))}
       {item.packItems.length > 4 && (
-        <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-white/70">
+        <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-xs font-semibold text-white/70">
           +{item.packItems.length - 4}
         </span>
       )}
@@ -266,10 +266,10 @@ export function InventoryHealthFocus({ activeHealthLabel }: { activeHealthLabel:
   if (!activeHealthLabel) return null;
 
   return (
-    <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-4 admin-card-glass">
+    <div className="rounded-2xl border admin-tone-border-info admin-tone-bg-info p-4 admin-card-glass">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-cyan-200/80">
+          <p className="text-xs font-semibold uppercase tracking-wide admin-tone-text-info">
             Focus de salut
           </p>
           <p className="mt-1 text-sm text-white/80">{activeHealthLabel}</p>
@@ -391,7 +391,7 @@ export function InventoryGridSection({ displayedItems }: { displayedItems: Inven
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-4xl">{catConf.icon}</div>
               )}
-              <span className={`absolute top-2 right-2 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${statusConf.bg} ${statusConf.text} admin-card-glass`}>
+              <span className={`absolute top-2 right-2 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusConf.bg} ${statusConf.text} admin-card-glass`}>
                 {statusConf.label}
               </span>
             </div>
@@ -407,7 +407,7 @@ export function InventoryGridSection({ displayedItems }: { displayedItems: Inven
               </div>
               <InventoryPackLinks item={item} />
               {item.purchasePrice && (
-                <p className="text-[11px]">
+                <p className="text-xs">
                   Resten aprox. {Math.max(0, (item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS) - item.totalHoursUsed).toFixed(0)}h útils
                 </p>
               )}
@@ -448,11 +448,11 @@ export function InventoryMobileListSection({
                 <Link href={buildInventoryHref(item.id)} className="font-medium text-sm leading-tight transition-colors block truncate">
                   {item.name}
                 </Link>
-                <code className="text-[11px] font-mono mt-0.5 inline-block opacity-60">{item.code}</code>
+                <code className="text-xs font-mono mt-0.5 inline-block opacity-60">{item.code}</code>
               </div>
               <div className="text-right shrink-0 space-y-1">
                 <p className="text-sm font-semibold">{formatNumber(item.value)}€</p>
-                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${statusConf.bg} ${statusConf.text}`}>
+                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusConf.bg} ${statusConf.text}`}>
                   {statusConf.label}
                 </span>
               </div>
@@ -460,12 +460,12 @@ export function InventoryMobileListSection({
             <div className="mt-3 flex items-center justify-between gap-2">
               <div className="flex flex-wrap items-center gap-2 min-w-0">
                 <span className="inline-flex items-center gap-1 text-xs opacity-70">{catConf.icon} {catConf.label}</span>
-                <span className="inline-flex items-center rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium">{condLabel}</span>
-                {item.watts ? <span className="text-[11px] opacity-60">{item.watts}W</span> : null}
+                <span className="inline-flex items-center rounded-full bg-white/10 px-2 py-0.5 text-xs font-medium">{condLabel}</span>
+                {item.watts ? <span className="text-xs opacity-60">{item.watts}W</span> : null}
               </div>
               <div className="mt-2"><InventoryPackLinks item={item} compact /></div>
               <div className="flex items-center gap-1 shrink-0">
-                <select value={item.status} onChange={(e) => handleStatusChange(item.id, e.target.value)} aria-label={`Estat de ${item.name}`} className={`min-h-[44px] min-w-[44px] rounded-xl px-2 py-1 text-[11px] font-medium border-0 cursor-pointer ${statusConf.bg} ${statusConf.text}`}>
+                <select value={item.status} onChange={(e) => handleStatusChange(item.id, e.target.value)} aria-label={`Estat de ${item.name}`} className={`min-h-[44px] min-w-[44px] rounded-xl px-2 py-1 text-xs font-medium border-0 cursor-pointer ${statusConf.bg} ${statusConf.text}`}>
                   {statuses.map((st) => (
                     <option key={st} value={st}>{STATUS_CONFIG[st].label}</option>
                   ))}
@@ -514,7 +514,7 @@ export function InventoryDesktopTableSection({
               const tableLifePct = calculateLifeRemainingPercent(item.totalHoursUsed, item.expectedLifeHours);
 
               return (
-                <tr key={item.id} className="transition-colors hover:bg-white/[0.03]">
+                <tr key={item.id} className="transition-colors adm-row-hover">
                   <td className="px-4 py-3"><code className="text-xs font-mono px-2 py-1 rounded">{item.code}</code></td>
                   <td className="px-4 py-3">
                     <Link href={buildInventoryHref(item.id)} className="font-medium transition-colors">{item.name}</Link>

@@ -102,10 +102,10 @@ export function CalendarStatsGrid({
         <div key={entry.label} className={`admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all ${toneClasses[entry.tone]}`}>
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide">{entry.label}</span>
+              <span className="text-xs uppercase tracking-wide">{entry.label}</span>
               <span className="text-xl sm:text-2xl font-bold">{entry.value}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-[10px] font-medium">{entry.badge}</span>
+            <span className="rounded-full px-2 py-0.5 text-xs font-medium">{entry.badge}</span>
           </div>
         </div>
       ))}

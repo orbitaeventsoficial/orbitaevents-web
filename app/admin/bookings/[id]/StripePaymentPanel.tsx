@@ -64,7 +64,7 @@ function PaymentRow({
 
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-[var(--at-text)]">{label}</p>
-        <p className="text-[11px] text-[var(--at-subtle)]">{sublabel}</p>
+        <p className="text-xs text-[var(--at-subtle)]">{sublabel}</p>
       </div>
 
       <div className="text-right shrink-0 mr-2">
@@ -75,7 +75,7 @@ function PaymentRow({
           {amount}
         </p>
         <p
-          className="text-[11px] font-medium"
+          className="text-xs font-medium"
           style={{ color: paid ? 'var(--at-green)' : locked ? 'var(--at-subtle)' : 'var(--at-orange)' }}
         >
           {paid ? 'Pagat' : locked ? 'Blocat' : 'Pendent'}
@@ -217,15 +217,15 @@ export default function StripePaymentPanel({
           <div
             className="flex items-center justify-center w-7 h-7 rounded-lg text-sm select-none"
             style={{
-              background: 'color-mix(in oklab, var(--at-violet) 14%, var(--at-panel) 86%)',
-              border: '1px solid color-mix(in oklab, var(--at-violet) 30%, var(--at-border) 70%)',
+              background: 'color-mix(in oklab, var(--at-gold) 14%, var(--at-panel) 86%)',
+              border: '1px solid color-mix(in oklab, var(--at-gold) 30%, var(--at-border) 70%)',
             }}
           >
             💳
           </div>
           <div>
             <p className="text-sm font-semibold text-[var(--at-text)]">Pagaments</p>
-            <p className="text-[11px] text-[var(--at-subtle)]">Stripe · Bizum · links de checkout</p>
+            <p className="text-xs text-[var(--at-subtle)]">Stripe · Bizum · links de checkout</p>
           </div>
         </div>
         {hasBizumPending && !bothPaid && (

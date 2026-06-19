@@ -142,13 +142,13 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
   }
 
   return (
-    <section className="rounded-2xl border border-white/10 p-5 shadow-sm">
+    <section className="ap-card p-5">
       <h2 className="text-lg font-semibold">Històric de configuració</h2>
       <div className="mt-2 flex justify-end">
         <button
           type="button"
           onClick={exportCsv}
-          className="rounded-md border border-white/10 px-2.5 py-1.5 text-xs font-semibold hover:bg-white/5"
+          className="ap-btn ap-btn--xs"
         >
           Exportar CSV (filtrat)
         </button>
@@ -159,7 +159,7 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value as 'ALL' | 'OWNER' | 'MANAGER' | 'VIEWER')}
-            className="mt-1 w-full rounded-md border px-2 py-1.5 text-xs"
+            className="adm-input mt-1 w-full text-xs"
           >
             <option value="ALL">Tots</option>
             <option value="OWNER">OWNER</option>
@@ -173,7 +173,7 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
-            className="mt-1 w-full rounded-md border px-2 py-1.5 text-xs"
+            className="adm-input mt-1 w-full text-xs"
           />
         </label>
         <label className="text-xs">
@@ -182,7 +182,7 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
-            className="mt-1 w-full rounded-md border px-2 py-1.5 text-xs"
+            className="adm-input mt-1 w-full text-xs"
           />
         </label>
         <label className="text-xs">
@@ -192,7 +192,7 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="canal, ràtio, cost..."
-            className="mt-1 w-full rounded-md border px-2 py-1.5 text-xs"
+            className="adm-input mt-1 w-full text-xs"
           />
         </label>
       </div>
@@ -210,7 +210,7 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
                   type="button"
                   onClick={() => restore(entry)}
                   disabled={restoringId === entry.id}
-                  className="rounded-md border border-white/10 px-2 py-1 text-xs font-semibold hover:bg-white/5 disabled:opacity-60"
+                  className="ap-btn ap-btn--xs"
                 >
                   {restoringId === entry.id ? 'Restaurant...' : 'Restaurar'}
                 </button>

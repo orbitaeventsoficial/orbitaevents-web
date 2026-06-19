@@ -215,7 +215,7 @@ export default function InboxPanel() {
                   onClick={() => handleEmailClick(email)}
                   type="button"
                   aria-pressed={selectedEmail?.uid === email.uid}
-                  className={`w-full cursor-pointer px-4 py-3 text-left transition-colors hover:bg-white/[0.03] ${
+                  className={`w-full cursor-pointer px-4 py-3 text-left transition-colors adm-row-hover ${
                     selectedEmail?.uid === email.uid ? 'admin-tone-bg-info border-l-2 admin-tone-border-info' : ''
                   } ${!email.isRead ? 'bg-white/[0.02]' : ''}`}
                 >

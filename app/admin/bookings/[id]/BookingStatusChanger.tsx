@@ -109,7 +109,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
               >
                 <span className={`bd__status-dot ${STATUS_DOT[status] ?? 'bg-white/30'}`} />
                 {c.label}
-                {isActive && <span className="ml-auto opacity-50 text-[10px]">actiu</span>}
+                {isActive && <span className="ml-auto opacity-50 text-xs">actiu</span>}
               </button>
             );
           })}
@@ -117,12 +117,12 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
       )}
 
       {successMsg && (
-        <p className="absolute top-full left-0 mt-1 text-[11px] text-[var(--o-success)] whitespace-nowrap pointer-events-none">
+        <p className="absolute top-full left-0 mt-1 text-xs text-[var(--o-success)] whitespace-nowrap pointer-events-none">
           ✓ {successMsg}
         </p>
       )}
       {error && (
-        <p className="absolute top-full left-0 mt-1 text-[11px] text-[var(--o-danger)] whitespace-nowrap pointer-events-none">
+        <p className="absolute top-full left-0 mt-1 text-xs text-[var(--o-danger)] whitespace-nowrap pointer-events-none">
           ⚠ {error}
         </p>
       )}
@@ -142,7 +142,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
                 Cancel·lar
               </button>
               <button onClick={() => void updateStatus('COMPLETED')} disabled={isLoading} type="button"
-                className="rounded-xl px-4 py-2 text-sm font-medium text-white shadow disabled:opacity-50">
+                className="ap-btn ap-btn--primary">
                 {isLoading ? 'Actualitzant…' : 'Completar'}
               </button>
             </div>

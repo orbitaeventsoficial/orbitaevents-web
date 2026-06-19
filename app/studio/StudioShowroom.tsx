@@ -63,26 +63,26 @@ const PALETTE: { group: string; items: { name: string; token: string; hex: strin
   {
     group: 'Fons · capes de profunditat',
     items: [
-      { name: 'Fons absolut', token: '--o-bg', hex: '#07090d', use: 'Body, viewport base' },
-      { name: 'Superfície', token: '--o-surface', hex: '#0e1219', use: 'Sidebar, command bar' },
-      { name: 'Card / elev-1', token: '--o-elev-1', hex: '#141923', use: 'Targetes principals' },
-      { name: 'Raised / elev-2', token: '--o-elev-2', hex: '#1c2230', use: 'Hover, botons secondary' },
-      { name: 'Popover / elev-3', token: '--o-elev-3', hex: '#252b3a', use: 'Tooltips, dropdowns' },
+      { name: 'Fons absolut', token: '--o-bg', hex: '#0b0b0e', use: 'Body, viewport base' },
+      { name: 'Superfície', token: '--o-surface', hex: '#111116', use: 'Sidebar, command bar' },
+      { name: 'Card / elev-1', token: '--o-elev-1', hex: '#161619', use: 'Targetes principals' },
+      { name: 'Raised / elev-2', token: '--o-elev-2', hex: '#1e1f27', use: 'Hover, botons secondary' },
+      { name: 'Popover / elev-3', token: '--o-elev-3', hex: '#25252a', use: 'Tooltips, dropdowns' },
     ],
   },
   {
     group: 'Text · nivells de jerarquia',
     items: [
-      { name: 'Primari', token: '--o-text', hex: '#f5f7fa', use: 'Títols, valors clau' },
-      { name: 'Secundari', token: '--o-text-2', hex: '#a2acba', use: 'Body, descripcions' },
-      { name: 'Terciari', token: '--o-text-3', hex: '#6b7585', use: 'Labels, captions' },
-      { name: 'Subtle', token: '--o-text-4', hex: '#4a525e', use: 'Disabled, separadors' },
+      { name: 'Primari', token: '--o-text', hex: '#e4ded4', use: 'Títols, valors clau' },
+      { name: 'Secundari', token: '--o-text-2', hex: '#b6aea2', use: 'Body, descripcions' },
+      { name: 'Terciari', token: '--o-text-3', hex: '#9a9286', use: 'Labels, captions' },
+      { name: 'Subtle', token: '--o-text-4', hex: '#6b6459', use: 'Disabled, separadors' },
     ],
   },
   {
     group: 'Marca · Òrbita (or sobri)',
     items: [
-      { name: 'Accent (or)', token: '--o-accent', hex: '#d4a857', use: 'CTA primary, focus' },
+      { name: 'Accent (or)', token: '--o-accent', hex: '#d7b86e', use: 'CTA primary, focus' },
       { name: 'Accent fosc', token: '--o-accent-deep', hex: '#b8923f', use: 'Borders, ombres' },
       { name: 'Ink', token: '--o-accent-ink', hex: '#1a1208', use: 'Text sobre or' },
     ],
@@ -258,11 +258,12 @@ const LAB_PALETTE_GROUPS: { group: string; items: { name: string; token: string;
   {
     group: 'Fons · Obsidiana càlida (mai negre pur ni slate fred)',
     items: [
-      { name: 'Canvas', token: '--canvas', hex: '#0a0a0c', use: 'Viewport, body base' },
-      { name: 'Side', token: '--side', hex: '#0d0d10', use: 'Barra lateral' },
-      { name: 'Panel', token: '--panel', hex: '#131318', use: 'Cards, panells elevats' },
-      { name: 'Raised', token: '--raised', hex: '#1d1e25', use: 'Hover, botons, inputs' },
-      { name: 'Sunk', token: '--sunk', hex: '#08080a', use: 'Cel·les buides del calendari' },
+      { name: 'Canvas', token: '--canvas', hex: '#111116', use: 'Viewport, body base' },
+      { name: 'Side', token: '--side', hex: '#0f0f13', use: 'Barra lateral' },
+      { name: 'Panel', token: '--panel', hex: '#161619', use: 'Cards, panells elevats' },
+      { name: 'Raised', token: '--raised', hex: '#1e1f27', use: 'Hover, botons, inputs' },
+      { name: 'Elevated', token: '--elevated', hex: '#25252a', use: 'Capa superior (modals, popovers)' },
+      { name: 'Sunk', token: '--sunk', hex: '#0b0b0e', use: 'Cel·les buides del calendari' },
     ],
   },
   {

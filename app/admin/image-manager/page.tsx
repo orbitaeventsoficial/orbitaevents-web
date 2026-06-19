@@ -86,7 +86,7 @@ export default function ImageManagerPage() {
     <div className="space-y-6 p-4 md:p-6">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
         <div>
-          <h1 className="text-3xl font-black text-white">Gestor d&apos;imatges</h1>
+          <h1 className="text-3xl font-bold text-[var(--t)]">Gestor d&apos;imatges</h1>
           <p className="mt-2 max-w-3xl text-sm text-white/70">
             Monocapa de govern visual del projecte. Puja imatges des d&apos;aquí i es propaguen a web, mòbil i SEO automàticament.
           </p>
@@ -159,12 +159,12 @@ export default function ImageManagerPage() {
       />
 
       <div className="grid gap-3 md:grid-cols-[minmax(0,220px)_1fr]">
-        <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
+        <div className="rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-4">
           <div className="space-y-2">
             <button
               type="button"
               onClick={() => setActiveSection('all')}
-              className={`w-full rounded-2xl px-4 py-2 text-left text-sm ${activeSection === 'all' ? 'bg-amber-500 text-black font-bold' : 'bg-white/5 text-white/70'}`}
+              className={`w-full rounded-2xl px-4 py-2 text-left text-sm ${activeSection === 'all' ? 'bg-[var(--gold)] text-[var(--gold-ink)] font-bold' : 'bg-white/5 text-white/70'}`}
             >
               Totes les seccions
             </button>
@@ -173,7 +173,7 @@ export default function ImageManagerPage() {
                 key={section.id}
                 type="button"
                 onClick={() => setActiveSection(section.id)}
-                className={`w-full rounded-2xl px-4 py-2 text-left text-sm ${activeSection === section.id ? 'bg-amber-500 text-black font-bold' : 'bg-white/5 text-white/70'}`}
+                className={`w-full rounded-2xl px-4 py-2 text-left text-sm ${activeSection === section.id ? 'bg-[var(--gold)] text-[var(--gold-ink)] font-bold' : 'bg-white/5 text-white/70'}`}
               >
                 {section.icon} {section.name}
               </button>
@@ -182,12 +182,12 @@ export default function ImageManagerPage() {
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
+          <div className="rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-4">
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Cerca per clau, target o descripció"
-              className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
+              className="w-full rounded-2xl border border-white/10 bg-[var(--sunk)] px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
             />
           </div>
 
@@ -195,7 +195,7 @@ export default function ImageManagerPage() {
           {success && <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">{success}</div>}
 
           {loading ? (
-            <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 text-sm text-white/60">Carregant placements...</div>
+            <div className="rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-6 text-sm text-white/60">Carregant placements...</div>
           ) : (
             <div className="space-y-4">
               {filtered.map((placement) => (
@@ -206,7 +206,7 @@ export default function ImageManagerPage() {
                 />
               ))}
               {filtered.length === 0 && (
-                <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 text-center text-sm text-white/40">
+                <div className="rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-6 text-center text-sm text-white/40">
                   Cap placement trobat
                 </div>
               )}
