@@ -15,6 +15,10 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-19 [ESTAT: tancat — NETEJA DE CODI MORT I SOBRANT (ordre propietari «merda morta fora»)]
+Detecció real (ts-prune + depcheck + grep repo-wide, NO lectura línia-a-línia de 104k LOC — seria malbaratament). Eliminat SEGUR: 46 scripts `.dbg-*.cjs` d'un sol ús (mantingut `.dbg-studio.cjs`, mandat protocol); 8 deps sense ús (`@react-email/*`, `@sendgrid/mail`, `date-fns`, `dotenv`, `jspdf-autotable`, `react-hook-form`, `@types/dompurify`; `cssnano` es manté → postcss prod); 2 blobs base64 morts 134KB (`logo-base64`, `logo-wordmark-base64`). 84 exports morts verificats (count==1) DOCUMENTATS a `docs/audit/dead-code.md` però NO esborrats: són API canònica (site-config helpers de CLAUDE.md), infra (imap/pdf), domini monocapa → esborrar-los violaria el protocol + tree-shaking ja els treu. `validate:core` EXIT 0. Deute canon 78 P3 (visual, passada pròpia) intacte.
+Avís per l'altre agent: NO reintrodueixis aquestes deps ni els `.dbg` d'un sol ús. Si vols podar els 84 exports de la secció D de dead-code.md, cal verificació visual + ordre del propietari.
+
 [claude] 2026-06-19 [ESTAT: tancat — COMMIT + PUSH de l'arbre acumulat #987–#1018 (canon admin) a main]
 Ordre del propietari: arrancar dev local + commit + push. El working tree acumulava #987–#1018 (eradicació canon admin carbó+or, guard `qa:admin-canon`, hover monocapa, residu contacte/WhatsApp) — 170 modificats + 29 sense rastrejar (debug scripts `.dbg-*.cjs` que el repo JA rastreja + `scripts/check-admin-canon.mjs` + `docs/audit/`). Origin/main estava a #986. Verificació real: `pnpm run validate:core` EXIT 0 (qa:admin-canon 0 P1, només P3 advisori). Commit únic + push a `origin/main`. Dev viu a :3000.
 
