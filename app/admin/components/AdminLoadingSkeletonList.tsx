@@ -10,10 +10,10 @@ export default function AdminLoadingSkeletonList() {
 
       {/* Filter bar */}
       <div className="flex items-center gap-3">
-        <div className="h-9 flex-1 max-w-xs rounded-xl bg-white/[0.04]" />
-        <div className="h-9 w-28 rounded-xl bg-white/[0.04]" />
-        <div className="h-9 w-28 rounded-xl bg-white/[0.04]" />
-        <div className="h-9 w-28 rounded-xl bg-white/[0.04]" />
+        <div className="h-9 flex-1 max-w-xs rounded-xl bg-[var(--o-admin-fill-2)]" />
+        <div className="h-9 w-28 rounded-xl bg-[var(--o-admin-fill-2)]" />
+        <div className="h-9 w-28 rounded-xl bg-[var(--o-admin-fill-2)]" />
+        <div className="h-9 w-28 rounded-xl bg-[var(--o-admin-fill-2)]" />
       </div>
 
       {/* Table */}
@@ -21,7 +21,7 @@ export default function AdminLoadingSkeletonList() {
         {/* Header */}
         <div className="flex items-center gap-4 border-b border-white/10 px-4 py-3">
           {[60, 120, 80, 100, 80, 80].map((w, i) => (
-            <div key={i} className="h-3 rounded bg-white/[0.06]" style={{ width: w }} />
+            <div key={i} className="h-3 rounded bg-[var(--o-admin-fill-3)]" style={{ width: w }} />
           ))}
         </div>
         {/* Rows */}
@@ -33,7 +33,7 @@ export default function AdminLoadingSkeletonList() {
             {[60, 120, 80, 100, 80, 80].map((w, j) => (
               <div
                 key={j}
-                className="h-3 rounded bg-white/[0.03]"
+                className="h-3 rounded bg-[var(--o-admin-fill-1)]"
                 style={{ width: j === 1 ? w + 20 : w }}
               />
             ))}

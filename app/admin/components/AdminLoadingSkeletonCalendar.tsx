@@ -8,7 +8,7 @@ export default function AdminLoadingSkeletonCalendar() {
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 ap-card" />
-          <div className="h-7 w-36 rounded-lg bg-white/[0.03]" />
+          <div className="h-7 w-36 rounded-lg bg-[var(--o-admin-fill-1)]" />
           <div className="h-8 w-8 ap-card" />
         </div>
         <div className="flex gap-1">
@@ -23,7 +23,7 @@ export default function AdminLoadingSkeletonCalendar() {
       <div className="overflow-x-auto">
         <div className="grid min-w-[640px] grid-cols-7 gap-px overflow-x-auto">
           {Array.from({ length: COLS }).map((_, i) => (
-            <div key={i} className="h-8 rounded bg-white/[0.03]" />
+            <div key={i} className="h-8 rounded bg-[var(--o-admin-fill-1)]" />
           ))}
         </div>
       </div>
@@ -36,12 +36,12 @@ export default function AdminLoadingSkeletonCalendar() {
               key={i}
               className="h-20 ap-card p-1.5"
             >
-              <div className="h-5 w-5 rounded-full bg-white/[0.04]" />
+              <div className="h-5 w-5 rounded-full bg-[var(--o-admin-fill-2)]" />
               {i % 4 === 0 && (
-                <div className="mt-1 h-4 w-full rounded bg-white/[0.04]" />
+                <div className="mt-1 h-4 w-full rounded bg-[var(--o-admin-fill-2)]" />
               )}
               {i % 7 === 2 && (
-                <div className="mt-1 h-4 w-3/4 rounded bg-white/[0.04]" />
+                <div className="mt-1 h-4 w-3/4 rounded bg-[var(--o-admin-fill-2)]" />
               )}
             </div>
           ))}

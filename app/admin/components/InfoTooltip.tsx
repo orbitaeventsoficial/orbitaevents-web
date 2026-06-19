@@ -151,7 +151,7 @@ export default function InfoTooltip({ text }: InfoTooltipProps) {
         onMouseLeave={closeTipDelayed}
         onFocus={openTip}
         onBlur={closeTipDelayed}
-        className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/15 bg-white/10 text-[12px] font-bold leading-none text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+        className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/15 bg-white/10 text-[length:var(--o-text-2xs)] font-bold leading-none text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
         aria-label="Ajuda"
         aria-expanded={open}
       >

@@ -63,14 +63,14 @@ function ChannelCard({
         </div>
       </div>
 
-      <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/[0.05]">
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--o-admin-fill-3)]">
         <div className="flex h-full">
           <div className="bg-[var(--o-info)]" style={{ width: `${firstShare}%` }} />
           <div className="bg-[var(--o-warning)]" style={{ width: `${assistShare}%` }} />
           <div className="bg-[var(--o-success)]" style={{ width: `${lastShare}%` }} />
         </div>
       </div>
-      <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/[0.04]">
+      <div className="mt-2 h-1 overflow-hidden rounded-full bg-[var(--o-admin-fill-2)]">
         <div className="h-full rounded-full bg-white/30" style={{ width: `${Math.max(8, intensity)}%` }} />
       </div>
 

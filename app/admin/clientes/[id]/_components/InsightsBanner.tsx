@@ -9,7 +9,7 @@ const HEALTH_CONFIG: Record<CustomerInsightsDTO['relationalHealth'], { label: st
   EXCELLENT: { label: 'Excel·lent', color: 'admin-tone-text-success', bg: 'admin-tone-bg-success admin-tone-border-success' },
   GOOD: { label: 'Bona', color: 'admin-tone-text-cyan', bg: 'admin-tone-bg-cyan admin-tone-border-cyan' },
   AT_RISK: { label: 'En risc', color: 'admin-tone-text-warning', bg: 'admin-tone-bg-warning admin-tone-border-warning' },
-  COLD: { label: 'Fred', color: 'text-white/60', bg: 'bg-white/[0.08] border-white/15' },
+  COLD: { label: 'Fred', color: 'text-white/60', bg: 'bg-[var(--o-admin-fill-4)] border-white/15' },
   LOST: { label: 'Perdut', color: 'admin-tone-text-danger', bg: 'admin-tone-bg-danger admin-tone-border-danger' },
 };
 

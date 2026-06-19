@@ -1,3 +1,29 @@
+## 2026-06-19 — Tokenització de superfícies i mides de font admin: `bg-white/[0.0x]` + `text-[Npx]` → tokens (guard a 0) (Canvi #1019, claude)
+
+### Context (continuació sèrie tokenització #984–#986, working tree en curs reprès)
+La sessió tenia 24 fitxers admin modificats sense commit: una passada de tokenització a mitges. El residu que encara feia saltar el guard `qa:admin-canon` (`superficie-adhoc`, ~70) eren **superfícies estàtiques `bg-white/[0.0x]`** (blanc fred, opacitats 0.02–0.08) i **mides de font literals `text-[Npx]`** repartides per ~25 fitxers. La mateixa superfície es pintava amb blanc fred, fora del to càlid del canon `rgba(236,233,227,x)` → trencava la hipersemblança dins d'un mateix component (p.ex. un skeleton amb una barra a `fill-2` càlid i una altra a `bg-white/[0.05]` fred).
+
+### Què s'ha fet
+- **Fills → escala `--o-admin-fill-*`** (to càlid, `orbita-tokens.css`): match exacte `0.02→fill-1`, `0.04→fill-2`, `0.06→fill-3`, `0.08→fill-4`. Valors fora d'escala mapejats preservant la jerarquia visual: `0.03→fill-1` (tènue), `0.05→fill-3` (prominent, queda per sobre del body a `fill-2`). Afecta skeletons de loader, status pills (NONE/LOW/ARCHIVED/IDEA), tracks de progrés, dividers i cel·les de calendari.
+- **Mides de font → `--o-text-*`**: `text-[22px]→--o-text-xl`, `text-[26px]→--o-text-xl-2` (24px, «valor clau display»), `text-[12px]→--o-text-2xs`. 0 `text-[Npx]` literals restants a l'admin.
+- Legítims intactes: selectors guard `admin-shell.css` que forcen ≥12px (`text-[10px]`/`text-[11px]`).
+
+### Verificació
+- Guard `qa:admin-canon --strict`: `superficie-adhoc` ~70 → **0 troballes** (0 P1).
+- Browser (dev viu a :3000): `/admin/text-manager` http 200, els fills resolen al to càlid `rgba(236,233,227,x)` (mostra `0.08` = `fill-4`, 4676 elements), 0 page errors, cap overflow horitzontal.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0 (incl. `qa:admin-canon` 0 troballes). `pnpm build` **DIFERIT**: `next dev` viu a :3000 (build i dev comparteixen `.next` — restricció del propietari); swap de tokens pur, sense lògica ni imports nous, idèntic a passades ja provades en build (#1015/#1018).
+- Validació funcional: superfícies i tipografia admin d'una sola escala de tokens; zero blanc fred i zero px literal.
+- Validació humana/UX: pendent del propietari.
+
+### Coordinació
+Via lliure. Counter 1018 → 1019. SENSE commit.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-18 — Verd WhatsApp a token `--oe-whatsapp` (eradicat hardcoded a CTAs públics) (Canvi #1018, claude)
 
 ### Context (passada de residu a tot el repo, ordre del propietari «entra a cada codi, busca hardcoded/merda»)

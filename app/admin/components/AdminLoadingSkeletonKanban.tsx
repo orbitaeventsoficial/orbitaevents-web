@@ -24,17 +24,17 @@ export default function AdminLoadingSkeletonKanban() {
           <div key={ci} className="space-y-3 ap-card p-3">
             {/* Column header */}
             <div className="flex items-center justify-between">
-              <div className="h-4 w-20 rounded bg-white/[0.05]" />
-              <div className="h-5 w-6 rounded-full bg-white/[0.04]" />
+              <div className="h-4 w-20 rounded bg-[var(--o-admin-fill-3)]" />
+              <div className="h-5 w-6 rounded-full bg-[var(--o-admin-fill-2)]" />
             </div>
             {/* Cards */}
             {Array.from({ length: col.cards }).map((_, ki) => (
               <div key={ki} className="ap-card p-3 space-y-2">
-                <div className="h-3.5 w-full rounded bg-white/[0.05]" />
-                <div className="h-3 w-2/3 rounded bg-white/[0.04]" />
+                <div className="h-3.5 w-full rounded bg-[var(--o-admin-fill-3)]" />
+                <div className="h-3 w-2/3 rounded bg-[var(--o-admin-fill-2)]" />
                 <div className="flex gap-1.5 pt-0.5">
-                  <div className="h-5 w-14 rounded-full bg-white/[0.04]" />
-                  <div className="h-5 w-10 rounded-full bg-white/[0.04]" />
+                  <div className="h-5 w-14 rounded-full bg-[var(--o-admin-fill-2)]" />
+                  <div className="h-5 w-10 rounded-full bg-[var(--o-admin-fill-2)]" />
                 </div>
               </div>
             ))}

@@ -13,14 +13,14 @@ export const metadata = {
 };
 
 const LOAD_CONFIG: Record<DayLoadLevel, { label: string; color: string; bg: string; dot: string }> = {
-  FREE: { label: 'Lliure', color: 'text-white/50', bg: 'bg-white/[0.02]', dot: 'bg-white/40' },
+  FREE: { label: 'Lliure', color: 'text-white/50', bg: 'bg-[var(--o-admin-fill-1)]', dot: 'bg-white/40' },
   LIGHT: { label: 'Lleuger', color: 'admin-tone-text-cyan', bg: 'admin-tone-bg-cyan', dot: 'bg-[var(--o-info)]' },
   FULL: { label: 'Ple', color: 'admin-tone-text-warning', bg: 'admin-tone-bg-warning', dot: 'bg-[var(--o-warning)]' },
   OVERLOADED: { label: 'Sobrecarregat', color: 'admin-tone-text-danger', bg: 'admin-tone-bg-danger', dot: 'bg-[var(--o-danger)]' },
 };
 
 const ALERT_CONFIG: Record<WeekAlertLevel, { label: string; border: string; bg: string; tone: string }> = {
-  NONE: { label: 'Sense reserves', border: 'border-white/10', bg: 'bg-white/[0.03]', tone: 'text-white/50' },
+  NONE: { label: 'Sense reserves', border: 'border-white/10', bg: 'bg-[var(--o-admin-fill-1)]', tone: 'text-white/50' },
   INFO: { label: 'Activitat normal', border: 'admin-tone-border-cyan', bg: 'admin-tone-bg-cyan', tone: 'admin-tone-text-cyan' },
   WARNING: { label: 'Setmana intensa', border: 'admin-tone-border-warning', bg: 'admin-tone-bg-warning', tone: 'admin-tone-text-warning' },
   CRITICAL: { label: 'Capacitat al límit', border: 'admin-tone-border-danger', bg: 'admin-tone-bg-danger', tone: 'admin-tone-text-danger' },

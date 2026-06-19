@@ -15,6 +15,10 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-19 [ESTAT: tancat — TOKENITZACIÓ SUPERFÍCIES + FONT ADMIN #1019 (guard canon a 0)]
+Reprès el working tree en curs (24 fitxers admin sense commit = passada de tokenització a mitges). Completada: tot `bg-white/[0.0x]` (blanc fred) → escala `--o-admin-fill-*` (to càlid del canon) i tot `text-[Npx]` → `--o-text-*`. Match exacte 0.02/0.04/0.06/0.08→fill-1..4; fora d'escala preservant jerarquia 0.03→fill-1, 0.05→fill-3; 26px→`--o-text-xl-2`. Guard `qa:admin-canon` `superficie-adhoc` ~70 → **0 troballes**. tsc + validate:core EXIT 0; browser `/admin/text-manager` 200 + fills resolen `rgba(236,233,227,x)` + 0 page errors. `pnpm build` DIFERIT (dev viu a :3000, restricció propietari; swap de tokens pur). Counter 1018→1019. SENSE commit.
+Avís per l'altre agent: NO reintrodueixis `bg-white/[0.0x]` ni `text-[Npx]` a l'admin — usa `--o-admin-fill-*` i `--o-text-*`. El guard ara bloqueja a 0.
+
 [claude] 2026-06-19 [ESTAT: tancat — NETEJA DE CODI MORT I SOBRANT (ordre propietari «merda morta fora»)]
 Detecció real (ts-prune + depcheck + grep repo-wide, NO lectura línia-a-línia de 104k LOC — seria malbaratament). Eliminat SEGUR: 46 scripts `.dbg-*.cjs` d'un sol ús (mantingut `.dbg-studio.cjs`, mandat protocol); 8 deps sense ús (`@react-email/*`, `@sendgrid/mail`, `date-fns`, `dotenv`, `jspdf-autotable`, `react-hook-form`, `@types/dompurify`; `cssnano` es manté → postcss prod); 2 blobs base64 morts 134KB (`logo-base64`, `logo-wordmark-base64`). 84 exports morts verificats (count==1) DOCUMENTATS a `docs/audit/dead-code.md` però NO esborrats: són API canònica (site-config helpers de CLAUDE.md), infra (imap/pdf), domini monocapa → esborrar-los violaria el protocol + tree-shaking ja els treu. `validate:core` EXIT 0. Deute canon 78 P3 (visual, passada pròpia) intacte.
 Avís per l'altre agent: NO reintrodueixis aquestes deps ni els `.dbg` d'un sol ús. Si vols podar els 84 exports de la secció D de dead-code.md, cal verificació visual + ordre del propietari.

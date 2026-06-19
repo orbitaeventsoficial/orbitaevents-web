@@ -244,9 +244,9 @@ export default function TextManagerPage() {
       <header className="shrink-0 border-b border-white/[0.06] bg-[var(--o-admin-canvas)]">
         <div className="flex items-center gap-3 px-5 h-14">
           <span className="text-xs font-bold text-white/30 uppercase tracking-[0.18em] shrink-0">Gestor de textos</span>
-          <div className="w-px h-4 bg-white/[0.08] shrink-0" />
+          <div className="w-px h-4 bg-[var(--o-admin-fill-4)] shrink-0" />
 
-          <div className="flex items-center rounded-lg border border-white/[0.08] overflow-hidden shrink-0 bg-white/[0.03]">
+          <div className="flex items-center rounded-lg border border-white/[0.08] overflow-hidden shrink-0 bg-[var(--o-admin-fill-1)]">
             {(['ca', 'es', 'en'] as const).map((lang) => (
               <button
                 key={lang}
@@ -275,7 +275,7 @@ export default function TextManagerPage() {
             className={`flex items-center gap-2 px-3 h-8 rounded-lg text-xs font-medium border transition-all shrink-0 ${
               showOnlyModified
                 ? 'admin-tone-bg-warning admin-tone-border-warning admin-tone-text-warning'
-                : 'bg-white/[0.02] border-white/[0.08] text-white/35 hover:text-white/55 hover:border-white/15'
+                : 'bg-[var(--o-admin-fill-1)] border-white/[0.08] text-white/35 hover:text-white/55 hover:border-white/15'
             }`}
           >
             <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${showOnlyModified ? 'bg-[var(--o-warning)]' : 'bg-white/25'}`} />
@@ -333,7 +333,7 @@ export default function TextManagerPage() {
               <span>Totes</span>
               <span className="text-xs opacity-50">{Object.keys(currentTexts).length}</span>
             </button>
-            <div className="my-2 h-px bg-white/[0.06]" />
+            <div className="my-2 h-px bg-[var(--o-admin-fill-3)]" />
             {SECTIONS.map(section => {
               const counts = sectionCounts[section.id] || { total: 0, modified: 0 };
               const isActive = activeSection === section.id;
@@ -405,7 +405,7 @@ export default function TextManagerPage() {
                             className={`w-full px-3 py-2 rounded-lg text-sm text-white/85 placeholder-white/20 resize-y outline-none transition-all border ${
                               isModified
                                 ? 'admin-tone-bg-warning admin-tone-border-warning'
-                                : 'bg-white/[0.03] border-white/[0.05] focus:border-white/12'
+                                : 'bg-[var(--o-admin-fill-1)] border-white/[0.05] focus:border-white/12'
                             }`}
                             placeholder="Buit..."
                           />

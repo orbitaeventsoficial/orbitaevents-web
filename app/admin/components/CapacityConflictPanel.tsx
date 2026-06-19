@@ -19,7 +19,7 @@ function ConflictRow({ conflict }: { conflict: CapacityConflict }) {
           {conflict.date} · {conflict.bookings.map((b) => b.clientName).join(' + ')}
         </p>
       </div>
-      <div className="h-1.5 w-16 rounded-full bg-white/[0.06] overflow-hidden shrink-0">
+      <div className="h-1.5 w-16 rounded-full bg-[var(--o-admin-fill-3)] overflow-hidden shrink-0">
         <div className={`h-full rounded-full ${barColor}`} style={{ width: `${Math.min(barWidth / 2, 100)}%` }} />
       </div>
       <span className={`shrink-0 rounded-md px-2 py-0.5 text-xs font-bold ${badgeStyle}`}>

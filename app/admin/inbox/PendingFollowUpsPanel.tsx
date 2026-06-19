@@ -10,7 +10,7 @@ import { resolveImportedLeadHref } from './importNavigation';
 const URGENCY_STYLE: Record<string, { bg: string; text: string; label: string }> = {
   URGENT: { bg: 'bg-rose-500/10 border-rose-500/30', text: 'text-rose-300', label: 'Urgent' },
   NORMAL: { bg: 'bg-amber-500/10 border-amber-500/30', text: 'text-amber-300', label: 'Normal' },
-  LOW: { bg: 'bg-white/[0.03] border-white/10', text: 'opacity-60', label: 'Baix' },
+  LOW: { bg: 'bg-[var(--o-admin-fill-1)] border-white/10', text: 'opacity-60', label: 'Baix' },
 };
 
 export default function PendingFollowUpsPanel() {

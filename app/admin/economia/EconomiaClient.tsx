@@ -290,7 +290,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs font-medium uppercase tracking-wider">Valor d&apos;inventari</p>
-                      <p className="mt-1 font-[family-name:var(--display)] text-[22px] font-bold leading-none">{money(props.inventoryValue)}</p>
+                      <p className="mt-1 font-[family-name:var(--display)] text-[length:var(--o-text-xl)] font-bold leading-none">{money(props.inventoryValue)}</p>
                       <p className="text-xs mt-0.5">{props.inventoryCount} elements actius</p>
                     </div>
                     <Link

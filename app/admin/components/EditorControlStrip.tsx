@@ -69,7 +69,7 @@ function renderPanel(panel: EditorPanel) {
           {panel.stats.map((stat) => (
             <div key={stat.label} className={`rounded-[var(--o-r-md)] border p-3 ${getStatToneClass(stat.tone)}`}>
               <p className="font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-wide text-[var(--t3)]">{stat.label}</p>
-              <p className="mt-1 font-[family-name:var(--display)] text-[22px] font-bold leading-none text-[var(--t)]">{stat.value}</p>
+              <p className="mt-1 font-[family-name:var(--display)] text-[length:var(--o-text-xl)] font-bold leading-none text-[var(--t)]">{stat.value}</p>
               {stat.hint ? <p className="text-xs text-[var(--t3)]">{stat.hint}</p> : null}
             </div>
           ))}

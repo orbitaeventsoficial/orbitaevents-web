@@ -20,7 +20,7 @@ const RISK_CONFIG: Record<string, { label: string; color: string; bg: string }> 
   HIGH: { label: 'Alt', color: 'text-rose-300', bg: 'bg-rose-500/15 border-rose-500/30' },
   MEDIUM: { label: 'Mitjà', color: 'text-amber-300', bg: 'bg-amber-500/15 border-amber-500/30' },
   LOW: { label: 'Baix', color: 'text-emerald-300', bg: 'bg-emerald-500/15 border-emerald-500/30' },
-  NONE: { label: 'Cap', color: 'text-white/60', bg: 'bg-white/[0.08] border-white/15' },
+  NONE: { label: 'Cap', color: 'text-white/60', bg: 'bg-[var(--o-admin-fill-4)] border-white/15' },
 };
 
 const ACTION_CTA: Record<string, { href: (input: { leadId: string; customerId?: string | null; bookingId?: string | null }) => string; label: string }> = {

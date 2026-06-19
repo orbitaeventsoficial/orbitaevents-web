@@ -3,7 +3,7 @@ import type { AnomalyReport, AnomalyAlert } from '@/lib/services/dailyAnomalySer
 const LEVEL_STYLE = {
   POSITIVE: { border: 'admin-tone-border-success', bg: 'admin-tone-bg-success', text: 'admin-tone-text-success', badge: 'admin-tone-bg-success admin-tone-text-success' },
   NEGATIVE: { border: 'admin-tone-border-danger', bg: 'admin-tone-bg-danger', text: 'admin-tone-text-danger', badge: 'admin-tone-bg-danger admin-tone-text-danger' },
-  NEUTRAL: { border: 'border-white/10', bg: 'bg-white/[0.02]', text: 'text-white/60', badge: 'bg-white/10 text-white/60' },
+  NEUTRAL: { border: 'border-white/10', bg: 'bg-[var(--o-admin-fill-1)]', text: 'text-white/60', badge: 'bg-white/10 text-white/60' },
 };
 
 function DeviationBar({ deviation }: { deviation: number }) {
@@ -11,7 +11,7 @@ function DeviationBar({ deviation }: { deviation: number }) {
   const width = Math.max(pct / 2, 2);
   const color = deviation > 0 ? 'bg-[var(--o-success)]' : 'bg-[var(--o-danger)]';
   return (
-    <div className="h-1.5 w-20 rounded-full bg-white/[0.06] overflow-hidden">
+    <div className="h-1.5 w-20 rounded-full bg-[var(--o-admin-fill-3)] overflow-hidden">
       <div className={`h-full rounded-full ${color}`} style={{ width: `${width}%` }} />
     </div>
   );
@@ -53,7 +53,7 @@ export default function AnomalyPanel({ report }: { report: AnomalyReport }) {
           </h2>
           <p className="mt-1 text-xs opacity-60">{report.verdict}</p>
         </div>
-        <span className="shrink-0 rounded-md bg-white/[0.06] px-2 py-0.5 text-xs font-bold opacity-50">
+        <span className="shrink-0 rounded-md bg-[var(--o-admin-fill-3)] px-2 py-0.5 text-xs font-bold opacity-50">
           vs {report.windowDays}d
         </span>
       </div>

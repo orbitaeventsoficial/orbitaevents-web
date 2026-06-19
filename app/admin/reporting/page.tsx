@@ -412,7 +412,7 @@ export default async function ReportingPage() {
             <h2 className="text-sm font-semibold">Leads en risc (Top 20)</h2>
             <div className="mt-3 space-y-2">
               {report.topRiskLeads.slice(0, 10).map((lead) => (
-                <div key={lead.id} className="flex items-center justify-between gap-3 rounded-lg border border-white/5 bg-white/[0.02] p-3">
+                <div key={lead.id} className="flex items-center justify-between gap-3 rounded-lg border border-white/5 bg-[var(--o-admin-fill-1)] p-3">
                   <div>
                     <p className="text-xs font-semibold">{lead.name}</p>
                     <p className="text-xs opacity-50">{lead.status} · {lead.source} · score {lead.score}</p>

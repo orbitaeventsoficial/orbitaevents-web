@@ -100,11 +100,11 @@ const IDEA_SOURCE_LABEL: Record<SerializedIdea['source'], string> = {
 };
 
 const STATUS_TONE: Record<string, string> = {
-  IDEA: 'bg-white/[0.08] border-white/15 text-white/60',
+  IDEA: 'bg-[var(--o-admin-fill-4)] border-white/15 text-white/60',
   DRAFT: 'admin-tone-bg-warning admin-tone-border-warning admin-tone-text-warning',
   SCHEDULED: 'admin-tone-bg-cyan admin-tone-border-cyan admin-tone-text-cyan',
   PUBLISHED: 'admin-tone-bg-success admin-tone-border-success admin-tone-text-success',
-  ARCHIVED: 'bg-white/[0.03] border-white/10 text-white/40',
+  ARCHIVED: 'bg-[var(--o-admin-fill-1)] border-white/10 text-white/40',
 };
 
 const PLATFORM_ICON: Record<string, string> = {
@@ -623,7 +623,7 @@ export default function SocialClient({
           <div className="overflow-x-auto rounded-xl">
             <div className="grid min-w-[720px] grid-cols-7 gap-px overflow-x-auto rounded-xl border border-white/10 overflow-hidden admin-card-glass">
             {['Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds', 'Dg'].map((d) => (
-              <div key={d} className="bg-white/[0.05] p-2 text-center text-xs font-semibold uppercase tracking-wider opacity-50">
+              <div key={d} className="bg-[var(--o-admin-fill-3)] p-2 text-center text-xs font-semibold uppercase tracking-wider opacity-50">
                 {d}
               </div>
             ))}
@@ -633,7 +633,7 @@ export default function SocialClient({
               return (
                 <div
                   key={day.date}
-                  className={`min-h-[80px] border-t border-white/5 p-1.5 ${day.isCurrentMonth ? 'bg-white/[0.02]' : 'bg-transparent opacity-30'} ${isToday ? 'ring-1 ring-inset ring-[var(--ax-hair-gold)]' : ''}`}
+                  className={`min-h-[80px] border-t border-white/5 p-1.5 ${day.isCurrentMonth ? 'bg-[var(--o-admin-fill-1)]' : 'bg-transparent opacity-30'} ${isToday ? 'ring-1 ring-inset ring-[var(--ax-hair-gold)]' : ''}`}
                 >
                   <p className={`text-xs font-medium ${isToday ? 'admin-tone-text-cyan' : 'opacity-60'}`}>{day.day}</p>
                   <div className="mt-0.5 space-y-0.5">

@@ -70,7 +70,7 @@ export async function LeadDossiersPanel({ leadId, leadNom, leadEmail, leadTelefo
               .map((p) => p.nom)
               .join(' · ');
             return (
-              <li key={d.id} className="flex items-start justify-between gap-4 rounded-lg border border-white/8 bg-white/[0.03] px-4 py-3">
+              <li key={d.id} className="flex items-start justify-between gap-4 rounded-lg border border-white/8 bg-[var(--o-admin-fill-1)] px-4 py-3">
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-sm truncate">{d.nom}{d.empresa ? ` — ${d.empresa}` : ''}</p>
                   <p className="text-xs opacity-60 mt-0.5">{productNames || 'Sense productes'}</p>

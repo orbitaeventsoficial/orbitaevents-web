@@ -32,7 +32,7 @@ export function KpiCard({ label, value, sub, color }: {
       {...helpAttrs(ADMIN_ECONOMY_HELP.kpiCard(label, sub))}
     >
       <p className="font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.16em] text-[var(--t3)]">{label}</p>
-      <p className={`mt-2 font-[family-name:var(--display)] text-[22px] font-bold leading-none tracking-[-0.01em] ${color}`}>{value}</p>
+      <p className={`mt-2 font-[family-name:var(--display)] text-[length:var(--o-text-xl)] font-bold leading-none tracking-[-0.01em] ${color}`}>{value}</p>
       {sub && <p className="mt-1.5 font-[family-name:var(--mono)] text-xs text-[var(--t3)]">{sub}</p>}
     </div>
   );
@@ -87,7 +87,7 @@ export function HealthScore({ overdueTotal, outstandingTotal, marginPct }: { ove
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className={`font-[family-name:var(--display)] text-[26px] font-bold ${color}`}>{score}</span>
+          <span className={`font-[family-name:var(--display)] text-[length:var(--o-text-xl-2)] font-bold ${color}`}>{score}</span>
         </div>
       </div>
       <p className={`mt-2 font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.14em] ${color}`} {...helpAttrs(ADMIN_ECONOMY_HELP.healthLabel(label))}>{label}</p>

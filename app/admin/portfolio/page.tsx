@@ -461,7 +461,7 @@ function CategorySection({
               {media.map((item) => {
                 const coverRefs = coverMap.get(item.mediaUrl) || [];
                 return (
-                  <div key={item.id} draggable={!item.isStatic} onDragStart={() => !item.isStatic && setDraggingId(item.id)} onDragOver={(event) => !item.isStatic && event.preventDefault()} onDrop={() => !item.isStatic && void handleDrop(item.id)} className={`overflow-hidden rounded-2xl border bg-white/[0.02] transition-colors ${draggingId === item.id ? 'border-[var(--hair-gold)]' : 'border-white/10 hover:border-white/20'}`}>
+                  <div key={item.id} draggable={!item.isStatic} onDragStart={() => !item.isStatic && setDraggingId(item.id)} onDragOver={(event) => !item.isStatic && event.preventDefault()} onDrop={() => !item.isStatic && void handleDrop(item.id)} className={`overflow-hidden rounded-2xl border bg-[var(--o-admin-fill-1)] transition-colors ${draggingId === item.id ? 'border-[var(--hair-gold)]' : 'border-white/10 hover:border-white/20'}`}>
                     <div className="grid gap-0 md:grid-cols-[18rem_minmax(0,1fr)]">
                       <button type="button" onClick={() => onOpenPreview({ url: item.mediaUrl, type: item.mediaType, alt: item.caption || `${name} media` })} className="relative aspect-[4/3] bg-black">
                         {item.mediaType === 'image' ? <Image src={item.mediaUrl} alt={item.caption || `${name} media`} fill sizes="(max-width: 768px) 100vw, 288px" className="object-cover" /> : <video src={item.mediaUrl} className="h-full w-full object-cover" muted playsInline preload="metadata" />}

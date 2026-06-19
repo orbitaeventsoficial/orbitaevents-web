@@ -47,7 +47,7 @@ export default function CaptureHealthPanel({ report }: { report: CaptureHealthRe
         </div>
         <Link
           href={report.suggestedAction.href}
-          className={`shrink-0 rounded-lg border px-3 py-2 text-xs font-bold transition-colors hover:bg-white/10 ${isCritical ? 'border-white/20 bg-white/[0.06]' : 'border-white/10'}`}
+          className={`shrink-0 rounded-lg border px-3 py-2 text-xs font-bold transition-colors hover:bg-white/10 ${isCritical ? 'border-white/20 bg-[var(--o-admin-fill-3)]' : 'border-white/10'}`}
         >
           {report.suggestedAction.label} →
         </Link>

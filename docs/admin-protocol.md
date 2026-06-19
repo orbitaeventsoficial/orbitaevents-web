@@ -1453,6 +1453,25 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1019 — 2026-06-19 — claude (TANCAT)
+
+**Tokenització de superfícies i mides de font admin — eradicat `bg-white/[0.0x]` i `text-[Npx]` (canon rule #4/#5, guard a 0).**
+
+- Continuació de la sèrie de tokenització (#984–#986): el residu real que quedava al guard `qa:admin-canon` eren superfícies estàtiques `bg-white/[0.0x]` (blanc fred, opacitats 0.02–0.08) i mides de font literals `text-[Npx]` repartides per ~25 fitxers admin. La mateixa superfície es pintava amb blanc fred fora del to càlid del canon (`rgba(236,233,227,x)`), trencant la hipersemblança.
+- **Fills → escala canònica `--o-admin-fill-*`** (`app/studio/orbita-tokens.css`, to càlid): match exacte `0.02→fill-1`, `0.04→fill-2`, `0.06→fill-3`, `0.08→fill-4`; fora d'escala preservant jerarquia `0.03→fill-1` (tènue), `0.05→fill-3` (prominent). Skeletons de loader, status pills, tracks, dividers i cel·les de calendari ara tots a tons càlids de token.
+- **Mides de font → `--o-text-*`**: `text-[22px]→--o-text-xl`, `text-[26px]→--o-text-xl-2` (24px, «valor clau display»), `text-[12px]→--o-text-2xs`. 0 `text-[Npx]` literals.
+- Guard `qa:admin-canon --strict`: `superficie-adhoc` ~70 → **0 troballes** (0 P1). Tot l'admin ressalta/pinta superfícies amb una sola escala de tokens.
+- Verificat al browser (dev viu): `/admin/text-manager` http 200, els fills resolen al to càlid `rgba(236,233,227,x)` (mostra `0.08` = `fill-4`), 0 page errors, cap overflow horitzontal a 1280px.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 1018 -> 1019.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` EXIT 0 (incl. `qa:admin-canon` 0 troballes). `pnpm build` DIFERIT: `next dev` viu a :3000 (restricció del propietari — build i dev comparteixen `.next`); swap de tokens pur idèntic a passades ja provades en build (#1015/#1018), sense lògica nova ni imports nous.
+- Validació funcional: superfícies i tipografia admin d'una sola escala de tokens; cap blanc fred ni px literal.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1018 — 2026-06-18 — claude (TANCAT)
 
 **Verd WhatsApp a token (`--oe-whatsapp`) — eradicat hardcoded a ~10 CTAs públics.**

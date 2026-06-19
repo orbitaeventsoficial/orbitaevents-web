@@ -166,7 +166,7 @@ export default function ProposalsList({
           onClick={() => setStatusFilter('')}
           className={`rounded-[var(--o-r-md)] border p-3 text-left transition-colors ${!statusFilter ? 'border-[var(--hair-gold)] bg-[var(--raised)]' : 'border-[var(--line)] bg-[var(--panel)] hover:border-[var(--line2)]'}`}
         >
-          <p className="font-[family-name:var(--display)] text-[22px] font-bold leading-none">{stats.total}</p>
+          <p className="font-[family-name:var(--display)] text-[length:var(--o-text-xl)] font-bold leading-none">{stats.total}</p>
           <p className="mt-1 font-[family-name:var(--mono)] text-xs uppercase tracking-[0.12em] text-[var(--t3)]">Total</p>
         </button>
         {PROPOSAL_FILTERABLE_STATUSES.map((status) => {
@@ -180,7 +180,7 @@ export default function ProposalsList({
               onClick={() => setStatusFilter(status)}
               className={`rounded-[var(--o-r-md)] border p-3 text-left transition-colors ${isActive ? 'border-[var(--hair-gold)] bg-[var(--raised)]' : 'border-[var(--line)] bg-[var(--panel)] hover:border-[var(--line2)]'}`}
             >
-              <p className="font-[family-name:var(--display)] text-[22px] font-bold leading-none">{count}</p>
+              <p className="font-[family-name:var(--display)] text-[length:var(--o-text-xl)] font-bold leading-none">{count}</p>
               <p className="mt-1 font-[family-name:var(--mono)] text-xs uppercase tracking-[0.12em] text-[var(--t3)]">{cfg.label}{status === 'DRAFT' ? 's' : 's'}</p>
             </button>
           );

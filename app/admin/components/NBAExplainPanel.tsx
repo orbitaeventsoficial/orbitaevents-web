@@ -38,9 +38,9 @@ export default function NBAExplainPanel() {
       <div className="ap-card p-4 animate-pulse">
         <div className="mb-3 h-2.5 w-32 rounded bg-white/10" />
         <div className="space-y-2">
-          <div className="h-3 w-full rounded bg-white/[0.06]" />
-          <div className="h-3 w-4/5 rounded bg-white/[0.06]" />
-          <div className="h-3 w-3/5 rounded bg-white/[0.04]" />
+          <div className="h-3 w-full rounded bg-[var(--o-admin-fill-3)]" />
+          <div className="h-3 w-4/5 rounded bg-[var(--o-admin-fill-3)]" />
+          <div className="h-3 w-3/5 rounded bg-[var(--o-admin-fill-2)]" />
         </div>
       </div>
     );

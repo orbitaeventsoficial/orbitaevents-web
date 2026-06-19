@@ -259,7 +259,7 @@ function EventCard({ event }: { event: TimelineEventDTO }) {
 
   return (
     <article
-      className={`min-w-0 overflow-hidden rounded-xl border-l-2 bg-white/[0.03] p-2.5 pl-3 ${borderColor}`}
+      className={`min-w-0 overflow-hidden rounded-xl border-l-2 bg-[var(--o-admin-fill-1)] p-2.5 pl-3 ${borderColor}`}
     >
       <div className="flex items-start gap-2">
         <span className="text-sm">{icon}</span>

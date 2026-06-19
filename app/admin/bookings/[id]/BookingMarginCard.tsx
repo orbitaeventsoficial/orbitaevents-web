@@ -245,7 +245,7 @@ export default function BookingMarginCard({
           <Tooltip text="Calculat pel motor de cost: pack, extres, transport i cost operacional.">
             <p className="text-xs font-medium uppercase">% marge</p>
           </Tooltip>
-          <p className={`font-[family-name:var(--display)] text-[22px] font-bold leading-none ${marginColor}`}>{marginPct.toFixed(1)}%</p>
+          <p className={`font-[family-name:var(--display)] text-[length:var(--o-text-xl)] font-bold leading-none ${marginColor}`}>{marginPct.toFixed(1)}%</p>
           <p className={`text-xs mt-0.5 ${marginColor}`}>
             {marginPct >= 50 ? 'Excel·lent. Marge sa.' :
              marginPct >= 30 ? 'Acceptable. Encara hi ha marge per optimitzar.' :

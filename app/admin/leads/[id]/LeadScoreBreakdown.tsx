@@ -78,7 +78,7 @@ export default function LeadScoreBreakdown({
                   ? 'bg-rose-500/[0.06] text-rose-200'
                   : factor.type === 'POSITIVE'
                   ? 'bg-emerald-500/[0.06] text-emerald-200'
-                  : 'bg-white/[0.04] text-white/70'
+                  : 'bg-[var(--o-admin-fill-2)] text-white/70'
               }`}
             >
               <span className="flex items-center gap-1.5">
