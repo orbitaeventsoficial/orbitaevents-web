@@ -1502,6 +1502,20 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1085 — 2026-06-22 — claude (TANCAT)
+
+**Poda de createDossierFromBolo orfe (tanca deute #1072).**
+
+- `createDossierFromBolo` eliminat de dossierService (unic consumidor era la ruta generate-dossier esborrada #1072). Autocontinguda; cap import orfe.
+- Validació tècnica: tsc + validate:core EXIT 0.
+- Validació funcional: creacio de dossier intacta.
+- Validació humana/UX: no visible.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1084 — 2026-06-22 — claude (TANCAT)
 
 **Poda de 2 rutes API [param] mortes (comm-summary, generate-dossier).**

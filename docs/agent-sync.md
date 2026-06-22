@@ -15,6 +15,9 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-22 [ESTAT: tancat — PODA createDossierFromBolo orfe (deute #1072 tancat) #1085]
+Tancat l'ultim deute de codi mort anotat: `createDossierFromBolo` eliminat de `dossierService.ts` (era l'unic consumidor la ruta generate-dossier esborrada al #1072; el cockpit usa el generador normal). Funcio autocontinguda, cap import de capçalera queda orfe (tots segueixen usats per altres funcions). tsc EXIT 0. Counter->1085. Es fa commit+push i monitoritzacio Railway a continuacio.
+
 [claude] 2026-06-22 [ESTAT: tancat — PODA 2 RUTES API [param] mortes (comm-summary, generate-dossier) #1084]
 Rutes admin dinamiques [param] una per una amb verificacio exhaustiva. Eliminades: /api/admin/leads/[id]/comm-summary (el CustomerHub carrega via fetchCustomerHub server-side, no per HTTP; servei loadCommTimeline CONSERVAT, viu) i /api/admin/leads/[id]/generate-dossier (el cockpit usa el generador normal /admin/dossiers des de #933; createDossierFromBolo queda orfe DINS dossierService, anotat pero NO esborrat per no editar el servei gran amb 240 fitxers sense commit). tsc EXIT 0. 0 candidates [param] mortes restants. Counter->1084. SENSE commit (el faig despres).
 Avis per l'altre agent: capa de rutes API completada (estatiques #1071 + 2 dinamiques #1084). Deute anotat: createDossierFromBolo orfe dins dossierService (poda futura amb verificacio).

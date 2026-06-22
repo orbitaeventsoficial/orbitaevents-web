@@ -28,6 +28,30 @@ Continuació non stop del drenatge CSRF backend després de #1082. Perímetre pe
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-22 — Poda de createDossierFromBolo orfe (tanca deute #1072) (Canvi #1085, claude)
+
+### Context
+Ultim cap solt de codi mort: en esborrar la ruta `generate-dossier` (#1072), `createDossierFromBolo` va quedar orfe dins `dossierService.ts`. Anotat com a deute; ara tancat.
+
+### Que s'ha fet
+Eliminada la funcio `createDossierFromBolo` (autocontinguda, nomes usava prisma). Cap import de capçalera queda orfe — tots segueixen usats per createDossier/sendDossierByEmail/etc.
+
+### Verificacio
+- Cap consumidor (grep) abans d'esborrar.
+- `tsc --noEmit` EXIT 0; tots els imports de dossierService segueixen usats.
+
+### Validació
+- Validació tècnica: tsc + validate:core EXIT 0.
+- Validació funcional: creacio de dossier intacta (createDossier + generador normal).
+- Validació humana/UX: no visible.
+
+### Coordinacio
+Counter -> 1085. Commit + push + monitoritzacio Railway a continuacio (ordre propietari).
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-22 — Poda de 2 rutes API [param] mortes, una per una (Canvi #1084, claude)
 
 ### Context
