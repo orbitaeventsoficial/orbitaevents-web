@@ -1,3 +1,4 @@
+import './cockpit.css';
 import { AdminPage } from '../components/AdminPage';
 import { buildEconomicCockpit } from '@/lib/services/economicCockpitService';
 import { formatCurrency, formatMonthYearCompact } from '@/lib/constants';
@@ -8,74 +9,99 @@ export const metadata = {
   title: 'Cockpit Econòmic | Òrbita Admin',
 };
 
-// Zenit econòmic: una lectura de comandament — quant tinc compromès, quant és
-// probable (ponderat) i quina és la previsió combinada per mes. Font única:
-// buildEconomicCockpit (unifica pipeline ponderat + cash-flow). Visual provisional
-// (tokens canònics) — pendent de la passada visual del propietari.
+// Zenit econòmic. Tesi: la tresoreria futura del negoci d'un cop d'ull —
+// quant està compromès (segur), quant és probable (pipeline ponderat) i com va
+// la previsió respecte l'any passat. Font única: buildEconomicCockpit.
 export default async function CockpitPage() {
   const cockpit = await buildEconomicCockpit(6).catch(() => null);
 
   if (!cockpit) {
     return (
-      <AdminPage title="Cockpit Econòmic" subtitle="Previsió d'ingressos i marge dels propers mesos.">
-        <div className="ap-card ap-card-body">No s&apos;ha pogut carregar la previsió.</div>
+      <AdminPage title="Cockpit Econòmic" subtitle="Previsió d'ingressos dels propers mesos.">
+        <div className="ap-card ap-card-body">No s&apos;ha pogut carregar la previsió ara mateix. Torna-ho a provar.</div>
       </AdminPage>
     );
   }
 
   const { summary, months } = cockpit;
-  const maxBar = Math.max(1, ...months.map((m) => Math.max(m.committedRevenue, m.weightedPipeline)));
+  const yoy = summary.yoyDeltaPct;
+  const yoyClass = yoy === null ? '' : yoy >= 0 ? 'ck__yoy--up' : 'ck__yoy--down';
+  const maxMonth = Math.max(1, ...months.map((m) => m.committedRevenue + m.weightedPipeline));
 
   return (
     <AdminPage
       title="Cockpit Econòmic"
-      subtitle={`Previsió dels propers ${summary.monthsAhead} mesos — compromès, ponderat i combinat.`}
+      subtitle="La salut econòmica dels propers sis mesos, en una lectura."
     >
-      <section className="ap-kpi-row">
-        <div className="ap-kpi ap-kpi--success">
-          <p className="ap-kpi-label">Compromès</p>
-          <p className="ap-kpi-value">{formatCurrency(summary.committedTotal)}</p>
-          <p className="ap-kpi-trend">Reserves ja confirmades</p>
-        </div>
-        <div className="ap-kpi ap-kpi--info">
-          <p className="ap-kpi-label">Ponderat (probable)</p>
-          <p className="ap-kpi-value">{formatCurrency(summary.weightedTotal)}</p>
-          <p className="ap-kpi-trend">Pipeline × probabilitat</p>
-        </div>
-        <div className="ap-kpi">
-          <p className="ap-kpi-label">Previsió combinada</p>
-          <p className="ap-kpi-value">{formatCurrency(summary.combinedTotal)}</p>
-          <p className="ap-kpi-trend">Pipeline + històric</p>
-        </div>
-        <div className="ap-kpi">
-          <p className="ap-kpi-label">Variació interanual</p>
-          <p className="ap-kpi-value">{summary.yoyDeltaPct === null ? '—' : `${summary.yoyDeltaPct > 0 ? '+' : ''}${summary.yoyDeltaPct}%`}</p>
-          <p className="ap-kpi-trend">vs mateix període any anterior</p>
-        </div>
-      </section>
-
-      <section className="ap-card">
-        <div className="ap-card-body">
-          <h2 className="text-sm font-semibold mb-3">Per mes</h2>
-          <div className="space-y-3">
-            {months.map((m) => (
-              <div key={m.month} className="flex items-center gap-3">
-                <span className="w-20 shrink-0 text-xs font-medium opacity-70">{formatMonthYearCompact(m.month)}</span>
-                <div className="flex-1 flex items-center gap-2">
-                  <div className="flex-1 h-4 rounded admin-tone-bg-neutral overflow-hidden flex">
-                    <div className="h-full admin-tone-bg-success" style={{ width: `${(m.committedRevenue / maxBar) * 100}%` }} title="Compromès" />
-                    <div className="h-full admin-tone-bg-info" style={{ width: `${(m.weightedPipeline / maxBar) * 100}%` }} title="Ponderat" />
-                  </div>
-                </div>
-                <span className="w-24 shrink-0 text-right text-xs font-semibold">{formatCurrency(m.committedRevenue + m.weightedPipeline)}</span>
-              </div>
-            ))}
+      <div className="ck">
+        {/* HERO — el número-tesi: tresoreria prevista del període */}
+        <section className="ck__hero" aria-label="Previsió del període">
+          <p className="ck__eyebrow">Tresoreria · pròxims {summary.monthsAhead} mesos</p>
+          <div className="ck__herorow">
+            <p className="ck__heronum">{formatCurrency(summary.combinedTotal)}</p>
+            {yoy !== null && (
+              <span className={`ck__yoy ${yoyClass}`} title="Variació de la previsió respecte el mateix període de l'any anterior">
+                {yoy >= 0 ? '▲' : '▼'} {Math.abs(yoy)}%
+                <span className="ck__yoy-label">vs any passat</span>
+              </span>
+            )}
           </div>
-          <p className="mt-3 text-xs opacity-50">
-            Verd: compromès (reserves confirmades) · Blau: ponderat (pipeline × probabilitat).
-          </p>
-        </div>
-      </section>
+          <p className="ck__herocap">Previsió combinada — pipeline ponderat més la mitjana històrica del mes.</p>
+        </section>
+
+        {/* PILARS — jerarquia de certesa de l'ingrés */}
+        <section className="ck__pillars" aria-label="Composició de la previsió">
+          <article className="ck__pillar ck__pillar--committed">
+            <span className="ck__pillar-dot" aria-hidden="true" />
+            <p className="ck__pillar-label">Compromès</p>
+            <p className="ck__pillar-val">{formatCurrency(summary.committedTotal)}</p>
+            <p className="ck__pillar-cap">Reserves ja confirmades</p>
+          </article>
+          <article className="ck__pillar ck__pillar--weighted">
+            <span className="ck__pillar-dot" aria-hidden="true" />
+            <p className="ck__pillar-label">Probable</p>
+            <p className="ck__pillar-val">{formatCurrency(summary.weightedTotal)}</p>
+            <p className="ck__pillar-cap">Pipeline × probabilitat de tancament</p>
+          </article>
+          <article className="ck__pillar">
+            <p className="ck__pillar-label">Històric</p>
+            <p className="ck__pillar-val">{formatCurrency(summary.previousYearTotal)}</p>
+            <p className="ck__pillar-cap">Mateix període, any anterior</p>
+          </article>
+        </section>
+
+        {/* SIGNATURA — escala temporal: certesa de l'ingrés mes a mes */}
+        <section className="ck__timeline" aria-label="Previsió mes a mes">
+          <header className="ck__tl-head">
+            <h2 className="ck__tl-title">Mes a mes</h2>
+            <div className="ck__legend">
+              <span className="ck__legend-item"><span className="ck__legend-swatch ck__legend-swatch--committed" /> Compromès</span>
+              <span className="ck__legend-item"><span className="ck__legend-swatch ck__legend-swatch--weighted" /> Probable</span>
+            </div>
+          </header>
+
+          {months.every((m) => m.committedRevenue + m.weightedPipeline === 0) ? (
+            <p className="ck__empty">Encara no hi ha reserves confirmades ni pipeline obert amb valor per a aquests mesos. Quan entrin leads amb pressupost, la previsió apareixerà aquí.</p>
+          ) : (
+            <ul className="ck__rows">
+              {months.map((m) => {
+                const committedPct = (m.committedRevenue / maxMonth) * 100;
+                const weightedPct = (m.weightedPipeline / maxMonth) * 100;
+                return (
+                  <li key={m.month} className="ck__row">
+                    <span className="ck__row-month">{formatMonthYearCompact(m.month)}</span>
+                    <span className="ck__row-track">
+                      <span className="ck__row-committed" style={{ width: `${committedPct}%` }} />
+                      <span className="ck__row-weighted" style={{ width: `${weightedPct}%` }} />
+                    </span>
+                    <span className="ck__row-total">{formatCurrency(m.committedRevenue + m.weightedPipeline)}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+      </div>
     </AdminPage>
   );
 }

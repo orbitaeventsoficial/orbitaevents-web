@@ -1502,6 +1502,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1091 — 2026-06-22 — claude (TANCAT)
+
+**La meva versió del zenit: disseny del Cockpit Econòmic (carbó+or).**
+
+- Disseny propi dins el canon: número-tesi de tresoreria en or + 3 pilars amb jerarquia de certesa + signatura (escala temporal or sòlid=compromès / or translúcid=probable).
+- `cockpit.css` scoped: només layout (grid/clamp/rem/tokens), cap hex ni px de maquetacio.
+- Validació tècnica: tsc + qa:admin-canon 0 + qa:css-monocapa + validate:core EXIT 0; render 3 breakpoints 0 errors/0 overflow.
+- Validació funcional: zenit acabat i operatiu.
+- Validació humana/UX: proposta; el propietari farà la seva.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1090 — 2026-06-22 — claude (TANCAT)
 
 **Cockpit operatiu: enllaçat al sidebar.**

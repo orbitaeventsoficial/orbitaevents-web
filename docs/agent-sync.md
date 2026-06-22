@@ -15,6 +15,9 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-22 [ESTAT: tancat — LA MEVA VERSIÓ del zenit: disseny del Cockpit (carbó+or) #1091]
+Versió de disseny pròpia del Cockpit (petició del propietari «la teva versió»). Dins el canon carbó+or (tokens only, cap CSS nou de color): número-tesi de tresoreria gran en or + eyebrow mono, 3 pilars amb jerarquia de certesa (Compromès verd / Probable or / Històric), i element SIGNATURA = escala temporal mes a mes on or SÒLID=compromès i or TRANSLÚCID=probable (comunica la certesa de l'ingrés). cockpit.css scoped (només layout: grid/clamp/rem, tokens; cap hex, cap px de maquetacio). qa:admin-canon 0 + qa:css-monocapa OK. Render 3 breakpoints HTTP 200, 0 errors, 0 overflow. El propietari farà la seva versió després. Counter->1091.
+
 [claude] 2026-06-22 [ESTAT: tancat — Cockpit operatiu: enllaçat al sidebar #1090]
 El zenit (/admin/cockpit) ara es OPERATIU: afegit al sidebar (grup Sistema, al costat de Finances). getGroupForPath ja el mapeja a sistema per defecte. Guards de nav/manual verds. CSS canònic existent (cap CSS nou). Cap sobra nova (dead-views 0). Counter->1090.
 

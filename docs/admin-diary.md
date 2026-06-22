@@ -28,6 +28,40 @@ Continuació non stop del drenatge CSRF backend després de #1082. Perímetre pe
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-22 — La meva versió del zenit: disseny del Cockpit Econòmic (Canvi #1091, claude)
+
+### Context
+El propietari vol veure LA MEVA versió de disseny del zenit (després farà la seva). Aplicada guia frontend-design DINS el canon Òrbita (carbó+or, no negociable, amb guards).
+
+### Brief de disseny (fixat)
+Subjecte: operador de festes que necessita saber en 3 segons la salut econòmica futura. Job de la pàgina: respondre «quant tinc compromès, quant és probable, com vaig vs l'any passat».
+
+### Decisions de disseny
+- HERO = número-tesi: la previsió combinada del període, gran, en or (--o-admin-gold-bright), amb eyebrow mono i badge YoY (verd/vermell segons signe).
+- PILARS amb jerarquia de CERTESA (no 4 KPIs plans iguals): Compromès (verd, reserves confirmades) · Probable (or, pipeline ponderat) · Històric.
+- SIGNATURA: escala temporal mes a mes amb or SÒLID = compromès i or TRANSLÚCID (--o-admin-gold-tint-3) = probable → la certesa de l'ingrés es llegeix d'un cop d'ull.
+- Empty state útil (no buit fred) quan no hi ha pipeline amb valor.
+
+### Implementació
+- `app/admin/cockpit/cockpit.css`: scoped, NOMÉS layout (grid, clamp, rem, ch, fr) + tokens. Cap hex, cap px de maquetacio, cap CSS de color nou. Responsiu (mòbil 1 col) + prefers-reduced-motion.
+- `page.tsx` reescrit amb l'estructura hero/pilars/timeline.
+
+### Verificació
+- tsc + qa:admin-canon (0) + qa:css-monocapa + validate:core EXIT 0.
+- Render desktop/tablet/mòbil: HTTP 200, 0 page errors, 0 overflow horitzontal.
+
+### Validació
+- Validació tècnica: tsc + validate:core EXIT 0.
+- Validació funcional: zenit acabat i operatiu (sidebar + dades reals).
+- Validació humana/UX: la meva proposta; el propietari farà la seva versió.
+
+### Coordinació
+Counter -> 1091. Commit + push + monitor.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-22 — Cockpit operatiu: enllaçat al sidebar (Canvi #1090, claude)
 
 ### Context
