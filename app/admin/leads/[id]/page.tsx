@@ -26,20 +26,13 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-import { getEventLabel } from '@/lib/constants';
+import { getEventLabel, parseBudgetAmount } from '@/lib/constants';
 
 
 const STAGE_KEY_MAP: Record<string, string> = {
   NEW: 'nou', CONTACTED: 'contactat', QUOTE_SENT: 'contactat',
   NEGOTIATING: 'contactat', WON: 'guanyat', LOST: 'perdut',
 };
-
-function parseBudgetValue(input?: string | null): number | null {
-  if (!input) return null;
-  const normalized = input.replace(/[^\d.,]/g, '').replace(/\./g, '').replace(',', '.');
-  const value = Number(normalized);
-  return Number.isFinite(value) ? value : null;
-}
 
 export default async function LeadDetailPage({ params }: Props) {
   const lead = await prisma.lead.findUnique({
@@ -148,7 +141,7 @@ export default async function LeadDetailPage({ params }: Props) {
   }
 
   const eventType = getEventLabel(lead.eventType);
-  const budgetValue = parseBudgetValue(lead.budget);
+  const budgetValue = parseBudgetAmount(lead.budget);
   const estimatedRevenue = lead.booking?.total ?? budgetValue ?? null;
   const stageKey = STAGE_KEY_MAP[lead.status] || 'nou';
 

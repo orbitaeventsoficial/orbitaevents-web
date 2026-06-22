@@ -1,4 +1,4 @@
-import { LEAD_SCORING_STATUS_BASE, LEAD_SCORING_STATUS_PROBABILITY, EVENT_TYPE_DEFAULT_BUDGET } from '@/lib/constants';
+import { LEAD_SCORING_STATUS_BASE, LEAD_SCORING_STATUS_PROBABILITY, EVENT_TYPE_DEFAULT_BUDGET, parseBudgetAmount } from '@/lib/constants';
 
 type ScoreInput = {
   status: string;
@@ -22,11 +22,10 @@ type LeadScoreResult = {
   riskFlags: string[];
 };
 
+// Wrapper de la font canònica `parseBudgetAmount` (lib/constants); retorna 0
+// per al scoring (que suma el valor).
 function parseBudgetValue(input?: string | null): number {
-  if (!input) return 0;
-  const normalized = input.replace(/[^\d.,]/g, '').replace(/\./g, '').replace(',', '.');
-  const value = Number(normalized);
-  return Number.isFinite(value) ? value : 0;
+  return parseBudgetAmount(input) ?? 0;
 }
 
 function clamp(value: number, min: number, max: number): number {

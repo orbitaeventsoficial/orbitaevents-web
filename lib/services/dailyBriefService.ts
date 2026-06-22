@@ -6,16 +6,16 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { prisma } from '@/lib/prisma';
-import { LEAD_SCORING_STATUS_PROBABILITY } from '@/lib/constants';
+import { LEAD_SCORING_STATUS_PROBABILITY, parseBudgetAmount } from '@/lib/constants';
 import { generateCampaigns, type Campaign } from './campaignService';
 import { deriveLeadResponseState, loadPendingFollowUps } from '@/lib/services/responseTrackingService';
 import { loadPipelineSuggestions } from '@/lib/services/leadPipelineSuggestionsService';
 import { loadSocialContentPulse } from '@/lib/services/socialContentPulseService';
 
+// Wrapper de la font canònica `parseBudgetAmount` (lib/constants); retorna 0 en
+// comptes de null per als consumidors que sumen el valor.
 export function parseBudgetValue(input?: string | null): number {
-  if (!input) return 0;
-  const num = Number(input.replace(/[^\d.,]/g, '').replace(/\./g, '').replace(',', '.'));
-  return Number.isFinite(num) ? num : 0;
+  return parseBudgetAmount(input) ?? 0;
 }
 
 // ───────────────────────────────────────────────────────────────────────────

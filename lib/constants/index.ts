@@ -547,6 +547,33 @@ export function formatTimeShort(date: Date | string | null | undefined, locale =
   return new Date(date).toLocaleTimeString(toIntlLocale(locale), { hour: '2-digit', minute: '2-digit' });
 }
 
+/**
+ * Parseja el camp `budget` (string lliure: "300", "300€", "1.200", "1.200,50")
+ * en un nombre, o null si no s'extreu cap xifra positiva. Font ÚNICA canònica:
+ * abans aquesta lògica estava duplicada (i divergent) a 5+ serveis. Gestiona punt
+ * i coma com a decimal/miler segons els dígits que segueixen l'últim separador.
+ */
+export function parseBudgetAmount(budget: string | null | undefined): number | null {
+  if (!budget) return null;
+  const digits = budget.replace(/[^\d.,]/g, '');
+  if (!digits) return null;
+  const lastDot = digits.lastIndexOf('.');
+  const lastComma = digits.lastIndexOf(',');
+  let normalized = digits;
+  if (lastDot > -1 && lastComma > -1) {
+    if (lastComma > lastDot) normalized = digits.replace(/\./g, '').replace(',', '.');
+    else normalized = digits.replace(/,/g, '');
+  } else if (lastComma > -1) {
+    const after = digits.length - lastComma - 1;
+    normalized = after > 0 && after <= 2 ? digits.replace(',', '.') : digits.replace(/,/g, '');
+  } else if (lastDot > -1) {
+    const after = digits.length - lastDot - 1;
+    normalized = after > 0 && after <= 2 ? digits : digits.replace(/\./g, '');
+  }
+  const n = Number(normalized);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
 /** Number with locale formatting */
 export function formatNumber(value: number | null | undefined, opts?: Intl.NumberFormatOptions, locale = 'ca-ES'): string {
   if (value === null || value === undefined) return '-';

@@ -15,6 +15,9 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-22 [ESTAT: tancat — MONOCAPA parseBudget: 6 implementacions divergents → 1 canònica #1086]
+Duplicacio de logica de domini REAL i DIVERGENT: el parseig de pressupost (string lliure → num) estava reimplementat a 6 llocs (commercialScoring, dailyBriefService, taskQueueService, seasonCalendarService, leads/[id]/page + packSuggestion diferent). 4 versions simples tenien un BUG: "300.50" (decimal punt) → 30050. La de seasonCalendar era robusta. Unificat: font unica `parseBudgetAmount` a lib/constants (logica robusta), tots la consumeixen (wrappers ?? 0 on cal). Mateix pressupost ara dona el MATEIX valor a score/forecast/calendari. 114 tests dels serveis afectats verds + nou test parseBudgetAmount (6, inclou cas buggy corregit). tsc EXIT 0. Counter->1086.
+
 [claude] 2026-06-22 [ESTAT: tancat — PODA createDossierFromBolo orfe (deute #1072 tancat) #1085]
 Tancat l'ultim deute de codi mort anotat: `createDossierFromBolo` eliminat de `dossierService.ts` (era l'unic consumidor la ruta generate-dossier esborrada al #1072; el cockpit usa el generador normal). Funcio autocontinguda, cap import de capçalera queda orfe (tots segueixen usats per altres funcions). tsc EXIT 0. Counter->1085. Es fa commit+push i monitoritzacio Railway a continuacio.
 

@@ -7,11 +7,12 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { prisma } from '@/lib/prisma';
+import { parseBudgetAmount } from '@/lib/constants';
 
+// Wrapper de la font canònica `parseBudgetAmount` (lib/constants); retorna 0 en
+// comptes de null per als consumidors que sumen el valor.
 export function parseBudgetValue(input?: string | null): number {
-  if (!input) return 0;
-  const num = Number(input.replace(/[^\d.,]/g, '').replace(/\./g, '').replace(',', '.'));
-  return Number.isFinite(num) ? num : 0;
+  return parseBudgetAmount(input) ?? 0;
 }
 
 // ───────────────────────────────────────────────────────────────────────────

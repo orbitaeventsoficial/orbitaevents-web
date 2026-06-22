@@ -28,6 +28,36 @@ Continuació non stop del drenatge CSRF backend després de #1082. Perímetre pe
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-22 — Monocapa: parseBudget unificat (6 implementacions divergents → 1 canònica) (Canvi #1086, claude)
+
+### Context
+Passada de duplicacio de LOGICA de domini (no codi mort: dues fonts de veritat).
+
+### Troballa (divergencia real)
+El parseig del camp `budget` (string lliure "300€"/"1.200,50") estava reimplementat a 6 llocs. 4 versions simples (`commercialScoring`, `dailyBriefService`, `taskQueueService`, `leads/[id]/page`) usaven `replace(/./g,"")` → BUG: "300.50" (decimal punt) interpretat com 30050. La de `seasonCalendar` (`parseBudgetAmount`) gestionava be punt/coma. Efecte: el mateix lead podia donar valor diferent al score, al forecast i al calendari.
+
+### Que s'ha fet
+- Font unica `parseBudgetAmount(input): number|null` a `lib/constants/index.ts` (logica robusta).
+- `seasonCalendarService` la re-exporta (compat amb el seu test).
+- `dailyBriefService`/`taskQueueService`/`commercialScoring`: `parseBudgetValue` passa a wrapper `parseBudgetAmount(x) ?? 0`.
+- `leads/[id]/page`: usa la canònica directament (funcio local eliminada).
+- `packSuggestionService.parseBudgetRange` (rang min-max, contracte diferent) es deixa intacte.
+
+### Verificacio
+- tsc EXIT 0. 114 tests dels 5 serveis afectats verds (cap regressio — la robusta passa tots els casos existents). Nou test `parseBudgetAmount` (6, inclou el cas "300.50" abans buggy).
+
+### Validació
+- Validació tècnica: tsc + tests + validate:core EXIT 0.
+- Validació funcional: score/forecast/calendari comparteixen UNA logica de parseig; bug de decimal-punt corregit.
+- Validació humana/UX: no visible (correccio interna; valors mes correctes).
+
+### Coordinacio
+Counter -> 1086. Commit + push + monitor Railway.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-22 — Poda de createDossierFromBolo orfe (tanca deute #1072) (Canvi #1085, claude)
 
 ### Context

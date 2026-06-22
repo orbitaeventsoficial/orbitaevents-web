@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { parseBudgetAmount } from '@/lib/constants';
 
 // ─── Raw input types (de la BD) ──────────────────────────────────────────────
 
@@ -101,32 +102,10 @@ export interface SeasonCalendarResult {
 
 // ─── Helpers purs ─────────────────────────────────────────────────────────────
 
-// Parseja el camp `budget` del lead (string lliure: "300", "300€", "300 EUR", "1.200",
-// "1,200", "1.200,50") en un nombre. Retorna null si no es pot extreure cap xifra.
-// Acceptat tant punt com coma com a separador decimal/miler — pren el darrer com a
-// decimal si hi ha 2 dígits darrere.
-export function parseBudgetAmount(budget: string | null | undefined): number | null {
-  if (!budget) return null;
-  const digits = budget.replace(/[^\d.,]/g, '');
-  if (!digits) return null;
-  const lastDot = digits.lastIndexOf('.');
-  const lastComma = digits.lastIndexOf(',');
-  let normalized = digits;
-  if (lastDot > -1 && lastComma > -1) {
-    // Format europeu o americà mixt — el darrer separador és el decimal.
-    if (lastComma > lastDot) normalized = digits.replace(/\./g, '').replace(',', '.');
-    else normalized = digits.replace(/,/g, '');
-  } else if (lastComma > -1) {
-    // Si hi ha 1-2 dígits després de la coma, és decimal; si no, miler.
-    const after = digits.length - lastComma - 1;
-    normalized = after > 0 && after <= 2 ? digits.replace(',', '.') : digits.replace(/,/g, '');
-  } else if (lastDot > -1) {
-    const after = digits.length - lastDot - 1;
-    normalized = after > 0 && after <= 2 ? digits : digits.replace(/\./g, '');
-  }
-  const n = Number(normalized);
-  return Number.isFinite(n) && n > 0 ? n : null;
-}
+// `parseBudgetAmount` viu ara a `lib/constants` (font única canònica; abans estava
+// duplicada i divergent a 5+ serveis). Es re-exporta aquí per compatibilitat amb
+// els consumidors i tests que la importaven d'aquest servei.
+export { parseBudgetAmount } from '@/lib/constants';
 
 // ─── Date helpers (UTC-aware, sense dependències externes) ────────────────────
 

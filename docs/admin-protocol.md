@@ -1502,6 +1502,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1086 — 2026-06-22 — claude (TANCAT)
+
+**Monocapa: parseBudget unificat (6 implementacions divergents → 1 canònica).**
+
+- El parseig de pressupost estava reimplementat a 6 llocs; 4 amb un bug ("300.50"→30050). Unificat a `parseBudgetAmount` (lib/constants, logica robusta); tots la consumeixen.
+- Efecte corregit: el mateix lead donava valor diferent a score/forecast/calendari.
+- Validació tècnica: tsc + 114 tests serveis + nou test (6) + validate:core EXIT 0.
+- Validació funcional: una sola veritat de parseig; bug decimal-punt corregit.
+- Validació humana/UX: no visible.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1085 — 2026-06-22 — claude (TANCAT)
 
 **Poda de createDossierFromBolo orfe (tanca deute #1072).**
