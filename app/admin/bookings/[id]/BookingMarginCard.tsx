@@ -15,6 +15,8 @@ import {
   TRAVEL_BLOCK_KM,
 } from '@/lib/services/travelCost';
 import { formatCurrency } from '@/lib/constants';
+import { computeDirectCostBreakdown } from '@/lib/services/costEngine';
+import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { getMarginTone, getTravelMarginTone } from '@/lib/margin-utils';
 import Tooltip from '@/app/admin/components/Tooltip';
@@ -85,22 +87,26 @@ export default function BookingMarginCard({
   const travelNetMargin = calculatedTravelCharge - calculatedTravelCost;
   const travelMarginPct = calculatedTravelCharge > 0 ? (travelNetMargin / calculatedTravelCharge) * 100 : 0;
 
-  const packEstimatedCost = packPrice * packCostRatio;
-  const packCostUsed = typeof inventoryCostReal === 'number' && inventoryCostReal > 0
-    ? inventoryCostReal
-    : packEstimatedCost;
-  const extrasCost = extrasTotal * extraCostRatio;
-  const extraHoursCost = extraHours * extraHourPrice * extraHourCostRatio;
+  // Cost directe via la font única (computeDirectCostBreakdown), no reimplementat.
+  // El helper gestiona pack real-vs-estimat (inventoryCostReal) i usa el travelCost
+  // explícit que ja hem calculat. Els ratios vénen dels props (config de la reserva).
+  const { packCost: packCostUsed, extrasCost, extraHoursCost, directCost } = computeDirectCostBreakdown(
+    {
+      total,
+      packPrice,
+      extrasTotal,
+      extraHours,
+      extraHourPrice,
+      distanceKm,
+      vehicleCostPerKm,
+      travelCost: calculatedTravelCost,
+      inventoryCostReal,
+      serviceLinesCost,
+    },
+    { ...PROFITABILITY_MODEL_DEFAULTS, packCostRatio, extraCostRatio, extraHourCostRatio, fixedOperationalCost },
+  );
 
-  const directCost =
-    packCostUsed +
-    extrasCost +
-    extraHoursCost +
-    fixedOperationalCost +
-    calculatedTravelCost +
-    serviceLinesCost;
-
-  const netMargin = total - directCost;
+  const netMargin = total - directCost; // marge en viu: sense CAC (per disseny)
   const marginPct = total > 0 ? (netMargin / total) * 100 : 0;
   const targetMarginAmount = total * (targetMarginPct / 100);
   const marginDeltaVsTarget = netMargin - targetMarginAmount;

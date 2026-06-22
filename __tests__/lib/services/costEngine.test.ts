@@ -32,6 +32,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   computeBookingFinancialSummary,
+  computeDirectCostBreakdown,
   computeSimpleMarginPct,
   computeCollaboratorNetMargin,
   aggregateServiceLines,
@@ -860,5 +861,60 @@ describe('computeSupportableTravelKm', () => {
 
   it('cost/km més alt (benzina cara) → menys km assumibles', () => {
     expect(computeSupportableTravelKm(28, 0.23)).toBe(Math.floor(28 / 0.23)); // 121
+  });
+});
+
+// ─── computeDirectCostBreakdown — font única del cost directe (#1088) ──────────
+// Extreta de computeBookingFinancialSummary perquè els components de marge en viu
+// (useBookingPricing, BookingMarginCard) no reimplementin la fórmula. Aquests
+// tests blinden que la font única és coherent amb el cor i amb els patrons que
+// usen els components migrats.
+describe('computeDirectCostBreakdown (font única del cost directe)', () => {
+  const base = {
+    total: 1000, packPrice: 500, extrasTotal: 100, extraHours: 2,
+    extraHourPrice: 50, distanceKm: 0, travelCost: 40, serviceLinesCost: 0,
+  };
+
+  it('el directCost coincideix EXACTAMENT amb el de computeBookingFinancialSummary', () => {
+    const breakdown = computeDirectCostBreakdown(base, defaultConfig);
+    const summary = computeBookingFinancialSummary(base, defaultConfig);
+    expect(breakdown.directCost).toBe(summary.directCost);
+    expect(breakdown.packCost).toBe(summary.packCost);
+    expect(breakdown.extrasCost).toBe(summary.extrasCost);
+    expect(breakdown.extraHoursCost).toBe(summary.extraHoursCost);
+    expect(breakdown.travelCost).toBe(summary.travelCost);
+  });
+
+  it('pack real (inventoryCostReal>0) preval sobre l\'estimat', () => {
+    const b = computeDirectCostBreakdown({ ...base, inventoryCostReal: 123 }, defaultConfig);
+    expect(b.packCost).toBe(123);
+    expect(b.packCostIsReal).toBe(true);
+  });
+
+  it('pack estimat = packPrice × packCostRatio quan no hi ha cost real', () => {
+    const b = computeDirectCostBreakdown(base, defaultConfig);
+    expect(b.packCost).toBe(500 * defaultConfig.packCostRatio);
+    expect(b.packCostIsReal).toBe(false);
+  });
+
+  it('travelCost explícit s\'usa tal qual; si és 0 amb distanceKm 0 → 0 (patró components en viu)', () => {
+    expect(computeDirectCostBreakdown({ ...base, travelCost: 40 }, defaultConfig).travelCost).toBe(40);
+    expect(computeDirectCostBreakdown({ ...base, travelCost: 0, distanceKm: 0 }, defaultConfig).travelCost).toBe(0);
+  });
+
+  it('patró useBookingPricing (extraHours=1, extraHourPrice=preu agregat) dóna el cost esperat', () => {
+    // En viu el preu d'hores extra ja ve agregat; extraHours=1 × preu × ratio.
+    const b = computeDirectCostBreakdown(
+      { total: 800, packPrice: 400, extrasTotal: 0, extraHours: 1, extraHourPrice: 120, distanceKm: 0, travelCost: 0 },
+      defaultConfig,
+    );
+    expect(b.extraHoursCost).toBe(120 * defaultConfig.extraHourCostRatio);
+  });
+
+  it('directCost és la suma exacta dels components', () => {
+    const b = computeDirectCostBreakdown(base, defaultConfig);
+    expect(b.directCost).toBeCloseTo(
+      b.packCost + b.extrasCost + b.extraHoursCost + b.fixedOperationalCost + b.travelCost + b.serviceLinesCost, 6,
+    );
   });
 });

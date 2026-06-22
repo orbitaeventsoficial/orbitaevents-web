@@ -134,10 +134,29 @@ export function computeSupportableTravelKm(netMargin: number, costPerKm: number)
  * Calcula el resum financer complet d'una reserva.
  * Font única de veritat per a tots els càlculs de marge/cost.
  */
-export function computeBookingFinancialSummary(
+/** Desglossament dels components del cost directe d'un bolo. */
+export interface DirectCostBreakdown {
+  packCost: number;
+  packCostIsReal: boolean;
+  extrasCost: number;
+  extraHoursCost: number;
+  fixedOperationalCost: number;
+  travelCost: number;
+  serviceLinesRevenue: number;
+  serviceLinesCost: number;
+  directCost: number;
+}
+
+/**
+ * Font ÚNICA del càlcul del cost directe d'un bolo (sense CAC). La usen tant
+ * `computeBookingFinancialSummary` (servidor) com els components de marge en viu
+ * del client (`useBookingPricing`, `BookingMarginCard`), per no reimplementar la
+ * mateixa fórmula a 3 llocs i evitar que divergeixin.
+ */
+export function computeDirectCostBreakdown(
   input: BookingCostInput,
   config: ProfitabilityConfig,
-): BookingFinancialSummary {
+): DirectCostBreakdown {
   // Pack cost: real si disponible, estimat si no
   const packCostIsReal =
     typeof input.inventoryCostReal === 'number' && input.inventoryCostReal > 0;
@@ -169,6 +188,21 @@ export function computeBookingFinancialSummary(
 
   const directCost =
     packCost + extrasCost + extraHoursCost + fixedOperationalCost + travelCost + serviceLinesCost;
+
+  return {
+    packCost, packCostIsReal, extrasCost, extraHoursCost, fixedOperationalCost,
+    travelCost, serviceLinesRevenue, serviceLinesCost, directCost,
+  };
+}
+
+export function computeBookingFinancialSummary(
+  input: BookingCostInput,
+  config: ProfitabilityConfig,
+): BookingFinancialSummary {
+  const {
+    packCost, packCostIsReal, extrasCost, extraHoursCost, fixedOperationalCost,
+    travelCost, serviceLinesRevenue, serviceLinesCost, directCost,
+  } = computeDirectCostBreakdown(input, config);
 
   // CAC
   const acquisitionCost =

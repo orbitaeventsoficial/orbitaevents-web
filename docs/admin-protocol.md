@@ -1502,6 +1502,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1088 — 2026-06-22 — claude (TANCAT)
+
+**Tall 1: marge en viu via font única (computeDirectCostBreakdown).**
+
+- `useBookingPricing` i `BookingMarginCard` reimplementaven la fórmula de cost directe del costEngine. Extreta a helper pur `computeDirectCostBreakdown`; el cor i els 2 components l'usen. directCost d'una sola font.
+- 0 canvi de números: el directCost tenia la mateixa definicio; netMargin en viu segueix sense CAC (disseny). 6 tests nous blinden la consistencia breakdown↔summary.
+- Validació tècnica: tsc + 76 tests costEngine + validate:core EXIT 0.
+- Validació funcional: marge en viu idèntic, font única.
+- Validació humana/UX: cap canvi visible.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1087 — 2026-06-22 — claude (TANCAT)
 
 **Seguretat P0: CSRF a 62 handlers backend admin (deute a 0).**

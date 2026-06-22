@@ -6,7 +6,7 @@ import {
   OPERATOR_EXTRA_MIN_PRICE, OPERATOR_EXTRA_FACTOR,
 } from '@/lib/constants/pricing';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
-import { aggregateServiceLines } from '@/lib/services/costEngine';
+import { aggregateServiceLines, computeDirectCostBreakdown } from '@/lib/services/costEngine';
 import {
   calculateBillableTravelKm,
   calculateTravelBlocks,
@@ -126,14 +126,21 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
 
   const marginEstimate = useMemo(() => {
     if (!pricing) return null;
-    const packCost = pricing.packPrice * PROFITABILITY_MODEL_DEFAULTS.packCostRatio;
-    const extrasCost = pricing.extrasPrice * PROFITABILITY_MODEL_DEFAULTS.extraCostRatio;
-    const extraHoursCost = pricing.extraHoursPrice * PROFITABILITY_MODEL_DEFAULTS.extraHourCostRatio;
-    const fixedCost = PROFITABILITY_MODEL_DEFAULTS.fixedOperationalCost;
-    const travelCostEst = internalTravelCost;
-    const serviceLinesCost = pricing.serviceLinesCost || 0;
-    const directCost = packCost + extrasCost + extraHoursCost + fixedCost + travelCostEst + serviceLinesCost;
-    const netMargin = pricing.total - directCost;
+    // Cost directe via la font única (computeDirectCostBreakdown), no reimplementat.
+    // extraHours=1 + extraHourPrice=extraHoursPrice perquè el preu d'hores extra ja ve
+    // agregat (count×preu). travelCost explícit; si és 0, el helper el recalcula a 0.
+    const { directCost } = computeDirectCostBreakdown({
+      total: pricing.total,
+      packPrice: pricing.packPrice,
+      extrasTotal: pricing.extrasPrice,
+      extraHours: 1,
+      extraHourPrice: pricing.extraHoursPrice,
+      distanceKm: 0,
+      travelCost: internalTravelCost,
+      serviceLinesRevenue: pricing.serviceLinesRevenue,
+      serviceLinesCost: pricing.serviceLinesCost || 0,
+    }, PROFITABILITY_MODEL_DEFAULTS);
+    const netMargin = pricing.total - directCost; // marge en viu: sense CAC (per disseny)
     const marginPct = pricing.total > 0 ? (netMargin / pricing.total) * 100 : 0;
     const tone: 'emerald' | 'amber' | 'rose' = marginPct >= 50 ? 'emerald' : marginPct >= 30 ? 'amber' : 'rose';
     return { directCost, netMargin, marginPct, tone };

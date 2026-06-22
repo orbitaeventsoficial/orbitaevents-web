@@ -28,6 +28,34 @@ Continuació non stop del drenatge CSRF backend després de #1082. Perímetre pe
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-22 — Tall 1: marge en viu via font única computeDirectCostBreakdown (Canvi #1088, claude)
+
+### Context
+TALL 1 de la proposta, fet AMB XARXA (tests primer). `useBookingPricing` i `BookingMarginCard` reimplementaven la fórmula de cost directe del costEngine (packPrice×ratio + extras×ratio + ...) → duplicacio de logica de domini.
+
+### Anàlisi prèvia (per no canviar números)
+El `directCost` tenia la MATEIXA definicio als 3 llocs; el netMargin difereix per disseny (marge en viu SENSE CAC, fitxa final amb CAC). Per tant unificar el directCost no canvia cap valor mostrat.
+
+### Què s'ha fet
+- Helper pur `computeDirectCostBreakdown(input, config)` extret de computeBookingFinancialSummary (que ara l'usa internament → 70 tests del cor garanteixen 0 canvi).
+- `useBookingPricing.marginEstimate` i `BookingMarginCard` criden el helper en comptes de reimplementar; mantenen netMargin/tone locals (sense CAC, com abans).
+- Edge cases verificats: travelCost=0 → calculateTravelCost(0)=0 (igual); extraHours=1×preu-agregat (useBookingPricing); pack real vs estimat (BookingMarginCard, igual que el helper).
+
+### Xarxa de tests
+6 tests nous a costEngine.test.ts: directCost del helper === directCost de computeBookingFinancialSummary (consistencia exacta), pack real/estimat, travelCost explícit/0, patró extraHours=1, suma de components. 76 tests del costEngine verds.
+
+### Validació
+- Validació tècnica: tsc + 76 tests costEngine + validate:core EXIT 0.
+- Validació funcional: marge en viu idèntic (mateixa fórmula, ara d'una sola font); si el costEngine canvia la composicio del cost, els 3 es mouen junts.
+- Validació humana/UX: cap canvi de números mostrats (per construcció + tests).
+
+### Coordinació
+Counter -> 1088. Commit + push + monitor Railway.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-22 — Seguretat P0: CSRF a 62 handlers backend admin (deute a 0) (Canvi #1087, claude)
 
 ### Context

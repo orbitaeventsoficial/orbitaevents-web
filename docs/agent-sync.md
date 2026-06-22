@@ -15,6 +15,9 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-22 [ESTAT: tancat — TALL 1: marge en viu via font única (computeDirectCostBreakdown) #1088]
+Eliminada la duplicacio de la formula de cost directe: useBookingPricing i BookingMarginCard reimplementaven packPrice*ratio+extras*ratio+... (la fórmula del costEngine). Extreta a helper pur `computeDirectCostBreakdown` al costEngine; computeBookingFinancialSummary l'usa (70 tests del cor verds = 0 canvi de números) i els 2 components client tambe. Fet AMB XARXA: 6 tests nous que blinden la consistencia exacta breakdown↔summary + patrons dels components (extraHours=1, travelCost=0→0, pack real vs estimat). 0 regressio garantida. El netMargin en viu segueix SENSE CAC (per disseny, no tocat). tsc + 76 tests costEngine + validate:core EXIT 0. Counter->1088.
+
 [claude] 2026-06-22 [ESTAT: tancat — SEGURETAT P0: CSRF a 62 handlers backend admin (deute a 0) #1087]
 TALL 0 de la proposta d'enginyeria. Sanejat el deute CSRF que codex va inventariar (#1030): afegit verifyCsrf() a 62 handlers mutadors (POST/PUT/PATCH/DELETE) de 43 fitxers /api/admin/* que en mancaven. Allowlist de deute a 0. Llum verda confirmada abans: qa:admin-mutating-fetch-csrf verd (frontend ja envia token via fetchWithCsrf). Risc de cron verificat: cap workflow/cron crida endpoints /api/admin; leads/views manté GET amb Bearer SENSE CSRF (lectura cron) i POST/DELETE amb CSRF (UI). Prova funcional: POST sense token → 403 (abans processava). tsc + validate:core (qa:api-admin-csrf 0 deute) EXIT 0. Counter->1087.
 Avis per l'altre agent: tot handler mutador /api/admin ara EXIGEIX CSRF. Les crides han d'usar fetchWithCsrf (ja és el cas). NO afegeixis verifyCsrf a endpoints de cron (Bearer, sense cookie).
