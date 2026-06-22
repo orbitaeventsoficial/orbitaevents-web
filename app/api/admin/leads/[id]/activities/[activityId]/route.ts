@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
 import { deleteLeadActivity } from '@/lib/services/leadActivityService';
@@ -10,6 +11,8 @@ interface Params {
 export async function DELETE(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   try {
     const result = await deleteLeadActivity(params.id, params.activityId);

@@ -1,6 +1,7 @@
 // app/api/admin/bookings/[id]/status/route.ts
 // API específica per canviar estat de reserva
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { requireAuth, requirePermission } from '@/lib/auth';
 import { changeBookingStatus } from '@/lib/services/bookingRouteService';
@@ -15,6 +16,8 @@ type BookingStatus = typeof BOOKING_STATUS_VALUES[number];
 export async function PATCH(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
 

@@ -1,6 +1,7 @@
 // app/api/admin/emails/run-cron/route.ts
 // Executa el cron de post-event manualment des del panell admin
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
 import { saveCronRunStatus } from '@/lib/services/cronRunStatusService';
@@ -12,6 +13,8 @@ export const maxDuration = 30;
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   const results: PostEventDispatchResult[] = [];
   const now = new Date();

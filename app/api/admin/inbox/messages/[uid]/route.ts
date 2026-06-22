@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { deleteEmail, fetchEmailByUid, getTrashFolderPath, markAsRead, markAsUnread, moveToFolder, restoreFromTrash, setFlag } from '@/lib/imap';
 import { requireAuth } from '@/lib/auth';
@@ -81,6 +82,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   const authError = requireAuth(request);
   if (authError) return authError;
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return csrfError;
   const { uid } = await params;
 
   if (!uid) {
@@ -152,6 +155,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   const authError = requireAuth(request);
   if (authError) return authError;
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return csrfError;
   const { uid } = await params;
 
   if (!uid) {

@@ -15,6 +15,10 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-22 [ESTAT: tancat — SEGURETAT P0: CSRF a 62 handlers backend admin (deute a 0) #1087]
+TALL 0 de la proposta d'enginyeria. Sanejat el deute CSRF que codex va inventariar (#1030): afegit verifyCsrf() a 62 handlers mutadors (POST/PUT/PATCH/DELETE) de 43 fitxers /api/admin/* que en mancaven. Allowlist de deute a 0. Llum verda confirmada abans: qa:admin-mutating-fetch-csrf verd (frontend ja envia token via fetchWithCsrf). Risc de cron verificat: cap workflow/cron crida endpoints /api/admin; leads/views manté GET amb Bearer SENSE CSRF (lectura cron) i POST/DELETE amb CSRF (UI). Prova funcional: POST sense token → 403 (abans processava). tsc + validate:core (qa:api-admin-csrf 0 deute) EXIT 0. Counter->1087.
+Avis per l'altre agent: tot handler mutador /api/admin ara EXIGEIX CSRF. Les crides han d'usar fetchWithCsrf (ja és el cas). NO afegeixis verifyCsrf a endpoints de cron (Bearer, sense cookie).
+
 [claude] 2026-06-22 [ESTAT: tancat — MONOCAPA parseBudget: 6 implementacions divergents → 1 canònica #1086]
 Duplicacio de logica de domini REAL i DIVERGENT: el parseig de pressupost (string lliure → num) estava reimplementat a 6 llocs (commercialScoring, dailyBriefService, taskQueueService, seasonCalendarService, leads/[id]/page + packSuggestion diferent). 4 versions simples tenien un BUG: "300.50" (decimal punt) → 30050. La de seasonCalendar era robusta. Unificat: font unica `parseBudgetAmount` a lib/constants (logica robusta), tots la consumeixen (wrappers ?? 0 on cal). Mateix pressupost ara dona el MATEIX valor a score/forecast/calendari. 114 tests dels serveis afectats verds + nou test parseBudgetAmount (6, inclou cas buggy corregit). tsc EXIT 0. Counter->1086.
 

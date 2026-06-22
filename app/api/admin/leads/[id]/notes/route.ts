@@ -1,6 +1,7 @@
 // app/api/admin/leads/[id]/notes/route.ts
 // API per gestionar notes d'un lead
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
 import { cleanupDuplicateLeadNotes, createLeadNote, deleteLeadNote } from '@/lib/services/leadNoteService';
@@ -12,6 +13,8 @@ interface Params {
 export async function POST(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
   try {
     const body = await req.json();
     const result = await createLeadNote(params.id, body?.content, body?.createdBy);
@@ -28,6 +31,8 @@ export async function POST(req: NextRequest, { params }: Params) {
 export async function PUT(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
   try {
     const result = await cleanupDuplicateLeadNotes(params.id);
     return NextResponse.json(result);
@@ -40,6 +45,8 @@ export async function PUT(req: NextRequest, { params }: Params) {
 export async function DELETE(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
   try {
     const { searchParams } = new URL(req.url);
     const result = await deleteLeadNote(params.id, searchParams.get('noteId'));

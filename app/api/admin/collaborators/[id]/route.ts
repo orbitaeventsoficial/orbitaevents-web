@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { requireAuth } from '@/lib/auth';
 import { log } from '@/lib/logger';
 import { deleteAdminCollaborator, getAdminCollaborator, updateAdminCollaborator } from '@/lib/services/collaboratorAdminService';
@@ -19,6 +20,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   const authError = requireAuth(request);
   if (authError) return authError;
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return csrfError;
 
   try {
     const body = await request.json();
@@ -33,6 +36,8 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   try {
     const result = await deleteAdminCollaborator(params.id);

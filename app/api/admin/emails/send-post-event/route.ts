@@ -1,6 +1,7 @@
 // app/api/admin/emails/send-post-event/route.ts
 // Enviament manual d'email post-event des del panell admin
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
 import { sendPostEventEmailForBooking } from '@/lib/services/postEventDispatchService';
@@ -8,6 +9,8 @@ import { sendPostEventEmailForBooking } from '@/lib/services/postEventDispatchSe
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   try {
     const formData = await req.formData();

@@ -1,6 +1,7 @@
 // app/api/admin/bookings/[id]/inventory/route.ts
 // API per gestionar l'inventari assignat a una reserva
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
 import {
@@ -30,6 +31,8 @@ export async function GET(req: NextRequest, { params }: Params) {
 export async function POST(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   try {
     const body = await req.json();
@@ -44,6 +47,8 @@ export async function POST(req: NextRequest, { params }: Params) {
 export async function PATCH(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   try {
     const body = await req.json();
@@ -58,6 +63,8 @@ export async function PATCH(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   try {
     const { searchParams } = new URL(req.url);

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { requireAuth } from '@/lib/auth';
 import { z } from 'zod';
 import { createGalleryShareToken, revokeGalleryShareToken, getGalleryShareInfo } from '@/lib/services/galleryService';
@@ -23,6 +24,8 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 export async function POST(req: NextRequest, { params }: RouteParams) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   const { id } = await params;
   const body = await req.json().catch(() => null);
@@ -43,6 +46,8 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   const { id } = await params;
   try {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { requireAuth } from '@/lib/auth';
 import { log } from '@/lib/logger';
 import { importLeadFromInboxMessage } from '@/lib/services/inboxLeadImportService';
@@ -12,6 +13,8 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest, { params }: RouteParams) {
   const authError = requireAuth(request);
   if (authError) return authError;
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return csrfError;
 
   const { uid } = await params;
   const uidNum = Number.parseInt(uid, 10);

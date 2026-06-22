@@ -1,6 +1,7 @@
 // app/api/admin/leads/[id]/route.ts
 // API per gestionar lead individual
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { z } from 'zod';
 import { requireAuth } from '@/lib/auth';
@@ -62,6 +63,8 @@ export async function GET(req: NextRequest, { params }: Params) {
 export async function PATCH(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
   try {
     let rawBody;
     try {
@@ -95,6 +98,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 export async function DELETE(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
   try {
     const result = await deleteLeadIfAllowed(params.id);
     return NextResponse.json(result.body, { status: result.status });

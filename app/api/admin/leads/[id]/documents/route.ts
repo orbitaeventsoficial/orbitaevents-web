@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
 import { listLeadDocuments, uploadLeadDocument } from '@/lib/services/leadDocumentService';
@@ -22,6 +23,8 @@ export async function GET(req: NextRequest, { params }: Params) {
 export async function POST(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
   try {
     const result = await uploadLeadDocument(params.id, await req.formData());
     return NextResponse.json(result.body, { status: result.status });

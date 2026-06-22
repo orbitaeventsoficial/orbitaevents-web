@@ -1,4 +1,5 @@
 import 'server-only';
+import { verifyCsrf } from '@/lib/csrf';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -42,6 +43,8 @@ function regexFallback(text: string): Record<string, string> {
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   const { text } = await req.json() as { text?: string };
   if (!text?.trim()) {

@@ -1,6 +1,7 @@
 // app/api/admin/bookings/route.ts
 // API per gestionar reserves
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { requireAuth, requirePermission } from '@/lib/auth';
 import { getRequestId } from '@/lib/request-context';
@@ -94,6 +95,8 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
   const requestId = getRequestId(req);

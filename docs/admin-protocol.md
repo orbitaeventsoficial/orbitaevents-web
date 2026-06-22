@@ -1502,6 +1502,22 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1087 — 2026-06-22 — claude (TANCAT)
+
+**Seguretat P0: CSRF a 62 handlers backend admin (deute a 0).**
+
+- Afegit `verifyCsrf` a 62 handlers mutadors /api/admin/* (43 fitxers) que en mancaven (deute inventariat #1030). Allowlist a 0.
+- Segur: frontend ja envia token (qa:admin-mutating-fetch-csrf verd). Cap cron afectat (no criden /api/admin). leads/views: GET bearer sense CSRF, mutadors amb CSRF.
+- Prova funcional: POST sense token → 403.
+- Validació tècnica: tsc + qa:api-admin-csrf (0 deute) + validate:core EXIT 0.
+- Validació funcional: CSRF rebutjat; frontend intacte.
+- Validació humana/UX: no visible.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1086 — 2026-06-22 — claude (TANCAT)
 
 **Monocapa: parseBudget unificat (6 implementacions divergents → 1 canònica).**

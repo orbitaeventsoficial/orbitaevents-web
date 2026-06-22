@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { requireAuth, requirePermission, getAdminRole } from '@/lib/auth';
 import { log } from '@/lib/logger';
 import {
@@ -60,6 +61,8 @@ export async function GET(req: NextRequest, { params }: Params) {
 export async function POST(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
 
@@ -97,6 +100,8 @@ export async function POST(req: NextRequest, { params }: Params) {
 export async function DELETE(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { requireAuth, requirePermission } from '@/lib/auth';
 import { log } from '@/lib/logger';
 import { executeBookingCommunication, parseBookingCommunicationBody } from '@/lib/services/bookingCommunicationService';
@@ -10,6 +11,8 @@ interface Params {
 export async function POST(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
 

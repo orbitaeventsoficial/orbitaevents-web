@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { z } from 'zod';
 import { requireAuth, requirePermission } from '@/lib/auth';
 import { confirmBizumPayment } from '@/lib/services/bookingBizumService';
@@ -13,6 +14,8 @@ export async function POST(
 ) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
 

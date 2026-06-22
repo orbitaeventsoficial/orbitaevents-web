@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { requireAuth } from '@/lib/auth';
 import { log } from '@/lib/logger';
 import { deleteCollaboratorMember, updateCollaboratorMember } from '@/lib/services/collaboratorMemberService';
@@ -6,6 +7,8 @@ import { deleteCollaboratorMember, updateCollaboratorMember } from '@/lib/servic
 export async function PATCH(request: NextRequest, { params }: { params: { id: string; memberId: string } }) {
   const authError = requireAuth(request);
   if (authError) return authError;
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return csrfError;
 
   try {
     const body = await request.json();
@@ -20,6 +23,8 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 export async function DELETE(request: NextRequest, { params }: { params: { id: string; memberId: string } }) {
   const authError = requireAuth(request);
   if (authError) return authError;
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return csrfError;
 
   try {
     const result = await deleteCollaboratorMember(params.memberId);

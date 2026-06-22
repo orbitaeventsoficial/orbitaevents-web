@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { requireAuth } from '@/lib/auth';
 import { countPendingTestimonials } from '@/lib/services/testimonialAdminService';
 
@@ -7,6 +8,8 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   try {
     const pendingCount = await countPendingTestimonials();

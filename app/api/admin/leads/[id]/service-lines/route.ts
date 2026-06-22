@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 import { requireAuth } from '@/lib/auth';
 import { log } from '@/lib/logger';
 import { listLeadServiceLines, replaceLeadServiceLines } from '@/lib/services/leadServiceLineService';
@@ -21,6 +22,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   const authError = requireAuth(request);
   if (authError) return authError;
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return csrfError;
 
   try {
     const body = await request.json();

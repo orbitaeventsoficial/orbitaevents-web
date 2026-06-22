@@ -28,6 +28,37 @@ Continuació non stop del drenatge CSRF backend després de #1082. Perímetre pe
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-22 — Seguretat P0: CSRF a 62 handlers backend admin (deute a 0) (Canvi #1087, claude)
+
+### Context
+TALL 0 de la proposta d'enginyeria («tot»). El risc objectivament més greu: 62 handlers mutadors /api/admin/* sense `verifyCsrf` (deute inventariat per codex #1030). Amb auth Basic, vulnerables a CSRF.
+
+### Llum verda prèvia (per no trencar el frontend)
+`qa:admin-mutating-fetch-csrf` verd: cap fetch mutador natiu a /api/admin des de app/admin → el frontend ja envia el token via `fetchWithCsrf`. Per tant afegir el guard backend és segur.
+
+### Què s'ha fet
+- `verifyCsrf(req)` injectat just després de l'auth a 62 handlers (43 fitxers), seguint el patró canònic. Import afegit on faltava.
+- Allowlist de deute CSRF (`scripts/api-admin-csrf-allowlist.txt`) buidada → 0 deute.
+
+### Risc de cron verificat (crític)
+Cap workflow (.github) ni cron (app/api/cron) crida endpoints /api/admin → cap cron es trenca. `leads/views` manté GET amb Bearer (lectura cron) SENSE CSRF; els seus POST/DELETE (UI) reben CSRF.
+
+### Verificació
+- tsc EXIT 0 (xarxa: import/sintaxi). `qa:api-admin-csrf` OK (176 handlers, 0 deute). `qa:admin-mutating-fetch-csrf` verd. validate:core EXIT 0.
+- Prova funcional al dev: `POST /api/admin/leads` amb Basic però SENSE token CSRF → 403 (abans processava la petició).
+
+### Validació
+- Validació tècnica: tsc + validate:core EXIT 0.
+- Validació funcional: atac CSRF ara rebutjat (403); frontend intacte (envia token).
+- Validació humana/UX: cap canvi visible.
+
+### Coordinació
+Counter -> 1087. Commit + push + monitor Railway.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-22 — Monocapa: parseBudget unificat (6 implementacions divergents → 1 canònica) (Canvi #1086, claude)
 
 ### Context
