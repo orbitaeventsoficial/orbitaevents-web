@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { formatCurrency, formatDateTime, getProposalStatusDisplay } from '@/lib/constants';
 import { buildCustomerProposalHref } from '@/lib/admin/customerWorkspaceHref';
 import ProposalOwnerPanel from '../ProposalOwnerPanel';
+import '../presupuestos.css';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,45 +41,44 @@ export default async function ProposalDetailPage({ params }: Props) {
     : null;
 
   return (
-    <div className="ap-page">
-      <div className="space-y-6">
-        <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <main className="pr__page">
+        <header className="pr__hero">
           <div>
             <Link
               href="/admin/presupuestos"
-              className="text-xs text-white/60 hover:text-white"
+              className="ap-back"
             >
               ← Tots els pressupostos
             </Link>
-            <h1 className="text-2xl font-semibold mt-1">{proposal.reference}</h1>
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
+            <p className="pr__eyebrow">Comercial · Detall de proposta</p>
+            <h1 className="pr__title">{proposal.reference}</h1>
+            <div className="pr__statusLine">
               <span
                 className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusDisplay.bg} ${statusDisplay.text} ${statusDisplay.border}`}
               >
                 {statusDisplay.label}
               </span>
-              <span className="text-white/50">·</span>
-              <span className="tabular-nums font-medium">{formatCurrency(proposal.total)}</span>
-              <span className="text-white/50">·</span>
-              <span className="text-white/60 text-xs">Creat {formatDateTime(proposal.createdAt)}</span>
+              <span className="pr__amount">{formatCurrency(proposal.total)}</span>
+              <span className="pr__muted text-xs">Creat {formatDateTime(proposal.createdAt)}</span>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="pr__heroActions">
             {editorHref ? (
               <Link
                 href={editorHref}
-                className="text-xs px-3 py-1.5 rounded-lg bg-amber-500/90 text-zinc-900 font-semibold hover:bg-amber-400"
+                className="ap-btn ap-btn--primary"
               >
                 Obrir editor
               </Link>
             ) : (
-              <span className="text-xs text-white/50 italic">
+              <span className="pr__muted text-xs italic">
                 Vincula un client per editar el pressupost
               </span>
             )}
           </div>
         </header>
 
+        <section className="pr__detailGrid">
         <ProposalOwnerPanel
           proposalId={proposal.id}
           initial={{
@@ -104,7 +104,7 @@ export default async function ProposalDetailPage({ params }: Props) {
               : null,
           }}
         />
-      </div>
-    </div>
+        </section>
+    </main>
   );
 }

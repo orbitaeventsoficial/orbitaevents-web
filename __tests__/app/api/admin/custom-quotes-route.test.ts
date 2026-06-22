@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockList, mockCreate, mockGet, mockUpdate, mockDelete } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockList, mockCreate, mockGet, mockUpdate, mockDelete } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockList: vi.fn(),
   mockCreate: vi.fn(),
   mockGet: vi.fn(),
@@ -11,6 +12,7 @@ const { mockRequireAuth, mockList, mockCreate, mockGet, mockUpdate, mockDelete }
 }));
 
 vi.mock('@/lib/auth', () => ({ requireAuth: mockRequireAuth }));
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 vi.mock('@/lib/services/customQuoteAdminService', () => ({
   listAdminCustomQuotes: mockList,
   createAdminCustomQuote: mockCreate,
@@ -24,7 +26,7 @@ import { GET as ListGET, POST } from '@/app/api/admin/custom-quotes/route';
 import { GET as DetailGET, PATCH, DELETE } from '@/app/api/admin/custom-quotes/[id]/route';
 
 describe('GET /api/admin/custom-quotes (list)', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockList.mockResolvedValue([{ id: 'cq-1' }]); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockList.mockResolvedValue([{ id: 'cq-1' }]); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));
@@ -34,6 +36,7 @@ describe('GET /api/admin/custom-quotes (list)', () => {
   it('retorna llista', async () => {
     const res = await ListGET(new NextRequest('http://localhost/api/admin/custom-quotes'));
     expect(res.status).toBe(200);
+    expect(mockVerifyCsrf).not.toHaveBeenCalled();
     const body = await res.json();
     expect(body).toEqual([{ id: 'cq-1' }]);
   });
@@ -45,13 +48,24 @@ describe('GET /api/admin/custom-quotes (list)', () => {
 });
 
 describe('POST /api/admin/custom-quotes', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockCreate.mockResolvedValue({ status: 201, body: { id: 'cq-2' } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockCreate.mockResolvedValue({ status: 201, body: { id: 'cq-2' } }); });
 
   it('crea custom quote', async () => {
     const req = new NextRequest('http://localhost/api/admin/custom-quotes', { method: 'POST', body: JSON.stringify({ title: 'Pressupost especial' }), headers: { 'Content-Type': 'application/json' } });
     const res = await POST(req);
     expect(res.status).toBe(201);
+    expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
     expect(mockCreate).toHaveBeenCalledWith({ title: 'Pressupost especial' });
+  });
+
+  it('rebutja CSRF abans de crear', async () => {
+    mockVerifyCsrf.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Invalid CSRF token' }), { status: 403 }));
+    const req = new NextRequest('http://localhost/api/admin/custom-quotes', { method: 'POST', body: JSON.stringify({ title: 'No' }), headers: { 'Content-Type': 'application/json' } });
+
+    const res = await POST(req);
+
+    expect(res.status).toBe(403);
+    expect(mockCreate).not.toHaveBeenCalled();
   });
 
   it('retorna 500 si falla', async () => {
@@ -62,11 +76,12 @@ describe('POST /api/admin/custom-quotes', () => {
 });
 
 describe('GET /api/admin/custom-quotes/[id]', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockGet.mockResolvedValue({ status: 200, body: { id: 'cq-1' } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockGet.mockResolvedValue({ status: 200, body: { id: 'cq-1' } }); });
 
   it('retorna detall', async () => {
     const res = await DetailGET(new NextRequest('http://localhost/api/admin/custom-quotes/cq-1'), { params: { id: 'cq-1' } });
     expect(res.status).toBe(200);
+    expect(mockVerifyCsrf).not.toHaveBeenCalled();
     expect(mockGet).toHaveBeenCalledWith('cq-1');
   });
 
@@ -82,12 +97,23 @@ describe('GET /api/admin/custom-quotes/[id]', () => {
 });
 
 describe('PATCH /api/admin/custom-quotes/[id]', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockUpdate.mockResolvedValue({ status: 200, body: { ok: true } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockUpdate.mockResolvedValue({ status: 200, body: { ok: true } }); });
 
   it('actualitza correctament', async () => {
     const req = new NextRequest('http://localhost/api/admin/custom-quotes/cq-1', { method: 'PATCH', body: JSON.stringify({ title: 'Nou' }), headers: { 'Content-Type': 'application/json' } });
     expect((await PATCH(req, { params: { id: 'cq-1' } })).status).toBe(200);
+    expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
     expect(mockUpdate).toHaveBeenCalledWith('cq-1', { title: 'Nou' });
+  });
+
+  it('rebutja CSRF abans dactualitzar', async () => {
+    mockVerifyCsrf.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Invalid CSRF token' }), { status: 403 }));
+    const req = new NextRequest('http://localhost/api/admin/custom-quotes/cq-1', { method: 'PATCH', body: JSON.stringify({ title: 'No' }), headers: { 'Content-Type': 'application/json' } });
+
+    const res = await PATCH(req, { params: { id: 'cq-1' } });
+
+    expect(res.status).toBe(403);
+    expect(mockUpdate).not.toHaveBeenCalled();
   });
 
   it('retorna 500 si falla', async () => {
@@ -98,11 +124,23 @@ describe('PATCH /api/admin/custom-quotes/[id]', () => {
 });
 
 describe('DELETE /api/admin/custom-quotes/[id]', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockDelete.mockResolvedValue({ status: 200, body: { ok: true } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockDelete.mockResolvedValue({ status: 200, body: { ok: true } }); });
 
   it('elimina correctament', async () => {
-    expect((await DELETE(new NextRequest('http://localhost/api/admin/custom-quotes/cq-1', { method: 'DELETE' }), { params: { id: 'cq-1' } })).status).toBe(200);
+    const req = new NextRequest('http://localhost/api/admin/custom-quotes/cq-1', { method: 'DELETE' });
+    expect((await DELETE(req, { params: { id: 'cq-1' } })).status).toBe(200);
+    expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
     expect(mockDelete).toHaveBeenCalledWith('cq-1');
+  });
+
+  it('rebutja CSRF abans deliminar', async () => {
+    mockVerifyCsrf.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Invalid CSRF token' }), { status: 403 }));
+    const req = new NextRequest('http://localhost/api/admin/custom-quotes/cq-1', { method: 'DELETE' });
+
+    const res = await DELETE(req, { params: { id: 'cq-1' } });
+
+    expect(res.status).toBe(403);
+    expect(mockDelete).not.toHaveBeenCalled();
   });
 
   it('retorna 500 si falla', async () => {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { requireAuth, requirePermission } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { getAdminFaqById, updateAdminFaq } from '@/lib/services/faqAdminService';
 
 export const dynamic = 'force-dynamic';
@@ -30,6 +31,9 @@ export async function PATCH(
   if (authError) return authError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
+
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   try {
     const { id } = await params;

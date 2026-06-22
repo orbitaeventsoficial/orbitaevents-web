@@ -1,13 +1,15 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockList, mockCreate } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockList, mockCreate } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockList: vi.fn(),
   mockCreate: vi.fn(),
 }));
 
 vi.mock('@/lib/auth', () => ({ requireAuth: mockRequireAuth }));
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 vi.mock('@/lib/services/discountCodeAdminService', () => ({
   listAdminDiscountCodes: mockList,
   createAdminDiscountCode: mockCreate,
@@ -23,7 +25,7 @@ function makePostReq(body: Record<string, unknown>) {
 }
 
 describe('GET /api/admin/discount-codes', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockList.mockResolvedValue([{ id: 'dc-1', code: 'PROMO10' }]); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockList.mockResolvedValue([{ id: 'dc-1', code: 'PROMO10' }]); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));
@@ -35,6 +37,7 @@ describe('GET /api/admin/discount-codes', () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body).toEqual([{ id: 'dc-1', code: 'PROMO10' }]);
+    expect(mockVerifyCsrf).not.toHaveBeenCalled();
   });
 
   it('retorna 500 si falla', async () => {
@@ -44,16 +47,27 @@ describe('GET /api/admin/discount-codes', () => {
 });
 
 describe('POST /api/admin/discount-codes', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockCreate.mockResolvedValue({ status: 201, body: { id: 'dc-2' } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockCreate.mockResolvedValue({ status: 201, body: { id: 'dc-2' } }); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));
-    expect((await POST(makePostReq({ code: 'X', value: 10, validUntil: '2026-12-31' }))).status).toBe(401);
+    const res = await POST(makePostReq({ code: 'X', value: 10, validUntil: '2026-12-31' }));
+    expect(res.status).toBe(401);
+    expect(mockVerifyCsrf).not.toHaveBeenCalled();
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it('rebutja sense CSRF', async () => {
+    mockVerifyCsrf.mockReturnValueOnce(new Response(JSON.stringify({ error: 'CSRF' }), { status: 403 }));
+    const res = await POST(makePostReq({ code: 'PROMO20', value: 20, validUntil: '2026-12-31' }));
+    expect(res.status).toBe(403);
+    expect(mockCreate).not.toHaveBeenCalled();
   });
 
   it('crea codi correctament', async () => {
     const res = await POST(makePostReq({ code: 'PROMO20', value: 20, validUntil: '2026-12-31' }));
     expect(res.status).toBe(201);
+    expect(mockVerifyCsrf).toHaveBeenCalledTimes(1);
     expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({ code: 'PROMO20', value: 20 }));
   });
 

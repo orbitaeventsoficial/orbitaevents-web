@@ -43,3 +43,7 @@ Es podrien eliminar en una passada dedicada amb verificació visual, però NO en
 - `font-px` ×8 — `text-[22px]` en números display → token `--o-text-*`.
 
 Són canvis **visuals** que requereixen verificació a 3 breakpoints; passada dedicada, no neteja de codi mort.
+
+## Codi LATENT — preparat però no cablejat (NO esborrar, no és mort)
+
+- `lib/services/holdedService.ts`: integració de facturació amb Holded, gated per `HOLDED_ENABLED`/`HOLDED_API_KEY` (`isHoldedEnabled()`). Cap importador actiu perquè la **facturació està APARCADA** al full de ruta (s'activa quan Òrbita tingui estructura legal/bancària, §0 de producte-zenit). Ecosistema present (InvoiceSection, `/api/admin/invoices/[id]/sync`, schema). És codi LATENT intencional, no mort. Verificat #1045 (claude, 2026-06-22).

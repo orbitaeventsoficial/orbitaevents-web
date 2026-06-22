@@ -53,13 +53,15 @@ function relativeDate(dateStr: string): string {
 export default function ProposalsList({
   proposals,
   quotes,
+  initialStatusFilter = '',
 }: {
   proposals: ProposalItem[];
   quotes: QuoteItem[];
+  initialStatusFilter?: string;
 }) {
   const router = useRouter();
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>(initialStatusFilter);
   const [actionMsg, setActionMsg] = useState<string | null>(null);
   const [sendingId, setSendingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -160,14 +162,15 @@ export default function ProposalsList({
   }
 
   return (
-    <section className="mb-6 space-y-4">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+    <section className="pr__list">
+      <div className="pr__statGrid">
         <button
           onClick={() => setStatusFilter('')}
-          className={`rounded-[var(--o-r-md)] border p-3 text-left transition-colors ${!statusFilter ? 'border-[var(--hair-gold)] bg-[var(--raised)]' : 'border-[var(--line)] bg-[var(--panel)] hover:border-[var(--line2)]'}`}
+          className="pr__stat"
+          aria-pressed={!statusFilter}
         >
-          <p className="font-[family-name:var(--display)] text-[length:var(--o-text-xl)] font-bold leading-none">{stats.total}</p>
-          <p className="mt-1 font-[family-name:var(--mono)] text-xs uppercase tracking-[0.12em] text-[var(--t3)]">Total</p>
+          <span className="pr__statValue">{stats.total}</span>
+          <span className="pr__statLabel">Total</span>
         </button>
         {PROPOSAL_FILTERABLE_STATUSES.map((status) => {
           const cfg = getProposalStatusDisplay(status);
@@ -178,28 +181,29 @@ export default function ProposalsList({
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className={`rounded-[var(--o-r-md)] border p-3 text-left transition-colors ${isActive ? 'border-[var(--hair-gold)] bg-[var(--raised)]' : 'border-[var(--line)] bg-[var(--panel)] hover:border-[var(--line2)]'}`}
+              className="pr__stat"
+              aria-pressed={isActive}
             >
-              <p className="font-[family-name:var(--display)] text-[length:var(--o-text-xl)] font-bold leading-none">{count}</p>
-              <p className="mt-1 font-[family-name:var(--mono)] text-xs uppercase tracking-[0.12em] text-[var(--t3)]">{cfg.label}{status === 'DRAFT' ? 's' : 's'}</p>
+              <span className="pr__statValue">{count}</span>
+              <span className="pr__statLabel">{cfg.label}s</span>
             </button>
           );
         })}
       </div>
 
       {totalValue > 0 && (
-        <div className="rounded-xl border px-4 py-2 text-sm">
+        <div className="pr__metric">
           Valor acceptat: <strong>{formatCurrency(totalValue)}</strong>
         </div>
       )}
 
       {actionMsg && (
-        <div className="rounded-xl border px-4 py-2 text-sm">
+        <div className="pr__notice">
           {actionMsg}
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="pr__toolbar">
         <input
           type="search"
           placeholder="Cerca per client, referència..."
@@ -208,42 +212,44 @@ export default function ProposalsList({
           className="adm-input min-w-[200px] flex-1"
           aria-label="Cercar pressupostos"
         />
-        {statusFilter && (
-          <button
-            onClick={() => setStatusFilter('')}
-            className="ap-btn ap-btn--xs"
+        <div className="pr__actionRow">
+          {statusFilter && (
+            <button
+              onClick={() => setStatusFilter('')}
+              className="ap-btn ap-btn--xs"
+            >
+              Netejar filtre
+            </button>
+          )}
+          <Link
+            href="/admin/presupuestos?customerId=new"
+            className="ap-btn ap-btn--primary"
           >
-            Netejar filtre
-          </button>
-        )}
-        <Link
-          href="/admin/presupuestos"
-          className="ap-btn ap-btn--primary"
-        >
-          + Nou pressupost
-        </Link>
+            + Nou pressupost
+          </Link>
+        </div>
       </div>
 
-      <div className="space-y-3 lg:hidden">
+      <div className="pr__cards">
         {filtered.length === 0 ? (
-          <p className="py-8 text-center opacity-60">
+          <p className="pr__empty">
             {search || statusFilter ? 'Cap resultat amb aquests filtres' : 'Cap pressupost creat encara'}
           </p>
         ) : (
           filtered.map((proposal) => (
             <article
               key={proposal.id}
-              className="ap-card block rounded-2xl p-4 transition-colors hover:admin-tone-bg-neutral"
+              className="ap-card pr__proposalCard adm-row-hover"
             >
-              <div className="flex items-start justify-between gap-3">
+              <div className="pr__proposalTop">
                 <div className="min-w-0 flex-1">
                   <Link
                     href={getProposalHref(proposal)}
-                    className="font-medium hover:underline"
+                    className="pr__ref hover:underline"
                   >
                     {proposal.reference}
                   </Link>
-                  <p className="truncate text-sm opacity-70">
+                  <p className="pr__muted truncate text-sm">
                     {proposal.customerId ? (
                       <Link href={buildCustomerHubHref(proposal.customerId)} className="hover:underline">
                         {proposal.customer?.name || 'Sense nom'}
@@ -256,63 +262,63 @@ export default function ProposalsList({
                 <StatusBadge status={proposal.status} />
               </div>
 
-              <div className="mt-3 flex items-center justify-between text-sm">
-                <span className="tabular-nums font-medium">{formatCurrency(proposal.total)}</span>
-                <span className="opacity-60">{relativeDate(proposal.createdAt)}</span>
+              <div className="pr__statusLine">
+                <span className="pr__amount">{formatCurrency(proposal.total)}</span>
+                <span className="pr__muted">{relativeDate(proposal.createdAt)}</span>
               </div>
 
-              <div className="mt-3 flex flex-wrap items-center gap-2">
+              <div className="pr__rowActions">
                 <Link
                   href={getProposalHref(proposal)}
-                  className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/10 px-3 py-2 text-sm transition-colors hover:bg-white/10"
+                  className="ap-btn ap-btn--primary ap-btn--xs"
                 >
-                  ✏️ Editar
+                  Editar
                 </Link>
                 {proposal.status === 'DRAFT' && (
                   <button
                     onClick={() => handleSend(proposal.id)}
                     disabled={sendingId === proposal.id}
-                    className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/10 px-3 py-2 text-sm transition-colors hover:bg-white/10 disabled:opacity-50"
+                    className="ap-btn ap-btn--xs"
                   >
-                    {sendingId === proposal.id ? '⏳ Enviant...' : '📧 Enviar'}
+                    {sendingId === proposal.id ? 'Enviant...' : 'Enviar'}
                   </button>
                 )}
                 {proposal.status === 'SENT' && (
                   <>
                     <button
                       onClick={() => handleStatus(proposal.id, 'ACCEPTED')}
-                      className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border px-3 py-2 text-sm transition-colors hover:bg-white/10"
+                      className="ap-btn ap-btn--xs"
                     >
-                      ✅ Acceptat
+                      Acceptat
                     </button>
                     <button
                       onClick={() => handleStatus(proposal.id, 'REJECTED')}
-                      className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border px-3 py-2 text-sm transition-colors hover:bg-white/10"
+                      className="ap-btn ap-btn--xs admin-tone-text-danger admin-tone-border-danger"
                     >
-                      ❌ Rebutjat
+                      Rebutjat
                     </button>
                   </>
                 )}
                 {proposal.customer && proposal.customerId && (
                   <Link
                     href={buildCustomerHubHref(proposal.customerId)}
-                    className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/10 px-3 py-2 text-sm transition-colors hover:bg-white/10"
+                    className="ap-btn ap-btn--xs"
                   >
-                    👤 Client
+                    Client
                   </Link>
                 )}
                 <Link
                   href={getProposalDetailHref(proposal)}
-                  className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/10 px-3 py-2 text-sm transition-colors hover:bg-white/10"
+                  className="ap-btn ap-btn--xs"
                 >
-                  🔗 Vincles
+                  Vincles
                 </Link>
                 {proposal.leadId && (
                   <Link
                     href={buildLeadWorkspaceHref(proposal.leadId)}
-                    className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/10 px-3 py-2 text-sm transition-colors hover:bg-white/10"
+                    className="ap-btn ap-btn--xs"
                   >
-                    📋 Entrada
+                    Entrada
                   </Link>
                 )}
               </div>
@@ -321,57 +327,56 @@ export default function ProposalsList({
         )}
       </div>
 
-      <div className="hidden overflow-hidden overflow-x-auto rounded-2xl border lg:block">
-        <table className="w-full min-w-[600px] text-sm" aria-label="Llistat de pressupostos">
+      <div className="pr__tableShell">
+        <table className="pr__table" aria-label="Llistat de pressupostos">
           <thead>
-            <tr className="border-b border-[var(--line)] bg-[var(--sunk)]">
-              <th scope="col" className="px-4 py-3 text-left font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.12em] text-[var(--t3)]">Ref.</th>
-              <th scope="col" className="px-4 py-3 text-left font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.12em] text-[var(--t3)]">Client</th>
-              <th scope="col" className="hidden px-4 py-3 text-left font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.12em] text-[var(--t3)] sm:table-cell">Estat</th>
-              <th scope="col" className="px-4 py-3 text-right font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.12em] text-[var(--t3)]">Import</th>
-              <th scope="col" className="hidden px-4 py-3 text-right font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.12em] text-[var(--t3)] md:table-cell">Data</th>
-              <th scope="col" className="px-4 py-3 text-right font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.12em] text-[var(--t3)]">Accions</th>
+            <tr>
+              <th scope="col">Ref.</th>
+              <th scope="col">Client</th>
+              <th scope="col">Estat</th>
+              <th scope="col" className="pr__num">Import</th>
+              <th scope="col" className="pr__num">Data</th>
+              <th scope="col" className="pr__num">Accions</th>
             </tr>
           </thead>
-          <tbody className="divide-y admin-tone-border-subtle">
+          <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center opacity-60">
+                <td colSpan={6} className="pr__empty">
                   {search || statusFilter ? 'Cap resultat amb aquests filtres' : 'Cap pressupost creat encara'}
                 </td>
               </tr>
             ) : (
               filtered.map((proposal) => (
                 <tr key={proposal.id} className="transition-colors adm-row-hover">
-                  <td className="px-4 py-3">
+                  <td>
                     <Link
                       href={getProposalHref(proposal)}
-                      className="font-medium hover:underline"
+                      className="pr__ref hover:underline"
                     >
                       {proposal.reference}
                     </Link>
-                    <span className="ml-2 sm:hidden"><StatusBadge status={proposal.status} /></span>
                   </td>
-                  <td className="px-4 py-3">
+                  <td>
                     {proposal.customerId ? (
                       <Link href={buildCustomerHubHref(proposal.customerId)} className="hover:underline">
                         {proposal.customer?.name || 'Sense nom'}
                       </Link>
                     ) : (
-                      <span className="opacity-60">Sense client assignat</span>
+                      <span className="pr__muted">Sense client assignat</span>
                     )}
-                    <p className="max-w-[200px] truncate text-xs opacity-50">{proposal.customer?.email}</p>
+                    <p className="pr__muted max-w-[200px] truncate text-xs">{proposal.customer?.email}</p>
                   </td>
-                  <td className="hidden px-4 py-3 sm:table-cell">
+                  <td>
                     <StatusBadge status={proposal.status} />
                   </td>
-                  <td className="px-4 py-3 text-right tabular-nums font-medium">
+                  <td className="pr__num pr__amount">
                     {formatCurrency(proposal.total)}
                   </td>
-                  <td className="hidden px-4 py-3 text-right opacity-60 md:table-cell">
+                  <td className="pr__num pr__muted">
                     {relativeDate(proposal.createdAt)}
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="pr__num">
                     <div className="flex items-center justify-end gap-1">
                       <Link
                         href={getProposalHref(proposal)}
@@ -417,26 +422,26 @@ export default function ProposalsList({
       </div>
 
       {quotes.length > 0 && (
-        <details className="rounded-2xl border p-4">
-          <summary className="cursor-pointer text-sm font-medium opacity-70 transition-opacity hover:opacity-100">
-            📄 Pressupostos antics (LeadDocument) — {quotes.length}
+        <details className="pr__legacy">
+          <summary>
+            Pressupostos antics (LeadDocument) — {quotes.length}
           </summary>
-          <div className="mt-3 space-y-2">
+          <div className="pr__legacyList">
             {quotes.map((quote) => (
-              <div key={quote.id} className="flex items-center justify-between rounded-xl border p-3">
+              <div key={quote.id} className="pr__legacyItem">
                 <div>
                   <a href={quote.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium hover:underline">
                     {quote.title}
                   </a>
-                  <p className="text-xs opacity-50">
+                  <p className="pr__muted text-xs">
                     {quote.lead?.name || 'Lead'} · {relativeDate(quote.createdAt)}
                   </p>
                 </div>
                 <Link
                   href={buildLeadWorkspaceHref(quote.leadId)}
-                  className="text-xs opacity-60 hover:opacity-100"
+                  className="ap-btn ap-btn--xs"
                 >
-                  Veure lead →
+                  Veure lead
                 </Link>
               </div>
             ))}

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth, requirePermission } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import {
   listNotificationRecipients,
   saveNotificationRecipients,
@@ -32,6 +33,9 @@ export async function POST(req: NextRequest) {
   if (authError) return authError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
+
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   try {
     const body = await req.json().catch(() => ({}));

@@ -68,6 +68,18 @@ Significa: **pàgina validada pel propietari** («Charlie»). A prop de final, n
 - 🟢 = migrada tècnicament al sistema visual.
 - `TANCAT CHARLIE` = el propietari l'ha checkat i la dóna per bona com a patró.
 
+### 1.1 Maniobra obligatòria quan el propietari diu `TANCAT CHARLIE`
+
+Quan el propietari diu que una pantalla està revisada o `TANCAT CHARLIE`, l'agent **atura la feina nova i primer consolida aquest fet**:
+
+1. Actualitza `docs/admin-inventari-pagines.md`: estat 🟢 i nota explícita `TANCAT CHARLIE — revisada pel propietari`.
+2. Comprova si el fitxer principal de la pantalla ja té la marca al top; si no, l'afegeix amb la data.
+3. Afegeix al bloc d'agent-sync que aquella ruta és zona protegida.
+4. A partir d'aquell moment, la pantalla no es reobre per "millorar-la" ni per fer auditories genèriques. Només es toca si el propietari ho demana explícitament o si una regressió tècnica demostrable la trenca.
+5. Si la pantalla tenia subzones pendents, es documenten com a subpantalles separades. No es baixa el rang de la pantalla validada.
+
+Objectiu: no perdre temps redescobrint pantalles ja revisades pel propietari ni tornar a posar en dubte criteris humans ja tancats.
+
 **Marca canònica (comentari al TOP del fitxer de pàgina/component):**
 
 ```tsx
@@ -77,6 +89,23 @@ Significa: **pàgina validada pel propietari** («Charlie»). A prop de final, n
 // pàgines s'ha de construir fidel a aquest model.
 // ─────────────────────────────────────────────────────────
 ```
+
+### 1.2 Fitxa forense obligatòria abans de construir
+
+Abans de qualsevol actuació visual, funcional o de cablejat sobre una pantalla admin, la pantalla ha de tenir fitxa `FETA` a `docs/admin-fitxes-pantalles.md`. Si no la té, la feina no és "millorar la pantalla": la feina és auditar-la.
+
+La fitxa `FETA` exigeix:
+
+1. història del component (`git log --follow`, diari/protocol i motiu original);
+2. reachability real des de la ruta viva, no només imports que semblen ús;
+3. lectura línia per línia de ruta, components propis, CSS local, helpers, APIs i serveis específics;
+4. comprovació CSS contra DOM real;
+5. cable punta a punta: UI → acció → API/servei → dades → resposta → òrgan veí;
+6. detecció explícita de duplicacions, codi mort, codi latent i hardcoded;
+7. diagnòstic de connexions interrompudes: si la capacitat viu en 2, 3 o 4 illes en lloc d'un organisme;
+8. decisió abans d'implementar: conservar, fusionar, podar, reconnectar o protegir.
+
+No es marca `FETA` perquè compila, perquè el navegador carrega o perquè un grep no troba res. `FETA` vol dir que el component ha estat entès i que no queda cap peça sobrera sense nom ni decisió.
 
 ---
 

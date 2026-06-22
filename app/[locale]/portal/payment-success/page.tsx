@@ -24,7 +24,7 @@ export default function PaymentSuccessPage({
       : t.paymentSuccessRemainingBody;
 
   return (
-    <main className="min-h-screen text-white/90 flex items-center justify-center px-4" style={{ background: 'linear-gradient(160deg,#050709 0%,#0a0d12 40%,#060810 100%)' }}>
+    <main className="min-h-screen text-white/90 flex items-center justify-center px-4 portal-shell-bg">
       <div className="w-full max-w-lg">
         <div className="rounded-2xl border border-emerald-500/30 bg-emerald-950/20 p-8 text-center shadow-xl">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-emerald-500/40 bg-emerald-900/30">

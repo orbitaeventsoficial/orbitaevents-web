@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { requireAuth } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { listCrewBlocks, createCrewBlock, deleteCrewBlock } from '@/lib/services/crewScheduleService';
 
@@ -20,6 +21,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
+
   try {
     const body = await req.json();
     const result = await createCrewBlock(body);
@@ -33,6 +37,9 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
+
   try {
     const id = req.nextUrl.searchParams.get('id') ?? '';
     const result = await deleteCrewBlock(id);

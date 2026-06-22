@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { requireAuth } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { createAdminCustomQuote, listAdminCustomQuotes } from '@/lib/services/customQuoteAdminService';
 
@@ -18,6 +19,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const authError = requireAuth(request);
   if (authError) return authError;
+
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return csrfError;
 
   try {
     const body = await request.json();

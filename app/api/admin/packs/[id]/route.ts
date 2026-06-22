@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { getAdminPackById, updateAdminPack } from '@/lib/services/packAdminService';
 
 export async function PATCH(
@@ -9,6 +10,8 @@ export async function PATCH(
 ) {
   const authError = requireAuth(request);
   if (authError) return authError;
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return csrfError;
 
   try {
     const { id } = await params;

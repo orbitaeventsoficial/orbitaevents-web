@@ -5,6 +5,7 @@
 Aquest fitxer és la constitució del repo. Conté normes estables de treball, patrons de codi i la llista de zones protegides.
 
 Per estat funcional i peces consolidades:
+- `docs/protocol-executiu.md` → resum operatiu curt (qui decideix què, com s'auditen òrgans i què vol dir fet)
 - `docs/estat-admin.md` → dossier viu de l'admin
 - `docs/admin-diary.md` → registre cronològic del que s'ha fet i amb quina validació
 
@@ -55,7 +56,8 @@ Cada canvi, per petit que sigui, ha de complir TOT això abans de considerar-se 
 3. Llegir `docs/admin-diary.md`.
 4. Si la tasca és d'admin o toca una zona ja consolidada, llegir `docs/estat-admin.md`.
 5. Si la tasca és d'admin o toca una zona consolidada, llegir també `docs/admin-protocol.md`, el tram rellevant del `§6` i el final del `§9` abans de començar.
-6. Si existeix una guia específica de la iniciativa, usar-la només com a context del tall concret.
+6. Si la tasca és d'admin, llegir `docs/protocol-executiu.md` com a resum operatiu abans de decidir el tall.
+7. Si existeix una guia específica de la iniciativa, usar-la només com a context del tall concret.
 
 **Cap IA ni agent (Claude, Codex o qualsevol altre) pot començar feina real al repo sense haver fet aquesta lectura mínima.** No és opcional ni es pot saltar "perquè el canvi és petit". Una IA que comenci a editar sense haver llegit i confirmat aquest flux està incomplint el protocol i la seva passada s'ha de revertir.
 

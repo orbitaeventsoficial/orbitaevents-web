@@ -4,6 +4,8 @@ Data d'inici: 2026-04-08
 Última consolidació: 2026-04-09
 Estat: document viu — font única de veritat sobre producte, arquitectura, coordinació, navegació i full de ruta.
 
+Lectura operativa curta: `docs/protocol-executiu.md`. Aquest document gros continua sent la font completa; l'executiu diu com aplicar-lo sense perdre's.
+
 Aquest document substitueix i integra sis documents originals:
 - protocol de producte admin
 - protocol de treball Zenith
@@ -30,6 +32,18 @@ Tots sis absorbits al 100% i esborrats el 2026-04-09 (Canvi #0).
 - **§8** Ordre recomanat fins al Zenith
 - **§9** Registre de canvis (comptador global)
 - **§10** Veredicte
+
+---
+
+# Lectura executiva
+
+Abans d'entrar al detall, tot agent ha d'entendre aquesta separació:
+
+- El propietari decideix la **visual final** i marca `TANCAT CHARLIE`.
+- Els agents decideixen i assumeixen el **sota-faldilles tècnic**: codi viu, codi mort, CSS real, serveis, APIs, duplicacions, hardcoded i cables interromputs.
+- El treball no s'organitza per 80-90 rutes planes, sinó per 25-30 pantalles reals agrupades en òrgans: Comandament, Comercial, Documents, Comunicacions, Reserves, Clients, Catàleg, Partners, Post-event i Sistema.
+- Si una pantalla està partida en 2, 3 o 4 illes, no és feina del propietari descobrir-ho: la fitxa forense ho ha de dir abans d'implementar.
+- Per la versió curta executable, veure `docs/protocol-executiu.md`.
 
 ---
 
@@ -193,7 +207,7 @@ Passar d'un admin amb moltes eines a un sistema operatiu comercial i d'operacion
 # 2. Mètode de treball
 
 ## 2.1 Principis invariables
-- **Construir, no auditar**. No es gasta temps verificant el que ja està tancat a CLAUDE.md secció "Què JA EXISTEIX".
+- **Construir, no auditar** continua sent vàlid per no reobrir zones tancades sense motiu; però en pantalles admin no autoritza a tocar res sense fitxa forense. Si la pantalla no té fitxa `FETA`, el primer tall és auditar-la i documentar-ne història, reachability i cablejat real abans d'implementar.
 - **Monocapa**: cada valor/efecte/string viu en un sol lloc. Els dominis nous defineixen constants a `lib/constants` i la resta importa.
 - **Zero hardcoded** a l'admin català. Tot string visible o acció semàntica ha d'estar centralitzada.
 - **Copy traduïble de la web pública**: viu a `messages/*`. No ha de quedar escampat entre `config`, components i constants sense criteri.
@@ -224,13 +238,16 @@ Passar d'un admin amb moltes eines a un sistema operatiu comercial i d'operacion
 - **Font executable de runtime**: la mateixa norma viu també a `docs/agent-runtime-policy.json` amb `repository=orbitaevents`, `defaultWorkspacePath=D:\orbitaevents`, `mode=nonstop_until_end` i `afterGreenCutWithActionableBacklog=forbidden`. El guard `pnpm run qa:nonstop-protocol` valida que el JSON, `CLAUDE.md`, aquest protocol i `validate:core` continuïn alineats.
 - **Norma de granularitat de canvis**: cada `Canvi #N` ha de resoldre una unitat de valor real i descriure's en una sola frase d'usuari ("ara la UI fa X", "el guard detecta Y", "el servei calcula Z"). No es registren com a canvis separats: l'addició d'un sol camp a una constant sense canvi de comportament visible, una frase aïllada a un document o un tweak d'estil que no altera jerarquia ni usabilitat. Si el canvi no té un efecte que una persona pugui observar o que un test pugui blindar, no mereix número propi. La sèrie #525-#534 (10 microaddicions al gate) és el contraexemple canònic: tot allò hauria de cabre en 2-3 canvis agrupats. D'ara endavant: primer agrupar, després registrar.
 - **Workflow mínim obligatori per cada tall**: abans de tocar res s'han de fer 4 comprovacions i deixar-les clares al cap: (1) `git status` per detectar worktree brut, (2) `ADMIN_CHANGE_COUNTER` actual, (3) `§6.N` afectat o `SEGÜENT` que justifica el tall, (4) classificació del tall: `codi`, `UI`, `documental`, `schema/migració` o `infra`. Sense aquestes 4 peces, no s'ha començat de veritat.
+- **Maniobra obligatòria `TANCAT CHARLIE`**: si el propietari diu que una pantalla/ruta està revisada o `TANCAT CHARLIE`, l'agent no continua amb feina nova fins que aquest fet queda consolidat al mapa: `docs/admin-inventari-pagines.md` passa a 🟢 amb nota explícita `TANCAT CHARLIE — revisada pel propietari`, el fitxer principal conserva o rep la marca al top, i `docs/agent-sync.md` avisa que la ruta és zona protegida. Aquesta pantalla no es reobre per auditories genèriques ni "millores" no demanades; només per ordre explícita del propietari o regressió demostrable. Si queden subzones pendents, es documenten com a subpantalles separades sense degradar la pantalla validada.
+- **Fitxa forense obligatòria abans de tocar pantalla**: cap agent pot començar migració visual, funcional o de cablejat sobre una pantalla admin sense fitxa prèvia a `docs/admin-fitxes-pantalles.md`. La fitxa ha de dir història del component, ruta, component viu, imports/exports, CSS viu, APIs/serveis, dades i accions que governa, òrgans veïns, codi mort relacionat, duplicacions, hardcoded/residu, connexions interrompudes, riscos, evidència llegida i decisió de treball. Una fitxa només és `FETA` quan s'ha auditat línia per línia el cablejat de ruta → components → CSS/DOM → serveis/APIs → dades/accions → òrgans veïns; un grep o una intuïció només permet estat `INICIAL`. Si la fitxa no existeix o està incompleta, el primer tall és fer-la; no es toca codi funcional abans. Objectiu explícit: quan acabi la fitxa, ha de quedar clar si la pantalla és un sol organisme o si viu trencada en 2, 3 o 4 illes, i què sobra.
+- **Responsabilitat de cohesió dels agents**: el propietari no carrega amb detectar arquitectura trencada. Claude/Codex han d'entregar-li una superfície visual avaluable i assumir internament la cohesió del codi: escollir font viva, eliminar o aïllar codi mort, reconnectar cables i documentar qualsevol deute que no es pugui resoldre en el tall.
 - **Regla explícita de worktree brut**: si el repo ja té canvis locals aliens, no es permet "netejar", reordenar ni refactoritzar per comoditat. Només es toca l'àmbit mínim necessari pel tall actual. Si el fitxer ja està modificat i el nou tall hi entra, primer s'ha d'entendre què ja hi ha i adaptar-s'hi; no s'imposa un estat net fictici.
 - **Validació en 3 capes**: cada tall ha de deixar escrit què s'ha validat exactament entre aquestes tres capes: (1) `validació tècnica` — types, tests, guards, build; (2) `validació funcional` — el cas d'ús resolt produeix l'efecte correcte; (3) `validació humana/UX` — una persona no tècnica entén què passa i què ha de fer. Dir només "validat" és massa ambigu i ja no és acceptable.
 - **Ordre de prioritat operatiu**: quan hi ha dubte entre diversos fronts, l'ordre és aquest: (1) errors de compilació o contracte trencat, (2) regressions de runtime o dades, (3) tests/guards en vermell, (4) `PENDENT CRÍTIC` o `SEGÜENT` explícit del protocol, (5) millores documentals o UX no bloquejants. Això evita obrir fronts bonics mentre la base encara falla.
 - **Autoregulació de model/effort i consum**: no es treballa en mode “màxim del màxim” per defecte. Per `go` normal, docs, guards, tests focalitzats, refactors petits i canvis mecànics, l'agent ha de ser eficient: context mínim suficient, eines agrupades, respostes curtes i raonament proporcional. S'eleva a `high`/màxim només quan hi ha risc real: producció, schema/migracions, auth, dades, concurrència entre agents, errors opacs de build/runtime, decisions arquitectòniques o refactors grans. Si cal pujar el nivell, s'ha d'explicar breument el motiu. Objectiu: pagar per rigor quan aporta valor, no per inèrcia.
 - **Checklist de tancament canònic**: al final del tall s'ha de poder respondre sí/no, sense literatura, a aquesta llista: `tests tocats?`, `npx tsc --noEmit OK?`, `validate:core OK?`, `qa:protocol OK?`, `§6 afectat actualitzat?`, `§9 registrat?`, `docs/diario.md actualitzat?`, `ADMIN_CHANGE_COUNTER pujat?`, `tipus de validació explicitats?`. Si falta un sí en un tall que tocava aquell punt, el tall continua obert.
 - **Aplicació simètrica per actor**: aquestes normes operatives no són només per un agent concret. Apliquen igual a `claude`, `codex` i al `user` quan intervé directament al repo. Ningú no queda exempt del workflow mínim, la regla de worktree brut, la validació en 3 capes ni el checklist de tancament.
-- **Norma operativa de no-col·lisió entre agents**: `claude` i `codex` treballen concurrents sobre el mateix repo. Abans d'atacar un `SEGÜENT` cal mirar la darrera finestra de canvis `#N` al §9 i veure quin perímetre està ocupat ara mateix (el `ADMIN_CHANGE_COUNTER` pot pujar preemptivament per l'altre agent entre dues consultes). Dos indicadors: (1) si el counter està per sobre del darrer Canvi registrat al §9, és que l'altre agent ha reservat el número i està escrivint-ne el contingut — no es pren aquest número, el següent agent usa `counter + 1`; (2) abans de començar un tall, cal triar un **front diferent** al que ha tocat l'altre agent les darreres hores (si `codex` està al Lead Hub `LOST`, `claude` ataca bookings/tasks/social; i al revés). Si tot i així es detecta col·lisió (p.ex. edits paral·leles al mateix fitxer), el tall es replanteja o s'espera. Val la pena perdre una ronda abans que fer feina que es trepitgi.
+- **Norma operativa de no-col·lisió entre agents**: `claude` i `codex` treballen concurrents sobre el mateix repo. Abans d'atacar un `SEGÜENT` cal mirar la darrera finestra de canvis `#N` al §9 i veure quin perímetre està ocupat ara mateix (el `ADMIN_CHANGE_COUNTER` pot pujar preemptivament per l'altre agent entre dues consultes). Dos indicadors: (1) si el counter està per sobre del darrer Canvi registrat al §9, és que l'altre agent ha reservat el número i està escrivint-ne el contingut — no es pren aquest número, el següent agent usa `counter + 1`; (2) abans de començar un tall, cal triar un **front diferent** al que ha tocat l'altre agent les darreres hores (si `codex` està al Lead Hub `LOST`, `claude` ataca bookings/tasks/social; i al revés). Si la col·lisió es detecta durant el registre —per exemple, un agent tanca el número que l'altre estava documentant— la solució canònica és renumerar immediatament el tall al següent número lliure visible, actualitzar `ADMIN_CHANGE_COUNTER`, `§9`, diari i `agent-sync`, i deixar una nota de renumeració dins el mateix canvi. Si la col·lisió és de fitxers o perímetre, el tall es replanteja o s'espera. Val la pena perdre una ronda abans que fer feina que es trepitgi.
 
 ## 2.1.0 Característiques exigides del repo
 - **Monocapa real**: cada valor de domini, label, acció, to, icona o regla viu en un sol lloc i la resta importa.
@@ -788,6 +805,7 @@ Criteri pràctic:
 
 ## 6.6 Leads / Pipeline comercial
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
+**FET** *(2026-06-21 per `claude` — Canvi #1020)*: Fase 1B del full de ruta (quick win #1, eix conversió): la vista «Pipeline» de `/admin/leads` (`LeadsSeasonClient`) afegeix **Forecast ponderat** (valor × probabilitat canònica `LEAD_SCORING_STATUS_PROBABILITY`, la mateixa que `buildPipelineForecast` al dashboard) a la barra de resum + «≈ € ponderat» per carril obert. Constant `OPEN_PIPELINE_STATUSES` a `lib/constants`. **De passada, eradicada una illa morta preexistent** (duplicació de pipeline): `LeadPipelineView` + `LeadViewToggle` + branca `?pipeline=true` + `getPipelineLeads`, que no es renderitzaven enlloc. «El pipeline ÉS el forecast.»
 **FET** *(2026-06-13 per `codex` — Canvi #935)*: el configurador del bolo dins la fitxa de lead és canònic segons etapa. Abans de reserva escriu `LeadServiceLine`; quan ja hi ha reserva vinculada, el mateix endpoint del lead llegeix i escriu `BookingServiceLine`, de manera que ampliar o modificar des del lead toca la reserva real.
 
 **FET** *(2026-06-13 per `codex` — Canvi #934)*: quan un lead ja té reserva vinculada, la fitxa de lead mostra els productes contractats de `Booking` (pack, extres, línies de servei i hores extra). Flux solidari endavant i enrere: el lead cuina la reserva, però la reserva és la font de veritat contractual un cop existeix.
@@ -1063,6 +1081,37 @@ Criteri pràctic:
 **FET** *(2026-05-05 per `codex` — Canvi #522)*: `adminAutomationService` deixa de passar summaries d'automatització a Prisma amb casts dobles `as unknown as Prisma.InputJsonValue`. El helper local `normalizeAdminLogDetails()` serialitza a JSON abans de guardar `details` als logs `COMM_SEQUENCE_BATCH`, `AUTOMATION_SLA_ENFORCED` i `AUTOMATION_RUN_ALL`; `__tests__/lib/services/adminAutomationService.test.ts` blinda el patró i evita regressió cap al cast opac.
 **FET** *(2026-05-20 per `codex` — Canvi #721)*: `qa:admin-mutating-fetch-csrf` ha detectat i tancat una regressió real a `app/admin/inbox/AiReplySuggestions.tsx`: el POST a `/api/admin/ai/inbox-reply` passa a `fetchWithCsrf()` i l'error path deixa de tenir `catch` buit. `validate:core` torna a poder protegir mutacions admin sense excepcions.
 **FET** *(2026-05-23 per `codex` — Canvi #759)*: manteniment petit i reforç d'arrencada formalitzats sota el pendent crític de no deixar regressions silencioses. La pantalla IMAP explica correctament que una configuració `source='env'` s'elimina a Railway Variables, el Customer Hub mostra `tasca oberta` / `tasques obertes`, la migració `stripe_webhook_events` usa `TIMESTAMP(3)` coherent amb PostgreSQL i `qa:nonstop-protocol` blinda que `go/seguim/continua` obliguin a llegir `agent-sync`, diari, §6, §9, `git status` i `ADMIN_CHANGE_COUNTER` abans de començar.
+**FET** *(2026-06-22 per `codex` — Canvi #1029)*: blindatge CSRF dels dos POST d'enviament de pressupost detectats durant la fitxa forense del PDF Studio. `/api/admin/emails/quote` i `/api/admin/proposals/[id]/send` ja validen `verifyCsrf(req)` al backend, alineats amb el client que ja usava `fetchWithCsrf()`. 12 tests de ruta verds.
+**FET** *(2026-06-22 per `codex` — Canvi #1030)*: guard backend `qa:api-admin-csrf` afegit a `validate:core`. Revisa cada `POST/PUT/PATCH/DELETE` de `app/api/admin/**/route.ts` i exigeix `verifyCsrf(req)` dins del handler; el deute històric queda inventariat en una baseline exacta de 138 handlers perquè no en pugui entrar cap de nou i perquè cada sanejament futur obligui a retirar entrades stale.
+**FET** *(2026-06-22 per `codex` — Canvi #1031)*: primer drenatge de la baseline CSRF backend dins Documents/Pressupostos. `POST /api/admin/dossiers/[id]/send` i `POST /api/admin/leads/[id]/quote` ja validen `verifyCsrf(req)` abans d'enviar/generar document; la baseline baixa de 138 a 136 handlers inventariats, amb 9 tests de ruta nous.
+**FET** *(2026-06-22 per `codex` — Canvi #1033)*: segon drenatge de la baseline CSRF backend dins Documents. `POST /api/admin/dossiers` i `PATCH/DELETE /api/admin/dossiers/[id]` ja validen `verifyCsrf(req)` abans de crear, restaurar, purgar o enviar a paperera; la baseline baixa de 136 a 133 handlers inventariats, amb 14 tests de ruta nous.
+**FET** *(2026-06-22 per `codex` — Canvi #1035)*: tercer drenatge de la baseline CSRF backend, ara en dues rutes admin IA. `POST /api/admin/ai/copy-suggestions` i `POST /api/admin/ai/inbox-reply` validen `verifyCsrf(req)` abans de llegir el body o invocar generació; la baseline baixa de 133 a 131 handlers inventariats, amb tests de ruta ampliats.
+**FET** *(2026-06-22 per `codex` — Canvi #1036)*: quart drenatge de la baseline CSRF backend, ara en Blog admin. `POST`, `PUT` i `DELETE` de `app/api/admin/blog/route.ts` validen `verifyCsrf(req)` abans de llegir body o executar eliminació; la baseline baixa de 131 a 128 handlers inventariats, amb test de ruta nou.
+**FET** *(2026-06-22 per `codex` — Canvi #1038)*: la solució de col·lisió de numeració queda escrita explícitament a §2.1 i continua el drenatge CSRF backend en Coverage admin. `POST /api/admin/coverage` valida `verifyCsrf(req)` abans de llegir body; la baseline baixa de 128 a 127 handlers inventariats, amb test de ruta nou. Tall renumerat de #1037 a #1038 perquè Claude ha ocupat #1037 en paral·lel.
+**FET** *(2026-06-22 per `codex` — Canvi #1039)*: cinquè drenatge de la baseline CSRF backend. `PUT /api/admin/css` valida `verifyCsrf(req)` després d'auth i permís `mutate`, abans de llegir body o desar CSS; la baseline baixa de 127 a 126 handlers inventariats, amb test de ruta nou.
+**FET** *(2026-06-22 per `codex` — Canvi #1041)*: sisè drenatge de la baseline CSRF backend. `POST /api/admin/discount-codes` valida `verifyCsrf(req)` abans de llegir body o crear codis de descompte; la baseline baixa de 126 a 125 handlers inventariats, amb test de ruta ampliat. Tall renumerat de #1040 a #1041 perquè Claude ha ocupat #1040 en paral·lel.
+**FET** *(2026-06-22 per `codex` — Canvi #1042)*: setè drenatge de la baseline CSRF backend. `PUT /api/admin/extras` valida `verifyCsrf(req)` abans de llegir body o guardar la configuració d'extres; la baseline baixa de 125 a 124 handlers inventariats, amb test de ruta nou.
+**FET** *(2026-06-22 per `codex` — Canvi #1043)*: vuitè drenatge de la baseline CSRF backend. `POST /api/admin/features` valida `verifyCsrf(req)` abans de llegir body o actualitzar flags de funcionalitat; la baseline baixa de 124 a 123 handlers inventariats, amb test de ruta nou.
+**FET** *(2026-06-22 per `codex` — Canvi #1044)*: novè drenatge de la baseline CSRF backend. `POST /api/admin/fuel/reference` valida `verifyCsrf(req)` després del permís `mutate`, abans de refrescar la referència de combustible; la baseline baixa de 123 a 122 handlers inventariats, amb test de ruta nou.
+**FET** *(2026-06-22 per `codex` — Canvi #1046)*: desè drenatge de la baseline CSRF backend. `POST/DELETE /api/admin/faq` i `PATCH /api/admin/faq/[id]` validen `verifyCsrf(req)` després del permís `mutate`, abans de crear, eliminar o actualitzar FAQs; la baseline baixa de 122 a 119 handlers inventariats, amb test de ruta nou.
+**FET** *(2026-06-22 per `codex` — Canvi #1047)*: onzè drenatge de la baseline CSRF backend. `POST/DELETE /api/admin/cuadrant/blocks` validen `verifyCsrf(req)` després de l'auth, abans de crear o eliminar bloquejos manuals del quadrant; la baseline baixa de 119 a 117 handlers inventariats, amb test de ruta nou.
+**FET** *(2026-06-22 per `codex` — Canvi #1049)*: dotzè drenatge de la baseline CSRF backend. `POST /api/admin/custom-quotes` i `PATCH/DELETE /api/admin/custom-quotes/[id]` validen `verifyCsrf(...)` després de l'auth, abans de crear, actualitzar o eliminar pressupostos personalitzats; la baseline baixa de 117 a 114 handlers inventariats, amb test de ruta ampliat.
+**FET** *(2026-06-22 per `codex` — Canvi #1050)*: tretzè drenatge de la baseline CSRF backend. `POST /api/admin/customers/check-duplicates` valida `verifyCsrf(request)` després de l'auth i abans del `try` tolerant; la baseline baixa de 114 a 113 handlers inventariats, amb test de ruta ampliat.
+**FET** *(2026-06-22 per `codex` — Canvi #1051)*: catorzè drenatge de la baseline CSRF backend. `POST/DELETE /api/admin/hero-media` validen `verifyCsrf(req)` després de l'auth, abans de reordenar, afegir o eliminar media del hero; la baseline baixa de 113 a 111 handlers inventariats, amb test de ruta nou.
+**FET** *(2026-06-22 per `codex` — Canvi #1052)*: quinzè drenatge de la baseline CSRF backend. `PUT/POST/PATCH/DELETE /api/admin/image-manager` validen `verifyCsrf(req)` després d'auth i permís `mutate`, abans de llegir JSON/form-data o tocar assets; la baseline baixa de 111 a 107 handlers inventariats, amb test de ruta nou.
+**FET** *(2026-06-22 per `codex` — Canvi #1053)*: setzè drenatge de la baseline CSRF backend. `POST /api/admin/maps/distance` valida `verifyCsrf(req)` després d'auth i permís `mutate`, abans de llegir body o calcular distància; la baseline baixa de 107 a 106 handlers inventariats, amb test de ruta nou.
+**FET** *(2026-06-22 per `codex` — Canvi #1054)*: dissetè drenatge de la baseline CSRF backend. `POST/DELETE /api/admin/protocol/validations` validen `verifyCsrf(req)` després d'auth i permís `mutate`, abans de registrar o desfer validacions humanes; la baseline baixa de 106 a 104 handlers inventariats, amb test de ruta ampliat.
+**FET** *(2026-06-22 per `codex` — Canvi #1055)*: divuitè drenatge de la baseline CSRF backend. `POST /api/admin/stats` valida `verifyCsrf(req)` després de l'auth, abans d'actualitzar fallbacks manuals d'estadístiques; la baseline baixa de 104 a 103 handlers inventariats, amb test de ruta nou.
+**FET** *(2026-06-22 per `codex` — Canvi #1056)*: dinovè drenatge de la baseline CSRF backend. `POST /api/admin/system/db-reconnect` valida `verifyCsrf(req)` després d'auth i permís `mutate`, abans de reconnectar Prisma; la baseline baixa de 103 a 102 handlers inventariats, amb test de ruta nou.
+**FET** *(2026-06-22 per `codex` — Canvi #1057)*: vintè drenatge de la baseline CSRF backend. `POST /api/admin/start-process` valida `verifyCsrf(request)` després d'auth, abans de llegir body o iniciar processos de client; la baseline baixa de 102 a 101 handlers inventariats, amb test de ruta nou.
+**FET** *(2026-06-22 per `codex` — Canvi #1058)*: vint-i-unè drenatge de la baseline CSRF backend. `POST /api/admin/settings/notification-recipients` i `POST /api/admin/settings/quote-template` validen `verifyCsrf(req)` després d'auth i permís `mutate`, abans de llegir body o desar settings; la baseline baixa de 101 a 99 handlers inventariats, amb tests de ruta nous.
+**FET** *(2026-06-22 per `codex` — Canvi #1059)*: vint-i-dosè drenatge de la baseline CSRF backend. `POST /api/admin/reports/profitability/config` valida `verifyCsrf(req)` després d'auth i permís `mutate`, abans de llegir body o desar configuració; la baseline baixa de 99 a 98 handlers inventariats, amb test de ruta nou.
+**FET** *(2026-06-22 per `codex` — Canvi #1060)*: vint-i-tresè drenatge de la baseline CSRF backend. `POST /api/admin/test-notifications` valida `verifyCsrf(req)` després d'auth, abans de llegir body o enviar email de test; la baseline baixa de 98 a 97 handlers inventariats, amb test de ruta nou.
+**FET** *(2026-06-22 per `codex` — Canvi #1061)*: vint-i-quatrè drenatge de la baseline CSRF backend. `POST /api/admin/questionnaires` i `PATCH/DELETE /api/admin/questionnaires/[id]` validen `verifyCsrf(req)` després d'auth, abans de llegir body, validar o mutar plantilles; la baseline baixa de 97 a 94 handlers inventariats, amb tests de ruta nous.
+**FET** *(2026-06-22 per `codex` — Canvi #1062)*: vint-i-cinquè drenatge de la baseline CSRF backend. `POST /api/admin/translate` valida `verifyCsrf(req)` després d'auth, abans de rate limit, body o traducció; la baseline baixa de 94 a 93 handlers inventariats, amb test de ruta nou.
+**FET** *(2026-06-22 per `codex` — Canvi #1063)*: vint-i-sisè drenatge de la baseline CSRF backend. `PUT/POST /api/admin/text-manager` validen `verifyCsrf(req)` després d'auth i permís `mutate`, abans de llegir body o cridar serveis de text-manager; la baseline baixa de 93 a 91 handlers inventariats, amb test de ruta nou.
+**FET** *(2026-06-22 per `codex` — Canvi #1064)*: vint-i-setè drenatge de la baseline CSRF backend. `DELETE /api/admin/privacy/consents` valida `verifyCsrf(req)` després d'auth, abans de llegir body o revocar consentiments; la baseline baixa de 91 a 90 handlers inventariats, amb test de ruta nou.
+**FET** *(2026-06-22 per `codex` — Canvi #1065)*: vint-i-vuitè drenatge de la baseline CSRF backend. `POST /api/admin/privacy/requests/[id]/process` valida `verifyCsrf(req)` després d'auth, abans de llegir body o processar sol·licituds ARCO; la baseline baixa de 90 a 89 handlers inventariats, amb test de ruta ampliat.
 **PENDENT CRÍTIC**: evitar regressions silencioses en repo gran.
 **FET** *(2026-05-12 per `claude` — Canvi #549)*: guard `qa:api-admin-auth` detecta qualsevol ruta `/api/admin/*` sense `requireAuth`. Fix P0 de 4 rutes que estaven desprotegides (`leads/follow-ups`, `leads/suggestions`, `leads/[id]/quote`, `leads/[id]/status`). `validate:core` puja a 18 guards. 5 tests blindats.
 **FET** *(2026-05-11 per `claude` — Canvi #538)*: dos guards nous al `validate:core` (17 guards totals) cobreixen consistència de dominis compartits del manual de màrqueting. `scripts/check-admin-manual-hrefs.mjs` verifica que tots els `adminHref`/`href` d'`/admin/*` al manual apuntin a `page.tsx` reals a `app/` (21 hrefs verificats). `scripts/check-admin-manual-consistency.mjs` valida la coherència interna del gate: `requiredActionIds`/`blockedActionIds` existeixen a `ADMIN_MARKETING_PHASES`, `requiredOutputs` cobreix exactament els requerits, `blockedReasons` cobreix exactament els bloquejats, `ADMIN_MARKETING_PHASE_EVIDENCE` cobreix exactament els requerits, `primaryActionId`/`nextPhaseActionId` existeixen i no estan bloquejats, bootstrap amb ≥1 finestra. Tests: 15 tests hrefs + 13 tests consistency. Entrades `qa:admin-manual-hrefs` i `qa:admin-manual-consistency` a `package.json`.
@@ -1450,6 +1499,1209 @@ Seqüència obligatòria de registre:
 - `user` — decisions manuals o interventions directes
 
 ## Entrades
+
+---
+
+### Canvi #1084 — 2026-06-22 — claude (TANCAT)
+
+**Poda de 2 rutes API [param] mortes (comm-summary, generate-dossier).**
+
+- `/api/admin/leads/[id]/comm-summary`: morta (CustomerHub carrega via fetchCustomerHub server-side, no HTTP). Servei loadCommTimeline conservat.
+- `/api/admin/leads/[id]/generate-dossier`: morta (cockpit usa generador /admin/dossiers des de #933).
+- Deute: createDossierFromBolo orfe dins dossierService (poda futura).
+- Validació tècnica: tsc EXIT 0; 0 candidates [param] mortes restants.
+- Validació funcional: cap flux viu afectat.
+- Validació humana/UX: no visible.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1083 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin portfolio media.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1082. Perímetre petit: CRUD de media del portfolio, sense tocar events, límits/media constants, serveis portfolio més enllà del guard, UI, dades de domini ni schema.
+- `app/api/admin/portfolio/media/route.ts`: `POST`, `PATCH` i `DELETE` validen `verifyCsrf(req)` després de `requireAuth(req)`, abans de formData/body/query o servei.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades 3 entrades; baseline CSRF backend 66 → 63; grup `portfolio` drenat de l'allowlist.
+- `__tests__/app/api/admin/portfolio-media-route.test.ts`: test nou per lectura sense CSRF i ordre auth/CSRF/servei en pujar, actualitzar i eliminar media.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1083`; el següent canvi real ha de ser `#1084`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/portfolio-media-route.test.ts` OK (8 tests); `pnpm run qa:api-admin-csrf` OK (177 handlers mutadors; 63 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: pujar, actualitzar o eliminar media de portfolio des d'admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; la UI/admin existent ja usa `fetchWithCsrf` quan aplica.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1082 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin portfolio events.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1081. Perímetre petit: CRUD d'events concrets del portfolio, sense tocar media, serveis portfolio més enllà del guard, UI, dades de domini ni schema.
+- `app/api/admin/portfolio/events/route.ts`: `POST`, `PATCH` i `DELETE` validen `verifyCsrf(req)` després de `requireAuth(req)`, abans de body/query o servei.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades 3 entrades; baseline CSRF backend 69 → 66.
+- `__tests__/app/api/admin/portfolio-events-route.test.ts`: test nou per lectura sense CSRF i ordre auth/CSRF/servei en crear, actualitzar i eliminar events.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1082`; el següent canvi real ha de ser `#1083`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/portfolio-events-route.test.ts` OK (8 tests); `pnpm run qa:api-admin-csrf` OK (177 handlers mutadors; 66 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: crear, actualitzar o eliminar events de portfolio des d'admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; la UI/admin existent ja usa `fetchWithCsrf` quan aplica.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1081 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin tasks CRUD.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1080. Perímetre petit: CRUD de tasques universals admin, sense tocar el model Task, serveis taskAdmin més enllà del guard, UI, leads tasks, bookings ni schema.
+- `app/api/admin/tasks/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)`, abans de llegir body o crear la tasca.
+- `app/api/admin/tasks/[id]/route.ts`: `PATCH` i `DELETE` validen `verifyCsrf(req)` després de `requireAuth(req)`, abans de llegir body, actualitzar o eliminar la tasca.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades 3 entrades; baseline CSRF backend 72 → 69; grup `tasks` admin drenat de l'allowlist.
+- `__tests__/app/api/admin/tasks-route.test.ts`: test nou per lectura sense CSRF, auth abans de CSRF, CSRF abans de body/servei, validació 400 i error 500.
+- `__tests__/app/api/admin/tasks-detail-route.test.ts`: test ampliat per CSRF en `PATCH` i `DELETE`.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1081`; el següent canvi real ha de ser `#1082`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/tasks-route.test.ts __tests__/app/api/admin/tasks-detail-route.test.ts` OK (18 tests); `pnpm run qa:api-admin-csrf` OK (177 handlers mutadors; 69 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: crear, actualitzar o eliminar tasques universals admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; la UI/admin existent ja usa `fetchWithCsrf` quan aplica.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1080 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin tasks automation.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1079. Perímetre petit: automatització de tasques i generació de checklist diari, sense tocar el model Task, serveis més enllà del guard, UI, leads, bookings ni schema.
+- `app/api/admin/tasks/auto/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)`, abans d'executar l'automatització de tasques.
+- `app/api/admin/tasks/daily-checklist/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)`, abans de generar el checklist diari.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades 2 entrades; baseline CSRF backend 74 → 72.
+- `__tests__/app/api/admin/tasks-automation-route.test.ts`: test nou per auth abans de CSRF, CSRF abans de servei, happy path i error 500 per ambdues rutes.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1080`; el següent canvi real ha de ser `#1081`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/tasks-automation-route.test.ts` OK (8 tests); `pnpm run qa:api-admin-csrf` OK (177 handlers mutadors; 72 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: executar automatitzacions de tasques i checklist diari des d'admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; la UI/admin existent ja usa `fetchWithCsrf` quan aplica.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1079 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin packs detail.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1078. Perímetre petit: actualització de pack admin per id, sense tocar catàlegs de packs, dades de domini, UI ni schema.
+- `app/api/admin/packs/[id]/route.ts`: `PATCH` valida `verifyCsrf(req)` després de `requireAuth(req)`, abans de resoldre params, llegir body o actualitzar el pack.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 75 → 74; grup `packs` drenat de l'allowlist.
+- `__tests__/app/api/admin/packs-detail-route.test.ts`: test ampliat per lectura sense CSRF, auth abans de CSRF, CSRF abans de params/body/servei, happy path i error 500.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1079`; el següent canvi real ha de ser `#1080`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/packs-detail-route.test.ts` OK (8 tests); `pnpm run qa:api-admin-csrf` OK (177 handlers mutadors; 74 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: actualitzar packs admin per id ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; la UI/admin existent ja usa `fetchWithCsrf` quan aplica.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1078 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin packs create.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1077. Perímetre petit: creació de packs admin, sense tocar catàlegs de packs, dades de domini, UI ni schema.
+- `app/api/admin/packs/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)`, abans de llegir body o crear el pack.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 76 → 75.
+- `__tests__/app/api/admin/packs-route.test.ts`: test ampliat per lectura sense CSRF, auth abans de CSRF, CSRF abans de body/servei, happy path i error 500.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1078`; el següent canvi real ha de ser `#1079`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/packs-route.test.ts` OK (8 tests); `pnpm run qa:api-admin-csrf` OK (177 handlers mutadors; 75 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: crear packs admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; la UI/admin existent ja usa `fetchWithCsrf` quan aplica.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1077 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin packs sync.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1076. Perímetre petit: sincronització de packs del config a la base de dades, sense tocar catàlegs de packs, dades de domini, UI ni schema.
+- `app/api/admin/packs/sync/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)`, abans de sincronitzar packs.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 77 → 76.
+- `__tests__/app/api/admin/packs-sync-route.test.ts`: test ampliat per auth abans de CSRF, CSRF abans de servei, happy path i error 500.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1077`; el següent canvi real ha de ser `#1078`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/packs-sync-route.test.ts` OK (4 tests); `pnpm run qa:api-admin-csrf` OK (177 handlers mutadors; 76 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: sincronitzar packs del config des del camí admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; la UI/admin existent ja usa `fetchWithCsrf` quan aplica.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1076 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin packs price-sync.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1075. Perímetre petit: sincronització de preus públics recomanats dels packs; es conserva el bypass cron Bearer existent i el CSRF només aplica al camí admin autenticat.
+- `app/api/admin/packs/price-sync/route.ts`: `POST` valida `verifyCsrf(req)` al camí admin després de `requireAuth(req)` i permís `automation`, abans de sincronitzar preus.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 78 → 77.
+- `__tests__/app/api/admin/packs-price-sync-route.test.ts`: test ampliat per auth, permís, CSRF, happy path admin i bypass cron Bearer sense CSRF.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1076`; el següent canvi real ha de ser `#1077`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/packs-price-sync-route.test.ts` OK (5 tests); `pnpm run qa:api-admin-csrf` OK (177 handlers mutadors; 77 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: sincronitzar preus de packs des del camí admin ja no accepta mutacions sense CSRF; cron Bearer manté el contracte existent.
+- Validació humana/UX: sense canvi visual; la UI/admin existent ja usa `fetchWithCsrf` quan aplica.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1075 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin pricing general.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1074. Perímetre petit: actualització de preus d'extres des del gestor de pricing, sense tocar regles econòmiques, servei pricingAdmin, UI ni schema.
+- `app/api/admin/pricing/route.ts`: `PUT` valida `verifyCsrf(req)` després de `requireAuth(req)`, abans de llegir body o actualitzar el preu de l'extra.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 79 → 78.
+- `__tests__/app/api/admin/pricing-route.test.ts`: test nou per lectura sense CSRF, auth abans de CSRF, CSRF abans de body/servei, happy path, status funcional i error 500.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1075`; el següent canvi real ha de ser `#1076`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/pricing-route.test.ts` OK (6 tests); `pnpm run qa:api-admin-csrf` OK (177 handlers mutadors; 78 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: actualitzar preus d'extres admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; la UI existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1074 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin pricing model-config.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1073. Perímetre petit: configuració del model econòmic de packs, sense tocar regles econòmiques, servei packPricingHealth ni UI.
+- `app/api/admin/pricing/model-config/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)` i permís `mutate`, abans de llegir body, obtenir rol o desar configuració.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 80 → 79.
+- `__tests__/app/api/admin/pricing-model-config-route.test.ts`: test nou per lectura sense CSRF, ordre auth/permís/CSRF, happy path amb rol admin i error 500.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1074`; el següent canvi real ha de ser `#1075`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/pricing-model-config-route.test.ts` OK (6 tests); `pnpm run qa:api-admin-csrf` OK (177 handlers mutadors; 79 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: desar la configuració del model econòmic dels packs ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; la UI existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1073 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin post-event reports.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1072. Perímetre petit: creació d'informes post-event admin, sense tocar servei postEventReportAdmin, UI post-event, bookings ni schema.
+- `app/api/admin/post-event/reports/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)`, abans de llegir body o crear l'informe.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 81 → 80.
+- `__tests__/app/api/admin/post-event-reports-route.test.ts`: test nou per auth abans de CSRF, rebuig 403, happy path, error funcional i error 500.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1073`; el següent canvi real ha de ser `#1074`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/post-event-reports-route.test.ts` OK (5 tests); `pnpm run qa:api-admin-csrf` OK (177 handlers mutadors; 80 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: crear informes post-event admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; la UI existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1072 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin settings generals.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1071. Perímetre petit: mutacions de configuració general admin, sense tocar servei adminSettings, settings secundaris, UI ni schema.
+- `app/api/admin/settings/route.ts`: `PUT` i `POST` validen `verifyCsrf(req)` després de `requireAuth(req)`, abans de llegir body o desar settings.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades 2 entrades; baseline CSRF backend 83 → 81.
+- `__tests__/app/api/admin/settings-route.test.ts`: test nou per lectura sense CSRF, auth abans de CSRF, rebuigs 403, validació 400 i happy paths de PUT/POST.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1072`; el següent canvi real ha de ser `#1073`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/settings-route.test.ts` OK (8 tests); `pnpm run qa:api-admin-csrf` OK (177 handlers mutadors; 81 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: actualitzar o crear settings generals admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; les UIs existents ja usen `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1071 — 2026-06-22 — claude (TANCAT)
+
+**Poda de 20 rutes API admin mortes + 5 serveis exclusius.**
+
+- Metode segur: tota `/api/admin/*` te requireAuth (nomes UI) → si cap fitxer construeix el path complet, es morta. Exclosos crons (Bearer) i clients lib/api/*.
+- Eliminades 20 rutes sense consumidor (moltes cua de components esborrats #1026) + 5 serveis (includedExtrasService, adminSearchService, executiveCockpitService, inboxAiReplyService, pricingConfigService) + tests.
+- Falsos positius evitats: cuadrant/repartiment (viva), hero-media public≠admin, cashFlow/customerSegmentation/financeAlerts (vius). socialPerformanceService restaurat (tsc va caçar import relatiu de socialContentPulse).
+- Validació tècnica: tsc EXIT 0 + qa:api-admin-auth (164 rutes OK) + validate:core EXIT 0.
+- Validació funcional: cap consumidor viu afectat.
+- Validació humana/UX: no visible.
+- Deute: rutes admin `[param]` no auditades en bloc (paths interpolats).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1070 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin testimonials.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1069. Perímetre petit: moderació de testimonis admin, sense tocar servei testimonialAdmin, UI de ressenyes ni recordatoris per email.
+- `app/api/admin/testimonials/route.ts`: `PATCH` valida `verifyCsrf(req)` després de `requireAuth(req)`, abans de llegir body o moderar el testimoni.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 84 → 83.
+- `__tests__/app/api/admin/testimonials-route.test.ts`: test nou per lectura sense CSRF, auth abans de CSRF, rebuig 403, happy path, status funcional del servei i error 500.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1070`; el següent canvi real ha de ser `#1071`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/testimonials-route.test.ts` OK (6 tests); `pnpm run qa:api-admin-csrf` OK (177 handlers mutadors; 83 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: aprovar, ocultar o eliminar testimonis admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; la UI existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1069 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin social-posts.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1068. Perímetre petit: mutacions de publicacions socials admin, sense tocar servei socialPost, schema ni UI social.
+- `app/api/admin/social-posts/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)`, abans de llegir body, validar Zod o crear la publicació.
+- `app/api/admin/social-posts/[id]/route.ts`: `PATCH` i `DELETE` validen `verifyCsrf(req)` després de `requireAuth(req)`, abans de llegir body o actualitzar/eliminar la publicació.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades 5 entrades; baseline CSRF backend 89 → 84. Tres són el deute social-posts tancat i dues eren stale perquè les rutes `packs/included-extras` i `pricing/config` ja no existeixen al worktree actual.
+- `__tests__/app/api/admin/social-posts-route.test.ts`: test nou per lectures sense CSRF, auth abans de CSRF, rebuigs 403 i happy paths de crear/actualitzar/eliminar.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1069`; el següent canvi real ha de ser `#1070`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/social-posts-route.test.ts` OK (9 tests); `pnpm run qa:api-admin-csrf` OK (177 handlers mutadors; 84 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: crear, actualitzar o eliminar publicacions socials admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; la UI existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1068 — 2026-06-22 — claude (TANCAT)
+
+**Monocapa front: gradient de fons del portal repetit 12× → token + classe.**
+
+- El gradient de fons del portal client estava inline repetit 12 cops (2 variants) a 11 pagines. Centralitzat a token `--o-portal-bg` + classe `.portal-shell-bg` (globals.css).
+- Front public net de telefons/emails/URLs hardcoded. Hex restants legitims (logo SVG, tematiques tancades, meta, canvas, accent producte).
+- Validació tècnica: tsc EXIT 0 + render payment-success HTTP 200, fons identic.
+- Validació funcional: invariant visual.
+- Validació humana/UX: no visible.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1067 — 2026-06-22 — claude (TANCAT)
+
+**Guard de codi mort estès al front-office.**
+
+- `check-dead-admin-views.mjs`: candidats ara admin + `app/components` + `components/` (CANDIDATE_DIRS). Reachability per BFS des de rutes Next (gestiona dynamic). Tota la base de components protegida.
+- Provat: EXIT 0 sobre repo net + caça mort artificial al front.
+- Validació tècnica: tsc + validate:core EXIT 0.
+- Validació funcional: front protegit contra illes mortes.
+- Validació humana/UX: no visible.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1066 — 2026-06-22 — claude (TANCAT)
+
+**Neteja de codi mort del front-office: zombie studio-lab + 6 components.**
+
+- `app/studio-lab/` (directori zombie buit, donat per eliminat a CLAUDE.md) + 6 components publics morts substituits en consolidacions: BlogViewTracker, BottomNav (->MobileBottomNav), HeroUrgencyBadge, WhatsAppSticky (->FloatingCTAs), ReviewsSection (->GoogleReviewsRotating), BottomCTABar.
+- Verificat per path d'import exacte. Cap consolidat protegit afectat. Falsos positius evitats: serveis en subdir (bug path, son VIUS), substring (MobileBottomNav/MobileReviewsSection).
+- Validació tècnica: tsc EXIT 0 + validate:core. 0 components publics orfes.
+- Validació funcional: web publica neta de codi mort.
+- Validació humana/UX: no visible.
+- Deute: estendre guard reachability al front (compte amb dynamic imports condicionals).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1065 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin privacy requests process.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1064. Perímetre petit i sensible: processar sol·licituds ARCO admin, sense tocar regles ni serveis privacy request.
+- `app/api/admin/privacy/requests/[id]/process/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)`, abans de `verifyBasicAuth`, llegir body o processar la sol·licitud.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 90 → 89.
+- `__tests__/app/api/admin/privacy-requests-process-route.test.ts`: test existent ampliat amb mock CSRF per auth abans de CSRF, rebuig 403 abans de body/servei, validació 400 i happy paths.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1065`; el següent canvi real ha de ser `#1066`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/privacy-requests-process-route.test.ts` OK (6 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 89 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: processar sol·licituds ARCO admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; la UI existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1064 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin privacy consents.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1063. Perímetre petit i sensible: revocació admin de consentiments RGPD, sense tocar regles ni serveis privacy.
+- `app/api/admin/privacy/consents/route.ts`: `DELETE` valida `verifyCsrf(req)` després de `requireAuth(req)`, abans de llegir body, revocar consentiment o escriure audit log. `GET` queda lectura sense CSRF.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 91 → 90.
+- `__tests__/app/api/admin/privacy-consents-route.test.ts`: test nou per lectura sense CSRF, auth abans de CSRF, rebuig 403, validació 400 i revocacions per `consentId` o `customerId + consentType`.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1064`; el següent canvi real ha de ser `#1065`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/privacy-consents-route.test.ts` OK (6 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 90 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: revocar consentiments admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; la UI existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1063 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin text-manager.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1062. Perímetre coherent: mutacions del gestor de textos admin, sense tocar fitxers de traducció ni servei.
+- `app/api/admin/text-manager/route.ts`: `PUT` i `POST` validen `verifyCsrf(req)` després de `requireAuth(req)` i `requirePermission(req, 'mutate')`, abans de llegir body o cridar serveis de text-manager. `GET` queda lectura sense CSRF.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades 2 entrades; baseline CSRF backend 93 → 91.
+- `__tests__/app/api/admin/text-manager-route.test.ts`: test nou per lectura sense CSRF, ordre auth/permís/CSRF, rebuigs 403 i happy paths de desar/executar acció.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1063`; el següent canvi real ha de ser `#1064`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/text-manager-route.test.ts` OK (7 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 91 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: desar modificacions o executar accions del gestor de textos admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; la UI existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1062 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin translate.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1061. Perímetre petit: traducció automàtica admin, sense tocar servei de traducció ni fallbacks externs.
+- `app/api/admin/translate/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)`, abans de rate limit, llegir body o cridar `translateAdminContent`. `GET` queda lectura/detecció amb rate limit i sense CSRF.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 94 → 93.
+- `__tests__/app/api/admin/translate-route.test.ts`: test nou per GET sense CSRF, auth abans de CSRF, CSRF abans de rate limit/body/traducció, rate limit i happy path.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1062`; el següent canvi real ha de ser `#1063`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/translate-route.test.ts` OK (5 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 93 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: traduir contingut des de l'admin ja no accepta mutacions sense CSRF ni consumeix rate limit si falta CSRF.
+- Validació humana/UX: sense canvi visual; les UIs existents ja usen `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1061 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin questionnaires.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1060. Perímetre coherent: mutacions de plantilles de qüestionaris admin, sense tocar servei ni esquemes.
+- `app/api/admin/questionnaires/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)`, abans de llegir body, validar Zod o crear plantilla.
+- `app/api/admin/questionnaires/[id]/route.ts`: `PATCH` i `DELETE` validen `verifyCsrf(req)` després de `requireAuth(req)`, abans de consultar, validar o mutar la plantilla.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades 3 entrades; baseline CSRF backend 97 → 94.
+- `__tests__/app/api/admin/questionnaires-route.test.ts` i `__tests__/app/api/admin/questionnaires-detail-route.test.ts`: tests nous per lectura sense CSRF, auth abans de CSRF, rebuigs 403 i happy paths de crear/actualitzar/eliminar.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1061`; el següent canvi real ha de ser `#1062`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/questionnaires-route.test.ts __tests__/app/api/admin/questionnaires-detail-route.test.ts` OK (12 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 94 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: crear, actualitzar o eliminar plantilles de qüestionari admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; les UIs existents ja usen `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1060 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin test-notifications.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1059. Perímetre petit: endpoint admin per enviar email de test de notificacions, sense tocar SMTP ni servei d'enviament.
+- `app/api/admin/test-notifications/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)`, abans de llegir body o cridar `sendAdminTestEmail`.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 98 → 97.
+- `__tests__/app/api/admin/test-notifications-route.test.ts`: test nou amb servei mock per lectura sense CSRF, auth abans de CSRF, rebuig 403, happy path i error de servei.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1060`; el següent canvi real ha de ser `#1061`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/test-notifications-route.test.ts` OK (5 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 97 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: enviar un email de test de notificacions des de l'admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; la UI existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1059 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin profitability config.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1058. Perímetre petit: configuració admin de l'informe de rendibilitat, sense tocar càlculs econòmics.
+- `app/api/admin/reports/profitability/config/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)` i `requirePermission(req, 'mutate')`, abans de llegir body, normalitzar o desar configuració.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 99 → 98.
+- `__tests__/app/api/admin/reports-profitability-config-route.test.ts`: test nou per lectura sense CSRF, ordre auth/permís/CSRF, rebuig 403 i happy path amb `getAdminRole`.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1059`; el següent canvi real ha de ser `#1060`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/reports-profitability-config-route.test.ts` OK (5 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 98 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: desar la configuració de rendibilitat ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1058 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin settings secundaris.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1057. Perímetre petit i coherent: dues rutes secundàries de settings, ja consumides amb `fetchWithCsrf`.
+- `app/api/admin/settings/notification-recipients/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)` i `requirePermission(req, 'mutate')`, abans de llegir body o desar destinataris.
+- `app/api/admin/settings/quote-template/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)` i `requirePermission(req, 'mutate')`, abans de llegir body, normalitzar o desar plantilla.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades 2 entrades; baseline CSRF backend 101 → 99.
+- `__tests__/app/api/admin/settings-notification-recipients-route.test.ts` i `__tests__/app/api/admin/settings-quote-template-route.test.ts`: tests nous per lectura sense CSRF, ordre auth/permís/CSRF, rebuig 403 i happy path.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1058`; el següent canvi real ha de ser `#1059`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/settings-notification-recipients-route.test.ts __tests__/app/api/admin/settings-quote-template-route.test.ts` OK (10 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 99 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: desar destinataris de notificació i plantilla de pressupost ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; les UIs existents ja usen `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1057 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin start-process.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1056. Perímetre petit: endpoint admin d'iniciar processos de client, ja consumit amb `fetchWithCsrf` des de clientes.
+- `app/api/admin/start-process/route.ts`: `POST` valida `verifyCsrf(request)` després de `requireAuth(request)`, abans de llegir body o cridar `startCustomerProcess`.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 102 → 101.
+- `__tests__/app/api/admin/start-process-route.test.ts`: test nou amb mock CSRF i servei per auth abans de CSRF, rebuig 403 abans de llegir body/iniciar procés, happy path i error de servei.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1057`; el següent canvi real ha de ser `#1058`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/start-process-route.test.ts` OK (4 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 101 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: iniciar processos de client des de l'admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; la UI existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1056 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin db-reconnect.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1055. Perímetre petit i sensible: botó admin de reconnectar base de dades, ja consumit amb `fetchWithCsrf`.
+- `app/api/admin/system/db-reconnect/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)` i `requirePermission(req, 'mutate')`, abans de fer `$disconnect`, `$connect`, `SELECT 1` o escriure `adminLog`.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 103 → 102.
+- `__tests__/app/api/admin/db-reconnect-route.test.ts`: test nou amb mock CSRF i Prisma per auth abans de permís/CSRF, permís abans de CSRF, rebuig 403 i happy path de reconnect.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1056`; el següent canvi real ha de ser `#1057`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/db-reconnect-route.test.ts` OK (4 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 102 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: reconnectar la base de dades des de l'admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; el botó existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1055 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin stats.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1054. Perímetre petit: fallback manual d'estadístiques admin.
+- `app/api/admin/stats/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)`, abans de llegir body o actualitzar `updateAdminStatFallback`. `GET` continua sense CSRF perquè és lectura.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 104 → 103.
+- `__tests__/app/api/admin/stats-route.test.ts`: test nou amb mock CSRF per lectura sense CSRF, auth abans de CSRF, rebuig 403, validacions de key i happy path.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1055`; el següent canvi real ha de ser `#1056`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/stats-route.test.ts` OK (6 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 103 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: actualitzar el fallback d'estadístiques admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1054 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin protocol validations.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1053. Perímetre petit: validacions humanes del protocol, ja consumides pel viewer amb `fetchWithCsrf`.
+- `app/api/admin/protocol/validations/route.ts`: `POST` i `DELETE` validen `verifyCsrf(req)` després de `requireAuth(req)` i `requirePermission(req, 'mutate')`, abans de llegir body o escriure/esborrar validacions. `GET` continua sense CSRF perquè és lectura amb permís `read`.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades 2 entrades; baseline CSRF backend 106 → 104.
+- `__tests__/app/api/admin/protocol-validations-route.test.ts`: ampliat amb mock CSRF per lectura sense CSRF, permís abans de CSRF, rebuigs 403 i happy paths de registrar/eliminar.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1054`; el següent canvi real ha de ser `#1055`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/protocol-validations-route.test.ts` OK (9 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 104 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: registrar o desfer validacions humanes del protocol ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; el component existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1053 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin maps distance.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1052. Perímetre petit: càlcul de distància admin, amb auth i permís `mutate` ja existents.
+- `app/api/admin/maps/distance/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)` i `requirePermission(req, 'mutate')`, abans de llegir JSON o invocar `calculateGoogleMapsDistance`.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 107 → 106.
+- `__tests__/app/api/admin/maps-distance-route.test.ts`: test nou amb mock CSRF per auth abans de permís/CSRF, permís abans de CSRF, rebuig 403, body invàlid i happy path.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1053`; el següent canvi real ha de ser `#1054`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/maps-distance-route.test.ts` OK (5 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 106 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: el càlcul admin de distància ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1052 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin image-manager.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1051. Perímetre acotat: gestor d'imatges admin, ja consumit per la UI amb `fetchWithCsrf`.
+- `app/api/admin/image-manager/route.ts`: `PUT`, `POST`, `PATCH` i `DELETE` validen `verifyCsrf(req)` després de `requireAuth(req)` i `requirePermission(req, 'mutate')`, abans de llegir JSON/form-data, desar configuració, pujar, reordenar o eliminar assets. `GET` continua sense CSRF perquè és lectura.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades 4 entrades; baseline CSRF backend 111 → 107.
+- `__tests__/app/api/admin/image-manager-route.test.ts`: test nou amb mock CSRF per lectura sense CSRF, permís abans de CSRF, rebuigs 403 i happy paths de desar/reordenar/eliminar.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1052`; el següent canvi real ha de ser `#1053`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/image-manager-route.test.ts` OK (9 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 107 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: desar, pujar, reordenar o eliminar assets del gestor d'imatges ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; la UI existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1051 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin hero-media.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1050. Perímetre petit: ruta legacy del hero unificat, sense test de route previ.
+- `app/api/admin/hero-media/route.ts`: `POST` i `DELETE` validen `verifyCsrf(req)` després de `requireAuth(req)`, abans de llegir JSON/form-data, reordenar, afegir o eliminar media. `GET` continua sense CSRF perquè és lectura.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades 2 entrades; baseline CSRF backend 113 → 111.
+- `__tests__/app/api/admin/hero-media-route.test.ts`: test nou amb mock CSRF per lectura sense CSRF, auth abans de CSRF, rebuigs 403 i happy paths de reordenar/eliminar.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1051`; el següent canvi real ha de ser `#1052`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/hero-media-route.test.ts` OK (6 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 111 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: reordenar o eliminar media del hero ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1050 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin customers check-duplicates.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1049. Perímetre petit: detecció de duplicats de client, ja consumida des d'admin amb `fetchWithCsrf`.
+- `app/api/admin/customers/check-duplicates/route.ts`: `POST` valida `verifyCsrf(request)` després de `requireAuth(request)` i abans del `try` tolerant, evitant que un rebuig CSRF es transformi en resposta `ok:true`.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 114 → 113.
+- `__tests__/app/api/admin/customers-check-duplicates-route.test.ts`: ampliat amb mock CSRF, auth abans de CSRF, rebuig 403 sense invocar deduplicació i happy path amb CSRF net.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1050`; el següent canvi real ha de ser `#1051`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/customers-check-duplicates-route.test.ts` OK (5 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 113 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: la cerca de duplicats de clients ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; les UI existents ja usen `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1049 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin custom-quotes.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1048. Perímetre petit: rutes admin custom-quotes, ja consumides pel cost calculator amb `fetchWithCsrf`.
+- `app/api/admin/custom-quotes/route.ts`: `POST` valida `verifyCsrf(request)` després de `requireAuth(request)`, abans de llegir body o crear el pressupost personalitzat. `GET` continua sense CSRF perquè és lectura.
+- `app/api/admin/custom-quotes/[id]/route.ts`: `PATCH` i `DELETE` validen `verifyCsrf(...)` després de `requireAuth(...)`, abans d'actualitzar o eliminar. `GET` continua sense CSRF perquè és lectura.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades 3 entrades; baseline CSRF backend 117 → 114.
+- `__tests__/app/api/admin/custom-quotes-route.test.ts`: ampliat amb mock CSRF per lectura sense CSRF, rebuigs 403 i happy paths de crear/actualitzar/eliminar.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1049`; el següent canvi real ha de ser `#1050`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/custom-quotes-route.test.ts` OK (15 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 114 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: crear, actualitzar i eliminar custom quotes ja no accepten mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; el client existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1048 — 2026-06-22 — claude (TANCAT)
+
+**Auditoria de cohesio de l'admin COMPLETA: 0 codi mort, residu nomes visual.**
+
+- Organ Clients SA (CustomerHubClient + _components). Tancament de la passada de cohesio (#1032-#1048).
+- Deute d'enginyeria de tot l'admin: ESGOTAT. 0 codi mort (components + serveis), cablejat net, 6 serveis orfes podats, guard reachability complet.
+- Residu restant = nomes VISUAL (propietari): 2 superficies `bg-white/[0.015]` (reporting, text-manager) + 4 inline-styles layout a bookings/page. Resta legitim (email HTML, css-manager dades, text-white/X sistema, portal producte).
+- Validació tècnica: tsc + validate:core EXIT 0.
+- Validació funcional: organs auditats sense codi mort.
+- Validació humana/UX: residu visual per al propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1047 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin quadrant blocks.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1046. Perímetre petit: bloquejos manuals del quadrant, ja consumits pel client admin amb `fetchWithCsrf`.
+- `app/api/admin/cuadrant/blocks/route.ts`: `POST` i `DELETE` validen `verifyCsrf(req)` després de `requireAuth(req)`, abans de llegir body o eliminar. `GET` continua sense CSRF perquè és lectura.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades 2 entrades; baseline CSRF backend 119 → 117.
+- `__tests__/app/api/admin/cuadrant-blocks-route.test.ts`: test nou amb mock CSRF per lectura sense CSRF, auth abans de CSRF, rebuigs 403 i happy paths de crear/eliminar.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1047`; el següent canvi real ha de ser `#1048`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/cuadrant-blocks-route.test.ts` OK (6 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 117 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: crear i eliminar bloquejos manuals del quadrant ja no accepten mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; el client existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1046 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin FAQ.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1045 de Claude. Perímetre petit: rutes admin FAQ, ja consumides pel formulari admin amb `fetchWithCsrf`.
+- `app/api/admin/faq/route.ts`: `POST` i `DELETE` validen `verifyCsrf(req)` després de `requireAuth(req)` i `requirePermission(req, 'mutate')`, abans de llegir body o eliminar.
+- `app/api/admin/faq/[id]/route.ts`: `PATCH` valida `verifyCsrf(req)` després de `requireAuth(req)` i `requirePermission(req, 'mutate')`, abans de llegir body o actualitzar. Els `GET` continuen sense CSRF perquè són lectura.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades 3 entrades; baseline CSRF backend 122 → 119.
+- `__tests__/app/api/admin/faq-route.test.ts`: test nou amb mock CSRF per llista/detall lectura, auth, permís `mutate` abans de CSRF, rebuigs 403 i happy paths de crear/eliminar/actualitzar.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1046`; el següent canvi real ha de ser `#1047`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/faq-route.test.ts` OK (10 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 119 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: crear, eliminar i actualitzar FAQs admin ja no accepten mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; el formulari existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1045 — 2026-06-22 — claude (TANCAT)
+
+**Poda de 6 serveis orfes (cua transitiva de les neteges de components #1026/#1032).**
+
+- En esborrar components morts, els serveis exclusius d'aquells components van quedar orfes. Eliminats 6 serveis + 6 tests: `leadInsightsService`, `leadScoreBreakdownService`, `leadOwnerControlSummaryService`, `adminCommandPaletteService`, `inboxOwnerControlSummaryService`, `dossierCatalogSelectionService`. Cap protegit a dead-code.md.
+- Lliço d'auditoria: `grep -v "test"` dona falsos positius (test-notifications, testimonials); `adminTestNotificationService` i `testimonialAdminService` son VIUS i NO s'han tocat. Verificat per path d'import.
+- Validació tècnica: tsc EXIT 0 (xarxa: cap import viu) + validate:core.
+- Validació funcional: cap funcionalitat afectada.
+- Validació humana/UX: no visible.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1044 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin fuel reference.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1043. Perímetre petit: endpoint de referència de combustible. El `GET` alimenta càlculs com a lectura; el `POST` refresca manualment la referència i és la mutació.
+- `app/api/admin/fuel/reference/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)` i `requirePermission(req, 'mutate')`, abans de cridar `refreshFuelReferenceNow()`. `GET` continua sense CSRF perquè és lectura amb permís `read`.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 123 → 122.
+- `__tests__/app/api/admin/fuel-reference-route.test.ts`: test nou amb mock CSRF, GET sense CSRF, auth abans de permisos/CSRF, permís `mutate` abans de CSRF, rebuig 403 i happy path de refresh.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1044`; el següent canvi real ha de ser `#1045`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/fuel-reference-route.test.ts` OK (6 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 122 deutes inventariats); `pnpm run qa:protocol` OK (current #1045 per canvi paral·lel de Claude); `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: refrescar manualment la referència de combustible admin ja no accepta `POST` sense CSRF.
+- Validació humana/UX: sense canvi visual; la lectura existent per reserves continua com a `GET`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1043 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin features.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1042. Perímetre petit: endpoint de flags de funcionalitat admin, ja consumit pel client admin amb `fetchWithCsrf`.
+- `app/api/admin/features/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)` i abans de llegir el body o cridar `updateAdminFeature()`. `GET` continua sense CSRF perquè és lectura.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 124 → 123.
+- `__tests__/app/api/admin/features-route.test.ts`: test nou amb mock CSRF, GET sense CSRF, auth abans de CSRF, rebuig 403, validacions 400 i happy path d'actualització.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1043`; el següent canvi real ha de ser `#1044`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/features-route.test.ts` OK (7 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 123 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: actualitzar flags de funcionalitat admin ja no accepta `POST` sense CSRF.
+- Validació humana/UX: sense canvi visual; el client existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1042 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin extras.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1041. Perímetre petit: endpoint d'extres del configurador, ja consumit pel client admin amb `fetchWithCsrf`.
+- `app/api/admin/extras/route.ts`: `PUT` valida `verifyCsrf(req)` després de `requireAuth(req)` i abans de llegir el body o cridar `saveExtrasConfiguratorConfig()`. `GET` continua sense CSRF perquè és lectura.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 125 → 124.
+- `__tests__/app/api/admin/extras-route.test.ts`: test nou amb mock CSRF, GET sense CSRF, auth abans de CSRF, rebuig 403, validació 400 i happy path de guardat.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1042`; el següent canvi real ha de ser `#1043`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/extras-route.test.ts` OK (6 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 124 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: guardar la configuració d'extres admin ja no accepta `PUT` sense CSRF.
+- Validació humana/UX: sense canvi visual; el client existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1041 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin discount-codes.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1039. Durant el registre, Claude ha ocupat #1040 en paral·lel amb la fitxa Reserves + auditoria global; aquest tall es renumera a #1041 segons la norma de no-col·lisió.
+- `app/api/admin/discount-codes/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)` i abans de llegir el body o cridar `createAdminDiscountCode()`. `GET` continua sense CSRF perquè és lectura.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 126 → 125.
+- `__tests__/app/api/admin/discount-codes-route.test.ts`: ampliat amb mock CSRF, GET sense CSRF, auth abans de CSRF i rebuig 403 sense invocar el servei de creació.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1041`; el següent canvi real ha de ser `#1042`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/discount-codes-route.test.ts` OK (10 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 125 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: crear codis de descompte admin ja no accepta `POST` sense CSRF.
+- Validació humana/UX: sense canvi visual; el client existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1040 — 2026-06-22 — claude (TANCAT)
+
+**Fitxa Reserves + auditoria global de cohesio de l'admin.**
+
+- Organ Reserves (bookings, [id], new, calendario, capacity): SA estructuralment, cap codi mort, cablejat correcte (`BookingServiceLinesSection` reutilitzat net en 3 llocs). Fix: 1 superficie ad-hoc -> `.adm-row-hover`.
+- Auditoria global: deute estructural de tot l'admin NEGLIGIBLE. `text-white/X`/`rgba(255,255,255,X)` son legitims pel canon (sistema sobre fons fosc). Hex inline gairebe tot legitim (canvas, css-manager dades, portal accent producte).
+- Deute real anotat (passada propia): 4 inline-styles layout px a bookings/page; reengagement/loading.tsx skeleton #850.
+- Validació tècnica: tsc + qa:admin-canon + qa:no-dead-admin-views EXIT 0.
+- Validació funcional: organ sa.
+- Validació humana/UX: no toca visual.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1039 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF admin CSS manager.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1038. Perímetre petit i fora de l'òrgan Comercial.
+- `app/api/admin/css/route.ts`: `PUT` valida `verifyCsrf(req)` després de `requireAuth(req)` i `requirePermission(req, 'mutate')`, abans de llegir el body o cridar `saveAdminCustomCss()`. `GET` continua sense CSRF perquè és lectura.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 127 → 126.
+- `__tests__/app/api/admin/css-route.test.ts`: nou test de ruta per GET sense CSRF, auth, permís, rebuig CSRF, desat sanititzat i body JSON invàlid.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1039`; el següent canvi real ha de ser `#1040`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/css-route.test.ts` OK (6 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 126 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: desar CSS admin ja no accepta `PUT` sense CSRF i conserva auth + permís `mutate`.
+- Validació humana/UX: sense canvi visual; el client existent ja usa `fetchWithCsrf`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1038 — 2026-06-22 — codex (FET)
+
+**Protocol no-col·lisió explícit + CSRF Coverage admin.**
+
+- Context: el propietari demana apuntar al protocol la solució aplicada quan Claude va ocupar #1034 mentre Codex documentava el tall IA. Durant aquest registre, Claude ha ocupat #1037 en paral·lel; aquest tall es renumera a #1038 aplicant la mateixa norma de no-col·lisió ja escrita.
+- `docs/admin-protocol.md` §2.1: la norma de no-col·lisió ara diu què fer si la col·lisió apareix durant el registre: renumerar el tall al següent número lliure visible, actualitzar `ADMIN_CHANGE_COUNTER`, §9, diari i `agent-sync`, i deixar la nota de renumeració dins el canvi.
+- `app/api/admin/coverage/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)` i abans de llegir el body. `GET` continua sense CSRF perquè és lectura.
+- `scripts/api-admin-csrf-allowlist.txt`: retirada 1 entrada; baseline CSRF backend 128 → 127.
+- `__tests__/app/api/admin/coverage-route.test.ts`: nou test de ruta per GET sense CSRF, auth abans de CSRF, rebuig CSRF, validació de body i delegació a `updateCoverageAreas`.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1038`; el següent canvi real ha de ser `#1039`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/coverage-route.test.ts` OK (6 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 127 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: actualitzar Coverage admin ja no accepta POST sense CSRF i la propera col·lisió de número té solució canònica escrita.
+- Validació humana/UX: sense canvi visual; la norma queda més explícita per agents futurs.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1037 — 2026-06-22 — claude (TANCAT)
+
+**Fitxes forenses /admin/leads/arxiu + /reengagement (sanes) — organ Comercial tancat.**
+
+- Tercer tall de fitxes de l'organ Comercial. Totes dues pantalles son sanes: page renderitza un sol Client, imports usats, cap codi mort/duplicacio/residu.
+- Cap canvi de codi necessari. Deute menor: `reengagement/loading.tsx` skeleton antic (#850).
+- Organ Comercial auditat sencer: leads (CHARLIE) + leads/[id] (#1032) + sales-ops (#1034) + arxiu + reengagement.
+- Validació tècnica: tsc + qa:no-dead-admin-views EXIT 0 · render HTTP 200, 0 errors.
+- Validació funcional: organ net.
+- Validació humana/UX: no toca visual.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1036 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF de les mutacions admin Blog.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` després de #1035, amb perímetre petit i fora de Leads, sales-ops, dossiers, UI i schema.
+- `app/api/admin/blog/route.ts`: `POST`, `PUT` i `DELETE` validen `verifyCsrf(req)` després de `requireAuth(req)`. `GET` continua sense CSRF perquè és lectura.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades 3 entrades; baseline CSRF backend 131 → 128.
+- `__tests__/app/api/admin/blog-route.test.ts`: nou test de ruta per GET sense CSRF, auth abans de CSRF, rebuig CSRF i delegació a `blogAdminService` en create/update/delete.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1036`; el següent canvi real ha de ser `#1037`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/blog-route.test.ts` OK (8 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 128 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: crear, actualitzar i eliminar posts de Blog admin ja no accepta mutacions sense CSRF.
+- Validació humana/UX: sense canvi visual; no toca Blog UI, Leads, sales-ops, dossiers ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1035 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF de dues rutes admin IA.**
+
+- Context: continuació del drenatge incremental del baseline `qa:api-admin-csrf` iniciat al #1030. Durant el registre, Claude ha ocupat #1034 en paral·lel; aquest tall es renumera a #1035 segons la norma de no-col·lisió.
+- `app/api/admin/ai/copy-suggestions/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)` i abans de llegir el body o generar suggeriments.
+- `app/api/admin/ai/inbox-reply/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)` i abans de llegir el body o generar respostes IA.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades 2 entrades; baseline CSRF backend 133 → 131.
+- `__tests__/app/api/admin/ai/copy-suggestions-route.test.ts` i `__tests__/app/api/admin/ai/inbox-reply-route.test.ts`: ampliats amb mock CSRF i casos 403.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1035`; el següent canvi real ha de ser `#1036`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/ai/copy-suggestions-route.test.ts __tests__/app/api/admin/ai/inbox-reply-route.test.ts` OK (11 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors; 131 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: els endpoints IA admin ja no accepten generació via POST sense CSRF.
+- Validació humana/UX: sense canvi visual; no toca UI, Leads ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1034 — 2026-06-22 — claude (TANCAT)
+
+**Fitxa forense /admin/sales-ops (òrgan sa) + fix botó-void.**
+
+- Segona fitxa FETA de l'òrgan Comercial. /admin/sales-ops és sa: 4 components vius i renderitzats, tots els imports usats, cap codi mort ni duplicació.
+- Únic residu: 1 botó-void (Link "Obrir Social" estilat a mà amb border-white/15 bg-white/5) → `.ap-btn ap-btn--secondary text-xs`.
+- Validació tècnica: tsc EXIT 0 · qa:admin-canon 0 · render HTTP 200, 0 page errors.
+- Validació funcional: sense residu de canon; render idèntic.
+- Validació humana/UX: no toca layout.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+---
+
+### Canvi #1033 — 2026-06-22 — codex (FET)
+
+**Sanejament CSRF del CRUD de dossiers.**
+
+- Context: després del #1031, l'òrgan Documents encara tenia el CRUD de dossiers a la baseline CSRF històrica. Claude ha tancat #1032 en paral·lel sobre Leads; aquest tall continua en fitxers disjunts.
+- `app/api/admin/dossiers/route.ts`: `POST` valida `verifyCsrf(req)` després de `requireAuth(req)` i abans de validar body/crear dossier.
+- `app/api/admin/dossiers/[id]/route.ts`: `DELETE` i `PATCH` validen `verifyCsrf(req)` abans de `softDeleteDossier`, `restoreDossier` o `purgeDossier`. `GET` continua sense CSRF perquè és lectura.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades les tres entrades sanejades. La baseline baixa de 136 a 133 deutes inventariats.
+- Tests nous: `__tests__/app/api/admin/dossiers-route.test.ts` i `__tests__/app/api/admin/dossiers-detail-route.test.ts` cobreixen auth, CSRF, validació de body, creació, lectura, paperera, restore, purge i acció desconeguda.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` passa a `1033`; el següent canvi real ha de ser `#1034`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/dossiers-route.test.ts __tests__/app/api/admin/dossiers-detail-route.test.ts` OK (14 tests); `pnpm run qa:api-admin-csrf` OK (133 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: el CRUD de dossiers conserva comportament, però ja no accepta mutacions admin sense CSRF.
+- Validació humana/UX: sense canvi visual. No toca Leads, schema ni el guard de codi mort de #1032.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1032 — 2026-06-22 — claude (TANCAT)
+
+**Fitxa forense /admin/leads/[id]: eradicades ~2.500 línies de codi mort + guard d'imports-sense-ús.**
+
+- Primera fitxa forense FETA de l'òrgan Comercial. L'arbre viu real de la cabina comercial és només `page.tsx → LeadDetailClient → LeadBoloSection`.
+- `page.tsx` importava 12 components que NO renderitzava (superseded pel redisseny "fitxa en una pantalla" #920-#939). Eliminats: LeadWorkspace, LeadActionsEnhanced, LeadProfileEditor, LeadGuidedFlow, LeadInsightsBanner, LeadScoreBreakdown, LeadTechnicalSnapshotPanel, LeadCustomerLinkPanel, LeadMobileQuickActions, ScoreSnapshotButton, LeadDossiersPanel, LeadDossierActions + 2 tests orfes (~2.500 línies).
+- `page.tsx` netejat de càlculs morts i selects Prisma podats (587 → ~250 línies). El render viu queda intacte.
+- **Guard `check-dead-admin-views` millorat**: una aresta d'import ara només compta si el binding s'usa al cos (abans, un import no renderitzat mantenia el component "viu" — el forat que va deixar 2.500 línies penjades). Proteccions contra falsos positius (side-effect imports, re-exports, namespace sempre compten); 0 falsos positius al repo.
+- Verificació: `tsc` EXIT 0 (Prisma tipa pel select → poda segura). Render verificat al navegador (fitxa d'Alejandro García, HTTP 200, 0 page errors, idèntica). Guard provat (arrels + transitives + imports-sense-ús).
+- Validació tècnica: `tsc` + `qa:no-dead-admin-views` EXIT 0. (`validate:core` complet momentàniament bloquejat pel guard CSRF de codex #1030/#1031 en curs, en rutes API alienes a aquest tall.)
+- Validació funcional: cabina comercial idèntica amb 1/5 del codi a page.tsx; cap import-sense-ús pot tornar a colar codi mort.
+- Validació humana/UX: no toca visual.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1028 — 2026-06-21 — claude (TANCAT)
+
+**Guard de codi mort admin millorat a reachability real (caça illes transitives).**
+
+- Codex (#1027) va detectar correctament el límit del guard #1026: només caçava l'ARREL d'una illa; una illa transitiva (A importada només per B, totes dues mortes) encara passava perquè B "comptava" com a ús d'A. En comptes de deixar-ho documentat com a limitació, s'elimina.
+- `scripts/check-dead-admin-views.mjs` reescrit: construeix el graf d'imports de tot el codi (app/ + components/ + lib/ + middleware), resol àlies de tsconfig (`@/*`, `@/lib`, `@/components`, `@/data`), fa BFS des dels punts d'entrada de Next (page/layout/route/loading/error/not-found/template/default/global-error) i marca MORT qualsevol component `.tsx` sota `app/admin/**` no accessible. Captura imports estàtics, dinàmics i re-exports.
+- Provat amb illa transitiva artificial (A→B, ningú importa A): el guard nou flageja **les dues**; l'antic només hauria caçat A. Gap tancat.
+- `docs/protocol-executiu.md`: actualitzada l'afirmació sobre el guard (ara reachability real; la fitxa forense segueix cobrint CSS↔DOM, duplicacions semàntiques, hardcoded i cablejat de dades, que el guard no pot veure).
+- Validació tècnica: `pnpm run qa:no-dead-admin-views` OK (0) · `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0.
+- Validació funcional: cap illa admin (arrel o transitiva) pot entrar sense fer petar `validate:core`. Redueix la càrrega de reachability manual de la fitxa forense.
+- Validació humana/UX: no toca visual.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1027 — 2026-06-21 — codex (TANCAT)
+
+**Revisió del guard de codi mort #1026 i precisió del protocol.**
+
+- Revisat `scripts/check-dead-admin-views.mjs`: és correcte com a barrera automàtica conservadora contra components admin `.tsx` orfes, però no és una prova completa de reachability de tot el graf.
+- `docs/protocol-executiu.md`: aclarit que `qa:no-dead-admin-views` no substitueix la fitxa forense ni la lectura línia per línia.
+- `docs/admin-fitxes-pantalles.md`: afegit el guard com a prova mínima d'una fitxa `FETA`, amb allowlist només si hi ha justificació. També actualitzada la fitxa inicial de `/admin/leads` perquè ja no digui que Claude "està corregint" la pipeline morta: queda eradicada i la font viva és `LeadsSeasonClient`.
+- Validació tècnica: `pnpm run qa:no-dead-admin-views` OK; `pnpm run qa:protocol` OK.
+- Validació funcional: el protocol queda més estricte i més honest: automàtic per arrels òrfenes, fitxa forense per cablejat complet.
+- Validació humana/UX: no toca visual; reforça el contracte que el propietari només valida visual, no codi mort ni ponts interns.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1029 — 2026-06-22 — codex (FET)
+
+**Fitxa forense de `/admin/presupuestos/[id]` i blindatge CSRF de l'enviament de pressupostos.**
+
+- `docs/admin-fitxes-pantalles.md`: nova fitxa `FETA` de `/admin/presupuestos/[id]` + editor PDF intern. La ruta de detall és viva i curta (`page.tsx` + `ProposalOwnerPanel`); el deute real queda a `PresupuestoPdfStudio`/`StudioPreview`, que encara conserva UI ad-hoc fora de `pr__*`.
+- Auditoria de cablejat: detall → Prisma/relations; owner → `reassignProposalOwner`; editor → proposals CRUD, pricing, distance, profitability, translate, email quote i proposal send.
+- Troballa funcional de seguretat dins el cable d'enviament: `POST /api/admin/emails/quote` i `POST /api/admin/proposals/[id]/send` tenien `requireAuth` però no `verifyCsrf`, tot i que el client ja enviava via `fetchWithCsrf`.
+- `app/api/admin/emails/quote/route.ts` i `app/api/admin/proposals/[id]/send/route.ts`: afegit `verifyCsrf(req)` abans de mutar/enviar.
+- Tests: `__tests__/app/api/admin/emails-quote-route.test.ts` ampliat amb cas CSRF; nou `__tests__/app/api/admin/proposals-send-route.test.ts` per auth, CSRF, happy path, passthrough i error.
+- `§6.14`: registrat com a tancament del pendent crític de regressions silencioses en rutes admin mutadores.
+- `ADMIN_CHANGE_COUNTER` passa a `1029`; el següent canvi real ha de ser `#1030`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/emails-quote-route.test.ts __tests__/app/api/admin/proposals-send-route.test.ts` OK (12 tests); `pnpm run qa:no-dead-admin-views` OK; `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: l'enviament de pressupostos conserva el flux existent però ja no accepta POST admin sense token CSRF.
+- Validació humana/UX: no canvia cap pantalla visible; la fitxa deixa clar que el proper tall visual és l'editor PDF intern, no la llista ni la ruta de detall.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1030 — 2026-06-22 — codex (FET)
+
+**Guard backend CSRF per rutes admin mutadores.**
+
+- Context: el #1029 ha trobat una regressió real de CSRF en dos POST admin d'enviament de pressupost. El client ja usava `fetchWithCsrf`, però el backend no tenia cap guard equivalent a `qa:api-admin-auth` per impedir que el patró tornés a aparèixer.
+- Nou `scripts/check-api-admin-csrf.mjs`: recorre `app/api/admin/**/route.ts`, extreu handlers HTTP exportats amb el mateix patró robust del guard d'auth, ignora mètodes segurs (`GET/HEAD/OPTIONS`) i exigeix `verifyCsrf(` dins de cada `POST/PUT/PATCH/DELETE`. Els comentaris es neutralitzen perquè un `verifyCsrf` comentat no compti.
+- Nova baseline `scripts/api-admin-csrf-allowlist.txt`: inventaria exactament 138 handlers mutadors històrics sense CSRF. El guard falla si apareix qualsevol violació nova fora de baseline i també falla si una entrada baseline queda stale després d'arreglar una ruta, obligant a reduir el deute.
+- `package.json`: afegit `qa:api-admin-csrf` i cablejat a `validate:core` immediatament després de `qa:api-admin-auth`.
+- Tests: `__tests__/scripts/check-api-admin-csrf.test.ts` cobreix safe methods sense CSRF, mutadors protegits, mutadors sense protecció, múltiples violacions, fitxers fora d'admin, `verifyCsrf` comentat, protecció parcial i destructuració de `params`.
+- `§6.14`: registrat dins el pendent crític de regressions silencioses en repo gran.
+- `ADMIN_CHANGE_COUNTER` passa a `1030`; el següent canvi real ha de ser `#1031`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/scripts/check-api-admin-csrf.test.ts` OK (8 tests); `pnpm run qa:api-admin-csrf` OK (182 handlers mutadors revisats, 138 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: cap nova ruta admin mutadora pot entrar sense CSRF o sense quedar explícitament inventariada; els dos endpoints corregits al #1029 no formen part de la baseline.
+- Validació humana/UX: sense canvi visual. El deute queda visible i reduïble per òrgans, sense obrir un tall massiu de 138 rutes.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1031 — 2026-06-22 — codex (FET)
+
+**Primer sanejament de baseline CSRF backend dins Documents/Pressupostos.**
+
+- Context: el #1030 ha inventariat 138 handlers admin mutadors històrics sense CSRF. El següent tall natural és reduir el deute per òrgans, començant pel perímetre Documents/Pressupostos perquè el #1029 ja hi havia detectat la regressió d'enviament.
+- `app/api/admin/dossiers/[id]/send/route.ts`: afegit `verifyCsrf(req)` després de `requireAuth(req)` i abans de `sendDossierByEmail(params.id)`.
+- `app/api/admin/leads/[id]/quote/route.ts`: `POST` ara valida `verifyCsrf(req)` abans de delegar a `handleLeadQuotePost(req, params.id)`. `GET` continua sense CSRF perquè és lectura.
+- `scripts/api-admin-csrf-allowlist.txt`: retirades les dues entrades sanejades. La baseline baixa de 138 a 136 deutes inventariats.
+- Tests nous: `__tests__/app/api/admin/dossiers-send-route.test.ts` i `__tests__/app/api/admin/leads-quote-route.test.ts` cobreixen auth, CSRF, happy path i errors de domini/delegació.
+- `§6.14`: registrat com a reducció incremental del pendent crític de regressions silencioses.
+- `ADMIN_CHANGE_COUNTER` passa a `1031`; el següent canvi real ha de ser `#1032`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/api/admin/dossiers-send-route.test.ts __tests__/app/api/admin/leads-quote-route.test.ts` OK (9 tests); `pnpm run qa:api-admin-csrf` OK (136 deutes inventariats); `pnpm run qa:protocol` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: els clients admin ja enviaven amb `fetchWithCsrf`; ara el backend rebutja POST sense token en aquests dos endpoints.
+- Validació humana/UX: sense canvi visual. No es toca l'editor PDF ni la UI de Leads.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1026 — 2026-06-21 — claude (TANCAT)
+
+**Guard automàtic de codi mort admin (`qa:no-dead-admin-views`) + eradicació de 16 illes mortes.**
+
+- Materialitza el contracte del propietari (propietari = visual; agents = enginyeria/cohesió). El sistema de fitxes forenses (#1023/#1024) demana reachability MANUAL per pantalla; això no escala a 90 rutes ni evita recaigudes. Aquest guard l'automatitza.
+- Nou `scripts/check-dead-admin-views.mjs` (+ allowlist `scripts/dead-admin-views-allowlist.json`), cablejat a `validate:core`: detecta components `.tsx` sota `app/admin/**` que no importa cap ruta (l'arrel d'una illa morta, com `LeadViewToggle` → `LeadPipelineView` del #1020). Captura imports estàtics, dinàmics (`dynamic(() => import())`) i re-exports. Conservador: només flageja l'arrel no importada per ningú (col·lisió de basename → es considera viu, mai fals positiu).
+- **El guard va caçar 16 components morts reals** (verificats contra app/components/lib/__tests__/e2e + tsc), eliminats: subsistema d'inbox antic sencer substituït per `SafataClient` (`InboxClient`, `InboxModals`, `InboxSections`, `AiReplySuggestions`, `CommSummaryPanel`, `InboxLeadContext`), `BookingViewToggle` (bessó del `LeadViewToggle`), `CalendarSections`, `CustomerLocationDistance`, `AdminHelpOverlay`, `AdminSearchModal`, `LeadActions`, `LeadLostReasonBadge`, `LeadQuickPriority`, `LeadQuickStatus`. + 7 tests orfes que testaven codi mort.
+- `package.json`: nou script + afegit a la cadena `validate:core`.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` EXIT 0 (incl. el guard nou a 0) · 14 tests inbox/leads verds.
+- Validació funcional: l'admin té reachability automàtica; cap illa morta nova pot entrar sense fer petar `validate:core`. 16 illes preexistents fora.
+- Validació humana/UX: no afecta visual (només esborra codi no renderitzat); pendent cap revisió del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1025 — 2026-06-21 — codex (FET)
+
+**Protocol executiu i agrupació per òrgans reals.**
+
+- Creat `docs/protocol-executiu.md`: resum curt amb contracte de responsabilitat, 10 regles que no es poden saltar, òrgans principals, ordre d'intervenció, definició de fet i abast de repo.
+- `CLAUDE.md`: afegit el protocol executiu a l'entrada de documents vius i al flux d'arrencada admin.
+- `docs/admin-protocol.md`: afegida lectura executiva al principi i norma explícita de responsabilitat de cohesió dels agents.
+- `docs/admin-fitxes-pantalles.md`: afegida responsabilitat clara propietari vs agents i agrupació per òrgans principals, per no tractar subrutes com pantalles independents.
+- Efecte: el propietari valida visual i `TANCAT CHARLIE`; Claude/Codex assumeixen codi, cablejat, poda, duplicacions i cohesió de l'arxipèlag.
+- `ADMIN_CHANGE_COUNTER` passa a `1025`; el següent canvi real ha de ser `#1026`.
+- Validació tècnica: `pnpm run qa:protocol` OK.
+- Validació funcional: el protocol ara separa llei completa i porta d'entrada operativa, i converteix les 80-90 rutes en 10 òrgans auditables.
+- Validació humana/UX: respon a la demanda del propietari: ell no ha de fer cohesió tècnica; només validar visual i criteri final.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1024 — 2026-06-21 — codex (FET)
+
+**Fitxa forense exhaustiva abans de construir pantalles admin.**
+
+- `docs/admin-fitxes-pantalles.md`: la fitxa passa de plantilla bàsica a protocol forense. Ara exigeix història del component, reachability real, cable punta a punta, lectura línia per línia del perímetre, CSS contra DOM, monocapa, codi mort/latent, hardcoded, connexions interrompudes i decisió abans d'implementar.
+- `docs/admin-protocol.md`: reforçada la norma de fitxa obligatòria. Un grep o intuïció només dona estat `INICIAL`; `FETA` exigeix auditoria completa ruta → components → CSS/DOM → serveis/APIs → dades/accions → òrgans veïns.
+- `docs/admin-build-method.md`: afegida la secció `1.2 Fitxa forense obligatòria abans de construir`, perquè el mètode de pàgines admin no permeti començar cap millora sense auditoria.
+- Efecte: abans de tocar una pantalla s'ha de saber si és un sol organisme o si viu partida en 2, 3 o 4 illes, i què sobra.
+- `ADMIN_CHANGE_COUNTER` passa a `1024`; el següent canvi real ha de ser `#1025`.
+- Validació tècnica: `pnpm run qa:protocol` OK.
+- Validació funcional: la feina de pantalla queda bloquejada fins que la fitxa indiqui component viu, cablejat viu i residu sobrant.
+- Validació humana/UX: regla afegida per ordre directa del propietari: "quan acabeu, el component no li sobri ni una coma".
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1023 — 2026-06-21 — codex (FET)
+
+**Fitxes obligatòries de pantalles admin abans de tocar res.**
+
+- Nou document `docs/admin-fitxes-pantalles.md`: plantilla obligatòria de fitxa, objectiu de reachability i registre inicial de totes les rutes `app/admin/**/page.tsx`.
+- Fitxes inicials fetes: `/admin/leads` (TANCAT CHARLIE, superfície viva `LeadsSeasonClient`, illa morta detectada `LeadPipelineView`/`LeadViewToggle`) i `/admin/presupuestos` (superfície viva de llista, editor PDF intern com a subpantalla pendent).
+- `docs/admin-protocol.md`: norma nova — cap migració visual, funcional o de cablejat sobre una pantalla admin comença sense fitxa prèvia a `docs/admin-fitxes-pantalles.md`.
+- Efecte: el propietari pot avaluar la feina pantalla per pantalla i els agents no poden tornar a tocar una còpia no renderitzada sense haver provat quin és el component viu.
+- `ADMIN_CHANGE_COUNTER` passa a `1023`; el següent canvi real ha de ser `#1024`.
+- Validació tècnica: `pnpm run qa:protocol` OK.
+- Validació funcional: hi ha cua explícita de fitxes per repartir entre Claude i Codex.
+- Validació humana/UX: afegit per ordre directa del propietari: "entre claude i tu, feu totes les fitxes, i podem avaluar la feina".
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1022 — 2026-06-21 — codex (FET)
+
+**Protocol anti-pèrdua de temps: maniobra obligatòria quan el propietari marca `TANCAT CHARLIE`.**
+
+- `docs/admin-protocol.md`: afegida la regla operativa que, quan el propietari diu que una pantalla està revisada o `TANCAT CHARLIE`, l'agent ha d'aturar feina nova i consolidar-ho a inventari, marca de fitxer i agent-sync abans de continuar.
+- `docs/admin-build-method.md`: afegida la secció `1.1` amb la maniobra exacta: posar la ruta en 🟢, nota `TANCAT CHARLIE — revisada pel propietari`, protegir-la de reauditories genèriques i separar subzones pendents sense degradar la pantalla validada.
+- Efecte: una pantalla ja validada pel propietari deixa de ser candidata a "redescobrir", "millorar perquè sí" o tornar a posar en dubte. Només es reobre per ordre explícita o regressió demostrable.
+- `ADMIN_CHANGE_COUNTER` passa a `1022`; el següent canvi real ha de ser `#1023`.
+- Validació tècnica: `pnpm run qa:protocol` OK.
+- Validació funcional: `/admin/leads` queda preservada com a exemple immediat de pantalla validada pel propietari i no es reobre dins la passada de Pressupostos.
+- Validació humana/UX: regla afegida per ordre directa del propietari: "afegeix aquestes maniobres al protocol".
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1021 — 2026-06-21 — codex (FET)
+
+**Pantalla negra de Pressupostos — cabina comercial + llista responsiva.**
+
+- Passada visual estructural sobre `/admin/presupuestos` i `/admin/presupuestos/[id]`: nova capa `app/admin/presupuestos/presupuestos.css` amb prefix `pr__*`, `AdminPage` eliminat de la carcassa de llista/editor/detall, hero comercial, KPIs, taula desktop i cards mobile.
+- `ProposalsList` respecta `statusFilter` inicial, reordena filtres/accions i conserva les operacions comercials principals; `ProposalOwnerPanel` queda alineat amb tokens i backdrop existent.
+- Inventari actualitzat: Pressupostos i Pressupost detall passen de 🔴 a 🟡. No és `TANCAT CHARLIE`: la revisió humana del propietari queda pendent.
+- Risc pendent: l'editor PDF intern (`PresupuestoPdfStudio`/`StudioPreview`) conserva deute visual i necessita una passada pròpia.
+- `ADMIN_CHANGE_COUNTER` passa a `1021`; el següent canvi real ha de ser `#1022`.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run qa:admin-canon` EXIT 0 · HTTP autenticat `/admin/presupuestos` 200 · Playwright desktop/mobile sense page errors ni overflow · `pnpm run validate:core` EXIT 0.
+- Validació funcional: filtres per estat via querystring operatius; llista i detall conserven accions principals.
+- Validació humana/UX: pendent del propietari a `http://localhost:3000/admin/presupuestos`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1020 — 2026-06-21 — claude (TANCAT)
+
+**Pipeline de leads amb valor ponderat — «el pipeline ÉS el forecast» (§6.6 / Fase 1B del full de ruta).**
+
+- Quick win #1 de `docs/producte-zenit-full-de-ruta.md` (eix conversió): la vista «Pipeline» de `/admin/leads` mostrava només recompte + valor brut; ara mostra **Forecast ponderat** (valor × probabilitat) a la barra de resum i **≈ € ponderat per carril obert**.
+- **⚠️ Error i rectificació:** primer vaig implementar-ho a `LeadPipelineView` + `lib/services/leads/pipeline.ts` SENSE comprovar quina pantalla es renderitza. Resulta que `LeadPipelineView` + `LeadViewToggle` eren **codi mort** (illa morta transitiva preexistent: `LeadViewToggle` no l'importava ningú). `/admin/leads` renderitza `LeadsSeasonClient`. Incompliment de la regla «reflectit al web» + aprofundiment d'una duplicació. El propietari ho va detectar.
+- **Rectificació (monocapa):** esborrada l'illa morta (`LeadPipelineView.tsx`, `LeadViewToggle.tsx`, `lib/services/leads/pipeline.ts` + test, branca `?pipeline=true` de la ruta + `isValidSource`/`LeadSource` orfes). `PipelineBoard` es manté (l'usa el pipeline viu de reserves).
+- **Implementació definitiva** a `app/admin/leads/LeadsSeasonClient.tsx`: helper pur `weightedLeadValue(lead) = round(value × LEAD_SCORING_STATUS_PROBABILITY[realStatus])` (0 per a WON/LOST). Mètrica «Forecast ponderat» + «≈ X €» per carril obert. Reusa la constant canònica que ja alimenta `buildPipelineForecast` al dashboard → una sola veritat, cap map nou.
+- `app/admin/leads/leads-design.css`: `.fx__metric-forecast` i `.fx__lane-forecast` en or canònic (`var(--gold)`).
+- `lib/constants/index.ts`: nova constant canònica `OPEN_PIPELINE_STATUSES`.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` (re-run final). Browser (dev viu): vista Pipeline → mètrica «Forecast ponderat» present i en or (`rgb(215,184,110)`), 0 page errors. Dona 0 € amb les dades actuals (leads oberts sense pressupost), igual que la mètrica «Pipeline» preexistent.
+- Validació funcional: forecast a la pantalla realment renderitzada; illa morta eliminada; probabilitat compartida amb el dashboard.
+- Validació humana/UX: pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
 
 ---
 

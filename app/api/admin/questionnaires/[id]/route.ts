@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { z } from 'zod';
 import {
   getQuestionnaireTemplate,
@@ -37,6 +38,9 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const authError = requireAuth(req);
   if (authError) return authError;
 
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
+
   const existing = await getQuestionnaireTemplate(params.id);
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
@@ -53,6 +57,9 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   const authError = requireAuth(req);
   if (authError) return authError;
+
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   const existing = await getQuestionnaireTemplate(params.id);
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });

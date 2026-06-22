@@ -161,33 +161,33 @@ export default function ProposalOwnerPanel({
 
   return (
     <section
-      className="ap-card p-6"
+      className="ap-card pr__proposalCard"
       aria-label="Re-assignar pressupost"
     >
-      <h3 className="text-sm font-semibold mb-1">Vincles del pressupost</h3>
-      <p className="text-xs text-white/60 mb-4">
+      <h3 className="pr__ref">Vincles del pressupost</h3>
+      <p className="pr__muted text-sm">
         Un pressupost pot estar lligat a un client, un lead i/o una reserva. Pots canviar qualsevol vincle aquí sense haver d’esborrar i recrear.
       </p>
-      <ul className="space-y-3">
+      <ul className="pr__legacyList">
         {ownerRows.map((row) => (
           <li
             key={row.kind}
-            className="rounded-lg border border-[var(--line)] bg-[var(--sunk)] p-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+            className="pr__legacyItem"
           >
             <div className="text-sm">
-              <div className="text-xs uppercase tracking-wide text-white/50">{row.label}</div>
+              <div className="pr__metaLabel">{row.label}</div>
               {row.currentId ? (
                 <>
                   <div className="font-semibold">{row.currentLabel || row.currentId}</div>
                   {row.currentSecondary && (
-                    <div className="text-xs text-white/60 break-all">{row.currentSecondary}</div>
+                    <div className="pr__muted break-all text-xs">{row.currentSecondary}</div>
                   )}
                 </>
               ) : (
-                <div className="text-sm text-white/50 italic">Sense {row.label.toLowerCase()} assignat</div>
+                <div className="pr__muted text-sm italic">Sense {row.label.toLowerCase()} assignat</div>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="pr__rowActions">
               {row.href && (
                 <Link
                   href={row.href}
@@ -223,11 +223,11 @@ export default function ProposalOwnerPanel({
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--ax-overlay-xl)] p-4"
           onClick={() => setOpen(null)}
         >
           <div
-            className="w-full max-w-md ap-card p-5 shadow-2xl"
+            className="w-full max-w-md ap-card pr__proposalCard"
             onClick={(e) => e.stopPropagation()}
           >
             <h4 className="text-sm font-semibold">{config.title}</h4>
@@ -241,9 +241,9 @@ export default function ProposalOwnerPanel({
             />
             <div className="mt-3 max-h-64 overflow-y-auto">
               {loading ? (
-                <p className="text-xs text-white/50 px-1 py-2">Cercant…</p>
+                <p className="pr__muted px-1 py-2 text-xs">Cercant…</p>
               ) : results.length === 0 ? (
-                <p className="text-xs text-white/50 px-1 py-2">{config.emptyHint}</p>
+                <p className="pr__muted px-1 py-2 text-xs">{config.emptyHint}</p>
               ) : (
                 <ul className="space-y-1">
                   {results.map((r) => (
@@ -252,10 +252,10 @@ export default function ProposalOwnerPanel({
                         type="button"
                         onClick={() => void submitChange({ [`${open}Id`]: r.id })}
                         disabled={submitting}
-                        className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-white/10 disabled:opacity-60"
+                        className="adm-row-hover w-full rounded-[var(--o-r-md)] px-3 py-2 text-left text-sm disabled:opacity-60"
                       >
                         <div className="font-medium">{r.primary}</div>
-                        {r.secondary && <div className="text-xs text-white/60">{r.secondary}</div>}
+                        {r.secondary && <div className="pr__muted text-xs">{r.secondary}</div>}
                       </button>
                     </li>
                   ))}

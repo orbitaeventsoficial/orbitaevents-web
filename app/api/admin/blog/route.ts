@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { createAdminBlogPost, deleteAdminBlogPost, listAdminBlogPosts, updateAdminBlogPost } from '@/lib/services/blogAdminService';
 
 export async function GET(req: NextRequest) {
@@ -37,6 +38,8 @@ export async function POST(req: NextRequest) {
   try {
     const authError = requireAuth(req);
     if (authError) return authError;
+    const csrfError = verifyCsrf(req);
+    if (csrfError) return csrfError;
 
     const body = await req.json();
     const result = await createAdminBlogPost(body ?? {});
@@ -54,6 +57,8 @@ export async function PUT(req: NextRequest) {
   try {
     const authError = requireAuth(req);
     if (authError) return authError;
+    const csrfError = verifyCsrf(req);
+    if (csrfError) return csrfError;
 
     const body = await req.json();
     const result = await updateAdminBlogPost(body ?? {});
@@ -71,6 +76,8 @@ export async function DELETE(req: NextRequest) {
   try {
     const authError = requireAuth(req);
     if (authError) return authError;
+    const csrfError = verifyCsrf(req);
+    if (csrfError) return csrfError;
 
     const { searchParams } = new URL(req.url);
     const result = await deleteAdminBlogPost(searchParams.get('id'));

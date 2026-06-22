@@ -12,7 +12,7 @@
 
 | Pàgina | Ruta | Contingut clau | Estat | Nota |
 |---|---|---|---|---|
-| Leads | `/admin/leads` | Calendari temporada, pipeline kanban, focus zone, fitxa lead | 🟡 | Lab #777 + servei #780 + shell #781 + pàgina #782 + dades reals #783 + canvi estat #784 + drag #785 + delete #786 + badge LOST #787 + WhatsApp/correu #788 + fix LOST #789 + enriquit #790 + arxiu #791-#793 + meteo #794 + prioritat inline #796 + reconstrucció Agenda #846 + fitxa interna recuperada #848. **7/8 funcions inventari leads tancades** (#5 suggeriments pendent decisió propietari) |
+| Leads | `/admin/leads` | Calendari temporada, pipeline kanban, focus zone, fitxa lead | 🟢 | **TANCAT CHARLIE** — revisada pel propietari. Lab #777 + servei #780 + shell #781 + pàgina #782 + dades reals #783 + canvi estat #784 + drag #785 + delete #786 + badge LOST #787 + WhatsApp/correu #788 + fix LOST #789 + enriquit #790 + arxiu #791-#793 + meteo #794 + prioritat inline #796 + reconstrucció Agenda #846 + fitxa interna recuperada #848 + forecast ponderat #1020. |
 | Lead fitxa | `/admin/leads/[id]` | Timeline, tasques, documents, scoring, insights | 🟢 | Canvi #810 — `leads-design.css` ampliat (`lp2__*`), `AdminPage` eliminat, sub-components conservats |
 | Lead re-engagement | `/admin/leads/reengagement` | Candidats a recuperar, WhatsApp/email | 🟢 | Canvi #850 — `reengagement.css`, prefix `lr__`, `AdminPage` eliminat, `mailto:` substituït per `buildLeadComposeHref` |
 | Clients (llista) | `/admin/clientes` | Llista, segments, filtres | 🟢 | Canvi #811 — `clientes.css`, prefix `cl__`, cap AdminPage |
@@ -34,8 +34,8 @@
 
 | Pàgina | Ruta | Contingut clau | Estat | Nota |
 |---|---|---|---|---|
-| Pressupostos | `/admin/presupuestos` | Llista de proposals | 🔴 | |
-| Pressupost detall | `/admin/presupuestos/[id]` | Detall, PDF Studio | 🔴 | |
+| Pressupostos | `/admin/presupuestos` | Llista de proposals | 🟡 | Canvi #1021 — `presupuestos.css`, prefix `pr__`, `AdminPage` eliminat de llista/editor/detall; cabina comercial i llista responsiva reordenades. Pendent validació humana per `TANCAT CHARLIE`. |
+| Pressupost detall | `/admin/presupuestos/[id]` | Detall, PDF Studio | 🟡 | Canvi #1021 — shell de detall en pantalla negra amb `pr__*`; Canvi #1029 — fitxa forense `FETA` i CSRF blindat en enviament. Editor PDF intern pendent de passada visual pròpia (`PresupuestoPdfStudio`/`StudioPreview`). |
 | Sales Ops | `/admin/sales-ops` | SLA, seqüències, automatismes | 🔴 | |
 | Intake ràpid | `/admin/intake` | Formulari de nova entrada | 🟢 | Canvi #809 — `intake.css`, prefix `ni-`, extracció IA Gemini, "Nou lead" tret del nav |
 | Quick create | `/admin/quick-create` | Creació assistida lead/pressupost | 🔴 | |

@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { getPricingAdminData, normalizePricingLocale, updateExtraPrice } from '@/lib/services/pricingAdminService';
 
 export const dynamic = 'force-dynamic';
@@ -27,6 +28,8 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
   try {
     const body = await req.json();
     const result = await updateExtraPrice(body?.extraId, body?.price);

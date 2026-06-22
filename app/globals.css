@@ -58,6 +58,10 @@
     --oe-whatsapp-strong: #20BA5A;
     --oe-whatsapp-rgb: 37, 211, 102;
 
+    /* Fons canònic del portal client (sub-app proposta→signatura→pagament).
+       Era el mateix gradient inline repetit ~12 cops a les pàgines del portal. */
+    --o-portal-bg: linear-gradient(160deg, #050709 0%, #0a0d12 40%, #060810 100%);
+
     /* ─────────────────────────────────────────────────────────────────────────
        GRADIENTS
        ───────────────────────────────────────────────────────────────────────── */
@@ -3114,3 +3118,6 @@ html.admin-mode .ap-empty-action {
   html.admin-mode .ap-card-body { padding: 1rem 1.125rem; }
   html.admin-mode .ap-page { gap: 1.25rem; }
 }
+
+/* Fons canònic del portal client — substitueix l'inline repetit ~12× (monocapa). */
+.portal-shell-bg { background: var(--o-portal-bg); }

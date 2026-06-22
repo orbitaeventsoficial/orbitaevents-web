@@ -47,7 +47,7 @@ export default async function ClientPortalGalleryPage({
   }
 
   return (
-    <main className="min-h-screen pb-24 text-white/90" style={{ background: 'linear-gradient(160deg,#050709 0%,#0a0d12 40%,#060810 100%)' }}>
+    <main className="min-h-screen pb-24 text-white/90 portal-shell-bg">
       <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
         <header className="mb-6">
           <Link

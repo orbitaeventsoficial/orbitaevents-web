@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminRole, requireAuth, requirePermission } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import {
   getPackPricingModelConfigEditable,
@@ -23,6 +24,8 @@ export async function POST(req: NextRequest) {
   if (authError) return authError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   try {
     const body = await req.json().catch(() => ({}));

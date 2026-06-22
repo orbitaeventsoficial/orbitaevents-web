@@ -745,6 +745,9 @@ export const LEAD_PIPELINE_COLUMNS = [
   { status: 'LOST', label: 'Perdut', toneClass: 'admin-leads-tone admin-leads-tone--lost', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--lost' },
 ] as const;
 
+/** Estats "oberts" del pipeline comercial (forecast ponderat). WON = tancat; LOST = descartat. */
+export const OPEN_PIPELINE_STATUSES = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] as const;
+
 export const PRIORITY_DOT_CLASS: Record<string, string> = {
   LOW: 'admin-tone-bg-neutral',
   MEDIUM: 'admin-tone-bg-info',

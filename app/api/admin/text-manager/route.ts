@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { requireAuth, requirePermission } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { getTextManagerPayload, runTextManagerAction, saveTextManagerModifications } from '@/lib/services/textManagerService';
 
 export const dynamic = 'force-dynamic';
@@ -24,6 +25,8 @@ export async function PUT(req: NextRequest) {
   if (authError) return authError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
   try {
     const body = await req.json();
     const result = await saveTextManagerModifications(body as {
@@ -45,6 +48,8 @@ export async function POST(req: NextRequest) {
   if (authError) return authError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
   try {
     const body = await req.json();
     const result = await runTextManagerAction((body as { action?: string }).action || '');

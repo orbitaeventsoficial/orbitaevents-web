@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { syncAdminPacksFromConfig } from '@/lib/services/packAdminService';
 
@@ -13,6 +14,8 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   try {
     return NextResponse.json(await syncAdminPacksFromConfig());

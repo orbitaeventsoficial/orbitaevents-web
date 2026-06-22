@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { PRIVACY_CONSENT_STATUS_VALUES, type PrivacyConsentStatus } from '@/lib/constants/privacy';
 import { listConsents, revokeConsent, logPrivacyAction, findConsentById } from '@/lib/services/privacyService';
 import type { ConsentType } from '@prisma/client';
@@ -47,6 +48,9 @@ export async function GET(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   try {
     const body = await req.json();
@@ -97,5 +101,3 @@ export async function DELETE(req: NextRequest) {
     );
   }
 }
-
-

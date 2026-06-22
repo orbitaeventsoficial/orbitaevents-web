@@ -40,7 +40,7 @@ export default async function SignContractPage({
   if (!contractSummary || !contractSummary.awaitingInlineSignature) {
     const portalUrl = `/${locale}/portal/${params.token}`;
     return (
-      <main className="min-h-screen text-white/90 flex items-center justify-center p-6" style={{ background: 'linear-gradient(160deg,#050709 0%,#0a0d12 40%,#060810 100%)' }}>
+      <main className="min-h-screen text-white/90 flex items-center justify-center p-6 portal-shell-bg">
         <div className="max-w-md w-full text-center space-y-4">
           <p className="text-lg font-semibold">
             {contractSummary?.status === 'SIGNED'
@@ -68,7 +68,7 @@ export default async function SignContractPage({
   const accentBg = toRgba(accentHex, 0.15) || 'rgba(6, 182, 212, 0.15)';
 
   return (
-    <main className="min-h-screen text-white/90 relative" style={{ background: 'linear-gradient(160deg,#050709 0%,#0a0d12 40%,#060810 100%)' }}>
+    <main className="min-h-screen text-white/90 relative portal-shell-bg">
       <div className="mx-auto max-w-lg px-4 py-8 sm:px-6">
         <header
           className="rounded-2xl border bg-white/[0.03] p-6 shadow-xl"

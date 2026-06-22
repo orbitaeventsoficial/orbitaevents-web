@@ -334,7 +334,7 @@ export default async function ClientPortalPage({
   const isUpcoming = eventDateObj.getTime() > Date.now();
 
   return (
-    <main className="min-h-screen pb-24 text-white/90 relative" style={{ background: 'linear-gradient(160deg, #050709 0%, #0a0d12 40%, #060810 100%)' }}>
+    <main className="min-h-screen pb-24 text-white/90 relative portal-shell-bg">
       {/* Ambient glow behind hero */}
       <div
         className="pointer-events-none absolute inset-0 overflow-hidden"

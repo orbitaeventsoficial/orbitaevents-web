@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth, requirePermission } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { syncPackPublicPricesToRecommended } from '@/lib/services/packPricingHealth';
 
 export const dynamic = 'force-dynamic';
@@ -18,6 +19,8 @@ export async function POST(req: NextRequest) {
     if (authError) return authError;
     const permissionError = requirePermission(req, 'automation');
     if (permissionError) return permissionError;
+    const csrfError = verifyCsrf(req);
+    if (csrfError) return csrfError;
   }
 
   const result = await syncPackPublicPricesToRecommended();

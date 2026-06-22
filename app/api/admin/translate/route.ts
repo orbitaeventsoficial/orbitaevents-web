@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { detectAdminContentLanguage, translateAdminContent } from '@/lib/services/translationService';
 
@@ -11,6 +12,10 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
+
   const rateLimit = await checkRateLimit(req, {
     limit: 30,
     windowSeconds: 300,

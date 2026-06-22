@@ -236,7 +236,7 @@ export default async function SalesOpsPage() {
             <h2 className="text-sm font-semibold">Contingut social</h2>
             <p className="mt-0.5 text-xs opacity-60">Activitat editorial i conversió orgànica des d&apos;Instagram</p>
           </div>
-          <Link href="/admin/social" className="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10">
+          <Link href="/admin/social" className="ap-btn ap-btn--secondary text-xs">
             Obrir Social →
           </Link>
         </div>

@@ -1,14 +1,18 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockUpdateTask, mockDeleteTask } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockUpdateTask, mockDeleteTask } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockUpdateTask: vi.fn(),
   mockDeleteTask: vi.fn(),
 }));
 
 vi.mock('@/lib/auth', () => ({
   requireAuth: mockRequireAuth,
+}));
+vi.mock('@/lib/csrf', () => ({
+  verifyCsrf: mockVerifyCsrf,
 }));
 vi.mock('@/lib/services/tasks/taskAdminService', () => ({
   updateAdminTask: mockUpdateTask,
@@ -42,6 +46,7 @@ describe('PATCH /api/admin/tasks/[id]', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockRequireAuth.mockReturnValue(null);
+    mockVerifyCsrf.mockReturnValue(null);
     mockUpdateTask.mockResolvedValue({ ok: true, task: { id: 'task-1', status: 'DONE' } });
   });
 
@@ -52,12 +57,26 @@ describe('PATCH /api/admin/tasks/[id]', () => {
     const { req, params } = makePatchReq('task-1', { status: 'DONE' });
     const res = await PATCH(req, params);
     expect(res.status).toBe(401);
+    expect(mockVerifyCsrf).not.toHaveBeenCalled();
+    expect(mockUpdateTask).not.toHaveBeenCalled();
+  });
+
+  it('rebutja CSRF abans de llegir body o actualitzar', async () => {
+    mockVerifyCsrf.mockReturnValueOnce(new Response('{}', { status: 403 }));
+    const { req, params } = makePatchReq('task-1', { status: 'DONE' });
+
+    const res = await PATCH(req, params);
+
+    expect(res.status).toBe(403);
+    expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
+    expect(mockUpdateTask).not.toHaveBeenCalled();
   });
 
   it('actualitza tasca correctament', async () => {
     const { req, params } = makePatchReq('task-1', { status: 'DONE' });
     const res = await PATCH(req, params);
     expect(res.status).toBe(200);
+    expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
     expect(mockUpdateTask).toHaveBeenCalledWith('task-1', { status: 'DONE' });
   });
 
@@ -98,6 +117,7 @@ describe('DELETE /api/admin/tasks/[id]', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockRequireAuth.mockReturnValue(null);
+    mockVerifyCsrf.mockReturnValue(null);
     mockDeleteTask.mockResolvedValue({ ok: true });
   });
 
@@ -108,12 +128,26 @@ describe('DELETE /api/admin/tasks/[id]', () => {
     const { req, params } = makeDeleteReq();
     const res = await DELETE(req, params);
     expect(res.status).toBe(401);
+    expect(mockVerifyCsrf).not.toHaveBeenCalled();
+    expect(mockDeleteTask).not.toHaveBeenCalled();
+  });
+
+  it('rebutja CSRF abans d’eliminar', async () => {
+    mockVerifyCsrf.mockReturnValueOnce(new Response('{}', { status: 403 }));
+    const { req, params } = makeDeleteReq();
+
+    const res = await DELETE(req, params);
+
+    expect(res.status).toBe(403);
+    expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
+    expect(mockDeleteTask).not.toHaveBeenCalled();
   });
 
   it('elimina tasca correctament', async () => {
     const { req, params } = makeDeleteReq('task-1');
     const res = await DELETE(req, params);
     expect(res.status).toBe(200);
+    expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
     expect(mockDeleteTask).toHaveBeenCalledWith('task-1');
   });
 

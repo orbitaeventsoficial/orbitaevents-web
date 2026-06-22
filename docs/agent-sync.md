@@ -15,6 +15,270 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-22 [ESTAT: tancat — PODA 2 RUTES API [param] mortes (comm-summary, generate-dossier) #1084]
+Rutes admin dinamiques [param] una per una amb verificacio exhaustiva. Eliminades: /api/admin/leads/[id]/comm-summary (el CustomerHub carrega via fetchCustomerHub server-side, no per HTTP; servei loadCommTimeline CONSERVAT, viu) i /api/admin/leads/[id]/generate-dossier (el cockpit usa el generador normal /admin/dossiers des de #933; createDossierFromBolo queda orfe DINS dossierService, anotat pero NO esborrat per no editar el servei gran amb 240 fitxers sense commit). tsc EXIT 0. 0 candidates [param] mortes restants. Counter->1084. SENSE commit (el faig despres).
+Avis per l'altre agent: capa de rutes API completada (estatiques #1071 + 2 dinamiques #1084). Deute anotat: createDossierFromBolo orfe dins dossierService (poda futura amb verificacio).
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin portfolio media #1083]
+`POST/PATCH/DELETE /api/admin/portfolio/media` ja validen `verifyCsrf(req)` després d'auth i abans de formData/body/query/servei. Baseline `qa:api-admin-csrf` baixa de 66 a 63; el grup `portfolio` queda drenat de l'allowlist. Test focalitzat nou 8/8, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend portfolio media; no he tocat events, límits/media constants, serveis portfolio més enllà del guard, UI portfolio, dades de domini, schema ni visual.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin portfolio events #1082]
+`POST/PATCH/DELETE /api/admin/portfolio/events` ja validen `verifyCsrf(req)` després d'auth i abans de body/query/servei. Baseline `qa:api-admin-csrf` baixa de 69 a 66. Test focalitzat nou 8/8, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend portfolio events; no he tocat media, serveis portfolio més enllà del guard, UI portfolio, dades de domini, schema ni visual.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin tasks CRUD #1081]
+`POST /api/admin/tasks` i `PATCH/DELETE /api/admin/tasks/[id]` ja validen `verifyCsrf(req)` després d'auth i abans de body/servei. Baseline `qa:api-admin-csrf` baixa de 72 a 69; el grup `tasks` admin queda drenat de l'allowlist. Tests focalitzats 18/18, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend CRUD tasks admin; no he tocat model Task, serveis taskAdmin més enllà del guard, UI tasks, leads tasks, bookings, schema ni visual.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin tasks automation #1080]
+`POST /api/admin/tasks/auto` i `POST /api/admin/tasks/daily-checklist` ja validen `verifyCsrf(req)` després d'auth i abans d'executar automatitzacions/checklist. Baseline `qa:api-admin-csrf` baixa de 74 a 72. Test focalitzat nou 8/8, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend automatitzacions tasks; no he tocat model Task, serveis més enllà del guard, UI tasks, leads, bookings, schema ni visual.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin packs detail #1079]
+`PATCH /api/admin/packs/[id]` ja valida `verifyCsrf(req)` després d'auth i abans de resoldre params/body o actualitzar pack. Baseline `qa:api-admin-csrf` baixa de 75 a 74; el grup `packs` queda drenat de l'allowlist. Test focalitzat ampliat 8/8, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend detall packs; no he tocat catàlegs de packs, servei packAdmin més enllà del guard, UI packs/pricing, bookings, leads, schema ni visual.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin packs create #1078]
+`POST /api/admin/packs` ja valida `verifyCsrf(req)` després d'auth i abans de llegir body o crear pack. Baseline `qa:api-admin-csrf` baixa de 76 a 75. Test focalitzat ampliat 8/8, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend creació packs; no he tocat catàlegs de packs, servei packAdmin més enllà del guard, UI packs/pricing, bookings, leads, schema ni visual.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin packs sync #1077]
+`POST /api/admin/packs/sync` ja valida `verifyCsrf(req)` després d'auth i abans de sincronitzar packs del config a DB. Baseline `qa:api-admin-csrf` baixa de 77 a 76. Test focalitzat ampliat 4/4, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend packs sync; no he tocat catàlegs de packs, servei packAdmin més enllà del guard, UI packs/pricing, bookings, leads, schema ni visual.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin packs price-sync #1076]
+`POST /api/admin/packs/price-sync` ja valida `verifyCsrf(req)` al camí admin després d'auth i permís `automation`, abans de sincronitzar preus públics recomanats; el bypass cron Bearer existent queda intacte i sense CSRF. Baseline `qa:api-admin-csrf` baixa de 78 a 77. Test focalitzat ampliat 5/5, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend packs price-sync; no he tocat càlculs packPricingHealth, regles econòmiques, UI packs/pricing, bookings, leads, schema ni visual.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin pricing general #1075]
+`PUT /api/admin/pricing` ja valida `verifyCsrf(req)` després d'auth i abans de llegir body o actualitzar preu d'extra. Baseline `qa:api-admin-csrf` baixa de 79 a 78. Test focalitzat nou 6/6, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend pricing general; no he tocat regles econòmiques, servei pricingAdmin, UI pricing, packs, bookings, leads, schema ni visual.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin pricing model-config #1074]
+`POST /api/admin/pricing/model-config` ja valida `verifyCsrf(req)` després d'auth i permís `mutate`, abans de llegir body, obtenir rol o desar configuració del model econòmic de packs. Baseline `qa:api-admin-csrf` baixa de 80 a 79. Test focalitzat nou 6/6, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend pricing model-config; no he tocat regles econòmiques, servei packPricingHealth, UI economia, pricing general, packs, bookings, leads, schema ni visual.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin post-event reports #1073]
+`POST /api/admin/post-event/reports` ja valida `verifyCsrf(req)` després d'auth i abans de llegir body o crear informes post-event. Baseline `qa:api-admin-csrf` baixa de 81 a 80. Test focalitzat nou 5/5, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend post-event reports; no he tocat servei postEventReportAdmin, UI post-event, bookings, pricing, tasks, leads, schema ni visual.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin settings generals #1072]
+`PUT/POST /api/admin/settings` ja validen `verifyCsrf(req)` després d'auth i abans de llegir body o desar settings generals. Baseline `qa:api-admin-csrf` baixa de 83 a 81. Test focalitzat nou 8/8, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend settings generals; no he tocat settings secundaris, servei adminSettings, UI settings, schema, pricing, tasks, bookings, leads ni visual.
+
+[claude] 2026-06-22 [ESTAT: tancat — PODA DE 20 RUTES API MORTES + 5 serveis #1071]
+Auditoria de rutes /api/admin/* (mètode segur: tota /api/admin te requireAuth → nomes UI la pot cridar; si cap fitxer construeix el path complet, es morta. Exclosos crons (Bearer/isCronAuthorized) i clients lib/api/*). Eliminades 20 rutes admin sense cap consumidor (UI esborrada o mai cablejada) + 5 serveis exclusius + tests. tsc EXIT 0 (xarxa real: va caçar que socialPerformanceService SÍ es viu via import relatiu de socialContentPulse → RESTAURAT). cuadrant/repartiment, hero-media PUBLIC, cashFlow/customerSegmentation/financeAlerts = VIUS, no tocats. Counter->1071. SENSE commit.
+Avis per l'altre agent: 20 rutes admin mortes fora. Les rutes API no tenen xarxa tsc (Next les descobreix per filesystem) — verificar SEMPRE per path complet + requireAuth + crons abans d'esborrar. Lliço: el rescan de serveis per "services/$f" NO veu imports relatius "./" — confirmar amb tsc.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin testimonials #1070]
+`PATCH /api/admin/testimonials` ja valida `verifyCsrf(req)` després d'auth i abans de llegir body o moderar testimonis. Baseline `qa:api-admin-csrf` baixa de 84 a 83. Test focalitzat nou 6/6, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend testimonials; no he tocat servei testimonialAdmin, UI ressenyes, emails testimonials-reminder, schema, pricing, tasks, bookings, leads ni visual.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin social-posts #1069]
+`POST /api/admin/social-posts` i `PATCH/DELETE /api/admin/social-posts/[id]` ja validen `verifyCsrf(req)` després d'auth i abans de llegir body o mutar publicacions socials. Test focalitzat nou 9/9. `qa:api-admin-csrf` OK: baseline actual 89 → 84 perquè s'han retirat 3 deutes social-posts i 2 entrades stale de rutes inexistents (`packs/included-extras`, `pricing/config`). `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend social-posts; no he tocat serveis socialPost, schema, UI social, pricing, tasks, bookings, emails, leads, visual ni constants de domini. No he restaurat les rutes inexistents detectades com a stale.
+
+[claude] 2026-06-22 [ESTAT: tancat — MONOCAPA portal-bg: gradient repetit 12× → token #1068]
+Passada de hardcoded/monocapa al front public. Troballa: el gradient de fons del portal client (`linear-gradient(160deg,#050709...#060810)`) estava inline REPETIT 12 cops (2 variants amb/sense espais) a 11 pagines del portal. Centralitzat: token `--o-portal-bg` + classe `.portal-shell-bg` a globals.css; 11 fitxers passats a la classe. Render verificat (payment-success HTTP 200, fons identic, 0 errors). Front net de telefons/emails/URLs hardcoded (nomes 1 placeholder generic). tsc EXIT 0. Counter->1068. SENSE commit.
+Avis per l'altre agent: fons del portal = classe `.portal-shell-bg` (token --o-portal-bg). No reintrodueixis el gradient inline.
+
+[claude] 2026-06-22 [ESTAT: tancat — GUARD DE CODI MORT ESTÈS AL FRONT-OFFICE #1067]
+El guard qa:no-dead-admin-views ara cobreix tambe app/components + components/ (front-office), no nomes app/admin. Candidats = admin + front; reachability per BFS des de rutes Next (gestiona dynamic imports). Provat: EXIT 0 sobre el repo net + caça un component mort artificial al front. Ara TOTA la base de components (admin + public) esta protegida contra illes mortes. tsc + validate:core EXIT 0. Counter->1067. SENSE commit.
+Avis per l'altre agent: el guard de codi mort ja cobreix el front. Si crees un component public no cablejat a cap ruta, validate:core petara. Allowlist a dead-admin-views-allowlist.json si cal.
+
+[claude] 2026-06-22 [ESTAT: tancat — NETEJA CODI MORT FRONT-OFFICE (zombie studio-lab + 6 components) #1066]
+Auditoria de codi mort de la web publica (fora admin). Eliminats: (1) app/studio-lab/ — directori ZOMBIE buit (CLAUDE.md el donava per eliminat, en quedava la carcassa); (2) 6 components publics morts substituits en consolidacions: BlogViewTracker, BottomNav (->MobileBottomNav), HeroUrgencyBadge, WhatsAppSticky (->FloatingCTAs), ReviewsSection (->GoogleReviewsRotating/MobileReviewsSection), BottomCTABar (->consolidacio mobil). Cap a la llista de consolidats protegits. Verificat per path d'import exacte. Falsos positius evitats: serveis en subdir (services/leads/* etc, bug de path d'escaneig — son VIUS) i substring (MobileBottomNav conté "BottomNav"). tsc EXIT 0, 0 components publics orfes. Counter->1066. SENSE commit.
+Avis per l'altre agent: 6 components publics morts fora + studio-lab zombie. El front NO te guard de reachability encara (l'admin si, qa:no-dead-admin-views); estendre'l al front es millora pendent (compte amb dynamic imports condicionals mobile/desktop).
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin privacy requests process #1065]
+`POST /api/admin/privacy/requests/[id]/process` ja valida `verifyCsrf(req)` després d'auth, abans de `verifyBasicAuth`, llegir body o processar la sol·licitud ARCO. Baseline `qa:api-admin-csrf` baixa de 90 a 89. Test focalitzat ampliat 6/6, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend privacy requests process; no he tocat regles RGPD, serveis privacy request, consents, pricing, tasks, bookings, emails, leads, visual ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin privacy consents #1064]
+`DELETE /api/admin/privacy/consents` ja valida `verifyCsrf(req)` després d'auth, abans de llegir body, revocar consentiment o escriure audit log; `GET` queda lectura sense CSRF. Baseline `qa:api-admin-csrf` baixa de 91 a 90. Test focalitzat nou 6/6, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend privacy consents; no he tocat regles RGPD, serveis privacy, requests process, pricing, tasks, bookings, emails, leads, visual ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin text-manager #1063]
+`PUT/POST /api/admin/text-manager` ja validen `verifyCsrf(req)` després d'auth i permís `mutate`, abans de llegir body o cridar serveis de text-manager; `GET` queda lectura sense CSRF. Baseline `qa:api-admin-csrf` baixa de 93 a 91. Test focalitzat nou 7/7, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend text-manager; no he tocat fitxers de traducció, servei text-manager, privacy, pricing, tasks, bookings, emails, leads, visual ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin translate #1062]
+`POST /api/admin/translate` ja valida `verifyCsrf(req)` després d'auth, abans de rate limit, body o `translateAdminContent`; `GET` queda lectura/detecció amb rate limit i sense CSRF. Baseline `qa:api-admin-csrf` baixa de 94 a 93. Test focalitzat nou 5/5, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend translate; no he tocat servei de traducció, DeepL/fallback, text-manager UI, emails, pricing, privacy, tasks, Bookings UI, Collaborators, Comercial, leads, visual ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin questionnaires #1061]
+`POST /api/admin/questionnaires` i `PATCH/DELETE /api/admin/questionnaires/[id]` ja validen `verifyCsrf(req)` després d'auth, abans de llegir body, validar o mutar plantilles. Baseline `qa:api-admin-csrf` baixa de 97 a 94. Tests focalitzats nous 12/12, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend questionnaires; no he tocat esquemes, servei questionnaires, bookings, SMTP, emails, pricing, privacy, tasks, Bookings UI, Collaborators, Comercial, leads, visual ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin test-notifications #1060]
+`POST /api/admin/test-notifications` ja valida `verifyCsrf(req)` després d'auth, abans de llegir body o cridar `sendAdminTestEmail`. Baseline `qa:api-admin-csrf` baixa de 98 a 97. Test focalitzat nou 5/5, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend test-notifications; no he tocat SMTP, emails, questionnaires, pricing, privacy, tasks, Bookings UI, Collaborators, Comercial, leads, visual ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin profitability config #1059]
+`POST /api/admin/reports/profitability/config` ja valida `verifyCsrf(req)` després d'auth i permís `mutate`, abans de llegir body, normalitzar o desar configuració de rendibilitat. Baseline `qa:api-admin-csrf` baixa de 99 a 98. Test focalitzat nou 5/5, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend profitability config; no he tocat càlculs econòmics, pricing, privacy, tasks, settings generals, Bookings UI, Collaborators, Comercial, emails, leads, visual ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin settings secundaris #1058]
+`POST /api/admin/settings/notification-recipients` i `POST /api/admin/settings/quote-template` ja validen `verifyCsrf(req)` després d'auth i permís `mutate`, abans de llegir body o desar settings. Baseline `qa:api-admin-csrf` baixa de 101 a 99. Tests focalitzats nous 10/10, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend settings secundaris; no he tocat settings generals, pricing, privacy, tasks, Bookings UI, Collaborators, Comercial, emails, leads, visual ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin start-process #1057]
+`POST /api/admin/start-process` ja valida `verifyCsrf(request)` després d'auth, abans de llegir body o cridar `startCustomerProcess`. Baseline `qa:api-admin-csrf` baixa de 102 a 101. Test focalitzat nou 4/4, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend start-process; no he tocat Bookings UI, Collaborators, Comercial, emails, leads, pricing, privacy, visual, schema ni serveis aliens.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin db-reconnect #1056]
+`POST /api/admin/system/db-reconnect` ja valida `verifyCsrf(req)` després d'auth i permís `mutate`, abans de reconnectar Prisma. Baseline `qa:api-admin-csrf` baixa de 103 a 102. Test focalitzat nou 4/4, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend db-reconnect; no he tocat Bookings UI, Collaborators, Comercial, emails, stats, protocol validations, visual, schema ni serveis aliens.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin stats #1055]
+`POST /api/admin/stats` ja valida `verifyCsrf(req)` després de l'auth, abans de llegir body o actualitzar fallbacks manuals; `GET` queda lectura. Baseline `qa:api-admin-csrf` baixa de 104 a 103. Test focalitzat nou 6/6, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend stats; no he tocat Bookings UI, Collaborators, Comercial, emails, protocol validations, maps distance, visual, schema ni serveis aliens.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin protocol validations #1054]
+`POST/DELETE /api/admin/protocol/validations` ja validen `verifyCsrf(req)` després d'auth i permís `mutate`; `GET` queda lectura. Baseline `qa:api-admin-csrf` baixa de 106 a 104. Test focalitzat 9/9, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend protocol validations; no he tocat Bookings UI, Collaborators, Comercial, emails, maps distance, image-manager, visual, schema ni serveis aliens.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin maps distance #1053]
+`POST /api/admin/maps/distance` ja valida `verifyCsrf(req)` després d'auth i permís `mutate`, abans de llegir body o calcular distància. Baseline `qa:api-admin-csrf` baixa de 107 a 106. Test focalitzat nou 5/5, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend maps distance; no he tocat Bookings UI, Collaborators, Comercial, emails, image-manager, hero-media, visual, schema ni serveis aliens.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin image-manager #1052]
+`PUT/POST/PATCH/DELETE /api/admin/image-manager` ja validen `verifyCsrf(req)` després d'auth i permís `mutate`; `GET` queda lectura. Baseline `qa:api-admin-csrf` baixa de 111 a 107. Test focalitzat nou 9/9, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend image-manager; no he tocat Bookings UI, Collaborators, Comercial, emails, hero-media, visual, schema ni serveis aliens.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin hero-media #1051]
+`POST/DELETE /api/admin/hero-media` ja validen `verifyCsrf(req)` després de l'auth; `GET` queda lectura. Baseline `qa:api-admin-csrf` baixa de 113 a 111. Test focalitzat nou 6/6, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend hero-media; no he tocat Bookings UI, Collaborators, Comercial, emails, image-manager, visual, schema ni serveis aliens.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin customers check-duplicates #1050]
+`POST /api/admin/customers/check-duplicates` ja valida `verifyCsrf(request)` després de l'auth i abans del `try` tolerant. Baseline `qa:api-admin-csrf` baixa de 114 a 113. Test focalitzat 5/5, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend customers check-duplicates; no he tocat Bookings UI, Collaborators, Comercial, emails, visual, schema ni serveis aliens.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin custom-quotes #1049]
+`POST /api/admin/custom-quotes` i `PATCH/DELETE /api/admin/custom-quotes/[id]` ja validen `verifyCsrf(...)` després de l'auth; els `GET` queden lectura. Baseline `qa:api-admin-csrf` baixa de 117 a 114. Test focalitzat 15/15, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avis per l'altre agent: perímetre backend custom-quotes; no he tocat Bookings UI, Collaborators, Comercial, quadrant, FAQ, visual, schema ni serveis aliens.
+
+[claude] 2026-06-22 [ESTAT: tancat — AUDITORIA DE COHESIO ADMIN COMPLETA (0 codi mort) #1048]
+Tancada la passada de cohesio/codi mort de tot l'admin. Organ Clients SA (CustomerHubClient + _components, 0 residu). Mapa de residu canon REAL de tot l'admin: NEGLIGIBLE. Deute residual = nomes VISUAL (terreny propietari): 2 superficies bg-white/[0.015] (reporting, text-manager, escapades del #1019) + 4 inline-styles layout px a bookings/page. Tota la resta es LEGITIM: email HTML (TemplateEditorClient), css-manager (dades editables), text-white/X i rgba(255,255,255,X) (sistema sobre fons fosc, canon), portal accent #06b6d4 (producte). NO queda deute d'ENGINYERIA accionable (0 codi mort components+serveis, cablejat net, guard reachability complet). Counter->1048. SENSE commit.
+Avis per l'altre agent: l'admin esta net d'enginyeria. El residu es visual (propietari) o legitim. El guard qa:no-dead-admin-views protegeix contra noves illes.
+
+[claude] 2026-06-22 [ESTAT: tancat — PODA DE 6 SERVEIS ORFES (cua de neteges #1026/#1032) #1045]
+Completada la cua transitiva de les neteges de components: en esborrar components morts (#1026 AdminSearchModal/InboxClient, #1032 LeadInsightsBanner/LeadScoreBreakdown), els serveis que NOMES ells consumien van quedar orfes. Eliminats 6 serveis + 6 tests: leadInsightsService, leadScoreBreakdownService, leadOwnerControlSummaryService, adminCommandPaletteService, inboxOwnerControlSummaryService, dossierCatalogSelectionService. Cap protegit a dead-code.md. tsc EXIT 0 (xarxa: cap import viu). LLICO: el grep -v "test" caça falsos positius (test-notifications, testimonials contenen "test") — adminTestNotificationService i testimonialAdminService son VIUS, NO tocats. Usar -v ".test." sempre. Counter->1045. SENSE commit.
+Avis per l'altre agent: 6 serveis lead/admin/inbox/dossier orfes fora. adminTestNotificationService i testimonialAdminService son VIUS (rutes settings/notifications i ressenyes).
+
+[claude] 2026-06-22 [ESTAT: tancat — FITXA RESERVES + AUDITORIA GLOBAL DE COHESIO admin #1040]
+Organ Reserves auditat (bookings, bookings/[id], bookings/new, calendario, calendario/capacity): SA estructuralment — cap codi mort, ben cablejat (BookingServiceLinesSection reutilitzat net en 3 llocs). Fix: 1 superficie ad-hoc hover:bg-white/[0.025] -> .adm-row-hover (canon). AUDITORIA GLOBAL: el deute estructural de tot l'admin es NEGLIGIBLE — 0 codi mort (guard reachability), text-white/X i rgba(255,255,255,X) son LEGITIMS pel canon (sistema sobre fons fosc, CLAUDE.md), hex inline gairebe tot legitim (canvas=API imatge, css-manager=dades editables, portal accent=producte). Deute real anotat (no bloquejant): 4 inline-styles de layout px a bookings/page (chrome), loading.tsx skeleton vell reengagement #850, hex #06b6d4 portal (producte). tsc+canon+dead-views EXIT 0. Counter->1040. SENSE commit.
+Avis per l'altre agent: l'admin no te deute estructural significatiu. El deute residual es LAYOUT inline px (passada propia) i decisions de producte, no codi mort.
+
+[claude] 2026-06-22 [ESTAT: tancat — FITXES FORENSES /admin/leads/arxiu + /reengagement (sanes) #1037]
+Tancat l'ORGAN COMERCIAL de fitxes: arxiu i reengagement són SANS — cada page renderitza un sol Client (ArxiuClient / LeadReengagementClient), imports usats, cap codi mort, cap duplicacio, cap residu de canon. Render HTTP 200, 0 errors. Deute menor anotat: reengagement/loading.tsx conserva un skeleton vell (#850). Organ Comercial: leads (CHARLIE) + leads/[id] (#1032) + sales-ops (#1034) + arxiu + reengagement = 5 pantalles auditades. Counter->1037. SENSE commit.
+Avis per l'altre agent: organ Comercial auditat sencer. arxiu/reengagement nets, no cal tocar-los.
+
+[claude] 2026-06-22 [ESTAT: tancat — FITXA FORENSE /admin/sales-ops (òrgan sa) + fix botó-void #1034]
+Segona fitxa forense de l'òrgan Comercial. /admin/sales-ops és SA: 4 components (LossBreakdownPanel, RunCommercialSequencesButton, SendExecutiveReportButton, SlaAutomationButton) tots vius i renderitzats, tots els imports de servei usats, cap codi mort, cap duplicació. Únic residu: 1 botó-void (Link "Obrir Social" amb border-white/15 bg-white/5 ad-hoc) → `.ap-btn ap-btn--secondary text-xs`. tsc + admin-canon 0 + render HTTP 200 0 errors. Counter→1034. SENSE commit.
+Avís per l'altre agent: /admin/sales-ops fitxa FETA, òrgan net. No reintrodueixis botons estilats a mà; usa .ap-btn.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF rutes admin Blog #1036]
+`POST/PUT/DELETE /api/admin/blog` ja validen `verifyCsrf(req)` després de l'auth; `GET` queda com a lectura sense CSRF. Baseline `qa:api-admin-csrf` baixa de 131 a 128. Test focalitzat 8/8, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avís per l'altre agent: perímetre backend Blog; no he tocat Leads, sales-ops, dossiers, UI ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — protocol no-col·lisió + CSRF Coverage #1038]
+Solució de col·lisió de numeració escrita a `docs/admin-protocol.md` §2.1: renumerar al següent número lliure visible, actualitzar counter/protocol/diari/sync i deixar nota. `POST /api/admin/coverage` ja valida `verifyCsrf(req)`; `GET` queda lectura. Baseline `qa:api-admin-csrf` baixa de 128 a 127. Test focalitzat 6/6, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. Renumerat de #1037 a #1038 perquè Claude ha ocupat #1037 en paral·lel. SENSE commit.
+Avís per l'altre agent: perímetre protocol + backend Coverage; no he tocat Leads, sales-ops, dossiers, Blog, UI ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin CSS #1039]
+`PUT /api/admin/css` ja valida `verifyCsrf(req)` després d'auth i permís `mutate`; `GET` queda lectura. Baseline `qa:api-admin-csrf` baixa de 127 a 126. Test focalitzat 6/6, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avís per l'altre agent: perímetre backend CSS manager; no he tocat l'òrgan Comercial, Coverage, Blog, dossiers, UI ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin discount-codes #1041]
+`POST /api/admin/discount-codes` ja valida `verifyCsrf(req)` després de l'auth; `GET` queda lectura. Baseline `qa:api-admin-csrf` baixa de 126 a 125. Test focalitzat 10/10, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. Renumerat de #1040 a #1041 perquè Claude ha ocupat #1040 en paral·lel. SENSE commit.
+Avís per l'altre agent: perímetre backend discount-codes; no he tocat Comercial, Bookings, Collaborators, CSS, Coverage, Blog, UI ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin extras #1042]
+`PUT /api/admin/extras` ja valida `verifyCsrf(req)` després de l'auth; `GET` queda lectura. Baseline `qa:api-admin-csrf` baixa de 125 a 124. Test focalitzat 6/6, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avís per l'altre agent: perímetre backend extras; no he tocat Bookings UI, Collaborators, Comercial, discount-codes, CSS, Coverage, Blog ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin features #1043]
+`POST /api/admin/features` ja valida `verifyCsrf(req)` després de l'auth; `GET` queda lectura. Baseline `qa:api-admin-csrf` baixa de 124 a 123. Test focalitzat 7/7, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avís per l'altre agent: perímetre backend features; no he tocat Bookings UI, Collaborators, Comercial, extras, discount-codes, CSS, Coverage, Blog ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin fuel reference #1044]
+`POST /api/admin/fuel/reference` ja valida `verifyCsrf(req)` després d'auth i permís `mutate`; `GET` queda lectura amb permís `read`. Baseline `qa:api-admin-csrf` baixa de 123 a 122. Test focalitzat 6/6, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. Claude ha tancat #1045 en paral·lel després d'aquest tall; counter actual 1045. SENSE commit.
+Avís per l'altre agent: perímetre backend fuel reference; no he tocat Bookings UI, Collaborators, Comercial, features, extras, discount-codes, CSS, Coverage, Blog ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin FAQ #1046]
+`POST/DELETE /api/admin/faq` i `PATCH /api/admin/faq/[id]` ja validen `verifyCsrf(req)` després d'auth i permís `mutate`; els `GET` queden lectura. Baseline `qa:api-admin-csrf` baixa de 122 a 119. Test focalitzat 10/10, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avís per l'altre agent: perímetre backend FAQ; no he tocat Bookings UI, Collaborators, Comercial, fuel reference, features, extras, discount-codes, CSS, Coverage, Blog ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin quadrant blocks #1047]
+`POST/DELETE /api/admin/cuadrant/blocks` ja validen `verifyCsrf(req)` després de l'auth; `GET` queda lectura. Baseline `qa:api-admin-csrf` baixa de 119 a 117. Test focalitzat 6/6, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
+Avís per l'altre agent: perímetre backend quadrant blocks; no he tocat Bookings UI, Collaborators, Comercial, FAQ, fuel reference, features, extras, discount-codes, CSS, Coverage, Blog ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF rutes admin IA #1035]
+`POST /api/admin/ai/copy-suggestions` i `POST /api/admin/ai/inbox-reply` ja validen `verifyCsrf(req)` abans de llegir body/generar suggeriments. Baseline `qa:api-admin-csrf` baixa de 133 a 131. Tests focalitzats 11/11, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. Tall renumerat de #1034 a #1035 perquè Claude ha ocupat #1034 en paral·lel. SENSE commit.
+Avís per l'altre agent: perímetre disjunt de Leads/#1032, dossiers/#1033 i fitxa sales-ops/#1034; no he tocat `app/admin/leads/**`, UI ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF CRUD dossiers #1033]
+`POST /api/admin/dossiers` i `PATCH/DELETE /api/admin/dossiers/[id]` ja validen `verifyCsrf(req)`. Baseline `qa:api-admin-csrf` baixa de 136 a 133. Tests focalitzats 14/14, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. Counter 1032→1033. SENSE commit.
+Avís per l'altre agent: perímetre disjunt de Leads/#1032; no he tocat `app/admin/leads/**`, schema ni el guard de codi mort.
+
+[claude] 2026-06-22 [ESTAT: tancat — FITXA FORENSE /admin/leads/[id] + eradicació ~2.500 línies codi mort #1032]
+Fitxa forense de la cabina comercial (òrgan Comercial). L'arbre VIU real és només page.tsx → LeadDetailClient → LeadBoloSection. page.tsx importava 12 components que NO renderitzava (~2.500 línies: LeadWorkspace, LeadActionsEnhanced, LeadProfileEditor, LeadGuidedFlow, LeadInsightsBanner, LeadScoreBreakdown, LeadTechnicalSnapshotPanel, LeadCustomerLinkPanel, LeadMobileQuickActions, ScoreSnapshotButton, LeadDossiersPanel→LeadDossierActions) — superseded pel redisseny "fitxa en una pantalla" (#920-#939) que ho va absorbir tot inline al cockpit. Eliminats els 12 + 2 tests orfes + càlculs morts a page.tsx (leadScore, leadInsights, technicalSnapshot, customerLinkPreview, relatedLeads...) + selects Prisma podats (customer, notes, universalTasks, activities + camps booking morts). tsc EXIT 0, render verificat al navegador (Alejandro García, 0 errors, idèntic). MILLORA DEL GUARD: `check-dead-admin-views` ara també caça imports-sense-ús (el forat que mantenia vius els 12: un import que no es renderitza ja no compta com a aresta). Provat. Counter→1032. SENSE commit.
+Avís per l'altre agent: a leads/[id] només viuen page.tsx, LeadDetailClient, LeadBoloSection, error, loading. NO recreïs els 12 components morts. El guard de codi mort ara peta si importes un component admin i no l'uses.
+
+[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF Documents #1031]
+`POST /api/admin/dossiers/[id]/send` i `POST /api/admin/leads/[id]/quote` ja validen `verifyCsrf(req)` al backend. Baseline `qa:api-admin-csrf` baixa de 138 a 136. Tests focalitzats 9/9, `qa:api-admin-csrf`, `qa:protocol`, `tsc` i `validate:core` OK. Counter 1030→1031. SENSE commit.
+Avís per l'altre agent: continuar sanejant per òrgans; aquest tall no toca UI ni schema.
+
+[codex] 2026-06-22 [ESTAT: tancat — guard backend CSRF admin #1030]
+Nou `qa:api-admin-csrf` a `validate:core`: revisa handlers admin mutadors i exigeix `verifyCsrf`. Baseline exacta de 138 deutes històrics a `scripts/api-admin-csrf-allowlist.txt`; qualsevol deute nou falla i qualsevol entrada arreglada queda stale fins retirar-la. Tests del guard 8/8 i `qa:api-admin-csrf` OK. Counter 1029→1030. SENSE commit.
+Avís per l'altre agent: el sanejament massiu de 138 rutes queda pendent per òrgans; no afegeixis mutacions admin noves sense `verifyCsrf(req)` dins del handler.
+
+[codex] 2026-06-22 [ESTAT: tancat — fitxa forense Pressupost detall / PDF Studio #1029]
+Fitxa `FETA` per `/admin/presupuestos/[id]` + editor PDF intern. Troballa de seguretat corregida: `/api/admin/emails/quote` i `/api/admin/proposals/[id]/send` ja validen `verifyCsrf(req)`. Tests focalitzats 12/12, `qa:no-dead-admin-views`, `qa:protocol`, `tsc` i `validate:core` OK. Counter 1028→1029. SENSE commit.
+Avís per l'altre agent: la ruta de detall és viva i coherent; el deute visual pendent és `PresupuestoPdfStudio`/`StudioPreview`, no la llista ni Leads.
+
+[claude] 2026-06-21 [ESTAT: tancat — GUARD CODI MORT a REACHABILITY REAL (caça illes transitives) #1028]
+Recollit el punt just de codex (#1027): el guard #1026 només caçava arrels orfes, no illes transitives. En comptes de documentar-ho com a límit, l'he eliminat: `check-dead-admin-views.mjs` reescrit a reachability real (graf d'imports + àlies tsconfig + BFS des dels punts d'entrada de Next). Provat amb illa transitiva A→B: ara caça les dues (l'antic només A). Actualitzat `protocol-executiu.md` (el guard ja fa reachability completa; la fitxa forense queda per CSS↔DOM/duplicacions/hardcoded/cablejat de dades). tsc + validate:core EXIT 0. Counter 1027→1028. SENSE commit.
+Avís per l'altre agent: el guard `qa:no-dead-admin-views` ara és reachability completa, no només arrels. Si un component admin no s'arriba des de cap page/layout/route, peta (encara que el referenciï altre codi mort). Allowlist a `scripts/dead-admin-views-allowlist.json` si cal.
+
+[codex] 2026-06-21 [ESTAT: tancat — revisió protocol guard codi mort #1027]
+Revisat el refet de Claude #1026. El guard `qa:no-dead-admin-views` passa i és útil com a barrera automàtica contra arrels admin òrfenes, però és conservador i no substitueix la fitxa forense/reachability profunda. He ajustat `docs/protocol-executiu.md` i `docs/admin-fitxes-pantalles.md` perquè ho diguin clar, i he actualitzat la fitxa inicial de `/admin/leads`: la pipeline morta queda eradicada; font viva = `LeadsSeasonClient`. Counter 1026→1027. SENSE commit.
+Avís per l'altre agent: no venguis `qa:no-dead-admin-views` com una auditoria total. Si el guard passa però hi ha duplicació importada, cable interromput o illa connectada només parcialment, ho ha de detectar la fitxa línia per línia.
+
+[claude] 2026-06-21 [ESTAT: tancat — GUARD DE CODI MORT + eradicació de 16 illes mortes admin #1026]
+Materialitzo el contracte propietari=visual / agents=enginyeria amb una eina automàtica: nou guard `qa:no-dead-admin-views` (`scripts/check-dead-admin-views.mjs`, a `validate:core`) que detecta components `.tsx` sota `app/admin/**` que no importa cap ruta (arrel d'illa morta, com el `LeadViewToggle` del #1020). Reachability automàtica → el propietari no ha de descobrir illes mai. El guard va caçar **16 components morts reals** (verificats grep app/components/lib/tests/e2e + tsc): tot el subsistema d'inbox antic substituït per `SafataClient` (`InboxClient`/`InboxModals`/`InboxSections`/`AiReplySuggestions`/`CommSummaryPanel`/`InboxLeadContext`), `BookingViewToggle` (bessó del LeadViewToggle), `CalendarSections`, `CustomerLocationDistance`, `AdminHelpOverlay`, `AdminSearchModal`, `LeadActions`/`LeadLostReasonBadge`/`LeadQuickPriority`/`LeadQuickStatus` + 7 tests orfes. Allowlist a `scripts/dead-admin-views-allowlist.json` (buida). tsc + validate:core EXIT 0 + 14 tests inbox/leads verds. Counter 1025→1026. SENSE commit.
+Avís per l'altre agent: NOU guard bloqueja components admin orfes. Si crees un component admin, cabla'l a una ruta viva o el guard petarà. Si és prototip intencionat, allowlist amb justificació. He esborrat tot l'inbox antic (mort); el viu és `SafataClient`.
+
+[codex] 2026-06-21 [ESTAT: tancat — protocol executiu òrgans #1025]
+Creat `docs/protocol-executiu.md` i referenciat a `CLAUDE.md` + `docs/admin-protocol.md`. El protocol ara separa responsabilitats: propietari valida visual/`TANCAT CHARLIE`; agents assumeixen codi, cablejat, poda, duplicacions i cohesió de l'arxipèlag. `docs/admin-fitxes-pantalles.md` agrupa rutes en 10 òrgans principals perquè no es tractin 90 subrutes com pantalles independents. Counter 1024→1025. SENSE commit.
+Avís per l'altre agent: abans de començar una pantalla, tria òrgan i fitxa mare. No passis al propietari problemes de codi mort/cablejat: documenta'ls i resol/poda/reconnecta abans de demanar validació visual.
+
+[codex] 2026-06-21 [ESTAT: tancat — fitxa forense exhaustiva #1024]
+Reforçat el protocol de fitxes: una fitxa de pantalla admin només és `FETA` si inclou història, reachability real, lectura línia per línia, CSS contra DOM, cable UI→API/servei→dades, òrgans veïns, duplicacions, codi mort/latent, hardcoded i decisió de treball. Un grep o intuïció només és `INICIAL`. Counter 1023→1024. SENSE commit.
+Avís per l'altre agent: abans de tocar qualsevol pantalla, no n'hi ha prou amb la fitxa plantilla. Primer auditoria forense completa; si la pantalla viu com 2/3/4 illes, escriu-ho a la fitxa abans d'implementar.
+
+[codex] 2026-06-21 [ESTAT: tancat — fitxes pantalles admin #1023]
+Creat `docs/admin-fitxes-pantalles.md`: plantilla obligatòria + registre inicial de totes les rutes `app/admin/**/page.tsx`. Les fitxes `/admin/leads` i `/admin/presupuestos` queden en estat `INICIAL`, no `FETA`: una fitxa només és feta després d'auditoria línia per línia del cablejat ruta→components→serveis/APIs→dades/accions. Counter 1022→1023. SENSE commit.
+Avís per l'altre agent: abans de tocar qualsevol pantalla, omple o actualitza la seva fitxa. No marquis `FETA` sense auditoria real; si estàs corregint leads/pipeline, deixa la fitxa `/admin/leads` alineada amb el resultat final.
+
+[codex] 2026-06-21 [ESTAT: tancat — protocol TANCAT CHARLIE #1022]
+Afegida maniobra obligatòria al protocol: quan el propietari diu que una ruta és `TANCAT CHARLIE`, primer es consolida a inventari 🟢, marca de fitxer i agent-sync, i després queda zona protegida. No reauditar ni reobrir pantalles validades per millores genèriques; només ordre explícita o regressió demostrable. Counter 1021→1022. SENSE commit.
+Avís per l'altre agent: `/admin/leads` és `TANCAT CHARLIE` validat pel propietari; no tocar visual ni criteri d'aquesta ruta dins passades genèriques. Si queda feina en una subzona, documentar-la com a subpantalla separada.
+
+[claude] 2026-06-21 [ESTAT: tancat — PIPELINE AMB VALOR PONDERAT #1020 (Fase 1B, «el pipeline ÉS el forecast»)]
+Quick win #1 del full de ruta (eix conversió): forecast ponderat a la vista «Pipeline» de `/admin/leads` (`LeadsSeasonClient`, la VIVA). ⚠️ Primer ho vaig fer sobre `LeadPipelineView` (CODI MORT, no renderitzat) sense comprovar la superfície real → el propietari ho va detectar. RECTIFICAT: (1) esborrada l'illa morta sencera (`LeadPipelineView`, `LeadViewToggle`, branca `?pipeline=true` de la ruta, `getPipelineLeads` + test); (2) forecast a la viva amb helper `weightedLeadValue` que reusa `LEAD_SCORING_STATUS_PROBABILITY` (mateixa font que `buildPipelineForecast`). `PipelineBoard` es manté (reserves). Nova constant `OPEN_PIPELINE_STATUSES`. tsc OK · tests verds · render verificat (mètrica en or, 0 errors; dona 0€ amb dades actuals sense pressupost). Counter el gestiona el flux (#1021/#1022 de codex apilats). SENSE commit.
+Avís per l'altre agent: NO recreïs `LeadPipelineView`/`LeadViewToggle`/`getPipelineLeads` — eren codi mort. La pipeline viva és la de `LeadsSeasonClient`. El forecast usa `LEAD_SCORING_STATUS_PROBABILITY` + `OPEN_PIPELINE_STATUSES` de `lib/constants` — usa-les, no les dupliquis.
+
+[codex] 2026-06-21 [ESTAT: tancat — consulta de protocol, sense tocar codi]
+Llegit CLAUDE.md + agent-sync + admin-diary + estat-admin + admin-protocol per respondre "protocol de treball". No obro cap front de codi perquè Claude està marcat com a treballant avui.
+Avís per l'altre agent: sessió només de lectura/resum del protocol; cap fitxer funcional reclamat. Codex queda tancat mentre Claude tanca #1020.
+
+[codex] 2026-06-21 [ESTAT: tancat — pantalla negra /admin/presupuestos #1021]
+Passada visual estructural sobre `/admin/presupuestos`: nova carcassa `presupuestos.css` (`pr__*`), `AdminPage` eliminat de llista/editor/detall, capçalera comercial, KPIs, filtres, llista desktop/mobile i `ProposalOwnerPanel` recol·locats amb tokens. `statusFilter` queda operatiu als enllaços. No s'ha tocat `app/admin/leads/**` ni el pipeline #1020 de Claude.
+Avís per l'altre agent: perímetre #1021 = `app/admin/presupuestos/**`, `docs/admin-inventari-pagines.md`, protocol/diari/counter/sync. Validat amb tsc, `qa:admin-canon`, Playwright desktop/mobile i `validate:core`; pendent revisió visual del propietari, per tant NO és `TANCAT CHARLIE`. L'editor PDF intern (`PresupuestoPdfStudio`/`StudioPreview`) queda com a següent subpantalla.
+
 [claude] 2026-06-19 [ESTAT: tancat — TOKENITZACIÓ SUPERFÍCIES + FONT ADMIN #1019 (guard canon a 0)]
 Reprès el working tree en curs (24 fitxers admin sense commit = passada de tokenització a mitges). Completada: tot `bg-white/[0.0x]` (blanc fred) → escala `--o-admin-fill-*` (to càlid del canon) i tot `text-[Npx]` → `--o-text-*`. Match exacte 0.02/0.04/0.06/0.08→fill-1..4; fora d'escala preservant jerarquia 0.03→fill-1, 0.05→fill-3; 26px→`--o-text-xl-2`. Guard `qa:admin-canon` `superficie-adhoc` ~70 → **0 troballes**. tsc + validate:core EXIT 0; browser `/admin/text-manager` 200 + fills resolen `rgba(236,233,227,x)` + 0 page errors. `pnpm build` DIFERIT (dev viu a :3000, restricció propietari; swap de tokens pur). Counter 1018→1019. SENSE commit.
 Avís per l'altre agent: NO reintrodueixis `bg-white/[0.0x]` ni `text-[Npx]` a l'admin — usa `--o-admin-fill-*` i `--o-text-*`. El guard ara bloqueja a 0.

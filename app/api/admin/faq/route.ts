@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { requireAuth, requirePermission } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { createAdminFaq, deleteAdminFaq, listAdminFaqs } from '@/lib/services/faqAdminService';
 
 export const dynamic = 'force-dynamic';
@@ -24,6 +25,9 @@ export async function POST(req: NextRequest) {
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
 
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
+
   try {
     const body = await req.json();
     const result = await createAdminFaq(body);
@@ -39,6 +43,9 @@ export async function DELETE(req: NextRequest) {
   if (authError) return authError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
+
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   try {
     const { searchParams } = new URL(req.url);

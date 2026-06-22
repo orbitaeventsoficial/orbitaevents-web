@@ -1,12 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
-const { mockRequireAuth, mockGenerateCopy } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockGenerateCopy } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockGenerateCopy: vi.fn(),
 }));
 
 vi.mock('@/lib/auth', () => ({ requireAuth: mockRequireAuth }));
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 vi.mock('@/lib/services/copyAiSuggestionsService', () => ({
   generateCopySuggestions: mockGenerateCopy,
 }));
@@ -25,6 +27,7 @@ describe('POST /api/admin/ai/copy-suggestions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockRequireAuth.mockReturnValue(null);
+    mockVerifyCsrf.mockReturnValue(null);
     mockGenerateCopy.mockResolvedValue({
       suggestions: ['Text A', 'Text B', 'Text C'],
       generatedAt: '2026-05-20T00:00:00.000Z',
@@ -39,6 +42,14 @@ describe('POST /api/admin/ai/copy-suggestions', () => {
     mockRequireAuth.mockReturnValue(new Response('Unauthorized', { status: 401 }));
     const res = await POST(makeRequest({ type: 'quote-why-us', context: 'test' }));
     expect(res.status).toBe(401);
+    expect(mockVerifyCsrf).not.toHaveBeenCalled();
+    expect(mockGenerateCopy).not.toHaveBeenCalled();
+  });
+
+  it('rebutja sense CSRF', async () => {
+    mockVerifyCsrf.mockReturnValueOnce(new Response(JSON.stringify({ error: 'CSRF' }), { status: 403 }));
+    const res = await POST(makeRequest({ type: 'quote-why-us', context: 'test' }));
+    expect(res.status).toBe(403);
     expect(mockGenerateCopy).not.toHaveBeenCalled();
   });
 
@@ -47,6 +58,7 @@ describe('POST /api/admin/ai/copy-suggestions', () => {
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.suggestions).toHaveLength(3);
+    expect(mockVerifyCsrf).toHaveBeenCalledTimes(1);
   });
 
   it('retorna suggeriments per social-caption', async () => {

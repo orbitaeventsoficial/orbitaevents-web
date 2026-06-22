@@ -19,7 +19,6 @@ vi.mock('@/lib/services/leadAdminService', () => ({
   createAdminLead: mockCreateAdminLead,
   listAdminLeads: vi.fn(),
 }));
-vi.mock('@/lib/services/leads/pipeline', () => ({ getPipelineLeads: vi.fn() }));
 vi.mock('@/lib/services/leads/leadCustomerLinkService', () => ({
   previewLeadCustomerLink: mockPreviewLeadCustomerLink,
   linkLeadToCustomer: mockLinkLeadToCustomer,

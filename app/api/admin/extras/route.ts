@@ -1,6 +1,7 @@
 ﻿// app/api/admin/extras/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import {
   getExtrasConfiguratorConfig,
   saveExtrasConfiguratorConfig,
@@ -17,6 +18,9 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   const body = await req.json().catch(() => null);
   const config = body?.config;

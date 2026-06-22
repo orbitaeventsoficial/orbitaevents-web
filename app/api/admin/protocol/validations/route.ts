@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getAdminRole, requireAuth, requirePermission } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import {
   loadCanviValidations,
   recordCanviValidation,
@@ -34,6 +35,9 @@ export async function POST(req: NextRequest) {
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
 
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
+
   const body = await req.json().catch(() => null);
   const parsed = recordSchema.safeParse(body);
   if (!parsed.success) {
@@ -56,6 +60,9 @@ export async function DELETE(req: NextRequest) {
   if (authError) return authError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
+
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   const body = await req.json().catch(() => null);
   const parsed = deleteSchema.safeParse(body);

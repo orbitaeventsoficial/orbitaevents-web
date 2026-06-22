@@ -1,16 +1,16 @@
 import Link from 'next/link';
 import dynamicImport from 'next/dynamic';
 import { prisma } from '@/lib/prisma';
-import { AdminPage } from '../components/AdminPage';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { formatCurrency } from '@/lib/constants';
 import ProposalsList from './ProposalsList';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import './presupuestos.css';
 
 const PresupuestoPdfStudio = dynamicImport(() => import('./PresupuestoPdfStudio'), {
   ssr: false,
   loading: () => (
-    <section className="rounded-2xl border p-6 text-sm">
+    <section className="pr__loading">
       Carregant editor de pressupostos...
     </section>
   ),
@@ -35,11 +35,12 @@ function buildSchedule(start?: string | null, end?: string | null): string {
 export default async function PresupuestosPage({
   searchParams,
 }: {
-  searchParams?: { customerId?: string; leadId?: string; proposalId?: string };
+  searchParams?: { customerId?: string; leadId?: string; proposalId?: string; statusFilter?: string };
 }) {
   const customerId = searchParams?.customerId || '';
   const leadId = searchParams?.leadId || '';
   const proposalId = searchParams?.proposalId || '';
+  const statusFilter = searchParams?.statusFilter || '';
 
   // If we have customerId or proposalId, show the editor
   const showEditor = Boolean(customerId || proposalId || leadId);
@@ -275,20 +276,26 @@ export default async function PresupuestosPage({
         };
 
     return (
-      <AdminPage
-        title="Pressupostos"
-        subtitle="Tots els pressupostos creats. Filtra, cerca i gestiona des d'aquí."
-        actions={
+      <main className="pr__page">
+        <header className="pr__hero">
+          <div>
+            <p className="pr__eyebrow">Comercial · Pressupostos</p>
+            <h1 className="pr__title">Pressupostos</h1>
+            <p className="pr__subtitle">
+              Controla què s'ha ofert, què està pendent de seguiment i què ja hauria de convertir-se en reserva.
+            </p>
+          </div>
+          <div className="pr__heroActions">
           <Link
             href="/admin/presupuestos?customerId=new"
             className="ap-btn ap-btn--primary"
           >
             + Nou pressupost
           </Link>
-        }
-      >
+          </div>
+        </header>
         <OwnerControlStrip
-          className="mb-6"
+          className="pr__signal"
           system={{
             eyebrow: 'Automàtic · Catàleg comercial',
             title: counts.total === 0
@@ -316,17 +323,23 @@ export default async function PresupuestosPage({
         <ProposalsList
           proposals={serializedProposals}
           quotes={serializedQuotes}
+          initialStatusFilter={statusFilter}
         />
-      </AdminPage>
+      </main>
     );
   }
 
   // EDITOR VIEW — show the PDF studio
   return (
-    <AdminPage
-      title={proposalId ? 'Editar pressupost' : 'Nou pressupost'}
-      subtitle={
-        <>
+    <main className="pr__page">
+      <header className="pr__hero">
+        <div>
+          <Link href="/admin/presupuestos" className="ap-back">
+            ← Pressupostos
+          </Link>
+          <p className="pr__eyebrow">Comercial · Editor PDF</p>
+          <h1 className="pr__title">{proposalId ? 'Editar pressupost' : 'Nou pressupost'}</h1>
+          <p className="pr__subtitle">
           {customer ? (
             <span>
               Client: <Link href={buildCustomerHubHref(customer.id)} className="hover:underline"><strong>{customer.name}</strong></Link> ({customer.email})
@@ -334,19 +347,16 @@ export default async function PresupuestosPage({
           ) : (
             'Selecciona un client per començar'
           )}
-        </>
-      }
-      back={{ href: '/admin/presupuestos', label: 'Pressupostos' }}
-      actions={
-        <div className="flex gap-2">
+          </p>
+        </div>
+        <div className="pr__heroActions">
           {customer && (
             <Link href={buildCustomerHubHref(customer.id)} className="ap-btn ap-btn--secondary">
-              👤 Fitxa Client
+              Fitxa client
             </Link>
           )}
         </div>
-      }
-    >
+      </header>
       <PresupuestoPdfStudio
         initialCustomerId={customer?.id || leadForEditor?.customer?.id || ''}
         initialCustomerName={customer?.name || leadForEditor?.customer?.name || leadForEditor?.name || ''}
@@ -366,6 +376,6 @@ export default async function PresupuestosPage({
         initialBrandTagline={String(brandSettings['quotes.brandTagline'] || 'El teu esdeveniment. El teu estil. La teva nit perfecta.')}
         initialBrandLogoDataUrl={String(brandSettings['quotes.logoDataUrl'] || '')}
       />
-    </AdminPage>
+    </main>
   );
 }

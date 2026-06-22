@@ -5,6 +5,7 @@ const {
   mockRequireAuth,
   mockRequirePermission,
   mockGetAdminRole,
+  mockVerifyCsrf,
   mockLoadCanviValidations,
   mockRecordCanviValidation,
   mockRemoveCanviValidation,
@@ -12,6 +13,7 @@ const {
   mockRequireAuth: vi.fn(),
   mockRequirePermission: vi.fn(),
   mockGetAdminRole: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockLoadCanviValidations: vi.fn(),
   mockRecordCanviValidation: vi.fn(),
   mockRemoveCanviValidation: vi.fn(),
@@ -22,6 +24,8 @@ vi.mock('@/lib/auth', () => ({
   requirePermission: mockRequirePermission,
   getAdminRole: mockGetAdminRole,
 }));
+
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 
 vi.mock('@/lib/services/protocolValidationsService', () => ({
   loadCanviValidations: mockLoadCanviValidations,
@@ -37,6 +41,7 @@ describe('/api/admin/protocol/validations', () => {
     mockRequireAuth.mockReturnValue(null);
     mockRequirePermission.mockReturnValue(null);
     mockGetAdminRole.mockReturnValue('OWNER');
+    mockVerifyCsrf.mockReturnValue(null);
     mockLoadCanviValidations.mockResolvedValue(
       new Map([
         [462, { canviN: 462, validatedAt: '2026-04-30T10:00:00.000Z', validatedBy: 'OWNER' }],
@@ -62,6 +67,7 @@ describe('/api/admin/protocol/validations', () => {
     const res = await GET(req);
 
     expect(mockRequirePermission).toHaveBeenCalledWith(req, 'read');
+    expect(mockVerifyCsrf).not.toHaveBeenCalled();
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual({
       ok: true,
@@ -76,6 +82,21 @@ describe('/api/admin/protocol/validations', () => {
       body: JSON.stringify({ canviN: 465 }),
     });
     expect((await POST(req)).status).toBe(403);
+    expect(mockVerifyCsrf).not.toHaveBeenCalled();
+  });
+
+  it('POST rebutja CSRF abans de llegir body o registrar', async () => {
+    mockVerifyCsrf.mockReturnValueOnce(new Response(JSON.stringify({ error: 'CSRF' }), { status: 403 }));
+    const req = new NextRequest('http://localhost/api/admin/protocol/validations', {
+      method: 'POST',
+      body: JSON.stringify({ canviN: 465 }),
+    });
+
+    const res = await POST(req);
+
+    expect(res.status).toBe(403);
+    expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
+    expect(mockRecordCanviValidation).not.toHaveBeenCalled();
   });
 
   it('POST valida el body i retorna 400 si es invalid', async () => {
@@ -101,6 +122,7 @@ describe('/api/admin/protocol/validations', () => {
     const res = await POST(req);
 
     expect(mockRequirePermission).toHaveBeenCalledWith(req, 'mutate');
+    expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
     expect(mockRecordCanviValidation).toHaveBeenCalledWith({
       canviN: 465,
       validatedBy: 'MANAGER',
@@ -122,6 +144,7 @@ describe('/api/admin/protocol/validations', () => {
     const res = await DELETE(req);
 
     expect(mockRequirePermission).toHaveBeenCalledWith(req, 'mutate');
+    expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
     expect(mockRemoveCanviValidation).toHaveBeenCalledWith(465);
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual({ ok: true, removed: true });
@@ -136,6 +159,20 @@ describe('/api/admin/protocol/validations', () => {
     const res = await DELETE(req);
 
     expect(res.status).toBe(400);
+    expect(mockRemoveCanviValidation).not.toHaveBeenCalled();
+  });
+
+  it('DELETE rebutja CSRF abans de llegir body o eliminar', async () => {
+    mockVerifyCsrf.mockReturnValueOnce(new Response(JSON.stringify({ error: 'CSRF' }), { status: 403 }));
+    const req = new NextRequest('http://localhost/api/admin/protocol/validations', {
+      method: 'DELETE',
+      body: JSON.stringify({ canviN: 465 }),
+    });
+
+    const res = await DELETE(req);
+
+    expect(res.status).toBe(403);
+    expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
     expect(mockRemoveCanviValidation).not.toHaveBeenCalled();
   });
 });

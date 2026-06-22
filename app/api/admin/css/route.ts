@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth, requirePermission } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { getAdminCustomCss, saveAdminCustomCss } from '@/lib/services/adminCustomCssService';
 
 export const dynamic = 'force-dynamic';
@@ -19,6 +20,8 @@ export async function PUT(req: NextRequest) {
   if (authError) return authError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   const body = await req.json().catch(() => null) as { css?: string } | null;
   const { hadForbiddenRules } = await saveAdminCustomCss(typeof body?.css === 'string' ? body.css : '');

@@ -1,13 +1,15 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockGetById, mockUpdate } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockGetById, mockUpdate } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockGetById: vi.fn(),
   mockUpdate: vi.fn(),
 }));
 
 vi.mock('@/lib/auth', () => ({ requireAuth: mockRequireAuth }));
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 vi.mock('@/lib/services/packAdminService', () => ({
   getAdminPackById: mockGetById,
   updateAdminPack: mockUpdate,
@@ -19,7 +21,12 @@ import { GET, PATCH } from '@/app/api/admin/packs/[id]/route';
 const ctx = { params: Promise.resolve({ id: 'p1' }) };
 
 describe('GET /api/admin/packs/[id]', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockGetById.mockResolvedValue({ status: 200, body: { id: 'p1' } }); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockRequireAuth.mockReturnValue(null);
+    mockVerifyCsrf.mockReturnValue(null);
+    mockGetById.mockResolvedValue({ status: 200, body: { id: 'p1' } });
+  });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response('{}', { status: 401 }));
@@ -28,6 +35,7 @@ describe('GET /api/admin/packs/[id]', () => {
 
   it('retorna pack', async () => {
     expect((await GET(new NextRequest('http://localhost/x'), ctx)).status).toBe(200);
+    expect(mockVerifyCsrf).not.toHaveBeenCalled();
     expect(mockGetById).toHaveBeenCalledWith('p1');
   });
 
@@ -43,11 +51,39 @@ describe('GET /api/admin/packs/[id]', () => {
 });
 
 describe('PATCH /api/admin/packs/[id]', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockUpdate.mockResolvedValue({ status: 200, body: { ok: true } }); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockRequireAuth.mockReturnValue(null);
+    mockVerifyCsrf.mockReturnValue(null);
+    mockUpdate.mockResolvedValue({ status: 200, body: { ok: true } });
+  });
+
+  it('rebutja auth abans de CSRF', async () => {
+    mockRequireAuth.mockReturnValueOnce(new Response('{}', { status: 401 }));
+    const req = new NextRequest('http://localhost/x', { method: 'PATCH', body: JSON.stringify({ name: 'Nou' }), headers: { 'Content-Type': 'application/json' } });
+
+    const res = await PATCH(req, ctx);
+
+    expect(res.status).toBe(401);
+    expect(mockVerifyCsrf).not.toHaveBeenCalled();
+    expect(mockUpdate).not.toHaveBeenCalled();
+  });
+
+  it('rebutja CSRF abans de resoldre params/body o actualitzar', async () => {
+    mockVerifyCsrf.mockReturnValueOnce(new Response('{}', { status: 403 }));
+    const req = new NextRequest('http://localhost/x', { method: 'PATCH', body: JSON.stringify({ name: 'Nou' }), headers: { 'Content-Type': 'application/json' } });
+
+    const res = await PATCH(req, ctx);
+
+    expect(res.status).toBe(403);
+    expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
+    expect(mockUpdate).not.toHaveBeenCalled();
+  });
 
   it('actualitza pack', async () => {
     const req = new NextRequest('http://localhost/x', { method: 'PATCH', body: JSON.stringify({ name: 'Nou' }), headers: { 'Content-Type': 'application/json' } });
     expect((await PATCH(req, ctx)).status).toBe(200);
+    expect(mockVerifyCsrf).toHaveBeenCalledWith(req);
     expect(mockUpdate).toHaveBeenCalledWith('p1', { name: 'Nou' });
   });
 

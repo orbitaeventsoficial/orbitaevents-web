@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { requireAuth, requirePermission } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import {
   deleteImageManagerAsset,
   getImageManagerPayload,
@@ -29,6 +30,9 @@ export async function PUT(req: NextRequest) {
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
 
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
+
   try {
     const body = await req.json();
     const result = await saveImageManagerModifications(body);
@@ -44,6 +48,9 @@ export async function POST(req: NextRequest) {
   if (authError) return authError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
+
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   try {
     const formData = await req.formData();
@@ -85,6 +92,9 @@ export async function PATCH(req: NextRequest) {
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
 
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
+
   try {
     const body = await req.json();
     const key = typeof body?.key === 'string' ? body.key : '';
@@ -107,6 +117,9 @@ export async function DELETE(req: NextRequest) {
   if (authError) return authError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
+
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   try {
     const body = await req.json();

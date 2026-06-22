@@ -1,0 +1,4 @@
+{
+  "_comment": "Components admin .tsx exportats que NO importa cap ruta però que es conserven a propòsit (prototip protegit, peça preparada amb decisió documentada). Cada entrada exigeix justificació. Vegeu scripts/check-dead-admin-views.mjs i docs/admin-fitxes-pantalles.md.",
+  "allow": []
+}

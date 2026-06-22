@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAuth, verifyBasicAuth } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { processPrivacyRequestById } from '@/lib/services/privacyRequestAdminService';
 
 export const dynamic = 'force-dynamic';
@@ -21,6 +22,9 @@ export async function POST(
 ) {
   const authError = requireAuth(req);
   if (authError) return authError;
+
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   const auth = verifyBasicAuth(req);
   const adminUser = auth.authenticated ? auth.user || 'admin' : 'admin';

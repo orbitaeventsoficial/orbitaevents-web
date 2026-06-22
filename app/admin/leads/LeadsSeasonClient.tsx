@@ -21,7 +21,7 @@ import { useToast } from '@/app/admin/components/ToastProvider';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildLeadComposeHref, buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { LEAD_LOST_REASON_LABELS, isLeadLostReason } from '@/lib/constants/leadLoss';
-import { formatCurrency } from '@/lib/constants';
+import { formatCurrency, LEAD_SCORING_STATUS_PROBABILITY, OPEN_PIPELINE_STATUSES } from '@/lib/constants';
 import LeadLostStatusPrompt from './LeadLostStatusPrompt';
 import { patchLeadStatus, type LeadStatus } from './leadStatusClient';
 import { buildLeadWhatsAppHref } from './leadWhatsApp';
@@ -57,6 +57,15 @@ function paymentState(booking: LeadData['booking']): PayState | null {
 }
 type Stage = LeadData['stage'];
 type ViewMode = 'calendari' | 'pipeline' | 'llista';
+
+// Valor ponderat d'un lead obert = estimatedValue × probabilitat canònica de l'estat
+// (LEAD_SCORING_STATUS_PROBABILITY, la mateixa font que buildPipelineForecast al dashboard).
+// Tancats (WON) i descartats (LOST) no compten al forecast d'oberts → 0.
+function weightedLeadValue(lead: LeadData): number {
+  const status = lead.realStatus;
+  if (!status || !(OPEN_PIPELINE_STATUSES as readonly string[]).includes(status)) return 0;
+  return Math.round(lead.value * (LEAD_SCORING_STATUS_PROBABILITY[status] ?? 0));
+}
 
 /* ── Constants · v847 ───────────────────────────────────────────────────── */
 
@@ -678,6 +687,9 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
         const totalValue  = effectiveLeads.reduce((s, l) => s + l.value, 0);
         const openValue   = effectiveLeads.filter((l) => l.stage === 'nou' || l.stage === 'contactat').reduce((s, l) => s + l.value, 0);
         const wonValue    = effectiveLeads.filter((l) => l.stage === 'guanyat').reduce((s, l) => s + l.value, 0);
+        // Forecast ponderat: valor × probabilitat de tancament (constant canònica, la mateixa
+        // que alimenta buildPipelineForecast al dashboard) dels leads encara oberts.
+        const openForecast = effectiveLeads.reduce((s, l) => s + weightedLeadValue(l), 0);
         const activeCount = effectiveLeads.filter((l) => l.stage !== 'perdut').length;
         const wonCount    = effectiveLeads.filter((l) => l.stage === 'guanyat').length;
         return (
@@ -689,6 +701,10 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
             <div className="fx__metric">
               <span>Pipeline</span>
               <b>{formatCurrency(openValue)}</b>
+            </div>
+            <div className="fx__metric" title="Suma del valor × probabilitat de tancament dels leads oberts">
+              <span>Forecast ponderat</span>
+              <b className="fx__metric-forecast">{formatCurrency(openForecast)}</b>
             </div>
             <div className="fx__metric">
               <span>Guanyat</span>
@@ -819,6 +835,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
             {PIPELINE_STAGES.map((stage) => {
               const laneLeads = effectiveLeads.filter((l) => l.stage === stage);
               const laneValue = laneLeads.reduce((sum, l) => sum + l.value, 0);
+              const laneForecast = laneLeads.reduce((sum, l) => sum + weightedLeadValue(l), 0);
               return (
                 <section
                   key={stage}
@@ -837,6 +854,11 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                     <div className="fx__lanetitle">
                       <h2>{STAGE_LABEL[stage]}</h2>
                       <small>{laneValue ? formatCurrency(laneValue) : '—'}</small>
+                      {laneForecast > 0 && (
+                        <small className="fx__lane-forecast" title="Valor ponderat per probabilitat de tancament">
+                          ≈ {formatCurrency(laneForecast)}
+                        </small>
+                      )}
                     </div>
                     <span>{laneLeads.length}</span>
                   </div>

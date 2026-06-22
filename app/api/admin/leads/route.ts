@@ -5,7 +5,6 @@ import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
 import { safeParseInt } from '@/lib/utils';
 import { z } from 'zod';
-import { getPipelineLeads } from '@/lib/services/leads/pipeline';
 import { countNewAdminLeads, createAdminLead, listAdminLeads } from '@/lib/services/leadAdminService';
 import { linkLeadToCustomer, previewLeadCustomerLink } from '@/lib/services/leads/leadCustomerLinkService';
 import { EVENT_TYPE_VALUES, LEAD_SOURCE_VALUES, LEAD_STATUS_VALUES, PRIORITY_VALUES } from '@/lib/constants';
@@ -15,7 +14,6 @@ export const dynamic = 'force-dynamic';
 type LeadStatus = typeof LEAD_STATUS_VALUES[number];
 type EventType = typeof EVENT_TYPE_VALUES[number];
 type Priority = typeof PRIORITY_VALUES[number];
-type LeadSource = typeof LEAD_SOURCE_VALUES[number];
 
 async function linkManualLeadToCustomer(leadId: string) {
   const preview = await previewLeadCustomerLink(leadId);
@@ -62,10 +60,6 @@ function isValidPriority(value: string | null): value is Priority {
   return value !== null && PRIORITY_VALUES.includes(value as Priority);
 }
 
-function isValidSource(value: string | null): value is LeadSource {
-  return value !== null && LEAD_SOURCE_VALUES.includes(value as LeadSource);
-}
-
 const leadSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
@@ -97,49 +91,6 @@ export async function GET(req: NextRequest) {
 
   try {
     const { searchParams } = new URL(req.url);
-    const pipelineMode = searchParams.get('pipeline') === 'true';
-
-    if (pipelineMode) {
-      const pipelineLimit = safeParseInt(searchParams.get('limit'), 200, 1, 500);
-      const statusParams = searchParams.getAll('status').filter(isValidStatus);
-      const eventTypeParams = searchParams.getAll('eventType').filter(isValidEventType);
-      const priorityParams = searchParams.getAll('priority').filter(isValidPriority);
-      const sourceParams = searchParams.getAll('source').filter(isValidSource);
-      const search = searchParams.get('search') || searchParams.get('q');
-      const fromParam = searchParams.get('from');
-      const toParam = searchParams.get('to');
-
-      const fromDate = fromParam ? new Date(fromParam) : null;
-      const toDate = toParam ? new Date(toParam) : null;
-      const validFrom = fromDate && !Number.isNaN(fromDate.getTime()) ? fromDate : null;
-      const validTo = toDate && !Number.isNaN(toDate.getTime()) ? toDate : null;
-      if (validTo) validTo.setHours(23, 59, 59, 999);
-
-      const where = {
-        ...(statusParams.length > 0 && { status: { in: statusParams } }),
-        ...(eventTypeParams.length > 0 && { eventType: { in: eventTypeParams } }),
-        ...(priorityParams.length > 0 && { priority: { in: priorityParams } }),
-        ...(sourceParams.length > 0 && { source: { in: sourceParams } }),
-        ...(search && {
-          OR: [
-            { name: { contains: search, mode: 'insensitive' as const } },
-            { email: { contains: search, mode: 'insensitive' as const } },
-            { phone: { contains: search } },
-          ],
-        }),
-        ...(validFrom || validTo
-          ? {
-              eventDate: {
-                ...(validFrom ? { gte: validFrom } : {}),
-                ...(validTo ? { lte: validTo } : {}),
-              },
-            }
-          : {}),
-      };
-
-      const leads = await getPipelineLeads(pipelineLimit, where);
-      return NextResponse.json({ ok: true, data: { leads } });
-    }
 
     const countOnly = searchParams.get('countOnly') === 'true';
     if (countOnly) {
