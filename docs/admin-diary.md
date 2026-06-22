@@ -28,6 +28,35 @@ Continuació non stop del drenatge CSRF backend després de #1082. Perímetre pe
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-22 — El zenit: Cockpit Econòmic, font de comandament unificada (Canvi #1089, claude)
+
+### Context
+El zenit del programa (Tall 3), amb llibertat del propietari i pensant en el CONJUNT (l'organisme). Diagnostic previ: 6 serveis de forecast dispersos (pipelineForecast, cashFlowForecast, operationalForecast, profitability, reporting, costEngine) que cada pagina munta a mà → fragmentacio.
+
+### Decisio d'enginyer (criteri propi)
+El zenit NO es una pagina que dupliqui economia: es una FONT DE VERITAT de comandament que unifica. Construit el cor primer (servei + tests, que perdura); la visual la refà el propietari.
+
+### Què s'ha fet
+- `lib/services/economicCockpitService.ts`: `composeEconomicCockpit(pipeline, cashflow)` (PURA, testejable) + `buildEconomicCockpit(monthsAhead)` (wrapper I/O que reusa buildPipelineForecast + buildCashFlowForecast en paral·lel). Contracte: per mes (compromès, ponderat, banda 1σ, combinat, YoY, cash-flow net) + agregat (totals + variació interanual).
+- `app/admin/cockpit/page.tsx` + loading: pàgina funcional amb 4 KPIs de comandament + previsio per mes (barres compromès/ponderat). Tokens canònics (ap-kpi, ap-card, admin-tone-*). Amplades de barra inline (cas tècnic acceptat: runtime).
+- 6 tests de la composicio pura (fusio per mes, totals, YoY, buit).
+
+### Verificació
+- tsc + 6 tests + validate:core EXIT 0 (dead-views, loading-tsx, admin-canon verds).
+- Render `/admin/cockpit` HTTP 200, 0 page errors, dades reals (combinat 4.386€ de l'historic; compromès/ponderat 0 perquè ara no hi ha pipeline obert amb valor).
+
+### Validació
+- Validació tècnica: tsc + tests + validate:core EXIT 0.
+- Validació funcional: una font de previsio de comandament; pàgina operativa.
+- Validació humana/UX: visual PROVISIONAL — el propietari la refarà (mandat explícit).
+
+### Coordinació
+Counter -> 1089. Commit + push + monitor Railway.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-22 — Tall 1: marge en viu via font única computeDirectCostBreakdown (Canvi #1088, claude)
 
 ### Context

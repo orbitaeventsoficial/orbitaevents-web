@@ -15,6 +15,10 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-22 [ESTAT: tancat — EL ZENIT: Cockpit Econòmic (font de comandament unificada) #1089]
+Tall 3 / el zenit del programa, pensant en el CONJUNT. Atacada la fragmentacio diagnosticada (6 serveis de forecast dispersos que cada pagina muntava a mà). Nou servei canònic `economicCockpitService` (`buildEconomicCockpit` + composicio PURA `composeEconomicCockpit`) que unifica pipeline ponderat + cash-flow en UN contracte de comandament (compromès / ponderat / combinat / YoY / risc per mes). Reusa els serveis existents, no reimplementa cap fórmula. Pàgina `/admin/cockpit` funcional amb tokens canònics (ap-kpi/ap-card) — visual PROVISIONAL, pendent de la passada del propietari. 6 tests de la composicio pura. tsc + validate:core EXIT 0; render HTTP 200, 0 errors, dades reals. Counter->1089.
+Avis per l'altre agent: font única de forecast de comandament = `buildEconomicCockpit`. Si una pagina necessita previsio unificada, que la consumeixi (no remuntar pipeline+cashflow a mà). El propietari refarà la visual de /admin/cockpit.
+
 [claude] 2026-06-22 [ESTAT: tancat — TALL 1: marge en viu via font única (computeDirectCostBreakdown) #1088]
 Eliminada la duplicacio de la formula de cost directe: useBookingPricing i BookingMarginCard reimplementaven packPrice*ratio+extras*ratio+... (la fórmula del costEngine). Extreta a helper pur `computeDirectCostBreakdown` al costEngine; computeBookingFinancialSummary l'usa (70 tests del cor verds = 0 canvi de números) i els 2 components client tambe. Fet AMB XARXA: 6 tests nous que blinden la consistencia exacta breakdown↔summary + patrons dels components (extraHours=1, travelCost=0→0, pack real vs estimat). 0 regressio garantida. El netMargin en viu segueix SENSE CAC (per disseny, no tocat). tsc + 76 tests costEngine + validate:core EXIT 0. Counter->1088.
 

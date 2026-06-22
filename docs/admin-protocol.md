@@ -1502,6 +1502,22 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1089 — 2026-06-22 — claude (TANCAT)
+
+**El zenit: Cockpit Econòmic — font de comandament unificada.**
+
+- Nou `economicCockpitService` (`buildEconomicCockpit` + composicio pura `composeEconomicCockpit`) que unifica pipeline ponderat + cash-flow en UN contracte (compromès/ponderat/combinat/YoY per mes). Reusa serveis existents, ataca la fragmentacio dels 6 forecast dispersos.
+- Pàgina `/admin/cockpit` funcional amb tokens canònics (visual provisional, la refà el propietari).
+- 6 tests de composicio pura.
+- Validació tècnica: tsc + tests + validate:core EXIT 0; render HTTP 200, 0 errors.
+- Validació funcional: una font de previsio de comandament.
+- Validació humana/UX: visual provisional, pendent del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1088 — 2026-06-22 — claude (TANCAT)
 
 **Tall 1: marge en viu via font única (computeDirectCostBreakdown).**
