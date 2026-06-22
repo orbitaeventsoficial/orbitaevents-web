@@ -28,6 +28,30 @@ Continuació non stop del drenatge CSRF backend després de #1082. Perímetre pe
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-22 — Cockpit operatiu: enllaçat al sidebar (Canvi #1090, claude)
+
+### Context
+El zenit /admin/cockpit existia per URL però no era descobrible. Permís del propietari per fer-ho de debò amb el CSS actual.
+
+### Què s'ha fet
+- `app/admin/layout.tsx`: entrada «Cockpit» → /admin/cockpit al grup Sistema (abans de Finances). `getGroupForPath` ja el mapeja a sistema per defecte.
+- Cap CSS nou: la pàgina usa classes canòniques (ap-kpi/ap-card/admin-tone-*).
+
+### Verificació
+- qa:admin-manual-hrefs + qa:admin-manual-consistency verds. tsc + validate:core EXIT 0. dead-views 0.
+
+### Validació
+- Validació tècnica: tsc + validate:core EXIT 0.
+- Validació funcional: cockpit accessible des del sidebar.
+- Validació humana/UX: visual provisional, pendent del propietari.
+
+### Coordinació
+Counter -> 1090. Commit + push + monitor.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-22 — El zenit: Cockpit Econòmic, font de comandament unificada (Canvi #1089, claude)
 
 ### Context

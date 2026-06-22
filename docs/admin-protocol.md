@@ -1502,6 +1502,20 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1090 — 2026-06-22 — claude (TANCAT)
+
+**Cockpit operatiu: enllaçat al sidebar.**
+
+- `layout.tsx`: entrada «Cockpit» al grup Sistema. CSS canònic existent, cap CSS nou.
+- Validació tècnica: guards nav/manual + tsc + validate:core EXIT 0.
+- Validació funcional: cockpit descobrible des del sidebar.
+- Validació humana/UX: visual provisional.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1089 — 2026-06-22 — claude (TANCAT)
 
 **El zenit: Cockpit Econòmic — font de comandament unificada.**

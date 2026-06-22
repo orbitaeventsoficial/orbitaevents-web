@@ -60,6 +60,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     id: 'sistema', label: 'Sistema',
     items: [
+      { label: 'Cockpit', href: '/admin/cockpit' },
       { label: 'Finances', href: '/admin/economia' },
       { label: 'Configuració', href: '/admin/settings' },
       { label: 'Studio', href: '/admin/studio' },
