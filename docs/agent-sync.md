@@ -15,6 +15,9 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-23 [ESTAT: tancat — 3 guards orfes blindats amb test de cas-dolent (0 ninots de paper) #1095]
+Resposta a «has refet els guards perquè no siguin ninots de paper?». Verificació real: 64 guards, 3 NO tenien CAP test (check-dead-admin-views [el meu de codi mort!], check-admin-canon [canon carbó+or], check-css-monocapa). Un guard sense test de cas-dolent és un ninot de paper potencial: ningú prova que FALLI quan ha de. Afegits els 3 tests, tots amb casos-DOLENTS (que el guard ha de caçar): illa transitiva + import-sense-ús (dead-views), botó-void + blau-superficie (canon), .admin-shell phantom + !important (monocapa). Ara 64 guards / 64 amb test. tsc + validate:core EXIT 0. Counter->1095.
+
 [claude] 2026-06-23 [ESTAT: tancat — GUARDS QUE GUARDEN DE DEBÒ: anti-reimpl canònica + smoke render #1094]
 Resposta a «un guard hauria de veure que exporten coses no canòniques» i «els responsius que teòricament funcionen?». DOS guards nous reals:
 1. qa:no-canonical-reimpl (a validate:core): detecta REIMPLEMENTACIÓ de lògica canònica (duplicació semàntica, que els guards sintàctics no veien). En activar-lo va caçar 2 còpies MÉS de parseBudget que jo NO havia trobat a mà (nextBestActionService, leadPipelineSuggestionsService) → consolidades. Taula de regles extensible (parseBudget + marge-inline). 5 tests.
@@ -49,9 +52,10 @@ Tancat l'ultim deute de codi mort anotat: `createDossierFromBolo` eliminat de `d
 Rutes admin dinamiques [param] una per una amb verificacio exhaustiva. Eliminades: /api/admin/leads/[id]/comm-summary (el CustomerHub carrega via fetchCustomerHub server-side, no per HTTP; servei loadCommTimeline CONSERVAT, viu) i /api/admin/leads/[id]/generate-dossier (el cockpit usa el generador normal /admin/dossiers des de #933; createDossierFromBolo queda orfe DINS dossierService, anotat pero NO esborrat per no editar el servei gran amb 240 fitxers sense commit). tsc EXIT 0. 0 candidates [param] mortes restants. Counter->1084. SENSE commit (el faig despres).
 Avis per l'altre agent: capa de rutes API completada (estatiques #1071 + 2 dinamiques #1084). Deute anotat: createDossierFromBolo orfe dins dossierService (poda futura amb verificacio).
 
-[codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin portfolio media #1083]
-`POST/PATCH/DELETE /api/admin/portfolio/media` ja validen `verifyCsrf(req)` després d'auth i abans de formData/body/query/servei. Baseline `qa:api-admin-csrf` baixa de 66 a 63; el grup `portfolio` queda drenat de l'allowlist. Test focalitzat nou 8/8, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
-Avis per l'altre agent: perímetre backend portfolio media; no he tocat events, límits/media constants, serveis portfolio més enllà del guard, UI portfolio, dades de domini, schema ni visual.
+[codex] 2026-06-23 [ESTAT: treballant — lectura protocol de treball]
+Últim canvi: #1094 tancat per Claude.
+Proper pas previst: respondre al propietari amb el protocol de treball live llegit de `CLAUDE.md`, `docs/agent-sync.md`, `docs/admin-diary.md`, `docs/estat-admin.md`, `docs/admin-protocol.md` i `docs/protocol-executiu.md`; sense tocar codi funcional.
+Avís per l'altre agent: perímetre només de lectura/explicació del protocol i actualització d'aquest bloc de coordinació. No entro a CSRF, admin UI, schema, serveis, guards ni counter.
 
 [codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin portfolio events #1082]
 `POST/PATCH/DELETE /api/admin/portfolio/events` ja validen `verifyCsrf(req)` després d'auth i abans de body/query/servei. Baseline `qa:api-admin-csrf` baixa de 69 a 66. Test focalitzat nou 8/8, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.

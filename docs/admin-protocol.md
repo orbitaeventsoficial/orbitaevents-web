@@ -1502,6 +1502,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1095 — 2026-06-23 — claude (TANCAT)
+
+**3 guards orfes blindats amb test de cas-dolent (0 ninots de paper).**
+
+- 64 guards, 3 sense test (`check-dead-admin-views`, `check-admin-canon`, `check-css-monocapa`). Afegits 12 tests (5+4+3) amb casos-DOLENTS que proven que el guard FALLA quan ha de. Ara 64/64 amb test.
+- Corregits 2 fixtures meus erronis durant el procés (font-black=P3, PAGE_CLASS_RE prefixos) → els tests reflecteixen el comportament real.
+- Validació tècnica: tsc + validate:core + 12 tests EXIT 0.
+- Validació funcional: tot guard crític demostra que caça la violació que vigila.
+- Validació humana/UX: no toca producte.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1094 — 2026-06-23 — claude (TANCAT)
 
 **Guards que guarden de debò: anti-reimplementació canònica + smoke de render.**

@@ -28,6 +28,36 @@ Continuació non stop del drenatge CSRF backend després de #1082. Perímetre pe
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-23 — 3 guards orfes blindats amb test de cas-dolent (0 ninots de paper) (Canvi #1095, claude)
+
+### Context
+El propietari va preguntar si els guards són eficients o «ninots de paper». Verificació honesta: la prova que un guard no és ninot de paper és tenir un test que demostri que FALLA quan ha de fallar.
+
+### Troballa
+64 guards, **3 sense CAP test**: `check-dead-admin-views` (el meu de codi mort), `check-admin-canon` (canon carbó+or, crític), `check-css-monocapa`. Que jo els provés a mà no compta si no queda blindat.
+
+### Què s'ha fet
+Afegits els 3 tests, cadascun amb casos-DOLENTS reals (verificant que el guard els caça) + casos-bons:
+- dead-views: illa orfe + illa TRANSITIVA + import-sense-ús → FALLA; component usat → PASSA.
+- admin-canon: botó-void + blau-superficie + blanc-absolut (P1) → FALLA; .ap-btn → PASSA.
+- css-monocapa: .admin-shell phantom + !important en classe pròpia → FALLA; CSS net → PASSA.
+Durant el procés vaig corregir 2 fixtures meus erronis (font-black és P3 no P1; PAGE_CLASS_RE usa prefixos concrets) — provant que els tests reflecteixen el comportament REAL del guard, no el que jo suposava.
+
+### Resultat
+64 guards / 64 amb test. 0 guards sense prova de cas-dolent.
+
+### Validació
+- Validació tècnica: tsc + validate:core EXIT 0 + 12 tests nous (5+4+3) verds.
+- Validació funcional: cada guard crític demostra que FALLA davant la violació que diu vigilar.
+- Validació humana/UX: no toca producte.
+
+### Coordinació
+Counter -> 1095.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-23 — Guards que guarden de debò: anti-reimplementació canònica + smoke de render (Canvi #1094, claude)
 
 ### Context
