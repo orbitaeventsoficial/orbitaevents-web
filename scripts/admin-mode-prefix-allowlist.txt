@@ -1,4 +1,4 @@
 # Baseline de deute CSS admin sense prefix html.admin-mode.
 # El guard BLOQUEJA noves violacions; aquestes es redueixen amb verificació visual.
 # Generat per --write-baseline. NO afegir entrades a mà.
-app/admin/bookings/[id]/booking-detail.css:150: @media (max-width: 1023px)
+

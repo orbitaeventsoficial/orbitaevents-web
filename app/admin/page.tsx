@@ -207,7 +207,7 @@ export default async function AdminDashboard() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="admin-cr-hero-kicker">{getGreeting()}</p>
-              <h1 className="admin-hero-title">Òrbita Events</h1>
+              <h1 className="admin-hero-title">Centre de control</h1>
               <p className="admin-hero-subtitle">Visió general del negoci</p>
             </div>
             <div className="admin-cr-hero-actions">
@@ -912,7 +912,7 @@ export default async function AdminDashboard() {
 
       <section className="admin-cr-audit" {...helpAttrs(ADMIN_DASHBOARD_HELP.recentAudit)}>
         <div className="admin-cr-audit-head">
-          <h3 className="admin-cr-step-title">🧾 Auditoria recent</h3>
+          <h3 className="admin-cr-step-title">Auditoria recent</h3>
           <p className="admin-cr-small admin-cr-small--muted">Últimes accions d&apos;admin</p>
         </div>
         {d.recentAdminLogs.length === 0 ? (
@@ -931,6 +931,5 @@ export default async function AdminDashboard() {
     </div>
   );
 }
-
 
 

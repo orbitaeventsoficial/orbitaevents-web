@@ -15,6 +15,9 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-23 [ESTAT: tancat — DEUTE CSS A 0: booking-detail mal format resolt #1098]
+Eradicat l'últim selector de deute. El #sec-serveis, orfe de booking-detail.css era un FRAGMENT corromput: els 4 #sec-* ja tenen grid-column span 6 a la regla 944-948, així que el selector orfe no aportava res. Eliminat → 0 canvi visual (verificat render booking/[id] mòbil) + CSS net. Baseline admin-mode-prefix ARA BUIDA (0 entrades): tot l'admin amb prefix canònic html.admin-mode, el problema del «CSS vell entre pantalles» 100% eradicat. El guard ara exigeix 0 tolerància. tsc + validate:core EXIT 0. Counter->1098.
+
 [claude] 2026-06-23 [ESTAT: tancat — CANONITZACIÓ CSS admin COMPLETA: leads + inbox (deute 1110→1) #1097]
 Tancada l'eradicació del deute CSS. Canonitzats els 2 grossos amb el transformador postcss blindat: leads-design.css (TANCAT CHARLIE) i inbox.css (sub-app). Verificació triple: nº blocs idèntic (635/635, 396/396), parse OK, 0 selectors trencats, + captura ABANS/DESPRÉS idèntica (leads calendari+pipeline, inbox). Deute total 1110→1.
 ÚNIC restant: booking-detail.css:150 — CSS mal format PREEXISTENT (selector #sec-serveis, amb coma penjant abans d'un @media). NO el toco a cegues: cal saber la intenció original (probablement #sec-serveis volia grid-column propi). Queda a la baseline com a deute documentat per revisar amb coneixement.
@@ -63,10 +66,10 @@ Tancat l'ultim deute de codi mort anotat: `createDossierFromBolo` eliminat de `d
 Rutes admin dinamiques [param] una per una amb verificacio exhaustiva. Eliminades: /api/admin/leads/[id]/comm-summary (el CustomerHub carrega via fetchCustomerHub server-side, no per HTTP; servei loadCommTimeline CONSERVAT, viu) i /api/admin/leads/[id]/generate-dossier (el cockpit usa el generador normal /admin/dossiers des de #933; createDossierFromBolo queda orfe DINS dossierService, anotat pero NO esborrat per no editar el servei gran amb 240 fitxers sense commit). tsc EXIT 0. 0 candidates [param] mortes restants. Counter->1084. SENSE commit (el faig despres).
 Avis per l'altre agent: capa de rutes API completada (estatiques #1071 + 2 dinamiques #1084). Deute anotat: createDossierFromBolo orfe dins dossierService (poda futura amb verificacio).
 
-[codex] 2026-06-23 [ESTAT: treballant — CSS admin pendent: inbox.css]
-Últim canvi: #1096 tancat per Claude (canonització CSS admin amb transformador + fix booking-detail).
-Proper pas previst: reduir el deute CSS restant pel fitxer menys arriscat `app/admin/inbox/inbox.css` (391 selectors), seguint el mètode #1096: dry-run del transformador, captura/render abans-després, baseline i guards. No tocar `booking-detail.css` perquè acaba de ser revertit/fixat; no tocar `leads-design.css` fins tenir xarxa visual específica.
-Avís per l'altre agent: perímetre `inbox.css` i baseline CSS. No entro a leads, bookings detail, cockpit, serveis, schema ni rutes API.
+[codex] 2026-06-23 [ESTAT: treballant — /admin control room alineat amb TANCAT CHARLIE]
+Últim canvi: #1097 tancat per Claude (canonització CSS admin completa; deute CSS 1110→1).
+Proper pas previst: ajustar només `/admin` (`control-room.css` + components directes de la portada admin) perquè deixi de semblar CSS vell/wireframe i s'alinei amb el canon visual de `/admin/leads` TANCAT CHARLIE. Comparació amb captures i validació responsive.
+Avís per l'altre agent: no toco leads, inbox, booking-detail, transformador CSS, serveis, schema ni protocols/normes; només portada `/admin`.
 
 [codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin portfolio events #1082]
 `POST/PATCH/DELETE /api/admin/portfolio/events` ja validen `verifyCsrf(req)` després d'auth i abans de body/query/servei. Baseline `qa:api-admin-csrf` baixa de 69 a 66. Test focalitzat nou 8/8, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.

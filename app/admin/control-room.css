@@ -14,7 +14,7 @@ html.admin-mode .admin-control-room {
 }
 
 html.admin-mode .admin-control-room > * + * {
-  margin-top: 0.75rem;
+  margin-top: 0.7rem;
 }
 
 html.admin-mode .admin-control-room .admin-cr-title {
@@ -35,7 +35,11 @@ html.admin-mode .admin-control-room .admin-cr-mobile-only {
 html.admin-mode .admin-control-room .admin-cr-quick-links {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.625rem;
+  gap: 0;
+  border: 1px solid var(--ax-fill-5);
+  border-radius: var(--o-r-md);
+  overflow: hidden;
+  background: color-mix(in oklab, var(--at-panel) 72%, transparent);
 }
 
 @media (min-width: 640px) {
@@ -45,26 +49,54 @@ html.admin-mode .admin-control-room .admin-cr-quick-links {
 }
 
 html.admin-mode .admin-control-room .admin-cr-quick-link {
-  border: 1px solid var(--at-border);
-  background: var(--at-panel);
+  min-width: 0;
+  display: grid;
+  gap: 0.18rem;
+  border: 0;
+  border-right: 1px solid var(--ax-fill-5);
+  border-bottom: 1px solid var(--ax-fill-5);
+  background: transparent;
   color: var(--at-text);
-  border-radius: 0.75rem;
-  padding: 0.625rem 0.75rem;
-  font-size: 0.75rem;
+  padding: 0.62rem 0.82rem;
   transition: 150ms ease;
 }
 
+html.admin-mode .admin-control-room .admin-cr-quick-link:nth-child(2n) {
+  border-right: 0;
+}
+
+html.admin-mode .admin-control-room .admin-cr-quick-link:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+html.admin-mode .admin-control-room .admin-cr-quick-kicker {
+  color: var(--at-muted);
+  font-family: var(--mono);
+  font-size: var(--o-text-micro);
+  font-weight: var(--o-fw-bold);
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+html.admin-mode .admin-control-room .admin-cr-quick-label {
+  overflow: hidden;
+  color: var(--at-text);
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-bold);
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 html.admin-mode .admin-control-room .admin-cr-quick-link:hover {
-  border-color: color-mix(in oklab, var(--at-gold) 40%, var(--at-border) 60%);
   color: var(--at-gold-text);
-  background: color-mix(in oklab, var(--at-gold) 6%, var(--at-panel) 94%);
-  box-shadow: 0 2px 8px color-mix(in oklab, var(--at-gold) 12%, transparent 88%);
-  transform: translateY(-1px);
+  background: color-mix(in oklab, var(--at-gold) 7%, transparent);
 }
 
 html.admin-mode .admin-control-room .admin-cr-panel {
-  border: 1px solid var(--at-border);
-  border-radius: 0.75rem;
+  border: 1px solid var(--ax-fill-5);
+  border-radius: var(--o-r-md);
   padding: 0.75rem;
 }
 
@@ -118,7 +150,7 @@ html.admin-mode .admin-control-room .admin-cr-chip {
   padding: 0.2rem 0.6rem;
   font-size: 11px;
   font-weight: 700;
-  border: 1px solid var(--at-border);
+  border: 1px solid var(--ax-fill-5);
 }
 
 html.admin-mode .admin-control-room .admin-cr-pill--pilot { border-color: var(--at-cr-pilot-border); color: var(--at-cr-pilot-text); background: var(--at-cr-emerald-chip); }
@@ -397,7 +429,7 @@ html.admin-mode .admin-control-room .admin-ui-btn--ghost:hover { background: var
 }
 
 @media (min-width: 768px) {
-  html.admin-mode .admin-control-room .admin-cr-quick-links { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  html.admin-mode .admin-control-room .admin-cr-quick-links { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   html.admin-mode .admin-control-room .admin-cr-desktop-only { display: block; }
 }
 
@@ -416,6 +448,20 @@ html.admin-mode .admin-control-room .admin-ui-btn--ghost:hover { background: var
   html.admin-mode .admin-control-room .admin-cr-mini-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
+@media (min-width: 768px) {
+  html.admin-mode .admin-control-room .admin-cr-quick-link:nth-child(2n) {
+    border-right: 1px solid var(--ax-fill-5);
+  }
+
+  html.admin-mode .admin-control-room .admin-cr-quick-link:nth-child(4n) {
+    border-right: 0;
+  }
+
+  html.admin-mode .admin-control-room .admin-cr-quick-link:nth-last-child(-n + 4) {
+    border-bottom: 0;
+  }
+}
+
 
 
 
@@ -427,25 +473,16 @@ html.admin-mode .admin-control-room .admin-ui-btn--ghost:hover { background: var
 html.admin-mode .admin-control-room .admin-hero-header {
   position: relative;
   overflow: hidden;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  border: 1px solid color-mix(in oklab, var(--at-gold) 20%, var(--at-border) 80%);
-  background:
-    radial-gradient(ellipse 120% 100% at 15% 0%, color-mix(in oklab, var(--at-gold) 12%, transparent 88%), transparent 50%),
-    radial-gradient(ellipse 80% 80% at 85% 20%, color-mix(in oklab, var(--at-violet) 8%, transparent 92%), transparent 50%),
-    linear-gradient(170deg, var(--at-surface), var(--at-panel));
-  box-shadow: var(--at-shadow-lg);
+  border: 0;
+  border-bottom: 1px solid var(--ax-fill-5);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0.95rem 1.25rem 0.85rem;
 }
 
 html.admin-mode .admin-control-room .admin-hero-glow {
-  position: absolute;
-  top: -40%;
-  left: -20%;
-  width: 70%;
-  height: 120%;
-  background: radial-gradient(circle, color-mix(in oklab, var(--at-gold) 10%, transparent 90%), transparent 70%);
-  pointer-events: none;
-  animation: admin-hero-glow-drift 12s ease-in-out infinite alternate;
+  display: none;
 }
 
 @keyframes admin-hero-glow-drift {
@@ -454,19 +491,37 @@ html.admin-mode .admin-control-room .admin-hero-glow {
 }
 
 html.admin-mode .admin-control-room .admin-hero-title {
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  background: linear-gradient(135deg, var(--at-text) 30%, var(--at-gold-text) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  margin: 0;
+  color: var(--at-text);
+  font-family: var(--display);
+  font-size: clamp(2rem, 3vw, 2.4rem);
+  font-weight: var(--o-fw-xbold);
+  letter-spacing: 0;
+  line-height: 1;
 }
 
 html.admin-mode .admin-control-room .admin-hero-subtitle {
-  font-size: 0.875rem;
+  margin-top: 0.45rem;
   color: var(--at-muted);
-  margin-top: 0.25rem;
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-semi);
+}
+
+html.admin-mode .admin-control-room .admin-cr-hero-kicker {
+  margin: 0 0 0.4rem;
+  color: var(--at-gold);
+  font-family: var(--mono);
+  font-size: var(--o-text-micro);
+  font-weight: var(--o-fw-bold);
+  letter-spacing: 0.22em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+html.admin-mode .admin-control-room .admin-cr-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.62rem;
 }
 
 /* ── Semàfor glow pulsar (per l'event imminent) ── */
@@ -663,9 +718,9 @@ html.admin-mode .admin-control-room .admin-cr-quick-link {
 }
 
 html.admin-mode .admin-control-room .admin-cr-quick-link:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  background: color-mix(in oklab, var(--at-info) 8%, var(--at-panel) 92%);
+  transform: none;
+  box-shadow: none;
+  background: color-mix(in oklab, var(--at-gold) 7%, transparent);
 }
 
 /* ── Cards amb subtle top gradient line ── */
@@ -691,16 +746,16 @@ html.admin-mode .admin-control-room .admin-cr-info-card:hover {
 
 /* ── Panels amb top border accent ── */
 html.admin-mode .admin-control-room .admin-cr-panel--pilot {
-  border-top: 2px solid var(--at-cr-emerald);
+  border-top: 1px solid color-mix(in oklab, var(--at-gold) 42%, var(--at-border));
 }
 html.admin-mode .admin-control-room .admin-cr-panel--checklist {
-  border-top: 2px solid var(--at-info);
+  border-top: 1px solid color-mix(in oklab, var(--at-gold) 34%, var(--at-border));
 }
 html.admin-mode .admin-control-room .admin-cr-panel--command {
-  border-top: 2px solid var(--at-violet);
+  border-top: 1px solid color-mix(in oklab, var(--at-gold) 34%, var(--at-border));
 }
 html.admin-mode .admin-control-room .admin-cr-panel--radar {
-  border-top: 2px solid var(--at-cyan);
+  border-top: 1px solid color-mix(in oklab, var(--at-gold) 34%, var(--at-border));
 }
 
 /* ── Status chips amb millor contrast ── */
@@ -729,6 +784,62 @@ html.admin-mode .admin-control-room .admin-cr-audit-row {
 
 html.admin-mode .admin-control-room .admin-cr-audit-row:hover {
   background: var(--at-cr-bg-hover);
+}
+
+/* ── Passada TANCAT CHARLIE: superfícies menys wireframe, més carbó/or ── */
+html.admin-mode .admin-control-room .admin-cr-panel,
+html.admin-mode .admin-control-room .admin-cr-step,
+html.admin-mode .admin-control-room .admin-cr-command-card,
+html.admin-mode .admin-control-room .admin-cr-info-card,
+html.admin-mode .admin-control-room .admin-cr-stat-box,
+html.admin-mode .admin-control-room .admin-cr-radar-card,
+html.admin-mode .admin-control-room .admin-cr-banner,
+html.admin-mode .admin-control-room .admin-cr-alert,
+html.admin-mode .admin-control-room .admin-ui-card,
+html.admin-mode .admin-control-room .admin-ui-metric-card,
+html.admin-mode .admin-control-room .admin-cr-list-row,
+html.admin-mode .admin-control-room .admin-cr-health-item,
+html.admin-mode .admin-control-room .admin-cr-mini-card {
+  border-color: var(--ax-fill-5);
+  background: color-mix(in oklab, var(--at-panel) 72%, transparent);
+  box-shadow: none;
+}
+
+html.admin-mode .admin-control-room .admin-cr-step:hover,
+html.admin-mode .admin-control-room .admin-cr-radar-card:hover,
+html.admin-mode .admin-control-room .admin-cr-command-card:hover,
+html.admin-mode .admin-control-room .admin-cr-info-card:hover,
+html.admin-mode .admin-control-room .admin-ui-card:hover,
+html.admin-mode .admin-control-room .admin-ui-metric-card:hover,
+html.admin-mode .admin-control-room .admin-cr-mini-card:hover {
+  border-color: color-mix(in oklab, var(--at-gold) 46%, var(--at-border));
+  box-shadow: none;
+  transform: none;
+}
+
+html.admin-mode .admin-control-room .admin-cr-daily-brief {
+  border-color: var(--ax-fill-5);
+  background: color-mix(in oklab, var(--at-panel) 72%, transparent);
+  box-shadow: none;
+}
+
+html.admin-mode .admin-control-room .admin-cr-daily-brief .admin-tone-border-success,
+html.admin-mode .admin-control-room .admin-cr-daily-brief .admin-tone-border-warning,
+html.admin-mode .admin-control-room .admin-cr-daily-brief .admin-tone-border-danger,
+html.admin-mode .admin-control-room .admin-cr-daily-brief .admin-tone-border-cyan {
+  border-color: var(--ax-fill-5);
+}
+
+html.admin-mode .admin-control-room .admin-cr-daily-brief a:hover {
+  border-color: color-mix(in oklab, var(--at-gold) 34%, var(--ax-line));
+}
+
+html.admin-mode .admin-control-room .admin-cr-alert-mark {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  background: var(--at-gold);
+  flex-shrink: 0;
 }
 
 /* ── Reduced motion ── */

@@ -28,6 +28,32 @@ Continuació non stop del drenatge CSRF backend després de #1082. Perímetre pe
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-23 — Deute CSS a 0: booking-detail mal format resolt (Canvi #1098, claude)
+
+### Context
+Últim selector de deute CSS (1 restant del #1097): el `#sec-serveis,` orfe de booking-detail.css.
+
+### Diagnòstic (intenció, no a cegues)
+Era un FRAGMENT corromput: els 4 `#sec-*` (client/event/serveis/finances) JA tenen `grid-column: span 6` a la regla 944-948. El selector orfe `#sec-serveis,` amb coma penjant abans del @media no aportava res (redundant + trencat).
+
+### Què s'ha fet
+Eliminat el selector orfe, deixant el @media net. 0 canvi visual (la regla real de span 6 es manté). Verificat render booking/[id] a mòbil (el breakpoint del @media): HTTP 200, 0 errors, 0 overflow.
+
+### Resultat
+Baseline `admin-mode-prefix` BUIDA (0 entrades). Deute CSS 1110→0. Tot l'admin amb prefix canònic; el «CSS vell entre pantalles» 100% eradicat. El guard ara és de 0 tolerància.
+
+### Validació
+- Validació tècnica: tsc + validate:core EXIT 0 (guard CSS baseline 0).
+- Validació funcional: render booking-detail idèntic.
+- Validació humana/UX: 0 canvi visual.
+
+### Coordinació
+Counter -> 1098.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-23 — Canonització CSS admin COMPLETA: leads + inbox (deute 1110→1) (Canvi #1097, claude)
 
 ### Context

@@ -146,7 +146,6 @@ html.admin-mode .bd__overview #sec-client,
 html.admin-mode .bd__overview #sec-event {
   grid-column: span 6;
 }
-html.admin-mode .bd__overview #sec-serveis,
 @media (max-width: 1023px) {
   html.admin-mode .bd__overview > .bd__pnl {
     grid-column: 1 / -1 !important;

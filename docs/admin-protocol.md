@@ -1502,6 +1502,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1098 — 2026-06-23 — claude (TANCAT)
+
+**Deute CSS a 0: booking-detail mal format resolt.**
+
+- El `#sec-serveis,` orfe era un fragment corromput (els 4 #sec-* ja tenen span 6 a la regla 944-948). Eliminat → 0 canvi visual, CSS net.
+- Baseline admin-mode-prefix BUIDA. Deute CSS 1110→0. Tot l'admin canònic; guard a 0 tolerància.
+- Validació tècnica: tsc + validate:core EXIT 0.
+- Validació funcional: render booking-detail idèntic (verificat mòbil).
+- Validació humana/UX: 0 canvi visual.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1097 — 2026-06-23 — claude (TANCAT)
 
 **Canonització CSS admin COMPLETA: leads + inbox (deute 1110→1).**

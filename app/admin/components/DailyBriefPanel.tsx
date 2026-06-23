@@ -10,13 +10,10 @@ const ALERT_TONE: Record<AlertLevel, string> = {
 
 export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
   return (
-    <section className="rounded-2xl border border-white/10 p-5 admin-card-glass space-y-4">
+    <section className="admin-cr-daily-brief rounded-2xl border p-5 space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-sm font-semibold flex items-center gap-2">
-            <span>📋</span>
-            <span>Resum del dia</span>
-          </h2>
+          <h2 className="text-sm font-semibold">Resum del dia</h2>
           <p className="mt-0.5 text-xs opacity-60">{brief.summary}</p>
         </div>
         <Link
@@ -64,7 +61,7 @@ export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
               href={alert.href}
               className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 text-xs transition-colors hover:bg-white/5 ${ALERT_TONE[alert.level]}`}
             >
-              <span className="text-sm shrink-0">{alert.icon}</span>
+              <span className="admin-cr-alert-mark" aria-hidden="true" />
               <div className="min-w-0 flex-1">
                 <span className="font-semibold">{alert.title}</span>
                 <span className="ml-1.5 opacity-70">{alert.detail}</span>
@@ -97,7 +94,7 @@ export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
       {/* Top campaigns */}
       {brief.topCampaigns.length > 0 && (
         <div className="flex items-center gap-2 text-xs opacity-50">
-          <span>📣 Campanyes suggerides:</span>
+          <span>Campanyes suggerides:</span>
           {brief.topCampaigns.map((c, i) => (
             <span key={i}>{c.name} ({c.audienceSize})</span>
           ))}
