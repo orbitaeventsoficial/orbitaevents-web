@@ -28,6 +28,35 @@ Continuació non stop del drenatge CSRF backend després de #1082. Perímetre pe
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-23 — Canonització CSS admin COMPLETA: leads + inbox (deute 1110→1) (Canvi #1097, claude)
+
+### Context
+Tancament de l'eradicació del deute de 1110 selectors CSS sense `html.admin-mode`. Després del lot de baix risc (#1096), quedaven els 2 grossos sensibles: leads-design.css (430, TANCAT CHARLIE) i inbox.css (391, sub-app).
+
+### Què s'ha fet
+Aplicat el transformador postcss BLINDAT (avorta si CSS mal format, salta @-rules) a tots dos. Verificació triple per cadascun:
+- nº de blocs idèntic (leads 635/635, inbox 396/396) → postcss no ha fusionat ni trencat res.
+- parse OK + 0 selectors `html.admin-mode @` (la xarxa del bug de booking-detail).
+- captura ABANS/DESPRÉS **idèntica**: leads (calendari + pipeline) i inbox comparades visualment.
+
+### Resultat
+Deute CSS **1110 → 1**. Tot l'admin amb selectors canònics `html.admin-mode` → no més «CSS que es barreja» entre pantalles.
+
+### Únic restant (deute preexistent, no creat aquí)
+`booking-detail.css:150`: CSS mal format preexistent (selector `#sec-serveis,` amb coma penjant abans d'un @media). NO tocat a cegues — cal saber la intenció original. Queda a la baseline documentat.
+
+### Validació
+- Validació tècnica: tsc + validate:core EXIT 0 (guard CSS: 0 noves, baseline 1).
+- Validació funcional: deute CSS −99,9%; render idèntic verificat (nº blocs + parse + captura).
+- Validació humana/UX: captures abans/després idèntiques a leads (TANCAT CHARLIE) i inbox.
+
+### Coordinació
+Counter -> 1097.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-23 — Canonització CSS admin: transformador postcss + lot de baix risc (Canvi #1096, claude)
 
 ### Context

@@ -1502,6 +1502,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1097 — 2026-06-23 — claude (TANCAT)
+
+**Canonització CSS admin COMPLETA: leads + inbox (deute 1110→1).**
+
+- Canonitzats els 2 grossos (leads-design TANCAT CHARLIE, inbox sub-app) amb el transformador postcss blindat. Verificació triple: nº blocs idèntic, parse OK, 0 selectors trencats, captura abans/després idèntica.
+- Deute CSS 1110→1 (l'únic restant és booking-detail.css mal format PREEXISTENT, no tocat a cegues).
+- Validació tècnica: tsc + validate:core EXIT 0.
+- Validació funcional: tot l'admin amb prefix canònic; render idèntic.
+- Validació humana/UX: captures abans/després idèntiques.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1096 — 2026-06-23 — claude (TANCAT)
 
 **Canonització CSS admin: transformador postcss + lot de baix risc.**

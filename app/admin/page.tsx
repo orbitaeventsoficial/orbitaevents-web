@@ -206,13 +206,13 @@ export default async function AdminDashboard() {
         <div className="relative z-10">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-medium opacity-60 mb-1">{getGreeting()}</p>
+              <p className="admin-cr-hero-kicker">{getGreeting()}</p>
               <h1 className="admin-hero-title">Òrbita Events</h1>
               <p className="admin-hero-subtitle">Visió general del negoci</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="admin-cr-hero-actions">
               <Link href="/admin/analytics" className="hidden sm:inline-flex">
-                <Button variant="secondary" icon="📈" label="Analítica" helpText={ADMIN_DASHBOARD_HELP.analyticsButton} />
+                <Button variant="secondary" label="Analítica" helpText={ADMIN_DASHBOARD_HELP.analyticsButton} />
               </Link>
               <Link href="/admin/leads">
                 <Button variant="primary" icon="+" label="Nou lead" helpText={ADMIN_DASHBOARD_HELP.newLeadButton} />
@@ -220,14 +220,38 @@ export default async function AdminDashboard() {
             </div>
           </div>
           <div className="admin-cr-quick-links mt-4">
-            <Link href="/admin/inbox" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.inbox)}>📥 Inbox (IMAP)</Link>
-            <Link href="/admin/emails" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.emails)}>🤖 Correus automàtics</Link>
-            <Link href="/admin/bookings" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.bookings)}>📋 Reserves</Link>
-            <Link href="/admin/bookings?payment=overdue" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.overdue)}>💸 Cobraments vençuts</Link>
-            <Link href="/admin/bookings?payment=due-soon" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.dueSoon)}>⏳ Vencen aviat</Link>
-            <Link href="/admin/economia" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.economy)}>💶 Economia</Link>
-            <Link href="/admin/salut" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.health)}>🩺 Salut</Link>
-            <Link href="/admin/calendario" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.calendar)}>📅 Calendari</Link>
+            <Link href="/admin/inbox" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.inbox)}>
+              <span className="admin-cr-quick-kicker">Comunicació</span>
+              <span className="admin-cr-quick-label">Inbox IMAP</span>
+            </Link>
+            <Link href="/admin/emails" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.emails)}>
+              <span className="admin-cr-quick-kicker">Automatització</span>
+              <span className="admin-cr-quick-label">Correus</span>
+            </Link>
+            <Link href="/admin/bookings" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.bookings)}>
+              <span className="admin-cr-quick-kicker">Operació</span>
+              <span className="admin-cr-quick-label">Reserves</span>
+            </Link>
+            <Link href="/admin/bookings?payment=overdue" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.overdue)}>
+              <span className="admin-cr-quick-kicker">Risc</span>
+              <span className="admin-cr-quick-label">Vençuts</span>
+            </Link>
+            <Link href="/admin/bookings?payment=due-soon" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.dueSoon)}>
+              <span className="admin-cr-quick-kicker">Proper</span>
+              <span className="admin-cr-quick-label">Vencen aviat</span>
+            </Link>
+            <Link href="/admin/economia" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.economy)}>
+              <span className="admin-cr-quick-kicker">Marge</span>
+              <span className="admin-cr-quick-label">Economia</span>
+            </Link>
+            <Link href="/admin/salut" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.health)}>
+              <span className="admin-cr-quick-kicker">Sistema</span>
+              <span className="admin-cr-quick-label">Salut</span>
+            </Link>
+            <Link href="/admin/calendario" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.calendar)}>
+              <span className="admin-cr-quick-kicker">Agenda</span>
+              <span className="admin-cr-quick-label">Calendari</span>
+            </Link>
           </div>
         </div>
       </div>
@@ -907,7 +931,6 @@ export default async function AdminDashboard() {
     </div>
   );
 }
-
 
 
 
