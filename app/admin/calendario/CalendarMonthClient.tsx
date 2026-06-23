@@ -739,7 +739,7 @@ export default function CalendarMonthClient() {
                 )}
 
                 {visibleLayers.followUps && dayData.followUps.length > 0 && (
-                  <div className="mt-0.5 truncate rounded-md border border-rose-500/30 bg-rose-500/10 px-1 py-0.5 text-xs sm:text-xs text-rose-200">
+                  <div className="mt-0.5 truncate rounded-md border admin-tone-border-danger admin-tone-bg-danger px-1 py-0.5 text-xs sm:text-xs admin-tone-text-danger">
                     ☎ {dayData.followUps[0].name}{dayData.followUps.length > 1 ? ` +${dayData.followUps.length - 1}` : ''}
                   </div>
                 )}
@@ -979,7 +979,7 @@ export default function CalendarMonthClient() {
                         customerId: item.customerId,
                         customerTab: 'comms',
                       })}
-                      className="block rounded-xl border border-rose-500/20 bg-rose-500/[0.05] px-3 py-2.5 transition-all"
+                      className="block rounded-xl border admin-tone-border-danger admin-tone-bg-danger px-3 py-2.5 transition-all"
                     >
                       <div className="truncate text-sm font-medium">Follow-up · {item.name}</div>
                       <div className="mt-1 text-xs opacity-70">{item.urgency} · {item.suggestedAction}</div>

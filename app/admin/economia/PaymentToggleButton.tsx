@@ -55,8 +55,8 @@ export default function PaymentToggleButton({
       disabled={saving}
       className={`rounded-md px-2 py-1 text-xs font-semibold ${
         currentValue
-          ? 'bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/20'
-          : 'bg-amber-500/15 text-amber-300 hover:bg-amber-500/20'
+          ? 'admin-tone-bg-success admin-tone-text-success hover:admin-tone-bg-success'
+          : 'admin-tone-bg-warning admin-tone-text-warning hover:admin-tone-bg-warning'
       } disabled:opacity-60`}
     >
       {saving ? '...' : currentValue ? 'Pagat' : 'Pendent'}

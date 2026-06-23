@@ -119,7 +119,7 @@ export default function LossBreakdownPanel({
           <span
             className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${
               status === 'error'
-                ? 'border-rose-500/30 bg-rose-500/10 text-rose-200'
+                ? 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger'
                 : 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info'
             }`}
           >
@@ -149,10 +149,10 @@ export default function LossBreakdownPanel({
           <p className="mt-2 text-2xl font-semibold text-white">{summary.total}</p>
           <p className="mt-1 text-xs admin-tone-text-neutral">{summary.commercialTotal} comercials · {summary.autoTotal} automàtics</p>
         </div>
-        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[0.06] p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-100/80">Auto-descartats</p>
-          <p className="mt-2 text-2xl font-semibold text-amber-200">{summary.autoTotal}</p>
-          <p className="mt-1 text-xs text-amber-50/75">Leads amb `EVENT_PASSED` fora del càlcul del motiu comercial principal.</p>
+        <div className="rounded-2xl border admin-tone-border-warning admin-tone-bg-warning p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] admin-tone-text-warning">Auto-descartats</p>
+          <p className="mt-2 text-2xl font-semibold admin-tone-text-warning">{summary.autoTotal}</p>
+          <p className="mt-1 text-xs admin-tone-text-warning">Leads amb `EVENT_PASSED` fora del càlcul del motiu comercial principal.</p>
         </div>
         <div className="ap-card p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/50">Sense classificar</p>

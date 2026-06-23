@@ -382,7 +382,7 @@ export default async function CatalogPage({
                         </div>
                         <div>
                           <p className="">Benefici</p>
-                          <p className={pack.profit >= 0 ? 'text-emerald-200 font-semibold' : 'text-rose-200 font-semibold'}>
+                          <p className={pack.profit >= 0 ? 'admin-tone-text-success font-semibold' : 'admin-tone-text-danger font-semibold'}>
                             {formatCurrency(pack.profit)}
                           </p>
                         </div>
@@ -507,13 +507,13 @@ export default async function CatalogPage({
                           </td>
                           <td className="px-3 py-2 text-right">{formatCurrency(row.publicPrice)}</td>
                           <td className="px-3 py-2 text-right">{formatCurrency(row.directCost)}</td>
-                          <td className={`px-3 py-2 text-right font-semibold ${row.profit >= 0 ? 'text-emerald-200' : 'text-rose-200'}`}>
+                          <td className={`px-3 py-2 text-right font-semibold ${row.profit >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
                             {formatCurrency(row.profit)}
                           </td>
                           <td className="px-3 py-2 text-right">{formatPct(row.marginPct)}</td>
                           <td className="px-3 py-2 text-right">{formatPct(row.costRatioPct)}</td>
                           <td className="px-3 py-2 text-right">{formatCurrency(row.recommendedPrice)}</td>
-                          <td className={`px-3 py-2 text-right font-semibold ${Math.abs(row.divergencePct) >= 20 ? 'text-amber-200' : 'text-white/70'}`}>
+                          <td className={`px-3 py-2 text-right font-semibold ${Math.abs(row.divergencePct) >= 20 ? 'admin-tone-text-warning' : 'text-white/70'}`}>
                             {formatPct(row.divergencePct)}
                           </td>
                           <td className="px-3 py-2 text-xs">

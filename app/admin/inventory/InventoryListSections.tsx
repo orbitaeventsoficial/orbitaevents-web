@@ -413,7 +413,7 @@ export function InventoryGridSection({ displayedItems }: { displayedItems: Inven
               )}
               <div className="h-1.5 w-full rounded-full bg-white/10">
                 <div
-                  className={`h-1.5 rounded-full ${lifePercent > 40 ? 'bg-emerald-400' : lifePercent > 20 ? 'bg-amber-400' : lifePercent > 5 ? 'bg-orange-400' : 'bg-rose-400'}`}
+                  className={`h-1.5 rounded-full ${lifePercent > 40 ? 'admin-tone-bg-success' : lifePercent > 20 ? 'admin-tone-bg-warning' : lifePercent > 5 ? 'admin-tone-bg-warning' : 'admin-tone-bg-danger'}`}
                   style={{ width: `${Math.max(lifePercent, 3)}%` }}
                 />
               </div>
@@ -529,7 +529,7 @@ export function InventoryDesktopTableSection({
                       <p>{item.totalHoursUsed > 0 ? `${item.totalHoursUsed}h` : '—'}</p>
                       {item.purchasePrice && <p>↓ {Math.max(0, (item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS) - item.totalHoursUsed).toFixed(0)}h restants</p>}
                       <div className="h-1 w-full rounded-full bg-white/10 max-w-[80px]">
-                        <div className={`h-1 rounded-full ${tableLifePct > 40 ? 'bg-emerald-400' : tableLifePct > 20 ? 'bg-amber-400' : tableLifePct > 5 ? 'bg-orange-400' : 'bg-rose-400'}`} style={{ width: `${Math.max(tableLifePct, 5)}%` }} />
+                        <div className={`h-1 rounded-full ${tableLifePct > 40 ? 'admin-tone-bg-success' : tableLifePct > 20 ? 'admin-tone-bg-warning' : tableLifePct > 5 ? 'admin-tone-bg-warning' : 'admin-tone-bg-danger'}`} style={{ width: `${Math.max(tableLifePct, 5)}%` }} />
                       </div>
                     </div>
                   </td>

@@ -30,8 +30,8 @@ import {
 export const dynamic = 'force-dynamic';
 
 const STATUS_STYLE: Record<ProtocolCanviStatus, string> = {
-  FET: 'border-emerald-500/40 bg-emerald-500/[0.08] text-emerald-200',
-  'EN MARXA': 'border-amber-500/40 bg-amber-500/[0.08] text-amber-200',
+  FET: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
+  'EN MARXA': 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
   PENDENT: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
   UNKNOWN: 'border-[var(--line)] bg-[var(--panel)] text-white/70',
 };
@@ -155,12 +155,12 @@ export default async function AdminProtocolPage({
             defaultValue={query}
             placeholder="Cerca per #462, claude, audit trail..."
             aria-label="Cercar al protocol"
-            className="flex-1 min-w-[240px] ap-card px-3 py-2 text-sm placeholder:text-white/40 focus:border-amber-500/50 focus:outline-none"
+            className="flex-1 min-w-[240px] ap-card px-3 py-2 text-sm placeholder:text-white/40 focus:admin-tone-border-warning focus:outline-none"
           />
           <select
             name="validation"
             defaultValue={validationFilter}
-            className="min-w-[180px] ap-card px-3 py-2 text-sm focus:border-amber-500/50 focus:outline-none"
+            className="min-w-[180px] ap-card px-3 py-2 text-sm focus:admin-tone-border-warning focus:outline-none"
           >
             <option value="all">Tots els canvis</option>
             <option value="validated">Només validats</option>
@@ -210,7 +210,7 @@ export default async function AdminProtocolPage({
           title={`§${focusedSection.id} — ${focusedSection.title}`}
           description="Secció oberta des d'un CTA del manual. Aquí veus el contingut canònic; el text complet és a docs/admin-protocol.md."
         >
-          <div id={focusedSection.anchorId} className="rounded-2xl border border-amber-500/40 bg-amber-500/[0.04] p-4">
+          <div id={focusedSection.anchorId} className="rounded-2xl border admin-tone-border-warning admin-tone-bg-warning p-4">
             <pre className="overflow-x-auto whitespace-pre-wrap text-xs leading-relaxed opacity-90">
               {focusedSection.body}
             </pre>
@@ -236,7 +236,7 @@ export default async function AdminProtocolPage({
                 <Link
                   key={section.anchorId}
                   href={`/admin/docs/protocol?seccio=${section.id}#${section.anchorId}`}
-                  className="admin-card-glass flex flex-col gap-1 rounded-xl border border-white/10 p-3 transition hover:border-amber-500/40"
+                  className="admin-card-glass flex flex-col gap-1 rounded-xl border border-white/10 p-3 transition hover:admin-tone-border-warning"
                 >
                   <span className="text-xs font-semibold uppercase tracking-wider opacity-50">§{section.id}</span>
                   <span className="text-sm font-bold leading-snug">{section.title}</span>
@@ -267,7 +267,7 @@ export default async function AdminProtocolPage({
                   id={canvi.anchorId}
                   open={shouldAutoOpenProtocolCanvi(canvi.n, focus, validations, validationFilter)}
                   className={`admin-card-glass rounded-2xl border p-4 transition ${
-                    isFocus ? 'border-amber-500/40 bg-amber-500/[0.04]' : 'border-white/10'
+                    isFocus ? 'admin-tone-border-warning admin-tone-bg-warning' : 'border-white/10'
                   }`}
                 >
                   <summary className="flex cursor-pointer flex-wrap items-center gap-2 list-none">

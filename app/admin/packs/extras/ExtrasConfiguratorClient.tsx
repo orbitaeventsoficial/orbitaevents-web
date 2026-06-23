@@ -274,7 +274,7 @@ export default function ExtrasConfiguratorClient() {
                       onClick={() => toggleService(index, service)}
                       className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                         active
-                          ? 'border-emerald-400/50 bg-emerald-500/20 text-emerald-200'
+                          ? 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success'
                           : 'border-white/10 bg-white/5 text-white/70 hover:bg-white/10'
                       }`}
                     >

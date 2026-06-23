@@ -1502,6 +1502,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1105 — 2026-06-23 — claude (TANCAT)
+
+**Canon d'estats: 114→19 colors Tailwind cru → admin-tone-* (38 fitxers).**
+
+- Eradicat el residu d'estats Tailwind cru (emerald/red/amber/rose...) → classes canòniques `admin-tone-{bg,text,border}-{success,warning,danger}` a 38 fitxers. hover cru → `.adm-row-hover`. Els 19 restants són exempts legítims (editors PDF + image-manager).
+- Conclusió d'organisme: les 2 costures que vaig diagnosticar eren falses (nav=codi mort #1104; comandament=granularitat legítima). L'admin està més cohesionat del previst.
+- Validació tècnica: tsc + qa:admin-canon 0 + validate:core EXIT 0 + smoke 8 pàgines 0 problemes.
+- Validació funcional: estats d'una gramàtica; render intacte.
+- Validació humana/UX: 8 pàgines verificades.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1104 — 2026-06-23 — claude (TANCAT)
 
 **La «costura de nav» era codi mort + guard de dades ampliat.**

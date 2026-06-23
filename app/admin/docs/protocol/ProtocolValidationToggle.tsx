@@ -62,12 +62,12 @@ export default function ProtocolValidationToggle({
   };
 
   return (
-    <section className={`mt-3 rounded-xl border p-3 ${isValidated ? 'border-emerald-500/20 bg-emerald-500/[0.05]' : 'border-[var(--line)] bg-[var(--panel)]'}`}>
+    <section className={`mt-3 rounded-xl border p-3 ${isValidated ? 'admin-tone-border-success admin-tone-bg-success' : 'border-[var(--line)] bg-[var(--panel)]'}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Validació humana</p>
           {validation ? (
-            <p className="text-sm text-emerald-200">
+            <p className="text-sm admin-tone-text-success">
               Validat per {validation.validatedBy} · {formatDateTimeFull(validation.validatedAt)}
             </p>
           ) : (
@@ -100,7 +100,7 @@ export default function ProtocolValidationToggle({
         <p className="mt-2 text-xs opacity-70">Nota registrada: {validation.notes}</p>
       ) : null}
       {error ? (
-        <p className="mt-2 rounded-xl border border-rose-500/20 px-3 py-2 text-xs text-rose-300">{error}</p>
+        <p className="mt-2 rounded-xl border admin-tone-border-danger px-3 py-2 text-xs admin-tone-text-danger">{error}</p>
       ) : null}
     </section>
   );

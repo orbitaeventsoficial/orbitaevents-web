@@ -244,7 +244,7 @@ export default function CostCalculatorClient() {
           onDrop={handleDrop}
           className={`min-h-[200px] rounded-xl border-2 border-dashed p-6 transition-colors ${
             dragOver
-              ? 'border-amber-500/50 bg-amber-500/5'
+              ? 'admin-tone-border-warning admin-tone-bg-warning'
               : components.length === 0
               ? 'admin-tone-border-neutral admin-tone-bg-neutral'
               : 'border-transparent bg-transparent p-0'

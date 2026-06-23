@@ -19,12 +19,12 @@ function PaymentIndicator({ booking }: { booking: BookingDTO }) {
   return (
     <div className="mt-2 flex flex-wrap gap-2 text-xs" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.payment)}>
       {deposit > 0 && (
-        <span className={`rounded-full px-2 py-0.5 ${booking.depositPaid ? 'bg-emerald-500/15 text-emerald-300' : 'bg-rose-500/15 text-rose-300'}`}>
+        <span className={`rounded-full px-2 py-0.5 ${booking.depositPaid ? 'admin-tone-bg-success admin-tone-text-success' : 'admin-tone-bg-danger admin-tone-text-danger'}`}>
           Dipòsit {formatNumber(deposit)} € {booking.depositPaid ? '✓' : '✗'}
         </span>
       )}
       {remaining > 0 && (
-        <span className={`rounded-full px-2 py-0.5 ${booking.remainingPaid ? 'bg-emerald-500/15 text-emerald-300' : 'bg-white/5 text-white/40'}`}>
+        <span className={`rounded-full px-2 py-0.5 ${booking.remainingPaid ? 'admin-tone-bg-success admin-tone-text-success' : 'bg-white/5 text-white/40'}`}>
           Resta {formatNumber(remaining)} € {booking.remainingPaid ? '✓' : ''}
         </span>
       )}
@@ -71,7 +71,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
                     <span>{booking.date ? formatDateFull(booking.date) : 'Sense data'}</span>
                     {booking.date && new Date(booking.date) >= now && booking.status !== 'CANCELLED' && (() => {
                       const days = Math.ceil((new Date(booking.date).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-                      return <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${days <= 7 ? 'bg-amber-500/20 text-amber-300' : 'bg-white/10 text-white/50'}`}>{days === 0 ? 'AVUI' : `${days}d`}</span>;
+                      return <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${days <= 7 ? 'admin-tone-bg-warning admin-tone-text-warning' : 'bg-white/10 text-white/50'}`}>{days === 0 ? 'AVUI' : `${days}d`}</span>;
                     })()}
                     {(booking.startTime || booking.endTime) && <span>{booking.startTime || '?'} – {booking.endTime || '?'}</span>}
                   </div>

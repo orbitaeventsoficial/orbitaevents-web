@@ -414,7 +414,7 @@ export default function CalendarDayClient() {
                         customerId: item.customerId,
                         customerTab: 'comms',
                       })}
-                      className="block rounded-xl border border-rose-500/20 bg-rose-500/[0.05] px-3 py-2"
+                      className="block rounded-xl border admin-tone-border-danger admin-tone-bg-danger px-3 py-2"
                     >
                       <div className="truncate text-sm font-medium">☎ Follow-up · {item.name}</div>
                       <div className="mt-1 text-xs opacity-70">{item.urgency} · {item.suggestedAction}</div>

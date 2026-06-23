@@ -175,7 +175,7 @@ export function AddCustomerModal({
                 <div className="flex items-center gap-2">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
                     dup.matchScore >= 80 ? 'admin-tone-soft-danger' :
-                    dup.matchScore >= 50 ? 'bg-amber-500/20 text-amber-300' :
+                    dup.matchScore >= 50 ? 'admin-tone-bg-warning admin-tone-text-warning' :
                     'bg-white/5 text-white/40'
                   }`}>
                     {dup.matchScore}%
@@ -206,7 +206,7 @@ export function AddCustomerModal({
                 value={newCustomer.name}
                 onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
                 className={`w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all ${
-                  !newCustomer.name && newCustomer.email ? 'border-rose-500/40' : ''
+                  !newCustomer.name && newCustomer.email ? 'admin-tone-border-danger' : ''
                 }`}
                 placeholder="Maria García"
                 required
@@ -221,7 +221,7 @@ export function AddCustomerModal({
                 value={newCustomer.email}
                 onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
                 className={`w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all ${
-                  !newCustomer.email && newCustomer.name ? 'border-rose-500/40' : ''
+                  !newCustomer.email && newCustomer.name ? 'admin-tone-border-danger' : ''
                 }`}
                 placeholder="maria@email.com"
                 required

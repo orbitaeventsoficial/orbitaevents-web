@@ -10,8 +10,8 @@ export const metadata = {
 };
 
 const URGENCY_TONE: Record<string, string> = {
-  HIGH: 'border-rose-500/30 bg-rose-500/10 text-rose-300',
-  MEDIUM: 'border-amber-500/30 bg-amber-500/10 text-amber-300',
+  HIGH: 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger',
+  MEDIUM: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
   LOW: 'border-[var(--line)] bg-[var(--panel)] text-white/60',
 };
 
@@ -163,9 +163,9 @@ export default async function CampaignsPage() {
             <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Campanyes suggerides</p>
             <p className="mt-1 text-xl font-bold">{campaigns.length}</p>
           </div>
-          <div className="rounded-xl border border-rose-500/20 bg-rose-500/[0.04] p-3">
+          <div className="rounded-xl border admin-tone-border-danger admin-tone-bg-danger p-3">
             <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Urgència alta</p>
-            <p className="mt-1 text-xl font-bold text-rose-300">{highCount}</p>
+            <p className="mt-1 text-xl font-bold admin-tone-text-danger">{highCount}</p>
           </div>
           <div className="ap-card p-3">
             <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Audiència total</p>

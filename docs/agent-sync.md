@@ -15,6 +15,10 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-23 [ESTAT: tancat — CANON D'ESTATS: 114→19 colors Tailwind cru → admin-tone-* (38 fitxers) #1105]
+Eradicat el residu d'estats Tailwind cru (emerald/red/amber/rose...) a 38 fitxers admin → classes canòniques admin-tone-{bg,text,border}-{success,warning,danger}. Transformador per famílies (qualsevol tonalitat/opacitat). De 114 a 19 (els 19 restants són EXEMPTS legítims: PresupuestoPdfStudio/StudioPreview=editors PDF, image-manager=placement visual). hover:bg-color cru → .adm-row-hover canònic. tsc + admin-canon 0 + validate:core EXIT 0 + smoke 8 pàgines tocades 0 problemes.
+NOTA d'organisme: les 2 «costures» del meu diagnòstic anterior eren FALSES alarmes — nav (codi mort #1104) i comandament economia/cockpit (granularitat de presentació legítima, no duplicació: les fórmules ja són úniques). L'admin està més cohesionat del que el diagnòstic deia. Counter->1105.
+
 [claude] 2026-06-23 [ESTAT: tancat — LA «COSTURA DE NAV» ERA CODI MORT + guard de dades ampliat #1104]
 Auditoria d'organisme: vaig diagnosticar la nav admin com a «2 fonts que divergeixen» (nav-items.ts 50 vs layout.tsx 23). Investigant a fons: nav-items.ts és CODI MORT (cap importador; cua de l'AdminSearchModal esborrat al #1026). NO era fragmentació, era una illa morta que el guard no veia (és .ts de dades, no .tsx). Eradicats 4 mòduls .ts orfes (nav-items, adminHelpGlossary, importNavigation, inbox-types) + 1 test orfe — tots cua de components ja esborrats. La nav admin ÉS una sola font viva (layout.tsx).
 GUARD AMPLIAT: check-dead-admin-views ara cobreix .ts de dades sota app/admin/components/, no només .tsx → tapa el forat. validate:core EXIT 0 (0 falsos positius a tot el repo). Counter->1104.

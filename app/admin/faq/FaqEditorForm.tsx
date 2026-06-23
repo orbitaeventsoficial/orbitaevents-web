@@ -149,8 +149,8 @@ export default function FaqEditorForm({
               onClick={() => setIsActive((v) => !v)}
               className={`rounded-xl border px-4 py-2 text-sm font-semibold ${
                 isActive
-                  ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-200'
-                  : 'border-rose-500/40 bg-rose-500/15 text-rose-200'
+                  ? 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success'
+                  : 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger'
               }`}
             >
               {isActive ? 'Activa' : 'Inactiva'}

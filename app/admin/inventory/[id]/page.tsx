@@ -142,8 +142,8 @@ export default async function InventoryItemPage({ params }: PageProps) {
           <div className="mt-2 h-2 w-full rounded-full">
             <div
               className={`h-2 rounded-full transition-all ${
-                lifeRemaining > 50 ? 'bg-emerald-400' :
-                lifeRemaining > 20 ? 'bg-amber-400' : 'bg-rose-400'
+                lifeRemaining > 50 ? 'admin-tone-bg-success' :
+                lifeRemaining > 20 ? 'admin-tone-bg-warning' : 'admin-tone-bg-danger'
               }`}
               style={{ width: `${lifeRemaining}%` }}
             />

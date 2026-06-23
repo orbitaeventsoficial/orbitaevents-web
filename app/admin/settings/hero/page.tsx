@@ -53,7 +53,7 @@ export default function HeroMediaAdmin() {
         </p>
         <Link
           href="/admin/image-manager"
-          className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-5 py-2.5 text-sm font-bold text-[var(--gold-ink)]"
+          className="inline-flex items-center gap-2 rounded-full admin-tone-bg-warning px-5 py-2.5 text-sm font-bold text-[var(--gold-ink)]"
         >
           Anar al gestor d’imatges
         </Link>

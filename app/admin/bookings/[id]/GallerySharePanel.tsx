@@ -133,7 +133,7 @@ export default function GallerySharePanel({ bookingId }: Props) {
               type="button"
               onClick={handleRevoke}
               disabled={working}
-              className="rounded-xl border border-red-500/20 px-3 py-1.5 text-xs font-medium text-red-400 hover:border-red-500/40 transition-colors disabled:opacity-50 min-h-[36px]"
+              className="rounded-xl border admin-tone-border-danger px-3 py-1.5 text-xs font-medium admin-tone-text-danger hover:admin-tone-border-danger transition-colors disabled:opacity-50 min-h-[36px]"
             >
               Revocar
             </button>
@@ -173,7 +173,7 @@ export default function GallerySharePanel({ bookingId }: Props) {
         </div>
       )}
 
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs admin-tone-text-danger">{error}</p>}
     </div>
   );
 }

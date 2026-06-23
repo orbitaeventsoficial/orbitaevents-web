@@ -145,20 +145,20 @@ export default function TimelinePanel({
 
       {/* Filters */}
       {filter === 'all' && commercialPriority && (
-        <div className="mt-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3">
+        <div className="mt-3 rounded-xl border admin-tone-border-warning admin-tone-bg-warning p-3">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-wider text-amber-300/80">
+              <p className="text-xs font-semibold uppercase tracking-wider admin-tone-text-warning">
                 Estat comercial actual
               </p>
-              <p className="mt-1 text-sm font-medium text-amber-100">
+              <p className="mt-1 text-sm font-medium admin-tone-text-warning">
                 {commercialPriority.title}
               </p>
-              <p className="mt-1 text-xs leading-relaxed text-amber-50/80">
+              <p className="mt-1 text-xs leading-relaxed admin-tone-text-warning">
                 {commercialPriority.detail}
               </p>
               {commercialPriority.footnote && (
-                <p className="mt-2 text-xs uppercase tracking-wide text-amber-200/60">
+                <p className="mt-2 text-xs uppercase tracking-wide admin-tone-text-warning">
                   {commercialPriority.footnote}
                 </p>
               )}
@@ -169,14 +169,14 @@ export default function TimelinePanel({
                   href={commercialRiskLink.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="shrink-0 rounded-full border border-amber-400/30 px-2.5 py-1 text-xs font-medium text-amber-200 transition-colors hover:bg-amber-500/10"
+                  className="shrink-0 rounded-full border admin-tone-border-warning px-2.5 py-1 text-xs font-medium admin-tone-text-warning transition-colors hover:admin-tone-bg-warning"
                 >
                   {commercialRiskLink.label}
                 </a>
               ) : (
                 <Link
                   href={commercialRiskLink.href}
-                  className="shrink-0 rounded-full border border-amber-400/30 px-2.5 py-1 text-xs font-medium text-amber-200 transition-colors hover:bg-amber-500/10"
+                  className="shrink-0 rounded-full border admin-tone-border-warning px-2.5 py-1 text-xs font-medium admin-tone-text-warning transition-colors hover:admin-tone-bg-warning"
                 >
                   {commercialRiskLink.label}
                 </Link>

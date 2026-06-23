@@ -37,7 +37,7 @@ function StarRating({ rating }: { rating: number }) {
         return (
           <span
             key={star}
-            className={`text-sm ${fill >= 1 ? 'text-amber-400' : fill > 0 ? 'text-amber-400/50' : 'text-white/10'}`}
+            className={`text-sm ${fill >= 1 ? 'admin-tone-text-warning' : fill > 0 ? 'admin-tone-text-warning' : 'text-white/10'}`}
           >
             ★
           </span>

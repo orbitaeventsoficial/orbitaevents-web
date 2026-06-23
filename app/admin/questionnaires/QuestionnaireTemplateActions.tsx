@@ -55,7 +55,7 @@ export default function QuestionnaireTemplateActions({
         </button>
         <button
           onClick={handleDelete}
-          className="inline-flex rounded-lg border border-red-500/30 px-3 py-1.5 text-xs text-red-300 hover:bg-red-500/10"
+          className="inline-flex rounded-lg border admin-tone-border-danger px-3 py-1.5 text-xs admin-tone-text-danger hover:admin-tone-bg-danger"
           type="button"
         >
           Eliminar

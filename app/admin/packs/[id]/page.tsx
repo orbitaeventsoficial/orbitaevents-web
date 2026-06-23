@@ -147,10 +147,10 @@ export default async function EditPackPage({ params }: { params: Promise<{ id: s
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`rounded-full px-2 py-0.5 text-xs ${
-                    b.status === 'COMPLETED' ? 'bg-emerald-500/20 text-emerald-400' :
+                    b.status === 'COMPLETED' ? 'admin-tone-bg-success admin-tone-text-success' :
                     b.status === 'CONFIRMED' ? 'admin-tone-bg-info admin-tone-text-info' :
-                    b.status === 'CANCELLED' ? 'bg-red-500/20 text-red-400' :
-                    'bg-amber-500/20 text-amber-400'
+                    b.status === 'CANCELLED' ? 'admin-tone-bg-danger admin-tone-text-danger' :
+                    'admin-tone-bg-warning admin-tone-text-warning'
                   }`}>
                     {getBookingStatusLabel(b.status)}
                   </span>

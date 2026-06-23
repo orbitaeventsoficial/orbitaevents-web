@@ -125,7 +125,7 @@ export default function CrewBlockManager({
                     {b.allDay ? 'tot el dia' : `${b.startLabel}–${b.endLabel ?? '?'}`}
                     {b.reason && <span className="opacity-60"> · {b.reason}</span>}
                   </span>
-                  <button type="button" onClick={() => remove(b.id)} className="text-rose-300 hover:text-rose-200" aria-label="Treure bloqueig">✕</button>
+                  <button type="button" onClick={() => remove(b.id)} className="admin-tone-text-danger hover:admin-tone-text-danger" aria-label="Treure bloqueig">✕</button>
                 </li>
               ))}
             </ul>

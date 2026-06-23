@@ -225,7 +225,7 @@ export default function CronsClient() {
                   {cron.lastStatus && (
                     <div className="flex gap-2">
                       <span className="text-white/40 w-24 flex-shrink-0">Estat:</span>
-                      <span className={cron.lastStatus === 'ok' ? 'text-emerald-400' : 'text-rose-400'}>
+                      <span className={cron.lastStatus === 'ok' ? 'admin-tone-text-success' : 'admin-tone-text-danger'}>
                         {cron.lastStatus.toUpperCase()}
                       </span>
                     </div>

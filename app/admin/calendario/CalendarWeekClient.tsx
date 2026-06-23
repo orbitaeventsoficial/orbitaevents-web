@@ -352,7 +352,7 @@ export default function CalendarWeekClient() {
                       customerId: item.customerId,
                       customerTab: 'comms',
                     })}
-                    className="block rounded-xl border border-rose-500/20 bg-rose-500/[0.05] px-2.5 py-2 transition-all"
+                    className="block rounded-xl border admin-tone-border-danger admin-tone-bg-danger px-2.5 py-2 transition-all"
                   >
                     <div className="truncate text-xs font-semibold">☎ {item.name}</div>
                     <div className="mt-0.5 text-xs opacity-70">{item.urgency}</div>

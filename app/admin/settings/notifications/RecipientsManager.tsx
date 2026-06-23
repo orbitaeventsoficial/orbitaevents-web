@@ -235,7 +235,7 @@ export function RecipientsManager() {
                   <button
                     type="button"
                     onClick={() => removeRecipient(r.email)}
-                    className="text-xs text-red-300 hover:text-red-200"
+                    className="text-xs admin-tone-text-danger hover:admin-tone-text-danger"
                     aria-label={`Eliminar ${r.email}`}
                   >
                     Eliminar

@@ -200,8 +200,8 @@ export default function FeaturesPage() {
                 aria-busy={saving === feature.key}
                 className={`admin-feature-toggle relative inline-flex h-9 min-w-[88px] items-center rounded-full border px-2 text-xs font-bold uppercase tracking-wide transition-colors ${
                   feature.enabled
-                    ? 'border-emerald-400/70 bg-emerald-500/85 text-emerald-950'
-                    : 'border-rose-400/70 bg-rose-500/85 text-rose-950'
+                    ? 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success'
+                    : 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger'
                 } ${saving === feature.key ? 'opacity-60 cursor-wait' : ''}`}
               >
                 <span className="pr-2">{feature.enabled ? 'ON' : 'OFF'}</span>

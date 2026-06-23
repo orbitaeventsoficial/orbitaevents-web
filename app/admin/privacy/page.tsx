@@ -434,7 +434,7 @@ export default function AdminPrivacyPage() {
   if (fetchError && !stats) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <p className="text-amber-400 text-lg font-medium">{fetchError}</p>
+        <p className="admin-tone-text-warning text-lg font-medium">{fetchError}</p>
         <button type="button" onClick={load} className="ap-btn ap-btn--primary">Reintentar</button>
       </div>
     );
@@ -473,8 +473,8 @@ export default function AdminPrivacyPage() {
             <p className="text-2xl font-bold">{stats.requests.completed}</p>
             <p className="text-xs opacity-60">Completades</p>
           </div>
-          <div className={`rounded-2xl border p-4 ${stats.requests.urgent > 0 ? 'border-red-500/30 bg-red-500/5' : 'admin-card-glass'}`}>
-            <p className={`text-2xl font-bold ${stats.requests.urgent > 0 ? 'text-red-400' : ''}`}>{stats.requests.urgent}</p>
+          <div className={`rounded-2xl border p-4 ${stats.requests.urgent > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : 'admin-card-glass'}`}>
+            <p className={`text-2xl font-bold ${stats.requests.urgent > 0 ? 'admin-tone-text-danger' : ''}`}>{stats.requests.urgent}</p>
             <p className="text-xs opacity-60">Urgents (&lt;5 dies)</p>
           </div>
         </div>
@@ -743,7 +743,7 @@ export default function AdminPrivacyPage() {
                             type="button"
                             onClick={() => revokeConsentAction(c.id)}
                             disabled={revokingId === c.id}
-                            className="rounded-xl border border-red-500/30 px-3 py-2 text-xs font-medium text-red-400 transition-colors min-h-[44px] disabled:opacity-50"
+                            className="rounded-xl border admin-tone-border-danger px-3 py-2 text-xs font-medium admin-tone-text-danger transition-colors min-h-[44px] disabled:opacity-50"
                           >
                             Revocar
                           </button>
@@ -801,7 +801,7 @@ export default function AdminPrivacyPage() {
                                 type="button"
                                 onClick={() => revokeConsentAction(c.id)}
                                 disabled={revokingId === c.id}
-                                className="rounded-xl border border-red-500/30 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                                className="rounded-xl border admin-tone-border-danger px-3 py-1.5 text-xs font-medium admin-tone-text-danger hover:admin-tone-bg-danger transition-colors disabled:opacity-50"
                               >
                                 {revokingId === c.id ? 'Revocant...' : 'Revocar'}
                               </button>

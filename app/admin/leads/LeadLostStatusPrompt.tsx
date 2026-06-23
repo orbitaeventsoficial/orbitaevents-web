@@ -30,7 +30,7 @@ export default function LeadLostStatusPrompt({
   if (!open) return null;
 
   return (
-    <div className="mt-3 rounded-2xl border border-amber-500/25 bg-amber-500/[0.06] p-4">
+    <div className="mt-3 rounded-2xl border admin-tone-border-warning admin-tone-bg-warning p-4">
       <p className="text-sm font-medium text-white">{title}</p>
       <div className="mt-3 space-y-3">
         <div>

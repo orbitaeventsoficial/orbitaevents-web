@@ -229,7 +229,7 @@ export default function StatsPage() {
             key={stat.key}
             className={`border rounded-xl p-6 ${
               stat.isManual
-                ? 'bg-orange-950/30 border-orange-400/30'
+                ? 'admin-tone-bg-warning admin-tone-border-warning'
                 : 'bg-black/60 border-white/10'
             }`}
           >

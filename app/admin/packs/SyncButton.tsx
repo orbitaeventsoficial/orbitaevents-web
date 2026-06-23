@@ -69,12 +69,12 @@ export default function SyncButton() {
         <div
           className={`mt-4 rounded-xl p-4 ${
             result.ok
-              ? 'bg-emerald-500/10 border border-emerald-500/30'
-              : 'bg-rose-500/10 border border-rose-500/30'
+              ? 'admin-tone-bg-success border admin-tone-border-success'
+              : 'admin-tone-bg-danger border admin-tone-border-danger'
           }`}
           role={result.ok ? 'status' : 'alert'}
         >
-          <p className={`text-sm font-medium ${result.ok ? 'text-emerald-300' : 'text-rose-300'}`}>
+          <p className={`text-sm font-medium ${result.ok ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
             {result.message || (result.ok ? '✓ Sincronització completada' : '✗ Error')}
           </p>
 

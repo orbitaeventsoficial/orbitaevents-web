@@ -46,13 +46,13 @@ export default async function RepartimentPage({ searchParams }: { searchParams: 
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Facturat (client)</p>
           <p className="text-xl font-bold">{formatCurrency(payout.totals.revenue)}</p>
         </div>
-        <div className="rounded-xl border border-amber-500/25 bg-amber-500/[0.06] p-3 text-center">
+        <div className="rounded-xl border admin-tone-border-warning admin-tone-bg-warning p-3 text-center">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">A col·laboradors</p>
-          <p className="text-xl font-bold text-amber-300">{formatCurrency(payout.totals.collaboratorCost)}</p>
+          <p className="text-xl font-bold admin-tone-text-warning">{formatCurrency(payout.totals.collaboratorCost)}</p>
         </div>
-        <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/[0.06] p-3 text-center">
+        <div className="rounded-xl border admin-tone-border-success admin-tone-bg-success p-3 text-center">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">La teva part</p>
-          <p className="text-xl font-bold text-emerald-300">{formatCurrency(payout.totals.ownerNet)}</p>
+          <p className="text-xl font-bold admin-tone-text-success">{formatCurrency(payout.totals.ownerNet)}</p>
         </div>
       </div>
 
@@ -67,12 +67,12 @@ export default async function RepartimentPage({ searchParams }: { searchParams: 
             <section
               key={person.personKey}
               className={`rounded-xl border p-3 ${
-                person.isOwner ? 'border-emerald-500/25 bg-emerald-500/[0.04]' : 'border-[var(--line)] bg-[var(--panel)]'
+                person.isOwner ? 'admin-tone-border-success admin-tone-bg-success' : 'border-[var(--line)] bg-[var(--panel)]'
               }`}
             >
               <div className="flex items-center justify-between">
                 <h3 className="flex items-center gap-2 text-sm font-bold">
-                  <span className={`inline-block h-2 w-2 rounded-full ${person.isOwner ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+                  <span className={`inline-block h-2 w-2 rounded-full ${person.isOwner ? 'admin-tone-bg-success' : 'admin-tone-bg-warning'}`} />
                   {person.isOwner ? (
                     person.personName
                   ) : (
@@ -84,7 +84,7 @@ export default async function RepartimentPage({ searchParams }: { searchParams: 
                     {person.isOwner ? 'es queda' : 'cobra'} · {person.assignments} {person.assignments === 1 ? 'feina' : 'feines'}
                   </span>
                 </h3>
-                <span className={`text-lg font-bold tabular-nums ${person.isOwner ? 'text-emerald-300' : 'text-amber-300'}`}>
+                <span className={`text-lg font-bold tabular-nums ${person.isOwner ? 'admin-tone-text-success' : 'admin-tone-text-warning'}`}>
                   {formatCurrency(person.amount)}
                 </span>
               </div>

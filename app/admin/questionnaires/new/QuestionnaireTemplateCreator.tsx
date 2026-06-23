@@ -56,7 +56,7 @@ export default function QuestionnaireTemplateCreator() {
   return (
     <div className="space-y-6 max-w-2xl">
       {error && (
-        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm text-red-300">{error}</p>
+        <p className="rounded-lg border admin-tone-border-danger admin-tone-bg-danger px-4 py-2 text-sm admin-tone-text-danger">{error}</p>
       )}
 
       <div className="space-y-4 ap-card p-4">
@@ -99,7 +99,7 @@ export default function QuestionnaireTemplateCreator() {
             <div className="flex items-center justify-between">
               <p className="text-xs text-white/40">Pregunta {idx + 1}</p>
               {questions.length > 1 && (
-                <button onClick={() => removeQuestion(idx)} type="button" className="text-xs text-red-300 hover:underline">
+                <button onClick={() => removeQuestion(idx)} type="button" className="text-xs admin-tone-text-danger hover:underline">
                   Eliminar
                 </button>
               )}

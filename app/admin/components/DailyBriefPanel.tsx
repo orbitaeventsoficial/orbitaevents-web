@@ -34,9 +34,9 @@ export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
           <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Leads oberts</p>
           <p className="text-lg font-bold">{brief.kpis.openLeads}</p>
         </div>
-        <div className={`rounded-lg border p-2 text-center ${brief.kpis.overdueTasksCount > 0 ? 'border-rose-500/30 bg-rose-500/[0.04]' : 'border-[var(--line)] bg-[var(--panel)]'}`}>
+        <div className={`rounded-lg border p-2 text-center ${brief.kpis.overdueTasksCount > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : 'border-[var(--line)] bg-[var(--panel)]'}`}>
           <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Vençudes</p>
-          <p className={`text-lg font-bold ${brief.kpis.overdueTasksCount > 0 ? 'text-rose-300' : ''}`}>{brief.kpis.overdueTasksCount}</p>
+          <p className={`text-lg font-bold ${brief.kpis.overdueTasksCount > 0 ? 'admin-tone-text-danger' : ''}`}>{brief.kpis.overdueTasksCount}</p>
         </div>
         <div className="ap-card p-2 text-center">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Reserves 7d</p>

@@ -432,7 +432,7 @@ function CategorySection({
 
       {expanded && (
         <div className="space-y-4 border-t border-white/10 p-5">
-          {error && <p className="rounded-xl border border-rose-500/20 px-3 py-2 text-sm text-rose-300">{error}</p>}
+          {error && <p className="rounded-xl border admin-tone-border-danger px-3 py-2 text-sm admin-tone-text-danger">{error}</p>}
           <div className="grid gap-3 lg:grid-cols-3">
             <AdminHelpLegend title="Portada" body="És la imatge principal de cada event. La pots marcar des de qualsevol miniatura." />
             <AdminHelpLegend title="Assignació" body="Vincula una peça a un event concret perquè sàpigues on surt i la puguis reutilitzar amb criteri." />
@@ -497,14 +497,14 @@ function CategorySection({
                             <div className="flex flex-wrap gap-2">
                               {categoryEvents.length === 0 ? <p className="text-xs text-white/45">Crea primer un event.</p> : categoryEvents.map((eventItem) => {
                                 const active = coverRefs.some((coverEvent) => coverEvent.id === eventItem.id);
-                                return <button key={eventItem.id} type="button" disabled={item.isStatic} onClick={() => void handleSetCover(eventItem.id, item.mediaUrl)} className={`rounded-full border px-3 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-60 ${active ? 'border-amber-400/40 bg-amber-500/10 text-amber-200' : 'border-white/10 text-white/70 hover:bg-white/5'}`}>{active ? `Portada: ${eventItem.title}` : eventItem.title}</button>;
+                                return <button key={eventItem.id} type="button" disabled={item.isStatic} onClick={() => void handleSetCover(eventItem.id, item.mediaUrl)} className={`rounded-full border px-3 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-60 ${active ? 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning' : 'border-white/10 text-white/70 hover:bg-white/5'}`}>{active ? `Portada: ${eventItem.title}` : eventItem.title}</button>;
                               })}
                             </div>
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-2">
                           <button type="button" disabled={item.isStatic} onClick={() => { replaceTargetRef.current = item; replaceFileRef.current?.click(); }} className="rounded-xl border border-white/10 px-3 py-2 text-sm text-white/80 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60">Substituir fitxer</button>
-                          <button type="button" onClick={() => void handleDelete(item)} disabled={savingId === item.id || item.isStatic} className="rounded-xl border border-rose-500/20 px-3 py-2 text-sm text-rose-300 hover:bg-rose-500/10 disabled:opacity-50">Eliminar</button>
+                          <button type="button" onClick={() => void handleDelete(item)} disabled={savingId === item.id || item.isStatic} className="rounded-xl border admin-tone-border-danger px-3 py-2 text-sm admin-tone-text-danger hover:admin-tone-bg-danger disabled:opacity-50">Eliminar</button>
                         </div>
                       </div>
                     </div>
@@ -596,7 +596,7 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
         </div>
         <button type="button" onClick={() => setShowForm((current) => !current)} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/85 hover:bg-white/5">{showForm ? 'Tancar formulari' : '+ Nou event'}</button>
       </div>
-      {error && <p className="rounded-xl border border-rose-500/20 px-3 py-2 text-sm text-rose-300">{error}</p>}
+      {error && <p className="rounded-xl border admin-tone-border-danger px-3 py-2 text-sm admin-tone-text-danger">{error}</p>}
       <div className="grid gap-3 lg:grid-cols-3">
         <AdminHelpLegend title="Portada" body="És la imatge que representa l'event a la web. Es pot triar des de la pestanya de media." />
         <AdminHelpLegend title="Publicació" body="Un event en esborrany existeix a l'admin però no es veu a la part pública." />
@@ -629,13 +629,13 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
             <div className="flex flex-col gap-4 md:flex-row md:items-center">
               <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black">{eventItem.coverImage ? <Image src={eventItem.coverImage} alt={eventItem.title} fill className="object-cover" sizes="96px" /> : null}</div>
               <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2"><p className="text-sm font-semibold text-white/90">{eventItem.title}</p><span className={`rounded-full px-2 py-1 text-xs ${eventItem.published ? 'bg-emerald-500/15 text-emerald-200' : 'bg-white/10 text-white/60'}`}>{eventItem.published ? 'Publicat' : 'Esborrany'}</span></div>
+                <div className="flex flex-wrap items-center gap-2"><p className="text-sm font-semibold text-white/90">{eventItem.title}</p><span className={`rounded-full px-2 py-1 text-xs ${eventItem.published ? 'admin-tone-bg-success admin-tone-text-success' : 'bg-white/10 text-white/60'}`}>{eventItem.published ? 'Publicat' : 'Esborrany'}</span></div>
                 <p className="mt-1 text-xs text-white/45">/{eventItem.categorySlug}/{eventItem.slug} · {eventItem._count?.media || 0} elements vinculats</p>
                 <p className="mt-1 text-xs text-white/35">Portada: {eventItem.coverImage || 'pendent'}</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <button type="button" onClick={() => void togglePublished(eventItem)} className="rounded-xl border border-white/10 px-3 py-2 text-sm text-white/80 hover:bg-white/5">{eventItem.published ? 'Despublicar' : 'Publicar'}</button>
-                <button type="button" onClick={() => void deleteEvent(eventItem.id)} className="rounded-xl border border-rose-500/20 px-3 py-2 text-sm text-rose-300 hover:bg-rose-500/10">Eliminar</button>
+                <button type="button" onClick={() => void deleteEvent(eventItem.id)} className="rounded-xl border admin-tone-border-danger px-3 py-2 text-sm admin-tone-text-danger hover:admin-tone-bg-danger">Eliminar</button>
               </div>
             </div>
           </div>

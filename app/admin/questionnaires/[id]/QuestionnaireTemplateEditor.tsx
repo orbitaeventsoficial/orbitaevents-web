@@ -68,7 +68,7 @@ export default function QuestionnaireTemplateEditor({
   return (
     <div className="space-y-6 max-w-2xl">
       {error && (
-        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm text-red-300">{error}</p>
+        <p className="rounded-lg border admin-tone-border-danger admin-tone-bg-danger px-4 py-2 text-sm admin-tone-text-danger">{error}</p>
       )}
 
       <div className="space-y-4 ap-card p-4">
@@ -112,7 +112,7 @@ export default function QuestionnaireTemplateEditor({
               {questions.length > 1 && (
                 <button
                   onClick={() => removeQuestion(idx)}
-                  className="text-xs text-red-300 hover:underline"
+                  className="text-xs admin-tone-text-danger hover:underline"
                   type="button"
                 >
                   Eliminar

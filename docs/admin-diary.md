@@ -27,6 +27,35 @@ Counter -> 1099.
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-23 — Canon d'estats: 114→19 colors Tailwind cru → admin-tone-* (Canvi #1105, claude)
+
+### Context
+Després de canonitzar el manual, quedaven ~114 colors d'estat Tailwind cru (emerald/red/amber/rose/green/yellow/orange) en ~38 fitxers admin — el residu canon real que el guard advisori veu però no bloqueja.
+
+### Què s'ha fet
+- Transformador per famílies → `admin-tone-{bg,text,border}-{success,warning,danger}` (mapatge: emerald/green→success, amber/yellow/orange→warning, rose/red→danger). Gestiona qualsevol tonalitat i opacitat (/NN, /[0.0N]).
+- `hover:bg-<color>` cru → `.adm-row-hover` canònic.
+- 38 fitxers canonitzats. De 114→19; els 19 restants són EXEMPTS legítims (PresupuestoPdfStudio + StudioPreview = editors de PDF/paper; image-manager = placement visual de l'usuari).
+
+### Verificació
+- tsc EXIT 0 (cap classe trencada). qa:admin-canon 0, qa:admin-mode-prefix 0. validate:core EXIT 0.
+- Smoke de 8 pàgines canonitzades (stats, portfolio, crons, features, cuadrant/repartiment, ressenyes, privacy, cost-calculator): 200, 0 overflow, 0 errors.
+
+### Conclusió d'organisme (honesta)
+Les 2 «costures d'arxipèlag» que vaig diagnosticar a l'auditoria eren falses alarmes: la nav era CODI MORT (#1104) i el comandament economia↔cockpit és granularitat de presentació legítima (les fórmules canòniques ja són úniques: buildCashFlowForecast, buildPipelineForecast, costEngine). El que SÍ era real i ja resolt: codi mort + residu de canon. L'admin està més cohesionat del que el diagnòstic inicial deia.
+
+### Validació
+- Validació tècnica: tsc + validate:core + smoke EXIT 0.
+- Validació funcional: estats d'una sola gramàtica (admin-tone-*); render intacte.
+- Validació humana/UX: 8 pàgines verificades 0 problemes; pendent ullada del propietari.
+
+### Coordinació
+Counter -> 1105. NO he tocat admin/page.tsx (worktree propietari).
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-23 — La «costura de nav» era codi mort + guard de dades ampliat (Canvi #1104, claude)
 
 ### Context

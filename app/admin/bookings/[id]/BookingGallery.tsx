@@ -197,7 +197,7 @@ export default function BookingGallery({ bookingId }: Props) {
         </button>
       </div>
 
-      {error && <p className="text-sm text-red-400 rounded-xl border border-red-500/20 px-3 py-2">{error}</p>}
+      {error && <p className="text-sm admin-tone-text-danger rounded-xl border admin-tone-border-danger px-3 py-2">{error}</p>}
 
       <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => e.target.files && handleUpload(e.target.files)} />
 
@@ -215,7 +215,7 @@ export default function BookingGallery({ bookingId }: Props) {
             <div key={photo.id} className={`group relative aspect-square rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${selectedId === photo.id ? 'admin-tone-border-info admin-tone-bg-info' : 'admin-tone-border-neutral hover:admin-tone-border-slate'}`} onClick={() => setSelectedId(selectedId === photo.id ? null : photo.id)} {...helpAttrs(ADMIN_BOOKING_HELP.gallery.photo)}>
               <Image src={photo.photoUrl} alt={photo.caption || 'Foto event'} fill className="object-cover" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" />
               <div className="absolute top-2 left-2 flex gap-1">{photo.isPortal && <span className="ap-badge ap-badge--info text-xs">Portal</span>}{photo.isPortfolio && <span className="ap-badge text-xs">Portfolio</span>}</div>
-              <button type="button" onClick={(e) => { e.stopPropagation(); deletePhoto(photo.id); }} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-red-600/80 text-white rounded-full p-1.5 transition-opacity min-h-[32px] min-w-[32px] flex items-center justify-center" title={ADMIN_BOOKING_HELP.gallery.delete.title} aria-label={ADMIN_BOOKING_HELP.gallery.delete.title} {...helpAttrs(ADMIN_BOOKING_HELP.gallery.delete)}>
+              <button type="button" onClick={(e) => { e.stopPropagation(); deletePhoto(photo.id); }} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 admin-tone-bg-danger text-white rounded-full p-1.5 transition-opacity min-h-[32px] min-w-[32px] flex items-center justify-center" title={ADMIN_BOOKING_HELP.gallery.delete.title} aria-label={ADMIN_BOOKING_HELP.gallery.delete.title} {...helpAttrs(ADMIN_BOOKING_HELP.gallery.delete)}>
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
