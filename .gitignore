@@ -59,6 +59,7 @@ contact.html
 playwright-report/
 test-results/
 *.html
+!public/offline.html
 !public/respira-rosa/index.html
 screenshots/
 screenshots-mobile/
@@ -75,3 +76,7 @@ tmp/
 .claude/settings.local.json
 .claude/settings.json
 .claude/scheduled_tasks.lock
+
+# Captures de debug/auditoria al root (mai al repo; usar .codex-captures/)
+/*.png
+/*.jpg
