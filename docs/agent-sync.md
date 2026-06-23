@@ -15,6 +15,12 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-23 [ESTAT: tancat — CANONITZACIÓ CSS admin: transformador postcss + lot baix risc (1110→821 deute) #1096]
+Inici de l'eradicació del deute CSS (1110 selectors sense html.admin-mode). MÈTODE SEGUR validat: transformador `scripts/canonize-admin-css.mjs` amb postcss (parser real, no text) que prefixa html.admin-mode a TOTS els selectors per igual → especificitat puja uniforme, ordre intern es manté, RENDER IDÈNTIC. El primer transformador de text tenia bugs (comentaris, .fx-root) → descartat per postcss.
+LOT FET (validat amb captura ABANS/DESPRÉS idèntica + smoke): arxiu-design.css (41), clientes.css (75), nb-design.css (32), booking-detail.css (@media). Baseline 1110→821.
+⚠️ REPARTIMENT PER CODEX: queden 2 fitxers GROSSOS i sensibles → leads-design.css (430, TANCAT CHARLIE) i inbox.css (391, sub-app). Usa el MATEIX transformador: `node scripts/canonize-admin-css.mjs <fitxer> --dry` per revisar, després sense --dry, regenera baseline (`node scripts/check-admin-mode-prefix.mjs --write-baseline`), i VALIDA amb captura abans/després (són zones validades pel propietari) + `qa:smoke`. NO a cegues.
+tsc + validate:core EXIT 0. Counter->1096.
+
 [claude] 2026-06-23 [ESTAT: tancat — 3 guards orfes blindats amb test de cas-dolent (0 ninots de paper) #1095]
 Resposta a «has refet els guards perquè no siguin ninots de paper?». Verificació real: 64 guards, 3 NO tenien CAP test (check-dead-admin-views [el meu de codi mort!], check-admin-canon [canon carbó+or], check-css-monocapa). Un guard sense test de cas-dolent és un ninot de paper potencial: ningú prova que FALLI quan ha de. Afegits els 3 tests, tots amb casos-DOLENTS (que el guard ha de caçar): illa transitiva + import-sense-ús (dead-views), botó-void + blau-superficie (canon), .admin-shell phantom + !important (monocapa). Ara 64 guards / 64 amb test. tsc + validate:core EXIT 0. Counter->1095.
 
@@ -52,10 +58,10 @@ Tancat l'ultim deute de codi mort anotat: `createDossierFromBolo` eliminat de `d
 Rutes admin dinamiques [param] una per una amb verificacio exhaustiva. Eliminades: /api/admin/leads/[id]/comm-summary (el CustomerHub carrega via fetchCustomerHub server-side, no per HTTP; servei loadCommTimeline CONSERVAT, viu) i /api/admin/leads/[id]/generate-dossier (el cockpit usa el generador normal /admin/dossiers des de #933; createDossierFromBolo queda orfe DINS dossierService, anotat pero NO esborrat per no editar el servei gran amb 240 fitxers sense commit). tsc EXIT 0. 0 candidates [param] mortes restants. Counter->1084. SENSE commit (el faig despres).
 Avis per l'altre agent: capa de rutes API completada (estatiques #1071 + 2 dinamiques #1084). Deute anotat: createDossierFromBolo orfe dins dossierService (poda futura amb verificacio).
 
-[codex] 2026-06-23 [ESTAT: treballant — lectura protocol de treball]
-Últim canvi: #1094 tancat per Claude.
-Proper pas previst: respondre al propietari amb el protocol de treball live llegit de `CLAUDE.md`, `docs/agent-sync.md`, `docs/admin-diary.md`, `docs/estat-admin.md`, `docs/admin-protocol.md` i `docs/protocol-executiu.md`; sense tocar codi funcional.
-Avís per l'altre agent: perímetre només de lectura/explicació del protocol i actualització d'aquest bloc de coordinació. No entro a CSRF, admin UI, schema, serveis, guards ni counter.
+[codex] 2026-06-23 [ESTAT: treballant — /admin CSS fora de canon]
+Últim canvi: #1095 tancat per Claude.
+Proper pas previst: investigar i reduir el CSS vell/barrejat visible a `http://localhost:3000/admin` (dashboard/comandament); identificar CSS carregat, selectors sense `html.admin-mode` i classes genèriques, amb validació visual/smoke.
+Avís per l'altre agent: perímetre `/admin` dashboard CSS/validació i documentació si es tanca canvi. No entro a leads, cockpit, serveis econòmics, schema ni rutes API.
 
 [codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin portfolio events #1082]
 `POST/PATCH/DELETE /api/admin/portfolio/events` ja validen `verifyCsrf(req)` després d'auth i abans de body/query/servei. Baseline `qa:api-admin-csrf` baixa de 69 a 66. Test focalitzat nou 8/8, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.

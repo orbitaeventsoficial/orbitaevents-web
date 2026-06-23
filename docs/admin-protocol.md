@@ -1502,6 +1502,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1096 — 2026-06-23 — claude (TANCAT)
+
+**Canonització CSS admin: transformador postcss + lot de baix risc.**
+
+- Eina `scripts/canonize-admin-css.mjs` (postcss): prefixa `html.admin-mode` uniformement → render idèntic. Lot fet: arxiu, clientes, nb-design, booking-detail (baseline 1110→821), captures abans/després idèntiques.
+- Repartiment a codex: leads-design (430, TANCAT CHARLIE) + inbox (391, sub-app) amb el mateix mètode + captura obligatòria.
+- Validació tècnica: tsc + validate:core EXIT 0.
+- Validació funcional: deute CSS −26%, render igual.
+- Validació humana/UX: captures abans/després idèntiques.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1095 — 2026-06-23 — claude (TANCAT)
 
 **3 guards orfes blindats amb test de cas-dolent (0 ninots de paper).**

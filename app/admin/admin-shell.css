@@ -7,7 +7,7 @@
 ============================================================================ */
 
 /* ── Variables globals (aliases a app/studio/orbita-tokens.css) ──────────── */
-.ax-root {
+html.admin-mode .ax-root {
   --ui:      var(--font-inter), "Segoe UI", system-ui, -apple-system, sans-serif;
   --display: var(--font-display), var(--font-inter), "Segoe UI", system-ui, sans-serif;
   --mono:    var(--font-inter), "Inter", system-ui, sans-serif;
@@ -54,10 +54,12 @@ html.admin-mode [class*="rounded-3xl"] {
   border-radius: var(--o-r-md);
 }
 
-.ax-root *, .ax-root *::before, .ax-root *::after { box-sizing: border-box; }
+html.admin-mode .ax-root *,
+html.admin-mode .ax-root *::before,
+html.admin-mode .ax-root *::after { box-sizing: border-box; }
 
 /* ── Esquelet de l'app ────────────────────────────────────────────────────── */
-.ax {
+html.admin-mode .ax {
   position: relative;
   min-height: 100vh;
   background: var(--ax-canvas);
@@ -65,7 +67,7 @@ html.admin-mode [class*="rounded-3xl"] {
 }
 
 /* Atmosfera càlida tènue */
-.ax::before {
+html.admin-mode .ax::before {
   content: "";
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background:
@@ -76,14 +78,14 @@ html.admin-mode [class*="rounded-3xl"] {
 }
 
 /* Gra fi */
-.ax::after {
+html.admin-mode .ax::after {
   content: "";
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   opacity: 0.04; mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-.ax__page { position: relative; z-index: 1; min-width: 0; }
+html.admin-mode .ax__page { position: relative; z-index: 1; min-width: 0; }
 
 /* ── Històric comercial compartit (lead + reserva) ─────────────────────── */
 html.admin-mode .cdh {
@@ -214,7 +216,7 @@ html.admin-mode .cdh__meta {
 }
 
 /* ── Error boundary admin ────────────────────────────────────────────────── */
-.ax__error {
+html.admin-mode .ax__error {
   min-height: 60vh;
   display: grid;
   place-items: center;
@@ -223,7 +225,7 @@ html.admin-mode .cdh__meta {
   font-family: var(--ui);
 }
 
-.ax__errorcard {
+html.admin-mode .ax__errorcard {
   width: min(100%, 520px);
   padding: 30px;
   border: 1px solid var(--ax-line);
@@ -234,7 +236,7 @@ html.admin-mode .cdh__meta {
   text-align: center;
 }
 
-.ax__erroricon {
+html.admin-mode .ax__erroricon {
   width: 58px;
   height: 58px;
   display: grid;
@@ -246,9 +248,9 @@ html.admin-mode .cdh__meta {
   color: var(--ax-gold-bright);
 }
 
-.ax__erroricon svg { width: 28px; height: 28px; }
+html.admin-mode .ax__erroricon svg { width: 28px; height: 28px; }
 
-.ax__errortitle {
+html.admin-mode .ax__errortitle {
   margin: 0 0 8px;
   font-family: var(--display);
   font-size: 24px;
@@ -257,13 +259,13 @@ html.admin-mode .cdh__meta {
   color: var(--ax-t);
 }
 
-.ax__errortext {
+html.admin-mode .ax__errortext {
   margin: 0 0 22px;
   color: var(--ax-t2);
   font-size: 14px;
 }
 
-.ax__errordebug {
+html.admin-mode .ax__errordebug {
   margin: 0 0 22px;
   padding: 13px 14px;
   border: 1px solid var(--ax-line2);
@@ -273,27 +275,27 @@ html.admin-mode .cdh__meta {
   text-align: left;
 }
 
-.ax__errordebug p {
+html.admin-mode .ax__errordebug p {
   margin: 0;
   overflow-wrap: anywhere;
   font-family: var(--mono);
   font-size: 12px;
 }
 
-.ax__errordigest {
+html.admin-mode .ax__errordigest {
   margin-top: 8px !important;
   color: var(--ax-t3);
   font-size: 11px !important;
 }
 
-.ax__erroractions {
+html.admin-mode .ax__erroractions {
   display: flex;
   justify-content: center;
   gap: 10px;
   flex-wrap: wrap;
 }
 
-.ax__errorbtn {
+html.admin-mode .ax__errorbtn {
   min-height: 38px;
   display: inline-flex;
   align-items: center;
@@ -308,30 +310,30 @@ html.admin-mode .cdh__meta {
   transition: transform 130ms ease, border-color 130ms ease, background 130ms ease, color 130ms ease;
 }
 
-.ax__errorbtn:hover { transform: translateY(-1px); }
-.ax__errorbtn:active { transform: translateY(0); }
+html.admin-mode .ax__errorbtn:hover { transform: translateY(-1px); }
+html.admin-mode .ax__errorbtn:active { transform: translateY(0); }
 
-.ax__errorbtn--primary {
+html.admin-mode .ax__errorbtn--primary {
   border: 1px solid var(--ax-hair-gold);
   background: linear-gradient(180deg, color-mix(in oklab, var(--ax-gold) 18%, var(--ax-raised)), color-mix(in oklab, var(--ax-gold) 7%, var(--ax-panel)));
   color: var(--ax-gold-bright);
 }
 
-.ax__errorbtn--ghost {
+html.admin-mode .ax__errorbtn--ghost {
   border: 1px solid var(--ax-line2);
   background: transparent;
   color: var(--ax-t2);
 }
 
-.ax__errorbtn--ghost:hover {
+html.admin-mode .ax__errorbtn--ghost:hover {
   border-color: var(--ax-hair-gold);
   color: var(--ax-t);
   background: var(--ax-raised);
 }
 
 /* Layout de dues columnes: sidebar + workspace */
-.ax--side .ax__workspace { min-width: 0; margin-left: 236px; }
-.ax__side {
+html.admin-mode .ax--side .ax__workspace { min-width: 0; margin-left: 236px; }
+html.admin-mode .ax__side {
   position: fixed; inset: 0 auto 0 0; z-index: 40;
   width: 236px; display: flex; flex-direction: column; gap: 17px;
   padding: 16px 14px;
@@ -345,27 +347,27 @@ html.admin-mode .cdh__meta {
 }
 
 /* ── Marca ────────────────────────────────────────────────────────────────── */
-.ax__brand {
+html.admin-mode .ax__brand {
   flex: none; display: flex; align-items: center;
   height: 52px; padding: 0 0 16px;
   border-bottom: 1px solid var(--ax-hair-gold);
 }
-.ax__logo {
+html.admin-mode .ax__logo {
   display: block; width: 140px; height: 46px;
   object-fit: contain; object-position: left center;
   filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.42));
 }
 
 /* ── Navegació lateral ────────────────────────────────────────────────────── */
-.ax__sidenav {
+html.admin-mode .ax__sidenav {
   display: flex; flex-direction: column; gap: 6px; flex: 1; min-height: 0;
   overflow-y: auto; scrollbar-width: none;
 }
-.ax__sidenav::-webkit-scrollbar { display: none; }
+html.admin-mode .ax__sidenav::-webkit-scrollbar { display: none; }
 
-.ax__sidegroup { display: flex; flex-direction: column; gap: 5px; }
+html.admin-mode .ax__sidegroup { display: flex; flex-direction: column; gap: 5px; }
 
-.ax__sideitem {
+html.admin-mode .ax__sideitem {
   position: relative; display: flex; align-items: center; gap: 11px;
   width: 100%; min-height: 46px; padding: 0 13px;
   border: 1px solid transparent; border-radius: 12px;
@@ -373,8 +375,8 @@ html.admin-mode .cdh__meta {
   font: inherit; font-size: var(--o-text-md, 15px); font-weight: 700; text-align: left; cursor: pointer;
   transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
 }
-.ax__sideitem:hover { background: var(--ax-panel); color: var(--ax-t); border-color: var(--ax-line); }
-.ax__sidegroup.is-active > .ax__sideitem {
+html.admin-mode .ax__sideitem:hover { background: var(--ax-panel); color: var(--ax-t); border-color: var(--ax-line); }
+html.admin-mode .ax__sidegroup.is-active > .ax__sideitem {
   background: linear-gradient(
     180deg,
     color-mix(in oklab, var(--ax-gold) 10%, var(--ax-raised)),
@@ -383,18 +385,19 @@ html.admin-mode .cdh__meta {
   color: var(--ax-gold-bright);
   border-color: var(--ax-hair-gold);
 }
-.ax__sidegroup.is-active > .ax__sideitem::before {
+html.admin-mode .ax__sidegroup.is-active > .ax__sideitem::before {
   content: "";
   position: absolute; left: -14px; top: 8px; bottom: 8px;
   width: 3px; border-radius: 0 3px 3px 0;
   background: var(--ax-gold);
 }
 
-.ax__sidesub {
+html.admin-mode .ax__sidesub {
   display: flex; flex-direction: column; gap: 2px;
   padding: 3px 0 7px 26px;
 }
-.ax__sidesub a, .ax__sidesub button {
+html.admin-mode .ax__sidesub a,
+html.admin-mode .ax__sidesub button {
   display: flex; align-items: center; min-height: 33px; padding: 0 10px;
   border: 0; border-radius: 9px;
   background: transparent; color: var(--ax-t3);
@@ -402,37 +405,39 @@ html.admin-mode .cdh__meta {
   cursor: pointer; text-decoration: none;
   transition: background 140ms ease, color 140ms ease;
 }
-.ax__sidesub a:hover, .ax__sidesub button:hover { background: var(--ax-panel); color: var(--ax-t); }
-.ax__sidesub a.is-on, .ax__sidesub button.is-on {
+html.admin-mode .ax__sidesub a:hover,
+html.admin-mode .ax__sidesub button:hover { background: var(--ax-panel); color: var(--ax-t); }
+html.admin-mode .ax__sidesub a.is-on,
+html.admin-mode .ax__sidesub button.is-on {
   color: var(--ax-gold-bright);
   background: color-mix(in oklab, var(--ax-gold) 9%, transparent);
 }
 
 /* ── Accions primàries al capdamunt del sidebar ───────────────────────────── */
-.ax__sidetop {
+html.admin-mode .ax__sidetop {
   display: flex; flex-direction: row; gap: 6px;
   padding-bottom: 12px; border-bottom: 1px solid var(--ax-line);
 }
 
 /* ── Items secundaris al submenú ──────────────────────────────────────────── */
-.ax__sidesub a.is-secondary,
-.ax__sidesub button.is-secondary {
+html.admin-mode .ax__sidesub a.is-secondary,
+html.admin-mode .ax__sidesub button.is-secondary {
   font-size: 12px;
   color: var(--ax-t3);
   opacity: 0.7;
 }
-.ax__sidesub a.is-secondary:hover,
-.ax__sidesub button.is-secondary:hover {
+html.admin-mode .ax__sidesub a.is-secondary:hover,
+html.admin-mode .ax__sidesub button.is-secondary:hover {
   opacity: 1;
   color: var(--ax-t2);
 }
-.ax__sidesub a.is-secondary.is-on {
+html.admin-mode .ax__sidesub a.is-secondary.is-on {
   opacity: 1;
   color: var(--ax-gold-bright);
 }
 
 /* Botó d'acció primària: vora de llautó, fons fosc amb sheen */
-.ax__add {
+html.admin-mode .ax__add {
   flex: 1; min-width: 0;
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   padding: 8px 10px; border-radius: 10px;
@@ -449,7 +454,7 @@ html.admin-mode .cdh__meta {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   transition: transform 130ms ease, border-color 130ms ease, background 130ms ease;
 }
-.ax__add:hover {
+html.admin-mode .ax__add:hover {
   transform: translateY(-1px);
   border-color: var(--ax-gold);
   background: linear-gradient(
@@ -458,10 +463,10 @@ html.admin-mode .cdh__meta {
     color-mix(in oklab, var(--ax-gold) 8%, var(--ax-panel))
   );
 }
-.ax__add:active { transform: translateY(0); }
+html.admin-mode .ax__add:active { transform: translateY(0); }
 
 /* Botó d'accés directe a la safata d'entrada — posició primària al capdamunt */
-.ax__inbox {
+html.admin-mode .ax__inbox {
   flex: 1; min-width: 0;
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   padding: 8px 10px; border-radius: 10px;
@@ -477,7 +482,7 @@ html.admin-mode .cdh__meta {
   cursor: pointer; text-decoration: none;
   transition: transform 130ms ease, border-color 130ms ease, background 130ms ease;
 }
-.ax__inbox:hover {
+html.admin-mode .ax__inbox:hover {
   transform: translateY(-1px);
   border-color: var(--ax-gold);
   background: linear-gradient(
@@ -486,8 +491,8 @@ html.admin-mode .cdh__meta {
     color-mix(in oklab, var(--ax-gold) 8%, var(--ax-panel))
   );
 }
-.ax__inbox:active { transform: translateY(0); }
-.ax__inbox.is-on {
+html.admin-mode .ax__inbox:active { transform: translateY(0); }
+html.admin-mode .ax__inbox.is-on {
   border-color: var(--ax-gold);
   background: linear-gradient(
     180deg,
@@ -497,22 +502,22 @@ html.admin-mode .cdh__meta {
 }
 
 /* ── Peu de la sidebar ────────────────────────────────────────────────────── */
-.ax__sidefoot {
+html.admin-mode .ax__sidefoot {
   margin-top: auto; display: flex; align-items: center; gap: 9px;
   padding-top: 14px; border-top: 1px solid var(--ax-line);
   color: var(--ax-t3); font-size: 13px; font-weight: 650;
 }
-.ax__sidefootname {
+html.admin-mode .ax__sidefootname {
   flex: 1; min-width: 0;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.ax__meav {
+html.admin-mode .ax__meav {
   display: grid; place-items: center; width: 32px; height: 32px;
   border-radius: 50%; background: var(--ax-raised);
   border: 1px solid var(--ax-line); color: var(--ax-t2);
   font-size: 11px; font-weight: 700;
 }
-.ax__change {
+html.admin-mode .ax__change {
   display: inline-flex; align-items: center; min-height: 28px; padding: 5px 11px;
   border: 1px solid var(--ax-hair-gold); border-radius: 999px;
   background: color-mix(in oklab, var(--ax-gold) 9%, transparent);
@@ -525,32 +530,35 @@ html.admin-mode .cdh__meta {
 @keyframes ax-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 /* ax-rise NO pot anar a ax__page — transform trenca position:sticky dels fills.
    S'aplica a ax__page-inner si cal animació d'entrada. */
-.ax__page { animation: none; }
+html.admin-mode .ax__page { animation: none; }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .ax--side .ax__workspace { margin-left: 0; }
-  .ax__side {
+  html.admin-mode .ax--side .ax__workspace { margin-left: 0; }
+  html.admin-mode .ax__side {
     position: relative; width: auto; min-height: 0;
     flex-direction: row; flex-wrap: wrap; align-items: center;
     padding: 10px 14px; gap: 10px;
     border-right: 0; border-bottom: 1px solid var(--ax-line);
   }
-  .ax__brand { height: auto; padding: 0; border-bottom: 0; }
-  .ax__logo { width: 118px; height: 38px; }
-  .ax__sidenav { flex-direction: row; overflow-x: auto; flex: 1; min-height: 0; min-width: 0; }
-  .ax__sidegroup { flex: 0 0 auto; }
-  .ax__sidegroup.is-active > .ax__sideitem::before {
+  html.admin-mode .ax__brand { height: auto; padding: 0; border-bottom: 0; }
+  html.admin-mode .ax__logo { width: 118px; height: 38px; }
+  html.admin-mode .ax__sidenav { flex-direction: row; overflow-x: auto; flex: 1; min-height: 0; min-width: 0; }
+  html.admin-mode .ax__sidegroup { flex: 0 0 auto; }
+  html.admin-mode .ax__sidegroup.is-active > .ax__sideitem::before {
     left: 10px; right: 10px; top: auto; bottom: -1px;
     width: auto; height: 2px; border-radius: 2px;
   }
-  .ax__sidesub { display: none; }
-  .ax__sidetop, .ax__sidefoot { display: none; }
-  .ax__sideitem { min-height: 38px; font-size: 13.5px; }
+  html.admin-mode .ax__sidesub { display: none; }
+  html.admin-mode .ax__sidetop,
+  html.admin-mode .ax__sidefoot { display: none; }
+  html.admin-mode .ax__sideitem { min-height: 38px; font-size: 13.5px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ax-root *, .ax-root *::before, .ax-root *::after {
+  html.admin-mode .ax-root *,
+  html.admin-mode .ax-root *::before,
+  html.admin-mode .ax-root *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }

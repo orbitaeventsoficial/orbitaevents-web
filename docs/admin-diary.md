@@ -28,6 +28,33 @@ Continuació non stop del drenatge CSRF backend després de #1082. Perímetre pe
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-23 — Canonització CSS admin: transformador postcss + lot de baix risc (Canvi #1096, claude)
+
+### Context
+Inici de l'eradicació real del deute de 1110 selectors CSS sense `html.admin-mode` (#1093), amb ajuda de codex (repartiment).
+
+### Mètode segur (validat)
+Transformador `scripts/canonize-admin-css.mjs` amb **postcss** (parser CSS real). Prefixa `html.admin-mode` a TOTS els selectors per igual → l'especificitat puja uniformement i l'ordre intern del fitxer es manté → **render idèntic**. (El primer intent amb transformador de text tenia bugs amb comentaris inline i el scope `.fx-root` → descartat a favor de postcss.)
+
+### Lot fet per claude (baix/mitjà risc, validat)
+- `arxiu-design.css` (41), `clientes.css` (75), `nb-design.css` (32), `booking-detail.css` (@media). 
+- Validació: captura ABANS/DESPRÉS **idèntica** (arxiu i clientes comparades visualment), render HTTP 200 / 0 errors / 0 overflow (inclòs booking/[id] a mòbil pel @media tocat). Baseline 1110→821.
+
+### Repartiment per codex (grossos i sensibles)
+- `leads-design.css` (430, TANCAT CHARLIE) i `inbox.css` (391, sub-app). Mateix transformador + captura abans/després obligatòria (zones validades) + `qa:smoke`.
+
+### Validació
+- Validació tècnica: tsc + validate:core EXIT 0 (guard CSS estès a 0 noves, baseline 821).
+- Validació funcional: el meu lot canonitzat amb render idèntic; deute baixa 26%.
+- Validació humana/UX: captures abans/després idèntiques.
+
+### Coordinació
+Counter -> 1096. leads+inbox per a codex.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-23 — 3 guards orfes blindats amb test de cas-dolent (0 ninots de paper) (Canvi #1095, claude)
 
 ### Context
