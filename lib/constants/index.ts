@@ -429,12 +429,6 @@ export const PRIORITY_CONFIG: Record<string, StatusTone> = {
 };
 
 /** Plain text priority labels (for selects and forms) */
-export const PRIORITY_LABELS: Record<string, string> = {
-  LOW: 'Baixa',
-  MEDIUM: 'Mitjana',
-  HIGH: 'Alta',
-  URGENT: 'Urgent',
-};
 
 /** Plain text lead status labels (for selects and forms) */
 export const LEAD_STATUS_LABELS: Record<string, string> = {
@@ -506,10 +500,6 @@ export function formatDateShort(date: Date | string | null | undefined, locale =
 }
 
 /** Short weekday: "dl." */
-export function formatWeekdayShort(date: Date | string | null | undefined, locale = 'ca-ES'): string {
-  if (!date) return '-';
-  return new Date(date).toLocaleDateString(toIntlLocale(locale), { weekday: 'short' });
-}
 
 /** Long weekday: "dilluns" */
 export function formatWeekdayLong(date: Date | string | null | undefined, locale = 'ca-ES'): string {
@@ -671,9 +661,6 @@ export function getBookingDocumentFlowStepStyle(done: boolean, active: boolean) 
   return BOOKING_DOCUMENT_FLOW_STEP_STYLES.pending;
 }
 
-export function getLeadPriorityDisplay(priority: string) {
-  return PRIORITY_CONFIG[priority] || PRIORITY_CONFIG.MEDIUM;
-}
 
 export function getProposalStatusDisplay(status: string) {
   return PROPOSAL_STATUS_CONFIG[status] || PROPOSAL_STATUS_CONFIG.DRAFT;
@@ -754,39 +741,12 @@ export const LEAD_STATUS_OPTIONS = Object.entries(LEAD_STATUS_LABELS).map(([valu
   label,
 }));
 
-export const LEAD_STATUS_ACTION_OPTIONS = [
-  { value: 'NEW', label: 'Nova entrada', tone: 'admin-tone-bg-info', icon: '🆕' },
-  { value: 'CONTACTED', label: 'Contactat', tone: 'admin-tone-bg-warning', icon: '📞' },
-  { value: 'QUOTE_SENT', label: 'Pressupost enviat', tone: 'admin-tone-bg-neutral', icon: '📄' },
-  { value: 'NEGOTIATING', label: 'En negociació', tone: 'admin-tone-bg-warning', icon: '🤝' },
-  { value: 'WON', label: 'Guanyat!', tone: 'admin-tone-bg-success', icon: '✅' },
-  { value: 'LOST', label: 'Perdut', tone: 'admin-tone-bg-danger', icon: '❌' },
-] as const;
 
-export const LEAD_PIPELINE_COLUMNS = [
-  { status: 'NEW', label: 'Noves', toneClass: 'admin-leads-tone admin-leads-tone--new', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--new' },
-  { status: 'CONTACTED', label: 'Contactat', toneClass: 'admin-leads-tone admin-leads-tone--contacted', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--contacted' },
-  { status: 'QUOTE_SENT', label: 'Pressupost enviat', toneClass: 'admin-leads-tone admin-leads-tone--quote', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--quote' },
-  { status: 'NEGOTIATING', label: 'Negociant', toneClass: 'admin-leads-tone admin-leads-tone--negotiating', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--negotiating' },
-  { status: 'WON', label: 'Guanyat', toneClass: 'admin-leads-tone admin-leads-tone--won', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--won' },
-  { status: 'LOST', label: 'Perdut', toneClass: 'admin-leads-tone admin-leads-tone--lost', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--lost' },
-] as const;
 
 /** Estats "oberts" del pipeline comercial (forecast ponderat). WON = tancat; LOST = descartat. */
 export const OPEN_PIPELINE_STATUSES = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] as const;
 
-export const PRIORITY_DOT_CLASS: Record<string, string> = {
-  LOW: 'admin-tone-bg-neutral',
-  MEDIUM: 'admin-tone-bg-info',
-  HIGH: 'admin-tone-bg-warning',
-  URGENT: 'admin-tone-bg-danger',
-};
 
-export const LEAD_SCORE_BAND_LABELS: Record<string, string> = {
-  LOW: 'BAIX',
-  MEDIUM: 'MITJÀ',
-  HIGH: 'ALT',
-};
 
 export const BOOKING_STATUS_ORDER = ['PENDING', 'CONFIRMED', 'PREPARING', 'COMPLETED', 'CANCELLED'] as const;
 export const BOOKING_PIPELINE_COLUMNS = [
@@ -836,18 +796,6 @@ export const BOOKING_GALLERY_PORTFOLIO_CATEGORIES = [
   { slug: 'fiestas-tematicas-mon-magic', name: 'Fiestas temáticas Món Màgic' },
 ] as const;
 
-export const INVENTORY_CATEGORY_LABELS: Record<string, string> = {
-  SOUND: '🔊 So',
-  LIGHTING: '💡 Il·lum.',
-  EFFECTS: '✨ Efectes',
-  STRUCTURE: '🏗️ Estruct.',
-  CABLING: '🔌 Cable',
-  TECH: '💻 Tech',
-  DECORATION_HP: '🎃 Deco HP',
-  DECORATION_HW: '🎄 Deco HW',
-  DECORATION_GEN: '🎨 Deco Gen',
-  CONSUMABLE: '📦 Consum.',
-};
 
 export const INVENTORY_CONDITION_OPTIONS = [
   { value: 'NEW', label: 'Nou' },
@@ -945,16 +893,6 @@ export const INTAKE_SOURCE_OPTIONS = [
   { value: 'OTHER', label: 'Altre', icon: '📋' },
 ] as const;
 
-export const INTAKE_SOURCE_SELECTED_STYLES: Record<string, string> = {
-  PHONE: 'border-sky-400/70 bg-sky-500/25 text-sky-100',
-  WHATSAPP: 'border-emerald-400/70 bg-emerald-500/25 text-emerald-100',
-  INSTAGRAM: 'border-pink-400/70 bg-pink-500/25 text-pink-100',
-  WALLAPOP: 'border-lime-400/70 bg-lime-500/25 text-lime-100',
-  REFERRAL: 'border-orange-400/70 bg-orange-500/25 text-orange-100',
-  GOOGLE: 'border-amber-400/70 bg-amber-500/25 text-amber-100',
-  WEBSITE: 'border-cyan-400/70 bg-cyan-500/25 text-cyan-100',
-  OTHER: 'border-white/20 bg-white/10 text-white/90',
-};
 
 export const INTAKE_EVENT_TYPE_OPTIONS = [
   { value: 'WEDDING', label: 'Casament', icon: '💍' },
@@ -1526,10 +1464,6 @@ export const LEAD_DOCUMENT_TYPE_VALUES = [
 
 
 
-export const PUBLIC_MONTH_KEYS = [
-  'january', 'february', 'march', 'april', 'may', 'june',
-  'july', 'august', 'september', 'october', 'november', 'december',
-] as const;
 
 export type PublicBottomNavIcon = 'Home' | 'Briefcase' | 'Calculator' | 'Image' | 'MessageCircle';
 
@@ -1601,7 +1535,6 @@ export const PUBLIC_HALLOWEEN_DECORATION_ITEMS = [
   { icon: '💀', key: 7 },
 ] as const;
 
-export const PUBLIC_HALLOWEEN_PREVIEW_ICONS = ['👻', '🕷️', '🫕', '🕯️', '💀', '🕸️'] as const;
 
 export const PUBLIC_HALLOWEEN_PACKS = [
   { key: 'basic', emoji: '🕯️', hours: 4, price: 600, popular: false },
@@ -1686,12 +1619,6 @@ export const PUBLIC_FOOTER_SOCIAL_LINK_META = [
   { name: 'YouTube', configKey: 'youtube', color: 'hover:text-[#FF0000] hover:bg-[#FF0000]/10' },
 ] as const;
 
-export const PUBLIC_FOOTER_TRUST_SIGNAL_META = [
-  { key: 'experience', icon: '⭐', color: 'from-amber-500/30 to-orange-500/30', accent: 'text-amber-400' },
-  { key: 'events', icon: '🎉', color: 'from-purple-500/30 to-pink-500/30', accent: 'text-purple-400' },
-  { key: 'response', icon: '⚡', color: 'from-green-500/30 to-emerald-500/30', accent: 'text-emerald-400' },
-  { key: 'coverage', icon: '📍', color: 'from-blue-500/30 to-cyan-500/30', accent: 'text-cyan-400' },
-] as const;
 
 
 export const PUBLIC_HERO_MEDIA_FALLBACK = HERO_MEDIA_DEFAULT_ITEMS.map(({ id, url, type, label }) => ({
@@ -2152,50 +2079,7 @@ export type LeadGuidedStep = {
   doneColor: string;
 };
 
-export const LEAD_GUIDED_STEPS: LeadGuidedStep[] = [
-  {
-    status: 'NEW',
-    label: 'Entrada nova',
-    icon: '📥',
-    color: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
-    activeColor: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info border-2',
-    doneColor: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
-  },
-  {
-    status: 'CONTACTED',
-    label: 'Contactat',
-    icon: '📞',
-    color: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
-    activeColor: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning border-2',
-    doneColor: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
-  },
-  {
-    status: 'QUOTE_SENT',
-    label: 'Pressupost enviat',
-    icon: '📄',
-    color: 'admin-tone-border-neutral admin-tone-bg-neutral admin-tone-text-neutral',
-    activeColor: 'admin-tone-border-neutral admin-tone-bg-neutral admin-tone-text-neutral border-2',
-    doneColor: 'admin-tone-border-neutral admin-tone-bg-neutral admin-tone-text-neutral',
-  },
-  {
-    status: 'NEGOTIATING',
-    label: 'Negociant',
-    icon: '🤝',
-    color: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
-    activeColor: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning border-2',
-    doneColor: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
-  },
-  {
-    status: 'WON',
-    label: 'Guanyat!',
-    icon: '🎉',
-    color: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
-    activeColor: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success border-2',
-    doneColor: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
-  },
-];
 
-export const LEAD_GUIDED_STATUS_ORDER: Array<'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON'> = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON'];
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CUSTOMER PRIORITY STYLES

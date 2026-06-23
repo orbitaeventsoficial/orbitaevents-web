@@ -1502,6 +1502,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1107 — 2026-06-23 — claude (TANCAT)
+
+**14 constants mortes de lib/constants/index eliminades.**
+
+- 32 exports sense ús extern detectats; eliminats NOMÉS els 14 segurs (1 ocurrència = només def, sense ús intern ni extern). PRIORITY_LABELS, LEAD_PIPELINE_COLUMNS (orfenat per mi #1020), LEAD_GUIDED_STEPS, etc.
+- Prudència: 18 «orfes» NO tocats (ús intern a index.ts o a dead-code.md). 225→211 exports, ni un de més.
+- Validació tècnica: tsc + tests constants + arch:layer + validate:core EXIT 0.
+- Validació funcional: cap constant viva afectada.
+- Validació humana/UX: no toca render.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1106 — 2026-06-23 — claude (TANCAT)
 
 **Neteja lib/: 2 mòduls morts + shuffle unificat.**

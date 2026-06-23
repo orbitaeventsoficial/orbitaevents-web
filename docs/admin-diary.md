@@ -27,6 +27,36 @@ Counter -> 1099.
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-23 — 14 constants mortes de lib/constants/index eliminades (Canvi #1107, claude)
+
+### Context
+Auditoria de `lib/constants/index.ts` (208 exports, capa canònica de domini, mai auditada a fons per codi mort).
+
+### Mètode segur (no esborrar a cegues)
+32 exports sense ús EXTERN detectats. Però molts tenen ús INTERN a index.ts (una funció els consumeix) → esborrar-los trencaria. Filtre: només els que tenen **1 sola ocurrència a index.ts** (només la definició) I 0 ús extern = realment morts. 15 candidats; 1 exclòs (INVOICE_STATUS_LABELS, a dead-code.md = conservar #988).
+
+### Eliminades (14, totes verificades + tsc xarxa)
+PRIORITY_LABELS, formatWeekdayShort, getLeadPriorityDisplay, LEAD_STATUS_ACTION_OPTIONS, `LEAD_PIPELINE_COLUMNS` (l'havia orfenat jo al #1020 en esborrar LeadPipelineView), PRIORITY_DOT_CLASS, LEAD_SCORE_BAND_LABELS, INVENTORY_CATEGORY_LABELS, INTAKE_SOURCE_SELECTED_STYLES, PUBLIC_MONTH_KEYS, PUBLIC_HALLOWEEN_PREVIEW_ICONS, PUBLIC_FOOTER_TRUST_SIGNAL_META, LEAD_GUIDED_STEPS, LEAD_GUIDED_STATUS_ORDER.
+
+### NO tocades (prudència)
+Les altres 18 «orfes» tenen ús intern a index.ts o estan a la llista de conservar. Esborrar-les hauria trencat.
+
+### Verificació
+- 225→211 exports (exactament 14, ni un de més — claus quadrades). Constants clau (formatCurrency, parseBudgetAmount, LEAD_STATUS_VALUES...) intactes.
+- tsc EXIT 0 + tests de constants verds + arch:layer:check 0 + validate:core EXIT 0.
+
+### Validació
+- Validació tècnica: tsc + validate:core EXIT 0.
+- Validació funcional: 14 constants mortes menys; cap viva afectada.
+- Validació humana/UX: no toca render.
+
+### Coordinació
+Counter -> 1107.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-23 — Neteja lib/: 2 mòduls morts + shuffle unificat (Canvi #1106, claude)
 
 ### Context

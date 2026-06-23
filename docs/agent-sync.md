@@ -15,6 +15,10 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-23 [ESTAT: tancat — 14 constants mortes de lib/constants/index fora #1107]
+Auditoria de lib/constants/index.ts (208 exports, mai auditat a fons): 32 orfes detectats. Eliminades NOMÉS les 14 SEGURES (1 ocurrència a index.ts = només def, 0 ús intern, 0 ús extern): PRIORITY_LABELS, formatWeekdayShort, getLeadPriorityDisplay, LEAD_STATUS_ACTION_OPTIONS, LEAD_PIPELINE_COLUMNS (orfenat per mi al #1020), PRIORITY_DOT_CLASS, LEAD_SCORE_BAND_LABELS, INVENTORY_CATEGORY_LABELS, INTAKE_SOURCE_SELECTED_STYLES, PUBLIC_MONTH_KEYS, PUBLIC_HALLOWEEN_PREVIEW_ICONS, PUBLIC_FOOTER_TRUST_SIGNAL_META, LEAD_GUIDED_STEPS, LEAD_GUIDED_STATUS_ORDER.
+PRUDÈNCIA: les altres 18 «orfes» NO tocades — tenien ús INTERN a index.ts (WHATSAPP_NUMBER, LEAD_STATUS_CONFIG, PRIORITY_CONFIG, SOURCE_ICONS...) o estan a dead-code.md (INVOICE_STATUS_LABELS, conservar #988). Esborrar-les trencaria. Verificat per nº d'ocurrències + tsc xarxa. 225→211 exports, ni un de més. validate:core EXIT 0. Counter->1107.
+
 [claude] 2026-06-23 [ESTAT: tancat — neteja lib/: 2 mòduls morts fora + shuffle unificat #1106]
 Auditoria de codi mort a lib/ (fora services, que el guard no cobreix). Eliminats 2 mòduls orfes: api-error-handler.ts (validationError de PresupuestoPdfStudio era un useState local, no l'import) i google-maps-url.ts (cap ús). DUPLICACIÓ resolta: lib/utils/shuffle.ts existia PERÒ HeroElegant i MobileHeroUltimate tenien còpies LOCALS idèntiques (Fisher-Yates) → ara totes dues importen el mòdul canònic (que té test). shuffle passa d'orfe a 2 consumidors. tsc + validate:core EXIT 0; home desktop+mòbil 200/0 errors. middleware/admin-auth NO tocat (viu via middleware.ts). Counter->1106.
 
