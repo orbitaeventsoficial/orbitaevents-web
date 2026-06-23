@@ -63,6 +63,14 @@ export default async function CockpitPage() {
             <p className="ck__pillar-val">{formatCurrency(summary.weightedTotal)}</p>
             <p className="ck__pillar-cap">Pipeline × probabilitat de tancament</p>
           </article>
+          <article className="ck__pillar ck__pillar--net">
+            <span className="ck__pillar-dot" aria-hidden="true" />
+            <p className="ck__pillar-label">Marge previst</p>
+            <p className="ck__pillar-val">{formatCurrency(summary.netForecastTotal)}</p>
+            <p className="ck__pillar-cap">
+              {summary.netMarginPct === null ? 'Benefici net estimat' : `${summary.netMarginPct}% sobre la previsió`}
+            </p>
+          </article>
           <article className="ck__pillar">
             <p className="ck__pillar-label">Històric</p>
             <p className="ck__pillar-val">{formatCurrency(summary.previousYearTotal)}</p>

@@ -63,6 +63,23 @@ describe('composeEconomicCockpit', () => {
     expect(c.summary.yoyDeltaPct).toBeNull();
   });
 
+  it('netForecastTotal suma el netCashFlow + netMarginPct sobre el combinat', () => {
+    const c = composeEconomicCockpit(
+      [pm('2026-07', { combined: 1000 }), pm('2026-08', { combined: 1000 })],
+      [
+        { month: '2026-07', income: 1000, costs: 600, netFlow: 400, cumulative: 400 },
+        { month: '2026-08', income: 1000, costs: 700, netFlow: 300, cumulative: 700 },
+      ],
+    );
+    expect(c.summary.netForecastTotal).toBe(700); // 400 + 300
+    expect(c.summary.netMarginPct).toBe(35); // 700 / 2000 = 35%
+  });
+
+  it('netMarginPct = null si no hi ha previsió combinada', () => {
+    const c = composeEconomicCockpit([pm('2026-07')], []);
+    expect(c.summary.netMarginPct).toBeNull();
+  });
+
   it('cockpit buit: totals a 0, sense mesos', () => {
     const c = composeEconomicCockpit([], []);
     expect(c.months).toHaveLength(0);

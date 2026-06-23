@@ -83,7 +83,7 @@ html.admin-mode .ck__herocap {
 /* ── PILARS: jerarquia de certesa ─────────────────────────────────────────── */
 html.admin-mode .ck__pillars {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.875rem;
 }
 html.admin-mode .ck__pillar {
@@ -103,6 +103,7 @@ html.admin-mode .ck__pillar-dot {
 }
 html.admin-mode .ck__pillar--committed .ck__pillar-dot { background: var(--o-admin-success-text); }
 html.admin-mode .ck__pillar--weighted .ck__pillar-dot { background: var(--o-admin-gold); }
+html.admin-mode .ck__pillar--net .ck__pillar-dot { background: var(--o-admin-gold-bright); }
 html.admin-mode .ck__pillar-label {
   margin: 0;
   font-family: var(--font-inter, system-ui, sans-serif);
@@ -121,6 +122,7 @@ html.admin-mode .ck__pillar-val {
 }
 html.admin-mode .ck__pillar--committed .ck__pillar-val { color: var(--o-admin-success-text); }
 html.admin-mode .ck__pillar--weighted .ck__pillar-val { color: var(--o-admin-gold-bright); }
+html.admin-mode .ck__pillar--net .ck__pillar-val { color: var(--o-admin-gold-bright); }
 html.admin-mode .ck__pillar-cap {
   margin: 0.35rem 0 0;
   font-size: var(--o-text-2xs);
@@ -215,6 +217,9 @@ html.admin-mode .ck__empty {
 }
 
 /* ── Responsiu ────────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  html.admin-mode .ck__pillars { grid-template-columns: repeat(2, 1fr); }
+}
 @media (max-width: 640px) {
   html.admin-mode .ck__pillars { grid-template-columns: 1fr; }
   html.admin-mode .ck__row { grid-template-columns: 3.5rem 1fr auto; gap: 0.5rem; }

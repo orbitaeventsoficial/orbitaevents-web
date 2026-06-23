@@ -28,6 +28,11 @@ export interface CockpitSummary {
   weightedTotal: number;        // suma de weightedPipeline
   combinedTotal: number;        // suma de combinedForecast
   previousYearTotal: number;    // suma YoY
+  /** Marge net previst del període (suma de netCashFlow) — el «quant guanyo», no
+   *  només «quant entra». Aquesta és la diferència competitiva: marge real. */
+  netForecastTotal: number;
+  /** Marge net sobre la previsió combinada d'ingressos (%). null si no hi ha ingrés. */
+  netMarginPct: number | null;
   /** Variació de la previsió combinada respecte el mateix període de l'any anterior (%). */
   yoyDeltaPct: number | null;
   monthsAhead: number;
@@ -68,8 +73,12 @@ export function composeEconomicCockpit(
   const weightedTotal = sum((m) => m.weightedPipeline);
   const combinedTotal = sum((m) => m.combinedForecast);
   const previousYearTotal = sum((m) => m.previousYearActual);
+  const netForecastTotal = sum((m) => m.netCashFlow);
   const yoyDeltaPct = previousYearTotal > 0
     ? Math.round(((combinedTotal - previousYearTotal) / previousYearTotal) * 1000) / 10
+    : null;
+  const netMarginPct = combinedTotal > 0
+    ? Math.round((netForecastTotal / combinedTotal) * 1000) / 10
     : null;
 
   return {
@@ -79,6 +88,8 @@ export function composeEconomicCockpit(
       weightedTotal,
       combinedTotal,
       previousYearTotal,
+      netForecastTotal,
+      netMarginPct,
       yoyDeltaPct,
       monthsAhead: months.length,
     },
