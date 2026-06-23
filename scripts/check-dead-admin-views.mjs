@@ -187,9 +187,13 @@ const CANDIDATE_DIRS = [
   path.join(repoRoot, 'components'),
 ];
 const allowlist = loadAllowlist();
+// Tipus de definició (.d.ts) i config no són candidats: no es "renderitzen" ni
+// s'importen necessàriament per ruta. Sí ho són components .tsx i mòduls de
+// dades .ts (constants/helpers/types) que, si no els importa ningú accessible,
+// són illes mortes — el cas de nav-items.ts/inbox-types.ts (#1104).
 const dead = allFiles.filter((f) => {
   if (!CANDIDATE_DIRS.some((d) => f.startsWith(d + path.sep))) return false;
-  if (!f.endsWith('.tsx')) return false;
+  if (!/\.(tsx|ts)$/.test(f) || f.endsWith('.d.ts')) return false;
   if (NEXT_ENTRY.has(baseName(f))) return false;
   if (reachable.has(f)) return false;
   const rel = path.relative(repoRoot, f).replace(/\\/g, '/');

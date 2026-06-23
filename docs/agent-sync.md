@@ -15,6 +15,11 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-23 [ESTAT: tancat — LA «COSTURA DE NAV» ERA CODI MORT + guard de dades ampliat #1104]
+Auditoria d'organisme: vaig diagnosticar la nav admin com a «2 fonts que divergeixen» (nav-items.ts 50 vs layout.tsx 23). Investigant a fons: nav-items.ts és CODI MORT (cap importador; cua de l'AdminSearchModal esborrat al #1026). NO era fragmentació, era una illa morta que el guard no veia (és .ts de dades, no .tsx). Eradicats 4 mòduls .ts orfes (nav-items, adminHelpGlossary, importNavigation, inbox-types) + 1 test orfe — tots cua de components ja esborrats. La nav admin ÉS una sola font viva (layout.tsx).
+GUARD AMPLIAT: check-dead-admin-views ara cobreix .ts de dades sota app/admin/components/, no només .tsx → tapa el forat. validate:core EXIT 0 (0 falsos positius a tot el repo). Counter->1104.
+Avís: la nav admin és UNA font (layout.tsx). No recreïs nav-items.ts.
+
 [claude] 2026-06-23 [ESTAT: tancat — EINA DE CAMP 3/3: ALARMA DE SORTIDA al calendari #1102]
 Tancada la iniciativa. Atacat el prerequisit: distanceKm afegit a seasonCalendarService (SeasonCalendarBookingLink + select booking + mapeig) i a LeadData.booking. La fitxa del calendari ara mostra «Sortir cap al bolo HH:MM · X min viatge + 60 muntatge» quan el lead té reserva amb km i hora. Reusa buildEventLogistics/computeDepartureTime canònics. Verificat amb dades reals: Carlos (19:30, 12km, Lliçà) → sortir 18:19. tsc + 23 tests seasonCalendar + validate:core EXIT 0.
 INICIATIVA EINA DE CAMP COMPLETA: ✅ reserva (Waze+Maps+sortida #1099) · ✅ calendari Waze (#1101) · ✅ alarma de sortida (aquest). Telèfon clicable ja existia. Counter->1102.

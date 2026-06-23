@@ -1502,6 +1502,22 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1104 — 2026-06-23 — claude (TANCAT)
+
+**La «costura de nav» era codi mort + guard de dades ampliat.**
+
+- La nav admin no tenia 2 fonts divergents: `nav-items.ts` era codi mort (cua de l'AdminSearchModal #1026). Eradicats 4 mòduls .ts orfes (nav-items, adminHelpGlossary, importNavigation, inbox-types) + 1 test. La nav és una sola font (layout.tsx).
+- `check-dead-admin-views` ampliat a .ts de dades (no només .tsx) → tapa el forat.
+- Lliçó: un diagnòstic d'arxipèlag pot ser codi mort no detectat.
+- Validació tècnica: tsc + validate:core EXIT 0 (0 falsos positius).
+- Validació funcional: nav d'una font; 0 .ts orfes a app/admin/components.
+- Validació humana/UX: no toca render.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1103 — 2026-06-23 — claude (TANCAT)
 
 **Manual 100% canònic + tret de l'exempció del guard; web públic auditat (sense deute).**

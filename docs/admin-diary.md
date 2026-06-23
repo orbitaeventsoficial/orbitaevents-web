@@ -27,6 +27,33 @@ Counter -> 1099.
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-23 — La «costura de nav» era codi mort + guard de dades ampliat (Canvi #1104, claude)
+
+### Context
+A l'auditoria d'organisme vaig marcar la nav admin com a costura d'arxipèlag («2 fonts: nav-items.ts 50 destins vs sidebar 23»). El propietari em va donar via lliure per atacar-la.
+
+### Troballa (el diagnòstic era a mitges)
+NO eren 2 fonts divergents: `nav-items.ts` és **codi mort** (cap importador viu; era cua de l'AdminSearchModal esborrat al #1026). La nav admin ja ÉS una sola font viva (`layout.tsx`). El meu guard de codi mort no ho va veure perquè és un `.ts` de dades, no un `.tsx` de component.
+
+### Què s'ha fet
+- Eradicats 4 mòduls .ts orfes (verificats per path d'import exacte + tsc): `nav-items.ts`, `adminHelpGlossary.ts`, `inbox/importNavigation.ts`, `inbox/inbox-types.ts` + 1 test orfe. Tots cua de components ja esborrats.
+- `check-dead-admin-views` ampliat: els candidats inclouen `.ts` de dades (no només `.tsx`), excloent `.d.ts` i rutes Next. Tapa el forat que va deixar passar nav-items.
+
+### Lliçó
+Un diagnòstic d'arxipèlag pot ser, en realitat, codi mort no detectat. Verificar reachability ABANS de proposar una refeta de cohesió.
+
+### Validació
+- Validació tècnica: tsc + validate:core EXIT 0 (guard ampliat, 0 falsos positius a tot el repo).
+- Validació funcional: nav admin d'una sola font; cap codi mort de dades restant a app/admin/components.
+- Validació humana/UX: no toca render (codi sense consumidor).
+
+### Coordinació
+Counter -> 1104. (NO he tocat admin/page.tsx, worktree del propietari.)
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-23 — Manual canònic + exempció eliminada; web públic auditat (Canvi #1103, claude)
 
 ### Context
