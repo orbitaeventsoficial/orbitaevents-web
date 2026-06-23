@@ -57,7 +57,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 1092;
+export const ADMIN_CHANGE_COUNTER = 1093;
 
 export const ADMIN_DOSSIER_GENERATOR_COPY = {
   page: {

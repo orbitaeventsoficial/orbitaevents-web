@@ -196,10 +196,10 @@ html.admin-mode :is(.x, .y) .z {
     expect(result.stderr).toContain('.leak-after-import');
   });
 
-  it('adverteix quan el fitxer no existeix però no falla', () => {
+  it('no falla quan no hi ha cap CSS admin (escaneig recursiu robust)', () => {
     const result = runGuard({});
     expect(result.status).toBe(0);
-    expect(result.stderr).toContain('WARN');
+    expect(result.stdout).toContain('OK');
   });
 
   it('reporta múltiples violacions de fitxers diferents', () => {

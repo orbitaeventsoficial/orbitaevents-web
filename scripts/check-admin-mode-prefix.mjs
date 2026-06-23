@@ -28,10 +28,38 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const ROOT = process.cwd();
-const ADMIN_CSS_FILES = [
-  path.join(ROOT, 'app', 'admin', 'admin-theme.css'),
-  path.join(ROOT, 'app', 'admin', 'control-room.css'),
-];
+
+// Tots els CSS sota app/admin/** han de tenir el prefix canònic `html.admin-mode`
+// (CLAUDE.md §Selector canònic). Abans el guard només mirava 2 fitxers — punt cec
+// que amagava centenars de regles sense prefix a leads/inbox/clientes/etc. i
+// provocava CSS que es barrejava en navegar entre pantalles admin (#1093).
+function collectAdminCss(dir, out = []) {
+  if (!fs.existsSync(dir)) return out;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) collectAdminCss(full, out);
+    else if (entry.name.endsWith('.css')) out.push(full);
+  }
+  return out;
+}
+const ADMIN_CSS_FILES = collectAdminCss(path.join(ROOT, 'app', 'admin'));
+
+// Baseline de deute conegut (selectors sense prefix que ja existien). El guard
+// BLOQUEJA noves violacions; les de la baseline es redueixen incrementalment amb
+// verificació visual (moltes zones són TANCAT CHARLIE). Format: "rel:linia: sel".
+const BASELINE_PATH = path.join(ROOT, 'scripts', 'admin-mode-prefix-allowlist.txt');
+function loadBaseline() {
+  try {
+    return new Set(
+      fs.readFileSync(BASELINE_PATH, 'utf8')
+        .split('\n')
+        .map((l) => l.trim())
+        .filter((l) => l && !l.startsWith('#')),
+    );
+  } catch {
+    return new Set();
+  }
+}
 
 const REQUIRED_PREFIX = 'html.admin-mode';
 
@@ -158,22 +186,48 @@ for (const file of ADMIN_CSS_FILES) {
   allViolations.push(...scanFile(file, rel));
 }
 
-if (allViolations.length > 0) {
+// Mode generació de baseline: `node check-admin-mode-prefix.mjs --write-baseline`
+if (process.argv.includes('--write-baseline')) {
+  const header = '# Baseline de deute CSS admin sense prefix html.admin-mode.\n' +
+    '# El guard BLOQUEJA noves violacions; aquestes es redueixen amb verificació visual.\n' +
+    '# Generat per --write-baseline. NO afegir entrades a mà.\n';
+  fs.writeFileSync(BASELINE_PATH, header + allViolations.join('\n') + '\n');
+  console.log(`[admin-mode-prefix] baseline escrita: ${allViolations.length} entrades a ${path.relative(ROOT, BASELINE_PATH)}`);
+  process.exit(0);
+}
+
+const baseline = loadBaseline();
+const newViolations = allViolations.filter((v) => !baseline.has(v));
+// Entrades de baseline que ja no existeixen (deute pagat) → s'han de netejar.
+const allSet = new Set(allViolations);
+const staleBaseline = [...baseline].filter((b) => !allSet.has(b));
+
+if (newViolations.length > 0) {
   process.stderr.write(
-    `[admin-mode-prefix] FAIL: ${allViolations.length} selector(s) sense prefix html.admin-mode:\n`,
+    `[admin-mode-prefix] FAIL: ${newViolations.length} selector(s) NOU(S) sense prefix html.admin-mode:\n`,
   );
-  for (const v of allViolations) {
+  for (const v of newViolations) {
     process.stderr.write(`  ${v}\n`);
   }
   process.stderr.write(
-    '\nTots els selectors a admin-theme.css i control-room.css han de\n' +
-      'començar amb `html.admin-mode` per no afectar la web pública.\n' +
-      '\nExcepcions estructurals (no són selectors): @keyframes, @media,\n' +
+    '\nTots els selectors CSS sota app/admin/** han de començar amb\n' +
+      '`html.admin-mode` per no barrejar-se entre pantalles admin ni filtrar.\n' +
+      'Excepcions estructurals (no són selectors): @keyframes, @media,\n' +
       '@supports, @layer, @font-face i altres at-rules.\n',
   );
   process.exit(1);
 }
 
+if (staleBaseline.length > 0) {
+  process.stderr.write(
+    `[admin-mode-prefix] FAIL: ${staleBaseline.length} entrada(es) stale a la baseline (deute ja pagat).\n` +
+      'Regenera-la: node scripts/check-admin-mode-prefix.mjs --write-baseline\n',
+  );
+  for (const v of staleBaseline) process.stderr.write(`  ${v}\n`);
+  process.exit(1);
+}
+
 console.log(
-  '[admin-mode-prefix] OK: tots els selectors CSS admin usen html.admin-mode.',
+  `[admin-mode-prefix] OK: 0 violacions noves a ${ADMIN_CSS_FILES.length} CSS admin ` +
+    `(${baseline.size} de deute conegut a reduir).`,
 );

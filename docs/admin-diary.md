@@ -28,6 +28,34 @@ Continuació non stop del drenatge CSRF backend després de #1082. Perímetre pe
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-23 — Guard CSS estès (punt cec eradicat) + marge al cockpit (Canvi #1093, claude)
+
+### Context
+El propietari va detectar CSS vell barrejant-se entre pantalles admin, i va fer LA pregunta clau: si un guard era cec, quants més ho són? Meta-auditoria.
+
+### Troballa (#1093)
+`qa:admin-mode-prefix` validava NOMÉS 2 de 17 CSS admin → punt cec que amagava **1110 selectors** sense `html.admin-mode`. Aquest prefix evita que el CSS d'una pantalla es barregi amb una altra. Sense ell + classes genèriques compartides (`.is-on`, `.is-active`, `.fx-root`) = «CSS vell» en navegar.
+
+### Què s'ha fet
+- Guard estès a escaneig recursiu de tot `app/admin/**.css` + baseline de 1110 (deute visible, bloqueja noves) + detecció stale.
+- Meta-auditoria dels 64 guards: 54 recursius (sans), 10 «fix» legítims (validen 1 document), 1 cec (CSS) → eradicat. El punt cec del CSS era ÚNIC en la seva categoria.
+- #1092: marge previst al cockpit (netForecastTotal/netMarginPct + pilar).
+
+### Risc confirmat
+Cap CSS de deute s'importa fora d'admin (0 filtració a web pública). El risc era admin↔admin.
+
+### Validació
+- Validació tècnica: tsc + validate:core EXIT 0 (guard estès verd amb baseline).
+- Validació funcional: 1110 de deute ara VISIBLE; cap regla nova sense prefix pot entrar.
+- Validació humana/UX: la canonització real dels 1110 (toca TANCAT CHARLIE) queda per a passades amb captura, zona per zona.
+
+### Coordinació
+Counter -> 1093.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-22 — La meva versió del zenit: disseny del Cockpit Econòmic (Canvi #1091, claude)
 
 ### Context

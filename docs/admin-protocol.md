@@ -1502,6 +1502,37 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1093 — 2026-06-23 — claude (TANCAT)
+
+**Guard CSS admin estès a TOTS els fitxers (punt cec eradicat) + meta-auditoria de guards.**
+
+- El propietari va detectar CSS que es barrejava entre pantalles admin. ARREL: `qa:admin-mode-prefix` només validava 2 fitxers (admin-theme.css, control-room.css) de 17 → punt cec que amagava 1110 selectors sense prefix `html.admin-mode` a leads/inbox/clientes/etc.
+- `check-admin-mode-prefix.mjs` ara escaneja recursivament TOT `app/admin/**.css` (17 fitxers) amb baseline (`admin-mode-prefix-allowlist.txt`, 1110 entrades de deute conegut) + detecció d'entrades stale. Bloqueja noves violacions; el deute es redueix amb verificació visual (moltes zones TANCAT CHARLIE).
+- META-AUDITORIA dels 64 guards: 54 escanegen recursivament el seu domini; 10 «fix» validen un document concret (protocol/manual/studio — legítim); el CSS era l'únic amb domini ampli + llista fixa. Punt cec únic, eradicat.
+- Risc del deute confirmat acotat: cap d'aquests CSS s'importa fora d'admin (0 filtració a web pública); el risc era admin↔admin per classes genèriques compartides.
+- Validació tècnica: tsc + validate:core EXIT 0 (guard estès verd amb baseline).
+- Validació funcional: cap regla CSS admin nova pot entrar sense prefix; deute de 1110 ara VISIBLE i comptat.
+- Validació humana/UX: la reducció dels 1110 (canonització real) queda per a passades amb captura, zona per zona.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1092 — 2026-06-23 — claude (TANCAT)
+
+**Marge previst al Cockpit — «quant guanyo», no només «quant entra».**
+
+- `economicCockpitService`: nous camps `netForecastTotal` (suma netCashFlow) + `netMarginPct`. Pilar «Marge previst» a /admin/cockpit. 8 tests.
+- Validació tècnica: tsc + 8 tests + validate:core EXIT 0; render 4 pilars, 0 overflow.
+- Validació funcional: el zenit mostra el benefici net previst, no només ingrés.
+- Validació humana/UX: visual provisional.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1091 — 2026-06-22 — claude (TANCAT)
 
 **La meva versió del zenit: disseny del Cockpit Econòmic (carbó+or).**
