@@ -36,11 +36,22 @@ function canonize(src) {
       const s = sel.trim();
       if (s.length === 0) return sel;
       if (s.startsWith(PREFIX)) return sel;       // ja canònic
+      if (s.startsWith('@')) return sel;          // at-rule mal parsejada (CSS d'origen brut) → no tocar
       if (/^(from|to|\d+%)$/i.test(s)) return sel; // step (defensiu)
       return `${PREFIX} ${s}`;
     });
   });
-  return root.toString();
+  const result = root.toString();
+  // Xarxa de seguretat: el CSS d'origen pot estar mal format (p.ex. selector amb
+  // coma penjant abans d'un @media) i postcss el normalitza de forma inesperada.
+  // Si el resultat conté un selector invàlid, AVORTA — no escriguis CSS trencat.
+  if (/html\.admin-mode\s+@/.test(result)) {
+    throw new Error(
+      'CSS d\'origen mal format (selector + @-rule barrejats). Reviseu-lo a mà; ' +
+      'el transformador no l\'aplica per no trencar el render.',
+    );
+  }
+  return result;
 }
 
 const file = process.argv[2];
