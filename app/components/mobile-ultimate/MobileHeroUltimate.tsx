@@ -9,6 +9,7 @@ import { PUBLIC_HERO_MEDIA_FALLBACK, WHATSAPP_URL_WITH_MESSAGE } from '@/lib/con
 import { trackCTAClick, trackWhatsAppClick } from '@/app/lib/analytics';
 import WhatsAppIcon from '@/app/components/public/WhatsAppIcon';
 import { fetchHeroMedia, type HeroMediaItem } from '@/lib/api/heroMediaClient';
+import { shuffle } from '@/lib/utils/shuffle';
 
 const IMAGE_DURATION = 8500;
 
@@ -28,15 +29,6 @@ const HERO_PARTICLES = [
   { x: 28, y: 72, size: 1.5, delay: 0.4, dur: 9.3 },
   { x: 68, y: 68, size: 2, delay: 1.5, dur: 7.6 },
 ];
-
-function shuffle<T>(arr: T[]): T[] {
-  const next = [...arr];
-  for (let i = next.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [next[i], next[j]] = [next[j], next[i]];
-  }
-  return next;
-}
 
 function MorphingText() {
   const t = useTranslations('mobileHero');

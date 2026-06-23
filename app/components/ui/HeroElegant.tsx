@@ -9,21 +9,11 @@ import { trackCTAClick } from '@/app/lib/analytics';
 import { PUBLIC_HERO_KEN_BURNS_PRESETS, PUBLIC_HERO_MEDIA_FALLBACK } from '@/lib/constants';
 import { fetchHeroMedia, type HeroMediaItem } from '@/lib/api/heroMediaClient';
 import ArrowRightIcon from '@/app/components/public/ArrowRightIcon';
+import { shuffle } from '@/lib/utils/shuffle';
 
 
 const IMAGE_DURATION = 9000;
 const VIDEO_MIN_DURATION = 12000;
-
-// Ken Burns — zoom in suau, cada direcció diferent
-
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
 
 // ─── Staggered word reveal ───────────────────────────────────────────────────
 function StaggeredWords({ text, delay = 0 }: { text: string; delay?: number }) {

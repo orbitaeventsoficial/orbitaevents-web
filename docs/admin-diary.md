@@ -27,6 +27,31 @@ Counter -> 1099.
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-23 — Neteja lib/: 2 mòduls morts + shuffle unificat (Canvi #1106, claude)
+
+### Context
+Auditoria de codi mort a `lib/` general (el guard cobreix services + admin, no lib/ arrel).
+
+### Què s'ha fet
+- Eliminats 2 mòduls orfes (verificats: cap importador viu): `lib/api-error-handler.ts` (el `validationError` que semblava usar-lo a PresupuestoPdfStudio era un useState LOCAL homònim) i `lib/google-maps-url.ts` (`buildGoogleMapsSearchUrl` sense cap ús).
+- DUPLICACIÓ real resolta: `lib/utils/shuffle.ts` (canònic, amb test) existia però `HeroElegant` i `MobileHeroUltimate` tenien CÒPIES LOCALS idèntiques (Fisher-Yates). Substituïdes per l'import del mòdul → shuffle passa d'orfe a 2 consumidors, 0 duplicació.
+- `lib/middleware/admin-auth.ts` NO tocat: és viu (middleware.ts l'importa).
+
+### Verificació
+- tsc EXIT 0 (shuffle resol als 2 fitxers). validate:core EXIT 0. Home desktop + mòbil HTTP 200, 0 page errors, hero present (els 2 components que usen shuffle).
+
+### Validació
+- Validació tècnica: tsc + validate:core + render home EXIT 0.
+- Validació funcional: 2 morts menys; shuffle d'una sola font.
+- Validació humana/UX: hero desktop+mòbil intacte.
+
+### Coordinació
+Counter -> 1106.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-23 — Canon d'estats: 114→19 colors Tailwind cru → admin-tone-* (Canvi #1105, claude)
 
 ### Context

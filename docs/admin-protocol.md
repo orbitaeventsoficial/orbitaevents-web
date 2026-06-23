@@ -1502,6 +1502,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1106 — 2026-06-23 — claude (TANCAT)
+
+**Neteja lib/: 2 mòduls morts + shuffle unificat.**
+
+- Eliminats `api-error-handler.ts` + `google-maps-url.ts` (orfes verificats). DUPLICACIÓ: HeroElegant i MobileHeroUltimate tenien còpies locals de shuffle → ara importen `lib/utils/shuffle.ts` canònic.
+- middleware/admin-auth no tocat (viu).
+- Validació tècnica: tsc + validate:core EXIT 0; home desktop+mòbil 200/0 errors.
+- Validació funcional: 2 morts menys, shuffle d'una font.
+- Validació humana/UX: hero intacte.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1105 — 2026-06-23 — claude (TANCAT)
 
 **Canon d'estats: 114→19 colors Tailwind cru → admin-tone-* (38 fitxers).**

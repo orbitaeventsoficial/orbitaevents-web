@@ -15,6 +15,9 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-23 [ESTAT: tancat — neteja lib/: 2 mòduls morts fora + shuffle unificat #1106]
+Auditoria de codi mort a lib/ (fora services, que el guard no cobreix). Eliminats 2 mòduls orfes: api-error-handler.ts (validationError de PresupuestoPdfStudio era un useState local, no l'import) i google-maps-url.ts (cap ús). DUPLICACIÓ resolta: lib/utils/shuffle.ts existia PERÒ HeroElegant i MobileHeroUltimate tenien còpies LOCALS idèntiques (Fisher-Yates) → ara totes dues importen el mòdul canònic (que té test). shuffle passa d'orfe a 2 consumidors. tsc + validate:core EXIT 0; home desktop+mòbil 200/0 errors. middleware/admin-auth NO tocat (viu via middleware.ts). Counter->1106.
+
 [claude] 2026-06-23 [ESTAT: tancat — CANON D'ESTATS: 114→19 colors Tailwind cru → admin-tone-* (38 fitxers) #1105]
 Eradicat el residu d'estats Tailwind cru (emerald/red/amber/rose...) a 38 fitxers admin → classes canòniques admin-tone-{bg,text,border}-{success,warning,danger}. Transformador per famílies (qualsevol tonalitat/opacitat). De 114 a 19 (els 19 restants són EXEMPTS legítims: PresupuestoPdfStudio/StudioPreview=editors PDF, image-manager=placement visual). hover:bg-color cru → .adm-row-hover canònic. tsc + admin-canon 0 + validate:core EXIT 0 + smoke 8 pàgines tocades 0 problemes.
 NOTA d'organisme: les 2 «costures» del meu diagnòstic anterior eren FALSES alarmes — nav (codi mort #1104) i comandament economia/cockpit (granularitat de presentació legítima, no duplicació: les fórmules ja són úniques). L'admin està més cohesionat del que el diagnòstic deia. Counter->1105.
