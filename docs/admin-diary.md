@@ -27,6 +27,37 @@ Counter -> 1099.
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-23 — Eina de camp mòbil: logística de bolo (Waze + hora de sortida) (Canvi #1100, claude)
+
+### Context
+Ordres del propietari (iniciativa de producte): que tot s'enllaci amb el mòbil — trucar, reserves al calendari amb adreça, adreça → Waze/navegador, alarmes de quan sortir per muntar i arribar a temps (+1h muntatge).
+
+### Peça canònica (font única, testejada)
+`lib/admin/eventLogistics.ts` — helpers PURS:
+- `buildTelHref` (tel: net), `buildWazeUrl` (navegació directa), `buildMapsUrl` (fallback).
+- `estimateTravelMinutes` (km/65km·h), `computeDepartureTime` (bolo − viatge − muntatge), `buildEventLogistics` (resum).
+- Decisions del propietari: SETUP_MINUTES=60, AVG_TRAVEL_SPEED_KMH=65. 11 tests.
+
+### Fet (1a superfície)
+Fitxa de reserva `booking/[id]` (sec-event): Waze + Maps + «Sortir cap al bolo HH:MM · X min viatge + 60 min muntatge». Render verificat (Waze→Kimera climbing, sortida 07:32). CSS amb tokens i prefix canònic (deute CSS segueix 0).
+
+### Pendent (mateixa iniciativa, següents talls)
+- Reserves + adreça al calendari (leads).
+- Telèfon clicable on falti.
+- Alarmes de sortida (avisos al calendari).
+
+### Validació
+- Validació tècnica: tsc + 11 tests + validate:core EXIT 0.
+- Validació funcional: la fitxa de reserva és eina de camp (navegar + hora de sortida real).
+- Validació humana/UX: render verificat; pendent ullada del propietari.
+
+### Coordinació
+Counter -> 1100.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-22 — Sanejament CSRF admin portfolio media (Canvi #1083, codex)
 
 ### Context

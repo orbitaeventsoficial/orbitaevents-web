@@ -32,9 +32,214 @@ html.admin-mode .admin-control-room .admin-cr-mobile-only {
   display: inline-flex;
 }
 
+html.admin-mode .admin-control-room .admin-cr-focus {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: stretch;
+  margin-top: 0.9rem;
+  overflow: hidden;
+  border: 1px solid var(--ax-line);
+  border-left: 3px solid var(--at-gold);
+  border-radius: var(--o-r-md);
+  background: color-mix(in oklab, var(--at-panel) 62%, transparent);
+  color: var(--at-text);
+  text-decoration: none;
+}
+
+html.admin-mode .admin-control-room .admin-cr-focus-status {
+  align-self: center;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-left: 1rem;
+  border-radius: 999px;
+  background: var(--at-gold);
+  box-shadow: 0 0 0 0.25rem color-mix(in oklab, var(--at-gold) 16%, transparent);
+}
+
+html.admin-mode .admin-control-room .admin-cr-focus-main {
+  min-width: 0;
+  display: grid;
+  gap: 0.12rem;
+  padding: 0.58rem 1rem 0.6rem 0.85rem;
+}
+
+html.admin-mode .admin-control-room .admin-cr-focus-kicker {
+  color: var(--at-gold);
+  font-family: var(--mono);
+  font-size: var(--o-text-micro);
+  font-weight: var(--o-fw-bold);
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+html.admin-mode .admin-control-room .admin-cr-focus-title {
+  overflow: hidden;
+  color: var(--at-text);
+  font-family: var(--display);
+  font-size: var(--o-text-lg);
+  font-weight: var(--o-fw-xbold);
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.admin-mode .admin-control-room .admin-cr-focus-detail {
+  overflow: hidden;
+  color: var(--at-muted);
+  font-size: var(--o-text-xs);
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.admin-mode .admin-control-room .admin-cr-focus-value {
+  display: grid;
+  place-items: center;
+  min-width: 7rem;
+  padding: 0 1rem;
+  border-left: 1px solid var(--ax-line);
+  color: var(--at-gold-text);
+  font-family: var(--display);
+  font-size: var(--o-text-lg);
+  font-weight: var(--o-fw-bold);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+html.admin-mode .admin-control-room .admin-cr-focus-open {
+  display: grid;
+  place-items: center;
+  padding: 0 0.9rem;
+  border-left: 1px solid var(--ax-line);
+  color: var(--at-muted);
+  font-size: var(--o-text-xs);
+  font-weight: var(--o-fw-bold);
+}
+
+html.admin-mode .admin-control-room .admin-cr-focus:hover {
+  border-color: color-mix(in oklab, var(--at-gold) 42%, var(--ax-line));
+}
+
+html.admin-mode .admin-control-room .admin-cr-metrics {
+  display: flex;
+  align-items: stretch;
+  margin-top: 0.65rem;
+  overflow: hidden;
+  border: 1px solid var(--ax-fill-5);
+  border-radius: 0;
+  background: color-mix(in oklab, var(--at-panel) 64%, transparent);
+}
+
+html.admin-mode .admin-control-room .admin-cr-metric {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.44rem 0.82rem;
+  border-right: 1px solid var(--ax-fill-5);
+  color: var(--at-text);
+  text-decoration: none;
+}
+
+html.admin-mode .admin-control-room .admin-cr-metric:last-child {
+  border-right: 0;
+  background: color-mix(in oklab, var(--at-gold) 5%, transparent);
+}
+
+html.admin-mode .admin-control-room .admin-cr-metric span {
+  flex: none;
+  color: var(--at-muted);
+  font-family: var(--mono);
+  font-size: var(--o-text-micro);
+  font-weight: var(--o-fw-semi);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+html.admin-mode .admin-control-room .admin-cr-metric b {
+  overflow: hidden;
+  color: var(--at-text);
+  font-family: var(--display);
+  font-size: var(--o-text-md-2);
+  font-weight: var(--o-fw-bold);
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.admin-mode .admin-control-room .admin-cr-metric:last-child b {
+  color: var(--at-gold-text);
+}
+
+@media (max-width: 900px) {
+  html.admin-mode .admin-control-room .admin-cr-focus {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  html.admin-mode .admin-control-room .admin-cr-focus-open {
+    display: none;
+  }
+
+  html.admin-mode .admin-control-room .admin-cr-metrics {
+    flex-wrap: wrap;
+  }
+
+  html.admin-mode .admin-control-room .admin-cr-metric {
+    flex: 1 0 33.333%;
+    border-bottom: 1px solid var(--ax-fill-5);
+  }
+
+  html.admin-mode .admin-control-room .admin-cr-metric:nth-child(3n) {
+    border-right: 0;
+  }
+
+  html.admin-mode .admin-control-room .admin-cr-metric:nth-last-child(-n + 3) {
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  html.admin-mode .admin-control-room .admin-cr-focus {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  html.admin-mode .admin-control-room .admin-cr-focus-value {
+    grid-column: 1 / -1;
+    justify-content: start;
+    min-width: 0;
+    padding: 0.5rem 1rem 0.65rem;
+    border-top: 1px solid var(--ax-fill-5);
+    border-left: 0;
+  }
+
+  html.admin-mode .admin-control-room .admin-cr-metric {
+    flex-basis: 50%;
+  }
+
+  html.admin-mode .admin-control-room .admin-cr-metric:nth-child(3n) {
+    border-right: 1px solid var(--ax-fill-5);
+  }
+
+  html.admin-mode .admin-control-room .admin-cr-metric:nth-child(2n) {
+    border-right: 0;
+  }
+
+  html.admin-mode .admin-control-room .admin-cr-metric:nth-last-child(-n + 3) {
+    border-bottom: 1px solid var(--ax-fill-5);
+  }
+
+  html.admin-mode .admin-control-room .admin-cr-metric:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+}
+
 html.admin-mode .admin-control-room .admin-cr-quick-links {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 0.65rem;
   gap: 0;
   border: 1px solid var(--ax-fill-5);
   border-radius: var(--o-r-md);
@@ -104,6 +309,7 @@ html.admin-mode .admin-control-room .admin-cr-panel--pilot { background: var(--a
 html.admin-mode .admin-control-room .admin-cr-panel--checklist { background: var(--at-surface); border-color: color-mix(in oklab, var(--at-info) 40%, var(--at-border) 60%); }
 html.admin-mode .admin-control-room .admin-cr-panel--command { background: var(--at-surface); border-color: color-mix(in oklab, var(--at-violet) 40%, var(--at-border) 60%); }
 html.admin-mode .admin-control-room .admin-cr-panel--radar { background: var(--at-surface); border-color: var(--at-border); }
+html.admin-mode .admin-control-room .admin-cr-panel--cycle { border-top-color: var(--ax-hair-gold); }
 
 html.admin-mode .admin-control-room .admin-cr-panel-head,
 html.admin-mode .admin-control-room .admin-cr-panel-row {
@@ -182,6 +388,41 @@ html.admin-mode .admin-control-room .admin-cr-step-kicker { font-size: 11px; fon
 html.admin-mode .admin-control-room .admin-cr-step-title { font-size: 14px; font-weight: 700; color: var(--at-text); }
 html.admin-mode .admin-control-room .admin-cr-step-desc { font-size: 12px; color: var(--at-text); margin-top: 0.25rem; }
 html.admin-mode .admin-control-room .admin-cr-step-cta { margin-top: 0.5rem; display: inline-flex; font-size: 12px; font-weight: 700; color: var(--at-text); text-decoration: underline dotted; }
+
+html.admin-mode .admin-control-room .admin-cr-cycle-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-top: 0.8rem;
+}
+
+html.admin-mode .admin-control-room .admin-cr-step-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+html.admin-mode .admin-control-room .admin-cr-step-head > div {
+  min-width: 0;
+}
+
+html.admin-mode .admin-control-room .admin-cr-step-metric {
+  flex: none;
+  max-width: 45%;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--ax-line) 42%, transparent);
+  border-radius: 999px;
+  color: var(--at-text);
+  font-family: var(--mono);
+  font-size: var(--o-text-micro);
+  font-weight: var(--o-fw-bold);
+  line-height: 1;
+  padding: 0.32rem 0.48rem;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
 
 html.admin-mode .admin-control-room .admin-cr-action-link {
   border: 1px solid var(--at-cr-cyan-border);
@@ -430,6 +671,7 @@ html.admin-mode .admin-control-room .admin-ui-btn--ghost:hover { background: var
 
 @media (min-width: 768px) {
   html.admin-mode .admin-control-room .admin-cr-quick-links { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  html.admin-mode .admin-control-room .admin-cr-cycle-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   html.admin-mode .admin-control-room .admin-cr-desktop-only { display: block; }
 }
 
@@ -446,6 +688,7 @@ html.admin-mode .admin-control-room .admin-ui-btn--ghost:hover { background: var
   html.admin-mode .admin-control-room .admin-cr-main-grid-wide { grid-column: span 3 / span 3; }
   html.admin-mode .admin-control-room .admin-cr-alert-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   html.admin-mode .admin-control-room .admin-cr-mini-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  html.admin-mode .admin-control-room .admin-cr-cycle-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (min-width: 768px) {

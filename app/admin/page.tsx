@@ -132,15 +132,41 @@ export default async function AdminDashboard() {
     postEventPending: d.postEventPending,
   });
   const operatingCycleTone: Record<AdminOperatingCycleTone, string> = {
-    success: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
-    warning: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
-    info: 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan',
+    success: 'admin-cr-step--emerald',
+    warning: 'admin-cr-step--amber',
+    info: 'admin-cr-step--sky',
   };
   const nextPriorityHref = d.alerts[0]?.href || '/admin/tasks';
   const nextPriorityTitle = d.alerts[0]?.title || (d.upcomingTasks[0]?.title ? d.upcomingTasks[0].title : 'Revisar la cua de tasques');
   const nextPriorityDetail = d.alerts[0]?.description || (d.upcomingTasks[0]?.lead?.name ? `Relacionat amb ${d.upcomingTasks[0].lead.name}` : 'Obre el workspace que concentra la feina pendent.');
   const operationHref = d.nextEvent ? buildBookingHref(d.nextEvent.id) : '/admin/bookings';
   const operationLabel = d.nextEvent ? `${d.nextEvent.clientName} · ${d.nextEvent.daysUntil === 0 ? 'avui' : d.nextEvent.daysUntil === 1 ? 'demà' : `d'aquí ${d.nextEvent.daysUntil} dies`}` : 'Sense bolo imminent';
+  const controlMetrics = [
+    { label: 'Entrades mes', value: d.leadsThisMonth.toString(), href: '/admin/leads' },
+    { label: 'Pipeline 30d', value: formatCurrency(d.pipelineWeighted30), href: '/admin/leads' },
+    { label: 'Reserves', value: d.bookingsConfirmed.toString(), href: '/admin/bookings' },
+    { label: 'Cobraments', value: formatCurrency(d.pendingPayments), href: '/admin/bookings?payment=overdue' },
+    { label: 'Marge', value: `${d.avgMarginPct}%`, href: '/admin/economia' },
+    {
+      label: 'Salut',
+      value: criticalHealthCount > 0 ? `${criticalHealthCount} crítics` : warningHealthCount > 0 ? `${warningHealthCount} avisos` : 'OK',
+      href: '/admin/salut',
+    },
+  ];
+  const focusHref = d.nextEvent ? buildBookingHref(d.nextEvent.id) : nextPriorityHref;
+  const focusKicker = d.nextEvent
+    ? d.nextEvent.daysUntil === 0 ? 'Bolo avui' : d.nextEvent.daysUntil === 1 ? 'Bolo demà' : `Bolo en ${d.nextEvent.daysUntil} dies`
+    : 'Prioritat oberta';
+  const focusTitle = d.nextEvent ? d.nextEvent.clientName : nextPriorityTitle;
+  const focusDetail = d.nextEvent
+    ? [
+        formatDate(d.nextEvent.eventDate),
+        d.nextEvent.eventStartTime,
+        d.nextEvent.eventType ? getEventLabel(d.nextEvent.eventType) : null,
+        d.nextEvent.eventVenue || d.nextEvent.eventLocation,
+      ].filter(Boolean).join(' · ')
+    : nextPriorityDetail;
+  const focusValue = d.nextEvent ? formatCurrency(d.nextEvent.total) : manualDecisionCount > 0 ? `${manualDecisionCount} fronts` : 'Net';
   const pipelineRadarItems = pulse.pipelineDrivers.length > 0
     ? pulse.pipelineDrivers.slice(0, 3).map((driver) => {
         const tone = driver.priority === 'CRITICAL'
@@ -201,7 +227,7 @@ export default async function AdminDashboard() {
   return (
     <div className="admin-control-room">
       {/* ═══ HERO HEADER ═══ */}
-      <div className="admin-hero-header admin-gradient admin-gradient--hero admin-card-glass">
+      <div className="admin-hero-header">
         <div className="admin-hero-glow" />
         <div className="relative z-10">
           <div className="flex items-start justify-between gap-4">
@@ -219,7 +245,27 @@ export default async function AdminDashboard() {
               </Link>
             </div>
           </div>
-          <div className="admin-cr-quick-links mt-4">
+          <Link href={focusHref} className="admin-cr-focus">
+            <span className="admin-cr-focus-status" aria-hidden="true" />
+            <span className="admin-cr-focus-main">
+              <span className="admin-cr-focus-kicker">{focusKicker}</span>
+              <span className="admin-cr-focus-title">{focusTitle}</span>
+              <span className="admin-cr-focus-detail">{focusDetail}</span>
+            </span>
+            <span className="admin-cr-focus-value">{focusValue}</span>
+            <span className="admin-cr-focus-open">Obrir</span>
+          </Link>
+
+          <div className="admin-cr-metrics" aria-label="Resum de comandament">
+            {controlMetrics.map((metric) => (
+              <Link key={metric.label} href={metric.href} className="admin-cr-metric">
+                <span>{metric.label}</span>
+                <b>{metric.value}</b>
+              </Link>
+            ))}
+          </div>
+
+          <div className="admin-cr-quick-links">
             <Link href="/admin/inbox" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.inbox)}>
               <span className="admin-cr-quick-kicker">Comunicació</span>
               <span className="admin-cr-quick-label">Inbox IMAP</span>
@@ -285,34 +331,32 @@ export default async function AdminDashboard() {
 
       <NBAExplainPanel />
 
-      <section className="rounded-2xl border border-white/10 p-4 admin-card-glass">
-        <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/50">Cicle operatiu</p>
-            <h2 className="mt-1 text-lg font-semibold text-white">On està viu el sistema ara</h2>
+      <section className="admin-cr-panel admin-cr-panel--cycle">
+        <div className="admin-cr-panel-row">
+          <div>
+            <p className="admin-cr-kicker">Cicle operatiu</p>
+            <h2 className="admin-cr-h2">On està viu el sistema ara</h2>
           </div>
-          <Link href="/admin/manual" className="shrink-0 rounded-xl border border-white/10 px-3 py-2 text-xs font-semibold text-white/70 transition-colors hover:bg-white/5">
+          <Link href="/admin/manual" className="admin-cr-action-link">
             Obrir manual
           </Link>
         </div>
-        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <div className="admin-cr-cycle-grid">
           {operatingCycle.map((item) => (
             <Link
               key={item.step}
               href={item.href}
-              className={`rounded-2xl border p-3 transition-colors adm-row-hover ${operatingCycleTone[item.tone]}`}
+              className={`admin-cr-step ${operatingCycleTone[item.tone]}`}
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-xs font-bold uppercase tracking-wider opacity-60">Pas {item.step}</p>
-                  <h3 className="mt-1 text-sm font-black text-white">{item.title}</h3>
+              <div className="admin-cr-step-head">
+                <div>
+                  <p className="admin-cr-step-kicker">Pas {item.step}</p>
+                  <h3 className="admin-cr-step-title">{item.title}</h3>
                 </div>
-                <span className="shrink-0 rounded-full border border-white/10 bg-black/10 px-2 py-1 text-xs font-bold uppercase tracking-wide">
-                  {item.metric}
-                </span>
+                <span className="admin-cr-step-metric">{item.metric}</span>
               </div>
-              <p className="mt-3 text-xs leading-relaxed text-white/70">{item.detail}</p>
-              <p className="mt-3 text-xs font-semibold text-white/55">{item.cta}</p>
+              <p className="admin-cr-step-desc">{item.detail}</p>
+              <p className="admin-cr-step-cta">{item.cta}</p>
             </Link>
           ))}
         </div>
@@ -931,5 +975,3 @@ export default async function AdminDashboard() {
     </div>
   );
 }
-
-

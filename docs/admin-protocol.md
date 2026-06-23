@@ -1502,6 +1502,22 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1100 — 2026-06-23 — claude (TANCAT)
+
+**Eina de camp mòbil: logística de bolo (Waze + hora de sortida).**
+
+- Nova peça canònica `lib/admin/eventLogistics.ts` (helpers purs tel/waze/maps/sortida) + 11 tests. Muntatge 60min, 65km/h. Hora de sortida = bolo − viatge − muntatge.
+- Fitxa de reserva: Waze + Maps + «Sortir cap al bolo». Render verificat.
+- Validació tècnica: tsc + 11 tests + validate:core EXIT 0.
+- Validació funcional: fitxa de reserva com a eina de camp.
+- Validació humana/UX: render verificat; pendent ullada propietari.
+- PENDENT (mateixa iniciativa): calendari amb adreça, telèfon clicable, alarmes de sortida.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1099 — 2026-06-23 — codex (TANCAT)
 
 **/admin alineat amb TANCAT CHARLIE: portada menys hero/wireframe.**

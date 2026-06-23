@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { buildLeadComposeHref, buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildCustomerComposeHref, buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
+import { buildEventLogistics } from '@/lib/admin/eventLogistics';
 import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
 import { notFound } from 'next/navigation';
 import { BookingStatusChanger } from './BookingStatusChanger';
@@ -158,6 +159,13 @@ export default async function BookingDetailPage({ params }: PageProps) {
   });
 
   const bookingCompat       = booking as BookingNumericCompat;
+  // Logística de camp (mòbil): navegar a l'adreça i hora de sortida (viatge + 1h muntatge).
+  const eventLogistics = buildEventLogistics({
+    phone: booking.clientPhone,
+    address: [booking.eventVenue, booking.eventLocation].filter(Boolean).join(', '),
+    distanceKm: typeof bookingCompat.distanceKm === 'number' ? bookingCompat.distanceKm : null,
+    eventStartTime: booking.eventStartTime,
+  });
   const packPrice           = booking.pack?.price ? Number(booking.pack.price) : 0;
   const extrasTotal         = booking.extras?.reduce((s: number, e: { price?: number | null; quantity?: number | null }) => s + Number(e.price || 0) * (e.quantity || 1), 0) ?? 0;
   const serviceLinesCost    = booking.serviceLines?.reduce((s: number, l: { costAmount?: number | null; quantity?: number | null }) => s + Number(l.costAmount || 0) * (l.quantity || 1), 0) ?? 0;
@@ -420,6 +428,25 @@ export default async function BookingDetailPage({ params }: PageProps) {
               <div className="bd__grid--span2"><p className="bd__field-label">Ubicació</p><p className="bd__field-val">{booking.eventLocation}</p></div>
               {booking.eventVenue && (
                 <div className="bd__grid--span2"><p className="bd__field-label">Espai</p><p className="bd__field-val">{booking.eventVenue}</p></div>
+              )}
+              {eventLogistics.departureTime && (
+                <div className="bd__grid--span2">
+                  <p className="bd__field-label">Sortir cap al bolo</p>
+                  <p className="bd__field-val bd__field-val--em">
+                    {eventLogistics.departureTime}
+                    <span className="bd__field-hint"> · {eventLogistics.travelMinutes} min viatge + {eventLogistics.setupMinutes} min muntatge</span>
+                  </p>
+                </div>
+              )}
+              {(eventLogistics.wazeUrl || eventLogistics.mapsUrl) && (
+                <div className="bd__grid--span2 bd__nav-actions">
+                  {eventLogistics.wazeUrl && (
+                    <a href={eventLogistics.wazeUrl} target="_blank" rel="noopener noreferrer" className="ap-btn ap-btn--secondary ap-btn--xs">🧭 Waze</a>
+                  )}
+                  {eventLogistics.mapsUrl && (
+                    <a href={eventLogistics.mapsUrl} target="_blank" rel="noopener noreferrer" className="ap-btn ap-btn--secondary ap-btn--xs">📍 Maps</a>
+                  )}
+                </div>
               )}
             </div>
           </section>

@@ -1330,3 +1330,7 @@ html.admin-mode .bd__table { width: 100%; border-collapse: collapse; font-size: 
 html.admin-mode .bd__table th { text-align: left; padding: 6px 10px; color: var(--t3); font-weight: var(--o-fw-semi); border-bottom: 1px solid var(--o-admin-line); }
 html.admin-mode .bd__table td { padding: 8px 10px; color: var(--t); border-bottom: 1px solid var(--o-admin-line); }
 html.admin-mode .bd__table tr:last-child td { border-bottom: 0; }
+
+/* Logística de camp: navegació (Waze/Maps) + pista d'hora de sortida */
+html.admin-mode .bd__nav-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.25rem; }
+html.admin-mode .bd__field-hint { font-size: var(--o-text-2xs); color: var(--t3); font-weight: var(--o-fw-normal); }

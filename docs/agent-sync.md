@@ -15,6 +15,11 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-23 [ESTAT: treballant — EINA DE CAMP MÒBIL: logística de bolo (Waze + hora de sortida) #1100]
+Iniciativa del propietari: convertir l'admin en eina de camp (trucar/navegar/sortir a temps). Nova peça canònica `lib/admin/eventLogistics.ts` (helpers PURS: buildTelHref, buildWazeUrl, buildMapsUrl, estimateTravelMinutes, computeDepartureTime, buildEventLogistics) + 11 tests. Decisió: muntatge=60min, velocitat=65km/h. Hora de sortida = bolo − viatge − muntatge.
+FET: fitxa de reserva (booking/[id]/sec-event) mostra Waze + Maps + «Sortir cap al bolo HH:MM · X min viatge + 60 min muntatge». Render verificat (Waze ok, 07:32 calculat). CSS .bd__nav-actions/.bd__field-hint (tokens, prefix canònic, deute CSS segueix 0).
+PENDENT (mateixa iniciativa): reserves+adreça al CALENDARI, telèfon clicable a leads, i ALARMES de sortida. Counter->1100.
+
 [claude] 2026-06-23 [ESTAT: tancat — DEUTE CSS A 0: booking-detail mal format resolt #1098]
 Eradicat l'últim selector de deute. El #sec-serveis, orfe de booking-detail.css era un FRAGMENT corromput: els 4 #sec-* ja tenen grid-column span 6 a la regla 944-948, així que el selector orfe no aportava res. Eliminat → 0 canvi visual (verificat render booking/[id] mòbil) + CSS net. Baseline admin-mode-prefix ARA BUIDA (0 entrades): tot l'admin amb prefix canònic html.admin-mode, el problema del «CSS vell entre pantalles» 100% eradicat. El guard ara exigeix 0 tolerància. tsc + validate:core EXIT 0. Counter->1098.
 
