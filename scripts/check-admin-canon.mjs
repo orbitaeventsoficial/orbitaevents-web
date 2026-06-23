@@ -22,7 +22,6 @@ const EXEMPT = [
   'email-templates',    // HTML d'email: estils inline obligatoris
   'CanvasEditorClient', // editor gràfic: color = disseny de l'usuari
   'PresupuestoPdfStudio', // editor de PDF/paper
-  'manual/page',        // documentació amb mappings (revisat a part)
 ];
 
 function walk(dir, acc = []) {
