@@ -66,10 +66,10 @@ Tancat l'ultim deute de codi mort anotat: `createDossierFromBolo` eliminat de `d
 Rutes admin dinamiques [param] una per una amb verificacio exhaustiva. Eliminades: /api/admin/leads/[id]/comm-summary (el CustomerHub carrega via fetchCustomerHub server-side, no per HTTP; servei loadCommTimeline CONSERVAT, viu) i /api/admin/leads/[id]/generate-dossier (el cockpit usa el generador normal /admin/dossiers des de #933; createDossierFromBolo queda orfe DINS dossierService, anotat pero NO esborrat per no editar el servei gran amb 240 fitxers sense commit). tsc EXIT 0. 0 candidates [param] mortes restants. Counter->1084. SENSE commit (el faig despres).
 Avis per l'altre agent: capa de rutes API completada (estatiques #1071 + 2 dinamiques #1084). Deute anotat: createDossierFromBolo orfe dins dossierService (poda futura amb verificacio).
 
-[codex] 2026-06-23 [ESTAT: treballant — /admin control room alineat amb TANCAT CHARLIE]
-Últim canvi: #1097 tancat per Claude (canonització CSS admin completa; deute CSS 1110→1).
-Proper pas previst: ajustar només `/admin` (`control-room.css` + components directes de la portada admin) perquè deixi de semblar CSS vell/wireframe i s'alinei amb el canon visual de `/admin/leads` TANCAT CHARLIE. Comparació amb captures i validació responsive.
-Avís per l'altre agent: no toco leads, inbox, booking-detail, transformador CSS, serveis, schema ni protocols/normes; només portada `/admin`.
+[codex] 2026-06-23 [ESTAT: tancat — /admin control room alineat amb TANCAT CHARLIE #1099]
+Últim canvi: #1099 (codex) — portada `/admin` ajustada contra el canon visual de `/admin/leads` TANCAT CHARLIE.
+Proper pas previst: cap dins aquest perímetre; si es continua, que sigui una revisió visual del propietari o una altra pantalla concreta.
+Avís per l'altre agent: només s'ha tocat `app/admin/control-room.css` i documentació/counter. No he tocat leads, inbox, booking-detail, transformador CSS, serveis, schema ni normes/protocols.
 
 [codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin portfolio events #1082]
 `POST/PATCH/DELETE /api/admin/portfolio/events` ja validen `verifyCsrf(req)` després d'auth i abans de body/query/servei. Baseline `qa:api-admin-csrf` baixa de 69 a 66. Test focalitzat nou 8/8, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.

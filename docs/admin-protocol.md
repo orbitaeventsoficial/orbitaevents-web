@@ -1502,6 +1502,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1099 — 2026-06-23 — codex (TANCAT)
+
+**/admin alineat amb TANCAT CHARLIE: portada menys hero/wireframe.**
+
+- Ajustat només `app/admin/control-room.css`: títol menys hero, superfícies més baixes, contorns de panells/targetes/DailyBrief més subtils amb tokens canònics i `color-mix`.
+- No es toca cap norma/protocol, servei, schema, leads, inbox ni booking-detail; perímetre exclusiu de portada `/admin`.
+- Validació tècnica: tsc + qa:admin-canon + qa:css-monocapa + qa:admin-mode-prefix EXIT 0.
+- Validació funcional: render real `/admin` amb auth als 3 breakpoints (desktop/tablet/mòbil): HTTP 200, 0 errors, 0 overflow.
+- Validació humana/UX: comparat contra `/admin/leads` TANCAT CHARLIE; menys look de CSS vell/wireframe, més llenguatge carbó/or operatiu.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
 ### Canvi #1098 — 2026-06-23 — claude (TANCAT)
 
 **Deute CSS a 0: booking-detail mal format resolt.**

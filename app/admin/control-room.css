@@ -494,7 +494,7 @@ html.admin-mode .admin-control-room .admin-hero-title {
   margin: 0;
   color: var(--at-text);
   font-family: var(--display);
-  font-size: clamp(2rem, 3vw, 2.4rem);
+  font-size: clamp(1.85rem, 2.6vw, 2.18rem);
   font-weight: var(--o-fw-xbold);
   letter-spacing: 0;
   line-height: 1;
@@ -800,8 +800,8 @@ html.admin-mode .admin-control-room .admin-ui-metric-card,
 html.admin-mode .admin-control-room .admin-cr-list-row,
 html.admin-mode .admin-control-room .admin-cr-health-item,
 html.admin-mode .admin-control-room .admin-cr-mini-card {
-  border-color: var(--ax-fill-5);
-  background: color-mix(in oklab, var(--at-panel) 72%, transparent);
+  border-color: color-mix(in oklab, var(--ax-line) 48%, transparent);
+  background: color-mix(in oklab, var(--at-panel) 64%, transparent);
   box-shadow: none;
 }
 
@@ -818,16 +818,20 @@ html.admin-mode .admin-control-room .admin-cr-mini-card:hover {
 }
 
 html.admin-mode .admin-control-room .admin-cr-daily-brief {
-  border-color: var(--ax-fill-5);
-  background: color-mix(in oklab, var(--at-panel) 72%, transparent);
+  border-color: color-mix(in oklab, var(--ax-line) 44%, transparent);
+  background: color-mix(in oklab, var(--at-panel) 64%, transparent);
   box-shadow: none;
+}
+
+html.admin-mode .admin-control-room .admin-cr-daily-brief .border {
+  border-color: color-mix(in oklab, var(--ax-line) 44%, transparent);
 }
 
 html.admin-mode .admin-control-room .admin-cr-daily-brief .admin-tone-border-success,
 html.admin-mode .admin-control-room .admin-cr-daily-brief .admin-tone-border-warning,
 html.admin-mode .admin-control-room .admin-cr-daily-brief .admin-tone-border-danger,
 html.admin-mode .admin-control-room .admin-cr-daily-brief .admin-tone-border-cyan {
-  border-color: var(--ax-fill-5);
+  border-color: color-mix(in oklab, var(--ax-line) 44%, transparent);
 }
 
 html.admin-mode .admin-control-room .admin-cr-daily-brief a:hover {

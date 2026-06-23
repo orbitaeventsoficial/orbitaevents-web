@@ -1,3 +1,32 @@
+## 2026-06-23 — /admin alineat amb TANCAT CHARLIE (Canvi #1099, codex)
+
+### Context
+El propietari detecta que `http://localhost:3000/admin` no està bé si es compara amb el canònic TANCAT CHARLIE (`/admin/leads`). Després de la canonització CSS a 0 (#1098), el problema ja no és selector vell entre pantalles sinó composició visual de la portada: massa efecte hero/wireframe i contorns competint amb el contingut.
+
+### Què s'ha fet
+- `app/admin/control-room.css`: reduïda l'escala del títol de portada perquè funcioni com a eina d'operació, no com a landing.
+- `app/admin/control-room.css`: rebaixats contorns i fons de targetes/panells amb tokens canònics (`--ax-line`, `--at-panel`) i `color-mix`, mantenint l'accent d'or només en hover.
+- `app/admin/control-room.css`: rebaixats també els contorns interns del `DailyBriefPanel` per evitar l'efecte de llistat blanc/wireframe.
+
+### Verificació
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run qa:admin-canon` OK.
+- `pnpm run qa:css-monocapa` OK.
+- `pnpm run qa:admin-mode-prefix` OK (0 deute conegut).
+- Render real de `/admin` amb auth als 3 breakpoints: desktop, tablet i mòbil → HTTP 200, 0 errors, 0 overflow.
+
+### Validació
+- Validació tècnica: canvi limitat a CSS canònic de portada admin; sense colors hardcoded ni selectors fora d'`html.admin-mode`.
+- Validació funcional: `/admin` continua operatiu i responsive als 3 breakpoints.
+- Validació humana/UX: la portada abandona el look de CSS vell/wireframe i queda més pròxima al llenguatge TANCAT CHARLIE: menys hero, menys línia blanca, més carbó/or.
+
+### Coordinació
+Counter -> 1099.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-22 — Sanejament CSRF admin portfolio media (Canvi #1083, codex)
 
 ### Context
