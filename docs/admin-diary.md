@@ -27,6 +27,30 @@ Counter -> 1099.
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-23 — Tipus Locale unificat al canònic @/i18n (Canvi #1108, claude)
+
+### Context
+Monocapa de domini: `type Locale = ca|es|en` (i SupportedLocale) estava redefinit localment a 12 fitxers, tot i existir el canònic `export type Locale` a `i18n.ts`.
+
+### Què s'ha fet
+- 12 fitxers passen a `import type { Locale } from '@/i18n'`. `import type` s'esborra en compilar → cap runtime, cap cicle, cap risc de bundle (encara que el fitxer fos client).
+- Els que re-exportaven el tipus (contact-copy→route, catalogPdf→dossierComposite, etc.) mantenen la superfície amb `import type` + `export type`.
+
+### Autocrítica honesta
+La unificació va encadenar 5 errors tsc (re-export + ús intern simultani) que vaig corregir amb la xarxa tsc. ROI baix per a un type de 3 strings; ho deixo fet perquè ja és verd, però confirma que el deute tècnic restant és marginal i delicat — el següent pas de valor real és la decisió de producte/visual del propietari, no més micro-neteja.
+
+### Validació
+- Validació tècnica: tsc + validate:core EXIT 0; 0 redefinicions locals restants.
+- Validació funcional: un sol tipus Locale de domini; superfícies d'API mantingudes.
+- Validació humana/UX: no toca runtime ni render.
+
+### Coordinació
+Counter -> 1108.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-23 — 14 constants mortes de lib/constants/index eliminades (Canvi #1107, claude)
 
 ### Context

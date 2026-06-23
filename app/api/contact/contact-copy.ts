@@ -7,7 +7,8 @@ import { z } from 'zod';
 import type { NextRequest } from 'next/server';
 import type { EventType, LeadSource } from '@prisma/client';
 
-export type Locale = 'ca' | 'es' | 'en';
+import type { Locale } from '@/i18n';
+export type { Locale };
 
 export const CONTACT_COPY: Record<Locale, Record<string, string>> = {
   ca: {

@@ -15,7 +15,7 @@ import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { verifyCsrf } from '@/lib/csrf';
 
 export const dynamic = 'force-dynamic';
-type Locale = 'ca' | 'es' | 'en';
+import type { Locale } from '@/i18n';
 const MESSAGES: Record<Locale, Record<string, string>> = {
   ca: {
     invalidEmail: 'Correu electrònic no vàlid',

@@ -5,7 +5,8 @@
 
 import type { NextRequest } from 'next/server';
 
-export type Locale = 'ca' | 'es' | 'en';
+import type { Locale } from '@/i18n';
+export type { Locale };
 
 export type VerifyMessages = {
   requestTypes: Record<string, string>;

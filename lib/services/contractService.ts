@@ -31,7 +31,7 @@ export async function getCompanyConfig() {
   };
 }
 
-type SupportedLocale = 'ca' | 'es' | 'en';
+import type { Locale as SupportedLocale } from '@/i18n';
 
 function generateContractNumber(): string {
   const year = new Date().getFullYear();

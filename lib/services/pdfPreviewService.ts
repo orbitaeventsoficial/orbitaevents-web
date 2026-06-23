@@ -8,7 +8,7 @@ import { generateInvoicePDF, type InvoiceLineItem, type InvoicePdfData } from '@
 import { DEFAULT_QUOTE_TEMPLATE } from '@/lib/services/quoteTemplateService';
 import { resolvePackI18nKey } from '@/lib/pack-i18n';
 
-type SupportedLocale = 'ca' | 'es' | 'en';
+import type { Locale as SupportedLocale } from '@/i18n';
 
 function resolveLocale(value: string): SupportedLocale {
   return value === 'es' || value === 'en' ? value : 'ca';

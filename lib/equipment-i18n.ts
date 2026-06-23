@@ -2,7 +2,7 @@ import caMessages from '@/messages/ca.json';
 import esMessages from '@/messages/es.json';
 import enMessages from '@/messages/en.json';
 
-type Locale = 'ca' | 'es' | 'en';
+import type { Locale } from '@/i18n';
 
 const MESSAGES = {
   ca: caMessages,

@@ -20,7 +20,8 @@ import {
 } from '@/lib/pdf-config';
 import { getJsPDF, checkPageBreak } from '@/lib/utils/pdfHelpers';
 
-export type SupportedLocale = 'ca' | 'es' | 'en';
+import type { Locale as SupportedLocale } from '@/i18n';
+export type { SupportedLocale };
 
 interface CatalogTranslations {
   brochure: string;

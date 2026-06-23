@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 
-type Locale = 'ca' | 'es' | 'en';
+import type { Locale } from '@/i18n';
 
 type ExtraBooking = {
   price: number;

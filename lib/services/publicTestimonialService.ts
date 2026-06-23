@@ -2,7 +2,7 @@ import { PUBLIC_VERIFIED_CUSTOMER_LABELS } from '@/lib/constants/index';
 import { prisma } from '@/lib/prisma';
 import { recordCustomerTestimonialSubmitted } from '@/lib/services/customerActivityService';
 
-type Locale = 'ca' | 'es' | 'en';
+import type { Locale } from '@/i18n';
 
 type SubmitPublicTestimonialInput = {
   rating: number;

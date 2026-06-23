@@ -1502,6 +1502,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1108 — 2026-06-23 — claude (TANCAT)
+
+**Tipus Locale unificat al canònic @/i18n (12 fitxers).**
+
+- `type Locale/SupportedLocale = ca|es|en` redefinit a 12 fitxers → `import type { Locale } from '@/i18n'` (canònic). import type = 0 runtime/cicle/bundle. Re-exports mantenen superfície.
+- Autocrítica: ROI baix (5 errors tsc encadenats per a un type de 3 strings); fet perquè és verd, però el deute restant és marginal.
+- Validació tècnica: tsc + validate:core EXIT 0; 0 redefinicions locals.
+- Validació funcional: un sol tipus de domini.
+- Validació humana/UX: no toca runtime.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1107 — 2026-06-23 — claude (TANCAT)
 
 **14 constants mortes de lib/constants/index eliminades.**

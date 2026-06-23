@@ -15,6 +15,10 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-23 [ESTAT: tancat — tipus Locale unificat al canònic @/i18n (12 fitxers) #1108]
+Monocapa de domini: el tipus Locale/SupportedLocale = ca|es|en estava REDEFINIT localment a 12 fitxers en comptes d'importar el canònic de i18n.ts. Unificats amb import type (s'esborra en compilar → 0 runtime, 0 cicle, 0 risc de bundle encara que el fitxer sigui client). Els que el re-exportaven mantenen la superfície (import type + export type). 0 redefinicions locals restants. tsc + validate:core EXIT 0.
+AUTOCRÍTICA honesta: aquesta unificació va donar 5 errors tsc encadenats (re-export+ús intern) que vaig anar corregint amb la xarxa tsc → ROI baix per a un type de 3 strings. La xarxa va aguantar però confirma que el deute restant ja és marginal i delicat. Counter->1108.
+
 [claude] 2026-06-23 [ESTAT: tancat — 14 constants mortes de lib/constants/index fora #1107]
 Auditoria de lib/constants/index.ts (208 exports, mai auditat a fons): 32 orfes detectats. Eliminades NOMÉS les 14 SEGURES (1 ocurrència a index.ts = només def, 0 ús intern, 0 ús extern): PRIORITY_LABELS, formatWeekdayShort, getLeadPriorityDisplay, LEAD_STATUS_ACTION_OPTIONS, LEAD_PIPELINE_COLUMNS (orfenat per mi al #1020), PRIORITY_DOT_CLASS, LEAD_SCORE_BAND_LABELS, INVENTORY_CATEGORY_LABELS, INTAKE_SOURCE_SELECTED_STYLES, PUBLIC_MONTH_KEYS, PUBLIC_HALLOWEEN_PREVIEW_ICONS, PUBLIC_FOOTER_TRUST_SIGNAL_META, LEAD_GUIDED_STEPS, LEAD_GUIDED_STATUS_ORDER.
 PRUDÈNCIA: les altres 18 «orfes» NO tocades — tenien ús INTERN a index.ts (WHATSAPP_NUMBER, LEAD_STATUS_CONFIG, PRIORITY_CONFIG, SOURCE_ICONS...) o estan a dead-code.md (INVOICE_STATUS_LABELS, conservar #988). Esborrar-les trencaria. Verificat per nº d'ocurrències + tsc xarxa. 225→211 exports, ni un de més. validate:core EXIT 0. Counter->1107.

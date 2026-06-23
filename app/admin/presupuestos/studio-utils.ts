@@ -21,7 +21,8 @@ export type DocMode = 'quote' | 'contract';
 
 export type SectionId = 'config' | 'client' | 'brand' | 'pack' | 'extras-catalog' | 'extras-custom' | 'contract';
 
-export type Locale = 'ca' | 'es' | 'en';
+import type { Locale } from '@/i18n';
+export type { Locale };
 
 export type CustomExtra = {
   id: string;

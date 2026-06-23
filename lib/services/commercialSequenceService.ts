@@ -19,7 +19,7 @@ export type SequenceRunSummary = {
   errors: number;
 };
 
-type Locale = 'ca' | 'es' | 'en';
+import type { Locale } from '@/i18n';
 
 type NurturingStepDef = {
   step: number;
