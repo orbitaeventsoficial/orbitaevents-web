@@ -27,6 +27,38 @@ Counter -> 1099.
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-23 — Eina de camp 3/3: alarma de sortida al calendari (Canvi #1102, claude)
+
+### Context
+Últim tall de la iniciativa «eina de camp». Al #1101 vaig documentar que l'alarma necessitava distanceKm, que el calendari no exposava. Aquest tall ataca aquell prerequisit.
+
+### Què s'ha fet
+- `seasonCalendarService`: `distanceKm` afegit a `SeasonCalendarBookingLink` + al select del booking del lead + al mapeig.
+- `LeadData.booking`: camp `distanceKm` (page.tsx ja propagava e.booking).
+- Fitxa del calendari: nova fila «Sortir cap al bolo HH:MM · X min viatge + 60 muntatge» quan hi ha reserva amb km + hora. Reusa `buildEventLogistics` (computeDepartureTime canònic). CSS `.fxd__departtime/.fxd__departhint` (tokens, deute CSS 0).
+
+### Verificació
+- Càlcul amb dades reals (Carlos: bolo 19:30, 12km, Lliçà de Munt) → **sortir 18:19** (11 viatge + 60 muntatge) + Waze. Correcte.
+- Test del contracte: fixture de seasonCalendar actualitzat amb distanceKm; 23 tests verds.
+
+### Iniciativa COMPLETA
+- ✅ Fitxa de reserva: Waze + Maps + hora de sortida (#1099).
+- ✅ Fitxa del calendari: Waze (#1101).
+- ✅ Alarma de sortida al calendari (aquest tall).
+- ✅ Telèfon clicable (ja existia a reserva/clients/inbox).
+
+### Validació
+- Validació tècnica: tsc + 23 tests seasonCalendar + validate:core EXIT 0.
+- Validació funcional: l'operador veu a quina hora sortir des del calendari, amb muntatge inclòs.
+- Validació humana/UX: càlcul verificat amb dades reals; pendent ullada del propietari al navegador.
+
+### Coordinació
+Counter -> 1102.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-23 — Eina de camp 2/3: Waze a la fitxa del calendari (Canvi #1101, claude)
 
 ### Context

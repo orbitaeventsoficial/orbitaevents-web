@@ -1502,6 +1502,22 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1102 — 2026-06-23 — claude (TANCAT)
+
+**Eina de camp 3/3: alarma de sortida al calendari.**
+
+- `distanceKm` afegit a seasonCalendarService (link + select + mapeig) i LeadData.booking. Fitxa del calendari mostra «Sortir cap al bolo HH:MM» (viatge + 60 muntatge) via buildEventLogistics canònic.
+- Verificat amb dades reals (Carlos 19:30/12km → sortir 18:19).
+- Iniciativa eina de camp COMPLETA: reserva (#1099) + calendari Waze (#1101) + alarma (aquest) + telèfon clicable (ja existia).
+- Validació tècnica: tsc + 23 tests + validate:core EXIT 0.
+- Validació funcional: hora de sortida amb muntatge des del calendari.
+- Validació humana/UX: càlcul verificat; pendent ullada propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1101 — 2026-06-23 — claude (TANCAT)
 
 **Eina de camp 2/3: Waze a la fitxa del calendari.**

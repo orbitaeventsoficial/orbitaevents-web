@@ -31,7 +31,7 @@ function StageStat({
       <p className="text-xs font-semibold uppercase tracking-wider opacity-50">{label}</p>
       <div className="mt-1 flex items-baseline justify-between gap-2">
         <p className={`text-lg font-bold ${tone}`}>{value}</p>
-        <span className="text-xs text-white/45">{formatPct(value, total)}</span>
+        <span className="text-xs admin-cr-meta">{formatPct(value, total)}</span>
       </div>
     </div>
   );
@@ -53,8 +53,8 @@ function ChannelCard({
     <article className="ap-card p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-white/90">{channel.label}</p>
-          <p className="mt-1 text-xs text-white/45">
+          <p className="text-sm font-semibold">{channel.label}</p>
+          <p className="mt-1 text-xs admin-cr-meta">
             {channel.totalTouchpoints} touchpoints · {channel.firstTouchCount + channel.lastTouchCount} moments clau
           </p>
         </div>
@@ -71,7 +71,7 @@ function ChannelCard({
         </div>
       </div>
       <div className="mt-2 h-1 overflow-hidden rounded-full bg-[var(--o-admin-fill-2)]">
-        <div className="h-full rounded-full bg-white/30" style={{ width: `${Math.max(8, intensity)}%` }} />
+        <div className="h-full rounded-full bg-[var(--ax-line)]" style={{ width: `${Math.max(8, intensity)}%` }} />
       </div>
 
       <div className="mt-3 grid gap-2 sm:grid-cols-3">
@@ -81,11 +81,11 @@ function ChannelCard({
       </div>
 
       <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-        <div className="rounded-lg border border-white/10 bg-black/10 p-2">
+        <div className="admin-cr-mini-card admin-cr-card-pad">
           <p className="opacity-45">Ingressos d&apos;entrada</p>
           <p className="mt-1 font-semibold admin-tone-text-cyan">{formatEuro(channel.firstTouchRevenue)}</p>
         </div>
-        <div className="rounded-lg border border-white/10 bg-black/10 p-2">
+        <div className="admin-cr-mini-card admin-cr-card-pad">
           <p className="opacity-45">Ingressos de tancament</p>
           <p className="mt-1 font-semibold admin-tone-text-success">{formatEuro(channel.lastTouchRevenue)}</p>
         </div>
@@ -109,12 +109,12 @@ function JourneyCard({ journey }: { journey: LeadJourney }) {
     <article className="ap-card p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-white/90">Lead {journey.leadId.slice(0, 8)}</p>
-          <p className="mt-1 text-xs text-white/45">
+          <p className="text-sm font-semibold">Lead {journey.leadId.slice(0, 8)}</p>
+          <p className="mt-1 text-xs admin-cr-meta">
             {journey.touchpointCount} touchpoints · {journey.status} · {formatMoment(journey.firstTouch.timestamp)}
           </p>
         </div>
-        <div className="rounded-full border border-white/10 px-2.5 py-1 text-xs font-bold text-white/70">
+        <div className="admin-cr-chip">
           {formatEuro(journey.revenue)}
         </div>
       </div>
@@ -236,21 +236,21 @@ export default function AttributionPanel({ report }: { report: MultiTouchReport 
               <div className="ap-card p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Snapshot ràpid</p>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
-                  <div className="rounded-lg border border-white/10 bg-black/10 p-3">
+                  <div className="admin-cr-mini-card admin-cr-card-pad">
                     <p className="text-xs uppercase tracking-wider opacity-50">Canals actius</p>
                     <p className="mt-1 text-2xl font-bold">{report.byChannel.length}</p>
                   </div>
-                  <div className="rounded-lg border border-white/10 bg-black/10 p-3">
+                  <div className="admin-cr-mini-card admin-cr-card-pad">
                     <p className="text-xs uppercase tracking-wider opacity-50">Touchpoints totals</p>
                     <p className="mt-1 text-2xl font-bold">{report.byChannel.reduce((sum, channel) => sum + channel.totalTouchpoints, 0)}</p>
                   </div>
-                  <div className="rounded-lg border border-white/10 bg-black/10 p-3">
+                  <div className="admin-cr-mini-card admin-cr-card-pad">
                     <p className="text-xs uppercase tracking-wider opacity-50">Ingressos first touch</p>
                     <p className="mt-1 text-xl font-bold admin-tone-text-cyan">
                       {formatEuro(report.byChannel.reduce((sum, channel) => sum + channel.firstTouchRevenue, 0))}
                     </p>
                   </div>
-                  <div className="rounded-lg border border-white/10 bg-black/10 p-3">
+                  <div className="admin-cr-mini-card admin-cr-card-pad">
                     <p className="text-xs uppercase tracking-wider opacity-50">Ingressos last touch</p>
                     <p className="mt-1 text-xl font-bold admin-tone-text-success">
                       {formatEuro(report.byChannel.reduce((sum, channel) => sum + channel.lastTouchRevenue, 0))}

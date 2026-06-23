@@ -22,7 +22,7 @@ import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildLeadComposeHref, buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { LEAD_LOST_REASON_LABELS, isLeadLostReason } from '@/lib/constants/leadLoss';
 import { formatCurrency, LEAD_SCORING_STATUS_PROBABILITY, OPEN_PIPELINE_STATUSES } from '@/lib/constants';
-import { buildWazeUrl } from '@/lib/admin/eventLogistics';
+import { buildWazeUrl, buildEventLogistics } from '@/lib/admin/eventLogistics';
 import LeadLostStatusPrompt from './LeadLostStatusPrompt';
 import { patchLeadStatus, type LeadStatus } from './leadStatusClient';
 import { buildLeadWhatsAppHref } from './leadWhatsApp';
@@ -45,7 +45,7 @@ export type LeadData = {
   email: string | null;
   priority: LeadPriority;
   channel: string; owner: string; last: string;
-  booking: { id: string; reference: string; status: string; depositPaid: boolean; remainingPaid: boolean } | null;
+  booking: { id: string; reference: string; status: string; depositPaid: boolean; remainingPaid: boolean; distanceKm: number | null } | null;
   wx: WxData;
 };
 
@@ -459,6 +459,24 @@ function LeadDetailPanel({
                   )}
                 </dd>
               </div>
+              {(() => {
+                // Alarma de sortida: només si hi ha reserva amb km i hora del bolo.
+                const logi = buildEventLogistics({
+                  address: lead.location,
+                  distanceKm: lead.booking?.distanceKm ?? null,
+                  eventStartTime: lead.time || null,
+                });
+                if (!logi.departureTime || logi.travelMinutes === 0) return null;
+                return (
+                  <div className="fxd__row--long">
+                    <dt>Sortir cap al bolo</dt>
+                    <dd>
+                      <span className="fxd__departtime">{logi.departureTime}</span>
+                      <span className="fxd__departhint"> · {logi.travelMinutes} min viatge + {logi.setupMinutes} min muntatge</span>
+                    </dd>
+                  </div>
+                );
+              })()}
             </dl>
           </section>
 

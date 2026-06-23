@@ -2440,3 +2440,5 @@ html.admin-mode .fx__lanetitle small.fx__lane-forecast { display: block; color: 
 
 /* Navegació Waze des de la fitxa del calendari (eina de camp) */
 html.admin-mode .fxd__navlink { color: var(--gold); font-weight: var(--o-fw-semibold); white-space: nowrap; }
+html.admin-mode .fxd__departtime { font-weight: var(--o-fw-bold); color: var(--gold); }
+html.admin-mode .fxd__departhint { font-size: var(--o-text-2xs); color: var(--t3); }

@@ -3,12 +3,12 @@ import type { CaptureHealthReport, CaptureHealthStatus, CaptureTrend } from '@/l
 
 // Consumeix les classes d'estat canòniques (admin-tone-*). GROWING era cyan (blau,
 // fora del canon) → success (creixent = positiu); la resta = semàfor de sèrie.
-const STATUS_STYLE: Record<CaptureHealthStatus, { border: string; bg: string; text: string; icon: string }> = {
-  DROUGHT: { border: 'admin-tone-border-danger', bg: 'admin-tone-bg-danger', text: 'admin-tone-text-danger', icon: '🏜️' },
-  FAMINE: { border: 'admin-tone-border-danger', bg: 'admin-tone-bg-danger', text: 'admin-tone-text-danger', icon: '⚠️' },
-  LOW: { border: 'admin-tone-border-warning', bg: 'admin-tone-bg-warning', text: 'admin-tone-text-warning', icon: '📉' },
-  HEALTHY: { border: 'admin-tone-border-success', bg: 'admin-tone-bg-success', text: 'admin-tone-text-success', icon: '✅' },
-  GROWING: { border: 'admin-tone-border-success', bg: 'admin-tone-bg-success', text: 'admin-tone-text-success', icon: '🚀' },
+const STATUS_STYLE: Record<CaptureHealthStatus, { border: string; bg: string; text: string }> = {
+  DROUGHT: { border: 'admin-tone-border-danger', bg: 'admin-tone-bg-danger', text: 'admin-tone-text-danger' },
+  FAMINE: { border: 'admin-tone-border-danger', bg: 'admin-tone-bg-danger', text: 'admin-tone-text-danger' },
+  LOW: { border: 'admin-tone-border-warning', bg: 'admin-tone-bg-warning', text: 'admin-tone-text-warning' },
+  HEALTHY: { border: 'admin-tone-border-success', bg: 'admin-tone-bg-success', text: 'admin-tone-text-success' },
+  GROWING: { border: 'admin-tone-border-success', bg: 'admin-tone-bg-success', text: 'admin-tone-text-success' },
 };
 
 const TREND_ICON: Record<CaptureTrend, string> = {
@@ -20,7 +20,7 @@ const TREND_ICON: Record<CaptureTrend, string> = {
 const TREND_COLOR: Record<CaptureTrend, string> = {
   UP: 'admin-tone-text-success',
   DOWN: 'admin-tone-text-danger',
-  FLAT: 'text-white/50',
+  FLAT: 'admin-cr-meta',
 };
 
 function formatTrendPct(trend: CaptureTrend, pct: number): string {

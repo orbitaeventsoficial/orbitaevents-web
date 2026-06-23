@@ -11,6 +11,8 @@ export interface SeasonCalendarBookingLink {
   status: string;
   depositPaid: boolean;
   remainingPaid: boolean;
+  /** km anada i tornada de la reserva, per estimar l'hora de sortida al calendari. */
+  distanceKm: number | null;
 }
 
 export interface SeasonCalendarLeadRaw {
@@ -306,7 +308,7 @@ export async function loadSeasonCalendar(
         },
         booking: {
           // Si hi ha booking, el seu `total` és la veritat del valor del bolo.
-          select: { id: true, reference: true, status: true, depositPaid: true, remainingPaid: true, total: true },
+          select: { id: true, reference: true, status: true, depositPaid: true, remainingPaid: true, total: true, distanceKm: true },
         },
       },
       orderBy: { eventDate: 'asc' },
@@ -361,6 +363,7 @@ export async function loadSeasonCalendar(
             status: l.booking.status,
             depositPaid: l.booking.depositPaid,
             remainingPaid: l.booking.remainingPaid,
+            distanceKm: l.booking.distanceKm ?? null,
           }
         : null,
     })),

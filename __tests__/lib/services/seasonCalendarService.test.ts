@@ -222,7 +222,7 @@ describe('buildSeasonCalendar', () => {
       id: 'l1',
       status: 'WON',
       eventDate: new Date('2026-06-20T00:00:00.000Z'),
-      booking: { id: 'b9', reference: 'OE-2026-009', status: 'CONFIRMED', depositPaid: true, remainingPaid: false },
+      booking: { id: 'b9', reference: 'OE-2026-009', status: 'CONFIRMED', depositPaid: true, remainingPaid: false, distanceKm: 40 },
     });
     const plainLead = makeLead({ id: 'l2', eventDate: new Date('2026-06-19T00:00:00.000Z') });
     const result = buildSeasonCalendar(makeInput([wonWithBooking, plainLead]));

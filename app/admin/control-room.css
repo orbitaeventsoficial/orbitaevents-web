@@ -328,6 +328,40 @@ html.admin-mode .admin-control-room .admin-cr-attribution-panel {
   padding: 1rem;
 }
 
+html.admin-mode .admin-control-room .admin-cr-quick-actions {
+  padding: 1rem;
+}
+
+html.admin-mode .admin-control-room .admin-cr-action-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+html.admin-mode .admin-control-room .admin-cr-command-button,
+html.admin-mode .admin-control-room .admin-cr-command-result {
+  min-width: 0;
+  border: 1px solid color-mix(in oklab, var(--ax-line) 44%, transparent);
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--at-panel) 62%, transparent);
+  color: var(--at-text);
+  font-size: var(--o-text-xs);
+  font-weight: var(--o-fw-semi);
+  padding: 0.58rem 0.7rem;
+  text-align: left;
+}
+
+html.admin-mode .admin-control-room .admin-cr-command-button:hover {
+  border-color: color-mix(in oklab, var(--at-gold) 34%, var(--ax-line));
+  color: var(--at-gold-text);
+}
+
+html.admin-mode .admin-control-room .admin-cr-command-result {
+  margin-top: 0.75rem;
+  color: var(--at-muted);
+}
+
 html.admin-mode .admin-control-room .admin-cr-panel-head,
 html.admin-mode .admin-control-room .admin-cr-panel-row {
   display: flex;
@@ -689,6 +723,7 @@ html.admin-mode .admin-control-room .admin-ui-btn--ghost:hover { background: var
 @media (min-width: 768px) {
   html.admin-mode .admin-control-room .admin-cr-quick-links { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   html.admin-mode .admin-control-room .admin-cr-cycle-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  html.admin-mode .admin-control-room .admin-cr-action-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   html.admin-mode .admin-control-room .admin-cr-desktop-only { display: block; }
 }
 
@@ -706,6 +741,7 @@ html.admin-mode .admin-control-room .admin-ui-btn--ghost:hover { background: var
   html.admin-mode .admin-control-room .admin-cr-alert-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   html.admin-mode .admin-control-room .admin-cr-mini-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   html.admin-mode .admin-control-room .admin-cr-cycle-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  html.admin-mode .admin-control-room .admin-cr-action-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (min-width: 768px) {

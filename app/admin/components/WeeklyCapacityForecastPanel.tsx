@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import type { WeeklyCapacityForecast, WeekAlertLevel } from '@/lib/services/operationalForecastService';
 
-const ALERT_STYLE: Record<WeekAlertLevel, { border: string; bg: string; tone: string; icon: string; label: string }> = {
-  NONE: { border: 'border-white/10', bg: 'bg-[var(--o-admin-fill-1)]', tone: 'text-white/50', icon: '·', label: 'Sense reserves' },
-  INFO: { border: 'admin-tone-border-info', bg: 'admin-tone-bg-info', tone: 'admin-tone-text-info', icon: '·', label: 'Normal' },
-  WARNING: { border: 'admin-tone-border-warning', bg: 'admin-tone-bg-warning', tone: 'admin-tone-text-warning', icon: '!', label: 'Intensa' },
-  CRITICAL: { border: 'admin-tone-border-danger', bg: 'admin-tone-bg-danger', tone: 'admin-tone-text-danger', icon: '!!', label: 'Al límit' },
+const ALERT_STYLE: Record<WeekAlertLevel, { border: string; bg: string; tone: string; label: string }> = {
+  NONE: { border: '', bg: '', tone: 'admin-cr-meta', label: 'Sense reserves' },
+  INFO: { border: 'admin-tone-border-info', bg: 'admin-tone-bg-info', tone: 'admin-tone-text-info', label: 'Normal' },
+  WARNING: { border: 'admin-tone-border-warning', bg: 'admin-tone-bg-warning', tone: 'admin-tone-text-warning', label: 'Intensa' },
+  CRITICAL: { border: 'admin-tone-border-danger', bg: 'admin-tone-bg-danger', tone: 'admin-tone-text-danger', label: 'Al límit' },
 };
 
 export default function WeeklyCapacityForecastPanel({ forecast }: { forecast: WeeklyCapacityForecast[] }) {

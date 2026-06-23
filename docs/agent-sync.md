@@ -15,6 +15,10 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-23 [ESTAT: tancat — EINA DE CAMP 3/3: ALARMA DE SORTIDA al calendari #1102]
+Tancada la iniciativa. Atacat el prerequisit: distanceKm afegit a seasonCalendarService (SeasonCalendarBookingLink + select booking + mapeig) i a LeadData.booking. La fitxa del calendari ara mostra «Sortir cap al bolo HH:MM · X min viatge + 60 muntatge» quan el lead té reserva amb km i hora. Reusa buildEventLogistics/computeDepartureTime canònics. Verificat amb dades reals: Carlos (19:30, 12km, Lliçà) → sortir 18:19. tsc + 23 tests seasonCalendar + validate:core EXIT 0.
+INICIATIVA EINA DE CAMP COMPLETA: ✅ reserva (Waze+Maps+sortida #1099) · ✅ calendari Waze (#1101) · ✅ alarma de sortida (aquest). Telèfon clicable ja existia. Counter->1102.
+
 [claude] 2026-06-23 [ESTAT: tancat — EINA DE CAMP 2/3: Waze a la fitxa del calendari #1101]
 2a superfície de la iniciativa eina de camp: la fitxa del lead (overlay del calendari) ara mostra 🧭 Waze a la fila «Lloc» (reusa buildWazeUrl canònic). CSS .fxd__navlink (token gold, prefix canònic, deute CSS segueix 0). Render leads 200, 0 errors.
 ⚠️ ALARMA DE SORTIDA (pendent del propietari): requereix distanceKm al calendari, que seasonCalendarService NO exposa avui (només eventStartTime). Per fer una alarma de sortida HONESTA cal afegir distanceKm/travelCost al select del calendari + booking — és un tall propi de DADES, no de UI. NO ho he fet a mitges. Documentat com a prerequisit. Counter->1101.
