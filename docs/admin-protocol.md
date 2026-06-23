@@ -1502,6 +1502,20 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1103 — 2026-06-23 — claude (TANCAT)
+
+**Manual 100% canònic + tret de l'exempció del guard; web públic auditat (sense deute).**
+
+- El propietari va detectar CSS no canònic. ARREL: `manual/page` estava a l'EXEMPT de `check-admin-canon` («revisat a part») → punt cec que amagava violet (marca prohibida) + 73 línies de color Tailwind cru (rose/emerald/amber).
+- Canonitzat tot a `admin-tone-*` (success/warning/danger) + font-black→font-bold (29) + superfície ad-hoc→token. Tret de l'EXEMPT → ara el guard el vigila. 0 troballes, render 0 elements de color cru.
+- Web públic auditat: els 22 hex restants són TOTS legítims (SVG de logo, banderes, temàtiques TANCADES, canvas, accent de producte). El canon carbó+or és de l'admin, no del web públic. Cap deute de canonització accionable.
+- Validació tècnica: tsc + qa:admin-canon EXIT 0.
+- Validació funcional: manual sense punt cec; guard amb una exempció menys.
+- Validació humana/UX: render del manual 0 color cru.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1102 — 2026-06-23 — claude (TANCAT)
 
 **Eina de camp 3/3: alarma de sortida al calendari.**

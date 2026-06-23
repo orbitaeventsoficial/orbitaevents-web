@@ -27,6 +27,27 @@ Counter -> 1099.
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-23 — Manual canònic + exempció eliminada; web públic auditat (Canvi #1103, claude)
+
+### Context
+El propietari va veure CSS no canònic a captures. Arrel: el manual estava exempt del guard admin-canon, amagant violet + 73 línies de color cru.
+
+### Què s'ha fet
+- Manual: violet/rose/emerald/amber cru → `admin-tone-*`; font-black→font-bold; superfície ad-hoc→token. Tret de l'EXEMPT del guard. 0 troballes.
+- Web públic auditat: 22 hex tots legítims (SVG logo, banderes, temàtiques tancades, canvas, accent producte). El canon és de l'admin; el web té identitat pròpia. Sense deute accionable.
+
+### Validació
+- Validació tècnica: tsc + qa:admin-canon EXIT 0.
+- Validació funcional: manual vigilat pel guard; un punt cec menys.
+- Validació humana/UX: render manual 0 color cru.
+
+### Coordinació
+Counter -> 1103. (codi ja committat a 8637e61a; aquest tall sincronitza counter+docs.)
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-23 — Eina de camp 3/3: alarma de sortida al calendari (Canvi #1102, claude)
 
 ### Context
