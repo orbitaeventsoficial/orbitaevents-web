@@ -1502,6 +1502,22 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1094 — 2026-06-23 — claude (TANCAT)
+
+**Guards que guarden de debò: anti-reimplementació canònica + smoke de render.**
+
+- `qa:no-canonical-reimpl` (validate:core): detecta duplicació SEMÀNTICA (reimplementar lògica canònica), que els guards sintàctics no veien. Va caçar 2 còpies més de parseBudget (total 8) → consolidades. 5 tests.
+- `qa:smoke` (server viu): auto-discovery de totes les pàgines admin + render 3 breakpoints + falla amb status/overflow/runtime. 82 rutes × 3 = 246 renders, 0 problemes.
+- Meta-auditoria: 54/64 guards recursius, 10 fix legítims, 1 cec (CSS, ja eradicat). El buit eren categories (semàntica + render), ara cobertes.
+- Validació tècnica: tsc + validate:core + 5 tests + smoke 246 renders EXIT 0.
+- Validació funcional: regressió de canòniques bloquejada; responsius verificats de debò.
+- Validació humana/UX: 0 overflow a 82 pàgines × 3 breakpoints.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1093 — 2026-06-23 — claude (TANCAT)
 
 **Guard CSS admin estès a TOTS els fitxers (punt cec eradicat) + meta-auditoria de guards.**

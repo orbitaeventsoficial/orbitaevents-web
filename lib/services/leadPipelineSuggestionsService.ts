@@ -6,6 +6,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { prisma } from '@/lib/prisma';
+import { parseBudgetAmount } from '@/lib/constants';
 
 // ───────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -70,9 +71,7 @@ function daysUntil(ref: Date | null, now: Date): number | null {
 }
 
 function estimateBudget(budget: string | null): number {
-  if (!budget) return 0;
-  const num = Number(budget.replace(/[^\d.,]/g, '').replace(/\./g, '').replace(',', '.'));
-  return Number.isFinite(num) ? num : 0;
+  return parseBudgetAmount(budget) ?? 0;
 }
 
 // ───────────────────────────────────────────────────────────────────────────

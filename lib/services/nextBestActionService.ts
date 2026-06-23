@@ -7,7 +7,7 @@
 // Part pura (assemblatge + scoring) + wrapper (fetch paral·lel).
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { formatCurrencyExact } from '@/lib/constants';
+import { formatCurrencyExact, parseBudgetAmount } from '@/lib/constants';
 import { log } from '@/lib/logger';
 import { loadPendingFollowUps, type FollowUpSummary, type PendingFollowUp } from '@/lib/services/responseTrackingService';
 import { loadCapacityConflicts, type CapacityConflictReport, type CapacityConflict } from '@/lib/services/capacityConflictService';
@@ -140,9 +140,7 @@ function daysUntil(ref: Date | null, now: Date): number | null {
 }
 
 function estimateBudget(budget: string | null): number {
-  if (!budget) return 0;
-  const num = Number(budget.replace(/[^\d.,]/g, '').replace(/\./g, '').replace(',', '.'));
-  return Number.isFinite(num) ? num : 0;
+  return parseBudgetAmount(budget) ?? 0;
 }
 
 function makeId(domain: string, type: string, entityId: string): string {

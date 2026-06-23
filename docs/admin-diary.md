@@ -28,6 +28,32 @@ Continuació non stop del drenatge CSRF backend després de #1082. Perímetre pe
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+## 2026-06-23 — Guards que guarden de debò: anti-reimplementació canònica + smoke de render (Canvi #1094, claude)
+
+### Context
+El propietari va fer dues preguntes clau: (1) «un guard hauria de veure que exporten coses no canòniques» i (2) «els responsius que teòricament funcionen?». Els 64 guards eren ESTÀTICS (sintaxi) i no cobrien ni duplicació semàntica ni render real.
+
+### Guard 1 — qa:no-canonical-reimpl (a validate:core)
+Detecta REIMPLEMENTACIÓ de lògica que ja és canònica (el que va deixar parseBudget i marges duplicats sense que cap guard ho cacés). Taula de regles: patró + fitxer canònic únic + què usar. En activar-lo va caçar **2 còpies de parseBudget que jo NO havia trobat a mà** (`nextBestActionService.ts`, `leadPipelineSuggestionsService.ts`) → consolidades a `parseBudgetAmount`. Total real de còpies: 8 (6 a mà + 2 pel guard). 5 tests del guard.
+
+### Guard 2 — qa:smoke (cal server viu, fora de validate:core)
+Verificació de RENDER i RESPONSIU real. Descobreix TOTES les pàgines admin estàtiques automàticament (auto-discovery de page.tsx, res hardcoded — lliçó del punt cec #1093), les obre als 3 breakpoints i FALLA amb status>=400 / overflow horitzontal / error de runtime. Executat: **82 rutes × 3 breakpoints = 246 renders, 0 problemes**. Els responsius admin ara estan verificats, no «teòricament».
+
+### Meta-auditoria de guards (resposta a «quants més són cecs?»)
+Dels 64 guards: 54 escanegen recursivament el domini, 10 «fix» validen 1 document concret (legítim), 1 (CSS) era cec → ja eradicat (#1093). El buit real no eren guards cecs sinó CATEGORIES que faltaven: duplicació semàntica + render. Tancades amb aquests 2.
+
+### Validació
+- Validació tècnica: tsc + validate:core EXIT 0 (qa:no-canonical-reimpl integrat) + 5 tests del guard + smoke 246 renders OK.
+- Validació funcional: cap reimplementació de parseBudget/marge pot tornar; render+responsiu admin verificable amb un sol comandament.
+- Validació humana/UX: smoke confirma 0 overflow als 3 breakpoints a 82 pàgines.
+
+### Coordinació
+Counter -> 1094.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-23 — Guard CSS estès (punt cec eradicat) + marge al cockpit (Canvi #1093, claude)
 
 ### Context

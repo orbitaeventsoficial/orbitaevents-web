@@ -15,6 +15,13 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-23 [ESTAT: tancat — GUARDS QUE GUARDEN DE DEBÒ: anti-reimpl canònica + smoke render #1094]
+Resposta a «un guard hauria de veure que exporten coses no canòniques» i «els responsius que teòricament funcionen?». DOS guards nous reals:
+1. qa:no-canonical-reimpl (a validate:core): detecta REIMPLEMENTACIÓ de lògica canònica (duplicació semàntica, que els guards sintàctics no veien). En activar-lo va caçar 2 còpies MÉS de parseBudget que jo NO havia trobat a mà (nextBestActionService, leadPipelineSuggestionsService) → consolidades. Taula de regles extensible (parseBudget + marge-inline). 5 tests.
+2. qa:smoke (cal server viu, fora de validate:core): descobreix TOTES les pàgines admin estàtiques (auto-discovery, no hardcoded — lliçó del punt cec), render als 3 breakpoints, FALLA amb status>=400/overflow/runtime-error. Executat: 82 rutes × 3 = 246 renders, 0 problemes → els responsius admin ARA estan verificats de debò, no «teòricament».
+tsc + validate:core EXIT 0. Counter->1094.
+Avis per l'altre agent: no reimplementis parseBudget ni marge inline (qa:no-canonical-reimpl bloqueja). Per verificar render/responsiu: pnpm run qa:smoke (server viu).
+
 [claude] 2026-06-22 [ESTAT: tancat — LA MEVA VERSIÓ del zenit: disseny del Cockpit (carbó+or) #1091]
 Versió de disseny pròpia del Cockpit (petició del propietari «la teva versió»). Dins el canon carbó+or (tokens only, cap CSS nou de color): número-tesi de tresoreria gran en or + eyebrow mono, 3 pilars amb jerarquia de certesa (Compromès verd / Probable or / Històric), i element SIGNATURA = escala temporal mes a mes on or SÒLID=compromès i or TRANSLÚCID=probable (comunica la certesa de l'ingrés). cockpit.css scoped (només layout: grid/clamp/rem, tokens; cap hex, cap px de maquetacio). qa:admin-canon 0 + qa:css-monocapa OK. Render 3 breakpoints HTTP 200, 0 errors, 0 overflow. El propietari farà la seva versió després. Counter->1091.
 
