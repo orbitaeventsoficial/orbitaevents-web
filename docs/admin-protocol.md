@@ -1502,6 +1502,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1101 — 2026-06-23 — claude (TANCAT)
+
+**Eina de camp 2/3: Waze a la fitxa del calendari.**
+
+- Fitxa del lead (overlay calendari) mostra 🧭 Waze a «Lloc» (reusa buildWazeUrl). CSS .fxd__navlink (token, deute CSS 0).
+- ALARMA DE SORTIDA pendent: requereix distanceKm al calendari (seasonCalendarService no l'exposa). Prerequisit documentat; no feta a mitges. computeDepartureTime ja existeix i testejat per quan hi hagi la dada.
+- Validació tècnica: tsc + validate:core EXIT 0.
+- Validació funcional: navegació des del calendari.
+- Validació humana/UX: render 200, 0 errors.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1100 — 2026-06-23 — claude (TANCAT)
 
 **Eina de camp mòbil: logística de bolo (Waze + hora de sortida).**

@@ -157,10 +157,10 @@ export default function AttributionPanel({ report }: { report: MultiTouchReport 
   ), null);
 
   return (
-    <section className="rounded-2xl border border-white/10 p-5 admin-card-glass space-y-5">
+    <section className="admin-cr-panel admin-cr-attribution-panel">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0 flex-1">
-          <h2 className="text-sm font-semibold">🧭 Atribució multi-touch</h2>
+          <h2 className="text-sm font-semibold">Atribució multi-touch</h2>
           <p className="mt-1 max-w-2xl text-xs opacity-70">
             Llegeix quin canal obre el lead, quin el manté viu i quin acaba tancant la venda als últims {report.windowDays} dies.
           </p>

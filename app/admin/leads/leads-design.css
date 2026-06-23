@@ -2437,3 +2437,6 @@ html.admin-mode .fxd__bolo-actions { display: flex; flex-wrap: wrap; gap: 0.65re
 /* Forecast ponderat (Fase 1B) — «el pipeline ÉS el forecast». Diners ponderats en or. */
 html.admin-mode .fx__metric b.fx__metric-forecast { color: var(--gold); }
 html.admin-mode .fx__lanetitle small.fx__lane-forecast { display: block; color: var(--gold); font-weight: var(--o-fw-semibold); margin-top: 1px; }
+
+/* Navegació Waze des de la fitxa del calendari (eina de camp) */
+html.admin-mode .fxd__navlink { color: var(--gold); font-weight: var(--o-fw-semibold); white-space: nowrap; }

@@ -15,6 +15,10 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-23 [ESTAT: tancat — EINA DE CAMP 2/3: Waze a la fitxa del calendari #1101]
+2a superfície de la iniciativa eina de camp: la fitxa del lead (overlay del calendari) ara mostra 🧭 Waze a la fila «Lloc» (reusa buildWazeUrl canònic). CSS .fxd__navlink (token gold, prefix canònic, deute CSS segueix 0). Render leads 200, 0 errors.
+⚠️ ALARMA DE SORTIDA (pendent del propietari): requereix distanceKm al calendari, que seasonCalendarService NO exposa avui (només eventStartTime). Per fer una alarma de sortida HONESTA cal afegir distanceKm/travelCost al select del calendari + booking — és un tall propi de DADES, no de UI. NO ho he fet a mitges. Documentat com a prerequisit. Counter->1101.
+
 [claude] 2026-06-23 [ESTAT: treballant — EINA DE CAMP MÒBIL: logística de bolo (Waze + hora de sortida) #1100]
 Iniciativa del propietari: convertir l'admin en eina de camp (trucar/navegar/sortir a temps). Nova peça canònica `lib/admin/eventLogistics.ts` (helpers PURS: buildTelHref, buildWazeUrl, buildMapsUrl, estimateTravelMinutes, computeDepartureTime, buildEventLogistics) + 11 tests. Decisió: muntatge=60min, velocitat=65km/h. Hora de sortida = bolo − viatge − muntatge.
 FET: fitxa de reserva (booking/[id]/sec-event) mostra Waze + Maps + «Sortir cap al bolo HH:MM · X min viatge + 60 min muntatge». Render verificat (Waze ok, 07:32 calculat). CSS .bd__nav-actions/.bd__field-hint (tokens, prefix canònic, deute CSS segueix 0).

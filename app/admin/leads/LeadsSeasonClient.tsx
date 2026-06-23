@@ -22,6 +22,7 @@ import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildLeadComposeHref, buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { LEAD_LOST_REASON_LABELS, isLeadLostReason } from '@/lib/constants/leadLoss';
 import { formatCurrency, LEAD_SCORING_STATUS_PROBABILITY, OPEN_PIPELINE_STATUSES } from '@/lib/constants';
+import { buildWazeUrl } from '@/lib/admin/eventLogistics';
 import LeadLostStatusPrompt from './LeadLostStatusPrompt';
 import { patchLeadStatus, type LeadStatus } from './leadStatusClient';
 import { buildLeadWhatsAppHref } from './leadWhatsApp';
@@ -449,7 +450,15 @@ function LeadDetailPanel({
               <div><dt>Pax</dt><dd>{lead.pax || '—'}</dd></div>
               <div><dt>Inici</dt><dd>{lead.time || '—'}</dd></div>
               <div><dt>Fi</dt><dd>{lead.endTime || '—'}</dd></div>
-              <div className="fxd__row--long"><dt>Lloc</dt><dd>{lead.location || '—'}</dd></div>
+              <div className="fxd__row--long">
+                <dt>Lloc</dt>
+                <dd>
+                  {lead.location || '—'}
+                  {buildWazeUrl(lead.location) && (
+                    <a href={buildWazeUrl(lead.location)!} target="_blank" rel="noopener noreferrer" className="fxd__navlink"> 🧭 Waze</a>
+                  )}
+                </dd>
+              </div>
             </dl>
           </section>
 

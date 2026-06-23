@@ -311,6 +311,23 @@ html.admin-mode .admin-control-room .admin-cr-panel--command { background: var(-
 html.admin-mode .admin-control-room .admin-cr-panel--radar { background: var(--at-surface); border-color: var(--at-border); }
 html.admin-mode .admin-control-room .admin-cr-panel--cycle { border-top-color: var(--ax-hair-gold); }
 
+html.admin-mode .admin-control-room .admin-cr-next-event {
+  padding: 1.1rem;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+html.admin-mode .admin-control-room .admin-cr-revenue-goal {
+  padding: 1rem;
+}
+
+html.admin-mode .admin-control-room .admin-cr-forecast-panel,
+html.admin-mode .admin-control-room .admin-cr-capture-panel,
+html.admin-mode .admin-control-room .admin-cr-attribution-panel {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+}
+
 html.admin-mode .admin-control-room .admin-cr-panel-head,
 html.admin-mode .admin-control-room .admin-cr-panel-row {
   display: flex;

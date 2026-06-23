@@ -374,12 +374,12 @@ export default async function AdminDashboard() {
       {/* ═══ PRÒXIM BOLO ═══ */}
       {d.nextEvent && (
         <Link href={buildBookingHref(d.nextEvent.id)} className="block">
-          <section className={`rounded-2xl border-2 p-5 sm:p-6 transition-all admin-card-glass ${
+          <section className={`admin-cr-panel admin-cr-next-event ${
             d.nextEvent.daysUntil <= 1
               ? 'admin-tone-border-warning admin-glow-pulse'
               : d.nextEvent.daysUntil <= 3
                 ? 'admin-tone-border-cyan'
-                : 'border-white/10'
+                : ''
           }`}>
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0 flex-1">
@@ -434,7 +434,7 @@ export default async function AdminDashboard() {
       )}
 
       {/* ═══ OBJECTIU MENSUAL — amb RadialProgress ═══ */}
-      <section className="rounded-2xl border border-white/10 p-4 sm:p-5 admin-card-glass" {...helpAttrs(ADMIN_DASHBOARD_HELP.revenueGoal)}>
+      <section className="admin-cr-panel admin-cr-revenue-goal" {...helpAttrs(ADMIN_DASHBOARD_HELP.revenueGoal)}>
         <div className="flex items-center gap-5">
           <RadialProgress
             value={d.revenueMonthPct}
