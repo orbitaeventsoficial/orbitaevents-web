@@ -2882,6 +2882,19 @@ html.admin-mode .ap-section-title {
   line-height: 1.2;
 }
 
+/* Títol de secció STANDALONE (canon Temporada, display 18px). Igual que
+   .ap-section-title però SENSE margin propi, perquè conviu amb utilitats
+   `mt-*`/`mb-*` locals sense conflicte d'especificitat. Substitut canònic del
+   patró Tailwind cru `text-lg font-semibold` als <h2>/<h3> de secció. */
+html.admin-mode .ap-h2 {
+  font-family: var(--display);
+  font-size: var(--o-text-lg);
+  font-weight: var(--o-fw-bold);
+  color: var(--t);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
 html.admin-mode .ap-section-desc {
   margin: 0.2rem 0 0;
   font-family: var(--mono);

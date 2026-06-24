@@ -397,7 +397,7 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Prioritat d’avui</p>
-              <h2 className="text-lg font-semibold text-white/90">Què convé atacar primer</h2>
+              <h2 className="ap-h2">Què convé atacar primer</h2>
               <p className="mt-1 text-sm text-white/60">Lectura curta perquè no hagis d’escanejar tota la pantalla abans de decidir.</p>
             </div>
             <span className="rounded-full border border-white/10 px-2.5 py-1 text-xs text-white/60">{priorityItems.length} focus</span>

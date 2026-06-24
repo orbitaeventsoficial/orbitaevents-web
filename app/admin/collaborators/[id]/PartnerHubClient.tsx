@@ -9,7 +9,6 @@ import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { formatCurrency, formatDate } from '@/lib/constants';
 import { COLLABORATOR_ROLE_OPTIONS, COLLABORATOR_MEMBER_ROLE_OPTIONS, getCollaboratorMemberRoleLabel } from '@/lib/constants/admin';
-import './partner-hub.css';
 
 interface SourcedLead {
   id: string;
@@ -204,7 +203,7 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
             <div className={`ap-kpi ${economics.pendingCommissions > 0 ? 'ap-kpi--warning' : 'ap-kpi--success'}`}><span className="ap-kpi-label">Comissions pendents</span><span className="ap-kpi-value">{formatCurrency(economics.pendingCommissions)}</span></div>
           </div>
           <section className="ap-card p-5">
-            <h2 className="ph__h2 mb-3">Identitat</h2>
+            <h2 className="ap-h2 mb-3">Identitat</h2>
             <div className="grid gap-3 md:grid-cols-2 text-sm">
               <div><span className="ap-muted">Empresa</span><div>{partner.company || '—'}</div></div>
               <div><span className="ap-muted">Especialitat</span><div>{partner.specialty || '—'}</div></div>
@@ -228,7 +227,7 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
 
       {tab === 'membres' && (
         <section className="ap-card p-5">
-          <h2 className="ph__h2 mb-1">Equip / membres</h2>
+          <h2 className="ap-h2 mb-1">Equip / membres</h2>
           <p className="ap-muted text-sm mb-4">Persones dins d&apos;aquest proveïdor (p. ex. el cap, mags, animadors…).</p>
 
           <div className="flex flex-wrap items-end gap-2 mb-4">
@@ -266,7 +265,7 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
 
       {tab === 'passa' && (
         <section className="ap-card p-5">
-          <h2 className="ph__h2 mb-3">Bolos que ens passa</h2>
+          <h2 className="ap-h2 mb-3">Bolos que ens passa</h2>
           <p className="ap-muted text-sm mb-4">Leads i reserves on aquest partner és l&apos;origen del bolo (<code>sourceCollaboratorId</code>).</p>
           <h3 className="text-sm font-semibold mb-2">Leads ({data.sourcedLeads.length})</h3>
           {data.sourcedLeads.length === 0 ? <Empty text="Cap lead passat per aquest partner." /> : (
@@ -305,7 +304,7 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
 
       {tab === 'contractem' && (
         <section className="ap-card p-5">
-          <h2 className="ph__h2 mb-3">Bolos on el contractem</h2>
+          <h2 className="ap-h2 mb-3">Bolos on el contractem</h2>
           <p className="ap-muted text-sm mb-4">Reserves on Òrbita contracta aquest partner (<code>CollaboratorBooking</code>) — cost i comissió.</p>
           {data.contractedBookings.length === 0 ? <Empty text="Encara no l&apos;hem contractat en cap reserva." /> : (
             <table className="w-full text-sm">
@@ -328,7 +327,7 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
 
       {tab === 'cataleg' && (
         <section className="ap-card p-5">
-          <h2 className="ph__h2 mb-3">Material i catàleg</h2>
+          <h2 className="ap-h2 mb-3">Material i catàleg</h2>
           {data.products.length === 0 ? <Empty text="Aquest partner no té productes al catàleg." /> : (
             <table className="w-full text-sm">
               <thead><tr className="text-left ap-muted"><th scope="col" className="py-2">Producte</th><th scope="col">Categoria</th><th scope="col">Cost</th><th scope="col">PVP</th><th scope="col">Estat</th></tr></thead>
@@ -350,7 +349,7 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
 
       {tab === 'economia' && (
         <section className="ap-card p-5">
-          <h2 className="ph__h2 mb-3">Economia</h2>
+          <h2 className="ap-h2 mb-3">Economia</h2>
           <div className="ap-kpi-row mb-4">
             <div className="ap-kpi ap-kpi--success"><span className="ap-kpi-label">Quant li paguem (total)</span><span className="ap-kpi-value">{formatCurrency(economics.totalPaidToPartner)}</span></div>
             <div className="ap-kpi"><span className="ap-kpi-label">Ingrés que ens genera</span><span className="ap-kpi-value">{formatCurrency(economics.sourcedRevenue)}</span></div>
@@ -368,7 +367,7 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
 
       {tab === 'notes' && (
         <section className="ap-card p-5">
-          <h2 className="ph__h2 mb-3">Notes i contacte</h2>
+          <h2 className="ap-h2 mb-3">Notes i contacte</h2>
           <div className="grid gap-3 md:grid-cols-2 text-sm mb-4">
             <div><span className="ap-muted">Email</span><div>{partner.email ? <Link href={`/admin/inbox/compose?to=${encodeURIComponent(partner.email)}`} className="ap-link">{partner.email}</Link> : '—'}</div></div>
             <div><span className="ap-muted">Telèfon</span><div>{partner.phone ? <a href={`tel:${partner.phone}`} className="ap-link">{partner.phone}</a> : '—'}</div></div>

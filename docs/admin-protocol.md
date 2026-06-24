@@ -1513,6 +1513,25 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1146 — 2026-06-25 — claude (TANCAT)
+
+**Classe canònica `.ap-h2` (títol de secció standalone) + migració del front Comandament + consolidació Partner Hub.**
+
+- Context: escaneig global va revelar un patró estès — ~100 títols de secció `<h2>/<h3>` amb `text-lg/xl font-semibold/bold` (Tailwind cru, NO Plus Jakarta), divergents del canon. Calia una font única abans de migrar.
+- `app/globals.css`: nova classe `.ap-h2` — clon de `.ap-section-title` (display 18px bold `--t`) PERÒ sense `margin`, perquè conviu amb utilitats `mt-*`/`mb-*` locals sense conflicte d'especificitat. És el substitut canònic del patró `text-lg font-semibold` als títols de secció.
+- Migrat el front auditat (Comandament): `salut/page` (1 títol), `analytics/page` (2 títols). El dashboard `page.tsx:396` (nom del proper event, `text-xl sm:text-2xl` hero responsiu) i els `text-xl font-bold` de `reporting` (valors KPI numèrics, no títols) queden fora d'abast per disseny.
+- Consolidació: `PartnerHubClient` (#1145) passa de `.ph__h2` a `.ap-h2`; eliminat `partner-hub.css` (la classe ara és global, zero duplicació).
+- DEUTE documentat: queden ~100 títols `text-lg/xl font-*` Tailwind cru a l'admin (molts en panells de codex: clientes/bookings detail). La font única ja existeix (`.ap-h2`); la migració és mecànica i s'ha de fer per òrgan auditat, NO a cegues sobre fitxers d'un altre agent.
+- `ADMIN_CHANGE_COUNTER` puja a `1146`; el següent canvi real ha de ser `#1147`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 (qa:admin-canon 0, qa:css-monocapa 0).
+- Validació funcional: render salut/analytics/reporting/Partner Hub HTTP 200, `.ap-h2` = Plus Jakarta, 0 overflow, 0 runtime error.
+- Validació humana/UX: pendent validació visual del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1145 — 2026-06-25 — claude (TANCAT)
 
 **Fitxa forense òrgan Partners + 2 bugs reals (títols Tailwind cru + KPIs amb classe morta).**

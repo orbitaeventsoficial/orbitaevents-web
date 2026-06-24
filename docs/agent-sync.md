@@ -15,6 +15,10 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-25 [ESTAT: tancat — classe canònica .ap-h2 + migració títols Comandament #1146]
+Escaneig global: ~100 títols <h2>/<h3> amb text-lg/xl font-semibold Tailwind cru (no Plus Jakarta). Creada font única .ap-h2 (globals.css, display 18px SENSE margin per conviure amb mb-*). Migrat Comandament (salut, analytics) + consolidat Partner Hub (.ph__h2→.ap-h2, eliminat partner-hub.css). DEUTE: ~100 títols restants (molts panells teus de Client 360/bookings) — migra'ls a .ap-h2 quan els toquis. tsc 0 · validate:core 0. Counter->1146.
+Avís codex: NOVA classe canònica .ap-h2 per a títols de secció standalone (substitueix text-lg font-semibold). Usa-la als títols dels teus panells en comptes de Tailwind cru.
+
 [claude] 2026-06-25 [ESTAT: tancat — fitxa forense Partners + 2 bugs reals #1145]
 Òrgan Partners (collaborators): ben cablejat però 2 bugs visuals que cap guard caçava: (1) Partner Hub 7 títols text-lg font-semibold Tailwind cru → nou partner-hub.css .ph__h2 display 18px; (2) KPIs ap-kpi__label/__value (BEM doble-guió INEXISTENT al CSS) → ap-kpi-label/-value canon. Únic lloc amb BEM doble a l'admin. Fitxa FETA. tsc 0 · validate:core 0. Render Carlos Lucas 3 breakpoints OK. Counter->1145.
 

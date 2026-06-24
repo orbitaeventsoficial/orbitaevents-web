@@ -1,3 +1,26 @@
+## 2026-06-25 — Classe canònica .ap-h2 + migració títols Comandament (Canvi #1146, claude)
+
+### Context
+Escaneig global: ~100 títols de secció `<h2>/<h3>` amb `text-lg/xl font-semibold/bold` Tailwind cru (no Plus Jakarta). Cal font única abans de migrar.
+
+### Què s'ha fet
+- `globals.css`: nova `.ap-h2` (clon de .ap-section-title display 18px però SENSE margin, per conviure amb mb-*/mt-* sense conflicte). Substitut canònic del Tailwind cru.
+- Migrat front Comandament: salut (1), analytics (2). Dashboard hero responsiu i números KPI de reporting fora d'abast.
+- Consolidat Partner Hub (#1145): .ph__h2 → .ap-h2; eliminat partner-hub.css (zero duplicació).
+- DEUTE: ~100 títols Tailwind cru restants (molts en panells de codex). Font única ja existeix; migració mecànica per òrgan auditat, no a cegues.
+
+### Validació
+- Validació tècnica: tsc 0 · validate:core 0 (qa:admin-canon 0, qa:css-monocapa 0).
+- Validació funcional: render salut/analytics/reporting/Partner Hub HTTP 200, .ap-h2 = Plus Jakarta, 0 overflow/error.
+- Validació humana/UX: pendent validació visual del propietari.
+
+### Coordinació
+Counter -> 1146. Front Comandament/canon (claude). codex aturat.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-25 — Fitxa forense Partners + 2 bugs reals (Canvi #1145, claude)
 
 ### Context
