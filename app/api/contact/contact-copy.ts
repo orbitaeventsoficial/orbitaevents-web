@@ -8,6 +8,7 @@ import type { NextRequest } from 'next/server';
 import type { EventType, LeadSource } from '@prisma/client';
 
 import type { Locale } from '@/i18n';
+import { SITE_CONFIG } from '@/app/config/site-config';
 export type { Locale };
 
 export const CONTACT_COPY: Record<Locale, Record<string, string>> = {
@@ -57,7 +58,7 @@ export const CONTACT_COPY: Record<Locale, Record<string, string>> = {
     clientEstimatedBudget: 'Pressupost estimat',
     clientEstimatedNote: '*Preu orientatiu. Confirmarem el preu final al correu.',
     clientCallNow: 'Trucar ara al',
-    clientReasonEmail: 'Has rebut aquest correu perqu\u00e8 has demanat informaci\u00f3 a orbitaevents.com.',
+    clientReasonEmail: `Has rebut aquest correu perqu\u00e8 has demanat informaci\u00f3 a ${SITE_CONFIG.web.domain}.`,
     clientMailSubjectPrefix: 'Rebut! La teva sol\u00b7licitud per',
     successMessage: 'Missatge enviat correctament',
     estimatedResponse: '2-4 hores',
@@ -110,7 +111,7 @@ export const CONTACT_COPY: Record<Locale, Record<string, string>> = {
     clientEstimatedBudget: 'Presupuesto estimado',
     clientEstimatedNote: '*Precio orientativo. Confirmaremos el precio final por correo.',
     clientCallNow: 'Llamar ahora al',
-    clientReasonEmail: 'Has recibido este correo porque solicitaste información en orbitaevents.com.',
+    clientReasonEmail: `Has recibido este correo porque solicitaste información en ${SITE_CONFIG.web.domain}.`,
     clientMailSubjectPrefix: '¡Recibido! Tu solicitud para',
     successMessage: 'Mensaje enviado con éxito',
     estimatedResponse: '2-4 horas',
@@ -163,7 +164,7 @@ export const CONTACT_COPY: Record<Locale, Record<string, string>> = {
     clientEstimatedBudget: 'Estimated quote',
     clientEstimatedNote: '*Indicative price. We will confirm final price by email.',
     clientCallNow: 'Call now at',
-    clientReasonEmail: 'You received this email because you requested information on orbitaevents.com.',
+    clientReasonEmail: `You received this email because you requested information on ${SITE_CONFIG.web.domain}.`,
     clientMailSubjectPrefix: 'Received! Your request for',
     successMessage: 'Message sent successfully',
     estimatedResponse: '2-4 hours',

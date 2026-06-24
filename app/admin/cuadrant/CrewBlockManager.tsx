@@ -110,7 +110,7 @@ export default function CrewBlockManager({
               Motiu (opc.)
               <input type="text" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Vacances, altre bolo…" className="rounded adm-input text-xs" />
             </label>
-            <button type="button" onClick={add} disabled={saving} className="rounded-lg border admin-tone-border-info admin-tone-bg-info px-3 py-1.5 text-xs font-semibold admin-tone-text-info hover:admin-tone-bg-info disabled:opacity-50">
+            <button type="button" onClick={add} disabled={saving} className="ap-btn ap-btn--primary ap-btn--xs">
               {saving ? 'Desant…' : 'Afegir'}
             </button>
           </div>
@@ -125,7 +125,7 @@ export default function CrewBlockManager({
                     {b.allDay ? 'tot el dia' : `${b.startLabel}–${b.endLabel ?? '?'}`}
                     {b.reason && <span className="opacity-60"> · {b.reason}</span>}
                   </span>
-                  <button type="button" onClick={() => remove(b.id)} className="admin-tone-text-danger hover:admin-tone-text-danger" aria-label="Treure bloqueig">✕</button>
+                  <button type="button" onClick={() => remove(b.id)} className="admin-tone-text-danger transition-opacity hover:opacity-70" aria-label="Treure bloqueig">✕</button>
                 </li>
               ))}
             </ul>

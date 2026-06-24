@@ -2,8 +2,8 @@
  * Processa les imatges dels productes de Carlos (Masquerade) des del Word original.
  *
  * Mapeig correcte (del Word de Carlos):
- *   image3 → animacio-tematica (animador sol)
- *   image4 → animacio-personatge (animador + Mickey)
+ *   image3 → animacio-1-personatge (animador sol)
+ *   image4 → animacio-2-personatges (animador + Mickey)
  *   image1 → secret-pirates (portada pirates sencera)
  *   image2 → NO s'usa (és el logo de l'empresa)
  *
@@ -23,8 +23,8 @@ const OUT_DIR = path.join(process.cwd(), 'public', 'img', 'collaborators', 'masq
 // cropFrac: regió a conservar [leftFrac, topFrac, widthFrac, heightFrac] sobre l'original.
 // Serveix per reenquadrar les fotos quan cal abans del format final.
 const JOBS = [
-  { src: 'image3.jpg', out: 'animacio-tematica.jpg', crop: [0.05, 0.02, 0.90, 0.96], fit: 'cover', q: 84 },
-  { src: 'image4.jpg', out: 'animacio-personatge.jpg', crop: [0.02, 0.02, 0.96, 0.96], fit: 'cover', q: 84 },
+  { src: 'image3.jpg', out: 'animacio-1-personatge.jpg', crop: [0.05, 0.02, 0.90, 0.96], fit: 'cover', q: 84 },
+  { src: 'image4.jpg', out: 'animacio-2-personatges.jpg', crop: [0.02, 0.02, 0.96, 0.96], fit: 'cover', q: 84 },
   { src: 'image1.jpg', out: 'secret-pirates.jpg', crop: [0.0, 0.0, 1.0, 1.0], fit: 'inside', q: 82 },
 ];
 

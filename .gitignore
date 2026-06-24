@@ -43,7 +43,7 @@ nul
 
 # Backups & uploads
 backup/
-uploads/
+/uploads/
 
 # Misc
 *.log
@@ -60,6 +60,9 @@ playwright-report/
 test-results/
 *.html
 !public/offline.html
+!public/oauth-home.html
+!public/oauth-privacy.html
+!public/oauth-terms.html
 !public/respira-rosa/index.html
 screenshots/
 screenshots-mobile/

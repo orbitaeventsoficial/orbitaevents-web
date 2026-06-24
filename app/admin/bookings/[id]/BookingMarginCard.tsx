@@ -225,7 +225,7 @@ export default function BookingMarginCard({
           </p>
         </div>
         <div className="admin-booking-margin-badge">
-          <span className={`text-xl font-bold ${marginColor}`}>{marginPct.toFixed(1)}%</span>
+          <span className={`admin-booking-margin-badge-value ${marginColor}`}>{marginPct.toFixed(1)}%</span>
           <span className="text-xs uppercase tracking-wide opacity-70">Marge actual</span>
         </div>
       </div>
@@ -251,7 +251,7 @@ export default function BookingMarginCard({
           <Tooltip text="Calculat pel motor de cost: pack, extres, transport i cost operacional.">
             <p className="text-xs font-medium uppercase">% marge</p>
           </Tooltip>
-          <p className={`font-[family-name:var(--display)] text-[length:var(--o-text-xl)] font-bold leading-none ${marginColor}`}>{marginPct.toFixed(1)}%</p>
+          <p className={`admin-booking-margin-kpi-value ${marginColor}`}>{marginPct.toFixed(1)}%</p>
           <p className={`text-xs mt-0.5 ${marginColor}`}>
             {marginPct >= 50 ? 'Excel·lent. Marge sa.' :
              marginPct >= 30 ? 'Acceptable. Encara hi ha marge per optimitzar.' :
@@ -301,7 +301,7 @@ export default function BookingMarginCard({
 
       {total > 0 && (
         <div className="mb-6 admin-booking-margin-panel rounded-xl border p-4">
-          <h3 className="text-base font-bold mb-1">{"On va cada euro d'aquest bolo"}</h3>
+          <h3 className="admin-booking-margin-panel-title">{"On va cada euro d'aquest bolo"}</h3>
           <p className="text-sm mb-4 opacity-70">Desglossament practic de costos i benefici real.</p>
           <div className="space-y-3 text-sm">
             <div className="flex items-start justify-between gap-3">
@@ -357,10 +357,10 @@ export default function BookingMarginCard({
             <div className="border-t admin-tone-border-neutral pt-3 mt-1">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <span className="font-bold text-base">Benefici net</span>
+                  <span className="admin-booking-margin-benefit-label">Benefici net</span>
                   <p className="text-xs opacity-60 mt-0.5">Compte principal — sou, estalvi i reinversio</p>
                 </div>
-                <span className={`shrink-0 text-base font-bold tabular-nums ${netMargin >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
+                <span className={`admin-booking-margin-benefit-value ${netMargin >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
                   {formatCurrency(netMargin)}
                 </span>
               </div>

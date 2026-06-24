@@ -9,9 +9,9 @@ import { formatCurrency } from '@/lib/constants';
 type Props = { initialCandidates: ReactivationCandidate[] };
 
 const PRIORITY_TONE: Record<ReactivationPriority, string> = {
-  ALTA: 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger',
-  MITJANA: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
-  BAIXA: 'border-[var(--line)] bg-[var(--panel)] text-white/60',
+  ALTA: 'rc__tone rc__tone--high',
+  MITJANA: 'rc__tone rc__tone--medium',
+  BAIXA: 'rc__tone rc__tone--low',
 };
 
 const CHANNEL_ICON: Record<string, string> = {
@@ -67,78 +67,78 @@ export default function ReactivationClient({ initialCandidates }: Props) {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="rc">
       {/* KPIs */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="rc__stats">
         <button
           type="button"
           onClick={() => setFilter('ALL')}
-          className={`rounded-xl border p-3 text-left transition-colors ${filter === 'ALL' ? 'admin-tone-border-info admin-tone-bg-info' : 'border-[var(--line)] bg-[var(--panel)] adm-row-hover'}`}
+          className={`rc__stat ${filter === 'ALL' ? 'rc__stat--active' : ''}`}
         >
-          <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Total</p>
-          <p className="mt-1 text-xl font-bold">{stats.total}</p>
+          <p className="rc__stat-label">Total</p>
+          <p className="rc__stat-value">{stats.total}</p>
         </button>
         {(['ALTA', 'MITJANA', 'BAIXA'] as const).map((p) => (
           <button
             key={p}
             type="button"
             onClick={() => setFilter(filter === p ? 'ALL' : p)}
-            className={`rounded-xl border p-3 text-left transition-colors ${filter === p ? PRIORITY_TONE[p] : 'border-[var(--line)] bg-[var(--panel)] adm-row-hover'}`}
+            className={`rc__stat ${filter === p ? PRIORITY_TONE[p] : ''}`}
           >
-            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Prioritat {p}</p>
-            <p className="mt-1 text-xl font-bold">{stats[p]}</p>
+            <p className="rc__stat-label">Prioritat {p}</p>
+            <p className="rc__stat-value">{stats[p]}</p>
           </button>
         ))}
       </div>
 
       {visible.length === 0 ? (
-        <div className="ap-card p-12 text-center">
-          <p className="text-4xl">✨</p>
-          <p className="mt-3 text-sm font-semibold opacity-80">
+        <div className="ap-card rc__empty">
+          <p className="rc__empty-icon">✨</p>
+          <p className="rc__empty-title">
             {initialCandidates.length === 0
               ? 'Cap client a reactivar ara mateix'
               : 'Tots els candidats visibles estan filtrats o descartats'}
           </p>
-          <p className="mt-1 text-xs opacity-50">
+          <p className="rc__empty-copy">
             {initialCandidates.length === 0
               ? 'Els clients apareixen aquí quan estan dormants, en risc de pèrdua o amb health score baix.'
               : 'Ajusta el filtre per tornar a veure candidats.'}
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="rc__list">
           {visible.map((c) => (
             <article
               key={c.customerId}
-              className="ap-card p-4 adm-row-hover transition-colors"
+              className="ap-card rc__candidate"
             >
-              <div className="flex items-start justify-between gap-4 flex-wrap">
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${PRIORITY_TONE[c.priority]}`}>
+              <div className="rc__candidate-head">
+                <div className="rc__candidate-main">
+                  <div className="rc__meta">
+                    <span className={PRIORITY_TONE[c.priority]}>
                       {c.priority}
                     </span>
-                    <span className="text-xs opacity-60">{c.reasonLabel}</span>
-                    <span className="text-xs opacity-40">·</span>
-                    <span className="text-xs opacity-60">Score {c.score}</span>
+                    <span>{c.reasonLabel}</span>
+                    <span className="rc__dot">·</span>
+                    <span>Score {c.score}</span>
                   </div>
-                  <div className="mt-1.5 flex items-center gap-2 flex-wrap">
+                  <div className="rc__identity">
                     <Link
                       href={buildCustomerHubHref(c.customerId)}
-                      className="text-sm font-semibold hover:admin-tone-text-info transition-colors"
+                      className="rc__name"
                     >
                       {c.name}
                     </Link>
-                    <span className="text-xs opacity-50">·</span>
-                    <span className="text-xs opacity-60">{c.email}</span>
+                    <span className="rc__dot">·</span>
+                    <span>{c.email}</span>
                     {c.phone && (
                       <>
-                        <span className="text-xs opacity-50">·</span>
-                        <span className="text-xs opacity-60">{c.phone}</span>
+                        <span className="rc__dot">·</span>
+                        <span>{c.phone}</span>
                       </>
                     )}
                   </div>
-                  <div className="mt-1 text-xs opacity-50 flex items-center gap-2 flex-wrap">
+                  <div className="rc__facts">
                     <span>{c.totalEvents} event{c.totalEvents === 1 ? '' : 's'}</span>
                     <span>·</span>
                     <span>{formatCurrency(c.totalSpent)}</span>
@@ -158,65 +158,65 @@ export default function ReactivationClient({ initialCandidates }: Props) {
                     )}
                   </div>
                 </div>
-                <div className="flex flex-col items-end gap-1 shrink-0">
-                  <div className="flex items-center gap-1">
+                <div className="rc__channels">
+                  <div className="rc__channel-list">
                     {c.suggestedChannels.map((ch) => (
-                      <span key={ch} title={ch} className="text-xs opacity-70">
+                      <span key={ch} title={ch}>
                         {CHANNEL_ICON[ch] || ch}
                       </span>
                     ))}
                   </div>
-                  <span className="text-xs opacity-40">{c.preferredLocale.toUpperCase()}</span>
+                  <span className="rc__locale">{c.preferredLocale.toUpperCase()}</span>
                 </div>
               </div>
 
-              <details className="mt-3 group">
-                <summary className="cursor-pointer text-xs font-semibold opacity-70 hover:opacity-100 list-none">
-                  <span className="group-open:hidden">▶ Veure missatge suggerit</span>
-                  <span className="hidden group-open:inline">▼ Amagar missatge</span>
+              <details className="rc__message">
+                <summary className="rc__message-summary">
+                  <span className="rc__message-closed">▶ Veure missatge suggerit</span>
+                  <span className="rc__message-open">▼ Amagar missatge</span>
                 </summary>
-                <div className="mt-2 rounded-lg border border-[var(--line)] bg-[var(--sunk)] p-3">
-                  <p className="text-xs font-semibold opacity-70">Assumpte</p>
-                  <p className="mt-0.5 text-xs">{c.suggestedSubject}</p>
-                  <p className="mt-2 text-xs font-semibold opacity-70">Missatge</p>
-                  <pre className="mt-0.5 text-xs whitespace-pre-wrap font-sans opacity-80">{c.suggestedMessage}</pre>
+                <div className="rc__message-box">
+                  <p className="rc__message-label">Assumpte</p>
+                  <p className="rc__message-text">{c.suggestedSubject}</p>
+                  <p className="rc__message-label rc__message-label--spaced">Missatge</p>
+                  <pre className="rc__message-pre">{c.suggestedMessage}</pre>
                 </div>
               </details>
 
-              <div className="mt-3 flex flex-wrap items-center gap-2">
+              <div className="rc__actions">
                 {c.whatsappUrl && (
                   <a
                     href={c.whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-lg border admin-tone-border-success admin-tone-bg-success px-3 py-1.5 text-xs font-medium admin-tone-text-success hover:opacity-80"
+                    className="rc__action rc__action--success"
                   >
                     💬 WhatsApp
                   </a>
                 )}
                 <a
                   href={c.mailtoUrl}
-                  className="rounded-lg border admin-tone-border-info admin-tone-bg-info px-3 py-1.5 text-xs font-medium admin-tone-text-info hover:admin-tone-bg-info"
+                  className="rc__action rc__action--info"
                 >
                   ✉️ Email
                 </a>
                 <button
                   type="button"
                   onClick={() => handleCopyMessage(c)}
-                  className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"
+                  className="rc__action rc__action--ghost"
                 >
                   {copied === c.customerId ? '✓ Copiat' : 'Copiar missatge'}
                 </button>
                 <Link
                   href={buildCustomerHubHref(c.customerId)}
-                  className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"
+                  className="rc__action rc__action--ghost"
                 >
                   Veure fitxa →
                 </Link>
                 <button
                   type="button"
                   onClick={() => handleDismiss(c.customerId)}
-                  className="ml-auto rounded-lg border border-white/10 px-2 py-1 text-xs opacity-60 hover:bg-white/5"
+                  className="rc__action rc__action--dismiss"
                 >
                   Descartar
                 </button>

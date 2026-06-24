@@ -477,8 +477,8 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                   <span>Cobrament</span>
                   <span>{pct}%</span>
                 </div>
-                <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
-                  <div className="h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(100, pct)}%` }} />
+                <div className="ch__summary-progress">
+                  <div className="ch__summary-progress-bar" style={{ width: `${Math.min(100, pct)}%` }} />
                 </div>
               </div>
             )}
@@ -889,11 +889,11 @@ function ActionCard({ title, isEmpty, emptyText, content, action }: { title: str
 
 function QuickAction({ href, label, color, external }: { href: string; label: string; color: 'cyan' | 'amber' | 'emerald' | 'indigo' | 'slate'; external?: boolean; }) {
   const colorStyles = {
-    cyan: 'admin-tone-border-cyan admin-tone-text-cyan hover:bg-white/5',
-    amber: 'admin-tone-border-warning admin-tone-text-warning hover:bg-white/5',
-    emerald: 'admin-tone-border-success admin-tone-text-success hover:bg-white/5',
-    indigo: 'admin-tone-border-violet admin-tone-text-violet hover:bg-white/5',
-    slate: 'border-white/15 text-white/60 hover:bg-white/10',
+    cyan: 'ch__summary-quick--info',
+    amber: 'ch__summary-quick--warning',
+    emerald: 'ch__summary-quick--success',
+    indigo: 'ch__summary-quick--vip',
+    slate: 'ch__summary-quick--muted',
   };
 
   return (
@@ -901,7 +901,7 @@ function QuickAction({ href, label, color, external }: { href: string; label: st
       href={href}
       target={external ? '_blank' : undefined}
       rel={external ? 'noopener noreferrer' : undefined}
-      className={`rounded-xl border px-3 py-1.5 text-xs font-medium transition-colors ${colorStyles[color]}`}
+      className={`ch__summary-quick ${colorStyles[color]}`}
       {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.quickAction(label))}
     >
       {label}
@@ -996,8 +996,8 @@ function RouteSnapshotCard({
       {venue && location && <p className="mt-1 text-xs">{location}</p>}
       <div className="mt-3 flex flex-wrap gap-2 text-xs">
         {distanceLabel && <span className="rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-0.5 admin-tone-text-cyan">🚗 {distanceLabel}</span>}
-        {oneWayLabel && <span className="rounded-full border border-white/10 px-2 py-0.5">{oneWayLabel}</span>}
-        {liveRoute?.durationText && <span className="rounded-full border border-white/10 px-2 py-0.5">⏱️ {liveRoute.durationText}</span>}
+        {oneWayLabel && <span className="ch__summary-route-pill">{oneWayLabel}</span>}
+        {liveRoute?.durationText && <span className="ch__summary-route-pill">⏱️ {liveRoute.durationText}</span>}
       </div>
       {sourceLabel && <p className="mt-2 text-xs opacity-70">{sourceLabel}</p>}
       {liveRoute?.originResolved && <p className="mt-1 text-xs opacity-60">Base Òrbita: {liveRoute.originResolved}</p>}
@@ -1134,15 +1134,15 @@ function CrmStatusBar({
         {customer.referredBy && (
           <a
             href={buildCustomerHubHref(customer.referredBy.id)}
-            className="inline-flex items-center gap-1 text-xs text-white/50 hover:text-white/70 transition-colors"
+            className="ch__summary-referral-link"
           >
-            Referit per: <span className="font-medium text-white/70">{customer.referredBy.name}</span>
+            Referit per: <span>{customer.referredBy.name}</span>
           </a>
         )}
 
         {/* Referrals count */}
         {customer.referrals && customer.referrals.length > 0 && (
-          <span className="text-xs text-white/50">
+          <span className="ch__summary-referral-count">
             Ha referit {customer.referrals.length} client{customer.referrals.length > 1 ? 's' : ''}
           </span>
         )}
@@ -1171,7 +1171,7 @@ function CrmStatusBar({
           <button
             type="button"
             onClick={() => setAddingTag(true)}
-            className="rounded-full border border-dashed border-white/20 px-2.5 py-0.5 text-xs text-white/40 hover:text-white/60 hover:border-white/30 transition-colors"
+            className="ch__summary-add-tag"
           >
             + tag
           </button>
@@ -1186,7 +1186,7 @@ function CrmStatusBar({
                 if (e.key === 'Escape') { setAddingTag(false); setNewTag(''); }
               }}
               placeholder="Nou tag..."
-              className="w-24 rounded-lg border border-white/20 bg-transparent px-2 py-0.5 text-xs text-white/80 placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-[var(--ax-hair-gold)]"
+              className="ch__summary-tag-input"
               autoFocus
               disabled={saving}
               list="tag-presets"
@@ -1207,7 +1207,7 @@ function CrmStatusBar({
             <button
               type="button"
               onClick={() => { setAddingTag(false); setNewTag(''); }}
-              className="text-xs text-white/40 hover:text-white/60"
+              className="ch__summary-tag-cancel"
             >
               ×
             </button>

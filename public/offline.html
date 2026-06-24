@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sense connexió — Òrbita Events</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #121417;
+      color: #edf2f7;
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+    .card {
+      text-align: center;
+      max-width: 400px;
+      padding: 2.5rem 2rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(27, 31, 36, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .icon { font-size: 3rem; margin-bottom: 1rem; }
+    h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+    p { color: #bac5d2; font-size: 0.95rem; line-height: 1.5; }
+    .retry {
+      display: inline-block;
+      margin-top: 1.5rem;
+      padding: 0.625rem 1.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid rgba(193, 139, 44, 0.4);
+      background: rgba(193, 139, 44, 0.15);
+      color: #edf2f7;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .retry:hover { background: rgba(193, 139, 44, 0.25); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">📡</div>
+    <h1>Sense connexió</h1>
+    <p>No es pot connectar al servidor. Comprova la connexió a internet i torna-ho a provar.</p>
+    <a href="/" class="retry" onclick="location.reload(); return false;">Tornar a provar</a>
+  </div>
+</body>
+</html>

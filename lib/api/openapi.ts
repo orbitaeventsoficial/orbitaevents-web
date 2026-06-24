@@ -19,7 +19,7 @@ export const openAPISchema = {
   },
   servers: [
     {
-      url: 'https://orbitaevents.com',
+      url: SITE_CONFIG.web.url,
       description: 'Production',
     },
     {

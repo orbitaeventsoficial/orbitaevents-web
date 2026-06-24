@@ -33,7 +33,7 @@ const PRODUCTS = [
     durationLabel: '1h',
     costPrice: 160,
     sellPrice: productPrice(160),
-    imageUrl: `${IMG}/animacio-tematica.jpg`,
+    imageUrl: `${IMG}/animacio-1-personatge.jpg`,
     // Sinopsi adaptada literalment del dossier del proveïdor (to natural, en català).
     description: "Els nostres personatges més entranyables vénen a descobrir-te un nou món de màgia i de color. Una animació on els jocs i els balls són els protagonistes, en un xou totalment dinàmic i ple de música. Pregunta'ns pels personatges disponibles!",
     includes: INCLUDES,
@@ -46,7 +46,7 @@ const PRODUCTS = [
     durationLabel: '1h',
     costPrice: 250,
     sellPrice: productPrice(250),
-    imageUrl: `${IMG}/animacio-personatge.jpg`,
+    imageUrl: `${IMG}/animacio-2-personatges.jpg`,
     description: "T'agradaria conèixer els teus personatges preferits? Disney, Bluey, Patrulla Canina… amb nosaltres és possible! Gaudeix de les nostres animacions amb els vostres personatges favorits, en una vetllada on els haureu d'ajudar a través de balls i dinàmiques. Esteu a punt per ballar amb ells?",
     includes: INCLUDES,
     sortOrder: 2,

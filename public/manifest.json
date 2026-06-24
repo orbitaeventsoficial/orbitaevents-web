@@ -63,7 +63,7 @@
       "url": "/contacto",
       "icons": [
         {
-          "src": "/icon-shortcut-contact.png",
+          "src": "/favicon-96.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -76,7 +76,7 @@
       "url": "/portfolio",
       "icons": [
         {
-          "src": "/icon-shortcut-portfolio.png",
+          "src": "/favicon-96.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -89,34 +89,11 @@
       "url": "/servicios/bodas",
       "icons": [
         {
-          "src": "/icon-shortcut-wedding.png",
+          "src": "/favicon-96.png",
           "sizes": "96x96",
           "type": "image/png"
         }
       ]
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/screenshots/home-mobile.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Pàgina principal"
-    },
-    {
-      "src": "/screenshots/services-mobile.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Els nostres serveis"
-    },
-    {
-      "src": "/screenshots/portfolio-mobile.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Portfolio"
     }
   ],
   "related_applications": [],

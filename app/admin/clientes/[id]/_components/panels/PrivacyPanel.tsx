@@ -56,10 +56,10 @@ export default function PrivacyPanel() {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border admin-card-glass p-5 animate-pulse">
-        <div className="h-6 w-1/3 rounded bg-white/10" />
-        <div className="mt-4 space-y-2">
-          {[1, 2, 3].map((i) => <div key={i} className="h-12 rounded-xl bg-white/5" />)}
+      <div className="ch__privacy-card ch__privacy-loading">
+        <div className="ch__privacy-skeleton ch__privacy-skeleton--title" />
+        <div className="ch__privacy-list">
+          {[1, 2, 3].map((i) => <div key={i} className="ch__privacy-skeleton ch__privacy-skeleton--row" />)}
         </div>
       </div>
     );
@@ -94,20 +94,20 @@ export default function PrivacyPanel() {
   const revokedConsents = consents.filter((c) => !c.granted || c.revokedAt);
 
   return (
-    <div className="space-y-4" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.privacy.root)}>
-      <div className="rounded-2xl border admin-card-glass p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.privacy.consents)}>
-        <h2 className="text-lg font-semibold">Consentiments</h2>
+    <div className="ch__privacy-stack" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.privacy.root)}>
+      <div className="ch__privacy-card" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.privacy.consents)}>
+        <h2 className="ch__privacy-title">Consentiments</h2>
 
-        {activeConsents.length === 0 && revokedConsents.length === 0 && <p className="mt-3 text-sm opacity-50">Cap consentiment registrat.</p>}
+        {activeConsents.length === 0 && revokedConsents.length === 0 && <p className="ch__privacy-empty">Cap consentiment registrat.</p>}
 
         {activeConsents.length > 0 && (
-          <div className="mt-3 space-y-2">
+          <div className="ch__privacy-list">
             {activeConsents.map((c) => (
-              <div key={c.id} className="flex items-center justify-between rounded-xl border p-3">
+              <div key={c.id} className="ch__privacy-row">
                 <div>
-                  <span className="text-sm font-medium">{getPrivacyConsentLabel(c.consentType)}</span>
-                  <span className="ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs">Actiu</span>
-                  <p className="text-xs opacity-50 mt-0.5">{c.source} · v{c.consentVersion}{c.grantedAt && <> · {formatDateTime(c.grantedAt)}</>}</p>
+                  <span className="ch__privacy-name">{getPrivacyConsentLabel(c.consentType)}</span>
+                  <span className="ch__privacy-badge ch__privacy-badge--active">Actiu</span>
+                  <p className="ch__privacy-meta">{c.source} · v{c.consentVersion}{c.grantedAt && <> · {formatDateTime(c.grantedAt)}</>}</p>
                 </div>
               </div>
             ))}
@@ -115,15 +115,15 @@ export default function PrivacyPanel() {
         )}
 
         {revokedConsents.length > 0 && (
-          <details className="mt-3">
-            <summary className="cursor-pointer text-sm opacity-60 hover:opacity-100 transition-opacity">Revocats / Inactius ({revokedConsents.length})</summary>
-            <div className="mt-2 space-y-2">
+          <details className="ch__privacy-details">
+            <summary className="ch__privacy-summary">Revocats / Inactius ({revokedConsents.length})</summary>
+            <div className="ch__privacy-list">
               {revokedConsents.map((c) => (
-                <div key={c.id} className="flex items-center justify-between rounded-xl border p-3 opacity-50">
+                <div key={c.id} className="ch__privacy-row ch__privacy-row--muted">
                   <div>
-                    <span className="text-sm font-medium">{getPrivacyConsentLabel(c.consentType)}</span>
-                    <span className="ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs">Revocat</span>
-                    <p className="text-xs opacity-50 mt-0.5">{c.revokedAt && <>Revocat: {formatDateTime(c.revokedAt)}</>}</p>
+                    <span className="ch__privacy-name">{getPrivacyConsentLabel(c.consentType)}</span>
+                    <span className="ch__privacy-badge ch__privacy-badge--revoked">Revocat</span>
+                    <p className="ch__privacy-meta">{c.revokedAt && <>Revocat: {formatDateTime(c.revokedAt)}</>}</p>
                   </div>
                 </div>
               ))}
@@ -132,15 +132,15 @@ export default function PrivacyPanel() {
         )}
       </div>
 
-      <div className="rounded-2xl border admin-card-glass p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.privacy.gdprActions)}>
-        <h2 className="text-lg font-semibold">Accions RGPD</h2>
-        {exportMsg && <p className="mt-2 text-sm rounded-xl border px-3 py-2">{exportMsg}</p>}
-        <div className="mt-3 flex flex-wrap gap-2">
+      <div className="ch__privacy-card" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.privacy.gdprActions)}>
+        <h2 className="ch__privacy-title">Accions RGPD</h2>
+        {exportMsg && <p className="ch__privacy-message">{exportMsg}</p>}
+        <div className="ch__privacy-actions">
           <button
             type="button"
             onClick={() => handleExport(false)}
             disabled={exporting}
-            className="rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 min-h-[44px]"
+            className="ch__privacy-button"
             {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.privacy.exportFull)}
           >
             {exporting ? 'Exportant...' : 'Exportar dades (Art. 15)'}
@@ -149,7 +149,7 @@ export default function PrivacyPanel() {
             type="button"
             onClick={() => handleExport(true)}
             disabled={exporting}
-            className="rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 min-h-[44px]"
+            className="ch__privacy-button"
             {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.privacy.exportPortable)}
           >
             Exportar portable (Art. 20)
@@ -157,24 +157,24 @@ export default function PrivacyPanel() {
         </div>
       </div>
 
-      <div className="rounded-2xl border admin-card-glass p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.privacy.requests)}>
-        <h2 className="text-lg font-semibold">Sol·licituds de drets (ARCO)</h2>
+      <div className="ch__privacy-card" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.privacy.requests)}>
+        <h2 className="ch__privacy-title">Sol·licituds de drets (ARCO)</h2>
 
         {requests.length === 0 ? (
-          <p className="mt-3 text-sm opacity-50">Cap sol·licitud de drets registrada.</p>
+          <p className="ch__privacy-empty">Cap sol·licitud de drets registrada.</p>
         ) : (
-          <div className="mt-3 space-y-2">
+          <div className="ch__privacy-list">
             {requests.map((r) => {
               const statusCfg = getPrivacyRequestStatusDisplay(r.status);
               return (
-                <div key={r.id} className="rounded-xl border p-3">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-medium">{getPrivacyRequestTypeLabel(r.requestType)}</span>
-                    <span className={`text-xs font-medium ${statusCfg.color}`}>{statusCfg.label}</span>
-                    <span className="text-xs opacity-40">{formatDateTime(r.createdAt)}</span>
+                <div key={r.id} className="ch__privacy-row">
+                  <div className="ch__privacy-row-head">
+                    <span className="ch__privacy-name">{getPrivacyRequestTypeLabel(r.requestType)}</span>
+                    <span className={`ch__privacy-status ${statusCfg.color}`}>{statusCfg.label}</span>
+                    <span className="ch__privacy-date">{formatDateTime(r.createdAt)}</span>
                   </div>
-                  {r.description && <p className="mt-1 text-xs opacity-60">{r.description}</p>}
-                  {r.legalDeadline && r.status !== 'COMPLETED' && r.status !== 'REJECTED' && <p className="mt-1 text-xs">Deadline: {formatDateTime(r.legalDeadline)}</p>}
+                  {r.description && <p className="ch__privacy-description">{r.description}</p>}
+                  {r.legalDeadline && r.status !== 'COMPLETED' && r.status !== 'REJECTED' && <p className="ch__privacy-deadline">Deadline: {formatDateTime(r.legalDeadline)}</p>}
                 </div>
               );
             })}

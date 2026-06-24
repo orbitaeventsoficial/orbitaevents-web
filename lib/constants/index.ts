@@ -21,7 +21,7 @@ type StatusTone = {
 // CONTACTO
 // ---------------------------------------------------------------------------
 
-export const WHATSAPP_NUMBER = '34699121023';
+export const WHATSAPP_NUMBER = SITE_CONFIG.business.phone.replace(/\D/g, '');
 export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`;
 export const WHATSAPP_URL_WITH_MESSAGE = (message: string) =>
   `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;

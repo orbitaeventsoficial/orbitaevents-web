@@ -61,6 +61,10 @@ html.admin-mode .cl__spinner { width: 28px; height: 28px; border: 2px solid var(
 @keyframes cl-spin { to { transform: rotate(360deg); } }
 html.admin-mode .cl__empty { padding: 40px; text-align: center; border: 1px dashed var(--line); border-radius: var(--o-r-lg); color: var(--t3); font-size: var(--o-text-base); }
 
+/* Modals */
+html.admin-mode .cl__modal-backdrop { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 1rem; background: color-mix(in oklab, var(--canvas) 72%, transparent); backdrop-filter: blur(18px); }
+html.admin-mode .cl__duplicate-score-low { background: color-mix(in oklab, var(--panel) 82%, transparent); color: var(--t3); }
+
 /* Taula (desktop, lg+) */
 html.admin-mode .cl__tablewrap { border: 1px solid var(--line); border-radius: var(--o-r-lg); overflow: hidden; background: linear-gradient(180deg, var(--panel), color-mix(in oklab, var(--panel) 90%, var(--canvas))); overflow-x: auto; }
 html.admin-mode .cl__table { width: 100%; min-width: 860px; border-collapse: collapse; font-size: var(--o-text-sm); }

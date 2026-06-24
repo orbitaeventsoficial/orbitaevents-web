@@ -15,6 +15,60 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-25 [ESTAT: tancat — Customer Hub ch__*-title 100% clònics (display+bold) #1144]
+Tancat el pendent del #1122: 5 títols de panell del Customer Hub (bookings/leads/proposals/privacy/discounts) → font-family display + bold (= .ap-section-title). codex ja els tenia a 18px; faltava la font de marca. timeline-title (11px) intacte. tsc 0 · validate:core 0. Tots els títols de secció de l'admin ara Plus Jakarta display 18px. Counter->1144.
+
+[claude] 2026-06-25 [ESTAT: tancat — guard qa:smoke-detail-coverage (blinda cobertura [param]) #1143]
+Tapat el risc de degradació del #1138: nou guard estàtic check-smoke-detail-coverage (a validate:core) falla si una ruta [param] del FS no és a COVERED_PARAM_ROUTES. +2 tests. tsc 0 · validate:core 0 (11=11) · vitest 2/2. Counter->1143.
+VERIFICACIÓ POST-CRASH DE CODEX: codex va petar DESPRÉS de tancar el seu #1142 (bookings/page). El seu #1142 està COMPLET: documentat (§9+diari amb 3 capes validació + autors), tsc 0, validate:core 0, i les 5 pantalles que tocava (bookings list/detail, customer hub, reactivation, referrals) rendereixen netes 3 breakpoints 0 error/0 overflow. NO hi havia feina a mitges. Counter/§9/diari alineats a 1142.
+
+[claude] 2026-06-25 [ESTAT: tancat — nou guard qa:smoke-detail: render rutes [param] #1138]
+Tapat punt cec: qa:smoke saltava les rutes [param] (cal id real). Nou scripts/smoke-render-detail.mjs resol ids per Prisma i renderitza els 11 detalls (booking/lead/client/inventory/pack/proposal/blog/faq/email-template...) als 3 breakpoints. 1a execució: 30 renders, 0 errors, 0 overflow (questionnaires omès, BD buida). package.json qa:smoke-detail (fora de validate:core, cal server+BD). tsc 0 · validate:core 0. Counter->1138.
+Avís codex: nou guard qa:smoke-detail per verificar fitxes detall amb dades reals (server viu). Útil després de tocar qualsevol page [id].
+
+[claude] 2026-06-25 [ESTAT: tancat — guard check-admin-canon ampliat: botó-void en consts #1135]
+Tapat el gap del #1133: check-admin-canon ara caça botó-void en const strings (no només className literals), excloent interpolació ${...} (fons via variant). +2 tests (cas-dolent + cas-bo), 6/6. Va validar que ConfirmDialog:208 és legítim (rep fons via ${styles.button}). guard 0 P1 net · validate:core 0. Counter->1135.
+Avís codex: el guard de canon ara és més estricte amb botó-void en consts; si defineixes classes de botó en una const, posa-hi fons (.ap-btn) o l'strict et bloquejarà.
+
+[claude] 2026-06-25 [ESTAT: tancat — fitxa forense òrgan Comunicacions + botó-void #1133]
+Front codex-free: auditoria òrgan Comunicacions (inbox/emails/email-templates). Organ SA. Fix real: ManualActionsPanel PRIMARY_BUTTON era botó-void en const string (text-white sense fons, gap del guard) → ap-btn ap-btn--primary. Únic d'aquest tipus a l'admin. Fitxa FETA. tsc 0 · validate:core 0. Counter->1133.
+Avís codex: Comunicacions auditat i FETA. GAP de guard anotat: check-admin-canon no caça botó-void en consts (només className literals) — candidat a ampliar.
+
+[claude] 2026-06-24 [ESTAT: tancat — fitxa forense òrgan Catàleg + ternari mort #1132]
+Front nou lluny de codex (Client 360): auditoria forense de l'òrgan Catàleg (packs/pricing/inventory/catalog/cost-calculator). Organ SA: reachable, serveis consumits, sense duplicació, ja canònic via AdminPage. Heatmap MARGIN_TONES = exempció de domini legítima. Fix: ternari mort a InventoryListSections (416,532) → simplificat. Fitxa FETA al registre. tsc 0 · validate:core 0. Counter->1132.
+Avís codex: Catàleg auditat i FETA (no cal repetir-lo). Cap fitxer teu tocat (inventory/packs/pricing). Customer Hub ch__*-title segueix pendent meu per quan alliberis customer-hub.css.
+
+[claude] 2026-06-24 [ESTAT: tancat — tancament canon títols segurs: new booking nb__h2 → display 18px #1129]
+nb-design.css .nb__h2: 16px → 18px (--o-text-lg). Tots els títols de secció de zones NO-codex ja són display 18px (ap-section-title, bd__pnl-title, fxd__panelhead, nb__h2). tsc 0 · validate:core 0. Counter->1129.
+Avís codex: ÚNIC pendent de canon de títols = ch__*-title del Customer Hub (el teu fitxer actiu #1126-1128). Quan l'alliberis, els alinearé a display 18px. NO toco customer-hub.css mentre hi siguis.
+
+[claude] 2026-06-24 [ESTAT: tancat — booking detail títols de panell al canon (mono-gold→display 18px) #1127]
+booking-detail.css .bd__pnl-title: kicker mono-gold uppercase → display 18px --t (= .ap-section-title). Decisió Opus: títols de secció = display 18px arreu. tsc 0 · validate:core 0. Render booking detall 200, Plus Jakarta 18px. Counter->1127.
+Avís codex: he tocat .bd__pnl-title a booking-detail.css (perímetre bookings, NO el teu #1126 Client 360). Si tornes a booking detail, el títol de panell ja és display 18px canon.
+
+[claude] 2026-06-24 [ESTAT: tancat — lead detail tipografia 100% canon (Bricolage→Plus Jakarta) #1125]
+leads-design.css: totes les ocurrències de var(--heading) (Bricolage) → var(--display); .fxd__panelhead span i displays de valors ara Plus Jakarta. 0 --heading restants. tsc 0 · validate:core 0. Render lead detall 200, Plus Jakarta. Counter->1125.
+Avís codex: booking detail bd__pnl-title (mono-gold) NO tocat (territori teu); Inbox panes compactes = excepció funcional.
+
+[claude] 2026-06-24 [ESTAT: tancat — eyebrow d'òrgan automàtic a tot AdminPage (monocapa) #1124]
+Rollout de l'eyebrow canònic SENSE tocar 74 pàgines: nou mòdul app/admin/lib/adminNav.ts (font única NAV_GROUPS + getGroupForPath, extrets de layout.tsx) + getAdminOrganLabel(pathname). layout.tsx ara importa del mòdul. AdminPage passa a client (usePathname) i deriva l'eyebrow de ruta→òrgan (override per prop intacte). Cada pàgina mostra la seva coordenada: Comercial/Operativa/Catàleg/Web/Sistema. tsc 0 · validate:core 0 (canon 0, dead-views 0). Counter->1124.
+Avís codex: NAV_GROUPS + getGroupForPath ara viuen a app/admin/lib/adminNav.ts (no a layout.tsx). Si toques la nav, edita el mòdul. AdminPage és client ara.
+
+[claude] 2026-06-24 [ESTAT: tancat — headers propis (Inbox, detall reserva/lead) al canon #1123]
+Continuació del #1122. Alineats els 3 headers propis restants al canon únic: inbox.css .sf__title, leads-design.css .fxd__hd-name (Bricolage→display) + .fxd__hd-eyebrow (→mono 0.18em), admin-shell.css .ap-detail-title (color→--t). VERIFICAT amb estils computats: .sf__title, .ap-detail-title, .fxd__hd-name = Plus Jakarta 32px rgb(228,222,212), idèntics a ap-title/fx__h1/ch__h1. tsc 0 · validate:core 0 (canon 0). Counter->1123.
+Avís codex: tots els headers admin ja són clònics (AdminPage + Customer Hub + Inbox + detall reserva + detall lead). NO toquis .sf__title/.fxd__hd-name/.ap-detail-title/.ap-title/.ch__h1 (canon decidit per Opus).
+
+[claude] 2026-06-24 [ESTAT: tancat — CANONITZACIÓ headers + estructures (decisió Opus) #1122]
+Ordre del propietari: tot l'admin clònic+canònic amb el header de Temporada (TANCAT CHARLIE) com a referència. Decisió Opus: header únic = fx__pagehead (eyebrow mono + h1 display 32px + sub mono + hairline, pla, carbó+or). Aplicat MONOCAPA a globals.css (.ap-* → ~80 pàgines): header (eyebrow nou + ap-title=fx__h1 display 32px + sub mono + hairline), contenidors (.ap-section/.ap-card hairline+panel+radi únic --o-r-md, plans), KPIs (label mono + valor display, --info blau neutralitzat). AdminPage: prop eyebrow. Cuadrant: eyebrow="Operacions". customer-hub.css: .ch__h1 → display 32px.
+VERIFICAT: ap-title === fx__h1 === ch__h1 (Plus Jakarta 32px rgb(228,222,212)). tsc 0 · validate:core 0 (canon 0, css-monocapa 0) · render 3 breakpoints 0 overflow/0 error. Counter->1122.
+Avís per codex: el HEADER de Customer Hub (.ch__h1) i el sistema .ap-* són MEUS (canon). Tu segueixes amb els PANELLS ch__* (#1118-1121) — fronts disjunts. NO canviïs .ap-title/.ap-header/.ap-kpi/.ch__h1 (canon decidit). Queda obert: headers propis d'Inbox + detall reserva/lead a alinear al mateix canon.
+
+[claude] 2026-06-24 [ESTAT: tancat — FITXA FORENSE òrgan Cuadrant + fix botó-acció canònic #1115]
+Auditoria forense de l'òrgan Cuadrant (/admin/cuadrant + /repartiment): SA i ben cablejat. Servei pur canònic (crewScheduleService, 23 tests), 3 rutes API amb auth+CSRF correctes, repartiment=flux de caixa (no reimplementa marge de costEngine), cap codi mort, cap CSS de pàgina propi (tot classes canòniques). Únic residu objectiu: botó «Afegir» del CrewBlockManager era botó-a-mà amb hover no-op → .ap-btn ap-btn--primary ap-btn--xs (regla canon #2) + hover real al «✕». Fitxa FETA escrita; registre PENDENT→FETA.
+VERIFICAT: les classes admin-tone-*-cyan/info ja estan neutralitzades a carbó (#999/#1011) i bg-[var(--o-info)] és idioma compartit de 8 fitxers admin (no defecte). tsc 0 · validate:core 0 (canon 0) · servei 23/23 · render 4 rutes × 3 breakpoints 0 overflow/0 error · HTTP 200.
+RENUMERACIÓ: obert com #1111 (counter #1110 a l'arrencada), però codex va avançar a #1112/#1113/#1114 en viu → renumerat al següent lliure #1115. Counter->1115.
+Avís per codex: l'òrgan CUADRANT ja té fitxa FETA (#1115) — no cal repetir-lo. Cap fitxer teu tocat (només app/admin/cuadrant/CrewBlockManager.tsx + docs).
+
 [claude] 2026-06-23 [ESTAT: tancat — tipus Locale unificat al canònic @/i18n (12 fitxers) #1108]
 Monocapa de domini: el tipus Locale/SupportedLocale = ca|es|en estava REDEFINIT localment a 12 fitxers en comptes d'importar el canònic de i18n.ts. Unificats amb import type (s'esborra en compilar → 0 runtime, 0 cicle, 0 risc de bundle encara que el fitxer sigui client). Els que el re-exportaven mantenen la superfície (import type + export type). 0 redefinicions locals restants. tsc + validate:core EXIT 0.
 AUTOCRÍTICA honesta: aquesta unificació va donar 5 errors tsc encadenats (re-export+ús intern) que vaig anar corregint amb la xarxa tsc → ROI baix per a un type de 3 strings. La xarxa va aguantar però confirma que el deute restant ja és marginal i delicat. Counter->1108.
@@ -99,10 +153,40 @@ Tancat l'ultim deute de codi mort anotat: `createDossierFromBolo` eliminat de `d
 Rutes admin dinamiques [param] una per una amb verificacio exhaustiva. Eliminades: /api/admin/leads/[id]/comm-summary (el CustomerHub carrega via fetchCustomerHub server-side, no per HTTP; servei loadCommTimeline CONSERVAT, viu) i /api/admin/leads/[id]/generate-dossier (el cockpit usa el generador normal /admin/dossiers des de #933; createDossierFromBolo queda orfe DINS dossierService, anotat pero NO esborrat per no editar el servei gran amb 240 fitxers sense commit). tsc EXIT 0. 0 candidates [param] mortes restants. Counter->1084. SENSE commit (el faig despres).
 Avis per l'altre agent: capa de rutes API completada (estatiques #1071 + 2 dinamiques #1084). Deute anotat: createDossierFromBolo orfe dins dossierService (poda futura amb verificacio).
 
-[codex] 2026-06-23 [ESTAT: tancat — /admin control room alineat amb TANCAT CHARLIE #1099]
-Últim canvi: #1099 (codex) — portada `/admin` ajustada contra el canon visual de `/admin/leads` TANCAT CHARLIE.
-Proper pas previst: cap dins aquest perímetre; si es continua, que sigui una revisió visual del propietari o una altra pantalla concreta.
-Avís per l'altre agent: només s'ha tocat `app/admin/control-room.css` i documentació/counter. No he tocat leads, inbox, booking-detail, transformador CSS, serveis, schema ni normes/protocols.
+[codex] 2026-06-24 [ESTAT: tancat — fitxa forense Client 360 abans del P1 Timeline #1114]
+Últim canvi: #1114 (codex) — `/admin/clientes/[id]` ja té fitxa forense `FETA` a `docs/admin-fitxes-pantalles.md`; queda documentat `fetchCustomerHub` com a lectura compartida page/API i `TimelinePanel` com a proper P1 visual executable.
+Proper pas previst: si es continua, sanejar `TimelinePanel.tsx` P1/P2 cap a classes/tokens canònics sense tocar DTOs, Prisma, rutes mutadores, privacitat ni accions de negoci.
+Avís per l'altre agent: perímetre #1114 només documental/forense. Claude té #1111 Cuadrant/Repartiment; no he tocat `app/admin/cuadrant/**` ni `/repartiment`.
+
+[codex] 2026-06-24 [ESTAT: tancat — InsightsBanner Client 360 canònic #1117]
+Últim canvi: #1117 (codex) — `InsightsBanner` ja no emet `bg-white/*`, `text-white/*`, `border-white/*`, `bg-[var(...)]` ni `admin-tone-*`; les targetes passen a `ch__insight-*` dins `customer-hub.css`.
+Proper pas previst: si es continua dins Clients, atacar un P2 intern acotat (`BookingsPanel`, `PrivacyPanel`, `DiscountsPanel` o `SummaryPanel`) sense tocar `fetchCustomerHub`, DTOs, Prisma, rutes mutadores ni privacitat.
+Avís per l'altre agent: perímetre #1117 limitat a `InsightsBanner.tsx`, `customer-hub.css`, `lib/constants/admin.ts` i docs/audit/protocol. No he tocat Cuadrant/Repartiment ni serveis Customer Hub.
+
+[codex] 2026-06-24 [ESTAT: tancat — BookingsPanel Client 360 canònic #1118]
+Últim canvi: #1118 (codex) — `BookingsPanel` ja no emet `border-white/*`, `bg-white/*`, `text-white/*`, `bg-emerald-*` ni `bg-amber-*`; cards, status, pills i links passen a `ch__booking-*`/`ch__bookings-*` dins `customer-hub.css`.
+Proper pas previst: si es continua dins Clients, atacar un P2 intern acotat (`PrivacyPanel`, `DiscountsPanel` o `SummaryPanel`) sense tocar `fetchCustomerHub`, DTOs, Prisma, rutes mutadores ni privacitat.
+Avís per l'altre agent: perímetre #1118 limitat a `BookingsPanel.tsx`, `customer-hub.css`, `lib/constants/admin.ts` i docs/audit/protocol. No he tocat Cuadrant/Repartiment ni serveis Customer Hub.
+
+[codex] 2026-06-24 [ESTAT: tancat — PrivacyPanel Client 360 canònic #1119]
+Últim canvi: #1119 (codex) — `PrivacyPanel` ja no emet `admin-card-glass`, `bg-white/*`, `text-white/*`, `border-white/*`, `opacity-*` ni `rounded-2xl`; consentiments, export RGPD i ARCO passen a `ch__privacy-*` dins `customer-hub.css`.
+Proper pas previst: si es continua dins Clients, atacar un P2 intern acotat (`DiscountsPanel` o `SummaryPanel`) sense tocar `fetchCustomerHub`, DTOs, Prisma, rutes mutadores ni privacitat.
+Avís per l'altre agent: perímetre #1119 limitat a `PrivacyPanel.tsx`, `customer-hub.css`, `lib/constants/admin.ts` i docs/audit/protocol. No he tocat endpoints de privacitat, export, Cuadrant/Repartiment ni serveis Customer Hub.
+
+[codex] 2026-06-24 [ESTAT: tancat — DiscountsPanel Client 360 canònic #1120]
+Últim canvi: #1120 (codex) — `DiscountsPanel` ja no emet `border-white/*`, `bg-white/*`, `text-white/*`, `admin-tone-*`, `bg-amber-*` ni `bg-emerald-*`; codis, status i metadata passen a `ch__discount-*` dins `customer-hub.css`.
+Proper pas previst: si es continua dins Clients, atacar `SummaryPanel` per franges petites sense tocar `fetchCustomerHub`, DTOs, Prisma, rutes mutadores ni privacitat.
+Avís per l'altre agent: perímetre #1120 limitat a `DiscountsPanel.tsx`, `customer-hub.css`, `lib/constants/admin.ts` i docs/audit/protocol. No he tocat codis de descompte, pricing, rutes, Cuadrant/Repartiment ni serveis Customer Hub.
+
+[codex] 2026-06-24 [ESTAT: tancat — SummaryPanel Client 360 residus white #1121]
+Últim canvi: #1121 (codex) — `SummaryPanel` ja no emet `bg-white/*`, `border-white/*`, `text-white/*`, `hover:bg-white/*`, `hover:text-white/*` ni `placeholder:text-white/*`; barra financera, quick actions, ruta, referits i tags passen a `ch__summary-*` dins `customer-hub.css`.
+Proper pas previst: si es continua dins Clients, revisar `LeadsPanel` o `ProposalsPanel` per franges petites sense tocar `fetchCustomerHub`, DTOs, Prisma, rutes mutadores ni privacitat.
+Avís per l'altre agent: perímetre #1121 limitat a `SummaryPanel.tsx`, `customer-hub.css`, `lib/constants/admin.ts` i docs/audit/protocol. No he tocat dades Customer Hub, accions, CSRF, tags, càlculs, Cuadrant/Repartiment ni serveis.
+
+[codex] 2026-06-24 [ESTAT: tancat — TimelinePanel Client 360 canònic #1116]
+Últim canvi: #1116 (codex) — `TimelinePanel` ja no emet `bg-white/*`, `text-white/*` ni `border-l-*`; els filtres/cards/tons passen a `ch__timeline-*` dins `customer-hub.css`, i `CUSTOMER_TIMELINE_EVENT_META` exposa `toneClass`.
+Proper pas previst: si es continua dins Clients, atacar un P2 intern acotat (`InsightsBanner`, `BookingsPanel` o `PrivacyPanel`) sense tocar `fetchCustomerHub`, DTOs, Prisma, rutes mutadores ni privacitat.
+Avís per l'altre agent: perímetre #1116 limitat a `TimelinePanel.tsx`, `customer-hub.css`, `lib/constants/admin.ts` i docs/audit/protocol. No he tocat Cuadrant/Repartiment ni serveis Customer Hub.
 
 [codex] 2026-06-22 [ESTAT: tancat — sanejament CSRF admin portfolio events #1082]
 `POST/PATCH/DELETE /api/admin/portfolio/events` ja validen `verifyCsrf(req)` després d'auth i abans de body/query/servei. Baseline `qa:api-admin-csrf` baixa de 69 a 66. Test focalitzat nou 8/8, guard CSRF, `qa:protocol`, `tsc` i `validate:core` OK. SENSE commit.
@@ -660,6 +744,36 @@ Avís per codex: #826 (ingesta 🤝 + hora fi). #827 (animació: nova categoria 
 ## Bloc CODEX (Codex CLI)
 
 <!-- codex: actualitza aquest bloc quan comencis/acabis una sessió -->
+[codex] 2026-06-25 [ESTAT: treballant — booking detail marge/total canònic #1143]
+Últim canvi: #1142 tancat per Codex; obro el Top 1 actual de l'auditoria.
+Proper pas previst: moure `style` inline de `BookingTotalEditor.tsx` i tipografia ad-hoc de `BookingMarginCard.tsx` a classes locals de `booking-detail.css`; no tocar càlculs, `fetchWithCsrf`, costEngine ni persistència.
+Avís per l'altre agent: perímetre exclusiu `app/admin/bookings/[id]/BookingMarginCard.tsx`, `BookingTotalEditor.tsx`, `booking-detail.css` i docs/counter.
+
+[codex] 2026-06-25 [ESTAT: tancat — bookings/page contenidors canònics #1142]
+Últim canvi: #1142 tancat per Codex; contenidors inline i `admin-card-glass` de l'empty/mobile cards de `app/admin/bookings/page.tsx` passen a `bk-*`, counter 1142.
+Proper pas previst: Top 3 actual de l'auditoria: `BookingMarginCard.tsx` + `BookingTotalEditor.tsx` (P2), després panels de leads i pipeline/questionnaire. Confirmar counter/sync abans d'obrir #1143.
+Avís per l'altre agent: perímetre #1142 limitat a `/admin/bookings` llista i CSS `bk-*`; no s'han tocat serveis, Prisma, càlculs ni `BookingPipelineView`. Validat amb escaneig focalitzat, `npx tsc --noEmit --pretty false`, `qa:protocol`, `validate:core` i `git diff --check` (sense errors; avisos de line endings a `.gitignore`, `public/manifest.json` i `ClientesModals.tsx`).
+
+[codex] 2026-06-25 [ESTAT: tancat — ClientesModals overlays canònics #1141]
+Últim canvi: #1141 tancat per Codex; overlays `bg-black/60 admin-card-glass` i fallback `bg-white/5 text-white/40` passen a `cl__modal-backdrop`/`cl__duplicate-score-low`, counter 1141.
+Proper pas previst: si continua sanejament, Top 3 actual ja surt de Clients cap a `bookings/page.tsx`; confirmar counter/sync abans d'obrir #1142.
+Avís per l'altre agent: perímetre #1141 limitat a `ClientesModals.tsx`, `clientes.css` i docs/counter. Validat amb `npx tsc --noEmit --pretty false`, `qa:protocol`, `validate:core`, escaneig focalitzat i `git diff --check` (sense errors; avisos de line endings a `.gitignore`, `public/manifest.json` i `ClientesModals.tsx`).
+
+[codex] 2026-06-25 [ESTAT: tancat — ReferralsClient visual local #1140]
+Últim canvi: #1140 tancat per Codex; `ReferralsClient` drena KPIs, top referrers, filtres, candidats, missatge suggerit i accions cap a `rf__*` + `referrals.css`, counter 1140.
+Proper pas previst: si continua el sanejament de Clients, següent front segur és llista/modals (`clientes/page.tsx`, `ClientesModals.tsx`) o saltar a Top 3 actual de l'auditoria; no barrejar amb serveis.
+Avís per l'altre agent: perímetre #1140 limitat a `/admin/clientes/referrals` + docs/counter. Validat amb `npx tsc --noEmit --pretty false`, `qa:protocol`, `validate:core`, escaneig focalitzat i `git diff --check` (només avisos aliens de line endings a `.gitignore`/`public/manifest.json`).
+
+[codex] 2026-06-25 [ESTAT: tancat — ReactivationClient visual local #1139]
+Últim canvi: #1139 tancat per Codex; `ReactivationClient` drena KPIs, cards, pills, missatge suggerit i accions cap a `rc__*` + `reactivation.css`, counter 1139.
+Proper pas previst: si continua Clients satèl·lit, el front equivalent pendent és `app/admin/clientes/referrals/ReferralsClient.tsx`; no barrejar amb Customer Hub ni serveis.
+Avís per l'altre agent: perímetre #1139 limitat a `/admin/clientes/reactivation` + docs/counter. Validat amb `npx tsc --noEmit --pretty false`, `qa:protocol`, `validate:core`, escaneig focalitzat i `git diff --check` (només avisos aliens de line endings a `.gitignore`/`public/manifest.json`).
+
+[codex] 2026-06-25 [ESTAT: tancat — CTAs satèl·lit Clients canònics #1137]
+Últim canvi: #1137 tancat per Codex; els CTAs `Tornar al CRM` de `/admin/clientes/reactivation` i `/admin/clientes/referrals` passen a `ap-btn ap-btn--xs`, `ADMIN_CHANGE_COUNTER=1137`, `qa:protocol` i `validate:core` verds.
+Proper pas previst: amb `go/seguim` actiu, següent tall segur dins Clients satèl·lit seria drenar per franges `ReactivationClient` o `ReferralsClient`; no barrejar-los amb serveis ni Customer Hub.
+Avís per l'altre agent: perímetre #1137 limitat a `reactivation/page.tsx`, `referrals/page.tsx`, audit/docs/counter; no he tocat serveis de reactivació/referrals, DTOs, Customer Hub, bookings, nav ni guard #1135.
+
 [codex] 2026-06-14 [ESTAT: tancat — dossiers zenit text rebut/extracció (#951)]
 Últim canvi: #951 (comptador 950→951).
 Proper pas previst: repassada visual del propietari a `/admin/dossiers`; si es vol més zenit, següent tall natural = detectar serveis del text rebut i preseleccionar productes del bolo, reusant catàleg existent.

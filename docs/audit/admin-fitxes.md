@@ -18,29 +18,18 @@ El blau/negre residual viu en **components compartits de llista i panells**, no 
 | fitxer:línia | eix | descripció | sev |
 |---|---|---|---|
 | bookings/[id]/ClientPortalAccessPanel.tsx:39,197 | 0-HARDCODED | `#06b6d4` (default + placeholder de l'accent del portal); hauria de venir de config/token de marca del portal | P3 |
-| clientes/ClientesModals.tsx:143,381 | CANÒNIC | `bg-black/60 admin-card-glass` a l'overlay del modal — negre absolut + classe glass legacy | P2 |
-| clientes/ClientesModals.tsx:179 | CANÒNIC | `bg-white/5 text-white/40` ad-hoc en comptes de `--panel`/`--t3` | P2 |
-| clientes/[id]/_components/TimelinePanel.tsx:197 | CANÒNIC | `bg-white text-black` — blanc/negre absolut PROHIBIT | P1 |
-| clientes/[id]/_components/TimelinePanel.tsx:198,262 | MONOCAPA | `bg-white/5 text-white/40 / bg-white/[0.03]` ad-hoc → `--panel`/`--sunk` | P2 |
-| clientes/[id]/_components/TimelinePanel.tsx | CANÒNIC | 6 colors Tailwind semàntics (`emerald/amber/...`) → `admin-tone-*` | P2 |
-| clientes/[id]/_components/InsightsBanner.tsx:12,19,25,67,92 | MONOCAPA | barreja `admin-tone-*` correctes amb fallbacks `bg-white/[0.03]`/`text-white/60` ad-hoc | P2 |
-| clientes/[id]/_components/panels/BookingsPanel.tsx:11,27,74 | MONOCAPA | `border-white/10 bg-white/5 text-white/60` + `bg-emerald-500/15`/`bg-amber-500/20` ad-hoc → tones | P2 |
-| clientes/[id]/_components/panels/SummaryPanel.tsx:480,892-896 | MONOCAPA | `bg-white/10` (barra) + map de tones amb `border-white/15 text-white/60 hover:bg-white/5` | P2 |
-| clientes/[id]/_components/panels/DiscountsPanel.tsx:6 | MONOCAPA | map local `border-white/10 bg-white/5 text-white/40` + colors Tailwind → tones | P2 |
-| clientes/[id]/_components/panels/PrivacyPanel.tsx:59,98,135,160 | CANÒNIC | `admin-card-glass` legacy en 4 cards en comptes de `.ap-card` | P2 |
-| clientes/[id]/_components/panels/LeadsPanel.tsx | CANÒNIC | colors Tailwind semàntics → `admin-tone-*` | P2 |
-| clientes/[id]/_components/panels/ProposalsPanel.tsx | MONOCAPA | superfície `white/[...]` ad-hoc → `--panel` | P3 |
-| clientes/reactivation/ReactivationClient.tsx:14,76,86,95,113,178,206-219 | MONOCAPA | pervasiu `border-white/10 bg-white/[0.03]`, `bg-black/20`, `bg-white/5` ad-hoc → `--panel`/`--sunk`/`--line` | P2 |
-| clientes/referrals/ReferralsClient.tsx:14,56-255 | MONOCAPA | mateix patró pervasiu `white/[...]` + `bg-black/20`; map local de tones | P2 |
-| clientes/reactivation/page.tsx:22 · referrals/page.tsx:22 | MONOCAPA | botó `border-white/15 bg-white/5` ad-hoc → `.ap-btn` | P3 |
+| clientes/ClientesModals.tsx:143,381 | CANÒNIC | Resolt al #1141: overlays `bg-black/60 admin-card-glass` substituïts per `cl__modal-backdrop` tokenitzat a `clientes.css` | OK |
+| clientes/ClientesModals.tsx:179 | CANÒNIC | Resolt al #1141: fallback `bg-white/5 text-white/40` substituït per `cl__duplicate-score-low` tokenitzat | OK |
+| clientes/reactivation/ReactivationClient.tsx:14,76,86,95,113,178,206-219 | MONOCAPA | Resolt al #1139: KPIs, cards, pills, missatge suggerit i accions passen a gramàtica local `rc__*` + `reactivation.css` escopat a `html.admin-mode` | OK |
+| clientes/referrals/ReferralsClient.tsx:14,56-255 | MONOCAPA | Resolt al #1140: KPIs, top referrers, filtres, candidats, missatge suggerit i accions passen a gramàtica local `rf__*` + `referrals.css` escopat a `html.admin-mode` | OK |
+| clientes/reactivation/page.tsx:22 · referrals/page.tsx:22 | MONOCAPA | Resolt al #1137: botó `border-white/15 bg-white/5` ad-hoc substituït per `.ap-btn ap-btn--xs` | OK |
 | clientes/page.tsx:350 · CustomersPageSections.tsx:226,310 | RESPONSIU | `style={{marginTop:10}}`/`{marginLeft:6}` px inline → token/classe | P3 |
-| clientes/[id]/_components/CustomerHeader.tsx:234,425 | MONOCAPA | `style` inline (`inset/zIndex`, `display:contents`) — wiring, acceptable però fora de CSS | P3 |
-| bookings/[id]/StripePaymentPanel.tsx:56,73,79,219-343 | MONOCAPA | bloc gros de `style={{background/color/border}}` amb `color-mix(--at-*)` + `text-[var(--at-*)]` ad-hoc; duplica el que farien `.admin-tone-*`/`.ap-*`; usa capa legacy `--at-*` no canònica | P1 |
+| clientes/[id]/_components/CustomerHeader.tsx:234,425 | MONOCAPA | Resolt al #1136: `style` inline (`inset/zIndex`, `display:contents`) mogut a `ch__statusbackdrop` i `ch__stageitem` a `customer-hub.css` | OK |
 | bookings/[id]/BookingTotalEditor.tsx:59-119 | MONOCAPA+RESPONSIU | inputs i alertes amb `style` inline (tokens `--panel`/`--gold`/`--o-danger`) + px durs (`width:100`,`borderRadius:4`,`fontSize:10`) → classes CSS | P2 |
 | bookings/[id]/BookingMarginCard.tsx:222,248,357 | CANÒNIC | `text-2xl/xl/base font-black` — display pesat fora de tokens tipogràfics | P2 |
 | bookings/[id]/BookingMarginCard.tsx:215,223 | RESPONSIU | `text-[11px]` font-px ad-hoc → token | P3 |
-| bookings/page.tsx:304,310,340,363 | MONOCAPA+RESPONSIU | `style` de layout amb px durs (`maxWidth:1220`,`padding:'8px 20px'`,`gap:8`) duplicant la container; → classe/`--o-*` | P2 |
-| bookings/page.tsx:366,383 | CANÒNIC | `admin-card-glass` legacy a empty-state i cards de llista → `.ap-card` | P2 |
+| bookings/page.tsx:304,310,340,363 | MONOCAPA+RESPONSIU | Resolt al #1142: contenidors `style={{...}}` moguts a `bk-detail-bar-row`, `bk-detail-bar-actions`, `bk-list-shell` i `bk-list-shell--top` | OK |
+| bookings/page.tsx:366,383 | CANÒNIC | Resolt al #1142: empty-state i cards mòbil passen de `admin-card-glass` a `ap-card bk-empty-state` / `ap-card bk-mobile-card` | OK |
 | bookings/page.tsx:393-546 | RESPONSIU | múltiples `text-[10px]`/`text-[9px]` font-px ad-hoc a la taula → tokens | P3 |
 | bookings/BookingPipelineView.tsx:182,267,283 | CANÒNIC | `bg-black/15 dark:bg-white/20` + `hover:bg-black/20` — negre/blanc ad-hoc | P2 |
 | bookings/BookingPipelineView.tsx:154-312 | RESPONSIU | `text-[10px]`/`text-[11px]` repetits → tokens | P3 |
@@ -70,19 +59,18 @@ El blau/negre residual viu en **components compartits de llista i panells**, no 
 - **Fitxers amb troballes**: 35 aprox. (la resta — incloent-hi les fitxes canòniques de lead i la
   capçalera de la fitxa de reserva, els `loading.tsx`/`error.tsx` i la majoria de seccions `nb__*` /
   `bd__*` — netes).
-- **Troballes totals**: ~45 entrades de taula.
+- **Troballes totals**: ~34 entrades de taula.
+- **Actualització Client 360**: després dels canvis #1116-#1121, #1126, #1128, #1130, #1131, #1134, #1136, #1139, #1140 i #1141, els panells dinàmics principals del Customer Hub ja tenen drenatge visual documentat, els inline styles de `CustomerHeader` queden fora, `/admin/clientes/reactivation` + `/admin/clientes/referrals` ja no emeten superfícies visuals ad hoc i `ClientesModals` ja no conserva overlay/glass legacy; el residu restant d'aquest òrgan és llista i validació visual, no de panells principals.
 
 ### Per severitat
 
 - **P0**: 0 (cap ruta sense auth, cap hex de superfície carbó trencat, cap negre absolut a la fitxa de reserva corregida).
-- **P1**: 2 — `StripePaymentPanel.tsx` (bloc gros de `style` inline cromàtic sobre capa legacy `--at-*`) · `TimelinePanel.tsx:197` (`bg-white text-black` absolut).
-- **P2**: ~22 — superfícies `bg-white/[0.03]` / `border-white/10` ad-hoc en comptes de `--panel`/`--line` (clientes reactivation/referrals/panells, leads CustomerLinkPanel), `admin-card-glass` legacy (PrivacyPanel, bookings/page, LeadDossiersPanel, ClientesModals), `text-cyan-*` blau, `text-2xl font-black` (BookingMarginCard), inline-px de layout a bookings/page i BookingTotalEditor.
-- **P3**: ~21 — font-px ad-hoc (`text-[10px]`/`text-[11px]`/`text-[9px]`), `style` de marges/amplades px puntuals, `#06b6d4` default del portal, `bg-black/20` previews.
+- **P1**: 0 — `StripePaymentPanel.tsx` resolt al Canvi #1113 i `TimelinePanel.tsx` resolt al Canvi #1116.
+- **P2**: ~8 — superfícies `bg-white/[0.03]` / `border-white/10` ad-hoc en comptes de `--panel`/`--line` (leads CustomerLinkPanel), `admin-card-glass` legacy (LeadDossiersPanel), `text-cyan-*` blau, `text-2xl font-black` (BookingMarginCard), inline-px de layout a BookingTotalEditor.
+- **P3**: ~20 — font-px ad-hoc (`text-[10px]`/`text-[11px]`/`text-[9px]`), `style` de marges/amplades px puntuals, `#06b6d4` default del portal, `bg-black/20` previews.
 
-## Top 5
+## Top 3
 
-1. **bookings/[id]/StripePaymentPanel.tsx (P1)** — bloc gran de `style={{background/color/border}}` amb `color-mix(--at-*)` + `text-[var(--at-*)]`: lògica cromàtica inline sobre capa legacy, ha de passar a `.admin-tone-*`/`.ap-*`.
-2. **clientes/[id]/_components/TimelinePanel.tsx:197 (P1)** — `bg-white text-black`: blanc i negre absoluts prohibits; cal token de superfície + `--t`.
-3. **clientes/reactivation/ReactivationClient.tsx + referrals/ReferralsClient.tsx (P2)** — patró pervasiu `border-white/10 bg-white/[0.03]` + `bg-black/20` + maps locals de tones; refer sobre `--panel`/`--sunk`/`--line` i `admin-tone-*`.
-4. **bookings/page.tsx (P2)** — `admin-card-glass` legacy a cards de llista + `style` de layout amb px durs (`maxWidth:1220`, `padding:'8px 20px'`) duplicant la container; → `.ap-card` i classe de container amb tokens.
-5. **bookings/[id]/BookingMarginCard.tsx + BookingTotalEditor.tsx (P2)** — `text-2xl/xl font-black` fora de tokens tipogràfics i `style` inline amb px durs (`width:100`, `fontSize:10`) que haurien de ser classes CSS.
+1. **bookings/[id]/BookingMarginCard.tsx + BookingTotalEditor.tsx (P2)** — `text-2xl/xl font-black` fora de tokens tipogràfics i `style` inline amb px durs (`width:100`, `fontSize:10`) que haurien de ser classes CSS.
+2. **leads CustomerLinkPanel + LeadDossiersPanel (P2)** — superfícies legacy (`admin-card-glass`, `white/*`) que han de baixar a tokens i classes locals.
+3. **bookings/BookingPipelineView.tsx + bookings/[id]/BookingQuestionnaireSection.tsx (P2)** — negre/blanc ad hoc i `text-cyan-*` dins superfícies operatives; baixar a tokens/classes locals.

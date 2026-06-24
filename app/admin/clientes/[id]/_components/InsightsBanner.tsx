@@ -5,25 +5,25 @@ import type { CustomerCommSummaryDTO, CustomerInsightsDTO } from '@/lib/customer
 import { buildCustomerNextActionLink } from '@/lib/customer-hub/nextActionLink';
 import { formatCurrency } from '@/lib/constants';
 
-const HEALTH_CONFIG: Record<CustomerInsightsDTO['relationalHealth'], { label: string; color: string; bg: string }> = {
-  EXCELLENT: { label: 'Excel·lent', color: 'admin-tone-text-success', bg: 'admin-tone-bg-success admin-tone-border-success' },
-  GOOD: { label: 'Bona', color: 'admin-tone-text-cyan', bg: 'admin-tone-bg-cyan admin-tone-border-cyan' },
-  AT_RISK: { label: 'En risc', color: 'admin-tone-text-warning', bg: 'admin-tone-bg-warning admin-tone-border-warning' },
-  COLD: { label: 'Fred', color: 'text-white/60', bg: 'bg-[var(--o-admin-fill-4)] border-white/15' },
-  LOST: { label: 'Perdut', color: 'admin-tone-text-danger', bg: 'admin-tone-bg-danger admin-tone-border-danger' },
+const HEALTH_CONFIG: Record<CustomerInsightsDTO['relationalHealth'], { label: string; toneClass: string }> = {
+  EXCELLENT: { label: 'Excel·lent', toneClass: 'ch__insight-card--success' },
+  GOOD: { label: 'Bona', toneClass: 'ch__insight-card--info' },
+  AT_RISK: { label: 'En risc', toneClass: 'ch__insight-card--warning' },
+  COLD: { label: 'Fred', toneClass: 'ch__insight-card--cold' },
+  LOST: { label: 'Perdut', toneClass: 'ch__insight-card--danger' },
 };
 
 const URGENCY_COLOR: Record<string, string> = {
-  HIGH: 'admin-tone-border-danger admin-tone-bg-danger',
-  MEDIUM: 'admin-tone-border-warning admin-tone-bg-warning',
-  LOW: 'border-[var(--line)] bg-[var(--panel)]',
+  HIGH: 'ch__insight-card--danger',
+  MEDIUM: 'ch__insight-card--warning',
+  LOW: 'ch__insight-card--neutral',
 };
 
 const COMMERCIAL_RISK_COLOR: Record<string, string> = {
-  HIGH: 'admin-tone-text-danger',
-  MEDIUM: 'admin-tone-text-warning',
-  LOW: 'text-white/60',
-  NONE: 'admin-tone-text-success',
+  HIGH: 'ch__insight-text--danger',
+  MEDIUM: 'ch__insight-text--warning',
+  LOW: 'ch__insight-text--muted',
+  NONE: 'ch__insight-text--success',
 };
 
 export default function InsightsBanner({
@@ -51,20 +51,20 @@ export default function InsightsBanner({
   });
 
   return (
-    <div className="grid gap-2 sm:grid-cols-3">
+    <div className="ch__insights-grid">
       {/* Next Action — from insights engine */}
-      <div className={`rounded-xl border p-3 ${urgencyBorder}`}>
-        <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Acció recomanada</p>
-        <p className="mt-1 text-sm font-semibold">{insights.nextAction.label}</p>
+      <div className={`ch__insight-card ${urgencyBorder}`}>
+        <p className="ch__insight-label">Acció recomanada</p>
+        <p className="ch__insight-title ch__insight-title--sm">{insights.nextAction.label}</p>
         {insights.nextAction.context && (
-          <p className="mt-0.5 text-xs opacity-70">{insights.nextAction.context}</p>
+          <p className="ch__insight-context">{insights.nextAction.context}</p>
         )}
         {nextActionLink && (
           <Link
             href={nextActionLink.href}
             target={nextActionLink.external ? '_blank' : undefined}
             rel={nextActionLink.external ? 'noopener noreferrer' : undefined}
-            className="mt-2 inline-flex rounded-lg border px-2.5 py-1 text-xs font-semibold hover:bg-white/10 transition-colors"
+            className="ch__insight-link"
           >
             {nextActionLink.label}
           </Link>
@@ -72,16 +72,16 @@ export default function InsightsBanner({
       </div>
 
       {/* Relational Health */}
-      <div className={`rounded-xl border p-3 ${health.bg}`}>
-        <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Salut relacional</p>
-        <p className={`mt-1 text-lg font-bold ${health.color}`}>{health.label}</p>
-        <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs opacity-70">
+      <div className={`ch__insight-card ${health.toneClass}`}>
+        <p className="ch__insight-label">Salut relacional</p>
+        <p className="ch__insight-title">{health.label}</p>
+        <div className="ch__insight-meta">
           {insights.completedEvents > 0 && <span>{insights.completedEvents} events</span>}
           {insights.recurrence > 1 && <span>Recurrent ({insights.recurrence}x)</span>}
           {insights.daysSinceLastContact != null && <span>Últim contacte fa {insights.daysSinceLastContact}d</span>}
         </div>
         {insights.commercialRisk.level !== 'NONE' && (
-          <p className={`mt-2 text-xs ${commercialRiskColor}`}>
+          <p className={`ch__insight-risk ${commercialRiskColor}`}>
             {insights.commercialRisk.label}
             {insights.commercialRisk.context ? ` · ${insights.commercialRisk.context}` : ''}
           </p>
@@ -89,12 +89,12 @@ export default function InsightsBanner({
       </div>
 
       {/* Value summary */}
-      <div className="ap-card p-3">
-        <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Valor del client</p>
-        <p className="mt-1 text-lg font-bold">{formatCurrency(insights.ltv)}</p>
-        <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs opacity-70">
+      <div className="ch__insight-card ch__insight-card--neutral">
+        <p className="ch__insight-label">Valor del client</p>
+        <p className="ch__insight-title">{formatCurrency(insights.ltv)}</p>
+        <div className="ch__insight-meta">
           {insights.pendingPaymentTotal > 0 && (
-            <span className="admin-tone-text-warning">Pendent: {formatCurrency(insights.pendingPaymentTotal)}</span>
+            <span className="ch__insight-text--warning">Pendent: {formatCurrency(insights.pendingPaymentTotal)}</span>
           )}
           {insights.openTasksCount > 0 && <span>{insights.openTasksCount} tasques obertes</span>}
           {insights.daysUntilNextEvent != null && insights.daysUntilNextEvent >= 0 && (

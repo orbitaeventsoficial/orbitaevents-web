@@ -99,7 +99,7 @@ ${content}
 </td></tr>
 <tr><td style="padding:24px 32px;border-top:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);">
 <div style="font-size:13px;color:rgba(255,255,255,0.5);">Gràcies per confiar en nosaltres.</div>
-<div style="margin-top:8px;font-size:12px;color:rgba(255,255,255,0.3);">📞 ${SITE_CONFIG.business.phoneDisplay} · ✉ ${SITE_CONFIG.business.email} · 🌐 orbitaevents.com</div>
+<div style="margin-top:8px;font-size:12px;color:rgba(255,255,255,0.3);">📞 ${SITE_CONFIG.business.phoneDisplay} · ✉ ${SITE_CONFIG.business.email} · 🌐 ${SITE_CONFIG.web.domain}</div>
 <div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.2);">© ${new Date().getFullYear()} ${SITE_CONFIG.business.name} · ${SITE_CONFIG.business.address.city}, ${SITE_CONFIG.business.address.region}</div>
 </td></tr>
 </table>

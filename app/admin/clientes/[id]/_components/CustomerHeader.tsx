@@ -231,7 +231,7 @@ export default function CustomerHeader({
 
                   {menuOpen && (
                     <>
-                      <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={() => setMenuOpen(false)} />
+                      <div className="ch__statusbackdrop" onClick={() => setMenuOpen(false)} />
                       <div className="ch__statusmenu">
                         {CUSTOMER_HUB_STAGE_ORDER.map((s) => {
                           const isActive = s === status;
@@ -422,7 +422,7 @@ export default function CustomerHeader({
                 else if (isDone) stageClass += ' ch__stage--done';
                 else if (isLost) stageClass += ' ch__stage--lost';
                 return (
-                  <div key={stage} style={{ display: 'contents' }}>
+                  <div key={stage} className="ch__stageitem">
                     {idx > 0 && (
                       <div className={`ch__stagepipe${isDone ? ' ch__stagepipe--done' : ''}`} />
                     )}

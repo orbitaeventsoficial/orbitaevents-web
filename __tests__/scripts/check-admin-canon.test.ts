@@ -49,4 +49,21 @@ describe('check-admin-canon', () => {
     });
     expect(r.status).toBe(0);
   });
+
+  it('FALLA amb botó-void en CONST string (no només className literal) (#1133)', () => {
+    const r = runGuard({
+      'app/admin/x/Panel.tsx':
+        "const PRIMARY_BUTTON = 'rounded-xl px-4 py-2 text-sm font-medium text-white shadow-lg';\nexport function P(){ return <button className={PRIMARY_BUTTON}>x</button>; }",
+    });
+    expect(r.status).not.toBe(0);
+    expect(r.stdout + r.stderr).toMatch(/void|P1/i);
+  });
+
+  it('PASSA amb className template interpolat on el fons ve d\'una variant (${styles.button})', () => {
+    const r = runGuard({
+      'app/admin/x/Dialog.tsx':
+        '<button className={`rounded-xl px-4 py-2 text-white ${styles.button}`}>x</button>',
+    });
+    expect(r.status).toBe(0);
+  });
 });

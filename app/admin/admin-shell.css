@@ -673,11 +673,11 @@ html.admin-mode .ap-detail-kicker {
 html.admin-mode .ap-detail-title {
   margin: 0;
   font-family: var(--display);
-  font-size: 32px;
-  font-weight: 800;
-  letter-spacing: -0.022em;
-  line-height: 1.05;
-  color: rgba(255,255,255,0.88);
+  font-size: var(--o-text-2xl);
+  font-weight: var(--o-fw-xbold);
+  letter-spacing: -0.018em;
+  line-height: 1;
+  color: var(--t);
 }
 
 html.admin-mode .ap-detail-meta {

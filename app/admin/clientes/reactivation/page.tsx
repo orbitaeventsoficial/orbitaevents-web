@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { AdminPage } from '../../components/AdminPage';
 import { loadReactivationCandidates } from '@/lib/services/reactivationService';
 import ReactivationClient from './ReactivationClient';
+import './reactivation.css';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +20,7 @@ export default async function ReactivationPage() {
       actions={
         <Link
           href="/admin/clientes"
-          className="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"
+          className="ap-btn ap-btn--xs"
         >
           ← Tornar al CRM
         </Link>

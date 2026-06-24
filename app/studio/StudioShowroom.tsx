@@ -20,6 +20,7 @@ import { useState, type ReactNode } from 'react';
 import { CLIENT_LOGOS } from '@/config/client-logos';
 import { EXTRAS, INVENTARIO, getAllPacks, type PackDefinition, type ServiceSlug } from '@/config/packs-config';
 import { PORTFOLIO_CATEGORIES } from '@/config/portfolio-images';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import { PDF_DOCUMENT_CATALOG, type PdfDocumentId } from '@/lib/constants/pdfDocuments';
 import { ORBITA_LOGO_LOCKUP_LIGHT_BASE64 } from '@/lib/logo-lockup-light-base64';
 import './orbita-tokens.css';
@@ -968,7 +969,7 @@ export default function StudioShowroom() {
                     <strong>Catàleg Animació filtrat</strong>
                     <p>Packs, condicions, extres i imports viuen aquí, després del dossier bonic.</p>
                   </div>
-                  <div className="o-dossier-cta"><span>Per confirmar disponibilitat o per a qualsevol dubte</span><strong>+34 699 12 10 23 · info@orbitaevents.com</strong></div>
+                  <div className="o-dossier-cta"><span>Per confirmar disponibilitat o per a qualsevol dubte</span><strong>{SITE_CONFIG.business.phoneDisplay} · {SITE_CONFIG.business.email}</strong></div>
                 </div>
               )}
             </div>

@@ -8,10 +8,14 @@ import { buildLeadContinuity } from '@/lib/customer-hub/leadContinuity';
 import { getTopCustomerHubLead, sortCustomerHubLeads } from '@/lib/customer-hub/topLead';
 
 const BLOCKER_TONE_CLASS: Record<'DANGER' | 'WARNING' | 'INFO', string> = {
-  DANGER: 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger',
-  WARNING: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
-  INFO: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
+  DANGER: 'ch__lead-blocker--danger',
+  WARNING: 'ch__lead-blocker--warning',
+  INFO: 'ch__lead-blocker--info',
 };
+
+function toneKey(value: string) {
+  return value.toLowerCase().replace(/_/g, '-');
+}
 
 export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
   const leads = sortCustomerHubLeads(data.leads);
@@ -20,33 +24,33 @@ export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
   const topLeadContinuity = topLead ? buildLeadContinuity(topLead, data.customer.id) : null;
 
   return (
-    <section className="rounded-2xl border p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.leads.root)}>
-      <div className="flex items-center justify-between gap-3">
+    <section className="ch__leads-panel" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.leads.root)}>
+      <div className="ch__leads-head">
         <div>
-          <h2 className="text-lg font-semibold">Entrades vinculades</h2>
-          <p className="text-sm">Historial d&apos;oportunitats comercials d&apos;aquest client.</p>
+          <h2 className="ch__leads-title">Entrades vinculades</h2>
+          <p className="ch__leads-summary">Historial d&apos;oportunitats comercials d&apos;aquest client.</p>
         </div>
       </div>
       {topLead && (
-        <div className="mt-4 rounded-xl border p-3">
-          <p className="text-xs uppercase tracking-wider opacity-60">Lead prioritària</p>
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-            <span className="font-semibold">{topLead.name}</span>
-            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getLeadStatusDisplay(topLead.status).bg} ${getLeadStatusDisplay(topLead.status).text}`}>
+        <div className="ch__lead-priority-card">
+          <p className="ch__lead-label">Lead prioritària</p>
+          <div className="ch__lead-badges">
+            <span className="ch__lead-name">{topLead.name}</span>
+            <span className="ch__lead-badge" data-status={toneKey(topLead.status)}>
               {getLeadStatusDisplay(topLead.status).label}
             </span>
-            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getLeadPriorityColorDisplay(topLead.priority).badgeClass}`}>
+            <span className="ch__lead-badge" data-priority={toneKey(topLead.priority)}>
               {getLeadPriorityColorDisplay(topLead.priority).label}
             </span>
           </div>
           {topLead.commercialBlocker && (
-            <p className="mt-2 text-xs opacity-80">
+            <p className="ch__lead-note">
               {topLead.commercialBlocker.label}
               {topLead.commercialBlocker.context ? ` · ${topLead.commercialBlocker.context}` : ''}
             </p>
           )}
           {topLeadContinuity && (
-            <p className="mt-2 text-xs opacity-75">
+            <p className="ch__lead-continuity">
               {topLeadContinuity.stageLabel} · {topLeadContinuity.narrative}
             </p>
           )}
@@ -55,61 +59,61 @@ export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
               href={topLeadAction.href}
               target={topLeadAction.external ? '_blank' : undefined}
               rel={topLeadAction.external ? 'noreferrer' : undefined}
-              className="mt-3 inline-flex rounded-lg border px-3 py-1.5 text-xs font-medium"
+              className="ch__lead-action"
             >
               {topLeadAction.label}
             </Link>
           )}
         </div>
       )}
-      <div className="mt-4 space-y-3">
+      <div className="ch__leads-list">
         {leads.length === 0 ? (
-          <p className="rounded-xl border p-3 text-sm">Cap entrada vinculada a aquest client.</p>
+          <p className="ch__leads-empty">Cap entrada vinculada a aquest client.</p>
         ) : leads.map((lead) => {
           const statusConf = getLeadStatusDisplay(lead.status);
           const priorityConf = getLeadPriorityColorDisplay(lead.priority);
           const actionLink = buildLeadActionLink(lead);
           const continuity = buildLeadContinuity(lead, data.customer.id);
           return (
-            <article key={lead.id} className="rounded-xl border p-4 transition-colors" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.leads.card(lead.name))}>
-              <Link href={continuity.hubHref} className="block">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-semibold">{lead.name}</p>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusConf.bg} ${statusConf.text}`}>{statusConf.label}</span>
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${priorityConf.badgeClass}`}>{priorityConf.label}</span>
+            <article key={lead.id} className="ch__lead-card" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.leads.card(lead.name))}>
+              <Link href={continuity.hubHref} className="ch__lead-main">
+                <div className="ch__lead-card-head">
+                  <p className="ch__lead-name">{lead.name}</p>
+                  <div className="ch__lead-badges">
+                    <span className="ch__lead-badge" data-status={toneKey(lead.status)}>{statusConf.label}</span>
+                    <span className="ch__lead-badge" data-priority={toneKey(lead.priority)}>{priorityConf.label}</span>
                   </div>
                 </div>
-                <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                <div className="ch__lead-meta">
                   <span>{getEventLabel(lead.eventType)}</span>
                   <span>{lead.eventDate ? formatDate(lead.eventDate) : 'Sense data'}</span>
                 </div>
                 {lead.commercialBlocker && (
-                  <div className={`mt-3 rounded-lg border px-3 py-2 text-xs ${BLOCKER_TONE_CLASS[lead.commercialBlocker.tone]}`}>
-                    <p className="font-medium">{lead.commercialBlocker.label}</p>
-                    {lead.commercialBlocker.context && <p className="mt-1 opacity-80">{lead.commercialBlocker.context}</p>}
+                  <div className={`ch__lead-blocker ${BLOCKER_TONE_CLASS[lead.commercialBlocker.tone]}`}>
+                    <p>{lead.commercialBlocker.label}</p>
+                    {lead.commercialBlocker.context && <p>{lead.commercialBlocker.context}</p>}
                   </div>
                 )}
-                {lead.booking && <p className="mt-2 text-xs">Reserva {lead.booking.reference} · {formatNumber(lead.booking.total)}€</p>}
-                <p className="mt-2 text-xs opacity-75">
+                {lead.booking && <p className="ch__lead-booking">Reserva {lead.booking.reference} · {formatNumber(lead.booking.total)}€</p>}
+                <p className="ch__lead-continuity">
                   {continuity.stageLabel} · {continuity.narrative}
                 </p>
-                <p className="mt-1 text-xs">Creada {formatDateSimple(lead.createdAt)}</p>
+                <p className="ch__lead-date">Creada {formatDateSimple(lead.createdAt)}</p>
               </Link>
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="ch__lead-actions">
                 {actionLink && (
                   <Link
                     href={actionLink.href}
                     target={actionLink.external ? '_blank' : undefined}
                     rel={actionLink.external ? 'noreferrer' : undefined}
-                    className="inline-flex rounded-lg border px-3 py-1 text-xs font-medium"
+                    className="ch__lead-action"
                   >
                     {actionLink.label}
                   </Link>
                 )}
                 <Link
                   href={continuity.technicalHref}
-                  className="inline-flex rounded-lg border px-3 py-1 text-xs font-medium opacity-80"
+                  className="ch__lead-action ch__lead-action--muted"
                 >
                   Fitxa tècnica del lead
                 </Link>

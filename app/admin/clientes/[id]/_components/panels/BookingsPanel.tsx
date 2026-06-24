@@ -8,7 +8,7 @@ import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 
 function getBookingStatusBadgeClass(status: string) {
   const tone = BOOKING_STATUS_CONFIG[status];
-  return tone ? ('border-current ' + tone.bg + ' ' + tone.text) : 'border-white/10 bg-white/5 text-white/60';
+  return tone ? ('border-current ' + tone.bg + ' ' + tone.text) : 'ch__booking-status--muted';
 }
 
 function PaymentIndicator({ booking }: { booking: BookingDTO }) {
@@ -17,14 +17,14 @@ function PaymentIndicator({ booking }: { booking: BookingDTO }) {
   const remaining = total - deposit;
 
   return (
-    <div className="mt-2 flex flex-wrap gap-2 text-xs" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.payment)}>
+    <div className="ch__booking-payment" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.payment)}>
       {deposit > 0 && (
-        <span className={`rounded-full px-2 py-0.5 ${booking.depositPaid ? 'admin-tone-bg-success admin-tone-text-success' : 'admin-tone-bg-danger admin-tone-text-danger'}`}>
+        <span className={`ch__booking-pill ${booking.depositPaid ? 'ch__booking-pill--success' : 'ch__booking-pill--danger'}`}>
           Dipòsit {formatNumber(deposit)} € {booking.depositPaid ? '✓' : '✗'}
         </span>
       )}
       {remaining > 0 && (
-        <span className={`rounded-full px-2 py-0.5 ${booking.remainingPaid ? 'admin-tone-bg-success admin-tone-text-success' : 'bg-white/5 text-white/40'}`}>
+        <span className={`ch__booking-pill ${booking.remainingPaid ? 'ch__booking-pill--success' : 'ch__booking-pill--muted'}`}>
           Resta {formatNumber(remaining)} € {booking.remainingPaid ? '✓' : ''}
         </span>
       )}
@@ -39,73 +39,73 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
   const customerBookingCreateHref = buildCustomerBookingCreateHref(data.customer.id);
 
   return (
-    <section className="rounded-2xl border p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.root)}>
-      <div className="flex items-center justify-between gap-3">
+    <section className="ch__bookings-panel" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.root)}>
+      <div className="ch__bookings-head">
         <div>
-          <h2 className="text-lg font-semibold">Reserves / Dates</h2>
-          <p className="text-sm">{data.bookings.length} total · {upcoming.length} properes · {past.length} passades</p>
+          <h2 className="ch__bookings-title">Reserves / Dates</h2>
+          <p className="ch__bookings-summary">{data.bookings.length} total · {upcoming.length} properes · {past.length} passades</p>
         </div>
         <Link href={customerBookingCreateHref} className="ap-btn ap-btn--primary ap-btn--xs" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.newBooking)}>
           Nova reserva
         </Link>
       </div>
 
-      <div className="mt-4 space-y-3">
+      <div className="ch__bookings-list">
         {data.bookings.length === 0 ? (
-          <p className="rounded-xl border p-3 text-sm">Sense reserves. Crea la primera reserva del client.</p>
+          <p className="ch__bookings-empty">Sense reserves. Crea la primera reserva del client.</p>
         ) : (
           <>
-            {upcoming.length > 0 && <p className="text-xs font-semibold uppercase tracking-wider">Properes ({upcoming.length})</p>}
+            {upcoming.length > 0 && <p className="ch__bookings-section-label">Properes ({upcoming.length})</p>}
             {upcoming.map((booking) => {
               const statusColor = getBookingStatusBadgeClass(booking.status);
               const reference = booking.reference || booking.id.slice(0, 8);
               return (
-                <div key={booking.id} className="rounded-xl border p-4" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.card(reference))}>
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-sm font-semibold">{reference}</p>
-                    <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusColor}`}>{labelEstatReserva(booking.status)}</span>
+                <div key={booking.id} className="ch__booking-card" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.card(reference))}>
+                  <div className="ch__booking-card-head">
+                    <p className="ch__booking-ref">{reference}</p>
+                    <span className={`ch__booking-status ${statusColor}`}>{labelEstatReserva(booking.status)}</span>
                   </div>
 
-                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                  <div className="ch__booking-meta">
                     {booking.eventType && <span>{getEventLabel(booking.eventType)}</span>}
                     <span>{booking.date ? formatDateFull(booking.date) : 'Sense data'}</span>
                     {booking.date && new Date(booking.date) >= now && booking.status !== 'CANCELLED' && (() => {
                       const days = Math.ceil((new Date(booking.date).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-                      return <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${days <= 7 ? 'admin-tone-bg-warning admin-tone-text-warning' : 'bg-white/10 text-white/50'}`}>{days === 0 ? 'AVUI' : `${days}d`}</span>;
+                      return <span className={`ch__booking-pill ${days <= 7 ? 'ch__booking-pill--warning' : 'ch__booking-pill--muted'}`}>{days === 0 ? 'AVUI' : `${days}d`}</span>;
                     })()}
                     {(booking.startTime || booking.endTime) && <span>{booking.startTime || '?'} – {booking.endTime || '?'}</span>}
                   </div>
 
-                  {(booking.location || booking.venue) && <p className="mt-1 text-xs">📍 {booking.venue || booking.location}</p>}
+                  {(booking.location || booking.venue) && <p className="ch__booking-location">📍 {booking.venue || booking.location}</p>}
 
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {booking.packName && <span className="rounded-md px-2 py-0.5 text-xs">🎵 {booking.packName}</span>}
-                    {booking.guestCount && <span className="rounded-md px-2 py-0.5 text-xs">👥 {booking.guestCount} convidats</span>}
-                    {booking.discountCode && <span className="rounded-md px-2 py-0.5 text-xs">🏷️ {booking.discountCode}</span>}
+                  <div className="ch__booking-tags">
+                    {booking.packName && <span className="ch__booking-tag">🎵 {booking.packName}</span>}
+                    {booking.guestCount && <span className="ch__booking-tag">👥 {booking.guestCount} convidats</span>}
+                    {booking.discountCode && <span className="ch__booking-tag">🏷️ {booking.discountCode}</span>}
                   </div>
 
                   {(booking.depositAmount || booking.totalAmount) && <PaymentIndicator booking={booking} />}
 
-                  <div className="mt-3 border-t pt-2">
-                    <Link href={buildBookingHref(booking.id)} className="inline-flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.openBooking)}>
+                  <div className="ch__booking-actions">
+                    <Link href={buildBookingHref(booking.id)} className="ch__booking-link" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.openBooking)}>
                       Obrir fitxa d&apos;esdeveniment →
                     </Link>
                   </div>
                 </div>
               );
             })}
-            {past.length > 0 && <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-white/40">Passades / Cancel·lades ({past.length})</p>}
+            {past.length > 0 && <p className="ch__bookings-section-label ch__bookings-section-label--muted">Passades / Cancel·lades ({past.length})</p>}
             {past.map((booking) => {
               const statusColor = getBookingStatusBadgeClass(booking.status);
               return (
-                <div key={booking.id} className="rounded-xl border border-white/5 p-4 opacity-60">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-sm font-semibold">{booking.reference || booking.id.slice(0, 8)}</p>
-                    <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusColor}`}>{labelEstatReserva(booking.status)}</span>
+                <div key={booking.id} className="ch__booking-card ch__booking-card--past">
+                  <div className="ch__booking-card-head">
+                    <p className="ch__booking-ref">{booking.reference || booking.id.slice(0, 8)}</p>
+                    <span className={`ch__booking-status ${statusColor}`}>{labelEstatReserva(booking.status)}</span>
                   </div>
-                  <p className="mt-1 text-xs">{booking.date ? formatDateFull(booking.date) : 'Sense data'}</p>
-                  <div className="mt-2 border-t border-white/5 pt-2">
-                    <Link href={buildBookingHref(booking.id)} className="text-xs" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.openBooking)}>
+                  <p className="ch__booking-location">{booking.date ? formatDateFull(booking.date) : 'Sense data'}</p>
+                  <div className="ch__booking-actions">
+                    <Link href={buildBookingHref(booking.id)} className="ch__booking-link ch__booking-link--plain" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.openBooking)}>
                       Obrir fitxa →
                     </Link>
                   </div>

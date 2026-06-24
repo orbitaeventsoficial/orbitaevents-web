@@ -25,14 +25,20 @@
  * </AdminPage>
  */
 
+'use client';
+
 import type { ReactNode } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import InfoTooltip from './InfoTooltip';
 import type { HelpCopy } from './adminHelpContent';
 import { helpAttrs } from './adminHelpContent';
+import { getAdminOrganLabel } from '../lib/adminNav';
 
 interface AdminPageProps {
   title: string;
+  /** Eyebrow / coordenada canònica (mono, uppercase) sobre el títol — patró Temporada. */
+  eyebrow?: ReactNode;
   subtitle?: ReactNode;
   back?: { href: string; label: string; help?: HelpCopy };
   actions?: ReactNode;
@@ -51,6 +57,7 @@ interface AdminPageProps {
 
 export function AdminPage({
   title,
+  eyebrow,
   subtitle,
   back,
   actions,
@@ -66,6 +73,10 @@ export function AdminPage({
   alertHelp,
   contentHelp,
 }: AdminPageProps) {
+  const pathname = usePathname();
+  // Eyebrow = coordenada d'òrgan (canon Temporada). Si la pàgina no en passa,
+  // es deriva de la ruta → grup de nav (font única `adminNav`).
+  const resolvedEyebrow = eyebrow ?? getAdminOrganLabel(pathname ?? '');
   return (
     <div className={`ap-page ${className}`} {...helpAttrs(help)}>
       <header className="ap-header" {...helpAttrs(headerHelp)}>
@@ -75,6 +86,7 @@ export function AdminPage({
               ← {back.label}
             </Link>
           )}
+          {resolvedEyebrow && <span className="ap-eyebrow">{resolvedEyebrow}</span>}
           <h1 className="ap-title">{title}</h1>
           {subtitle && <p className="ap-subtitle">{subtitle}</p>}
         </div>

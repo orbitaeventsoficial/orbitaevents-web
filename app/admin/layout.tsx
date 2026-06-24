@@ -9,105 +9,13 @@ import { ToastProvider } from './components/ToastProvider';
 import { useCsrfFetch } from '@/hooks/useCsrfFetch';
 import { log } from '@/lib/logger';
 import { ADMIN_CHANGE_COUNTER } from '@/lib/constants/admin';
+import { NAV_GROUPS, getGroupForPath, type NavItem, type NavGroup } from './lib/adminNav';
 import '../studio/orbita-tokens.css';
 import './admin-theme.css';
 import './control-room.css';
 import './admin-shell.css';
 
-/* ── Grups de navegació ───────────────────────────────────────────────────── */
-type NavItem = { label: string; href: string; secondary?: boolean };
-type NavGroup = { id: string; label: string; items: NavItem[] };
-
-const NAV_GROUPS: NavGroup[] = [
-  {
-    id: 'agenda', label: 'Comercial',
-    items: [
-      // Nucli comercial pel flux: captar → proposar → reservar → client.
-      // (Renombrat «Agenda»→«Comercial» #967: el grup conté tot el comercial,
-      // no només calendari. Col·laboradors connectat aquí, abans cable solt.)
-      { label: 'Temporada', href: '/admin/leads' },
-      { label: 'Reserves', href: '/admin/bookings' },
-      { label: 'Pressupostos', href: '/admin/presupuestos' },
-      { label: 'Dossiers', href: '/admin/dossiers' },
-      { label: 'Clients', href: '/admin/clientes' },
-      { label: 'Col·laboradors', href: '/admin/collaborators' },
-      { label: 'Arxiu', href: '/admin/leads/arxiu', secondary: true },
-    ],
-  },
-  {
-    id: 'events', label: 'Operativa',
-    items: [
-      { label: 'Tasques', href: '/admin/tasks' },
-      { label: 'Inventari', href: '/admin/inventory' },
-    ],
-  },
-  {
-    id: 'cataleg', label: 'Catàleg',
-    items: [
-      { label: 'Packs', href: '/admin/packs' },
-      { label: 'Pricing', href: '/admin/pricing' },
-    ],
-  },
-  {
-    id: 'web', label: 'Web',
-    items: [
-      { label: 'Portfolio', href: '/admin/portfolio' },
-      { label: 'Blog', href: '/admin/blog' },
-      { label: 'Ressenyes', href: '/admin/ressenyes' },
-      { label: 'Social', href: '/admin/social' },
-    ],
-  },
-  {
-    id: 'sistema', label: 'Sistema',
-    items: [
-      { label: 'Cockpit', href: '/admin/cockpit' },
-      { label: 'Finances', href: '/admin/economia' },
-      { label: 'Configuració', href: '/admin/settings' },
-      { label: 'Studio', href: '/admin/studio' },
-      { label: 'Manual', href: '/admin/manual' },
-      { label: 'Atles', href: '/admin/docs/organisme', secondary: true },
-      { label: 'Esquema absolut', href: '/admin/docs/esquema', secondary: true },
-      { label: 'Full de ruta', href: '/admin/docs/full-de-ruta', secondary: true },
-    ],
-  },
-];
-
-function getGroupForPath(pathname: string): string {
-  if (
-    pathname.startsWith('/admin/leads') ||
-    pathname.startsWith('/admin/dossiers') ||
-    pathname.startsWith('/admin/clientes') ||
-    pathname.startsWith('/admin/collaborators') ||
-    pathname.startsWith('/admin/presupuestos') ||
-    pathname.startsWith('/admin/intake') ||
-    pathname.startsWith('/admin/quick-create') ||
-    pathname.startsWith('/admin/sales-ops') ||
-    // Workspace fusionat Agenda (#844): bookings i calendari ja no tenen entrada
-    // pròpia al nav, però quan algú hi accedeix per URL marquem Agenda activa.
-    pathname.startsWith('/admin/bookings') ||
-    pathname.startsWith('/admin/calendario')
-  ) return 'agenda';
-  if (
-    pathname.startsWith('/admin/tasks') ||
-    pathname.startsWith('/admin/inventory')
-  ) return 'events';
-  if (
-    pathname.startsWith('/admin/packs') ||
-    pathname.startsWith('/admin/pricing') ||
-    pathname.startsWith('/admin/catalog') ||
-    pathname.startsWith('/admin/cost-calculator')
-  ) return 'cataleg';
-  if (
-    pathname.startsWith('/admin/portfolio') ||
-    pathname.startsWith('/admin/blog') ||
-    pathname.startsWith('/admin/social') ||
-    pathname.startsWith('/admin/ressenyes') ||
-    pathname.startsWith('/admin/marketing') ||
-    pathname.startsWith('/admin/google-reviews') ||
-    pathname.startsWith('/admin/campaigns')
-  ) return 'web';
-  return 'sistema';
-}
+/* Grups de navegació + mapa ruta→òrgan: font única a `./lib/adminNav`. */
 
 /* ── Layout principal ─────────────────────────────────────────────────────── */
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

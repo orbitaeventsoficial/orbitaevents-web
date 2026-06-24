@@ -13,18 +13,18 @@ export default function MarginExtrasPanel({ data, activeProposalId }: { data: Cu
   const margin = typeof subtotal === 'number' && typeof total === 'number' ? total - subtotal : undefined;
 
   return (
-    <section className="rounded-2xl border p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_3.margin.root)}>
-      <h2 className="text-lg font-semibold">Extres / Marge</h2>
-      <p className="mt-1 text-sm">Document actiu: {data.active.source} {active?.reference ? `· ${active.reference}` : ''}</p>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+    <section className="ch__margin-panel" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_3.margin.root)}>
+      <h2 className="ch__margin-heading">Extres / Marge</h2>
+      <p className="ch__margin-summary">Document actiu: {data.active.source} {active?.reference ? `· ${active.reference}` : ''}</p>
+      <div className="ch__margin-grid">
         <Metric label="Subtotal" value={money(subtotal)} />
         <Metric label="Descompte" value={money(discount)} />
         <Metric label="Total" value={money(total)} />
         <Metric label="Marge estimat" value={money(margin)} />
       </div>
-      <div className="mt-4 rounded-xl border p-3 text-xs flex items-center justify-between" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_3.margin.studio)}>
+      <div className="ch__margin-studio" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_3.margin.studio)}>
         <span>Per editar extres i cost real, obre l&apos;Studio amb el proposal actiu.</span>
-        {active && <Link href={buildCustomerProposalHref(data.customer.id, active.id)} className="rounded-xl border px-3 py-1.5 text-xs font-semibold transition-colors ml-3 shrink-0" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_3.margin.openStudio)}>Obrir Studio →</Link>}
+        {active && <Link href={buildCustomerProposalHref(data.customer.id, active.id)} className="ch__margin-studio-link" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_3.margin.openStudio)}>Obrir Studio →</Link>}
       </div>
     </section>
   );
@@ -32,9 +32,9 @@ export default function MarginExtrasPanel({ data, activeProposalId }: { data: Cu
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border p-3" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_3.margin.metric(label))}>
-      <p className="text-xs">{label}</p>
-      <p className="mt-1 text-lg font-semibold">{value}</p>
+    <div className="ch__margin-metric" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_3.margin.metric(label))}>
+      <p className="ch__margin-metric-label">{label}</p>
+      <p className="ch__margin-metric-value">{value}</p>
     </div>
   );
 }

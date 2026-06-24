@@ -42,11 +42,12 @@ html.admin-mode .sf__eyebrow {
 
 html.admin-mode .sf__title {
   margin: 0;
-  font-size: var(--o-text-xl);
+  font-family: var(--display);
+  font-size: var(--o-text-2xl);
   font-weight: var(--o-fw-xbold);
-  letter-spacing: -0.015em;
-  color: var(--ax-t);
-  line-height: 1.1;
+  letter-spacing: -0.018em;
+  color: var(--t);
+  line-height: 1;
 }
 
 html.admin-mode .sf__topbar-right {

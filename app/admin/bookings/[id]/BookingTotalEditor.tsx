@@ -56,9 +56,9 @@ export default function BookingTotalEditor({
   }
 
   return (
-    <span style={{ display: 'inline-flex', flexDirection: 'column', gap: 4 }}>
+    <span className="bd-total-editor">
       {editing ? (
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <span className="bd-total-editor__form">
           <input
             type="number"
             min={0}
@@ -67,16 +67,7 @@ export default function BookingTotalEditor({
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setEditing(false); }}
             autoFocus
-            style={{
-              background: 'var(--panel)',
-              border: '1px solid var(--line2)',
-              borderRadius: 4,
-              color: 'var(--gold)',
-              fontSize: 'inherit',
-              fontWeight: 700,
-              padding: '2px 8px',
-              width: 100,
-            }}
+            className="bd-total-editor__input"
           />
           <span className="text-xs text-[var(--t3)]">€</span>
           <button onClick={save} disabled={saving} className="fxd__savebtn text-xs">✓</button>
@@ -85,11 +76,7 @@ export default function BookingTotalEditor({
       ) : (
         <button
           onClick={() => setEditing(true)}
-          style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            color: 'inherit', font: 'inherit', fontWeight: 'inherit',
-            padding: 0, borderBottom: '1px dashed var(--gold)',
-          }}
+          className="bd-total-editor__trigger"
           title="Clic per editar el total"
         >
           {formatCurrency(displayTotal)}
@@ -98,19 +85,12 @@ export default function BookingTotalEditor({
 
       {/* Alerta marge negatiu */}
       {marginAlert && costFloor != null && (
-        <span style={{
-          fontSize: 10, fontWeight: 600, color: 'var(--o-danger)',
-          background: 'color-mix(in oklab, var(--o-danger) 10%, transparent)',
-          borderRadius: 3, padding: '2px 5px', letterSpacing: '0.04em',
-        }}>
+        <span className="bd-total-editor__alert">
           ⚠ Cost estimat {formatCurrency(costFloor)} · marge {formatCurrency(displayTotal - costFloor)}
           {suggestedPrice != null && (
             <button
               onClick={() => { setValue(String(suggestedPrice)); setEditing(true); }}
-              style={{
-                marginLeft: 6, background: 'none', border: 'none', cursor: 'pointer',
-                color: 'var(--gold)', fontWeight: 700, fontSize: 10, padding: 0,
-              }}
+              className="bd-total-editor__suggestion"
               title={`Preu suggerit amb marge ${TARGET_MARGIN * 100}%`}
             >
               → {formatCurrency(suggestedPrice)}?

@@ -111,6 +111,17 @@ for (const f of files) {
       if (isBtnVoid(cls)) {
         hits.push({ rel, ln: i + 1, id: 'boto-void', sev: 'P1', desc: 'Botó-void: text-white + padding sense fons (usar .ap-btn)' });
       }
+    } else {
+      // Botó-void en CONST/string (#1133): abans el guard només mirava
+      // className="...", deixant escapar `const X = '...text-white...'` que
+      // després s'aplica via className={X}. Escanegem literals de línies SENSE
+      // className= (les const/ternari de classes viuen separades de l'ús).
+      // Només strings SENSE interpolació `${...}`: si interpola, el fons pot
+      // venir de la variable (p.ex. variant `${styles.button}`) → no és void.
+      const strs = line.match(/'[^']*'|"[^"]*"|`[^`]*`/g) || [];
+      if (strs.some((s) => !s.includes('${') && isBtnVoid(s.slice(1, -1)))) {
+        hits.push({ rel, ln: i + 1, id: 'boto-void', sev: 'P1', desc: 'Botó-void en const/string: text-white + padding sense fons (usar .ap-btn)' });
+      }
     }
   });
 }

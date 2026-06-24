@@ -1,3 +1,853 @@
+## 2026-06-25 — Customer Hub ch__*-title 100% clònics (Canvi #1144, claude)
+
+### Context
+Pendent del #1122: alinear els títols de panell del Customer Hub al canon de secció. codex ja els havia portat a 18px (#1118-1142); faltava la tipografia display. Fet ara que codex ha tancat el Customer Hub.
+
+### Què s'ha fet
+- `customer-hub.css`: 5 títols (bookings/leads/proposals/privacy/discounts) → `font-family: var(--display)` + `letter-spacing: -0.01em` + semi→bold. Mida i color ja eren canon.
+- `.ch__timeline-title` (11px) no tocat (mini-label dens, no títol de secció).
+
+### Validació
+- Validació tècnica: tsc 0 · validate:core 0 (qa:admin-canon 0, qa:css-monocapa 0).
+- Validació funcional: render Customer Hub HTTP 200, 0 error. Tots els títols de secció de l'admin ara Plus Jakarta display 18px.
+- Validació humana/UX: pendent validació visual del propietari.
+
+### Coordinació
+Counter -> 1144. Tanca el pendent que esperava que codex alliberés customer-hub.css.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-25 — Guard qa:smoke-detail-coverage: blinda cobertura [param] (Canvi #1143, claude)
+
+### Context
+El qa:smoke-detail (#1138) té el mapeig de rutes [param] manual. Una fitxa detall nova sense afegir al mapeig quedaria fora del render sense avís (punt cec reobert).
+
+### Què s'ha fet
+- `smoke-render-detail.mjs`: COVERED_PARAM_ROUTES exportada (font única); render només si invocat directament (importable sense efectes).
+- `check-smoke-detail-coverage.mjs` (NOU, estàtic): descobreix [param] del FS, FALLA si alguna no és coberta o si n'hi ha stale. Afegit a validate:core.
+- `__tests__/scripts/check-smoke-detail-coverage.test.ts`: 2 tests (PASSA actual, FALLA ruta nova). 2/2.
+
+### Validació
+- Validació tècnica: tsc 0 · validate:core 0 (11 [param] = 11 cobertes) · vitest 2/2.
+- Validació funcional: smoke-detail segueix amb 30 vistes; cobertura no degradable sense avís de CI.
+- Validació humana/UX: n/a (eina de qualitat).
+
+### Coordinació
+Counter -> 1143. Front qualitat/guards (claude). codex ha petat després de tancar el seu #1142 (verificat complet: documentat + validat + render net).
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-25 — bookings/page sense contenidors inline ni glass P2 (Canvi #1142, codex)
+
+### Context
+Top 3 actual de `docs/audit/admin-fitxes.md` després de tancar Clients. `app/admin/bookings/page.tsx` tenia residu P2 en contenidors de layout (`style={{...}}` amb `maxWidth`, `padding`, `gap`) i en empty/cards mòbil amb `admin-card-glass`.
+
+### Què s'ha fet
+- `bookings/page.tsx`: la barra superior passa de `style={{...}}` a `bk-detail-bar-row` i `bk-detail-bar-actions`.
+- `bookings/page.tsx`: els contenidors de llista passen de `style={{ maxWidth: 1220, ... }}` a `bk-list-shell` / `bk-list-shell--top`.
+- `bookings/page.tsx`: l'empty state i les cards mòbil deixen `admin-card-glass` i passen a `ap-card bk-empty-state` / `ap-card bk-mobile-card`.
+- `booking-detail.css`: afegides classes `bk-*` escopades a `html.admin-mode` amb tokens i responsive conservador.
+
+### Validació
+- Validació tècnica: `Select-String` focalitzat sobre `bookings/page.tsx` dona 0 `style={{`, 0 `admin-card-glass`, 0 `bg-black`, 0 `bg-white`, 0 `border-white`, 0 `hover:bg-white`; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: cap canvi a queries Prisma, `BookingFilters`, `BookingPipelineViewWrapper`, `ExportCsvButton`, links de client/reserva, càlculs de marge, paginació ni mutacions; només classes i CSS.
+- Validació humana/UX: llista, empty i cards mòbil mantenen estructura i accions; el layout deixa d'usar px inline i vidre legacy. La taula desktop amb fonts `text-[...]` continua pendent com a P3 separat.
+
+### Coordinació
+Counter -> 1142. Perímetre limitat a `/admin/bookings` llista i `bk-*` dins `booking-detail.css`; no toca detall funcional, serveis, Prisma, PipelineView ni taula P3.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-25 — ClientesModals sense overlay/glass legacy (Canvi #1141, codex)
+
+### Context
+Continuació després del #1140 dins Clients. L'auditoria encara marcava `ClientesModals.tsx` amb residu P2 acotat: dos overlays `bg-black/60 admin-card-glass` i un fallback de score duplicat `bg-white/5 text-white/40`.
+
+### Què s'ha fet
+- `ClientesModals.tsx`: els dos overlays de `AddCustomerModal` i `StartProcessModal` passen a `cl__modal-backdrop`.
+- `ClientesModals.tsx`: el fallback visual de score baix de duplicat passa a `cl__duplicate-score-low`.
+- `clientes.css`: afegides les dues classes amb tokens (`--canvas`, `--panel`, `--t3`) i `html.admin-mode`, sense negre/blanc absolut ni glass legacy.
+- `docs/audit/admin-fitxes.md`: les dues troballes P2 de `ClientesModals` queden resoltes al #1141.
+
+### Validació
+- Validació tècnica: `Select-String` focalitzat sobre `ClientesModals.tsx` dona 0 `bg-black/60`, 0 `admin-card-glass`, 0 `bg-white/5`, 0 `text-white/40`, 0 `border-white`, 0 `hover:bg-white`, 0 `style={{`; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: cap canvi a `fetchWithCsrf`, detecció de duplicats, `duplicateOverride`, `handleAddCustomer`, `startProcess`, `toast`, `ADMIN_CUSTOMER_START_PROCESSES`, formularis ni callbacks; només classes i CSS.
+- Validació humana/UX: els modals conserven posició, tancament per backdrop/Escape i contingut; l'overlay passa a superfície tokenitzada i el score baix deixa d'emetre blanc cru.
+
+### Coordinació
+Counter -> 1141. Perímetre limitat a `ClientesModals.tsx` + `clientes.css`; no toca serveis, DTOs, API routes, Customer Hub, Reactivation, Referrals ni bookings.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-25 — ReferralsClient amb gramàtica visual local (Canvi #1140, codex)
+
+### Context
+Continuació simètrica del #1139 dins Clients satèl·lit. `docs/audit/admin-fitxes.md` encara marcava `app/admin/clientes/referrals/ReferralsClient.tsx` com a P2 per superfícies `white/*`, `bg-black/20`, tons locals i botons ad hoc.
+
+### Què s'ha fet
+- `ReferralsClient.tsx`: KPIs globals, top referrers, filtres, candidats, pills de prioritat, missatge suggerit i accions passen de classes visuals genèriques a una gramàtica local `rf__*`.
+- `referrals.css`: nova capa escopada a `html.admin-mode` que governa `rf__*` amb tokens (`--panel`, `--sunk`, `--line`, `--t`, `--muted`, `--o-*`) i responsive propi.
+- `page.tsx`: importa el CSS local de la pantalla, igual que la resta de subpantalles admin amb CSS propi.
+- `docs/audit/admin-fitxes.md` i `docs/admin-fitxes-pantalles.md`: el P2 visual de `ReferralsClient` queda resolt al #1140.
+
+### Validació
+- Validació tècnica: `Select-String` focalitzat sobre `ReferralsClient.tsx` dona 0 `bg-white`, 0 `border-white`, 0 `text-white`, 0 `hover:bg-white`, 0 `rounded-*`, 0 `opacity-*`, 0 `space-y-*`, 0 `border-[`, 0 `bg-[`, 0 `text-[`, 0 `admin-tone`, 0 `group-open`; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: cap canvi a `loadReferralsSummary`, `summary`, `visibleCandidates`, `handleDismiss`, `handleCopyMessage`, `navigator.clipboard`, `whatsappUrl`, `mailtoUrl`, `buildCustomerHubHref`, `formatPercent`, `formatCurrency` ni textos de missatge; només classes i CSS.
+- Validació humana/UX: la pantalla conserva els mateixos KPIs, top referrers, filtres, candidats i accions, però deixa d'inventar superfícies locals i queda alineada amb el tall `rc__*` de reactivació.
+
+### Coordinació
+Counter -> 1140. Perímetre limitat a `/admin/clientes/referrals`; no toca Reactivation, Customer Hub, serveis, DTOs, API routes, bookings, nav ni guard #1135/#1138.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-25 — Guard qa:smoke-detail: render de rutes [param] (Canvi #1138, claude)
+
+### Context
+`qa:smoke` salta les rutes admin `[param]` (cal id real), deixant les fitxes detall més pesades (booking/lead/client/inventory/pack/proposal…) sense render automàtic. Punt cec real.
+
+### Què s'ha fet
+- `scripts/smoke-render-detail.mjs` (NOU): resol un id real per Prisma per a cada model, mapeja 11 dirs `[param]` → URL, render 3 breakpoints, FALLA amb status>=400/overflow/runtime-error, OMET taules buides.
+- `package.json`: `qa:smoke-detail`. Fora de validate:core (cal server+BD, com qa:smoke).
+- 1a execució: 10 rutes [param] × 3 breakpoints = 30 renders, 0 errors, 0 overflow (questionnaires omès, BD buida).
+
+### Validació
+- Validació tècnica: tsc 0 · validate:core 0 · qa:smoke-detail OK (30 renders).
+- Validació funcional: les 10 fitxes detall renderitzen netes amb dades reals als 3 breakpoints (primera cobertura).
+- Validació humana/UX: n/a (eina de qualitat); cobreix les pantalles que el propietari més usa.
+
+### Coordinació
+Counter -> 1138. Front qualitat/guards (claude); codex a Client 360/Clients. Disjunts.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-25 — ReactivationClient amb gramàtica visual local (Canvi #1139, codex)
+
+### Context
+Continuació del sanejament de Clients satèl·lit després del #1137. `docs/audit/admin-fitxes.md` marcava `app/admin/clientes/reactivation/ReactivationClient.tsx` com a P2 per superfícies i accions ad hoc (`white/*`, `bg-black/20`, tons locals) dins una pantalla que ja viu sota `AdminPage`.
+
+### Què s'ha fet
+- `ReactivationClient.tsx`: KPIs, empty state, cards de candidat, pills de prioritat, identitat, canals, desplegable de missatge i accions passen de classes genèriques/Tailwind visuals a una gramàtica local `rc__*`.
+- `reactivation.css`: nova capa escopada a `html.admin-mode` que governa `rc__*` amb tokens (`--panel`, `--sunk`, `--line`, `--t`, `--muted`, `--o-*`) i responsive propi.
+- `page.tsx`: importa el CSS local de la pantalla, seguint el patró ja existent en altres pàgines admin.
+- `docs/audit/admin-fitxes.md` i `docs/admin-fitxes-pantalles.md`: el P2 visual de `ReactivationClient` queda marcat com a resolt al #1139; `ReferralsClient` continua pendent.
+
+### Validació
+- Validació tècnica: `Select-String` focalitzat sobre `ReactivationClient.tsx` dona 0 `bg-white`, 0 `border-white`, 0 `text-white`, 0 `hover:bg-white`, 0 `rounded-*`, 0 `opacity-*`, 0 `space-y-*`, 0 `border-[`, 0 `bg-[`, 0 `text-[`, 0 `admin-tone`, 0 `group-open`; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: cap canvi a `loadReactivationCandidates`, `visible`, `stats`, `handleDismiss`, `handleCopyMessage`, `navigator.clipboard`, `whatsappUrl`, `mailtoUrl`, `buildCustomerHubHref`, `formatCurrency` ni textos del missatge suggerit; només classes i CSS.
+- Validació humana/UX: la pantalla conserva els mateixos filtres, candidats, accions i desplegable, però deixa d'inventar superfícies locals i passa a llegir com a òrgan admin consistent.
+
+### Coordinació
+Counter -> 1139. Perímetre limitat a `/admin/clientes/reactivation`; no toca ReferralsClient, Customer Hub, serveis, DTOs, API routes, bookings, nav ni guard #1135.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-25 — CTAs satèl·lit de Clients al botó canònic (Canvi #1137, codex)
+
+### Context
+Continuació non-stop després del #1136. L'auditoria `docs/audit/admin-fitxes.md` encara marcava els botons `Tornar al CRM` de `/admin/clientes/reactivation` i `/admin/clientes/referrals` com a CTA ad hoc (`border-white/15 bg-white/5`), tot i viure dins `AdminPage`.
+
+### Què s'ha fet
+- `app/admin/clientes/reactivation/page.tsx`: el Link d'accions torna al CRM amb `ap-btn ap-btn--xs`.
+- `app/admin/clientes/referrals/page.tsx`: mateix canvi per al Link equivalent.
+- `docs/audit/admin-fitxes.md`: la troballa P3 d'aquests dos CTAs queda marcada com a resolta al #1137.
+
+### Validació
+- Validació tècnica: `Select-String` focalitzat sobre els dos `page.tsx` dona 0 `border-white`, 0 `bg-white`, 0 `hover:bg-white`, 0 `rounded-lg`, 0 `px-3`, 0 `py-1.5`, 0 `text-xs`; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `validate:core` OK.
+- Validació funcional: cap canvi a `loadReactivationCandidates`, `loadReferralsSummary`, `AdminPage`, `href="/admin/clientes"` ni components client; només classes del CTA de retorn.
+- Validació humana/UX: els dos botons mantenen el mateix text i destí, però ara consumeixen el botó canònic de l'admin i deixen d'inventar superfície local.
+
+### Coordinació
+Counter -> 1137. Perímetre limitat a pàgines satèl·lit de Clients; no toca serveis, Customer Hub, reactivation/referrals client interns, bookings, nav ni guard #1135.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-25 — Guard check-admin-canon ampliat: botó-void en consts (Canvi #1135, claude)
+
+### Context
+Al #1133 vaig trobar un botó-void en const string que el guard no caçava (només mirava `className="..."`). Un guard que deixa passar la seva pròpia classe de violació és un ninot de paper.
+
+### Què s'ha fet
+- `scripts/check-admin-canon.mjs`: branca nova que escaneja literals de string a línies sense className literal i marca botó-void si passen isBtnVoid i NO interpolen `${...}` (si interpolen, el fons pot venir de la variant). Cobreix també className={`...`} sense interpolació.
+- En activar-lo va caçar ConfirmDialog.tsx:208 → LEGÍTIM (rep fons via `${styles.button}`), correctament exclòs.
+- `__tests__/scripts/check-admin-canon.test.ts`: +2 tests (const botó-void FALLA, template interpolat PASSA). 6/6.
+
+### Validació
+- Validació tècnica: tsc 0 · guard 0 P1 sobre repo net · vitest 6/6 · validate:core 0.
+- Validació funcional: només guard + test, cap canvi de render.
+- Validació humana/UX: n/a (eina de qualitat).
+
+### Coordinació
+Counter -> 1135. Front qualitat/guards (claude); codex a Client 360. Disjunts.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-25 — CustomerHeader Client 360 sense inline layout (Canvi #1136, codex)
+
+### Context
+Continuació non-stop dins Client 360 després del #1134. La fitxa del hub encara documentava dos residus locals a `CustomerHeader.tsx`: un backdrop fixed del menú d'estat i un wrapper `display: contents` dins el rail d'etapes.
+
+### Què s'ha fet
+- `CustomerHeader.tsx`: substituïts els dos `style={{...}}` per classes `ch__statusbackdrop` i `ch__stageitem`.
+- `customer-hub.css`: afegits els selectors `ch__statusbackdrop` i `ch__stageitem` al costat de `ch__statuswrap` i `ch__stagebar-row`.
+- `docs/admin-fitxes-pantalles.md` i `docs/audit/admin-fitxes.md`: el residu inline de `CustomerHeader` queda marcat com a resolt al #1135.
+
+### Validació
+- Validació tècnica: `Select-String` focalitzat sobre `CustomerHeader.tsx` dona 0 `style={{`, 0 `bg-white`, 0 `border-white`, 0 `text-white`, 0 `hover:bg-white`, 0 `rounded-2xl`, 0 `rounded-xl`, 0 `opacity-`, 0 `border-dashed`, 0 `space-y-`, 0 `border-[`, 0 `bg-[`, 0 `text-[`, 0 `admin-tone`; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `validate:core` OK.
+- Validació funcional: cap canvi a `setMenuOpen`, `changeStatus`, `deleteCustomer`, `fetchWithCsrf`, `useConfirmDialog`, TABS ni helpers de navegació; el backdrop continua tancant el menú d'estat i el rail d'etapes conserva `display: contents`.
+- Validació humana/UX: cap canvi visible intencionat; menú d'estat, rail d'etapes, capçalera, KPIs, accions ràpides i tabs conserven la mateixa jerarquia, ara amb layout governat per CSS del hub.
+
+### Coordinació
+Counter -> 1136. Perímetre Client 360 petit; no toca accions de client, dades, DTOs, rutes API, bookings, nav ni canon global de títols.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-25 — CommsPanel Client 360 canònic (Canvi #1134, codex)
+
+### Context
+Continuació non-stop dins Client 360 després del #1131 i amb #1133 ja ocupat per Claude a l'òrgan Comunicacions. `CommsPanel` era l'últim panell dinàmic principal del Customer Hub amb contenidors, mètriques, pills, botons, textarea i llista de missatges encara renderitzats amb classes genèriques.
+
+### Què s'ha fet
+- `CommsPanel.tsx`: el panell passa a classes `ch__comms-*` / `ch__comm-*` per fil canònic de conversa, accions ràpides, mètriques, estat de conversa, seguiment pendent, canals, nota interna i missatges.
+- `customer-hub.css`: afegit el paquet `ch__comms-*` amb superfícies, pills, accions, textarea, botó de desar, llista de missatges i responsive a tablet/mòbil.
+- `docs/admin-fitxes-pantalles.md` i `docs/audit/admin-fitxes.md`: `CommsPanel` queda marcat com a visualment drenat; el residu de Client 360 queda concentrat en capçalera/satèl·lits i validació visual final.
+
+### Validació
+- Validació tècnica: `Select-String` focalitzat sobre `CommsPanel.tsx` dona 0 `bg-white`, 0 `border-white`, 0 `text-white`, 0 `hover:bg-white`, 0 `rounded-2xl`, 0 `rounded-xl`, 0 `opacity-`, 0 `border-dashed`, 0 `space-y-`, 0 `border-[`, 0 `bg-[`, 0 `text-[`, 0 `admin-tone` i 0 utilitats visuals genèriques al `className`; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `validate:core` OK.
+- Validació funcional: cap canvi a `fetchWithCsrf`, `POST /api/admin/customers/[id]/activities`, `router.refresh`, `buildCustomerCommunicationSpine`, `buildCustomerNextActionLink`, `buildCustomerCommercialRiskLink`, `buildCustomerComposeHref`, `buildCustomerTaskCreateHref`, WhatsApp ni format de missatges; només classes, format i CSS.
+- Validació humana/UX: es preserven el fil canònic, accions ràpides, quatre mètriques, estat de conversa, seguiment, repartiment per canal, nota interna, error i llista de fins a 40 missatges amb superfícies del hub i layout mòbil segur.
+
+### Coordinació
+Counter -> 1134. Perímetre Client 360 petit; no toca Comunicacions #1133, Catàleg #1132, bookings, nav, DTOs, Prisma, rutes API ni canon global de títols.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-25 — Fitxa forense òrgan Comunicacions + botó-void (Canvi #1133, claude)
+
+### Context
+Front codex-free. Òrgan Comunicacions (inbox/compose/settings, emails, email-templates), PENDENT.
+
+### Què s'ha fet
+- Auditoria: organ SA. Components tots reachable, serveis consumits, sense duplicació.
+- Fix real (gap de guard): `ManualActionsPanel.tsx` `PRIMARY_BUTTON` era una const string amb `text-white shadow-lg` sense fons → botó-void. El guard no el caça (només mira `className="..."` literals, no consts). → `'ap-btn ap-btn--primary'`. Únic botó-void en const de tot l'admin.
+- Fitxa escrita; registre PENDENT → FETA (#1133). Gap de guard anotat.
+
+### Validació
+- Validació tècnica: tsc 0 · validate:core 0 (qa:admin-canon 0).
+- Validació funcional: render /admin/emails HTTP 200, botó ara `.ap-btn--primary`, 0 error.
+- Validació humana/UX: pendent validació visual del propietari.
+
+### Coordinació
+Counter -> 1133. Front Comunicacions (claude); codex a Client 360. Disjunts.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-24 — Fitxa forense òrgan Catàleg + ternari mort (Canvi #1132, claude)
+
+### Context
+Front nou (ordre del propietari de continuar lluny de codex, que segueix a Client 360). Òrgan Catàleg (packs/pricing/inventory/catalog/cost-calculator), PENDENT al registre.
+
+### Què s'ha fet
+- Auditoria forense: organ SA. Tots els components reachable (InventoryListSections viu via import multi-línia — fals positiu de grep d'una línia). Serveis consumits, sense duplicació, ja canònic (AdminPage). Heatmap de marge (MARGIN_TONES) documentat com a exempció de domini legítima (no residu).
+- `InventoryListSections.tsx` (416, 532): ternari amb branca morta (`>20 warning : >5 warning`) → `>40 success : >5 warning : danger`. Comportament idèntic.
+- Fitxa de l'òrgan escrita; registre PENDENT → FETA (#1132).
+
+### Validació
+- Validació tècnica: tsc 0 · validate:core 0 (qa:admin-canon 0).
+- Validació funcional: barres de vida sense canvi de comportament; packs/pricing/inventory ja renderitzats verds (#1122-1124).
+- Validació humana/UX: pendent validació visual del propietari.
+
+### Coordinació
+Counter -> 1132. Front Catàleg (claude); codex a Client 360. Disjunts.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-24 — TasksNotesPanel Client 360 canònic (Canvi #1131, codex)
+
+### Context
+Continuació non-stop dins Client 360 després del #1130. `TasksNotesPanel` era l'últim panell petit abans de `CommsPanel`: tenia JSX comprimit i classes genèriques per contenidor, notice/error, columnes, targetes i botons de tasca.
+
+### Què s'ha fet
+- `TasksNotesPanel.tsx`: descomprimit el JSX i substituïdes les classes locals per `ch__tasks-*` / `ch__task-*` per panell, capçalera, notice/error, grid, columnes, targetes, accions i link.
+- `customer-hub.css`: afegit el paquet `ch__tasks-*` amb superfícies, botons, estat de confirmació d'eliminació, empty state, responsive grid i truncat segur del link.
+- `docs/admin-fitxes-pantalles.md`: `TasksNotesPanel` queda marcat com a visualment drenat i el proper tall Client 360 queda `CommsPanel`.
+
+### Validació
+- Validació tècnica: `Select-String` focalitzat sobre `TasksNotesPanel.tsx` dona 0 `bg-white`, 0 `border-white`, 0 `text-white`, 0 `hover:bg-white`, 0 `rounded-2xl`, 0 `rounded-xl`, 0 `opacity-`, 0 `border-dashed`, 0 `space-y-`, 0 `border-[`, 0 `bg-[`, 0 `text-[`, 0 `admin-tone`; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `validate:core` OK.
+- Validació funcional: cap canvi a `fetchWithCsrf`, `PATCH /api/admin/tasks/[id]`, `DELETE /api/admin/tasks/[id]`, `router.refresh`, timeout de confirmació, `buildCustomerTaskCreateHref`, `buildCustomerWorkspaceTabHref` ni partició pendents/completades; només classes, format i CSS.
+- Validació humana/UX: dues columnes, empty state, confirmació “Segur?”, botó “Nova tasca”, error/notice i link de Customer Hub preservats amb superfícies del hub i layout mòbil segur.
+
+### Coordinació
+Counter -> 1131. Perímetre Client 360 petit; no toca model Task, rutes, services, bookings, `nb-design.css` ni canon global de títols.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-24 — MarginExtrasPanel Client 360 canònic (Canvi #1130, codex)
+
+### Context
+Continuació non-stop dins Client 360 després del #1128 i del #1129 de Claude. `MarginExtrasPanel` era el tall pendent més petit: contenidor, mètriques i CTA Studio encara vivien amb classes genèriques (`rounded-*`, `border`, `p-*`, `grid`) dins el JSX.
+
+### Què s'ha fet
+- `MarginExtrasPanel.tsx`: el panell passa a classes `ch__margin-*` per contenidor, heading, resum, grid, mètriques i CTA Studio.
+- `customer-hub.css`: afegit el paquet `ch__margin-*` amb superfícies, mètriques, responsive grid i acció Studio governades pels tokens del hub.
+- `docs/admin-fitxes-pantalles.md`: `MarginExtrasPanel` queda marcat com a visualment drenat i el proper tall Client 360 queda a `CommsPanel` o `TasksNotesPanel`.
+
+### Validació
+- Validació tècnica: `Select-String` focalitzat sobre `MarginExtrasPanel.tsx` dona 0 `bg-white`, 0 `border-white`, 0 `text-white`, 0 `hover:bg-white`, 0 `rounded-2xl`, 0 `rounded-xl`, 0 `opacity-`, 0 `border-dashed`, 0 `space-y-`, 0 `border-[`, 0 `bg-[`, 0 `text-[`, 0 `admin-tone`; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `validate:core` OK.
+- Validació funcional: cap canvi a càlcul de subtotal/descompte/total/marge, `money()`, `formatNumber`, selecció de proposal actiu ni `buildCustomerProposalHref`; només classes i CSS.
+- Validació humana/UX: el panell conserva les quatre mètriques i l'accés a Studio, amb superfícies i espaiat del hub i wrap mòbil del CTA.
+
+### Coordinació
+Counter -> 1130. Perímetre Client 360 petit; no toca bookings, `nb-design.css`, pricing, rutes ni el canon global de títols.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-24 — Tancament canon títols segurs: new booking nb__h2 (Canvi #1129, claude)
+
+### Context
+Últim outlier de títol de secció en zones no-codex: `nb__h2` (new booking) era display 16px; canon de secció = display 18px.
+
+### Què s'ha fet
+- `nb-design.css` `.nb__h2`: `--o-text-md-2` (16px) → `--o-text-lg` (18px), tracking −0.01em. Idèntic a `.ap-section-title`/`.bd__pnl-title`/`.fxd__panelhead`.
+
+### Validació
+- Validació tècnica: tsc 0 · validate:core 0 (qa:admin-canon 0).
+- Validació funcional: només mida/tracking d'un títol ja display; sense risc.
+- Validació humana/UX: pendent validació visual. Tots els títols de secció de zones no-codex ja són display 18px; únic pendent = ch__*-title (Customer Hub, fitxer actiu de codex).
+
+### Coordinació
+Counter -> 1129. codex actiu a Client 360 panells (#1126-1128). Customer Hub = territori codex, no tocat.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-24 — ProposalsPanel Client 360 canònic (Canvi #1128, codex)
+
+### Context
+Continuació non-stop després del #1126. `ProposalsPanel` era el següent P3 petit dins Client 360: superfícies genèriques, `text-white/40`, botons locals i confirmacions inline en el JSX. El tall s'ha renumerat a #1128 perquè Claude ha tancat #1127 a booking detail mentre aquest registre es preparava.
+
+### Què s'ha fet
+- `ProposalsPanel.tsx`: grups, cards, accions, confirmació d'enviament, error i bloc de contracte passen a classes `ch__proposal-*`; es conserva tota la lògica d'enviament, estats, contracte i refresh.
+- `customer-hub.css`: afegit el paquet `ch__proposal-*` per stack, header, grups plegables, cards, status, accions, confirmació, error i contracte amb tokens del hub.
+- `docs/audit/admin-fitxes.md` i `docs/admin-fitxes-pantalles.md`: `ProposalsPanel` surt del P3 pendent i el proper tall dins Client 360 queda als panells interns restants.
+
+### Validació
+- Validació tècnica: `Select-String` focalitzat sobre `ProposalsPanel.tsx` dona 0 `bg-white`, 0 `border-white`, 0 `text-white`, 0 `hover:bg-white`, 0 `rounded-2xl`, 0 `opacity-`, 0 `border-dashed`, 0 `space-y-`, 0 `border-[`, 0 `bg-[`, 0 `text-[`; `npx tsc --noEmit --pretty false` OK; `qa:admin-canon` OK; `qa:css-monocapa` OK; `qa:protocol` OK; `validate:core` OK.
+- Validació funcional: cap canvi a `fetchWithCsrf`, rutes de proposal/contract, `router.refresh`, status, generació/enviament de contracte ni helpers de href; només classes i CSS.
+- Validació humana/UX: el panell conserva lectura per esborranys/pendents/històric, imports, estats i accions, ara amb superfícies i controls governats per `customer-hub.css`.
+
+### Coordinació
+Counter -> 1128. Front Client 360 disjunt dels headers/booking detail de Claude i del diagnòstic actiu de `/admin/bookings`.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-24 — Booking detail títols de panell al canon (Canvi #1127, claude)
+
+### Context
+Continuació non-stop. El detall de reserva (`bd__pnl-title`) usava kicker mono-gold uppercase per als títols de panell, outlier respecte al patró de secció display 18px de la resta.
+
+### Què s'ha fet
+- `booking-detail.css` `.bd__pnl-title`: mono-gold 11px uppercase → `--display` `--o-text-lg` `--o-fw-bold` `--t` (idèntic a `.ap-section-title`).
+
+### Validació
+- Validació tècnica: tsc 0 · validate:core 0 (qa:admin-canon 0); només font/mida/color a tokens canònics.
+- Validació funcional: render booking detall HTTP 200, `.bd__pnl-title` = Plus Jakarta 18px, 0 error.
+- Validació humana/UX: pendent validació visual del propietari (canvia el kicker mono-gold del booking detail). Perímetre bookings, no col·lisiona amb #1126 (codex, Client 360).
+
+### Coordinació
+Counter -> 1127. codex actiu a Client 360 (#1126). Perímetres disjunts.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-24 — LeadsPanel Client 360 canònic (Canvi #1126, codex)
+
+### Context
+Continuació de Client 360 després del #1121. La fitxa ja marcava `LeadsPanel` o `ProposalsPanel` com a següent tall petit; s'ha triat `LeadsPanel` perquè conservava tons locals (`admin-tone-*` i classes cromàtiques dels helpers de lead) dins el JSX.
+
+### Què s'ha fet
+- `LeadsPanel.tsx`: el panell passa a classes semàntiques `ch__lead-*`; status, prioritat i blocker s'expressen amb `data-status`/`data-priority` i classes de hub, sense tocar la lògica de leads, continuïtat ni enllaços.
+- `customer-hub.css`: afegit el paquet `ch__lead-*` per panell, cards, badges, blocker, meta, empty state i accions amb tokens del hub.
+- `docs/audit/admin-fitxes.md` i `docs/admin-fitxes-pantalles.md`: `LeadsPanel` surt del P2 pendent i el proper tall dins Client 360 queda `ProposalsPanel`.
+
+### Validació
+- Validació tècnica: `Select-String` focalitzat sobre `LeadsPanel.tsx` dona 0 `admin-tone`, 0 `bg-white`, 0 `border-white`, 0 `text-white`, 0 `border-[`, 0 `bg-[`, 0 `text-[`, 0 `opacity-`, 0 `rounded-2xl`; `npx tsc --noEmit --pretty false` OK; `qa:admin-canon` OK; `qa:css-monocapa` OK; `qa:no-admin-static-css-var-styles` OK.
+- Validació funcional: cap canvi a `fetchCustomerHub`, DTOs, Prisma, rutes, `buildLeadActionLink`, `buildLeadContinuity`, `sortCustomerHubLeads`, `getTopCustomerHubLead` ni enllaços; només classes i CSS.
+- Validació humana/UX: el panell conserva la lectura d'entrada prioritària, estat, prioritat, blocker, continuïtat i accions, ara governada per `customer-hub.css`.
+
+### Coordinació
+Counter -> 1126. Front Client 360 disjunt dels headers/lead detail de Claude i del diagnòstic actiu de `/admin/bookings`.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-24 — Lead detail tipografia 100% canon (Canvi #1125, claude)
+
+### Context
+Continuació non-stop. El detall de lead (`fxd__*`) usava `--heading` (Bricolage) per a títols i valors, divergint del canon Plus Jakarta.
+
+### Què s'ha fet
+- `leads-design.css`: `.fxd__panelhead span` → `--display`; totes les 5 ocurrències de `var(--heading)` (displays de valors: fact-val--big, profitpill, bolo-total…) → `var(--display)`. 0 restants.
+
+### Validació
+- Validació tècnica: tsc 0 · validate:core 0 (qa:admin-canon 0); només font-family a tokens canònics.
+- Validació funcional: render lead detall HTTP 200, `.fxd__panelhead span` = Plus Jakarta, 0 error. Tot el detall de lead ja és Plus Jakarta.
+- Validació humana/UX: pendent validació visual del propietari. Booking detail (mono-gold, territori codex) i Inbox panes (excepció funcional) no tocats.
+
+### Coordinació
+Counter -> 1125. Front lead/headers (claude); codex a Client 360. Disjunts.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-24 — Eyebrow d'òrgan automàtic a tot AdminPage (Canvi #1124, claude)
+
+### Context
+Continuació de la canonització de headers («sigue» del propietari): el header canònic té eyebrow (coordenada d'òrgan); faltava a les ~74 pàgines AdminPage. En comptes d'editar-les una a una (insostenible + col·lisió amb codex), solució monocapa.
+
+### Què s'ha fet
+- Nou `app/admin/lib/adminNav.ts`: font única `NAV_GROUPS` + `getGroupForPath` (extrets de layout.tsx) + `getAdminOrganLabel(pathname)`.
+- `layout.tsx`: importa del mòdul compartit (deixa de duplicar-ho).
+- `AdminPage.tsx`: client (`usePathname`), eyebrow derivat de ruta→òrgan quan no es passa prop; override per prop intacte.
+
+### Validació
+- Validació tècnica: tsc 0 · validate:core 0 (qa:admin-canon 0, qa:no-dead-admin-views 0); adminNav reachable.
+- Validació funcional: render real — packs/pricing→«Catàleg», inventory→«Operativa», cuadrant→«Operacions», settings/analytics→«Sistema»; HTTP 200, 0 error.
+- Validació humana/UX: pendent validació visual del propietari; cada pàgina mostra la seva coordenada automàticament.
+
+### Coordinació
+Counter -> 1124. Front headers/nav (claude); codex a panells Client 360. Disjunts.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-24 — Headers propis (Inbox, detall reserva/lead) al canon (Canvi #1123, claude)
+
+### Context
+Continuació del #1122 per ordre del propietari: alinear els headers propis que encara divergien (Inbox, detall de reserva, detall de lead) al header canònic únic (Temporada).
+
+### Què s'ha fet
+- `inbox.css` `.sf__title`: `--display` + `--o-text-2xl` + `--t` (abans 22px sense display).
+- `leads-design.css` `.fxd__hd-name` (detall lead): `--heading` Bricolage → `--display`, `--o-text-2xl`; `.fxd__hd-eyebrow` → `--mono` uppercase 0.18em.
+- `admin-shell.css` `.ap-detail-title` (detall reserva + llista): color a `--t`, mida/pes/spacing a tokens canònics.
+
+### Validació
+- Validació tècnica: tsc 0 · validate:core 0 (qa:admin-canon 0, qa:css-monocapa 0); només CSS, tokens canònics.
+- Validació funcional: estils computats reals — `.sf__title`, `.ap-detail-title`, `.fxd__hd-name` = Plus Jakarta 32px rgb(228,222,212), idèntics a `.ap-title`/`.fx__h1`/`.ch__h1`.
+- Validació humana/UX: pendent validació visual del propietari. Tots els headers de l'admin ara clònics.
+
+### Coordinació
+Counter -> 1123. Front headers (claude); codex a panells Client 360. Disjunts.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-24 — Canonització de headers + estructures (Canvi #1122, claude)
+
+### Context
+Ordre del propietari: tots els headers/contenidors/tipografia de l'admin han de ser clònics i canònics, amb el header de Temporada (TANCAT CHARLIE) com a referència. Em demana explícitament que Opus DECIDEIXI el millor header i faci la canonització.
+
+### Decisió de disseny (Opus)
+Header canònic únic = patró Temporada (`fx__pagehead`): eyebrow mono uppercase + h1 display 32px + subtítol mono + separador hairline, pla, carbó+or. És l'únic validat pel propietari, té jerarquia editorial de marca (coordenada → identitat → accions) i usa el sistema tipogràfic dual (display=identitat, mono=dades). Res de gradients/glass.
+
+### Què s'ha fet
+- Monocapa a `app/globals.css` (sistema `.ap-*`, ~80 pàgines via `AdminPage`): header (eyebrow nou + `.ap-title` display 32px = `.fx__h1` + subtítol mono + hairline), contenidors (`.ap-section`/`.ap-card` hairline `--line` + `--panel` + radi únic `--o-r-md`, plans), KPIs (label mono + valor display; blau `--info` neutralitzat).
+- `AdminPage.tsx`: prop `eyebrow`. Cuadrant + repartiment: `eyebrow="Operacions"`.
+- `customer-hub.css`: `.ch__h1` → tipografia canònica display 32px (perímetre header; codex fa els panells `ch__*` en paral·lel, fronts disjunts).
+
+### Verificació
+- `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 (qa:admin-canon 0, qa:css-monocapa 0).
+- Estils computats reals: `.ap-title`, `.fx__h1` i `.ch__h1` → TOTS Plus Jakarta · 32px · rgb(228,222,212). Render 3 breakpoints (cuadrant/repartiment/inventory/pricing/packs/Customer Hub): 0 overflow, 0 runtime error.
+
+### Validació
+- Validació tècnica: monocapa CSS + 1 prop component; 0 hardcoded nou, tokens canònics; tsc 0, validate:core 0 (qa:admin-canon 0, qa:css-monocapa 0).
+- Validació funcional: header idèntic a tot l'admin AdminPage + Customer Hub; estils computats `.ap-title`/`.fx__h1`/`.ch__h1` = Plus Jakarta 32px rgb(228,222,212); render 3 breakpoints 0 overflow/0 error.
+- Validació humana/UX: pendent validació visual del propietari. Queda obert: headers propis restants (Inbox, detall reserva/lead) + rollout d'eyebrow per òrgan.
+
+### Coordinació
+Counter -> 1122. Front HEADERS/estructura compartida (claude); codex a PANELLS Client 360 (#1118-1121). Disjunts.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-24 — SummaryPanel Client 360 residus white (Canvi #1121, codex)
+
+### Context
+Un cop drenats Timeline, Insights, Bookings, Privacy i Discounts, `SummaryPanel` conservava residus `white/*` en la barra financera, quick actions, pills de ruta, referits i controls de tags. El tall s'ha limitat a aquests residus visuals.
+
+### Què s'ha fet
+- `SummaryPanel.tsx`: substituïts `bg-white/*`, `border-white/*`, `text-white/*`, hovers i placeholder blancs per classes `ch__summary-*`; es conserva l'amplada dinàmica de la barra i tots els handlers de tags/links.
+- `customer-hub.css`: afegit el paquet `ch__summary-*` per barra financera, quick actions, pills de ruta, referits i controls de tags.
+- `docs/audit/admin-fitxes.md`: `SummaryPanel` surt del P2 auditat i el recompte baixa.
+- `docs/admin-fitxes-pantalles.md`: Client 360 queda sincronitzat amb el sanejament #1121.
+
+### Verificació
+- `Select-String` focalitzat sobre `SummaryPanel.tsx`: 0 `bg-white`, 0 `border-white`, 0 `text-white`, 0 `hover:bg-white`, 0 `hover:text-white`, 0 `placeholder:text-white`.
+- `npx tsc --noEmit --pretty false` OK.
+
+### Validació
+- Validació tècnica: `pnpm run qa:protocol` OK · `pnpm run validate:core` OK · `git diff --check` OK (només avisos de line endings aliens a `.gitignore` i `public/manifest.json`).
+- Validació funcional: cap canvi a `fetchCustomerHub`, DTOs, Prisma, quick actions, tags, rutes, links, càlculs financers ni amplada dinàmica de la barra; només classes i CSS.
+- Validació humana/UX: la lectura de resum financer, accions ràpides, ruta i tags es conserva, ara sense residus `white/*` locals.
+
+### Coordinació
+Counter -> 1121.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-24 — DiscountsPanel Client 360 canònic (Canvi #1120, codex)
+
+### Context
+Després de `PrivacyPanel` al #1119, el següent P2 acotat dins Client 360 era `DiscountsPanel`: map local amb `border-white/bg-white/text-white`, `admin-tone-*` i fitxer compactat en una línia.
+
+### Què s'ha fet
+- `DiscountsPanel.tsx`: substituït el map local per status `ch__discount-status-*` i l'estructura visual per classes `ch__discount-*`; es conserva la lògica d'actiu/desactivat/esgotat/caducat, dates, usos i origen.
+- `customer-hub.css`: afegit el paquet `ch__discount-*` amb panell, cards, codi, percentatge, status, meta i used-state governats per tokens del hub.
+- `docs/audit/admin-fitxes.md`: `DiscountsPanel` surt del P2 i el recompte baixa.
+- `docs/admin-fitxes-pantalles.md`: Client 360 queda sincronitzat amb el sanejament #1120.
+
+### Verificació
+- `Select-String` focalitzat sobre `DiscountsPanel.tsx`: 0 `border-white`, 0 `bg-white`, 0 `text-white`, 0 `admin-tone`, 0 `bg-amber`, 0 `bg-emerald`.
+- `npx tsc --noEmit --pretty false` OK.
+
+### Validació
+- Validació tècnica: `pnpm run qa:protocol` OK · `pnpm run validate:core` OK · `git diff --check` OK (només avisos de line endings aliens a `.gitignore` i `public/manifest.json`).
+- Validació funcional: cap canvi a codis de descompte, dates, usos, origen, pricing, rutes ni serveis; només classes i CSS.
+- Validació humana/UX: el panell conserva lectura de codi, percentatge, estat, validesa, usos i origen, ara governada per `customer-hub.css`.
+
+### Coordinació
+Counter -> 1120.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-24 — PrivacyPanel Client 360 canònic (Canvi #1119, codex)
+
+### Context
+Després de `BookingsPanel` al #1118, el següent P2 acotat dins Client 360 era `PrivacyPanel`: quatre cards amb `admin-card-glass` legacy, skeletons `bg-white/*` i utilitats visuals locals. El tall havia de ser només de presentació perquè el panell governa consentiments, export RGPD i sol·licituds ARCO.
+
+### Què s'ha fet
+- `PrivacyPanel.tsx`: substituïdes les classes legacy i locals per `ch__privacy-*`; es conserva la lectura de consentiments, export amb CSRF, missatges d'export i render d'ARCO.
+- `customer-hub.css`: afegit el paquet `ch__privacy-*` amb stack, cards, loading, skeleton, files, badges, accions, botons i textos governats per tokens del hub.
+- `docs/audit/admin-fitxes.md`: `PrivacyPanel` surt del P2 i el recompte baixa.
+- `docs/admin-fitxes-pantalles.md`: Client 360 queda sincronitzat amb el sanejament #1119.
+
+### Verificació
+- `Select-String` focalitzat sobre `PrivacyPanel.tsx`: 0 `admin-card-glass`, 0 `bg-white`, 0 `text-white`, 0 `border-white`, 0 `opacity-`, 0 `rounded-2xl`.
+- `npx tsc --noEmit --pretty false` OK.
+
+### Validació
+- Validació tècnica: `pnpm run qa:protocol` OK · `pnpm run validate:core` OK · `git diff --check` OK (només avisos de line endings aliens a `.gitignore` i `public/manifest.json`).
+- Validació funcional: cap canvi a `/consents`, `/export`, `fetchWithCsrf`, consentiments, export RGPD, sol·licituds ARCO ni tractament d'errors; només classes i CSS.
+- Validació humana/UX: el panell conserva la lectura de consentiments actius/revocats, accions RGPD i ARCO, ara governada per `customer-hub.css`.
+
+### Coordinació
+Counter -> 1119.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-24 — BookingsPanel Client 360 canònic (Canvi #1118, codex)
+
+### Context
+Amb `TimelinePanel` i `InsightsBanner` ja drenats, el següent P2 acotat dins Client 360 era `BookingsPanel`: fallback de status amb `border-white/bg-white/text-white`, pills locals de pagament i contador amb `bg-white/*` i tons crus `bg-emerald-*`/`bg-amber-*`.
+
+### Què s'ha fet
+- `BookingsPanel.tsx`: substituïdes les superfícies i pills locals per classes `ch__booking-*`/`ch__bookings-*`; es conserva la lògica de properes/passades, status, pagaments, countdown, links i formatadors.
+- `customer-hub.css`: afegit el paquet `ch__booking-*`/`ch__bookings-*` amb panell, cards, headers, status, meta, tags, pills, accions i links governats per tokens del hub.
+- `docs/audit/admin-fitxes.md`: `BookingsPanel` surt del P2 i el recompte baixa.
+- `docs/admin-fitxes-pantalles.md`: Client 360 queda sincronitzat amb el sanejament #1118.
+
+### Verificació
+- `Select-String` focalitzat sobre `BookingsPanel.tsx`: 0 `border-white`, 0 `bg-white`, 0 `text-white`, 0 `bg-emerald`, 0 `bg-amber`.
+- `npx tsc --noEmit --pretty false` OK.
+
+### Validació
+- Validació tècnica: `pnpm run qa:protocol` OK · `pnpm run validate:core` OK · `git diff --check` OK (només avisos de line endings aliens a `.gitignore` i `public/manifest.json`).
+- Validació funcional: cap canvi a `fetchCustomerHub`, DTOs, Prisma, API routes, status de reserva, dates, pagaments, links ni formatadors; només classes i CSS.
+- Validació humana/UX: el panell conserva la lectura de reserves properes/passades, estat, countdown i pagaments, ara governada per `customer-hub.css`.
+
+### Coordinació
+Counter -> 1118.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-24 — InsightsBanner Client 360 canònic (Canvi #1117, codex)
+
+### Context
+Després del drenatge de `TimelinePanel` al #1116, el següent tall acotat dins Client 360 era `InsightsBanner`: tres targetes amb fallbacks locals (`bg-white/*`, `text-white/*`, `border-white/*`, `bg-[var(...)]`) i barreja de `admin-tone-*`.
+
+### Què s'ha fet
+- `InsightsBanner.tsx`: els mapes passen de classes cromàtiques locals a classes semàntiques `ch__insight-*`; es conserva la lògica de next action, salut relacional, risc comercial i valor del client.
+- `customer-hub.css`: afegit el paquet `ch__insight-*` amb grid, targetes, tons, meta, link i text semàntic governats per tokens del hub.
+- `docs/audit/admin-fitxes.md`: `InsightsBanner` surt del P2 i el recompte baixa.
+- `docs/admin-fitxes-pantalles.md`: Client 360 queda sincronitzat amb el sanejament #1117.
+
+### Verificació
+- `Select-String` focalitzat sobre `InsightsBanner.tsx`: 0 `bg-white`, 0 `text-white`, 0 `border-white`, 0 `bg-[var(...)]`, 0 `admin-tone`.
+- `npx tsc --noEmit --pretty false` OK.
+
+### Validació
+- Validació tècnica: `pnpm run qa:protocol` OK · `pnpm run validate:core` OK · `git diff --check` OK (només avisos de line endings aliens a `.gitignore` i `public/manifest.json`).
+- Validació funcional: cap canvi a `fetchCustomerHub`, DTOs, Prisma, API routes, privacitat, accions de client, next action ni càlculs d'insights; només classes i CSS.
+- Validació humana/UX: les tres targetes mantenen jerarquia i lectura de risc/salut/valor, ara governades per `customer-hub.css`.
+
+### Coordinació
+Counter -> 1117.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-24 — TimelinePanel Client 360 canònic (Canvi #1116, codex)
+
+### Context
+Amb Client 360 ja documentat com a fitxa forense `FETA` al #1114 i el counter avançat per Claude a #1115, el següent tall executable era el residu visual de `TimelinePanel`: filtres amb `bg-white/*`/`text-white/*` i metadata amb `border-l-*` Tailwind semàntic.
+
+### Què s'ha fet
+- `TimelinePanel.tsx`: substituïdes les classes cromàtiques locals per classes `ch__timeline-*`; el component manté filtres, agrupació per dia, links i event rendering.
+- `customer-hub.css`: afegit el paquet `ch__timeline-*` amb tokens canònics del hub per contenidor, filtres, scroll, day headers, cards, links, empty state i tons d'event.
+- `lib/constants/admin.ts`: `CUSTOMER_TIMELINE_EVENT_META` deixa d'exposar `border-l-*` Tailwind i passa a `toneClass` semàntic (`ch__timeline-event--*`).
+- `docs/audit/admin-fitxes.md`: `TimelinePanel` surt del P1/P2; el recompte P1 queda a 0 i el Top queda reordenat.
+- `docs/admin-fitxes-pantalles.md`: Client 360 queda sincronitzat amb el sanejament #1116.
+
+### Verificació
+- `rg` sobre `TimelinePanel.tsx` + `CUSTOMER_TIMELINE_EVENT_META`: 0 `bg-white`, 0 `text-white`, 0 `border-l-*`, 0 `bg-[var(--o-admin-fill-1)]`, 0 `text-[var(`.
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run qa:admin-canon` OK, 0 troballes.
+- `pnpm run qa:admin-mode-prefix` OK.
+- `pnpm run qa:css-monocapa` OK.
+- `pnpm run qa:no-admin-static-css-var-styles` OK.
+
+### Validació
+- Validació tècnica: `pnpm run qa:protocol` OK · `pnpm run validate:core` OK · `git diff --check` OK (només avisos de line endings aliens a `.gitignore` i `public/manifest.json`).
+- Validació funcional: cap canvi a `fetchCustomerHub`, DTOs, Prisma, API routes, privacitat, accions de client, links ni filtres; només classes i CSS.
+- Validació humana/UX: la timeline conserva jerarquia i lectura per tons, ara governada per `customer-hub.css`.
+
+### Coordinació
+Counter -> 1116.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-24 — Fitxa forense òrgan Cuadrant + fix botó-acció canònic (Canvi #1115, claude)
+
+### Context
+Ordre de continuïtat `seguim` del propietari. Backlog de features verificat com a DRENAT: la iniciativa Cuadrant + Repartiment (`docs/cuadrant-repartiment-concept.md`) ja estava construïda sencera (F0–F4: servei pur + 3 rutes API + 2 pàgines + CrewBlockManager + integració Partner Hub, #917-921). Però al registre `docs/admin-fitxes-pantalles.md` `/admin/cuadrant` i `/admin/cuadrant/repartiment` constaven `PENDENT` — sense fitxa forense. Per la regla #2/#3 del protocol executiu, un òrgan admin no està tancat sense fitxa. Front net respecte a codex (que treballava en paral·lel a Reserves/Finances, #1112-#1113).
+
+### Què s'ha fet
+- **Auditoria forense de l'òrgan Cuadrant** (servei + 3 rutes + 2 pàgines + CrewBlockManager, línia a línia): reachability OK (cap illa morta, passa `qa:no-dead-admin-views`), cablejat UI→API→servei→dades íntegre, seguretat correcta (`requireAuth` a totes les rutes, `verifyCsrf` als mutadors, `fetchWithCsrf` al client), monocapa de diners respectada (repartiment = flux de caixa real, no reimplementa marge de `costEngine`; `formatCurrency` centralitzat), loaders GRACEFUL si `crew_blocks` no existeix.
+- **Verificació CSS↔DOM**: les classes `admin-tone-*-cyan/info` estan neutralitzades a carbó des de #999/#1011 (no renderitzen blau); el punt de status `bg-[var(--o-info)]` és l'idioma compartit de 8 fitxers admin (inclòs el dashboard i el germà `calendario/capacity`) → NO és defecte de l'òrgan, tocar-lo només aquí trencaria la hipersemblança.
+- **Únic residu objectiu corregit** (`app/admin/cuadrant/CrewBlockManager.tsx`): el botó d'acció «Afegir» era un botó estilat a mà (no `.ap-btn`) amb un `hover:admin-tone-bg-info` no-op → `.ap-btn ap-btn--primary ap-btn--xs` (regla canon #2). El `hover:admin-tone-text-danger` no-op del botó «✕» → `transition-opacity hover:opacity-70` (hover real).
+- Fitxa `FETA` escrita a `docs/admin-fitxes-pantalles.md` + files del registre `PENDENT → FETA`.
+
+### Verificació
+- `npx tsc --noEmit` EXIT 0.
+- `pnpm run validate:core` EXIT 0 — tots els guards verds, **qa:admin-canon 0 troballes**.
+- `npx vitest run crewScheduleService.test.ts` → 23/23.
+- Render real amb auth: 4 rutes (cuadrant/repartiment + params `days`/`month`) × 3 breakpoints (desktop/tablet/mòbil) → 0 overflow, 0 runtime error; HTTP 200.
+
+### Validació
+- Validació tècnica: canvi limitat a 2 className d'un component admin (botó-acció canònic + hover real); 0 hardcoded nou, 0 CSS nou, dins canon carbó+or.
+- Validació funcional: l'òrgan Cuadrant continua operatiu; el botó «Afegir» bloqueig ara és hipersemblant amb les accions de tot l'admin.
+- Validació humana/UX: pendent validació visual del propietari (com tota fitxa `FETA`).
+
+### Coordinació
+Counter -> 1115. **Renumeració**: el tall es va obrir com a #1111 (counter mostrava #1110 a l'arrencada), però codex va avançar en viu a #1112 (bookings), #1113 (StripePaymentPanel) i #1114 (Client 360) durant la sessió; per la norma de no-col·lisió, renumerat al següent número lliure, #1115. Perímetres disjunts: claude=Cuadrant, codex=Reserves/Finances/Clients.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-24 — Fitxa forense Client 360 abans de tocar Timeline (Canvi #1114, codex)
+
+### Context
+Després de resoldre el P1 de `StripePaymentPanel` al #1113, el següent P1 global de `docs/audit/admin-fitxes.md` era `TimelinePanel.tsx` dins `/admin/clientes/[id]`. Però Client 360 encara constava `PENDENT` a `docs/admin-fitxes-pantalles.md`, així que el protocol obligava a fer fitxa forense abans de tocar visual o codi.
+
+### Què s'ha fet
+- `docs/admin-fitxes-pantalles.md`: l'òrgan Clients passa a `INICIAL parcial` i `/admin/clientes/[id]` queda `FETA`.
+- Afegida la fitxa forense de Client 360: història, component viu, CSS, APIs/serveis, dades, accions, òrgans veïns, duplicacions, residu visual, riscos i decisió de treball.
+- Documentat que `page.tsx` i `GET /api/admin/customers/[id]/hub` comparteixen `fetchCustomerHub`, i que el P1 executable és visual/canònic a `TimelinePanel`, sense tocar DTOs, Prisma ni rutes mutadores.
+
+### Verificació
+- Fitxers llegits: `page.tsx`, `CustomerHubClient.tsx`, `CustomerHeader.tsx`, `TimelinePanel.tsx`, `customer-hub.css`, `fetchCustomerHub.ts`, `data.ts`, `dto.ts`, `timeline.ts`, `/api/admin/customers/[id]/route.ts`, `/hub` i `/status`.
+- Fonts de deute verificades: `docs/audit/admin-fitxes.md` manté el P1 de `TimelinePanel.tsx`; `docs/admin-fitxes-pantalles.md` ja no bloqueja aquest tall per estat `PENDENT`.
+
+### Validació
+- Validació tècnica: `pnpm run qa:protocol` OK · `pnpm run validate:core` OK · `git diff --check` OK (només avisos de line endings aliens a `.gitignore` i `public/manifest.json`).
+- Validació funcional: no es toca runtime; només queda desbloquejat el sanejament visual de timeline.
+- Validació humana/UX: el propietari ja té mapa llegible del hub abans que s'intervingui el lateral de timeline.
+
+### Coordinació
+Counter -> 1114.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-24 — StripePaymentPanel P1 visual canònic (Canvi #1113, codex)
+
+### Context
+Després de deixar `/admin/bookings/[id]` amb fitxa forense `FETA` al #1112, el següent P1 executable era `StripePaymentPanel.tsx`: un bloc gran de `style={{ background/color/border }}`, `color-mix(--at-*)` i `text-[var(--at-*)]` dins Finances.
+
+### Què s'ha fet
+- `StripePaymentPanel.tsx`: eliminats els estils inline cromàtics i les classes `text-[var(...)]`; el component només decideix estat (`paid`, `locked`, `pending`) i renderitza classes semàntiques `bd__stripe-*`.
+- `booking-detail.css`: afegit el paquet `bd__stripe-*` amb tokens canònics `--o-*`, `--ax-*`, `--t*`, inclòs layout responsive del panell de pagaments.
+- `docs/audit/admin-fitxes.md`: `StripePaymentPanel` surt del P1; el recompte P1 baixa de 2 a 1 i el Top 5 queda reordenat.
+- `docs/admin-fitxes-pantalles.md`: la fitxa de Reserva detall queda actualitzada: el P1 de Stripe està resolt i el següent tall de l'òrgan passa a P2 acotat.
+
+### Verificació
+- `Select-String` sobre `StripePaymentPanel.tsx`: 0 `style=`, 0 `text-[var(`, 0 `--at-`, 0 `color-mix`.
+- `pnpm run qa:no-admin-static-css-var-styles` OK.
+- `pnpm run qa:admin-mode-prefix` OK.
+- `pnpm run qa:admin-canon` OK, 0 P1.
+- `pnpm run qa:css-monocapa` OK.
+- `npx tsc --noEmit --pretty false` OK.
+
+### Validació
+- Validació tècnica: `pnpm run qa:protocol` OK · `pnpm run validate:core` OK · `git diff --check` OK.
+- Validació funcional: cap endpoint, webhook, Bizum, Stripe Checkout, pricing ni cost engine modificat.
+- Validació humana/UX: el panell conserva els mateixos estats visuals de pagament però queda governat per CSS canònic i responsive.
+
+### Coordinació
+Counter -> 1113.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-24 — Fitxa forense Reserva detall abans de tocar Stripe (Canvi #1112, codex)
+
+### Context
+`/admin/bookings/[id]` ja constava com a fitxa operativa a l'inventari històric, però seguia `PENDENT` dins `docs/admin-fitxes-pantalles.md`. El P1 viu documentat a `docs/audit/admin-fitxes.md` és `StripePaymentPanel.tsx`, però el protocol prohibeix tocar una pantalla admin sense fitxa forense `FETA`.
+
+### Què s'ha fet
+- `docs/admin-fitxes-pantalles.md`: l'òrgan Reserves passa a `INICIAL parcial` i `/admin/bookings/[id]` queda `FETA`.
+- Afegida la fitxa forense completa de Reserva detall: història, component viu, CSS, APIs/serveis, dades, accions, òrgans veïns, codi mort, duplicacions, hardcoded/residu, connexions interrompudes, riscos, evidència i decisió de treball.
+- Documentat el següent tall executable: sanejar `StripePaymentPanel` cap a classes/tokens canònics sense tocar lògica Stripe/Bizum, webhook ni regles de preu.
+- Renumeració per concurrència: Claude ha reservat `#1111` a `docs/agent-sync.md` per Cuadrant/Repartiment; aquest tall de Codex queda registrat com a `#1112`.
+
+### Verificació
+- Fitxers llegits: `app/admin/bookings/[id]/page.tsx`, `StripePaymentPanel.tsx`, `booking-detail.css`, `docs/admin-booking-detail-rebuild-inventari.md`, `docs/audit/admin-fitxes.md`.
+- Guards previs del perímetre: `pnpm run qa:api-admin-csrf` OK · `pnpm run qa:no-dead-admin-views` OK · `pnpm run qa:admin-mode-prefix` OK.
+
+### Validació
+- Validació tècnica: `pnpm run qa:protocol` OK · `pnpm run validate:core` OK · `git diff --check` OK.
+- Validació funcional: no es toca runtime; la fitxa desbloqueja el sanejament P1 de Stripe amb frontera clara.
+- Validació humana/UX: el propietari ja no ha de deduir quines peces formen Reserva detall ni què es pot tocar amb risc.
+
+### Coordinació
+Counter -> 1112.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-23 — Higiene desplegable de PWA, assets i brossa local (Canvi #1110, codex)
+
+### Context
+Després del #1109, el propietari demana continuar successivament i incloure també la brutícia aliena. La capa nova no és codi de domini sinó fitxers que poden fer drift sense TypeScript: manifests PWA, assets públics duplicats, HTML/captures generades i lockfiles locals.
+
+### Què s'ha fet
+- `/admin`: absorbit el canvi aliena bo de la portada que retirava emojis de KPI; completada la poda eliminant `MetricCard.icon` i CSS `.admin-ui-metric-icon` mort.
+- `public/manifest.json`: shortcuts públics reutilitzen `/favicon-96.png` existent i s'eliminen screenshots inexistents que apuntaven a 404.
+- `__tests__/public/manifest-webmanifest.test.ts`: ampliat perquè també validi `manifest.json` públic i comprovi que totes les icones declarades existeixen a `public/`.
+- `public/offline.html`: preservat com a fitxer funcional requerit per `public/sw.js`; passa a ser visible per entrar al repo en lloc de quedar ocult per `*.html`.
+- `.gitignore`: `uploads/` queda ancorat com `/uploads/` perquè no torni a ignorar `app/api/uploads/**`; afegides excepcions explícites per HTML OAuth i `offline.html`.
+- Masquerade: `seed-masquerade-products.mjs` i `process-masquerade-images.mjs` usen les rutes canòniques `animacio-1-personatge.jpg` / `animacio-2-personatges.jpg`; eliminades les còpies antigues duplicades `animacio-tematica.jpg` i `animacio-personatge.jpg`.
+- Neteja de brossa local/generada: eliminats HTML de dossiers exportats, `audit/visual-report.html`, `audit/screenshots/`, `.codex-captures/`, `scripts/admin-screenshots/`, logs locals, `tsconfig.tsbuildinfo`, `.codex-dev.pid` i `package-lock.json` tracked contra el gestor canònic `pnpm`.
+
+### Verificació
+- `rg` de rutes antigues Masquerade a `scripts app lib public`: 0 resultats.
+- Check de manifests: cap `src` declarat a `manifest.json` / `manifest.webmanifest` apunta a un asset absent.
+- `rg --files` d'HTML: només queden OAuth, Respira i `public/offline.html`.
+- `git ls-files -c -i --exclude-standard`: només resten `.codex-dev.pid` i `package-lock.json`, tots dos eliminats en aquest tall.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__/public/manifest-webmanifest.test.ts` OK (6 tests) · `npx tsc --noEmit --pretty false` OK · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK · `pnpm build` OK · `git diff --check` OK.
+- Validació funcional: PWA pública deixa de declarar assets inexistents; offline fallback es conserva com a fitxer desplegable; Masquerade manté les mateixes imatges amb noms canònics.
+- Validació humana/UX: `/admin` perd emojis en KPI i queda més net; la resta són neteges sense canvi visual intencionat.
+
+### Coordinació
+Counter -> 1110.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-23 — Monocapa final de marca/contacte (Canvi #1109, codex)
+
+### Context
+Després de les auditories netes de codi mort, duplicació, CSS, constants, tipus, seguretat i qualitat de tests, quedava una capa de coherència de domini: literals de marca/contacte que no trenquen avui però competeixen amb `SITE_CONFIG`.
+
+### Què s'ha fet
+- `lib/constants/index.ts`: `WHATSAPP_NUMBER` deriva de `SITE_CONFIG.business.phone` en lloc de repetir el número.
+- `lib/api/openapi.ts`: el servidor de producció deriva de `SITE_CONFIG.web.url`.
+- `lib/constants/admin.ts`, `/admin/presupuestos` i `PresupuestoPdfStudio`: defaults de marca/domini del PDF Studio deriven de `ADMIN_PDF_STUDIO_DEFAULTS`, i aquest de `SITE_CONFIG`.
+- `app/studio/StudioShowroom.tsx`, `app/admin/email-templates/[slug]/TemplateEditorClient.tsx` i `app/api/contact/contact-copy.ts`: contactes/domini visibles deriven de `SITE_CONFIG`.
+
+### Verificació
+- `rg` específic de literals de marca/contacte fora de `site-config` OK: cap `'https://orbitaevents.com'`, `'orbitaevents.com'`, `+34 699 12 10 23`, `info@orbitaevents.com` ni `WHATSAPP_NUMBER = '...'` a `app/` i `lib/`.
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+
+### Validació
+- Validació tècnica: canvi limitat a monocapa de configuració; sense schema, sense lògica de negoci i sense tocar el worktree brut aliè de `/admin`.
+- Validació funcional: el contacte/domini públic continua sent el mateix, però ara ve d'una sola font.
+- Validació humana/UX: cap canvi visual intencionat; les superfícies que mostren contacte conserven el mateix text amb dades canòniques.
+
+### Coordinació
+Counter -> 1109.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-23 — /admin alineat amb TANCAT CHARLIE (Canvi #1099, codex)
 
 ### Context

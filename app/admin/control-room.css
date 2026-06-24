@@ -636,7 +636,6 @@ html.admin-mode .admin-control-room .admin-ui-metric-head {
 html.admin-mode .admin-control-room .admin-ui-metric-copy { min-width: 0; flex: 1; }
 html.admin-mode .admin-control-room .admin-ui-metric-label { font-size: 12px; color: var(--at-muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 html.admin-mode .admin-control-room .admin-ui-metric-value { margin-top: 0.2rem; font-size: 1.45rem; line-height: 1.2; color: var(--at-text); font-weight: 700; }
-html.admin-mode .admin-control-room .admin-ui-metric-icon { flex-shrink: 0; margin-left: 0.375rem; opacity: 0.9; font-size: 1.2rem; }
 html.admin-mode .admin-control-room .admin-ui-metric-dot { width: 3rem; height: 6px; border-radius: 9999px; margin-bottom: 0.5rem; }
 html.admin-mode .admin-control-room .admin-ui-metric-change { font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 html.admin-mode .admin-control-room .admin-ui-metric-change--up { color: var(--at-success); }
@@ -644,27 +643,21 @@ html.admin-mode .admin-control-room .admin-ui-metric-change--down { color: var(-
 html.admin-mode .admin-control-room .admin-ui-metric-change--neutral { color: var(--at-muted); }
 html.admin-mode .admin-control-room .admin-ui-metric-card--cyan { border-color: var(--at-cr-sky-deep); }
 html.admin-mode .admin-control-room .admin-ui-metric-card--cyan:hover { border-color: var(--at-info); }
-html.admin-mode .admin-control-room .admin-ui-metric-card--cyan .admin-ui-metric-icon { color: var(--at-info); }
 html.admin-mode .admin-control-room .admin-ui-metric-card--cyan .admin-ui-metric-dot { background: var(--at-cr-cyan-text); }
 html.admin-mode .admin-control-room .admin-ui-metric-card--emerald { border-color: var(--at-cr-emerald); }
 html.admin-mode .admin-control-room .admin-ui-metric-card--emerald:hover { border-color: var(--at-success); }
-html.admin-mode .admin-control-room .admin-ui-metric-card--emerald .admin-ui-metric-icon { color: var(--at-success); }
 html.admin-mode .admin-control-room .admin-ui-metric-card--emerald .admin-ui-metric-dot { background: var(--at-cr-emerald-text); }
 html.admin-mode .admin-control-room .admin-ui-metric-card--rose { border-color: var(--at-cr-rose-border); }
 html.admin-mode .admin-control-room .admin-ui-metric-card--rose:hover { border-color: var(--at-cr-rose-text); }
-html.admin-mode .admin-control-room .admin-ui-metric-card--rose .admin-ui-metric-icon { color: var(--at-cr-rose-text); }
 html.admin-mode .admin-control-room .admin-ui-metric-card--rose .admin-ui-metric-dot { background: var(--at-cr-rose-text); }
 html.admin-mode .admin-control-room .admin-ui-metric-card--amber { border-color: var(--at-cr-amber-border); }
 html.admin-mode .admin-control-room .admin-ui-metric-card--amber:hover { border-color: var(--at-brand-vivid); }
-html.admin-mode .admin-control-room .admin-ui-metric-card--amber .admin-ui-metric-icon { color: var(--at-brand-vivid); }
 html.admin-mode .admin-control-room .admin-ui-metric-card--amber .admin-ui-metric-dot { background: var(--at-cr-amber-text); }
 html.admin-mode .admin-control-room .admin-ui-metric-card--purple { border-color: var(--at-cr-violet-border); }
 html.admin-mode .admin-control-room .admin-ui-metric-card--purple:hover { border-color: var(--at-violet); }
-html.admin-mode .admin-control-room .admin-ui-metric-card--purple .admin-ui-metric-icon { color: var(--at-violet); }
 html.admin-mode .admin-control-room .admin-ui-metric-card--purple .admin-ui-metric-dot { background: var(--at-violet); }
 html.admin-mode .admin-control-room .admin-ui-metric-card--sky { border-color: var(--at-cr-sky-border); }
 html.admin-mode .admin-control-room .admin-ui-metric-card--sky:hover { border-color: var(--at-cr-sky-text); }
-html.admin-mode .admin-control-room .admin-ui-metric-card--sky .admin-ui-metric-icon { color: var(--at-cr-sky-text); }
 html.admin-mode .admin-control-room .admin-ui-metric-card--sky .admin-ui-metric-dot { background: var(--at-cr-sky-text); }
 
 html.admin-mode .admin-control-room .admin-ui-card { overflow: hidden; border-radius: 0.875rem; border: 1px solid var(--at-border); background: var(--at-surface); box-shadow: var(--at-shadow-md); }
@@ -701,7 +694,6 @@ html.admin-mode .admin-control-room .admin-ui-btn--ghost:hover { background: var
   html.admin-mode .admin-control-room .admin-ui-metric-card { padding: 1rem; }
   html.admin-mode .admin-control-room .admin-ui-metric-label { font-size: 13px; }
   html.admin-mode .admin-control-room .admin-ui-metric-value { font-size: 1.75rem; }
-  html.admin-mode .admin-control-room .admin-ui-metric-icon { font-size: 1.4rem; }
   html.admin-mode .admin-control-room .admin-ui-metric-change { font-size: 12px; }
   html.admin-mode .admin-control-room .admin-ui-card-head { padding: 0.85rem 1.25rem; }
   html.admin-mode .admin-control-room .admin-ui-card-title { font-size: 15px; }

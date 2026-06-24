@@ -160,7 +160,6 @@ export function MetricCard({
   value,
   change,
   changeType,
-  icon,
   accent = 'cyan',
   helpTitle,
   helpText,
@@ -169,7 +168,6 @@ export function MetricCard({
   value: string | number;
   change?: string;
   changeType?: 'up' | 'down' | 'neutral';
-  icon?: string;
   accent?: AccentColor;
   helpTitle?: string;
   helpText?: string;
@@ -188,7 +186,6 @@ export function MetricCard({
           <p className="admin-ui-metric-label">{label}</p>
           <p className="admin-ui-metric-value">{value}</p>
         </div>
-        {icon && <span className="admin-ui-metric-icon">{icon}</span>}
       </div>
       <div className="admin-ui-metric-dot" />
       {change && (
@@ -394,5 +391,4 @@ export function MiniLineChart({ series, height = 56 }: { series: Series[]; heigh
     </div>
   );
 }
-
 

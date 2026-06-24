@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { AdminPage } from '../../components/AdminPage';
 import { loadReferralsSummary } from '@/lib/services/referralsService';
 import ReferralsClient from './ReferralsClient';
+import './referrals.css';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +20,7 @@ export default async function ReferralsPage() {
       actions={
         <Link
           href="/admin/clientes"
-          className="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"
+          className="ap-btn ap-btn--xs"
         >
           ← Tornar al CRM
         </Link>

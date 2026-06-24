@@ -67,51 +67,61 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
     setError(null);
     try {
       const res = await fetchWithCsrf(`/api/admin/customers/${data.customer.id}/activities`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'NOTE_ADDED', note: clean }),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'NOTE_ADDED', note: clean }),
       });
       const payload = await res.json().catch(() => ({}));
       if (!res.ok || !payload?.ok) throw new Error(payload?.error || 'No s’ha pogut desar la nota');
-      setNote(''); router.refresh();
-    } catch (err) { console.error('Error desant nota comunicació', err); setError(err instanceof Error ? err.message : 'Error desant la nota'); } finally { setSaving(false); }
+      setNote('');
+      router.refresh();
+    } catch (err) {
+      console.error('Error desant nota comunicació', err);
+      setError(err instanceof Error ? err.message : 'Error desant la nota');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
-    <section className="rounded-2xl border p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.root)}>
-      <h2 className="text-lg font-semibold">Comunicacions</h2>
-      <p className="mt-1 text-sm">Historial de correus, notes i seguiment.</p>
-      <div className="mt-3 rounded-xl border p-3">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="text-xs">Fil canònic de conversa</p>
-            <p className="mt-1 text-sm font-semibold">{communicationSpine.stateLabel}</p>
-            <p className="mt-1 text-xs opacity-75">{communicationSpine.detail}</p>
+    <section className="ch__comms-panel" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.root)}>
+      <h2 className="ch__comms-heading">Comunicacions</h2>
+      <p className="ch__comms-summary">Historial de correus, notes i seguiment.</p>
+
+      <div className="ch__comms-card">
+        <div className="ch__comms-card-head">
+          <div className="ch__comms-card-copy">
+            <p className="ch__comms-label">Fil canònic de conversa</p>
+            <p className="ch__comms-card-value">{communicationSpine.stateLabel}</p>
+            <p className="ch__comms-card-detail">{communicationSpine.detail}</p>
           </div>
-          <span className="rounded-full border px-2 py-1 text-xs">{communicationSpine.ownerLabel}</span>
+          <span className="ch__comms-pill">{communicationSpine.ownerLabel}</span>
         </div>
-        <div className="mt-3 flex flex-wrap gap-2 text-xs">
-          <Link href={communicationSpine.hubHref} className="rounded border px-2 py-1">
+        <div className="ch__comms-actions">
+          <Link href={communicationSpine.hubHref} className="ch__comms-action">
             Obrir fil del client
           </Link>
-          <Link href={communicationSpine.taskHref} className="rounded border px-2 py-1">
+          <Link href={communicationSpine.taskHref} className="ch__comms-action">
             Crear tasca des del fil
           </Link>
         </div>
       </div>
-      <div className="mt-3 rounded-xl border p-3" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.quickActions)}>
-        <p className="text-xs">Accions ràpides</p>
-        <div className="mt-2 flex flex-wrap gap-2">
+
+      <div className="ch__comms-card" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.quickActions)}>
+        <p className="ch__comms-label">Accions ràpides</p>
+        <div className="ch__comms-actions ch__comms-actions--quick">
           {nextActionLink && (
             nextActionLink.external ? (
               <a
                 href={nextActionLink.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded border px-2 py-1 text-xs font-semibold"
+                className="ch__comms-action ch__comms-action--strong"
               >
                 {nextActionLink.label}
               </a>
             ) : (
-              <Link href={nextActionLink.href} className="rounded border px-2 py-1 text-xs font-semibold">
+              <Link href={nextActionLink.href} className="ch__comms-action ch__comms-action--strong">
                 {nextActionLink.label}
               </Link>
             )
@@ -122,85 +132,96 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
                 href={commercialRiskLink.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded border px-2 py-1 text-xs"
+                className="ch__comms-action"
               >
                 {commercialRiskLink.label}
               </a>
             ) : (
-              <Link href={commercialRiskLink.href} className="rounded border px-2 py-1 text-xs">
+              <Link href={commercialRiskLink.href} className="ch__comms-action">
                 {commercialRiskLink.label}
               </Link>
             )
           )}
-          <Link href={buildCustomerComposeHref(data.customer.id, 'primer-contacte')} className="rounded border px-2 py-1 text-xs" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.template('Plantilla 1r contacte'))}>Plantilla 1r contacte</Link>
-          <Link href={buildCustomerComposeHref(data.customer.id, 'enviament-pressupost')} className="rounded border px-2 py-1 text-xs" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.template('Envia pressupost'))}>Envia pressupost</Link>
-          <Link href={buildCustomerComposeHref(data.customer.id, 'recordatori')} className="rounded border px-2 py-1 text-xs" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.template('Recordatori'))}>Recordatori</Link>
-          <Link href={customerTaskCreateHref} className="rounded border px-2 py-1 text-xs" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.template('Crear tasca de seguiment'))}>Crear tasca de seguiment</Link>
+          <Link href={buildCustomerComposeHref(data.customer.id, 'primer-contacte')} className="ch__comms-action" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.template('Plantilla 1r contacte'))}>
+            Plantilla 1r contacte
+          </Link>
+          <Link href={buildCustomerComposeHref(data.customer.id, 'enviament-pressupost')} className="ch__comms-action" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.template('Envia pressupost'))}>
+            Envia pressupost
+          </Link>
+          <Link href={buildCustomerComposeHref(data.customer.id, 'recordatori')} className="ch__comms-action" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.template('Recordatori'))}>
+            Recordatori
+          </Link>
+          <Link href={customerTaskCreateHref} className="ch__comms-action" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.template('Crear tasca de seguiment'))}>
+            Crear tasca de seguiment
+          </Link>
         </div>
       </div>
-      <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <article className="rounded-xl border p-3">
-          <p className="text-xs uppercase tracking-wider opacity-60">Últim contacte</p>
-          <p className="mt-1 text-sm font-semibold">
+
+      <div className="ch__comms-metrics">
+        <article className="ch__comms-metric">
+          <p className="ch__comms-metric-label">Últim contacte</p>
+          <p className="ch__comms-metric-value">
             {commSummary.lastContactAt ? formatDateTime(commSummary.lastContactAt) : 'Sense contacte'}
           </p>
         </article>
-        <article className="rounded-xl border p-3">
-          <p className="text-xs uppercase tracking-wider opacity-60">Dies sense contacte</p>
-          <p className="mt-1 text-sm font-semibold">
+        <article className="ch__comms-metric">
+          <p className="ch__comms-metric-label">Dies sense contacte</p>
+          <p className="ch__comms-metric-value">
             {commSummary.daysSinceLastContact ?? '—'}
           </p>
         </article>
-        <article className="rounded-xl border p-3">
-          <p className="text-xs uppercase tracking-wider opacity-60">Gap resposta</p>
-          <p className="mt-1 text-sm font-semibold">
+        <article className="ch__comms-metric">
+          <p className="ch__comms-metric-label">Gap resposta</p>
+          <p className="ch__comms-metric-value">
             {commSummary.responseGap != null ? `${commSummary.responseGap} h` : '—'}
           </p>
         </article>
-        <article className="rounded-xl border p-3">
-          <p className="text-xs uppercase tracking-wider opacity-60">Volum comunicació</p>
-          <p className="mt-1 text-sm font-semibold">{commSummary.total}</p>
+        <article className="ch__comms-metric">
+          <p className="ch__comms-metric-label">Volum comunicació</p>
+          <p className="ch__comms-metric-value">{commSummary.total}</p>
         </article>
       </div>
-      <div className="mt-3 rounded-xl border p-3">
-        <p className="text-xs">Estat de conversa</p>
-        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-          <span className="rounded-full border px-2 py-1 font-semibold">{responseState}</span>
-          {lastTouchLabel && <span className="rounded-full border px-2 py-1 opacity-75">Últim toc · {lastTouchLabel}</span>}
+
+      <div className="ch__comms-card">
+        <p className="ch__comms-label">Estat de conversa</p>
+        <div className="ch__comms-pills">
+          <span className="ch__comms-pill ch__comms-pill--strong">{responseState}</span>
+          {lastTouchLabel && <span className="ch__comms-pill ch__comms-pill--muted">Últim toc · {lastTouchLabel}</span>}
         </div>
       </div>
+
       {followUpSummary && followUpSummary.total > 0 && followUpSummary.topItem && (
-        <div className="mt-3 rounded-xl border p-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <p className="text-xs">Seguiment canònic pendent</p>
-              <p className="mt-1 text-sm font-semibold">
+        <div className="ch__comms-card">
+          <div className="ch__comms-card-head">
+            <div className="ch__comms-card-copy">
+              <p className="ch__comms-label">Seguiment canònic pendent</p>
+              <p className="ch__comms-card-value">
                 {followUpSummary.total} pendent{followUpSummary.total > 1 ? 's' : ''} · {followUpSummary.urgent} urgent{followUpSummary.urgent > 1 ? 's' : ''}
               </p>
             </div>
-            <span className="rounded-full border px-2 py-1 text-xs">
+            <span className="ch__comms-pill">
               {followUpSummary.topItem.urgency} · {followUpSummary.topItem.daysSinceOutbound}d
             </span>
           </div>
-          <p className="mt-2 text-xs opacity-75">{followUpSummary.topItem.suggestedAction}</p>
-          <div className="mt-3 flex flex-wrap gap-2 text-xs">
+          <p className="ch__comms-card-detail">{followUpSummary.topItem.suggestedAction}</p>
+          <div className="ch__comms-actions">
             {commercialRiskLink ? (
               commercialRiskLink.external ? (
                 <a
                   href={commercialRiskLink.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded border px-2 py-1"
+                  className="ch__comms-action"
                 >
                   {commercialRiskLink.label}
                 </a>
               ) : (
-                <Link href={commercialRiskLink.href} className="rounded border px-2 py-1">
+                <Link href={commercialRiskLink.href} className="ch__comms-action">
                   {commercialRiskLink.label}
                 </Link>
               )
             ) : (
-              <Link href={buildCustomerComposeHref(data.customer.id, 'seguiment')} className="rounded border px-2 py-1">
+              <Link href={buildCustomerComposeHref(data.customer.id, 'seguiment')} className="ch__comms-action">
                 ✉️ Preparar seguiment
               </Link>
             )}
@@ -209,46 +230,60 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
                 href={`https://wa.me/${followUpSummary.topItem.phone.replace(/[^\d]/g, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded border px-2 py-1"
+                className="ch__comms-action"
               >
                 💬 WhatsApp
               </a>
             )}
             <Link
               href={buildCustomerWorkspaceTabHref(data.customer.id, 'comms')}
-              className="rounded border px-2 py-1"
+              className="ch__comms-action"
             >
               Obrir Customer Hub
             </Link>
           </div>
         </div>
       )}
-      <div className="mt-3 rounded-xl border p-3">
-        <p className="text-xs">Repartiment per canal</p>
-        <div className="mt-2 flex flex-wrap gap-2 text-xs">
-          <span className="rounded-full border px-2 py-1">📧 Email · {commSummary.channels.EMAIL}</span>
-          <span className="rounded-full border px-2 py-1">💬 WhatsApp · {commSummary.channels.WHATSAPP}</span>
-          <span className="rounded-full border px-2 py-1">📞 Trucades · {commSummary.channels.CALL}</span>
-          <span className="rounded-full border px-2 py-1">📝 Notes · {commSummary.channels.NOTE}</span>
+
+      <div className="ch__comms-card">
+        <p className="ch__comms-label">Repartiment per canal</p>
+        <div className="ch__comms-pills">
+          <span className="ch__comms-pill">📧 Email · {commSummary.channels.EMAIL}</span>
+          <span className="ch__comms-pill">💬 WhatsApp · {commSummary.channels.WHATSAPP}</span>
+          <span className="ch__comms-pill">📞 Trucades · {commSummary.channels.CALL}</span>
+          <span className="ch__comms-pill">📝 Notes · {commSummary.channels.NOTE}</span>
         </div>
       </div>
-      <div className="mt-3 rounded-xl border p-3" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.note)}>
-        <p className="text-xs">Afegir nota interna</p>
-        <textarea className="mt-2 w-full rounded-xl border px-3 py-2 text-sm" rows={3} placeholder="Escriu una nota de seguiment..." value={note} onChange={(e) => setNote(e.target.value)} />
-        {error && <p className="mt-2 rounded-md border px-2 py-1 text-xs">{error}</p>}
-        <div className="mt-2"><button type="button" onClick={saveNote} disabled={saving || !note.trim()} className="rounded px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60">{saving ? 'Desant...' : 'Desa nota'}</button></div>
+
+      <div className="ch__comms-card" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.note)}>
+        <label className="ch__comms-label" htmlFor="customer-comms-note">Afegir nota interna</label>
+        <textarea
+          id="customer-comms-note"
+          className="ch__comms-note-input"
+          rows={3}
+          placeholder="Escriu una nota de seguiment..."
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+        />
+        {error && <p className="ch__comms-error">{error}</p>}
+        <div className="ch__comms-note-actions">
+          <button type="button" onClick={saveNote} disabled={saving || !note.trim()} className="ch__comms-save">
+            {saving ? 'Desant...' : 'Desa nota'}
+          </button>
+        </div>
       </div>
-      <div className="mt-4 space-y-2">
+
+      <div className="ch__comms-message-list">
         {data.messages.length === 0 ? (
-          <p className="rounded-xl border p-3 text-sm">No hi ha comunicacions encara.</p>
+          <p className="ch__comms-empty">No hi ha comunicacions encara.</p>
         ) : data.messages.slice(0, 40).map((message) => (
-          <article key={message.id} className="rounded-xl border p-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-xs font-semibold">{formatMessageTitle(message.subject, message.channel)}</p>
-              <span className="rounded-full border px-2 py-0.5 text-xs opacity-70">{formatMessageChannel(message.channel)}</span>
+          <article key={message.id} className="ch__comm-card">
+            <div className="ch__comm-head">
+              <p className="ch__comm-title">{formatMessageTitle(message.subject, message.channel)}</p>
+              <span className="ch__comms-pill ch__comms-pill--compact">{formatMessageChannel(message.channel)}</span>
             </div>
-            {message.bodyPreview && <p className="mt-1 text-xs">{message.bodyPreview}</p>}
-            <p className="mt-1 text-xs">{formatDateTime(message.createdAt)}</p>
+            {message.bodyPreview && <p className="ch__comm-preview">{message.bodyPreview}</p>}
+            <p className="ch__comm-date">{formatDateTime(message.createdAt)}</p>
           </article>
         ))}
       </div>

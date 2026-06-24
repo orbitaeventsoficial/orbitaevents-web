@@ -30,7 +30,7 @@ html.admin-mode .nb__side { position: sticky; top: 80px; display: grid; gap: 14p
 html.admin-mode .nb__panel { border: 1px solid var(--line); border-top: 1px solid var(--hair-gold); border-radius: var(--o-r-lg); padding: 20px 22px; background: linear-gradient(180deg, var(--panel), color-mix(in oklab, var(--panel) 86%, var(--canvas))); box-shadow: 0 24px 50px -40px var(--ax-overlay-xl); }
 html.admin-mode .nb__panel--error { border-color: var(--o-stage-lost); border-left: 3px solid var(--o-stage-lost); }
 html.admin-mode .nb__phead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 0 14px; }
-html.admin-mode .nb__h2 { margin: 0; font-family: var(--display); font-size: var(--o-text-md-2); font-weight: var(--o-fw-bold); color: var(--t); letter-spacing: -0.005em; }
+html.admin-mode .nb__h2 { margin: 0; font-family: var(--display); font-size: var(--o-text-lg); font-weight: var(--o-fw-bold); color: var(--t); letter-spacing: -0.01em; }
 html.admin-mode .nb__pintro { margin: 0; color: var(--t3); font-size: var(--o-text-2xs); font-family: var(--mono); }
 
 /* Fields */

@@ -140,7 +140,7 @@ export function AddCustomerModal({
       initial={reduceMotion ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/60 admin-card-glass flex items-center justify-center z-50 p-4"
+      className="cl__modal-backdrop"
       onClick={onClose}
       role="presentation"
     >
@@ -176,7 +176,7 @@ export function AddCustomerModal({
                   <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
                     dup.matchScore >= 80 ? 'admin-tone-soft-danger' :
                     dup.matchScore >= 50 ? 'admin-tone-bg-warning admin-tone-text-warning' :
-                    'bg-white/5 text-white/40'
+                    'cl__duplicate-score-low'
                   }`}>
                     {dup.matchScore}%
                   </span>
@@ -378,7 +378,7 @@ export function StartProcessModal({
       initial={reduceMotion ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/60 admin-card-glass flex items-center justify-center z-50 p-4"
+      className="cl__modal-backdrop"
       onClick={onClose}
       role="presentation"
     >

@@ -1,4 +1,5 @@
 import { getAllPacks } from '@/app/config/packs-config';
+import { SITE_CONFIG } from '@/app/config/site-config';
 
 export const ADMIN_SHORTCUT_ROUTES: Record<string, string> = {
   '1': '/admin/leads',
@@ -57,7 +58,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 1108;
+export const ADMIN_CHANGE_COUNTER = 1144;
 
 export const ADMIN_DOSSIER_GENERATOR_COPY = {
   page: {
@@ -193,20 +194,20 @@ export const CUSTOMER_TIMELINE_FILTER_OPTIONS = [
   { key: 'comms', label: 'Comunicacions', icon: '💬' },
 ] as const;
 
-export const CUSTOMER_TIMELINE_EVENT_META: Record<string, { filter: 'proposals' | 'bookings' | 'tasks' | 'comms'; icon: string; borderClass: string }> = {
-  PROPOSAL_CREATED: { filter: 'proposals', icon: '📄', borderClass: 'border-l-cyan-500' },
-  PROPOSAL_SENT: { filter: 'proposals', icon: '📤', borderClass: 'border-l-cyan-400' },
-  PROPOSAL_ACCEPTED: { filter: 'proposals', icon: '✅', borderClass: 'border-l-emerald-500' },
-  BOOKING_CREATED: { filter: 'bookings', icon: '📅', borderClass: 'border-l-indigo-500' },
-  BOOKING_CONFIRMED: { filter: 'bookings', icon: '🎉', borderClass: 'border-l-emerald-400' },
-  TASK_CREATED: { filter: 'tasks', icon: '📝', borderClass: 'border-l-amber-500' },
-  TASK_DONE: { filter: 'tasks', icon: '✓', borderClass: 'border-l-emerald-500' },
-  MESSAGE_SENT: { filter: 'comms', icon: '✉️', borderClass: 'border-l-violet-500' },
-  EMAIL_RECEIVED: { filter: 'comms', icon: '📩', borderClass: 'border-l-violet-400' },
-  WHATSAPP_SENT: { filter: 'comms', icon: '💬', borderClass: 'border-l-green-500' },
-  PHONE_CALL: { filter: 'comms', icon: '📞', borderClass: 'border-l-sky-500' },
-  NOTE_ADDED: { filter: 'comms', icon: '📌', borderClass: 'border-l-white/20' },
-  ACTIVITY: { filter: 'comms', icon: '•', borderClass: 'border-l-white/10' },
+export const CUSTOMER_TIMELINE_EVENT_META: Record<string, { filter: 'proposals' | 'bookings' | 'tasks' | 'comms'; icon: string; toneClass: string }> = {
+  PROPOSAL_CREATED: { filter: 'proposals', icon: '📄', toneClass: 'ch__timeline-event--proposal' },
+  PROPOSAL_SENT: { filter: 'proposals', icon: '📤', toneClass: 'ch__timeline-event--proposal' },
+  PROPOSAL_ACCEPTED: { filter: 'proposals', icon: '✅', toneClass: 'ch__timeline-event--success' },
+  BOOKING_CREATED: { filter: 'bookings', icon: '📅', toneClass: 'ch__timeline-event--booking' },
+  BOOKING_CONFIRMED: { filter: 'bookings', icon: '🎉', toneClass: 'ch__timeline-event--success' },
+  TASK_CREATED: { filter: 'tasks', icon: '📝', toneClass: 'ch__timeline-event--warning' },
+  TASK_DONE: { filter: 'tasks', icon: '✓', toneClass: 'ch__timeline-event--success' },
+  MESSAGE_SENT: { filter: 'comms', icon: '✉️', toneClass: 'ch__timeline-event--comms' },
+  EMAIL_RECEIVED: { filter: 'comms', icon: '📩', toneClass: 'ch__timeline-event--comms' },
+  WHATSAPP_SENT: { filter: 'comms', icon: '💬', toneClass: 'ch__timeline-event--comms' },
+  PHONE_CALL: { filter: 'comms', icon: '📞', toneClass: 'ch__timeline-event--comms' },
+  NOTE_ADDED: { filter: 'comms', icon: '📌', toneClass: 'ch__timeline-event--note' },
+  ACTIVITY: { filter: 'comms', icon: '•', toneClass: 'ch__timeline-event--activity' },
 };
 
 
@@ -758,8 +759,8 @@ export const ADMIN_PDF_STUDIO_DEFAULTS: Record<string, string> = {
   whyChooseUs: 'Equip tecnic professional, resposta rapida i proposta adaptada perque tot surti perfecte sense complicacions.',
   brandTagline: 'El teu esdeveniment. El teu estil. La teva nit perfecta.',
   cancellationPolicy: 'Cancel·lació fins a 30 dies: 100% devolució. 15-30 dies: 50%. Menys de 15 dies: no reemborsable.',
-  brandName: 'Òrbita Events',
-  brandWebsite: 'orbitaevents.com',
+  brandName: SITE_CONFIG.business.name,
+  brandWebsite: SITE_CONFIG.web.domain,
 };
 
 // ─── Dashboard Pilot Steps (static config) ──────────────────────────────

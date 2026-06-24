@@ -54,10 +54,10 @@ Les rutes admin no es tracten com 90 pantalles independents. Primer s'agrupen pe
 | Comandament | `/admin`, `/admin/salut`, `/admin/reporting`, `/admin/analytics` | PENDENT |
 | Comercial | `/admin/leads`, `/admin/leads/[id]`, `/admin/sales-ops`, `/admin/leads/arxiu`, `/admin/leads/reengagement` | INICIAL parcial |
 | Documents | `/admin/presupuestos`, `/admin/presupuestos/[id]`, `/admin/dossiers`, `/admin/studio` | INICIAL parcial |
-| Comunicacions | `/admin/inbox`, `/admin/inbox/compose`, `/admin/inbox/settings`, `/admin/emails`, `/admin/email-templates` | PENDENT |
-| Reserves | `/admin/bookings`, `/admin/bookings/[id]`, `/admin/bookings/new`, `/admin/calendario`, `/admin/calendario/capacity` | PENDENT |
-| Clients | `/admin/clientes`, `/admin/clientes/[id]`, `/admin/clientes/reactivation`, `/admin/clientes/referrals` | PENDENT |
-| Catàleg | `/admin/packs`, `/admin/packs/[id]`, `/admin/packs/extras`, `/admin/inventory`, `/admin/pricing`, `/admin/catalog` | PENDENT |
+| Comunicacions | `/admin/inbox`, `/admin/inbox/compose`, `/admin/inbox/settings`, `/admin/emails`, `/admin/email-templates` | FETA (#1133) |
+| Reserves | `/admin/bookings`, `/admin/bookings/[id]`, `/admin/bookings/new`, `/admin/calendario`, `/admin/calendario/capacity` | INICIAL parcial |
+| Clients | `/admin/clientes`, `/admin/clientes/[id]`, `/admin/clientes/reactivation`, `/admin/clientes/referrals` | INICIAL parcial |
+| Catàleg | `/admin/packs`, `/admin/packs/[id]`, `/admin/packs/extras`, `/admin/inventory`, `/admin/pricing`, `/admin/catalog` | FETA (#1132) |
 | Partners | `/admin/collaborators`, `/admin/collaborators/[id]` | PENDENT |
 | Post-event | `/admin/post-event`, reports, surveys, feedback, playbook | PENDENT |
 | Sistema | settings, crons, scripts, features, coverage, docs, canvas, text/css/image managers | PENDENT |
@@ -337,6 +337,203 @@ Decisió de treball:
 - El proper tall funcional/visual sobre Documents ha de ser l'editor PDF intern: migrar `PresupuestoPdfStudio`/`StudioPreview` a carcassa canònica `pr__*` o component compartit, reduir utilitaris visuals ad-hoc i decidir si l'acció d'enviament ha de quedar en una sola semàntica visible.
 - No tocar pricing, càlcul de transport, IVA ni generació PDF sense una ordre funcional explícita.
 
+### `/admin/bookings/[id]`
+
+Pantalla: Reserva detall / cabina operativa
+Ruta: `/admin/bookings/[id]`
+Estat inventari: 🟢
+TANCAT CHARLIE: no — pendent validació visual del propietari.
+Estat fitxa: FETA — auditoria forense integrada el 2026-06-24 (Canvi #1112), sobre inventari previ `docs/admin-booking-detail-rebuild-inventari.md` i lectura del perímetre viu.
+
+Història:
+- `docs/admin-booking-detail-rebuild-inventari.md` (2026-06-02) va inventariar la refeta de fitxa reserva amb el cas Kimera/OE-2026-003: cabina molt potent però massa carregada, amb prioritat a semàfor, cobrament, client, bolo i accions crítiques.
+- Canvi #849: migració visual de la fitxa a `booking-detail.css`, prefix `bd__`, secció sticky i `BookingSectionNav`.
+- Canvis #577-#591: flux Stripe/portal client/post-pagament completat; `StripePaymentPanel` queda muntat dins Finances i connectat a Checkout/webhook.
+- Canvis #1099-#1102: logística de camp afegida a reserva/calendari amb Waze/Maps i hora de sortida.
+
+Component viu:
+- `app/admin/bookings/[id]/page.tsx`: server component real. Importa `booking-detail.css`, carrega `Booking` amb Prisma i renderitza tota la cabina.
+- Components fills vius renderitzats directament: `BookingStatusChanger`, `CommunicationPanel`, `CalendarSyncButton`, `PostEventEmailButton`, `BookingMarginCard`, `BookingServiceLinesEditor`, `BookingChecklist`, `InvoiceSection`, `DocumentFlowSection`, `BookingInventorySection`, `ClientPortalAccessPanel`, `StripePaymentPanel`, `BookingSectionNav`, `BookingGallery`, `BookingFieldNotesComposer`, `BookingCustomerLinkPanel`, `BookingQuestionnaireSection`, `BookingTotalEditor`.
+- Estats auxiliars: `loading.tsx`, `error.tsx`.
+- `GallerySharePanel.tsx` existeix al directori però no queda muntat directament al `page.tsx`; és peça latent/adjacent del flux galeria-share, no superfície principal de la fitxa.
+
+CSS viu:
+- `app/admin/bookings/[id]/booking-detail.css`: cobreix el detall `bd__*` i també algunes classes `bk-*` de la llista perquè `/admin/bookings/page.tsx` l'importa.
+- El CSS usa `html.admin-mode` i tokens `--ax-*`/`--o-*`; `qa:admin-mode-prefix` és 0 deute.
+- Canvi #1142: la llista `/admin/bookings` deixa d'emetre els contenidors `style={{...}}` P2 i `admin-card-glass` a empty/cards mòbil; passen a `bk-detail-bar-row`, `bk-detail-bar-actions`, `bk-list-shell`, `bk-empty-state` i `bk-mobile-card`.
+- Residus coneguts: overrides amb `!important` sobre components encaixats (`admin-booking-margin*`, inputs dins `bd__root`). El P1 cromàtic de `StripePaymentPanel.tsx` queda resolt al Canvi #1113.
+
+APIs/serveis vius:
+- Lectura inicial: `prisma.booking.findUnique()` al `page.tsx` amb `pack`, `extras`, `serviceLines`, `inventory`, `lead`, `proposals`, `invoices`, post-event, enquesta i feedback.
+- Snapshot operacional: `getBookingOperationalSnapshot()` → checklist, timeline canònica, client, portal actiu, configuració de rendibilitat, cost inventari, comunicacions i post-event.
+- Meteo/logística: `getWeatherForEvent()` i `buildEventLogistics()`.
+- Customer/lead/proposal links: `buildCustomerHubHref`, `buildCustomerComposeHref`, `buildLeadWorkspaceHref`, `buildLeadComposeHref`, `buildProposalHref`, `buildPackHref`.
+- Mutacions principals: `/api/admin/bookings/[id]`, `/status`, `/calendar-sync`, `/checklist`, `/gallery`, `/gallery-share`, `/inventory`, `/portal-access`, `/communications`, `/customer-link`, `/stripe-checkout`, `/confirm-bizum`, `/api/admin/emails/send-post-event`, `/api/admin/maps/distance`.
+
+Dades que governa:
+- Identitat i estat de la reserva: `reference`, `status`, client/contacte, lead/customer vinculats.
+- Bolo: data, horari, ubicació, venue, convidats, logística de sortida i navegació.
+- Servei: pack, extres, hores extra i `BookingServiceLine`.
+- Economia: subtotal, descompte, IVA, total editable, paga i senyal, resta, Stripe/Bizum, marge i cost directe.
+- Operativa: inventari, checklist, portal client, qüestionari, documents, factura, comunicacions, timeline, galeria, post-event.
+
+Accions que governa:
+- Canviar estat de reserva.
+- Editar total manual.
+- Generar/copiar links Stripe i confirmar Bizum declarat.
+- Vincular/crear client si falta `customerId`.
+- Sincronitzar calendari, afegir a Google Calendar, enviar post-event, crear informe intern.
+- Assignar inventari, editar checklist, gestionar portal/qüestionari/documents/factures/galeria.
+
+Òrgans veïns:
+- upstream: Agenda/Leads (`/admin/leads`), llista de reserves, Customer Hub, Economia, Calendari i Dashboard obren aquesta fitxa via `buildBookingHref()`.
+- downstream: Customer Hub, Lead workspace, Inbox/Compose, Portal client, Documents/pressupostos/contractes/factures, Inventari, Post-event, Google Calendar i timeline canònica.
+
+Codi mort relacionat:
+- `qa:no-dead-admin-views` passa verd; no hi ha arrel admin òrfena.
+- `GallerySharePanel` no apareix al render principal del `page.tsx`; cal tractar-lo com a subflux de galeria-share abans de podar o muntar-lo.
+
+Duplicacions:
+- La llista `/admin/bookings` i el detall comparteixen `booking-detail.css`; és una convivència històrica acceptable però no ideal per futures passades de llista.
+- El detall llegeix Prisma directament i després amplia amb `bookingOperationalService`; no és duplicació funcional, però la font de lectura està partida entre query server i snapshot operacional.
+- El marge final passa per `BookingMarginCard`/cost engine; no recalcular marges locals fora d'aquest perímetre.
+
+Hardcoded/residu visual:
+- Resolt #1113: `StripePaymentPanel.tsx` ja no conserva `style={{ background/color/border }}`, `color-mix(--at-*)` ni `text-[var(--at-*)]`; els estats de pagament viuen en classes `bd__stripe-*` dins `booking-detail.css`.
+- Residus menors al `page.tsx`: `style={{ textDecoration: 'none' }}`, `style={{ opacity: 0.4 }}` i `style={{ marginTop: '10px' }}` són locals; no bloquegen la fitxa però entren al radar si es toca la carcassa.
+- Icones/emoji visibles a botons (`Waze`, `Maps`, `Client`, `Lead`) existeixen; si es redissenya, preferir icona canònica o copy curt coherent.
+
+Connexions interrompudes:
+- No hi ha cable funcional principal trencat: la reserva connecta amb client, lead, documents, portal, inventari, calendari, timeline i post-event.
+- Fricció coneguda del cas Kimera: booking pot tenir `customerId` buit, diferències de pax/contacte/adreça respecte al lead, i tensió entre `invoiceRequired=false`, `vatRate=21`, `paymentMethod=CASH` i `cashAmount`. La UI ho mostra parcialment però no ho resol automàticament.
+
+Riscos:
+- Canviar pagaments/Stripe/Bizum afecta diners reals i webhook; qualsevol canvi funcional requereix tests focalitzats de ruta/servei.
+- Canviar total/IVA/manual pricing no s'ha de reinterpretar com a canvi de regla de negoci.
+- El P1 visual de `StripePaymentPanel` queda resolt al Canvi #1113; el risc restant de pagaments és funcional, no de capa visual.
+
+Evidència d'auditoria:
+- Fitxers llegits: `page.tsx`, `StripePaymentPanel.tsx`, `booking-detail.css`, `docs/admin-booking-detail-rebuild-inventari.md`, `docs/audit/admin-fitxes.md`.
+- Imports/exports verificats: `page.tsx` → components locals; `StripePaymentPanel` → `fetchWithCsrf` + `/stripe-checkout` i `/confirm-bizum`; enllaços externs via helpers.
+- Selectors CSS verificats contra DOM: `bd__root`, `bd__overview`, `bd__pnl`, `bd__secnav`, `bd__stripe`, taules, field notes i overrides de components encaixats.
+- Serveis/APIs seguits: `bookingOperationalService`, `bookingStripePaymentService`, rutes booking admin, webhook Stripe, timeline/cost engine per referències.
+- Proves/guards executats en aquest tall: `pnpm run qa:api-admin-csrf`, `pnpm run qa:no-dead-admin-views`, `pnpm run qa:admin-mode-prefix`.
+
+Decisió de treball:
+- Es conserva la ruta i la cabina: és viva, connectada i operativa.
+- Proper tall executable dins Reserva detall: si es continua en aquest òrgan, atacar un P2 acotat (`BookingTotalEditor` o `BookingMarginCard`) sense tocar lògica Stripe/Bizum ni regles de preu.
+- No tocar: schema, webhook Stripe, càlculs de total/IVA, cost engine, llista de reserves ni refeta visual global de la fitxa.
+- Validació pendent del propietari: visual final de la cabina abans de marcar `TANCAT CHARLIE`.
+
+### `/admin/clientes/[id]`
+
+Pantalla: Client 360 / Customer Hub
+Ruta: `/admin/clientes/[id]`
+Estat inventari: 🟢
+TANCAT CHARLIE: no — pendent validació visual del propietari.
+Estat fitxa: FETA — auditoria forense inicial completada el 2026-06-24 (Canvi #1114), abans de tocar el P1 visual de `TimelinePanel.tsx`.
+
+Història:
+- Canvi #812: migració de la fitxa 360 al disseny Brass & Obsidian, `customer-hub.css` amb prefix `ch__`, `CustomerHubClient`/`CustomerHeader`, KPIs, stagebar, tabs i accions pròpies.
+- Canvi #1048: auditoria transversal va declarar l'òrgan Clients sa a nivell de codi mort/components, amb residu pendent només visual.
+- Canvi #1114: aquesta fitxa deixa `/admin/clientes/[id]` de `PENDENT` a `FETA` dins `docs/admin-fitxes-pantalles.md`, perquè el P1 `TimelinePanel.tsx:197` no es podia sanejar sense mapa forense.
+- Canvi #1116: `TimelinePanel` deixa d'emetre superfícies `bg-white/*`, `text-white/*` i `border-l-*` Tailwind; el lateral passa a classes `ch__timeline-*` governades per `customer-hub.css`.
+- Canvi #1117: `InsightsBanner` deixa d'emetre fallbacks `bg-white/*`, `text-white/*`, `border-white/*`, `bg-[var(...)]` i `admin-tone-*`; les tres targetes passen a classes `ch__insight-*` governades per `customer-hub.css`.
+- Canvi #1118: `BookingsPanel` deixa d'emetre `border-white/*`, `bg-white/*`, `text-white/*`, `bg-emerald-*` i `bg-amber-*`; cards, badges, pills, seccions i links passen a classes `ch__booking-*`/`ch__bookings-*`.
+- Canvi #1119: `PrivacyPanel` deixa d'emetre `admin-card-glass`, skeletons `bg-white/*` i utilitats visuals locals; consentiments, export RGPD i ARCO passen a classes `ch__privacy-*`.
+- Canvi #1120: `DiscountsPanel` deixa d'emetre `border-white/*`, `bg-white/*`, `text-white/*` i `admin-tone-*`; codis, status i metadata passen a classes `ch__discount-*`.
+- Canvi #1121: `SummaryPanel` deixa d'emetre residus `bg-white/*`, `border-white/*`, `text-white/*`, `hover:bg-white/*`, `hover:text-white/*` i `placeholder:text-white/*`; barra financera, quick actions, ruta, referits i tags passen a classes `ch__summary-*`.
+- Canvi #1126: `LeadsPanel` deixa d'emetre `admin-tone-*`, classes Tailwind cromàtiques de lead i superfícies genèriques; status, prioritat, blocker, cards i accions passen a classes `ch__lead-*`.
+- Canvi #1128: `ProposalsPanel` deixa d'emetre superfícies genèriques, `text-white/40`, botons locals i confirmacions inline; grups, cards, accions, error i contracte passen a classes `ch__proposal-*`.
+- Canvi #1134: `CommsPanel` deixa d'emetre contenidors, mètriques, pills, botons, textarea i llista de missatges amb classes genèriques; el fil canònic, accions ràpides, seguiment, canals, nota interna i missatges passen a `ch__comms-*` / `ch__comm-*`.
+- Canvi #1136: `CustomerHeader.tsx` deixa de tenir els dos `style={{...}}` locals documentats; el backdrop del menú d'estat i el wrapper del rail d'etapes passen a `ch__statusbackdrop` i `ch__stageitem`.
+- Canvi #1139: `/admin/clientes/reactivation` deixa d'emetre KPIs, cards, pills, missatge suggerit i accions amb classes visuals genèriques; `ReactivationClient` passa a `rc__*` i `reactivation.css` escopat a `html.admin-mode`.
+- Canvi #1140: `/admin/clientes/referrals` deixa d'emetre KPIs, top referrers, filtres, candidats, missatge suggerit i accions amb classes visuals genèriques; `ReferralsClient` passa a `rf__*` i `referrals.css` escopat a `html.admin-mode`.
+- Canvi #1141: `ClientesModals` deixa d'emetre overlays `bg-black/60 admin-card-glass` i fallback `bg-white/5 text-white/40`; passen a `cl__modal-backdrop` i `cl__duplicate-score-low` dins `clientes.css`.
+
+Component viu:
+- `app/admin/clientes/[id]/page.tsx`: server component real. Importa `customer-hub.css`, força dinàmic, resol metadata i carrega dades amb `fetchCustomerHub(id)`.
+- `CustomerHubClient.tsx`: client shell viu. Gestiona pestanya activa, refresh via `/api/admin/customers/[id]/hub`, avisos de tasca, context compartit i layout `ch__grid`.
+- `CustomerHeader.tsx`: capçalera viva amb estat comercial, accions ràpides, canvi d'estat via CSRF, delete/anonymize via CSRF, next action i prioritat comercial.
+- Panells dinàmics vius: `SummaryPanel` (residus `white/*` drenats al #1121), `ProposalsPanel` (visualment drenat al #1128), `BookingsPanel` (visualment drenat al #1118), `MarginExtrasPanel` (visualment drenat al #1130), `CommsPanel` (visualment drenat al #1134), `TasksNotesPanel` (visualment drenat al #1131), `DiscountsPanel` (visualment drenat al #1120), `LeadsPanel` (visualment drenat al #1126), `PrivacyPanel` (visualment drenat al #1119).
+- `TimelinePanel.tsx`: lateral viu de timeline/riscs; és el primer punt P1 visual detectat.
+- Components auxiliars vius: `InsightsBanner` (visualment drenat al #1117), `OwnerControlStrip`, `MobileQuickActions`, `loading.tsx`.
+
+CSS viu:
+- `app/admin/clientes/[id]/customer-hub.css`: capa local `ch__*` per shell, header, KPIs, tabs, cards, botons, estats i layout responsive.
+- El CSS local conviu amb classes Tailwind encara presents dins panells; no es pot considerar completament drenat de residu visual.
+
+APIs/serveis vius:
+- Lectura canònica: `lib/customer-hub/fetchCustomerHub.ts` és font compartida per `page.tsx` i `GET /api/admin/customers/[id]/hub`.
+- Dades base: `lib/customer-hub/data.ts` resol customer/lead/booking/proposal/task/activity/document i agrega leads, proposals, bookings, tasks, messages, discount codes, contacts, insights i reactivació.
+- Timeline: `lib/customer-hub/timeline.ts` combina events de negoci i activitat canònica (`timelineQueryService`) i enllaça cap a leads/bookings amb helpers compartits.
+- Rutes admin vives: `/api/admin/customers/[id]` (`GET/PATCH/DELETE`), `/hub`, `/status`, `/tags`, `/preferences`, `/contacts`, `/activities`, `/consents`, `/export`.
+- Enllaços canònics: `customerWorkspaceHref`, `leadWorkspaceHref`, `bookingWorkspaceHref`, `nextActionLink`, `communicationSpine`, `commercialPriority`.
+
+Dades que governa:
+- Identitat i estat del client: nom, email, telèfon, idioma, consentiments, estat hub, tags, preferències i referències.
+- Historial comercial: leads, pressupostos, reserves, tasques, comunicacions, activitats, documents/contractes i codis de descompte.
+- Salut comercial: `CustomerInsightsDTO`, risc comercial, propera acció, recurrència, LTV, pagaments pendents, reactivació i referits.
+
+Accions que governa:
+- Canviar estat del client (`/status`).
+- Editar dades base, tags, preferències i contactes (`/api/admin/customers/[id]`, `/tags`, `/preferences`, `/contacts`).
+- Crear o obrir pressupostos, reserves, tasques i comunicacions via helpers de workspace.
+- Registrar activitats de comunicació i marcar/eliminar tasques.
+- Exportar dades i consultar/gestionar consentiments des del panell de privacitat.
+- Filtrar timeline per tipus d'event i refrescar hub sense canviar ruta.
+
+Òrgans veïns:
+- upstream: `/admin/clientes`, leads, reserves, pressupostos, tasques, inbox/comunicacions i dashboard obren aquesta fitxa via helpers de customer/workspace.
+- downstream: `/admin/leads/[id]`, `/admin/bookings/[id]`, `/admin/presupuestos`, Inbox/Compose, Tasks, Privacy/GDPR, Reactivation/Referrals, Discounts i timeline canònica.
+
+Codi mort relacionat:
+- `qa:no-dead-admin-views` ja passa verd en el perímetre admin; no hi ha arrel `clientes/[id]` òrfena detectada.
+- Els panells dinàmics són renderitzats per `CustomerHubClient` segons tab; no són codi mort per falta d'import estàtic directe.
+
+Duplicacions:
+- La lectura està ben centralitzada: `page.tsx` i l'API `hub` consumeixen `fetchCustomerHub`.
+- La capa `data.ts` fa Prisma directe i és el punt compartit del hub; no duplicar queries locals dins panells si es toca dades.
+- La timeline del client ja passa per `timelineQueryService` quan hi ha events canònics; no reimplementar mappings de timeline dins UI.
+- Hi ha convivència visual: `customer-hub.css` governa la carcassa `ch__*`, però panells interns encara tenen Tailwind i tons locals.
+
+Hardcoded/residu visual:
+- Resolt #1116: `TimelinePanel` ja no conserva `bg-white/*`, `text-white/*`, `bg-[var(...)]` ni `border-l-*` Tailwind al JSX o a la metadata; els tons viuen a `ch__timeline-event--*`.
+- Resolt #1117: `InsightsBanner` ja no conserva `bg-white/*`, `text-white/*`, `border-white/*`, `bg-[var(...)]` ni `admin-tone-*`; les superfícies i tons viuen a `ch__insight-*`.
+- Resolt #1118: `BookingsPanel` ja no conserva `border-white/*`, `bg-white/*`, `text-white/*`, `bg-emerald-*` ni `bg-amber-*`; el panell viu a `ch__booking-*`/`ch__bookings-*`.
+- Resolt #1119: `PrivacyPanel` ja no conserva `admin-card-glass`, `bg-white/*`, `text-white/*`, `border-white/*`, `opacity-*` ni `rounded-2xl` locals; el panell viu a `ch__privacy-*`.
+- Resolt #1120: `DiscountsPanel` ja no conserva `border-white/*`, `bg-white/*`, `text-white/*`, `admin-tone-*`, `bg-amber-*` ni `bg-emerald-*`; el panell viu a `ch__discount-*`.
+- Resolt #1121: `SummaryPanel` ja no conserva `bg-white/*`, `border-white/*`, `text-white/*`, `hover:bg-white/*`, `hover:text-white/*` ni `placeholder:text-white/*`; els residus drenats viuen a `ch__summary-*`.
+- Resolt #1126: `LeadsPanel` ja no conserva `admin-tone-*`, classes cromàtiques Tailwind dels helpers de lead ni superfícies genèriques `rounded/border/p-*`; el panell viu a `ch__lead-*`.
+- Resolt #1128: `ProposalsPanel` ja no conserva `bg-white/*`, `border-white/*`, `text-white/*`, `rounded-2xl`, `opacity-*`, `border-dashed`, `space-y-*` ni superfícies/botons locals; el panell viu a `ch__proposal-*`.
+- Resolt #1134: `CommsPanel` ja no conserva `bg-white/*`, `border-white/*`, `text-white`, `rounded-2xl`, `rounded-xl`, `opacity-*`, `space-y-*`, superfícies/botons/textarea genèrics ni botó de nota amb `disabled:opacity-*`; el panell viu a `ch__comms-*` / `ch__comm-*`.
+- Resolt #1136: `CustomerHeader.tsx` ja no conserva overlay inline ni `display: contents` inline; ambdós viuen a `customer-hub.css`.
+- El residu documentat dins la fitxa Client 360 queda concentrat sobretot en llista i validació visual final; qualsevol sanejament s'ha de fer per franges, sense reescriure el hub sencer.
+
+Connexions interrompudes:
+- No hi ha cable principal trencat: Customer Hub llegeix, muta i enllaça amb leads, reserves, pressupostos, tasques, comunicacions, privacitat i timeline.
+- Fricció existent: Client 360 fa de hub transversal; tocar estat/client/contacte pot impactar lead/booking/proposal. Cal preservar els helpers de navegació i el contracte `CustomerHubDTO`.
+- El refresh client (`fetch /hub`) no substitueix `router.refresh()` dels panells que muten altres òrgans; no barrejar patrons sense revisar cada acció.
+
+Riscos:
+- Canviar `fetchCustomerHub` o `data.ts` afecta Customer Hub sencer i qualsevol accés indirecte des de leads/bookings/proposals.
+- Canviar privacitat/export/DELETE afecta GDPR i dades reals; requereix tests focalitzats si es toca funcionalment.
+- Canviar timeline pot degradar la lectura canònica d'activitat si es confonen logs tècnics amb esdeveniments comercials.
+- El P1 visual/canònic de `TimelinePanel` queda resolt al Canvi #1116, `InsightsBanner` queda drenat al #1117, `BookingsPanel` al #1118, `PrivacyPanel` al #1119, `DiscountsPanel` al #1120, els residus `white/*` de `SummaryPanel` al #1121, `LeadsPanel` al #1126, `ProposalsPanel` al #1128, `MarginExtrasPanel` al #1130, `TasksNotesPanel` al #1131, `CommsPanel` al #1134, els inline styles de `CustomerHeader` al #1136, `ReactivationClient` al #1139, `ReferralsClient` al #1140 i overlays de `ClientesModals` al #1141; el risc restant de Client 360 ja no és un panell dinàmic principal, sinó llista i validació visual final del propietari.
+
+Evidència d'auditoria:
+- Fitxers llegits línia per línia: `page.tsx`, `CustomerHubClient.tsx`, `CustomerHeader.tsx`, `TimelinePanel.tsx`, `customer-hub.css`, `fetchCustomerHub.ts`, `data.ts`, `dto.ts`, `timeline.ts`.
+- Imports/exports verificats: `page.tsx` → `CustomerHubClient`; `CustomerHubClient` → panells dinàmics + `TimelinePanel`; `CustomerHeader` → helpers workspace + `fetchWithCsrf`.
+- Selectors CSS verificats contra DOM: carcassa `ch__root`, `ch__grid`, `ch__header`, `ch__tabs`, `ch__btn`, `ch__panel`, `ch__fab`; residu visual local queda documentat com a pendent.
+- Serveis/APIs seguits: `fetchCustomerHub`, `customer-hub/data`, `timeline`, `/api/admin/customers/[id]`, `/hub`, `/status` i rutes filles de customers.
+- Proves/guards previs del perímetre: `qa:no-dead-admin-views` verd i P1 registrat a `docs/audit/admin-fitxes.md`; validació final d'aquest tall queda al registre #1114.
+
+Decisió de treball:
+- Es conserva Customer Hub com a organisme viu i font central del client.
+- Proper tall executable: si es continua dins Client 360, revisar només superfícies satèl·lit o deixar-lo per validació visual del propietari; no tocar `fetchCustomerHub`, DTOs, Prisma, rutes API, privacitat ni accions de negoci.
+- No tocar en aquest tall: schema, serveis, contractes de dades, rutes mutadores, panells interns fora de timeline ni refeta visual global de Client 360.
+- Validació pendent del propietari: visual final de Client 360 abans de marcar `TANCAT CHARLIE`.
+
 ### `/admin/leads/arxiu`
 
 Pantalla: Arxiu de leads (historic)
@@ -373,6 +570,77 @@ Connexions interrompudes: cap.
 
 Decisio de treball: organ sa, cap canvi de codi. Pendent validacio visual del propietari.
 
+### `/admin/cuadrant` + `/admin/cuadrant/repartiment` (òrgan Cuadrant)
+
+Pantalla: Cuadrant operatiu (qui treballa, solapaments, disponibilitat) + Repartiment de pasta (qui cobra què).
+Ruta: `/admin/cuadrant` · `/admin/cuadrant/repartiment`
+Estat inventari: 🟢
+TANCAT CHARLIE: no — pendent validacio visual del propietari.
+Estat fitxa: FETA (auditoria forense #1115, claude, 2026-06-24)
+
+Historia: construit als #917-921 (commit f6f4a715, «bolo economia + cuadrant operatiu + repartiment») seguint `docs/cuadrant-repartiment-concept.md` (pla d'Opus, F0-F4). Tocat despres nomes pel canon carbo+or (#1105). Mai havia tingut fitxa forense → era PENDENT al registre tot i estar construit i operatiu.
+
+Reachability: les 2 `page.tsx` son rutes Next reals; `CrewBlockManager` importat nomes per `cuadrant/page.tsx`; passa `qa:no-dead-admin-views`. Cap illa morta.
+
+Component viu: `cuadrant/page.tsx` (server) → `CrewBlockManager` (client) + `loading.tsx` × 2. `repartiment/page.tsx` (server, sense client propi).
+CSS viu: cap CSS de pagina propi — tot via classes canoniques (`ap-card`, `adm-input`, `adm-row-hover`, `admin-tone-*`, `ap-btn`) i utilitats. Correcte: l'organ no inventa CSS.
+APIs/serveis vius: servei canonic `lib/services/crewScheduleService.ts` (purs `buildCrewSchedule`/`detectOverlaps`/`buildPayoutSummary` + loaders + CRUD `CrewBlock`, 23 tests). Rutes `GET /api/admin/cuadrant`, `GET /api/admin/cuadrant/repartiment`, `GET/POST/DELETE /api/admin/cuadrant/blocks` — totes amb `requireAuth`; els mutadors (POST/DELETE) amb `verifyCsrf`. El client usa `fetchWithCsrf`. Loaders GRACEFUL si la taula `crew_blocks` encara no existeix (try/catch → []).
+Codi mort relacionat: cap.
+Duplicacions: cap. El repartiment es FLUX DE CAIXA (costAmount real per linia), NO reimplementa marge — el marge segueix a `costEngine`. Monocapa de diners respectada (`formatCurrency` centralitzat).
+Hardcoded/residu visual: dins canon. Les classes `admin-tone-*-cyan/info` estan NEUTRALITZADES a carbo (`--at-raised`/`--at-text`) des de #999/#1011 — no renderitzen blau; el punt de status `bg-[var(--o-info)]` es l'idioma compartit de tot l'admin (8 fitxers, inclos `app/admin/page.tsx` i el germa directe `calendario/capacity`), no un defecte de l'organ. Tocar-lo nomes aqui trencaria la hipersemblança amb els veins.
+Cablejat amb organs veins: cada assignacio enllaça a la seva reserva (`buildBookingHref`) o lead (`buildLeadWorkspaceHref`); el repartiment enllaça al Partner Hub (`/admin/collaborators/[id]`); back-links cuadrant↔calendari↔repartiment coherents. Flux de context correcte.
+Connexions interrompudes: cap.
+
+Canvi de codi (#1115): unic residu objectiu corregit a `CrewBlockManager.tsx` — el boto d'accio «Afegir» era un boto a ma (border+bg+padding amb `admin-tone-*-info` i un `hover:admin-tone-bg-info` no-op que Tailwind no genera) → ara `.ap-btn ap-btn--primary ap-btn--xs` (regla canon #2: tot boto consumeix `.ap-btn`). El `hover:admin-tone-text-danger` no-op del boto «✕» → `transition-opacity hover:opacity-70` (hover real). Cap altre canvi: la resta de l'organ es canonic i hipersemblant amb `calendario/capacity`.
+
+Validacio: tsc EXIT 0 · validate:core EXIT 0 (qa:admin-canon 0 troballes) · `crewScheduleService.test.ts` 23/23 · render 4 rutes (cuadrant/repartiment + params) × 3 breakpoints = 0 overflow, 0 runtime error · HTTP 200.
+
+Decisio de treball: organ SA i ben cablejat. Fet el fix canonic del boto-accio; la resta es conserva. Pendent validacio visual del propietari.
+
+### Òrgan Catàleg (`/admin/packs`, `/admin/pricing`, `/admin/inventory`, `/admin/catalog`, `/admin/cost-calculator`)
+
+Pantalla: Catàleg — producte, cost, preu i inventari.
+Estat inventari: 🟢
+TANCAT CHARLIE: no — pendent validacio visual del propietari.
+Estat fitxa: FETA (auditoria forense #1132, claude, 2026-06-24)
+
+Reachability: tots els components vius i renderitzats. `packs/page` → PackPriceQuickEditor + SyncButton; `inventory/page` → InventoryListClient → InventoryListSections (import named multi-línia, NO mort — fals positiu inicial de grep d'una línia, confirmat per Grep complet); `cost-calculator/page` → CostCalculatorClient; `pricing/page` i `catalog/page` autocontinguts. Passa `qa:no-dead-admin-views`.
+Component viu: les page.tsx + els clients citats + loading.tsx a cada ruta.
+CSS viu: classes canòniques compartides (`.ap-*` via AdminPage — header amb eyebrow d'òrgan «Catàleg» auto del #1124, `.ap-section-title` display 18px del #1122). Cap CSS de pàgina propi divergent.
+APIs/serveis vius: packAdminService, packPricingCheckService, packPricingHealth, inventoryAdminService, inventoryBundles, bookingInventoryService, extrasConfiguratorService, catalogPdfService. Tots consumits.
+Codi mort relacionat: cap.
+Duplicacions: cap (qa:no-canonical-reimpl verd; les fórmules de preu/marge viuen a costEngine/pricing-intelligence, no es reimplementen a la UI).
+Hardcoded/residu visual: dins canon. Excepció LEGÍTIMA documentada: `MARGIN_TONES`/`PRICE` a `lib/constants/pricing-intelligence.ts` és un HEATMAP de 8 nivells de salut de marge (verd→vermell, `tone.hex`) aplicat via `style={{background/borderLeftColor: tone.hex}}` a `pricing/page`. És una visualització de domini centralitzada (monocapa), com els editors PDF — NO un residu a tokenitzar (8 stops graduals no caben a 3 admin-tone). `style={{width}}` de les barres de vida = runtime %. `text-white/X` = sistema sobre fons fosc.
+Connexions interrompudes: cap. Packs↔pricing↔inventory↔cost-calculator coherents; packs enllaça a booking/extras.
+
+Canvi de codi (#1132): netejat un ternari redundant a `InventoryListSections.tsx` (barres de vida, línies 416 i 532): `>40 success : >20 warning : >5 warning : danger` → `>40 success : >5 warning : danger` (la branca `>5 warning` era idèntica a `>20 warning` = morta; comportament idèntic: success>40, warning 5-40, danger<5).
+
+Validacio: tsc EXIT 0 · validate:core EXIT 0 (qa:admin-canon 0) · render packs/pricing/inventory ja verificat (#1122-1124).
+
+Decisio de treball: organ SA, ben cablejat i ja canònic (AdminPage). Fet el micro-fix del ternari mort; el heatmap de marge es conserva com a exempció de domini. Pendent validacio visual del propietari.
+
+### Òrgan Comunicacions (`/admin/inbox`, `/admin/inbox/compose`, `/admin/inbox/settings`, `/admin/emails`, `/admin/email-templates`)
+
+Pantalla: Comunicacions — safata IMAP, redactor, configuració SMTP/IMAP, panell de correus i plantilles.
+Estat inventari: 🟢
+TANCAT CHARLIE: no — pendent validacio visual del propietari.
+Estat fitxa: FETA (auditoria forense #1133, claude, 2026-06-24)
+
+Reachability: tots els components vius (1 importador cadascun, cap mort): SafataClient, ComposeForm, ImapSettingsClient, EmailConfigPanel, EmailStatsCards, InboxPanel, ManualActionsPanel, RecentEmailsTable, SendPostEventButton, EmailTemplatesClient (+ [slug]/TemplateEditorClient). Passa `qa:no-dead-admin-views`.
+CSS viu: inbox.css (sf__, sub-app 3-panes), classes canòniques a emails/email-templates. Header sf__title ja canon (#1123).
+APIs/serveis vius: adminEmailSendService, adminQuoteEmailService, emailTemplateService, emailTrackingService, emailSentRetryService, imapSettingsService, inboxLeadImportService, inboxTemplateService, bulkComposeSegmentService, emailLeadExtractionService. Tots consumits.
+Codi mort relacionat: cap.
+Duplicacions: cap.
+Hardcoded/residu visual: dins canon. Excepció LEGÍTIMA: `color: '#06b6d4'` a TemplateEditorClient = color per defecte d'EMAIL HTML (renderitza a clients externs, no pot usar tokens CSS). Panes compactes d'Inbox (sf__pane-title 2xs) = excepció funcional de mail-app 3-columnes.
+Connexions interrompudes: cap. Inbox↔leads (import), emails↔post-event, compose↔plantilles coherents.
+
+Canvi de codi (#1133): corregit un BOTÓ-VOID que el guard no caçava (era una const string, no un `className="..."` literal): `ManualActionsPanel.tsx` `PRIMARY_BUTTON = 'rounded-xl px-4 py-2 ... text-white shadow-lg'` (sense fons → text blanc + shadow sobre transparent) → `'ap-btn ap-btn--primary'` (regla canon #2). Escaneig confirma que era l'ÚNIC botó-void en const a tot l'admin.
+GAP DE GUARD documentat: `check-admin-canon` detecta botó-void només a `className="..."` literals, no a consts (`const X = '...text-white...'`). Candidat a ampliar el guard en una passada futura.
+
+Validacio: tsc EXIT 0 · validate:core EXIT 0 (qa:admin-canon 0) · render /admin/emails HTTP 200, 3 `.ap-btn--primary`, 0 runtime error.
+
+Decisio de treball: organ SA i ben cablejat. Fet el fix del botó-void; la resta es conserva. Pendent validacio visual del propietari.
+
 ## Registre de fitxes per fer
 
 | Ruta | Page | Estat fitxa | Propietari | Nota |
@@ -383,8 +651,8 @@ Decisio de treball: organ sa, cap canvi de codi. Pendent validacio visual del pr
 | `/admin/blog` | `app/admin/blog/page.tsx` | PENDENT | codex/claude | Blog llista |
 | `/admin/blog/edit/[id]` | `app/admin/blog/edit/[id]/page.tsx` | PENDENT | codex/claude | Blog edició |
 | `/admin/blog/new` | `app/admin/blog/new/page.tsx` | PENDENT | codex/claude | Nou blog |
-| `/admin/bookings` | `app/admin/bookings/page.tsx` | PENDENT | codex/claude | Reserves llista |
-| `/admin/bookings/[id]` | `app/admin/bookings/[id]/page.tsx` | PENDENT | codex/claude | Reserva detall |
+| `/admin/bookings` | `app/admin/bookings/page.tsx` | PENDENT | codex/claude | Reserves llista — contenidors/glass P2 drenats #1142 |
+| `/admin/bookings/[id]` | `app/admin/bookings/[id]/page.tsx` | FETA | codex | Reserva detall — fitxa forense #1112 |
 | `/admin/bookings/new` | `app/admin/bookings/new/page.tsx` | PENDENT | codex/claude | Nova reserva |
 | `/admin/calendario` | `app/admin/calendario/page.tsx` | PENDENT | codex/claude | Calendari legacy/compatibilitat |
 | `/admin/calendario/capacity` | `app/admin/calendario/capacity/page.tsx` | PENDENT | codex/claude | Capacitat |
@@ -392,17 +660,17 @@ Decisio de treball: organ sa, cap canvi de codi. Pendent validacio visual del pr
 | `/admin/canvas` | `app/admin/canvas/page.tsx` | PENDENT | codex/claude | Canvas |
 | `/admin/catalog` | `app/admin/catalog/page.tsx` | PENDENT | codex/claude | Catàleg |
 | `/admin/clientes` | `app/admin/clientes/page.tsx` | PENDENT | codex/claude | Clients llista |
-| `/admin/clientes/[id]` | `app/admin/clientes/[id]/page.tsx` | PENDENT | codex/claude | Client 360 |
-| `/admin/clientes/reactivation` | `app/admin/clientes/reactivation/page.tsx` | PENDENT | codex/claude | Reactivació |
-| `/admin/clientes/referrals` | `app/admin/clientes/referrals/page.tsx` | PENDENT | codex/claude | Referrals |
+| `/admin/clientes/[id]` | `app/admin/clientes/[id]/page.tsx` | FETA | codex | Client 360 — fitxa forense #1114; Timeline #1116; Insights #1117; Bookings #1118; Privacy #1119; Discounts #1120; Summary #1121 |
+| `/admin/clientes/reactivation` | `app/admin/clientes/reactivation/page.tsx` | PENDENT | codex/claude | Reactivació — visual `ReactivationClient` drenat #1139 |
+| `/admin/clientes/referrals` | `app/admin/clientes/referrals/page.tsx` | PENDENT | codex/claude | Referrals — visual `ReferralsClient` drenat #1140 |
 | `/admin/collaborators` | `app/admin/collaborators/page.tsx` | PENDENT | codex/claude | Partners |
 | `/admin/collaborators/[id]` | `app/admin/collaborators/[id]/page.tsx` | PENDENT | codex/claude | Partner detail |
 | `/admin/cost-calculator` | `app/admin/cost-calculator/page.tsx` | PENDENT | codex/claude | Calculadora costos |
 | `/admin/coverage` | `app/admin/coverage/page.tsx` | PENDENT | codex/claude | Coverage |
 | `/admin/crons` | `app/admin/crons/page.tsx` | PENDENT | codex/claude | Crons |
 | `/admin/css-manager` | `app/admin/css-manager/page.tsx` | PENDENT | codex/claude | CSS Manager |
-| `/admin/cuadrant` | `app/admin/cuadrant/page.tsx` | PENDENT | codex/claude | Quadrant |
-| `/admin/cuadrant/repartiment` | `app/admin/cuadrant/repartiment/page.tsx` | PENDENT | codex/claude | Repartiment |
+| `/admin/cuadrant` | `app/admin/cuadrant/page.tsx` | FETA | claude | Quadrant — fitxa forense #1115 |
+| `/admin/cuadrant/repartiment` | `app/admin/cuadrant/repartiment/page.tsx` | FETA | claude | Repartiment — fitxa forense #1115 |
 | `/admin/discount-codes` | `app/admin/discount-codes/page.tsx` | PENDENT | codex/claude | Codis descompte |
 | `/admin/docs/esquema` | `app/admin/docs/esquema/page.tsx` | PENDENT | codex/claude | Docs esquema |
 | `/admin/docs/full-de-ruta` | `app/admin/docs/full-de-ruta/page.tsx` | PENDENT | codex/claude | Full de ruta |

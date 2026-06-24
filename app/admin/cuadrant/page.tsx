@@ -54,6 +54,7 @@ export default async function CuadrantPage({ searchParams }: { searchParams: { d
 
   return (
     <AdminPage
+      eyebrow="Operacions"
       title="Cuadrant operatiu"
       subtitle={`${totalAssignments} assignacions · ${schedule.people.length} persones · ${overlapCount} solapaments`}
       back={{ href: '/admin/calendario', label: 'Calendari' }}

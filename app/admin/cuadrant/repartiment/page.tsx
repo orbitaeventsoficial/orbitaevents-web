@@ -29,6 +29,7 @@ export default async function RepartimentPage({ searchParams }: { searchParams: 
 
   return (
     <AdminPage
+      eyebrow="Operacions"
       title="Repartiment de pasta"
       subtitle={`${label} · ${formatCurrency(payout.totals.revenue)} facturat`}
       back={{ href: '/admin/cuadrant', label: 'Cuadrant' }}

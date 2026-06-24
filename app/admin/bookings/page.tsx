@@ -301,13 +301,13 @@ export default async function BookingsPage({
 
       {/* ── Header sticky — mateix patró que la fitxa de reserva ── */}
       <div className="ap-sticky-header">
-        <div className="ap-detail-bar" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '8px 20px' }}>
+        <div className="ap-detail-bar bk-detail-bar-row">
           {customerId ? (
             <Link href={buildCustomerWorkspaceTabHref(customerId, 'bookings')} className="ap-detail-bar-btn">← Client</Link>
           ) : (
             <span className="ap-detail-kicker">Agenda</span>
           )}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div className="bk-detail-bar-actions">
             <ExportCsvButton
               filename="reserves"
               headers={['Referència', 'Client', 'Data', 'Tipus', 'Estat', 'Total (€)']}
@@ -337,7 +337,7 @@ export default async function BookingsPage({
         </div>
       )}
 
-      <div style={{ maxWidth: 1220, margin: '0 auto', padding: '8px 20px', width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div className="bk-list-shell bk-list-shell--top">
 
         <div className="bk-stats-bar ap-detail-stats">
           <div className="ap-detail-stats-cell ap-detail-stats-cell--gold">
@@ -360,10 +360,10 @@ export default async function BookingsPage({
         <BookingPipelineViewWrapper />
       )}
 
-      {!isKanban && <div style={{ maxWidth: 1220, margin: '0 auto', padding: '0 20px', width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}><>
+      {!isKanban && <div className="bk-list-shell"><>
       <section className="lg:hidden space-y-3">
         {bookings.length === 0 ? (
-          <div className="rounded-2xl border admin-card-glass p-8 text-center">
+          <div className="ap-card bk-empty-state">
             <span className="text-4xl">📅</span>
             <p className="mt-2">Encara no hi ha reserves</p>
             <p className="text-xs mt-1 admin-tone-text-slate">Quan un lead es confirma, es genera una reserva automàticament. També pots crear-ne una manualment.</p>
@@ -380,10 +380,10 @@ export default async function BookingsPage({
             return (
               <article
                 key={booking.id}
-                className={`block rounded-2xl border admin-card-glass p-4 transition-colors ${
+                className={`ap-card bk-mobile-card ${
                   isPast && booking.status !== 'COMPLETED'
-                    ? 'admin-tone-border-warning'
-                    : 'admin-tone-border-neutral admin-tone-bg-neutral hover:brightness-105'
+                    ? 'bk-mobile-card--past'
+                    : 'bk-mobile-card--normal'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">

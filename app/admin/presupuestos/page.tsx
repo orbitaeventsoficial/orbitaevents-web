@@ -3,6 +3,7 @@ import dynamicImport from 'next/dynamic';
 import { prisma } from '@/lib/prisma';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { formatCurrency } from '@/lib/constants';
+import { ADMIN_PDF_STUDIO_DEFAULTS } from '@/lib/constants/admin';
 import ProposalsList from './ProposalsList';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import './presupuestos.css';
@@ -369,8 +370,8 @@ export default async function PresupuestosPage({
         initialLeadId={leadId}
         initialProposalId={proposalId}
         initialPreferredLocale={customer?.preferredLocale || leadForEditor?.customer?.preferredLocale || leadForEditor?.preferredLocale || 'ca'}
-        initialBrandName={String(brandSettings['quotes.brandName'] || 'Òrbita Events')}
-        initialBrandWebsite={String(brandSettings['quotes.brandWebsite'] || 'orbitaevents.com')}
+        initialBrandName={String(brandSettings['quotes.brandName'] || ADMIN_PDF_STUDIO_DEFAULTS.brandName)}
+        initialBrandWebsite={String(brandSettings['quotes.brandWebsite'] || ADMIN_PDF_STUDIO_DEFAULTS.brandWebsite)}
         initialBrandEmail={String(brandSettings['quotes.brandEmail'] || '')}
         initialBrandPhone={String(brandSettings['quotes.brandPhone'] || '')}
         initialBrandTagline={String(brandSettings['quotes.brandTagline'] || 'El teu esdeveniment. El teu estil. La teva nit perfecta.')}
