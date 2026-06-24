@@ -15,6 +15,9 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-25 [ESTAT: tancat — fitxa forense Partners + 2 bugs reals #1145]
+Òrgan Partners (collaborators): ben cablejat però 2 bugs visuals que cap guard caçava: (1) Partner Hub 7 títols text-lg font-semibold Tailwind cru → nou partner-hub.css .ph__h2 display 18px; (2) KPIs ap-kpi__label/__value (BEM doble-guió INEXISTENT al CSS) → ap-kpi-label/-value canon. Únic lloc amb BEM doble a l'admin. Fitxa FETA. tsc 0 · validate:core 0. Render Carlos Lucas 3 breakpoints OK. Counter->1145.
+
 [claude] 2026-06-25 [ESTAT: tancat — Customer Hub ch__*-title 100% clònics (display+bold) #1144]
 Tancat el pendent del #1122: 5 títols de panell del Customer Hub (bookings/leads/proposals/privacy/discounts) → font-family display + bold (= .ap-section-title). codex ja els tenia a 18px; faltava la font de marca. timeline-title (11px) intacte. tsc 0 · validate:core 0. Tots els títols de secció de l'admin ara Plus Jakarta display 18px. Counter->1144.
 

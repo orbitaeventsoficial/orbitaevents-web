@@ -1,0 +1,14 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   ph__ — Partner Hub (/admin/collaborators/[id])
+   Només tipografia canònica de títols de secció (display 18px), consumint
+   tokens d'orbita-tokens.css. El marge segueix venint de les utilitats
+   Tailwind locals (mb-*), que no col·lisionen perquè aquí no declarem margin.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+html.admin-mode .ph__h2 {
+  font-family: var(--display);
+  font-size: var(--o-text-lg);
+  font-weight: var(--o-fw-bold);
+  letter-spacing: -0.01em;
+  color: var(--t);
+}

@@ -58,7 +58,7 @@ Les rutes admin no es tracten com 90 pantalles independents. Primer s'agrupen pe
 | Reserves | `/admin/bookings`, `/admin/bookings/[id]`, `/admin/bookings/new`, `/admin/calendario`, `/admin/calendario/capacity` | INICIAL parcial |
 | Clients | `/admin/clientes`, `/admin/clientes/[id]`, `/admin/clientes/reactivation`, `/admin/clientes/referrals` | INICIAL parcial |
 | Catàleg | `/admin/packs`, `/admin/packs/[id]`, `/admin/packs/extras`, `/admin/inventory`, `/admin/pricing`, `/admin/catalog` | FETA (#1132) |
-| Partners | `/admin/collaborators`, `/admin/collaborators/[id]` | PENDENT |
+| Partners | `/admin/collaborators`, `/admin/collaborators/[id]` | FETA (#1145) |
 | Post-event | `/admin/post-event`, reports, surveys, feedback, playbook | PENDENT |
 | Sistema | settings, crons, scripts, features, coverage, docs, canvas, text/css/image managers | PENDENT |
 
@@ -640,6 +640,29 @@ GAP DE GUARD documentat: `check-admin-canon` detecta botó-void només a `classN
 Validacio: tsc EXIT 0 · validate:core EXIT 0 (qa:admin-canon 0) · render /admin/emails HTTP 200, 3 `.ap-btn--primary`, 0 runtime error.
 
 Decisio de treball: organ SA i ben cablejat. Fet el fix del botó-void; la resta es conserva. Pendent validacio visual del propietari.
+
+### Òrgan Partners (`/admin/collaborators`, `/admin/collaborators/[id]`)
+
+Pantalla: Partners — base única de relació externa (col·laboradors, cas Carlos Lucas amb rol dual client/proveïdor).
+Estat inventari: 🟢
+TANCAT CHARLIE: no — pendent validacio visual del propietari.
+Estat fitxa: FETA (auditoria forense #1145, claude, 2026-06-25)
+
+Reachability: 3 components vius (1 importador cadascun): CollaboratorsClient (llista), PartnerHubClient (detall, 7 tabs), CollaboratorProductsPanel. Passa qa:no-dead-admin-views.
+CSS viu: classes canòniques `.ap-*` (ap-card, ap-kpi, ap-table, ap-btn) + NOU `partner-hub.css` (només `.ph__h2`, tipografia de títol de secció).
+APIs/serveis vius: collaboratorAdminService, collaboratorMemberService, collaboratorProductService, partnerHubService. Tots consumits.
+Codi mort relacionat: cap.
+Duplicacions: cap.
+Hardcoded/residu visual: 2 BUGS reals corregits (#1145, vegeu sota). Resta dins canon.
+Connexions interrompudes: cap. Partner enllaça a bolos (booking/lead hrefs) i al cuadrant.
+
+Bugs de codi corregits (#1145) — cap guard els caçava:
+1. Títols de secció `text-lg font-semibold` (Tailwind cru, 7×) → `.ph__h2` (display 18px bold) via nou partner-hub.css. Abans no eren Plus Jakarta.
+2. KPIs amb `.ap-kpi__label`/`.ap-kpi__value` (BEM doble-guió INEXISTENT al CSS) → `.ap-kpi-label`/`.ap-kpi-value` (canon, #1122). Abans els KPIs no tenien estil canònic. Únic lloc de l'admin amb aquest BEM doble.
+
+Validacio: tsc EXIT 0 · validate:core EXIT 0 (qa:admin-canon 0) · render Partner Hub (Carlos Lucas) 3 breakpoints, `.ph__h2`/`.ap-kpi-value` = Plus Jakarta, HTTP 200, 0 overflow/error.
+
+Decisio de treball: organ ben cablejat amb 2 bugs visuals corregits. Pendent validacio visual del propietari.
 
 ## Registre de fitxes per fer
 

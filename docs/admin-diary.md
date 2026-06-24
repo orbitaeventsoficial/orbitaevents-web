@@ -1,3 +1,26 @@
+## 2026-06-25 — Fitxa forense Partners + 2 bugs reals (Canvi #1145, claude)
+
+### Context
+Front codex-free. Òrgan Partners (collaborators + [id]), PENDENT.
+
+### Què s'ha fet
+- Auditoria: organ ben cablejat (3 components reachable, serveis consumits). 2 bugs visuals que cap guard caçava:
+  1. Partner Hub: 7 títols `text-lg font-semibold` (Tailwind cru, no Plus Jakarta) → nou `partner-hub.css` amb `.ph__h2` (display 18px bold), només tipografia (mb-* Tailwind conservat).
+  2. KPIs amb `.ap-kpi__label`/`.ap-kpi__value` (BEM doble-guió inexistent al CSS) → `.ap-kpi-label`/`.ap-kpi-value` (canon #1122). Estaven sense estil. Únic lloc de l'admin amb aquest BEM doble.
+- Fitxa escrita; registre PENDENT → FETA (#1145).
+
+### Validació
+- Validació tècnica: tsc 0 · validate:core 0 (qa:admin-canon 0, qa:css-monocapa 0).
+- Validació funcional: render Partner Hub (Carlos Lucas) 3 breakpoints; `.ph__h2`/`.ap-kpi-value` ara Plus Jakarta; HTTP 200, 0 overflow/error.
+- Validació humana/UX: pendent validació visual del propietari.
+
+### Coordinació
+Counter -> 1145. Front Partners (claude). codex aturat (crash post-#1142).
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-25 — Customer Hub ch__*-title 100% clònics (Canvi #1144, claude)
 
 ### Context

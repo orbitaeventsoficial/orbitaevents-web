@@ -1513,6 +1513,25 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1145 — 2026-06-25 — claude (TANCAT)
+
+**Fitxa forense òrgan Partners + 2 bugs reals (títols Tailwind cru + KPIs amb classe morta).**
+
+- Context: front codex-free (codex aturat). Òrgan Partners (`/admin/collaborators`, `/admin/collaborators/[id]`), `PENDENT`.
+- Auditoria: organ ben cablejat (3 components reachable, serveis consumits, sense duplicació). Però DOS bugs visuals reals (que cap guard caçava):
+  1. **Títols de secció Tailwind cru**: el Partner Hub usava `<h2 className="text-lg font-semibold">` × 7 → no Plus Jakarta, divergent de tot l'admin canonitzat. Nou `partner-hub.css` minimal amb `.ph__h2` (display 18px bold `--t`, només tipografia → el `mb-*` Tailwind es conserva sense conflicte). Import al client.
+  2. **KPIs amb classe morta**: `ap-kpi__label`/`ap-kpi__value` (BEM doble-guió) NO existeixen al CSS — el canon és `.ap-kpi-label`/`.ap-kpi-value` (guió simple, #1122). 6 ocurrències → els KPIs estaven SENSE estil canònic. Corregit. Escaneig confirma que era l'únic lloc amb aquest BEM doble a l'admin.
+- `docs/admin-fitxes-pantalles.md`: fitxa de l'òrgan escrita; registre `PENDENT → FETA (#1145)`.
+- `ADMIN_CHANGE_COUNTER` puja a `1145`; el següent canvi real ha de ser `#1146`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 (qa:admin-canon 0, qa:css-monocapa 0).
+- Validació funcional: render Partner Hub (cas Carlos Lucas) 3 breakpoints — `.ph__h2` i `.ap-kpi-value` ara Plus Jakarta, HTTP 200, 0 overflow, 0 runtime error.
+- Validació humana/UX: pendent validació visual del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1144 — 2026-06-25 — claude (TANCAT)
 
 **Customer Hub: títols de panell `ch__*-title` 100% clònics amb el canon de secció (display + bold).**
