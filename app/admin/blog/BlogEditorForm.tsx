@@ -295,7 +295,7 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <section className="ap-card rounded-2xl p-6">
-          <h2 className="mb-4 text-lg font-semibold">Configuració</h2>
+          <h2 className="mb-4 ap-h2">Configuració</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <label htmlFor="blog-slug" className="mb-1 block text-sm">Slug (URL) *</label>
@@ -350,7 +350,7 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
 
         <section className="ap-card rounded-2xl p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Contingut</h2>
+            <h2 className="ap-h2">Contingut</h2>
             <div role="tablist" aria-label="Idioma del contingut" className="ap-tabs-nav">
               {(['es', 'ca'] as Locale[]).map((l) => (
                 <button key={l} type="button" role="tab" aria-selected={activeLocale === l} onClick={() => setActiveLocale(l)} className={getLocaleTabClass(activeLocale === l)}>

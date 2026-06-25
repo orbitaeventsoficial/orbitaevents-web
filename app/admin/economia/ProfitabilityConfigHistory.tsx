@@ -143,7 +143,7 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
 
   return (
     <section className="ap-card p-5">
-      <h2 className="text-lg font-semibold">Històric de configuració</h2>
+      <h2 className="ap-h2">Històric de configuració</h2>
       <div className="mt-2 flex justify-end">
         <button
           type="button"

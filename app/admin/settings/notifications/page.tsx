@@ -60,7 +60,7 @@ function StatusCard({ title, ready, warning = false, successText, pendingText }:
     <div className={`rounded-xl border p-6 shadow-sm ${tone}`}>
       <div className="mb-2 flex items-center gap-3">
         <span className="text-2xl">{icon}</span>
-        <h2 className="text-lg font-semibold">{title}</h2>
+        <h2 className="ap-h2">{title}</h2>
       </div>
       <p className={`text-sm ${textTone}`}>{ready ? successText : pendingText}</p>
     </div>
@@ -237,7 +237,7 @@ export default function SettingsNotificationsPage() {
       <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold">Radar viu de notificacions</h2>
+            <h2 className="ap-h2">Radar viu de notificacions</h2>
             <p className="text-sm text-white/70">El mateix recompte canònic que veu el shell admin, sense haver de sortir d'aquesta pantalla.</p>
           </div>
           <span className="ap-badge ap-badge--info">Total viu: {totalCount}</span>
@@ -285,7 +285,7 @@ export default function SettingsNotificationsPage() {
 
       <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
         <div className="mb-4">
-          <h2 className="text-lg font-semibold">Cobertura real dels avisos</h2>
+          <h2 className="ap-h2">Cobertura real dels avisos</h2>
           <p className="text-sm text-white/70">Per cada tipus d’alerta, veus quins canals tens realment operatius i on falla la cadena.</p>
         </div>
         <div className="space-y-3">
@@ -344,7 +344,7 @@ export default function SettingsNotificationsPage() {
       </section>
 
       <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
-        <h2 className="mb-4 text-lg font-semibold">🧪 Test d'Email</h2>
+        <h2 className="mb-4 ap-h2">🧪 Test d'Email</h2>
 
         {testResult && <ResultBox success={testResult.success} message={testResult.message} />}
 
@@ -362,7 +362,7 @@ export default function SettingsNotificationsPage() {
       </section>
 
       <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
-        <h2 className="mb-4 text-lg font-semibold">🤖 Pilot automàtic comercial</h2>
+        <h2 className="mb-4 ap-h2">🤖 Pilot automàtic comercial</h2>
 
         <div className="grid gap-3 text-sm">
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
@@ -424,7 +424,7 @@ export default function SettingsNotificationsPage() {
       <RecipientsManager />
 
       <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
-        <h2 className="mb-4 text-lg font-semibold">⚙️ Configuració Actual</h2>
+        <h2 className="mb-4 ap-h2">⚙️ Configuració Actual</h2>
 
         <div className="space-y-4">
           <div>
@@ -455,7 +455,7 @@ export default function SettingsNotificationsPage() {
 
       {instructions.length > 0 && !config?.status.emailReady && (
         <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
-          <h2 className="mb-4 text-lg font-semibold">📝 Instruccions de Configuració</h2>
+          <h2 className="mb-4 ap-h2">📝 Instruccions de Configuració</h2>
 
           {instructions.map((instruction, index) => (
             <pre key={index} className="mb-4 overflow-x-auto rounded-xl border p-4 text-sm whitespace-pre-wrap">
@@ -466,7 +466,7 @@ export default function SettingsNotificationsPage() {
       )}
 
       <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
-        <h2 className="mb-4 text-lg font-semibold">📚 Referència Ràpida</h2>
+        <h2 className="mb-4 ap-h2">📚 Referència Ràpida</h2>
 
         <div className="prose prose-sm max-w-none">
           <h3 className="text-base font-medium">Variables d'entorn necessàries:</h3>

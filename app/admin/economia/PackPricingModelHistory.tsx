@@ -79,7 +79,7 @@ export default function PackPricingModelHistory({ entries }: { entries: PackHist
 
   return (
     <section className="ap-card p-5">
-      <h2 className="text-lg font-semibold">Històric model econòmic packs</h2>
+      <h2 className="ap-h2">Històric model econòmic packs</h2>
       <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         <label className="text-xs">
           Rol

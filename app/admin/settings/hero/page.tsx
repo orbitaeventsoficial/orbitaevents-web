@@ -47,7 +47,7 @@ export default function HeroMediaAdmin() {
       </div>
 
       <div className="rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-white">On s’ha mogut?</h2>
+        <h2 className="ap-h2 text-white">On s’ha mogut?</h2>
         <p className="text-sm text-white/65">
           Obre el gestor d’imatges i treballa la col·lecció manual del placement <span className="font-mono text-white">home.hero.slides</span>.
         </p>

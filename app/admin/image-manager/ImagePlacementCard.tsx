@@ -190,7 +190,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
     <article className="rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-5">
       <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
         <div>
-          <h2 className="text-lg font-bold text-white">{placement.label}</h2>
+          <h2 className="ap-h2 text-white">{placement.label}</h2>
           <p className="mt-1 text-sm text-white/60">{placement.description}</p>
           <div className="mt-2 flex flex-wrap gap-2 text-xs text-white/45">
             <span className="rounded-full border border-white/10 px-3 py-1">{placement.key}</span>

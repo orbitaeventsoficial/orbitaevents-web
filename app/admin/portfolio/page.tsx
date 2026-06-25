@@ -591,7 +591,7 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-white/90">Events del portfolio</h2>
+          <h2 className="ap-h2 text-white/90">Events del portfolio</h2>
           <p className="text-xs text-white/45">Cada event és una mini-pàgina pública amb portada, metadades i galeria vinculada.</p>
         </div>
         <button type="button" onClick={() => setShowForm((current) => !current)} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/85 hover:bg-white/5">{showForm ? 'Tancar formulari' : '+ Nou event'}</button>

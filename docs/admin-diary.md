@@ -1,3 +1,25 @@
+## 2026-06-25 — Migració massiva de títols a .ap-h2 (codemod, Canvi #1147, claude)
+
+### Context
+Drenatge del deute de ~100 títols `text-lg font-semibold/bold` Tailwind cru, amb la classe canònica .ap-h2 ja establerta (#1146).
+
+### Què s'ha fet
+- Codemod segur (temporal): substitueix `text-lg font-semibold/bold` → `ap-h2` només en línies amb `<h2>/<h3>` sense `<p>` barrejat, EXCLOENT zones de codex (clientes/[id]/_components, bookings/[id]).
+- 72 substitucions a 32 fitxers (economia, settings, sales-ops, packs, pricing, blog, catalog, portfolio, collaborators, components…). 0 títols cru restants en fitxers segurs.
+- Deute: títols dels panells de codex exclosos a propòsit (migrar amb .ap-h2 quan s'auditin).
+
+### Validació
+- Validació tècnica: tsc 0 · validate:core 0 (qa:admin-canon 0, qa:css-monocapa 0).
+- Validació funcional: qa:smoke (82 rutes × 3 breakpoints) 0 errors/0 overflow.
+- Validació humana/UX: pendent validació visual del propietari; títols migrats a Plus Jakarta display 18px.
+
+### Coordinació
+Counter -> 1147. Front canon (claude). codex aturat; els seus panells exclosos del codemod.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-25 — Classe canònica .ap-h2 + migració títols Comandament (Canvi #1146, claude)
 
 ### Context

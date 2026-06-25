@@ -782,7 +782,7 @@ function SocialPostModal({
         onSubmit={handleSubmit}
         className="w-full max-w-lg rounded-2xl border border-white/10 admin-form-deep p-6 space-y-4 max-h-[90vh] overflow-y-auto"
       >
-        <h2 className="text-lg font-semibold">{post ? 'Editar publicació' : 'Nova publicació'}</h2>
+        <h2 className="ap-h2">{post ? 'Editar publicació' : 'Nova publicació'}</h2>
 
         {error && <p className="rounded-lg border admin-tone-border-danger admin-tone-bg-danger px-3 py-2 text-sm admin-tone-text-danger">{error}</p>}
 

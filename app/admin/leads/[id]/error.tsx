@@ -13,7 +13,7 @@ export default function LeadDetailError({
     <div className="flex min-h-[50vh] items-center justify-center p-4">
       <div className="ap-card max-w-md p-8 text-center">
         <p className="mb-4 text-4xl">⚠️</p>
-        <h2 className="mb-2 text-lg font-bold">
+        <h2 className="mb-2 ap-h2">
           Error carregant el lead
         </h2>
         <p className="mb-4 text-sm">

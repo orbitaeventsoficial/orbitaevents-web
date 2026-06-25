@@ -134,7 +134,7 @@ export function RecipientsManager() {
   if (loading) {
     return (
       <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
-        <h2 className="mb-4 text-lg font-semibold">📬 Destinataris de notificacions</h2>
+        <h2 className="mb-4 ap-h2">📬 Destinataris de notificacions</h2>
         <p className="text-sm text-white/70">Carregant…</p>
       </section>
     );
@@ -144,7 +144,7 @@ export function RecipientsManager() {
     <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold">📬 Destinataris de notificacions</h2>
+          <h2 className="ap-h2">📬 Destinataris de notificacions</h2>
           <p className="text-sm text-white/70">
             Gestiona quins correus reben cada tipus de notificació. Els canvis sobreescriuen el fallback de Railway.
           </p>

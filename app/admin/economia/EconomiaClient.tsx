@@ -436,7 +436,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">⚠️</span>
-                    <h2 className="text-lg font-bold">Fora de termini</h2>
+                    <h2 className="ap-h2">Fora de termini</h2>
                     {props.atRiskRows.length > 0 && (
                       <span className="rounded-full px-2 py-0.5 text-xs font-bold">
                         {props.atRiskRows.length}
@@ -535,7 +535,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               <section className="ap-card p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">⏰</span>
-                  <h2 className="text-lg font-bold">Venciments en 7 dies</h2>
+                  <h2 className="ap-h2">Venciments en 7 dies</h2>
                   {props.upcomingDueRows.length > 0 && (
                     <span className="rounded-full px-2 py-0.5 text-xs font-bold">
                       {props.upcomingDueRows.length}
@@ -577,7 +577,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
             <>
               {!props.hasReport && (
                 <section className="ap-card p-6">
-                  <h2 className="text-lg font-bold">Sense dades disponibles</h2>
+                  <h2 className="ap-h2">Sense dades disponibles</h2>
                   <p className="mt-1 text-sm">
                     {props.reportError
                       ? 'Hi ha hagut un error calculant la rendibilitat. Revisa la Configuració o torna-ho a provar.'
@@ -724,7 +724,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
           {activeTab === 'tresoreria' && (
             <>
               <section className="ap-card p-5">
-                <h2 className="text-lg font-semibold mb-1">Previsió de tresoreria</h2>
+                <h2 className="ap-h2 mb-1">Previsió de tresoreria</h2>
                 <p className="text-xs mb-4">Projecció mensual d'ingressos i costos basada en reserves confirmades.</p>
 
                 {props.cashFlow && props.cashFlow.length > 0 ? (
@@ -767,7 +767,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
           {activeTab === 'previsions' && (
             <>
               <section className="ap-card p-5">
-                <h2 className="text-lg font-semibold mb-1">Previsió de vendes</h2>
+                <h2 className="ap-h2 mb-1">Previsió de vendes</h2>
                 <p className="text-xs mb-4">
                   Combinació de pipeline ponderat i tendència històrica amb estacionalitat. La columna
                   <span className="font-semibold"> Rang ±1σ</span> reflecteix el ventall esperat segons la
@@ -852,7 +852,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               {/* CAC per canal */}
               {props.cacByChannel && props.cacByChannel.length > 0 && (
                 <section className="ap-card p-5">
-                  <h2 className="text-lg font-semibold mb-1">CAC per canal</h2>
+                  <h2 className="ap-h2 mb-1">CAC per canal</h2>
                   <p className="text-xs mb-4">Cost d'adquisició de client real vs estimat, derivat de dades.</p>
 
                   <div className="overflow-x-auto rounded-xl border border-white/10">
@@ -894,7 +894,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               <section className="ap-card p-5">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h2 className="text-lg font-semibold">Semàfor de packs (clar)</h2>
+                    <h2 className="ap-h2">Semàfor de packs (clar)</h2>
                     <p className="text-xs">
                       Mostra PVP, hora extra, cost estimat i benefici real estimat per pack.
                     </p>
@@ -972,7 +972,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               {/* Vehicle config */}
               {props.vehicleConfig && (
                 <section className="ap-card p-5">
-                  <h2 className="text-lg font-semibold mb-1">Vehicle i desplaçament</h2>
+                  <h2 className="ap-h2 mb-1">Vehicle i desplaçament</h2>
                   <p className="text-xs mb-4">
                     Cost per km derivat del preu MITECO + manteniment. Actualitzat automàticament.
                   </p>

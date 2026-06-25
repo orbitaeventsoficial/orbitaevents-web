@@ -445,7 +445,7 @@ export default function PricingAdminPage() {
 
           <div className="grid md:grid-cols-2 gap-6">
             <div className="rounded-2xl border admin-card-glass p-6">
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+              <h3 className="ap-h2 mb-4 flex items-center gap-2">
                 <span className="text-2xl">🏆</span>
                 Extras Més Venuts
               </h3>
@@ -468,7 +468,7 @@ export default function PricingAdminPage() {
             </div>
 
             <div className="rounded-2xl border admin-card-glass p-6">
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+              <h3 className="ap-h2 mb-4 flex items-center gap-2">
                 <span className="text-2xl">🎯</span>
                 Packs Més Populars
               </h3>
@@ -533,7 +533,7 @@ export default function PricingAdminPage() {
         <div className="space-y-6">
           {/* Tarifes per servei */}
           <div className="rounded-xl border border-white/10 p-6 admin-card-glass">
-            <h3 className="text-lg font-bold mb-1">Tarifes per servei (€/h facturable)</h3>
+            <h3 className="ap-h2 mb-1">Tarifes per servei (€/h facturable)</h3>
             <p className="text-sm opacity-50 mb-5">Mercat DJ professional Barcelona. Hores facturables = inici → fi del bolo.</p>
             <table className="w-full text-sm">
               <thead>
@@ -582,7 +582,7 @@ export default function PricingAdminPage() {
 
           {/* Gradient de marge */}
           <div className="rounded-xl border border-white/10 p-6 admin-card-glass">
-            <h3 className="text-lg font-bold mb-1">Escala de marge</h3>
+            <h3 className="ap-h2 mb-1">Escala de marge</h3>
             <p className="text-sm opacity-50 mb-5">A pitjor marge, color més brillant i cridaner.</p>
             <div className="flex gap-2 flex-wrap">
               {MARGIN_TONES.map((t) => (
@@ -597,7 +597,7 @@ export default function PricingAdminPage() {
 
           {/* Cost amortització equip */}
           <div className="rounded-xl border border-white/10 p-6 admin-card-glass">
-            <h3 className="text-lg font-bold mb-1">Cost real d'amortització per hora</h3>
+            <h3 className="ap-h2 mb-1">Cost real d'amortització per hora</h3>
             <p className="text-sm opacity-50 mb-5">Fallback per categoria. S'usa si l'ítem d'inventari no té dades de compra.</p>
             <table className="w-full text-sm">
               <thead>

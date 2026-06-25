@@ -72,7 +72,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
 
   return (
     <section className="ap-card p-5">
-      <h2 className="text-lg font-semibold">Model econòmic de packs</h2>
+      <h2 className="ap-h2">Model econòmic de packs</h2>
       <p className="mt-1 text-xs">
         Aquesta configuració calcula PVP recomanat, hora extra recomanada i alertes de divergència a packs.
       </p>

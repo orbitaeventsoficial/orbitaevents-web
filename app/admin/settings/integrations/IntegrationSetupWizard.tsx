@@ -45,7 +45,7 @@ export default function IntegrationSetupWizard({
     <section className="rounded-2xl border p-5 admin-card-glass">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h2 className="text-lg font-semibold">Configuració ràpida d&apos;integracions</h2>
+          <h2 className="ap-h2">Configuració ràpida d&apos;integracions</h2>
           <p className="text-xs">3 passos per deixar email + calendari + feed operatius.</p>
         </div>
         <div className="text-xs">Estat global: {status.emailReady && status.calendarReady ? 'Operatiu' : 'Pendent'}</div>

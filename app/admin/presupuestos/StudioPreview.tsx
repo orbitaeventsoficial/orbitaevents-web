@@ -53,7 +53,7 @@ export default function StudioPreview(props: StudioPreviewProps) {
 
   return (
     <aside className="admin-quote-studio-preview h-fit rounded-2xl border p-5">
-      <h2 className="text-lg font-semibold">Vista ràpida</h2>
+      <h2 className="ap-h2">Vista ràpida</h2>
       <p className="mt-1 text-sm">Resum del que sortirà al PDF.</p>
 
       <div className="mt-4 space-y-3 text-sm">

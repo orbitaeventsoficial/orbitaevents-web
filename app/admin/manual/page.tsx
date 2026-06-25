@@ -569,7 +569,7 @@ export default async function AdminManualPage() {
               <p className="text-xs font-bold uppercase tracking-wider admin-tone-text-danger">
                 {ADMIN_MARKETING_PHASE_LABEL[ADMIN_MARKETING_PHASE_GATE.activePhase]}
               </p>
-              <h2 className="mt-1 text-lg font-bold leading-snug">{ADMIN_MARKETING_PHASE_GATE.title}</h2>
+              <h2 className="mt-1 ap-h2 leading-snug">{ADMIN_MARKETING_PHASE_GATE.title}</h2>
               <p className="mt-2 max-w-4xl text-sm leading-relaxed opacity-75">{ADMIN_MARKETING_PHASE_GATE.decision}</p>
               <p className="mt-2 max-w-4xl rounded-xl border admin-tone-border-danger admin-tone-bg-danger px-3 py-2 text-xs font-bold leading-relaxed admin-tone-text-danger">{ADMIN_MARKETING_PHASE_GATE.focusRule}</p>
               <p className="mt-2 max-w-4xl text-xs font-semibold leading-relaxed opacity-65">{ADMIN_MARKETING_PHASE_GATE.blockedUntil}</p>

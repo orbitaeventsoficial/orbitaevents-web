@@ -1513,6 +1513,24 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1147 — 2026-06-25 — claude (TANCAT)
+
+**Migració massiva de títols de secció a `.ap-h2` (codemod segur, 72 títols × 32 fitxers).**
+
+- Context: continuació del #1146. El deute de ~100 títols `text-lg font-semibold/bold` Tailwind cru calia drenar-lo. Amb la classe canònica `.ap-h2` ja establerta (#1146), migració mecànica.
+- Codemod `.codemod-h2.mjs` (temporal, eliminat): per a cada `.tsx` d'admin EXCLOENT les zones de codex (`clientes/[id]/_components`, `bookings/[id]`), substitueix `text-lg font-semibold`/`text-lg font-bold` → `ap-h2` NOMÉS en línies amb `<h2>/<h3>` i SENSE `<p>` barrejat (per no tocar paràgrafs ni mides `text-xl/2xl`).
+- Resultat: **72 substitucions a 32 fitxers** (economia, settings, sales-ops, packs, pricing, blog, catalog, portfolio, collaborators, components, coverage, features, manual, social, image-manager, inventory/[id], leads/[id]/error…). 0 títols `text-lg` cru restants en fitxers segurs.
+- Pendent (deute documentat): els títols dels panells de codex (`clientes/[id]/_components`, `bookings/[id]`) — exclosos a propòsit; codex els migrarà o jo quan els auditi, amb `.ap-h2` ja disponible.
+- `ADMIN_CHANGE_COUNTER` puja a `1147`; el següent canvi real ha de ser `#1148`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 (qa:admin-canon 0, qa:css-monocapa 0).
+- Validació funcional: `pnpm run qa:smoke` (82 rutes × 3 breakpoints) confirma 0 errors/0 overflow després del codemod.
+- Validació humana/UX: pendent validació visual del propietari — tots els títols de secció migrats passen a Plus Jakarta display 18px.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1146 — 2026-06-25 — claude (TANCAT)
 
 **Classe canònica `.ap-h2` (títol de secció standalone) + migració del front Comandament + consolidació Partner Hub.**

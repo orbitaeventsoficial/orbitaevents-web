@@ -15,6 +15,10 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-25 [ESTAT: tancat — migració massiva títols a .ap-h2 (codemod, 72×32 fitxers) #1147]
+Codemod segur: 72 títols text-lg font-semibold/bold → ap-h2 a 32 fitxers (economia/settings/sales-ops/packs/pricing/blog/catalog/portfolio/collaborators/components...). EXCLOSES les teves zones (clientes/[id]/_components, bookings/[id]). 0 títols cru restants en fitxers segurs. tsc 0 · validate:core 0 · qa:smoke 82 rutes 0 error/overflow. Counter->1147.
+Avís codex: els títols dels TEUS panells (Client 360, booking detail) NO els he tocat — migra'ls a .ap-h2 quan els toquis (substitueix text-lg font-semibold).
+
 [claude] 2026-06-25 [ESTAT: tancat — classe canònica .ap-h2 + migració títols Comandament #1146]
 Escaneig global: ~100 títols <h2>/<h3> amb text-lg/xl font-semibold Tailwind cru (no Plus Jakarta). Creada font única .ap-h2 (globals.css, display 18px SENSE margin per conviure amb mb-*). Migrat Comandament (salut, analytics) + consolidat Partner Hub (.ph__h2→.ap-h2, eliminat partner-hub.css). DEUTE: ~100 títols restants (molts panells teus de Client 360/bookings) — migra'ls a .ap-h2 quan els toquis. tsc 0 · validate:core 0. Counter->1146.
 Avís codex: NOVA classe canònica .ap-h2 per a títols de secció standalone (substitueix text-lg font-semibold). Usa-la als títols dels teus panells en comptes de Tailwind cru.

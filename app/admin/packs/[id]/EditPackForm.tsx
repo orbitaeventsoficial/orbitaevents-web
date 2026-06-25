@@ -433,7 +433,7 @@ export default function EditPackForm({
 
       {activeTab === 'economic' && (
         <section className="rounded-2xl border p-6">
-          <h3 className="mb-4 text-lg font-semibold">Economia i semàfors</h3>
+          <h3 className="mb-4 ap-h2">Economia i semàfors</h3>
 
           <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-xl border p-3">
@@ -612,7 +612,7 @@ export default function EditPackForm({
 
             {activeTab === 'content' && (
         <section className="rounded-2xl border p-6">
-          <h3 className="mb-4 text-lg font-semibold">Inventari del pack</h3>
+          <h3 className="mb-4 ap-h2">Inventari del pack</h3>
           <p className="mb-3 text-xs">
             Compon el pack com una peça operativa real: què hi entra, què és obligatori i quin cost base estàs arrossegant.
           </p>
@@ -845,7 +845,7 @@ export default function EditPackForm({
 
       {activeTab === 'texts' && (
         <section className="rounded-2xl border p-6">
-          <h3 className="mb-4 text-lg font-semibold">Textos</h3>
+          <h3 className="mb-4 ap-h2">Textos</h3>
           <p className="mb-3 text-xs">Nom del pack editable + tagline + features per idioma.</p>
           <div className="grid gap-4">
             {SUPPORTED_LOCALES.map((locale) => {
@@ -887,7 +887,7 @@ export default function EditPackForm({
         </section>
       )}
 
-      {activeTab === 'publish' && <section className="rounded-2xl border p-6"><h3 className="mb-4 text-lg font-semibold">Publicació</h3><div className="grid gap-4 sm:grid-cols-3"><label className="text-sm"><input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} /> Actiu</label><label className="text-sm"><input type="checkbox" checked={formData.isFeatured} onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })} /> Destacat</label><input type="number" value={formData.order} onChange={(e) => setFormData({ ...formData, order: Number(e.target.value) || 0 })} className={input} placeholder="Ordre" /></div></section>}
+      {activeTab === 'publish' && <section className="rounded-2xl border p-6"><h3 className="mb-4 ap-h2">Publicació</h3><div className="grid gap-4 sm:grid-cols-3"><label className="text-sm"><input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} /> Actiu</label><label className="text-sm"><input type="checkbox" checked={formData.isFeatured} onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })} /> Destacat</label><input type="number" value={formData.order} onChange={(e) => setFormData({ ...formData, order: Number(e.target.value) || 0 })} className={input} placeholder="Ordre" /></div></section>}
 
       <div className="sticky bottom-2 z-10 flex flex-wrap justify-end gap-3 rounded-xl border p-3 backdrop-blur">
         <Link href="/admin/packs" className="rounded-xl border px-4 py-2 text-sm font-medium">Cancel·lar</Link>

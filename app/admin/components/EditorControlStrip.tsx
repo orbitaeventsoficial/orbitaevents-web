@@ -62,7 +62,7 @@ function renderPanel(panel: EditorPanel) {
   return (
     <article className={`rounded-[var(--o-r-md)] border p-5 ${toneClass.panel}`}>
       <p className={`font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.16em] ${toneClass.accent}`}>{panel.eyebrow}</p>
-      <h2 className="mt-2 text-lg font-semibold text-[var(--t)]">{panel.title}</h2>
+      <h2 className="mt-2 ap-h2 text-[var(--t)]">{panel.title}</h2>
       {panel.description ? <p className="mt-2 text-sm text-[var(--t2)]">{panel.description}</p> : null}
       {panel.stats && panel.stats.length > 0 ? (
         <div className={`mt-4 grid gap-3 ${statsGridClass}`}>
@@ -104,7 +104,7 @@ export function EditorControlStrip({
       {renderPanel(status)}
       <article className={`rounded-[var(--o-r-md)] border p-5 ${actionTone.panel}`}>
         <p className={`font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.16em] ${actionTone.accent}`}>{action.eyebrow}</p>
-        <h2 className="mt-2 text-lg font-semibold text-[var(--t)]">{action.title}</h2>
+        <h2 className="mt-2 ap-h2 text-[var(--t)]">{action.title}</h2>
         <p className="mt-2 text-sm text-[var(--t2)]">{action.description}</p>
         {action.primaryAction ? (
           <div className="mt-4 flex flex-wrap gap-2">

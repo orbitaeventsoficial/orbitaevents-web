@@ -135,7 +135,7 @@ export default async function IntegrationsPage() {
       <section className="grid gap-4 lg:grid-cols-2">
         <article className={CARD}>
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Google Business</h2>
+            <h2 className="ap-h2">Google Business</h2>
             <BoolBadge ok={Boolean(map['integrations.google.refreshToken'])} />
           </div>
           <p className="mt-2 text-sm">Connexió per dades de Google Reviews i ecosistema Google.</p>
@@ -144,7 +144,7 @@ export default async function IntegrationsPage() {
 
         <article className={CARD}>
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Google Ads (OAuth)</h2>
+            <h2 className="ap-h2">Google Ads (OAuth)</h2>
             <BoolBadge ok={Boolean(map['integrations.googleAds.refreshToken'])} />
           </div>
           <p className="mt-2 text-sm">Connexió OAuth per carregar dades de campanyes i conversions a Analítica.</p>
@@ -156,7 +156,7 @@ export default async function IntegrationsPage() {
 
         <article className={CARD}>
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Gmail (OAuth)</h2>
+            <h2 className="ap-h2">Gmail (OAuth)</h2>
             <BoolBadge ok={Boolean(map['integrations.gmail.refreshToken'])} />
           </div>
           <p className="mt-2 text-sm">Lectura i operativa de bústia Gmail des de l&apos;admin.</p>
@@ -166,7 +166,7 @@ export default async function IntegrationsPage() {
 
         <article className={CARD}>
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Safata IMAP</h2>
+            <h2 className="ap-h2">Safata IMAP</h2>
             <BoolBadge ok={imapConfigured} />
           </div>
           <p className="mt-2 text-sm">Captura i importació d&apos;emails a leads CRM.</p>
@@ -176,7 +176,7 @@ export default async function IntegrationsPage() {
 
         <article className={CARD}>
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Sincronització Google Calendar</h2>
+            <h2 className="ap-h2">Sincronització Google Calendar</h2>
             <BoolBadge ok={googleCalendarConnected} />
           </div>
           <p className="mt-2 text-sm">Mirall automàtic complet cada 15 minuts: reserves, leads amb data, tasques obertes, dies bloquejats i publicacions socials. La primera connexió omple el calendari immediatament.</p>
@@ -191,7 +191,7 @@ export default async function IntegrationsPage() {
 
         <article className={CARD}>
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Feed de calendari (ICS)</h2>
+            <h2 className="ap-h2">Feed de calendari (ICS)</h2>
             <BoolBadge ok={Boolean(calendarFeedToken)} />
           </div>
           <p className="mt-2 text-sm">Subscripció del calendari de reserves a Google Calendar, iPhone o Android.</p>
@@ -200,7 +200,7 @@ export default async function IntegrationsPage() {
       </section>
 
       <section className={CARD}>
-        <h2 className="text-lg font-semibold">Checklist tècnic</h2>
+        <h2 className="ap-h2">Checklist tècnic</h2>
         <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
           <p>• Gmail token: {map['integrations.gmail.refreshToken'] ? 'OK' : 'Pendent'}</p>
           <p>• Google token: {map['integrations.google.refreshToken'] ? 'OK' : 'Pendent'}</p>

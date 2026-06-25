@@ -110,7 +110,7 @@ export default function LossBreakdownPanel({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">Pèrdues de lead</p>
-          <h2 className="mt-2 text-lg font-semibold">Per què es refreda l&apos;embut</h2>
+          <h2 className="mt-2 ap-h2">Per què es refreda l&apos;embut</h2>
           <p className="mt-1 max-w-3xl text-sm admin-tone-text-neutral">
             Lectura dels últims {days} dies sobre el motiu de pèrdua, els canals afectats i la tendència mensual.
           </p>

@@ -109,7 +109,7 @@ export default async function SettingsPage() {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">Accessos directes</p>
-            <h2 className="mt-1 text-lg font-semibold text-white/90">Canvis que acostumen a tenir més impacte</h2>
+            <h2 className="mt-1 ap-h2 text-white/90">Canvis que acostumen a tenir més impacte</h2>
             <p className="mt-1 text-sm text-white/65">Entrades ràpides a les peces de configuració que més afecten venda, marca i operativa.</p>
           </div>
         </div>

@@ -181,7 +181,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
       {/* Packs vinculats */}
       {item.packItems.length > 0 && (
         <section className="rounded-2xl border admin-card-glass p-6">
-          <h2 className="text-lg font-semibold mb-4">Packs vinculats</h2>
+          <h2 className="ap-h2 mb-4">Packs vinculats</h2>
           <div className="flex flex-wrap gap-2">
             {item.packItems.map((pi) => {
               const packName = pi.pack.translations.find((t) => t.locale === 'ca')?.name

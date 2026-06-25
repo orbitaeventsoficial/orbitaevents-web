@@ -339,7 +339,7 @@ export default async function CatalogPage({
       </nav>
 
       <section className="ap-card rounded-2xl p-6">
-        <h2 className="text-lg font-semibold">{CATALOG_TAB_META[activeTab].title}</h2>
+        <h2 className="ap-h2">{CATALOG_TAB_META[activeTab].title}</h2>
         <p className="mt-1 text-sm">{CATALOG_TAB_META[activeTab].description}</p>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2">

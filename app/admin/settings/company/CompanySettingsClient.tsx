@@ -94,7 +94,7 @@ export default function CompanySettingsClient({ initial }: { initial: Record<str
         <div className="mb-4 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl border">🏢</div>
           <div>
-            <h2 className="text-lg font-semibold">Dades fiscals</h2>
+            <h2 className="ap-h2">Dades fiscals</h2>
             <p className="text-sm">Apareixen als contractes, factures i pressupostos</p>
           </div>
         </div>
@@ -119,7 +119,7 @@ export default function CompanySettingsClient({ initial }: { initial: Record<str
         <div className="mb-4 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl border">📊</div>
           <div>
-            <h2 className="text-lg font-semibold">Integracio Holded</h2>
+            <h2 className="ap-h2">Integracio Holded</h2>
             <p className="text-sm">Sincronitza factures automaticament amb Holded</p>
           </div>
         </div>

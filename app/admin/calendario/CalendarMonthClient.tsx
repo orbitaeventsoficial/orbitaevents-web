@@ -756,7 +756,7 @@ export default function CalendarMonthClient() {
         <div id="calendar-detail" className="rounded-2xl border admin-card-glass p-4 sm:p-5" {...helpAttrs(ADMIN_CALENDAR_HELP.monthDayDetail)}>
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div>
-              <h2 className="text-base sm:text-lg font-semibold">
+              <h2 className="text-base sm:ap-h2">
                 {formatDateFull(selectedDayData.date)}
               </h2>
               <p className="mt-0.5 text-xs sm:text-sm">

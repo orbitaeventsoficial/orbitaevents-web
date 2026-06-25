@@ -398,7 +398,7 @@ export default async function PacksPage({
       {packsByService.map((group) => (
         <section key={group.service} className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">{group.label}</h2>
+            <h2 className="ap-h2">{group.label}</h2>
             <span className="text-xs">{group.packs.length} packs</span>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -562,7 +562,7 @@ export default async function PacksPage({
       {otherPacks.length > 0 && (
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Altres</h2>
+            <h2 className="ap-h2">Altres</h2>
             <span className="text-xs">{otherPacks.length} packs</span>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -732,7 +732,7 @@ export default async function PacksPage({
       )}
 
       <section className="mt-8 rounded-2xl border admin-card-glass p-5">
-        <h2 className="text-lg font-semibold">Serveis solts d&apos;Òrbita</h2>
+        <h2 className="ap-h2">Serveis solts d&apos;Òrbita</h2>
         <p className="mt-1 text-sm admin-tone-text-neutral">
           Serveis propis que s&apos;afegeixen a una reserva fora de pack (p. ex. DJ extra, tècnic de so).
           Es gestionen com a dades al codi; els productes de col·laboradors van al seu catàleg.

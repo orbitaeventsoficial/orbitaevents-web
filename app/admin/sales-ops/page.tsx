@@ -277,7 +277,7 @@ export default async function SalesOpsPage() {
       <section className="ap-card rounded-2xl p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold">Automatització del temps de resposta (24h)</h2>
+            <h2 className="ap-h2">Automatització del temps de resposta (24h)</h2>
             <p className="text-sm admin-tone-text-neutral">Si una entrada passa de 24h sense resposta, el sistema crea tasca i eleva prioritat.</p>
           </div>
           <div className="flex items-center gap-2">
@@ -303,7 +303,7 @@ export default async function SalesOpsPage() {
 
       <section className="ap-card rounded-2xl p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold">Auditoria exhaustiva (avui)</h2>
+          <h2 className="ap-h2">Auditoria exhaustiva (avui)</h2>
           <p className="text-xs admin-tone-text-neutral">Diagnòstic, millora a 30 dies i escalat a 90 dies</p>
         </div>
         <div className="mt-4 grid gap-3 xl:grid-cols-2">
@@ -325,17 +325,17 @@ export default async function SalesOpsPage() {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
-        <article className="ap-card rounded-2xl p-5"><h2 className="text-lg font-semibold">Pla d'execució a 30 dies</h2><ol className="mt-3 space-y-2 text-sm admin-tone-text-neutral"><li>1. Temps de resposta: deixar cada dia a 0 les entrades de +24h.</li><li>2. Tasques guia: treballar sempre des de la checklist diària.</li><li>3. Pipeline: neteja setmanal de fases i estats sense activitat.</li><li>4. Missatges: optimitzar plantilles per pujar la taxa de resposta.</li><li>5. Dades: control diari de duplicats i camps crítics.</li><li>6. Reserva a calendari: verificar traçabilitat a tots els casos.</li></ol></article>
-        <article className="ap-card rounded-2xl p-5"><h2 className="text-lg font-semibold">Pla d'escalat a 90 dies</h2><ol className="mt-3 space-y-2 text-sm admin-tone-text-neutral"><li>1. Predicció: alertes abans que una entrada entri en risc.</li><li>2. Automatització: seqüències per segment i tipus d'esdeveniment.</li><li>3. Quadre executiu: marge i previsió per canal en una sola vista.</li><li>4. Qualitat de dades: regles intel·ligents a la captura inicial.</li><li>5. Post-event: feedback incorporat per millorar proposta comercial.</li><li>6. Operativa solo: més accions en 1 clic i menys canvi de pantalla.</li></ol></article>
+        <article className="ap-card rounded-2xl p-5"><h2 className="ap-h2">Pla d'execució a 30 dies</h2><ol className="mt-3 space-y-2 text-sm admin-tone-text-neutral"><li>1. Temps de resposta: deixar cada dia a 0 les entrades de +24h.</li><li>2. Tasques guia: treballar sempre des de la checklist diària.</li><li>3. Pipeline: neteja setmanal de fases i estats sense activitat.</li><li>4. Missatges: optimitzar plantilles per pujar la taxa de resposta.</li><li>5. Dades: control diari de duplicats i camps crítics.</li><li>6. Reserva a calendari: verificar traçabilitat a tots els casos.</li></ol></article>
+        <article className="ap-card rounded-2xl p-5"><h2 className="ap-h2">Pla d'escalat a 90 dies</h2><ol className="mt-3 space-y-2 text-sm admin-tone-text-neutral"><li>1. Predicció: alertes abans que una entrada entri en risc.</li><li>2. Automatització: seqüències per segment i tipus d'esdeveniment.</li><li>3. Quadre executiu: marge i previsió per canal en una sola vista.</li><li>4. Qualitat de dades: regles intel·ligents a la captura inicial.</li><li>5. Post-event: feedback incorporat per millorar proposta comercial.</li><li>6. Operativa solo: més accions en 1 clic i menys canvi de pantalla.</li></ol></article>
       </section>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <section className="ap-card rounded-2xl p-5"><h2 className="text-lg font-semibold">Conversió per origen</h2><div className="mt-4 ap-table-wrap border-0"><table className="ap-table min-w-full text-sm" aria-label="Conversió per origen"><thead className="ap-table-head"><tr><th scope="col" className="ap-table-th">Origen</th><th scope="col" className="ap-table-th">Total</th><th scope="col" className="ap-table-th">Tancats</th><th scope="col" className="ap-table-th">Taxa de tancament</th></tr></thead><tbody className="ap-table-body">{bySource.map((row) => (<tr key={row.source}><td className="py-2 font-medium">{row.source}</td><td className="py-2">{row.total}</td><td className="py-2">{row.won}</td><td className="py-2">{toPct(row.winRate)}</td></tr>))}</tbody></table></div></section>
-        <section className="ap-card rounded-2xl p-5"><h2 className="text-lg font-semibold">Conversió per comercial</h2><div className="mt-4 ap-table-wrap border-0"><table className="ap-table min-w-full text-sm" aria-label="Conversió per comercial"><thead className="ap-table-head"><tr><th scope="col" className="ap-table-th">Comercial</th><th scope="col" className="ap-table-th">Total</th><th scope="col" className="ap-table-th">Tancats</th><th scope="col" className="ap-table-th">Taxa de tancament</th></tr></thead><tbody className="ap-table-body">{byAssignee.map((row) => (<tr key={row.assignee}><td className="py-2 font-medium">{row.assignee}</td><td className="py-2">{row.total}</td><td className="py-2">{row.won}</td><td className="py-2">{toPct(row.winRate)}</td></tr>))}</tbody></table></div></section>
+        <section className="ap-card rounded-2xl p-5"><h2 className="ap-h2">Conversió per origen</h2><div className="mt-4 ap-table-wrap border-0"><table className="ap-table min-w-full text-sm" aria-label="Conversió per origen"><thead className="ap-table-head"><tr><th scope="col" className="ap-table-th">Origen</th><th scope="col" className="ap-table-th">Total</th><th scope="col" className="ap-table-th">Tancats</th><th scope="col" className="ap-table-th">Taxa de tancament</th></tr></thead><tbody className="ap-table-body">{bySource.map((row) => (<tr key={row.source}><td className="py-2 font-medium">{row.source}</td><td className="py-2">{row.total}</td><td className="py-2">{row.won}</td><td className="py-2">{toPct(row.winRate)}</td></tr>))}</tbody></table></div></section>
+        <section className="ap-card rounded-2xl p-5"><h2 className="ap-h2">Conversió per comercial</h2><div className="mt-4 ap-table-wrap border-0"><table className="ap-table min-w-full text-sm" aria-label="Conversió per comercial"><thead className="ap-table-head"><tr><th scope="col" className="ap-table-th">Comercial</th><th scope="col" className="ap-table-th">Total</th><th scope="col" className="ap-table-th">Tancats</th><th scope="col" className="ap-table-th">Taxa de tancament</th></tr></thead><tbody className="ap-table-body">{byAssignee.map((row) => (<tr key={row.assignee}><td className="py-2 font-medium">{row.assignee}</td><td className="py-2">{row.total}</td><td className="py-2">{row.won}</td><td className="py-2">{toPct(row.winRate)}</td></tr>))}</tbody></table></div></section>
       </div>
 
       <section className="ap-card rounded-2xl p-5">
-        <h2 className="text-lg font-semibold">Entrades en risc (prioritzar avui)</h2>
+        <h2 className="ap-h2">Entrades en risc (prioritzar avui)</h2>
         <div className="mt-4 space-y-2">
           {riskLeads.length === 0 ? (
             <p className="text-sm admin-tone-text-neutral">Sense riscos rellevants.</p>

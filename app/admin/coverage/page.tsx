@@ -230,7 +230,7 @@ export default function CoveragePage() {
 
       {/* Add Area Form */}
       <div className="rounded-2xl border admin-card-glass p-6">
-        <h2 className="text-lg font-semibold mb-4">Afegir Ciutat</h2>
+        <h2 className="ap-h2 mb-4">Afegir Ciutat</h2>
         <div className="flex gap-3">
           <input
             type="text"

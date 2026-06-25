@@ -177,7 +177,7 @@ export default function FeaturesPage() {
 
       {/* Features List */}
       <div className="rounded-2xl border admin-card-glass p-6">
-        <h2 className="text-lg font-semibold mb-4">Funcionalitats</h2>
+        <h2 className="ap-h2 mb-4">Funcionalitats</h2>
         <div className="space-y-3">
           {features.map((feature) => (
             <div

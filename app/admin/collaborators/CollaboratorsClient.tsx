@@ -305,7 +305,7 @@ export default function CollaboratorsClient() {
 
       {showForm && (
         <form onSubmit={handleSubmit} className="ap-card space-y-4 rounded-xl p-6">
-          <h3 className="text-lg font-bold">{editingId ? 'Editar partner' : 'Nou partner'}</h3>
+          <h3 className="ap-h2">{editingId ? 'Editar partner' : 'Nou partner'}</h3>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label htmlFor="collab-name" className="mb-1 block text-sm admin-tone-text-neutral">Nom *</label>
@@ -454,7 +454,7 @@ export default function CollaboratorsClient() {
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
                   <div className="mb-1 flex items-center gap-3">
-                    <h3 className="text-lg font-bold">{c.name}</h3>
+                    <h3 className="ap-h2">{c.name}</h3>
                     {c.company && <span className="text-sm admin-tone-text-neutral">{c.company}</span>}
                     <span className={getPricingBadge(c.pricingModel)}>
                       {c.pricingModel === 'DISCOUNT' ? `${c.commissionPct}% descompte` : `Net + ${c.commissionPct}%`}
