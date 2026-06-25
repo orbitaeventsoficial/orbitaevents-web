@@ -109,7 +109,7 @@ export default function BookingTravelDiscountSection({
           </div>
           <div className="nb__field">
             <label htmlFor="nb-discount-code" className="nb__label">Codi descompte</label>
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div className="nb__discount-code-row">
               <input
                 id="nb-discount-code"
                 type="text"
@@ -125,8 +125,7 @@ export default function BookingTravelDiscountSection({
                 type="button"
                 onClick={onValidateDiscountCode}
                 disabled={validatingCode || !form.discountCode}
-                className="nb__btn--sec"
-                style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}
+                className="nb__btn--sec nb__btn--compact"
               >
                 {validatingCode ? 'Validant…' : 'Validar'}
               </button>
@@ -140,7 +139,7 @@ export default function BookingTravelDiscountSection({
             )}
           </div>
         </div>
-        <div className="nb__field" style={{ marginTop: 12 }}>
+        <div className="nb__field nb__field--spaced">
           <label htmlFor="nb-notes" className="nb__label">Notes internes</label>
           <textarea
             id="nb-notes"

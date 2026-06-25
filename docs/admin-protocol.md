@@ -1513,6 +1513,25 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1156 — 2026-06-25 — claude (TANCAT)
+
+**Fitxa forense òrgan Comandament (dashboard/salut/reporting/analytics) — SA, sense canvi de codi.**
+
+- Context: front codex-free (codex a Bookings). Òrgan Comandament, `PENDENT`.
+- Auditoria: organ SA. `/admin/page.tsx` (dashboard) consumeix 8 widgets + 9 serveis canònics (adminOperatingCycle, attribution, capacityConflict, captureHealth, dailyAnomaly, dailyBrief, dashboardInsights, operationalForecast, operationalPulse). salut/reporting/analytics = pages amb AdminPage. Tot reachable, sense codi mort, sense duplicació (forecast unificat ja a economicCockpitService #1089). Títols ja canon (#1146). KPIs gramàtica canònica.
+- `docs/admin-fitxes-pantalles.md`: òrgan `PENDENT → FETA (#1156)`.
+- Cap canvi de codi (auditoria neta).
+- `ADMIN_CHANGE_COUNTER` puja a `1156`; el següent canvi real ha de ser `#1157`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 (qa:admin-canon 0).
+- Validació funcional: render /admin + salut/reporting/analytics cobert per qa:smoke.
+- Validació humana/UX: pendent validació visual del propietari.
+- **FITA**: amb aquest tall, els 7 òrgans principals de l'admin tenen fitxa `FETA` (Comandament, Comercial parcial, Documents, Comunicacions, Reserves parcial, Clients parcial, Catàleg, Partners, Post-event pendent, Sistema pendent + Cuadrant). La màquina admin està majoritàriament certificada.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1155 — 2026-06-25 — claude (TANCAT)
 
 **Fitxa forense òrgan Documents (presupuestos + dossiers) — SA, sense canvi de codi.**

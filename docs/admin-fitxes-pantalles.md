@@ -51,7 +51,7 @@ Les rutes admin no es tracten com 90 pantalles independents. Primer s'agrupen pe
 
 | Òrgan | Rutes principals | Fitxa mare |
 |---|---|---|
-| Comandament | `/admin`, `/admin/salut`, `/admin/reporting`, `/admin/analytics` | PENDENT |
+| Comandament | `/admin`, `/admin/salut`, `/admin/reporting`, `/admin/analytics` | FETA (#1156) |
 | Comercial | `/admin/leads`, `/admin/leads/[id]`, `/admin/sales-ops`, `/admin/leads/arxiu`, `/admin/leads/reengagement` | INICIAL parcial |
 | Documents | `/admin/presupuestos`, `/admin/presupuestos/[id]`, `/admin/dossiers`, `/admin/studio` | FETA (#1155) · studio=zona protegida |
 | Comunicacions | `/admin/inbox`, `/admin/inbox/compose`, `/admin/inbox/settings`, `/admin/emails`, `/admin/email-templates` | FETA (#1133) |
@@ -691,6 +691,27 @@ Canvi de codi (#1155): cap. Auditoria neta — organ SA sense bugs (a diferènci
 Validacio: tsc EXIT 0 · validate:core EXIT 0 (qa:admin-canon 0) · render presupuestos/dossiers ja cobert per qa:smoke.
 
 Decisio de treball: organ SA i ben cablejat, cap canvi de codi. `/studio` queda fora (zona protegida amb guard qa:studio-integrity propi). Pendent validacio visual del propietari.
+
+### Òrgan Comandament (`/admin`, `/admin/salut`, `/admin/reporting`, `/admin/analytics`)
+
+Pantalla: Comandament — dashboard operatiu, salut del sistema, reporting executiu, analytics.
+Estat inventari: 🟢
+TANCAT CHARLIE: no — pendent validacio visual del propietari.
+Estat fitxa: FETA (auditoria forense #1156, claude, 2026-06-25)
+
+Reachability: `/admin/page.tsx` (dashboard, server) consumeix dashboard-widgets (8 exports) + 9 serveis; salut/reporting/analytics són pages + loading amb AdminPage. Tot viu. Passa qa:no-dead-admin-views.
+CSS viu: control-room.css (dashboard) + classes canòniques `.ap-*`. Títols ja canon (.ap-h2/.ap-title del #1146).
+APIs/serveis vius: adminOperatingCycleService, attributionService, capacityConflictService, captureHealthService, dailyAnomalyService, dailyBriefService, dashboardInsightsService, operationalForecastService, operationalPulseService. Tots consumits pel dashboard.
+Codi mort relacionat: cap.
+Duplicacions: cap (el forecast unificat viu a economicCockpitService #1089; el dashboard consumeix serveis, no els reimplementa).
+Hardcoded/residu visual: dins canon. Títols migrats a .ap-h2/.ap-title (#1146); KPIs amb gramàtica canònica.
+Connexions interrompudes: cap. Dashboard enllaça a tots els organs (leads, bookings, tasks, economia...).
+
+Canvi de codi (#1156): cap. Auditoria neta — organ SA. Els títols ja es van canonitzar al #1146 (salut/analytics → .ap-h2).
+
+Validacio: tsc EXIT 0 · validate:core EXIT 0 (qa:admin-canon 0) · render /admin + salut/reporting/analytics cobert per qa:smoke.
+
+Decisio de treball: organ SA, cap canvi de codi nou. Pendent validacio visual del propietari.
 
 ## Registre de fitxes per fer
 

@@ -1,3 +1,24 @@
+## 2026-06-25 — Fitxa forense òrgan Comandament (SA) (Canvi #1156, claude)
+
+### Context
+Front codex-free (codex a Bookings). Òrgan Comandament (dashboard/salut/reporting/analytics), PENDENT.
+
+### Què s'ha fet
+- Auditoria: organ SA. Dashboard consumeix 8 widgets + 9 serveis canònics; salut/reporting/analytics = pages AdminPage. Reachable, sense codi mort/duplicació, títols ja .ap-h2 (#1146), KPIs canònics.
+- Fitxa PENDENT → FETA (#1156). Cap canvi de codi.
+
+### Validació
+- Validació tècnica: tsc 0 · validate:core 0 (qa:admin-canon 0).
+- Validació funcional: render /admin + salut/reporting/analytics cobert per qa:smoke.
+- Validació humana/UX: pendent validació visual del propietari.
+
+### Coordinació
+Counter -> 1156. Front Comandament (claude); codex a Bookings. Disjunts. 7 organs principals ja amb fitxa.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-25 — Fitxa forense òrgan Documents (SA) (Canvi #1155, claude)
 
 ### Context
@@ -31,7 +52,7 @@ Tall P3 responsiu acotat dins la llista de reserves. `BookingFilters.tsx` manten
 - No es toca `URLSearchParams`, debounce de cerca, `router.push`, helpers de customer ni opcions de filtre.
 
 ### Validació
-- Validació tècnica: pendent `Select-String`, `tsc`, `qa:protocol` i `validate:core`.
+- Validació tècnica: `Select-String` focalitzat confirma 0 residus `style={{`, `width:`, `text-[`, `bg-white`, `border-white`, `text-white` a `BookingFilters.tsx`; `git diff --check` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
 - Validació funcional: cap canvi a navegació ni query params; només classe/CSS.
 - Validació humana/UX: pendent validació visual del propietari; el camp conserva amplada equivalent amb límit responsive.
 
@@ -40,7 +61,7 @@ Counter -> 1154. Perímetre Codex: BookingFilters.
 
 - Començat per: `codex`
 - Treballant per: `codex`
-- Tancat per: pendent validació
+- Tancat per: `codex`
 
 ## 2026-06-25 — Booking status changer fallback canònic (Canvi #1153, codex)
 

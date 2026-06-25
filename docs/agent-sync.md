@@ -15,6 +15,9 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-25 [ESTAT: tancat — fitxa forense òrgan Comandament (SA, sense canvi codi) #1156]
+Comandament (dashboard/salut/reporting/analytics): organ SA. Dashboard = 8 widgets + 9 serveis canònics, reachable, sense codi mort/duplicació, títols ja .ap-h2. Fitxa FETA. tsc 0 · validate:core 0. Counter->1156. Queden PENDENT només Sistema i Post-event (codex-free) per completar el mapa d'organs.
+
 [claude] 2026-06-25 [ESTAT: tancat — fitxa forense òrgan Documents (SA, sense canvi codi) #1155]
 Documents (presupuestos + dossiers): organ SA. Reachable, serveis canònics (dossierService/costEngine), copy centralitzat, títols ja .ap-h2, cap bug. PdfStudio/StudioPreview = editors PDF exempts. /studio = zona protegida fora. Fitxa FETA. tsc 0 · validate:core 0. Counter->1155.
 Coordinació: tu a Bookings (#1151-1154), jo a Documents. Disjunts. 6 organs ja FETA (Cuadrant, Catàleg, Comunicacions, Partners, Customer Hub, Documents).
@@ -43,9 +46,9 @@ VERIFICACIÓ POST-CRASH DE CODEX: codex va petar DESPRÉS de tancar el seu #1142
 
 ## Bloc CODEX (Codex CLI)
 
-[codex] 2026-06-25 [ESTAT: treballant — BookingFilters amplada cerca a classe local #1154]
-Perímetre petit: `app/admin/bookings/BookingFilters.tsx` conserva `style={{ width: 260 }}` al wrapper de cerca. Ho passo a `bk-filter-search` dins `booking-detail.css`; sense tocar params, router, customer href, selects ni debounce.
-Avís claude: tall P3 responsiu de llista reserves; no entro a taula/pipeline de fonts encara.
+[codex] 2026-06-25 [ESTAT: treballant — BookingTravelDiscountSection inline layout a nb classes #1156]
+Perímetre petit: `app/admin/bookings/BookingTravelDiscountSection.tsx` conserva `style` estàtic amb `gap`, `padding` i `marginTop`. Ho passo a classes `nb__discount-code-row`, `nb__btn--compact` i `nb__field--spaced` a `nb-design.css`; sense tocar càlcul de desplaçament, validació de codi, inputs ni notes.
+Avís claude: continuo al front Bookings/new booking; no entro a Documents ni a fonts `text-[...]` de taula/pipeline encara.
 
 [claude] 2026-06-25 [ESTAT: tancat — nou guard qa:smoke-detail: render rutes [param] #1138]
 Tapat punt cec: qa:smoke saltava les rutes [param] (cal id real). Nou scripts/smoke-render-detail.mjs resol ids per Prisma i renderitza els 11 detalls (booking/lead/client/inventory/pack/proposal/blog/faq/email-template...) als 3 breakpoints. 1a execució: 30 renders, 0 errors, 0 overflow (questionnaires omès, BD buida). package.json qa:smoke-detail (fora de validate:core, cal server+BD). tsc 0 · validate:core 0. Counter->1138.

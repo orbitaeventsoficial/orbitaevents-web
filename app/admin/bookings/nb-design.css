@@ -39,6 +39,7 @@ html.admin-mode .nb__row--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); 
 html.admin-mode .nb__row--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 html.admin-mode .nb__row + .nb__row { margin-top: 12px; }
 html.admin-mode .nb__field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+html.admin-mode .nb__field--spaced { margin-top: 12px; }
 html.admin-mode .nb__label { font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-bold); letter-spacing: 0.1em; text-transform: uppercase; color: var(--t3); display: flex; align-items: center; gap: 6px; }
 html.admin-mode .nb__label--req::after { content: "*"; color: var(--gold); }
 html.admin-mode .nb__input,
@@ -85,6 +86,7 @@ html.admin-mode .nb__btn--prim { display: inline-flex; align-items: center; just
 html.admin-mode .nb__btn--prim:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
 html.admin-mode .nb__btn--prim:disabled { opacity: 0.5; cursor: not-allowed; }
 html.admin-mode .nb__btn--sec { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 16px; border: 1px solid var(--hair-gold); border-radius: var(--o-r-md-2); background: transparent; color: var(--t); font: inherit; font-size: var(--o-text-sm); font-weight: var(--o-fw-semi-plus); text-decoration: none; cursor: pointer; transition: border-color 140ms ease, background 140ms ease, color 140ms ease; }
+html.admin-mode .nb__btn--compact { padding: 10px 14px; white-space: nowrap; }
 html.admin-mode .nb__btn--sec:hover { border-color: var(--gold); color: var(--gold-bright); background: color-mix(in oklab, var(--gold) 6%, transparent); }
 
 /* Pack cards */
@@ -99,6 +101,7 @@ html.admin-mode .nb__packprice { font-family: var(--mono); font-size: var(--o-te
 html.admin-mode .nb__packdesc { font-size: var(--o-text-2xs); color: var(--t3); line-height: 1.4; }
 html.admin-mode .nb__packmeta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3); }
 html.admin-mode .nb__input--code { font-family: var(--mono); text-transform: uppercase; }
+html.admin-mode .nb__discount-code-row { display: flex; gap: 8px; }
 /* Utility classes locals (sense Tailwind) — usat per evitar inline fontSize/color */
 html.admin-mode .nb__conflict-ref { font-size: var(--o-text-2xs); color: var(--t2); }
 html.admin-mode .nb__conflict-hint { display: block; margin-top: 6px; color: var(--t3); }
