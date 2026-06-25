@@ -361,6 +361,8 @@ CSS viu:
 - `app/admin/bookings/[id]/booking-detail.css`: cobreix el detall `bd__*` i també algunes classes `bk-*` de la llista perquè `/admin/bookings/page.tsx` l'importa.
 - El CSS usa `html.admin-mode` i tokens `--ax-*`/`--o-*`; `qa:admin-mode-prefix` és 0 deute.
 - Canvi #1142: la llista `/admin/bookings` deixa d'emetre els contenidors `style={{...}}` P2 i `admin-card-glass` a empty/cards mòbil; passen a `bk-detail-bar-row`, `bk-detail-bar-actions`, `bk-list-shell`, `bk-empty-state` i `bk-mobile-card`.
+- Canvi #1148: `BookingTotalEditor` i la cabina de marge (`BookingMarginCard`) deixen els inline styles i valors tipogràfics P2; passen a `bd-total-editor*` i `admin-booking-margin-*` dins aquest CSS.
+- Canvi #1149: el pipeline de `/admin/bookings` deixa el dot mòbil i els botons ←/→ amb negre/blanc ad hoc; passen a `bk-pipeline-dot--inactive` i `bk-pipeline-shift-btn` dins aquest CSS.
 - Residus coneguts: overrides amb `!important` sobre components encaixats (`admin-booking-margin*`, inputs dins `bd__root`). El P1 cromàtic de `StripePaymentPanel.tsx` queda resolt al Canvi #1113.
 
 APIs/serveis vius:
@@ -421,7 +423,7 @@ Evidència d'auditoria:
 
 Decisió de treball:
 - Es conserva la ruta i la cabina: és viva, connectada i operativa.
-- Proper tall executable dins Reserva detall: si es continua en aquest òrgan, atacar un P2 acotat (`BookingTotalEditor` o `BookingMarginCard`) sense tocar lògica Stripe/Bizum ni regles de preu.
+- Proper tall executable dins Reserva detall: si es continua en aquest òrgan, atacar un P2 acotat de questionnaire/gallery/share o pipeline, sense tocar lògica Stripe/Bizum ni regles de preu.
 - No tocar: schema, webhook Stripe, càlculs de total/IVA, cost engine, llista de reserves ni refeta visual global de la fitxa.
 - Validació pendent del propietari: visual final de la cabina abans de marcar `TANCAT CHARLIE`.
 
@@ -674,7 +676,7 @@ Decisio de treball: organ ben cablejat amb 2 bugs visuals corregits. Pendent val
 | `/admin/blog` | `app/admin/blog/page.tsx` | PENDENT | codex/claude | Blog llista |
 | `/admin/blog/edit/[id]` | `app/admin/blog/edit/[id]/page.tsx` | PENDENT | codex/claude | Blog edició |
 | `/admin/blog/new` | `app/admin/blog/new/page.tsx` | PENDENT | codex/claude | Nou blog |
-| `/admin/bookings` | `app/admin/bookings/page.tsx` | PENDENT | codex/claude | Reserves llista — contenidors/glass P2 drenats #1142 |
+| `/admin/bookings` | `app/admin/bookings/page.tsx` | PENDENT | codex/claude | Reserves llista — contenidors/glass P2 drenats #1142; pipeline dots/botons P2 drenats #1149 |
 | `/admin/bookings/[id]` | `app/admin/bookings/[id]/page.tsx` | FETA | codex | Reserva detall — fitxa forense #1112 |
 | `/admin/bookings/new` | `app/admin/bookings/new/page.tsx` | PENDENT | codex/claude | Nova reserva |
 | `/admin/calendario` | `app/admin/calendario/page.tsx` | PENDENT | codex/claude | Calendari legacy/compatibilitat |

@@ -1513,6 +1513,41 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1150 — 2026-06-25 — claude (TANCAT)
+
+**Canon de títols al 100%: migració dels títols dels panells de codex (Client 360 + booking detail) a `.ap-h2`.**
+
+- Context: completar el #1147. Els 13 títols `text-lg font-semibold` de les zones que el codemod anterior excloïa per prudència (`clientes/[id]/_components`, `bookings/[id]`) ja es poden migrar amb tot committejat. Amb això, 0 títols de secció Tailwind cru a TOT l'admin.
+- Codemod (mateixa lògica segura del #1147: només `<h2>/<h3>` sense `<p>` barrejat): 13 substitucions a 9 fitxers — `SummaryPanel` (4), `BookingGallery`, `BookingInventorySection` (2), `BookingMarginCard`, `BookingQuestionnaireSection`, `BookingStatusChanger`, `ClientPortalAccessPanel`, `CommunicationPanel`, `bookings/[id]/error`.
+- Additiu (substitueix className, no toca lògica). No col·lisiona amb la feina de codex (#1148/#1149) als mateixos fitxers: el codemod llegeix l'estat viu i només canvia el patró de títol; tsc verd ho confirma.
+- `ADMIN_CHANGE_COUNTER` puja a `1150`; el següent canvi real ha de ser `#1151`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 (qa:admin-canon 0).
+- Validació funcional: 0 títols `text-lg font-*` cru restants a tot `app/admin`. Render booking/client detall verificat (qa:smoke-detail).
+- Validació humana/UX: pendent validació visual del propietari. Tots els títols de secció de l'admin (100%) ara Plus Jakarta display 18px.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1149 — 2026-06-25 — codex (TANCAT)
+
+**El pipeline de reserves deixa els dots/botons P2 amb negre/blanc ad hoc i passa a tokens locals.**
+
+- Context: continuació de Reserves després del #1148. `app/admin/bookings/BookingPipelineView.tsx` tenia residu P2 viu i acotat: dot mòbil inactiu amb `bg-black/15 dark:bg-white/20` i botons ←/→ amb `hover:bg-black/20`.
+- `app/admin/bookings/BookingPipelineView.tsx`: el dot inactiu passa a `bk-pipeline-dot--inactive`; els botons de canvi de columna passen a `bk-pipeline-shift-btn`.
+- `app/admin/bookings/[id]/booking-detail.css`: afegides les regles `bk-pipeline-*` escopades a `html.admin-mode`, amb `color-mix` sobre `--t`, radi `--o-r-sm`, mida `--o-text-xs` i transicions locals.
+- `docs/audit/admin-fitxes.md`: la troballa P2 del pipeline queda resolta; també es marca com a obsolet el Top 1 antic de leads perquè `LeadCustomerLinkPanel.tsx` i `LeadDossiersPanel.tsx` ja no existeixen al perímetre viu.
+- `ADMIN_CHANGE_COUNTER` puja a `1149`; el següent canvi real ha de ser `#1150`.
+- Validació tècnica: `Select-String` focalitzat sobre `BookingPipelineView.tsx` dona 0 `bg-black/15`, 0 `dark:bg-white/20`, 0 `hover:bg-black/20`, 0 `bg-white`, 0 `border-white`, 0 `text-white`; `npx tsc --noEmit --pretty false` EXIT 0; `pnpm run qa:protocol` EXIT 0; `pnpm run validate:core` EXIT 0.
+- Validació funcional: cap canvi a `fetchWithCsrf`, `/api/admin/bookings?pipeline=true`, drag/drop, `PATCH /api/admin/bookings/:id/status`, links de reserva/client ni accions mòbils; només classes i CSS.
+- Validació humana/UX: pendent validació visual del propietari; dots i botons mantenen la mateixa jerarquia però ja no depenen de negre/blanc Tailwind cru.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
 ### Canvi #1147 — 2026-06-25 — claude (TANCAT)
 
 **Migració massiva de títols de secció a `.ap-h2` (codemod segur, 72 títols × 32 fitxers).**
@@ -1601,6 +1636,25 @@ Seqüència obligatòria de registre:
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
+
+---
+
+### Canvi #1148 — 2026-06-25 — codex (TANCAT)
+
+**La fitxa de reserva mou l'editor de total i la cabina de marge P2 a classes locals tokenitzades.**
+
+- Context: Top 1 actual de `docs/audit/admin-fitxes.md`. `app/admin/bookings/[id]/BookingTotalEditor.tsx` tenia `style={{...}}` amb px durs (`width:100`, `fontSize:10`, `borderRadius:4`, `marginLeft:6`) i `BookingMarginCard.tsx` mantenia valors/títols de marge amb tipografia ad-hoc fora de classes locals.
+- `app/admin/bookings/[id]/BookingTotalEditor.tsx`: l'arrel, fila d'edició, input, trigger, alerta de marge i botó de suggeriment passen a `bd-total-editor*`.
+- `app/admin/bookings/[id]/BookingMarginCard.tsx`: percentatge principal, KPI de marge, títol del panell "On va cada euro" i benefici net passen a classes locals `admin-booking-margin-*`.
+- `app/admin/bookings/[id]/booking-detail.css`: afegides les regles locals sota `html.admin-mode` amb tokens (`--panel`, `--line2`, `--gold`, `--o-*`, escala tipogràfica) i sense reobrir càlculs ni serveis.
+- `docs/audit/admin-fitxes.md`: les troballes P2 de `BookingTotalEditor` i `BookingMarginCard` queden resoltes al #1148.
+- `ADMIN_CHANGE_COUNTER` puja a `1148`; el següent canvi real ha de ser `#1149`.
+- Validació tècnica: `Select-String` focalitzat dona 0 `style={{`, 0 `fontSize`, 0 `width`, 0 `borderRadius`, 0 `marginLeft`, 0 `letterSpacing` a `BookingTotalEditor.tsx`; i 0 residus `font-[family-name]`, `text-[length:var(--o-text-xl)]`, `text-xl font-bold`, `font-bold text-base`, `text-base font-bold` a `BookingMarginCard.tsx`.
+- Validació funcional: cap canvi a càlculs de marge, `computeDirectCostBreakdown`, travel cost, `fetchWithCsrf`, `PATCH /api/admin/bookings/:id`, `toast`, `router.refresh` ni persistència de distància/total; només classes i CSS.
+- Validació humana/UX: l'editor de total conserva el mateix gest d'edició, alerta i suggeriment, i la cabina econòmica manté jerarquia visual amb tokens locals.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
 
 ---
 

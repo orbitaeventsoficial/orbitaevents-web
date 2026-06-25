@@ -219,7 +219,7 @@ export default function BookingMarginCard({
       <div className="admin-booking-margin-hero mb-6">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] opacity-70">Cabina econòmica</p>
-          <h2 className="mt-2 text-lg font-semibold">Marge i costos</h2>
+          <h2 className="mt-2 ap-h2">Marge i costos</h2>
           <p className="mt-1 text-sm opacity-80">
             Llegeix en un cop d'ull què deixa la reserva, on marxa cada euro i si el desplaçament està ben cobert.
           </p>

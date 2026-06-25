@@ -67,7 +67,7 @@ export default function CommunicationPanel({
 
   return (
     <section className="ap-card p-6" {...helpAttrs(ADMIN_BOOKING_HELP_3.communication.root)}>
-      <h2 className="text-lg font-semibold">Comunicacions multicanal</h2>
+      <h2 className="ap-h2">Comunicacions multicanal</h2>
       <div className="mt-3 space-y-3">
         {flows.map((flow) => {
           const status = initialStatuses[flow.key];

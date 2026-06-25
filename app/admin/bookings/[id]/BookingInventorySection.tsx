@@ -250,7 +250,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
   if (loading) {
     return (
       <section className="ap-card rounded-xl p-6" {...helpAttrs(ADMIN_BOOKING_HELP_2.inventory.root)}>
-        <h2 className="text-lg font-semibold mb-4">Equipament assignat</h2>
+        <h2 className="ap-h2 mb-4">Equipament assignat</h2>
         <p className="text-sm">Carregant...</p>
       </section>
     );
@@ -259,7 +259,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
   return (
     <section className="ap-card rounded-xl p-6" {...helpAttrs(ADMIN_BOOKING_HELP_2.inventory.root)}>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">
+        <h2 className="ap-h2">
           Equipament assignat
           {assigned.length > 0 && (
             <span className="text-sm font-normal ml-2">

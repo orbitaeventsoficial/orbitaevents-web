@@ -353,7 +353,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
 
       <div className="admin-customer-card admin-customer-card--contact rounded-2xl border p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.contact)}>
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Informació de contacte</h2>
+          <h2 className="ap-h2">Informació de contacte</h2>
           {!editing ? (
             <button
               type="button"
@@ -432,7 +432,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
       <ContactsSection customerId={data.customer.id} contacts={data.contacts ?? []} />
 
       <div className="admin-customer-card admin-customer-card--ops rounded-2xl border p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.operations)}>
-        <h2 className="text-lg font-semibold">Resum operatiu</h2>
+        <h2 className="ap-h2">Resum operatiu</h2>
         <p className="mt-1 text-sm">
           Client des de {formatDate(data.customer.createdAt)}
         </p>
@@ -456,7 +456,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
         const pct = quoted > 0 ? Math.round((paid / quoted) * 100) : 0;
         return (
           <div className="rounded-2xl border p-5">
-            <h2 className="text-lg font-semibold">Resum financer</h2>
+            <h2 className="ap-h2">Resum financer</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               <div>
                 <p className="text-xs uppercase tracking-wider">Pressupostat</p>
@@ -1295,7 +1295,7 @@ function ContactsSection({ customerId, contacts: initialContacts }: { customerId
   return (
     <div className="rounded-2xl border p-5">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Persones de contacte</h2>
+        <h2 className="ap-h2">Persones de contacte</h2>
         {!isEditing && (
           <button
             type="button"

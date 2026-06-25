@@ -8,7 +8,7 @@ export default async function BookingQuestionnaireSection({ bookingId }: { booki
   return (
     <section className="admin-booking-panel ap-card rounded-xl p-6">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <h2 className="text-lg font-semibold">Qüestionari pre-event</h2>
+        <h2 className="ap-h2">Qüestionari pre-event</h2>
         <Link
           href="/admin/questionnaires"
           className="text-xs text-white/40 hover:text-white/70 transition-colors"

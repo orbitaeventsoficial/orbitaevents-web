@@ -191,7 +191,7 @@ export default function BookingGallery({ bookingId }: Props) {
       <GallerySharePanel bookingId={bookingId} />
 
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Galeria de fotos ({photos.length})</h2>
+        <h2 className="ap-h2">Galeria de fotos ({photos.length})</h2>
         <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading} className="rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 min-h-[44px]" {...helpAttrs(ADMIN_BOOKING_HELP.gallery.upload)}>
           {uploading ? 'Pujant...' : 'Pujar fotos'}
         </button>

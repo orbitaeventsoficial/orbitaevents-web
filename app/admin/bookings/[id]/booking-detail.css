@@ -85,6 +85,28 @@ html.admin-mode .bk-mobile-card--normal:hover {
   border-color: color-mix(in oklab, var(--gold) 36%, var(--line));
   background: color-mix(in oklab, var(--gold) 5%, var(--panel));
 }
+html.admin-mode .bk-pipeline-dot--inactive {
+  background: color-mix(in oklab, var(--t) 15%, transparent);
+}
+html.admin-mode .bk-pipeline-shift-btn {
+  border: 0;
+  border-radius: var(--o-r-sm);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 0.125rem 0.25rem;
+  font-size: var(--o-text-xs);
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    opacity 140ms ease;
+}
+html.admin-mode .bk-pipeline-shift-btn:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--t) 10%, transparent);
+}
+html.admin-mode .bk-pipeline-shift-btn:disabled {
+  cursor: not-allowed;
+}
 
 /* ═══════════════════════════════════════════════════════════════════════
    bd__ — Booking Detail (/admin/bookings/[id])

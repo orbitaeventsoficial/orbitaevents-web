@@ -1,3 +1,47 @@
+## 2026-06-25 — Canon de títols 100% a .ap-h2 (Canvi #1150, claude)
+
+### Context
+Completar el #1147: els títols de secció que havien quedat exclosos per prudència a zones de Codex (`clientes/[id]/_components`, `bookings/[id]`) ja es poden migrar al canon `.ap-h2`.
+
+### Què s'ha fet
+- Codemod segur sobre títols `<h2>/<h3>`: 13 substitucions a 9 fitxers (`SummaryPanel`, `BookingGallery`, `BookingInventorySection`, `BookingMarginCard`, `BookingQuestionnaireSection`, `BookingStatusChanger`, `ClientPortalAccessPanel`, `CommunicationPanel`, `bookings/[id]/error`).
+- El canvi és additiu de classes: no toca lògica, dades, fetchs ni mutacions.
+- Resultat declarat al protocol: 0 títols de secció Tailwind cru restants a `app/admin`.
+
+### Validació
+- Validació tècnica: segons entrada de protocol #1150, `npx tsc --noEmit` EXIT 0 i `pnpm run validate:core` EXIT 0.
+- Validació funcional: segons entrada de protocol #1150, `qa:smoke-detail` verifica booking/client detail i no queden títols `text-lg font-*` crus a l'admin.
+- Validació humana/UX: pendent validació visual del propietari.
+
+### Coordinació
+Counter -> 1150. Entrada afegida per Codex per reparar la coherència protocol/diari després que el protocol #1150 ja existís.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-25 — Pipeline reserves: dots i botons a tokens locals (Canvi #1149, codex)
+
+### Context
+Continuació del drenatge P2 de reserves. `BookingPipelineView.tsx` conservava tres residus visuals vius: dot mòbil inactiu amb `bg-black/15 dark:bg-white/20` i botons ←/→ amb `hover:bg-black/20`.
+
+### Què s'ha fet
+- `app/admin/bookings/BookingPipelineView.tsx`: el dot inactiu passa a `bk-pipeline-dot--inactive`; els botons de desplaçament entre columnes passen a `bk-pipeline-shift-btn`.
+- `app/admin/bookings/[id]/booking-detail.css`: afegides les regles `bk-pipeline-*` amb tokens (`--t`, `--o-r-sm`, `--o-text-xs`) i sense canviar cap fetch, mutació, drag/drop ni estat del kanban.
+- `docs/audit/admin-fitxes.md`: la troballa P2 del pipeline queda resolta i les entrades de leads que apuntaven a fitxers inexistents queden marcades com a obsoletes.
+
+### Validació
+- Validació tècnica: `Select-String` focalitzat confirma 0 residus `bg-black/15`, `dark:bg-white/20`, `hover:bg-black/20`, `bg-white`, `border-white`, `text-white` a `BookingPipelineView.tsx`; `npx tsc --noEmit --pretty false` EXIT 0. `qa:protocol` i `validate:core` es passen sobre l'estat combinat després del #1150.
+- Validació funcional: sense canvi de lògica; el kanban conserva columns, drag/drop, accions mòbils i `PATCH /api/admin/bookings/:id/status`.
+- Validació humana/UX: pendent validació visual del propietari; dots/botons mantenen jerarquia però ja no emeten negre/blanc ad hoc.
+
+### Coordinació
+Counter -> 1149. Perímetre Codex: reserves llista/pipeline. Counter actual del repo: 1150 per entrada posterior de Claude.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-25 — Migració massiva de títols a .ap-h2 (codemod, Canvi #1147, claude)
 
 ### Context
@@ -108,6 +152,29 @@ Counter -> 1143. Front qualitat/guards (claude). codex ha petat després de tanc
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
+
+## 2026-06-25 — booking detail marge/total sense inline P2 (Canvi #1148, codex)
+
+### Context
+Top 1 actual de `docs/audit/admin-fitxes.md`: `BookingTotalEditor.tsx` tenia `style={{...}}` amb px durs per input, trigger i alerta de marge; `BookingMarginCard.tsx` mantenia valors/títols de marge amb tipografia ad-hoc fora de classes locals.
+
+### Què s'ha fet
+- `BookingTotalEditor.tsx`: l'editor inline de total passa a `bd-total-editor`, `bd-total-editor__form`, `bd-total-editor__input`, `bd-total-editor__trigger`, `bd-total-editor__alert` i `bd-total-editor__suggestion`.
+- `BookingMarginCard.tsx`: percentatge principal, KPI de marge, títol de panell i benefici net passen a classes locals `admin-booking-margin-*`.
+- `booking-detail.css`: afegides les regles locals amb tokens (`--panel`, `--line2`, `--gold`, `--o-*`, escala tipogràfica) sota `html.admin-mode`.
+- `docs/audit/admin-fitxes.md`: les dues troballes P2 de `BookingTotalEditor` i `BookingMarginCard` queden resoltes al #1148.
+
+### Validació
+- Validació tècnica: `Select-String` focalitzat dona 0 `style={{`, 0 `fontSize`, 0 `width`, 0 `borderRadius`, 0 `marginLeft`, 0 `letterSpacing` a `BookingTotalEditor.tsx`; i 0 residus `font-[family-name]`, `text-[length:var(--o-text-xl)]`, `text-xl font-bold`, `font-bold text-base`, `text-base font-bold` a `BookingMarginCard.tsx`.
+- Validació funcional: cap canvi a càlculs de marge, `computeDirectCostBreakdown`, travel cost, `fetchWithCsrf`, `PATCH /api/admin/bookings/:id`, `toast`, `router.refresh` ni persistència de distància/total; només classes i CSS.
+- Validació humana/UX: l'editor de total conserva el mateix comportament d'edició, alerta i suggeriment, però deixa de portar mides i colors inline; la cabina econòmica manté jerarquia amb tokens.
+
+### Coordinació
+Counter -> 1148. Perímetre limitat a `BookingMarginCard.tsx`, `BookingTotalEditor.tsx` i `booking-detail.css`; no toca serveis, Prisma, API routes ni càlculs.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
 
 ## 2026-06-25 — bookings/page sense contenidors inline ni glass P2 (Canvi #1142, codex)
 

@@ -135,7 +135,7 @@ export default function ClientPortalAccessPanel({
 
   return (
     <section className="ap-card p-6" {...helpAttrs(ADMIN_BOOKING_HELP_3.portal.root)}>
-      <h2 className="mb-2 text-lg font-semibold">Portal client (link únic)</h2>
+      <h2 className="mb-2 ap-h2">Portal client (link únic)</h2>
       <p className="mb-4 text-xs">
         Genera un enllaç privat sense login per compartir estat, serveis, pagaments i informació post-event.
       </p>
