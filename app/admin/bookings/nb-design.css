@@ -38,6 +38,7 @@ html.admin-mode .nb__row { display: grid; grid-template-columns: repeat(2, minma
 html.admin-mode .nb__row--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 html.admin-mode .nb__row--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 html.admin-mode .nb__row + .nb__row { margin-top: 12px; }
+html.admin-mode .nb__row--spaced { margin-top: 12px; }
 html.admin-mode .nb__field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 html.admin-mode .nb__field--spaced { margin-top: 12px; }
 html.admin-mode .nb__label { font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-bold); letter-spacing: 0.1em; text-transform: uppercase; color: var(--t3); display: flex; align-items: center; gap: 6px; }
@@ -50,12 +51,15 @@ html.admin-mode .nb__textarea:focus { outline: none; border-color: var(--gold); 
 html.admin-mode .nb__input::placeholder,
 html.admin-mode .nb__textarea::placeholder { color: var(--t3); font-weight: var(--o-fw-book); }
 html.admin-mode .nb__hint { font-size: var(--o-text-xs); color: var(--t3); line-height: 1.4; }
+html.admin-mode .nb__hint--spaced { margin-top: 10px; }
 html.admin-mode .nb__hint--ok { color: var(--o-stage-won-strong); }
 html.admin-mode .nb__hint--warn { color: var(--gold); }
 html.admin-mode .nb__hint--info { color: var(--t2); }
 
 /* Event type — chips (sense colors primaris, Brass & Obsidian) */
 html.admin-mode .nb__chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+html.admin-mode .nb__chips--spaced { margin-top: 6px; }
+html.admin-mode .nb__event-type-field { margin-bottom: 16px; }
 html.admin-mode .nb__chip { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 10px; border: 1px solid var(--line); border-radius: var(--o-r-md); background: color-mix(in oklab, var(--panel) 92%, transparent); color: var(--t2); font: inherit; font-size: var(--o-text-sm); font-weight: var(--o-fw-semi-plus); cursor: pointer; transition: border-color 140ms ease, background 140ms ease, color 140ms ease, transform 140ms ease; }
 html.admin-mode .nb__chip:hover { border-color: var(--hair-gold); color: var(--t); background: color-mix(in oklab, var(--gold) 5%, var(--panel)); transform: translateY(-1px); }
 html.admin-mode .nb__chip.is-on { border-color: var(--gold); background: linear-gradient(180deg, color-mix(in oklab, var(--gold) 14%, var(--panel)), color-mix(in oklab, var(--gold) 6%, var(--panel))); color: var(--gold-bright); box-shadow: inset 0 0 0 1px var(--gold); }
@@ -104,6 +108,7 @@ html.admin-mode .nb__input--code { font-family: var(--mono); text-transform: upp
 html.admin-mode .nb__discount-code-row { display: flex; gap: 8px; }
 /* Utility classes locals (sense Tailwind) — usat per evitar inline fontSize/color */
 html.admin-mode .nb__conflict-ref { font-size: var(--o-text-2xs); color: var(--t2); }
+html.admin-mode .nb__conflict-title { display: block; margin-bottom: 4px; }
 html.admin-mode .nb__conflict-hint { display: block; margin-top: 6px; color: var(--t3); }
 html.admin-mode .nb__req { color: var(--gold); font-size: var(--o-text-base); }
 html.admin-mode .nb__pricemargin-pct { font-size: var(--o-text-2xs); color: var(--t3); font-weight: var(--o-fw-semi); }

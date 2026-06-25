@@ -1,3 +1,5 @@
+export const CLIENT_PORTAL_DEFAULT_ACCENT_COLOR = '#06b6d4';
+
 export function toRgba(hex: string, alpha: number): string | null {
   const clean = hex.trim().replace('#', '');
   const valid = /^[0-9a-fA-F]{6}$/.test(clean)
@@ -18,5 +20,5 @@ export function resolvePortalAccentHex(personalization: unknown): string {
   if (raw && /^#?[0-9a-fA-F]{3,6}$/.test(raw)) {
     return raw.startsWith('#') ? raw : `#${raw}`;
   }
-  return '#06b6d4';
+  return CLIENT_PORTAL_DEFAULT_ACCENT_COLOR;
 }

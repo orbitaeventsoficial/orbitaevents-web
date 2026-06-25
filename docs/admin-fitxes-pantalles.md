@@ -158,6 +158,7 @@ Duplicacions:
 
 Hardcoded/residu visual:
 - no reobrir visual sense ordre explícita; és zona protegida.
+- Canvi #1161: `LeadLostStatusPrompt` deixa `text-white`/`text-white/75`; passa a `fx__lostprompt-title` i `fx__lostprompt-label` dins `leads-design.css`.
 
 Riscos:
 - qualsevol canvi sobre leads ha de provar que toca la superfície viva i no una illa.
@@ -361,8 +362,12 @@ CSS viu:
 - `app/admin/bookings/[id]/booking-detail.css`: cobreix el detall `bd__*` i també algunes classes `bk-*` de la llista perquè `/admin/bookings/page.tsx` l'importa.
 - El CSS usa `html.admin-mode` i tokens `--ax-*`/`--o-*`; `qa:admin-mode-prefix` és 0 deute.
 - Canvi #1142: la llista `/admin/bookings` deixa d'emetre els contenidors `style={{...}}` P2 i `admin-card-glass` a empty/cards mòbil; passen a `bk-detail-bar-row`, `bk-detail-bar-actions`, `bk-list-shell`, `bk-empty-state` i `bk-mobile-card`.
+- Canvi #1160: la taula `/admin/bookings` deixa el color Tailwind arbitrari `text-[var(--gold)]` a la referència; passa a `bk-booking-ref-link`. L'auditoria de fonts `text-[10px]`/`text-[11px]` del listat/pipeline queda obsoleta perquè el codi viu ja no conserva aquests patrons.
 - Canvi #1154: `BookingFilters` deixa l'amplada inline `style={{ width: 260 }}` del camp de cerca i passa a `bk-filter-search`.
+- Canvi #1157: `BookingTravelDiscountSection` deixa tres `style` estàtics (`gap`, `padding/whiteSpace`, `marginTop`) i passa a `nb__discount-code-row`, `nb__btn--compact` i `nb__field--spaced`.
+- Canvi #1158: `BookingClientEventSection` deixa cinc `style` estàtics de marge/display i passa a `nb__event-type-field`, `nb__chips--spaced`, `nb__conflict-title`, `nb__row--spaced` i `nb__hint--spaced`.
 - Canvi #1148: `BookingTotalEditor` i la cabina de marge (`BookingMarginCard`) deixen els inline styles i valors tipogràfics P2; passen a `bd-total-editor*` i `admin-booking-margin-*` dins aquest CSS.
+- Canvi #1159: `ClientPortalAccessPanel` deixa el literal duplicat `#06b6d4`; default i placeholder de l'accent del portal consumeixen `CLIENT_PORTAL_DEFAULT_ACCENT_COLOR`.
 - Canvi #1149: el pipeline de `/admin/bookings` deixa el dot mòbil i els botons ←/→ amb negre/blanc ad hoc; passen a `bk-pipeline-dot--inactive` i `bk-pipeline-shift-btn` dins aquest CSS.
 - Canvi #1151: `BookingQuestionnaireSection` deixa `text-white/*` i `admin-tone-text-cyan`; passa a `bd-questionnaire-*` dins aquest CSS.
 - Canvi #1152: `BookingGallery` i `GallerySharePanel` deixen `white/*` en skeleton/dropzones/delete/share; passen a `bd-gallery-*` i `bd-gallery-share-*` dins aquest CSS.
@@ -725,7 +730,7 @@ Decisio de treball: organ SA, cap canvi de codi nou. Pendent validacio visual de
 | `/admin/blog/new` | `app/admin/blog/new/page.tsx` | PENDENT | codex/claude | Nou blog |
 | `/admin/bookings` | `app/admin/bookings/page.tsx` | PENDENT | codex/claude | Reserves llista — contenidors/glass P2 drenats #1142; pipeline dots/botons P2 drenats #1149 |
 | `/admin/bookings/[id]` | `app/admin/bookings/[id]/page.tsx` | FETA | codex | Reserva detall — fitxa forense #1112 |
-| `/admin/bookings/new` | `app/admin/bookings/new/page.tsx` | PENDENT | codex/claude | Nova reserva |
+| `/admin/bookings/new` | `app/admin/bookings/new/page.tsx` | PENDENT | codex/claude | Nova reserva — TravelDiscount inline layout P3 drenat #1157; ClientEvent marges inline drenats #1158 |
 | `/admin/calendario` | `app/admin/calendario/page.tsx` | PENDENT | codex/claude | Calendari legacy/compatibilitat |
 | `/admin/calendario/capacity` | `app/admin/calendario/capacity/page.tsx` | PENDENT | codex/claude | Capacitat |
 | `/admin/campaigns` | `app/admin/campaigns/page.tsx` | PENDENT | codex/claude | Campanyes |

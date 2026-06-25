@@ -1513,6 +1513,87 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1161 — 2026-06-25 — codex (TANCAT)
+
+**`LeadLostStatusPrompt` deixa `text-white/*` i usa classes locals tokenitzades.**
+
+- Context: Top 1 actual de `docs/audit/admin-fitxes.md`. El prompt de pèrdua de Leads mantenia `text-white` i `text-white/75` dins el JSX.
+- `app/admin/leads/LeadLostStatusPrompt.tsx`: el títol passa a `fx__lostprompt-title`; els labels passen a `fx__lostprompt-label`.
+- `app/admin/leads/leads-design.css`: afegides `fx__lostprompt-title` i `fx__lostprompt-label` dins `html.admin-mode`, amb `var(--t)` i `var(--t2)`.
+- No es toca cap handler, motiu canònic, nota, API, transició d'estat ni pipeline.
+- `ADMIN_CHANGE_COUNTER` puja a `1161`; el següent canvi real ha de ser `#1162`.
+- Validació tècnica: `rg "text-white|white/|bg-white|border-white" app\admin\leads\LeadLostStatusPrompt.tsx` confirma 0 residus; `git diff --check` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: canvi només de classes; mateixos camps i accions.
+- Validació humana/UX: pendent validació visual del propietari.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1160 — 2026-06-25 — codex (TANCAT)
+
+**`/admin/bookings` deixa el color Tailwind arbitrari de la referència de reserva.**
+
+- Context: Top 1 de `docs/audit/admin-fitxes.md` apuntava a fonts arbitràries `text-[10px]`/`text-[11px]`/`text-[9px]` a `bookings/page.tsx` i `BookingPipelineView.tsx`. Relectura del codi viu: aquest residu de font-px ja no existeix; quedava un residu real al mateix perímetre, `text-[var(--gold)]`, a la referència de la taula.
+- `app/admin/bookings/page.tsx`: la classe `text-[var(--gold)]` passa a `bk-booking-ref-link`.
+- `app/admin/bookings/[id]/booking-detail.css`: afegida `bk-booking-ref-link` amb `color: var(--gold)` dins `html.admin-mode`.
+- `docs/audit/admin-fitxes.md`: l'entrada de fonts `text-[...]` de `bookings/page.tsx` + `BookingPipelineView.tsx` queda marcada com a obsoleta/resolta al #1160.
+- No es toca pipeline logic, filtres, ordenació, accions, dades ni cap API.
+- `ADMIN_CHANGE_COUNTER` puja a `1160`; el següent canvi real ha de ser `#1161`.
+- Validació tècnica: `rg "text-\[" app\admin\bookings\page.tsx app\admin\bookings\BookingPipelineView.tsx` confirma 0 residus; `git diff --check` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: canvi només de classe CSS; mateix link i mateix color visual.
+- Validació humana/UX: pendent validació visual del propietari.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1159 — 2026-06-25 — codex (TANCAT)
+
+**`ClientPortalAccessPanel` consumeix l'accent per defecte del portal des d'una font única.**
+
+- Context: tall P3 acotat dins `/admin/bookings/[id]`. `ClientPortalAccessPanel.tsx` mantenia `#06b6d4` duplicat com a estat inicial i placeholder del camp d'accent del portal client.
+- `lib/clientPortalUtils.ts`: afegida `CLIENT_PORTAL_DEFAULT_ACCENT_COLOR` i usada com a retorn per defecte de `resolvePortalAccentHex()`.
+- `app/admin/bookings/[id]/ClientPortalAccessPanel.tsx`: l'estat inicial `accentColor` i el `placeholder` consumeixen `CLIENT_PORTAL_DEFAULT_ACCENT_COLOR`.
+- No es toca generació/revocació d'enllaços, payload de personalització, APIs, portal públic ni valors existents de BD.
+- `ADMIN_CHANGE_COUNTER` puja a `1159`; el següent canvi real ha de ser `#1160`.
+- Validació tècnica: `Select-String` focalitzat confirma 0 residus `#06b6d4`, `style={{`, `text-[`, `bg-white`, `border-white` i `text-white` a `ClientPortalAccessPanel.tsx`; `git diff --check` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: canvi només de font de default; mateix valor visible i mateix payload quan l'usuari no modifica l'accent.
+- Validació humana/UX: pendent validació visual del propietari.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1158 — 2026-06-25 — codex (TANCAT)
+
+**`BookingClientEventSection` mou marges/layout inline a classes locals `nb__*`.**
+
+- Context: tall P3 responsiu acotat de `/admin/bookings/new`. La secció de client/esdeveniment mantenia cinc `style` estàtics: `marginBottom: 16`, `marginTop: 6`, `display: 'block'` + `marginBottom: 4`, `marginTop: 12` i `marginTop: 10`.
+- `app/admin/bookings/BookingClientEventSection.tsx`: aquests estils passen a `nb__event-type-field`, `nb__chips--spaced`, `nb__conflict-title`, `nb__row--spaced` i `nb__hint--spaced`.
+- `app/admin/bookings/nb-design.css`: afegides classes locals dins `html.admin-mode`.
+- No es toca cap handler, botó de tipus d'event, càlcul de distància, missatge de distància ni render de conflictes.
+- `ADMIN_CHANGE_COUNTER` puja a `1158`; el següent canvi real ha de ser `#1159`.
+- Validació tècnica: `Select-String` focalitzat confirma 0 residus `style={{`, `marginBottom`, `marginTop`, `display:`, `text-[`, `bg-white`, `border-white`, `text-white` a `BookingClientEventSection.tsx`; `git diff --check` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: canvi només de classes/CSS; mateix DOM funcional i mateixes condicions.
+- Validació humana/UX: pendent validació visual del propietari.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1157 — 2026-06-25 — codex (TANCAT)
+
+**`BookingTravelDiscountSection` mou layout px inline a classes locals `nb__*`.**
+
+- Context: tall P3 responsiu acotat de `/admin/bookings/new`. La secció de desplaçament/descompte mantenia tres `style` estàtics: `gap: 8`, `padding: '10px 14px'`/`whiteSpace: 'nowrap'` i `marginTop: 12`.
+- `app/admin/bookings/BookingTravelDiscountSection.tsx`: la fila del codi de descompte passa a `nb__discount-code-row`; el botó afegeix `nb__btn--compact`; el camp de notes afegeix `nb__field--spaced`.
+- `app/admin/bookings/nb-design.css`: afegides classes locals dins `html.admin-mode` i gramàtica `nb__*`.
+- No es toca càlcul de viatge, validació de codi, notes, handlers ni dades del formulari.
+- `ADMIN_CHANGE_COUNTER` puja a `1157`; el següent canvi real ha de ser `#1158`.
+- Validació tècnica: `Select-String` focalitzat confirma 0 residus `style={{`, `gap:`, `padding:`, `marginTop`, `whiteSpace`, `text-[`, `bg-white`, `border-white`, `text-white` a `BookingTravelDiscountSection.tsx`; `git diff --check` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: canvi només de classes/CSS; mateix DOM funcional i mateixos handlers.
+- Validació humana/UX: pendent validació visual del propietari.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1156 — 2026-06-25 — claude (TANCAT)
 
 **Fitxa forense òrgan Comandament (dashboard/salut/reporting/analytics) — SA, sense canvi de codi.**

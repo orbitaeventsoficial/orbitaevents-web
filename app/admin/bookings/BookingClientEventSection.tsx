@@ -111,9 +111,9 @@ export default function BookingClientEventSection({
           <h2 className="nb__h2">Detalls de l&apos;esdeveniment</h2>
         </div>
 
-        <div className="nb__field" style={{ marginBottom: 16 }}>
+        <div className="nb__field nb__event-type-field">
           <span id="nb-event-type-label" className="nb__label">Tipus d&apos;event</span>
-          <div role="group" aria-labelledby="nb-event-type-label" className="nb__chips" style={{ marginTop: 6 }}>
+          <div role="group" aria-labelledby="nb-event-type-label" className="nb__chips nb__chips--spaced">
             {EVENT_TYPE_VALUES.map((value) => (
               <button
                 key={value}
@@ -177,7 +177,7 @@ export default function BookingClientEventSection({
         {dateConflicts.length > 0 && (
           <div className="nb__conflict" role="alert">
             <div>
-              <strong style={{ display: 'block', marginBottom: 4 }}>
+              <strong className="nb__conflict-title">
                 Ja {dateConflicts.length === 1 ? 'hi ha 1 reserva' : `hi ha ${dateConflicts.length} reserves`} aquest dia
               </strong>
               {dateConflicts.map((conflict) => (
@@ -190,7 +190,7 @@ export default function BookingClientEventSection({
           </div>
         )}
 
-        <div className="nb__row" style={{ marginTop: 12 }}>
+        <div className="nb__row nb__row--spaced">
           <div className="nb__field">
             <label htmlFor="nb-location" className="nb__label nb__label--req">Ubicació</label>
             <input
@@ -216,7 +216,7 @@ export default function BookingClientEventSection({
         </div>
 
         {(calculatingDistance || distanceInfo) && (
-          <p className={`nb__hint nb__hint--${distanceInfo?.tone ?? 'info'}`} style={{ marginTop: 10 }}>
+          <p className={`nb__hint nb__hint--${distanceInfo?.tone ?? 'info'} nb__hint--spaced`}>
             {calculatingDistance && '🛰  Calculant ruta automàticament…'}
             {!calculatingDistance && distanceInfo && distanceInfo.text}
           </p>

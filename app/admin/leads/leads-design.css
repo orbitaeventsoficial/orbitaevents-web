@@ -43,6 +43,9 @@ html.admin-mode .fx__pay[data-pay="full"] { --paycol: var(--o-stage-won-strong);
 html.admin-mode .fx__pay[data-pay="part"] { --paycol: var(--gold); }
 html.admin-mode .fx__pay[data-pay="none"] { --paycol: var(--o-stage-lost); }
 
+html.admin-mode .fx__lostprompt-title { color: var(--t); }
+html.admin-mode .fx__lostprompt-label { color: var(--t2); }
+
 /* ── PEÇA 1: Capçalera ─────────────────────────────────────────────────── */
 
 html.admin-mode .fx__page { position: relative; z-index: 1; min-width: 0; }

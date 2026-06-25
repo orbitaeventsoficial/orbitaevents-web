@@ -89,6 +89,9 @@ html.admin-mode .bk-filter-search {
   position: relative;
   width: min(100%, 16.25rem);
 }
+html.admin-mode .bk-booking-ref-link {
+  color: var(--gold);
+}
 html.admin-mode .bk-pipeline-dot--inactive {
   background: color-mix(in oklab, var(--t) 15%, transparent);
 }

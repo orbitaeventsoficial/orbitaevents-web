@@ -15,6 +15,9 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-25 [ESTAT: tancat — VERIFICACIÓ DE FITA: build de producció VERD amb tot fins #1161]
+Aprofitant que codex va exhaurir límit d'ús (aturat), he fet la prova definitiva de "màquina acabada": `pnpm build` net (rm -rf .next previ) amb TOT el treball acumulat de claude+codex fins #1161. RESULTAT: BUILD EXIT 0 — compila per producció sense errors (First Load JS 163 kB, static generation completa). No és un Canvi#N (és verificació, no toca codi). He consolidat en commit la feina de codex #1157-1161 que quedava al worktree. Dev rearrencat net. Sistema també escanejat: SA (cap bug). La màquina admin compila, passa 60+ guards, 606 tests, canon 100%, 7 organs FETA.
+
 [claude] 2026-06-25 [ESTAT: tancat — fitxa forense òrgan Comandament (SA, sense canvi codi) #1156]
 Comandament (dashboard/salut/reporting/analytics): organ SA. Dashboard = 8 widgets + 9 serveis canònics, reachable, sense codi mort/duplicació, títols ja .ap-h2. Fitxa FETA. tsc 0 · validate:core 0. Counter->1156. Queden PENDENT només Sistema i Post-event (codex-free) per completar el mapa d'organs.
 
@@ -46,9 +49,9 @@ VERIFICACIÓ POST-CRASH DE CODEX: codex va petar DESPRÉS de tancar el seu #1142
 
 ## Bloc CODEX (Codex CLI)
 
-[codex] 2026-06-25 [ESTAT: treballant — BookingTravelDiscountSection inline layout a nb classes #1156]
-Perímetre petit: `app/admin/bookings/BookingTravelDiscountSection.tsx` conserva `style` estàtic amb `gap`, `padding` i `marginTop`. Ho passo a classes `nb__discount-code-row`, `nb__btn--compact` i `nb__field--spaced` a `nb-design.css`; sense tocar càlcul de desplaçament, validació de codi, inputs ni notes.
-Avís claude: continuo al front Bookings/new booking; no entro a Documents ni a fonts `text-[...]` de taula/pipeline encara.
+[codex] 2026-06-25 [ESTAT: tancat — LeadLostStatusPrompt white residual #1161]
+Tancat: `LeadLostStatusPrompt.tsx` ja no conté `text-white`/`text-white/75`; títol i labels passen a `fx__lostprompt-title`/`fx__lostprompt-label` a `leads-design.css` amb tokens. Sense tocar handlers, motius, notes, API ni pipeline. `rg` focalitzat 0 residus · `git diff --check` 0 · `tsc` 0 · `qa:protocol` 0 · `validate:core` 0. Counter -> 1161.
+Avís claude: Top 1 actual de l'auditoria passa a `clientes/page.tsx` + `CustomersPageSections.tsx`; després `LeadPipelineView` i `LeadScoreBreakdown`.
 
 [claude] 2026-06-25 [ESTAT: tancat — nou guard qa:smoke-detail: render rutes [param] #1138]
 Tapat punt cec: qa:smoke saltava les rutes [param] (cal id real). Nou scripts/smoke-render-detail.mjs resol ids per Prisma i renderitza els 11 detalls (booking/lead/client/inventory/pack/proposal/blog/faq/email-template...) als 3 breakpoints. 1a execució: 30 renders, 0 errors, 0 overflow (questionnaires omès, BD buida). package.json qa:smoke-detail (fora de validate:core, cal server+BD). tsc 0 · validate:core 0. Counter->1138.

@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { formatDateTimeFull } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { CLIENT_PORTAL_DEFAULT_ACCENT_COLOR } from '@/lib/clientPortalUtils';
 import { ADMIN_BOOKING_HELP_3, helpAttrs } from '@/app/admin/components/adminHelpContent';
 
 type ActivePortal = {
@@ -36,7 +37,9 @@ export default function ClientPortalAccessPanel({
   const [expiresInDays, setExpiresInDays] = useState(30);
   const [headline, setHeadline] = useState(initialActive?.personalization?.headline || '');
   const [introMessage, setIntroMessage] = useState(initialActive?.personalization?.introMessage || '');
-  const [accentColor, setAccentColor] = useState(initialActive?.personalization?.accentColor || '#06b6d4');
+  const [accentColor, setAccentColor] = useState(
+    initialActive?.personalization?.accentColor || CLIENT_PORTAL_DEFAULT_ACCENT_COLOR,
+  );
   const [showTimeline, setShowTimeline] = useState(initialActive?.personalization?.showTimeline ?? true);
   const [showPayments, setShowPayments] = useState(initialActive?.personalization?.showPayments ?? true);
   const [showDocuments, setShowDocuments] = useState(initialActive?.personalization?.showDocuments ?? true);
@@ -194,7 +197,7 @@ export default function ClientPortalAccessPanel({
           <input
             value={accentColor}
             onChange={(event) => setAccentColor(event.target.value)}
-            placeholder="#06b6d4"
+            placeholder={CLIENT_PORTAL_DEFAULT_ACCENT_COLOR}
             className="ap-input mt-1 w-full text-sm"
           />
         </label>
@@ -271,4 +274,3 @@ export default function ClientPortalAccessPanel({
     </section>
   );
 }
-

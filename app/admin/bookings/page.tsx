@@ -508,7 +508,7 @@ export default async function BookingsPage({
                       className={`bk-table-row adm-row-hover${isPast && booking.status !== 'COMPLETED' ? ' bk-table-row--past' : ''}`}
                     >
                       <td className="px-3 py-2.5">
-                        <Link href={buildBookingHref(booking.id)} className="block max-w-[7rem] truncate font-mono text-xs text-[var(--gold)] hover:opacity-80 whitespace-nowrap">
+                        <Link href={buildBookingHref(booking.id)} className="bk-booking-ref-link block max-w-[7rem] truncate font-mono text-xs hover:opacity-80 whitespace-nowrap">
                           {booking.reference}
                         </Link>
                       </td>
