@@ -23,11 +23,11 @@ El blau/negre residual viu en **components compartits de llista i panells**, no 
 | clientes/reactivation/ReactivationClient.tsx:14,76,86,95,113,178,206-219 | MONOCAPA | Resolt al #1139: KPIs, cards, pills, missatge suggerit i accions passen a gramàtica local `rc__*` + `reactivation.css` escopat a `html.admin-mode` | OK |
 | clientes/referrals/ReferralsClient.tsx:14,56-255 | MONOCAPA | Resolt al #1140: KPIs, top referrers, filtres, candidats, missatge suggerit i accions passen a gramàtica local `rf__*` + `referrals.css` escopat a `html.admin-mode` | OK |
 | clientes/reactivation/page.tsx:22 · referrals/page.tsx:22 | MONOCAPA | Resolt al #1137: botó `border-white/15 bg-white/5` ad-hoc substituït per `.ap-btn ap-btn--xs` | OK |
-| clientes/page.tsx:350 · CustomersPageSections.tsx:226,310 | RESPONSIU | `style={{marginTop:10}}`/`{marginLeft:6}` px inline → token/classe | P3 |
+| clientes/page.tsx:350 · CustomersPageSections.tsx:226,310 | RESPONSIU | Resolt al #1163: `marginTop:10` (`.cl__lifecycle`) i `marginLeft:6` ×2 (badge VIP) passen a `clientes.css` en `rem` | OK |
 | clientes/[id]/_components/CustomerHeader.tsx:234,425 | MONOCAPA | Resolt al #1136: `style` inline (`inset/zIndex`, `display:contents`) mogut a `ch__statusbackdrop` i `ch__stageitem` a `customer-hub.css` | OK |
 | bookings/[id]/BookingTotalEditor.tsx:59-119 | MONOCAPA+RESPONSIU | Resolt al #1148: input, trigger, alerta i suggeriment passen de `style={{...}}` inline a classes `bd-total-editor*` tokenitzades a `booking-detail.css` | OK |
 | bookings/[id]/BookingMarginCard.tsx:222,248,357 | CANÒNIC | Resolt al #1148: percentatges/títols/benefici passen a classes locals `admin-booking-margin-*` amb escala tipogràfica tokenitzada | OK |
-| bookings/[id]/BookingMarginCard.tsx:215,223 | RESPONSIU | `text-[11px]` font-px ad-hoc → token | P3 |
+| bookings/[id]/BookingMarginCard.tsx:215,223 | RESPONSIU | Obsolet/resolt al #1148: ja no hi ha `text-[11px]`; les línies són `admin-booking-margin` + `text-sm opacity-80` | OK |
 | bookings/page.tsx:304,310,340,363 | MONOCAPA+RESPONSIU | Resolt al #1142: contenidors `style={{...}}` moguts a `bk-detail-bar-row`, `bk-detail-bar-actions`, `bk-list-shell` i `bk-list-shell--top` | OK |
 | bookings/page.tsx:366,383 | CANÒNIC | Resolt al #1142: empty-state i cards mòbil passen de `admin-card-glass` a `ap-card bk-empty-state` / `ap-card bk-mobile-card` | OK |
 | bookings/page.tsx:393-546 | RESPONSIU | Obsolet/resolt al #1160: ja no hi ha `text-[10px]`/`text-[9px]`; el residu real `text-[var(--gold)]` de la referència passa a `bk-booking-ref-link` | OK |
@@ -46,10 +46,11 @@ El blau/negre residual viu en **components compartits de llista i panells**, no 
 | leads/[id]/LeadInsightsBanner.tsx | MONOCAPA | Obsolet al #1153: el fitxer ja no existeix al perímetre viu `app/admin/leads` | OK |
 | leads/[id]/LeadDossiersPanel.tsx:52 | CANÒNIC | Obsolet al #1149: el fitxer ja no existeix al perímetre viu `app/admin/leads` | OK |
 | leads/[id]/LeadCustomerLinkPanel.tsx | MONOCAPA | Obsolet al #1149: el fitxer ja no existeix al perímetre viu `app/admin/leads` | OK |
-| leads/[id]/LeadScoreBreakdown.tsx:18 | CANÒNIC | barra + colors Tailwind semàntics (7) → tones; `style={{width:score}}` dinàmic OK | P3 |
-| leads/LeadPipelineView.tsx:371,387 | CANÒNIC | `hover:bg-black/20 hover:text-white` — negre/blanc ad-hoc | P3 |
-| leads/LeadPipelineView.tsx:53-465 | RESPONSIU | `text-[10px]` repetit (llista pipeline) → tokens | P3 |
-| leads/LeadQuickPriority.tsx:46 · LeadQuickStatus.tsx:71 | RESPONSIU | `text-[11px]` ad-hoc → token | P3 |
+| leads/[id]/LeadScoreBreakdown.tsx:18 | CANÒNIC | Obsolet: el fitxer ja no existeix al perímetre viu `app/admin/leads` (Leads reescrit post-2026-06-16) | OK |
+| leads/LeadPipelineView.tsx:371,387 | CANÒNIC | Obsolet: el fitxer ja no existeix al perímetre viu `app/admin/leads` | OK |
+| leads/LeadPipelineView.tsx:53-465 | RESPONSIU | Obsolet: el fitxer ja no existeix al perímetre viu `app/admin/leads` | OK |
+| leads/LeadQuickPriority.tsx:46 · LeadQuickStatus.tsx:71 | RESPONSIU | Obsolet: cap dels dos fitxers existeix al perímetre viu `app/admin/leads` | OK |
+| bookings/[id]/page.tsx:392,687 | RESPONSIU | `style={{marginTop:'10px'}}`/`{marginBottom:'16px'}` px estàtic de maquetació → classe local | P3 |
 | leads/LeadLostStatusPrompt.tsx | MONOCAPA | Resolt al #1161: `text-white` i `text-white/75` passen a `fx__lostprompt-title` i `fx__lostprompt-label` tokenitzats a `leads-design.css` | OK |
 | leads/arxiu/ArxiuClient.tsx:97,117,118 | RESPONSIU | `style={{width:pct}}` dinàmic — OK (excepció) | OK |
 
@@ -71,6 +72,8 @@ El blau/negre residual viu en **components compartits de llista i panells**, no 
 
 ## Top 3
 
-1. **clientes/page.tsx + CustomersPageSections.tsx (P3)** — marges inline puntuals (`marginTop`/`marginLeft`) a la llista de clients; migrar a classes locals.
-2. **LeadPipelineView.tsx (P3)** — `hover:bg-black/20 hover:text-white` i `text-[10px]` residuals; tokenitzar en passada de Leads.
-3. **leads/LeadScoreBreakdown.tsx (P3)** — barra + colors Tailwind semàntics; passar a tones/classes locals quan es torni al detall de lead.
+1. **bookings/[id]/page.tsx:392,687 (P3)** — `marginTop:'10px'` / `marginBottom:'16px'` px estàtic de maquetació → classe local a `booking-detail.css`.
+2. — *(buit)* La resta de l'abast (leads · clientes) està drenada de residus cromàtics, font-px i `style` estàtics.
+3. — *(buit)*
+
+> **Estat 2026-06-25 (#1163):** reescaneig de tot l'abast (leads/bookings/clientes). 0 residus cromàtics (`text-[Npx]`, `bg-black`, `hover:text-white`). Els antics Top de Leads (`LeadPipelineView`, `LeadScoreBreakdown`, `LeadQuick*`) són **obsolets**: els fitxers ja no existeixen (Leads reescrit). Top 1 anterior (marges de la llista de clients) resolt al #1163. Únic residu real viu: 2 px estàtics a la fitxa de reserva.

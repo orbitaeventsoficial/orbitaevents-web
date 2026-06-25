@@ -1513,6 +1513,270 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1176 — 2026-06-25 — claude (TANCAT)
+
+**`/studio` (zona protegida): reparació dels 3 bugs de tokens/classe fantasma amb el token canònic d'studio.**
+
+- Context: el propietari («seguim» reiterat + «quan acabis la feina, jo atacaré el producte») mana acabar tota la feina TÈCNICA. Els 3 bugs registrats al #1175 són reparació tècnica (token/classe fantasma), no decisió de producte → procedents.
+- Troballa clau: studio té el seu **propi sistema de tokens** (`--o-accent`, `--o-text*`, `--o-elev*`), diferent del de l'admin. El germà `.o-typepages__domainname` ja usa `--o-accent`. Per tant el fix correcte **no és inventar un color** sinó usar l'accent canònic d'studio.
+- `app/studio/studio.css`: `--concept-accent` (×2, `.o-concept-card`) i `--proposal-accent` (×3, `.o-proposal-card`) → `var(--o-accent)`; definida `.o-typepages__domain { display: flex; flex-direction: column; }` (wrapper que ja s'apilava → 0 canvi de layout).
+- Resultat: concept/proposal cards recuperen el border-top + text en l'accent canònic; el wrapper de domini té regla. Detector: **0 tokens i 0 classes fantasma a TOT el repo** (inclòs studio).
+- **Captura de regressió** (protocol /studio): `node .dbg-studio.cjs` → `.codex-captures/dbg-studio.png`. `/admin/studio` renderitza íntegre (20 seccions, carbó+or). `qa:studio-integrity` verd (16 seccions).
+- `ADMIN_CHANGE_COUNTER` puja a `1176`; el següent canvi real ha de ser `#1177`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 (studio-integrity OK) · `pnpm build` EXIT 0 · captura de regressió OK.
+- Validació funcional: tokens resolen a l'accent d'studio; el wrapper de typepages no altera el layout.
+- Validació humana/UX: el propietari validarà visualment en atacar el producte (terreny seu).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1175 — 2026-06-25 — claude (TANCAT)
+
+**Guards de fantasmes estesos al front públic (blindatge complet del producte) + registre del deute de `/studio`.**
+
+- Context: els guards `qa:no-phantom-tokens` (#1171) i `qa:no-phantom-classes` (#1174) cobrien només l'admin. Estesos a tot el producte (admin + front públic `app/` + `components/`), excloent la fitxa tècnica protegida `/studio` (té règim propi via `qa:studio-integrity` + deute conegut).
+- `scripts/check-phantom-tokens.mjs`: cobreix tot el CSS excepte `studio.css`.
+- `scripts/check-phantom-classes.mjs`: cobreix TSX d'`app/` + `components/` excepte `app/studio`.
+- Verificat: el **front públic (web del client) està net** — 0 tokens i 0 classes fantasma. Els guards corren verds amb la cobertura ampliada.
+- **DEUTE REGISTRAT — `/studio` (zona protegida, pendent de decisió del propietari), 3 bugs reals confirmats NO tocats:**
+  - `--concept-accent` (studio.css:4010,4018) → `.o-concept-card` border-top + text sense l'accent previst.
+  - `--proposal-accent` (studio.css:4245,4260,4296) → `.o-proposal-card` border-top + text sense accent.
+  - `.o-typepages__domain` (StudioShowroom.tsx:1316) → wrapper de domini sense regla CSS.
+  - Motiu de no actuar: `/studio` és zona protegida («ja va ser reventada un cop»), l'scope de tokens és complex (`:root` vs `.ax-root`) i el color d'accent correcte és incert. Requereix ordre + color del propietari.
+- `ADMIN_CHANGE_COUNTER` puja a `1175`; el següent canvi real ha de ser `#1176`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 (foreground) · `pnpm build` EXIT 0.
+- Validació funcional: guards verds amb cobertura ampliada; cap regressió (front ja net).
+- Validació humana/UX: no aplica (eina interna).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1174 — 2026-06-25 — claude (TANCAT)
+
+**Nou guard `qa:no-phantom-classes` — blinda contra classes BEM fantasma (el botó-void de #1173 no podrà tornar).**
+
+- Context: el #1173 va trobar 8 classes BEM usades al TSX admin sense regla CSS (incl. un botó-void real). Convertit el detector en guard permanent, germà de `qa:no-phantom-tokens` (#1171).
+- `scripts/check-phantom-classes.mjs`: funció pura `findPhantomClasses` + runner. Detecta `className` LITERAL amb classe BEM (`prefix__nom`) sense cap regla `.classe {}` a cap CSS. Falsos positius gestionats: ignora classes Tailwind/utils (sense `__`) i classes construïdes dinàmicament (interpolacions `${...}`, `[...]`).
+- `package.json`: `qa:no-phantom-classes` afegit i encadenat al final de `validate:core`.
+- `__tests__/scripts/check-phantom-classes.test.ts`: 5 tests — 1 cas-DOLENT (classe fantasma → status 1) + 4 casos-bons (definida, Tailwind, interpolació, definida en un altre CSS → status 0).
+- `ADMIN_CHANGE_COUNTER` puja a `1174`; el següent canvi real ha de ser `#1175`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 (foreground, inclou el guard nou) · `pnpm build` EXIT 0 · vitest guard 5/5.
+- Validació funcional: el guard corre net sobre el repo (0 fantasmes després de #1173) i falla amb una classe fantasma artificial.
+- Validació humana/UX: no aplica (eina interna).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1173 — 2026-06-25 — claude (TANCAT)
+
+**BUG VISUAL: 8 classes BEM fantasma (usades al TSX admin sense regla CSS → estil no aplicat), incl. un botó-void real.**
+
+- Context: estès el patró de detecció de #1168-#1172 (tokens) a les **classes**: detector de classes BEM (`prefix__nom`) usades en `className` literals de TSX d'admin però sense cap regla `.classe {}` a cap CSS. Mateix tipus de bug silenciós que els tokens fantasma.
+- **Botó-void real** (el tipus de bug P1 que el RESUM marcava): els botons «Cancel·lar» i «Enviar» de `inbox/compose/ComposeForm.tsx` usaven `ix__btn ix__btn--ghost`/`--primary`, **cap definida** → es veien sense estil de botó. Fix canònic: `ap-btn ap-btn--secondary` / `ap-btn ap-btn--primary`.
+- Variants que faltaven, definides coherents amb els germans existents:
+  - `bookings/nb-design.css`: `.nb__sl-row--pack` (fila del pack base destacada en or, com `--base` però més marcada), `.nb__sl-packname` (label semi), `.nb__sl-packhint` (hint petit, com `.nb__sl-owncost`).
+  - `bookings/[id]/booking-detail.css`: `.bd__btn--gold` (variant daurada del botó, com `.bd__btn--sec` però en or; el botó «+ Foto» del compositor de notes) i `.bd__fieldnotes-head` (apilat vertical de la capçalera).
+- Detector: 8 → 0 classes BEM fantasma a l'admin.
+- `ADMIN_CHANGE_COUNTER` puja a `1173`; el següent canvi real ha de ser `#1174`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 (admin-canon 0) · `pnpm build` EXIT 0.
+- Validació funcional: els botons de compose recuperen aspecte de botó canònic; el pack base, el hint, el botó «+Foto» daurat i la capçalera de field-notes ara tenen estil.
+- Validació humana/UX: pendent validació visual del propietari (inbox compose, nova reserva, booking detail).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1172 — 2026-06-25 — claude (TANCAT)
+
+**Canonització del deute de tokens amb fallback (admin CSS 100% net de tokens no-canònics).**
+
+- Context: tancament del deute menor anotat al #1170/#1171 (tokens fantasma PERÒ amb fallback vàlid → funcionen, però no canònics). Verificat que els fallbacks `--ax-fill-*` sí existeixen (dossiers no estava trencat).
+- `dossiers.css`: eliminat el token fantasma intermedi `--ax-border`/`--ax-surface2` deixant el fallback real que ja s'aplicava — `var(--ax-border, var(--ax-fill-N))` → `var(--ax-fill-N)` i `var(--ax-surface2, var(--ax-fill-N))` → `var(--ax-fill-N)` (35 usos, fallbacks fill-2/3/4/5/6 preservats un a un). **0 canvi visual** (el fallback era el valor efectiu).
+- `bookings/[id]/booking-detail.css`: `var(--sans, system-ui, sans-serif)` → `var(--ui)`. `--sans` no existeix i queia a `system-ui` (font inconsistent amb l'Inter `--ui` de la resta de la fitxa); ara alineat a la font canònica de l'admin.
+- `admin-theme.css` (legacy Control Room): `var(--at-gold-edge, var(--at-gold))` → `var(--at-gold)`; `var(--at-gold-bright, var(--at-gold-text))` → `var(--at-gold-text)`. 0 canvi visual.
+- Resultat: el detector reporta **0 tokens amb fallback no-canònic** i 0 bugs (els 2 «sense fallback» que resten són falsos positius ja documentats: `--fxd-kpi-hue` runtime + `--ax-` comentari).
+- `ADMIN_CHANGE_COUNTER` puja a `1172`; el següent canvi real ha de ser `#1173`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 · `pnpm build` EXIT 0.
+- Validació funcional: 0 canvi visual a dossiers/Control Room; a booking detail l'element afectat passa de `system-ui` a Inter (alineació tipogràfica correcta).
+- Validació humana/UX: pendent validació visual del propietari (dossiers, booking detail).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1171 — 2026-06-25 — claude (TANCAT)
+
+**Nou guard `qa:no-phantom-tokens` — blinda contra tokens CSS fantasma (els bugs #1168/#1169 no podran tornar).**
+
+- Context: els Canvis #1168 (`--o-stage-done`) i #1169 (`--o-space-*`/`--o-gold`/`--muted`) eren bugs visuals reals (l'estil no s'aplicava) que CAP guard caçava. Convertit el detector en guard permanent (cultura #1094/#1095: guards reals amb test de cas-dolent).
+- `scripts/check-phantom-tokens.mjs`: funció pura `findPhantomTokens` + runner. Detecta `var(--x)` **sense fallback** usat a CSS d'admin però no definit en cap CSS. Gestiona falsos positius: ignora comentaris CSS, variables de `next/font` (`--font-*`, injectades en runtime) i tokens injectats via `style` inline (selector `[style*="--tok"]`, p. ex. `--fxd-kpi-hue`).
+- `package.json`: `qa:no-phantom-tokens` afegit i encadenat al final de `validate:core`.
+- `__tests__/scripts/check-phantom-tokens.test.ts`: 6 tests — 1 cas-DOLENT (token fantasma → status 1) + 5 casos-bons (fallback, definit, runtime `[style*]`, comentari, next/font → status 0).
+- `ADMIN_CHANGE_COUNTER` puja a `1171`; el següent canvi real ha de ser `#1172`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 (inclou el guard nou) · `pnpm build` EXIT 0 · vitest guard 6/6.
+- Validació funcional: el guard corre net sobre el repo (0 fantasmes després de #1168-#1170) i falla amb un token fantasma artificial.
+- Validació humana/UX: no aplica (eina interna; no canvia UI).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1170 — 2026-06-25 — claude (TANCAT)
+
+**8 tokens fantasma residuals (sense fallback) → token canònic real, a 6 fitxers CSS.**
+
+- Context: tancament del deute obert al #1169. Cada token resolt al seu canònic existent (verificat contra `orbita-tokens.css`, no inventat):
+  - `dossiers.css`: `--ax-t1` → `--ax-t` (19 usos; text principal).
+  - `bookings/[id]/booking-detail.css`: `--t1` → `--t`; `--o-fw-medium` → `--o-fw-book` (500); `--ax-gold-bg` → `--ax-gold-tint-2` (fons daurat suau, coherent amb la vora `hair-gold`).
+  - `presupuestos.css`: `--t1` → `--t`; `--o-lh-normal` → `--o-lh-body` (1.50).
+  - `clientes/[id]/customer-hub.css`: `--o-r-2xl` → `--o-r-xl` (20px, radi màxim de l'escala; 8 usos).
+  - `leads-design.css`: `--o-fw-semibold` → `--o-fw-semi` (600).
+  - `bookings/nb-design.css`: `--o-fw-regular` → `--o-fw-normal` (400).
+- FALSOS POSITIUS confirmats i NO tocats: `--fxd-kpi-hue` (leads-design) s'injecta en runtime via `style` inline (selector `.fxd__kpi[style*="--fxd-kpi-hue"]`); `--ax-` (inbox:1780) és text dins un comentari.
+- DEUTE menor restant (NO bug, tenen fallback): `--ax-border`/`--ax-surface2`/`--sans`/`--at-gold-edge`/`--at-gold-bright` usats amb `var(--tok, fallback)` → resolen pel fallback; candidats a canonitzar en passada de puresa futura.
+- `ADMIN_CHANGE_COUNTER` puja a `1170`; el següent canvi real ha de ser `#1171`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 (studio-integrity OK) · `pnpm build` EXIT 0.
+- Validació funcional: els colors de text (dossiers/booking/presupuestos), el radi (customer-hub) i els pesos tipogràfics (leads/nb/booking) ara resolen al valor canònic; abans queien a heretat/default.
+- Validació humana/UX: pendent validació visual del propietari (dossiers, booking detail, presupuestos, customer hub, leads, nova reserva).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1169 — 2026-06-25 — claude (TANCAT)
+
+**BUG VISUAL REAL: `/admin/clientes/reactivation` + `/referrals` amb escala d'espai + colors trencats (tokens fantasma).**
+
+- Context: script d'anàlisi de tokens fantasma (usats a CSS però definits enlloc, sense fallback → l'estil no s'aplica). `reactivation.css` i `referrals.css` (codex #1139/#1140) usaven una família `--o-space-*` (60+ punts: tot el gap/padding) que **no existia**, més `--o-gold` (hovers) i `--muted` (labels), tampoc definits. Resultat real: contenidors sense gap/padding (tot atapeït), hovers sense color or (el `color-mix` amb token buit invalida la regla) i labels sense color tènue.
+- Fix canònic (ampliar primer la font de tokens): afegida l'**escala d'espaiat `--o-space-1/2/3/4/6/12`** (4px-based, en `rem`) a `app/studio/orbita-tokens.css`, al costat dels radis.
+- `app/admin/clientes/reactivation/reactivation.css` + `referrals/referrals.css`: `var(--o-gold)` → `var(--gold)` (typo del token canònic) i `var(--muted)` → `var(--t3)` (text terciari, equivalent del label tènue).
+- `ADMIN_CHANGE_COUNTER` puja a `1169`; el següent canvi real ha de ser `#1170`.
+- DEUTE OBERT (mateix patró, altres zones — pròxim tall): 10 tokens fantasma més sense fallback → `--ax-t1` (dossiers), `--t1` (booking-detail/presupuestos), `--o-r-2xl` (customer-hub), `--o-fw-semibold/regular/medium`, `--ax-gold-bg`, `--ax-` (typo inbox:1780), `--o-lh-normal`, `--fxd-kpi-hue` (verificar si és runtime).
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 (studio-integrity OK) · `pnpm build` EXIT 0.
+- Validació funcional: les 2 pàgines recuperen gap/padding canònics, hover daurat i labels en color terciari.
+- Validació humana/UX: pendent validació visual del propietari (reactivation + referrals).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1168 — 2026-06-25 — claude (TANCAT)
+
+**BUG VISUAL REAL: token fantasma `--o-stage-done` (semàfor de connexió Inbox sense color) → definit a `orbita-tokens.css`.**
+
+- Context: verificació directa del P1.C del `RESUM.md`. `inbox.css` usa `var(--o-stage-done)` a 9 punts (banners de connexió + `.ix__connstat` semàfor IMAP: `is-ok`, dot, badge) PERÒ el token **no estava definit en cap fitxer CSS**. Resultat: els `color-mix(in oklab, var(--o-stage-done) …)` eren invàlids → el verd de «connectat/ok» **no s'aplicava** (semàfor sense color).
+- Fix canònic (flux: ampliar primer la font de tokens): afegit `--o-stage-done: var(--o-stage-won)` a `app/studio/orbita-tokens.css`, al costat dels altres stages. Semànticament «fet/connectat» = verd d'èxit; alias per no duplicar el hex (monocapa). Cap dels 9 usos a `inbox.css` s'ha hagut de tocar.
+- `ADMIN_CHANGE_COUNTER` puja a `1168`; el següent canvi real ha de ser `#1169`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 (qa:studio-integrity OK) · `pnpm build` EXIT 0.
+- Validació funcional: el semàfor de connexió de l'Inbox ara resol a verd quan IMAP/SMTP està connectat; abans quedava sense color de fons/text.
+- Validació humana/UX: pendent validació visual del propietari (Inbox, capçalera de connexió).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1167 — 2026-06-25 — claude (TANCAT)
+
+**Economia: 5 `font-black` als números → `font-bold` (canon #5).**
+
+- Context: el propietari dona llum verda («seguim») per atacar el deute que altera lleugerament el disseny. La regla canònica #5 prohibeix `font-black` als números (usar `font-bold`/`--display`). El guard `check-admin-canon` només bloqueja `font-black` combinat amb `text-2xl..4xl`, així que aquests (`text-sm`/`text-xs`/`text-xl`) eren un gap conscient del guard.
+- `app/admin/economia/EconomiaClient.tsx`: els 5 `font-black` → `font-bold`: ranking `{i+1}` del top de marge (L388), badge del top de packs (L615) i els 3 KPIs de salut de pricing (Sa/Vigilar/Crític, L910/914/918). Eren els únics `font-black` vius de tot l'admin (manual/image-manager ja resolts).
+- Canvi visual: pes tipogràfic 900 → 700 als números afectats (alineació amb el canon; coherent amb la resta de KPIs de l'admin).
+- `ADMIN_CHANGE_COUNTER` puja a `1167`; el següent canvi real ha de ser `#1168`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 (canon 0) · `pnpm build` EXIT 0.
+- Validació funcional: canvi només de pes tipogràfic; cap dada, càlcul ni layout afectat.
+- Validació humana/UX: pendent validació visual del propietari (economia, zona seva).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1166 — 2026-06-25 — claude (TANCAT)
+
+**Inbox / ComposeForm: 4 `style` de maquetació pura → classes CSS `cx__*`.**
+
+- Context: finestra codex-aturat. Continuació del drenatge segur (0 canvi visual) a `app/admin/inbox/compose/ComposeForm.tsx`.
+- `app/admin/inbox/compose/ComposeForm.tsx`: grid de packs (`grid + minmax(200px) + gap:10`) → `cx__packgrid`; capçalera bulk (`flex between` sobre `cx__input`) → `cx__input--between`; barra d'accions inferior (`flex gap:10`) → `cx__formactions`; barra d'enviament (`flex between + gap:12 + flexWrap + padding + borderTop`) → `cx__composebar`.
+- `app/admin/inbox/inbox.css`: 4 classes noves en `rem` (`200px`→`12.5rem`, `10/12px`→`0.625/0.75rem`, `14px 22px`→`0.875rem 1.375rem`). Color via token `--ax-line`.
+- CONSERVAT amb motiu: `style` del botó d'opció de pack (L428) — barreja maquetació amb **color dinàmic per estat** (`isSelected`); migrar-lo és un refactor del patró de selecció (style condicional → className condicional), fora de l'abast «moure maquetació estàtica a 0 canvi visual». Documentat com a residu mixt, no trivial.
+- `ADMIN_CHANGE_COUNTER` puja a `1166`; el següent canvi real ha de ser `#1167`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 · `pnpm build` EXIT 0.
+- Validació funcional: canvi només de classes/CSS; equivalència visual exacta dels 4 contenidors migrats.
+- Validació humana/UX: pendent validació visual del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1165 — 2026-06-25 — claude (TANCAT)
+
+**Intake (alta manual de lead): 6 `style` px estàtics de maquetació → modificadors CSS.**
+
+- Context: finestra codex-aturat. Continuació del drenatge segur (0 canvi visual) a la resta d'òrgans admin: `app/admin/intake/page.tsx`.
+- `app/admin/intake/page.tsx`: 6 `style` inline de maquetació px substituïts: `marginTop:2px` de `.ni__pills` ELIMINAT (la classe ja aplica `margin-top:2px` → era redundant); `marginBottom:18px` → `ni__field--mb-lg`; `marginBottom:14px` → `ni__grid--mb`; `gap:10px` ×2 → `ni__grid--gap-sm`; `marginTop:8` de `.ni__card-hint` → `ni__card-hint--mt` (modificador, perquè `.ni__card-hint` també s'usa sense marge a L263).
+- `app/admin/intake/intake.css`: afegits 4 modificadors d'espaiat en `rem` (`.ni__grid--gap-sm`, `.ni__grid--mb`, `.ni__field--mb-lg`, `.ni__card-hint--mt`). Cap classe base tocada → 0 efecte en altres instàncies.
+- Casos tècnics conservats: spinner `animation:'spin'` (animació runtime) i `minHeight:'unset'` (override funcional puntual del textarea).
+- `ADMIN_CHANGE_COUNTER` puja a `1165`; el següent canvi real ha de ser `#1166`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 · `pnpm build` EXIT 0.
+- Validació funcional: canvi només de classes/CSS; equivalència visual exacta (2/8/10/14/18px → rem). Modificadors no afecten altres usos de les classes base.
+- Validació humana/UX: pendent validació visual del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1164 — 2026-06-25 — claude (TANCAT)
+
+**Fitxa de reserva: 2 marges px estàtics → CSS canònic + saneig de l'auditoria desfasada.**
+
+- Context: finestra codex-aturat. Drenatge de l'últim residu de maquetació px viu de l'abast de `docs/audit/admin-fitxes.md`, i correcció de l'auditoria (de 2026-06-16) que apuntava a fitxers de Leads que ja no existeixen.
+- `app/admin/bookings/[id]/page.tsx`: el wrapper del link «Veure entrada original» perd `style={{ marginTop:'10px' }}` → `bd__lead-origin`; el wrapper del compositor de notes perd `style={{ marginBottom:'16px' }}` → `bd__notes-wrap`.
+- `app/admin/bookings/[id]/booking-detail.css`: afegides `.bd__lead-origin` (`margin-top: 0.625rem`) i `.bd__notes-wrap` (`margin-bottom: 1rem`) en `rem`. 0 canvi visual.
+- Reescaneig de tot l'abast (leads/bookings/clientes): **0 residus cromàtics** (`text-[Npx]`, `bg-black`, `hover:text-white`) i **0 `style` estàtics** de maquetació restants. Els `style` que queden són dinàmics (`width:%`) o no-cromàtics acceptats (`textDecoration`, `opacity`).
+- `docs/audit/admin-fitxes.md`: marcades OBSOLETES les entrades de `LeadPipelineView` / `LeadScoreBreakdown` / `LeadQuickPriority` / `LeadQuickStatus` (fitxers inexistents, Leads reescrit) i `BookingMarginCard:215,223` (resolt #1148). Top 3 reescrit honest.
+- `ADMIN_CHANGE_COUNTER` puja a `1164`; el següent canvi real ha de ser `#1165`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 · `pnpm build` EXIT 0.
+- Validació funcional: canvi només de classes/CSS; equivalència visual exacta (10px=0.625rem, 16px=1rem).
+- Validació humana/UX: pendent validació visual del propietari (fitxa de reserva, zona seva).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1163 — 2026-06-25 — claude (TANCAT)
+
+**Llista de clients: 3 marges px inline → CSS canònic (Top 1 de l'auditoria).**
+
+- Context: finestra codex-aturat. Drenatge del Top 1 de `docs/audit/admin-fitxes.md` (P3), únic residu de maquetació px de l'òrgan Clients.
+- `app/admin/clientes/page.tsx`: el filtre de fase `.cl__lifecycle` perd `style={{ marginTop:10 }}`.
+- `app/admin/clientes/CustomersPageSections.tsx`: el badge VIP (×2, vista card + taula) perd `style={{ marginLeft:6 }}`.
+- `app/admin/clientes/clientes.css`: `.cl__lifecycle` rep `margin-top: 0.625rem`; `.cl__badge--vip` rep `margin-left: 0.375rem`. En `rem`, no px nous. `cl__badge--vip` només té aquestes 2 ocurrències (totes dins `.cl__name`) → migrar a la classe és segur, 0 canvi visual.
+- `ADMIN_CHANGE_COUNTER` puja a `1163`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 · `pnpm build` EXIT 0.
+- Validació funcional: canvi només de classes/CSS; equivalència visual exacta (10px=0.625rem, 6px=0.375rem).
+- Validació humana/UX: pendent validació visual del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1162 — 2026-06-25 — claude (TANCAT)
 
 **Fitxes forenses Sistema + Post-event — MAPA D'ORGANS COMPLET.**

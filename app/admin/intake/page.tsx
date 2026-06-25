@@ -273,7 +273,7 @@ export default function IntakePage() {
           aria-label="Text per extreure informació del client"
         />
         {extracting && (
-          <p className="ni__card-hint" style={{ marginTop: 8 }}>⟳ Extraient informació…</p>
+          <p className="ni__card-hint ni__card-hint--mt">⟳ Extraient informació…</p>
         )}
       </div>
 
@@ -421,7 +421,7 @@ export default function IntakePage() {
           </div>
           <div className="ni__field ni__col2">
             <label className="ni__label">Prioritat</label>
-            <div className="ni__pills" style={{ marginTop: '2px' }}>
+            <div className="ni__pills">
               {INTAKE_PRIORITY_OPTIONS.map((p) => (
                 <button
                   key={p.value}
@@ -442,7 +442,7 @@ export default function IntakePage() {
       <div className="ni__card">
         <p className="ni__card-title">Detalls de l&apos;event</p>
 
-        <div className="ni__field" style={{ marginBottom: '18px' }}>
+        <div className="ni__field ni__field--mb-lg">
           <label className="ni__label">Tipus d&apos;event</label>
           <div className="ni__tiles">
             {INTAKE_EVENT_TYPE_OPTIONS.map((et) => (
@@ -460,8 +460,8 @@ export default function IntakePage() {
           </div>
         </div>
 
-        <div className="ni__grid ni__grid--3" style={{ marginBottom: '14px' }}>
-          <div className="ni__grid ni__grid--2" style={{ gap: '10px' }}>
+        <div className="ni__grid ni__grid--3 ni__grid--mb">
+          <div className="ni__grid ni__grid--2 ni__grid--gap-sm">
             <div className="ni__field">
               <label htmlFor="intake-date" className="ni__label">Data</label>
               <input
@@ -518,7 +518,7 @@ export default function IntakePage() {
               autoComplete="off"
             />
           </div>
-          <div className="ni__grid ni__grid--2" style={{ gap: '10px' }}>
+          <div className="ni__grid ni__grid--2 ni__grid--gap-sm">
             <div className="ni__field">
               <label htmlFor="intake-guests" className="ni__label">Convidats</label>
               <input

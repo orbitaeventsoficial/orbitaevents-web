@@ -347,7 +347,7 @@ function CrmSegmentFilters({
         )}
       </div>
 
-      <div className="cl__lifecycle" style={{ marginTop: 10 }}>
+      <div className="cl__lifecycle">
         <label htmlFor="lifecycle-filter">Fase:</label>
         <select
           id="lifecycle-filter"

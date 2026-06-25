@@ -15,6 +15,62 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-25 [ESTAT: tancat — /studio: reparació dels 3 bugs de tokens/classe fantasma #1176]
+Reparats els 3 bugs d'studio (zona protegida) amb el token CANÒNIC d'studio (--o-accent), no inventat: studio té el seu propi sistema de tokens i el germà o-typepages__domainname ja usava --o-accent. concept/proposal-accent → --o-accent; definida .o-typepages__domain (flex column, 0 canvi layout). Captura de regressió OK (.codex-captures/dbg-studio.png, /admin/studio íntegre 20 seccions). 0 fantasmes a TOT el repo. tsc 0 · validate:core 0 (studio-integrity OK) · build EXIT 0. Counter->1176.
+Avís codex: studio té sistema de tokens propi (--o-accent/--o-text*/--o-elev*), NO --o-admin-*. Tot el producte net de tokens/classes fantasma.
+
+[claude] 2026-06-25 [ESTAT: tancat — guards de fantasmes estesos al front públic + deute /studio #1175]
+Estesos qa:no-phantom-tokens/classes a tot el producte (admin + front públic), excloent la fitxa protegida /studio. Front públic verificat NET (0 fantasmes). DEUTE /studio registrat (zona protegida, NO tocat): --concept-accent, --proposal-accent (studio.css), .o-typepages__domain (StudioShowroom) — 3 bugs reals que necessiten ordre + color del propietari. tsc 0 · validate:core 0 · build EXIT 0. Counter->1175.
+Avís codex: els guards de fantasmes ara cobreixen TOT el producte (no només admin). /studio queda fora (zona protegida amb 3 bugs documentats pendents del propietari).
+
+[claude] 2026-06-25 [ESTAT: tancat — NOU GUARD qa:no-phantom-classes (blinda classes BEM fantasma) #1174]
+Convertit el detector de classes BEM fantasma en guard permanent (germà de qa:no-phantom-tokens). scripts/check-phantom-classes.mjs a validate:core + 5 tests (cas-dolent + Tailwind/interpolació/definida). tsc 0 · validate:core 0 (foreground) · build EXIT 0 · vitest 5/5. Counter->1174.
+Avís codex: validate:core ara et bloqueja si uses una classe BEM (prefix__nom) al className sense regla CSS. Defineix-la o usa una canònica. Tanca la línia de fantasmes (tokens #1171 + classes #1174). NOTA tècnica: corre validate:core en FOREGROUND, no background (els tests spawnSync pateixen contenció i donen falsos fallos).
+
+[claude] 2026-06-25 [ESTAT: tancat — BUG: 8 classes BEM fantasma (incl. botó-void de compose) #1173]
+Estès el patró de detecció a les CLASSES (no només tokens): 8 classes BEM usades al TSX admin sense regla CSS. CRÍTIC: botons Cancel·lar/Enviar de ComposeForm usaven ix__btn--ghost/--primary (cap definida) = BOTÓ-VOID real → fix `ap-btn ap-btn--secondary/--primary`. Definides nb__sl-row--pack/packname/packhint + bd__btn--gold + bd__fieldnotes-head (coherents amb germans). 8→0 fantasma. tsc 0 · validate:core 0 · build EXIT 0. Counter->1173.
+Avís codex: detector de classes BEM fantasma al scratchpad — candidat a guard qa:no-phantom-classes. Compte amb classes BEM al className que no tinguin regla CSS (l'estil no s'aplica i cap guard ho veu).
+
+[claude] 2026-06-25 [ESTAT: tancat — canonització del deute de tokens amb fallback #1172]
+Tancat el deute menor: dossiers `var(--ax-border/surface2, var(--ax-fill-N))` → `var(--ax-fill-N)` (35 usos, 0 canvi visual); booking-detail `--sans`→`--ui` (alineat a Inter); admin-theme `--at-gold-edge/bright` → fallback. Admin CSS 100% net de tokens no-canònics (0 amb fallback, 0 bugs; resten 2 falsos positius runtime/comentari). tsc 0 · validate:core 0 · build EXIT 0. Counter->1172.
+Avís codex: tota la capa de tokens CSS de l'admin és canònica ara. El guard qa:no-phantom-tokens vigila els fantasma sense fallback.
+
+[claude] 2026-06-25 [ESTAT: tancat — NOU GUARD qa:no-phantom-tokens (blinda tokens CSS fantasma) #1171]
+Convertit el detector de tokens fantasma en guard permanent (els bugs #1168/#1169 no podran tornar). scripts/check-phantom-tokens.mjs (findPhantomTokens pura + runner), a validate:core, + 6 tests (1 cas-dolent + 5 bons: fallback/definit/runtime[style*]/comentari/next-font). tsc 0 · validate:core 0 · build EXIT 0 · vitest 6/6. Counter->1171.
+Avís codex: ARA validate:core et bloquejarà si uses var(--token) sense fallback i el token no existeix. Defineix-lo a orbita-tokens.css o corregeix el nom. Això tanca la línia de bugs de tokens fantasma.
+
+[claude] 2026-06-25 [ESTAT: tancat — 8 tokens fantasma residuals → token canònic (6 fitxers) #1170]
+Tancat el deute del #1169: dossiers `--ax-t1`→`--ax-t`, booking-detail `--t1`→`--t`/`--o-fw-medium`→`--o-fw-book`/`--ax-gold-bg`→`--ax-gold-tint-2`, presupuestos `--t1`→`--t`/`--o-lh-normal`→`--o-lh-body`, customer-hub `--o-r-2xl`→`--o-r-xl`, leads `--o-fw-semibold`→`--o-fw-semi`, nb `--o-fw-regular`→`--o-fw-normal`. Falsos positius (no tocats): --fxd-kpi-hue (runtime via style), --ax- (comentari). 0 tokens fantasma reals restants. tsc 0 · validate:core 0 · build EXIT 0. Counter->1170.
+Avís codex: tot l'admin CSS net de tokens fantasma sense fallback. Resta deute menor amb fallback (--ax-border/--ax-surface2/--sans) canonitzable en passada de puresa. Script de detecció a scratchpad — candidat a guard qa:no-phantom-tokens.
+
+[claude] 2026-06-25 [ESTAT: tancat — BUG: reactivation+referrals escala d'espai+colors fantasma #1169]
+Script de tokens fantasma: reactivation.css/referrals.css (TEUS, #1139/#1140) usaven `--o-space-*` (60+ punts = tot el gap/padding), `--o-gold` i `--muted` — CAP definit → espaiat col·lapsat, hovers sense or, labels sense color. Fix: nova escala `--o-space-1/2/3/4/6/12` (4px, rem) a orbita-tokens.css + `--o-gold`→`--gold`, `--muted`→`--t3`. tsc 0 · validate:core 0 · build EXIT 0. Counter->1169.
+Avís codex: ATENCIÓ — vas escriure reactivation/referrals amb tokens que no existeixen (--o-space-*, --o-gold, --muted); el render no peta però l'estil no s'aplicava. Comprova SEMPRE que var(--o-*) existeixi a orbita-tokens.css. Queden 10 tokens fantasma més (dossiers --ax-t1, booking-detail --t1, customer-hub --o-r-2xl, --o-fw-*, inbox --ax-) per al #1170.
+
+[claude] 2026-06-25 [ESTAT: tancat — BUG: token fantasma --o-stage-done (semàfor Inbox sense color) #1168]
+Verificat el P1.C del RESUM: `--o-stage-done` s'usava a 9 punts d'inbox.css (semàfor connexió IMAP `.ix__connstat` + banners) però NO estava definit enlloc → color-mix invàlid → verd de «connectat» no s'aplicava. Fix canònic: afegit `--o-stage-done: var(--o-stage-won)` a orbita-tokens.css (alias, sense duplicar hex). 9 usos resolen sense tocar inbox.css. tsc 0 · validate:core 0 (studio-integrity OK) · build EXIT 0. Counter->1168.
+Avís codex: si veus tokens `var(--o-*)` que no resolen, comprova la definició a orbita-tokens.css abans. `--o-stage-done` ja existeix (= verd won).
+
+[claude] 2026-06-25 [ESTAT: tancat — economia: 5 font-black als números → font-bold (canon #5) #1167]
+Amb llum verda del propietari («seguim»), atacat el deute que altera lleugerament el disseny: els 5 `font-black` d'EconomiaClient (ranking, badge, 3 KPIs salut pricing) → `font-bold`. Eren els únics font-black vius de l'admin. El guard no els caçava (només bloqueja font-black+text-2xl+). Pes 900→700. tsc 0 · validate:core 0 (canon 0) · build EXIT 0. Counter->1167.
+Avís codex: 0 font-black a tot l'admin. Següent deute de volum = superfícies P2 (bg-white/5→.ap-card) a economia/dashboard/image-manager.
+
+[claude] 2026-06-25 [ESTAT: tancat — inbox/ComposeForm: 4 style maquetació → classes cx__ #1166]
+Drenatge segur estès a /admin/inbox/compose: grid de packs + 2 barres flex + capçalera bulk → cx__packgrid/cx__formactions/cx__composebar/cx__input--between (inbox.css, rem). CONSERVAT el botó de pack (L428) amb color dinàmic isSelected (refactor de patró, no 0-canvi-visual). tsc 0 · validate:core 0 · build EXIT 0. Counter->1166.
+Avís codex: ComposeForm drenat (excepte pack-option dinàmic). Mapa de style inline restant a l'admin: majoritàriament dinàmic (skeletons/virtualització/charts) o color-dada d'editors exempts (canvas/css-manager/pricing tones/dashboard-widgets). El que queda accionable és VOLUM P2 (superfícies→.ap-card) en zones grans = passada validada pel propietari.
+
+[claude] 2026-06-25 [ESTAT: tancat — intake: 6 style px estàtics → modificadors CSS #1165]
+Drenatge segur (0 canvi visual) estès a /admin/intake: 6 `style` px de maquetació → modificadors `ni__*` a intake.css (rem). 1 era redundant (.ni__pills ja té el marge). Cap classe base tocada → 0 efecte col·lateral. Conservats spinner animation + minHeight:unset (tècnics). tsc 0 · validate:core 0 · build EXIT 0. Counter->1165.
+Avís codex: intake drenat de maquetació px. Mètode segur per a px estàtics = modificador nou (--mb/--gap), mai tocar la classe base si es comparteix.
+
+[claude] 2026-06-25 [ESTAT: tancat — fitxa de reserva: 2 px estàtics → CSS + saneig auditoria #1164]
+Drenat l'últim residu de maquetació px de l'abast de l'auditoria: els 2 `style` estàtics de bookings/[id]/page.tsx (`marginTop:10px` del link origen + `marginBottom:16px` del compositor de notes) → `.bd__lead-origin`/`.bd__notes-wrap` a booking-detail.css (rem). Reescaneig leads/bookings/clientes: 0 residus cromàtics, 0 style estàtics restants. SANEIG: l'auditoria (2026-06-16) apuntava a LeadPipelineView/LeadScoreBreakdown/LeadQuick* que JA NO EXISTEIXEN (Leads reescrit) → marcades obsoletes; Top 3 honest. tsc 0 · validate:core 0 · build EXIT 0. Counter->1164.
+Avís codex: abast leads/bookings/clientes 100% drenat de residus visuals. Auditoria admin-fitxes.md ja és honesta (sense fitxers morts).
+
+[claude] 2026-06-25 [ESTAT: tancat — Top 1 auditoria: marges px inline de la llista de clients → CSS #1163]
+Finestra codex-aturat. Drenat el Top 1 de docs/audit/admin-fitxes.md (P3): els 3 `style` px inline de la llista de clients (`marginTop:10` a `.cl__lifecycle` de clientes/page.tsx + `marginLeft:6` ×2 al badge VIP de CustomersPageSections.tsx) passen a la capa CSS canònica (clientes.css, en `rem` no px nous: `.cl__lifecycle{margin-top:.625rem}`, `.cl__badge--vip{margin-left:.375rem}`). 0 canvi visual. cl__badge--vip té només aquestes 2 ocurrències, totes dins .cl__name → segur a la classe. tsc 0 · validate:core 0 (admin-canon 0) · build EXIT 0. Counter->1163.
+Avís codex: Top 1 de l'auditoria resolt; els següents són LeadPipelineView (hover:bg-black/20 + text-[10px]) i LeadScoreBreakdown (tones).
+
 [claude] 2026-06-25 [ESTAT: tancat — fitxes Sistema + Post-event: MAPA D'ORGANS COMPLET #1162]
 Tancades les 2 fitxes que faltaven (finestra codex-aturat): Post-event (SA, 0 bugs) i Sistema (SA, editors canvas/managers = exempts legítims, /studio protegit a part). Els 10 organs del mapa + Cuadrant + Customer Hub ara amb fitxa FETA. Admin certificat punta a punta. tsc 0 · validate:core 0 · build EXIT 0. Counter->1162.
 

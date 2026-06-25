@@ -609,7 +609,7 @@ html.admin-mode .ch__insight-text--muted { color: var(--t2); }
 /* ── Bookings ── */
 html.admin-mode .ch__bookings-panel {
   border: 1px solid var(--o-admin-line);
-  border-radius: var(--o-r-2xl);
+  border-radius: var(--o-r-xl);
   padding: 20px;
   background: var(--panel);
 }
@@ -803,7 +803,7 @@ html.admin-mode .ch__booking-link--plain:hover {
 /* ── Leads ── */
 html.admin-mode .ch__leads-panel {
   border: 1px solid var(--o-admin-line);
-  border-radius: var(--o-r-2xl);
+  border-radius: var(--o-r-xl);
   padding: 20px;
   background: var(--panel);
 }
@@ -1057,7 +1057,7 @@ html.admin-mode .ch__lead-action--muted {
 /* ── Margin extras ── */
 html.admin-mode .ch__margin-panel {
   border: 1px solid var(--o-admin-line);
-  border-radius: var(--o-r-2xl);
+  border-radius: var(--o-r-xl);
   padding: 20px;
   background: var(--o-admin-fill-1);
 }
@@ -1157,7 +1157,7 @@ html.admin-mode .ch__tasks-panel {
   min-width: 0;
   overflow: hidden;
   border: 1px solid var(--o-admin-line);
-  border-radius: var(--o-r-2xl);
+  border-radius: var(--o-r-xl);
   padding: 20px;
   background: var(--o-admin-fill-1);
 }
@@ -1365,7 +1365,7 @@ html.admin-mode .ch__comms-panel {
   min-width: 0;
   overflow: hidden;
   border: 1px solid var(--o-admin-line);
-  border-radius: var(--o-r-2xl);
+  border-radius: var(--o-r-xl);
   padding: 1.25rem;
   background: var(--o-admin-fill-1);
 }
@@ -1644,7 +1644,7 @@ html.admin-mode .ch__proposal-group,
 html.admin-mode .ch__proposal-card,
 html.admin-mode .ch__proposals-empty {
   border: 1px solid var(--o-admin-line);
-  border-radius: var(--o-r-2xl);
+  border-radius: var(--o-r-xl);
   background: var(--panel);
 }
 
@@ -1896,7 +1896,7 @@ html.admin-mode .ch__privacy-stack {
 
 html.admin-mode .ch__privacy-card {
   border: 1px solid var(--o-admin-line);
-  border-radius: var(--o-r-2xl);
+  border-radius: var(--o-r-xl);
   padding: 20px;
   background: var(--panel);
 }
@@ -2077,7 +2077,7 @@ html.admin-mode .ch__privacy-skeleton--row {
 /* ── Discounts ── */
 html.admin-mode .ch__discounts-panel {
   border: 1px solid var(--o-admin-line);
-  border-radius: var(--o-r-2xl);
+  border-radius: var(--o-r-xl);
   padding: 20px;
   background: var(--panel);
 }

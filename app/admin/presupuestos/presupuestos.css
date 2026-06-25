@@ -28,7 +28,7 @@ html.admin-mode .pr__eyebrow {
 
 html.admin-mode .pr__title {
   margin: 0;
-  color: var(--t1);
+  color: var(--t);
   font-family: var(--display);
   font-size: clamp(var(--o-text-xl-2), 4vw, var(--o-text-3xl));
   font-weight: 800;
@@ -40,7 +40,7 @@ html.admin-mode .pr__subtitle {
   margin: .55rem 0 0;
   color: var(--t2);
   font-size: var(--o-text-base);
-  line-height: var(--o-lh-normal);
+  line-height: var(--o-lh-body);
 }
 
 html.admin-mode .pr__heroActions,
@@ -89,7 +89,7 @@ html.admin-mode .pr__stat[aria-pressed="true"] {
 
 html.admin-mode .pr__statValue {
   display: block;
-  color: var(--t1);
+  color: var(--t);
   font-family: var(--display);
   font-size: var(--o-text-xl);
   font-weight: 800;
@@ -130,7 +130,7 @@ html.admin-mode .pr__notice {
   border: 1px solid var(--hair-gold);
   border-radius: var(--o-r-md);
   background: var(--o-admin-fill-3);
-  color: var(--t1);
+  color: var(--t);
   font-size: var(--o-text-sm);
 }
 
@@ -159,7 +159,7 @@ html.admin-mode .pr__proposalTop {
 }
 
 html.admin-mode .pr__ref {
-  color: var(--t1);
+  color: var(--t);
   font-weight: 750;
 }
 
@@ -168,7 +168,7 @@ html.admin-mode .pr__muted {
 }
 
 html.admin-mode .pr__amount {
-  color: var(--t1);
+  color: var(--t);
   font-family: var(--display);
   font-weight: 800;
   font-variant-numeric: tabular-nums;

@@ -4007,7 +4007,7 @@ html.admin-mode .o-pdfdoc__donut-item span { width: 8px; height: 8px; border-rad
 .o-concept-card {
   min-height: 286px;
   border: 1px solid rgba(255, 255, 255, 0.11);
-  border-top: 3px solid var(--concept-accent);
+  border-top: 3px solid var(--o-accent);
   border-radius: 22px;
   padding: 18px;
   background: linear-gradient(180deg, rgba(28, 34, 48, 0.9), rgba(14, 18, 25, 0.94));
@@ -4015,7 +4015,7 @@ html.admin-mode .o-pdfdoc__donut-item span { width: 8px; height: 8px; border-rad
 }
 
 .o-concept-card__top span {
-  color: var(--concept-accent);
+  color: var(--o-accent);
   font-family: var(--o-font-mono);
   font-size: 11px;
   font-weight: 800;
@@ -4242,7 +4242,7 @@ html.admin-mode .o-pdfdoc__donut-item span { width: 8px; height: 8px; border-rad
 
 .o-proposal-card {
   border: 1px solid rgba(255, 255, 255, 0.11);
-  border-top-color: var(--proposal-accent);
+  border-top-color: var(--o-accent);
   border-radius: 22px;
   padding: 20px;
   background: linear-gradient(180deg, rgba(28, 34, 48, 0.88), rgba(14, 18, 25, 0.94));
@@ -4257,7 +4257,7 @@ html.admin-mode .o-pdfdoc__donut-item span { width: 8px; height: 8px; border-rad
 }
 
 .o-proposal-card__top strong {
-  color: var(--proposal-accent);
+  color: var(--o-accent);
   font-size: 30px;
   letter-spacing: -0.03em;
 }
@@ -4293,7 +4293,7 @@ html.admin-mode .o-pdfdoc__donut-item span { width: 8px; height: 8px; border-rad
 }
 
 .o-proposal-facts div {
-  border-left: 2px solid var(--proposal-accent);
+  border-left: 2px solid var(--o-accent);
   padding-left: 10px;
 }
 
@@ -4813,6 +4813,7 @@ html.admin-mode .o-pdfdoc__donut-item span { width: 8px; height: 8px; border-rad
 
 /* ── #20 Fitxes tipus (patrons de pàgina canònics i comparables) ── */
 .o-typepages { display: flex; flex-direction: column; gap: 1rem; }
+.o-typepages__domain { display: flex; flex-direction: column; }
 .o-typepages__domainname {
   font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--o-accent);

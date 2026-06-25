@@ -223,7 +223,7 @@ export function CustomersMobileList({
                       <span className="cl__code">CLI-{String(customer.customerNumber).padStart(4, '0')}</span>
                     )}
                     {customer.name}
-                    {customer.is_vip && <span className="cl__badge cl__badge--vip" style={{ marginLeft: 6 }}>VIP</span>}
+                    {customer.is_vip && <span className="cl__badge cl__badge--vip">VIP</span>}
                   </span>
                 </div>
                 {customer.city && <p className="cl__card-meta">{customer.city}</p>}
@@ -307,7 +307,7 @@ export function CustomersDesktopTable({
                           <span className="cl__code">CLI-{String(customer.customerNumber).padStart(4, '0')}</span>
                         )}
                         {customer.name}
-                        {customer.is_vip && <span className="cl__badge cl__badge--vip" style={{ marginLeft: 6 }}>VIP</span>}
+                        {customer.is_vip && <span className="cl__badge cl__badge--vip">VIP</span>}
                       </span>
                       {customer.city && <span className="cl__city">{customer.city}</span>}
                     </div>

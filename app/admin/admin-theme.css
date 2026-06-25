@@ -96,14 +96,14 @@ html.admin-mode {
      violet → or. Estat (rose/amber/emerald a dalt) es manté. Una capa → tot el
      dashboard Control Room passa a carbó+or quan els selectors reviuen. */
   --at-cr-sky: var(--at-gold);
-  --at-cr-sky-border: var(--at-gold-edge, var(--at-gold));
+  --at-cr-sky-border: var(--at-gold);
   --at-cr-sky-deep: var(--at-gold);
   --at-cr-sky-soft: color-mix(in oklab, var(--at-gold) 15%, transparent);
   --at-cr-sky-text: var(--at-gold-text);
   --at-cr-sky-bg: var(--o-admin-raised);
   --at-cr-cyan-border: var(--at-gold);
   --at-cr-cyan-text: var(--at-gold-text);
-  --at-cr-cyan-light: var(--at-gold-bright, var(--at-gold-text));
+  --at-cr-cyan-light: var(--at-gold-text);
 
   --at-cr-violet-border: var(--at-gold);
   --at-cr-violet-bg: var(--o-admin-raised);

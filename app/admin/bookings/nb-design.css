@@ -190,6 +190,15 @@ html.admin-mode .nb__sl-row--base {
   padding: 6px 10px;
 }
 html.admin-mode .nb__sl-readonly { flex: 0 0 92px; display: inline-flex; align-items: center; justify-content: flex-end; font-size: var(--o-text-sm); font-weight: var(--o-fw-semi); color: var(--t); }
+/* Fila del pack base seleccionat: destacada en or (lleugerament més marcada que --base). */
+html.admin-mode .nb__sl-row--pack {
+  border: 1px solid color-mix(in oklab, var(--gold) 30%, var(--line));
+  border-radius: var(--o-r-sm-2);
+  background: color-mix(in oklab, var(--gold) 8%, transparent);
+  padding: 6px 10px;
+}
+html.admin-mode .nb__sl-packname { font-weight: var(--o-fw-semi); color: var(--t); }
+html.admin-mode .nb__sl-packhint { flex: 0 0 92px; display: inline-flex; align-items: center; justify-content: center; font-size: var(--o-text-2xs); color: var(--t3); font-style: italic; }
 html.admin-mode .nb__sl-del--ghost { border: none; background: transparent; color: var(--t3); opacity: 0.45; cursor: default; }
 @media (max-width: 560px) {
   html.admin-mode .nb__sl-label, html.admin-mode .nb__sl-num, html.admin-mode .nb__sl-qty, html.admin-mode .nb__sl-payer { flex: 1 1 100%; }
@@ -206,7 +215,7 @@ html.admin-mode .nb__pack-tune { margin-top: 16px; padding: 14px; border: 1px so
 html.admin-mode .nb__pack-tune-title { margin: 0 0 10px; font-size: var(--o-text-2xs); font-weight: var(--o-fw-semi); text-transform: uppercase; letter-spacing: 0.04em; color: var(--t3); }
 html.admin-mode .nb__pack-tune-grid { display: flex; gap: 16px; flex-wrap: wrap; }
 html.admin-mode .nb__field--narrow { max-width: 200px; flex: 1 1 160px; }
-html.admin-mode .nb__field-hint { margin-top: 4px; font-size: var(--o-text-2xs); font-weight: var(--o-fw-regular); color: var(--t3); }
+html.admin-mode .nb__field-hint { margin-top: 4px; font-size: var(--o-text-2xs); font-weight: var(--o-fw-normal); color: var(--t3); }
 html.admin-mode .nb__invoice-row { margin-top: 12px; display: flex; align-items: center; gap: 10px; }
 html.admin-mode .nb__invoice-check { display: flex; cursor: pointer; align-items: center; gap: 8px; font-size: var(--o-text-sm); color: var(--t2); }
 html.admin-mode .nb__vat-flag { margin-left: 4px; font-size: var(--o-text-2xs); color: var(--o-warning); }

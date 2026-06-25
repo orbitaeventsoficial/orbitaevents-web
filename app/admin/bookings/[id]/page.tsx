@@ -389,7 +389,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
             })()}
             {booking.lead && <hr className="bd__sep" />}
             {booking.lead && (
-              <div style={{ marginTop: '10px' }}>
+              <div className="bd__lead-origin">
                 <Link href={buildLeadWorkspaceHref(booking.lead.id)} className="bd__field-link">Veure entrada original →</Link>
               </div>
             )}
@@ -684,7 +684,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
         <div className="bd__sec-divider" id="sec-galeria"><span>Galeria</span></div>
         <section className="bd__pnl" {...helpAttrs(ADMIN_BOOKING_HELP.detail.gallery)}>
-          <div style={{ marginBottom: '16px' }}>
+          <div className="bd__notes-wrap">
             <BookingFieldNotesComposer bookingId={booking.id} />
           </div>
           <BookingGallery bookingId={booking.id} />

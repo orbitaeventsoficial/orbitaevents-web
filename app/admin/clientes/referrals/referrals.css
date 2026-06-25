@@ -32,14 +32,14 @@ html.admin-mode .rf__candidate {
 
 html.admin-mode .rf__top-card:hover,
 html.admin-mode .rf__candidate:hover {
-  border-color: color-mix(in srgb, var(--o-gold) 42%, var(--line));
-  background: color-mix(in srgb, var(--o-gold) 5%, var(--panel));
+  border-color: color-mix(in srgb, var(--gold) 42%, var(--line));
+  background: color-mix(in srgb, var(--gold) 5%, var(--panel));
 }
 
 html.admin-mode .rf__label,
 html.admin-mode .rf__section-title,
 html.admin-mode .rf__metric-label {
-  color: var(--muted);
+  color: var(--t3);
   font-family: var(--mono);
   font-size: var(--o-text-xs);
   font-weight: 700;
@@ -113,7 +113,7 @@ html.admin-mode .rf__top-main {
 
 html.admin-mode .rf__rank {
   flex: 0 0 auto;
-  color: color-mix(in srgb, var(--muted) 70%, transparent);
+  color: color-mix(in srgb, var(--t3) 70%, transparent);
   font-size: var(--o-text-lg);
   font-weight: 700;
 }
@@ -134,7 +134,7 @@ html.admin-mode .rf__line {
 
 html.admin-mode .rf__line--muted {
   margin-top: 0.125rem;
-  color: var(--muted);
+  color: var(--t3);
 }
 
 html.admin-mode .rf__top-metrics {
@@ -147,7 +147,7 @@ html.admin-mode .rf__metric {
 }
 
 html.admin-mode .rf__metric-label {
-  color: var(--muted);
+  color: var(--t3);
 }
 
 html.admin-mode .rf__metric-value {
@@ -181,8 +181,8 @@ html.admin-mode .rf__filter {
 }
 
 html.admin-mode .rf__filter:hover {
-  border-color: color-mix(in srgb, var(--o-gold) 42%, var(--line));
-  background: color-mix(in srgb, var(--o-gold) 5%, var(--panel));
+  border-color: color-mix(in srgb, var(--gold) 42%, var(--line));
+  background: color-mix(in srgb, var(--gold) 5%, var(--panel));
 }
 
 html.admin-mode .rf__filter--active {
@@ -235,7 +235,7 @@ html.admin-mode .rf__empty-title {
 }
 
 html.admin-mode .rf__empty-copy {
-  color: var(--muted);
+  color: var(--t3);
   font-size: var(--o-text-xs);
 }
 
@@ -259,7 +259,7 @@ html.admin-mode .rf__facts {
 
 html.admin-mode .rf__meta,
 html.admin-mode .rf__facts {
-  color: var(--muted);
+  color: var(--t3);
   font-size: var(--o-text-xs);
 }
 
@@ -285,7 +285,7 @@ html.admin-mode .rf__facts {
 }
 
 html.admin-mode .rf__dot {
-  color: color-mix(in srgb, var(--muted) 65%, transparent);
+  color: color-mix(in srgb, var(--t3) 65%, transparent);
 }
 
 html.admin-mode .rf__message {
@@ -294,7 +294,7 @@ html.admin-mode .rf__message {
 
 html.admin-mode .rf__message-summary {
   cursor: pointer;
-  color: var(--muted);
+  color: var(--t3);
   font-size: var(--o-text-xs);
   font-weight: 700;
   list-style: none;
@@ -385,14 +385,14 @@ html.admin-mode .rf__action--success:hover,
 html.admin-mode .rf__action--info:hover,
 html.admin-mode .rf__action--ghost:hover,
 html.admin-mode .rf__action--dismiss:hover {
-  border-color: color-mix(in srgb, var(--o-gold) 44%, var(--line));
-  background: color-mix(in srgb, var(--o-gold) 7%, var(--panel));
+  border-color: color-mix(in srgb, var(--gold) 44%, var(--line));
+  background: color-mix(in srgb, var(--gold) 7%, var(--panel));
 }
 
 html.admin-mode .rf__action--dismiss {
   margin-left: auto;
   padding-inline: var(--o-space-2);
-  color: var(--muted);
+  color: var(--t3);
 }
 
 @media (min-width: 640px) {

@@ -142,6 +142,12 @@ html.admin-mode .ni__grid {
   gap: 14px;
 }
 
+/* Modificadors d'espaiat (en rem, substitueixen styles px inline) */
+html.admin-mode .ni__grid--gap-sm { gap: 0.625rem; }
+html.admin-mode .ni__grid--mb { margin-bottom: 0.875rem; }
+html.admin-mode .ni__field--mb-lg { margin-bottom: 1.125rem; }
+html.admin-mode .ni__card-hint--mt { margin-top: 0.5rem; }
+
 @media (min-width: 560px) {
   html.admin-mode .ni__grid--2 { grid-template-columns: 1fr 1fr; }
   html.admin-mode .ni__grid--3 { grid-template-columns: 1fr 1fr 1fr; }

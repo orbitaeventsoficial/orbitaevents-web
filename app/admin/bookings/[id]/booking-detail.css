@@ -231,7 +231,7 @@ html.admin-mode .bd-gallery-share-button {
   border-radius: var(--o-r-lg);
   padding: 0.375rem 0.75rem;
   font-size: var(--o-text-xs);
-  font-weight: var(--o-fw-medium);
+  font-weight: var(--o-fw-book);
   transition: border-color 140ms ease, background-color 140ms ease, opacity 140ms ease;
 }
 html.admin-mode .bd-gallery-share-button:hover:not(:disabled) {
@@ -924,7 +924,7 @@ html.admin-mode .bd__status-chip {
   border-radius: var(--o-r-pill);
   font-size: var(--o-text-sm);
   font-weight: var(--o-fw-semi);
-  font-family: var(--sans, system-ui, sans-serif);
+  font-family: var(--ui);
   letter-spacing: 0;
   cursor: pointer;
   transition: opacity 0.15s;
@@ -1017,6 +1017,11 @@ html.admin-mode .bd__btn--sec {
   border-color: var(--ax-line2);
   background: var(--ax-raised);
   color: var(--ax-t);
+}
+html.admin-mode .bd__btn--gold {
+  border-color: var(--o-admin-hair-gold);
+  background: var(--ax-gold-tint-2);
+  color: var(--gold-bright);
 }
 
 html.admin-mode .bd__kpis {
@@ -1307,6 +1312,14 @@ html.admin-mode .bd__sep {
   margin: 11px 0 0;
 }
 
+html.admin-mode .bd__lead-origin {
+  margin-top: 0.625rem;
+}
+
+html.admin-mode .bd__notes-wrap {
+  margin-bottom: 1rem;
+}
+
 html.admin-mode .bd__packcard,
 html.admin-mode .bd__extrarow,
 html.admin-mode .bd__extrahours {
@@ -1403,14 +1416,14 @@ html.admin-mode .bd__stripe-icon {
   height: 28px;
   border-radius: var(--o-r-md);
   border: 1px solid var(--o-admin-hair-gold);
-  background: var(--ax-gold-bg);
+  background: var(--ax-gold-tint-2);
   font-size: var(--o-text-sm);
   user-select: none;
 }
 
 html.admin-mode .bd__stripe-title {
   margin: 0;
-  color: var(--t1);
+  color: var(--t);
   font-size: var(--o-text-sm);
   font-weight: var(--o-fw-semi);
 }
@@ -1494,7 +1507,7 @@ html.admin-mode .bd__stripe-amount {
 
 html.admin-mode .bd__stripe-price {
   margin: 0;
-  color: var(--t1);
+  color: var(--t);
   font-size: var(--o-text-sm);
   font-weight: var(--o-fw-bold);
   font-variant-numeric: tabular-nums;
@@ -1736,6 +1749,8 @@ html.admin-mode .bd__fieldnotes {
   border-radius: var(--o-r-lg);
   background: var(--ax-fill-1);
 }
+
+html.admin-mode .bd__fieldnotes-head { display: flex; flex-direction: column; gap: 2px; }
 
 html.admin-mode .bd__fieldnotes-kicker,
 html.admin-mode .bd__fieldnotes-label span {

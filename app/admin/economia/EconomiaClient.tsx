@@ -385,7 +385,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                         href={buildBookingHref(row.id)}
                         className="flex items-center gap-3 rounded-xl border border-white/5 p-3 hover:bg-white/5 transition-colors group"
                       >
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-sm font-black">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-sm font-bold">
                           {i + 1}
                         </span>
                         <div className="flex-1 min-w-0">
@@ -612,7 +612,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                               href={buildBookingHref(row.id)}
                               className="flex items-center gap-3 rounded-xl border border-white/5 p-3 hover:bg-white/5 transition-colors group"
                             >
-                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-xs font-black">
+                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-xs font-bold">
                                 {i + 1}
                               </span>
                               <div className="flex-1 min-w-0">
@@ -907,15 +907,15 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 <div className="mt-3 grid gap-2 sm:grid-cols-3">
                   <article className="rounded-xl border p-3">
                     <p className="text-xs">Sa</p>
-                    <p className="text-xl font-black">{props.packPricingSummary.healthy}</p>
+                    <p className="text-xl font-bold">{props.packPricingSummary.healthy}</p>
                   </article>
                   <article className="rounded-xl border p-3">
                     <p className="text-xs">Vigilar</p>
-                    <p className="text-xl font-black">{props.packPricingSummary.warning}</p>
+                    <p className="text-xl font-bold">{props.packPricingSummary.warning}</p>
                   </article>
                   <article className="rounded-xl border p-3">
                     <p className="text-xs">Crític</p>
-                    <p className="text-xl font-black">{props.packPricingSummary.critical}</p>
+                    <p className="text-xl font-bold">{props.packPricingSummary.critical}</p>
                   </article>
                 </div>
 

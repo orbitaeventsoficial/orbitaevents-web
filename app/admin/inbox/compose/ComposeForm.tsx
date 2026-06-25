@@ -413,7 +413,7 @@ export default function ComposeForm({
 
               <div className="cx__field">
                 <label className="cx__label">Pack recomanat *</label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10 }}>
+                <div className="cx__packgrid">
                   {packs.map((pack) => {
                     const name =
                       pack.translations.find((t) => t.locale === locale)?.name ||
@@ -523,10 +523,7 @@ export default function ComposeForm({
               <div className="cx__field">
                 <label htmlFor="cf-to" className="cx__label">Per a *</label>
                 {isBulkSegmentMode ? (
-                  <div
-                    className="cx__input"
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-                  >
+                  <div className="cx__input cx__input--between">
                     <span>{initialSegmentAudience?.label}</span>
                     <span className="cx__recipcount">
                       {initialSegmentAudience?.recipients.length} contactes
@@ -572,17 +569,7 @@ export default function ComposeForm({
         </div>
 
         {/* Barra d'enviament */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            flexWrap: 'wrap',
-            padding: '14px 22px',
-            borderTop: '1px solid var(--ax-line)',
-          }}
-        >
+        <div className="cx__composebar">
           <div>
             {error && (
               <div className="cx__error" role="alert">
@@ -590,11 +577,11 @@ export default function ComposeForm({
               </div>
             )}
           </div>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <div className="cx__formactions">
             <button
               type="button"
               onClick={() => router.push(returnHref)}
-              className="ix__btn ix__btn--ghost"
+              className="ap-btn ap-btn--secondary"
             >
               Cancel·lar
             </button>
@@ -603,7 +590,7 @@ export default function ComposeForm({
               onClick={handleSend}
               disabled={sending}
               aria-busy={sending}
-              className="ix__btn ix__btn--primary"
+              className="ap-btn ap-btn--primary"
               style={sending ? { opacity: 0.5, pointerEvents: 'none' } : undefined}
             >
               {sending
