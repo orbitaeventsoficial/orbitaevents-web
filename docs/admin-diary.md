@@ -1,3 +1,26 @@
+## 2026-06-25 — Fitxes Sistema + Post-event: mapa d'organs complet (Canvi #1162, claude)
+
+### Context
+Finestra codex-aturat (límit d'ús). Tancar les 2 fitxes que faltaven al mapa.
+
+### Què s'ha fet
+- Post-event (5 rutes): SA, serveis consumits, 0 bugs. FETA.
+- Sistema (settings/crons/scripts/canvas/managers/stats/activity/cockpit/economia): components clau reachable, serveis canònics, exempcions legítimes (editors: canvas/managers). /studio protegit a part. FETA.
+- Registre: Post-event + Sistema PENDENT → FETA. Cap canvi de codi.
+- FITA: els 10 organs del mapa + Cuadrant + Customer Hub tenen fitxa. Admin certificat punta a punta.
+
+### Validació
+- Validació tècnica: tsc 0 · validate:core 0 · pnpm build EXIT 0 (verificat amb tot fins #1161).
+- Validació funcional: render cobert per qa:smoke (82) + qa:smoke-detail (11 [param]).
+- Validació humana/UX: pendent validació visual del propietari (terreny seu segons el pla).
+
+### Coordinació
+Counter -> 1162. Finestra codex-aturat aprofitada per completar el mapa.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-25 — LeadLostStatusPrompt sense white ad-hoc (Canvi #1161, codex)
 
 ### Context

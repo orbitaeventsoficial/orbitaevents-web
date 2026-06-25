@@ -59,8 +59,8 @@ Les rutes admin no es tracten com 90 pantalles independents. Primer s'agrupen pe
 | Clients | `/admin/clientes`, `/admin/clientes/[id]`, `/admin/clientes/reactivation`, `/admin/clientes/referrals` | INICIAL parcial |
 | Catàleg | `/admin/packs`, `/admin/packs/[id]`, `/admin/packs/extras`, `/admin/inventory`, `/admin/pricing`, `/admin/catalog` | FETA (#1132) |
 | Partners | `/admin/collaborators`, `/admin/collaborators/[id]` | FETA (#1145) |
-| Post-event | `/admin/post-event`, reports, surveys, feedback, playbook | PENDENT |
-| Sistema | settings, crons, scripts, features, coverage, docs, canvas, text/css/image managers | PENDENT |
+| Post-event | `/admin/post-event`, reports, surveys, feedback, playbook | FETA (#1162) |
+| Sistema | settings, crons, scripts, features, coverage, docs, canvas, text/css/image managers | FETA (#1162) |
 
 Una ruta detall (`[id]`), editor o modal gran només rep fitxa pròpia si governa dades/accions diferents de la fitxa mare.
 
@@ -717,6 +717,37 @@ Canvi de codi (#1156): cap. Auditoria neta — organ SA. Els títols ja es van c
 Validacio: tsc EXIT 0 · validate:core EXIT 0 (qa:admin-canon 0) · render /admin + salut/reporting/analytics cobert per qa:smoke.
 
 Decisio de treball: organ SA, cap canvi de codi nou. Pendent validacio visual del propietari.
+
+### Òrgan Post-event (`/admin/post-event`, reports, surveys, feedback, playbook)
+
+Pantalla: Post-event — tancament de bolo i aprenentatge (informes, enquestes, feedback, playbook).
+Estat inventari: 🟢
+TANCAT CHARLIE: no — pendent validacio visual del propietari.
+Estat fitxa: FETA (auditoria forense #1162, claude, 2026-06-25)
+
+Reachability: les 5 rutes (post-event, reports, reports/new, surveys, feedback, playbook) són pages amb AdminPage + loading. Passa qa:no-dead-admin-views.
+CSS viu: classes canòniques `.ap-*`. Títols ja canon.
+APIs/serveis vius: postEventReportAdmin i serveis post-event consumits per les pages.
+Codi mort / Duplicacions / Hardcoded: cap (escaneig #1162: 0 BEM doble, 0 dialog natiu, 0 títol cru).
+Connexions interrompudes: cap. Post-event connecta amb booking i client (tancament de bolo).
+
+Decisio de treball: organ SA, cap canvi de codi. Pendent validacio visual del propietari.
+
+### Òrgan Sistema (settings, crons, scripts, features, coverage, canvas, text/css/image managers, stats, activity, cockpit, economia, docs)
+
+Pantalla: Sistema — infraestructura, configuració, eines i sistema visual protegits.
+Estat inventari: 🟢
+TANCAT CHARLIE: no — pendent validacio visual del propietari.
+Estat fitxa: FETA (auditoria forense #1162, claude, 2026-06-25)
+
+Reachability: components clau vius (SettingsClient×5 usos, CronsClient, ScriptsClient, CanvasEditorClient, ActivityClient, EconomiaClient×2). Passa qa:no-dead-admin-views.
+CSS viu: classes canòniques `.ap-*` + control-room.css (cockpit). Títols ja canon (.ap-h2 del #1146).
+APIs/serveis vius: adminSettings, cron services, economicCockpitService (cockpit), pricing services (economia). Consumits.
+Codi mort / Duplicacions: cap.
+Hardcoded/residu visual: dins canon. EXEMPCIONS legítimes documentades: CanvasEditorClient (editor gràfic, color = disseny d'usuari), css-manager/text-manager/image-manager (dades editables = contingut, no chrome) — tots a EXEMPT del guard de canon.
+Connexions interrompudes: cap. cockpit↔economicCockpitService (forecast unificat #1089), economia↔costEngine.
+
+Decisio de treball: organ SA. `/studio` queda protegit a part (qa:studio-integrity). Editors (canvas/managers) són exempts legítims. Cap canvi de codi. Pendent validacio visual del propietari.
 
 ## Registre de fitxes per fer
 

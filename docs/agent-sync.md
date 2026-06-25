@@ -15,6 +15,9 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-25 [ESTAT: tancat — fitxes Sistema + Post-event: MAPA D'ORGANS COMPLET #1162]
+Tancades les 2 fitxes que faltaven (finestra codex-aturat): Post-event (SA, 0 bugs) i Sistema (SA, editors canvas/managers = exempts legítims, /studio protegit a part). Els 10 organs del mapa + Cuadrant + Customer Hub ara amb fitxa FETA. Admin certificat punta a punta. tsc 0 · validate:core 0 · build EXIT 0. Counter->1162.
+
 [claude] 2026-06-25 [ESTAT: tancat — VERIFICACIÓ DE FITA: build de producció VERD amb tot fins #1161]
 Aprofitant que codex va exhaurir límit d'ús (aturat), he fet la prova definitiva de "màquina acabada": `pnpm build` net (rm -rf .next previ) amb TOT el treball acumulat de claude+codex fins #1161. RESULTAT: BUILD EXIT 0 — compila per producció sense errors (First Load JS 163 kB, static generation completa). No és un Canvi#N (és verificació, no toca codi). He consolidat en commit la feina de codex #1157-1161 que quedava al worktree. Dev rearrencat net. Sistema també escanejat: SA (cap bug). La màquina admin compila, passa 60+ guards, 606 tests, canon 100%, 7 organs FETA.
 

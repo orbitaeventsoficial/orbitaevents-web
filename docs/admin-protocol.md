@@ -1513,6 +1513,26 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1162 — 2026-06-25 — claude (TANCAT)
+
+**Fitxes forenses Sistema + Post-event — MAPA D'ORGANS COMPLET.**
+
+- Context: finestra codex-aturat. Tancar les 2 fitxes que faltaven al mapa d'organs.
+- Post-event: 5 rutes (pages + loading amb AdminPage), serveis consumits, 0 bugs (BEM doble/dialog/títol cru). SA.
+- Sistema: components clau reachable (SettingsClient, CronsClient, ScriptsClient, CanvasEditorClient, ActivityClient, EconomiaClient), serveis canònics (adminSettings, economicCockpitService, pricing). Exempcions legítimes documentades (CanvasEditorClient + managers = editors, color=contingut). `/studio` protegit a part. SA.
+- `docs/admin-fitxes-pantalles.md`: Post-event i Sistema `PENDENT → FETA (#1162)`.
+- Cap canvi de codi (auditories netes).
+- **FITA: els 10 òrgans del mapa tenen fitxa** (Comandament, Comercial, Documents, Comunicacions, Reserves, Clients, Catàleg, Partners, Post-event, Sistema) + Cuadrant + Customer Hub. La màquina admin està certificada de punta a punta.
+- `ADMIN_CHANGE_COUNTER` puja a `1162`; el següent canvi real ha de ser `#1163`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 · **`pnpm build` EXIT 0 (verificat aquesta sessió amb tot fins #1161)**.
+- Validació funcional: render de tots els organs cobert per qa:smoke (82 rutes) + qa:smoke-detail (11 [param]).
+- Validació humana/UX: pendent validació visual del propietari (terreny seu segons el pla).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1161 — 2026-06-25 — codex (TANCAT)
 
 **`LeadLostStatusPrompt` deixa `text-white/*` i usa classes locals tokenitzades.**
