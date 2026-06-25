@@ -1513,6 +1513,99 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1155 — 2026-06-25 — claude (TANCAT)
+
+**Fitxa forense òrgan Documents (presupuestos + dossiers) — SA, sense canvi de codi.**
+
+- Context: front codex-free (codex a Bookings #1151-1153). Òrgan Documents, `INICIAL parcial`.
+- Auditoria: organ SA. Components reachable (PresupuestoPdfStudio, ProposalsList, ProposalOwnerPanel, StudioPreview, DossierGeneratorClient, DossierListActions). Serveis canònics consumits (dossierService, costEngine, travelCost, leadServiceLineService, collaboratorProductService). Copy centralitzat (`ADMIN_DOSSIER_GENERATOR_COPY` + `dossier-copy` + `messages.dossier.*`). Diners via costEngine, no reimplementat. Títols ja canon (.ap-h2). Cap codi mort, cap duplicació, cap dialog natiu, cap BEM doble.
+- Exempció: PresupuestoPdfStudio + StudioPreview són editors de PDF (color = contingut, exempts del guard de canon — ja a EXEMPT).
+- `/studio` (zona protegida amb `qa:studio-integrity`) queda FORA d'aquesta fitxa.
+- `docs/admin-fitxes-pantalles.md`: fitxa escrita; òrgan `INICIAL parcial → FETA (#1155)`.
+- Cap canvi de codi (auditoria neta, a diferència de Partners #1145).
+- `ADMIN_CHANGE_COUNTER` puja a `1155`; el següent canvi real ha de ser `#1156`.
+- Validació tècnica: `npx tsc --noEmit` EXIT 0 · `pnpm run validate:core` EXIT 0 (qa:admin-canon 0).
+- Validació funcional: render presupuestos/dossiers cobert per qa:smoke.
+- Validació humana/UX: pendent validació visual del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1154 — 2026-06-25 — codex (TANCAT)
+
+**`BookingFilters` mou l'amplada px dura de la cerca a classe local responsiva.**
+
+- Context: tall P3 responsiu acotat de la llista de reserves. `app/admin/bookings/BookingFilters.tsx` mantenia `style={{ width: 260 }}` al wrapper de cerca.
+- `app/admin/bookings/BookingFilters.tsx`: el wrapper passa a `bk-filter-search`.
+- `app/admin/bookings/[id]/booking-detail.css`: `bk-filter-search` defineix `position: relative` i `width: min(100%, 16.25rem)`.
+- `docs/audit/admin-fitxes.md`: la troballa de `BookingFilters.tsx:104` queda resolta al #1154.
+- `ADMIN_CHANGE_COUNTER` puja a `1154`; el següent canvi real ha de ser `#1155`.
+- Validació tècnica: `Select-String` focalitzat sobre `BookingFilters.tsx` dona 0 `style={{`, 0 `width:`, 0 `text-[`, 0 `bg-white`, 0 `border-white`, 0 `text-white`; `npx tsc --noEmit --pretty false` EXIT 0; `pnpm run qa:protocol` EXIT 0; `pnpm run validate:core` EXIT 0.
+- Validació funcional: cap canvi a `URLSearchParams`, debounce de cerca, `router.push`, helpers customer/list ni opcions de filtre; només classe i CSS.
+- Validació humana/UX: pendent validació visual del propietari; el camp manté amplada equivalent amb límit responsive.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1153 — 2026-06-25 — codex (TANCAT)
+
+**`BookingStatusChanger` deixa fallback blanc i inline style estàtic; auditoria stale corregida.**
+
+- Context: després del #1152, el Top 1 P2 de leads (`LeadInsightsBanner`) i el residu cromàtic antic de `DocumentFlowSection` ja no existien a l'estat viu. El residu real següent era `BookingStatusChanger.tsx`: fallback `bg-white/30` als dots i `style={{ transform, transition }}` estàtic a la fletxa.
+- `app/admin/bookings/[id]/BookingStatusChanger.tsx`: fallback dels dots passa a `bd__status-dot--fallback`; la fletxa oberta passa a classe `bd__status-arrow--open`.
+- `app/admin/bookings/[id]/booking-detail.css`: afegides regles locals tokenitzades per al fallback de dot i la rotació/transició de fletxa.
+- `docs/audit/admin-fitxes.md`: `LeadInsightsBanner` i `DocumentFlowSection` queden marcats com a obsolets en l'estat viu; `BookingStatusChanger` queda resolt al #1153.
+- `ADMIN_CHANGE_COUNTER` puja a `1153`; el següent canvi real ha de ser `#1154`.
+- Validació tècnica: `Select-String` focalitzat sobre `BookingStatusChanger.tsx` dona 0 `bg-white`, 0 `border-white`, 0 `text-white`, 0 `bg-black`, 0 `text-cyan`, 0 `style={{`; `npx tsc --noEmit --pretty false` EXIT 0; `pnpm run qa:protocol` EXIT 0; `pnpm run validate:core` EXIT 0.
+- Validació funcional: cap canvi a `PATCH /api/admin/bookings/:id/status`, `router.refresh`, confirmació de completat, estadístiques, missatges d'èxit/error ni ordre d'estats; només classes i CSS.
+- Validació humana/UX: pendent validació visual del propietari; xip i desplegable conserven comportament amb fallback tokenitzat.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1152 — 2026-06-25 — codex (TANCAT)
+
+**`BookingGallery` i `GallerySharePanel` deixen blanc cru P2 i passen a classes locals tokenitzades.**
+
+- Context: Top 1 P2 viu de `docs/audit/admin-fitxes.md` després del #1151. La galeria i el panell de share mantenien `bg-white/10`, `border-white/*` i `text-white/*` en skeleton, dropzones, botó d'esborrar, icona, botons, URL i label.
+- `app/admin/bookings/[id]/BookingGallery.tsx`: skeleton, dropzone, tile d'afegir, símbol `+` i botó d'esborrar passen a `bd-gallery-*`.
+- `app/admin/bookings/[id]/GallerySharePanel.tsx`: icona, botons generar/copiar, URL compartida i label de contrasenya passen a `bd-gallery-share-*`.
+- `app/admin/bookings/[id]/booking-detail.css`: afegides regles locals sota `html.admin-mode` amb tokens (`--t`, `--t3`, `--line`, `--gold`, `--panel`, `--o-danger`, `--o-admin-light`, escala `--o-text-*`).
+- `docs/audit/admin-fitxes.md`: les troballes P2 de `BookingGallery` i `GallerySharePanel` queden resoltes al #1152.
+- `ADMIN_CHANGE_COUNTER` puja a `1152`; el següent canvi real ha de ser `#1153`.
+- Validació tècnica: `Select-String` focalitzat sobre `BookingGallery.tsx` + `GallerySharePanel.tsx` dona 0 `bg-white`, 0 `border-white`, 0 `text-white`, 0 `text-cyan`, 0 `bg-black`, 0 `style={{`; `npx tsc --noEmit --pretty false` EXIT 0; `pnpm run qa:protocol` EXIT 0; `pnpm run validate:core` EXIT 0.
+- Validació funcional: cap canvi a `optimizeImage`, upload, delete, caption, flags portal/portfolio, token de share, copy, password ni revocació; només classes i CSS.
+- Validació humana/UX: pendent validació visual del propietari; skeleton, dropzones, botons i URL mantenen jerarquia sense blanc cru.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1151 — 2026-06-25 — codex (TANCAT)
+
+**`BookingQuestionnaireSection` deixa `text-white/*` i `admin-tone-text-cyan` i passa a classes locals tokenitzades.**
+
+- Context: següent P2 viu de reserves després del #1149 i de la migració `.ap-h2` del #1150. La secció de qüestionari ja tenia títol canònic, però conservava textos auxiliars `text-white/*` i l'enllaç `admin-tone-text-cyan`.
+- `app/admin/bookings/[id]/BookingQuestionnaireSection.tsx`: enllaç de gestió, estat buit, meta de plantilla, ajuda, data, label i resposta passen a classes locals `bd-questionnaire-*`.
+- `app/admin/bookings/[id]/booking-detail.css`: afegides regles `bd-questionnaire-*` sota `html.admin-mode` amb `--t`, `--t2`, `--t3`, `--gold` i escala `--o-text-*`.
+- `docs/audit/admin-fitxes.md`: la troballa P2 de `BookingQuestionnaireSection` queda resolta al #1151.
+- `ADMIN_CHANGE_COUNTER` puja a `1151`; el següent canvi real ha de ser `#1152`.
+- Validació tècnica: `Select-String` focalitzat sobre `BookingQuestionnaireSection.tsx` dona 0 `bg-white`, 0 `border-white`, 0 `text-cyan`, 0 `text-white`, 0 `admin-card-glass`, 0 `style={{`; `npx tsc --noEmit --pretty false` EXIT 0; `pnpm run qa:protocol` EXIT 0; `pnpm run validate:core` EXIT 0.
+- Validació funcional: cap canvi a `getBookingQuestionnaire`, `formatDateSimple`, map de respostes, links `/admin/questionnaires` ni estats de la secció; només classes i CSS.
+- Validació humana/UX: pendent validació visual del propietari; la secció conserva jerarquia i passa a tokens locals sense blanc/cian cru.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
 ### Canvi #1150 — 2026-06-25 — claude (TANCAT)
 
 **Canon de títols al 100%: migració dels títols dels panells de codex (Client 360 + booking detail) a `.ap-h2`.**

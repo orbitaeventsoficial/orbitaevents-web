@@ -53,7 +53,7 @@ Les rutes admin no es tracten com 90 pantalles independents. Primer s'agrupen pe
 |---|---|---|
 | Comandament | `/admin`, `/admin/salut`, `/admin/reporting`, `/admin/analytics` | PENDENT |
 | Comercial | `/admin/leads`, `/admin/leads/[id]`, `/admin/sales-ops`, `/admin/leads/arxiu`, `/admin/leads/reengagement` | INICIAL parcial |
-| Documents | `/admin/presupuestos`, `/admin/presupuestos/[id]`, `/admin/dossiers`, `/admin/studio` | INICIAL parcial |
+| Documents | `/admin/presupuestos`, `/admin/presupuestos/[id]`, `/admin/dossiers`, `/admin/studio` | FETA (#1155) · studio=zona protegida |
 | Comunicacions | `/admin/inbox`, `/admin/inbox/compose`, `/admin/inbox/settings`, `/admin/emails`, `/admin/email-templates` | FETA (#1133) |
 | Reserves | `/admin/bookings`, `/admin/bookings/[id]`, `/admin/bookings/new`, `/admin/calendario`, `/admin/calendario/capacity` | INICIAL parcial |
 | Clients | `/admin/clientes`, `/admin/clientes/[id]`, `/admin/clientes/reactivation`, `/admin/clientes/referrals` | INICIAL parcial |
@@ -361,8 +361,12 @@ CSS viu:
 - `app/admin/bookings/[id]/booking-detail.css`: cobreix el detall `bd__*` i també algunes classes `bk-*` de la llista perquè `/admin/bookings/page.tsx` l'importa.
 - El CSS usa `html.admin-mode` i tokens `--ax-*`/`--o-*`; `qa:admin-mode-prefix` és 0 deute.
 - Canvi #1142: la llista `/admin/bookings` deixa d'emetre els contenidors `style={{...}}` P2 i `admin-card-glass` a empty/cards mòbil; passen a `bk-detail-bar-row`, `bk-detail-bar-actions`, `bk-list-shell`, `bk-empty-state` i `bk-mobile-card`.
+- Canvi #1154: `BookingFilters` deixa l'amplada inline `style={{ width: 260 }}` del camp de cerca i passa a `bk-filter-search`.
 - Canvi #1148: `BookingTotalEditor` i la cabina de marge (`BookingMarginCard`) deixen els inline styles i valors tipogràfics P2; passen a `bd-total-editor*` i `admin-booking-margin-*` dins aquest CSS.
 - Canvi #1149: el pipeline de `/admin/bookings` deixa el dot mòbil i els botons ←/→ amb negre/blanc ad hoc; passen a `bk-pipeline-dot--inactive` i `bk-pipeline-shift-btn` dins aquest CSS.
+- Canvi #1151: `BookingQuestionnaireSection` deixa `text-white/*` i `admin-tone-text-cyan`; passa a `bd-questionnaire-*` dins aquest CSS.
+- Canvi #1152: `BookingGallery` i `GallerySharePanel` deixen `white/*` en skeleton/dropzones/delete/share; passen a `bd-gallery-*` i `bd-gallery-share-*` dins aquest CSS.
+- Canvi #1153: `BookingStatusChanger` deixa el fallback `bg-white/30` i l'inline style estàtic de fletxa; passa a `bd__status-dot--fallback` i `bd__status-arrow--open`.
 - Residus coneguts: overrides amb `!important` sobre components encaixats (`admin-booking-margin*`, inputs dins `bd__root`). El P1 cromàtic de `StripePaymentPanel.tsx` queda resolt al Canvi #1113.
 
 APIs/serveis vius:
@@ -665,6 +669,28 @@ Bugs de codi corregits (#1145) — cap guard els caçava:
 Validacio: tsc EXIT 0 · validate:core EXIT 0 (qa:admin-canon 0) · render Partner Hub (Carlos Lucas) 3 breakpoints, `.ph__h2`/`.ap-kpi-value` = Plus Jakarta, HTTP 200, 0 overflow/error.
 
 Decisio de treball: organ ben cablejat amb 2 bugs visuals corregits. Pendent validacio visual del propietari.
+
+### Òrgan Documents (`/admin/presupuestos`, `/admin/dossiers`) + `/studio` (protegit a part)
+
+Pantalla: Documents — pressupost/PDF (proposals) i generador de dossiers comercials.
+Estat inventari: 🟢
+TANCAT CHARLIE: no — pendent validacio visual del propietari. (`/studio` = zona protegida pròpia, NO auditada aquí.)
+Estat fitxa: FETA (auditoria forense #1155, claude, 2026-06-25)
+
+Reachability: tots els components vius (1 importador): `presupuestos/page` → PresupuestoPdfStudio (editor PDF), ProposalsList, ProposalOwnerPanel, StudioPreview; `dossiers/page` → DossierGeneratorClient, DossierListActions. Passa qa:no-dead-admin-views.
+CSS viu: `presupuestos.css`, `dossiers.css` (layout propi). Títols ja canon (.ap-h2, StudioPreview migrat al #1147).
+APIs/serveis vius: dossierService (getAllDossiers/getDeletedDossiers), costEngine, travelCost, leadServiceLineService, collaboratorProductService. Lectura presupuestos via prisma (customer/lead/proposal/setting/leadDocument) al server page.
+Monocapa: copy del generador centralitzat a `ADMIN_DOSSIER_GENERATOR_COPY` + `lib/constants/dossier-copy` + `messages.dossier.*`; diners via costEngine (NO reimplementat).
+Codi mort relacionat: cap.
+Duplicacions: cap.
+Hardcoded/residu visual: dins canon. PresupuestoPdfStudio + StudioPreview són EDITORS DE PDF (exempts del guard de canon: el color és contingut del document, no chrome — vegeu EXEMPT a check-admin-canon).
+Connexions interrompudes: cap. Pressupost↔lead/client (prisma), dossier↔catàleg de productes (orbita/collaborator), tots dos↔costEngine.
+
+Canvi de codi (#1155): cap. Auditoria neta — organ SA sense bugs (a diferència de Partners #1145). Només documentació.
+
+Validacio: tsc EXIT 0 · validate:core EXIT 0 (qa:admin-canon 0) · render presupuestos/dossiers ja cobert per qa:smoke.
+
+Decisio de treball: organ SA i ben cablejat, cap canvi de codi. `/studio` queda fora (zona protegida amb guard qa:studio-integrity propi). Pendent validacio visual del propietari.
 
 ## Registre de fitxes per fer
 

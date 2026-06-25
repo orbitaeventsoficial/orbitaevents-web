@@ -1,3 +1,114 @@
+## 2026-06-25 — Fitxa forense òrgan Documents (SA) (Canvi #1155, claude)
+
+### Context
+Front codex-free (codex a Bookings #1151-1153). Òrgan Documents (presupuestos + dossiers), INICIAL parcial.
+
+### Què s'ha fet
+- Auditoria: organ SA. Components reachable, serveis canònics (dossierService, costEngine...), copy centralitzat (ADMIN_DOSSIER_GENERATOR_COPY), diners via costEngine no reimplementat, títols ja .ap-h2. Cap codi mort/duplicació/dialog natiu/BEM doble.
+- PresupuestoPdfStudio/StudioPreview = editors PDF (exempts canon). /studio = zona protegida a part.
+- Fitxa INICIAL parcial → FETA (#1155). Cap canvi de codi (auditoria neta).
+
+### Validació
+- Validació tècnica: tsc 0 · validate:core 0 (qa:admin-canon 0).
+- Validació funcional: render presupuestos/dossiers cobert per qa:smoke.
+- Validació humana/UX: pendent validació visual del propietari.
+
+### Coordinació
+Counter -> 1155. Front Documents (claude); codex a Bookings (#1151-1154). Disjunts.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-25 — BookingFilters amplada cerca a classe local (Canvi #1154, codex)
+
+### Context
+Tall P3 responsiu acotat dins la llista de reserves. `BookingFilters.tsx` mantenia `style={{ width: 260 }}` al wrapper de cerca.
+
+### Què s'ha fet
+- `app/admin/bookings/BookingFilters.tsx`: el wrapper de cerca passa de `style={{ width: 260 }}` a `bk-filter-search`.
+- `app/admin/bookings/[id]/booking-detail.css`: `bk-filter-search` defineix amplada responsiva `min(100%, 16.25rem)` i conserva `position: relative`.
+- No es toca `URLSearchParams`, debounce de cerca, `router.push`, helpers de customer ni opcions de filtre.
+
+### Validació
+- Validació tècnica: pendent `Select-String`, `tsc`, `qa:protocol` i `validate:core`.
+- Validació funcional: cap canvi a navegació ni query params; només classe/CSS.
+- Validació humana/UX: pendent validació visual del propietari; el camp conserva amplada equivalent amb límit responsive.
+
+### Coordinació
+Counter -> 1154. Perímetre Codex: BookingFilters.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: pendent validació
+
+## 2026-06-25 — Booking status changer fallback canònic (Canvi #1153, codex)
+
+### Context
+El P2 viu de leads (`LeadInsightsBanner`) i el residu cromàtic de `DocumentFlowSection` eren obsolets a l'estat actual. El següent residu real era `BookingStatusChanger.tsx`: fallback `bg-white/30` als dots i un inline style estàtic per rotar la fletxa.
+
+### Què s'ha fet
+- `app/admin/bookings/[id]/BookingStatusChanger.tsx`: fallback dels dots passa a `bd__status-dot--fallback`; la fletxa oberta passa a `bd__status-arrow--open`.
+- `app/admin/bookings/[id]/booking-detail.css`: afegits fallback tokenitzat i transició/rotació de la fletxa.
+- `docs/audit/admin-fitxes.md`: `LeadInsightsBanner` i el residu antic de `DocumentFlowSection` queden marcats com a obsolets; `BookingStatusChanger` queda resolt.
+
+### Validació
+- Validació tècnica: `Select-String` focalitzat confirma 0 residus `bg-white`, `border-white`, `text-white`, `bg-black`, `text-cyan`, `style={{` a `BookingStatusChanger.tsx`; `npx tsc --noEmit --pretty false` EXIT 0; `pnpm run qa:protocol` EXIT 0; `pnpm run validate:core` EXIT 0.
+- Validació funcional: sense canvis a `PATCH /api/admin/bookings/:id/status`, confirmació de completat, `router.refresh`, stats ni missatges.
+- Validació humana/UX: pendent validació visual del propietari; el xip conserva estat i desplegable, però sense fallback blanc cru ni style inline estàtic.
+
+### Coordinació
+Counter -> 1153. Perímetre Codex: status changer i auditoria stale.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-25 — Booking gallery/share sense white cru (Canvi #1152, codex)
+
+### Context
+Top 1 P2 viu de `docs/audit/admin-fitxes.md` després del #1151. `BookingGallery.tsx` i `GallerySharePanel.tsx` mantenien `bg-white/10`, `border-white/*` i `text-white/*` en skeleton, dropzones, botó d'esborrar, icona, botons de share, URL i label.
+
+### Què s'ha fet
+- `app/admin/bookings/[id]/BookingGallery.tsx`: skeleton, dropzone, tile d'afegir, símbol `+` i botó d'esborrar passen a `bd-gallery-*`.
+- `app/admin/bookings/[id]/GallerySharePanel.tsx`: icona, botons generar/copiar, URL compartida i label de contrasenya passen a `bd-gallery-share-*`.
+- `app/admin/bookings/[id]/booking-detail.css`: afegides regles locals tokenitzades amb `--t`, `--t3`, `--line`, `--gold`, `--panel`, `--o-danger` i escala `--o-text-*`.
+- No es toca optimització WebP, upload, `fetchWithCsrf`, token de share, copy, password ni revocació.
+
+### Validació
+- Validació tècnica: `Select-String` focalitzat confirma 0 residus `bg-white`, `border-white`, `text-white`, `text-cyan`, `bg-black`, `style={{` a `BookingGallery.tsx` + `GallerySharePanel.tsx`; `npx tsc --noEmit --pretty false` EXIT 0; `pnpm run qa:protocol` EXIT 0; `pnpm run validate:core` EXIT 0.
+- Validació funcional: canvi només de classes/CSS; la galeria conserva càrrega, pujada, delete, selecció, portal/portfolio i share.
+- Validació humana/UX: pendent validació visual del propietari; dropzones, botons i URL deixen blanc cru i mantenen jerarquia.
+
+### Coordinació
+Counter -> 1152. Perímetre Codex: galeria de reserva i share panel.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-25 — Booking questionnaire sense white/cyan cru (Canvi #1151, codex)
+
+### Context
+Següent P2 viu de reserves després del #1149/#1150. `BookingQuestionnaireSection.tsx` ja tenia el títol a `.ap-h2`, però mantenia textos `text-white/*` i l'enllaç `admin-tone-text-cyan`.
+
+### Què s'ha fet
+- `app/admin/bookings/[id]/BookingQuestionnaireSection.tsx`: textos auxiliars, data, label/resposta i enllaços passen a classes locals `bd-questionnaire-*`.
+- `app/admin/bookings/[id]/booking-detail.css`: afegides les regles `bd-questionnaire-*` amb tokens (`--t`, `--t2`, `--t3`, `--gold`, escala `--o-text-*`).
+- No es toca `getBookingQuestionnaire`, el map de preguntes/respostes, `formatDateSimple` ni les rutes `/admin/questionnaires`.
+
+### Validació
+- Validació tècnica: `Select-String` focalitzat confirma 0 residus `bg-white`, `border-white`, `text-cyan`, `text-white`, `admin-card-glass`, `style={{` a `BookingQuestionnaireSection.tsx`; `npx tsc --noEmit --pretty false` EXIT 0; `pnpm run qa:protocol` EXIT 0; `pnpm run validate:core` EXIT 0.
+- Validació funcional: canvi només de classes/CSS; els tres estats (sense plantilla, pendent, completat) conserven estructura i contingut.
+- Validació humana/UX: pendent validació visual del propietari; es manté jerarquia calmada sense blanc/cian cru.
+
+### Coordinació
+Counter -> 1151. Perímetre Codex: reserva detall, secció qüestionari.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-25 — Canon de títols 100% a .ap-h2 (Canvi #1150, claude)
 
 ### Context
@@ -31,7 +142,7 @@ Continuació del drenatge P2 de reserves. `BookingPipelineView.tsx` conservava t
 - `docs/audit/admin-fitxes.md`: la troballa P2 del pipeline queda resolta i les entrades de leads que apuntaven a fitxers inexistents queden marcades com a obsoletes.
 
 ### Validació
-- Validació tècnica: `Select-String` focalitzat confirma 0 residus `bg-black/15`, `dark:bg-white/20`, `hover:bg-black/20`, `bg-white`, `border-white`, `text-white` a `BookingPipelineView.tsx`; `npx tsc --noEmit --pretty false` EXIT 0. `qa:protocol` i `validate:core` es passen sobre l'estat combinat després del #1150.
+- Validació tècnica: `Select-String` focalitzat confirma 0 residus `bg-black/15`, `dark:bg-white/20`, `hover:bg-black/20`, `bg-white`, `border-white`, `text-white` a `BookingPipelineView.tsx`; `npx tsc --noEmit --pretty false` EXIT 0; `pnpm run qa:protocol` EXIT 0; `pnpm run validate:core` EXIT 0 sobre l'estat combinat després del #1150.
 - Validació funcional: sense canvi de lògica; el kanban conserva columns, drag/drop, accions mòbils i `PATCH /api/admin/bookings/:id/status`.
 - Validació humana/UX: pendent validació visual del propietari; dots/botons mantenen jerarquia però ja no emeten negre/blanc ad hoc.
 

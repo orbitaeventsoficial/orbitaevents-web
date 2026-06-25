@@ -11,7 +11,7 @@ export default async function BookingQuestionnaireSection({ bookingId }: { booki
         <h2 className="ap-h2">Qüestionari pre-event</h2>
         <Link
           href="/admin/questionnaires"
-          className="text-xs text-white/40 hover:text-white/70 transition-colors"
+          className="bd-questionnaire-link"
         >
           Gestionar plantilles →
         </Link>
@@ -19,10 +19,10 @@ export default async function BookingQuestionnaireSection({ bookingId }: { booki
 
       {!data ? (
         <div className="ap-card p-4">
-          <p className="text-sm text-white/50">Cap plantilla de qüestionari activa.</p>
+          <p className="bd-questionnaire-empty">Cap plantilla de qüestionari activa.</p>
           <Link
             href="/admin/questionnaires/new"
-            className="mt-2 inline-block admin-tone-text-cyan hover:underline text-xs"
+            className="bd-questionnaire-create-link"
           >
             Crear primera plantilla
           </Link>
@@ -33,10 +33,10 @@ export default async function BookingQuestionnaireSection({ bookingId }: { booki
             <span className="inline-block w-2 h-2 rounded-full admin-tone-bg-warning shrink-0" />
             <p className="text-sm font-medium">Pendent de resposta</p>
           </div>
-          <p className="text-xs text-white/50">
-            Plantilla activa: <span className="text-white/70">{data.template.title}</span>
+          <p className="bd-questionnaire-meta">
+            Plantilla activa: <span className="bd-questionnaire-template-title">{data.template.title}</span>
           </p>
-          <p className="text-xs text-white/40 mt-1">
+          <p className="bd-questionnaire-help">
             El client veurà el qüestionari al seu portal però encara no ha enviat respostes.
           </p>
         </div>
@@ -46,7 +46,7 @@ export default async function BookingQuestionnaireSection({ bookingId }: { booki
             <span className="inline-block w-2 h-2 rounded-full admin-tone-bg-success shrink-0" />
             <p className="text-sm font-medium admin-tone-text-success">Qüestionari completat</p>
             {data.response.submittedAt && (
-              <span className="text-xs text-white/40">
+              <span className="bd-questionnaire-date">
                 {formatDateSimple(data.response.submittedAt)}
               </span>
             )}
@@ -59,8 +59,8 @@ export default async function BookingQuestionnaireSection({ bookingId }: { booki
                 : (answer as string) || '—';
               return (
                 <div key={q.id} className="ap-card p-3">
-                  <dt className="text-xs text-white/40 uppercase tracking-wide">{q.label}</dt>
-                  <dd className="mt-1 text-sm text-white/85">{displayAnswer}</dd>
+                  <dt className="bd-questionnaire-answer-label">{q.label}</dt>
+                  <dd className="bd-questionnaire-answer-value">{displayAnswer}</dd>
                 </div>
               );
             })}

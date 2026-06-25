@@ -33,17 +33,17 @@ El blau/negre residual viu en **components compartits de llista i panells**, no 
 | bookings/page.tsx:393-546 | RESPONSIU | múltiples `text-[10px]`/`text-[9px]` font-px ad-hoc a la taula → tokens | P3 |
 | bookings/BookingPipelineView.tsx:182,267,283 | CANÒNIC | Resolt al #1149: dot inactiu i botons ←/→ passen a `bk-pipeline-dot--inactive` / `bk-pipeline-shift-btn` tokenitzats a `booking-detail.css` | OK |
 | bookings/BookingPipelineView.tsx:154-312 | RESPONSIU | `text-[10px]`/`text-[11px]` repetits → tokens | P3 |
-| bookings/[id]/BookingQuestionnaireSection.tsx:21,25,61 | MONOCAPA+CANÒNIC | `bg-white/[0.02] border-white/10` (10 ocurr.) + `text-cyan-400` enllaç blau | P2 |
-| bookings/[id]/BookingGallery.tsx:179,256,262 | CANÒNIC | `bg-white/10`, `bg-white` (toggles) blanc absolut → token/superfície | P2 |
-| bookings/[id]/DocumentFlowSection.tsx:97 | CANÒNIC | `bg-black/20` (preview de signatura) + `border-emerald-300/30` ad-hoc | P3 |
-| bookings/[id]/GallerySharePanel.tsx:145 | MONOCAPA | `text-white/40 bg-white/[0.03]` (5 ocurr.) ad-hoc → `--t3`/`--panel` | P2 |
-| bookings/[id]/BookingStatusChanger.tsx:89,110 | MONOCAPA | fallback `bg-white/30` en map de dots → token | P3 |
+| bookings/[id]/BookingQuestionnaireSection.tsx:21,25,61 | MONOCAPA+CANÒNIC | Resolt al #1151: textos/enllaços passen de `text-white/*` i `admin-tone-text-cyan` a classes `bd-questionnaire-*` tokenitzades | OK |
+| bookings/[id]/BookingGallery.tsx:179,256,262 | CANÒNIC | Resolt al #1152: skeleton/dropzones/delete passen de `white/*` a `bd-gallery-*` tokenitzat | OK |
+| bookings/[id]/DocumentFlowSection.tsx:97 | CANÒNIC | Obsolet al #1153: el residu cromàtic ja no existeix; queda només `style={{ width: progressWidth }}` dinàmic acceptable | OK |
+| bookings/[id]/GallerySharePanel.tsx:145 | MONOCAPA | Resolt al #1152: icona, botons, URL i label passen de `white/*` a `bd-gallery-share-*` tokenitzat | OK |
+| bookings/[id]/BookingStatusChanger.tsx:89,110 | MONOCAPA | Resolt al #1153: fallback `bg-white/30` passa a `bd__status-dot--fallback`; fletxa sense inline style estàtic | OK |
 | bookings/[id]/BookingChecklist.tsx:115 | RESPONSIU | barra amb `style={{width:pct}}` — dinàmic OK; tone via `${tone.bar}` correcte | OK |
-| bookings/BookingFilters.tsx:104 | RESPONSIU | `style={{width:260}}` px dur → `--o-*`/`%` | P3 |
+| bookings/BookingFilters.tsx:104 | RESPONSIU | Resolt al #1154: wrapper de cerca passa de `style={{width:260}}` a `bk-filter-search` responsiu | OK |
 | bookings/BookingClientEventSection.tsx:114-219 | RESPONSIU | `style={{marginBottom/Top:N}}` px inline (6 ocurr.) → classes `nb__*` | P3 |
 | bookings/BookingTravelDiscountSection.tsx:112,129,143 | RESPONSIU | `style` amb px (`gap:8`,`padding:'10px 14px'`) inline → classes | P3 |
-| leads/[id]/LeadInsightsBanner.tsx:92 | CANÒNIC | `text-cyan-300` blau → `admin-tone-text-cyan` | P2 |
-| leads/[id]/LeadInsightsBanner.tsx | MONOCAPA | colors Tailwind semàntics (3) → tones | P3 |
+| leads/[id]/LeadInsightsBanner.tsx:92 | CANÒNIC | Obsolet al #1153: el fitxer ja no existeix al perímetre viu `app/admin/leads` | OK |
+| leads/[id]/LeadInsightsBanner.tsx | MONOCAPA | Obsolet al #1153: el fitxer ja no existeix al perímetre viu `app/admin/leads` | OK |
 | leads/[id]/LeadDossiersPanel.tsx:52 | CANÒNIC | Obsolet al #1149: el fitxer ja no existeix al perímetre viu `app/admin/leads` | OK |
 | leads/[id]/LeadCustomerLinkPanel.tsx | MONOCAPA | Obsolet al #1149: el fitxer ja no existeix al perímetre viu `app/admin/leads` | OK |
 | leads/[id]/LeadScoreBreakdown.tsx:18 | CANÒNIC | barra + colors Tailwind semàntics (7) → tones; `style={{width:score}}` dinàmic OK | P3 |
@@ -66,11 +66,11 @@ El blau/negre residual viu en **components compartits de llista i panells**, no 
 
 - **P0**: 0 (cap ruta sense auth, cap hex de superfície carbó trencat, cap negre absolut a la fitxa de reserva corregida).
 - **P1**: 0 — `StripePaymentPanel.tsx` resolt al Canvi #1113 i `TimelinePanel.tsx` resolt al Canvi #1116.
-- **P2**: ~3 — superfícies `bg-white/[0.03]` / `border-white/10` ad-hoc, `text-cyan-*` blau i toggles/superfícies `white/*` pendents a questionnaire/gallery/share. Pipeline resolt #1149; entrades antigues de leads obsoletes #1149.
+- **P2**: 0 — pipeline resolt #1149; questionnaire resolt #1151; gallery/share resolts #1152; entrades antigues de leads obsoletes #1149/#1153.
 - **P3**: ~20 — font-px ad-hoc (`text-[10px]`/`text-[11px]`/`text-[9px]`), `style` de marges/amplades px puntuals, `#06b6d4` default del portal, `bg-black/20` previews.
 
 ## Top 3
 
-1. **bookings/[id]/BookingQuestionnaireSection.tsx (P2)** — superfícies `white/*` i enllaç `text-cyan-*` dins qüestionari; baixar a tokens/classes locals.
-2. **bookings/[id]/BookingGallery.tsx + GallerySharePanel.tsx (P2)** — toggles/superfícies amb blanc absolut o `white/*`; baixar a tokens/classes locals.
-3. **leads/[id]/LeadInsightsBanner.tsx (P2)** — blau `text-cyan-300` viu; baixar a tone/token canònic.
+1. **bookings/page.tsx + BookingPipelineView.tsx (P3)** — fonts `text-[10px]`/`text-[11px]`/`text-[9px]` a llista/pipeline; migrar a tokens quan es faci passada responsiva.
+2. **BookingFilters.tsx + new booking sections (P3)** — inline styles de layout (`width`, `gap`, `padding`, marges) pendents de classes locals.
+3. **LeadLostStatusPrompt.tsx (P3)** — `text-white/*` residual petit dins prompt de pèrdua; tokenitzar quan es torni a leads.

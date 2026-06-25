@@ -85,6 +85,10 @@ html.admin-mode .bk-mobile-card--normal:hover {
   border-color: color-mix(in oklab, var(--gold) 36%, var(--line));
   background: color-mix(in oklab, var(--gold) 5%, var(--panel));
 }
+html.admin-mode .bk-filter-search {
+  position: relative;
+  width: min(100%, 16.25rem);
+}
 html.admin-mode .bk-pipeline-dot--inactive {
   background: color-mix(in oklab, var(--t) 15%, transparent);
 }
@@ -106,6 +110,144 @@ html.admin-mode .bk-pipeline-shift-btn:hover:not(:disabled) {
 }
 html.admin-mode .bk-pipeline-shift-btn:disabled {
   cursor: not-allowed;
+}
+
+/* ── Booking questionnaire section ── */
+html.admin-mode .bd-questionnaire-link {
+  font-size: var(--o-text-xs);
+  color: var(--t3);
+  transition: color 140ms ease;
+}
+html.admin-mode .bd-questionnaire-link:hover {
+  color: var(--t2);
+}
+html.admin-mode .bd-questionnaire-empty {
+  color: var(--t3);
+  font-size: var(--o-text-sm);
+}
+html.admin-mode .bd-questionnaire-create-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: var(--gold);
+  font-size: var(--o-text-xs);
+}
+html.admin-mode .bd-questionnaire-create-link:hover {
+  color: var(--t);
+  text-decoration: underline;
+}
+html.admin-mode .bd-questionnaire-meta,
+html.admin-mode .bd-questionnaire-date,
+html.admin-mode .bd-questionnaire-answer-label {
+  color: var(--t3);
+  font-size: var(--o-text-xs);
+}
+html.admin-mode .bd-questionnaire-template-title {
+  color: var(--t2);
+}
+html.admin-mode .bd-questionnaire-help {
+  color: var(--t3);
+  font-size: var(--o-text-xs);
+  margin-top: 0.25rem;
+}
+html.admin-mode .bd-questionnaire-answer-label {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+html.admin-mode .bd-questionnaire-answer-value {
+  color: var(--t);
+  font-size: var(--o-text-sm);
+  margin-top: 0.25rem;
+}
+
+/* ── Booking gallery and share panel ── */
+html.admin-mode .bd-gallery-skeleton-bar {
+  width: 25%;
+  height: 1.5rem;
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--t) 10%, transparent);
+}
+html.admin-mode .bd-gallery-dropzone,
+html.admin-mode .bd-gallery-add-tile {
+  border: 2px dashed color-mix(in oklab, var(--t) 20%, transparent);
+  cursor: pointer;
+  transition: border-color 140ms ease, background-color 140ms ease;
+}
+html.admin-mode .bd-gallery-dropzone:hover,
+html.admin-mode .bd-gallery-add-tile:hover {
+  border-color: color-mix(in oklab, var(--t) 40%, transparent);
+  background: color-mix(in oklab, var(--t) 3%, transparent);
+}
+html.admin-mode .bd-gallery-dropzone {
+  border-radius: var(--o-r-xl);
+  padding: 3rem;
+  text-align: center;
+}
+html.admin-mode .bd-gallery-add-tile {
+  aspect-ratio: 1 / 1;
+  border-radius: var(--o-r-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+html.admin-mode .bd-gallery-add-symbol {
+  color: var(--t3);
+  font-size: var(--o-text-2xl);
+}
+html.admin-mode .bd-gallery-delete-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  min-width: 2rem;
+  min-height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background: var(--o-danger);
+  color: var(--o-admin-light);
+  opacity: 0;
+  padding: 0.375rem;
+  transition: opacity 140ms ease, filter 140ms ease;
+}
+html.admin-mode .group:hover .bd-gallery-delete-btn {
+  opacity: 1;
+}
+html.admin-mode .bd-gallery-delete-btn:hover {
+  filter: brightness(1.08);
+}
+html.admin-mode .bd-gallery-share-icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--t3);
+  flex-shrink: 0;
+}
+html.admin-mode .bd-gallery-share-button {
+  min-height: 2.25rem;
+  border: 1px solid var(--line);
+  border-radius: var(--o-r-lg);
+  padding: 0.375rem 0.75rem;
+  font-size: var(--o-text-xs);
+  font-weight: var(--o-fw-medium);
+  transition: border-color 140ms ease, background-color 140ms ease, opacity 140ms ease;
+}
+html.admin-mode .bd-gallery-share-button:hover:not(:disabled) {
+  border-color: color-mix(in oklab, var(--gold) 35%, var(--line));
+  background: color-mix(in oklab, var(--gold) 5%, transparent);
+}
+html.admin-mode .bd-gallery-share-url {
+  overflow-wrap: anywhere;
+  border-radius: var(--o-r-sm-2);
+  background: var(--panel);
+  color: var(--t3);
+  font-family: var(--mono);
+  font-size: var(--o-text-xs);
+  padding: 0.5rem 0.75rem;
+}
+html.admin-mode .bd-gallery-share-label {
+  display: block;
+  color: var(--t3);
+  font-size: var(--o-text-xs);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -794,12 +936,19 @@ html.admin-mode .bd__status-dot {
   border-radius: 50%;
   flex-shrink: 0;
 }
+html.admin-mode .bd__status-dot--fallback {
+  background: color-mix(in oklab, var(--t) 30%, transparent);
+}
 
 html.admin-mode .bd__status-arrow {
   flex-shrink: 0;
   opacity: 0.6;
   display: flex;
   align-items: center;
+  transition: transform 150ms ease;
+}
+html.admin-mode .bd__status-arrow--open {
+  transform: rotate(180deg);
 }
 
 /* ── Dropdown d'estats ── */

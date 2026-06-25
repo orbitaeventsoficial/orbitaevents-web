@@ -86,9 +86,9 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
         aria-expanded={open}
         className={`bd__status-chip ${conf.bg} ${conf.text} ${conf.border}`}
       >
-        <span className={`bd__status-dot ${STATUS_DOT[currentStatus] ?? 'bg-white/30'}`} />
+        <span className={`bd__status-dot ${STATUS_DOT[currentStatus] ?? 'bd__status-dot--fallback'}`} />
         {conf.label}
-        <svg className="bd__status-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true" style={{ transform: open ? 'rotate(180deg)' : undefined, transition: 'transform 0.15s' }}>
+        <svg className={`bd__status-arrow${open ? ' bd__status-arrow--open' : ''}`} width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
           <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </button>
@@ -107,7 +107,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
                 onClick={() => void handleStatusChange(status)}
                 className={`bd__status-opt${isActive ? ' bd__status-opt--on' : ''}`}
               >
-                <span className={`bd__status-dot ${STATUS_DOT[status] ?? 'bg-white/30'}`} />
+                <span className={`bd__status-dot ${STATUS_DOT[status] ?? 'bd__status-dot--fallback'}`} />
                 {c.label}
                 {isActive && <span className="ml-auto opacity-50 text-xs">actiu</span>}
               </button>

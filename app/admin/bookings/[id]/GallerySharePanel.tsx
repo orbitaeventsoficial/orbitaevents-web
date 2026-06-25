@@ -101,7 +101,7 @@ export default function GallerySharePanel({ bookingId }: Props) {
     <div className="ap-card rounded-xl p-4 space-y-3">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <svg className="w-4 h-4 text-white/40 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <svg className="bd-gallery-share-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
           </svg>
           <span className="text-sm font-medium">Link de galeria compartida</span>
@@ -115,7 +115,7 @@ export default function GallerySharePanel({ bookingId }: Props) {
             type="button"
             onClick={() => setShowPasswordInput((v) => !v)}
             disabled={working}
-            className="rounded-xl border border-white/10 px-3 py-1.5 text-xs font-medium hover:border-white/30 transition-colors disabled:opacity-50 min-h-[36px]"
+            className="bd-gallery-share-button disabled:opacity-50"
           >
             Generar link
           </button>
@@ -125,7 +125,7 @@ export default function GallerySharePanel({ bookingId }: Props) {
               type="button"
               onClick={handleCopy}
               disabled={working}
-              className="rounded-xl border border-white/10 px-3 py-1.5 text-xs font-medium hover:border-white/30 transition-colors disabled:opacity-50 min-h-[36px]"
+              className="bd-gallery-share-button disabled:opacity-50"
             >
               {copied ? 'Copiat!' : 'Copiar'}
             </button>
@@ -142,14 +142,14 @@ export default function GallerySharePanel({ bookingId }: Props) {
       </div>
 
       {info?.token && shareUrl && (
-        <p className="text-xs text-white/40 break-all font-mono bg-[var(--panel)] rounded-lg px-3 py-2">
+        <p className="bd-gallery-share-url">
           {shareUrl}
         </p>
       )}
 
       {showPasswordInput && !info?.token && (
         <div className="space-y-2">
-          <label htmlFor="share-password" className="text-xs text-white/50 block">
+          <label htmlFor="share-password" className="bd-gallery-share-label">
             Contrasenya (opcional)
           </label>
           <div className="flex gap-2">
