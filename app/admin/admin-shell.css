@@ -599,7 +599,7 @@ html.admin-mode .ap-sticky-header {
 html.admin-mode .ap-detail-bar {
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
@@ -611,6 +611,7 @@ html.admin-mode .ap-detail-bar {
 html.admin-mode .ap-detail-bar-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   height: 32px;
   padding: 0 13px;
@@ -623,6 +624,7 @@ html.admin-mode .ap-detail-bar-btn {
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
+  max-width: 100%;
   transition: background 0.12s, color 0.12s, border-color 0.12s;
 }
 html.admin-mode .ap-detail-bar-btn:hover {
@@ -649,7 +651,10 @@ html.admin-mode .ap-detail-bar-actions {
   flex-direction: row;
   align-items: center;
   gap: 6px;
-  flex-shrink: 0;
+  flex: 0 1 auto;
+  min-width: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 html.admin-mode .ap-detail-hero {
@@ -678,6 +683,7 @@ html.admin-mode .ap-detail-title {
   letter-spacing: -0.018em;
   line-height: 1;
   color: var(--t);
+  overflow-wrap: anywhere;
 }
 
 html.admin-mode .ap-detail-meta {
@@ -697,6 +703,52 @@ html.admin-mode .ap-detail-stats {
 }
 @media (max-width: 900px) {
   html.admin-mode .ap-detail-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+  html.admin-mode .ap-detail-bar {
+    align-items: stretch;
+    padding-inline: 0.875rem;
+  }
+
+  html.admin-mode .ap-detail-bar > *,
+  html.admin-mode .ap-detail-bar-actions {
+    width: 100%;
+  }
+
+  html.admin-mode .ap-detail-bar-actions {
+    justify-content: flex-start;
+  }
+
+  html.admin-mode .ap-detail-bar-btn,
+  html.admin-mode .ap-detail-bar-actions > * {
+    flex: 1 1 min(100%, 9rem);
+  }
+
+  html.admin-mode .ap-detail-hero {
+    padding-inline: 0.875rem;
+  }
+
+  html.admin-mode .ap-detail-title {
+    font-size: var(--o-text-xl);
+    line-height: 1.08;
+  }
+
+  html.admin-mode .ap-detail-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html.admin-mode .ap-detail-stats-cell {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding-inline: 0.875rem;
+  }
+
+  html.admin-mode .ap-detail-stats-label {
+    max-width: 100%;
+    white-space: normal;
+  }
 }
 
 /* Cel·la: label + valor en la mateixa línia (baseline) */

@@ -9,6 +9,14 @@ export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
 
+  if (process.env.ADMIN_AI_ENABLED !== '1') {
+    return NextResponse.json({
+      explanation: '',
+      actions: [],
+      generatedAt: new Date().toISOString(),
+    });
+  }
+
   const report = await loadNextBestActions();
   const top5 = report.actions.slice(0, 5);
   const { explanation, generatedAt } = await generateNBAExplanation(top5);

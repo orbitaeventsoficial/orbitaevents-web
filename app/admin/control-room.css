@@ -1285,31 +1285,6 @@ html.admin-mode .admin-customer-summary .admin-customer-card--quick a {
   }
 }
 
-html.admin-mode .admin-booking-page .ap-header {
-  position: relative;
-  overflow: hidden;
-  border-radius: 1.5rem;
-  border: 1px solid color-mix(in oklab, var(--at-info) 16%, var(--at-border) 84%);
-  background:
-    radial-gradient(circle at 10% 8%, color-mix(in oklab, var(--at-info) 18%, transparent 82%), transparent 32%),
-    radial-gradient(circle at 92% 10%, color-mix(in oklab, var(--at-brand-vivid) 14%, transparent 86%), transparent 28%),
-    linear-gradient(180deg, color-mix(in oklab, var(--at-surface) 82%, white 8%), color-mix(in oklab, var(--at-panel) 92%, black 8%));
-  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.18);
-}
-
-html.admin-mode .admin-booking-page .ap-header::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.05) 44%, transparent 100%);
-}
-
-html.admin-mode .admin-booking-page .ap-header > * {
-  position: relative;
-  z-index: 1;
-}
-
 html.admin-mode .admin-booking-executive {
   margin-top: 0.35rem;
 }
@@ -1402,34 +1377,6 @@ html.admin-mode .admin-booking-travel-editor {
     width: 100%;
     align-items: flex-start;
   }
-}
-
-html.admin-mode .admin-leads-page .ap-header,
-html.admin-mode .admin-lead-detail-page .ap-header {
-  position: relative;
-  overflow: hidden;
-  border-radius: 1.5rem;
-  border: 1px solid color-mix(in oklab, var(--at-brand-vivid) 16%, var(--at-border) 84%);
-  background:
-    radial-gradient(circle at 8% 10%, color-mix(in oklab, var(--at-brand-vivid) 18%, transparent 82%), transparent 30%),
-    radial-gradient(circle at 90% 12%, color-mix(in oklab, var(--at-info) 14%, transparent 86%), transparent 28%),
-    linear-gradient(180deg, color-mix(in oklab, var(--at-surface) 80%, white 10%), color-mix(in oklab, var(--at-panel) 92%, black 8%));
-  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.18);
-}
-
-html.admin-mode .admin-leads-page .ap-header::before,
-html.admin-mode .admin-lead-detail-page .ap-header::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.05) 42%, transparent 100%);
-}
-
-html.admin-mode .admin-leads-page .ap-header > *,
-html.admin-mode .admin-lead-detail-page .ap-header > * {
-  position: relative;
-  z-index: 1;
 }
 
 html.admin-mode .admin-leads-switcher,
