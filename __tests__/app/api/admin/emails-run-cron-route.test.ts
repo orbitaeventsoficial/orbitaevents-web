@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockListPending, mockSendEmail, mockSaveCronRunStatus } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockListPending, mockSendEmail, mockSaveCronRunStatus } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockListPending: vi.fn(),
   mockSendEmail: vi.fn(),
   mockSaveCronRunStatus: vi.fn(),
@@ -16,12 +17,14 @@ vi.mock('@/lib/services/postEventDispatchService', () => ({
 vi.mock('@/lib/services/cronRunStatusService', () => ({ saveCronRunStatus: mockSaveCronRunStatus }));
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn() } }));
 
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
+
 import { POST } from '@/app/api/admin/emails/run-cron/route';
 
 describe('POST /api/admin/emails/run-cron', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockListPending.mockResolvedValue([
       { id: 'b1', clientName: 'Anna', clientEmail: 'anna@test.cat' },
     ]);

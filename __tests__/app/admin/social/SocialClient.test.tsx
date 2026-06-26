@@ -58,7 +58,6 @@ describe('SocialClient', () => {
     expect(screen.getByText('Repetir el format que porta leads i revisar conversió guanyada')).toBeInTheDocument();
     expect(screen.getByText('9 leads Instagram · 2 guanyats')).toBeInTheDocument();
     expect(screen.getByText('2 guanyats · 22% conversió')).toBeInTheDocument();
-    expect(screen.getByText(/3 publicades en 30 dies · consistència 67% · Instagram: 9 leads, 2 guanyats/)).toBeInTheDocument();
   });
 
   it('eleva el següent pas quan el calendari social esta aturat', () => {
@@ -74,8 +73,9 @@ describe('SocialClient', () => {
 
     expect(screen.getByText('Aturat')).toBeInTheDocument();
     expect(screen.getByText('Cap publicació publicada en els últims 30 dies.')).toBeInTheDocument();
-    expect(screen.getByText('Publicar una peça real abans de generar més idees')).toBeInTheDocument();
-    expect(screen.getByText(/Instagram sense leads atribuïts/)).toBeInTheDocument();
+    // Operating loop viu (l'antic panell OwnerControlStrip va ser eradicat al #976 → null)
     expect(screen.getByText('Calendari sense pols públic')).toBeInTheDocument();
+    expect(screen.getByText('Publicar una peça real i mesurar si genera conversa comercial')).toBeInTheDocument();
+    expect(screen.getByText('Instagram encara sense pipeline atribuït')).toBeInTheDocument();
   });
 });

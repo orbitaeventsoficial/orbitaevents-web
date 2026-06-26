@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockSendBulkComposeSegment } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockSendBulkComposeSegment } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockSendBulkComposeSegment: vi.fn(),
 }));
 
@@ -12,12 +13,14 @@ vi.mock('@/lib/services/bulkComposeSegmentService', () => ({
   sendBulkComposeSegment: mockSendBulkComposeSegment,
 }));
 
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
+
 import { POST } from '@/app/api/admin/emails/send-bulk/route';
 
 describe('POST /api/admin/emails/send-bulk', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockSendBulkComposeSegment.mockResolvedValue({
       ok: true,
       segmentKey: 'customers-weddings-2025',

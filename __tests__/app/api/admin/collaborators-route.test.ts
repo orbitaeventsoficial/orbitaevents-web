@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockList, mockCreate, mockGet, mockUpdate, mockDelete } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockList, mockCreate, mockGet, mockUpdate, mockDelete } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockList: vi.fn(),
   mockCreate: vi.fn(),
   mockGet: vi.fn(),
@@ -20,11 +21,13 @@ vi.mock('@/lib/services/collaboratorAdminService', () => ({
 }));
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn(), warn: vi.fn() } }));
 
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
+
 import { GET as ListGET, POST } from '@/app/api/admin/collaborators/route';
 import { GET as DetailGET, PATCH, DELETE } from '@/app/api/admin/collaborators/[id]/route';
 
 describe('GET /api/admin/collaborators (list)', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockList.mockResolvedValue([{ id: 'col-1', name: 'DJ Max' }]); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockList.mockResolvedValue([{ id: 'col-1', name: 'DJ Max' }]); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));
@@ -45,7 +48,7 @@ describe('GET /api/admin/collaborators (list)', () => {
 });
 
 describe('POST /api/admin/collaborators', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockCreate.mockResolvedValue({ status: 201, body: { id: 'col-2' } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockCreate.mockResolvedValue({ status: 201, body: { id: 'col-2' } }); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));
@@ -68,7 +71,7 @@ describe('POST /api/admin/collaborators', () => {
 });
 
 describe('GET /api/admin/collaborators/[id]', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockGet.mockResolvedValue({ status: 200, body: { id: 'col-1', name: 'DJ Max' } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockGet.mockResolvedValue({ status: 200, body: { id: 'col-1', name: 'DJ Max' } }); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));
@@ -93,7 +96,7 @@ describe('GET /api/admin/collaborators/[id]', () => {
 });
 
 describe('PATCH /api/admin/collaborators/[id]', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockUpdate.mockResolvedValue({ status: 200, body: { ok: true } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockUpdate.mockResolvedValue({ status: 200, body: { ok: true } }); });
 
   it('actualitza correctament', async () => {
     const req = new NextRequest('http://localhost/api/admin/collaborators/col-1', { method: 'PATCH', body: JSON.stringify({ name: 'Nou nom' }), headers: { 'Content-Type': 'application/json' } });
@@ -110,7 +113,7 @@ describe('PATCH /api/admin/collaborators/[id]', () => {
 });
 
 describe('DELETE /api/admin/collaborators/[id]', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockDelete.mockResolvedValue({ status: 200, body: { ok: true } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockDelete.mockResolvedValue({ status: 200, body: { ok: true } }); });
 
   it('elimina correctament', async () => {
     const req = new NextRequest('http://localhost/api/admin/collaborators/col-1', { method: 'DELETE' });

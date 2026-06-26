@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockRequirePermission, mockGetBookingDetail, mockUpdateBooking, mockDeleteBooking, mockDispatchAutoTrigger } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockRequirePermission, mockGetBookingDetail, mockUpdateBooking, mockDeleteBooking, mockDispatchAutoTrigger } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockRequirePermission: vi.fn(),
   mockGetBookingDetail: vi.fn(),
   mockUpdateBooking: vi.fn(),
@@ -28,6 +29,8 @@ vi.mock('@/lib/logger', () => ({
 vi.mock('@/lib/request-context', () => ({
   getRequestId: () => 'test-req-id',
 }));
+
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 
 import { GET, PATCH, DELETE } from '@/app/api/admin/bookings/[id]/route';
 
@@ -73,7 +76,7 @@ const sampleBooking = {
 describe('GET /api/admin/bookings/[id]', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockRequirePermission.mockReturnValue(null);
     mockGetBookingDetail.mockResolvedValue({ status: 200, body: { booking: sampleBooking } });
   });
@@ -133,7 +136,7 @@ describe('GET /api/admin/bookings/[id]', () => {
 describe('PATCH /api/admin/bookings/[id]', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockRequirePermission.mockReturnValue(null);
     mockUpdateBooking.mockResolvedValue({
       status: 200,
@@ -204,7 +207,7 @@ describe('PATCH /api/admin/bookings/[id]', () => {
 describe('DELETE /api/admin/bookings/[id]', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockRequirePermission.mockReturnValue(null);
     mockGetBookingDetail.mockResolvedValue({
       status: 200,

@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockGetDetail, mockUpdate, mockDelete } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockGetDetail, mockUpdate, mockDelete } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockGetDetail: vi.fn(),
   mockUpdate: vi.fn(),
   mockDelete: vi.fn(),
@@ -16,12 +17,14 @@ vi.mock('@/lib/services/inventoryAdminService', () => ({
 }));
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn() } }));
 
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
+
 import { GET, PATCH, DELETE } from '@/app/api/admin/inventory/[id]/route';
 
 const ctx = { params: { id: 'i1' } };
 
 describe('GET /api/admin/inventory/[id]', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockGetDetail.mockResolvedValue({ status: 200, body: { id: 'i1' } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockGetDetail.mockResolvedValue({ status: 200, body: { id: 'i1' } }); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response('{}', { status: 401 }));
@@ -45,7 +48,7 @@ describe('GET /api/admin/inventory/[id]', () => {
 });
 
 describe('PATCH /api/admin/inventory/[id]', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockUpdate.mockResolvedValue({ status: 200, body: { ok: true } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockUpdate.mockResolvedValue({ status: 200, body: { ok: true } }); });
 
   it('actualitza element', async () => {
     const req = new NextRequest('http://localhost/x', { method: 'PATCH', body: JSON.stringify({ name: 'Nou' }), headers: { 'Content-Type': 'application/json' } });
@@ -61,7 +64,7 @@ describe('PATCH /api/admin/inventory/[id]', () => {
 });
 
 describe('DELETE /api/admin/inventory/[id]', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockDelete.mockResolvedValue({ status: 200, body: { ok: true } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockDelete.mockResolvedValue({ status: 200, body: { ok: true } }); });
 
   it('elimina element', async () => {
     expect((await DELETE(new NextRequest('http://localhost/x', { method: 'DELETE' }), ctx)).status).toBe(200);

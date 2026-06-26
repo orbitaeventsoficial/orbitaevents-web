@@ -3,6 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 vi.mock('@/app/config/site-config', () => ({
   SITE_CONFIG: {
     business: {
+      phone: '+34654467087',
       phoneDisplay: '654 46 70 87',
       email: 'info@orbitaevents.com',
     },

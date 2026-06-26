@@ -123,8 +123,7 @@ describe('MarketingPage', () => {
 
     expect(screen.getByRole('heading', { name: 'Marketing Hub' })).toBeInTheDocument();
     expect(screen.getByText('Readiness · PAID_BLOCKED')).toBeInTheDocument();
-    expect(screen.getByText('Paid media bloquejat fins validar captació orgànica')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Obrir pla de captació' })).toHaveAttribute('href', '/admin/manual');
+    // headline + nextStep CTA vivien al panell OwnerControlStrip, eradicat al #976 (ara null)
     expect(screen.getByRole('heading', { name: 'Activar xarxa personal' })).toBeInTheDocument();
     expect(screen.getByText('Google Analytics 4')).toBeInTheDocument();
     expect(screen.getByText('Google Business Profile')).toBeInTheDocument();

@@ -2,12 +2,13 @@ import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const {
-  mockRequireAuth,
+  mockRequireAuth, mockVerifyCsrf,
   mockCreateAdminLead,
   mockPreviewLeadCustomerLink,
   mockLinkLeadToCustomer,
 } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockCreateAdminLead: vi.fn(),
   mockPreviewLeadCustomerLink: vi.fn(),
   mockLinkLeadToCustomer: vi.fn(),
@@ -24,6 +25,8 @@ vi.mock('@/lib/services/leads/leadCustomerLinkService', () => ({
   linkLeadToCustomer: mockLinkLeadToCustomer,
 }));
 
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
+
 import { POST } from '@/app/api/admin/leads/route';
 
 function makeRequest(body: Record<string, unknown>) {
@@ -36,7 +39,7 @@ function makeRequest(body: Record<string, unknown>) {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockRequireAuth.mockReturnValue(null);
+  mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
   mockCreateAdminLead.mockResolvedValue({
     ok: true,
     lead: {

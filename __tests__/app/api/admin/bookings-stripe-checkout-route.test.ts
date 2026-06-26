@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockRequirePermission, mockPrisma, mockCreateStripeCheckoutSession } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockRequirePermission, mockPrisma, mockCreateStripeCheckoutSession } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockRequirePermission: vi.fn(),
   mockPrisma: {
     booking: {
@@ -27,6 +28,8 @@ vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/services/stripeService', () => ({
   createStripeCheckoutSession: mockCreateStripeCheckoutSession,
 }));
+
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 
 import { POST } from '@/app/api/admin/bookings/[id]/stripe-checkout/route';
 
@@ -55,7 +58,7 @@ describe('POST /api/admin/bookings/[id]/stripe-checkout', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.STRIPE_SECRET_KEY = 'sk_test_mock';
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockRequirePermission.mockReturnValue(null);
     mockPrisma.booking.findUnique.mockResolvedValue(booking);
     mockPrisma.booking.update.mockResolvedValue({});

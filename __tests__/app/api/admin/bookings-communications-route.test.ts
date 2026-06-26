@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockRequirePermission, mockParseBody, mockExecute } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockRequirePermission, mockParseBody, mockExecute } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockRequirePermission: vi.fn(),
   mockParseBody: vi.fn(),
   mockExecute: vi.fn(),
@@ -14,6 +15,8 @@ vi.mock('@/lib/services/bookingCommunicationService', () => ({
   executeBookingCommunication: mockExecute,
 }));
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn(), warn: vi.fn() } }));
+
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 
 import { POST } from '@/app/api/admin/bookings/[id]/communications/route';
 
@@ -29,7 +32,7 @@ function makePostReq(id: string, body: Record<string, unknown>) {
 describe('POST /api/admin/bookings/[id]/communications', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockRequirePermission.mockReturnValue(null);
     mockParseBody.mockReturnValue({ type: 'email', to: 'test@mail.com' });
     mockExecute.mockResolvedValue({ status: 200, body: { ok: true } });

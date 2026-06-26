@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockGetView, mockAssign, mockUpdate, mockRemove } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockGetView, mockAssign, mockUpdate, mockRemove } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockGetView: vi.fn(),
   mockAssign: vi.fn(),
   mockUpdate: vi.fn(),
@@ -17,6 +18,8 @@ vi.mock('@/lib/services/bookingInventoryService', () => ({
   removeBookingInventoryAssignment: mockRemove,
 }));
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn(), warn: vi.fn() } }));
+
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 
 import { GET, POST, PATCH, DELETE } from '@/app/api/admin/bookings/[id]/inventory/route';
 
@@ -44,7 +47,7 @@ function makeDeleteReq(assignmentId?: string) {
 }
 
 describe('GET /api/admin/bookings/[id]/inventory', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockGetView.mockResolvedValue({ status: 200, body: { items: [] } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockGetView.mockResolvedValue({ status: 200, body: { items: [] } }); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));
@@ -71,7 +74,7 @@ describe('GET /api/admin/bookings/[id]/inventory', () => {
 });
 
 describe('POST /api/admin/bookings/[id]/inventory', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockAssign.mockResolvedValue({ status: 200, body: { ok: true } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockAssign.mockResolvedValue({ status: 200, body: { ok: true } }); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));
@@ -94,7 +97,7 @@ describe('POST /api/admin/bookings/[id]/inventory', () => {
 });
 
 describe('PATCH /api/admin/bookings/[id]/inventory', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockUpdate.mockResolvedValue({ status: 200, body: { ok: true } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockUpdate.mockResolvedValue({ status: 200, body: { ok: true } }); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));
@@ -114,7 +117,7 @@ describe('PATCH /api/admin/bookings/[id]/inventory', () => {
 });
 
 describe('DELETE /api/admin/bookings/[id]/inventory', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockRemove.mockResolvedValue({ status: 200, body: { ok: true } }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockRemove.mockResolvedValue({ status: 200, body: { ok: true } }); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));

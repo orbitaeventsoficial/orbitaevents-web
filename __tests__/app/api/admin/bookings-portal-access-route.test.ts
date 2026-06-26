@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockRequireAuth, mockRequirePermission, mockGetAdminRole, mockGetActive, mockIssue, mockNormalizeLocale, mockRevoke } = vi.hoisted(() => ({
+const { mockRequireAuth, mockVerifyCsrf, mockRequirePermission, mockGetAdminRole, mockGetActive, mockIssue, mockNormalizeLocale, mockRevoke } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
+  mockVerifyCsrf: vi.fn(),
   mockRequirePermission: vi.fn(),
   mockGetAdminRole: vi.fn(),
   mockGetActive: vi.fn(),
@@ -19,6 +20,8 @@ vi.mock('@/lib/services/clientPortalAccess', () => ({
   revokeActiveClientPortalAccess: mockRevoke,
 }));
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn(), warn: vi.fn() } }));
+
+vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
 
 import { GET, POST, DELETE } from '@/app/api/admin/bookings/[id]/portal-access/route';
 
@@ -38,7 +41,7 @@ function makeDeleteReq(id = 'book-1') {
 }
 
 describe('GET /api/admin/bookings/[id]/portal-access', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockRequirePermission.mockReturnValue(null); mockGetActive.mockResolvedValue({ id: 'pa-1', active: true }); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockRequirePermission.mockReturnValue(null); mockGetActive.mockResolvedValue({ id: 'pa-1', active: true }); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));
@@ -68,7 +71,7 @@ describe('GET /api/admin/bookings/[id]/portal-access', () => {
 describe('POST /api/admin/bookings/[id]/portal-access', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRequireAuth.mockReturnValue(null);
+    mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null);
     mockRequirePermission.mockReturnValue(null);
     mockGetAdminRole.mockReturnValue('ADMIN');
     mockNormalizeLocale.mockReturnValue('ca');
@@ -104,7 +107,7 @@ describe('POST /api/admin/bookings/[id]/portal-access', () => {
 });
 
 describe('DELETE /api/admin/bookings/[id]/portal-access', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockRequirePermission.mockReturnValue(null); mockRevoke.mockResolvedValue(1); });
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockVerifyCsrf.mockReturnValue(null); mockRequirePermission.mockReturnValue(null); mockRevoke.mockResolvedValue(1); });
 
   it('rebutja sense auth', async () => {
     mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));
