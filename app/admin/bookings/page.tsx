@@ -5,11 +5,8 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
-import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { Prisma } from '@prisma/client';
-import { AdminPage } from '../components/AdminPage';
-import { AdminHelpPanel } from '../components/AdminHelpPanel';
 import BookingActions from './BookingActions';
 import BookingFilters from './BookingFilters';
 import { BOOKING_OVERVIEW_STATUS_CARDS, formatDate, formatDateShort, formatCurrency, getBookingStatusDisplay, getEventLabel } from '@/lib/constants';
@@ -21,7 +18,6 @@ import ExportCsvButton from '../components/ExportCsvButton';
 import dynamicImport from 'next/dynamic';
 import { ADMIN_BOOKING_PAYMENT_FILTER_OPTIONS } from '@/lib/constants/admin';
 import { buildCustomerBookingListHref, buildCustomerWorkspaceTabHref, buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 
 const BookingPipelineViewWrapper = dynamicImport(
   () => import('./BookingPipelineView'),
@@ -246,55 +242,6 @@ export default async function BookingsPage({
   const totalRevenue = stats.reduce((sum, s) => sum + (s._sum.total || 0), 0);
   const paymentFilterLabel = getPaymentFilterLabel(paymentFilter);
   const now = new Date();
-  const nextWeek = addDays(now, 7);
-  const pendingPaymentCount = bookings.filter((booking) => !booking.depositPaid || !booking.remainingPaid).length;
-  const overduePaymentCount = bookings.filter((booking) => {
-    if (booking.status === 'CANCELLED' || booking.status === 'COMPLETED') return false;
-    const eventDate = new Date(booking.eventDate);
-    return (!booking.depositPaid && eventDate < addDays(now, 30)) || (!booking.remainingPaid && eventDate < addDays(now, 7));
-  }).length;
-  const upcomingExecutionCount = bookings.filter((booking) => {
-    if (booking.status === 'CANCELLED' || booking.status === 'COMPLETED') return false;
-    const eventDate = new Date(booking.eventDate);
-    return eventDate >= now && eventDate <= nextWeek;
-  }).length;
-  const preparingCount = statsMap.PREPARING?.count || 0;
-  const automaticSignals = [
-    customerId ? 'Llista contextual del client activa' : null,
-    paymentFilterLabel ? `Focus automàtic: ${paymentFilterLabel}` : null,
-    upcomingExecutionCount > 0 ? `${upcomingExecutionCount} reserva${upcomingExecutionCount > 1 ? 'es' : ''} dins dels pròxims 7 dies` : null,
-    preparingCount > 0 ? `${preparingCount} reserva${preparingCount > 1 ? 'es' : ''} en preparació` : null,
-  ].filter(Boolean) as string[];
-  const manualSignals = [
-    overduePaymentCount > 0 ? `${overduePaymentCount} cobrament${overduePaymentCount > 1 ? 's' : ''} en risc o vençut${overduePaymentCount > 1 ? 's' : ''}` : null,
-    pendingPaymentCount > 0 ? `${pendingPaymentCount} reserva${pendingPaymentCount > 1 ? 'es' : ''} amb cobrament pendent` : null,
-    statsMap.PENDING?.count ? `${statsMap.PENDING.count} reserva${statsMap.PENDING.count > 1 ? 'es' : ''} pendents de confirmar` : null,
-  ].filter(Boolean) as string[];
-  const nextStepHref = overduePaymentCount > 0
-    ? customerId
-      ? buildCustomerBookingListHref(customerId, { payment: 'overdue' })
-      : '/admin/bookings?payment=overdue'
-    : upcomingExecutionCount > 0
-      ? customerId
-        ? buildCustomerBookingListHref(customerId, { status: 'PREPARING' })
-        : '/admin/bookings?status=PREPARING'
-      : customerId
-        ? buildCustomerWorkspaceTabHref(customerId, 'bookings')
-        : '/admin/bookings/new';
-  const nextStepLabel = overduePaymentCount > 0
-    ? 'Revisar cobraments en risc'
-    : upcomingExecutionCount > 0
-      ? 'Preparar reserves imminents'
-      : customerId
-        ? 'Obrir workspace del client'
-        : 'Crear reserva nova';
-  const nextStepDetail = overduePaymentCount > 0
-    ? 'La prioritat és tancar imports que poden afectar execució o caixa.'
-    : upcomingExecutionCount > 0
-      ? 'Hi ha execució pròxima i convé revisar checklist, timings i estat.'
-      : customerId
-        ? 'No hi ha tensió clara ara mateix, però el context del client continua actiu.'
-        : 'No hi ha senyal calent a la llista actual.';
 
   return (
     <div className="bd__root">

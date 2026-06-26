@@ -1,6 +1,5 @@
 ﻿import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { calculateCostPerHour } from '@/lib/inventory-utils';
 import { computePackPricingHealth, getPackPricingModelConfig } from '@/lib/services/packPricingHealth';
 import { prisma } from '@/lib/prisma';
@@ -174,7 +173,6 @@ export default async function CatalogPage({
 
   const packsWithoutInventory = sortedRows.filter((row) => row.inventory.length === 0).length;
   const highDivergenceCount = sortedRows.filter((row) => Math.abs(row.divergencePct) >= 20).length;
-  const topCriticalPack = sortedRows.find((row) => row.semaforo.tone === 'red');
 
   const stripSystemItems: string[] = [];
   if (sortedRows.length > 0) {
@@ -228,60 +226,6 @@ export default async function CatalogPage({
         ? 'info'
         : 'success';
 
-  const stripNextStep = !pricingConfig
-    ? {
-        eyebrow: 'Següent pas · Configuració',
-        title: 'Configurar model de preus',
-        detail:
-          'Sense `getPackPricingModelConfig` no es pot avaluar salut de packs. Configura el model abans de continuar amb catàleg.',
-        href: '/admin/pricing',
-        ctaLabel: 'Obrir preus',
-      }
-    : sortedRows.length === 0
-      ? {
-          eyebrow: 'Següent pas · Primer pack',
-          title: 'Crear el primer pack actiu',
-          detail:
-            'El catàleg no té cap pack actiu. Crea el primer per poder oferir packs al web i començar a rebre reserves.',
-          href: '/admin/packs/new',
-          ctaLabel: 'Crear pack',
-        }
-      : redCount > 0
-        ? {
-            eyebrow: 'Següent pas · Crític',
-            title: `Resol ${redCount} ${pluralize(redCount, 'pack crític', 'packs crítics')}`,
-            detail: topCriticalPack
-              ? `"${topCriticalPack.name}" té ${formatPct(topCriticalPack.marginPct)} marge (objectiu ${formatPct(targetMarginPct)}). Puja preu o redueix costos abans de vendre'l més.`
-              : 'Hi ha packs amb marge sota llindar crític. Puja preu o redueix costos abans de vendre més.',
-            href: '/admin/packs?focus=critical-margin',
-            ctaLabel: 'Obrir packs crítics',
-            secondaryAction: { href: '/admin/pricing', label: 'Gestor de preus' },
-          }
-        : packsWithoutInventory > 0
-          ? {
-              eyebrow: 'Següent pas · Inventari',
-              title: `${packsWithoutInventory} ${pluralize(packsWithoutInventory, 'pack', 'packs')} sense components`,
-              detail:
-                'Sense inventari associat, el cost directe no inclou equipament real. Vincula elements d\'inventari per obtenir salut de preu fiable.',
-              href: '/admin/packs?focus=without-inventory',
-              ctaLabel: 'Obrir packs sense inventari',
-            }
-          : avgMargin < targetMarginPct
-            ? {
-                eyebrow: 'Següent pas · Marge',
-                title: 'Marge mitjà per sota d\'objectiu',
-                detail: `El marge mitjà és ${formatPct(avgMargin)} quan l'objectiu és ${formatPct(targetMarginPct)}. Revisa el gestor de preus per acostar-te al target.`,
-                href: '/admin/pricing',
-                ctaLabel: 'Obrir gestor de preus',
-              }
-            : {
-                eyebrow: 'Següent pas',
-                title: 'Catàleg saludable',
-                detail: `${greenCount} packs sans · marge mitjà ${formatPct(avgMargin)}. Aprofita per crear un pack nou o revisar rendibilitat.`,
-                href: '/admin/packs/new',
-                ctaLabel: 'Crear pack nou',
-                secondaryAction: { href: '/admin/economia', label: 'Revisar rendibilitat' },
-              };
 
   return (
     <AdminPage
@@ -293,32 +237,6 @@ export default async function CatalogPage({
         </p>
       ) : undefined}
     >
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic · Catàleg',
-          title:
-            sortedRows.length === 0
-              ? 'Sense packs actius'
-              : redCount > 0
-                ? 'Salut del catàleg amb risc'
-                : 'Salut del catàleg',
-          tone: stripSystemTone,
-          items: stripSystemItems,
-          emptyText: 'Sense packs al catàleg.',
-        }}
-        manual={{
-          eyebrow: 'Manual · Backlog',
-          title:
-            stripManualItems.length === 0
-              ? 'Cap senyal manual'
-              : `${stripManualItems.length} ${pluralize(stripManualItems.length, 'senyal per revisar', 'senyals per revisar')}`,
-          tone: stripManualTone,
-          items: stripManualItems,
-          emptyText: 'Cap pack crític, sense inventari ni amb desviació alta.',
-        }}
-        nextStep={stripNextStep}
-      />
-
       <nav className="flex flex-wrap gap-2">
         {(Object.keys(CATALOG_TAB_META) as CatalogTab[]).map((tab) => {
           const isActive = tab === activeTab;

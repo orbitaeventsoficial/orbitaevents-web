@@ -718,7 +718,6 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
         // que alimenta buildPipelineForecast al dashboard) dels leads encara oberts.
         const openForecast = effectiveLeads.reduce((s, l) => s + weightedLeadValue(l), 0);
         const activeCount = effectiveLeads.filter((l) => l.stage !== 'perdut').length;
-        const wonCount    = effectiveLeads.filter((l) => l.stage === 'guanyat').length;
         return (
           <div className="fx__metrics" aria-label="Resum comercial">
             <div className="fx__metric">

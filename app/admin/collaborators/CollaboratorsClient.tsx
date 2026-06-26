@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_COLLABORATOR_EMPTY_FORM, COLLABORATOR_ROLE_OPTIONS } from '@/lib/constants/admin';
 import { useToast } from '../components/ToastProvider';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import CollaboratorProductsPanel, { type CollaboratorProduct } from './CollaboratorProductsPanel';
 
@@ -203,77 +202,9 @@ export default function CollaboratorsClient() {
     return <div className="py-8 text-center admin-tone-text-neutral">Carregant...</div>;
   }
 
-  const inactiveCount = collaborators.filter((collaborator) => !collaborator.isActive).length;
-  const collaboratorsWithBookings = collaborators.filter((collaborator) => collaborator.bookings.length > 0).length;
-  const nextStepTitle = collaborators.length === 0
-    ? 'Crear el primer col·laborador'
-    : showForm
-      ? editingId
-        ? 'Tancar o desar l’edició activa'
-        : 'Completar l’alta abans d’obrir més fronts'
-      : (kpis?.pendingCommissions || 0) > 0
-        ? 'Revisar primer les comissions pendents'
-        : 'Mantenir la xarxa activa i neta';
-  const nextStepDetail = collaborators.length === 0
-    ? 'Sense col·laboradors actius no hi ha canal de revenda ni comissions per governar.'
-    : showForm
-      ? 'Ara mateix hi ha una sessió d’edició oberta i convé tancar-la amb criteri abans de seguir remenant el catàleg.'
-      : (kpis?.pendingCommissions || 0) > 0
-        ? 'El retorn més alt ara no és afegir més col·laboradors, sinó regularitzar les comissions que continuen pendents.'
-        : 'Amb la xarxa estable, el següent pas bo és revisar activitat, reserves i si cal ampliar la cartera activa.';
 
   return (
     <div className="space-y-6">
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què veu el sistema a la xarxa de col·laboradors',
-          tone: collaborators.length > 0 ? 'info' : 'warning',
-          items: [
-            kpis
-              ? `${kpis.total} col·laboradors totals, ${kpis.active} actius i ${kpis.totalBookings} reserves associades.`
-              : 'Encara no hi ha KPI carregat per al canal de col·laboradors.',
-            kpis
-              ? `${kpis.totalRevenue}€ facturats via col·laboradors i ${kpis.totalCommissions}€ de comissions totals.`
-              : 'Sense dades econòmiques visibles ara mateix.',
-            collaboratorsWithBookings > 0
-              ? `${collaboratorsWithBookings} col·laboradors ja tenen reserves vinculades.`
-              : 'Cap col·laborador té reserves vinculades encara.',
-            kpis
-              ? `${kpis.totalSourcedLeads + kpis.totalSourcedBookings} bolos tenen partner d'origen assignat.`
-              : "Encara no hi ha lectura d'origen comercial.",
-          ],
-          emptyText: 'Sense col·laboradors no hi ha lectura automàtica del canal.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'On et cal intervenir',
-          tone: showForm || inactiveCount > 0 || (kpis?.pendingCommissions || 0) > 0 ? 'warning' : 'success',
-          items: [
-            showForm
-              ? editingId
-                ? 'Hi ha una edició oberta d’un col·laborador existent.'
-                : 'Hi ha un alta nova oberta pendent de tancar o desar.'
-              : 'No hi ha cap formulari obert ara mateix.',
-            inactiveCount > 0
-              ? `${inactiveCount} col·laboradors estan inactius i convé revisar si cal reactivar-los o netejar-los.`
-              : 'Tota la xarxa visible està activa.',
-            (kpis?.pendingCommissions || 0) > 0
-              ? `${kpis?.pendingCommissions || 0}€ continuen pendents de comissió.`
-              : 'No hi ha comissions pendents a primer nivell.',
-          ],
-          emptyText: 'No hi ha coll manual evident a primer nivell.',
-        }}
-        nextStep={{
-          eyebrow: 'Següent pas',
-          title: nextStepTitle,
-          detail: nextStepDetail,
-          href: '/admin/collaborators',
-          ctaLabel: collaborators.length === 0 ? 'Crear partner' : 'Revisar partners',
-          secondaryAction: showForm ? { href: '/admin/collaborators', label: 'Tornar a la llista' } : undefined,
-        }}
-      />
-
       {loadError && (
         <div className="ap-inline-alert ap-inline-alert--danger">
           {loadError}

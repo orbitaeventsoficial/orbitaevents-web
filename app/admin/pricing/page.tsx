@@ -6,7 +6,6 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { formatCurrency, formatDate, formatNumber, INVENTORY_CATEGORY_OPTIONS } from '@/lib/constants';
 import { ADMIN_PRICING_TABS, type PricingTab } from '@/lib/constants/admin';
 import { fetchWithCsrf } from '@/lib/csrf';
@@ -248,31 +247,6 @@ export default function PricingAdminPage() {
         alert: 'Packs amb alerta de preu',
       }[activeFocus]
     : null;
-  const zeroPriceExtras = extras.filter((extra) => extra.priceType !== 'ON_REQUEST' && Number(extra.price || 0) <= 0).length;
-  const packAlerts = packs.filter((pack) => pack.editableNote?.toLowerCase().includes('alerta')).length;
-  const inventoryWithUsage = inventory.filter((item) => item.stats.totalEvents > 0).length;
-  const nextStepTitle = !stats
-    ? 'Recuperar la lectura de preus abans d’actuar'
-    : activeFocus === 'zero-price'
-      ? 'Regularitzar els extres a preu 0'
-      : activeFocus === 'alert'
-        ? 'Revisar els packs amb alerta abans de tocar res més'
-        : zeroPriceExtras > 0
-          ? 'Atacar primer els extres sense preu'
-          : packAlerts > 0
-            ? 'Revisar els packs marcats amb alerta'
-            : 'Mantenir el catàleg de preus sota control';
-  const nextStepDetail = !stats
-    ? 'Sense dades de pricing carregades no toca prendre decisions sobre marge, cost o PVP.'
-    : activeFocus === 'zero-price'
-      ? 'Aquest focus ja t’aïlla els extres que encara no tenen preu útil per vendre.'
-      : activeFocus === 'alert'
-        ? 'Aquest focus ja t’aïlla els packs que demanen revisió abans de confiar en la seva lectura econòmica.'
-        : zeroPriceExtras > 0
-          ? 'El retorn més alt ara no és repassar-ho tot, sinó tancar els extres que continuen sense preu vàlid.'
-          : packAlerts > 0
-            ? 'Amb els extres estables, el següent coll és revisar els packs que arrosseguen alerta de preu.'
-            : 'Amb el catàleg estable, el següent pas útil és revisar marge, ús i salut econòmica amb criteri.';
 
   if (loading) {
     return (
@@ -299,59 +273,6 @@ export default function PricingAdminPage() {
       title="Preus"
       subtitle="Revisa preus, marges i costos dels extres, packs i inventari per saber què renta i què no."
     >
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què veu el sistema al catàleg de preus',
-          tone: stats ? 'info' : 'warning',
-          items: [
-            stats
-              ? `${stats.totalExtras} extres, ${stats.totalPacks} packs i ${stats.totalInventory} ítems d’inventari en lectura econòmica.`
-              : 'Sense stats carregades del catàleg de pricing.',
-            stats
-              ? `${formatCurrency(stats.totalRevenue._sum.total || 0)} d’ingressos i ${stats.completedBookings} esdeveniments completats al resum.`
-              : 'Sense resum d’ingressos disponible ara mateix.',
-            inventoryWithUsage > 0
-              ? `${inventoryWithUsage} ítems d’inventari tenen ús registrat a la vista actual.`
-              : 'Cap ítem d’inventari mostra ús registrat a primer nivell.',
-          ],
-          emptyText: 'Sense dades no hi ha lectura automàtica del catàleg.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'On et cal intervenir',
-          tone: zeroPriceExtras > 0 || packAlerts > 0 || Boolean(message?.type === 'error') ? 'warning' : 'success',
-          items: [
-            zeroPriceExtras > 0
-              ? `${zeroPriceExtras} extres continuen amb preu 0 i demanen revisió.`
-              : 'No hi ha extres a preu 0 al primer nivell.',
-            packAlerts > 0
-              ? `${packAlerts} packs arrosseguen alerta de preu a la seva nota editable.`
-              : 'No hi ha packs marcats amb alerta a primer nivell.',
-            activeFocusLabel
-              ? `Hi ha focus de salut actiu sobre ${activeFocusLabel}.`
-              : `Sense focus actiu: estàs governant la pestanya ${ADMIN_PRICING_TABS.find((tab) => tab.key === activeTab)?.label || activeTab}.`,
-          ],
-          emptyText: 'No hi ha coll manual evident a primer nivell.',
-        }}
-        nextStep={{
-          eyebrow: 'Següent pas',
-          title: nextStepTitle,
-          detail: nextStepDetail,
-          href:
-            activeFocus === 'zero-price'
-              ? '/admin/pricing?tab=extras&focus=zero-price'
-              : activeFocus === 'alert'
-                ? '/admin/pricing?tab=packs&focus=alert'
-                : '/admin/pricing',
-          ctaLabel: activeFocus ? 'Mantenir aquest focus' : 'Revisar pricing',
-          secondaryAction:
-            activeTab !== 'overview'
-              ? { href: '/admin/pricing?tab=overview', label: 'Tornar al resum' }
-              : undefined,
-        }}
-      />
-
       <div className="flex gap-2 flex-wrap">
         {ADMIN_PRICING_TABS.map(tabDef => {
           const badgeCounts: Record<string, number> = { extras: extras.length, packs: packs.length, inventory: inventory.length };

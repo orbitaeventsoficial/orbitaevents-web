@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { buildExecutiveReport } from '@/lib/services/executiveReportService';
 import { generateReportingInsights, type InsightPriority } from '@/lib/services/reportingInsightsService';
 import { formatNumber } from '@/lib/constants';
@@ -43,40 +42,9 @@ export default async function ReportingPage() {
     loadEmailTrackingReport(90),
   ]);
   const marginRate = report.margin.marginRate;
-  const recurrenceRate = report.recurrence.returningRate;
   const openRate = emailTracking.globalOpenRate / 100;
   const replyRate = emailTracking.globalReplyRate / 100;
-  const systemItems = [
-    `${currency(report.headline.forecastWeighted)} de previsió ponderada sobre ${currency(report.headline.pipelineRaw)} de pipeline`,
-    `${currency(report.margin.grossMargin)} de marge brut amb taxa del ${pct(marginRate)}`,
-    `${pct(recurrenceRate)} de recurrència i ${report.recurrence.avgEventsPerCustomer.toFixed(1)} events per client`,
-    `${emailTracking.totalSent} emails trackejats en ${emailTracking.windowDays} dies amb open rate del ${emailTracking.globalOpenRate}%`,
-  ].filter(Boolean);
-  const manualItems = [
-    report.headline.slaBroken > 0 ? `${report.headline.slaBroken} SLA trencats encara impacten el reporting executiu` : '',
-    marginRate < 0.55 ? `El marge brut està en ${pct(marginRate)} i demana revisar pricing o cost directe` : '',
-    recurrenceRate < 0.3 ? `La recurrència és del ${pct(recurrenceRate)} i encara no consolida base fidel` : '',
-    replyRate < 0.08 || openRate < 0.35
-      ? `El tracking d'email encara és fluix (${emailTracking.globalOpenRate}% opens, ${emailTracking.globalReplyRate}% replies)`
-      : '',
-  ].filter(Boolean);
   const insights = generateReportingInsights(report, { emailOpenRate: openRate, emailReplyRate: replyRate });
-  const topInsight = insights[0];
-  const nextStep = topInsight
-    ? {
-        title: topInsight.headline,
-        detail: topInsight.detail,
-        href: topInsight.href,
-        ctaLabel: topInsight.ctaLabel,
-        secondaryAction: topInsight.secondaryAction,
-      }
-    : {
-        title: "Optimitzar missatges i conversió dels canals forts",
-        detail: "La base financera no mostra un incendi immediat. El millor seguent pas és analitzar canals i empènyer conversió.",
-        href: "/admin/sales-ops",
-        ctaLabel: "Anar a Sales Ops",
-        secondaryAction: { href: "/admin/analytics", label: "Obrir analítica" },
-      };
 
   const funnelMax = Math.max(
     report.funnel.NEW,
@@ -108,27 +76,6 @@ export default async function ReportingPage() {
       }
     >
       <div className="space-y-6 p-6">
-        <OwnerControlStrip
-          system={{
-            eyebrow: 'Automàtic',
-            title: 'Què vigila el sistema',
-            tone: report.headline.slaBroken > 0 ? 'warning' : 'info',
-            items: systemItems,
-            emptyText: 'Sense senyals executives automàtiques rellevants ara mateix.',
-          }}
-          manual={{
-            eyebrow: 'Manual',
-            title: 'On et cal intervenir',
-            tone: manualItems.length > 0 ? 'warning' : 'success',
-            items: manualItems,
-            emptyText: 'Sense desviacions crítiques. Pots usar el reporting per optimització fina.',
-          }}
-          nextStep={{
-            eyebrow: 'Següent pas',
-            ...nextStep,
-          }}
-        />
-
         {insights.length > 1 && (
           <section className="ap-card p-4">
             <h2 className="text-xs font-semibold uppercase tracking-wider opacity-60">

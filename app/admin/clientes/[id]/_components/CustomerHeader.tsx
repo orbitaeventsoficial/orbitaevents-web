@@ -22,7 +22,6 @@ import {
 import { buildCustomerNextActionLink } from '@/lib/customer-hub/nextActionLink';
 import { buildCustomerCommercialPriority } from '@/lib/customer-hub/commercialPriority';
 import InsightsBanner from './InsightsBanner';
-import { OwnerControlStrip } from '@/app/admin/components/OwnerControlStrip';
 import MobileQuickActions from '@/app/admin/components/MobileQuickActions';
 
 type TabKey = 'summary' | 'proposals' | 'bookings' | 'margin' | 'comms' | 'tasks' | 'discounts' | 'leads' | 'privacy';
@@ -133,8 +132,6 @@ export default function CustomerHeader({
   }, [confirm, hasProtectedData, data.customer.name, id, toast, router]);
 
   const currentStageIndex = CUSTOMER_HUB_STAGE_ORDER.indexOf(status);
-  const openTasks = data.tasks.filter((task) => !task.done).length;
-  const draftProposals = data.proposals.filter((proposal) => proposal.status === 'DRAFT').length;
   const nextActionLink = buildCustomerNextActionLink({
     customerId: id,
     customerName: data.customer.name,
@@ -146,39 +143,6 @@ export default function CustomerHeader({
     insights: data.insights,
     followUpSummary: data.followUpSummary,
   });
-  const ownerWatchItems = [
-    data.insights.commercialRisk.level !== 'NONE'
-      ? data.insights.commercialRisk.label
-      : null,
-    data.insights.relationalHealth === 'AT_RISK' || data.insights.relationalHealth === 'COLD' || data.insights.relationalHealth === 'LOST'
-      ? `Salut relacional: ${data.insights.relationalHealth.toLowerCase()}`
-      : null,
-    data.kpis.nextEventDate
-      ? `Pròxim esdeveniment: ${formatDate(data.kpis.nextEventDate)}`
-      : null,
-  ].filter(Boolean) as string[];
-  const ownerManualItems = [
-    draftProposals > 0
-      ? `${draftProposals} pressupost${draftProposals > 1 ? 's' : ''} en esborrany`
-      : null,
-    openTasks > 0
-      ? `${openTasks} tasca${openTasks > 1 ? 'ques' : ''} oberta${openTasks > 1 ? 'es' : ''}`
-      : null,
-    commercialPriority?.detail || null,
-  ].filter(Boolean) as string[];
-  const ownerNextStep = nextActionLink
-    ? {
-        label: nextActionLink.label,
-        href: nextActionLink.href,
-        external: nextActionLink.external,
-        detail: data.insights.nextAction.context || commercialPriority?.detail || 'Acció assistida recomanada pel sistema',
-      }
-    : {
-        label: 'Enviar missatge',
-        href: customerComposeHref,
-        external: false,
-        detail: commercialPriority?.detail || 'No hi ha un bloqueig fort, però convé mantenir relació activa',
-      };
 
   const changeStatus = useCallback(async (newStatus: HubStatus) => {
     setActionLoading(`status-${newStatus}`);
@@ -368,30 +332,6 @@ export default function CustomerHeader({
         </div>
 
         {/* ── Owner strip + mobile quick actions ── */}
-        <OwnerControlStrip
-          className="lg:grid-cols-[1.1fr_1.1fr_1.3fr]"
-          system={{
-            eyebrow: 'Automàtic',
-            title: 'Què veu el sistema',
-            tone: 'info',
-            items: ownerWatchItems,
-            emptyText: 'Sense alertes automàtiques destacades ara mateix.',
-          }}
-          manual={{
-            eyebrow: 'Manual',
-            title: 'On et cal intervenir',
-            tone: ownerManualItems.length > 0 ? 'warning' : 'success',
-            items: ownerManualItems,
-            emptyText: 'No hi ha cap front manual calent a la capçalera.',
-          }}
-          nextStep={{
-            title: ownerNextStep.label,
-            detail: ownerNextStep.detail,
-            href: ownerNextStep.href,
-            external: ownerNextStep.external,
-          }}
-        />
-
         <MobileQuickActions
           phone={data.customer.phone}
           email={data.customer.email}

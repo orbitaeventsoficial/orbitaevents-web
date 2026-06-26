@@ -1,13 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AdminPage } from '../components/AdminPage';
 import { formatDateTime } from '@/lib/constants';
 import { PRIVACY_AUDIT_ACTION_LABELS, getPrivacyConsentLabel, getPrivacyPriorityDisplay, getPrivacyRequestStatusDisplay, getPrivacyRequestTypeLabel } from '@/lib/constants/privacy';
 import Link from 'next/link';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 
 type PrivacyStats = {
@@ -244,181 +243,6 @@ export default function AdminPrivacyPage() {
     return Math.ceil(diff / 86400000);
   }
 
-  const strip = useMemo<OwnerStripConfig | null>(() => {
-    if (!stats) return null;
-
-    const urgentVisible = requests.filter((request) => {
-      const daysLeft = getDaysUntilDeadline(request.legalDeadline);
-      return daysLeft !== null && daysLeft <= 5;
-    }).length;
-    const overdueVisible = requests.filter((request) => {
-      const daysLeft = getDaysUntilDeadline(request.legalDeadline);
-      return daysLeft !== null && daysLeft < 0;
-    }).length;
-    const verifiedVisible = requests.filter((request) => request.status === 'VERIFIED').length;
-    const revokedVisible = consents.filter((consent) => Boolean(consent.revokedAt)).length;
-    const activeVisible = consents.filter((consent) => !consent.revokedAt).length;
-    const systemActorCount = auditLogs.filter((entry) => !entry.performedBy || entry.performedBy === 'SYSTEM').length;
-
-    if (pageTab === 'requests') {
-      const systemItems = [
-        `${stats.requests.pending} pendents totals · ${stats.requests.completed} completades`,
-        `${stats.requests.urgent} urgents al global RGPD`,
-      ];
-      const manualItems: string[] = [];
-      if (overdueVisible > 0) manualItems.push(`${overdueVisible} sol·licituds visibles ja vençudes`);
-      if (urgentVisible > 0) manualItems.push(`${urgentVisible} sol·licituds visibles amb menys de 5 dies`);
-      if (verifiedVisible > 0) manualItems.push(`${verifiedVisible} verificades pendents de processar`);
-
-      const nextStep =
-        overdueVisible > 0
-          ? {
-              eyebrow: 'Següent pas · Crític',
-              title: `Processar ${overdueVisible} sol·licituds vençudes`,
-              detail: 'Hi ha peticions fora de termini legal a la vista actual. Entra a Sol·licituds ARCO i tanca el backlog immediatament.',
-              href: '#requests',
-              ctaLabel: 'Obrir sol·licituds',
-            }
-          : urgentVisible > 0
-            ? {
-                eyebrow: 'Següent pas · Termini',
-                title: `Resoldre ${urgentVisible} sol·licituds urgents`,
-                detail: 'Tens peticions amb menys de 5 dies de marge. Prioritza aprovació o rebuig abans de quedar fora de termini.',
-                href: '#requests',
-                ctaLabel: 'Obrir sol·licituds',
-              }
-            : verifiedVisible > 0
-              ? {
-                  eyebrow: 'Següent pas · Processar',
-                  title: `Tancar ${verifiedVisible} verificades`,
-                  detail: 'Ja estan verificades però encara no processades. Completa el cicle legal i documenta la resposta.',
-                  href: '#requests',
-                  ctaLabel: 'Gestionar ARCO',
-                }
-              : {
-                  eyebrow: 'Següent pas',
-                  title: 'Canal RGPD sota control',
-                  detail: 'No hi ha urgències visibles a Sol·licituds. Pots revisar consentiments o el registre d’auditoria.',
-                  href: '#consents',
-                  ctaLabel: 'Obrir consentiments',
-                  secondaryAction: { href: '#audit', label: 'Veure auditoria' },
-                };
-
-      return {
-        system: {
-          eyebrow: 'Automàtic · Sol·licituds',
-          title: stats.requests.pending > 0 ? 'Safata RGPD activa' : 'Safata RGPD al dia',
-          tone: stats.requests.urgent > 0 ? 'warning' : stats.requests.pending > 0 ? 'info' : 'success',
-          items: systemItems,
-          emptyText: 'Sense càrrega legal visible.',
-        },
-        manual: {
-          eyebrow: 'Manual · Terminis',
-          title: manualItems.length === 0 ? 'Cap acció manual crítica' : `${manualItems.length} senyals per revisar`,
-          tone: overdueVisible > 0 || urgentVisible > 0 ? 'warning' : manualItems.length > 0 ? 'info' : 'success',
-          items: manualItems,
-          emptyText: 'Sense venciments ni verificades pendents a la vista.',
-        },
-        nextStep,
-      };
-    }
-
-    if (pageTab === 'consents') {
-      const systemItems = [
-        `${stats.consents.total} consentiments totals · ${stats.consents.active} actius`,
-        `${consentsTotal} registres carregats amb filtre "${consentFilter}"`,
-      ];
-      const manualItems: string[] = [];
-      if (revokedVisible > 0) manualItems.push(`${revokedVisible} registres revocats a la vista actual`);
-      if (activeVisible === 0 && consentsTotal > 0) manualItems.push('Cap consentiment actiu a la vista actual');
-      if (consentSearch.trim()) manualItems.push(`Cerca activa: "${consentSearch.trim()}"`);
-
-      const nextStep =
-        activeVisible === 0 && consentsTotal > 0
-          ? {
-              eyebrow: 'Següent pas · Revisió',
-              title: 'Sense consentiments actius a la vista',
-              detail: 'El filtre actual només mostra revocats o una cerca sense resultats actius. Revisa el catàleg complet abans de tocar res.',
-              href: '#consents',
-              ctaLabel: 'Obrir consentiments',
-            }
-          : stats.consents.active === 0
-            ? {
-                eyebrow: 'Següent pas · Alertar',
-                title: 'No queda cap consentiment actiu',
-                detail: 'Sense consentiments actius no hi ha base clara per a certes comunicacions. Revisa captació i polítiques abans de continuar.',
-                href: '#requests',
-                ctaLabel: 'Obrir sol·licituds',
-                secondaryAction: { href: '#audit', label: 'Veure auditoria' },
-              }
-            : {
-                eyebrow: 'Següent pas',
-                title: 'Govern de consentiments estable',
-                detail: 'Els consentiments actius estan visibles. Aprofita per revisar el registre d’auditoria o netejar revocats antics.',
-                href: '#audit',
-                ctaLabel: 'Obrir auditoria',
-              };
-
-      return {
-        system: {
-          eyebrow: 'Automàtic · Consentiments',
-          title: stats.consents.active > 0 ? 'Base legal disponible' : 'Sense base activa visible',
-          tone: stats.consents.active > 0 ? 'success' : 'warning',
-          items: systemItems,
-          emptyText: 'Sense consentiments carregats.',
-        },
-        manual: {
-          eyebrow: 'Manual · Revisió',
-          title: manualItems.length === 0 ? 'Cap senyal manual' : `${manualItems.length} senyals per revisar`,
-          tone: activeVisible === 0 && consentsTotal > 0 ? 'warning' : manualItems.length > 0 ? 'info' : 'success',
-          items: manualItems,
-          emptyText: 'Sense revocats ni filtres que degradin la lectura.',
-        },
-        nextStep,
-      };
-    }
-
-    const systemItems = [
-      `${auditLogs.length} registres carregats a l'auditoria`,
-      `${systemActorCount} entrades generades per sistema`,
-    ];
-    const manualItems: string[] = [];
-    if (auditLogs.length === 0 && !auditLoading) manualItems.push('No hi ha traça carregada a l’auditoria');
-    if (auditLogs.some((entry) => !entry.reason)) manualItems.push('Hi ha accions sense motiu explícit a la mostra');
-
-    return {
-      system: {
-        eyebrow: 'Automàtic · Auditoria',
-        title: auditLogs.length > 0 ? 'Traça legal visible' : 'Auditoria sense dades',
-        tone: auditLogs.length > 0 ? 'info' : 'warning',
-        items: systemItems,
-        emptyText: 'Sense registres d’auditoria carregats.',
-      },
-      manual: {
-        eyebrow: 'Manual · Compliment',
-        title: manualItems.length === 0 ? 'Traça consistent' : `${manualItems.length} senyals per revisar`,
-        tone: manualItems.length > 0 ? 'warning' : 'success',
-        items: manualItems,
-        emptyText: 'Registre carregat sense buits evidents a la mostra.',
-      },
-      nextStep: auditLogs.length === 0
-        ? {
-            eyebrow: 'Següent pas · Revisar',
-            title: 'Comprovar per què no hi ha auditoria',
-            detail: 'Sense traça visible no pots verificar el compliment. Torna a sol·licituds i consentiments per comprovar activitat recent.',
-            href: '#requests',
-            ctaLabel: 'Obrir sol·licituds',
-            secondaryAction: { href: '#consents', label: 'Veure consentiments' },
-          }
-        : {
-            eyebrow: 'Següent pas',
-            title: 'Compliment documentat',
-            detail: 'La traça legal és visible. Si vols seguir netejant el front shared, el següent residual ja és fora de RGPD.',
-            href: '/admin/text-manager',
-            ctaLabel: 'Obrir Text Manager',
-          },
-    };
-  }, [auditLoading, auditLogs, consentFilter, consentSearch, consents, consentsTotal, pageTab, requests, stats]);
 
   if (loading && !stats) {
     return (
@@ -445,14 +269,6 @@ export default function AdminPrivacyPage() {
       title="Privacitat i RGPD"
       subtitle="Sol·licituds ARCO, consentiments i compliment legal."
     >
-      {strip && (
-        <OwnerControlStrip
-          className="mb-2"
-          system={strip.system}
-          manual={strip.manual}
-          nextStep={strip.nextStep}
-        />
-      )}
 
       {/* KPI cards */}
       {stats && (

@@ -5,15 +5,14 @@ import Link from 'next/link';
 import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { formatDateShort, formatDateFull } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { ADMIN_CALENDAR_HELP, helpAttrs } from '../components/adminHelpContent';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { CalendarApiDay, CalendarApiResponse, MonthYear, CalendarCell } from './calendar-utils';
-import { weekdayLabels, resolveServiceLabel, resolveTimeLabel, formatKey, getMonthDays, addMonths, monthLabel, isToday, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel } from './calendar-utils';
+import { weekdayLabels, resolveServiceLabel, resolveTimeLabel, getMonthDays, addMonths, monthLabel, isToday, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel } from './calendar-utils';
 
 type OwnerTone = 'info' | 'warning' | 'success';
 type OwnerStripConfig = {
@@ -288,113 +287,9 @@ export default function CalendarMonthClient() {
     };
   }, [cells, data]);
 
-  const strip = useMemo<OwnerStripConfig>(() => {
-    const hiddenLayers = Object.entries(visibleLayers)
-      .filter(([, visible]) => !visible)
-      .map(([layer]) => layer);
-    const selectedPayload = selectedDayData.payload;
-    const selectedHasItems = selectedPayload
-      ? (selectedPayload.leads?.length ?? 0) +
-          selectedPayload.reservas.length +
-          selectedPayload.bloqueos.length +
-          selectedPayload.tasks.length +
-          selectedPayload.socialPosts.length +
-          selectedPayload.followUps.length
-      : 0;
-
-    const systemItems: string[] = [];
-    systemItems.push(`${stats.totalReservas} reserves · ${stats.totalLeads} entrades · ${stats.totalBloqueos} bloquejos al rang visible`);
-    systemItems.push(`${stats.freeDays} dies lliures · ${stats.mixedDays} dies mixtes · ${stats.workDays} dies amb feina`);
-    if (stats.totalTasks > 0 || stats.totalSocialPosts > 0) {
-      systemItems.push(`${stats.totalTasks} tasques · ${stats.totalSocialPosts} posts socials`);
-    }
-
-    const manualItems: string[] = [];
-    if (stats.mixedDays > 0) {
-      manualItems.push(`${stats.mixedDays} ${stats.mixedDays === 1 ? 'dia mixt' : 'dies mixtes'} amb reserva i bloqueig`);
-    }
-    if (hiddenLayers.length > 0) {
-      manualItems.push(`${hiddenLayers.length} ${hiddenLayers.length === 1 ? 'capa amagada' : 'capes amagades'} a la lectura actual`);
-    }
-    if (selectedDayData.key && selectedHasItems > 0) {
-      manualItems.push(`${selectedHasItems} elements oberts al detall del ${formatDateShort(selectedDayData.key)}`);
-    }
-    if (showBlockForm && selectedDayData.key) {
-      manualItems.push(`Bloqueig manual en preparació per al ${formatDateShort(selectedDayData.key)}`);
-    }
-    if (draggingBookingId) {
-      manualItems.push('Hi ha una reserva en moviment via drag & drop');
-    }
-
-    const nextStep =
-      stats.mixedDays > 0
-        ? {
-            eyebrow: 'Següent pas · Conflicte',
-            title: `Revisar ${stats.mixedDays} ${stats.mixedDays === 1 ? 'dia mixt' : 'dies mixtes'}`,
-            detail: 'Els dies mixtes combinen reserva i bloqueig. Revisa el detall del calendari abans de moure o tancar disponibilitat.',
-            href: '/admin/calendario?view=day',
-            ctaLabel: 'Obrir vista dia',
-            secondaryAction: { href: '/admin/calendario?view=week', label: 'Vista setmana' },
-          }
-        : stats.totalReservas === 0 && stats.totalBloqueos === 0
-          ? {
-              eyebrow: 'Següent pas · Disponibilitat',
-              title: 'Calendari visible sense ocupació',
-              detail: 'El rang visible no té reserves ni bloquejos. Pots bloquejar absències o preparar la propera planificació comercial.',
-              href: '#calendar-detail',
-              ctaLabel: 'Obrir detall',
-            }
-          : selectedDayData.key && selectedHasItems > 0
-            ? {
-                eyebrow: 'Següent pas · Dia obert',
-                title: `Treballar el ${formatDateShort(selectedDayData.key)}`,
-                detail: 'Ja tens un dia seleccionat amb activitat. Tanca moviments, bloquejos o accions ràpides des del panell de detall.',
-                href: '#calendar-detail',
-                ctaLabel: 'Anar al detall',
-              }
-            : {
-                eyebrow: 'Següent pas',
-                title: 'Ocupació visible sota control',
-                detail: 'El mes visible no mostra conflictes forts. Si vols més precisió operativa, baixa a setmana o dia.',
-                href: '/admin/calendario?view=week',
-                ctaLabel: 'Obrir vista setmana',
-                secondaryAction: { href: '/admin/calendario?view=day', label: 'Vista dia' },
-              };
-
-    return {
-      system: {
-        eyebrow: 'Automàtic · Ocupació',
-        title: stats.totalReservas > 0 || stats.totalBloqueos > 0 ? 'Mapa d’ocupació visible' : 'Calendari visible buit',
-        tone: stats.mixedDays > 0 ? 'warning' : stats.totalReservas > 0 || stats.totalBloqueos > 0 ? 'info' : 'success',
-        items: systemItems,
-        emptyText: 'Sense ocupació visible al rang carregat.',
-      },
-      manual: {
-        eyebrow: 'Manual · Operativa',
-        title: manualItems.length === 0 ? 'Cap tensió manual' : `${manualItems.length} senyals per revisar`,
-        tone: stats.mixedDays > 0 || showBlockForm || draggingBookingId ? 'warning' : manualItems.length > 0 ? 'info' : 'success',
-        items: manualItems,
-        emptyText: 'Sense conflictes, capes amagades ni moviments manuals oberts.',
-      },
-      nextStep,
-    };
-  }, [
-    draggingBookingId,
-    selectedDayData.key,
-    selectedDayData.payload,
-    showBlockForm,
-    stats,
-    visibleLayers,
-  ]);
 
   return (
     <AdminPage title="Calendari" subtitle="Visualitza reserves, bloquejos i feina planificada per executar el negoci.">
-      <OwnerControlStrip
-        system={strip.system}
-        manual={strip.manual}
-        nextStep={strip.nextStep}
-      />
-
       {/* Barra superior: selector de mes + meta info */}
       <div className="flex flex-col gap-2 rounded-xl border admin-card-glass p-2.5 sm:p-3 md:flex-row md:items-center md:justify-between" {...helpAttrs(ADMIN_CALENDAR_HELP.monthNavigation)}>
         <div className="flex flex-wrap items-center gap-2">

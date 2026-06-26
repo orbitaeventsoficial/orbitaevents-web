@@ -33,7 +33,7 @@ import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
 import BookingTotalEditor from './BookingTotalEditor';
 import { previewBookingCustomerLink } from '@/lib/services/bookings/bookingCustomerLinkService';
-import { getBookingStatusDisplay, getLeadStatusDisplay, getEventLabel, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull, getContractStatusLabel, getInvoiceStatusLabel, getProposalStatusDisplay } from '@/lib/constants';
+import { getLeadStatusDisplay, getEventLabel, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull, getContractStatusLabel, getInvoiceStatusLabel, getProposalStatusDisplay } from '@/lib/constants';
 import { ADMIN_BOOKING_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import type { BookingExtraRow, BookingProposalRow, BookingInvoiceRow, BookingNumericCompat } from './booking-utils';
 import { buildGoogleCalendarUrl, getPackTranslation } from './booking-utils';
@@ -123,7 +123,6 @@ export default async function BookingDetailPage({ params }: PageProps) {
   const booking = await getBooking(params.id);
   if (!booking) notFound();
 
-  const statusConf     = getBookingStatusDisplay(booking.status);
   const eventType      = getEventLabel(booking.eventType);
   const packTranslation = getPackTranslation(
     booking.pack.translations,
@@ -180,25 +179,12 @@ export default async function BookingDetailPage({ params }: PageProps) {
   const isToday   = daysUntil === 0;
   const isSoon    = daysUntil > 0 && daysUntil <= 7;
 
-  const directCostPreview =
-    (inventoryCostReal > 0 ? inventoryCostReal : packPrice * profitabilityConfig.packCostRatio) +
-    (extrasTotal * profitabilityConfig.extraCostRatio) +
-    (extraHours * extraHourPrice * profitabilityConfig.extraHourCostRatio) +
-    profitabilityConfig.fixedOperationalCost;
-  const previewMarginPct = booking.total > 0 ? ((Number(booking.total) - directCostPreview) / Number(booking.total)) * 100 : 0;
 
   // KPI payment state helpers
-  const paymentKpiClass = booking.depositPaid && booking.remainingPaid ? 'bd__kpi--ok' : booking.depositPaid ? 'bd__kpi--warn' : 'bd__kpi--err';
-  const paymentDotClass = booking.depositPaid && booking.remainingPaid ? 'bd__kpi-dot--ok' : booking.depositPaid ? 'bd__kpi-dot--warn' : 'bd__kpi-dot--err';
   const paymentLabel    = booking.depositPaid && booking.remainingPaid ? 'Completat' : booking.depositPaid ? 'Parcial' : 'Pendent';
 
-  const flowKpiClass = reviewFlowStatus === 'RESPONDIDO' ? 'bd__kpi--ok' : reviewFlowStatus === 'ENVIADO' ? 'bd__kpi--warn' : 'bd__kpi--err';
-  const flowDotClass = reviewFlowStatus === 'RESPONDIDO' ? 'bd__kpi-dot--ok' : reviewFlowStatus === 'ENVIADO' ? 'bd__kpi-dot--warn' : 'bd__kpi-dot--err';
   const flowLabel    = reviewFlowStatus === 'RESPONDIDO' ? 'Respost' : reviewFlowStatus === 'ENVIADO' ? 'Enviat' : 'Falta enviar';
 
-  const peKpiClass = internalPostEventStatus === 'COMPLETO' ? 'bd__kpi--ok' : internalPostEventStatus === 'EN_PROGRESO' ? 'bd__kpi--warn' : '';
-  const peDotClass = internalPostEventStatus === 'COMPLETO' ? 'bd__kpi-dot--ok' : internalPostEventStatus === 'EN_PROGRESO' ? 'bd__kpi-dot--warn' : 'bd__kpi-dot--neutral';
-  const peLabel    = internalPostEventStatus === 'COMPLETO' ? 'Completat' : internalPostEventStatus === 'EN_PROGRESO' ? 'En progrés' : 'Pendent';
   const documentHistoryItems: CommercialDocumentHistoryItem[] = [
     ...booking.proposals.flatMap((p) => {
       const items: CommercialDocumentHistoryItem[] = [{

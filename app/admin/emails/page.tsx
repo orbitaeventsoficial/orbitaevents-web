@@ -4,7 +4,6 @@ import { log } from '@/lib/logger';
 import { formatDateTime, formatDateSimple, PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import EmailStatsCards from './EmailStatsCards';
 import EmailConfigPanel from './EmailConfigPanel';
@@ -161,61 +160,6 @@ async function getPendingPostEventBookings() {
 export default async function EmailsAdminPage() {
   const stats = await getEmailStats();
   const pendingBookings = await getPendingPostEventBookings();
-  const cronStatus = stats.cronLastStatus?.toLowerCase() || null;
-  const systemItems = [
-    `${stats.leadsWithEmail} leads amb email capturats en els últims 30 dies`,
-    `${stats.postEventSent} post-event totals enviats i ${stats.postEventPending} pendents ara mateix`,
-    `${stats.recentEmailActions} enviaments automàtics en 24h i ${stats.recentTestimonials} testimonis rebuts en 7 dies`,
-    stats.cronLastRun
-      ? `Últim cron d'emails: ${formatDateTime(stats.cronLastRun)} (${stats.cronLastStatus || 'sense estat'})`
-      : 'El cron d\'emails encara no té cap execució registrada',
-  ].filter(Boolean);
-  const manualItems = [
-    stats.postEventPending > 0
-      ? `${stats.postEventPending} reserves completades encara esperen correu post-event`
-      : '',
-    pendingBookings[0]
-      ? `La cua manual arrenca per ${pendingBookings[0].clientName} (${formatDateSimple(pendingBookings[0].eventDate)})`
-      : '',
-    stats.hasQueryErrors
-      ? 'Hi ha consultes fallides; convé revisar migracions o estructura abans de confiar en totes les xifres'
-      : '',
-    cronStatus && cronStatus !== 'ok'
-      ? `L'últim cron va quedar en ${stats.cronLastStatus}; cal validar missatge i resum abans d'assumir automatització sana`
-      : '',
-  ].filter(Boolean);
-  const nextStep =
-    stats.postEventPending > 0
-      ? {
-          title: 'Buidar la cua post-event abans que es refredi',
-          detail: `Hi ha ${stats.postEventPending} enviaments post-event pendents. El següent pas correcte és forçar la cua manual i només després revisar si el problema és puntual o estructural.`,
-          href: '/admin/emails',
-          ctaLabel: 'Atacar la cua manual',
-          secondaryAction: { href: '/admin/inbox', label: 'Obrir Safata' },
-        }
-      : stats.hasQueryErrors
-        ? {
-            title: 'Recuperar confiança en les dades abans d’optimitzar',
-            detail: 'El panell continua operatiu, però hi ha consultes parcials. El primer pas és estabilitzar estructura i cron perquè la lectura torni a ser fiable.',
-            href: '/admin/settings/integrations',
-            ctaLabel: 'Revisar integracions',
-            secondaryAction: { href: '/admin/salut', label: 'Obrir Salut' },
-          }
-        : cronStatus && cronStatus !== 'ok'
-          ? {
-              title: 'Validar el cron d’emails abans d’escapar a configuració',
-              detail: `L'última execució ha quedat en ${stats.cronLastStatus}. El millor següent pas és revisar estat i missatge del cron abans de tocar plantilles o panells laterals.`,
-              href: '/admin/crons',
-              ctaLabel: 'Revisar Crons',
-              secondaryAction: { href: '/admin/emails', label: 'Tornar al panell' },
-            }
-          : {
-              title: 'Optimitzar conversa i reputació, no apagar focs',
-              detail: 'No hi ha una incidència dura visible al sistema d’emails. El millor següent pas és treballar plantilles, proves manuals i captura de ressenyes amb el flux estable.',
-              href: '/admin/email-templates',
-              ctaLabel: 'Obrir plantilles',
-              secondaryAction: { href: '/admin/google-reviews', label: 'Veure Google Reviews' },
-            };
 
   return (
     <AdminPage
@@ -223,27 +167,6 @@ export default async function EmailsAdminPage() {
       subtitle="Control i configuració del sistema d'emails automàtics"
       back={{ href: '/admin', label: 'Panell' }}
     >
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què mou el sistema d’emails',
-          tone: stats.postEventPending > 0 || (cronStatus !== null && cronStatus !== 'ok') ? 'warning' : 'info',
-          items: systemItems,
-          emptyText: 'Sense senyals automàtiques rellevants al sistema d’emails.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'On et cal intervenir',
-          tone: manualItems.length > 0 ? 'warning' : 'success',
-          items: manualItems,
-          emptyText: 'Cap cua manual crítica oberta ara mateix al panell d’emails.',
-        }}
-        nextStep={{
-          eyebrow: 'Següent pas',
-          ...nextStep,
-        }}
-      />
-
 
       {/* Stats Cards */}
       <EmailStatsCards stats={stats} />

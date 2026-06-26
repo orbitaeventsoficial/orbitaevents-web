@@ -6,7 +6,7 @@ import QuickActions from './components/QuickActions';
 import StatusQuickSelect from './components/StatusQuickSelect';
 import { fetchDashboardData, timeAgo, formatEventDate } from './lib/dashboard-data';
 import { formatDateTimeFull, formatCurrency, formatDate, getEventLabel } from '@/lib/constants';
-import { generateDashboardInsights, type DashboardInsight } from '@/lib/services/dashboardInsightsService';
+import { generateDashboardInsights } from '@/lib/services/dashboardInsightsService';
 import WeatherWidget from './components/WeatherWidget';
 import { ADMIN_DASHBOARD_HELP, helpAttrs } from './components/adminHelpContent';
 import { getGreeting, RadialProgress, MetricCard, Card, Button, MonthlyBarChart, DonutChart, MiniLineChart } from './lib/dashboard-widgets';
@@ -26,7 +26,6 @@ import { loadCapacityConflicts } from '@/lib/services/capacityConflictService';
 import CapacityConflictPanel from './components/CapacityConflictPanel';
 import { loadWeeklyCapacityForecast } from '@/lib/services/operationalForecastService';
 import WeeklyCapacityForecastPanel from './components/WeeklyCapacityForecastPanel';
-import { OwnerControlStrip } from './components/OwnerControlStrip';
 import { buildDashboardOperatingCycle, type AdminOperatingCycleTone } from '@/lib/services/adminOperatingCycleService';
 import NBAExplainPanel from './components/NBAExplainPanel';
 
@@ -93,36 +92,6 @@ export default async function AdminDashboard() {
   const criticalHealthCount = d.salutSnapshot?.summary.critical || 0;
   const warningHealthCount = d.salutSnapshot?.summary.warning || 0;
   const manualDecisionCount = d.alerts.length + d.upcomingTasks.length;
-  const autoSignals = [
-    {
-      label: 'Crons clau',
-      value: `${d.cronMap['emails.cron.lastStatus'] || '—'} · ${d.cronMap['automation.commercial.lastStatus'] || '—'}`,
-    },
-    {
-      label: 'Salut vigilada',
-      value: criticalHealthCount > 0 ? `${criticalHealthCount} crítics` : warningHealthCount > 0 ? `${warningHealthCount} avisos` : 'Tot correcte',
-    },
-    {
-      label: 'Checklist d’avui',
-      value: `${d.checklistTodayDoneCount} fetes · ${d.checklistTodayPendingCount} pendents`,
-    },
-  ];
-  const ownerDecisions = [
-    {
-      label: 'Alertes obertes',
-      value: d.alerts.length > 0 ? `${d.alerts.length} a revisar` : 'Cap alerta oberta',
-    },
-    {
-      label: 'Tasques obertes',
-      value: d.upcomingTasks.length > 0 ? `${d.upcomingTasks.length} pendents` : 'Sense cua oberta',
-    },
-    {
-      label: 'Cobraments pendents',
-      value: d.pendingPayments > 0 ? `${formatCurrency(d.pendingPayments)} per cobrar` : 'Cap import pendent',
-    },
-  ];
-  const ownerAutomaticSignals = autoSignals.map((item) => `${item.label}: ${item.value}`);
-  const ownerManualSignals = ownerDecisions.map((item) => `${item.label}: ${item.value}`);
   const operatingCycle = buildDashboardOperatingCycle({
     leadsThisMonth: d.leadsThisMonth,
     staleLeadsCount: d.staleLeadsCount,
@@ -139,8 +108,6 @@ export default async function AdminDashboard() {
   const nextPriorityHref = d.alerts[0]?.href || '/admin/tasks';
   const nextPriorityTitle = d.alerts[0]?.title || (d.upcomingTasks[0]?.title ? d.upcomingTasks[0].title : 'Revisar la cua de tasques');
   const nextPriorityDetail = d.alerts[0]?.description || (d.upcomingTasks[0]?.lead?.name ? `Relacionat amb ${d.upcomingTasks[0].lead.name}` : 'Obre el workspace que concentra la feina pendent.');
-  const operationHref = d.nextEvent ? buildBookingHref(d.nextEvent.id) : '/admin/bookings';
-  const operationLabel = d.nextEvent ? `${d.nextEvent.clientName} · ${d.nextEvent.daysUntil === 0 ? 'avui' : d.nextEvent.daysUntil === 1 ? 'demà' : `d'aquí ${d.nextEvent.daysUntil} dies`}` : 'Sense bolo imminent';
   const controlMetrics = [
     { label: 'Entrades mes', value: d.leadsThisMonth.toString(), href: '/admin/leads' },
     { label: 'Pipeline 30d', value: formatCurrency(d.pipelineWeighted30), href: '/admin/leads' },
@@ -301,33 +268,6 @@ export default async function AdminDashboard() {
           </div>
         </div>
       </div>
-
-      <OwnerControlStrip
-        className="lg:grid-cols-[1.2fr_1fr_1fr]"
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què està fent el sistema per tu',
-          tone: 'info',
-          items: ownerAutomaticSignals,
-          emptyText: 'Sense senyals automàtiques destacades ara mateix.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'On tu has de decidir',
-          tone: manualDecisionCount > 0 ? 'warning' : 'success',
-          items: ownerManualSignals,
-          emptyText: 'No hi ha cap front manual calent ara mateix.',
-        }}
-        nextStep={{
-          title: nextPriorityTitle,
-          detail: nextPriorityDetail,
-          href: nextPriorityHref,
-          secondaryAction: {
-            href: operationHref,
-            label: operationLabel,
-          },
-        }}
-      />
 
       <NBAExplainPanel />
 

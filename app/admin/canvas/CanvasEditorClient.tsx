@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { OwnerControlStrip } from '@/app/admin/components/OwnerControlStrip';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { CANVAS_COLOR_OPTIONS } from '@/lib/constants';
 import { ADMIN_CANVAS_PRESET_SIZES, ADMIN_CANVAS_TEMPLATES } from '@/lib/constants/admin';
@@ -93,116 +92,6 @@ export default function CanvasEditorClient() {
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const selected = elements.find(e => e.id === selectedId) || null;
-  const activePreset = useMemo(
-    () =>
-      (Object.keys(PRESET_SIZES) as PresetSize[]).find(
-        (preset) =>
-          PRESET_SIZES[preset].width === canvasSize.width &&
-          PRESET_SIZES[preset].height === canvasSize.height,
-      ) ?? null,
-    [canvasSize.height, canvasSize.width],
-  );
-  const selectedTemplateName = useMemo(
-    () =>
-      TEMPLATES.find(
-        (template) =>
-          template.width === canvasSize.width &&
-          template.height === canvasSize.height &&
-          template.bg === canvasBg &&
-          template.elements.length === elements.length,
-      )?.name ?? null,
-    [canvasBg, canvasSize.height, canvasSize.width, elements.length],
-  );
-  const strip = useMemo<OwnerStripConfig>(() => {
-    const textCount = elements.filter((element) => element.type === 'text').length;
-    const shapeCount = elements.filter((element) => element.type === 'shape').length;
-
-    const systemItems: string[] = [
-      `${canvasSize.width}×${canvasSize.height}px${activePreset ? ` · ${PRESET_SIZES[activePreset].label}` : ''}`,
-      `${elements.length} ${elements.length === 1 ? 'element' : 'elements'} · ${textCount} text · ${shapeCount} formes`,
-    ];
-    if (selectedTemplateName) {
-      systemItems.push(`Base carregada: ${selectedTemplateName}`);
-    }
-
-    const manualItems: string[] = [];
-    if (selected) {
-      manualItems.push(`Element seleccionat: ${selected.type === 'text' ? 'text' : selected.type === 'shape' ? 'forma' : 'imatge'}`);
-    }
-    if (dragging) {
-      manualItems.push('Hi ha un element en moviment');
-    }
-    if (resizing) {
-      manualItems.push('Hi ha un element redimensionant-se');
-    }
-    if (exporting) {
-      manualItems.push('Exportació PNG en curs');
-    }
-    if (elements.length === 0) {
-      manualItems.push('Canvas buit, pendent de crear la primera peça');
-    }
-
-    const nextStep =
-      exporting
-        ? {
-            eyebrow: 'Següent pas · Exportació',
-            title: 'Esperar que acabi l’exportació',
-            detail: 'El canvas s’està renderitzant a PNG. No obris un altre front fins que acabi la descàrrega.',
-            href: '#canvas-toolbar',
-            ctaLabel: 'Veure toolbar',
-          }
-        : elements.length === 0
-          ? {
-              eyebrow: 'Següent pas · Primera peça',
-              title: 'Carregar plantilla o afegir text',
-              detail: 'El canvas és buit. El camí net és carregar una plantilla o crear el primer element abans d’ajustar propietats.',
-              href: '#canvas-templates',
-              ctaLabel: 'Obrir plantilles',
-            }
-          : selected
-            ? {
-                eyebrow: 'Següent pas · Ajust fi',
-                title: 'Editar l’element seleccionat',
-                detail: 'Ja tens focus actiu. Ajusta posició, mida, color o copy abans d’exportar la peça.',
-                href: '#canvas-properties',
-                ctaLabel: 'Obrir propietats',
-              }
-            : {
-                eyebrow: 'Següent pas',
-                title: 'Seleccionar capa o exportar',
-                detail: 'La composició ja és viva. Pots seleccionar una capa per polir-la o exportar directament el PNG.',
-                href: '#canvas-layers',
-                ctaLabel: 'Obrir capes',
-              };
-
-    return {
-      system: {
-        eyebrow: 'Automàtic · Composició',
-        title: elements.length > 0 ? 'Canvas en construcció' : 'Canvas buit',
-        tone: elements.length > 0 ? 'info' : 'warning',
-        items: systemItems,
-        emptyText: 'Sense configuració visible al canvas.',
-      },
-      manual: {
-        eyebrow: 'Manual · Sessió',
-        title: manualItems.length === 0 ? 'Cap tensió manual' : `${manualItems.length} senyals de sessió`,
-        tone: exporting || dragging || resizing ? 'warning' : manualItems.length > 0 ? 'info' : 'success',
-        items: manualItems,
-        emptyText: 'Sense selecció, moviments ni exportació en curs.',
-      },
-      nextStep,
-    };
-  }, [
-    activePreset,
-    canvasSize.height,
-    canvasSize.width,
-    dragging,
-    elements,
-    exporting,
-    resizing,
-    selected,
-    selectedTemplateName,
-  ]);
 
   // Scale canvas to fit viewport
   const CANVAS_MAX_H = 700;
@@ -446,12 +335,6 @@ export default function CanvasEditorClient() {
 
   return (
     <div className="space-y-6">
-      <OwnerControlStrip
-        system={strip.system}
-        manual={strip.manual}
-        nextStep={strip.nextStep}
-      />
-
       <div className="flex flex-col gap-6 lg:flex-row">
       {/* LEFT - Canvas */}
       <div className="flex-1 min-w-0">

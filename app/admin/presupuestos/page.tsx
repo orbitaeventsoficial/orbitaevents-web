@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import dynamicImport from 'next/dynamic';
 import { prisma } from '@/lib/prisma';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { formatCurrency } from '@/lib/constants';
 import { ADMIN_PDF_STUDIO_DEFAULTS } from '@/lib/constants/admin';
 import ProposalsList from './ProposalsList';
@@ -233,48 +232,6 @@ export default async function PresupuestosPage({
       manualItems.push(`${counts.rejected} rebutjades recents (lliçó per l'ofertes)`);
     }
 
-    const nextStep = acceptedWithoutBooking > 0
-      ? {
-          eyebrow: 'Següent pas · Conversió',
-          title: 'Convertir acceptades en reserves',
-          detail: `${acceptedWithoutBooking} ${acceptedWithoutBooking === 1 ? 'proposta acceptada no té reserva' : 'propostes acceptades no tenen reserva'} vinculada. Tanca el cercle creant la reserva des de la fitxa.`,
-          href: '/admin/presupuestos?statusFilter=ACCEPTED',
-          ctaLabel: 'Veure acceptades',
-          secondaryAction: { href: '/admin/bookings', label: 'Obrir reserves' },
-        }
-      : sentStale > 0
-      ? {
-          eyebrow: 'Següent pas · Follow-up',
-          title: 'Recuperar propostes enviades fredes',
-          detail: `${sentStale} ${sentStale === 1 ? 'proposta enviada ha passat' : 'propostes enviades han passat'} ${SENT_STALE_DAYS}+ dies sense resposta. Reactiva-les amb un seguiment o tanca-les.`,
-          href: '/admin/presupuestos?statusFilter=SENT',
-          ctaLabel: 'Revisar enviades',
-          secondaryAction: { href: '/admin/inbox/compose', label: 'Redactar seguiment' },
-        }
-      : draftStale > 0
-      ? {
-          eyebrow: 'Següent pas · Netejar',
-          title: 'Tancar esborranys oberts',
-          detail: `${draftStale} ${draftStale === 1 ? 'esborrany porta' : 'esborranys porten'} ${DRAFT_STALE_DAYS}+ dies sense enviar. Completa'ls, envia'ls o esborra'ls per no deixar cua fantasma.`,
-          href: '/admin/presupuestos?statusFilter=DRAFT',
-          ctaLabel: 'Revisar esborranys',
-        }
-      : counts.total === 0
-      ? {
-          eyebrow: 'Següent pas',
-          title: 'Crear el primer pressupost',
-          detail: 'Encara no hi ha propostes al catàleg comercial recent. Obre un pressupost nou per començar la traça.',
-          href: '/admin/presupuestos?customerId=new',
-          ctaLabel: 'Nou pressupost',
-        }
-      : {
-          eyebrow: 'Següent pas',
-          title: 'Catàleg comercial al dia',
-          detail: 'Sense bloquejos visibles a les propostes recents. Aprofita per preparar noves ofertes o revisar plantilles del PDF.',
-          href: '/admin/presupuestos?customerId=new',
-          ctaLabel: 'Nou pressupost',
-          secondaryAction: { href: '/admin/settings/quotes', label: 'Plantilles PDF' },
-        };
 
     return (
       <main className="pr__page">
@@ -295,32 +252,6 @@ export default async function PresupuestosPage({
           </Link>
           </div>
         </header>
-        <OwnerControlStrip
-          className="pr__signal"
-          system={{
-            eyebrow: 'Automàtic · Catàleg comercial',
-            title: counts.total === 0
-              ? 'Sense propostes recents'
-              : `${counts.total} propostes recents`,
-            tone: counts.accepted > 0 ? 'success' : counts.total > 0 ? 'info' : 'info',
-            items: systemItems,
-            emptyText: 'El catàleg encara no té propostes registrades.',
-          }}
-          manual={{
-            eyebrow: 'Manual · Intervenció',
-            title: manualItems.length === 0
-              ? 'Cap coll visible'
-              : `${manualItems.length} senyals per revisar`,
-            tone: (acceptedWithoutBooking > 0 || sentStale > 0 || counts.expired > 0)
-              ? 'warning'
-              : manualItems.length > 0
-              ? 'info'
-              : 'success',
-            items: manualItems,
-            emptyText: 'Cap proposta requereix intervenció manual ara mateix.',
-          }}
-          nextStep={nextStep}
-        />
         <ProposalsList
           proposals={serializedProposals}
           quotes={serializedQuotes}

@@ -1,3 +1,226 @@
+## 2026-06-26 — Codi mort de leads/[id] (TANCAT CHARLIE) eliminat amb autorització (Canvi #1185, claude)
+
+### Context
+Últim codi mort detectat pendent: 3 consts orfes a `leads/[id]/LeadDetailClient.tsx` (zona TANCAT CHARLIE). El #1183 els va deixar perquè calia ordre del propietari. **El propietari va autoritzar explícitament** («entra-hi», «fes neteja», «no pateixis», «tu acaba la feina»). Evidència git: introduïts el 2026-06-02 (#849-854), abandonats des de fa ~3,5 setmanes.
+
+### Què s'ha tret (cadena transitiva completa, derivacions pures)
+- Consts: `pay` (= `paymentState(...)`), `nextStage` (= `nextStageFor(stage)`), `editable` (booleà derivat de `stage`/`booking`).
+- Funcions locals que només alimentaven aquests consts: `paymentState` (118), `nextStageFor` (133).
+- Tipus orfe resultant: `PayState` (34, només el retornava `paymentState`).
+- CONSERVAT: `leadSummary` (funció entremig, viva), `EditableField` (9 usos, no relacionat amb el const `editable`), `Stage` (21 usos via `stage`).
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 · `validate:core` EXIT 0 · `pnpm test:run` **522 fitxers / 5013 tests / 0 fallos** · `qa:smoke` (render lead detail).
+- Validació funcional: cap canvi de render (consts/funcions no renderitzats; la fitxa del lead usa `stage`/`leadSummary`/`EditableField` intactes).
+- Validació humana/UX: el propietari va autoritzar entrar al TANCAT CHARLIE explícitament i va dir que refarà la peça si calgués.
+
+### Coordinació
+Counter -> 1185. Perímetre: `app/admin/leads/[id]/LeadDetailClient.tsx`. **Tanca el cleanup de codi mort de tota la sessió** — 0 consts/funcions/tipus/imports orfes a TOT l'admin (excepte bastida viva conscient).
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-26 — Eliminació de la bastida abandonada «entrada unificada» de l'inbox (Canvi #1184, claude)
+
+### Context
+El #1183 va DEIXAR el clúster «vista d'entrada unificada» de `SafataClient` per prudència (semblava feature en construcció). Investigat amb git: **és codi abandonat, no en construcció** — no es toca des del 2026-05-28 (commit #826-828), i `SafataClient` va rebre canvis posteriors (#849-854, #953-967) que NO el van cablejar. Amb autorització del propietari («gràcies endavant»), eliminat.
+
+### Verificació prèvia (que era segur)
+- Tot el clúster només es referencia a si mateix i acaba en `unifiedInboxItems` (mai renderitzat): `inboxEmailsForEntry` → `filteredInboxEmails` → `unifiedInboxItems` (+ `type UnifiedItem`), més 2 orfes terminals `inboxUnread` i `handleSelectImapFromEntry`.
+- La safata VIVA renderitza per un camí diferent (`handleSelectImap`, línia 873; `active`/folders) — independent del clúster.
+
+### Què s'ha tret (SafataClient.tsx)
+`handleSelectImapFromEntry` (handler duplicat mort), `inboxUnread`, `unifiedInboxItems`, `filteredInboxEmails`, `inboxEmailsForEntry` (cadena transitiva) i `type UnifiedItem`. Deps compartides conservades (`sortEmails` 3 usos, `SafataLead` 9 usos, `ImapEmail`). 0 imports orfes resultants.
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 · `validate:core` EXIT 0 · `pnpm test:run` **522 fitxers / 5013 tests / 0 fallos** · `qa:smoke` (render inbox).
+- Validació funcional: cap canvi de render (clúster no renderitzat; safata viva intacta via `handleSelectImap`).
+- Validació humana/UX: el propietari va autoritzar l'eliminació («gràcies endavant») després de presentar-li l'evidència git d'abandó.
+
+### Coordinació
+Counter -> 1184. Perímetre: `app/admin/inbox/SafataClient.tsx`. Tanca el flag que el #1183 va deixar obert per a l'inbox. Resta pendent NOMÉS leads/[id] (TANCAT CHARLIE) com a codi mort no tocat.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-26 — Codi mort preexistent (no-OwnerControlStrip) a 4 fitxers admin (Canvi #1183, claude)
+
+### Context
+En verificar la completesa del cleanup d'orfes (#1182), el detector va trobar codi mort **preexistent** (sense relació amb OwnerControlStrip) a 6 fitxers admin. Aplicat el mateix mètode segur NOMÉS al subconjunt net i no-protegit.
+
+### Què s'ha tret (4 fitxers, 12 consts + 2 imports)
+- `bookings/[id]/page.tsx`: 9 derivacions pures de KPI (`statusConf`, `paymentKpiClass`/`paymentDotClass`, `flowKpiClass`/`flowDotClass`, `peKpiClass`/`peDotClass`/`peLabel`, `previewMarginPct`) + `directCostPreview` (cascada) — restes d'un refactor de la capçalera de KPIs. Import orfe `getBookingStatusDisplay` netejat.
+- `calendario/CalendarDayClient.tsx`: `router` (`useRouter()` sense ús) + import `useRouter`.
+- `leads/LeadsSeasonClient.tsx`: `wonCount` (filter sense ús).
+- `manual/page.tsx`: `totalCapabilities`.
+
+### Què s'ha DEIXAT i per què (NO tocat — decisió de prudència)
+- `inbox/SafataClient.tsx`: `handleSelectImapFromEntry`, `inboxUnread`, `unifiedInboxItems` — tots porten marques de la «vista d'entrada unificada» (comentaris + tipus `UnifiedItem`); és **bastida d'una feature en construcció** en un sub-app que el propietari treballa activament (projecte «Safata canal correu»). Mig-desmuntar-la seria un error.
+- `leads/[id]/LeadDetailClient.tsx`: `pay`, `nextStage`, `editable` — derivacions pures però en zona **TANCAT CHARLIE** (protegida); possible bastida d'un mode d'edició. Requereix ordre del propietari.
+
+### Mètode
+Remover robust (count==1 only, cascada per iteració, fronteres per profunditat, backup, `tsc` d'oracle). Fals positiu detectat i respectat: `promises` a `manual/page.tsx` és `import { promises as fs }` (usat via àlies `fs`) — NO tocat.
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 · `validate:core` EXIT 0 · `pnpm test:run` **522 fitxers / 5013 tests / 0 fallos** · `qa:smoke` (render).
+- Validació funcional: cap canvi de render (codi mort no renderitzat); els tests de booking detail segueixen verds.
+- Validació humana/UX: no aplica.
+
+### Coordinació
+Counter -> 1183. Perímetre: 4 fitxers admin (codi mort net no-protegit). Deixat flag a `agent-sync` per a la resta (inbox unified + leads/[id] TANCAT CHARLIE) que necessiten decisió del propietari.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-26 — Cleanup d'orfes d'OwnerControlStrip a TOTS els consumidors (Canvi #1182, claude)
+
+### Context
+El #1181 va netejar els orfes de **3** consumidors (els que jo coneixia). En verificar la completesa amb un detector sobre **tots** els fitxers tocats al #1180, van aparèixer consts orfes (`systemItems`/`manualItems`/`nextStep`/`automaticSignals`/`ownerManualItems`…) a **20 consumidors més** — el #1181 estava incomplet. Aquest canvi tanca el cleanup a tot arreu.
+
+### Mètode (segur per construcció + lliçó del bug de l'script)
+- Remover robust `strip-orphans-robust.mjs`: només treu consts `count==1` (realment sense ús per `grep` — els deps vius tenen `count>1` i MAI es toquen; la cascada es resol iterant), amb **detecció de fronteres de sentència per profunditat** de `()[]{}` + strings/templates (la causa real de la corrupció del #1180 era `;\s*$`). Backup previ + `tsc` d'oracle.
+- BUG trobat i resolt: `execSync` a Windows usa `cmd.exe`, que NO treu les cometes del glob `'app/admin/**/*.tsx'` → llista de fitxers buida → el primer intent va processar 0 fitxers (cap dany). Corregit amb llista explícita de 24 fitxers.
+- 1 cas límit manual: `operationLabel` (templates niats `` `…${`…`}` ``) que el tracker no gestiona → tret a mà.
+- Imports orfes resultants (10 fitxers: `DEFAULT_LOCALE`, `formatCurrency`, `AdminPage`/`AdminHelpPanel` estancats a `bookings`, `useMemo`, `pluralize`…) → netejats amb `clean-imports.mjs` (reconstrueix la llista de noms, elimina l'import si queda buit).
+
+### Resultat
+- **0 consts orfes + 0 imports orfes** a TOTS els consumidors d'OwnerControlStrip. La cadena queda 100% neta (render #1180 + fitxer #1180 + computacions #1181+#1182).
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 (re-executat després de cada fase) · `validate:core` EXIT 0 · `pnpm test:run` **522 fitxers / 5013 tests / 0 fallos** · detectors d'orfes (const + import) = 0.
+- Validació funcional: cap canvi de render (codi mort no renderitzat); `qa:smoke` confirma els consumidors netes.
+- Validació humana/UX: no aplica (eliminació de codi mort sense superfície d'usuari).
+
+### Coordinació
+Counter -> 1182. Perímetre: 24 consumidors admin (consts + imports orfes). Completa el #1181.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-26 — Neteja de les computacions orfes residuals del #1180 (Canvi #1181, claude)
+
+### Context
+El #1180 va treure el render mort d'`OwnerControlStrip` però va **deixar intactes** les computacions narratives que l'alimentaven a 3 consumidors amb consts amb nom (la resta tenien les dades inline, eliminades amb el block). Aquestes consts quedaven com a codi mort (es calculaven a cada render sense usar-se). Un reviewer les marcaria. Completades ara amb el mètode segur.
+
+### Mètode (la lliçó del #1180)
+L'intent del #1180 de fer-ho amb un script en cascada va **corrompre fitxers** (detecció de fronteres de sentència defectuosa + no distingia deps vius de morts). Aquesta vegada: **manual, per fitxer, amb `tsc` com a oracle després de cada pas**, i verificant SEMPRE amb `grep` de línies que cada dep no s'usés en JSX viu abans de treure'l (p. ex. `lowStockItems` s'usa viu a la línia 480 → conservat; `dominantCategory`/`dominantCategoryMeta` s'usaven a `statsCards` fins que es va treure `nextStep`, llavors orfes).
+
+### Què s'ha tret (tot grep-verificat com a strip-only, cascada resolta fins a 0 orfes)
+- `ActivityClient`: `systemItems`, `manualItems`, `timelineLinkedCount`, `sourceCounts`, `sourceEntries`, `nextStep`, `activeCategoryLabel`, `dominantCategory`, `dominantCategoryMeta`. Conservats `windowLabel` (viu a la fila d'activitat) i la resta.
+- `SocialClient`: `weakestLink`, `nextStepTitle`, `nextStepDescription`, `draftCount`. Conservat `operatingLoop` (secció viva).
+- `InventoryListClient`: `hasActiveFilters`, `nextStepTitle`, `nextStepDetail`, `nextStepHref`, `nextStepLabel`, `packLinkedItems`, `missingCostItems`, `unusedValuableItems`, `endOfLifeItems`, `agingItems`, `selectedBundleCoverage`. Conservat `lowStockItems` (viu) i el motor de filtres `displayedItems`.
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 (re-executat després de CADA eliminació) · `validate:core` EXIT 0 · `pnpm test:run` **522 fitxers / 5013 tests / 0 fallos** (els 3 tests de health-filters d'inventory segueixen verds: usen `displayedItems`, no els count useMemos eliminats).
+- Detector d'orfes final: **0** a tots 3 fitxers.
+- Validació funcional: cap canvi de render (codi mort que no es renderitzava); `qa:smoke` confirma `/admin/activity`, `/admin/social` i `/admin/inventory` netes als 3 breakpoints (81/82 rutes; l'única excepció és el flaky-timeout de perf de `/admin`, aliè a aquest canvi).
+- Validació humana/UX: no aplica (eliminació de codi mort sense superfície d'usuari).
+
+### Coordinació
+Counter -> 1181. Perímetre: 3 components admin. Tanca el deute que el #1180 va deixar explícitament obert.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-26 — Eliminació del plumbing mort d'OwnerControlStrip (Canvi #1180, claude)
+
+### Context
+El #976 va eradicar el panell `OwnerControlStrip` (el feia retornar `null`) per ordre del propietari («un festival de colors no-Òrbita que violava la norma de sèrie»), mantenint la signatura «perquè els ~37 consumidors no es trenquin» i deixant explícitament **«la neteja dels usos (treure import + bloc) com a feina de seguiment, sense impacte UI»**. Aquesta sessió ja havia arreglat 4 tests UI (#1179) que fallaven precisament per aquest plumbing mort. Toca completar el cleanup planificat.
+
+### Què s'ha fet
+- Eliminat l'`import` + el block `<OwnerControlStrip .../>` (sempre self-closing, render `null`) a **33 consumidors** de `app/admin/**`. 0 impacte UI (el component no renderitzava res).
+- 5 consumidors tenien el block embolcallat en una expressió (`{cond && (<strip/>)}` o `return (<strip/>)`); resolts treient l'expressió buida. A `discount-codes`/`privacy`/`ressenyes` el block estava darrere d'un `const strip = useMemo(...)` dedicat → eliminat el `useMemo` orfe sencer (clarament strip-only).
+- `clientes`: el wrapper `CustomerHubOperatingStrip` (component que NOMÉS renderitzava el strip) eliminat sencer + el seu ús a `clientes/page.tsx` + l'import orfe de `buildCustomerHubOperatingSummary`.
+- Eliminat el fitxer **`app/admin/components/OwnerControlStrip.tsx`** (orfe: 0 imports a tot el repo després del cleanup; `OwnerControlSlot` també sense ús).
+- DECISIÓ d'abast: les computacions narratives que alimentaven el strip (p. ex. `systemItems`/`manualItems` a alguns consumidors) es deixaven intactes aquí (un intent de neteja agressiva d'orfes en cascada va corrompre 3 fitxers; revertits a HEAD i refets amb el cleanup mínim segur). **→ Completades després al #1181** amb mètode manual + `tsc` com a oracle (0 orfes restants).
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 · `validate:core` EXIT 0 (incl. `check-dead-admin-views`, que ara té un component mort menys) · `pnpm test:run` **522 fitxers / 5013 tests / 0 fallos**.
+- Validació de render (`qa:smoke`): **81/82 rutes verdes als 3 breakpoints** (243 renders nets). Única excepció: `/admin` (dashboard GA4) fa **flaky-timeout** al `page.goto` de 30s en 1 breakpoint **variable** entre execucions (run 1: desktop+mobile; run 2: desktop) — NO és regressió de #1180: és perf de la ruta més pesada (`/admin` respon HTTP 401/auth en 11s calent, render correcte als altres breakpoints), justament la ruta que codex està optimitzant al #1177/#1178. El component eradicat renderitzava `null`, així que #1180 no pot alentir res.
+- Validació funcional: cap canvi de render (el component eradicat ja retornava `null`); pàgines idèntiques visualment.
+- Validació humana/UX: no aplica (eliminació de codi mort sense impacte UI, com va declarar el #976).
+
+### Coordinació
+Counter -> 1180. Perímetre: 33 consumidors admin + `clientes/page.tsx` + eliminació de `OwnerControlStrip.tsx`. No s'ha tocat la feina sense commitejar de codex (#1177/#1178). Tanca el deute de seguiment que el #976 va deixar obert.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-26 — Restauració de la suite de tests: de 120 fallos a 0 (Canvi #1179, claude)
+
+### Context
+Arrencada de sessió («seguim»). Després de confirmar `validate:core` verd, vaig executar `pnpm test:run` (que `validate:core` NO inclou) i la suite estava **vermella: 120 tests fallits en 31 fitxers**, malgrat que diaris anteriors la donaven per verda. Causa: canvis de producte recents als quals no es va córrer `test:run` o els fallos no es van documentar.
+
+### Diagnòstic i fix (test-only, 0 codi de producte tocat)
+- **113 fallos · CSRF (arrel #1087)**: 25 tests de ruta admin (`__tests__/app/api/admin/*`) provaven handlers mutadors que ara criden `verifyCsrf()` (afegit #1087) però no mockejaven `@/lib/csrf` → 403 abans de la lògica → assertions 400/500 fallaven. Fix: afegit `mockVerifyCsrf` al `vi.hoisted` + `vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }))` + reset a `null`, seguint el patró establert a `tasks-route.test.ts`. Cap ruta admin importa res més que `verifyCsrf` de `@/lib/csrf` (verificat) → mock segur.
+- **2 fallos · mock site-config incomplet**: `dossier-html-builder` i `adminQuoteEmailService` mockejaven `SITE_CONFIG.business` sense `phone` → `lib/constants/index.ts:24` (`WHATSAPP_NUMBER = ...phone.replace(...)`) petava en càrrega. Fix: afegit `phone` als mocks.
+- **2 fallos · nba-explain (gate IA #1177 de codex)**: el #1177 va afegir el gate `ADMIN_AI_ENABLED !== '1'` que retorna buit; el test no activava la flag. Fix: `process.env.ADMIN_AI_ENABLED = '1'` al `beforeEach` + restauració al `afterEach`.
+- **1 fallo · seasonCalendar (#1102)**: el #1102 va afegir `distanceKm` al booking del calendari; l'`expected` del test no l'incloïa. Fix: afegit `distanceKm: 40` a l'expected.
+- **4 fallos UI · OwnerControlStrip eradicat (#976)**: `OwnerControlStrip` retorna `null` des del #976 (ordre del propietari), però `SocialClient` (×2), `marketing/page` i `InventoryListClient` tenien assertions sobre contingut que només es renderitzava via aquell panell mort. Fix: re-apuntades les assertions a les superfícies vives (KPI cards, operating loop, badge `Readiness`) i eliminat el test de «friccions» d'inventory (sense superfície viva equivalent).
+
+### Validació
+- Validació tècnica: `pnpm test:run` → **522 fitxers / 5013 tests, 0 fallos** (abans 120 fallits). `validate:core` 0 (re-executat amb els canvis).
+- Validació funcional: cada fix re-apunta a comportament real verificat (DOM dump per als UI, traça per als de càrrega).
+- Validació humana/UX: no aplica (canvi d'infraestructura de test, cap superfície d'usuari tocada).
+
+### Coordinació
+Counter -> 1179. Perímetre: **només `__tests__/**`** (32 fitxers). NO he tocat cap codi de producte ni la feina sense commitejar de codex (#1177/#1178: ga4/weather/nba-route/css/counter). Worktree compartit respectat.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-26 — Dashboard principal amb GA4 cachejat i navegació calenta més ràpida (Canvi #1178, codex)
+
+### Context
+Després de tancar el #1177, `/admin` continuava sent la ruta més lenta en calent. Mesura directa dels serveis del dashboard: `fetchDashboardData` era el coll d'ampolla (~1.8-2.0s), mentre `dailyBrief`, `operationalPulse`, `captureHealth`, `attribution`, `anomalies`, `capacity` i `weeklyForecast` quedaven per sota de 300ms. El cost venia sobretot de `getGa4Report()`, que feia múltiples crides GA4 cada render i no compartia cache amb `/admin/analytics` ni màrqueting.
+
+### Què s'ha fet
+- `lib/analytics/ga4.ts`: `getGa4Report()` passa per cache in-memory de 2 minuts i deduplicació d'in-flight. Si dues pantalles demanen GA4 alhora, comparteixen la mateixa promesa; si es navega en calent, no es tornen a disparar les 9+ lectures GA4.
+- Contracte funcional intacte: les pantalles segueixen rebent `Ga4Report | null`; només canvia la política de càrrega per evitar xarxa repetida i bloqueig del dashboard.
+
+### Validació
+- Validació tècnica: mesura local amb el mateix procés: `fetchDashboardData cold` ~1765ms; `fetchDashboardData warm` ~561ms després de cache GA4.
+- Validació funcional: afecta `/admin`, `/admin/analytics` i `loadMarketingHubSummary()` sense tocar UI ni dades de negoci.
+- Validació humana/UX: el centre de control deixa de pagar una consulta analítica externa completa a cada canvi de pàgina en calent.
+
+### Coordinació
+Counter -> 1178. Perímetre: cache GA4 compartida; no toca Anthropic, weather, CSS ni dades operatives.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-26 — Headers canònics responsius + navegació local sense crides externes automàtiques (Canvi #1177, codex)
+
+### Context
+El propietari detecta canvi de pàgina lent en local i capçaleres poc responsives. Diagnòstic amb servidor local viu i Playwright autenticat a 375/768/1440: sense overflow global, però primeres càrregues molt lentes per recompilació `next dev` i crides externes decoratives (`nba-explain`, weather). També es confirma que hi havia capçaleres especials de Leads/Bookings que trencaven el patró `ap-header`. Criteri de privacitat fixat: cap IA externa llegeix dades de l'admin per defecte; només amb opt-in explícit.
+
+### Què s'ha fet
+- `app/globals.css`: `ap-header`, `ap-header-actions`, `ap-title`, `ap-subtitle`, `ap-section-head`, `ap-section-actions` i `ap-btn` reforçats com a sistema responsiu: wrap real, `min-width:0`, botons centrats i accions full-width a mòbil.
+- `app/admin/admin-shell.css`: `ap-detail-bar` deixa de ser `nowrap`, accions i botons de detail fan wrap, títol amb `overflow-wrap`, i stats de detail passen a 2 columnes a mòbil.
+- `app/admin/control-room.css`: eliminats overrides locals de `.admin-booking-page .ap-header` i `.admin-leads-page/.admin-lead-detail-page .ap-header`; les capçaleres tornen al tipus canònic `ap-header`.
+- `app/api/admin/ai/nba-explain/route.ts`: cap crida externa a Anthropic si no hi ha `ADMIN_AI_ENABLED=1` explícit.
+- `lib/services/weatherService.ts`: en desenvolupament local no consulta Nominatim/OpenWeatherMap si no hi ha `ADMIN_DEV_EXTERNAL_WEATHER=1`.
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 · `weatherService.test.ts` 2/2 · `validate:core` 0 · `git diff --check` 0.
+- Validació funcional: Playwright autenticat a `/admin`, `/admin/leads`, `/admin/bookings`, `/admin/settings`, `/admin/presupuestos`, `/admin/clientes`, `/admin/inbox` a 375/768/1440; scroll horitzontal 0 i cap header amb overflow.
+- Validació humana/UX: les capçaleres deixen de dependre de variants locals i respiren com a tipus de sistema; la navegació local deixa de quedar contaminada per crides externes d'IA/meteo.
+
+### Coordinació
+Counter -> 1177. Perímetre: sistema `ap-*`, headers detail, opt-in d'IA admin i weather local. Sense tocar lògica de negoci ni dades.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-25 — /studio: reparació dels 3 bugs de tokens/classe fantasma (Canvi #1176, claude)
 
 ### Context

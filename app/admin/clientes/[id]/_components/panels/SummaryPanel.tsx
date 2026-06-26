@@ -34,7 +34,6 @@ import {
 } from '@/lib/admin/customerWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { getLeadPriorityColorDisplay } from '@/app/admin/leads/colorTheme';
-import { OwnerControlStrip } from '@/app/admin/components/OwnerControlStrip';
 
 type CustomerEditableFields = {
   name: string;
@@ -193,76 +192,8 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
     alerts.push({ type: 'info', text: `${activeDiscounts.length} codi${activeDiscounts.length > 1 ? 's' : ''} de descompte actiu${activeDiscounts.length > 1 ? 's' : ''} (${activeDiscounts.map(d => d.code).join(', ')})` });
   }
 
-  const ownerAutomaticSignals = [
-    data.insights.commercialRisk.level !== 'NONE'
-      ? `${data.insights.commercialRisk.label}${data.insights.commercialRisk.context ? ` · ${data.insights.commercialRisk.context}` : ''}`
-      : null,
-    data.reactivation
-      ? `Reactivació detectada: ${data.reactivation.reasonLabel}`
-      : null,
-    nextEvent?.date
-      ? `Pròxim esdeveniment en ${getDaysUntil(nextEvent.date)} dies`
-      : null,
-    activeDiscounts.length > 0
-      ? `${activeDiscounts.length} codi${activeDiscounts.length > 1 ? 's' : ''} actiu${activeDiscounts.length > 1 ? 's' : ''}`
-      : null,
-  ].filter(Boolean) as string[];
 
-  const ownerManualSignals = [
-    urgentTasks > 0
-      ? `${urgentTasks} tasca${urgentTasks > 1 ? 'ques' : ''} urgent${urgentTasks > 1 ? 's' : ''}`
-      : null,
-    draftProposals > 0
-      ? `${draftProposals} pressupost${draftProposals > 1 ? 's' : ''} en esborrany`
-      : null,
-    sentProposals > 0 && acceptedProposals === 0
-      ? `${sentProposals} pressupost${sentProposals > 1 ? 's' : ''} pendent${sentProposals > 1 ? 's' : ''} de resposta`
-      : null,
-    topLeadAction && topLead
-      ? `Hi ha una oportunitat viva: ${topLead.name || 'lead activa'}`
-      : null,
-  ].filter(Boolean) as string[];
 
-  const ownerNextStep = topLeadAction
-    ? {
-        title: topLeadAction.label,
-        detail: topLead?.commercialBlocker?.label || topLeadActionChannel || 'Acció comercial assistida',
-        href: topLeadAction.href,
-        external: topLeadAction.external,
-      }
-    : reactivationTaskHref
-      ? {
-          title: 'Crear tasca de reactivació',
-          detail: data.reactivation
-            ? `${data.reactivation.reasonLabel} · prioritat ${data.reactivation.priority.toLowerCase()}`
-            : 'Seguiment suggerit per al client',
-          href: reactivationTaskHref,
-          external: false,
-        }
-      : nextTask
-        ? {
-            title: nextTask.title,
-            detail: nextTask.dueDate
-              ? `Tasques pendents · venciment ${formatDateSimple(nextTask.dueDate)}`
-              : 'Tasques pendents per revisar',
-            href: customerTaskCreateHref,
-            external: false,
-          }
-        : nextEvent
-          ? {
-              title: nextEvent.reference || 'Obrir reserva',
-              detail: nextEvent.date
-                ? `Pròxim esdeveniment · ${formatDateFull(nextEvent.date)}`
-                : 'Reserva vinculada al client',
-              href: buildBookingHref(nextEvent.id),
-              external: false,
-            }
-          : {
-              title: 'Enviar missatge',
-              detail: 'No hi ha bloqueig crític, però convé mantenir el client actiu',
-              href: customerComposeHref,
-              external: false,
-            };
 
   const handleSave = useCallback(async () => {
     setSaving(true);
@@ -320,34 +251,6 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
           ))}
         </div>
       )}
-
-      <OwnerControlStrip
-        className="xl:grid-cols-[1.1fr_1.1fr_1.3fr]"
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què està vigilant el sistema',
-          tone: 'info',
-          items: ownerAutomaticSignals,
-          emptyText: 'Sense senyals automàtiques destacades ara mateix.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'Què et reclama decisió',
-          tone: ownerManualSignals.length > 0 ? 'warning' : 'success',
-          items: ownerManualSignals,
-          emptyText: 'No hi ha cap front manual calent ara mateix.',
-        }}
-        nextStep={{
-          title: ownerNextStep.title,
-          detail: ownerNextStep.detail,
-          href: ownerNextStep.href,
-          external: ownerNextStep.external,
-          secondaryAction: {
-            href: customerTaskCreateHref,
-            label: 'Preparar tasca',
-          },
-        }}
-      />
 
       <CrmStatusBar customer={data.customer} onTagsChange={() => router.refresh()} />
 

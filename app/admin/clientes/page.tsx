@@ -17,7 +17,6 @@ import { AddCustomerModal, StartProcessModal } from './ClientesModals';
 import {
   CustomersDesktopTable,
   CustomersEmpty,
-  CustomerHubOperatingStrip,
   CustomersError,
   CustomersHelpPanel,
   CustomersLoading,
@@ -182,7 +181,6 @@ export default function AdminContactesPage() {
 
         <div className="cl__content">
           <CustomersHelpPanel />
-          {!loading && !error && <CustomerHubOperatingStrip customers={customers} stats={stats} />}
           <CustomersToolbar
             searchInput={searchInput}
             setSearchInput={setSearchInput}

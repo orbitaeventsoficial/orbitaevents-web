@@ -4,13 +4,11 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import { AdminPage, AdminKpiRow, AdminKpi } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { formatDateTime } from '@/lib/constants';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { log } from '@/lib/logger';
-import { pluralize } from '@/lib/utils/pluralize';
 
 type Testimonial = {
   id: string;
@@ -187,124 +185,6 @@ export default function AdminRessenyesPage() {
     toast.success('Imatge descarregada');
   };
 
-  const strip = useMemo(() => {
-    if (loading) return null;
-
-    const now = Date.now();
-    const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
-    const total = pending.length + approved.length;
-    const stalePending = pending.filter((t) => now - new Date(t.createdAt).getTime() > SEVEN_DAYS).length;
-    const lowRatingPending = pending.filter((t) => t.rating < 4).length;
-    const lowRatingApproved = approved.filter((t) => t.rating < 4).length;
-
-    const systemItems: string[] = [];
-    if (total > 0) {
-      systemItems.push(
-        `${total} ressenyes rebudes · ${approved.length} aprovades · ${pending.length} pendents`,
-      );
-      systemItems.push(`Nota mitjana: ${avgRating.toFixed(1)}★`);
-    } else {
-      systemItems.push('Encara no hi ha ressenyes rebudes');
-    }
-
-    const manualItems: string[] = [];
-    if (pending.length > 0) {
-      manualItems.push(
-        `${pending.length} ${pluralize(pending.length, 'ressenya pendent', 'ressenyes pendents')} de moderació`,
-      );
-    }
-    if (stalePending > 0) {
-      manualItems.push(
-        `${stalePending} ${pluralize(stalePending, 'pendent', 'pendents')} de fa >7 dies`,
-      );
-    }
-    if (lowRatingPending > 0) {
-      manualItems.push(
-        `${lowRatingPending} ${pluralize(lowRatingPending, 'pendent amb <4★', 'pendents amb <4★')}`,
-      );
-    }
-    if (lowRatingApproved > 0) {
-      manualItems.push(
-        `${lowRatingApproved} ${pluralize(lowRatingApproved, 'aprovada amb <4★ visible', 'aprovades amb <4★ visibles')} al web`,
-      );
-    }
-
-    const systemTone: 'info' | 'warning' | 'success' =
-      total === 0 ? 'info' : avgRating >= 4 ? 'success' : avgRating >= 3 ? 'warning' : 'warning';
-
-    const manualTone: 'info' | 'warning' | 'success' =
-      stalePending > 0 || lowRatingApproved > 0
-        ? 'warning'
-        : manualItems.length > 0
-          ? 'info'
-          : 'success';
-
-    const nextStep =
-      total === 0
-        ? {
-            eyebrow: 'Següent pas · Demanar',
-            title: 'Encara no hi ha ressenyes',
-            detail:
-              'Quan un client completa un event, l\'enquesta post-event demana ressenya pública. Revisa que l\'automatisme estigui actiu.',
-            href: '/admin/post-event/surveys',
-            ctaLabel: 'Obrir enquestes',
-          }
-        : pending.length > 0
-          ? {
-              eyebrow: 'Següent pas · Moderar',
-              title: `Moderar ${pending.length} ${pluralize(pending.length, 'ressenya pendent', 'ressenyes pendents')}`,
-              detail:
-                stalePending > 0
-                  ? `${stalePending} ${pluralize(stalePending, 'porta', 'porten')} >7 dies esperant. Aprova o amaga per no bloquejar el testimoniatge al web.`
-                  : 'Aprova o amaga cada testimoniatge per poder-lo fer servir com a canvas i social proof al web.',
-              href: '#pendents',
-              ctaLabel: 'Obrir pendents',
-              secondaryAction:
-                approved.length > 0 ? { href: '#aprovades', label: 'Veure aprovades' } : undefined,
-            }
-          : lowRatingApproved > 0
-            ? {
-                eyebrow: 'Següent pas · Reviu',
-                title: `${lowRatingApproved} ${pluralize(lowRatingApproved, 'aprovada amb <4★', 'aprovades amb <4★')} al web`,
-                detail:
-                  'Considera amagar ressenyes baixes per mantenir la mitjana pública. No elimina la ressenya — només la treu del canal públic.',
-                href: '#aprovades',
-                ctaLabel: 'Revisar aprovades',
-              }
-            : {
-                eyebrow: 'Següent pas',
-                title: 'Moderació al dia',
-                detail: `${approved.length} ${pluralize(approved.length, 'ressenya aprovada visible', 'ressenyes aprovades visibles')}. Aprofita per generar canvas Story/Instagram i distribuir social proof.`,
-                href: '#aprovades',
-                ctaLabel: 'Veure aprovades',
-              };
-
-    return {
-      system: {
-        eyebrow: 'Automàtic · Catàleg',
-        title:
-          total === 0
-            ? 'Sense ressenyes encara'
-            : pending.length > 0
-              ? 'Moderació pendent'
-              : 'Catàleg de social proof',
-        tone: systemTone,
-        items: systemItems,
-        emptyText: 'Sense ressenyes al catàleg.',
-      },
-      manual: {
-        eyebrow: 'Manual · Backlog',
-        title:
-          manualItems.length === 0
-            ? 'Cap senyal manual'
-            : `${manualItems.length} ${pluralize(manualItems.length, 'senyal per revisar', 'senyals per revisar')}`,
-        tone: manualTone,
-        items: manualItems,
-        emptyText: 'Sense pendents ni ressenyes baixes visibles.',
-      },
-      nextStep,
-    };
-  }, [loading, pending, approved, avgRating]);
 
   if (loading) {
     return (
@@ -331,13 +211,6 @@ export default function AdminRessenyesPage() {
         </AdminKpiRow>
       }
     >
-      {strip && (
-        <OwnerControlStrip
-          system={strip.system}
-          manual={strip.manual}
-          nextStep={strip.nextStep}
-        />
-      )}
 
       <div id="pendents" aria-hidden="true" />
       <div id="aprovades" aria-hidden="true" />

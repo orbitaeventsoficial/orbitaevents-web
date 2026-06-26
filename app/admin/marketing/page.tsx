@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import {
   loadMarketingHubSummary,
   type MarketingHubIntegrationStatus,
@@ -67,31 +66,6 @@ export default async function MarketingPage() {
         </div>
       }
     >
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: summary.headline,
-          tone: summary.readiness === 'PAID_BLOCKED' || summary.readiness === 'FOUNDATION' ? 'warning' : 'info',
-          items: summary.systemItems,
-          emptyText: 'Sense dades de captació encara.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'Decisions que no pot prendre el sistema',
-          tone: summary.readiness === 'READY_TO_MEASURE' ? 'success' : 'warning',
-          items: summary.manualItems,
-          emptyText: 'No hi ha decisions manuals pendents.',
-        }}
-        nextStep={{
-          eyebrow: 'Següent moviment',
-          title: summary.nextStep.title,
-          detail: summary.nextStep.detail,
-          href: summary.nextStep.href,
-          ctaLabel: summary.nextStep.label,
-          secondaryAction: { href: '/admin/manual', label: 'Veure playbook' },
-        }}
-      />
-
       <section className="ap-card rounded-2xl p-6">
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div>

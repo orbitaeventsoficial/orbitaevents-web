@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
-import { useRouter } from 'next/navigation';
 import { formatDateFull, formatWeekdayLong, getBookingStatusBadgeDisplay } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 import { ADMIN_CALENDAR_HELP, helpAttrs } from '../components/adminHelpContent';
@@ -17,7 +16,6 @@ type CalendarLayer = 'bookings' | 'blocks' | 'leads' | 'tasks' | 'social' | 'fol
 
 export default function CalendarDayClient() {
   const toast = useToast();
-  const router = useRouter();
   const todayDate = useMemo(() => new Date(), []);
 
   const [currentDate, setCurrentDate] = useState<Date>(todayDate);

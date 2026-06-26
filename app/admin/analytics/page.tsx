@@ -1,12 +1,11 @@
 // app/admin/analytics/page.tsx
 import Link from 'next/link';
-import { DEFAULT_LOCALE, formatCurrency, formatNumber, getEventTypeDisplay, getLeadStatusAnalyticsDisplay, getSourceDisplay } from '@/lib/constants';
+import { formatNumber, getEventTypeDisplay, getLeadStatusAnalyticsDisplay, getSourceDisplay } from '@/lib/constants';
 import { getGa4ConfigStatus, getGa4Report } from '@/lib/analytics/ga4';
 import { getGoogleAdsConfigStatus, getGoogleAdsReport } from '@/lib/analytics/google-ads';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import InfoTooltip from '../components/InfoTooltip';
 import { ADMIN_ANALYTICS_HELP } from '../components/adminHelpContent';
 
@@ -192,65 +191,6 @@ export default async function AnalyticsPage() {
         </div>
       }
     >
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què veu el sistema al panell de rendiment',
-          tone: ga4Ready || googleAdsStatus.ready ? 'info' : 'warning',
-          items: [
-            `${data.leads.thisYear} entrades i ${data.bookings.thisYear} reserves aquest any.`,
-            `${formatNumber(data.revenue.thisYear)}€ facturats enguany amb tiquet mitjà de ${formatNumber(data.revenue.avgBooking, { maximumFractionDigits: 0 })}€.`,
-            ga4Ready
-              ? `GA4 està ${ga4 ? 'carregant dades reals' : 'configurat però sense lectura estable ara mateix'}.`
-              : 'GA4 encara no està configurat correctament.',
-          ],
-          emptyText: 'Sense fonts connectades no hi ha lectura automàtica del rendiment.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'On et cal intervenir',
-          tone: !ga4Ready || !googleAdsStatus.ready || Boolean(ga4Error || googleAdsError) ? 'warning' : 'success',
-          items: [
-            ops.avgFirstContactHours > 24
-              ? `El primer contacte mitjà és de ${Math.max(0, Math.round(ops.avgFirstContactHours))}h i demana tensió comercial.`
-              : `El primer contacte mitjà està controlat a ${Math.max(0, Math.round(ops.avgFirstContactHours))}h.`,
-            ga4Error
-              ? `GA4 està fallant: ${ga4Error}`
-              : !ga4Ready
-                ? 'Cal regularitzar la configuració de GA4.'
-                : 'GA4 no mostra incidència crítica al primer nivell.',
-            googleAdsError
-              ? `Google Ads està fallant: ${googleAdsError}`
-              : !googleAdsStatus.ready
-                ? 'Google Ads encara té configuració pendent.'
-                : 'Google Ads no mostra incidència crítica al primer nivell.',
-          ],
-          emptyText: 'No hi ha coll manual evident al primer nivell.',
-        }}
-        nextStep={{
-          eyebrow: 'Següent pas',
-          title: !ga4Ready
-            ? 'Connectar i estabilitzar GA4'
-            : !googleAdsStatus.ready
-              ? 'Regularitzar la capa de Google Ads'
-              : ops.conversionToQuotePct < 30
-                ? 'Atacar la conversió d’entrada a pressupost'
-                : 'Fer servir el panell per seguir el rendiment setmanal',
-          detail: !ga4Ready
-            ? 'Sense GA4 estable, el panell encara no pot donar lectura completa de trànsit i comportament.'
-            : !googleAdsStatus.ready
-              ? 'Amb GA4 operatiu, el següent buit clar és la capa de paid media.'
-              : ops.conversionToQuotePct < 30
-                ? 'Les mètriques apunten més retorn en millorar l’embut comercial que no pas en afegir més dashboards.'
-                : 'La base d’analítica ja permet governar creixement, qualitat i trànsit sense sortir del panell.',
-          href: !ga4Ready ? '#google-ads' : '/admin/analytics',
-          ctaLabel: !ga4Ready ? 'Veure integracions analytics' : 'Revisar rendiment',
-          secondaryAction: !ga4Ready || !googleAdsStatus.ready
-            ? { href: '/admin/settings/integrations', label: 'Obrir integracions' }
-            : undefined,
-        }}
-      />
-
       <section className="ap-card rounded-2xl p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>

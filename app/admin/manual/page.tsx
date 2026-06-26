@@ -93,7 +93,6 @@ const toneClass = {
 const ROADMAP_STATUS_ORDER: Record<'PENDING' | 'DONE', number> = { PENDING: 0, DONE: 1 };
 
 export default async function AdminManualPage() {
-  const totalCapabilities = ADMIN_MANUAL_SECTIONS.reduce((sum, section) => sum + section.capabilities.length, 0);
   const totalOperatingFlowSteps = ADMIN_MANUAL_OPERATING_FLOW.length;
   const totalVisualAligned = ADMIN_MANUAL_VISUAL_GOVERNANCE
     .filter((section) => section.status === 'ALIGNED')

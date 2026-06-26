@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useToast } from '../components/ToastProvider';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { formatDateTimeFull } from '@/lib/constants';
 import { ADMIN_CRON_HEALTH_CONFIG } from '@/lib/constants/admin';
 
@@ -78,80 +77,9 @@ export default function CronsClient() {
     error: crons.filter((c) => c.health === 'error').length,
     unknown: crons.filter((c) => c.health === 'unknown').length,
   };
-  const delayedCrons = crons.filter((c) => c.health === 'warning');
-  const failedCrons = crons.filter((c) => c.health === 'error');
-  const neverRunCrons = crons.filter((c) => c.health === 'unknown');
-  const systemItems = [
-    `${healthCounts.ok} crons estan correctes ara mateix`,
-    delayedCrons.length > 0 ? `${delayedCrons.length} crons van amb retard o fora de finestra` : '',
-    failedCrons.length > 0 ? `${failedCrons.length} crons han fallat i poden estar bloquejant automatismes` : '',
-    neverRunCrons.length > 0 ? `${neverRunCrons.length} crons encara no s'han executat mai` : '',
-  ].filter(Boolean);
-  const manualItems = [
-    failedCrons[0] ? `Cal revisar ${failedCrons[0].label} perquè està en error` : '',
-    delayedCrons[0] ? `Convé validar ${delayedCrons[0].label} perquè ja va tard` : '',
-    neverRunCrons.length > 0 ? 'Hi ha processos sense primera execució registrada i això erosiona confiança operativa' : '',
-    failedCrons.length === 0 && delayedCrons.length === 0 && neverRunCrons.length === 0
-      ? 'Sense incidències manuals crítiques. El focus pot passar a observació i consistència.'
-      : '',
-  ].filter(Boolean);
-  const nextStep =
-    failedCrons[0]
-      ? {
-          title: `Atacar l'error de ${failedCrons[0].label}`,
-          detail: failedCrons[0].lastMessage
-            ? `L'últim error registrat diu: ${failedCrons[0].lastMessage}. El primer pas és obrir el cron i llegir el detall abans que altres automatismes quedin cecs.`
-            : `Aquest cron està en error. El primer pas és obrir-lo i revisar el darrer estat abans que la incidència s'arrossegui.`,
-          href: '/admin/crons',
-          ctaLabel: 'Revisar cron en aquesta llista',
-          secondaryAction: { href: '/admin/salut', label: 'Obrir Salut' },
-        }
-      : delayedCrons[0]
-        ? {
-            title: `Regularitzar el retard de ${delayedCrons[0].label}`,
-            detail: `No hi ha error dur, però ${delayedCrons[0].label} ja surt fora de temps. El següent pas és confirmar si és retard puntual o símptoma sistèmic.`,
-            href: '/admin/crons',
-            ctaLabel: 'Revisar cron en aquesta llista',
-            secondaryAction: { href: '/admin/salut', label: 'Obrir Salut' },
-          }
-        : neverRunCrons[0]
-          ? {
-              title: `Verificar la primera execució de ${neverRunCrons[0].label}`,
-              detail: `Hi ha crons que encara no tenen rastre d'execució. Abans de donar-los per bons, cal confirmar que realment s'han desplegat i corren.`,
-              href: '/admin/crons',
-              ctaLabel: 'Revisar cron en aquesta llista',
-              secondaryAction: { href: '/admin' , label: 'Tornar al dashboard' },
-            }
-          : {
-              title: 'Mantenir observabilitat, no apagar focs',
-              detail: 'No hi ha errors ni retards crítics. El millor següent pas és revisar periòdicament salut i assegurar que els automatismes continuen visibles.',
-              href: '/admin/salut',
-              ctaLabel: 'Obrir Salut',
-              secondaryAction: { href: '/admin', label: 'Tornar al dashboard' },
-            };
 
   return (
     <div className="space-y-4">
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què vigila el sistema',
-          tone: failedCrons.length > 0 ? 'warning' : 'info',
-          items: systemItems,
-          emptyText: 'Sense senyals de cron rellevants ara mateix.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'On et cal intervenir',
-          tone: failedCrons.length > 0 || delayedCrons.length > 0 || neverRunCrons.length > 0 ? 'warning' : 'success',
-          items: manualItems,
-          emptyText: 'Cap cron et reclama intervenció manual ara mateix.',
-        }}
-        nextStep={{
-          eyebrow: 'Següent pas',
-          ...nextStep,
-        }}
-      />
 
       {/* Resum */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

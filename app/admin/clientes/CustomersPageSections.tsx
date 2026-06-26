@@ -1,11 +1,10 @@
 import Link from 'next/link';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { AdminHelpPanel } from '../components/AdminHelpPanel';
 import ExportCsvButton from '../components/ExportCsvButton';
 import { ADMIN_CUSTOMERS_LIST_HELP, helpAttrs } from '../components/adminHelpContent';
 import { getCustomerSourceLabel } from '@/lib/constants';
 import type { Customer, CustomerStats, ExecutionPriority } from './customer-utils';
-import { buildCustomerHubOperatingSummary, getNextStep } from './customer-utils';
+import { getNextStep } from './customer-utils';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 
 function sourceBadgeClass(source?: string): string {
@@ -47,40 +46,6 @@ export function CustomersStatsActions({ stats }: { stats: CustomerStats | null }
   );
 }
 
-export function CustomerHubOperatingStrip({
-  customers,
-  stats,
-}: {
-  customers: Customer[];
-  stats: CustomerStats | null;
-}) {
-  const summary = buildCustomerHubOperatingSummary(customers, stats);
-
-  return (
-    <OwnerControlStrip
-      system={{
-        eyebrow: 'Customer Hub',
-        title: 'Què concentra el CRM ara',
-        items: summary.systemItems,
-        tone: summary.tone,
-        emptyText: 'Encara no hi ha lectura útil de clients.',
-      }}
-      manual={{
-        eyebrow: 'Manual',
-        title: 'On intervenir primer',
-        items: summary.manualItems,
-        tone: summary.tone,
-        emptyText: 'Sense clients visibles no hi ha intervenció prioritzable.',
-      }}
-      nextStep={{
-        title: summary.nextStep.title,
-        detail: summary.nextStep.detail,
-        href: summary.nextStep.href,
-        ctaLabel: summary.nextStep.ctaLabel,
-      }}
-    />
-  );
-}
 
 export function CustomersToolbar({
   searchInput,

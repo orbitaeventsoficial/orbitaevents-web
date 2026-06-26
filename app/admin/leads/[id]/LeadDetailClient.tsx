@@ -31,7 +31,6 @@ import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
 
 type Stage = 'nou' | 'contactat' | 'guanyat' | 'perdut';
-type PayState = 'none' | 'part' | 'full' | null;
 
 const STAGE_LABEL: Record<Stage, string> = {
   nou: 'Nou', contactat: 'Contactat', guanyat: 'Guanyat', perdut: 'Perdut',
@@ -115,25 +114,12 @@ export type LeadDetailData = {
   } | null;
 };
 
-function paymentState(booking: LeadDetailData['booking']): PayState {
-  if (!booking) return null;
-  if (booking.depositPaid && booking.remainingPaid) return 'full';
-  if (booking.depositPaid) return 'part';
-  return 'none';
-}
-
 function leadSummary(lead: LeadDetailData): string {
   if (lead.stage === 'perdut') return 'Lead perdut. Considera reengagement si el motiu era timing.';
   if (lead.stage === 'guanyat' && lead.booking) return 'Reserva activa. Gestiona cobraments i preparació.';
   if (lead.stage === 'guanyat') return 'Crear reserva, contracte i pagament inicial.';
   if (lead.stage === 'contactat') return 'Enviar pressupost i fer seguiment en 48h.';
   return 'Contactar el client avui.';
-}
-
-function nextStageFor(stage: Stage): Stage | null {
-  if (stage === 'nou') return 'contactat';
-  if (stage === 'contactat') return 'guanyat';
-  return null;
 }
 
 type EditableField = 'phone' | 'email' | 'eventPhone' | 'eventAddress' | 'eventDate' | 'eventStartTime' | 'eventEndTime' | 'eventLocation' | 'guestCount' | 'budget';
@@ -349,9 +335,6 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
     setEditValue('');
   }
 
-  const pay = paymentState(lead.booking ? { ...lead.booking } : null);
-  const nextStage = nextStageFor(stage);
-  const editable = stage !== 'guanyat' || !lead.booking;
 
   async function moveLead(target: Stage) {
     if (pending || target === stage) return;

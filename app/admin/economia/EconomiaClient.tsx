@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AdminPage } from '../components/AdminPage';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { ADMIN_ECONOMY_HELP, helpAttrs } from '../components/adminHelpContent';
 import PaymentToggleButton from './PaymentToggleButton';
 import PaymentReminderActions from './PaymentReminderActions';
@@ -49,22 +48,6 @@ export default function EconomiaClient(props: EconomiaClientProps) {
     () => props.upcomingDueRows.filter((row) => row.dueSoonRemaining).length,
     [props.upcomingDueRows]
   );
-  const cashFlowRows = props.cashFlow ?? [];
-  const forecastRows = props.forecast_pipeline ?? [];
-  const nextStepTitle = props.overdueTotal > 0
-    ? 'Atacar primer els cobraments fora de termini'
-    : props.riskProfitability.length > 0
-      ? 'Revisar els marges que ja cauen en risc'
-      : activeTab === 'config'
-        ? 'Ajustar models i costos amb el focus correcte'
-        : 'Mantenir caixa i marge sota govern';
-  const nextStepDetail = props.overdueTotal > 0
-    ? `Hi ha ${money(props.overdueTotal)} fora de termini i ${props.atRiskRows.length} cobraments amb tensió real.`
-    : props.riskProfitability.length > 0
-      ? `${props.riskProfitability.length} esdeveniments estan per sota del marge sa i convé entrar per rendibilitat.`
-      : activeTab === 'config'
-        ? 'La configuració és el front actiu: revisa el model abans de tocar més pantalles operatives.'
-        : 'Amb el primer nivell estable, el següent pas bo és seguir tresoreria, previsió i marge des del mateix cockpit.';
 
   return (
     <AdminPage
@@ -93,57 +76,6 @@ export default function EconomiaClient(props: EconomiaClientProps) {
         </div>
       }
     >
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què veu el sistema a l’economia',
-          tone: props.hasReport ? 'info' : 'warning',
-          items: [
-            `${money(props.outstandingTotal)} pendents, ${money(props.monthCollected)} cobrats aquest mes i ${money(props.dueSoonTotal)} vencen en 7 dies.`,
-            props.hasReport
-              ? `${money(props.realized.netMargin)} de marge realitzat i ${money(props.forecast.netMargin)} de marge previst.`
-              : 'L’informe de rendibilitat encara no està disponible ara mateix.',
-            cashFlowRows.length > 0
-              ? `${cashFlowRows.length} mesos de tresoreria previstos i ${forecastRows.length} mesos de forecast comercial.`
-              : 'Sense previsió de tresoreria visible al primer nivell.',
-          ],
-          emptyText: 'Sense dades econòmiques no hi ha lectura automàtica del cockpit.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'On et cal intervenir',
-          tone: props.overdueTotal > 0 || props.riskProfitability.length > 0 ? 'warning' : 'success',
-          items: [
-            props.overdueTotal > 0
-              ? `${overdueDepositCount} dipòsits i ${overdueRemainingCount} restes estan fora de termini.`
-              : 'No hi ha cobrament vençut al primer nivell.',
-            props.riskProfitability.length > 0
-              ? `${props.riskProfitability.length} esdeveniments cauen en marge baix.`
-              : 'No hi ha alertes de marge crític al primer nivell.',
-            activeTab === 'config'
-              ? 'La pestanya activa és configuració i concentra els ajustos sensibles de model.'
-              : `La pestanya activa és ${TABS.find((tab) => tab.id === activeTab)?.label || activeTab}.`,
-          ],
-          emptyText: 'No hi ha coll manual evident al primer nivell.',
-        }}
-        nextStep={{
-          eyebrow: 'Següent pas',
-          title: nextStepTitle,
-          detail: nextStepDetail,
-          href: '/admin/economia',
-          ctaLabel:
-            props.overdueTotal > 0
-              ? 'Revisar cobraments'
-              : props.riskProfitability.length > 0
-                ? 'Revisar rendibilitat'
-                : 'Obrir economia',
-          secondaryAction:
-            activeTab !== 'resum'
-              ? { href: '/admin/economia', label: 'Tornar al resum' }
-              : undefined,
-        }}
-      />
-
 
       {/* ═══════════ TAB NAVIGATION ═══════════ */}
       <nav role="tablist" aria-label="Seccions d'economia" className="admin-economia-tabs flex gap-1 ap-card p-1" {...helpAttrs(ADMIN_ECONOMY_HELP.tabs)}>

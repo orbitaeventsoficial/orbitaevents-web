@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import AiCopySuggestionsInline from '../components/AiCopySuggestionsInline';
 import { buildSocialOperatingLoop } from '@/lib/socialOperatingLoop';
 import {
@@ -255,7 +254,6 @@ export default function SocialClient({
 
   const totalPosts = counts.IDEA + counts.DRAFT + counts.SCHEDULED + counts.PUBLISHED + counts.ARCHIVED;
   const scheduledCount = counts.SCHEDULED ?? 0;
-  const draftCount = counts.DRAFT ?? 0;
   const publishedCount = counts.PUBLISHED ?? 0;
   const pulse = initialContentPulse;
   const instagramConversionRate = pulse.instagramLeadCount > 0
@@ -267,39 +265,6 @@ export default function SocialClient({
     : pulse.daysSinceLastPost === null
       ? 'Hi ha activitat, però no hi ha data clara de darrera publicació.'
       : `Última publicació fa ${pulse.daysSinceLastPost} dies.`;
-  const weakestLink = totalPosts === 0
-    ? 'Encara no hi ha cap peça al calendari editorial.'
-    : !pulse.isActive
-      ? `El calendari existeix, però no hi ha publicació viva dins la finestra de ${pulse.windowDays} dies.`
-    : draftCount > 0
-      ? `${draftCount} publicacions continuen en esborrany i demanen decisió editorial.`
-      : pulse.consistencyScore < 50
-        ? `La consistència editorial és baixa (${pulse.consistencyScore}%). Cal reforçar cadència abans d'obrir més canals.`
-      : scheduledCount === 0 && publishedCount === 0
-        ? 'Hi ha peces en pipeline però cap calendari o publicació activa ara mateix.'
-        : 'El calendari té peça viva i no hi ha coll editorial evident al primer nivell.';
-  const nextStepTitle = totalPosts === 0
-    ? 'Crear la primera publicació del calendari'
-    : !pulse.isActive
-      ? 'Publicar una peça real abans de generar més idees'
-    : draftCount > 0
-      ? 'Tancar esborranys abans d’obrir més fronts'
-      : pulse.consistencyScore < 50
-        ? 'Programar cadència mínima per recuperar consistència'
-      : ideas.length > 0
-        ? 'Convertir idees suggerides en peces programades'
-        : 'Mantenir el calendari viu i revisar la propera onada';
-  const nextStepDescription = totalPosts === 0
-    ? 'Sense peces al calendari no hi ha pipeline social real per operar.'
-    : !pulse.isActive
-      ? 'La prioritat no és omplir el backlog, sinó transformar una idea o esborrany en publicació visible.'
-    : draftCount > 0
-      ? 'El retorn més alt aquí no és generar més idees, sinó passar primer els esborranys a programats o descartar-los.'
-      : pulse.consistencyScore < 50
-        ? 'La lectura comercial demana regularitat: programa la següent peça abans de perseguir més formats.'
-      : ideas.length > 0
-        ? 'La millor palanca actual és transformar idees automàtiques en publicacions reals abans que es refredin.'
-      : 'Amb el pipeline estable, el següent pas útil és revisar programació, publicació i tracció del calendari actual.';
   const operatingLoop = buildSocialOperatingLoop({
     ideasCount: ideas.length,
     scheduledCount,
@@ -312,52 +277,6 @@ export default function SocialClient({
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què veu el sistema al calendari social',
-          items: [
-            `${totalPosts} peces totals al pipeline social.`,
-            ideas.length > 0
-              ? `${ideas.length} idees generades automàticament des de bookings, testimonials, portfolio o esdeveniments propers.`
-              : 'Sense idees automàtiques pendents ara mateix.',
-            view === 'calendar'
-              ? 'La vista activa és calendari i el sistema agrupa el contingut per dia.'
-              : 'La vista activa és llista i el sistema prioritza estat i accions directes.',
-            pulse.instagramLeadCount > 0
-              ? `${pulse.publishedLast30d} publicades en ${pulse.windowDays} dies · consistència ${pulse.consistencyScore}% · Instagram: ${pulse.instagramLeadCount} leads, ${pulse.instagramWonCount} guanyats (${instagramConversionRate}%).`
-              : `${pulse.publishedLast30d} publicades en ${pulse.windowDays} dies · consistència ${pulse.consistencyScore}% · Instagram sense leads atribuïts dins la lectura actual.`,
-          ],
-          tone: pulseRisk ? 'warning' : 'info',
-          emptyText: 'Encara no hi ha lectura automàtica útil perquè no hi ha peces al pipeline.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'On et cal intervenir',
-          items: [
-            weakestLink,
-            statusFilter === 'all'
-              ? 'No hi ha filtre d’estat actiu: estàs governant el catàleg complet.'
-              : `Hi ha filtre actiu sobre ${SOCIAL_POST_STATUS_LABELS[statusFilter as SocialPostStatus] || statusFilter}.`,
-            showIdeas
-              ? 'El panell d’idees és visible i permet convertir o descartar suggeriments.'
-              : 'El panell d’idees està ocult i no està entrant a la lectura principal.',
-          ],
-          tone: draftCount > 0 || totalPosts === 0 ? 'warning' : 'success',
-          emptyText: 'No hi ha coll manual evident al primer nivell.',
-        }}
-        nextStep={{
-          eyebrow: 'Següent pas',
-          title: nextStepTitle,
-          detail: `${nextStepDescription} Ara tens ${scheduledCount} programades i ${publishedCount} publicades.`,
-          href: '/admin/social',
-          ctaLabel: totalPosts === 0 ? 'Crear publicació' : 'Revisar calendari',
-          secondaryAction: ideas.length > 0
-            ? { href: '/admin/social', label: 'Veure idees' }
-            : undefined,
-        }}
-      />
-
       <section className="admin-card-glass rounded-2xl border border-white/10 p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>

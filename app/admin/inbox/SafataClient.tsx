@@ -421,32 +421,6 @@ export default function SafataClient({
    * "llegits" per definició).
    */
   /* Seleccionar email IMAP des de la vista d'entrada unificada (usa special.inbox) */
-  const handleSelectImapFromEntry = async (email: ImapEmail) => {
-    const folder = special?.inbox || 'INBOX';
-    setSelectedImap(email);
-    setDetailLoading(true);
-    try {
-      const params = new URLSearchParams({ folder });
-      const res = await fetch(`/api/admin/inbox/messages/${email.uid}?${params.toString()}`, {
-        headers: { 'x-admin': '1' },
-      });
-      const data = await res.json() as { ok: boolean; email?: ImapEmail };
-      if (data.ok && data.email) {
-        setSelectedImap(data.email);
-        if (!email.isRead) {
-          setEmailsByFolder(prev => ({
-            ...prev,
-            [folder]: (prev[folder] || []).map(e => e.uid === email.uid ? { ...e, isRead: true } : e),
-          }));
-          loadFolders();
-        }
-      }
-    } catch (err) {
-      console.error('[Safata] Error carregant email (entrada unificada):', err);
-    } finally {
-      setDetailLoading(false);
-    }
-  };
 
   const handleSelectImap = async (email: ImapEmail) => {
     setSelectedImap(email); // mostra capçalera de seguida (UX optimista)
@@ -617,38 +591,7 @@ export default function SafataClient({
   })), [currentFolderEmails, search, sortBy, outbound]);
 
   /* Comptadors sidebar */
-  const inboxUnread = useMemo(() => {
-    if (!special) return 0;
-    const f = folders.find(x => x.path === special.inbox);
-    return f?.unread ?? 0;
-  }, [folders, special]);
 
-  /* Emails del inbox IMAP per a la vista d'entrada unificada */
-  const inboxEmailsForEntry = useMemo(() => {
-    if (!imapConfigured || !special?.inbox) return [] as ImapEmail[];
-    return (emailsByFolder[special.inbox] || []) as ImapEmail[];
-  }, [imapConfigured, special, emailsByFolder]);
-
-  const filteredInboxEmails = useMemo(() => sortEmails(inboxEmailsForEntry.filter(e => {
-    if (!search.trim()) return true;
-    const q = search.toLowerCase();
-    return e.from.address.toLowerCase().includes(q) || e.from.name.toLowerCase().includes(q) || e.subject.toLowerCase().includes(q);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- emailsByFolder s'accedeix via inboxEmailsForEntry, no cal com a dep directe
-  })), [inboxEmailsForEntry, search, sortBy]);
-
-  /* Llista unificada per a la vista "Entrada" */
-  type UnifiedItem =
-    | { kind: 'lead'; lead: SafataLead; date: Date }
-    | { kind: 'email'; email: ImapEmail; date: Date };
-
-  const unifiedInboxItems = useMemo((): UnifiedItem[] => {
-    if (active.kind !== 'leads') return [];
-    const items: UnifiedItem[] = [
-      ...filteredLeads.map(l => ({ kind: 'lead' as const, lead: l, date: new Date(l.createdAt) })),
-      ...filteredInboxEmails.map(e => ({ kind: 'email' as const, email: e, date: new Date(e.date) })),
-    ];
-    return items.sort((a, b) => b.date.getTime() - a.date.getTime());
-  }, [active.kind, filteredLeads, filteredInboxEmails]);
 
   /* Comptador de leads no llegits (només leads web) */
   const entranceUnread = localStats.unreadLeads;

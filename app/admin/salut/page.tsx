@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { AdminHelpPanel } from '../components/AdminHelpPanel';
 import { ADMIN_SALUT_HELP, helpAttrs } from '../components/adminHelpContent';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { AdminEmptyState, AdminKpi, AdminKpiRow, AdminPage, AdminSection } from '../components/AdminPage';
 import { formatDateTimeFull } from '@/lib/constants';
 import {
@@ -278,38 +277,6 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
   const hasActiveFilters = activeStatus !== 'all' || activeFocus !== 'all';
   const priorityItems = buildPriorityItems(filteredSections);
   const summary = hasActiveFilters ? filteredSummary : snapshot.summary;
-  const systemItems = [
-    `${summary.ok} blocs estan correctes segons l'últim càlcul`,
-    summary.warning > 0 ? `${summary.warning} punts estan en ambre i convé revisar-los abans que creixin` : '',
-    summary.critical > 0 ? `${summary.critical} incidències crítiques poden tocar operativa, diners o qualitat` : '',
-    `Últim càlcul registrat a ${formatDateTimeFull(snapshot.generatedAt)}`,
-  ].filter(Boolean);
-  const manualItems = [
-    priorityItems[0] ? `${priorityItems[0].item.title}: ${priorityItems[0].item.impact}` : '',
-    priorityItems[1] ? `${priorityItems[1].item.title}: ${priorityItems[1].item.impact}` : '',
-    priorityItems[2] ? `${priorityItems[2].item.title}: ${priorityItems[2].item.impact}` : '',
-    priorityItems.length === 0 ? 'No hi ha focus manual urgent ara mateix. Pots usar la pantalla per control preventiu.' : '',
-  ].filter(Boolean);
-  const nextStep =
-    priorityItems[0]
-      ? {
-          title: `Atacar primer ${priorityItems[0].item.title}`,
-          detail: `${priorityItems[0].item.impact} El primer tall no és llegir-ho tot, sinó obrir directament el bloc que aquest senyal ja marca com a prioritari.`,
-          href: priorityItems[0].item.href,
-          ctaLabel: priorityItems[0].item.actionLabel,
-          secondaryAction: priorityItems[1]
-            ? { href: priorityItems[1].item.href, label: priorityItems[1].item.actionLabel }
-            : undefined,
-        }
-      : {
-          title: 'Mantenir control preventiu, no apagar focs',
-          detail: 'Ara mateix no hi ha un focus crític clar. El millor següent pas és mantenir observació i usar els filtres per revisar àrees sensibles abans que es degradin.',
-          href: activeStatus !== 'all' || activeFocus !== 'all' ? '/admin/salut' : '/admin/crons',
-          ctaLabel: activeStatus !== 'all' || activeFocus !== 'all' ? 'Veure salut completa' : 'Obrir Crons',
-          secondaryAction: activeStatus !== 'all' || activeFocus !== 'all'
-            ? { href: '/admin/crons', label: 'Obrir Crons' }
-            : undefined,
-        };
 
   return (
     <AdminPage
@@ -341,27 +308,6 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
             body: 'Aquest bloc no mostra incidències obertes ara mateix.',
           },
         ]}
-      />
-
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què vigila el sistema',
-          tone: summary.critical > 0 ? 'warning' : 'info',
-          items: systemItems,
-          emptyText: 'Sense senyals rellevants de salut ara mateix.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'On et cal intervenir',
-          tone: priorityItems.length > 0 ? 'warning' : 'success',
-          items: manualItems,
-          emptyText: 'Sense focus manual urgent ara mateix.',
-        }}
-        nextStep={{
-          eyebrow: 'Següent pas',
-          ...nextStep,
-        }}
       />
 
       <section className="rounded-2xl border border-white/10 p-4 admin-card-glass" {...helpAttrs(ADMIN_SALUT_HELP.filters)}>

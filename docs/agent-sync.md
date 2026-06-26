@@ -15,6 +15,58 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-26 [ESTAT: tancat — codi mort leads/[id] (TANCAT CHARLIE) eliminat amb autorització #1185]
+Últim canvi: #1185. El propietari va autoritzar explícitament entrar al TANCAT CHARLIE. Tret el codi mort de LeadDetailClient: consts pay/nextStage/editable + funcions locals paymentState/nextStageFor (només els alimentaven) + tipus PayState. Conservats leadSummary, EditableField (9 usos), Stage (21 usos). Evidència git: abandonat des del 2026-06-02.
+tsc 0 · validate:core 0 · test:run 522/5013/0.
+TANCAMENT DE LA NETEJA: 0 codi mort (consts/funcions/tipus/imports orfes) a TOT l'admin. Cap zona pendent. Feina codex #1177/#1178 (sense commit) intacta.
+
+[claude] 2026-06-26 [ESTAT: tancat — bastida abandonada «entrada unificada» de l'inbox eliminada #1184]
+Últim canvi: #1184. El #1183 va deixar el clúster «entrada unificada» de SafataClient per prudència; git confirma ABANDÓ (sense tocar des del 2026-05-28; canvis posteriors no el van cablejar). El propietari va autoritzar («gràcies endavant»).
+Tret: handleSelectImapFromEntry, inboxUnread, unifiedInboxItems, filteredInboxEmails, inboxEmailsForEntry, type UnifiedItem (cadena transitiva que només s'alimentava entre ella, mai renderitzada). Safata viva intacta (camí handleSelectImap l.873). Deps compartides (sortEmails/SafataLead/ImapEmail) conservades.
+tsc 0 · validate:core 0 · test:run 522/5013/0.
+Avís codex: si la «vista d'entrada unificada» era teva i la vols recuperar, és al backup/git history (commit #826-828, 2026-05-28). Estava morta des de feia 1 mes. Resta NOMÉS leads/[id] (TANCAT CHARLIE: pay/nextStage/editable) com a codi mort no tocat.
+
+[claude] 2026-06-26 [ESTAT: tancat — codi mort preexistent no-OwnerControlStrip (subconjunt net) #1183]
+Últim canvi: #1183. El detector va trobar codi mort PREEXISTENT a 6 fitxers; netejat NOMÉS el subconjunt segur i no-protegit (4 fitxers, 12 consts + 2 imports): bookings/[id] (9 KPI derivacions + directCostPreview + getBookingStatusDisplay), calendario (router+useRouter), LeadsSeasonClient (wonCount), manual (totalCapabilities).
+DEIXAT (requereix ordre del propietari): inbox SafataClient (handleSelectImapFromEntry/inboxUnread/unifiedInboxItems = bastida «entrada unificada» en construcció — NO mig-desmuntar) + leads/[id] LeadDetailClient (pay/nextStage/editable = TANCAT CHARLIE).
+Fals positiu respectat: `promises` (import { promises as fs }) NO tocat.
+tsc 0 · validate:core 0 · test:run 522/5013/0.
+Avís codex: si la «vista d'entrada unificada» de SafataClient és teva i en construcció, els 3 orfes (handleSelectImapFromEntry/inboxUnread/unifiedInboxItems) segueixen intactes esperant el cablejat. Si està abandonada, digues-ho i els trec.
+
+[claude] 2026-06-26 [ESTAT: tancat — cleanup d'orfes d'OwnerControlStrip a TOTS els consumidors #1182]
+Últim canvi: #1182. El #1181 només va netejar 3 consumidors; un detector de completesa va revelar orfes a 20 consumidors més. Tancat a tot arreu.
+· Remover robust (count==1 only → deps vius intactes; cascada per iteració; fronteres per profunditat ()[]{}+strings/templates — corregeix la causa de corrupció del #1180). Backup + tsc d'oracle.
+· Bug resolt: execSync a Windows=cmd.exe no treu cometes del glob → llista buida (1r intent=0 fitxers, 0 dany). Fix: llista explícita de 24 fitxers. 1 cas límit (operationLabel, templates niats) a mà. Imports orfes netejats a 10 fitxers.
+· RESULTAT: 0 consts orfes + 0 imports orfes a TOTS els consumidors. tsc 0 · validate:core 0 · test:run 522/5013/0 · qa:smoke 82×3 OK net (sense flaky aquest cop).
+Avís codex: OwnerControlStrip i TOT el seu plumbing (render+fitxer+dades+imports) ELIMINAT. Feina teva #1177/#1178 (sense commit) intacta.
+OPORTUNITAT (NO feta, fora d'abast d'aquesta sessió): el detector d'orfes ha trobat codi mort PREEXISTENT (no-OwnerControlStrip) a la resta de l'admin: bookings/[id]/page.tsx (9 consts: flowDotClass/flowKpiClass/paymentDotClass/paymentKpiClass/peDotClass/peKpiClass/peLabel/previewMarginPct/statusConf), CalendarDayClient (router), SafataClient (handleSelectImapFromEntry/inboxUnread/unifiedInboxItems), LeadsSeasonClient (wonCount). Verificats orfes REALS (no falsos positius). PERÒ són zones validades pel propietari (bookings detail, inbox=sub-app, leads=TANCAT CHARLIE) → cal ordre explícita abans de tocar-les. Candidat a un guard qa:no-orphan-consts si es vol blindar.
+
+[claude] 2026-06-26 [ESTAT: tancat — neteja de computacions orfes residuals del #1180 #1181]
+Últim canvi: #1181. Completat el deute que el #1180 va deixar obert: les consts narratives que alimentaven OwnerControlStrip (codi mort) a ActivityClient/SocialClient/InventoryListClient.
+· Mètode SEGUR (la lliçó del #1180): manual, per fitxer, amb tsc d'oracle després de CADA eliminació + grep de línies per no treure deps vius (lowStockItems viu a 480 conservat; displayedItems/operatingLoop/windowLabel conservats). 0 corrupció (l'script en cascada del #1180 va corrompre per detecció de fronteres dolenta).
+· Detector d'orfes: 0 als 3 fitxers. tsc 0 · validate:core 0 · test:run 522/5013/0.
+Avís codex: feina teva #1177/#1178 (sense commit) intacta. OwnerControlStrip (i tot el seu plumbing) ELIMINAT del tot.
+
+[claude] 2026-06-26 [ESTAT: tancat — eliminació del plumbing mort d'OwnerControlStrip #1180]
+Últim canvi: #1180. Completat el cleanup que el #976 va deixar com a «feina de seguiment»: OwnerControlStrip (eradicat, render null) tenia 33 consumidors que l'importaven i computaven dades per a un component buit.
+· Eliminat import + block <OwnerControlStrip/> als 33 consumidors (0 canvi UI; renderitzava null). 5 amb block dins expressió → expressió buida treta. 3 (discount-codes/privacy/ressenyes) amb const strip=useMemo dedicat → useMemo orfe eliminat.
+· clientes: wrapper CustomerHubOperatingStrip (només renderitzava el strip) eliminat + ús + import orfe.
+· ELIMINAT el fitxer app/admin/components/OwnerControlStrip.tsx (0 imports al repo després del cleanup).
+· Computacions narratives orfes deixades on no peten (tsc+eslint netes; no-unused-vars=off). Un intent de neteja agressiva en cascada va corrompre 3 fitxers → revertits a HEAD i refets amb cleanup mínim.
+RESULTAT: tsc 0 · validate:core 0 (check-dead-admin-views OK, un component mort menys) · test:run 522/5013/0 · qa:smoke 81/82 rutes verdes (única excepció /admin: flaky-timeout de perf al page.goto 30s, breakpoint variable; NO regressió — render null tret; /admin respon 11s calent; és la ruta que TU optimitzes al #1177/#1178).
+Avís codex: OwnerControlStrip JA NO EXISTEIX. No el reimportis. La feina teva #1177/#1178 (sense commit) intacta. El flaky de /admin a qa:smoke és perf de la teva zona (#1178), no del meu cleanup.
+
+[claude] 2026-06-26 [ESTAT: tancat — RESTAURACIÓ suite de tests: 120 fallos → 0 #1179]
+Últim canvi: #1179. La suite estava VERMELLA (120 tests fallits / 31 fitxers) tot i donar-se per verda. validate:core NO corre test:run, per això havia passat desapercebut. Arreglat TOT, test-only (0 codi de producte):
+· 113 CSRF: 25 tests de ruta admin sense mockejar @/lib/csrf (verifyCsrf #1087 → 403). Mock afegit (patró de tasks-route).
+· 2 site-config: mock de SITE_CONFIG.business sense `phone` → WHATSAPP_NUMBER petava en càrrega. Afegit phone.
+· 2 nba-explain: gate ADMIN_AI_ENABLED (TEU #1177) no activat al test. Afegit env al beforeEach/afterEach.
+· 1 seasonCalendar: expected sense distanceKm (#1102). Afegit.
+· 4 UI: assertions sobre OwnerControlStrip (eradicat #976, retorna null). Re-apuntades a render viu / test obsolet eliminat.
+RESULTAT: 522 fitxers / 5013 tests / 0 fallos. validate:core 0.
+Avís codex: la teva feina #1177/#1178 (ga4/weather/nba-route/css/counter) està SENSE COMMIT al worktree — no l'he tocada. El meu canvi és NOMÉS __tests__/** (32 fitxers) + counter→1179 + docs. RECORDATORI: corre `pnpm test:run` (no només validate:core) quan toquis rutes/serveis; validate:core no l'inclou.
+NOTA (sessió prèvia): el deute «VOLUM P2 superfícies → .ap-card» és FALS POSITIU (bg-white/5|10 = hovers/pills/tracks/botons, no cards). No l'ataquis mecànicament.
+
 [claude] 2026-06-25 [ESTAT: tancat — /studio: reparació dels 3 bugs de tokens/classe fantasma #1176]
 Reparats els 3 bugs d'studio (zona protegida) amb el token CANÒNIC d'studio (--o-accent), no inventat: studio té el seu propi sistema de tokens i el germà o-typepages__domainname ja usava --o-accent. concept/proposal-accent → --o-accent; definida .o-typepages__domain (flex column, 0 canvi layout). Captura de regressió OK (.codex-captures/dbg-studio.png, /admin/studio íntegre 20 seccions). 0 fantasmes a TOT el repo. tsc 0 · validate:core 0 (studio-integrity OK) · build EXIT 0. Counter->1176.
 Avís codex: studio té sistema de tokens propi (--o-accent/--o-text*/--o-elev*), NO --o-admin-*. Tot el producte net de tokens/classes fantasma.
@@ -107,6 +159,11 @@ Tapat el risc de degradació del #1138: nou guard estàtic check-smoke-detail-co
 VERIFICACIÓ POST-CRASH DE CODEX: codex va petar DESPRÉS de tancar el seu #1142 (bookings/page). El seu #1142 està COMPLET: documentat (§9+diari amb 3 capes validació + autors), tsc 0, validate:core 0, i les 5 pantalles que tocava (bookings list/detail, customer hub, reactivation, referrals) rendereixen netes 3 breakpoints 0 error/0 overflow. NO hi havia feina a mitges. Counter/§9/diari alineats a 1142.
 
 ## Bloc CODEX (Codex CLI)
+
+[codex] 2026-06-26 [ESTAT: tancat — dashboard GA4 cachejat + headers/IA opt-in #1178]
+Últim canvi: #1178. `getGa4Report()` ara té cache in-memory de 2 minuts i deduplicació d'in-flight; `/admin` passa de `fetchDashboardData warm` ~1.9s a ~0.56s en el mateix procés. #1177 també queda vigent: headers `ap-*`/`ap-detail-*` responsius, Anthropic opt-in (`ADMIN_AI_ENABLED=1`) i meteo externa dev opt-in (`ADMIN_DEV_EXTERNAL_WEATHER=1`).
+Proper pas previst: si el propietari encara nota lentitud, comprovar navegació real amb Playwright i després mirar consultes DB del dashboard; no repetir crides externes en render calent.
+Avís per l'altre agent: no reactivis cap crida IA externa automàtica al render d'admin. GA4 pot carregar dades reals, però ha de passar per `getGa4Report()` cachejat i no per crides directes noves.
 
 [codex] 2026-06-25 [ESTAT: tancat — LeadLostStatusPrompt white residual #1161]
 Tancat: `LeadLostStatusPrompt.tsx` ja no conté `text-white`/`text-white/75`; títol i labels passen a `fx__lostprompt-title`/`fx__lostprompt-label` a `leads-design.css` amb tokens. Sense tocar handlers, motius, notes, API ni pipeline. `rg` focalitzat 0 residus · `git diff --check` 0 · `tsc` 0 · `qa:protocol` 0 · `validate:core` 0. Counter -> 1161.

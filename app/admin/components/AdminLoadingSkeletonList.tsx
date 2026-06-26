@@ -1,6 +1,6 @@
 /**
  * Skeleton per a pàgines de llista (leads, bookings, clientes).
- * Replica: OwnerControlStrip + filter bar + 8 files de taula.
+ * Replica: capçalera + filter bar + 8 files de taula.
  */
 export default function AdminLoadingSkeletonList() {
   return (
