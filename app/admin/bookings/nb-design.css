@@ -249,9 +249,11 @@ html.admin-mode .nb__group-label { font-size: var(--o-text-2xs); font-weight: va
 html.admin-mode .nb__econ-diff { margin-top: 10px; font-size: var(--o-text-2xs); color: var(--t2); }
 html.admin-mode .nb__econ-diff-hint { color: var(--t3); }
 
-/* To del marge a la sidebar segons salut */
-html.admin-mode .nb__pricemargin[data-tone="emerald"] b { color: var(--o-stage-won, var(--gold)); }
-html.admin-mode .nb__pricemargin[data-tone="rose"] b { color: var(--o-warning); }
+/* To del marge a la sidebar segons salut (4 bandes canòniques getMarginBand) */
+html.admin-mode .nb__pricemargin[data-tone="emerald"] b { color: var(--o-success); }
+html.admin-mode .nb__pricemargin[data-tone="amber"] b { color: var(--o-warning); }
+html.admin-mode .nb__pricemargin[data-tone="orange"] b { color: var(--o-stage-new); }
+html.admin-mode .nb__pricemargin[data-tone="rose"] b { color: var(--o-danger); }
 
 /* Dues columnes per al grup "Què contractem" (Serveis | Pack) a pantalla ampla */
 html.admin-mode .nb__cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }

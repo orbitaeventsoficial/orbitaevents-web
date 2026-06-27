@@ -26,9 +26,46 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { getMarginTone, getTravelMarginTone, calculateSimpleMarginPct } from '@/lib/margin-utils';
+import {
+  getMarginTone, getTravelMarginTone, calculateSimpleMarginPct,
+  getMarginBand, getMarginLabel, getMarginTextClass, getMarginBarClass,
+} from '@/lib/margin-utils';
 
 describe('margin-utils', () => {
+  // ─── getMarginBand ── font única de llindars del semàfor de marge (4 bandes)
+  describe('getMarginBand — banda canònica (font única de llindars)', () => {
+    it('classifica les 4 bandes pels llindars 50/30/15', () => {
+      expect(getMarginBand(60)).toBe('excellent');
+      expect(getMarginBand(50)).toBe('excellent');
+      expect(getMarginBand(49.9)).toBe('acceptable');
+      expect(getMarginBand(30)).toBe('acceptable');
+      expect(getMarginBand(29.9)).toBe('watch');
+      expect(getMarginBand(15)).toBe('watch');
+      expect(getMarginBand(14.9)).toBe('critical');
+      expect(getMarginBand(0)).toBe('critical');
+      expect(getMarginBand(-10)).toBe('critical');
+    });
+
+    it('getMarginTone deriva de getMarginBand (mateixos llindars)', () => {
+      expect(getMarginTone(20).tone).toBe('orange'); // watch
+      expect(getMarginBand(20)).toBe('watch');
+    });
+
+    it('getMarginLabel retorna l’etiqueta catalana de la banda', () => {
+      expect(getMarginLabel(60)).toBe('Excel·lent');
+      expect(getMarginLabel(35)).toBe('Acceptable');
+      expect(getMarginLabel(20)).toBe('Vigilar');
+      expect(getMarginLabel(5)).toBe('Crític');
+    });
+
+    it('getMarginTextClass / getMarginBarClass retornen la classe canònica per banda', () => {
+      expect(getMarginTextClass(20)).toBe('o-margin-text--watch');
+      expect(getMarginBarClass(20)).toBe('o-margin-bar--watch');
+      expect(getMarginTextClass(60)).toBe('o-margin-text--excellent');
+      expect(getMarginBarClass(5)).toBe('o-margin-bar--critical');
+    });
+  });
+
   // ─── getMarginTone ──────────────────────────────────────────────────────────
   // Determina el color del semàfor segons el percentatge de marge.
 

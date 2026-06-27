@@ -1,3 +1,35 @@
+## 2026-06-27 — Semàfor de marge: unificació a 4 bandes canòniques (font única) (Canvi #1190, claude)
+
+### Context
+Caça de bugs. El to del marge estava FRAGMENTAT i divergent entre pantalles: el mateix marge (p. ex. 20%) es veia de colors diferents segons on miressis.
+
+### Bugs trobats
+- `useBookingPricing.ts` (nova reserva): només 3 bandes; tractava TOT <30% com a vermell (rose), perdent la banda «Vigilar» (15-30%).
+- `nb-design.css` (nova reserva): només tenia regla `data-tone` per `emerald` i `rose`; i `rose` (crític) usava `--o-warning` (AMBRE) en comptes de vermell. Amber i orange sense regla → queien al color per defecte.
+- `economia-types.ts` `marginColor/marginBg`: col·lapsava a 3 colors (branca `>=15` idèntica a `>=30`), sense el taronja «Vigilar».
+- `leads-design.css` `fxd__profitpill`: amber i orange tots dos a `--o-warning` (taronja indistint).
+- La intenció original (documentada al test de margin-utils) sempre van ser 4 bandes; `getMarginTone` ja les tenia, però la resta divergia.
+
+### Què s'ha fet (monocapa)
+- `lib/margin-utils.ts`: nova **font única** `getMarginBand(pct)` (≥50 excellent · ≥30 acceptable · ≥15 watch · <15 critical). `getMarginTone` ara en deriva (mateixa sortida). Nous helpers `getMarginLabel`, `getMarginTextClass`, `getMarginBarClass`.
+- `admin-shell.css`: 4+4 classes canòniques `.o-margin-text--*` / `.o-margin-bar--*` amb tokens (verd `--o-success`, ambre `--o-warning`, taronja `--o-stage-new`, vermell `--o-danger`).
+- `economia-types.ts`: `marginColor/marginBg` deleguen als helpers → 4 colors a text i barra.
+- `useBookingPricing.ts`: 4 tons (afegit `orange`) derivats de `getMarginBand`; `BookingPricingSummary` amplia el tipus i mostra l'**etiqueta** («Vigilar»…). `nb-design.css`: 4 regles `data-tone` amb els tokens correctes.
+- `leads-design.css`: taronja distint (`--o-stage-new`).
+- 4 tests nous a `margin-utils.test.ts` (band/label/class).
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 · `validate:core` EXIT 0 (admin-canon/css-monocapa/admin-mode-prefix OK) · `pnpm test:run` **523/5012/0** (25 de margin-utils) · pàgines economia/bookings-new/leads 200.
+- Validació funcional: mateixos llindars a tot arreu; 4 colors consistents.
+- Validació humana/UX: **pendent OK visual del propietari** (els ajustos de color/llindar són trivials: tot viu a `getMarginBand` + tokens).
+
+### Coordinació
+Counter -> 1190. Perímetre: margin-utils + 3 CSS + economia-types + useBookingPricing + BookingPricingSummary. Tons via tokens (canon OK).
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-27 — Incongruència #2: vistes desades de leads eliminades (codi mort) (Canvi #1189, claude)
 
 ### Context

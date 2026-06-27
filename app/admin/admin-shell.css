@@ -896,3 +896,15 @@ html.admin-mode .admin-economia-tab--active {
   color: var(--ax-t);
   box-shadow: inset 0 0 0 1px var(--ax-line2);
 }
+
+/* ── Semàfor de marge canònic (4 bandes, font única getMarginBand) ──────────
+   Excel·lent (verd) · Acceptable (ambre) · Vigilar (taronja) · Crític (vermell).
+   Consumit via getMarginTextClass()/getMarginBarClass() de lib/margin-utils. */
+html.admin-mode .o-margin-text--excellent { color: var(--o-success); }
+html.admin-mode .o-margin-text--acceptable { color: var(--o-warning); }
+html.admin-mode .o-margin-text--watch { color: var(--o-stage-new); }
+html.admin-mode .o-margin-text--critical { color: var(--o-danger); }
+html.admin-mode .o-margin-bar--excellent { background: var(--o-success); }
+html.admin-mode .o-margin-bar--acceptable { background: var(--o-warning); }
+html.admin-mode .o-margin-bar--watch { background: var(--o-stage-new); }
+html.admin-mode .o-margin-bar--critical { background: var(--o-danger); }

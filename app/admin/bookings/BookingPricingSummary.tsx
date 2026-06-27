@@ -7,6 +7,7 @@
 ============================================================================ */
 
 import { formatCurrency, formatCurrencyExact } from '@/lib/constants';
+import { getMarginLabel } from '@/lib/margin-utils';
 import { DEPOSIT_PERCENT } from '@/lib/constants/pricing';
 
 interface BookingPricingSummaryProps {
@@ -29,7 +30,7 @@ interface BookingPricingSummaryProps {
     directCost: number;
     netMargin: number;
     marginPct: number;
-    tone: 'emerald' | 'amber' | 'rose';
+    tone: 'emerald' | 'amber' | 'orange' | 'rose';
   } | null;
 }
 
@@ -104,7 +105,7 @@ export default function BookingPricingSummary({
             <b>{formatCurrencyExact(marginEstimate.directCost)}</b>
           </div>
           <div className="nb__pricemargin" data-tone={marginEstimate.tone}>
-            <span>Marge net</span>
+            <span>Marge net · {getMarginLabel(marginEstimate.marginPct)}</span>
             <b>{formatCurrency(marginEstimate.netMargin)} <small className="nb__pricemargin-pct">· {marginEstimate.marginPct.toFixed(0)}%</small></b>
           </div>
         </>

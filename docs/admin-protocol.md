@@ -1513,6 +1513,23 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1190 — 2026-06-27 — claude (TANCAT)
+
+**Semàfor de marge: unificació a 4 bandes canòniques (font única `getMarginBand`).**
+
+- Context: el to del marge estava fragmentat — el mateix marge es veia de colors diferents segons la pantalla (nova reserva 3 bandes + rose=ambre per bug; economia 3 col·lapsat; leads taronja indistint).
+- Font única `getMarginBand(pct)` a `margin-utils.ts` (≥50/≥30/≥15 → excellent/acceptable/watch/critical). `getMarginTone` en deriva. Helpers `getMarginLabel`/`getMarginTextClass`/`getMarginBarClass`.
+- Classes canòniques `.o-margin-text/bar--*` a `admin-shell.css` (tokens verd/ambre/taronja `--o-stage-new`/vermell). Consumides per economia (text+barra), useBookingPricing+nb-design.css (4 data-tone + etiqueta), leads (taronja distint).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja a `1190`; el següent canvi real ha de ser `#1191`.
+- Validació tècnica: `tsc` 0 · `validate:core` 0 (canon OK) · `test:run` 523/5012/0 · pàgines 200.
+- Validació funcional: 4 colors consistents, mateixos llindars arreu.
+- Validació humana/UX: pendent OK visual del propietari (ajustos trivials, tot a getMarginBand+tokens).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1189 — 2026-06-27 — claude (TANCAT)
 
 **Incongruència #2: eliminades les vistes desades de leads (codi mort, ordre «elimina» del propietari).**

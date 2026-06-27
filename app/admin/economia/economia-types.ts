@@ -4,6 +4,7 @@
  */
 
 import { formatCurrency } from '@/lib/constants';
+import { getMarginTextClass, getMarginBarClass } from '@/lib/margin-utils';
 import type { ProfitabilityConfig } from '@/lib/services/profitabilityService';
 import type { PackPricingModelConfig } from '@/lib/services/packPricingHealth';
 
@@ -168,20 +169,14 @@ export function pct(value: number) {
   return `${(value * 100).toFixed(1)}%`;
 }
 
+// Semàfor de marge canònic (4 bandes: Excel·lent/Acceptable/Vigilar/Crític),
+// font única getMarginBand. pctValue és fracció (0-1) → percent.
 export function marginColor(pctValue: number): string {
-  const p = pctValue * 100;
-  if (p >= 50) return 'admin-tone-text-success';
-  if (p >= 30) return 'admin-tone-text-warning';
-  if (p >= 15) return 'admin-tone-text-warning';
-  return 'admin-tone-text-danger';
+  return getMarginTextClass(pctValue * 100);
 }
 
 export function marginBg(pctValue: number): string {
-  const p = pctValue * 100;
-  if (p >= 50) return 'admin-tone-bg-success';
-  if (p >= 30) return 'admin-tone-bg-warning';
-  if (p >= 15) return 'admin-tone-bg-warning';
-  return 'admin-tone-bg-danger';
+  return getMarginBarClass(pctValue * 100);
 }
 
 export function paymentStateBadge(paid: boolean) {

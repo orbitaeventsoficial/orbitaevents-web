@@ -1737,9 +1737,11 @@ html.admin-mode .fxd__profitpill > strong {
   font-weight: var(--o-fw-xbold);
   color: var(--t);
 }
-html.admin-mode .fxd__profitpill[data-tone="amber"] > strong,
-html.admin-mode .fxd__profitpill[data-tone="orange"] > strong {
+html.admin-mode .fxd__profitpill[data-tone="amber"] > strong {
   color: var(--o-warning);
+}
+html.admin-mode .fxd__profitpill[data-tone="orange"] > strong {
+  color: var(--o-stage-new);
 }
 html.admin-mode .fxd__profitpill[data-tone="rose"] > strong {
   color: var(--o-danger);

@@ -24,6 +24,12 @@ Ordre «elimina» del propietari. leadSavedViewsService + /api/admin/leads/views
 ESTAT auditoria d'incongruències: #1 pagament FET (#1187) · #2 vistes desades ELIMINAT (#1189) · #3 reintent APPEND Sent = cas límit, requereix panell «enviats amb arxiu fallat» + retry (baixa prioritat, pendent) · #4 packs/price-sync = capacitat ÚNICA «syncPackPublicPricesToRecommended» (aplicar preus recomanats als públics) SENSE UI — NO és codi mort; canvia preus públics en bloc → DECISIÓ del propietari (cablejar amb confirmació o eliminar).
 Avís codex: NO toquis /api/admin/packs/price-sync ni syncPackPublicPricesToRecommended fins que el propietari decideixi.
 
+[claude] 2026-06-27 [ESTAT: tancat — semàfor de marge unificat a 4 bandes canòniques #1190]
+Caça de bugs: el to del marge estava fragmentat (3+ implementacions divergents; el mateix 20% es veia de 3 colors). Bugs reals: nova reserva només styled emerald/rose i rose=AMBRE (no vermell); economia col·lapsada a 3; leads taronja indistint.
+Fix monocapa: FONT ÚNICA getMarginBand a lib/margin-utils (4 bandes 50/30/15: excellent/acceptable/watch/critical). getMarginTone en deriva. Classes canòniques .o-margin-text/bar--* a admin-shell.css (tokens: success/warning/stage-new[taronja]/danger). Consumides per economia (text+barra), useBookingPricing+nb-design.css (4 data-tone + etiqueta «Vigilar»), leads (taronja distint). 4 tests nous.
+tsc 0 · validate:core 0 (canon OK) · test:run 523/5012/0. PENDENT OK visual del propietari.
+Avís codex: el semàfor de marge ara és MONOCAPA via getMarginBand/getMarginTone. Si pintes marge, deriva d'allà (no inventis llindars). Taronja «Vigilar» = token --o-stage-new.
+
 [claude] 2026-06-27 [ESTAT: tancat — toggle «Marcar pagat» a la fitxa de reserva (incongruència UX) #1187]
 Resposta a «puc posar que han pagat? no ho veig enlloc». El pagament només es marcava des d'Economia (bulk); la fitxa de reserva ho mostrava read-only. Nou PaymentToggle.tsx (.ap-btn canònic) que reutilitza el PATCH /api/admin/bookings/[id]. 5 tests. tsc 0 · validate:core 0 · test:run 5013+5 · render real OK.
 AUDITORIA d'incongruències (registrada, NO atacada): vistes desades de leads (servei+API sense UI), reintent APPEND Sent (endpoint sense botó), packs/price-sync (ruta sense caller). Candidates per si el propietari les vol.
