@@ -1513,6 +1513,22 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1193 — 2026-06-28 — claude (TANCAT)
+
+**V1-#1: botó «Cobrat en efectiu» a la fitxa de reserva (decisió del propietari).**
+
+- Context: cobrar en efectiu no es podia registrar (bolo apareixia «pendent», camp cashAmount orfe).
+- Nou `CashPaymentButton.tsx`: PATCH `/api/admin/bookings/[id]` amb depositPaid+remainingPaid=true, paymentMethod=CASH, cashAmount=total. Visible només mentre quedi per cobrar. 5 tests.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja a `1193`; el següent canvi real ha de ser `#1194`.
+- Validació tècnica: `tsc` 0 · `validate:core` EXIT 0 · test:run +5 · render verificat.
+- Validació funcional: el botó marca tot pagat + registra l'efectiu.
+- Validació humana/UX: pendent prova en viu del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1192 — 2026-06-27 — claude (TANCAT)
 
 **V1 auditoria econòmica: simplificació del ternari de comissió redundant (V1-#3).**

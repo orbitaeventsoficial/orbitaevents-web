@@ -1,3 +1,25 @@
+## 2026-06-28 — V1-#1: botó «Cobrat en efectiu» a la fitxa de reserva (Canvi #1193, claude)
+
+### Context
+Decisió del propietari (auditoria V1, troballa #1): «Quan cobro en efectiu, vull un botó que ho marqui com a pagat». Abans, un bolo cobrat en efectiu apareixia «pendent» (no hi havia manera de registrar-ho; el camp cashAmount era orfe).
+
+### Què s'ha fet
+- Nou `CashPaymentButton.tsx`: botó «💵 Cobrat en efectiu» que fa el PATCH canònic `/api/admin/bookings/[id]` amb `depositPaid=true, remainingPaid=true, *PaidAt=now, paymentMethod='CASH', cashAmount=total`. Es mostra només mentre quedi import per cobrar (si `fullyPaid`, retorna null). Després mostra la nota «💵 Cobrat en efectiu · {total}».
+- `bookings/[id]/page.tsx`: render sota el paygrid. `booking-detail.css`: `.bd__cashrow`/`.bd__cashnote` amb tokens.
+- 5 tests de component.
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 · `pnpm test:run` (+5 CashPaymentButton) · `validate:core` EXIT 0.
+- Validació funcional: el botó es renderitza a una fitxa pendent real (verificat amb render); l'API accepta CASH+cashAmount; el PATCH marca tot pagat.
+- Validació humana/UX: respon directament la decisió del propietari; pendent que ho provi en viu.
+
+### Coordinació
+Counter -> 1193. Resol V1-#1. cashAmount deixa de ser orfe (ara el botó l'omple i marca pagat). Part de l'auditoria V1.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-27 — V1 auditoria econòmica: simplificació del ternari de comissió redundant (Canvi #1192, claude)
 
 ### Context

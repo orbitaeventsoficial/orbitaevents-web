@@ -33,6 +33,7 @@ import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
 import BookingTotalEditor from './BookingTotalEditor';
 import PaymentToggle from './PaymentToggle';
+import CashPaymentButton from './CashPaymentButton';
 import { getPaymentLabel } from '@/lib/payment-status';
 import { previewBookingCustomerLink } from '@/lib/services/bookings/bookingCustomerLinkService';
 import { getLeadStatusDisplay, getEventLabel, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull, getContractStatusLabel, getInvoiceStatusLabel, getProposalStatusDisplay } from '@/lib/constants';
@@ -508,6 +509,9 @@ export default async function BookingDetailPage({ params }: PageProps) {
                   <PaymentToggle bookingId={booking.id} field="remainingPaid" paid={booking.remainingPaid} />
                 </div>
               </div>
+            </div>
+            <div className="bd__cashrow">
+              <CashPaymentButton bookingId={booking.id} total={Number(booking.total)} fullyPaid={booking.depositPaid && booking.remainingPaid} />
             </div>
             <div className="bd__stripe">
               <StripePaymentPanel

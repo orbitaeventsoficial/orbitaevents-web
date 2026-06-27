@@ -1372,6 +1372,18 @@ html.admin-mode .bd__paygrid {
   background: var(--o-admin-line);
 }
 
+/* Botó/nota de cobrament en efectiu (sota el paygrid) */
+html.admin-mode .bd__cashrow {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+html.admin-mode .bd__cashnote {
+  font-size: var(--o-text-xs);
+  color: var(--o-stage-won);
+  font-weight: var(--o-fw-semi);
+}
+
 html.admin-mode .bd__paycell {
   padding: 11px 12px;
   background: var(--ax-fill-1);
