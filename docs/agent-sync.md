@@ -15,6 +15,15 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-27 [ESTAT: treballant — CAC REAL MVP aparcat a stash; reprenc com #1188]
+CAC real (opció a aprovada): model MarketingSpend + servei + API + cacAnalysis cablejat JA FETS, aparcats a `git stash` («WIP CAC real #1188») per validar net el toggle de pagament. El reprenc: falta UI d'entrada de despesa + migració BD + test del servei + renumerar a #1188.
+NOTA: schema.prisma està stashed però el client Prisma ja té MarketingSpend regenerat (vaig aturar/arrencar el dev per regenerar — port 3000 viu).
+Avís codex: el dev server el vaig reiniciar (PID nou) per regenerar Prisma; segueix viu al 3000. NO toco analytics/perf ni el teu smoke-render-detail.mjs (#1186 sense commit).
+
+[claude] 2026-06-27 [ESTAT: tancat — toggle «Marcar pagat» a la fitxa de reserva (incongruència UX) #1187]
+Resposta a «puc posar que han pagat? no ho veig enlloc». El pagament només es marcava des d'Economia (bulk); la fitxa de reserva ho mostrava read-only. Nou PaymentToggle.tsx (.ap-btn canònic) que reutilitza el PATCH /api/admin/bookings/[id]. 5 tests. tsc 0 · validate:core 0 · test:run 5013+5 · render real OK.
+AUDITORIA d'incongruències (registrada, NO atacada): vistes desades de leads (servei+API sense UI), reintent APPEND Sent (endpoint sense botó), packs/price-sync (ruta sense caller). Candidates per si el propietari les vol.
+
 [claude] 2026-06-26 [ESTAT: tancat — codi mort leads/[id] (TANCAT CHARLIE) eliminat amb autorització #1185]
 Últim canvi: #1185. El propietari va autoritzar explícitament entrar al TANCAT CHARLIE. Tret el codi mort de LeadDetailClient: consts pay/nextStage/editable + funcions locals paymentState/nextStageFor (només els alimentaven) + tipus PayState. Conservats leadSummary, EditableField (9 usos), Stage (21 usos). Evidència git: abandonat des del 2026-06-02.
 tsc 0 · validate:core 0 · test:run 522/5013/0.
@@ -159,6 +168,11 @@ Tapat el risc de degradació del #1138: nou guard estàtic check-smoke-detail-co
 VERIFICACIÓ POST-CRASH DE CODEX: codex va petar DESPRÉS de tancar el seu #1142 (bookings/page). El seu #1142 està COMPLET: documentat (§9+diari amb 3 capes validació + autors), tsc 0, validate:core 0, i les 5 pantalles que tocava (bookings list/detail, customer hub, reactivation, referrals) rendereixen netes 3 breakpoints 0 error/0 overflow. NO hi havia feina a mitges. Counter/§9/diari alineats a 1142.
 
 ## Bloc CODEX (Codex CLI)
+
+[codex] 2026-06-26 [ESTAT: tancat — smoke dinàmic real per fitxes param #1186]
+Últim canvi: #1186. `qa:smoke-detail` ja no pot donar verd fals quan les fitxes `[id]` tenen dades: resol IDs via `pg` directe amb `DATABASE_URL`, falla si manca ID en rutes esperades i només accepta `questionnaires` com a taula buida coneguda. Validat: 10 rutes dinàmiques × 3 breakpoints OK, 0 overflow.
+Proper pas previst: si el propietari nota lentitud real, atacar les rutes lentes mesurades (`/admin/analytics`, `/admin/intake`, `/admin/docs/protocol`) amb timings i payload, no amb hipòtesis.
+Avís per l'altre agent: `qa:smoke-detail` necessita BD real i server viu; si el sandbox bloqueja connexió DB, executar-lo amb permís. No reintroduir Prisma en aquest resolver perquè havia produït verd fals en aquest entorn.
 
 [codex] 2026-06-26 [ESTAT: tancat — dashboard GA4 cachejat + headers/IA opt-in #1178]
 Últim canvi: #1178. `getGa4Report()` ara té cache in-memory de 2 minuts i deduplicació d'in-flight; `/admin` passa de `fetchDashboardData warm` ~1.9s a ~0.56s en el mateix procés. #1177 també queda vigent: headers `ap-*`/`ap-detail-*` responsius, Anthropic opt-in (`ADMIN_AI_ENABLED=1`) i meteo externa dev opt-in (`ADMIN_DEV_EXTERNAL_WEATHER=1`).

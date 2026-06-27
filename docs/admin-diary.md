@@ -1,3 +1,50 @@
+## 2026-06-27 — Toggle «Marcar pagat» a la fitxa de reserva (incongruència d'UX) (Canvi #1187, claude)
+
+### Context
+El propietari preguntava «puc posar en algun lloc que han pagat? no ho veig enlloc». Auditoria d'incongruències (capacitats sense porta a la UI): el pagament es podia marcar NOMÉS des d'`/admin/economia` (selecció bulk → `/api/admin/bookings/bulk-payment`); la **fitxa de la reserva** (`/admin/bookings/[id]`), el lloc natural, només MOSTRAVA «Pagat/Pendent» en read-only, sense acció.
+
+### Què s'ha fet
+- Nou component client `PaymentToggle.tsx` (patró de `BookingTotalEditor`): botó canònic `.ap-btn` que marca/desmarca paga-i-senyal i resta. Reutilitza el PATCH ja existent `/api/admin/bookings/[id]` (camps `depositPaid`/`remainingPaid` + `*PaidAt`) — 0 endpoint nou.
+- `bookings/[id]/page.tsx`: substituïts els 2 `<p className="bd__paycell-state">` read-only pel toggle (optimistic UI + toast + `router.refresh()` perquè el color de la cel·la i el semàfor s'actualitzin).
+- 5 tests de component (`__tests__/app/admin/bookings/PaymentToggle.test.tsx`): estat pagat/pendent, PATCH amb camp+data correctes, desmarcar (false + null), i revert òptim si el PATCH falla.
+
+### Auditoria d'incongruències (registrada per al propietari)
+Detectades més capacitats sense UI (no atacades aquí): vistes desades de leads (servei+API sense cap consumidor), reintent d'APPEND a Sent IMAP (endpoint UI sense botó), `packs/price-sync` (ruta sense caller, té CRON_SECRET).
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 · `validate:core` EXIT 0 (canon 0) · `pnpm test:run` 5013 verds + 5 nous del toggle · `qa:smoke` (la fitxa renderitza el botó, verificat amb render real d'una reserva).
+- Validació funcional: «Marcar pagat» apareix a la fitxa real; PATCH persisteix (`updateBookingDetail` ja gestiona els camps); semàfor s'actualitza al refresh.
+- Validació humana/UX: respon directament la petició del propietari; pendent que ho provi en viu.
+
+### Coordinació
+Counter -> 1187. Perímetre: `bookings/[id]` (toggle). NO toco `scripts/smoke-render-detail.mjs` (és el #1186 de codex, sense commit). El CAC real (#1188) queda aparcat a `git stash` per validar aquest toggle net.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-26 — Smoke dinàmic sense verd fals per a fitxes `[param]` (Canvi #1186, codex)
+
+### Context
+Després de la passada responsiva global, el smoke de rutes dinàmiques (`qa:smoke-detail`) donava un verd fals: només renderitzava `/admin/email-templates/[slug]` i marcava com a "taula buida" fitxes que sí tenien dades (`bookings`, `leads`, `clientes`, `collaborators`, `inventory`, `packs`, `blog`, `faq`, `presupuestos`). Això deixava sense prova real les capçaleres i layouts responsius de les fitxes `[id]`.
+
+### Canvi
+- `scripts/smoke-render-detail.mjs`: el resolver d'IDs deixa Prisma en aquest punt de QA i consulta directament la BD amb `pg` + `DATABASE_URL`, sobre les taules canòniques del schema.
+- El smoke ara falla si una ruta dinàmica esperada no pot resoldre ID, excepte `/admin/questionnaires/[id]`, que queda acceptada com a taula buida coneguda.
+- Es manté `qa:smoke-detail-coverage` com a guard estàtic perquè qualsevol ruta `[param]` nova hagi d'entrar a la llista coberta.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:smoke-detail-coverage` OK; `git diff --check` OK.
+- Validació funcional: `pnpm run qa:smoke-detail` OK amb BD real: 10 rutes `[param]` × 3 breakpoints verificades; només `/admin/questionnaires/[id]` omesa per taula buida.
+- Validació humana/UX: el QA ja comprova les fitxes detall que el propietari ha demanat responsives, no només pàgines estàtiques.
+
+### Coordinació
+Counter -> 1186. Perímetre: `scripts/smoke-render-detail.mjs` i documentació/counter. No toca pantalles ni canvis concurrents de Claude.
+
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-26 — Codi mort de leads/[id] (TANCAT CHARLIE) eliminat amb autorització (Canvi #1185, claude)
 
 ### Context

@@ -1513,6 +1513,38 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1187 — 2026-06-27 — claude (TANCAT)
+
+**Toggle «Marcar pagat» a la fitxa de reserva — resol una incongruència d'UX (pagament només marcable des d'Economia bulk).**
+
+- Context: el propietari no trobava on marcar que un client ha pagat. Auditoria: la fitxa `/admin/bookings/[id]` mostrava l'estat de pagament read-only; només es podia canviar des d'`/admin/economia` (bulk).
+- Nou `PaymentToggle.tsx` (client, patró `BookingTotalEditor`): botó `.ap-btn` que marca/desmarca paga-i-senyal i resta reutilitzant el PATCH `/api/admin/bookings/[id]` (`depositPaid`/`remainingPaid` + `*PaidAt`). Substituïts els 2 `<p>` read-only de `bd__paycell-state`.
+- 5 tests de component nous.
+- Auditoria registrada (no atacada): vistes desades de leads sense UI, reintent APPEND Sent sense botó, `packs/price-sync` sense caller.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja a `1187`; el següent canvi real ha de ser `#1188`.
+- Validació tècnica: `tsc --noEmit` 0 · `validate:core` EXIT 0 · `pnpm test:run` 5013 + 5 nous · render real verificat.
+- Validació funcional: el botó apareix i el PATCH persisteix (`updateBookingDetail`).
+- Validació humana/UX: respon la petició directa; pendent prova en viu del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #1186 — 2026-06-26 — codex (TANCAT)
+**`qa:smoke-detail` deixa de donar verd fals i renderitza fitxes `[param]` amb IDs reals.**
+- Context: el smoke dinàmic saltava 10 fitxes com a "taula buida" tot i haver-hi dades, i només provava `/admin/email-templates/[slug]`. Això invalidava la comprovació responsiva de les fitxes detall després de la passada de headers/capçaleres.
+- `scripts/smoke-render-detail.mjs`: el resolver d'IDs passa de Prisma a `pg` directe amb `DATABASE_URL`, fent `SELECT id ... LIMIT 1` sobre les taules canòniques (`bookings`, `leads`, `customers`, `collaborators`, `inventory_items`, `packs`, `blog_posts`, `faqs`, `proposals`, `questionnaire_templates`).
+- El smoke ara falla si qualsevol fitxa esperada queda sense ID, excepte `/admin/questionnaires/[id]`, que és taula buida coneguda.
+- Resultat: `pnpm run qa:smoke-detail` renderitza 10 rutes dinàmiques × 3 breakpoints, amb 0 errors i 0 overflow horitzontal.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:smoke-detail-coverage` OK; `git diff --check` OK.
+- Validació funcional: `pnpm run qa:smoke-detail` OK amb BD real: 10 rutes dinàmiques × 3 breakpoints, 0 errors i 0 overflow horitzontal.
+- Validació humana/UX: el QA ja cobreix les fitxes detall responsives que el propietari ha demanat revisar, no només les pàgines estàtiques.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja a `1186`; el següent canvi real ha de ser `#1187`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1185 — 2026-06-26 — claude (TANCAT)
 
 **Codi mort de `leads/[id]/LeadDetailClient.tsx` (TANCAT CHARLIE) eliminat amb autorització explícita del propietari.**

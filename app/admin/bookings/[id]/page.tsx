@@ -32,6 +32,7 @@ import { getWeatherForEvent } from '@/lib/services/weatherService';
 import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
 import BookingTotalEditor from './BookingTotalEditor';
+import PaymentToggle from './PaymentToggle';
 import { previewBookingCustomerLink } from '@/lib/services/bookings/bookingCustomerLinkService';
 import { getLeadStatusDisplay, getEventLabel, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull, getContractStatusLabel, getInvoiceStatusLabel, getProposalStatusDisplay } from '@/lib/constants';
 import { ADMIN_BOOKING_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
@@ -495,12 +496,16 @@ export default async function BookingDetailPage({ params }: PageProps) {
               <div className={`bd__paycell ${booking.depositPaid ? 'bd__paycell--ok' : 'bd__paycell--err'}`}>
                 <p className="bd__paycell-label">Paga i senyal</p>
                 <p className="bd__paycell-val">{formatCurrency(booking.depositAmount)}</p>
-                <p className="bd__paycell-state">{booking.depositPaid ? 'Pagat' : 'Pendent'}</p>
+                <div className="bd__paycell-state">
+                  <PaymentToggle bookingId={booking.id} field="depositPaid" paid={booking.depositPaid} />
+                </div>
               </div>
               <div className={`bd__paycell ${booking.remainingPaid ? 'bd__paycell--ok' : 'bd__paycell--warn'}`}>
                 <p className="bd__paycell-label">Resta</p>
                 <p className="bd__paycell-val">{formatCurrency(booking.remainingAmount)}</p>
-                <p className="bd__paycell-state">{booking.remainingPaid ? 'Pagat' : 'Pendent'}</p>
+                <div className="bd__paycell-state">
+                  <PaymentToggle bookingId={booking.id} field="remainingPaid" paid={booking.remainingPaid} />
+                </div>
               </div>
             </div>
             <div className="bd__stripe">
