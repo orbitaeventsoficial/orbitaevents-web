@@ -1513,6 +1513,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1191 — 2026-06-27 — claude (TANCAT)
+
+**Auditoria admin: label de pagament canònic (font única) + reporting «(CAC)» enganyós.**
+
+- Context: auditoria funcional. Dos bugs: (1) label de pagament incoherent (fitxa «Completat» vs llista «Pagat»); (2) reporting titulava «Conversió per origen (CAC)» sense cap columna de cost.
+- `lib/payment-status.ts` (font única: getPaymentBand/Label/TextClass/DotClass, 4 tests). Migrats bookings list+detail al helper. Reporting: títol honest «Conversió per origen» + `.ap-h2`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja a `1191`; el següent canvi real ha de ser `#1192`.
+- Validació: `tsc` 0 · `validate:core` 0 (service-coverage 246, canon OK) · `test:run` +4.
+- PENDENT (decisió UX propietari): botons de pagament a llista/Customer Hub (format per decidir). Nota: 44 `<h2>` Tailwind cru detectats, NO migrats a cegues (molts són widgets compactes a propòsit).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1190 — 2026-06-27 — claude (TANCAT)
 
 **Semàfor de marge: unificació a 4 bandes canòniques (font única `getMarginBand`).**

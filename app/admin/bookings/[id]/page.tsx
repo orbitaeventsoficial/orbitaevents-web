@@ -33,6 +33,7 @@ import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
 import BookingTotalEditor from './BookingTotalEditor';
 import PaymentToggle from './PaymentToggle';
+import { getPaymentLabel } from '@/lib/payment-status';
 import { previewBookingCustomerLink } from '@/lib/services/bookings/bookingCustomerLinkService';
 import { getLeadStatusDisplay, getEventLabel, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull, getContractStatusLabel, getInvoiceStatusLabel, getProposalStatusDisplay } from '@/lib/constants';
 import { ADMIN_BOOKING_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
@@ -181,8 +182,8 @@ export default async function BookingDetailPage({ params }: PageProps) {
   const isSoon    = daysUntil > 0 && daysUntil <= 7;
 
 
-  // KPI payment state helpers
-  const paymentLabel    = booking.depositPaid && booking.remainingPaid ? 'Completat' : booking.depositPaid ? 'Parcial' : 'Pendent';
+  // KPI payment state helpers (label canònic via lib/payment-status)
+  const paymentLabel    = getPaymentLabel(booking.depositPaid, booking.remainingPaid);
 
   const flowLabel    = reviewFlowStatus === 'RESPONDIDO' ? 'Respost' : reviewFlowStatus === 'ENVIADO' ? 'Enviat' : 'Falta enviar';
 

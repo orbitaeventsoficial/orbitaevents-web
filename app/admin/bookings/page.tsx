@@ -11,6 +11,7 @@ import BookingActions from './BookingActions';
 import BookingFilters from './BookingFilters';
 import { BOOKING_OVERVIEW_STATUS_CARDS, formatDate, formatDateShort, formatCurrency, getBookingStatusDisplay, getEventLabel } from '@/lib/constants';
 import { getMarginTone } from '@/lib/margin-utils';
+import { getPaymentLabel, getPaymentTextClass, getPaymentDotClass } from '@/lib/payment-status';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 import { computeSimpleMarginPct } from '@/lib/services/costEngine';
 import { getTranslatedPackName } from '@/lib/pack-name';
@@ -357,9 +358,9 @@ export default async function BookingsPage({
                   </div>
                   <div className="text-right shrink-0">
                     <p className="font-bold">{formatCurrency(booking.total)}</p>
-                    <span className={`inline-flex items-center gap-1 text-xs font-medium mt-0.5 ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-text-success' : booking.depositPaid ? 'admin-tone-text-warning' : 'admin-tone-text-danger'}`}>
-                      <span className={`inline-block h-1.5 w-1.5 rounded-full ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-bg-success' : booking.depositPaid ? 'admin-tone-bg-warning' : 'admin-tone-bg-danger'}`} />
-                      {booking.depositPaid && booking.remainingPaid ? 'Pagat' : booking.depositPaid ? 'Parcial' : 'Pendent'}
+                    <span className={`inline-flex items-center gap-1 text-xs font-medium mt-0.5 ${getPaymentTextClass(booking.depositPaid, booking.remainingPaid)}`}>
+                      <span className={`inline-block h-1.5 w-1.5 rounded-full ${getPaymentDotClass(booking.depositPaid, booking.remainingPaid)}`} />
+                      {getPaymentLabel(booking.depositPaid, booking.remainingPaid)}
                     </span>
                     {(() => {
                       const extrasTotal = booking.extras.reduce((sum, e) => sum + e.price * e.quantity, 0);
@@ -490,9 +491,9 @@ export default async function BookingsPage({
                       </td>
                       <td className="px-3 py-2.5">
                         <div className="max-w-[7rem] truncate text-sm font-bold tabular-nums whitespace-nowrap">{formatCurrency(booking.total)}</div>
-                        <span className={`inline-flex items-center gap-1 text-xs mt-0.5 ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-text-success' : booking.depositPaid ? 'admin-tone-text-warning' : 'admin-tone-text-danger'}`}>
-                          <span className={`inline-block h-1.5 w-1.5 rounded-full ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-bg-success' : booking.depositPaid ? 'admin-tone-bg-warning' : 'admin-tone-bg-danger'}`} />
-                          {booking.depositPaid && booking.remainingPaid ? 'Pagat' : booking.depositPaid ? 'Parcial' : 'Pendent'}
+                        <span className={`inline-flex items-center gap-1 text-xs mt-0.5 ${getPaymentTextClass(booking.depositPaid, booking.remainingPaid)}`}>
+                          <span className={`inline-block h-1.5 w-1.5 rounded-full ${getPaymentDotClass(booking.depositPaid, booking.remainingPaid)}`} />
+                          {getPaymentLabel(booking.depositPaid, booking.remainingPaid)}
                         </span>
                       </td>
                       <td className="px-3 py-2.5 text-center">

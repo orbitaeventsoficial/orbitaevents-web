@@ -1,3 +1,33 @@
+## 2026-06-27 — Auditoria admin: label de pagament canònic + reporting «(CAC)» enganyós (Canvi #1191, claude)
+
+### Context
+Auditoria funcional mil·limètrica de l'admin (encàrrec del propietari). Dues incongruències confirmades caçant amb captures + codi.
+
+### Bugs arreglats
+1. **Label de pagament incoherent** — la fitxa de reserva deia «Completat», la llista «Pagat» per al MATEIX estat (`depositPaid && remainingPaid`). Resposta a «si poso completat es pugui posar també pagat».
+2. **Reporting «Conversió per origen (CAC)»** — el títol prometia CAC però la taula només mostra conversió (total/tancats/win rate/ingrés mig), CAP columna de cost. El CAC real viu a Economia (#1188). A més el `<h2>` era `text-sm font-semibold` (Tailwind cru, viola eix canònic).
+
+### Què s'ha fet (monocapa)
+- Nou `lib/payment-status.ts`: **font única** de l'estat de pagament — `getPaymentBand` (paid/partial/pending) + `getPaymentLabel` (Pagat/Parcial/Pendent, canònic) + `getPaymentTextClass`/`getPaymentDotClass` (admin-tone). 4 tests.
+- `bookings/[id]/page.tsx`: «Completat» → `getPaymentLabel` (ara «Pagat», unificat).
+- `bookings/page.tsx`: les 2 ocurrències del semàfor de pagament inline (text+dot+label duplicats) → helpers canònics.
+- `reporting/page.tsx`: títol «Conversió per origen (CAC)» → «Conversió per origen» + `.ap-h2` canònic.
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 · `validate:core` EXIT 0 (service-coverage 246, admin-canon OK) · `pnpm test:run` (+4 payment-status).
+- Validació funcional: mateix label a tot arreu; reporting honest.
+- Validació humana/UX: pendent OK del propietari.
+
+### Coordinació
+Counter -> 1191. Perímetre: payment-status + bookings (list/detail) + reporting. **PENDENT (decisió UX del propietari)**: botons de pagament addicionals a la llista de reserves / Customer Hub — format per decidir (toggle que cicla? 2 botons dipòsit/resta?). El toggle principal ja existeix a la fitxa (#1187).
+
+### Nota d'auditoria (eix CANÒNIC)
+Detectats **44 `<h2>` amb Tailwind cru** a l'admin. NO migrats a cegues: molts són títols de WIDGET compactes de dashboard (`text-sm` a propòsit); migrar-los a `.ap-h2` (18px) els faria semblar títols de secció grans. Cal revisió cas a cas. Registrat per a una passada futura.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-27 — Semàfor de marge: unificació a 4 bandes canòniques (font única) (Canvi #1190, claude)
 
 ### Context

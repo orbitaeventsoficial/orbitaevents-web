@@ -207,7 +207,7 @@ export default async function ReportingPage() {
 
         {/* Conversion by Source */}
         <section className="ap-card p-5">
-          <h2 className="text-sm font-semibold">Conversió per origen (CAC)</h2>
+          <h2 className="ap-h2">Conversió per origen</h2>
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-sm" aria-label="Conversió per origen">
               <thead>

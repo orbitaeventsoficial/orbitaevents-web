@@ -15,6 +15,12 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-27 [ESTAT: tancat — auditoria: label pagament canònic + reporting (CAC) enganyós #1191]
+Auditoria funcional admin (encàrrec propietari). 2 bugs: label pagament incoherent (fitxa «Completat» vs llista «Pagat») i reporting «Conversió per origen (CAC)» sense columna de cost. Fix: lib/payment-status.ts (font única label+to, 4 tests), bookings list+detail migrats, reporting títol honest + .ap-h2. tsc 0 · validate:core 0 · +4 tests.
+PDFs VERIFICATS funcionalment (no captura): 5 generadors studio/preview + dossier compost = %PDF OK. PENDENT: botons pagament a llista/hub (decisió UX). 44 h2 Tailwind cru detectats (no migrats a cegues, molts són widgets compactes).
+Avís codex: estat de pagament ara MONOCAPA via lib/payment-status (getPaymentLabel/Band/TextClass/DotClass). No reinventis label/to de pagament.
+
+
 [claude] 2026-06-27 [ESTAT: tancat — CAC real MVP: despesa de màrqueting per canal #1188]
 CAC real complet. Model MarketingSpend + migració 20260627093220 APLICADA A PRODUCCIÓ (via migrate deploy; migrate dev té el shadow DB trencat per P3006). Servei (5 tests) + cacAnalysis cablejat (realCac=despesa/guanyats del període, 7 tests reescrits) + API /api/admin/marketing/spend + UI MarketingSpendPanel a Economia/Previsions + columna Despesa a la taula CAC.
 tsc 0 · validate:core 0 (service-coverage+schema-drift OK) · test:run 524/5021/0 · /admin/economia 200 · round-trip DB OK. build PENDENT (dev viu; el faré abans del commit final).
