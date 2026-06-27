@@ -13,6 +13,8 @@ import {
 import { recordBookingCommunicationLog } from '@/lib/services/bookingCommunicationLogService';
 import { recordCustomerPostEventEmailSent } from '@/lib/services/customerActivityService';
 import { recordEmailSend } from '@/lib/services/emailTrackingService';
+import { getBookingQuestionnaire } from '@/lib/services/questionnaireService';
+import { issueClientPortalAccess } from '@/lib/services/clientPortalAccess';
 
 export type PostEventDispatchResult = {
   bookingId: string;
@@ -102,11 +104,30 @@ export async function sendPostEventEmailForBooking(
   const reviewUrl = `${baseUrl}/${locale}/valoracio?token=${reviewToken}&ref=${booking.reference}`;
   const packName = resolvePackName(booking.pack?.translations, locale);
 
+  // Enquesta de satisfacció: si hi ha una plantilla activa i encara no s'ha
+  // respost, generem l'accés al portal del client i incloem l'enllaç a l'email.
+  let questionnaireUrl: string | undefined;
+  try {
+    const questionnaire = await getBookingQuestionnaire(booking.id);
+    if (questionnaire && !questionnaire.response) {
+      const portal = await issueClientPortalAccess({
+        bookingId: booking.id,
+        locale,
+        createdBy: 'post-event-dispatch',
+      });
+      questionnaireUrl = portal.url;
+    }
+  } catch (error) {
+    // No bloquejar l'enviament del post-event si l'enquesta falla.
+    console.error('[postEventDispatch] No s\'ha pogut preparar l\'enquesta', error);
+  }
+
   const emailHtml = generatePostEventEmail({
     name,
     packName,
     eventDate: booking.eventDate,
     reviewUrl,
+    questionnaireUrl,
     googleReviewUrl: SITE_CONFIG.reviews.googleReviewUrl,
     locale,
   });

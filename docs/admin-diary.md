@@ -1,3 +1,25 @@
+## 2026-06-28 — V2-#1: enviament automàtic de l'enquesta de satisfacció post-event (Canvi #1195, claude)
+
+### Context
+Decisió del propietari (auditoria V2): «Que enviï les enquestes en automàtic». Diagnòstic V2: el sistema d'enquestes (plantilles admin + portal client) era complet però **el client no rebia mai l'enllaç** (el dispatch post-event enviava la valoració, no l'enquesta) → 0 respostes.
+
+### Què s'ha fet (reaprofitant el cron + email existents)
+- `postEventDispatchService.sendPostEventEmailForBooking`: abans de generar l'email, si hi ha una plantilla d'enquesta activa (`getBookingQuestionnaire`) i encara no s'ha respost, genera l'accés al portal del client (`issueClientPortalAccess`) i passa l'`url` a la plantilla. Si falla, NO bloqueja l'enviament del post-event (try/catch).
+- `postEventEmailService.generatePostEventEmail`: nou paràmetre opcional `questionnaireUrl`; copy `questionnaireText`/`questionnaireCta` als 3 idiomes (ca/es/en); bloc HTML amb botó d'enquesta renderitzat NOMÉS si hi ha URL (no trenca la valoració).
+- 4 tests de la plantilla.
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 · `postEventEmailQuestionnaire` 4 tests verds · `validate:core` EXIT 0.
+- Validació funcional: l'email inclou el botó d'enquesta amb URL real, no el mostra sense, manté la valoració, copy per idioma. L'enviament és el cron post-event existent (1-2 dies després de l'event).
+- Validació humana/UX: respon la decisió del propietari; quan hi hagi enquestes actives i events completats, els clients rebran l'enllaç automàticament.
+
+### Coordinació
+Counter -> 1195. Resol V2-#1. L'enquesta deixa de ser un sistema sense via d'arribada. Part de l'auditoria V2.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-28 — V1-#6: alerta «lead guanyat sense reserva» (forat negre destapat) (Canvi #1194, claude)
 
 ### Context

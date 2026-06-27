@@ -1513,6 +1513,22 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1195 — 2026-06-28 — claude (TANCAT)
+
+**V2-#1: enviament automàtic de l'enquesta de satisfacció post-event.**
+
+- Context: el sistema d'enquestes era complet però el client no rebia mai l'enllaç (el dispatch enviava la valoració, no l'enquesta) → 0 respostes.
+- `postEventDispatchService`: genera l'accés al portal (`issueClientPortalAccess`) si hi ha enquesta activa sense resposta, i passa l'url a l'email (try/catch, no bloqueja). `postEventEmailService`: paràmetre `questionnaireUrl` + copy ca/es/en + botó renderitzat només si hi ha URL. 4 tests.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja a `1195`; el següent canvi real ha de ser `#1196`.
+- Validació tècnica: `tsc` 0 · 4 tests verds · `validate:core` EXIT 0.
+- Validació funcional: email amb botó d'enquesta (URL real), no el mostra sense, manté valoració, copy per idioma; via el cron post-event existent.
+- Validació humana/UX: respon la decisió del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1194 — 2026-06-28 — claude (TANCAT)
 
 **V1-#6: alerta «lead guanyat sense reserva» (forat negre destapat).**

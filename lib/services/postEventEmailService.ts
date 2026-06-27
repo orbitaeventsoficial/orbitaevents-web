@@ -50,10 +50,11 @@ export function generatePostEventEmail(params: {
   packName: string;
   eventDate: Date;
   reviewUrl: string;
+  questionnaireUrl?: string;
   googleReviewUrl: string;
   locale: PostEventLocale;
 }): string {
-  const { name, packName, eventDate, reviewUrl, googleReviewUrl, locale } = params;
+  const { name, packName, eventDate, reviewUrl, questionnaireUrl, googleReviewUrl, locale } = params;
 
   const firstName = name.split(' ')[0];
   const formattedDate = eventDate.toLocaleDateString(toIntlLocale(locale), {
@@ -75,6 +76,8 @@ export function generatePostEventEmail(params: {
       bonusDetails: '+5% extra si compartes foto / +10% extra si compartes video',
       googleText: 'También puedes dejarnos una reseña en Google:',
       googleCta: 'Reseña en Google',
+      questionnaireText: '¿Nos ayudas con una breve encuesta de satisfacción? Solo te llevará un minuto.',
+      questionnaireCta: 'Responder la encuesta',
       footer: 'Gracias por formar parte de la familia Òrbita Events',
     },
     ca: {
@@ -89,6 +92,8 @@ export function generatePostEventEmail(params: {
       bonusDetails: '+5% extra si comparteixes foto / +10% extra si comparteixes video',
       googleText: 'També pots deixar-nos una ressenya a Google:',
       googleCta: 'Ressenya a Google',
+      questionnaireText: 'Ens ajudes amb una breu enquesta de satisfacció? Només et portarà un minut.',
+      questionnaireCta: 'Respondre l\'enquesta',
       footer: 'Gràcies per formar part de la família Òrbita Events',
     },
     en: {
@@ -103,6 +108,8 @@ export function generatePostEventEmail(params: {
       bonusDetails: '+5% extra for a photo / +10% extra for a video',
       googleText: 'You can also leave us a Google review:',
       googleCta: 'Google Review',
+      questionnaireText: 'Would you help us with a short satisfaction survey? It only takes a minute.',
+      questionnaireCta: 'Answer the survey',
       footer: 'Thank you for being part of the Òrbita Events family',
     },
   };
@@ -179,6 +186,15 @@ export function generatePostEventEmail(params: {
           ${t.googleCta}
         </a>
       </div>
+${questionnaireUrl ? `
+      <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+        <p style="margin: 0 0 12px 0; font-size: 14px; color: rgba(255,255,255,0.75);">
+          ${t.questionnaireText}
+        </p>
+        <a href="${questionnaireUrl}" style="display: inline-block; background: rgba(255,184,0,0.15); border: 1px solid rgba(255,184,0,0.4); color: #FFB800; padding: 12px 28px; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 14px;">
+          ${t.questionnaireCta}
+        </a>
+      </div>` : ''}
 
     </div>
 
