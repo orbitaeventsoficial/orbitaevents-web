@@ -55,10 +55,7 @@ describe('listAdminCollaborators', () => {
 
     expect(result.kpis.total).toBe(2);
     expect(result.kpis.active).toBe(1);
-    expect(result.kpis.totalBookings).toBe(2);
-    expect(result.kpis.totalRevenue).toBe(3000);
-    expect(result.kpis.totalCommissions).toBe(300);
-    expect(result.kpis.pendingCommissions).toBe(100);
+    // Comissions retirades (#1196): el cost de col·laborador va per línies de servei (+20%).
     expect(result.kpis.totalSourcedLeads).toBe(3);
     expect(result.kpis.totalSourcedBookings).toBe(1);
   });

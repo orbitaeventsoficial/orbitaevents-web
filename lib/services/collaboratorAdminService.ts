@@ -24,20 +24,6 @@ export async function listAdminCollaborators() {
   const collaborators = await prisma.collaborator.findMany({
     orderBy: { createdAt: 'desc' },
     include: {
-      bookings: {
-        include: {
-          booking: {
-            select: {
-              id: true,
-              reference: true,
-              clientName: true,
-              total: true,
-              eventDate: true,
-              status: true,
-            },
-          },
-        },
-      },
       products: {
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
       },
@@ -50,16 +36,10 @@ export async function listAdminCollaborators() {
     },
   });
 
-  const allBookings = collaborators.flatMap((collaborator) => collaborator.bookings || []);
   const allProducts = collaborators.flatMap((collaborator) => collaborator.products || []);
   const catalogValue = allProducts
     .filter((product) => product.isActive)
     .reduce((sum, product) => sum + (product.sellPrice || 0), 0);
-  const totalCommissions = allBookings.reduce((sum, collaboratorBooking) => sum + collaboratorBooking.commissionAmount, 0);
-  const totalRevenue = allBookings.reduce((sum, collaboratorBooking) => sum + (collaboratorBooking.booking.total || 0), 0);
-  const pendingCommissions = allBookings
-    .filter((collaboratorBooking) => !collaboratorBooking.isPaid)
-    .reduce((sum, collaboratorBooking) => sum + collaboratorBooking.commissionAmount, 0);
   const totalSourcedLeads = collaborators.reduce((sum, collaborator) => sum + (collaborator._count?.sourcedLeads || 0), 0);
   const totalSourcedBookings = collaborators.reduce((sum, collaborator) => sum + (collaborator._count?.sourcedBookings || 0), 0);
 
@@ -68,10 +48,6 @@ export async function listAdminCollaborators() {
     kpis: {
       total: collaborators.length,
       active: collaborators.filter((collaborator) => collaborator.isActive).length,
-      totalBookings: allBookings.length,
-      totalRevenue: Math.round(totalRevenue),
-      totalCommissions: Math.round(totalCommissions),
-      pendingCommissions: Math.round(pendingCommissions),
       totalProducts: allProducts.length,
       catalogValue: Math.round(catalogValue),
       totalSourcedLeads,
@@ -106,23 +82,6 @@ export async function createAdminCollaborator(input: CollaboratorInput) {
 export async function getAdminCollaborator(id: string) {
   const collaborator = await prisma.collaborator.findUnique({
     where: { id },
-    include: {
-      bookings: {
-        include: {
-          booking: {
-            select: {
-              id: true,
-              reference: true,
-              clientName: true,
-              total: true,
-              eventDate: true,
-              status: true,
-            },
-          },
-        },
-        orderBy: { createdAt: 'desc' },
-      },
-    },
   });
 
   if (!collaborator) {

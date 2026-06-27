@@ -797,7 +797,6 @@ model Booking {
   invoices             Invoice[]
   tasks                Task[]
   portalAccesses       ClientPortalAccess[]
-  collaboratorBookings CollaboratorBooking[]
   serviceLines         BookingServiceLine[]
   galleryPhotos        BookingGalleryPhoto[]
   inventoryUsages      InventoryUsage[]
@@ -1875,7 +1874,6 @@ model Collaborator {
   isActive      Boolean                  @default(true)
   isFavorite    Boolean                  @default(false) // Surt als desplegables ràpids de reserva (origen/facturació)
 
-  bookings CollaboratorBooking[]
   products CollaboratorProduct[]
   members CollaboratorMember[]
   sourcedLeads Lead[] @relation("LeadSourceCollaborator")
@@ -1955,27 +1953,6 @@ model CollaboratorProduct {
 
   @@index([collaboratorId])
   @@map("collaborator_products")
-}
-
-model CollaboratorBooking {
-  id             String       @id @default(cuid())
-  collaboratorId String
-  collaborator   Collaborator @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
-  bookingId      String
-  booking        Booking      @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-
-  commissionPct     Float // % comissió aplicat
-  commissionAmount  Float // Import comissió en €
-  collaboratorPrice Float? // Preu que veu el col·laborador (si model DISCOUNT)
-  isPaid            Boolean   @default(false)
-  paidAt            DateTime?
-
-  createdAt DateTime @default(now())
-
-  @@unique([collaboratorId, bookingId])
-  @@index([bookingId])
-  @@index([collaboratorId])
-  @@map("collaborator_bookings")
 }
 
 enum CollaboratorPricingModel {

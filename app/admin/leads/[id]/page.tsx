@@ -124,13 +124,6 @@ export default async function LeadDetailPage({ params }: Props) {
               collaborator: { select: { name: true } },
             },
           },
-          collaboratorBookings: {
-            select: {
-              commissionAmount: true,
-              collaborator: { select: { name: true } },
-            },
-            take: 1,
-          },
         },
       },
     },
@@ -341,19 +334,20 @@ export default async function LeadDetailPage({ params }: Props) {
             }
             return products;
           })(),
-          collaboratorCost: lead.booking.collaboratorBookings?.[0]
-            ? {
-                amount: Number(lead.booking.collaboratorBookings[0].commissionAmount),
-                name: lead.booking.collaboratorBookings[0].collaborator.name,
-              }
-            : null,
+          collaboratorCost: (() => {
+            // Cost de col·laborador = línies de servei subcontractades (amb collaboratorId).
+            const collabLines = (lead.booking.serviceLines || []).filter((l) => l.collaboratorId);
+            if (collabLines.length === 0) return null;
+            const amount = collabLines.reduce((sum, l) => sum + Number(l.costAmount || 0) * (l.quantity || 1), 0);
+            return amount > 0 ? { amount, name: collabLines[0].collaborator?.name || 'Col·laborador' } : null;
+          })(),
           costFloor: (() => {
-            // Pack base + transport + col·laborador = cost mínim estimat
+            // Pack base + transport + cost de col·laborador (línies) = cost mínim estimat
             const packCost = lead.booking.pack?.price ? Number(lead.booking.pack.price) : 0;
             const travelCost = lead.booking.travelCost ? Number(lead.booking.travelCost) : 0;
-            const collabCost = lead.booking.collaboratorBookings?.[0]
-              ? Number(lead.booking.collaboratorBookings[0].commissionAmount)
-              : 0;
+            const collabCost = (lead.booking.serviceLines || [])
+              .filter((l) => l.collaboratorId)
+              .reduce((sum, l) => sum + Number(l.costAmount || 0) * (l.quantity || 1), 0);
             const floor = packCost + travelCost + collabCost;
             return floor > 0 ? floor : null;
           })(),

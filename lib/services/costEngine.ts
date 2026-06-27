@@ -28,7 +28,7 @@ interface BookingCostInput {
   inventoryCostReal?: number | null;
   /** Ingrés explícit de línies del bolo quan la reserva es construeix per línies. */
   serviceLinesRevenue?: number | null;
-  /** Cost explícit de línies del bolo. No duplicar amb CollaboratorBooking. */
+  /** Cost explícit de línies del bolo (cost real de col·laborador subcontractat). */
   serviceLinesCost?: number | null;
 }
 

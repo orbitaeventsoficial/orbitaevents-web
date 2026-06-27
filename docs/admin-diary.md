@@ -1,3 +1,33 @@
+## 2026-06-28 — V1-#4: retirada del sistema de comissions (CollaboratorBooking) (Canvi #1196, claude)
+
+### Context
+Decisió del propietari (auditoria V1): «el 20% és el que uso per defecte amb tot, la resta fora». L'auditoria va destapar DOS sistemes de repartiment paral·lels: (A) línies de servei amb cost +20% (`resellPrice`) = VIU, i (B) comissions (`CollaboratorBooking`) = BUIT (0 files) però amb UI viva al Partner Hub. El propietari confirma que usa el +20% per tot → retirada completa del sistema B (opció A confirmada sabent que el Partner Hub perd la secció de comissions).
+
+### Verificació de seguretat (abans de tocar res)
+- Taula `collaborator_bookings`: **0 files** (re-verificat 2 cops, inclòs `SELECT COUNT(*)` directe just abans del DROP) → zero pèrdua de dades.
+- Mapejats TOTS els usos: schema (model + 2 relacions), `collaboratorAdminService`, `partnerHubService`, `CollaboratorsClient`, `PartnerHubClient`, `collaborators/[id]/page`, `leads/[id]/page`, 2 tests.
+
+### Què s'ha fet (per capes, validant tsc a cada pas)
+- **Schema**: eliminat el model `CollaboratorBooking` + relacions a Booking/Collaborator. Migració `20260628012307_remove_collaborator_bookings` (DROP TABLE + FKs, amb IF EXISTS) **aplicada a producció** (`migrate deploy`).
+- **collaboratorAdminService**: tret `include.bookings`; eliminats KPIs `totalBookings`/`totalRevenue`/`totalCommissions`/`pendingCommissions`.
+- **partnerHubService**: tret `contractedBookings`; economia ara: cost del partner = `serviceLinesPaid` (línies de servei +20%). `totalPaidToPartner = serviceLinesPaid`.
+- **CollaboratorsClient**: tret KPI de comissions, interface `CollaboratorBooking`, taula de bolos, helper `getPaymentBadge` orfe.
+- **PartnerHubClient**: tret tipus `ContractedBooking`, pestanya «Bolos on el contractem», KPIs i bloc d'economia de comissió. Substituïts per «Línies subcontractades» / «Cost subcontractat».
+- **leads/[id]**: `collaboratorCost`/`costFloor` ara surten de les línies de servei amb `collaboratorId` (no de comissions).
+- Tests de `collaboratorAdminService` i `partnerHubService` actualitzats.
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 · `validate:core` EXIT 0 (schema-drift 63 models = un menys, confirma el DROP; service-coverage OK) · tests dels serveis verds · `prisma migrate status` aplicada.
+- Validació funcional: `/admin/collaborators`, `/admin/collaborators/[id]` (Partner Hub) i `/admin/leads/[id]` rendereixen HTTP 200 sense crash. Round-trip: la taula ja no existeix.
+- Validació humana/UX: el Partner Hub queda amb una sola veritat (cost per línies +20%); el propietari va confirmar la retirada.
+
+### Coordinació
+Counter -> 1196. Resol V1-#4. Una sola manera de fer el repartiment (línies de servei +20%). El `pricingModel`/`commissionPct` del Collaborator es conserven (metadades del partner, sense ús de càlcul).
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-28 — V2-#1: enviament automàtic de l'enquesta de satisfacció post-event (Canvi #1195, claude)
 
 ### Context

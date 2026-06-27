@@ -1513,6 +1513,22 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1196 — 2026-06-28 — claude (TANCAT)
+
+**V1-#4: retirada del sistema de comissions (CollaboratorBooking).**
+
+- Context: auditoria V1 va trobar 2 sistemes de repartiment paral·lels — línies de servei +20% (viu) i comissions CollaboratorBooking (buit, 0 files, però amb UI). El propietari usa el +20% per tot → retirada del sistema de comissions.
+- Verificat 0 files abans del DROP (zero pèrdua). Eliminat: model + 2 relacions; migració `20260628012307_remove_collaborator_bookings` aplicada a producció. Netejats collaboratorAdminService, partnerHubService, CollaboratorsClient, PartnerHubClient (pestanya «Bolos on el contractem» + KPIs comissió), leads/[id] (cost de col·lab ara per línies de servei). Tests actualitzats.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja a `1196`; el següent canvi real ha de ser `#1197`.
+- Validació tècnica: `tsc` 0 · `validate:core` 0 (schema-drift 63 models, un menys) · tests serveis verds.
+- Validació funcional: collaborators, Partner Hub i leads/[id] rendereixen 200 sense crash.
+- Validació humana/UX: una sola veritat de repartiment (+20% per línies); propietari va confirmar.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1195 — 2026-06-28 — claude (TANCAT)
 
 **V2-#1: enviament automàtic de l'enquesta de satisfacció post-event.**

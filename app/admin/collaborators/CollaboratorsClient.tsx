@@ -21,7 +21,6 @@ interface Collaborator {
   costPerHour: number | null;
   notes: string | null;
   isActive: boolean;
-  bookings: CollaboratorBooking[];
   products: CollaboratorProduct[];
   _count?: {
     sourcedLeads?: number;
@@ -29,29 +28,9 @@ interface Collaborator {
   };
 }
 
-interface CollaboratorBooking {
-  id: string;
-  commissionPct: number;
-  commissionAmount: number;
-  collaboratorPrice: number | null;
-  isPaid: boolean;
-  booking: {
-    id: string;
-    reference: string;
-    clientName: string;
-    total: number;
-    eventDate: string;
-    status: string;
-  };
-}
-
 interface KPIs {
   total: number;
   active: number;
-  totalBookings: number;
-  totalRevenue: number;
-  totalCommissions: number;
-  pendingCommissions: number;
   totalProducts: number;
   catalogValue: number;
   totalSourcedLeads: number;
@@ -61,15 +40,9 @@ interface KPIs {
 const KPI_ITEMS = (kpis: KPIs) => [
   { label: 'Total', value: kpis.total, tone: '' },
   { label: 'Actius', value: kpis.active, tone: 'ap-kpi--success' },
-  { label: 'Reserves', value: kpis.totalBookings, tone: 'ap-kpi--info' },
   { label: 'Bolos passats', value: kpis.totalSourcedLeads + kpis.totalSourcedBookings, tone: 'ap-kpi--success' },
   { label: 'Productes', value: kpis.totalProducts, tone: '' },
   { label: 'Valor catàleg', value: `${kpis.catalogValue}€`, tone: 'ap-kpi--info' },
-  {
-    label: 'Comissions pendents',
-    value: `${kpis.pendingCommissions}€`,
-    tone: kpis.pendingCommissions > 0 ? 'ap-kpi--warning' : 'ap-kpi--success',
-  },
 ];
 
 function getPricingBadge(pricingModel: Collaborator['pricingModel']) {
@@ -78,9 +51,6 @@ function getPricingBadge(pricingModel: Collaborator['pricingModel']) {
     : 'ap-badge ap-badge--info';
 }
 
-function getPaymentBadge(isPaid: boolean) {
-  return isPaid ? 'ap-badge ap-badge--success' : 'ap-badge ap-badge--warning';
-}
 
 export default function CollaboratorsClient() {
   const toast = useToast();
@@ -405,10 +375,6 @@ export default function CollaboratorsClient() {
                     )}
                     {c.email && <span>{c.email}</span>}
                     {c.phone && <span>{c.phone}</span>}
-                    <span>{c.bookings.length} reserves</span>
-                    {c.bookings.length > 0 && (
-                      <span className="font-medium">{Math.round(c.bookings.reduce((s, b) => s + b.commissionAmount, 0))}€ comissions</span>
-                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -426,37 +392,6 @@ export default function CollaboratorsClient() {
                   </button>
                 </div>
               </div>
-
-              {c.bookings.length > 0 && (
-                <div className="mt-4 border-t pt-4">
-                  <div className="ap-table-wrap rounded-xl border-0">
-                    <table className="ap-table w-full text-sm" aria-label={`Reserves de ${c.name}`}>
-                      <thead className="ap-table-head">
-                        <tr>
-                          <th scope="col" className="ap-table-th">Referència</th>
-                          <th scope="col" className="ap-table-th">Client</th>
-                          <th scope="col" className="ap-table-th text-right">Total</th>
-                          <th scope="col" className="ap-table-th text-right">Comissió</th>
-                          <th scope="col" className="ap-table-th text-right">Estat</th>
-                        </tr>
-                      </thead>
-                      <tbody className="ap-table-body">
-                        {c.bookings.slice(0, 5).map((cb) => (
-                          <tr key={cb.id}>
-                            <td className="py-1.5">{cb.booking.reference}</td>
-                            <td>{cb.booking.clientName}</td>
-                            <td className="text-right">{cb.booking.total}€</td>
-                            <td className="text-right">{cb.commissionAmount}€</td>
-                            <td className="text-right">
-                              <span className={getPaymentBadge(cb.isPaid)}>{cb.isPaid ? 'Pagat' : 'Pendent'}</span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
 
               <CollaboratorProductsPanel
                 collaboratorId={c.id}

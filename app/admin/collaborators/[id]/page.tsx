@@ -64,17 +64,6 @@ export default async function PartnerDetailPage({ params }: Props) {
       total: booking.total,
       eventDate: booking.eventDate ? booking.eventDate.toISOString() : null,
     })),
-    contractedBookings: hub.contractedBookings.map((item) => ({
-      id: item.id,
-      commissionAmount: item.commissionAmount,
-      collaboratorPrice: item.collaboratorPrice,
-      isPaid: item.isPaid,
-      reference: item.booking.reference,
-      clientName: item.booking.clientName,
-      status: item.booking.status,
-      total: item.booking.total,
-      eventDate: item.booking.eventDate ? item.booking.eventDate.toISOString() : null,
-    })),
     products: hub.products.map((product) => ({
       id: product.id,
       name: product.name,

@@ -28,18 +28,6 @@ interface SourcedBooking {
   eventDate: string | null;
 }
 
-interface ContractedBooking {
-  id: string;
-  commissionAmount: number;
-  collaboratorPrice: number | null;
-  isPaid: boolean;
-  reference: string;
-  clientName: string;
-  status: string;
-  total: number;
-  eventDate: string | null;
-}
-
 interface PartnerProduct {
   id: string;
   name: string;
@@ -79,10 +67,6 @@ interface PartnerHubData {
     sourcedLeadsCount: number;
     sourcedBookingsCount: number;
     sourcedRevenue: number;
-    contractedCount: number;
-    contractedRevenue: number;
-    totalCommissions: number;
-    pendingCommissions: number;
     productsCount: number;
     catalogValue: number;
     catalogCost: number;
@@ -92,17 +76,15 @@ interface PartnerHubData {
   };
   sourcedLeads: SourcedLead[];
   sourcedBookings: SourcedBooking[];
-  contractedBookings: ContractedBooking[];
   products: PartnerProduct[];
 }
 
-type TabKey = 'resum' | 'membres' | 'passa' | 'contractem' | 'cataleg' | 'economia' | 'notes';
+type TabKey = 'resum' | 'membres' | 'passa' | 'cataleg' | 'economia' | 'notes';
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'resum', label: 'Resum' },
   { key: 'membres', label: 'Equip / membres' },
   { key: 'passa', label: 'Bolos que ens passa' },
-  { key: 'contractem', label: 'Bolos on el contractem' },
   { key: 'cataleg', label: 'Material i catàleg' },
   { key: 'economia', label: 'Economia' },
   { key: 'notes', label: 'Notes i contacte' },
@@ -198,9 +180,9 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
         <div className="flex flex-col gap-4">
           <div className="ap-kpi-row">
             <div className="ap-kpi"><span className="ap-kpi-label">Bolos que ens passa</span><span className="ap-kpi-value">{economics.sourcedLeadsCount + economics.sourcedBookingsCount}</span></div>
-            <div className="ap-kpi ap-kpi--info"><span className="ap-kpi-label">On el contractem</span><span className="ap-kpi-value">{economics.contractedCount}</span></div>
+            <div className="ap-kpi ap-kpi--info"><span className="ap-kpi-label">Línies subcontractades</span><span className="ap-kpi-value">{economics.serviceLinesCount}</span></div>
             <div className="ap-kpi"><span className="ap-kpi-label">Productes</span><span className="ap-kpi-value">{economics.productsCount}</span></div>
-            <div className={`ap-kpi ${economics.pendingCommissions > 0 ? 'ap-kpi--warning' : 'ap-kpi--success'}`}><span className="ap-kpi-label">Comissions pendents</span><span className="ap-kpi-value">{formatCurrency(economics.pendingCommissions)}</span></div>
+            <div className="ap-kpi"><span className="ap-kpi-label">Cost subcontractat</span><span className="ap-kpi-value">{formatCurrency(economics.serviceLinesPaid)}</span></div>
           </div>
           <section className="ap-card p-5">
             <h2 className="ap-h2 mb-3">Identitat</h2>
@@ -302,29 +284,6 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
         </section>
       )}
 
-      {tab === 'contractem' && (
-        <section className="ap-card p-5">
-          <h2 className="ap-h2 mb-3">Bolos on el contractem</h2>
-          <p className="ap-muted text-sm mb-4">Reserves on Òrbita contracta aquest partner (<code>CollaboratorBooking</code>) — cost i comissió.</p>
-          {data.contractedBookings.length === 0 ? <Empty text="Encara no l&apos;hem contractat en cap reserva." /> : (
-            <table className="w-full text-sm">
-              <thead><tr className="text-left ap-muted"><th scope="col" className="py-2">Ref</th><th scope="col">Client</th><th scope="col">Data</th><th scope="col">Comissió</th><th scope="col">Pagat</th></tr></thead>
-              <tbody>
-                {data.contractedBookings.map((item) => (
-                  <tr key={item.id}>
-                    <td className="py-2">{item.reference}</td>
-                    <td>{item.clientName}</td>
-                    <td>{item.eventDate ? formatDate(item.eventDate) : '—'}</td>
-                    <td>{formatCurrency(item.commissionAmount)}</td>
-                    <td><span className={`ap-badge ${item.isPaid ? 'ap-badge--success' : 'ap-badge--warning'}`}>{item.isPaid ? 'Pagat' : 'Pendent'}</span></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </section>
-      )}
-
       {tab === 'cataleg' && (
         <section className="ap-card p-5">
           <h2 className="ap-h2 mb-3">Material i catàleg</h2>
@@ -356,9 +315,6 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
           </div>
           <div className="grid gap-4 md:grid-cols-2 text-sm">
             <div><span className="ap-muted">Ingrés generat (bolos que ens passa)</span><div className="text-lg font-semibold">{formatCurrency(economics.sourcedRevenue)}</div></div>
-            <div><span className="ap-muted">Volum on el contractem</span><div className="text-lg font-semibold">{formatCurrency(economics.contractedRevenue)}</div></div>
-            <div><span className="ap-muted">Comissions que li paguem</span><div className="text-lg font-semibold">{formatCurrency(economics.totalCommissions)}</div></div>
-            <div><span className="ap-muted">Comissions pendents de pagar</span><div className="text-lg font-semibold">{formatCurrency(economics.pendingCommissions)}</div></div>
             <div><span className="ap-muted">Pagat en serveis subcontractats ({economics.serviceLinesCount})</span><div className="text-lg font-semibold">{formatCurrency(economics.serviceLinesPaid)}</div></div>
             <div><span className="ap-muted">Valor del catàleg (PVP)</span><div className="text-lg font-semibold">{formatCurrency(economics.catalogValue)}</div></div>
           </div>
