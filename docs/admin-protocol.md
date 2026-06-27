@@ -1513,6 +1513,22 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1194 — 2026-06-28 — claude (TANCAT)
+
+**V1-#6: alerta «lead guanyat sense reserva» (forat negre destapat).**
+
+- Context: cas Cristina Rey — lead WON amb dipòsit cobrat però sense reserva. El NBA saltava els WON i el query no els carregava → forat negre. L'auditoria va trobar 7 leads així (un amb event passat).
+- `ACTIVE_LEAD_STATUSES` + WON; `extractLeadActions` genera `CLOSE_DEAL` «Crear reserva» si WON sense booking (CRITICAL si event ≤14d). WON amb booking segueix saltant. 3 tests nous.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja a `1194`; el següent canvi real ha de ser `#1195`.
+- Validació tècnica: `tsc` 0 · 29 tests NBA verds · `validate:core` EXIT 0.
+- Validació funcional: detecta els 7 leads WON sense reserva reals.
+- Validació humana/UX: alerta visible al cockpit NBA; respon el cas del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1193 — 2026-06-28 — claude (TANCAT)
 
 **V1-#1: botó «Cobrat en efectiu» a la fitxa de reserva (decisió del propietari).**

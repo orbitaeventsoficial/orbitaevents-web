@@ -155,6 +155,32 @@ function extractLeadActions(leads: NBALeadInput[], now: Date): NextBestAction[] 
   const actions: NextBestAction[] = [];
 
   for (const lead of leads) {
+    // Lead GUANYAT però sense reserva creada: el bolo està tancat (sovint amb
+    // dipòsit cobrat) però no s'ha materialitzat en reserva → cau en un forat
+    // negre (no surt a economia ni a cobraments). Cal avisar perquè es creï.
+    if (lead.status === 'WON' && !lead.hasBooking) {
+      const dUntilEventWon = daysUntil(lead.eventDate, now);
+      actions.push({
+        rank: 0,
+        id: makeId('lead', 'WON_NO_BOOKING', lead.id),
+        domain: 'lead',
+        actionType: 'CLOSE_DEAL',
+        urgency: dUntilEventWon !== null && dUntilEventWon <= 14 ? 'CRITICAL' : 'HIGH',
+        icon: '⚠️',
+        title: `Crear reserva — ${lead.name}`,
+        subtitle: dUntilEventWon !== null
+          ? `Guanyat sense reserva · event en ${dUntilEventWon} dies`
+          : 'Guanyat sense reserva',
+        href: buildLeadWorkspaceHref(lead.id),
+        score: 0,
+        entity: { type: 'lead', id: lead.id, name: lead.name },
+        reasoning: 'El lead està guanyat però no té reserva: el bolo no apareix a economia ni a cobraments fins que es creï',
+        estimatedImpact: 'HIGH',
+        timeWindow: dUntilEventWon !== null && dUntilEventWon <= 7 ? 'Ara' : 'Aquesta setmana',
+      });
+      continue;
+    }
+
     if (['WON', 'LOST', 'DISQUALIFIED'].includes(lead.status)) continue;
 
     const hoursOld = (now.getTime() - lead.createdAt.getTime()) / (1000 * 60 * 60);
@@ -570,7 +596,10 @@ export function buildNBAReport(actions: NextBestAction[], now: Date): NBAReport 
 // WRAPPER — fetch paral·lel de totes les fonts
 // ───────────────────────────────────────────────────────────────────────────
 
-const ACTIVE_LEAD_STATUSES: LeadStatus[] = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'];
+// WON s'inclou per detectar leads guanyats SENSE reserva (forat negre: bolo
+// tancat que no s'ha materialitzat). extractLeadActions els filtra: només els
+// WON sense booking generen acció; els WON amb booking se salten (continue).
+const ACTIVE_LEAD_STATUSES: LeadStatus[] = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON'];
 const EMPTY_FOLLOWUPS: FollowUpSummary = { generatedAt: '', total: 0, urgent: 0, normal: 0, low: 0, items: [] };
 const EMPTY_CAPACITY: CapacityConflictReport = { generatedAt: '', windowDays: 14, conflicts: [], verdict: '' };
 

@@ -1,3 +1,25 @@
+## 2026-06-28 — V1-#6: alerta «lead guanyat sense reserva» (forat negre destapat) (Canvi #1194, claude)
+
+### Context
+Decisió del propietari (auditoria V1, cas Cristina Rey): un lead guanyat (amb dipòsit cobrat, event de Juliol) NO tenia reserva al sistema. Diagnòstic: `nextBestActionService` saltava TOTS els leads WON (`continue`), i el query només carregava `ACTIVE_LEAD_STATUSES` sense WON → un bolo tancat sense reserva queda en un forat negre (no surt a economia ni a cobraments, ningú avisa). **L'auditoria va destapar 7 leads en aquesta situació** (Cristina + Carlos Lucas ×3 + altres), un amb event ja passat (13/06).
+
+### Què s'ha fet
+- `ACTIVE_LEAD_STATUSES` (NBA): afegit `WON` perquè els guanyats es carreguin.
+- `extractLeadActions`: nova branca abans del `continue` de WON — si `status==='WON' && !hasBooking` genera acció `CLOSE_DEAL` «Crear reserva — {nom}», CRITICAL si event ≤14 dies, amb el reasoning que explica que el bolo no apareix a economia fins que es creï la reserva. Els WON AMB reserva segueixen saltant.
+- 3 tests nous (WON amb reserva s'ignora · WON sense reserva avisa · event proper → CRITICAL); actualitzat el test antic «ignora WON/LOST».
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 · `nextBestActionService` 29 tests verds · `validate:core` EXIT 0.
+- Validació funcional: verificat amb dades reals — detecta els 7 leads WON sense reserva (inclòs Cristina Rey, event 11/07).
+- Validació humana/UX: respon el cas reportat pel propietari; l'alerta sortirà al cockpit NBA / dashboard.
+
+### Coordinació
+Counter -> 1194. Resol V1-#6. Aquests 7 bolos tancats sense reserva ara són visibles i accionables. Part de l'auditoria V1.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-28 — V1-#1: botó «Cobrat en efectiu» a la fitxa de reserva (Canvi #1193, claude)
 
 ### Context
