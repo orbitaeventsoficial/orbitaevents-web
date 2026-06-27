@@ -1,3 +1,30 @@
+## 2026-06-27 — Incongruència #2: vistes desades de leads eliminades (codi mort) (Canvi #1189, claude)
+
+### Context
+Auditoria d'incongruències (capacitats sense porta a la UI). El propietari va ordenar «elimina» per a les vistes desades de leads: `leadSavedViewsService.ts` + ruta `/api/admin/leads/views` existien però **cap pantalla** les consumia ni les desava, i **cap cron** cridava el GET (tot i tenir Bearer auth pensat per cron). Feature fantasma.
+
+### Verificació prèvia (codi mort total)
+- `leadSavedViewsService`/`getLeadSavedViews`/`LeadSavedView`/`sanitizeLeadSavedViews`/`getLeadViewsKey`: 0 consumidors fora del propi route.
+- `/api/admin/leads/views`: 0 callers (cap UI, cap cron/workflow a `.github/`, cap scheduler extern).
+
+### Què s'ha eliminat
+- `app/api/admin/leads/views/route.ts` (+ directori buit).
+- `lib/services/leadSavedViewsService.ts`.
+- `__tests__/lib/services/leadSavedViewsService.test.ts` (test del servei mort).
+- 0 referències residuals a tot el repo.
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 · `validate:core` EXIT 0 (api-admin-auth 162, service-coverage 246, no-dead-admin-views OK) · `pnpm test:run` verd.
+- Validació funcional: cap superfície afectada (no es renderitzava ni s'usava).
+- Validació humana/UX: el propietari va ordenar l'eliminació.
+
+### Coordinació
+Counter -> 1189. Resta de l'auditoria: #1 pagament FET (#1187); #3 reintent APPEND Sent (cas límit, panell + retry pendents, baixa prioritat); #4 `packs/price-sync` = capacitat ÚNICA «aplicar preus recomanats» sense UI (NO codi mort) — necessita decisió del propietari (cablejar amb confirmació o eliminar), perquè canvia preus públics en bloc.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-27 — CAC real: despesa de màrqueting per canal (MVP entrada manual) (Canvi #1188, claude)
 
 ### Context

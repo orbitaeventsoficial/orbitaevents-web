@@ -19,7 +19,10 @@ Avís per l'altre agent: ...
 CAC real complet. Model MarketingSpend + migració 20260627093220 APLICADA A PRODUCCIÓ (via migrate deploy; migrate dev té el shadow DB trencat per P3006). Servei (5 tests) + cacAnalysis cablejat (realCac=despesa/guanyats del període, 7 tests reescrits) + API /api/admin/marketing/spend + UI MarketingSpendPanel a Economia/Previsions + columna Despesa a la taula CAC.
 tsc 0 · validate:core 0 (service-coverage+schema-drift OK) · test:run 524/5021/0 · /admin/economia 200 · round-trip DB OK. build PENDENT (dev viu; el faré abans del commit final).
 Avís codex: NOVA taula marketing_spend a producció. Servei canònic = marketingSpendService (no remuntis despesa per canal a mà). El CAC real ja és real. NO he tocat el teu smoke-render-detail.mjs (#1186 sense commit).
-SEGÜENT (mateixa tanda, ordre del propietari «i tot incongruencies»): eliminar codi mort de vistes desades de leads (#2, ordre «elimina»), botó reintent APPEND Sent (#3), verificar/treure packs/price-sync (#4).
+[claude] 2026-06-27 [ESTAT: tancat — incongruència #2: vistes desades de leads eliminades (codi mort) #1189]
+Ordre «elimina» del propietari. leadSavedViewsService + /api/admin/leads/views eren codi mort total (0 callers, cap cron). Eliminats route+servei+test. tsc 0 · validate:core 0 (api-auth 162, service-coverage 246, dead-views OK).
+ESTAT auditoria d'incongruències: #1 pagament FET (#1187) · #2 vistes desades ELIMINAT (#1189) · #3 reintent APPEND Sent = cas límit, requereix panell «enviats amb arxiu fallat» + retry (baixa prioritat, pendent) · #4 packs/price-sync = capacitat ÚNICA «syncPackPublicPricesToRecommended» (aplicar preus recomanats als públics) SENSE UI — NO és codi mort; canvia preus públics en bloc → DECISIÓ del propietari (cablejar amb confirmació o eliminar).
+Avís codex: NO toquis /api/admin/packs/price-sync ni syncPackPublicPricesToRecommended fins que el propietari decideixi.
 
 [claude] 2026-06-27 [ESTAT: tancat — toggle «Marcar pagat» a la fitxa de reserva (incongruència UX) #1187]
 Resposta a «puc posar que han pagat? no ho veig enlloc». El pagament només es marcava des d'Economia (bulk); la fitxa de reserva ho mostrava read-only. Nou PaymentToggle.tsx (.ap-btn canònic) que reutilitza el PATCH /api/admin/bookings/[id]. 5 tests. tsc 0 · validate:core 0 · test:run 5013+5 · render real OK.

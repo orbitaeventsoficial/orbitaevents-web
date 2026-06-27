@@ -1513,6 +1513,23 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1189 — 2026-06-27 — claude (TANCAT)
+
+**Incongruència #2: eliminades les vistes desades de leads (codi mort, ordre «elimina» del propietari).**
+
+- Context: `leadSavedViewsService` + `/api/admin/leads/views` existien sense cap consumidor (ni UI ni cron). Feature fantasma.
+- Verificat codi mort total (0 callers a tot el repo, cap cron/scheduler). Eliminats: route (+dir), servei, i el seu test.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja a `1189`; el següent canvi real ha de ser `#1190`.
+- Validació tècnica: `tsc --noEmit` 0 · `validate:core` EXIT 0 (api-admin-auth 162, service-coverage 246, dead-views OK) · `test:run` verd.
+- Validació funcional: cap superfície afectada.
+- Validació humana/UX: ordre explícita del propietari.
+- Resta auditoria: #1 FET (#1187); #3 reintent Sent (baixa prioritat); #4 `packs/price-sync` = capacitat única sense UI (decisió del propietari pendent).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1188 — 2026-06-27 — claude (TANCAT)
 
 **CAC real: model `MarketingSpend` + entrada manual de despesa per canal (MVP).**
