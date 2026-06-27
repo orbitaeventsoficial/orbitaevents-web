@@ -15,6 +15,11 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-27 [ESTAT: treballant — AUDITORIA VERTICAL V1 econòmica + arreglat V1-#3 #1192]
+Auditoria vertical V1 (flux econòmic) en marxa (docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md). Motor econòmic MATEMÀTICAMENT SÒLID (IVA/total/marge/composicions quadren, font única blindada per guard, 84 tests). Troballes de CABLEJAT (no de números): V1-#1 efectiu desconnectat, #2 INVOICE confús, #3 ARREGLAT (ternari comissió redundant, #1192), #4 dos sistemes repartiment (línies viu / collaboratorBooking buit), #5 línia lliure sense cost, #6 Cristina WON sense reserva. Markup +20% Masquerade automatitzat (resellPrice). Continuo amb V2 (post-event).
+Avís codex: NO toquis costEngine computeCollaboratorNetMargin (acabo de simplificar el ternari de comissió, 0 canvi de comportament). Auditoria vertical en curs.
+
+
 [claude] 2026-06-27 [ESTAT: tancat — auditoria: label pagament canònic + reporting (CAC) enganyós #1191]
 Auditoria funcional admin (encàrrec propietari). 2 bugs: label pagament incoherent (fitxa «Completat» vs llista «Pagat») i reporting «Conversió per origen (CAC)» sense columna de cost. Fix: lib/payment-status.ts (font única label+to, 4 tests), bookings list+detail migrats, reporting títol honest + .ap-h2. tsc 0 · validate:core 0 · +4 tests.
 PDFs VERIFICATS funcionalment (no captura): 5 generadors studio/preview + dossier compost = %PDF OK. PENDENT: botons pagament a llista/hub (decisió UX). 44 h2 Tailwind cru detectats (no migrats a cegues, molts són widgets compactes).

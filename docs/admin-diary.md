@@ -1,3 +1,26 @@
+## 2026-06-27 — V1 auditoria econòmica: simplificació del ternari de comissió redundant (Canvi #1192, claude)
+
+### Context
+Auditoria vertical econòmica (V1). Troballa V1-#3: a `computeCollaboratorNetMargin` (costEngine), el càlcul de `commissionAmount` tenia un ternari `pricingModel === 'DISCOUNT' ? total*pct : total*pct` amb **les dues branques idèntiques** → feia pensar que els 2 models calculen la comissió diferent quan no.
+
+### Verificació
+Els tests documenten la intenció: la comissió és igual als 2 models (`total × pct`); el que difereix de debò és el `collaboratorPrice` (DISCOUNT: `total − comissió`; NET_PLUS_COMMISSION: `total sencer`), que JA estava ben implementat. Per tant V1-#3 és **redundància que enganya**, no bug de números.
+
+### Què s'ha fet
+- Simplificat el ternari redundant de `commissionAmount` a un càlcul directe + comentari que explica que la diferència entre models és el `collaboratorPrice`. 0 canvi de comportament.
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 · **76 tests del costEngine verds** (0 canvi de comportament confirmat) · `validate:core` EXIT 0.
+- Validació funcional: la comissió i el collaboratorPrice donen els mateixos valors que abans (els tests existents ho garanteixen); pura simplificació.
+- Validació humana/UX: no aplica (lògica interna, sense superfície d'usuari).
+
+### Coordinació
+Counter -> 1192. Part de l'auditoria V1 (vegeu `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md`). Resta de troballes V1 (#1 efectiu, #2 INVOICE, #4 dos sistemes repartiment, #5 línia lliure, #6 Cristina WON) documentades, pendents de decisió del propietari.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-27 — Auditoria admin: label de pagament canònic + reporting «(CAC)» enganyós (Canvi #1191, claude)
 
 ### Context

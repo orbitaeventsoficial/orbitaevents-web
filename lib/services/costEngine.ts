@@ -262,15 +262,16 @@ export function computeCollaboratorNetMargin(
   summary: BookingFinancialSummary,
   collaborator: CollaboratorCostInput,
 ): { netMarginAfterCommission: number; commissionAmount: number; collaboratorPrice: number; marginPctAfterCommission: number } {
-  const commissionAmount =
-    collaborator.pricingModel === 'DISCOUNT'
-      ? Math.round(summary.total * (collaborator.commissionPct / 100))
-      : Math.round(summary.total * (collaborator.commissionPct / 100));
+  // La comissió es calcula igual als dos models: % sobre el total.
+  // El que difereix entre models és el collaboratorPrice (preu que veu el col·lab):
+  //  - DISCOUNT: el col·lab rep el total MENYS la comissió (preu amb descompte).
+  //  - NET_PLUS_COMMISSION: el col·lab rep el total sencer (la comissió va a part).
+  const commissionAmount = Math.round(summary.total * (collaborator.commissionPct / 100));
 
   const collaboratorPrice =
     collaborator.pricingModel === 'DISCOUNT'
       ? summary.total - commissionAmount
-      : summary.total; // en model NET, el col·lab rep el preu net
+      : summary.total;
 
   const netMarginAfterCommission = summary.netMargin - commissionAmount;
   const marginPctAfterCommission =

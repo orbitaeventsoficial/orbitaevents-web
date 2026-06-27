@@ -1513,6 +1513,23 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1192 — 2026-06-27 — claude (TANCAT)
+
+**V1 auditoria econòmica: simplificació del ternari de comissió redundant (V1-#3).**
+
+- Context: `computeCollaboratorNetMargin` tenia un ternari `commissionAmount` amb les 2 branques idèntiques (DISCOUNT i NET_PLUS_COMMISSION calculaven igual). Els tests confirmen que la comissió ÉS igual als 2 models; el que difereix és `collaboratorPrice` (ja ben implementat). Redundància que enganya, no bug de números.
+- Simplificat a càlcul directe + comentari explicatiu. 0 canvi de comportament.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja a `1192`; el següent canvi real ha de ser `#1193`.
+- Validació tècnica: `tsc` 0 · 76 tests costEngine verds (0 canvi) · `validate:core` EXIT 0.
+- Validació funcional: mateixos valors de comissió/collaboratorPrice que abans (garantit pels tests); pura simplificació.
+- Validació humana/UX: no aplica (lògica interna).
+- Part de l'auditoria vertical V1 (docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md). Resta de troballes V1 pendents de decisió del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1191 — 2026-06-27 — claude (TANCAT)
 
 **Auditoria admin: label de pagament canònic (font única) + reporting «(CAC)» enganyós.**
