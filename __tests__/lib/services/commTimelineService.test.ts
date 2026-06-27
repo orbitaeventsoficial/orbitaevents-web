@@ -1,25 +1,45 @@
 import { describe, it, expect } from 'vitest';
-import { buildCommTimeline, buildCommTimelineFromCanonicalEvents, type CommTimelineRawEntry, type CommTimelineInput } from '@/lib/services/commTimelineService';
+import { buildCommTimelineFromCanonicalEvents } from '@/lib/services/commTimelineService';
 import type { CanonicalTimelineEvent } from '@/lib/services/timelineQueryService';
 
 const NOW = new Date('2026-04-10T10:00:00Z');
 
-function makeEntry(overrides: Partial<CommTimelineRawEntry> = {}): CommTimelineRawEntry {
+// Mapeig de tipus d'activitat → timelineType canònic (per als tests de canal).
+const TYPE_TO_TIMELINE: Record<string, string> = {
+  EMAIL: 'MESSAGE_SENT',
+  WHATSAPP: 'WHATSAPP_SENT',
+  CALL: 'PHONE_CALL',
+  NOTE: 'NOTE_ADDED',
+  STATUS_CHANGE: 'STATUS_CHANGE',
+  SYSTEM: 'SYSTEM',
+  TASK: 'TASK',
+};
+
+// makeEntry(raw) → CanonicalTimelineEvent equivalent, perquè els tests proven la
+// via VIVA (buildCommTimelineFromCanonicalEvents) en comptes de la raw retirada (#1197).
+function makeEntry(overrides: {
+  id?: string; type?: string; title?: string; description?: string;
+  createdBy?: string; createdAt?: Date; metadata?: Record<string, unknown> | null;
+} = {}): CanonicalTimelineEvent {
+  const type = overrides.type ?? 'EMAIL';
   return {
     id: overrides.id ?? 'a1',
-    type: 'EMAIL',
-    title: 'Follow-up',
-    description: 'Cos del missatge',
-    createdBy: 'Admin',
-    createdAt: new Date('2026-04-09T10:00:00Z'),
-    leadId: 'lead-1',
-    metadata: null,
-    ...overrides,
+    source: 'leadActivity',
+    entityType: 'lead',
+    entityId: 'lead-1',
+    kind: 'message',
+    title: overrides.title ?? 'Follow-up',
+    body: overrides.description ?? 'Cos del missatge',
+    actor: overrides.createdBy ?? 'Admin',
+    occurredAt: (overrides.createdAt ?? new Date('2026-04-09T10:00:00Z')).toISOString(),
+    metadata: overrides.metadata ?? undefined,
+    link: undefined,
+    timelineType: (TYPE_TO_TIMELINE[type] ?? 'MESSAGE_SENT') as CanonicalTimelineEvent['timelineType'],
   };
 }
 
-function makeInput(activities: CommTimelineRawEntry[], overrides: Partial<CommTimelineInput> = {}): CommTimelineInput {
-  return { activities, customerId: null, now: NOW, ...overrides };
+function makeInput(activities: CanonicalTimelineEvent[], overrides: { customerId?: string | null; now?: Date } = {}) {
+  return { events: activities, customerId: overrides.customerId ?? null, now: overrides.now ?? NOW };
 }
 
 function makeCanonicalEvent(overrides: Partial<CanonicalTimelineEvent> = {}): CanonicalTimelineEvent {
@@ -39,7 +59,9 @@ function makeCanonicalEvent(overrides: Partial<CanonicalTimelineEvent> = {}): Ca
   };
 }
 
-describe('buildCommTimeline', () => {
+const buildCommTimeline = buildCommTimelineFromCanonicalEvents;
+
+describe('buildCommTimeline (via canònica)', () => {
   it('retorna buit sense activitats', () => {
     const result = buildCommTimeline(makeInput([]));
     expect(result.total).toBe(0);

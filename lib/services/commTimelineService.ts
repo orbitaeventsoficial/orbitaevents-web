@@ -37,23 +37,6 @@ export type CommTimelineSummary = {
   responseGap: number | null;
 };
 
-export type CommTimelineRawEntry = {
-  id: string;
-  type: string;
-  title: string | null;
-  description: string | null;
-  createdBy: string | null;
-  createdAt: Date;
-  leadId: string;
-  metadata: Record<string, unknown> | null;
-};
-
-export type CommTimelineInput = {
-  activities: CommTimelineRawEntry[];
-  customerId: string | null;
-  now: Date;
-};
-
 type CommTimelineCanonicalInput = {
   events: CanonicalTimelineEvent[];
   customerId: string | null;
@@ -63,17 +46,6 @@ type CommTimelineCanonicalInput = {
 // ───────────────────────────────────────────────────────────────────────────
 // CHANNEL MAPPING
 // ───────────────────────────────────────────────────────────────────────────
-
-const TYPE_TO_CHANNEL: Record<string, CommChannel> = {
-  EMAIL: 'EMAIL',
-  WHATSAPP: 'WHATSAPP',
-  CALL: 'CALL',
-  NOTE: 'NOTE',
-  STATUS_CHANGE: 'SYSTEM',
-  DOCUMENT: 'SYSTEM',
-  TASK: 'SYSTEM',
-  SYSTEM: 'SYSTEM',
-};
 
 function normalizeCommChannel(value: unknown): CommChannel | null {
   if (typeof value !== 'string') return null;
@@ -86,15 +58,6 @@ function normalizeCommChannel(value: unknown): CommChannel | null {
   if (normalized === 'FORM' || normalized === 'WEB_FORM' || normalized === 'CONTACT_FORM') return 'FORM';
   if (normalized === 'SYSTEM') return 'SYSTEM';
   return null;
-}
-
-function inferDirection(entry: CommTimelineRawEntry): CommDirection {
-  if (entry.type === 'NOTE') return 'INTERNAL';
-  if (entry.createdBy === 'system' || entry.createdBy === 'Scoring Bot' || entry.type === 'SYSTEM' || entry.type === 'STATUS_CHANGE') return 'INTERNAL';
-  // Inbound heuristic: title/description contains keywords
-  const text = ((entry.title ?? '') + ' ' + (entry.description ?? '')).toLowerCase();
-  if (text.includes('rebut') || text.includes('entrant') || text.includes('client escriu') || text.includes('resposta del client')) return 'INBOUND';
-  return 'OUTBOUND';
 }
 
 function inferDirectionFromCanonicalEvent(event: CanonicalTimelineEvent): CommDirection {
@@ -184,26 +147,6 @@ function summarizeEntries(entries: CommEntry[], now: Date): CommTimelineSummary 
 // ───────────────────────────────────────────────────────────────────────────
 // PURE FUNCTION
 // ───────────────────────────────────────────────────────────────────────────
-
-export function buildCommTimeline(input: CommTimelineInput): CommTimelineSummary {
-  const { activities, customerId, now } = input;
-  const commTypes = new Set(['EMAIL', 'WHATSAPP', 'CALL', 'NOTE']);
-  const entries: CommEntry[] = activities
-    .filter((activity) => commTypes.has(activity.type))
-    .map((a) => ({
-    id: a.id,
-    channel: normalizeCommChannel(a.metadata?.channel) ?? TYPE_TO_CHANNEL[a.type] ?? 'SYSTEM',
-    direction: inferDirection(a),
-    title: a.title ?? a.type,
-    body: a.description,
-    author: a.createdBy,
-    occurredAt: a.createdAt.toISOString(),
-    leadId: a.leadId,
-    customerId,
-    metadata: a.metadata,
-  }));
-  return summarizeEntries(entries, now);
-}
 
 export function buildCommTimelineFromCanonicalEvents(input: CommTimelineCanonicalInput): CommTimelineSummary {
   const { events, customerId, now } = input;

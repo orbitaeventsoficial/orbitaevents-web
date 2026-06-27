@@ -85,6 +85,13 @@ context (ids/params) correcte? el que es veu aquí és el mateix que a Economia/
 | V4 | CLIENT / RECURRÈNCIA | Lead→Client→Portal client (pagament/signatura)→Reactivació/Referrals | ⬜ |
 | V5 | CATÀLEG → PREU | Pack/Inventari→Cost→Preu recomanat→Pressupost (cablejat de preus) | ⬜ |
 
+### 🔬 V3 — VERTICAL DE COMUNICACIÓ (1a passada) · Lead→Inbox/Email→Seqüències→Timeline
+Dades reals: 53 leadActivity, 6 emailSend.
+- ✅ **Arquitectura sòlida**: les escriptures de comunicació passen per helpers tipats (`recordLeadEmailSent`/`recordLeadQuoteSent`/`recordLeadContractSent`…), no inline → font única. La timeline unifica via `timelineQueryService` (canònic).
+- ✅ **`pendingResponseFrom` correcte** (qui ha de respondre): últim contacte INBOUND→TEAM, OUTBOUND→CLIENT. 20 tests. La via VIVA (`loadCommTimeline`→`buildCommTimelineFromCanonicalEvents`→`inferDirectionFromCanonicalEvent`) usa `metadata.direction` explícit + `EMAIL_RECEIVED`, amb la heurística de text com a ÚLTIM recurs (robusta).
+- 🐛 **V3-#1 · `buildCommTimeline` (raw) + `inferDirection` = codi mort** — funció pública exportada que NOMÉS criden els seus tests; producció usa la versió canònica. La `inferDirection` vella és més fràgil (només heurística de text, sense metadata.direction) però NO s'usa. Candidata a eliminar (verificar 0 consumidors externs fets — confirmat: només tests).
+- ⏳ Pendents V3: seqüències comercials (commercialSequenceService), Inbox IMAP↔BD (vinculació via headers X-Orbita), reintent APPEND Sent (#3 auditoria).
+
 ### FASE 2 — AUDITORIES HORITZONTALS (disseny pàgina a pàgina) · «que tot sigui IMPECABLE»
 Quan les verticals estiguin verdes: les 92 pàgines + 6 PDFs + 13 emails + components, amb
 el checklist mestre de 17 blocs. Les taules A-D d'aquest document són per a aquesta fase.

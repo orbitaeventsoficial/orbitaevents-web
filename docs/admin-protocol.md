@@ -1513,6 +1513,22 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1197 — 2026-06-28 — claude (TANCAT)
+
+**V3-#1: retira `buildCommTimeline` (raw) mort + millora cobertura de la via viva.**
+
+- Context: `buildCommTimeline` (raw) + `inferDirection` eren codi mort (producció usa `buildCommTimelineFromCanonicalEvents`); però els tests provaven el resum només via la raw → la via viva no tenia tests.
+- Migrat el test a la via canònica (20 tests, ara sobre producció); eliminat el codi mort (raw + inferDirection + tipus orfes CommTimelineRawEntry/CommTimelineInput/TYPE_TO_CHANNEL).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja a `1197`; el següent canvi real ha de ser `#1198`.
+- Validació tècnica: `tsc` 0 · 20 tests verds · `validate:core` EXIT 0.
+- Validació funcional: timeline igual; lògica de resum ara testada a la via de producció.
+- Validació humana/UX: no aplica.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1196 — 2026-06-28 — claude (TANCAT)
 
 **V1-#4: retirada del sistema de comissions (CollaboratorBooking).**

@@ -1,3 +1,24 @@
+## 2026-06-28 — V3-#1: retira `buildCommTimeline` (raw) mort + millora cobertura de la via viva (Canvi #1197, claude)
+
+### Context
+Auditoria vertical V3 (comunicació). Troballa V3-#1: `buildCommTimeline` (entrada raw) + el seu helper `inferDirection` eren codi mort (producció usa `buildCommTimelineFromCanonicalEvents`, la via canònica). PERÒ els 18 tests del fitxer provaven la lògica de resum (channels/pendingResponseFrom/responseGap) NOMÉS via la funció raw → la via VIVA no tenia tests directes. Esborrar sense més hauria deixat producció sense cobertura.
+
+### Què s'ha fet (eliminar millorant, no degradant)
+- **Migrat el test** perquè provi la via canònica (viva): `makeInput` ara construeix l'input de `buildCommTimelineFromCanonicalEvents`, `makeEntry` mapeja raw→event canònic (TYPE_TO_TIMELINE: EMAIL→MESSAGE_SENT, CALL→PHONE_CALL…). Els 20 cossos de test queden iguals; ara cobreixen la via de producció.
+- **Eliminat el codi mort**: `buildCommTimeline` (raw), `inferDirection` (heurística vella, més fràgil), i els tipus orfes resultants `CommTimelineRawEntry`, `CommTimelineInput`, `TYPE_TO_CHANNEL`.
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 · **20 tests verds** (ara sobre la via viva) · `validate:core` EXIT 0.
+- Validació funcional: la timeline de comunicació segueix igual (només s'ha tret l'entrada raw no usada); la lògica de resum ara està testada a la via de producció.
+- Validació humana/UX: no aplica (refactor intern + cobertura).
+
+### Coordinació
+Counter -> 1197. Resol V3-#1. La vertical de comunicació queda neta (arquitectura sòlida ja verificada: helpers tipats, timeline canònica, pendingResponseFrom robust).
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-28 — V1-#4: retirada del sistema de comissions (CollaboratorBooking) (Canvi #1196, claude)
 
 ### Context
