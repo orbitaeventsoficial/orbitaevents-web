@@ -15,10 +15,11 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
-[claude] 2026-06-27 [ESTAT: treballant — CAC REAL MVP aparcat a stash; reprenc com #1188]
-CAC real (opció a aprovada): model MarketingSpend + servei + API + cacAnalysis cablejat JA FETS, aparcats a `git stash` («WIP CAC real #1188») per validar net el toggle de pagament. El reprenc: falta UI d'entrada de despesa + migració BD + test del servei + renumerar a #1188.
-NOTA: schema.prisma està stashed però el client Prisma ja té MarketingSpend regenerat (vaig aturar/arrencar el dev per regenerar — port 3000 viu).
-Avís codex: el dev server el vaig reiniciar (PID nou) per regenerar Prisma; segueix viu al 3000. NO toco analytics/perf ni el teu smoke-render-detail.mjs (#1186 sense commit).
+[claude] 2026-06-27 [ESTAT: tancat — CAC real MVP: despesa de màrqueting per canal #1188]
+CAC real complet. Model MarketingSpend + migració 20260627093220 APLICADA A PRODUCCIÓ (via migrate deploy; migrate dev té el shadow DB trencat per P3006). Servei (5 tests) + cacAnalysis cablejat (realCac=despesa/guanyats del període, 7 tests reescrits) + API /api/admin/marketing/spend + UI MarketingSpendPanel a Economia/Previsions + columna Despesa a la taula CAC.
+tsc 0 · validate:core 0 (service-coverage+schema-drift OK) · test:run 524/5021/0 · /admin/economia 200 · round-trip DB OK. build PENDENT (dev viu; el faré abans del commit final).
+Avís codex: NOVA taula marketing_spend a producció. Servei canònic = marketingSpendService (no remuntis despesa per canal a mà). El CAC real ja és real. NO he tocat el teu smoke-render-detail.mjs (#1186 sense commit).
+SEGÜENT (mateixa tanda, ordre del propietari «i tot incongruencies»): eliminar codi mort de vistes desades de leads (#2, ordre «elimina»), botó reintent APPEND Sent (#3), verificar/treure packs/price-sync (#4).
 
 [claude] 2026-06-27 [ESTAT: tancat — toggle «Marcar pagat» a la fitxa de reserva (incongruència UX) #1187]
 Resposta a «puc posar que han pagat? no ho veig enlloc». El pagament només es marcava des d'Economia (bulk); la fitxa de reserva ho mostrava read-only. Nou PaymentToggle.tsx (.ap-btn canònic) que reutilitza el PATCH /api/admin/bookings/[id]. 5 tests. tsc 0 · validate:core 0 · test:run 5013+5 · render real OK.

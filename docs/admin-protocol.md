@@ -1513,6 +1513,23 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1188 — 2026-06-27 — claude (TANCAT)
+
+**CAC real: model `MarketingSpend` + entrada manual de despesa per canal (MVP).**
+
+- Context: el propietari volia CAC real; `cacAnalysis` tenia conversió real però `realCac` fals (derivat de l'estimat, sense despesa). Aprovada l'opció (a): entrada manual.
+- Schema `MarketingSpend` (canal/year/month/amount, únic `[channel,year,month]`); migració `20260627093220_add_marketing_spend` via `migrate diff` (shadow DB de `migrate dev` trencat) i aplicada amb `migrate deploy`. Round-trip DB verificat.
+- Servei `marketingSpendService` (CRUD + `getChannelSpendSummary`), `cacAnalysis` cablejat (`realCac = despesa / guanyats del període`), API `/api/admin/marketing/spend`, UI `MarketingSpendPanel` a Economia + columna «Despesa» a la taula CAC.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja a `1188`; el següent canvi real ha de ser `#1189`.
+- Validació tècnica: `tsc --noEmit` 0 · `validate:core` EXIT 0 · `pnpm test:run` 524/5021/0 · `/admin/economia` 200. `pnpm build` PENDENT (dev viu; CI el cobreix).
+- Validació funcional: round-trip DB OK; CAC real de dades reals.
+- Validació humana/UX: pendent que el propietari carregui despesa.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1187 — 2026-06-27 — claude (TANCAT)
 
 **Toggle «Marcar pagat» a la fitxa de reserva — resol una incongruència d'UX (pagament només marcable des d'Economia bulk).**

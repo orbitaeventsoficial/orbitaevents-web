@@ -1,3 +1,27 @@
+## 2026-06-27 — CAC real: despesa de màrqueting per canal (MVP entrada manual) (Canvi #1188, claude)
+
+### Context
+El propietari volia CAC real (no els valors a mà de `channelCac`). `cacAnalysis.ts` ja tenia la conversió REAL per canal, però el `realCac` era FALS: `estimatedCac × (baseline/conversió)`, derivat de l'estimat, sense despesa. Aprovada l'opció (a): entrada manual de despesa per canal i mes.
+
+### Què s'ha fet
+- **Schema**: model Prisma `MarketingSpend` (canal `LeadSource`, year, month, amount, notes; únic `[channel,year,month]`). Migració `20260627093220_add_marketing_spend` creada via `migrate diff` (el shadow DB de `migrate dev` falla replicant migracions antigues — P3006) i **aplicada a producció amb `migrate deploy`** (production-safe). Round-trip real verificat (create+read per clau única+delete).
+- **Servei** `marketingSpendService.ts`: list/upsert/delete + `getChannelSpendSummary` (total + rang de mesos cobert per canal). 5 tests.
+- **cacAnalysis.ts cablejat**: `realCac = despesa real / clients guanyats (convertedAt dins el període cobert per la despesa)`. Si no hi ha despesa → `realCac`/`realSpend` null i es mostra l'estimat. Test reescrit (7) — eliminada la fórmula falsa.
+- **API** `/api/admin/marketing/spend` (GET/POST/DELETE, auth + CSRF).
+- **UI**: `MarketingSpendPanel.tsx` (entrada despesa amb `<input type="month">` per no hardcodejar mesos; SOURCE_LABELS/LEAD_SOURCE_VALUES canònics) a la pestanya Previsions d'Economia, sobre la taula CAC. Taula CAC ampliada amb columna «Despesa» i el real marca «est.» quan falta despesa. `router.refresh()` recalcula el CAC al desar.
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 · `validate:core` EXIT 0 (service-coverage OK 247, schema-drift OK 64 models) · `pnpm test:run` **524 fitxers / 5021 tests / 0 fallos** · `/admin/economia` HTTP 200. **`pnpm build` PENDENT** (dev server viu comparteix `.next`; es farà abans del commit final / el cobreix CI).
+- Validació funcional: round-trip DB OK; CAC real es calcula de despesa/guanyats reals.
+- Validació humana/UX: pendent que el propietari carregui despesa i validi el càlcul en viu.
+
+### Coordinació
+Counter -> 1188. Perímetre: nou model + servei + API + cacAnalysis + UI economia. DISJUNT de codex (ell a rendiment). NO toco `scripts/smoke-render-detail.mjs` (#1186 codex).
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-27 — Toggle «Marcar pagat» a la fitxa de reserva (incongruència d'UX) (Canvi #1187, claude)
 
 ### Context

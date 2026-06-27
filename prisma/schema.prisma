@@ -2226,3 +2226,20 @@ model SocialPost {
   @@index([bookingId])
   @@map("social_posts")
 }
+
+/// Despesa de màrqueting real per canal i mes — base del CAC real
+/// (CAC = despesa del canal / clients guanyats del mateix període).
+model MarketingSpend {
+  id        String     @id @default(cuid())
+  channel   LeadSource
+  year      Int
+  month     Int // 1-12
+  amount    Float // euros invertits al canal aquell mes
+  notes     String?    @db.Text
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@unique([channel, year, month])
+  @@index([year, month])
+  @@map("marketing_spend")
+}

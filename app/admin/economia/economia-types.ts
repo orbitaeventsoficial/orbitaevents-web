@@ -109,6 +109,7 @@ export interface CacChannelRow {
   wonLeads: number;
   conversionRate: number;
   estimatedCac: number;
+  realSpend: number | null;
   realCac: number | null;
 }
 

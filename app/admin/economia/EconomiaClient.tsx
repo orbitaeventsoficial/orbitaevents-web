@@ -7,6 +7,7 @@ import { AdminPage } from '../components/AdminPage';
 import { ADMIN_ECONOMY_HELP, helpAttrs } from '../components/adminHelpContent';
 import PaymentToggleButton from './PaymentToggleButton';
 import PaymentReminderActions from './PaymentReminderActions';
+import MarketingSpendPanel from './MarketingSpendPanel';
 import { formatDateSimple, formatDateFull } from '@/lib/constants';
 import ExportCsvButton from '../components/ExportCsvButton';
 import ProfitabilityConfigEditor from './ProfitabilityConfigEditor';
@@ -781,6 +782,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 )}
               </section>
 
+              {/* Despesa de màrqueting (base del CAC real) */}
+              <MarketingSpendPanel />
+
               {/* CAC per canal */}
               {props.cacByChannel && props.cacByChannel.length > 0 && (
                 <section className="ap-card p-5">
@@ -795,6 +799,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                           <th scope="col" className="px-3 py-2 text-right">Leads</th>
                           <th scope="col" className="px-3 py-2 text-right">Guanyats</th>
                           <th scope="col" className="px-3 py-2 text-right">Conversió</th>
+                          <th scope="col" className="px-3 py-2 text-right">Despesa</th>
                           <th scope="col" className="px-3 py-2 text-right">CAC estimat</th>
                           <th scope="col" className="px-3 py-2 text-right">CAC real</th>
                         </tr>
@@ -806,9 +811,10 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                             <td className="px-3 py-2 text-right">{row.totalLeads}</td>
                             <td className="px-3 py-2 text-right">{row.wonLeads}</td>
                             <td className="px-3 py-2 text-right">{(row.conversionRate * 100).toFixed(1)}%</td>
+                            <td className="px-3 py-2 text-right">{row.realSpend !== null ? money(row.realSpend) : '—'}</td>
                             <td className="px-3 py-2 text-right">{money(row.estimatedCac)}</td>
                             <td className="px-3 py-2 text-right font-semibold">
-                              {row.realCac !== null ? money(row.realCac) : '—'}
+                              {row.realCac !== null ? money(row.realCac) : <span title="Carrega despesa del canal per veure el CAC real">est.</span>}
                             </td>
                           </tr>
                         ))}
