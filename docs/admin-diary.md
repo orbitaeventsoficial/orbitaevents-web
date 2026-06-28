@@ -1,3 +1,23 @@
+## 2026-06-28 — FASE 3 claredat: connecta `leadSummary` (següent pas) a la fitxa del lead (Canvi #1198, claude)
+
+### Context
+Auditoria FASE 3 (claredat per al novell). La fitxa del lead tenia `leadSummary(lead)` que dona el següent pas segons l'estat («Contactar el client avui», «Enviar pressupost i fer seguiment en 48h», «Crear reserva, contracte i pagament inicial»…) PERÒ estava **definida i mai renderitzada** (codi mort). Un operador novell no veia cap guia de què fer.
+
+### Què s'ha fet (connectar el que existeix, no afegir nou)
+- `LeadDetailClient.tsx`: renderitzat `leadSummary(lead)` sota el nom, amb tag «Següent pas» + `aria-label`.
+- `leads-design.css`: classes canòniques `.fxd__hd-next` + `.fxd__hd-next-tag` — **només tokens** (`--gold`, `--ui`, `--mono`, `--o-text-*`, `--o-r-sm-2`, `color-mix`), zero hardcoded; `flex-wrap` per a responsiu.
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0 errors + `validate:core`. (Residus del guard = falsos positius: `#920`/`#851` són números de canvi en comentaris.)
+- Validació funcional: la fitxa del lead ara mostra el següent pas recomanat, contextualitzat a l'estat.
+- Validació humana/UX: guia visible però secundària al nom; tag or per cridar l'ull del novell sense soroll.
+
+### Coordinació
+Counter → 1198. Resol F2-b del `ROADMAP-EXECUCIO.md`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-28 — V3-#1: retira `buildCommTimeline` (raw) mort + millora cobertura de la via viva (Canvi #1197, claude)
 
 ### Context

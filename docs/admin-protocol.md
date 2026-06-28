@@ -1513,6 +1513,23 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1198 — 2026-06-28 — claude (TANCAT)
+
+**FASE 3 claredat: connecta `leadSummary` (següent pas) a la fitxa del lead.**
+
+- `leadSummary(lead)` existia però no es renderitzava (codi mort); el novell no veia guia de què fer.
+- `LeadDetailClient.tsx`: renderitzat sota el nom amb tag «Següent pas» + aria-label.
+- `leads-design.css`: `.fxd__hd-next` + `.fxd__hd-next-tag` (només tokens, responsiu flex-wrap).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1198`; el següent canvi real ha de ser `#1199`.
+- Validació tècnica: `tsc` 0 · `validate:core`.
+- Validació funcional: següent pas visible per estat a la fitxa del lead.
+- Validació humana/UX: guia secundària al nom, tag or sense soroll.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1197 — 2026-06-28 — claude (TANCAT)
 
 **V3-#1: retira `buildCommTimeline` (raw) mort + millora cobertura de la via viva.**

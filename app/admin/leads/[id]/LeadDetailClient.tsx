@@ -378,6 +378,7 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
           <div className="fxd__hd-ident">
             <p className="fxd__hd-eyebrow">{STAGE_LABEL[stage]} · {lead.type} · {sourceLabel(lead.channel)}</p>
             <h2 className="fxd__hd-name">{lead.name}</h2>
+            <p className="fxd__hd-next" aria-label="Següent pas recomanat"><span className="fxd__hd-next-tag">Següent pas</span>{leadSummary(lead)}</p>
           </div>
           <div className="fxd__hd-reach" aria-label="Contacte ràpid">
             {(['phone', 'email'] as EditableField[]).map((f) => (
