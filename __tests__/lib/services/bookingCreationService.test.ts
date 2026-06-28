@@ -5,7 +5,7 @@ const { mockPrisma, mockCalculateGoogleMapsDistance, mockGetFuelCostPerKmReferen
     booking: { create: vi.fn(), findFirst: vi.fn(), findUnique: vi.fn() },
     lead: { findUnique: vi.fn(), update: vi.fn() },
     customer: { findUnique: vi.fn() },
-    collaborator: { findUnique: vi.fn() },
+    collaborator: { findUnique: vi.fn(), findFirst: vi.fn() },
     pack: { findUnique: vi.fn(), create: vi.fn() },
     extra: { findUnique: vi.fn(), create: vi.fn() },
     packInventory: { findMany: vi.fn() },
@@ -51,6 +51,7 @@ const MOCK_PACK = {
 
 function setupDefaults() {
   mockPrisma.pack.findUnique.mockResolvedValue(MOCK_PACK);
+  mockPrisma.collaborator.findFirst.mockResolvedValue(null); // so llogat (Isma): per defecte no existeix → no afegeix línia
   mockPrisma.booking.findFirst.mockResolvedValue(null); // no previous bookings
   mockPrisma.booking.findUnique.mockResolvedValue(null); // reference doesn't exist yet
   mockPrisma.bookingInventory.groupBy.mockResolvedValue([]); // no overlapping items
@@ -116,6 +117,27 @@ describe('createBookingFromInput', () => {
 
     const createCall = mockPrisma.booking.create.mock.calls[0][0];
     expect(createCall.data.reference).toMatch(/^OE-\d{4}-001$/);
+  });
+
+  it('afegeix la línia de lloguer de so (Isma) quan el bolo porta pack', async () => {
+    mockPrisma.collaborator.findFirst.mockResolvedValue({ id: 'isma-1' });
+    await createBookingFromInput(BASE_INPUT);
+
+    const createCall = mockPrisma.booking.create.mock.calls[0][0];
+    const lines = createCall.data.serviceLines?.create ?? [];
+    const sound = lines.find((l: { collaboratorId?: string }) => l.collaboratorId === 'isma-1');
+    expect(sound).toBeDefined();
+    expect(sound.costAmount).toBe(50);
+    expect(sound.revenueAmount).toBe(0); // no es factura a part: només resta al marge
+  });
+
+  it('NO afegeix línia de so si el col·laborador de lloguer no existeix', async () => {
+    mockPrisma.collaborator.findFirst.mockResolvedValue(null);
+    await createBookingFromInput(BASE_INPUT);
+
+    const createCall = mockPrisma.booking.create.mock.calls[0][0];
+    const lines = createCall.data.serviceLines?.create ?? [];
+    expect(lines.length).toBe(0);
   });
 
   it('genera referència incremental amb reserves prèvies', async () => {

@@ -9,6 +9,43 @@ import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
 import { ACTIVE_BOOKING_STATUSES } from '@/lib/constants';
 import { calcVatRate, calcDeposit, roundMoney, CUSTOM_BOOKING_PACK_SLUG, CUSTOM_BOOKING_PACK_MARKER } from '@/lib/constants/pricing';
 import { calculateEventDuration } from '@/lib/inventory-utils';
+import { SOUND_RENTAL } from '@/lib/constants/inventory';
+
+/**
+ * Afegeix automàticament la línia de lloguer de so (Isma) si el bolo porta pack i
+ * encara no en té cap. revenueAmount=0 (no es factura a part al client); costAmount
+ * resta al marge via el col·laborador. Degradació segura: si Isma no existeix, no fa res.
+ */
+async function appendSoundRentalLine(
+  lines: ReturnType<typeof normalizeServiceLines>,
+  hasPack: boolean,
+) {
+  if (!SOUND_RENTAL.enabled || !hasPack) return lines;
+  const alreadyHasSound = lines.some(
+    (l) => l.kind === 'EQUIPMENT' && (l.label ?? '').toLowerCase().includes('so'),
+  );
+  if (alreadyHasSound) return lines;
+  const rental = await prisma.collaborator.findFirst({
+    where: { name: SOUND_RENTAL.collaboratorName, roles: { has: 'EQUIPMENT_RENTAL' } },
+    select: { id: true },
+  });
+  if (!rental) return lines;
+  return [
+    ...lines,
+    {
+      collaboratorId: rental.id,
+      sortOrder: lines.length,
+      partyType: null,
+      kind: 'EQUIPMENT' as const,
+      label: SOUND_RENTAL.label,
+      revenueAmount: 0,
+      costAmount: SOUND_RENTAL.costPerEvent,
+      quantity: 1,
+      hours: null,
+      notes: 'Afegit automàticament — so llogat per bolo (mentre no hi hagi altaveus propis).',
+    },
+  ];
+}
 
 const OPERATOR_EXTRA_ID = '__operator_extra__';
 const OPERATOR_EXTRA_SLUG = 'operator-support-hour';
@@ -357,9 +394,11 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   const extraHoursPrice = extraHours * pack.extraHourPrice;
   const extrasPrice = data.extras?.reduce((sum, e) => sum + e.price * (e.quantity || 1), 0) || 0;
   // Si el payload no porta línies però el lead té un bolo muntat, s'hereten (Fase 2).
-  const serviceLines = normalizeServiceLines(
+  const serviceLinesBase = normalizeServiceLines(
     (data.serviceLines && data.serviceLines.length > 0) ? data.serviceLines : leadBoloLines
   );
+  // So llogat automàtic (Isma) quan el bolo porta pack i no té ja línia de so.
+  const serviceLines = await appendSoundRentalLine(serviceLinesBase, Boolean(resolvedPackId));
   const serviceLinesRevenue = serviceLines.reduce((sum, line) => sum + (line.revenueAmount || 0), 0);
   // El pack, les hores extra, els extres i les línies de servei se SUMEN tots
   // (les línies són serveis addicionals, no substitueixen el pack). El total
