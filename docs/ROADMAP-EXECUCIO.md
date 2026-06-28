@@ -50,10 +50,13 @@ cablejat al següent pas existeix.
 ---
 
 ## FASE 3 — TOT (components, UI, responsive, claredat per al novell)
-- ⬜ T1 — coherència visual dels components del flux (els 7 eixos de sèrie).
+- ✅ **T3-a · «Següent pas» a la fitxa del lead** (#1198) — `leadSummary` estava mort a `LeadDetailClient`; connectat. El novell ara veu què fer segons l'estat. (El kanban `LeadsSeasonClient` JA el mostrava — L375 — i la fitxa de reserva té `BookingChecklist`: la guia ja existeix a la resta de pantalles principals.)
+- ⬜ T1 — coherència visual dels components del flux (els 7 eixos de sèrie). *(Requereix verificació visual als 3 breakpoints — millor amb dev server + captures.)*
 - ⬜ T2 — responsive 375/tablet/desktop de les pàgines del flux.
-- ⬜ T3 — claredat per al novell: noms confusos (snapshot/archive/snapshot), navegació, què-fer-ara.
-- ⬜ T4 — neteja de documentació (39 docs → jerarquia clara). *Nota: 6 docs «vells» estan cablejats a guards, no moure'ls.*
+- ⬜ T3-b — noms confusos (snapshot/archive/snapshot). *Risc: renombrar = churn d'imports; baix valor d'usuari. Ajornat.*
+- ⬜ T4 — neteja de documentació (39 docs → jerarquia clara). *Nota: 6 docs «vells» estan cablejats a guards, NO moure'ls (verificat).*
+
+> **Nota FASE 3:** l'escombrada de «helpers de guia morts» va donar 8 falsos positius (leadSummary/focusActionLabel del kanban SÍ es renderitzen). Confirma la conclusió del diagnòstic: **no perseguir codi mort.** El #1198 va ser l'únic cas genuí. La guia per al novell ja és present a les pantalles principals (lead detail ara, kanban, booking checklist).
 
 ---
 
