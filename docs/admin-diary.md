@@ -1,3 +1,25 @@
+## 2026-06-28 — Inventari: botó «Buscar reposició» (DJ Mania primer + el més barat) (Canvi #1204, claude)
+
+### Context
+Estratègia acordada amb el propietari: **preferència DJ Mania** (finançament) **+ buscar el més barat**. Un enllaç estàtic no pot expressar les dues coses; cal una cerca en viu. El motor (`searchReplacementCandidates`, #1201) ja prioritza DJ Mania i torna candidats; faltava exposar-lo.
+
+### Què s'ha fet
+- **Servei**: `searchReplacementForItem(itemId, q?)` (wrapper que llegeix el nom de l'item i cerca, retorna candidats + `cheapestPrice`).
+- **API**: `GET /api/admin/inventory/[id]/replacement-search` (requireAuth, via servei — no prisma directe).
+- **UI**: component `ReplacementSearchButton` a la fitxa d'inventari. Botó «🔍 Buscar reposició» → mostra candidats reals amb **badge DJ Mania 🥇** (primer) i **badge «Més barat»**, foto, preu, botó «Comprar ↗» i «Usar» (desa com a `purchaseUrl`). Canònic (`.ap-card`, `.ap-btn`, `admin-tone-*`, tokens; `next/image unoptimized` per als thumbnails de cerca).
+- Refinada l'estratègia d'enllaç estàtic: les cerques DJ Mania genèriques (que fallaven amb «EV», «2000W») → cerca Google Shopping del producte net (40 items), mostra tots els venedors.
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core` EXIT 0 (passa prisma-in-routes via servei, no-img-tag via next/image, layer-catalogs via constant compartida).
+- Validació funcional: el botó cerca en viu i deixa triar DJ Mania o el més barat; «Usar» actualitza l'enllaç de reposició.
+- Validació humana/UX: DJ Mania destacat primer (preferència), més barat marcat (decisió informada).
+
+### Coordinació
+Counter → 1204. Territori inventari. Sense schema (reusa purchaseUrl del #1203), costEngine ni reserves.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-28 — Inventari: camp `purchaseUrl` dedicat + imatges locals + neteja canònica de la fitxa (Canvi #1203, claude)
 
 ### Context

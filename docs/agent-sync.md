@@ -15,6 +15,11 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-28 [ESTAT: tancat — inventari botó «Buscar reposició» DJ Mania+barat #1204]
+Botó intel·ligent de reposició a la fitxa d'inventari: servei `searchReplacementForItem` + API `GET /api/admin/inventory/[id]/replacement-search` + component `ReplacementSearchButton` (DJ Mania 🥇 primer + «Més barat», foto/preu/Comprar/Usar). Sense schema nou (reusa purchaseUrl #1203). Counter → 1204.
+Avís codex: cap canvi de schema aquí. SerpApi (tier 100/mes) compartit amb Google Reviews — el botó gasta 1 cerca per ús.
+
+
 [claude] 2026-06-28 [ESTAT: tancat — inventari camp purchaseUrl + imatges locals + neteja canònica #1203]
 Camp NOU `InventoryItem.purchaseUrl` (TEXT) + migració `20260628190000_add_inventory_purchase_url` aplicada a Railway. ⚠️ CODEX: he tocat schema (camp additiu, no destructiu) — regenera Prisma si treballes inventari. Enllaços moguts de `purchasePriceSource` a `purchaseUrl` (44 items) + font netejada. Botó «Comprar reposició» a la fitxa. Imatges externes baixades a webp local (uploads/inventory). Fitxa neta de blanc cru (tokens). Counter → 1203.
 Avís codex: el camp dedicat `purchaseUrl` que vas esmentar ja existeix (l'he fet jo). Sense costEngine/reserves.

@@ -17,6 +17,7 @@ import {
 } from '@/lib/inventory-utils';
 import { formatDate, formatNumber, DEFAULT_EXPECTED_LIFE_HOURS, getBookingStatusLabel } from '@/lib/constants';
 import InventoryItemEditor from './InventoryItemEditor';
+import ReplacementSearchButton from './ReplacementSearchButton';
 import InventoryPhotoUpload from './InventoryPhotoUpload';
 
 export const dynamic = 'force-dynamic';
@@ -180,6 +181,21 @@ export default async function InventoryItemPage({ params }: PageProps) {
             )}
           </div>
         )}
+        <div className="mt-4 border-t pt-3">
+          <p className="text-xs font-medium uppercase text-[var(--t3)]">Reposició</p>
+          {item.purchaseUrl && (
+            <a
+              href={item.purchaseUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ap-btn ap-btn--xs mt-2 mr-2"
+            >
+              Comprar reposició ↗
+            </a>
+          )}
+          <p className="mt-2 mb-2 text-xs text-[var(--t3)]">DJ Mania primer (finançament) + el més barat d&apos;altres botigues.</p>
+          <ReplacementSearchButton itemId={item.id} />
+        </div>
       </section>
 
       {/* Foto + Edició en 2 columnes */}

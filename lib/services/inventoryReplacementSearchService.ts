@@ -7,6 +7,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { PREFERRED_REPLACEMENT_SOURCES } from '@/lib/constants/inventory';
+import { prisma } from '@/lib/prisma';
 
 export interface ReplacementCandidate {
   title: string;
@@ -81,4 +82,23 @@ export async function searchReplacementCandidates(
   } catch (error) {
     return { query, ok: false, error: error instanceof Error ? error.message : 'Error desconegut', candidates: [] };
   }
+}
+
+/**
+ * Cerca de reposició per a un item d'inventari concret (per id).
+ * Si no es passa `q`, usa el nom de l'item. Retorna candidats + el preu més barat.
+ */
+export async function searchReplacementForItem(
+  itemId: string,
+  q?: string,
+): Promise<(ReplacementSearchResult & { itemFound: boolean; cheapestPrice: number | null })> {
+  const item = await prisma.inventoryItem.findUnique({ where: { id: itemId }, select: { name: true } });
+  if (!item) {
+    return { query: q ?? '', ok: false, error: 'Element no trobat', candidates: [], itemFound: false, cheapestPrice: null };
+  }
+  const query = q?.trim() || item.name;
+  const result = await searchReplacementCandidates(query, 6);
+  const priced = result.candidates.filter((c) => c.price != null);
+  const cheapestPrice = priced.length ? Math.min(...priced.map((c) => c.price as number)) : null;
+  return { ...result, itemFound: true, cheapestPrice };
 }

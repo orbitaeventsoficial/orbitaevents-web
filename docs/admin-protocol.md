@@ -1513,6 +1513,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1204 — 2026-06-28 — claude (FET)
+**Inventari: botó «Buscar reposició» (DJ Mania primer + el més barat).**
+- Servei `searchReplacementForItem(itemId, q?)` + API `GET /api/admin/inventory/[id]/replacement-search` (requireAuth, via servei).
+- UI `ReplacementSearchButton` a la fitxa: cerca en viu, badge DJ Mania 🥇 primer + «Més barat», foto/preu/«Comprar»/«Usar» (desa purchaseUrl). Canònic (next/image unoptimized per thumbnails).
+- Enllaços estàtics genèrics passats a cerca Google Shopping del producte net (40 items).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1204`; el següent canvi real ha de ser `#1205`.
+- Validació tècnica: `tsc` 0; `validate:core` 0.
+- Validació funcional: botó cerca i deixa triar DJ Mania o el més barat.
+- Validació humana/UX: DJ Mania destacat (preferència), més barat marcat.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1203 — 2026-06-28 — claude (FET)
 **Inventari: camp `purchaseUrl` dedicat + imatges locals + neteja canònica de la fitxa.**
 - Schema + migració `20260628190000_add_inventory_purchase_url` (camp `purchaseUrl`, aplicada a Railway). Backfill: enllaç mogut de la font → `purchaseUrl` (44 items) + font netejada.
