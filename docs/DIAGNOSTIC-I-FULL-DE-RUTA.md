@@ -124,7 +124,7 @@ fetes les 5 verticals (econòmica, post-event, comunicació, client/portal, cat�
 Pendent: **executar les decisions de consolidació** que les verticals han destapat
 (retirar duplicats, connectar capacitats òrfenes que es volen). Mètode provat: §7.
 
-### Fase 2 — ÒRFENES: connectar o eliminar (⬜)
+### Fase 2 — ÒRFENES: connectar o eliminar (⬜ — REPRIORITZAT A BAIXA, veure aprenentatge)
 Per cada una de les 79 funcions òrfenes, decisió binària amb el propietari:
 - **Connectar** (refer) si és una capacitat que es vol → enganxar-la al camí viu, **no
   fer-ne un de nou**. Si la via viva es queda curta, **estendre-la** perquè sigui un
@@ -135,6 +135,55 @@ Per cada una de les 79 funcions òrfenes, decisió binària amb el propietari:
 ⚠️ **Regla d'or abans de matar:** comprovar que el que es manté fa la MATEIXA feina (o
 millor) que el que s'elimina. (Lliçó real: la «substitució» de privacy NO cobria els
 casos per-entitat — gairebé res era un kill net.)
+
+> ### 🧠 APRENENTATGE DEL CERVELL (2026-06-28) — la cacera de codi mort és de BAIX RENDIMENT
+> Després de traçar a fons múltiples candidats a «codi mort» (privacy, hero, els 5
+> «penjats» del transversal: financeAlerts, holded, responseTracking, signature,
+> translation), **gairebé tots han resultat VIUS**. L'ús real s'amaga darrere de:
+> (a) crides **lib→lib** (un servei en crida un altre), (b) **alias** re-exportats,
+> (c) **endpoints HTTP** cridats des del frontend amb un string (`fetch('/api/...')`),
+> invisibles a qualsevol anàlisi estàtica de funcions.
+>
+> **Conclusió:** aquest codi té MOLT menys codi mort del que diuen les mètriques. La
+> superfície és gran però **viva**. Perseguir funcions òrfenes una a una = molt esforç,
+> molt risc de trencar coses vives, i guany mínim. **S'ATURA com a estratègia principal.**
+> Només s'elimina una funció quan se n'ha traçat la cadena completa (funció → alias →
+> route → fetch) i és buida de debò (com `buildCommTimeline`, #1197).
+>
+> **La palanca real NO és esborrar — és:** (1) **fiabilitzar** els fluxos que el propietari
+> usa de debò (el 10-20%), (2) **reduir superfície** amagant/simplificant el perifèric que
+> no usa (l'admin té 93 pàgines), (3) **consolidar** la fragmentació del CRM (36 serveis),
+> l'únic clúster on combinar té valor real i és al flux central.
+>
+> **Igual de important — què NO cal tocar:** clústers que funcionen i tenen poc valor de
+> canvi (p. ex. els 3 serveis de protocol intern → 1 sola pàgina): fusionar-los seria
+> soroll sense benefici per a l'usuari. Es queden. *Millorar ≠ remenar.*
+
+> ### 🧠🧠 CONCLUSIÓ ESTRATÈGICA DEFINITIVA (2026-06-28) — l'organisme és VIU, no inflat
+> S'han verificat a fons **5 hipòtesis de «sobrant»** consecutives: (1) funcions privacy
+> «substituïdes», (2) els 5 serveis «penjats» del transversal, (3) leadActivity vs
+> customerActivity, (4) el trio de snapshots de lead, (5) els 26 docs «vells».
+> **Resultat: 5 de 5 eren VIUS o distints.** Fins i tot 6 docs «vells» estan cablejats a
+> GUARDS (`check-visual-identity-bridge`, `check-product-operating-system`,
+> `check-dead-admin-views`) i scripts de seed — moure'ls trencaria el QA.
+>
+> **DIAGNÒSTIC REAL DEL PROJECTE:** no està inflat de brossa — està **densament
+> interconnectat i viu**. La sensació de «massa extens» és real, però és **múscul cablejat,
+> no greix**. «Reduir esborrant» és el model mental EQUIVOCAT aquí: gairebé res és
+> eliminable amb seguretat, i el que ho sembla amaga l'ús darrere d'alias, endpoints HTTP,
+> crides lib→lib o guards.
+>
+> **PER TANT, les úniques palanques vàlides (que milloren sense trencar):**
+> 1. **CLAREDAT** — mapes (atles), noms menys confusos, índexs. El cervell ha de poder
+>    abastar l'organisme. (Zero risc; pur guany.)
+> 2. **FIABILITAT** dels fluxos que el propietari usa (el 10-20%) — afinar/cosir, no esborrar.
+> 3. **REDUIR SUPERFÍCIE A LA UI** — amagar del menú les pàgines que no s'usen. Es decideix
+>    a nivell de **navegació/visibilitat**, NO esborrant codi. Requereix input del propietari
+>    (què uses / què no).
+>
+> **Queda PROHIBIT** (per haver-ho verificat 5 cops) tornar a obrir una campanya d'esborrat
+> massiu de codi o docs «perquè sembla mort». Cada eliminació individual exigeix traçar la
+> cadena completa (funció→alias→route→fetch / doc→guard→script) i provar que és buida.
 
 ### Fase 3 — FIABILITAT: del 10-20% al 100% de confiança (⬜, l'objectiu real)
 Que cada flux que el propietari fa servir sigui **de confiança total**: estats buits,
