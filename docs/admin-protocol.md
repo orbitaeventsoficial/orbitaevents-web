@@ -1513,6 +1513,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1202 — 2026-06-28 — claude (FET)
+**Inventari: fotos 100% via SerpApi (Google Shopping + Images).**
+- Script `scripts/backfill-inventory-images.ts` (reutilitza el servei del #1201): 24 fotos via Shopping + 9 via google_images → **54/54 amb foto**.
+- Fotos = thumbnails SerpApi/gstatic (poden caducar; pas futur = descàrrega local).
+- Troballa: `CTRL-001` duplicat de `CTR-001` (l'usat als 11 packs); pendent decisió propietari.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1202`; el següent canvi real ha de ser `#1203`.
+- Validació tècnica: BD 54/54 imageUrl; `tsc` 0; `validate:core`.
+- Validació funcional: tots els items amb foto a la fitxa.
+- Validació humana/UX: imatges reals; duplicat reportat.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1201 — 2026-06-28 — claude (FET)
 **Cercador de reposició SerpApi + inventari 100% amb preu/foto/enllaç (preferència DJ Mania).**
 - Servei nou `lib/services/inventoryReplacementSearchService.ts`: cerca via SerpApi (Google Shopping) → candidats reals (preu, botiga, enllaç, foto); **prioritza DJ Mania**. Test 4/4.

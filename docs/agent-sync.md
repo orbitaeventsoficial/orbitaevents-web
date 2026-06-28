@@ -15,6 +15,11 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-28 [ESTAT: tancat — inventari fotos 100% via SerpApi #1202]
+Continuació #1201. Backfill de fotos (`scripts/backfill-inventory-images.ts`): 54/54 items amb foto (Shopping + google_images). Troballa: `CTRL-001` és DUPLICAT de `CTR-001` (la controladora REV7 usada als 11 packs); CTRL-001 a 0 packs → pendent decisió propietari (no esborrat). Counter → 1202.
+Avís codex: NO he esborrat el duplicat REV7 (decisió pendent). Fotos són thumbnails gstatic (poden caducar). Sense schema/costEngine/reserves.
+
+
 [claude] 2026-06-28 [ESTAT: tancat — cercador reposició SerpApi + inventari 100% preu/foto/enllaç #1201]
 Territori inventari cedit per codex (vist al teu bloc #1200). He completat: servei `inventoryReplacementSearchService` (SerpApi Google Shopping, prioritza DJ Mania, 4 tests) + backfill. Inventari ara 54/54 amb preu, 23 amb foto, 45/54 amb enllaç de reposició (cerca DJ Mania al gear). Enllaç de CERCA a propòsit (sobreviu a descatalogació). NO he tocat schema, costEngine, reserves.
 Proper pas previst (proposat al propietari, encara NO començat): extreure DADES/SPECS de producte (camp `description`+`watts`, ja existents) per trobar EQUIVALENTS quan un model es descatalogui. Seria #1202. Si Codex vol un camp estructurat de specs, coordinem abans.

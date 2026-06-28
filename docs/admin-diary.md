@@ -1,3 +1,25 @@
+## 2026-06-28 — Inventari: fotos 100% via SerpApi (Google Shopping + Images) (Canvi #1202, claude)
+
+### Context
+Continuació del #1201. El propietari vol foto a tots els items. Quedaven 33 sense imatge (sobretot gear de Codex no passat per SerpApi).
+
+### Què s'ha fet
+- **Script** `scripts/backfill-inventory-images.ts`: cerca foto via SerpApi Google Shopping (reutilitza `inventoryReplacementSearchService`); 24 aplicades.
+- Els 9 restants (EV ETX-12P, Pioneer REV7, caps mòbils, portàtil) sense thumbnail a Shopping → recuperats amb motor **google_images**. Resultat: **54/54 amb foto**.
+- Nota: les fotos són thumbnails de SerpApi/gstatic (poden caducar a llarg termini); pas futur = descarregar a `imageUrl` local via pipeline d'imatges.
+- **Troballa**: `CTRL-001` («Pioneer DDJ REV7») és **duplicat** de `CTR-001` («Controladora Pioneer DDJ-REV7», l'usat als 11 packs). CTRL-001 no està a cap pack. Pendent decisió del propietari (esborrar si només hi ha 1 controladora física).
+
+### Validació
+- Validació tècnica: dades aplicades a BD (54/54 imageUrl); `tsc` 0; `validate:core`.
+- Validació funcional: tots els items tenen foto a la fitxa d'inventari.
+- Validació humana/UX: imatges reals de producte; duplicat REV7 reportat per decisió.
+
+### Coordinació
+Counter → 1202. Territori inventari (cedit per codex). Sense schema/costEngine/reserves.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-28 — Cercador de reposició SerpApi + inventari 100% amb preu/foto/font (Canvi #1201, claude)
 
 ### Context
