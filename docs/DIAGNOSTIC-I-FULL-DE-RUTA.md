@@ -63,6 +63,32 @@ Després d'auditar el flux econòmic i de pagaments de punta a punta:
 - **La base de qualitat és seriosa.** 68 guards + ~5.000 tests + CI. Pocs projectes
   d'aquesta mida tenen aquesta xarxa.
 
+### 3.1.bis 📊 DADA EMPÍRICA — què s'usa de debò (de l'`adminLog`, 2026-06-28)
+Anàlisi de 457 registres d'`adminLog` (accions reals sobre el sistema):
+- **Accions humanes concentrades en 2 entitats:** `booking` (142 UPDATE + creacions/portal) i
+  `lead` (50 UPDATE + 12 CREATE + comms). **~95% de tota l'activitat humana.**
+- La resta del sistema (clients, inventari, packs, col·laboradors, màrqueting, reporting,
+  documents…) **no rep cap acció humana registrada**; només hi ha automatismes (pricing
+  check, fuel refresh, alertes) que corren sols.
+
+**Conclusió:** el «10-20% que el propietari usa» té nom — **és LEADS → RESERVES.** És
+l'empresa en funcionament real. (Caveat: `adminLog` registra escriptures, no visites.)
+
+**MATÍS CRÍTIC del propietari (2026-06-28):** *no* usa només el 20% perquè no necessiti la
+resta. Usa el 20% **perquè la resta té ERRADES o coses a mig fer (manques)** — i perquè,
+com a **novell sense experiència**, un sistema de 93 pàgines és **inabastable mentalment**.
+Vol usar el 80% restant; no pot, perquè falla o està incomplet.
+
+**Implicació operativa (corregida):**
+1. **NO desjerarquitzar/amagar la perifèria** — el propietari la vol. L'objectiu és el
+   contrari: **fer-la funcionar** perquè passi del 20% al 100% d'ús.
+2. **La feina central = caça d'ERRADES i MANQUES**, àrea per àrea, arreglant a mesura, fins
+   que cada funció sigui de confiança i usable. (És exactament el que fan les auditories
+   verticals: troben «errades o manques» — vegeu §6 i el resultat #1187-1197.)
+3. **CLAREDAT per al novell** — mapes, noms, navegació entenedora, perquè un sol cap sense
+   experiència pugui abastar i confiar en l'organisme.
+4. El cor (lead→reserva) ja és sòlid; l'expansió va cap a les àrees adjacents trencades.
+
 ### 3.2 La tensió central (el que el propietari viu cada dia)
 > «Estic en proves. Uso la interfície al **10-20%** perquè **encara no és fiable** i és
 > **molt extensa**.»
