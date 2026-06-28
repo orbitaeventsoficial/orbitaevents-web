@@ -4,6 +4,19 @@
 
 Aquest fitxer és la constitució del repo. Conté normes estables de treball, patrons de codi i la llista de zones protegides.
 
+### 📍 Ordre de lectura canònic (per a qualsevol que entri, humà o IA)
+
+El projecte té UNA jerarquia de lectura, no 39 documents solts. Es llegeix en aquest ordre:
+
+1. **`docs/DIAGNOSTIC-I-FULL-DE-RUTA.md`** ← **LLEGEIX-HO PRIMER.** L'auditoria d'Opus de
+   l'organisme: què és, la mida real, el diagnòstic honest i el full de ruta en 5 fases.
+   Conté el **mapa de documents** (què és viu vs vell). És la «llicència per operar».
+2. **Aquest `CLAUDE.md`** ← la LLEI: normes innegociables, patrons, zones protegides.
+3. **`docs/admin-protocol.md`** ← el MANUAL OPERATIU del dia a dia (§6 backlog, §9 història).
+
+La resta de `docs/**` són **referència** (es consulten quan toca) o **arxiu** (feina ja
+tancada). El mapa complet, classificat viu/vell, viu al §8 del DIAGNÒSTIC.
+
 Per estat funcional i peces consolidades:
 - `docs/protocol-executiu.md` → resum operatiu curt (qui decideix què, com s'auditen òrgans i què vol dir fet)
 - `docs/estat-admin.md` → dossier viu de l'admin
