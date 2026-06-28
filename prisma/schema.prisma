@@ -56,6 +56,8 @@ model InventoryItem {
   minStock          Int?
   purchaseDate      DateTime?
   purchasePrice     Float?
+  purchasePriceSource String?        @db.Text
+  purchasePriceSourceCheckedAt DateTime?
   expectedLifeHours Float?            @default(2000)
   imageUrl          String?
   notes             String?

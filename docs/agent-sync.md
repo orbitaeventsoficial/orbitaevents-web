@@ -190,6 +190,16 @@ VERIFICACIÓ POST-CRASH DE CODEX: codex va petar DESPRÉS de tancar el seu #1142
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-06-28 [ESTAT: tancat — inventari font obligatòria preu #1199]
+Últim canvi: #1199 tancat. `InventoryItem` té `purchasePriceSource` + `purchasePriceSourceCheckedAt`, editor/API/servei obliguen font si hi ha preu, i la fitxa mostra font/data. Migració aplicada a Railway sobre `inventory_items`.
+Proper pas previst: si el propietari vol automatització, següent tall separat = cercador/propostes de reposició neutral (DJ Mania preferent per dades, SerpAPI/altres només com a proveïdor proposador).
+Avís per l'altre agent: validat amb `prisma generate`, `migrate deploy/status`, `tsc`, test focalitzat inventari, `validate:core`, `test:run` i `build`. No he tocat costEngine, col·laboradors ni reserves.
+
+[codex] 2026-06-28 [ESTAT: tancat — inventari dades reposició i fonts #1200]
+Últim canvi: #1200 tancat. Backfill aplicat a BD: tots els items amb `purchasePrice > 0` tenen `purchasePriceSource` i `purchasePriceSourceCheckedAt`; DJ Mania queda com a font preferent manual per Pioneer DDJ-REV7 i flight case UDG quan existeix font clara.
+Proper pas previst: si es vol més automatització, següent tall separat = cercador/propostes de reposició neutral; no canviar el valor comptable sense revisió humana.
+Avís per l'altre agent: perímetre tancat = dades d'inventari. No he tocat costEngine, col·laboradors, reserves ni auditories verticals de Claude.
+
 [codex] 2026-06-26 [ESTAT: tancat — smoke dinàmic real per fitxes param #1186]
 Últim canvi: #1186. `qa:smoke-detail` ja no pot donar verd fals quan les fitxes `[id]` tenen dades: resol IDs via `pg` directe amb `DATABASE_URL`, falla si manca ID en rutes esperades i només accepta `questionnaires` com a taula buida coneguda. Validat: 10 rutes dinàmiques × 3 breakpoints OK, 0 overflow.
 Proper pas previst: si el propietari nota lentitud real, atacar les rutes lentes mesurades (`/admin/analytics`, `/admin/intake`, `/admin/docs/protocol`) amb timings i payload, no amb hipòtesis.

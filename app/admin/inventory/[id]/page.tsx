@@ -89,6 +89,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
   const lifeRemaining = calculateLifeRemainingPercent(item.totalHoursUsed, item.expectedLifeHours);
   const expectedLifeHours = item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS;
   const remainingHours = Math.max(0, expectedLifeHours - item.totalHoursUsed);
+  const purchaseSourceIsUrl = item.purchasePriceSource?.startsWith('http://') || item.purchasePriceSource?.startsWith('https://');
 
   return (
     <AdminPage
@@ -159,6 +160,26 @@ export default async function InventoryItemPage({ params }: PageProps) {
           <p>Hores restants = Vida útil estimada − Hores acumulades.</p>
           <p>Aquest càlcul et dona una referència de cost real d&apos;ús per reserva.</p>
         </div>
+        {item.purchasePriceSource && (
+          <div className="mt-4 border-t pt-3 text-xs">
+            <p className="font-medium uppercase">Font del preu</p>
+            {purchaseSourceIsUrl ? (
+              <a
+                href={item.purchasePriceSource}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 inline-block underline decoration-white/30"
+              >
+                {item.purchasePriceSource}
+              </a>
+            ) : (
+              <p className="mt-1">{item.purchasePriceSource}</p>
+            )}
+            {item.purchasePriceSourceCheckedAt && (
+              <p className="mt-1">Comprovat: {formatDate(item.purchasePriceSourceCheckedAt)}</p>
+            )}
+          </div>
+        )}
       </section>
 
       {/* Foto + Edició en 2 columnes */}

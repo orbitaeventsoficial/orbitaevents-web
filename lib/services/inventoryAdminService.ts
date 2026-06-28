@@ -19,24 +19,27 @@ type InventoryListInput = {
 type InventoryCreateInput = {
   code?: string;
   name: string;
-  description?: string;
+  description?: string | null;
   category: InventoryCategory;
-  watts?: number;
+  watts?: number | null;
   value: number;
   status?: ItemStatus;
   condition?: ItemCondition;
   isConsumable?: boolean;
-  stockQuantity?: number;
-  minStock?: number;
-  imageUrl?: string;
-  notes?: string;
-  purchaseDate?: string;
-  purchasePrice?: number;
-  expectedLifeHours?: number;
+  stockQuantity?: number | null;
+  minStock?: number | null;
+  imageUrl?: string | null;
+  notes?: string | null;
+  purchaseDate?: string | null;
+  purchasePrice?: number | null;
+  purchasePriceSource?: string | null;
+  expectedLifeHours?: number | null;
 };
 
 type InventoryUpdateInput = Record<string, unknown> & {
   purchaseDate?: string | Date | null;
+  purchasePrice?: number | null;
+  purchasePriceSource?: string | null;
 };
 
 async function normalizeInventoryImage(file: File): Promise<Buffer> {
@@ -113,6 +116,11 @@ export async function listInventoryAdminData(input: InventoryListInput) {
 }
 
 export async function createInventoryItem(input: InventoryCreateInput) {
+  const purchasePriceSource = input.purchasePrice ? input.purchasePriceSource?.trim() : undefined;
+  if (input.purchasePrice && !purchasePriceSource) {
+    return { status: 400, body: { error: 'La font del preu és obligatòria quan hi ha preu de compra o reposició' } };
+  }
+
   let code = input.code?.trim().toUpperCase();
   if (!code) {
     const existingItems = await prisma.inventoryItem.findMany({
@@ -147,6 +155,8 @@ export async function createInventoryItem(input: InventoryCreateInput) {
       notes: input.notes,
       purchaseDate: input.purchaseDate ? new Date(input.purchaseDate) : undefined,
       purchasePrice: input.purchasePrice,
+      purchasePriceSource,
+      purchasePriceSourceCheckedAt: purchasePriceSource ? new Date() : undefined,
       expectedLifeHours: input.expectedLifeHours,
     },
   });
@@ -222,6 +232,20 @@ export async function updateInventoryItem(id: string, input: InventoryUpdateInpu
   const data = { ...input };
   if (data.purchaseDate && typeof data.purchaseDate === 'string') {
     data.purchaseDate = new Date(data.purchaseDate);
+  }
+  if (typeof data.purchasePriceSource === 'string') {
+    data.purchasePriceSource = data.purchasePriceSource.trim() || null;
+  }
+
+  const currentSource = (existing as { purchasePriceSource?: string | null }).purchasePriceSource ?? null;
+  const nextPurchasePrice = data.purchasePrice === undefined ? existing.purchasePrice : data.purchasePrice;
+  const nextSource = data.purchasePriceSource === undefined ? currentSource : data.purchasePriceSource;
+
+  if (typeof nextPurchasePrice === 'number' && nextPurchasePrice > 0 && (typeof nextSource !== 'string' || !nextSource.trim())) {
+    return { status: 400, body: { error: 'La font del preu és obligatòria quan hi ha preu de compra o reposició' } };
+  }
+  if (data.purchasePriceSource !== undefined || data.purchasePrice !== undefined) {
+    data.purchasePriceSourceCheckedAt = nextSource ? new Date() : null;
   }
 
   const item = await prisma.inventoryItem.update({

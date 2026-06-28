@@ -1,3 +1,49 @@
+## 2026-06-28 — Inventari: backfill de fonts de preu i reposició DJ base (Canvi #1200, codex)
+
+### Context
+Continuació directa del #1199. Un cop el model obliga a guardar font quan hi ha preu, quedaven dades històriques d'inventari amb `purchasePrice` o valor de reposició però sense `purchasePriceSource`. El propietari ha indicat DJ Mania com a proveïdor preferent quan hi hagi bon preu/finançament, però el sistema no s'ha de casar amb cap API ni proveïdor.
+
+### Què s'ha fet
+- Backfill a BD: 30 registres revisats; tots els items amb `purchasePrice > 0` han quedat amb `purchasePriceSource` i `purchasePriceSourceCheckedAt`.
+- DJ Mania com a font manual preferent per la controladora Pioneer DDJ-REV7 (`CTRL-001` i `CTR-001`) a 1.899 EUR.
+- DJ Mania com a font manual del flight case UDG per DDJ-REV7 (`CAS-001`) a 265,78 EUR.
+- Alfasoni com a font manual actual de la BeamZ B2500 (`BMB-001`) a 179 EUR.
+- Fonts internes explícites per items sense URL externa clara (`PC-001`, `USB-002`) i marcador honest per inventari històric pendent de revisar font externa.
+
+### Validació
+- Validació tècnica: escriptura Prisma transaccional aplicada a BD; verificació posterior `afterMissing: 0` per `purchasePrice > 0 AND purchasePriceSource IS NULL`.
+- Validació funcional: cap item amb preu de compra/reposició queda sense font; els items DJ base ja tenen font preferent i data de comprovació.
+- Validació humana/UX: la fitxa d'inventari mostrarà font i data, i els preus antics no queden com a números sense rastre.
+
+### Coordinació
+Counter → 1200. Tall de dades sobre inventari; sense schema nou ni tocar costEngine, col·laboradors, reserves o auditoria vertical de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-28 — Inventari: font obligatòria del preu de compra/reposició (Canvi #1199, codex)
+
+### Context
+Treball interactiu d'inventari. El propietari vol que els preus de reposició tinguin continuïtat anual, amb enllaç o font, i que la descatalogació no deixi un número sense rastre. També s'ha decidit no casar l'inventari amb una API concreta de cerca: DJ Mania pot ser proveïdor preferent, però la dada estable és la font del preu.
+
+### Què s'ha fet
+- `InventoryItem`: afegits `purchasePriceSource` i `purchasePriceSourceCheckedAt`.
+- Editor d'inventari: si hi ha preu de compra/reposició, la font és obligatòria.
+- API/servei: validació server-side perquè cap item amb preu quedi sense font.
+- Fitxa d'inventari: mostra la font i la data de comprovació al bloc d'amortització.
+- Migració aplicada a Railway sobre la taula mapejada `inventory_items`; primer intent fallit corregit perquè el model Prisma té `@@map("inventory_items")`.
+
+### Validació
+- Validació tècnica: `npx prisma generate` OK; `npx prisma migrate deploy` OK; `npx prisma migrate status` OK; `npx tsc --noEmit --pretty false` OK; `pnpm test:run -- --run __tests__\lib\services\inventoryAdminService.test.ts` OK (17 tests); `pnpm run validate:core` OK; `pnpm test:run` OK; `pnpm build` OK.
+- Validació funcional: un item amb preu ja no es pot guardar sense URL/factura/font indicada.
+- Validació humana/UX: el propietari veu d'on surt el preu i pot revisar reposició encara que el producte es descatalogui.
+
+### Coordinació
+Counter → 1199. Continuació de FASE 3 aplicada a claredat econòmica d'inventari.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-28 — FASE 3 claredat: connecta `leadSummary` (següent pas) a la fitxa del lead (Canvi #1198, claude)
 
 ### Context

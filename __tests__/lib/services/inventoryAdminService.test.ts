@@ -123,6 +123,36 @@ describe('createInventoryItem', () => {
       data: expect.objectContaining({ action: 'CREATE', entity: 'inventory' }),
     });
   });
+
+  it('rebutja preu de compra sense font', async () => {
+    const result = await createInventoryItem({
+      name: 'Controladora',
+      category: 'AUDIO' as never,
+      value: 1200,
+      purchasePrice: 1200,
+    });
+
+    expect(result.status).toBe(400);
+    expect(mockPrisma.inventoryItem.create).not.toHaveBeenCalled();
+  });
+
+  it('desa font i data de comprovació quan hi ha preu', async () => {
+    const result = await createInventoryItem({
+      name: 'Controladora',
+      category: 'AUDIO' as never,
+      value: 1200,
+      purchasePrice: 1200,
+      purchasePriceSource: ' https://djmania.es/producte ',
+    });
+
+    expect(result.status).toBe(200);
+    expect(mockPrisma.inventoryItem.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        purchasePriceSource: 'https://djmania.es/producte',
+        purchasePriceSourceCheckedAt: expect.any(Date),
+      }),
+    });
+  });
 });
 
 describe('getInventoryItemDetails', () => {
@@ -158,6 +188,30 @@ describe('updateInventoryItem', () => {
     expect(result.status).toBe(200);
     expect(mockPrisma.adminLog.create).toHaveBeenCalledWith({
       data: expect.objectContaining({ action: 'UPDATE', entity: 'inventory' }),
+    });
+  });
+
+  it('rebutja actualitzar preu si deixa la font buida', async () => {
+    mockPrisma.inventoryItem.findUnique.mockResolvedValue({ id: 'inv-1', purchasePrice: null, purchasePriceSource: null });
+
+    const result = await updateInventoryItem('inv-1', { purchasePrice: 500, purchasePriceSource: '   ' });
+
+    expect(result.status).toBe(400);
+    expect(mockPrisma.inventoryItem.update).not.toHaveBeenCalled();
+  });
+
+  it('actualitza la data de comprovació quan canvia la font del preu', async () => {
+    mockPrisma.inventoryItem.findUnique.mockResolvedValue({ id: 'inv-1', purchasePrice: 500, purchasePriceSource: 'Factura antiga' });
+
+    const result = await updateInventoryItem('inv-1', { purchasePriceSource: ' DJ Mania ' });
+
+    expect(result.status).toBe(200);
+    expect(mockPrisma.inventoryItem.update).toHaveBeenCalledWith({
+      where: { id: 'inv-1' },
+      data: expect.objectContaining({
+        purchasePriceSource: 'DJ Mania',
+        purchasePriceSourceCheckedAt: expect.any(Date),
+      }),
     });
   });
 });

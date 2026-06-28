@@ -24,6 +24,7 @@ interface ItemData {
   notes: string | null;
   purchaseDate: string | Date | null;
   purchasePrice: number | null;
+  purchasePriceSource: string | null;
   expectedLifeHours: number | null;
   isConsumable: boolean;
   stockQuantity: number | null;
@@ -73,6 +74,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
       ? new Date(item.purchaseDate).toISOString().split('T')[0]
       : '',
     purchasePrice: item?.purchasePrice?.toString() || '',
+    purchasePriceSource: item?.purchasePriceSource || '',
     expectedLifeHours: (item?.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS).toString(),
     isConsumable: item?.isConsumable || false,
     stockQuantity: item?.stockQuantity?.toString() || '',
@@ -118,6 +120,10 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
       setError('Nom i valor són obligatoris');
       return;
     }
+    if (form.purchasePrice && !form.purchasePriceSource.trim()) {
+      setError('Si informes un preu de compra o reposició, cal indicar la font del preu');
+      return;
+    }
 
     setSaving(true);
     setError(null);
@@ -138,6 +144,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
         minStock: form.minStock ? parseInt(form.minStock, 10) : null,
         purchaseDate: form.purchaseDate || null,
         purchasePrice: form.purchasePrice ? parseFloat(form.purchasePrice) : null,
+        purchasePriceSource: form.purchasePrice ? form.purchasePriceSource.trim() : null,
         expectedLifeHours: form.expectedLifeHours ? parseFloat(form.expectedLifeHours) : null,
       };
 
@@ -444,6 +451,20 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
                   className={inputClass}
                 />
               </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="inv-purchase-source" className="text-xs">Font del preu *</label>
+                <input
+                  id="inv-purchase-source"
+                  type="text"
+                  value={form.purchasePriceSource}
+                  onChange={(e) => updateField('purchasePriceSource', e.target.value)}
+                  placeholder="URL de reposició, factura o cost indicat pel propietari"
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label htmlFor="inv-purchase-date" className="text-xs">Data compra</label>
                 <input

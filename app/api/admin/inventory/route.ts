@@ -13,23 +13,24 @@ export const dynamic = 'force-dynamic';
 const inventorySchema = z.object({
   code: z.string().optional(),
   name: z.string().min(1),
-  description: z.string().optional(),
+  description: z.string().nullable().optional(),
   category: z.enum([
     'SOUND', 'LIGHTING', 'EFFECTS', 'STRUCTURE', 'CABLING',
     'TECH', 'DECORATION_HP', 'DECORATION_HW', 'DECORATION_GEN', 'CONSUMABLE',
   ]),
-  watts: z.number().optional(),
+  watts: z.number().nullable().optional(),
   value: z.number().min(0),
   status: z.enum(['AVAILABLE', 'IN_USE', 'MAINTENANCE', 'BROKEN', 'RETIRED']).optional(),
   condition: z.enum(['NEW', 'EXCELLENT', 'GOOD', 'FAIR', 'POOR']).optional(),
   isConsumable: z.boolean().optional(),
-  stockQuantity: z.number().optional(),
-  minStock: z.number().optional(),
-  imageUrl: z.string().optional(),
-  notes: z.string().optional(),
-  purchaseDate: z.string().optional(),
-  purchasePrice: z.number().optional(),
-  expectedLifeHours: z.number().optional(),
+  stockQuantity: z.number().nullable().optional(),
+  minStock: z.number().nullable().optional(),
+  imageUrl: z.string().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  purchaseDate: z.string().nullable().optional(),
+  purchasePrice: z.number().nullable().optional(),
+  purchasePriceSource: z.string().nullable().optional(),
+  expectedLifeHours: z.number().nullable().optional(),
 });
 
 export async function GET(req: NextRequest) {

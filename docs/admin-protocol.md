@@ -1513,6 +1513,45 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1200 — 2026-06-28 — codex (FET)
+**Inventari: backfill de fonts de preu i reposició DJ base.**
+- Context: després del #1199 el model ja impedia guardar preus nous sense font, però quedaven dades històriques amb `purchasePrice` i `purchasePriceSource` buit. El propietari ha indicat DJ Mania com a proveïdor preferent quan hi hagi font clara, sense lligar l'inventari a cap API concreta.
+- BD inventari: backfill transaccional sobre 30 registres; tots els items amb `purchasePrice > 0` queden amb `purchasePriceSource` i `purchasePriceSourceCheckedAt`.
+- `CTRL-001` i `CTR-001`: Pioneer DDJ-REV7 actualitzada a 1.899 EUR amb font manual DJ Mania.
+- `CAS-001`: flight case UDG per DDJ-REV7 actualitzat a 265,78 EUR amb font manual DJ Mania.
+- `BMB-001`: BeamZ B2500 actualitzada a 179 EUR amb font manual Alfasoni.
+- `PC-001`, `UNI-001` i `USB-002`: font textual explícita quan el criteri és cost intern o reposició coneguda; la resta de preus antics queden marcats com a inventari històric intern pendent de revisar font externa.
+- Efecte: cap preu de compra/reposició queda sense rastre; si un producte es descataloga, la fitxa conserva data i font per buscar equivalent.
+- Validació tècnica: escriptura Prisma a BD OK; verificació posterior `purchasePrice > 0 AND purchasePriceSource IS NULL` = 0.
+- Validació funcional: la fitxa d'inventari ja pot mostrar font/data per tots els items amb preu.
+- Validació humana/UX: DJ Mania queda prioritzada on hi ha font/preu clar, però el model continua neutral i preparat per un cercador futur.
+- `ADMIN_CHANGE_COUNTER` puja a `1200`; el següent canvi real ha de ser `#1201`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+### Canvi #1199 — 2026-06-28 — codex (TANCAT)
+
+**Inventari: font obligatòria del preu de compra/reposició.**
+
+- `InventoryItem`: afegits `purchasePriceSource` i `purchasePriceSourceCheckedAt` per guardar d'on surt el preu i quan s'ha comprovat.
+- Editor d'inventari: si s'informa un preu de compra/reposició, la font és obligatòria.
+- API/servei: validació server-side perquè cap item amb preu quedi sense font.
+- Fitxa d'inventari: mostra la font i la data de comprovació al bloc d'amortització.
+- Criteri de continuïtat: el model queda neutral respecte del cercador. DJ Mania pot ser proveïdor preferent, SerpAPI/Google poden proposar candidats, però la dada estable és la font guardada.
+- Migració aplicada a Railway sobre `inventory_items`; corregit el SQL perquè el model Prisma té `@@map("inventory_items")`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1199`; el següent canvi real ha de ser `#1200`.
+- Validació tècnica: `npx prisma generate` OK; `npx prisma migrate deploy` OK; `npx prisma migrate status` OK; `npx tsc --noEmit --pretty false` OK; `pnpm test:run -- --run __tests__\lib\services\inventoryAdminService.test.ts` OK (17 tests); `pnpm run validate:core` OK; `pnpm test:run` OK; `pnpm build` OK.
+- Validació funcional: un item amb preu ja no es pot guardar sense URL/factura/font indicada.
+- Validació humana/UX: el propietari veu d'on surt el preu i pot revisar reposició encara que el producte es descatalogui.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
 ### Canvi #1198 — 2026-06-28 — claude (TANCAT)
 
 **FASE 3 claredat: connecta `leadSummary` (següent pas) a la fitxa del lead.**
