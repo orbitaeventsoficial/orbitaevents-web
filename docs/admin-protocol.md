@@ -1513,6 +1513,22 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1201 — 2026-06-28 — claude (FET)
+**Cercador de reposició SerpApi + inventari 100% amb preu/foto/enllaç (preferència DJ Mania).**
+- Servei nou `lib/services/inventoryReplacementSearchService.ts`: cerca via SerpApi (Google Shopping) → candidats reals (preu, botiga, enllaç, foto); **prioritza DJ Mania**. Test 4/4.
+- Script `scripts/backfill-inventory-serpapi.ts` (revisió + `--apply`, overrides manuals).
+- Dades: inventari **54/54 amb preu** (reals via SerpApi + DJ Mania/Alfasoni + OQAN QSS001ST 47,25€/u), **23 amb foto**, **45/54 amb enllaç de reposició** (cerca DJ Mania al gear; atrezzo sense, no n'és proveïdor). Tots amb font (model #1199).
+- Enllaç de CERCA (no de producte) a propòsit: sobreviu a la descatalogació → mostra equivalents actuals.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1201`; el següent canvi real ha de ser `#1202`.
+- Validació tècnica: `tsc` 0 · test servei 4/4 · `validate:core`.
+- Validació funcional: cap item sense preu/font; cercador proposa reposició real, DJ Mania prioritzat.
+- Validació humana/UX: humà al mig (revisió abans d'aplicar; GoPro corregida Mini→Hero11 nova).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1200 — 2026-06-28 — codex (FET)
 **Inventari: backfill de fonts de preu i reposició DJ base.**
 - Context: després del #1199 el model ja impedia guardar preus nous sense font, però quedaven dades històriques amb `purchasePrice` i `purchasePriceSource` buit. El propietari ha indicat DJ Mania com a proveïdor preferent quan hi hagi font clara, sense lligar l'inventari a cap API concreta.

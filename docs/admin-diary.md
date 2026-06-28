@@ -1,3 +1,26 @@
+## 2026-06-28 — Cercador de reposició SerpApi + inventari 100% amb preu/foto/font (Canvi #1201, claude)
+
+### Context
+Continuació del #1199/#1200 (codex). Quedaven 24 items petits sense preu. El propietari vol **dades reals** (preu + foto + enllaç de reposició), no estimacions, i té clau `SERPAPI_KEY` (tier gratuït, ja usada per Google Reviews). DJ Mania és proveïdor preferent (ofereix finançament tipus Klarna/SeQura).
+
+### Què s'ha fet
+- **Servei nou** `lib/services/inventoryReplacementSearchService.ts`: cerca de reposició via SerpApi (motor Google Shopping) → candidats reals (preu, botiga, enllaç, foto). **Prioritza DJ Mania** quan apareix. Reusable pel futur botó de la fitxa. Test: 4 casos.
+- **Script** `scripts/backfill-inventory-serpapi.ts`: mode revisió + `--apply`; overrides manuals (GoPro Mini→Hero11 Black nova 389,99€; fantasmes sense resultat).
+- **Dades**: inventari **54/54 amb preu** (reals via SerpApi + DJ Mania/Alfasoni + 4 trípodes OQAN QSS001ST 47,25€/u DJ Mania), **23 amb foto automàtica**, tots amb font (model #1199). Eliminat seed d'estimacions obsolet.
+- **Enllaços de reposició (preferència DJ Mania)**: afegit enllaç de cerca DJ Mania a **40 items de gear** (so/llum/efectes/estructura/cablejat/tech/consumible) → **45/54 amb enllaç**. Els 9 sense són atrezzo decoratiu (escombres, fantasmes, mirall, gàbia, quadre) que DJ Mania no ven.
+- **Efecte econòmic visible**: preus recomanats encesos amb amortització real; premium/luxury **−19%** infravalorats (decisió de producte del propietari).
+
+### Validació
+- Validació tècnica: `tsc --noEmit` 0; test del servei nou 4/4 verds; `validate:core`.
+- Validació funcional: cap item sense preu/font; el cercador proposa reposició real amb DJ Mania prioritzat.
+- Validació humana/UX: humà al mig (revisió abans d'aplicar; GoPro corregida de Mini a Hero11 nova).
+
+### Coordinació
+Counter → 1201. Territori inventari cedit per codex. No s'ha tocat schema, costEngine ni reserves.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-28 — Inventari: backfill de fonts de preu i reposició DJ base (Canvi #1200, codex)
 
 ### Context
