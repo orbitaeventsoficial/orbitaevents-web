@@ -72,4 +72,20 @@ cablejat al següent pas existeix.
 ## Registre d'avanç
 - 2026-06-28 — Creat el full de ruta. Diners verificats (quadren). Trobat D1 (inventari↔pack buit), D2 (28 items sense cost), B1 (suggeriments orfes).
 - 2026-06-28 — FASE 1 en marxa: **F1 ✅** (captació sòlida), **F2 🔄** (trobat F2-a: WON manual sense reserva = arrel 7 bolos; F2-b: fitxa sense «què fer ara»), **F3 ✅** (conversió excel·lent i completa), **F4 ✅** (pressupost complet). Següent: F5 (contracte), F7 (operativa), F8 (post-event); F6 ja auditat (V4 ✅).
-- 2026-06-28 — **FASE 1 COMPLETA: el flux F1→F8 està cablejat i funciona de punta a punta.** Verificat que **F2-a JA està tapat** (redirecció a crear reserva des de fitxa I kanban) → els 7 bolos són dades, no codi. **B1 superat per NBA** (no connectar). **VEREDICTE GLOBAL (8 verificacions seguides): no hi ha codi trencat per arreglar.** El que bloqueja l'ús del 80% és: (1) **DADES d'inventari** (P2: preus + assignació pack↔item) i (2) **accions d'operador a mig fer** (P1: 7 bolos). El codi és sòlid; la palanca és **dades + claredat per al novell**, no fixos de codi. Següent: FASE 3 (claredat/UI) o que el propietari executi P1/P2.
+- 2026-06-28 — **FASE 1 COMPLETA: el flux F1→F8 està cablejat i funciona de punta a punta.** Verificat que **F2-a JA està tapat** (redirecció a crear reserva des de fitxa I kanban) → els 7 bolos són dades, no codi. **B1 superat per NBA** (no connectar). **VEREDICTE GLOBAL: no hi ha codi trencat per arreglar.** El que bloqueja l'ús del 80% és: (1) **DADES d'inventari** (P2) i (2) **accions d'operador a mig fer** (P1). El codi és sòlid; la palanca és **dades + claredat per al novell**, no fixos de codi.
+- 2026-06-28 — **FASE 2 EXECUTADA: D1 desbloquejat.** Esborrany aprovat → `scripts/seed-pack-inventory.mjs` aplicat (183 vincles). El **preu recomanat ja computa** i és **visible a Catàleg + Economia** (usen el config correcte). Troballa D1-bis: **packs premium/luxury infravalorats ~17%** (decisió de producte del propietari).
+- 2026-06-28 — **FASE 3 iniciada: #1198** — «Següent pas» connectat a la fitxa del lead (guia per al novell). Escombrada de morts = 8 falsos positius → confirmat: no perseguir codi mort.
+- 2026-06-28 — **CERTIFICACIÓ EN BLOC (read-only, tot ✅):** flux complet, motor financer (quadra al cèntim), hub del client (15 blocs), calendari (quadra), dashboard salut, NBA cockpit, inventari (51), segmentació, reporting, tasques (45). **El sistema funciona de dalt a baix.**
+
+---
+
+## 🏁 ESTAT EN TORNAR (resum per al propietari)
+**El que he fet avui (10 commits):** diagnòstic d'organisme + atles funcional (684 fns) + roadmap; auditoria vertical completa del flux lead→cash (tot sòlid); **desbloqueig de l'inventari** (els packs ja tenen equip → preus recomanats encesos); guia «següent pas» a la fitxa del lead; certificació read-only de tot el sistema (tot verd).
+
+**El veredicte honest:** el teu codi **NO està trencat** — està viu, complet i interconnectat. Uses el 20% per **dades incompletes + desconeixement de novell**, no per bugs.
+
+**El que ara depèn de TU (i et desbloqueja el 80%):**
+1. **P2 (a)** — omplir el **preu de compra** dels 32 items a `/admin/inventory?health=missing-cost`. → encén amortització real + preu recomanat complet.
+2. **P2 (b)** — fet: l'inventari ja està assignat als packs (seed aplicat).
+3. **Decisió de preu** — els packs premium/luxury estan ~17% per sota del recomanat. Apujar o assumir marge.
+4. **P1** — materialitzar els 7 bolos guanyats sense reserva (cobrats en efectiu).
