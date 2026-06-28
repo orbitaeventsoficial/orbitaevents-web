@@ -1513,6 +1513,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1205 — 2026-06-28 — claude (FET)
+**So real: col·laborador Isma (lloguer 50€/bolo) + EV ETX-12P com a desig futur.**
+- Realitat: el propietari NO té els EV (somni); lloga el so a Isma per 50€/bolo. `scripts/seed-isma-rental.mjs` (idempotent): crea Isma (EQUIPMENT_RENTAL) + treu els EV dels 11 packs + RETIRED.
+- Troballa: l'amortització dels EV (899€) donava cost de so fals ~2,70€/bolo; el real és 50€ (~18×). Marge real més baix.
+- El cost de so s'aplica per reserva com a línia Isma (manual ara). Pendent decisió: automatitzar a bookingCreationService (zona sensible).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1205`; el següent canvi real ha de ser `#1206`.
+- Validació tècnica: dades aplicades a BD; `validate:core`.
+- Validació funcional: so = cost de col·laborador real, no amortització falsa.
+- Validació humana/UX: Isma favorit als desplegables; EV no disponibles.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1204 — 2026-06-28 — claude (FET)
 **Inventari: botó «Buscar reposició» (DJ Mania primer + el més barat).**
 - Servei `searchReplacementForItem(itemId, q?)` + API `GET /api/admin/inventory/[id]/replacement-search` (requireAuth, via servei).

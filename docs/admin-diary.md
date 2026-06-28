@@ -1,3 +1,30 @@
+## 2026-06-28 — So real: col·laborador Isma (lloguer 50€/bolo) + EV ETX-12P com a desig futur (Canvi #1205, claude)
+
+### Context
+Realitat declarada pel propietari: NO té els EV ETX-12P (són un somni, els comprarà nous ~1.444€). Ara **lloga el so a Isma per 50€/bolo** (JBL + Mackie). El cost real del so s'ha de restar al marge.
+
+### Troballa de diners
+Els packs amortitzaven 2 EV (899€) → cost de so fals de **~2,70€/bolo**. El cost REAL és **50€/bolo** (~18×). El marge real dels packs amb so és més baix del que el sistema mostrava.
+
+### Què s'ha fet (`scripts/seed-isma-rental.mjs`, idempotent)
+- **Col·laborador Isma** creat (rol `EQUIPMENT_RENTAL`, lloguer d'altaveus, favorit). Es resta al marge com Masquerade (línia de servei amb `collaboratorId`).
+- **EV ETX-12P** (ALT-001/002) → tret dels 11 packs + `status RETIRED` + nota «DESIG/FUTUR». Reversible quan es comprin.
+- Confirmat: treure els EV amb prou feines mou el preu recomanat (217→216€) → l'amortització no captava el cost real; el lloguer 50€ sí.
+
+### Pendent (decisió oberta de producte)
+El cost de so (50€) s'aplica **per reserva** com a línia Isma (mecanisme existent, manual ara). Opció futura: **automatitzar** la línia Isma a la creació de reserva dels packs amb DJ (toca `bookingCreationService`, zona sensible — requereix OK). El preu recomanat del pack NO inclou encara els 50€ (és cost per bolo, no del pack).
+
+### Validació
+- Validació tècnica: dades aplicades a BD (Isma creat, EV RETIRED + fora packs); `validate:core`.
+- Validació funcional: el so deixa de ser amortització falsa; queda com a cost de col·laborador real.
+- Validació humana/UX: Isma surt als desplegables de reserva (favorit); EV no surten com a disponibles.
+
+### Coordinació
+Counter → 1205. Territori inventari/col·laboradors (dades). NO s'ha tocat costEngine ni bookingCreationService (l'automatització queda pendent de decisió).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-28 — Inventari: botó «Buscar reposició» (DJ Mania primer + el més barat) (Canvi #1204, claude)
 
 ### Context

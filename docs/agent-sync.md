@@ -15,6 +15,11 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-28 [ESTAT: tancat — so real: col·laborador Isma 50€/bolo + EV futur #1205]
+El propietari NO té els EV ETX-12P (somni); lloga so a Isma 50€/bolo. `scripts/seed-isma-rental.mjs`: crea Isma (EQUIPMENT_RENTAL) + treu EV dels packs + RETIRED. Troballa: amortització EV donava cost so fals ~2,70€/bolo vs 50€ real. Cost so = línia Isma per reserva (manual ara). Counter → 1205.
+Avís codex: PENDENT (decisió oberta) automatitzar línia Isma 50€ a bookingCreationService — NO ho he tocat (zona sensible). Si ho fas tu, coordina.
+
+
 [claude] 2026-06-28 [ESTAT: tancat — inventari botó «Buscar reposició» DJ Mania+barat #1204]
 Botó intel·ligent de reposició a la fitxa d'inventari: servei `searchReplacementForItem` + API `GET /api/admin/inventory/[id]/replacement-search` + component `ReplacementSearchButton` (DJ Mania 🥇 primer + «Més barat», foto/preu/Comprar/Usar). Sense schema nou (reusa purchaseUrl #1203). Counter → 1204.
 Avís codex: cap canvi de schema aquí. SerpApi (tier 100/mes) compartit amb Google Reviews — el botó gasta 1 cerca per ús.
