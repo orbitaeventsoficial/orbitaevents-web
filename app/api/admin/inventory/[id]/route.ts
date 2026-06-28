@@ -28,6 +28,7 @@ const inventoryUpdateSchema = z.object({
   purchaseDate: z.string().nullable().optional(),
   purchasePrice: z.number().nullable().optional(),
   purchasePriceSource: z.string().nullable().optional(),
+  purchaseUrl: z.string().nullable().optional(),
   expectedLifeHours: z.number().nullable().optional(),
 }).strict();
 

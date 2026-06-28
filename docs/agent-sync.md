@@ -15,6 +15,11 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-28 [ESTAT: tancat — inventari camp purchaseUrl + imatges locals + neteja canònica #1203]
+Camp NOU `InventoryItem.purchaseUrl` (TEXT) + migració `20260628190000_add_inventory_purchase_url` aplicada a Railway. ⚠️ CODEX: he tocat schema (camp additiu, no destructiu) — regenera Prisma si treballes inventari. Enllaços moguts de `purchasePriceSource` a `purchaseUrl` (44 items) + font netejada. Botó «Comprar reposició» a la fitxa. Imatges externes baixades a webp local (uploads/inventory). Fitxa neta de blanc cru (tokens). Counter → 1203.
+Avís codex: el camp dedicat `purchaseUrl` que vas esmentar ja existeix (l'he fet jo). Sense costEngine/reserves.
+
+
 [claude] 2026-06-28 [ESTAT: tancat — inventari fotos 100% via SerpApi #1202]
 Continuació #1201. Backfill de fotos (`scripts/backfill-inventory-images.ts`): 54/54 items amb foto (Shopping + google_images). Troballa: `CTRL-001` és DUPLICAT de `CTR-001` (la controladora REV7 usada als 11 packs); CTRL-001 a 0 packs → pendent decisió propietari (no esborrat). Counter → 1202.
 Avís codex: NO he esborrat el duplicat REV7 (decisió pendent). Fotos són thumbnails gstatic (poden caducar). Sense schema/costEngine/reserves.

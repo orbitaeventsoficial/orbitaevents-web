@@ -1513,6 +1513,22 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1203 — 2026-06-28 — claude (FET)
+**Inventari: camp `purchaseUrl` dedicat + imatges locals + neteja canònica de la fitxa.**
+- Schema + migració `20260628190000_add_inventory_purchase_url` (camp `purchaseUrl`, aplicada a Railway). Backfill: enllaç mogut de la font → `purchaseUrl` (44 items) + font netejada.
+- UI: botó «Comprar reposició» a `InventoryItemEditor` (`.ap-btn`); API (Zod) + servei accepten el camp.
+- Imatges: `scripts/localize-inventory-images.ts` baixa les 53 externes (gstatic) → webp local (`uploads/inventory`, servides per `/api/uploads`). Es veuen sempre, no caduquen.
+- Canon: `InventoryItemEditor` net de blanc cru (`text-white`/`bg-white/5`/`border-white/10` → tokens; `rounded-3xl` → `.ap-card`).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1203`; el següent canvi real ha de ser `#1204`.
+- Validació tècnica: `migrate deploy` OK; `tsc` 0; `validate:core`.
+- Validació funcional: enllaç net clicable; imatges visibles; camps separats.
+- Validació humana/UX: botó reposició a la fitxa; fitxa sense blanc cru.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #1202 — 2026-06-28 — claude (FET)
 **Inventari: fotos 100% via SerpApi (Google Shopping + Images).**
 - Script `scripts/backfill-inventory-images.ts` (reutilitza el servei del #1201): 24 fotos via Shopping + 9 via google_images → **54/54 amb foto**.

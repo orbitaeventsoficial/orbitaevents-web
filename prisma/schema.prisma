@@ -58,6 +58,7 @@ model InventoryItem {
   purchasePrice     Float?
   purchasePriceSource String?        @db.Text
   purchasePriceSourceCheckedAt DateTime?
+  purchaseUrl       String?          @db.Text
   expectedLifeHours Float?            @default(2000)
   imageUrl          String?
   notes             String?

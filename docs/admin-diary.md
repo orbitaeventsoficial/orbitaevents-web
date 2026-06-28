@@ -1,3 +1,26 @@
+## 2026-06-28 — Inventari: camp `purchaseUrl` dedicat + imatges locals + neteja canònica de la fitxa (Canvi #1203, claude)
+
+### Context
+El propietari volia un enllaç de compra/reposició net (no enterrat al text de la font), imatges que es veiessin (els thumbnails gstatic els bloquejava Next.js + caduquen) i va assenyalar que la visual estava descurada.
+
+### Què s'ha fet
+- **Schema + migració** `20260628190000_add_inventory_purchase_url`: nou camp `InventoryItem.purchaseUrl` (TEXT, nullable). Aplicada a Railway (`migrate deploy`). [coordinat: territori inventari cedit per codex]
+- **Backfill dades**: extret l'enllaç de `purchasePriceSource` → `purchaseUrl` (44 items) i **netejat** el text de la font (deixa de barrejar nota+enllaç).
+- **UI**: camp + botó «Comprar reposició ↗» a `InventoryItemEditor` (consumeix `.ap-btn`); API (Zod) + servei accepten `purchaseUrl`.
+- **Imatges locals** (`scripts/localize-inventory-images.ts`): descarregades les 53 imatges externes (SerpApi/gstatic) → webp local (`uploads/inventory/{code}.webp`), servides per `/api/uploads`. Ara es veuen sempre i no caduquen.
+- **Neteja canònica** de `InventoryItemEditor`: eliminat el blanc cru (`text-white`, `bg-white/5`, `border-white/10`) → tokens (`--t`/`--t2`/`--t3`/`--line`/`--raised`); `rounded-3xl` ad-hoc → `.ap-card`. 0 blancs crus.
+
+### Validació
+- Validació tècnica: `prisma migrate deploy` OK; `tsc` 0; `validate:core`.
+- Validació funcional: enllaç de reposició net i clicable; imatges visibles (HTTP 200 local); preu/font/foto/enllaç separats cada un al seu camp.
+- Validació humana/UX: botó «Comprar reposició» a la fitxa; fitxa sense blanc cru.
+
+### Coordinació
+Counter → 1203. Territori inventari (cedit per codex). Schema tocat (camp additiu) — avisat a agent-sync. Sense costEngine ni reserves.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-28 — Inventari: fotos 100% via SerpApi (Google Shopping + Images) (Canvi #1202, claude)
 
 ### Context

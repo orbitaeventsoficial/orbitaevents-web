@@ -33,6 +33,7 @@ type InventoryCreateInput = {
   purchaseDate?: string | null;
   purchasePrice?: number | null;
   purchasePriceSource?: string | null;
+  purchaseUrl?: string | null;
   expectedLifeHours?: number | null;
 };
 
@@ -40,6 +41,7 @@ type InventoryUpdateInput = Record<string, unknown> & {
   purchaseDate?: string | Date | null;
   purchasePrice?: number | null;
   purchasePriceSource?: string | null;
+  purchaseUrl?: string | null;
 };
 
 async function normalizeInventoryImage(file: File): Promise<Buffer> {
@@ -157,6 +159,7 @@ export async function createInventoryItem(input: InventoryCreateInput) {
       purchasePrice: input.purchasePrice,
       purchasePriceSource,
       purchasePriceSourceCheckedAt: purchasePriceSource ? new Date() : undefined,
+      purchaseUrl: input.purchaseUrl?.trim() || undefined,
       expectedLifeHours: input.expectedLifeHours,
     },
   });
