@@ -20,7 +20,7 @@ Recorrer cada baula com un operador real, verificar que la pàgina/component fun
 cablejat al següent pas existeix.
 
 - ✅ **F1 · Captació de lead** — formulari públic `ContactFormComplete` → `/api/contact` → `persistContactLead`. **SÒLID:** validació Zod (400), captcha Turnstile (403), dedup (fusiona lead existent), tracking source/UTM/locale/pack, status NEW + activitat. Cap manca.
-- 🔄 **F2 · Fitxa del lead + accions** — l'operador obre un lead: veu dades, pot contactar, canviar estat. 🔴 **F2-a (manca, operador novell):** es pot marcar un lead **WON manualment** (PATCH `/api/admin/leads/[id]`) **sense crear reserva** → arrel dels **7 bolos fantasma**. El #1194 alerta al dashboard, però NO al moment de marcar WON. *Fix proposat: en passar a WON sense booking, oferir «crear reserva ara» al punt d'acció.* 🔴 **F2-b:** la fitxa no diu «què fer ara» (NBA/`leadPipelineSuggestions` desconnectat — vegeu B1).
+- ✅ **F2 · Fitxa del lead + accions** — VERIFICAT que **F2-a JA està tapat per totes les vies**: la fitxa (`LeadDetailClient` L352-353) i el kanban (`LeadsSeasonClient` L583-586) **redirigeixen a `/admin/bookings/new?leadId=` en marcar WON sense reserva**; les targetes WON tenen botó «Crear reserva»; el #1194 alerta al dashboard; l'estat es diu «Guanyat — pendent de crear reserva» (és un estat intermedi DISSENYAT). → **Els 7 bolos fantasma NO són codi trencat:** són dades velles o creacions abandonades a mig fer = **neteja de dades del propietari (P1).** 🟡 **F2-b:** la fitxa concreta no mostra el «què fer ara» de l'NBA (existeix al dashboard); millora opcional de claredat, baixa prioritat.
 - ✅ **F3 · Conversió lead → booking** (`bookingCreationService` ← `/api/admin/bookings`) — **EXCEL·LENT i complet:** arrossega customer + col·laborador + línies del lead; deriva hores extra; suma pack+extres+línies+desplaçament (Google Maps real); IVA segons factura; arrodoneix a cèntims (sense desquadre Stripe); crea reserva amb tot, **marca lead WON+convertedAt**, bloqueja calendari (availability BOOKED), crea **tasca de preparació −7 dies**, registra activitat client + adminLog. Cap pèrdua de dades. 🔴 *crida `assignPackInventory` però és no-op perquè els packs no tenen inventari (D1).*
 - ✅ **F4 · Pressupost / quote** (`proposalAdminService` + `proposalDispatchService` + `quotePdfService`) — **complet:** CRUD + PDF (jsPDF) + send. El send marca `SENT`+`sentAt`, actualitza lead→`QUOTE_SENT`, guard clar si falta client. 25 proposals reals, 0 òrfens. *Obs: tots en DRAFT (no s'envien pel sistema) — possible senyal que l'operador ho fa a mà; fricció lleu: cal client vinculat abans d'enviar.*
 - ⬜ **F5 · Contracte** — generació, enviament, signatura (portal).
@@ -44,7 +44,7 @@ cablejat al següent pas existeix.
 - ⬜ **D4** — verificar **despeses fixes** i **desplaçament** (travelCost) en cada reserva. *(travelCost apareix correcte: 2-19€ segons distància.)*
 
 ### Funcions (capacitats fetes però desconnectades — connectar, no refer)
-- 🔴 **B1 — `leadPipelineSuggestionsService` orfe.** Genera 7 tipus de suggeriments accionables per lead (hot uncontacted, stale negotiation, quote no reply…) i **cap pàgina el mostra**. La fitxa del lead no guia el novell. → **Connectar** a la fitxa/pipeline.
+- 🟡 **B1 — `leadPipelineSuggestionsService` orfe però SUPERAT per NBA.** Genera suggeriments agregats de pipeline; PERÒ `nextBestActionService` (viu, al dashboard `/admin/page.tsx`) ja cobreix la mateixa funció («què prioritzar»). És el patró «dos sistemes per a una funció»: NBA és el viu. → **No connectar (duplicaria NBA); candidat a retirar** quan toqui, amb la cadena verificada. No és una manca d'usuari.
 - ⬜ **B2** — revisar inventari d'òrfenes (`audit/inventari-funcions-orfenes.md`) cas a cas amb la cadena completa (funció→alias→route→fetch) abans de decidir connectar/treure. *Baixa prioritat (verificat: poc rendiment).*
 
 ---
@@ -59,7 +59,9 @@ cablejat al següent pas existeix.
 
 ## Deures del PROPIETARI (no codi — desbloquegen ús)
 - ⬜ P1 — **Materialitzar 7 bolos guanyats sense reserva** (cobrats en efectiu, fora del sistema).
-- ⬜ P2 — **Omplir cost/vida de 28 items d'inventari** + **assignar inventari als packs** (desbloqueja D1+D2+D3 → preu recomanat real).
+- ⬜ P2 — **Desbloqueig de l'inventari (D1+D2+D3 → preu recomanat real).** Dues tasques concretes:
+  - **(a) Omplir el PREU DE COMPRA de 32 items** (la `vida útil` ja és 2000h per defecte a gairebé tots). Falten preus de: Pioneer DDJ-REV7, auriculars HDJ-CX, focus LED, trípodes (×4), cablejat DMX, allargos, portàtil OMEN, GoPro 11, decoració (escombres, mirall, gàbia, fantasmes…). Ruta: `/admin/inventory?health=missing-cost`.
+  - **(b) Assignar inventari als 11 packs** (ara tots a 0 items): disco-basico/premium/completo, bodas-basico/premium/luxury, empresas-evento/cocktail/gala, bingo-musical, batalla-musical. Sense això, `computePackPricingHealth` retorna preu recomanat 0€.
 - ⬜ P3 — Decidir privacy: `recordConsent` + retenció (refer o deixar).
 
 ---
@@ -67,3 +69,4 @@ cablejat al següent pas existeix.
 ## Registre d'avanç
 - 2026-06-28 — Creat el full de ruta. Diners verificats (quadren). Trobat D1 (inventari↔pack buit), D2 (28 items sense cost), B1 (suggeriments orfes).
 - 2026-06-28 — FASE 1 en marxa: **F1 ✅** (captació sòlida), **F2 🔄** (trobat F2-a: WON manual sense reserva = arrel 7 bolos; F2-b: fitxa sense «què fer ara»), **F3 ✅** (conversió excel·lent i completa), **F4 ✅** (pressupost complet). Següent: F5 (contracte), F7 (operativa), F8 (post-event); F6 ja auditat (V4 ✅).
+- 2026-06-28 — **FASE 1 COMPLETA: el flux F1→F8 està cablejat i funciona de punta a punta.** Verificat que **F2-a JA està tapat** (redirecció a crear reserva des de fitxa I kanban) → els 7 bolos són dades, no codi. **B1 superat per NBA** (no connectar). **VEREDICTE GLOBAL (8 verificacions seguides): no hi ha codi trencat per arreglar.** El que bloqueja l'ús del 80% és: (1) **DADES d'inventari** (P2: preus + assignació pack↔item) i (2) **accions d'operador a mig fer** (P1: 7 bolos). El codi és sòlid; la palanca és **dades + claredat per al novell**, no fixos de codi. Següent: FASE 3 (claredat/UI) o que el propietari executi P1/P2.
