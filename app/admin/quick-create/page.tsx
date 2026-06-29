@@ -19,7 +19,7 @@ export default async function QuickCreatePage() {
       <div className="space-y-6 max-w-3xl">
         <header>
           <h1 className="text-2xl font-semibold">Creació ràpida</h1>
-          <p className="text-sm text-white/60 mt-1">
+          <p className="text-sm text-[var(--t2)] mt-1">
             Una pantalla, una decisió. Pots crear només el lead, lead + pressupost, o tot
             d&apos;un cop (lead + pressupost + reserva).
           </p>

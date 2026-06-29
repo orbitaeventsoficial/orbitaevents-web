@@ -12,6 +12,7 @@ import { CLIENT_PORTAL_MESSAGES, type ClientPortalLocale } from '@/lib/clientPor
 import { resolvePortalAccentHex } from '@/lib/clientPortalUtils';
 import PortalBottomNav from '../PortalBottomNav';
 import GalleryClient from './GalleryClient';
+import { getClientPortalHiddenNavItems, getClientPortalVisibility } from '@/lib/clientPortalVisibility';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -28,6 +29,7 @@ export default async function ClientPortalGalleryPage({
 
   const access = await findPortalAccessByRawToken(params.token);
   if (!access) notFound();
+  const visibility = getClientPortalVisibility(access.personalization);
 
   const requestHeaders = headers();
   await markPortalAccessHit({
@@ -99,6 +101,7 @@ export default async function ClientPortalGalleryPage({
           contract: t.contract,
           gallery: t.navGallery,
         }}
+        hiddenItems={getClientPortalHiddenNavItems(visibility)}
       />
     </main>
   );

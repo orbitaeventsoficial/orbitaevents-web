@@ -90,7 +90,7 @@ export default function PackPriceQuickEditor({
             type="button"
             onClick={save}
             disabled={saving}
-            className="rounded-md border border-white/20 bg-white/10 px-2.5 py-1 text-xs font-semibold hover:bg-white/20 disabled:opacity-60"
+            className="rounded-md border border-[var(--line)] bg-[var(--raised)] px-2.5 py-1 text-xs font-semibold hover:bg-[var(--raised)] disabled:opacity-60"
           >
             {saving ? 'Desant...' : 'Desar PVP'}
           </button>

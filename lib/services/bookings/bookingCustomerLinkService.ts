@@ -192,6 +192,13 @@ export async function linkBookingToCustomer(input: {
     where: { id: input.bookingId },
     data: { customerId: resolvedCustomerId },
   });
+  await prisma.clientPortalAccess.updateMany({
+    where: {
+      bookingId: input.bookingId,
+      revokedAt: null,
+    },
+    data: { customerId: resolvedCustomerId },
+  });
 
   return { ok: true, customerId: resolvedCustomerId, created, alreadyLinked: false };
 }

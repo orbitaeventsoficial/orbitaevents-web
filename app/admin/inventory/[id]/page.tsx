@@ -169,7 +169,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
                 href={item.purchasePriceSource}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-1 inline-block underline decoration-white/30"
+                className="mt-1 inline-block underline decoration-[var(--line)]"
               >
                 {item.purchasePriceSource}
               </a>
@@ -228,9 +228,9 @@ export default async function InventoryItemPage({ params }: PageProps) {
                 <Link
                   key={pi.id}
                   href={buildPackHref(pi.pack.id)}
-                  className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm transition-colors hover:bg-white/5"
+                  className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm transition-colors hover:bg-[var(--raised)]"
                 >
-                  <span className="font-medium underline decoration-white/20">{packName}</span>
+                  <span className="font-medium underline decoration-[var(--line)]">{packName}</span>
                   <span className="">x{pi.quantity}</span>
                   {pi.isRequired && (
                     <span className="text-xs px-1.5 py-0.5 rounded">obligatori</span>

@@ -294,7 +294,7 @@ export async function loadPostEventPlaybook(
   // Testimonis per customer (comparem eventDate)
   const testimonials = customerIds.length > 0
     ? await prisma.customerTestimonial.findMany({
-        where: { customerId: { in: customerIds } },
+        where: { customerId: { in: customerIds }, isApproved: true },
         select: { customerId: true, eventDate: true },
       })
     : [];

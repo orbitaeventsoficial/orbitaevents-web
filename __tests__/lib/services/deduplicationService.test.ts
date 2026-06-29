@@ -9,6 +9,14 @@ const { mockPrisma } = vi.hoisted(() => ({
       updateMany: vi.fn(),
     },
     lead: { updateMany: vi.fn() },
+    booking: { updateMany: vi.fn() },
+    proposal: { updateMany: vi.fn() },
+    invoice: { updateMany: vi.fn() },
+    task: { updateMany: vi.fn() },
+    clientPortalAccess: { updateMany: vi.fn() },
+    customerContact: { updateMany: vi.fn() },
+    consentRecord: { updateMany: vi.fn() },
+    dataRequest: { updateMany: vi.fn() },
     customerTestimonial: { updateMany: vi.fn() },
     customerDiscountCode: { updateMany: vi.fn() },
     customerActivity: { updateMany: vi.fn(), create: vi.fn() },
@@ -49,6 +57,7 @@ function makeCustomer(overrides: Partial<Record<string, unknown>> = {}) {
     totalEvents: 2,
     totalSpent: 3000,
     lastEventDate: new Date('2025-06-01'),
+    referredById: null,
     ...overrides,
   };
 }
@@ -317,6 +326,83 @@ describe('mergeCustomers', () => {
       fieldsUpdated: [],
       totalEventsAfterMerge: 4,
       totalSpentAfterMerge: 6000,
+    });
+  });
+
+  it('mou relacions operatives del duplicat al client principal', async () => {
+    const primary = makeCustomer({ id: 'p' });
+    const dup = makeCustomer({ id: 'd1' });
+
+    mockPrisma.customer.findMany.mockResolvedValue([
+      { ...primary, leads: [], testimonials: [], discountCodes: [] },
+      { ...dup, leads: [], testimonials: [], discountCodes: [] },
+    ]);
+    mockPrisma.$transaction.mockResolvedValue([]);
+    mockPrisma.customer.findUnique.mockResolvedValue(primary);
+
+    await mergeCustomers('p', ['d1']);
+
+    const relationModels = [
+      mockPrisma.lead,
+      mockPrisma.booking,
+      mockPrisma.proposal,
+      mockPrisma.invoice,
+      mockPrisma.task,
+      mockPrisma.clientPortalAccess,
+      mockPrisma.customerContact,
+      mockPrisma.consentRecord,
+      mockPrisma.dataRequest,
+      mockPrisma.customerTestimonial,
+      mockPrisma.customerDiscountCode,
+      mockPrisma.customerActivity,
+    ];
+
+    for (const model of relationModels) {
+      expect(model.updateMany).toHaveBeenCalledWith({
+        where: { customerId: { in: ['d1'] } },
+        data: { customerId: 'p' },
+      });
+    }
+  });
+
+  it('reassigna els referrals que apuntaven al duplicat cap al client principal', async () => {
+    const primary = makeCustomer({ id: 'p' });
+    const dup = makeCustomer({ id: 'd1' });
+
+    mockPrisma.customer.findMany.mockResolvedValue([
+      { ...primary, leads: [], testimonials: [], discountCodes: [] },
+      { ...dup, leads: [], testimonials: [], discountCodes: [] },
+    ]);
+    mockPrisma.$transaction.mockResolvedValue([]);
+    mockPrisma.customer.findUnique.mockResolvedValue(primary);
+
+    await mergeCustomers('p', ['d1']);
+
+    expect(mockPrisma.customer.updateMany).toHaveBeenCalledWith({
+      where: { referredById: { in: ['d1'] } },
+      data: { referredById: 'p' },
+    });
+  });
+
+  it('hereta referredById del duplicat si el principal no en tenia', async () => {
+    const primary = makeCustomer({ id: 'p', referredById: null });
+    const dup = makeCustomer({ id: 'd1', referredById: 'referrer-1' });
+
+    mockPrisma.customer.findMany.mockResolvedValue([
+      { ...primary, leads: [], testimonials: [], discountCodes: [] },
+      { ...dup, leads: [], testimonials: [], discountCodes: [] },
+    ]);
+    mockPrisma.$transaction.mockResolvedValue([]);
+    mockPrisma.customer.findUnique.mockResolvedValue({ ...primary, referredById: 'referrer-1' });
+
+    const result = await mergeCustomers('p', ['d1']);
+
+    expect(result.fieldsUpdated).toContain('referredById');
+    expect(mockPrisma.customer.update).toHaveBeenCalledWith({
+      where: { id: 'p' },
+      data: expect.objectContaining({
+        referredBy: { connect: { id: 'referrer-1' } },
+      }),
     });
   });
 });

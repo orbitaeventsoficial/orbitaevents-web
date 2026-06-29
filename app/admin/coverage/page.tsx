@@ -204,7 +204,7 @@ export default function CoveragePage() {
                     key={area.city}
                     className="border rounded-xl p-3 flex items-center justify-between"
                   >
-                    <span className={`font-medium ${area.enabled ? 'text-white/90' : 'text-white/30'}`}>
+                    <span className={`font-medium ${area.enabled ? 'text-[var(--t)]' : 'text-[var(--t3)]'}`}>
                       {area.city}
                     </span>
                     <div className="flex items-center gap-2">
@@ -214,7 +214,7 @@ export default function CoveragePage() {
                         className={`px-3 py-1 rounded-full text-xs font-medium ${
                           area.enabled
                             ? 'admin-tone-soft-success'
-                            : 'bg-white/10 text-white/40'
+                            : 'bg-[var(--raised)] text-[var(--t3)]'
                         }`}
                       >
                         {area.enabled ? '✓ Activa' : '✕ Desactivada'}

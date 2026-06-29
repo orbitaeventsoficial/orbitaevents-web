@@ -80,9 +80,9 @@ context (ids/params) correcte? el que es veu aquí és el mateix que a Economia/
 | # | Vertical (flux) | Recorregut | Estat |
 |---|---|---|---|
 | **V1** | **ECONÒMICA / COMERCIAL** (el cor) | Lead→Pressupost→Reserva→Cost/Marge→Contracte→Pagament→Repartiment→Caixa/Economia | ✅ TANCADA #1218 |
-| V2 | POST-EVENT | Event→Informe→Enquesta→Ressenya→Feedback | ⬜ |
+| V2 | POST-EVENT | Event→Informe→Enquesta→Ressenya→Feedback | ✅ TANCADA #1239 (perímetre no-mail) |
 | V3 | COMUNICACIÓ | Lead→Email/Inbox→Seqüències→Timeline client | ✅ TANCADA #1220 |
-| V4 | CLIENT / RECURRÈNCIA | Lead→Client→Portal client (pagament/signatura)→Reactivació/Referrals | ⬜ |
+| V4 | CLIENT / RECURRÈNCIA | Lead→Client→Portal client (pagament/signatura)→Reactivació/Referrals | ✅ TANCADA #1231 |
 | V5 | CATÀLEG → PREU | Pack/Inventari→Cost→Preu recomanat→Pressupost (cablejat de preus) | ⬜ |
 
 ### 🔬 V3 — VERTICAL DE COMUNICACIÓ (1a passada) · Lead→Inbox/Email→Seqüències→Timeline
@@ -94,6 +94,25 @@ Dades reals: 53 leadActivity, 6 emailSend.
 - ✅ **Inbox IMAP↔BD via X-Orbita — RESOLT / verificat #1220** — l'enviament persisteix `EmailSend` amb headers X-Orbita, Message-ID i resultat IMAP (`imapAppendOk`, folder, uid, error); `lib/imap.ts` parseja `In-Reply-To`/`References` i helpers X-Orbita.
 - ✅ **Reintent APPEND Sent — RESOLT / blindat #1220** — `emailSentRetryService` reconstrueix MIME des del snapshot + headers persistits i `POST /api/admin/emails/sent/[id]/append-imap` queda coberta amb test HTTP.
 - ✅ **V3 tancada en primera passada** — no queden pendents de codi detectats dins Lead→Email/Inbox→Seqüències→Timeline. Reobrir només amb prova viva contrària.
+
+### 🔬 V4 — VERTICAL CLIENT / RECURRENCIA (1a passada) · Lead→Client→Portal→Signatura/Pagament→Reactivació/Referrals
+- ✅ **V4-#1 · Toggles del portal només visuals — RESOLT #1226** — `showDocuments=false` ja talla `/contract` i `/invoice`, `showTimeline=false` talla `/timeline`, `showPayments=false` continua tallant `/payments`, i la nav inferior deriva els ítems visibles de la mateixa font `getClientPortalVisibility()`.
+- ✅ **V4-#2 · Signatura parcial si falla el PDF firmat — RESOLT #1227** — `signContractOnline()` reverteix `SIGNED` a `SENT` i neteja metadata si `generateSignedContractPdf()` falla; la timeline només registra signatura quan el PDF material existeix.
+- ✅ **V4-#3 · PortalAccess desconnectat si el client es vincula tard — RESOLT #1228** — `linkBookingToCustomer()` actualitza els accessos actius del portal quan la reserva passa a tenir customer, tant en vincle a client existent com en creació de client nou.
+- ✅ **V4-#4 · Reactivació incloïa clients fusionats — RESOLT #1229** — `loadReactivationCandidates()` filtra `mergedIntoId=null`, com ja feia referrals, perquè la cua no generi tasques ni intents comercials sobre fitxes antigues fusionades.
+- ✅ **V4-#5 · Fusió de clients perdia historial operatiu — RESOLT #1230** — `mergeCustomers()` mou bookings, proposals, invoices, tasks, portal access, contactes, consentiments i data requests al customer principal, i `resolveCustomerHubCustomerId()` redirigeix fitxes fusionades cap al canònic.
+- ✅ **V4-#6 · Referrals trencats després de fusionar clients — RESOLT #1231** — `mergeCustomers()` reassigna cap al principal els clients que tenien `referredById` apuntant al duplicat i hereta el `referredById` del duplicat si el principal no en tenia.
+- ✅ **V4 tancada en primera passada** — client/portal/pagament/signatura/reactivació/referrals queden verificats. La frontera post-event/enquesta/ressenya passa a V2 i els mails automàtics queden fora d'aquest tancament per coordinació amb Claude.
+
+### 🔬 V2 — VERTICAL POST-EVENT (1a passada) · Event→Informe→Enquesta→Ressenya→Feedback
+- 🔶 **V2-#1 · Informe intern acceptava dades fora de contracte — RESOLT #1232** — `createAdminPostEventReport()` només permet reserves `COMPLETED`, restringeix `status` a `DRAFT|COMPLETED` i valida valoracions 1-5 abans d'escriure a BD.
+- 🔶 **V2-#2 · Estat operatiu post-event no distingia esborrany vs tancat — RESOLT #1232** — `getBookingOperationalSnapshot()` només marca `COMPLETO` quan hi ha informe `COMPLETED` i feedback enviat o enquesta rebuda.
+- 🔶 **V2-#3 · Testimoni públic desconnectava booking i descompte — RESOLT #1233** — `POST /api/testimonials` propaga `token+bookingRef`; `submitPublicTestimonial()` enllaça reserva/customer, marca `reviewSubmittedAt`, copia `eventType/eventDate` i desa `discountCodeId` amb l'id real del descompte.
+- 🔶 **V2-#4 · Google Reviews admin refrescava cache, no sincronitzava — RESOLT #1234** — `runReviewsSync()` és el runner canònic compartit per cron i admin; `/api/admin/google-reviews/sync` exigeix auth+CSRF i el botó `Refrescar` sincronitza amb SerpAPI abans de recarregar `/api/google-reviews` amb `cache: 'no-store'`.
+- 🔶 **V2-#5 · Playbook comptava testimonis no aprovats com a prova social feta — RESOLT #1235** — `loadPostEventPlaybook()` filtra `CustomerTestimonial.isApproved=true`, de manera que una ressenya rebuda però pendent/amagada no tanca l'acció `testimonial`.
+- 🔶 **V2-#6 · Copy admin confonia pendent d'enviar amb pendent de resposta — RESOLT #1236** — `/admin/post-event` etiqueta el KPI com `Enquestes sense resposta` (query real: `clientSurvey=null`) i `/admin/google-reviews` reflecteix el cron + refresc manual #1234.
+- 🔶 **V2-#7 · Playbook post-event estava orfe del hub mare — RESOLT #1237** — `/admin/post-event` incorpora el quart pas `Playbook` cap a `/admin/post-event/playbook`, amb graella responsive a 4 passos.
+- ✅ **V2 tancada en primera passada no-mail — #1239** — informe intern, estat operatiu, testimoni públic/moderació, Google Reviews, playbook i hub post-event queden coherents. El perímetre d'enviament automàtic de mails, Inbox, APPEND i seqüències queda fora d'aquest tancament per coordinació explícita.
 
 ### FASE 2 — AUDITORIES HORITZONTALS (disseny pàgina a pàgina) · «que tot sigui IMPECABLE»
 Quan les verticals estiguin verdes: les 92 pàgines + 6 PDFs + 13 emails + components, amb

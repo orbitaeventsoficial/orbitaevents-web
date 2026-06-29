@@ -65,18 +65,36 @@ export async function signContractOnline(input: {
     return { ok: false, reason: 'NOT_SIGNABLE' };
   }
 
+  const signedData = {
+    contractStatus: 'SIGNED',
+    contractSignedAt: now,
+    contractSignedBy: input.signedBy,
+    contractSignatureIp: input.ip,
+    contractSignatureUa: input.userAgent,
+    contractSignatureBlob: input.signatureBlob ?? null,
+  } as const;
+
   await prisma.proposal.update({
     where: { id: proposal.id },
-    data: {
-      contractStatus: 'SIGNED',
-      contractSignedAt: now,
-      contractSignedBy: input.signedBy,
-      contractSignatureIp: input.ip,
-      contractSignatureUa: input.userAgent,
-      contractSignatureBlob: input.signatureBlob ?? null,
-    },
+    data: signedData,
   });
-  await generateSignedContractPdf(proposal.id);
+
+  try {
+    await generateSignedContractPdf(proposal.id);
+  } catch (error) {
+    await prisma.proposal.update({
+      where: { id: proposal.id },
+      data: {
+        contractStatus: 'SENT',
+        contractSignedAt: null,
+        contractSignedBy: null,
+        contractSignatureIp: null,
+        contractSignatureUa: null,
+        contractSignatureBlob: null,
+      },
+    });
+    throw error;
+  }
   if (proposal.leadId && proposal.contractReference) {
     await recordLeadContractSigned({
       leadId: proposal.leadId,

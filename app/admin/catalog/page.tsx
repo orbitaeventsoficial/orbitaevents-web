@@ -232,7 +232,7 @@ export default async function CatalogPage({
       title="Catàleg"
       subtitle="Punt únic per operar packs, extres, inventari i regles de preu."
       alert={pricingAlerts > 0 ? (
-        <p className="inline-flex rounded-full border px-3 py-1 text-xs font-semibold">
+        <p className="inline-flex rounded-full border admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning px-3 py-1 text-xs font-semibold">
           ⚠ {pricingAlerts} alertes de divergència de preu en packs
         </p>
       ) : undefined}
@@ -265,13 +265,13 @@ export default async function CatalogPage({
             <>
               <Link
                 href="/admin/packs"
-                className="rounded-xl border px-4 py-3 text-sm"
+                className="ap-card adm-row-hover block px-4 py-3 text-sm transition-colors"
               >
                 Obrir gestió de packs
               </Link>
               <Link
                 href="/admin/packs/new"
-                className="rounded-xl border px-4 py-3 text-sm"
+                className="ap-card adm-row-hover block px-4 py-3 text-sm transition-colors"
               >
                 Crear pack nou
               </Link>
@@ -281,7 +281,7 @@ export default async function CatalogPage({
                     <Link
                       key={pack.id}
                       href={buildPackHref(pack.id)}
-                      className="rounded-xl border px-4 py-3 text-sm"
+                      className="ap-card adm-row-hover block px-4 py-3 text-sm transition-colors"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
@@ -321,13 +321,13 @@ export default async function CatalogPage({
             <>
               <Link
                 href="/admin/packs/extras"
-                className="rounded-xl border px-4 py-3 text-sm"
+                className="ap-card adm-row-hover block px-4 py-3 text-sm transition-colors"
               >
                 Obrir catàleg d&apos;extres
               </Link>
               <Link
                 href="/admin/pricing"
-                className="rounded-xl border px-4 py-3 text-sm"
+                className="ap-card adm-row-hover block px-4 py-3 text-sm transition-colors"
               >
                 Revisar vendes d&apos;extres
               </Link>
@@ -337,13 +337,13 @@ export default async function CatalogPage({
             <>
               <Link
                 href="/admin/inventory"
-                className="rounded-xl border px-4 py-3 text-sm"
+                className="ap-card adm-row-hover block px-4 py-3 text-sm transition-colors"
               >
                 Obrir inventari complet
               </Link>
               <Link
                 href="/admin/inventory/new"
-                className="rounded-xl border px-4 py-3 text-sm"
+                className="ap-card adm-row-hover block px-4 py-3 text-sm transition-colors"
               >
                 Afegir element nou
               </Link>
@@ -375,13 +375,13 @@ export default async function CatalogPage({
               </div>
               <Link
                 href="/admin/pricing"
-                className="rounded-xl border px-4 py-3 text-sm"
+                className="ap-card adm-row-hover block px-4 py-3 text-sm transition-colors"
               >
                 Obrir gestor de preus
               </Link>
               <Link
                 href="/admin/economia"
-                className="rounded-xl border px-4 py-3 text-sm"
+                className="ap-card adm-row-hover block px-4 py-3 text-sm transition-colors"
               >
                 Revisar rendibilitat
               </Link>
@@ -431,7 +431,7 @@ export default async function CatalogPage({
                           <td className="px-3 py-2 text-right">{formatPct(row.marginPct)}</td>
                           <td className="px-3 py-2 text-right">{formatPct(row.costRatioPct)}</td>
                           <td className="px-3 py-2 text-right">{formatCurrency(row.recommendedPrice)}</td>
-                          <td className={`px-3 py-2 text-right font-semibold ${Math.abs(row.divergencePct) >= 20 ? 'admin-tone-text-warning' : 'text-white/70'}`}>
+                          <td className={`px-3 py-2 text-right font-semibold ${Math.abs(row.divergencePct) >= 20 ? 'admin-tone-text-warning' : 'text-[var(--t2)]'}`}>
                             {formatPct(row.divergencePct)}
                           </td>
                           <td className="px-3 py-2 text-xs">

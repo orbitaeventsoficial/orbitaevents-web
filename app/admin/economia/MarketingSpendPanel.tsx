@@ -124,7 +124,7 @@ export default function MarketingSpendPanel() {
       ) : entries.length === 0 ? (
         <p className="text-xs">Encara no hi ha despesa carregada. El CAC real es mostrarà quan n’afegeixis.</p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-white/10">
+        <div className="overflow-x-auto rounded-xl border border-[var(--line)]">
           <table className="min-w-[420px] w-full text-sm" aria-label="Despesa de màrqueting carregada">
             <thead>
               <tr className="text-left text-xs uppercase tracking-wider">

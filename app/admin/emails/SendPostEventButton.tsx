@@ -38,7 +38,7 @@ export default function SendPostEventButton({ bookingId }: { bookingId: string }
   const buttonClass = sent
     ? 'admin-tone-bg-success admin-tone-text-success admin-tone-border-success border'
     : loading
-      ? 'border border-white/10 bg-white/5 text-white/30'
+      ? 'border border-[var(--line)] bg-[var(--raised)] text-[var(--t3)]'
       : 'ap-btn ap-btn--primary';
 
   return (

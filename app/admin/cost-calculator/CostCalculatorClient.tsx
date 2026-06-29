@@ -212,7 +212,7 @@ export default function CostCalculatorClient() {
 
       {/* Sidebar — Components disponibles */}
       <div className="ap-card rounded-xl p-5" data-help-title="Components disponibles" data-help-desc="Arrossega o clica components per afegir-los al pressupost. Cada component té un cost/hora estimat.">
-        <h3 className="text-sm font-bold text-white/70 uppercase tracking-wider mb-4">Components</h3>
+        <h3 className="text-sm font-bold text-[var(--t2)] uppercase tracking-wider mb-4">Components</h3>
         <p className="mb-4 text-xs admin-tone-text-slate">Arrossega o clica per afegir</p>
         <div className="space-y-2">
           {AVAILABLE_COMPONENTS.map((comp) => (
@@ -225,7 +225,7 @@ export default function CostCalculatorClient() {
             >
               <span className="text-xl">{comp.icon}</span>
               <div className="flex-1 min-w-0">
-                <div className="text-sm text-white font-medium">{comp.label}</div>
+                <div className="text-sm text-[var(--t)] font-medium">{comp.label}</div>
                 <div className="text-xs admin-tone-text-slate">
                   {comp.costPerHour}€/{comp.unit}
                 </div>
@@ -251,7 +251,7 @@ export default function CostCalculatorClient() {
           }`}
         >
           {components.length === 0 ? (
-            <div className="text-center py-12 text-white/30">
+            <div className="text-center py-12 text-[var(--t3)]">
               <p className="text-4xl mb-3">🧮</p>
               <p className="text-lg font-medium">Arrossega components aquí</p>
               <p className="text-sm mt-1">o clica'ls a la barra lateral</p>
@@ -265,12 +265,12 @@ export default function CostCalculatorClient() {
                   <div key={comp.id} className="ap-card flex items-center gap-4 rounded-xl p-4 transition-colors hover:admin-tone-bg-neutral">
                     <span className="text-2xl">{comp.icon}</span>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-bold text-white">{comp.label}</div>
+                      <div className="text-sm font-bold text-[var(--t)]">{comp.label}</div>
                     </div>
 
                     {/* Quantity */}
                     <div className="flex flex-col items-center gap-0.5">
-                      <label className="text-xs text-white/30 uppercase">{unit === 'km' ? 'Km' : 'Uds'}</label>
+                      <label className="text-xs text-[var(--t3)] uppercase">{unit === 'km' ? 'Km' : 'Uds'}</label>
                       <input
                         type="number" min={1} value={comp.quantity}
                         onChange={(e) => updateComponent(comp.id, 'quantity', Math.max(1, Number(e.target.value)))}
@@ -281,7 +281,7 @@ export default function CostCalculatorClient() {
                     {/* Hours (only for hora units) */}
                     {unit === 'hora' && (
                       <div className="flex flex-col items-center gap-0.5">
-                        <label className="text-xs text-white/30 uppercase">Hores</label>
+                        <label className="text-xs text-[var(--t3)] uppercase">Hores</label>
                         <input
                           type="number" min={1} value={comp.hours}
                           onChange={(e) => updateComponent(comp.id, 'hours', Math.max(1, Number(e.target.value)))}
@@ -292,7 +292,7 @@ export default function CostCalculatorClient() {
 
                     {/* Unit cost */}
                     <div className="flex flex-col items-center gap-0.5">
-                      <label className="text-xs text-white/30 uppercase">€/{unit}</label>
+                      <label className="text-xs text-[var(--t3)] uppercase">€/{unit}</label>
                       <input
                         type="number" min={0} step={0.01} value={comp.unitCost}
                         onChange={(e) => updateComponent(comp.id, 'unitCost', Math.max(0, Number(e.target.value)))}
@@ -302,12 +302,12 @@ export default function CostCalculatorClient() {
 
                     {/* Total */}
                     <div className="w-20 text-right">
-                      <div className="text-xs text-white/30">Cost</div>
+                      <div className="text-xs text-[var(--t3)]">Cost</div>
                       <div className="text-sm font-bold">{Math.round(comp.total * 100) / 100}€</div>
                     </div>
 
                     {/* Remove */}
-                    <button onClick={() => removeComponent(comp.id)} className="text-white/30 transition-colors p-1" aria-label="Eliminar">
+                    <button onClick={() => removeComponent(comp.id)} className="text-[var(--t3)] transition-colors p-1" aria-label="Eliminar">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                       </svg>
@@ -325,7 +325,7 @@ export default function CostCalculatorClient() {
             <div className="grid md:grid-cols-4 gap-6 mb-6">
               <div>
                 <div className="text-xs admin-tone-text-slate mb-1">Cost total</div>
-                <div className="text-3xl font-bold text-white">{totals.totalCost}€</div>
+                <div className="text-3xl font-bold text-[var(--t)]">{totals.totalCost}€</div>
               </div>
               <div>
                 <div className="text-xs admin-tone-text-slate mb-1">Marge</div>
@@ -335,7 +335,7 @@ export default function CostCalculatorClient() {
                     onChange={(e) => setMarginPct(Number(e.target.value))}
                     className="flex-1 accent-amber-500"
                   />
-                  <span className="text-lg font-bold text-white w-12 text-right">{marginPct}%</span>
+                  <span className="text-lg font-bold text-[var(--t)] w-12 text-right">{marginPct}%</span>
                 </div>
               </div>
               <div>

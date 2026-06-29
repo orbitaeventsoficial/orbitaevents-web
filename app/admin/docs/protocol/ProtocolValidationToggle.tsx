@@ -92,7 +92,7 @@ export default function ProtocolValidationToggle({
           rows={2}
           maxLength={500}
           placeholder="Ex.: revisat en mòbil, CTA clar, flux entenedor, text OK..."
-          className="w-full rounded-xl border border-white/10 bg-[var(--sunk)] px-3 py-2 text-sm placeholder:text-white/35"
+          className="w-full rounded-xl border border-[var(--line)] bg-[var(--sunk)] px-3 py-2 text-sm placeholder:text-[var(--t3)]"
         />
       </label>
 

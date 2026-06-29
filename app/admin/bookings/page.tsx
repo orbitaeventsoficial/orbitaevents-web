@@ -466,7 +466,7 @@ export default async function BookingsPage({
                       </td>
                       <td className="px-3 py-2.5">
                         {booking.customerId ? (
-                          <Link href={buildCustomerHubHref(booking.customerId!)} className="font-semibold text-sm hover:text-white truncate block max-w-[160px]">
+                          <Link href={buildCustomerHubHref(booking.customerId!)} className="font-semibold text-sm hover:text-[var(--t)] truncate block max-w-[160px]">
                             {booking.clientName}
                           </Link>
                         ) : (

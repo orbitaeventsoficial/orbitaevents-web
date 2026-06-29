@@ -394,7 +394,7 @@ export default function DiscountCodesPage() {
             <article key={c.id} className="ap-card block rounded-2xl p-4 transition-colors hover:admin-tone-bg-neutral">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <code className="text-sm font-mono px-2 py-0.5 rounded bg-white/5">{c.code}</code>
+                  <code className="text-sm font-mono px-2 py-0.5 rounded bg-[var(--raised)]">{c.code}</code>
                   {c.description && <p className="text-xs mt-1">{c.description}</p>}
                 </div>
                 <div className="text-right shrink-0">
@@ -402,7 +402,7 @@ export default function DiscountCodesPage() {
                     {c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}â‚¬`}
                   </span>
                   <span className={`block mt-0.5 rounded-full px-2 py-0.5 text-xs font-medium text-center ${
-                    active ? 'admin-tone-soft-success' : 'bg-white/5 text-white/40'
+                    active ? 'admin-tone-soft-success' : 'bg-[var(--raised)] text-[var(--t3)]'
                   }`}>
                     {active ? 'Actiu' : 'Inactiu'}
                   </span>
@@ -463,7 +463,7 @@ export default function DiscountCodesPage() {
                     </td>
                     <td className="px-4 py-3">{c.type === 'PERCENTAGE' ? 'Percentatge' : 'Import fix'}</td>
                     <td className="px-4 py-3 font-semibold">{c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}â‚¬`}</td>
-                    <td className={`px-4 py-3 ${expired ? 'admin-tone-text-danger' : 'text-white/60'}`}>
+                    <td className={`px-4 py-3 ${expired ? 'admin-tone-text-danger' : 'text-[var(--t2)]'}`}>
                       {formatDateSimple(c.validUntil)}
                       {expired && <span className="block text-xs">Caducat</span>}
                     </td>
@@ -476,7 +476,7 @@ export default function DiscountCodesPage() {
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                           c.isActive && !expired && !maxReached
                             ? 'admin-tone-soft-success'
-                            : 'bg-white/5 text-white/40'
+                            : 'bg-[var(--raised)] text-[var(--t3)]'
                         }`}
                       >
                         {c.isActive && !expired && !maxReached ? 'Actiu' : 'Inactiu'}

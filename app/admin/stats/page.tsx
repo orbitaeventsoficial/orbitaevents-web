@@ -230,7 +230,7 @@ export default function StatsPage() {
             className={`border rounded-xl p-6 ${
               stat.isManual
                 ? 'admin-tone-bg-warning admin-tone-border-warning'
-                : 'bg-black/60 border-white/10'
+                : 'bg-black/60 border-[var(--line)]'
             }`}
           >
             <div className="flex items-start justify-between mb-4">
@@ -249,15 +249,15 @@ export default function StatsPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div className="bg-white/5 rounded-xl p-3">
+              <div className="bg-[var(--raised)] rounded-xl p-3">
                 <div className="text-xs mb-1">Valor Actual</div>
                 <div className="text-2xl font-bold">{stat.value}</div>
               </div>
-              <div className="bg-white/5 rounded-xl p-3">
+              <div className="bg-[var(--raised)] rounded-xl p-3">
                 <div className="text-xs mb-1">Valor Calculat</div>
                 <div className="text-2xl font-bold">{stat.calculated}</div>
               </div>
-              <div className="bg-white/5 rounded-xl p-3">
+              <div className="bg-[var(--raised)] rounded-xl p-3">
                 <div className="text-xs mb-1">Valor Manual</div>
                 <div className="text-2xl font-bold">
                   {stat.isManual ? stat.fallback : '—'}
@@ -272,7 +272,7 @@ export default function StatsPage() {
                   min={0}
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
-                  className="flex-1 px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
+                  className="flex-1 px-4 py-2 border border-[var(--line)] rounded-xl focus:ring-2"
                   step="0.1"
                 />
                 <button
@@ -287,7 +287,7 @@ export default function StatsPage() {
                 <button
                   onClick={() => setEditingStat(null)}
                   type="button"
-                  className="px-4 py-2 bg-white/5 rounded-xl font-medium hover:bg-white/10"
+                  className="px-4 py-2 bg-[var(--raised)] rounded-xl font-medium hover:bg-[var(--raised)]"
                 >
                   Cancel·lar
                 </button>
@@ -297,7 +297,7 @@ export default function StatsPage() {
                 <button
                   onClick={() => startEdit(stat)}
                   type="button"
-                  className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-xl font-medium hover:bg-white/10"
+                  className="flex-1 px-4 py-2 bg-[var(--raised)] border border-[var(--line)] rounded-xl font-medium hover:bg-[var(--raised)]"
                 >
                   ✏️ Editar Valor Manual
                 </button>

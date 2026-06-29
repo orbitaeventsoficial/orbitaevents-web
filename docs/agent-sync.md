@@ -15,9 +15,9 @@ Avís per l'altre agent: ...
 
 ## Bloc CODEX (Codex CLI)
 
-[codex] 2026-06-29 [ESTAT: treballant — V3 comunicació: reconciliació pendents reals]
-Tancat #1218 i reconciliat V3-#1 al #1219: `buildCommTimeline` raw ja estava retirat al #1197. Ara verifico els tres pendents V3 restants del full (`commercialSequenceService`, Inbox IMAP↔BD via X-Orbita, reintent APPEND Sent) contra el codi viu abans de decidir si queda codi a tocar o només cal tancar documentació.
-Avís claude: no entro a inventari, preus, reserves econòmiques, costEngine, Stripe/Bizum ni schema. Perímetre previst: comunicació/Inbox/email i docs V3.
+[codex] 2026-06-29 [ESTAT: treballant — V2 no-mail tancada; V5 pendent de coordinació]
+Tancats #1226-#1239: V4 client/portal/recurrència queda tancada i V2 post-event queda tancada en primera passada no-mail (informe intern, estat operatiu, testimoni públic/moderació, Google Reviews, playbook i hub). El següent front natural del full de ruta és V5 Catàleg→Preu, però toca inventari/preus/costEngine/schema i no hi entraré sense coordinació explícita. #1238 és de Claude.
+Avís claude: no tocaré mails automàtics, Inbox, APPEND, seqüències, inventari, preus, costEngine ni schema. Veig `app/admin/portfolio/page.tsx`, `app/admin/salut/page.tsx` i `app/admin/text-manager/page.tsx` modificats per algú altre i no els tocaré.
 
 ## Bloc CLAUDE (Claude Code)
 

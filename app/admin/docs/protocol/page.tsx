@@ -33,7 +33,7 @@ const STATUS_STYLE: Record<ProtocolCanviStatus, string> = {
   FET: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
   'EN MARXA': 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
   PENDENT: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
-  UNKNOWN: 'border-[var(--line)] bg-[var(--panel)] text-white/70',
+  UNKNOWN: 'border-[var(--line)] bg-[var(--panel)] text-[var(--t2)]',
 };
 
 const AUTHOR_STYLE: Record<string, string> = {
@@ -42,7 +42,7 @@ const AUTHOR_STYLE: Record<string, string> = {
 };
 
 function getAuthorStyle(author: string): string {
-  return AUTHOR_STYLE[author.toLowerCase()] ?? 'border-[var(--line)] bg-[var(--panel)] text-white/70';
+  return AUTHOR_STYLE[author.toLowerCase()] ?? 'border-[var(--line)] bg-[var(--panel)] text-[var(--t2)]';
 }
 
 async function readProtocolMarkdown(): Promise<string> {
@@ -106,22 +106,22 @@ export default async function AdminProtocolPage({
       back={{ href: '/admin/manual', label: 'Manual de possibilitats' }}
     >
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        <div className="admin-card-glass rounded-2xl border border-white/10 p-4">
+        <div className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Canvis registrats</p>
           <p className="mt-2 text-3xl font-bold">{allCanvis.length}</p>
           <p className="mt-1 text-xs opacity-60">{totalFet} FET · {allCanvis.length - totalFet} altres estats.</p>
         </div>
-        <div className="admin-card-glass rounded-2xl border border-white/10 p-4">
+        <div className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Seccions del protocol</p>
           <p className="mt-2 text-3xl font-bold">{allSections.length}</p>
           <p className="mt-1 text-xs opacity-60">§X.Y agrupades per àrea de producte.</p>
         </div>
-        <div className="admin-card-glass rounded-2xl border border-white/10 p-4">
+        <div className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Darrer canvi</p>
           <p className="mt-2 text-3xl font-bold">#{allCanvis[0]?.n ?? '—'}</p>
           <p className="mt-1 text-xs opacity-60">{lastDate} · {allCanvis[0]?.author ?? '—'}</p>
         </div>
-        <div className="admin-card-glass rounded-2xl border border-white/10 p-4">
+        <div className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Validats humans</p>
           <p className="mt-2 text-3xl font-bold">{validationSummary.validatedCount}</p>
           <p className="mt-1 text-xs opacity-60">
@@ -134,7 +134,7 @@ export default async function AdminProtocolPage({
             {firstPending ? `Següent pendent: #${firstPending.n} · ${firstPending.author}` : 'No queda cap pendent en aquesta vista.'}
           </p>
         </div>
-        <div className="admin-card-glass rounded-2xl border border-white/10 p-4">
+        <div className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Filtre actiu</p>
           <p className="mt-2 text-3xl font-bold">{filtered.length}</p>
           <p className="mt-1 text-xs font-semibold uppercase tracking-wide opacity-50">
@@ -155,7 +155,7 @@ export default async function AdminProtocolPage({
             defaultValue={query}
             placeholder="Cerca per #462, claude, audit trail..."
             aria-label="Cercar al protocol"
-            className="flex-1 min-w-[240px] ap-card px-3 py-2 text-sm placeholder:text-white/40 focus:admin-tone-border-warning focus:outline-none"
+            className="flex-1 min-w-[240px] ap-card px-3 py-2 text-sm placeholder:text-[var(--t3)] focus:admin-tone-border-warning focus:outline-none"
           />
           <select
             name="validation"
@@ -198,7 +198,7 @@ export default async function AdminProtocolPage({
               {pendingShortcut.label}
             </Link>
           ) : (
-            <span className="rounded-full border border-white/10 px-3 py-2 text-xs opacity-60">
+            <span className="rounded-full border border-[var(--line)] px-3 py-2 text-xs opacity-60">
               {pendingShortcut.label}
             </span>
           )}
@@ -236,7 +236,7 @@ export default async function AdminProtocolPage({
                 <Link
                   key={section.anchorId}
                   href={`/admin/docs/protocol?seccio=${section.id}#${section.anchorId}`}
-                  className="admin-card-glass flex flex-col gap-1 rounded-xl border border-white/10 p-3 transition hover:admin-tone-border-warning"
+                  className="admin-card-glass flex flex-col gap-1 rounded-xl border border-[var(--line)] p-3 transition hover:admin-tone-border-warning"
                 >
                   <span className="text-xs font-semibold uppercase tracking-wider opacity-50">§{section.id}</span>
                   <span className="text-sm font-bold leading-snug">{section.title}</span>
@@ -267,7 +267,7 @@ export default async function AdminProtocolPage({
                   id={canvi.anchorId}
                   open={shouldAutoOpenProtocolCanvi(canvi.n, focus, validations, validationFilter)}
                   className={`admin-card-glass rounded-2xl border p-4 transition ${
-                    isFocus ? 'admin-tone-border-warning admin-tone-bg-warning' : 'border-white/10'
+                    isFocus ? 'admin-tone-border-warning admin-tone-bg-warning' : 'border-[var(--line)]'
                   }`}
                 >
                   <summary className="flex cursor-pointer flex-wrap items-center gap-2 list-none">
@@ -290,7 +290,7 @@ export default async function AdminProtocolPage({
                       {canvi.headline}
                     </span>
                   </summary>
-                  <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-xl border border-white/5 bg-black/30 p-3 text-xs leading-relaxed opacity-90">
+                  <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-xl border border-[var(--line)] bg-black/30 p-3 text-xs leading-relaxed opacity-90">
                     {canvi.body}
                   </pre>
                   <ProtocolValidationToggle canviN={canvi.n} validation={validation} />

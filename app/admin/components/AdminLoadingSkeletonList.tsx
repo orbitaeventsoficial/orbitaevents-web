@@ -19,7 +19,7 @@ export default function AdminLoadingSkeletonList() {
       {/* Table */}
       <div className="ap-card overflow-hidden">
         {/* Header */}
-        <div className="flex items-center gap-4 border-b border-white/10 px-4 py-3">
+        <div className="flex items-center gap-4 border-b border-[var(--line)] px-4 py-3">
           {[60, 120, 80, 100, 80, 80].map((w, i) => (
             <div key={i} className="h-3 rounded bg-[var(--o-admin-fill-3)]" style={{ width: w }} />
           ))}
@@ -28,7 +28,7 @@ export default function AdminLoadingSkeletonList() {
         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
           <div
             key={i}
-            className="flex items-center gap-4 border-b border-white/[0.04] px-4 py-3"
+            className="flex items-center gap-4 border-b border-[var(--line)] px-4 py-3"
           >
             {[60, 120, 80, 100, 80, 80].map((w, j) => (
               <div

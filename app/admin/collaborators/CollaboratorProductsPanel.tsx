@@ -136,7 +136,7 @@ export default function CollaboratorProductsPanel({ collaboratorId, products, on
       <div className="mb-3 flex items-center justify-between">
         <h4 className="text-sm font-semibold admin-tone-text-neutral">
           Catàleg de productes
-          {products.length > 0 && <span className="ml-2 text-white/40">({products.length})</span>}
+          {products.length > 0 && <span className="ml-2 text-[var(--t3)]">({products.length})</span>}
         </h4>
         <button
           type="button"
@@ -188,7 +188,7 @@ export default function CollaboratorProductsPanel({ collaboratorId, products, on
           <div>
             <label htmlFor="prod-description" className="mb-1 block text-xs admin-tone-text-neutral">
               Text del dossier
-              <span className="ml-2 text-white/40">Narrativa que es mostra al capítol del dossier comercial</span>
+              <span className="ml-2 text-[var(--t3)]">Narrativa que es mostra al capítol del dossier comercial</span>
             </label>
             <textarea id="prod-description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={4} placeholder="Explica l'experiència en to comercial. La marca del proveïdor es neteja automàticament: tot es presenta com a Òrbita." className="adm-input adm-input--textarea" />
           </div>
@@ -237,7 +237,7 @@ export default function CollaboratorProductsPanel({ collaboratorId, products, on
                   )}
                   <div className="flex items-center justify-between gap-2 text-xs">
                     <span className="admin-tone-text-neutral">Cost {formatCurrency(p.costPrice)}</span>
-                    <span className="font-bold text-white">PVP {formatCurrency(p.sellPrice)}</span>
+                    <span className="font-bold text-[var(--t)]">PVP {formatCurrency(p.sellPrice)}</span>
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <span className={m.cls}>+{formatCurrency(m.net)} (+{m.markupPct.toFixed(0)}% sobre cost)</span>

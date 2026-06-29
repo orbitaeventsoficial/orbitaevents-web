@@ -344,7 +344,7 @@ export default function CanvasEditorClient() {
           <button onClick={() => addShape('rect')} className="ap-btn ap-btn--secondary min-h-[40px] text-sm">+ Rectangle</button>
           <button onClick={() => addShape('circle')} className="ap-btn ap-btn--secondary min-h-[40px] text-sm">+ Cercle</button>
           <button onClick={() => addShape('line')} className="ap-btn ap-btn--secondary min-h-[40px] text-sm">+ Línia</button>
-          <div className="mx-1 hidden w-px bg-white/10 sm:block" />
+          <div className="mx-1 hidden w-px bg-[var(--raised)] sm:block" />
           {selectedId && (
             <>
               <button onClick={duplicateSelected} className="ap-btn ap-btn--secondary min-h-[40px] text-sm">Duplicar</button>

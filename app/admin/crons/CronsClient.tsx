@@ -84,20 +84,20 @@ export default function CronsClient() {
       {/* Resum */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-2xl border p-3 sm:p-4">
-          <div className="text-xs sm:text-xs uppercase tracking-wide text-white/50">Correctes</div>
+          <div className="text-xs sm:text-xs uppercase tracking-wide text-[var(--t3)]">Correctes</div>
           <div className="text-2xl sm:text-3xl font-bold">{healthCounts.ok}</div>
         </div>
         <div className="rounded-2xl border p-3 sm:p-4">
-          <div className="text-xs sm:text-xs uppercase tracking-wide text-white/50">Retardats</div>
+          <div className="text-xs sm:text-xs uppercase tracking-wide text-[var(--t3)]">Retardats</div>
           <div className="text-2xl sm:text-3xl font-bold">{healthCounts.warning}</div>
         </div>
         <div className="rounded-2xl border p-3 sm:p-4">
-          <div className="text-xs sm:text-xs uppercase tracking-wide text-white/50">Errors</div>
+          <div className="text-xs sm:text-xs uppercase tracking-wide text-[var(--t3)]">Errors</div>
           <div className="text-2xl sm:text-3xl font-bold">{healthCounts.error}</div>
         </div>
         <div className="rounded-2xl border p-3 sm:p-4">
-          <div className="text-xs sm:text-xs uppercase tracking-wide text-white/50">Mai executat</div>
-          <div className="text-2xl sm:text-3xl font-bold text-white/30">{healthCounts.unknown}</div>
+          <div className="text-xs sm:text-xs uppercase tracking-wide text-[var(--t3)]">Mai executat</div>
+          <div className="text-2xl sm:text-3xl font-bold text-[var(--t3)]">{healthCounts.unknown}</div>
         </div>
       </div>
 
@@ -122,7 +122,7 @@ export default function CronsClient() {
                     <div className="font-semibold text-sm sm:text-base truncate">
                       {cron.label}
                     </div>
-                    <div className="text-xs text-white/50">
+                    <div className="text-xs text-[var(--t3)]">
                       {cron.frequency}
                     </div>
                   </div>
@@ -132,27 +132,27 @@ export default function CronsClient() {
                     <div className="text-xs font-medium">
                       {config.label}
                     </div>
-                    <div className="text-xs text-white/40">
+                    <div className="text-xs text-[var(--t3)]">
                       {cron.lastRun ? formatTimeAgo(cron.lastRun) : 'Mai'}
                     </div>
                   </div>
-                  <span className={`text-white/30 transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+                  <span className={`text-[var(--t3)] transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
                     ▼
                   </span>
                 </div>
               </div>
 
               {isExpanded && (
-                <div className="mt-3 pt-3 border-t border-white/10 text-sm space-y-2" onClick={(e) => e.stopPropagation()}>
+                <div className="mt-3 pt-3 border-t border-[var(--line)] text-sm space-y-2" onClick={(e) => e.stopPropagation()}>
                   {cron.lastRun && (
                     <div className="flex gap-2">
-                      <span className="text-white/40 w-24 flex-shrink-0">Últim run:</span>
+                      <span className="text-[var(--t3)] w-24 flex-shrink-0">Últim run:</span>
                       <span>{formatDateTimeFull(cron.lastRun)}</span>
                     </div>
                   )}
                   {cron.lastStatus && (
                     <div className="flex gap-2">
-                      <span className="text-white/40 w-24 flex-shrink-0">Estat:</span>
+                      <span className="text-[var(--t3)] w-24 flex-shrink-0">Estat:</span>
                       <span className={cron.lastStatus === 'ok' ? 'admin-tone-text-success' : 'admin-tone-text-danger'}>
                         {cron.lastStatus.toUpperCase()}
                       </span>
@@ -160,16 +160,16 @@ export default function CronsClient() {
                   )}
                   {cron.lastMessage && (
                     <div className="flex gap-2">
-                      <span className="text-white/40 w-24 flex-shrink-0">Missatge:</span>
+                      <span className="text-[var(--t3)] w-24 flex-shrink-0">Missatge:</span>
                       <span className="">{cron.lastMessage}</span>
                     </div>
                   )}
                   {summaryLines.length > 0 && (
                     <div>
-                      <span className="text-white/40 text-xs">Resum:</span>
+                      <span className="text-[var(--t3)] text-xs">Resum:</span>
                       <div className="mt-1 grid gap-1 sm:grid-cols-2">
                         {summaryLines.map((line) => (
-                          <div key={line} className="rounded-xl bg-white/5 px-2.5 py-1.5 text-xs">
+                          <div key={line} className="rounded-xl bg-[var(--raised)] px-2.5 py-1.5 text-xs">
                             {line}
                           </div>
                         ))}
@@ -188,7 +188,7 @@ export default function CronsClient() {
         <button
           type="button"
           onClick={() => { setLoading(true); fetchCrons(); }}
-          className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-all hover:bg-white/10 active:scale-[0.98]"
+          className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-all hover:bg-[var(--raised)] active:scale-[0.98]"
         >
           Actualitzar
         </button>

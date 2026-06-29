@@ -14,6 +14,8 @@ type SubmitPublicTestimonialInput = {
   videoUrl?: string;
   allowGoogleShare: boolean;
   consentPhotoPublication: boolean;
+  token?: string;
+  bookingRef?: string;
 };
 
 function generateDiscountCode(): string {
@@ -129,9 +131,24 @@ export async function submitPublicTestimonial(input: SubmitPublicTestimonialInpu
   validUntil.setMonth(validUntil.getMonth() + 6);
 
   return prisma.$transaction(async (tx) => {
-    let customer = await tx.customer.findUnique({
-      where: { emailNormalized },
-    });
+    const booking = input.token && input.bookingRef
+      ? await tx.booking.findFirst({
+          where: {
+            reference: input.bookingRef,
+            reviewToken: input.token,
+          },
+          select: {
+            id: true,
+            customerId: true,
+            eventType: true,
+            eventDate: true,
+          },
+        })
+      : null;
+
+    let customer = booking?.customerId
+      ? await tx.customer.findUnique({ where: { id: booking.customerId } })
+      : await tx.customer.findUnique({ where: { emailNormalized } });
 
     if (!customer) {
       customer = await tx.customer.create({
@@ -153,6 +170,8 @@ export async function submitPublicTestimonial(input: SubmitPublicTestimonialInpu
         customerId: customer.id,
         text: input.comment,
         rating: input.rating,
+        eventType: booking?.eventType || null,
+        eventDate: booking?.eventDate || null,
         photoUrl: input.photoUrl || null,
         showName: true,
         showPhoto: input.consentPhotoPublication,
@@ -160,7 +179,7 @@ export async function submitPublicTestimonial(input: SubmitPublicTestimonialInpu
       },
     });
 
-    await tx.customerDiscountCode.create({
+    const discount = await tx.customerDiscountCode.create({
       data: {
         customerId: customer.id,
         code: discountCode,
@@ -176,8 +195,15 @@ export async function submitPublicTestimonial(input: SubmitPublicTestimonialInpu
 
     await tx.customerTestimonial.update({
       where: { id: testimonial.id },
-      data: { discountCodeId: discountCode },
+      data: { discountCodeId: discount.id },
     });
+
+    if (booking) {
+      await tx.booking.update({
+        where: { id: booking.id },
+        data: { reviewSubmittedAt: new Date() },
+      });
+    }
 
     await recordCustomerTestimonialSubmitted({
       customerId: customer.id,

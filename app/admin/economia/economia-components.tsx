@@ -41,7 +41,7 @@ export function KpiCard({ label, value, sub, color }: {
 export function ProgressBar({ value, max, color }: { value: number; max: number; color: string }) {
   const width = max > 0 ? Math.min((value / max) * 100, 100) : 0;
   return (
-    <div className="h-2 w-full rounded-full bg-white/5 overflow-hidden" {...helpAttrs(ADMIN_ECONOMY_HELP.progressBar)}>
+    <div className="h-2 w-full rounded-full bg-[var(--raised)] overflow-hidden" {...helpAttrs(ADMIN_ECONOMY_HELP.progressBar)}>
       <motion.div
         initial={{ width: 0 }}
         animate={{ width: `${width}%` }}
@@ -76,7 +76,7 @@ export function HealthScore({ overdueTotal, outstandingTotal, marginPct }: { ove
       <p className="font-[family-name:var(--mono)] text-xs font-semibold uppercase tracking-[0.16em] text-[var(--t3)] mb-3">Salut financera</p>
       <div className="relative w-28 h-28">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8" className="text-white/5" />
+          <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8" className="text-[var(--line)]" />
           <motion.circle
             cx="50" cy="50" r="45" fill="none"
             strokeWidth="8" strokeLinecap="round"
@@ -106,7 +106,7 @@ export function PaymentTimelineBar({ row }: { row: PaymentRow }) {
       ? 'bg-[var(--o-danger)]'
       : row.dueSoonDeposit
         ? 'bg-[var(--o-warning)]'
-        : 'bg-white/15';
+        : 'bg-[var(--raised)]';
 
   const remainingColor = row.remainingPaid
     ? 'bg-[var(--o-success)]'
@@ -114,14 +114,14 @@ export function PaymentTimelineBar({ row }: { row: PaymentRow }) {
       ? 'bg-[var(--o-danger)]'
       : row.dueSoonRemaining
         ? 'bg-[var(--o-warning)]'
-        : 'bg-white/15';
+        : 'bg-[var(--raised)]';
 
   const depositLabel = `Diposit: ${money(row.depositAmount)} ${row.depositPaid ? '(pagat)' : '(pendent)'}`;
   const remainingLabel = `Resta: ${money(row.remainingAmount)} ${row.remainingPaid ? '(pagat)' : '(pendent)'}`;
 
   return (
     <div className="space-y-1" {...helpAttrs(ADMIN_ECONOMY_HELP.paymentTimeline)}>
-      <div className="flex items-center gap-0.5 h-4 rounded-full overflow-hidden bg-white/5 w-full">
+      <div className="flex items-center gap-0.5 h-4 rounded-full overflow-hidden bg-[var(--raised)] w-full">
         <div
           className={`h-full ${depositColor} transition-all duration-300 relative group`}
           style={{ width: `${depositPct}%` }}
@@ -133,7 +133,7 @@ export function PaymentTimelineBar({ row }: { row: PaymentRow }) {
           aria-label={depositLabel}
           {...helpAttrs(ADMIN_ECONOMY_HELP.paymentTimelineSegment(depositLabel))}
         >
-          <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white/80 opacity-0 group-hover:opacity-100 transition-opacity">
+          <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-[var(--t2)] opacity-0 group-hover:opacity-100 transition-opacity">
             {depositPct > 15 ? `${Math.round(depositPct)}%` : ''}
           </span>
         </div>
@@ -148,12 +148,12 @@ export function PaymentTimelineBar({ row }: { row: PaymentRow }) {
           aria-label={remainingLabel}
           {...helpAttrs(ADMIN_ECONOMY_HELP.paymentTimelineSegment(remainingLabel))}
         >
-          <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white/80 opacity-0 group-hover:opacity-100 transition-opacity">
+          <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-[var(--t2)] opacity-0 group-hover:opacity-100 transition-opacity">
             {remainingPct > 15 ? `${Math.round(remainingPct)}%` : ''}
           </span>
         </div>
       </div>
-      <div className="flex justify-between text-xs text-white/40">
+      <div className="flex justify-between text-xs text-[var(--t3)]">
         <span className="flex items-center gap-1">
           <span className={`inline-block w-1.5 h-1.5 rounded-full ${depositColor}`} />
           Diposit {row.depositPaid ? '✓' : ''}
@@ -286,7 +286,7 @@ export function CobramentFiltersSection({
 
   return (
     <>
-      <section className="rounded-xl border border-white/10 p-3 space-y-3" {...helpAttrs(ADMIN_ECONOMY_HELP.filters)}>
+      <section className="rounded-xl border border-[var(--line)] p-3 space-y-3" {...helpAttrs(ADMIN_ECONOMY_HELP.filters)}>
         <div className="flex flex-wrap items-center gap-2">
           <input
             type="text"
@@ -294,7 +294,7 @@ export function CobramentFiltersSection({
             aria-label="Cercar per referència o client"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 min-w-[180px] rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm placeholder:text-white/30 focus:outline-none"
+            className="flex-1 min-w-[180px] rounded-xl border border-[var(--line)] bg-[var(--raised)] px-3 py-2 text-sm placeholder:text-[var(--t3)] focus:outline-none"
             {...helpAttrs(ADMIN_ECONOMY_HELP.search)}
           />
           <div {...helpAttrs(ADMIN_ECONOMY_HELP.exportCsv)}>
@@ -325,7 +325,7 @@ export function CobramentFiltersSection({
               className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                 filter === chip.id
                   ? 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning'
-                  : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10'
+                  : 'border-[var(--line)] bg-[var(--raised)] text-[var(--t2)] hover:bg-[var(--raised)]'
               }`}
               {...helpAttrs(ADMIN_ECONOMY_HELP.filterChip(chip.label))}
             >
@@ -362,7 +362,7 @@ export function CobramentFiltersSection({
           <button
             type="button"
             onClick={() => setSelected(new Set())}
-            className="text-xs text-white/40 hover:text-white/60"
+            className="text-xs text-[var(--t3)] hover:text-[var(--t2)]"
             {...helpAttrs(ADMIN_ECONOMY_HELP.clearSelection)}
           >
             Netejar selecció
@@ -374,7 +374,7 @@ export function CobramentFiltersSection({
       <section className="rounded-2xl border p-3 shadow-lg overflow-x-auto" {...helpAttrs(ADMIN_ECONOMY_HELP.table)}>
         <table className="w-full text-sm" aria-label="Cobraments pendents">
           <thead>
-            <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wide text-white/50">
+            <tr className="border-b border-[var(--line)] text-left text-xs uppercase tracking-wide text-[var(--t3)]">
               <th scope="col" className="px-2 py-2 w-8">
                 <input
                   type="checkbox"
@@ -396,13 +396,13 @@ export function CobramentFiltersSection({
           <tbody>
             {filteredRows.length === 0 && (
               <tr>
-                <td colSpan={9} className="px-2 py-8 text-center text-white/40">
+                <td colSpan={9} className="px-2 py-8 text-center text-[var(--t3)]">
                   Cap resultat amb els filtres actuals.
                 </td>
               </tr>
             )}
             {filteredRows.map((row) => (
-              <tr key={row.id} className="border-b border-white/5 adm-row-hover transition-colors">
+              <tr key={row.id} className="border-b border-[var(--line)] adm-row-hover transition-colors">
                 <td className="px-2 py-2">
                   <input
                     type="checkbox"
@@ -418,12 +418,12 @@ export function CobramentFiltersSection({
                   <PaymentTimelineBar row={row} />
                 </td>
                 <td className="px-2 py-2 text-right">
-                  <span className={`text-xs font-medium ${row.depositPaid ? 'admin-tone-text-success' : row.overdueDeposit ? 'admin-tone-text-danger' : 'text-white/60'}`}>
+                  <span className={`text-xs font-medium ${row.depositPaid ? 'admin-tone-text-success' : row.overdueDeposit ? 'admin-tone-text-danger' : 'text-[var(--t2)]'}`}>
                     {money(row.depositAmount)}
                   </span>
                 </td>
                 <td className="px-2 py-2 text-right">
-                  <span className={`text-xs font-medium ${row.remainingPaid ? 'admin-tone-text-success' : row.overdueRemaining ? 'admin-tone-text-danger' : 'text-white/60'}`}>
+                  <span className={`text-xs font-medium ${row.remainingPaid ? 'admin-tone-text-success' : row.overdueRemaining ? 'admin-tone-text-danger' : 'text-[var(--t2)]'}`}>
                     {money(row.remainingAmount)}
                   </span>
                 </td>
@@ -431,7 +431,7 @@ export function CobramentFiltersSection({
                 <td className="px-2 py-2">
                   <Link
                     href={buildBookingHref(row.id)}
-                    className="text-xs text-white/40 hover:text-white/70"
+                    className="text-xs text-[var(--t3)] hover:text-[var(--t2)]"
                     {...helpAttrs(ADMIN_ECONOMY_HELP.rowLink(row.reference))}
                   >
                     &rarr;

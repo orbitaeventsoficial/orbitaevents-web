@@ -30,7 +30,7 @@ export default function MobileQuickActions({
   if (!hasActions) return null;
 
   return (
-    <section className="md:hidden rounded-2xl border border-white/10 p-3 admin-card-glass">
+    <section className="md:hidden rounded-2xl border border-[var(--line)] p-3 admin-card-glass">
       <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] opacity-60">
         Accions ràpides
       </p>

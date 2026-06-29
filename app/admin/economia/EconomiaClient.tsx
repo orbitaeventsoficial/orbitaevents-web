@@ -139,7 +139,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   <KpiCard
                     label="Total pendent de cobrar"
                     value={money(props.outstandingTotal)}
-                    color="text-white/90"
+                    color="text-[var(--t)]"
                   />
                   <KpiCard
                     label="Pendent fora de termini"
@@ -173,7 +173,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     label="Ingressos realitzats"
                     value={money(props.realized.revenue)}
                     sub={`${props.realized.bookings} completats`}
-                    color="text-white/90"
+                    color="text-[var(--t)]"
                   />
                   <KpiCard
                     label="Marge net realitzat"
@@ -185,7 +185,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     label="Ingressos previstos"
                     value={money(props.forecast.revenue)}
                     sub={`${props.forecast.bookings} en pipeline`}
-                    color="text-white/90"
+                    color="text-[var(--t)]"
                   />
                   <KpiCard
                     label="Marge previst"
@@ -322,7 +322,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                       <Link
                         key={row.id}
                         href={buildBookingHref(row.id)}
-                        className="flex items-center gap-3 rounded-xl border border-white/5 p-3 hover:bg-white/5 transition-colors group"
+                        className="flex items-center gap-3 rounded-xl border border-[var(--line)] p-3 hover:bg-[var(--raised)] transition-colors group"
                       >
                         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-sm font-bold">
                           {i + 1}
@@ -355,7 +355,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
           {activeTab === 'cobraments' && (
             <>
               <div className="grid gap-3 grid-cols-2 xl:grid-cols-4">
-                <KpiCard label="Total pendent de cobrar" value={money(props.outstandingTotal)} color="text-white/90" />
+                <KpiCard label="Total pendent de cobrar" value={money(props.outstandingTotal)} color="text-[var(--t)]" />
                 <KpiCard label="Pendent fora de termini" value={money(props.overdueTotal)} color="admin-tone-text-danger" />
                 <KpiCard label="Vencen en 7 dies" value={money(props.dueSoonTotal)} color="admin-tone-text-warning" />
                 <KpiCard label="Cobrat aquest mes" value={money(props.monthCollected)} color="admin-tone-text-success" />
@@ -400,7 +400,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                         key={row.id}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="group rounded-xl border border-white/10 p-3 transition-colors"
+                        className="group rounded-xl border border-[var(--line)] p-3 transition-colors"
                       >
                         <summary className="list-none cursor-pointer">
                           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -409,7 +409,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                               <p className="mt-0.5 text-xs">
                                 {formatDateFull(row.eventDate)}
                                 &nbsp;·&nbsp;
-                                <span className="rounded bg-white/10 px-1.5 py-0.5 text-xs font-semibold uppercase">{row.status}</span>
+                                <span className="rounded bg-[var(--raised)] px-1.5 py-0.5 text-xs font-semibold uppercase">{row.status}</span>
                               </p>
                             </div>
                             <div className="flex flex-wrap items-center justify-end gap-2">
@@ -419,14 +419,14 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                               <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${paymentStateBadge(row.remainingPaid)}`}>
                                 Saldo {row.remainingPaid ? 'pagat' : 'pendent'}
                               </span>
-                              <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-xs font-semibold">
+                              <span className="rounded-full border border-[var(--line)] bg-[var(--raised)] px-2 py-0.5 text-xs font-semibold">
                                 Veure detall
                               </span>
                             </div>
                           </div>
                         </summary>
 
-                        <div className="mt-3 border-t border-white/10 pt-3">
+                        <div className="mt-3 border-t border-[var(--line)] pt-3">
                           <div className="mb-3 flex items-center justify-between gap-2">
                             <p className="text-xs">Codi reserva: {row.reference}</p>
                             <Link href={buildBookingHref(row.id)} className="ap-btn ap-btn--xs shrink-0">
@@ -483,7 +483,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 </div>
                 <div className="space-y-2">
                   {props.upcomingDueRows.length === 0 ? (
-                    <div className="rounded-xl border border-white/10 p-4 text-center">
+                    <div className="rounded-xl border border-[var(--line)] p-4 text-center">
                       <p className="text-sm font-semibold">Cap venciment en 7 dies.</p>
                       <p className="mt-1 text-xs">
                         No tens cap cobrament pendent que caduqui entre avui i els pròxims 7 dies.
@@ -491,7 +491,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     </div>
                   ) : (
                     props.upcomingDueRows.map((row) => (
-                      <div key={row.id} className="flex items-center gap-3 rounded-xl border border-white/5 p-3 hover:bg-white/5 transition-colors">
+                      <div key={row.id} className="flex items-center gap-3 rounded-xl border border-[var(--line)] p-3 hover:bg-[var(--raised)] transition-colors">
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold truncate">{row.reference} &middot; {row.clientName}</p>
                           <p className="text-xs">{formatDateSimple(row.eventDate)}</p>
@@ -528,9 +528,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               {props.hasReport && (
                 <>
                   <div className="grid gap-3 grid-cols-2 xl:grid-cols-4">
-                    <KpiCard label="Ingressos realitzats" value={money(props.realized.revenue)} sub={`${props.realized.bookings} completats`} color="text-white/90" />
+                    <KpiCard label="Ingressos realitzats" value={money(props.realized.revenue)} sub={`${props.realized.bookings} completats`} color="text-[var(--t)]" />
                     <KpiCard label="Marge net realitzat" value={money(props.realized.netMargin)} sub={`Mitjà ${pct(props.realized.avgMarginPct)}`} color="admin-tone-text-success" />
-                    <KpiCard label="Previsió d'ingressos" value={money(props.forecast.revenue)} sub={`${props.forecast.bookings} en pipeline`} color="text-white/90" />
+                    <KpiCard label="Previsió d'ingressos" value={money(props.forecast.revenue)} sub={`${props.forecast.bookings} en pipeline`} color="text-[var(--t)]" />
                     <KpiCard label="Previsió de marge" value={money(props.forecast.netMargin)} sub={`Mitjà ${pct(props.forecast.avgMarginPct)}`} color="admin-tone-text-warning" />
                   </div>
 
@@ -549,7 +549,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                             <Link
                               key={row.id}
                               href={buildBookingHref(row.id)}
-                              className="flex items-center gap-3 rounded-xl border border-white/5 p-3 hover:bg-white/5 transition-colors group"
+                              className="flex items-center gap-3 rounded-xl border border-[var(--line)] p-3 hover:bg-[var(--raised)] transition-colors group"
                             >
                               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-xs font-bold">
                                 {i + 1}
@@ -563,7 +563,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                               <div className="text-right shrink-0">
                                 <p className={`text-sm font-bold ${marginColor(row.marginPct)}`}>{money(row.netMargin)}</p>
                                 <div className="flex items-center gap-1.5 justify-end mt-1">
-                                  <div className="h-1.5 w-12 rounded-full bg-white/5 overflow-hidden">
+                                  <div className="h-1.5 w-12 rounded-full bg-[var(--raised)] overflow-hidden">
                                     <div className={`h-full rounded-full ${marginBg(row.marginPct)}`} style={{ width: `${Math.min(row.marginPct * 100, 100)}%` }} />
                                   </div>
                                   <span className={`text-xs font-semibold ${marginColor(row.marginPct)}`}>{pct(row.marginPct)}</span>
@@ -625,7 +625,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     <div className="overflow-x-auto">
                       <table className="min-w-full text-sm" aria-label="Rendibilitat per canal">
                         <thead>
-                          <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wider">
+                          <tr className="border-b border-[var(--line)] text-left text-xs uppercase tracking-wider">
                             <th scope="col" className="py-3 pr-4">Canal</th>
                             <th scope="col" className="py-3 pr-4">Esdeveniments</th>
                             <th scope="col" className="py-3 pr-4">Ingressos</th>
@@ -635,14 +635,14 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                         </thead>
                         <tbody>
                           {props.bySource.map((row) => (
-                            <tr key={row.source} className="border-b border-white/5 adm-row-hover transition-colors">
+                            <tr key={row.source} className="border-b border-[var(--line)] adm-row-hover transition-colors">
                               <td className="py-3 pr-4 font-semibold">{row.source}</td>
                               <td className="py-3 pr-4">{row.bookings}</td>
                               <td className="py-3 pr-4">{money(row.revenue)}</td>
                               <td className="py-3 pr-4">{money(row.netMargin)}</td>
                               <td className="py-3">
                                 <div className="flex items-center gap-2">
-                                  <div className="h-1.5 w-16 rounded-full bg-white/5 overflow-hidden">
+                                  <div className="h-1.5 w-16 rounded-full bg-[var(--raised)] overflow-hidden">
                                     <div className={`h-full rounded-full ${marginBg(row.avgMarginPct)}`} style={{ width: `${Math.min(row.avgMarginPct * 100, 100)}%` }} />
                                   </div>
                                   <span className={`text-xs font-semibold ${marginColor(row.avgMarginPct)}`}>{pct(row.avgMarginPct)}</span>
@@ -667,7 +667,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 <p className="text-xs mb-4">Projecció mensual d'ingressos i costos basada en reserves confirmades.</p>
 
                 {props.cashFlow && props.cashFlow.length > 0 ? (
-                  <div className="overflow-x-auto rounded-xl border border-white/10">
+                  <div className="overflow-x-auto rounded-xl border border-[var(--line)]">
                     <table className="min-w-[700px] w-full text-sm" aria-label="Projecció de tresoreria">
                       <thead>
                         <tr className="text-left text-xs uppercase tracking-wider">
@@ -715,7 +715,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 </p>
 
                 {props.forecast_pipeline && props.forecast_pipeline.length > 0 ? (
-                  <div className="overflow-x-auto rounded-xl border border-white/10">
+                  <div className="overflow-x-auto rounded-xl border border-[var(--line)]">
                     <table className="min-w-[1080px] w-full text-sm" aria-label="Previsió de vendes">
                       <thead>
                         <tr className="text-left text-xs uppercase tracking-wider">
@@ -797,7 +797,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   <h2 className="ap-h2 mb-1">CAC per canal</h2>
                   <p className="text-xs mb-4">Cost d'adquisició de client real vs estimat, derivat de dades.</p>
 
-                  <div className="overflow-x-auto rounded-xl border border-white/10">
+                  <div className="overflow-x-auto rounded-xl border border-[var(--line)]">
                     <table className="min-w-[600px] w-full text-sm" aria-label="CAC per canal">
                       <thead>
                         <tr className="text-left text-xs uppercase tracking-wider">
@@ -863,7 +863,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   </article>
                 </div>
 
-                <div className="mt-4 overflow-x-auto rounded-xl border border-white/10">
+                <div className="mt-4 overflow-x-auto rounded-xl border border-[var(--line)]">
                   <table className="min-w-[1250px] w-full text-sm" aria-label="Rendibilitat per pack">
                     <thead className="">
                       <tr className="text-left text-xs uppercase tracking-wider">
@@ -921,7 +921,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     Cost per km derivat del preu MITECO + manteniment. Actualitzat automàticament.
                   </p>
                   <div className="grid gap-3 sm:grid-cols-4">
-                    <div className="rounded-xl border border-white/10 p-3">
+                    <div className="rounded-xl border border-[var(--line)] p-3">
                       <p className="text-xs uppercase tracking-wide">Preu combustible</p>
                       <p className="text-lg font-bold">
                         {props.vehicleConfig.fuelPricePerLiter > 0
@@ -929,11 +929,11 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                           : 'Sense dada MITECO'}
                       </p>
                     </div>
-                    <div className="rounded-xl border border-white/10 p-3">
+                    <div className="rounded-xl border border-[var(--line)] p-3">
                       <p className="text-xs uppercase tracking-wide">Consum vehicle</p>
                       <p className="text-lg font-bold">{props.vehicleConfig.consumptionL100.toFixed(1)} L/100km</p>
                     </div>
-                    <div className="rounded-xl border border-white/10 p-3">
+                    <div className="rounded-xl border border-[var(--line)] p-3">
                       <p className="text-xs uppercase tracking-wide">Manteniment</p>
                       <p className="text-lg font-bold">{props.vehicleConfig.maintenanceCostPerKm.toFixed(2)} €/km</p>
                     </div>

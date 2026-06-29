@@ -109,7 +109,7 @@ export default function LossBreakdownPanel({
     <section className="ap-card rounded-2xl p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">Pèrdues de lead</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--t3)]">Pèrdues de lead</p>
           <h2 className="mt-2 ap-h2">Per què es refreda l&apos;embut</h2>
           <p className="mt-1 max-w-3xl text-sm admin-tone-text-neutral">
             Lectura dels últims {days} dies sobre el motiu de pèrdua, els canals afectats i la tendència mensual.
@@ -138,15 +138,15 @@ export default function LossBreakdownPanel({
 
       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         <div className="ap-card p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/50">Motiu principal</p>
-          <p className="mt-2 text-lg font-semibold text-white">{summary.topReason?.label ?? 'Sense patró comercial clar'}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--t3)]">Motiu principal</p>
+          <p className="mt-2 text-lg font-semibold text-[var(--t)]">{summary.topReason?.label ?? 'Sense patró comercial clar'}</p>
           <p className="mt-1 text-xs admin-tone-text-neutral">
             {summary.topReason ? `${summary.topReason.count} leads · ${summary.topReason.share}% del total` : 'Cap motiu comercial domina la mostra actual.'}
           </p>
         </div>
         <div className="ap-card p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/50">Leads perduts</p>
-          <p className="mt-2 text-2xl font-semibold text-white">{summary.total}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--t3)]">Leads perduts</p>
+          <p className="mt-2 text-2xl font-semibold text-[var(--t)]">{summary.total}</p>
           <p className="mt-1 text-xs admin-tone-text-neutral">{summary.commercialTotal} comercials · {summary.autoTotal} automàtics</p>
         </div>
         <div className="rounded-2xl border admin-tone-border-warning admin-tone-bg-warning p-4">
@@ -155,8 +155,8 @@ export default function LossBreakdownPanel({
           <p className="mt-1 text-xs admin-tone-text-warning">Leads amb `EVENT_PASSED` fora del càlcul del motiu comercial principal.</p>
         </div>
         <div className="ap-card p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/50">Sense classificar</p>
-          <p className="mt-2 text-2xl font-semibold text-white">{summary.uncategorized}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--t3)]">Sense classificar</p>
+          <p className="mt-2 text-2xl font-semibold text-[var(--t)]">{summary.uncategorized}</p>
           <p className="mt-1 text-xs admin-tone-text-neutral">Pèrdues sense motiu canònic o amb dades antigues encara no sanejades.</p>
         </div>
       </div>
@@ -169,7 +169,7 @@ export default function LossBreakdownPanel({
         <article className="ap-card p-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h3 className="text-sm font-semibold text-white">Mix de motius</h3>
+              <h3 className="text-sm font-semibold text-[var(--t)]">Mix de motius</h3>
               <p className="mt-1 text-xs admin-tone-text-neutral">Distribució de pèrdues classificades per motiu canònic.</p>
             </div>
           </div>
@@ -178,29 +178,29 @@ export default function LossBreakdownPanel({
             <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-center">
               <div
                 aria-label="Donut de motius de pèrdua"
-                className="mx-auto h-40 w-40 rounded-full border border-white/10"
+                className="mx-auto h-40 w-40 rounded-full border border-[var(--line)]"
                 style={{ backgroundImage: donutGradient }}
               >
-                <div className="m-auto mt-7 flex h-24 w-24 items-center justify-center rounded-full border border-white/10 admin-donut-hole text-center">
+                <div className="m-auto mt-7 flex h-24 w-24 items-center justify-center rounded-full border border-[var(--line)] admin-donut-hole text-center">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.18em] text-white/45">Leads</p>
-                    <p className="mt-1 text-2xl font-semibold text-white">{summary.total}</p>
+                    <p className="text-xs uppercase tracking-[0.18em] text-[var(--t3)]">Leads</p>
+                    <p className="mt-1 text-2xl font-semibold text-[var(--t)]">{summary.total}</p>
                   </div>
                 </div>
               </div>
 
               <div className="flex-1 space-y-2">
                 {donutEntries.map((entry, index) => (
-                  <div key={entry.key} className="flex items-center justify-between gap-3 rounded-xl border border-white/8 bg-black/10 px-3 py-2 text-xs">
+                  <div key={entry.key} className="flex items-center justify-between gap-3 rounded-xl border border-[var(--line)] bg-black/10 px-3 py-2 text-xs">
                     <div className="flex items-center gap-2">
                       <span
                         aria-hidden="true"
                         className="h-2.5 w-2.5 rounded-full"
                         style={{ backgroundColor: ADMIN_CHART_COLORS[index % ADMIN_CHART_COLORS.length] }}
                       />
-                      <span className="text-white/85">{entry.label}</span>
+                      <span className="text-[var(--t2)]">{entry.label}</span>
                     </div>
-                    <span className="text-white/65">{entry.count} · {entry.share}%</span>
+                    <span className="text-[var(--t2)]">{entry.count} · {entry.share}%</span>
                   </div>
                 ))}
               </div>
@@ -211,7 +211,7 @@ export default function LossBreakdownPanel({
         </article>
 
         <article className="ap-card p-4">
-          <h3 className="text-sm font-semibold text-white">Canals més afectats</h3>
+          <h3 className="text-sm font-semibold text-[var(--t)]">Canals més afectats</h3>
           <p className="mt-1 text-xs admin-tone-text-neutral">On es concentren més pèrdues dins la finestra actual.</p>
 
           {topSources.length > 0 ? (
@@ -221,10 +221,10 @@ export default function LossBreakdownPanel({
                 return (
                   <div key={entry.key}>
                     <div className="mb-1 flex items-center justify-between gap-2 text-xs">
-                      <span className="text-white/85">{entry.label}</span>
-                      <span className="text-white/60">{entry.count} · {entry.share}%</span>
+                      <span className="text-[var(--t2)]">{entry.label}</span>
+                      <span className="text-[var(--t2)]">{entry.count} · {entry.share}%</span>
                     </div>
-                    <div className="h-2 rounded-full bg-white/8">
+                    <div className="h-2 rounded-full bg-[var(--raised)]">
                       <div className="h-2 rounded-full admin-tone-bg-info" style={{ width: `${width}%` }} />
                     </div>
                   </div>
@@ -237,12 +237,12 @@ export default function LossBreakdownPanel({
         </article>
 
         <article className="ap-card p-4">
-          <h3 className="text-sm font-semibold text-white">Tendència mensual</h3>
+          <h3 className="text-sm font-semibold text-[var(--t)]">Tendència mensual</h3>
           <p className="mt-1 text-xs admin-tone-text-neutral">Evolució dels leads perduts per mes natural.</p>
 
           {summary.byMonth.length > 0 ? (
             <>
-              <div className="mt-4 rounded-xl border border-white/8 bg-black/10 p-3">
+              <div className="mt-4 rounded-xl border border-[var(--line)] bg-black/10 p-3">
                 <svg viewBox="0 0 160 72" className="h-28 w-full" role="img" aria-label="Tendència mensual de pèrdues">
                   <path d="M8 64 H152" stroke={ADMIN_SVG_COLORS.baselineLine} strokeWidth="1" />
                   <polyline
@@ -263,9 +263,9 @@ export default function LossBreakdownPanel({
               </div>
               <div className="mt-3 grid gap-2">
                 {summary.byMonth.slice(-4).map((point) => (
-                  <div key={point.monthIso} className="flex items-center justify-between rounded-xl border border-white/8 bg-black/10 px-3 py-2 text-xs">
-                    <span className="text-white/80">{formatMonth(point.monthIso)}</span>
-                    <span className="text-white/60">{point.count} leads</span>
+                  <div key={point.monthIso} className="flex items-center justify-between rounded-xl border border-[var(--line)] bg-black/10 px-3 py-2 text-xs">
+                    <span className="text-[var(--t2)]">{formatMonth(point.monthIso)}</span>
+                    <span className="text-[var(--t2)]">{point.count} leads</span>
                   </div>
                 ))}
               </div>

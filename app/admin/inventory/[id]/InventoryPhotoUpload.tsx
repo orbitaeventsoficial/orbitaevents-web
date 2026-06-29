@@ -225,7 +225,7 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
           className={`aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all ${
             dragActive
               ? 'admin-tone-border-info admin-tone-bg-info'
-              : 'border-[var(--line)] bg-[var(--panel)] hover:border-white/20'
+              : 'border-[var(--line)] bg-[var(--panel)] hover:border-[var(--line)]'
           }`}
         >
           {uploading ? (

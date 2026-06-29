@@ -14,7 +14,7 @@ const STATUS_TONE: Record<PlaybookActionStatus, string> = {
   DONE: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
   PENDING: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
   OVERDUE: 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger',
-  NOT_APPLICABLE: 'border-[var(--line)] bg-[var(--panel)] text-white/40',
+  NOT_APPLICABLE: 'border-[var(--line)] bg-[var(--panel)] text-[var(--t3)]',
 };
 
 const STATUS_ICON: Record<PlaybookActionStatus, string> = {
@@ -122,7 +122,7 @@ export default async function PlaybookPage() {
                 </div>
 
                 {/* Progress bar */}
-                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/5">
+                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[var(--raised)]">
                   <div
                     className={`h-full transition-all ${
                       item.progress === 100

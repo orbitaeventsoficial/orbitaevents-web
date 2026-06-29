@@ -23,6 +23,7 @@ import CountdownTimer from './CountdownTimer';
 import StarIcon from '@/app/components/public/StarIcon';
 import { toRgba, resolvePortalAccentHex } from '@/lib/clientPortalUtils';
 import PortalBottomNav from './PortalBottomNav';
+import { getClientPortalHiddenNavItems, getClientPortalVisibility } from '@/lib/clientPortalVisibility';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -251,18 +252,8 @@ export default async function ClientPortalPage({
     headline?: string;
     introMessage?: string;
     accentColor?: string;
-    showTimeline?: boolean;
-    showPayments?: boolean;
-    showDocuments?: boolean;
-    showPostEvent?: boolean;
-    showQuestionnaire?: boolean;
   };
-
-  const showTimeline = personalization.showTimeline ?? true;
-  const showPayments = personalization.showPayments ?? true;
-  const showDocuments = personalization.showDocuments ?? true;
-  const showPostEvent = personalization.showPostEvent ?? true;
-  const showQuestionnaire = personalization.showQuestionnaire ?? true;
+  const visibility = getClientPortalVisibility(access.personalization);
 
   let portalPhotos: { id: string; photoUrl: string; caption: string | null }[] = [];
   try {
@@ -528,7 +519,7 @@ export default async function ClientPortalPage({
           </SectionCard>
 
           {/* Payments */}
-          {showPayments && (
+          {visibility.payments && (
             <SectionCard icon={<IconCreditCard className="w-4 h-4" />} title={t.payments} accentHex={accentHex}>
               <p className="text-sm text-white/50 mb-4">{getPaymentNoticeMessage(t, paymentSummary.notice)}</p>
               <div className="grid gap-3 sm:grid-cols-2 mb-4">
@@ -574,7 +565,7 @@ export default async function ClientPortalPage({
           )}
 
           {/* Documents */}
-          {showDocuments && (
+          {visibility.documents && (
             <SectionCard icon={<IconFileText className="w-4 h-4" />} title={t.documents} accentHex={accentHex}>
               {contractSummary ? (
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-4 mb-3">
@@ -630,7 +621,7 @@ export default async function ClientPortalPage({
           )}
 
           {/* Timeline */}
-          {showTimeline && (
+          {visibility.timeline && (
             <SectionCard icon={<IconActivity className="w-4 h-4" />} title={t.timeline} accentHex={accentHex}>
               <div className="grid gap-3 sm:grid-cols-3 mb-4">
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
@@ -706,7 +697,7 @@ export default async function ClientPortalPage({
           )}
 
           {/* Questionnaire */}
-          {showQuestionnaire && activeQuestionnaire && (
+          {visibility.questionnaire && activeQuestionnaire && (
             <SectionCard icon={<IconClipboard className="w-4 h-4" />} title={t.questionnaireLabel} accentHex={accentHex}>
               <div className="mb-4 flex items-center gap-2">
                 {activeQuestionnaire.response ? (
@@ -727,7 +718,7 @@ export default async function ClientPortalPage({
           )}
 
           {/* Post-event */}
-          {showPostEvent && booking.status === 'COMPLETED' && (
+          {visibility.postEvent && booking.status === 'COMPLETED' && (
             <SectionCard icon={<StarIcon className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />} title={t.postEvent} accentHex={accentHex}>
               <p className="text-sm text-white/50">
                 {t.trackingStatus}: {(booking as Record<string, unknown>).clientFeedback ? t.feedbackSent : t.pendingClose}.
@@ -758,6 +749,7 @@ export default async function ClientPortalPage({
           contract: t.contract,
           gallery: t.navGallery,
         }}
+        hiddenItems={getClientPortalHiddenNavItems(visibility)}
       />
     </main>
   );

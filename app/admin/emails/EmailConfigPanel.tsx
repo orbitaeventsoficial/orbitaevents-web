@@ -156,7 +156,7 @@ export default function EmailConfigPanel() {
             saved
               ? 'border admin-tone-soft-success admin-tone-border-success admin-tone-text-success'
               : saving
-                ? 'border border-white/10 bg-white/5 text-white/30'
+                ? 'border border-[var(--line)] bg-[var(--raised)] text-[var(--t3)]'
                 : 'ap-btn ap-btn--primary justify-center'
           }`}
         >

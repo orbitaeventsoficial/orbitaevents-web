@@ -49,6 +49,8 @@ export async function POST(request: NextRequest) {
       videoUrl: data.videoUrl || undefined,
       allowGoogleShare: data.allowGoogleShare,
       consentPhotoPublication: data.consentPhotoPublication,
+      token: data.token,
+      bookingRef: data.bookingRef,
     });
 
     return NextResponse.json({

@@ -41,7 +41,7 @@ export function InventoryToolbar({
         className={`px-3 py-2 text-xs font-medium transition-colors ${
           viewMode === 'list'
             ? 'admin-tone-bg-info admin-tone-text-info'
-            : 'bg-white/5 text-white/40 hover:bg-white/10'
+            : 'bg-[var(--raised)] text-[var(--t3)] hover:bg-[var(--raised)]'
         }`}
       >
         Llista
@@ -54,7 +54,7 @@ export function InventoryToolbar({
         className={`px-3 py-2 text-xs font-medium transition-colors ${
           viewMode === 'grid'
             ? 'admin-tone-bg-info admin-tone-text-info'
-            : 'bg-white/5 text-white/40 hover:bg-white/10'
+            : 'bg-[var(--raised)] text-[var(--t3)] hover:bg-[var(--raised)]'
         }`}
       >
         Graella
@@ -97,7 +97,7 @@ function InventoryKpiCard({ label, value }: { label: string; value: string }) {
 
 function InventoryPackLinks({ item, compact = false }: { item: InventoryItem; compact?: boolean }) {
   if (item.packItems.length === 0) {
-    return <span className="text-xs text-white/40">Sense pack</span>;
+    return <span className="text-xs text-[var(--t3)]">Sense pack</span>;
   }
 
   return (
@@ -112,7 +112,7 @@ function InventoryPackLinks({ item, compact = false }: { item: InventoryItem; co
         </Link>
       ))}
       {item.packItems.length > 4 && (
-        <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-xs font-semibold text-white/70">
+        <span className="inline-flex items-center rounded-full border border-[var(--line)] bg-[var(--raised)] px-2 py-0.5 text-xs font-semibold text-[var(--t2)]">
           +{item.packItems.length - 4}
         </span>
       )}
@@ -223,7 +223,7 @@ export function InventoryBundlesSection(props: InventoryBundlesSectionProps) {
                   <button
                     type="button"
                     onClick={() => removeItemFromBundle(item.id)}
-                    className="px-2 py-1 rounded-lg hover:bg-white/10 transition-colors"
+                    className="px-2 py-1 rounded-lg hover:bg-[var(--raised)] transition-colors"
                   >
                     Treure
                   </button>
@@ -272,7 +272,7 @@ export function InventoryHealthFocus({ activeHealthLabel }: { activeHealthLabel:
           <p className="text-xs font-semibold uppercase tracking-wide admin-tone-text-info">
             Focus de salut
           </p>
-          <p className="mt-1 text-sm text-white/80">{activeHealthLabel}</p>
+          <p className="mt-1 text-sm text-[var(--t2)]">{activeHealthLabel}</p>
         </div>
         <Link href="/admin/inventory" className="ap-btn ap-btn--secondary text-sm">
           Veure tot l’inventari
@@ -411,7 +411,7 @@ export function InventoryGridSection({ displayedItems }: { displayedItems: Inven
                   Resten aprox. {Math.max(0, (item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS) - item.totalHoursUsed).toFixed(0)}h útils
                 </p>
               )}
-              <div className="h-1.5 w-full rounded-full bg-white/10">
+              <div className="h-1.5 w-full rounded-full bg-[var(--raised)]">
                 <div
                   className={`h-1.5 rounded-full ${lifePercent > 40 ? 'admin-tone-bg-success' : lifePercent > 5 ? 'admin-tone-bg-warning' : 'admin-tone-bg-danger'}`}
                   style={{ width: `${Math.max(lifePercent, 3)}%` }}
@@ -460,7 +460,7 @@ export function InventoryMobileListSection({
             <div className="mt-3 flex items-center justify-between gap-2">
               <div className="flex flex-wrap items-center gap-2 min-w-0">
                 <span className="inline-flex items-center gap-1 text-xs opacity-70">{catConf.icon} {catConf.label}</span>
-                <span className="inline-flex items-center rounded-full bg-white/10 px-2 py-0.5 text-xs font-medium">{condLabel}</span>
+                <span className="inline-flex items-center rounded-full bg-[var(--raised)] px-2 py-0.5 text-xs font-medium">{condLabel}</span>
                 {item.watts ? <span className="text-xs opacity-60">{item.watts}W</span> : null}
               </div>
               <div className="mt-2"><InventoryPackLinks item={item} compact /></div>
@@ -470,7 +470,7 @@ export function InventoryMobileListSection({
                     <option key={st} value={st}>{STATUS_CONFIG[st].label}</option>
                   ))}
                 </select>
-                <Link href={buildInventoryHref(item.id)} className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl px-3 text-xs font-medium transition-colors bg-white/5 hover:bg-white/10">
+                <Link href={buildInventoryHref(item.id)} className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl px-3 text-xs font-medium transition-colors bg-[var(--raised)] hover:bg-[var(--raised)]">
                   Fitxa
                 </Link>
               </div>
@@ -528,7 +528,7 @@ export function InventoryDesktopTableSection({
                     <div className="text-xs space-y-1">
                       <p>{item.totalHoursUsed > 0 ? `${item.totalHoursUsed}h` : '—'}</p>
                       {item.purchasePrice && <p>↓ {Math.max(0, (item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS) - item.totalHoursUsed).toFixed(0)}h restants</p>}
-                      <div className="h-1 w-full rounded-full bg-white/10 max-w-[80px]">
+                      <div className="h-1 w-full rounded-full bg-[var(--raised)] max-w-[80px]">
                         <div className={`h-1 rounded-full ${tableLifePct > 40 ? 'admin-tone-bg-success' : tableLifePct > 5 ? 'admin-tone-bg-warning' : 'admin-tone-bg-danger'}`} style={{ width: `${Math.max(tableLifePct, 5)}%` }} />
                       </div>
                     </div>

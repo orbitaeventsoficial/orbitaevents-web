@@ -23,7 +23,7 @@ type PackFocus = 'alert' | 'critical-margin' | 'missing-capacity' | 'partial-cos
 
 function renderPackInventoryPreview(pack: Awaited<ReturnType<typeof getPacks>>[number]) {
   if (pack.inventory.length === 0) {
-    return <p className="text-xs text-white/40">Sense equip base assignat</p>;
+    return <p className="text-xs text-[var(--t3)]">Sense equip base assignat</p>;
   }
 
   return (
@@ -39,12 +39,12 @@ function renderPackInventoryPreview(pack: Awaited<ReturnType<typeof getPacks>>[n
           </span>
         ))}
         {pack.inventory.length > 4 && (
-          <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-xs font-semibold text-white/70">
+          <span className="inline-flex items-center rounded-full border border-[var(--line)] bg-[var(--raised)] px-2 py-0.5 text-xs font-semibold text-[var(--t2)]">
             +{pack.inventory.length - 4} més
           </span>
         )}
       </div>
-      <p className="text-xs text-white/55">
+      <p className="text-xs text-[var(--t3)]">
         {pack.inventory.filter((row) => row.isRequired).length} obligatoris · {pack.inventory.reduce((sum, row) => sum + Math.max(1, row.quantity), 0)} unitats totals
       </p>
     </div>
@@ -277,7 +277,7 @@ export default async function PacksPage({
         </Link>
         <Link
           href="/admin/packs/extras"
-          className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/60 hover:bg-white/10"
+          className="inline-flex items-center rounded-full border border-[var(--line)] bg-[var(--raised)] px-4 py-2 text-sm font-medium text-[var(--t2)] hover:bg-[var(--raised)]"
         >
           Extres
         </Link>
@@ -334,7 +334,7 @@ export default async function PacksPage({
                   className={`rounded-2xl border admin-card-glass overflow-hidden ${
                     pack.isFeatured
                       ? 'ring-1 admin-tone-border-warning'
-                      : 'border-white/10'
+                      : 'border-[var(--line)]'
                   }`}
                 >
                   <div className="p-4 border-b">
@@ -448,8 +448,8 @@ export default async function PacksPage({
                     </div>
                     <div className="ap-card p-3 text-xs">
                       <div className="mb-2 flex items-center justify-between gap-2">
-                        <span className="font-semibold text-white/80">Equip del pack</span>
-                        <span className="text-white/55">{pack.inventory.length} elements</span>
+                        <span className="font-semibold text-[var(--t2)]">Equip del pack</span>
+                        <span className="text-[var(--t3)]">{pack.inventory.length} elements</span>
                       </div>
                       {renderPackInventoryPreview(pack)}
                     </div>
@@ -458,13 +458,13 @@ export default async function PacksPage({
                   <div className="px-4 py-3 border-t flex gap-2">
                     <Link
                       href={buildPackHref(pack.id)}
-                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-[var(--line)] bg-[var(--raised)] hover:bg-[var(--raised)] transition-colors"
                     >
                       ✏️ Editar
                     </Link>
                     <Link
                       href={buildPackHref(pack.id, 'content')}
-                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-[var(--line)] bg-[var(--raised)] hover:bg-[var(--raised)] transition-colors"
                     >
                       📦 Equip
                     </Link>
@@ -498,7 +498,7 @@ export default async function PacksPage({
                   className={`rounded-2xl border admin-card-glass overflow-hidden ${
                     pack.isFeatured
                       ? 'ring-1 admin-tone-border-warning'
-                      : 'border-white/10'
+                      : 'border-[var(--line)]'
                   }`}
                 >
                   <div className="p-4 border-b">
@@ -612,8 +612,8 @@ export default async function PacksPage({
                     </div>
                     <div className="ap-card p-3 text-xs">
                       <div className="mb-2 flex items-center justify-between gap-2">
-                        <span className="font-semibold text-white/80">Equip del pack</span>
-                        <span className="text-white/55">{pack.inventory.length} elements</span>
+                        <span className="font-semibold text-[var(--t2)]">Equip del pack</span>
+                        <span className="text-[var(--t3)]">{pack.inventory.length} elements</span>
                       </div>
                       {renderPackInventoryPreview(pack)}
                     </div>
@@ -622,13 +622,13 @@ export default async function PacksPage({
                   <div className="px-4 py-3 border-t flex gap-2">
                     <Link
                       href={buildPackHref(pack.id)}
-                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-[var(--line)] bg-[var(--raised)] hover:bg-[var(--raised)] transition-colors"
                     >
                       ✏️ Editar
                     </Link>
                     <Link
                       href={buildPackHref(pack.id, 'content')}
-                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-[var(--line)] bg-[var(--raised)] hover:bg-[var(--raised)] transition-colors"
                     >
                       📦 Equip
                     </Link>

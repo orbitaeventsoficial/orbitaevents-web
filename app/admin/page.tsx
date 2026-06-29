@@ -408,7 +408,7 @@ export default async function AdminDashboard() {
             <p className="text-sm opacity-50">
               de {formatCurrency(d.revenueTarget)} objectiu
             </p>
-            <div className="w-full h-2 rounded-full bg-white/5 overflow-hidden mt-2">
+            <div className="w-full h-2 rounded-full bg-[var(--raised)] overflow-hidden mt-2">
               <div
                 className={`h-full rounded-full admin-progress-animated ${
                   d.revenueMonthPct >= 100 ? 'bg-[var(--o-success)]' : d.revenueMonthPct >= 60 ? 'bg-[var(--o-warning)]' : 'bg-[var(--o-danger)]'
@@ -585,7 +585,7 @@ export default async function AdminDashboard() {
       {/* ─── Insights narratius ─────────────────────────────────────── */}
       {insights.length > 0 && (
         <div className="ap-card p-5 space-y-3">
-          <p className="text-xs font-bold text-white/50 uppercase tracking-wider mb-2">Què necessites saber avui</p>
+          <p className="text-xs font-bold text-[var(--t3)] uppercase tracking-wider mb-2">Què necessites saber avui</p>
           {insights.map((insight) => (
               <div key={insight.id} className={`flex items-start gap-3 px-4 py-3 rounded-xl border ${ADMIN_DASHBOARD_INSIGHT_COLORS[insight.type] || ''}`}>
                 <span className="text-lg flex-shrink-0">{insight.icon}</span>
@@ -678,8 +678,8 @@ export default async function AdminDashboard() {
                       <Link key={item.id} href={item.href} className="flex items-start gap-2 rounded-lg px-3 py-2 transition-colors adm-row-hover" data-help-title={item.title} data-help-desc={item.reason}>
                         <span className={`mt-0.5 inline-block w-2 h-2 rounded-full shrink-0 ${item.status === 'critical' ? 'bg-[var(--o-danger)]' : 'bg-[var(--o-warning)]'}`} />
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-white/90 truncate">{item.title}</p>
-                          <p className="text-xs text-white/50 line-clamp-1">{item.reason}</p>
+                          <p className="text-sm font-medium text-[var(--t)] truncate">{item.title}</p>
+                          <p className="text-xs text-[var(--t3)] line-clamp-1">{item.reason}</p>
                         </div>
                       </Link>
                     ))}

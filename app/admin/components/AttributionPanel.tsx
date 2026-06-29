@@ -132,7 +132,7 @@ function JourneyCard({ journey }: { journey: LeadJourney }) {
 
 function EmptyState({ hasLeads }: { hasLeads: boolean }) {
   return (
-    <div className="ap-card p-4 text-sm text-white/65">
+    <div className="ap-card p-4 text-sm text-[var(--t2)]">
       {hasLeads
         ? 'Hi ha leads al període, però encara no hi ha conversions guanyades per construir el journey multi-touch.'
         : 'Sense leads al període. Quan entrin conversions, aquí es veurà quin canal obre, acompanya i tanca cada venda.'}
@@ -165,7 +165,7 @@ export default function AttributionPanel({ report }: { report: MultiTouchReport 
             Llegeix quin canal obre el lead, quin el manté viu i quin acaba tancant la venda als últims {report.windowDays} dies.
           </p>
         </div>
-        <div className="ap-card px-3 py-2 text-xs text-white/65">
+        <div className="ap-card px-3 py-2 text-xs text-[var(--t2)]">
           {report.totalLeads} leads analitzats · {report.wonLeads} guanyats
         </div>
       </div>
@@ -188,13 +188,13 @@ export default function AttributionPanel({ report }: { report: MultiTouchReport 
         </div>
         <div className="ap-card p-3">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-55">Journey mitjà</p>
-          <p className="mt-1 text-lg font-bold text-white">{avgJourneyTouches > 0 ? avgJourneyTouches : '—'}</p>
+          <p className="mt-1 text-lg font-bold text-[var(--t)]">{avgJourneyTouches > 0 ? avgJourneyTouches : '—'}</p>
           <p className="mt-1 text-xs opacity-55">{hasWins ? 'touchpoints per venda guanyada' : 'pendent de conversions'}</p>
         </div>
       </div>
 
-      <div className="rounded-xl border admin-tone-border-cyan admin-tone-bg-cyan p-4 text-sm leading-relaxed text-white/75">
-        <span className="font-semibold text-white/95">Veredicte:</span> {report.verdict}
+      <div className="rounded-xl border admin-tone-border-cyan admin-tone-bg-cyan p-4 text-sm leading-relaxed text-[var(--t2)]">
+        <span className="font-semibold text-[var(--t)]">Veredicte:</span> {report.verdict}
       </div>
 
       {!hasWins ? (
@@ -205,8 +205,8 @@ export default function AttributionPanel({ report }: { report: MultiTouchReport 
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Mapa de crèdit</p>
-                  <h3 className="mt-1 text-base font-semibold text-white/90">Qui obre, qui escalfa i qui tanca</h3>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--t3)]">Mapa de crèdit</p>
+                  <h3 className="mt-1 text-base font-semibold text-[var(--t)]">Qui obre, qui escalfa i qui tanca</h3>
                 </div>
                 <div className="flex flex-wrap gap-2 text-xs">
                   <span className="rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-1 admin-tone-text-cyan">First touch</span>
@@ -223,10 +223,10 @@ export default function AttributionPanel({ report }: { report: MultiTouchReport 
 
             <div className="space-y-3">
               <div className="ap-card p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Lectures clau</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--t3)]">Lectures clau</p>
                 <div className="mt-3 space-y-2">
                   {(report.insights.length > 0 ? report.insights : ['Encara no hi ha prou varietat de touchpoints per extreure una lectura més fina.']).map((insight) => (
-                    <div key={insight} className="ap-card px-3 py-2 text-sm text-white/75">
+                    <div key={insight} className="ap-card px-3 py-2 text-sm text-[var(--t2)]">
                       {insight}
                     </div>
                   ))}
@@ -234,7 +234,7 @@ export default function AttributionPanel({ report }: { report: MultiTouchReport 
               </div>
 
               <div className="ap-card p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Snapshot ràpid</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--t3)]">Snapshot ràpid</p>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
                   <div className="admin-cr-mini-card admin-cr-card-pad">
                     <p className="text-xs uppercase tracking-wider opacity-50">Canals actius</p>
@@ -263,8 +263,8 @@ export default function AttributionPanel({ report }: { report: MultiTouchReport 
 
           <div className="space-y-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Journeys recents</p>
-              <h3 className="mt-1 text-base font-semibold text-white/90">Mostra curta de vendes guanyades</h3>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--t3)]">Journeys recents</p>
+              <h3 className="mt-1 text-base font-semibold text-[var(--t)]">Mostra curta de vendes guanyades</h3>
             </div>
             <div className="grid gap-3 lg:grid-cols-2">
               {report.journeys.slice(0, 4).map((journey) => (

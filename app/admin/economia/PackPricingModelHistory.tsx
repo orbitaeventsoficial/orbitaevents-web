@@ -113,7 +113,7 @@ export default function PackPricingModelHistory({ entries }: { entries: PackHist
           <p className="text-sm">Encara no hi ha versions desades del model de packs.</p>
         ) : (
           filteredEntries.map((entry) => (
-            <div key={entry.id} className="rounded-xl border border-white/10 p-3">
+            <div key={entry.id} className="rounded-xl border border-[var(--line)] p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold">{formatDateTimeFull(entry.createdAt)}</p>
                 <button

@@ -1,6 +1,18 @@
-import { describe, it, expect } from 'vitest';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
+
+const { mockPrisma } = vi.hoisted(() => ({
+  mockPrisma: {
+    customer: {
+      findMany: vi.fn(),
+    },
+  },
+}));
+
+vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
+
 import {
   generateReactivationCandidates,
+  loadReactivationCandidates,
   type ReactivationInput,
 } from '@/lib/services/reactivationService';
 
@@ -29,6 +41,11 @@ function makeCustomer(overrides: Partial<Customer> = {}): Customer {
     ...overrides,
   };
 }
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  mockPrisma.customer.findMany.mockResolvedValue([]);
+});
 
 describe('generateReactivationCandidates', () => {
   it('retorna array buit sense clients', () => {
@@ -240,5 +257,19 @@ describe('generateReactivationCandidates', () => {
       now: NOW,
     });
     expect(result[0].daysSinceLastEvent).toBe(200);
+  });
+});
+
+describe('loadReactivationCandidates', () => {
+  it('exclou clients fusionats del pipeline de reactivació', async () => {
+    await loadReactivationCandidates(NOW);
+
+    expect(mockPrisma.customer.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          mergedIntoId: null,
+        }),
+      })
+    );
   });
 });

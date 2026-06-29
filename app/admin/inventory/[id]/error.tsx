@@ -31,7 +31,7 @@ export default function InventoryDetailError({
           </button>
           <Link
             href="/admin/inventory"
-            className="px-4 py-2 rounded-xl bg-white/5 text-sm font-semibold hover:bg-white/10 border border-white/10"
+            className="px-4 py-2 rounded-xl bg-[var(--raised)] text-sm font-semibold hover:bg-[var(--raised)] border border-[var(--line)]"
           >
             Tornar a inventari
           </Link>

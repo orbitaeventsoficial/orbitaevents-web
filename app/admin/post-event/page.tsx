@@ -42,7 +42,7 @@ async function getPostEventData() {
       prisma.postEventReport.count({
         where: { status: 'DRAFT' },
       }),
-      // Enquestes pendents d'enviar
+      // Enquestes sense resposta
       prisma.booking.count({
         where: {
           status: 'COMPLETED',
@@ -107,6 +107,15 @@ export default async function PostEventPage() {
       numberTone: 'admin-tone-soft-success admin-tone-border-success admin-tone-text-success',
       items: ['💌 Missatge personalitzat', '📸 Foto icònica', '🎁 Codi descompte 10%', '👥 Per referits'],
     },
+    {
+      number: 4,
+      title: 'Playbook',
+      subtitle: 'Checklist de tancament',
+      href: '/admin/post-event/playbook',
+      cta: 'Obrir playbook',
+      numberTone: 'admin-tone-soft-cyan admin-tone-border-cyan admin-tone-text-cyan',
+      items: ['✅ Agraïment', '⭐ Testimoni aprovat', '📣 Publicació social', '👥 Referral'],
+    },
   ] as const;
 
   const bookingsWithoutReport = data.recentBookings.length;
@@ -136,7 +145,7 @@ export default async function PostEventPage() {
     manualItems.push(`${data.pendingReports} informes en esborrany per completar`);
   }
   if (data.pendingSurveys > 0) {
-    manualItems.push(`${data.pendingSurveys} enquestes encara sense enviar al client`);
+    manualItems.push(`${data.pendingSurveys} enquestes encara sense resposta del client`);
   }
 
 
@@ -149,9 +158,9 @@ export default async function PostEventPage() {
           <p className="ap-kpi-meta">Esborrany</p>
         </div>
         <div className="ap-kpi ap-kpi--info">
-          <p className="ap-kpi-label">Enquestes per enviar <InfoTooltip text="Esdeveniments completats on el client encara no ha rebut l'enquesta de satisfacció." /></p>
+          <p className="ap-kpi-label">Enquestes sense resposta <InfoTooltip text="Esdeveniments completats on encara no consta cap resposta d'enquesta del client." /></p>
           <p className="ap-kpi-value">{data.pendingSurveys}</p>
-          <p className="ap-kpi-meta">Sense enquesta enviada</p>
+          <p className="ap-kpi-meta">Sense resposta rebuda</p>
         </div>
         <div className="ap-kpi ap-kpi--success">
           <p className="ap-kpi-label">Informes completats <InfoTooltip text="Informes interns ja tancats. Serveixen per avaluar com va anar l'event i millorar." /></p>
@@ -163,7 +172,7 @@ export default async function PostEventPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-3">
+      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         {workflowSteps.map((step) => (
           <article key={step.number} className="ap-card overflow-hidden rounded-2xl p-0">
             <div className="border-b p-4 admin-tone-border-neutral">

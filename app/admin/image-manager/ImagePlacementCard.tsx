@@ -182,7 +182,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
   const dropzoneClasses = `
     relative flex cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed
     transition-colors
-    ${dragOver ? 'border-amber-400 bg-amber-500/10' : 'border-white/15 bg-[var(--sunk)] hover:border-white/30'}
+    ${dragOver ? 'border-amber-400 bg-amber-500/10' : 'border-[var(--line)] bg-[var(--sunk)] hover:border-[var(--line)]'}
     ${isCollection && hasItems ? 'h-28' : 'h-40'}
   `;
 
@@ -190,12 +190,12 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
     <article className="rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-5">
       <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
         <div>
-          <h2 className="ap-h2 text-white">{placement.label}</h2>
-          <p className="mt-1 text-sm text-white/60">{placement.description}</p>
-          <div className="mt-2 flex flex-wrap gap-2 text-xs text-white/45">
-            <span className="rounded-full border border-white/10 px-3 py-1">{placement.key}</span>
-            <span className="rounded-full border border-white/10 px-3 py-1">{placement.kind}</span>
-            <span className={`rounded-full px-3 py-1 ${hasItems ? 'border border-amber-400/30 bg-amber-500/10 text-amber-300' : 'border border-white/10 text-white/45'}`}>
+          <h2 className="ap-h2 text-[var(--t)]">{placement.label}</h2>
+          <p className="mt-1 text-sm text-[var(--t2)]">{placement.description}</p>
+          <div className="mt-2 flex flex-wrap gap-2 text-xs text-[var(--t3)]">
+            <span className="rounded-full border border-[var(--line)] px-3 py-1">{placement.key}</span>
+            <span className="rounded-full border border-[var(--line)] px-3 py-1">{placement.kind}</span>
+            <span className={`rounded-full px-3 py-1 ${hasItems ? 'border border-amber-400/30 bg-amber-500/10 text-amber-300' : 'border border-[var(--line)] text-[var(--t3)]'}`}>
               {hasItems ? `manual · ${items.length} asset${items.length > 1 ? 's' : ''}` : 'auto'}
             </span>
           </div>
@@ -204,7 +204,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
           <button
             type="button"
             onClick={handleSetAuto}
-            className="rounded-full border border-white/10 px-4 py-2 text-xs font-semibold text-white/70 hover:bg-white/5"
+            className="rounded-full border border-[var(--line)] px-4 py-2 text-xs font-semibold text-[var(--t2)] hover:bg-[var(--raised)]"
           >
             Tornar a auto
           </button>
@@ -214,7 +214,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
       {isCollection && hasItems && (
         <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {items.map((item, idx) => (
-            <div key={item.id} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[var(--sunk)]">
+            <div key={item.id} className="group relative overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--sunk)]">
               <div className="relative h-32">
                 <Image
                   src={item.src}
@@ -227,12 +227,12 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
               <div className="flex items-center justify-between gap-1 p-2">
                 <div className="flex gap-1">
                   {idx > 0 && (
-                    <button type="button" onClick={() => handleMoveItem(item.id, -1)} className="rounded px-1.5 py-0.5 text-xs text-white/50 hover:bg-white/10" aria-label="Moure amunt">
+                    <button type="button" onClick={() => handleMoveItem(item.id, -1)} className="rounded px-1.5 py-0.5 text-xs text-[var(--t3)] hover:bg-[var(--raised)]" aria-label="Moure amunt">
                       â†
                     </button>
                   )}
                   {idx < items.length - 1 && (
-                    <button type="button" onClick={() => handleMoveItem(item.id, 1)} className="rounded px-1.5 py-0.5 text-xs text-white/50 hover:bg-white/10" aria-label="Moure avall">
+                    <button type="button" onClick={() => handleMoveItem(item.id, 1)} className="rounded px-1.5 py-0.5 text-xs text-[var(--t3)] hover:bg-[var(--raised)]" aria-label="Moure avall">
                       â†’
                     </button>
                   )}
@@ -241,7 +241,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
                   <button
                     type="button"
                     onClick={() => setEditAlt(editAlt === item.id ? null : item.id)}
-                    className="rounded px-1.5 py-0.5 text-xs text-white/50 hover:bg-white/10"
+                    className="rounded px-1.5 py-0.5 text-xs text-[var(--t3)] hover:bg-[var(--raised)]"
                     aria-label="Editar alt"
                   >
                     alt
@@ -270,7 +270,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
 
       {!isCollection && hasItems && (
         <div className="mb-4 grid gap-4 lg:grid-cols-[180px_1fr]">
-          <div className="relative h-40 overflow-hidden rounded-2xl border border-white/10 bg-[var(--sunk)]">
+          <div className="relative h-40 overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--sunk)]">
             <Image
               src={items[0].src}
               alt={items[0].alt || placement.label}
@@ -288,18 +288,18 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
             </button>
           </div>
           <div className="space-y-3">
-            <div className="text-xs text-white/40">
+            <div className="text-xs text-[var(--t3)]">
               {items[0].mimeType && <span className="mr-3">{items[0].mimeType}</span>}
               {items[0].width && items[0].height && <span className="mr-3">{items[0].width}×{items[0].height}</span>}
               {items[0].sizeBytes && <span>{Math.round(items[0].sizeBytes / 1024)} KB</span>}
             </div>
-            <label className="block space-y-1 text-sm text-white/70">
+            <label className="block space-y-1 text-sm text-[var(--t2)]">
               <span>Alt text</span>
               <div className="flex gap-2">
                 <input
                   defaultValue={items[0].alt || ''}
                   placeholder="Text alternatiu"
-                  className="flex-1 rounded-2xl border border-white/10 bg-[var(--sunk)] px-4 py-2.5 text-sm text-white outline-none placeholder:text-white/35"
+                  className="flex-1 rounded-2xl border border-[var(--line)] bg-[var(--sunk)] px-4 py-2.5 text-sm text-[var(--t)] outline-none placeholder:text-[var(--t3)]"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       handleSaveAlt(items[0].id, (e.target as HTMLInputElement).value);
@@ -312,7 +312,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
                     const input = (e.currentTarget.parentElement?.querySelector('input') as HTMLInputElement);
                     if (input) handleSaveAlt(items[0].id, input.value);
                   }}
-                  className="rounded-2xl border border-white/10 px-4 py-2 text-xs font-semibold text-white/70 hover:bg-white/5"
+                  className="rounded-2xl border border-[var(--line)] px-4 py-2 text-xs font-semibold text-[var(--t2)] hover:bg-[var(--raised)]"
                 >
                   Desar
                 </button>
@@ -350,7 +350,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
         {uploading ? (
           <span className="text-sm text-amber-300 animate-pulse">Pujant i processant...</span>
         ) : (
-          <span className="text-sm text-white/40">
+          <span className="text-sm text-[var(--t3)]">
             {hasItems && isCollection
               ? 'Arrossega o clica per afegir una imatge'
               : hasItems
@@ -366,12 +366,12 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
 function AltEditor({ initial, onSave, onCancel }: { initial: string; onSave: (v: string) => void; onCancel: () => void }) {
   const [value, setValue] = useState(initial);
   return (
-    <div className="flex gap-1 border-t border-white/10 p-2">
+    <div className="flex gap-1 border-t border-[var(--line)] p-2">
       <input
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="Alt text"
-        className="flex-1 rounded-lg border border-white/10 bg-[var(--sunk)] px-2 py-1 text-xs text-white outline-none placeholder:text-white/30"
+        className="flex-1 rounded-lg border border-[var(--line)] bg-[var(--sunk)] px-2 py-1 text-xs text-[var(--t)] outline-none placeholder:text-[var(--t3)]"
         autoFocus
         onKeyDown={(e) => {
           if (e.key === 'Enter') onSave(value);

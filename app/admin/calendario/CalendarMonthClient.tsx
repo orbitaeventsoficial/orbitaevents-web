@@ -296,7 +296,7 @@ export default function CalendarMonthClient() {
           <button
             type="button"
             onClick={() => setMonthYear((prev) => addMonths(prev, -1))}
-            className="inline-flex min-h-[40px] items-center rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10 active:scale-[0.98]"
+            className="inline-flex min-h-[40px] items-center rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-[var(--raised)] active:scale-[0.98]"
           >
             ← Anterior
           </button>
@@ -315,7 +315,7 @@ export default function CalendarMonthClient() {
           <button
             type="button"
             onClick={() => setMonthYear((prev) => addMonths(prev, 1))}
-            className="inline-flex min-h-[40px] items-center rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10 active:scale-[0.98]"
+            className="inline-flex min-h-[40px] items-center rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-[var(--raised)] active:scale-[0.98]"
           >
             Mes següent →
           </button>
@@ -326,14 +326,14 @@ export default function CalendarMonthClient() {
             <button
               type="button"
               onClick={() => router.push('/admin/calendario?view=week')}
-              className="inline-flex min-h-[40px] flex-1 items-center justify-center border-r px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10 sm:flex-none"
+              className="inline-flex min-h-[40px] flex-1 items-center justify-center border-r px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-[var(--raised)] sm:flex-none"
             >
               Setmana
             </button>
             <button
               type="button"
               onClick={() => router.push('/admin/calendario?view=day')}
-              className="inline-flex min-h-[40px] flex-1 items-center justify-center px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10 sm:flex-none"
+              className="inline-flex min-h-[40px] flex-1 items-center justify-center px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-[var(--raised)] sm:flex-none"
             >
               Dia
             </button>
@@ -376,7 +376,7 @@ export default function CalendarMonthClient() {
             key={key}
             type="button"
             onClick={() => toggleLayer(key as 'leads' | 'bookings' | 'blocks' | 'tasks' | 'social' | 'followUps')}
-            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-white/10 border-white/20' : 'border-white/10 opacity-45'}`}
+            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-[var(--raised)] border-[var(--line)]' : 'border-[var(--line)] opacity-45'}`}
           >
             {label}
           </button>
@@ -460,7 +460,7 @@ export default function CalendarMonthClient() {
       <div className="flex flex-wrap items-center gap-3 sm:gap-4 rounded-xl admin-card-glass border px-3 sm:px-4 py-2 text-sm" {...helpAttrs(ADMIN_CALENDAR_HELP.legend)}>
         <span className="font-medium">Llegenda:</span>
         <div className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-sm bg-white/15 border border-white/20" />
+          <span className="h-3 w-3 rounded-sm bg-[var(--raised)] border border-[var(--line)]" />
           <span className="text-xs sm:text-sm">Lliure</span>
         </div>
         <div className="flex items-center gap-1.5">

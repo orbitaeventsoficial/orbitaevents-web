@@ -13,7 +13,7 @@ export default async function QuestionnairesPage() {
   return (
     <AdminPage title="Qüestionaris pre-event">
       <div className="flex items-center justify-between mb-6">
-        <p className="text-sm text-white/50">
+        <p className="text-sm text-[var(--t3)]">
           {templates.length === 0
             ? 'Crea el primer qüestionari que els clients veuran al portal.'
             : `${templates.length} plantill${templates.length === 1 ? 'a' : 'es'}`}
@@ -27,7 +27,7 @@ export default async function QuestionnairesPage() {
       </div>
 
       {templates.length === 0 ? (
-        <div className="ap-card p-8 text-center text-sm text-white/40">
+        <div className="ap-card p-8 text-center text-sm text-[var(--t3)]">
           Cap qüestionari creat encara.
         </div>
       ) : (
@@ -39,21 +39,21 @@ export default async function QuestionnairesPage() {
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="font-semibold text-white truncate">{tpl.title}</p>
+                  <p className="font-semibold text-[var(--t)] truncate">{tpl.title}</p>
                   {tpl.isActive ? (
                     <span className="shrink-0 rounded-full admin-tone-bg-success px-2 py-0.5 text-xs admin-tone-text-success">
                       Actiu
                     </span>
                   ) : (
-                    <span className="shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/40">
+                    <span className="shrink-0 rounded-full bg-[var(--raised)] px-2 py-0.5 text-xs text-[var(--t3)]">
                       Inactiu
                     </span>
                   )}
                 </div>
                 {tpl.description && (
-                  <p className="mt-0.5 text-sm text-white/50 truncate">{tpl.description}</p>
+                  <p className="mt-0.5 text-sm text-[var(--t3)] truncate">{tpl.description}</p>
                 )}
-                <p className="mt-1 text-xs text-white/30">
+                <p className="mt-1 text-xs text-[var(--t3)]">
                   {tpl.questions.length} pregunt{tpl.questions.length === 1 ? 'a' : 'es'}
                 </p>
               </div>

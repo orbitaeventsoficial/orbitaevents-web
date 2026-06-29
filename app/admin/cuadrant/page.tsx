@@ -69,7 +69,7 @@ export default async function CuadrantPage({ searchParams }: { searchParams: { d
               className={`rounded-lg border px-2.5 py-1 text-xs font-semibold transition-colors ${
                 days === w.days
                   ? 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan'
-                  : 'border-[var(--line)] bg-[var(--panel)] text-white/60 adm-row-hover'
+                  : 'border-[var(--line)] bg-[var(--panel)] text-[var(--t2)] adm-row-hover'
               }`}
             >
               {w.label}
@@ -127,7 +127,7 @@ export default async function CuadrantPage({ searchParams }: { searchParams: { d
               >
                 <div className="mb-2 flex items-center justify-between">
                   <h3 className="flex items-center gap-2 text-sm font-bold">
-                    <span className={`inline-block h-2 w-2 rounded-full ${person.isOwner ? 'bg-[var(--o-info)]' : 'bg-white/40'}`} />
+                    <span className={`inline-block h-2 w-2 rounded-full ${person.isOwner ? 'bg-[var(--o-info)]' : 'bg-[var(--raised)]'}`} />
                     {person.personName}
                     {person.isOwner && <span className="text-xs font-normal opacity-50">(tu)</span>}
                   </h3>
@@ -159,7 +159,7 @@ export default async function CuadrantPage({ searchParams }: { searchParams: { d
                               </span>
                             </div>
                             <div className="flex items-center gap-2 opacity-55">
-                              <span className="rounded bg-white/10 px-1.5 text-xs font-semibold uppercase tracking-wide">
+                              <span className="rounded bg-[var(--raised)] px-1.5 text-xs font-semibold uppercase tracking-wide">
                                 {KIND_LABEL[a.kind]}
                               </span>
                               <span className="truncate">{a.label}</span>

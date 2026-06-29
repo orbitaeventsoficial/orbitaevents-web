@@ -128,7 +128,7 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
               aria-label={item.checked ? `Desmarcar: ${item.label}` : `Marcar: ${item.label}`}
             >
               {item.checked && (
-                <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <svg className="h-3 w-3 text-[var(--t)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               )}

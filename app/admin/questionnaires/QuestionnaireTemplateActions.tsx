@@ -42,13 +42,13 @@ export default function QuestionnaireTemplateActions({
       <div className="flex shrink-0 flex-wrap gap-2">
         <Link
           href={buildQuestionnaireHref(id)}
-          className="inline-flex rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 hover:bg-white/5"
+          className="inline-flex rounded-lg border border-[var(--line)] px-3 py-1.5 text-xs text-[var(--t2)] hover:bg-[var(--raised)]"
         >
           Editar
         </Link>
         <button
           onClick={handleToggle}
-          className="inline-flex rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 hover:bg-white/5"
+          className="inline-flex rounded-lg border border-[var(--line)] px-3 py-1.5 text-xs text-[var(--t2)] hover:bg-[var(--raised)]"
           type="button"
         >
           {isActive ? 'Desactivar' : 'Activar'}

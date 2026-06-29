@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 const IDLE_BUTTON = 'w-full rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors admin-tone-idle';
-const DISABLED_BUTTON = 'w-full cursor-not-allowed rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/30';
+const DISABLED_BUTTON = 'w-full cursor-not-allowed rounded-xl border border-[var(--line)] bg-[var(--raised)] px-4 py-2.5 text-sm font-medium text-[var(--t3)]';
 const PRIMARY_BUTTON = 'ap-btn ap-btn--primary';
 
 function ResultMessage({ result }: { result: { ok: boolean; message: string } }) {

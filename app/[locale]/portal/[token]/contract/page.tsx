@@ -20,6 +20,7 @@ import {
 } from '@/lib/clientPortalContract';
 import { toRgba, resolvePortalAccentHex } from '@/lib/clientPortalUtils';
 import PortalBottomNav from '../PortalBottomNav';
+import { getClientPortalHiddenNavItems, getClientPortalVisibility } from '@/lib/clientPortalVisibility';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -50,6 +51,8 @@ export default async function ClientPortalContractPage({
 
   const access = await findPortalAccessByRawToken(params.token);
   if (!access) notFound();
+  const visibility = getClientPortalVisibility(access.personalization);
+  if (!visibility.documents) notFound();
 
   const requestHeaders = headers();
   await markPortalAccessHit({
@@ -176,6 +179,7 @@ export default async function ClientPortalContractPage({
           contract: t.contract,
           gallery: t.navGallery,
         }}
+        hiddenItems={getClientPortalHiddenNavItems(visibility)}
       />
     </main>
   );

@@ -20,6 +20,7 @@ import {
 } from '@/lib/clientPortalTimeline';
 import { resolvePortalAccentHex } from '@/lib/clientPortalUtils';
 import PortalBottomNav from '../PortalBottomNav';
+import { getClientPortalHiddenNavItems, getClientPortalVisibility } from '@/lib/clientPortalVisibility';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -100,6 +101,8 @@ export default async function ClientPortalTimelinePage({
 
   const access = await findPortalAccessByRawToken(params.token);
   if (!access) notFound();
+  const visibility = getClientPortalVisibility(access.personalization);
+  if (!visibility.timeline) notFound();
 
   const requestHeaders = headers();
   await markPortalAccessHit({
@@ -187,6 +190,7 @@ export default async function ClientPortalTimelinePage({
           contract: t.contract,
           gallery: t.navGallery,
         }}
+        hiddenItems={getClientPortalHiddenNavItems(visibility)}
       />
     </main>
   );

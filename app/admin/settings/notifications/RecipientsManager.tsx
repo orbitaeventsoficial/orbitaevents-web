@@ -135,7 +135,7 @@ export function RecipientsManager() {
     return (
       <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
         <h2 className="mb-4 ap-h2">📬 Destinataris de notificacions</h2>
-        <p className="text-sm text-white/70">Carregant…</p>
+        <p className="text-sm text-[var(--t2)]">Carregant…</p>
       </section>
     );
   }
@@ -145,7 +145,7 @@ export function RecipientsManager() {
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="ap-h2">📬 Destinataris de notificacions</h2>
-          <p className="text-sm text-white/70">
+          <p className="text-sm text-[var(--t2)]">
             Gestiona quins correus reben cada tipus de notificació. Els canvis sobreescriuen el fallback de Railway.
           </p>
         </div>
@@ -175,7 +175,7 @@ export function RecipientsManager() {
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="border-b border-white/10 text-left">
+            <tr className="border-b border-[var(--line)] text-left">
               <th scope="col" className="px-2 py-2 font-medium">Email</th>
               <th scope="col" className="px-2 py-2 font-medium">Etiqueta</th>
               {ALL_CATEGORIES.map((c) => (
@@ -190,13 +190,13 @@ export function RecipientsManager() {
           <tbody>
             {recipients.length === 0 && (
               <tr>
-                <td colSpan={ALL_CATEGORIES.length + 4} className="px-2 py-4 text-center text-white/60">
+                <td colSpan={ALL_CATEGORIES.length + 4} className="px-2 py-4 text-center text-[var(--t2)]">
                   No hi ha destinataris. Afegeix-ne almenys un per rebre notificacions.
                 </td>
               </tr>
             )}
             {recipients.map((r) => (
-              <tr key={r.email} className="border-b border-white/5">
+              <tr key={r.email} className="border-b border-[var(--line)]">
                 <td className="px-2 py-2 font-mono text-xs">{r.email}</td>
                 <td className="px-2 py-2">
                   <input
@@ -204,7 +204,7 @@ export function RecipientsManager() {
                     value={r.label}
                     onChange={(e) => updateLabel(r.email, e.target.value)}
                     placeholder="p. ex. Info oficial"
-                    className="w-full rounded border border-white/10 bg-white/5 px-2 py-1 text-sm"
+                    className="w-full rounded border border-[var(--line)] bg-[var(--raised)] px-2 py-1 text-sm"
                   />
                 </td>
                 {ALL_CATEGORIES.map((c) => (
@@ -247,34 +247,34 @@ export function RecipientsManager() {
         </table>
       </div>
 
-      <div className="mt-6 border-t border-white/10 pt-4">
+      <div className="mt-6 border-t border-[var(--line)] pt-4">
         <h3 className="mb-2 text-sm font-medium">Afegir destinatari</h3>
         <div className="flex flex-wrap items-end gap-2">
           <label className="flex flex-1 min-w-[200px] flex-col gap-1">
-            <span className="text-xs uppercase text-white/70">Email</span>
+            <span className="text-xs uppercase text-[var(--t2)]">Email</span>
             <input
               type="email"
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
               placeholder="nou@example.com"
-              className="rounded border border-white/10 bg-white/5 px-2 py-2 text-sm"
+              className="rounded border border-[var(--line)] bg-[var(--raised)] px-2 py-2 text-sm"
             />
           </label>
           <label className="flex flex-1 min-w-[180px] flex-col gap-1">
-            <span className="text-xs uppercase text-white/70">Etiqueta (opcional)</span>
+            <span className="text-xs uppercase text-[var(--t2)]">Etiqueta (opcional)</span>
             <input
               type="text"
               value={newLabel}
               onChange={(e) => setNewLabel(e.target.value)}
               placeholder="p. ex. Comercial"
-              className="rounded border border-white/10 bg-white/5 px-2 py-2 text-sm"
+              className="rounded border border-[var(--line)] bg-[var(--raised)] px-2 py-2 text-sm"
             />
           </label>
           <button type="button" onClick={addRecipient} className="ap-btn ap-btn--primary">
             Afegir
           </button>
         </div>
-        <p className="mt-2 text-xs text-white/60">
+        <p className="mt-2 text-xs text-[var(--t2)]">
           Nou destinatari es crea amb totes les categories activades. Desa els canvis perquè tinguin efecte.
         </p>
       </div>

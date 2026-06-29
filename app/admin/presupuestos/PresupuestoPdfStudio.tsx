@@ -1220,8 +1220,8 @@ export default function PresupuestoPdfStudio({
               <div className="flex items-center gap-2">
                 {sectionStatus.clientOk ? (<span className="rounded-full px-2 py-0.5 text-xs">OK</span>) : sectionStatus.clientWarn ? (<span className="rounded-full px-2 py-0.5 text-xs">{sectionStatus.clientWarn}</span>) : null}
               </div>
-              {!isCustomerScoped && (<button type="button" onClick={() => setShowCustomerPicker(!showCustomerPicker)} className="flex items-center gap-1 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-white/5">+ Cercar client</button>)}
-              {isCustomerScoped && !initialCustomerId && (<button type="button" onClick={clearSelectedCustomer} className="rounded-xl border px-3 py-1.5 text-xs transition-colors hover:bg-white/5">Canviar client</button>)}
+              {!isCustomerScoped && (<button type="button" onClick={() => setShowCustomerPicker(!showCustomerPicker)} className="flex items-center gap-1 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-[var(--raised)]">+ Cercar client</button>)}
+              {isCustomerScoped && !initialCustomerId && (<button type="button" onClick={clearSelectedCustomer} className="rounded-xl border px-3 py-1.5 text-xs transition-colors hover:bg-[var(--raised)]">Canviar client</button>)}
             </div>
             {showCustomerPicker && (
               <div className="mb-4 rounded-xl border p-3">
@@ -1230,7 +1230,7 @@ export default function PresupuestoPdfStudio({
                 {customerResults.length > 0 && (
                   <div className="mt-2 max-h-48 space-y-1 overflow-y-auto">
                     {customerResults.filter((c) => c.id !== customerId).map((c) => (
-                      <button key={c.id} type="button" onClick={() => selectCustomer(c)} className="flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-sm transition-colors hover:bg-white/5">
+                      <button key={c.id} type="button" onClick={() => selectCustomer(c)} className="flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--raised)]">
                         <div><span className="font-medium">{c.name}</span><span className="ml-2 text-xs opacity-60">{c.email}</span></div>
                         {c.phone && <span className="text-xs opacity-50">{c.phone}</span>}
                       </button>
@@ -1407,9 +1407,9 @@ export default function PresupuestoPdfStudio({
             return (
               <div className={`rounded-2xl border p-4 transition-all ${borderTone} ${isDragging ? 'opacity-40' : ''}`}>
                 <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing select-none">
-                  <span className="text-white/20 text-sm" aria-hidden>&#9776;</span>
+                  <span className="text-[var(--t3)] text-sm" aria-hidden>&#9776;</span>
                   <p className="flex-1 text-xs font-semibold uppercase tracking-wide">{SECTION_LABELS[sectionId]}</p>
-                  <button type="button" onClick={(e) => { e.stopPropagation(); toggleCollapse(sectionId); }} className="rounded-lg px-2 py-1 text-xs hover:bg-white/5 transition-colors" aria-label={isCollapsed ? 'Expandir secció' : 'Col·lapsar secció'}>
+                  <button type="button" onClick={(e) => { e.stopPropagation(); toggleCollapse(sectionId); }} className="rounded-lg px-2 py-1 text-xs hover:bg-[var(--raised)] transition-colors" aria-label={isCollapsed ? 'Expandir secció' : 'Col·lapsar secció'}>
                     {isCollapsed ? '>' : 'v'}
                   </button>
                 </div>

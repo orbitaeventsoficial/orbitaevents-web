@@ -1,3 +1,234 @@
+## 2026-06-29 — V2 auditoria vertical post-event no-mail tancada (Canvi #1239, codex)
+
+### Context
+Després dels talls #1232-#1237, la primera passada V2 sense entrar a mails automàtics ja no mostra cap bug viu petit dins informe intern, estat operatiu, recepció/moderació de testimoni, Google Reviews, playbook i hub post-event. El #1238 ja ha quedat ocupat per Claude amb homogeneïtzació canònica, així que aquest tancament es registra com a #1239.
+
+### Què s'ha fet
+- `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md`: V2 passa a `✅ TANCADA #1239 (perímetre no-mail)` i el bloc V2 queda amb els set punts resolts.
+- `docs/agent-sync.md`: Codex deixa constància que la següent vertical real és V5, però que toca inventari/preus/cost i requereix coordinació abans d'entrar-hi.
+- `docs/admin-protocol.md` i aquest diari registren el tancament formal.
+
+### Validació
+- Validació tècnica: protocol.
+- Validació funcional: no hi ha canvi de producte en aquest tall; és tancament documental del flux auditat.
+- Validació humana/UX: el full de ruta torna a dir clarament què queda i què no s'ha de tocar sense coordinar.
+
+### Coordinació
+Counter → 1239. Tancament V2 no-mail; no toca enviament automàtic de mails, Inbox, APPEND, seqüències, inventari, preus, costEngine ni schema. #1238 pertany a Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — Homogeneïtzació canònica MASSIVA: 0 blancs crus a tot l'admin (Canvi #1238, claude)
+
+### Context
+Ordre del propietari: auditoria pam a pam fins que tot sigui canònic, responsiu, monocapa i sense hardcodes. Escaneig global: **751 blancs crus Tailwind** (text-white/NN, bg-white/N, border-white/NN) en 127 fitxers + botons-void al catàleg.
+
+### Què s'ha fet
+- **Tokenització massiva**: script que converteix TOTS els blancs crus → tokens (--t/--t2/--t3 per text segons opacitat, --line per vores, --raised per fons, --hair-gold per hover) a 85 fitxers .tsx d'app/admin. **0 blancs crus restants** a tot l'admin.
+- **Catàleg** (el «pam» que veia el propietari): botons-void (rounded-xl border sense fons) → .ap-card clicable; alert amb to warning canònic; blanc cru → tokens.
+- **Guard**: REPORT_STATUSES (Set de validació local de Codex) afegit a l'allowlist de layer-catalogs amb justificació.
+- Hex restants verificats = falsos positius (#842, #968… són números de canvi en comentaris, no colors). Hex reals = 0 (eines css-manager/canvas/email són cas tècnic acceptat).
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core` EXIT 0 (admin-canon, no-inline-hex, no-inline-rgba, no-admin-slate-gray, css-monocapa, layer-catalogs — tots verds).
+- Validació funcional: cap canvi de comportament; tokenització no perceptible visualment però compleix monocapa.
+- Validació humana/UX: catàleg amb botons canònics (arreglat el «pam»); homogeneïtat de tokens a tot l'admin.
+
+### Coordinació
+Counter → 1238. Homogeneïtzació de canon/monocapa. Pendent: responsiu (verificació següent). Codex parat.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-29 — V2 hub post-event: playbook deixa d'estar orfe (Canvi #1237, codex)
+
+### Context
+La repassada de cablejat V2 ha confirmat que `/admin/post-event/playbook` existia i estava registrat a la documentació, però el hub `/admin/post-event` només exposava Informes, Enquestes i Feedback. El checklist post-event quedava accessible per URL directa però no com a pas natural de l'òrgan mare.
+
+### Què s'ha fet
+- `app/admin/post-event/page.tsx`: afegit el quart pas `Playbook` amb CTA cap a `/admin/post-event/playbook`.
+- La graella del workflow passa a `md:grid-cols-2 xl:grid-cols-4` perquè els quatre passos respirin sense forçar tres columnes.
+
+### Validació
+- Validació tècnica: TypeScript i protocol.
+- Validació funcional: el hub post-event ara porta al checklist que calcula agraïment, testimoni aprovat, publicació social i referral.
+- Validació humana/UX: l'òrgan mare ja no amaga una peça viva del flux.
+
+### Coordinació
+Counter → 1237. Tall V2 no-mail; no toca enviament automàtic de mails, Inbox, APPEND, seqüències, inventari, preus, costEngine ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — V2 copy operatiu: post-event i Google Reviews diuen el que fan (Canvi #1236, codex)
+
+### Context
+La repassada final de cablejat visible V2 ha detectat dues incoherències de copy: `/admin/post-event` deia `Enquestes per enviar` tot i comptar reserves completades sense resposta (`clientSurvey=null`), i `/admin/google-reviews` encara deia que la sincronització passava durant el build de Railway després del runner manual/admin #1234.
+
+### Què s'ha fet
+- `app/admin/post-event/page.tsx`: el KPI i el resum passen a parlar d'`Enquestes sense resposta`, amb tooltip i meta alineats amb la query real.
+- `app/admin/google-reviews/page.tsx`: la informació visible explica que les ressenyes se sincronitzen per cron i també manualment des de la pantalla.
+
+### Validació
+- Validació tècnica: TypeScript i protocol.
+- Validació funcional: no canvia dades ni automatismes; només evita que l'admin confongui `pendent de resposta` amb `pendent d'enviar`.
+- Validació humana/UX: el text visible torna a coincidir amb l'estat real del flux.
+
+### Coordinació
+Counter → 1236. Tall V2 no-mail; no toca enviament automàtic de mails, Inbox, APPEND, seqüències, inventari, preus, costEngine ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — V2 playbook: testimoni només compta si està aprovat (Canvi #1235, codex)
+
+### Context
+La revisió de publicació/moderació post-event ha detectat que el playbook podia donar per feta l'acció `testimonial` amb qualsevol `CustomerTestimonial` del client i data propera, encara que fos pendent de moderació o amagada. Això trencava el sentit operatiu de “prova social publicada”.
+
+### Què s'ha fet
+- `lib/services/postEventPlaybookService.ts`: `loadPostEventPlaybook()` només considera testimonis amb `isApproved: true`.
+- `__tests__/lib/services/postEventPlaybookLoader.test.ts`: regressions del wrapper Prisma perquè filtri aprovats i mantingui pendent el testimoni no publicat.
+
+### Validació
+- Validació tècnica: tests focalitzats del playbook pur i del loader Prisma.
+- Validació funcional: un testimoni rebut però pendent ja no tanca la tasca post-event fins que l'admin l'aprova.
+- Validació humana/UX: la cua post-event diferencia “rebut” de “publicat/aprovat” i no dona falsos DONE.
+
+### Coordinació
+Counter → 1235. Tall V2 no-mail; no toca enviament automàtic de mails, Inbox, APPEND, seqüències, inventari, preus, costEngine ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — V2 Google Reviews: refresc admin sincronitza de debò (Canvi #1234, codex)
+
+### Context
+La passada V2 no-mail ha detectat que `/admin/google-reviews` mostrava un botó `Refrescar`, però l'acció només tornava a llegir `/api/google-reviews` des de la cache pública. Això podia donar feedback d'èxit sense haver consultat SerpAPI ni haver escrit cap cache nova.
+
+### Què s'ha fet
+- `lib/services/reviewsSyncService.ts`: nova funció `runReviewsSync()` com a runner canònic que consulta SerpAPI, escriu cache i registra `automation.reviewsSync`.
+- `app/api/cron/reviews-sync/route.ts`: la ruta cron reutilitza el runner compartit.
+- `app/api/admin/google-reviews/sync/route.ts`: nova ruta admin `POST` amb auth + CSRF per disparar sincronització manual sense exposar `CRON_SECRET`.
+- `app/admin/google-reviews/page.tsx`: el botó `Refrescar` ara crida la ruta admin i després recarrega la cache pública amb `cache: 'no-store'`.
+- Tests afegits/actualitzats a ruta admin, ruta cron, servei i client canònic.
+
+### Validació
+- Validació tècnica: tests focalitzats de Google Reviews, ruta cron, ruta admin i client canònic.
+- Validació funcional: el refresc manual de l'admin ja executa sincronització real i no només re-llegeix dades antigues.
+- Validació humana/UX: el toast d'èxit només surt després d'una sincronització real; si SerpAPI falla, l'admin veu error.
+
+### Coordinació
+Counter → 1234. Tall V2 no-mail; no toca enviament automàtic de mails, Inbox, APPEND, seqüències, inventari, preus, costEngine ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — V2 testimoni: link públic reconnecta reserva, client i descompte (Canvi #1233, codex)
+
+### Context
+La segona passada V2 no-mail ha detectat que el formulari públic de valoració enviava `token` i `bookingRef`, però l'API no els propagava al servei i el testimoni quedava com una opinió genèrica per email. A més, el testimoni guardava `discountCodeId` amb el codi visible, mentre l'admin el resol per `id`, deixant el descompte associat invisible a moderació.
+
+### Què s'ha fet
+- `app/api/testimonials/route.ts`: propaga `token` i `bookingRef` al servei.
+- `lib/services/publicTestimonialService.ts`: si `token+bookingRef` coincideixen amb una reserva, usa el customer de la reserva, copia `eventType/eventDate` al testimoni i marca `Booking.reviewSubmittedAt`.
+- El `discountCodeId` del testimoni ara desa l'`id` del `CustomerDiscountCode`, no el `code` públic.
+- Tests ampliats a servei públic i ruta API.
+
+### Validació
+- Validació tècnica: tests focalitzats de testimoni públic/admin/API i TypeScript.
+- Validació funcional: una valoració rebuda des del link post-event queda connectada al booking i el descompte es veu a l'admin.
+- Validació humana/UX: moderar testimonis ja mostra la recompensa real i la fitxa de reserva pot detectar resposta de review.
+
+### Coordinació
+Counter → 1233. Tall V2 no-mail; no toca enviament automàtic de mails, Inbox, APPEND, seqüències, inventari, preus, costEngine ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — V2 post-event: informe validat i estat operatiu coherent (Canvi #1232, codex)
+
+### Context
+L'auditoria V2 post-event continua sense tocar mails automàtics per coordinació amb Claude. El primer forat no-mail detectat era que l'informe intern podia crear-se via API per una reserva no completada, acceptava `status` arbitrari i valoracions fora del rang que el formulari promet (1-5). A més, l'snapshot operatiu podia donar per complet un post-event amb informe no completat o no reconèixer el cas informe completat + enquesta resposta.
+
+### Què s'ha fet
+- `lib/services/postEventReportAdminService.ts`: la creació d'informe exigeix reserva `COMPLETED`, `status` només `DRAFT|COMPLETED` i valoracions 1-5.
+- `lib/services/bookingOperationalService.ts`: l'estat intern post-event només és `COMPLETO` amb informe `COMPLETED` i feedback enviat o enquesta rebuda; l'esborrany queda `EN_PROGRESO`.
+- Tests ampliats a `postEventReportAdminService.test.ts` i `bookingOperationalService.test.ts`.
+
+### Validació
+- Validació tècnica: tests focalitzats post-event/API/snapshot i TypeScript.
+- Validació funcional: l'informe intern ja no pot néixer abans d'hora ni amb dades fora de contracte.
+- Validació humana/UX: el propietari veu estats post-event que corresponen a feina real tancada, no a files parcials.
+
+### Coordinació
+Counter → 1232. Tall V2 no-mail; no toca enviament automàtic de mails, Inbox, APPEND, seqüències, inventari, preus, costEngine ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — V4 referrals: fusió conserva el graf de referits (Canvi #1231, codex)
+
+### Context
+La passada final de recurrència/referrals ha trobat que la fusió de clients ja movia l'historial operatiu (#1230), però encara podia deixar el graf de referrals apuntant al duplicat: clients que havien vingut referits per una fitxa fusionada continuaven amb `referredById` antic, i el principal podia perdre el seu `referredById` si només el tenia el duplicat.
+
+### Què s'ha fet
+- `lib/services/deduplicationService.ts`: quan es fusionen clients, els clients referits pel duplicat passen a apuntar al principal.
+- El principal hereta el `referredById` del duplicat si encara no en tenia.
+- `__tests__/lib/services/deduplicationService.test.ts`: regressions del graf de referrals durant la fusió.
+
+### Validació
+- Validació tècnica: tests focalitzats de deduplicació/referrals, TypeScript i protocol.
+- Validació funcional: el programa de referrals continua atribuint valor al customer canònic després d'una fusió.
+- Validació humana/UX: la fitxa 360 no perd qui ha recomanat qui quan es netegen duplicats.
+
+### Coordinació
+Counter → 1231. V4 client/portal/recurrència queda tancada; no toca mails automàtics, Inbox, APPEND, seqüències, inventari, preus, costEngine ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — V4 fusió client: historial operatiu cap al customer canònic (Canvi #1230, codex)
+
+### Context
+La revisió de recurrència ha detectat que `mergeCustomers()` només movia leads, testimonis, descomptes i activity logs. Les reserves, pressupostos, factures, tasques, accessos de portal, contactes, consentiments i data requests podien quedar enganxats al client duplicat ja marcat amb `mergedIntoId`, deixant el Customer Hub canònic sense historial operatiu complet.
+
+### Què s'ha fet
+- `lib/services/deduplicationService.ts`: la fusió mou totes les relacions operatives amb `customerId` cap al client principal.
+- `lib/customer-hub/data.ts`: `resolveCustomerHubCustomerId()` retorna `mergedIntoId` quan rep una fitxa antiga fusionada.
+- Tests nous/actualitzats per blindar el trasllat de relacions i la resolució del Customer Hub.
+
+### Validació
+- Validació tècnica: tests focalitzats de deduplicació i Customer Hub, TypeScript i protocol.
+- Validació funcional: una fusió conserva reserves, portal, tasques i documents comercials al customer canònic.
+- Validació humana/UX: obrir una fitxa fusionada porta a la veritat viva i no a un client buit o incomplet.
+
+### Coordinació
+Counter → 1230. Tall V4 pur; no toca mails automàtics, Inbox, APPEND, seqüències, inventari, preus, costEngine ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — V4 recurrència: reactivació exclou clients fusionats (Canvi #1229, codex)
+
+### Context
+La revisió final de V4 sobre recurrència/reactivació/referrals ha trobat una asimetria: `loadReferralsSummary()` ja excloïa clients fusionats (`mergedIntoId=null`), però `loadReactivationCandidates()` podia carregar fitxes antigues fusionades. Això podia portar una tasca o intent de reactivació al registre equivocat en comptes del customer canònic.
+
+### Què s'ha fet
+- `lib/services/reactivationService.ts`: el wrapper Prisma de reactivació filtra `mergedIntoId: null`.
+- `__tests__/lib/services/reactivationService.test.ts`: regressió del wrapper per blindar que la query exclou clients fusionats.
+
+### Validació
+- Validació tècnica: test focalitzat de reactivació, TypeScript i protocol.
+- Validació funcional: la cua de reactivació només proposa clients canònics vius, alineada amb referrals.
+- Validació humana/UX: evita crear tasques comercials sobre fitxes antigues després d'una fusió de clients.
+
+### Coordinació
+Counter → 1229. Tall V4 pur; no toca mails automàtics, Inbox, APPEND, seqüències, inventari, preus, costEngine ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-29 — Homogeneïtzació canònica: blancs crus → tokens a 3 pàgines top de deute (Canvi #1226, claude)
 
 ### Context

@@ -402,10 +402,10 @@ export default function EditPackForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <section className="rounded-2xl border border-white/10 p-5">
+      <section className="rounded-2xl border border-[var(--line)] p-5">
         <h2 className="text-xl font-bold">Editor pro de pack</h2>
         <p className="mt-1 text-sm">Drag & drop d'inventari dins/fora + autocalcul de preus recomanats.</p>
-        <div className="mt-4 grid gap-2 sm:grid-cols-4">{TABS.map((t) => <button key={t.id} type="button" onClick={() => setActiveTab(t.id)} className={`rounded-xl border px-3 py-2 text-sm font-semibold ${activeTab === t.id ? 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning' : 'border-[var(--line)] bg-[var(--panel)] text-white/60'}`}>{t.icon} {t.label}</button>)}</div>
+        <div className="mt-4 grid gap-2 sm:grid-cols-4">{TABS.map((t) => <button key={t.id} type="button" onClick={() => setActiveTab(t.id)} className={`rounded-xl border px-3 py-2 text-sm font-semibold ${activeTab === t.id ? 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning' : 'border-[var(--line)] bg-[var(--panel)] text-[var(--t2)]'}`}>{t.icon} {t.label}</button>)}</div>
       </section>
 
       {error && <div className="rounded-xl border p-4 text-sm">Error: {error}</div>}
@@ -458,7 +458,7 @@ export default function EditPackForm({
             <button
               type="button"
               onClick={() => setAutoPricing((v) => !v)}
-              className={`rounded-xl border px-3 py-1.5 text-xs font-semibold ${autoPricing ? 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success' : 'border-white/10 bg-white/5 text-white/80'}`}
+              className={`rounded-xl border px-3 py-1.5 text-xs font-semibold ${autoPricing ? 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success' : 'border-[var(--line)] bg-[var(--raised)] text-[var(--t2)]'}`}
             >
               Preu automàtic {autoPricing ? 'ON' : 'OFF'}
             </button>
@@ -519,7 +519,7 @@ export default function EditPackForm({
             <div className="rounded-xl border p-3">
               <p className="text-xs">Cost base estimat pack</p>
               <p className="mt-2 text-lg font-semibold">{eur(baseCostPack)}</p>
-              <p className="mt-1 text-xs text-white/55">És el cost mínim estimat abans de deixar marge.</p>
+              <p className="mt-1 text-xs text-[var(--t3)]">És el cost mínim estimat abans de deixar marge.</p>
             </div>
           </div>
 
@@ -621,7 +621,7 @@ export default function EditPackForm({
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide admin-tone-text-cyan">Flux de treball</p>
-                <p className="mt-1 text-sm text-white/80">Primer decideix si comences manualment, des d'un lot o amb el compositor. Després revisa quantitats i marca com a obligatori només allò que realment defineix el pack.</p>
+                <p className="mt-1 text-sm text-[var(--t2)]">Primer decideix si comences manualment, des d'un lot o amb el compositor. Després revisa quantitats i marca com a obligatori només allò que realment defineix el pack.</p>
               </div>
               <span className="inline-flex items-center rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-3 py-1 text-xs font-semibold admin-tone-text-cyan">
                 {included.length} elements · {totalUnits} unitats
@@ -648,11 +648,11 @@ export default function EditPackForm({
             <div className="ap-card p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Compositor automàtic</p>
-                  <h4 className="mt-1 text-sm font-semibold text-white">Punt de partida, no decisió final</h4>
-                  <p className="mt-1 text-sm text-white/70">El compositor classifica per nom, codi, categoria i descripció. T'estalvia arrencar de zero, però sempre has de revisar el resultat abans de desar.</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--t3)]">Compositor automàtic</p>
+                  <h4 className="mt-1 text-sm font-semibold text-[var(--t)]">Punt de partida, no decisió final</h4>
+                  <p className="mt-1 text-sm text-[var(--t2)]">El compositor classifica per nom, codi, categoria i descripció. T'estalvia arrencar de zero, però sempre has de revisar el resultat abans de desar.</p>
                 </div>
-                <span className="inline-flex items-center rounded-full border border-[var(--line)] bg-[var(--panel)] px-3 py-1 text-xs text-white/70">
+                <span className="inline-flex items-center rounded-full border border-[var(--line)] bg-[var(--panel)] px-3 py-1 text-xs text-[var(--t2)]">
                   Revisa quantitats i obligatorietat després
                 </span>
               </div>
@@ -661,8 +661,8 @@ export default function EditPackForm({
                   <div key={mode} className={`rounded-2xl border p-4 ${mode === 'base' ? 'admin-tone-border-cyan admin-tone-bg-cyan' : 'admin-tone-border-warning admin-tone-bg-warning'}`}>
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <p className="text-sm font-semibold text-white">{details.title}</p>
-                        <p className="mt-1 text-xs text-white/60">{details.picks}</p>
+                        <p className="text-sm font-semibold text-[var(--t)]">{details.title}</p>
+                        <p className="mt-1 text-xs text-[var(--t2)]">{details.picks}</p>
                       </div>
                       <button
                         type="button"
@@ -672,20 +672,20 @@ export default function EditPackForm({
                         Aplicar {details.title}
                       </button>
                     </div>
-                    <p className="mt-3 text-sm text-white/70">{details.description}</p>
+                    <p className="mt-3 text-sm text-[var(--t2)]">{details.description}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="ap-card p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Lots reutilitzables</p>
-              <h4 className="mt-1 text-sm font-semibold text-white">Afegeix peces que sempre viatgen juntes</h4>
-              <p className="mt-1 text-sm text-white/70">Els lots serveixen quan el pack repeteix una combinació real. Redueixen errors i acceleren la composició.</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--t3)]">Lots reutilitzables</p>
+              <h4 className="mt-1 text-sm font-semibold text-[var(--t)]">Afegeix peces que sempre viatgen juntes</h4>
+              <p className="mt-1 text-sm text-[var(--t2)]">Els lots serveixen quan el pack repeteix una combinació real. Redueixen errors i acceleren la composició.</p>
               {bundlePreview ? (
                 <div className="mt-4 ap-card p-4">
-                  <p className="text-sm font-semibold text-white">{bundlePreview.name}</p>
-                  <p className="mt-1 text-xs text-white/60">{bundlePreview.itemIds.length} elements al lot seleccionat.</p>
+                  <p className="text-sm font-semibold text-[var(--t)]">{bundlePreview.name}</p>
+                  <p className="mt-1 text-xs text-[var(--t2)]">{bundlePreview.itemIds.length} elements al lot seleccionat.</p>
                   <button
                     type="button"
                     onClick={() => addBundleToPack(bundlePreview.id)}
@@ -696,7 +696,7 @@ export default function EditPackForm({
                   </button>
                 </div>
               ) : (
-                <div className="mt-4 rounded-2xl border border-dashed border-[var(--line)] bg-[var(--panel)] p-4 text-sm text-white/60">
+                <div className="mt-4 rounded-2xl border border-dashed border-[var(--line)] bg-[var(--panel)] p-4 text-sm text-[var(--t2)]">
                   Encara no hi ha cap lot seleccionat.
                 </div>
               )}
@@ -714,7 +714,7 @@ export default function EditPackForm({
                       key={bundle.id}
                       type="button"
                       onClick={() => setSelectedBundleId(bundle.id)}
-                      className={`rounded-xl border px-3 py-2 text-left transition-colors ${active ? 'admin-tone-border-violet admin-tone-bg-violet admin-tone-text-violet' : 'border-white/15 bg-white/5 text-white/80 hover:bg-white/10'}`}
+                      className={`rounded-xl border px-3 py-2 text-left transition-colors ${active ? 'admin-tone-border-violet admin-tone-bg-violet admin-tone-text-violet' : 'border-[var(--line)] bg-[var(--raised)] text-[var(--t2)] hover:bg-[var(--raised)]'}`}
                     >
                       <p className="text-sm font-semibold">{bundle.name}</p>
                       <p className="text-xs opacity-80">{bundle.itemIds.length} elements</p>
@@ -750,7 +750,7 @@ export default function EditPackForm({
             >
               <div className="mb-2 flex items-center justify-between gap-3">
                 <p className="text-sm font-semibold">Disponibles ({available.length})</p>
-                <span className="text-xs text-white/45">Arrossega cap a inclosos</span>
+                <span className="text-xs text-[var(--t3)]">Arrossega cap a inclosos</span>
               </div>
               <div className="max-h-[26rem] space-y-2 overflow-auto pr-1">
                 {available.map((i) => (
@@ -776,7 +776,7 @@ export default function EditPackForm({
             >
               <div className="mb-2 flex items-center justify-between gap-3">
                 <p className="text-sm font-semibold">Inclosos ({included.length})</p>
-                <span className="text-xs text-white/45">Revisa quantitats i obligatorietat</span>
+                <span className="text-xs text-[var(--t3)]">Revisa quantitats i obligatorietat</span>
               </div>
               <div className="max-h-[26rem] space-y-2 overflow-auto pr-1">
                 {included.map(({ row, item }) => (
@@ -797,7 +797,7 @@ export default function EditPackForm({
                               Obligatori
                             </span>
                           ) : (
-                            <span className="rounded-full border border-[var(--line)] bg-[var(--panel)] px-2 py-0.5 text-xs font-semibold text-white/60">
+                            <span className="rounded-full border border-[var(--line)] bg-[var(--panel)] px-2 py-0.5 text-xs font-semibold text-[var(--t2)]">
                               Opcional
                             </span>
                           )}

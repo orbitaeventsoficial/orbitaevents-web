@@ -163,7 +163,7 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
           </div>
         </div>
 
-        <aside className="rounded-xl border border-white/10 p-4">
+        <aside className="rounded-xl border border-[var(--line)] p-4">
           <h3 className="text-sm font-semibold">Guia ràpida de coeficients</h3>
           <p className="mt-1 text-xs">
             Cada ratio és un coeficient de cost. A més ratio, menys marge.

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useAsyncForm } from '../../components/useAsyncForm';
 
-const inputClass = 'w-full ap-card px-3 py-2 text-sm text-white/90';
+const inputClass = 'w-full ap-card px-3 py-2 text-sm text-[var(--t)]';
 
 export default function NewPackForm() {
   const router = useRouter();

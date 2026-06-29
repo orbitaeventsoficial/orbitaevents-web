@@ -222,19 +222,39 @@ describe('getBookingOperationalSnapshot', () => {
 
   // ─── internalPostEventStatus ──────────────────────────────────────
 
-  it('internalPostEventStatus = COMPLETO si report + feedback.sentAt', async () => {
+  it('internalPostEventStatus = COMPLETO si informe completat + feedback.sentAt', async () => {
     const result = await getBookingOperationalSnapshot(
       makeBookingInput({
-        postEventReport: { id: 'r1' },
+        postEventReport: { id: 'r1', status: 'COMPLETED' },
         clientFeedback: { sentAt: new Date() },
       }),
     );
     expect(result.internalPostEventStatus).toBe('COMPLETO');
   });
 
+  it('internalPostEventStatus = COMPLETO si informe completat + enquesta rebuda', async () => {
+    const result = await getBookingOperationalSnapshot(
+      makeBookingInput({
+        postEventReport: { id: 'r1', status: 'COMPLETED' },
+        clientSurvey: { id: 'survey-1' },
+      }),
+    );
+    expect(result.internalPostEventStatus).toBe('COMPLETO');
+  });
+
+  it('internalPostEventStatus = EN_PROGRESO si informe encara es esborrany', async () => {
+    const result = await getBookingOperationalSnapshot(
+      makeBookingInput({
+        postEventReport: { id: 'r1', status: 'DRAFT' },
+        clientSurvey: { id: 'survey-1' },
+      }),
+    );
+    expect(result.internalPostEventStatus).toBe('EN_PROGRESO');
+  });
+
   it('internalPostEventStatus = EN_PROGRESO si només report', async () => {
     const result = await getBookingOperationalSnapshot(
-      makeBookingInput({ postEventReport: { id: 'r1' } }),
+      makeBookingInput({ postEventReport: { id: 'r1', status: 'COMPLETED' } }),
     );
     expect(result.internalPostEventStatus).toBe('EN_PROGRESO');
   });

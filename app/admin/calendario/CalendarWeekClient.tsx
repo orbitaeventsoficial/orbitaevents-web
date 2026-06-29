@@ -172,7 +172,7 @@ export default function CalendarWeekClient() {
             <button
               type="button"
               onClick={() => router.push('/admin/calendario?view=day')}
-              className="inline-flex items-center px-3 py-2 text-sm font-medium transition-all hover:bg-white/10"
+              className="inline-flex items-center px-3 py-2 text-sm font-medium transition-all hover:bg-[var(--raised)]"
             >
               Dia
             </button>
@@ -215,7 +215,7 @@ export default function CalendarWeekClient() {
             key={key}
             type="button"
             onClick={() => toggleLayer(key as CalendarLayer)}
-            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-white/10 border-white/20' : 'border-white/10 opacity-45'}`}
+            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-[var(--raised)] border-[var(--line)]' : 'border-[var(--line)] opacity-45'}`}
           >
             {label}
           </button>
@@ -409,7 +409,7 @@ export default function CalendarWeekClient() {
               </div>
 
               {/* Accions ràpides */}
-              <div className="mt-2 pt-2 border-t border-white/5 flex gap-1">
+              <div className="mt-2 pt-2 border-t border-[var(--line)] flex gap-1">
                 <Link
                   href={`/admin/bookings/new?date=${key}`}
                   className="flex-1 rounded-lg border py-1 text-center text-xs font-medium transition-colors admin-tone-idle"

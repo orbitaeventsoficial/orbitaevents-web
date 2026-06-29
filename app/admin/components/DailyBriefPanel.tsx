@@ -18,7 +18,7 @@ export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
         </div>
         <Link
           href="/admin/reporting"
-          className="rounded-lg border border-white/10 px-2.5 py-1 text-xs hover:bg-white/5"
+          className="rounded-lg border border-[var(--line)] px-2.5 py-1 text-xs hover:bg-[var(--raised)]"
         >
           Reporting →
         </Link>
@@ -59,7 +59,7 @@ export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
             <Link
               key={i}
               href={alert.href}
-              className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 text-xs transition-colors hover:bg-white/5 ${ALERT_TONE[alert.level]}`}
+              className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 text-xs transition-colors hover:bg-[var(--raised)] ${ALERT_TONE[alert.level]}`}
             >
               <span className="admin-cr-alert-mark" aria-hidden="true" />
               <div className="min-w-0 flex-1">

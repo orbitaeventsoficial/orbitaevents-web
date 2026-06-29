@@ -19,6 +19,7 @@ import {
 import { toRgba, resolvePortalAccentHex } from '@/lib/clientPortalUtils';
 import PortalBottomNav from '../PortalBottomNav';
 import BizumPayButton from './BizumPayButton';
+import { getClientPortalHiddenNavItems, getClientPortalVisibility } from '@/lib/clientPortalVisibility';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -51,7 +52,8 @@ export default async function ClientPortalPaymentsPage({
   if (!access) notFound();
 
   const personalization = access.personalization;
-  if ((personalization as { showPayments?: boolean } | null)?.showPayments === false) notFound();
+  const visibility = getClientPortalVisibility(personalization);
+  if (!visibility.payments) notFound();
 
   const requestHeaders = headers();
   await markPortalAccessHit({
@@ -212,6 +214,7 @@ export default async function ClientPortalPaymentsPage({
           contract: t.contract,
           gallery: t.navGallery,
         }}
+        hiddenItems={getClientPortalHiddenNavItems(visibility)}
       />
     </main>
   );

@@ -29,7 +29,7 @@ export default function AdminLoadingSkeletonInbox() {
         {/* Right: email reader */}
         <div className="space-y-4 ap-card p-5">
           {/* From / subject */}
-          <div className="space-y-2 border-b border-white/[0.06] pb-4">
+          <div className="space-y-2 border-b border-[var(--line)] pb-4">
             <div className="h-6 w-2/3 rounded-lg bg-[var(--o-admin-fill-3)]" />
             <div className="flex gap-3">
               <div className="h-4 w-16 rounded bg-[var(--o-admin-fill-2)]" />

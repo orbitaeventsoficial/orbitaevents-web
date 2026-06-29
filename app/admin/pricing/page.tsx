@@ -296,7 +296,7 @@ export default function PricingAdminPage() {
             {tab.badge && (
               <span className={`
                 text-xs px-2 py-0.5 rounded-full
-                ${activeTab === tab.key ? 'bg-white/20' : 'bg-white/10'}
+                ${activeTab === tab.key ? 'bg-[var(--raised)]' : 'bg-[var(--raised)]'}
               `}>
                 {tab.badge}
               </span>
@@ -374,7 +374,7 @@ export default function PricingAdminPage() {
                 {stats.topExtras.map((extra, i) => (
                   <div key={extra.slug} className="flex items-center justify-between p-3 rounded-xl">
                     <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm ${i === 0 ? 'admin-tone-bg-warning' : i === 1 ? 'admin-tone-bg-neutral' : i === 2 ? 'admin-tone-bg-warning' : 'admin-tone-bg-neutral'}`}>
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[var(--t)] text-sm ${i === 0 ? 'admin-tone-bg-warning' : i === 1 ? 'admin-tone-bg-neutral' : i === 2 ? 'admin-tone-bg-warning' : 'admin-tone-bg-neutral'}`}>
                         {i + 1}
                       </span>
                       <span className="font-medium">{extra.name}</span>
@@ -397,7 +397,7 @@ export default function PricingAdminPage() {
                 {stats.topPacks.map((pack, i) => (
                   <div key={pack.slug} className="flex items-center justify-between p-3 rounded-xl">
                     <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm ${i === 0 ? 'admin-tone-bg-warning' : i === 1 ? 'admin-tone-bg-neutral' : i === 2 ? 'admin-tone-bg-warning' : 'admin-tone-bg-neutral'}`}>
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[var(--t)] text-sm ${i === 0 ? 'admin-tone-bg-warning' : i === 1 ? 'admin-tone-bg-neutral' : i === 2 ? 'admin-tone-bg-warning' : 'admin-tone-bg-neutral'}`}>
                         {i + 1}
                       </span>
                       <span className="font-medium">{pack.name}</span>
@@ -453,12 +453,12 @@ export default function PricingAdminPage() {
       {activeTab === 'tarifes' && (
         <div className="space-y-6">
           {/* Tarifes per servei */}
-          <div className="rounded-xl border border-white/10 p-6 admin-card-glass">
+          <div className="rounded-xl border border-[var(--line)] p-6 admin-card-glass">
             <h3 className="ap-h2 mb-1">Tarifes per servei (€/h facturable)</h3>
             <p className="text-sm opacity-50 mb-5">Mercat DJ professional Barcelona. Hores facturables = inici → fi del bolo.</p>
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/10">
+                <tr className="border-b border-[var(--line)]">
                   <th scope="col" className="text-left py-2 opacity-60 font-medium">Servei</th>
                   <th scope="col" className="text-right py-2 opacity-60 font-medium">Mínim</th>
                   <th scope="col" className="text-right py-2 opacity-60 font-medium">Recomanat</th>
@@ -481,7 +481,7 @@ export default function PricingAdminPage() {
                     animacion_infantil: 'Animació infantil', extra_hora: 'Hora addicional',
                   };
                   return (
-                    <tr key={key} className="border-b border-white/5 adm-row-hover">
+                    <tr key={key} className="border-b border-[var(--line)] adm-row-hover">
                       <td className="py-3 flex items-center gap-2">
                         <span className="inline-block w-2 h-2 rounded-full flex-shrink-0" style={{ background: tone.hex }} />
                         {labels[key] ?? key}
@@ -502,12 +502,12 @@ export default function PricingAdminPage() {
           </div>
 
           {/* Gradient de marge */}
-          <div className="rounded-xl border border-white/10 p-6 admin-card-glass">
+          <div className="rounded-xl border border-[var(--line)] p-6 admin-card-glass">
             <h3 className="ap-h2 mb-1">Escala de marge</h3>
             <p className="text-sm opacity-50 mb-5">A pitjor marge, color més brillant i cridaner.</p>
             <div className="flex gap-2 flex-wrap">
               {MARGIN_TONES.map((t) => (
-                <div key={t.tone.kind} className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold border border-white/10"
+                <div key={t.tone.kind} className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold border border-[var(--line)]"
                   style={{ borderLeftColor: t.tone.hex, borderLeftWidth: 3, color: t.tone.hex }}>
                   {t.tone.name}
                   {t.min > -Infinity && <span className="opacity-50 font-normal">≥{t.min}%</span>}
@@ -517,12 +517,12 @@ export default function PricingAdminPage() {
           </div>
 
           {/* Cost amortització equip */}
-          <div className="rounded-xl border border-white/10 p-6 admin-card-glass">
+          <div className="rounded-xl border border-[var(--line)] p-6 admin-card-glass">
             <h3 className="ap-h2 mb-1">Cost real d'amortització per hora</h3>
             <p className="text-sm opacity-50 mb-5">Fallback per categoria. S'usa si l'ítem d'inventari no té dades de compra.</p>
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/10">
+                <tr className="border-b border-[var(--line)]">
                   <th scope="col" className="text-left py-2 opacity-60 font-medium">Categoria</th>
                   <th scope="col" className="text-right py-2 opacity-60 font-medium">Cost compra</th>
                   <th scope="col" className="text-right py-2 opacity-60 font-medium">Vida útil (h)</th>
@@ -531,7 +531,7 @@ export default function PricingAdminPage() {
               </thead>
               <tbody>
                 {(Object.entries(EQUIPMENT_AMORTIZATION) as [string, { value: number; lifeHours: number }][]).map(([cat, data]) => (
-                  <tr key={cat} className="border-b border-white/5 adm-row-hover">
+                  <tr key={cat} className="border-b border-[var(--line)] adm-row-hover">
                     <td className="py-3 font-mono text-xs opacity-70">{cat}</td>
                     <td className="py-3 text-right">{formatCurrency(data.value)}</td>
                     <td className="py-3 text-right">{formatNumber(data.lifeHours)}h</td>

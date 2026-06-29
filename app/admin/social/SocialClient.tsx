@@ -99,11 +99,11 @@ const IDEA_SOURCE_LABEL: Record<SerializedIdea['source'], string> = {
 };
 
 const STATUS_TONE: Record<string, string> = {
-  IDEA: 'bg-[var(--o-admin-fill-4)] border-white/15 text-white/60',
+  IDEA: 'bg-[var(--o-admin-fill-4)] border-[var(--line)] text-[var(--t2)]',
   DRAFT: 'admin-tone-bg-warning admin-tone-border-warning admin-tone-text-warning',
   SCHEDULED: 'admin-tone-bg-cyan admin-tone-border-cyan admin-tone-text-cyan',
   PUBLISHED: 'admin-tone-bg-success admin-tone-border-success admin-tone-text-success',
-  ARCHIVED: 'bg-[var(--o-admin-fill-1)] border-white/10 text-white/40',
+  ARCHIVED: 'bg-[var(--o-admin-fill-1)] border-[var(--line)] text-[var(--t3)]',
 };
 
 const PLATFORM_ICON: Record<string, string> = {
@@ -277,40 +277,40 @@ export default function SocialClient({
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
-      <section className="admin-card-glass rounded-2xl border border-white/10 p-4">
+      <section className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-white/50">Bucle social únic</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)]">Bucle social únic</p>
             <h2 className="mt-2 text-base font-bold leading-snug">{operatingLoop.title}</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-white/65">{operatingLoop.focus}</p>
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--t2)]">{operatingLoop.focus}</p>
           </div>
           <div className="flex flex-wrap gap-2 text-xs lg:justify-end">
-            <span className="rounded-full border border-white/10 px-2 py-1">{operatingLoop.evidence}</span>
-            <span className="rounded-full border border-white/10 px-2 py-1">{operatingLoop.captureLabel}</span>
+            <span className="rounded-full border border-[var(--line)] px-2 py-1">{operatingLoop.evidence}</span>
+            <span className="rounded-full border border-[var(--line)] px-2 py-1">{operatingLoop.captureLabel}</span>
           </div>
         </div>
       </section>
 
       <section className="grid gap-3 lg:grid-cols-4">
         <article className={`admin-card-glass rounded-2xl border p-4 ${pulseRisk ? 'admin-tone-border-warning admin-tone-bg-warning' : 'admin-tone-border-success admin-tone-bg-success'}`}>
-          <p className="text-xs font-bold uppercase tracking-wider text-white/50">Pols editorial</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)]">Pols editorial</p>
           <h2 className="mt-2 text-base font-bold leading-snug">{pulse.isActive ? 'Actiu' : 'Aturat'}</h2>
-          <p className="mt-2 text-xs leading-relaxed text-white/65">{pulseSummary}</p>
+          <p className="mt-2 text-xs leading-relaxed text-[var(--t2)]">{pulseSummary}</p>
         </article>
-        <article className="admin-card-glass rounded-2xl border border-white/10 p-4">
-          <p className="text-xs font-bold uppercase tracking-wider text-white/50">Cadència</p>
+        <article className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)]">Cadència</p>
           <p className="mt-2 text-2xl font-bold">{pulse.consistencyScore}%</p>
-          <p className="mt-1 text-xs text-white/60">{pulse.postsLast30d} peces creades · {pulse.scheduledUpcoming} programades</p>
+          <p className="mt-1 text-xs text-[var(--t2)]">{pulse.postsLast30d} peces creades · {pulse.scheduledUpcoming} programades</p>
         </article>
-        <article className="admin-card-glass rounded-2xl border border-white/10 p-4">
-          <p className="text-xs font-bold uppercase tracking-wider text-white/50">Cua editorial</p>
+        <article className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)]">Cua editorial</p>
           <p className="mt-2 text-2xl font-bold">{pulse.draftsPending}</p>
-          <p className="mt-1 text-xs text-white/60">esborranys pendents de decisió</p>
+          <p className="mt-1 text-xs text-[var(--t2)]">esborranys pendents de decisió</p>
         </article>
-        <article className="admin-card-glass rounded-2xl border border-white/10 p-4">
-          <p className="text-xs font-bold uppercase tracking-wider text-white/50">Instagram → pipeline</p>
+        <article className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)]">Instagram → pipeline</p>
           <p className="mt-2 text-2xl font-bold">{pulse.instagramLeadCount}</p>
-          <p className="mt-1 text-xs text-white/60">{pulse.instagramWonCount} guanyats · {instagramConversionRate}% conversió</p>
+          <p className="mt-1 text-xs text-[var(--t2)]">{pulse.instagramWonCount} guanyats · {instagramConversionRate}% conversió</p>
         </article>
       </section>
 
@@ -321,7 +321,7 @@ export default function SocialClient({
             key={key}
             onClick={() => setStatusFilter(statusFilter === key ? 'all' : key)}
             type="button"
-            className={`admin-stagger-item rounded-xl border p-3 text-left transition-colors ${statusFilter === key ? STATUS_TONE[key] : 'border-white/10 admin-card-glass adm-row-hover'}`}
+            className={`admin-stagger-item rounded-xl border p-3 text-left transition-colors ${statusFilter === key ? STATUS_TONE[key] : 'border-[var(--line)] admin-card-glass adm-row-hover'}`}
           >
             <p className="text-xs font-semibold uppercase tracking-wider opacity-60">{label}</p>
             <p className="mt-1 text-xl font-bold">{counts[key as SocialPostStatus]}</p>
@@ -335,14 +335,14 @@ export default function SocialClient({
           <button
             onClick={() => setView('list')}
             type="button"
-            className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${view === 'list' ? 'bg-white/10 border-white/20' : 'border-white/5 hover:bg-white/5'}`}
+            className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${view === 'list' ? 'bg-[var(--raised)] border-[var(--line)]' : 'border-[var(--line)] hover:bg-[var(--raised)]'}`}
           >
             Llista
           </button>
           <button
             onClick={() => setView('calendar')}
             type="button"
-            className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${view === 'calendar' ? 'bg-white/10 border-white/20' : 'border-white/5 hover:bg-white/5'}`}
+            className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${view === 'calendar' ? 'bg-[var(--raised)] border-[var(--line)]' : 'border-[var(--line)] hover:bg-[var(--raised)]'}`}
           >
             Calendari
           </button>
@@ -379,7 +379,7 @@ export default function SocialClient({
             <button
               onClick={() => setShowIdeas((v) => !v)}
               type="button"
-              className="rounded-lg border border-white/10 px-2 py-1 text-xs hover:bg-white/5 sm:self-auto self-start"
+              className="rounded-lg border border-[var(--line)] px-2 py-1 text-xs hover:bg-[var(--raised)] sm:self-auto self-start"
             >
               {showIdeas ? 'Amagar' : 'Mostrar'}
             </button>
@@ -390,7 +390,7 @@ export default function SocialClient({
               {ideas.map((idea) => (
                 <div
                   key={idea.id}
-                  className="admin-stagger-item rounded-lg border border-white/10 admin-card-glass p-3 adm-row-hover transition-colors"
+                  className="admin-stagger-item rounded-lg border border-[var(--line)] admin-card-glass p-3 adm-row-hover transition-colors"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
@@ -424,7 +424,7 @@ export default function SocialClient({
                     <button
                       onClick={() => handleDismissIdea(idea.id)}
                       type="button"
-                      className="rounded border border-white/10 px-2 py-1 text-xs opacity-60 hover:bg-white/5"
+                      className="rounded border border-[var(--line)] px-2 py-1 text-xs opacity-60 hover:bg-[var(--raised)]"
                     >
                       Descartar
                     </button>
@@ -447,7 +447,7 @@ export default function SocialClient({
             </div>
           ) : (
             filteredPosts.map((post) => (
-              <div key={post.id} className="admin-stagger-item rounded-xl border border-white/10 admin-card-glass p-4 adm-row-hover transition-colors">
+              <div key={post.id} className="admin-stagger-item rounded-xl border border-[var(--line)] admin-card-glass p-4 adm-row-hover transition-colors">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -482,7 +482,7 @@ export default function SocialClient({
                       <select
                         value={post.status}
                         onChange={(e) => handleStatusChange(post.id, e.target.value)}
-                        className="min-w-0 rounded border border-white/10 bg-transparent px-1.5 py-0.5 text-xs"
+                        className="min-w-0 rounded border border-[var(--line)] bg-transparent px-1.5 py-0.5 text-xs"
                       >
                         {Object.entries(SOCIAL_POST_STATUSES).map(([, val]) => (
                           <option key={val} value={val}>{SOCIAL_POST_STATUS_LABELS[val]}</option>
@@ -491,14 +491,14 @@ export default function SocialClient({
                       <button
                         onClick={() => { setEditingPost(post); setShowCreate(true); }}
                         type="button"
-                        className="rounded border border-white/10 px-1.5 py-0.5 text-xs hover:bg-white/10"
+                        className="rounded border border-[var(--line)] px-1.5 py-0.5 text-xs hover:bg-[var(--raised)]"
                       >
                         ✏️
                       </button>
                       <button
                         onClick={() => handleDelete(post.id)}
                         type="button"
-                        className="rounded border border-white/10 px-1.5 py-0.5 text-xs hover:admin-tone-bg-danger"
+                        className="rounded border border-[var(--line)] px-1.5 py-0.5 text-xs hover:admin-tone-bg-danger"
                       >
                         🗑️
                       </button>
@@ -521,7 +521,7 @@ export default function SocialClient({
                 return { year: d.getFullYear(), month: d.getMonth() };
               })}
               type="button"
-              className="rounded-lg border border-white/10 px-3 py-1.5 text-sm hover:bg-white/5"
+              className="rounded-lg border border-[var(--line)] px-3 py-1.5 text-sm hover:bg-[var(--raised)]"
             >
               ◀
             </button>
@@ -534,13 +534,13 @@ export default function SocialClient({
                 return { year: d.getFullYear(), month: d.getMonth() };
               })}
               type="button"
-              className="rounded-lg border border-white/10 px-3 py-1.5 text-sm hover:bg-white/5"
+              className="rounded-lg border border-[var(--line)] px-3 py-1.5 text-sm hover:bg-[var(--raised)]"
             >
               ▶
             </button>
           </div>
           <div className="overflow-x-auto rounded-xl">
-            <div className="grid min-w-[720px] grid-cols-7 gap-px overflow-x-auto rounded-xl border border-white/10 overflow-hidden admin-card-glass">
+            <div className="grid min-w-[720px] grid-cols-7 gap-px overflow-x-auto rounded-xl border border-[var(--line)] overflow-hidden admin-card-glass">
             {['Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds', 'Dg'].map((d) => (
               <div key={d} className="bg-[var(--o-admin-fill-3)] p-2 text-center text-xs font-semibold uppercase tracking-wider opacity-50">
                 {d}
@@ -552,7 +552,7 @@ export default function SocialClient({
               return (
                 <div
                   key={day.date}
-                  className={`min-h-[80px] border-t border-white/5 p-1.5 ${day.isCurrentMonth ? 'bg-[var(--o-admin-fill-1)]' : 'bg-transparent opacity-30'} ${isToday ? 'ring-1 ring-inset ring-[var(--ax-hair-gold)]' : ''}`}
+                  className={`min-h-[80px] border-t border-[var(--line)] p-1.5 ${day.isCurrentMonth ? 'bg-[var(--o-admin-fill-1)]' : 'bg-transparent opacity-30'} ${isToday ? 'ring-1 ring-inset ring-[var(--ax-hair-gold)]' : ''}`}
                 >
                   <p className={`text-xs font-medium ${isToday ? 'admin-tone-text-cyan' : 'opacity-60'}`}>{day.day}</p>
                   <div className="mt-0.5 space-y-0.5">
@@ -699,7 +699,7 @@ function SocialPostModal({
       <form
         onClick={(e) => e.stopPropagation()}
         onSubmit={handleSubmit}
-        className="w-full max-w-lg rounded-2xl border border-white/10 admin-form-deep p-6 space-y-4 max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-lg rounded-2xl border border-[var(--line)] admin-form-deep p-6 space-y-4 max-h-[90vh] overflow-y-auto"
       >
         <h2 className="ap-h2">{post ? 'Editar publicació' : 'Nova publicació'}</h2>
 
@@ -718,7 +718,7 @@ function SocialPostModal({
                 key={val}
                 type="button"
                 onClick={() => togglePlatform(val)}
-                className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${platforms.includes(val) ? 'admin-tone-bg-cyan admin-tone-border-cyan admin-tone-text-cyan' : 'border-white/10 hover:bg-white/5'}`}
+                className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${platforms.includes(val) ? 'admin-tone-bg-cyan admin-tone-border-cyan admin-tone-text-cyan' : 'border-[var(--line)] hover:bg-[var(--raised)]'}`}
               >
                 {PLATFORM_ICON[val]} {SOCIAL_PLATFORM_LABELS[val as SocialPlatform]}
               </button>
@@ -781,7 +781,7 @@ function SocialPostModal({
         </div>
 
         <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-end">
-          <button type="button" onClick={onClose} className="rounded-xl border border-white/10 px-4 py-2 text-sm hover:bg-white/5">
+          <button type="button" onClick={onClose} className="rounded-xl border border-[var(--line)] px-4 py-2 text-sm hover:bg-[var(--raised)]">
             Cancel·lar
           </button>
           <button type="submit" disabled={saving || !title.trim() || platforms.length === 0} className="ap-btn ap-btn--primary px-6 py-2 disabled:opacity-50 sm:w-auto w-full">

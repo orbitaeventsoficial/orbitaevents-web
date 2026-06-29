@@ -296,6 +296,14 @@ export async function mergeCustomers(
     updateData.lastEventDate = new Date(Math.max(...lastEventDates.map(d => d.getTime())));
   }
 
+  if (!primary.referredById) {
+    const duplicateReferrer = duplicates.find((c) => c.referredById && c.referredById !== primaryId);
+    if (duplicateReferrer?.referredById) {
+      updateData.referredBy = { connect: { id: duplicateReferrer.referredById } };
+      fieldsUpdated.push('referredById');
+    }
+  }
+
   // Normalitzar si s'ha actualitzat phone o instagram
   if (updateData.phone) {
     updateData.phoneNormalized = normalizePhone(updateData.phone as string);
@@ -314,6 +322,40 @@ export async function mergeCustomers(
 
     // Moure leads dels duplicats al principal
     prisma.lead.updateMany({
+      where: { customerId: { in: duplicateIds } },
+      data: { customerId: primaryId },
+    }),
+
+    // Moure relacions operatives de client al principal
+    prisma.booking.updateMany({
+      where: { customerId: { in: duplicateIds } },
+      data: { customerId: primaryId },
+    }),
+    prisma.proposal.updateMany({
+      where: { customerId: { in: duplicateIds } },
+      data: { customerId: primaryId },
+    }),
+    prisma.invoice.updateMany({
+      where: { customerId: { in: duplicateIds } },
+      data: { customerId: primaryId },
+    }),
+    prisma.task.updateMany({
+      where: { customerId: { in: duplicateIds } },
+      data: { customerId: primaryId },
+    }),
+    prisma.clientPortalAccess.updateMany({
+      where: { customerId: { in: duplicateIds } },
+      data: { customerId: primaryId },
+    }),
+    prisma.customerContact.updateMany({
+      where: { customerId: { in: duplicateIds } },
+      data: { customerId: primaryId },
+    }),
+    prisma.consentRecord.updateMany({
+      where: { customerId: { in: duplicateIds } },
+      data: { customerId: primaryId },
+    }),
+    prisma.dataRequest.updateMany({
       where: { customerId: { in: duplicateIds } },
       data: { customerId: primaryId },
     }),
@@ -340,6 +382,12 @@ export async function mergeCustomers(
     prisma.customer.updateMany({
       where: { id: { in: duplicateIds } },
       data: { mergedIntoId: primaryId },
+    }),
+
+    // Reassignar referrals que apuntaven al duplicat
+    prisma.customer.updateMany({
+      where: { referredById: { in: duplicateIds } },
+      data: { referredById: primaryId },
     }),
   ]);
 
@@ -406,4 +454,3 @@ function calculateSimilarity(str1: string, str2: string): number {
   const distance = matrix[len1][len2];
   return 1 - distance / maxLen;
 }
-

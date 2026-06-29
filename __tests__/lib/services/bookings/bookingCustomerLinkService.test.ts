@@ -6,6 +6,9 @@ const { mockPrisma } = vi.hoisted(() => ({
       findUnique: vi.fn(),
       update: vi.fn(),
     },
+    clientPortalAccess: {
+      updateMany: vi.fn(),
+    },
     customer: {
       findMany: vi.fn(),
       findUnique: vi.fn(),
@@ -151,6 +154,10 @@ describe('linkBookingToCustomer — link', () => {
       where: { id: 'b-link' },
       data: { customerId: 'c-target' },
     });
+    expect(mockPrisma.clientPortalAccess.updateMany).toHaveBeenCalledWith({
+      where: { bookingId: 'b-link', revokedAt: null },
+      data: { customerId: 'c-target' },
+    });
   });
 });
 
@@ -206,6 +213,10 @@ describe('linkBookingToCustomer — create', () => {
     expect(data.preferredLocale).toBe('es');
     expect(mockPrisma.booking.update).toHaveBeenCalledWith({
       where: { id: 'b-create' },
+      data: { customerId: 'c-new' },
+    });
+    expect(mockPrisma.clientPortalAccess.updateMany).toHaveBeenCalledWith({
+      where: { bookingId: 'b-create', revokedAt: null },
       data: { customerId: 'c-new' },
     });
   });

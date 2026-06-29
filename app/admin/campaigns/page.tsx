@@ -11,7 +11,7 @@ export const metadata = {
 const URGENCY_TONE: Record<string, string> = {
   HIGH: 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger',
   MEDIUM: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
-  LOW: 'border-[var(--line)] bg-[var(--panel)] text-white/60',
+  LOW: 'border-[var(--line)] bg-[var(--panel)] text-[var(--t2)]',
 };
 
 const URGENCY_LABEL: Record<string, string> = {
@@ -67,7 +67,7 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
           <span className="group-open:hidden">▶ Veure plantilla del missatge</span>
           <span className="hidden group-open:inline">▼ Amagar plantilla</span>
         </summary>
-        <div className="mt-2 rounded-lg border border-white/10 bg-[var(--sunk)] p-3">
+        <div className="mt-2 rounded-lg border border-[var(--line)] bg-[var(--sunk)] p-3">
           <p className="text-xs font-semibold opacity-70">Assumpte</p>
           <p className="mt-0.5 text-xs">{campaign.subject}</p>
           <p className="mt-2 text-xs font-semibold opacity-70">Cos del missatge</p>
@@ -91,7 +91,7 @@ export default async function CampaignsPage() {
       actions={
         <Link
           href="/admin/clientes/reactivation"
-          className="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"
+          className="rounded-lg border border-[var(--line)] bg-[var(--raised)] px-3 py-1.5 text-xs hover:bg-[var(--raised)]"
         >
           Reactivació individual →
         </Link>

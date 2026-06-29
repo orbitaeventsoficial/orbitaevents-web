@@ -48,6 +48,8 @@ const validBody = {
   videoUrl: '',
   allowGoogleShare: true,
   consentPhotoPublication: false,
+  token: 'review-token-1',
+  bookingRef: 'OE-2026-001',
 };
 
 describe('/api/testimonials', () => {
@@ -91,6 +93,8 @@ describe('/api/testimonials', () => {
       videoUrl: undefined,
       allowGoogleShare: true,
       consentPhotoPublication: false,
+      token: 'review-token-1',
+      bookingRef: 'OE-2026-001',
     });
   });
 

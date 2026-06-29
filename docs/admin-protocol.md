@@ -1365,6 +1365,16 @@ Salt qualitatiu multi-tall. Honeybook s'ha menjat el mercat USA d'events amb aix
 **FET parcial** *(2026-05-16 per `codex` — Canvi #585)*: el portal client ja comença a separar-se en subrutes reals amb `/[locale]/portal/[token]/payments`. La portada enllaça a `payments`, `buildClientPortalPaymentsPath()` blinda la ruta interna, i la pàgina dedicada mostra resum de pagament, proper pas, targeta de bestreta, targeta de resta i CTAs Stripe quan toca, respectant `showPayments=false`.
 **FET parcial** *(2026-06-29 per `codex` — Canvi #1226)*: la visibilitat del portal client deixa de ser només visual. `lib/clientPortalVisibility.ts` interpreta els flags de `ClientPortalAccess.personalization`; `/payments`, `/timeline`, `/contract`, `/invoice` i `/questionnaire` retornen `notFound()` si el bloc corresponent està desactivat, i `PortalBottomNav` amaga els ítems derivats del mateix contracte. Això tanca el forat on un client podia entrar per URL directa a documents o timeline amagats per l'admin.
 **FET parcial** *(2026-06-29 per `codex` — Canvi #1228)*: el vincle tardà reserva→client també actualitza els accessos actius del portal. `linkBookingToCustomer()` ja no deixa `ClientPortalAccess.customerId=null` quan una reserva que ja tenia portal es vincula o crea client; actualitza `client_portal_access` per `bookingId + revokedAt=null`, mantenint Customer Hub i recurrència connectats.
+**FET parcial** *(2026-06-29 per `codex` — Canvi #1229)*: la reactivació deixa d'incloure clients fusionats. `loadReactivationCandidates()` filtra `mergedIntoId=null`, alineat amb referrals, perquè la cua de recurrència no creï tasques ni intents comercials sobre fitxes antigues absorbides per un customer canònic.
+**FET parcial** *(2026-06-29 per `codex` — Canvi #1230)*: la fusió de clients ja no deixa historial operatiu al duplicat. `mergeCustomers()` mou bookings, proposals, invoices, tasks, portal access, contactes, consentiments i data requests cap al customer principal; `resolveCustomerHubCustomerId()` retorna el `mergedIntoId` si s'obre una fitxa antiga fusionada.
+**FET parcial** *(2026-06-29 per `codex` — Canvi #1231)*: la fusió conserva el graf de referrals. Els clients que tenien `referredById` apuntant al duplicat passen al customer principal, i el principal hereta el `referredById` del duplicat si no en tenia; V4 queda tancada fora de la frontera post-event/V2.
+**FET parcial** *(2026-06-29 per `codex` — Canvi #1232)*: la branca V2 d'informe intern queda sanejada sense tocar mails automàtics. `createAdminPostEventReport()` només accepta reserves `COMPLETED`, `status` `DRAFT|COMPLETED` i valoracions 1-5; `getBookingOperationalSnapshot()` només dona el post-event per `COMPLETO` quan l'informe és `COMPLETED` i hi ha feedback enviat o enquesta resposta.
+**FET parcial** *(2026-06-29 per `codex` — Canvi #1233)*: la recepció de testimoni públic torna a connectar amb la reserva. `POST /api/testimonials` propaga `token+bookingRef`; `submitPublicTestimonial()` valida la parella contra `Booking.reviewToken`, usa el customer de la reserva, copia `eventType/eventDate`, marca `reviewSubmittedAt` i desa `discountCodeId` amb l'id real del descompte.
+**FET parcial** *(2026-06-29 per `codex` — Canvi #1234)*: el refresc manual de Google Reviews ja sincronitza de debò. `runReviewsSync()` concentra la consulta SerpAPI, l'escriptura de cache i el registre `automation.reviewsSync`; la ruta cron i la nova ruta admin `POST /api/admin/google-reviews/sync` reutilitzen aquesta font única, i `/admin/google-reviews` dispara la ruta amb CSRF abans de recarregar la cache pública.
+**FET parcial** *(2026-06-29 per `codex` — Canvi #1235)*: el playbook post-event ja no compta testimonis pendents com a prova social publicada. `loadPostEventPlaybook()` filtra `CustomerTestimonial.isApproved=true` abans de marcar l'acció `testimonial` com a feta, així moderació/publicació tornen a ser la frontera real.
+**FET parcial** *(2026-06-29 per `codex` — Canvi #1236)*: el copy visible de V2 torna a correspondre amb el cablejat real. `/admin/post-event` ja parla d'`Enquestes sense resposta` perquè la query compta `clientSurvey=null`, i `/admin/google-reviews` explica cron + refresc manual en lloc de build Railway.
+**FET parcial** *(2026-06-29 per `codex` — Canvi #1237)*: el playbook post-event deixa d'estar orfe. El hub `/admin/post-event` afegeix el quart pas `Playbook` cap a `/admin/post-event/playbook` i adapta la graella responsive a quatre passos.
+**FET** *(2026-06-29 per `codex` — Canvi #1239)*: V2 post-event queda tancada en primera passada no-mail. El full de ruta marca `✅ TANCADA #1239 (perímetre no-mail)` després de resoldre informe intern, estat operatiu, recepció/moderació de testimoni, Google Reviews, playbook i hub. Mails automàtics, Inbox, APPEND i seqüències continuen fora del perímetre per coordinació.
 **FET parcial** *(2026-05-16 per `claude` — Canvi #586)*: el portal guanya subruta de procés/timeline a `/[locale]/portal/[token]/timeline`. `getClientPortalTimeline()` deriva sis fites (reserva creada, pressupost enviat, contracte signat, paga i senyal, dia de l'event, pagament final) amb estat `done/upcoming/future` sense schema nou; la pàgina mostra la línia de temps vertical amb colors semàfor (emerald/cyan/blanc); la portada principal enllaça a la nova ruta des de la secció "Estat del procés". Missatges trilingüals afegits a `CLIENT_PORTAL_MESSAGES`.
 **FET parcial** *(2026-05-16 per `claude` — Canvi #587)*: el portal guanya subruta de factura/pressupost a `/[locale]/portal/[token]/invoice`. `getClientPortalInvoiceSummary()` exposa total, desglossament bestreta/resta amb dates de pagament i referència+PDF del primer pressupost amb PDF; `buildClientPortalInvoicePath()` construeix la ruta canònica. La portada substitueix l'enllaç directe al PDF per dos botons: "Veure pressupost" (invoice) + PDF si existeix. 8 claus noves trilingüals a `CLIENT_PORTAL_MESSAGES`.
 **FET** *(2026-05-17 per `claude` — Canvi #592)*: subruta `/portal/[token]/gallery` tanca G.25. `buildClientPortalGalleryPath()` canònic. Pàgina dedicada de galeria amb `listPortalPhotos()` i `next/image`. Portada del portal: preview 6 fotos + CTA "Veure totes les fotos". Clau `galleryViewLink` als tres locales. 3 tests del builder. Portal complet: `overview` + `contract` + `payments` + `timeline` + `invoice` + `questionnaire` (G.26) + `gallery` (ara).
@@ -1528,6 +1538,154 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1238 — 2026-06-29 — claude (FET)
+**Homogeneïtzació canònica massiva: 0 blancs crus a tot l'admin (auditoria pam a pam).**
+- 751 blancs crus Tailwind (text-white/NN, bg-white/N, border-white/NN) → tokens (--t/--t2/--t3/--line/--raised/--hair-gold) a 85 fitxers .tsx. Catàleg: botons-void → .ap-card, alert amb to. REPORT_STATUSES a allowlist layer-catalogs.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1238`; el següent canvi real ha de ser `#1239`.
+- Validació tècnica: `tsc` 0; `validate:core` EXIT 0 (admin-canon/no-inline-hex/no-inline-rgba/css-monocapa/layer-catalogs verds).
+- Validació funcional: cap canvi de comportament; monocapa complerta.
+- Validació humana/UX: catàleg arreglat (botons-void → cards); tokens homogenis.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1239 — 2026-06-29 — codex (FET)
+**V2 auditoria vertical post-event no-mail tancada.**
+- Context: després de #1232-#1237 no queda cap bug viu petit dins el perímetre post-event sense mails automàtics. El #1238 ja és de Claude, així que el tancament V2 es registra com #1239.
+- `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md`: V2 passa a `✅ TANCADA #1239 (perímetre no-mail)`.
+- `docs/agent-sync.md`: el següent front natural és V5 Catàleg→Preu, però queda en espera perquè toca inventari/preus/costEngine/schema i requereix coordinació.
+- Validació tècnica: `pnpm run qa:protocol`.
+- Validació funcional: tancament documental; cap canvi de runtime.
+- Validació humana/UX: el full de ruta ja no deixa V2 en estat ambigu quan el perímetre acordat està resolt.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1239`; el següent canvi real ha de ser `#1240`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1237 — 2026-06-29 — codex (FET)
+**V2 hub post-event: el playbook queda enllaçat des de l'òrgan mare.**
+- Context: `/admin/post-event/playbook` era una pantalla viva i documentada, però `/admin/post-event` només oferia Informes, Enquestes i Feedback. El checklist quedava orfe del flux principal.
+- `app/admin/post-event/page.tsx`: afegeix el pas `Playbook` amb CTA a `/admin/post-event/playbook`.
+- `app/admin/post-event/page.tsx`: la graella del workflow passa a `md:grid-cols-2 xl:grid-cols-4` per encaixar quatre passos.
+- Validació tècnica: `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: el hub post-event ja porta al checklist d'agraïment/testimoni/social/referral.
+- Validació humana/UX: l'usuari no necessita conèixer la URL directa del playbook.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1237`; el següent canvi real ha de ser `#1238`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1236 — 2026-06-29 — codex (FET)
+**V2 copy operatiu: post-event i Google Reviews descriuen l'estat real.**
+- Context: `/admin/post-event` deia `Enquestes per enviar`, però la dada era `clientSurvey=null`, és a dir, sense resposta rebuda. `/admin/google-reviews` encara parlava de build Railway tot i el runner manual/admin #1234.
+- `app/admin/post-event/page.tsx`: KPI, tooltip, meta i resum manual passen a `Enquestes sense resposta`.
+- `app/admin/google-reviews/page.tsx`: el bloc informatiu diu cron + refresc manual des de la pantalla.
+- Validació tècnica: `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvia dades ni automatismes; alinea copy amb queries i rutes vives.
+- Validació humana/UX: l'admin ja no interpreta una resposta pendent com si fos un enviament pendent.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1236`; el següent canvi real ha de ser `#1237`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1235 — 2026-06-29 — codex (FET)
+**V2 playbook: un testimoni només tanca la prova social si està aprovat.**
+- Context: `loadPostEventPlaybook()` buscava testimonis per `customerId` i data propera sense filtrar moderació. Una ressenya pendent o amagada podia marcar l'acció `testimonial` com a `DONE`.
+- `lib/services/postEventPlaybookService.ts`: la consulta de `CustomerTestimonial` afegeix `isApproved: true`.
+- `__tests__/lib/services/postEventPlaybookLoader.test.ts`: blinda que el wrapper Prisma només carregui testimonis aprovats i que, sense cap aprovat, l'acció segueixi pendent.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/postEventPlaybookService.test.ts __tests__/lib/services/postEventPlaybookLoader.test.ts`.
+- Validació funcional: rebut no equival a publicat; la cua post-event queda oberta fins que moderació aprova.
+- Validació humana/UX: el playbook ja no mostra falsos `DONE` per prova social no publicada.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1235`; el següent canvi real ha de ser `#1236`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1234 — 2026-06-29 — codex (FET)
+**V2 Google Reviews: el refresc admin sincronitza SerpAPI, no només cache.**
+- Context: `/admin/google-reviews` prometia `Refrescar`, però només tornava a llegir el client canònic públic `/api/google-reviews`. Això podia mostrar èxit sense haver executat la sincronització real.
+- `lib/services/reviewsSyncService.ts`: afegeix `runReviewsSync()` com a runner únic per consultar SerpAPI, escriure cache i registrar `automation.reviewsSync`.
+- `app/api/cron/reviews-sync/route.ts`: reutilitza `runReviewsSync()` en lloc de duplicar la persistència.
+- `app/api/admin/google-reviews/sync/route.ts`: nova ruta admin `POST` amb `requireAuth` + `verifyCsrf`, sense exposar `CRON_SECRET` al client.
+- `app/admin/google-reviews/page.tsx`: el botó `Refrescar` crida la ruta admin i després recarrega les dades públiques amb `cache: 'no-store'`.
+- `__tests__/app/api/admin/google-reviews-sync-route.test.ts`, `__tests__/app/api/cron/reviews-sync-route.test.ts`, `__tests__/lib/services/reviewsSyncService.test.ts` i `__tests__/lib/api/googleReviewsClient.test.ts`: regressions de ruta admin, cron, runner i client canònic.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/reviewsSyncService.test.ts __tests__/app/api/cron/reviews-sync-route.test.ts __tests__/app/api/admin/google-reviews-sync-route.test.ts __tests__/lib/api/googleReviewsClient.test.ts`.
+- Validació funcional: el refresc manual de l'admin només dona èxit després d'una sincronització real i mostra error si SerpAPI no retorna resultats.
+- Validació humana/UX: l'admin ja no confon rellegir cache amb sincronitzar Google.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1234`; el següent canvi real ha de ser `#1235`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1233 — 2026-06-29 — codex (FET)
+**V2 testimoni: el link públic reconnecta reserva, client i descompte.**
+- Context: el formulari públic enviava `token` i `bookingRef`, però l'API no els passava al servei; el testimoni quedava desvinculat del booking i el descompte associat es guardava amb `code` dins `discountCodeId`, mentre l'admin el resol per `id`.
+- `app/api/testimonials/route.ts`: propaga `token` i `bookingRef` a `submitPublicTestimonial()`.
+- `lib/services/publicTestimonialService.ts`: amb `token+bookingRef` vàlids, troba la reserva per `reference + reviewToken`, usa el seu `customerId`, copia `eventType/eventDate` al testimoni i marca `reviewSubmittedAt`.
+- `lib/services/publicTestimonialService.ts`: `discountCodeId` passa a guardar l'id del `CustomerDiscountCode` creat, de manera que `listAdminTestimonials()` el pot resoldre.
+- `__tests__/lib/services/publicTestimonialService.test.ts` i `__tests__/app/api/testimonials-route.test.ts`: regressions del link públic i del descompte resoluble.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/publicTestimonialService.test.ts __tests__/lib/services/testimonialAdminService.test.ts __tests__/app/api/testimonials-route.test.ts`; `npx tsc --noEmit --pretty false`.
+- Validació funcional: una review post-event rebuda des del link queda marcada al booking i visible com a testimoni amb recompensa.
+- Validació humana/UX: moderació de testimonis mostra el codi de descompte real i la fitxa de reserva pot detectar que el client ja ha respost.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1233`; el següent canvi real ha de ser `#1234`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1232 — 2026-06-29 — codex (FET)
+**V2 post-event: creació d'informe validada i estat operatiu coherent.**
+- Context: dins la V2 no-mail, l'API d'informes post-event podia crear informe per una reserva no completada, acceptar `status` arbitrari i valoracions fora del rang 1-5 del formulari. L'snapshot operatiu tampoc distingia prou entre esborrany i informe completat.
+- `lib/services/postEventReportAdminService.ts`: exigeix booking `COMPLETED`, restringeix `status` a `DRAFT|COMPLETED` i valida `soundQuality`/`danceFloorLevel` entre 1 i 5 abans d'escriure.
+- `lib/services/bookingOperationalService.ts`: `internalPostEventStatus` només és `COMPLETO` amb informe `COMPLETED` i feedback enviat o enquesta rebuda; informe en esborrany queda `EN_PROGRESO`.
+- `__tests__/lib/services/postEventReportAdminService.test.ts` i `__tests__/lib/services/bookingOperationalService.test.ts`: regressions de reserva no completada, status invalid, rangs 1-5 i tancament per informe+enquesta.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/postEventReportAdminService.test.ts __tests__/lib/services/bookingOperationalService.test.ts __tests__/app/api/admin/post-event-reports-route.test.ts`; `npx tsc --noEmit --pretty false`.
+- Validació funcional: l'informe intern post-event només neix quan el bolo ja està completat i amb dades dins del contracte.
+- Validació humana/UX: el dashboard/fitxa no llegeix un post-event parcial com si fos tancat.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1232`; el següent canvi real ha de ser `#1233`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1231 — 2026-06-29 — codex (FET)
+**V4 referrals: la fusió de clients conserva qui ha referit qui.**
+- Context: després del #1230, quedava un cable específic de referrals: els clients referits per un duplicat podien continuar apuntant a la fitxa fusionada.
+- `lib/services/deduplicationService.ts`: reassigna `referredById` dels referits del duplicat al client principal i hereta el referrer del duplicat si el principal no en tenia.
+- `__tests__/lib/services/deduplicationService.test.ts`: regressions per reassignació i herència de `referredById`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/deduplicationService.test.ts __tests__/lib/services/referralsService.test.ts`; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: referrals i valor generat queden atribuïts al customer canònic després de fusionar duplicats.
+- Validació humana/UX: la fitxa 360 i `/admin/clientes/referrals` mantenen la narrativa comercial de recomanacions.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1231`; el següent canvi real ha de ser `#1232`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1230 — 2026-06-29 — codex (FET)
+**V4 fusió client: l'historial operatiu passa al customer canònic.**
+- Context: `mergeCustomers()` deixava reserves, pressupostos, factures, tasques, portals i contactes al duplicat fusionat, trencant Customer Hub i recurrència.
+- `lib/services/deduplicationService.ts`: mou bookings, proposals, invoices, tasks, `ClientPortalAccess`, contactes, consentiments i data requests al client principal.
+- `lib/customer-hub/data.ts`: si l'id rebut és un customer amb `mergedIntoId`, resol directament el customer canònic.
+- `__tests__/lib/services/deduplicationService.test.ts` i `__tests__/lib/customer-hub/data.test.ts`: regressions del trasllat i del resolver.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/deduplicationService.test.ts __tests__/lib/customer-hub/data.test.ts __tests__/lib/customer-hub/fetchCustomerHub.test.ts`; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: després d'una fusió, reserves/portal/tasques/documents comercials queden visibles al customer principal.
+- Validació humana/UX: la fitxa 360 no es parteix entre client antic i client canònic.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1230`; el següent canvi real ha de ser `#1231`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1229 — 2026-06-29 — codex (FET)
+**V4 recurrència: la reactivació només proposa clients canònics no fusionats.**
+- Context: referrals ja filtrava `mergedIntoId=null`, però reactivació podia carregar fitxes antigues fusionades i portar tasques comercials al customer equivocat.
+- `lib/services/reactivationService.ts`: `loadReactivationCandidates()` afegeix `mergedIntoId: null` al `where`.
+- `__tests__/lib/services/reactivationService.test.ts`: regressió del wrapper Prisma perquè la query exclogui clients fusionats.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/reactivationService.test.ts __tests__/lib/services/referralsService.test.ts`; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: la cua de reactivació queda alineada amb referrals i no apunta a fitxes absorbides.
+- Validació humana/UX: el propietari no reactiva ni crea tasques sobre una fitxa client antiga després d'una fusió.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1229`; el següent canvi real ha de ser `#1230`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1228 — 2026-06-29 — codex (FET)
 **V4 client: vincular una reserva també reassigna els PortalAccess actius.**
 - Context: una reserva podia generar portal abans de tenir `customerId`; si després es vinculava o creava client, `Booking.customerId` quedava bé però `ClientPortalAccess.customerId` seguia null.
@@ -1550,7 +1708,7 @@ Seqüència obligatòria de registre:
 - Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/contractSignatureService.test.ts __tests__/app/api/portal/sign-route.test.ts`; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
 - Validació funcional: una fallada transitòria de PDF deixa el contracte reintentable i no signat parcialment.
 - Validació humana/UX: evita l'estat ambigu on el client veu error però l'admin veu contracte signat.
-- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1227`; el següent canvi real ha de ser `#1228`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1238`; el següent canvi real ha de ser `#1239`.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`
@@ -1571,10 +1729,10 @@ Seqüència obligatòria de registre:
 - Treballant per: `codex`
 - Tancat per: `codex`
 
-### Canvi #1226 — 2026-06-29 — claude (FET)
+### Nota concurrent — 2026-06-29 — claude (regularitzada fora del comptador)
 **Homogeneïtzació canònica: blancs crus → tokens a portfolio/text-manager/salut.**
 - Top del deute visual: blancs crus Tailwind (`text-white/NN`, `bg-white/N`, `border-white/NN`) → tokens (`--t`/`--t2`/`--t3`/`--line`/`--raised`/`--hair-gold`). 0 blancs crus restants. Compliment monocapa (no canvi visual perceptible).
-- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1226`; el següent canvi real ha de ser `#1227`.
+- Regularització documental: aquest bloc havia entrat amb `Canvi #1226` mentre Codex ja havia registrat el #1226 de V4 portal; es conserva com a nota per no duplicar numeració al §9.
 - Validació tècnica: `tsc` 0; `validate:core` (admin-canon) 0.
 - Validació funcional: cap canvi de comportament; captura portfolio idèntica.
 - Validació humana/UX: homogeneïtzació cap al canon sense regressió.

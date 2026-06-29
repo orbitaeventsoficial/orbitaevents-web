@@ -15,6 +15,7 @@ import { formatDateTimeFull } from '@/lib/constants';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import GoogleGIcon from '@/app/components/public/GoogleGIcon';
 import { fetchPublicGoogleReviews, type GoogleReview } from '@/lib/api/googleReviewsClient';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 interface ReviewsData {
   lastUpdated?: string;
@@ -35,10 +36,10 @@ export default function GoogleReviewsAdminPage() {
     loadReviews();
   }, []);
 
-  async function loadReviews() {
+  async function loadReviews(init?: RequestInit) {
     try {
       setLoadError(null);
-      const reviewsData = (await fetchPublicGoogleReviews()) as ReviewsData;
+      const reviewsData = (await fetchPublicGoogleReviews(init)) as ReviewsData;
       setData(reviewsData);
       return true;
     } catch (error) {
@@ -54,12 +55,20 @@ export default function GoogleReviewsAdminPage() {
   async function syncReviews() {
     setSyncing(true);
     try {
-      const reloaded = await loadReviews();
-      if (reloaded) {
-        toast.success('Ressenyes actualitzades');
-      } else {
-        toast.error("No s'han pogut actualitzar les ressenyes");
+      const response = await fetchWithCsrf('/api/admin/google-reviews/sync', { method: 'POST' });
+      const result = await response.json().catch(() => null) as { ok?: boolean; error?: string; synced?: number } | null;
+
+      if (!response.ok || !result?.ok) {
+        toast.error(result?.error || "No s'han pogut sincronitzar les ressenyes");
+        return;
       }
+
+      const reloaded = await loadReviews({ cache: 'no-store' });
+      toast[reloaded ? 'success' : 'error'](
+        reloaded
+          ? `Ressenyes sincronitzades (${result.synced ?? 0})`
+          : "Sincronitzades, però no s'han pogut recarregar"
+      );
     } finally {
       setSyncing(false);
     }
@@ -75,7 +84,7 @@ export default function GoogleReviewsAdminPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen" role="status" aria-live="polite">
-        <div className="text-white">Carregant ressenyes...</div>
+        <div className="text-[var(--t)]">Carregant ressenyes...</div>
       </div>
     );
   }
@@ -99,7 +108,7 @@ export default function GoogleReviewsAdminPage() {
           animate={{ opacity: 1, y: 0 }}
           className="border rounded-2xl p-6"
         >
-          <div className="text-sm text-white/60 mb-1">Valoració mitjana</div>
+          <div className="text-sm text-[var(--t2)] mb-1">Valoració mitjana</div>
           <div className="text-3xl font-bold">{data?.rating.toFixed(1) || '0.0'}</div>
           <div className="mt-1 text-xs admin-tone-text-slate">⭐⭐⭐⭐⭐</div>
         </motion.div>
@@ -110,7 +119,7 @@ export default function GoogleReviewsAdminPage() {
           transition={reduceMotion ? { duration: 0 } : { delay: 0.1 }}
           className="border rounded-2xl p-6"
         >
-          <div className="text-sm text-white/60 mb-1">Total ressenyes</div>
+          <div className="text-sm text-[var(--t2)] mb-1">Total ressenyes</div>
           <div className="text-3xl font-bold">{totalReviews}</div>
           <div className="mt-1 text-xs admin-tone-text-slate">En Google Business</div>
         </motion.div>
@@ -121,7 +130,7 @@ export default function GoogleReviewsAdminPage() {
           transition={reduceMotion ? { duration: 0 } : { delay: 0.2 }}
           className="border rounded-2xl p-6"
         >
-          <div className="text-sm text-white/60 mb-1">5 estrelles</div>
+          <div className="text-sm text-[var(--t2)] mb-1">5 estrelles</div>
           <div className="text-3xl font-bold">{fiveStarReviews.length}</div>
           <div className="mt-1 text-xs admin-tone-text-slate">Mostrades al web</div>
         </motion.div>
@@ -132,7 +141,7 @@ export default function GoogleReviewsAdminPage() {
           transition={reduceMotion ? { duration: 0 } : { delay: 0.3 }}
           className="border rounded-2xl p-6"
         >
-          <div className="text-sm text-white/60 mb-1">Última sincronització</div>
+          <div className="text-sm text-[var(--t2)] mb-1">Última sincronització</div>
           <div className="text-sm font-semibold">{lastUpdate}</div>
           <button
             onClick={syncReviews}
@@ -146,7 +155,7 @@ export default function GoogleReviewsAdminPage() {
 
       {/* Reviews List */}
       <div className="ap-card rounded-2xl p-6">
-        <h2 className="text-xl font-bold text-white mb-6">
+        <h2 className="text-xl font-bold text-[var(--t)] mb-6">
           Ressenyes de 5 estrelles ({fiveStarReviews.length})
         </h2>
 
@@ -172,14 +181,14 @@ export default function GoogleReviewsAdminPage() {
               >
                 <div className="flex items-start gap-4">
                   {/* Avatar */}
-                  <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white font-bold flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-[var(--raised)] flex items-center justify-center text-[var(--t)] font-bold flex-shrink-0">
                     {review.author_name.charAt(0)}
                   </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-white">{review.author_name}</h3>
+                      <h3 className="font-semibold text-[var(--t)]">{review.author_name}</h3>
                       <span className="text-xs admin-tone-text-neutral">{review.relative_time_description}</span>
                     </div>
 
@@ -191,7 +200,7 @@ export default function GoogleReviewsAdminPage() {
                       ))}
                     </div>
 
-                    <p className="text-white/80 text-sm leading-relaxed">{review.text}</p>
+                    <p className="text-[var(--t2)] text-sm leading-relaxed">{review.text}</p>
                   </div>
                 </div>
               </motion.div>
@@ -203,8 +212,8 @@ export default function GoogleReviewsAdminPage() {
       {/* Info Box */}
       <div className="mt-8 border rounded-xl p-6">
         <h3 className="font-semibold mb-2">ℹ️ Informació</h3>
-        <ul className="text-sm text-white/70 space-y-1">
-          <li>• Les ressenyes se sincronitzen automàticament durant el build de Railway</li>
+        <ul className="text-sm text-[var(--t2)] space-y-1">
+          <li>• Les ressenyes se sincronitzen amb el cron i també es poden refrescar manualment des d'aquesta pantalla</li>
           <li>• Només es mostren ressenyes de 5 estrelles al web</li>
           <li>• La sincronització usa SerpAPI configurat a les variables d’entorn</li>
           <li>• No es poden editar ni eliminar ressenyes (són de Google Business)</li>

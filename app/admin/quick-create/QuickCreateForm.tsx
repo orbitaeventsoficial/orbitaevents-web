@@ -163,7 +163,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
         <legend className="px-2 text-sm font-semibold">Client</legend>
         <div className="grid sm:grid-cols-2 gap-3">
           <label className="block text-sm">
-            <span className="text-xs text-white/60">Nom *</span>
+            <span className="text-xs text-[var(--t2)]">Nom *</span>
             <input
               type="text"
               required
@@ -173,7 +173,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             />
           </label>
           <label className="block text-sm">
-            <span className="text-xs text-white/60">Email *</span>
+            <span className="text-xs text-[var(--t2)]">Email *</span>
             <input
               type="email"
               required
@@ -183,7 +183,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             />
           </label>
           <label className="block text-sm">
-            <span className="text-xs text-white/60">Telèfon</span>
+            <span className="text-xs text-[var(--t2)]">Telèfon</span>
             <input
               type="tel"
               value={form.phone}
@@ -192,7 +192,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             />
           </label>
           <label className="block text-sm">
-            <span className="text-xs text-white/60">DNI/NIE</span>
+            <span className="text-xs text-[var(--t2)]">DNI/NIE</span>
             <input
               type="text"
               value={form.dni}
@@ -207,7 +207,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
         <legend className="px-2 text-sm font-semibold">Esdeveniment</legend>
         <div className="grid sm:grid-cols-2 gap-3">
           <label className="block text-sm">
-            <span className="text-xs text-white/60">Tipus</span>
+            <span className="text-xs text-[var(--t2)]">Tipus</span>
             <select
               value={form.eventType}
               onChange={(e) => update('eventType', e.target.value)}
@@ -221,7 +221,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             </select>
           </label>
           <label className="block text-sm">
-            <span className="text-xs text-white/60">Data</span>
+            <span className="text-xs text-[var(--t2)]">Data</span>
             <input
               type="date"
               value={form.eventDate}
@@ -230,7 +230,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             />
           </label>
           <label className="block text-sm">
-            <span className="text-xs text-white/60">Lloc</span>
+            <span className="text-xs text-[var(--t2)]">Lloc</span>
             <input
               type="text"
               value={form.eventLocation}
@@ -239,7 +239,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             />
           </label>
           <label className="block text-sm">
-            <span className="text-xs text-white/60">Inici</span>
+            <span className="text-xs text-[var(--t2)]">Inici</span>
             <input
               type="time"
               value={form.eventStartTime}
@@ -248,7 +248,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             />
           </label>
           <label className="block text-sm">
-            <span className="text-xs text-white/60">Fi</span>
+            <span className="text-xs text-[var(--t2)]">Fi</span>
             <input
               type="time"
               value={form.eventEndTime}
@@ -257,7 +257,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             />
           </label>
           <label className="block text-sm">
-            <span className="text-xs text-white/60">Establiment / venue</span>
+            <span className="text-xs text-[var(--t2)]">Establiment / venue</span>
             <input
               type="text"
               value={form.eventVenue}
@@ -266,7 +266,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             />
           </label>
           <label className="block text-sm">
-            <span className="text-xs text-white/60">Invitats</span>
+            <span className="text-xs text-[var(--t2)]">Invitats</span>
             <input
               type="number"
               min={0}
@@ -276,7 +276,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             />
           </label>
           <label className="block text-sm">
-            <span className="text-xs text-white/60">Pressupost (text lliure)</span>
+            <span className="text-xs text-[var(--t2)]">Pressupost (text lliure)</span>
             <input
               type="text"
               placeholder="ex. 800-1200€"
@@ -286,7 +286,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             />
           </label>
           <label className="block text-sm sm:col-span-2">
-            <span className="text-xs text-white/60">Pack</span>
+            <span className="text-xs text-[var(--t2)]">Pack</span>
             <select
               value={form.packId}
               onChange={(e) => update('packId', e.target.value)}
@@ -315,7 +315,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
                       </span>
                     ) : null}
                   </div>
-                  <p className="text-white/85">
+                  <p className="text-[var(--t2)]">
                     <span className="font-semibold">{suggestedPack.code}</span> · {suggestedPack.price}€
                   </p>
                   {bestSuggestion && bestSuggestion.reasons.length > 0 ? (
@@ -329,7 +329,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
                     </p>
                   ) : null}
                   {suggestedAlternatives.length > 0 ? (
-                    <p className="text-xs text-white/55">
+                    <p className="text-xs text-[var(--t3)]">
                       Alternatives: {suggestedAlternatives.map((pack) => pack.code).join(' · ')}
                     </p>
                   ) : null}
@@ -346,7 +346,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
               ) : (
                 <div className="space-y-1">
                   <p className="font-semibold admin-tone-text-cyan">Sense suggeriment clar</p>
-                  <p className="text-xs text-white/65">
+                  <p className="text-xs text-[var(--t2)]">
                     Amb les dades actuals no hi ha cap pack amb encaix prou net. Ajusta invitats,
                     pressupost o tria el pack manualment.
                   </p>
@@ -355,7 +355,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             </div>
           )}
           <label className="block text-sm sm:col-span-2">
-            <span className="text-xs text-white/60">Notes / missatge</span>
+            <span className="text-xs text-[var(--t2)]">Notes / missatge</span>
             <textarea
               rows={3}
               value={form.message}
@@ -376,7 +376,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             className="ap-btn ap-btn--secondary"
           >
             <div className="font-semibold">Només lead</div>
-            <div className="text-xs text-white/60 mt-1">Captura inicial</div>
+            <div className="text-xs text-[var(--t2)] mt-1">Captura inicial</div>
           </button>
           <button
             type="button"
@@ -385,7 +385,7 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             className="rounded-lg border admin-tone-border-warning admin-tone-bg-warning px-4 py-3 text-sm font-medium hover:opacity-80 disabled:opacity-60"
           >
             <div className="font-semibold">Lead + pressupost</div>
-            <div className="text-xs text-white/70 mt-1">DRAFT</div>
+            <div className="text-xs text-[var(--t2)] mt-1">DRAFT</div>
           </button>
           <button
             type="button"
@@ -394,14 +394,14 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
             className="rounded-lg border admin-tone-border-success admin-tone-bg-success px-4 py-3 text-sm font-medium hover:opacity-80 disabled:opacity-60"
           >
             <div className="font-semibold">Tot d&apos;un cop</div>
-            <div className="text-xs text-white/70 mt-1">+ Reserva PENDING</div>
+            <div className="text-xs text-[var(--t2)] mt-1">+ Reserva PENDING</div>
           </button>
         </div>
         {submitting && (
           <p className="text-xs admin-tone-text-warning">Creant {submitting}…</p>
         )}
         {!form.packId && suggestedPack ? (
-          <p className="text-xs text-white/55">
+          <p className="text-xs text-[var(--t3)]">
             Tens un pack suggerit disponible. Si no l&apos;apliques, el lead es crearà sense pack
             assignat.
           </p>

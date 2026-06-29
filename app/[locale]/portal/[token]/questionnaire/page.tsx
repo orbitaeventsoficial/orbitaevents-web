@@ -15,6 +15,7 @@ import { getBookingQuestionnaire } from '@/lib/services/questionnaireService';
 import { resolvePortalAccentHex } from '@/lib/clientPortalUtils';
 import PortalBottomNav from '../PortalBottomNav';
 import QuestionnaireForm from './QuestionnaireForm';
+import { getClientPortalHiddenNavItems, getClientPortalVisibility } from '@/lib/clientPortalVisibility';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -31,6 +32,8 @@ export default async function ClientPortalQuestionnairePage({
 
   const access = await findPortalAccessByRawToken(params.token);
   if (!access) notFound();
+  const visibility = getClientPortalVisibility(access.personalization);
+  if (!visibility.questionnaire) notFound();
 
   const requestHeaders = headers();
   await markPortalAccessHit({
@@ -94,6 +97,7 @@ export default async function ClientPortalQuestionnairePage({
           contract: t.contract,
           gallery: t.navGallery,
         }}
+        hiddenItems={getClientPortalHiddenNavItems(visibility)}
       />
     </main>
   );

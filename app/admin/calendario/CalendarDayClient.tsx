@@ -190,7 +190,7 @@ export default function CalendarDayClient() {
             key={key}
             type="button"
             onClick={() => toggleLayer(key as CalendarLayer)}
-            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-white/10 border-white/20' : 'border-white/10 opacity-45'}`}
+            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-[var(--raised)] border-[var(--line)]' : 'border-[var(--line)] opacity-45'}`}
           >
             {label}
           </button>
@@ -281,8 +281,8 @@ export default function CalendarDayClient() {
                   });
 
                   return (
-                    <div key={hour} className="flex border-b border-white/5 min-h-[48px]">
-                      <div className="w-16 flex-shrink-0 border-r border-white/5 px-3 py-2 text-right text-xs">
+                    <div key={hour} className="flex border-b border-[var(--line)] min-h-[48px]">
+                      <div className="w-16 flex-shrink-0 border-r border-[var(--line)] px-3 py-2 text-right text-xs">
                         {String(hour).padStart(2, '0')}:00
                       </div>
                       <div className="flex-1 flex items-stretch gap-1 px-2 py-1">

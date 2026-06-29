@@ -69,7 +69,7 @@ export default function WeatherWidget() {
 
   return (
     <section className="ap-card p-4 sm:p-5">
-      <p className="text-xs font-bold text-white/50 uppercase tracking-wider mb-3">
+      <p className="text-xs font-bold text-[var(--t3)] uppercase tracking-wider mb-3">
         Temps pròxims events
       </p>
       <div className="flex gap-3 overflow-x-auto pb-1">
@@ -84,16 +84,16 @@ export default function WeatherWidget() {
                 {f.temp}°
               </span>
             </div>
-            <p className="text-xs font-medium text-white/70 truncate">{f.description}</p>
+            <p className="text-xs font-medium text-[var(--t2)] truncate">{f.description}</p>
             {f.rainProbability > 0 && (
               <p className="text-xs admin-tone-text-cyan mt-0.5">
                 {'\uD83D\uDCA7'} {f.rainProbability}% pluja
               </p>
             )}
-            <div className="mt-2 pt-2 border-t border-white/5">
-              <p className="text-xs font-medium text-white/80 truncate">{f.clientName}</p>
-              <p className="text-xs text-white/40 truncate">{f.location}</p>
-              <p className="text-xs text-white/40 mt-0.5">{formatShortDate(f.eventDate)}</p>
+            <div className="mt-2 pt-2 border-t border-[var(--line)]">
+              <p className="text-xs font-medium text-[var(--t2)] truncate">{f.clientName}</p>
+              <p className="text-xs text-[var(--t3)] truncate">{f.location}</p>
+              <p className="text-xs text-[var(--t3)] mt-0.5">{formatShortDate(f.eventDate)}</p>
             </div>
           </div>
         ))}

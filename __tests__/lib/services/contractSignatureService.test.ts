@@ -179,4 +179,36 @@ describe('signContractOnline', () => {
       }),
     }));
   });
+
+  it('reverteix la signatura si falla la generacio del PDF signat', async () => {
+    mockGenerateSignedContractPdf.mockRejectedValueOnce(new Error('PDF_FAILED'));
+
+    await expect(signContractOnline({
+      rawToken: RAW_TOKEN,
+      signedBy: 'Maria Garcia',
+      ip: '127.0.0.1',
+      userAgent: 'Vitest UA',
+      signatureBlob: 'data:image/png;base64,abc123',
+    })).rejects.toThrow('PDF_FAILED');
+
+    expect(mockPrisma.proposal.update).toHaveBeenNthCalledWith(1, expect.objectContaining({
+      where: { id: 'proposal-1' },
+      data: expect.objectContaining({
+        contractStatus: 'SIGNED',
+        contractSignedBy: 'Maria Garcia',
+      }),
+    }));
+    expect(mockPrisma.proposal.update).toHaveBeenNthCalledWith(2, {
+      where: { id: 'proposal-1' },
+      data: {
+        contractStatus: 'SENT',
+        contractSignedAt: null,
+        contractSignedBy: null,
+        contractSignatureIp: null,
+        contractSignatureUa: null,
+        contractSignatureBlob: null,
+      },
+    });
+    expect(mockRecordLeadContractSigned).not.toHaveBeenCalled();
+  });
 });

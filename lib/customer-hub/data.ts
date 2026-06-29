@@ -56,8 +56,9 @@ export type CustomerHubTaskLite = {
 export async function resolveCustomerHubCustomerId(entityId: string): Promise<string | null> {
   const customer = await prisma.customer.findUnique({
     where: { id: entityId },
-    select: { id: true },
+    select: { id: true, mergedIntoId: true },
   });
+  if (customer?.mergedIntoId) return customer.mergedIntoId;
   if (customer?.id) return customer.id;
 
   const lead = await safeQuery(

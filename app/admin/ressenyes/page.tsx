@@ -35,13 +35,13 @@ function StarRating({ rating }: { rating: number }) {
         return (
           <span
             key={star}
-            className={`text-sm ${fill >= 1 ? 'admin-tone-text-warning' : fill > 0 ? 'admin-tone-text-warning' : 'text-white/10'}`}
+            className={`text-sm ${fill >= 1 ? 'admin-tone-text-warning' : fill > 0 ? 'admin-tone-text-warning' : 'text-[var(--t3)]'}`}
           >
             ★
           </span>
         );
       })}
-      <span className="ml-1.5 text-xs font-semibold text-white/50">{rating.toFixed(1)}</span>
+      <span className="ml-1.5 text-xs font-semibold text-[var(--t3)]">{rating.toFixed(1)}</span>
     </div>
   );
 }
@@ -250,7 +250,7 @@ export default function AdminRessenyesPage() {
           transition={{ duration: shouldReduceMotion ? 0 : 0.18 }}
         >
         {activeList.length === 0 && (
-          <div className="rounded-2xl border admin-card-glass p-6 text-center text-white/40">
+          <div className="rounded-2xl border admin-card-glass p-6 text-center text-[var(--t3)]">
             {activeTab === 'pending'
               ? 'Cap ressenya pendent. Tot al dia!'
               : 'Cap ressenya aprovada encara.'}
@@ -267,13 +267,13 @@ export default function AdminRessenyesPage() {
                   </div>
                   <div>
                     <div className="text-sm font-semibold">{t.customer.name}</div>
-                    <div className="text-xs text-white/40">{t.customer.email}</div>
+                    <div className="text-xs text-[var(--t3)]">{t.customer.email}</div>
                   </div>
                 </div>
-                <div className="text-xs text-white/30 mt-1.5 ml-10">
+                <div className="text-xs text-[var(--t3)] mt-1.5 ml-10">
                   {formatDateTime(t.createdAt)}
                   {t.eventType && (
-                    <span className="ml-2 px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/40">
+                    <span className="ml-2 px-1.5 py-0.5 rounded-full bg-[var(--raised)] border border-[var(--line)] text-[var(--t3)]">
                       {t.eventType}
                     </span>
                   )}
@@ -282,12 +282,12 @@ export default function AdminRessenyesPage() {
               <StarRating rating={t.rating} />
             </div>
 
-            <blockquote className="mt-4 pl-4 border-l-2 text-white/70 italic whitespace-pre-wrap leading-relaxed">
+            <blockquote className="mt-4 pl-4 border-l-2 text-[var(--t2)] italic whitespace-pre-wrap leading-relaxed">
               {t.text}
             </blockquote>
 
             {t.discountCode && (
-              <div className="mt-3 text-xs text-white/30 flex items-center gap-1.5">
+              <div className="mt-3 text-xs text-[var(--t3)] flex items-center gap-1.5">
                 <span className="px-1.5 py-0.5 rounded border font-mono">
                   {t.discountCode.code}
                 </span>
@@ -345,7 +345,7 @@ export default function AdminRessenyesPage() {
                   <button
                     type="button"
                     onClick={() => downloadCanvas(t, 'story')}
-                    className="px-4 py-2 rounded-full border border-white/10 text-sm font-semibold transition-colors hover:bg-white/5"
+                    className="px-4 py-2 rounded-full border border-[var(--line)] text-sm font-semibold transition-colors hover:bg-[var(--raised)]"
                   >
                     Descarregar
                   </button>

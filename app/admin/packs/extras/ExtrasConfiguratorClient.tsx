@@ -275,7 +275,7 @@ export default function ExtrasConfiguratorClient() {
                       className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                         active
                           ? 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success'
-                          : 'border-white/10 bg-white/5 text-white/70 hover:bg-white/10'
+                          : 'border-[var(--line)] bg-[var(--raised)] text-[var(--t2)] hover:bg-[var(--raised)]'
                       }`}
                     >
                       {SERVICE_LABELS[service]}

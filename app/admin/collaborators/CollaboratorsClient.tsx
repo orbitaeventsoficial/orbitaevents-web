@@ -260,7 +260,7 @@ export default function CollaboratorsClient() {
               <p className="mb-2 block text-sm admin-tone-text-neutral">Rols del partner</p>
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {COLLABORATOR_ROLE_OPTIONS.map((role) => (
-                  <label key={role.value} className="flex cursor-pointer items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-sm text-white/80">
+                  <label key={role.value} className="flex cursor-pointer items-center gap-2 rounded-lg border border-[var(--line)] px-3 py-2 text-sm text-[var(--t2)]">
                     <input
                       type="checkbox"
                       checked={(form.roles || []).includes(role.value)}
@@ -284,7 +284,7 @@ export default function CollaboratorsClient() {
                 className="adm-input"
               />
               {form.costPerHour !== '' && Number(form.costPerHour) > 0 && (
-                <p className="mt-1 text-xs text-white/40">
+                <p className="mt-1 text-xs text-[var(--t3)]">
                   1,5h → {Math.round(Number(form.costPerHour) * 1.5)}€ · 2h → {Math.round(Number(form.costPerHour) * 2)}€ · 3h → {Math.round(Number(form.costPerHour) * 3)}€
                 </p>
               )}
@@ -367,7 +367,7 @@ export default function CollaboratorsClient() {
                     {(c.roles || []).map((role) => (
                       <span key={role} className="ap-badge">{COLLABORATOR_ROLE_OPTIONS.find((option) => option.value === role)?.label || role}</span>
                     ))}
-                    {c.costPerHour != null && <span className="text-white/60">{c.costPerHour}€/h</span>}
+                    {c.costPerHour != null && <span className="text-[var(--t2)]">{c.costPerHour}€/h</span>}
                     {((c._count?.sourcedLeads || 0) + (c._count?.sourcedBookings || 0)) > 0 && (
                       <span className="text-[color:var(--ax-success)]">
                         {(c._count?.sourcedLeads || 0) + (c._count?.sourcedBookings || 0)} bolos passats

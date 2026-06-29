@@ -11,6 +11,10 @@ import { log } from '@/lib/logger';
 const PLACE_ID = process.env.NEXT_PUBLIC_GOOGLE_PLACE_ID || 'ChIJe39Xr8t/iUcRdyBu8A2xdLM';
 const MAX_PAGES = 5; // Màxim 5 pàgines per evitar gastar crèdits SerpAPI
 
+export type ReviewsSyncResult =
+  | { ok: true; rating: number; total: number; synced: number }
+  | { ok: false; error: string };
+
 function mapReview(r: Record<string, unknown>): CachedGoogleReview {
   return {
     author_name: (r.user as Record<string, string>)?.name || 'Anònim',
@@ -92,11 +96,19 @@ export async function fetchFromSerpAPI(): Promise<{
 
 export async function syncReviews(): Promise<void> {
   try {
+    await runReviewsSync('reviews-sync (scheduler)');
+  } catch (error) {
+    // The scheduler is fire-and-forget. runReviewsSync already records the failure.
+  }
+}
+
+export async function runReviewsSync(logPrefix = 'reviews-sync'): Promise<ReviewsSyncResult> {
+  try {
     const data = await fetchFromSerpAPI();
 
     if (!data) {
-      log.warn('reviews-sync (scheduler): No s\'han pogut obtenir ressenyes de SerpAPI');
-      return;
+      log.warn(`${logPrefix}: No s'han pogut obtenir ressenyes de SerpAPI`);
+      return { ok: false, error: 'SerpAPI no ha retornat resultats' };
     }
 
     await writeGoogleReviewsCache({
@@ -105,20 +117,30 @@ export async function syncReviews(): Promise<void> {
       reviews: data.reviews,
     });
 
-    log.info(`reviews-sync (scheduler): ${data.reviews.length} ressenyes sincronitzades (${data.total} total, ${data.rating}★)`);
+    const result = {
+      ok: true,
+      rating: data.rating,
+      total: data.total,
+      synced: data.reviews.length,
+    } as const;
+
+    log.info(`${logPrefix}: ${result.synced} ressenyes sincronitzades (${result.total} total, ${result.rating}★)`);
 
     await saveCronRunStatus({
       prefix: 'automation.reviewsSync',
       status: 'ok',
-      summary: { rating: data.rating, total: data.total, synced: data.reviews.length },
+      summary: { rating: result.rating, total: result.total, synced: result.synced },
     });
+
+    return result;
   } catch (error) {
-    log.error('reviews-sync (scheduler): Error', error instanceof Error ? error : undefined);
+    log.error(`${logPrefix}: Error`, error instanceof Error ? error : undefined);
     await saveCronRunStatus({
       prefix: 'automation.reviewsSync',
       status: 'error',
       summary: {},
       message: error instanceof Error ? error.message : 'Error intern',
     }).catch(() => {});
+    throw error;
   }
 }
