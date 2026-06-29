@@ -11,6 +11,7 @@ import {
   type CustomerLifecycleValue,
 } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { getAdminOrganLabel } from '@/app/admin/lib/adminNav';
 import type { Customer, CustomerStats, ExecutionPriority } from './customer-utils';
 import { getExecutionPriority } from './customer-utils';
 import { AddCustomerModal, StartProcessModal } from './ClientesModals';
@@ -173,6 +174,7 @@ export default function AdminContactesPage() {
       <div className="cl">
         <div className="cl__pagehead">
           <div className="cl__titles">
+            <span className="ap-eyebrow">{getAdminOrganLabel('/admin/clientes')}</span>
             <h1 className="cl__h1">Clients</h1>
             <span className="cl__sub">CRM · Afegeix clients i inicia processos</span>
           </div>

@@ -1,3 +1,23 @@
+## 2026-06-30 — Coherència: eyebrow (coordenada d'òrgan) a clientes (Canvi #1246, claude)
+
+### Context
+Continuació de la coherència de headers (#1240). El header de clientes (cl__pagehead) no mostrava l'eyebrow (la coordenada d'òrgan «Comercial») que leads i AdminPage sí tenen a dalt del títol. Per això es veia diferent de leads. Verificat: bookings JA en té (ap-detail-kicker) — fals negatiu del detector inicial.
+
+### Què s'ha fet
+- `clientes/page.tsx`: afegit `<span className="ap-eyebrow">{getAdminOrganLabel('/admin/clientes')}</span>` abans del `cl__h1`. Coordenada via `getAdminOrganLabel` (monocapa, no text hardcoded).
+- Verificat amb captura: clientes ara mostra «COMERCIAL» (mono) + «Clients» (display) + subtítol = idèntic a l'estructura de leads.
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core` EXIT 0.
+- Validació funcional: eyebrow renderitzat amb la coordenada correcta.
+- Validació humana/UX: captura confirma coherència amb leads.
+
+### Coordinació
+Counter → 1246. Consolida també #1241-1245 (codex V3-V5) ja presents al diari. Codex actiu en paral·lel.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-29 — Coherència de headers: tots els títols a tipografia canònica (leads mana) (Canvi #1240, claude)
 
 ### Context
@@ -21,10 +41,10 @@ Counter → 1240. Coherència (hipersemblança). Els workspaces rics (leads/book
 - Treballant per: `claude`
 - Tancat per: `claude`
 
-## 2026-06-30 — V5 pressupostos email conserva el total del Studio (Canvi #1244, codex)
+## 2026-06-30 — V5 pressupostos email conserva el total del Studio (Canvi #1245, codex)
 
 ### Context
-El #1242/#1243 feia que el Studio de pressupostos rebés i sincronitzés el PVP real del pack, però l'enviament manual per email passava `price: total` a `/api/admin/emails/quote`. El servei legacy interpretava `price` com a preu base del pack, hi tornava a sumar extres i IVA amb `createQuoteFromLead()`, i podia generar un email amb import diferent del PDF/proposta del Studio.
+El #1243/#1244 feia que el Studio de pressupostos rebés i sincronitzés el PVP real del pack, però l'enviament manual per email passava `price: total` a `/api/admin/emails/quote`. El servei legacy interpretava `price` com a preu base del pack, hi tornava a sumar extres i IVA amb `createQuoteFromLead()`, i podia generar un email amb import diferent del PDF/proposta del Studio.
 
 ### Què s'ha fet
 - `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: l'enviament per email ara envia `price` com a preu base i afegeix `quoteTotals` amb `basePrice`, `subtotal`, `discount`, `vatAmount` i `total`.
@@ -35,10 +55,10 @@ El #1242/#1243 feia que el Studio de pressupostos rebés i sincronitzés el PVP 
 ### Validació
 - Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\adminQuoteEmailService.test.ts __tests__\app\admin\presupuestos\studio-utils-pricing.test.ts __tests__\app\api\admin\pricing-route.test.ts __tests__\app\admin\packs\packEditorPricing.test.ts __tests__\lib\services\packPricingHealth.test.ts` (50 tests OK) i `npx tsc --noEmit --pretty false`.
 - Validació funcional: el total que es desa a la proposta i el total que surt pel correu manual del Studio comparteixen el mateix breakdown econòmic.
-- Validació humana/UX: l'operador deixa de poder veure un import al Studio/PDF i enviar-ne un altre per email.
+- Validació humana/UX: l'email manual deixa de poder recalcular un import diferent del breakdown que el Studio persisteix a la proposta.
 
 ### Coordinació
-Counter → 1244. Tall V5 de sortida de pressupost; no toca mails automàtics, Inbox UI, APPEND, seqüències, inventari, fonts de preu, schema, costEngine ni sync massiu de preus.
+Counter → 1245. Tall V5 de sortida de pressupost; no toca mails automàtics, Inbox UI, APPEND, seqüències, inventari, fonts de preu, schema, costEngine ni sync massiu de preus.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`
@@ -62,10 +82,10 @@ Counter → 1239. Pendent: el header de leads (fxd__hd) segueix sent estructural
 - Treballant per: `claude`
 - Tancat per: `claude`
 
-## 2026-06-29 — V5 pressupostos sincronitza PVP real quan arriba el catàleg (Canvi #1243, codex)
+## 2026-06-29 — V5 pressupostos sincronitza PVP real quan arriba el catàleg (Canvi #1244, codex)
 
 ### Context
-El #1242 feia que els packs del Studio de pressupostos rebessin PVP/durada/hora extra de `/api/admin/pricing`, però el formulari tenia `basePrice`, `durationHours`, `packName` i `featuresText` com a estat inicialitzat abans que l'API respongués. En un pressupost nou, el select podia mostrar el PVP real mentre el camp `Preu base` conservava el fallback estàtic.
+El #1243 feia que els packs del Studio de pressupostos rebessin PVP/durada/hora extra de `/api/admin/pricing`, però el formulari tenia `basePrice`, `durationHours`, `packName` i `featuresText` com a estat inicialitzat abans que l'API respongués. En un pressupost nou, el select podia mostrar el PVP real mentre el camp `Preu base` conservava el fallback estàtic.
 
 ### Què s'ha fet
 - `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: quan arriba el pack de catàleg real, el formulari sincronitza `packName`, `basePrice`, `durationHours` i `featuresText`.
@@ -79,12 +99,12 @@ El #1242 feia que els packs del Studio de pressupostos rebessin PVP/durada/hora 
 - Validació humana/UX: el select i el camp `Preu base` deixen de poder discrepar per latència del catàleg.
 
 ### Coordinació
-Counter → 1243. Tall V5 residual de cablejat Pressupostos; no toca inventari, fonts de preu, schema, costEngine, sync massiu de preus, mails automàtics, Inbox, APPEND ni seqüències. #1238 pertany a Claude.
+Counter → 1244. Tall V5 residual de cablejat Pressupostos; no toca inventari, fonts de preu, schema, costEngine, sync massiu de preus, mails automàtics, Inbox, APPEND ni seqüències. #1238 pertany a Claude; #1240 pertany a Claude.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`
 
-## 2026-06-29 — V5 pressupostos consumeix PVP real de packs (Canvi #1242, codex)
+## 2026-06-29 — V5 pressupostos consumeix PVP real de packs (Canvi #1243, codex)
 
 ### Context
 La passada Catàleg→Preu ha detectat que `/admin/presupuestos` sí carregava `/api/admin/pricing`, però només feia servir el nom dels packs. El preu base (`priceValue`), la durada (`djHours`) i l'hora extra continuaven sortint del fallback estàtic `getPacksByService()`. Això podia fer que un PVP actualitzat a `/admin/packs` no arribés al pressupost.
@@ -102,15 +122,15 @@ La passada Catàleg→Preu ha detectat que `/admin/presupuestos` sí carregava `
 - Validació humana/UX: quan l'usuari crea un pressupost, el preu base del pack ja no queda desfasat respecte al que veu a `/admin/packs`.
 
 ### Coordinació
-Counter → 1242. Tall V5 de cablejat Pressupostos; no toca inventari, fonts de preu, schema, costEngine, sync massiu de preus, mails automàtics, Inbox, APPEND ni seqüències. #1238 pertany a Claude.
+Counter → 1243. Tall V5 de cablejat Pressupostos; no toca inventari, fonts de preu, schema, costEngine, sync massiu de preus, mails automàtics, Inbox, APPEND ni seqüències. #1238 pertany a Claude; #1240 pertany a Claude.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`
 
-## 2026-06-29 — V5 editor packs: recomanat local alineat amb specialistServices (Canvi #1241, codex)
+## 2026-06-29 — V5 editor packs: recomanat local alineat amb specialistServices (Canvi #1242, codex)
 
 ### Context
-Després del #1240, la salut server-side de packs ja respectava `pricing.pack.specialistServices`, però l'editor `/admin/packs/[id]` mantenia un càlcul local per recalcular el recomanat quan es canvien inventari, hores, watts o servei. Aquell càlcul no rebia `specialistServices` i tornava a assumir `specialistCostPerHour` sempre.
+Després del #1241, la salut server-side de packs ja respectava `pricing.pack.specialistServices`, però l'editor `/admin/packs/[id]` mantenia un càlcul local per recalcular el recomanat quan es canvien inventari, hores, watts o servei. Aquell càlcul no rebia `specialistServices` i tornava a assumir `specialistCostPerHour` sempre.
 
 ### Què s'ha fet
 - `app/admin/packs/[id]/packEditorPricing.ts`: helper pur `computePackEditorPricing()` amb la mateixa regla de V5: especialista només si `service` consta a `specialistServices`; si no, operari base.
@@ -124,12 +144,12 @@ Després del #1240, la salut server-side de packs ja respectava `pricing.pack.sp
 - Validació humana/UX: quan l'usuari edita un pack normal, el semàfor i el recomanat no tornen a inflar-se amb cost d'especialista.
 
 ### Coordinació
-Counter → 1241. Tall V5 petit i delimitat; no toca inventari, fonts de preu, schema, costEngine, sync massiu de preus, mails automàtics, Inbox, APPEND ni seqüències. #1238 pertany a Claude.
+Counter → 1242. Tall V5 petit i delimitat; no toca inventari, fonts de preu, schema, costEngine, sync massiu de preus, mails automàtics, Inbox, APPEND ni seqüències. #1238 pertany a Claude; #1240 pertany a Claude.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`
 
-## 2026-06-29 — V5 pricing: specialistServices governa la mà d'obra de packs (Canvi #1240, codex)
+## 2026-06-29 — V5 pricing: specialistServices governa la mà d'obra de packs (Canvi #1241, codex)
 
 ### Context
 La primera passada V5 Catàleg→Preu ha detectat un bug delimitat: `getPackPricingModelConfig()` carregava `pricing.pack.specialistServices`, però `computePackPricingHealth()` ignorava aquesta configuració i aplicava `specialistCount=1` a tots els packs, també a serveis normals com `fiestas`.
@@ -146,7 +166,7 @@ La primera passada V5 Catàleg→Preu ha detectat un bug delimitat: `getPackPric
 - Validació humana/UX: les pantalles que mostren `Equip tècnic` deixen de presentar tots els packs com `1 especialista`.
 
 ### Coordinació
-Counter → 1240. Tall V5 petit i delimitat; no toca inventari, fonts de preu, schema, costEngine, sync massiu de preus, mails automàtics, Inbox, APPEND ni seqüències. #1238 pertany a Claude.
+Counter → 1241. Tall V5 petit i delimitat; no toca inventari, fonts de preu, schema, costEngine, sync massiu de preus, mails automàtics, Inbox, APPEND ni seqüències. #1238 pertany a Claude; #1240 pertany a Claude.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`
