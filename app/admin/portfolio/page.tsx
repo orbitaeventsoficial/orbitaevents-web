@@ -138,7 +138,7 @@ function FullscreenPreview({ preview, onClose }: { preview: PreviewState | null;
       <button
         type="button"
         onClick={onClose}
-        className="absolute right-4 top-4 rounded-full border border-white/15 bg-black/60 px-3 py-2 text-sm text-white/90"
+        className="absolute right-4 top-4 rounded-full border border-[var(--line)] bg-black/60 px-3 py-2 text-sm text-[var(--t)]"
       >
         Tancar
       </button>
@@ -413,23 +413,23 @@ function CategorySection({
       <input ref={fileRef} type="file" accept={PORTFOLIO_MEDIA_UPLOAD_ACCEPT} multiple className="hidden" onChange={(event) => event.target.files && void handleUpload(event.target.files)} />
       <input ref={replaceFileRef} type="file" accept={PORTFOLIO_MEDIA_UPLOAD_ACCEPT} className="hidden" onChange={handleReplaceSelection} />
 
-      <button type="button" onClick={() => setExpanded((current) => !current)} className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-white/5">
+      <button type="button" onClick={() => setExpanded((current) => !current)} className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-[var(--raised)]">
         <div className="flex items-center gap-3">
           <span className="text-lg">🖼️</span>
           <div>
-            <p className="font-semibold text-white/90">{name}</p>
-            <p className="text-xs text-white/40">{slug}</p>
+            <p className="font-semibold text-[var(--t)]">{name}</p>
+            <p className="text-xs text-[var(--t3)]">{slug}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-xs text-white/60">
-          <span className="rounded-full border border-white/10 px-2 py-1">{imageCount} fotos</span>
-          <span className="rounded-full border border-white/10 px-2 py-1">{videoCount} vídeos</span>
+        <div className="flex items-center gap-2 text-xs text-[var(--t2)]">
+          <span className="rounded-full border border-[var(--line)] px-2 py-1">{imageCount} fotos</span>
+          <span className="rounded-full border border-[var(--line)] px-2 py-1">{videoCount} vídeos</span>
           <span className={`text-base transition-transform ${expanded ? 'rotate-180' : ''}`}>â–¾</span>
         </div>
       </button>
 
       {expanded && (
-        <div className="space-y-4 border-t border-white/10 p-5">
+        <div className="space-y-4 border-t border-[var(--line)] p-5">
           {error && <p className="rounded-xl border admin-tone-border-danger px-3 py-2 text-sm admin-tone-text-danger">{error}</p>}
           <div className="grid gap-3 lg:grid-cols-3">
             <AdminHelpLegend title="Portada" body="És la imatge principal de cada event. La pots marcar des de qualsevol miniatura." />
@@ -437,71 +437,71 @@ function CategorySection({
             <AdminHelpLegend title="Ordre" body="L'ordre controla la galeria pública. Arrossega targetes per canviar-lo sense tocar codi." />
           </div>
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
-            <button type="button" onClick={() => fileRef.current?.click()} className="rounded-2xl border-2 border-dashed border-white/15 p-8 text-left transition-colors hover:border-white/30 adm-row-hover">
+            <button type="button" onClick={() => fileRef.current?.click()} className="rounded-2xl border-2 border-dashed border-[var(--line)] p-8 text-left transition-colors hover:border-[var(--hair-gold)] adm-row-hover">
               <span className="mb-3 block text-3xl">ï¼‹</span>
-              <p className="text-sm font-medium text-white/90">Afegir media a {name}</p>
-              <p className="mt-1 text-xs text-white/50">Puja des de l'admin. El backend converteix imatges a AVIF, conserva l'ordre i deixa traça a la BBDD.</p>
-              <p className="mt-2 text-xs text-white/35">{uploading ? 'Pujant...' : `Límit imatge: ${PORTFOLIO_MEDIA_IMAGE_MAX_SIZE / (1024 * 1024)}MB · vídeo: ${PORTFOLIO_MEDIA_VIDEO_MAX_SIZE / (1024 * 1024)}MB`}</p>
+              <p className="text-sm font-medium text-[var(--t)]">Afegir media a {name}</p>
+              <p className="mt-1 text-xs text-[var(--t3)]">Puja des de l'admin. El backend converteix imatges a AVIF, conserva l'ordre i deixa traça a la BBDD.</p>
+              <p className="mt-2 text-xs text-[var(--t3)]">{uploading ? 'Pujant...' : `Límit imatge: ${PORTFOLIO_MEDIA_IMAGE_MAX_SIZE / (1024 * 1024)}MB · vídeo: ${PORTFOLIO_MEDIA_VIDEO_MAX_SIZE / (1024 * 1024)}MB`}</p>
             </button>
             <div className="ap-card p-4">
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-white/40">Events d'aquesta categoria</p>
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--t3)]">Events d'aquesta categoria</p>
               <div className="mt-3 space-y-2">
-                {categoryEvents.length === 0 ? <p className="text-sm text-white/45">Encara no hi ha events creats per aquesta categoria.</p> : categoryEvents.map((eventItem) => <div key={eventItem.id} className="rounded-xl border border-white/10 px-3 py-2"><p className="text-sm font-medium text-white/90">{eventItem.title}</p><p className="text-xs text-white/45">Portada actual: {eventItem.coverImage ? 'assignada' : 'pendent'}</p></div>)}
+                {categoryEvents.length === 0 ? <p className="text-sm text-[var(--t3)]">Encara no hi ha events creats per aquesta categoria.</p> : categoryEvents.map((eventItem) => <div key={eventItem.id} className="rounded-xl border border-[var(--line)] px-3 py-2"><p className="text-sm font-medium text-[var(--t)]">{eventItem.title}</p><p className="text-xs text-[var(--t3)]">Portada actual: {eventItem.coverImage ? 'assignada' : 'pendent'}</p></div>)}
               </div>
             </div>
           </div>
           {loading ? (
-            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">{[1,2,3,4].map((item) => <div key={item} className="aspect-[0.9] animate-pulse rounded-2xl bg-white/5" />)}</div>
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">{[1,2,3,4].map((item) => <div key={item} className="aspect-[0.9] animate-pulse rounded-2xl bg-[var(--raised)]" />)}</div>
           ) : media.length === 0 ? (
-            <p className="py-6 text-center text-sm text-white/45">{PORTFOLIO_MEDIA_ADMIN_EMPTY_STATE}</p>
+            <p className="py-6 text-center text-sm text-[var(--t3)]">{PORTFOLIO_MEDIA_ADMIN_EMPTY_STATE}</p>
           ) : (
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
               {media.map((item) => {
                 const coverRefs = coverMap.get(item.mediaUrl) || [];
                 return (
-                  <div key={item.id} draggable={!item.isStatic} onDragStart={() => !item.isStatic && setDraggingId(item.id)} onDragOver={(event) => !item.isStatic && event.preventDefault()} onDrop={() => !item.isStatic && void handleDrop(item.id)} className={`overflow-hidden rounded-2xl border bg-[var(--o-admin-fill-1)] transition-colors ${draggingId === item.id ? 'border-[var(--hair-gold)]' : 'border-white/10 hover:border-white/20'}`}>
+                  <div key={item.id} draggable={!item.isStatic} onDragStart={() => !item.isStatic && setDraggingId(item.id)} onDragOver={(event) => !item.isStatic && event.preventDefault()} onDrop={() => !item.isStatic && void handleDrop(item.id)} className={`overflow-hidden rounded-2xl border bg-[var(--o-admin-fill-1)] transition-colors ${draggingId === item.id ? 'border-[var(--hair-gold)]' : 'border-[var(--line)] hover:border-[var(--hair-gold)]'}`}>
                     <div className="grid gap-0 md:grid-cols-[18rem_minmax(0,1fr)]">
                       <button type="button" onClick={() => onOpenPreview({ url: item.mediaUrl, type: item.mediaType, alt: item.caption || `${name} media` })} className="relative aspect-[4/3] bg-black">
                         {item.mediaType === 'image' ? <Image src={item.mediaUrl} alt={item.caption || `${name} media`} fill sizes="(max-width: 768px) 100vw, 288px" className="object-cover" /> : <video src={item.mediaUrl} className="h-full w-full object-cover" muted playsInline preload="metadata" />}
-                        <div className="absolute left-3 top-3 rounded-full bg-black/60 px-2 py-1 text-xs text-white/90">{item.mediaType === 'image' ? 'Imatge' : 'Vídeo'} · #{item.sortOrder + 1}</div>
-                        <div className="absolute bottom-3 left-3 rounded-full bg-black/60 px-2 py-1 text-xs text-white/90">Clic per ampliar</div>
+                        <div className="absolute left-3 top-3 rounded-full bg-black/60 px-2 py-1 text-xs text-[var(--t)]">{item.mediaType === 'image' ? 'Imatge' : 'Vídeo'} · #{item.sortOrder + 1}</div>
+                        <div className="absolute bottom-3 left-3 rounded-full bg-black/60 px-2 py-1 text-xs text-[var(--t)]">Clic per ampliar</div>
                       </button>
                       <div className="space-y-4 p-4">
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
-                            <p className="text-sm font-semibold text-white/90">{item.caption || 'Sense caption'}</p>
-                            <p className="text-xs text-white/40">ID {item.id.slice(0, 8)} · destí /portfolio/{slug}</p>
+                            <p className="text-sm font-semibold text-[var(--t)]">{item.caption || 'Sense caption'}</p>
+                            <p className="text-xs text-[var(--t3)]">ID {item.id.slice(0, 8)} · destí /portfolio/{slug}</p>
                           </div>
-                          <div className="flex items-center gap-2 text-xs text-white/45">
-                            <span className="rounded-full border border-white/10 px-2 py-1">{item.isStatic ? 'Catàleg públic actual' : 'Drag & drop'}</span>
-                            {item.event ? <span className="rounded-full border admin-tone-border-info px-2 py-1 admin-tone-text-info">Vinculat a {item.event.title}</span> : <span className="rounded-full border border-white/10 px-2 py-1">Sense event</span>}
+                          <div className="flex items-center gap-2 text-xs text-[var(--t3)]">
+                            <span className="rounded-full border border-[var(--line)] px-2 py-1">{item.isStatic ? 'Catàleg públic actual' : 'Drag & drop'}</span>
+                            {item.event ? <span className="rounded-full border admin-tone-border-info px-2 py-1 admin-tone-text-info">Vinculat a {item.event.title}</span> : <span className="rounded-full border border-[var(--line)] px-2 py-1">Sense event</span>}
                           </div>
                         </div>
                         <div>
-                          <label className="mb-1 block text-xs text-white/40">Llegenda / codi intern</label>
-                          <input defaultValue={item.caption || ''} disabled={item.isStatic} onBlur={(event) => { if ((item.caption || '') !== event.target.value) { void handleCaptionSave(item, event.target.value); } }} className="w-full ap-card px-3 py-2 text-sm text-white/85 disabled:cursor-not-allowed disabled:opacity-60" placeholder="Ex: entrada-cerimonia" />
-                          <p className="mt-1 text-xs text-white/35">{item.isStatic ? 'Aquesta peça ve del catàleg públic actual. Per editar-la o reordenar-la, primer cal migrar-la al portfolio de BBDD.' : "Aquesta etiqueta t'ajuda a saber què és la peça sense obrir-la."}</p>
+                          <label className="mb-1 block text-xs text-[var(--t3)]">Llegenda / codi intern</label>
+                          <input defaultValue={item.caption || ''} disabled={item.isStatic} onBlur={(event) => { if ((item.caption || '') !== event.target.value) { void handleCaptionSave(item, event.target.value); } }} className="w-full ap-card px-3 py-2 text-sm text-[var(--t2)] disabled:cursor-not-allowed disabled:opacity-60" placeholder="Ex: entrada-cerimonia" />
+                          <p className="mt-1 text-xs text-[var(--t3)]">{item.isStatic ? 'Aquesta peça ve del catàleg públic actual. Per editar-la o reordenar-la, primer cal migrar-la al portfolio de BBDD.' : "Aquesta etiqueta t'ajuda a saber què és la peça sense obrir-la."}</p>
                         </div>
                         <div className="grid gap-3 md:grid-cols-2">
                           <div>
-                            <label className="mb-1 block text-xs text-white/40">Assignar a event</label>
-                            <select value={item.event?.id || ''} disabled={item.isStatic} onChange={(event) => void handleAssignEvent(item, event.target.value)} className="w-full ap-card px-3 py-2 text-sm text-white/85 disabled:cursor-not-allowed disabled:opacity-60">
+                            <label className="mb-1 block text-xs text-[var(--t3)]">Assignar a event</label>
+                            <select value={item.event?.id || ''} disabled={item.isStatic} onChange={(event) => void handleAssignEvent(item, event.target.value)} className="w-full ap-card px-3 py-2 text-sm text-[var(--t2)] disabled:cursor-not-allowed disabled:opacity-60">
                               <option value="">Sense assignació</option>
                               {categoryEvents.map((eventItem) => <option key={eventItem.id} value={eventItem.id}>{eventItem.title}</option>)}
                             </select>
                           </div>
                           <div>
-                            <label className="mb-1 block text-xs text-white/40">Fer portada de</label>
+                            <label className="mb-1 block text-xs text-[var(--t3)]">Fer portada de</label>
                             <div className="flex flex-wrap gap-2">
-                              {categoryEvents.length === 0 ? <p className="text-xs text-white/45">Crea primer un event.</p> : categoryEvents.map((eventItem) => {
+                              {categoryEvents.length === 0 ? <p className="text-xs text-[var(--t3)]">Crea primer un event.</p> : categoryEvents.map((eventItem) => {
                                 const active = coverRefs.some((coverEvent) => coverEvent.id === eventItem.id);
-                                return <button key={eventItem.id} type="button" disabled={item.isStatic} onClick={() => void handleSetCover(eventItem.id, item.mediaUrl)} className={`rounded-full border px-3 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-60 ${active ? 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning' : 'border-white/10 text-white/70 hover:bg-white/5'}`}>{active ? `Portada: ${eventItem.title}` : eventItem.title}</button>;
+                                return <button key={eventItem.id} type="button" disabled={item.isStatic} onClick={() => void handleSetCover(eventItem.id, item.mediaUrl)} className={`rounded-full border px-3 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-60 ${active ? 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning' : 'border-[var(--line)] text-[var(--t2)] hover:bg-[var(--raised)]'}`}>{active ? `Portada: ${eventItem.title}` : eventItem.title}</button>;
                               })}
                             </div>
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          <button type="button" disabled={item.isStatic} onClick={() => { replaceTargetRef.current = item; replaceFileRef.current?.click(); }} className="rounded-xl border border-white/10 px-3 py-2 text-sm text-white/80 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60">Substituir fitxer</button>
+                          <button type="button" disabled={item.isStatic} onClick={() => { replaceTargetRef.current = item; replaceFileRef.current?.click(); }} className="rounded-xl border border-[var(--line)] px-3 py-2 text-sm text-[var(--t2)] hover:bg-[var(--raised)] disabled:cursor-not-allowed disabled:opacity-60">Substituir fitxer</button>
                           <button type="button" onClick={() => void handleDelete(item)} disabled={savingId === item.id || item.isStatic} className="rounded-xl border admin-tone-border-danger px-3 py-2 text-sm admin-tone-text-danger hover:admin-tone-bg-danger disabled:opacity-50">Eliminar</button>
                         </div>
                       </div>
@@ -589,10 +589,10 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="ap-h2 text-white/90">Events del portfolio</h2>
-          <p className="text-xs text-white/45">Cada event és una mini-pàgina pública amb portada, metadades i galeria vinculada.</p>
+          <h2 className="ap-h2 text-[var(--t)]">Events del portfolio</h2>
+          <p className="text-xs text-[var(--t3)]">Cada event és una mini-pàgina pública amb portada, metadades i galeria vinculada.</p>
         </div>
-        <button type="button" onClick={() => setShowForm((current) => !current)} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/85 hover:bg-white/5">{showForm ? 'Tancar formulari' : '+ Nou event'}</button>
+        <button type="button" onClick={() => setShowForm((current) => !current)} className="rounded-xl border border-[var(--line)] px-4 py-2 text-sm text-[var(--t2)] hover:bg-[var(--raised)]">{showForm ? 'Tancar formulari' : '+ Nou event'}</button>
       </div>
       {error && <p className="rounded-xl border admin-tone-border-danger px-3 py-2 text-sm admin-tone-text-danger">{error}</p>}
       <div className="grid gap-3 lg:grid-cols-3">
@@ -603,20 +603,20 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
       {showForm ? (
         <div className="ap-card p-5">
           <div className="grid gap-4 md:grid-cols-2">
-            <input value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value, slug: event.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/g, '') }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="Títol de l'event" />
-            <input value={form.slug} onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="Slug URL" />
-            <select value={form.categorySlug} onChange={(event) => setForm((current) => ({ ...current, categorySlug: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85">{PORTFOLIO_CATEGORIES.map((category) => <option key={category.slug} value={category.slug}>{category.name}</option>)}</select>
-            <input value={form.coverImage} onChange={(event) => setForm((current) => ({ ...current, coverImage: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="URL de portada" />
-            <input value={form.subtitle} onChange={(event) => setForm((current) => ({ ...current, subtitle: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="Subtítol" />
-            <input value={form.venue} onChange={(event) => setForm((current) => ({ ...current, venue: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="Venue" />
-            <input value={form.location} onChange={(event) => setForm((current) => ({ ...current, location: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="Ubicació" />
-            <input type="date" value={form.eventDate} onChange={(event) => setForm((current) => ({ ...current, eventDate: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" />
-            <input type="number" min={0} value={form.guestCount} onChange={(event) => setForm((current) => ({ ...current, guestCount: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85" placeholder="Convidats" />
-            <input value={form.services} onChange={(event) => setForm((current) => ({ ...current, services: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-white/85 md:col-span-2" placeholder="Serveis separats per coma" />
-            <textarea value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} rows={4} className="ap-card px-3 py-2.5 text-sm text-white/85 md:col-span-2" placeholder="Descripció" />
+            <input value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value, slug: event.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/g, '') }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="Títol de l'event" />
+            <input value={form.slug} onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="Slug URL" />
+            <select value={form.categorySlug} onChange={(event) => setForm((current) => ({ ...current, categorySlug: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]">{PORTFOLIO_CATEGORIES.map((category) => <option key={category.slug} value={category.slug}>{category.name}</option>)}</select>
+            <input value={form.coverImage} onChange={(event) => setForm((current) => ({ ...current, coverImage: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="URL de portada" />
+            <input value={form.subtitle} onChange={(event) => setForm((current) => ({ ...current, subtitle: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="Subtítol" />
+            <input value={form.venue} onChange={(event) => setForm((current) => ({ ...current, venue: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="Venue" />
+            <input value={form.location} onChange={(event) => setForm((current) => ({ ...current, location: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="Ubicació" />
+            <input type="date" value={form.eventDate} onChange={(event) => setForm((current) => ({ ...current, eventDate: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" />
+            <input type="number" min={0} value={form.guestCount} onChange={(event) => setForm((current) => ({ ...current, guestCount: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)]" placeholder="Convidats" />
+            <input value={form.services} onChange={(event) => setForm((current) => ({ ...current, services: event.target.value }))} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)] md:col-span-2" placeholder="Serveis separats per coma" />
+            <textarea value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} rows={4} className="ap-card px-3 py-2.5 text-sm text-[var(--t2)] md:col-span-2" placeholder="Descripció" />
           </div>
           <div className="mt-4 flex items-center justify-between">
-            <label className="flex items-center gap-2 text-sm text-white/80"><input type="checkbox" checked={form.published} onChange={(event) => setForm((current) => ({ ...current, published: event.target.checked }))} />Publicat</label>
+            <label className="flex items-center gap-2 text-sm text-[var(--t2)]"><input type="checkbox" checked={form.published} onChange={(event) => setForm((current) => ({ ...current, published: event.target.checked }))} />Publicat</label>
             <button type="button" onClick={() => void handleSubmit()} disabled={saving} className="ap-btn ap-btn--primary">{saving ? 'Guardant...' : 'Crear event'}</button>
           </div>
         </div>
@@ -625,14 +625,14 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
         {events.map((eventItem) => (
           <div key={eventItem.id} className="ap-card rounded-2xl p-4">
             <div className="flex flex-col gap-4 md:flex-row md:items-center">
-              <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black">{eventItem.coverImage ? <Image src={eventItem.coverImage} alt={eventItem.title} fill className="object-cover" sizes="96px" /> : null}</div>
+              <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-[var(--line)] bg-black">{eventItem.coverImage ? <Image src={eventItem.coverImage} alt={eventItem.title} fill className="object-cover" sizes="96px" /> : null}</div>
               <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2"><p className="text-sm font-semibold text-white/90">{eventItem.title}</p><span className={`rounded-full px-2 py-1 text-xs ${eventItem.published ? 'admin-tone-bg-success admin-tone-text-success' : 'bg-white/10 text-white/60'}`}>{eventItem.published ? 'Publicat' : 'Esborrany'}</span></div>
-                <p className="mt-1 text-xs text-white/45">/{eventItem.categorySlug}/{eventItem.slug} · {eventItem._count?.media || 0} elements vinculats</p>
-                <p className="mt-1 text-xs text-white/35">Portada: {eventItem.coverImage || 'pendent'}</p>
+                <div className="flex flex-wrap items-center gap-2"><p className="text-sm font-semibold text-[var(--t)]">{eventItem.title}</p><span className={`rounded-full px-2 py-1 text-xs ${eventItem.published ? 'admin-tone-bg-success admin-tone-text-success' : 'bg-[var(--o-admin-light)]/10 text-[var(--t2)]'}`}>{eventItem.published ? 'Publicat' : 'Esborrany'}</span></div>
+                <p className="mt-1 text-xs text-[var(--t3)]">/{eventItem.categorySlug}/{eventItem.slug} · {eventItem._count?.media || 0} elements vinculats</p>
+                <p className="mt-1 text-xs text-[var(--t3)]">Portada: {eventItem.coverImage || 'pendent'}</p>
               </div>
               <div className="flex flex-wrap gap-2">
-                <button type="button" onClick={() => void togglePublished(eventItem)} className="rounded-xl border border-white/10 px-3 py-2 text-sm text-white/80 hover:bg-white/5">{eventItem.published ? 'Despublicar' : 'Publicar'}</button>
+                <button type="button" onClick={() => void togglePublished(eventItem)} className="rounded-xl border border-[var(--line)] px-3 py-2 text-sm text-[var(--t2)] hover:bg-[var(--raised)]">{eventItem.published ? 'Despublicar' : 'Publicar'}</button>
                 <button type="button" onClick={() => void deleteEvent(eventItem.id)} className="rounded-xl border admin-tone-border-danger px-3 py-2 text-sm admin-tone-text-danger hover:admin-tone-bg-danger">Eliminar</button>
               </div>
             </div>
@@ -686,8 +686,8 @@ export default function AdminPortfolioPage() {
     <div className="space-y-6">
       <FullscreenPreview preview={preview} onClose={() => setPreview(null)} />
       <div>
-        <h1 className="text-2xl font-bold text-white/95">Portfolio</h1>
-        <p className="mt-1 text-sm text-white/50">Gestor visual únic del portfolio: miniatures, destinació real, portada, ordre, substitució i assignació d'events.</p>
+        <h1 className="text-2xl font-bold text-[var(--t)]">Portfolio</h1>
+        <p className="mt-1 text-sm text-[var(--t3)]">Gestor visual únic del portfolio: miniatures, destinació real, portada, ordre, substitució i assignació d'events.</p>
       </div>
       <div className="grid gap-3 lg:grid-cols-3">
         <AdminHelpLegend title="Què estàs veient" body="Media gestiona fitxers i ordre. Events gestiona la pàgina pública i les seves metadades." />
@@ -702,7 +702,7 @@ export default function AdminPortfolioPage() {
       </div>
       {tab === 'media' ? (
         <div className="space-y-3">
-          {eventsLoading ? <div className="ap-card p-6 text-sm text-white/50">Carregant events i assignacions...</div> : PORTFOLIO_CATEGORIES.map((category) => <CategorySection key={category.slug} slug={category.slug} name={category.name} events={events} onEventsRefresh={loadEvents} onOpenPreview={setPreview} />)}
+          {eventsLoading ? <div className="ap-card p-6 text-sm text-[var(--t3)]">Carregant events i assignacions...</div> : PORTFOLIO_CATEGORIES.map((category) => <CategorySection key={category.slug} slug={category.slug} name={category.name} events={events} onEventsRefresh={loadEvents} onOpenPreview={setPreview} />)}
         </div>
       ) : (
         <EventsManager events={events} onEventsRefresh={loadEvents} />

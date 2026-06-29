@@ -1351,6 +1351,7 @@ Salt qualitatiu multi-tall. Honeybook s'ha menjat el mercat USA d'events amb aix
 **FET parcial** *(2026-05-15 per `codex` — Canvi #573)*: la signatura manuscrita ja és part obligatòria del flux online i queda visible al propietari. `SignContractForm` no envia sense blob de `SignaturePad`, la ruta passa `signatureBlob`, `signContractOnline()` el desa a `contractSignatureBlob`, i `DocumentFlowSection` mostra la imatge capturada quan el contracte està `SIGNED`. El PDF firmat continua pendent.
 **FET parcial** *(2026-05-15 per `codex` — Canvi #574)*: el client també veu la signatura manuscrita capturada dins la pàgina del contracte del portal. `ClientPortalContractSummary` exposa `signatureBlob`, `findPortalAccessByRawToken()` carrega `contractSignatureBlob`, i `/portal/[token]/contract` renderitza la imatge quan el contracte està `SIGNED`. El PDF firmat continua pendent.
 **FET parcial** *(2026-05-15 per `codex` — Canvi #575)*: la signatura inline ja produeix un PDF signat material. `ContractPdfData` accepta `signedBy`, `signedAt`, `signatureBlob` i `signatureIp`, `generateContractPDF()` pinta la signatura capturada al bloc de signatures, `generateSignedContractPdf()` regenera i puja el PDF a storage local, i `signContractOnline()` el desa de nou a `contractPdfUrl`/`contractPdfKey` després de marcar el contracte com `SIGNED`. Resta revisar si cal una entitat `ContractSignature` pròpia o si els camps actuals de `Proposal` són suficients.
+**FET parcial** *(2026-06-29 per `codex` — Canvi #1227)*: la signatura inline deixa de poder quedar parcial si falla el PDF signat. `signContractOnline()` marca `SIGNED`, genera el PDF firmat i, si `generateSignedContractPdf()` falla, reverteix `contractStatus` a `SENT` i neteja `contractSignedAt/By/IP/UA/blob`; la timeline només rep `recordLeadContractSigned()` quan el PDF material ja existeix. El client pot reintentar i l'admin no veu un contracte signat sense document firmat.
 **FET parcial** *(2026-05-15 per `codex` — Canvi #576)*: la signatura de contracte queda també a la timeline operativa del lead. `leadActivityService` exporta `recordLeadContractSigned()`, `signContractOnline()` crea l'activitat `Contracte signat` amb `source: portal` després de generar el PDF signat, i `markContractSigned()` fa el mateix amb `source: admin` quan la signatura es marca manualment. Això fa visible el fet signat dins la narrativa comercial sense crear encara una entitat `ContractSignature` separada.
 - **F.23 [USP] Pagaments online (Stripe link) dins el pressupost** — Honeybook brutal. CTA "Paga el 30% per confirmar" amb Stripe Checkout. Implica: integració Stripe + nou flow `Booking.paymentLink` + webhook handler.
 **FET parcial** *(2026-05-16 per `codex` — Canvi #577)*: F.23 queda iniciat amb base de dades i CTA segur al portal client. `Booking` incorpora `depositPaymentUrl` i `remainingPaymentUrl` amb migració SQL, `getClientPortalPaymentSummary()` normalitza links `http(s)` i decideix si toca pagar bestreta o resta, i `/portal/[token]` mostra el botó de pagament online només quan existeix un link vàlid i l'import encara no està pagat. Encara falta generació Stripe Checkout real i webhook per marcar pagaments.
@@ -1362,6 +1363,8 @@ Salt qualitatiu multi-tall. Honeybook s'ha menjat el mercat USA d'events amb aix
 **FET** *(2026-05-17 per `codex` — Canvi #591)*: F.23 queda tancat com a flux complet de pagament online dins el pressupost/portal. `getClientPortalInvoiceSummary()` reutilitza `getClientPortalPaymentSummary()` i exposa `paymentUrl`, `payableOnline`, `nextPayment` i `paymentNotice` per bestreta/resta; `/[locale]/portal/[token]/invoice` mostra el CTA Stripe corresponent al costat del desglossament del pressupost. Això connecta el pressupost visible amb el mateix motor canònic que ja alimentava `/payments`, el webhook idempotent i la timeline admin.
 - **G.25 [USP mig-llarg] Portal client** — timeline visible, contracte, factures, fotos post-event, qüestionaris. Honeybook Client Portal és el referent absolut. Implica: nou conjunt rutes `/portal/[token]/*` (`overview`, `contract`, `payments`, `gallery`, `questionnaire`) basades en `ClientPortalAccess` que ja existeix com a model.
 **FET parcial** *(2026-05-16 per `codex` — Canvi #585)*: el portal client ja comença a separar-se en subrutes reals amb `/[locale]/portal/[token]/payments`. La portada enllaça a `payments`, `buildClientPortalPaymentsPath()` blinda la ruta interna, i la pàgina dedicada mostra resum de pagament, proper pas, targeta de bestreta, targeta de resta i CTAs Stripe quan toca, respectant `showPayments=false`.
+**FET parcial** *(2026-06-29 per `codex` — Canvi #1226)*: la visibilitat del portal client deixa de ser només visual. `lib/clientPortalVisibility.ts` interpreta els flags de `ClientPortalAccess.personalization`; `/payments`, `/timeline`, `/contract`, `/invoice` i `/questionnaire` retornen `notFound()` si el bloc corresponent està desactivat, i `PortalBottomNav` amaga els ítems derivats del mateix contracte. Això tanca el forat on un client podia entrar per URL directa a documents o timeline amagats per l'admin.
+**FET parcial** *(2026-06-29 per `codex` — Canvi #1228)*: el vincle tardà reserva→client també actualitza els accessos actius del portal. `linkBookingToCustomer()` ja no deixa `ClientPortalAccess.customerId=null` quan una reserva que ja tenia portal es vincula o crea client; actualitza `client_portal_access` per `bookingId + revokedAt=null`, mantenint Customer Hub i recurrència connectats.
 **FET parcial** *(2026-05-16 per `claude` — Canvi #586)*: el portal guanya subruta de procés/timeline a `/[locale]/portal/[token]/timeline`. `getClientPortalTimeline()` deriva sis fites (reserva creada, pressupost enviat, contracte signat, paga i senyal, dia de l'event, pagament final) amb estat `done/upcoming/future` sense schema nou; la pàgina mostra la línia de temps vertical amb colors semàfor (emerald/cyan/blanc); la portada principal enllaça a la nova ruta des de la secció "Estat del procés". Missatges trilingüals afegits a `CLIENT_PORTAL_MESSAGES`.
 **FET parcial** *(2026-05-16 per `claude` — Canvi #587)*: el portal guanya subruta de factura/pressupost a `/[locale]/portal/[token]/invoice`. `getClientPortalInvoiceSummary()` exposa total, desglossament bestreta/resta amb dates de pagament i referència+PDF del primer pressupost amb PDF; `buildClientPortalInvoicePath()` construeix la ruta canònica. La portada substitueix l'enllaç directe al PDF per dos botons: "Veure pressupost" (invoice) + PDF si existeix. 8 claus noves trilingüals a `CLIENT_PORTAL_MESSAGES`.
 **FET** *(2026-05-17 per `claude` — Canvi #592)*: subruta `/portal/[token]/gallery` tanca G.25. `buildClientPortalGalleryPath()` canònic. Pàgina dedicada de galeria amb `listPortalPhotos()` i `next/image`. Portada del portal: preview 6 fotos + CTA "Veure totes les fotos". Clau `galleryViewLink` als tres locales. 3 tests del builder. Portal complet: `overview` + `contract` + `payments` + `timeline` + `invoice` + `questionnaire` (G.26) + `gallery` (ara).
@@ -1524,6 +1527,60 @@ Seqüència obligatòria de registre:
 ## Entrades
 
 ---
+
+### Canvi #1228 — 2026-06-29 — codex (FET)
+**V4 client: vincular una reserva també reassigna els PortalAccess actius.**
+- Context: una reserva podia generar portal abans de tenir `customerId`; si després es vinculava o creava client, `Booking.customerId` quedava bé però `ClientPortalAccess.customerId` seguia null.
+- `lib/services/bookings/bookingCustomerLinkService.ts`: `linkBookingToCustomer()` actualitza `clientPortalAccess.updateMany({ bookingId, revokedAt:null })` amb el customer resolt.
+- `__tests__/lib/services/bookings/bookingCustomerLinkService.test.ts`: regressions per `link` i `create`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/bookings/bookingCustomerLinkService.test.ts __tests__/lib/services/clientPortalAccess.test.ts`; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: el portal ja queda associat al customer encara que l'enllaç client es faci després.
+- Validació humana/UX: Customer Hub, recurrència i lectures per client no perden portals generats abans de netejar la fitxa.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1228`; el següent canvi real ha de ser `#1229`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1227 — 2026-06-29 — codex (FET)
+**V4 signatura: rollback si falla la generació del PDF signat.**
+- Context: `signContractOnline()` marcava `SIGNED` abans de generar el PDF firmat; una fallada de `generateSignedContractPdf()` podia deixar estat parcial a BD.
+- `lib/services/contractSignatureService.ts`: la generació del PDF signat queda dins `try/catch`; si falla, el contracte torna a `SENT` i es netegen camps de signatura.
+- `recordLeadContractSigned()` només s'executa després de tenir PDF signat material.
+- `__tests__/lib/services/contractSignatureService.test.ts`: regressió de rollback quan falla el PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/contractSignatureService.test.ts __tests__/app/api/portal/sign-route.test.ts`; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: una fallada transitòria de PDF deixa el contracte reintentable i no signat parcialment.
+- Validació humana/UX: evita l'estat ambigu on el client veu error però l'admin veu contracte signat.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1227`; el següent canvi real ha de ser `#1228`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1226 — 2026-06-29 — codex (FET)
+**V4 portal client: els toggles de visibilitat també protegeixen subrutes i nav.**
+- Context: auditoria V4 no solapada amb mails. Els flags `showDocuments` i `showTimeline` només amagaven blocs a la portada; les subrutes directes seguien obertes i la nav inferior mostrava botons amagats.
+- `lib/clientPortalVisibility.ts`: font única per `showPayments`, `showTimeline`, `showDocuments`, `showPostEvent` i `showQuestionnaire`.
+- `PortalBottomNav`: nou `hiddenItems` derivat del helper compartit.
+- `/[locale]/portal/[token]/payments`, `/timeline`, `/contract`, `/invoice` i `/questionnaire`: `notFound()` quan el flag corresponent està desactivat.
+- Portada, galeria i qüestionari passen la nav filtrada perquè el client no vegi accessos incoherents.
+- `__tests__/lib/clientPortalVisibility.test.ts`: blinda defaults, flags `false` i derivació de nav.
+- Validació tècnica: test focalitzat, `npx tsc --noEmit --pretty false`, `pnpm run qa:protocol`.
+- Validació funcional: els toggles del portal són contracte real de navegació i URL, no només decoració de portada.
+- Validació humana/UX: el client no rep botons ni accessos directes a seccions que l'admin ha ocultat.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1226`; el següent canvi real ha de ser `#1227`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1226 — 2026-06-29 — claude (FET)
+**Homogeneïtzació canònica: blancs crus → tokens a portfolio/text-manager/salut.**
+- Top del deute visual: blancs crus Tailwind (`text-white/NN`, `bg-white/N`, `border-white/NN`) → tokens (`--t`/`--t2`/`--t3`/`--line`/`--raised`/`--hair-gold`). 0 blancs crus restants. Compliment monocapa (no canvi visual perceptible).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1226`; el següent canvi real ha de ser `#1227`.
+- Validació tècnica: `tsc` 0; `validate:core` (admin-canon) 0.
+- Validació funcional: cap canvi de comportament; captura portfolio idèntica.
+- Validació humana/UX: homogeneïtzació cap al canon sense regressió.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
 
 ### Canvi #1225 — 2026-06-29 — claude (FET)
 **S2: Economia surt de «Sistema» cap a «Operativa» (dia a dia).**

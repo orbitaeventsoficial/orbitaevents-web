@@ -1,3 +1,88 @@
+## 2026-06-29 — Homogeneïtzació canònica: blancs crus → tokens a 3 pàgines top de deute (Canvi #1226, claude)
+
+### Context
+Pla de simplificació / homogeneïtzació («tot canònic», propietari). Les pàgines top del rànquing de deute visual (portfolio 56, text-manager, salut) usaven Tailwind blanc cru (`text-white/NN`, `bg-white/N`, `border-white/NN`) en comptes de tokens → violaven la monocapa del canon.
+
+### Què s'ha fet
+- `portfolio/page.tsx`, `text-manager/page.tsx`, `salut/page.tsx`: tots els blancs crus → tokens (`--t`/`--t2`/`--t3` per text, `--line` per vores, `--raised` per fons, `--hair-gold` per hover). **0 blancs crus restants** a les 3.
+- Nota honesta: el canvi NO és visualment perceptible (els blancs crus es renderitzaven gairebé com els tokens); el valor és **compliment del canon/monocapa** — si es canvia un token, aquestes pàgines el segueixen.
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core` (guard admin-canon) EXIT 0.
+- Validació funcional: cap canvi de comportament; captura de portfolio idèntica (confirmat).
+- Validació humana/UX: homogeneïtzació cap al canon; sense regressió visual.
+
+### Coordinació
+Counter → 1226. Homogeneïtzació canònica (S6 parcial). Codex parat.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-29 — V4 client: vincular reserva actualitza PortalAccess (Canvi #1228, codex)
+
+### Context
+La revisió `Lead → Client → Booking → PortalAccess` ha trobat un forat de recurrència: quan una reserva sense client es vinculava o creava client després d'haver generat portal, només s'actualitzava `Booking.customerId`. Els `ClientPortalAccess` actius mantenien `customerId=null`, deixant el portal fora del Customer Hub i de lectures futures per client.
+
+### Què s'ha fet
+- `lib/services/bookings/bookingCustomerLinkService.ts`: després d'actualitzar `Booking.customerId`, actualitza també els `ClientPortalAccess` actius (`revokedAt=null`) de la mateixa reserva.
+- `__tests__/lib/services/bookings/bookingCustomerLinkService.test.ts`: regressions per als dos camins, vincular a client existent i crear client nou.
+
+### Validació
+- Validació tècnica: tests focalitzats de linking i portal access; TypeScript.
+- Validació funcional: una reserva vinculada tard a client deixa el portal associat al mateix customer.
+- Validació humana/UX: Customer Hub/recurrència no perden portals generats abans de completar la fitxa client.
+
+### Coordinació
+Counter → 1228. Tall V4 pur; no toca mails automàtics, Inbox, APPEND, seqüències, inventari, preus, costEngine ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — V4 signatura: rollback si falla el PDF signat (Canvi #1227, codex)
+
+### Context
+Segona passada V4 sobre la signatura inline del portal. `signContractOnline()` marcava la proposta com `SIGNED` abans de generar i pujar el PDF signat. Si `generateSignedContractPdf()` fallava, la ruta pública podia retornar error però el contracte quedava parcialment signat a BD, sense document material consistent.
+
+### Què s'ha fet
+- `lib/services/contractSignatureService.ts`: després de desar la signatura, la generació del PDF signat queda dins `try/catch`.
+- Si falla la generació del PDF, es reverteixen els camps de signatura i el contracte torna a `SENT`.
+- La traça `recordLeadContractSigned()` només s'escriu quan el PDF signat ja s'ha generat correctament.
+- `__tests__/lib/services/contractSignatureService.test.ts`: regressió perquè una fallada de PDF no deixi un contracte `SIGNED` parcial.
+
+### Validació
+- Validació tècnica: tests focalitzats de servei de signatura i ruta pública; TypeScript.
+- Validació funcional: el client pot reintentar una signatura si falla el PDF; l'admin no veu un contracte signat sense PDF firmat.
+- Validació humana/UX: evita l'estat ambigu "m'ha donat error però consta signat".
+
+### Coordinació
+Counter → 1227. Tall V4 pur; no toca mails automàtics, Inbox, APPEND, seqüències, inventari, preus, costEngine ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — V4 portal client: toggles aplicats a subrutes i nav (Canvi #1226, codex)
+
+### Context
+En obrir V4 (Client/Portal/Recurrència) sense entrar a mails, la primera prova de cablejat ha trobat que els toggles del portal client només amagaven blocs de la portada. `showPayments=false` sí bloquejava `/payments`, però `showDocuments=false` deixava entrar per URL directa a `/contract` i `/invoice`, `showTimeline=false` deixava entrar a `/timeline`, i la nav inferior continuava mostrant seccions amagades.
+
+### Què s'ha fet
+- `lib/clientPortalVisibility.ts`: nova font única per interpretar `personalization.showPayments/showTimeline/showDocuments/showPostEvent/showQuestionnaire`.
+- `PortalBottomNav`: accepta `hiddenItems` i retira de la nav els ítems ocults pel mateix contracte.
+- Portal client: portada, pagaments, contracte, timeline, invoice, galeria i qüestionari consumeixen el helper compartit.
+- Les subrutes protegides retornen `notFound()` quan el flag corresponent està desactivat: `payments`, `timeline`, `contract`, `invoice` i `questionnaire`.
+- `__tests__/lib/clientPortalVisibility.test.ts`: cobertura del contracte de visibilitat i de la nav derivada.
+
+### Validació
+- Validació tècnica: test del helper, TypeScript i protocol.
+- Validació funcional: un flag desactivat ja no és només visual; també talla URL directa i navegació.
+- Validació humana/UX: el client deixa de veure botons cap a seccions que l'admin ha decidit amagar.
+
+### Coordinació
+Counter → 1226. Tall V4 pur; no toca mails automàtics, Inbox, APPEND, seqüències, inventari, preus, costEngine ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-29 — S2/S3: Economia surt de «Sistema» cap a «Operativa» (dia a dia) (Canvi #1225, claude)
 
 ### Context
