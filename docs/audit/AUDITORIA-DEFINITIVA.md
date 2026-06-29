@@ -80,7 +80,7 @@ obres de debò. **No es fusiona/amaga res a cegues.** El mètode: tu obres el me
 > de números en 1-2 i aprimar el menú.** Menys superfície = un cap que se'n refia.
 
 ## 🔧 COHERÈNCIA DE COMPONENTS (2026-06-30, en curs) — «s'han de fer tots»
-Headers ✅ (#1240, #1246). PENDENT verificar eyebrow: **inbox**, **leads/arxiu** (el detector
+Headers ✅ (#1240, #1246). ✅ inbox (sf__eyebrow+sf__title) i leads/arxiu (ax__eyebrow+ax__h1) JA coherents (header en Client components, fals negatiu del detector).
 els marcava sense eyebrow; pot ser fals negatiu com bookings).
 Components a homogeneïtzar (escaneig inicial, falsos positius inclosos): botons sense .ap-btn,
 inputs sense .adm-input, badges sense to canònic. Atac per tipus, validant cada tanda.

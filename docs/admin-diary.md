@@ -1,3 +1,37 @@
+## 2026-06-30 — CACERIA MONUMENTAL de coherència (informe nocturn complet) (Canvi #1250, claude)
+
+### Context
+Ordre del propietari: «caceria monumental de tot, non-stop» (mentre dorm). Codex parat. Auditoria EXHAUSTIVA de coherència de TOTS els tipus de component admin, no només headers.
+
+### Què s'ha caçat i arreglat
+- **Botons**: 24 `<button>` (#1249) + 1 `<Link>` d'acció (packs «+ Nou Pack») → `.ap-btn` amb variant del rol. Tabs/navegació respectats (un intent v1 els va aplanar → revertit).
+- **Headers** (#1240, #1246): tots coherents amb leads (eyebrow + títol display). inbox i leads/arxiu eren falsos negatius (header en Client components, ja tenen sf__/ax__ eyebrow+títol).
+
+### Què s'ha verificat JA COHERENT (no calia tocar)
+- **Inputs**: només 4 divergents (la resta .adm-input/.ap-input). **Cards**: 1.
+- **Badges**: 56 canònics + 15 «cyan» que en realitat apunten a carbó (--at-raised/--at-text, no blau) + 45 amb tokens. Cap blau real.
+- **Canon dur**: `text-[Npx]` 0 · `font-black` 0 · gradients Tailwind 0 · `slate/gray/zinc` 0. Tot net.
+- **KPIs**: 12 fitxers amb .ap-kpi canònic.
+
+### Deute documentat (per fer amb el propietari, NO a cegues)
+- **3 sistemes de tabs** (admin-catalog-tab, admin-economia-tab, admin-reviews-tab): usen tokens però noms diferents → unificar a un .ap-tab canònic (delicat: estats actiu/inactiu).
+- **21 botons funcionals** (min-h-44 tàctil, toggles): estil propi legítim, no es forcen a .ap-btn.
+- **Feina V5 de Codex a `git stash@{0}`** (studio-utils.ts, packEditorPricing.ts): recuperar amb stash pop + resoldre conflictes.
+
+### Veredicte de la caceria
+L'admin JA era molt més coherent del que semblava. Els problemes reals (títols sans, botons sense .ap-btn, espaiat header px) estaven concentrats i ja resolts. El canon dur (colors, font, gradients) es complia arreu.
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core` EXIT 0 a cada tanda.
+- Validació funcional: captures de packs/inventory/cost-calculator/social/economia — layout intacte.
+- Validació humana/UX: botons família .ap-btn, headers com leads, 0 blau, 0 px hardcoded.
+
+### Coordinació
+Counter → 1250. ⚠️ Codex té V5 al stash@{0}. Pendent amb propietari: unificar tabs, decidir botons funcionals.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-30 — Caceria botons (tanda 2): 24 <button> → .ap-btn variant (Canvi #1249, claude)
 
 ### Context
