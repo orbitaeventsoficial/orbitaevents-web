@@ -224,7 +224,7 @@ export default function CalendarDayClient() {
                 </div>
                 <div className="flex items-center gap-2">
                   {isBlocked ? (
-                    <button onClick={unblockDay} type="button" className="text-xs px-3 py-1 rounded-xl border transition-colors">
+                    <button onClick={unblockDay} type="button" className="ap-btn ap-btn--xs">
                       Desbloquejar
                     </button>
                   ) : (

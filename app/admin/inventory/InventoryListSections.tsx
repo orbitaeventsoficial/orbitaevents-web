@@ -172,7 +172,7 @@ export function InventoryBundlesSection(props: InventoryBundlesSectionProps) {
           aria-label="Nom del nou lot"
           className="rounded-xl border px-3 py-2 text-xs"
         />
-        <button type="button" onClick={createBundle} className="rounded-xl border px-3 py-2 text-xs">
+        <button type="button" onClick={createBundle} className="ap-btn ap-btn--xs">
           + Crear lot
         </button>
       </div>
@@ -189,7 +189,7 @@ export function InventoryBundlesSection(props: InventoryBundlesSectionProps) {
             <button
               type="button"
               onClick={deleteSelectedBundle}
-              className="rounded-xl border px-3 py-1.5 text-xs"
+              className="ap-btn ap-btn--xs"
             >
               Eliminar lot
             </button>
@@ -352,7 +352,7 @@ export function InventoryFiltersSection({
         <button
           type="button"
           onClick={resetFilters}
-          className="rounded-xl border px-3 py-2 text-xs font-medium transition-colors"
+          className="ap-btn ap-btn--xs"
           {...helpAttrs(ADMIN_INVENTORY_HELP.resetFilters)}
         >
           Netejar filtres

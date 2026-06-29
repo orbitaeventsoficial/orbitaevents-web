@@ -45,7 +45,7 @@ export default function AiCopySuggestionsInline({ type, context, onApply, label 
           type="button"
           onClick={handleGenerate}
           disabled={loading || !context.trim()}
-          className="flex items-center gap-1.5 rounded-lg border border-[var(--hair-gold)] bg-[var(--panel)] px-3 py-1.5 text-xs font-medium text-[var(--gold)] transition-colors hover:bg-[var(--raised)] disabled:opacity-40"
+          className="ap-btn ap-btn--xs flex items-center gap-1.5 disabled:opacity-40"
         >
           {loading ? (
             <span className="inline-block h-3 w-3 animate-spin rounded-full border border-[var(--gold)] border-t-transparent" />

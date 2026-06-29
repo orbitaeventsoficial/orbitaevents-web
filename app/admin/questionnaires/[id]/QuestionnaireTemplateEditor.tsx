@@ -170,7 +170,7 @@ export default function QuestionnaireTemplateEditor({
         <button
           onClick={addQuestion}
           type="button"
-          className="inline-flex rounded-lg border border-[var(--line)] px-4 py-2 text-sm text-[var(--t2)] hover:bg-[var(--raised)]"
+          className="ap-btn inline-flex"
         >
           + Afegir pregunta
         </button>

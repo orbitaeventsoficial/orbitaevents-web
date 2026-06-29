@@ -15,7 +15,7 @@ export default function CustomerHubError({
         <button
           type="button"
           onClick={reset}
-          className="mt-4 rounded-xl border px-3 py-2 text-sm font-semibold"
+          className="ap-btn mt-4"
         >
           Reintentar
         </button>

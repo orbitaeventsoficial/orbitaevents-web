@@ -363,7 +363,7 @@ export default function CostCalculatorClient() {
                 />
                 <button
                   onClick={handleSave} disabled={saving}
-                  className="px-6 py-2.5 rounded-xl text-[var(--gold-ink)] font-bold transition-colors disabled:opacity-50"
+                  className="ap-btn ap-btn--primary disabled:opacity-50"
                 >
                   {saving ? 'Desant...' : 'Desar pressupost'}
                 </button>

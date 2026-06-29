@@ -119,7 +119,7 @@ export default function NewPackForm() {
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-xl border px-4 py-2 text-sm font-semibold disabled:opacity-60"
+          className="ap-btn disabled:opacity-60"
         >
           {submitting ? 'Creant...' : 'Crear pack'}
         </button>

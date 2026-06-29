@@ -272,7 +272,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                 type="button"
                 onClick={cancelEdit}
                 disabled={saving}
-                className="rounded-xl border px-3 py-1.5 text-xs disabled:opacity-50"
+                className="ap-btn ap-btn--xs disabled:opacity-50"
                 {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.cancelEdit)}
               >
                 Cancel·la
@@ -1271,7 +1271,7 @@ function ContactsSection({ customerId, contacts: initialContacts }: { customerId
           {error && <p className="text-xs admin-tone-text-danger">{error}</p>}
           <div className="flex gap-2">
             <button type="button" onClick={handleSave} disabled={saving || !form.name.trim()}
-              className="rounded-xl px-4 py-2 text-sm font-semibold border border-[var(--ax-hair-gold)] text-[var(--ax-gold-bright)] disabled:opacity-50">
+              className="ap-btn disabled:opacity-50">
               {saving ? 'Desant...' : editId ? 'Desar canvis' : 'Afegir'}
             </button>
             <button type="button" onClick={() => { setAdding(false); setEditId(null); setForm(EMPTY_FORM); setError(''); }}

@@ -195,7 +195,7 @@ export default function ConfirmDialog({
                 type="button"
                 onClick={onCancel}
                 disabled={busy}
-                className="rounded-xl border border-[var(--line)] bg-[var(--raised)] px-4 py-2 text-sm font-medium text-[var(--t2)] transition-colors hover:bg-[var(--raised)] focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50"
+                className="ap-btn disabled:opacity-50"
                 {...helpAttrs(ADMIN_SHARED_HELP.confirmCancel)}
               >
                 Cancel·lar

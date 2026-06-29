@@ -781,7 +781,7 @@ function SocialPostModal({
         </div>
 
         <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-end">
-          <button type="button" onClick={onClose} className="rounded-xl border border-[var(--line)] px-4 py-2 text-sm hover:bg-[var(--raised)]">
+          <button type="button" onClick={onClose} className="ap-btn">
             Cancel·lar
           </button>
           <button type="submit" disabled={saving || !title.trim() || platforms.length === 0} className="ap-btn ap-btn--primary px-6 py-2 disabled:opacity-50 sm:w-auto w-full">

@@ -1,3 +1,24 @@
+## 2026-06-30 — Caceria botons (tanda 2): 24 <button> → .ap-btn variant (Canvi #1249, claude)
+
+### Context
+Caceria nocturna de coherència de components («fes-ho tot non-stop», propietari dorm). Codex parat. Un primer intent (script v1) va tocar <Link> de navegació i va aplanar tabs (Packs/Extres) → revertit. Script v2 conservador: NOMÉS <button> (no <Link>), conserva classes de layout, exclou fitxers de la feina V5 de Codex (al stash).
+
+### Què s'ha fet
+- 24 `<button>` amb estil propi (rounded+border+px, no botó-void) → `.ap-btn` amb la variant del rol (`--xs` per petits, `--primary` per daurats/success), conservant layout (mt-*, flex-1, gap, shrink-0). 19 fitxers: bookings/[id], calendario, clientes (modals/panels/error), cost-calculator, image-manager, inventory, questionnaires, settings/quotes, social, etc.
+- Tabs/navegació (<Link>) NO tocats (es respecten).
+- **Feina V5 de Codex preservada a `git stash@{0}`** (studio-utils.ts +131L, packEditorPricing.ts nou) — recuperable amb `git stash pop`.
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core` EXIT 0 (admin-canon verd).
+- Validació funcional: captures de cost-calculator/inventory/social — layout intacte.
+- Validació humana/UX: botons coherents amb la família .ap-btn.
+
+### Coordinació
+Counter → 1249. ⚠️ Codex té V5 al stash (conflicte potencial al pop). Pendent: <Link> d'acció + badges (~98) + headers inbox/arxiu.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-30 — Coherència de botons (tanda 1): manual → .ap-btn (Canvi #1248, claude)
 
 ### Context

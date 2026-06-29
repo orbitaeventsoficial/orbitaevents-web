@@ -206,7 +206,7 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
                 type="button"
                 onClick={handleRemovePhoto}
                 disabled={uploading}
-                className="rounded-xl px-2 py-1 text-xs backdrop-blur-sm"
+                className="ap-btn ap-btn--xs"
               >
                 Treure
               </button>

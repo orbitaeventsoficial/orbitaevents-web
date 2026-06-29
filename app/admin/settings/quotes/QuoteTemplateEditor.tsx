@@ -150,7 +150,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           type="button"
           onClick={save}
           disabled={saving}
-          className="admin-quote-template-save rounded-xl border px-4 py-2 text-sm font-semibold disabled:opacity-60"
+          className="ap-btn disabled:opacity-60"
         >
           {saving ? 'Desant...' : 'Desar plantilla'}
         </button>

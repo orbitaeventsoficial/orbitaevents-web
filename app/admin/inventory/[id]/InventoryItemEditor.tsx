@@ -573,7 +573,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
           type="button"
           onClick={handleSave}
           disabled={saving || !form.name || !form.value}
-          className="rounded-xl bg-[var(--o-info)] px-6 py-3 text-sm font-semibold text-[var(--t)] shadow-lg transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="ap-btn disabled:opacity-50"
         >
           {saving ? 'Desant...' : mode === 'create' ? 'Crear element' : 'Desar canvis'}
         </button>
@@ -582,7 +582,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
           <button
             type="button"
             onClick={handleDelete}
-            className="rounded-xl border admin-tone-border-danger px-4 py-3 text-sm admin-tone-text-danger transition-colors hover:bg-[var(--raised)]"
+            className="ap-btn"
           >
             Eliminar
           </button>

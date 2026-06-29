@@ -421,7 +421,7 @@ export function StartProcessModal({
         <button
           onClick={onClose}
           type="button"
-          className="w-full mt-6 py-3 border rounded-xl transition-all"
+          className="ap-btn w-full mt-6"
         >
           Cancel·lar
         </button>

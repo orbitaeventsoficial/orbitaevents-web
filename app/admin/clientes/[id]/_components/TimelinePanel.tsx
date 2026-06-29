@@ -229,7 +229,7 @@ export default function TimelinePanel({
         <button
           type="button"
           onClick={toggleExpand}
-          className="mt-3 w-full rounded-xl border py-2 text-xs transition-colors"
+          className="ap-btn ap-btn--xs mt-3 w-full"
         >
           {expanded ? 'Mostra menys ↑' : `Mostra més (${groupedTimeline.length - 5} dies més) ↓`}
         </button>

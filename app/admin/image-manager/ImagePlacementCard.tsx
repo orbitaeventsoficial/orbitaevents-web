@@ -204,7 +204,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
           <button
             type="button"
             onClick={handleSetAuto}
-            className="rounded-full border border-[var(--line)] px-4 py-2 text-xs font-semibold text-[var(--t2)] hover:bg-[var(--raised)]"
+            className="ap-btn ap-btn--xs"
           >
             Tornar a auto
           </button>

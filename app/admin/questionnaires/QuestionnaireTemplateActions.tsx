@@ -48,7 +48,7 @@ export default function QuestionnaireTemplateActions({
         </Link>
         <button
           onClick={handleToggle}
-          className="inline-flex rounded-lg border border-[var(--line)] px-3 py-1.5 text-xs text-[var(--t2)] hover:bg-[var(--raised)]"
+          className="ap-btn ap-btn--xs inline-flex"
           type="button"
         >
           {isActive ? 'Desactivar' : 'Activar'}

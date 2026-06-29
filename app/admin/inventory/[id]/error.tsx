@@ -25,7 +25,7 @@ export default function InventoryDetailError({
         <div className="flex gap-3 justify-center">
           <button
             onClick={reset}
-            className="px-4 py-2 rounded-xl text-sm font-semibold border"
+            className="ap-btn"
           >
             Reintentar
           </button>

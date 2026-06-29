@@ -272,7 +272,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
             type="button"
             onClick={handleAssignPack}
             disabled={packTemplate.length === 0}
-            className="rounded-xl border px-3 py-1.5 text-xs font-medium disabled:opacity-50 transition-colors"
+            className="ap-btn ap-btn--xs disabled:opacity-50"
           >
             + Afegir inventari del pack
           </button>
@@ -321,7 +321,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
           <button
             type="button"
             onClick={handleAssignBundle}
-            className="rounded-xl border px-3 py-1.5 text-xs font-medium transition-colors"
+            className="ap-btn ap-btn--xs"
           >
             + Afegir lot
           </button>

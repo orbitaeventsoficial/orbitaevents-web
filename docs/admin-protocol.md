@@ -1561,6 +1561,17 @@ Seqüència obligatòria de registre:
 - Treballant per: `claude`
 - Tancat per: `claude`
 
+### Canvi #1249 — 2026-06-30 — claude (FET)
+**Caceria botons (tanda 2): 24 <button> → .ap-btn variant.**
+- 24 `<button>` (només button, no Link/tabs) → `.ap-btn` variant del rol, conservant layout. 19 fitxers. Tabs respectats. Feina V5 Codex a git stash@{0}.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1249`; el següent canvi real ha de ser `#1250`.
+- Validació tècnica: `tsc` 0; `validate:core` EXIT 0.
+- Validació funcional: captures layout intacte.
+- Validació humana/UX: botons família .ap-btn.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1248 — 2026-06-30 — claude (FET)
 **Coherència de botons (tanda 1): manual → .ap-btn.**
 - `manual/page.tsx`: 13 botons de navegació → `.ap-btn ap-btn--xs shrink-0`. Pendent: 74 botons simples + 21 funcionals (criteri).
