@@ -33,7 +33,7 @@
 | 15 | **PDF** (catàleg/dossier/contracte/factura) | ✅ | Catàleg verificat amb render: de luxe |
 | 16 | **Portal del client** (contracte/galeria/pagament) | ✅ | Impecable (V4) |
 | 17 | **Emails automàtics** (post-event, etc.) | ✅ | HTML als serveis, ben fets (render verificat) |
-| 18 | 🔴 **Editor de plantilles d'email** (`/admin/email-templates`) | 🔴 **MANCA** | 24 plantilles editables PERÒ desconnectades: editar-les NO canvia els emails reals (s'envien des de l'HTML del codi). **Opció A = connectar; Opció B = retirar l'editor.** |
+| 18 | 🟡 Editor de plantilles d'email | 🟡 | booking_confirmation CONNECTAT (#1221); resta pendent decisió (connectar tots o retirar) |
 | 19 | **Web pública** (homepage/packs/serveis) | ⬜ | Zona consolidada; render pendent (captures async) |
 
 ## D. CRM / CLIENTS
@@ -41,25 +41,34 @@
 |---|---|---|---|
 | 20 | **Hub del client** (fitxa única) | ✅ | 15 blocs (V4) |
 | 21 | **Segmentació / lifecycle** | ⬜ | Funcions existeixen; ús real per verificar |
-| 22 | **Reactivació / referrals** | ⬜ | Per verificar |
+| 22 | Reactivació / referrals | ✅ | pàgina→servei→BD cablejat (poques dades encara) |
 | 23 | **Campanyes / màrqueting** | ✅ | Fitxa Codex (#1206): CRM massiu manual |
 
 ## E. SISTEMA / TRANSVERSAL
 | # | Procés | Estat | Nota |
 |---|---|---|---|
 | 24 | **Comunicació / safata** (IMAP↔BD) | 🟡 | Timeline canònica OK; vinculació IMAP per afinar |
-| 25 | **Tasques / automatismes** (14 crons) | ⬜ | Verificar que cada cron dispara i té efecte |
-| 26 | **Privacitat / RGPD** | 🟡 | Vives les de llista; `recordConsent`/retenció desconnectades |
+| 25 | Tasques / automatismes (15 crons) | ✅ | 15/15 programats (#1223 data-retention + dossier-trash-purge) |
+| 26 | Privacitat / RGPD | ✅ | recordConsent (#1222) + cron retenció (#1223) connectats |
 | 27 | **Documents / dossiers** | ✅ | Generació verificada |
 
 ---
 
-## 🎯 MANQUES REALS trobades (per fer junts)
-1. 🔴 **Emails: editor de plantilles desconnectat** (#18) — opció A (connectar) o B (retirar). *El propietari ha demanat A.*
-2. 🟡 **Preus d'inventari «històric»** — 4-5 surten alts vs mercat (cabina, fum baix, multiefectes, focus) — confirmar.
-3. 🟡 **RGPD** — `recordConsent` (0 consentiments registrats) + retenció sense cron.
-4. ⬜ **Crons** — verificar que els 14 disparen de debò.
-5. ⬜ **Web pública** — render visual pendent (captures async fallen).
+## 🎯 MANQUES — estat després de la passada (Claude sol)
+1. ✅ **Emails: confirmació de reserva connectada** (#1221) — el client ara rep email + editor governa aquest. RESTA: decidir si es connecten TOTS o es retira l'editor (decisió propietari).
+2. 🟡 **Preus d'inventari «històric»** — 4-5 marcats «pendent confirmar» a la fitxa (cabina, fum baix, multiefectes, 2 focus). DECISIÓ PROPIETARI.
+3. ✅ **RGPD RESOLT** — `recordConsent` connectat al formulari (#1222) + cron de retenció programat (#1223).
+4. ✅ **Crons RESOLT** — 15/15 programats (faltaven dossier-trash-purge i data-retention).
+5. ⬜ **Web pública** — render visual pendent (captures async fallen; zona consolidada en prod).
+
+## ✅ El que Claude ha pogut tancar sol (2026-06-29)
+Inventari 100% · confirmació de reserva + 1r email connectat a l'editor · RGPD complet ·
+crons 15/15 · so Isma/Rufo · consolidació feina Codex. Tot validat i pujat.
+
+## 🔒 El que NOMÉS pot fer el propietari (o junts davant pantalla)
+- **Visual** de les pàgines usades (assenyalar elements concrets).
+- **Decisió emails** (connectar tots vs retirar editor) + payment_reminder (té lògica).
+- **Preus** (4-5 històrics + premium −19%) i **7 bolos** en efectiu.
 
 ## Decisions de producte pendents (propietari)
 - Preu premium/luxury (−19% vs recomanat): apujar o assumir.
