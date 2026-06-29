@@ -227,10 +227,10 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
             </div>
 
             <div>
-              <h1 className="text-2xl font-semibold text-[var(--t)]">
+              <h1 className="ap-title">
                 {form.name.trim() || (mode === 'create' ? 'Element nou sense nom encara' : 'Element sense nom')}
               </h1>
-              <p className="mt-1 max-w-3xl text-sm text-[var(--t2)]">
+              <p className="ap-subtitle mt-1 max-w-3xl">
                 {form.description.trim() || 'Defineix bé el material perquè packs, costos i operativa entenguin la mateixa veritat.'}
               </p>
             </div>

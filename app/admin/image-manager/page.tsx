@@ -86,8 +86,8 @@ export default function ImageManagerPage() {
     <div className="space-y-6 p-4 md:p-6">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[var(--t)]">Gestor d&apos;imatges</h1>
-          <p className="mt-2 max-w-3xl text-sm text-[var(--t2)]">
+          <h1 className="ap-title">Gestor d&apos;imatges</h1>
+          <p className="ap-subtitle mt-2 max-w-3xl">
             Monocapa de govern visual del projecte. Puja imatges des d&apos;aquí i es propaguen a web, mòbil i SEO automàticament.
           </p>
         </div>

@@ -1381,6 +1381,10 @@ Salt qualitatiu multi-tall. Honeybook s'ha menjat el mercat USA d'events amb aix
 **FET** *(2026-06-29 per `codex` — Canvi #1241)*: l'editor `/admin/packs/[id]` queda alineat amb el model V5. El recomanat local que reacciona a inventari/hores/servei passa per `computePackEditorPricing()` i rep `specialistServices`, evitant que la pantalla torni a calcular tots els packs com especialistes.
 
 **FET** *(2026-06-29 per `codex` — Canvi #1242)*: Pressupostos deixa de descartar el PVP real de packs. `/admin/presupuestos` continua tenint fallback estàtic, però quan `/api/admin/pricing` retorna packs de BD superposa `price`, `originalPrice`, `extraHourPrice` i `djHours` per `slug`, de manera que el PVP editat a `/admin/packs` arriba al pressupost.
+
+**FET** *(2026-06-29 per `codex` — Canvi #1243)*: Pressupostos sincronitza el formulari quan el PVP real de catàleg arriba després del primer render. `basePrice`, durada, nom i features s'actualitzen en pressupostos nous sense override manual, però no es trepitgen propostes existents, custom packs, drafts locals ni edits manuals.
+
+**FET** *(2026-06-30 per `codex` — Canvi #1244)*: l'enviament manual del Studio de pressupostos ja no reinterpreta el total com a preu base. `PresupuestoPdfStudio` envia `quoteTotals` explícits i `adminQuoteEmailService` els respecta sense recalcular extres/IVA pel camí legacy del lead.
 **FET parcial** *(2026-05-16 per `claude` — Canvi #586)*: el portal guanya subruta de procés/timeline a `/[locale]/portal/[token]/timeline`. `getClientPortalTimeline()` deriva sis fites (reserva creada, pressupost enviat, contracte signat, paga i senyal, dia de l'event, pagament final) amb estat `done/upcoming/future` sense schema nou; la pàgina mostra la línia de temps vertical amb colors semàfor (emerald/cyan/blanc); la portada principal enllaça a la nova ruta des de la secció "Estat del procés". Missatges trilingüals afegits a `CLIENT_PORTAL_MESSAGES`.
 **FET parcial** *(2026-05-16 per `claude` — Canvi #587)*: el portal guanya subruta de factura/pressupost a `/[locale]/portal/[token]/invoice`. `getClientPortalInvoiceSummary()` exposa total, desglossament bestreta/resta amb dates de pagament i referència+PDF del primer pressupost amb PDF; `buildClientPortalInvoicePath()` construeix la ruta canònica. La portada substitueix l'enllaç directe al PDF per dos botons: "Veure pressupost" (invoice) + PDF si existeix. 8 claus noves trilingüals a `CLIENT_PORTAL_MESSAGES`.
 **FET** *(2026-05-17 per `claude` — Canvi #592)*: subruta `/portal/[token]/gallery` tanca G.25. `buildClientPortalGalleryPath()` canònic. Pàgina dedicada de galeria amb `listPortalPhotos()` i `next/image`. Portada del portal: preview 6 fotos + CTA "Veure totes les fotos". Clau `galleryViewLink` als tres locales. 3 tests del builder. Portal complet: `overview` + `contract` + `payments` + `timeline` + `invoice` + `questionnaire` (G.26) + `gallery` (ara).
@@ -1544,6 +1548,39 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1244 — 2026-06-30 — codex (FET)
+**V5 pressupostos email conserva el total del Studio.**
+- Context: el Studio ja consumia PVP real i sincronitzava el formulari (#1242/#1243), però el POST a `/api/admin/emails/quote` enviava `price: total`. `adminQuoteEmailService` interpretava `price` com a preu base i, amb lead, `createQuoteFromLead()` hi podia tornar a sumar extres i IVA.
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: l'enviament manual calcula el mateix breakdown que `saveProposalDraft()` i envia `quoteTotals` (`basePrice`, `subtotal`, `discount`, `vatAmount`, `total`).
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: `price` torna a ser el preu base del pack, no el total final.
+- `lib/services/adminQuoteEmailService.ts`: si rep `quoteTotals`, construeix el `quoteData` amb aquests imports explícits i evita el recalculador legacy del lead.
+- `lib/services/adminQuoteEmailService.ts`: el flux antic sense `quoteTotals` queda intacte per compatibilitat amb Inbox/altres consumidors.
+- `__tests__/lib/services/adminQuoteEmailService.test.ts`: cobertura perquè els totals explícits del Studio no dupliquin extres ni IVA.
+- `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md`: V5 passa a `🔶 EN CURS #1244` i registra V5-#5 com a resolt.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\adminQuoteEmailService.test.ts __tests__\app\admin\presupuestos\studio-utils-pricing.test.ts __tests__\app\api\admin\pricing-route.test.ts __tests__\app\admin\packs\packEditorPricing.test.ts __tests__\lib\services\packPricingHealth.test.ts` OK (50 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: el total que es desa a la proposta i el total enviat pel correu manual del Studio comparteixen el mateix breakdown.
+- Validació humana/UX: el client no rep per email un import recalculat diferent del que l'operador veu al Studio/PDF.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1244`; el següent canvi real ha de ser `#1245`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1243 — 2026-06-29 — codex (FET)
+**V5 pressupostos sincronitza PVP real quan arriba el catàleg.**
+- Context: el #1242 superposava PVP/durada/hora extra de BD sobre el pack del Studio, però `basePrice`, `durationHours`, `packName` i `featuresText` ja eren estat React inicialitzat abans de la resposta de `/api/admin/pricing`. En un pressupost nou, el select podia mostrar el PVP real i el camp `Preu base` quedar-se amb el fallback estàtic.
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: afegida sincronització controlada del formulari quan canvia `selectedPack`.
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: els camps de pack marquen override manual; els drafts locals i propostes existents també bloquegen la sincronització.
+- `app/admin/presupuestos/studio-utils.ts`: helper pur `shouldSyncCatalogPackToForm()` amb el criteri explícit.
+- `__tests__/app/admin/presupuestos/studio-utils-pricing.test.ts`: cobertura de sincronització positiva i bloquejos per proposal/custom/manual.
+- `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md`: V5 passa a `🔶 EN CURS #1243` i registra V5-#4 com a resolt.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\presupuestos\studio-utils-pricing.test.ts __tests__\app\api\admin\pricing-route.test.ts __tests__\app\admin\packs\packEditorPricing.test.ts __tests__\lib\services\packPricingHealth.test.ts` OK (31 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: el PVP real arriba també al camp `Preu base` en pressupostos nous.
+- Validació humana/UX: el select de pack i el camp de preu base deixen de poder discrepar per latència.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1243`; el següent canvi real ha de ser `#1244`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1240 — 2026-06-29 — codex (FET)
 **V5 pricing: `specialistServices` governa la mà d'obra de packs.**
 - Context: `getPackPricingModelConfig()` carregava `pricing.pack.specialistServices`, però `computePackPricingHealth()` ignorava aquesta configuració i aplicava `specialistCount=1` a tots els packs. Això convertia `fiestas` i altres serveis normals en packs amb cost d'especialista.
@@ -1592,6 +1629,17 @@ Seqüència obligatòria de registre:
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+### Canvi #1240 — 2026-06-29 — claude (FET)
+**Coherència de headers: tots els títols a tipografia canònica (leads mana).**
+- La incoherència eren 4 pàgines amb títol sans (text-2xl/3xl font-bold) en comptes de display. portfolio+quick-create → AdminPage; image-manager+inventory editor → .ap-title/.ap-subtitle. 0 títols no-canònics restants (excepte 2 layout d'auth).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1240`; el següent canvi real ha de ser `#1241`.
+- Validació tècnica: `tsc` 0; `validate:core` EXIT 0.
+- Validació funcional: tots els headers amb tipografia de leads (display xbold + mono).
+- Validació humana/UX: portfolio verificat amb captura.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1239 — 2026-06-29 — claude (FET)
 **Header canònic: espaiat px → rem (text ja no enganxat).**
 - `.ap-header-left` `gap: 3px` → `0.375rem`. Canònic (px→rem) + espaiat (text respira). Afecta ~67 headers AdminPage.
@@ -1613,19 +1661,6 @@ Seqüència obligatòria de registre:
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
-
-### Canvi #1239 — 2026-06-29 — codex (FET)
-**V2 auditoria vertical post-event no-mail tancada.**
-- Context: després de #1232-#1237 no queda cap bug viu petit dins el perímetre post-event sense mails automàtics. El #1238 ja és de Claude, així que el tancament V2 es registra com #1239.
-- `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md`: V2 passa a `✅ TANCADA #1239 (perímetre no-mail)`.
-- `docs/agent-sync.md`: el següent front natural és V5 Catàleg→Preu, però queda en espera perquè toca inventari/preus/costEngine/schema i requereix coordinació.
-- Validació tècnica: `pnpm run qa:protocol`.
-- Validació funcional: tancament documental; cap canvi de runtime.
-- Validació humana/UX: el full de ruta ja no deixa V2 en estat ambigu quan el perímetre acordat està resolt.
-- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1239`; el següent canvi real ha de ser `#1240`.
-- Començat per: `codex`
-- Treballant per: `codex`
-- Tancat per: `codex`
 
 ### Canvi #1237 — 2026-06-29 — codex (FET)
 **V2 hub post-event: el playbook queda enllaçat des de l'òrgan mare.**

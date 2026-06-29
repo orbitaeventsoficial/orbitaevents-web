@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { AdminHelpLegend } from '@/app/admin/components/AdminHelpLegend';
+import { AdminPage } from '@/app/admin/components/AdminPage';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { PORTFOLIO_CATEGORIES, PORTFOLIO_IMAGES } from '@/app/config/portfolio-images';
 import {
@@ -683,12 +684,11 @@ export default function AdminPortfolioPage() {
 
 
   return (
-    <div className="space-y-6">
+    <AdminPage
+      title="Portfolio"
+      subtitle="Gestor visual únic del portfolio: miniatures, destinació real, portada, ordre, substitució i assignació d'events."
+    >
       <FullscreenPreview preview={preview} onClose={() => setPreview(null)} />
-      <div>
-        <h1 className="text-2xl font-bold text-[var(--t)]">Portfolio</h1>
-        <p className="mt-1 text-sm text-[var(--t3)]">Gestor visual únic del portfolio: miniatures, destinació real, portada, ordre, substitució i assignació d'events.</p>
-      </div>
       <div className="grid gap-3 lg:grid-cols-3">
         <AdminHelpLegend title="Què estàs veient" body="Media gestiona fitxers i ordre. Events gestiona la pàgina pública i les seves metadades." />
         <AdminHelpLegend title="Com treballar" body="Primer crea o revisa l'event. Després vincula les imatges, tria portada i ordena la galeria des de Media." />
@@ -707,7 +707,7 @@ export default function AdminPortfolioPage() {
       ) : (
         <EventsManager events={events} onEventsRefresh={loadEvents} />
       )}
-    </div>
+    </AdminPage>
   );
 }
 

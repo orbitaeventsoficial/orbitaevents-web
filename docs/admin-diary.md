@@ -1,3 +1,48 @@
+## 2026-06-29 — Coherència de headers: tots els títols a tipografia canònica (leads mana) (Canvi #1240, claude)
+
+### Context
+El propietari: «el header de leads segueix sent diferent». Investigació: els títols i eyebrows de leads (fxd__hd), AdminPage (.ap-title) i els workspaces (cl__h1) JA usen els MATEIXOS tokens (--display 2xl xbold + --mono xs). La incoherència real eren 4 pàgines amb títol `text-2xl/3xl font-bold` (Tailwind SANS, no display).
+
+### Què s'ha fet (leads mana = tots els títols display xbold)
+- `portfolio/page.tsx`: migrat a `AdminPage` (header canònic: eyebrow «WEB» + títol display). Verificat amb captura: idèntic estil a leads.
+- `quick-create/page.tsx`: migrat a `AdminPage`.
+- `image-manager/page.tsx`: títol `text-3xl font-bold` → `.ap-title`; subtítol → `.ap-subtitle`.
+- `inventory/[id]/InventoryItemEditor.tsx`: títol `text-2xl font-semibold` → `.ap-title`.
+- Resultat: 0 títols no-canònics als headers admin (excepte 2 layout.tsx d'auth «Accés restringit», que es queden).
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core` EXIT 0.
+- Validació funcional: tots els headers usen la tipografia de leads (display xbold + eyebrow mono).
+- Validació humana/UX: portfolio verificat amb captura — header coherent amb leads.
+
+### Coordinació
+Counter → 1240. Coherència (hipersemblança). Els workspaces rics (leads/bookings/clientes) mantenen el seu header propi, que JA usa els tokens canònics. Codex parat.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-30 — V5 pressupostos email conserva el total del Studio (Canvi #1244, codex)
+
+### Context
+El #1242/#1243 feia que el Studio de pressupostos rebés i sincronitzés el PVP real del pack, però l'enviament manual per email passava `price: total` a `/api/admin/emails/quote`. El servei legacy interpretava `price` com a preu base del pack, hi tornava a sumar extres i IVA amb `createQuoteFromLead()`, i podia generar un email amb import diferent del PDF/proposta del Studio.
+
+### Què s'ha fet
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: l'enviament per email ara envia `price` com a preu base i afegeix `quoteTotals` amb `basePrice`, `subtotal`, `discount`, `vatAmount` i `total`.
+- `lib/services/adminQuoteEmailService.ts`: quan rep `quoteTotals`, construeix el `quoteData` amb aquests imports explícits i no passa pel recalculador legacy del lead.
+- El flux antic sense `quoteTotals` queda intacte per compatibilitat amb altres consumidors.
+- `__tests__/lib/services/adminQuoteEmailService.test.ts`: cobertura perquè els totals explícits del Studio no dupliquin extres ni IVA.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\adminQuoteEmailService.test.ts __tests__\app\admin\presupuestos\studio-utils-pricing.test.ts __tests__\app\api\admin\pricing-route.test.ts __tests__\app\admin\packs\packEditorPricing.test.ts __tests__\lib\services\packPricingHealth.test.ts` (50 tests OK) i `npx tsc --noEmit --pretty false`.
+- Validació funcional: el total que es desa a la proposta i el total que surt pel correu manual del Studio comparteixen el mateix breakdown econòmic.
+- Validació humana/UX: l'operador deixa de poder veure un import al Studio/PDF i enviar-ne un altre per email.
+
+### Coordinació
+Counter → 1244. Tall V5 de sortida de pressupost; no toca mails automàtics, Inbox UI, APPEND, seqüències, inventari, fonts de preu, schema, costEngine ni sync massiu de preus.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-29 — Header canònic: espaiat px → rem (text ja no enganxat) (Canvi #1239, claude)
 
 ### Context
@@ -16,6 +61,28 @@ Counter → 1239. Pendent: el header de leads (fxd__hd) segueix sent estructural
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
+
+## 2026-06-29 — V5 pressupostos sincronitza PVP real quan arriba el catàleg (Canvi #1243, codex)
+
+### Context
+El #1242 feia que els packs del Studio de pressupostos rebessin PVP/durada/hora extra de `/api/admin/pricing`, però el formulari tenia `basePrice`, `durationHours`, `packName` i `featuresText` com a estat inicialitzat abans que l'API respongués. En un pressupost nou, el select podia mostrar el PVP real mentre el camp `Preu base` conservava el fallback estàtic.
+
+### Què s'ha fet
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: quan arriba el pack de catàleg real, el formulari sincronitza `packName`, `basePrice`, `durationHours` i `featuresText`.
+- La sincronització queda bloquejada per propostes existents, custom pack, esborrany local carregat o edició manual dels camps de pack.
+- `app/admin/presupuestos/studio-utils.ts`: helper pur `shouldSyncCatalogPackToForm()` per fer explícit el criteri.
+- `__tests__/app/admin/presupuestos/studio-utils-pricing.test.ts`: cobertura del criteri de sincronització.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\presupuestos\studio-utils-pricing.test.ts __tests__\app\api\admin\pricing-route.test.ts __tests__\app\admin\packs\packEditorPricing.test.ts __tests__\lib\services\packPricingHealth.test.ts` (31 tests OK) i `npx tsc --noEmit --pretty false`.
+- Validació funcional: Pressupostos nou aplica el PVP real quan arriba el catàleg; propostes existents i edits manuals conserven el valor triat.
+- Validació humana/UX: el select i el camp `Preu base` deixen de poder discrepar per latència del catàleg.
+
+### Coordinació
+Counter → 1243. Tall V5 residual de cablejat Pressupostos; no toca inventari, fonts de preu, schema, costEngine, sync massiu de preus, mails automàtics, Inbox, APPEND ni seqüències. #1238 pertany a Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
 
 ## 2026-06-29 — V5 pressupostos consumeix PVP real de packs (Canvi #1242, codex)
 
