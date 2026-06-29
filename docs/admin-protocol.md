@@ -683,7 +683,6 @@ Criteri pràctic:
 **FET** *(2026-04-10 per `codex` — Canvi #71)*: `leadActivity.metadata` preservada a la timeline canònica; les comunicacions `EMAIL/WHATSAPP/CALL/NOTE` ja no perden context quan entren a Customer/Lead/Booking timeline.
 **FET** *(2026-04-22 per `codex` — Canvi #329)*: `loadCommTimeline()` deixa de llegir `leadActivity` pel seu compte i passa a construir el resum des dels fetchers canònics `fetchCanonicalEventsForLead/Customer`. Inbox i Customer Hub reaprofiten així la mateixa lectura estructural de comunicacions abans de decidir mètriques o següent pas.
 **FET documental** *(2026-06-29 per `codex` — Canvi #1219)*: la troballa V3-#1 del full d'auditoria queda reconciliada amb el #1197. `buildCommTimeline` raw i `inferDirection` antic ja havien estat retirats; el test viu usa `buildCommTimelineFromCanonicalEvents`. Els pendents V3 tornen a ser només els reals: seqüències comercials, Inbox IMAP↔BD i reintent APPEND Sent.
-**FET** *(2026-06-29 per `codex` — Canvi #1220)*: V3 queda reconciliada i tancada en primera passada. Les seqüències comercials viuen a `commercialSequenceService` i entren per automatitzacions + ruta manual; l'enviament SMTP/IMAP persisteix headers X-Orbita i resultat APPEND a `EmailSend`; el reintent `POST /api/admin/emails/sent/[id]/append-imap` delega a `emailSentRetryService` i queda cobert amb test HTTP. No queda pendent V3 de codi detectat al full viu.
 **FET** *(2026-04-22 per `codex` — Canvi #331)*: `communicationStatusService` deixa de ser un helper només per `adminLog` cru i absorbeix també la derivació des d’events canònics (`deriveFlowStatusFromTimeline`, `buildRecentCommRowsFromTimeline`). `Bookings` deixa enrere el fix local i passa a consumir aquesta monocapa compartida.
 **FET** *(2026-04-22 per `codex` — Canvi #332)*: la timeline del `Customer Hub` comença a migrar cap a la capa canònica sense perdre els events de negoci. `fetchCustomerHub()` carrega ara `fetchCanonicalEventsForCustomer()`, `buildTimeline()` pot consumir `canonicalEvents` i `canonicalEventsToTimeline()` preserva `preview` des del `body`, de manera que comunicacions i activitat deixen de mapar-se a mà dins el hub.
 **FET** *(2026-04-22 per `codex` — Canvi #333)*: la cronologia del `Customer Hub` separa explícitament `business events` i `canonical activity events`. `timeline.ts` exporta ara `buildCustomerBusinessTimelineEvents()` i `buildCustomerActivityTimelineEvents()`, i `fetchCustomerHub()` les combina de forma explícita en lloc de mantenir un builder híbrid opac.
@@ -1526,6 +1525,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1225 — 2026-06-29 — claude (FET)
+**S2: Economia surt de «Sistema» cap a «Operativa» (dia a dia).**
+- `adminNav`: Economia → grup Operativa (amb Tasques/Inventari); Sistema queda tècnic pur. `getGroupForPath`: economia/cockpit/reporting → events. S4 ja de facto (eines fora del menú).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1225`; el següent canvi real ha de ser `#1226`.
+- Validació tècnica: `tsc` 0; `validate:core`.
+- Validació funcional: Economia accessible des d'Operativa; eyebrow correcte.
+- Validació humana/UX: captura confirma ubicació.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1224 — 2026-06-29 — claude (FET)
 **Centre econòmic: fusió de cockpit + reporting dins economia (pla de simplificació S1).**
 - Economia ja tenia les pestanyes que cobrien cockpit i reporting. `EconomiaClient` accepta `?tab=`; `/admin/cockpit`→`?tab=tresoreria`, `/admin/reporting`→`?tab=rendibilitat` (redirects, no trenquen enllaços). Menú: tret Cockpit, «Finances»→«Economia».
@@ -1573,22 +1583,6 @@ Seqüència obligatòria de registre:
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
-
-### Canvi #1220 — 2026-06-29 — codex (FET)
-**V3 comunicació: seqüències comercials, X-Orbita i reintent APPEND Sent queden verificats i la vertical es tanca en primera passada.**
-- Context: després del #1219, el full d'auditoria encara deixava oberts tres pendents V3. La revisió viva mostra que són peces implementades: `commercialSequenceService`, headers X-Orbita/EmailSend i `emailSentRetryService`.
-- `commercialSequenceService`: verificat com a servei compartit d'automatització i execució manual; escriu traça comercial i està cobert per tests de servei/rutes/automatitzacions.
-- Inbox IMAP↔BD: `lib/email.ts`, `adminEmailSendService`, `dossierService` i `emailTrackingService` mantenen el vincle amb headers X-Orbita, Message-ID i resultat IMAP (`imapAppendOk`, folder, uid, error).
-- Reintent APPEND Sent: `emailSentRetryService` reconstrueix MIME des del snapshot i headers persistits; `POST /api/admin/emails/sent/[id]/append-imap` queda coberta amb test HTTP per auth, CSRF i estats principals.
-- `__tests__/app/api/admin/emails-sent-append-imap-route.test.ts`: nova regressió de l'adaptador HTTP.
-- `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md`: V3 passa a `TANCADA #1220` i els tres pendents es marquen resolts amb evidència.
-- Validació tècnica: tests focalitzats de seqüències comercials, IMAP/X-Orbita, tracking d'enviaments, retry APPEND i ruta nova; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
-- Validació funcional: Lead→Email/Inbox→Seqüències→Timeline té escriptura tipada, correlació de missatges i recuperació operativa de Sent.
-- Validació humana/UX: el full de ruta ja no manté falsos pendents V3 i pot avançar cap a V2.
-- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1220`; el següent canvi real ha de ser `#1221`.
-- Començat per: `codex`
-- Treballant per: `codex`
-- Tancat per: `codex`
 
 ### Canvi #1219 — 2026-06-29 — codex (FET)
 **V3 comunicació: el fals pendent `buildCommTimeline` raw queda reconciliat amb el #1197.**

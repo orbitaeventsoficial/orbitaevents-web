@@ -28,6 +28,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     id: 'events', label: 'Operativa',
     items: [
+      { label: 'Economia', href: '/admin/economia' },
       { label: 'Tasques', href: '/admin/tasks' },
       { label: 'Inventari', href: '/admin/inventory' },
     ],
@@ -51,7 +52,6 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     id: 'sistema', label: 'Sistema',
     items: [
-      { label: 'Economia', href: '/admin/economia' },
       { label: 'Configuració', href: '/admin/settings' },
       { label: 'Studio', href: '/admin/studio' },
       { label: 'Manual', href: '/admin/manual' },
@@ -78,6 +78,9 @@ export function getGroupForPath(pathname: string): string {
     pathname.startsWith('/admin/calendario')
   ) return 'agenda';
   if (
+    pathname.startsWith('/admin/economia') ||
+    pathname.startsWith('/admin/cockpit') ||
+    pathname.startsWith('/admin/reporting') ||
     pathname.startsWith('/admin/tasks') ||
     pathname.startsWith('/admin/inventory')
   ) return 'events';

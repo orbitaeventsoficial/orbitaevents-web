@@ -1,3 +1,24 @@
+## 2026-06-29 — S2/S3: Economia surt de «Sistema» cap a «Operativa» (dia a dia) (Canvi #1225, claude)
+
+### Context
+Pla de simplificació S2 (aprimar/reordenar el menú). Economia (el que el propietari usa cada dia) estava enterrada al grup «Sistema» barrejada amb tècnic/docs. S4 (treure eines del menú) ja estava fet de facto: analytics/canvas/css-manager/scripts/coverage NO són al menú visible.
+
+### Què s'ha fet
+- `adminNav`: «Economia» moguda de grup «Sistema» → «Operativa» (amb Tasques, Inventari = el dia a dia operatiu). Sistema queda tècnic pur (Configuració, Studio, Manual + docs secondary).
+- `getGroupForPath`: economia/cockpit/reporting → grup «events» (coordenada d'òrgan correcta a l'eyebrow).
+- Verificat amb captura: Economia surt sota «Operativa», eyebrow «Operativa».
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core`.
+- Validació funcional: Economia accessible des d'Operativa; eyebrow correcte.
+- Validació humana/UX: captura confirma la nova ubicació.
+
+### Coordinació
+Counter → 1225. S2 fet; S3/S4 ja eren de facto (docs secondary, eines fora del menú). Codex parat.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-29 — Centre econòmic: fusió de cockpit + reporting a economia (Canvi #1224, claude)
 
 ### Context
@@ -84,29 +105,6 @@ Counter → 1221. Codex parat (worktree lliure). Sense tocar la fórmula del cos
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
-
-## 2026-06-29 — V3 comunicació tancada: seqüències, X-Orbita i APPEND Sent reconciliats (Canvi #1220, codex)
-
-### Context
-Després del #1219 quedaven tres pendents V3 al full d'auditoria: seqüències comercials, vinculació Inbox IMAP↔BD via headers X-Orbita i reintent d'APPEND a Sent. La verificació contra codi viu mostra que no eren forats oberts actuals sinó feina ja implementada en canvis anteriors i no reflectida al full.
-
-### Què s'ha fet
-- `commercialSequenceService` queda verificat com a servei viu: s'executa des d'automatitzacions diàries, ruta manual del lead i endpoint admin, amb traça `COMM_SEQUENCE_EXEC` i tests dedicats.
-- La via SMTP/IMAP queda verificada: `lib/email.ts` envia amb headers Òrbita, `adminEmailSendService` i `dossierService` persisteixen `EmailSend`, i `emailTrackingService` desa resultat SMTP + APPEND.
-- El reintent APPEND Sent queda cobert de punta a adaptador: `emailSentRetryService` reconstrueix MIME amb snapshot + headers Òrbita i la ruta `POST /api/admin/emails/sent/[id]/append-imap` tradueix els estats del servei a HTTP.
-- `__tests__/app/api/admin/emails-sent-append-imap-route.test.ts`: nova cobertura d'auth, CSRF, ok, not-found, no-snapshot i append-failed.
-- `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md`: V3 passa a tancada en primera passada amb evidència de codi viu.
-
-### Validació
-- Validació tècnica: tests focalitzats de seqüències comercials, IMAP/X-Orbita, tracking d'enviaments, retry APPEND i nova ruta HTTP.
-- Validació funcional: Lead→Email/Inbox→Seqüències→Timeline té escriptures traçades, headers de correlació i recuperació manual quan falla l'arxiu a Sent.
-- Validació humana/UX: el full de ruta deixa de presentar falsos pendents i apunta el següent treball a V2, no a reobrir comunicació.
-
-### Coordinació
-Counter → 1220. Tanca V3 sense tocar inventari, preus, reserves econòmiques, costEngine, schema ni UI d'inventari.
-- Començat per: `codex`
-- Treballant per: `codex`
-- Tancat per: `codex`
 
 ## 2026-06-29 — V3: `buildCommTimeline` raw ja estava retirat (#1197) (Canvi #1219, codex)
 
