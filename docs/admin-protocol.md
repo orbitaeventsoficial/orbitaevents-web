@@ -1375,6 +1375,12 @@ Salt qualitatiu multi-tall. Honeybook s'ha menjat el mercat USA d'events amb aix
 **FET parcial** *(2026-06-29 per `codex` — Canvi #1236)*: el copy visible de V2 torna a correspondre amb el cablejat real. `/admin/post-event` ja parla d'`Enquestes sense resposta` perquè la query compta `clientSurvey=null`, i `/admin/google-reviews` explica cron + refresc manual en lloc de build Railway.
 **FET parcial** *(2026-06-29 per `codex` — Canvi #1237)*: el playbook post-event deixa d'estar orfe. El hub `/admin/post-event` afegeix el quart pas `Playbook` cap a `/admin/post-event/playbook` i adapta la graella responsive a quatre passos.
 **FET** *(2026-06-29 per `codex` — Canvi #1239)*: V2 post-event queda tancada en primera passada no-mail. El full de ruta marca `✅ TANCADA #1239 (perímetre no-mail)` després de resoldre informe intern, estat operatiu, recepció/moderació de testimoni, Google Reviews, playbook i hub. Mails automàtics, Inbox, APPEND i seqüències continuen fora del perímetre per coordinació.
+
+**FET** *(2026-06-29 per `codex` — Canvi #1240)*: V5 Catàleg→Preu queda oberta amb el primer bug de cablejat corregit: `computePackPricingHealth()` ja respecta `pricing.pack.specialistServices` en lloc de forçar tots els packs a 1 especialista. Serveis especialistes = especialista; resta = operari base + suport per llindars.
+
+**FET** *(2026-06-29 per `codex` — Canvi #1241)*: l'editor `/admin/packs/[id]` queda alineat amb el model V5. El recomanat local que reacciona a inventari/hores/servei passa per `computePackEditorPricing()` i rep `specialistServices`, evitant que la pantalla torni a calcular tots els packs com especialistes.
+
+**FET** *(2026-06-29 per `codex` — Canvi #1242)*: Pressupostos deixa de descartar el PVP real de packs. `/admin/presupuestos` continua tenint fallback estàtic, però quan `/api/admin/pricing` retorna packs de BD superposa `price`, `originalPrice`, `extraHourPrice` i `djHours` per `slug`, de manera que el PVP editat a `/admin/packs` arriba al pressupost.
 **FET parcial** *(2026-05-16 per `claude` — Canvi #586)*: el portal guanya subruta de procés/timeline a `/[locale]/portal/[token]/timeline`. `getClientPortalTimeline()` deriva sis fites (reserva creada, pressupost enviat, contracte signat, paga i senyal, dia de l'event, pagament final) amb estat `done/upcoming/future` sense schema nou; la pàgina mostra la línia de temps vertical amb colors semàfor (emerald/cyan/blanc); la portada principal enllaça a la nova ruta des de la secció "Estat del procés". Missatges trilingüals afegits a `CLIENT_PORTAL_MESSAGES`.
 **FET parcial** *(2026-05-16 per `claude` — Canvi #587)*: el portal guanya subruta de factura/pressupost a `/[locale]/portal/[token]/invoice`. `getClientPortalInvoiceSummary()` exposa total, desglossament bestreta/resta amb dates de pagament i referència+PDF del primer pressupost amb PDF; `buildClientPortalInvoicePath()` construeix la ruta canònica. La portada substitueix l'enllaç directe al PDF per dos botons: "Veure pressupost" (invoice) + PDF si existeix. 8 claus noves trilingüals a `CLIENT_PORTAL_MESSAGES`.
 **FET** *(2026-05-17 per `claude` — Canvi #592)*: subruta `/portal/[token]/gallery` tanca G.25. `buildClientPortalGalleryPath()` canònic. Pàgina dedicada de galeria amb `listPortalPhotos()` i `next/image`. Portada del portal: preview 6 fotos + CTA "Veure totes les fotos". Clau `galleryViewLink` als tres locales. 3 tests del builder. Portal complet: `overview` + `contract` + `payments` + `timeline` + `invoice` + `questionnaire` (G.26) + `gallery` (ara).
@@ -1537,6 +1543,65 @@ Seqüència obligatòria de registre:
 ## Entrades
 
 ---
+
+### Canvi #1240 — 2026-06-29 — codex (FET)
+**V5 pricing: `specialistServices` governa la mà d'obra de packs.**
+- Context: `getPackPricingModelConfig()` carregava `pricing.pack.specialistServices`, però `computePackPricingHealth()` ignorava aquesta configuració i aplicava `specialistCount=1` a tots els packs. Això convertia `fiestas` i altres serveis normals en packs amb cost d'especialista.
+- `lib/services/packPricingHealth.ts`: afegida detecció del servei especialista normalitzant `pack.service` i consultant `config.specialistServices`.
+- `lib/services/packPricingHealth.ts`: els serveis especialistes usen `1 especialista`; els no especialistes usen `1 operari base`; els llindars de convidats/hores/watts continuen afegint `1 operari` de suport.
+- `__tests__/lib/services/packPricingHealth.test.ts`: la regressió antiga `sempre specialistCount = 1` queda eliminada i substituïda per casos `fiestas`, `bodas`, `empresas` i operaris de suport.
+- `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md`: V5 passa a `🔶 EN CURS #1240` i registra V5-#1 com a resolt.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\packPricingHealth.test.ts __tests__\lib\services\packPricingCheckService.test.ts __tests__\lib\services\packAdminService.test.ts __tests__\lib\services\adminHealthService.test.ts` OK (39 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: el setting admin deixa de ser un no-op i el preu recomanat dels packs normals ja no hereta cost d'especialista.
+- Validació humana/UX: les superfícies de packs que mostren `Equip tècnic` deixen de presentar tots els packs com a `1 especialista`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1240`; el següent canvi real ha de ser `#1241`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1241 — 2026-06-29 — codex (FET)
+**V5 editor packs: recomanat local alineat amb `specialistServices`.**
+- Context: el #1240 reparava `computePackPricingHealth()` server-side, però `/admin/packs/[id]` recalculava el recomanat al client quan l'usuari canviava inventari, servei, hores, watts o convidats. Aquest càlcul local no tenia `specialistServices` i mantenia la regla antiga d'especialista sempre.
+- `app/admin/packs/[id]/packEditorPricing.ts`: nou helper pur `computePackEditorPricing()` amb recomanat pack/hora extra, cost humà/h i comptadors especialista/operari.
+- `app/admin/packs/[id]/EditPackForm.tsx`: el `useMemo` de recomanat local passa a usar el helper i té `formData.service` com a dependència real.
+- `app/admin/packs/[id]/page.tsx`: la pàgina passa `specialistServices` de `getPackPricingModelConfig()` al client.
+- `__tests__/app/admin/packs/packEditorPricing.test.ts`: cobertura de servei no especialista, servei especialista normalitzat i suport addicional per llindar.
+- `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md`: V5 passa a `🔶 EN CURS #1241` i registra V5-#2 com a resolt.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\packs\packEditorPricing.test.ts __tests__\lib\services\packPricingHealth.test.ts __tests__\lib\services\packPricingCheckService.test.ts __tests__\lib\services\packAdminService.test.ts` OK (38 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: l'editor de pack ja no divergeix del model server-side quan recomana PVP abans de desar.
+- Validació humana/UX: el semàfor/recomanat de packs normals no apareix inflat per cost d'especialista mentre s'edita.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1241`; el següent canvi real ha de ser `#1242`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1242 — 2026-06-29 — codex (FET)
+**V5 pressupostos consumeix PVP real de packs.**
+- Context: `/admin/presupuestos` carregava `/api/admin/pricing`, però només en consumia `name` per als packs. El `priceValue`, la durada i l'hora extra venien de `getPacksByService()` estàtic, així que el PVP editat a `/admin/packs` podia no arribar al pressupost.
+- `app/admin/presupuestos/studio-utils.ts`: afegit `packsBySlug` a `PricingCatalogState`, tipus `PricingCatalogPackOverride` i helper pur `applyPricingCatalogPackOverride()`.
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: el loader de pricing conserva `price`, `originalPrice`, `extraHourPrice` i `djHours` per `slug`.
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: la llista de packs superposa les dades de BD sobre el fallback estàtic abans de calcular `basePrice`, `durationHours` i `operatorExtraPrice`.
+- `__tests__/app/admin/presupuestos/studio-utils-pricing.test.ts`: cobertura del merge PVP/durada/hora extra.
+- `__tests__/app/api/admin/pricing-route.test.ts`: contracte GET ampliat perquè el retorn inclogui packs amb preu.
+- `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md`: V5 passa a `🔶 EN CURS #1242` i registra V5-#3 com a resolt.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\presupuestos\studio-utils-pricing.test.ts __tests__\app\api\admin\pricing-route.test.ts __tests__\app\admin\packs\packEditorPricing.test.ts __tests__\lib\services\packPricingHealth.test.ts` OK (29 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: Pack admin → pricing API → Pressupostos ja transporta PVP, durada i hora extra.
+- Validació humana/UX: el preu base del pressupost ja no queda desfasat del PVP real del pack.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1242`; el següent canvi real ha de ser `#1243`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1239 — 2026-06-29 — claude (FET)
+**Header canònic: espaiat px → rem (text ja no enganxat).**
+- `.ap-header-left` `gap: 3px` → `0.375rem`. Canònic (px→rem) + espaiat (text respira). Afecta ~67 headers AdminPage.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1239`; el següent canvi real ha de ser `#1240`.
+- Validació tècnica: `validate:core` EXIT 0.
+- Validació funcional: header amb més aire (verificat amb captura catàleg).
+- Validació humana/UX: text del header ja no enganxat.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
 
 ### Canvi #1238 — 2026-06-29 — claude (FET)
 **Homogeneïtzació canònica massiva: 0 blancs crus a tot l'admin (auditoria pam a pam).**
