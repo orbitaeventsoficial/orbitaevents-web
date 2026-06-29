@@ -1,3 +1,23 @@
+## 2026-06-29 — RGPD: cron de retenció de dades programat (Canvi #1223, claude)
+
+### Context
+Segona manca RGPD: `executeRetentionPolicies` existia però cap cron la cridava → les polítiques de retenció (DELETE/ANONYMIZE de dades velles) no s'executaven mai. Verificat: 0 polítiques actives → programar el cron és SEGUR (no esborra res fins que el propietari creï polítiques conscientment).
+
+### Què s'ha fet
+- **Cron nou** `app/api/cron/data-retention/route.ts`: auth CRON_SECRET + `executeRetentionPolicies` + `saveCronRunStatus`. Segur per defecte (0 polítiques = 0 esborrats).
+- `daily-crons.yml`: afegit al bloc diari. Ara 15 crons programats.
+
+### Validació
+- Validació tècnica: `tsc` 0; `qa:api-cron-auth` OK (15 rutes); `validate:core`.
+- Validació funcional: les polítiques de retenció s'aplicaran diàriament quan n'hi hagi d'actives.
+- Validació humana/UX: cap efecte ara (0 polítiques); el propietari controla l'esborrat creant polítiques.
+
+### Coordinació
+Counter → 1223. Completa el RGPD (recordConsent #1222 + retenció). Codex parat.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-29 — RGPD: el formulari de contacte registra el consentiment (Canvi #1222, claude)
 
 ### Context

@@ -1526,6 +1526,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1223 — 2026-06-29 — claude (FET)
+**RGPD: cron de retenció de dades programat.**
+- `executeRetentionPolicies` no tenia cron. Cron nou `/api/cron/data-retention` (auth + cronRunStatus) + afegit a daily-crons.yml (15 crons). Segur: 0 polítiques actives = 0 esborrats.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1223`; el següent canvi real ha de ser `#1224`.
+- Validació tècnica: `tsc` 0; `qa:api-cron-auth` OK; `validate:core`.
+- Validació funcional: retenció s'aplicarà diàriament quan hi hagi polítiques.
+- Validació humana/UX: cap efecte ara; el propietari controla via polítiques.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1222 — 2026-06-29 — claude (FET)
 **RGPD: el formulari de contacte registra el consentiment (recordConsent connectat).**
 - `recordConsent` existia però no es cridava (0 consentiments). Connectat a `/api/contact` (GDPR_BASIC, granted, IP/UA/email, degradació segura).
