@@ -1385,6 +1385,8 @@ Salt qualitatiu multi-tall. Honeybook s'ha menjat el mercat USA d'events amb aix
 **FET** *(2026-06-29 per `codex` — Canvi #1244)*: Pressupostos sincronitza el formulari quan el PVP real de catàleg arriba després del primer render. `basePrice`, durada, nom i features s'actualitzen en pressupostos nous sense override manual, però no es trepitgen propostes existents, custom packs, drafts locals ni edits manuals.
 
 **FET** *(2026-06-30 per `codex` — Canvi #1245)*: l'enviament manual del Studio de pressupostos ja no reinterpreta el total com a preu base. `PresupuestoPdfStudio` envia `quoteTotals` explícits i `adminQuoteEmailService` els respecta sense recalcular extres/IVA pel camí legacy del lead.
+
+**FET** *(2026-06-30 per `codex` — Canvi #1247)*: PDF, preview, proposta, contracte i email de pressupost comparteixen el mateix càlcul final amb IVA. `computeQuoteStudioTotals()` centralitza subtotal/descompte/IVA/total, `quotePdfService` mostra fila d'IVA i canvia el disclaimer a IVA inclòs quan rep `vatAmount`. #1246 pertany a Claude.
 **FET parcial** *(2026-05-16 per `claude` — Canvi #586)*: el portal guanya subruta de procés/timeline a `/[locale]/portal/[token]/timeline`. `getClientPortalTimeline()` deriva sis fites (reserva creada, pressupost enviat, contracte signat, paga i senyal, dia de l'event, pagament final) amb estat `done/upcoming/future` sense schema nou; la pàgina mostra la línia de temps vertical amb colors semàfor (emerald/cyan/blanc); la portada principal enllaça a la nova ruta des de la secció "Estat del procés". Missatges trilingüals afegits a `CLIENT_PORTAL_MESSAGES`.
 **FET parcial** *(2026-05-16 per `claude` — Canvi #587)*: el portal guanya subruta de factura/pressupost a `/[locale]/portal/[token]/invoice`. `getClientPortalInvoiceSummary()` exposa total, desglossament bestreta/resta amb dates de pagament i referència+PDF del primer pressupost amb PDF; `buildClientPortalInvoicePath()` construeix la ruta canònica. La portada substitueix l'enllaç directe al PDF per dos botons: "Veure pressupost" (invoice) + PDF si existeix. 8 claus noves trilingüals a `CLIENT_PORTAL_MESSAGES`.
 **FET** *(2026-05-17 per `claude` — Canvi #592)*: subruta `/portal/[token]/gallery` tanca G.25. `buildClientPortalGalleryPath()` canònic. Pàgina dedicada de galeria amb `listPortalPhotos()` i `next/image`. Portada del portal: preview 6 fotos + CTA "Veure totes les fotos". Clau `galleryViewLink` als tres locales. 3 tests del builder. Portal complet: `overview` + `contract` + `payments` + `timeline` + `invoice` + `questionnaire` (G.26) + `gallery` (ara).
@@ -1558,6 +1560,34 @@ Seqüència obligatòria de registre:
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
+
+### Canvi #1248 — 2026-06-30 — claude (FET)
+**Coherència de botons (tanda 1): manual → .ap-btn.**
+- `manual/page.tsx`: 13 botons de navegació → `.ap-btn ap-btn--xs shrink-0`. Pendent: 74 botons simples + 21 funcionals (criteri).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1248`; el següent canvi real ha de ser `#1249`.
+- Validació tècnica: `tsc` 0; `validate:core` EXIT 0.
+- Validació funcional: manual intacte (captura).
+- Validació humana/UX: botons coherents.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1247 — 2026-06-30 — codex (FET)
+**V5 pressupostos PDF/preview mostra IVA i total final únic.**
+- Context: després del #1245, l'email manual ja respectava els totals explícits del Studio, però el PDF de pressupost i la preview encara mostraven `total` sense IVA. Mentrestant `Proposal`, contracte i email persistien/enviaven total final amb IVA.
+- `app/admin/presupuestos/studio-utils.ts`: nou helper pur `computeQuoteStudioTotals()` amb `subtotal`, `discount`, `taxableBase`, `vatRate`, `vatAmount` i `total`.
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: `pricingTotals` passa a ser la font comuna per proposta, PDF, contracte, email i preview.
+- `app/admin/presupuestos/StudioPreview.tsx`: el resum visible mostra fila d'IVA abans del total.
+- `lib/services/quotePdfService.ts`: `QuoteData` accepta `vatRate`/`vatAmount`; el resum del PDF mostra IVA i el disclaimer passa a IVA inclòs quan arriba IVA explícit.
+- `__tests__/app/admin/presupuestos/studio-utils-pricing.test.ts`: cobertura del càlcul final únic.
+- `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md`: V5 passa a `🔶 EN CURS #1247` i registra V5-#6 com a resolt.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\presupuestos\studio-utils-pricing.test.ts __tests__\lib\services\quotePdfService.test.ts` OK (11 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: el total visible al PDF/preview i el total persistit/enviat comparteixen el mateix breakdown amb IVA.
+- Validació humana/UX: el client no rep un PDF amb total sense IVA mentre l'admin desa o envia un import final amb IVA.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1247`; el següent canvi real ha de ser `#1248`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
 
 ### Canvi #1245 — 2026-06-30 — codex (FET)
 **V5 pressupostos email conserva el total del Studio.**

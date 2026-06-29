@@ -78,3 +78,9 @@ obres de debò. **No es fusiona/amaga res a cegues.** El mètode: tu obres el me
 > **No tens un problema de qualitat — tens un problema d'ABUNDÀNCIA.** El codi és bo; n'hi
 > ha massa. La millora de més valor no és afegir ni repintar: és **fusionar les 7 pàgines
 > de números en 1-2 i aprimar el menú.** Menys superfície = un cap que se'n refia.
+
+## 🔧 COHERÈNCIA DE COMPONENTS (2026-06-30, en curs) — «s'han de fer tots»
+Headers ✅ (#1240, #1246). PENDENT verificar eyebrow: **inbox**, **leads/arxiu** (el detector
+els marcava sense eyebrow; pot ser fals negatiu com bookings).
+Components a homogeneïtzar (escaneig inicial, falsos positius inclosos): botons sense .ap-btn,
+inputs sense .adm-input, badges sense to canònic. Atac per tipus, validant cada tanda.

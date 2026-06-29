@@ -187,7 +187,7 @@ export default async function AdminManualPage() {
                   <h2 className="mt-1 text-base font-bold leading-snug">{item.title}</h2>
                   <p className="mt-2 text-sm leading-relaxed opacity-75">{item.objective}</p>
                 </div>
-                <Link href={item.entryHref} className="shrink-0 rounded-xl border border-[var(--line)] px-3 py-2 text-center text-xs font-bold transition-colors hover:bg-[var(--raised)]">
+                <Link href={item.entryHref} className="ap-btn ap-btn--xs shrink-0">
                   {item.entryLabel}
                 </Link>
               </div>
@@ -292,7 +292,7 @@ export default async function AdminManualPage() {
                   </p>
                   <h2 className="mt-1 text-base font-bold leading-snug">{item.trigger}</h2>
                 </div>
-                <Link href={item.actionHref} className="shrink-0 rounded-xl border border-[var(--line)] px-3 py-2 text-center text-xs font-bold transition-colors hover:bg-[var(--raised)]">
+                <Link href={item.actionHref} className="ap-btn ap-btn--xs shrink-0">
                   {item.actionLabel}
                 </Link>
               </div>
@@ -321,7 +321,7 @@ export default async function AdminManualPage() {
                   </p>
                   <h2 className="mt-1 text-base font-bold leading-snug">{item.artifact}</h2>
                 </div>
-                <Link href={item.proofHref} className="shrink-0 rounded-xl border border-[var(--line)] px-3 py-2 text-center text-xs font-bold transition-colors hover:bg-[var(--raised)]">
+                <Link href={item.proofHref} className="ap-btn ap-btn--xs shrink-0">
                   {item.proofLabel}
                 </Link>
               </div>
@@ -352,7 +352,7 @@ export default async function AdminManualPage() {
                     {operatingFlowByStep.get(handoff.fromStep)?.title} → {operatingFlowByStep.get(handoff.toStep)?.title}
                   </h2>
                 </div>
-                <Link href={handoff.nextWorkspaceHref} className="shrink-0 rounded-xl border border-[var(--line)] px-3 py-2 text-center text-xs font-bold transition-colors hover:bg-[var(--raised)]">
+                <Link href={handoff.nextWorkspaceHref} className="ap-btn ap-btn--xs shrink-0">
                   {handoff.nextWorkspace}
                 </Link>
               </div>
@@ -464,7 +464,7 @@ export default async function AdminManualPage() {
                           <h3 className="text-sm font-bold leading-snug">{item.title}</h3>
                           <p className="mt-2 text-sm leading-relaxed opacity-75">{item.description}</p>
                         </div>
-                        <Link href={item.href} className="shrink-0 rounded-xl border border-[var(--line)] px-3 py-2 text-center text-xs font-bold transition-colors hover:bg-[var(--raised)]">
+                        <Link href={item.href} className="ap-btn ap-btn--xs shrink-0">
                           Obrir
                         </Link>
                       </div>
@@ -542,7 +542,7 @@ export default async function AdminManualPage() {
                         Pas {capability.flowStep} · {operatingFlowByStep.get(capability.flowStep)?.title}
                       </p>
                     </div>
-                    <Link href={capability.href} className="shrink-0 rounded-xl border border-[var(--line)] px-3 py-2 text-center text-xs font-bold transition-colors hover:bg-[var(--raised)]">
+                    <Link href={capability.href} className="ap-btn ap-btn--xs shrink-0">
                       {capability.cta}
                     </Link>
                   </div>
@@ -573,7 +573,7 @@ export default async function AdminManualPage() {
               <p className="mt-2 max-w-4xl rounded-xl border admin-tone-border-danger admin-tone-bg-danger px-3 py-2 text-xs font-bold leading-relaxed admin-tone-text-danger">{ADMIN_MARKETING_PHASE_GATE.focusRule}</p>
               <p className="mt-2 max-w-4xl text-xs font-semibold leading-relaxed opacity-65">{ADMIN_MARKETING_PHASE_GATE.blockedUntil}</p>
             </div>
-            <Link href="/admin/docs/protocol?seccio=6.16#seccio-6-16" className="shrink-0 rounded-xl border border-[var(--line)] px-3 py-2 text-center text-xs font-bold transition-colors hover:bg-[var(--raised)]">
+            <Link href="/admin/docs/protocol?seccio=6.16#seccio-6-16" className="ap-btn ap-btn--xs shrink-0">
               Obrir §6.16
             </Link>
           </div>
@@ -807,7 +807,7 @@ export default async function AdminManualPage() {
                   <p className="text-xs font-bold uppercase tracking-wider admin-tone-text-warning">{item.cadence}</p>
                   <h3 className="mt-1 text-base font-bold leading-snug">{item.title}</h3>
                 </div>
-                <Link href={item.adminHref} className="shrink-0 rounded-xl border border-[var(--line)] px-3 py-2 text-center text-xs font-bold transition-colors hover:bg-[var(--raised)]">
+                <Link href={item.adminHref} className="ap-btn ap-btn--xs shrink-0">
                   {item.adminLabel}
                 </Link>
               </div>

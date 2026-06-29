@@ -1,3 +1,22 @@
+## 2026-06-30 — Coherència de botons (tanda 1): manual → .ap-btn (Canvi #1248, claude)
+
+### Context
+«S'han de fer tots» els components canònics. Escaneig: inputs (4 divergents) i cards (1) JA coherents. Botons: 103 sense .ap-btn → classificats en 74 simples (migrables) + 21 funcionals (min-h-44 tàctil, toggles, estats — cas per cas) + 13 de manual.
+
+### Què s'ha fet (tanda 1)
+- `manual/page.tsx`: 13 botons de navegació (`rounded-xl border border-[var(--line)] px-3 py-2 text-xs font-bold`, idèntics) → `.ap-btn ap-btn--xs shrink-0`. Verificat amb captura: pàgina intacta.
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core` EXIT 0.
+- Validació funcional: manual carrega i navega bé (captura).
+- Validació humana/UX: botons coherents amb la resta de l'admin.
+
+### Coordinació
+Counter → 1248. Pendent: ~74 botons simples (tandes següents) + 21 funcionals (criteri cas per cas). Headers inbox/leads/arxiu pendents de verificar eyebrow. **Codex committejant ràpid al mateix worktree — coordinar.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-30 — Coherència: eyebrow (coordenada d'òrgan) a clientes (Canvi #1246, claude)
 
 ### Context
@@ -17,6 +36,29 @@ Counter → 1246. Consolida també #1241-1245 (codex V3-V5) ja presents al diari
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
+
+## 2026-06-30 — V5 pressupostos PDF/preview mostra IVA i total final únic (Canvi #1247, codex)
+
+### Context
+Després del #1245, l'email manual ja respectava el breakdown econòmic del Studio, però el PDF de pressupost i la vista ràpida continuaven mostrant el total sense IVA mentre `Proposal`, contracte i email treballaven amb total final amb IVA. Això deixava dos totals visibles dins el mateix flux.
+
+### Què s'ha fet
+- `app/admin/presupuestos/studio-utils.ts`: nou helper pur `computeQuoteStudioTotals()` amb subtotal, descompte, base imposable, IVA i total final.
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: proposta, preview, PDF, contracte i email passen a consumir el mateix `pricingTotals`.
+- `app/admin/presupuestos/StudioPreview.tsx`: la vista ràpida mostra la fila `IVA` abans del total.
+- `lib/services/quotePdfService.ts`: el PDF de pressupost accepta `vatRate`/`vatAmount`, mostra la fila d'IVA i canvia el disclaimer a IVA inclòs quan rep IVA explícit.
+- `__tests__/app/admin/presupuestos/studio-utils-pricing.test.ts`: cobertura del càlcul únic de totals.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\presupuestos\studio-utils-pricing.test.ts __tests__\lib\services\quotePdfService.test.ts` (11 tests OK) i `npx tsc --noEmit --pretty false`.
+- Validació funcional: el total visible al Studio/PDF i el total persistit/enviat comparteixen el mateix càlcul amb IVA.
+- Validació humana/UX: el client deixa de veure un pressupost amb total sense IVA mentre el sistema desa/envia el total amb IVA.
+
+### Coordinació
+Counter → 1247. Tall V5 de pressupost; no toca mails automàtics, Inbox UI, APPEND, seqüències, inventari, fonts de preu, schema, costEngine ni sync massiu de preus. #1246 pertany a Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
 
 ## 2026-06-29 — Coherència de headers: tots els títols a tipografia canònica (leads mana) (Canvi #1240, claude)
 
