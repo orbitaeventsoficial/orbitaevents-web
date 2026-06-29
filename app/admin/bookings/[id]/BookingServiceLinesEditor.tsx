@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
+import { collaboratorLineCostErrorMessage, findCollaboratorLinesWithoutCost } from '@/lib/booking-service-line-validation';
 import BookingServiceLinesSection from '../BookingServiceLinesSection';
 import type { BookingServiceLineFormInput } from '../booking-form.types';
 
@@ -25,6 +26,12 @@ export default function BookingServiceLinesEditor({ bookingId, initialLines }: B
   };
 
   const handleSave = async () => {
+    const missingCost = findCollaboratorLinesWithoutCost(lines)[0];
+    if (missingCost) {
+      toast.error(collaboratorLineCostErrorMessage(missingCost));
+      return;
+    }
+
     setSaving(true);
     try {
       const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}`, {

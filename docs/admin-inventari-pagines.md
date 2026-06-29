@@ -17,7 +17,7 @@
 | Lead re-engagement | `/admin/leads/reengagement` | Candidats a recuperar, WhatsApp/email | 🟢 | Canvi #850 — `reengagement.css`, prefix `lr__`, `AdminPage` eliminat, `mailto:` substituït per `buildLeadComposeHref` |
 | Clients (llista) | `/admin/clientes` | Llista, segments, filtres | 🟢 | Canvi #811 — `clientes.css`, prefix `cl__`, cap AdminPage |
 | Client fitxa 360 | `/admin/clientes/[id]` | Hub relacional, timeline, comunicacions, tasques | 🟢 | Canvi #812 — `customer-hub.css`, prefix `ch__`, cap AdminPage, cap ap-* |
-| Reactivació | `/admin/clientes/reactivation` | Candidats per reactivar | 🔴 | |
+| Reactivació | `/admin/clientes/reactivation` | Candidats per reactivar | 🔴 | Fitxa forense FETA #1210 |
 | Referrals | `/admin/clientes/referrals` | Top referrers, candidats | 🔴 | |
 | Reserves (llista) | `/admin/bookings` | Absorbida per **Agenda** (#844). El workspace `/admin/leads` mostra leads+reserves+calendari fusionats amb vistes Calendari/Pipeline/Llista. | 🟢 | Canvi #836-#844 — fusió Leads+Reserves+Calendari sota *Agenda*. URL antiga segueix accessible directament. |
 | Reserva detall | `/admin/bookings/[id]` | Fitxa operativa (cobraments, contracte, inventari, checklist, factura, post-event). | 🟢 | Canvi #849 — `booking-detail.css`, prefix `bd__`, `AdminPage` eliminat, `BookingSectionNav` amb `bd__secnav`. Sub-components conservats. |
@@ -39,8 +39,8 @@
 | Sales Ops | `/admin/sales-ops` | SLA, seqüències, automatismes | 🔴 | |
 | Intake ràpid | `/admin/intake` | Formulari de nova entrada | 🟢 | Canvi #809 — `intake.css`, prefix `ni-`, extracció IA Gemini, "Nou lead" tret del nav |
 | Quick create | `/admin/quick-create` | Creació assistida lead/pressupost | 🔴 | |
-| Marketing | `/admin/marketing` | Hub de captació, canals, gaps | 🔴 | |
-| Campanyes | `/admin/campaigns` | Campanyes de reactivació | 🔴 | |
+| Marketing | `/admin/marketing` | Hub de captació, canals, gaps | 🔴 | Fitxa forense FETA #1207; no migrada visualment |
+| Campanyes | `/admin/campaigns` | Campanyes de reactivació | 🔴 | Fitxa forense FETA #1206; no migrada visualment |
 
 ## Financer
 
@@ -79,7 +79,7 @@
 | Ressenyes internes | `/admin/ressenyes` | Testimonis | 🔴 | |
 | Image Manager | `/admin/image-manager` | Assets visuals | 🔴 | |
 | Canvas | `/admin/canvas` | Creativitats | 🔴 | |
-| Social | `/admin/social` | Xarxes socials | 🔴 | |
+| Social | `/admin/social` | Xarxes socials | 🔴 | Fitxa forense FETA #1209 |
 
 ## Catàleg
 
@@ -130,7 +130,7 @@
 | Activity | `/admin/activity` | Log d'activitat | 🔴 | |
 | Manual | `/admin/manual` | Manual operatiu | 🔴 | |
 | Protocol | `/admin/docs/protocol` | Protocol de producte | 🔴 | |
-| Marketing Hub | `/admin/marketing` | Hub de captació | 🔴 | |
+| Marketing Hub | `/admin/marketing` | Hub de captació | 🔴 | Fitxa forense FETA #1207; no migrada visualment |
 
 ---
 

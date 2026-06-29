@@ -77,15 +77,30 @@ cablejat al següent pas existeix.
 - 2026-06-28 — **FASE 3 iniciada: #1198** — «Següent pas» connectat a la fitxa del lead (guia per al novell). Escombrada de morts = 8 falsos positius → confirmat: no perseguir codi mort.
 - 2026-06-28 — **CERTIFICACIÓ EN BLOC (read-only, tot ✅):** flux complet, motor financer (quadra al cèntim), hub del client (15 blocs), calendari (quadra), dashboard salut, NBA cockpit, inventari (51), segmentació, reporting, tasques (45). **El sistema funciona de dalt a baix.**
 
+### 🔧 MÒDUL INVENTARI/COST — COMPLETAT (#1199-1209, 2026-06-28)
+Bloc gran de feina sobre inventari i cost real (claude + codex):
+- **#1199-1200 (codex)**: font obligatòria del preu (`purchasePriceSource` + data); cap preu sense font.
+- **#1201 (claude)**: cercador de reposició via **SerpApi** (Google Shopping, prioritza DJ Mania); inventari 54/54 amb preu real.
+- **#1202**: fotos 100% (SerpApi Shopping + Images).
+- **#1203**: camp `purchaseUrl` dedicat + **imatges locals** (webp, no caduquen) + neteja canònica de la fitxa.
+- **#1204**: botó «🔍 Buscar reposició» (DJ Mania 🥇 + més barat, foto/preu/Comprar/Usar).
+- **#1205**: **so real** — col·laborador **Isma** (lloguer 50€/bolo); EV ETX-12P = desig futur (no comprats). Troballa: amortització donava cost de so fals ~2,70€ vs 50€ real (~18×).
+- **#1209 (codi)**: **automatització** — cada bolo amb pack porta la línia Isma 50€ al marge (37 tests).
+- **Duplicat REV7 eliminat** (53 items reals).
+- ⬜ **PENDENT propietari**: validar ~26 preus «històrics intern» (canó CO2/cabina/multiefectes surten alts vs mercat); decisió preu premium/luxury (−19% recomanat).
+
 ---
 
 ## 🏁 ESTAT EN TORNAR (resum per al propietari)
-**El que he fet avui (10 commits):** diagnòstic d'organisme + atles funcional (684 fns) + roadmap; auditoria vertical completa del flux lead→cash (tot sòlid); **desbloqueig de l'inventari** (els packs ja tenen equip → preus recomanats encesos); guia «següent pas» a la fitxa del lead; certificació read-only de tot el sistema (tot verd).
+**El que s'ha fet (≈19 commits, 2026-06-28):** diagnòstic d'organisme + atles funcional (684 fns); auditoria vertical completa del flux lead→cash (tot sòlid); guia «següent pas» a la fitxa del lead; **mòdul inventari/cost COMPLET** (preus reals + fotos + enllaços reposició + botó SerpApi + so llogat Isma automatitzat).
 
-**El veredicte honest:** el teu codi **NO està trencat** — està viu, complet i interconnectat. Uses el 20% per **dades incompletes + desconeixement de novell**, no per bugs.
+**El veredicte honest:** el teu codi **NO està trencat** — està viu, complet i interconnectat. Uses el 20% per **dades incompletes + desconeixement de novell + deute visual**, no per bugs.
 
-**El que ara depèn de TU (i et desbloqueja el 80%):**
-1. **P2 (a)** — omplir el **preu de compra** dels 32 items a `/admin/inventory?health=missing-cost`. → encén amortització real + preu recomanat complet.
-2. **P2 (b)** — fet: l'inventari ja està assignat als packs (seed aplicat).
-3. **Decisió de preu** — els packs premium/luxury estan ~17% per sota del recomanat. Apujar o assumir marge.
-4. **P1** — materialitzar els 7 bolos guanyats sense reserva (cobrats en efectiu).
+**El que ara depèn de TU:**
+1. ⬜ **Validar preus «històrics»** (~26 items sense font externa confirmada).
+2. ⬜ **Decisió de preu** premium/luxury (−19% vs recomanat: apujar o assumir).
+3. ⬜ **Materialitzar els 7 bolos** en efectiu.
+
+**El gran front pendent de CLAUDE:**
+- 🔴 **DEUTE VISUAL de l'admin** («merda arreu»). **NORD definit pel propietari (2026-06-28): `/admin/leads` és LA REFERÈNCIA d'or; tot el que no s'hi assembli és el que s'ha d'arreglar.** Causa: leads té sistema propi ric (`fxd__*`, 2.475L CSS); la resta usa `AdminPage`+`ap-*` genèric. Camí: (A) pàgina a pàgina o (B) promoure el patró de leads al component compartit `AdminPage` (totes milloren alhora). **Bloquejat fins que el propietari passi captures** (leads + pàgina lletja) — el visual sense ulls és anar cec (el protocol exigeix captura als 3 breakpoints).
+- ⬜ Specs de producte (per trobar equivalents quan un model es descatalogui).

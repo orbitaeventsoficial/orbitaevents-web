@@ -79,9 +79,9 @@ context (ids/params) correcte? el que es veu aquí és el mateix que a Economia/
 
 | # | Vertical (flux) | Recorregut | Estat |
 |---|---|---|---|
-| **V1** | **ECONÒMICA / COMERCIAL** (el cor) | Lead→Pressupost→Reserva→Cost/Marge→Contracte→Pagament→Repartiment→Caixa/Economia | 🔶 EN CURS |
+| **V1** | **ECONÒMICA / COMERCIAL** (el cor) | Lead→Pressupost→Reserva→Cost/Marge→Contracte→Pagament→Repartiment→Caixa/Economia | ✅ TANCADA #1218 |
 | V2 | POST-EVENT | Event→Informe→Enquesta→Ressenya→Feedback | ⬜ |
-| V3 | COMUNICACIÓ | Lead→Email/Inbox→Seqüències→Timeline client | ⬜ |
+| V3 | COMUNICACIÓ | Lead→Email/Inbox→Seqüències→Timeline client | ✅ TANCADA #1220 |
 | V4 | CLIENT / RECURRÈNCIA | Lead→Client→Portal client (pagament/signatura)→Reactivació/Referrals | ⬜ |
 | V5 | CATÀLEG → PREU | Pack/Inventari→Cost→Preu recomanat→Pressupost (cablejat de preus) | ⬜ |
 
@@ -89,8 +89,11 @@ context (ids/params) correcte? el que es veu aquí és el mateix que a Economia/
 Dades reals: 53 leadActivity, 6 emailSend.
 - ✅ **Arquitectura sòlida**: les escriptures de comunicació passen per helpers tipats (`recordLeadEmailSent`/`recordLeadQuoteSent`/`recordLeadContractSent`…), no inline → font única. La timeline unifica via `timelineQueryService` (canònic).
 - ✅ **`pendingResponseFrom` correcte** (qui ha de respondre): últim contacte INBOUND→TEAM, OUTBOUND→CLIENT. 20 tests. La via VIVA (`loadCommTimeline`→`buildCommTimelineFromCanonicalEvents`→`inferDirectionFromCanonicalEvent`) usa `metadata.direction` explícit + `EMAIL_RECEIVED`, amb la heurística de text com a ÚLTIM recurs (robusta).
-- 🐛 **V3-#1 · `buildCommTimeline` (raw) + `inferDirection` = codi mort** — funció pública exportada que NOMÉS criden els seus tests; producció usa la versió canònica. La `inferDirection` vella és més fràgil (només heurística de text, sense metadata.direction) però NO s'usa. Candidata a eliminar (verificar 0 consumidors externs fets — confirmat: només tests).
-- ⏳ Pendents V3: seqüències comercials (commercialSequenceService), Inbox IMAP↔BD (vinculació via headers X-Orbita), reintent APPEND Sent (#3 auditoria).
+- ✅ **V3-#1 · `buildCommTimeline` (raw) + `inferDirection` = codi mort — RESOLT #1197 / reconciliat #1219** — el codi raw ja va ser retirat; els tests ara cobreixen la via viva `buildCommTimelineFromCanonicalEvents`.
+- ✅ **Seqüències comercials — RESOLT / verificat #1220** — `commercialSequenceService` és la font viva i entra per automatitzacions diàries, execució manual del lead i endpoint admin; la traça `COMM_SEQUENCE_EXEC` alimenta timeline/metrics i té tests dedicats.
+- ✅ **Inbox IMAP↔BD via X-Orbita — RESOLT / verificat #1220** — l'enviament persisteix `EmailSend` amb headers X-Orbita, Message-ID i resultat IMAP (`imapAppendOk`, folder, uid, error); `lib/imap.ts` parseja `In-Reply-To`/`References` i helpers X-Orbita.
+- ✅ **Reintent APPEND Sent — RESOLT / blindat #1220** — `emailSentRetryService` reconstrueix MIME des del snapshot + headers persistits i `POST /api/admin/emails/sent/[id]/append-imap` queda coberta amb test HTTP.
+- ✅ **V3 tancada en primera passada** — no queden pendents de codi detectats dins Lead→Email/Inbox→Seqüències→Timeline. Reobrir només amb prova viva contrària.
 
 ### FASE 2 — AUDITORIES HORITZONTALS (disseny pàgina a pàgina) · «que tot sigui IMPECABLE»
 Quan les verticals estiguin verdes: les 92 pàgines + 6 PDFs + 13 emails + components, amb
@@ -114,15 +117,18 @@ G. Cost: col·laborador (real) vs propi (imputat per ratio)
 
 ### Troballes V1 (acumulatives)
 - ✅ **Càlcul IVA/total CORRECTE** a tots els bolos provats (cost engine matemàticament sòlid: 680+142.8=822.8; 445+0=445).
-- 🐛 **V1-#1 · `cashAmount` desconnectat back↔front** — el camp existeix a BD i l'API el pot guardar, però NO es renderitza enlloc, NO té UI per registrar-lo i NO afecta el semàfor de pagament (que mira depositPaid/remainingPaid). Resultat: OE-2026-003 té cash=300 (=total) cobrat però el semàfor el marca «Pendent». **No hi ha manera neta de registrar un pagament en efectiu.** → REPLANTEJAMENT de producte (vol UI d'efectiu que ompli cashAmount + marqui pagat? o és camp llegat a eliminar?).
-- 🐛 **V1-#2 · `paymentMethod=INVOICE` vs `invoiceRequired` incoherents** — OE-2026-004 és INVOICE però invoiceRequired=false (paga «per factura» però «sense IVA»). Dos camps que es poden contradir + el nom INVOICE confon amb invoiceRequired. Números OK; és coherència/nomenclatura. → clarificar significat de paymentMethod=INVOICE o renombrar.
-- 🐛 **V1-#3 · Ternari de comissió amb branques idèntiques** — `computeCollaboratorNetMargin` (costEngine:265-268): el `if (pricingModel==='DISCOUNT')` calcula `total*pct/100` a les DUES branques. NET_PLUS_COMMISSION no es distingeix. Bug de lògica (o redundància que enganya). → verificar regla de negoci de NET_PLUS_COMMISSION.
-- 🐛 **V1-#4 · DOS sistemes de repartiment paral·lels** — (A) línies de servei amb `costAmount`+`resellPrice` = VIU (Masquerade +20% automàtic). (B) `CollaboratorBooking`+`commissionPct`+`computeCollaboratorNetMargin` = BUIT (0 repartiments reals, tots els 5 col·lab a 0%) i amb el bug V1-#3. Sistema B sembla llegat/a mig fer. → decidir: consolidar en un o documentar quin és el canònic.
+- ✅ **V1-#1 · `cashAmount` desconnectat back↔front — RESOLT #1213** — el helper canònic de pagament accepta `cashAmount` + `total` com a cobertura real: efectiu complet = `Pagat`, efectiu parcial = `Parcial`. La llista i la fitxa de reserva consumeixen aquesta lectura, el detall mostra `Efectiu registrat`, i el botó d'efectiu continua escrivint `depositPaid`, `remainingPaid`, `paymentMethod=CASH` i `cashAmount`.
+- ✅ **V1-#2 · `paymentMethod=INVOICE` vs `invoiceRequired` incoherents — RESOLT #1211** — el flux de creació desa explícitament `invoiceRequired`, les reserves noves neixen amb `paymentMethod=TRANSFER` i l'admin separa `Fiscalitat` (factura/IVA) de `Cobrament` (canal). El valor `INVOICE` queda etiquetat com a administratiu antic i ja no es pot llegir com a decisió d'IVA.
+- ✅ **V1-#3 · Ternari de comissió amb branques idèntiques — RESOLT #1192** — el càlcul es va simplificar i els tests documenten la regla real: la comissió és `total × pct` als dos models; la diferència de negoci viu al `collaboratorPrice`. Era redundància enganyosa, no bug numèric.
+- ✅ **V1-#4 · DOS sistemes de repartiment paral·lels — RESOLT #1196** — el propietari confirma que el repartiment canònic és una sola via: línies de servei amb cost + PVP/resellPrice (+20% per defecte). `CollaboratorBooking` queda retirat de la UI operativa i no participa en el càlcul.
 - ✅ **Markup +20% Masquerade (resellPrice) AUTOMATITZAT** — `RESELL_MARKUP=0.20`, `resellPrice(cost)=ceilToStep(cost*1.2,5)`. S'aplica a la fitxa de productes del col·laborador (`CollaboratorProductsPanel`); el bolo agafa preu venda + cost per separat. NO és manual.
-- ⚠️ **V1-#5 · Línia LLIURE de col·laborador sense cost → marge inflat** — `addFreeLine` crea línia amb `revenueAmount` sense `costAmount`. Si s'afegeix Masquerade com a línia lliure (en comptes de «producte de col·laborador»), el cost no entra i el marge surt fals. → guia/validació perquè els serveis de col·lab passin sempre pel flux de producte.
+- ✅ **V1-#5 · Línia LLIURE de col·laborador sense cost → marge inflat — RESOLT #1214** — les línies amb `collaboratorId` exigeixen `costAmount > 0`: l'editor de `/admin/bookings/[id]` bloqueja el desat amb toast i el PATCH `/api/admin/bookings/[id]` retorna `400` si arriba una línia de col·laborador sense cost real. Les línies internes sense col·laborador continuen permeses.
 - ✅ **Branca C (estats→caixa)** — forecast de caixa = `status IN [CONFIRMED, PREPARING]`; economia global = `not CANCELLED`. Raonable (previst vs global). `RETIRED` de la 156 és inventoryItem (correcte, no booking).
-- 🐛 **V1-#6 · Cristina Rey: lead WON sense reserva** — guanyat però `booking: null`. Si la venda es va tancar, hauria d'haver generat reserva. → verificar si és cas real obert o residu.
-- ⏳ Pendents: branca D (2 trams semàfor), F (pack vs línies: marge quadra?), propagació lead→reserva, mètodes TRANSFER/Bizum/Stripe.
+- ✅ **Branca D (2 trams semàfor) — RESOLT #1215** — `depositPaid` i `remainingPaid` són trams independents; el helper canònic considera qualsevol tram pagat com a `Parcial`, i només marca `Pagat` quan tots dos són certs. Dashboard i Agenda consumeixen aquesta lectura.
+- ✅ **V1-#6 · Cristina Rey: lead WON sense reserva — RESOLT #1194 / DADA PENDENT PROPIETARI** — el sistema ja detecta leads `WON` sense reserva i els fa visibles al dashboard/NBA; F2 també redirigeix a crear reserva quan es marca WON sense booking. El que resta és materialitzar les dades antigues reals, no arreglar cablejat.
+- ✅ **Branca F (pack + serviceLines + extres + desplaçament) — RESOLT #1217** — el motor ja sumava pack, hores extra, extres, línies i desplaçament; el forat era de lectura en superfícies resum. Fitxa de reserva, llista, dashboard i Economia ara alimenten el costEngine amb `serviceLines`, cost intern de línies pròpies (`aggregateServiceLines`), hores extra i cost de desplaçament.
+- ✅ **TRANSFER/Bizum/Stripe — RE-VERIFICAT #1218** — `paymentMethod` queda acotat a canal manual/base (`TRANSFER`, `CASH`, `INVOICE` llegat). Stripe i Bizum són vies per tram: Stripe crea/desa links i el webhook marca `depositPaid`/`remainingPaid`; Bizum declara des del portal i l'admin confirma el tram. La UI de fitxa ho diu com a "Vies per tram".
+- ✅ **V1 tancada a nivell de cablejat econòmic/comercial** — no queden pendents de codi detectats dins V1. La propagació lead→reserva queda marcada com a sòlida al `docs/ROADMAP-EXECUCIO.md` F3; només reobrir-la si una prova viva contradiu el roadmap.
 
 ### SUPERFÍCIES GROSSES (entren com a verticals/horitzontals segons toqui)
 - **W. WEB PÚBLICA** (`orbitaevents.com`): homepage, serveis, packs, portfolio, blog, opinions, contacte, configurador, zones, legal, temàtiques — Fase 2 (disseny) + V-pròpia (conversió/SEO).

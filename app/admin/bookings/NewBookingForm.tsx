@@ -11,8 +11,8 @@
 ============================================================================ */
 
 import { useEffect, useState } from 'react';
-import { VAT_RATE_INVOICE } from '@/lib/constants/pricing';
 import { formatCurrency } from '@/lib/constants';
+import { getBookingFiscalMode } from '@/lib/constants/booking-payment';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
@@ -95,6 +95,7 @@ export default function NewBookingForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- només ha de reaccionar quan arriba leadData, no a manualTotalPrice
   }, [leadData]);
   const [invoiceRequired, setInvoiceRequired] = useState(false);
+  const fiscalMode = getBookingFiscalMode(invoiceRequired);
   const [showPack, setShowPack] = useState(false);
   useEffect(() => { if (form.packId) setShowPack(true); }, [form.packId]);
   const [sourceCollaboratorId, setSourceCollaboratorId] = useState('');
@@ -331,16 +332,17 @@ export default function NewBookingForm() {
                 <span className="nb__field-hint">preu final pactat; substitueix el càlcul automàtic</span>
               </div>
               <div className="nb__field nb__field--narrow">
-                <span className="nb__label">Factura</span>
+                <span className="nb__label">Fiscalitat</span>
                 <label className="nb__invoice-check">
                   <input
                     type="checkbox" checked={invoiceRequired}
                     onChange={(e) => setInvoiceRequired(e.target.checked)}
                     role="switch" aria-checked={invoiceRequired}
                   />
-                  Vol factura
-                  {invoiceRequired && <span className="nb__vat-flag">+{VAT_RATE_INVOICE}% IVA</span>}
+                  Factura amb IVA
+                  {invoiceRequired && <span className="nb__vat-flag">+{fiscalMode.vatRate}% IVA</span>}
                 </label>
+                <span className="nb__field-hint">{fiscalMode.help}</span>
               </div>
             </div>
 

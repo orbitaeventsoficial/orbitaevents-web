@@ -10,6 +10,7 @@ import { ACTIVE_BOOKING_STATUSES } from '@/lib/constants';
 import { calcVatRate, calcDeposit, roundMoney, CUSTOM_BOOKING_PACK_SLUG, CUSTOM_BOOKING_PACK_MARKER } from '@/lib/constants/pricing';
 import { calculateEventDuration } from '@/lib/inventory-utils';
 import { SOUND_RENTAL } from '@/lib/constants/inventory';
+import { DEFAULT_BOOKING_PAYMENT_METHOD } from '@/lib/constants/booking-payment';
 
 /**
  * Afegeix automàticament la línia de lloguer de so (Isma) si el bolo porta pack i
@@ -427,12 +428,13 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   const travelCharge = distanceKm != null ? calculateTravelCharge(distanceKm) : 0;
   const subtotalCalculated = subtotalBase + travelCharge;
   const discount = data.discount || 0;
-  const vatRate = calcVatRate(data.invoiceRequired ?? false);
+  const invoiceRequired = Boolean(data.invoiceRequired);
+  const vatRate = calcVatRate(invoiceRequired);
   const manualTotal = data.manualTotalPrice != null && data.manualTotalPrice > 0
     ? roundMoney(data.manualTotalPrice)
     : null;
   const subtotal = manualTotal !== null
-    ? data.invoiceRequired
+    ? invoiceRequired
       ? roundMoney(manualTotal * 100 / (100 + vatRate))
       : manualTotal
     : subtotalCalculated;
@@ -488,11 +490,13 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       subtotal,
       discount: manualTotal !== null ? 0 : discount,
       discountCode: data.discountCode,
+      invoiceRequired,
       vatRate,
       vatAmount,
       total,
       depositAmount,
       remainingAmount: Math.round((total - depositAmount) * 100) / 100,
+      paymentMethod: DEFAULT_BOOKING_PAYMENT_METHOD,
       notes: data.notes,
       extras: resolvedExtras.length > 0 ? { create: resolvedExtras } : undefined,
       serviceLines: serviceLines.length > 0 ? { create: serviceLines } : undefined,

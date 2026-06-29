@@ -28,13 +28,15 @@ import BookingFieldNotesComposer from './BookingFieldNotesComposer';
 import BookingCustomerLinkPanel from './BookingCustomerLinkPanel';
 import BookingQuestionnaireSection from './BookingQuestionnaireSection';
 import { getBookingOperationalSnapshot } from '@/lib/services/bookingOperationalService';
+import { aggregateServiceLines } from '@/lib/services/costEngine';
 import { getWeatherForEvent } from '@/lib/services/weatherService';
 import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
 import BookingTotalEditor from './BookingTotalEditor';
 import PaymentToggle from './PaymentToggle';
 import CashPaymentButton from './CashPaymentButton';
-import { getPaymentLabel } from '@/lib/payment-status';
+import { getPaymentBand, getPaymentLabel } from '@/lib/payment-status';
+import { getBookingFiscalMode, getBookingPaymentMethodHelp, getBookingPaymentMethodLabel } from '@/lib/constants/booking-payment';
 import { previewBookingCustomerLink } from '@/lib/services/bookings/bookingCustomerLinkService';
 import { getLeadStatusDisplay, getEventLabel, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull, getContractStatusLabel, getInvoiceStatusLabel, getProposalStatusDisplay } from '@/lib/constants';
 import { ADMIN_BOOKING_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
@@ -170,7 +172,8 @@ export default async function BookingDetailPage({ params }: PageProps) {
   });
   const packPrice           = booking.pack?.price ? Number(booking.pack.price) : 0;
   const extrasTotal         = booking.extras?.reduce((s: number, e: { price?: number | null; quantity?: number | null }) => s + Number(e.price || 0) * (e.quantity || 1), 0) ?? 0;
-  const serviceLinesCost    = booking.serviceLines?.reduce((s: number, l: { costAmount?: number | null; quantity?: number | null }) => s + Number(l.costAmount || 0) * (l.quantity || 1), 0) ?? 0;
+  const serviceLinesAgg     = aggregateServiceLines(booking.serviceLines ?? []);
+  const serviceLinesCost    = serviceLinesAgg.cost;
   const extraHours          = typeof bookingCompat.extraHours === 'number' ? bookingCompat.extraHours : 0;
   const extraHourPrice      = booking.pack?.extraHourPrice ? Number(booking.pack.extraHourPrice) : 0;
   const inventoryCostReal   = inventoryCost.totalCost;
@@ -184,7 +187,15 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
 
   // KPI payment state helpers (label canònic via lib/payment-status)
-  const paymentLabel    = getPaymentLabel(booking.depositPaid, booking.remainingPaid);
+  const paymentCoverage = {
+    cashAmount: booking.cashAmount ? Number(booking.cashAmount) : null,
+    total: Number(booking.total),
+  };
+  const paymentBand     = getPaymentBand(booking.depositPaid, booking.remainingPaid, paymentCoverage);
+  const paymentLabel    = getPaymentLabel(booking.depositPaid, booking.remainingPaid, paymentCoverage);
+  const fiscalMode      = getBookingFiscalMode(booking.invoiceRequired);
+  const paymentMethodLabel = getBookingPaymentMethodLabel(booking.paymentMethod);
+  const paymentMethodHelp  = getBookingPaymentMethodHelp(booking.paymentMethod);
 
   const flowLabel    = reviewFlowStatus === 'RESPONDIDO' ? 'Respost' : reviewFlowStatus === 'ENVIADO' ? 'Enviat' : 'Falta enviar';
 
@@ -293,9 +304,9 @@ export default async function BookingDetailPage({ params }: PageProps) {
               <p className="ap-detail-stats-label">Total reserva</p>
               <p className="ap-detail-stats-val">{formatCurrency(booking.total)}</p>
             </div>
-            <div className={`ap-detail-stats-cell ${booking.depositPaid && booking.remainingPaid ? 'ap-detail-stats-cell--ok' : booking.depositPaid ? 'ap-detail-stats-cell--warn' : 'ap-detail-stats-cell--err'}`}>
+            <div className={`ap-detail-stats-cell ${paymentBand === 'paid' ? 'ap-detail-stats-cell--ok' : paymentBand === 'partial' ? 'ap-detail-stats-cell--warn' : 'ap-detail-stats-cell--err'}`}>
               <p className="ap-detail-stats-label">
-                <span className={`ap-detail-stats-dot ap-detail-stats-dot--${booking.depositPaid && booking.remainingPaid ? 'ok' : booking.depositPaid ? 'warn' : 'err'}`} />
+                <span className={`ap-detail-stats-dot ap-detail-stats-dot--${paymentBand === 'paid' ? 'ok' : paymentBand === 'partial' ? 'warn' : 'err'}`} />
                 Pagament
               </p>
               <p className="ap-detail-stats-val">{paymentLabel}</p>
@@ -492,8 +503,14 @@ export default async function BookingDetailPage({ params }: PageProps) {
                 <div className="bd__finrow"><span>Descompte{booking.discountCode ? ` (${booking.discountCode})` : ''}</span><span>-{formatCurrency(booking.discount)}</span></div>
               )}
               <div className="bd__finrow"><span>IVA ({booking.vatRate}%)</span><span>{formatCurrency(booking.vatAmount)}</span></div>
+              <div className="bd__finrow"><span>Fiscalitat</span><span>{fiscalMode.label}</span></div>
+              <div className="bd__finrow"><span>Cobrament</span><span>{paymentMethodLabel}</span></div>
+              {paymentCoverage.cashAmount && paymentCoverage.cashAmount > 0 && (
+                <div className="bd__finrow"><span>Efectiu registrat</span><span>{formatCurrency(paymentCoverage.cashAmount)}</span></div>
+              )}
               <div className="bd__finrow bd__finrow--total"><span>Total</span><BookingTotalEditor bookingId={booking.id} total={Number(booking.total)} /></div>
             </div>
+            <p className="bd__field-hint">{paymentMethodHelp}</p>
             <div className="bd__paygrid">
               <div className={`bd__paycell ${booking.depositPaid ? 'bd__paycell--ok' : 'bd__paycell--err'}`}>
                 <p className="bd__paycell-label">Paga i senyal</p>

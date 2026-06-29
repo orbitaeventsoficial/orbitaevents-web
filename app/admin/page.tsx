@@ -28,6 +28,7 @@ import { loadWeeklyCapacityForecast } from '@/lib/services/operationalForecastSe
 import WeeklyCapacityForecastPanel from './components/WeeklyCapacityForecastPanel';
 import { buildDashboardOperatingCycle, type AdminOperatingCycleTone } from '@/lib/services/adminOperatingCycleService';
 import NBAExplainPanel from './components/NBAExplainPanel';
+import { getPaymentBand, getPaymentLabel } from '@/lib/payment-status';
 
 // Removed: all widget components now in lib/dashboard-widgets.tsx
 export const dynamic = 'force-dynamic';
@@ -89,6 +90,22 @@ export default async function AdminDashboard() {
     ...step,
     ...pilotDynamic[step.id],
   }));
+  const nextEventPaymentBand = d.nextEvent
+    ? getPaymentBand(d.nextEvent.depositPaid, d.nextEvent.remainingPaid)
+    : null;
+  const nextEventPaymentLabel = d.nextEvent
+    ? getPaymentLabel(d.nextEvent.depositPaid, d.nextEvent.remainingPaid)
+    : '';
+  const nextEventPaymentTooltip = nextEventPaymentBand === 'paid'
+    ? 'Tot pagat'
+    : nextEventPaymentBand === 'partial'
+      ? 'Pagament parcial registrat'
+      : 'Sense cap pagament';
+  const nextEventPaymentDotClass = nextEventPaymentBand === 'paid'
+    ? 'bg-[var(--o-success)]'
+    : nextEventPaymentBand === 'partial'
+      ? 'bg-[var(--o-warning)]'
+      : 'bg-[var(--o-danger)]';
   const criticalHealthCount = d.salutSnapshot?.summary.critical || 0;
   const warningHealthCount = d.salutSnapshot?.summary.warning || 0;
   const manualDecisionCount = d.alerts.length + d.upcomingTasks.length;
@@ -347,11 +364,11 @@ export default async function AdminDashboard() {
                 <p className="text-2xl font-bold font-mono tabular-nums">{formatCurrency(d.nextEvent.total)}</p>
                 <p className="text-xs opacity-70 mt-0.5">{d.nextEvent.packName}</p>
                 <div className="flex items-center justify-end gap-1.5 mt-2">
-                  <Tooltip text={d.nextEvent.depositPaid && d.nextEvent.remainingPaid ? 'Tot pagat' : d.nextEvent.depositPaid ? 'Falta pagament final' : 'Sense cap pagament'}>
-                    <span className={`inline-block w-2.5 h-2.5 rounded-full ${d.nextEvent.depositPaid && d.nextEvent.remainingPaid ? 'bg-[var(--o-success)]' : d.nextEvent.depositPaid ? 'bg-[var(--o-warning)]' : 'bg-[var(--o-danger)]'}`} />
+                  <Tooltip text={nextEventPaymentTooltip}>
+                    <span className={`inline-block w-2.5 h-2.5 rounded-full ${nextEventPaymentDotClass}`} />
                   </Tooltip>
                   <span className="text-xs">
-                    {d.nextEvent.depositPaid && d.nextEvent.remainingPaid ? 'Pagat' : d.nextEvent.depositPaid ? 'Parcial' : 'Pendent'}
+                    {nextEventPaymentLabel}
                   </span>
                 </div>
                 {d.nextEvent.checklistTotal > 0 && (

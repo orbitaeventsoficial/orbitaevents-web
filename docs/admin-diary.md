@@ -1,3 +1,350 @@
+## 2026-06-29 — V3 comunicació tancada: seqüències, X-Orbita i APPEND Sent reconciliats (Canvi #1220, codex)
+
+### Context
+Després del #1219 quedaven tres pendents V3 al full d'auditoria: seqüències comercials, vinculació Inbox IMAP↔BD via headers X-Orbita i reintent d'APPEND a Sent. La verificació contra codi viu mostra que no eren forats oberts actuals sinó feina ja implementada en canvis anteriors i no reflectida al full.
+
+### Què s'ha fet
+- `commercialSequenceService` queda verificat com a servei viu: s'executa des d'automatitzacions diàries, ruta manual del lead i endpoint admin, amb traça `COMM_SEQUENCE_EXEC` i tests dedicats.
+- La via SMTP/IMAP queda verificada: `lib/email.ts` envia amb headers Òrbita, `adminEmailSendService` i `dossierService` persisteixen `EmailSend`, i `emailTrackingService` desa resultat SMTP + APPEND.
+- El reintent APPEND Sent queda cobert de punta a adaptador: `emailSentRetryService` reconstrueix MIME amb snapshot + headers Òrbita i la ruta `POST /api/admin/emails/sent/[id]/append-imap` tradueix els estats del servei a HTTP.
+- `__tests__/app/api/admin/emails-sent-append-imap-route.test.ts`: nova cobertura d'auth, CSRF, ok, not-found, no-snapshot i append-failed.
+- `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md`: V3 passa a tancada en primera passada amb evidència de codi viu.
+
+### Validació
+- Validació tècnica: tests focalitzats de seqüències comercials, IMAP/X-Orbita, tracking d'enviaments, retry APPEND i nova ruta HTTP.
+- Validació funcional: Lead→Email/Inbox→Seqüències→Timeline té escriptures traçades, headers de correlació i recuperació manual quan falla l'arxiu a Sent.
+- Validació humana/UX: el full de ruta deixa de presentar falsos pendents i apunta el següent treball a V2, no a reobrir comunicació.
+
+### Coordinació
+Counter → 1220. Tanca V3 sense tocar inventari, preus, reserves econòmiques, costEngine, schema ni UI d'inventari.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — V3: `buildCommTimeline` raw ja estava retirat (#1197) (Canvi #1219, codex)
+
+### Context
+En obrir V3, el full d'auditoria encara marcava `buildCommTimeline` raw + `inferDirection` com a codi mort pendent. La verificació viva ha trobat que aquest ítem ja havia estat tancat per Claude al #1197: el test es va migrar a `buildCommTimelineFromCanonicalEvents` i el codi raw es va retirar de `commTimelineService`.
+
+### Què s'ha fet
+- `rg` confirma que `buildCommTimeline` raw ja no existeix en codi de producció; només queda l'alias local del test apuntant a la via canònica viva.
+- `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md`: V3-#1 passa de bug obert a resolt #1197, i els pendents V3 queden reduïts a seqüències comercials, Inbox IMAP↔BD i reintent APPEND Sent.
+- `docs/admin-protocol.md`: §6.3 i §9 registren la reconciliació perquè el següent agent no reobri una feina ja feta.
+
+### Validació
+- Validació tècnica: documental + `rg`; el codi ja havia estat validat al #1197.
+- Validació funcional: cap canvi de runtime; la via viva continua sent `loadCommTimeline` → `buildCommTimelineFromCanonicalEvents`.
+- Validació humana/UX: el mapa V3 deixa de mostrar un fals pendent i apunta als problemes reals de comunicació.
+
+### Coordinació
+Counter → 1219. Tall documental; no toca codi, schema, inventari, pagaments, reserves econòmiques ni UI.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — V1 pagaments: TRANSFER/Bizum/Stripe re-verificats com a vies de tram (Canvi #1218, codex)
+
+### Context
+El darrer pendent real de V1 era la re-verificació operadora dels canals TRANSFER/Bizum/Stripe. El risc no era matemàtic sinó de model mental: `paymentMethod` només desa el canal manual/base (`TRANSFER`, `CASH`, `INVOICE` llegat), mentre que Stripe i Bizum funcionen com a vies de cobrament per tram i acaben marcant `depositPaid` o `remainingPaid`.
+
+### Què s'ha fet
+- `lib/constants/booking-payment.ts`: l'ajuda de `TRANSFER` explicita que Stripe i Bizum són vies per tram, no nous valors del camp `paymentMethod`.
+- `app/admin/bookings/[id]/StripePaymentPanel.tsx`: el panell passa de "Stripe · Bizum · links de checkout" a "Vies per tram", alineant la UI amb el contracte real.
+- `__tests__/lib/booking-payment-method.test.ts`: blinda que `STRIPE` i `BIZUM` es normalitzen al canal base `TRANSFER` i que l'ajuda comunica el model.
+- `__tests__/app/api/admin/bookings-confirm-bizum-route.test.ts`: cobreix auth/CSRF/permisos, confirmació de tram i conflicte quan no hi ha declaració.
+- `__tests__/app/api/portal/bizum-notify-route.test.ts`: cobreix declaració Bizum des del portal, validació de `paymentType` i conflicte per declaració repetida.
+
+### Validació
+- Validació tècnica: tests focalitzats de constant, Bizum service, Stripe service, ruta Stripe checkout, ruta webhook Stripe i les dues rutes Bizum noves.
+- Validació funcional: TRANSFER queda com a canal de cobrament manual/base; Stripe genera/desa links i el webhook marca trams; Bizum declara des del portal i l'admin confirma el tram.
+- Validació humana/UX: l'operador ja no ha de llegir Stripe/Bizum com a "mètodes guardats" sinó com a vies que tanquen bestreta/resta.
+
+### Coordinació
+Counter → 1218. Tanca el pendent real restant de V1 sense tocar schema, inventari, preus, catàleg, costEngine ni repartiment.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — V1 branca F: marge resum amb serviceLines i hores extra (Canvi #1217, codex)
+
+### Context
+La branca F revisa si la composició econòmica del bolo quadra quan hi conviuen pack, línies de servei, extres, hores extra i desplaçament. El motor de creació ja sumava aquests blocs, però les superfícies resum no alimentaven totes les dades al motor de marge.
+
+### Què s'ha fet
+- `app/admin/bookings/[id]/page.tsx`: la fitxa de reserva calcula el cost de línies amb `aggregateServiceLines()` en lloc de sumar només `costAmount`, de manera que les línies pròpies d'Òrbita també imputen cost intern.
+- `app/admin/bookings/page.tsx`: la llista de reserves carrega `serviceLines` i passa `serviceLinesRevenue`, `serviceLinesCost`, `extraHours` i `extraHourPrice` a `computeSimpleMarginPct()`.
+- `app/admin/lib/dashboard-data.ts`: el marge mitjà del dashboard carrega les mateixes dades i deixa de calcular marge només amb pack/extres/desplaçament.
+- `lib/services/profitabilityService.ts`: Economia carrega `serviceLines`, les agrega amb la font única i les passa a `computeBookingFinancialSummary()`.
+- Tests: regressió a `costEngine` perquè el marge simple inclogui cost de línies, i guard estàtic a `profitabilityService` perquè no es perdi el wiring.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/costEngine.test.ts __tests__/lib/services/profitabilityService.test.ts`; `npx tsc --noEmit --pretty false`.
+- Validació funcional: una reserva amb línies pròpies o subcontractades ja no queda inflada als resums; el mateix cost de línies que veu el motor s'aplica a fitxa, llista, dashboard i Economia.
+- Validació humana/UX: el percentatge de marge visible en superfícies de decisió deixa d'amagar Isma/Masquerade/serveis propis fora de pack.
+
+### Coordinació
+Counter → 1217. Tanca la branca F sense tocar preus, inventari, schema, costEngine de base ni dades de catàleg.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — V1: full viu reconciliat amb #1192/#1194/#1196 (Canvi #1216, codex)
+
+### Context
+El full d'auditoria V1 encara marcava com a bugs oberts V1-#3, V1-#4 i V1-#6, però el diari ja els havia resolt a #1192, #1196 i #1194 respectivament. Això podia fer que un agent reobrís feina tancada o tornés a tocar costEngine/repartiment sense necessitat.
+
+### Què s'ha fet
+- `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md`: V1-#3, V1-#4 i V1-#6 passen a resolts amb referència als canvis que els tanquen.
+- El pendent V1 queda reduït al que encara és viu: branca F i re-verificació operadora dels mètodes TRANSFER/Bizum/Stripe.
+- La propagació lead→reserva deixa de figurar com a pendent genèric perquè `docs/ROADMAP-EXECUCIO.md` F3 ja la marca com a completa; només es reobrirà amb prova viva contrària.
+
+### Validació
+- Validació tècnica: documental; `qa:protocol` i `diff --check` han de quedar nets.
+- Validació funcional: cap canvi de runtime.
+- Validació humana/UX: el full de ruta deixa de demanar feina falsa sobre repartiment, comissions i Cristina WON; el següent pas queda més clar.
+
+### Coordinació
+Counter → 1216. Tall de reconciliació documental; no toca codi de negoci, inventari, packs, preus, schema, costEngine, Stripe/Bizum ni reserves.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — V1 branca D: tram final pagat ja no sembla pendent (Canvi #1215, codex)
+
+### Context
+La branca D de l'auditoria vertical revisa els dos trams de cobrament. El helper canònic encara llegia `remainingPaid=true` amb `depositPaid=false` com a `Pendent`, tot i que els toggles i el bulk de pagaments permeten marcar la resta de manera independent.
+
+### Què s'ha fet
+- `lib/payment-status.ts`: qualsevol tram pagat (`depositPaid` o `remainingPaid`) classifica la reserva com a `Parcial`; només els dos trams pagats són `Pagat`.
+- `app/admin/page.tsx`: el semàfor del pròxim esdeveniment del dashboard consumeix `getPaymentBand/getPaymentLabel` en lloc de ternaris locals.
+- `app/admin/leads/LeadsSeasonClient.tsx`: l'agenda de leads/reserves deriva el seu `paymentState` de la mateixa font única i deixa de dir "Sense pagaments" quan només està pagada la resta.
+- `__tests__/lib/payment-status.test.ts`: regressió per `remainingPaid=true` i `depositPaid=false`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/payment-status.test.ts`; `npx tsc --noEmit --pretty false`.
+- Validació funcional: qualsevol cobrament real d'un dels dos trams es mostra com a parcial; cap pagament continua sent pendent; els dos trams pagats continuen sent `Pagat`.
+- Validació humana/UX: dashboard i Agenda ja no contradiuen la fitxa quan s'ha registrat un tram de pagament.
+
+### Coordinació
+Counter → 1215. Tanca la part de semàfor de branca D sense tocar escriptures de pagament, schema, inventari, packs, preus, costEngine ni repartiment V1-#4.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — V1-#5: línies de col·laborador sense cost queden bloquejades (Canvi #1214, codex)
+
+### Context
+L'auditoria vertical V1 marcava que una línia lliure amb col·laborador podia entrar amb `revenueAmount` però sense `costAmount`, inflant el marge perquè el cost real del proveïdor no comptava.
+
+### Què s'ha fet
+- `lib/booking-service-line-validation.ts`: helper canònic per detectar línies amb `collaboratorId` i cost real absent o zero.
+- `app/admin/bookings/[id]/BookingServiceLinesEditor.tsx`: el botó de desar bloqueja aquestes línies amb toast i demana recrear-les des del catàleg de productes.
+- `app/api/admin/bookings/[id]/route.ts`: el PATCH rebutja el mateix cas amb `400`, abans d'arribar al servei/DB.
+- `__tests__/lib/booking-service-line-validation.test.ts` i `__tests__/app/api/admin/bookings-detail-route.test.ts`: regressió del helper i de la barrera API.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/booking-service-line-validation.test.ts __tests__/app/api/admin/bookings-detail-route.test.ts`; `npx tsc --noEmit --pretty false`.
+- Validació funcional: una línia interna pot continuar sense cost explícit; una línia amb col·laborador no pot guardar-se sense cost real.
+- Validació humana/UX: l'admin rep un error accionable i el flux correcte queda reconduït cap al catàleg de productes de col·laborador.
+
+### Coordinació
+Counter → 1214. Tanca V1-#5 sense schema, migració, inventari, packs, preus, costEngine ni repartiment V1-#4.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — V1-#1: efectiu registrat compta al semàfor de pagament (Canvi #1213, codex)
+
+### Context
+L'auditoria vertical V1 marcava que `cashAmount` podia existir a BD però quedar desconnectat de la lectura de pagament: una reserva amb efectiu registrat podia continuar sortint com a `Pendent` si `depositPaid` i `remainingPaid` no estaven marcats.
+
+### Què s'ha fet
+- `lib/payment-status.ts`: el helper canònic de pagament accepta cobertura opcional (`cashAmount` + `total`) i considera `cashAmount >= total` com a `Pagat`, i `cashAmount > 0` com a `Parcial`.
+- `app/admin/bookings/[id]/page.tsx`: el KPI de pagament i el resum econòmic consumeixen aquesta cobertura i mostren `Efectiu registrat` quan hi ha import.
+- `app/admin/bookings/page.tsx`: els semàfors de pagament de llista i targeta mòbil també deriven de la cobertura real.
+- `__tests__/lib/payment-status.test.ts`: cobertura de regressió per efectiu complet i parcial.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/payment-status.test.ts __tests__/app/admin/bookings/CashPaymentButton.test.tsx`; `npx tsc --noEmit --pretty false`.
+- Validació funcional: una reserva antiga amb `cashAmount=total` deixa de llegir-se com a pendent encara que els flags antics no estiguin alineats; el botó d'efectiu continua enviant `depositPaid`, `remainingPaid`, `paymentMethod=CASH` i `cashAmount`.
+- Validació humana/UX: l'admin mostra l'import d'efectiu registrat i el semàfor no contradiu el cobrament real.
+
+### Coordinació
+Counter → 1213. Tanca V1-#1 sense schema, migració, costEngine, inventari, packs ni automatització Isma.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — Build verd: handler de reposició d'inventari deixa de semblar un hook (Canvi #1212, codex)
+
+### Context
+El tall V1-#2 ja passava tests focalitzats, `tsc`, `qa:protocol` i `validate:core`, però `pnpm build` quedava bloquejat al lint de Next per `react-hooks/rules-of-hooks` a `ReplacementSearchButton`: el handler local `useAsReplacement` començava per `use` i React l'interpretava com a hook cridat dins un callback.
+
+### Què s'ha fet
+- `app/admin/inventory/[id]/ReplacementSearchButton.tsx`: el handler passa a `handleUseAsReplacement`, sense canviar la crida PATCH, l'estat de saving ni el comportament del botó `Usar`.
+
+### Validació
+- Validació tècnica: `pnpm build` OK.
+- Validació funcional: el botó continua desant `purchaseUrl`; només desapareix el fals positiu de hook.
+- Validació humana/UX: cap canvi visual ni de flux d'inventari.
+
+### Coordinació
+Counter → 1212. Microfix de build sobre inventari; cap canvi a schema, preus, costEngine, packs ni reserves.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-29 — V1-#2: fiscalitat i cobrament separats a reserves (Canvi #1211, codex)
+
+### Context
+L'auditoria vertical V1 havia detectat que `paymentMethod=INVOICE` i `invoiceRequired` podien llegir-se com la mateixa cosa, tot i governar decisions diferents. En revisar el flux real, la causa era més forta: la creació de reserves calculava l'IVA amb `invoiceRequired`, però no desava explícitament el camp i deixava el default de BD; a més, `paymentMethod` naixia per default com `INVOICE`, reforçant la confusió.
+
+### Què s'ha fet
+- `lib/constants/booking-payment.ts`: nova capa canònica petita per separar canal de cobrament (`TRANSFER`, `CASH`, `INVOICE` llegat) de fiscalitat (`invoiceRequired`).
+- `lib/services/bookingCreationService.ts`: les reserves noves desen explícitament `invoiceRequired` i neixen amb `paymentMethod='TRANSFER'` com a canal de cobrament per defecte, sense tocar schema ni costEngine.
+- `app/admin/bookings/NewBookingForm.tsx`: el toggle visible passa de "Factura" genèric a "Fiscalitat / Factura amb IVA", amb ajuda que explica l'efecte real sobre l'IVA.
+- `app/admin/bookings/[id]/page.tsx`: el resum econòmic mostra separades les línies `Fiscalitat` i `Cobrament`, i identifica `INVOICE` com a valor administratiu antic que no decideix IVA.
+- `__tests__/lib/booking-payment-method.test.ts` i `__tests__/lib/services/bookingCreationService.test.ts`: cobertura de la separació i de la invariant `invoiceRequired` desat + `vatRate` coherent.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/booking-payment-method.test.ts __tests__/lib/services/bookingCreationService.test.ts`; `npx tsc --noEmit --pretty false`.
+- Validació funcional: una reserva nova amb factura grava `invoiceRequired=true` i `vatRate=21`; sense factura grava `invoiceRequired=false`, `vatRate=0` i canal inicial `TRANSFER`.
+- Validació humana/UX: l'admin ja no demana interpretar "factura" com a mètode de pagament; fiscalitat i cobrament apareixen com dues lectures separades.
+
+### Coordinació
+Counter → 1211. Tanca V1-#2 del full d'auditoria vertical. Cap canvi a schema, inventari, packs, preus, costEngine ni automatització Isma.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-28 — Fitxa forense `/admin/clientes/reactivation`: cua individual assistida, no campanya massiva (Canvi #1210, codex)
+
+### Context
+Després de tancar Campanyes, Marketing i Social, faltava el veí directe de Campanyes. `/admin/campaigns` deriva a Reactivació per accions individualitzades, però calia deixar escrit que Reactivació no és un enviador massiu ni un duplicat de Campanyes.
+
+### Què s'ha fet
+- `docs/admin-fitxes-pantalles.md`: fitxa `FETA` de `/admin/clientes/reactivation` amb història, reachability, component viu, servei, dades governades, duplicacions, riscos i decisió de treball.
+- `docs/admin-inventari-pagines.md`: Reactivació manté estat visual `🔴` però queda anotada com a fitxa forense FETA #1210.
+- `docs/admin-protocol.md`: §6.5 i §9 registren el veredicte.
+- `lib/constants/admin.ts`: counter → 1210.
+
+### Veredicte
+Reactivació és viva i individual: `page.tsx` carrega `loadReactivationCandidates()`, `ReactivationClient` filtra/copia/obre WhatsApp-email i torna al Customer Hub, i `reactivationService.generateReactivationCandidates()` classifica clients en 6 motius amb templates ca/es i canals suggerits.
+
+No duplica Campanyes, Customer Hub ni Leads Reengagement. La traça persistent correcta viu al Customer Hub/Tasks amb `TASK_SOURCE.REACTIVATION` i `TASK_DEDUPE_KEY.reactivation(customerId)`.
+
+### Validació
+- Validació tècnica: lectura forense dels fitxers i consumidors; `qa:no-dead-admin-views`; `tsc --noEmit`; `qa:protocol`; `git diff --check`.
+- Validació funcional: documentada la cadena front→servei→Customer/Tasks sense canviar schema ni UI funcional.
+- Validació humana/UX: queda escrita la frontera Campanyes massives manuals / Reactivació individual / Reengagement de leads.
+
+### Coordinació
+Counter → 1210. Cap canvi a inventari, packs, preus, schema, costEngine, `bookingCreationService`, col·laboradors, reserves ni scripts d'Isma.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-28 — Fitxa forense `/admin/social`: calendari editorial viu, no duplicat de Marketing/Campanyes (Canvi #1209, codex)
+
+### Context
+Després de classificar `/admin/campaigns` (#1206), `/admin/marketing` (#1207) i cablejar Marketing → Campanyes (#1208), faltava tancar el tercer òrgan del mapa Social/Growth. `/admin/social` havia acumulat molts canvis bons, però continuava pendent al registre de fitxes.
+
+### Què s'ha fet
+- `docs/admin-fitxes-pantalles.md`: fitxa `FETA` de `/admin/social` amb història, reachability, component viu, serveis, APIs, dades governades, duplicacions, riscos i decisió de treball.
+- `docs/admin-inventari-pagines.md`: Social manté estat visual `🔴` però queda anotat com a fitxa forense FETA #1209.
+- `docs/admin-protocol.md`: §6.9 i §9 registren el veredicte.
+- `lib/constants/admin.ts`: counter → 1209.
+
+### Veredicte
+Social és viu: `page.tsx` carrega posts, counts, idees i pols editorial; `SocialClient` governa CRUD, calendari, idees, estat i Instagram→pipeline; `socialPostService`, `socialIdeasService`, `socialContentPulseService`, `socialPerformanceService` i `buildSocialOperatingLoop()` mantenen idees, calendari i captació dins una sola lectura.
+
+No duplica Marketing ni Campanyes. Marketing governa canals/gaps; Campanyes genera drafts CRM massius; Social governa calendari/posting/captació social. No cal planificador avançat mentre `socialPerformanceService` no indiqui fricció recurrent real.
+
+### Validació
+- Validació tècnica: lectura forense dels fitxers i consumidors; `qa:no-dead-admin-views`; `tsc --noEmit`; `qa:protocol`; `git diff --check`.
+- Validació funcional: documentada la cadena front→serveis→Prisma/API sense canviar schema, serveis ni UI funcional.
+- Validació humana/UX: queda escrita la frontera Social/Marketing/Campanyes perquè no es reobri per intuïció.
+
+### Coordinació
+Counter → 1209. Cap canvi a inventari, packs, preus, schema, costEngine, `bookingCreationService`, col·laboradors, reserves ni scripts d'Isma.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-28 — Marketing Hub enllaça Campanyes CRM (Canvi #1208, codex)
+
+### Context
+Les fitxes #1206 i #1207 deixen clar que `/admin/campaigns` és CRM massiu manual i `/admin/marketing` és govern de canals/gaps. Faltava un cable visible perquè el propietari pugui passar de diagnòstic de captació a acció CRM massiva sense que Marketing reimplementi el generador.
+
+### Què s'ha fet
+- `app/admin/marketing/page.tsx`: CTA `Campanyes CRM` cap a `/admin/campaigns` al header d'accions.
+- `__tests__/app/admin/marketing/page.test.tsx`: el render exigeix el link i l'href.
+- `docs/admin-fitxes-pantalles.md`: la fitxa de Marketing ja no deixa aquest cable com a interrupció pendent.
+- `docs/admin-protocol.md` + `lib/constants/admin.ts`: registre #1208 i counter → 1208.
+
+### Validació
+- Validació tècnica: test focalitzat de Marketing; `tsc --noEmit`; `qa:protocol`; `qa:no-dead-admin-views`; `git diff --check`.
+- Validació funcional: Marketing obre Campanyes CRM reutilitzant la ruta viva; no hi ha servei nou, schema nou ni mutació.
+- Validació humana/UX: sortida clara de diagnòstic a acció massiva, sense confondre-la amb Social ni ROI paid complet.
+
+### Coordinació
+Counter → 1208. Cap canvi a inventari, packs, preus, schema, costEngine, `bookingCreationService`, col·laboradors, reserves ni scripts d'Isma.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-28 — Fitxa forense `/admin/marketing`: govern de canals i gaps, no ROI complet (Canvi #1207, codex)
+
+### Context
+Continuació documental del #1206. Abans de fer cap CTA entre Marketing i Campanyes, calia fitxar `/admin/marketing`: és el veí natural de Campanyes i acumula molts talls parcials del roadmap `marketing-analytics-hub`.
+
+### Què s'ha fet
+- `docs/admin-fitxes-pantalles.md`: fitxa `FETA` de `/admin/marketing` amb història, reachability, front→servei→fonts de dades, duplicacions, gaps i decisió de treball.
+- `docs/admin-inventari-pagines.md`: Marketing i Marketing Hub mantenen estat visual `🔴` però queden anotats com a fitxa forense FETA #1207.
+- `docs/admin-protocol.md`: §6.16 i §9 registren el veredicte.
+- `lib/constants/admin.ts`: counter → 1207.
+
+### Veredicte
+Marketing Hub és viu: `buildMarketingHubSummary()` té tests i `loadMarketingHubSummary()` alimenta la page. Reutilitza Capture Health, GA4/Google Ads quan estan configurats, Attribution, Google Business Profile, Prisma i `ADMIN_MARKETING_ACTIVE_CHANNEL_LOCK`.
+
+No duplica Analytics, Reporting, Economia, Social ni Campanyes. El seu rol correcte és **govern de captació i mesura**: readiness, bloqueig de paid, diagnòstic per canal i gaps ROI/CAC. El ROI/CAC extern complet continua parcial i s'ha de presentar com a gap, no com a certesa.
+
+### Validació
+- Validació tècnica: lectura forense dels fitxers i consumidors; `qa:no-dead-admin-views`; `tsc --noEmit`; `qa:protocol`.
+- Validació funcional: documentada la cadena front→servei→fonts de dades i el fet que la pantalla no muta dades.
+- Validació humana/UX: queda escrit que Marketing no és generador de campanyes ni dashboard paid complet; si cal acció CRM massiva, s'ha d'enllaçar `/admin/campaigns`.
+
+### Coordinació
+Counter → 1207. Cap canvi a inventari, packs, preus, schema, costEngine, `bookingCreationService`, col·laboradors, reserves ni scripts d'Isma.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-28 — Fitxa forense `/admin/campaigns`: CRM massiu manual, no Social duplicat (Canvi #1206, codex)
+
+### Context
+Amb Claude treballant inventari/preus/Isma fins al #1205, Codex agafa un carril disjunt i documental del full de ruta: §6.9 Social/Growth tenia el risc residual d'evitar que idees, calendari i captació es fragmentessin. `/admin/campaigns` estava `PENDENT` a les fitxes forenses i podia semblar una illa duplicada.
+
+### Què s'ha fet
+- `docs/admin-fitxes-pantalles.md`: fitxa `FETA` de `/admin/campaigns` amb reachability, història, front→servei→Prisma, consumidors, òrgans veïns, duplicacions i decisió de treball.
+- `docs/admin-inventari-pagines.md`: Campanyes manté estat visual `🔴` però queda anotada com a fitxa forense FETA #1206.
+- `docs/admin-protocol.md`: §6.9 i §9 registren el veredicte.
+- `lib/constants/admin.ts`: counter → 1206.
+
+### Veredicte
+Campanyes és viva: `campaignService.generateCampaigns()` té tests, `loadCampaigns()` alimenta la pàgina i `dailyBriefService` reutilitza la funció pura per `topCampaigns`. No duplica Social (`/admin/social` = posts/calendari/pols editorial) ni Marketing (`/admin/marketing` = canals, CAC/ROI i gaps de mesura). El seu rol correcte és **CRM massiu manual** derivat de segments de client.
+
+### Validació
+- Validació tècnica: lectura forense dels fitxers i consumidors; `qa:no-dead-admin-views`; `tsc --noEmit`; `qa:protocol`.
+- Validació funcional: documentada la cadena front→servei→Prisma i el fet que la pantalla no muta dades.
+- Validació humana/UX: queda escrit que no és enviador automàtic ni calendari social; si algun dia s'automatitza, ha de passar per Inbox/Timeline amb traça canònica.
+
+### Coordinació
+Counter → 1206. Cap canvi a inventari, packs, preus, schema, costEngine, `bookingCreationService`, col·laboradors, reserves ni scripts d'Isma.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-28 — So real: col·laborador Isma (lloguer 50€/bolo) + EV ETX-12P com a desig futur (Canvi #1205, claude)
 
 ### Context

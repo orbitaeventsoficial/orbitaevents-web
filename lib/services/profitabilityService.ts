@@ -1,7 +1,7 @@
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { prisma } from '@/lib/prisma';
 import type { LeadSource, Prisma } from '@prisma/client';
-import { computeBookingFinancialSummary } from './costEngine';
+import { aggregateServiceLines, computeBookingFinancialSummary } from './costEngine';
 
 export type ProfitabilityConfig = {
   packCostRatio: number;
@@ -25,6 +25,8 @@ type BookingRow = {
   extraHours: number;
   extraHourPrice: number;
   extrasTotal: number;
+  serviceLinesRevenue: number;
+  serviceLinesCost: number;
   travelCost: number;
   source: LeadSource | 'UNKNOWN';
 };
@@ -111,7 +113,18 @@ export async function upsertProfitabilityConfig(input: ProfitabilityConfig, role
 }
 
 function toProfitabilityRow(row: BookingRow, config: ProfitabilityConfig): ProfitabilityRow {
-  const summary = computeBookingFinancialSummary({ total: row.total, packPrice: row.packPrice, extrasTotal: row.extrasTotal, extraHours: row.extraHours, extraHourPrice: row.extraHourPrice, distanceKm: 0, travelCost: row.travelCost, source: row.source }, config);
+  const summary = computeBookingFinancialSummary({
+    total: row.total,
+    packPrice: row.packPrice,
+    extrasTotal: row.extrasTotal,
+    extraHours: row.extraHours,
+    extraHourPrice: row.extraHourPrice,
+    distanceKm: 0,
+    travelCost: row.travelCost,
+    source: row.source,
+    serviceLinesRevenue: row.serviceLinesRevenue,
+    serviceLinesCost: row.serviceLinesCost,
+  }, config);
   return { ...row, directCost: summary.directCost, acquisitionCost: summary.acquisitionCost, netMargin: summary.netMargin, marginPct: summary.marginPct / 100 };
 }
 
@@ -126,11 +139,13 @@ async function fetchProfitabilityBookings() {
   const includeWithLead = {
     pack: { select: { price: true, extraHourPrice: true } },
     extras: { select: { price: true, quantity: true } },
+    serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true } },
     lead: { select: { source: true } },
   };
   const includeWithoutLead = {
     pack: { select: { price: true, extraHourPrice: true } },
     extras: { select: { price: true, quantity: true } },
+    serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true } },
   };
 
   const readAll = async (include: typeof includeWithLead | typeof includeWithoutLead) => {
@@ -170,12 +185,16 @@ export async function buildProfitabilityReport(): Promise<ProfitabilityReport> {
   const rows: ProfitabilityRow[] = bookings.map((booking) => {
     const packObj = (booking.pack && typeof booking.pack === 'object') ? (booking.pack as { price?: number; extraHourPrice?: number }) : null;
     const extrasObj = Array.isArray(booking.extras) ? booking.extras as Array<{ price?: number; quantity?: number }> : [];
+    const serviceLinesObj = Array.isArray(booking.serviceLines)
+      ? booking.serviceLines as Array<{ revenueAmount?: number | null; costAmount?: number | null; quantity?: number | null; collaboratorId?: string | null }>
+      : [];
     const leadObj = (booking.lead && typeof booking.lead === 'object') ? (booking.lead as { source?: string }) : null;
     const extrasTotal = extrasObj.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 0), 0);
+    const serviceLines = aggregateServiceLines(serviceLinesObj);
     const travelCost = typeof booking.travelCost === 'number' ? booking.travelCost : 0;
     const sourceValue = typeof leadObj?.source === 'string' ? leadObj.source : 'UNKNOWN';
     const base: BookingRow = {
-      id: String(booking.id || ''), reference: String(booking.reference || ''), status: String(booking.status || 'UNKNOWN'), eventDate: booking.eventDate instanceof Date ? booking.eventDate : new Date(), clientName: String(booking.clientName || 'Client'), total: Number(booking.total) || 0, packPrice: Number(packObj?.price) || 0, extraHours: Number(booking.extraHours) || 0, extraHourPrice: Number(packObj?.extraHourPrice) || 0, extrasTotal, travelCost, source: sourceValue as LeadSource | 'UNKNOWN',
+      id: String(booking.id || ''), reference: String(booking.reference || ''), status: String(booking.status || 'UNKNOWN'), eventDate: booking.eventDate instanceof Date ? booking.eventDate : new Date(), clientName: String(booking.clientName || 'Client'), total: Number(booking.total) || 0, packPrice: Number(packObj?.price) || 0, extraHours: Number(booking.extraHours) || 0, extraHourPrice: Number(packObj?.extraHourPrice) || 0, extrasTotal, serviceLinesRevenue: serviceLines.revenue, serviceLinesCost: serviceLines.cost, travelCost, source: sourceValue as LeadSource | 'UNKNOWN',
     };
     return toProfitabilityRow(base, config);
   });

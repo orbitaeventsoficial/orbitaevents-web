@@ -29,6 +29,7 @@ import { buildLeadWhatsAppHref } from './leadWhatsApp';
 import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
 import { SERVICE_HOURLY_RATES, resolveServicePricingKey } from '@/lib/constants/pricing-intelligence';
+import { getPaymentBand } from '@/lib/payment-status';
 
 /* ── Tipus ──────────────────────────────────────────────────────────────── */
 
@@ -52,9 +53,8 @@ export type LeadData = {
 type PayState = 'full' | 'part' | 'none';
 function paymentState(booking: LeadData['booking']): PayState | null {
   if (!booking) return null;
-  if (booking.depositPaid && booking.remainingPaid) return 'full';
-  if (booking.depositPaid) return 'part';
-  return 'none';
+  const band = getPaymentBand(booking.depositPaid, booking.remainingPaid);
+  return band === 'paid' ? 'full' : band === 'partial' ? 'part' : 'none';
 }
 type Stage = LeadData['stage'];
 type ViewMode = 'calendari' | 'pipeline' | 'llista';
@@ -81,12 +81,12 @@ const STAGE_TOOLTIP: Record<Stage, string> = {
 };
 const PAY_TOOLTIP: Record<PayState, string> = {
   full: 'Reserva pagada del tot',
-  part: 'Senyal pagat · resta pendent',
+  part: 'Pagament parcial registrat',
   none: 'Reserva sense cap pagament',
 };
 const PAY_LABEL: Record<PayState, string> = {
   full: 'Pagada',
-  part: 'Senyal pagat',
+  part: 'Pagament parcial',
   none: 'Sense pagaments',
 };
 const PIPELINE_STAGES: Stage[] = ['nou', 'contactat', 'guanyat', 'perdut'];

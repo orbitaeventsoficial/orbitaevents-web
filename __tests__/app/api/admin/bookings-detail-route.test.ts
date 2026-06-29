@@ -202,6 +202,25 @@ describe('PATCH /api/admin/bookings/[id]', () => {
     const res = await PATCH(req, params);
     expect(res.status).toBe(400);
   });
+
+  it('rebutja línies de col·laborador sense cost real', async () => {
+    const { req, params } = makePatchRequest('book-1', {
+      serviceLines: [
+        {
+          collaboratorId: 'partner-1',
+          kind: 'PROVIDER_SERVICE',
+          label: 'Animació partner',
+          revenueAmount: 240,
+        },
+      ],
+    });
+
+    const res = await PATCH(req, params);
+    expect(res.status).toBe(400);
+    expect(mockUpdateBooking).not.toHaveBeenCalled();
+    const body = await res.json();
+    expect(JSON.stringify(body.details)).toContain('cost real');
+  });
 });
 
 describe('DELETE /api/admin/bookings/[id]', () => {

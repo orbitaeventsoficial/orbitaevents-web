@@ -112,6 +112,15 @@ describe('createBookingFromInput', () => {
     expect(mockPrisma.booking.create).toHaveBeenCalledOnce();
   });
 
+  it('crea reserves noves amb transferència com a canal de cobrament per defecte', async () => {
+    await createBookingFromInput({ ...BASE_INPUT, invoiceRequired: false });
+
+    const createCall = mockPrisma.booking.create.mock.calls[0][0];
+    expect(createCall.data.paymentMethod).toBe('TRANSFER');
+    expect(createCall.data.invoiceRequired).toBe(false);
+    expect(createCall.data.vatRate).toBe(0);
+  });
+
   it('genera referència OE-YYYY-001 sense reserves prèvies', async () => {
     await createBookingFromInput(BASE_INPUT);
 
@@ -159,6 +168,7 @@ describe('createBookingFromInput', () => {
     // Travel charge depends on distance — with Google Maps returning 60km,
     // travelCharge is calculated by calculateTravelCharge(60)
     // But we'll check the financial structure is correct
+    expect(createCall.data.invoiceRequired).toBe(true);
     expect(createCall.data.vatRate).toBe(21);
     expect(createCall.data.depositAmount).toBeGreaterThan(0);
     // remainingAmount = total - deposit, arrodonit a cèntims (#699): vat i total

@@ -13,7 +13,7 @@ import { BOOKING_OVERVIEW_STATUS_CARDS, formatDate, formatDateShort, formatCurre
 import { getMarginTone } from '@/lib/margin-utils';
 import { getPaymentLabel, getPaymentTextClass, getPaymentDotClass } from '@/lib/payment-status';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
-import { computeSimpleMarginPct } from '@/lib/services/costEngine';
+import { aggregateServiceLines, computeSimpleMarginPct } from '@/lib/services/costEngine';
 import { getTranslatedPackName } from '@/lib/pack-name';
 import ExportCsvButton from '../components/ExportCsvButton';
 import dynamicImport from 'next/dynamic';
@@ -172,6 +172,7 @@ async function getBookings(params: BookingSearchParams) {
             pack: { include: { translations: true } },
             lead: { select: { id: true, name: true, source: true, preferredLocale: true } },
             extras: { select: { price: true, quantity: true } },
+            serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true } },
             _count: { select: { extras: true } },
           },
         }),
@@ -358,21 +359,24 @@ export default async function BookingsPage({
                   </div>
                   <div className="text-right shrink-0">
                     <p className="font-bold">{formatCurrency(booking.total)}</p>
-                    <span className={`inline-flex items-center gap-1 text-xs font-medium mt-0.5 ${getPaymentTextClass(booking.depositPaid, booking.remainingPaid)}`}>
-                      <span className={`inline-block h-1.5 w-1.5 rounded-full ${getPaymentDotClass(booking.depositPaid, booking.remainingPaid)}`} />
-                      {getPaymentLabel(booking.depositPaid, booking.remainingPaid)}
+                    <span className={`inline-flex items-center gap-1 text-xs font-medium mt-0.5 ${getPaymentTextClass(booking.depositPaid, booking.remainingPaid, { cashAmount: booking.cashAmount ? Number(booking.cashAmount) : null, total: Number(booking.total) })}`}>
+                      <span className={`inline-block h-1.5 w-1.5 rounded-full ${getPaymentDotClass(booking.depositPaid, booking.remainingPaid, { cashAmount: booking.cashAmount ? Number(booking.cashAmount) : null, total: Number(booking.total) })}`} />
+                      {getPaymentLabel(booking.depositPaid, booking.remainingPaid, { cashAmount: booking.cashAmount ? Number(booking.cashAmount) : null, total: Number(booking.total) })}
                     </span>
                     {(() => {
                       const extrasTotal = booking.extras.reduce((sum, e) => sum + e.price * e.quantity, 0);
+                      const serviceLines = aggregateServiceLines(booking.serviceLines);
                       const marginPct = computeSimpleMarginPct(
                         {
                           total: booking.total,
                           packPrice: booking.pack.price,
                           extrasTotal,
-                          extraHours: 0,
-                          extraHourPrice: 0,
+                          extraHours: booking.extraHours ?? 0,
+                          extraHourPrice: booking.pack.extraHourPrice ?? 0,
                           distanceKm: 0,
                           travelCost: booking.travelCost ?? 0,
+                          serviceLinesRevenue: serviceLines.revenue,
+                          serviceLinesCost: serviceLines.cost,
                         },
                         profitConfig,
                       );
@@ -491,23 +495,26 @@ export default async function BookingsPage({
                       </td>
                       <td className="px-3 py-2.5">
                         <div className="max-w-[7rem] truncate text-sm font-bold tabular-nums whitespace-nowrap">{formatCurrency(booking.total)}</div>
-                        <span className={`inline-flex items-center gap-1 text-xs mt-0.5 ${getPaymentTextClass(booking.depositPaid, booking.remainingPaid)}`}>
-                          <span className={`inline-block h-1.5 w-1.5 rounded-full ${getPaymentDotClass(booking.depositPaid, booking.remainingPaid)}`} />
-                          {getPaymentLabel(booking.depositPaid, booking.remainingPaid)}
+                        <span className={`inline-flex items-center gap-1 text-xs mt-0.5 ${getPaymentTextClass(booking.depositPaid, booking.remainingPaid, { cashAmount: booking.cashAmount ? Number(booking.cashAmount) : null, total: Number(booking.total) })}`}>
+                          <span className={`inline-block h-1.5 w-1.5 rounded-full ${getPaymentDotClass(booking.depositPaid, booking.remainingPaid, { cashAmount: booking.cashAmount ? Number(booking.cashAmount) : null, total: Number(booking.total) })}`} />
+                          {getPaymentLabel(booking.depositPaid, booking.remainingPaid, { cashAmount: booking.cashAmount ? Number(booking.cashAmount) : null, total: Number(booking.total) })}
                         </span>
                       </td>
                       <td className="px-3 py-2.5 text-center">
                         {(() => {
                           const extrasTotal = booking.extras.reduce((sum, e) => sum + e.price * e.quantity, 0);
+                          const serviceLines = aggregateServiceLines(booking.serviceLines);
                           const marginPct = computeSimpleMarginPct(
                             {
                               total: booking.total,
                               packPrice: booking.pack.price,
                               extrasTotal,
-                              extraHours: 0,
-                              extraHourPrice: 0,
+                              extraHours: booking.extraHours ?? 0,
+                              extraHourPrice: booking.pack.extraHourPrice ?? 0,
                               distanceKm: 0,
                               travelCost: booking.travelCost ?? 0,
+                              serviceLinesRevenue: serviceLines.revenue,
+                              serviceLinesCost: serviceLines.cost,
                             },
                             profitConfig,
                           );

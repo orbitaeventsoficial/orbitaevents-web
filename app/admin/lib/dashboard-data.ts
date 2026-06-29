@@ -3,7 +3,7 @@ import { getGa4Report, getGa4ConfigStatus } from '@/lib/analytics/ga4';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import { generateDailyChecklistTasks } from '@/lib/services/dailyChecklist';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
-import { computeSimpleMarginPct } from '@/lib/services/costEngine';
+import { aggregateServiceLines, computeSimpleMarginPct } from '@/lib/services/costEngine';
 import { buildCashFlowForecast } from '@/lib/services/cashFlowForecast';
 import { buildPipelineForecast } from '@/lib/services/pipelineForecast';
 import { formatDateSimple, PLACEHOLDER_EMAIL_DOMAIN, EVENT_TYPE_CHART_COLORS, TASK_SOURCE } from '@/lib/constants';
@@ -270,7 +270,14 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     cachedQuery('admin:dashboard:command:bookings', () => prisma.booking.findMany({ where: { status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] } }, orderBy: [{ eventDate: 'asc' }, { createdAt: 'desc' }], take: 6, select: { id: true, reference: true, clientName: true, status: true, eventDate: true } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery('admin:dashboard:margin:avg', () => prisma.booking.findMany({
       where: { status: { in: ['CONFIRMED', 'COMPLETED'] } },
-      select: { total: true, travelCost: true, pack: { select: { price: true } }, extras: { select: { price: true, quantity: true } } },
+      select: {
+        total: true,
+        extraHours: true,
+        travelCost: true,
+        pack: { select: { price: true, extraHourPrice: true } },
+        extras: { select: { price: true, quantity: true } },
+        serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true } },
+      },
     }), CacheTTL.SHORT).catch(() => []),
     // ─── Financial forecasts (abans bloc 4 seqüencial) ─────────────────
     cachedQuery('admin:dashboard:cashflow', () => buildCashFlowForecast(2), CacheTTL.SHORT).catch(() => []),
@@ -356,19 +363,29 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   const conversionRate = leadsCount > 0 ? Math.round((wonLeads / leadsCount) * 100) : 0;
 
   // Marge mitjà de reserves confirmades/completades
-  const marginPcts = (marginBookings as Array<{ total: number; travelCost: number | null; pack: { price: number }; extras: Array<{ price: number; quantity: number }> }>)
+  const marginPcts = (marginBookings as Array<{
+    total: number;
+    extraHours: number | null;
+    travelCost: number | null;
+    pack: { price: number; extraHourPrice: number };
+    extras: Array<{ price: number; quantity: number }>;
+    serviceLines: Array<{ revenueAmount: number | null; costAmount: number | null; quantity: number | null; collaboratorId: string | null }>;
+  }>)
     .filter((b) => b.total > 0)
     .map((b) => {
       const extrasTotal = b.extras.reduce((sum, e) => sum + e.price * e.quantity, 0);
+      const serviceLines = aggregateServiceLines(b.serviceLines);
       return computeSimpleMarginPct(
         {
           total: b.total,
           packPrice: b.pack.price,
           extrasTotal,
-          extraHours: 0,
-          extraHourPrice: 0,
+          extraHours: b.extraHours ?? 0,
+          extraHourPrice: b.pack.extraHourPrice ?? 0,
           distanceKm: 0,
           travelCost: b.travelCost ?? 0,
+          serviceLinesRevenue: serviceLines.revenue,
+          serviceLinesCost: serviceLines.cost,
         },
         profitConfig,
       );

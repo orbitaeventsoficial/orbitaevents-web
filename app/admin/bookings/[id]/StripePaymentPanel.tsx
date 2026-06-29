@@ -201,7 +201,7 @@ export default function StripePaymentPanel({
           </div>
           <div>
             <p className="bd__stripe-title">Pagaments</p>
-            <p className="bd__stripe-copy">Stripe · Bizum · links de checkout</p>
+            <p className="bd__stripe-copy">Vies per tram: Stripe checkout o Bizum declarat pel client</p>
           </div>
         </div>
         {hasBizumPending && !bothPaid && (

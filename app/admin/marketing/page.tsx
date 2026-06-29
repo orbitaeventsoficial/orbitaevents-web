@@ -63,6 +63,9 @@ export default async function MarketingPage() {
           <Link href="/admin/analytics" className="ap-btn ap-btn--secondary text-xs">
             Analítica
           </Link>
+          <Link href="/admin/campaigns" className="ap-btn ap-btn--secondary text-xs">
+            Campanyes CRM
+          </Link>
         </div>
       }
     >

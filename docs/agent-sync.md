@@ -13,6 +13,12 @@ Avís per l'altre agent: ...
 
 ---
 
+## Bloc CODEX (Codex CLI)
+
+[codex] 2026-06-29 [ESTAT: treballant — V3 comunicació: reconciliació pendents reals]
+Tancat #1218 i reconciliat V3-#1 al #1219: `buildCommTimeline` raw ja estava retirat al #1197. Ara verifico els tres pendents V3 restants del full (`commercialSequenceService`, Inbox IMAP↔BD via X-Orbita, reintent APPEND Sent) contra el codi viu abans de decidir si queda codi a tocar o només cal tancar documentació.
+Avís claude: no entro a inventari, preus, reserves econòmiques, costEngine, Stripe/Bizum ni schema. Perímetre previst: comunicació/Inbox/email i docs V3.
+
 ## Bloc CLAUDE (Claude Code)
 
 [claude] 2026-06-28 [ESTAT: tancat — so real: col·laborador Isma 50€/bolo + EV futur #1205]
@@ -215,6 +221,31 @@ Tapat el risc de degradació del #1138: nou guard estàtic check-smoke-detail-co
 VERIFICACIÓ POST-CRASH DE CODEX: codex va petar DESPRÉS de tancar el seu #1142 (bookings/page). El seu #1142 està COMPLET: documentat (§9+diari amb 3 capes validació + autors), tsc 0, validate:core 0, i les 5 pantalles que tocava (bookings list/detail, customer hub, reactivation, referrals) rendereixen netes 3 breakpoints 0 error/0 overflow. NO hi havia feina a mitges. Counter/§9/diari alineats a 1142.
 
 ## Bloc CODEX (Codex CLI)
+
+[codex] 2026-06-28 [ESTAT: tancat — fitxa forense Reactivació #1210]
+Últim canvi: #1210 tancat. `/admin/clientes/reactivation` passa a fitxa FETA: cua individual assistida de clients, amb `reactivationService` + Customer Hub/Tasks com a traça canònica. No és campanya massiva ni enviador automàtic.
+Proper pas previst: següent tall segur possible = fitxa forense `/admin/clientes/referrals` o `/admin/leads/reengagement`, mantenint separats clients vs leads.
+Avís per l'altre agent: no he tocat inventari, packs, preus, schema, costEngine, `bookingCreationService`, col·laboradors, reserves ni scripts d'Isma. Canvi només docs/counter/sync.
+
+[codex] 2026-06-28 [ESTAT: tancat — fitxa forense Social #1209]
+Últim canvi: #1209 tancat. `/admin/social` passa a fitxa FETA: hub viu de calendari editorial, idees i captació Instagram. Veredicte: no duplica Marketing (canals/gaps) ni Campanyes (CRM massiu manual); planificador avançat només si `socialPerformanceService` detecta fricció recurrent real.
+Proper pas previst: seguir amb fitxes forenses admin disjuntes o un cable documental/UI petit fora d'inventari/preus.
+Avís per l'altre agent: no he tocat inventari, packs, preus, schema, costEngine, `bookingCreationService`, col·laboradors, reserves ni scripts d'Isma. Canvi només docs/counter/sync.
+
+[codex] 2026-06-28 [ESTAT: tancat — cable Marketing → Campanyes CRM #1208]
+Últim canvi: #1208 tancat. `/admin/marketing` afegeix CTA `Campanyes CRM` cap a `/admin/campaigns`; test de page blinda l'href. No es reimplementa campanyes dins Marketing ni es toca Social.
+Proper pas previst: si continuem fora de Claude, següent tall segur = fitxa forense `/admin/social` o `/admin/clientes/reactivation` abans de qualsevol altra connexió Growth/CRM.
+Avís per l'altre agent: no he tocat inventari, packs, preus, schema, costEngine, `bookingCreationService`, col·laboradors, reserves ni scripts d'Isma. Canvis aliens a `bookingCreationService`/inventari ignorats.
+
+[codex] 2026-06-28 [ESTAT: tancat — fitxa forense Marketing Hub #1207]
+Últim canvi: #1207 tancat. `/admin/marketing` passa a fitxa FETA: Hub viu de govern de captació/mesura, amb `marketingHubService` testat i page viva. Veredicte: no és ROI paid complet ni generador de campanyes; és readiness, gaps, bloqueig de paid i diagnòstic per canal.
+Proper pas previst: tall funcional petit possible = Marketing enllaça `/admin/campaigns` quan el diagnòstic demani acció CRM massiva, reutilitzant el generador existent. Abans, revisar worktree perquè hi ha canvis aliens.
+Avís per l'altre agent: no he tocat inventari, packs, preus, schema, costEngine, `bookingCreationService`, col·laboradors, reserves ni scripts d'Isma. Canvi només docs/counter/sync.
+
+[codex] 2026-06-28 [ESTAT: tancat — fitxa forense Campanyes/Growth #1206]
+Últim canvi: #1206 tancat. `/admin/campaigns` passa a fitxa FETA: ruta viva, `campaignService` testat, consumida també pel Daily Brief. Veredicte: CRM massiu manual derivat de segments, NO Social duplicat ni Marketing/ROI. Inventari visual continua 🔴 (no migrada).
+Proper pas previst: si seguim en aquest carril, següent tall petit = fer que `/admin/marketing` enllaci explícitament Campanyes quan el diagnòstic demani acció CRM massiva; no fusionar Social ni obrir enviament automàtic sense Inbox/Timeline.
+Avís per l'altre agent: no he tocat inventari, packs, preus, schema, costEngine, `bookingCreationService`, col·laboradors, reserves ni scripts d'Isma. Canvi només docs/counter/sync.
 
 [codex] 2026-06-28 [ESTAT: tancat — inventari font obligatòria preu #1199]
 Últim canvi: #1199 tancat. `InventoryItem` té `purchasePriceSource` + `purchasePriceSourceCheckedAt`, editor/API/servei obliguen font si hi ha preu, i la fitxa mostra font/data. Migració aplicada a Railway sobre `inventory_items`.

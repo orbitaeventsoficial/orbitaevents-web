@@ -45,7 +45,7 @@ export default function ReplacementSearchButton({ itemId }: { itemId: string }) 
     }
   }
 
-  async function useAsReplacement(link: string | null) {
+  async function handleUseAsReplacement(link: string | null) {
     if (!link) return;
     setSavingLink(link);
     try {
@@ -102,7 +102,7 @@ export default function ReplacementSearchButton({ itemId }: { itemId: string }) 
                     <a href={c.link} target="_blank" rel="noopener noreferrer" className="ap-btn ap-btn--xs">Comprar ↗</a>
                   )}
                   {c.link && (
-                    <button type="button" onClick={() => useAsReplacement(c.link)} className="ap-btn ap-btn--xs ap-btn--primary" disabled={savingLink === c.link}>
+                    <button type="button" onClick={() => handleUseAsReplacement(c.link)} className="ap-btn ap-btn--xs ap-btn--primary" disabled={savingLink === c.link}>
                       {savingLink === c.link ? 'Desant…' : 'Usar'}
                     </button>
                   )}

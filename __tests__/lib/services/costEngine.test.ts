@@ -548,6 +548,25 @@ describe('costEngine', () => {
       const cacPct = (summary.acquisitionCost / input.total) * 100;
       expect(simplePct - summary.marginPct).toBeCloseTo(cacPct, 2);
     });
+
+    it('inclou cost de línies de servei en el marge simple de llistes i dashboards', () => {
+      const input = baseInput({
+        total: 1000,
+        packPrice: 0,
+        extrasTotal: 0,
+        extraHours: 0,
+        extraHourPrice: 0,
+        distanceKm: 0,
+        travelCost: 0,
+        serviceLinesRevenue: 300,
+        serviceLinesCost: 120,
+      });
+
+      const simplePct = computeSimpleMarginPct(input, defaultConfig);
+
+      // directCost = fixedOperationalCost 45 + serviceLinesCost 120 = 165
+      expect(simplePct).toBeCloseTo(83.5, 2);
+    });
   });
 
   // ─── computeCollaboratorNetMargin ──────────────────────────────────────────

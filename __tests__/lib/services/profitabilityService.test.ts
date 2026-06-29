@@ -150,5 +150,12 @@ describe('profitabilityService', () => {
       expect(source).toContain('batch.length === PROFITABILITY_BATCH_SIZE');
       expect(source).not.toContain('while (true)');
     });
+
+    it('carrega serviceLines i les passa al motor de marge', () => {
+      expect(source).toContain('serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true } }');
+      expect(source).toContain('aggregateServiceLines(serviceLinesObj)');
+      expect(source).toContain('serviceLinesRevenue: row.serviceLinesRevenue');
+      expect(source).toContain('serviceLinesCost: row.serviceLinesCost');
+    });
   });
 });

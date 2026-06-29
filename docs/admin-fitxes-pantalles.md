@@ -749,6 +749,342 @@ Connexions interrompudes: cap. cockpit↔economicCockpitService (forecast unific
 
 Decisio de treball: organ SA. `/studio` queda protegit a part (qa:studio-integrity). Editors (canvas/managers) són exempts legítims. Cap canvi de codi. Pendent validacio visual del propietari.
 
+### `/admin/campaigns`
+
+Pantalla: Campanyes — comunicacions massives suggerides per segment CRM.
+Ruta: `/admin/campaigns`
+Estat inventari: 🔴 (no migrada visualment al mapa de pàgines)
+TANCAT CHARLIE: no — pendent validacio visual del propietari.
+Estat fitxa: FETA (auditoria forense #1206, codex, 2026-06-28)
+
+Història:
+- Construida al cicle d'expansio CRM/Growth (commit base `2f2bc545`) amb servei pur `generateCampaigns()` i page server `CampaignsPage`.
+- Reforçada visualment al #295 amb `OwnerControlStrip` segons el registre historic, i sanejada posteriorment pels guards admin-canon/no-slate-gray.
+- El #379 decideix que Social no necessita planificador editorial avançat; el #601 i #688 blinden que Social no es fragmenti. Aquesta fitxa comprova que Campanyes no és una ruta social paral·lela, sino CRM massiu.
+
+Reachability:
+- `app/admin/campaigns/page.tsx` és una ruta Next real, `dynamic = 'force-dynamic'`.
+- `app/admin/lib/adminNav.ts` classifica `/admin/campaigns` dins l'òrgan `web`.
+- `app/admin/components/DailyBriefPanel.tsx` enllaça a `/admin/campaigns` quan `brief.topCampaigns` existeix.
+- `lib/constants/adminManual.ts` referencia `/admin/campaigns` al ritme setmanal de divendres.
+
+Component viu:
+- `app/admin/campaigns/page.tsx`: server component autocontingut. Renderitza `AdminPage`, KPIs, empty state, llistat de `CampaignCard` i bloc explicatiu.
+- No hi ha component fill extern propi ni CSS local.
+
+CSS viu:
+- Sense CSS local. Consumeix classes canòniques globals (`AdminPage`, `.ap-card`, `.ap-btn` indirectament quan pertoqui, `admin-tone-*`).
+- Residu visual pendent de possible sanejament posterior: alguns detalls són Tailwind/local (`rounded-lg`, `border-white/15`, emoji icons). No bloqueja la fitxa perquè és estat existent i no s'ha tocat codi funcional.
+
+APIs/serveis vius:
+- `lib/services/campaignService.ts`
+  - `generateCampaigns(input)` és la funció pura i testada.
+  - `loadCampaigns(now)` carrega segments CRM via Prisma (`customer.count`) i genera drafts.
+- `lib/services/dailyBriefService.ts` consumeix `generateCampaigns()` per alimentar el resum diari i `topCampaigns`.
+- No hi ha API route pròpia ni model `Campaign`: les campanyes són suggeriments calculats, no entitat persistent.
+
+Dades que governa:
+- Lectures agregades de `Customer`: `total`, `totalEvents`, `createdAt`, `lifecycleStage`, `healthScore`, `totalSpent`.
+- Constants de domini: `CUSTOMER_SEGMENTS`, `CUSTOMER_DORMANT_MONTHS`.
+- Sortida: drafts amb `type`, `segment`, `audienceSize`, `channel`, `subject`, `bodyTemplate`, `urgency`, `estimatedImpact`.
+
+Accions que governa:
+- Cap mutació. La pantalla no envia campanyes; només mostra suggeriments i plantilles perquè el propietari executi manualment per WhatsApp/email.
+- CTA principal cap a `/admin/clientes/reactivation` per passar de comunicació massiva a reactivació individual.
+
+Òrgans veïns:
+- upstream: Customer Hub / CRM (`Customer.lifecycleStage`, `healthScore`, `totalEvents`, `totalSpent`).
+- downstream: Dashboard/Daily Brief (`topCampaigns`), Manual operatiu (cadència de divendres), Reacció individual (`/admin/clientes/reactivation`).
+- veïns conceptuals: `/admin/marketing` governa canals/ROI/gaps; `/admin/social` governa calendari editorial i captació Instagram; `/admin/campaigns` governa campanyes CRM massives manuals.
+
+Codi mort relacionat:
+- Cap evidència de codi mort: `generateCampaigns` té tests i consumidors (`loadCampaigns`, `dailyBriefService`); la page és reachable.
+
+Duplicacions:
+- No duplica Social: Social tracta posts/calendari/pols editorial, no missatges CRM massius.
+- No duplica Marketing: Marketing diagnostica canals, ROI/CAC i gaps de mesura; Campanyes genera drafts concrets a partir de segments de client.
+- Solapament controlat amb Reactivació: Campanyes és massiu/manual; Reactivació és individualitzada. El CTA cap a Reactivació és correcte.
+
+Hardcoded/residu visual:
+- Text admin local en català acceptable per pantalla admin, però les plantilles de missatge i labels de campanya són decisions de domini i viuen dins el servei. Si es toca funcionalment, primer s'ha de decidir si aquestes plantilles passen a constants compartides o es mantenen com a sortida del generador pur.
+- `getMonthName()` usa `toLocaleDateString` dins servei. No és inline admin UI, però si el domini creix convé derivar-ho dels helpers de `lib/constants`.
+- Icons emoji locals (`TYPE_ICON`, `CHANNEL_ICON`) i maps locals (`URGENCY_TONE`, `URGENCY_LABEL`) són deute menor de monocapa si es reutilitzen en una altra superfície.
+
+Connexions interrompudes:
+- La pantalla no deixa traça d'execucio: com que només copia/mostra plantilles, no sap si una campanya s'ha enviat. Això és decisió de producte futura, no bug actual.
+- No està integrada dins `/admin/marketing`; avui és una ruta separada. La separació és tolerable perquè el rol és diferent, però el següent pas natural seria que Marketing l'enllaci com a "acció CRM massiva" quan el canal actiu ho demani.
+
+Riscos:
+- Reobrir-la com a planificador social duplicaria el #379/#601/#688 i trencaria §6.9.
+- Automatitzar enviament massiu sense traça a Inbox/Timeline duplicaria comunicacions i saltaria el fil canònic.
+- Convertir-la en entitat persistent exigiria decisió de producte i model propi; no és necessari per l'ús actual.
+
+Evidència d'auditoria:
+- fitxers llegits línia per línia: `app/admin/campaigns/page.tsx`, `lib/services/campaignService.ts`, `__tests__/lib/services/campaignService.test.ts`.
+- imports/exports verificats: `loadCampaigns` a page, `generateCampaigns` a tests i `dailyBriefService`, `/admin/campaigns` a `DailyBriefPanel`, `adminManual` i `adminNav`.
+- selectors CSS verificats contra DOM: no hi ha CSS local; classes globals existents.
+- serveis/APIs seguits: page → `loadCampaigns()` → Prisma `customer.count`; daily brief → `generateCampaigns()`.
+- proves/guards executats: lectura forense + `rg` de consumidors. Validació tècnica final del canvi documental: `qa:protocol`, `qa:no-dead-admin-views`, `tsc --noEmit`.
+
+Decisio de treball:
+- conservar `/admin/campaigns` com a eina viva de CRM massiu manual.
+- no tocar codi funcional en aquest tall.
+- següent tall recomanat, si es vol millorar: fer que `/admin/marketing` enllaci explícitament a Campanyes quan el diagnòstic demani acció CRM massiva, sense fusionar Social ni crear un segon planificador.
+- prohibició operativa: no afegir enviament massiu automàtic aquí sense passar per Inbox/Timeline i traça canònica.
+
+### `/admin/marketing`
+
+Pantalla: Marketing Hub — govern de captació, canals, mesura i bloqueig de paid media.
+Ruta: `/admin/marketing`
+Estat inventari: 🔴 (no migrada visualment al mapa de pàgines)
+TANCAT CHARLIE: no — pendent validacio visual del propietari.
+Estat fitxa: FETA (auditoria forense #1207, codex, 2026-06-28)
+
+Història:
+- Creat al #628 com a primera ruta operativa del roadmap `marketing-analytics-hub`, sense obrir OAuth nou.
+- Reforçat als #664/#665 amb diagnòstic i conversió per canal CRM; #716/#717 amb gaps ROI/CAC i ingressos atribuïts; #718/#719 amb Google Ads/GA4 reals quan estan configurats; #720/#736 amb Google Business Profile OAuth; #738 amb distinció Meta Pixel vs cost Meta Ads.
+- Tokenitzat visualment al #993. No estava fitxat forensicament abans del #1207.
+
+Reachability:
+- `app/admin/marketing/page.tsx` és ruta Next real, `dynamic = 'force-dynamic'`.
+- `app/admin/lib/adminNav.ts` classifica `/admin/marketing` dins l'òrgan `web`.
+- `app/admin/manual/page.tsx` apunta a `/admin/marketing` com a CTA de l'àrea `Captació i vendes`.
+- `lib/constants/adminManual.ts` conserva `marketing-analytics-hub` com a roadmap pendent ampli, però el hub existent ja cobreix govern intern i gaps de mesura.
+
+Component viu:
+- `app/admin/marketing/page.tsx`: server component que renderitza `AdminPage`, readiness, KPIs de captació, diagnòstic per canal, gaps ROI/CAC, canal actiu, integracions i fonts CRM dels últims 90 dies.
+- No té client component propi ni CSS local.
+
+CSS viu:
+- Sense CSS local. Consumeix `AdminPage`, `.ap-card`, `.ap-kpi`, `.ap-btn`, `.ap-badge`, `admin-tone-*` i tokens globals.
+- Residu visual menor existent: alguns contenidors combinen `ap-card` amb `rounded-2xl`; no es toca en aquesta fitxa.
+
+APIs/serveis vius:
+- `lib/services/marketingHubService.ts`
+  - `buildMarketingHubSummary(input)`: funció pura testada.
+  - `loadMarketingHubSummary()`: wrapper amb `loadCaptureHealth`, `getGa4ConfigStatus`, `getGa4Report`, `getGoogleAdsConfigStatus`, `getGoogleAdsReport`, `loadAttributionReport`, `getGoogleBusinessIntegrationConfig`, `prisma.lead.groupBy` i `ADMIN_MARKETING_ACTIVE_CHANNEL_LOCK`.
+- Tests vius: `__tests__/lib/services/marketingHubService.test.ts` i `__tests__/app/admin/marketing/page.test.tsx`.
+- No hi ha API route pròpia de Marketing Hub. L'API `/api/admin/marketing/spend` pertany a despesa/CAC dins Economia, no a aquesta pàgina.
+
+Dades que governa:
+- Salut de captació: leads 7/30/90 dies, tendències i fonts (`captureHealthService`).
+- Conversió CRM per origen: `Lead.source` + `Lead.status`.
+- Ingressos atribuïts: `attributionService`.
+- Integracions: GA4, Google Ads, Google Business Profile, Meta Pixel.
+- Regla operativa: `ADMIN_MARKETING_ACTIVE_CHANNEL_LOCK` i fases del manual.
+
+Accions que governa:
+- Cap mutació. És un hub de lectura i decisió.
+- CTAs cap a `/admin/analytics`, `/admin/reporting`, `/admin/settings/integrations`, `/admin/manual`, `/admin/google-reviews`, `/admin/text-manager`, `/admin/social`, `/admin/clientes/referrals` o `/admin/leads` segons diagnòstic.
+
+Òrgans veïns:
+- upstream: Captació/Leads, Attribution, GA4/Google Ads, Google Business Profile, Manual intern.
+- downstream: Analytics, Reporting, Manual, Integracions, Google Reviews, Text Manager, Social, Referrals, Leads.
+- veí pendent de cable suau: `/admin/campaigns` com a acció CRM massiva manual quan el diagnòstic demani segmentació.
+
+Codi mort relacionat:
+- Cap evidència de codi mort: servei, pàgina i tests són vius; `loadMarketingHubSummary()` és importat per la page.
+
+Duplicacions:
+- No duplica Analytics: Analytics mostra dades GA4/Ads; Marketing decideix què fer amb canals i gaps.
+- No duplica Reporting/Economia: Reporting/Economia llegeixen conversió, marge, CAC i despesa; Marketing governa readiness i bloqueig d'inversió.
+- No duplica Campanyes: Campanyes genera drafts massius CRM; Marketing diagnostica quin canal reforçar i quina dada falta.
+- No duplica Social: Social governa calendari/posting; Marketing només hi deriva quan origen Instagram o canal social demana acció.
+
+Hardcoded/residu visual:
+- Copy admin local acceptable; la semàntica estable de canals/gates viu a `adminManual.ts` o a `marketingHubService`.
+- `getSourceAction()` és un mapping de domini dins el servei. Si es reutilitza fora de Marketing, s'hauria d'extreure a constant/helper compartit.
+- No hi ha colors hex ni CSS local a la pàgina.
+
+Connexions interrompudes:
+- ROI/CAC extern complet continua parcial: Meta Ads no té connector de cost, i Google Ads/GA4 només aporten dades quan la config està preparada. La pantalla ho explica com a gap, no ho ven com a complet.
+- El cable suau cap a `/admin/campaigns` queda afegit al #1208 com a CTA `Campanyes CRM` dins les accions del header de Marketing.
+
+Riscos:
+- Presentar readiness com a ROI complet seria enganyós; la fitxa fixa que és hub de govern i gaps, no BI paid complet.
+- Obrir connectors paid o automatismes sense sortir del `ADMIN_MARKETING_ACTIVE_CHANNEL_LOCK` trencaria la regla anti-dispersió.
+- Afegir campanyes dins Marketing com a segon generador duplicaria `/admin/campaigns`; cal enllaçar, no reimplementar.
+
+Evidència d'auditoria:
+- fitxers llegits línia per línia: `app/admin/marketing/page.tsx`, `lib/services/marketingHubService.ts`, `__tests__/lib/services/marketingHubService.test.ts`, `__tests__/app/admin/marketing/page.test.tsx`, tram de `lib/constants/adminManual.ts`.
+- imports/exports verificats: `loadMarketingHubSummary` → page; `buildMarketingHubSummary` → tests; `/admin/marketing` → Manual i nav.
+- selectors CSS verificats contra DOM: no hi ha CSS local; classes globals existents.
+- serveis/APIs seguits: page → `loadMarketingHubSummary()` → capture/GA4/Ads/Attribution/GBP/Prisma.
+- proves/guards executats: lectura forense + `rg` de consumidors. Validació tècnica final del canvi documental: `qa:no-dead-admin-views`, `tsc --noEmit`, `qa:protocol`.
+
+Decisio de treball:
+- conservar `/admin/marketing` com a hub viu de govern de captació i mesura.
+- no reimplementar campanyes dins Marketing; el cable correcte és l'enllaç cap a `/admin/campaigns` (#1208).
+- no crear connectors paid nous ni enviar campanyes automàtiques sense decisió explícita i traça canònica.
+
+### `/admin/social`
+
+Pantalla: Social Media — calendari editorial, idees i captació Instagram.
+Ruta: `/admin/social`
+Estat inventari: 🔴 (no migrada visualment al mapa de pàgines)
+TANCAT CHARLIE: no — pendent validacio visual del propietari.
+Estat fitxa: FETA (auditoria forense #1209, codex, 2026-06-28)
+
+Història:
+- Creat al cicle Social Media Calendar (#38) amb workspace complet, CRUD, vista llista/calendari mensual, modal i KPIs.
+- Connectat a idees automàtiques (#40), mètriques de rendiment (#147), decisió de no fer planificador avançat (#379), pols editorial (#555), bucle social únic (#601), guard anti-split (#688) i regularització documental #742.
+- El #1206 i #1207 han fixat els veïns: Campanyes és CRM massiu manual; Marketing és govern de canals/gaps. Aquesta fitxa comprova que Social continua sent la font viva de calendari/posting/captació social.
+
+Reachability:
+- `app/admin/social/page.tsx` és ruta Next real, `dynamic = 'force-dynamic'`.
+- `app/admin/lib/adminNav.ts` classifica `/admin/social` dins l'òrgan `web`.
+- Daily Brief, Sales Ops, Calendari i Marketing Hub apunten a `/admin/social` com a sortida operativa quan el senyal és social.
+- APIs vives: `/api/admin/social-posts`, `/api/admin/social-posts/[id]`, `/api/admin/social-posts/performance`.
+
+Component viu:
+- `app/admin/social/page.tsx`: carrega en paral·lel `listSocialPosts()`, `getSocialPostCounts()`, `loadSocialIdeas()` i `loadSocialContentPulse()`; serialitza dates i passa el contracte a `SocialClient`.
+- `app/admin/social/SocialClient.tsx`: client component amb llista/calendari, filtres, modal crear/editar, canvi d'estat, eliminar, panell d'idees, pols editorial, cadència, cua i Instagram→pipeline.
+- `buildSocialOperatingLoop()` dona el veredicte únic abans dels KPI: idees, publicacions programades/publicades i captació Instagram en una sola lectura.
+
+CSS viu:
+- No hi ha CSS local de la ruta; consumeix classes globals admin/Tailwind existents.
+- Residu visual menor existent: maps locals amb emoji (`IDEA_SOURCE_ICON`, `PLATFORM_ICON`) i tons locals (`STATUS_TONE`). No es toca en aquesta fitxa; si es reutilitzen fora de Social, s'han d'extreure a constants compartides.
+
+APIs/serveis vius:
+- `lib/services/socialPostService.ts`: validació, CRUD, counts, calendari i sincronització amb Google Calendar (`syncSocialPostToGoogleCalendar`).
+- `lib/services/socialIdeasService.ts`: genera idees des de bookings recents, testimonials aprovats, portfolio publicat i esdeveniments propers.
+- `lib/services/socialContentPulseService.ts`: calcula pols 30 dies, consistència, drafts, programades i leads Instagram.
+- `lib/services/socialPerformanceService.ts`: mètriques per canal i recomanacions de ritme/diversitat.
+- Tests vius: `SocialClient.test.tsx`, `socialOperatingLoop.test.ts`, routes API i serveis social.
+
+Dades que governa:
+- Posts socials (`SocialPost`) amb estat, plataformes, calendari, publicació, media, booking vinculat i notes.
+- Idees de contingut derivades de booking/testimonial/portfolio/upcoming events.
+- Pols editorial: publicades, programades, esborranys, consistència, dies des de l'últim post.
+- Captació social: leads d'origen Instagram i guanyats.
+
+Accions que governa:
+- Crear/editar posts socials.
+- Canviar estat (`IDEA`, `DRAFT`, `SCHEDULED`, `PUBLISHED`, `ARCHIVED`).
+- Eliminar posts.
+- Pre-omplir posts des d'idees generades.
+- Sincronitzar cada canvi amb Google Calendar.
+
+Òrgans veïns:
+- upstream: Bookings, Testimonials, Portfolio, Leads Instagram, Google Calendar.
+- downstream: Daily Brief, Sales Ops, Calendari, Marketing Hub i reporting social.
+- veïns conceptuals: `/admin/marketing` diagnostica canals/gaps; `/admin/campaigns` genera drafts CRM massius; `/admin/social` governa calendari, posting i pols editorial.
+
+Codi mort relacionat:
+- Cap evidència de codi mort: la page importa tots els serveis principals, les APIs són consumides pel client i els tests cobreixen serveis, ruta i component.
+
+Duplicacions:
+- No duplica Marketing: Social executa contingut i calendari; Marketing decideix readiness, canals i gaps de mesura.
+- No duplica Campanyes: Social tracta posts/plataformes/calendari; Campanyes tracta missatges CRM massius a segments de clients.
+- No necessita planificador avançat ara: el #379/#742 deixen el criteri de reobertura només si `socialPerformanceService` marca inactivitat o baixa freqüència recurrent.
+
+Hardcoded/residu visual:
+- Copy admin local acceptable per pantalla interna.
+- Constants de domini de plataformes/estats/tipus/categories viuen a `lib/constants`; el client encara té mappings visuals locals perquè només són d'aquesta pantalla.
+- Si Social es divideix o algun mapping es reutilitza fora de la ruta, cal extreure'l abans de duplicar.
+
+Connexions interrompudes:
+- No hi ha connector real de publicació directa a xarxes; Social és calendari/operació, no publisher automàtic.
+- El rendiment per canal existeix com a servei/API, però la fitxa actual confirma el paper del workspace, no l'eleva a BI paid complet.
+
+Riscos:
+- Crear rutes separades `social-calendar`, `social-ideas` o `editorial-calendar` trencaria el guard #688 i fragmentaria §6.9.
+- Convertir Marketing en calendari social o Social en generador CRM duplicaria responsabilitats ja fixades al #1206/#1207.
+- Automatitzar publicació externa sense traça i permisos explícits seria una capacitat nova, no una millora menor.
+
+Evidència d'auditoria:
+- fitxers llegits línia per línia: `app/admin/social/page.tsx`, `lib/services/socialPostService.ts`, `lib/services/socialIdeasService.ts`, `lib/services/socialContentPulseService.ts`, `lib/socialOperatingLoop.ts`.
+- imports/exports verificats: page → serveis social; `SocialClient` → APIs; `buildSocialOperatingLoop` → client i tests; consumidors de `/admin/social` via `rg`.
+- serveis/APIs seguits: page → `listSocialPosts`/`loadSocialIdeas`/`loadSocialContentPulse`; client → `/api/admin/social-posts`; service → Prisma + Google Calendar.
+- proves/guards executats: lectura forense + `rg` de consumidors. Validació tècnica final del canvi documental: `qa:no-dead-admin-views`, `tsc --noEmit`, `qa:protocol`, `git diff --check`.
+
+Decisio de treball:
+- conservar `/admin/social` com a hub viu de calendari editorial, idees i captació social.
+- no crear planificador social avançat mentre no hi hagi fricció recurrent mesurada.
+- no fusionar Social amb Marketing ni Campanyes; els tres òrgans queden separats i cablejats per responsabilitat.
+
+### `/admin/clientes/reactivation`
+
+Pantalla: Reactivació de clients — candidats individuals per recuperar recurrència.
+Ruta: `/admin/clientes/reactivation`
+Estat inventari: 🔴 (no migrada visualment al mapa de pàgines)
+TANCAT CHARLIE: no — pendent validacio visual del propietari.
+Estat fitxa: FETA (auditoria forense #1210, codex, 2026-06-28)
+
+Història:
+- Creat al #41 amb `reactivationService.ts`, UI completa i 20 tests: candidats dormants/en risc, missatges ca/es, WhatsApp/email/copiar/descartar.
+- Integrat posteriorment amb Customer Hub i Tasks (#201-#210): la reactivació assistida obre esborrany o tasca, no enviament automàtic, i queda deduplicada per `TASK_DEDUPE_KEY.reactivation(customerId)`.
+- Visualment drenada als #1137/#1139 i reparada de tokens fantasma al #1169. Aquesta fitxa en comprova el rol funcional dins el mapa Campanyes/Social/Marketing.
+
+Reachability:
+- `app/admin/clientes/reactivation/page.tsx` és ruta Next real, `dynamic = 'force-dynamic'`.
+- `app/admin/lib/adminNav.ts` classifica l'àrea Clients; `/admin/campaigns` enllaça cap a aquesta ruta com a pas individual.
+- `lib/constants/adminManual.ts`, Daily Brief i Customer Hub referencien la reactivació com a part de recurrència/CRM.
+- `loading.tsx` existeix per contracte de pàgina admin.
+
+Component viu:
+- `page.tsx`: carrega `loadReactivationCandidates()` i renderitza `AdminPage` amb CTA `Tornar al CRM`.
+- `ReactivationClient.tsx`: filtra per prioritat, descarta candidats localment, copia missatge, obre WhatsApp/email, enllaça Customer Hub i mostra facts comercials del client.
+- `reactivation.css`: gramàtica local `rc__*` escopada a la ruta, amb tokens reparats.
+
+APIs/serveis vius:
+- `lib/services/reactivationService.ts`
+  - `generateReactivationCandidates(input)`: funció pura testada.
+  - `loadReactivationCandidates(now, limit)`: wrapper Prisma sobre `Customer`.
+- Tests vius: `__tests__/lib/services/reactivationService.test.ts` (classificació, exclusions, ordenació, templates, canals, URL WhatsApp, dies).
+- Traça operativa indirecta: Customer Hub genera tasques de reactivació amb `TASK_SOURCE.REACTIVATION` i dedupeKey canònic; `taskAdminService` deduplica/reobre quan cal.
+
+Dades que governa:
+- Lectura de `Customer`: lifecycleStage, totalEvents, totalSpent, healthScore, lastEventDate, lastContactedAt, preferredLocale, marketingConsent, email, telèfon i instagram.
+- Classificacions: `DORMANT_VIP`, `DORMANT_HIGH_VALUE`, `DORMANT_RECURRING`, `DORMANT_FIRST_TIME`, `AT_RISK_HEALTH`, `CHURNED_RECOVERY`.
+- Sortida: prioritat, score, canals suggerits, assumpte, missatge, WhatsApp URL i mailto.
+
+Accions que governa:
+- Obrir WhatsApp amb text preparat.
+- Obrir email amb assumpte/cos preparats.
+- Copiar missatge.
+- Obrir fitxa 360 del client.
+- Descartar candidat localment en sessió.
+- No envia res automàticament i no persisteix campanya pròpia.
+
+Òrgans veïns:
+- upstream: Customer Hub, historial d'esdeveniments, lifecycle, health score i consentiments.
+- downstream: Customer Hub, Tasks canòniques, Inbox/WhatsApp/email manual.
+- veïns conceptuals: `/admin/campaigns` és reactivació massiva/manual per segments; `/admin/clientes/reactivation` és recuperació individual assistida; `/admin/leads/reengagement` és reactivació de leads, no de clients.
+
+Codi mort relacionat:
+- Cap evidència de codi mort: servei, page, client, CSS i tests són vius; `loadReactivationCandidates()` alimenta la pàgina.
+
+Duplicacions:
+- No duplica Campanyes: Campanyes proposa missatges per audiències agregades; Reactivació mostra persones concretes i sortides individuals.
+- No duplica Customer Hub: Customer Hub és la fitxa canònica i absorbeix la traça; Reactivació és una cua focalitzada per trobar candidats.
+- No duplica Leads Reengagement: reengagement tracta leads sense convertir; reactivació tracta clients amb historial.
+
+Hardcoded/residu visual:
+- Copy admin local acceptable; templates ca/es viuen dins el servei com a sortida de domini testada.
+- Maps locals `PRIORITY_TONE` i `CHANNEL_ICON` són deute menor si s'han de reutilitzar fora de la ruta.
+- `mailto:` i `wa.me` aquí són accions externes explícites i manuals; no s'han de confondre amb comunicació canònica automàtica.
+
+Connexions interrompudes:
+- El botó `Descartar` és estat local, no persistència de decisió. Acceptable com a triatge de sessió; si cal traça real, ha de passar per Customer Hub/Tasks/Timeline.
+- La pàgina no crea tasques directament; la traça forta viu al Customer Hub. Això és intencionat perquè la fitxa 360 sigui el lloc de decisió.
+
+Riscos:
+- Convertir Reactivació en enviament automàtic massiu duplicaria Campanyes i trencaria la traça.
+- Afegir persistència local de descart sense model canònic podria crear una quarta capa de decisió del client.
+- Fusionar-la amb Leads Reengagement barrejaria clients amb historial i leads sense relació contractual.
+
+Evidència d'auditoria:
+- fitxers llegits línia per línia: `app/admin/clientes/reactivation/page.tsx`, `app/admin/clientes/reactivation/ReactivationClient.tsx`, `lib/services/reactivationService.ts`, `__tests__/lib/services/reactivationService.test.ts`.
+- imports/exports verificats: page → `loadReactivationCandidates`; client → `buildCustomerHubHref`; servei → Prisma + `CUSTOMER_DORMANT_MONTHS`; Customer Hub/Tasks → reactivació assistida amb dedupe.
+- consumidors verificats amb `rg`: Campanyes, Daily Brief, Customer Hub, Manual i Tasks.
+- proves/guards executats: lectura forense + `rg` de consumidors. Validació tècnica final del canvi documental: `qa:no-dead-admin-views`, `tsc --noEmit`, `qa:protocol`, `git diff --check`.
+
+Decisio de treball:
+- conservar `/admin/clientes/reactivation` com a cua individual assistida de clients.
+- no convertir-la en campanya massiva ni enviament automàtic.
+- si cal decisió persistent, fer-la passar per Customer Hub/Tasks/Timeline, no per estat local nou.
+
 ## Registre de fitxes per fer
 
 | Ruta | Page | Estat fitxa | Propietari | Nota |
@@ -764,12 +1100,12 @@ Decisio de treball: organ SA. `/studio` queda protegit a part (qa:studio-integri
 | `/admin/bookings/new` | `app/admin/bookings/new/page.tsx` | PENDENT | codex/claude | Nova reserva — TravelDiscount inline layout P3 drenat #1157; ClientEvent marges inline drenats #1158 |
 | `/admin/calendario` | `app/admin/calendario/page.tsx` | PENDENT | codex/claude | Calendari legacy/compatibilitat |
 | `/admin/calendario/capacity` | `app/admin/calendario/capacity/page.tsx` | PENDENT | codex/claude | Capacitat |
-| `/admin/campaigns` | `app/admin/campaigns/page.tsx` | PENDENT | codex/claude | Campanyes |
+| `/admin/campaigns` | `app/admin/campaigns/page.tsx` | FETA | codex | Campanyes — fitxa forense #1206 |
 | `/admin/canvas` | `app/admin/canvas/page.tsx` | PENDENT | codex/claude | Canvas |
 | `/admin/catalog` | `app/admin/catalog/page.tsx` | PENDENT | codex/claude | Catàleg |
 | `/admin/clientes` | `app/admin/clientes/page.tsx` | PENDENT | codex/claude | Clients llista |
 | `/admin/clientes/[id]` | `app/admin/clientes/[id]/page.tsx` | FETA | codex | Client 360 — fitxa forense #1114; Timeline #1116; Insights #1117; Bookings #1118; Privacy #1119; Discounts #1120; Summary #1121 |
-| `/admin/clientes/reactivation` | `app/admin/clientes/reactivation/page.tsx` | PENDENT | codex/claude | Reactivació — visual `ReactivationClient` drenat #1139 |
+| `/admin/clientes/reactivation` | `app/admin/clientes/reactivation/page.tsx` | FETA | codex | Reactivació — fitxa forense #1210; visual `ReactivationClient` drenat #1139 |
 | `/admin/clientes/referrals` | `app/admin/clientes/referrals/page.tsx` | PENDENT | codex/claude | Referrals — visual `ReferralsClient` drenat #1140 |
 | `/admin/collaborators` | `app/admin/collaborators/page.tsx` | PENDENT | codex/claude | Partners |
 | `/admin/collaborators/[id]` | `app/admin/collaborators/[id]/page.tsx` | PENDENT | codex/claude | Partner detail |
@@ -807,7 +1143,7 @@ Decisio de treball: organ SA. `/studio` queda protegit a part (qa:studio-integri
 | `/admin/leads/arxiu` | `app/admin/leads/arxiu/page.tsx` | PENDENT | codex/claude | Arxiu leads |
 | `/admin/leads/reengagement` | `app/admin/leads/reengagement/page.tsx` | PENDENT | codex/claude | Reengagement |
 | `/admin/manual` | `app/admin/manual/page.tsx` | PENDENT | codex/claude | Manual |
-| `/admin/marketing` | `app/admin/marketing/page.tsx` | PENDENT | codex/claude | Marketing |
+| `/admin/marketing` | `app/admin/marketing/page.tsx` | FETA | codex | Marketing — fitxa forense #1207 |
 | `/admin/mensajes` | `app/admin/mensajes/page.tsx` | PENDENT | codex/claude | Missatges |
 | `/admin/packs` | `app/admin/packs/page.tsx` | PENDENT | codex/claude | Packs |
 | `/admin/packs/[id]` | `app/admin/packs/[id]/page.tsx` | PENDENT | codex/claude | Pack detall |
@@ -839,7 +1175,7 @@ Decisio de treball: organ SA. `/studio` queda protegit a part (qa:studio-integri
 | `/admin/settings/integrations` | `app/admin/settings/integrations/page.tsx` | PENDENT | codex/claude | Integracions |
 | `/admin/settings/notifications` | `app/admin/settings/notifications/page.tsx` | PENDENT | codex/claude | Notificacions |
 | `/admin/settings/quotes` | `app/admin/settings/quotes/page.tsx` | PENDENT | codex/claude | Pressupostos config |
-| `/admin/social` | `app/admin/social/page.tsx` | PENDENT | codex/claude | Social |
+| `/admin/social` | `app/admin/social/page.tsx` | FETA | codex | Social — fitxa forense #1209 |
 | `/admin/stats` | `app/admin/stats/page.tsx` | PENDENT | codex/claude | Stats |
 | `/admin/studio` | `app/admin/studio/page.tsx` | PENDENT | codex/claude | Studio |
 | `/admin/tasks` | `app/admin/tasks/page.tsx` | PENDENT | codex/claude | Tasques |
