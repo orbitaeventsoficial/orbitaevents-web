@@ -53,14 +53,21 @@ ja existeix** — el que cal és REDUIR pàgines, no repintar-les.
 
 ---
 
-## 🎯 PLA DE SIMPLIFICACIÓ (per ordre d'impacte)
-| # | Acció | Impacte | Esforç | Risc |
-|---|---|---|---|---|
-| S1 | **Fusionar les 4 pàgines de KPIs** en 1 «Centre econòmic» amb pestanyes | 🔥 Alt | Mitjà-alt | Mitjà (cal validar què uses) |
-| S2 | **Agrupar el menú** (Diners, Manual, Sistema) de 24 a ~15 entrades | Alt | Baix | Baix |
-| S3 | **Treure docs/eines del menú diari** (col·lapsar) | Mitjà | Baix | Baix |
-| S4 | **Decidir emails** (connectar tots o retirar editor) | Mitjà | Mitjà | Baix |
-| S5 | Micro-homogeneïtzació visual (opcional) | Baix | Baix | Baix |
+## 🎯 PLA DE SIMPLIFICACIÓ — ESTAT EXECUTAT (2026-06-29)
+| # | Acció | Estat |
+|---|---|---|
+| S1 | Fusionar les pàgines de KPIs en 1 «Centre econòmic» | ✅ **FET #1224** — cockpit+reporting→economia (pestanyes ja existien); redirects, cap enllaç trencat |
+| S2 | Reordenar el menú | ✅ **FET #1225** — Economia surt de «Sistema» cap a «Operativa» (dia a dia) |
+| S3 | Treure docs del menú diari | ✅ **JA DE FACTO** — Atles/Esquema/Full de ruta són `secondary` |
+| S4 | Treure eines del menú | ✅ **JA DE FACTO** — analytics/canvas/css-manager/scripts/coverage fora del menú |
+| S5 | Decidir emails (connectar tots o retirar) | ⬜ **DECISIÓ PROPIETARI** — booking_confirmation ja connectat (#1221); patró llest |
+| S6 | Micro-homogeneïtzació visual | ⬜ requereix propietari davant pantalla |
+
+### Altres candidats de fusió revisats (i DESCARTATS)
+- `ressenyes` (testimonials propis) vs `google-reviews` (Google Business) → **fonts diferents, NO duplicat.**
+- `marketing` (Hub overview) vs `campaigns` (enviament massiu CRM) → **funcions diferents, NO duplicat.**
+- **Conclusió:** la duplicació de KPIs era l'ÚNICA fusió clara i de baix risc. Resolta. La resta de la
+  «abundància» són pàgines amb funció pròpia (no eliminables sense decisió de producte del propietari).
 
 ## ⚠️ El que NOMÉS pot decidir el propietari (3a passada)
 Tot S1-S4 toca **què veus i uses cada dia** → cal que confirmis quines d'aquestes pàgines
