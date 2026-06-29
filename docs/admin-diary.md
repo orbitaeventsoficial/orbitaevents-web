@@ -1,3 +1,27 @@
+## 2026-06-29 — Centre econòmic: fusió de cockpit + reporting a economia (Canvi #1224, claude)
+
+### Context
+Auditoria definitiva (troballa #1): 4 pàgines mostraven els mateixos KPIs. Descobert que **economia JA tenia les pestanyes** (Resum/Cobraments/Rendibilitat/Tresoreria/Previsions/Config) que cobreixen cockpit (tresoreria/previsió) i reporting (rendibilitat). La fusió és reorganització, no reescriptura.
+
+### Què s'ha fet
+- `EconomiaClient`: accepta `?tab=` (useSearchParams) per obrir la pestanya inicial; validat contra els 6 tabs.
+- `/admin/cockpit` → `redirect('/admin/economia?tab=tresoreria')`.
+- `/admin/reporting` → `redirect('/admin/economia?tab=rendibilitat')`.
+- `adminNav`: tret «Cockpit»; «Finances» → «Economia». Menú 24→23 entrades.
+- Verificat amb captura: cockpit aterra a Economia amb pestanya Tresoreria activa.
+- NO tocat: analytics (té GA4/web únic — es manté accessible fora del flux principal); coverage/cost-calculator/pricing (no són KPIs).
+
+### Validació
+- Validació tècnica: `tsc` 0; redirects 200; `validate:core`.
+- Validació funcional: cockpit/reporting porten a la pestanya correcta d'economia; cap enllaç trencat.
+- Validació humana/UX: captura confirma pestanya correcta + menú aprimat.
+
+### Coordinació
+Counter → 1224. Primera acció del pla de simplificació (S1 parcial). Codex parat.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-29 — RGPD: cron de retenció de dades programat (Canvi #1223, claude)
 
 ### Context

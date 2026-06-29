@@ -1526,6 +1526,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1224 — 2026-06-29 — claude (FET)
+**Centre econòmic: fusió de cockpit + reporting dins economia (pla de simplificació S1).**
+- Economia ja tenia les pestanyes que cobrien cockpit i reporting. `EconomiaClient` accepta `?tab=`; `/admin/cockpit`→`?tab=tresoreria`, `/admin/reporting`→`?tab=rendibilitat` (redirects, no trenquen enllaços). Menú: tret Cockpit, «Finances»→«Economia».
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1224`; el següent canvi real ha de ser `#1225`.
+- Validació tècnica: `tsc` 0; redirects 200; `validate:core`.
+- Validació funcional: redirects porten a la pestanya correcta; cap enllaç trencat.
+- Validació humana/UX: captura confirma pestanya activa + menú aprimat.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1223 — 2026-06-29 — claude (FET)
 **RGPD: cron de retenció de dades programat.**
 - `executeRetentionPolicies` no tenia cron. Cron nou `/api/cron/data-retention` (auth + cronRunStatus) + afegit a daily-crons.yml (15 crons). Segur: 0 polítiques actives = 0 esborrats.

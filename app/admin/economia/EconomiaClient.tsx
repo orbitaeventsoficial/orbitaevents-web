@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AdminPage } from '../components/AdminPage';
@@ -26,8 +27,13 @@ import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
 
 
 
+const VALID_TABS: Tab[] = ['resum', 'cobraments', 'rendibilitat', 'tresoreria', 'previsions', 'config'];
+
 export default function EconomiaClient(props: EconomiaClientProps) {
-  const [activeTab, setActiveTab] = useState<Tab>('resum');
+  const searchParams = useSearchParams();
+  const tabParam = searchParams?.get('tab');
+  const initialTab: Tab = tabParam && VALID_TABS.includes(tabParam as Tab) ? (tabParam as Tab) : 'resum';
+  const [activeTab, setActiveTab] = useState<Tab>(initialTab);
 
   const totalAlerts = useMemo(() =>
     props.atRiskRows.length + props.riskProfitability.length,
