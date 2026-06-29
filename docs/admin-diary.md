@@ -1,3 +1,24 @@
+## 2026-06-29 — RGPD: el formulari de contacte registra el consentiment (Canvi #1222, claude)
+
+### Context
+Manca de compliment legal trobada a la passada: `recordConsent` existia però NO es cridava → 0 consentiments registrats. El formulari de contacte no deixava rastre del consentiment del client.
+
+### Què s'ha fet
+- `app/api/contact/route.ts`: després de crear el lead, registra consentiment `GDPR_BASIC` (granted) amb email, IP, user-agent, source `contact_form`, sourceUrl. Degradació segura (no bloqueja el lead si falla).
+- `lib/constants/privacy.ts`: `PRIVACY_CONSENT_VERSION = '1.0'` (versió vigent del consentiment).
+- PENDENT (no fet, sensible): cron de retenció (`executeRetentionPolicies` esborra dades) — cal revisar les `DataRetentionPolicy` actives abans de programar-lo.
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core`.
+- Validació funcional: cada enviament del formulari deixa rastre de consentiment RGPD verificable.
+- Validació humana/UX: cap canvi visible; compliment legal millorat.
+
+### Coordinació
+Counter → 1222. Codex parat. Toca el backend del formulari públic (additiu, no UI).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-29 — Opció A: connecta l'email de confirmació de reserva a la plantilla editable (Canvi #1221, claude)
 
 ### Context

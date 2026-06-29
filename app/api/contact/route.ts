@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { PRIVACY_CONSENT_VERSION } from '@/lib/constants/privacy';
 import { sendEmailWithTimeout } from '@/lib/email';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { escapeHtml } from '@/lib/utils/sanitize';
@@ -118,6 +119,28 @@ export async function POST(req: NextRequest) {
       updateNote: `${t.noteNewWebContact}: ${eventLabel}${packName ? ` - ${t.notePack}: ${packName}` : ''}${message ? `\n${t.noteMessage}: ${message}` : ''}`,
       createNote: `${t.noteLeadCreatedVia} ${packId ? t.viaConfigurator : t.viaWebForm}${packName ? ` - ${t.noteInterestedPack}: ${packName}` : ''}${!clientEmail ? ` (${t.notePhoneContact}: ${clientPhone})` : ''}`,
     });
+
+    // Registre de consentiment RGPD (compliment legal): en enviar el formulari, el client
+    // accepta el tractament bàsic de dades. Degradació segura: no bloqueja el lead.
+    if (clientEmail) {
+      try {
+        const { recordConsent } = await import('@/lib/services/privacyService');
+        await recordConsent({
+          email: clientEmail,
+          consentType: 'GDPR_BASIC',
+          consentVersion: PRIVACY_CONSENT_VERSION,
+          granted: true,
+          source: 'contact_form',
+          sourceUrl: landingPage || undefined,
+          formId: 'contact',
+          ipAddress: clientIp,
+          userAgent: req.headers.get('user-agent') || undefined,
+        });
+      } catch (consentError) {
+        console.error('[contact] Error registrant consentiment RGPD:', consentError);
+      }
+    }
+
     if (_savedLeadId && clientEmail) {
       try {
         const { notifyNewLead } = await import('@/lib/services/notificationService');

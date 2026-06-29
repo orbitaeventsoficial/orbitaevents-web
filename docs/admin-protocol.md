@@ -1526,6 +1526,19 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1222 — 2026-06-29 — claude (FET)
+**RGPD: el formulari de contacte registra el consentiment (recordConsent connectat).**
+- `recordConsent` existia però no es cridava (0 consentiments). Connectat a `/api/contact` (GDPR_BASIC, granted, IP/UA/email, degradació segura).
+- `lib/constants/privacy.ts`: `PRIVACY_CONSENT_VERSION = '1.0'`.
+- Pendent (sensible): cron de retenció — revisar polítiques abans de programar.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1222`; el següent canvi real ha de ser `#1223`.
+- Validació tècnica: `tsc` 0; `validate:core`.
+- Validació funcional: consentiment registrat a cada formulari.
+- Validació humana/UX: cap canvi visible; compliment legal.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1221 — 2026-06-29 — claude (FET)
 **Opció A: l'email de confirmació de reserva es connecta a la plantilla editable.**
 - Troballa end-to-end: en crear reserva el client no rebia confirmació; l'editor `/admin/email-templates` estava desconnectat (editar plantilles no canviava emails reals).
