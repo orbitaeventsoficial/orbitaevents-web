@@ -19,8 +19,14 @@ const { mockPrisma, mockCalculateGoogleMapsDistance, mockGetFuelCostPerKmReferen
   mockGetFuelCostPerKmReference: vi.fn(),
 }));
 
+const { mockSendBookingConfirmationEmail } = vi.hoisted(() => ({
+  mockSendBookingConfirmationEmail: vi.fn().mockResolvedValue({ ok: true }),
+}));
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/logger', () => ({ log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
+vi.mock('@/lib/services/bookingConfirmationEmailService', () => ({
+  sendBookingConfirmationEmail: mockSendBookingConfirmationEmail,
+}));
 vi.mock('@/lib/services/googleMapsDistance', () => ({
   calculateGoogleMapsDistance: mockCalculateGoogleMapsDistance,
 }));
@@ -126,6 +132,17 @@ describe('createBookingFromInput', () => {
 
     const createCall = mockPrisma.booking.create.mock.calls[0][0];
     expect(createCall.data.reference).toMatch(/^OE-\d{4}-001$/);
+  });
+
+  it('envia email de confirmació al client en crear la reserva', async () => {
+    await createBookingFromInput(BASE_INPUT);
+
+    expect(mockSendBookingConfirmationEmail).toHaveBeenCalledOnce();
+    const arg = mockSendBookingConfirmationEmail.mock.calls[0][0];
+    expect(arg.to).toBe('joan@example.com');
+    expect(arg.reference).toMatch(/^OE-\d{4}-001$/);
+    expect(arg.total).toBeGreaterThan(0);
+    expect(arg.depositAmount).toBeGreaterThan(0);
   });
 
   it('afegeix la línia de lloguer de so (Isma) quan el bolo porta pack', async () => {

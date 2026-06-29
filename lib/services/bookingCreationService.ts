@@ -10,6 +10,7 @@ import { ACTIVE_BOOKING_STATUSES } from '@/lib/constants';
 import { calcVatRate, calcDeposit, roundMoney, CUSTOM_BOOKING_PACK_SLUG, CUSTOM_BOOKING_PACK_MARKER } from '@/lib/constants/pricing';
 import { calculateEventDuration } from '@/lib/inventory-utils';
 import { SOUND_RENTAL } from '@/lib/constants/inventory';
+import { sendBookingConfirmationEmail } from '@/lib/services/bookingConfirmationEmailService';
 import { DEFAULT_BOOKING_PAYMENT_METHOD } from '@/lib/constants/booking-payment';
 
 /**
@@ -570,6 +571,30 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       details: { reference, clientName: data.clientName, total },
     },
   });
+
+  // Confirmació al client (plantilla editable booking_confirmation). No bloqueja la
+  // creació si l'enviament falla: la reserva ja està desada.
+  const confirmationEmail = billedPartner?.email || data.clientEmail;
+  if (confirmationEmail) {
+    const sent = await sendBookingConfirmationEmail({
+      to: confirmationEmail,
+      locale: null,
+      reference: booking.reference,
+      clientName: data.clientName,
+      eventDate,
+      startTime: data.eventStartTime,
+      endTime: data.eventEndTime,
+      packId: resolvedPackId,
+      location: data.eventLocation,
+      total,
+      depositAmount,
+    });
+    if (!sent.ok) {
+      log.error('Confirmació de reserva no enviada', undefined, {
+        context: { reference: booking.reference, reason: sent.error },
+      });
+    }
+  }
 
   return { status: 200, body: { ok: true, booking } };
 }

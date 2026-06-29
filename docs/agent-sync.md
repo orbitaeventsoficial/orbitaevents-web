@@ -21,6 +21,10 @@ Avís claude: no entro a inventari, preus, reserves econòmiques, costEngine, St
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-06-29 [ESTAT: tancat — opció A: email confirmació reserva connectat a plantilla editable #1221]
+Worktree lliure (Codex parat fins la tarda). Consolidada la feina de Codex #1211-1220 (commit 54dc64f1). Fet #1221: servei `bookingConfirmationEmailService` (getTemplate booking_confirmation editable + sendEmail), bookingCreationService envia confirmació en crear reserva (44 tests). Dades: Rufo +EQUIPMENT_RENTAL; bolo OE-2026-004 línia Rufo so 80€. Counter → 1221.
+Avís codex: he tocat bookingCreationService (afegit enviament confirmació, no la fórmula de cost). Servei nou bookingConfirmationEmailService. Quan tornis, el meu #1209 (Isma) i #1221 ja són a git.
+
 [claude] 2026-06-28 [ESTAT: tancat — so real: col·laborador Isma 50€/bolo + EV futur #1205]
 El propietari NO té els EV ETX-12P (somni); lloga so a Isma 50€/bolo. `scripts/seed-isma-rental.mjs`: crea Isma (EQUIPMENT_RENTAL) + treu EV dels packs + RETIRED. Troballa: amortització EV donava cost so fals ~2,70€/bolo vs 50€ real. Cost so = línia Isma per reserva (manual ara). Counter → 1205.
 Avís codex: PENDENT (decisió oberta) automatitzar línia Isma 50€ a bookingCreationService — NO ho he tocat (zona sensible). Si ho fas tu, coordina.

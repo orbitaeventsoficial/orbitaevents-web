@@ -1,3 +1,25 @@
+## 2026-06-29 — Opció A: connecta l'email de confirmació de reserva a la plantilla editable (Canvi #1221, claude)
+
+### Context
+Troballa end-to-end: (1) en crear reserva el client NO rebia confirmació; (2) l'editor `/admin/email-templates` (24 plantilles) estava desconnectat. Opció A aprovada pel propietari.
+
+### Què s'ha fet
+- **Servei nou** `bookingConfirmationEmailService`: `getTemplate('booking_confirmation', locale, vars)` (plantilla EDITABLE) + `sendEmail`. Resol pack via `packTranslation`; total/dipòsit sense € (la plantilla l'afegeix); degradació segura. 5 tests.
+- **`bookingCreationService`**: envia la confirmació després de crear (no bloqueja si falla). Test.
+- **Efecte**: el client rep confirmació + editar la plantilla SÍ canvia l'email (primer connectat).
+- **Dades** (propietari): DJ Rufo → també `EQUIPMENT_RENTAL`; bolo OE-2026-004 (23/06) rep línia Rufo (2 subwoofer + 2 tops, 80€) al marge.
+
+### Validació
+- Validació tècnica: `tsc` 0; 44 tests (39 booking + 5 confirmació); `validate:core`.
+- Validació funcional: confirmació enviada; plantilla editable connectada.
+- Validació humana/UX: email verificat amb render; sense doble €.
+
+### Coordinació
+Counter → 1221. Codex parat (worktree lliure). Sense tocar la fórmula del cost engine.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-29 — V3 comunicació tancada: seqüències, X-Orbita i APPEND Sent reconciliats (Canvi #1220, codex)
 
 ### Context

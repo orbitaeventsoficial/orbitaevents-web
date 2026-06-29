@@ -1526,6 +1526,19 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1221 — 2026-06-29 — claude (FET)
+**Opció A: l'email de confirmació de reserva es connecta a la plantilla editable.**
+- Troballa end-to-end: en crear reserva el client no rebia confirmació; l'editor `/admin/email-templates` estava desconnectat (editar plantilles no canviava emails reals).
+- Servei nou `bookingConfirmationEmailService` (`getTemplate('booking_confirmation')` editable + `sendEmail`); `bookingCreationService` l'envia després de crear (degradació segura). Primer email connectat a l'editor.
+- Dades: DJ Rufo → també `EQUIPMENT_RENTAL`; bolo OE-2026-004 (23/06) rep línia Rufo so 80€ al marge.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1221`; el següent canvi real ha de ser `#1222`.
+- Validació tècnica: `tsc` 0; 44 tests; `validate:core`.
+- Validació funcional: confirmació enviada; plantilla editable amb efecte real.
+- Validació humana/UX: email verificat amb render; total sense doble €.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1220 — 2026-06-29 — codex (FET)
 **V3 comunicació: seqüències comercials, X-Orbita i reintent APPEND Sent queden verificats i la vertical es tanca en primera passada.**
 - Context: després del #1219, el full d'auditoria encara deixava oberts tres pendents V3. La revisió viva mostra que són peces implementades: `commercialSequenceService`, headers X-Orbita/EmailSend i `emailSentRetryService`.
