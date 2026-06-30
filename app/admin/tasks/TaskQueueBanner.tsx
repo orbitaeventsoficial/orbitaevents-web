@@ -46,37 +46,41 @@ export default function TaskQueueBanner({
   };
 
   return (
-    <div className="tk__queue">
-      <div className="tk__queue-top">
-        <span className="tk__queue-label">Queue operativa</span>
-        {activeQueue && (
-          <button type="button" onClick={handleClearAll} className="tk__queue-clear">
-            Mostrar totes ({total})
-          </button>
-        )}
-      </div>
-      <div className="tk__queue-pills">
-        {QUEUE_CONFIG.map(({ key, label, icon }) => {
-          const count = queues[key];
-          if (count === 0 && activeQueue !== key) return null;
-          const isActive = activeQueue === key;
-          return (
-            <button
-              key={key}
-              type="button"
-              onClick={() => handleClick(key)}
-              data-queue={key}
-              className={`tk__queue-pill${isActive ? ' is-active' : ''}`}
-            >
-              <span>{icon}</span>
-              <span>{label}</span>
-              <span className="tk__queue-count">{count}</span>
+    <div className="ap-card">
+      <div className="ap-card-body flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <span className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-[var(--t3)]">
+            Queue operativa
+          </span>
+          {activeQueue && (
+            <button type="button" onClick={handleClearAll} className="ap-btn ap-btn--xs">
+              Mostrar totes ({total})
             </button>
-          );
-        })}
-        {queues['NORMAL'] > 0 && (
-          <span className="tk__queue-normal">+ {queues['NORMAL']} normals</span>
-        )}
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {QUEUE_CONFIG.map(({ key, label, icon }) => {
+            const count = queues[key];
+            if (count === 0 && activeQueue !== key) return null;
+            const isActive = activeQueue === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => handleClick(key)}
+                aria-pressed={isActive}
+                className={`ap-btn ap-btn--xs ${isActive ? 'ap-btn--primary' : ''}`}
+              >
+                <span aria-hidden="true">{icon}</span>
+                <span>{label}</span>
+                <span className="rounded-full bg-[var(--raised)] px-1.5 font-bold text-[var(--t)]">{count}</span>
+              </button>
+            );
+          })}
+          {queues['NORMAL'] > 0 && (
+            <span className="px-2 text-xs text-[var(--t3)]">+ {queues['NORMAL']} normals</span>
+          )}
+        </div>
       </div>
     </div>
   );

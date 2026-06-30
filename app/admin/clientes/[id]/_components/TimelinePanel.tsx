@@ -130,7 +130,7 @@ export default function TimelinePanel({
   }, []);
 
   return (
-    <aside className="ch__timeline" data-help-title="Cronologia del client" data-help-desc="Agrupa l'activitat del client per dies i et deixa filtrar per pressupostos, reserves, tasques o comunicacions.">
+    <aside className="min-w-0 overflow-hidden rounded-[var(--o-r-xl)] border border-[var(--o-admin-line)] bg-[var(--ax-fill-1)] p-4 lg:sticky lg:top-[220px]" data-help-title="Cronologia del client" data-help-desc="Agrupa l'activitat del client per dies i et deixa filtrar per pressupostos, reserves, tasques o comunicacions.">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -186,13 +186,13 @@ export default function TimelinePanel({
         </div>
       )}
 
-      <div className="ch__timeline-filters" data-help-title="Filtres de cronologia" data-help-desc="Serveixen per reduir la cronologia al tipus d'activitat que t'interessa revisar ara mateix.">
+      <div className="mt-3 flex flex-wrap gap-1" data-help-title="Filtres de cronologia" data-help-desc="Serveixen per reduir la cronologia al tipus d'activitat que t'interessa revisar ara mateix.">
         {CUSTOMER_TIMELINE_FILTER_OPTIONS.map((opt) => (
           <button
             key={opt.key}
             type="button"
             onClick={() => setFilter(opt.key)}
-            className={`ch__timeline-filter${filter === opt.key ? ' ch__timeline-filter--active' : ''}`}
+            className={`cursor-pointer rounded-full border px-2 py-0.5 text-xs font-semibold transition-colors ${filter === opt.key ? 'border-[var(--o-admin-line-2)] bg-[var(--raised)] text-[var(--t)] shadow-[inset_0_0_0_1px_var(--line2)]' : 'border-[var(--o-admin-line)] bg-[var(--ax-fill-2)] text-[var(--t3)] hover:border-[var(--o-admin-line-2)] hover:bg-[var(--ax-fill-3)] hover:text-[var(--t2)]'}`}
           >
             {opt.icon} {opt.label}
           </button>
@@ -200,21 +200,21 @@ export default function TimelinePanel({
       </div>
 
       {/* Timeline content */}
-      <div className={`ch__timeline-scroll${expanded ? ' ch__timeline-scroll--expanded' : ''}`}>
+      <div className={`mt-4 min-w-0 overflow-y-auto overflow-x-hidden pr-1 ${expanded ? 'max-h-[80vh]' : 'max-h-[50vh]'}`}>
         {filteredTimeline.length === 0 ? (
           <EmptyState filter={filter} />
         ) : (
           displayedGroups.map((group) => (
             <div key={group.date}>
               {/* Day header */}
-              <div className="ch__timeline-day">
-                <p className="ch__timeline-day-label">
+              <div className="sticky top-0 z-10 bg-[var(--ax-fill-1)] py-1">
+                <p className="m-0 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--t3)]">
                   {group.label}
                 </p>
               </div>
 
               {/* Events */}
-              <div className="ch__timeline-events">
+              <div className="mb-4 mt-1 flex flex-col gap-1.5">
                 {group.events.map((event) => (
                   <EventCard key={event.id} event={event} />
                 ))}
@@ -245,7 +245,7 @@ export default function TimelinePanel({
 function EventCard({ event }: { event: TimelineEventDTO }) {
   const meta = CUSTOMER_TIMELINE_EVENT_META[event.type];
   const icon = meta?.icon || '•';
-  const toneClass = meta?.toneClass || 'ch__timeline-event--activity';
+  const toneClass = meta?.toneClass || 'border-l-[var(--o-admin-line)]';
   const preview = typeof event.meta?.preview === 'string' ? event.meta.preview.trim() : '';
   const direction = typeof event.meta?.direction === 'string' ? event.meta.direction : null;
   const channel = typeof event.meta?.channel === 'string' ? event.meta.channel : null;
@@ -255,24 +255,24 @@ function EventCard({ event }: { event: TimelineEventDTO }) {
 
   return (
     <article
-      className={`ch__timeline-event ${toneClass}`}
+      className={`min-w-0 overflow-hidden rounded-[var(--o-r-lg)] border-l-2 bg-[var(--o-admin-fill-1)] py-2.5 pl-3 pr-2.5 ${toneClass}`}
     >
       <div className="flex items-start gap-2">
-        <span className="ch__timeline-icon">{icon}</span>
+        <span className="text-sm leading-[1.35]">{icon}</span>
         <div className="flex-1 min-w-0">
-          <p className="ch__timeline-title">
+          <p className="m-0 break-words text-xs font-semibold text-[var(--t)]">
             {sanitizeEventTitle(event.title)}
           </p>
-          <p className="ch__timeline-time">
+          <p className="m-0 mt-0.5 break-words text-xs text-[var(--t3)]">
             {formatTime(event.at)}
           </p>
           {commMeta && (
-            <p className="ch__timeline-meta">
+            <p className="m-0 mt-0.5 break-words text-xs uppercase tracking-[0.08em] text-[var(--t3)]">
               {commMeta}
             </p>
           )}
           {preview && preview !== event.title && (
-            <p className="ch__timeline-preview">
+            <p className="m-0 mt-1 break-words text-xs leading-normal text-[var(--t2)]">
               {preview}
             </p>
           )}
@@ -282,7 +282,7 @@ function EventCard({ event }: { event: TimelineEventDTO }) {
       {event.link && (
         <Link
           href={event.link.href}
-          className="ch__timeline-link"
+          className="mt-1.5 inline-block max-w-full truncate text-xs text-[var(--gold)] no-underline transition-colors hover:text-[var(--gold-bright)]"
         >
           {event.link.label} →
         </Link>
@@ -301,8 +301,8 @@ function EmptyState({ filter }: { filter: TimelineFilter }) {
   };
 
   return (
-    <div className="ch__timeline-empty">
-      <p>{messages[filter]}</p>
+    <div className="rounded-[var(--o-r-lg)] border border-[var(--o-admin-line)] bg-[var(--ax-fill-2)] p-4 text-center text-[var(--t2)]">
+      <p className="m-0 text-sm">{messages[filter]}</p>
     </div>
   );
 }

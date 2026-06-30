@@ -45,7 +45,7 @@ export default function TaskRowActions({
   };
 
   return (
-    <div className="tk__row-acts">
+    <div className="flex w-full flex-col gap-1.5 sm:w-auto sm:flex-row sm:items-center">
       <Link href={destinationHref} className="ap-btn ap-btn--xs">
         Obrir destí
       </Link>

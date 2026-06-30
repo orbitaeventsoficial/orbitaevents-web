@@ -1,3 +1,41 @@
+## 2026-06-30 — Erradicació: hub de client (958) + tasks (219) 100% canònics (Canvi #1286, claude+agents)
+
+### Què s'ha fet
+- **hub de client** (clientes/[id], la pàgina MÉS GRAN): 958 `ch__` → canònic en ~10 fitxers (page.tsx, CustomerHubClient, CustomerHeader, InsightsBanner, tots els panells: Bookings/Comms/Discounts/Leads/MarginExtras/Summary/Timeline). AdminPage/AdminSection/.ap-card/.ap-kpi/.ap-table-*/.ap-badge/.ap-tab/.adm-input/AdminEmptyState. customer-hub.css ESBORRAT (0 ch__ ni fxd/fx) + import tret.
+- **tasks**: 219 `tk__` → canònic (TaskKanbanView drag&drop intacte, TaskPageSections, TaskQueueBanner, RowActions, new/page). tasks.css ESBORRAT + 2 imports trets. Corregits bugs de pas (botó-dins-botó, ap-btn--xs sense base).
+- Verificat: hub amb captura (header+KPIs+tabs+cronologia, la pàgina més rica); tasks amb captura. Ambdós 0 xx__, tsc 0.
+
+### Validació
+- Validació tècnica: `tsc` 0; `qa:canon-debt` OK.
+- Validació funcional: captures hub + tasks canònics; drag&drop tasks intacte.
+- Validació humana/UX: hipersemblants; hub (referència de fitxa rica) preservat.
+
+### Coordinació
+Counter → 1286. 13 pàgines erradicades. TANDA 4 COMPLETA (hub+nova-reserva+tasks). Queda ÚLTIMA MILLA: fxd/fx/bd/ax/ix shell compartit + lp2/lf morts.
+- Començat per: `claude+agents`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-30 — V5 forecast: reserves confirmades conserven cèntims (Canvi #1285, codex)
+
+### Context
+`pipelineForecast` pot arrodonir estimacions de pipeline per lectura executiva, però `confirmedRevenue` no és una estimació: són ingressos ja compromesos per reserves confirmades futures. Fins ara es feia `Math.round`, perdent cèntims.
+
+### Què s'ha fet
+- `lib/services/pipelineForecast.ts`: `confirmedRevenue` passa a arrodoniment monetari a 2 decimals.
+- `__tests__/lib/services/pipelineForecast.test.ts`: la regressió de reserves confirmades futures ara suma totals amb cèntims.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\pipelineForecast.test.ts` (21 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `validate:core` global continua bloquejat pel deute concurrent d'Inbox ja identificat a `app/admin/inbox/inbox.css:9` (`qa:admin-mode-prefix`).
+- Validació funcional: el forecast operatiu manté imports reals de reserves confirmades amb cèntims.
+- Validació humana/UX: el compromès futur no es presenta com una estimació arrodonida quan ja és diner real.
+
+### Coordinació
+Counter → 1285. El #1284 pertany a Claude (nova reserva canònica). No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni canonització de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-30 — Erradicació: nova reserva 100% canònica (formulari crític) (Canvi #1284, claude+agent)
 
 ### Què s'ha fet
@@ -28,7 +66,7 @@ El KPI `catalogValue` del llistat de col·laboradors arrodonia el valor del cat�
 - `__tests__/lib/services/collaboratorAdminService.test.ts`: el KPI cobreix productes actius decimals i ignora productes inactius.
 
 ### Validació
-- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\collaboratorAdminService.test.ts` (9 tests OK). Pendents en aquest punt: `tsc`, `qa:protocol`, `git diff --check` i comprovació del bloqueig conegut de `validate:core`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\collaboratorAdminService.test.ts` (9 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `validate:core` global continua bloquejat pel deute concurrent d'Inbox ja identificat a `app/admin/inbox/inbox.css:9` (`qa:admin-mode-prefix`).
 - Validació funcional: el llistat de col·laboradors conserva cèntims al valor del catàleg actiu.
 - Validació humana/UX: el KPI de catàleg ja no infla o retalla imports per arrodoniment a euros sencers.
 

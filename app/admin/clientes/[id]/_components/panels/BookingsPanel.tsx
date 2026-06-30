@@ -3,12 +3,23 @@ import { labelEstatReserva } from '@/lib/customer-hub/labels';
 import Link from 'next/link';
 import { BOOKING_STATUS_CONFIG, formatDateFull, formatNumber, getEventLabel } from '@/lib/constants';
 import { ADMIN_CUSTOMER_PANEL_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
+import { AdminSection } from '@/app/admin/components/AdminPage';
 import { buildCustomerBookingCreateHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 
+const PILL_BASE = 'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold leading-tight';
+const STATUS_BASE = `${PILL_BASE} border`;
+
+const PILL_TONE: Record<'success' | 'danger' | 'warning' | 'muted', string> = {
+  success: 'bg-[var(--ax-success-bg)] text-[var(--o-success)]',
+  danger: 'bg-[var(--ax-danger-bg)] text-[var(--o-danger)]',
+  warning: 'bg-[var(--ax-warning-bg)] text-[var(--o-warning)]',
+  muted: 'bg-[var(--ax-fill-3)] text-[var(--t3)]',
+};
+
 function getBookingStatusBadgeClass(status: string) {
   const tone = BOOKING_STATUS_CONFIG[status];
-  return tone ? ('border-current ' + tone.bg + ' ' + tone.text) : 'ch__booking-status--muted';
+  return tone ? ('border-current ' + tone.bg + ' ' + tone.text) : 'border-[var(--line2)] bg-[var(--ax-fill-3)] text-[var(--t2)]';
 }
 
 function PaymentIndicator({ booking }: { booking: BookingDTO }) {
@@ -17,14 +28,14 @@ function PaymentIndicator({ booking }: { booking: BookingDTO }) {
   const remaining = total - deposit;
 
   return (
-    <div className="ch__booking-payment" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.payment)}>
+    <div className="mt-2 flex flex-wrap gap-2" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.payment)}>
       {deposit > 0 && (
-        <span className={`ch__booking-pill ${booking.depositPaid ? 'ch__booking-pill--success' : 'ch__booking-pill--danger'}`}>
+        <span className={`${PILL_BASE} ${booking.depositPaid ? PILL_TONE.success : PILL_TONE.danger}`}>
           Dipòsit {formatNumber(deposit)} € {booking.depositPaid ? '✓' : '✗'}
         </span>
       )}
       {remaining > 0 && (
-        <span className={`ch__booking-pill ${booking.remainingPaid ? 'ch__booking-pill--success' : 'ch__booking-pill--muted'}`}>
+        <span className={`${PILL_BASE} ${booking.remainingPaid ? PILL_TONE.success : PILL_TONE.muted}`}>
           Resta {formatNumber(remaining)} € {booking.remainingPaid ? '✓' : ''}
         </span>
       )}
@@ -39,73 +50,72 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
   const customerBookingCreateHref = buildCustomerBookingCreateHref(data.customer.id);
 
   return (
-    <section className="ch__bookings-panel" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.root)}>
-      <div className="ch__bookings-head">
-        <div>
-          <h2 className="ch__bookings-title">Reserves / Dates</h2>
-          <p className="ch__bookings-summary">{data.bookings.length} total · {upcoming.length} properes · {past.length} passades</p>
-        </div>
+    <AdminSection
+      title="Reserves / Dates"
+      description={`${data.bookings.length} total · ${upcoming.length} properes · ${past.length} passades`}
+      actions={
         <Link href={customerBookingCreateHref} className="ap-btn ap-btn--primary ap-btn--xs" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.newBooking)}>
           Nova reserva
         </Link>
-      </div>
-
-      <div className="ch__bookings-list">
+      }
+      help={ADMIN_CUSTOMER_PANEL_HELP.bookings.root}
+    >
+      <div className="flex flex-col gap-3">
         {data.bookings.length === 0 ? (
-          <p className="ch__bookings-empty">Sense reserves. Crea la primera reserva del client.</p>
+          <p className="m-0 rounded-[var(--o-r-xl)] border border-[var(--o-admin-line)] p-3 text-sm text-[var(--t2)]">Sense reserves. Crea la primera reserva del client.</p>
         ) : (
           <>
-            {upcoming.length > 0 && <p className="ch__bookings-section-label">Properes ({upcoming.length})</p>}
+            {upcoming.length > 0 && <p className="m-0 text-xs font-semibold uppercase tracking-[0.08em] leading-tight text-[var(--t2)]">Properes ({upcoming.length})</p>}
             {upcoming.map((booking) => {
               const statusColor = getBookingStatusBadgeClass(booking.status);
               const reference = booking.reference || booking.id.slice(0, 8);
               return (
-                <div key={booking.id} className="ch__booking-card" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.card(reference))}>
-                  <div className="ch__booking-card-head">
-                    <p className="ch__booking-ref">{reference}</p>
-                    <span className={`ch__booking-status ${statusColor}`}>{labelEstatReserva(booking.status)}</span>
+                <div key={booking.id} className="rounded-[var(--o-r-xl)] border border-[var(--o-admin-line)] bg-[var(--raised)] p-4" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.card(reference))}>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="m-0 text-sm font-semibold text-[var(--t)]">{reference}</p>
+                    <span className={`${STATUS_BASE} ${statusColor}`}>{labelEstatReserva(booking.status)}</span>
                   </div>
 
-                  <div className="ch__booking-meta">
+                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[var(--t2)]">
                     {booking.eventType && <span>{getEventLabel(booking.eventType)}</span>}
                     <span>{booking.date ? formatDateFull(booking.date) : 'Sense data'}</span>
                     {booking.date && new Date(booking.date) >= now && booking.status !== 'CANCELLED' && (() => {
                       const days = Math.ceil((new Date(booking.date).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-                      return <span className={`ch__booking-pill ${days <= 7 ? 'ch__booking-pill--warning' : 'ch__booking-pill--muted'}`}>{days === 0 ? 'AVUI' : `${days}d`}</span>;
+                      return <span className={`${PILL_BASE} ${days <= 7 ? PILL_TONE.warning : PILL_TONE.muted}`}>{days === 0 ? 'AVUI' : `${days}d`}</span>;
                     })()}
                     {(booking.startTime || booking.endTime) && <span>{booking.startTime || '?'} – {booking.endTime || '?'}</span>}
                   </div>
 
-                  {(booking.location || booking.venue) && <p className="ch__booking-location">📍 {booking.venue || booking.location}</p>}
+                  {(booking.location || booking.venue) && <p className="mt-1 text-xs leading-snug text-[var(--t2)]">📍 {booking.venue || booking.location}</p>}
 
-                  <div className="ch__booking-tags">
-                    {booking.packName && <span className="ch__booking-tag">🎵 {booking.packName}</span>}
-                    {booking.guestCount && <span className="ch__booking-tag">👥 {booking.guestCount} convidats</span>}
-                    {booking.discountCode && <span className="ch__booking-tag">🏷️ {booking.discountCode}</span>}
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {booking.packName && <span className="rounded-[var(--o-r-md)] bg-[var(--ax-fill-2)] px-2 py-0.5 text-xs leading-tight text-[var(--t2)]">🎵 {booking.packName}</span>}
+                    {booking.guestCount && <span className="rounded-[var(--o-r-md)] bg-[var(--ax-fill-2)] px-2 py-0.5 text-xs leading-tight text-[var(--t2)]">👥 {booking.guestCount} convidats</span>}
+                    {booking.discountCode && <span className="rounded-[var(--o-r-md)] bg-[var(--ax-fill-2)] px-2 py-0.5 text-xs leading-tight text-[var(--t2)]">🏷️ {booking.discountCode}</span>}
                   </div>
 
                   {(booking.depositAmount || booking.totalAmount) && <PaymentIndicator booking={booking} />}
 
-                  <div className="ch__booking-actions">
-                    <Link href={buildBookingHref(booking.id)} className="ch__booking-link" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.openBooking)}>
+                  <div className="mt-3 border-t border-[var(--line)] pt-2">
+                    <Link href={buildBookingHref(booking.id)} className="ap-btn ap-btn--xs" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.openBooking)}>
                       Obrir fitxa d&apos;esdeveniment →
                     </Link>
                   </div>
                 </div>
               );
             })}
-            {past.length > 0 && <p className="ch__bookings-section-label ch__bookings-section-label--muted">Passades / Cancel·lades ({past.length})</p>}
+            {past.length > 0 && <p className="m-0 mt-1 text-xs font-semibold uppercase tracking-[0.08em] leading-tight text-[var(--t3)]">Passades / Cancel·lades ({past.length})</p>}
             {past.map((booking) => {
               const statusColor = getBookingStatusBadgeClass(booking.status);
               return (
-                <div key={booking.id} className="ch__booking-card ch__booking-card--past">
-                  <div className="ch__booking-card-head">
-                    <p className="ch__booking-ref">{booking.reference || booking.id.slice(0, 8)}</p>
-                    <span className={`ch__booking-status ${statusColor}`}>{labelEstatReserva(booking.status)}</span>
+                <div key={booking.id} className="rounded-[var(--o-r-xl)] border border-[var(--line)] bg-[var(--raised)] p-4 opacity-[0.62]">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="m-0 text-sm font-semibold text-[var(--t)]">{booking.reference || booking.id.slice(0, 8)}</p>
+                    <span className={`${STATUS_BASE} ${statusColor}`}>{labelEstatReserva(booking.status)}</span>
                   </div>
-                  <p className="ch__booking-location">{booking.date ? formatDateFull(booking.date) : 'Sense data'}</p>
-                  <div className="ch__booking-actions">
-                    <Link href={buildBookingHref(booking.id)} className="ch__booking-link ch__booking-link--plain" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.openBooking)}>
+                  <p className="mt-1 text-xs leading-snug text-[var(--t2)]">{booking.date ? formatDateFull(booking.date) : 'Sense data'}</p>
+                  <div className="mt-3 border-t border-[var(--line)] pt-2">
+                    <Link href={buildBookingHref(booking.id)} className="text-xs font-semibold text-[var(--t2)] transition-colors hover:text-[var(--t)]" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.openBooking)}>
                       Obrir fitxa →
                     </Link>
                   </div>
@@ -115,6 +125,6 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
           </>
         )}
       </div>
-    </section>
+    </AdminSection>
   );
 }

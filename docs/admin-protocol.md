@@ -1550,6 +1550,30 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1285 — 2026-06-30 — codex (FET)
+**V5 forecast: reserves confirmades conserven cèntims.**
+- `lib/services/pipelineForecast.ts`: `confirmedRevenue` passa a arrodoniment monetari a 2 decimals.
+- `__tests__/lib/services/pipelineForecast.test.ts`: la regressió de reserves confirmades futures ara suma totals amb cèntims.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\pipelineForecast.test.ts` (21 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `validate:core` global continua bloquejat pel deute concurrent d'Inbox ja identificat a `app/admin/inbox/inbox.css:9` (`qa:admin-mode-prefix`).
+- Validació funcional: el forecast operatiu manté imports reals de reserves confirmades amb cèntims.
+- Validació humana/UX: el compromès futur no es presenta com una estimació arrodonida quan ja és diner real.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1285`; el següent canvi real ha de ser `#1286`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1283 — 2026-06-30 — codex (FET)
+**V5 col·laboradors: valor de catàleg amb cèntims.**
+- `lib/services/collaboratorAdminService.ts`: `catalogValue` passa a arrodoniment monetari a 2 decimals.
+- `__tests__/lib/services/collaboratorAdminService.test.ts`: el KPI cobreix productes actius decimals i ignora productes inactius.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\collaboratorAdminService.test.ts` (9 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `validate:core` global continua bloquejat pel deute concurrent d'Inbox ja identificat a `app/admin/inbox/inbox.css:9` (`qa:admin-mode-prefix`).
+- Validació funcional: el llistat de col·laboradors conserva cèntims al valor del catàleg actiu.
+- Validació humana/UX: el KPI de catàleg ja no infla o retalla imports per arrodoniment a euros sencers.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1283`; el següent canvi real ha de ser `#1284`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1282 — 2026-06-30 — codex (FET)
 **V5 atribució: ingressos multi-touch amb cèntims exactes.**
 - `app/admin/components/AttributionPanel.tsx`: helper exportat `formatAttributionEuro()` amb arrodoniment monetari a 2 decimals i `formatCurrencyExact`.
@@ -1594,6 +1618,17 @@ Seqüència obligatòria de registre:
 - Validació funcional: captura formulari canònic complet.
 - Validació humana/UX: hipersemblant; preus preservats.
 - Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1286 — 2026-06-30 — claude (FET)
+**Erradicació: hub de client (958) + tasks (219) 100% canònics.**
+- hub clientes/[id] 958 ch__ → AdminPage/.ap-card/.ap-kpi/.ap-table-*/.ap-tab (10 fitxers, tots els panells). customer-hub.css ESBORRAT + import. tasks 219 tk__ → canònic (drag&drop intacte). tasks.css ESBORRAT + 2 imports.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1286`; el següent canvi real ha de ser `#1287`.
+- Validació tècnica: `tsc` 0; qa:canon-debt OK.
+- Validació funcional: captures hub + tasks canònics.
+- Validació humana/UX: hipersemblants; hub ric preservat.
+- Començat per: `claude+agents`
 - Treballant per: `claude`
 - Tancat per: `claude`
 

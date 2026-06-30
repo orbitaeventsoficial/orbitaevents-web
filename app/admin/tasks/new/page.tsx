@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import '../tasks.css';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { AdminPage, AdminSection } from '../../components/AdminPage';
 import { useAsyncForm } from '../../components/useAsyncForm';
 import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildCustomerHubTaskHref } from '@/lib/customer-hub/taskResultNotice';
@@ -66,59 +66,55 @@ export default function NewTaskPage() {
     ? "Deixa la reactivació registrada com a tasca explícita abans d'executar cap enviament."
     : "Crea una tasca operativa vinculada al client.";
 
-  return (
-    <div className="tk__form-shell">
-      <header className="tk__form-header">
-        <Link href={customerHubTasksHref} className="tk__form-back">
-          ← {customerId ? 'Client' : 'Tasques'}
-        </Link>
-        <div className="tk__form-head-text">
-          <h1 className="tk__form-title">Nova tasca</h1>
-          <p className="tk__form-sub">{subtitle}</p>
-        </div>
-      </header>
+  const labelClass = 'text-xs font-bold uppercase tracking-[0.06em] text-[var(--t2)]';
 
-      <div className="tk__form-body">
-        <form onSubmit={onSubmit} className="tk__form-card">
-          <div className="tk__form-field">
-            <label htmlFor="task-title" className="tk__form-label">Títol</label>
+  return (
+    <AdminPage
+      title="Nova tasca"
+      subtitle={subtitle}
+      back={{ href: customerHubTasksHref, label: customerId ? 'Client' : 'Tasques' }}
+    >
+      <AdminSection>
+        <form onSubmit={onSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="task-title" className={labelClass}>Títol</label>
             <input
               id="task-title"
-              className="tk__form-input"
+              className="adm-input"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
             />
           </div>
 
-          <div className="tk__form-field">
-            <label htmlFor="task-desc" className="tk__form-label">Descripció</label>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="task-desc" className={labelClass}>Descripció</label>
             <textarea
               id="task-desc"
-              className="tk__form-textarea"
+              className="adm-input adm-input--textarea"
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
 
-          <div className="tk__form-2col">
-            <div className="tk__form-field">
-              <label htmlFor="task-due" className="tk__form-label">Data límit</label>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="task-due" className={labelClass}>Data límit</label>
               <input
                 id="task-due"
                 type="date"
-                className="tk__form-input"
+                className="adm-input"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
               />
             </div>
 
-            <div className="tk__form-field">
-              <label htmlFor="task-priority" className="tk__form-label">Prioritat</label>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="task-priority" className={labelClass}>Prioritat</label>
               <select
                 id="task-priority"
-                className="tk__form-select"
+                className="adm-input"
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT')}
                 aria-label="Prioritat de la tasca"
@@ -131,23 +127,27 @@ export default function NewTaskPage() {
             </div>
           </div>
 
-          {error && <p className="tk__form-err">{error}</p>}
+          {error && (
+            <p className="rounded-[var(--o-r-md)] border admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger p-2.5 text-xs">
+              {error}
+            </p>
+          )}
 
-          <div className="tk__form-footer">
+          <div className="flex items-center gap-2.5">
             <button
               type="submit"
               disabled={submitting || !title.trim()}
-              className="tk__btn tk__btn--prim"
+              className="ap-btn ap-btn--primary"
             >
               {submitting ? 'Creant...' : 'Crear tasca'}
             </button>
-            <Link href={customerHubTasksHref} className="tk__btn">
+            <Link href={customerHubTasksHref} className="ap-btn">
               Cancel·lar
             </Link>
           </div>
         </form>
-      </div>
-    </div>
+      </AdminSection>
+    </AdminPage>
   );
 }
 

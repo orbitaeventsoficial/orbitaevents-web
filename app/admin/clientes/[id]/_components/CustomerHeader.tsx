@@ -63,6 +63,31 @@ const TABS: Array<{ key: TabKey; label: string; icon: string; badge?: (data: Cus
   { key: 'privacy', label: 'Privacitat', icon: '🔒' },
 ];
 
+const STATUS_BTN_TONE: Record<string, string> = {
+  confirmed: 'border-[var(--ax-success-strong)] bg-[var(--ax-success-bg)] text-[var(--o-success)]',
+  negotiation: 'border-[var(--ax-warning-strong)] bg-[var(--ax-warning-bg)] text-[var(--o-warning)]',
+  postevent: 'border-[var(--ax-vip)] bg-[var(--ax-vip-soft)] text-[var(--ax-vip)]',
+  lost: 'border-[var(--ax-danger-strong)] bg-[var(--ax-danger-bg)] text-[var(--o-danger)]',
+};
+const STATUS_BTN_DEFAULT = 'border-[var(--o-admin-line-2)] bg-[var(--ax-fill-3)] text-[var(--t2)]';
+
+const STATUS_OPT_TONE: Record<string, string> = {
+  confirmed: 'text-[var(--o-success)]',
+  negotiation: 'text-[var(--o-warning)]',
+  postevent: 'text-[var(--ax-vip)]',
+  lost: 'text-[var(--o-danger)]',
+};
+
+const AVATAR_TONE: Record<string, string> = {
+  confirmed: 'border-[var(--ax-success-bg)] bg-[var(--ax-success-bg)]',
+  negotiation: 'border-[var(--ax-warning-bg)] bg-[var(--ax-warning-bg)]',
+  postevent: 'border-[var(--ax-vip-soft)] bg-[var(--ax-vip-soft)]',
+  lost: 'border-[var(--ax-danger-bg)] bg-[var(--ax-danger-bg)]',
+};
+const AVATAR_DEFAULT = 'border-[var(--o-admin-line)] bg-[var(--ax-fill-3)]';
+
+const STAGE_BASE = 'whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-semibold';
+
 function getInitials(name: string): string {
   return name
     .split(' ')
@@ -165,27 +190,26 @@ export default function CustomerHeader({
   }, [id, refresh, toast]);
 
   return (
-    <header className="ch__header" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.root)}>
-      <div className="ch__hero">
+    <header className="sticky top-0 z-30 border-b border-[var(--o-admin-line)] bg-[var(--ax-overlay-sm)] backdrop-blur-[20px]" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.root)}>
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-3 px-4 pb-3 pt-3.5">
 
         {/* ── Top row ── */}
-        <div className="ch__toprow">
-          <div className="ch__leftcol">
-            <div className="ch__avatar" data-status={statusSlug}>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="flex min-w-0 flex-1 items-start gap-3.5">
+            <div className={`hidden h-[54px] w-[54px] shrink-0 items-center justify-center rounded-[var(--o-r-xl)] border text-lg font-bold text-[var(--t)] shadow-[var(--o-shadow-md)] sm:flex ${AVATAR_TONE[statusSlug] || AVATAR_DEFAULT}`}>
               {getInitials(data.customer.name)}
             </div>
-            <div className="ch__namecol">
-              <div className="ch__navrow">
-                <Link href="/admin/clientes" className="ch__back" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.backToCustomers)}>
+            <div className="min-w-0 flex-1">
+              <div className="mb-[3px] flex flex-wrap items-center gap-2">
+                <Link href="/admin/clientes" className="text-xs text-[var(--t3)] no-underline transition-colors hover:text-[var(--t2)]" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.backToCustomers)}>
                   ← Clients
                 </Link>
 
-                <div className="ch__statuswrap">
+                <div className="relative">
                   <button
                     type="button"
                     onClick={() => setMenuOpen(!menuOpen)}
-                    className="ch__status"
-                    data-status={statusSlug}
+                    className={`inline-flex cursor-pointer items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold transition-opacity hover:opacity-80 disabled:cursor-default disabled:opacity-60 ${STATUS_BTN_TONE[statusSlug] || STATUS_BTN_DEFAULT}`}
                     disabled={actionLoading !== null}
                     {...helpAttrs(ADMIN_CUSTOMER_HELP.header.statusToggle)}
                   >
@@ -195,18 +219,18 @@ export default function CustomerHeader({
 
                   {menuOpen && (
                     <>
-                      <div className="ch__statusbackdrop" onClick={() => setMenuOpen(false)} />
-                      <div className="ch__statusmenu">
+                      <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+                      <div className="absolute left-0 top-[calc(100%+4px)] z-50 min-w-[140px] rounded-[var(--o-r-lg)] border border-[var(--o-admin-line-2)] bg-[var(--raised)] py-1 shadow-[var(--o-shadow-lg)]">
                         {CUSTOMER_HUB_STAGE_ORDER.map((s) => {
                           const isActive = s === status;
+                          const slug = s.toLowerCase();
                           return (
                             <button
                               key={s}
                               type="button"
                               onClick={() => changeStatus(s)}
                               disabled={isActive}
-                              className="ch__statusopt"
-                              data-status={s.toLowerCase()}
+                              className={`w-full cursor-pointer border-none bg-transparent px-3 py-1.5 text-left text-xs transition-colors hover:bg-[var(--ax-fill-3)] disabled:cursor-default disabled:bg-[var(--ax-fill-3)] disabled:font-bold ${STATUS_OPT_TONE[slug] || 'text-[var(--t2)]'}`}
                               {...helpAttrs(ADMIN_CUSTOMER_HELP.header.statusOption(labelEstatClient(s)))}
                             >
                               {labelEstatClient(s)}
@@ -218,30 +242,30 @@ export default function CustomerHeader({
                   )}
                 </div>
 
-                <span className="ch__navmeta" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.lastContact)}>
+                <span className="text-xs text-[var(--t3)]" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.lastContact)}>
                   · Últim contacte: {lastContactText}
                 </span>
               </div>
 
-              <h1 className="ch__h1">
+              <h1 className="m-0 mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap text-2xl font-extrabold leading-none tracking-[-0.018em] text-[var(--t)] [font-family:var(--display)]">
                 {data.customer.customerNumber != null && (
-                  <span className="ch__h1-num">
+                  <span className="mr-1.5 text-sm text-[var(--t3)] [font-family:var(--mono)]">
                     CLI-{String(data.customer.customerNumber).padStart(4, '0')}
                   </span>
                 )}
                 {data.customer.name}
               </h1>
 
-              <div className="ch__contact">
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-[var(--t2)]">
                 {data.customer.email && (
-                  <Link href={customerComposeHref} title="Obrir redactor amb aquest client">
+                  <Link href={customerComposeHref} title="Obrir redactor amb aquest client" className="text-[var(--t2)] no-underline transition-colors hover:text-[var(--t)]">
                     {data.customer.email}
                   </Link>
                 )}
                 {data.customer.phone && (
                   <>
-                    <span className="ch__contact-sep">·</span>
-                    <a href={`tel:${data.customer.phone}`}>{data.customer.phone}</a>
+                    <span className="text-[var(--t3)]">·</span>
+                    <a href={`tel:${data.customer.phone}`} className="text-[var(--t2)] no-underline transition-colors hover:text-[var(--t)]">{data.customer.phone}</a>
                   </>
                 )}
                 {data.customer.phone && (
@@ -250,6 +274,7 @@ export default function CustomerHeader({
                     target="_blank"
                     rel="noopener noreferrer"
                     title={ADMIN_CUSTOMER_HELP.header.whatsapp.title}
+                    className="text-[var(--t2)] no-underline transition-colors hover:text-[var(--t)]"
                     {...helpAttrs(ADMIN_CUSTOMER_HELP.header.whatsapp)}
                   >
                     💬
@@ -260,74 +285,74 @@ export default function CustomerHeader({
           </div>
 
           {/* ── Actions ── */}
-          <div className="ch__acts" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.quickActions)}>
+          <div className="flex flex-wrap items-start gap-2" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.quickActions)}>
             <Link
               href={customerProposalHref}
-              className="ch__btn ch__btn--prim"
+              className="ap-btn ap-btn--primary ap-btn--xs"
               {...helpAttrs(ADMIN_CUSTOMER_HELP.header.action('Nou pressupost', 'Crea una proposta nova ja vinculada a aquest client.'))}
             >
               <span>📄</span>
-              <span className="ch__btn-label">Nou pressupost</span>
+              <span className="hidden sm:inline">Nou pressupost</span>
             </Link>
             <Link
               href={customerBookingCreateHref}
-              className="ch__btn ch__btn--sec"
+              className="ap-btn ap-btn--secondary ap-btn--xs"
               {...helpAttrs(ADMIN_CUSTOMER_HELP.header.action('Nova reserva', 'Crea una reserva nova vinculada a aquest client.'))}
             >
               <span>📅</span>
-              <span className="ch__btn-label">Nova reserva</span>
+              <span className="hidden sm:inline">Nova reserva</span>
             </Link>
             <Link
               href={customerTaskCreateHref}
-              className="ch__btn ch__btn--warn"
+              className="ap-btn ap-btn--xs"
               {...helpAttrs(ADMIN_CUSTOMER_HELP.header.action('Nova tasca', 'Afegeix una tasca operativa o comercial associada al client.'))}
             >
               <span>✅</span>
-              <span className="ch__btn-label">Nova tasca</span>
+              <span className="hidden sm:inline">Nova tasca</span>
             </Link>
             <Link
               href={customerComposeHref}
-              className="ch__btn"
+              className="ap-btn ap-btn--xs"
               {...helpAttrs(ADMIN_CUSTOMER_HELP.header.action('Missatge', 'Obre el redactor de correu amb aquest client ja preseleccionat.'))}
             >
               <span>✉️</span>
-              <span className="ch__btn-label">Missatge</span>
+              <span className="hidden sm:inline">Missatge</span>
             </Link>
             <button
               type="button"
               onClick={deleteCustomer}
               disabled={actionLoading === 'delete'}
-              className="ch__btn ch__btn--danger"
+              className="ap-btn ap-btn--danger ap-btn--xs"
               title={hasProtectedData ? ADMIN_CUSTOMER_HELP.header.deleteProtected.title : ADMIN_CUSTOMER_HELP.header.deletePlain.title}
               {...helpAttrs(hasProtectedData ? ADMIN_CUSTOMER_HELP.header.deleteProtected : ADMIN_CUSTOMER_HELP.header.deletePlain)}
             >
               <span>🗑️</span>
-              <span className="ch__btn-label">{actionLoading === 'delete' ? 'Eliminant...' : 'Eliminar'}</span>
+              <span className="hidden sm:inline">{actionLoading === 'delete' ? 'Eliminant...' : 'Eliminar'}</span>
             </button>
           </div>
         </div>
 
         {/* ── KPIs ── */}
-        <div className="ch__kpis" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.kpis)}>
-          <div className={`ch__kpi${data.kpis.nextEventDate ? ' ch__kpi--hi' : ''}`} {...helpAttrs(ADMIN_CUSTOMER_HELP.header.kpi('Pròxim esdeveniment'))}>
-            <p className="ch__kpi-label">Pròxim esdeveniment</p>
-            <p className="ch__kpi-val">{formatDate(data.kpis.nextEventDate)}</p>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.kpis)}>
+          <div className={`ap-kpi ${data.kpis.nextEventDate ? 'ap-kpi--warning' : ''}`} {...helpAttrs(ADMIN_CUSTOMER_HELP.header.kpi('Pròxim esdeveniment'))}>
+            <span className="ap-kpi-label">Pròxim esdeveniment</span>
+            <span className="ap-kpi-value">{formatDate(data.kpis.nextEventDate)}</span>
           </div>
-          <div className="ch__kpi" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.kpi('Total pressupostat'))}>
-            <p className="ch__kpi-label">Total pressupostat</p>
-            <p className="ch__kpi-val">{money(data.kpis.totalQuoted)}</p>
+          <div className="ap-kpi" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.kpi('Total pressupostat'))}>
+            <span className="ap-kpi-label">Total pressupostat</span>
+            <span className="ap-kpi-value">{money(data.kpis.totalQuoted)}</span>
           </div>
-          <div className={`ch__kpi${data.kpis.totalPaid && data.kpis.totalPaid > 0 ? ' ch__kpi--hi' : ''}`} {...helpAttrs(ADMIN_CUSTOMER_HELP.header.kpi('Total cobrat'))}>
-            <p className="ch__kpi-label">Total cobrat</p>
-            <p className="ch__kpi-val">{money(data.kpis.totalPaid)}</p>
+          <div className={`ap-kpi ${data.kpis.totalPaid && data.kpis.totalPaid > 0 ? 'ap-kpi--warning' : ''}`} {...helpAttrs(ADMIN_CUSTOMER_HELP.header.kpi('Total cobrat'))}>
+            <span className="ap-kpi-label">Total cobrat</span>
+            <span className="ap-kpi-value">{money(data.kpis.totalPaid)}</span>
           </div>
-          <div className="ch__kpi" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.kpi('Marge estimat'))}>
-            <p className="ch__kpi-label">Marge estimat</p>
-            <p className="ch__kpi-val">{money(data.kpis.marginEstimated)}</p>
+          <div className="ap-kpi" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.kpi('Marge estimat'))}>
+            <span className="ap-kpi-label">Marge estimat</span>
+            <span className="ap-kpi-value">{money(data.kpis.marginEstimated)}</span>
           </div>
-          <div className="ch__kpi" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.kpi('Última comunicació'))}>
-            <p className="ch__kpi-label">Última comunicació</p>
-            <p className="ch__kpi-val">{formatDate(data.kpis.lastContactAt)}</p>
+          <div className="ap-kpi" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.kpi('Última comunicació'))}>
+            <span className="ap-kpi-label">Última comunicació</span>
+            <span className="ap-kpi-value">{formatDate(data.kpis.lastContactAt)}</span>
           </div>
         </div>
 
@@ -349,22 +374,22 @@ export default function CustomerHeader({
         />
 
         {/* ── Stage progress ── */}
-        <div className="ch__rail" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.stage)}>
-          <div className="ch__stagebar" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.stageProgress)}>
-            <p className="ch__stagebar-title">On està aquest client</p>
-            <div className="ch__stagebar-row">
+        <div {...helpAttrs(ADMIN_CUSTOMER_HELP.header.stage)}>
+          <div className="rounded-[var(--o-r-lg)] border border-[var(--o-admin-line)] bg-[var(--ax-fill-1)] px-3 py-2.5" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.stageProgress)}>
+            <p className="m-0 mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--t3)]">On està aquest client</p>
+            <div className="flex items-center overflow-x-auto">
               {CUSTOMER_HUB_STAGE_ORDER.map((stage, idx) => {
                 const isCurrent = stage === status;
                 const isDone = status !== 'LOST' && idx < currentStageIndex;
                 const isLost = stage === 'LOST' && status === 'LOST';
-                let stageClass = 'ch__stage';
-                if (isCurrent) stageClass += ' ch__stage--cur';
-                else if (isDone) stageClass += ' ch__stage--done';
-                else if (isLost) stageClass += ' ch__stage--lost';
+                let stageClass = `${STAGE_BASE} border-[var(--o-admin-line)] bg-transparent text-[var(--t3)]`;
+                if (isCurrent) stageClass = `${STAGE_BASE} border-[var(--ax-info-strong)] bg-[var(--ax-info-bg)] text-[var(--o-info)] shadow-[0_0_0_3px_var(--ax-info-bg)]`;
+                else if (isDone) stageClass = `${STAGE_BASE} border-[var(--ax-success-border)] bg-[var(--ax-success-bg)] text-[var(--o-success)]`;
+                else if (isLost) stageClass = `${STAGE_BASE} border-[var(--ax-danger-border)] bg-[var(--ax-danger-bg)] text-[var(--o-danger)]`;
                 return (
-                  <div key={stage} className="ch__stageitem">
+                  <div key={stage} className="contents">
                     {idx > 0 && (
-                      <div className={`ch__stagepipe${isDone ? ' ch__stagepipe--done' : ''}`} />
+                      <div className={`h-px w-7 shrink-0 ${isDone ? 'bg-[var(--ax-success-bg)]' : 'bg-[var(--o-admin-line)]'}`} />
                     )}
                     <span className={stageClass}>
                       {isDone && '✓ '}{CUSTOMER_HUB_STAGE_LABELS[stage]}
@@ -377,7 +402,7 @@ export default function CustomerHeader({
         </div>
 
         {/* ── Desktop tabs ── */}
-        <div className="ch__tabs" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.tabs)}>
+        <div className="hidden flex-wrap gap-1 pb-1.5 md:flex" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.tabs)}>
           {TABS.map((item) => {
             const badge = item.badge?.(data);
             const isOn = tab === item.key;
@@ -386,13 +411,13 @@ export default function CustomerHeader({
                 key={item.key}
                 type="button"
                 onClick={() => setTab(item.key)}
-                className={`ch__tab${isOn ? ' ch__tab--on' : ''}`}
+                className={`ap-tab ${isOn ? 'ap-tab--active' : 'ap-tab--idle'}`}
                 {...helpAttrs(ADMIN_CUSTOMER_HELP.header.tab(item.label))}
               >
-                <span className="ch__tab-icon">{item.icon}</span>
+                <span className="text-base">{item.icon}</span>
                 {item.label}
                 {badge != null && badge > 0 && (
-                  <span className="ch__tab-badge">{badge}</span>
+                  <span className="rounded-full bg-[var(--ax-warning-bg)] px-1.5 text-xs font-bold text-[var(--o-warning)]">{badge}</span>
                 )}
               </button>
             );
@@ -403,7 +428,7 @@ export default function CustomerHeader({
         <select
           value={tab}
           onChange={(e) => setTab(e.target.value as TabKey)}
-          className="ch__sel"
+          className="adm-input mb-1.5 md:hidden"
           {...helpAttrs(ADMIN_CUSTOMER_HELP.header.mobileTabs)}
         >
           {TABS.map((item) => {

@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_CUSTOMER_PANEL_HELP_2, helpAttrs } from '@/app/admin/components/adminHelpContent';
+import { AdminSection } from '@/app/admin/components/AdminPage';
 import {
   buildCustomerTaskCreateHref,
   buildCustomerWorkspaceTabHref,
@@ -80,12 +81,10 @@ export default function TasksNotesPanel({
   };
 
   return (
-    <section className="ch__tasks-panel" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.tasks.root)}>
-      <div className="ch__tasks-head">
-        <div>
-          <h2 className="ch__tasks-heading">Tasques / Notes</h2>
-          <p className="ch__tasks-summary">Checklist operativa vinculada al client.</p>
-        </div>
+    <AdminSection
+      title="Tasques / Notes"
+      description="Checklist operativa vinculada al client."
+      actions={
         <Link
           href={customerTaskCreateHref}
           className="ap-btn ap-btn--primary ap-btn--xs"
@@ -93,23 +92,25 @@ export default function TasksNotesPanel({
         >
           Nova tasca
         </Link>
-      </div>
+      }
+      help={ADMIN_CUSTOMER_PANEL_HELP_2.tasks.root}
+    >
       {notice && (
-        <div className="ch__tasks-notice" role="alert">
-          <p>{notice}</p>
+        <div className="mb-3 flex items-start justify-between gap-3 rounded-[var(--o-r-xl)] border border-[var(--o-admin-line)] bg-[var(--ax-fill-2)] p-3 text-sm leading-snug text-[var(--t2)]" role="alert">
+          <p className="m-0 min-w-0 flex-1">{notice}</p>
           {onDismissNotice && (
             <button
               type="button"
               onClick={onDismissNotice}
-              className="ch__tasks-dismiss"
+              className="ap-btn ap-btn--xs shrink-0"
             >
               Tancar
             </button>
           )}
         </div>
       )}
-      {error && <p className="ch__tasks-error">{error}</p>}
-      <div className="ch__tasks-grid">
+      {error && <p className="m-0 mb-3 rounded-[var(--o-r-xl)] border border-[var(--o-admin-line)] bg-[var(--ax-fill-2)] px-2.5 py-2 text-xs leading-snug text-[var(--o-danger)]">{error}</p>}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <TaskColumn
           title="Pendents"
           items={openTasks}
@@ -130,7 +131,7 @@ export default function TasksNotesPanel({
           doneColumn
         />
       </div>
-    </section>
+    </AdminSection>
   );
 }
 
@@ -161,26 +162,26 @@ function TaskColumn({
   doneColumn?: boolean;
 }) {
   return (
-    <div className="ch__tasks-column" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.tasks.column(title))}>
-      <p className="ch__tasks-column-label">{title}</p>
-      <div className="ch__tasks-list">
+    <div className="min-w-0" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.tasks.column(title))}>
+      <p className="m-0 text-xs font-semibold uppercase tracking-[0.08em] leading-tight text-[var(--t3)]">{title}</p>
+      <div className="mt-2 flex min-w-0 flex-col gap-2">
         {items.length === 0 ? (
-          <p className="ch__tasks-empty">Sense tasques.</p>
+          <p className="m-0 rounded-[var(--o-r-xl)] border border-[var(--o-admin-line)] bg-[var(--ax-fill-2)] p-3 text-xs text-[var(--t2)]">Sense tasques.</p>
         ) : (
           items.map((task) => (
             <article
               key={task.id}
-              className="ch__task-card"
+              className="min-w-0 overflow-hidden rounded-[var(--o-r-xl)] border border-[var(--o-admin-line)] bg-[var(--ax-fill-2)] p-3"
               {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.tasks.task(task.title))}
             >
-              <p className="ch__task-title">{task.title}</p>
-              <p className="ch__task-date">{task.dueDate ? formatDate(task.dueDate) : 'Sense venciment'}</p>
-              <div className="ch__task-actions">
+              <p className="m-0 break-words text-sm leading-snug text-[var(--t)]">{task.title}</p>
+              <p className="m-0 mt-1 text-xs leading-snug text-[var(--t3)]">{task.dueDate ? formatDate(task.dueDate) : 'Sense venciment'}</p>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
                 <button
                   type="button"
                   onClick={() => onToggleDone(task.id)}
                   disabled={busyTaskId === task.id}
-                  className="ch__task-action"
+                  className="ap-btn ap-btn--xs"
                 >
                   {busyTaskId === task.id ? 'Desant...' : doneColumn ? 'Reobrir' : 'Marcar feta'}
                 </button>
@@ -188,12 +189,12 @@ function TaskColumn({
                   type="button"
                   onClick={() => onDelete(task.id)}
                   disabled={busyTaskId === task.id}
-                  className={`ch__task-action ${confirmingDeleteId === task.id ? 'ch__task-action--danger' : ''}`}
+                  className={`ap-btn ap-btn--xs ${confirmingDeleteId === task.id ? 'ap-btn--danger' : ''}`}
                 >
                   {confirmingDeleteId === task.id ? 'Segur?' : 'Eliminar'}
                 </button>
                 {task.leadId && (
-                  <Link href={buildCustomerWorkspaceTabHref(customerId, 'tasks')} className="ch__task-link">
+                  <Link href={buildCustomerWorkspaceTabHref(customerId, 'tasks')} className="min-w-0 max-w-full truncate text-xs text-[var(--gold)] no-underline transition-colors hover:text-[var(--gold-bright)]">
                     Obrir Customer Hub
                   </Link>
                 )}

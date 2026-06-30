@@ -1,6 +1,5 @@
 import { TASK_QUEUE_VALUES, TASK_STATUS_VALUES } from '@/lib/constants';
 import type { TaskStatus } from '@/lib/services/tasks/leadScopedTaskService';
-import './tasks.css';
 import {
   TaskFiltersSection,
   TaskKanbanSection,

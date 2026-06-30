@@ -37,16 +37,16 @@ export default function GenerateDailyChecklistButton() {
   };
 
   return (
-    <div className="ap-btn">
+    <div className="flex flex-col items-end gap-1">
       <button
         type="button"
         onClick={handleGenerate}
         disabled={loading}
-        className="ap-btn"
+        className="ap-btn ap-btn--xs"
       >
         {loading ? 'Generant...' : "Checklist d'avui"}
       </button>
-      {message && <p className="tk__auto-msg">{message}</p>}
+      {message && <p className="max-w-[14rem] text-right text-xs text-[var(--t3)]">{message}</p>}
     </div>
   );
 }
