@@ -203,13 +203,13 @@ export function CustomersMobileList({
             <div className="cl__card-footer">
               <div className="cl__card-footleft">
                 <span className={sourceBadgeClass(customer.source)}>{getCustomerSourceLabel(customer.source)}</span>
-                <Link href={nextStep.href} className="cl__nextstep-link">{nextStep.label} →</Link>
+                <Link href={nextStep.href} className="ap-btn--xs">{nextStep.label} →</Link>
               </div>
               <div className="cl__rowacts" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.toolbar)}>
                 <button
                   onClick={() => onStartProcess(customer)}
                   type="button"
-                  className="cl__rowbtn"
+                  className="ap-btn--xs"
                   title="Iniciar procés"
                   {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.startProcess)}
                 >
@@ -220,7 +220,7 @@ export function CustomersMobileList({
                 </button>
                 <Link
                   href={buildCustomerHubHref(customer.id)}
-                  className="cl__rowbtn"
+                  className="ap-btn--xs"
                   title="Fitxa 360"
                   {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.customerFile)}
                 >
@@ -291,7 +291,7 @@ export function CustomersDesktopTable({
                 </td>
                 <td>
                   <div className="cl__nextstep">
-                    <Link href={nextStep.href} className="cl__nextstep-link">{nextStep.label}</Link>
+                    <Link href={nextStep.href} className="ap-btn--xs">{nextStep.label}</Link>
                     <span className="cl__nextstep-hint">{nextStep.hint}</span>
                   </div>
                 </td>
@@ -300,7 +300,7 @@ export function CustomersDesktopTable({
                     <button
                       onClick={() => onStartProcess(customer)}
                       type="button"
-                      className="cl__rowbtn"
+                      className="ap-btn--xs"
                       title="Iniciar procés"
                       {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.startProcess)}
                     >
@@ -311,7 +311,7 @@ export function CustomersDesktopTable({
                     </button>
                     <Link
                       href={buildCustomerHubHref(customer.id)}
-                      className="cl__rowbtn"
+                      className="ap-btn--xs"
                       title="Fitxa 360"
                       {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.customerFile)}
                     >

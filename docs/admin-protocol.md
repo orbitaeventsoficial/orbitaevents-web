@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1263 — 2026-06-30 — claude (FET)
+**Canonització: clientes botons d'acció + select.**
+- cl__rowbtn/nextstep-link→.ap-btn--xs, cl__lifecycle-sel→.adm-input. searchinput es manté (icona). Pendent: taula/badges/toggles.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1263`; el següent canvi real ha de ser `#1264`.
+- Validació tècnica: `tsc` 0; `validate:core`.
+- Validació funcional: botons/select canònics.
+- Validació humana/UX: pendent captura.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1262 — 2026-06-30 — claude (FET)
 **Botó primari canònic: outline confirmat (demo canonització).**
 - `.ap-btn--primary` outline daurat documentat (decisió propietari). 1 canvi → tots els botons primaris de l'admin responen (provat sòlid→outline).

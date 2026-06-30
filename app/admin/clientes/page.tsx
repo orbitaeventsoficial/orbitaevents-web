@@ -356,7 +356,7 @@ function CrmSegmentFilters({
             clearAll();
             setLifecycleFilter(e.target.value as CustomerLifecycleValue | '');
           }}
-          className="cl__lifecycle-sel"
+          className="adm-input"
         >
           <option value="">Totes les fases</option>
           {CUSTOMER_LIFECYCLE_VALUES.map((val) => (

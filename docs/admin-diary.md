@@ -1,3 +1,19 @@
+## 2026-06-30 — Canonització: clientes botons d'acció + select (Canvi #1263, claude)
+
+### Què s'ha fet
+- clientes: `cl__rowbtn`/`cl__nextstep-link`→`.ap-btn--xs`, `cl__lifecycle-sel`→`.adm-input`. `cl__searchinput` es manté (input amb icona = layout específic). Pendent: taula, badges, toggles seg/prio.
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core`.
+- Validació funcional: botons i select de clientes consumeixen canònic.
+- Validació humana/UX: pendent captura (clientes async).
+
+### Coordinació
+Counter → 1263. clientes Fase A avançat. Següent: bookings.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-30 — Botó primari canònic: outline confirmat (demo de canonització) (Canvi #1262, claude)
 
 ### Context
