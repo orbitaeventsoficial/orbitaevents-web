@@ -45,23 +45,38 @@ function PaymentRow({
   stripeConfigured: boolean;
 }) {
   const stateClass = paid ? 'paid' : locked ? 'locked' : 'pending';
+  const DOT_TONE: Record<string, string> = {
+    paid: 'border-[var(--ax-success-border)] bg-[var(--ax-success-bg)]',
+    pending: 'border-[var(--ax-warning-border)] bg-[var(--ax-warning-bg)]',
+    locked: 'border-[var(--o-admin-line)] bg-[var(--ax-fill-1)]',
+  };
+  const PRICE_TONE: Record<string, string> = {
+    paid: 'text-[var(--o-success)]',
+    pending: 'text-[var(--t)]',
+    locked: 'text-[var(--t)]',
+  };
+  const STATUS_TONE: Record<string, string> = {
+    paid: 'text-[var(--o-success)]',
+    pending: 'text-[var(--o-warning)]',
+    locked: 'text-[var(--t3)]',
+  };
 
   return (
-    <div className={`bd__stripe-row bd__stripe-row--${stateClass}`}>
-      <div className={`bd__stripe-dot bd__stripe-dot--${stateClass}`}>
+    <div className="flex items-center gap-3 p-4">
+      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm ${DOT_TONE[stateClass]}`}>
         {paid ? '✓' : locked ? '🔒' : '◌'}
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="bd__stripe-title">{label}</p>
-        <p className="bd__stripe-copy">{sublabel}</p>
+        <p className="m-0 text-sm font-semibold text-[var(--t)]">{label}</p>
+        <p className="m-0 text-xs text-[var(--t3)]">{sublabel}</p>
       </div>
 
-      <div className="bd__stripe-amount">
-        <p className={`bd__stripe-price bd__stripe-price--${stateClass}`}>
+      <div className="shrink-0 text-right">
+        <p className={`m-0 text-sm font-bold tabular-nums ${PRICE_TONE[stateClass]}`}>
           {amount}
         </p>
-        <p className={`bd__stripe-status bd__stripe-status--${stateClass}`}>
+        <p className={`m-0 text-xs font-semibold ${STATUS_TONE[stateClass]}`}>
           {paid ? 'Pagat' : locked ? 'Blocat' : 'Pendent'}
         </p>
       </div>
@@ -193,30 +208,30 @@ export default function StripePaymentPanel({
   const hasBizumPending = bizumDepositDeclared || bizumRemainingDeclared;
 
   return (
-    <div className="ap-card bd__stripe-card">
-      <div className="bd__stripe-head">
+    <div className="ap-card overflow-hidden">
+      <div className="flex flex-col gap-3 border-b border-[var(--o-admin-line)] p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="bd__stripe-icon">
+          <div className="flex h-7 w-7 select-none items-center justify-center rounded-[var(--o-r-md)] border border-[var(--o-admin-hair-gold)] bg-[var(--ax-gold-tint-2)] text-sm">
             💳
           </div>
           <div>
-            <p className="bd__stripe-title">Pagaments</p>
-            <p className="bd__stripe-copy">Vies per tram: Stripe checkout o Bizum declarat pel client</p>
+            <p className="m-0 text-sm font-semibold text-[var(--t)]">Pagaments</p>
+            <p className="m-0 text-xs text-[var(--t3)]">Vies per tram: Stripe checkout o Bizum declarat pel client</p>
           </div>
         </div>
         {hasBizumPending && !bothPaid && (
-          <span className="bd__stripe-badge bd__stripe-badge--warning">
+          <span className="animate-pulse whitespace-nowrap rounded-full border border-[var(--ax-warning-border)] bg-[var(--ax-warning-bg)] px-2.5 py-1 text-xs font-bold text-[var(--o-warning)]">
             ● Bizum pendent
           </span>
         )}
         {bothPaid && (
-          <span className="bd__stripe-badge bd__stripe-badge--success">
+          <span className="whitespace-nowrap rounded-full border border-[var(--ax-success-border)] bg-[var(--ax-success-bg)] px-2.5 py-1 text-xs font-bold text-[var(--o-success)]">
             ✓ Tot pagat
           </span>
         )}
       </div>
 
-      <div className="bd__stripe-list">
+      <div className="border-t border-[var(--o-admin-line-2)]">
         <PaymentRow
           label="Paga i senyal"
           sublabel="30% · primer pagament"
@@ -231,7 +246,7 @@ export default function StripePaymentPanel({
           locked={false}
           stripeConfigured={stripeConfigured}
         />
-        <div className="bd__stripe-separator" />
+        <div className="mx-4 h-px bg-[var(--o-admin-line-2)]" />
         <PaymentRow
           label="Pagament final"
           sublabel="70% · pagament restant"
@@ -251,7 +266,7 @@ export default function StripePaymentPanel({
       {(bizumDepositDeclared || bizumRemainingDeclared) && (
         <div className="mx-3 mt-2 mb-1 space-y-1.5">
           {bizumDepositDeclared && !depositPaid && (
-            <div className="bd__stripe-alert bd__stripe-alert--warning">
+            <div className="flex items-center justify-between gap-3 rounded-[var(--o-r-lg)] border border-[var(--ax-warning-border)] bg-[var(--ax-warning-bg)] px-3 py-2.5 text-xs text-[var(--o-warning)]">
               <span>
                 El client declara que ha fet el Bizum de la <strong>paga i senyal</strong>. Confirma quan vegis l'ingrés.
               </span>
@@ -266,7 +281,7 @@ export default function StripePaymentPanel({
             </div>
           )}
           {bizumRemainingDeclared && !remainingPaid && (
-            <div className="bd__stripe-alert bd__stripe-alert--warning">
+            <div className="flex items-center justify-between gap-3 rounded-[var(--o-r-lg)] border border-[var(--ax-warning-border)] bg-[var(--ax-warning-bg)] px-3 py-2.5 text-xs text-[var(--o-warning)]">
               <span>
                 El client declara que ha fet el Bizum del <strong>pagament final</strong>. Confirma quan vegis l'ingrés.
               </span>
@@ -284,7 +299,7 @@ export default function StripePaymentPanel({
       )}
 
       {error && (
-        <div className="bd__stripe-alert bd__stripe-alert--danger">
+        <div className="mx-3 mb-3 mt-1 flex items-center justify-between gap-3 rounded-[var(--o-r-lg)] border border-[var(--ax-danger-border)] bg-[var(--ax-danger-bg)] px-3 py-2.5 text-xs text-[var(--o-danger)]">
           {error}
         </div>
       )}

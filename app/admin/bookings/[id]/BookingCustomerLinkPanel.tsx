@@ -78,28 +78,28 @@ export default function BookingCustomerLinkPanel({
   if (preview.kind === 'matches-found') {
     return (
       <section
-        className="bd__linkstrip bd__linkstrip--warn"
+        className="flex flex-wrap items-center justify-between gap-3.5 rounded-[var(--o-r-xl)] border border-[var(--ax-warning-border)] bg-[var(--ax-warning-bg)] p-3"
         aria-label="Coincidencies de client"
       >
-        <div className="bd__linkstrip-main">
-          <h3>Aquesta reserva ja sembla un client</h3>
-          <p>{preview.matches.length === 1 ? '1 coincidència' : `${preview.matches.length} coincidències`} al CRM. Vincula-la per evitar duplicats.</p>
+        <div className="min-w-0">
+          <h3 className="m-0 text-sm font-extrabold text-[var(--t)]">Aquesta reserva ja sembla un client</h3>
+          <p className="mt-0.5 text-xs text-[var(--t3)]">{preview.matches.length === 1 ? '1 coincidència' : `${preview.matches.length} coincidències`} al CRM. Vincula-la per evitar duplicats.</p>
         </div>
-        <ul className="bd__linkstrip-matches">
+        <ul className="m-0 flex w-full list-none flex-col gap-1.5 p-0 sm:w-auto sm:min-w-[40%]">
           {preview.matches.map((match) => {
             const pendingId = `link:${match.customerId}`;
             const isSubmitting = submitting === pendingId;
             return (
               <li
                 key={match.customerId}
-                className="bd__linkstrip-match"
+                className="flex items-center justify-between gap-2.5 rounded-[var(--o-r-lg)] border border-[var(--o-admin-line)] bg-[var(--ax-overlay-lg)] px-2 py-1.5"
               >
                 <div>
-                  <strong>{match.customerName}</strong>
-                  <span>{match.confidence === 'strong' ? 'Fort' : 'Parcial'}{match.matchedBy.length > 0 && ` · ${formatMatchedBy(match.matchedBy)}`}</span>
+                  <strong className="block text-xs text-[var(--t)]">{match.customerName}</strong>
+                  <span className="block text-xs uppercase tracking-[0.06em] text-[var(--t3)]">{match.confidence === 'strong' ? 'Fort' : 'Parcial'}{match.matchedBy.length > 0 && ` · ${formatMatchedBy(match.matchedBy)}`}</span>
                 </div>
-                <div className="bd__linkstrip-actions">
-                  <Link href={buildCustomerHubHref(match.customerId)} className="bd__linkstrip-btn">
+                <div className="flex items-center gap-1.5">
+                  <Link href={buildCustomerHubHref(match.customerId)} className="ap-btn ap-btn--xs">
                     Veure fitxa
                   </Link>
                   <button
@@ -108,7 +108,7 @@ export default function BookingCustomerLinkPanel({
                       void submit('link', { customerId: match.customerId, pendingId })
                     }
                     disabled={isSubmitting || submitting !== null}
-                    className="bd__linkstrip-btn bd__linkstrip-btn--primary"
+                    className="ap-btn ap-btn--primary ap-btn--xs"
                   >
                     {isSubmitting ? 'Vinculant…' : 'Vincular'}
                   </button>
@@ -126,18 +126,18 @@ export default function BookingCustomerLinkPanel({
   const isSubmitting = submitting === pendingId;
   return (
     <section
-      className="bd__linkstrip"
+      className="flex flex-wrap items-center justify-between gap-3.5 rounded-[var(--o-r-xl)] border border-[var(--o-admin-line)] bg-[var(--ax-fill-1)] p-3"
       aria-label="Crear client des de la reserva"
     >
-      <div className="bd__linkstrip-main">
-        <h3>Client de pas</h3>
-        <p>No està vinculat al CRM. Crea client només si vols historial i seguiment post-event.</p>
+      <div className="min-w-0">
+        <h3 className="m-0 text-sm font-extrabold text-[var(--t)]">Client de pas</h3>
+        <p className="mt-0.5 text-xs text-[var(--t3)]">No està vinculat al CRM. Crea client només si vols historial i seguiment post-event.</p>
       </div>
       <button
         type="button"
         onClick={() => void submit('create', { pendingId })}
         disabled={isSubmitting || submitting !== null}
-        className="bd__linkstrip-btn bd__linkstrip-btn--primary"
+        className="ap-btn ap-btn--primary ap-btn--xs"
       >
         {isSubmitting ? 'Creant…' : 'Crear client'}
       </button>

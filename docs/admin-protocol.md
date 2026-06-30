@@ -1550,17 +1550,29 @@ Seqüència obligatòria de registre:
 
 ---
 
-### Canvi #1291 — 2026-06-30 — codex (EN MARXA)
+### Canvi #1293 — 2026-07-01 — codex (FET)
+**V5 paginació admin: invoices i proposals amb enters finits.**
+- `lib/services/proposalAdminService.ts` i `lib/services/invoiceAdminService.ts`: normalitzen `page` i `limit` com enters positius finits, amb `limit` capat a 200.
+- `__tests__/lib/services/proposalAdminService.test.ts` i `__tests__/lib/services/invoiceAdminService.test.ts`: cobertura de decimals, `Infinity`/`NaN` i límits superiors.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\proposalAdminService.test.ts` (20 tests OK), `pnpm test:run -- --run __tests__\lib\services\invoiceAdminService.test.ts` (8 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK, `git diff --check` OK i `pnpm run validate:core` OK.
+- Validació funcional: les llistes admin de pressupostos i factures ja no envien `skip/take` decimals o no finits al client Prisma.
+- Validació humana/UX: la paginació manté defaults previs, però queda estable amb entrada bruta.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1293`; el següent canvi real ha de ser `#1294`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1291 — 2026-06-30 — codex (FET)
 **V5 pressupostos personalitzats: imports sanejats.**
 - `lib/services/customQuoteAdminService.ts`: saneja imports no negatius a 2 decimals, marge no negatiu i `finalPrice` nul quan arriba buit/brut.
 - `__tests__/lib/services/customQuoteAdminService.test.ts`: cobertura de create/update amb valors bruts i decimals monetaris.
-- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\customQuoteAdminService.test.ts` (12 tests OK). Pendents abans de tancar: `tsc`, `qa:protocol`, `git diff --check` i comprovació del blocker global d'Inbox.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\customQuoteAdminService.test.ts` (12 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK, `git diff --check` OK i `pnpm run validate:core` OK. El blocker anterior d'Inbox ja queda resolt en el counter global #1292 de Claude.
 - Validació funcional: els pressupostos personalitzats ja no poden persistir imports negatius o `NaN` des del servei admin.
 - Validació humana/UX: les xifres de pressupost manual queden normalitzades abans d'arribar a BD encara que una ruta enviï entrada bruta.
 - `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1291`; el següent canvi real ha de ser `#1292`.
 - Començat per: `codex`
 - Treballant per: `codex`
-- Tancat per: `pendent`
+- Tancat per: `codex`
 
 ### Canvi #1290 — 2026-06-30 — codex (FET)
 **V5 productes col·laborador: preus i ordre sanejats.**
@@ -1582,6 +1594,17 @@ Seqüència obligatòria de registre:
 - Validació funcional: captures arxiu + settings.
 - Validació humana/UX: hipersemblants.
 - Començat per: `claude+agents`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1294 — 2026-07-01 — claude (FET)
+**Erradicació: booking-detall (bd) 100% canònic.**
+- bookings/[id] 531 bd__ → AdminPage/AdminSection/.ap-card/.ap-kpi/.ap-tab/.ap-table-* (agent). Claude acaba 2 fxd__ de BookingTotalEditor → .ap-btn. booking-detail.css conservat (classes amb guió vives, no BEM).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1294`; el següent canvi real ha de ser `#1295`.
+- Validació tècnica: `tsc` 0; qa:canon-debt OK.
+- Validació funcional: captura booking-detall canònica.
+- Validació humana/UX: hipersemblant.
+- Començat per: `claude+agent`
 - Treballant per: `claude`
 - Tancat per: `claude`
 

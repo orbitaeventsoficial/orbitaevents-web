@@ -246,7 +246,7 @@ export default async function BookingsPage({
   const now = new Date();
 
   return (
-    <div className="bd__root">
+    <div className="min-h-screen bg-[var(--ax-canvas)] text-[var(--t2)]">
 
       {/* ── Header sticky — mateix patró que la fitxa de reserva ── */}
       <div className="ap-sticky-header">

@@ -1,3 +1,41 @@
+## 2026-07-01 — Erradicació: booking-detall (bd) 100% canònic (Canvi #1294, claude+agent)
+
+### Què s'ha fet
+- **booking-detall** (bookings/[id], la fitxa de reserva): ~531 `bd__` → canònic (agent: AdminPage, AdminSection, .ap-card, .ap-kpi, .ap-tab, .ap-table-*, .ap-badge, .adm-input). Claude acaba els 2 últims `fxd__savebtn/cancelbtn` de BookingTotalEditor → .ap-btn.
+- booking-detail.css NO esborrat: conté classes vives amb GUIÓ (bd-total-editor, bd-gallery-*, bk-pipeline-*) que NO són BEM xx__ (no són deute, s'usen). Conservat correctament.
+- Verificat: captura fitxa reserva (header+tabs+seccions+resum econòmic), idèntic al sistema. 0 bd__/fxd__, tsc 0.
+
+### Validació
+- Validació tècnica: `tsc` 0; `qa:canon-debt` OK (bd desaparegut).
+- Validació funcional: captura booking-detall canònica.
+- Validació humana/UX: hipersemblant.
+
+### Coordinació
+Counter → 1294. 17 pàgines. Queda NOMÉS la fitxa de lead (fxd/fx, la referència) — agent es va aturar a mig (límit sessió), es reprèn. + cdh residual.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-01 — V5 paginació admin: invoices i proposals amb enters finits (Canvi #1293, codex)
+
+### Context
+`listAdminProposals` i `listAdminInvoices` calculaven `page`, `limit`, `skip` i `take` amb `Number(...)` directe. Això podia deixar passar decimals o valors no finits abans d'arribar a Prisma.
+
+### Què s'ha fet
+- `lib/services/proposalAdminService.ts` i `lib/services/invoiceAdminService.ts`: normalitzen `page` i `limit` com enters positius finits, amb `limit` capat a 200.
+- `__tests__/lib/services/proposalAdminService.test.ts` i `__tests__/lib/services/invoiceAdminService.test.ts`: cobertura de decimals, `Infinity`/`NaN` i límits superiors.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\proposalAdminService.test.ts` (20 tests OK), `pnpm test:run -- --run __tests__\lib\services\invoiceAdminService.test.ts` (8 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK, `git diff --check` OK i `pnpm run validate:core` OK.
+- Validació funcional: les llistes admin de pressupostos i factures ja no envien `skip/take` decimals o no finits al client Prisma.
+- Validació humana/UX: la paginació manté defaults previs, però queda estable amb entrada bruta.
+
+### Coordinació
+Counter → 1293. No toca mails automàtics, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks, booking detail/bd ni canonització de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-01 — Última milla: arxiu (ax) + settings-inbox (ix) 100% canònics (Canvi #1292, claude+agents)
 
 ### Què s'ha fet
@@ -26,7 +64,7 @@ Counter → 1292. 16 pàgines. Agent bd (booking-detall, 531) encara treballant.
 - `__tests__/lib/services/customQuoteAdminService.test.ts`: cobertura de create/update amb valors bruts i decimals monetaris.
 
 ### Validació
-- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\customQuoteAdminService.test.ts` (12 tests OK). Pendents abans de tancar: `tsc`, `qa:protocol`, `git diff --check` i comprovació del blocker global d'Inbox.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\customQuoteAdminService.test.ts` (12 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK, `git diff --check` OK i `pnpm run validate:core` OK. El blocker anterior d'Inbox ja queda resolt en el counter global #1292 de Claude.
 - Validació funcional: els pressupostos personalitzats ja no poden persistir imports negatius o `NaN` des del servei admin.
 - Validació humana/UX: les xifres de pressupost manual queden normalitzades abans d'arribar a BD encara que una ruta enviï entrada bruta.
 
@@ -34,7 +72,7 @@ Counter → 1292. 16 pàgines. Agent bd (booking-detall, 531) encara treballant.
 Counter → 1291. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni canonització de Claude.
 - Començat per: `codex`
 - Treballant per: `codex`
-- Tancat per: `pendent`
+- Tancat per: `codex`
 
 ## 2026-06-30 — V5 productes col·laborador: preus i ordre sanejats (Canvi #1290, codex)
 

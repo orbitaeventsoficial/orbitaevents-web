@@ -70,8 +70,8 @@ export default function BookingTotalEditor({
             className="bd-total-editor__input"
           />
           <span className="text-xs text-[var(--t3)]">€</span>
-          <button onClick={save} disabled={saving} className="fxd__savebtn text-xs">✓</button>
-          <button onClick={() => setEditing(false)} className="fxd__cancelbtn text-xs">✕</button>
+          <button onClick={save} disabled={saving} className="ap-btn ap-btn--primary ap-btn--xs">✓</button>
+          <button onClick={() => setEditing(false)} className="ap-btn ap-btn--xs">✕</button>
         </span>
       ) : (
         <button

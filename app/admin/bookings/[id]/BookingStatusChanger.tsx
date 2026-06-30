@@ -84,17 +84,17 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
         disabled={isLoading}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className={`bd__status-chip ${conf.bg} ${conf.text} ${conf.border}`}
+        className={`inline-flex h-8 cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border pl-2.5 pr-3 text-sm font-semibold transition-opacity hover:opacity-80 disabled:cursor-wait disabled:opacity-60 ${conf.bg} ${conf.text} ${conf.border}`}
       >
-        <span className={`bd__status-dot ${STATUS_DOT[currentStatus] ?? 'bd__status-dot--fallback'}`} />
+        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT[currentStatus] ?? 'bg-[var(--t3)]'}`} />
         {conf.label}
-        <svg className={`bd__status-arrow${open ? ' bd__status-arrow--open' : ''}`} width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+        <svg className={`flex shrink-0 items-center opacity-60 transition-transform${open ? ' rotate-180' : ''}`} width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
           <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </button>
 
       {open && (
-        <div className="bd__status-menu" role="listbox" aria-label="Canviar estat">
+        <div className="absolute left-0 top-[calc(100%+0.375rem)] z-50 flex min-w-[11.25rem] flex-col gap-px rounded-[var(--o-r-lg)] border border-[var(--o-admin-line-2)] bg-[var(--o-admin-raised)] p-1 shadow-[0_8px_24px_var(--ax-overlay-xl)]" role="listbox" aria-label="Canviar estat">
           {BOOKING_STATUS_ORDER.map((status) => {
             const c = getBookingStatusDisplay(status);
             const isActive = status === currentStatus;
@@ -105,9 +105,9 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
                 role="option"
                 aria-selected={isActive}
                 onClick={() => void handleStatusChange(status)}
-                className={`bd__status-opt${isActive ? ' bd__status-opt--on' : ''}`}
+                className={`flex items-center gap-2 rounded-[var(--o-r-md)] px-2.5 py-1.5 text-left text-xs font-semibold transition-colors hover:bg-[var(--ax-fill-3)] hover:text-[var(--t)] ${isActive ? 'bg-[var(--ax-fill-2)] text-[var(--t)]' : 'text-[var(--t2)]'}`}
               >
-                <span className={`bd__status-dot ${STATUS_DOT[status] ?? 'bd__status-dot--fallback'}`} />
+                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT[status] ?? 'bg-[var(--t3)]'}`} />
                 {c.label}
                 {isActive && <span className="ml-auto opacity-50 text-xs">actiu</span>}
               </button>

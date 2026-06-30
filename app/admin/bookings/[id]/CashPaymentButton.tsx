@@ -60,7 +60,7 @@ export default function CashPaymentButton({
 
   if (done) {
     return (
-      <p className="bd__cashnote">💵 Cobrat en efectiu · {formatCurrency(total)}</p>
+      <p className="text-xs font-semibold text-[var(--o-stage-won)]">💵 Cobrat en efectiu · {formatCurrency(total)}</p>
     );
   }
 
