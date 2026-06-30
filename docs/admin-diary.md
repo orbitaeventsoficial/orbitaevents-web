@@ -1,3 +1,21 @@
+## 2026-06-30 — Erradicació: inbox/safata 100% canònica (Canvi #1276, claude+agent)
+
+### Què s'ha fet
+- `SafataClient.tsx` (la pàgina més complexa: sidebar carpetes + pane llista + detall lead + detall IMAP + modal Composer + modal Extreure-lead + dropdown Moure): 553 `sf__` → canònic (AdminPage, AdminEmptyState, .ap-btn/--primary/--secondary/--danger/--xs, .ap-tab/--active, .adm-input/--textarea, .ap-inline-alert, layout 3 columnes Tailwind+tokens). Funcionalitat intacta (selecció múltiple, filtres, cerca, ordenació, accions bulk, moure, flag, esborrar, respondre/reenviar, crear lead/client, paginació, auto-refresh).
+- `inbox.css`: tretes TOTES les regles sf__ (bloc mort + bloc viu 3 columnes). `ix__` (52, settings) INTACTE; @keyframes sf-spin conservat (l'usa ix__). Import tret de page.tsx (safata); settings segueix important-lo.
+- Verificat: captura safata funcional + canònica. 0 sf__, ix__ intactes, tsc 0.
+
+### Validació
+- Validació tècnica: `tsc` 0; `qa:canon-debt` OK; ix__ intacte (52); settings import OK.
+- Validació funcional: captura safata canònica.
+- Validació humana/UX: hipersemblant; inbox settings no afectat.
+
+### Coordinació
+Counter → 1276. 10a pàgina. TANDA 3 COMPLETA (inbox+clientes+presupuestos). Deute ~3500.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-30 — Erradicació: presupuestos (llista + detall) 100% canònica (Canvi #1274, claude+agent)
 
 ### Què s'ha fet
@@ -16,7 +34,7 @@ Counter → 1274. 9a pàgina. Agent inbox (sf) encara treballant. Tanda 3 quasi 
 - Treballant per: `claude`
 - Tancat per: `claude`
 
-## 2026-06-30 — V5 reserves: el so Isma no s'afegeix a bolos sense pack de catàleg (Canvi #1274, codex)
+## 2026-06-30 — V5 reserves: el so Isma no s'afegeix a bolos sense pack de catàleg (Canvi #1275, codex)
 
 ### Context
 La creació de reserva afegeix automàticament la línia de lloguer de so Isma quan el bolo porta pack de catàleg. Però els bolos personalitzats també resolen un pack tècnic intern de 0 €, i això podia fer que un bolo sense pack de catàleg rebés un cost de so automàtic indegut si Isma existeix a BD.
@@ -31,7 +49,7 @@ La creació de reserva afegeix automàticament la línia de lloguer de so Isma q
 - Validació humana/UX: marge i cost de la nova reserva personalitzada no queden contaminats per una línia invisible de so.
 
 ### Coordinació
-Counter → 1274. Renumerat de #1273 a #1274 perquè Claude ja havia tancat #1273 a clientes. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni canonització de Claude.
+Counter → 1275. Renumerat de #1273/#1274 a #1275 perquè Claude ja havia tancat #1273 a clientes i #1274 a presupuestos. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni canonització de Claude.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`

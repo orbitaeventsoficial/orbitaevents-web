@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1276 — 2026-06-30 — claude (FET)
+**Erradicació: inbox/safata 100% canònica (la més complexa).**
+- SafataClient 553 sf__ → AdminPage/.ap-btn/.ap-tab/.adm-input/.ap-inline-alert/AdminEmptyState + layout 3 col tokens. inbox.css: regles sf__ tretes; ix__ (52) i sf-spin intactes. Import tret de page.tsx (safata); settings el manté.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1276`; el següent canvi real ha de ser `#1277`.
+- Validació tècnica: `tsc` 0; qa:canon-debt OK; ix__ intacte.
+- Validació funcional: captura safata canònica, funcionalitat intacta.
+- Validació humana/UX: hipersemblant.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1274 — 2026-06-30 — claude (FET)
 **Erradicació: presupuestos (llista + detall) 100% canònica.**
 - page+ProposalsList+ProposalOwnerPanel+[id]/page 137 pr__ → AdminPage/.ap-kpi/.ap-table-*/.ap-card/.ap-badge/.adm-input/AdminEmptyState. presupuestos.css ESBORRAT + imports trets. PdfStudio NO tocat.
@@ -1561,15 +1572,15 @@ Seqüència obligatòria de registre:
 - Treballant per: `claude`
 - Tancat per: `claude`
 
-### Canvi #1274 — 2026-06-30 — codex (FET)
+### Canvi #1275 — 2026-06-30 — codex (FET)
 **V5 reserves: el so Isma no s'afegeix a bolos sense pack de catàleg.**
 - `lib/services/bookingCreationService.ts`: separa `hasCatalogPack` del pack tècnic personalitzat i només aplica `appendSoundRentalLine()` quan el `packId` original és un pack real de catàleg.
 - `__tests__/lib/services/bookingCreationService.test.ts`: cobertura de bolo `__custom__` amb Isma existent que manté només les línies explícites i no afegeix so automàtic.
 - Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\bookingCreationService.test.ts` (44 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
 - Validació funcional: un bolo personalitzat no rep cost automàtic de so pel simple fet de tenir pack tècnic intern.
 - Validació humana/UX: marge i cost de la nova reserva personalitzada no queden contaminats per una línia invisible de so.
-- Renumerat de `#1273` a `#1274` perquè Claude ja havia tancat `#1273` a clientes.
-- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1274`; el següent canvi real ha de ser `#1275`.
+- Renumerat de `#1273/#1274` a `#1275` perquè Claude ja havia tancat `#1273` a clientes i `#1274` a presupuestos.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1275`; el següent canvi real ha de ser `#1276`.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`

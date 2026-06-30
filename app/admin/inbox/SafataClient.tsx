@@ -6,6 +6,7 @@ import { formatDate, formatDateShort, formatDateTime } from '@/lib/constants';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { AdminEmptyState } from '../components/AdminPage';
 
 /* ── Tipus ─────────────────────────────────────────────────────────────────── */
 export type SafataLead = {
@@ -203,6 +204,33 @@ function quoteForward(email: ImapEmail): string {
   const body = (email.bodyText || '').slice(0, 4000);
   return `\n\n──────── Missatge reenviat ────────\nDe: ${fromLine}\nData: ${date}\nAssumpte: ${email.subject}\nPer a: ${toLine}\n\n${body}`;
 }
+
+/* ── Classes canòniques compartides (Tailwind + tokens · 100% canònic) ─────── */
+const NAV_ITEM =
+  'flex w-full items-center gap-2 rounded-[var(--o-r-md)] border border-transparent bg-transparent px-3 py-2 text-left text-sm font-semibold text-[var(--t2)] no-underline transition-colors hover:bg-[var(--panel)] hover:text-[var(--t)]';
+const NAV_ITEM_ON =
+  'border-[var(--hair-gold)] bg-[color-mix(in_oklab,var(--gold)_10%,var(--panel))] text-[var(--gold-bright)] hover:bg-[color-mix(in_oklab,var(--gold)_10%,var(--panel))] hover:text-[var(--gold-bright)]';
+const NAV_BADGE =
+  'inline-flex h-[1.125rem] min-w-[1.125rem] flex-shrink-0 items-center justify-center rounded-[var(--o-r-sm)] bg-[var(--gold)] px-1.5 text-xs font-bold leading-none text-[var(--gold-ink)]';
+const ICON_BTN =
+  'inline-flex h-[2.125rem] w-[2.125rem] flex-shrink-0 items-center justify-center rounded-[var(--o-r-sm)] border border-transparent bg-transparent text-base text-[var(--t3)] transition-colors hover:border-[var(--line2)] hover:bg-[var(--raised)] hover:text-[var(--t)]';
+const ICON_BTN_ON =
+  'border-[var(--hair-gold)] bg-[color-mix(in_oklab,var(--gold)_12%,var(--panel))] text-[var(--gold-bright)] hover:text-[var(--gold-bright)]';
+const ICON_BTN_DANGER =
+  'text-[var(--o-danger)] hover:border-[color-mix(in_oklab,var(--o-danger)_40%,transparent)] hover:bg-[var(--o-danger-soft)] hover:text-[var(--o-danger)]';
+const CLOSE_BTN =
+  'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[var(--o-r-sm)] border border-[var(--line2)] bg-transparent text-base text-[var(--t3)] transition-colors hover:border-[var(--hair-gold)] hover:bg-[var(--raised)] hover:text-[var(--t)]';
+const DATA_LABEL = 'text-xs font-bold uppercase tracking-[0.15em] text-[var(--t3)]';
+const MODAL_BACKDROP =
+  'fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[color-mix(in_oklab,var(--canvas)_80%,var(--ax-ink))] px-5 py-[5vh]';
+const MODAL =
+  'flex w-full max-w-[45rem] flex-col overflow-hidden rounded-[var(--o-r-lg)] border border-[var(--hair-gold)] bg-[var(--panel)] shadow-[0_24px_48px_var(--ax-overlay-lg)]';
+const MODAL_HEAD =
+  'flex items-center justify-between border-b border-[var(--line)] bg-[color-mix(in_oklab,var(--gold)_5%,var(--panel))] px-[1.125rem] py-3.5';
+const MODAL_TITLE = 'text-base font-bold tracking-[-0.005em] text-[var(--t)]';
+const MODAL_FOOTER =
+  'flex flex-wrap items-center gap-2 border-t border-[var(--line)] bg-[color-mix(in_oklab,var(--canvas)_92%,var(--ax-ink))] px-4 py-3';
+const SPIN = 'inline-block animate-spin';
 
 /* ── Component principal ───────────────────────────────────────────────────── */
 export default function SafataClient({
@@ -626,89 +654,89 @@ export default function SafataClient({
   const hasSelected = (active.kind === 'leads' && !!selectedLead) || (active.kind === 'folder' && !!selectedImap);
 
   return (
-    <div className="sf">
+    <div className="flex h-[100dvh] flex-col overflow-hidden bg-[var(--canvas)] text-[var(--t)] md:flex-row">
 
       {/* ── Sidebar ──────────────────────────────────────────────────────── */}
-      <aside className="sf__sidebar">
-        <div className="sf__sidebar-brand">
-          <span className="sf__eyebrow">Comunicació</span>
-          <h1 className="sf__title">Safata</h1>
+      <aside className="flex flex-none flex-col overflow-hidden border-b border-[var(--line)] bg-[var(--side)] md:w-[11rem] md:border-b-0 md:border-r">
+        <div className="hidden flex-none border-b border-[var(--line)] px-4 pb-3.5 pt-4 md:block">
+          <p className="text-xs font-bold uppercase tracking-[0.22em] text-[var(--gold)] opacity-70">Comunicació</p>
+          <h1 className="text-2xl font-bold leading-none text-[var(--t)] [font-family:var(--display)]">Safata</h1>
         </div>
 
-        <nav className="sf__nav">
-          <div className="sf__navgroup">
+        <nav className="flex min-h-0 flex-1 flex-row gap-0.5 overflow-auto p-2 [scrollbar-width:none] md:flex-col [&::-webkit-scrollbar]:hidden">
+          <div className="flex flex-shrink-0 flex-col gap-0.5 md:flex-shrink">
             <button type="button"
-              className={`sf__navitem${active.kind === 'leads' ? ' is-on' : ''}`}
+              className={`${NAV_ITEM}${active.kind === 'leads' ? ` ${NAV_ITEM_ON}` : ''}`}
               onClick={() => handleTabChange({ kind: 'leads' })}>
-              <span className="sf__navitem-icon">📥</span>
-              <span className="sf__navitem-label">Leads web</span>
-              {entranceUnread > 0 && <span className="sf__navitem-badge">{entranceUnread}</span>}
+              <span className="w-[18px] flex-shrink-0 text-center text-base opacity-90">📥</span>
+              <span className="flex-1 whitespace-nowrap">Leads web</span>
+              {entranceUnread > 0 && <span className={NAV_BADGE}>{entranceUnread}</span>}
             </button>
           </div>
 
           {imapConfigured && (
-            <div className="sf__navgroup">
-              <span className="sf__navgroup-label">Bústia</span>
-              {foldersError && <p className="sf__navgroup-error">{foldersError}</p>}
+            <div className="flex flex-shrink-0 flex-col gap-0.5 md:mt-3 md:flex-shrink md:border-t md:border-[var(--line)] md:pt-3">
+              <span className="hidden px-2 pb-1.5 text-xs font-bold uppercase tracking-[0.2em] text-[var(--gold)] opacity-70 md:block">Bústia</span>
+              {foldersError && <p className="px-2 pb-1.5 text-xs text-[var(--o-stage-lost)]">{foldersError}</p>}
               {specialFolders.map(f => (
                 <button key={f.path} type="button"
-                  className={`sf__navitem${active.kind === 'folder' && active.path === f.path ? ' is-on' : ''}`}
+                  className={`${NAV_ITEM}${active.kind === 'folder' && active.path === f.path ? ` ${NAV_ITEM_ON}` : ''}`}
                   onClick={() => handleTabChange({ kind: 'folder', path: f.path, specialUse: f.iconKey })}>
-                  <span className="sf__navitem-icon">{ICONS[f.iconKey]}</span>
-                  <span className="sf__navitem-label">{FOLDER_LABELS[f.iconKey]}</span>
-                  {f.unread > 0 && <span className="sf__navitem-badge">{f.unread}</span>}
+                  <span className="w-[18px] flex-shrink-0 text-center text-base opacity-90">{ICONS[f.iconKey]}</span>
+                  <span className="flex-1 whitespace-nowrap">{FOLDER_LABELS[f.iconKey]}</span>
+                  {f.unread > 0 && <span className={NAV_BADGE}>{f.unread}</span>}
                 </button>
               ))}
             </div>
           )}
 
           {imapConfigured && customFolders.length > 0 && (
-            <div className="sf__navgroup">
-              <span className="sf__navgroup-label">Carpetes</span>
+            <div className="flex flex-shrink-0 flex-col gap-0.5 md:mt-3 md:flex-shrink md:border-t md:border-[var(--line)] md:pt-3">
+              <span className="hidden px-2 pb-1.5 text-xs font-bold uppercase tracking-[0.2em] text-[var(--gold)] opacity-70 md:block">Carpetes</span>
               {customFolders.map(f => (
                 <button key={f.path} type="button"
-                  className={`sf__navitem${active.kind === 'folder' && active.path === f.path ? ' is-on' : ''}`}
+                  className={`${NAV_ITEM}${active.kind === 'folder' && active.path === f.path ? ` ${NAV_ITEM_ON}` : ''}`}
                   onClick={() => handleTabChange({ kind: 'folder', path: f.path })}>
-                  <span className="sf__navitem-icon">{ICONS.custom}</span>
-                  <span className="sf__navitem-label" title={f.path}>{f.name}</span>
-                  {f.unread > 0 && <span className="sf__navitem-badge">{f.unread}</span>}
+                  <span className="w-[18px] flex-shrink-0 text-center text-base opacity-90">{ICONS.custom}</span>
+                  <span className="flex-1 truncate" title={f.path}>{f.name}</span>
+                  {f.unread > 0 && <span className={NAV_BADGE}>{f.unread}</span>}
                 </button>
               ))}
             </div>
           )}
         </nav>
 
-        <div className="sf__sidebar-foot">
+        <div className="flex flex-none gap-2 border-l border-[var(--line)] p-2 md:flex-col md:border-l-0 md:border-t">
           <button type="button"
-            className="sf__compose-trigger sf__compose-trigger--full"
+            className="ap-btn ap-btn--primary w-full justify-center"
             onClick={() => setComposerOpen({ mode: 'new' })}>
             ✉ Nou correu
           </button>
-          <a href="/admin/inbox/settings" className="sf__navitem">
-            <span className="sf__navitem-icon">⚙</span>
-            <span className="sf__navitem-label">Configuració</span>
+          <a href="/admin/inbox/settings" className={NAV_ITEM}>
+            <span className="w-[18px] flex-shrink-0 text-center text-base opacity-90">⚙</span>
+            <span className="flex-1 whitespace-nowrap">Configuració</span>
           </a>
         </div>
       </aside>
 
       {/* ── Pane (llista) ────────────────────────────────────────────────── */}
-      <div className="sf__pane">
-        <div className="sf__pane-head">
+      <div className="flex min-h-0 flex-none flex-col overflow-hidden border-[var(--line)] md:w-[21rem] md:border-r">
+        <div className="flex flex-none items-center gap-2 border-b border-[var(--line)] bg-[color-mix(in_oklab,var(--panel)_50%,var(--canvas))] px-3 py-2.5">
           {active.kind === 'folder' && filteredEmails.length > 0 && (
             <input
               type="checkbox"
-              className="sf__pane-checkbox"
+              className="h-3.5 w-3.5 flex-shrink-0 cursor-pointer accent-[var(--gold)]"
               aria-label="Seleccionar tots"
               checked={selectedUids.size > 0 && selectedUids.size === filteredEmails.length}
               ref={el => { if (el) el.indeterminate = selectedUids.size > 0 && selectedUids.size < filteredEmails.length; }}
               onChange={e => e.target.checked ? selectAllVisible(filteredEmails.map(x => x.uid)) : clearSelection()}
             />
           )}
-          <span className="sf__pane-title">{paneTitle}</span>
+          <span className="flex-1 truncate text-xs font-bold text-[var(--t)]">{paneTitle}</span>
           <select
             value={sortBy}
             onChange={e => setSortBy(e.target.value as typeof sortBy)}
-            className="sf__sort-select"
+            className="adm-input w-auto py-1 text-xs"
             aria-label="Ordenar per"
           >
             <option value="data-desc">Data ↓</option>
@@ -717,118 +745,120 @@ export default function SafataClient({
             <option value="remitent">Remitent A-Z</option>
           </select>
           {active.kind === 'folder' && (
-            <button type="button" className="sf__pane-refresh" aria-label="Refrescar"
+            <button type="button" className={`${ICON_BTN} h-[1.625rem] w-[1.625rem] border-[var(--line2)]`} aria-label="Refrescar"
               onClick={() => { invalidateFolder(active.path); loadFolders(); }}
               title="Refrescar carpeta">↻</button>
           )}
-          <span className="sf__pane-count">{paneCount}</span>
+          <span className="flex-shrink-0 rounded-[var(--o-r-xs)] border border-[var(--line)] bg-[var(--sunk)] px-1.5 py-0.5 text-xs tabular-nums text-[var(--t3)]">{paneCount}</span>
         </div>
 
         {actionFeedback && (
           <div
-            className={`sf__pane-feedback${actionFeedback.type === 'error' ? ' is-error' : ' is-ok'}`}
+            className={`ap-inline-alert ${actionFeedback.type === 'error' ? 'ap-inline-alert--danger' : 'ap-inline-alert--success'} flex items-start gap-2`}
             role={actionFeedback.type === 'error' ? 'alert' : 'status'}
           >
-            <span className="sf__pane-feedback-text">{actionFeedback.text}</span>
-            <button type="button" className="sf__pane-feedback-close" aria-label="Tancar avís"
+            <span className="min-w-0 flex-1">{actionFeedback.text}</span>
+            <button type="button" className="flex-shrink-0 cursor-pointer bg-transparent text-xs opacity-70 transition-opacity hover:opacity-100" aria-label="Tancar avís"
               onClick={() => setActionFeedback(null)}>✕</button>
           </div>
         )}
 
         {active.kind === 'folder' && selectedUids.size > 0 && (
-          <div className="sf__pane-actions" role="toolbar" aria-label="Accions en lot">
-            <span className="sf__pane-actions-count">{selectedUids.size} seleccionat{selectedUids.size === 1 ? '' : 's'}</span>
-            <button type="button" onClick={() => doBulk('markRead')} className="sf__action-btn sf__action-btn--ghost sf__action-btn--sm">● Llegit</button>
-            <button type="button" onClick={() => doBulk('markUnread')} className="sf__action-btn sf__action-btn--ghost sf__action-btn--sm">○ No llegit</button>
-            <button type="button" onClick={() => doBulk('flag')} className="sf__action-btn sf__action-btn--ghost sf__action-btn--sm">★ Marcar</button>
-            <button type="button" onClick={() => doBulk('unflag')} className="sf__action-btn sf__action-btn--ghost sf__action-btn--sm">☆ Treure</button>
+          <div className="sticky top-0 z-[2] flex flex-wrap items-center gap-1.5 border-b border-[var(--line)] bg-[color-mix(in_oklab,var(--gold)_5%,var(--panel))] px-3 py-2" role="toolbar" aria-label="Accions en lot">
+            <span className="pr-1.5 text-xs font-bold tracking-[0.05em] text-[var(--gold-bright)]">{selectedUids.size} seleccionat{selectedUids.size === 1 ? '' : 's'}</span>
+            <button type="button" onClick={() => doBulk('markRead')} className="ap-btn ap-btn--xs">● Llegit</button>
+            <button type="button" onClick={() => doBulk('markUnread')} className="ap-btn ap-btn--xs">○ No llegit</button>
+            <button type="button" onClick={() => doBulk('flag')} className="ap-btn ap-btn--xs">★ Marcar</button>
+            <button type="button" onClick={() => doBulk('unflag')} className="ap-btn ap-btn--xs">☆ Treure</button>
             <MoveDropdown folders={folders} special={special} currentPath={active.path}
               onMove={target => doBulk('moveTo', target)} />
-            <button type="button" onClick={() => doBulk('delete')} className="sf__action-btn sf__action-btn--ghost sf__action-btn--sm">🗑 Esborrar</button>
-            <button type="button" onClick={clearSelection} aria-label="Esborrar selecció" className="sf__action-btn sf__action-btn--ghost sf__action-btn--sm">✕</button>
+            <button type="button" onClick={() => doBulk('delete')} className="ap-btn ap-btn--xs ap-btn--danger">🗑 Esborrar</button>
+            <button type="button" onClick={clearSelection} aria-label="Esborrar selecció" className="ap-btn ap-btn--xs">✕</button>
           </div>
         )}
 
-        <div className="sf__search">
+        <div className="flex-none border-b border-[var(--line)] px-3 py-2.5">
           <input
             type="search"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder={outbound ? 'Cercar destinatari o assumpte...' : 'Cercar remitent o assumpte...'}
             aria-label="Cercar"
-            className="sf__searchinput"
+            className="adm-input"
           />
         </div>
 
-        <div className="sf__pane-list">
+        <div className="min-h-0 flex-1 overflow-y-auto">
           {/* Leads web */}
           {active.kind === 'leads' && (
             filteredLeads.length === 0 ? (
-              <div className="sf__empty">
-                <span className="sf__empty-icon">📭</span>
-                <p className="sf__empty-title">Cap lead</p>
-              </div>
-            ) : filteredLeads.map(lead => (
+              <AdminEmptyState icon="📭" title="Cap lead" />
+            ) : filteredLeads.map(lead => {
+              const selected = selectedLead?.id === lead.id;
+              const unread = lead.status === 'NEW';
+              return (
               <button key={lead.id} type="button" onClick={() => handleSelectLead(lead)}
-                className={['sf__lead', selectedLead?.id === lead.id ? 'is-selected' : '', lead.status === 'NEW' ? 'is-unread' : ''].filter(Boolean).join(' ')}>
-                <div className="sf__lead-row">
-                  {lead.status === 'NEW' && <span className="sf__lead-dot" aria-label="Nova" />}
-                  <span className="sf__lead-name">{lead.name}</span>
-                  {lead.status === 'NEW' && <span className="sf__lead-badge-new">NOU</span>}
-                  <span className="sf__lead-date">{formatDateShort(lead.createdAt)}</span>
+                className={`flex w-full flex-col gap-1 border-b border-l-[3px] px-2.5 py-2.5 text-left transition-colors hover:bg-[var(--panel)] ${selected ? 'border-l-[var(--gold)] bg-[color-mix(in_oklab,var(--gold)_8%,var(--panel))]' : 'border-l-transparent'} ${unread ? 'border-b-[var(--hair-gold)] bg-[color-mix(in_oklab,var(--gold)_6%,var(--canvas))]' : 'border-b-[var(--line)]'}`}>
+                <div className="flex items-center gap-2">
+                  {unread && <span className="h-[7px] w-[7px] flex-shrink-0 rounded-full bg-[var(--gold)] shadow-[0_0_6px_var(--gold)]" aria-label="Nova" />}
+                  <span className="flex-1 truncate text-sm font-bold text-[var(--t)]">{lead.name}</span>
+                  {unread && <span className="flex-shrink-0 rounded-[var(--o-r-xs)] bg-[var(--gold)] px-1.5 text-xs font-bold uppercase tracking-[0.1em] leading-relaxed text-[var(--gold-ink)]">NOU</span>}
+                  <span className="flex-shrink-0 text-xs text-[var(--t3)]">{formatDateShort(lead.createdAt)}</span>
                 </div>
-                <p className="sf__lead-preview">
+                <p className="truncate text-xs text-[var(--t3)]">
                   {lead.eventType ?? '—'}{lead.eventDate ? ` · ${formatDate(lead.eventDate)}` : ''}
                 </p>
               </button>
-            ))
+            );})
           )}
 
           {/* Carpeta IMAP */}
           {active.kind === 'folder' && (
             currentFolderState?.loading && filteredEmails.length === 0 ? (
-              <div className="sf__empty"><span className="sf__empty-icon sf__spin">↻</span><p className="sf__empty-title">Carregant...</p></div>
+              <AdminEmptyState icon="↻" title="Carregant..." />
             ) : currentFolderState?.error ? (
-              <div className="sf__empty">
-                <p className="sf__empty-title sf__empty-title--error">{currentFolderState.error}</p>
-                <button type="button" onClick={() => loadFolderEmails(active.path, 0)} className="sf__action-btn sf__action-btn--ghost">Reintentar</button>
-              </div>
+              <AdminEmptyState
+                icon="⚠"
+                title={currentFolderState.error}
+                action={<button type="button" onClick={() => loadFolderEmails(active.path, 0)} className="ap-btn ap-btn--xs">Reintentar</button>}
+              />
             ) : filteredEmails.length === 0 ? (
-              <div className="sf__empty"><span className="sf__empty-icon">{outbound ? '📤' : '📭'}</span><p className="sf__empty-title">{outbound ? 'Cap email enviat' : 'Cap correu'}</p></div>
+              <AdminEmptyState icon={outbound ? '📤' : '📭'} title={outbound ? 'Cap email enviat' : 'Cap correu'} />
             ) : <>
               {filteredEmails.map(email => {
                 const isSelected = selectedImap?.id === email.id;
                 const checked = selectedUids.has(email.uid);
+                const unread = !email.isRead && !outbound;
                 const display = outbound
                   ? ((email.to ?? [])[0]?.name || (email.to ?? [])[0]?.address || '—')
                   : (email.from.name || email.from.address);
                 const pill = email.orbita ? buildOrbitaPill(email.orbita) : null;
                 return (
-                  <div key={email.id} className={['sf__lead', isSelected ? 'is-selected' : '', !email.isRead && !outbound ? 'is-unread' : ''].filter(Boolean).join(' ')}>
+                  <div key={email.id} className={`grid grid-cols-[auto_1fr_auto] items-center gap-2 border-b border-l-[3px] px-2.5 py-2.5 transition-colors ${isSelected ? 'border-l-[var(--gold)] bg-[color-mix(in_oklab,var(--gold)_8%,var(--panel))]' : 'border-l-transparent'} ${unread ? 'border-b-[var(--hair-gold)] bg-[color-mix(in_oklab,var(--gold)_6%,var(--canvas))]' : 'border-b-[var(--line)]'}`}>
                     <input
                       type="checkbox"
                       checked={checked}
                       onChange={() => toggleSelect(email.uid)}
-                      className="sf__lead-checkbox"
+                      className="h-3.5 w-3.5 flex-shrink-0 cursor-pointer accent-[var(--gold)]"
                       aria-label="Seleccionar"
                       onClick={e => e.stopPropagation()}
                     />
-                    <button type="button" onClick={() => handleSelectImap(email)} className="sf__lead-body">
-                      <div className="sf__lead-row">
-                        {!email.isRead && !outbound && <span className="sf__lead-dot" aria-label="No llegit" />}
-                        {email.isFlagged && <span className="sf__lead-flag is-on" aria-label="Marcat">★</span>}
-                        <span className="sf__lead-name">{display}</span>
-                        <span className="sf__lead-date">{formatDateShort(email.date)}</span>
+                    <button type="button" onClick={() => handleSelectImap(email)} className="flex min-w-0 flex-col gap-1 bg-transparent text-left">
+                      <div className="flex items-center gap-2">
+                        {unread && <span className="h-[7px] w-[7px] flex-shrink-0 rounded-full bg-[var(--gold)] shadow-[0_0_6px_var(--gold)]" aria-label="No llegit" />}
+                        {email.isFlagged && <span className="flex-shrink-0 text-xs text-[var(--gold-bright)] [text-shadow:0_0_5px_var(--gold)]" aria-label="Marcat">★</span>}
+                        <span className="flex-1 truncate text-sm font-bold text-[var(--t)]">{display}</span>
+                        <span className="flex-shrink-0 text-xs text-[var(--t3)]">{formatDateShort(email.date)}</span>
                       </div>
-                      <p className="sf__lead-preview">
+                      <p className="truncate text-xs text-[var(--t3)]">
                         {email.subject}
-                        {email.hasAttachments && <span className="sf__lead-attach"> 📎</span>}
-                        {pill && <span className="sf__lead-badge" title={pill.hint}>🔗 {pill.label}</span>}
+                        {email.hasAttachments && <span className="ml-1 inline-block text-xs opacity-70"> 📎</span>}
+                        {pill && <span className="ml-1.5 inline-block whitespace-nowrap rounded-[var(--o-r-xs)] border border-[var(--hair-gold)] bg-[color-mix(in_oklab,var(--gold)_10%,var(--panel))] px-1.5 text-xs font-bold tracking-[0.04em] text-[var(--gold-bright)]" title={pill.hint}>🔗 {pill.label}</span>}
                       </p>
                     </button>
-                    <div className="sf__lead-quickacts">
+                    <div className="flex flex-shrink-0 items-center gap-1">
                       <button type="button"
-                        className={`sf__iconbtn${email.isFlagged ? ' is-on' : ''}`}
+                        className={`${ICON_BTN} h-8 w-8${email.isFlagged ? ` ${ICON_BTN_ON}` : ''}`}
                         title={email.isFlagged ? 'Treure marca' : 'Marcar'}
                         aria-label={email.isFlagged ? 'Treure marca' : 'Marcar'}
                         aria-pressed={email.isFlagged}
@@ -836,7 +866,7 @@ export default function SafataClient({
                         {email.isFlagged ? '★' : '☆'}
                       </button>
                       <button type="button"
-                        className="sf__iconbtn sf__iconbtn--danger"
+                        className={`${ICON_BTN} ${ICON_BTN_DANGER} h-8 w-8`}
                         title="Esborrar"
                         aria-label="Esborrar correu"
                         onClick={e => { e.stopPropagation(); deleteSingle(email); }}>
@@ -848,7 +878,7 @@ export default function SafataClient({
               })}
               {currentFolderState?.hasMore && (
                 <button type="button" onClick={() => loadFolderEmails(active.path, currentFolderState.offset, true)}
-                  disabled={currentFolderState.loading} className="sf__load-more">
+                  disabled={currentFolderState.loading} className="ap-btn ap-btn--secondary w-full rounded-none border-x-0 border-b-0">
                   {currentFolderState.loading ? 'Carregant...' : 'Carregar més'}
                 </button>
               )}
@@ -884,14 +914,14 @@ export default function SafataClient({
           onDelete={() => deleteSingle(selectedImap, active.kind === 'leads' ? (special?.inbox ?? undefined) : undefined)}
         />
       ) : !hasSelected && !composerOpen ? (
-        <div className="sf__detail-blank">
-          <span className="sf__detail-blank-icon">
+        <div className="flex flex-1 flex-col items-center justify-center border-l border-[var(--line)] bg-[color-mix(in_oklab,var(--canvas)_96%,var(--panel))] p-10 text-center text-[var(--t3)]">
+          <span className="mb-4 text-3xl opacity-40">
             {outbound ? '📤' : active.kind === 'folder' ? '📨' : '📬'}
           </span>
-          <p className="sf__detail-blank-title">
+          <p className="mb-1.5 text-base font-bold text-[var(--t2)]">
             Selecciona un {outbound ? 'enviat' : 'correu'}
           </p>
-          <p className="sf__detail-blank-body">El contingut del missatge apareixerà aquí.</p>
+          <p className="max-w-[16rem] text-xs leading-relaxed text-[var(--t3)]">El contingut del missatge apareixerà aquí.</p>
         </div>
       ) : null}
 
@@ -1004,55 +1034,53 @@ function ExtractEmailModal({
   };
 
   return (
-    <div className="sf__modal-backdrop" role="dialog" aria-modal="true" aria-label="Extreure dades del correu">
-      <div className="sf__modal sf__extract-modal">
-        <div className="sf__modal-head">
-          <span className="sf__modal-title">✦ Crear lead des del correu</span>
-          <button type="button" onClick={onClose} className="sf__detail-close" aria-label="Tancar">✕</button>
+    <div className={MODAL_BACKDROP} role="dialog" aria-modal="true" aria-label="Extreure dades del correu">
+      <div className={`${MODAL} max-w-[35rem]`}>
+        <div className={MODAL_HEAD}>
+          <span className={MODAL_TITLE}>✦ Crear lead des del correu</span>
+          <button type="button" onClick={onClose} className={CLOSE_BTN} aria-label="Tancar">✕</button>
         </div>
-        <div className="sf__modal-body">
-          <div className="sf__extract-fields">
-            <div className="sf__extract-row">
-              <span className="sf__extract-lbl">Nom</span>
-              <input type="text" value={name} onChange={e => setName(e.target.value)} className="sf__extract-input" aria-label="Nom" />
-            </div>
-            <div className="sf__extract-row">
-              <span className="sf__extract-lbl">Email</span>
-              <input type="email" value={emailVal} onChange={e => setEmailVal(e.target.value)} className="sf__extract-input" aria-label="Email" />
-            </div>
-            <div className="sf__extract-row">
-              <span className="sf__extract-lbl">Telèfon</span>
-              <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} className="sf__extract-input" placeholder="Opcional" aria-label="Telèfon" />
-            </div>
-            <div className="sf__extract-row">
-              <span className="sf__extract-lbl">Tipus d&apos;event</span>
-              <select value={eventType} onChange={e => setEventType(e.target.value)} className="sf__extract-select" aria-label="Tipus d'event">
-                {Object.entries(EVENT_TYPES_LABELS).map(([k, v]) => (
-                  <option key={k} value={k}>{v}</option>
-                ))}
-              </select>
-            </div>
-            <div className="sf__extract-row sf__extract-row--msg">
-              <span className="sf__extract-lbl">Missatge</span>
-              <textarea
-                value={message}
-                onChange={e => setMessage(e.target.value)}
-                className="sf__extract-input"
-                rows={4}
-                aria-label="Missatge"
-              />
-            </div>
+        <div className="flex flex-col gap-4 p-4">
+          <div className="grid gap-1.5">
+            <label htmlFor="ex-name" className={DATA_LABEL}>Nom</label>
+            <input id="ex-name" type="text" value={name} onChange={e => setName(e.target.value)} className="adm-input" />
           </div>
-          <p className="sf__extract-hint">
+          <div className="grid gap-1.5">
+            <label htmlFor="ex-email" className={DATA_LABEL}>Email</label>
+            <input id="ex-email" type="email" value={emailVal} onChange={e => setEmailVal(e.target.value)} className="adm-input" />
+          </div>
+          <div className="grid gap-1.5">
+            <label htmlFor="ex-phone" className={DATA_LABEL}>Telèfon</label>
+            <input id="ex-phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} className="adm-input" placeholder="Opcional" />
+          </div>
+          <div className="grid gap-1.5">
+            <label htmlFor="ex-type" className={DATA_LABEL}>Tipus d&apos;event</label>
+            <select id="ex-type" value={eventType} onChange={e => setEventType(e.target.value)} className="adm-input" aria-label="Tipus d'event">
+              {Object.entries(EVENT_TYPES_LABELS).map(([k, v]) => (
+                <option key={k} value={k}>{v}</option>
+              ))}
+            </select>
+          </div>
+          <div className="grid gap-1.5">
+            <label htmlFor="ex-msg" className={DATA_LABEL}>Missatge</label>
+            <textarea
+              id="ex-msg"
+              value={message}
+              onChange={e => setMessage(e.target.value)}
+              className="adm-input adm-input--textarea"
+              rows={4}
+            />
+          </div>
+          <p className="text-xs leading-relaxed text-[var(--t3)]">
             Es crearà un lead amb estat CONTACTED i s&apos;intentarà vincular al client existent.
           </p>
-          {error && <p className="sf__action-error sf__action-error--padded">{error}</p>}
+          {error && <div className="ap-inline-alert ap-inline-alert--danger" role="alert">{error}</div>}
         </div>
-        <div className="sf__modal-footer">
-          <button type="button" onClick={handleCreate} disabled={saving || !name.trim() || !emailVal.trim()} className="sf__action-btn sf__action-btn--primary">
+        <div className={MODAL_FOOTER}>
+          <button type="button" onClick={handleCreate} disabled={saving || !name.trim() || !emailVal.trim()} className="ap-btn ap-btn--primary">
             {saving ? 'Creant...' : 'Crear lead'}
           </button>
-          <button type="button" onClick={onClose} className="sf__action-btn sf__action-btn--ghost">Cancel·lar</button>
+          <button type="button" onClick={onClose} className="ap-btn ap-btn--secondary">Cancel·lar</button>
         </div>
       </div>
     </div>
@@ -1070,25 +1098,26 @@ function MoveDropdown({
 }) {
   const [open, setOpen] = useState(false);
   const targets = folders.filter(f => f.path !== currentPath);
+  const MOVE_ITEM = 'block w-full cursor-pointer rounded-[var(--o-r-sm)] bg-transparent px-2.5 py-1.5 text-left text-xs text-[var(--t2)] transition-colors hover:bg-[color-mix(in_oklab,var(--gold)_10%,var(--panel))] hover:text-[var(--gold-bright)]';
   return (
-    <div className="sf__move-wrap">
-      <button type="button" onClick={() => setOpen(o => !o)} className="sf__action-btn sf__action-btn--ghost sf__action-btn--sm">
+    <div className="relative inline-block">
+      <button type="button" onClick={() => setOpen(o => !o)} className="ap-btn ap-btn--xs">
         📁 Moure
       </button>
       {open && (
-        <div className="sf__move-menu" role="menu">
+        <div className="absolute left-0 top-full z-[3] mt-1 max-h-[17.5rem] min-w-[11.25rem] overflow-y-auto rounded-[var(--o-r-md)] border border-[var(--hair-gold)] bg-[var(--raised)] p-1 shadow-[0_12px_28px_var(--ax-overlay-lg)]" role="menu">
           {special?.inbox && special.inbox !== currentPath && (
-            <button type="button" onClick={() => { onMove(special.inbox); setOpen(false); }} className="sf__move-item">
+            <button type="button" onClick={() => { onMove(special.inbox); setOpen(false); }} className={MOVE_ITEM}>
               📥 Entrada
             </button>
           )}
           {special?.archive && special.archive !== currentPath && (
-            <button type="button" onClick={() => { onMove(special.archive!); setOpen(false); }} className="sf__move-item">
+            <button type="button" onClick={() => { onMove(special.archive!); setOpen(false); }} className={MOVE_ITEM}>
               📦 Arxiu
             </button>
           )}
           {targets.filter(t => !t.specialUse).map(t => (
-            <button key={t.path} type="button" onClick={() => { onMove(t.path); setOpen(false); }} className="sf__move-item">
+            <button key={t.path} type="button" onClick={() => { onMove(t.path); setOpen(false); }} className={MOVE_ITEM}>
               📁 {t.name}
             </button>
           ))}
@@ -1264,42 +1293,46 @@ function Composer({
     'lead-reply': 'Respondre al lead',
   };
 
+  const CC_TOGGLE = 'w-fit cursor-pointer border-b border-[var(--line)] bg-transparent px-4 py-1 text-left text-xs font-semibold text-[var(--t3)] transition-colors hover:text-[var(--t2)]';
+  const COMPOSE_INPUT = 'w-full border-0 border-b border-[var(--line)] bg-transparent px-4 py-2.5 text-base font-semibold text-[var(--t)] outline-none placeholder:text-[var(--t3)]';
   return (
-    <div className="sf__modal-backdrop" role="dialog" aria-modal="true" aria-label={titleByMode[mode]}>
-      <div className="sf__modal">
-        <div className="sf__modal-head">
-          <span className="sf__modal-title">{titleByMode[mode]}</span>
-          <button type="button" onClick={onClose} className="sf__detail-close" aria-label="Tancar">✕</button>
+    <div className={MODAL_BACKDROP} role="dialog" aria-modal="true" aria-label={titleByMode[mode]}>
+      <div className={MODAL}>
+        <div className={MODAL_HEAD}>
+          <span className={MODAL_TITLE}>{titleByMode[mode]}</span>
+          <button type="button" onClick={onClose} className={CLOSE_BTN} aria-label="Tancar">✕</button>
         </div>
-        <div className="sf__modal-body">
+        <div className="flex flex-col">
           {(mode === 'lead-reply' || mode === 'new') && (
-            <div className="sf__compose-tpls">
+            <div className="flex flex-wrap gap-1 border-b border-[var(--line)] px-3 py-2">
               {TPLS.map(t => (
-                <button key={t.key} type="button" onClick={() => selectTpl(t.key)} className={`sf__compose-tpl${tpl === t.key ? ' is-on' : ''}`}>
+                <button key={t.key} type="button" onClick={() => selectTpl(t.key)}
+                  className={`ap-tab ${tpl === t.key ? 'ap-tab--active' : 'ap-tab--idle'}`}>
                   {t.label}
                 </button>
               ))}
             </div>
           )}
-          <input type="email" value={to} onChange={e => setTo(e.target.value)} placeholder="Per a..." aria-label="Per a" className="sf__compose-subject" />
+          <input type="email" value={to} onChange={e => setTo(e.target.value)} placeholder="Per a..." aria-label="Per a" className={COMPOSE_INPUT} />
           {showCc ? (
-            <input type="text" value={cc} onChange={e => setCc(e.target.value)} placeholder="CC (separa amb comes)" aria-label="CC" className="sf__compose-subject sf__compose-cc" />
+            <input type="text" value={cc} onChange={e => setCc(e.target.value)} placeholder="CC (separa amb comes)" aria-label="CC" className={`${COMPOSE_INPUT} text-sm font-normal text-[var(--t2)]`} />
           ) : (
-            <button type="button" onClick={() => setShowCc(true)} className="sf__compose-cc-toggle">+ CC</button>
+            <button type="button" onClick={() => setShowCc(true)} className={CC_TOGGLE}>+ CC</button>
           )}
           {showBcc ? (
-            <input type="text" value={bcc} onChange={e => setBcc(e.target.value)} placeholder="CCO" aria-label="CCO" className="sf__compose-subject sf__compose-cc" />
+            <input type="text" value={bcc} onChange={e => setBcc(e.target.value)} placeholder="CCO" aria-label="CCO" className={`${COMPOSE_INPUT} text-sm font-normal text-[var(--t2)]`} />
           ) : (
-            <button type="button" onClick={() => setShowBcc(true)} className="sf__compose-cc-toggle">+ CCO</button>
+            <button type="button" onClick={() => setShowBcc(true)} className={CC_TOGGLE}>+ CCO</button>
           )}
-          <input type="text" value={subject} onChange={e => setSubject(e.target.value)} placeholder="Assumpte" aria-label="Assumpte" className="sf__compose-subject" />
+          <input type="text" value={subject} onChange={e => setSubject(e.target.value)} placeholder="Assumpte" aria-label="Assumpte" className={COMPOSE_INPUT} />
           {forwardAttachments.length > 0 && (
-            <div className="sf__compose-attachrow">
-              <span className="sf__compose-attachlbl">📎 Adjunts:</span>
+            <div className="flex flex-wrap items-center gap-2 border-b border-[var(--line)] bg-[color-mix(in_oklab,var(--gold)_3%,var(--panel))] px-4 py-2">
+              <span className="whitespace-nowrap text-xs font-bold text-[var(--t3)]">📎 Adjunts:</span>
               {forwardAttachments.map(a => (
-                <label key={a.partKey} className="sf__compose-attachcheck">
+                <label key={a.partKey} className="inline-flex cursor-pointer items-center gap-1.5 rounded-[var(--o-r-sm)] border border-[var(--line2)] bg-[var(--panel)] px-2 py-1 text-xs text-[var(--t2)] transition-colors has-[:checked]:border-[var(--hair-gold)] has-[:checked]:bg-[color-mix(in_oklab,var(--gold)_8%,var(--panel))] has-[:checked]:text-[var(--gold-bright)]">
                   <input
                     type="checkbox"
+                    className="h-3 w-3 flex-shrink-0 accent-[var(--gold)]"
                     checked={selectedAttachPartKeys.has(a.partKey)}
                     onChange={() => toggleAttach(a.partKey)}
                   />
@@ -1308,27 +1341,27 @@ function Composer({
               ))}
             </div>
           )}
-          <textarea value={body} onChange={e => setBody(e.target.value)} placeholder="Escriu el missatge..." aria-label="Cos del mail" className="sf__compose-body" />
-          {error && <p className="sf__action-error">{error}</p>}
+          <textarea value={body} onChange={e => setBody(e.target.value)} placeholder="Escriu el missatge..." aria-label="Cos del mail" className="min-h-[8.75rem] w-full resize-y border-0 border-b border-[var(--line)] bg-transparent px-4 py-3 text-base leading-relaxed text-[var(--t)] outline-none placeholder:text-[var(--t3)]" />
+          {error && <div className="ap-inline-alert ap-inline-alert--danger m-4" role="alert">{error}</div>}
           {success && (
-            <div className="sf__send-ok">
+            <div className="ap-inline-alert ap-inline-alert--success m-4" role="status">
               ✓ Enviat correctament — {success.folder ? `arxivat a ${success.folder}` : 'sense arxiu a Sent'}
             </div>
           )}
         </div>
-        <div className="sf__modal-footer">
-          <button type="button" onClick={handleSend} disabled={sending || !to.trim() || !subject.trim() || !body.trim()} className="sf__action-btn sf__action-btn--primary">
+        <div className={MODAL_FOOTER}>
+          <button type="button" onClick={handleSend} disabled={sending || !to.trim() || !subject.trim() || !body.trim()} className="ap-btn ap-btn--primary">
             {sending ? 'Enviant...' : 'Enviar'}
           </button>
           {draftsAvailable && (
-            <button type="button" onClick={handleSaveDraft} disabled={savingDraft} className="sf__action-btn sf__action-btn--ghost">
+            <button type="button" onClick={handleSaveDraft} disabled={savingDraft} className="ap-btn ap-btn--secondary">
               {savingDraft ? 'Desant...' : 'Desar esborrany'}
             </button>
           )}
-          <a href={lead?.id ? `/admin/inbox/compose?leadId=${lead.id}` : '/admin/inbox/compose'} className="sf__action-btn sf__action-btn--ghost" title="Composer complet (pressupost, adjunts)">
+          <a href={lead?.id ? `/admin/inbox/compose?leadId=${lead.id}` : '/admin/inbox/compose'} className="ap-btn ap-btn--secondary" title="Composer complet (pressupost, adjunts)">
             Composer complet ↗
           </a>
-          <button type="button" onClick={onClose} className="sf__action-btn sf__action-btn--ghost">Cancel·lar</button>
+          <button type="button" onClick={onClose} className="ap-btn ap-btn--secondary">Cancel·lar</button>
         </div>
       </div>
     </div>
@@ -1381,59 +1414,59 @@ function LeadDetail({
 
 
   return (
-    <div className="sf__detail">
-      <div className="sf__detail-head">
-        <div className="sf__detail-sender">
-          <div className="sf__detail-avatar">{lead.name.charAt(0).toUpperCase()}</div>
-          <div className="sf__detail-senderinfo">
-            <p className="sf__detail-sendername">{lead.name}</p>
-            <p className="sf__detail-senderaddr">{lead.email}</p>
+    <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex flex-none items-center justify-between gap-3 border-b border-[var(--line)] bg-[color-mix(in_oklab,var(--panel)_80%,var(--canvas))] px-5 py-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-[var(--hair-gold)] bg-[color-mix(in_oklab,var(--gold)_20%,var(--raised))] text-base font-bold text-[var(--gold-bright)]">{lead.name.charAt(0).toUpperCase()}</div>
+          <div className="min-w-0">
+            <p className="truncate text-base font-bold text-[var(--t)]">{lead.name}</p>
+            <p className="truncate text-xs text-[var(--t3)]">{lead.email}</p>
           </div>
         </div>
-        <div className="sf__detail-headactions">
-          <button type="button" onClick={handleToggleRead} disabled={markingStatus} className="sf__action-btn sf__action-btn--ghost sf__action-btn--sm">
+        <div className="flex flex-shrink-0 flex-wrap items-center justify-end gap-2">
+          <button type="button" onClick={handleToggleRead} disabled={markingStatus} className="ap-btn ap-btn--xs">
             {lead.status === 'NEW' ? '○ No llegit' : '● Llegit'}
           </button>
-          <button type="button" onClick={onCompose} className="sf__compose-trigger">✉ Respondre</button>
-          <button type="button" onClick={onClose} className="sf__detail-close" aria-label="Tancar">✕</button>
+          <button type="button" onClick={onCompose} className="ap-btn ap-btn--primary">✉ Respondre</button>
+          <button type="button" onClick={onClose} className={CLOSE_BTN} aria-label="Tancar">✕</button>
         </div>
       </div>
-      <div className="sf__detail-scroll">
-        <div className="sf__data-grid">
-          {lead.eventType && <div className="sf__data-field"><p className="sf__data-label">Tipus d&apos;event</p><p className="sf__data-value">{lead.eventType}</p></div>}
-          {lead.eventDate && <div className="sf__data-field"><p className="sf__data-label">Data</p><p className="sf__data-value">{formatDate(lead.eventDate)}</p></div>}
-          {displayTime && <div className="sf__data-field"><p className="sf__data-label">Horari</p><p className="sf__data-value">{displayTime}</p></div>}
-          {lead.eventLocation && <div className="sf__data-field"><p className="sf__data-label">Ubicació</p><p className="sf__data-value">{lead.eventLocation}</p></div>}
-          {lead.guestCount != null && <div className="sf__data-field"><p className="sf__data-label">Convidats</p><p className="sf__data-value">{lead.guestCount}</p></div>}
-          {lead.budget && <div className="sf__data-field"><p className="sf__data-label">Pressupost</p><p className="sf__data-value">{lead.budget}</p></div>}
-          {lead.phone && <div className="sf__data-field"><p className="sf__data-label">Telèfon</p><p className="sf__data-value"><a href={`tel:${lead.phone}`} className="sf__data-link">{lead.phone}</a></p></div>}
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <div className="grid grid-cols-2 gap-px border-b border-[var(--line)] bg-[var(--line)]">
+          {lead.eventType && <div className="flex flex-col gap-1 bg-[color-mix(in_oklab,var(--panel)_70%,var(--canvas))] px-[1.125rem] py-3.5"><p className={DATA_LABEL}>Tipus d&apos;event</p><p className="text-base font-semibold text-[var(--t)]">{lead.eventType}</p></div>}
+          {lead.eventDate && <div className="flex flex-col gap-1 bg-[color-mix(in_oklab,var(--panel)_70%,var(--canvas))] px-[1.125rem] py-3.5"><p className={DATA_LABEL}>Data</p><p className="text-base font-semibold text-[var(--t)]">{formatDate(lead.eventDate)}</p></div>}
+          {displayTime && <div className="flex flex-col gap-1 bg-[color-mix(in_oklab,var(--panel)_70%,var(--canvas))] px-[1.125rem] py-3.5"><p className={DATA_LABEL}>Horari</p><p className="text-base font-semibold text-[var(--t)]">{displayTime}</p></div>}
+          {lead.eventLocation && <div className="flex flex-col gap-1 bg-[color-mix(in_oklab,var(--panel)_70%,var(--canvas))] px-[1.125rem] py-3.5"><p className={DATA_LABEL}>Ubicació</p><p className="text-base font-semibold text-[var(--t)]">{lead.eventLocation}</p></div>}
+          {lead.guestCount != null && <div className="flex flex-col gap-1 bg-[color-mix(in_oklab,var(--panel)_70%,var(--canvas))] px-[1.125rem] py-3.5"><p className={DATA_LABEL}>Convidats</p><p className="text-base font-semibold text-[var(--t)]">{lead.guestCount}</p></div>}
+          {lead.budget && <div className="flex flex-col gap-1 bg-[color-mix(in_oklab,var(--panel)_70%,var(--canvas))] px-[1.125rem] py-3.5"><p className={DATA_LABEL}>Pressupost</p><p className="text-base font-semibold text-[var(--t)]">{lead.budget}</p></div>}
+          {lead.phone && <div className="flex flex-col gap-1 bg-[color-mix(in_oklab,var(--panel)_70%,var(--canvas))] px-[1.125rem] py-3.5"><p className={DATA_LABEL}>Telèfon</p><p className="text-base font-semibold text-[var(--t)]"><a href={`tel:${lead.phone}`} className="text-[var(--gold-bright)] no-underline hover:underline">{lead.phone}</a></p></div>}
         </div>
         {lead.message && (
-          <div className="sf__msg-section">
-            <p className="sf__msg-label">Missatge</p>
-            <p className="sf__msg-body">{lead.message}</p>
+          <div className="border-b border-[var(--line)] px-5 py-[1.125rem]">
+            <p className="mb-2.5 text-xs font-bold uppercase tracking-[0.15em] text-[var(--gold)] opacity-80">Missatge</p>
+            <p className="whitespace-pre-wrap text-base leading-relaxed text-[var(--t2)]">{lead.message}</p>
           </div>
         )}
-        <div className="sf__action-block">
-          <p className="sf__action-block-label">Client</p>
-          <div className="sf__action-row">
+        <div className="border-b border-[var(--line)] px-5 py-4">
+          <p className={`mb-3 ${DATA_LABEL}`}>Client</p>
+          <div className="flex flex-wrap gap-2">
             {lead.customerId ? (
-              <a href={buildCustomerHubHref(lead.customerId)} className="sf__action-btn sf__action-btn--primary">Veure client</a>
+              <a href={buildCustomerHubHref(lead.customerId)} className="ap-btn ap-btn--primary">Veure client</a>
             ) : (
-              <button type="button" onClick={handleCreateCustomer} disabled={creating} className="sf__action-btn sf__action-btn--primary">
+              <button type="button" onClick={handleCreateCustomer} disabled={creating} className="ap-btn ap-btn--primary">
                 {creating ? 'Creant...' : 'Crear client'}
               </button>
             )}
-            <a href={buildLeadWorkspaceHref(lead.id)} className="sf__action-btn sf__action-btn--ghost">Veure lead</a>
+            <a href={buildLeadWorkspaceHref(lead.id)} className="ap-btn ap-btn--secondary">Veure lead</a>
           </div>
-          {createError && <p className="sf__action-error">{createError}</p>}
+          {createError && <div className="ap-inline-alert ap-inline-alert--danger mt-2" role="alert">{createError}</div>}
         </div>
         {lead.phone && (
-          <div className="sf__action-block">
-            <p className="sf__action-block-label">Contacte directe</p>
-            <div className="sf__action-row">
-              <a href={`https://wa.me/${lead.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="sf__action-btn sf__action-btn--primary">WhatsApp</a>
-              <a href={`tel:${lead.phone}`} className="sf__action-btn sf__action-btn--ghost">Trucar</a>
+          <div className="border-b border-[var(--line)] px-5 py-4">
+            <p className={`mb-3 ${DATA_LABEL}`}>Contacte directe</p>
+            <div className="flex flex-wrap gap-2">
+              <a href={`https://wa.me/${lead.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="ap-btn ap-btn--primary">WhatsApp</a>
+              <a href={`tel:${lead.phone}`} className="ap-btn ap-btn--secondary">Trucar</a>
             </div>
           </div>
         )}
@@ -1489,79 +1522,79 @@ function ImapDetail({
   const ccList = (email.cc ?? []).map(c => c.name ? `${c.name} <${c.address}>` : c.address).filter(Boolean);
 
   return (
-    <div className="sf__detail">
-      <div className="sf__detail-head">
-        <div className="sf__detail-sender">
-          <div className="sf__detail-avatar">{display.charAt(0).toUpperCase()}</div>
-          <div className="sf__detail-senderinfo">
-            <p className="sf__detail-sendername">{display}</p>
-            <p className="sf__detail-senderaddr">{displayAddr}</p>
+    <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex flex-none items-center justify-between gap-3 border-b border-[var(--line)] bg-[color-mix(in_oklab,var(--panel)_80%,var(--canvas))] px-5 py-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-[var(--hair-gold)] bg-[color-mix(in_oklab,var(--gold)_20%,var(--raised))] text-base font-bold text-[var(--gold-bright)]">{display.charAt(0).toUpperCase()}</div>
+          <div className="min-w-0">
+            <p className="truncate text-base font-bold text-[var(--t)]">{display}</p>
+            <p className="truncate text-xs text-[var(--t3)]">{displayAddr}</p>
           </div>
         </div>
-        <div className="sf__detail-headactions">
+        <div className="flex flex-shrink-0 flex-wrap items-center justify-end gap-2.5">
           {!outbound && (
-            <button type="button" onClick={onReply} className="sf__compose-trigger" title="Respondre">✉ Respondre</button>
+            <button type="button" onClick={onReply} className="ap-btn ap-btn--primary" title="Respondre">✉ Respondre</button>
           )}
           {!outbound && !email.orbita && (
-            <button type="button" onClick={() => setExtractOpen(true)} className="sf__extract-btn" title="Crear lead des d'aquest correu">
+            <button type="button" onClick={() => setExtractOpen(true)} className="ap-btn" title="Crear lead des d'aquest correu">
               ✦ Crear lead
             </button>
           )}
-          <div className="sf__detail-acts-group">
+          <div className="flex items-center gap-1 rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] px-2 py-1">
             {!outbound && (
-              <button type="button" onClick={onReplyAll} className="sf__iconbtn" title="Respondre a tothom" aria-label="Respondre a tothom">↩↩</button>
+              <button type="button" onClick={onReplyAll} className={ICON_BTN} title="Respondre a tothom" aria-label="Respondre a tothom">↩↩</button>
             )}
-            <button type="button" onClick={onForward} className="sf__iconbtn" title="Reenviar" aria-label="Reenviar">➡</button>
-            <button type="button" onClick={() => onFlag(!email.isFlagged)} className={`sf__iconbtn${email.isFlagged ? ' is-on' : ''}`} title={email.isFlagged ? 'Treure marca' : 'Marcar amb estrella'} aria-label={email.isFlagged ? 'Treure marca' : 'Marcar amb estrella'} aria-pressed={email.isFlagged}>
+            <button type="button" onClick={onForward} className={ICON_BTN} title="Reenviar" aria-label="Reenviar">➡</button>
+            <button type="button" onClick={() => onFlag(!email.isFlagged)} className={`${ICON_BTN}${email.isFlagged ? ` ${ICON_BTN_ON}` : ''}`} title={email.isFlagged ? 'Treure marca' : 'Marcar amb estrella'} aria-label={email.isFlagged ? 'Treure marca' : 'Marcar amb estrella'} aria-pressed={email.isFlagged}>
               {email.isFlagged ? '★' : '☆'}
             </button>
             <MoveDropdown folders={folders} special={special} currentPath={currentPath} onMove={onMove} />
             {!outbound && (
-              <button type="button" onClick={onMarkUnread} className="sf__iconbtn" title="Marcar com no llegit" aria-label="Marcar com a no llegit">○</button>
+              <button type="button" onClick={onMarkUnread} className={ICON_BTN} title="Marcar com no llegit" aria-label="Marcar com a no llegit">○</button>
             )}
           </div>
-          <button type="button" onClick={onDelete} className="sf__iconbtn sf__iconbtn--danger sf__iconbtn--standalone" title="Esborrar" aria-label="Esborrar correu">🗑</button>
-          <button type="button" onClick={onClose} className="sf__detail-close" aria-label="Tancar">✕</button>
+          <button type="button" onClick={onDelete} className={`${ICON_BTN} border-[color-mix(in_oklab,var(--o-danger)_45%,var(--line))] bg-[var(--o-danger-soft)] text-[var(--o-danger)] hover:border-[var(--o-danger)] hover:bg-[color-mix(in_oklab,var(--o-danger)_25%,var(--panel))] hover:text-[var(--o-danger)]`} title="Esborrar" aria-label="Esborrar correu">🗑</button>
+          <button type="button" onClick={onClose} className={CLOSE_BTN} aria-label="Tancar">✕</button>
         </div>
       </div>
 
-      <div className="sf__detail-scroll">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
         {pill && (
-          <div className={`sf__detail-pill${pill.href ? '' : ' is-static'}`} title={pill.hint}>
+          <div className={`mx-5 mt-3.5 flex w-fit items-center gap-2 rounded-[var(--o-r-sm)] border border-[var(--hair-gold)] bg-[color-mix(in_oklab,var(--gold)_6%,var(--panel))] px-3 py-2 text-xs font-semibold text-[var(--t2)]${pill.href ? '' : ' opacity-85'}`} title={pill.hint}>
             🔗 Vincle:
             {pill.href ? (
-              <a href={pill.href} className="sf__detail-pill-link">{pill.label}</a>
+              <a href={pill.href} className="font-bold text-[var(--gold-bright)] no-underline hover:underline">{pill.label}</a>
             ) : (
-              <span className="sf__detail-pill-text">{pill.label}</span>
+              <span className="font-bold text-[var(--t)]">{pill.label}</span>
             )}
             {email.orbita?.source === 'reference' && (
-              <span className="sf__detail-pill-hint">(detectat per resposta)</span>
+              <span className="text-xs italic text-[var(--t3)]">(detectat per resposta)</span>
             )}
           </div>
         )}
-        <div className="sf__imap-subjectbar">
-          <p className="sf__imap-subject">{email.subject}</p>
-          <p className="sf__imap-meta">
+        <div className="border-b border-[var(--line)] px-5 pb-3 pt-4">
+          <p className="mb-1.5 text-base font-bold leading-tight text-[var(--t)]">{email.subject}</p>
+          <p className="flex items-center gap-2 text-xs text-[var(--t3)]">
             {formatDateTime(email.date)}
-            {email.hasAttachments && <span className="sf__imap-attach">📎</span>}
-            {ccList.length > 0 && <span className="sf__imap-cc">CC: {ccList.join(', ')}</span>}
+            {email.hasAttachments && <span className="text-sm opacity-80">📎</span>}
+            {ccList.length > 0 && <span className="block text-[var(--t3)]">CC: {ccList.join(', ')}</span>}
           </p>
         </div>
-        <div className="sf__imap-body">
+        <div className="flex flex-1 flex-col p-5">
           {loading ? (
-            <p className="sf__imap-text-empty"><span className="sf__spin">↻</span> Carregant cos del missatge...</p>
+            <p className="text-sm text-[var(--t3)]"><span className={SPIN}>↻</span> Carregant cos del missatge...</p>
           ) : email.bodyHtml ? (
-            <iframe srcDoc={email.bodyHtml} sandbox="allow-same-origin" className="sf__imap-iframe" title="Cos del missatge" />
+            <iframe srcDoc={email.bodyHtml} sandbox="allow-same-origin" className="block min-h-[30rem] w-full flex-1 rounded-[var(--o-r-sm)] border-0 bg-[var(--ax-light)]" title="Cos del missatge" />
           ) : email.bodyText ? (
-            <pre className="sf__imap-text">{email.bodyText}</pre>
+            <pre className="m-0 whitespace-pre-wrap break-words bg-transparent text-sm leading-relaxed text-[var(--t2)] [font-family:inherit]">{email.bodyText}</pre>
           ) : (
-            <p className="sf__imap-text-empty">(sense cos de text)</p>
+            <p className="text-sm text-[var(--t3)]">(sense cos de text)</p>
           )}
         </div>
         {!loading && email.attachments && email.attachments.length > 0 && (
-          <div className="sf__attachments">
-            <p className="sf__attachments-label">📎 Adjunts ({email.attachments.length})</p>
-            <div className="sf__attachments-list">
+          <div className="border-t border-[var(--line)] px-5 pb-5 pt-3.5">
+            <p className="mb-2.5 text-xs font-bold uppercase tracking-[0.12em] text-[var(--t3)]">📎 Adjunts ({email.attachments.length})</p>
+            <div className="flex flex-wrap gap-2">
               {email.attachments.map(att => {
                 const params = new URLSearchParams({
                   folder: currentPath,
@@ -1573,13 +1606,13 @@ function ImapDetail({
                   <a
                     key={att.partKey}
                     href={`/api/admin/inbox/messages/${email.uid}/attachment?${params.toString()}`}
-                    className="sf__attach-chip"
+                    className="inline-flex max-w-[15rem] items-center gap-1.5 rounded-[var(--o-r-sm)] border border-[var(--line2)] bg-[var(--panel)] px-3 py-2 text-xs font-semibold text-[var(--t2)] no-underline transition-colors hover:border-[var(--hair-gold)] hover:bg-[var(--raised)] hover:text-[var(--t)]"
                     download={att.filename}
                   >
-                    <span className="sf__attach-chip-icon">{attachIcon(att.contentType)}</span>
-                    <span className="sf__attach-chip-name">{att.filename}</span>
+                    <span className="flex-shrink-0 text-base">{attachIcon(att.contentType)}</span>
+                    <span className="flex-1 truncate">{att.filename}</span>
                     {att.size > 0 && (
-                      <span className="sf__attach-chip-size">{formatAttachSize(att.size)}</span>
+                      <span className="flex-shrink-0 text-xs text-[var(--t3)]">{formatAttachSize(att.size)}</span>
                     )}
                   </a>
                 );

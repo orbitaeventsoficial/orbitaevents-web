@@ -4,7 +4,6 @@ import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 import { isImapConfigured } from '@/lib/env';
 import SafataClient from './SafataClient';
-import './inbox.css';
 
 export const dynamic = 'force-dynamic';
 
