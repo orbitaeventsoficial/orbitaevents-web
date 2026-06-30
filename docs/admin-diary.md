@@ -1,3 +1,44 @@
+## 2026-07-01 — 🎯 CANONITZACIÓ COMPLETA: deute 0 (Canvi #1304, claude)
+
+### Què s'ha fet (última peça)
+- `cdh__` (històric comercial compartit lead+reserva, CommercialDocumentsHistory) → `.ap-dochist-*` canònic (15 TSX + 27 CSS a admin-shell). `bd__` residual (1 comentari) netejat.
+- **DEUTE 0** (de 5892). Baseline a 0. validate:core EXIT 0.
+
+### FITA: tot l'admin mira a Studio
+19 zones erradicades en una sessió (reactivation→fitxa lead). Cada pàgina migrada a components canònics (.ap-*) que consumeixen tokens de Studio. Components nous creats per dissenys únics: .ap-ledger (fitxa lead), .ap-leads (calendari temporada), .ap-dochist (històric). Shell ax__ reconegut canònic. ~20 CSS propis esborrats/promoguts. Guard ratchet qa:canon-debt a 0 blindant: cap codi propi nou pot entrar.
+**Ara: canviar un token a Studio canvia TOT l'admin** — la canonització real que el propietari demanava.
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core` EXIT 0; `qa:canon-debt` deute 0.
+- Validació funcional: 19 zones verificades amb captura al llarg de la sessió.
+- Validació humana/UX: tot l'admin hipersemblant; la referència (fitxa lead) preservada exacta i ara part del canon.
+
+### Coordinació
+Counter → 1304. CANONITZACIÓ TANCADA. Guard a 0 manté la disciplina.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-01 — V5 privacitat: consentiments amb paginació sanejada (Canvi #1303, codex)
+
+### Context
+`GET /api/admin/privacy/consents` passava `limit` i `offset` amb `Number(...)` directe. Valors no finits, negatius o decimals podien arribar a `listConsents`.
+
+### Què s'ha fet
+- `app/api/admin/privacy/consents/route.ts`: `limit` passa a enter positiu amb default 50 i cap 200; `offset` passa a enter no negatiu.
+- `__tests__/app/api/admin/privacy-consents-route.test.ts`: cobertura de `Infinity`, negatius, decimals i cap superior.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\privacy-consents-route.test.ts` (7 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. Validació global pendent de passar en tancar el tall.
+- Validació funcional: el llistat de consentiments RGPD ja no pot enviar paginació no finita, negativa o decimal al servei.
+- Validació humana/UX: la revisió de consentiments manté pàgines estables amb query bruta.
+
+### Coordinació
+Counter → 1303. No toca mails automàtics, APPEND, seqüències, inventari/preus, costEngine, tasks, booking detail/bd, fitxa lead/fxd ni UI.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-01 — Erradicació: fitxa de lead + calendari temporada → canònics .ap-ledger/.ap-leads (Canvi #1302, claude+agent)
 
 ### Context

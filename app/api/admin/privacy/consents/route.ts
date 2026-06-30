@@ -12,6 +12,17 @@ import type { ConsentType } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
+function normalizePositiveInteger(value: string | null, fallback: number, max?: number): number {
+  const parsed = Number(value);
+  const normalized = Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback;
+  return max ? Math.min(normalized, max) : normalized;
+}
+
+function normalizeNonNegativeInteger(value: string | null): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? Math.floor(parsed) : 0;
+}
+
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
@@ -24,8 +35,8 @@ export async function GET(req: NextRequest) {
       : 'all';
     const consentType = searchParams.get('type') as ConsentType | null;
     const search = searchParams.get('q') || undefined;
-    const limit = Math.min(Number(searchParams.get('limit')) || 50, 200);
-    const offset = Number(searchParams.get('offset')) || 0;
+    const limit = normalizePositiveInteger(searchParams.get('limit'), 50, 200);
+    const offset = normalizeNonNegativeInteger(searchParams.get('offset'));
 
     const result = await listConsents({
       status,

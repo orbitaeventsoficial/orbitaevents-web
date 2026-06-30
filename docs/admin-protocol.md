@@ -1550,6 +1550,29 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1304 — 2026-07-01 — claude (FET)
+**CANONITZACIÓ COMPLETA: deute 0.**
+- cdh__ → .ap-dochist canònic; bd__ comentari netejat. DEUTE 5892→0. Baseline 0. 19 zones erradicades en la sessió; components nous .ap-ledger/.ap-leads/.ap-dochist; shell ax canònic. Guard qa:canon-debt a 0 blinda. Ara un token a Studio canvia tot l'admin.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1304`; el següent canvi real ha de ser `#1305`.
+- Validació tècnica: `tsc` 0; validate:core EXIT 0; deute 0.
+- Validació funcional: 19 zones verificades amb captura.
+- Validació humana/UX: admin hipersemblant; referència preservada.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1303 — 2026-07-01 — codex (FET)
+**V5 privacitat: consentiments amb paginació sanejada.**
+- `app/api/admin/privacy/consents/route.ts`: `limit` normalitzat com a enter positiu amb default 50 i cap 200; `offset` com a enter no negatiu.
+- `__tests__/app/api/admin/privacy-consents-route.test.ts`: cobertura de `Infinity`, negatius, decimals i cap superior.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\privacy-consents-route.test.ts` (7 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. Validació global pendent.
+- Validació funcional: el llistat de consentiments RGPD ja no envia paginació no finita, negativa o decimal al servei.
+- Validació humana/UX: la revisió de consentiments manté pàgines estables amb query bruta.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1303`; el següent canvi real ha de ser `#1304`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1301 — 2026-07-01 — codex (FET)
 **V5 privacitat: audit log amb paginació sanejada.**
 - `app/api/admin/privacy/audit/route.ts`: `limit` normalitzat com a enter positiu amb default 50 i cap 200; `offset` com a enter no negatiu.

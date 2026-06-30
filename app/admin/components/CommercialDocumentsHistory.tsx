@@ -33,18 +33,18 @@ export default function CommercialDocumentsHistory({
 
   return (
     <section className={`cdh ${className}`.trim()} aria-label={title}>
-      <div className="cdh__head">
+      <div className="ap-dochist-head">
         <div>
-          <h2 className="cdh__title">{title}</h2>
-          {subtitle && <p className="cdh__subtitle">{subtitle}</p>}
+          <h2 className="ap-dochist-title">{title}</h2>
+          {subtitle && <p className="ap-dochist-subtitle">{subtitle}</p>}
         </div>
-        <span className="cdh__count">{sortedItems.length}</span>
+        <span className="ap-dochist-count">{sortedItems.length}</span>
       </div>
 
       {sortedItems.length === 0 ? (
-        <p className="cdh__empty">{emptyText}</p>
+        <p className="ap-dochist-empty">{emptyText}</p>
       ) : (
-        <div className="cdh__list">
+        <div className="ap-dochist-list">
           {sortedItems.map((item) => {
             const meta = [
               formatDateTimeFull(item.createdAt),
@@ -52,24 +52,24 @@ export default function CommercialDocumentsHistory({
             ].filter(Boolean);
             const body = (
               <>
-                <span className="cdh__kind">{item.kindLabel}</span>
-                <span className="cdh__main">
+                <span className="ap-dochist-kind">{item.kindLabel}</span>
+                <span className="ap-dochist-main">
                   <strong>{item.reference || item.title}</strong>
                   {item.reference && <span>{item.title}</span>}
                 </span>
-                <span className="cdh__side">
+                <span className="ap-dochist-side">
                   {item.amount !== null && item.amount !== undefined && (
                     <strong>{formatCurrency(item.amount)}</strong>
                   )}
                   {item.statusLabel && <em>{item.statusLabel}</em>}
                 </span>
-                <span className="cdh__meta">{meta.join(' · ')}</span>
+                <span className="ap-dochist-meta">{meta.join(' · ')}</span>
               </>
             );
 
             if (!item.href) {
               return (
-                <article key={item.id} className="cdh__item">
+                <article key={item.id} className="ap-dochist-item">
                   {body}
                 </article>
               );
@@ -77,14 +77,14 @@ export default function CommercialDocumentsHistory({
 
             if (item.targetBlank) {
               return (
-                <a key={item.id} href={item.href} target="_blank" rel="noopener noreferrer" className="cdh__item cdh__item--link">
+                <a key={item.id} href={item.href} target="_blank" rel="noopener noreferrer" className="ap-dochist-item ap-dochist-item--link">
                   {body}
                 </a>
               );
             }
 
             return (
-              <Link key={item.id} href={item.href} className="cdh__item cdh__item--link">
+              <Link key={item.id} href={item.href} className="ap-dochist-item ap-dochist-item--link">
                 {body}
               </Link>
             );

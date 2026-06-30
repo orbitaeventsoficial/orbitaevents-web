@@ -1,7 +1,4 @@
 {
-  "total": 43,
-  "perFile": {
-    "app/admin/admin-shell.css": 28,
-    "app/admin/components/CommercialDocumentsHistory.tsx": 15
-  }
+  "total": 0,
+  "perFile": {}
 }

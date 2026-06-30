@@ -92,7 +92,7 @@ Per cada element propi `xx__` trobat:
 - [x] **codi mort lp2/lf** (#1278) · **arxiu + settings-inbox** (#1279) · **booking-detall** (#1280)
 - [x] **fitxa lead — botons/inputs** (#1281, verificat captura ABANS/DESPRÉS idèntica)
 - [ ] **fitxa lead + calendari temporada (fxd/fx estructures)** → EN CURS: agent crea components canònics nous (.ap-ledger/.ap-cal) reproduint l'aspecte exacte (decisió propietari: opció A + crear canònics)
-- [ ] **cdh** (42, històric comercial compartit) → últim residual, després de fxd/fx
+- [x] **cdh + bd residuals** → .ap-dochist (#1304). DEUTE 0. CANONITZACIÓ COMPLETA.
 
 ## 7. Honestedat sobre l'abast
 Això és una **refactorització gran** (no d'una sessió): ~5.900 usos en 21 sistemes. Es fa

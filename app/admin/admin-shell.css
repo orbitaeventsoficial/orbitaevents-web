@@ -96,7 +96,7 @@ html.admin-mode .cdh {
   color: var(--ax-t);
 }
 
-html.admin-mode .cdh__head {
+html.admin-mode .ap-dochist-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -104,20 +104,20 @@ html.admin-mode .cdh__head {
   margin-bottom: .85rem;
 }
 
-html.admin-mode .cdh__title {
+html.admin-mode .ap-dochist-title {
   margin: 0;
   font-size: var(--o-text-base);
   font-weight: var(--o-fw-bold);
   letter-spacing: 0;
 }
 
-html.admin-mode .cdh__subtitle {
+html.admin-mode .ap-dochist-subtitle {
   margin: .2rem 0 0;
   color: var(--ax-t3);
   font-size: var(--o-text-xs);
 }
 
-html.admin-mode .cdh__count {
+html.admin-mode .ap-dochist-count {
   display: inline-flex;
   min-width: 2rem;
   justify-content: center;
@@ -128,7 +128,7 @@ html.admin-mode .cdh__count {
   font-size: var(--o-text-xs);
 }
 
-html.admin-mode .cdh__empty {
+html.admin-mode .ap-dochist-empty {
   margin: 0;
   border: 1px dashed var(--ax-line2);
   border-radius: var(--o-r-sm);
@@ -137,12 +137,12 @@ html.admin-mode .cdh__empty {
   font-size: var(--o-text-sm);
 }
 
-html.admin-mode .cdh__list {
+html.admin-mode .ap-dochist-list {
   display: grid;
   gap: .5rem;
 }
 
-html.admin-mode .cdh__item {
+html.admin-mode .ap-dochist-item {
   display: grid;
   grid-template-columns: minmax(6.5rem, .6fr) minmax(0, 1.35fr) minmax(7rem, auto);
   gap: .75rem;
@@ -155,62 +155,62 @@ html.admin-mode .cdh__item {
   color: inherit;
 }
 
-html.admin-mode .cdh__item--link:hover {
+html.admin-mode .ap-dochist-item--link:hover {
   border-color: var(--ax-hair-gold);
   background: color-mix(in oklab, var(--ax-gold) 7%, var(--ax-sunk));
 }
 
-html.admin-mode .cdh__kind {
+html.admin-mode .ap-dochist-kind {
   color: var(--ax-gold-bright);
   font-size: var(--o-text-xs);
   font-weight: var(--o-fw-bold);
 }
 
-html.admin-mode .cdh__main {
+html.admin-mode .ap-dochist-main {
   min-width: 0;
   display: grid;
   gap: .1rem;
 }
 
-html.admin-mode .cdh__main strong,
-html.admin-mode .cdh__main span {
+html.admin-mode .ap-dochist-main strong,
+html.admin-mode .ap-dochist-main span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-html.admin-mode .cdh__main span,
-html.admin-mode .cdh__meta,
-html.admin-mode .cdh__side em {
+html.admin-mode .ap-dochist-main span,
+html.admin-mode .ap-dochist-meta,
+html.admin-mode .ap-dochist-side em {
   color: var(--ax-t3);
   font-size: var(--o-text-xs);
   font-style: normal;
 }
 
-html.admin-mode .cdh__side {
+html.admin-mode .ap-dochist-side {
   display: grid;
   justify-items: end;
   gap: .1rem;
 }
 
-html.admin-mode .cdh__side strong {
+html.admin-mode .ap-dochist-side strong {
   color: var(--ax-gold-bright);
 }
 
-html.admin-mode .cdh__meta {
+html.admin-mode .ap-dochist-meta {
   grid-column: 2 / -1;
 }
 
 @media (max-width: 760px) {
-  html.admin-mode .cdh__item {
+  html.admin-mode .ap-dochist-item {
     grid-template-columns: 1fr;
   }
 
-  html.admin-mode .cdh__side {
+  html.admin-mode .ap-dochist-side {
     justify-items: start;
   }
 
-  html.admin-mode .cdh__meta {
+  html.admin-mode .ap-dochist-meta {
     grid-column: auto;
   }
 }
@@ -584,7 +584,7 @@ html.admin-mode .ax__page { animation: none; }
        [<nav className="ap-detail-secnav">]  ← nav seccions opcional
      </div>
 
-   NO usar position:sticky inline, ni bd__header per a pàgines noves.
+   NO usar position:sticky inline, ni .ap-detail-header per a pàgines noves.
    ════════════════════════════════════════════════════════════════════════════ */
 html.admin-mode .ap-sticky-header {
   position: sticky;
@@ -2810,14 +2810,14 @@ html.admin-mode .ap-ledger-document-history {
   /* Negre carbó de la fitxa (no el sunk heretat): el bloc es fon amb la pàgina. */
   background: var(--ax-canvas);
 }
-html.admin-mode .ap-ledger-document-history .cdh__head {
+html.admin-mode .ap-ledger-document-history .ap-dochist-head {
   margin-bottom: 0.35rem;
   align-items: center;
 }
-html.admin-mode .ap-ledger-document-history .cdh__title { font-size: var(--o-text-sm); }
-html.admin-mode .ap-ledger-document-history .cdh__subtitle { display: none; }
-html.admin-mode .ap-ledger-document-history .cdh__list { gap: 0.3rem; }
-html.admin-mode .ap-ledger-document-history .cdh__item {
+html.admin-mode .ap-ledger-document-history .ap-dochist-title { font-size: var(--o-text-sm); }
+html.admin-mode .ap-ledger-document-history .ap-dochist-subtitle { display: none; }
+html.admin-mode .ap-ledger-document-history .ap-dochist-list { gap: 0.3rem; }
+html.admin-mode .ap-ledger-document-history .ap-dochist-item {
   padding: 0.3rem 0.55rem;
   gap: 0.6rem;
   /* Carta sobre carbó com els panells germans (--ax-panel), no el negre sunk heretat. */
@@ -2825,7 +2825,7 @@ html.admin-mode .ap-ledger-document-history .cdh__item {
   border-color: var(--ax-line2);
 }
 /* Una sola línia per document: la data/enviament queda al document obert. */
-html.admin-mode .ap-ledger-document-history .cdh__meta { display: none; }
+html.admin-mode .ap-ledger-document-history .ap-dochist-meta { display: none; }
 
 @media (max-width: 80rem) {
   html.admin-mode .ap-ledger-zenith {
