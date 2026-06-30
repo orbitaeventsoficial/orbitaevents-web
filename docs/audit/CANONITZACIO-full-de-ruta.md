@@ -81,21 +81,18 @@ Per cada element propi `xx__` trobat:
 - **Fase D (CRM secundari):** referrals · reactivation · reengagement · intake
 - **Fase E (neteja final):** docs view · residus shell
 
-## 6. CHECKLIST D'ESTAT (es marca a mesura)
-- [x] **Header: tokens canònics `--head-*` a Studio** (#1255) — 6 sistemes consumeixen els mateixos paràmetres
-- [x] **tasks** → header (AdminPage) + botons (.ap-btn) + tokens (#1258). Kanban card/queue = layout específic tokenitzat (protocol OK).
-- [ ] clientes (llista) → canònic + esborrar `clientes.css`
-- [ ] bookings → canònic
-- [ ] presupuestos → canònic + esborrar `presupuestos.css`
-- [ ] leads → canònic (cas complex: rail de temporada com a contingut, no estructura)
-- [ ] clientes/[id] hub (`ch__`, 958) → canònic
-- [ ] bookings/[id] (`bd__`/`nb__`) → canònic
-- [ ] dossiers (`dg__`) → canònic
-- [ ] inbox (`sf__`/`cx__`) → canònic
-- [x] **reactivation** → 100% canònic, css esborrat (#1266, −122 deute) · [ ] referrals / reengagement (en curs agents)
-- [ ] intake (`ni__`) → canònic
-- [ ] docs view (`dmd__`) → canònic
-- [x] **Guard ratchet `qa:canon-debt`** (#1265): baseline 5892, bloqueja regressions, força deute→0. Integrat a validate:core.
+## 6. CHECKLIST D'ESTAT (deute 5892 → ~1194, −80%)
+- [x] **Guard ratchet `qa:canon-debt`** (#1265): baseline, bloqueja regressions, força deute→0. A validate:core.
+- [x] **Header canònic `--head-*` a Studio** (#1255) — 6 sistemes consumeixen els mateixos paràmetres
+- [x] **Botó primari canònic** (#1260) — outline daurat; 15 botons amb `.ap-btn` base
+- [x] **reactivation** (#1266) · **referrals** + **reengagement** (#1267) · **docs view** (#1268)
+- [x] **intake** (#1269) · **compose** (#1270) · **dossiers** (#1271)
+- [x] **clientes llista** (#1273) · **presupuestos** (#1274) · **inbox/safata** (#1275)
+- [x] **nova reserva** (#1276) · **hub de client (958!)** + **tasks** (#1277)
+- [x] **codi mort lp2/lf** (#1278) · **arxiu + settings-inbox** (#1279) · **booking-detall** (#1280)
+- [x] **fitxa lead — botons/inputs** (#1281, verificat captura ABANS/DESPRÉS idèntica)
+- [ ] **fitxa lead + calendari temporada (fxd/fx estructures)** → EN CURS: agent crea components canònics nous (.ap-ledger/.ap-cal) reproduint l'aspecte exacte (decisió propietari: opció A + crear canònics)
+- [ ] **cdh** (42, històric comercial compartit) → últim residual, després de fxd/fx
 
 ## 7. Honestedat sobre l'abast
 Això és una **refactorització gran** (no d'una sessió): ~5.900 usos en 21 sistemes. Es fa
