@@ -1550,6 +1550,41 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1291 — 2026-06-30 — codex (EN MARXA)
+**V5 pressupostos personalitzats: imports sanejats.**
+- `lib/services/customQuoteAdminService.ts`: saneja imports no negatius a 2 decimals, marge no negatiu i `finalPrice` nul quan arriba buit/brut.
+- `__tests__/lib/services/customQuoteAdminService.test.ts`: cobertura de create/update amb valors bruts i decimals monetaris.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\customQuoteAdminService.test.ts` (12 tests OK). Pendents abans de tancar: `tsc`, `qa:protocol`, `git diff --check` i comprovació del blocker global d'Inbox.
+- Validació funcional: els pressupostos personalitzats ja no poden persistir imports negatius o `NaN` des del servei admin.
+- Validació humana/UX: les xifres de pressupost manual queden normalitzades abans d'arribar a BD encara que una ruta enviï entrada bruta.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1291`; el següent canvi real ha de ser `#1292`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `pendent`
+
+### Canvi #1290 — 2026-06-30 — codex (FET)
+**V5 productes col·laborador: preus i ordre sanejats.**
+- `lib/services/collaboratorProductService.ts`: centralitza parseig de preus no negatius, arrodoneix `costPrice`/`sellPrice` a 2 decimals i saneja `sortOrder` com enter no negatiu.
+- `__tests__/lib/services/collaboratorProductService.test.ts`: cobertura de preus decimals, `sortOrder` negatiu i update amb arrodoniment monetari.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\collaboratorProductService.test.ts` (18 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `validate:core` global continua bloquejat pel deute concurrent d'Inbox ja identificat a `app/admin/inbox/inbox.css:9` (`qa:admin-mode-prefix`).
+- Validació funcional: el catàleg de productes de partners ja no pot persistir imports amb precisió arbitrària ni ordre negatiu.
+- Validació humana/UX: els productes revenguts mantenen preus de catàleg consistents i ordenació estable encara que arribi entrada bruta.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1290`; el següent canvi real ha de ser `#1291`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1292 — 2026-07-01 — claude (FET)
+**Última milla: arxiu (ax) + settings-inbox (ix) 100% canònics.**
+- arxiu 119 ax__ → AdminPage/.ap-kpi/.ap-table-*/etc; arxiu-design.css ESBORRAT; SHELL intacte. settings-inbox 75 ix__ → AdminPage/.ap-card/.adm-input/.ap-inline-alert; inbox.css ESBORRAT del tot; aliases ix__ tretes d'admin-shell.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1292`; el següent canvi real ha de ser `#1293`.
+- Validació tècnica: `tsc` 0; qa:canon-debt OK; shell intacte.
+- Validació funcional: captures arxiu + settings.
+- Validació humana/UX: hipersemblants.
+- Començat per: `claude+agents`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1288 — 2026-06-30 — codex (FET)
 **V5 col·laboradors: comissió i cost/hora sanejats.**
 - `lib/services/collaboratorAdminService.ts`: afegeix sanejament compartit per `commissionPct` i `costPerHour` en creació i actualització.

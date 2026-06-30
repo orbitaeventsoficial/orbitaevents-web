@@ -1,3 +1,61 @@
+## 2026-07-01 — Última milla: arxiu (ax) + settings-inbox (ix) 100% canònics (Canvi #1292, claude+agents)
+
+### Què s'ha fet
+- **arxiu** (leads/arxiu): ~119 `ax__` → canònic (AdminPage, AdminKpiRow/Kpi, AdminSection, .ap-card, .adm-input, .ap-btn, .ap-table-*, AdminEmptyState). arxiu-design.css ESBORRAT + import tret. SHELL (.ax-root/.ax__workspace) INTACTE verificat.
+- **settings-inbox** (inbox/settings): ~75 `ix__` → canònic (AdminPage, .ap-card, .adm-input, .ap-btn, .ap-inline-alert, .ap-badge, animate-spin). inbox.css ESBORRAT del tot (ja sense sf/cx/ix; sf-spin keyframe mort). Aliases ix__ mortes tretes d'admin-shell.css.
+- Verificat: captures arxiu (KPIs+seccions) i settings (header+IMAP). 0 xx__, tsc 0.
+
+### Validació
+- Validació tècnica: `tsc` 0; `qa:canon-debt` OK; shell intacte; ix__ 0 a tot el repo.
+- Validació funcional: captures arxiu + settings canònics.
+- Validació humana/UX: hipersemblants; shell admin no afectat.
+
+### Coordinació
+Counter → 1292. 16 pàgines. Agent bd (booking-detall, 531) encara treballant. Queda fitxa lead (fxd/fx) — decisió de criteri (preservar referència vs migrar).
+- Començat per: `claude+agents`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-30 — V5 pressupostos personalitzats: imports sanejats (Canvi #1291, codex)
+
+### Context
+`customQuoteAdminService` persistia `totalCost`, `suggestedPrice`, `marginPct` i `finalPrice` amb `Number(...)` directe. En create podia guardar imports negatius i en update podia guardar `NaN`.
+
+### Què s'ha fet
+- `lib/services/customQuoteAdminService.ts`: saneja imports no negatius a 2 decimals, marge no negatiu i `finalPrice` nul quan arriba buit/brut.
+- `__tests__/lib/services/customQuoteAdminService.test.ts`: cobertura de create/update amb valors bruts i decimals monetaris.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\customQuoteAdminService.test.ts` (12 tests OK). Pendents abans de tancar: `tsc`, `qa:protocol`, `git diff --check` i comprovació del blocker global d'Inbox.
+- Validació funcional: els pressupostos personalitzats ja no poden persistir imports negatius o `NaN` des del servei admin.
+- Validació humana/UX: les xifres de pressupost manual queden normalitzades abans d'arribar a BD encara que una ruta enviï entrada bruta.
+
+### Coordinació
+Counter → 1291. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni canonització de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `pendent`
+
+## 2026-06-30 — V5 productes col·laborador: preus i ordre sanejats (Canvi #1290, codex)
+
+### Context
+`collaboratorProductService` validava preus negatius/no numèrics, però persistia imports amb precisió lliure i `sortOrder` amb `Number(...) || 0`, deixant entrar decimals o valors negatius a l'ordre.
+
+### Què s'ha fet
+- `lib/services/collaboratorProductService.ts`: centralitza parseig de preus no negatius, arrodoneix `costPrice`/`sellPrice` a 2 decimals i saneja `sortOrder` com enter no negatiu.
+- `__tests__/lib/services/collaboratorProductService.test.ts`: cobertura de preus decimals, `sortOrder` negatiu i update amb arrodoniment monetari.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\collaboratorProductService.test.ts` (18 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `validate:core` global continua bloquejat pel deute concurrent d'Inbox ja identificat a `app/admin/inbox/inbox.css:9` (`qa:admin-mode-prefix`).
+- Validació funcional: el catàleg de productes de partners ja no pot persistir imports amb precisió arbitrària ni ordre negatiu.
+- Validació humana/UX: els productes revenguts mantenen preus de catàleg consistents i ordenació estable encara que arribi entrada bruta.
+
+### Coordinació
+Counter → 1290. El #1289 pertany a Claude (codi mort lp2/lf de leads-design.css). No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni canonització de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-30 — Última milla: codi mort lp2/lf esborrat de leads-design.css (Canvi #1289, claude)
 
 ### Què s'ha fet

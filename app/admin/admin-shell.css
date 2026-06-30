@@ -845,18 +845,13 @@ html.admin-mode .ap-detail-secbtn--on {
 }
 
 /* ── Input de formulari canònic de l'admin (#961) ──────────────────────────
-   Font única. Abans la definició vivia a inbox.css com `.ix__forminput`, cosa
-   que creava una dependència creuada: /admin/dossiers consumeix la classe però
-   no carrega inbox.css → inputs sense estil garantit en càrrega directa.
-   Ara viu a la capa compartida (admin-shell, sempre carregada via layout).
-   `.ix__forminput` es manté com a àlies perquè els consumidors existents
-   funcionin sense tocar-los; NOU codi ha d'usar `.adm-input`. */
+   Font única a la capa compartida (admin-shell, sempre carregada via layout).
+   Codi nou ha d'usar `.adm-input`. */
 /* `.ap-input` (104 usos a l'admin) NO estava definida → els inputs queien al fons
    gris/blanc per defecte del navegador, desentonant del carbó. S'afegeix com a àlies
    del canònic perquè tot el repo consumeixi el mateix input de la sèrie (monocapa). */
 html.admin-mode .adm-input,
-html.admin-mode .ap-input,
-html.admin-mode .ix__forminput {
+html.admin-mode .ap-input {
   width: 100%;
   border: 1px solid var(--ax-line);
   border-radius: var(--o-r-md);
@@ -867,11 +862,9 @@ html.admin-mode .ix__forminput {
   font-family: inherit;
   transition: border-color 140ms ease;
 }
-html.admin-mode .adm-input--textarea,
-html.admin-mode .ix__forminput--textarea { resize: vertical; line-height: 1.6; }
+html.admin-mode .adm-input--textarea { resize: vertical; line-height: 1.6; }
 html.admin-mode .adm-input:focus,
-html.admin-mode .ap-input:focus,
-html.admin-mode .ix__forminput:focus { outline: none; border-color: var(--ax-hair-gold); }
+html.admin-mode .ap-input:focus { outline: none; border-color: var(--ax-hair-gold); }
 
 /* ── Hover canònic de fila/ítem interactiu (font única — hipersemblança):
    tota fila de taula, ítem de llista o card clicable de l'admin ressalta
