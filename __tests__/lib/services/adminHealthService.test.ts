@@ -287,4 +287,20 @@ describe('adminHealthService', () => {
 
     expect(catalogSection?.items.some((item) => item.id === 'catalog-inventory-unused' && item.count === 5)).toBe(true);
   });
+
+  it('saneja comptadors autofix de settings abans de crear incidències', async () => {
+    mockPrisma.setting.findMany.mockResolvedValue([
+      { key: 'emails.cron.lastRun', value: new Date().toISOString() },
+      { key: 'automation.commercial.lastRun', value: new Date().toISOString() },
+      { key: 'alerts.finance.autofixFailureCount', value: '2.9' },
+      { key: 'alerts.system.autofixFailureCount', value: 'no-num' },
+    ]);
+
+    const snapshot = await getAdminHealthSnapshot();
+    const financeItems = snapshot.sections.find((section) => section.scope === 'finances')?.items || [];
+    const systemItems = snapshot.sections.find((section) => section.scope === 'system')?.items || [];
+
+    expect(financeItems.some((item) => item.id === 'finance-autofix-open' && item.count === 2)).toBe(true);
+    expect(systemItems.some((item) => item.id === 'system-autofix-open')).toBe(false);
+  });
 });

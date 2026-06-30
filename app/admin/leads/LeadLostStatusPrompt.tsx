@@ -31,10 +31,10 @@ export default function LeadLostStatusPrompt({
 
  return (
  <div className="mt-3 rounded-2xl border admin-tone-border-warning admin-tone-bg-warning p-4">
- <p className="fx__lostprompt-title text-sm font-medium">{title}</p>
+ <p className="ap-leads-lostprompt-title text-sm font-medium">{title}</p>
  <div className="mt-3 space-y-3">
  <div>
- <label className="fx__lostprompt-label mb-1 block text-xs font-medium" htmlFor="lead-lost-reason">
+ <label className="ap-leads-lostprompt-label mb-1 block text-xs font-medium" htmlFor="lead-lost-reason">
  Motiu canònic
  </label>
  <select
@@ -53,7 +53,7 @@ export default function LeadLostStatusPrompt({
  </div>
 
  <div>
- <label className="fx__lostprompt-label mb-1 block text-xs font-medium" htmlFor="lead-lost-note">
+ <label className="ap-leads-lostprompt-label mb-1 block text-xs font-medium" htmlFor="lead-lost-note">
  Nota interna (opcional)
  </label>
  <textarea

@@ -22,6 +22,7 @@ import {
   listAdminProposals,
   createAdminProposal,
   getAdminProposalById,
+  ProposalFinancialConsistencyError,
   updateAdminProposal,
   reassignProposalOwner,
 } from '@/lib/services/proposalAdminService';
@@ -74,6 +75,29 @@ describe('listAdminProposals', () => {
     expect(mockPrisma.proposal.count).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({ status: 'DRAFT' }),
+      })
+    );
+  });
+
+  it('normalitza paginació a enters finits i limita el take', async () => {
+    await listAdminProposals({ page: 2.9, limit: Number.POSITIVE_INFINITY });
+
+    expect(mockPrisma.proposal.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 50,
+        take: 50,
+      })
+    );
+
+    vi.clearAllMocks();
+    mockPrisma.proposal.findMany.mockResolvedValue([]);
+    mockPrisma.proposal.count.mockResolvedValue(0);
+    await listAdminProposals({ page: 3.7, limit: 999.9 });
+
+    expect(mockPrisma.proposal.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 400,
+        take: 200,
       })
     );
   });
@@ -139,6 +163,21 @@ describe('createAdminProposal', () => {
       })
     );
   });
+
+  it('rebutja totals econòmics incoherents abans de persistir', async () => {
+    await expect(createAdminProposal({
+      currency: 'EUR',
+      validityDays: 30,
+      subtotal: 500,
+      discount: 0,
+      vatRate: 21,
+      vatAmount: 99,
+      total: 605,
+      snapshot: {},
+    })).rejects.toBeInstanceOf(ProposalFinancialConsistencyError);
+
+    expect(mockPrisma.proposal.create).not.toHaveBeenCalled();
+  });
 });
 
 describe('getAdminProposalById', () => {
@@ -184,6 +223,24 @@ describe('updateAdminProposal', () => {
         }),
       })
     );
+  });
+
+  it('rebutja actualització econòmica parcial abans de persistir', async () => {
+    await expect(updateAdminProposal('prop1', { total: 500 })).rejects.toBeInstanceOf(ProposalFinancialConsistencyError);
+
+    expect(mockPrisma.proposal.update).not.toHaveBeenCalled();
+  });
+
+  it('rebutja actualització econòmica completa però incoherent abans de persistir', async () => {
+    await expect(updateAdminProposal('prop1', {
+      subtotal: 500,
+      discount: 0,
+      vatRate: 21,
+      vatAmount: 99,
+      total: 599,
+    })).rejects.toBeInstanceOf(ProposalFinancialConsistencyError);
+
+    expect(mockPrisma.proposal.update).not.toHaveBeenCalled();
   });
 });
 

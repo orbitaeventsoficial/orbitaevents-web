@@ -152,18 +152,20 @@ describe('createCollaboratorProduct', () => {
     mockPrisma.collaboratorProduct.create.mockResolvedValue({ id: 'p1', name: 'Bingo' });
     const res = await createCollaboratorProduct('col1', {
       name: '  Bingo  ',
-      costPrice: 200,
-      sellPrice: 250,
+      costPrice: 200.126,
+      sellPrice: 250.455,
       category: '  Bingo  ',
       crew: '',
+      sortOrder: -4,
     });
     expect(res.status).toBe(201);
     const data = mockPrisma.collaboratorProduct.create.mock.calls[0][0].data;
     expect(data.name).toBe('Bingo');
     expect(data.category).toBe('Bingo');
     expect(data.crew).toBeNull();
-    expect(data.costPrice).toBe(200);
-    expect(data.sellPrice).toBe(250);
+    expect(data.costPrice).toBe(200.13);
+    expect(data.sellPrice).toBe(250.46);
+    expect(data.sortOrder).toBe(0);
   });
 });
 
@@ -176,11 +178,21 @@ describe('updateCollaboratorProduct', () => {
 
   it('actualitza només els camps presents', async () => {
     mockPrisma.collaboratorProduct.update.mockResolvedValue({ id: 'p1', sellPrice: 300 });
-    const res = await updateCollaboratorProduct('p1', { sellPrice: 300 });
+    const res = await updateCollaboratorProduct('p1', { costPrice: '120.126', sellPrice: 300.455, sortOrder: 2.7 });
     expect(res.status).toBe(200);
     const data = mockPrisma.collaboratorProduct.update.mock.calls[0][0].data;
-    expect(data.sellPrice).toBe(300);
+    expect(data.costPrice).toBe(120.13);
+    expect(data.sellPrice).toBe(300.46);
+    expect(data.sortOrder).toBe(3);
     expect(data.name).toBeUndefined();
+  });
+
+  it('neutralitza sortOrder brut en actualitzar', async () => {
+    mockPrisma.collaboratorProduct.update.mockResolvedValue({ id: 'p1', sortOrder: 0 });
+    const res = await updateCollaboratorProduct('p1', { sortOrder: -8 });
+
+    expect(res.status).toBe(200);
+    expect(mockPrisma.collaboratorProduct.update.mock.calls[0][0].data.sortOrder).toBe(0);
   });
 });
 

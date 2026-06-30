@@ -1,9 +1,9 @@
 import type { ChannelCredit, LeadJourney, MultiTouchReport } from '@/lib/services/attributionService';
-import { formatCurrency, formatDateShort } from '@/lib/constants';
+import { formatCurrencyExact, formatDateShort } from '@/lib/constants';
 
-function formatEuro(v: number): string {
+export function formatAttributionEuro(v: number): string {
   if (v === 0) return '—';
-  return formatCurrency(Math.round(v));
+  return formatCurrencyExact(Math.round(v * 100) / 100);
 }
 
 function formatPct(value: number, total: number): string {
@@ -83,11 +83,11 @@ function ChannelCard({
       <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
         <div className="admin-cr-mini-card admin-cr-card-pad">
           <p className="opacity-45">Ingressos d&apos;entrada</p>
-          <p className="mt-1 font-semibold admin-tone-text-cyan">{formatEuro(channel.firstTouchRevenue)}</p>
+          <p className="mt-1 font-semibold admin-tone-text-cyan">{formatAttributionEuro(channel.firstTouchRevenue)}</p>
         </div>
         <div className="admin-cr-mini-card admin-cr-card-pad">
           <p className="opacity-45">Ingressos de tancament</p>
-          <p className="mt-1 font-semibold admin-tone-text-success">{formatEuro(channel.lastTouchRevenue)}</p>
+          <p className="mt-1 font-semibold admin-tone-text-success">{formatAttributionEuro(channel.lastTouchRevenue)}</p>
         </div>
       </div>
     </article>
@@ -115,7 +115,7 @@ function JourneyCard({ journey }: { journey: LeadJourney }) {
           </p>
         </div>
         <div className="admin-cr-chip">
-          {formatEuro(journey.revenue)}
+          {formatAttributionEuro(journey.revenue)}
         </div>
       </div>
 
@@ -247,13 +247,13 @@ export default function AttributionPanel({ report }: { report: MultiTouchReport 
                   <div className="admin-cr-mini-card admin-cr-card-pad">
                     <p className="text-xs uppercase tracking-wider opacity-50">Ingressos first touch</p>
                     <p className="mt-1 text-xl font-bold admin-tone-text-cyan">
-                      {formatEuro(report.byChannel.reduce((sum, channel) => sum + channel.firstTouchRevenue, 0))}
+                      {formatAttributionEuro(report.byChannel.reduce((sum, channel) => sum + channel.firstTouchRevenue, 0))}
                     </p>
                   </div>
                   <div className="admin-cr-mini-card admin-cr-card-pad">
                     <p className="text-xs uppercase tracking-wider opacity-50">Ingressos last touch</p>
                     <p className="mt-1 text-xl font-bold admin-tone-text-success">
-                      {formatEuro(report.byChannel.reduce((sum, channel) => sum + channel.lastTouchRevenue, 0))}
+                      {formatAttributionEuro(report.byChannel.reduce((sum, channel) => sum + channel.lastTouchRevenue, 0))}
                     </p>
                   </div>
                 </div>

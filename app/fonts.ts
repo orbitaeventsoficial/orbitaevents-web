@@ -68,7 +68,7 @@ export const plexMono = JetBrains_Mono({
 // ═══════════════════════════════════════════════════════════════════════════
 // FONT COS ADMIN "PANTALLA NEGRA" - text/valors de la fitxa del lead i endavant
 // Manrope: grotesca moderna amb caràcter, més personalitat que Inter sense perdre
-// llegibilitat en pantalla densa. Consumida (scope) via --ui a .fxd__fullpage.
+// llegibilitat en pantalla densa. Consumida (scope) via --ui a .ap-ledger-fullpage.
 // ═══════════════════════════════════════════════════════════════════════════
 export const manrope = Manrope({
   subsets: ["latin"],

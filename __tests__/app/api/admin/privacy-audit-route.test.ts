@@ -40,6 +40,22 @@ describe('GET /api/admin/privacy/audit', () => {
     expect(mockPrisma.privacyAuditLog.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { action: 'CONSENT_REVOKED' } }));
   });
 
+  it('saneja paginació bruta', async () => {
+    await GET(new NextRequest('http://localhost/api/admin/privacy/audit?limit=Infinity&offset=-3'));
+
+    expect(mockPrisma.privacyAuditLog.findMany).toHaveBeenLastCalledWith(expect.objectContaining({
+      take: 50,
+      skip: 0,
+    }));
+
+    await GET(new NextRequest('http://localhost/api/admin/privacy/audit?limit=250.8&offset=9.7'));
+
+    expect(mockPrisma.privacyAuditLog.findMany).toHaveBeenLastCalledWith(expect.objectContaining({
+      take: 200,
+      skip: 9,
+    }));
+  });
+
   it('retorna 500 si falla', async () => {
     mockPrisma.privacyAuditLog.findMany.mockRejectedValueOnce(new Error('DB'));
     expect((await GET(new NextRequest('http://localhost/api/admin/privacy/audit'))).status).toBe(500);

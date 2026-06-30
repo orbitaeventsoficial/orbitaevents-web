@@ -150,7 +150,7 @@ function lostReasonLabel(reason: string | null): string | null {
 
 function leadCellFoot(lead: LeadData): ReactNode {
   if (lead.time) return <>{lead.time} · {lead.location || '—'}</>;
-  return <><span className="fx__nohour">sense hora</span>{lead.location ? ` · ${lead.location}` : ''}</>;
+  return <><span className="ap-leads-nohour">sense hora</span>{lead.location ? ` · ${lead.location}` : ''}</>;
 }
 
 function LeadDayCell({
@@ -171,9 +171,9 @@ function LeadDayCell({
   const firstLead = leads[0];
   if (!firstLead) {
     return (
-      <span className={`fx__cell is-free${inMonth ? '' : ' is-out'}`}>
-        <span className="fx__day">{dayLabel}</span>
-        <span className="fx__freelabel">Lliure</span>
+      <span className={`ap-leads-cell is-free${inMonth ? '' : ' is-out'}`}>
+        <span className="ap-leads-day">{dayLabel}</span>
+        <span className="ap-leads-freelabel">Lliure</span>
       </span>
     );
   }
@@ -183,22 +183,22 @@ function LeadDayCell({
     return (
       <button
         type="button"
-        className={`fx__cell${weekday ? ' fx__cell--wd' : ''} is-lead${inMonth ? '' : ' is-out'}${firstLead.id === focusId ? ' is-active' : ''}${pay ? ' is-reserva' : ''}`}
+        className={`ap-leads-cell${weekday ? ' ap-leads-cell--wd' : ''} is-lead${inMonth ? '' : ' is-out'}${firstLead.id === focusId ? ' is-active' : ''}${pay ? ' is-reserva' : ''}`}
         data-stage={firstLead.stage}
         onClick={() => onOpen(firstLead.id)}
       >
-        <span className="fx__celltop">
-          <span className="fx__day">{dayLabel}</span>
-          {firstLead.value > 0 && <span className="fx__cval">{formatCurrency(firstLead.value)}</span>}
-          <span className="fx__cellmeta">
+        <span className="ap-leads-celltop">
+          <span className="ap-leads-day">{dayLabel}</span>
+          {firstLead.value > 0 && <span className="ap-leads-cval">{formatCurrency(firstLead.value)}</span>}
+          <span className="ap-leads-cellmeta">
             <WxBadge wx={firstLead.wx} size="sm" />
-            {pay && <span className="fx__pay" data-pay={pay} data-tip={PAY_TOOLTIP[pay]} />}
-            <span className="fx__dot" data-stage={firstLead.stage} data-tip={pay ? `Reserva · ${PAY_TOOLTIP[pay]}` : STAGE_TOOLTIP[firstLead.stage]} />
+            {pay && <span className="ap-leads-pay" data-pay={pay} data-tip={PAY_TOOLTIP[pay]} />}
+            <span className="ap-leads-dot" data-stage={firstLead.stage} data-tip={pay ? `Reserva · ${PAY_TOOLTIP[pay]}` : STAGE_TOOLTIP[firstLead.stage]} />
           </span>
         </span>
-        <span className="fx__celltype">{pay ? 'Reserva' : firstLead.type}</span>
-        <span className="fx__lname">{firstLead.name}</span>
-        <span className="fx__cellfoot">{leadCellFoot(firstLead)}</span>
+        <span className="ap-leads-celltype">{pay ? 'Reserva' : firstLead.type}</span>
+        <span className="ap-leads-lname">{firstLead.name}</span>
+        <span className="ap-leads-cellfoot">{leadCellFoot(firstLead)}</span>
       </button>
     );
   }
@@ -208,33 +208,33 @@ function LeadDayCell({
 
   return (
     <div
-      className={`fx__cell${weekday ? ' fx__cell--wd' : ''} fx__cell--multi is-lead${inMonth ? '' : ' is-out'}${active ? ' is-active' : ''}${hasReservation ? ' is-reserva' : ''}`}
+      className={`ap-leads-cell${weekday ? ' ap-leads-cell--wd' : ''} ap-leads-cell--multi is-lead${inMonth ? '' : ' is-out'}${active ? ' is-active' : ''}${hasReservation ? ' is-reserva' : ''}`}
       data-stage={firstLead.stage}
     >
-      <span className="fx__multiday">
-        <span className="fx__day">{dayLabel}</span>
-        <span className="fx__multicount">{leads.length} bolos</span>
+      <span className="ap-leads-multiday">
+        <span className="ap-leads-day">{dayLabel}</span>
+        <span className="ap-leads-multicount">{leads.length} bolos</span>
       </span>
-      <span className="fx__multiparts">
+      <span className="ap-leads-multiparts">
         {leads.map((lead) => {
           const pay = paymentState(lead.booking);
           return (
             <button
               key={lead.id}
               type="button"
-              className={`fx__cellpart${lead.id === focusId ? ' is-active' : ''}`}
+              className={`ap-leads-cellpart${lead.id === focusId ? ' is-active' : ''}`}
               data-stage={lead.stage}
               onClick={() => onOpen(lead.id)}
             >
-              <span className="fx__partmain">
-                <span className="fx__lname">{lead.name}</span>
-                <span className="fx__cellmeta">
+              <span className="ap-leads-partmain">
+                <span className="ap-leads-lname">{lead.name}</span>
+                <span className="ap-leads-cellmeta">
                   <WxBadge wx={lead.wx} size="sm" />
-                  {pay && <span className="fx__pay" data-pay={pay} data-tip={PAY_TOOLTIP[pay]} />}
-                  <span className="fx__dot" data-stage={lead.stage} data-tip={pay ? `Reserva · ${PAY_TOOLTIP[pay]}` : STAGE_TOOLTIP[lead.stage]} />
+                  {pay && <span className="ap-leads-pay" data-pay={pay} data-tip={PAY_TOOLTIP[pay]} />}
+                  <span className="ap-leads-dot" data-stage={lead.stage} data-tip={pay ? `Reserva · ${PAY_TOOLTIP[pay]}` : STAGE_TOOLTIP[lead.stage]} />
                 </span>
               </span>
-              <span className="fx__cellfoot">{leadCellFoot(lead)}</span>
+              <span className="ap-leads-cellfoot">{leadCellFoot(lead)}</span>
             </button>
           );
         })}
@@ -286,10 +286,10 @@ function PriceHint({ value, time, endTime, type }: { value: number; time: string
   const level = perHour < rate.min ? 'critical' : perHour < rate.recommended ? 'warn' : 'ok';
   const sign = devPct >= 0 ? '+' : '';
   return (
-    <div className="fxd__pricehint" data-level={level}>
-      <span className="fxd__ph-rate">{perHour}€/h</span>
-      <span className="fxd__ph-dev">{sign}{devPct}% vs mercat</span>
-      <span className="fxd__ph-rec">Recomanat: {rate.recommended}€/h</span>
+    <div className="ap-ledger-pricehint" data-level={level}>
+      <span className="ap-ledger-ph-rate">{perHour}€/h</span>
+      <span className="ap-ledger-ph-dev">{sign}{devPct}% vs mercat</span>
+      <span className="ap-ledger-ph-rec">Recomanat: {rate.recommended}€/h</span>
     </div>
   );
 }
@@ -303,16 +303,16 @@ function BookingInlineActions({ lead }: { lead: LeadData }) {
   // (doctrina canònica, vegeu docs/fitxes-tipus.md i docs/bolo-flux.md). El drawer
   // només mostra l'estat i obre la reserva.
   return (
-    <section className="fxd__panel fxd__panel--booking">
-      <div className="fxd__panelhead">
+    <section className="ap-ledger-panel ap-ledger-panel--booking">
+      <div className="ap-ledger-panelhead">
         <span>Reserva</span>
         <strong>{booking.reference}</strong>
       </div>
-      <div className="fxd__bookingstate">
-        {pay && <span className="fx__pay" data-pay={pay} />}
+      <div className="ap-ledger-bookingstate">
+        {pay && <span className="ap-leads-pay" data-pay={pay} />}
         <span>{pay ? PAY_LABEL[pay] : 'Reserva vinculada'}</span>
       </div>
-      <div className="fxd__actions">
+      <div className="ap-ledger-actions">
         <Link href={buildBookingHref(booking.id)} className="ap-btn--xs">Obrir reserva</Link>
       </div>
     </section>
@@ -343,37 +343,37 @@ function LeadDetailPanel({
 
   return (
     <div className="fxd" data-stage={lead.stage} role="dialog" aria-modal="true" aria-label={`Fitxa de ${lead.name}`}>
-      <div className="fxd__shade" onClick={onClose} />
-      <aside className="fxd__sheet">
-        <header className="fxd__bar">
-          <button type="button" className="fxd__back" onClick={onClose}><span>{I.back}</span>Torna</button>
-          <Link href={buildLeadWorkspaceHref(lead.id)} className="fxd__full">Fitxa completa</Link>
-          <button type="button" className="fxd__close" aria-label="Tancar fitxa" onClick={onClose}>{I.close}</button>
+      <div className="ap-ledger-shade" onClick={onClose} />
+      <aside className="ap-ledger-sheet">
+        <header className="ap-ledger-bar">
+          <button type="button" className="ap-ledger-back" onClick={onClose}><span>{I.back}</span>Torna</button>
+          <Link href={buildLeadWorkspaceHref(lead.id)} className="ap-ledger-full">Fitxa completa</Link>
+          <button type="button" className="ap-ledger-close" aria-label="Tancar fitxa" onClick={onClose}>{I.close}</button>
         </header>
 
-        <section className="fxd__hero">
-          <span className="fxd__kicker">{STAGE_LABEL[lead.stage]} · {lead.type}</span>
+        <section className="ap-ledger-hero">
+          <span className="ap-ledger-kicker">{STAGE_LABEL[lead.stage]} · {lead.type}</span>
           <h2>{lead.name}</h2>
-          {reason && <span className="fxd__lost">{reason}</span>}
+          {reason && <span className="ap-ledger-lost">{reason}</span>}
           {lead.wx.forecast && (
-            <span className="fxd__wxrow">
+            <span className="ap-ledger-wxrow">
               <WxBadge wx={lead.wx} size="md" />
-              {lead.dateISO && <span className="fxd__wxdate">{fullDate(lead.dateISO)}</span>}
+              {lead.dateISO && <span className="ap-ledger-wxdate">{fullDate(lead.dateISO)}</span>}
             </span>
           )}
         </section>
 
-        <div className="fxd__stats">
+        <div className="ap-ledger-stats">
           <div><span>Valor</span><b>{lead.value ? formatCurrency(lead.value) : '—'}</b></div>
           <div><span>Durada</span><b>{durationLabel(lead.time, lead.endTime)}</b></div>
           <div><span>Prioritat</span><b>{PRIORITY_LABEL[lead.priority]}</b></div>
         </div>
         <PriceHint value={lead.value} time={lead.time} endTime={lead.endTime} type={lead.type} />
-        <div className="fxd__grid">
-          <section className="fxd__panel">
-            <div className="fxd__panelhead"><span>Següent pas</span></div>
-            <p className="fxd__summary">{leadSummary(lead)}</p>
-            <div className="fxd__actions">
+        <div className="ap-ledger-grid">
+          <section className="ap-ledger-panel">
+            <div className="ap-ledger-panelhead"><span>Següent pas</span></div>
+            <p className="ap-ledger-summary">{leadSummary(lead)}</p>
+            <div className="ap-ledger-actions">
               {lead.stage === 'guanyat' && !lead.booking && (
                 <Link href={`/admin/bookings/new?leadId=${encodeURIComponent(lead.id)}`} className="ap-btn--primary">
                   Crear reserva
@@ -397,9 +397,9 @@ function LeadDetailPanel({
             </div>
           </section>
 
-          <section className="fxd__panel">
-            <div className="fxd__panelhead"><span>Canviar fase</span></div>
-            <div className="fxd__stagepick">
+          <section className="ap-ledger-panel">
+            <div className="ap-ledger-panelhead"><span>Canviar fase</span></div>
+            <div className="ap-ledger-stagepick">
               {PIPELINE_STAGES.map((stage) => (
                 <button
                   key={stage}
@@ -409,22 +409,22 @@ function LeadDetailPanel({
                   disabled={!editable || pending || stage === lead.stage}
                   onClick={() => onMoveLead(lead.id, stage)}
                 >
-                  <span className="fx__dot" data-stage={stage} />
+                  <span className="ap-leads-dot" data-stage={stage} />
                   {STAGE_LABEL[stage]}
                 </button>
               ))}
             </div>
           </section>
 
-          <section className="fxd__panel">
-            <div className="fxd__panelhead"><span>Contacte</span></div>
-            <dl className="fxd__rows fxd__rows--contact">
+          <section className="ap-ledger-panel">
+            <div className="ap-ledger-panelhead"><span>Contacte</span></div>
+            <dl className="ap-ledger-rows ap-ledger-rows--contact">
               <div><dt>Telèfon</dt><dd>{lead.phone || '—'}</dd></div>
               <div><dt>Email</dt><dd>{lead.email || '—'}</dd></div>
               <div><dt>Canal</dt><dd>{lead.channel || '—'}</dd></div>
               <div><dt>Últim contacte</dt><dd>{lead.last || '—'}</dd></div>
             </dl>
-            <div className="fxd__actions fxd__actions--contact">
+            <div className="ap-ledger-actions ap-ledger-actions--contact">
               {(() => {
                 const waHref = buildLeadWhatsAppHref(lead.phone, lead.name);
                 return waHref ? (
@@ -443,19 +443,19 @@ function LeadDetailPanel({
             </div>
           </section>
 
-          <section className="fxd__panel">
-            <div className="fxd__panelhead"><span>Dades del bolo</span></div>
-            <dl className="fxd__rows fxd__rows--event">
+          <section className="ap-ledger-panel">
+            <div className="ap-ledger-panelhead"><span>Dades del bolo</span></div>
+            <dl className="ap-ledger-rows ap-ledger-rows--event">
               <div><dt>Data</dt><dd>{lead.dateISO ? fullDate(lead.dateISO) : '—'}</dd></div>
               <div><dt>Pax</dt><dd>{lead.pax || '—'}</dd></div>
               <div><dt>Inici</dt><dd>{lead.time || '—'}</dd></div>
               <div><dt>Fi</dt><dd>{lead.endTime || '—'}</dd></div>
-              <div className="fxd__row--long">
+              <div className="ap-ledger-row--long">
                 <dt>Lloc</dt>
                 <dd>
                   {lead.location || '—'}
                   {buildWazeUrl(lead.location) && (
-                    <a href={buildWazeUrl(lead.location)!} target="_blank" rel="noopener noreferrer" className="fxd__navlink"> 🧭 Waze</a>
+                    <a href={buildWazeUrl(lead.location)!} target="_blank" rel="noopener noreferrer" className="ap-ledger-navlink"> 🧭 Waze</a>
                   )}
                 </dd>
               </div>
@@ -468,11 +468,11 @@ function LeadDetailPanel({
                 });
                 if (!logi.departureTime || logi.travelMinutes === 0) return null;
                 return (
-                  <div className="fxd__row--long">
+                  <div className="ap-ledger-row--long">
                     <dt>Sortir cap al bolo</dt>
                     <dd>
-                      <span className="fxd__departtime">{logi.departureTime}</span>
-                      <span className="fxd__departhint"> · {logi.travelMinutes} min viatge + {logi.setupMinutes} min muntatge</span>
+                      <span className="ap-ledger-departtime">{logi.departureTime}</span>
+                      <span className="ap-ledger-departhint"> · {logi.travelMinutes} min viatge + {logi.setupMinutes} min muntatge</span>
                     </dd>
                   </div>
                 );
@@ -662,17 +662,17 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
     <div className="fx-root is-contrast">
 
       {/* ── PEÇA 1: Capçalera ── */}
-      <header className="fx__pagehead">
-        <div className="fx__tt">
-          <span className="fx__eyebrow">Temporada {currentYear}</span>
-          <h1 className="fx__h1">Caps de setmana <span className="fx__charlie" title="Validat pel propietari — patró de referència">✓ TANCAT CHARLIE</span></h1>
+      <header className="ap-leads-pagehead">
+        <div className="ap-leads-tt">
+          <span className="ap-leads-eyebrow">Temporada {currentYear}</span>
+          <h1 className="ap-leads-h1">Caps de setmana <span className="ap-leads-charlie" title="Validat pel propietari — patró de referència">✓ TANCAT CHARLIE</span></h1>
         </div>
-        <div className="fx__headright">
-          <span className="fx__sub">
+        <div className="ap-leads-headright">
+          <span className="ap-leads-sub">
             {MONTHS_SHORT[m0 - 1]} – {MONTHS_SHORT[mLast.m - 1]} {mLast.y} · caps de setmana
           </span>
-          <Link href="/admin/intake" className="fx__add"><span className="fx__addic">{I.plus}</span>Nova entrada</Link>
-          <div className="fx__view" role="group" aria-label="Vista">
+          <Link href="/admin/intake" className="ap-leads-add"><span className="ap-leads-addic">{I.plus}</span>Nova entrada</Link>
+          <div className="ap-leads-view" role="group" aria-label="Vista">
             <button type="button" className={viewMode === 'calendari' ? 'is-on' : ''} aria-pressed={viewMode === 'calendari'} onClick={() => setViewMode('calendari')}>Calendari</button>
             <button type="button" className={viewMode === 'pipeline'  ? 'is-on' : ''} aria-pressed={viewMode === 'pipeline'}  onClick={() => setViewMode('pipeline')}>Pipeline</button>
             <button type="button" className={viewMode === 'llista'    ? 'is-on' : ''} aria-pressed={viewMode === 'llista'}    onClick={() => setViewMode('llista')}>Llista</button>
@@ -681,28 +681,28 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
       </header>
 
       {/* ── PEÇA 2: Zona Focus ── */}
-      <div className="fx__focus" data-stage={focus?.stage ?? 'nou'}>
+      <div className="ap-leads-focus" data-stage={focus?.stage ?? 'nou'}>
         {focus ? (
-          <button type="button" className="fx__focusrow" onClick={() => setPageId(focus.id)}>
-            <span className="fx__dot" data-stage={focus.stage} aria-hidden="true" />
-            <span className="fx__focustext">
-              <span className="fx__focusaction">{focusActionLabel(focus)}</span>
-              <span className="fx__focusname">{focus.name}</span>
-              <span className="fx__focusmeta">
+          <button type="button" className="ap-leads-focusrow" onClick={() => setPageId(focus.id)}>
+            <span className="ap-leads-dot" data-stage={focus.stage} aria-hidden="true" />
+            <span className="ap-leads-focustext">
+              <span className="ap-leads-focusaction">{focusActionLabel(focus)}</span>
+              <span className="ap-leads-focusname">{focus.name}</span>
+              <span className="ap-leads-focusmeta">
                 {focus.type}{focus.dateISO ? ` · ${fullDate(focus.dateISO)}` : ''}{focus.location ? ` · ${focus.location}` : ''}{focus.pax ? ` · ${focus.pax} pax` : ''}
               </span>
             </span>
-            <span className="fx__focusval">{focus.value ? formatCurrency(focus.value) : '—'}</span>
+            <span className="ap-leads-focusval">{focus.value ? formatCurrency(focus.value) : '—'}</span>
           </button>
         ) : (
-          <span className="fx__focusrow fx__focusrow--empty">
-            <span className="fx__focustext">
-              <span className="fx__focusname">Cap entrada activa</span>
-              <span className="fx__focusmeta">No hi ha leads oberts per a la temporada actual.</span>
+          <span className="ap-leads-focusrow ap-leads-focusrow--empty">
+            <span className="ap-leads-focustext">
+              <span className="ap-leads-focusname">Cap entrada activa</span>
+              <span className="ap-leads-focusmeta">No hi ha leads oberts per a la temporada actual.</span>
             </span>
           </span>
         )}
-        <div className="fx__focuscycle">
+        <div className="ap-leads-focuscycle">
           <button type="button" aria-label="Decisió anterior" onClick={() => cycleFocus(-1)}>{I.back}</button>
           <span>{focusPos < 0 ? '–' : focusPos + 1} / {focusQueue.length}</span>
           <button type="button" aria-label="Decisió següent" onClick={() => cycleFocus(1)}>{I.arrow}</button>
@@ -719,24 +719,24 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
         const openForecast = effectiveLeads.reduce((s, l) => s + weightedLeadValue(l), 0);
         const activeCount = effectiveLeads.filter((l) => l.stage !== 'perdut').length;
         return (
-          <div className="fx__metrics" aria-label="Resum comercial">
-            <div className="fx__metric">
+          <div className="ap-leads-metrics" aria-label="Resum comercial">
+            <div className="ap-leads-metric">
               <span>Entrades</span>
               <b>{effectiveLeads.length} ({activeCount} actives)</b>
             </div>
-            <div className="fx__metric">
+            <div className="ap-leads-metric">
               <span>Pipeline</span>
               <b>{formatCurrency(openValue)}</b>
             </div>
-            <div className="fx__metric" title="Suma del valor × probabilitat de tancament dels leads oberts">
+            <div className="ap-leads-metric" title="Suma del valor × probabilitat de tancament dels leads oberts">
               <span>Forecast ponderat</span>
-              <b className="fx__metric-forecast">{formatCurrency(openForecast)}</b>
+              <b className="ap-leads-metric-forecast">{formatCurrency(openForecast)}</b>
             </div>
-            <div className="fx__metric">
+            <div className="ap-leads-metric">
               <span>Guanyat</span>
               <b>{formatCurrency(wonValue)}</b>
             </div>
-            <div className="fx__metric">
+            <div className="ap-leads-metric">
               <span>Temporada {currentYear}</span>
               <b>{formatCurrency(totalValue)}</b>
             </div>
@@ -748,19 +748,19 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
         const noDate = effectiveLeads.filter((l) => !l.dateISO && l.stage !== 'perdut');
         if (!noDate.length) return null;
         return (
-          <div className="fx__nodate">
-            <div className="fx__nodatehead">
+          <div className="ap-leads-nodate">
+            <div className="ap-leads-nodatehead">
               <span>Sense data assignada</span>
-              <span className="fx__nodatecount">{noDate.length}</span>
+              <span className="ap-leads-nodatecount">{noDate.length}</span>
             </div>
-            <div className="fx__nodatelist">
+            <div className="ap-leads-nodatelist">
               {noDate.map((l) => (
-                <button key={l.id} type="button" className="fx__nodaterow" data-stage={l.stage}
+                <button key={l.id} type="button" className="ap-leads-nodaterow" data-stage={l.stage}
                   onClick={() => setPageId(l.id)}>
-                  <span className="fx__dot" data-stage={l.stage} aria-hidden="true" />
-                  <span className="fx__nodatename">{l.name}</span>
-                  <span className="fx__nodatemeta">{l.type}{l.pax ? ` · ${l.pax} pax` : ''}</span>
-                  {l.value > 0 && <span className="fx__cval">{formatCurrency(l.value)}</span>}
+                  <span className="ap-leads-dot" data-stage={l.stage} aria-hidden="true" />
+                  <span className="ap-leads-nodatename">{l.name}</span>
+                  <span className="ap-leads-nodatemeta">{l.type}{l.pax ? ` · ${l.pax} pax` : ''}</span>
+                  {l.value > 0 && <span className="ap-leads-cval">{formatCurrency(l.value)}</span>}
                 </button>
               ))}
             </div>
@@ -769,57 +769,57 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
       })()}
 
       {/* ── PEÇA 4: Contingut (calendari / pipeline / llista) ── */}
-      <div className="fx__content">
+      <div className="ap-leads-content">
 
         {/* ── Llegenda + barra de mesos (només calendari) ── */}
         {viewMode === 'calendari' && (
           <>
-            <div className="fx__calbar">
-              <button type="button" className="fx__calnav" onClick={() => setMonthStart((s) => Math.max(1, s - 1))} disabled={monthStart <= 1} aria-label="Mesos anteriors">{I.back}</button>
-              <div className="fx__calmonths" role="group" aria-label="Selector de mesos">
+            <div className="ap-leads-calbar">
+              <button type="button" className="ap-leads-calnav" onClick={() => setMonthStart((s) => Math.max(1, s - 1))} disabled={monthStart <= 1} aria-label="Mesos anteriors">{I.back}</button>
+              <div className="ap-leads-calmonths" role="group" aria-label="Selector de mesos">
                 {Array.from({ length: 12 }, (_, i) => Math.floor((monthStart - 1) / 12) * 12 + i + 1).map((vm) => {
                   const { m } = toCalMonth(year, vm);
                   const on = visibleMonths.includes(vm);
                   return (
-                    <button key={vm} type="button" className={`fx__calchip${on ? ' is-on' : ''}`} aria-pressed={on}
+                    <button key={vm} type="button" className={`ap-leads-calchip${on ? ' is-on' : ''}`} aria-pressed={on}
                       onClick={() => setMonthStart(Math.min(MONTH_MAX_START, Math.max(1, vm)))}>
                       {MONTHS_SHORT[m - 1]}
                     </button>
                   );
                 })}
               </div>
-              <button type="button" className="fx__calnav" onClick={() => setMonthStart((s) => Math.min(MONTH_MAX_START, s + 1))} disabled={monthStart >= MONTH_MAX_START} aria-label="Mesos següents">{I.arrow}</button>
+              <button type="button" className="ap-leads-calnav" onClick={() => setMonthStart((s) => Math.min(MONTH_MAX_START, s + 1))} disabled={monthStart >= MONTH_MAX_START} aria-label="Mesos següents">{I.arrow}</button>
             </div>
 
             {/* ── Empty state global: cap lead a tota la temporada ── */}
             {effectiveLeads.length === 0 && (
-              <div className="fx__calempty" role="status">
-                <span className="fx__calempty-tx">Cap entrada aquesta temporada</span>
-                <span className="fx__calempty-sub">Quan entri un lead apareixerà al cap de setmana corresponent.</span>
-                <Link href="/admin/intake" className="fx__add"><span className="fx__addic">{I.plus}</span>Nova entrada</Link>
+              <div className="ap-leads-calempty" role="status">
+                <span className="ap-leads-calempty-tx">Cap entrada aquesta temporada</span>
+                <span className="ap-leads-calempty-sub">Quan entri un lead apareixerà al cap de setmana corresponent.</span>
+                <Link href="/admin/intake" className="ap-leads-add"><span className="ap-leads-addic">{I.plus}</span>Nova entrada</Link>
               </div>
             )}
 
             {/* ── Grid de mesos ── */}
-            <div className="fx__cal">
+            <div className="ap-leads-cal">
               {months.map((month) => {
                 const monthLeads = month.slots.reduce((n, slot) => {
                   if (slot.type === 'weekend') return n + slot.days.reduce((sum, d) => sum + (d.inMonth ? d.leads.length : 0), 0);
                   return n + slot.leads.length;
                 }, 0);
                 return (
-                  <article className={`fx__mon${month.isFuture ? ' is-future' : ''}`} key={month.m}>
-                    <div className="fx__monhead">
+                  <article className={`ap-leads-mon${month.isFuture ? ' is-future' : ''}`} key={month.m}>
+                    <div className="ap-leads-monhead">
                       <h2>{month.label}</h2>
-                      <span className="fx__monmeta">
-                        {month.isFuture && <span className="fx__futurebadge">⚠ Any futur</span>}
-                        <span className="fx__moncount">{monthLeads} {monthLeads === 1 ? 'bolo' : 'bolos'}</span>
+                      <span className="ap-leads-monmeta">
+                        {month.isFuture && <span className="ap-leads-futurebadge">⚠ Any futur</span>}
+                        <span className="ap-leads-moncount">{monthLeads} {monthLeads === 1 ? 'bolo' : 'bolos'}</span>
                       </span>
                     </div>
-                    <div className="fx__weekhead">
-                      <span className="fx__gh">Dv</span><span className="fx__gh">Ds</span><span className="fx__gh">Dg</span>
+                    <div className="ap-leads-weekhead">
+                      <span className="ap-leads-gh">Dv</span><span className="ap-leads-gh">Ds</span><span className="ap-leads-gh">Dg</span>
                     </div>
-                    <div className="fx__grid">
+                    <div className="ap-leads-grid">
                       {month.slots.map((slot) => {
                         if (slot.type === 'weekday') {
                           const DOW_LABEL = ['Dg','Dl','Dt','Dc','Dj','Dv','Ds'];
@@ -857,7 +857,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
 
         {/* ── PEÇA 5a: Pipeline ── */}
         {viewMode === 'pipeline' && (
-          <div className="fx__pipeline">
+          <div className="ap-leads-pipeline">
             {PIPELINE_STAGES.map((stage) => {
               const laneLeads = effectiveLeads.filter((l) => l.stage === stage);
               const laneValue = laneLeads.reduce((sum, l) => sum + l.value, 0);
@@ -865,7 +865,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
               return (
                 <section
                   key={stage}
-                  className={`fx__lane${dropStage === stage ? ' is-drop' : ''}`}
+                  className={`ap-leads-lane${dropStage === stage ? ' is-drop' : ''}`}
                   data-stage={stage}
                   onDragOver={(e) => { if (dragLeadId) { e.preventDefault(); if (dropStage !== stage) setDropStage(stage); } }}
                   onDragLeave={(e) => { if (e.currentTarget === e.target) setDropStage((c) => c === stage ? null : c); }}
@@ -876,29 +876,29 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                     if (id) handleMoveLead(id, stage);
                   }}
                 >
-                  <div className="fx__lanehead">
-                    <div className="fx__lanetitle">
+                  <div className="ap-leads-lanehead">
+                    <div className="ap-leads-lanetitle">
                       <h2>{STAGE_LABEL[stage]}</h2>
                       <small>{laneValue ? formatCurrency(laneValue) : '—'}</small>
                       {laneForecast > 0 && (
-                        <small className="fx__lane-forecast" title="Valor ponderat per probabilitat de tancament">
+                        <small className="ap-leads-lane-forecast" title="Valor ponderat per probabilitat de tancament">
                           ≈ {formatCurrency(laneForecast)}
                         </small>
                       )}
                     </div>
                     <span>{laneLeads.length}</span>
                   </div>
-                  <div className="fx__lanecards">
+                  <div className="ap-leads-lanecards">
                     {laneLeads.length === 0 && (
                       stage === 'nou' ? (
-                        <Link href="/admin/intake" className="fx__laneempty fx__laneempty--cta">
-                          <span className="fx__laneemptyic">{I.plus}</span>
-                          <span className="fx__laneemptytx">Cap lead nou</span>
-                          <span className="fx__laneemptysub">Afegeix una entrada</span>
+                        <Link href="/admin/intake" className="ap-leads-laneempty ap-leads-laneempty--cta">
+                          <span className="ap-leads-laneemptyic">{I.plus}</span>
+                          <span className="ap-leads-laneemptytx">Cap lead nou</span>
+                          <span className="ap-leads-laneemptysub">Afegeix una entrada</span>
                         </Link>
                       ) : (
-                        <span className="fx__laneempty">
-                          <span className="fx__laneemptytx">
+                        <span className="ap-leads-laneempty">
+                          <span className="ap-leads-laneemptytx">
                             {stage === 'guanyat' ? 'Cap bolo tancat encara' : stage === 'perdut' ? 'Res perdut' : 'Res en seguiment'}
                           </span>
                         </span>
@@ -911,7 +911,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                       <button
                         key={l.id}
                         type="button"
-                        className={`fx__pipelead${l.id === focusId ? ' is-active' : ''}${dragLeadId === l.id ? ' is-dragging' : ''}${pendingId === l.id ? ' is-pending' : ''}`}
+                        className={`ap-leads-pipelead${l.id === focusId ? ' is-active' : ''}${dragLeadId === l.id ? ' is-dragging' : ''}${pendingId === l.id ? ' is-pending' : ''}`}
                         data-stage={l.stage}
                         data-priority={l.priority}
                         draggable={draggable && pendingId !== l.id}
@@ -923,14 +923,14 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
                         onDragEnd={() => { setDragLeadId(null); setDropStage(null); }}
                         onClick={() => setPageId(l.id)}
                       >
-                        <span className="fx__leadkicker">{l.type}{(l.priority === 'URGENT' || l.priority === 'HIGH') && <span className="fx__pri" data-pri={l.priority}>{l.priority === 'URGENT' ? '⚡' : '↑'}</span>}</span>
-                        <span className="fx__leadtop">
-                          <b>{pay && <span className="fx__pay" data-pay={pay} data-tip={PAY_TOOLTIP[pay]} />}{l.name}</b>
+                        <span className="ap-leads-leadkicker">{l.type}{(l.priority === 'URGENT' || l.priority === 'HIGH') && <span className="ap-leads-pri" data-pri={l.priority}>{l.priority === 'URGENT' ? '⚡' : '↑'}</span>}</span>
+                        <span className="ap-leads-leadtop">
+                          <b>{pay && <span className="ap-leads-pay" data-pay={pay} data-tip={PAY_TOOLTIP[pay]} />}{l.name}</b>
                           <strong>{l.value ? formatCurrency(l.value) : '—'}</strong>
                         </span>
-                        {pay && <span className="fx__paylabel" data-pay={pay}>{PAY_LABEL[pay]}</span>}
-                        <span className="fx__leadwhen">{l.dateISO ? fullDate(l.dateISO) : '—'}{l.location ? ` · ${l.location}` : ''}</span>
-                        <span className="fx__leadmeta">
+                        {pay && <span className="ap-leads-paylabel" data-pay={pay}>{PAY_LABEL[pay]}</span>}
+                        <span className="ap-leads-leadwhen">{l.dateISO ? fullDate(l.dateISO) : '—'}{l.location ? ` · ${l.location}` : ''}</span>
+                        <span className="ap-leads-leadmeta">
                           {l.pax ? `${l.pax} pax` : 'Pax pendent'}{l.product ? ` · ${l.product}` : ''}{l.last ? ` · ${l.last}` : ''}
                         </span>
                       </button>
@@ -946,32 +946,32 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
         {/* ── PEÇA 5b: Llista ── */}
         {viewMode === 'llista' && (() => {
           const sorted = [...effectiveLeads.filter((l) => l.dateISO), ...effectiveLeads.filter((l) => !l.dateISO)].sort((a, b) => a.dateISO.localeCompare(b.dateISO));
-          if (!sorted.length) return <p className="fx__placeholder">No hi ha entrades per a la temporada.</p>;
+          if (!sorted.length) return <p className="ap-leads-placeholder">No hi ha entrades per a la temporada.</p>;
           return (
-            <div className="fx__list">
-              <table className="fx__listtbl">
+            <div className="ap-leads-list">
+              <table className="ap-leads-listtbl">
                 <thead><tr>
                   <th scope="col">Data</th>
                   <th scope="col">Bolo</th>
                   <th scope="col">Tipus</th>
                   <th scope="col">Lloc</th>
                   <th scope="col">Fase</th>
-                  <th scope="col" className="fx__listnum">Valor</th>
+                  <th scope="col" className="ap-leads-listnum">Valor</th>
                 </tr></thead>
                 <tbody>
                   {sorted.map((l) => {
                     const pay = paymentState(l.booking);
                     const phase = pay ? (pay === 'full' ? 'Pagada' : pay === 'part' ? 'Senyal' : 'Pendent') : STAGE_LABEL[l.stage];
                     return (
-                      <tr key={l.id} className="fx__listrow" data-stage={l.stage}
+                      <tr key={l.id} className="ap-leads-listrow" data-stage={l.stage}
                         onClick={() => setPageId(l.id)} tabIndex={0}
                         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setPageId(l.id); } }}>
-                        <td className="fx__listdate">{l.dateISO ? fullDate(l.dateISO) : <em>sense data</em>}</td>
-                        <td className="fx__listname"><span className="fx__dot" data-stage={l.stage} />{pay && <span className="fx__pay" data-pay={pay} />}{l.name}</td>
+                        <td className="ap-leads-listdate">{l.dateISO ? fullDate(l.dateISO) : <em>sense data</em>}</td>
+                        <td className="ap-leads-listname"><span className="ap-leads-dot" data-stage={l.stage} />{pay && <span className="ap-leads-pay" data-pay={pay} />}{l.name}</td>
                         <td>{l.type}</td>
                         <td>{l.location || '—'}</td>
-                        <td className="fx__listphase" data-pay={pay ?? undefined}>{pay && <span className="fx__pay" data-pay={pay} />}{phase}</td>
-                        <td className="fx__listnum">{l.value ? formatCurrency(l.value) : '—'}</td>
+                        <td className="ap-leads-listphase" data-pay={pay ?? undefined}>{pay && <span className="ap-leads-pay" data-pay={pay} />}{phase}</td>
+                        <td className="ap-leads-listnum">{l.value ? formatCurrency(l.value) : '—'}</td>
                       </tr>
                     );
                   })}
@@ -993,9 +993,9 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
       )}
 
       {lostTarget && (
-        <div className="fx__lostmodal" role="dialog" aria-modal="true" aria-label="Marcar lead com a perdut">
-          <div className="fx__lostmodal-card">
-            <h2 className="fx__lostmodal-h">Marcar com a perdut</h2>
+        <div className="ap-leads-lostmodal" role="dialog" aria-modal="true" aria-label="Marcar lead com a perdut">
+          <div className="ap-leads-lostmodal-card">
+            <h2 className="ap-leads-lostmodal-h">Marcar com a perdut</h2>
             <LeadLostStatusPrompt
               open={true}
               lostReason={lostReason}

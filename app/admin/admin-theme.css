@@ -212,7 +212,7 @@ html.admin-mode .admin-tone-soft-warning {
 html.admin-mode .admin-tone-bg-neutral { background: var(--at-raised); }
 html.admin-mode .admin-tone-bg-slate { background: color-mix(in oklab, var(--at-muted) 16%, var(--at-panel) 84%); }
 /* Canon Òrbita (Cristina/leads): NO hi ha blau de superfície. «Info/cyan/actiu»
-   = neutre carbó elevat, com el control actiu de la fitxa (`.fx__view button.is-on`
+   = neutre carbó elevat, com el control actiu de la fitxa (`.ap-leads-view button.is-on`
    → --raised, sense or). L'or queda reservat a diners/accions. Redefinició monocapa:
    abans aquestes 6 classes resolien a blau (#5fb7e8) i tintaven cards arreu. */
 html.admin-mode .admin-tone-bg-info { background: var(--at-raised); }

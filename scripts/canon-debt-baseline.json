@@ -1,15 +1,7 @@
 {
-  "total": 1233,
+  "total": 43,
   "perFile": {
-    "app/admin/admin-shell.css": 93,
-    "app/admin/admin-theme.css": 1,
-    "app/admin/components/CommercialDocumentsHistory.tsx": 15,
-    "app/admin/error.tsx": 12,
-    "app/admin/layout.tsx": 16,
-    "app/admin/leads/LeadLostStatusPrompt.tsx": 3,
-    "app/admin/leads/leads-design.css": 788,
-    "app/admin/leads/LeadsSeasonClient.tsx": 187,
-    "app/admin/leads/[id]/LeadBoloSection.tsx": 33,
-    "app/admin/leads/[id]/LeadDetailClient.tsx": 85
+    "app/admin/admin-shell.css": 28,
+    "app/admin/components/CommercialDocumentsHistory.tsx": 15
   }
 }

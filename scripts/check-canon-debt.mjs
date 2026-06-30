@@ -26,7 +26,10 @@ const ADMIN_DIR = path.join(ROOT, 'app', 'admin');
 const BASELINE = path.join(__dirname, 'canon-debt-baseline.json');
 
 // Prefixos CANÒNICS permesos (NO són deute). La resta de `xx__` és codi propi a erradicar.
-const CANONICAL = new Set(['ap', 'adm']);
+// `ax` = shell oficial del layout admin (.ax-root/.ax__workspace/.ax__page/.ax__error,
+// la carcassa definida a layout.tsx + admin-shell.css). És infraestructura canònica, no
+// deute de pàgina — per això s'accepta com a prefix canònic.
+const CANONICAL = new Set(['ap', 'adm', 'ax']);
 
 function walk(dir, out = []) {
   if (!fs.existsSync(dir)) return out;

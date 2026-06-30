@@ -90,6 +90,44 @@ describe('createAdminCustomQuote', () => {
       }),
     });
   });
+
+  it('saneja imports i marge bruts en crear', async () => {
+    await createAdminCustomQuote({
+      name: 'Brut',
+      totalCost: -25,
+      suggestedPrice: 'no-num',
+      marginPct: -5,
+      finalPrice: -10,
+    });
+
+    expect(mockPrisma.customQuote.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        totalCost: 0,
+        suggestedPrice: 0,
+        marginPct: 30,
+        finalPrice: null,
+      }),
+    });
+  });
+
+  it('conserva decimals monetaris en crear', async () => {
+    await createAdminCustomQuote({
+      name: 'Decimals',
+      totalCost: '120.126',
+      suggestedPrice: '200.455',
+      marginPct: '33.337',
+      finalPrice: '199.994',
+    });
+
+    expect(mockPrisma.customQuote.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        totalCost: 120.13,
+        suggestedPrice: 200.46,
+        marginPct: 33.34,
+        finalPrice: 199.99,
+      }),
+    });
+  });
 });
 
 describe('getAdminCustomQuote', () => {
@@ -112,6 +150,25 @@ describe('updateAdminCustomQuote', () => {
     expect(mockPrisma.customQuote.update).toHaveBeenCalledWith({
       where: { id: 'cq1' },
       data: expect.objectContaining({ name: 'Actualitzat', status: 'ACCEPTED' }),
+    });
+  });
+
+  it('saneja imports en actualitzar', async () => {
+    await updateAdminCustomQuote('cq1', {
+      totalCost: '90.126',
+      suggestedPrice: -1,
+      marginPct: Number.NaN,
+      finalPrice: '150.555',
+    });
+
+    expect(mockPrisma.customQuote.update).toHaveBeenCalledWith({
+      where: { id: 'cq1' },
+      data: expect.objectContaining({
+        totalCost: 90.13,
+        suggestedPrice: 0,
+        marginPct: 30,
+        finalPrice: 150.56,
+      }),
     });
   });
 });

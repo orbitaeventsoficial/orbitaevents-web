@@ -380,7 +380,7 @@ const TYPE_PAGES: {
     domain: 'Leads',
     views: [
       { name: 'Calendari', file: 'LeadsSeasonClient.tsx', role: 'Vista de temporada: tots els leads pel mapa de caps de setmana. Revisada i tancada pel propietari.', state: 'canonica' },
-      { name: 'Fitxa compacta', file: '.fxd__sheet (drawer)', role: 'Resum ràpid del lead seleccionat + porta a la fitxa completa. Cobrament tret (va a la reserva).', state: 'canonica' },
+      { name: 'Fitxa compacta', file: '.ap-ledger-sheet (drawer)', role: 'Resum ràpid del lead seleccionat + porta a la fitxa completa. Cobrament tret (va a la reserva).', state: 'canonica' },
       { name: 'Fitxa completa', file: 'leads/[id]/LeadDetailClient.tsx', role: 'Govern del lead + configurador del bolo en una pantalla.', state: 'canonica' },
     ],
   },

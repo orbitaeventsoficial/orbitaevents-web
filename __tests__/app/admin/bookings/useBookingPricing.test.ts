@@ -1,0 +1,53 @@
+import { renderHook } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+
+import { useBookingPricing } from '@/app/admin/bookings/useBookingPricing';
+import type { BookingFormData, BookingPack } from '@/app/admin/bookings/booking-form.types';
+
+const BASE_FORM: Pick<BookingFormData, 'packId' | 'extraHours' | 'eventStartTime' | 'eventEndTime' | 'distanceKm' | 'fuelCostPerKm' | 'discount'> = {
+  packId: 'pack-basic',
+  extraHours: '0',
+  eventStartTime: '22:00',
+  eventEndTime: '00:00',
+  distanceKm: '0',
+  fuelCostPerKm: '0.19',
+  discount: '0',
+};
+
+const PACKS: BookingPack[] = [
+  {
+    id: 'pack-basic',
+    slug: 'basic',
+    service: 'discomovil',
+    price: 500,
+    originalPrice: null,
+    extraHourPrice: 50,
+    djHours: 2,
+    soundWatts: 2000,
+    includesFog: false,
+    includesMic: false,
+    translations: [{ name: 'Basic', description: 'Pack basic' }],
+  },
+];
+
+describe('useBookingPricing', () => {
+  it('clampa la base despres de descompte a zero', () => {
+    const { result } = renderHook(() =>
+      useBookingPricing({
+        form: { ...BASE_FORM, discount: '900' },
+        packs: PACKS,
+        extras: [],
+        selectedExtras: {},
+        invoiceRequired: true,
+      }),
+    );
+
+    expect(result.current.pricing).toMatchObject({
+      subtotal: 500,
+      discount: 900,
+      vatAmount: 0,
+      total: 0,
+      deposit: 0,
+    });
+  });
+});

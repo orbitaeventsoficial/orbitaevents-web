@@ -1,3 +1,134 @@
+## 2026-07-01 — Erradicació: fitxa de lead + calendari temporada → canònics .ap-ledger/.ap-leads (Canvi #1302, claude+agent)
+
+### Context
+LA PEÇA CLAU: la fitxa de lead «TANCAT CHARLIE» (referència del propietari) + el calendari de temporada. Decisió propietari: opció A (migrar) + crear canònics nous on calgui ("ho refaré creant nous elements o css").
+
+### Què s'ha fet
+- **Components canònics NOUS** (capa compartida admin-shell.css, consumint tokens): `.ap-ledger-*` (header ledger de la fitxa: hd/fact/zenith/profitpill/kpi/panel/editinput/sheet) ← era fxd__; `.ap-leads-*` (calendari temporada: cell/day/dot/pay/metric/pipelead/lane) ← era fx__. 511 regles mogudes VERBATIM (aspecte idèntic, només canvia el prefix).
+- TSX migrats: LeadDetailClient, LeadBoloSection, LeadsSeasonClient, LeadLostStatusPrompt, BookingTotalEditor. Funcionalitat intacta (edició inline preu/marge, drag pipeline, calendari, drawer).
+- Netejat: 36 regles `nb__cfg` mortes (sense consumidor TSX) que l'agent havia mogut → esborrades.
+- **Shell ** (.ax-root/.ax__workspace/.ax__page/.ax__error) reconegut com a CANÒNIC oficial al guard (CANONICAL += 'ax') — és la carcassa del layout, no deute.
+- `.fx-root`, keyframes fx-*, leads-design.css base → INTACTES.
+- VERIFICAT amb captura ABANS/DESPRÉS: fitxa de lead i calendari de temporada EXACTAMENT idèntics.
+
+### Resultat
+**Deute 5892 → 43 (−99.3%).** Només queda cdh (42, històric comercial) + bd (1). Tot l'admin mira a Studio.
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core` EXIT 0; check-admin-canon sense P1; 0 fxd/fx a tot el codi.
+- Validació funcional: captures fitxa lead + temporada idèntiques a l'original.
+- Validació humana/UX: la referència preservada exacta, ara part del canon oficial (.ap-ledger/.ap-leads).
+
+### Coordinació
+Counter → 1302. 19 zones. Queda NOMÉS cdh (42) + bd (1) per a deute 0.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-01 — V5 privacitat: audit log amb paginació sanejada (Canvi #1301, codex)
+
+### Context
+`GET /api/admin/privacy/audit` passava `limit` i `offset` amb `Number(...)` directe. Valors no finits, negatius o decimals podien arribar a `listPrivacyAuditLogs`.
+
+### Què s'ha fet
+- `app/api/admin/privacy/audit/route.ts`: `limit` passa a enter positiu amb default 50 i cap 200; `offset` passa a enter no negatiu.
+- `__tests__/app/api/admin/privacy-audit-route.test.ts`: cobertura de `Infinity`, negatius, decimals i cap superior.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\privacy-audit-route.test.ts` (5 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK.
+- Validació global: `pnpm run validate:core` continua bloquejat pel `qa:canon-debt` concurrent a `app/admin/admin-shell.css` (134 `xx__` vs baseline 93), fora del tall #1301.
+- Validació funcional: l'audit log RGPD ja no pot enviar `take/skip` no finits, negatius o decimals al servei.
+- Validació humana/UX: la revisió d'auditoria manté pàgines estables amb query bruta.
+
+### Coordinació
+Counter → 1301. No toca mails automàtics, APPEND, seqüències, inventari/preus, costEngine, tasks, booking detail/bd, fitxa lead/fxd ni UI.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-01 — V5 activity: query GET sanejada (Canvi #1300, codex)
+
+### Context
+`GET /api/admin/activity` calculava `days`, `page` i `limit` amb `Number(...)` directe. Valors no finits, negatius o decimals podien alterar la finestra temporal o arribar al servei canònic.
+
+### Què s'ha fet
+- `app/api/admin/activity/route.ts`: `days`, `page` i `limit` passen a enters positius; `days` capat a 90 i `limit` capat a 200.
+- `__tests__/app/api/admin/activity-route.test.ts`: cobertura de decimals, `Infinity`, negatius, auth i error del servei.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\activity-route.test.ts` (4 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK.
+- Validació global: `pnpm run validate:core` continua bloquejat pel `qa:canon-debt` concurrent a `app/admin/admin-shell.css` (134 `xx__` vs baseline 93), fora del tall #1300.
+- Validació funcional: la consulta d'activitat admin ja no pot construir finestres futures o paginacions no finites des de query bruta.
+- Validació humana/UX: l'historial d'activitat manté finestra i paginació previsibles.
+
+### Coordinació
+Counter → 1300. No toca mails automàtics, APPEND, seqüències, inventari/preus, costEngine, tasks, booking detail/bd, fitxa lead/fxd ni UI.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-01 — V5 testimonials: paginació GET sanejada (Canvi #1299, codex)
+
+### Context
+`GET /api/admin/testimonials` passava `limit` i `offset` al servei amb `Number(...)` directe. Valors no finits, negatius o decimals podien arribar a la consulta.
+
+### Què s'ha fet
+- `app/api/admin/testimonials/route.ts`: `limit` passa a enter positiu amb default 50 i cap 200; `offset` passa a enter no negatiu.
+- `__tests__/app/api/admin/testimonials-route.test.ts`: cobertura de `Infinity`, negatius, decimals i cap superior.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\testimonials-route.test.ts` (7 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK.
+- Validació global: `pnpm run validate:core` continua bloquejat pel `qa:canon-debt` concurrent a `app/admin/admin-shell.css` (134 `xx__` vs baseline 93), fora del tall #1299.
+- Validació funcional: el llistat admin de testimonis ja no pot enviar paginació no finita, negativa o decimal al servei.
+- Validació humana/UX: el panell de testimonis manté una mida de pàgina estable encara amb query bruta.
+
+### Coordinació
+Counter → 1299. No toca mails automàtics, APPEND, seqüències, inventari/preus, costEngine, tasks, booking detail/bd, fitxa lead/fxd ni UI.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-01 — V5 stats admin: fallbacks manuals finits (Canvi #1298, codex)
+
+### Context
+`adminStatsService` llegia fallbacks manuals amb `parseFloat(...) || 0` i acceptava escriure qualsevol `number`. Això podia deixar entrar `NaN`, `Infinity` o strings parcials com a estadístiques manuals del panell.
+
+### Què s'ha fet
+- `lib/services/adminStatsService.ts`: normalitza fallbacks manuals com a números finits i no negatius tant en lectura com en actualització.
+- `__tests__/lib/services/adminStatsService.test.ts`: cobertura de `Infinity`, `NaN`, strings parcials, negatius i decimals vàlids.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\adminStatsService.test.ts` (13 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK.
+- Validació global: `pnpm run validate:core` arriba fins al final però cau a `qa:canon-debt` per regressió concurrent a `app/admin/admin-shell.css` (134 `xx__` vs baseline 93), vinculada a CSS de lead/ledger fora del tall #1298.
+- Validació funcional: les estadístiques admin ja no poden quedar dominades per fallbacks manuals no finits o bruts.
+- Validació humana/UX: el tauler rep números previsibles i torna al valor calculat quan el fallback manual és invàlid.
+
+### Coordinació
+Counter → 1298. No toca mails automàtics, APPEND, seqüències, inventari/preus, costEngine, tasks, booking detail/bd, fitxa lead/fxd ni UI.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-01 — V5 settings admin: NUMBER finit i estricte (Canvi #1297, codex)
+
+### Context
+`adminSettingsService` convertia settings `NUMBER` amb `parseFloat`. Això podia retornar `NaN` o acceptar strings parcials com `12abc`, i l'API admin podia exposar valors numèrics no fiables.
+
+### Què s'ha fet
+- `lib/services/adminSettingsService.ts`: els settings `NUMBER` es parsegen amb `Number(...)` i només es retornen si són finits; la resta baixa a `0`.
+- `__tests__/lib/services/adminSettingsService.test.ts`: cobertura de valors no numèrics, `Infinity`, strings parcials i decimals vàlids.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\adminSettingsService.test.ts` (11 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK, `git diff --check` OK i `pnpm run validate:core` OK.
+- Validació funcional: `/api/admin/settings` ja no pot exposar `NaN`/infinits ni números parcials des de settings `NUMBER`.
+- Validació humana/UX: els camps numèrics de configuració arriben al panell com a números previsibles.
+
+### Coordinació
+Counter → 1297. No toca mails automàtics, APPEND, seqüències, inventari/preus, costEngine, tasks, booking detail/bd ni fitxa lead/fxd.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-01 — Fitxa de lead: botons/inputs → canònic (genèrics migrats) (Canvi #1296, claude)
 
 ### Context

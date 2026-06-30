@@ -96,4 +96,18 @@ describe('getFinanceAlertsSummary', () => {
     expect(result.breakdown.autofixFailureCount).toBe(3);
     expect(result.breakdown.systemAutofixFailureCount).toBe(2);
   });
+
+  it('saneja comptadors autofix bruts', async () => {
+    mockPrisma.setting.findUnique.mockImplementation(({ where }: { where: { key: string } }) => {
+      if (where.key === 'alerts.finance.autofixFailureCount') return { value: '3.9' };
+      if (where.key === 'alerts.system.autofixFailureCount') return { value: '-2' };
+      if (where.key === 'pricing.pack.marginTargetPct') return { value: '30' };
+      return null;
+    });
+
+    const result = await getFinanceAlertsSummary();
+
+    expect(result.breakdown.autofixFailureCount).toBe(3);
+    expect(result.breakdown.systemAutofixFailureCount).toBe(0);
+  });
 });

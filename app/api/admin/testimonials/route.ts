@@ -5,6 +5,17 @@ import { listAdminTestimonials, moderateTestimonial } from '@/lib/services/testi
 
 export const dynamic = 'force-dynamic';
 
+function normalizePositiveInteger(value: string | null, fallback: number, max?: number): number {
+  const parsed = Number(value);
+  const normalized = Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback;
+  return max ? Math.min(normalized, max) : normalized;
+}
+
+function normalizeNonNegativeInteger(value: string | null): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? Math.floor(parsed) : 0;
+}
+
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
@@ -12,8 +23,8 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const result = await listAdminTestimonials({
     status: searchParams.get('status'),
-    limit: Number(searchParams.get('limit') || 50),
-    offset: Number(searchParams.get('offset') || 0),
+    limit: normalizePositiveInteger(searchParams.get('limit'), 50, 200),
+    offset: normalizeNonNegativeInteger(searchParams.get('offset')),
   });
 
   return NextResponse.json(result);

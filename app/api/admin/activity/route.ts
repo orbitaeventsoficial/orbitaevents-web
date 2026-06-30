@@ -5,6 +5,12 @@ import { fetchCanonicalAdminActivityPage } from '@/lib/services/timelineQuerySer
 
 export const dynamic = 'force-dynamic';
 
+function normalizePositiveInteger(value: string | null, fallback: number, max?: number): number {
+  const parsed = Number(value);
+  const normalized = Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback;
+  return max ? Math.min(normalized, max) : normalized;
+}
+
 export async function GET(request: NextRequest) {
   const authError = requireAuth(request);
   if (authError) return authError;
@@ -12,9 +18,9 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category'); // comms | automation | system | crud
-    const days = Math.min(Number(searchParams.get('days')) || 7, 90);
-    const page = Math.max(Number(searchParams.get('page')) || 1, 1);
-    const limit = Math.min(Number(searchParams.get('limit')) || 50, 200);
+    const days = normalizePositiveInteger(searchParams.get('days'), 7, 90);
+    const page = normalizePositiveInteger(searchParams.get('page'), 1);
+    const limit = normalizePositiveInteger(searchParams.get('limit'), 50, 200);
 
     const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 

@@ -41,13 +41,16 @@ describe('listAdminCollaborators', () => {
           { commissionAmount: 100, isPaid: false, booking: { total: 1000 } },
           { commissionAmount: 200, isPaid: true, booking: { total: 2000 } },
         ],
-        products: [],
+        products: [
+          { id: 'p1', isActive: true, sellPrice: 199.99 },
+          { id: 'p2', isActive: false, sellPrice: 500 },
+        ],
       },
       {
         id: 'c2', isActive: false,
         _count: { sourcedLeads: 1, sourcedBookings: 0 },
         bookings: [],
-        products: [],
+        products: [{ id: 'p3', isActive: true, sellPrice: 40.15 }],
       },
     ]);
 
@@ -55,6 +58,8 @@ describe('listAdminCollaborators', () => {
 
     expect(result.kpis.total).toBe(2);
     expect(result.kpis.active).toBe(1);
+    expect(result.kpis.totalProducts).toBe(3);
+    expect(result.kpis.catalogValue).toBe(240.14);
     // Comissions retirades (#1196): el cost de col·laborador va per línies de servei (+20%).
     expect(result.kpis.totalSourcedLeads).toBe(3);
     expect(result.kpis.totalSourcedBookings).toBe(1);
@@ -106,6 +111,36 @@ describe('createAdminCollaborator', () => {
       }),
     });
   });
+
+  it('saneja comissió i cost per hora bruts', async () => {
+    await createAdminCollaborator({
+      name: 'Brut',
+      commissionPct: -12,
+      costPerHour: 'no-num',
+    });
+
+    expect(mockPrisma.collaborator.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        commissionPct: 0,
+        costPerHour: null,
+      }),
+    });
+  });
+
+  it('conserva decimals monetaris de comissió i cost per hora', async () => {
+    await createAdminCollaborator({
+      name: 'Decimal',
+      commissionPct: '12.345',
+      costPerHour: '45.678',
+    });
+
+    expect(mockPrisma.collaborator.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        commissionPct: 12.35,
+        costPerHour: 45.68,
+      }),
+    });
+  });
 });
 
 describe('getAdminCollaborator', () => {
@@ -129,6 +164,15 @@ describe('updateAdminCollaborator', () => {
     expect(mockPrisma.collaborator.update).toHaveBeenCalledWith({
       where: { id: 'c1' },
       data: expect.objectContaining({ name: 'Updated', isActive: false }),
+    });
+  });
+
+  it('saneja imports numèrics en actualitzar', async () => {
+    await updateAdminCollaborator('c1', { commissionPct: -4, costPerHour: Number.NaN });
+
+    expect(mockPrisma.collaborator.update).toHaveBeenCalledWith({
+      where: { id: 'c1' },
+      data: expect.objectContaining({ commissionPct: 0, costPerHour: null }),
     });
   });
 });

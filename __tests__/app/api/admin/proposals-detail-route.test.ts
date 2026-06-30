@@ -11,10 +11,28 @@ const { mockRequireAuth, mockVerifyCsrf, mockGetProposal, mockUpdateProposal, mo
 
 vi.mock('@/lib/auth', () => ({ requireAuth: mockRequireAuth }));
 vi.mock('@/lib/csrf', () => ({ verifyCsrf: mockVerifyCsrf }));
-vi.mock('@/lib/services/proposalAdminService', () => ({
-  getAdminProposalById: mockGetProposal,
-  updateAdminProposal: mockUpdateProposal,
-}));
+vi.mock('@/lib/services/proposalAdminService', () => {
+  const roundMoney = (value: number) => Math.round(value * 100) / 100;
+  return {
+    PROPOSAL_FINANCIAL_FIELDS: ['subtotal', 'discount', 'vatRate', 'vatAmount', 'total'] as const,
+    getAdminProposalById: mockGetProposal,
+    updateAdminProposal: mockUpdateProposal,
+    deleteAdminProposal: vi.fn(),
+    getProposalFinancialConsistencyIssues: (data: { subtotal: number; discount: number; vatRate: number; vatAmount: number; total: number }) => {
+      const taxableBase = Math.max(0, roundMoney(data.subtotal - data.discount));
+      const expectedVatAmount = roundMoney(taxableBase * (data.vatRate / 100));
+      const expectedTotal = roundMoney(taxableBase + expectedVatAmount);
+      const issues = [];
+      if (Math.abs(roundMoney(data.vatAmount) - expectedVatAmount) > 0.01) {
+        issues.push({ field: 'vatAmount', message: 'IVA incoherent amb subtotal, descompte i vatRate' });
+      }
+      if (Math.abs(roundMoney(data.total) - expectedTotal) > 0.01) {
+        issues.push({ field: 'total', message: 'Total incoherent amb subtotal, descompte i IVA' });
+      }
+      return issues;
+    },
+  };
+});
 vi.mock('@/lib/services/automationTriggers', () => ({ dispatchAutoTrigger: mockDispatchAutoTrigger }));
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn(), warn: vi.fn() } }));
 vi.mock('@/lib/request-context', () => ({ getRequestId: () => 'test-req-id' }));
@@ -114,9 +132,49 @@ describe('PATCH /api/admin/proposals/[id]', () => {
   });
 
   it('no dispara auto-trigger per altres camps', async () => {
-    const { req, params } = makePatchReq('prop-1', { total: 500 });
+    const { req, params } = makePatchReq('prop-1', { locale: 'ca' });
     await PATCH(req, params);
     expect(mockDispatchAutoTrigger).not.toHaveBeenCalled();
+  });
+
+  it('rebutja actualització econòmica parcial', async () => {
+    const { req, params } = makePatchReq('prop-1', { total: 500 });
+
+    const res = await PATCH(req, params);
+
+    expect(res.status).toBe(400);
+    expect(mockUpdateProposal).not.toHaveBeenCalled();
+  });
+
+  it('rebutja totals econòmics incoherents', async () => {
+    const { req, params } = makePatchReq('prop-1', {
+      subtotal: 1000,
+      discount: 0,
+      vatRate: 21,
+      vatAmount: 100,
+      total: 1100,
+    });
+
+    const res = await PATCH(req, params);
+
+    expect(res.status).toBe(400);
+    expect(mockUpdateProposal).not.toHaveBeenCalled();
+  });
+
+  it('accepta bloc econòmic complet i coherent', async () => {
+    const payload = {
+      subtotal: 1000,
+      discount: 100,
+      vatRate: 21,
+      vatAmount: 189,
+      total: 1089,
+    };
+    const { req, params } = makePatchReq('prop-1', payload);
+
+    const res = await PATCH(req, params);
+
+    expect(res.status).toBe(200);
+    expect(mockUpdateProposal).toHaveBeenCalledWith('prop-1', payload);
   });
 
   it('rebutja dades invàlides', async () => {

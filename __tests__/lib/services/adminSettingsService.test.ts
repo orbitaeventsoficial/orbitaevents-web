@@ -62,6 +62,22 @@ describe('listAdminSettings', () => {
     );
   });
 
+  it('saneja NUMBER no finits o parcials a 0', async () => {
+    mockPrisma.setting.findMany.mockResolvedValue([
+      { key: 'bad', value: 'not-number', type: 'NUMBER', category: 'test' },
+      { key: 'infinite', value: 'Infinity', type: 'NUMBER', category: 'test' },
+      { key: 'partial', value: '12abc', type: 'NUMBER', category: 'test' },
+      { key: 'valid', value: '12.5', type: 'NUMBER', category: 'test' },
+    ]);
+
+    const result = await listAdminSettings('test');
+
+    expect(result.settings['bad']).toBe(0);
+    expect(result.settings['infinite']).toBe(0);
+    expect(result.settings['partial']).toBe(0);
+    expect(result.settings['valid']).toBe(12.5);
+  });
+
   it('parseja BOOLEAN correctament', async () => {
     mockPrisma.setting.findMany.mockResolvedValue([
       { key: 'flag', value: 'true', type: 'BOOLEAN', category: 'test' },

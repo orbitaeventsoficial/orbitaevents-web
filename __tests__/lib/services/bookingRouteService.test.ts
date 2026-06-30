@@ -209,6 +209,38 @@ describe('updateBookingDetail', () => {
       ],
     });
   });
+
+  it('ignora totalPrice negatiu en callers interns i no persisteix totals negatius', async () => {
+    await updateBookingDetail('booking-1', { totalPrice: -100 });
+
+    expect(mockPrisma.booking.update).toHaveBeenCalledWith({
+      where: { id: 'booking-1' },
+      data: {},
+    });
+  });
+
+  it('ignora imports de cobrament negatius en callers interns', async () => {
+    await updateBookingDetail('booking-1', {
+      depositAmount: -10,
+      remainingAmount: -5,
+      cashAmount: -2,
+      discount: -30,
+    });
+
+    expect(mockPrisma.booking.update).toHaveBeenCalledWith({
+      where: { id: 'booking-1' },
+      data: {},
+    });
+  });
+
+  it('permet netejar cashAmount amb null sense convertir-ho en import invalid', async () => {
+    await updateBookingDetail('booking-1', { cashAmount: null });
+
+    expect(mockPrisma.booking.update).toHaveBeenCalledWith({
+      where: { id: 'booking-1' },
+      data: { cashAmount: null },
+    });
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────

@@ -1,18 +1,21 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { listLeadServiceLines, replaceLeadServiceLines } from '@/lib/services/leadServiceLineService';
 
-const { mockPrisma } = vi.hoisted(() => ({
+const { mockPrisma, mockUpdateBookingDetail } = vi.hoisted(() => ({
   mockPrisma: {
     lead: { findUnique: vi.fn() },
     leadServiceLine: { findMany: vi.fn(), deleteMany: vi.fn(), createMany: vi.fn() },
     $transaction: vi.fn(),
   },
+  mockUpdateBookingDetail: vi.fn(),
 }));
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
+vi.mock('@/lib/services/bookingRouteService', () => ({ updateBookingDetail: mockUpdateBookingDetail }));
 
 beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.$transaction.mockResolvedValue([]);
+  mockUpdateBookingDetail.mockResolvedValue({ status: 200, body: { ok: true } });
 });
 
 describe('listLeadServiceLines', () => {
@@ -42,7 +45,7 @@ describe('replaceLeadServiceLines', () => {
       { label: 'Animació', kind: 'PROVIDER_SERVICE', collaboratorId: 'col1', revenueAmount: 240, costAmount: 200 },
     ]);
     expect(r.status).toBe(200);
-    expect(r.body.count).toBe(2);
+    expect((r.body as { count: number }).count).toBe(2);
     expect(mockPrisma.$transaction).toHaveBeenCalledOnce();
     const createArg = mockPrisma.leadServiceLine.createMany.mock.calls[0][0];
     expect(createArg.data).toHaveLength(2);
@@ -56,15 +59,51 @@ describe('replaceLeadServiceLines', () => {
       { label: 'X', kind: 'WIZARD', revenueAmount: 50 },
       { label: '', revenueAmount: 0 }, // buida → descartada
     ]);
-    expect(r.body.count).toBe(1);
+    expect((r.body as { count: number }).count).toBe(1);
     const createArg = mockPrisma.leadServiceLine.createMany.mock.calls[0][0];
     expect(createArg.data[0].kind).toBe('OTHER');
+  });
+
+  it('saneja imports negatius i quantitats brutes abans de persistir línies pre-reserva', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'lead1' });
+
+    const r = await replaceLeadServiceLines('lead1', [
+      { label: 'Servei brut', revenueAmount: -100, costAmount: -50, quantity: -2, hours: -3 },
+    ]);
+
+    expect((r.body as { count: number }).count).toBe(1);
+    const createArg = mockPrisma.leadServiceLine.createMany.mock.calls[0][0];
+    expect(createArg.data[0]).toMatchObject({
+      label: 'Servei brut',
+      revenueAmount: 0,
+      costAmount: 0,
+      quantity: 1,
+      hours: null,
+    });
   });
 
   it('si no queden línies, només esborra (sense createMany)', async () => {
     mockPrisma.lead.findUnique.mockResolvedValue({ id: 'lead1' });
     const r = await replaceLeadServiceLines('lead1', []);
-    expect(r.body.count).toBe(0);
+    expect((r.body as { count: number }).count).toBe(0);
+    expect(mockPrisma.leadServiceLine.createMany).not.toHaveBeenCalled();
+  });
+
+  it('si el lead ja te reserva, delega al servei de booking perquè recalculi totals', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'lead1', booking: { id: 'booking-1' } });
+
+    const r = await replaceLeadServiceLines('lead1', [
+      { label: 'DJ extra', kind: 'DJ', revenueAmount: 120, quantity: 3 },
+    ]);
+
+    expect(r.status).toBe(200);
+    expect(r.body).toMatchObject({ ok: true, count: 1, bookingId: 'booking-1' });
+    expect(mockUpdateBookingDetail).toHaveBeenCalledWith('booking-1', {
+      serviceLines: [
+        expect.objectContaining({ label: 'DJ extra', kind: 'DJ', revenueAmount: 120, quantity: 3 }),
+      ],
+    });
+    expect(mockPrisma.$transaction).not.toHaveBeenCalled();
     expect(mockPrisma.leadServiceLine.createMany).not.toHaveBeenCalled();
   });
 });

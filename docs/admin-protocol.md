@@ -1550,6 +1550,70 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1301 — 2026-07-01 — codex (FET)
+**V5 privacitat: audit log amb paginació sanejada.**
+- `app/api/admin/privacy/audit/route.ts`: `limit` normalitzat com a enter positiu amb default 50 i cap 200; `offset` com a enter no negatiu.
+- `__tests__/app/api/admin/privacy-audit-route.test.ts`: cobertura de `Infinity`, negatius, decimals i cap superior.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\privacy-audit-route.test.ts` (5 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK.
+- Validació global: `pnpm run validate:core` continua bloquejat pel `qa:canon-debt` concurrent a `app/admin/admin-shell.css` (134 `xx__` vs baseline 93), fora del tall #1301.
+- Validació funcional: l'audit log RGPD ja no envia `take/skip` no finits, negatius o decimals al servei.
+- Validació humana/UX: la revisió d'auditoria manté pàgines estables amb query bruta.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1301`; el següent canvi real ha de ser `#1302`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1300 — 2026-07-01 — codex (FET)
+**V5 activity: query GET sanejada.**
+- `app/api/admin/activity/route.ts`: `days`, `page` i `limit` normalitzats com a enters positius; `days` capat a 90 i `limit` capat a 200.
+- `__tests__/app/api/admin/activity-route.test.ts`: cobertura de decimals, `Infinity`, negatius, auth i error del servei.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\activity-route.test.ts` (4 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK.
+- Validació global: `pnpm run validate:core` continua bloquejat pel `qa:canon-debt` concurrent a `app/admin/admin-shell.css` (134 `xx__` vs baseline 93), fora del tall #1300.
+- Validació funcional: l'activitat admin ja no construeix finestres futures ni paginació no finita des de query bruta.
+- Validació humana/UX: l'historial d'activitat manté finestra i paginació previsibles.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1300`; el següent canvi real ha de ser `#1301`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1299 — 2026-07-01 — codex (FET)
+**V5 testimonials: paginació GET sanejada.**
+- `app/api/admin/testimonials/route.ts`: `limit` normalitzat com a enter positiu amb default 50 i cap 200; `offset` com a enter no negatiu.
+- `__tests__/app/api/admin/testimonials-route.test.ts`: cobertura de `Infinity`, negatius, decimals i cap superior.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\testimonials-route.test.ts` (7 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK.
+- Validació global: `pnpm run validate:core` continua bloquejat pel `qa:canon-debt` concurrent a `app/admin/admin-shell.css` (134 `xx__` vs baseline 93), fora del tall #1299.
+- Validació funcional: el llistat admin de testimonis ja no envia paginació no finita, negativa o decimal al servei.
+- Validació humana/UX: la mida i desplaçament de pàgina queden previsibles amb query bruta.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1299`; el següent canvi real ha de ser `#1300`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1298 — 2026-07-01 — codex (FET)
+**V5 stats admin: fallbacks manuals finits.**
+- `lib/services/adminStatsService.ts`: els fallbacks manuals es normalitzen com a números finits i no negatius en lectura i en actualització.
+- `__tests__/lib/services/adminStatsService.test.ts`: cobertura de `Infinity`, `NaN`, strings parcials, negatius i decimals vàlids.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\adminStatsService.test.ts` (13 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK.
+- Validació global: `pnpm run validate:core` arriba fins al final però cau a `qa:canon-debt` per regressió concurrent a `app/admin/admin-shell.css` (134 `xx__` vs baseline 93), fora del tall #1298.
+- Validació funcional: el panell d'estadístiques admin ignora fallbacks manuals no finits/bruts i torna al calculat.
+- Validació humana/UX: les estadístiques visibles mantenen valors numèrics previsibles.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1298`; el següent canvi real ha de ser `#1299`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1297 — 2026-07-01 — codex (FET)
+**V5 settings admin: NUMBER finit i estricte.**
+- `lib/services/adminSettingsService.ts`: els settings `NUMBER` es parsegen amb `Number(...)` i només es retornen si són finits; valors bruts passen a `0`.
+- `__tests__/lib/services/adminSettingsService.test.ts`: cobertura de no numèrics, `Infinity`, strings parcials i decimals vàlids.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\adminSettingsService.test.ts` (11 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK, `git diff --check` OK i `pnpm run validate:core` OK.
+- Validació funcional: `/api/admin/settings` ja no exposa `NaN`, infinits ni números parcials en settings `NUMBER`.
+- Validació humana/UX: els valors numèrics de configuració arriben al panell amb forma estable.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1297`; el següent canvi real ha de ser `#1298`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1295 — 2026-07-01 — codex (FET)
 **V5 salut/finances: comptadors autofix sanejats.**
 - `lib/services/financeAlertsService.ts` i `lib/services/adminHealthService.ts`: normalitzen `alerts.finance.autofixFailureCount` i `alerts.system.autofixFailureCount` com enters no negatius.
@@ -1628,6 +1692,17 @@ Seqüència obligatòria de registre:
 - Validació funcional: captura ABANS/DESPRÉS idèntica.
 - Validació humana/UX: referència preservada.
 - Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1302 — 2026-07-01 — claude (FET)
+**Erradicació: fitxa de lead + calendari temporada → .ap-ledger/.ap-leads (la referència).**
+- 511 regles fxd__/fx__ → components canònics NOUS .ap-ledger-*/.ap-leads-* (admin-shell.css, verbatim, aspecte idèntic). 5 TSX migrats. 36 regles nb__cfg mortes esborrades. Shell ax__ → CANONICAL del guard (carcassa oficial). Captura ABANS/DESPRÉS idèntica. Deute 5892→43.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1302`; el següent canvi real ha de ser `#1303`.
+- Validació tècnica: `tsc` 0; validate:core EXIT 0; 0 fxd/fx.
+- Validació funcional: captures fitxa lead + temporada idèntiques.
+- Validació humana/UX: referència preservada, ara canon oficial.
+- Començat per: `claude+agent`
 - Treballant per: `claude`
 - Tancat per: `claude`
 

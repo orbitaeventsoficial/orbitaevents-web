@@ -165,7 +165,7 @@ export default function LeadBoloSection({
  : null);
  }, [economia, onEconomiaChange]);
 
- // Marge → nivell visual reutilitzant els tons existents (.fxd__kpi data-level).
+ // Marge → nivell visual reutilitzant els tons existents (.ap-ledger-kpi data-level).
  const netLevel = !economia
  ? 'info'
  : economia.marginTone.tone === 'rose' ? 'critical'
@@ -231,17 +231,17 @@ export default function LeadBoloSection({
 
  if (loading) {
  return (
- <section className="fxd__panel">
- <div className="fxd__panelhead"><span>El bolo</span></div>
- <p className="fxd__hint-inline">Carregant…</p>
+ <section className="ap-ledger-panel">
+ <div className="ap-ledger-panelhead"><span>El bolo</span></div>
+ <p className="ap-ledger-hint-inline">Carregant…</p>
  </section>
  );
  }
 
  return (
- <div className="fxd__boloside">
- <section className="fxd__panel">
- <div className="fxd__panelhead">
+ <div className="ap-ledger-boloside">
+ <section className="ap-ledger-panel">
+ <div className="ap-ledger-panelhead">
  <span>El bolo</span>
  <button type="button" className="ap-btn ap-btn--primary" onClick={handleSave} disabled={saving || !dirty}>
  {saving ? 'Desant…' : 'Desar bolo'}
@@ -254,12 +254,12 @@ export default function LeadBoloSection({
  onChange={onLinesChange}
  />
 
- <div className="fxd__bolo-footer">
- <div className="fxd__bolo-total" aria-label="Total del bolo">
+ <div className="ap-ledger-bolo-footer">
+ <div className="ap-ledger-bolo-total" aria-label="Total del bolo">
  <span>Total bolo</span>
  <strong>{economia ? formatCurrency(economia.total) : '0€'}</strong>
  </div>
- <div className="fxd__bolo-actions">
+ <div className="ap-ledger-bolo-actions">
  <a className="ap-btn" href={dossierHref} onClick={(event) => openBuilder(event, dossierHref)} aria-disabled={saving}>
  Crear dossier
  </a>
@@ -274,31 +274,31 @@ export default function LeadBoloSection({
  </section>
 
  {/* ── Fulla d'economia del bolo (net per bolo) — Fase 4 ── */}
- {!compactEconomia && <section className="fxd__econo">
- <div className="fxd__econohead">
+ {!compactEconomia && <section className="ap-ledger-econo">
+ <div className="ap-ledger-econohead">
  <span>Economia del bolo</span>
- <span className="fxd__econonote">net per bolo · preus orientatius</span>
+ <span className="ap-ledger-econonote">net per bolo · preus orientatius</span>
  </div>
  {!economia ? (
- <p className="fxd__econonote">Afegeix un pack o línies al bolo per veure el net.</p>
+ <p className="ap-ledger-econonote">Afegeix un pack o línies al bolo per veure el net.</p>
  ) : (
- <div className="fxd__kpis">
- <div className="fxd__kpi" data-level="gold">
- <div className="fxd__kpi-val">{formatCurrency(economia.total)}</div>
- <div className="fxd__kpi-lbl">Ingrés del bolo</div>
- <div className="fxd__kpi-sub">suma de les línies</div>
+ <div className="ap-ledger-kpis">
+ <div className="ap-ledger-kpi" data-level="gold">
+ <div className="ap-ledger-kpi-val">{formatCurrency(economia.total)}</div>
+ <div className="ap-ledger-kpi-lbl">Ingrés del bolo</div>
+ <div className="ap-ledger-kpi-sub">suma de les línies</div>
  </div>
- <div className="fxd__kpi" data-level="info">
- <div className="fxd__kpi-val">{formatCurrency(economia.directCost)}</div>
- <div className="fxd__kpi-lbl">Cost directe</div>
- <div className="fxd__kpi-sub">
+ <div className="ap-ledger-kpi" data-level="info">
+ <div className="ap-ledger-kpi-val">{formatCurrency(economia.directCost)}</div>
+ <div className="ap-ledger-kpi-lbl">Cost directe</div>
+ <div className="ap-ledger-kpi-sub">
  {formatCurrency(economia.serviceLinesCost)} línies + {formatCurrency(economia.fixedOperationalCost)} operatiu
  </div>
  </div>
- <div className="fxd__kpi" data-level={netLevel}>
- <div className="fxd__kpi-val">{formatCurrency(economia.netMargin)}</div>
- <div className="fxd__kpi-lbl">Net per bolo</div>
- <div className="fxd__kpi-sub">
+ <div className="ap-ledger-kpi" data-level={netLevel}>
+ <div className="ap-ledger-kpi-val">{formatCurrency(economia.netMargin)}</div>
+ <div className="ap-ledger-kpi-lbl">Net per bolo</div>
+ <div className="ap-ledger-kpi-sub">
  {Math.round(economia.marginPct)}% marge · {economia.marginTone.label}
  </div>
  </div>

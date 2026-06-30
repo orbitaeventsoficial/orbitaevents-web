@@ -4,7 +4,7 @@ import { fetchPartnerHub } from '@/lib/services/partnerHubService';
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     collaborator: { findUnique: vi.fn() },
-    bookingServiceLine: { aggregate: vi.fn() },
+    bookingServiceLine: { findMany: vi.fn() },
   },
 }));
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
@@ -34,8 +34,8 @@ function buildPartner(overrides: Record<string, unknown> = {}) {
 describe('fetchPartnerHub', () => {
   beforeEach(() => {
     mockPrisma.collaborator.findUnique.mockReset();
-    mockPrisma.bookingServiceLine.aggregate.mockReset();
-    mockPrisma.bookingServiceLine.aggregate.mockResolvedValue({ _sum: { costAmount: 0 }, _count: 0 });
+    mockPrisma.bookingServiceLine.findMany.mockReset();
+    mockPrisma.bookingServiceLine.findMany.mockResolvedValue([]);
   });
 
   it('retorna null si el partner no existeix', async () => {
@@ -45,7 +45,10 @@ describe('fetchPartnerHub', () => {
 
   it('separa els tres conceptes i calcula economia agregada', async () => {
     mockPrisma.collaborator.findUnique.mockResolvedValue(buildPartner());
-    mockPrisma.bookingServiceLine.aggregate.mockResolvedValue({ _sum: { costAmount: 160 }, _count: 2 });
+    mockPrisma.bookingServiceLine.findMany.mockResolvedValue([
+      { costAmount: 80, quantity: 1 },
+      { costAmount: 40, quantity: 2 },
+    ]);
     const hub = await fetchPartnerHub('col_1');
 
     expect(hub).not.toBeNull();
@@ -67,7 +70,7 @@ describe('fetchPartnerHub', () => {
     expect(e.productsCount).toBe(1); // només p1 actiu
     expect(e.catalogValue).toBe(200); // sellPrice del p1
     expect(e.catalogCost).toBe(160); // costPrice del p1
-    expect(e.serviceLinesPaid).toBe(160); // cost subcontractat (línies de servei)
+    expect(e.serviceLinesPaid).toBe(160); // 80*1 + 40*2
     expect(e.serviceLinesCount).toBe(2);
     expect(e.totalPaidToPartner).toBe(160); // = serviceLinesPaid
   });
@@ -82,5 +85,24 @@ describe('fetchPartnerHub', () => {
     expect(e.serviceLinesPaid).toBe(0);
     expect(e.catalogValue).toBe(0);
     expect(e.productsCount).toBe(0);
+  });
+
+  it('preserva centims en ingressos, cataleg i serveis subcontractats', async () => {
+    mockPrisma.collaborator.findUnique.mockResolvedValue(
+      buildPartner({
+        products: [{ id: 'p1', sellPrice: 199.99, costPrice: 133.33, isActive: true }],
+        sourcedBookings: [{ id: 'sb1', reference: 'OE-5', clientName: 'A', eventDate: null, status: 'CONFIRMED', total: 800.45 }],
+      }),
+    );
+    mockPrisma.bookingServiceLine.findMany.mockResolvedValue([{ costAmount: 40.15, quantity: 2 }]);
+
+    const hub = await fetchPartnerHub('col_1');
+    const e = hub!.economics;
+
+    expect(e.sourcedRevenue).toBe(800.45);
+    expect(e.catalogValue).toBe(199.99);
+    expect(e.catalogCost).toBe(133.33);
+    expect(e.serviceLinesPaid).toBe(80.3);
+    expect(e.totalPaidToPartner).toBe(80.3);
   });
 });

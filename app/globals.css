@@ -2622,7 +2622,7 @@ html.admin-mode .ap-page {
 
 /* ── HEADER ──────────────────────────────────────────────────────────────────
    Canon Temporada (TANCAT CHARLIE): eyebrow mono + h1 display + sub mono,
-   separats per hairline. Clonic a `.fx__pagehead`. */
+   separats per hairline. Clonic a `.ap-leads-pagehead`. */
 html.admin-mode .ap-header {
   display: flex;
   align-items: flex-end;
@@ -3137,7 +3137,7 @@ html.admin-mode .ap-btn:disabled {
   pointer-events: none;
 }
 
-/* Acció primària = outline or de Cristina (`.fx__add`): fons transparent, vora
+/* Acció primària = outline or de Cristina (`.ap-leads-add`): fons transparent, vora
    hairline d'or, text or. Abans era or 22% sobre panel = massa fosc, semblava negre. */
 html.admin-mode .ap-btn--primary {
   /* Botó primari canònic: OUTLINE daurat VISIBLE (decisió propietari 2026-06-30).

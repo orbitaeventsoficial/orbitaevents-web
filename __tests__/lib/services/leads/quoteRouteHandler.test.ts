@@ -192,6 +192,31 @@ describe('handleLeadQuotePost', () => {
     );
   });
 
+  it('ignora customPrice/customHours invàlids al POST i conserva el pack base', async () => {
+    await handleLeadQuotePost(
+      makePostRequest({
+        customPrice: -10,
+        customHours: 'hores',
+      }),
+      LEAD_ID,
+    );
+
+    expect(mockCreateQuoteFromLead).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ price: MOCK_PACK.price, djHours: MOCK_PACK.djHours }),
+      undefined,
+    );
+    const documentArgs = mockPrisma.leadDocument.create.mock.calls[0][0];
+    expect(documentArgs.data.fileUrl).not.toContain('customPrice=');
+    expect(documentArgs.data.fileUrl).not.toContain('customHours=');
+  });
+
+  it('ignora packId no-string al POST i usa el pack del lead', async () => {
+    await handleLeadQuotePost(makePostRequest({ packId: { bad: true } }), LEAD_ID);
+
+    expect(mockResolveQuotePack).toHaveBeenCalledWith('discomovil', 'ca');
+  });
+
   it('retorna 500 en cas d\'error intern', async () => {
     mockGetQuoteTemplateSettings.mockRejectedValue(new Error('DB error'));
 

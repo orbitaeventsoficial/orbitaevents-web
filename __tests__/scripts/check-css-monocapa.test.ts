@@ -28,9 +28,9 @@ describe('check-css-monocapa', () => {
     expect(r.stdout + r.stderr).toMatch(/admin-shell|phantom/i);
   });
 
-  it('FALLA amb !important en una classe pròpia de pàgina (fxd__)', () => {
+  it('FALLA amb !important en una classe pròpia de pàgina (tk__)', () => {
     const r = runGuard({
-      'app/admin/x/x.css': 'html.admin-mode .fxd__panel {\n  color: red !important;\n}\n',
+      'app/admin/x/x.css': 'html.admin-mode .tk__panel {\n  color: red !important;\n}\n',
     });
     expect(r.status).toBe(1);
     expect(r.stdout + r.stderr).toMatch(/important/i);
@@ -38,7 +38,7 @@ describe('check-css-monocapa', () => {
 
   it('PASSA amb CSS net (classe pròpia, sense !important)', () => {
     const r = runGuard({
-      'app/admin/x/x.css': 'html.admin-mode .fxd__panel { color: var(--t); }',
+      'app/admin/x/x.css': 'html.admin-mode .tk__panel { color: var(--t); }',
     });
     expect(r.status).toBe(0);
   });

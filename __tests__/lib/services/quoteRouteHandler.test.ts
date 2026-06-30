@@ -242,6 +242,34 @@ describe('handleLeadQuotePost', () => {
     );
   });
 
+  it('ignora customPrice i customHours invàlids al body', async () => {
+    const req = makeRequest('http://localhost:3000/api/admin/leads/lead1/quote', 'POST', {
+      customPrice: -50,
+      customHours: Number.NaN,
+    });
+
+    await handleLeadQuotePost(req, 'lead1');
+
+    expect(mockDocService.createQuoteFromLead).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ price: defaultPack.price, djHours: defaultPack.djHours }),
+      undefined,
+    );
+    const documentArgs = mockPrisma.leadDocument.create.mock.calls[0][0];
+    expect(documentArgs.data.fileUrl).not.toContain('customPrice=');
+    expect(documentArgs.data.fileUrl).not.toContain('customHours=');
+  });
+
+  it('ignora packId no-string al body i usa el pack del lead', async () => {
+    const req = makeRequest('http://localhost:3000/api/admin/leads/lead1/quote', 'POST', {
+      packId: { bad: true },
+    });
+
+    await handleLeadQuotePost(req, 'lead1');
+
+    expect(mockQuotePack.resolveQuotePack).toHaveBeenCalledWith('premium', 'ca');
+  });
+
   it('accepta eventLocation override al body', async () => {
     const req = makeRequest('http://localhost:3000/api/admin/leads/lead1/quote', 'POST', {
       eventLocation: 'Madrid',

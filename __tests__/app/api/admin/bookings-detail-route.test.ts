@@ -197,6 +197,13 @@ describe('PATCH /api/admin/bookings/[id]', () => {
     expect(res.status).toBe(400);
   });
 
+  it('rebutja totalPrice negatiu', async () => {
+    const { req, params } = makePatchRequest('book-1', { totalPrice: -100 });
+    const res = await PATCH(req, params);
+    expect(res.status).toBe(400);
+    expect(mockUpdateBooking).not.toHaveBeenCalled();
+  });
+
   it('rebutja camps desconeguts (strict)', async () => {
     const { req, params } = makePatchRequest('book-1', { unknownField: 'xyz' });
     const res = await PATCH(req, params);
