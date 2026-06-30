@@ -1550,6 +1550,30 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1288 — 2026-06-30 — codex (FET)
+**V5 col·laboradors: comissió i cost/hora sanejats.**
+- `lib/services/collaboratorAdminService.ts`: afegeix sanejament compartit per `commissionPct` i `costPerHour` en creació i actualització.
+- `__tests__/lib/services/collaboratorAdminService.test.ts`: cobertura de valors bruts i decimals monetaris conservats.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\collaboratorAdminService.test.ts` (12 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `validate:core` global continua bloquejat pel deute concurrent d'Inbox ja identificat a `app/admin/inbox/inbox.css:9` (`qa:admin-mode-prefix`).
+- Validació funcional: el manteniment de partners/col·laboradors ja no pot persistir costos/hora no numèrics o negatius des del servei.
+- Validació humana/UX: les dades econòmiques base dels col·laboradors queden neutralitzades abans d'arribar a BD encara que el formulari o una ruta enviï entrada bruta.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1288`; el següent canvi real ha de ser `#1289`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1287 — 2026-06-30 — codex (FET)
+**V5 tresoreria: cashflow conserva cèntims.**
+- `lib/services/cashFlowForecast.ts`: `income`, `costs`, `netFlow` i `cumulative` passen a arrodoniment monetari a 2 decimals.
+- `__tests__/lib/services/cashFlowForecast.test.ts`: la regressió cobreix ingressos pendents, costos, net i acumulat amb decimals.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\cashFlowForecast.test.ts` (10 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `validate:core` global continua bloquejat pel deute concurrent d'Inbox ja identificat a `app/admin/inbox/inbox.css:9` (`qa:admin-mode-prefix`).
+- Validació funcional: la previsió mensual de caixa conserva cèntims en tots els imports monetaris derivats.
+- Validació humana/UX: tresoreria ja no maquilla imports pendents o costos per arrodoniment a euros sencers.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1287`; el següent canvi real ha de ser `#1288`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1285 — 2026-06-30 — codex (FET)
 **V5 forecast: reserves confirmades conserven cèntims.**
 - `lib/services/pipelineForecast.ts`: `confirmedRevenue` passa a arrodoniment monetari a 2 decimals.
@@ -1629,6 +1653,17 @@ Seqüència obligatòria de registre:
 - Validació funcional: captures hub + tasks canònics.
 - Validació humana/UX: hipersemblants; hub ric preservat.
 - Començat per: `claude+agents`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1289 — 2026-06-30 — claude (FET)
+**Última milla: codi mort lp2/lf esborrat de leads-design.css.**
+- Esborrades 145 línies de regles lp2__/lf__ mortes (0 TSX). Deute 2082→2019. .ax-root/.ax__workspace = shell canònic (no tocar); ax__stat/ix__ = deute real.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1289`; el següent canvi real ha de ser `#1290`.
+- Validació tècnica: `tsc` 0; qa:canon-debt OK; leads 200.
+- Validació funcional: leads intacte.
+- Validació humana/UX: codi mort, cap canvi visible.
+- Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
 

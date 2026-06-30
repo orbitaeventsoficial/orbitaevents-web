@@ -1,3 +1,61 @@
+## 2026-06-30 — Última milla: codi mort lp2/lf esborrat de leads-design.css (Canvi #1289, claude)
+
+### Què s'ha fet
+- `leads-design.css`: esborrades 145 línies de regles `lp2__` (62) i `lf__` (1) — codi MORT (0 TSX les usa; eren de la fitxa de lead antiga, ara usa fxd__). Queden 2 ocurrències = comentaris descriptius, no codi.
+- Deute 2082 → 2019 (−63). Leads renderitza 200, tsc 0.
+- Aclariment per l'última milla: `.ax-root`/`.ax__workspace`/`.ax__page` (layout.tsx) són SHELL CANÒNIC (NO tocar). `ax__stat/btn/field` (ArxiuClient) i `ix__` (settings inbox) són deute real.
+
+### Validació
+- Validació tècnica: `tsc` 0; `qa:canon-debt` OK; leads 200.
+- Validació funcional: leads intacte després d'esborrar les regles mortes.
+- Validació humana/UX: cap canvi visible (codi mort).
+
+### Coordinació
+Counter → 1289. Última milla iniciada. Següent: agents per arxiu (ax__), settings-inbox (ix__), booking-detall (bd__).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-30 — V5 col·laboradors: comissió i cost/hora sanejats (Canvi #1288, codex)
+
+### Context
+El servei admin de col·laboradors persistia `commissionPct` i `costPerHour` amb `Number(...)` directe. Això podia deixar entrar comissions negatives, costos/hora negatius o valors no numèrics al límit de domini.
+
+### Què s'ha fet
+- `lib/services/collaboratorAdminService.ts`: afegeix sanejament compartit per `commissionPct` i `costPerHour` en creació i actualització.
+- `__tests__/lib/services/collaboratorAdminService.test.ts`: cobertura de valors bruts i decimals monetaris conservats.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\collaboratorAdminService.test.ts` (12 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `validate:core` global continua bloquejat pel deute concurrent d'Inbox ja identificat a `app/admin/inbox/inbox.css:9` (`qa:admin-mode-prefix`).
+- Validació funcional: el manteniment de partners/col·laboradors ja no pot persistir costos/hora no numèrics o negatius des del servei.
+- Validació humana/UX: les dades econòmiques base dels col·laboradors queden neutralitzades abans d'arribar a BD encara que el formulari o una ruta enviï entrada bruta.
+
+### Coordinació
+Counter → 1288. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni canonització de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-30 — V5 tresoreria: cashflow conserva cèntims (Canvi #1287, codex)
+
+### Context
+`cashFlowForecast` agregava ingressos pendents, costos, net i acumulat mensual, però al final aplicava `Math.round` i perdia cèntims. En tresoreria prevista això és diner operatiu, no una lectura executiva arrodonida.
+
+### Què s'ha fet
+- `lib/services/cashFlowForecast.ts`: `income`, `costs`, `netFlow` i `cumulative` passen a arrodoniment monetari a 2 decimals.
+- `__tests__/lib/services/cashFlowForecast.test.ts`: la regressió cobreix ingressos pendents, costos, net i acumulat amb decimals.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\cashFlowForecast.test.ts` (10 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `validate:core` global continua bloquejat pel deute concurrent d'Inbox ja identificat a `app/admin/inbox/inbox.css:9` (`qa:admin-mode-prefix`).
+- Validació funcional: la previsió mensual de caixa conserva cèntims en tots els imports monetaris derivats.
+- Validació humana/UX: tresoreria ja no maquilla imports pendents o costos per arrodoniment a euros sencers.
+
+### Coordinació
+Counter → 1287. El #1286 pertany a Claude (hub client + tasks canònics). No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni canonització de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-30 — Erradicació: hub de client (958) + tasks (219) 100% canònics (Canvi #1286, claude+agents)
 
 ### Què s'ha fet

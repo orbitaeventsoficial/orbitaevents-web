@@ -1252,10 +1252,6 @@ html.admin-mode .fx__lostmodal-h {
 /* ══════════════════════════════════════════════════════════════════════════
    lf__ — Lead fitxa nova (/admin/leads/[id]) — canvas negre, reconstruïm
    ══════════════════════════════════════════════════════════════════════════ */
-html.admin-mode .lf__root {
-  min-height: 100vh;
-  background: var(--canvas, var(--ax-canvas));
-}
 
 /* Fitxa completa — ocupa tota l'àrea del workspace sense scroll */
 /* Stage color tokens per a pàgina completa (fxd__fullpage té data-stage però no és fill de .fx-root) */
@@ -2287,177 +2283,36 @@ html.admin-mode .fxd__budget-editable {
    ══════════════════════════════════════════════════════════════════════════ */
 
 /* ── Nav bar ── */
-html.admin-mode .lp2__bar {
-  position: sticky; top: 0; z-index: 30;
-  display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--o-admin-line);
-  backdrop-filter: blur(18px);
-  background: var(--ax-overlay-sm);
-}
-html.admin-mode .lp2__back {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-size: var(--o-text-2xs); color: var(--t3); text-decoration: none; transition: color .15s;
-}
-html.admin-mode .lp2__back:hover { color: var(--t2); }
-html.admin-mode .lp2__backic { font-size: var(--o-text-base); }
-html.admin-mode .lp2__crumb { font-size: var(--o-text-2xs); color: var(--t2); }
-html.admin-mode .lp2__baracts { display: flex; gap: 6px; flex-wrap: wrap; }
 
 /* ── Buttons ── */
-html.admin-mode .lp2__btn--prim,
-html.admin-mode .lp2__btn--sec {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 6px 12px; border-radius: var(--o-r-lg);
-  font-size: var(--o-text-2xs); font-weight: var(--o-fw-semi); text-decoration: none; cursor: pointer;
-  border: 1px solid var(--o-admin-line-2);
-  transition: background .15s, color .15s;
-}
-html.admin-mode .lp2__btn--prim {
-  background: var(--ax-gold-tint-2); border-color: var(--o-admin-hair-gold); color: var(--gold);
-}
-html.admin-mode .lp2__btn--prim:hover { background: var(--ax-gold-tint-2); }
-html.admin-mode .lp2__btn--sec {
-  background: var(--ax-fill-2); color: var(--t2);
-}
-html.admin-mode .lp2__btn--sec:hover { background: var(--ax-fill-4); color: var(--t); }
 
 /* ── Hero ── */
-html.admin-mode .lp2__hero {
-  padding: 16px; border-bottom: 1px solid var(--o-admin-line);
-  background: var(--ax-fill-1);
-}
-html.admin-mode .lp2__id { display: flex; flex-direction: column; gap: 2px; }
-html.admin-mode .lp2__kicker {
-  font-size: var(--o-text-micro); font-weight: var(--o-fw-semi); text-transform: uppercase;
-  letter-spacing: .10em; color: var(--t3);
-}
-html.admin-mode .lp2__name {
-  font-size: var(--o-text-xl); font-weight: var(--o-fw-bold); color: var(--t); margin: 0;
-}
-html.admin-mode .lp2__meta {
-  font-size: var(--o-text-2xs); color: var(--t3); display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;
-}
 
 /* ── KPI bar executiu ── */
-html.admin-mode .lp2__exec {
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;
-  padding: 12px 16px;
-}
 @media (min-width: 640px) {
-  html.admin-mode .lp2__exec { grid-template-columns: repeat(5, 1fr); }
-}
-html.admin-mode .lp2__kpi {
-  padding: 9px 12px; border-radius: var(--o-r-lg);
-  border: 1px solid var(--o-admin-line); background: var(--ax-fill-1);
-}
-html.admin-mode .lp2__kpi--money {
-  border-color: var(--o-admin-hair-gold); background: var(--ax-gold-tint-1);
-}
-html.admin-mode .lp2__kpi-label {
-  font-size: var(--o-text-micro); text-transform: uppercase; letter-spacing: .07em; color: var(--t3); margin: 0;
-}
-html.admin-mode .lp2__kpi-val {
-  font-size: var(--o-text-md); font-weight: var(--o-fw-bold); color: var(--t); margin: 3px 0 0;
-}
-html.admin-mode .lp2__kpi--money .lp2__kpi-val { color: var(--gold); }
+  }
 
 /* ── Layout principal ── */
-html.admin-mode .lp2__layout {
-  display: grid; grid-template-columns: 1fr; gap: 12px; padding: 16px;
-  max-width: 1200px; margin: 0 auto; padding-bottom: 48px;
-}
 @media (min-width: 1024px) {
-  html.admin-mode .lp2__layout { grid-template-columns: 1fr 320px; }
-}
-html.admin-mode .lp2__main { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
-html.admin-mode .lp2__decision { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+  }
 
 /* ── Panell ── */
-html.admin-mode .lp2__panel {
-  border: 1px solid var(--o-admin-line); border-radius: var(--o-r-xl);
-  background: var(--ax-fill-1); padding: 16px 18px;
-}
-html.admin-mode .lp2__h {
-  font-size: var(--o-text-sm); font-weight: var(--o-fw-semi); color: var(--t); margin: 0 0 12px;
-}
 
 /* ── Sense reserva ── */
-html.admin-mode .lp2__nobook {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
-  font-size: var(--o-text-sm); color: var(--t3);
-}
 
 /* ── Booking cards ── */
-html.admin-mode .lp2__bookcards {
-  display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 12px;
-}
 @media (min-width: 640px) {
-  html.admin-mode .lp2__bookcards { grid-template-columns: repeat(2, 1fr); }
-}
-html.admin-mode .lp2__bookcard {
-  border: 1px solid var(--o-admin-line-2); border-radius: var(--o-r-lg);
-  background: var(--ax-fill-1); padding: 12px 14px;
-}
-html.admin-mode .lp2__bookcard-title {
-  font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); text-transform: uppercase; letter-spacing: .08em;
-  color: var(--t3); margin: 0 0 8px;
-}
-html.admin-mode .lp2__bookfield {
-  display: flex; justify-content: space-between; gap: 8px;
-  font-size: var(--o-text-2xs); padding: 3px 0;
-  border-bottom: 1px solid var(--o-admin-line);
-}
-html.admin-mode .lp2__bookfield:last-child { border-bottom: none; }
-html.admin-mode .lp2__bookfield dt { color: var(--t3); }
-html.admin-mode .lp2__bookfield dd { color: var(--t); margin: 0; font-weight: var(--o-fw-book); }
+  }
 
 /* ── Post-event ── */
-html.admin-mode .lp2__postevent {
-  border-top: 1px solid var(--o-admin-line); padding-top: 12px; margin-top: 4px;
-}
-html.admin-mode .lp2__postevent-grid { display: flex; flex-direction: column; gap: 0; margin: 0; }
-html.admin-mode .lp2__prow {
-  display: flex; justify-content: space-between; gap: 8px;
-  font-size: var(--o-text-2xs); padding: 4px 0; border-bottom: 1px solid var(--o-admin-line);
-}
-html.admin-mode .lp2__prow:last-child { border-bottom: none; }
-html.admin-mode .lp2__prow dt { color: var(--t3); }
-html.admin-mode .lp2__prow dd { margin: 0; font-weight: var(--o-fw-book); color: var(--t); }
 
 /* ── Booking actions ── */
-html.admin-mode .lp2__bookacts {
-  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;
-  border-top: 1px solid var(--o-admin-line); padding-top: 12px;
-}
 
 /* ── Tones ── */
-html.admin-mode .lp2__tone--ok   { color: var(--o-success); }
-html.admin-mode .lp2__tone--warn  { color: var(--o-warning); }
-html.admin-mode .lp2__tone--bad   { color: var(--o-danger); }
 
 /* ── Rows (dl) ── */
-html.admin-mode .lp2__rows { display: flex; flex-direction: column; gap: 0; margin: 0; }
-html.admin-mode .lp2__rows > div {
-  display: flex; justify-content: space-between; gap: 8px;
-  font-size: var(--o-text-2xs); padding: 4px 0; border-bottom: 1px solid var(--o-admin-line);
-}
-html.admin-mode .lp2__rows > div:last-child { border-bottom: none; }
-html.admin-mode .lp2__rows dt { color: var(--t3); }
-html.admin-mode .lp2__rows dd { margin: 0; color: var(--t); font-weight: var(--o-fw-book); text-align: right; }
 
 /* ── Misc ── */
-html.admin-mode .lp2__mono-xs { font-family: var(--mono); font-size: var(--o-text-micro); }
-html.admin-mode .lp2__link-gold { color: var(--gold); text-decoration: none; }
-html.admin-mode .lp2__link-gold:hover { text-decoration: underline; }
-html.admin-mode .lp2__empty { font-size: var(--o-text-2xs); color: var(--t3); }
-html.admin-mode .lp2__histitem {
-  display: block; font-size: var(--o-text-2xs); color: var(--t2); text-decoration: none;
-  padding: 5px 0; border-bottom: 1px solid var(--o-admin-line);
-  transition: color .12s;
-}
-html.admin-mode .lp2__histitem:hover { color: var(--t); }
-html.admin-mode .lp2__histitem:last-child { border-bottom: none; }
 
 /* Pista inline als labels de relació (responsable intern / bolo passat per) */
 html.admin-mode .fxd__hint-inline { display: block; font-family: var(--ui); font-style: italic; font-weight: var(--o-fw-normal); font-size: var(--o-text-2xs); letter-spacing: 0; text-transform: none; color: var(--t3); margin-top: 1px; }

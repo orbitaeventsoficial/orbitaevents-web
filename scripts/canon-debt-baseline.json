@@ -1,5 +1,5 @@
 {
-  "total": 2082,
+  "total": 2019,
   "perFile": {
     "app/admin/admin-shell.css": 98,
     "app/admin/admin-theme.css": 1,
@@ -22,7 +22,7 @@
     "app/admin/leads/arxiu/arxiu-design.css": 58,
     "app/admin/leads/arxiu/ArxiuClient.tsx": 61,
     "app/admin/leads/LeadLostStatusPrompt.tsx": 3,
-    "app/admin/leads/leads-design.css": 851,
+    "app/admin/leads/leads-design.css": 788,
     "app/admin/leads/LeadsSeasonClient.tsx": 187,
     "app/admin/leads/[id]/LeadBoloSection.tsx": 33,
     "app/admin/leads/[id]/LeadDetailClient.tsx": 85
