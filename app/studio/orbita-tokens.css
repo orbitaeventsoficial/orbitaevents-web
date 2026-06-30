@@ -325,6 +325,15 @@
   --cell-name: #f1ece4;
   --cell-val: var(--o-admin-gold-bright);
 
+  /* ── Header canònic de pàgina (font única; la referència és el header de leads).
+     Tot pagehead admin consumeix aquests tokens; NO es defineixen paràmetres locals. ── */
+  --head-gap:    0.55rem;
+  --head-pad:    0.6rem clamp(0.9rem, 2.4vi, 1.5rem) 0.55rem;
+  --head-border: thin solid color-mix(in oklab, var(--line) 74%, transparent);
+  --head-bg:
+    linear-gradient(180deg, color-mix(in oklab, var(--raised) 40%, transparent), transparent 70%),
+    color-mix(in oklab, var(--canvas) 92%, transparent);
+
   /* Font-weight (aliases globals) */
   --fw-normal:    var(--o-fw-normal);
   --fw-book:      var(--o-fw-book);

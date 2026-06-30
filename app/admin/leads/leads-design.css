@@ -1504,12 +1504,12 @@ html.admin-mode .fxd__hd {
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
-  padding: 0.6rem clamp(0.9rem, 2.4vi, 1.5rem) 0.55rem;
-  border-bottom: thin solid color-mix(in oklab, var(--line) 74%, transparent);
-  background:
-    linear-gradient(180deg, color-mix(in oklab, var(--raised) 40%, transparent), transparent 70%),
-    color-mix(in oklab, var(--canvas) 92%, transparent);
+  /* Header canònic: consumeix els tokens de Studio (--head-*). Leads és la
+     referència del header, però els paràmetres viuen a Studio, no aquí. */
+  gap: var(--head-gap);
+  padding: var(--head-pad);
+  border-bottom: var(--head-border);
+  background: var(--head-bg);
 }
 /* Banda superior: identitat | contacte */
 html.admin-mode .fxd__hd-top {

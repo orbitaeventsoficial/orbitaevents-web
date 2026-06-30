@@ -1,3 +1,112 @@
+## 2026-06-30 — CANONITZACIÓ del header: 6 sistemes → 1 que mira a Studio (Canvi #1255, claude)
+
+### Context
+El propietari (insistit dies): «tot el repo ha de mirar a Studio; canònic vol dir que canvio un token a Studio i tot respon». Diagnòstic amb test de fucsia: els TOKENS ja propaguen (color OK), però hi havia **6 sistemes de header diferents** (fxd__hd, ap-header, cl__pagehead, ap-detail-hero, ni__head, pr__hero), cadascun amb paràmetres PROPIS (padding/gap/border/fons en px o gradients locals). Per això els headers es veien diferents i no responien a un canvi únic.
+
+### Què s'ha fet — header canònic únic
+- **Studio (orbita-tokens.css)**: nous tokens del header canònic `--head-gap/--head-pad/--head-border/--head-bg` (referència = leads). Font ÚNICA.
+- **6 sistemes migrats a consumir `--head-*`** (cap paràmetre local): `.ap-header` (67 pàgines, globals.css), `.fxd__hd` (leads), `.cl__pagehead` (clientes), `.ap-detail-hero` (bookings), `.ni__head` (intake), `.pr__hero` (presupuestos — eliminat el gradient propi 135deg).
+- Ara canviar `--head-bg` a Studio canvia TOTS els headers alhora. Això és canònic de debò.
+
+### Validació
+- Validació tècnica: CSS (no afecta tsc); `validate:core`.
+- Validació funcional: captures — economia i presupuestos ara tenen la banda de leads (gradient subtil + border-bottom), header coherent.
+- Validació humana/UX: 6 headers ara responen als mateixos paràmetres de Studio.
+
+### Coordinació
+Counter → 1255. PENDENT: verificar clientes amb captura (async), unificar tabs, i estendre el mètode (header) a card/botó/input com a components canònics que consumeixen Studio.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-30 — V5 propostes: coherència subtotal/descompte/IVA/total (Canvi #1255, codex)
+
+### Context
+Caça de flux Catàleg→Preu→Pressupost. Studio desa propostes amb totals coherents, però les APIs de propostes acceptaven `subtotal`, `discount`, `vatRate`, `vatAmount` i `total` com a camps independents sense comprovar que quadressin. Un payload directe podia deixar una proposta matemàticament inconsistent.
+
+### Què s'ha fet
+- `app/api/admin/proposals/route.ts`: el POST valida que `vatAmount` i `total` quadrin amb `subtotal`, `discount` i `vatRate`.
+- `app/api/admin/proposals/[id]/route.ts`: el PATCH permet canvis no econòmics sols, però si toca qualsevol camp econòmic exigeix el bloc complet i coherent.
+- `__tests__/app/api/admin/proposals-route.test.ts`: cobertura de POST coherent, IVA incoherent i total incoherent.
+- `__tests__/app/api/admin/proposals-detail-route.test.ts`: cobertura de PATCH econòmic parcial, incoherent i coherent.
+
+### Validació
+- Validació tècnica: pendent d'executar en aquesta tanda (`proposals-route`, `proposals-detail-route`, TypeScript, `qa:protocol`, `validate:core`).
+- Validació funcional: una proposta no pot persistir totals desquadrats via API directa.
+- Validació humana/UX: el pressupost visible, desat i enviable manté un únic càlcul econòmic coherent.
+
+### Coordinació
+Counter → 1255. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema ni costEngine.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-30 — V5 reserves: extres/descompte no poden distorsionar totals (Canvi #1254, codex)
+
+### Context
+Caça de flux Catàleg→Preu→Reserva. La ruta de creació de reserves validava `manualTotalPrice` i `customPackPrice`, però `discount`, `extras.price` i `extras.quantity` eren massa permissius; a més, el servei sumava el preu d'un extra abans de comprovar si l'`extraId` existia. Això podia crear totals que no corresponien als extres persistits.
+
+### Què s'ha fet
+- `app/api/admin/bookings/route.ts`: `extraHours`, `discount`, `extras.price` i `extras.quantity` passen a tenir mínims/positiu al schema.
+- `lib/services/bookingCreationService.ts`: normalitza extres i descompte també dins el servei, per protegir callers interns.
+- Els extres només entren al subtotal si `resolveExtraId()` els pot convertir a extra real; ja no es cobra un extra inexistent que després no queda creat.
+- `__tests__/lib/services/bookingCreationService.test.ts`: cobertura de descompte negatiu, extra inexistent i extra amb preu/quantitat bruts.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\bookingCreationService.test.ts` (42 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: la reserva només suma extres persistibles i no permet que imports negatius alterin el total.
+- Validació humana/UX: el total de reserva queda alineat amb les línies que realment existeixen al bolo.
+
+### Coordinació
+Counter → 1254. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema ni costEngine.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-30 — V5 pressupost de lead: overrides custom sanejats (Canvi #1253, codex)
+
+### Context
+Caça de la vertical V5 Catàleg→Preu. El GET del pressupost de lead sanejava `customPrice` i `customHours`, però el POST aplicava el body cru. Això podia generar un pressupost amb preu/hores negatius, no finits o de tipus erroni, i també podia petar si `packId` no era string.
+
+### Què s'ha fet
+- `lib/services/leads/quoteRouteHandler.ts`: `parsePositiveNumber()` accepta `unknown` i només deixa passar nombres finits positius.
+- El POST usa el mateix saneig que el GET per `customPrice` i `customHours`; si són invàlids, conserva el pack base.
+- `packId` del body/query passa per `parsePackKey()`, de manera que valors no-string no trenquen el handler i es torna al pack del lead o al fallback.
+- `__tests__/lib/services/quoteRouteHandler.test.ts` i `__tests__/lib/services/leads/quoteRouteHandler.test.ts`: cobertura d'overrides invàlids i `packId` no-string.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\quoteRouteHandler.test.ts __tests__\lib\services\leads\quoteRouteHandler.test.ts` (26 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: el pressupost generat des de lead ja no pot substituir el PVP/durada de pack per valors bruts del body.
+- Validació humana/UX: el flux de pressupost manté imports coherents encara que el payload arribi brut.
+
+### Coordinació
+Counter → 1253. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema ni costEngine.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-30 — V5 Quick Create: proposta amb preu de pack server-side (Canvi #1252, codex)
+
+### Context
+Continuació de la vertical V5 Catàleg→Preu fora de mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema i costEngine. `QuickCreateForm` enviava `proposalSubtotal` des del client, però la reserva creada tot seguit recalcula el pack des de BD; si el preu canviava o el payload arribava manipulat, lead→proposta→reserva podia quedar amb imports diferents.
+
+### Què s'ha fet
+- `lib/services/leads/quickCreateFlow.ts`: la proposta resol el subtotal server-side amb `prisma.pack.findUnique(...price...)` quan hi ha `interestedPackId`.
+- Si no hi ha pack seleccionat, es conserva el fallback existent de `proposalSubtotal` per a propostes plantilla.
+- Si arriba un `interestedPackId` inexistent, no es confia en el subtotal del client i la proposta queda a 0 en comptes de fabricar un import sense pack real.
+- `__tests__/lib/services/leads/quickCreateFlow.test.ts`: cobertura del preu server-side, del fallback sense pack i del cas pack inexistent.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\leads\quickCreateFlow.test.ts` (11 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: Quick Create deixa de tenir el client com a autoritat del PVP quan hi ha pack real.
+- Validació humana/UX: el flux lead → pressupost → reserva queda més coherent; el preu visible de la proposta neix de la mateixa font que la reserva.
+
+### Coordinació
+Counter → 1252. #1251 pertany a Claude. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema ni costEngine.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-30 — Passada intensiva #2: a11y + certificació que el canon és net (Canvi #1251, claude)
 
 ### Context

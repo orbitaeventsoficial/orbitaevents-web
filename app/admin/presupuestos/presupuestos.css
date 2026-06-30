@@ -6,14 +6,13 @@ html.admin-mode .pr__page {
 html.admin-mode .pr__hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: clamp(1rem, 2vw, 1.5rem);
+  gap: var(--head-gap);
   align-items: end;
-  padding: clamp(1rem, 2vw, 1.5rem);
-  border: 1px solid var(--line);
-  border-radius: var(--o-r-md);
-  background:
-    linear-gradient(135deg, var(--o-admin-fill-4), transparent 58%),
-    var(--panel);
+  /* Header canònic: consumeix els tokens de Studio (--head-*). Abans tenia un
+     gradient propi 135deg (no canònic) — eliminat. */
+  padding: var(--head-pad);
+  border-bottom: var(--head-border);
+  background: var(--head-bg);
 }
 
 html.admin-mode .pr__eyebrow {

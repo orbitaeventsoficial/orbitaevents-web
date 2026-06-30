@@ -2629,8 +2629,12 @@ html.admin-mode .ap-header {
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
-  padding-bottom: 0.625rem;
-  border-bottom: 1px solid var(--line);
+  /* Header canònic: consumeix els tokens de Studio (--head-*), referència = leads.
+     Cap pàgina defineix paràmetres propis de header. */
+  padding: var(--head-pad);
+  border-bottom: var(--head-border);
+  background: var(--head-bg);
+  border-radius: var(--o-r-md) var(--o-r-md) 0 0;
 }
 
 html.admin-mode .ap-header-left {

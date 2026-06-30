@@ -1550,6 +1550,64 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1255 — 2026-06-30 — claude (FET)
+**Canonització del header: 6 sistemes → 1 que mira a Studio.**
+- Studio: tokens `--head-gap/--head-pad/--head-border/--head-bg` (referència leads). 6 sistemes (ap-header/fxd__hd/cl__pagehead/ap-detail-hero/ni__head/pr__hero) migrats a consumir-los; eliminat el gradient propi 135deg de presupuestos. Canviar el header a Studio ara canvia tots alhora.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1255`; el següent canvi real ha de ser `#1256`.
+- Validació tècnica: CSS; `validate:core`.
+- Validació funcional: captures economia/presupuestos amb banda canònica.
+- Validació humana/UX: 6 headers responen als mateixos paràmetres de Studio.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1254 — 2026-06-30 — codex (FET)
+**V5 reserves: extres/descompte no poden distorsionar totals.**
+- Context: `manualTotalPrice` i `customPackPrice` ja estaven blindats, però `discount`, `extras.price` i `extras.quantity` eren massa permissius; el servei també sumava l'extra abans de comprovar si l'`extraId` existia.
+- `app/api/admin/bookings/route.ts`: `extraHours`, `discount`, `extras.price` i `extras.quantity` passen a validar mínims/positiu al schema.
+- `lib/services/bookingCreationService.ts`: normalitza extres i descompte també dins el servei per protegir callers interns.
+- Els extres només entren al subtotal si `resolveExtraId()` els pot convertir a extra real; ja no es cobra un extra inexistent que després no queda creat.
+- `__tests__/lib/services/bookingCreationService.test.ts`: cobertura de descompte negatiu, extra inexistent i extra amb preu/quantitat bruts.
+- `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md`: V5 registra V5-#9 resolt.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1254`; el següent canvi real ha de ser `#1255`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\bookingCreationService.test.ts` (42 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: la reserva només suma extres persistibles i no permet que imports negatius alterin el total.
+- Validació humana/UX: el total de reserva queda alineat amb les línies que realment existeixen al bolo.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1253 — 2026-06-30 — codex (FET)
+**V5 pressupost de lead: overrides custom sanejats.**
+- Context: el GET del pressupost de lead sanejava `customPrice` i `customHours`, però el POST aplicava el body cru. Un payload brut podia generar preu/hores negatius o no finits, i un `packId` no-string podia trencar el handler.
+- `lib/services/leads/quoteRouteHandler.ts`: `parsePositiveNumber()` passa a acceptar `unknown` i només deixa passar nombres finits positius.
+- El POST reutilitza el saneig per `customPrice` i `customHours`; si són invàlids, conserva el `price`/`djHours` del pack base.
+- `packId` del body/query passa per `parsePackKey()`; valors no-string no fan 500 i cauen al pack del lead o `default`.
+- `__tests__/lib/services/quoteRouteHandler.test.ts` i `__tests__/lib/services/leads/quoteRouteHandler.test.ts`: cobertura d'overrides invàlids i `packId` no-string.
+- `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md`: V5 registra V5-#8 resolt.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1253`; el següent canvi real ha de ser `#1254`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\quoteRouteHandler.test.ts __tests__\lib\services\leads\quoteRouteHandler.test.ts` (26 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: el pressupost generat des de lead ja no pot substituir el PVP/durada de pack per valors bruts del body.
+- Validació humana/UX: el flux de pressupost manté imports coherents encara que el payload arribi brut.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1252 — 2026-06-30 — codex (FET)
+**V5 Quick Create: proposta amb preu de pack server-side.**
+- Context: `QuickCreateForm` enviava `proposalSubtotal` des del client, però la reserva posterior recalcula el pack des de BD. Un preu stale o manipulat podia deixar lead→proposta→reserva amb imports divergents.
+- `lib/services/leads/quickCreateFlow.ts`: quan hi ha `interestedPackId`, el subtotal de la proposta es resol server-side amb `prisma.pack.findUnique(...price...)`.
+- Es conserva el fallback `proposalSubtotal` només quan no hi ha pack seleccionat; si el packId no existeix, no es confia en l'import del client i la proposta queda a 0.
+- `__tests__/lib/services/leads/quickCreateFlow.test.ts`: cobertura de preu server-side, fallback sense pack i pack inexistent.
+- `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md`: V5 registra V5-#7 resolt.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1252`; el següent canvi real ha de ser `#1253`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\leads\quickCreateFlow.test.ts` (11 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: Quick Create deixa de tenir el client com a autoritat del PVP quan existeix pack real.
+- Validació humana/UX: el flux lead → pressupost → reserva queda alineat amb la font viva de pack.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1246 — 2026-06-30 — claude (FET)
 **Coherència: eyebrow (coordenada d'òrgan) a clientes.**
 - `clientes/page.tsx`: afegit `.ap-eyebrow` amb `getAdminOrganLabel('/admin/clientes')` («Comercial») abans del cl__h1. Ara idèntic a leads. bookings ja en tenia (ap-detail-kicker).

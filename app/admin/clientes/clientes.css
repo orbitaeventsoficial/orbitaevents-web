@@ -3,7 +3,7 @@
 html.admin-mode .cl { padding: 0 0 48px; }
 
 /* Capçalera */
-html.admin-mode .cl__pagehead { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 28px 30px 20px; }
+html.admin-mode .cl__pagehead { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--head-gap); flex-wrap: wrap; padding: var(--head-pad); border-bottom: var(--head-border); background: var(--head-bg); }
 html.admin-mode .cl__titles { display: flex; flex-direction: column; gap: 4px; }
 html.admin-mode .cl__h1 { font-family: var(--display); font-size: var(--o-text-2xl); font-weight: var(--o-fw-xbold); line-height: 1; letter-spacing: -0.02em; color: var(--t); }
 html.admin-mode .cl__sub { font-family: var(--mono); font-size: var(--o-text-sm); color: var(--t3); letter-spacing: 0.04em; }

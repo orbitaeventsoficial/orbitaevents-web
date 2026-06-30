@@ -658,8 +658,10 @@ html.admin-mode .ap-detail-bar-actions {
 }
 
 html.admin-mode .ap-detail-hero {
-  padding: 12px 20px 10px;
-  border-bottom: 1px solid var(--ax-line, rgba(255,255,255,0.1));
+  /* Header canònic: consumeix els tokens de Studio (--head-*). */
+  padding: var(--head-pad);
+  border-bottom: var(--head-border);
+  background: var(--head-bg);
 }
 
 html.admin-mode .ap-detail-kicker {
