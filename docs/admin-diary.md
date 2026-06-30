@@ -1,3 +1,31 @@
+## 2026-06-30 — Passada intensiva #2: a11y + certificació que el canon és net (Canvi #1251, claude)
+
+### Context
+Segona passada intensiva (propietari: «fes una altra passada intensiva»). Atac a tipus de deute no coberts abans: inline styles, rgba(), px de maquetació, accessibilitat, taules.
+
+### Què s'ha trobat i arreglat
+- **A11y**: 1 botó-icona («✕» a SafataClient) sense `aria-label` → afegit `aria-label="Esborrar selecció"`. (Únic problema real de tota la passada.)
+
+### Què s'ha verificat COM A TÈCNIC ACCEPTAT (no és deute)
+- **14 rgba() inline**: TOTS legítims — canvas (eina de color), email HTML (TemplateEditor, els clients de correu no suporten tokens CSS), color dinàmic de widget. El protocol els accepta explícitament.
+- **34 inline styles**: TOTS tècnics — width dinàmic de barres/gràfics (dashboard-widgets, analytics, AttributionPanel, LossBreakdown), canvas, css-manager, animació spin, reset `unset`. Cap color/padding cru.
+- **px de maquetació**: majoria `min-h-[44px]`/`min-w-[44px]` = target tàctil WCAG (legítim, no es tokenitza). `h-[500px]`/`min-w-[640px]` = casos tècnics puntuals.
+- **Taules**: 0 `<th>` sense `scope`. ✅
+
+### Veredicte
+L'admin està impecable de canon: 0 deute real tret d'1 aria-label (ara arreglat). Tots els "residus" detectats són casos tècnics que el protocol accepta (canvas, email HTML, runtime dinàmic, accessibilitat tàctil).
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core` EXIT 0.
+- Validació funcional: cap canvi de comportament; a11y millorada.
+- Validació humana/UX: botó de tancar selecció ara accessible.
+
+### Coordinació
+Counter → 1251. Caceria de coherència + canon: COMPLETA. Deute restant (tabs, botons funcionals, stash Codex) requereix propietari/Codex.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-30 — CACERIA MONUMENTAL de coherència (informe nocturn complet) (Canvi #1250, claude)
 
 ### Context

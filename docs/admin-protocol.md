@@ -1561,6 +1561,17 @@ Seqüència obligatòria de registre:
 - Treballant per: `claude`
 - Tancat per: `claude`
 
+### Canvi #1251 — 2026-06-30 — claude (FET)
+**Passada intensiva #2: a11y + certificació canon net.**
+- A11y: botó «✕» SafataClient → aria-label. Verificat tècnic acceptat: 14 rgba (canvas/email/dinàmic), 34 inline styles (width dinàmic/canvas/animació), px maquetació (44px tàctil WCAG), taules scope 0. Únic deute real era l'aria-label.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1251`; el següent canvi real ha de ser `#1252`.
+- Validació tècnica: `tsc` 0; `validate:core` EXIT 0.
+- Validació funcional: a11y millorada, cap regressió.
+- Validació humana/UX: botó tancar selecció accessible.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1250 — 2026-06-30 — claude (FET)
 **Caceria monumental de coherència (informe nocturn).**
 - Botons: 24 <button> (#1249) + 1 <Link> acció → .ap-btn variant. Verificat JA coherent: inputs (4 div.), badges (cyan=carbó, 0 blau), font-px 0, font-black 0, gradients 0, slate 0, KPIs .ap-kpi. Deute: 3 sistemes de tabs (unificar amb propietari), 21 botons funcionals, stash Codex V5.

@@ -745,7 +745,7 @@ export default function SafataClient({
             <MoveDropdown folders={folders} special={special} currentPath={active.path}
               onMove={target => doBulk('moveTo', target)} />
             <button type="button" onClick={() => doBulk('delete')} className="sf__action-btn sf__action-btn--ghost sf__action-btn--sm">🗑 Esborrar</button>
-            <button type="button" onClick={clearSelection} className="sf__action-btn sf__action-btn--ghost sf__action-btn--sm">✕</button>
+            <button type="button" onClick={clearSelection} aria-label="Esborrar selecció" className="sf__action-btn sf__action-btn--ghost sf__action-btn--sm">✕</button>
           </div>
         )}
 
