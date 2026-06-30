@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1267 — 2026-06-30 — claude (FET)
+**Erradicació: referrals + reengagement 100% canòniques (agents).**
+- referrals 185 rf__ + reengagement 152 lr__ → canònic (AdminPage/.ap-*/admin-tone/AdminEmptyState). 2 css ESBORRATS + imports trets. Deute 5722→5370 (−352).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1267`; el següent canvi real ha de ser `#1268`.
+- Validació tècnica: `tsc` 0; qa:canon-debt OK.
+- Validació funcional: referrals captura; reengagement tsc + 0 lr__.
+- Validació humana/UX: hipersemblants a reactivation.
+- Començat per: `claude+agents`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1266 — 2026-06-30 — claude (FET)
 **Erradicació: reactivation 100% canònica, css esborrat.**
 - ReactivationClient rc__ → AdminPage/.ap-*/admin-tone. reactivation.css (122 rc__) ESBORRAT + import tret. Deute 5844→5722 (−122). Baseline actualitzat.

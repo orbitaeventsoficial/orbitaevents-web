@@ -1,3 +1,25 @@
+## 2026-06-30 — Erradicació: referrals + reengagement 100% canòniques (Canvi #1267, claude+agents)
+
+### Context
+2a i 3a pàgines erradicades amb agents dedicats (rellançats amb nous tokens). Patró = reactivation.
+
+### Què s'ha fet
+- **referrals** (ReferralsClient.tsx): 185 `rf__` → canònic (AdminPage, .ap-kpi, AdminSection, .ap-card, .ap-btn, .ap-badge, AdminEmptyState). referrals.css ESBORRAT + import tret de page.tsx.
+- **reengagement** (LeadReengagementClient.tsx): 152 `lr__` → canònic (mateix patró). reengagement.css ESBORRAT + import tret.
+- Deute: 5722 → 5370 (−352). Baseline blindat. Verificat: referrals amb captura (header AdminPage + KPIs + empty, idèntic a reactivation); ambdues tsc 0, 0 xx__.
+- Simplificació conscient (decisió canònica): botons WhatsApp/Email perden tonalitat ad-hoc → .ap-btn net, com la pàgina germana reactivation.
+
+### Validació
+- Validació tècnica: `tsc` 0; `qa:canon-debt` OK (rf, lr desapareguts).
+- Validació funcional: referrals captura OK; reengagement tsc + 0 lr__.
+- Validació humana/UX: hipersemblants a reactivation.
+
+### Coordinació
+Counter → 1267. Agent docs (dmd__) encara treballant — es committejarà a part. Mètode escalable confirmat: 3 pàgines en 1 tanda.
+- Començat per: `claude+agents`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-30 — Erradicació: reactivation 100% canònica, css esborrat (Canvi #1266, claude)
 
 ### Context

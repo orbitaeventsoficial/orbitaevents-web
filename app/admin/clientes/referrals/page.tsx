@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { AdminPage } from '../../components/AdminPage';
 import { loadReferralsSummary } from '@/lib/services/referralsService';
 import ReferralsClient from './ReferralsClient';
-import './referrals.css';
 
 export const dynamic = 'force-dynamic';
 
