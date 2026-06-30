@@ -1,3 +1,41 @@
+## 2026-06-30 — Erradicació: presupuestos (llista + detall) 100% canònica (Canvi #1274, claude+agent)
+
+### Què s'ha fet
+- `page.tsx` + `ProposalsList.tsx` + `ProposalOwnerPanel.tsx` + `[id]/page.tsx`: ~137 `pr__` → canònic (AdminPage, .ap-kpi, .ap-table-*, .ap-card, .ap-badge admin-tone estat, .adm-input, .ap-alert, AdminEmptyState). presupuestos.css ESBORRAT + imports trets.
+- Desviació JUSTIFICADA: [id]/page.tsx i ProposalOwnerPanel compartien presupuestos.css → calia migrar-los per esborrar el css. PresupuestoPdfStudio (editor PDF complex) NO tocat (verificat git status intacte).
+- Verificat: captura header AdminPage + KPIs + taula + badges, idèntic al sistema. 0 pr__, tsc 0, canon 0.
+
+### Validació
+- Validació tècnica: `tsc` 0; `qa:canon-debt` OK; check-admin-canon 0; PdfStudio intacte.
+- Validació funcional: captura presupuestos canònica.
+- Validació humana/UX: hipersemblant.
+
+### Coordinació
+Counter → 1274. 9a pàgina. Agent inbox (sf) encara treballant. Tanda 3 quasi completa.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-30 — V5 reserves: el so Isma no s'afegeix a bolos sense pack de catàleg (Canvi #1274, codex)
+
+### Context
+La creació de reserva afegeix automàticament la línia de lloguer de so Isma quan el bolo porta pack de catàleg. Però els bolos personalitzats també resolen un pack tècnic intern de 0 €, i això podia fer que un bolo sense pack de catàleg rebés un cost de so automàtic indegut si Isma existeix a BD.
+
+### Què s'ha fet
+- `lib/services/bookingCreationService.ts`: separa `hasCatalogPack` del pack tècnic personalitzat i només aplica `appendSoundRentalLine()` quan el `packId` original és un pack real de catàleg.
+- `__tests__/lib/services/bookingCreationService.test.ts`: cobertura de bolo `__custom__` amb Isma existent que manté només les línies explícites i no afegeix so automàtic.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\bookingCreationService.test.ts` (44 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: un bolo personalitzat no rep cost automàtic de so pel simple fet de tenir pack tècnic intern.
+- Validació humana/UX: marge i cost de la nova reserva personalitzada no queden contaminats per una línia invisible de so.
+
+### Coordinació
+Counter → 1274. Renumerat de #1273 a #1274 perquè Claude ja havia tancat #1273 a clientes. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni canonització de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-30 — Erradicació: clientes (llista) 100% canònica, css esborrat (Canvi #1273, claude+agent)
 
 ### Què s'ha fet

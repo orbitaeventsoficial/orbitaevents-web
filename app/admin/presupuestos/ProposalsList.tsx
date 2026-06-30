@@ -9,6 +9,7 @@ import { getProposalStatusDisplay, PROPOSAL_FILTERABLE_STATUSES, formatDate, for
 import { fetchWithCsrf } from '@/lib/csrf';
 import { buildCustomerProposalHref, buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
+import { AdminEmptyState } from '@/app/admin/components/AdminPage';
 
 type ProposalItem = {
   id: string;
@@ -162,15 +163,15 @@ export default function ProposalsList({
   }
 
   return (
-    <section className="pr__list">
-      <div className="pr__statGrid">
+    <section className="grid gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <button
           onClick={() => setStatusFilter('')}
-          className="pr__stat"
+          className={`ap-kpi cursor-pointer text-left hover:border-[var(--line2)] ${!statusFilter ? 'ap-kpi--info' : ''}`}
           aria-pressed={!statusFilter}
         >
-          <span className="pr__statValue">{stats.total}</span>
-          <span className="pr__statLabel">Total</span>
+          <span className="ap-kpi-label">Total</span>
+          <span className="ap-kpi-value">{stats.total}</span>
         </button>
         {PROPOSAL_FILTERABLE_STATUSES.map((status) => {
           const cfg = getProposalStatusDisplay(status);
@@ -181,38 +182,35 @@ export default function ProposalsList({
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className="pr__stat"
+              className={`ap-kpi cursor-pointer text-left hover:border-[var(--line2)] ${isActive ? 'ap-kpi--info' : ''}`}
               aria-pressed={isActive}
             >
-              <span className="pr__statValue">{count}</span>
-              <span className="pr__statLabel">{cfg.label}s</span>
+              <span className="ap-kpi-label">{cfg.label}s</span>
+              <span className="ap-kpi-value">{count}</span>
             </button>
           );
         })}
       </div>
 
       {totalValue > 0 && (
-        <div className="pr__metric">
-          Valor acceptat: <strong>{formatCurrency(totalValue)}</strong>
+        <div className="ap-kpi ap-kpi--warning w-fit">
+          <span className="ap-kpi-label">Valor acceptat</span>
+          <span className="ap-kpi-value">{formatCurrency(totalValue)}</span>
         </div>
       )}
 
-      {actionMsg && (
-        <div className="pr__notice">
-          {actionMsg}
-        </div>
-      )}
+      {actionMsg && <div className="ap-alert">{actionMsg}</div>}
 
-      <div className="pr__toolbar">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <input
           type="search"
           placeholder="Cerca per client, referència..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="adm-input min-w-[200px] flex-1"
+          className="adm-input flex-1"
           aria-label="Cercar pressupostos"
         />
-        <div className="pr__actionRow">
+        <div className="flex flex-wrap items-center gap-2">
           {statusFilter && (
             <button
               onClick={() => setStatusFilter('')}
@@ -230,26 +228,27 @@ export default function ProposalsList({
         </div>
       </div>
 
-      <div className="pr__cards">
+      <div className="grid gap-3 lg:hidden">
         {filtered.length === 0 ? (
-          <p className="pr__empty">
-            {search || statusFilter ? 'Cap resultat amb aquests filtres' : 'Cap pressupost creat encara'}
-          </p>
+          <AdminEmptyState
+            icon="📄"
+            title={search || statusFilter ? 'Cap resultat amb aquests filtres' : 'Cap pressupost creat encara'}
+          />
         ) : (
           filtered.map((proposal) => (
             <article
               key={proposal.id}
-              className="ap-card pr__proposalCard adm-row-hover"
+              className="ap-card adm-row-hover grid gap-3 p-4"
             >
-              <div className="pr__proposalTop">
+              <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <Link
                     href={getProposalHref(proposal)}
-                    className="pr__ref hover:underline"
+                    className="font-bold text-[var(--t)] hover:underline"
                   >
                     {proposal.reference}
                   </Link>
-                  <p className="pr__muted truncate text-sm">
+                  <p className="truncate text-sm text-[var(--t3)]">
                     {proposal.customerId ? (
                       <Link href={buildCustomerHubHref(proposal.customerId)} className="hover:underline">
                         {proposal.customer?.name || 'Sense nom'}
@@ -262,12 +261,12 @@ export default function ProposalsList({
                 <StatusBadge status={proposal.status} />
               </div>
 
-              <div className="pr__statusLine">
-                <span className="pr__amount">{formatCurrency(proposal.total)}</span>
-                <span className="pr__muted">{relativeDate(proposal.createdAt)}</span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="[font-family:var(--display)] font-bold tabular-nums text-[var(--t)]">{formatCurrency(proposal.total)}</span>
+                <span className="text-[var(--t3)]">{relativeDate(proposal.createdAt)}</span>
               </div>
 
-              <div className="pr__rowActions">
+              <div className="flex flex-wrap items-center gap-2">
                 <Link
                   href={getProposalHref(proposal)}
                   className="ap-btn ap-btn--primary ap-btn--xs"
@@ -327,32 +326,32 @@ export default function ProposalsList({
         )}
       </div>
 
-      <div className="pr__tableShell">
-        <table className="pr__table" aria-label="Llistat de pressupostos">
-          <thead>
+      <div className="ap-table-wrap hidden lg:block">
+        <table className="ap-table" aria-label="Llistat de pressupostos">
+          <thead className="ap-table-head">
             <tr>
-              <th scope="col">Ref.</th>
-              <th scope="col">Client</th>
-              <th scope="col">Estat</th>
-              <th scope="col" className="pr__num">Import</th>
-              <th scope="col" className="pr__num">Data</th>
-              <th scope="col" className="pr__num">Accions</th>
+              <th scope="col" className="ap-table-th">Ref.</th>
+              <th scope="col" className="ap-table-th">Client</th>
+              <th scope="col" className="ap-table-th">Estat</th>
+              <th scope="col" className="ap-table-th"><div className="text-right">Import</div></th>
+              <th scope="col" className="ap-table-th"><div className="text-right">Data</div></th>
+              <th scope="col" className="ap-table-th"><div className="text-right">Accions</div></th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="ap-table-body">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={6} className="pr__empty">
+                <td colSpan={6} className="px-4 py-8 text-center text-[var(--t3)]">
                   {search || statusFilter ? 'Cap resultat amb aquests filtres' : 'Cap pressupost creat encara'}
                 </td>
               </tr>
             ) : (
               filtered.map((proposal) => (
-                <tr key={proposal.id} className="transition-colors adm-row-hover">
+                <tr key={proposal.id}>
                   <td>
                     <Link
                       href={getProposalHref(proposal)}
-                      className="pr__ref hover:underline"
+                      className="font-bold text-[var(--t)] hover:underline"
                     >
                       {proposal.reference}
                     </Link>
@@ -363,20 +362,24 @@ export default function ProposalsList({
                         {proposal.customer?.name || 'Sense nom'}
                       </Link>
                     ) : (
-                      <span className="pr__muted">Sense client assignat</span>
+                      <span className="text-[var(--t3)]">Sense client assignat</span>
                     )}
-                    <p className="pr__muted max-w-[200px] truncate text-xs">{proposal.customer?.email}</p>
+                    <p className="max-w-[200px] truncate text-xs text-[var(--t3)]">{proposal.customer?.email}</p>
                   </td>
                   <td>
                     <StatusBadge status={proposal.status} />
                   </td>
-                  <td className="pr__num pr__amount">
-                    {formatCurrency(proposal.total)}
+                  <td>
+                    <div className="text-right [font-family:var(--display)] font-bold tabular-nums text-[var(--t)]">
+                      {formatCurrency(proposal.total)}
+                    </div>
                   </td>
-                  <td className="pr__num pr__muted">
-                    {relativeDate(proposal.createdAt)}
+                  <td>
+                    <div className="text-right text-[var(--t3)]">
+                      {relativeDate(proposal.createdAt)}
+                    </div>
                   </td>
-                  <td className="pr__num">
+                  <td>
                     <div className="flex items-center justify-end gap-1">
                       <Link
                         href={getProposalHref(proposal)}
@@ -422,18 +425,21 @@ export default function ProposalsList({
       </div>
 
       {quotes.length > 0 && (
-        <details className="pr__legacy">
-          <summary>
+        <details className="ap-card ap-card-body">
+          <summary className="cursor-pointer font-bold text-[var(--t2)]">
             Pressupostos antics (LeadDocument) — {quotes.length}
           </summary>
-          <div className="pr__legacyList">
+          <div className="mt-3 grid gap-2">
             {quotes.map((quote) => (
-              <div key={quote.id} className="pr__legacyItem">
-                <div>
+              <div
+                key={quote.id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] p-3"
+              >
+                <div className="min-w-0">
                   <a href={quote.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium hover:underline">
                     {quote.title}
                   </a>
-                  <p className="pr__muted text-xs">
+                  <p className="text-xs text-[var(--t3)]">
                     {quote.lead?.name || 'Lead'} · {relativeDate(quote.createdAt)}
                   </p>
                 </div>

@@ -1,5 +1,5 @@
 {
-  "total": 4077,
+  "total": 4035,
   "perFile": {
     "app/admin/admin-shell.css": 98,
     "app/admin/admin-theme.css": 1,
@@ -38,7 +38,6 @@
     "app/admin/components/CommercialDocumentsHistory.tsx": 15,
     "app/admin/error.tsx": 12,
     "app/admin/inbox/inbox.css": 330,
-    "app/admin/inbox/SafataClient.tsx": 42,
     "app/admin/inbox/settings/ImapSettingsClient.tsx": 68,
     "app/admin/inbox/settings/page.tsx": 7,
     "app/admin/layout.tsx": 16,

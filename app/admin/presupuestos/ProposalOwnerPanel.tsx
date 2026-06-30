@@ -161,33 +161,33 @@ export default function ProposalOwnerPanel({
 
   return (
     <section
-      className="ap-card pr__proposalCard"
+      className="ap-card grid gap-3 p-4"
       aria-label="Re-assignar pressupost"
     >
-      <h3 className="pr__ref">Vincles del pressupost</h3>
-      <p className="pr__muted text-sm">
+      <h3 className="font-bold text-[var(--t)]">Vincles del pressupost</h3>
+      <p className="text-sm text-[var(--t3)]">
         Un pressupost pot estar lligat a un client, un lead i/o una reserva. Pots canviar qualsevol vincle aquí sense haver d’esborrar i recrear.
       </p>
-      <ul className="pr__legacyList">
+      <ul className="grid gap-2">
         {ownerRows.map((row) => (
           <li
             key={row.kind}
-            className="pr__legacyItem"
+            className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] p-3"
           >
-            <div className="text-sm">
-              <div className="pr__metaLabel">{row.label}</div>
+            <div className="min-w-0 text-sm">
+              <div className="font-mono text-xs font-bold uppercase tracking-[0.12em] text-[var(--t3)]">{row.label}</div>
               {row.currentId ? (
                 <>
                   <div className="font-semibold">{row.currentLabel || row.currentId}</div>
                   {row.currentSecondary && (
-                    <div className="pr__muted break-all text-xs">{row.currentSecondary}</div>
+                    <div className="break-all text-xs text-[var(--t3)]">{row.currentSecondary}</div>
                   )}
                 </>
               ) : (
-                <div className="pr__muted text-sm italic">Sense {row.label.toLowerCase()} assignat</div>
+                <div className="text-sm italic text-[var(--t3)]">Sense {row.label.toLowerCase()} assignat</div>
               )}
             </div>
-            <div className="pr__rowActions">
+            <div className="flex flex-wrap items-center gap-2">
               {row.href && (
                 <Link
                   href={row.href}
@@ -227,7 +227,7 @@ export default function ProposalOwnerPanel({
           onClick={() => setOpen(null)}
         >
           <div
-            className="w-full max-w-md ap-card pr__proposalCard"
+            className="w-full max-w-md ap-card p-4"
             onClick={(e) => e.stopPropagation()}
           >
             <h4 className="text-sm font-semibold">{config.title}</h4>
@@ -241,9 +241,9 @@ export default function ProposalOwnerPanel({
             />
             <div className="mt-3 max-h-64 overflow-y-auto">
               {loading ? (
-                <p className="pr__muted px-1 py-2 text-xs">Cercant…</p>
+                <p className="px-1 py-2 text-xs text-[var(--t3)]">Cercant…</p>
               ) : results.length === 0 ? (
-                <p className="pr__muted px-1 py-2 text-xs">{config.emptyHint}</p>
+                <p className="px-1 py-2 text-xs text-[var(--t3)]">{config.emptyHint}</p>
               ) : (
                 <ul className="space-y-1">
                   {results.map((r) => (
@@ -255,7 +255,7 @@ export default function ProposalOwnerPanel({
                         className="adm-row-hover w-full rounded-[var(--o-r-md)] px-3 py-2 text-left text-sm disabled:opacity-60"
                       >
                         <div className="font-medium">{r.primary}</div>
-                        {r.secondary && <div className="pr__muted text-xs">{r.secondary}</div>}
+                        {r.secondary && <div className="text-xs text-[var(--t3)]">{r.secondary}</div>}
                       </button>
                     </li>
                   ))}

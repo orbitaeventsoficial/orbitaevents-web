@@ -5,12 +5,12 @@ import { formatCurrency } from '@/lib/constants';
 import { ADMIN_PDF_STUDIO_DEFAULTS } from '@/lib/constants/admin';
 import ProposalsList from './ProposalsList';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
-import './presupuestos.css';
+import { AdminPage } from '../components/AdminPage';
 
 const PresupuestoPdfStudio = dynamicImport(() => import('./PresupuestoPdfStudio'), {
   ssr: false,
   loading: () => (
-    <section className="pr__loading">
+    <section className="ap-card ap-card-body text-[var(--o-text-sm)] text-[var(--t2)]">
       Carregant editor de pressupostos...
     </section>
   ),
@@ -234,61 +234,51 @@ export default async function PresupuestosPage({
 
 
     return (
-      <main className="pr__page">
-        <header className="pr__hero">
-          <div>
-            <p className="pr__eyebrow">Comercial · Pressupostos</p>
-            <h1 className="pr__title">Pressupostos</h1>
-            <p className="pr__subtitle">
-              Controla què s'ha ofert, què està pendent de seguiment i què ja hauria de convertir-se en reserva.
-            </p>
-          </div>
-          <div className="pr__heroActions">
+      <AdminPage
+        eyebrow="Comercial · Pressupostos"
+        title="Pressupostos"
+        subtitle="Controla què s'ha ofert, què està pendent de seguiment i què ja hauria de convertir-se en reserva."
+        actions={
           <Link
             href="/admin/presupuestos?customerId=new"
             className="ap-btn ap-btn--primary"
           >
             + Nou pressupost
           </Link>
-          </div>
-        </header>
+        }
+      >
         <ProposalsList
           proposals={serializedProposals}
           quotes={serializedQuotes}
           initialStatusFilter={statusFilter}
         />
-      </main>
+      </AdminPage>
     );
   }
 
   // EDITOR VIEW — show the PDF studio
   return (
-    <main className="pr__page">
-      <header className="pr__hero">
-        <div>
-          <Link href="/admin/presupuestos" className="ap-back">
-            ← Pressupostos
+    <AdminPage
+      back={{ href: '/admin/presupuestos', label: 'Pressupostos' }}
+      eyebrow="Comercial · Editor PDF"
+      title={proposalId ? 'Editar pressupost' : 'Nou pressupost'}
+      subtitle={
+        customer ? (
+          <span>
+            Client: <Link href={buildCustomerHubHref(customer.id)} className="hover:underline"><strong>{customer.name}</strong></Link> ({customer.email})
+          </span>
+        ) : (
+          'Selecciona un client per començar'
+        )
+      }
+      actions={
+        customer ? (
+          <Link href={buildCustomerHubHref(customer.id)} className="ap-btn ap-btn--secondary">
+            Fitxa client
           </Link>
-          <p className="pr__eyebrow">Comercial · Editor PDF</p>
-          <h1 className="pr__title">{proposalId ? 'Editar pressupost' : 'Nou pressupost'}</h1>
-          <p className="pr__subtitle">
-          {customer ? (
-            <span>
-              Client: <Link href={buildCustomerHubHref(customer.id)} className="hover:underline"><strong>{customer.name}</strong></Link> ({customer.email})
-            </span>
-          ) : (
-            'Selecciona un client per començar'
-          )}
-          </p>
-        </div>
-        <div className="pr__heroActions">
-          {customer && (
-            <Link href={buildCustomerHubHref(customer.id)} className="ap-btn ap-btn--secondary">
-              Fitxa client
-            </Link>
-          )}
-        </div>
-      </header>
+        ) : undefined
+      }
+    >
       <PresupuestoPdfStudio
         initialCustomerId={customer?.id || leadForEditor?.customer?.id || ''}
         initialCustomerName={customer?.name || leadForEditor?.customer?.name || leadForEditor?.name || ''}
@@ -308,6 +298,6 @@ export default async function PresupuestosPage({
         initialBrandTagline={String(brandSettings['quotes.brandTagline'] || 'El teu esdeveniment. El teu estil. La teva nit perfecta.')}
         initialBrandLogoDataUrl={String(brandSettings['quotes.logoDataUrl'] || '')}
       />
-    </main>
+    </AdminPage>
   );
 }

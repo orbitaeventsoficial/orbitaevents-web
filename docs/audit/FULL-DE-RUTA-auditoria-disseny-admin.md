@@ -83,7 +83,7 @@ context (ids/params) correcte? el que es veu aquí és el mateix que a Economia/
 | V2 | POST-EVENT | Event→Informe→Enquesta→Ressenya→Feedback | ✅ TANCADA #1239 (perímetre no-mail) |
 | V3 | COMUNICACIÓ | Lead→Email/Inbox→Seqüències→Timeline client | ✅ TANCADA #1220 |
 | V4 | CLIENT / RECURRÈNCIA | Lead→Client→Portal client (pagament/signatura)→Reactivació/Referrals | ✅ TANCADA #1231 |
-| V5 | CATÀLEG → PREU | Pack/Inventari→Cost→Preu recomanat→Pressupost (cablejat de preus) | 🔶 EN CURS #1272 |
+| V5 | CATÀLEG → PREU | Pack/Inventari→Cost→Preu recomanat→Pressupost (cablejat de preus) | 🔶 EN CURS #1274 |
 
 ### 🔬 V3 — VERTICAL DE COMUNICACIÓ (1a passada) · Lead→Inbox/Email→Seqüències→Timeline
 Dades reals: 53 leadActivity, 6 emailSend.
@@ -129,6 +129,7 @@ Dades reals: 53 leadActivity, 6 emailSend.
 - 🔶 **V5-#12 · El preu pactat manual de reserva podia ser negatiu — RESOLT #1259** — el PATCH de reserva exigeix `totalPrice` positiu i `updateBookingDetail()` ignora imports manuals no positius abans de recalcular subtotal/IVA/total.
 - 🔶 **V5-#13 · Callers interns podien persistir cobraments negatius — RESOLT #1260** — `updateBookingDetail()` retira del patch imports negatius/no finits de `depositAmount`, `remainingAmount`, `cashAmount` i `discount`, preservant només `cashAmount: null` com a neteja explícita.
 - 🔶 **V5-#14 · Descompte superior al subtotal generava totals negatius — RESOLT #1272** — `bookingCreationService` i `useBookingPricing` clampen la base post-descompte a 0 quan no hi ha total manual, de manera que total, IVA, paga i senyal i pendent no baixen de zero.
+- 🔶 **V5-#15 · So Isma s'afegia a bolos sense pack de catàleg — RESOLT #1274** — `bookingCreationService` només afegeix la línia automàtica de so quan el `packId` original és un pack real de catàleg, no el pack tècnic `__custom__`.
 
 ### FASE 2 — AUDITORIES HORITZONTALS (disseny pàgina a pàgina) · «que tot sigui IMPECABLE»
 Quan les verticals estiguin verdes: les 92 pàgines + 6 PDFs + 13 emails + components, amb

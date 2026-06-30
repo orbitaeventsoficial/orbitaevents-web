@@ -1550,6 +1550,30 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1274 — 2026-06-30 — claude (FET)
+**Erradicació: presupuestos (llista + detall) 100% canònica.**
+- page+ProposalsList+ProposalOwnerPanel+[id]/page 137 pr__ → AdminPage/.ap-kpi/.ap-table-*/.ap-card/.ap-badge/.adm-input/AdminEmptyState. presupuestos.css ESBORRAT + imports trets. PdfStudio NO tocat.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1274`; el següent canvi real ha de ser `#1275`.
+- Validació tècnica: `tsc` 0; qa:canon-debt OK; canon 0.
+- Validació funcional: captura presupuestos canònica.
+- Validació humana/UX: hipersemblant.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1274 — 2026-06-30 — codex (FET)
+**V5 reserves: el so Isma no s'afegeix a bolos sense pack de catàleg.**
+- `lib/services/bookingCreationService.ts`: separa `hasCatalogPack` del pack tècnic personalitzat i només aplica `appendSoundRentalLine()` quan el `packId` original és un pack real de catàleg.
+- `__tests__/lib/services/bookingCreationService.test.ts`: cobertura de bolo `__custom__` amb Isma existent que manté només les línies explícites i no afegeix so automàtic.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\bookingCreationService.test.ts` (44 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: un bolo personalitzat no rep cost automàtic de so pel simple fet de tenir pack tècnic intern.
+- Validació humana/UX: marge i cost de la nova reserva personalitzada no queden contaminats per una línia invisible de so.
+- Renumerat de `#1273` a `#1274` perquè Claude ja havia tancat `#1273` a clientes.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1274`; el següent canvi real ha de ser `#1275`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1273 — 2026-06-30 — claude (FET)
 **Erradicació: clientes (llista) 100% canònica, css esborrat.**
 - clientes page+CustomersPageSections+ClientesModals 181 cl__ → AdminPage/AdminKpi/.adm-input/.ap-btn/.ap-table-*/.ap-card/.ap-badge/AdminEmptyState. clientes.css ESBORRAT + import tret. NO tocat [id]/ch__.
