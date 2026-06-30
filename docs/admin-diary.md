@@ -1,3 +1,47 @@
+## 2026-07-01 — Fitxa de lead: botons/inputs → canònic (genèrics migrats) (Canvi #1296, claude)
+
+### Context
+La fitxa de lead és la REFERÈNCIA «TANCAT CHARLIE» del propietari. Decisió: migrar (opció 1). Troballa executant: la fitxa té DOS components de disseny ÚNICS (header «ledger» de la fitxa + calendari de temporada fx__) que NO tenen equivalent .ap-* genèric — són l'ORIGEN del canon. Els ELEMENTS genèrics (botons/inputs) SÍ es migren sense risc.
+
+### Què s'ha fet (part segura, verificada)
+- LeadDetailClient + LeadBoloSection + LeadsSeasonClient + LeadLostStatusPrompt: `fxd__btn`/`savebtn`/`cancelbtn`/`editinput` (+ variants) → `.ap-btn`/`--primary`/`--xs` + `.adm-input`. Botons i inputs de tota la zona leads ara canònics.
+- VERIFICAT amb captura ABANS/DESPRÉS: la fitxa de lead segueix EXACTAMENT igual de bé (header, dades, KPIs, històric idèntics). Els genèrics migrats no canvien res visual.
+- Deute 1233 → 1194 (−39).
+
+### PENDENT DE DECISIÓ (propietari): estructures de disseny
+- `fxd__hd/fact/kpi/zenith/profitpill/panel` (header ledger de la fitxa, referència) + `fx__day/cell/dot/metric` (calendari de temporada): són COMPONENTS DE DISSENY ÚNICS, no deute migrable. Ja consumeixen tokens (miren Studio). Recomanació: declarar-los CANÒNICS-ACCEPTATS (la referència ÉS el canon-origen), no migrar a genèric (els empitjoraria).
+
+### Validació
+- Validació tècnica: `tsc` 0; `qa:canon-debt` OK (deute baixa).
+- Validació funcional: captura ABANS/DESPRÉS idèntica.
+- Validació humana/UX: referència preservada exacta.
+
+### Coordinació
+Counter → 1296. Botons/inputs de leads fets. Estructures de disseny (ledger + calendari) esperen decisió.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-01 — V5 salut/finances: comptadors autofix sanejats (Canvi #1295, codex)
+
+### Context
+`financeAlertsService` i `adminHealthService` llegien `alerts.finance.autofixFailureCount` i `alerts.system.autofixFailureCount` amb `Number(...) || 0`. Valors negatius, decimals o no numèrics podien restar o deformar alertes.
+
+### Què s'ha fet
+- `lib/services/financeAlertsService.ts` i `lib/services/adminHealthService.ts`: normalitzen comptadors autofix com enters no negatius.
+- `__tests__/lib/services/financeAlertsService.test.ts` i `__tests__/lib/services/adminHealthService.test.ts`: cobertura de valors decimals, negatius i no numèrics.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\financeAlertsService.test.ts` (5 tests OK), `pnpm test:run -- --run __tests__\lib\services\adminHealthService.test.ts` (5 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK, `git diff --check` OK i `pnpm run validate:core` OK.
+- Validació funcional: salut i finances ja no poden mostrar incidències autofix negatives, decimals o no finites des de settings.
+- Validació humana/UX: el recompte d'alertes queda estable i llegible encara que una automatització deixi un valor brut.
+
+### Coordinació
+Counter → 1295. No toca mails automàtics, APPEND, seqüències, inventari/preus, costEngine, tasks, booking detail/bd ni fitxa lead/fxd.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-01 — Erradicació: booking-detall (bd) 100% canònic (Canvi #1294, claude+agent)
 
 ### Què s'ha fet

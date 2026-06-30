@@ -1550,6 +1550,18 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1295 — 2026-07-01 — codex (FET)
+**V5 salut/finances: comptadors autofix sanejats.**
+- `lib/services/financeAlertsService.ts` i `lib/services/adminHealthService.ts`: normalitzen `alerts.finance.autofixFailureCount` i `alerts.system.autofixFailureCount` com enters no negatius.
+- `__tests__/lib/services/financeAlertsService.test.ts` i `__tests__/lib/services/adminHealthService.test.ts`: cobertura de decimals, negatius i valors no numèrics.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\financeAlertsService.test.ts` (5 tests OK), `pnpm test:run -- --run __tests__\lib\services\adminHealthService.test.ts` (5 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK, `git diff --check` OK i `pnpm run validate:core` OK.
+- Validació funcional: els comptadors autofix de salut/finances ja no poden restar ni inflar alertes amb valors bruts de settings.
+- Validació humana/UX: les alertes queden amb recompte enter i coherent.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1295`; el següent canvi real ha de ser `#1296`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1293 — 2026-07-01 — codex (FET)
 **V5 paginació admin: invoices i proposals amb enters finits.**
 - `lib/services/proposalAdminService.ts` i `lib/services/invoiceAdminService.ts`: normalitzen `page` i `limit` com enters positius finits, amb `limit` capat a 200.
@@ -1605,6 +1617,17 @@ Seqüència obligatòria de registre:
 - Validació funcional: captura booking-detall canònica.
 - Validació humana/UX: hipersemblant.
 - Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1296 — 2026-07-01 — claude (FET)
+**Fitxa de lead: botons/inputs → canònic (genèrics migrats).**
+- LeadDetailClient/LeadBoloSection/LeadsSeasonClient/LeadLostStatusPrompt: fxd__btn/savebtn/cancelbtn/editinput → .ap-btn/.adm-input. Verificat captura ABANS/DESPRÉS idèntica. Deute 1233→1194. Estructures de disseny (header ledger + calendari fx__) PENDENT decisió: recomano canònic-acceptat (referència = canon-origen).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1296`; el següent canvi real ha de ser `#1297`.
+- Validació tècnica: `tsc` 0; qa:canon-debt OK.
+- Validació funcional: captura ABANS/DESPRÉS idèntica.
+- Validació humana/UX: referència preservada.
+- Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
 

@@ -313,7 +313,7 @@ function BookingInlineActions({ lead }: { lead: LeadData }) {
         <span>{pay ? PAY_LABEL[pay] : 'Reserva vinculada'}</span>
       </div>
       <div className="fxd__actions">
-        <Link href={buildBookingHref(booking.id)} className="fxd__btn fxd__btn--ghost">Obrir reserva</Link>
+        <Link href={buildBookingHref(booking.id)} className="ap-btn--xs">Obrir reserva</Link>
       </div>
     </section>
   );
@@ -375,22 +375,22 @@ function LeadDetailPanel({
             <p className="fxd__summary">{leadSummary(lead)}</p>
             <div className="fxd__actions">
               {lead.stage === 'guanyat' && !lead.booking && (
-                <Link href={`/admin/bookings/new?leadId=${encodeURIComponent(lead.id)}`} className="fxd__btn fxd__btn--primary">
+                <Link href={`/admin/bookings/new?leadId=${encodeURIComponent(lead.id)}`} className="ap-btn--primary">
                   Crear reserva
                 </Link>
               )}
               {lead.booking && (
-                <Link href={buildBookingHref(lead.booking.id)} className="fxd__btn fxd__btn--primary">
+                <Link href={buildBookingHref(lead.booking.id)} className="ap-btn--primary">
                   Veure reserva
                 </Link>
               )}
               {nextStage && editable && (
-                <button type="button" className="fxd__btn fxd__btn--primary" disabled={pending} onClick={() => onMoveLead(lead.id, nextStage)}>
+                <button type="button" className="ap-btn--primary" disabled={pending} onClick={() => onMoveLead(lead.id, nextStage)}>
                   {pending ? 'Guardant...' : `Passar a ${STAGE_LABEL[nextStage]}`}
                 </button>
               )}
               {lead.stage !== 'perdut' && editable && (
-                <button type="button" className="fxd__btn" disabled={pending} onClick={() => onMoveLead(lead.id, 'perdut')}>
+                <button type="button" className="ap-btn" disabled={pending} onClick={() => onMoveLead(lead.id, 'perdut')}>
                   Marcar perdut
                 </button>
               )}
@@ -428,15 +428,15 @@ function LeadDetailPanel({
               {(() => {
                 const waHref = buildLeadWhatsAppHref(lead.phone, lead.name);
                 return waHref ? (
-                  <a href={waHref} target="_blank" rel="noopener noreferrer" className="fxd__btn fxd__btn--whatsapp">
+                  <a href={waHref} target="_blank" rel="noopener noreferrer" className="ap-btn">
                     <span>{I.phone}</span>WhatsApp
                   </a>
                 ) : (
-                  <button type="button" className="fxd__btn" disabled><span>{I.phone}</span>Sense telèfon</button>
+                  <button type="button" className="ap-btn" disabled><span>{I.phone}</span>Sense telèfon</button>
                 );
               })()}
               {lead.kind === 'lead' && (
-                <Link href={buildLeadComposeHref(lead.id, 'seguiment')} className="fxd__btn fxd__btn--mail">
+                <Link href={buildLeadComposeHref(lead.id, 'seguiment')} className="ap-btn">
                   <span>{I.mail}</span>Correu
                 </Link>
               )}
