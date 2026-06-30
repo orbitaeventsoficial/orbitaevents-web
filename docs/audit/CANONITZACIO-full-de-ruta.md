@@ -92,7 +92,7 @@ Per cada element propi `xx__` trobat:
 - [ ] bookings/[id] (`bd__`/`nb__`) → canònic
 - [ ] dossiers (`dg__`) → canònic
 - [ ] inbox (`sf__`/`cx__`) → canònic
-- [ ] referrals / reactivation / reengagement → canònic
+- [x] **reactivation** → 100% canònic, css esborrat (#1266, −122 deute) · [ ] referrals / reengagement (en curs agents)
 - [ ] intake (`ni__`) → canònic
 - [ ] docs view (`dmd__`) → canònic
 - [x] **Guard ratchet `qa:canon-debt`** (#1265): baseline 5892, bloqueja regressions, força deute→0. Integrat a validate:core.

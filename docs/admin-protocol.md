@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1266 — 2026-06-30 — claude (FET)
+**Erradicació: reactivation 100% canònica, css esborrat.**
+- ReactivationClient rc__ → AdminPage/.ap-*/admin-tone. reactivation.css (122 rc__) ESBORRAT + import tret. Deute 5844→5722 (−122). Baseline actualitzat.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1266`; el següent canvi real ha de ser `#1267`.
+- Validació tècnica: `tsc` 0; qa:canon-debt OK.
+- Validació funcional: captura header canònic + KPIs + empty.
+- Validació humana/UX: hipersemblant a la resta.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1265 — 2026-06-30 — claude (FET)
 **MECANISME d'erradicació: guard ratchet qa:canon-debt + botó outline visible.**
 - `scripts/check-canon-debt.mjs` + qa:canon-debt a validate:core: baseline 5892 usos xx__, FALLA si puja → força deute→0, bloqueja codi propi nou. Botó primari outline visible + 15 botons amb .ap-btn base afegida.

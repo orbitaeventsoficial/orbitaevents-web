@@ -1,5 +1,5 @@
 {
-  "total": 5892,
+  "total": 5722,
   "perFile": {
     "app/admin/admin-shell.css": 98,
     "app/admin/admin-theme.css": 1,
@@ -24,8 +24,6 @@
     "app/admin/clientes/ClientesModals.tsx": 3,
     "app/admin/clientes/CustomersPageSections.tsx": 69,
     "app/admin/clientes/page.tsx": 11,
-    "app/admin/clientes/reactivation/reactivation.css": 69,
-    "app/admin/clientes/reactivation/ReactivationClient.tsx": 53,
     "app/admin/clientes/referrals/referrals.css": 99,
     "app/admin/clientes/referrals/ReferralsClient.tsx": 86,
     "app/admin/clientes/[id]/customer-hub.css": 500,
@@ -43,7 +41,6 @@
     "app/admin/clientes/[id]/_components/panels/SummaryPanel.tsx": 15,
     "app/admin/clientes/[id]/_components/panels/TasksNotesPanel.tsx": 20,
     "app/admin/clientes/[id]/_components/TimelinePanel.tsx": 18,
-    "app/admin/cockpit/cockpit.css": 48,
     "app/admin/components/CommercialDocumentsHistory.tsx": 15,
     "app/admin/docs/docs-view.css": 34,
     "app/admin/docs/esquema/loading.tsx": 8,

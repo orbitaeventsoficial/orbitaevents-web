@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { AdminPage } from '../../components/AdminPage';
 import { loadReactivationCandidates } from '@/lib/services/reactivationService';
 import ReactivationClient from './ReactivationClient';
-import './reactivation.css';
 
 export const dynamic = 'force-dynamic';
 

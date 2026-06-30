@@ -1,3 +1,25 @@
+## 2026-06-30 — Erradicació: reactivation 100% canònica, css esborrat (Canvi #1266, claude)
+
+### Context
+Primera pàgina ERRADICADA de soca-rel amb el mecanisme nou. Iniciat per agent dedicat (TSX migrat a AdminPage+canònic), acabat per claude (agent aturat per límit sessió): esborrat reactivation.css (codi mort) + tret l'import de page.tsx.
+
+### Què s'ha fet
+- `ReactivationClient.tsx`: tots els `rc__` → canònic (AdminPage, .ap-card, .ap-btn, admin-tone, AdminEmptyState). 0 rc__ al TSX.
+- `reactivation.css` (122 usos rc__): ESBORRAT. Import tret de page.tsx.
+- Deute: 5844 → 5722 (−122). Baseline actualitzat (trinquet: no pot tornar a pujar).
+- Verificat amb captura: header AdminPage canònic + KPIs + empty state, idèntic a la resta.
+
+### Validació
+- Validació tècnica: `tsc` 0; `qa:canon-debt` OK (prefix rc desaparegut).
+- Validació funcional: pàgina carrega i es veu canònica (captura).
+- Validació humana/UX: hipersemblant a la resta de l'admin.
+
+### Coordinació
+Counter → 1266. Agents rellançats per referrals/reengagement (nous tokens). Mètode validat: funciona.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-30 — MECANISME d'erradicació: guard ratchet qa:canon-debt + botó outline visible (Canvi #1265, claude)
 
 ### Context

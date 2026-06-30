@@ -5,13 +5,20 @@ import Link from 'next/link';
 import type { ReactivationCandidate, ReactivationPriority } from '@/lib/services/reactivationService';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import { formatCurrency } from '@/lib/constants';
+import { AdminEmptyState } from '../../components/AdminPage';
 
 type Props = { initialCandidates: ReactivationCandidate[] };
 
-const PRIORITY_TONE: Record<ReactivationPriority, string> = {
-  ALTA: 'rc__tone rc__tone--high',
-  MITJANA: 'rc__tone rc__tone--medium',
-  BAIXA: 'rc__tone rc__tone--low',
+const KPI_TONE: Record<ReactivationPriority, string> = {
+  ALTA: 'ap-kpi--danger',
+  MITJANA: 'ap-kpi--warning',
+  BAIXA: 'ap-kpi--info',
+};
+
+const BADGE_TONE: Record<ReactivationPriority, string> = {
+  ALTA: 'ap-badge ap-badge--danger',
+  MITJANA: 'ap-badge ap-badge--warning',
+  BAIXA: 'ap-badge',
 };
 
 const CHANNEL_ICON: Record<string, string> = {
@@ -67,78 +74,75 @@ export default function ReactivationClient({ initialCandidates }: Props) {
   }
 
   return (
-    <div className="rc">
-      {/* KPIs */}
-      <div className="rc__stats">
+    <>
+      {/* KPIs / filtres */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <button
           type="button"
           onClick={() => setFilter('ALL')}
-          className={`rc__stat ${filter === 'ALL' ? 'rc__stat--active' : ''}`}
+          aria-pressed={filter === 'ALL'}
+          className={`ap-kpi cursor-pointer text-left hover:border-[var(--line2)] ${filter === 'ALL' ? 'ap-kpi--info' : ''}`}
         >
-          <p className="rc__stat-label">Total</p>
-          <p className="rc__stat-value">{stats.total}</p>
+          <span className="ap-kpi-label">Total</span>
+          <span className="ap-kpi-value">{stats.total}</span>
         </button>
         {(['ALTA', 'MITJANA', 'BAIXA'] as const).map((p) => (
           <button
             key={p}
             type="button"
             onClick={() => setFilter(filter === p ? 'ALL' : p)}
-            className={`rc__stat ${filter === p ? PRIORITY_TONE[p] : ''}`}
+            aria-pressed={filter === p}
+            className={`ap-kpi cursor-pointer text-left hover:border-[var(--line2)] ${filter === p ? KPI_TONE[p] : ''}`}
           >
-            <p className="rc__stat-label">Prioritat {p}</p>
-            <p className="rc__stat-value">{stats[p]}</p>
+            <span className="ap-kpi-label">Prioritat {p}</span>
+            <span className="ap-kpi-value">{stats[p]}</span>
           </button>
         ))}
       </div>
 
       {visible.length === 0 ? (
-        <div className="ap-card rc__empty">
-          <p className="rc__empty-icon">✨</p>
-          <p className="rc__empty-title">
-            {initialCandidates.length === 0
+        <AdminEmptyState
+          icon="✨"
+          title={
+            initialCandidates.length === 0
               ? 'Cap client a reactivar ara mateix'
-              : 'Tots els candidats visibles estan filtrats o descartats'}
-          </p>
-          <p className="rc__empty-copy">
-            {initialCandidates.length === 0
+              : 'Tots els candidats visibles estan filtrats o descartats'
+          }
+          description={
+            initialCandidates.length === 0
               ? 'Els clients apareixen aquí quan estan dormants, en risc de pèrdua o amb health score baix.'
-              : 'Ajusta el filtre per tornar a veure candidats.'}
-          </p>
-        </div>
+              : 'Ajusta el filtre per tornar a veure candidats.'
+          }
+        />
       ) : (
-        <div className="rc__list">
+        <div className="grid gap-3">
           {visible.map((c) => (
-            <article
-              key={c.customerId}
-              className="ap-card rc__candidate"
-            >
-              <div className="rc__candidate-head">
-                <div className="rc__candidate-main">
-                  <div className="rc__meta">
-                    <span className={PRIORITY_TONE[c.priority]}>
-                      {c.priority}
-                    </span>
+            <article key={c.customerId} className="ap-card">
+              <div className="ap-card-body flex flex-wrap items-start justify-between gap-4">
+                <div className="min-w-0 flex-1 basis-72">
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--t3)]">
+                    <span className={BADGE_TONE[c.priority]}>{c.priority}</span>
                     <span>{c.reasonLabel}</span>
-                    <span className="rc__dot">·</span>
+                    <span className="text-[var(--line2)]">·</span>
                     <span>Score {c.score}</span>
                   </div>
-                  <div className="rc__identity">
+                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--t2)]">
                     <Link
                       href={buildCustomerHubHref(c.customerId)}
-                      className="rc__name"
+                      className="text-sm font-bold text-[var(--t)] transition-colors hover:text-[var(--gold-bright)]"
                     >
                       {c.name}
                     </Link>
-                    <span className="rc__dot">·</span>
+                    <span className="text-[var(--line2)]">·</span>
                     <span>{c.email}</span>
                     {c.phone && (
                       <>
-                        <span className="rc__dot">·</span>
+                        <span className="text-[var(--line2)]">·</span>
                         <span>{c.phone}</span>
                       </>
                     )}
                   </div>
-                  <div className="rc__facts">
+                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--t3)]">
                     <span>{c.totalEvents} event{c.totalEvents === 1 ? '' : 's'}</span>
                     <span>·</span>
                     <span>{formatCurrency(c.totalSpent)}</span>
@@ -158,65 +162,62 @@ export default function ReactivationClient({ initialCandidates }: Props) {
                     )}
                   </div>
                 </div>
-                <div className="rc__channels">
-                  <div className="rc__channel-list">
+                <div className="flex shrink-0 flex-col items-start gap-1 text-xs text-[var(--t3)] sm:items-end">
+                  <div className="flex flex-wrap items-center gap-1">
                     {c.suggestedChannels.map((ch) => (
                       <span key={ch} title={ch}>
                         {CHANNEL_ICON[ch] || ch}
                       </span>
                     ))}
                   </div>
-                  <span className="rc__locale">{c.preferredLocale.toUpperCase()}</span>
+                  <span>{c.preferredLocale.toUpperCase()}</span>
                 </div>
               </div>
 
-              <details className="rc__message">
-                <summary className="rc__message-summary">
-                  <span className="rc__message-closed">▶ Veure missatge suggerit</span>
-                  <span className="rc__message-open">▼ Amagar missatge</span>
+              <details className="group ap-card-body pt-0">
+                <summary className="cursor-pointer list-none text-xs font-bold text-[var(--t3)] transition-colors hover:text-[var(--t)] [&::-webkit-details-marker]:hidden">
+                  <span className="group-open:hidden">▶ Veure missatge suggerit</span>
+                  <span className="hidden group-open:inline">▼ Amagar missatge</span>
                 </summary>
-                <div className="rc__message-box">
-                  <p className="rc__message-label">Assumpte</p>
-                  <p className="rc__message-text">{c.suggestedSubject}</p>
-                  <p className="rc__message-label rc__message-label--spaced">Missatge</p>
-                  <pre className="rc__message-pre">{c.suggestedMessage}</pre>
+                <div className="mt-2 rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)] p-3">
+                  <p className="font-mono text-xs font-bold uppercase tracking-[0.12em] text-[var(--t3)]">Assumpte</p>
+                  <p className="mt-0.5 text-xs text-[var(--t)]">{c.suggestedSubject}</p>
+                  <p className="mt-2 font-mono text-xs font-bold uppercase tracking-[0.12em] text-[var(--t3)]">Missatge</p>
+                  <pre className="mt-0.5 whitespace-pre-wrap font-[inherit] text-xs text-[var(--t)]">{c.suggestedMessage}</pre>
                 </div>
               </details>
 
-              <div className="rc__actions">
+              <div className="ap-card-body flex flex-wrap items-center gap-2 pt-0">
                 {c.whatsappUrl && (
                   <a
                     href={c.whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rc__action rc__action--success"
+                    className="ap-btn ap-btn--xs flex-1 sm:flex-none"
                   >
                     💬 WhatsApp
                   </a>
                 )}
-                <a
-                  href={c.mailtoUrl}
-                  className="rc__action rc__action--info"
-                >
+                <a href={c.mailtoUrl} className="ap-btn ap-btn--xs flex-1 sm:flex-none">
                   ✉️ Email
                 </a>
                 <button
                   type="button"
                   onClick={() => handleCopyMessage(c)}
-                  className="rc__action rc__action--ghost"
+                  className="ap-btn ap-btn--xs flex-1 sm:flex-none"
                 >
                   {copied === c.customerId ? '✓ Copiat' : 'Copiar missatge'}
                 </button>
                 <Link
                   href={buildCustomerHubHref(c.customerId)}
-                  className="rc__action rc__action--ghost"
+                  className="ap-btn ap-btn--xs flex-1 sm:flex-none"
                 >
                   Veure fitxa →
                 </Link>
                 <button
                   type="button"
                   onClick={() => handleDismiss(c.customerId)}
-                  className="rc__action rc__action--dismiss"
+                  className="ap-btn ap-btn--xs flex-1 sm:flex-none sm:ml-auto"
                 >
                   Descartar
                 </button>
@@ -225,6 +226,6 @@ export default function ReactivationClient({ initialCandidates }: Props) {
           ))}
         </div>
       )}
-    </div>
+    </>
   );
 }
