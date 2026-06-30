@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1268 — 2026-06-30 — claude (FET)
+**Erradicació: docs view (4 pàgines) 100% canòniques.**
+- MarkdownView + 3 page + 3 loading: 75 dmd__ → Tailwind/tokens/.ap-card/AdminEmptyState. docs-view.css ESBORRAT + 6 imports trets. 0 dmd__ a tot el repo.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1268`; el següent canvi real ha de ser `#1269`.
+- Validació tècnica: `tsc` 0; grep dmd__/docs-view 0.
+- Validació funcional: codi net (error dev = cache .next, cal reinici).
+- Validació humana/UX: pendent recaptura post-reinici.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1267 — 2026-06-30 — claude (FET)
 **Erradicació: referrals + reengagement 100% canòniques (agents).**
 - referrals 185 rf__ + reengagement 152 lr__ → canònic (AdminPage/.ap-*/admin-tone/AdminEmptyState). 2 css ESBORRATS + imports trets. Deute 5722→5370 (−352).

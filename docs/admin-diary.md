@@ -1,3 +1,26 @@
+## 2026-06-30 — Erradicació: docs view (4 pàgines) 100% canòniques (Canvi #1268, claude+agent)
+
+### Context
+4a tanda d'erradicació amb agent. Pàgines docs internes (organisme, full-de-ruta, esquema, protocol) + MarkdownView compartit.
+
+### Què s'ha fet
+- `MarkdownView.tsx`: classes `dmd__` (h1-h4, p, list, code, pre, table, quote) → utilitats Tailwind amb tokens (text via `text-[length:var(--o-text-*)]`, superfícies `--ax-*`, or `--ax-gold`, radis `--o-r-*`). 0 px literals.
+- 3 `page.tsx`: `dmd__doc` → `.ap-card`; `dmd__empty` → `AdminEmptyState`.
+- 3 `loading.tsx`: skeletons `dmd__skel` → Tailwind amb tokens + motion-safe.
+- `docs-view.css` (75 dmd__): ESBORRAT. 6 imports trets (3 page + 3 loading).
+- check-admin-canon → 0 troballes. Deute baixat (docs erradicat).
+
+### Validació
+- Validació tècnica: `tsc` 0; `grep dmd__` → 0 a tot el repo; `grep docs-view` → 0 al codi font.
+- Validació funcional: NOTA — el dev mostrava error "module not found docs-view.css" per CACHE .next vella (codi font net confirmat); cal reinici dev net per refrescar.
+- Validació humana/UX: pendent recaptura després de reinici dev.
+
+### Coordinació
+Counter → 1268. 4 pàgines erradicades en total (reactivation/referrals/reengagement/docs). Reinici dev pendent per netejar cache .next.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-30 — Erradicació: referrals + reengagement 100% canòniques (Canvi #1267, claude+agents)
 
 ### Context

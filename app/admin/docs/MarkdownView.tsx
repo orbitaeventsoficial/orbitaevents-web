@@ -8,6 +8,29 @@ import { Fragment, type ReactNode } from 'react';
  * Contingut sempre propi (docs/), per això es renderitza com a React (no HTML cru).
  */
 
+// Tipografia i superfícies 100% de token (canon admin). Sense classes pròpies.
+const CODE_CLS =
+  'font-[family-name:var(--mono)] text-[0.85em] bg-[var(--ax-raised)] border border-[var(--ax-line)] rounded-[var(--o-r-sm)] px-1.5 py-0.5 text-[var(--ax-gold-bright,var(--ax-gold))]';
+const PRE_CLS =
+  'bg-[var(--ax-raised)] border border-[var(--ax-line)] rounded-[var(--o-r-md)] p-4 overflow-x-auto mb-4 font-[family-name:var(--mono)] text-[length:var(--o-text-xs)] leading-relaxed text-[var(--ax-t2)] [&_code]:bg-transparent [&_code]:border-0 [&_code]:p-0 [&_code]:text-inherit';
+const HR_CLS = 'border-0 border-t border-[var(--ax-line)] my-7';
+const QUOTE_CLS =
+  'border-l-2 border-[var(--ax-gold)] bg-[var(--ax-raised)] px-4 py-3 mb-4 text-[var(--ax-t3)] italic';
+const TABLEWRAP_CLS = 'overflow-x-auto mb-5 border border-[var(--ax-line)] rounded-[var(--o-r-md)]';
+const TABLE_CLS =
+  'w-full border-collapse text-[length:var(--o-text-xs)] min-w-[32rem] [&_tr:last-child_td]:border-b-0';
+const TH_CLS =
+  'text-left px-3 py-2 border-b border-[var(--ax-line)] align-top text-[var(--ax-gold)] font-semibold whitespace-nowrap bg-[var(--ax-raised)]';
+const TD_CLS = 'text-left px-3 py-2 border-b border-[var(--ax-line)] align-top text-[var(--ax-t2)]';
+const P_CLS = 'mb-3.5';
+const LIST_CLS = 'mb-4 pl-5 [&_li]:mb-1.5';
+const HEAD_CLS: Record<number, string> = {
+  1: 'text-[length:var(--o-text-2xl)] font-bold leading-tight text-[var(--ax-t)] mb-4',
+  2: 'mt-8 mb-3 pt-5 border-t border-[var(--ax-line)] text-[length:var(--o-text-xl)] font-bold leading-tight text-[var(--ax-t)]',
+  3: 'mt-6 mb-2 text-[length:var(--o-text-lg)] font-bold leading-snug text-[var(--ax-gold)]',
+  4: 'mt-4 mb-2 text-[length:var(--o-text-base)] font-bold leading-snug text-[var(--ax-t)]',
+};
+
 function renderInline(text: string, keyBase: string): ReactNode[] {
   const nodes: ReactNode[] = [];
   const regex = /(`[^`]+`|\*\*[^*]+\*\*)/g;
@@ -18,7 +41,7 @@ function renderInline(text: string, keyBase: string): ReactNode[] {
     if (match.index > last) nodes.push(text.slice(last, match.index));
     const token = match[0];
     if (token.startsWith('`')) {
-      nodes.push(<code key={`${keyBase}-c${i}`} className="dmd__code">{token.slice(1, -1)}</code>);
+      nodes.push(<code key={`${keyBase}-c${i}`} className={CODE_CLS}>{token.slice(1, -1)}</code>);
     } else {
       nodes.push(<strong key={`${keyBase}-b${i}`}>{token.slice(2, -2)}</strong>);
     }
@@ -50,12 +73,12 @@ export function MarkdownView({ markdown }: { markdown: string }) {
         i += 1;
       }
       i += 1;
-      blocks.push(<pre key={key++} className="dmd__pre"><code>{buf.join('\n')}</code></pre>);
+      blocks.push(<pre key={key++} className={PRE_CLS}><code>{buf.join('\n')}</code></pre>);
       continue;
     }
 
     if (/^---+\s*$/.test(line)) {
-      blocks.push(<hr key={key++} className="dmd__hr" />);
+      blocks.push(<hr key={key++} className={HR_CLS} />);
       i += 1;
       continue;
     }
@@ -64,7 +87,7 @@ export function MarkdownView({ markdown }: { markdown: string }) {
     if (heading) {
       const level = heading[1].length;
       const content = renderInline(heading[2], `h${key}`);
-      const cls = `dmd__h dmd__h${level}`;
+      const cls = HEAD_CLS[level];
       blocks.push(
         level === 1 ? <h1 key={key++} className={cls}>{content}</h1>
         : level === 2 ? <h2 key={key++} className={cls}>{content}</h2>
@@ -84,14 +107,14 @@ export function MarkdownView({ markdown }: { markdown: string }) {
         i += 1;
       }
       blocks.push(
-        <div key={key++} className="dmd__tablewrap">
-          <table className="dmd__table">
+        <div key={key++} className={TABLEWRAP_CLS}>
+          <table className={TABLE_CLS}>
             <thead>
-              <tr>{header.map((cell, c) => <th key={c} scope="col">{renderInline(cell, `th${key}-${c}`)}</th>)}</tr>
+              <tr>{header.map((cell, c) => <th key={c} scope="col" className={TH_CLS}>{renderInline(cell, `th${key}-${c}`)}</th>)}</tr>
             </thead>
             <tbody>
               {rows.map((row, r) => (
-                <tr key={r}>{row.map((cell, c) => <td key={c}>{renderInline(cell, `td${key}-${r}-${c}`)}</td>)}</tr>
+                <tr key={r}>{row.map((cell, c) => <td key={c} className={TD_CLS}>{renderInline(cell, `td${key}-${r}-${c}`)}</td>)}</tr>
               ))}
             </tbody>
           </table>
@@ -106,7 +129,7 @@ export function MarkdownView({ markdown }: { markdown: string }) {
         buf.push(lines[i].replace(/^\s*>\s?/, ''));
         i += 1;
       }
-      blocks.push(<blockquote key={key++} className="dmd__quote">{renderInline(buf.join(' '), `q${key}`)}</blockquote>);
+      blocks.push(<blockquote key={key++} className={QUOTE_CLS}>{renderInline(buf.join(' '), `q${key}`)}</blockquote>);
       continue;
     }
 
@@ -118,7 +141,7 @@ export function MarkdownView({ markdown }: { markdown: string }) {
         i += 1;
       }
       const inner = items.map((it, idx) => <li key={idx}>{renderInline(it, `li${key}-${idx}`)}</li>);
-      blocks.push(ordered ? <ol key={key++} className="dmd__list">{inner}</ol> : <ul key={key++} className="dmd__list">{inner}</ul>);
+      blocks.push(ordered ? <ol key={key++} className={`list-decimal ${LIST_CLS}`}>{inner}</ol> : <ul key={key++} className={`list-disc ${LIST_CLS}`}>{inner}</ul>);
       continue;
     }
 
@@ -141,8 +164,12 @@ export function MarkdownView({ markdown }: { markdown: string }) {
       para.push(lines[i]);
       i += 1;
     }
-    blocks.push(<p key={key++} className="dmd__p">{renderInline(para.join(' '), `p${key}`)}</p>);
+    blocks.push(<p key={key++} className={P_CLS}>{renderInline(para.join(' '), `p${key}`)}</p>);
   }
 
-  return <div className="dmd">{blocks.map((b, idx) => <Fragment key={idx}>{b}</Fragment>)}</div>;
+  return (
+    <div className="text-[length:var(--o-text-sm)] leading-[1.7] text-[var(--ax-t2)]">
+      {blocks.map((b, idx) => <Fragment key={idx}>{b}</Fragment>)}
+    </div>
+  );
 }
