@@ -1,5 +1,5 @@
 // app/admin/inbox/compose/ComposeForm.tsx
-// Canvi #801 — reconstrucció des de zero (cx- classes, cap ap-*)
+// Redactor de correu/pressupost — 100% canònic (AdminPage + .ap-*/.adm-input)
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
@@ -259,29 +259,33 @@ export default function ComposeForm({
 
   if (sent) {
     return (
-      <div className="cx__success">
+      <div className="ap-inline-alert ap-inline-alert--success" role="status">
         ✓ {mode === 'quote' ? 'Pressupost enviat!' : isBulkSegmentMode ? 'Campanya enviada!' : 'Correu enviat!'}
       </div>
     );
   }
 
+  const labelClass = 'text-xs font-bold uppercase tracking-[0.1em] text-[var(--t2)]';
+
   return (
-    <div>
+    <div className="grid gap-4">
       {/* Toggle mode */}
-      <div className="cx__modetoggle">
+      <div className="ap-tabs-nav" role="tablist" aria-label="Tipus de redacció">
         <button
           type="button"
+          role="tab"
           onClick={() => setMode('email')}
-          aria-pressed={mode === 'email'}
-          className={`cx__modebtn${mode === 'email' ? ' is-on' : ''}`}
+          aria-selected={mode === 'email'}
+          className={`ap-tab ${mode === 'email' ? 'ap-tab--active' : 'ap-tab--idle'}`}
         >
           ✉ Correu normal
         </button>
         <button
           type="button"
+          role="tab"
           onClick={() => setMode('quote')}
-          aria-pressed={mode === 'quote'}
-          className={`cx__modebtn${mode === 'quote' ? ' is-on' : ''}`}
+          aria-selected={mode === 'quote'}
+          className={`ap-tab ${mode === 'quote' ? 'ap-tab--active' : 'ap-tab--idle'}`}
         >
           Pressupost
         </button>
@@ -289,57 +293,72 @@ export default function ComposeForm({
 
       {/* Plantilles intel·ligents (mode email) */}
       {mode === 'email' && smartTemplates.length > 0 && (
-        <div className="cx__tplcard">
-          <p className="cx__tpllabel">Plantilles intel·ligents</p>
-          <div className="cx__tplgrid">
-            {smartTemplates.map((tpl) => (
-              <button
-                key={tpl.key}
-                type="button"
-                onClick={() => applyTemplate(tpl)}
-                className={`cx__tplitem${activeTemplateKey === tpl.key ? ' is-on' : ''}`}
-              >
-                <p className="cx__tplname">{tpl.icon} {tpl.label}</p>
-                <p className="cx__tpldesc">{tpl.description}</p>
-              </button>
-            ))}
+        <section className="ap-card">
+          <div className="ap-card-body">
+            <p className={labelClass}>Plantilles intel·ligents</p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {smartTemplates.map((tpl) => {
+                const isActive = activeTemplateKey === tpl.key;
+                return (
+                  <button
+                    key={tpl.key}
+                    type="button"
+                    onClick={() => applyTemplate(tpl)}
+                    aria-pressed={isActive}
+                    className={`rounded-[var(--o-r-sm)] border p-3 text-left transition-colors ${
+                      isActive
+                        ? 'border-[var(--hair-gold)] bg-[var(--raised)] text-[var(--gold-bright)]'
+                        : 'border-[var(--line)] bg-[var(--sunk)] text-[var(--t2)] hover:bg-[var(--raised)] hover:text-[var(--t)]'
+                    }`}
+                  >
+                    <p className="text-sm font-bold">{tpl.icon} {tpl.label}</p>
+                    <p className="mt-0.5 truncate text-xs opacity-60">{tpl.description}</p>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        </section>
       )}
 
       {/* Audiència segmentada */}
       {mode === 'email' && initialSegmentAudience && (
-        <div className="cx__segcard">
-          <p className="cx__segcard-label">Audiència segmentada</p>
-          <p className="cx__segcard-name">{initialSegmentAudience.label}</p>
-          <p className="cx__segcard-desc">{initialSegmentAudience.description}</p>
-          <p className="cx__segcard-count">
-            {initialSegmentAudience.recipients.length} destinataris preparats per l&apos;enviament massiu.
-          </p>
-          <div className="cx__segrecipgrid">
-            {initialSegmentAudience.recipients.slice(0, 4).map((recipient) => (
-              <div key={recipient.id} className="cx__segrecip">
-                <p className="cx__segrecip-name">{recipient.name}</p>
-                <p className="cx__segrecip-email">{recipient.email}</p>
-              </div>
-            ))}
+        <section className="ap-card">
+          <div className="ap-card-body">
+            <p className={labelClass}>Audiència segmentada</p>
+            <p className="mt-1 text-base font-bold text-[var(--t)]">{initialSegmentAudience.label}</p>
+            <p className="mt-0.5 text-xs text-[var(--t2)]">{initialSegmentAudience.description}</p>
+            <p className="mt-2 text-sm font-semibold text-[var(--gold-bright)]">
+              {initialSegmentAudience.recipients.length} destinataris preparats per l&apos;enviament massiu.
+            </p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {initialSegmentAudience.recipients.slice(0, 4).map((recipient) => (
+                <div
+                  key={recipient.id}
+                  className="rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)] p-2"
+                >
+                  <p className="text-xs font-semibold text-[var(--t)]">{recipient.name}</p>
+                  <p className="text-xs text-[var(--t3)]">{recipient.email}</p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </section>
       )}
 
       {/* Formulari principal */}
-      <div className="cx__formcard">
-        <div className="cx__forminner">
+      <section className="ap-card">
+        <div className="ap-card-body grid gap-4">
           {/* Selecció de lead (mode individual) */}
           {!isBulkSegmentMode && (
-            <div className="cx__field">
-              <label htmlFor="cf-lead" className="cx__label">Entrada (opcional)</label>
+            <div className="grid gap-1.5">
+              <label htmlFor="cf-lead" className={labelClass}>Entrada (opcional)</label>
               <select
                 id="cf-lead"
                 value={selectedLeadId}
                 onChange={(e) => setSelectedLeadId(e.target.value)}
                 aria-label="Selecciona entrada"
-                className="cx__select"
+                className="adm-input"
               >
                 <option value="">-- Escriu email manualment --</option>
                 {leads.map((lead) => (
@@ -353,40 +372,40 @@ export default function ComposeForm({
 
           {/* Detalls del lead seleccionat */}
           {selectedLead && (
-            <div className="cx__leaddetail">
-              <p className="cx__leaddetail-title">Detalls de l&apos;entrada</p>
-              <div className="cx__leaddetail-grid">
+            <div className="rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)] p-4">
+              <p className={labelClass}>Detalls de l&apos;entrada</p>
+              <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <div>
-                  <p className="cx__leaddetail-label">Tipus</p>
-                  <p className="cx__leaddetail-value">
+                  <p className="text-xs text-[var(--t3)]">Tipus</p>
+                  <p className="text-sm font-semibold text-[var(--t)]">
                     {getEventLabel(selectedLead.eventType || '', 'No especificat')}
                   </p>
                 </div>
                 <div>
-                  <p className="cx__leaddetail-label">Data</p>
-                  <p className="cx__leaddetail-value">
+                  <p className="text-xs text-[var(--t3)]">Data</p>
+                  <p className="text-sm font-semibold text-[var(--t)]">
                     {selectedLead.eventDate
                       ? formatDateSimple(selectedLead.eventDate)
                       : 'No especificat'}
                   </p>
                 </div>
                 <div>
-                  <p className="cx__leaddetail-label">Ubicació</p>
-                  <p className="cx__leaddetail-value">
+                  <p className="text-xs text-[var(--t3)]">Ubicació</p>
+                  <p className="text-sm font-semibold text-[var(--t)]">
                     {selectedLead.eventLocation || 'No especificat'}
                   </p>
                 </div>
                 <div>
-                  <p className="cx__leaddetail-label">Convidats</p>
-                  <p className="cx__leaddetail-value">
+                  <p className="text-xs text-[var(--t3)]">Convidats</p>
+                  <p className="text-sm font-semibold text-[var(--t)]">
                     {selectedLead.guestCount || 'No especificat'}
                   </p>
                 </div>
               </div>
               {selectedLead.message && (
-                <div className="cx__leaddetail-msg">
-                  <p className="cx__leaddetail-label">Missatge</p>
-                  <p className="cx__leaddetail-msgtext">
+                <div className="mt-3 border-t border-[var(--line)] pt-3">
+                  <p className="text-xs text-[var(--t3)]">Missatge</p>
+                  <p className="mt-1 text-sm text-[var(--t2)]">
                     {selectedLead.message}
                   </p>
                 </div>
@@ -398,22 +417,22 @@ export default function ComposeForm({
           {mode === 'quote' ? (
             <>
               {!selectedLeadId && (
-                <div className="cx__field">
-                  <label htmlFor="cf-email-q" className="cx__label">Correu del client *</label>
+                <div className="grid gap-1.5">
+                  <label htmlFor="cf-email-q" className={labelClass}>Correu del client *</label>
                   <input
                     id="cf-email-q"
                     type="email"
                     value={to}
                     onChange={(e) => setTo(e.target.value)}
-                    className="cx__input"
+                    className="adm-input"
                     placeholder="email@exemple.com"
                   />
                 </div>
               )}
 
-              <div className="cx__field">
-                <label className="cx__label">Pack recomanat *</label>
-                <div className="cx__packgrid">
+              <div className="grid gap-1.5">
+                <span className={labelClass}>Pack recomanat *</span>
+                <div className="grid gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(12.5rem,1fr))]">
                   {packs.map((pack) => {
                     const name =
                       pack.translations.find((t) => t.locale === locale)?.name ||
@@ -425,21 +444,14 @@ export default function ComposeForm({
                         type="button"
                         onClick={() => setSelectedPackId(pack.id)}
                         aria-pressed={isSelected}
-                        style={{
-                          padding: '14px 16px',
-                          border: `2px solid ${isSelected ? 'var(--ax-hair-gold)' : 'var(--ax-line2)'}`,
-                          borderRadius: 10,
-                          background: isSelected
-                            ? 'color-mix(in oklab, var(--ax-gold) 10%, var(--ax-panel))'
-                            : 'var(--ax-sunk)',
-                          color: isSelected ? 'var(--ax-gold-bright)' : 'var(--ax-t)',
-                          textAlign: 'left',
-                          cursor: 'pointer',
-                          transition: 'border-color 120ms ease, background 120ms ease, color 120ms ease',
-                        }}
+                        className={`rounded-[var(--o-r-md)] border p-3.5 text-left transition-colors ${
+                          isSelected
+                            ? 'border-[var(--hair-gold)] bg-[var(--raised)] text-[var(--gold-bright)]'
+                            : 'border-[var(--line2)] bg-[var(--sunk)] text-[var(--t)] hover:bg-[var(--raised)]'
+                        }`}
                       >
-                        <p className="cx__packname">{name}</p>
-                        <p className="cx__packprice">
+                        <p className="text-base font-bold">{name}</p>
+                        <p className="mt-1 text-lg font-bold text-[var(--gold-bright)]">
                           {formatCurrency(pack.price)}
                         </p>
                       </button>
@@ -448,58 +460,58 @@ export default function ComposeForm({
                 </div>
               </div>
 
-              <div className="cx__field">
-                <label htmlFor="cf-price" className="cx__label">Preu total (€) *</label>
+              <div className="grid gap-1.5">
+                <label htmlFor="cf-price" className={labelClass}>Preu total (€) *</label>
                 <input
                   id="cf-price"
                   type="number"
                   min={0}
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
-                  className="cx__input cx__priceinput"
+                  className="adm-input text-xl font-bold"
                   placeholder="0"
                 />
               </div>
 
-              <div className="cx__field">
-                <label htmlFor="cf-extras" className="cx__label">Extras inclosos</label>
+              <div className="grid gap-1.5">
+                <label htmlFor="cf-extras" className={labelClass}>Extras inclosos</label>
                 <textarea
                   id="cf-extras"
                   value={extras.join('\n')}
                   onChange={(e) => setExtras(e.target.value.split('\n').filter(Boolean))}
                   rows={3}
-                  className="cx__textarea"
+                  className="adm-input adm-input--textarea"
                   placeholder="Un extra per línia..."
                 />
               </div>
 
-              <div className="cx__field">
-                <label htmlFor="cf-custmsg" className="cx__label">Missatge personalitzat (opcional)</label>
+              <div className="grid gap-1.5">
+                <label htmlFor="cf-custmsg" className={labelClass}>Missatge personalitzat (opcional)</label>
                 <textarea
                   id="cf-custmsg"
                   value={customMessage}
                   onChange={(e) => setCustomMessage(e.target.value)}
                   rows={4}
-                  className="cx__textarea"
+                  className="adm-input adm-input--textarea"
                   placeholder="Afegeix un missatge personalitzat..."
                 />
               </div>
 
-              <div className="cx__field">
-                <label htmlFor="cf-notes" className="cx__label">Notes addicionals</label>
+              <div className="grid gap-1.5">
+                <label htmlFor="cf-notes" className={labelClass}>Notes addicionals</label>
                 <textarea
                   id="cf-notes"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={2}
-                  className="cx__textarea"
+                  className="adm-input adm-input--textarea"
                   placeholder="Notes que apareixeran al pressupost..."
                 />
               </div>
 
-              <div className="cx__field">
-                <label className="cx__label">Idioma del pressupost</label>
-                <div className="cx__localepicker">
+              <div className="grid gap-1.5">
+                <span className={labelClass}>Idioma del pressupost</span>
+                <div className="ap-tabs-nav" role="group" aria-label="Idioma del pressupost">
                   {[
                     { code: 'ca', label: 'Català' },
                     { code: 'es', label: 'Castellà' },
@@ -509,7 +521,7 @@ export default function ComposeForm({
                       type="button"
                       onClick={() => setLocale(lang.code)}
                       aria-pressed={locale === lang.code}
-                      className={`cx__localebtn${locale === lang.code ? ' is-on' : ''}`}
+                      className={`ap-tab ${locale === lang.code ? 'ap-tab--active' : 'ap-tab--idle'}`}
                     >
                       {lang.label}
                     </button>
@@ -520,12 +532,12 @@ export default function ComposeForm({
           ) : (
             /* MODE CORREU NORMAL */
             <>
-              <div className="cx__field">
-                <label htmlFor="cf-to" className="cx__label">Per a *</label>
+              <div className="grid gap-1.5">
+                <label htmlFor="cf-to" className={labelClass}>Per a *</label>
                 {isBulkSegmentMode ? (
-                  <div className="cx__input cx__input--between">
+                  <div className="adm-input flex items-center justify-between">
                     <span>{initialSegmentAudience?.label}</span>
-                    <span className="cx__recipcount">
+                    <span className="text-xs text-[var(--t3)]">
                       {initialSegmentAudience?.recipients.length} contactes
                     </span>
                   </div>
@@ -535,32 +547,32 @@ export default function ComposeForm({
                     type="email"
                     value={to}
                     onChange={(e) => setTo(e.target.value)}
-                    className="cx__input"
+                    className="adm-input"
                     placeholder="email@exemple.com"
                   />
                 )}
               </div>
 
-              <div className="cx__field">
-                <label htmlFor="cf-subj" className="cx__label">Assumpte *</label>
+              <div className="grid gap-1.5">
+                <label htmlFor="cf-subj" className={labelClass}>Assumpte *</label>
                 <input
                   id="cf-subj"
                   type="text"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                  className="cx__input"
+                  className="adm-input"
                   placeholder="Assumpte de l'email"
                 />
               </div>
 
-              <div className="cx__field">
-                <label htmlFor="cf-body" className="cx__label">Missatge *</label>
+              <div className="grid gap-1.5">
+                <label htmlFor="cf-body" className={labelClass}>Missatge *</label>
                 <textarea
                   id="cf-body"
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
                   rows={10}
-                  className="cx__textarea"
+                  className="adm-input adm-input--textarea"
                   placeholder="Escriu el teu missatge..."
                 />
               </div>
@@ -569,15 +581,15 @@ export default function ComposeForm({
         </div>
 
         {/* Barra d'enviament */}
-        <div className="cx__composebar">
+        <div className="ap-card-body flex flex-wrap items-center justify-between gap-3 border-t border-[var(--line)]">
           <div>
             {error && (
-              <div className="cx__error" role="alert">
+              <div className="ap-inline-alert ap-inline-alert--danger" role="alert">
                 {error}
               </div>
             )}
           </div>
-          <div className="cx__formactions">
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => router.push(returnHref)}
@@ -591,7 +603,6 @@ export default function ComposeForm({
               disabled={sending}
               aria-busy={sending}
               className="ap-btn ap-btn--primary"
-              style={sending ? { opacity: 0.5, pointerEvents: 'none' } : undefined}
             >
               {sending
                 ? 'Enviant...'
@@ -603,7 +614,7 @@ export default function ComposeForm({
             </button>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

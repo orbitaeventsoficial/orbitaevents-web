@@ -1,16 +1,14 @@
 // app/admin/inbox/compose/page.tsx
-// Canvi #801 — reconstrucció des de zero (cx- classes, cap AdminPage)
 import { prisma } from '@/lib/prisma';
 import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
-import Link from 'next/link';
 import ComposeForm from './ComposeForm';
 import { resolveComposeReturnHref } from './composeNavigation';
+import { AdminPage } from '../../components/AdminPage';
 import {
   BULK_COMPOSE_SEGMENTS,
   loadBulkComposeAudience,
   type BulkComposeSegmentKey,
 } from '@/lib/services/bulkComposeSegmentService';
-import '../inbox.css';
 
 export const dynamic = 'force-dynamic';
 
@@ -119,58 +117,48 @@ export default async function ComposePage({
   });
 
   return (
-    <div className="cx">
-      {/* Capçalera */}
-      <div className="cx__head">
-        <Link href={returnHref} className="cx__back">
-          ← {customerId ? 'Client' : leadId ? 'Lead' : 'Safata'}
-        </Link>
-        <div className="cx__headtitles">
-          <p className="cx__headeyebrow">Redactor</p>
-          <h1 className="cx__headtitle">Nou correu</h1>
-        </div>
-      </div>
-
-      {/* Cos */}
-      <div className="cx__body">
-        {/* Segments de campanya */}
-        <div className="cx__segments">
+    <AdminPage
+      eyebrow="Redactor"
+      title="Nou correu"
+      back={{ href: returnHref, label: customerId ? 'Client' : leadId ? 'Lead' : 'Safata' }}
+      tabs={
+        <>
           {BULK_COMPOSE_SEGMENTS.map((segment) => (
             <a
               key={segment.key}
               href={`/admin/inbox/compose?segment=${segment.key}`}
-              className={`cx__segpill${segmentAudience?.key === segment.key ? ' is-on' : ''}`}
+              className={`ap-tab ${segmentAudience?.key === segment.key ? 'ap-tab--active' : 'ap-tab--idle'}`}
             >
               {segment.label}
             </a>
           ))}
           {segmentAudience && (
-            <a href="/admin/inbox/compose" className="cx__segpill">
+            <a href="/admin/inbox/compose" className="ap-tab ap-tab--idle">
               Redactor individual
             </a>
           )}
-        </div>
-
-        <ComposeForm
-          leads={leads}
-          packs={packs}
-          returnHref={returnHref}
-          initialLeadId={leadId || undefined}
-          initialCustomer={
-            customer
-              ? {
-                  id: customer.id,
-                  name: customer.name,
-                  email: customer.email || '',
-                  preferredLocale: customer.preferredLocale || 'ca',
-                }
-              : undefined
-          }
-          initialTemplate={template}
-          initialTo={to || undefined}
-          initialSegmentAudience={segmentAudience || undefined}
-        />
-      </div>
-    </div>
+        </>
+      }
+    >
+      <ComposeForm
+        leads={leads}
+        packs={packs}
+        returnHref={returnHref}
+        initialLeadId={leadId || undefined}
+        initialCustomer={
+          customer
+            ? {
+                id: customer.id,
+                name: customer.name,
+                email: customer.email || '',
+                preferredLocale: customer.preferredLocale || 'ca',
+              }
+            : undefined
+        }
+        initialTemplate={template}
+        initialTo={to || undefined}
+        initialSegmentAudience={segmentAudience || undefined}
+      />
+    </AdminPage>
   );
 }

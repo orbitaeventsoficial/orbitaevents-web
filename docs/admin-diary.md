@@ -1,3 +1,21 @@
+## 2026-06-30 — Erradicació: inbox/compose 100% canònica (Canvi #1270, claude+agent)
+
+### Què s'ha fet
+- `compose/ComposeForm.tsx` + `page.tsx`: 162 `cx__` → canònic (AdminPage eyebrow/title/back, .ap-tab/--active per segments+mode+idioma, .ap-card, .adm-input, .ap-inline-alert success/danger). Import inbox.css tret de page.tsx.
+- `inbox.css`: tret NOMÉS el bloc cx (77 regles, línies 949-1322). sf__ (553) i ix__ INTACTES (css compartit, no esborrat).
+- Verificat: captura header AdminPage + .ap-tab + .ap-card plantilles, idèntic al sistema. 0 cx__, sf__ intactes, tsc 0.
+
+### Validació
+- Validació tècnica: `tsc` 0; `qa:canon-debt` OK (cx desaparegut); check-admin-canon sense P1.
+- Validació funcional: captura compose canònica.
+- Validació humana/UX: hipersemblant; sf__ d'inbox no afectat.
+
+### Coordinació
+Counter → 1270. 6a pàgina. Agent dossiers (dg) encara treballant. inbox.css compartit: compte que sf__ es farà a part.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-30 — Erradicació: intake 100% canònica, css esborrat (Canvi #1269, claude+agent)
 
 ### Què s'ha fet

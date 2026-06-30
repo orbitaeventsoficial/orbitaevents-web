@@ -1,5 +1,5 @@
 {
-  "total": 4902,
+  "total": 4627,
   "perFile": {
     "app/admin/admin-shell.css": 98,
     "app/admin/admin-theme.css": 1,
@@ -40,8 +40,6 @@
     "app/admin/clientes/[id]/_components/panels/TasksNotesPanel.tsx": 20,
     "app/admin/clientes/[id]/_components/TimelinePanel.tsx": 18,
     "app/admin/components/CommercialDocumentsHistory.tsx": 15,
-    "app/admin/dossiers/DossierGeneratorClient.tsx": 116,
-    "app/admin/dossiers/dossiers.css": 159,
     "app/admin/error.tsx": 12,
     "app/admin/inbox/inbox.css": 330,
     "app/admin/inbox/SafataClient.tsx": 274,

@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1270 — 2026-06-30 — claude (FET)
+**Erradicació: inbox/compose 100% canònica.**
+- compose 162 cx__ → AdminPage/.ap-tab/.ap-card/.adm-input/.ap-inline-alert. inbox.css: tret bloc cx (77 regles), sf__/ix__ intactes. Import tret de page.tsx.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1270`; el següent canvi real ha de ser `#1271`.
+- Validació tècnica: `tsc` 0; qa:canon-debt OK; canon sense P1.
+- Validació funcional: captura compose canònica.
+- Validació humana/UX: hipersemblant; sf__ intacte.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1269 — 2026-06-30 — claude (FET)
 **Erradicació: intake 100% canònica, css esborrat.**
 - intake/page.tsx 171 ni__ → AdminPage/AdminSection/.adm-input/.ap-btn/.ap-card/.ap-badge. intake.css ESBORRAT + import tret. Spinner inline→animate-spin.
