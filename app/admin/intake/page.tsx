@@ -8,7 +8,7 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import { INTAKE_EVENT_TYPE_OPTIONS, INTAKE_PRIORITY_OPTIONS, INTAKE_SOURCE_OPTIONS } from '@/lib/constants';
-import './intake.css';
+import { AdminPage, AdminSection } from '@/app/admin/components/AdminPage';
 
 type DuplicateWarning = {
   id: string;
@@ -248,187 +248,196 @@ export default function IntakePage() {
   }, [form, duplicates, duplicateOverride, toast]);
 
   return (
-    <div className="ni">
-
-      {/* Capçalera */}
-      <div className="ni__head">
-        <span className="ni__eyebrow">Pipeline · Nova entrada</span>
-        <h1 className="ni__h1">Nova entrada</h1>
-        <p className="ni__sub">Crea una entrada des de qualsevol canal · detecció de duplicats en temps real</p>
-      </div>
-
+    <AdminPage
+      title="Nova entrada"
+      eyebrow="Pipeline · Nova entrada"
+      subtitle="Crea una entrada des de qualsevol canal · detecció de duplicats en temps real"
+      className="max-w-3xl"
+    >
       {/* ── IA Extractor ─────────────────────────────────────────────────── */}
-      <div className="ni__card ni__card--ai">
-        <p className="ni__card-title">IA · Extracció automàtica</p>
-        <p className="ni__card-hint">
-          Enganxa un WhatsApp, email o text amb la info del client — s&apos;ompliran els camps del formulari automàticament.
-        </p>
+      <AdminSection
+        title="IA · Extracció automàtica"
+        description="Enganxa un WhatsApp, email o text amb la info del client — s'ompliran els camps del formulari automàticament."
+      >
         <textarea
           value={pasteText}
           onChange={(e) => setPasteText(e.target.value)}
           onPaste={handlePaste}
-          className="ni__input ni__textarea"
+          className="adm-input adm-input--textarea"
           rows={6}
           placeholder={"Bon dia, sóc l'Adrià de l'Associació de Veïns de Rubí...\n(copia i enganxa aquí la conversa completa)"}
           aria-label="Text per extreure informació del client"
         />
         {extracting && (
-          <p className="ni__card-hint ni__card-hint--mt">⟳ Extraient informació…</p>
+          <p className="mt-2 text-xs text-[var(--t3)]">⟳ Extraient informació…</p>
         )}
-      </div>
+      </AdminSection>
 
       {/* ── Èxit ─────────────────────────────────────────────────────────── */}
       {success && (
-        <div className="ni__success">
-          <p className="ni__success-title">Entrada creada per a {success.name}</p>
-          <div className="ni__success-btns">
-            <Link href={buildLeadWorkspaceHref(success.id)} className="ni__btn ni__btn--primary">
-              Obrir entrada →
-            </Link>
-            <button type="button" onClick={() => setSuccess(null)} className="ni__btn ni__btn--ghost">
-              Crear una altra
-            </button>
+        <div className="ap-card ap-card--success">
+          <div className="ap-card-body">
+            <p className="text-sm font-bold admin-tone-text-success">Entrada creada per a {success.name}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link href={buildLeadWorkspaceHref(success.id)} className="ap-btn ap-btn--primary">
+                Obrir entrada →
+              </Link>
+              <button type="button" onClick={() => setSuccess(null)} className="ap-btn">
+                Crear una altra
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* ── Esborrany recuperat ──────────────────────────────────────────── */}
       {autosaveRestored && !success && (
-        <div className="ni__autosave" role="status">
-          <span>S&apos;ha recuperat un esborrany d&apos;aquest formulari.</span>
-          <button
-            type="button"
-            className="ni__btn ni__btn--ghost"
-            onClick={() => { clearAutosave(); setForm((prev) => ({ ...INITIAL_FORM, source: prev.source })); }}
-          >
-            Descartar i començar de nou
-          </button>
+        <div className="ap-card" role="status">
+          <div className="ap-card-body flex flex-wrap items-center justify-between gap-3">
+            <span className="text-sm text-[var(--t2)]">S&apos;ha recuperat un esborrany d&apos;aquest formulari.</span>
+            <button
+              type="button"
+              className="ap-btn ap-btn--xs"
+              onClick={() => { clearAutosave(); setForm((prev) => ({ ...INITIAL_FORM, source: prev.source })); }}
+            >
+              Descartar i començar de nou
+            </button>
+          </div>
         </div>
       )}
 
       {/* ── Error ────────────────────────────────────────────────────────── */}
       {error && (
-        <div className="ni__error">{error}</div>
+        <div className="ap-card ap-card--danger">
+          <div className="ap-card-body text-sm admin-tone-text-danger">{error}</div>
+        </div>
       )}
 
       {/* ── Duplicats ────────────────────────────────────────────────────── */}
       {duplicates.length > 0 && (
-        <div className="ni__dups">
-          <p className="ni__dups-title">
-            {checkingDuplicates && <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>⟳</span>}
-            Possibles duplicats ({duplicates.length})
-          </p>
-          {duplicates.map((dup) => (
-            <Link key={dup.id} href={buildCustomerHubHref(dup.id)} className="ni__dup-row">
-              <div>
-                <p className="ni__dup-name">{dup.name}</p>
-                <p className="ni__dup-meta">{dup.email}{dup.phone ? ` · ${dup.phone}` : ''}</p>
-              </div>
-              <span className={`ni__dup-badge ${
-                dup.matchScore >= 80 ? 'ni__dup-badge--high' :
-                dup.matchScore >= 50 ? 'ni__dup-badge--med' :
-                'ni__dup-badge--low'
-              }`}>
-                {dup.matchScore}%
-              </span>
-            </Link>
-          ))}
-        </div>
+        <AdminSection
+          title={
+            <span className="inline-flex items-center gap-2">
+              {checkingDuplicates && <span className="inline-block animate-spin" aria-hidden="true">⟳</span>}
+              Possibles duplicats ({duplicates.length})
+            </span>
+          }
+        >
+          <div className="flex flex-col gap-2">
+            {duplicates.map((dup) => (
+              <Link
+                key={dup.id}
+                href={buildCustomerHubHref(dup.id)}
+                className="adm-row-hover flex items-center justify-between gap-3 rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] px-3 py-2.5 no-underline"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-[var(--t)]">{dup.name}</p>
+                  <p className="truncate text-xs text-[var(--t3)]">{dup.email}{dup.phone ? ` · ${dup.phone}` : ''}</p>
+                </div>
+                <span className={
+                  dup.matchScore >= 80 ? 'ap-badge ap-badge--danger' :
+                  dup.matchScore >= 50 ? 'ap-badge ap-badge--warning' :
+                  'ap-badge'
+                }>
+                  {dup.matchScore}%
+                </span>
+              </Link>
+            ))}
+          </div>
+        </AdminSection>
       )}
 
       {/* ── Canal d'entrada ──────────────────────────────────────────────── */}
-      <div className="ni__card">
-        <p className="ni__card-title">Canal d&apos;entrada</p>
-        <div className="ni__pills">
+      <AdminSection title="Canal d'entrada">
+        <div className="flex flex-wrap gap-2">
           {INTAKE_SOURCE_OPTIONS.map((src) => (
             <button
               key={src.value}
               type="button"
               onClick={() => updateField('source', src.value)}
               aria-pressed={form.source === src.value}
-              className={`ni__pill${form.source === src.value ? ' ni__pill--on' : ''}`}
+              className={`ap-btn${form.source === src.value ? ' ap-btn--primary' : ''}`}
             >
-              <span className="ni__pill-icon">{src.icon}</span>
+              <span aria-hidden="true">{src.icon}</span>
               {src.label}
             </button>
           ))}
         </div>
-      </div>
+      </AdminSection>
 
       {/* ── Dades del client ─────────────────────────────────────────────── */}
-      <div className="ni__card">
-        <p className="ni__card-title">Dades del client</p>
-        <div className="ni__grid ni__grid--2">
-          <div className="ni__field">
-            <label htmlFor="intake-name" className="ni__label">Nom *</label>
+      <AdminSection title="Dades del client">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="block" htmlFor="intake-name">
+            <span className="text-xs text-[var(--t2)]">Nom *</span>
             <input
               id="intake-name"
               type="text"
               value={form.name}
               onChange={(e) => updateField('name', e.target.value)}
               placeholder="Nom i cognom"
-              className="ni__input"
+              className="adm-input mt-1"
               autoComplete="off"
             />
-          </div>
-          <div className="ni__field">
-            <label htmlFor="intake-email" className="ni__label">Email *</label>
+          </label>
+          <label className="block" htmlFor="intake-email">
+            <span className="text-xs text-[var(--t2)]">Email *</span>
             <input
               id="intake-email"
               type="email"
               value={form.email}
               onChange={(e) => updateField('email', e.target.value)}
               placeholder="client@exemple.com"
-              className="ni__input"
+              className="adm-input mt-1"
               autoComplete="off"
             />
-          </div>
-          <div className="ni__field">
-            <label htmlFor="intake-phone" className="ni__label">Telèfon</label>
+          </label>
+          <label className="block" htmlFor="intake-phone">
+            <span className="text-xs text-[var(--t2)]">Telèfon</span>
             <input
               id="intake-phone"
               type="tel"
               value={form.phone}
               onChange={(e) => updateField('phone', e.target.value)}
               placeholder="+34 600 000 000"
-              className="ni__input"
+              className="adm-input mt-1"
               autoComplete="off"
             />
-          </div>
-          <div className="ni__field">
-            <label htmlFor="intake-dni" className="ni__label">DNI / NIF / CIF</label>
+          </label>
+          <label className="block" htmlFor="intake-dni">
+            <span className="text-xs text-[var(--t2)]">DNI / NIF / CIF</span>
             <input
               id="intake-dni"
               type="text"
               value={form.dni}
               onChange={(e) => updateField('dni', e.target.value.toUpperCase())}
               placeholder="12345678A"
-              className="ni__input"
+              className="adm-input mt-1"
               autoComplete="off"
             />
-          </div>
-          <div className="ni__field ni__col2">
-            <label htmlFor="intake-address" className="ni__label">Adreça</label>
+          </label>
+          <label className="block sm:col-span-2" htmlFor="intake-address">
+            <span className="text-xs text-[var(--t2)]">Adreça</span>
             <input
               id="intake-address"
               type="text"
               value={form.address}
               onChange={(e) => updateField('address', e.target.value)}
               placeholder="Carrer, número, CP, ciutat"
-              className="ni__input"
+              className="adm-input mt-1"
               autoComplete="off"
             />
-          </div>
-          <div className="ni__field ni__col2">
-            <label className="ni__label">Prioritat</label>
-            <div className="ni__pills">
+          </label>
+          <div className="sm:col-span-2">
+            <span className="text-xs text-[var(--t2)]">Prioritat</span>
+            <div className="mt-1 flex flex-wrap gap-2">
               {INTAKE_PRIORITY_OPTIONS.map((p) => (
                 <button
                   key={p.value}
                   type="button"
                   onClick={() => updateField('priority', p.value)}
                   aria-pressed={form.priority === p.value}
-                  className={`ni__pill${form.priority === p.value ? ' ni__pill--on' : ''}`}
+                  className={`ap-btn${form.priority === p.value ? ' ap-btn--primary' : ''}`}
                 >
                   {p.label}
                 </button>
@@ -436,137 +445,130 @@ export default function IntakePage() {
             </div>
           </div>
         </div>
-      </div>
+      </AdminSection>
 
       {/* ── Detalls de l'event ───────────────────────────────────────────── */}
-      <div className="ni__card">
-        <p className="ni__card-title">Detalls de l&apos;event</p>
-
-        <div className="ni__field ni__field--mb-lg">
-          <label className="ni__label">Tipus d&apos;event</label>
-          <div className="ni__tiles">
+      <AdminSection title="Detalls de l'event">
+        <div className="mb-4">
+          <span className="text-xs text-[var(--t2)]">Tipus d&apos;event</span>
+          <div className="mt-1 flex flex-wrap gap-2">
             {INTAKE_EVENT_TYPE_OPTIONS.map((et) => (
               <button
                 key={et.value}
                 type="button"
                 onClick={() => updateField('eventType', et.value)}
                 aria-pressed={form.eventType === et.value}
-                className={`ni__tile${form.eventType === et.value ? ' ni__tile--on' : ''}`}
+                className={`ap-btn${form.eventType === et.value ? ' ap-btn--primary' : ''}`}
               >
-                <span className="ni__tile-icon">{et.icon}</span>
+                <span aria-hidden="true">{et.icon}</span>
                 {et.label}
               </button>
             ))}
           </div>
         </div>
 
-        <div className="ni__grid ni__grid--3 ni__grid--mb">
-          <div className="ni__grid ni__grid--2 ni__grid--gap-sm">
-            <div className="ni__field">
-              <label htmlFor="intake-date" className="ni__label">Data</label>
-              <input
-                id="intake-date"
-                type="date"
-                value={form.eventDate}
-                onChange={(e) => updateField('eventDate', e.target.value)}
-                className="ni__input"
-              />
-            </div>
-            <div className="ni__field">
-              <label htmlFor="intake-time" className="ni__label">
-                Hora inici
-                {form.eventTime && form.eventEndTime && (() => {
-                  const [sh, sm] = form.eventTime.split(':').map(Number);
-                  const [eh, em] = form.eventEndTime.split(':').map(Number);
-                  const mins = (eh * 60 + em) - (sh * 60 + sm);
-                  if (mins > 0) {
-                    const h = Math.floor(mins / 60);
-                    const m = mins % 60;
-                    return <span className="ni__label-hint">{h > 0 ? `${h}h` : ''}{m > 0 ? `${m}min` : ''}</span>;
-                  }
-                  return null;
-                })()}
-              </label>
-              <input
-                id="intake-time"
-                type="time"
-                value={form.eventTime}
-                onChange={(e) => updateField('eventTime', e.target.value)}
-                className="ni__input"
-              />
-            </div>
-          </div>
-          <div className="ni__field">
-            <label htmlFor="intake-end-time" className="ni__label">Hora fi</label>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <label className="block" htmlFor="intake-date">
+            <span className="text-xs text-[var(--t2)]">Data</span>
+            <input
+              id="intake-date"
+              type="date"
+              value={form.eventDate}
+              onChange={(e) => updateField('eventDate', e.target.value)}
+              className="adm-input mt-1"
+            />
+          </label>
+          <label className="block" htmlFor="intake-time">
+            <span className="text-xs text-[var(--t2)]">
+              Hora inici
+              {form.eventTime && form.eventEndTime && (() => {
+                const [sh, sm] = form.eventTime.split(':').map(Number);
+                const [eh, em] = form.eventEndTime.split(':').map(Number);
+                const mins = (eh * 60 + em) - (sh * 60 + sm);
+                if (mins > 0) {
+                  const h = Math.floor(mins / 60);
+                  const m = mins % 60;
+                  return <span className="ml-1.5 font-semibold text-[var(--gold)]">{h > 0 ? `${h}h` : ''}{m > 0 ? `${m}min` : ''}</span>;
+                }
+                return null;
+              })()}
+            </span>
+            <input
+              id="intake-time"
+              type="time"
+              value={form.eventTime}
+              onChange={(e) => updateField('eventTime', e.target.value)}
+              className="adm-input mt-1"
+            />
+          </label>
+          <label className="block" htmlFor="intake-end-time">
+            <span className="text-xs text-[var(--t2)]">Hora fi</span>
             <input
               id="intake-end-time"
               type="time"
               value={form.eventEndTime}
               onChange={(e) => updateField('eventEndTime', e.target.value)}
-              className="ni__input"
+              className="adm-input mt-1"
             />
-          </div>
-          <div className="ni__field">
-            <label htmlFor="intake-location" className="ni__label">Ubicació</label>
+          </label>
+          <label className="block sm:col-span-2 lg:col-span-1" htmlFor="intake-location">
+            <span className="text-xs text-[var(--t2)]">Ubicació</span>
             <input
               id="intake-location"
               type="text"
               value={form.eventLocation}
               onChange={(e) => updateField('eventLocation', e.target.value)}
               placeholder="Lloc de celebració"
-              className="ni__input"
+              className="adm-input mt-1"
               autoComplete="off"
             />
-          </div>
-          <div className="ni__grid ni__grid--2 ni__grid--gap-sm">
-            <div className="ni__field">
-              <label htmlFor="intake-guests" className="ni__label">Convidats</label>
-              <input
-                id="intake-guests"
-                type="number"
-                min={1}
-                value={form.guestCount}
-                onChange={(e) => updateField('guestCount', e.target.value)}
-                placeholder="60"
-                className="ni__input"
-              />
-            </div>
-            <div className="ni__field">
-              <label htmlFor="intake-budget" className="ni__label">Pressupost</label>
-              <input
-                id="intake-budget"
-                type="text"
-                value={form.budget}
-                onChange={(e) => updateField('budget', e.target.value)}
-                placeholder="2.000€"
-                className="ni__input"
-                autoComplete="off"
-              />
-            </div>
-          </div>
+          </label>
+          <label className="block" htmlFor="intake-guests">
+            <span className="text-xs text-[var(--t2)]">Convidats</span>
+            <input
+              id="intake-guests"
+              type="number"
+              min={1}
+              value={form.guestCount}
+              onChange={(e) => updateField('guestCount', e.target.value)}
+              placeholder="60"
+              className="adm-input mt-1"
+            />
+          </label>
+          <label className="block" htmlFor="intake-budget">
+            <span className="text-xs text-[var(--t2)]">Pressupost</span>
+            <input
+              id="intake-budget"
+              type="text"
+              value={form.budget}
+              onChange={(e) => updateField('budget', e.target.value)}
+              placeholder="2.000€"
+              className="adm-input mt-1"
+              autoComplete="off"
+            />
+          </label>
         </div>
 
-        <div className="ni__field">
-          <label htmlFor="intake-message" className="ni__label">Notes</label>
+        <label className="mt-3 block" htmlFor="intake-message">
+          <span className="text-xs text-[var(--t2)]">Notes</span>
           <textarea
             id="intake-message"
             value={form.message}
             onChange={(e) => updateField('message', e.target.value)}
             rows={3}
             placeholder="Detalls addicionals, context de la conversa..."
-            className="ni__input ni__textarea"
-            style={{ minHeight: 'unset' }}
+            className="adm-input adm-input--textarea mt-1"
           />
-        </div>
-      </div>
+        </label>
+      </AdminSection>
 
       {/* ── Accions ──────────────────────────────────────────────────────── */}
-      <div className="ni__actions">
+      <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
           onClick={handleSubmit}
           disabled={submitting || !form.name || !form.email}
-          className="ni__btn ni__btn--submit"
+          className="ap-btn ap-btn--primary"
         >
           {submitting ? 'Creant…' : 'Crear entrada'}
         </button>
@@ -578,12 +580,11 @@ export default function IntakePage() {
             setError(null);
             setSuccess(null);
           }}
-          className="ni__btn ni__btn--ghost"
+          className="ap-btn"
         >
           Netejar
         </button>
       </div>
-
-    </div>
+    </AdminPage>
   );
 }

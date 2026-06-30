@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1269 — 2026-06-30 — claude (FET)
+**Erradicació: intake 100% canònica, css esborrat.**
+- intake/page.tsx 171 ni__ → AdminPage/AdminSection/.adm-input/.ap-btn/.ap-card/.ap-badge. intake.css ESBORRAT + import tret. Spinner inline→animate-spin.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1269`; el següent canvi real ha de ser `#1270`.
+- Validació tècnica: `tsc` 0; qa:canon-debt OK.
+- Validació funcional: captura intake canònica.
+- Validació humana/UX: hipersemblant.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1268 — 2026-06-30 — claude (FET)
 **Erradicació: docs view (4 pàgines) 100% canòniques.**
 - MarkdownView + 3 page + 3 loading: 75 dmd__ → Tailwind/tokens/.ap-card/AdminEmptyState. docs-view.css ESBORRAT + 6 imports trets. 0 dmd__ a tot el repo.

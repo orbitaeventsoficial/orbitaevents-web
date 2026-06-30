@@ -1,3 +1,21 @@
+## 2026-06-30 — Erradicació: intake 100% canònica, css esborrat (Canvi #1269, claude+agent)
+
+### Què s'ha fet
+- `intake/page.tsx`: 171 `ni__` → canònic (AdminPage, AdminSection, .adm-input/.adm-input--textarea, .ap-btn/--primary/--xs toggles amb aria-pressed, .ap-card tons success/danger, .ap-badge). intake.css ESBORRAT + import tret.
+- Residus tècnics nets: spinner inline → animate-spin Tailwind; minHeight unset → tret.
+- Verificat: captura header AdminPage + AdminSection + adm-input, idèntic al sistema. 0 ni__, tsc 0.
+
+### Validació
+- Validació tècnica: `tsc` 0; `qa:canon-debt` OK (ni desaparegut).
+- Validació funcional: captura intake canònica.
+- Validació humana/UX: hipersemblant a la resta.
+
+### Coordinació
+Counter → 1269. 5a pàgina erradicada. Agents dossiers (dg) + compose (cx) encara treballant.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-30 — Erradicació: docs view (4 pàgines) 100% canòniques (Canvi #1268, claude+agent)
 
 ### Context
