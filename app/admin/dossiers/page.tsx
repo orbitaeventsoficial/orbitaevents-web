@@ -7,7 +7,7 @@
 // ─────────────────────────────────────────────────────────
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { AdminPage } from '../components/AdminPage';
+import { AdminPage, AdminSection } from '../components/AdminPage';
 import { DossierGeneratorClient } from './DossierGeneratorClient';
 import { ADMIN_DOSSIER_GENERATOR_COPY } from '@/lib/constants/admin';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
@@ -108,19 +108,22 @@ export default async function DossiersPage({ searchParams }: PageProps) {
       subtitle="Genera i gestiona els dossiers comercials per als clients."
     >
       {/* Generador */}
-      <section className="dg__gen-section">
-        <header className="dg__hero">
-          <div>
-            <span className="dg__hero-kicker">{ADMIN_DOSSIER_GENERATOR_COPY.page.kicker}</span>
-            <h2 className="dg__hero-title">{ADMIN_DOSSIER_GENERATOR_COPY.page.title}</h2>
-            <p className="dg__hero-copy">{ADMIN_DOSSIER_GENERATOR_COPY.page.description}</p>
+      <AdminSection
+        title={
+          <span className="flex flex-col gap-1">
+            <span className="font-mono text-xs font-bold uppercase tracking-[0.08em] text-[var(--gold-bright)]">{ADMIN_DOSSIER_GENERATOR_COPY.page.kicker}</span>
+            <span>{ADMIN_DOSSIER_GENERATOR_COPY.page.title}</span>
+          </span>
+        }
+        description={ADMIN_DOSSIER_GENERATOR_COPY.page.description}
+        actions={
+          <div className="flex flex-wrap items-center justify-end gap-2" aria-label="Estat del generador">
+            <span className="ap-badge">{ADMIN_DOSSIER_GENERATOR_COPY.page.railCustomer}</span>
+            <span className="ap-badge">{generatorProducts.length} {ADMIN_DOSSIER_GENERATOR_COPY.page.railCatalog}</span>
+            <span className="ap-badge">{dossiers.length} {ADMIN_DOSSIER_GENERATOR_COPY.page.railSaved}</span>
           </div>
-          <div className="dg__hero-rail" aria-label="Estat del generador">
-            <span>{ADMIN_DOSSIER_GENERATOR_COPY.page.railCustomer}</span>
-            <span>{generatorProducts.length} {ADMIN_DOSSIER_GENERATOR_COPY.page.railCatalog}</span>
-            <span>{dossiers.length} {ADMIN_DOSSIER_GENERATOR_COPY.page.railSaved}</span>
-          </div>
-        </header>
+        }
+      >
         <DossierGeneratorClient
           products={generatorProducts}
           dossierCopy={dossierCopy}
@@ -133,34 +136,33 @@ export default async function DossiersPage({ searchParams }: PageProps) {
           initialEventDesc={searchParams?.eventDesc}
           initialProductIds={initialProductIds}
         />
-      </section>
+      </AdminSection>
 
       {/* Llista de dossiers desats */}
       {dossiers.length > 0 && (
-        <section className="dg__list-section">
-          <h2 className="dg__section-title">Dossiers desats ({dossiers.length})</h2>
-          <div className="dg__list">
+        <AdminSection title={`Dossiers desats (${dossiers.length})`}>
+          <div className="flex flex-col gap-2">
             {dossiers.map((d) => {
               const productNames = lookupProducts
                 .filter((p) => d.productIds.includes(p.id))
                 .map((p) => p.nom)
                 .join(' · ');
               return (
-                <div key={d.id} className="dg__list-row">
-                  <div className="dg__list-info">
-                    <span className="dg__list-nom">{d.nom}{d.empresa ? ` — ${d.empresa}` : ''}</span>
-                    <span className="dg__list-meta">
+                <div key={d.id} className="ap-card ap-card-body flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="truncate text-base font-semibold text-[var(--t)]">{d.nom}{d.empresa ? ` — ${d.empresa}` : ''}</span>
+                    <span className="text-xs text-[var(--t3)]">
                       {productNames || 'Sense productes'}
                       {' · '}
                       {formatDateShort(typeof d.createdAt === 'string' ? d.createdAt : d.createdAt.toISOString())}
                     </span>
                     {d.sentAt && (
-                      <span className="dg__list-sent">
+                      <span className="text-xs text-[var(--gold-bright)]">
                         Enviat {formatDateShort(typeof d.sentAt === 'string' ? d.sentAt : d.sentAt.toISOString())} → {d.sentTo}
                       </span>
                     )}
                     {d.lead && (
-                      <Link href={buildLeadWorkspaceHref(d.lead.id)} className="dg__list-lead">
+                      <Link href={buildLeadWorkspaceHref(d.lead.id)} className="text-xs text-[var(--t3)] transition-colors hover:text-[var(--gold-bright)]">
                         Lead: {d.lead.name} ({d.lead.status})
                       </Link>
                     )}
@@ -187,25 +189,26 @@ export default async function DossiersPage({ searchParams }: PageProps) {
               );
             })}
           </div>
-        </section>
+        </AdminSection>
       )}
 
       {/* Paperera de dossiers (30 dies) */}
       {deletedDossiers.length > 0 && (
-        <section className="dg__list-section">
-          <h2 className="dg__section-title dg__section-title--trash">🗑 Paperera de dossiers ({deletedDossiers.length})</h2>
-          <p className="dg__section-hint">Els dossiers eliminats es purgen automàticament als 30 dies.</p>
-          <div className="dg__list">
+        <AdminSection
+          title={`🗑 Paperera de dossiers (${deletedDossiers.length})`}
+          description="Els dossiers eliminats es purgen automàticament als 30 dies."
+        >
+          <div className="flex flex-col gap-2">
             {deletedDossiers.map((d) => {
               const productNames = lookupProducts
                 .filter((p) => d.productIds.includes(p.id))
                 .map((p) => p.nom)
                 .join(' · ');
               return (
-                <div key={d.id} className="dg__list-row dg__list-row--deleted">
-                  <div className="dg__list-info">
-                    <span className="dg__list-nom">{d.nom}{d.empresa ? ` — ${d.empresa}` : ''}</span>
-                    <span className="dg__list-meta">
+                <div key={d.id} className="ap-card ap-card-body flex flex-wrap items-center justify-between gap-4 opacity-70">
+                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="truncate text-base font-semibold text-[var(--t)]">{d.nom}{d.empresa ? ` — ${d.empresa}` : ''}</span>
+                    <span className="text-xs text-[var(--t3)]">
                       {productNames || 'Sense productes'}
                       {' · '}
                       {d.deletedAt ? `Eliminat ${formatDateShort(typeof d.deletedAt === 'string' ? d.deletedAt : d.deletedAt.toISOString())}` : 'Eliminat'}
@@ -234,7 +237,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
               );
             })}
           </div>
-        </section>
+        </AdminSection>
       )}
 
     </AdminPage>

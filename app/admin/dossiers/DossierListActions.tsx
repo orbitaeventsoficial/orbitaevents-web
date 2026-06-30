@@ -115,17 +115,17 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
 
   if (isDeleted) {
     return (
-      <div className="dg__list-acts">
-        <button type="button" onClick={preview} className="dg__btn dg__btn--preview" title="Previsualitzar">
+      <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+        <button type="button" onClick={preview} className="ap-btn ap-btn--xs" title="Previsualitzar">
           Vista
         </button>
-        <button type="button" onClick={openCompositePdf} className="dg__btn dg__btn--pdf" title="Obrir dossier + fitxes en un sol PDF">
+        <button type="button" onClick={openCompositePdf} className="ap-btn ap-btn--primary ap-btn--xs" title="Obrir dossier + fitxes en un sol PDF">
           PDF complet
         </button>
-        <button type="button" onClick={restore} disabled={restoring} className="dg__btn dg__btn--save" title="Restaurar de la paperera">
+        <button type="button" onClick={restore} disabled={restoring} className="ap-btn ap-btn--xs" title="Restaurar de la paperera">
           {restoring ? '…' : '↩ Restaurar'}
         </button>
-        <button type="button" onClick={purge} disabled={purging} className="dg__btn dg__btn--danger" aria-label={`Eliminar permanentment dossier de ${nom}`} title="Eliminar permanentment">
+        <button type="button" onClick={purge} disabled={purging} className="ap-btn ap-btn--danger ap-btn--xs" aria-label={`Eliminar permanentment dossier de ${nom}`} title="Eliminar permanentment">
           {purging ? '…' : '✕ Eliminar'}
         </button>
       </div>
@@ -133,11 +133,11 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
   }
 
   return (
-    <div className="dg__list-acts">
-      <button type="button" onClick={preview} className="dg__btn dg__btn--preview" title="Previsualitzar">
+    <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+      <button type="button" onClick={preview} className="ap-btn ap-btn--xs" title="Previsualitzar">
         Vista
       </button>
-      <button type="button" onClick={openCompositePdf} className="dg__btn dg__btn--pdf" title="Obrir dossier + fitxes en un sol PDF">
+      <button type="button" onClick={openCompositePdf} className="ap-btn ap-btn--primary ap-btn--xs" title="Obrir dossier + fitxes en un sol PDF">
         PDF complet
       </button>
       {email && (
@@ -145,7 +145,7 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
           type="button"
           onClick={send}
           disabled={sending}
-          className="dg__btn dg__btn--save"
+          className="ap-btn ap-btn--xs"
           title={alreadySent ? 'Reenviar' : 'Enviar per email'}
         >
           {sending ? '…' : alreadySent ? 'Reenviar' : 'Enviar'}
@@ -155,7 +155,7 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
         type="button"
         onClick={moveToTrash}
         disabled={deleting}
-        className="dg__btn dg__btn--danger"
+        className="ap-btn ap-btn--danger ap-btn--xs"
         aria-label={`Mou a la paperera dossier de ${nom}`}
         title="Moure a la paperera (30 dies per restaurar)"
       >

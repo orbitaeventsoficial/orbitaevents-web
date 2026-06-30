@@ -1,3 +1,21 @@
+## 2026-06-30 — Erradicació: dossiers 100% canònica, css esborrat (Canvi #1271, claude+agent)
+
+### Què s'ha fet
+- `DossierGeneratorClient.tsx` (generador sencer: formulari, intake IA, cercadors lead/client, conflicte, checkout, selector hores DJ, catàleg) + `page.tsx` + `DossierListActions.tsx` + `loading.tsx`: ~348 `dg__` → canònic (AdminSection, .ap-card, .ap-btn/--primary/--danger/--xs, .adm-input, .ap-badge, AdminLoadingSkeletonList). Funcionalitat intacta.
+- `dossiers.css` ESBORRAT + 2 imports trets.
+- Verificat: captura header AdminPage + AdminSection + .ap-card, idèntic al sistema. 0 dg__, tsc 0, canon sense P1.
+
+### Validació
+- Validació tècnica: `tsc` 0; `qa:canon-debt` OK; check-admin-canon --strict 0; qa:no-phantom-classes OK.
+- Validació funcional: captura dossiers canònica.
+- Validació humana/UX: hipersemblant a la resta.
+
+### Coordinació
+Counter → 1271. 7a pàgina erradicada. Tanda 2 (intake+compose+dossiers) completa. Deute baixant cap a ~4350.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-30 — Erradicació: inbox/compose 100% canònica (Canvi #1270, claude+agent)
 
 ### Què s'ha fet

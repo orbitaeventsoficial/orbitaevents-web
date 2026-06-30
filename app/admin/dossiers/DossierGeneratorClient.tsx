@@ -9,9 +9,15 @@ import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import { DJ_EXTRA_HOUR_PRICE, DJ_FIRST_HOUR_PRICE, djPriceForHours } from '@/lib/constants/orbita-services';
 import { buildDossierHtml, type DossierCopy } from '@/lib/utils/dossier-html-builder';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
-import './dossiers.css';
+import { AdminSection } from '../components/AdminPage';
 
 const DJ_FIRST_PRODUCT_ID = 'orbita:dj-primera-hora';
+
+// Classes canòniques reutilitzades dins el generador (label de camp, capsa de
+// resultats del cercador i ítem de resultat) — tokens del sistema, zero hex local.
+const LABEL_CLS = 'flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.06em] text-[var(--t2)]';
+const RESULTS_CLS = 'absolute left-0 right-0 top-[calc(100%+0.25rem)] z-50 m-0 list-none overflow-hidden rounded-[var(--o-r-md)] border border-[var(--line2)] bg-[var(--raised)] p-1 shadow-lg';
+const RESULT_BTN_CLS = 'flex w-full flex-col gap-0.5 rounded-[var(--o-r-sm)] border-none bg-transparent px-3 py-2.5 text-left transition-colors hover:bg-[var(--panel)]';
 
 interface Props {
   products: AnimacioProduct[];
@@ -690,54 +696,53 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
   const canGenerate = nom.trim().length > 0 && selectedProducts.length > 0;
 
   return (
-    <div className="dg__wrap">
-      <section className="dg__panel dg__client-panel">
-        <div className="dg__panel-head">
-          <h2 className="dg__section-title">{ADMIN_DOSSIER_GENERATOR_COPY.client.title}</h2>
-          <p className="dg__section-hint">{ADMIN_DOSSIER_GENERATOR_COPY.client.hint}</p>
-        </div>
-        <div className="dg__intake">
-          <div className="dg__intake-head">
+    <div className="flex flex-col gap-6">
+      <AdminSection
+        title={ADMIN_DOSSIER_GENERATOR_COPY.client.title}
+        description={ADMIN_DOSSIER_GENERATOR_COPY.client.hint}
+      >
+        <div className="mb-4 flex flex-col gap-2.5 rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)] p-4">
+          <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h3>{ADMIN_DOSSIER_GENERATOR_COPY.client.intakeTitle}</h3>
-              <p>{ADMIN_DOSSIER_GENERATOR_COPY.client.intakeHint}</p>
+              <h3 className="text-base font-semibold text-[var(--t)]">{ADMIN_DOSSIER_GENERATOR_COPY.client.intakeTitle}</h3>
+              <p className="mt-1 max-w-[72ch] text-sm text-[var(--t3)]">{ADMIN_DOSSIER_GENERATOR_COPY.client.intakeHint}</p>
             </div>
-            <button type="button" className="dg__intake-action" onClick={extractReceivedText} disabled={extractingText}>
+            <button type="button" className="ap-btn ap-btn--primary shrink-0" onClick={extractReceivedText} disabled={extractingText}>
               {extractingText ? ADMIN_DOSSIER_GENERATOR_COPY.client.intakeWorking : ADMIN_DOSSIER_GENERATOR_COPY.client.intakeAction}
             </button>
           </div>
-          <label htmlFor="dg-received-text" className="dg__label">{ADMIN_DOSSIER_GENERATOR_COPY.client.intakeLabel}</label>
+          <label htmlFor="dg-received-text" className={LABEL_CLS}>{ADMIN_DOSSIER_GENERATOR_COPY.client.intakeLabel}</label>
           <textarea
             id="dg-received-text"
-            className="adm-input adm-input--textarea dg__intake-textarea"
+            className="adm-input adm-input--textarea min-h-20"
             value={receivedText}
             onChange={(event) => setReceivedText(event.target.value)}
             placeholder={ADMIN_DOSSIER_GENERATOR_COPY.client.intakePlaceholder}
             rows={3}
           />
         </div>
-        <div className="dg__search-wrap" ref={searchRef}>
+        <div className="relative mb-4 grid grid-cols-1 gap-3.5 sm:grid-cols-2" ref={searchRef}>
           {linkedLeadId ? (
-            <div className="dg__linked-lead">
-              <span className="dg__linked-label">{ADMIN_DOSSIER_GENERATOR_COPY.client.linkedLeadLabel}</span>
-              <span className="dg__linked-nom">{nom}</span>
-              {email && <span className="dg__linked-email">{email}</span>}
+            <div className="flex flex-wrap items-center gap-2.5 rounded-[var(--o-r-sm)] border border-[var(--gold)] bg-[var(--ax-gold-tint-1)] px-4 py-3">
+              <span className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--gold-bright)]">{ADMIN_DOSSIER_GENERATOR_COPY.client.linkedLeadLabel}</span>
+              <span className="text-base font-semibold text-[var(--t)]">{nom}</span>
+              {email && <span className="text-xs text-[var(--t3)]">{email}</span>}
               <a
                 href={buildLeadWorkspaceHref(linkedLeadId)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="dg__linked-open"
+                className="ap-btn ap-btn--primary ap-btn--xs ml-auto"
                 title="Obre la fitxa completa del lead en una pestanya nova (no perds el dossier en curs)"
               >
                 Obrir fitxa ↗
               </a>
-              <button type="button" className="dg__linked-clear" onClick={clearLinkedLead} aria-label="Desvincula el lead">
+              <button type="button" className="ap-btn ap-btn--xs" onClick={clearLinkedLead} aria-label="Desvincula el lead">
                 {ADMIN_DOSSIER_GENERATOR_COPY.client.changeLeadAction}
               </button>
             </div>
           ) : (
-            <div className="dg__search-field">
-              <label htmlFor="dg-search" className="dg__label">{ADMIN_DOSSIER_GENERATOR_COPY.client.leadSearchLabel}</label>
+            <div className="relative flex max-w-[42rem] flex-col gap-1.5">
+              <label htmlFor="dg-search" className={LABEL_CLS}>{ADMIN_DOSSIER_GENERATOR_COPY.client.leadSearchLabel}</label>
               <input
                 id="dg-search"
                 type="search"
@@ -748,14 +753,14 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
                 onFocus={() => searchResults.length > 0 && setShowResults(true)}
                 autoComplete="off"
               />
-              {searching && <span className="dg__search-spinner">Cercant…</span>}
+              {searching && <span className="absolute right-3 top-9 text-xs text-[var(--t3)]">Cercant…</span>}
               {showResults && searchResults.length > 0 && (
-                <ul className="dg__search-results">
+                <ul className={RESULTS_CLS}>
                   {searchResults.map((lead) => (
                     <li key={lead.id}>
-                      <button type="button" className="dg__search-result" onClick={() => selectLead(lead)}>
-                        <span className="dg__sr-nom">{lead.name}</span>
-                        <span className="dg__sr-meta">
+                      <button type="button" className={RESULT_BTN_CLS} onClick={() => selectLead(lead)}>
+                        <span className="text-base font-semibold text-[var(--t)]">{lead.name}</span>
+                        <span className="text-xs text-[var(--t3)]">
                           {lead.email ?? lead.phone ?? ''}
                           {' · '}
                           {lead.status}
@@ -766,24 +771,24 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
                 </ul>
               )}
               {showResults && searchResults.length === 0 && !searching && searchQuery.length >= 2 && (
-                <div className="dg__search-empty">Cap lead trobat. Omple les dades manualment.</div>
+                <div className="mt-1 rounded-[var(--o-r-sm)] border border-[var(--line)] px-3 py-2.5 text-sm text-[var(--t3)]">Cap lead trobat. Omple les dades manualment.</div>
               )}
             </div>
           )}
           {!linkedLeadId && (
-            <div className="dg__customer-wrap">
+            <div>
               {linkedCustomerId ? (
-                <div className="dg__linked-lead dg__linked-lead--customer">
-                  <span className="dg__linked-label">{ADMIN_DOSSIER_GENERATOR_COPY.client.linkedCustomerLabel}</span>
-                  <span className="dg__linked-nom">{linkedCustomerLabel || nom}</span>
-                  {email && <span className="dg__linked-email">{email}</span>}
-                  <button type="button" className="dg__linked-clear" onClick={clearLinkedCustomer} aria-label="Desvincula el client">
+                <div className="flex max-w-[42rem] flex-wrap items-center gap-2.5 rounded-[var(--o-r-sm)] border border-[var(--line2)] bg-[var(--sunk)] px-4 py-3">
+                  <span className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--gold-bright)]">{ADMIN_DOSSIER_GENERATOR_COPY.client.linkedCustomerLabel}</span>
+                  <span className="text-base font-semibold text-[var(--t)]">{linkedCustomerLabel || nom}</span>
+                  {email && <span className="text-xs text-[var(--t3)]">{email}</span>}
+                  <button type="button" className="ap-btn ap-btn--xs ml-auto" onClick={clearLinkedCustomer} aria-label="Desvincula el client">
                     {ADMIN_DOSSIER_GENERATOR_COPY.client.changeCustomerAction}
                   </button>
                 </div>
               ) : (
-                <div className="dg__search-field">
-                  <label htmlFor="dg-customer-search" className="dg__label">{ADMIN_DOSSIER_GENERATOR_COPY.client.customerSearchLabel}</label>
+                <div className="relative flex max-w-[42rem] flex-col gap-1.5">
+                  <label htmlFor="dg-customer-search" className={LABEL_CLS}>{ADMIN_DOSSIER_GENERATOR_COPY.client.customerSearchLabel}</label>
                   <input
                     id="dg-customer-search"
                     type="search"
@@ -794,14 +799,14 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
                     onFocus={() => customerResults.length > 0 && setShowCustomerResults(true)}
                     autoComplete="off"
                   />
-                  {customerSearching && <span className="dg__search-spinner">Cercant…</span>}
+                  {customerSearching && <span className="absolute right-3 top-9 text-xs text-[var(--t3)]">Cercant…</span>}
                   {showCustomerResults && customerResults.length > 0 && (
-                    <ul className="dg__search-results">
+                    <ul className={RESULTS_CLS}>
                       {customerResults.map((customer) => (
                         <li key={customer.id}>
-                          <button type="button" className="dg__search-result" onClick={() => selectCustomer(customer)}>
-                            <span className="dg__sr-nom">{customer.name}</span>
-                            <span className="dg__sr-meta">
+                          <button type="button" className={RESULT_BTN_CLS} onClick={() => selectCustomer(customer)}>
+                            <span className="text-base font-semibold text-[var(--t)]">{customer.name}</span>
+                            <span className="text-xs text-[var(--t3)]">
                               {customer.email ?? customer.phone ?? 'Client sense contacte principal'}
                               {customer.lifecycleStage ? ` · ${customer.lifecycleStage}` : ''}
                             </span>
@@ -811,7 +816,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
                     </ul>
                   )}
                   {showCustomerResults && customerResults.length === 0 && !customerSearching && customerQuery.length >= 2 && (
-                    <div className="dg__search-empty">Cap client trobat. Es crearà un client nou si actives el flux CRM.</div>
+                    <div className="mt-1 rounded-[var(--o-r-sm)] border border-[var(--line)] px-3 py-2.5 text-sm text-[var(--t3)]">Cap client trobat. Es crearà un client nou si actives el flux CRM.</div>
                   )}
                 </div>
               )}
@@ -819,19 +824,20 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
           )}
         </div>
         {customerConflict && !linkedCustomerId && !linkedLeadId && (
-          <div className="dg__customer-conflict" role="alert">
-            <div className="dg__conflict-body">
-              <span className="dg__conflict-kicker">{ADMIN_DOSSIER_GENERATOR_COPY.conflict.kicker}</span>
-              <strong>{customerConflict.name}</strong>
-              <span>{customerConflict.email ?? customerConflict.phone ?? ADMIN_DOSSIER_GENERATOR_COPY.conflict.noContact}</span>
-              <p>{ADMIN_DOSSIER_GENERATOR_COPY.conflict.body}</p>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-4 rounded-[var(--o-r-sm)] border border-[var(--gold)] bg-[var(--ax-gold-tint-1)] px-4 py-3.5" role="alert">
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <span className="font-mono text-xs font-bold uppercase tracking-[0.08em] text-[var(--gold-bright)]">{ADMIN_DOSSIER_GENERATOR_COPY.conflict.kicker}</span>
+              <strong className="text-base text-[var(--t)]">{customerConflict.name}</strong>
+              <span className="text-xs text-[var(--t3)]">{customerConflict.email ?? customerConflict.phone ?? ADMIN_DOSSIER_GENERATOR_COPY.conflict.noContact}</span>
+              <p className="mt-1 text-sm text-[var(--t2)]">{ADMIN_DOSSIER_GENERATOR_COPY.conflict.body}</p>
             </div>
-            <div className="dg__conflict-actions">
-              <button type="button" onClick={() => selectCustomer(customerConflict)}>
+            <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+              <button type="button" className="ap-btn ap-btn--primary ap-btn--xs" onClick={() => selectCustomer(customerConflict)}>
                 {ADMIN_DOSSIER_GENERATOR_COPY.conflict.linkAction}
               </button>
               <button
                 type="button"
+                className="ap-btn ap-btn--xs"
                 onClick={() => {
                   setCustomerQuery(customerConflict.email ?? customerConflict.phone ?? customerConflict.name);
                   setCustomerConflict(null);
@@ -843,87 +849,87 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
             </div>
           </div>
         )}
-          <div className="dg__fields">
-            <div className="dg__field">
-              <label htmlFor="dg-nom" className="dg__label">Nom *</label>
+          <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 xl:grid-cols-4">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="dg-nom" className={LABEL_CLS}>Nom *</label>
               <input id="dg-nom" type="text" className="adm-input" value={nom} onChange={(e) => { setNom(e.target.value); setCustomerConflict(null); }} placeholder="Adrià" autoComplete="off" />
             </div>
-            <div className="dg__field">
-              <label htmlFor="dg-empresa" className="dg__label">Empresa / Associació</label>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="dg-empresa" className={LABEL_CLS}>Empresa / Associació</label>
               <input id="dg-empresa" type="text" className="adm-input" value={empresa} onChange={(e) => setEmpresa(e.target.value)} placeholder="Associació de Veïns de Rubí" autoComplete="off" />
             </div>
-            <div className="dg__field">
-              <label htmlFor="dg-telefon" className="dg__label">Telèfon</label>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="dg-telefon" className={LABEL_CLS}>Telèfon</label>
               <input id="dg-telefon" type="tel" className="adm-input" value={telefon} onChange={(e) => { setTelefon(e.target.value); setCustomerConflict(null); }} placeholder="+34 600 00 00 00" autoComplete="off" />
             </div>
-            <div className="dg__field">
-              <label htmlFor="dg-email" className="dg__label">Email</label>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="dg-email" className={LABEL_CLS}>Email</label>
               <input id="dg-email" type="email" className="adm-input" value={email} onChange={(e) => { setEmail(e.target.value); setCustomerConflict(null); }} placeholder="client@exemple.com" autoComplete="off" />
             </div>
-            <div className="dg__field dg__field--full">
-              <label htmlFor="dg-event" className="dg__label">{ADMIN_DOSSIER_GENERATOR_COPY.client.eventSummaryLabel}</label>
+            <div className="flex flex-col gap-1.5 md:col-span-2 xl:col-span-4">
+              <label htmlFor="dg-event" className={LABEL_CLS}>{ADMIN_DOSSIER_GENERATOR_COPY.client.eventSummaryLabel}</label>
               <input id="dg-event" type="text" className="adm-input" value={eventDesc} onChange={(e) => setEventDesc(e.target.value)} placeholder={ADMIN_DOSSIER_GENERATOR_COPY.client.eventSummaryPlaceholder} autoComplete="off" />
             </div>
-            <div className="dg__field">
-              <label htmlFor="dg-travel-km" className="dg__label">Km desplaçament (anada + tornada)</label>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="dg-travel-km" className={LABEL_CLS}>Km desplaçament (anada + tornada)</label>
               <input id="dg-travel-km" type="number" min={0} step={1} className="adm-input" value={travelKm} onChange={(e) => setTravelKm(e.target.value)} placeholder="Ex: 70" autoComplete="off" />
             </div>
-            <div className="dg__field dg__field--full">
-              <label htmlFor="dg-salutacio" className="dg__label">
+            <div className="flex flex-col gap-1.5 md:col-span-2 xl:col-span-4">
+              <label htmlFor="dg-salutacio" className={LABEL_CLS}>
                 {ADMIN_DOSSIER_GENERATOR_COPY.client.introLabel}
-                <span className="dg__label-hint">{ADMIN_DOSSIER_GENERATOR_COPY.client.introHint}</span>
+                <span className="text-xs font-normal normal-case tracking-normal text-[var(--t3)]">{ADMIN_DOSSIER_GENERATOR_COPY.client.introHint}</span>
               </label>
               <textarea id="dg-salutacio" className="adm-input adm-input--textarea" value={salutacio} onChange={(e) => setSalutacio(e.target.value)} placeholder={ADMIN_DOSSIER_GENERATOR_COPY.client.introPlaceholder} rows={4} />
             </div>
           </div>
-      </section>
+      </AdminSection>
 
-      <div className="dg__config-grid">
-        <aside className="dg__config-side">
-          <section className="dg__checkout">
-            <div className="dg__checkout-head">
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(18rem,0.82fr)_minmax(0,1.18fr)]">
+        <aside className="flex flex-col gap-3.5 lg:sticky lg:top-4">
+          <section className="ap-card ap-card-body">
+            <div className="mb-3.5 flex flex-wrap items-start justify-between gap-4">
               <div>
-                <h2 className="dg__section-title">{ADMIN_DOSSIER_GENERATOR_COPY.bolo.title}</h2>
-                <p className="dg__section-hint">{ADMIN_DOSSIER_GENERATOR_COPY.bolo.hint}</p>
+                <h2 className="text-base font-semibold text-[var(--t)]">{ADMIN_DOSSIER_GENERATOR_COPY.bolo.title}</h2>
+                <p className="mt-1 text-sm text-[var(--t3)]">{ADMIN_DOSSIER_GENERATOR_COPY.bolo.hint}</p>
               </div>
-              <div className="dg__checkout-total">
-                <span>{ADMIN_DOSSIER_GENERATOR_COPY.bolo.totalLabel}</span>
-                <strong>{formatEuro(selectedTotal)}</strong>
+              <div className="shrink-0 text-right">
+                <span className="block font-mono text-xs uppercase tracking-[0.08em] text-[var(--t3)]">{ADMIN_DOSSIER_GENERATOR_COPY.bolo.totalLabel}</span>
+                <strong className="block text-xl leading-tight text-[var(--gold-bright)]">{formatEuro(selectedTotal)}</strong>
               </div>
             </div>
             {selectedProducts.length > 0 ? (
-              <div className="dg__checkout-list">
+              <div className="flex flex-col gap-2">
                 {selectedProducts.map((product) => {
                   const isDj = product.id === DJ_FIRST_PRODUCT_ID;
                   const price = productPriceValue(product, djHours);
                   return (
-                    <div key={product.id} className="dg__checkout-row">
+                    <div key={product.id} className="flex items-center justify-between gap-3 rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)] px-3 py-2.5">
                       <div>
-                        <span className="dg__checkout-name">{product.nom}{isDj ? ` · ${djHours}h` : ''}</span>
-                        <span className="dg__checkout-meta">{productGroupTitle(productGroupKey(product))} · {productBadge(product)}</span>
+                        <span className="block font-semibold text-[var(--t)]">{product.nom}{isDj ? ` · ${djHours}h` : ''}</span>
+                        <span className="mt-0.5 block text-xs text-[var(--t3)]">{productGroupTitle(productGroupKey(product))} · {productBadge(product)}</span>
                         {isDj && (
-                          <div className="dg__dj-hours" role="group" aria-label="Hores de DJ">
+                          <div className="mt-2 flex flex-wrap items-center gap-2" role="group" aria-label="Hores de DJ">
                             <button
                               type="button"
-                              className="dg__dj-hours-btn"
+                              className="inline-flex h-6 w-6 items-center justify-center rounded-[var(--o-r-sm)] border border-[var(--line2)] text-sm leading-none text-[var(--t)] hover:border-[var(--gold)] hover:text-[var(--gold-bright)] disabled:opacity-40"
                               onClick={() => setDjHours((h) => Math.max(1, h - 1))}
                               disabled={djHours <= 1}
                               aria-label="Treure una hora de DJ"
                             >−</button>
-                            <span className="dg__dj-hours-val">{djHours} {djHours === 1 ? 'hora' : 'hores'}</span>
+                            <span className="min-w-16 text-center font-mono text-xs text-[var(--t)]">{djHours} {djHours === 1 ? 'hora' : 'hores'}</span>
                             <button
                               type="button"
-                              className="dg__dj-hours-btn"
+                              className="inline-flex h-6 w-6 items-center justify-center rounded-[var(--o-r-sm)] border border-[var(--line2)] text-sm leading-none text-[var(--t)] hover:border-[var(--gold)] hover:text-[var(--gold-bright)] disabled:opacity-40"
                               onClick={() => setDjHours((h) => h + 1)}
                               aria-label="Afegir una hora de DJ"
                             >+</button>
-                            <span className="dg__dj-hours-hint">1a {formatEuro(DJ_FIRST_HOUR_PRICE)} · +{formatEuro(DJ_EXTRA_HOUR_PRICE)}/h</span>
+                            <span className="text-xs text-[var(--t3)]">1a {formatEuro(DJ_FIRST_HOUR_PRICE)} · +{formatEuro(DJ_EXTRA_HOUR_PRICE)}/h</span>
                           </div>
                         )}
                       </div>
-                      <div className="dg__checkout-side">
+                      <div className="flex shrink-0 items-center gap-2.5 font-mono text-sm text-[var(--t)]">
                         <span>{price != null ? formatEuro(price) : 'A mida'}</span>
-                        <button type="button" onClick={() => toggleProduct(product.id)} aria-label={`Treure ${product.nom}`}>
+                        <button type="button" className="ap-btn ap-btn--xs" onClick={() => toggleProduct(product.id)} aria-label={`Treure ${product.nom}`}>
                           Treure
                         </button>
                       </div>
@@ -932,24 +938,26 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
                 })}
               </div>
             ) : (
-              <p className="dg__checkout-empty">{ADMIN_DOSSIER_GENERATOR_COPY.bolo.empty}</p>
+              <p className="text-sm text-[var(--t3)]">{ADMIN_DOSSIER_GENERATOR_COPY.bolo.empty}</p>
             )}
           </section>
 
-          <div className="dg__send-options">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-3 rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)] px-4 py-3">
             {!linkedLeadId && (
-              <label className="dg__lead-create">
+              <label className="inline-flex cursor-pointer items-center gap-2.5 font-mono text-xs text-[var(--t2)]">
                 <input
                   type="checkbox"
+                  className="accent-[var(--gold)]"
                   checked={createLeadOnSave}
                   onChange={(event) => setCreateLeadOnSave(event.target.checked)}
                 />
                 <span>{linkedCustomerId ? ADMIN_DOSSIER_GENERATOR_COPY.actions.createLeadForCustomer : ADMIN_DOSSIER_GENERATOR_COPY.actions.createCrmFlow}</span>
               </label>
             )}
-            <label className="dg__lead-create">
+            <label className="inline-flex cursor-pointer items-center gap-2.5 font-mono text-xs text-[var(--t2)]">
               <input
                 type="checkbox"
+                className="accent-[var(--gold)]"
                 checked={sendOnSave}
                 onChange={(event) => setSendOnSave(event.target.checked)}
               />
@@ -957,55 +965,58 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
             </label>
           </div>
 
-          <div className="dg__actions">
-            <button type="button" className="dg__btn dg__btn--preview" onClick={() => generate('preview')} disabled={!canGenerate || generating}>
+          <div className="grid grid-cols-1 gap-2.5">
+            <button type="button" className="ap-btn" onClick={() => generate('preview')} disabled={!canGenerate || generating}>
               Previsualitzar
             </button>
-            <button type="button" className="dg__btn dg__btn--pdf" onClick={() => generate('pdf')} disabled={!canGenerate || generating}>
+            <button type="button" className="ap-btn ap-btn--primary" onClick={() => generate('pdf')} disabled={!canGenerate || generating}>
               Obrir PDF
             </button>
-            <button type="button" className="dg__btn dg__btn--save" onClick={saveDossier} disabled={!canGenerate || saving}>
+            <button type="button" className="ap-btn" onClick={saveDossier} disabled={!canGenerate || saving}>
               {saving ? 'Desant…' : savedId ? '✓ Desat' : 'Desar al sistema'}
             </button>
-            <button type="button" className="dg__btn dg__btn--download" onClick={() => generate('download')} disabled={!canGenerate || generating}>
+            <button type="button" className="ap-btn" onClick={() => generate('download')} disabled={!canGenerate || generating}>
               Descarregar peça HTML
             </button>
-            <span className="dg__hint">
+            <span className="text-xs text-[var(--t3)]">
               {!nom.trim() ? 'Omple el nom del client per continuar' : selectedProducts.length === 0 ? 'Selecciona almenys un producte' : `${selectedProducts.length} producte${selectedProducts.length > 1 ? 's' : ''} · ${formatEuro(selectedTotal)}`}
             </span>
           </div>
         </aside>
 
-        <section className="dg__panel dg__catalog-panel">
-          <h2 className="dg__section-title">{ADMIN_DOSSIER_GENERATOR_COPY.catalog.title}</h2>
-          <p className="dg__section-hint">{ADMIN_DOSSIER_GENERATOR_COPY.catalog.hint}</p>
+        <section className="ap-card ap-card-body min-w-0">
+          <h2 className="text-base font-semibold text-[var(--t)]">{ADMIN_DOSSIER_GENERATOR_COPY.catalog.title}</h2>
+          <p className="mb-4 mt-1 text-sm text-[var(--t3)]">{ADMIN_DOSSIER_GENERATOR_COPY.catalog.hint}</p>
           {productGroups.length === 0 && (
-            <p className="dg__catalog-empty">
+            <p className="mt-2 rounded-[var(--o-r-sm)] border border-dashed border-[var(--line2)] bg-[var(--sunk)] p-5 text-center text-sm text-[var(--t3)]">
               Encara no hi ha cap servei al catàleg. Activa productes a Òrbita o als col·laboradors per poder muntar el dossier.
             </p>
           )}
-          <div className="dg__product-groups">
+          <div className="flex flex-col gap-4">
             {productGroups.map(({ group, items }) => (
-              <section key={group} className="dg__product-group">
-                <div className="dg__group-head">
-                  <span className="dg__group-title">{productGroupTitle(group)}</span>
-                  <span className="dg__group-subtitle">{productGroupSubtitle(group)}</span>
+              <section key={group} className="flex flex-col gap-2.5">
+                <div className="flex items-baseline gap-3 border-b border-[var(--line)] pb-2">
+                  <span className="font-mono text-xs font-bold uppercase tracking-[0.08em] text-[var(--gold-bright)]">{productGroupTitle(group)}</span>
+                  <span className="text-xs text-[var(--t3)]">{productGroupSubtitle(group)}</span>
                 </div>
-                <div className="dg__products">
+                <div className="grid grid-cols-1 gap-2.5 xl:grid-cols-2">
                   {items.map((p) => {
                     const checked = selectedIds.has(p.id);
                     const priceLabel = productPriceLabel(p);
                     return (
-                      <label key={p.id} className={`dg__product-card${checked ? ' dg__product-card--active' : ''}`}>
-                        <input type="checkbox" checked={checked} onChange={() => toggleProduct(p.id)} className="dg__product-checkbox" aria-label={`Incloure ${p.nom}`} />
-                        <div className="dg__product-info">
-                          <span className="dg__product-top">
-                            <span className="dg__product-name">{p.nom}</span>
-                            <span className="dg__product-badge">{productBadge(p)}</span>
+                      <label
+                        key={p.id}
+                        className={`flex min-h-16 cursor-pointer items-center gap-3 rounded-[var(--o-r-sm)] border bg-[var(--sunk)] px-3.5 py-3 transition-colors hover:border-[var(--gold)] ${checked ? 'border-[var(--gold)] bg-[var(--ax-gold-tint-1)]' : 'border-[var(--line)]'}`}
+                      >
+                        <input type="checkbox" checked={checked} onChange={() => toggleProduct(p.id)} className="sr-only" aria-label={`Incloure ${p.nom}`} />
+                        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                          <span className="flex min-w-0 items-center gap-2">
+                            <span className="font-semibold text-[var(--t)]">{p.nom}</span>
+                            <span className="ap-badge shrink-0">{productBadge(p)}</span>
                           </span>
-                          {priceLabel && <span className="dg__product-price">{priceLabel}</span>}
+                          {priceLabel && <span className="text-xs text-[var(--t3)]">{priceLabel}</span>}
                         </div>
-                        <div className={`dg__product-check${checked ? ' dg__product-check--on' : ''}`}>✓</div>
+                        <div className={`flex h-[1.375rem] w-[1.375rem] items-center justify-center rounded-full border-2 text-xs ${checked ? 'border-[var(--gold)] bg-[var(--gold)] text-[var(--canvas)]' : 'border-[var(--line2)] text-transparent'}`}>✓</div>
                       </label>
                     );
                   })}
@@ -1013,7 +1024,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
               </section>
             ))}
           </div>
-          {selectedIds.size === 0 && <p className="dg__warn">Selecciona almenys un producte per generar el dossier.</p>}
+          {selectedIds.size === 0 && <p className="mt-3 text-sm text-[var(--o-stage-lost)]">Selecciona almenys un producte per generar el dossier.</p>}
         </section>
       </div>
     </div>

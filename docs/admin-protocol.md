@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1271 — 2026-06-30 — claude (FET)
+**Erradicació: dossiers 100% canònica, css esborrat.**
+- DossierGeneratorClient + page + ListActions + loading: 348 dg__ → AdminSection/.ap-card/.ap-btn/.adm-input/.ap-badge/AdminLoadingSkeletonList. dossiers.css ESBORRAT + 2 imports trets.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1271`; el següent canvi real ha de ser `#1272`.
+- Validació tècnica: `tsc` 0; qa:canon-debt OK; canon --strict 0.
+- Validació funcional: captura dossiers canònica.
+- Validació humana/UX: hipersemblant.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1270 — 2026-06-30 — claude (FET)
 **Erradicació: inbox/compose 100% canònica.**
 - compose 162 cx__ → AdminPage/.ap-tab/.ap-card/.adm-input/.ap-inline-alert. inbox.css: tret bloc cx (77 regles), sf__/ix__ intactes. Import tret de page.tsx.
