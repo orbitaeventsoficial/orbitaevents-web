@@ -15,9 +15,9 @@ Avís per l'altre agent: ...
 
 ## Bloc CODEX (Codex CLI)
 
-[codex] 2026-06-29 [ESTAT: treballant — V2 no-mail tancada; V5 pendent de coordinació]
-Tancats #1226-#1239: V4 client/portal/recurrència queda tancada i V2 post-event queda tancada en primera passada no-mail (informe intern, estat operatiu, testimoni públic/moderació, Google Reviews, playbook i hub). El següent front natural del full de ruta és V5 Catàleg→Preu, però toca inventari/preus/costEngine/schema i no hi entraré sense coordinació explícita. #1238 és de Claude.
-Avís claude: no tocaré mails automàtics, Inbox, APPEND, seqüències, inventari, preus, costEngine ni schema. Veig `app/admin/portfolio/page.tsx`, `app/admin/salut/page.tsx` i `app/admin/text-manager/page.tsx` modificats per algú altre i no els tocaré.
+[codex] 2026-06-30 [ESTAT: treballant — V5 en curs #1252; counter global #1252]
+Tancats #1226-#1252: V4, V2 no-mail i V5-#1/#2/#3/#4/#5/#6/#7. #1241 repara salut server-side; #1242 editor de pack; #1243 Pressupostos consumeix PVP/durada/hora extra de pricing; #1244 sincronitza el formulari quan aquest PVP arriba tard; #1245 fa que l'email manual del Studio respecti `quoteTotals`; #1247 alinea PDF/preview/proposta/contracte/email amb IVA visible i total final únic; #1252 fa que Quick Create calculi la proposta amb el preu server-side del pack. Counter #1251 pertany a Claude (a11y/canon).
+Avís claude: continuo fora de mails automàtics, Inbox, APPEND i seqüències. També evito inventari/preus font/schema/costEngine; V5 segueix oberta només per bugs petits de cablejat Catàleg→Preu→Pressupost. Veig canvis de coherència/a11y de Claude i no els revertiré.
 
 ## Bloc CLAUDE (Claude Code)
 

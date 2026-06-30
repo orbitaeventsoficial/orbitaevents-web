@@ -83,7 +83,7 @@ context (ids/params) correcte? el que es veu aquí és el mateix que a Economia/
 | V2 | POST-EVENT | Event→Informe→Enquesta→Ressenya→Feedback | ✅ TANCADA #1239 (perímetre no-mail) |
 | V3 | COMUNICACIÓ | Lead→Email/Inbox→Seqüències→Timeline client | ✅ TANCADA #1220 |
 | V4 | CLIENT / RECURRÈNCIA | Lead→Client→Portal client (pagament/signatura)→Reactivació/Referrals | ✅ TANCADA #1231 |
-| V5 | CATÀLEG → PREU | Pack/Inventari→Cost→Preu recomanat→Pressupost (cablejat de preus) | ⬜ |
+| V5 | CATÀLEG → PREU | Pack/Inventari→Cost→Preu recomanat→Pressupost (cablejat de preus) | 🔶 EN CURS #1247 |
 
 ### 🔬 V3 — VERTICAL DE COMUNICACIÓ (1a passada) · Lead→Inbox/Email→Seqüències→Timeline
 Dades reals: 53 leadActivity, 6 emailSend.
@@ -113,6 +113,14 @@ Dades reals: 53 leadActivity, 6 emailSend.
 - 🔶 **V2-#6 · Copy admin confonia pendent d'enviar amb pendent de resposta — RESOLT #1236** — `/admin/post-event` etiqueta el KPI com `Enquestes sense resposta` (query real: `clientSurvey=null`) i `/admin/google-reviews` reflecteix el cron + refresc manual #1234.
 - 🔶 **V2-#7 · Playbook post-event estava orfe del hub mare — RESOLT #1237** — `/admin/post-event` incorpora el quart pas `Playbook` cap a `/admin/post-event/playbook`, amb graella responsive a 4 passos.
 - ✅ **V2 tancada en primera passada no-mail — #1239** — informe intern, estat operatiu, testimoni públic/moderació, Google Reviews, playbook i hub post-event queden coherents. El perímetre d'enviament automàtic de mails, Inbox, APPEND i seqüències queda fora d'aquest tancament per coordinació explícita.
+
+### 🔬 V5 — VERTICAL CATÀLEG → PREU (1a passada) · Pack/Inventari→Cost→Preu recomanat→Pressupost
+- 🔶 **V5-#1 · `specialistServices` no afectava el càlcul de packs — RESOLT #1241** — `computePackPricingHealth()` ja no força `specialistCount=1` per tots els packs. Els serveis configurats com a especialistes usen 1 especialista; la resta usa 1 operari base, i els llindars de convidats/hores/watts continuen sumant operari de suport.
+- 🔶 **V5-#2 · L'editor de pack recalculava amb la fórmula antiga — RESOLT #1242** — `/admin/packs/[id]` usa `computePackEditorPricing()` pur amb la mateixa regla de `specialistServices`.
+- 🔶 **V5-#3 · Pressupostos descartava el PVP real dels packs — RESOLT #1243** — `/admin/presupuestos` superposa per `slug` PVP, PVP original, hora extra i `djHours` de BD sobre el fallback estàtic.
+- 🔶 **V5-#4 · El PVP real podia arribar tard i no entrar al formulari — RESOLT #1244** — el formulari se sincronitza amb el pack de catàleg quan és un pressupost nou i no hi ha override manual, sense trepitjar propostes existents, custom pack ni drafts locals.
+- 🔶 **V5-#5 · L'email manual podia recalcular un total diferent del Studio — RESOLT #1245** — el Studio envia `quoteTotals` explícits i `adminQuoteEmailService` els respecta sense passar pel recalculador legacy.
+- 🔶 **V5-#6 · PDF/preview mostraven un total sense IVA diferent de proposta/email — RESOLT #1247** — `computeQuoteStudioTotals()` centralitza subtotal, descompte, IVA i total final. Preview i PDF mostren IVA i comparteixen total final amb proposta, contracte i email.
 
 ### FASE 2 — AUDITORIES HORITZONTALS (disseny pàgina a pàgina) · «que tot sigui IMPECABLE»
 Quan les verticals estiguin verdes: les 92 pàgines + 6 PDFs + 13 emails + components, amb
