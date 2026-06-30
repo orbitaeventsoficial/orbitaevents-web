@@ -14,6 +14,7 @@ import { loadTaskQueue, type TaskQueue } from '@/lib/services/tasks/taskQueueSer
 import TaskQueueBanner from './TaskQueueBanner';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { AdminPage } from '../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -99,39 +100,24 @@ export default async function TasksPage({
   };
 
   return (
-    <div className="tk__root">
-      <header className="tk__header">
-        <div className="tk__header-left">
-          <span className="tk__eyebrow">Operativa</span>
-          <h1 className="tk__title">Tasques</h1>
-          <p className="tk__subtitle">{total} tasques{customerId ? ' del client' : ''}</p>
-        </div>
-        <div className="tk__header-right">
-          <TaskPageToolbar isKanban={isKanban} status={status} customerId={customerId} />
-        </div>
-      </header>
-
-      <div className="tk__body">
-        {!isKanban && (
-          <div className="tk__strip">
-          </div>
-        )}
-        {!isKanban && queueSummary.total > 0 && (
-          <div className="tk__section">
-            <TaskQueueBanner queues={queueSummary.queues} total={queueSummary.total} />
-          </div>
-        )}
-        {isKanban ? (
-          <TaskKanbanSection />
-        ) : (
-          <>
-            <TaskFiltersSection status={status} customerId={customerId} />
-            <TaskListSection tasks={tasks} resolveDestination={resolveDestination} />
-          </>
-        )}
-        {!isKanban && <TaskPagination page={page} totalPages={totalPages} buildHref={buildHref} />}
-      </div>
-    </div>
+    <AdminPage
+      title="Tasques"
+      subtitle={`${total} tasques${customerId ? ' del client' : ''}`}
+      actions={<TaskPageToolbar isKanban={isKanban} status={status} customerId={customerId} />}
+    >
+      {!isKanban && queueSummary.total > 0 && (
+        <TaskQueueBanner queues={queueSummary.queues} total={queueSummary.total} />
+      )}
+      {isKanban ? (
+        <TaskKanbanSection />
+      ) : (
+        <>
+          <TaskFiltersSection status={status} customerId={customerId} />
+          <TaskListSection tasks={tasks} resolveDestination={resolveDestination} />
+        </>
+      )}
+      {!isKanban && <TaskPagination page={page} totalPages={totalPages} buildHref={buildHref} />}
+    </AdminPage>
   );
 }
 

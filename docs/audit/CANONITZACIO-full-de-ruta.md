@@ -58,6 +58,13 @@ infraestructura legítima abans de tocar. `ap-*` és el canònic (NO es toca, é
 **Regla d'or (propietari):** si falta un component canònic, **primer s'amplia Studio/components
 canònics, després es consumeix.** Afegir elements està bé — però han de ser canònics. MAI un `xx__` nou.
 
+### Regla de decisió per element (propietari 2026-06-30)
+Per cada element propi `xx__` trobat:
+1. **Equival a un canònic existent?** → migra'l (`xx__btn`→`.ap-btn`).
+2. **Es repeteix en ≥2 pàgines fent el mateix?** → **ajunta i simplifica** en UN canònic compartit (amplia Studio); totes l'usen.
+3. **És exclusiu d'una pàgina però vàlid?** → es **crea de nou COM A CANÒNIC** a Studio/components (no `xx__`). Es simplifica si es pot.
+> Resum: ajuntar el que es repeteix · crear canònic el que és exclusiu · zero estructures pròpies.
+
 ## 4. Mètode per pàgina (repetible)
 1. Llegir la pàgina + el seu `xx.css`.
 2. Substituir l'estructura: `<AdminPage>` + `<AdminSection>` + `.ap-card`/`.ap-btn`/`.adm-input`…
@@ -76,7 +83,7 @@ canònics, després es consumeix.** Afegir elements està bé — però han de s
 
 ## 6. CHECKLIST D'ESTAT (es marca a mesura)
 - [x] **Header: tokens canònics `--head-*` a Studio** (#1255) — 6 sistemes consumeixen els mateixos paràmetres
-- [ ] **tasks** sencera → canònic (EN CURS) + esborrar `tasks.css`
+- [~] **tasks** → header+botons FETS (#1258); pendent tk__row/list/card/queue + esborrar tasks.css
 - [ ] clientes (llista) → canònic + esborrar `clientes.css`
 - [ ] bookings → canònic
 - [ ] presupuestos → canònic + esborrar `presupuestos.css`

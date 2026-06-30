@@ -1550,6 +1550,44 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1258 — 2026-06-30 — claude (FET)
+**Canonització Fase A: tasks header+botons → AdminPage/.ap-btn.**
+- tasks/page.tsx header tk__ → AdminPage (toolbar com a actions). Botons tk__btn* → .ap-btn* (4 fitxers). Pendent: tk__row/list/card/queue → canònic + esborrar tasks.css.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1258`; el següent canvi real ha de ser `#1259`.
+- Validació tècnica: `tsc` 0; `validate:core`.
+- Validació funcional: captura header canònic + botons ap-btn.
+- Validació humana/UX: desktop + mòbil 375px 0 overflow.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1257 — 2026-06-30 — codex (FET)
+**V5 propostes: coherència econòmica al servei canònic.**
+- `lib/constants/pricing.ts`: declara `PROPOSAL_FINANCIAL_FIELDS`; `lib/services/proposalAdminService.ts` concentra la regla econòmica (`getProposalFinancialConsistencyIssues` i error tipat).
+- `createAdminProposal()` rebutja totals incoherents abans de persistir; `updateAdminProposal()` rebutja actualitzacions econòmiques parcials o incoherents abans de persistir.
+- `app/api/admin/proposals/route.ts` i `app/api/admin/proposals/[id]/route.ts`: consumeixen la regla del servei i deixen de duplicar el càlcul.
+- `__tests__/lib/services/proposalAdminService.test.ts`: cobertura de creació incoherent, update parcial i update incoherent.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\proposalAdminService.test.ts __tests__\app\api\admin\proposals-route.test.ts __tests__\app\api\admin\proposals-detail-route.test.ts` (38 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: cap caller intern pot saltar-se la coherència econòmica de proposta entrant directament al servei.
+- Validació humana/UX: el pressupost continua mostrant una única economia coherent, vingui del Studio, Quick Create o API.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1257`; el següent canvi real ha de ser `#1258`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1256 — 2026-06-30 — codex (FET)
+**V5 propostes: coherència subtotal/descompte/IVA/total.**
+- `app/api/admin/proposals/route.ts`: el POST valida que `vatAmount` i `total` quadrin amb `subtotal`, `discount` i `vatRate`.
+- `app/api/admin/proposals/[id]/route.ts`: el PATCH permet canvis no econòmics sols, però si toca qualsevol camp econòmic exigeix el bloc complet i coherent.
+- `__tests__/app/api/admin/proposals-route.test.ts` i `__tests__/app/api/admin/proposals-detail-route.test.ts`: cobertura de POST/PATCH coherent, incoherent i parcial.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\proposals-route.test.ts __tests__\app\api\admin\proposals-detail-route.test.ts` (19 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: una proposta no pot persistir totals desquadrats via API directa.
+- Validació humana/UX: el pressupost visible, desat i enviable manté un únic càlcul econòmic coherent.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1256`; el següent canvi real ha de ser `#1257`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1255 — 2026-06-30 — claude (FET)
 **Canonització del header: 6 sistemes → 1 que mira a Studio.**
 - Studio: tokens `--head-gap/--head-pad/--head-border/--head-bg` (referència leads). 6 sistemes (ap-header/fxd__hd/cl__pagehead/ap-detail-hero/ni__head/pr__hero) migrats a consumir-los; eliminat el gradient propi 135deg de presupuestos. Canviar el header a Studio ara canvia tots alhora.

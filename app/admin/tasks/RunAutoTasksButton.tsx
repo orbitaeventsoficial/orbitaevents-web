@@ -35,12 +35,12 @@ export default function RunAutoTasksButton() {
   };
 
   return (
-    <div className="tk__auto-btn">
+    <div className="ap-btn">
       <button
         type="button"
         onClick={handleRun}
         disabled={loading}
-        className="tk__btn"
+        className="ap-btn"
       >
         {loading ? 'Executant...' : '⚡ Auto-tasques'}
       </button>

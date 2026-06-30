@@ -46,14 +46,14 @@ export default function TaskRowActions({
 
   return (
     <div className="tk__row-acts">
-      <Link href={destinationHref} className="tk__btn tk__btn--sm">
+      <Link href={destinationHref} className="ap-btn--xs">
         Obrir destí
       </Link>
       <button
         type="button"
         onClick={toggleStatus}
         disabled={saving}
-        className="tk__btn tk__btn--sm"
+        className="ap-btn--xs"
       >
         {saving ? 'Desant...' : isDone ? 'Reobrir' : 'Marcar feta'}
       </button>

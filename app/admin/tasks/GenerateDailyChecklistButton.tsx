@@ -37,12 +37,12 @@ export default function GenerateDailyChecklistButton() {
   };
 
   return (
-    <div className="tk__auto-btn">
+    <div className="ap-btn">
       <button
         type="button"
         onClick={handleGenerate}
         disabled={loading}
-        className="tk__btn"
+        className="ap-btn"
       >
         {loading ? 'Generant...' : "Checklist d'avui"}
       </button>

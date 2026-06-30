@@ -1,3 +1,47 @@
+## 2026-06-30 — Canonització Fase A: tasks header+botons → AdminPage/.ap-btn (Canvi #1258, claude)
+
+### Context
+Full de ruta de canonització total (docs/audit/CANONITZACIO-full-de-ruta.md). Fase A, pàgina tasks (tk__, 237 usos). Primer pas: header + botons.
+
+### Què s'ha fet
+- `tasks/page.tsx`: header propi `tk__header`/`tk__root`/`tk__body` → `<AdminPage title subtitle actions>`. El toolbar passa com a prop `actions`.
+- Botons `tk__btn`/`tk__btn--sm`/`tk__btn--prim`/`tk__auto-btn` → `.ap-btn`/`.ap-btn--xs`/`.ap-btn--primary` (TaskPageSections, TaskRowActions, RunAutoTasksButton, GenerateDailyChecklistButton). Equivalència verificada amb el CSS.
+- PENDENT (mateixa pàgina): `tk__row`/`tk__list`/`tk__card`/`tk__queue-*` → AdminSection/.ap-card; després esborrar tasks.css.
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core`.
+- Validació funcional: captura desktop — header canònic (banda + AdminPage) coherent amb economia/leads; botons ap-btn.
+- Validació humana/UX: tasks desktop OK + mòbil 375px 0 overflow (responsiu).
+
+### Coordinació
+Counter → 1258. Fase A tasks PARCIAL (header+botons). Codex: no toquis tasks. Checklist al full de ruta.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-30 — V5 propostes: coherència econòmica al servei canònic (Canvi #1257, codex)
+
+### Context
+El #1256 blindava les rutes HTTP de propostes, però la regla de `subtotal`/`discount`/`vatRate`/`vatAmount`/`total` encara vivia a les routes. Això deixava `proposalAdminService` massa permissiu si un flux intern el cridava directament.
+
+### Què s'ha fet
+- `lib/constants/pricing.ts`: declara `PROPOSAL_FINANCIAL_FIELDS`; `lib/services/proposalAdminService.ts` concentra la regla econòmica (`getProposalFinancialConsistencyIssues` i error tipat).
+- `createAdminProposal()` rebutja totals incoherents abans de persistir.
+- `updateAdminProposal()` rebutja actualitzacions econòmiques parcials o incoherents abans de persistir.
+- Les rutes `app/api/admin/proposals/*` consumeixen la mateixa regla del servei, sense duplicar el càlcul.
+- `__tests__/lib/services/proposalAdminService.test.ts`: cobertura de creació incoherent, update parcial i update incoherent.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\proposalAdminService.test.ts __tests__\app\api\admin\proposals-route.test.ts __tests__\app\api\admin\proposals-detail-route.test.ts` (38 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: cap caller intern pot saltar-se la coherència econòmica de proposta entrant directament al servei.
+- Validació humana/UX: el pressupost continua mostrant una única economia coherent, vingui del Studio, Quick Create o API.
+
+### Coordinació
+Counter → 1257. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine ni header canònic de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-30 — CANONITZACIÓ del header: 6 sistemes → 1 que mira a Studio (Canvi #1255, claude)
 
 ### Context
@@ -19,7 +63,7 @@ Counter → 1255. PENDENT: verificar clientes amb captura (async), unificar tabs
 - Treballant per: `claude`
 - Tancat per: `claude`
 
-## 2026-06-30 — V5 propostes: coherència subtotal/descompte/IVA/total (Canvi #1255, codex)
+## 2026-06-30 — V5 propostes: coherència subtotal/descompte/IVA/total (Canvi #1256, codex)
 
 ### Context
 Caça de flux Catàleg→Preu→Pressupost. Studio desa propostes amb totals coherents, però les APIs de propostes acceptaven `subtotal`, `discount`, `vatRate`, `vatAmount` i `total` com a camps independents sense comprovar que quadressin. Un payload directe podia deixar una proposta matemàticament inconsistent.
@@ -31,12 +75,12 @@ Caça de flux Catàleg→Preu→Pressupost. Studio desa propostes amb totals coh
 - `__tests__/app/api/admin/proposals-detail-route.test.ts`: cobertura de PATCH econòmic parcial, incoherent i coherent.
 
 ### Validació
-- Validació tècnica: pendent d'executar en aquesta tanda (`proposals-route`, `proposals-detail-route`, TypeScript, `qa:protocol`, `validate:core`).
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\proposals-route.test.ts __tests__\app\api\admin\proposals-detail-route.test.ts` (19 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
 - Validació funcional: una proposta no pot persistir totals desquadrats via API directa.
 - Validació humana/UX: el pressupost visible, desat i enviable manté un únic càlcul econòmic coherent.
 
 ### Coordinació
-Counter → 1255. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema ni costEngine.
+Counter → 1256. El #1255 queda reservat al tall de header canònic de Claude. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema ni costEngine.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`

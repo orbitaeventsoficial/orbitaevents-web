@@ -50,7 +50,7 @@ export function TaskPageToolbar({
       <GenerateDailyChecklistButton />
       <Link
         href={customerId ? buildCustomerTaskCreateHref(customerId) : '/admin/tasks/new'}
-        className="tk__btn tk__btn--prim"
+        className="ap-btn--primary"
         {...helpAttrs(ADMIN_TASKS_HELP.newTask)}
       >
         + Nova tasca
@@ -87,7 +87,7 @@ export function TaskFiltersSection({
           </option>
         ))}
       </select>
-      <button type="submit" className="tk__btn tk__btn--sm">Aplicar</button>
+      <button type="submit" className="ap-btn--xs">Aplicar</button>
     </form>
   );
 }
@@ -106,7 +106,7 @@ export function TaskListSection({
           <span className="tk__empty-icon">📝</span>
           <h3 className="tk__empty-title">No hi ha tasques</h3>
           <p className="tk__empty-desc">Crea una nova tasca per començar</p>
-          <Link href="/admin/tasks/new" className="tk__btn tk__btn--prim">+ Nova tasca</Link>
+          <Link href="/admin/tasks/new" className="ap-btn--primary">+ Nova tasca</Link>
         </div>
       </div>
     );
@@ -160,7 +160,7 @@ export function TaskPagination({
       <div className="tk__pagination-btns">
         <Link
           href={buildHref(Math.max(1, page - 1))}
-          className={`tk__btn tk__btn--sm${page === 1 ? ' pointer-events-none' : ''}`}
+          className={`ap-btn--xs${page === 1 ? ' pointer-events-none' : ''}`}
           style={page === 1 ? { opacity: 0.4 } : undefined}
           {...helpAttrs(ADMIN_TASKS_HELP.previousPage)}
         >
@@ -168,7 +168,7 @@ export function TaskPagination({
         </Link>
         <Link
           href={buildHref(Math.min(totalPages, page + 1))}
-          className={`tk__btn tk__btn--sm${page === totalPages ? ' pointer-events-none' : ''}`}
+          className={`ap-btn--xs${page === totalPages ? ' pointer-events-none' : ''}`}
           style={page === totalPages ? { opacity: 0.4 } : undefined}
           {...helpAttrs(ADMIN_TASKS_HELP.nextPage)}
         >
