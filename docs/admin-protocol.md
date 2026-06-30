@@ -1550,6 +1550,31 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1262 — 2026-06-30 — claude (FET)
+**Botó primari canònic: outline confirmat (demo canonització).**
+- `.ap-btn--primary` outline daurat documentat (decisió propietari). 1 canvi → tots els botons primaris de l'admin responen (provat sòlid→outline).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1262`; el següent canvi real ha de ser `#1263`.
+- Validació tècnica: CSS; `validate:core`.
+- Validació funcional: botons --primary coherents.
+- Validació humana/UX: provat amb captures.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1261 — 2026-06-30 — codex (FET)
+**V5 reserves: descompte superior al subtotal no genera totals negatius.**
+- `lib/services/bookingCreationService.ts`: `baseAfterDiscount` queda clampada a 0 quan no hi ha total manual.
+- `app/admin/bookings/useBookingPricing.ts`: el preview de nova reserva usa el mateix clamp, evitant totals negatius en UI.
+- `__tests__/lib/services/bookingCreationService.test.ts`: cobertura de descompte superior al subtotal amb total, paga i senyal i pendent a 0.
+- `__tests__/app/admin/bookings/useBookingPricing.test.ts`: cobertura del resum en viu amb descompte superior al subtotal.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\bookingCreationService.test.ts __tests__\app\admin\bookings\useBookingPricing.test.ts` (44 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: una nova reserva no pot néixer amb totals negatius per excés de descompte.
+- Validació humana/UX: el resum de nova reserva mostra base zero, no imports negatius, quan el descompte supera el subtotal.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1261`; el següent canvi real ha de ser `#1262`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1260 — 2026-06-30 — codex (FET)
 **V5 reserves: imports de cobrament interns no poden persistir negatius.**
 - `lib/services/bookingRouteService.ts`: normalitza camps monetaris de patch abans de persistir; `depositAmount`, `remainingAmount`, `cashAmount` i `discount` negatius/no finits es retiren del patch.

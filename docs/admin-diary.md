@@ -1,3 +1,22 @@
+## 2026-06-30 — Botó primari canònic: outline confirmat (demo de canonització) (Canvi #1262, claude)
+
+### Context
+Validació del poder de la canonització amb el botó primari. El propietari va provar sòlid → després outline. Demostra: canviar l'estil del botó primari a TOT l'admin és UN sol canvi a `.ap-btn--primary` (globals.css).
+
+### Què s'ha fet
+- `.ap-btn--primary`: confirmat OUTLINE daurat (background transparent + border --at-gold + text daurat), documentat com a decisió del propietari. Afecta TOTS els botons primaris de l'admin alhora.
+
+### Validació
+- Validació tècnica: CSS; `validate:core`.
+- Validació funcional: tots els botons --primary responen al canvi únic (provat sòlid→outline amb captures).
+- Validació humana/UX: botó primari coherent a tot arreu.
+
+### Coordinació
+Counter → 1262. Demostra el principi canònic: 1 canvi → tot respon.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-30 — Canonització Fase A: clientes botons → .ap-btn (Canvi #1261, claude)
 
 ### Context
@@ -17,6 +36,28 @@ Counter → 1261. Fase A: tasks ✅(header+botons), clientes 🔧(botons). PENDE
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
+
+## 2026-06-30 — V5 reserves: descompte superior al subtotal no genera totals negatius (Canvi #1262, codex)
+
+### Context
+En la creació de reserva, el servei sanejava descomptes negatius a 0, però no tallava el cas contrari: un `discount` superior al subtotal deixava `baseAfterDiscount` en negatiu i podia calcular `vatAmount`, `total`, `depositAmount` i `remainingAmount` negatius. El formulari de nova reserva feia el mateix càlcul en viu.
+
+### Què s'ha fet
+- `lib/services/bookingCreationService.ts`: `baseAfterDiscount` queda clampada a 0 quan no hi ha total manual.
+- `app/admin/bookings/useBookingPricing.ts`: el preview de nova reserva usa el mateix clamp, evitant totals negatius en UI.
+- `__tests__/lib/services/bookingCreationService.test.ts`: cobertura de descompte superior al subtotal amb total, paga i senyal i pendent a 0.
+- `__tests__/app/admin/bookings/useBookingPricing.test.ts`: cobertura del resum en viu amb descompte superior al subtotal.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\bookingCreationService.test.ts __tests__\app\admin\bookings\useBookingPricing.test.ts` (44 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: una nova reserva no pot néixer amb totals negatius per excés de descompte.
+- Validació humana/UX: el resum de nova reserva mostra base zero, no imports negatius, quan el descompte supera el subtotal.
+
+### Coordinació
+Counter → 1262. Renumerat de #1261 a #1262 perquè Claude ja havia tancat #1261 a clientes. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni header canònic de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
 
 ## 2026-06-30 — V5 reserves: imports de cobrament interns no poden persistir negatius (Canvi #1260, codex)
 
