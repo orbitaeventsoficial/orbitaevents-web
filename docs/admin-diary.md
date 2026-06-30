@@ -1,3 +1,22 @@
+## 2026-06-30 — Erradicació: clientes (llista) 100% canònica, css esborrat (Canvi #1273, claude+agent)
+
+### Què s'ha fet
+- `clientes/page.tsx` + `CustomersPageSections.tsx` + `ClientesModals.tsx`: ~181 `cl__` → canònic (AdminPage, AdminKpiRow/AdminKpi, .adm-input cerca amb icona, .ap-btn--xs segments/prioritats amb aria-pressed, .ap-table-* taula, .ap-card cards mòbil, .ap-badge--success/warning/danger, AdminEmptyState, .skeleton). Avatar/nom extrets a components locals amb tokens.
+- `clientes.css` ESBORRAT + import tret. Classes usades verificades existents (.ap-table-*, .skeleton, admin-tone-neutral).
+- Funcionalitat intacta: sort, filtres segment/lifecycle/prioritat, cerca debounced, paginació, modals duplicats, export CSV.
+- Verificat: captura header + help cards + cerca + segments + botó primari, idèntic al sistema. 0 cl__, tsc 0, canon 0.
+
+### Validació
+- Validació tècnica: `tsc` 0; `qa:canon-debt` OK; check-admin-canon 0; classes canòniques existents.
+- Validació funcional: captura clientes canònica.
+- Validació humana/UX: hipersemblant; NO tocat clientes/[id]/ ch__.
+
+### Coordinació
+Counter → 1273. 8a pàgina. Agents inbox (sf) + presupuestos (pr) encara treballant.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-30 — Erradicació: dossiers 100% canònica, css esborrat (Canvi #1271, claude+agent)
 
 ### Què s'ha fet
@@ -194,7 +213,7 @@ Counter → 1264. Fase A: tasks ✅(header+botons), clientes 🔧(botons). PENDE
 - Treballant per: `claude`
 - Tancat per: `claude`
 
-## 2026-06-30 — V5 reserves: descompte superior al subtotal no genera totals negatius (Canvi #1262, codex)
+## 2026-06-30 — V5 reserves: descompte superior al subtotal no genera totals negatius (Canvi #1272, codex)
 
 ### Context
 En la creació de reserva, el servei sanejava descomptes negatius a 0, però no tallava el cas contrari: un `discount` superior al subtotal deixava `baseAfterDiscount` en negatiu i podia calcular `vatAmount`, `total`, `depositAmount` i `remainingAmount` negatius. El formulari de nova reserva feia el mateix càlcul en viu.
@@ -211,7 +230,7 @@ En la creació de reserva, el servei sanejava descomptes negatius a 0, però no 
 - Validació humana/UX: el resum de nova reserva mostra base zero, no imports negatius, quan el descompte supera el subtotal.
 
 ### Coordinació
-Counter → 1262. Renumerat de #1261 a #1262 perquè Claude ja havia tancat #1261 a clientes. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni header canònic de Claude.
+Counter → 1272. Renumerat de #1261/#1262 a #1272 perquè Claude ja havia tancat #1261, #1262 i després va avançar fins a #1271. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni header canònic de Claude.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`

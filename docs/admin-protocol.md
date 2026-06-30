@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1273 — 2026-06-30 — claude (FET)
+**Erradicació: clientes (llista) 100% canònica, css esborrat.**
+- clientes page+CustomersPageSections+ClientesModals 181 cl__ → AdminPage/AdminKpi/.adm-input/.ap-btn/.ap-table-*/.ap-card/.ap-badge/AdminEmptyState. clientes.css ESBORRAT + import tret. NO tocat [id]/ch__.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1273`; el següent canvi real ha de ser `#1274`.
+- Validació tècnica: `tsc` 0; qa:canon-debt OK; canon 0.
+- Validació funcional: captura clientes canònica.
+- Validació humana/UX: hipersemblant.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1271 — 2026-06-30 — claude (FET)
 **Erradicació: dossiers 100% canònica, css esborrat.**
 - DossierGeneratorClient + page + ListActions + loading: 348 dg__ → AdminSection/.ap-card/.ap-btn/.adm-input/.ap-badge/AdminLoadingSkeletonList. dossiers.css ESBORRAT + 2 imports trets.
@@ -1649,7 +1660,7 @@ Seqüència obligatòria de registre:
 - Treballant per: `claude`
 - Tancat per: `claude`
 
-### Canvi #1261 — 2026-06-30 — codex (FET)
+### Canvi #1272 — 2026-06-30 — codex (FET)
 **V5 reserves: descompte superior al subtotal no genera totals negatius.**
 - `lib/services/bookingCreationService.ts`: `baseAfterDiscount` queda clampada a 0 quan no hi ha total manual.
 - `app/admin/bookings/useBookingPricing.ts`: el preview de nova reserva usa el mateix clamp, evitant totals negatius en UI.
@@ -1658,7 +1669,8 @@ Seqüència obligatòria de registre:
 - Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\bookingCreationService.test.ts __tests__\app\admin\bookings\useBookingPricing.test.ts` (44 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
 - Validació funcional: una nova reserva no pot néixer amb totals negatius per excés de descompte.
 - Validació humana/UX: el resum de nova reserva mostra base zero, no imports negatius, quan el descompte supera el subtotal.
-- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1264`; el següent canvi real ha de ser `#1265`.
+- Renumerat de `#1261/#1262` a `#1272` perquè Claude ja havia tancat `#1261`, `#1262` i després va avançar fins a `#1271`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1272`; el següent canvi real ha de ser `#1273`.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`

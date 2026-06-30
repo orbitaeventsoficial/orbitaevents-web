@@ -11,10 +11,10 @@ import {
   type CustomerLifecycleValue,
 } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
-import { getAdminOrganLabel } from '@/app/admin/lib/adminNav';
 import type { Customer, CustomerStats, ExecutionPriority } from './customer-utils';
 import { getExecutionPriority } from './customer-utils';
 import { AddCustomerModal, StartProcessModal } from './ClientesModals';
+import { AdminPage } from '../components/AdminPage';
 import {
   CustomersDesktopTable,
   CustomersEmpty,
@@ -27,7 +27,6 @@ import {
   CustomersStatsActions,
   CustomersToolbar,
 } from './CustomersPageSections';
-import './clientes.css';
 
 export default function AdminContactesPage() {
   const searchParams = useSearchParams();
@@ -170,61 +169,54 @@ export default function AdminContactesPage() {
   }, [page, totalPages]);
 
   return (
-    <div className="fx-root">
-      <div className="cl">
-        <div className="cl__pagehead">
-          <div className="cl__titles">
-            <span className="ap-eyebrow">{getAdminOrganLabel('/admin/clientes')}</span>
-            <h1 className="cl__h1">Clients</h1>
-            <span className="cl__sub">CRM · Afegeix clients i inicia processos</span>
-          </div>
-          <CustomersStatsActions stats={stats} />
-        </div>
+    <>
+      <AdminPage
+        title="Clients"
+        subtitle="CRM · Afegeix clients i inicia processos"
+        kpis={stats ? <CustomersStatsActions stats={stats} /> : undefined}
+      >
+        <CustomersHelpPanel />
+        <CustomersToolbar
+          searchInput={searchInput}
+          setSearchInput={setSearchInput}
+          customers={customers}
+          onAddCustomer={() => setShowAddModal(true)}
+        />
 
-        <div className="cl__content">
-          <CustomersHelpPanel />
-          <CustomersToolbar
-            searchInput={searchInput}
-            setSearchInput={setSearchInput}
-            customers={customers}
-            onAddCustomer={() => setShowAddModal(true)}
-          />
+        <CrmSegmentFilters
+          lifecycleFilter={lifecycleFilter}
+          setLifecycleFilter={setLifecycleFilter}
+          tagFilter={tagFilter}
+          setTagFilter={setTagFilter}
+          healthScoreMax={healthScoreMax}
+          setHealthScoreMax={setHealthScoreMax}
+          minSpent={minSpent}
+          setMinSpent={setMinSpent}
+          stats={stats}
+        />
 
-          <CrmSegmentFilters
-            lifecycleFilter={lifecycleFilter}
-            setLifecycleFilter={setLifecycleFilter}
-            tagFilter={tagFilter}
-            setTagFilter={setTagFilter}
-            healthScoreMax={healthScoreMax}
-            setHealthScoreMax={setHealthScoreMax}
-            minSpent={minSpent}
-            setMinSpent={setMinSpent}
-            stats={stats}
-          />
+        {!loading && customers.length > 0 && (
+          <CustomersPriorityFilters priorityFilter={priorityFilter} setPriorityFilter={setPriorityFilter} />
+        )}
 
-          {!loading && customers.length > 0 && (
-            <CustomersPriorityFilters priorityFilter={priorityFilter} setPriorityFilter={setPriorityFilter} />
-          )}
+        {error && <CustomersError message={error} onRetry={fetchCustomers} />}
+        {loading && <CustomersLoading />}
+        {!loading && customers.length === 0 && <CustomersEmpty />}
 
-          {error && <CustomersError message={error} onRetry={fetchCustomers} />}
-          {loading && <CustomersLoading />}
-          {!loading && customers.length === 0 && <CustomersEmpty />}
-
-          {!loading && customers.length > 0 && (
-            <>
-              <CustomersMobileList filteredCustomers={filteredCustomers} onStartProcess={openActionModal} />
-              <CustomersDesktopTable filteredCustomers={filteredCustomers} onStartProcess={openActionModal} />
-              <CustomersPagination
-                page={page}
-                totalPages={totalPages}
-                filteredCount={filteredCustomers.length}
-                totalCustomers={totalCustomers}
-                setPage={setPage}
-              />
-            </>
-          )}
-        </div>
-      </div>
+        {!loading && customers.length > 0 && (
+          <>
+            <CustomersMobileList filteredCustomers={filteredCustomers} onStartProcess={openActionModal} />
+            <CustomersDesktopTable filteredCustomers={filteredCustomers} onStartProcess={openActionModal} />
+            <CustomersPagination
+              page={page}
+              totalPages={totalPages}
+              filteredCount={filteredCustomers.length}
+              totalCustomers={totalCustomers}
+              setPage={setPage}
+            />
+          </>
+        )}
+      </AdminPage>
 
       <AnimatePresence>
         {showAddModal && (
@@ -258,7 +250,7 @@ export default function AdminContactesPage() {
           />
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 }
 
@@ -298,7 +290,7 @@ function CrmSegmentFilters({
 
   return (
     <div>
-      <div className="cl__segs">
+      <div className="flex flex-wrap items-center gap-2">
         {CUSTOMER_SEGMENTS.map((seg) => {
           const isActive =
             ('lifecycleStage' in seg.filter && lifecycleFilter === seg.filter.lifecycleStage) ||
@@ -331,11 +323,12 @@ function CrmSegmentFilters({
               key={seg.id}
               type="button"
               onClick={handleClick}
-              className={isActive ? 'cl__seg cl__seg--on' : 'cl__seg'}
+              aria-pressed={isActive}
+              className={`ap-btn ap-btn--xs ${isActive ? 'ap-btn--primary' : ''}`}
             >
               <span aria-hidden="true">{seg.icon}</span>
               <span>{seg.label}</span>
-              {badge && <span className="cl__seg-badge">{badge}</span>}
+              {badge && <span className="ap-badge">{badge}</span>}
             </button>
           );
         })}
@@ -347,8 +340,8 @@ function CrmSegmentFilters({
         )}
       </div>
 
-      <div className="cl__lifecycle">
-        <label htmlFor="lifecycle-filter">Fase:</label>
+      <div className="mt-2.5 flex items-center gap-2.5">
+        <label htmlFor="lifecycle-filter" className="font-mono text-xs uppercase tracking-wide text-[var(--t3)]">Fase:</label>
         <select
           id="lifecycle-filter"
           value={lifecycleFilter}
@@ -356,7 +349,7 @@ function CrmSegmentFilters({
             clearAll();
             setLifecycleFilter(e.target.value as CustomerLifecycleValue | '');
           }}
-          className="adm-input"
+          className="adm-input w-auto"
         >
           <option value="">Totes les fases</option>
           {CUSTOMER_LIFECYCLE_VALUES.map((val) => (
