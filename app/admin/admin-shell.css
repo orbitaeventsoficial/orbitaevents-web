@@ -927,9 +927,12 @@ html.admin-mode .ap-leads-page { position: relative; z-index: 1; min-width: 0; }
 
 html.admin-mode .ap-leads-pagehead {
   display: flex; align-items: flex-end; justify-content: space-between;
-  gap: 16px; padding: 12px var(--gutter) 10px;
-  border-bottom: 1px solid var(--line);
-  background: color-mix(in oklab, var(--canvas) 88%, transparent);
+  /* Header canònic: consumeix els tokens de Studio (--head-*), com .ap-header
+     i .ap-detail-hero. Abans tenia padding/border/fons propis (no canònic). */
+  gap: var(--head-gap);
+  padding: var(--head-pad);
+  border-bottom: var(--head-border);
+  background: var(--head-bg);
 }
 html.admin-mode .ap-leads-tt { display: flex; flex-direction: column; gap: 3px; }
 /* eyebrow = coordenada de temporada */
@@ -992,7 +995,7 @@ html.admin-mode .ap-leads-pipelead:focus-visible {
 }
 
 @media (max-width: 900px) {
-  html.admin-mode .ap-leads-pagehead { align-items: flex-start; flex-direction: column; padding: 22px 16px 16px; }
+  html.admin-mode .ap-leads-pagehead { align-items: flex-start; flex-direction: column; padding: var(--head-pad); }
   html.admin-mode .ap-leads-h1 { font-size: var(--o-text-2xl); }
   html.admin-mode .ap-leads-headright { width: 100%; justify-content: space-between; flex-wrap: wrap; }
 }
