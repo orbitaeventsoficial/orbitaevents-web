@@ -1,9 +1,9 @@
 /* ============================================================================
-   ÒRBITA ADMIN — NewBookingForm · Resum de preus (Brass & Obsidian)
+   ÒRBITA ADMIN — NewBookingForm · Resum de preus
    ----------------------------------------------------------------------------
-   Reescrit al sistema visual nb-* (Canvi #842). Pensat per viure dins la
-   sidebar sticky (nb__side) — sense bordes ostentosos, tipografia mono
-   tabular, total en daurat prominent, marge resumit a sota.
+   Canònic: .ap-card + Tailwind/tokens (canonització 2026-06-30, sistema
+   propi `nb-*` eradicat). Viu dins la sidebar sticky — total daurat i
+   daurat prominent, marge resumit a sota.
 ============================================================================ */
 
 import { formatCurrency, formatCurrencyExact } from '@/lib/constants';
@@ -34,6 +34,17 @@ interface BookingPricingSummaryProps {
   } | null;
 }
 
+const ROW = 'flex items-baseline justify-between gap-3.5 border-b border-[color-mix(in_oklab,var(--line)_50%,transparent)] py-1.5 text-sm text-[var(--t2)] last:border-b-0';
+const ROW_VAL = 'font-mono font-bold tabular-nums text-[var(--t)]';
+const ROW_MUTED = 'flex items-baseline justify-between gap-3.5 py-1.5 text-xs text-[var(--t3)]';
+
+const MARGIN_TONE: Record<'emerald' | 'amber' | 'orange' | 'rose', string> = {
+  emerald: 'text-[var(--o-success)]',
+  amber: 'text-[var(--o-warning)]',
+  orange: 'text-[var(--o-stage-new)]',
+  rose: 'text-[var(--o-danger)]',
+};
+
 export default function BookingPricingSummary({
   pricing,
   travelBlocks,
@@ -42,71 +53,73 @@ export default function BookingPricingSummary({
   marginEstimate,
 }: BookingPricingSummaryProps) {
   return (
-    <div className="nb__price">
-      <div className="nb__pricehead">
-        <h3>Resum de preus</h3>
-        <span>Live</span>
+    <div className="ap-card ap-card-body bg-[color-mix(in_oklab,var(--gold)_4%,var(--panel))]">
+      <div className="mb-3.5 flex items-baseline justify-between">
+        <h3 className="text-base font-bold text-[var(--t)]">Resum de preus</h3>
+        <span className="font-mono text-xs font-bold uppercase tracking-[0.12em] text-[var(--t3)]">Live</span>
       </div>
-      <div className="nb__pricerows">
-        <div className="nb__prow">
+      <div className="flex flex-col">
+        <div className={ROW}>
           <span>Pack</span>
-          <b>{formatCurrencyExact(pricing.packPrice)}</b>
+          <b className={ROW_VAL}>{formatCurrencyExact(pricing.packPrice)}</b>
         </div>
         {pricing.extraHoursPrice > 0 && (
-          <div className="nb__prow">
+          <div className={ROW}>
             <span>Hores extra</span>
-            <b>+{formatCurrencyExact(pricing.extraHoursPrice)}</b>
+            <b className={ROW_VAL}>+{formatCurrencyExact(pricing.extraHoursPrice)}</b>
           </div>
         )}
         {pricing.extrasPrice > 0 && (
-          <div className="nb__prow">
+          <div className={ROW}>
             <span>Extres</span>
-            <b>+{formatCurrencyExact(pricing.extrasPrice)}</b>
+            <b className={ROW_VAL}>+{formatCurrencyExact(pricing.extrasPrice)}</b>
           </div>
         )}
         {pricing.travelCharge > 0 && (
-          <div className="nb__prow">
+          <div className={ROW}>
             <span>Desplaçament ({travelBlocks} trams)</span>
-            <b>+{formatCurrencyExact(pricing.travelCharge)}</b>
+            <b className={ROW_VAL}>+{formatCurrencyExact(pricing.travelCharge)}</b>
           </div>
         )}
-        <div className="nb__prow">
+        <div className={ROW}>
           <span>Subtotal</span>
-          <b>{formatCurrencyExact(pricing.subtotal)}</b>
+          <b className={ROW_VAL}>{formatCurrencyExact(pricing.subtotal)}</b>
         </div>
         {pricing.discount > 0 && (
-          <div className="nb__prow">
+          <div className={ROW}>
             <span>Descompte</span>
-            <b>−{formatCurrencyExact(pricing.discount)}</b>
+            <b className={ROW_VAL}>−{formatCurrencyExact(pricing.discount)}</b>
           </div>
         )}
-        <div className="nb__prow">
+        <div className={ROW}>
           <span>IVA ({pricing.vatRate}%)</span>
-          <b>+{formatCurrencyExact(pricing.vatAmount)}</b>
+          <b className={ROW_VAL}>+{formatCurrencyExact(pricing.vatAmount)}</b>
         </div>
-        <div className="nb__prow nb__prow--total">
+        <div className="mt-1.5 flex items-baseline justify-between gap-3.5 border-t border-[var(--hair-gold)] pb-1 pt-3 text-base font-bold text-[var(--gold-bright)]">
           <span>Total</span>
-          <b>{formatCurrencyExact(pricing.total)}</b>
+          <b className="text-xl font-extrabold tabular-nums tracking-tight text-[var(--gold-bright)]">{formatCurrencyExact(pricing.total)}</b>
         </div>
-        <div className="nb__prow nb__prow--muted">
+        <div className={ROW_MUTED}>
           <span>Senyal ({DEPOSIT_PERCENT}%)</span>
-          <b>{formatCurrencyExact(pricing.deposit)}</b>
+          <b className="font-mono font-bold tabular-nums text-[var(--t2)]">{formatCurrencyExact(pricing.deposit)}</b>
         </div>
       </div>
       {internalTravelCost > 0 && (
-        <p className="nb__pricehint">
+        <p className="py-2 font-mono text-xs leading-snug text-[var(--t3)]">
           Cost intern transport estimat · {formatCurrencyExact(internalTravelCost)} ({defaultVehicleCostPerKm.toFixed(2)} €/km sobre km extra)
         </p>
       )}
       {marginEstimate && (
         <>
-          <div className="nb__prow nb__prow--muted">
+          <div className={ROW_MUTED}>
             <span>Cost directe</span>
-            <b>{formatCurrencyExact(marginEstimate.directCost)}</b>
+            <b className="font-mono font-bold tabular-nums text-[var(--t2)]">{formatCurrencyExact(marginEstimate.directCost)}</b>
           </div>
-          <div className="nb__pricemargin" data-tone={marginEstimate.tone}>
-            <span>Marge net · {getMarginLabel(marginEstimate.marginPct)}</span>
-            <b>{formatCurrency(marginEstimate.netMargin)} <small className="nb__pricemargin-pct">· {marginEstimate.marginPct.toFixed(0)}%</small></b>
+          <div className="mt-2 flex items-baseline justify-between rounded-[var(--o-r-md)] border border-dashed border-[var(--hair-gold)] bg-[color-mix(in_oklab,var(--gold)_4%,transparent)] px-3.5 py-3">
+            <span className="font-mono text-xs font-bold uppercase tracking-[0.1em] text-[var(--t3)]">Marge net · {getMarginLabel(marginEstimate.marginPct)}</span>
+            <b className={`text-lg font-bold tabular-nums ${MARGIN_TONE[marginEstimate.tone]}`}>
+              {formatCurrency(marginEstimate.netMargin)} <small className="text-xs font-semibold text-[var(--t3)]">· {marginEstimate.marginPct.toFixed(0)}%</small>
+            </b>
           </div>
         </>
       )}

@@ -1550,6 +1550,89 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1282 — 2026-06-30 — codex (FET)
+**V5 atribució: ingressos multi-touch amb cèntims exactes.**
+- `app/admin/components/AttributionPanel.tsx`: helper exportat `formatAttributionEuro()` amb arrodoniment monetari a 2 decimals i `formatCurrencyExact`.
+- `__tests__/app/admin/components/AttributionPanel.test.ts`: cobertura de cèntims i import zero.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\components\AttributionPanel.test.ts` (2 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `validate:core` global continua bloquejat pel deute concurrent d'Inbox ja identificat a `app/admin/inbox/inbox.css:9` (`qa:admin-mode-prefix`).
+- Validació funcional: el panell d'atribució multi-touch conserva cèntims en ingressos atribuïts.
+- Validació humana/UX: les xifres del canal que obre/tanca una venda ja no es maquillen a euros sencers.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1282`; el següent canvi real ha de ser `#1283`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1281 — 2026-06-30 — codex (FET)
+**V5 Partner Hub: imports monetaris conserven cèntims.**
+- `lib/services/partnerHubService.ts`: `round()` passa a arrodonir a 2 decimals en lloc d'euros sencers.
+- `__tests__/lib/services/partnerHubService.test.ts`: cobertura amb decimals en `sourcedRevenue`, `catalogValue`, `catalogCost`, `serviceLinesPaid` i `totalPaidToPartner`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\partnerHubService.test.ts` (4 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `validate:core` global continua bloquejat pel deute concurrent d'Inbox ja identificat a `app/admin/inbox/inbox.css:9` (`qa:admin-mode-prefix`).
+- Validació funcional: la fitxa de partner conserva cèntims en imports econòmics agregats.
+- Validació humana/UX: les xifres del Partner Hub ja no es maquillen per arrodoniment a euros sencers.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1281`; el següent canvi real ha de ser `#1282`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1280 — 2026-06-30 — codex (FET)
+**V5 lead pre-reserva: línies del bolo sanejades al servei.**
+- `lib/services/leadServiceLineService.ts`: saneja `revenueAmount`, `costAmount`, `quantity` i `hours` abans de persistir `LeadServiceLine` o delegar al booking.
+- `__tests__/lib/services/leadServiceLineService.test.ts`: regressió amb línia bruta que queda neutralitzada a `revenueAmount: 0`, `costAmount: 0`, `quantity: 1` i `hours: null`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\leadServiceLineService.test.ts` (7 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `validate:core` global continua bloquejat pel deute concurrent d'Inbox ja identificat a `app/admin/inbox/inbox.css:9` (`qa:admin-mode-prefix`).
+- Validació funcional: les línies del bolo pre-reserva no poden contaminar el configurador ni una futura reserva amb imports o quantitats negatives.
+- Validació humana/UX: el resum del bolo del lead queda protegit encara que una entrada bruta arribi fora del formulari normal.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1280`; el següent canvi real ha de ser `#1281`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1284 — 2026-06-30 — claude (FET)
+**Erradicació: nova reserva 100% canònica (formulari crític).**
+- NewBookingForm + 5 seccions 498 nb__ → AdminPage/AdminSection/.adm-input/.ap-btn/.ap-card. Nou booking-form-classes.ts (constants canòniques). nb-design.css ESBORRAT + 2 imports. Lògica preus/DJ/so intacta. bd/fxd [id] no tocats.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1284`; el següent canvi real ha de ser `#1285`.
+- Validació tècnica: `tsc` 0; qa:canon-debt OK.
+- Validació funcional: captura formulari canònic complet.
+- Validació humana/UX: hipersemblant; preus preservats.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1279 — 2026-06-30 — codex (FET)
+**V5 lead post-reserva: editar el bolo recalcula la reserva.**
+- `lib/services/leadServiceLineService.ts`: si el lead ja té reserva, delega a `updateBookingDetail(bookingId, { serviceLines })` en lloc d'escriure `BookingServiceLine` directament.
+- `__tests__/lib/services/leadServiceLineService.test.ts`: cobertura del camí post-reserva que comprova la delegació al servei canònic de reserva i evita transacció directa sobre línies de lead.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\leadServiceLineService.test.ts` (6 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `validate:core` global continua bloquejat pel deute concurrent d'Inbox ja identificat a `app/admin/inbox/inbox.css:9` (`qa:admin-mode-prefix`).
+- Validació funcional: editar el bolo des de la fitxa del lead després de reservar reutilitza el recalculador de la reserva i manté el total alineat amb les línies.
+- Validació humana/UX: el propietari pot ampliar o ajustar productes en un lead vinculat sense que la reserva quedi amb imports antics.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1279`; el següent canvi real ha de ser `#1280`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1278 — 2026-06-30 — codex (FET)
+**V5 Partner Hub: imports pagats amb quantitat real de línies.**
+- `lib/services/partnerHubService.ts`: substitueix l'aggregate simple per una lectura mínima de `costAmount` i `quantity`, i calcula `costAmount * quantity` per a imports pagats a partner subcontractat.
+- `__tests__/lib/services/partnerHubService.test.ts`: el cas econòmic cobreix una línia amb quantitat 2 i manté `serviceLinesPaid`/`totalPaidToPartner` en 160 €.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\partnerHubService.test.ts` (3 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `pnpm run qa:admin-mode-prefix` continua bloquejat per deute concurrent d'Inbox de Claude (`app/admin/inbox/inbox.css:9`); per tant `validate:core` global no es pot tancar des d'aquest perímetre sense tocar mails/Inbox.
+- Validació funcional: el Partner Hub ja no infraestima el que s'ha pagat a un col·laborador quan una línia subcontractada té múltiples unitats.
+- Validació humana/UX: la fitxa del partner mostra una lectura econòmica més honesta sense barrejar-la amb bolos que el partner ens passa o amb el seu catàleg.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1278`; el següent canvi real ha de ser `#1279`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1277 — 2026-06-30 — codex (FET)
+**V5 reserves: les línies de servei multipliquen quantitat al subtotal.**
+- `lib/services/bookingCreationService.ts`: `serviceLinesRevenue` ara suma `revenueAmount * quantity`, amb fallback `1`, perquè el subtotal de nova reserva quadri amb les `BookingServiceLine` persistides.
+- `__tests__/lib/services/bookingCreationService.test.ts`: regressió amb bolo personalitzat que hereta una línia del lead amb `quantity: 3` i comprova subtotal/total 360, no 120.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\bookingCreationService.test.ts` (45 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `pnpm run validate:core` queda bloquejat per deute concurrent d'Inbox de Claude (`app/admin/inbox/inbox.css:9` a `qa:admin-mode-prefix`, amb avisos `visual-overflow` a `SafataClient.tsx`); no s'ha tocat per respectar el perímetre de mails/Inbox.
+- Validació funcional: una reserva creada des d'un bolo amb múltiples unitats de servei ja no infraestima el PVP.
+- Validació humana/UX: el resum econòmic reflecteix la quantitat visible de la línia.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1277`; el següent canvi real ha de ser `#1278`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1276 — 2026-06-30 — claude (FET)
 **Erradicació: inbox/safata 100% canònica (la més complexa).**
 - SafataClient 553 sf__ → AdminPage/.ap-btn/.ap-tab/.adm-input/.ap-inline-alert/AdminEmptyState + layout 3 col tokens. inbox.css: regles sf__ tretes; ix__ (52) i sf-spin intactes. Import tret de page.tsx (safata); settings el manté.

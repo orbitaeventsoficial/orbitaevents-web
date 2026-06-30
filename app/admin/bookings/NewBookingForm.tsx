@@ -1,13 +1,12 @@
 'use client';
 
 /* ============================================================================
-   ÒRBITA ADMIN — Nova reserva (Brass & Obsidian)
+   ÒRBITA ADMIN — Nova reserva
    ----------------------------------------------------------------------------
-   Shell `nb-root` amb top bar + hero + layout 2 columnes (main + sidebar
-   sticky). Reaprofita tots els hooks i la lògica existent. Substitueix
-   `<AdminPage>` (vell) i les classes Tailwind del Frankenstein per CSS
-   canònic `nb__*` consumint tokens Studio.
-   Canvi #842.
+   Canònic: AdminPage + AdminSection + .ap-card + .adm-input + .ap-btn +
+   Tailwind/tokens de /studio. sistema propi `nb-*` eradicat (canonització 2026-06-30).
+   Layout de 2 columnes (qüestionari + sidebar sticky amb resum i CTA).
+   Reaprofita tots els hooks i la lògica de càlcul de preu existent.
 ============================================================================ */
 
 import { useEffect, useState } from 'react';
@@ -19,6 +18,8 @@ import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 import { useToast } from '../components/ToastProvider';
+import { AdminPage, AdminSection } from '../components/AdminPage';
+import { NB_FIELD, NB_LABEL, NB_HINT, NB_GROUP } from './booking-form-classes';
 import BookingPricingSummary from './BookingPricingSummary';
 import BookingPackExtrasSection from './BookingPackExtrasSection';
 import BookingTravelDiscountSection from './BookingTravelDiscountSection';
@@ -34,7 +35,6 @@ import { useBookingPricing } from './useBookingPricing';
 import { useFormAutosave } from '@/lib/hooks/useFormAutosave';
 import type { BookingExtra, BookingFormData, BookingSelectedExtras, BookingPartnerOption } from './booking-form.types';
 import { OPERATOR_EXTRA_ID, bookingAutosaveKey } from './booking-form.types';
-import './nb-design.css';
 
 // Opcions del desplegable de partners agrupades: Favorits primer, Altres després.
 // Així els típics (Masquerade) queden a dalt i els de material (Tronios, DJ Mania)
@@ -194,8 +194,11 @@ export default function NewBookingForm() {
 
   if (loading) {
     return (
-      <div className="nb-root">
-        <div className="nb__loading"><span className="nb__spinner" aria-label="Carregant" /></div>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <span
+          className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--hair-gold)] border-t-transparent"
+          aria-label="Carregant"
+        />
       </div>
     );
   }
@@ -204,41 +207,32 @@ export default function NewBookingForm() {
   const boloNotEmpty = !!form.packId || serviceLines.length > 0 || Object.keys(selectedExtras).length > 0 || (!!manualTotalPrice && Number(manualTotalPrice) > 0);
   const submitDisabled = submitting || !form.clientName || !form.clientEmail || !boloNotEmpty;
 
+  const narrowField = `${NB_FIELD} max-w-[12.5rem] flex-1 basis-40`;
+
   return (
-    <div className="nb-root">
-      <div className="nb__bar">
-        <Link href={backHref} className="nb__back">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 12L6 8l4-4" /></svg>
-          {backLabel}
-        </Link>
-        <span className="nb__crumb">{crumbContext} <em>/</em> <strong>Nova reserva</strong></span>
-      </div>
-
-      <div className="nb__hero">
-        <span className="nb__eyebrow">Nova reserva</span>
-        <h1 className="nb__h1">{leadData ? leadData.name : 'Crear reserva'}</h1>
-        <p className="nb__sub">
-          {leadData ? (
-            <>
-              Des de l&apos;entrada <Link href={buildLeadWorkspaceHref(leadData.id)} className="nb__leadlink">{leadData.name}</Link>
-              {leadData.budget && <> · Pressupost <b>{leadData.budget}</b></>}
-              {leadData.email && <> · {leadData.email}</>}
-            </>
-          ) : (
-            'Omple les dades del client, l\'esdeveniment i selecciona un pack.'
-          )}
-        </p>
-      </div>
-
-      <div className="nb__layout">
-        <div className="nb__main">
+    <AdminPage
+      back={{ href: backHref, label: backLabel }}
+      eyebrow={`${crumbContext} · Nova reserva`}
+      title={leadData ? leadData.name : 'Crear reserva'}
+      subtitle={leadData ? (
+        <>
+          Des de l&apos;entrada <Link href={buildLeadWorkspaceHref(leadData.id)} className="text-[var(--gold-bright)] underline decoration-dashed underline-offset-2 hover:text-[var(--gold)]">{leadData.name}</Link>
+          {leadData.budget && <> · Pressupost <b className="text-[var(--t)]">{leadData.budget}</b></>}
+          {leadData.email && <> · {leadData.email}</>}
+        </>
+      ) : (
+        'Omple les dades del client, l\'esdeveniment i selecciona un pack.'
+      )}
+    >
+      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22.5rem]">
+        <div className="flex min-w-0 flex-col gap-4">
           {error && (
-            <div className="nb__panel nb__panel--error">
-              <p className="nb__errortext">{error}</p>
+            <div className="ap-card ap-card--danger ap-card-body">
+              <p className="text-sm text-[var(--t)]">{error}</p>
             </div>
           )}
 
-          <div className="nb__group"><span className="nb__group-label">Qui i quan</span></div>
+          <div className={NB_GROUP}>Qui i quan</div>
 
           <BookingClientEventSection
             leadData={leadData ? {
@@ -265,7 +259,7 @@ export default function NewBookingForm() {
             onFieldChange={updateField}
           />
 
-          <div className="nb__group"><span className="nb__group-label">Què contractem</span></div>
+          <div className={NB_GROUP}>Què contractem</div>
 
           <BookingServiceLinesSection
             lines={serviceLines}
@@ -314,35 +308,32 @@ export default function NewBookingForm() {
             onValidateDiscountCode={() => void validateDiscountCode(form.discountCode)}
           />
 
-          <div className="nb__group"><span className="nb__group-label">Preu i tancament</span></div>
+          <div className={NB_GROUP}>Preu i tancament</div>
 
-          <section className="nb__panel">
-            <div className="nb__phead">
-              <h2 className="nb__h2">Preu acordat</h2>
-              <span className="nb__pintro">Resum econòmic del bolo</span>
-            </div>
-            <div className="nb__pack-tune-grid">
-              <div className="nb__field nb__field--narrow">
-                <label htmlFor="nb-manual-total" className="nb__label">Total tancat amb el client</label>
+          <AdminSection title="Preu acordat" description="Resum econòmic del bolo">
+            <div className="flex flex-wrap gap-4">
+              <div className={narrowField}>
+                <label htmlFor="nb-manual-total" className={NB_LABEL}>Total tancat amb el client</label>
                 <input
                   id="nb-manual-total" type="number" min={0} placeholder="Ex. 340"
                   value={manualTotalPrice} onChange={(e) => setManualTotalPrice(e.target.value)}
-                  className="nb__input"
+                  className="adm-input"
                 />
-                <span className="nb__field-hint">preu final pactat; substitueix el càlcul automàtic</span>
+                <span className={NB_HINT}>preu final pactat; substitueix el càlcul automàtic</span>
               </div>
-              <div className="nb__field nb__field--narrow">
-                <span className="nb__label">Fiscalitat</span>
-                <label className="nb__invoice-check">
+              <div className={narrowField}>
+                <span className={NB_LABEL}>Fiscalitat</span>
+                <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--t2)]">
                   <input
                     type="checkbox" checked={invoiceRequired}
                     onChange={(e) => setInvoiceRequired(e.target.checked)}
+                    className="accent-[var(--gold)]"
                     role="switch" aria-checked={invoiceRequired}
                   />
                   Factura amb IVA
-                  {invoiceRequired && <span className="nb__vat-flag">+{fiscalMode.vatRate}% IVA</span>}
+                  {invoiceRequired && <span className="ml-1 text-xs text-[var(--o-warning)]">+{fiscalMode.vatRate}% IVA</span>}
                 </label>
-                <span className="nb__field-hint">{fiscalMode.help}</span>
+                <span className={NB_HINT}>{fiscalMode.help}</span>
               </div>
             </div>
 
@@ -353,56 +344,52 @@ export default function NewBookingForm() {
               const diffPct = calculat > 0 ? (diff / calculat) * 100 : null;
               if (!diff) return null;
               return (
-                <p className="nb__econ-diff">
+                <p className="mt-2.5 text-xs text-[var(--t2)]">
                   Pactat {diff > 0 ? '+' : ''}{formatCurrency(diff)} sobre el calculat ({formatCurrency(calculat)})
                   {diffPct != null ? ` · ${diffPct > 0 ? '+' : ''}${diffPct.toFixed(0)}%` : ''}
-                  <span className="nb__econ-diff-hint"> · el marge i el total complet són al resum de la dreta</span>
+                  <span className="text-[var(--t3)]"> · el marge i el total complet són al resum de la dreta</span>
                 </p>
               );
             })()}
-          </section>
+          </AdminSection>
 
-          <section className="nb__panel">
-            <div className="nb__phead nb__phead--toggle">
-              <div>
-                <h2 className="nb__h2">Origen i facturació</h2>
-                <span className="nb__pintro">
-                  {(() => {
-                    const src = partners.find((p) => p.id === sourceCollaboratorId);
-                    const bill = partners.find((p) => p.id === billedCollaboratorId);
-                    const origin = src ? `Ve de ${src.company || src.name}` : 'Client directe';
-                    const billing = bill ? `factura a ${bill.company || bill.name}` : 'factura al client final';
-                    return `${origin} · ${billing}`;
-                  })()}
-                </span>
-              </div>
-              <button type="button" className="nb__toggle" onClick={() => setShowSourceBilling((v) => !v)}>
+          <AdminSection
+            title="Origen i facturació"
+            description={(() => {
+              const src = partners.find((p) => p.id === sourceCollaboratorId);
+              const bill = partners.find((p) => p.id === billedCollaboratorId);
+              const origin = src ? `Ve de ${src.company || src.name}` : 'Client directe';
+              const billing = bill ? `factura a ${bill.company || bill.name}` : 'factura al client final';
+              return `${origin} · ${billing}`;
+            })()}
+            actions={(
+              <button type="button" className="ap-btn ap-btn--xs" onClick={() => setShowSourceBilling((v) => !v)}>
                 {showSourceBilling ? 'Amagar' : 'Ajustar'}
               </button>
-            </div>
+            )}
+          >
             {showSourceBilling && (
               <div className="grid gap-3 md:grid-cols-2">
-                <label className="nb__field">
-                  <span className="nb__label">D&apos;on ve el bolo</span>
-                  <select value={sourceCollaboratorId} onChange={(e) => setSourceCollaboratorId(e.target.value)} className="nb__input">
+                <label className={NB_FIELD}>
+                  <span className={NB_LABEL}>D&apos;on ve el bolo</span>
+                  <select value={sourceCollaboratorId} onChange={(e) => setSourceCollaboratorId(e.target.value)} className="adm-input">
                     <option value="">Client directe (cap intermediari)</option>
                     {renderPartnerOptions(partners)}
                   </select>
                 </label>
-                <label className="nb__field">
-                  <span className="nb__label">A qui facturem</span>
-                  <select value={billedCollaboratorId} onChange={(e) => setBilledCollaboratorId(e.target.value)} className="nb__input">
+                <label className={NB_FIELD}>
+                  <span className={NB_LABEL}>A qui facturem</span>
+                  <select value={billedCollaboratorId} onChange={(e) => setBilledCollaboratorId(e.target.value)} className="adm-input">
                     <option value="">Al client final</option>
                     {renderPartnerOptions(partners)}
                   </select>
                 </label>
               </div>
             )}
-          </section>
-
+          </AdminSection>
         </div>
 
-        <aside className="nb__side">
+        <aside className="flex flex-col gap-3.5 xl:sticky xl:top-4">
           {pricing && (
             <BookingPricingSummary
               pricing={pricing}
@@ -412,21 +399,21 @@ export default function NewBookingForm() {
               marginEstimate={marginEstimate}
             />
           )}
-          <div className="nb__cta">
+          <div className="flex flex-col gap-2">
             <button
               type="button"
               onClick={handleSubmit}
               disabled={submitDisabled}
-              className="nb__btn--prim"
+              className="ap-btn ap-btn--primary w-full"
             >
               {submitting ? 'Creant reserva…' : 'Crear reserva'}
             </button>
-            <Link href={backHref} className="nb__btn--sec">
+            <Link href={backHref} className="ap-btn w-full">
               Cancel·lar
             </Link>
           </div>
         </aside>
       </div>
-    </div>
+    </AdminPage>
   );
 }

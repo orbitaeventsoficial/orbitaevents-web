@@ -58,7 +58,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 1276;
+export const ADMIN_CHANGE_COUNTER = 1284;
 
 export const ADMIN_DOSSIER_GENERATOR_COPY = {
   page: {
@@ -195,19 +195,19 @@ export const CUSTOMER_TIMELINE_FILTER_OPTIONS = [
 ] as const;
 
 export const CUSTOMER_TIMELINE_EVENT_META: Record<string, { filter: 'proposals' | 'bookings' | 'tasks' | 'comms'; icon: string; toneClass: string }> = {
-  PROPOSAL_CREATED: { filter: 'proposals', icon: '📄', toneClass: 'ch__timeline-event--proposal' },
-  PROPOSAL_SENT: { filter: 'proposals', icon: '📤', toneClass: 'ch__timeline-event--proposal' },
-  PROPOSAL_ACCEPTED: { filter: 'proposals', icon: '✅', toneClass: 'ch__timeline-event--success' },
-  BOOKING_CREATED: { filter: 'bookings', icon: '📅', toneClass: 'ch__timeline-event--booking' },
-  BOOKING_CONFIRMED: { filter: 'bookings', icon: '🎉', toneClass: 'ch__timeline-event--success' },
-  TASK_CREATED: { filter: 'tasks', icon: '📝', toneClass: 'ch__timeline-event--warning' },
-  TASK_DONE: { filter: 'tasks', icon: '✓', toneClass: 'ch__timeline-event--success' },
-  MESSAGE_SENT: { filter: 'comms', icon: '✉️', toneClass: 'ch__timeline-event--comms' },
-  EMAIL_RECEIVED: { filter: 'comms', icon: '📩', toneClass: 'ch__timeline-event--comms' },
-  WHATSAPP_SENT: { filter: 'comms', icon: '💬', toneClass: 'ch__timeline-event--comms' },
-  PHONE_CALL: { filter: 'comms', icon: '📞', toneClass: 'ch__timeline-event--comms' },
-  NOTE_ADDED: { filter: 'comms', icon: '📌', toneClass: 'ch__timeline-event--note' },
-  ACTIVITY: { filter: 'comms', icon: '•', toneClass: 'ch__timeline-event--activity' },
+  PROPOSAL_CREATED: { filter: 'proposals', icon: '📄', toneClass: 'border-l-[var(--o-info)]' },
+  PROPOSAL_SENT: { filter: 'proposals', icon: '📤', toneClass: 'border-l-[var(--o-info)]' },
+  PROPOSAL_ACCEPTED: { filter: 'proposals', icon: '✅', toneClass: 'border-l-[var(--o-success)]' },
+  BOOKING_CREATED: { filter: 'bookings', icon: '📅', toneClass: 'border-l-[var(--ax-vip)]' },
+  BOOKING_CONFIRMED: { filter: 'bookings', icon: '🎉', toneClass: 'border-l-[var(--o-success)]' },
+  TASK_CREATED: { filter: 'tasks', icon: '📝', toneClass: 'border-l-[var(--o-warning)]' },
+  TASK_DONE: { filter: 'tasks', icon: '✓', toneClass: 'border-l-[var(--o-success)]' },
+  MESSAGE_SENT: { filter: 'comms', icon: '✉️', toneClass: 'border-l-[var(--ax-vip)]' },
+  EMAIL_RECEIVED: { filter: 'comms', icon: '📩', toneClass: 'border-l-[var(--ax-vip)]' },
+  WHATSAPP_SENT: { filter: 'comms', icon: '💬', toneClass: 'border-l-[var(--ax-vip)]' },
+  PHONE_CALL: { filter: 'comms', icon: '📞', toneClass: 'border-l-[var(--ax-vip)]' },
+  NOTE_ADDED: { filter: 'comms', icon: '📌', toneClass: 'border-l-[var(--o-admin-line-2)]' },
+  ACTIVITY: { filter: 'comms', icon: '•', toneClass: 'border-l-[var(--o-admin-line)]' },
 };
 
 

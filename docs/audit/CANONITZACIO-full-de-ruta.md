@@ -107,3 +107,23 @@ direcció és la del propietari i és correcta. Aquest document és la coordinac
 - Claude arrenca per **tasks** (Fase A). Codex: no toquis tasks mentre estigui en curs.
 - Repartir per pàgines senceres (no per capes) per evitar trepitjar-se.
 - Cada pàgina migrada = 1 canvi documentat + checklist marcat aquí.
+
+## 9. ÚLTIMA MILLA — sistemes en CSS compartit (anàlisi 2026-06-30)
+Després de les 13 pàgines autocontingudes (reactivation→tasks), queden els sistemes en CSS
+compartit, més delicats (un css → múltiples pàgines). Pla:
+
+| Sistema | Usos | CSS | TSX | Nota |
+|---|---|---|---|---|
+| `fxd` | 683 | leads-design.css | 4 | Fitxa de lead = REFERÈNCIA del propietari. Molt delicat: migrar conservant l'aspecte exacte. |
+| `bd` | 533 | bookings/[id]/booking-detail.css | 8 | Booking detall. Autocontingut → agent. |
+| `fx` | 376 | admin-shell + customer-hub + leads-design | 3 | Shell de leads. Compartit. |
+| `ax` | 218 | admin-shell + booking-detail + arxiu | 3 | Possible infraestructura del shell — verificar si és canònic legítim. |
+| `ix` | 132 | admin-shell + inbox | 2 | Settings d'inbox. |
+| `cdh` | 42 | admin-shell + leads-design | 1 | CommercialDocumentsHistory. |
+| `lp2` | 62 | leads-design.css | **0 TSX** | ⚠️ CANDIDAT CODI MORT — verificar i esborrar regles. |
+| `lf` | 1 | leads-design.css | **0 TSX** | ⚠️ CANDIDAT CODI MORT. |
+
+**Ordre última milla:** (1) verificar+esborrar lp2/lf morts; (2) bd (autocontingut, agent);
+(3) fxd amb cura extra (referència lead, captura abans/després); (4) fx/ax/ix/cdh del shell
+un a un. **`ax`/`ix` a admin-shell.css poden ser infraestructura canònica legítima** — abans
+d'erradicar, comprovar si són part del shell (`.ax-root`/`.ax__workspace` són canònics!).

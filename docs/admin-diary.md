@@ -1,3 +1,163 @@
+## 2026-06-30 — Erradicació: nova reserva 100% canònica (formulari crític) (Canvi #1284, claude+agent)
+
+### Què s'ha fet
+- `NewBookingForm.tsx` + 5 seccions (ClientEvent, PackExtras, ServiceLines, TravelDiscount, PricingSummary): 498 `nb__` → canònic (AdminPage, AdminSection, .adm-input, .ap-btn/--primary/--xs, .ap-card/--danger, PricingSummary amb tokens). Nou `booking-form-classes.ts`: constants canòniques compartides (NB_FIELD/LABEL/HINT, monocapa, Tailwind+tokens, zero hex).
+- `nb-design.css` (337 línies) ESBORRAT + 2 imports trets.
+- Funcionalitat crítica intacta: hooks pricing, validacions, autosave, submit, fetch col·laboradors, regla DJ 1a hora, tècnic so. Cap handler tocat.
+- NO tocat bookings/[id]/ (bd__/fxd__ 534 intactes).
+- Verificat: captura formulari (AdminPage + AdminSection + .adm-input + chips), 0 nb__, tsc 0.
+
+### Validació
+- Validació tècnica: `tsc` 0; `qa:canon-debt` OK; bd/fxd [id] intactes.
+- Validació funcional: captura nova-reserva canònica, formulari complet.
+- Validació humana/UX: hipersemblant; lògica de preus preservada.
+
+### Coordinació
+Counter → 1284. 11a pàgina. Agents hub (ch) + tasks (tk) encara treballant.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-30 — V5 col·laboradors: valor de catàleg amb cèntims (Canvi #1283, codex)
+
+### Context
+El KPI `catalogValue` del llistat de col·laboradors arrodonia el valor del catàleg actiu amb `Math.round`, perdent cèntims. És el mateix patró ja corregit al Partner Hub, però en la vista agregada.
+
+### Què s'ha fet
+- `lib/services/collaboratorAdminService.ts`: `catalogValue` passa a arrodoniment monetari a 2 decimals.
+- `__tests__/lib/services/collaboratorAdminService.test.ts`: el KPI cobreix productes actius decimals i ignora productes inactius.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\collaboratorAdminService.test.ts` (9 tests OK). Pendents en aquest punt: `tsc`, `qa:protocol`, `git diff --check` i comprovació del bloqueig conegut de `validate:core`.
+- Validació funcional: el llistat de col·laboradors conserva cèntims al valor del catàleg actiu.
+- Validació humana/UX: el KPI de catàleg ja no infla o retalla imports per arrodoniment a euros sencers.
+
+### Coordinació
+Counter → 1283. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni canonització de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-30 — V5 atribució: ingressos multi-touch amb cèntims exactes (Canvi #1282, codex)
+
+### Context
+`AttributionPanel` formatava ingressos amb `formatCurrency(Math.round(v))`, convertint imports atribuïts a euros sencers. En un panell d'atribució, això pot distorsionar ingressos first-touch, last-touch i journeys.
+
+### Què s'ha fet
+- `app/admin/components/AttributionPanel.tsx`: helper exportat `formatAttributionEuro()` amb arrodoniment monetari a 2 decimals i `formatCurrencyExact`.
+- `__tests__/app/admin/components/AttributionPanel.test.ts`: cobertura de cèntims i import zero.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\components\AttributionPanel.test.ts` (2 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `validate:core` global continua bloquejat pel deute concurrent d'Inbox ja identificat a `app/admin/inbox/inbox.css:9` (`qa:admin-mode-prefix`).
+- Validació funcional: el panell d'atribució multi-touch conserva cèntims en ingressos atribuïts.
+- Validació humana/UX: les xifres del canal que obre/tanca una venda ja no es maquillen a euros sencers.
+
+### Coordinació
+Counter → 1282. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni canonització de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-30 — V5 Partner Hub: imports monetaris conserven cèntims (Canvi #1281, codex)
+
+### Context
+`partnerHubService` arrodonia imports amb `Math.round`, perdent cèntims en ingressos aportats pel partner, valor/cost de catàleg i serveis subcontractats. En una lectura econòmica, 199,99 € no pot convertir-se en 200 €.
+
+### Què s'ha fet
+- `lib/services/partnerHubService.ts`: `round()` passa a arrodonir a 2 decimals.
+- `__tests__/lib/services/partnerHubService.test.ts`: cobertura amb decimals en `sourcedRevenue`, `catalogValue`, `catalogCost`, `serviceLinesPaid` i `totalPaidToPartner`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\partnerHubService.test.ts` (4 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `validate:core` global continua bloquejat pel deute concurrent d'Inbox ja identificat a `app/admin/inbox/inbox.css:9` (`qa:admin-mode-prefix`).
+- Validació funcional: la fitxa de partner conserva cèntims en imports econòmics agregats.
+- Validació humana/UX: les xifres del Partner Hub ja no es maquillen per arrodoniment a euros sencers.
+
+### Coordinació
+Counter → 1281. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni canonització de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-30 — V5 lead pre-reserva: línies del bolo sanejades al servei (Canvi #1280, codex)
+
+### Context
+La ruta de línies del bolo del lead no valida amb Zod; per tant `replaceLeadServiceLines()` és la porta de domini. Fins ara un caller intern podia persistir imports negatius, quantitats negatives o hores negatives en `LeadServiceLine` pre-reserva.
+
+### Què s'ha fet
+- `lib/services/leadServiceLineService.ts`: saneja `revenueAmount`, `costAmount`, `quantity` i `hours` abans de persistir o delegar al booking.
+- `__tests__/lib/services/leadServiceLineService.test.ts`: regressió amb línia bruta que queda neutralitzada a `revenueAmount: 0`, `costAmount: 0`, `quantity: 1` i `hours: null`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\leadServiceLineService.test.ts` (7 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `validate:core` global continua bloquejat pel deute concurrent d'Inbox ja identificat a `app/admin/inbox/inbox.css:9` (`qa:admin-mode-prefix`).
+- Validació funcional: les línies del bolo pre-reserva no poden contaminar el configurador ni una futura reserva amb imports o quantitats negatives.
+- Validació humana/UX: el resum del bolo del lead queda protegit encara que una entrada bruta arribi fora del formulari normal.
+
+### Coordinació
+Counter → 1280. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni canonització de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-30 — V5 lead post-reserva: editar el bolo recalcula la reserva (Canvi #1279, codex)
+
+### Context
+Quan un lead encara no té reserva, les línies del bolo viuen a `LeadServiceLine`. Però quan ja hi ha `Booking`, la font de veritat passa a `BookingServiceLine`. El servei `replaceLeadServiceLines()` escrivia directament les línies de booking i es saltava `bookingRouteService`, de manera que subtotal/IVA/total podien quedar desfasats.
+
+### Què s'ha fet
+- `lib/services/leadServiceLineService.ts`: si el lead ja té reserva, delega a `updateBookingDetail(bookingId, { serviceLines })` en lloc d'escriure `BookingServiceLine` directament.
+- `__tests__/lib/services/leadServiceLineService.test.ts`: cobertura del camí post-reserva que comprova la delegació al servei canònic de reserva i evita transacció directa sobre línies de lead.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\leadServiceLineService.test.ts` (6 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `validate:core` global continua bloquejat pel deute concurrent d'Inbox ja identificat a `app/admin/inbox/inbox.css:9` (`qa:admin-mode-prefix`).
+- Validació funcional: editar el bolo des de la fitxa del lead després de reservar reutilitza el recalculador de la reserva i manté el total alineat amb les línies.
+- Validació humana/UX: el propietari pot ampliar o ajustar productes en un lead vinculat sense que la reserva quedi amb imports antics.
+
+### Coordinació
+Counter → 1279. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni canonització de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-30 — V5 Partner Hub: imports pagats amb quantitat real de línies (Canvi #1278, codex)
+
+### Context
+El Partner Hub mostrava quant hem pagat a un partner subcontractat agregant només `_sum(costAmount)`. Però les línies `BookingServiceLine` tenen `quantity`, així que una línia de 2 unitats a 40 € comptava com 40 €, no 80 €.
+
+### Què s'ha fet
+- `lib/services/partnerHubService.ts`: substitueix l'aggregate simple per una lectura mínima de `costAmount` i `quantity`, i calcula `costAmount * quantity`.
+- `__tests__/lib/services/partnerHubService.test.ts`: el cas econòmic ara cobreix dues línies, una d'elles amb quantitat 2, i manté `serviceLinesPaid`/`totalPaidToPartner` en 160 €.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\partnerHubService.test.ts` (3 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `pnpm run qa:admin-mode-prefix` continua bloquejat per deute concurrent d'Inbox de Claude (`app/admin/inbox/inbox.css:9`); per tant `validate:core` global no es pot tancar des d'aquest perímetre sense tocar mails/Inbox.
+- Validació funcional: el Partner Hub ja no infraestima el que s'ha pagat a un col·laborador quan una línia subcontractada té múltiples unitats.
+- Validació humana/UX: la fitxa del partner mostra una lectura econòmica més honesta sense barrejar-la amb bolos que el partner ens passa o amb el seu catàleg.
+
+### Coordinació
+Counter → 1278. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni canonització de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-30 — V5 reserves: les línies de servei multipliquen quantitat al subtotal (Canvi #1277, codex)
+
+### Context
+La creació de reserva persistia `BookingServiceLine.quantity`, però el subtotal només sumava `revenueAmount` una vegada. Un bolo amb una línia de servei de 3 unitats podia quedar desat amb quantitat 3 però facturat com si fos 1.
+
+### Què s'ha fet
+- `lib/services/bookingCreationService.ts`: `serviceLinesRevenue` ara suma `revenueAmount * quantity`, mantenint `1` com a fallback per línies antigues o incompletes.
+- `__tests__/lib/services/bookingCreationService.test.ts`: regressió amb bolo personalitzat que hereta una línia del lead amb `quantity: 3` i comprova subtotal/total 360, no 120.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\bookingCreationService.test.ts` (45 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. `pnpm run validate:core` queda bloquejat per deute concurrent d'Inbox de Claude (`app/admin/inbox/inbox.css:9` a `qa:admin-mode-prefix`, amb avisos `visual-overflow` a `SafataClient.tsx`); no s'ha tocat per respectar el perímetre de mails/Inbox.
+- Validació funcional: una nova reserva ja no infraestima el PVP quan una línia de servei representa múltiples unitats.
+- Validació humana/UX: el resum econòmic i la reserva creada reflecteixen el mateix multiplicador que l'usuari veu com a quantitat de línia.
+
+### Coordinació
+Counter → 1277. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni canonització de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-30 — Erradicació: inbox/safata 100% canònica (Canvi #1276, claude+agent)
 
 ### Què s'ha fet
