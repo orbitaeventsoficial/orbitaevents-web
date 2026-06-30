@@ -33,7 +33,7 @@ Counter → 1262. Demostra el principi canònic: 1 canvi → tot respon.
 - Treballant per: `claude`
 - Tancat per: `claude`
 
-## 2026-06-30 — Canonització Fase A: clientes botons → .ap-btn (Canvi #1261, claude)
+## 2026-06-30 — Canonització Fase A: clientes botons → .ap-btn (Canvi #1264, claude)
 
 ### Context
 Full de ruta canonització, Fase A, pàgina clientes (cl__). Header ja consumeix --head-* (#1255). Ara els botons.
@@ -48,7 +48,7 @@ Full de ruta canonització, Fase A, pàgina clientes (cl__). Header ja consumeix
 - Validació humana/UX: pendent captura (clientes carrega async).
 
 ### Coordinació
-Counter → 1261. Fase A: tasks ✅(header+botons), clientes 🔧(botons). PENDENT decisió propietari: botó primari outline vs sòlid (afecta tot).
+Counter → 1264. Fase A: tasks ✅(header+botons), clientes 🔧(botons). PENDENT decisió propietari: botó primari outline vs sòlid (afecta tot).
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`

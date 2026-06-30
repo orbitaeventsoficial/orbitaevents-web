@@ -1581,7 +1581,7 @@ Seqüència obligatòria de registre:
 - Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\bookingCreationService.test.ts __tests__\app\admin\bookings\useBookingPricing.test.ts` (44 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
 - Validació funcional: una nova reserva no pot néixer amb totals negatius per excés de descompte.
 - Validació humana/UX: el resum de nova reserva mostra base zero, no imports negatius, quan el descompte supera el subtotal.
-- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1261`; el següent canvi real ha de ser `#1262`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1264`; el següent canvi real ha de ser `#1265`.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`
@@ -1599,10 +1599,10 @@ Seqüència obligatòria de registre:
 - Treballant per: `codex`
 - Tancat per: `codex`
 
-### Canvi #1261 — 2026-06-30 — claude (FET)
+### Canvi #1264 — 2026-06-30 — claude (FET)
 **Canonització Fase A: clientes botons → .ap-btn.**
 - cl__add→ap-btn--primary, cl__pager-btn/cl__clearfilters→ap-btn--xs. cl__add era sòlid, ara outline canònic. Pendent: searchinput/table/badge/toggles.
-- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1261`; el següent canvi real ha de ser `#1262`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1264`; el següent canvi real ha de ser `#1265`.
 - Validació tècnica: `tsc` 0; `validate:core` EXIT 0.
 - Validació funcional: botons .ap-btn.
 - Validació humana/UX: pendent captura (async).
