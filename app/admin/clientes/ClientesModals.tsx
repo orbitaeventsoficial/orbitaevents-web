@@ -311,7 +311,7 @@ export function AddCustomerModal({
             disabled={actionLoading || !newCustomer.name || !newCustomer.email}
             type="button"
             aria-busy={actionLoading}
-            className="ap-btn ap-btn--primary flex-1"
+            className="ap-btn--primary flex-1"
           >
             {actionLoading ? 'Afegint...' : 'Afegir'}
           </button>

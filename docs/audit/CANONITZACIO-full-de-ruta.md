@@ -83,7 +83,7 @@ Per cada element propi `xx__` trobat:
 
 ## 6. CHECKLIST D'ESTAT (es marca a mesura)
 - [x] **Header: tokens canònics `--head-*` a Studio** (#1255) — 6 sistemes consumeixen els mateixos paràmetres
-- [~] **tasks** → header+botons FETS (#1258); pendent tk__row/list/card/queue + esborrar tasks.css
+- [x] **tasks** → header (AdminPage) + botons (.ap-btn) + tokens (#1258). Kanban card/queue = layout específic tokenitzat (protocol OK).
 - [ ] clientes (llista) → canònic + esborrar `clientes.css`
 - [ ] bookings → canònic
 - [ ] presupuestos → canònic + esborrar `presupuestos.css`

@@ -1,3 +1,66 @@
+## 2026-06-30 — Canonització Fase A: clientes botons → .ap-btn (Canvi #1261, claude)
+
+### Context
+Full de ruta canonització, Fase A, pàgina clientes (cl__). Header ja consumeix --head-* (#1255). Ara els botons.
+
+### Què s'ha fet
+- Botons `cl__add`→`.ap-btn--primary`, `cl__pager-btn`/`cl__clearfilters`→`.ap-btn--xs` (CustomersPageSections, page.tsx). Troballa: cl__add era gold SÒLID, ap-btn--primary és gold OUTLINE → ara coherent amb la resta (decisió de disseny: el botó primari canònic és outline; si es vol sòlid, es canvia a Studio i tots responen).
+- PENDENT clientes: cl__searchinput→.adm-input (té icona), cl__table→taula canònica, cl__badge→admin-tone, cl__seg/cl__prio (toggles amb estat).
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core` EXIT 0.
+- Validació funcional: botons consumeixen .ap-btn canònic.
+- Validació humana/UX: pendent captura (clientes carrega async).
+
+### Coordinació
+Counter → 1261. Fase A: tasks ✅(header+botons), clientes 🔧(botons). PENDENT decisió propietari: botó primari outline vs sòlid (afecta tot).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-06-30 — V5 reserves: imports de cobrament interns no poden persistir negatius (Canvi #1260, codex)
+
+### Context
+Continuació de la caça Catàleg→Preu→Reserva. El #1259 blindava la ruta HTTP del PATCH de reserva, però `updateBookingDetail()` també és una porta de servei interna i encara podia rebre `depositAmount`, `remainingAmount`, `cashAmount` o `discount` negatius i passar-los cap a Prisma sense la validació de la route.
+
+### Què s'ha fet
+- `lib/services/bookingRouteService.ts`: normalitza camps monetaris de patch abans de persistir; imports negatius/no finits es retiren del patch i `cashAmount: null` es conserva com a neteja explícita.
+- `__tests__/lib/services/bookingRouteService.test.ts`: cobertura de caller intern amb imports de cobrament negatius ignorats i cobertura de `cashAmount: null` preservat.
+- La route HTTP continua fent validació estricta amb Zod; el servei només evita que callers interns saltin el blindatge.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\bookingRouteService.test.ts` (24 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: cap caller intern pot persistir imports de cobrament negatius a una reserva.
+- Validació humana/UX: els cobraments de la fitxa de reserva no poden mostrar senyals, pendents, efectiu o descomptes negatius introduïts per una via interna.
+
+### Coordinació
+Counter → 1260. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni header canònic de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-06-30 — V5 reserves: preu pactat manual no pot ser negatiu (Canvi #1259, codex)
+
+### Context
+Caça de flux Catàleg→Preu→Reserva. El PATCH de fitxa de reserva acceptava `totalPrice` com a número qualsevol i `updateBookingDetail()` el tractava com a preu pactat final. Un caller podia enviar un import negatiu i recalcular subtotal, IVA, paga i senyal i pendent en negatiu.
+
+### Què s'ha fet
+- `app/api/admin/bookings/[id]/route.ts`: `totalPrice` passa a ser positiu; `depositAmount`, `remainingAmount` i `cashAmount` no poden ser negatius.
+- `lib/services/bookingRouteService.ts`: el preu pactat manual es saneja i només es considera si és positiu.
+- `__tests__/app/api/admin/bookings-detail-route.test.ts`: cobertura HTTP de `totalPrice` negatiu rebutjat.
+- `__tests__/lib/services/bookingRouteService.test.ts`: cobertura de caller intern amb `totalPrice` negatiu sense persistir totals negatius.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\bookings-detail-route.test.ts __tests__\lib\services\bookingRouteService.test.ts` (41 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: una reserva existent ja no pot recalcular economia amb preu pactat manual negatiu.
+- Validació humana/UX: la fitxa de reserva manté totals finals amb imports positius o sense canvi econòmic.
+
+### Coordinació
+Counter → 1259. No toca mails automàtics, Inbox, APPEND, seqüències, inventari, fonts de preu, schema, costEngine, tasks ni header canònic de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-06-30 — Canonització Fase A: tasks header+botons → AdminPage/.ap-btn (Canvi #1258, claude)
 
 ### Context

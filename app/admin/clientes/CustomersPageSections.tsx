@@ -93,7 +93,7 @@ export function CustomersToolbar({
         <button
           onClick={onAddCustomer}
           type="button"
-          className="cl__add"
+          className="ap-btn--primary"
           {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.addCustomer)}
         >
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -351,7 +351,7 @@ export function CustomersPagination({
           type="button"
           onClick={() => setPage((prev) => Math.max(1, prev - 1))}
           disabled={page === 1}
-          className="cl__pager-btn"
+          className="ap-btn--xs"
           {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.previousPage)}
         >
           ← Anterior
@@ -360,7 +360,7 @@ export function CustomersPagination({
           type="button"
           onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
           disabled={page === totalPages}
-          className="cl__pager-btn"
+          className="ap-btn--xs"
           {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.nextPage)}
         >
           Següent →

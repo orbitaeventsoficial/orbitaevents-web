@@ -1550,6 +1550,43 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1260 — 2026-06-30 — codex (FET)
+**V5 reserves: imports de cobrament interns no poden persistir negatius.**
+- `lib/services/bookingRouteService.ts`: normalitza camps monetaris de patch abans de persistir; `depositAmount`, `remainingAmount`, `cashAmount` i `discount` negatius/no finits es retiren del patch.
+- `lib/services/bookingRouteService.ts`: `cashAmount: null` es conserva com a neteja explícita del camp, sense convertir-lo en import invàlid.
+- `__tests__/lib/services/bookingRouteService.test.ts`: cobertura de caller intern amb imports de cobrament negatius ignorats i cobertura de `cashAmount: null` preservat.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\bookingRouteService.test.ts` (24 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: cap caller intern pot persistir imports de cobrament negatius a una reserva.
+- Validació humana/UX: la fitxa de reserva no pot acabar mostrant senyals, pendents, efectiu o descomptes negatius injectats per una via interna.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1260`; el següent canvi real ha de ser `#1261`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1261 — 2026-06-30 — claude (FET)
+**Canonització Fase A: clientes botons → .ap-btn.**
+- cl__add→ap-btn--primary, cl__pager-btn/cl__clearfilters→ap-btn--xs. cl__add era sòlid, ara outline canònic. Pendent: searchinput/table/badge/toggles.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1261`; el següent canvi real ha de ser `#1262`.
+- Validació tècnica: `tsc` 0; `validate:core` EXIT 0.
+- Validació funcional: botons .ap-btn.
+- Validació humana/UX: pendent captura (async).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1259 — 2026-06-30 — codex (FET)
+**V5 reserves: preu pactat manual no pot ser negatiu.**
+- `app/api/admin/bookings/[id]/route.ts`: `totalPrice` passa a ser positiu; `depositAmount`, `remainingAmount` i `cashAmount` no poden ser negatius.
+- `lib/services/bookingRouteService.ts`: el preu pactat manual es saneja i només es considera si és positiu.
+- `__tests__/app/api/admin/bookings-detail-route.test.ts` i `__tests__/lib/services/bookingRouteService.test.ts`: cobertura HTTP i de caller intern amb `totalPrice` negatiu.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\bookings-detail-route.test.ts __tests__\lib\services\bookingRouteService.test.ts` (41 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: una reserva existent ja no pot recalcular economia amb preu pactat manual negatiu.
+- Validació humana/UX: la fitxa de reserva manté totals finals amb imports positius o sense canvi econòmic.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1259`; el següent canvi real ha de ser `#1260`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1258 — 2026-06-30 — claude (FET)
 **Canonització Fase A: tasks header+botons → AdminPage/.ap-btn.**
 - tasks/page.tsx header tk__ → AdminPage (toolbar com a actions). Botons tk__btn* → .ap-btn* (4 fitxers). Pendent: tk__row/list/card/queue → canònic + esborrar tasks.css.
