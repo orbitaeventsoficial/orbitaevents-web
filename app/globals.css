@@ -3140,16 +3140,17 @@ html.admin-mode .ap-btn:disabled {
 /* Acció primària = outline or de Cristina (`.fx__add`): fons transparent, vora
    hairline d'or, text or. Abans era or 22% sobre panel = massa fosc, semblava negre. */
 html.admin-mode .ap-btn--primary {
-  /* Botó primari canònic: OUTLINE daurat (decisió propietari 2026-06-30).
-     Canviar aquí afecta TOTS els botons primaris de l'admin. */
-  background: transparent;
-  border-color: var(--at-gold);
-  color: var(--at-gold-text);
+  /* Botó primari canònic: OUTLINE daurat VISIBLE (decisió propietari 2026-06-30).
+     Recuadre daurat clar + fons subtil per marcar la forma. Canviar aquí afecta
+     TOTS els botons primaris de l'admin. */
+  background: color-mix(in oklab, var(--gold) 7%, transparent);
+  border-color: var(--gold);
+  color: var(--gold-bright);
 }
 
 html.admin-mode .ap-btn--primary:hover {
-  background: color-mix(in oklab, var(--at-gold) 8%, transparent);
-  border-color: var(--at-gold);
+  background: color-mix(in oklab, var(--gold) 15%, transparent);
+  border-color: var(--gold-bright);
 }
 
 html.admin-mode .ap-btn--secondary {

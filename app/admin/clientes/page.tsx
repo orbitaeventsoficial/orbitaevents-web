@@ -341,7 +341,7 @@ function CrmSegmentFilters({
         })}
 
         {hasActiveFilter && (
-          <button type="button" onClick={clearAll} className="ap-btn--xs">
+          <button type="button" onClick={clearAll} className="ap-btn ap-btn--xs">
             Netejar filtres
           </button>
         )}

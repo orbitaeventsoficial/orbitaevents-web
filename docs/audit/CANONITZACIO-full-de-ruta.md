@@ -95,7 +95,7 @@ Per cada element propi `xx__` trobat:
 - [ ] referrals / reactivation / reengagement → canònic
 - [ ] intake (`ni__`) → canònic
 - [ ] docs view (`dmd__`) → canònic
-- [ ] **Guard nou:** `qa:no-local-bem` que bloquegi nous `xx__` fora de l'allowlist canònic (`ap-`)
+- [x] **Guard ratchet `qa:canon-debt`** (#1265): baseline 5892, bloqueja regressions, força deute→0. Integrat a validate:core.
 
 ## 7. Honestedat sobre l'abast
 Això és una **refactorització gran** (no d'una sessió): ~5.900 usos en 21 sistemes. Es fa

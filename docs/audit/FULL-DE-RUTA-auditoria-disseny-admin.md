@@ -83,7 +83,7 @@ context (ids/params) correcte? el que es veu aquí és el mateix que a Economia/
 | V2 | POST-EVENT | Event→Informe→Enquesta→Ressenya→Feedback | ✅ TANCADA #1239 (perímetre no-mail) |
 | V3 | COMUNICACIÓ | Lead→Email/Inbox→Seqüències→Timeline client | ✅ TANCADA #1220 |
 | V4 | CLIENT / RECURRÈNCIA | Lead→Client→Portal client (pagament/signatura)→Reactivació/Referrals | ✅ TANCADA #1231 |
-| V5 | CATÀLEG → PREU | Pack/Inventari→Cost→Preu recomanat→Pressupost (cablejat de preus) | 🔶 EN CURS #1247 |
+| V5 | CATÀLEG → PREU | Pack/Inventari→Cost→Preu recomanat→Pressupost (cablejat de preus) | 🔶 EN CURS #1261 |
 
 ### 🔬 V3 — VERTICAL DE COMUNICACIÓ (1a passada) · Lead→Inbox/Email→Seqüències→Timeline
 Dades reals: 53 leadActivity, 6 emailSend.
@@ -121,6 +121,14 @@ Dades reals: 53 leadActivity, 6 emailSend.
 - 🔶 **V5-#4 · El PVP real podia arribar tard i no entrar al formulari — RESOLT #1244** — el formulari se sincronitza amb el pack de catàleg quan és un pressupost nou i no hi ha override manual, sense trepitjar propostes existents, custom pack ni drafts locals.
 - 🔶 **V5-#5 · L'email manual podia recalcular un total diferent del Studio — RESOLT #1245** — el Studio envia `quoteTotals` explícits i `adminQuoteEmailService` els respecta sense passar pel recalculador legacy.
 - 🔶 **V5-#6 · PDF/preview mostraven un total sense IVA diferent de proposta/email — RESOLT #1247** — `computeQuoteStudioTotals()` centralitza subtotal, descompte, IVA i total final. Preview i PDF mostren IVA i comparteixen total final amb proposta, contracte i email.
+- 🔶 **V5-#7 · Quick Create confiava en el PVP enviat pel client — RESOLT #1252** — `quickCreate()` resol server-side el `Pack.price` quan hi ha `interestedPackId`, conserva el fallback només sense pack i no fabrica imports amb un pack inexistent.
+- 🔶 **V5-#8 · El POST del pressupost de lead acceptava overrides bruts — RESOLT #1253** — `handleLeadQuotePost()` saneja `customPrice`, `customHours` i `packId` igual que el GET, i conserva el pack base quan el body no és vàlid.
+- 🔶 **V5-#9 · Extres/descompte de reserva podien distorsionar totals — RESOLT #1254** — la ruta i `createBookingFromInput()` rebutgen o normalitzen imports bruts, i només sumen extres que es poden resoldre i persistir.
+- 🔶 **V5-#10 · Propostes acceptaven totals econòmics desquadrats — RESOLT #1256** — les APIs de propostes validen coherència `subtotal`/`discount`/`vatRate`/`vatAmount`/`total`; el PATCH només permet modificar economia si arriba el bloc complet i coherent.
+- 🔶 **V5-#11 · La coherència de propostes vivia massa amunt — RESOLT #1257** — `lib/constants/pricing.ts` declara els camps econòmics i `proposalAdminService` és la font única de la regla: rebutja creació/update incoherent abans de Prisma; les rutes només consumeixen aquesta regla.
+- 🔶 **V5-#12 · El preu pactat manual de reserva podia ser negatiu — RESOLT #1259** — el PATCH de reserva exigeix `totalPrice` positiu i `updateBookingDetail()` ignora imports manuals no positius abans de recalcular subtotal/IVA/total.
+- 🔶 **V5-#13 · Callers interns podien persistir cobraments negatius — RESOLT #1260** — `updateBookingDetail()` retira del patch imports negatius/no finits de `depositAmount`, `remainingAmount`, `cashAmount` i `discount`, preservant només `cashAmount: null` com a neteja explícita.
+- 🔶 **V5-#14 · Descompte superior al subtotal generava totals negatius — RESOLT #1261** — `bookingCreationService` i `useBookingPricing` clampen la base post-descompte a 0 quan no hi ha total manual, de manera que total, IVA, paga i senyal i pendent no baixen de zero.
 
 ### FASE 2 — AUDITORIES HORITZONTALS (disseny pàgina a pàgina) · «que tot sigui IMPECABLE»
 Quan les verticals estiguin verdes: les 92 pàgines + 6 PDFs + 13 emails + components, amb

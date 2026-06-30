@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1265 — 2026-06-30 — claude (FET)
+**MECANISME d'erradicació: guard ratchet qa:canon-debt + botó outline visible.**
+- `scripts/check-canon-debt.mjs` + qa:canon-debt a validate:core: baseline 5892 usos xx__, FALLA si puja → força deute→0, bloqueja codi propi nou. Botó primari outline visible + 15 botons amb .ap-btn base afegida.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1265`; el següent canvi real ha de ser `#1266`.
+- Validació tècnica: `tsc` 0; guard OK; `validate:core`.
+- Validació funcional: guard bloqueja regressions; botons uniformes.
+- Validació humana/UX: mecanisme mesura i força erradicació.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1263 — 2026-06-30 — claude (FET)
 **Canonització: clientes botons d'acció + select.**
 - cl__rowbtn/nextstep-link→.ap-btn--xs, cl__lifecycle-sel→.adm-input. searchinput es manté (icona). Pendent: taula/badges/toggles.

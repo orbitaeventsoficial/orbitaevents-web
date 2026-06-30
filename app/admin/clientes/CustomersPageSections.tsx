@@ -93,7 +93,7 @@ export function CustomersToolbar({
         <button
           onClick={onAddCustomer}
           type="button"
-          className="ap-btn--primary"
+          className="ap-btn ap-btn--primary"
           {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.addCustomer)}
         >
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -203,13 +203,13 @@ export function CustomersMobileList({
             <div className="cl__card-footer">
               <div className="cl__card-footleft">
                 <span className={sourceBadgeClass(customer.source)}>{getCustomerSourceLabel(customer.source)}</span>
-                <Link href={nextStep.href} className="ap-btn--xs">{nextStep.label} →</Link>
+                <Link href={nextStep.href} className="ap-btn ap-btn--xs">{nextStep.label} →</Link>
               </div>
               <div className="cl__rowacts" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.toolbar)}>
                 <button
                   onClick={() => onStartProcess(customer)}
                   type="button"
-                  className="ap-btn--xs"
+                  className="ap-btn ap-btn--xs"
                   title="Iniciar procés"
                   {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.startProcess)}
                 >
@@ -220,7 +220,7 @@ export function CustomersMobileList({
                 </button>
                 <Link
                   href={buildCustomerHubHref(customer.id)}
-                  className="ap-btn--xs"
+                  className="ap-btn ap-btn--xs"
                   title="Fitxa 360"
                   {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.customerFile)}
                 >
@@ -291,7 +291,7 @@ export function CustomersDesktopTable({
                 </td>
                 <td>
                   <div className="cl__nextstep">
-                    <Link href={nextStep.href} className="ap-btn--xs">{nextStep.label}</Link>
+                    <Link href={nextStep.href} className="ap-btn ap-btn--xs">{nextStep.label}</Link>
                     <span className="cl__nextstep-hint">{nextStep.hint}</span>
                   </div>
                 </td>
@@ -300,7 +300,7 @@ export function CustomersDesktopTable({
                     <button
                       onClick={() => onStartProcess(customer)}
                       type="button"
-                      className="ap-btn--xs"
+                      className="ap-btn ap-btn--xs"
                       title="Iniciar procés"
                       {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.startProcess)}
                     >
@@ -311,7 +311,7 @@ export function CustomersDesktopTable({
                     </button>
                     <Link
                       href={buildCustomerHubHref(customer.id)}
-                      className="ap-btn--xs"
+                      className="ap-btn ap-btn--xs"
                       title="Fitxa 360"
                       {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.customerFile)}
                     >
@@ -351,7 +351,7 @@ export function CustomersPagination({
           type="button"
           onClick={() => setPage((prev) => Math.max(1, prev - 1))}
           disabled={page === 1}
-          className="ap-btn--xs"
+          className="ap-btn ap-btn--xs"
           {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.previousPage)}
         >
           ← Anterior
@@ -360,7 +360,7 @@ export function CustomersPagination({
           type="button"
           onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
           disabled={page === totalPages}
-          className="ap-btn--xs"
+          className="ap-btn ap-btn--xs"
           {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.nextPage)}
         >
           Següent →

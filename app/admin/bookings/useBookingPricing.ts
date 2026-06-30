@@ -113,7 +113,7 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
     const { revenue: serviceLinesRevenue, cost: serviceLinesCost } = aggregateServiceLines(serviceLines);
     const subtotal = packPrice + extraHoursPrice + extrasPrice + travelCharge + serviceLinesRevenue;
     const discount = parseFloat(form.discount) || 0;
-    const baseAfterDiscount = subtotal - discount;
+    const baseAfterDiscount = Math.max(0, subtotal - discount);
     const vatRate = calcVatRate(invoiceRequired);
     const manualTotal = manualTotalPrice && manualTotalPrice > 0 ? manualTotalPrice : null;
     const total = manualTotal ?? baseAfterDiscount + baseAfterDiscount * (vatRate / 100);

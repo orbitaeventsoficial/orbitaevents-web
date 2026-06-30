@@ -50,7 +50,7 @@ export function TaskPageToolbar({
       <GenerateDailyChecklistButton />
       <Link
         href={customerId ? buildCustomerTaskCreateHref(customerId) : '/admin/tasks/new'}
-        className="ap-btn--primary"
+        className="ap-btn ap-btn--primary"
         {...helpAttrs(ADMIN_TASKS_HELP.newTask)}
       >
         + Nova tasca
@@ -87,7 +87,7 @@ export function TaskFiltersSection({
           </option>
         ))}
       </select>
-      <button type="submit" className="ap-btn--xs">Aplicar</button>
+      <button type="submit" className="ap-btn ap-btn--xs">Aplicar</button>
     </form>
   );
 }
@@ -106,7 +106,7 @@ export function TaskListSection({
           <span className="tk__empty-icon">📝</span>
           <h3 className="tk__empty-title">No hi ha tasques</h3>
           <p className="tk__empty-desc">Crea una nova tasca per començar</p>
-          <Link href="/admin/tasks/new" className="ap-btn--primary">+ Nova tasca</Link>
+          <Link href="/admin/tasks/new" className="ap-btn ap-btn--primary">+ Nova tasca</Link>
         </div>
       </div>
     );

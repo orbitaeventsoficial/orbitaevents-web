@@ -1,3 +1,23 @@
+## 2026-06-30 — MECANISME d'erradicació: guard ratchet qa:canon-debt + botó outline visible (Canvi #1265, claude)
+
+### Context
+El propietari (amb raó): «anem centímetre a centímetre, però la feina és erradicar de soca-rel». Calia un MECANISME, no més pegats manuals. Demana «normes, scripts, agents».
+
+### Què s'ha fet
+- **NORMA/GUARD RATCHET** `scripts/check-canon-debt.mjs` + `qa:canon-debt` a validate:core: compta tot el CSS propi (`xx__`, exclou canònics `ap-`/`adm-`), baseline `scripts/canon-debt-baseline.json` (5892 usos, 90 fitxers). FALLA si el deute PUJA → impedeix codi propi nou (ni claude ni codex), força el deute a baixar cap a 0. `--report` (mètrica per sistema) i `--update` (regenera baseline després de netejar una pàgina).
+- **Botó primari**: outline daurat VISIBLE (border --gold + fons 7% + text --gold-bright) perquè el «recuadre» es vegi. A més, 15 botons usaven `ap-btn--X` sense `.ap-btn` base → afegida (es veien sense estil); packs tenia classes extra que el feien més gran → tret.
+
+### Validació
+- Validació tècnica: `tsc` 0; guard OK (5892=5892); `validate:core`.
+- Validació funcional: guard bloqueja regressions; botons primaris uniformes amb outline visible.
+- Validació humana/UX: mecanisme que mesura i força l'erradicació.
+
+### Coordinació
+Counter → 1265. Pròxim: agents dedicats netegen pàgines senceres; cada neteja → `qa:canon-debt:update` baixa el baseline.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-06-30 — Canonització: clientes botons d'acció + select (Canvi #1263, claude)
 
 ### Què s'ha fet

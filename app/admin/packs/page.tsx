@@ -261,7 +261,7 @@ export default async function PacksPage({
           <SyncButton />
           <Link
             href="/admin/packs/new"
-            className="ap-btn ap-btn--primary inline-flex items-center gap-2"
+            className="ap-btn ap-btn--primary"
           >
             + Nou Pack
           </Link>
