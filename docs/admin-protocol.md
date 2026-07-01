@@ -1549,11 +1549,22 @@ Seqüència obligatòria de registre:
 ## Entrades
 
 ---
+### Canvi #1333 — 2026-07-01 — claude (FET)
+**Fix real: ap-btn-primary (classe inexistent) + inputs pelats → canònic.**
+- `.ap-btn-primary` (guió simple, NO existeix) → `.ap-btn ap-btn--primary` a 4 fitxers (botons es veien sense estil primari). docs/protocol input .ap-card→.adm-input + select→.adm-input. image-manager input→.adm-input. 0 inputs pelats.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1333`; el següent canvi real ha de ser `#1334`.
+- Validació tècnica: tsc 0; validate:core.
+- Validació funcional: botons primaris correctes; inputs canònics.
+- Validació humana/UX: coherent.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
 
-### Canvi #1331 — 2026-07-01 — claude (FET)
+
+### Canvi #1332 — 2026-07-01 — claude (FET)
 **Fix visual: discount-codes inputs/toggles pelats → canònic.**
 - 6 inputs → .adm-input; 2 toggles tipus → .ap-tab; botons acció → .ap-btn. 0 pelats. Aclarit: escàner comptava px- (inputs/botons), no cards; cards ja totes migrades. Volta 375px: 26 pàgines 0 overflow.
-- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1331`; el següent canvi real ha de ser `#1332`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1332`; el següent canvi real ha de ser `#1333`.
 - Validació tècnica: tsc 0; validate:core.
 - Validació funcional: discount-codes canònic.
 - Validació humana/UX: coherent.
@@ -21683,6 +21694,21 @@ px tsc --noEmit OK · git diff --check OK.
 - Validació funcional: el builder pot renderitzar tota l'oferta seleccionada per defecte o només els productes triats, sense barrejar preus dins la narrativa.
 - Validació humana/UX: el primer impacte és premium i personalitzat amb nom de client; la lectura posterior explica valor abans de comparar números.
 - `ADMIN_CHANGE_COUNTER` puja a `888`; el següent canvi real ha de ser `#889`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1334 — 2026-07-01 — codex (FET)
+**Reserva real Andorra: Alba Orna Bingo Musical al calendari.**
+- Context: el lead `Alba Orna` del 5 de setembre de 2026 existia, però no hi havia cap reserva al setembre; per això no apareixia com a reserva al calendari.
+- BD viva: creada la reserva `OE-2026-006` vinculada al lead `cmr1xh7la0000ug7dj4jnihjr`, sense passar pel servei de creació que envia email automàtic.
+- Bolo: `Bingo Musical (Masquerade Events)` PVP 240€, cost Carlos/equip 160€, tècnic inclòs 40€ assignat a Òrbita.
+- Ruta i transport: 422 km totals, cost vehicle 105,50€ a `travelCost`, conductor Òrbita 108€ i Carlos passatger 90€ com a línies `[travel-cost]`.
+- Calendari: `availability` marcada `BOOKED` i ubicació completa `l'Aldosa de Canillo, Andorra`.
+- Validació tècnica: transacció Prisma amb `adminLog`; sense email automàtic.
+- Validació funcional: endpoint `/api/admin/calendario/mes?from=2026-09-05&to=2026-09-06` retorna la reserva `OE-2026-006` amb Alba Orna, Andorra, 17:00-18:30 i total 430€.
+- Validació humana/UX: la fitxa de reserva renderitza referència, client, Bingo Musical i transport; el calendari ja té una reserva real el 5/09.
+- `ADMIN_CHANGE_COUNTER` puja a `1334`; el següent canvi real ha de ser `#1335`. Renumerat perquè Claude ha registrat `#1332` i `#1333` en paral·lel.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`

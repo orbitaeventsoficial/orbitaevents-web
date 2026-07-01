@@ -1,4 +1,26 @@
-## 2026-07-01 — Fix visual: discount-codes inputs/toggles pelats → canònic (Canvi #1331, claude)
+## 2026-07-01 — Fix real: ap-btn-primary (classe inexistent) + inputs pelats → canònic (Canvi #1333, claude)
+
+### Context
+Caça d'inputs pelats: només 3 en 2 fitxers (docs/protocol, image-manager). Descobert BUG real: `.ap-btn-primary` (guió simple) NO existeix — el canònic és `.ap-btn--primary` (doble guió). 6 usos = botons sense estil de primari.
+
+### Què s'ha fet
+- **`.ap-btn-primary` (guió incorrecte) → `.ap-btn ap-btn--primary`** a 4 fitxers (AdminPage, docs/protocol, ProtocolValidationToggle, manual). Bug: aquests botons es veien sense estil primari.
+- docs/protocol: input de cerca usava `.ap-card` (!) → `.adm-input`; select → `.adm-input`.
+- image-manager: input alt text pelat → `.adm-input`.
+- 0 inputs pelats a tot l'admin (excl eines).
+
+### Validació
+- Validació tècnica: tsc 0; validate:core.
+- Validació funcional: botons primaris amb estil correcte; inputs canònics.
+- Validació humana/UX: coherent.
+
+### Coordinació
+Counter → 1333. Reconciliat duplicat #1331 amb Codex (el meu discount-codes → #1332). Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-01 — Fix visual: discount-codes inputs/toggles pelats → canònic (Canvi #1332, claude)
 
 ### Context
 Volta de confirmació: el meu escàner comptava "border px-" (que NO són cards sinó inputs/botons/toggles pelats). discount-codes en tenia 11: inputs de formulari amb border a mà (sense fons .adm-input), toggles de tipus, botons d'acció.
@@ -17,6 +39,29 @@ Counter → 1331. Volta de confirmació: 26 pàgines 375px 0 overflow/error. adm
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
+
+## 2026-07-01 — Reserva real Andorra: Alba Orna Bingo Musical al calendari (Canvi #1334, codex)
+
+### Context
+El propietari demana muntar i comprovar el cas real: 5 de setembre de 2026, Andorra, Bingo Musical. El lead existia (`Alba Orna`) però no hi havia cap reserva al setembre, per això no sortia com a reserva al calendari.
+
+### Què s'ha fet
+- BD viva: creada la reserva `OE-2026-006` vinculada al lead `cmr1xh7la0000ug7dj4jnihjr`, sense passar pel servei que envia email automàtic.
+- Bolo: `Bingo Musical (Masquerade Events)` PVP 240€, cost Carlos/equip 160€, tècnic inclòs 40€ assignat a Òrbita.
+- Ruta: Google Maps Granollers → l'Aldosa de Canillo = 211 km anada, 422 km total, 3h per sentit.
+- Transport real: vehicle 105,50€ a `travelCost`; conductor Òrbita 108€ i Carlos passatger 90€ com a línies `[travel-cost]`.
+- Calendari: `availability` marcada `BOOKED` i ubicació completa `l'Aldosa de Canillo, Andorra` perquè la targeta no quedi amb un lloc ambigu.
+
+### Validació
+- Validació tècnica: mutació feta en transacció Prisma amb `adminLog`; no s'ha disparat cap email automàtic.
+- Validació funcional: endpoint `/api/admin/calendario/mes?from=2026-09-05&to=2026-09-06` retorna `OE-2026-006`, `Alba Orna`, `l'Aldosa de Canillo, Andorra`, 17:00-18:30, total 430€.
+- Validació humana/UX: la fitxa de reserva renderitza `OE-2026-006`, Alba Orna, Bingo Musical i les línies de transport; el calendari ja té una reserva real el 5/09.
+
+### Coordinació
+Counter → 1334. Sense mails automàtics, sense schema i sense CSS admin core. Renumerat de #1331/#1332 a #1334 perquè Claude ha registrat #1332 (`discount-codes`) i #1333 (`ap-btn-primary`) en paral·lel.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
 
 ## 2026-07-01 — Homogeneïtat: admin-card-glass (2n sistema de card) → .ap-card (Canvi #1329, claude)
 

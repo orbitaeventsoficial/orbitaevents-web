@@ -971,7 +971,7 @@ export default async function AdminManualPage() {
                 </div>
                 <div className="mt-auto flex flex-wrap gap-2 pt-1">
                   {protocolTarget ? (
-                    <Link href={protocolTarget.href} className="ap-btn-primary text-xs">
+                    <Link href={protocolTarget.href} className="ap-btn ap-btn--primary text-xs">
                       {protocolTarget.label}
                     </Link>
                   ) : null}

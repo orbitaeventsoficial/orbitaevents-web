@@ -155,18 +155,18 @@ export default async function AdminProtocolPage({
             defaultValue={query}
             placeholder="Cerca per #462, claude, audit trail..."
             aria-label="Cercar al protocol"
-            className="flex-1 min-w-[240px] ap-card px-3 py-2 text-sm placeholder:text-[var(--t3)] focus:admin-tone-border-warning focus:outline-none"
+            className="adm-input flex-1 min-w-[15rem]"
           />
           <select
             name="validation"
             defaultValue={validationFilter}
-            className="min-w-[180px] ap-card px-3 py-2 text-sm focus:admin-tone-border-warning focus:outline-none"
+            className="adm-input min-w-[11rem]"
           >
             <option value="all">Tots els canvis</option>
             <option value="validated">Només validats</option>
             <option value="pending">Només pendents</option>
           </select>
-          <button type="submit" className="ap-btn-primary">Cercar</button>
+          <button type="submit" className="ap-btn ap-btn--primary">Cercar</button>
           {query || validationFilter !== 'all' ? (
             <a href="/admin/docs/protocol" className="ap-btn-secondary">Netejar</a>
           ) : null}
@@ -174,19 +174,19 @@ export default async function AdminProtocolPage({
         <div className="mt-3 flex flex-wrap gap-2 text-xs">
           <Link
             href={`/admin/docs/protocol${query ? `?q=${encodeURIComponent(query)}` : ''}`}
-            className={validationFilter === 'all' ? 'ap-btn-primary text-xs' : 'ap-btn-secondary text-xs'}
+            className={validationFilter === 'all' ? 'ap-btn ap-btn--primary text-xs' : 'ap-btn-secondary text-xs'}
           >
             Tots · {validationFilterCounts.all}
           </Link>
           <Link
             href={`/admin/docs/protocol?validation=validated${query ? `&q=${encodeURIComponent(query)}` : ''}`}
-            className={validationFilter === 'validated' ? 'ap-btn-primary text-xs' : 'ap-btn-secondary text-xs'}
+            className={validationFilter === 'validated' ? 'ap-btn ap-btn--primary text-xs' : 'ap-btn-secondary text-xs'}
           >
             Validats · {validationFilterCounts.validated}
           </Link>
           <Link
             href={`/admin/docs/protocol?validation=pending${query ? `&q=${encodeURIComponent(query)}` : ''}`}
-            className={validationFilter === 'pending' ? 'ap-btn-primary text-xs' : 'ap-btn-secondary text-xs'}
+            className={validationFilter === 'pending' ? 'ap-btn ap-btn--primary text-xs' : 'ap-btn-secondary text-xs'}
           >
             Pendents · {validationFilterCounts.pending}
           </Link>

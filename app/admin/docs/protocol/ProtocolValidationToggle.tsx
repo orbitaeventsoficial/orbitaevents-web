@@ -78,7 +78,7 @@ export default function ProtocolValidationToggle({
           type="button"
           onClick={isValidated ? handleRemove : handleValidate}
           disabled={isPending}
-          className={isValidated ? 'ap-btn-secondary text-xs' : 'ap-btn-primary text-xs'}
+          className={isValidated ? 'ap-btn-secondary text-xs' : 'ap-btn ap-btn--primary text-xs'}
         >
           {isPending ? 'Guardant...' : isValidated ? 'Desfer validació' : 'Marcar validació humana'}
         </button>

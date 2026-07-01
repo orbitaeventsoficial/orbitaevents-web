@@ -14,7 +14,7 @@
  *   title="Inventari"
  *   subtitle="Material tècnic"
  *   back={{ href: '/admin/catalog', label: 'Catàleg' }}
- *   actions={<Link href="/admin/inventory/new" className="ap-btn-primary">+ Nou element</Link>}
+ *   actions={<Link href="/admin/inventory/new" className="ap-btn ap-btn--primary">+ Nou element</Link>}
  * >
  *   ...
  * </AdminPage>

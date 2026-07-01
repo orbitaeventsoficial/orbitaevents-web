@@ -299,7 +299,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
                 <input
                   defaultValue={items[0].alt || ''}
                   placeholder="Text alternatiu"
-                  className="flex-1 rounded-2xl border border-[var(--line)] bg-[var(--sunk)] px-4 py-2.5 text-sm text-[var(--t)] outline-none placeholder:text-[var(--t3)]"
+                  className="adm-input flex-1"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       handleSaveAlt(items[0].id, (e.target as HTMLInputElement).value);
