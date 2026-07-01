@@ -1,3 +1,42 @@
+## 2026-07-01 — Canonització visual V2: tabs → .ap-tab (Canvi #1306, claude)
+
+### Context
+Capa 2 (homogeneïtat visual). El propietari: «canònic també vol dir que es vegin idèntics». Estudi d'abast (docs/audit/CANONITZACIO-VISUAL-capa2.md): 4 sistemes de header, 4 de tabs, ~64 px hardcoded.
+
+### Què s'ha fet
+- **V2 Tabs**: 3 sistemes propis (`.ap-leads-view`, `admin-economia-tab`, `admin-catalog-tab`) → `.ap-tab`/`--active`/`--idle` canònic. Migrats catalog/economia/LeadsSeasonClient (TSX) + regles CSS mortes esborrades (inclòs `.admin-shell .admin-catalog-tab` de globals.css, selector mort). Ara els tabs es veuen idèntics a totes les pàgines.
+- Verificat amb captura: economia/catalog amb tabs .ap-tab (daurat coherent).
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core`.
+- Validació funcional: captures tabs coherents.
+- Validació humana/UX: tabs homogenis (abans economia no era daurat).
+
+### Coordinació
+Counter → 1306. V2 fet. Pendent capa 2: V3 (px→tokens), V1/V4/V5 (verificats: títols/eyebrows ja canònics; headers padding unificat #1305).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-01 — Fix header leads: consumeix --head-* (Canvi #1305, claude)
+
+### Context
+El propietari detecta headers de diferents alçades (leads 120px vs altres 98px). Causa: `.ap-leads-pagehead` (creat en migrar el calendari) tenia padding/border/fons PROPIS en comptes de consumir `--head-*`.
+
+### Què s'ha fet
+- `admin-shell.css`: `.ap-leads-pagehead` (desktop + mòbil) → `padding: var(--head-pad)`, `border-bottom: var(--head-border)`, `background: var(--head-bg)`, `gap: var(--head-gap)`. Ara coherent amb `.ap-header` i `.ap-detail-hero`.
+
+### Validació
+- Validació tècnica: `validate:core`.
+- Validació funcional: captura — header leads coherent amb la resta.
+- Validació humana/UX: causa real de la queixa «headers diferents» corregida.
+
+### Coordinació
+Counter → 1305 (documentat retroactivament amb #1306). Inici capa 2 visual.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-01 — 🎯 CANONITZACIÓ COMPLETA: deute 0 (Canvi #1304, claude)
 
 ### Què s'ha fet (última peça)
@@ -29,7 +68,7 @@ Counter → 1304. CANONITZACIÓ TANCADA. Guard a 0 manté la disciplina.
 - `__tests__/app/api/admin/privacy-consents-route.test.ts`: cobertura de `Infinity`, negatius, decimals i cap superior.
 
 ### Validació
-- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\privacy-consents-route.test.ts` (7 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. Validació global pendent de passar en tancar el tall.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\privacy-consents-route.test.ts` (7 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK, `git diff --check` OK i `pnpm run validate:core` OK.
 - Validació funcional: el llistat de consentiments RGPD ja no pot enviar paginació no finita, negativa o decimal al servei.
 - Validació humana/UX: la revisió de consentiments manté pàgines estables amb query bruta.
 

@@ -85,7 +85,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
     >
 
       {/* ═══════════ TAB NAVIGATION ═══════════ */}
-      <nav role="tablist" aria-label="Seccions d'economia" className="admin-economia-tabs flex gap-1 ap-card p-1" {...helpAttrs(ADMIN_ECONOMY_HELP.tabs)}>
+      <nav role="tablist" aria-label="Seccions d'economia" className="ap-tabs flex gap-1 ap-card p-1" {...helpAttrs(ADMIN_ECONOMY_HELP.tabs)}>
         {TABS.map((tab) => {
           const isActive = activeTab === tab.id;
           const showBadge = tab.id === 'cobraments' && props.atRiskRows.length > 0;
@@ -95,8 +95,8 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               role="tab"
               aria-selected={isActive}
               onClick={() => setActiveTab(tab.id)}
-              className={`admin-economia-tab relative flex-1 rounded-[var(--o-r-sm)] px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
-                isActive ? 'admin-economia-tab--active' : 'admin-economia-tab--idle'
+              className={`ap-tab relative flex-1 rounded-[var(--o-r-sm)] px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
+                isActive ? 'ap-tab--active' : 'ap-tab--idle'
               }`}
             >
               <span className="mr-1">{tab.icon}</span>

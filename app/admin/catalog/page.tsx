@@ -244,10 +244,10 @@ export default async function CatalogPage({
             <Link
               key={tab}
               href={`/admin/catalog?tab=${tab}`}
-              className={`admin-catalog-tab rounded-full border px-4 py-2 text-sm font-semibold transition ${
+              className={`ap-tab rounded-full border px-4 py-2 text-sm font-semibold transition ${
                 isActive
-                  ? 'admin-catalog-tab--active'
-                  : 'admin-catalog-tab--idle'
+                  ? 'ap-tab--active'
+                  : 'ap-tab--idle'
               }`}
             >
               {CATALOG_TAB_META[tab].label}

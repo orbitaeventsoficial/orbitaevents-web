@@ -672,7 +672,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
             {MONTHS_SHORT[m0 - 1]} – {MONTHS_SHORT[mLast.m - 1]} {mLast.y} · caps de setmana
           </span>
           <Link href="/admin/intake" className="ap-leads-add"><span className="ap-leads-addic">{I.plus}</span>Nova entrada</Link>
-          <div className="ap-leads-view" role="group" aria-label="Vista">
+          <div className="ap-tab" role="group" aria-label="Vista">
             <button type="button" className={viewMode === 'calendari' ? 'is-on' : ''} aria-pressed={viewMode === 'calendari'} onClick={() => setViewMode('calendari')}>Calendari</button>
             <button type="button" className={viewMode === 'pipeline'  ? 'is-on' : ''} aria-pressed={viewMode === 'pipeline'}  onClick={() => setViewMode('pipeline')}>Pipeline</button>
             <button type="button" className={viewMode === 'llista'    ? 'is-on' : ''} aria-pressed={viewMode === 'llista'}    onClick={() => setViewMode('llista')}>Llista</button>

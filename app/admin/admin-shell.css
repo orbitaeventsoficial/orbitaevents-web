@@ -877,20 +877,6 @@ html.admin-mode .adm-row-hover:hover { background: var(--o-admin-hover); }
    actiu = NEUTRE carbó elevat (no or, no blanc), idle = text apagat. Abans
    `admin-economia-tab--active/--idle` no existien → la pestanya activa sortia
    blanc absolut. ───────────────────────────────────────────────────────────── */
-html.admin-mode .admin-economia-tab {
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--ax-t3);
-}
-html.admin-mode .admin-economia-tab--idle:hover {
-  color: var(--ax-t);
-  background: color-mix(in oklab, var(--ax-t) 4%, transparent);
-}
-html.admin-mode .admin-economia-tab--active {
-  background: var(--ax-raised);
-  color: var(--ax-t);
-  box-shadow: inset 0 0 0 1px var(--ax-line2);
-}
 
 /* ── Semàfor de marge canònic (4 bandes, font única getMarginBand) ──────────
    Excel·lent (verd) · Acceptable (ambre) · Vigilar (taronja) · Crític (vermell).
@@ -974,21 +960,6 @@ html.admin-mode .ap-leads-addic { display: grid; place-items: center; color: cur
 html.admin-mode .ap-leads-addic svg { width: 15px; height: 15px; }
 
 /* segmented control = navegació neutra, sense or (or és per diners/accions) */
-html.admin-mode .ap-leads-view {
-  display: inline-flex; align-items: center; gap: 2px; padding: 3px;
-  border: 1px solid var(--line); border-radius: var(--o-r-sm-2);
-  background: var(--panel); box-shadow: none;
-}
-html.admin-mode .ap-leads-view button {
-  padding: 8px 15px; border: 0; border-radius: var(--o-r-sm); background: transparent;
-  color: var(--t3); font: inherit; font-size: var(--o-text-sm); font-weight: var(--o-fw-semi); cursor: pointer;
-  transition: color 140ms ease, background 140ms ease;
-}
-html.admin-mode .ap-leads-view button:hover { color: var(--t2); }
-html.admin-mode .ap-leads-view button.is-on {
-  background: var(--raised); color: var(--t); font-weight: var(--o-fw-bold);
-  box-shadow: inset 0 0 0 1px var(--line2);
-}
 html.admin-mode .ap-leads-cell:focus-visible,
 html.admin-mode .ap-leads-pipelead:focus-visible {
   outline-offset: 2px;

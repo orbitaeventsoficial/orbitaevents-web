@@ -2467,27 +2467,9 @@ html.admin-mode .admin-shell .admin-pack-model-chip--warn   { border-color: var(
 html.admin-mode .admin-shell .admin-pack-model-chip--danger { border-color: var(--at-red); background: var(--at-red-dim); color: var(--at-text); }
 
 /* ── 16. CATÀLEG ─────────────────────────────────────────────────────────── */
-html.admin-mode .admin-shell .admin-catalog-tab {
-  border-color: var(--at-border);
-  transition: var(--at-transition);
-}
 
-html.admin-mode .admin-shell .admin-catalog-tab--active {
-  background: color-mix(in oklab, var(--at-gold) 20%, var(--at-panel) 80%);
-  border-color: var(--at-gold);
-  color: var(--at-gold-text);
-}
 
-html.admin-mode .admin-shell .admin-catalog-tab--idle {
-  background: var(--at-panel);
-  color: var(--at-muted);
-}
 
-html.admin-mode .admin-shell .admin-catalog-tab--idle:hover {
-  background: var(--at-raised);
-  border-color: var(--at-border-s);
-  color: var(--at-text);
-}
 
 /* ── 17. QUOTE TEMPLATE ──────────────────────────────────────────────────── */
 html.admin-mode .admin-shell .admin-quote-template {

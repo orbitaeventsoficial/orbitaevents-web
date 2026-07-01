@@ -1550,6 +1550,27 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1306 — 2026-07-01 — claude (FET)
+**Canonització visual V2: tabs → .ap-tab.**
+- 3 sistemes de tab propis (ap-leads-view/admin-economia-tab/admin-catalog-tab) → .ap-tab canònic (catalog/economia/leads season). Regles CSS mortes esborrades. Tabs homogenis.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1306`; el següent canvi real ha de ser `#1307`.
+- Validació tècnica: `tsc` 0; `validate:core`.
+- Validació funcional: captures tabs coherents.
+- Validació humana/UX: tabs idèntics a totes les pàgines.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1305 — 2026-07-01 — claude (FET)
+**Fix header leads: consumeix --head-* (no padding propi).**
+- `.ap-leads-pagehead` (desktop+mòbil) → var(--head-pad/border/bg/gap). Coherent amb .ap-header/.ap-detail-hero. Causa de la queixa «headers diferents».
+- Validació tècnica: `validate:core`.
+- Validació funcional: captura header leads coherent.
+- Validació humana/UX: headers homogenis.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1304 — 2026-07-01 — claude (FET)
 **CANONITZACIÓ COMPLETA: deute 0.**
 - cdh__ → .ap-dochist canònic; bd__ comentari netejat. DEUTE 5892→0. Baseline 0. 19 zones erradicades en la sessió; components nous .ap-ledger/.ap-leads/.ap-dochist; shell ax canònic. Guard qa:canon-debt a 0 blinda. Ara un token a Studio canvia tot l'admin.
@@ -1565,7 +1586,7 @@ Seqüència obligatòria de registre:
 **V5 privacitat: consentiments amb paginació sanejada.**
 - `app/api/admin/privacy/consents/route.ts`: `limit` normalitzat com a enter positiu amb default 50 i cap 200; `offset` com a enter no negatiu.
 - `__tests__/app/api/admin/privacy-consents-route.test.ts`: cobertura de `Infinity`, negatius, decimals i cap superior.
-- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\privacy-consents-route.test.ts` (7 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK i `git diff --check` OK. Validació global pendent.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\privacy-consents-route.test.ts` (7 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK, `git diff --check` OK i `pnpm run validate:core` OK.
 - Validació funcional: el llistat de consentiments RGPD ja no envia paginació no finita, negativa o decimal al servei.
 - Validació humana/UX: la revisió de consentiments manté pàgines estables amb query bruta.
 - `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1303`; el següent canvi real ha de ser `#1304`.
