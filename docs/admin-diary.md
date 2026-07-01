@@ -1,3 +1,23 @@
+## 2026-07-01 — Fix visual: bloc «Equips/Lots» d'inventory → inputs canònics (Canvi #1319, claude)
+
+### Context
+Revisió visual d'/admin/inventory (propietari). Troballa pròpia: el bloc «Equips / Lots» grinyolava — inputs/selects amb `rounded-xl border` pelat (sense fons --sunk, sense min-height tàctil) → semblaven caixes buides mortes, incoherents amb la resta d'inputs .adm-input.
+
+### Què s'ha fet
+- `InventoryListSections.tsx`: 8+ inputs/selects del bloc bundles + filtres Categoria/Estat → `.adm-input` (fons fosc canònic + tàctil). Botó candidat → .ap-btn; row d'element del lot → .ap-card; labels de filtre desbordats de border (doble vora) → alineació neta.
+- Ara el bloc és hipersemblant amb la resta de l'admin (inputs amb fons, coherents).
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0.
+- Validació funcional: captura — bloc Equips/Lots amb inputs canònics (fons fosc).
+- Validació humana/UX: el bloc ja no sembla trencat/buit.
+
+### Coordinació
+Counter → 1319. Fix visual real detectat en revisió. Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-01 — UX: target tàctil canònic als inputs + verificació overflow (Canvi #1318, claude)
 
 ### Què s'ha fet

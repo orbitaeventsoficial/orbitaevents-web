@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1319 — 2026-07-01 — claude (FET)
+**Fix visual: bloc «Equips/Lots» d'inventory → inputs canònics.**
+- InventoryListSections: inputs/selects amb border pelat → .adm-input (fons fosc + tàctil); botó candidat→.ap-btn; row lot→.ap-card; filtres categoria/estat sense doble vora. El bloc ja no sembla buit/trencat.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1319`; el següent canvi real ha de ser `#1320`.
+- Validació tècnica: tsc 0; validate:core EXIT 0.
+- Validació funcional: captura bloc amb inputs canònics.
+- Validació humana/UX: coherent amb la resta.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1318 — 2026-07-01 — claude (FET)
 **UX: target tàctil canònic als inputs.**
 - .adm-input/.ap-input min-height 40px (textarea 64px). 1 lloc → tots. Verificat intake 0 sota target. min-width grans = @media breakpoints (correctes).

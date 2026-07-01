@@ -156,7 +156,7 @@ export function InventoryBundlesSection(props: InventoryBundlesSectionProps) {
         <select
           value={selectedBundleId}
           onChange={(e) => setSelectedBundleId(e.target.value)}
-          className="rounded-xl border px-3 py-2 text-xs"
+          className="adm-input text-xs"
           aria-label="Seleccionar lot actiu"
         >
           {bundles.map((bundle) => (
@@ -170,7 +170,7 @@ export function InventoryBundlesSection(props: InventoryBundlesSectionProps) {
           onChange={(e) => setBundleNameDraft(e.target.value)}
           placeholder="Nou lot"
           aria-label="Nom del nou lot"
-          className="rounded-xl border px-3 py-2 text-xs"
+          className="adm-input text-xs"
         />
         <button type="button" onClick={createBundle} className="ap-btn ap-btn--xs">
           + Crear lot
@@ -184,7 +184,7 @@ export function InventoryBundlesSection(props: InventoryBundlesSectionProps) {
               onChange={(e) => renameSelectedBundle(e.target.value)}
               onBlur={persistRenameSelectedBundle}
               aria-label="Nom del lot"
-              className="w-full rounded-xl border px-3 py-2 text-sm"
+              className="adm-input"
             />
             <button
               type="button"
@@ -199,7 +199,7 @@ export function InventoryBundlesSection(props: InventoryBundlesSectionProps) {
               value={bundleItemSearch}
               onChange={(e) => setBundleItemSearch(e.target.value)}
               placeholder="Afegir element per nom o codi"
-              className="w-full rounded-xl border px-3 py-2 text-xs"
+              className="adm-input text-xs"
             />
             <div className="max-h-24 overflow-auto space-y-1">
               {candidateItems.map((item) => (
@@ -207,7 +207,7 @@ export function InventoryBundlesSection(props: InventoryBundlesSectionProps) {
                   key={item.id}
                   type="button"
                   onClick={() => addItemToBundle(item.id)}
-                  className="w-full text-left rounded-xl border px-3 py-2 text-xs"
+                  className="ap-btn ap-btn--xs w-full justify-start"
                 >
                   + {item.code} · {item.name}
                 </button>
@@ -217,7 +217,7 @@ export function InventoryBundlesSection(props: InventoryBundlesSectionProps) {
               {selectedBundleItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between rounded-xl border px-3 py-2 text-xs"
+                  className="ap-card flex items-center justify-between px-3 py-2 text-xs"
                 >
                   <span>{item.code} · {item.name}</span>
                   <button
@@ -312,15 +312,15 @@ export function InventoryFiltersSection({
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Cercar per nom o codi..."
         aria-label="Cercar ítems d'inventari"
-        className="w-full rounded-xl border px-4 py-3 text-sm "
+        className="adm-input"
       />
       <div className="grid gap-2 sm:grid-cols-3">
-        <label className="flex items-center gap-2 rounded-xl border px-3 py-2">
+        <label className="flex items-center gap-2 text-[var(--t3)]">
           <span className="shrink-0 text-xs">Categoria</span>
           <select
             value={filterCategory ?? ''}
             onChange={(e) => setFilterCategory(e.target.value || null)}
-            className="w-full rounded-xl border px-2 py-1.5 text-xs "
+            className="adm-input text-xs"
           >
             <option value="">Totes</option>
             {categories.map((cat) => {
@@ -334,12 +334,12 @@ export function InventoryFiltersSection({
             })}
           </select>
         </label>
-        <label className="flex items-center gap-2 rounded-xl border px-3 py-2">
+        <label className="flex items-center gap-2 text-[var(--t3)]">
           <span className="shrink-0 text-xs">Estat</span>
           <select
             value={filterStatus ?? ''}
             onChange={(e) => setFilterStatus(e.target.value || null)}
-            className="w-full rounded-xl border px-2 py-1.5 text-xs "
+            className="adm-input text-xs"
           >
             <option value="">Tots</option>
             {statuses.map((st) => (
