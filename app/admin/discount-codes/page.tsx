@@ -213,19 +213,19 @@ export default function DiscountCodesPage() {
     >
       {stats && (
         <div className="grid gap-4 sm:grid-cols-4">
-          <div className="rounded-2xl border p-4">
+          <div className="ap-card p-4">
             <p className="text-xs font-medium uppercase">Total codis</p>
             <p className="mt-2 text-3xl font-bold">{stats.total}</p>
           </div>
-          <div className="rounded-2xl border p-4">
+          <div className="ap-card p-4">
             <p className="text-xs font-medium uppercase">Actius</p>
             <p className="mt-2 text-3xl font-bold">{stats.active}</p>
           </div>
-          <div className="rounded-2xl border p-4">
+          <div className="ap-card p-4">
             <p className="text-xs font-medium uppercase">Caducats</p>
             <p className="mt-2 text-3xl font-bold">{stats.expired}</p>
           </div>
-          <div className="rounded-2xl border p-4">
+          <div className="ap-card p-4">
             <p className="text-xs font-medium uppercase">Usos totals</p>
             <p className="mt-2 text-3xl font-bold">{stats.totalUses}</p>
           </div>
@@ -233,19 +233,19 @@ export default function DiscountCodesPage() {
       )}
 
       {success && (
-        <div className="rounded-xl border p-4">
+        <div className="ap-card p-4">
           <p className="text-sm">{success}</p>
         </div>
       )}
       {formError && (
-        <div className="rounded-xl border p-4">
+        <div className="ap-card p-4">
           <p className="text-sm">{formError}</p>
         </div>
       )}
 
       <div id="nou-codi" aria-hidden="true" />
       {showForm && (
-        <div className="rounded-2xl border p-5 space-y-4">
+        <div className="ap-card p-5 space-y-4">
           <h2 className="text-sm font-semibold">Nou codi de descompte</h2>
 
           <div className="grid gap-4 sm:grid-cols-3">

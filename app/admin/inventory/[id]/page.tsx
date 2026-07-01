@@ -153,7 +153,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
         </div>
       </section>
 
-      <section className="rounded-2xl border p-4">
+      <section className="ap-card p-4">
         <h2 className="text-sm font-semibold">Com es calcula l&apos;amortització</h2>
         <div className="mt-2 grid gap-2 text-xs sm:grid-cols-2">
           <p>Cost/hora = Cost de compra ÷ Vida útil (hores).</p>

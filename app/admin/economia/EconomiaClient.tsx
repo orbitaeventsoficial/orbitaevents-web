@@ -388,7 +388,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 </div>
                 <div className="grid gap-2 lg:grid-cols-2">
                   {props.atRiskRows.length === 0 ? (
-                    <div className="rounded-xl border p-6 text-center">
+                    <div className="ap-card p-6 text-center">
                       <p className="font-semibold">Tot al dia!</p>
                       <p className="text-sm mt-1">
                         No hi ha cap cobrament pendent amb data de venciment passada.
@@ -434,7 +434,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                             </Link>
                           </div>
                           <div className="mb-3 grid gap-2 sm:grid-cols-2">
-                            <div className={`rounded-xl border p-3 ${row.depositPaid ? 'admin-tone-border-success admin-tone-bg-success' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
+                            <div className={`ap-card p-3 ${row.depositPaid ? 'admin-tone-border-success admin-tone-bg-success' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
                               <div className="flex items-center justify-between mb-1">
                                 <p className={`text-xs font-semibold ${row.depositPaid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>Bestreta</p>
                                 <p className={`text-sm font-bold ${row.depositPaid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>{money(row.depositAmount)}</p>
@@ -444,7 +444,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                               </p>
                               <PaymentToggleButton bookingId={row.id} field="depositPaid" currentValue={row.depositPaid} />
                             </div>
-                            <div className={`rounded-xl border p-3 ${row.remainingPaid ? 'admin-tone-border-success admin-tone-bg-success' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
+                            <div className={`ap-card p-3 ${row.remainingPaid ? 'admin-tone-border-success admin-tone-bg-success' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
                               <div className="flex items-center justify-between mb-1">
                                 <p className={`text-xs font-semibold ${row.remainingPaid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>Saldo restant</p>
                                 <p className={`text-sm font-bold ${row.remainingPaid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>{money(row.remainingAmount)}</p>
@@ -587,7 +587,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                       </div>
                       <div className="space-y-2">
                         {props.riskProfitability.length === 0 ? (
-                          <div className="rounded-xl border p-6 text-center">
+                          <div className="ap-card p-6 text-center">
                             <p className="font-semibold">Sense alertes!</p>
                             <p className="text-sm mt-1">Tots els marges són saludables.</p>
                           </div>
@@ -596,7 +596,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                             <Link
                               key={row.id}
                               href={buildBookingHref(row.id)}
-                              className="flex items-center gap-3 rounded-xl border p-3 transition-colors group"
+                              className="flex items-center gap-3 ap-card p-3 transition-colors group"
                             >
                               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-xs">📉</span>
                               <div className="flex-1 min-w-0">
@@ -849,15 +849,15 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 </div>
 
                 <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                  <article className="rounded-xl border p-3">
+                  <article className="ap-card p-3">
                     <p className="text-xs">Sa</p>
                     <p className="text-xl font-bold">{props.packPricingSummary.healthy}</p>
                   </article>
-                  <article className="rounded-xl border p-3">
+                  <article className="ap-card p-3">
                     <p className="text-xs">Vigilar</p>
                     <p className="text-xl font-bold">{props.packPricingSummary.warning}</p>
                   </article>
-                  <article className="rounded-xl border p-3">
+                  <article className="ap-card p-3">
                     <p className="text-xs">Crític</p>
                     <p className="text-xl font-bold">{props.packPricingSummary.critical}</p>
                   </article>
@@ -937,7 +937,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                       <p className="text-xs uppercase tracking-wide">Manteniment</p>
                       <p className="text-lg font-bold">{props.vehicleConfig.maintenanceCostPerKm.toFixed(2)} €/km</p>
                     </div>
-                    <div className="rounded-xl border p-3">
+                    <div className="ap-card p-3">
                       <p className="text-xs uppercase tracking-wide">Cost efectiu per km</p>
                       <p className="text-lg font-bold">{props.vehicleConfig.effectiveCostPerKm.toFixed(3)} €/km</p>
                       {props.vehicleConfig.updatedAt && (

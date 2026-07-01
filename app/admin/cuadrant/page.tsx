@@ -121,7 +121,7 @@ export default async function CuadrantPage({ searchParams }: { searchParams: { d
             return (
               <section
                 key={person.personKey}
-                className={`rounded-xl border p-3 ${
+                className={`ap-card p-3 ${
                   person.isOwner ? 'admin-tone-border-cyan admin-tone-bg-cyan' : 'border-[var(--line)] bg-[var(--panel)]'
                 }`}
               >

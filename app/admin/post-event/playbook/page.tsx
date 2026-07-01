@@ -52,7 +52,7 @@ export default async function PlaybookPage() {
             <p className="mt-1 text-xl font-bold admin-tone-text-success">{summary.fullyCompleted}</p>
           </div>
           <div
-            className={`rounded-xl border p-3 ${summary.withOverdue > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : 'border-[var(--line)] bg-[var(--panel)]'}`}
+            className={`ap-card p-3 ${summary.withOverdue > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : ''}`}
           >
             <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Amb overdue</p>
             <p className={`mt-1 text-xl font-bold ${summary.withOverdue > 0 ? 'admin-tone-text-danger' : ''}`}>

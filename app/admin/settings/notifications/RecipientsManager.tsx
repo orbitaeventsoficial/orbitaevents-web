@@ -133,7 +133,7 @@ export function RecipientsManager() {
 
   if (loading) {
     return (
-      <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm admin-card-glass">
         <h2 className="mb-4 ap-h2">📬 Destinataris de notificacions</h2>
         <p className="text-sm text-[var(--t2)]">Carregant…</p>
       </section>
@@ -141,7 +141,7 @@ export function RecipientsManager() {
   }
 
   return (
-    <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
+    <section className="ap-card p-6 shadow-sm admin-card-glass">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="ap-h2">📬 Destinataris de notificacions</h2>
@@ -161,7 +161,7 @@ export function RecipientsManager() {
 
       {status && (
         <div
-          className={`mb-4 rounded-xl border p-3 text-sm ${
+          className={`mb-4 ap-card p-3 text-sm ${
             status.kind === 'ok'
               ? 'admin-tone-soft-success admin-tone-border-success admin-tone-text-success'
               : 'admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger'

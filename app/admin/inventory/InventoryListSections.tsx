@@ -30,7 +30,7 @@ export function InventoryToolbar({
     <div
       role="tablist"
       aria-label="Vista d'inventari"
-      className="flex rounded-xl border p-0 overflow-hidden"
+      className="flex ap-card p-0 overflow-hidden"
       {...helpAttrs(ADMIN_INVENTORY_HELP.viewToggle)}
     >
       <button
@@ -144,7 +144,7 @@ export function InventoryBundlesSection(props: InventoryBundlesSectionProps) {
 
   return (
     <section
-      className="rounded-2xl border p-4 space-y-3"
+      className="ap-card p-4 space-y-3"
       {...helpAttrs(ADMIN_INVENTORY_HELP.bundles)}
     >
       <div className="flex flex-wrap items-center gap-2">
@@ -241,7 +241,7 @@ export function InventoryLowStockAlert({ lowStockItems }: { lowStockItems: Inven
   if (lowStockItems.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border p-4" {...helpAttrs(ADMIN_INVENTORY_HELP.lowStock)}>
+    <div className="ap-card p-4" {...helpAttrs(ADMIN_INVENTORY_HELP.lowStock)}>
       <p className="text-sm font-semibold mb-2">Alerta d&apos;estoc baix</p>
       <div className="flex flex-wrap gap-2">
         {lowStockItems.map((item) => (
@@ -377,7 +377,7 @@ export function InventoryGridSection({ displayedItems }: { displayedItems: Inven
           <Link
             key={item.id}
             href={buildInventoryHref(item.id)}
-            className="group rounded-2xl border p-0 overflow-hidden transition-all"
+            className="group ap-card p-0 overflow-hidden transition-all"
           >
             <div className="aspect-video relative overflow-hidden">
               {item.imageUrl ? (
@@ -492,7 +492,7 @@ export function InventoryDesktopTableSection({
   handleStatusChange: (itemId: string, status: string) => void;
 }) {
   return (
-    <section className="hidden lg:block rounded-2xl border p-0 admin-card-glass overflow-hidden" {...helpAttrs(ADMIN_INVENTORY_HELP.desktopTable)}>
+    <section className="hidden lg:block ap-card p-0 admin-card-glass overflow-hidden" {...helpAttrs(ADMIN_INVENTORY_HELP.desktopTable)}>
       <div className="overflow-x-auto">
         <table className="w-full text-sm" aria-label="Inventari d'equipament">
           <thead className="border-b">

@@ -174,11 +174,11 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
   }, [itemId, router]);
 
   return (
-    <div className="rounded-2xl border p-5 space-y-4">
+    <div className="ap-card p-5 space-y-4">
       <h2 className="text-sm font-semibold">Foto</h2>
 
       {error && (
-        <div className="rounded-xl border p-2">
+        <div className="ap-card p-2">
           <p className="text-xs">{error}</p>
         </div>
       )}

@@ -60,15 +60,15 @@ export default async function ReportsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="rounded-xl border p-4">
+        <div className="ap-card p-4">
           <div className="text-sm font-medium">Esborranys</div>
           <div className="text-3xl font-bold mt-1">{draftReports.length}</div>
         </div>
-        <div className="rounded-xl border p-4">
+        <div className="ap-card p-4">
           <div className="text-sm font-medium">Completats</div>
           <div className="text-3xl font-bold mt-1">{completedReports.length}</div>
         </div>
-        <div className="rounded-xl border p-4">
+        <div className="ap-card p-4">
           <div className="text-sm font-medium">Total</div>
           <div className="text-3xl font-bold mt-1">{reports.length}</div>
         </div>

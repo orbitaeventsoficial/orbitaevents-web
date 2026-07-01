@@ -11,7 +11,7 @@ export default function InventoryDetailError({
 }) {
   return (
     <div className="flex items-center justify-center min-h-[50vh] p-4">
-      <div className="max-w-md w-full rounded-2xl border p-8 text-center">
+      <div className="max-w-md w-full ap-card p-8 text-center">
         <p className="text-4xl mb-4">⚠️</p>
         <h2 className="ap-h2 mb-2">
           Error carregant l&apos;element

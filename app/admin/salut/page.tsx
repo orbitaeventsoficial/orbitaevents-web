@@ -203,7 +203,7 @@ function renderHealthCard(item: AdminHealthItem, sectionLabel: string) {
   return (
     <article
       key={item.id}
-      className={`rounded-2xl border p-4 admin-card-glass ${STATUS_TONE[item.status]}`}
+      className={`ap-card p-4 admin-card-glass ${STATUS_TONE[item.status]}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
@@ -350,7 +350,7 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
           </div>
           <div className="mt-4 grid gap-4 lg:grid-cols-3">
             {priorityItems.map(({ item, sectionLabel, groupLabel }) => (
-              <article key={item.id} className={`rounded-2xl border p-4 ${STATUS_TONE[item.status]}`}>
+              <article key={item.id} className={`ap-card p-4 ${STATUS_TONE[item.status]}`}>
                 <div className="flex items-center gap-2">
                   <span className={`inline-block h-2.5 w-2.5 rounded-full ${STATUS_DOT[item.status]}`} />
                   <p className="text-xs font-semibold uppercase tracking-wide text-[var(--t3)]">{STATUS_LABEL[item.status]}</p>

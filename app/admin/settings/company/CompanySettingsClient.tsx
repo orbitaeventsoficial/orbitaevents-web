@@ -90,7 +90,7 @@ export default function CompanySettingsClient({ initial }: { initial: Record<str
 
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl border p-6 admin-card-glass">
+      <section className="ap-card p-6 admin-card-glass">
         <div className="mb-4 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl border">🏢</div>
           <div>
@@ -115,7 +115,7 @@ export default function CompanySettingsClient({ initial }: { initial: Record<str
         </div>
       </section>
 
-      <section className="rounded-2xl border p-6 admin-card-glass">
+      <section className="ap-card p-6 admin-card-glass">
         <div className="mb-4 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl border">📊</div>
           <div>

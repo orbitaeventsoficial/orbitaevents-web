@@ -34,7 +34,7 @@ export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
           <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Leads oberts</p>
           <p className="text-lg font-bold">{brief.kpis.openLeads}</p>
         </div>
-        <div className={`rounded-lg border p-2 text-center ${brief.kpis.overdueTasksCount > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : 'border-[var(--line)] bg-[var(--panel)]'}`}>
+        <div className={`ap-card p-2 text-center ${brief.kpis.overdueTasksCount > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : ''}`}>
           <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Vençudes</p>
           <p className={`text-lg font-bold ${brief.kpis.overdueTasksCount > 0 ? 'admin-tone-text-danger' : ''}`}>{brief.kpis.overdueTasksCount}</p>
         </div>
@@ -42,7 +42,7 @@ export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
           <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Reserves 7d</p>
           <p className="text-lg font-bold">{brief.kpis.upcomingBookings7d}</p>
         </div>
-        <div className={`rounded-lg border p-2 text-center ${brief.kpis.pendingPaymentsCount > 0 ? 'admin-tone-border-warning admin-tone-bg-warning' : 'border-[var(--line)] bg-[var(--panel)]'}`}>
+        <div className={`ap-card p-2 text-center ${brief.kpis.pendingPaymentsCount > 0 ? 'admin-tone-border-warning admin-tone-bg-warning' : ''}`}>
           <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Cobraments</p>
           <p className={`text-lg font-bold ${brief.kpis.pendingPaymentsCount > 0 ? 'admin-tone-text-warning' : ''}`}>{brief.kpis.pendingPaymentsCount}</p>
         </div>

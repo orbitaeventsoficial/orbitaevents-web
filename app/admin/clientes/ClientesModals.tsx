@@ -158,7 +158,7 @@ export function AddCustomerModal({
 
         {/* Duplicate warnings */}
         {duplicateWarnings.length > 0 && (
-          <div className="mb-5 rounded-xl border p-4">
+          <div className="mb-5 ap-card p-4">
             <p className="text-sm font-semibold mb-2">
               Possibles duplicats detectats
             </p>

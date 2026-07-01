@@ -67,7 +67,7 @@ export default async function RepartimentPage({ searchParams }: { searchParams: 
           {payout.people.map((person) => (
             <section
               key={person.personKey}
-              className={`rounded-xl border p-3 ${
+              className={`ap-card p-3 ${
                 person.isOwner ? 'admin-tone-border-success admin-tone-bg-success' : 'border-[var(--line)] bg-[var(--panel)]'
               }`}
             >

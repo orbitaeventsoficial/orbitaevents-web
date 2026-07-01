@@ -292,7 +292,7 @@ export default function SocialClient({
       </section>
 
       <section className="grid gap-3 lg:grid-cols-4">
-        <article className={`admin-card-glass rounded-2xl border p-4 ${pulseRisk ? 'admin-tone-border-warning admin-tone-bg-warning' : 'admin-tone-border-success admin-tone-bg-success'}`}>
+        <article className={`admin-card-glass ap-card p-4 ${pulseRisk ? 'admin-tone-border-warning admin-tone-bg-warning' : 'admin-tone-border-success admin-tone-bg-success'}`}>
           <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)]">Pols editorial</p>
           <h2 className="mt-2 text-base font-bold leading-snug">{pulse.isActive ? 'Actiu' : 'Aturat'}</h2>
           <p className="mt-2 text-xs leading-relaxed text-[var(--t2)]">{pulseSummary}</p>
@@ -321,7 +321,7 @@ export default function SocialClient({
             key={key}
             onClick={() => setStatusFilter(statusFilter === key ? 'all' : key)}
             type="button"
-            className={`admin-stagger-item rounded-xl border p-3 text-left transition-colors ${statusFilter === key ? STATUS_TONE[key] : 'border-[var(--line)] admin-card-glass adm-row-hover'}`}
+            className={`admin-stagger-item ap-card p-3 text-left transition-colors ${statusFilter === key ? STATUS_TONE[key] : 'border-[var(--line)] admin-card-glass adm-row-hover'}`}
           >
             <p className="text-xs font-semibold uppercase tracking-wider opacity-60">{label}</p>
             <p className="mt-1 text-xl font-bold">{counts[key as SocialPostStatus]}</p>

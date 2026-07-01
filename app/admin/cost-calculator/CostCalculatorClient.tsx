@@ -321,7 +321,7 @@ export default function CostCalculatorClient() {
 
         {/* Totals + Marge */}
         {components.length > 0 && (
-          <div className="rounded-xl border p-6" data-help-title="Resum i marge" data-help-desc="Veu el cost total, ajusta el marge (%) amb el slider, i el sistema calcula benefici i preu suggerit automàticament.">
+          <div className="ap-card p-6" data-help-title="Resum i marge" data-help-desc="Veu el cost total, ajusta el marge (%) amb el slider, i el sistema calcula benefici i preu suggerit automàticament.">
             <div className="grid md:grid-cols-4 gap-6 mb-6">
               <div>
                 <div className="text-xs admin-tone-text-slate mb-1">Cost total</div>

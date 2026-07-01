@@ -446,7 +446,7 @@ export default async function AdminManualPage() {
           {ADMIN_MANUAL_VISUAL_GOVERNANCE.map((section) => {
             const style = visualGovernanceStyle[section.status];
             return (
-              <article key={section.title} className={`admin-card-glass rounded-2xl border p-4 ${style.panel}`}>
+              <article key={section.title} className={`admin-card-glass ap-card p-4 ${style.panel}`}>
                 <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
                     <h2 className="text-base font-bold leading-snug">{section.title}</h2>
@@ -765,7 +765,7 @@ export default async function AdminManualPage() {
           {MARKETING_PHASE_ORDER.map((phase) => {
             const actions = ADMIN_MARKETING_PHASES.filter((a) => a.phase === phase);
             return (
-              <div key={phase} className={`rounded-2xl border p-4 ${MARKETING_PHASE_STYLE[phase]}`}>
+              <div key={phase} className={`ap-card p-4 ${MARKETING_PHASE_STYLE[phase]}`}>
                 <p className="text-xs font-bold uppercase tracking-wider opacity-70">{ADMIN_MARKETING_PHASE_LABEL[phase]}</p>
                 <p className="mt-1 mb-4 text-sm leading-relaxed opacity-75">{ADMIN_MARKETING_PHASE_SUMMARY[phase]}</p>
                 <div className="space-y-2">
@@ -920,7 +920,7 @@ export default async function AdminManualPage() {
             return (
               <article
                 key={item.id}
-                className={`admin-card-glass flex flex-col gap-3 rounded-2xl border p-4 ${
+                className={`admin-card-glass flex flex-col gap-3 ap-card p-4 ${
                   item.status === 'DONE' ? 'admin-tone-border-success admin-tone-bg-success' : 'border-[var(--line)]'
                 }`}
               >

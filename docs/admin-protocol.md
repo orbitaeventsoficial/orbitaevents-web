@@ -1550,6 +1550,21 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1321 — 2026-07-01 — codex (FET)
+**Calendari: leads recuperats, dates estrictes i LOST simbòlic.**
+- Dades reals recuperades a BD: Alba Orna l'Aldosa → `2026-09-05`, Alba Orna Aravell → `2026-09-26`, David/Arancha → `2026-09-26`; es deixa traça a `adminLog`.
+- `app/api/admin/leads/route.ts`, `app/api/admin/leads/[id]/route.ts`, `lib/services/leadAdminService.ts`, `lib/services/leadRouteService.ts`: `eventDate` només accepta `YYYY-MM-DD` i es normalitza a migdia UTC; formats ambigus com `26 Setiembre` es rebutgen abans de guardar dades tortes.
+- `lib/services/adminCalendarMonthService.ts`: el calendari inclou leads `LOST` en lloc d'esborrar-los del mapa operatiu.
+- `app/admin/calendario/CalendarMonthClient.tsx`, `CalendarWeekClient.tsx`, `CalendarDayClient.tsx`: leads `LOST` es mostren com a línia petita `Perdut · nom`, sense targeta grossa ni pes visual de lead viu.
+- `__tests__/lib/services/leadAdminService.test.ts`, `leadRouteService.test.ts`, `adminCalendarMonthService.test.ts`, `__tests__/app/api/admin/leads-route.test.ts`, `leads-detail-route.test.ts`: regressions de data ambigua i `LOST` al calendari.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1321`; el següent canvi real ha de ser `#1322`.
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__/lib/services/leadAdminService.test.ts __tests__/lib/services/leadRouteService.test.ts __tests__/lib/services/adminCalendarMonthService.test.ts __tests__/app/api/admin/leads-route.test.ts __tests__/app/api/admin/leads-detail-route.test.ts` OK (49 tests); `npx tsc --noEmit --pretty false` OK; `git diff --check` OK (només avisos CRLF aliens); `pnpm run qa:protocol` OK després del registre.
+- Validació funcional: query amb el mateix filtre del calendari retorna els tres leads a setembre; `LOST` ja no queda filtrat fora de `days`.
+- Validació humana/UX: un lead perdut queda present com a recordatori simbòlic, però no ocupa l'espai visual d'una oportunitat viva.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1320 — 2026-07-01 — claude (FET)
 **Fix visual: cards de packs → .ap-card.**
 - packs/page.tsx ~16 contenidors rounded border p- pelats → .ap-card (fons canònic), tons condicionals conservats. KPI + mini-cards de marge coherents.
@@ -1558,6 +1573,17 @@ Seqüència obligatòria de registre:
 - Validació funcional: captura cards amb fons.
 - Validació humana/UX: hipersemblants.
 - Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1322 — 2026-07-01 — claude (FET)
+**Homogeneïtat: 177 contenidors border pelat → .ap-card (58 fitxers).**
+- Agent: 177 rounded border p-N pelats → .ap-card (fons canònic) en 58 fitxers. Tons condicionals conservats. Exclosos PdfStudio/Canvas/css-manager. 0 pelats restants. Pàgines ara germanes.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1322`; el següent canvi real ha de ser `#1323`.
+- Validació tècnica: tsc 0; validate:core EXIT 0; canon sense P1.
+- Validació funcional: captures cards amb fons.
+- Validació humana/UX: homogeneïtat de contenidors.
+- Començat per: `claude+agent`
 - Treballant per: `claude`
 - Tancat per: `claude`
 

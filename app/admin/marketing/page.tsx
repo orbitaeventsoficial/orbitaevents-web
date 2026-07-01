@@ -114,7 +114,7 @@ export default async function MarketingPage() {
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {summary.channelDiagnostics.map((diagnostic) => (
-            <div key={diagnostic.source} className={`rounded-xl border p-4 ${diagnosticTone[diagnostic.tone]}`}>
+            <div key={diagnostic.source} className={`ap-card p-4 ${diagnosticTone[diagnostic.tone]}`}>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h3 className="font-semibold">{diagnostic.label}</h3>
@@ -149,7 +149,7 @@ export default async function MarketingPage() {
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
           {summary.measurementGaps.map((gap) => (
-            <div key={gap.id} className={`rounded-xl border p-4 ${measurementGapTone[gap.status]}`}>
+            <div key={gap.id} className={`ap-card p-4 ${measurementGapTone[gap.status]}`}>
               <div className="flex items-start justify-between gap-3">
                 <h3 className="text-sm font-semibold">{gap.label}</h3>
                 <span className="shrink-0 text-xs font-bold">{measurementGapLabel[gap.status]}</span>

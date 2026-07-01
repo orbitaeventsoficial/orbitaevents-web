@@ -101,7 +101,7 @@ export default function ExtrasConfiguratorClient() {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border p-6">
+      <div className="ap-card p-6">
         Carregant configuració d\'extres...
       </div>
     );
@@ -141,7 +141,7 @@ export default function ExtrasConfiguratorClient() {
       </div>
 
       {error && (
-        <div className="rounded-xl border p-3 text-sm">
+        <div className="ap-card p-3 text-sm">
           {error}
         </div>
       )}
@@ -150,7 +150,7 @@ export default function ExtrasConfiguratorClient() {
         {extras.map((extra, index) => (
           <div
             key={`${extra.id}-${index}`}
-            className="rounded-2xl border p-5"
+            className="ap-card p-5"
           >
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div className="grid flex-1 gap-3 sm:grid-cols-2">

@@ -83,19 +83,19 @@ export default function CronsClient() {
 
       {/* Resum */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-2xl border p-3 sm:p-4">
+        <div className="ap-card p-3 sm:p-4">
           <div className="text-xs sm:text-xs uppercase tracking-wide text-[var(--t3)]">Correctes</div>
           <div className="text-2xl sm:text-3xl font-bold">{healthCounts.ok}</div>
         </div>
-        <div className="rounded-2xl border p-3 sm:p-4">
+        <div className="ap-card p-3 sm:p-4">
           <div className="text-xs sm:text-xs uppercase tracking-wide text-[var(--t3)]">Retardats</div>
           <div className="text-2xl sm:text-3xl font-bold">{healthCounts.warning}</div>
         </div>
-        <div className="rounded-2xl border p-3 sm:p-4">
+        <div className="ap-card p-3 sm:p-4">
           <div className="text-xs sm:text-xs uppercase tracking-wide text-[var(--t3)]">Errors</div>
           <div className="text-2xl sm:text-3xl font-bold">{healthCounts.error}</div>
         </div>
-        <div className="rounded-2xl border p-3 sm:p-4">
+        <div className="ap-card p-3 sm:p-4">
           <div className="text-xs sm:text-xs uppercase tracking-wide text-[var(--t3)]">Mai executat</div>
           <div className="text-2xl sm:text-3xl font-bold text-[var(--t3)]">{healthCounts.unknown}</div>
         </div>
@@ -113,7 +113,7 @@ export default function CronsClient() {
               key={cron.id}
               type="button"
               onClick={() => setExpandedId(isExpanded ? null : cron.id)}
-              className={`w-full text-left rounded-2xl border p-4 transition-all ${config.bg}`}
+              className={`w-full text-left ap-card p-4 transition-all ${config.bg}`}
             >
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">

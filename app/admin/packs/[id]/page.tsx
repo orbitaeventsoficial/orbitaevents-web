@@ -129,7 +129,7 @@ export default async function EditPackPage({ params }: { params: Promise<{ id: s
 
       {/* Reserves que usen aquest pack */}
       {packBookings.length > 0 && (
-        <section className="mt-6 rounded-xl border p-5">
+        <section className="mt-6 ap-card p-5">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">
             Reserves amb aquest pack ({packBookings.length})
           </h2>

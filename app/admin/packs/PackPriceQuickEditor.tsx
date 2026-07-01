@@ -74,15 +74,15 @@ export default function PackPriceQuickEditor({
 
   return (
     <>
-      <div className="rounded-xl border p-2">
+      <div className="ap-card p-2">
         <p className="">Pack PVP (editable)</p>
         <input className={inputClass} value={price} onChange={(e) => setPrice(e.target.value)} inputMode="decimal" />
       </div>
-      <div className="rounded-xl border p-2">
+      <div className="ap-card p-2">
         <p className="">Hora extra PVP (editable)</p>
         <input className={inputClass} value={extraHourPrice} onChange={(e) => setExtraHourPrice(e.target.value)} inputMode="decimal" />
       </div>
-      <div className={`col-span-2 rounded-xl border p-2 ${overallClass}`}>
+      <div className={`col-span-2 ap-card p-2 ${overallClass}`}>
         <p className="font-semibold">Semàfor preu pack: {packDiv >= 0 ? '+' : ''}{packDiv.toFixed(1)}%</p>
         <p className="font-semibold">Semàfor hora extra: {extraDiv >= 0 ? '+' : ''}{extraDiv.toFixed(1)}%</p>
         <div className="mt-2 flex items-center gap-2">

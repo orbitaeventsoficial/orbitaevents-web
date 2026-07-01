@@ -150,7 +150,7 @@ export default function BookingPipelineView() {
         {columnMetrics.map((col) => {
           const conf = BOOKING_STATUS_CONFIG[col.status];
           return (
-            <div key={col.status} className="rounded-xl border p-2 text-center">
+            <div key={col.status} className="ap-card p-2 text-center">
               <p className={`text-xs uppercase font-medium ${conf?.text || ''}`}>{col.label}</p>
               <p className="text-lg font-bold">{col.count}</p>
               <p className="text-xs">{formatCurrency(col.total)}</p>
@@ -245,7 +245,7 @@ function BookingCard({
       {...dragHandlers}
       aria-label={`Reserva ${booking.reference} — arrossega per moure`}
       {...helpAttrs(cardHelp)}
-      className={`admin-drag-item rounded-xl border p-3 transition-all hover:brightness-105 ${col.cardTone} ${
+      className={`admin-drag-item ap-card p-3 transition-all hover:brightness-105 ${col.cardTone} ${
         isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-grab active:cursor-grabbing'
       }`}
     >

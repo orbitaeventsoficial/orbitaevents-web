@@ -49,7 +49,7 @@ export default async function CapacityPage() {
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Dies lliures</p>
           <p className="text-xl font-bold admin-tone-text-success">{capacity.freeCount}</p>
         </div>
-        <div className={`rounded-xl border p-3 text-center ${capacity.overloadedCount > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : 'border-[var(--line)] bg-[var(--panel)]'}`}>
+        <div className={`ap-card p-3 text-center ${capacity.overloadedCount > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : ''}`}>
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Sobrecarregats</p>
           <p className={`text-xl font-bold ${capacity.overloadedCount > 0 ? 'admin-tone-text-danger' : ''}`}>{capacity.overloadedCount}</p>
         </div>
@@ -129,7 +129,7 @@ export default async function CapacityPage() {
             return (
               <div
                 key={week.weekStart}
-                className={`rounded-xl border p-3 ${config.border} ${config.bg}`}
+                className={`ap-card p-3 ${config.border} ${config.bg}`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-semibold opacity-80">{week.weekStart} → {week.weekEnd.slice(8)}</span>

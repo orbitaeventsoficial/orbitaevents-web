@@ -39,7 +39,7 @@ export default function WeeklyCapacityForecastPanel({ forecast }: { forecast: We
           return (
             <div
               key={week.weekStart}
-              className={`admin-stagger-item rounded-xl border p-3 ${style.border} ${style.bg}`}
+              className={`admin-stagger-item ap-card p-3 ${style.border} ${style.bg}`}
             >
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs font-semibold opacity-80">

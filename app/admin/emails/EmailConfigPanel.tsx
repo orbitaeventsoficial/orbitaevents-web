@@ -142,7 +142,7 @@ export default function EmailConfigPanel() {
         </div>
 
         {error && (
-          <div className="rounded-xl border p-3 admin-tone-soft-danger admin-tone-border-danger" role="alert">
+          <div className="ap-card p-3 admin-tone-soft-danger admin-tone-border-danger" role="alert">
             <p className="text-sm admin-tone-text-danger">❌ {error}</p>
           </div>
         )}

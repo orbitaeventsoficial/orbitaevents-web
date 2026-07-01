@@ -549,7 +549,7 @@ export default async function BookingsPage({
       </></div>}
 
       {!isKanban && pagination.totalPages > 1 && (
-        <section className="flex flex-col items-center justify-center gap-2 rounded-2xl border p-3 text-xs sm:flex-row sm:justify-between">
+        <section className="flex flex-col items-center justify-center gap-2 ap-card p-3 text-xs sm:flex-row sm:justify-between">
           <span>
             Pàgina {pagination.page} de {pagination.totalPages}
           </span>

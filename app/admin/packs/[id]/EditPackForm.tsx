@@ -408,7 +408,7 @@ export default function EditPackForm({
         <div className="mt-4 grid gap-2 sm:grid-cols-4">{TABS.map((t) => <button key={t.id} type="button" onClick={() => setActiveTab(t.id)} className={`rounded-xl border px-3 py-2 text-sm font-semibold ${activeTab === t.id ? 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning' : 'border-[var(--line)] bg-[var(--panel)] text-[var(--t2)]'}`}>{t.icon} {t.label}</button>)}</div>
       </section>
 
-      {error && <div className="rounded-xl border p-4 text-sm">Error: {error}</div>}
+      {error && <div className="ap-card p-4 text-sm">Error: {error}</div>}
 
       <AdminHelpPanel
         title="Com treballar aquest pack"
@@ -428,27 +428,27 @@ export default function EditPackForm({
           },
         ]}
       />
-      {info && <div className="rounded-xl border p-4 text-sm">Info: {info}</div>}
-      {success && <div className="rounded-xl border p-4 text-sm">Pack actualitzat correctament</div>}
+      {info && <div className="ap-card p-4 text-sm">Info: {info}</div>}
+      {success && <div className="ap-card p-4 text-sm">Pack actualitzat correctament</div>}
 
       {activeTab === 'economic' && (
-        <section className="rounded-2xl border p-6">
+        <section className="ap-card p-6">
           <h3 className="mb-4 ap-h2">Economia i semàfors</h3>
 
           <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-xl border p-3">
+            <div className="ap-card p-3">
               <p className="text-xs">Preu recomanat pack</p>
               <p className="text-lg font-semibold">{eur(recommended.pack)}</p>
             </div>
-            <div className="rounded-xl border p-3">
+            <div className="ap-card p-3">
               <p className="text-xs">Hora extra recomanada</p>
               <p className="text-lg font-semibold">{eur(recommended.extra)}</p>
             </div>
-            <div className={`rounded-xl border p-3 ${semClass(packDiv, pricingHint.alertThreshold)}`}>
+            <div className={`ap-card p-3 ${semClass(packDiv, pricingHint.alertThreshold)}`}>
               <p className="text-xs font-semibold">Semàfor pack</p>
               <p className="text-sm font-bold">{packDiv >= 0 ? '+' : ''}{packDiv.toFixed(1)}%</p>
             </div>
-            <div className={`rounded-xl border p-3 ${semClass(extraDiv, pricingHint.alertThreshold)}`}>
+            <div className={`ap-card p-3 ${semClass(extraDiv, pricingHint.alertThreshold)}`}>
               <p className="text-xs font-semibold">Semàfor hora extra</p>
               <p className="text-sm font-bold">{extraDiv >= 0 ? '+' : ''}{extraDiv.toFixed(1)}%</p>
             </div>
@@ -476,7 +476,7 @@ export default function EditPackForm({
           </div>
 
           <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-xl border p-3">
+            <div className="ap-card p-3">
               <p className="text-xs">Hores DJ (contador)</p>
               <div className="mt-2 flex items-center gap-2">
                 <button
@@ -496,7 +496,7 @@ export default function EditPackForm({
                 </button>
               </div>
             </div>
-            <div className="rounded-xl border p-3">
+            <div className="ap-card p-3">
               <p className="text-xs">Aforament max</p>
               <input
                 type="number"
@@ -506,7 +506,7 @@ export default function EditPackForm({
                 className={`${input} mt-2`}
               />
             </div>
-            <div className="rounded-xl border p-3">
+            <div className="ap-card p-3">
               <p className="text-xs">Potència so (W)</p>
               <input
                 type="number"
@@ -516,7 +516,7 @@ export default function EditPackForm({
                 className={`${input} mt-2`}
               />
             </div>
-            <div className="rounded-xl border p-3">
+            <div className="ap-card p-3">
               <p className="text-xs">Cost base estimat pack</p>
               <p className="mt-2 text-lg font-semibold">{eur(baseCostPack)}</p>
               <p className="mt-1 text-xs text-[var(--t3)]">És el cost mínim estimat abans de deixar marge.</p>
@@ -524,7 +524,7 @@ export default function EditPackForm({
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <div className={`rounded-xl border p-4 ${packSignal.cardClass}`}>
+            <div className={`ap-card p-4 ${packSignal.cardClass}`}>
               <div className="mb-3 flex items-center justify-between">
                 <p className="text-sm font-semibold">PVP pack</p>
                 <span className="inline-flex items-center gap-2 rounded-full border border-current/40 px-2 py-0.5 text-xs font-semibold">
@@ -549,7 +549,7 @@ export default function EditPackForm({
               )}
             </div>
 
-            <div className={`rounded-xl border p-4 ${extraSignal.cardClass}`}>
+            <div className={`ap-card p-4 ${extraSignal.cardClass}`}>
               <div className="mb-3 flex items-center justify-between">
                 <p className="text-sm font-semibold">PVP hora extra</p>
                 <span className="inline-flex items-center gap-2 rounded-full border border-current/40 px-2 py-0.5 text-xs font-semibold">
@@ -579,7 +579,7 @@ export default function EditPackForm({
             Cost inventari/h {eur(recommended.inventoryCostHour)} · Cost humà/h {eur(recommended.laborCostHour)}
           </div>
 
-          <div className="mt-4 rounded-xl border p-4">
+          <div className="mt-4 ap-card p-4">
             <div className="mb-3 flex items-center justify-between">
               <p className="text-sm font-semibold">Composició visual del pack</p>
               <p className="text-xs">{included.length} elements</p>
@@ -589,7 +589,7 @@ export default function EditPackForm({
             ) : (
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {included.map(({ row, item }) => (
-                  <article key={item.id} className="flex items-center gap-3 rounded-xl border p-2">
+                  <article key={item.id} className="flex items-center gap-3 ap-card p-2">
                     <NextImage
                       src={item.imageUrl || '/placeholder.png'}
                       alt={item.name}
@@ -611,7 +611,7 @@ export default function EditPackForm({
       )}
 
             {activeTab === 'content' && (
-        <section className="rounded-2xl border p-6">
+        <section className="ap-card p-6">
           <h3 className="mb-4 ap-h2">Inventari del pack</h3>
           <p className="mb-3 text-xs">
             Compon el pack com una peça operativa real: què hi entra, què és obligatori i quin cost base estàs arrossegant.
@@ -630,15 +630,15 @@ export default function EditPackForm({
           </div>
 
           <div className="mb-3 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-xl border p-3">
+            <div className="ap-card p-3">
               <p className="text-xs">Elements</p>
               <p className="text-lg font-semibold">{included.length}</p>
             </div>
-            <div className="rounded-xl border p-3">
+            <div className="ap-card p-3">
               <p className="text-xs">Unitats totals</p>
               <p className="text-lg font-semibold">{totalUnits}</p>
             </div>
-            <div className="rounded-xl border p-3">
+            <div className="ap-card p-3">
               <p className="text-xs">Cost inventari/h</p>
               <p className="text-lg font-semibold">{eur(recommended.inventoryCostHour)}</p>
             </div>
@@ -658,7 +658,7 @@ export default function EditPackForm({
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 {(Object.entries(composerSummary) as Array<[ComposerMode, typeof composerSummary.base]>).map(([mode, details]) => (
-                  <div key={mode} className={`rounded-2xl border p-4 ${mode === 'base' ? 'admin-tone-border-cyan admin-tone-bg-cyan' : 'admin-tone-border-warning admin-tone-bg-warning'}`}>
+                  <div key={mode} className={`ap-card p-4 ${mode === 'base' ? 'admin-tone-border-cyan admin-tone-bg-cyan' : 'admin-tone-border-warning admin-tone-bg-warning'}`}>
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <p className="text-sm font-semibold text-[var(--t)]">{details.title}</p>
@@ -746,7 +746,7 @@ export default function EditPackForm({
               onDragOver={(e) => { e.preventDefault(); setDropZone('available'); }}
               onDragLeave={() => setDropZone((p) => p === 'available' ? null : p)}
               onDrop={dropOut}
-              className={`rounded-xl border p-3 transition-all ${dropZone === 'available' ? 'admin-drop-active admin-tone-border-danger admin-tone-bg-danger' : 'border-[var(--line)] bg-[var(--panel)]'}`}
+              className={`ap-card p-3 transition-all ${dropZone === 'available' ? 'admin-drop-active admin-tone-border-danger admin-tone-bg-danger' : ''}`}
             >
               <div className="mb-2 flex items-center justify-between gap-3">
                 <p className="text-sm font-semibold">Disponibles ({available.length})</p>
@@ -754,7 +754,7 @@ export default function EditPackForm({
               </div>
               <div className="max-h-[26rem] space-y-2 overflow-auto pr-1">
                 {available.map((i) => (
-                  <article key={i.id} draggable aria-label={`${i.name} · arrossega per afegir al pack`} onDragStart={(e) => onDragStart(e, i.id, 'available')} className="admin-drag-item cursor-grab rounded-xl border p-2">
+                  <article key={i.id} draggable aria-label={`${i.name} · arrossega per afegir al pack`} onDragStart={(e) => onDragStart(e, i.id, 'available')} className="admin-drag-item cursor-grab ap-card p-2">
                     <div className="flex items-start gap-3">
                       <NextImage src={i.imageUrl || '/placeholder.png'} alt={i.name} width={56} height={56} className="h-14 w-14 rounded-md border object-cover" />
                       <div className="min-w-0 flex-1">
@@ -772,7 +772,7 @@ export default function EditPackForm({
               onDragOver={(e) => { e.preventDefault(); setDropZone('included'); }}
               onDragLeave={() => setDropZone((p) => p === 'included' ? null : p)}
               onDrop={dropIn}
-              className={`rounded-xl border p-3 transition-all ${dropZone === 'included' ? 'admin-drop-active admin-tone-border-success admin-tone-bg-success' : 'border-[var(--line)] bg-[var(--panel)]'}`}
+              className={`ap-card p-3 transition-all ${dropZone === 'included' ? 'admin-drop-active admin-tone-border-success admin-tone-bg-success' : ''}`}
             >
               <div className="mb-2 flex items-center justify-between gap-3">
                 <p className="text-sm font-semibold">Inclosos ({included.length})</p>
@@ -780,7 +780,7 @@ export default function EditPackForm({
               </div>
               <div className="max-h-[26rem] space-y-2 overflow-auto pr-1">
                 {included.map(({ row, item }) => (
-                  <article key={item.id} draggable aria-label={`${item.name} · arrossega per treure del pack`} onDragStart={(e) => onDragStart(e, item.id, 'included')} className="admin-drag-item cursor-grab rounded-xl border p-2">
+                  <article key={item.id} draggable aria-label={`${item.name} · arrossega per treure del pack`} onDragStart={(e) => onDragStart(e, item.id, 'included')} className="admin-drag-item cursor-grab ap-card p-2">
                     <div className="flex items-start gap-3">
                       <NextImage
                         src={item.imageUrl || '/placeholder.png'}
@@ -844,7 +844,7 @@ export default function EditPackForm({
       )}
 
       {activeTab === 'texts' && (
-        <section className="rounded-2xl border p-6">
+        <section className="ap-card p-6">
           <h3 className="mb-4 ap-h2">Textos</h3>
           <p className="mb-3 text-xs">Nom del pack editable + tagline + features per idioma.</p>
           <div className="grid gap-4">
@@ -852,7 +852,7 @@ export default function EditPackForm({
               const tr = translations.find((t) => t.locale === locale)!;
               const featuresValue = (tr.features || []).join('\n');
               return (
-                <div key={locale} className="rounded-xl border p-4">
+                <div key={locale} className="ap-card p-4">
                   <h4 className="mb-2 text-sm font-semibold">{locale.toUpperCase()}</h4>
                   <input
                     value={tr.name}
@@ -887,9 +887,9 @@ export default function EditPackForm({
         </section>
       )}
 
-      {activeTab === 'publish' && <section className="rounded-2xl border p-6"><h3 className="mb-4 ap-h2">Publicació</h3><div className="grid gap-4 sm:grid-cols-3"><label className="text-sm"><input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} /> Actiu</label><label className="text-sm"><input type="checkbox" checked={formData.isFeatured} onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })} /> Destacat</label><input type="number" value={formData.order} onChange={(e) => setFormData({ ...formData, order: Number(e.target.value) || 0 })} className={input} placeholder="Ordre" /></div></section>}
+      {activeTab === 'publish' && <section className="ap-card p-6"><h3 className="mb-4 ap-h2">Publicació</h3><div className="grid gap-4 sm:grid-cols-3"><label className="text-sm"><input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} /> Actiu</label><label className="text-sm"><input type="checkbox" checked={formData.isFeatured} onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })} /> Destacat</label><input type="number" value={formData.order} onChange={(e) => setFormData({ ...formData, order: Number(e.target.value) || 0 })} className={input} placeholder="Ordre" /></div></section>}
 
-      <div className="sticky bottom-2 z-10 flex flex-wrap justify-end gap-3 rounded-xl border p-3 backdrop-blur">
+      <div className="sticky bottom-2 z-10 flex flex-wrap justify-end gap-3 ap-card p-3 backdrop-blur">
         <Link href="/admin/packs" className="rounded-xl border px-4 py-2 text-sm font-medium">Cancel·lar</Link>
         <button type="submit" disabled={loading} className="ap-btn ap-btn--primary">{loading ? 'Desant...' : 'Desar canvis'}</button>
       </div>

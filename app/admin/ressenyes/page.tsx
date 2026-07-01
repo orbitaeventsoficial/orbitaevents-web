@@ -355,7 +355,7 @@ export default function AdminRessenyesPage() {
 
             {/* Canvas preview */}
             {canvasPreview?.id === t.id && (
-              <div className="mt-4 rounded-xl border p-4">
+              <div className="mt-4 ap-card p-4">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-sm font-semibold">Previsualització Canvas</p>
                   <button

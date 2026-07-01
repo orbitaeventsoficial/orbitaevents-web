@@ -18,7 +18,7 @@ function BoolBadge({ ok }: { ok: boolean }) {
 }
 
 const LINK_BUTTON = 'ap-btn ap-btn--secondary';
-const CARD = 'rounded-2xl border p-5 admin-card-glass';
+const CARD = 'ap-card p-5 admin-card-glass';
 
 export default async function IntegrationsPage() {
   const settings = await prisma.setting.findMany({

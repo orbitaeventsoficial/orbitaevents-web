@@ -74,7 +74,7 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
     <section className="ap-card p-5">
       <h2 className="ap-h2">Configuració de costos i CAC</h2>
       {criticalIssues.length > 0 && (
-        <div className="mt-3 rounded-xl border p-3 text-xs">
+        <div className="mt-3 ap-card p-3 text-xs">
           <p className="font-semibold">Dades crítiques pendents</p>
           <p className="mt-1">{criticalIssues.join(' · ')}</p>
         </div>

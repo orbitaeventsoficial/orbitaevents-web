@@ -188,12 +188,12 @@ export default async function SalesOpsPage() {
             <p className="mt-1 text-xl font-bold">{socialPulse.postsLast30d}</p>
             <p className="mt-0.5 text-xs opacity-50">{socialPulse.publishedLast30d} publicats</p>
           </div>
-          <div className={`rounded-xl border p-3 ${socialPulse.scheduledUpcoming > 0 ? 'admin-tone-border-info admin-tone-bg-info' : 'border-[var(--line)] bg-[var(--panel)]'}`}>
+          <div className={`ap-card p-3 ${socialPulse.scheduledUpcoming > 0 ? 'admin-tone-border-info admin-tone-bg-info' : ''}`}>
             <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Programats</p>
             <p className={`mt-1 text-xl font-bold ${socialPulse.scheduledUpcoming > 0 ? 'admin-tone-text-info' : ''}`}>{socialPulse.scheduledUpcoming}</p>
             <p className="mt-0.5 text-xs opacity-50">{socialPulse.draftsPending} esborranys</p>
           </div>
-          <div className={`rounded-xl border p-3 ${socialPulse.consistencyScore >= 60 ? 'admin-tone-border-success admin-tone-bg-success' : socialPulse.consistencyScore >= 30 ? 'admin-tone-border-warning admin-tone-bg-warning' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
+          <div className={`ap-card p-3 ${socialPulse.consistencyScore >= 60 ? 'admin-tone-border-success admin-tone-bg-success' : socialPulse.consistencyScore >= 30 ? 'admin-tone-border-warning admin-tone-bg-warning' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
             <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Consistència</p>
             <p className={`mt-1 text-xl font-bold ${socialPulse.consistencyScore >= 60 ? 'admin-tone-text-success' : socialPulse.consistencyScore >= 30 ? 'admin-tone-text-warning' : 'admin-tone-text-danger'}`}>{socialPulse.consistencyScore}%</p>
             <p className="mt-0.5 text-xs opacity-50">{socialPulse.daysSinceLastPost !== null ? `Fa ${socialPulse.daysSinceLastPost}d` : 'Mai publicat'}</p>

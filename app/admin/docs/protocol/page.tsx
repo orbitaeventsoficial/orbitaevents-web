@@ -266,7 +266,7 @@ export default async function AdminProtocolPage({
                   key={canvi.anchorId}
                   id={canvi.anchorId}
                   open={shouldAutoOpenProtocolCanvi(canvi.n, focus, validations, validationFilter)}
-                  className={`admin-card-glass rounded-2xl border p-4 transition ${
+                  className={`admin-card-glass ap-card p-4 transition ${
                     isFocus ? 'admin-tone-border-warning admin-tone-bg-warning' : 'border-[var(--line)]'
                   }`}
                 >

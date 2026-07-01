@@ -103,7 +103,7 @@ export default function FaqEditorForm({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border p-5">
+      <section className="ap-card p-5">
         <h2 className="text-sm font-semibold">Dades bàsiques</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>
@@ -161,7 +161,7 @@ export default function FaqEditorForm({
 
       <section className="space-y-4">
         {translations.map((t) => (
-          <div key={t.locale} className="rounded-2xl border p-5">
+          <div key={t.locale} className="ap-card p-5">
             <h3 className="text-sm font-semibold">Idioma: {t.locale.toUpperCase()}</h3>
             <div className="mt-3 space-y-3">
               <div>
@@ -189,7 +189,7 @@ export default function FaqEditorForm({
       </section>
 
       {error && (
-        <div className="rounded-xl border p-3 text-sm">
+        <div className="ap-card p-3 text-sm">
           {error}
         </div>
       )}

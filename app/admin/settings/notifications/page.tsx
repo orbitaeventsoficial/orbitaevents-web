@@ -57,7 +57,7 @@ function StatusCard({ title, ready, warning = false, successText, pendingText }:
   const icon = ready ? '✅' : warning ? '⚠️' : '❌';
 
   return (
-    <div className={`rounded-xl border p-6 shadow-sm ${tone}`}>
+    <div className={`ap-card p-6 shadow-sm ${tone}`}>
       <div className="mb-2 flex items-center gap-3">
         <span className="text-2xl">{icon}</span>
         <h2 className="ap-h2">{title}</h2>
@@ -70,7 +70,7 @@ function StatusCard({ title, ready, warning = false, successText, pendingText }:
 function ResultBox({ success, message }: { success: boolean; message: string }) {
   return (
     <div
-      className={`rounded-xl border p-4 ${
+      className={`ap-card p-4 ${
         success
           ? 'admin-tone-soft-success admin-tone-border-success admin-tone-text-success'
           : 'admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger'
@@ -234,7 +234,7 @@ export default function SettingsNotificationsPage() {
         }}
       />
 
-      <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm admin-card-glass">
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="ap-h2">Radar viu de notificacions</h2>
@@ -283,7 +283,7 @@ export default function SettingsNotificationsPage() {
         />
       </div>
 
-      <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm admin-card-glass">
         <div className="mb-4">
           <h2 className="ap-h2">Cobertura real dels avisos</h2>
           <p className="text-sm text-[var(--t2)]">Per cada tipus d’alerta, veus quins canals tens realment operatius i on falla la cadena.</p>
@@ -343,7 +343,7 @@ export default function SettingsNotificationsPage() {
         </div>
       </section>
 
-      <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm admin-card-glass">
         <h2 className="mb-4 ap-h2">🧪 Test d'Email</h2>
 
         {testResult && <ResultBox success={testResult.success} message={testResult.message} />}
@@ -361,7 +361,7 @@ export default function SettingsNotificationsPage() {
         {!config?.status.emailReady && <p className="mt-2 text-sm">Configura primer les variables SMTP per poder testejar</p>}
       </section>
 
-      <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm admin-card-glass">
         <h2 className="mb-4 ap-h2">🤖 Pilot automàtic comercial</h2>
 
         <div className="grid gap-3 text-sm">
@@ -390,7 +390,7 @@ export default function SettingsNotificationsPage() {
             </span>
           </div>
           {config?.automation.lastSummary && (
-            <div className="rounded-xl border p-3">
+            <div className="ap-card p-3">
               <p>
                 Seq: {config.automation.lastSummary.sequences?.executed ?? 0} · Email: {config.automation.lastSummary.sequences?.sentEmail ?? 0} · WA:{' '}
                 {config.automation.lastSummary.sequences?.sentWhatsapp ?? 0}
@@ -423,7 +423,7 @@ export default function SettingsNotificationsPage() {
 
       <RecipientsManager />
 
-      <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm admin-card-glass">
         <h2 className="mb-4 ap-h2">⚙️ Configuració Actual</h2>
 
         <div className="space-y-4">
@@ -454,18 +454,18 @@ export default function SettingsNotificationsPage() {
       </section>
 
       {instructions.length > 0 && !config?.status.emailReady && (
-        <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
+        <section className="ap-card p-6 shadow-sm admin-card-glass">
           <h2 className="mb-4 ap-h2">📝 Instruccions de Configuració</h2>
 
           {instructions.map((instruction, index) => (
-            <pre key={index} className="mb-4 overflow-x-auto rounded-xl border p-4 text-sm whitespace-pre-wrap">
+            <pre key={index} className="mb-4 overflow-x-auto ap-card p-4 text-sm whitespace-pre-wrap">
               {instruction}
             </pre>
           ))}
         </section>
       )}
 
-      <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm admin-card-glass">
         <h2 className="mb-4 ap-h2">📚 Referència Ràpida</h2>
 
         <div className="prose prose-sm max-w-none">

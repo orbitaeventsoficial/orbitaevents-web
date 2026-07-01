@@ -289,7 +289,7 @@ export default function AdminPrivacyPage() {
             <p className="text-2xl font-bold">{stats.requests.completed}</p>
             <p className="text-xs opacity-60">Completades</p>
           </div>
-          <div className={`rounded-2xl border p-4 ${stats.requests.urgent > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : 'admin-card-glass'}`}>
+          <div className={`ap-card p-4 ${stats.requests.urgent > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : 'admin-card-glass'}`}>
             <p className={`text-2xl font-bold ${stats.requests.urgent > 0 ? 'admin-tone-text-danger' : ''}`}>{stats.requests.urgent}</p>
             <p className="text-xs opacity-60">Urgents (&lt;5 dies)</p>
           </div>
@@ -380,7 +380,7 @@ export default function AdminPrivacyPage() {
           return (
             <div
               key={r.id}
-              className={`rounded-2xl border p-5 transition-colors ${
+              className={`ap-card p-5 transition-colors ${
                 isOverdue ? 'admin-tone-border-danger admin-tone-bg-danger' : isUrgent ? 'admin-tone-border-warning admin-tone-bg-warning' : 'admin-card-glass admin-tone-border-neutral admin-tone-bg-neutral'
               }`}
             >
@@ -694,27 +694,27 @@ export default function AdminPrivacyPage() {
           Informació RGPD - Articles aplicables
         </summary>
         <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm opacity-70">
-          <div className="rounded-xl border p-3">
+          <div className="ap-card p-3">
             <p className="font-semibold">Art. 15 - Accés</p>
             <p className="text-xs mt-1">El client pot obtenir còpia de totes les dades personals.</p>
           </div>
-          <div className="rounded-xl border p-3">
+          <div className="ap-card p-3">
             <p className="font-semibold">Art. 16 - Rectificació</p>
             <p className="text-xs mt-1">Corregir dades inexactes o incompletes.</p>
           </div>
-          <div className="rounded-xl border p-3">
+          <div className="ap-card p-3">
             <p className="font-semibold">Art. 17 - Supressió</p>
             <p className="text-xs mt-1">Dret a l&apos;oblit: eliminar dades personals.</p>
           </div>
-          <div className="rounded-xl border p-3">
+          <div className="ap-card p-3">
             <p className="font-semibold">Art. 18 - Limitació</p>
             <p className="text-xs mt-1">Restringir el tractament en certs supòsits.</p>
           </div>
-          <div className="rounded-xl border p-3">
+          <div className="ap-card p-3">
             <p className="font-semibold">Art. 20 - Portabilitat</p>
             <p className="text-xs mt-1">Rebre dades en format estructurat i portable.</p>
           </div>
-          <div className="rounded-xl border p-3">
+          <div className="ap-card p-3">
             <p className="font-semibold">Art. 21 - Oposició</p>
             <p className="text-xs mt-1">Oposar-se al tractament per màrqueting directe.</p>
           </div>

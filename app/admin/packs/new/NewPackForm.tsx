@@ -50,7 +50,7 @@ export default function NewPackForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border p-6">
+    <form onSubmit={handleSubmit} className="ap-card p-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="pack-slug" className="mb-1 block text-sm">Slug</label>

@@ -688,7 +688,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
             nextEvents.length > 0 && (
               <div className="space-y-3">
                 {nextEvents.map((ev) => (
-                  <div key={ev.id} className="rounded-xl border p-2">
+                  <div key={ev.id} className="ap-card p-2">
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-medium">{ev.reference || 'Reserva'}</p>
                       <a href={buildBookingHref(ev.id)} className="text-xs">Obrir →</a>
@@ -770,7 +770,7 @@ function StatCard({ label, value, detail, color }: { label: string; value: numbe
   };
 
   return (
-    <div className={`rounded-xl border p-3 ${colorStyles[color]}`} {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.stat(label))}>
+    <div className={`ap-card p-3 ${colorStyles[color]}`} {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.stat(label))}>
       <p className="text-xs">{label}</p>
       <p className="mt-1 text-2xl font-semibold">{value}</p>
       {detail && <p className="mt-0.5 text-xs">{detail}</p>}
@@ -1217,7 +1217,7 @@ function ContactsSection({ customerId, contacts: initialContacts }: { customerId
 
       <div className="flex flex-col gap-3">
         {contacts.map(c => (
-          <div key={c.id} className="flex items-start justify-between gap-3 rounded-xl border p-3">
+          <div key={c.id} className="flex items-start justify-between gap-3 ap-card p-3">
             <div className="flex flex-col gap-0.5 min-w-0">
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-sm">{c.name}</span>
@@ -1237,7 +1237,7 @@ function ContactsSection({ customerId, contacts: initialContacts }: { customerId
       </div>
 
       {isEditing && (
-        <div className="mt-4 rounded-xl border p-4 flex flex-col gap-3">
+        <div className="mt-4 ap-card p-4 flex flex-col gap-3">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label htmlFor="contact-name" className="text-xs font-semibold uppercase tracking-wider opacity-60 block mb-1">Nom *</label>

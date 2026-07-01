@@ -384,7 +384,7 @@ export default function CalendarMonthClient() {
       </div>
       {/* Stats ràpids del mes visible */}
       <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-6" {...helpAttrs(ADMIN_CALENDAR_HELP.stats)}>
-        <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-success admin-tone-border-success">
+        <div className="admin-card-glass ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-success admin-tone-border-success">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide admin-tone-text-success">Reserves</span>
@@ -396,7 +396,7 @@ export default function CalendarMonthClient() {
           </div>
         </div>
 
-        <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-danger admin-tone-border-danger">
+        <div className="admin-card-glass ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-danger admin-tone-border-danger">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide admin-tone-text-danger">Bloquejos</span>
@@ -408,7 +408,7 @@ export default function CalendarMonthClient() {
           </div>
         </div>
 
-        <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-info admin-tone-border-info">
+        <div className="admin-card-glass ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-info admin-tone-border-info">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide admin-tone-text-info">Dies lliures</span>
@@ -420,7 +420,7 @@ export default function CalendarMonthClient() {
           </div>
         </div>
 
-        <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-warning admin-tone-border-warning">
+        <div className="admin-card-glass ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-warning admin-tone-border-warning">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide admin-tone-text-warning">Dies mixtes</span>
@@ -432,7 +432,7 @@ export default function CalendarMonthClient() {
           </div>
         </div>
 
-        <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-info admin-tone-border-info">
+        <div className="admin-card-glass ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-info admin-tone-border-info">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide admin-tone-text-info">Tasques</span>
@@ -444,7 +444,7 @@ export default function CalendarMonthClient() {
           </div>
         </div>
 
-        <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-warning admin-tone-border-warning">
+        <div className="admin-card-glass ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-warning admin-tone-border-warning">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide admin-tone-text-warning">Social</span>
@@ -489,7 +489,7 @@ export default function CalendarMonthClient() {
           </div>
 
           {/* Graella del calendari */}
-          <div className="admin-calendar-grid grid grid-cols-7 gap-[1px] overflow-y-hidden overflow-x-auto rounded-2xl border p-0" {...helpAttrs(ADMIN_CALENDAR_HELP.monthGrid)}>
+          <div className="admin-calendar-grid grid grid-cols-7 gap-[1px] overflow-y-hidden overflow-x-auto ap-card p-0" {...helpAttrs(ADMIN_CALENDAR_HELP.monthGrid)}>
         {cells.map((cell) => {
           const dayData =
             data?.days?.[cell.key] ??
@@ -593,7 +593,9 @@ export default function CalendarMonthClient() {
 
                 {visibleLayers.leads && hasLeads && (
                   <div className="mt-0.5 space-y-0.5 text-xs sm:text-xs overflow-hidden">
-                    {dayLeads.slice(0, 2).map((leadItem) => (
+                    {dayLeads.slice(0, 2).map((leadItem) => {
+                      const isLost = leadItem.status === 'LOST';
+                      return (
                       <Link
                         key={leadItem.id}
                         href={buildLeadCustomerHref({
@@ -601,11 +603,14 @@ export default function CalendarMonthClient() {
                           customerId: leadItem.customerId,
                         })}
                         onClick={(event) => event.stopPropagation()}
-                        className="block truncate rounded-md px-1 py-0.5 admin-tone-soft-info admin-tone-text-info hover:underline"
+                        className={isLost
+                          ? 'block truncate rounded px-1 py-0.5 text-xs opacity-60 admin-tone-bg-neutral hover:underline'
+                          : 'block truncate rounded-md px-1 py-0.5 admin-tone-soft-info admin-tone-text-info hover:underline'}
                       >
-                        Entrada · {leadItem.name}
+                        {isLost ? 'Perdut' : 'Entrada'} · {leadItem.name}
                       </Link>
-                    ))}
+                      );
+                    })}
                     {dayLeads.length > 2 && (
                       <div>+{dayLeads.length - 2} entrades</div>
                     )}
@@ -696,7 +701,7 @@ export default function CalendarMonthClient() {
 
           {/* Formulari bloqueig inline */}
           {showBlockForm && selectedDayData.key && (
-            <div className="mt-3 flex flex-wrap items-end gap-2 rounded-xl border p-3">
+            <div className="mt-3 flex flex-wrap items-end gap-2 ap-card p-3">
               <div className="flex-1 min-w-[200px]">
                 <label htmlFor="block-note" className="block text-xs font-medium mb-1">
                   Motiu del bloqueig (opcional)
@@ -737,28 +742,35 @@ export default function CalendarMonthClient() {
                 </h3>
                 <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
                   {selectedDayData.payload?.leads?.length ? (
-                    selectedDayData.payload.leads.map((leadItem) => (
+                    selectedDayData.payload.leads.map((leadItem) => {
+                      const isLost = leadItem.status === 'LOST';
+                      return (
                       <Link
                         key={leadItem.id}
                         href={buildLeadCustomerHref({
                           leadId: leadItem.id,
                           customerId: leadItem.customerId,
                         })}
-                        className="block rounded-xl border px-3 py-2.5 transition-all admin-card-glass"
+                        className={isLost
+                          ? 'block rounded-lg border px-2 py-1.5 text-xs opacity-60 transition-all'
+                          : 'block rounded-xl border px-3 py-2.5 transition-all admin-card-glass'}
                       >
-                        <div className="truncate text-sm font-medium">{leadItem.name}</div>
-                        <div className="mt-1 text-xs opacity-70">
+                        <div className={isLost ? 'truncate font-medium' : 'truncate text-sm font-medium'}>
+                          {isLost ? 'Perdut · ' : ''}{leadItem.name}
+                        </div>
+                        <div className={isLost ? 'mt-0.5 opacity-70' : 'mt-1 text-xs opacity-70'}>
                           {(leadItem.eventStartTime || leadItem.eventEndTime)
                             ? `${leadItem.eventStartTime || '--:--'} - ${leadItem.eventEndTime || '--:--'}`
                             : resolveWorkTimeLabel(leadItem.eventDate)}
                           {leadItem.eventType ? ` · ${leadItem.eventType}` : ''}
                           {leadItem.status ? ` · ${leadItem.status}` : ''}
                         </div>
-                        {leadItem.eventLocation && (
+                        {!isLost && leadItem.eventLocation && (
                           <div className="mt-1 truncate text-xs opacity-60">{leadItem.eventLocation}</div>
                         )}
                       </Link>
-                    ))
+                      );
+                    })
                   ) : (
                     <div className="rounded-xl border border-dashed px-3 py-4 text-center text-sm">
                       Cap entrada en aquest dia
@@ -919,7 +931,7 @@ export default function CalendarMonthClient() {
           </div>
 
           {selectedDayData.payload?.reservas?.[0] && (
-            <div className="mt-4 rounded-xl border p-4">
+            <div className="mt-4 ap-card p-4">
               <h3 className="text-sm font-semibold">Fitxa de l&apos;esdeveniment</h3>
               <div className="mt-2 grid gap-2 text-sm sm:grid-cols-2">
                 <p><span className="">Client:</span> {selectedDayData.payload.reservas[0].clientName || '-'}</p>

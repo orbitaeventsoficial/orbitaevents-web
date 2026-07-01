@@ -292,7 +292,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
         </div>
       )}
       {skippedDetails.length > 0 && (
-        <div className="mb-3 rounded-xl border p-3">
+        <div className="mb-3 ap-card p-3">
           <p className="mb-2 text-xs font-semibold">Elements no afegits</p>
           <ul className="space-y-1">
             {skippedDetails.map((detail) => (

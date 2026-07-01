@@ -62,7 +62,7 @@ export default function ProtocolValidationToggle({
   };
 
   return (
-    <section className={`mt-3 rounded-xl border p-3 ${isValidated ? 'admin-tone-border-success admin-tone-bg-success' : 'border-[var(--line)] bg-[var(--panel)]'}`}>
+    <section className={`mt-3 ap-card p-3 ${isValidated ? 'admin-tone-border-success admin-tone-bg-success' : ''}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider opacity-60">Validació humana</p>

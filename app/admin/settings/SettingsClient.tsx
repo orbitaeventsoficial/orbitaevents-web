@@ -139,7 +139,7 @@ export default function SettingsClient({
   return (
     <div className="space-y-8">
       {error && (
-        <div className="rounded-xl border p-4 text-sm admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger" role="alert">
+        <div className="ap-card p-4 text-sm admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger" role="alert">
           {error}
         </div>
       )}

@@ -1,3 +1,48 @@
+## 2026-07-01 — Homogeneïtat: 177 contenidors 'border pelat' → .ap-card (58 fitxers) (Canvi #1322, claude+agent)
+
+### Context
+La revisió visual (inventory #1318, packs #1319) va destapar un patró SISTÈMIC: 339 contenidors amb `rounded-{lg,xl,2xl} border p-N` PELAT (border sense fons canònic) → cards que es veien "buides"/incoherents amb .ap-card. Causa que les pàgines no semblessin del tot germanes.
+
+### Què s'ha fet
+- Agent: **177 contenidors** `rounded border p-N` → `.ap-card` (fons --panel canònic) en **58 fitxers** (packs/[id] 29, settings/notifications 11, calendario 23, economia 9, privacy 8, discount-codes 7, faq, crons, emails, inventory...). Padding p-N i utilitats (grid/col-span/space-y) conservats.
+- Tons condicionals (8 casos) conservats: on l'else era border+bg idèntic a .ap-card, col·lapsat a ''; branca de to (admin-tone-*) intacta. Ordre CSS verificat (tons guanyen sobre --panel).
+- EXCLOSOS (correcte): PdfStudio, StudioPreview, Canvas, css-manager (eines/PDF). Botons/inputs/decoratius no tocats (patró p-N = contenidor, verificat).
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0; check-admin-canon sense P1; 0 pelats restants.
+- Validació funcional: captures discount-codes/economia — cards amb fons canònic.
+- Validació humana/UX: totes les pàgines ara germanes (mateix fons/radi/border de card).
+
+### Coordinació
+Counter → 1322. Homogeneïtat de contenidors a tot l'admin. Non-stop.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-01 — Calendari: leads recuperats, dates estrictes i LOST simbòlic (Canvi #1321, codex)
+
+### Context
+El propietari crea tres leads i no els veu al calendari. La BD confirma que no s'han perdut: dos havien entrat al 26 de novembre i un al 5 de juny. El cas més clar és David/Arancha: el nom deia "26 Setiembre", però `eventDate` havia quedat com novembre. A més, els leads `LOST` com el de Rous no han de desaparèixer del calendari, però tampoc ocupar una targeta gran.
+
+### Què s'ha fet
+- Recuperació directa a BD amb traça `adminLog`: Alba Orna l'Aldosa → `2026-09-05`; Alba Orna Aravell → `2026-09-26`; David/Arancha → `2026-09-26`.
+- `app/api/admin/leads/route.ts` i `app/api/admin/leads/[id]/route.ts`: `eventDate` només accepta `YYYY-MM-DD`.
+- `lib/services/leadAdminService.ts` i `lib/services/leadRouteService.ts`: normalització de dates de lead a migdia UTC i rebuig de formats ambigus.
+- `lib/services/adminCalendarMonthService.ts`: els leads `LOST` entren al calendari.
+- `CalendarMonthClient`, `CalendarWeekClient`, `CalendarDayClient`: els `LOST` es renderitzen petits com `Perdut · nom`, sense ocupar el pes visual d'un lead viu.
+- Tests ampliats per data ambigua i `LOST` al calendari.
+
+### Validació
+- Validació tècnica: 49 tests enfocats OK; `npx tsc --noEmit --pretty false` OK; `git diff --check` OK (només avisos CRLF aliens); `pnpm run qa:protocol` OK.
+- Validació funcional: query del mateix filtre del calendari retorna els tres leads a setembre.
+- Validació humana/UX: lead perdut visible com a senyal històric, no com a feina viva.
+
+### Coordinació
+Counter → 1321. #1320 era de Claude; aquest tall queda separat com #1321.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-01 — Fix visual: cards de packs → .ap-card (border pelat → fons canònic) (Canvi #1320, claude)
 
 ### Context

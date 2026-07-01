@@ -339,7 +339,7 @@ export function CobramentFiltersSection({
       </section>
 
       {selected.size > 0 && (
-        <section className="rounded-xl border p-3 flex flex-wrap items-center gap-3" {...helpAttrs(ADMIN_ECONOMY_HELP.bulkActions)}>
+        <section className="ap-card p-3 flex flex-wrap items-center gap-3" {...helpAttrs(ADMIN_ECONOMY_HELP.bulkActions)}>
           <span className="text-sm font-medium">{selected.size} seleccionat{selected.size !== 1 ? 's' : ''}</span>
           <button
             type="button"
@@ -371,7 +371,7 @@ export function CobramentFiltersSection({
         </section>
       )}
 
-      <section className="rounded-2xl border p-3 shadow-lg overflow-x-auto" {...helpAttrs(ADMIN_ECONOMY_HELP.table)}>
+      <section className="ap-card p-3 shadow-lg overflow-x-auto" {...helpAttrs(ADMIN_ECONOMY_HELP.table)}>
         <table className="w-full text-sm" aria-label="Cobraments pendents">
           <thead>
             <tr className="border-b border-[var(--line)] text-left text-xs uppercase tracking-wide text-[var(--t3)]">

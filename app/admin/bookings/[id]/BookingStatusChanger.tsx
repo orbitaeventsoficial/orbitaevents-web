@@ -129,12 +129,12 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
 
       {showConfirmComplete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm" role="presentation">
-          <div className="mx-4 max-w-md rounded-2xl border p-6 shadow-xl"
+          <div className="mx-4 max-w-md ap-card p-6 shadow-xl"
             {...helpAttrs(ADMIN_BOOKING_HELP_3.status.complete)}
             role="dialog" aria-modal="true" aria-labelledby="confirm-complete-title">
             <h3 id="confirm-complete-title" className="mb-2 ap-h2">Marcar com a Completat?</h3>
             <p className="mb-4">Actualitzarà les estadístiques públiques automàticament:</p>
-            <div className="mb-4 rounded-xl border p-4 text-sm">
+            <div className="mb-4 ap-card p-4 text-sm">
               <strong>+1</strong> event realitzat · <strong>+{guestCount}</strong> persones feliçes
             </div>
             <div className="flex justify-end gap-3">

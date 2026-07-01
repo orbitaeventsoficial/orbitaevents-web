@@ -39,11 +39,11 @@ export default async function SurveysPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="rounded-xl border p-4">
+        <div className="ap-card p-4">
           <div className="text-sm font-medium">Total Enquestes</div>
           <div className="text-3xl font-bold mt-1">{surveys.length}</div>
         </div>
-        <div className="rounded-xl border p-4">
+        <div className="ap-card p-4">
           <div className="text-sm font-medium">Valoracio mitjana</div>
           <div className="text-3xl font-bold mt-1">
             {surveys.length > 0
@@ -52,7 +52,7 @@ export default async function SurveysPage() {
             }
           </div>
         </div>
-        <div className="rounded-xl border p-4">
+        <div className="ap-card p-4">
           <div className="text-sm font-medium">NPS Mitjà</div>
           <div className="text-3xl font-bold mt-1">
             {surveys.length > 0
@@ -61,7 +61,7 @@ export default async function SurveysPage() {
             }
           </div>
         </div>
-        <div className="rounded-xl border p-4">
+        <div className="ap-card p-4">
           <div className="text-sm font-medium">Amb Testimoni</div>
           <div className="text-3xl font-bold mt-1">
             {surveys.filter(s => s.testimonialPermission !== 'NO').length}

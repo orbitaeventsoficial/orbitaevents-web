@@ -459,7 +459,7 @@ export default function BookingMarginCard({
             <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCharge)}</p>
             <p className="text-xs">{travelBlocks} trams · {TRAVEL_BLOCK_EUR} €</p>
           </div>
-          <div className={`rounded-xl border p-3 ${travelMarginCardBorder} ${travelMarginCardBg}`}>
+          <div className={`ap-card p-3 ${travelMarginCardBorder} ${travelMarginCardBg}`}>
             <p className="text-xs uppercase tracking-wide">Marge real transport</p>
             <p className={`text-sm font-semibold ${travelMarginColor}`}>
               {formatCurrency(travelNetMargin)}

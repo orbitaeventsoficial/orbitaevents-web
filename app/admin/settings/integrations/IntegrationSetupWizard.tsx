@@ -42,7 +42,7 @@ export default function IntegrationSetupWizard({
   );
 
   return (
-    <section className="rounded-2xl border p-5 admin-card-glass">
+    <section className="ap-card p-5 admin-card-glass">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="ap-h2">Configuració ràpida d&apos;integracions</h2>
@@ -60,7 +60,7 @@ export default function IntegrationSetupWizard({
       </div>
 
       {step === 1 && (
-        <div className="mt-4 rounded-xl border p-4 text-sm">
+        <div className="mt-4 ap-card p-4 text-sm">
           <p className="font-semibold">1. Email (Gmail o IMAP)</p>
           <ul className="mt-2 space-y-1 text-xs">
             <li>Gmail OAuth: {gmailConnected ? `Connectat (${connectedEmail || 'compte detectat'})` : 'Pendent (falta refresh token)'}</li>
@@ -75,7 +75,7 @@ export default function IntegrationSetupWizard({
       )}
 
       {step === 2 && (
-        <div className="mt-4 rounded-xl border p-4 text-sm">
+        <div className="mt-4 ap-card p-4 text-sm">
           <p className="font-semibold">2. Sincronització de calendari</p>
           <ul className="mt-2 space-y-1 text-xs">
             <li>OAuth Calendar: {googleCalendarConnected ? 'Connectat' : 'Pendent (falta refresh token)'}</li>
@@ -91,7 +91,7 @@ export default function IntegrationSetupWizard({
       )}
 
       {step === 3 && (
-        <div className="mt-4 rounded-xl border p-4 text-sm">
+        <div className="mt-4 ap-card p-4 text-sm">
           <p className="font-semibold">3. Feed ICS (opcional)</p>
           <ul className="mt-2 space-y-1 text-xs">
             <li>Token ICS: {icsFeedConfigured ? 'Generat' : 'Pendent'}</li>

@@ -8,7 +8,7 @@ export default function FaqLayout({ children }: { children: React.ReactNode }) {
 
   if (!allowed) {
     return (
-      <section className="rounded-2xl border p-6">
+      <section className="ap-card p-6">
         <h1 className="text-xl font-semibold">Accés restringit</h1>
         <p className="mt-1 text-sm">
           El rol actual ({role}) no pot editar Contingut.

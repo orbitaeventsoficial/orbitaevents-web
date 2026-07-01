@@ -172,7 +172,7 @@ export default async function EmailsAdminPage() {
       <EmailStatsCards stats={stats} />
 
       {stats.hasQueryErrors && (
-        <section className="rounded-2xl border p-4" data-help-title="Avís de dades parcials" data-help-desc="Indica que alguna consulta ha fallat. El panell segueix operatiu, però algunes xifres poden estar incompletes.">
+        <section className="ap-card p-4" data-help-title="Avís de dades parcials" data-help-desc="Indica que alguna consulta ha fallat. El panell segueix operatiu, però algunes xifres poden estar incompletes.">
           <p className="text-sm">
             ⚠️ Algunes dades no s&apos;han pogut carregar. El panell continua operatiu, però cal revisar migracions/estructura de BD.
           </p>
@@ -181,22 +181,22 @@ export default async function EmailsAdminPage() {
 
       {/* Logs / Automatitzacions */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-help-title="Estat d'automatitzacions" data-help-desc="Resumeix activitat recent del sistema d'emails i l'última execució del cron.">
-        <div className="rounded-2xl border p-5">
+        <div className="ap-card p-5">
           <p className="text-xs uppercase">Emails 24h</p>
           <p className="mt-2 text-2xl font-semibold">{stats.recentEmailActions}</p>
           <p className="text-xs mt-1">Enviats automàticament</p>
         </div>
-        <div className="rounded-2xl border p-5">
+        <div className="ap-card p-5">
           <p className="text-xs uppercase">Testimonis 7d</p>
           <p className="mt-2 text-2xl font-semibold">{stats.recentTestimonials}</p>
           <p className="text-xs mt-1">Respostes rebudes</p>
         </div>
-        <div className="rounded-2xl border p-5">
+        <div className="ap-card p-5">
           <p className="text-xs uppercase">Post-event pendents</p>
           <p className="mt-2 text-2xl font-semibold">{stats.postEventPending}</p>
           <p className="text-xs mt-1">Per enviar</p>
         </div>
-        <div className="rounded-2xl border p-5">
+        <div className="ap-card p-5">
           <p className="text-xs uppercase">Últim cron</p>
           <p className="mt-2 text-sm">
             {stats.cronLastRun

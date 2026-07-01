@@ -239,7 +239,7 @@ export default function CalendarWeekClient() {
             <div
               key={key}
               className={[
-                'flex min-h-[280px] flex-col rounded-2xl border p-3 transition-all',
+                'flex min-h-[280px] flex-col ap-card p-3 transition-all',
                 toneClasses.card,
                 todayClass ? 'ring-2 ring-cyan-400/50' : '',
               ].join(' ')}
@@ -282,7 +282,7 @@ export default function CalendarWeekClient() {
 
               {/* Formulari bloqueig inline */}
               {blockingDate === key && (
-                <div className="mb-2 flex flex-col gap-1.5 rounded-xl border p-2">
+                <div className="mb-2 flex flex-col gap-1.5 ap-card p-2">
                   <input
                     type="text"
                     value={blockNote}
@@ -358,22 +358,27 @@ export default function CalendarWeekClient() {
                     <div className="mt-0.5 text-xs opacity-70">{item.urgency}</div>
                   </Link>
                 ))}
-                {visibleLayers.leads && dayLeads.map((lead) => (
+                {visibleLayers.leads && dayLeads.map((lead) => {
+                  const isLost = lead.status === 'LOST';
+                  return (
                   <Link
                     key={lead.id}
                     href={buildLeadCustomerHref({
                       leadId: lead.id,
                       customerId: lead.customerId,
                     })}
-                    className="block rounded-xl border px-2.5 py-2 transition-all admin-card-glass admin-tone-soft-info"
+                    className={isLost
+                      ? 'block rounded-lg border px-2 py-1 text-xs opacity-60 transition-all'
+                      : 'block rounded-xl border px-2.5 py-2 transition-all admin-card-glass admin-tone-soft-info'}
                   >
-                    <div className="truncate text-xs font-semibold">Nova entrada · {lead.name}</div>
+                    <div className="truncate text-xs font-semibold">{isLost ? 'Perdut' : 'Nova entrada'} · {lead.name}</div>
                     <div className="mt-0.5 text-xs opacity-70">
                       {lead.eventStartTime || '--:--'}{lead.eventEndTime ? ` - ${lead.eventEndTime}` : ''}
-                      {lead.eventType ? ` · ${lead.eventType}` : ''}
+                      {!isLost && lead.eventType ? ` · ${lead.eventType}` : ''}
                     </div>
                   </Link>
-                ))}
+                  );
+                })}
                 {visibleLayers.bookings && dayData.reservas.map((r) => (
                   <Link
                     key={r.id}
