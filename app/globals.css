@@ -3107,6 +3107,9 @@ html.admin-mode .ap-btn {
   white-space: nowrap;
   line-height: 1.4;
   max-width: 100%;
+  /* Target tàctil canònic (UX): mínim 36px desktop; al mòbil creix a 44px (WCAG).
+     Un sol lloc → tots els botons de l'admin respecten la diana tàctil. */
+  min-height: 2.25rem;
 }
 
 html.admin-mode .ap-btn:hover {
@@ -3164,6 +3167,14 @@ html.admin-mode .ap-btn--danger:hover {
 html.admin-mode .ap-btn--xs {
   font-size: 0.7rem;
   padding: 0.25rem 0.625rem;
+  min-height: 1.75rem; /* desktop dens (taules); al mòbil creix a target tàctil */
+}
+
+/* Target tàctil mòbil (UX/WCAG): al mòbil tots els botons ≥44px per ser pitjables.
+   Canònic: viu aquí, cap component ho repeteix. */
+@media (max-width: 640px) {
+  html.admin-mode .ap-btn { min-height: 2.75rem; }
+  html.admin-mode .ap-btn--xs { min-height: 2.5rem; padding-block: 0.5rem; }
 }
 
 /* ── EMPTY STATE ─────────────────────────────────────────────────────────── */

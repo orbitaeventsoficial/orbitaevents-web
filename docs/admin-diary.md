@@ -1,3 +1,24 @@
+## 2026-07-01 — UX: target tàctil canònic als botons (mòbil ≥44px) (Canvi #1317, claude)
+
+### Context
+Prioritat del propietari: UX > colors. Troballa mesurada: 56-104 botons <32px al mòbil (tasks/clientes/presupuestos) = mala diana tàctil (difícils de pitjar).
+
+### Què s'ha fet
+- `.ap-btn`: `min-height: 2.25rem` (36px) base. `.ap-btn--xs`: min-height 1.75rem (denses desktop).
+- Media query mòbil (≤640px): `.ap-btn` → 2.75rem (44px WCAG), `.ap-btn--xs` → 2.5rem + padding vertical. Canònic: 1 sol lloc, TOTS els botons de l'admin respecten la diana tàctil.
+- Verificat a 375px: tasks (57), presupuestos (104), clientes (58) botons → 0 sota target.
+
+### Validació
+- Validació tècnica: validate:core EXIT 0.
+- Validació funcional: mesura a 375px — 0 botons petits (abans 56-104).
+- Validació humana/UX: botons pitjables al mòbil.
+
+### Coordinació
+Counter → 1317. UX real (no cosmètic). Reinici dev net (cache booking-detail.css resolt).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-01 — Consolidació CSS: booking-detail.css ELIMINAT (bd-/bk- → .ap-*) (Canvi #1316, claude+agent)
 
 ### Context

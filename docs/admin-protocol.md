@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1317 — 2026-07-01 — claude (FET)
+**UX: target tàctil canònic als botons (mòbil ≥44px).**
+- .ap-btn min-height 36px base; media query ≤640px → 44px (WCAG). .ap-btn--xs també. 1 lloc → tots responen. Verificat 375px: 56-104 botons petits → 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1317`; el següent canvi real ha de ser `#1318`.
+- Validació tècnica: validate:core EXIT 0.
+- Validació funcional: 0 botons sota target a 375px.
+- Validació humana/UX: botons pitjables al mòbil.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1314 — 2026-07-01 — codex (FET)
 **Front públic: capçaleres, portal i estats passen a gramàtica canònica.**
 - `app/components/public/PublicPageHeader.tsx`: nou component canònic per a capçaleres públiques simples, amb títol, descripció, eyebrow opcional, alineació i espaiat tancat (`default`/`compact`/`none`), sense `className` arbitrari.
