@@ -133,7 +133,7 @@ export default function CalendarWeekClient() {
   return (
     <AdminPage title="Calendari" subtitle="Visualitza reserves, bloquejos i feina planificada per executar el negoci.">
       {/* Barra superior */}
-      <div className="flex flex-col gap-3 rounded-2xl border admin-card-glass p-3 sm:p-4 md:flex-row md:items-center md:justify-between" {...helpAttrs(ADMIN_CALENDAR_HELP.weekNavigation)}>
+      <div className="ap-card flex flex-col gap-3 p-3 sm:p-4 md:flex-row md:items-center md:justify-between" {...helpAttrs(ADMIN_CALENDAR_HELP.weekNavigation)}>
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
@@ -201,7 +201,7 @@ export default function CalendarWeekClient() {
       </div>
 
 
-      <div className="flex flex-wrap items-center gap-2 rounded-xl border admin-card-glass px-3 py-2 text-xs">
+      <div className="ap-card flex flex-wrap items-center gap-2 px-3 py-2 text-xs">
         <span className="font-semibold opacity-60">Capes:</span>
         {[
           ['bookings', 'Reserves'],
@@ -328,7 +328,7 @@ export default function CalendarWeekClient() {
                   <Link
                     key={task.id}
                     href="/admin/tasks"
-                    className="block rounded-xl border px-2.5 py-2 transition-all admin-card-glass admin-tone-soft-info"
+                    className="ap-card block px-2.5 py-2 transition-all admin-tone-soft-info"
                   >
                     <div className="truncate text-xs font-semibold">✓ {task.title}</div>
                     <div className="mt-0.5 text-xs opacity-70">{resolveWorkTimeLabel(task.dueDate)} · {task.priority}</div>
@@ -338,7 +338,7 @@ export default function CalendarWeekClient() {
                   <Link
                     key={post.id}
                     href="/admin/social"
-                    className="block rounded-xl border px-2.5 py-2 transition-all admin-card-glass admin-tone-soft-warning"
+                    className="ap-card block px-2.5 py-2 transition-all admin-tone-soft-warning"
                   >
                     <div className="truncate text-xs font-semibold">📣 {post.title}</div>
                     <div className="mt-0.5 text-xs opacity-70">{resolveWorkTimeLabel(post.scheduledAt)} · {post.platforms.join(', ')}</div>
@@ -369,7 +369,7 @@ export default function CalendarWeekClient() {
                     })}
                     className={isLost
                       ? 'block rounded-lg border px-2 py-1 text-xs opacity-60 transition-all'
-                      : 'block rounded-xl border px-2.5 py-2 transition-all admin-card-glass admin-tone-soft-info'}
+                      : 'block rounded-xl border px-2.5 py-2 transition-all admin-tone-soft-info'}
                   >
                     <div className="truncate text-xs font-semibold">{isLost ? 'Perdut' : 'Nova entrada'} · {lead.name}</div>
                     <div className="mt-0.5 text-xs opacity-70">
@@ -383,7 +383,7 @@ export default function CalendarWeekClient() {
                   <Link
                     key={r.id}
                     href={buildBookingHref(r.id)}
-                    className="block rounded-xl border px-2.5 py-2 transition-all admin-card-glass"
+                    className="ap-card block px-2.5 py-2 transition-all"
                   >
                     <div className="flex items-center justify-between gap-1">
                       <span className="text-xs font-semibold truncate">

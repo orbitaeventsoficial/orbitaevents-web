@@ -203,7 +203,7 @@ function renderHealthCard(item: AdminHealthItem, sectionLabel: string) {
   return (
     <article
       key={item.id}
-      className={`ap-card p-4 admin-card-glass ${STATUS_TONE[item.status]}`}
+      className={`ap-card p-4 ${STATUS_TONE[item.status]}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
@@ -310,7 +310,7 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
         ]}
       />
 
-      <section className="rounded-2xl border border-[var(--line)] p-4 admin-card-glass" {...helpAttrs(ADMIN_SALUT_HELP.filters)}>
+      <section className="ap-card p-4" {...helpAttrs(ADMIN_SALUT_HELP.filters)}>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <p className="text-sm font-semibold text-[var(--t2)]">Filtra el que vols veure</p>
@@ -339,7 +339,7 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
       </section>
 
       {priorityItems.length > 0 ? (
-        <section className="rounded-2xl border border-[var(--line)] p-4 admin-card-glass" {...helpAttrs(ADMIN_SALUT_HELP.priorities)}>
+        <section className="ap-card p-4" {...helpAttrs(ADMIN_SALUT_HELP.priorities)}>
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-[var(--t3)]">Prioritat d’avui</p>
@@ -399,7 +399,7 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
               {hasSubgroups ? (
                 <div className="space-y-4">
                   {groups.map((group) => (
-                    <section key={group.id} className="rounded-2xl border border-[var(--line)] p-4 admin-card-glass">
+                    <section key={group.id} className="ap-card p-4">
                       <div className="mb-4 flex items-start justify-between gap-3">
                         <div>
                           <p className="text-xs font-semibold uppercase tracking-wide text-[var(--t3)]">{section.label}</p>

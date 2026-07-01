@@ -52,7 +52,7 @@ export default function EmailConfigPanel() {
   };
 
   return (
-    <section className="overflow-hidden rounded-2xl border admin-card-glass" data-help-title="Configuració d'emails" data-help-desc="Ajusta la configuració base del sistema: Google Reviews, retard post-event, automatismes actius i percentatges de descompte.">
+    <section className="ap-card overflow-hidden" data-help-title="Configuració d'emails" data-help-desc="Ajusta la configuració base del sistema: Google Reviews, retard post-event, automatismes actius i percentatges de descompte.">
       <div className="border-b px-6 py-4">
         <h2 className="font-semibold">⚙️ Configuració</h2>
       </div>

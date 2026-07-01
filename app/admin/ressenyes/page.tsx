@@ -250,7 +250,7 @@ export default function AdminRessenyesPage() {
           transition={{ duration: shouldReduceMotion ? 0 : 0.18 }}
         >
         {activeList.length === 0 && (
-          <div className="rounded-2xl border admin-card-glass p-6 text-center text-[var(--t3)]">
+          <div className="ap-card p-6 text-center text-[var(--t3)]">
             {activeTab === 'pending'
               ? 'Cap ressenya pendent. Tot al dia!'
               : 'Cap ressenya aprovada encara.'}
@@ -258,7 +258,7 @@ export default function AdminRessenyesPage() {
         )}
 
         {activeList.map((t) => (
-          <div key={t.id} className="rounded-2xl border admin-card-glass p-6">
+          <div key={t.id} className="ap-card p-6">
             <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
               <div>
                 <div className="flex items-center gap-2">

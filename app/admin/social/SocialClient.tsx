@@ -277,7 +277,7 @@ export default function SocialClient({
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
-      <section className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+      <section className="ap-card p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)]">Bucle social únic</p>
@@ -292,22 +292,22 @@ export default function SocialClient({
       </section>
 
       <section className="grid gap-3 lg:grid-cols-4">
-        <article className={`admin-card-glass ap-card p-4 ${pulseRisk ? 'admin-tone-border-warning admin-tone-bg-warning' : 'admin-tone-border-success admin-tone-bg-success'}`}>
+        <article className={`ap-card p-4 ${pulseRisk ? 'admin-tone-border-warning admin-tone-bg-warning' : 'admin-tone-border-success admin-tone-bg-success'}`}>
           <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)]">Pols editorial</p>
           <h2 className="mt-2 text-base font-bold leading-snug">{pulse.isActive ? 'Actiu' : 'Aturat'}</h2>
           <p className="mt-2 text-xs leading-relaxed text-[var(--t2)]">{pulseSummary}</p>
         </article>
-        <article className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+        <article className="ap-card p-4">
           <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)]">Cadència</p>
           <p className="mt-2 text-2xl font-bold">{pulse.consistencyScore}%</p>
           <p className="mt-1 text-xs text-[var(--t2)]">{pulse.postsLast30d} peces creades · {pulse.scheduledUpcoming} programades</p>
         </article>
-        <article className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+        <article className="ap-card p-4">
           <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)]">Cua editorial</p>
           <p className="mt-2 text-2xl font-bold">{pulse.draftsPending}</p>
           <p className="mt-1 text-xs text-[var(--t2)]">esborranys pendents de decisió</p>
         </article>
-        <article className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+        <article className="ap-card p-4">
           <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)]">Instagram → pipeline</p>
           <p className="mt-2 text-2xl font-bold">{pulse.instagramLeadCount}</p>
           <p className="mt-1 text-xs text-[var(--t2)]">{pulse.instagramWonCount} guanyats · {instagramConversionRate}% conversió</p>
@@ -321,7 +321,7 @@ export default function SocialClient({
             key={key}
             onClick={() => setStatusFilter(statusFilter === key ? 'all' : key)}
             type="button"
-            className={`admin-stagger-item ap-card p-3 text-left transition-colors ${statusFilter === key ? STATUS_TONE[key] : 'border-[var(--line)] admin-card-glass adm-row-hover'}`}
+            className={`admin-stagger-item ap-card p-3 text-left transition-colors ${statusFilter === key ? STATUS_TONE[key] : 'border-[var(--line)] adm-row-hover'}`}
           >
             <p className="text-xs font-semibold uppercase tracking-wider opacity-60">{label}</p>
             <p className="mt-1 text-xl font-bold">{counts[key as SocialPostStatus]}</p>
@@ -366,7 +366,7 @@ export default function SocialClient({
 
       {/* Ideas Panel — auto-generades des de bookings, testimonials, portfolio i events futurs */}
       {ideas.length > 0 && (
-        <div className="rounded-xl border admin-tone-border-violet admin-tone-bg-violet p-4 admin-card-glass">
+        <div className="ap-card admin-tone-border-violet admin-tone-bg-violet p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h3 className="text-sm font-semibold flex items-center gap-2">
@@ -390,7 +390,7 @@ export default function SocialClient({
               {ideas.map((idea) => (
                 <div
                   key={idea.id}
-                  className="admin-stagger-item rounded-lg border border-[var(--line)] admin-card-glass p-3 adm-row-hover transition-colors"
+                  className="ap-card admin-stagger-item p-3 adm-row-hover transition-colors"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
@@ -447,7 +447,7 @@ export default function SocialClient({
             </div>
           ) : (
             filteredPosts.map((post) => (
-              <div key={post.id} className="admin-stagger-item rounded-xl border border-[var(--line)] admin-card-glass p-4 adm-row-hover transition-colors">
+              <div key={post.id} className="ap-card admin-stagger-item p-4 adm-row-hover transition-colors">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -540,7 +540,7 @@ export default function SocialClient({
             </button>
           </div>
           <div className="overflow-x-auto rounded-xl">
-            <div className="grid min-w-[720px] grid-cols-7 gap-px overflow-x-auto rounded-xl border border-[var(--line)] overflow-hidden admin-card-glass">
+            <div className="ap-card grid min-w-[720px] grid-cols-7 gap-px overflow-x-auto overflow-hidden">
             {['Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds', 'Dg'].map((d) => (
               <div key={d} className="bg-[var(--o-admin-fill-3)] p-2 text-center text-xs font-semibold uppercase tracking-wider opacity-50">
                 {d}

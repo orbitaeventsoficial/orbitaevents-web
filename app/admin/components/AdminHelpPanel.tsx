@@ -22,7 +22,7 @@ export function AdminHelpPanel({
   if (items.length === 0) return null;
 
   return (
-    <section className={`space-y-3 ap-card p-4 admin-card-glass ${className}`}>
+    <section className={`space-y-3 ap-card p-4 ${className}`}>
       <div className="space-y-1">
         <h2 className="text-base font-semibold">{title}</h2>
         {description ? <p className="text-sm text-[var(--t2)]">{description}</p> : null}

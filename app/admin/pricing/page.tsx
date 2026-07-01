@@ -365,7 +365,7 @@ export default function PricingAdminPage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="rounded-2xl border admin-card-glass p-6">
+            <div className="ap-card p-6">
               <h3 className="ap-h2 mb-4 flex items-center gap-2">
                 <span className="text-2xl">🏆</span>
                 Extras Més Venuts
@@ -388,7 +388,7 @@ export default function PricingAdminPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl border admin-card-glass p-6">
+            <div className="ap-card p-6">
               <h3 className="ap-h2 mb-4 flex items-center gap-2">
                 <span className="text-2xl">🎯</span>
                 Packs Més Populars
@@ -412,7 +412,7 @@ export default function PricingAdminPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border admin-card-glass p-6">
+          <div className="ap-card p-6">
             <h3 className="font-bold mb-3 flex items-center gap-2">
               <span className="text-xl">💡</span>
               Com funciona aquesta pàgina
@@ -453,7 +453,7 @@ export default function PricingAdminPage() {
       {activeTab === 'tarifes' && (
         <div className="space-y-6">
           {/* Tarifes per servei */}
-          <div className="rounded-xl border border-[var(--line)] p-6 admin-card-glass">
+          <div className="ap-card p-6">
             <h3 className="ap-h2 mb-1">Tarifes per servei (€/h facturable)</h3>
             <p className="text-sm opacity-50 mb-5">Mercat DJ professional Barcelona. Hores facturables = inici → fi del bolo.</p>
             <table className="w-full text-sm">
@@ -502,7 +502,7 @@ export default function PricingAdminPage() {
           </div>
 
           {/* Gradient de marge */}
-          <div className="rounded-xl border border-[var(--line)] p-6 admin-card-glass">
+          <div className="ap-card p-6">
             <h3 className="ap-h2 mb-1">Escala de marge</h3>
             <p className="text-sm opacity-50 mb-5">A pitjor marge, color més brillant i cridaner.</p>
             <div className="flex gap-2 flex-wrap">
@@ -517,7 +517,7 @@ export default function PricingAdminPage() {
           </div>
 
           {/* Cost amortització equip */}
-          <div className="rounded-xl border border-[var(--line)] p-6 admin-card-glass">
+          <div className="ap-card p-6">
             <h3 className="ap-h2 mb-1">Cost real d'amortització per hora</h3>
             <p className="text-sm opacity-50 mb-5">Fallback per categoria. S'usa si l'ítem d'inventari no té dades de compra.</p>
             <table className="w-full text-sm">
@@ -560,7 +560,7 @@ export default function PricingAdminPage() {
             {filteredExtras.map(extra => (
               <div
                 key={extra.id}
-                className={`rounded-2xl border-2 overflow-hidden transition-all ${editingExtra === extra.id ? 'admin-tone-border-info admin-tone-bg-info' : 'admin-tone-border-neutral admin-tone-bg-neutral admin-card-glass'}`}
+                className={`rounded-2xl border-2 overflow-hidden transition-all ${editingExtra === extra.id ? 'admin-tone-border-info admin-tone-bg-info' : 'admin-tone-border-neutral admin-tone-bg-neutral'}`}
               >
                 <div className="p-6">
                   <div className="flex items-start justify-between">
@@ -663,7 +663,7 @@ export default function PricingAdminPage() {
             ))}
 
             {filteredExtras.length === 0 && (
-              <div className="rounded-2xl border admin-card-glass p-8 text-center text-sm">
+              <div className="ap-card p-8 text-center text-sm">
                 No hi ha extres dins d'aquest focus.
               </div>
             )}
@@ -688,7 +688,7 @@ export default function PricingAdminPage() {
 
           <div className="grid gap-4">
             {filteredPacks.map(pack => (
-              <div key={pack.id} className="rounded-2xl border admin-card-glass overflow-hidden">
+              <div key={pack.id} className="ap-card overflow-hidden">
                 <div className="p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -765,7 +765,7 @@ export default function PricingAdminPage() {
             ))}
 
             {filteredPacks.length === 0 && (
-              <div className="rounded-2xl border admin-card-glass p-8 text-center text-sm">
+              <div className="ap-card p-8 text-center text-sm">
                 No hi ha packs dins d'aquest focus.
               </div>
             )}
@@ -815,7 +815,7 @@ export default function PricingAdminPage() {
               const statusDisplay = getInventoryStatusDisplay(item.status);
 
               return (
-                <div key={item.id} className="rounded-2xl border admin-card-glass p-4 transition-colors">
+                <div key={item.id} className="ap-card p-4 transition-colors">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className={`w-12 h-12 ${categoryTone} rounded-xl flex items-center justify-center text-2xl`}>
@@ -902,7 +902,7 @@ function StatCard({
   const style = styles[color];
 
   return (
-    <div className={`admin-card-glass p-4 sm:p-5 ${style}`}>
+    <div className={`p-4 sm:p-5 ${style}`}>
       <div className="flex items-center justify-between mb-3">
         <span className="text-3xl">{icon}</span>
       </div>

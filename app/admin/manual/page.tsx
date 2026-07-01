@@ -137,22 +137,22 @@ export default async function AdminManualPage() {
       subtitle="Mapa pràctic per saber què existeix avui, què fa el sistema sol, què continua sent manual i on has d’entrar per aprofitar-ho."
     >
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Àrees cobertes</p>
           <p className="mt-2 text-3xl font-bold">{ADMIN_MANUAL_SECTIONS.length}</p>
           <p className="mt-1 text-xs opacity-60">Negoci, operativa, social, finances i sistema.</p>
         </div>
-        <div className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Flux operatiu</p>
           <p className="mt-2 text-3xl font-bold">{totalOperatingFlowSteps}</p>
           <p className="mt-1 text-xs opacity-60">Passos del cicle captar, convertir, executar, cobrar i reactivar.</p>
         </div>
-        <div className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Govern visual alineat</p>
           <p className="mt-2 text-3xl font-bold">{totalVisualAligned}</p>
           <p className="mt-1 text-xs opacity-60">Workspaces que ja parlen en mode propietari.</p>
         </div>
-        <div className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Roadmap pendent</p>
           <p className="mt-2 text-3xl font-bold">{roadmapPendingCount}</p>
           <p className="mt-1 text-xs opacity-60">{roadmapDoneCount} ja construïdes · {roadmapPendingCount} per atacar.</p>
@@ -162,7 +162,7 @@ export default async function AdminManualPage() {
       <AdminSection title="Què hi ha avui" description="La lectura ràpida perquè no hagis de recordar de cap què té el producte ni què és automàtic o manual.">
         <div className="grid gap-3 xl:grid-cols-2">
           {ADMIN_MANUAL_SNAPSHOT.map((section) => (
-            <article key={section.title} className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+            <article key={section.title} className="ap-card p-4">
               <h2 className="text-base font-bold leading-snug">{section.title}</h2>
               <p className="mt-2 text-sm leading-relaxed opacity-70">{section.description}</p>
               <ul className="mt-4 space-y-2 text-sm leading-relaxed opacity-80">
@@ -180,7 +180,7 @@ export default async function AdminManualPage() {
       <AdminSection title="Sistema operatiu de punta a punta" description="La narrativa única del producte: cada workspace existeix perquè una demanda avanci cap a reserva, cobrament i recurrència.">
         <div className="grid gap-3 xl:grid-cols-2">
           {ADMIN_MANUAL_OPERATING_FLOW.map((item) => (
-            <article key={item.step} className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+            <article key={item.step} className="ap-card p-4">
               <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
                   <p className="text-xs font-bold uppercase tracking-wider admin-tone-text-info">Pas {item.step}</p>
@@ -227,7 +227,7 @@ export default async function AdminManualPage() {
       <AdminSection title="Punts de control del flux" description="Els gates que impedeixen que el sistema avanci per inèrcia: cada pas ha de deixar una decisió clara abans de passar al següent.">
         <div className="grid gap-3 lg:grid-cols-2">
           {ADMIN_MANUAL_OPERATING_GATES.map((gate) => (
-            <article key={gate.step} className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+            <article key={gate.step} className="ap-card p-4">
               <div className="flex min-w-0 items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-xs font-bold uppercase tracking-wider admin-tone-text-info">Gate pas {gate.step}</p>
@@ -258,7 +258,7 @@ export default async function AdminManualPage() {
       <AdminSection title="Checklist de pas" description="Definició operativa de tancament: què ha d’estar resolt abans de considerar que una fase del sistema està feta.">
         <div className="grid gap-3 lg:grid-cols-2">
           {ADMIN_MANUAL_OPERATING_STEP_CHECKLIST.map((item) => (
-            <article key={item.step} className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+            <article key={item.step} className="ap-card p-4">
               <div className="flex min-w-0 items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-xs font-bold uppercase tracking-wider admin-tone-text-info">Pas {item.step}</p>
@@ -284,7 +284,7 @@ export default async function AdminManualPage() {
       <AdminSection title="Matriu d’excepcions" description="Quan un pas queda bloquejat, el manual diu quin primer moviment toca i on resoldre'l abans de deixar que el flux avanci.">
         <div className="grid gap-3 lg:grid-cols-2">
           {ADMIN_MANUAL_OPERATING_EXCEPTIONS.map((item) => (
-            <article key={item.step} className="admin-card-glass rounded-2xl border admin-tone-border-warning admin-tone-bg-warning p-4">
+            <article key={item.step} className="ap-card admin-tone-border-warning admin-tone-bg-warning p-4">
               <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
                   <p className="text-xs font-bold uppercase tracking-wider admin-tone-text-warning">
@@ -313,7 +313,7 @@ export default async function AdminManualPage() {
       <AdminSection title="Evidències de tancament" description="El rastre material que ha de quedar dins l’admin perquè cada pas es pugui considerar realment resolt, no només comentat de memòria.">
         <div className="grid gap-3 lg:grid-cols-2">
           {ADMIN_MANUAL_OPERATING_EVIDENCE.map((item) => (
-            <article key={item.step} className="admin-card-glass rounded-2xl border admin-tone-border-success admin-tone-bg-success p-4">
+            <article key={item.step} className="ap-card admin-tone-border-success admin-tone-bg-success p-4">
               <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
                   <p className="text-xs font-bold uppercase tracking-wider admin-tone-text-success">
@@ -342,7 +342,7 @@ export default async function AdminManualPage() {
       <AdminSection title="Handoffs entre passos" description="Què ha de quedar entregat perquè el següent workspace pugui treballar sense reinterpretar memòria, notes soltes o intuïció.">
         <div className="grid gap-3 lg:grid-cols-2">
           {ADMIN_MANUAL_OPERATING_HANDOFFS.map((handoff) => (
-            <article key={`${handoff.fromStep}-${handoff.toStep}`} className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+            <article key={`${handoff.fromStep}-${handoff.toStep}`} className="ap-card p-4">
               <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
                   <p className="text-xs font-bold uppercase tracking-wider admin-tone-text-info">
@@ -374,7 +374,7 @@ export default async function AdminManualPage() {
       <AdminSection title="Cobertura del sistema" description="Lectura inversa del mapa: quines eines sostenen cada pas del flux i on hi ha més o menys suport operatiu.">
         <div className="grid gap-3 lg:grid-cols-3">
           {capabilitiesByFlowStep.map((step) => (
-            <article key={step.step} className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+            <article key={step.step} className="ap-card p-4">
               <div className="flex min-w-0 items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-xs font-bold uppercase tracking-wider admin-tone-text-info">Pas {step.step}</p>
@@ -404,7 +404,7 @@ export default async function AdminManualPage() {
       <AdminSection title="Preguntes pràctiques" description="Respostes curtes a les preguntes que normalment acaben quedant a memòria i després es perden.">
         <div className="grid gap-3 lg:grid-cols-2">
           {ADMIN_MANUAL_REALITY_CHECKS.map((item) => (
-            <article key={item.question} className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+            <article key={item.question} className="ap-card p-4">
               <p className="text-xs font-bold uppercase tracking-wider admin-tone-text-info">Pregunta real</p>
               <h2 className="mt-1 text-base font-bold leading-snug">{item.question}</h2>
               <p className="mt-3 text-sm leading-relaxed opacity-75">{item.answer}</p>
@@ -416,7 +416,7 @@ export default async function AdminManualPage() {
       <AdminSection title="Frontera d’automatització" description="La regla bona és aquesta: manual només on hi ha risc real, aprovació sensible o excepció. La resta s’ha d’anar absorbint pel sistema.">
         <div className="grid gap-3 lg:grid-cols-2">
           {ADMIN_MANUAL_AUTOMATION_FRONTIER.map((item) => (
-            <article key={item.title} className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+            <article key={item.title} className="ap-card p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <h2 className="text-base font-bold leading-snug">{item.title}</h2>
@@ -446,7 +446,7 @@ export default async function AdminManualPage() {
           {ADMIN_MANUAL_VISUAL_GOVERNANCE.map((section) => {
             const style = visualGovernanceStyle[section.status];
             return (
-              <article key={section.title} className={`admin-card-glass ap-card p-4 ${style.panel}`}>
+              <article key={section.title} className={`ap-card p-4 ${style.panel}`}>
                 <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
                     <h2 className="text-base font-bold leading-snug">{section.title}</h2>
@@ -487,7 +487,7 @@ export default async function AdminManualPage() {
       <AdminSection title="Com s’ha d’utilitzar" description="No és una enciclopèdia: és un mapa per decidir ràpid on actuar.">
         <div className="grid gap-3 md:grid-cols-3">
           {ADMIN_MANUAL_PRINCIPLES.map((principle) => (
-            <article key={principle.title} className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+            <article key={principle.title} className="ap-card p-4">
               <h2 className="text-sm font-bold">{principle.title}</h2>
               <p className="mt-2 text-sm leading-relaxed opacity-70">{principle.description}</p>
             </article>
@@ -498,7 +498,7 @@ export default async function AdminManualPage() {
       <AdminSection title="Ritme operatiu" description="La rutina mínima perquè el producte funcioni com un sistema, no com una col·lecció de pantalles.">
         <div className="grid gap-3 lg:grid-cols-4">
           {ADMIN_MANUAL_OPERATING_RHYTHM.map((item) => (
-            <article key={item.cadence} className="admin-card-glass flex min-h-full flex-col rounded-2xl border border-[var(--line)] p-4">
+            <article key={item.cadence} className="ap-card flex min-h-full flex-col p-4">
               <p className="text-xs font-bold uppercase tracking-wider admin-tone-text-info">{item.cadence}</p>
               <h2 className="mt-2 text-sm font-bold leading-snug">{item.title}</h2>
               <p className="mt-2 text-sm leading-relaxed opacity-75">{item.objective}</p>
@@ -533,7 +533,7 @@ export default async function AdminManualPage() {
           <AdminSection key={section.title} title={<span>{section.icon} {section.title}</span>} description={section.summary}>
             <div className="grid gap-3 lg:grid-cols-3">
               {section.capabilities.map((capability) => (
-                <article key={capability.title} className={`admin-card-glass rounded-2xl border border-[var(--line)] p-4 ${toneClass[capability.tone]}`}>
+                <article key={capability.title} className={`ap-card border-[var(--line)] p-4 ${toneClass[capability.tone]}`}>
                   <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
                       <h3 className="text-base font-bold leading-snug">{capability.title}</h3>
@@ -770,7 +770,7 @@ export default async function AdminManualPage() {
                 <p className="mt-1 mb-4 text-sm leading-relaxed opacity-75">{ADMIN_MARKETING_PHASE_SUMMARY[phase]}</p>
                 <div className="space-y-2">
                   {actions.map((action) => (
-                    <div key={action.id} className="admin-card-glass rounded-xl border border-[var(--line)] p-3">
+                    <div key={action.id} className="ap-card p-3">
                       <h4 className="text-sm font-bold">{action.title}</h4>
                       <p className="mt-1 text-xs leading-relaxed opacity-70">{action.description}</p>
                       <div className="mt-2 flex flex-wrap gap-1.5 text-xs font-semibold uppercase tracking-wider opacity-60">
@@ -790,7 +790,7 @@ export default async function AdminManualPage() {
       <AdminSection title="Mètriques de màrqueting que has de mirar" description="Sense mesurar-les, no saps si estàs gastant bé els diners.">
         <div className="grid gap-3 md:grid-cols-2">
           {ADMIN_MARKETING_METRICS.map((metric) => (
-            <article key={metric.name} className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+            <article key={metric.name} className="ap-card p-4">
               <h3 className="text-sm font-bold">{metric.name}</h3>
               <p className="mt-2 text-sm leading-relaxed opacity-70">{metric.description}</p>
             </article>
@@ -801,7 +801,7 @@ export default async function AdminManualPage() {
       <AdminSection title="Playbook de màrqueting" description="Rutina simple per saber què fer, com fer-ho, quan fer-ho i quin mòdul obrir. Pensat per arribar a més clients sense improvisar.">
         <div className="grid gap-3 lg:grid-cols-2">
           {ADMIN_MARKETING_PLAYBOOK.map((item) => (
-            <article key={item.title} className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+            <article key={item.title} className="ap-card p-4">
               <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
                   <p className="text-xs font-bold uppercase tracking-wider admin-tone-text-warning">{item.cadence}</p>
@@ -835,7 +835,7 @@ export default async function AdminManualPage() {
 
       <AdminSection title="Criteri de canals i Google Ads" description="Si no entren leads, no es posa més pasta a cegues: primer es mira entrega, clic, conversió, qualitat i marge.">
         <div className="grid gap-3 lg:grid-cols-2">
-          <article className="admin-card-glass rounded-2xl border admin-tone-border-danger admin-tone-bg-danger p-4 lg:col-span-2">
+          <article className="ap-card admin-tone-border-danger admin-tone-bg-danger p-4 lg:col-span-2">
             <p className="text-xs font-bold uppercase tracking-wider admin-tone-text-danger">Regla dura</p>
             <h2 className="mt-1 text-xl font-bold">0 leads = coll d’ampolla abans que pressupost</h2>
             <p className="mt-2 max-w-3xl text-sm leading-relaxed opacity-75">
@@ -849,7 +849,7 @@ export default async function AdminManualPage() {
           </article>
 
           {ADMIN_MARKETING_CHANNELS.map((channel) => (
-            <article key={channel.platform} className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+            <article key={channel.platform} className="ap-card p-4">
               <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
                   <h3 className="text-base font-bold leading-snug">{channel.platform}</h3>
@@ -884,7 +884,7 @@ export default async function AdminManualPage() {
       <AdminSection title="Semàfor Google Ads" description="Criteri inicial per decidir si una campanya arriba a prou gent, si converteix i si es pot escalar.">
         <div className="grid gap-3 lg:grid-cols-2">
           {ADMIN_GOOGLE_ADS_DECISION_RULES.map((rule) => (
-            <article key={rule.metric} className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+            <article key={rule.metric} className="ap-card p-4">
               <p className="text-xs font-bold uppercase tracking-wider admin-tone-text-info">{rule.metric}</p>
               <h3 className="mt-1 text-base font-bold leading-snug">{rule.question}</h3>
               <div className="mt-4 grid gap-2">
@@ -920,7 +920,7 @@ export default async function AdminManualPage() {
             return (
               <article
                 key={item.id}
-                className={`admin-card-glass flex flex-col gap-3 ap-card p-4 ${
+                className={`flex flex-col gap-3 ap-card p-4 ${
                   item.status === 'DONE' ? 'admin-tone-border-success admin-tone-bg-success' : 'border-[var(--line)]'
                 }`}
               >

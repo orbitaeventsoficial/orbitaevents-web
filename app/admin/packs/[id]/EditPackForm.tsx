@@ -704,7 +704,7 @@ export default function EditPackForm({
           </div>
 
           {bundles.length > 0 && (
-            <div className="mb-3 rounded-2xl border admin-card-glass p-4">
+            <div className="ap-card mb-3 p-4">
               <p className="mb-2 text-xs font-semibold uppercase tracking-wide">Lots d'equip</p>
               <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
                 {bundles.map((bundle) => {

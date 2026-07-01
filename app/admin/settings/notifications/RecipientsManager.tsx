@@ -133,7 +133,7 @@ export function RecipientsManager() {
 
   if (loading) {
     return (
-      <section className="ap-card p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm">
         <h2 className="mb-4 ap-h2">📬 Destinataris de notificacions</h2>
         <p className="text-sm text-[var(--t2)]">Carregant…</p>
       </section>
@@ -141,7 +141,7 @@ export function RecipientsManager() {
   }
 
   return (
-    <section className="ap-card p-6 shadow-sm admin-card-glass">
+    <section className="ap-card p-6 shadow-sm">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="ap-h2">📬 Destinataris de notificacions</h2>

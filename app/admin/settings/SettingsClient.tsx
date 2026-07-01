@@ -148,7 +148,7 @@ export default function SettingsClient({
         const config = categoryConfig[category] || { label: category, icon: '??', description: '' };
 
         return (
-          <section key={category} className="overflow-hidden rounded-2xl border admin-card-glass">
+          <section key={category} className="ap-card overflow-hidden">
             <div className="border-b p-4">
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{config.icon}</span>

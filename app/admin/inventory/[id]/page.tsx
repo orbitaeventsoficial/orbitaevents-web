@@ -101,7 +101,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
 
       {/* KPIs */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Valor Actual</p>
           <p className="mt-2 text-3xl font-bold">
             {item.purchasePrice ? `${formatNumber(currentValue)}€` : `${formatNumber(item.value)}€`}
@@ -112,7 +112,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
             </p>
           )}
         </div>
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Hores Acumulades</p>
           <p className="mt-2 text-3xl font-bold">
             {formatNumber(item.totalHoursUsed)}h
@@ -121,7 +121,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
             de {formatNumber(item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS)}h vida útil
           </p>
         </div>
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Cost / Hora</p>
           <p className="mt-2 text-3xl font-bold">
             {item.purchasePrice ? `${formatNumber(costPerHour)}€` : '—'}
@@ -132,7 +132,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
             </p>
           )}
         </div>
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Vida Restant</p>
           <p className="mt-2 text-3xl font-bold">
             {lifeRemaining}%
@@ -217,7 +217,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
 
       {/* Packs vinculats */}
       {item.packItems.length > 0 && (
-        <section className="rounded-2xl border admin-card-glass p-6">
+        <section className="ap-card p-6">
           <h2 className="ap-h2 mb-4">Packs vinculats</h2>
           <div className="flex flex-wrap gap-2">
             {item.packItems.map((pi) => {
@@ -243,7 +243,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
       )}
 
       {/* Historial de bolos */}
-      <section className="rounded-2xl border admin-card-glass overflow-hidden">
+      <section className="ap-card overflow-hidden">
         <div className="border-b p-4">
           <h2 className="font-semibold">
             Historial de bolos
@@ -312,7 +312,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
       </section>
 
       {/* Historial d'ús (hores) */}
-      <section className="rounded-2xl border admin-card-glass overflow-hidden">
+      <section className="ap-card overflow-hidden">
         <div className="border-b p-4">
           <h2 className="font-semibold">
             Historial d&apos;ús

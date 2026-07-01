@@ -234,7 +234,7 @@ export default function SettingsNotificationsPage() {
         }}
       />
 
-      <section className="ap-card p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm">
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="ap-h2">Radar viu de notificacions</h2>
@@ -283,7 +283,7 @@ export default function SettingsNotificationsPage() {
         />
       </div>
 
-      <section className="ap-card p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm">
         <div className="mb-4">
           <h2 className="ap-h2">Cobertura real dels avisos</h2>
           <p className="text-sm text-[var(--t2)]">Per cada tipus d’alerta, veus quins canals tens realment operatius i on falla la cadena.</p>
@@ -343,7 +343,7 @@ export default function SettingsNotificationsPage() {
         </div>
       </section>
 
-      <section className="ap-card p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm">
         <h2 className="mb-4 ap-h2">🧪 Test d'Email</h2>
 
         {testResult && <ResultBox success={testResult.success} message={testResult.message} />}
@@ -361,7 +361,7 @@ export default function SettingsNotificationsPage() {
         {!config?.status.emailReady && <p className="mt-2 text-sm">Configura primer les variables SMTP per poder testejar</p>}
       </section>
 
-      <section className="ap-card p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm">
         <h2 className="mb-4 ap-h2">🤖 Pilot automàtic comercial</h2>
 
         <div className="grid gap-3 text-sm">
@@ -423,7 +423,7 @@ export default function SettingsNotificationsPage() {
 
       <RecipientsManager />
 
-      <section className="ap-card p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm">
         <h2 className="mb-4 ap-h2">⚙️ Configuració Actual</h2>
 
         <div className="space-y-4">
@@ -454,7 +454,7 @@ export default function SettingsNotificationsPage() {
       </section>
 
       {instructions.length > 0 && !config?.status.emailReady && (
-        <section className="ap-card p-6 shadow-sm admin-card-glass">
+        <section className="ap-card p-6 shadow-sm">
           <h2 className="mb-4 ap-h2">📝 Instruccions de Configuració</h2>
 
           {instructions.map((instruction, index) => (
@@ -465,7 +465,7 @@ export default function SettingsNotificationsPage() {
         </section>
       )}
 
-      <section className="ap-card p-6 shadow-sm admin-card-glass">
+      <section className="ap-card p-6 shadow-sm">
         <h2 className="mb-4 ap-h2">📚 Referència Ràpida</h2>
 
         <div className="prose prose-sm max-w-none">

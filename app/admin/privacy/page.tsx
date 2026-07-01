@@ -273,23 +273,23 @@ export default function AdminPrivacyPage() {
       {/* KPI cards */}
       {stats && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-          <div className="rounded-2xl border admin-card-glass p-4">
+          <div className="ap-card p-4">
             <p className="text-2xl font-bold">{stats.consents.total}</p>
             <p className="text-xs opacity-60">Consentiments totals</p>
           </div>
-          <div className="rounded-2xl border admin-card-glass p-4">
+          <div className="ap-card p-4">
             <p className="text-2xl font-bold">{stats.consents.active}</p>
             <p className="text-xs opacity-60">Consentiments actius</p>
           </div>
-          <div className="rounded-2xl border admin-card-glass p-4">
+          <div className="ap-card p-4">
             <p className="text-2xl font-bold">{stats.requests.pending}</p>
             <p className="text-xs opacity-60">Sol·licituds pendents</p>
           </div>
-          <div className="rounded-2xl border admin-card-glass p-4">
+          <div className="ap-card p-4">
             <p className="text-2xl font-bold">{stats.requests.completed}</p>
             <p className="text-xs opacity-60">Completades</p>
           </div>
-          <div className={`ap-card p-4 ${stats.requests.urgent > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : 'admin-card-glass'}`}>
+          <div className={`ap-card p-4 ${stats.requests.urgent > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : ''}`}>
             <p className={`text-2xl font-bold ${stats.requests.urgent > 0 ? 'admin-tone-text-danger' : ''}`}>{stats.requests.urgent}</p>
             <p className="text-xs opacity-60">Urgents (&lt;5 dies)</p>
           </div>
@@ -364,7 +364,7 @@ export default function AdminPrivacyPage() {
       {pageTab === 'requests' && (
       <div className="space-y-4">
         {requests.length === 0 && !loading && (
-          <div className="rounded-2xl border admin-card-glass p-6 text-center opacity-60">
+          <div className="ap-card p-6 text-center opacity-60">
             No hi ha sol·licituds amb aquest filtre.
           </div>
         )}
@@ -381,7 +381,7 @@ export default function AdminPrivacyPage() {
             <div
               key={r.id}
               className={`ap-card p-5 transition-colors ${
-                isOverdue ? 'admin-tone-border-danger admin-tone-bg-danger' : isUrgent ? 'admin-tone-border-warning admin-tone-bg-warning' : 'admin-card-glass admin-tone-border-neutral admin-tone-bg-neutral'
+                isOverdue ? 'admin-tone-border-danger admin-tone-bg-danger' : isUrgent ? 'admin-tone-border-warning admin-tone-bg-warning' : 'admin-tone-border-neutral admin-tone-bg-neutral'
               }`}
             >
               {/* Header */}
@@ -518,11 +518,11 @@ export default function AdminPrivacyPage() {
           {/* Consents list */}
           <div className="space-y-3">
             {consentsLoading ? (
-              <div className="rounded-2xl border admin-card-glass p-6 text-center opacity-60">
+              <div className="ap-card p-6 text-center opacity-60">
                 Carregant consentiments...
               </div>
             ) : consents.length === 0 ? (
-              <div className="rounded-2xl border admin-card-glass p-6 text-center opacity-60">
+              <div className="ap-card p-6 text-center opacity-60">
                 No hi ha consentiments amb aquest filtre.
               </div>
             ) : (
@@ -638,11 +638,11 @@ export default function AdminPrivacyPage() {
       {pageTab === 'audit' && (
         <div className="space-y-3">
           {auditLoading ? (
-            <div className="rounded-2xl border admin-card-glass p-6 text-center opacity-60">
+            <div className="ap-card p-6 text-center opacity-60">
               Carregant registre d&apos;auditoria...
             </div>
           ) : auditLogs.length === 0 ? (
-            <div className="rounded-2xl border admin-card-glass p-6 text-center opacity-60">
+            <div className="ap-card p-6 text-center opacity-60">
               Cap registre d&apos;auditoria trobat.
             </div>
           ) : (
@@ -689,7 +689,7 @@ export default function AdminPrivacyPage() {
       )}
 
       {/* RGPD info box */}
-      <details className="rounded-2xl border admin-card-glass p-4">
+      <details className="ap-card p-4">
         <summary className="cursor-pointer text-sm font-medium opacity-70 hover:opacity-100 transition-opacity">
           Informació RGPD - Articles aplicables
         </summary>

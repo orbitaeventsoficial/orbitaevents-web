@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1329 — 2026-07-01 — claude (FET)
+**Homogeneïtat: admin-card-glass (2n sistema de card) → .ap-card.**
+- 165 usos admin-card-glass (glass legacy) → .ap-card en ~30 fitxers. 0 usos a l'admin (5 a eines es queden). Cards ara totes idèntiques. Fet a mà (agent encallat).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1329`; el següent canvi real ha de ser `#1330`.
+- Validació tècnica: tsc 0; validate:core EXIT 0; canon sense P1.
+- Validació funcional: captures activity/salut/emails cards canòniques.
+- Validació humana/UX: eliminat el 2n sistema de card.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1325 — 2026-07-01 — claude (FET)
 **Homogeneïtat: 38 badges/pills fets a mà → .ap-badge.**
 - Agent: 38 badges → .ap-badge (22 neutres) + --success/warning/danger/info (16 estat), significat cromàtic conservat. 17 fitxers. Dots/avatars/barres/style-maps deixats (no són badges).
@@ -21661,6 +21672,51 @@ px tsc --noEmit OK · git diff --check OK.
 - Validació funcional: el builder pot renderitzar tota l'oferta seleccionada per defecte o només els productes triats, sense barrejar preus dins la narrativa.
 - Validació humana/UX: el primer impacte és premium i personalitzat amb nom de client; la lectura posterior explica valor abans de comparar números.
 - `ADMIN_CHANGE_COUNTER` puja a `888`; el següent canvi real ha de ser `#889`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1328 — 2026-07-01 — codex (FET)
+**Masquerade: Bingo/Batalla visibles al desplegable i menú responsiu.**
+- Context: a la fitxa completa de lead, el desplegable de Carlos/Masquerade mostrava primer les animacions i deixava `Bingo Musical` i `Batalla Musical` enterrats al final d'un menú petit amb scroll, fent pensar que no existien.
+- BD viva: reordenats els productes actius de Masquerade perquè `Bingo Musical` i `Batalla Musical` quedin a dalt (`sortOrder` 1/2), amb registre a `adminLog`.
+- `scripts/seed-masquerade-products.mjs`: mateix ordre canònic per no perdre'l en futures sincronitzacions.
+- `BookingServiceLinesSection`: el desplegable de productes de proveïdor deixa de ser un menú flotant; s'obre dins del flux del configurador amb `max-height` responsive i scroll intern.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:admin-canon` OK; `git diff --check` OK.
+- Validació funcional: rellegida la BD viva després del canvi: Bingo/Batalla són els dos primers productes actius de Masquerade.
+- Validació humana/UX: el configurador del bolo del lead/reserva ja no amaga els productes musicals ni talla el desplegable en pantalles petites.
+- `ADMIN_CHANGE_COUNTER` puja a `1328`; el següent canvi real ha de ser `#1329`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1327 — 2026-07-01 — codex (FET)
+**Calculadora de transport real: vehicle + conductor + passatgers.**
+- Context: el propietari demana que el cost de desplaçament compti també les hores de persones al cotxe, no només gasolina/km, i que es pugui assignar vehicle, conductor i passatgers segons qui executa el bolo.
+- `lib/services/travelLaborCost.ts`: nova font pura de càlcul. Constants canòniques inicials: conductor 18 €/h, passatger 15 €/h, velocitat estimada 65 km/h si no s'informen hores manuals. Retorna vehicle, conductor, passatgers, total i línies marcades `[travel-cost]`.
+- `NewBookingForm`: nova secció `Transport real` amb hores totals de cotxe, vehicle Òrbita/proveïdor, conductor Òrbita/proveïdor, passatgers Òrbita i passatgers proveïdor. Mostra KPIs de vehicle/conductor/passatgers/total i botó `Aplicar al bolo`.
+- El botó crea o substitueix línies de cost `BookingServiceLine` amb `revenueAmount=0` i `costAmount` real; així el marge les veu via el circuit existent sense schema nou ni motor paral·lel.
+- El PVP client no canvia automàticament: el transport real entra com a cost del bolo; el preu comercial segueix sent el calculat o el `Total tancat amb el client`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\travelLaborCost.test.ts __tests__\lib\constants\orbita-services.test.ts __tests__\lib\services\collaboratorProductService.test.ts` OK (28 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: tests cobreixen Andorra amb vehicle + conductor + passatger i el cas on Carlos posa vehicle/conductor; la UI substitueix línies `[travel-cost]` perquè reaplicar no dupliqui.
+- Validació humana/UX: l'operador pot muntar cada bolo separant producte, vehicle, conductor i passatgers abans de decidir el total final amb el client.
+- `ADMIN_CHANGE_COUNTER` puja a `1327`; el següent canvi real ha de ser `#1328`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1326 — 2026-07-01 — codex (FET)
+**Bingo/Batalla: tècnic inclòs però assignable a Òrbita o Masquerade.**
+- Context: el propietari aclareix que el problema no és el marge aplicat (ja existeix), sinó la liquidació operativa: el client compra el Bingo/Batalla complet, però el tècnic inclòs pot fer-lo Òrbita o pot portar-lo Carlos/Masquerade.
+- BD viva: eliminat el duplicat antic/inactiu `Bingo musical` 160→192 amb snapshot a `adminLog`. Queda el `Bingo Musical` actiu 200→240.
+- BD viva: `Bingo Musical` i `Batalla Musical` mantenen cost 200 i PVP 240 (`resellPrice(200)`), però el `crew` queda `Presentador + tècnic de so + equip propi` perquè el configurador desdobli el tècnic.
+- `scripts/seed-masquerade-products.mjs` i `scripts/fix-bingo-batalla-preu.mjs`: alineats perquè el seed no torni a compactar el tècnic.
+- `BookingServiceLinesSection`: la línia automàtica diu `Tècnic de so inclòs · 1,5 h`, el selector mostra `Tècnic: Òrbita (jo)` o proveïdor, i el cost 40€ és visible encara que el cobri el proveïdor.
+- Regla resultant: producte client complet = 240; internament Carlos/equip = 160, tècnic inclòs = 40, marge Òrbita = 40. El PVP no canvia quan el tècnic l'assumeix Òrbita o Masquerade; només canvia la liquidació.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\constants\orbita-services.test.ts __tests__\lib\services\collaboratorProductService.test.ts` OK (25 tests); `npx tsc --noEmit --pretty false` OK; `git diff --check` OK.
+- Validació funcional: BD viva verificada després del canvi: `Bingo Musical` i `Batalla Musical` actius amb `costPrice=200`, `sellPrice=240`, `crew=Presentador + tècnic de so + equip propi`; duplicat antic `Bingo musical` eliminat.
+- Validació humana/UX: al configurador, el tècnic inclòs queda visible com a línia assignable amb 40€ i selector Òrbita/proveïdor, sense canviar el PVP del producte.
+- `ADMIN_CHANGE_COUNTER` puja a `1326`; el següent canvi real ha de ser `#1327`.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`

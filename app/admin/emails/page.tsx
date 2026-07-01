@@ -222,7 +222,7 @@ export default async function EmailsAdminPage() {
         {/* Columna Principal (2/3) */}
         <div className="lg:col-span-2 space-y-6">
           {/* Pending Post-Event Emails */}
-          <section className="rounded-2xl border admin-card-glass overflow-hidden" data-help-title="Post-event pendents" data-help-desc="Llista reserves completades que encara no han rebut el correu post-event perquè puguis forçar-lo manualment.">
+          <section className="ap-card overflow-hidden" data-help-title="Post-event pendents" data-help-desc="Llista reserves completades que encara no han rebut el correu post-event perquè puguis forçar-lo manualment.">
             <div className="flex flex-col gap-3 border-b px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
               <div>
                 <h2 className="font-semibold">
@@ -281,7 +281,7 @@ export default async function EmailsAdminPage() {
           <ManualActionsPanel />
 
           {/* Google Reviews Link */}
-          <section className="rounded-2xl border admin-card-glass p-6" data-help-title="Enllaç de Google Reviews" data-help-desc="Tens a mà l'enllaç oficial perquè el client pugui deixar una ressenya pública a Google.">
+          <section className="ap-card p-6" data-help-title="Enllaç de Google Reviews" data-help-desc="Tens a mà l'enllaç oficial perquè el client pugui deixar una ressenya pública a Google.">
             <h3 className="font-semibold mb-4">⭐ Google Reviews</h3>
             <p className="text-sm mb-4">
               Enllaç directe per als clients que vulguin deixar ressenya a Google:

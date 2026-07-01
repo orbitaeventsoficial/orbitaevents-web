@@ -106,22 +106,22 @@ export default async function AdminProtocolPage({
       back={{ href: '/admin/manual', label: 'Manual de possibilitats' }}
     >
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        <div className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Canvis registrats</p>
           <p className="mt-2 text-3xl font-bold">{allCanvis.length}</p>
           <p className="mt-1 text-xs opacity-60">{totalFet} FET · {allCanvis.length - totalFet} altres estats.</p>
         </div>
-        <div className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Seccions del protocol</p>
           <p className="mt-2 text-3xl font-bold">{allSections.length}</p>
           <p className="mt-1 text-xs opacity-60">§X.Y agrupades per àrea de producte.</p>
         </div>
-        <div className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Darrer canvi</p>
           <p className="mt-2 text-3xl font-bold">#{allCanvis[0]?.n ?? '—'}</p>
           <p className="mt-1 text-xs opacity-60">{lastDate} · {allCanvis[0]?.author ?? '—'}</p>
         </div>
-        <div className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Validats humans</p>
           <p className="mt-2 text-3xl font-bold">{validationSummary.validatedCount}</p>
           <p className="mt-1 text-xs opacity-60">
@@ -134,7 +134,7 @@ export default async function AdminProtocolPage({
             {firstPending ? `Següent pendent: #${firstPending.n} · ${firstPending.author}` : 'No queda cap pendent en aquesta vista.'}
           </p>
         </div>
-        <div className="admin-card-glass rounded-2xl border border-[var(--line)] p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Filtre actiu</p>
           <p className="mt-2 text-3xl font-bold">{filtered.length}</p>
           <p className="mt-1 text-xs font-semibold uppercase tracking-wide opacity-50">
@@ -236,7 +236,7 @@ export default async function AdminProtocolPage({
                 <Link
                   key={section.anchorId}
                   href={`/admin/docs/protocol?seccio=${section.id}#${section.anchorId}`}
-                  className="admin-card-glass flex flex-col gap-1 rounded-xl border border-[var(--line)] p-3 transition hover:admin-tone-border-warning"
+                  className="ap-card flex flex-col gap-1 p-3 transition hover:admin-tone-border-warning"
                 >
                   <span className="text-xs font-semibold uppercase tracking-wider opacity-50">§{section.id}</span>
                   <span className="text-sm font-bold leading-snug">{section.title}</span>
@@ -266,7 +266,7 @@ export default async function AdminProtocolPage({
                   key={canvi.anchorId}
                   id={canvi.anchorId}
                   open={shouldAutoOpenProtocolCanvi(canvi.n, focus, validations, validationFilter)}
-                  className={`admin-card-glass ap-card p-4 transition ${
+                  className={`ap-card p-4 transition ${
                     isFocus ? 'admin-tone-border-warning admin-tone-bg-warning' : 'border-[var(--line)]'
                   }`}
                 >

@@ -88,7 +88,7 @@ export function InventorySummarySection({
 
 function InventoryKpiCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border admin-card-glass p-4">
+    <div className="ap-card p-4">
       <p className="text-xs font-medium uppercase">{label}</p>
       <p className="mt-2 text-3xl font-bold">{value}</p>
     </div>
@@ -266,7 +266,7 @@ export function InventoryHealthFocus({ activeHealthLabel }: { activeHealthLabel:
   if (!activeHealthLabel) return null;
 
   return (
-    <div className="rounded-2xl border admin-tone-border-info admin-tone-bg-info p-4 admin-card-glass">
+    <div className="ap-card admin-tone-border-info admin-tone-bg-info p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide admin-tone-text-info">
@@ -391,7 +391,7 @@ export function InventoryGridSection({ displayedItems }: { displayedItems: Inven
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-4xl">{catConf.icon}</div>
               )}
-              <span className={`absolute top-2 right-2 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusConf.bg} ${statusConf.text} admin-card-glass`}>
+              <span className={`absolute top-2 right-2 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusConf.bg} ${statusConf.text}`}>
                 {statusConf.label}
               </span>
             </div>
@@ -492,7 +492,7 @@ export function InventoryDesktopTableSection({
   handleStatusChange: (itemId: string, status: string) => void;
 }) {
   return (
-    <section className="hidden lg:block ap-card p-0 admin-card-glass overflow-hidden" {...helpAttrs(ADMIN_INVENTORY_HELP.desktopTable)}>
+    <section className="hidden lg:block ap-card p-0 overflow-hidden" {...helpAttrs(ADMIN_INVENTORY_HELP.desktopTable)}>
       <div className="overflow-x-auto">
         <table className="w-full text-sm" aria-label="Inventari d'equipament">
           <thead className="border-b">
@@ -553,7 +553,7 @@ export function InventoryDesktopTableSection({
 
 export function InventoryEmptyState({ hasFilters, resetFilters }: { hasFilters: boolean; resetFilters: () => void }) {
   return (
-    <div className="rounded-2xl border admin-card-glass p-12 text-center">
+    <div className="ap-card p-12 text-center">
       <span className="text-4xl">📦</span>
       <p className="mt-4">No hi ha elements que coincideixin amb els filtres</p>
       {hasFilters && (

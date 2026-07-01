@@ -284,7 +284,7 @@ export default async function PacksPage({
       </nav>
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Total Packs</p>
           <p className="mt-2 text-3xl font-bold">{filteredPacks.length}</p>
         </div>
@@ -331,7 +331,7 @@ export default async function PacksPage({
               return (
                 <div
                   key={pack.id}
-                  className={`rounded-2xl border admin-card-glass overflow-hidden ${
+                  className={`ap-card overflow-hidden ${
                     pack.isFeatured
                       ? 'ring-1 admin-tone-border-warning'
                       : 'border-[var(--line)]'
@@ -495,7 +495,7 @@ export default async function PacksPage({
               return (
                 <div
                   key={pack.id}
-                  className={`rounded-2xl border admin-card-glass overflow-hidden ${
+                  className={`ap-card overflow-hidden ${
                     pack.isFeatured
                       ? 'ring-1 admin-tone-border-warning'
                       : 'border-[var(--line)]'
@@ -641,14 +641,14 @@ export default async function PacksPage({
       )}
 
       {filteredPacks.length === 0 && (
-        <div className="rounded-2xl border admin-card-glass p-12 text-center">
+        <div className="ap-card p-12 text-center">
           <span className="text-4xl">📦</span>
           <p className="mt-4">{activeFocusLabel ? 'No hi ha packs dins d’aquest focus' : 'No hi ha packs configurats'}</p>
           <p className="text-sm">{activeFocusLabel ? 'Canvia el focus o torna a la vista completa.' : 'Executa el seed per carregar dades inicials'}</p>
         </div>
       )}
 
-      <section className="mt-8 rounded-2xl border admin-card-glass p-5">
+      <section className="ap-card mt-8 p-5">
         <h2 className="ap-h2">Serveis solts d&apos;Òrbita</h2>
         <p className="mt-1 text-sm admin-tone-text-neutral">
           Serveis propis que s&apos;afegeixen a una reserva fora de pack (p. ex. DJ extra, tècnic de so).

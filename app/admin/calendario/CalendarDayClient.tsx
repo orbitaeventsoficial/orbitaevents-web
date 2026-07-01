@@ -176,7 +176,7 @@ export default function CalendarDayClient() {
       </div>
 
 
-      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border admin-card-glass px-3 py-2 text-xs">
+      <div className="ap-card mb-4 flex flex-wrap items-center gap-2 px-3 py-2 text-xs">
         <span className="font-semibold opacity-60">Capes:</span>
         {[
           ['bookings', 'Reserves'],
@@ -212,8 +212,8 @@ export default function CalendarDayClient() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Timeline column */}
           <div className="lg:col-span-2">
-            <div className="overflow-hidden rounded-2xl border admin-card-glass" {...helpAttrs(ADMIN_CALENDAR_HELP.dayTimeline)}>
-              <div className={`flex items-center justify-between border-b px-5 py-3 ${isTodayDate ? 'admin-card-glass' : ''} ${dayToneClasses.card}`}>
+            <div className="ap-card overflow-hidden" {...helpAttrs(ADMIN_CALENDAR_HELP.dayTimeline)}>
+              <div className={`flex items-center justify-between border-b px-5 py-3 ${isTodayDate ? 'ap-card' : ''} ${dayToneClasses.card}`}>
                 <div className="flex items-center gap-2">
                   {isBlocked && <span className="w-2.5 h-2.5 rounded-full" />}
                   {!isBlocked && dayData.reservas.length > 0 && <span className="w-2.5 h-2.5 rounded-full" />}
@@ -246,7 +246,7 @@ export default function CalendarDayClient() {
               </div>
 
               {showBlockForm && (
-                <div className="flex items-center gap-2 border-b px-5 py-3 admin-card-glass">
+                <div className="ap-card flex items-center gap-2 border-b px-5 py-3">
                   <input
                     type="text"
                     value={blockNote}
@@ -312,7 +312,7 @@ export default function CalendarDayClient() {
 
                 {/* Bookings without time */}
                 {visibleTimelineBookings.filter((b) => b.startH === null).length > 0 && (
-                  <div className="border-t px-5 py-3 admin-card-glass">
+                  <div className="ap-card border-t px-5 py-3">
                     <p className="mb-2 text-xs">Sense hora definida:</p>
                     {visibleTimelineBookings.filter((b) => b.startH === null).map((b) => (
                       <Link
@@ -333,7 +333,7 @@ export default function CalendarDayClient() {
           {/* Detail sidebar */}
           <div className="space-y-4" {...helpAttrs(ADMIN_CALENDAR_HELP.daySidebar)}>
             {/* Summary card */}
-            <div className="ap-card p-5 admin-card-glass">
+            <div className="ap-card p-5">
               <h3 className="mb-3 text-sm font-semibold">Resum del dia</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
@@ -362,7 +362,7 @@ export default function CalendarDayClient() {
             </div>
 
             {visibleLayers.leads && dayLeads.length > 0 && (
-              <div className="ap-card p-5 admin-card-glass">
+              <div className="ap-card p-5">
                 <h3 className="mb-3 text-sm font-semibold">Entrades del web</h3>
                 <div className="space-y-2">
                   {dayLeads.map((lead) => {
@@ -396,7 +396,7 @@ export default function CalendarDayClient() {
             )}
 
             {((visibleLayers.tasks && dayData.tasks.length > 0) || (visibleLayers.social && dayData.socialPosts.length > 0) || (visibleLayers.followUps && dayData.followUps.length > 0)) && (
-              <div className="ap-card p-5 admin-card-glass">
+              <div className="ap-card p-5">
                 <h3 className="mb-3 text-sm font-semibold">Feina planificada</h3>
                 <div className="space-y-2">
                   {visibleLayers.tasks && dayData.tasks.map((task) => (
@@ -447,7 +447,7 @@ export default function CalendarDayClient() {
                 <Link
                   key={b.id}
                   href={buildBookingHref(b.id)}
-                  className="block ap-card p-5 transition-colors admin-card-glass"
+                  className="block ap-card p-5 transition-colors"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold">{resolveServiceLabel(b)}</span>
@@ -469,7 +469,7 @@ export default function CalendarDayClient() {
             })}
 
             {(visibleLayers.bookings ? dayData.reservas.length === 0 : true) && (!visibleLayers.blocks || !isBlocked) && (!visibleLayers.leads || dayLeads.length === 0) && (!visibleLayers.tasks || dayData.tasks.length === 0) && (!visibleLayers.social || dayData.socialPosts.length === 0) && (!visibleLayers.followUps || dayData.followUps.length === 0) && (
-              <div className="ap-card p-5 text-center admin-card-glass">
+              <div className="ap-card p-5 text-center">
                 <p className="text-sm">Dia lliure</p>
                 <Link
                   href={`/admin/bookings/new?date=${dateKey}`}

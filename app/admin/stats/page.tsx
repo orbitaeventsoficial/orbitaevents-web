@@ -210,12 +210,12 @@ export default function StatsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="rounded-xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <div className="text-sm font-medium">Valors automàtics</div>
           <div className="mt-1 text-3xl font-bold">{automaticStats}</div>
           <div className="mt-1 text-xs">Calculats des de la BD</div>
         </div>
-        <div className="rounded-xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <div className="text-sm font-medium">Valors manuals</div>
           <div className="mt-1 text-3xl font-bold">{manualStats}</div>
           <div className="mt-1 text-xs">Configurats manualment</div>
@@ -319,7 +319,7 @@ export default function StatsPage() {
       </div>
 
       {/* Info */}
-      <div id="stats-help" className="rounded-xl border admin-card-glass p-4">
+      <div id="stats-help" className="ap-card p-4">
         <h3 className="mb-2 text-sm font-semibold">ℹ️ Com funciona</h3>
         <ul className="space-y-1 text-sm">
           <li>• Els <strong>valors automàtics</strong> es calculen des de les reserves completades</li>

@@ -105,7 +105,7 @@ export default async function SettingsPage() {
         <SettingsClient groupedSettings={settings} categoryConfig={SETTINGS_CATEGORY_CONFIG} />
       )}
 
-      <section className="rounded-2xl border admin-card-glass p-5">
+      <section className="ap-card p-5">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--t3)]">Accessos directes</p>

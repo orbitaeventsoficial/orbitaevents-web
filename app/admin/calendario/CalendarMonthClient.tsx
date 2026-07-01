@@ -291,7 +291,7 @@ export default function CalendarMonthClient() {
   return (
     <AdminPage title="Calendari" subtitle="Visualitza reserves, bloquejos i feina planificada per executar el negoci.">
       {/* Barra superior: selector de mes + meta info */}
-      <div className="flex flex-col gap-2 rounded-xl border admin-card-glass p-2.5 sm:p-3 md:flex-row md:items-center md:justify-between" {...helpAttrs(ADMIN_CALENDAR_HELP.monthNavigation)}>
+      <div className="ap-card flex flex-col gap-2 p-2.5 sm:p-3 md:flex-row md:items-center md:justify-between" {...helpAttrs(ADMIN_CALENDAR_HELP.monthNavigation)}>
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
@@ -362,7 +362,7 @@ export default function CalendarMonthClient() {
       </div>
 
 
-      <div className="flex flex-wrap items-center gap-2 rounded-xl border admin-card-glass px-3 py-2 text-xs">
+      <div className="ap-card flex flex-wrap items-center gap-2 px-3 py-2 text-xs">
         <span className="font-semibold opacity-60">Capes:</span>
         {[
           ['bookings', 'Reserves'],
@@ -384,7 +384,7 @@ export default function CalendarMonthClient() {
       </div>
       {/* Stats ràpids del mes visible */}
       <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-6" {...helpAttrs(ADMIN_CALENDAR_HELP.stats)}>
-        <div className="admin-card-glass ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-success admin-tone-border-success">
+        <div className="ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-success admin-tone-border-success">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide admin-tone-text-success">Reserves</span>
@@ -396,7 +396,7 @@ export default function CalendarMonthClient() {
           </div>
         </div>
 
-        <div className="admin-card-glass ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-danger admin-tone-border-danger">
+        <div className="ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-danger admin-tone-border-danger">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide admin-tone-text-danger">Bloquejos</span>
@@ -408,7 +408,7 @@ export default function CalendarMonthClient() {
           </div>
         </div>
 
-        <div className="admin-card-glass ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-info admin-tone-border-info">
+        <div className="ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-info admin-tone-border-info">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide admin-tone-text-info">Dies lliures</span>
@@ -420,7 +420,7 @@ export default function CalendarMonthClient() {
           </div>
         </div>
 
-        <div className="admin-card-glass ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-warning admin-tone-border-warning">
+        <div className="ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-warning admin-tone-border-warning">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide admin-tone-text-warning">Dies mixtes</span>
@@ -432,7 +432,7 @@ export default function CalendarMonthClient() {
           </div>
         </div>
 
-        <div className="admin-card-glass ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-info admin-tone-border-info">
+        <div className="ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-info admin-tone-border-info">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide admin-tone-text-info">Tasques</span>
@@ -444,7 +444,7 @@ export default function CalendarMonthClient() {
           </div>
         </div>
 
-        <div className="admin-card-glass ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-warning admin-tone-border-warning">
+        <div className="ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-warning admin-tone-border-warning">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide admin-tone-text-warning">Social</span>
@@ -457,7 +457,7 @@ export default function CalendarMonthClient() {
         </div>      </div>
 
       {/* Llegenda */}
-      <div className="flex flex-wrap items-center gap-3 sm:gap-4 rounded-xl admin-card-glass border px-3 sm:px-4 py-2 text-sm" {...helpAttrs(ADMIN_CALENDAR_HELP.legend)}>
+      <div className="ap-card flex flex-wrap items-center gap-3 sm:gap-4 px-3 sm:px-4 py-2 text-sm" {...helpAttrs(ADMIN_CALENDAR_HELP.legend)}>
         <span className="font-medium">Llegenda:</span>
         <div className="flex items-center gap-1.5">
           <span className="h-3 w-3 rounded-sm bg-[var(--raised)] border border-[var(--line)]" />
@@ -653,7 +653,7 @@ export default function CalendarMonthClient() {
 
       {/* Panell de detalls */}
       {selectedDayData.date && (
-        <div id="calendar-detail" className="rounded-2xl border admin-card-glass p-4 sm:p-5" {...helpAttrs(ADMIN_CALENDAR_HELP.monthDayDetail)}>
+        <div id="calendar-detail" className="ap-card p-4 sm:p-5" {...helpAttrs(ADMIN_CALENDAR_HELP.monthDayDetail)}>
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div>
               <h2 className="text-base sm:ap-h2">
@@ -753,7 +753,7 @@ export default function CalendarMonthClient() {
                         })}
                         className={isLost
                           ? 'block rounded-lg border px-2 py-1.5 text-xs opacity-60 transition-all'
-                          : 'block rounded-xl border px-3 py-2.5 transition-all admin-card-glass'}
+                          : 'block rounded-xl border px-3 py-2.5 transition-all'}
                       >
                         <div className={isLost ? 'truncate font-medium' : 'truncate text-sm font-medium'}>
                           {isLost ? 'Perdut · ' : ''}{leadItem.name}
@@ -867,13 +867,13 @@ export default function CalendarMonthClient() {
                 </h3>
                 <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
                   {visibleLayers.tasks && selectedDayData.payload?.tasks?.map((task) => (
-                    <Link key={task.id} href="/admin/tasks" className="block rounded-xl border px-3 py-2.5 transition-all admin-card-glass">
+                    <Link key={task.id} href="/admin/tasks" className="ap-card block px-3 py-2.5 transition-all">
                       <div className="truncate text-sm font-medium">{task.title}</div>
                       <div className="mt-1 text-xs opacity-70">Tasca · {resolveWorkTimeLabel(task.dueDate)} · {task.priority}</div>
                     </Link>
                   ))}
                   {visibleLayers.social && selectedDayData.payload?.socialPosts?.map((post) => (
-                    <Link key={post.id} href="/admin/social" className="block rounded-xl border px-3 py-2.5 transition-all admin-card-glass">
+                    <Link key={post.id} href="/admin/social" className="ap-card block px-3 py-2.5 transition-all">
                       <div className="truncate text-sm font-medium">{post.title}</div>
                       <div className="mt-1 text-xs opacity-70">Social · {resolveWorkTimeLabel(post.scheduledAt)} · {post.platforms.join(', ')}</div>
                     </Link>

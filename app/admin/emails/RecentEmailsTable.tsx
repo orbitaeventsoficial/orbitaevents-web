@@ -43,7 +43,7 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
   };
 
   return (
-    <section className="overflow-hidden rounded-2xl border admin-card-glass" data-help-title="Activitat recent d'emails" data-help-desc="Llista cronològica dels últims enviaments, testimonis i automatitzacions relacionades amb correu.">
+    <section className="ap-card overflow-hidden" data-help-title="Activitat recent d'emails" data-help-desc="Llista cronològica dels últims enviaments, testimonis i automatitzacions relacionades amb correu.">
       <div className="border-b px-6 py-4">
         <h2 className="font-semibold">📊 Activitat Recent</h2>
         <p className="mt-1 text-xs">Últims 7 dies</p>

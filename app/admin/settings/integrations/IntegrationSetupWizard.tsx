@@ -42,7 +42,7 @@ export default function IntegrationSetupWizard({
   );
 
   return (
-    <section className="ap-card p-5 admin-card-glass">
+    <section className="ap-card p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="ap-h2">Configuració ràpida d&apos;integracions</h2>

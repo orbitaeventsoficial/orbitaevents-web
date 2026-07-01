@@ -62,7 +62,7 @@ const GRP_MENU = 'relative overflow-visible rounded-[var(--o-r-sm)] border borde
 const SUMMARY = 'flex cursor-pointer items-center gap-2 list-none bg-[color-mix(in_oklab,var(--raised)_70%,var(--panel))] px-3 py-2.5 text-xs font-semibold text-[var(--t2)] [&::-webkit-details-marker]:hidden [[open]>&]:text-[var(--gold)]';
 const SUMMARY_PACKS = `${SUMMARY} [[open]>&]:border-b [[open]>&]:border-[var(--line)]`;
 const CHEVRON = 'text-[0.6rem] opacity-60 transition-transform [[open]_&]:rotate-90';
-const MENU_ITEMS = 'flex flex-col [[open]_&]:absolute [[open]_&]:left-0 [[open]_&]:right-0 [[open]_&]:top-[calc(100%+0.28rem)] [[open]_&]:z-[35] [[open]_&]:max-h-[min(16rem,38vh)] [[open]_&]:overflow-y-auto [[open]_&]:rounded-[var(--o-r-sm)] [[open]_&]:border [[open]_&]:border-[var(--line)] [[open]_&]:bg-[color-mix(in_oklab,var(--panel)_96%,var(--canvas))] [[open]_&]:shadow-lg';
+const MENU_ITEMS = 'flex max-h-[min(22rem,58vh)] flex-col overflow-y-auto rounded-b-[var(--o-r-sm)] border-t border-[color-mix(in_oklab,var(--line)_55%,transparent)] bg-[color-mix(in_oklab,var(--panel)_96%,var(--canvas))]';
 const ITEM = 'flex w-full items-center justify-between gap-2 border-t border-[color-mix(in_oklab,var(--line)_50%,transparent)] bg-transparent px-3 py-2 text-left text-sm text-[var(--t)] transition-colors first:border-t-0 hover:bg-[color-mix(in_oklab,var(--gold)_10%,transparent)]';
 const ITEM_NAME = 'min-w-0 overflow-hidden text-ellipsis whitespace-nowrap';
 const ITEM_PRICE = 'shrink-0 font-semibold tabular-nums text-[var(--gold)]';
@@ -148,7 +148,7 @@ export default function BookingServiceLinesSection({
     const techLine: BookingServiceLineFormInput = {
       collaboratorId: p.collaboratorId, // per defecte el tècnic el posa el proveïdor
       kind: 'SOUND_TECH',
-      label: `Tècnic de so · ${SOUND_TECH_DURATION}`,
+      label: `Tècnic de so inclòs · ${SOUND_TECH_DURATION}`,
       revenueAmount: 0, // ja inclòs al PVP del producte
       costAmount: SOUND_TECH_PRICE,
       quantity: 1,
@@ -249,13 +249,15 @@ export default function BookingServiceLinesSection({
                       aria-label="Qui cobra el tècnic de so"
                       title="Qui posa (i cobra) el tècnic de so"
                     >
-                      <option value="">Tècnic: Òrbita</option>
+                      <option value="">Tècnic: Òrbita (jo)</option>
                       {soundTechPayers.map((p) => (
                         <option key={p.id} value={p.id}>Tècnic: {p.name}</option>
                       ))}
                     </select>
                   )}
-                  {line.collaboratorId ? (
+                  {line.kind === 'SOUND_TECH' && line.costAmount != null ? (
+                    <span className={SL_READONLY} title={line.collaboratorId ? 'Cost del tècnic inclòs al producte; es paga al proveïdor seleccionat.' : 'Cost intern del tècnic inclòs al producte; queda assignat a Òrbita.'}>{line.costAmount}€</span>
+                  ) : line.collaboratorId ? (
                     <span className={SL_NOTE} title="El cost a pagar al partner es gestiona a la seva fitxa">cost</span>
                   ) : (line.kind === 'DJ' || line.kind === 'EQUIPMENT') ? (
                     <span className={SL_NOTE} title="Cost d'equip propi (DJ / material): ja inclòs al cost operatiu fix del bolo. No es compta per línia (es duplicaria).">a operatiu</span>

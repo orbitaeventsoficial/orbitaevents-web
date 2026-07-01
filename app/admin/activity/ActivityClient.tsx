@@ -175,7 +175,7 @@ export default function ActivityClient() {
             key={key}
             onClick={() => setCategory(category === key ? 'all' : key)}
             className={`admin-stagger-item rounded-2xl border border-[var(--line)] p-4 text-left transition-all ${
-              category === key ? cardTone : 'admin-card-glass adm-row-hover'
+              category === key ? cardTone : 'adm-row-hover'
             }`}
           >
             <div className="mb-2 flex items-center justify-between">
@@ -259,7 +259,7 @@ export default function ActivityClient() {
 
           <section className="space-y-3 lg:hidden" aria-label="Registre d'activitat del sistema">
             {data.logs.length === 0 ? (
-              <div className="admin-card-glass rounded-2xl border border-[var(--line)] p-8 text-center">
+              <div className="ap-card p-8 text-center">
                 <p className="ap-empty-title">Cap activitat en aquest període</p>
               </div>
             ) : (
@@ -272,7 +272,7 @@ export default function ActivityClient() {
                 const entityLabel = getEntityLabel(entry);
 
                 return (
-                  <article key={entry.id} className="admin-stagger-item admin-card-glass block rounded-2xl border border-[var(--line)] p-4 transition-colors adm-row-hover">
+                  <article key={entry.id} className="ap-card admin-stagger-item block p-4 transition-colors adm-row-hover">
                     <div className="mb-2 flex items-start justify-between gap-3">
                       <span className={`${meta.tone} text-sm font-medium`}>
                         {meta.icon} {meta.label}
@@ -317,7 +317,7 @@ export default function ActivityClient() {
             )}
           </section>
 
-          <section className="hidden lg:block admin-card-glass rounded-2xl border border-[var(--line)] overflow-hidden">
+          <section className="ap-card hidden lg:block overflow-hidden">
             <div className="overflow-x-auto">
               <table className="ap-table w-full min-w-[920px] text-sm" aria-label="Registre d'activitat del sistema">
                 <thead className="ap-table-head">
