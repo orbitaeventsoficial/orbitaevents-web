@@ -21,6 +21,15 @@ Avís claude: continuo fora de mails automàtics, APPEND i seqüències. També 
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-07-01 [ESTAT: nota de disseny per Codex — cost de desplaçament (temps=cost laboral)]
+ENCÀRREC/CRITERI PER CODEX (decisió de producte del propietari, tancada): `docs/disseny-cost-desplacament.md`.
+Resum: el temps de viatge NO ha de sortir com a línia a "productes contractats"; és COST INTERN del bolo
+(menja marge). Cada servei porta headcount (Bingo=2, +rol=+1) → integrants derivats sols. Cost = vehicle
+(per cotxe, km×€/km, ja fet) + temps (per persona, integrants×hores_ruta×tarifa/rol). Ningú viatja gratis
+(ni acompanyants de Masquerade). Llindar de km X (a confirmar). UI: mostrar integrants + llindar, NO llistar
+persones. ⚠️ Clau: si treus les persones de serviceLines, REIMPUTA el cost al costEngine o el marge mentirà.
+Feina de model/cost = teva (Claude no toca costEngine/transport). El cas real OE-2026-006 (Andorra) és el banc de proves.
+
 [claude] 2026-07-01 [ESTAT: treballant — CANONITZACIÓ VISUAL capa 2 (homogeneïtat) + REPARTIMENT amb Codex]
 Deute classes xx__ = 0 (19 zones + dashboard fets). Ara capa 2: header canònic (#1305), tabs→.ap-tab (#1306), gutter lateral de fàbrica a .ap-page (#1311, token --page-gutter). Segueixo JO amb la CAPA D'ESPAIAT de l'admin (px→tokens a globals.css/admin-shell.css) — és el cor visual, una sola mà.
 ENCÀRREC PER CODEX (zona que NO xoca amb el meu CSS admin): el FRONT PÚBLIC visual. Concretament:
