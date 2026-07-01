@@ -1,3 +1,24 @@
+## 2026-07-01 — Canon tipografia: text-[Nrem] literals → token (Canvi #1337, claude)
+
+### Context
+Caça de font-size a mà. font-black: 0. text-[Npx]: 0. Trobats 4 text-[0.6rem]/[0.65rem] a bookings (seccions extras/services/travel) = 9.6-10.4px, per sota del mínim admin (12px) i no tokenitzats.
+
+### Què s'ha fet
+- 4 `text-[0.6rem]`/`text-[0.65rem]` → `text-[length:var(--o-text-2xs)]` (12px, token canònic, llegible) a BookingPackExtras/ServiceLines/TravelDiscount.
+- `MarkdownView text-[0.85em]` DEIXAT: és em RELATIU (codi inline dins prosa, escala amb el pare) — intencional.
+- w-[Npx]/h-[Npx] fixes verificats legítims (max-w contenidor, h-500 panell scroll, min-w taula desktop).
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0.
+- Validació funcional: tipografia via token.
+- Validació humana/UX: font ≥12px, canònica.
+
+### Coordinació
+Counter → 1337. Canon tipografia net. Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-01 — Canon color: bg-black superfícies + red crus → tokens (Canvi #1336, claude)
 
 ### Context

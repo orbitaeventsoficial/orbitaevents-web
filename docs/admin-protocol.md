@@ -1546,6 +1546,17 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1337 — 2026-07-01 — claude (FET)
+**Canon tipografia: text-[Nrem] literals → token.**
+- 4 text-[0.6/0.65rem] (bookings extras/services/travel) → text-[length:var(--o-text-2xs)] (12px). MarkdownView text-[0.85em] deixat (em relatiu). font-black 0, text-[Npx] 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1337`; el següent canvi real ha de ser `#1338`.
+- Validació tècnica: tsc 0; validate:core EXIT 0.
+- Validació funcional: tipografia token.
+- Validació humana/UX: font ≥12px.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## Entrades
 ### Canvi #1336 — 2026-07-01 — claude (FET)
 **Canon color: bg-black superfícies + red crus → tokens.**

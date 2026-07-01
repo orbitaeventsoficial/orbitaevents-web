@@ -84,11 +84,11 @@ export default function BookingPackExtrasSection({
                     : 'border-[var(--line)] bg-[var(--sunk)] hover:border-[var(--hair-gold)]'
                 }`}
               >
-                {serviceLbl && <span className="font-mono text-[0.6rem] font-bold uppercase tracking-[0.13em] text-[var(--gold)]">{serviceLbl}</span>}
+                {serviceLbl && <span className="font-mono text-[length:var(--o-text-2xs)] font-bold uppercase tracking-[0.13em] text-[var(--gold)]">{serviceLbl}</span>}
                 <span className="text-base font-bold text-[var(--t)]">{name}</span>
                 <span className="font-mono text-lg font-extrabold tabular-nums text-[var(--gold-bright)]">{pack.price}€</span>
                 {desc && <span className="text-xs leading-snug text-[var(--t3)]">{desc}</span>}
-                <span className="mt-1 flex flex-wrap gap-1.5 font-mono text-[0.6rem] text-[var(--t3)]">
+                <span className="mt-1 flex flex-wrap gap-1.5 font-mono text-[length:var(--o-text-2xs)] text-[var(--t3)]">
                   <span>{pack.djHours}h</span>
                   <span>·</span>
                   <span>{pack.soundWatts}W</span>

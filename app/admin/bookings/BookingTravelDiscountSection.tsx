@@ -73,7 +73,7 @@ export default function BookingTravelDiscountSection({
                 { dt: 'Càrrec', dd: travelCharge > 0 ? formatCurrencyExact(travelCharge) : '— €' },
               ].map((cell) => (
                 <div key={cell.dt} className="flex flex-col gap-1 bg-[var(--panel)] px-3.5 py-3">
-                  <dt className="font-mono text-[0.65rem] font-bold uppercase tracking-[0.09em] text-[var(--t3)]">{cell.dt}</dt>
+                  <dt className="font-mono text-[length:var(--o-text-2xs)] font-bold uppercase tracking-[0.09em] text-[var(--t3)]">{cell.dt}</dt>
                   <dd className="m-0 font-mono text-sm font-bold tabular-nums text-[var(--t)]">{cell.dd}</dd>
                 </div>
               ))}
