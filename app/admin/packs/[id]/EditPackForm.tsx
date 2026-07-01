@@ -405,7 +405,7 @@ export default function EditPackForm({
       <section className="rounded-2xl border border-[var(--line)] p-5">
         <h2 className="text-xl font-bold">Editor pro de pack</h2>
         <p className="mt-1 text-sm">Drag & drop d'inventari dins/fora + autocalcul de preus recomanats.</p>
-        <div className="mt-4 grid gap-2 sm:grid-cols-4">{TABS.map((t) => <button key={t.id} type="button" onClick={() => setActiveTab(t.id)} className={`rounded-xl border px-3 py-2 text-sm font-semibold ${activeTab === t.id ? 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning' : 'border-[var(--line)] bg-[var(--panel)] text-[var(--t2)]'}`}>{t.icon} {t.label}</button>)}</div>
+        <div className="mt-4 grid gap-2 sm:grid-cols-4">{TABS.map((t) => <button key={t.id} type="button" onClick={() => setActiveTab(t.id)} className={`ap-tab ${activeTab === t.id ? 'ap-tab--active' : 'ap-tab--idle'}`}>{t.icon} {t.label}</button>)}</div>
       </section>
 
       {error && <div className="ap-card p-4 text-sm">Error: {error}</div>}

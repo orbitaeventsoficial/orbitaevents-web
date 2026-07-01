@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1324 — 2026-07-01 — claude (FET)
+**Homogeneïtat: tabs/toggles border pelat → .ap-tab.**
+- EditPackForm pestanyes + cuadrant pills període + inventory editor selector estat → .ap-tab/--active/--idle. faq toggle Actiu/Inactiu deixat (verd/vermell semàntic).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1324`; el següent canvi real ha de ser `#1325`.
+- Validació tècnica: tsc 0; validate:core.
+- Validació funcional: tabs uniformes.
+- Validació humana/UX: hipersemblants.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1323 — 2026-07-01 — claude (FET)
 **Homogeneïtat: 7 contenidors px- restants → .ap-card.**
 - 7 <div> rounded border px- (string simple) → .ap-card (calendario/catalog/privacy). Els 15 restants són BOTONS/TABS (onClick/estat) → .ap-btn/.ap-tab, no card; deixats correctament.

@@ -300,11 +300,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
                       key={status.value}
                       type="button"
                       onClick={() => updateField('status', status.value)}
-                      className={`rounded-xl border px-2 py-1.5 text-xs font-medium transition-all ${
-                        form.status === status.value
-                          ? 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan'
-                          : 'border-[var(--line)] text-[var(--t3)] hover:bg-[var(--raised)]'
-                      }`}
+                      className={`ap-tab ${form.status === status.value ? 'ap-tab--active' : 'ap-tab--idle'}`}
                     >
                       {status.label}
                     </button>

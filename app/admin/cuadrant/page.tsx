@@ -66,11 +66,7 @@ export default async function CuadrantPage({ searchParams }: { searchParams: { d
             <Link
               key={w.days}
               href={`/admin/cuadrant?days=${w.days}`}
-              className={`rounded-lg border px-2.5 py-1 text-xs font-semibold transition-colors ${
-                days === w.days
-                  ? 'admin-tone-border-cyan admin-tone-bg-cyan admin-tone-text-cyan'
-                  : 'border-[var(--line)] bg-[var(--panel)] text-[var(--t2)] adm-row-hover'
-              }`}
+              className={`ap-tab ${days === w.days ? 'ap-tab--active' : 'ap-tab--idle'}`}
             >
               {w.label}
             </Link>

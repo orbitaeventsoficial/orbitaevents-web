@@ -1,3 +1,25 @@
+## 2026-07-01 — Homogeneïtat: tabs/toggles amb border pelat → .ap-tab (Canvi #1324, claude)
+
+### Context
+Els contenidors px- "restants" eren en realitat TABS/TOGGLES amb border pelat (no cards). Incoherents amb .ap-tab canònic.
+
+### Què s'ha fet
+- `EditPackForm.tsx`: selector de pestanyes (Bàsic/Preu/Equip/Publicació) rounded border → `.ap-tab`/`--active`/`--idle`.
+- `cuadrant/page.tsx`: pills de període (7/14/30/90 dies) → `.ap-tab`.
+- `inventory/[id]/InventoryItemEditor.tsx`: selector d'estat → `.ap-tab`.
+- `faq/FaqEditorForm` toggle Actiu/Inactiu: DEIXAT (verd/vermell semàntic intencional, és feedback d'estat no navegació).
+
+### Validació
+- Validació tècnica: tsc 0; validate:core.
+- Validació funcional: tabs amb estil canònic uniforme.
+- Validació humana/UX: tabs hipersemblants a tot l'admin.
+
+### Coordinació
+Counter → 1324. Tabs homogenis. Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-01 — Homogeneïtat: 7 contenidors px- restants → .ap-card (Canvi #1323, claude)
 
 ### Què s'ha fet
