@@ -191,7 +191,7 @@ export default function LossBreakdownPanel({
 
               <div className="flex-1 space-y-2">
                 {donutEntries.map((entry, index) => (
-                  <div key={entry.key} className="flex items-center justify-between gap-3 rounded-xl border border-[var(--line)] bg-black/10 px-3 py-2 text-xs">
+                  <div key={entry.key} className="flex items-center justify-between gap-3 rounded-xl border border-[var(--line)] bg-[var(--sunk)] px-3 py-2 text-xs">
                     <div className="flex items-center gap-2">
                       <span
                         aria-hidden="true"
@@ -242,7 +242,7 @@ export default function LossBreakdownPanel({
 
           {summary.byMonth.length > 0 ? (
             <>
-              <div className="mt-4 rounded-xl border border-[var(--line)] bg-black/10 p-3">
+              <div className="mt-4 rounded-xl border border-[var(--line)] bg-[var(--sunk)] p-3">
                 <svg viewBox="0 0 160 72" className="h-28 w-full" role="img" aria-label="Tendència mensual de pèrdues">
                   <path d="M8 64 H152" stroke={ADMIN_SVG_COLORS.baselineLine} strokeWidth="1" />
                   <polyline
@@ -263,7 +263,7 @@ export default function LossBreakdownPanel({
               </div>
               <div className="mt-3 grid gap-2">
                 {summary.byMonth.slice(-4).map((point) => (
-                  <div key={point.monthIso} className="flex items-center justify-between rounded-xl border border-[var(--line)] bg-black/10 px-3 py-2 text-xs">
+                  <div key={point.monthIso} className="flex items-center justify-between rounded-xl border border-[var(--line)] bg-[var(--sunk)] px-3 py-2 text-xs">
                     <span className="text-[var(--t2)]">{formatMonth(point.monthIso)}</span>
                     <span className="text-[var(--t2)]">{point.count} leads</span>
                   </div>

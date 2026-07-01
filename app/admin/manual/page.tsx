@@ -458,7 +458,7 @@ export default async function AdminManualPage() {
                 </div>
                 <div className="mt-4 grid gap-3">
                   {section.items.map((item) => (
-                    <div key={item.title} className="rounded-2xl border border-[var(--line)] bg-black/10 p-4">
+                    <div key={item.title} className="rounded-2xl border border-[var(--line)] bg-[var(--sunk)] p-4">
                       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div className="min-w-0">
                           <h3 className="text-sm font-bold leading-snug">{item.title}</h3>
@@ -579,7 +579,7 @@ export default async function AdminManualPage() {
           </div>
           <div className="mt-4 grid gap-2 md:grid-cols-2">
             {marketingGateActions.map((action) => (
-              <div key={action.id} className="rounded-xl border border-[var(--line)] bg-black/10 p-3">
+              <div key={action.id} className="rounded-xl border border-[var(--line)] bg-[var(--sunk)] p-3">
                 <h3 className="text-sm font-bold leading-snug">{action.title}</h3>
                 <p className="mt-1 text-xs leading-relaxed opacity-70">{action.description}</p>
                 <div className="mt-3 flex flex-wrap gap-1.5">
@@ -602,7 +602,7 @@ export default async function AdminManualPage() {
               </p>
             </div>
           ) : null}
-          <div className="mt-4 rounded-xl border border-[var(--line)] bg-black/10 p-3">
+          <div className="mt-4 rounded-xl border border-[var(--line)] bg-[var(--sunk)] p-3">
             <p className="text-xs font-bold uppercase tracking-wider admin-tone-text-success">Quan pots passar de fase</p>
             <div className="mt-3 grid gap-2 md:grid-cols-2">
               {ADMIN_MARKETING_PHASE_GATE.unlockCriteria.map((criterion) => (
@@ -634,7 +634,7 @@ export default async function AdminManualPage() {
             <p className="text-xs font-bold uppercase tracking-wider admin-tone-text-warning">No obrir encara</p>
             <div className="mt-3 grid gap-2 md:grid-cols-3">
               {marketingBlockedActions.map((action) => (
-                <div key={action.id} className="rounded-lg border border-[var(--line)] bg-black/10 px-3 py-2">
+                <div key={action.id} className="rounded-lg border border-[var(--line)] bg-[var(--sunk)] px-3 py-2">
                   <p className="text-xs font-bold leading-snug">{action.title}</p>
                   <p className="mt-1 text-xs leading-relaxed text-[var(--t2)]">
                     {ADMIN_MARKETING_PHASE_GATE.blockedReasons[action.id]}
@@ -644,7 +644,7 @@ export default async function AdminManualPage() {
               ))}
             </div>
           </div>
-          <div className="mt-4 rounded-xl border border-[var(--line)] bg-black/10 p-3">
+          <div className="mt-4 rounded-xl border border-[var(--line)] bg-[var(--sunk)] p-3">
             <p className="text-xs font-bold uppercase tracking-wider admin-tone-text-info">Pla de 14 dies</p>
             <div className="mt-3 grid gap-2 lg:grid-cols-3">
               {ADMIN_MARKETING_BOOTSTRAP_PLAN.map((step) => (
@@ -714,7 +714,7 @@ export default async function AdminManualPage() {
               {ADMIN_MARKETING_CHANNEL_DECISION_MATRIX.map((decision) => {
                 const action = ADMIN_MARKETING_PHASES.find((phaseAction) => phaseAction.id === decision.actionId);
                 return (
-                  <div key={decision.actionId} className="rounded-lg border admin-tone-border-success bg-black/10 px-3 py-2">
+                  <div key={decision.actionId} className="rounded-lg border admin-tone-border-success bg-[var(--sunk)] px-3 py-2">
                     <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0">
                         <p className="text-xs font-bold leading-snug">{action?.title ?? decision.actionId}</p>
@@ -742,7 +742,7 @@ export default async function AdminManualPage() {
               })}
             </div>
           </div>
-          <div className="mt-4 rounded-xl border border-[var(--line)] bg-black/10 p-3">
+          <div className="mt-4 rounded-xl border border-[var(--line)] bg-[var(--sunk)] p-3">
             <p className="text-xs font-bold uppercase tracking-wider admin-tone-text-warning">Tracker de proves Fase 0</p>
             <div className="mt-3 grid gap-2 lg:grid-cols-2">
               {ADMIN_MARKETING_PHASE_EVIDENCE.map((item) => {

@@ -57,7 +57,7 @@ export default function OperationalPulsePanel({ pulse }: { pulse: OperationalPul
       </div>
 
       {pulse.pipelineDrivers.length > 0 && (
-        <div className="mt-3 rounded-xl border border-[var(--line)] bg-black/10 p-3">
+        <div className="mt-3 rounded-xl border border-[var(--line)] bg-[var(--sunk)] p-3">
           <div className="flex items-center gap-2">
             <span className="inline-block h-2 w-2 rounded-full bg-[var(--o-warning)]" />
             <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Què degrada el pipeline</p>

@@ -1,3 +1,25 @@
+## 2026-07-01 — Canon color: bg-black superfícies + red crus → tokens (Canvi #1336, claude)
+
+### Context
+Caça de negre-blanc absolut i colors crus. Colors Tailwind (slate/gray/emerald): 0. Gradients: 0. Trobats 13 bg-black/10-30 (superfícies fetes amb negre) + red-400/200 crus a image-manager.
+
+### Què s'ha fet
+- **13 `bg-black/10-30` → `bg-[var(--sunk)]`** (superfície subtil canònica) a manual (7), sales-ops (3), OperationalPulse, docs/protocol, collaborators.
+- **image-manager**: `text-red-400/200`, `bg-red-500/10`, `border-red-400/20` → `admin-tone-*-danger`.
+- Els `bg-black/60-95` restants són OVERLAYS legítims (backdrop modal ConfirmDialog, fullscreen/galeria de foto portfolio/image-manager/social/stats) → es queden (cas tècnic sobre imatge).
+- 0 red crus, 0 slate/gray, 0 bg-black superfície a tot l'admin.
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0; canon 0 P1.
+- Validació funcional: superfícies i estats amb tokens.
+- Validació humana/UX: canon color net.
+
+### Coordinació
+Counter → 1336. Canon color: superfícies i estats tokenitzats. Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-01 — Homogeneïtat: 7 botons pelats → .ap-btn (0 restants) (Canvi #1335, claude)
 
 ### Context

@@ -1547,6 +1547,17 @@ Seqüència obligatòria de registre:
 - `user` — decisions manuals o interventions directes
 
 ## Entrades
+### Canvi #1336 — 2026-07-01 — claude (FET)
+**Canon color: bg-black superfícies + red crus → tokens.**
+- 13 bg-black/10-30 → bg-[var(--sunk)] (manual/sales-ops/OperationalPulse/docs/collaborators). image-manager red-400/200 → admin-tone-danger. bg-black/60-95 overlays foto/modal deixats. 0 crus.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1336`; el següent canvi real ha de ser `#1337`.
+- Validació tècnica: tsc 0; validate:core EXIT 0.
+- Validació funcional: superfícies/estats tokens.
+- Validació humana/UX: canon color net.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 
 ### Canvi #1335 — 2026-07-01 — claude (FET)
 **Homogeneïtat: 7 botons pelats → .ap-btn (0 restants).**

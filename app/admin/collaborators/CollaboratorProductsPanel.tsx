@@ -218,7 +218,7 @@ export default function CollaboratorProductsPanel({ collaboratorId, products, on
             return (
               <div key={p.id} className={`ap-card overflow-hidden rounded-xl ${p.isActive ? '' : 'opacity-50'}`}>
                 {p.imageUrl && (
-                  <div className="relative aspect-square w-full bg-black/20">
+                  <div className="relative aspect-square w-full bg-[var(--sunk)]">
                     <Image src={p.imageUrl} alt={p.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
                   </div>
                 )}

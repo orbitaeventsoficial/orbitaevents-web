@@ -290,7 +290,7 @@ export default async function AdminProtocolPage({
                       {canvi.headline}
                     </span>
                   </summary>
-                  <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-xl border border-[var(--line)] bg-black/30 p-3 text-xs leading-relaxed opacity-90">
+                  <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-xl border border-[var(--line)] bg-[var(--sunk)] p-3 text-xs leading-relaxed opacity-90">
                     {canvi.body}
                   </pre>
                   <ProtocolValidationToggle canviN={canvi.n} validation={validation} />

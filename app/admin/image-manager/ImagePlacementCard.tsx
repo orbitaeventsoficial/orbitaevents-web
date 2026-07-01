@@ -249,7 +249,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
                   <button
                     type="button"
                     onClick={() => handleDelete(item.id)}
-                    className="rounded px-1.5 py-0.5 text-xs text-red-400/70 hover:bg-red-500/10"
+                    className="rounded px-1.5 py-0.5 text-xs admin-tone-text-danger/70 hover:admin-tone-bg-danger"
                     aria-label="Eliminar"
                   >
                     âœ•
@@ -281,7 +281,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
             <button
               type="button"
               onClick={() => handleDelete()}
-              className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-1 text-xs text-red-400 hover:bg-red-500/20"
+              className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-1 text-xs admin-tone-text-danger hover:admin-tone-bg-danger"
               aria-label="Eliminar imatge"
             >
               âœ•
@@ -323,7 +323,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
       )}
 
       {localError && (
-        <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+        <div className="mb-4 rounded-2xl border admin-tone-border-danger admin-tone-bg-danger px-4 py-3 text-sm admin-tone-text-danger">
           {localError}
         </div>
       )}
