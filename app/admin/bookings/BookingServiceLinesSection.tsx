@@ -8,7 +8,7 @@
 ============================================================================ */
 
 import { useEffect, useState } from 'react';
-import { ORBITA_SERVICES, SOUND_TECH_PRICE, SOUND_TECH_DURATION, productIncludesSoundTech } from '@/lib/constants/orbita-services';
+import { ORBITA_SERVICES, SOUND_TECH_PRICE, SOUND_TECH_DURATION, partnerProductRequiresSoundTech } from '@/lib/constants/orbita-services';
 import { CUSTOM_BOOKING_PACK_SLUG } from '@/lib/constants/pricing';
 import { AdminSection } from '../components/AdminPage';
 import { NB_HINT, NB_NUM_BARE } from './booking-form-classes';
@@ -146,7 +146,7 @@ export default function BookingServiceLinesSection({
     // (cost SOUND_TECH_PRICE) perquè es pugui triar qui el cobra: el proveïdor
     // (per defecte) o Òrbita. El total no canvia: el producte baixa el cost del
     // tècnic i la línia de tècnic el recupera.
-    const hasTech = productIncludesSoundTech(p.crew);
+    const hasTech = partnerProductRequiresSoundTech({ name: p.name, crew: p.crew });
     const crewMembers = countCrewMembers(p.crew);
     const productCost = hasTech ? Math.max(0, p.costPrice - SOUND_TECH_PRICE) : p.costPrice;
     // Una línia de lloguer de material (col·laborador EQUIPMENT_RENTAL, p.ex. Tino)

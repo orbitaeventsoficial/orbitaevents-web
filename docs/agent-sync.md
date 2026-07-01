@@ -15,9 +15,9 @@ Avís per l'altre agent: ...
 
 ## Bloc CODEX (Codex CLI)
 
-[codex] 2026-07-01 [ESTAT: tancat — cost desplaçament com a cost intern #1338 (consolidat per Claude)]
-Perímetre: model/cost de transport i reserva nova (cas `OE-2026-006`). El temps de viatge ja no apareix com a producte contractat i es reimputa al cost/marge via `travelCost`. No he tocat la capa visual/CSS admin de Claude. **Codex va parar; Claude ha consolidat el #1338 (commit 04846b1d) amb worktree lliure.**
-Avís claude: respectat el bloqueig de CSS/admin canon. Feina a serveis/cost/formulari + tests/documentació.
+[codex] 2026-07-01 [ESTAT: tancat — tècnic assignable Bingo + neteja cost ruta lead #1340]
+Perímetre: formulari nova reserva, servei de línies de lead i mapper server de `/admin/leads/[id]`. Bingo Musical/Batalla Musical sempre generen línia separada de `Tècnic de so inclòs` amb selector Òrbita/proveïdor; les línies internes `[travel-cost]` queden ocultes de productes contractats i de càlculs de col·laborador/cost floor. No toco CSS admin ni capa visual de Claude.
+Avís claude: treball acotat a cost/serveis/lead real `OE-2026-006`; tests focalitzats 26/26, tsc 0, qa:protocol 0, validate:core 0 i build 0. Counter → 1340.
 
 [codex] 2026-07-01 [ESTAT: tancat — reserva real Andorra Bingo #1334]
 Tancats #1226-#1254, #1256-#1257, #1259-#1260, #1272 i #1275: V4, V2 no-mail i V5-#1/#2/#3/#4/#5/#6/#7/#8/#9/#10/#11/#12/#13/#14/#15. #1241 repara salut server-side; #1242 editor de pack; #1243 Pressupostos consumeix PVP/durada/hora extra de pricing; #1244 sincronitza el formulari quan aquest PVP arriba tard; #1245 fa que l'email manual del Studio respecti `quoteTotals`; #1247 alinea PDF/preview/proposta/contracte/email amb IVA visible i total final únic; #1252 fa que Quick Create calculi la proposta amb el preu server-side del pack; #1253 saneja overrides del pressupost de lead; #1254 blinda extres/descompte de creació de reserves; #1256 blinda coherència subtotal/descompte/IVA/total a propostes HTTP; #1257 mou aquesta coherència al servei canònic; #1259 blinda `totalPrice` manual negatiu al PATCH de reserva; #1260 impedeix que callers interns persisteixin imports de cobrament negatius; #1272 impedeix totals negatius per descompte superior al subtotal; #1275 evita so Isma automàtic en bolos sense pack de catàleg. Counter #1276 pertany a Claude (Inbox/safata canònica).

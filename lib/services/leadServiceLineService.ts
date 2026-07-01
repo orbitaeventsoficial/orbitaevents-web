@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { updateBookingDetail } from '@/lib/services/bookingRouteService';
+import { TRAVEL_COST_LINE_MARKER } from '@/lib/services/travelLaborCost';
 import type { BookingServiceLineKind } from '@prisma/client';
 
 const VALID_KINDS: readonly BookingServiceLineKind[] = ['DJ', 'SOUND_TECH', 'PROVIDER_SERVICE', 'EQUIPMENT', 'OTHER'];
@@ -33,6 +34,10 @@ function sanitizeHours(value?: number | null): number | null {
   return typeof value === 'number' && Number.isFinite(value) && value > 0 ? Math.round(value * 100) / 100 : null;
 }
 
+function isTravelCostLine(line: { notes?: string | null }): boolean {
+  return Boolean(line.notes?.includes(TRAVEL_COST_LINE_MARKER));
+}
+
 /** Línies del bolo d'un lead, ordenades. */
 export async function listLeadServiceLines(leadId: string) {
   const lead = await prisma.lead.findUnique({
@@ -47,7 +52,9 @@ export async function listLeadServiceLines(leadId: string) {
       },
     },
   });
-  if (lead?.booking) return { status: 200, body: { lines: lead.booking.serviceLines } };
+  if (lead?.booking) {
+    return { status: 200, body: { lines: lead.booking.serviceLines.filter((line) => !isTravelCostLine(line)) } };
+  }
 
   const lines = await prisma.leadServiceLine.findMany({
     where: { leadId },

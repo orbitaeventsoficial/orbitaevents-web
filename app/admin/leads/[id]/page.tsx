@@ -5,6 +5,7 @@ import LeadDetailClient from './LeadDetailClient';
 import { getWeatherForEvent } from '@/lib/services/weatherService';
 import { getEffectiveVehicleCostPerKm } from '@/lib/services/fuelReferenceService';
 import { DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
+import { TRAVEL_COST_LINE_MARKER } from '@/lib/services/travelLaborCost';
 import { computeBookingFinancialSummary } from '@/lib/services/costEngine';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 import type { WxData } from '@/app/admin/components/WxBadge';
@@ -33,6 +34,10 @@ const STAGE_KEY_MAP: Record<string, string> = {
   NEW: 'nou', CONTACTED: 'contactat', QUOTE_SENT: 'contactat',
   NEGOTIATING: 'contactat', WON: 'guanyat', LOST: 'perdut',
 };
+
+function isTravelCostLine(line: { notes?: string | null }): boolean {
+  return Boolean(line.notes?.includes(TRAVEL_COST_LINE_MARKER));
+}
 
 export default async function LeadDetailPage({ params }: Props) {
   const lead = await prisma.lead.findUnique({
@@ -120,6 +125,7 @@ export default async function LeadDetailPage({ params }: Props) {
               revenueAmount: true,
               costAmount: true,
               quantity: true,
+              notes: true,
               collaboratorId: true,
               collaborator: { select: { name: true } },
             },
@@ -174,9 +180,10 @@ export default async function LeadDetailPage({ params }: Props) {
     if (profitabilityConfig) {
       const extrasTotal = (b.extras ?? []).reduce(
         (s, e) => s + Number(e.price || 0) * (e.quantity || 1), 0);
-      const slRevenue = (b.serviceLines ?? []).reduce(
+      const visibleServiceLines = (b.serviceLines ?? []).filter((line) => !isTravelCostLine(line));
+      const slRevenue = visibleServiceLines.reduce(
         (s, l) => s + Number(l.revenueAmount || 0) * (l.quantity || 1), 0);
-      const slCost = (b.serviceLines ?? []).reduce(
+      const slCost = visibleServiceLines.reduce(
         (s, l) => s + Number(l.costAmount || 0) * (l.quantity || 1), 0);
       const summary = computeBookingFinancialSummary({
         total: Number(b.total),
@@ -312,7 +319,7 @@ export default async function LeadDetailPage({ params }: Props) {
                 meta: 'extra',
               });
             }
-            for (const line of lead.booking.serviceLines || []) {
+            for (const line of (lead.booking.serviceLines || []).filter((item) => !isTravelCostLine(item))) {
               products.push({
                 id: `line-${products.length}`,
                 kind: line.kind,
@@ -336,7 +343,7 @@ export default async function LeadDetailPage({ params }: Props) {
           })(),
           collaboratorCost: (() => {
             // Cost de col·laborador = línies de servei subcontractades (amb collaboratorId).
-            const collabLines = (lead.booking.serviceLines || []).filter((l) => l.collaboratorId);
+            const collabLines = (lead.booking.serviceLines || []).filter((l) => l.collaboratorId && !isTravelCostLine(l));
             if (collabLines.length === 0) return null;
             const amount = collabLines.reduce((sum, l) => sum + Number(l.costAmount || 0) * (l.quantity || 1), 0);
             return amount > 0 ? { amount, name: collabLines[0].collaborator?.name || 'Col·laborador' } : null;
@@ -346,7 +353,7 @@ export default async function LeadDetailPage({ params }: Props) {
             const packCost = lead.booking.pack?.price ? Number(lead.booking.pack.price) : 0;
             const travelCost = lead.booking.travelCost ? Number(lead.booking.travelCost) : 0;
             const collabCost = (lead.booking.serviceLines || [])
-              .filter((l) => l.collaboratorId)
+              .filter((l) => l.collaboratorId && !isTravelCostLine(l))
               .reduce((sum, l) => sum + Number(l.costAmount || 0) * (l.quantity || 1), 0);
             const floor = packCost + travelCost + collabCost;
             return floor > 0 ? floor : null;

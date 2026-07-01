@@ -1546,6 +1546,20 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1340 — 2026-07-01 — codex (FET)
+**Bingo Musical: tècnic de so sempre assignable + cost ruta net al lead.**
+- `lib/constants/orbita-services.ts`: `partnerProductRequiresSoundTech` converteix `Bingo Musical` i `Batalla Musical` en productes que sempre requereixen línia separada de tècnic, encara que el `crew` vingui buit.
+- `app/admin/bookings/BookingServiceLinesSection.tsx`: la línia `Tècnic de so inclòs` continua sortint amb selector Òrbita/proveïdor perquè es decideixi a qui s'ha de pagar sense duplicar el total venut.
+- `lib/services/leadServiceLineService.ts` i `app/admin/leads/[id]/page.tsx`: les línies internes `[travel-cost]` es filtren del lead i dels càlculs de productes contractats/cost de col·laborador/cost floor.
+- BD real: `OE-2026-006` reimputada; les línies històriques `[travel-cost]` s'han eliminat i el seu import ha passat a `travelCost`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1340`; el següent canvi real ha de ser `#1341`.
+- Validació tècnica: tests focalitzats verds; tsc 0; qa:protocol 0; validate:core EXIT 0.
+- Validació funcional: Bingo Musical força la pregunta de tècnic Òrbita/proveïdor; el cost de ruta queda intern i no reapareix com a producte contractat.
+- Validació humana/UX: el formulari demana qui cobra el tècnic quan toca i el lead real deixa de barrejar costos interns amb productes venuts.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1339 — 2026-07-01 — claude (FET)
 **Eradicació últim reducte: fantasma control-room.css + script debug amb contrasenya.**
 - Auditoria de veritat (no els 12 guards estàtics inicials): 60 guards + suite de tests (543 fitxers / 5159 tests / 0 fallos) + greps manuals.

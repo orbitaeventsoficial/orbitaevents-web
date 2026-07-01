@@ -43,6 +43,10 @@ export const DJ_EXTRA_HOUR_PRICE = 100;
 // proveïdor (animació/bingo de Masquerade). Un sol número per a tot el sistema.
 export const SOUND_TECH_PRICE = 40;
 export const SOUND_TECH_DURATION = '1,5 h';
+export const PARTNER_PRODUCTS_WITH_INCLUDED_SOUND_TECH = [
+  'bingo musical',
+  'batalla musical',
+] as const;
 
 /**
  * Detecta si un producte de proveïdor porta tècnic de so intrínsec (a partir
@@ -52,6 +56,12 @@ export const SOUND_TECH_DURATION = '1,5 h';
 export function productIncludesSoundTech(crew?: string | null): boolean {
   if (!crew) return false;
   return /t[eè]cnic\s+de\s+so/i.test(crew);
+}
+
+export function partnerProductRequiresSoundTech(input: { name?: string | null; crew?: string | null }): boolean {
+  if (productIncludesSoundTech(input.crew)) return true;
+  const normalizedName = (input.name || '').trim().toLowerCase();
+  return PARTNER_PRODUCTS_WITH_INCLUDED_SOUND_TECH.some((productName) => normalizedName === productName);
 }
 
 /** Preu derivat d'un servei de DJ per a N hores (≥1). Font única de qualsevol preu base. */

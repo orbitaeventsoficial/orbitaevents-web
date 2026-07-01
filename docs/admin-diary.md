@@ -1,3 +1,25 @@
+## 2026-07-01 — Bingo Musical: tècnic de so sempre assignable + cost ruta net al lead (Canvi #1340, codex)
+
+### Context
+El propietari valida el model de cost de desplaçament però detecta dos punts operatius: a Bingo Musical sempre hi ha un tècnic de so i el sistema ha de preguntar si el cobra Òrbita o el proveïdor; a més, el lead real `cmr1xh7la0000ug7dj4jnihjr` mostrava malament línies internes de ruta com si fossin productes contractats.
+
+### Què s'ha fet
+- `partnerProductRequiresSoundTech` fa que `Bingo Musical` i `Batalla Musical` generin sempre la línia separada `Tècnic de so inclòs`, encara que el `crew` del producte vingui buit.
+- `BookingServiceLinesSection` continua mostrant el selector de pagador del tècnic: Òrbita o el proveïdor; així el cost va al receptor correcte sense canviar el total venut.
+- `leadServiceLineService` i el mapper server de `/admin/leads/[id]` filtren línies internes `[travel-cost]` perquè no apareguin com a productes contractats ni inflin el cost de col·laborador/cost floor.
+- La reserva real `OE-2026-006` s'ha sanejat a BD: el temps de ruta antic s'ha reimputat a `travelCost` i s'han eliminat les línies `[travel-cost]` històriques.
+
+### Validació
+- Validació tècnica: tests focalitzats de serveis/constants/formulari verds; tsc 0; qa:protocol 0; validate:core EXIT 0.
+- Validació funcional: Bingo Musical força tècnic assignable; el cost de ruta queda com a cost intern del bolo, no com a producte contractat.
+- Validació humana/UX: el formulari pregunta qui paga/cobra el tècnic quan toca i el lead deixa de barrejar productes venuts amb costos interns.
+
+### Coordinació
+Counter → 1340. Sense schema, sense CSS admin core, sense mails automàtics.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-01 — Eradicació últim reducte: fantasma control-room.css + script debug amb contrasenya (Canvi #1339, claude)
 
 ### Context

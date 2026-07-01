@@ -20,6 +20,7 @@ beforeEach(() => {
 
 describe('listLeadServiceLines', () => {
   it('retorna les línies del lead', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue(null);
     mockPrisma.leadServiceLine.findMany.mockResolvedValue([{ id: 'l1' }]);
     const r = await listLeadServiceLines('lead1');
     expect(r.status).toBe(200);
@@ -27,6 +28,23 @@ describe('listLeadServiceLines', () => {
     expect(mockPrisma.leadServiceLine.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: { leadId: 'lead1' } })
     );
+  });
+
+  it('si el lead ja te reserva, amaga les línies internes de transport', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({
+      booking: {
+        serviceLines: [
+          { id: 'producte', label: 'Bingo Musical', notes: null },
+          { id: 'ruta', label: 'Temps ruta passatger', notes: '[travel-cost] PASSENGER · 6.00 h' },
+        ],
+      },
+    });
+
+    const r = await listLeadServiceLines('lead1');
+
+    expect(r.status).toBe(200);
+    expect(r.body.lines).toEqual([{ id: 'producte', label: 'Bingo Musical', notes: null }]);
+    expect(mockPrisma.leadServiceLine.findMany).not.toHaveBeenCalled();
   });
 });
 

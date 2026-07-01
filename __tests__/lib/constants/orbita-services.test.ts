@@ -4,6 +4,7 @@ import {
   SOUND_TECH_PRICE,
   SOUND_TECH_DURATION,
   productIncludesSoundTech,
+  partnerProductRequiresSoundTech,
   djPriceForHours,
   DJ_FIRST_HOUR_PRICE,
   DJ_EXTRA_HOUR_PRICE,
@@ -26,6 +27,16 @@ describe('productIncludesSoundTech', () => {
     expect(productIncludesSoundTech(null)).toBe(false);
     expect(productIncludesSoundTech(undefined)).toBe(false);
     expect(productIncludesSoundTech('')).toBe(false);
+  });
+});
+
+describe('partnerProductRequiresSoundTech', () => {
+  it('Bingo Musical sempre genera tècnic assignable encara que crew vingui buit', () => {
+    expect(partnerProductRequiresSoundTech({ name: 'Bingo Musical', crew: null })).toBe(true);
+  });
+
+  it('manté els productes sense tècnic fora de la línia assignable', () => {
+    expect(partnerProductRequiresSoundTech({ name: 'Pintacares professional', crew: 'Animador sol' })).toBe(false);
   });
 });
 
