@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1318 — 2026-07-01 — claude (FET)
+**UX: target tàctil canònic als inputs.**
+- .adm-input/.ap-input min-height 40px (textarea 64px). 1 lloc → tots. Verificat intake 0 sota target. min-width grans = @media breakpoints (correctes).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1318`; el següent canvi real ha de ser `#1319`.
+- Validació tècnica: tsc 0; validate:core.
+- Validació funcional: inputs ≥40px.
+- Validació humana/UX: pitjables.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1317 — 2026-07-01 — claude (FET)
 **UX: target tàctil canònic als botons (mòbil ≥44px).**
 - .ap-btn min-height 36px base; media query ≤640px → 44px (WCAG). .ap-btn--xs també. 1 lloc → tots responen. Verificat 375px: 56-104 botons petits → 0.

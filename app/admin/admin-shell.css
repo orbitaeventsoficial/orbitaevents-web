@@ -861,7 +861,12 @@ html.admin-mode .ap-input {
   font-size: var(--o-text-base);
   font-family: inherit;
   transition: border-color 140ms ease;
+  /* Target tàctil canònic (UX): input pitjable, ≥40px. Un sol lloc → tots els
+     inputs de l'admin. Evita també el zoom automàtic iOS (font-size ≥16px via token). */
+  min-height: 2.5rem;
 }
+html.admin-mode .adm-input--textarea,
+html.admin-mode textarea.adm-input { min-height: 4rem; }
 html.admin-mode .adm-input--textarea { resize: vertical; line-height: 1.6; }
 html.admin-mode .adm-input:focus,
 html.admin-mode .ap-input:focus { outline: none; border-color: var(--ax-hair-gold); }

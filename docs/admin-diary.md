@@ -1,3 +1,20 @@
+## 2026-07-01 — UX: target tàctil canònic als inputs + verificació overflow (Canvi #1318, claude)
+
+### Què s'ha fet
+- `.adm-input`/`.ap-input`: `min-height: 2.5rem` (40px) tàctil; textarea 4rem. Un sol lloc → tots els inputs de l'admin pitjables. Verificat intake (13 inputs, 0 sota target).
+- Verificat: els 11 "min-width grans" són @media breakpoints (640/768/1024/1280px), NO amplades de contenidor → correctes, cap overflow.
+
+### Validació
+- Validació tècnica: tsc 0; validate:core.
+- Validació funcional: inputs ≥40px a 375px.
+- Validació humana/UX: inputs pitjables, sense zoom iOS.
+
+### Coordinació
+Counter → 1318. UX tàctil (botons #1316 + inputs ara). Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-01 — UX: target tàctil canònic als botons (mòbil ≥44px) (Canvi #1317, claude)
 
 ### Context
