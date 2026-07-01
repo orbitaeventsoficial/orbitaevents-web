@@ -178,15 +178,17 @@ export default function NewBookingForm() {
 
   const applyTravelCostLines = () => {
     const nextLines = serviceLines.filter((line) => !line.notes?.includes(TRAVEL_COST_LINE_MARKER));
-    const travelLines: BookingServiceLineFormInput[] = travelCostBreakdown.lines.map((line) => ({
-      kind: 'OTHER',
-      label: line.label,
-      revenueAmount: 0,
-      costAmount: line.costAmount,
-      collaboratorId: line.collaboratorId || undefined,
-      quantity: 1,
-      notes: line.notes,
-    }));
+    const travelLines: BookingServiceLineFormInput[] = travelCostBreakdown.lines
+      .filter((line) => !line.notes.includes(`${TRAVEL_COST_LINE_MARKER} vehicle`))
+      .map((line) => ({
+        kind: 'OTHER',
+        label: line.label,
+        revenueAmount: 0,
+        costAmount: line.costAmount,
+        collaboratorId: line.collaboratorId || undefined,
+        quantity: 1,
+        notes: line.notes,
+      }));
     setServiceLines([...nextLines, ...travelLines]);
   };
 

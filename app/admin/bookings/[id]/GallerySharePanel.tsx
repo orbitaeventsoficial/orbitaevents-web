@@ -133,7 +133,7 @@ export default function GallerySharePanel({ bookingId }: Props) {
               type="button"
               onClick={handleRevoke}
               disabled={working}
-              className="rounded-xl border admin-tone-border-danger px-3 py-1.5 text-xs font-medium admin-tone-text-danger hover:admin-tone-border-danger transition-colors disabled:opacity-50 min-h-[36px]"
+              className="ap-btn ap-btn--xs admin-tone-border-danger admin-tone-text-danger"
             >
               Revocar
             </button>
@@ -165,7 +165,7 @@ export default function GallerySharePanel({ bookingId }: Props) {
               type="button"
               onClick={handleCreate}
               disabled={working}
-              className="rounded-xl admin-tone-bg-info border admin-tone-border-info px-4 py-2 text-xs font-semibold admin-tone-text-info hover:admin-tone-bg-info transition-colors disabled:opacity-50 min-h-[36px]"
+              className="ap-btn ap-btn--primary"
             >
               {working ? 'Generant...' : 'Crear'}
             </button>

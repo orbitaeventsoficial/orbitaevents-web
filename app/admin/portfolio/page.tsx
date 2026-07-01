@@ -139,7 +139,7 @@ function FullscreenPreview({ preview, onClose }: { preview: PreviewState | null;
       <button
         type="button"
         onClick={onClose}
-        className="absolute right-4 top-4 rounded-full border border-[var(--line)] bg-black/60 px-3 py-2 text-sm text-[var(--t)]"
+        className="ap-btn absolute right-4 top-4"
       >
         Tancar
       </button>

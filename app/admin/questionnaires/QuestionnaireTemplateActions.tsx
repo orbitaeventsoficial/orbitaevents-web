@@ -42,7 +42,7 @@ export default function QuestionnaireTemplateActions({
       <div className="flex shrink-0 flex-wrap gap-2">
         <Link
           href={buildQuestionnaireHref(id)}
-          className="inline-flex rounded-lg border border-[var(--line)] px-3 py-1.5 text-xs text-[var(--t2)] hover:bg-[var(--raised)]"
+          className="ap-btn ap-btn--xs"
         >
           Editar
         </Link>
@@ -55,7 +55,7 @@ export default function QuestionnaireTemplateActions({
         </button>
         <button
           onClick={handleDelete}
-          className="inline-flex rounded-lg border admin-tone-border-danger px-3 py-1.5 text-xs admin-tone-text-danger hover:admin-tone-bg-danger"
+          className="ap-btn ap-btn--xs admin-tone-border-danger admin-tone-text-danger"
           type="button"
         >
           Eliminar

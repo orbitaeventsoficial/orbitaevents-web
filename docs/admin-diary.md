@@ -1,3 +1,23 @@
+## 2026-07-01 — Homogeneïtat: 7 botons pelats → .ap-btn (0 restants) (Canvi #1335, claude)
+
+### Context
+Caça de botons pelats (`<button>` amb border+px a mà sense .ap-btn). Només 7 en 5 fitxers — l'admin ja quasi net.
+
+### Què s'ha fet
+- GallerySharePanel (2), PackPriceQuickEditor (1), QuestionnaireTemplateActions (2), portfolio (1, botó Tancar del fullscreen amb bg-black/60 → .ap-btn, elimina el negre absolut), text-manager (2: Reintentar + Desar amb estat verd) → `.ap-btn`/`--xs`/`--primary`, conservant tons d'estat (danger/success).
+- **0 botons pelats a tot l'admin.**
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0; canon 0 P1.
+- Validació funcional: botons canònics, estats conservats.
+- Validació humana/UX: botons homogenis.
+
+### Coordinació
+Counter → 1335. Botons homogenis (0 pelats). Amb inputs (0) i cards (0), tots els components bàsics nets. Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-01 — Fix real: ap-btn-primary (classe inexistent) + inputs pelats → canònic (Canvi #1333, claude)
 
 ### Context

@@ -232,7 +232,7 @@ export default function TextManagerPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-[var(--o-admin-canvas)]">
         <p className="admin-tone-text-warning text-sm">{error}</p>
-        <button type="button" onClick={loadTexts} className="text-sm px-4 py-2 rounded-lg border border-[var(--line)] text-[var(--t2)] hover:text-[var(--t2)]">Reintentar</button>
+        <button type="button" onClick={loadTexts} className="ap-btn ap-btn--xs">Reintentar</button>
       </div>
     );
   }
@@ -288,10 +288,10 @@ export default function TextManagerPage() {
           <button
             onClick={handleSave}
             disabled={saving || modifiedCount === 0}
-            className={`px-5 h-9 rounded-lg text-sm font-bold border transition-all shrink-0 ${
+            className={`ap-btn shrink-0 ${
               modifiedCount > 0
-                ? 'bg-[var(--o-success)] border-[var(--o-success)] text-[var(--t)] hover:brightness-110'
-                : 'bg-transparent border-[var(--line)] text-[var(--t3)] cursor-not-allowed'
+                ? 'ap-btn--primary admin-tone-border-success admin-tone-bg-success admin-tone-text-success'
+                : ''
             }`}
           >
             {saving ? 'Desant...' : 'Desar'}

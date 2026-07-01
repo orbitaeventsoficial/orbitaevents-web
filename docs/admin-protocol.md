@@ -1548,6 +1548,17 @@ Seqüència obligatòria de registre:
 
 ## Entrades
 
+### Canvi #1335 — 2026-07-01 — claude (FET)
+**Homogeneïtat: 7 botons pelats → .ap-btn (0 restants).**
+- GallerySharePanel/PackPriceQuickEditor/QuestionnaireTemplateActions/portfolio(Tancar, treu bg-black)/text-manager(Reintentar+Desar) → .ap-btn/--xs/--primary, tons conservats. 0 botons pelats a l'admin.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1335`; el següent canvi real ha de ser `#1336`.
+- Validació tècnica: tsc 0; validate:core EXIT 0.
+- Validació funcional: botons canònics.
+- Validació humana/UX: homogenis.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ---
 ### Canvi #1333 — 2026-07-01 — claude (FET)
 **Fix real: ap-btn-primary (classe inexistent) + inputs pelats → canònic.**
