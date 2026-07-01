@@ -43,6 +43,21 @@ describe('listLeadServiceLines', () => {
     expect(r.body.lines).toEqual([{ id: 'producte', label: 'Bingo Musical', notes: null }]);
   });
 
+  it('reimputa el cost intern de transport al marge (internalTravelCost)', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue(null);
+    mockPrisma.leadServiceLine.findMany.mockResolvedValue([
+      { id: 'producte', label: 'Bingo Musical', notes: null, costAmount: 160, quantity: 1 },
+      { id: 'conductor', label: 'Temps ruta conductor', notes: '[travel-cost] DRIVER · 6.00 h', costAmount: 108, quantity: 1 },
+      { id: 'passatger', label: 'Temps ruta passatger', notes: '[travel-cost] PASSENGER · 6.00 h', costAmount: 90, quantity: 1 },
+    ]);
+
+    const r = await listLeadServiceLines('lead1');
+
+    // el producte es visible; el transport s'amaga PERO el seu cost es reimputa
+    expect(r.body.lines).toHaveLength(1);
+    expect(r.body.internalTravelCost).toBe(198); // 108 + 90 → menja marge, no menteix
+  });
+
   it('si el lead ja te reserva, amaga les línies internes de transport', async () => {
     mockPrisma.lead.findUnique.mockResolvedValue({
       booking: {

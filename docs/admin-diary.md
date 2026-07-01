@@ -1,3 +1,24 @@
+## 2026-07-02 — Fix marge mentider: reimputa el cost de transport al bolo del lead (Canvi #1343, claude)
+
+### Context
+El propietari detecta que el lead d'Alba (sense reserva) no calcula els components de transport. Rastreig: el #1342 amaga les línies `[travel-cost]` de l'API `listLeadServiceLines`; `LeadBoloSection` les rebia filtrades I passava `travelCost: 0` al motor → **el marge ignorava els 198€ de ruta** (108 conductor + 90 passatger). Marge falsament optimista — exactament l'advertència de `docs/disseny-cost-desplacament.md` («si treus les persones de serviceLines, REIMPUTA el cost o el marge mentirà»). El cas RESERVA ja ho comptava (via `b.travelCost` server-side); el bug era només al cas lead-pur.
+
+### Què s'ha fet
+- `leadServiceLineService.listLeadServiceLines`: retorna `internalTravelCost` (suma del cost de les línies `[travel-cost]`) al costat de les línies visibles filtrades. Helper `sumTravelCostLines`. Només al cas lead-pur (el de reserva no es toca).
+- `LeadBoloSection`: nou estat `internalTravelCost`, capturat de l'API, alimentat com a `travelCost` a `computeBookingFinancialSummary` (motor canònic, cap càlcul de marge inline nou). Les línies segueixen amagades de la vista de productes; el cost SÍ compta.
+- +1 test: lead-pur amb producte + 2 línies `[travel-cost]` → `internalTravelCost = 198`, 1 línia visible (10/10).
+
+### Validació
+- Validació tècnica: tsc 0; test `leadServiceLineService` 10/10; validate:core EXIT 0.
+- Validació funcional: (runtime real, Playwright) l'API retorna `internalTravelCost: 198`; el marge del lead passa de fals-positiu a **Net −178€ / −74%** (240€ PVP − 200€ serveis − 20€ origen − 198€ ruta). Ara diu la veritat: bolo Andorra = pèrdua amb desplaçament comptat.
+- Validació humana/UX: el hero del lead mostra el net honest amb el transport reimputat.
+
+### Coordinació
+Counter → 1343. Entrada al carril de cost autoritzada pel propietari («fes-ho tu»), continguda: es reutilitza el motor canònic, no es reescriu marge. El càlcul EN VIU de km/trams/integrants per al lead (input de distància) queda per a Codex. Backup literal del lead a `backups/` abans de tocar. Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-02 — Recuperació del bolo al lead Alba sense recrear reserva (Canvi #1342, codex)
 
 ### Context

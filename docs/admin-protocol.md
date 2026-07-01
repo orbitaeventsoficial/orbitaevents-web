@@ -1546,6 +1546,18 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1343 — 2026-07-02 — claude (FET)
+**Fix marge mentider: reimputa el cost de transport al bolo del lead pur.**
+- Bug: el #1342 amaga les línies `[travel-cost]` de l'API; `LeadBoloSection` passava `travelCost: 0` → el marge del lead ignorava 198€ de ruta (advertència de `docs/disseny-cost-desplacament.md` materialitzada). El cas reserva ja ho comptava (`b.travelCost`); només fallava el lead-pur.
+- `leadServiceLineService`: retorna `internalTravelCost` (suma línies `[travel-cost]`) + helper `sumTravelCostLines`. `LeadBoloSection` l'alimenta com a `travelCost` al motor canònic `computeBookingFinancialSummary` (cap marge inline nou). Línies amagades de la vista, cost comptat.
+- Validació tècnica: tsc 0; test 10/10; validate:core EXIT 0.
+- Validació funcional: (Playwright) API `internalTravelCost: 198`; marge lead Andorra passa a Net −178€ / −74% (veritat: pèrdua amb desplaçament).
+- Validació humana/UX: el hero del lead mostra el net honest.
+- Entrada al carril de cost autoritzada pel propietari; continguda (motor canònic). Càlcul en viu km/trams = per a Codex. Counter → 1343.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1342 — 2026-07-02 — codex (FET)
 **Recuperació del bolo al lead Alba sense recrear reserva.**
 - BD viva: restaurades a `LeadServiceLine` les línies literals del backup `adminLog` `CREATE_ANDORRA_BINGO_BOOKING` per al lead `cmr1xh7la0000ug7dj4jnihjr`: Bingo Musical, tècnic de so inclòs i dues línies internes `[travel-cost]` de ruta.

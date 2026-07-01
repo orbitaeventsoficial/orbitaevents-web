@@ -63,6 +63,8 @@ export default function LeadBoloSection({
 }) {
  const toast = useToast();
  const [lines, setLines] = useState<BookingServiceLineFormInput[]>([]);
+ // Cost intern de ruta (línies [travel-cost] amagades): reimputat al marge.
+ const [internalTravelCost, setInternalTravelCost] = useState(0);
  const [loading, setLoading] = useState(true);
  const [saving, setSaving] = useState(false);
  const [dirty, setDirty] = useState(false);
@@ -88,6 +90,7 @@ export default function LeadBoloSection({
  notes: l.notes ?? undefined,
  }));
  setLines(loaded);
+ setInternalTravelCost(Number(d.internalTravelCost) || 0);
  }
  } catch (e) {
  console.error('[LeadBolo] càrrega', e);
@@ -137,7 +140,7 @@ export default function LeadBoloSection({
  const summary = computeBookingFinancialSummary({
  total: revenue,
  packPrice: 0, extrasTotal: 0, extraHours: 0, extraHourPrice: 0,
- distanceKm: 0, travelCost: 0,
+ distanceKm: 0, travelCost: internalTravelCost,
  serviceLinesRevenue: revenue, serviceLinesCost: cost + rentalTransport,
  source: source ?? null,
  }, {
@@ -145,7 +148,7 @@ export default function LeadBoloSection({
  fixedOperationalCost: hasOwnEquipment ? PROFITABILITY_MODEL_DEFAULTS.fixedOperationalCost : 0,
  });
  return summary;
- }, [buildVisibleLines, source, vehicleCostPerKm]);
+ }, [buildVisibleLines, source, vehicleCostPerKm, internalTravelCost]);
 
  // Eleva el net al contenidor (perquè visqui al hero de la fitxa, no enterrat a baix).
  useEffect(() => {

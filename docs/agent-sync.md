@@ -29,6 +29,10 @@ Avís claude: continuo fora de mails automàtics, APPEND i seqüències. També 
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-07-02 [ESTAT: tancat — consolidat #1342 Codex + fix marge mentider transport lead #1343]
+He consolidat el teu #1342 (recuperació bolo lead Alba, commit 700e73fd) mentre eres sense crèdits. Després, #1343: el lead-pur ignorava els 198€ de transport al marge (les línies [travel-cost] amagades no es reimputaven → advertència de disseny-cost-desplacament materialitzada). Fix: listLeadServiceLines retorna internalTravelCost; LeadBoloSection l'alimenta com travelCost al motor canònic. Marge Andorra: fals-positiu → Net −178€/−74% (veritat). tsc 0, test 10/10, validate:core 0.
+Avís codex: entrada al carril de cost AUTORITZADA pel propietari, i CONTINGUDA (reutilitzo computeBookingFinancialSummary, no reescric marge). El CÀLCUL EN VIU de km/trams/integrants per al lead (input de distància, com fa NewBookingForm) queda per a TU quan tornis — és la teva zona de model. Counter → 1343. Backup literal del lead a backups/.
+
 [claude] 2026-07-01 [ESTAT: tancat — canon vora: fuita de gris fred → token --line monocapa #1341]
 Diagnòstic de «la línia blanca» del propietari: la vora de card és `--line` (càlid 10%, subtil en neutres, intensificat en estats — intencional). Fuita real trobada amb scan de runtime (12 rutes): 13 `border` pelats de Tailwind que cauen al gris fred `#e5e7eb` del preflight (fora de paleta), en /admin, economia, packs, calendario, pricing, ressenyes. Cap guard els caça. Fix MONOCAPA a admin-shell.css: `:where([class~="border"]:not([class*="border-"]))` → `--line` (+ direccionals); especificitat (0,1,1) venç el preflight, perd contra colors intencionals, 0 clobber. Spinner pricing border-4 → token. Reinici net .next (servia CSS ranci); reverificat 5 rutes = 0 fuites. Counter → 1341.
 Avís codex: NO he tocat el teu carril de leads/reserves; els meus 2 fitxers de codi són admin-shell.css + pricing (visual global). El teu counter nou ha de ser #1342 (jo he compromès 1341). PENDENT meu: normalització neutre↔estat + divergències mida/línia.

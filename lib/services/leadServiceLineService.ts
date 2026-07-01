@@ -38,6 +38,19 @@ function isTravelCostLine(line: { notes?: string | null }): boolean {
   return Boolean(line.notes?.includes(TRAVEL_COST_LINE_MARKER));
 }
 
+/**
+ * Cost intern de les línies [travel-cost] (temps de ruta de conductor/passatgers).
+ * S'amaguen de la llista de productes però el cost s'ha de REIMPUTAR al marge
+ * (si no, el marge menteix: veure docs/disseny-cost-desplacament.md).
+ */
+function sumTravelCostLines(
+  lines: Array<{ notes?: string | null; costAmount?: number | null; quantity?: number | null }>,
+): number {
+  return lines
+    .filter(isTravelCostLine)
+    .reduce((sum, l) => sum + Number(l.costAmount || 0) * (l.quantity || 1), 0);
+}
+
 /** Línies del bolo d'un lead, ordenades. */
 export async function listLeadServiceLines(leadId: string) {
   const lead = await prisma.lead.findUnique({
@@ -60,7 +73,15 @@ export async function listLeadServiceLines(leadId: string) {
     where: { leadId },
     orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
   });
-  return { status: 200, body: { lines: lines.filter((line) => !isTravelCostLine(line)) } };
+  return {
+    status: 200,
+    body: {
+      lines: lines.filter((line) => !isTravelCostLine(line)),
+      // Lead pur (sense reserva): el cost de ruta viu a les línies [travel-cost],
+      // amagades de productes però reimputades al marge via aquest total.
+      internalTravelCost: sumTravelCostLines(lines),
+    },
+  };
 }
 
 /**
