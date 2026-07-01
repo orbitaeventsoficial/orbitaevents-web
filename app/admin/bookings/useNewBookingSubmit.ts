@@ -113,7 +113,7 @@ export function useNewBookingSubmit({
 
     try {
       const serviceLines = explicitServiceLines && explicitServiceLines.length > 0
-        ? explicitServiceLines
+        ? explicitServiceLines.map(({ travelHeadcount: _travelHeadcount, ...line }) => line)
         : buildServiceLines(relationshipContext);
       const billedCollaboratorId = explicitBilledCollaboratorId
         ?? (relationshipContext?.mode === 'PARTNER_HIRES_ORBITA' ? relationshipContext.partnerId || undefined : undefined);

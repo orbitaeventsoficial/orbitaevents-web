@@ -1,3 +1,27 @@
+## 2026-07-01 — Desplaçament: temps de ruta com a cost intern, no producte (Canvi #1338, codex)
+
+### Context
+Claude deixa `docs/disseny-cost-desplacament.md` amb decisió de producte tancada: el temps de viatge no ha d'aparèixer com a línia a "productes contractats"; és cost intern del bolo i ha de menjar marge. El cas `OE-2026-006` Andorra/Bingo és el banc de proves.
+
+### Què s'ha fet
+- `travelLaborCost` separa vehicle i temps de persones, compta integrants i aplica llindar de temps via `INCLUDED_TRAVEL_KM` fins que el propietari decideixi un valor diferent.
+- `NewBookingForm` deixa d'injectar línies `[travel-cost]` a `serviceLines`: el transport real es recalcula sol i entra com a `travelCost` intern.
+- Els integrants del desplaçament es deriven del bolo: pack base = 1, productes de partner llegeixen `crew`, tècnic inclòs = 1, operari extra = 1, hores extra del mateix DJ = 0; queda un ajust manual només per excepcions.
+- `useBookingPricing` accepta el cost intern complet de ruta perquè el marge en viu sumi vehicle + hores-persona sense embrutar "productes contractats".
+- `travelHeadcount` és metadada local de UI i es retira abans d'enviar `serviceLines` a l'API.
+- `BookingPricingSummary` explica el transport com a cost intern estimat.
+
+### Validació
+- Validació tècnica: tsc 0; tests focalitzats verds; validate:core EXIT 0.
+- Validació funcional: el temps de ruta ja no es persisteix com a producte contractat; el cost total de ruta s'imputa al marge via `travelCost` i els integrants surten dels serveis contractats.
+- Validació humana/UX: la secció mostra integrants derivats, ajust manual, llindar i cost de ruta com a cost intern, no com a servei que compra el client.
+
+### Coordinació
+Counter → 1338. Sense schema, sense mails, sense CSS admin core.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-01 — Canon tipografia: text-[Nrem] literals → token (Canvi #1337, claude)
 
 ### Context

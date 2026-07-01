@@ -41,14 +41,18 @@ interface UseBookingPricingOptions {
   manualTotalPrice?: number;
   invoiceRequired?: boolean;
   serviceLines?: BookingServiceLineFormInput[];
+  internalTravelCostOverride?: number;
 }
 
-export function useBookingPricing({ form, packs, extras, selectedExtras, customPackPrice, manualTotalPrice, invoiceRequired = false, serviceLines = [] }: UseBookingPricingOptions) {
+export function useBookingPricing({ form, packs, extras, selectedExtras, customPackPrice, manualTotalPrice, invoiceRequired = false, serviceLines = [], internalTravelCostOverride }: UseBookingPricingOptions) {
   const internalTravelCost = useMemo(() => {
+    if (typeof internalTravelCostOverride === 'number' && internalTravelCostOverride > 0) {
+      return internalTravelCostOverride;
+    }
     const km = parseFloat(form.distanceKm) || 0;
     const rate = parseFloat(form.fuelCostPerKm) || DEFAULT_VEHICLE_COST_PER_KM;
     return calculateTravelCost(km, rate, INCLUDED_TRAVEL_KM);
-  }, [form.distanceKm, form.fuelCostPerKm]);
+  }, [form.distanceKm, form.fuelCostPerKm, internalTravelCostOverride]);
 
   const travelCharge = useMemo(() => {
     const km = parseFloat(form.distanceKm) || 0;

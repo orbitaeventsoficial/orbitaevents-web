@@ -72,6 +72,25 @@ function packLabel(pack: BookingPack): string {
   return pack.translations?.[0]?.name || pack.slug;
 }
 
+function countCrewMembers(crew?: string | null): number {
+  if (!crew) return 1;
+  return crew
+    .split('+')
+    .map((part) => part.trim().toLowerCase())
+    .filter((part) => part && !/equip|decoraci[oó]|material|propi/.test(part))
+    .reduce((total, part) => {
+      const explicit = part.match(/\b(\d+)\b/);
+      return total + (explicit ? Number(explicit[1]) : 1);
+    }, 0) || 1;
+}
+
+function orbitaServiceHeadcount(id: string): number {
+  if (id === 'dj-primera-hora') return 1;
+  if (id === 'tecnic-so') return 1;
+  if (id === 'operari-extra') return 1;
+  return 0;
+}
+
 export default function BookingServiceLinesSection({
   lines,
   onChange,
@@ -111,13 +130,13 @@ export default function BookingServiceLinesSection({
       const hasFirstHour = firstHour && lines.some((l) => l.label === firstHour.label);
       if (firstHour && !hasFirstHour) {
         onChange([...lines,
-          { kind: firstHour.kind, label: firstHour.label, revenueAmount: firstHour.defaultPrice, quantity: 1 },
-          newLine,
+          { kind: firstHour.kind, label: firstHour.label, revenueAmount: firstHour.defaultPrice, quantity: 1, travelHeadcount: 1 },
+          { ...newLine, travelHeadcount: 0 },
         ]);
         return;
       }
     }
-    onChange([...lines, newLine]);
+    onChange([...lines, { ...newLine, travelHeadcount: orbitaServiceHeadcount(svc.id) }]);
   };
 
   const addPartnerProduct = (id: string) => {
@@ -128,6 +147,7 @@ export default function BookingServiceLinesSection({
     // (per defecte) o Òrbita. El total no canvia: el producte baixa el cost del
     // tècnic i la línia de tècnic el recupera.
     const hasTech = productIncludesSoundTech(p.crew);
+    const crewMembers = countCrewMembers(p.crew);
     const productCost = hasTech ? Math.max(0, p.costPrice - SOUND_TECH_PRICE) : p.costPrice;
     // Una línia de lloguer de material (col·laborador EQUIPMENT_RENTAL, p.ex. Tino)
     // és `EQUIPMENT`: això activa el transport d'anar a buscar-lo al càlcul del bolo.
@@ -140,6 +160,7 @@ export default function BookingServiceLinesSection({
       revenueAmount: p.sellPrice,
       costAmount: productCost,
       quantity: 1,
+      travelHeadcount: hasTech ? Math.max(0, crewMembers - 1) : crewMembers,
     };
     if (!hasTech) {
       onChange([...lines, productLine]);
@@ -152,6 +173,7 @@ export default function BookingServiceLinesSection({
       revenueAmount: 0, // ja inclòs al PVP del producte
       costAmount: SOUND_TECH_PRICE,
       quantity: 1,
+      travelHeadcount: 1,
     };
     onChange([...lines, productLine, techLine]);
   };

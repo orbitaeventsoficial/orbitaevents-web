@@ -17,7 +17,7 @@ import { useSearchParams } from 'next/navigation';
 import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
-import { calculateTravelCostBreakdown, TRAVEL_COST_LINE_MARKER } from '@/lib/services/travelLaborCost';
+import { calculateTravelCostBreakdown } from '@/lib/services/travelLaborCost';
 import { useToast } from '../components/ToastProvider';
 import { AdminPage, AdminSection } from '../components/AdminPage';
 import { NB_FIELD, NB_LABEL, NB_HINT, NB_GROUP } from './booking-form-classes';
@@ -92,8 +92,7 @@ export default function NewBookingForm() {
   const [travelVehicleOwner, setTravelVehicleOwner] = useState('OWNER');
   const [travelDriver, setTravelDriver] = useState('OWNER');
   const [travelPartnerId, setTravelPartnerId] = useState('');
-  const [travelOwnerPassengers, setTravelOwnerPassengers] = useState('0');
-  const [travelPartnerPassengers, setTravelPartnerPassengers] = useState('0');
+  const [travelHeadcountOverride, setTravelHeadcountOverride] = useState('');
   // Arrossega el pressupost del lead com a punt de partida del preu acordat.
   useEffect(() => {
     if (!leadData?.budget || manualTotalPrice) return;
@@ -129,6 +128,44 @@ export default function NewBookingForm() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  const travelPartner = useMemo(
+    () => partners.find((partner) => partner.id === travelPartnerId) || null,
+    [partners, travelPartnerId],
+  );
+  const travelPartnerLabel = travelPartner ? (travelPartner.company || travelPartner.name) : 'Proveïdor';
+  const travelVehicleOwnerMeta = travelVehicleOwner === 'PARTNER' && travelPartner
+    ? { label: travelPartnerLabel, collaboratorId: travelPartner.id }
+    : { label: 'Òrbita' };
+  const travelDriverMeta = travelDriver === 'PARTNER' && travelPartner
+    ? { label: travelPartnerLabel, collaboratorId: travelPartner.id }
+    : { label: 'Òrbita' };
+  const selectedPackForTravel = packs.find((pack) => pack.id === form.packId) || null;
+  const derivedTravelHeadcount = useMemo(() => {
+    const packHeadcount = selectedPackForTravel ? 1 : 0;
+    const linesHeadcount = serviceLines.reduce((sum, line) => {
+      if (typeof line.travelHeadcount === 'number') return sum + Math.max(0, line.travelHeadcount) * (line.quantity || 1);
+      if (line.kind === 'SOUND_TECH') return sum + (line.quantity || 1);
+      return sum;
+    }, 0);
+    return packHeadcount + linesHeadcount;
+  }, [selectedPackForTravel, serviceLines]);
+  const travelHeadcount = travelHeadcountOverride
+    ? Math.max(0, Math.floor(Number(travelHeadcountOverride) || 0))
+    : derivedTravelHeadcount;
+  const travelCostBreakdown = useMemo(() => {
+    const passengerCount = Math.max(0, travelHeadcount - 1);
+    return calculateTravelCostBreakdown({
+      roundTripKm: Number(form.distanceKm) || 0,
+      vehicleCostPerKm: Number(form.fuelCostPerKm) || DEFAULT_VEHICLE_COST_PER_KM,
+      routeHours: travelRouteHours ? Number(travelRouteHours) : undefined,
+      vehicleOwner: travelVehicleOwnerMeta,
+      people: [
+        ...(travelHeadcount > 0 ? [{ role: 'DRIVER' as const, ...travelDriverMeta }] : []),
+        ...(passengerCount > 0 ? [{ role: 'PASSENGER' as const, label: 'Equip ruta', count: passengerCount }] : []),
+      ],
+    });
+  }, [form.distanceKm, form.fuelCostPerKm, travelDriverMeta, travelHeadcount, travelRouteHours, travelVehicleOwnerMeta]);
+
   const {
     internalTravelCost,
     travelCharge,
@@ -147,50 +184,8 @@ export default function NewBookingForm() {
     manualTotalPrice: manualTotalPrice ? Number(manualTotalPrice) : undefined,
     invoiceRequired,
     serviceLines,
+    internalTravelCostOverride: travelCostBreakdown.totalCost,
   });
-
-  const travelPartner = useMemo(
-    () => partners.find((partner) => partner.id === travelPartnerId) || null,
-    [partners, travelPartnerId],
-  );
-  const travelPartnerLabel = travelPartner ? (travelPartner.company || travelPartner.name) : 'Proveïdor';
-  const travelVehicleOwnerMeta = travelVehicleOwner === 'PARTNER' && travelPartner
-    ? { label: travelPartnerLabel, collaboratorId: travelPartner.id }
-    : { label: 'Òrbita' };
-  const travelDriverMeta = travelDriver === 'PARTNER' && travelPartner
-    ? { label: travelPartnerLabel, collaboratorId: travelPartner.id }
-    : { label: 'Òrbita' };
-  const travelCostBreakdown = useMemo(() => {
-    const partnerPassengerCount = Number(travelPartnerPassengers) || 0;
-    const ownerPassengerCount = Number(travelOwnerPassengers) || 0;
-    return calculateTravelCostBreakdown({
-      roundTripKm: Number(form.distanceKm) || 0,
-      vehicleCostPerKm: Number(form.fuelCostPerKm) || DEFAULT_VEHICLE_COST_PER_KM,
-      routeHours: travelRouteHours ? Number(travelRouteHours) : undefined,
-      vehicleOwner: travelVehicleOwnerMeta,
-      people: [
-        { role: 'DRIVER', ...travelDriverMeta },
-        ...(ownerPassengerCount > 0 ? [{ role: 'PASSENGER' as const, label: 'Òrbita', count: ownerPassengerCount }] : []),
-        ...(partnerPassengerCount > 0 && travelPartner ? [{ role: 'PASSENGER' as const, label: travelPartnerLabel, collaboratorId: travelPartner.id, count: partnerPassengerCount }] : []),
-      ],
-    });
-  }, [form.distanceKm, form.fuelCostPerKm, travelDriverMeta, travelOwnerPassengers, travelPartner, travelPartnerLabel, travelPartnerPassengers, travelRouteHours, travelVehicleOwnerMeta]);
-
-  const applyTravelCostLines = () => {
-    const nextLines = serviceLines.filter((line) => !line.notes?.includes(TRAVEL_COST_LINE_MARKER));
-    const travelLines: BookingServiceLineFormInput[] = travelCostBreakdown.lines
-      .filter((line) => !line.notes.includes(`${TRAVEL_COST_LINE_MARKER} vehicle`))
-      .map((line) => ({
-        kind: 'OTHER',
-        label: line.label,
-        revenueAmount: 0,
-        costAmount: line.costAmount,
-        collaboratorId: line.collaboratorId || undefined,
-        quantity: 1,
-        notes: line.notes,
-      }));
-    setServiceLines([...nextLines, ...travelLines]);
-  };
 
   useEffect(() => {
     setSelectedExtras((prev) => {
@@ -358,7 +353,7 @@ export default function NewBookingForm() {
             onValidateDiscountCode={() => void validateDiscountCode(form.discountCode)}
           />
 
-          <AdminSection title="Transport real" description="Vehicle, conductor i persones">
+          <AdminSection title="Transport real" description="Cost intern del bolo; no és un producte contractat">
             <div className="grid gap-3 md:grid-cols-3">
               <label className={NB_FIELD}>
                 <span className={NB_LABEL}>Hores totals de cotxe</span>
@@ -388,6 +383,11 @@ export default function NewBookingForm() {
                 </select>
               </label>
               <label className={NB_FIELD}>
+                <span className={NB_LABEL}>Integrants derivats</span>
+                <input type="number" min={0} step={1} value={derivedTravelHeadcount} className="adm-input" readOnly />
+                <span className={NB_HINT}>Surt del pack i dels productes contractats.</span>
+              </label>
+              <label className={NB_FIELD}>
                 <span className={NB_LABEL}>Conductor</span>
                 <select value={travelDriver} onChange={(event) => setTravelDriver(event.target.value)} className="adm-input">
                   <option value="OWNER">Òrbita</option>
@@ -395,12 +395,9 @@ export default function NewBookingForm() {
                 </select>
               </label>
               <label className={NB_FIELD}>
-                <span className={NB_LABEL}>Passatgers Òrbita</span>
-                <input type="number" min={0} step={1} value={travelOwnerPassengers} onChange={(event) => setTravelOwnerPassengers(event.target.value)} className="adm-input" />
-              </label>
-              <label className={NB_FIELD}>
-                <span className={NB_LABEL}>Passatgers proveïdor</span>
-                <input type="number" min={0} step={1} value={travelPartnerPassengers} onChange={(event) => setTravelPartnerPassengers(event.target.value)} className="adm-input" disabled={!travelPartner} />
+                <span className={NB_LABEL}>Ajust manual integrants</span>
+                <input type="number" min={0} step={1} value={travelHeadcountOverride} onChange={(event) => setTravelHeadcountOverride(event.target.value)} className="adm-input" placeholder={String(derivedTravelHeadcount)} />
+                <span className={NB_HINT}>Només si algú no viatja o s'afegeix una persona.</span>
               </label>
             </div>
             <div className="mt-3 grid gap-2 sm:grid-cols-4">
@@ -409,12 +406,9 @@ export default function NewBookingForm() {
               <div className="ap-kpi"><p className="text-xs font-medium uppercase">Passatgers</p><p className="text-lg font-bold">{formatCurrency(travelCostBreakdown.passengerCost)}</p></div>
               <div className="ap-kpi"><p className="text-xs font-medium uppercase">Cost ruta</p><p className="text-lg font-bold">{formatCurrency(travelCostBreakdown.totalCost)}</p></div>
             </div>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <button type="button" className="ap-btn ap-btn--secondary" onClick={applyTravelCostLines} disabled={travelCostBreakdown.totalCost <= 0}>
-                Aplicar al bolo
-              </button>
-              <span className={NB_HINT}>Crea línies de cost marcades com a transport; si ho tornes a aplicar, substitueix les anteriors.</span>
-            </div>
+            <p className="mt-3 text-xs text-[var(--t3)]">
+              Integrants ruta: {travelCostBreakdown.peopleCount} · llindar temps {travelCostBreakdown.laborThresholdKm} km · el cost de vehicle i temps s'imputa al marge intern, no a productes contractats.
+            </p>
           </AdminSection>
 
           <div className={NB_GROUP}>Preu i tancament</div>

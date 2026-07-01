@@ -1546,6 +1546,21 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1338 — 2026-07-01 — codex (FET)
+**Desplaçament: temps de ruta com a cost intern, no producte.**
+- `lib/services/travelLaborCost.ts`: vehicle i temps de persones queden separats; es compten integrants i el temps només s'imputa a partir de `INCLUDED_TRAVEL_KM` mentre no hi hagi un llindar específic decidit pel propietari.
+- `app/admin/bookings/NewBookingForm.tsx`: eliminada la injecció de línies `[travel-cost]` a `serviceLines`; el transport real es recalcula sol i es desa com a `travelCost` intern. Els integrants es deriven del bolo (pack base, `crew` de partner, tècnic inclòs, operari extra) i l'ajust manual queda només per excepcions.
+- `app/admin/bookings/useBookingPricing.ts`: el marge en viu accepta el cost intern complet de ruta (vehicle + hores-persona) sense embrutar "productes contractats".
+- `app/admin/bookings/useNewBookingSubmit.ts`: retira `travelHeadcount` abans d'enviar `serviceLines` a l'API perquè és metadada local del formulari, no dada de BD.
+- `app/admin/bookings/BookingPricingSummary.tsx`: copy ajustat perquè el transport es llegeixi com a cost intern estimat.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1338`; el següent canvi real ha de ser `#1339`.
+- Validació tècnica: tsc 0; tests focalitzats verds; validate:core EXIT 0.
+- Validació funcional: el temps de ruta ja no apareix com a servei/producte contractat, continua menjant marge via `travelCost` i parteix dels integrants del que s'ha contractat.
+- Validació humana/UX: la UI mostra integrants derivats, ajust manual, llindar i cost ruta com a cost intern, no com una línia que el client compra.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1337 — 2026-07-01 — claude (FET)
 **Canon tipografia: text-[Nrem] literals → token.**
 - 4 text-[0.6/0.65rem] (bookings extras/services/travel) → text-[length:var(--o-text-2xs)] (12px). MarkdownView text-[0.85em] deixat (em relatiu). font-black 0, text-[Npx] 0.

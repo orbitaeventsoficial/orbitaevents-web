@@ -106,7 +106,7 @@ export default function BookingPricingSummary({
       </div>
       {internalTravelCost > 0 && (
         <p className="py-2 font-mono text-xs leading-snug text-[var(--t3)]">
-          Cost intern transport estimat · {formatCurrencyExact(internalTravelCost)} ({defaultVehicleCostPerKm.toFixed(2)} €/km sobre km extra)
+          Cost intern transport estimat · {formatCurrencyExact(internalTravelCost)} (vehicle {defaultVehicleCostPerKm.toFixed(2)} €/km + temps de ruta si aplica)
         </p>
       )}
       {marginEstimate && (

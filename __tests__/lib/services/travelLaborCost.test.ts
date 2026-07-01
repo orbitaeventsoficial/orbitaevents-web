@@ -39,6 +39,7 @@ describe('travelLaborCost', () => {
       roundTripKm: 30,
       vehicleCostPerKm: 0.25,
       routeHours: 0.75,
+      laborThresholdKm: 0,
       vehicleOwner: { label: 'Carlos', collaboratorId: 'carlos' },
       people: [{ role: 'DRIVER', label: 'Carlos', collaboratorId: 'carlos' }],
     });
@@ -51,5 +52,23 @@ describe('travelLaborCost', () => {
       expect.objectContaining({ collaboratorId: 'carlos', costAmount: 13.5 }),
     ]);
   });
-});
 
+  it('no imputa temps de persones per sota del llindar de km', () => {
+    const r = calculateTravelCostBreakdown({
+      roundTripKm: 30,
+      vehicleCostPerKm: 0.25,
+      routeHours: 0.75,
+      vehicleOwner: { label: 'Òrbita' },
+      people: [{ role: 'DRIVER', label: 'Òrbita' }],
+    });
+
+    expect(r.laborCostApplies).toBe(false);
+    expect(r.peopleCount).toBe(1);
+    expect(r.vehicleCost).toBe(7.5);
+    expect(r.driverCost).toBe(0);
+    expect(r.totalCost).toBe(7.5);
+    expect(r.lines).toEqual([
+      expect.objectContaining({ label: 'Vehicle ruta · Òrbita', costAmount: 7.5 }),
+    ]);
+  });
+});

@@ -98,6 +98,8 @@ export type BookingServiceLineFormInput = {
   costAmount?: number;
   quantity?: number;
   notes?: string;
+  /** Persones que aquesta línia aporta al desplaçament. UI-only: l'API ho ignora. */
+  travelHeadcount?: number;
 };
 
 export type RawExtraConfig = {

@@ -1,0 +1,116 @@
+import { DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM, calculateTravelCost, sanitizeNonNegative } from '@/lib/services/travelCost';
+
+export const TRAVEL_DRIVER_HOURLY_RATE = 18;
+export const TRAVEL_PASSENGER_HOURLY_RATE = 15;
+export const TRAVEL_AVG_SPEED_KMH = 65;
+export const TRAVEL_COST_LINE_MARKER = '[travel-cost]';
+
+export type TravelPersonRole = 'DRIVER' | 'PASSENGER';
+
+export type TravelPersonInput = {
+  role: TravelPersonRole;
+  label: string;
+  collaboratorId?: string | null;
+  count?: number | null;
+};
+
+export type TravelCostLine = {
+  label: string;
+  costAmount: number;
+  collaboratorId: string | null;
+  notes: string;
+};
+
+export type TravelCostBreakdown = {
+  roundTripKm: number;
+  routeHours: number;
+  laborThresholdKm: number;
+  laborCostApplies: boolean;
+  peopleCount: number;
+  vehicleCost: number;
+  driverCost: number;
+  passengerCost: number;
+  peopleCost: number;
+  totalCost: number;
+  lines: TravelCostLine[];
+};
+
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+export function estimateRoundTripHours(roundTripKm: number, speedKmh = TRAVEL_AVG_SPEED_KMH): number {
+  const km = sanitizeNonNegative(roundTripKm, 0);
+  const speed = Math.max(1, sanitizeNonNegative(speedKmh, TRAVEL_AVG_SPEED_KMH));
+  return round2(km / speed);
+}
+
+function lineNotes(role: 'vehicle' | TravelPersonRole, hours: number, rate?: number): string {
+  const rateText = typeof rate === 'number' ? ` · ${rate} EUR/h` : '';
+  return `${TRAVEL_COST_LINE_MARKER} ${role} · ${hours.toFixed(2)} h${rateText}`;
+}
+
+export function calculateTravelCostBreakdown(input: {
+  roundTripKm: number;
+  vehicleCostPerKm?: number | null;
+  routeHours?: number | null;
+  laborThresholdKm?: number | null;
+  vehicleOwner?: { label: string; collaboratorId?: string | null } | null;
+  people?: TravelPersonInput[];
+}): TravelCostBreakdown {
+  const roundTripKm = round2(sanitizeNonNegative(input.roundTripKm, 0));
+  const routeHours = round2(
+    input.routeHours != null
+      ? sanitizeNonNegative(input.routeHours, 0)
+      : estimateRoundTripHours(roundTripKm),
+  );
+  const vehicleCostPerKm = sanitizeNonNegative(input.vehicleCostPerKm, DEFAULT_VEHICLE_COST_PER_KM);
+  const laborThresholdKm = sanitizeNonNegative(input.laborThresholdKm, INCLUDED_TRAVEL_KM);
+  const laborCostApplies = roundTripKm > laborThresholdKm;
+  const vehicleCost = calculateTravelCost(roundTripKm, vehicleCostPerKm);
+  const lines: TravelCostLine[] = [];
+
+  if (vehicleCost > 0 && input.vehicleOwner) {
+    lines.push({
+      label: `Vehicle ruta · ${input.vehicleOwner.label}`,
+      costAmount: vehicleCost,
+      collaboratorId: input.vehicleOwner.collaboratorId || null,
+      notes: `${TRAVEL_COST_LINE_MARKER} vehicle · ${roundTripKm.toFixed(1)} km · ${vehicleCostPerKm.toFixed(2)} EUR/km`,
+    });
+  }
+
+  let driverCost = 0;
+  let passengerCost = 0;
+  let peopleCount = 0;
+  for (const person of input.people || []) {
+    const count = Math.max(1, Math.floor(sanitizeNonNegative(person.count ?? 1, 1)));
+    peopleCount += count;
+    if (!laborCostApplies) continue;
+    const rate = person.role === 'DRIVER' ? TRAVEL_DRIVER_HOURLY_RATE : TRAVEL_PASSENGER_HOURLY_RATE;
+    const cost = round2(routeHours * rate * count);
+    if (cost <= 0) continue;
+    if (person.role === 'DRIVER') driverCost += cost;
+    else passengerCost += cost;
+    lines.push({
+      label: `${person.role === 'DRIVER' ? 'Temps ruta conductor' : 'Temps ruta passatger'} · ${person.label}${count > 1 ? ` x${count}` : ''}`,
+      costAmount: cost,
+      collaboratorId: person.collaboratorId || null,
+      notes: lineNotes(person.role, routeHours, rate),
+    });
+  }
+
+  const peopleCost = round2(driverCost + passengerCost);
+  return {
+    roundTripKm,
+    routeHours,
+    laborThresholdKm,
+    laborCostApplies,
+    peopleCount,
+    vehicleCost,
+    driverCost: round2(driverCost),
+    passengerCost: round2(passengerCost),
+    peopleCost,
+    totalCost: round2(vehicleCost + peopleCost),
+    lines,
+  };
+}

@@ -140,4 +140,29 @@ describe('useNewBookingSubmit', () => {
       },
     ]);
   });
+
+  it('no envia travelHeadcount perquè és metadada local del formulari', async () => {
+    const { result } = renderHook(() => useNewBookingSubmit({
+      form: validForm(),
+      selectedExtras: {},
+      leadId: null,
+      leadData: null,
+      customerId: null,
+      internalTravelCost: 105,
+      serviceLines: [
+        { kind: 'PROVIDER_SERVICE', label: 'Bingo Musical', revenueAmount: 240, costAmount: 160, quantity: 1, travelHeadcount: 2 },
+      ],
+    }));
+
+    await act(async () => {
+      await result.current.submit();
+    });
+
+    const [, init] = mockFetchWithCsrf.mock.calls[0];
+    const body = JSON.parse(String(init?.body));
+    expect(body.travelCost).toBe(105);
+    expect(body.serviceLines).toEqual([
+      { kind: 'PROVIDER_SERVICE', label: 'Bingo Musical', revenueAmount: 240, costAmount: 160, quantity: 1 },
+    ]);
+  });
 });
