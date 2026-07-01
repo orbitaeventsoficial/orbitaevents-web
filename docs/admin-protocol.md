@@ -1550,6 +1550,40 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1313 — 2026-07-01 — codex (FET)
+**Front públic: UX d'estats/focus canonitzada en formularis compartits.**
+- `app/components/forms/ContactFormComplete.tsx`: required/error/success/focus/link/CTA deixen classes Tailwind crues (`red-*`, `green-*`, `amber-*`, `orange-*`) i passen a constants locals basades en tokens públics (`--oe-gold`, `--oe-orange`, `--oe-green`, `--grad-gold`, `--bg-main`).
+- `components/security/TurnstileWidget.tsx`: placeholder local de Turnstile passa de `yellow-*` a `--oe-amber`.
+- `app/components/legal/CookieConsent.client.tsx`: toggles i CTAs passen de `gray-*`/gradient amber-orange cru a `--bg-elevated`, `--text-primary` i `--grad-gold`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1313`; el següent canvi real ha de ser `#1314`.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: formulari de contacte, placeholder Turnstile dev i cookie consent mantenen el mateix comportament, però els estats visuals consumeixen tokens.
+- Validació humana/UX: es comença la canonització invisible: required, error, success, focus, toggle i CTA responen al mateix sistema visual públic.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1312 — 2026-07-01 — claude (FET)
+**Capa espaiat: escala completa + tokenització px→token admin.**
+- orbita-tokens: escala --o-space completa (05/15/25/35/5/8). Tokenització segura 185 px→token (padding/gap/margin, valors exactes, zero canvi visual). Captures idèntiques.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1312`; el següent canvi real ha de ser `#1313`.
+- Validació tècnica: tsc 0; validate:core.
+- Validació funcional: captures leads/booking idèntiques.
+- Validació humana/UX: espaiat tokenitzat.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1311 — 2026-07-01 — claude (FET)
+**Gutter lateral canònic de fàbrica a .ap-page.**
+- Token --page-gutter a Studio, aplicat a .ap-content/.ap-kpis/.ap-tabs-nav. Tota pàgina AdminPage hereta el gutter de fàbrica. Contenidors ja no toquen les vores.
+- Validació tècnica: tsc 0; validate:core.
+- Validació funcional: captura contingut amb gutter.
+- Validació humana/UX: contenidors respiren.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1310 — 2026-07-01 — claude (FET)
 **Canonització: dashboard /admin + image-manager.**
 - Dashboard ~888 admin-cr__ → AdminPage/.ap-kpi/.ap-card/.ap-badge (page+widgets+5 panells). Colors crus→admin-tone. control-room.css 1411→266L (bloc mort retallat; compartits conservats). image-manager colors→tone. Dashboard ara homogeni.

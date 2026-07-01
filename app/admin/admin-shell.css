@@ -220,7 +220,7 @@ html.admin-mode .ax__error {
   min-height: 60vh;
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: var(--o-space-6);
   color: var(--ax-t);
   font-family: var(--ui);
 }
@@ -251,7 +251,7 @@ html.admin-mode .ax__erroricon {
 html.admin-mode .ax__erroricon svg { width: 28px; height: 28px; }
 
 html.admin-mode .ax__errortitle {
-  margin: 0 0 8px;
+  margin: 0 0 var(--o-space-2);
   font-family: var(--display);
   font-size: 24px;
   font-weight: 800;
@@ -267,7 +267,7 @@ html.admin-mode .ax__errortext {
 
 html.admin-mode .ax__errordebug {
   margin: 0 0 22px;
-  padding: 13px 14px;
+  padding: 13px var(--o-space-35);
   border: 1px solid var(--ax-line2);
   border-radius: 12px;
   background: var(--ax-sunk);
@@ -283,7 +283,7 @@ html.admin-mode .ax__errordebug p {
 }
 
 html.admin-mode .ax__errordigest {
-  margin-top: 8px !important;
+  margin-top: var(--o-space-2) !important;
   color: var(--ax-t3);
   font-size: 11px !important;
 }
@@ -291,7 +291,7 @@ html.admin-mode .ax__errordigest {
 html.admin-mode .ax__erroractions {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: var(--o-space-25);
   flex-wrap: wrap;
 }
 
@@ -336,7 +336,7 @@ html.admin-mode .ax--side .ax__workspace { min-width: 0; margin-left: 236px; }
 html.admin-mode .ax__side {
   position: fixed; inset: 0 auto 0 0; z-index: 40;
   width: 236px; display: flex; flex-direction: column; gap: 17px;
-  padding: 16px 14px;
+  padding: var(--o-space-4) var(--o-space-35);
   border-right: 1px solid var(--ax-line);
   background: linear-gradient(
     180deg,
@@ -349,7 +349,7 @@ html.admin-mode .ax__side {
 /* ── Marca ────────────────────────────────────────────────────────────────── */
 html.admin-mode .ax__brand {
   flex: none; display: flex; align-items: center;
-  height: 52px; padding: 0 0 16px;
+  height: 52px; padding: 0 0 var(--o-space-4);
   border-bottom: 1px solid var(--ax-hair-gold);
 }
 html.admin-mode .ax__logo {
@@ -360,7 +360,7 @@ html.admin-mode .ax__logo {
 
 /* ── Navegació lateral ────────────────────────────────────────────────────── */
 html.admin-mode .ax__sidenav {
-  display: flex; flex-direction: column; gap: 6px; flex: 1; min-height: 0;
+  display: flex; flex-direction: column; gap: var(--o-space-15); flex: 1; min-height: 0;
   overflow-y: auto; scrollbar-width: none;
 }
 html.admin-mode .ax__sidenav::-webkit-scrollbar { display: none; }
@@ -393,12 +393,12 @@ html.admin-mode .ax__sidegroup.is-active > .ax__sideitem::before {
 }
 
 html.admin-mode .ax__sidesub {
-  display: flex; flex-direction: column; gap: 2px;
+  display: flex; flex-direction: column; gap: var(--o-space-05);
   padding: 3px 0 7px 26px;
 }
 html.admin-mode .ax__sidesub a,
 html.admin-mode .ax__sidesub button {
-  display: flex; align-items: center; min-height: 33px; padding: 0 10px;
+  display: flex; align-items: center; min-height: 33px; padding: 0 var(--o-space-25);
   border: 0; border-radius: 9px;
   background: transparent; color: var(--ax-t3);
   font: inherit; font-size: var(--o-text-sm, 13px); font-weight: 650; text-align: left;
@@ -415,8 +415,8 @@ html.admin-mode .ax__sidesub button.is-on {
 
 /* ── Accions primàries al capdamunt del sidebar ───────────────────────────── */
 html.admin-mode .ax__sidetop {
-  display: flex; flex-direction: row; gap: 6px;
-  padding-bottom: 12px; border-bottom: 1px solid var(--ax-line);
+  display: flex; flex-direction: row; gap: var(--o-space-15);
+  padding-bottom: var(--o-space-3); border-bottom: 1px solid var(--ax-line);
 }
 
 /* ── Items secundaris al submenú ──────────────────────────────────────────── */
@@ -439,8 +439,8 @@ html.admin-mode .ax__sidesub a.is-secondary.is-on {
 /* Botó d'acció primària: vora de llautó, fons fosc amb sheen */
 html.admin-mode .ax__add {
   flex: 1; min-width: 0;
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 8px 10px; border-radius: 10px;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--o-space-15);
+  padding: var(--o-space-2) var(--o-space-25); border-radius: var(--o-space-25);
   border: 1px solid var(--ax-hair-gold);
   background: linear-gradient(
     180deg,
@@ -468,8 +468,8 @@ html.admin-mode .ax__add:active { transform: translateY(0); }
 /* Botó d'accés directe a la safata d'entrada — posició primària al capdamunt */
 html.admin-mode .ax__inbox {
   flex: 1; min-width: 0;
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 8px 10px; border-radius: 10px;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--o-space-15);
+  padding: var(--o-space-2) var(--o-space-25); border-radius: var(--o-space-25);
   border: 1px solid var(--ax-hair-gold);
   background: linear-gradient(
     180deg,
@@ -504,7 +504,7 @@ html.admin-mode .ax__inbox.is-on {
 /* ── Peu de la sidebar ────────────────────────────────────────────────────── */
 html.admin-mode .ax__sidefoot {
   margin-top: auto; display: flex; align-items: center; gap: 9px;
-  padding-top: 14px; border-top: 1px solid var(--ax-line);
+  padding-top: var(--o-space-35); border-top: 1px solid var(--ax-line);
   color: var(--ax-t3); font-size: 13px; font-weight: 650;
 }
 html.admin-mode .ax__sidefootname {
@@ -538,7 +538,7 @@ html.admin-mode .ax__page { animation: none; }
   html.admin-mode .ax__side {
     position: relative; width: auto; min-height: 0;
     flex-direction: row; flex-wrap: wrap; align-items: center;
-    padding: 10px 14px; gap: 10px;
+    padding: var(--o-space-25) var(--o-space-35); gap: var(--o-space-25);
     border-right: 0; border-bottom: 1px solid var(--ax-line);
   }
   html.admin-mode .ax__brand { height: auto; padding: 0; border-bottom: 0; }
@@ -602,8 +602,8 @@ html.admin-mode .ap-detail-bar {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  padding: 8px 20px;
+  gap: var(--o-space-2);
+  padding: var(--o-space-2) var(--o-space-5);
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
@@ -612,7 +612,7 @@ html.admin-mode .ap-detail-bar-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: var(--o-space-15);
   height: 32px;
   padding: 0 13px;
   border: 1px solid var(--ax-line2, rgba(255,255,255,0.18));
@@ -650,7 +650,7 @@ html.admin-mode .ap-detail-bar-actions {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 6px;
+  gap: var(--o-space-15);
   flex: 0 1 auto;
   min-width: 0;
   flex-wrap: wrap;
@@ -667,8 +667,8 @@ html.admin-mode .ap-detail-hero {
 html.admin-mode .ap-detail-kicker {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: var(--o-space-2);
+  margin-bottom: var(--o-space-2);
   font-family: var(--mono);
   font-size: 11px;
   font-weight: 700;
@@ -692,8 +692,8 @@ html.admin-mode .ap-detail-meta {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
+  gap: var(--o-space-2);
+  margin-top: var(--o-space-25);
 }
 
 /* ── KPI cells (stats) ── */
@@ -756,7 +756,7 @@ html.admin-mode .ap-detail-stats {
 /* Cel·la: label + valor en la mateixa línia (baseline) */
 html.admin-mode .ap-detail-stats-cell {
   min-width: 0;
-  padding: 8px 14px;
+  padding: var(--o-space-2) var(--o-space-35);
   border-right: 1px solid var(--ax-line, rgba(255,255,255,0.1));
   display: flex;
   align-items: baseline;
@@ -816,14 +816,14 @@ html.admin-mode .ap-detail-secnav::-webkit-scrollbar { display: none; }
 html.admin-mode .ap-detail-secnav-list {
   display: flex;
   justify-content: center;
-  gap: 4px;
-  padding: 6px 24px;
+  gap: var(--o-space-1);
+  padding: var(--o-space-15) var(--o-space-6);
   min-width: max-content;
   width: 100%;
 }
 html.admin-mode .ap-detail-secbtn {
   height: 38px;
-  padding: 0 16px;
+  padding: 0 var(--o-space-4);
   border: 0;
   border-radius: 8px;
   background: transparent;
@@ -931,19 +931,19 @@ html.admin-mode .ap-leads-h1 {
   font-weight: var(--o-fw-xbold); letter-spacing: -0.018em; line-height: 1; color: var(--t);
 }
 html.admin-mode .ap-leads-charlie {
-  display: inline-block; vertical-align: middle; margin-left: 10px;
-  padding: 2px 8px; border-radius: 999px;
+  display: inline-block; vertical-align: middle; margin-left: var(--o-space-25);
+  padding: var(--o-space-05) var(--o-space-2); border-radius: 999px;
   border: 1px solid var(--hair-gold); color: var(--gold);
   background: color-mix(in oklab, var(--gold) 8%, transparent);
   font-family: var(--mono); font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold);
   letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap;
 }
 html.admin-mode .ap-leads-sub { font-family: var(--mono); font-size: var(--o-text-sm); color: var(--t3); letter-spacing: 0.015em; }
-html.admin-mode .ap-leads-headright { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+html.admin-mode .ap-leads-headright { display: flex; align-items: center; gap: var(--o-space-3); flex-wrap: wrap; justify-content: flex-end; }
 
 html.admin-mode .ap-leads-add {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 10px 15px; border-radius: var(--o-r-sm-2);
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--o-space-2);
+  padding: var(--o-space-25) 15px; border-radius: var(--o-r-sm-2);
   border: 1px solid var(--hair-gold);
   background: transparent;
   color: var(--gold); font: inherit; font-size: var(--o-text-sm); font-weight: var(--o-fw-bold);
@@ -977,7 +977,7 @@ html.admin-mode .ap-leads-pipelead:focus-visible {
 ─────────────────────────────────────────────────────────────────────────── */
 
 html.admin-mode .ap-leads-focus {
-  margin: 8px var(--gutter) 0;
+  margin: var(--o-space-2) var(--gutter) 0;
   display: flex; align-items: stretch; gap: 0;
   border: 1px solid var(--line2);
   border-left: 3px solid var(--c);
@@ -989,8 +989,8 @@ html.admin-mode .ap-leads-focus {
 
 html.admin-mode .ap-leads-focusrow {
   flex: 1; min-width: 0;
-  display: flex; align-items: center; gap: 16px;
-  padding: 5px 16px;
+  display: flex; align-items: center; gap: var(--o-space-4);
+  padding: 5px var(--o-space-4);
   border: 0; background: transparent; text-align: left; cursor: pointer; font: inherit;
   transition: background 140ms ease;
 }
@@ -1039,7 +1039,7 @@ html.admin-mode .ap-leads-focusmeta {
 
 /* valor = diners d'aquest bolo: l'or identifica, no crida. */
 html.admin-mode .ap-leads-focusval {
-  flex: none; align-self: center; padding: 0 18px 0 6px;
+  flex: none; align-self: center; padding: 0 18px 0 var(--o-space-15);
   font-family: var(--display); font-size: var(--o-text-lg); font-weight: var(--o-fw-bold);
   color: var(--gold); letter-spacing: -0.015em;
   font-variant-numeric: tabular-nums; white-space: nowrap;
@@ -1062,13 +1062,13 @@ html.admin-mode .ap-leads-focuscycle span {
   display: grid; place-items: center; min-width: 38px;
   font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); color: var(--t3);
   border-left: 1px solid var(--line); border-right: 1px solid var(--line);
-  padding: 0 4px; line-height: 1; letter-spacing: 0.04em;
+  padding: 0 var(--o-space-1); line-height: 1; letter-spacing: 0.04em;
 }
 
 @media (max-width: 900px) {
-  html.admin-mode .ap-leads-focus { margin: 14px 16px 0; }
+  html.admin-mode .ap-leads-focus { margin: var(--o-space-35) var(--o-space-4) 0; }
   html.admin-mode .ap-leads-focusname { font-size: var(--o-text-lg); }
-  html.admin-mode .ap-leads-focusval { font-size: var(--o-text-md-2); padding: 0 14px; }
+  html.admin-mode .ap-leads-focusval { font-size: var(--o-text-md-2); padding: 0 var(--o-space-35); }
 }
 
 /* ── PEÇA 3: Mètriques ───────────────────────────────────────────────────
@@ -1078,15 +1078,15 @@ html.admin-mode .ap-leads-focuscycle span {
 
 html.admin-mode .ap-leads-metrics {
   display: flex; align-items: stretch;
-  margin: 10px var(--gutter) 0;
+  margin: var(--o-space-25) var(--gutter) 0;
   border: 1px solid var(--line);
   border-radius: 0; overflow: hidden;
   background: var(--panel);
 }
 html.admin-mode .ap-leads-metric {
   flex: 1; min-width: 0;
-  display: flex; align-items: baseline; gap: 8px;
-  padding: 6px 14px;
+  display: flex; align-items: baseline; gap: var(--o-space-2);
+  padding: var(--o-space-15) var(--o-space-35);
   border-right: 1px solid var(--line);
 }
 html.admin-mode .ap-leads-metric:last-child { border-right: 0; }
@@ -1114,7 +1114,7 @@ html.admin-mode .ap-leads-metric:last-child b {
 }
 
 @media (max-width: 900px) {
-  html.admin-mode .ap-leads-metrics { flex-wrap: wrap; margin: 10px 16px 0; }
+  html.admin-mode .ap-leads-metrics { flex-wrap: wrap; margin: var(--o-space-25) var(--o-space-4) 0; }
   html.admin-mode .ap-leads-metric { flex: 1 0 45%; border-bottom: 1px solid var(--line); }
   html.admin-mode .ap-leads-metric:nth-child(even) { border-right: 0; }
   html.admin-mode .ap-leads-metric:nth-last-child(-n+2) { border-bottom: 0; }
@@ -1126,10 +1126,10 @@ html.admin-mode .ap-leads-metric:last-child b {
 
 /* ── PEÇA 4: Calendari ─────────────────────────────────────────────────── */
 
-html.admin-mode .ap-leads-content { padding: 10px var(--gutter) 0; flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+html.admin-mode .ap-leads-content { padding: var(--o-space-25) var(--gutter) 0; flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
 
 /* Barra de mesos */
-html.admin-mode .ap-leads-calbar { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; margin-top: 0; }
+html.admin-mode .ap-leads-calbar { display: flex; align-items: center; gap: var(--o-space-2); margin-bottom: var(--o-space-25); margin-top: 0; }
 html.admin-mode .ap-leads-calnav {
   flex: none; display: grid; place-items: center; width: 38px; height: 38px;
   border: 1px solid var(--line); border-radius: var(--o-r-sm-2);
@@ -1142,13 +1142,13 @@ html.admin-mode .ap-leads-calnav:active:not(:disabled) { transform: translateY(1
 html.admin-mode .ap-leads-calnav:disabled { opacity: 0.25; cursor: not-allowed; }
 html.admin-mode .ap-leads-calnav svg { width: 16px; height: 16px; }
 html.admin-mode .ap-leads-calmonths {
-  flex: 1; display: flex; align-items: center; gap: 2px;
-  padding: 4px; border: 1px solid var(--line); border-radius: var(--o-r-sm-2);
+  flex: 1; display: flex; align-items: center; gap: var(--o-space-05);
+  padding: var(--o-space-1); border: 1px solid var(--line); border-radius: var(--o-r-sm-2);
   background: var(--panel); overflow-x: auto; scrollbar-width: none;
 }
 html.admin-mode .ap-leads-calmonths::-webkit-scrollbar { display: none; }
 html.admin-mode .ap-leads-calchip {
-  flex: 1 0 auto; min-width: 48px; padding: 7px 10px;
+  flex: 1 0 auto; min-width: var(--o-space-12); padding: 7px var(--o-space-25);
   border: 0; border-radius: var(--o-r-sm); background: transparent;
   color: var(--t3); font: inherit; font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold);
   text-transform: capitalize; cursor: pointer;
@@ -1162,12 +1162,12 @@ html.admin-mode .ap-leads-calchip.is-on {
 }
 
 /* Grid de mesos */
-html.admin-mode .ap-leads-cal { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: start; }
+html.admin-mode .ap-leads-cal { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--o-space-3); align-items: start; }
 /* El mes és un panell enfonsat i tancat: una superfície contenidora amb cantonada
    visible, perquè les cel·les ocupades hi flotin clarament per damunt. */
 html.admin-mode .ap-leads-mon {
-  display: flex; flex-direction: column; gap: 8px;
-  padding: 10px 10px 12px;
+  display: flex; flex-direction: column; gap: var(--o-space-2);
+  padding: var(--o-space-25) var(--o-space-25) var(--o-space-3);
   border: 1px solid var(--line); border-radius: var(--o-r-md);
   background:
     linear-gradient(180deg, color-mix(in oklab, var(--panel) 82%, var(--sunk)) 0%, var(--sunk) 100%);
@@ -1189,11 +1189,11 @@ html.admin-mode .ap-leads-mon.is-future {
     inset 0 2px 0 color-mix(in oklab, var(--t) 3%, transparent),
     0 1px 1px var(--ax-overlay-lg);
 }
-html.admin-mode .ap-leads-monhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--line2); }
+html.admin-mode .ap-leads-monhead { display: flex; align-items: center; justify-content: space-between; gap: var(--o-space-2); padding-bottom: var(--o-space-2); border-bottom: 1px solid var(--line2); }
 html.admin-mode .ap-leads-monhead h2 { margin: 0; font-family: var(--display); font-size: var(--o-text-md); font-weight: var(--o-fw-bold); letter-spacing: -0.006em; color: var(--t); }
-html.admin-mode .ap-leads-monmeta { flex: none; display: inline-flex; align-items: baseline; gap: 8px; }
+html.admin-mode .ap-leads-monmeta { flex: none; display: inline-flex; align-items: baseline; gap: var(--o-space-2); }
 html.admin-mode .ap-leads-moncount {
-  padding: 2px 7px;
+  padding: var(--o-space-05) 7px;
   border: 1px solid var(--line);
   border-radius: var(--o-r-pill);
   background: color-mix(in oklab, var(--raised) 42%, transparent);
@@ -1201,7 +1201,7 @@ html.admin-mode .ap-leads-moncount {
   letter-spacing: 0.08em; text-transform: uppercase; color: var(--t3);
 }
 html.admin-mode .ap-leads-futurebadge {
-  font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); padding: 2px 7px; border-radius: var(--o-r-xs);
+  font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); padding: var(--o-space-05) 7px; border-radius: var(--o-r-xs);
   background: color-mix(in oklab, var(--gold) 6%, transparent);
   border: 1px solid color-mix(in oklab, var(--gold) 18%, transparent);
   color: var(--t3); letter-spacing: 0.06em; text-transform: uppercase;
@@ -1213,7 +1213,7 @@ html.admin-mode .ap-leads-weekhead {
   background: color-mix(in oklab, var(--line) 68%, transparent);
 }
 html.admin-mode .ap-leads-gh {
-  padding: 6px 8px;
+  padding: var(--o-space-15) var(--o-space-2);
   background: color-mix(in oklab, var(--raised) 28%, var(--sunk));
   font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold);
   letter-spacing: 0.22em; text-transform: uppercase; color: var(--t3); text-align: left;
@@ -1222,7 +1222,7 @@ html.admin-mode .ap-leads-gh {
    menys com a targetes i més com a dies dins d'una taula. */
 html.admin-mode .ap-leads-grid {
   display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: minmax(72px, auto);
-  gap: 1px; border: 1px solid color-mix(in oklab, var(--line) 68%, transparent); border-radius: 0 0 8px 8px;
+  gap: 1px; border: 1px solid color-mix(in oklab, var(--line) 68%, transparent); border-radius: 0 0 var(--o-space-2) var(--o-space-2);
   overflow: visible; background: color-mix(in oklab, var(--line) 58%, transparent);
 }
 
@@ -1235,9 +1235,9 @@ html.admin-mode .ap-leads-cell--wd {
 }
 
 /* Cel·la */
-html.admin-mode .ap-leads-cell { position: relative; display: flex; flex-direction: column; gap: 0; padding: 6px 8px 7px; border-radius: 0; text-align: left; font: inherit; }
-html.admin-mode .ap-leads-celltop { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
-html.admin-mode .ap-leads-cellmeta { display: inline-flex; align-items: center; gap: 6px; }
+html.admin-mode .ap-leads-cell { position: relative; display: flex; flex-direction: column; gap: 0; padding: var(--o-space-15) var(--o-space-2) 7px; border-radius: 0; text-align: left; font: inherit; }
+html.admin-mode .ap-leads-celltop { display: flex; align-items: center; justify-content: space-between; gap: var(--o-space-1); }
+html.admin-mode .ap-leads-cellmeta { display: inline-flex; align-items: center; gap: var(--o-space-15); }
 /* dia = coordenada estructural, no informació: mono, petit, retirat */
 html.admin-mode .ap-leads-day { font-family: var(--mono); font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold); letter-spacing: 0.01em; color: var(--t3); font-variant-numeric: tabular-nums; }
 html.admin-mode .ap-leads-cell.is-lead .ap-leads-day { color: color-mix(in oklab, var(--cell-t) 70%, transparent); }
@@ -1260,7 +1260,7 @@ html.admin-mode .ap-leads-cell.is-lead { --cell-t: var(--t); }
 html.admin-mode .ap-leads-cell.is-lead {
   min-width: 0;
   margin: 1px;
-  padding: 6px 8px 7px 10px;
+  padding: var(--o-space-15) var(--o-space-2) 7px var(--o-space-25);
   border: 1px solid var(--line2);
   border-left: 0;
   border-radius: var(--o-r-sm-2);
@@ -1310,10 +1310,10 @@ html.admin-mode .ap-leads-cell.is-reserva {
 }
 html.admin-mode .ap-leads-cell--multi {
   gap: 5px;
-  padding: 5px 6px 6px 10px;
+  padding: 5px var(--o-space-15) var(--o-space-15) var(--o-space-25);
 }
 html.admin-mode .ap-leads-multiday {
-  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--o-space-15);
   min-width: 0;
 }
 html.admin-mode .ap-leads-multicount {
@@ -1387,14 +1387,14 @@ html.admin-mode .ap-leads-cval { font-family: var(--mono); font-size: var(--o-te
 /* Safata leads sense data — franja horitzontal compacta */
 html.admin-mode .ap-leads-nodate {
   display: flex; align-items: center; gap: 0;
-  margin: 6px var(--gutter) 0;
+  margin: var(--o-space-15) var(--gutter) 0;
   border: 1px solid var(--line2);
   border-radius: var(--o-r-sm-2); overflow: hidden;
   background: var(--raised);
 }
 html.admin-mode .ap-leads-nodatehead {
-  display: flex; align-items: center; gap: 6px; flex-shrink: 0;
-  padding: 6px 12px; border-right: 1px solid var(--line2);
+  display: flex; align-items: center; gap: var(--o-space-15); flex-shrink: 0;
+  padding: var(--o-space-15) var(--o-space-3); border-right: 1px solid var(--line2);
   font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-xbold);
   letter-spacing: 0.12em; text-transform: uppercase;
   color: var(--t2); white-space: nowrap;
@@ -1406,8 +1406,8 @@ html.admin-mode .ap-leads-nodatecount {
 }
 html.admin-mode .ap-leads-nodatelist { display: flex; flex-direction: row; flex-wrap: wrap; flex: 1; }
 html.admin-mode .ap-leads-nodaterow {
-  display: flex; align-items: center; gap: 8px;
-  padding: 6px 16px; text-align: left; font: inherit;
+  display: flex; align-items: center; gap: var(--o-space-2);
+  padding: var(--o-space-15) var(--o-space-4); text-align: left; font: inherit;
   border-right: 1px solid color-mix(in oklab, var(--o-stage-new) 15%, var(--line));
   cursor: pointer; transition: background 120ms ease;
 }
@@ -1419,14 +1419,14 @@ html.admin-mode .ap-leads-nodaterow .ap-leads-cval { font-size: var(--o-text-xs)
 
 /* ── Anàlisi econòmica (fitxa completa del lead) ── */
 html.admin-mode .ap-ledger-econo {
-  margin: 0 14px 14px;
+  margin: 0 var(--o-space-35) var(--o-space-35);
   border: 1px solid var(--line);
   border-radius: var(--o-r-sm-2);
   overflow: hidden;
 }
 html.admin-mode .ap-ledger-econohead {
-  display: flex; align-items: baseline; gap: 10px;
-  padding: 9px 14px;
+  display: flex; align-items: baseline; gap: var(--o-space-25);
+  padding: 9px var(--o-space-35);
   border-bottom: 1px solid var(--line);
   font-family: var(--display); font-size: var(--o-text-md); font-weight: var(--o-fw-semi);
   letter-spacing: -0.01em; color: var(--t);
@@ -1475,7 +1475,7 @@ html.admin-mode .ap-ledger-kpi-sub { margin-top: 0.25rem; font-family: var(--mon
 /* Indicador de preu — semàfor €/h vs. mercat */
 html.admin-mode .ap-ledger-pricehint {
   display: flex; align-items: center; gap: 0.625rem; flex-wrap: wrap;
-  padding: 6px 14px; border-top: 1px solid var(--line);
+  padding: var(--o-space-15) var(--o-space-35); border-top: 1px solid var(--line);
   font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-semi);
   background: transparent;
 }
@@ -1490,7 +1490,7 @@ html.admin-mode .ap-ledger-ph-rec  { opacity: 0.55; margin-left: auto; }
 
 /* ── PEÇA 5: Pipeline ──────────────────────────────────────────────────── */
 
-html.admin-mode .ap-leads-pipeline { display: grid; grid-template-columns: repeat(4, minmax(230px, 1fr)); gap: 12px; align-items: start; }
+html.admin-mode .ap-leads-pipeline { display: grid; grid-template-columns: repeat(4, minmax(230px, 1fr)); gap: var(--o-space-3); align-items: start; }
 
 html.admin-mode .ap-leads-lane {
   display: flex; flex-direction: column; gap: 0; min-height: 200px;
@@ -1500,35 +1500,35 @@ html.admin-mode .ap-leads-lane {
   transition: background 150ms ease, border-color 150ms ease;
 }
 html.admin-mode .ap-leads-lane.is-drop { border-color: var(--gold); background: color-mix(in oklab, var(--gold) 4%, var(--panel)); }
-html.admin-mode .ap-leads-lanehead { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px 10px; border-bottom: 1px solid var(--line); }
+html.admin-mode .ap-leads-lanehead { display: flex; align-items: center; justify-content: space-between; gap: var(--o-space-3); padding: var(--o-space-3) var(--o-space-35) var(--o-space-25); border-bottom: 1px solid var(--line); }
 html.admin-mode .ap-leads-lanetitle { min-width: 0; display: flex; flex-direction: column; gap: 5px; }
 /* la capçalera de columna porta el seu propi punt d'estat: identifica la fase abans de llegir res */
-html.admin-mode .ap-leads-lanehead h2 { margin: 0; font-family: var(--mono); font-size: var(--o-text-sm); font-weight: var(--o-fw-bold); letter-spacing: 0.1em; text-transform: uppercase; color: var(--t2); display: inline-flex; align-items: center; gap: 8px; }
+html.admin-mode .ap-leads-lanehead h2 { margin: 0; font-family: var(--mono); font-size: var(--o-text-sm); font-weight: var(--o-fw-bold); letter-spacing: 0.1em; text-transform: uppercase; color: var(--t2); display: inline-flex; align-items: center; gap: var(--o-space-2); }
 html.admin-mode .ap-leads-lanehead h2::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
 html.admin-mode .ap-leads-lanetitle small { font-family: var(--display); font-size: var(--o-text-xl); font-weight: var(--o-fw-bold); line-height: 1; color: color-mix(in oklab, var(--gold) 72%, var(--t)); letter-spacing: -0.012em; font-variant-numeric: tabular-nums; }
 html.admin-mode .ap-leads-lanehead > span {
-  min-width: 24px; padding: 2px 6px;
+  min-width: var(--o-space-6); padding: var(--o-space-05) var(--o-space-15);
   border: 1px solid var(--line);
   border-radius: var(--o-r-pill);
   background: color-mix(in oklab, var(--raised) 42%, transparent);
   font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold);
   color: var(--t3); text-align: center; font-variant-numeric: tabular-nums;
 }
-html.admin-mode .ap-leads-lanecards { display: flex; flex-direction: column; gap: 6px; padding: 7px; }
+html.admin-mode .ap-leads-lanecards { display: flex; flex-direction: column; gap: var(--o-space-15); padding: 7px; }
 html.admin-mode .ap-leads-lanecards .ap-leads-laneempty { margin: 0; }
 
 /* EMPTY STATE de lane — una columna buida no és una caixa morta.
    "Nou" buit = crida a l'acció en or. Les altres = una nota tènue i retirada. */
 html.admin-mode .ap-leads-laneempty {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-  min-height: 96px; margin: 10px; padding: 18px 12px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--o-space-1);
+  min-height: 96px; margin: var(--o-space-25); padding: 18px var(--o-space-3);
   border: 1px dashed var(--line2); border-radius: var(--o-r-sm-2);
   background: color-mix(in oklab, var(--sunk) 40%, transparent);
   text-align: center; text-decoration: none;
 }
 html.admin-mode .ap-leads-laneemptytx { font-family: var(--mono); font-size: var(--o-text-sm); font-weight: var(--o-fw-bold); letter-spacing: 0.06em; text-transform: uppercase; color: var(--t3); }
 html.admin-mode .ap-leads-laneemptysub { font-family: var(--mono); font-size: var(--o-text-2xs); font-weight: var(--o-fw-semi); letter-spacing: 0.03em; color: var(--t3); opacity: 0.75; }
-html.admin-mode .ap-leads-laneemptyic { display: grid; place-items: center; width: 30px; height: 30px; margin-bottom: 2px; border-radius: 50%; border: 1px solid var(--hair-gold); color: var(--gold); transition: transform 140ms ease, background 140ms ease, border-color 140ms ease; }
+html.admin-mode .ap-leads-laneemptyic { display: grid; place-items: center; width: 30px; height: 30px; margin-bottom: var(--o-space-05); border-radius: 50%; border: 1px solid var(--hair-gold); color: var(--gold); transition: transform 140ms ease, background 140ms ease, border-color 140ms ease; }
 html.admin-mode .ap-leads-laneemptyic svg { width: 15px; height: 15px; }
 
 /* "Nou" buit = CTA viva: vora d'or, hover que s'encén */
@@ -1544,7 +1544,7 @@ html.admin-mode .ap-leads-laneempty--cta:hover .ap-leads-laneemptyic { transform
 /* CARD — prima, 2 línies, info essencial */
 html.admin-mode .ap-leads-pipelead {
   display: flex; flex-direction: column; gap: 5px;
-  padding: 10px 12px 10px 14px;
+  padding: var(--o-space-25) var(--o-space-3) var(--o-space-25) var(--o-space-35);
   border: 1px solid var(--line);
   border-left: 0;
   border-radius: var(--o-r-md);
@@ -1580,12 +1580,12 @@ html.admin-mode .ap-leads-pipelead[draggable="true"] { cursor: grab; }
 html.admin-mode .ap-leads-pipelead:last-child { border-bottom: 1px solid var(--line); }
 
 /* línia 1: nom + valor */
-html.admin-mode .ap-leads-leadtop { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+html.admin-mode .ap-leads-leadtop { display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2); }
 html.admin-mode .ap-leads-pipelead b {
   min-width: 0; flex: 1;
   font-family: var(--display); font-size: var(--o-text-md); font-weight: var(--o-fw-bold); letter-spacing: 0;
   color: var(--t); line-height: 1.2;
-  display: flex; align-items: center; gap: 6px;
+  display: flex; align-items: center; gap: var(--o-space-15);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 html.admin-mode .ap-leads-pipelead b .ap-leads-pay { flex: none; }
@@ -1624,7 +1624,7 @@ html.admin-mode .ap-leads-pipelead[data-priority="URGENT"].is-active { box-shado
 html.admin-mode .ap-leads-paylabel {
   display: inline-block; margin-top: 5px;
   font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); letter-spacing: 0.07em; text-transform: uppercase;
-  padding: 1px 6px; border-radius: var(--o-r-xs);
+  padding: 1px var(--o-space-15); border-radius: var(--o-r-xs);
 }
 html.admin-mode .ap-leads-paylabel[data-pay="full"] { color: var(--o-success); background: color-mix(in oklab, var(--o-success) 12%, transparent); }
 html.admin-mode .ap-leads-paylabel[data-pay="part"] { color: var(--o-stage-new); background: color-mix(in oklab, var(--o-stage-new) 12%, transparent); }
@@ -1638,20 +1638,20 @@ html.admin-mode .ap-leads-pipelead[data-stage="perdut"]:hover { opacity: 0.85; }
 
 html.admin-mode .ap-leads-list { border: 1px solid var(--line); border-radius: var(--o-r-sm); overflow: hidden; background: var(--panel); }
 html.admin-mode .ap-leads-listtbl { width: 100%; border-collapse: collapse; font-size: var(--o-text-sm); }
-html.admin-mode .ap-leads-listtbl thead th { padding: 12px 16px; text-align: left; font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); letter-spacing: 0.14em; text-transform: uppercase; color: var(--t3); border-bottom: 1px solid var(--line2); }
+html.admin-mode .ap-leads-listtbl thead th { padding: var(--o-space-3) var(--o-space-4); text-align: left; font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); letter-spacing: 0.14em; text-transform: uppercase; color: var(--t3); border-bottom: 1px solid var(--line2); }
 html.admin-mode .ap-leads-listtbl thead th.ap-leads-listnum { text-align: right; }
 html.admin-mode .ap-leads-listrow { cursor: pointer; border-bottom: 1px solid color-mix(in oklab, var(--line) 55%, transparent); transition: background 120ms ease; }
 html.admin-mode .ap-leads-listrow:last-child { border-bottom: 0; }
 html.admin-mode .ap-leads-listrow:hover { background: var(--raised); }
-html.admin-mode .ap-leads-listrow td { padding: 13px 16px; color: var(--t); vertical-align: middle; }
+html.admin-mode .ap-leads-listrow td { padding: 13px var(--o-space-4); color: var(--t); vertical-align: middle; }
 /* nansa cromàtica esquerra — la fila parla el mateix idioma que focus/cel·la/card */
 html.admin-mode .ap-leads-listrow td:first-child { box-shadow: inset 3px 0 0 color-mix(in oklab, var(--c) 55%, transparent); }
 html.admin-mode .ap-leads-listrow:hover td:first-child { box-shadow: inset 3px 0 0 color-mix(in oklab, var(--c) 82%, transparent); }
 html.admin-mode .ap-leads-listrow td em { color: var(--t3); font-style: italic; }
 html.admin-mode .ap-leads-listdate { font-family: var(--mono); font-size: var(--o-text-2xs); color: var(--t2); white-space: nowrap; }
-html.admin-mode .ap-leads-listname { font-family: var(--display); font-weight: var(--o-fw-bold); letter-spacing: -0.01em; display: flex; align-items: center; gap: 8px; }
+html.admin-mode .ap-leads-listname { font-family: var(--display); font-weight: var(--o-fw-bold); letter-spacing: -0.01em; display: flex; align-items: center; gap: var(--o-space-2); }
 html.admin-mode .ap-leads-listname .ap-leads-dot, html.admin-mode .ap-leads-listname .ap-leads-pay { width: 8px; height: 8px; flex: none; }
-html.admin-mode .ap-leads-listphase { font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); letter-spacing: 0.06em; text-transform: uppercase; color: var(--c); display: flex; align-items: center; gap: 6px; }
+html.admin-mode .ap-leads-listphase { font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold); letter-spacing: 0.06em; text-transform: uppercase; color: var(--c); display: flex; align-items: center; gap: var(--o-space-15); }
 html.admin-mode .ap-leads-listphase[data-pay="full"] { color: var(--o-success); }
 html.admin-mode .ap-leads-listphase[data-pay="part"] { color: var(--o-stage-new); }
 html.admin-mode .ap-leads-listphase[data-pay="none"] { color: var(--o-danger, var(--o-danger)); }
@@ -1668,8 +1668,8 @@ html.admin-mode .ap-ledger-sheet {
 }
 html.admin-mode .ap-ledger-bar {
   position: sticky; top: 0; z-index: 2; flex-shrink: 0;
-  display: flex; align-items: center; gap: 10px;
-  padding: 8px 14px;
+  display: flex; align-items: center; gap: var(--o-space-25);
+  padding: var(--o-space-2) var(--o-space-35);
   border-bottom: 1px solid var(--line);
   background: color-mix(in oklab, var(--canvas) 90%, transparent);
   backdrop-filter: blur(10px);
@@ -1678,7 +1678,7 @@ html.admin-mode .ap-ledger-back,
 html.admin-mode .ap-ledger-close,
 html.admin-mode .ap-ledger-full {
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-  min-height: 34px; padding: 0 12px;
+  min-height: 34px; padding: 0 var(--o-space-3);
   border: 1px solid var(--line); border-radius: var(--o-r-sm-2);
   background: var(--panel); color: var(--t2);
   font: inherit; font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold); text-decoration: none; cursor: pointer;
@@ -1695,13 +1695,13 @@ html.admin-mode .ap-ledger-full { margin-left: auto; }
 html.admin-mode .ap-ledger-close { width: 34px; padding: 0; }
 
 html.admin-mode .ap-ledger-hero {
-  padding: 11px 20px 9px; border-bottom: 1px solid var(--line);
+  padding: 11px var(--o-space-5) 9px; border-bottom: 1px solid var(--line);
   overflow: hidden; flex-shrink: 0;
   max-width: 100%;
 }
 html.admin-mode .ap-ledger-kicker {
-  display: inline-flex; align-items: center; gap: 8px;
-  margin-bottom: 6px;
+  display: inline-flex; align-items: center; gap: var(--o-space-2);
+  margin-bottom: var(--o-space-15);
   font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-bold);
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--c);
 }
@@ -1722,7 +1722,7 @@ html.admin-mode .ap-ledger-hero p {
 html.admin-mode .ap-ledger-wxrow { display: flex; align-items: center; gap: 0.44rem; margin-top: 0.3rem; }
 html.admin-mode .ap-ledger-wxdate { font-family: var(--mono); font-size: var(--o-text-xs); font-weight: var(--o-fw-semi); color: var(--t3); }
 html.admin-mode .ap-ledger-lost {
-  display: inline-flex; margin-top: 12px; padding: 5px 9px;
+  display: inline-flex; margin-top: var(--o-space-3); padding: 5px 9px;
   border: 1px solid color-mix(in oklab, var(--c) 34%, var(--line));
   border-radius: var(--o-r-pill);
   background: color-mix(in oklab, var(--c) 10%, transparent);
@@ -1737,7 +1737,7 @@ html.admin-mode .ap-ledger-stats {
   flex-shrink: 0;
 }
 html.admin-mode .ap-ledger-stats div {
-  min-width: 0; padding: 8px 12px; border-right: 1px solid var(--line);
+  min-width: 0; padding: var(--o-space-2) var(--o-space-3); border-right: 1px solid var(--line);
   display: flex; align-items: baseline; gap: 7px;
 }
 html.admin-mode .ap-ledger-stats div:last-child { border-right: 0; }
@@ -1757,14 +1757,14 @@ html.admin-mode .ap-ledger-grid {
   flex: 1 1 0; min-height: 0;
   display: grid; grid-template-columns: 1fr 1fr;
   grid-template-rows: minmax(0, .82fr) minmax(0, 1.08fr) auto;
-  gap: 8px; padding: 12px 14px; overflow: visible;
+  gap: var(--o-space-2); padding: var(--o-space-3) var(--o-space-35); overflow: visible;
 }
 html.admin-mode .ap-ledger-panel {
   position: relative; z-index: 1;
-  min-width: 0; min-height: 0; padding: 12px 14px; overflow: hidden;
+  min-width: 0; min-height: 0; padding: var(--o-space-3) var(--o-space-35); overflow: hidden;
   border: 1px solid var(--line); border-radius: var(--o-r-sm-2);
   background: var(--panel);
-  display: flex; flex-direction: column; gap: 6px;
+  display: flex; flex-direction: column; gap: var(--o-space-15);
 }
 html.admin-mode .ap-ledger-panel:focus-within { z-index: 10; overflow: visible; }
 html.admin-mode .ap-ledger-panel .ap-ledger-rows {
@@ -1775,7 +1775,7 @@ html.admin-mode .ap-ledger-panel .ap-ledger-rows::-webkit-scrollbar-thumb { back
 html.admin-mode .ap-ledger-panel--wide { grid-column: span 2; }
 html.admin-mode .ap-ledger-footer {
   border-top: 1px solid var(--line);
-  padding: 10px 14px;
+  padding: var(--o-space-25) var(--o-space-35);
   flex-shrink: 0;
 }
 
@@ -1788,7 +1788,7 @@ html.admin-mode .ap-ledger-panel--split {
 }
 html.admin-mode .ap-ledger-split-col {
   flex: 1; min-width: 0;
-  padding: 14px;
+  padding: var(--o-space-35);
   display: flex; flex-direction: column;
 }
 html.admin-mode .ap-ledger-split-col--sep {
@@ -1799,15 +1799,15 @@ html.admin-mode .ap-ledger-split-col--sep {
 html.admin-mode .ap-ledger-stagepick--col {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-top: 4px;
+  gap: var(--o-space-1);
+  margin-top: var(--o-space-1);
 }
 html.admin-mode .ap-ledger-panel--booking {
   grid-column: 1 / -1;
   border-color: color-mix(in oklab, var(--gold) 24%, var(--line));
   background: color-mix(in oklab, var(--gold) 5%, var(--panel));
 }
-html.admin-mode .ap-ledger-panelhead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 7px; }
+html.admin-mode .ap-ledger-panelhead { display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-25); margin-bottom: 7px; }
 html.admin-mode .ap-ledger-panelhead span {
   font-family: var(--display); font-size: var(--o-text-lg); font-weight: var(--o-fw-bold);
   letter-spacing: -0.01em; line-height: 1.1; color: var(--t);
@@ -1819,7 +1819,7 @@ html.admin-mode .ap-ledger-panelhead strong {
 html.admin-mode .ap-ledger-summary { margin: 0; color: var(--t2); font-size: var(--o-text-sm); line-height: 1.42; }
 
 html.admin-mode .ap-ledger-rows { display: grid; gap: 0; margin: 0; }
-html.admin-mode .ap-ledger-rows div { display: flex; justify-content: space-between; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--line); min-width: 0; overflow: hidden; }
+html.admin-mode .ap-ledger-rows div { display: flex; justify-content: space-between; gap: var(--o-space-2); padding: var(--o-space-1) 0; border-bottom: 1px solid var(--line); min-width: 0; overflow: hidden; }
 html.admin-mode .ap-ledger-rows div:has(.ap-ledger-editinput) { overflow: visible; }
 html.admin-mode .ap-ledger-rows div:last-child { border-bottom: 0; }
 html.admin-mode .ap-ledger-rows dt {
@@ -1833,7 +1833,7 @@ html.admin-mode .ap-ledger-rows dd {
 }
 html.admin-mode .ap-ledger-rows dd:has(.ap-ledger-editinput) { overflow: visible; }
 
-html.admin-mode .ap-ledger-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 13px; }
+html.admin-mode .ap-ledger-actions { display: flex; flex-wrap: wrap; gap: var(--o-space-2); margin-top: 13px; }
 html.admin-mode .ap-ledger-sheet .ap-ledger-actions--contact .ap-ledger-btn,
 html.admin-mode .ap-ledger-fullpage .ap-ledger-actions--contact .ap-ledger-btn { flex: 1 1 132px; }
 html.admin-mode .ap-ledger-sheet .ap-ledger-actions--contact,
@@ -1848,7 +1848,7 @@ html.admin-mode .ap-ledger-fullpage .ap-ledger-actions--contact .ap-ledger-btn {
 html.admin-mode .ap-ledger-sheet .ap-ledger-rows div,
 html.admin-mode .ap-ledger-fullpage .ap-ledger-rows div {
   align-items: flex-start;
-  gap: 10px;
+  gap: var(--o-space-25);
   overflow: hidden;
 }
 html.admin-mode .ap-ledger-sheet .ap-ledger-rows div:has(.ap-ledger-editinput),
@@ -1870,7 +1870,7 @@ html.admin-mode .ap-ledger-sheet .ap-ledger-rows--event,
 html.admin-mode .ap-ledger-fullpage .ap-ledger-rows--contact,
 html.admin-mode .ap-ledger-fullpage .ap-ledger-rows--event {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px 10px;
+  gap: var(--o-space-15) var(--o-space-25);
   flex: 0 0 auto;
 }
 html.admin-mode .ap-ledger-sheet .ap-ledger-rows--contact div,
@@ -1879,7 +1879,7 @@ html.admin-mode .ap-ledger-fullpage .ap-ledger-rows--contact div,
 html.admin-mode .ap-ledger-fullpage .ap-ledger-rows--event div {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2px;
+  gap: var(--o-space-05);
   padding: 0 0 5px;
 }
 html.admin-mode .ap-ledger-sheet .ap-ledger-rows--contact dt,
@@ -1901,7 +1901,7 @@ html.admin-mode .ap-ledger-sheet .ap-ledger-rows .ap-ledger-row--long,
 html.admin-mode .ap-ledger-fullpage .ap-ledger-rows .ap-ledger-row--long {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 4px;
+  gap: var(--o-space-1);
 }
 html.admin-mode .ap-ledger-sheet .ap-ledger-rows--event .ap-ledger-row--long,
 html.admin-mode .ap-ledger-sheet .ap-ledger-rows--contact .ap-ledger-row--long,
@@ -1916,7 +1916,7 @@ html.admin-mode .ap-ledger-fullpage .ap-ledger-rows .ap-ledger-row--long dd {
 }
 html.admin-mode .ap-ledger-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-  min-height: 36px; padding: 0 12px;
+  min-height: 36px; padding: 0 var(--o-space-3);
   border: 1px solid var(--line); border-radius: var(--o-r-sm-2);
   background: var(--raised); color: var(--t2);
   font: inherit; font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold); text-decoration: none; cursor: pointer;
@@ -1962,10 +1962,10 @@ html.admin-mode .ap-ledger-btn--mail:hover:not(:disabled) {
   background: color-mix(in oklab, var(--gold) 14%, var(--raised));
 }
 
-html.admin-mode .ap-ledger-stagepick { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+html.admin-mode .ap-ledger-stagepick { display: grid; grid-template-columns: 1fr 1fr; gap: var(--o-space-2); }
 html.admin-mode .ap-ledger-stagepick button {
-  display: inline-flex; align-items: center; gap: 8px;
-  min-height: 36px; padding: 0 10px;
+  display: inline-flex; align-items: center; gap: var(--o-space-2);
+  min-height: 36px; padding: 0 var(--o-space-25);
   border: 1px solid var(--line); border-radius: var(--o-r-sm-2);
   background: var(--raised); color: var(--t2);
   font: inherit; font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold); cursor: pointer;
@@ -1988,8 +1988,8 @@ html.admin-mode .ap-ledger-stagepick button.is-on .ap-leads-dot {
 html.admin-mode .ap-ledger-stageactions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  margin: -8px 0 10px;
+  gap: var(--o-space-2);
+  margin: -var(--o-space-2) 0 var(--o-space-25);
   flex: 0 0 auto;
 }
 html.admin-mode .ap-ledger-stageactions .ap-ledger-btn {
@@ -1998,7 +1998,7 @@ html.admin-mode .ap-ledger-stageactions .ap-ledger-btn {
   white-space: nowrap;
 }
 html.admin-mode .ap-ledger-bookingstate {
-  display: inline-flex; align-items: center; gap: 8px;
+  display: inline-flex; align-items: center; gap: var(--o-space-2);
   color: var(--t); font-family: var(--mono); font-size: var(--o-text-2xs); font-weight: var(--o-fw-xbold);
   letter-spacing: 0.05em; text-transform: uppercase;
 }
@@ -2007,34 +2007,34 @@ html.admin-mode .ap-ledger-bookingstate {
 html.admin-mode .ap-leads-lostmodal {
   position: fixed; inset: 0; z-index: 60;
   display: grid; place-items: center;
-  padding: 24px;
+  padding: var(--o-space-6);
   background: var(--ax-overlay-md);
   backdrop-filter: blur(4px);
 }
 html.admin-mode .ap-leads-lostmodal-card {
   width: 100%; max-width: 480px;
-  padding: 22px 22px 16px;
+  padding: 22px 22px var(--o-space-4);
   border: 1px solid var(--line2);
   border-radius: var(--o-r-md);
   background: var(--panel);
   box-shadow: 0 28px 70px -32px var(--ax-overlay-xl);
 }
 html.admin-mode .ap-leads-lostmodal-h {
-  margin: 0 0 12px;
+  margin: 0 0 var(--o-space-3);
   font-family: var(--display); font-size: var(--o-text-md-2); font-weight: var(--o-fw-xbold);
   color: var(--t);
 }
 
 @media (max-width: 900px) {
   html.admin-mode .ap-leads-pipeline { grid-template-columns: 1fr; }
-  html.admin-mode .ap-leads-content { padding: 16px 16px 36px; }
+  html.admin-mode .ap-leads-content { padding: var(--o-space-4) var(--o-space-4) 36px; }
   html.admin-mode .ap-leads-cal { grid-template-columns: 1fr; }
   html.admin-mode .ap-ledger-sheet { width: 100vw; }
   html.admin-mode .ap-ledger-hero h2 { font-size: var(--o-text-2xl); }
   html.admin-mode .ap-ledger-stats { grid-template-columns: 1fr 1fr; }
   html.admin-mode .ap-ledger-stats div:nth-child(even) { border-right: 0; }
   html.admin-mode .ap-ledger-stats div:nth-child(n+3) { border-top: 1px solid var(--line); }
-  html.admin-mode .ap-ledger-grid { grid-template-columns: 1fr; padding: 12px; }
+  html.admin-mode .ap-ledger-grid { grid-template-columns: 1fr; padding: var(--o-space-3); }
 }
 html.admin-mode .ap-ledger-fullpage[data-stage="contactat"] { --c: var(--o-stage-contacted); --strong: var(--o-stage-contacted-strong, var(--o-stage-contacted)); }
 html.admin-mode .ap-ledger-fullpage[data-stage="guanyat"]   { --c: var(--o-stage-won);       --strong: var(--o-stage-won-strong,       var(--o-stage-won)); }
@@ -2911,7 +2911,7 @@ html.admin-mode .ap-ledger-editval {
 }
 html.admin-mode .ap-ledger-editval:hover { border-bottom-color: var(--ax-fill-bright); }
 html.admin-mode .ap-ledger-empty { font-style: italic; color: var(--t3, var(--ax-t3)); font-size: var(--o-text-xs); }
-html.admin-mode .ap-ledger-editrow { display: flex; align-items: center; gap: 4px; }
+html.admin-mode .ap-ledger-editrow { display: flex; align-items: center; gap: var(--o-space-1); }
 html.admin-mode .ap-ledger-editinput {
   position: relative;
   z-index: 20;
@@ -2921,7 +2921,7 @@ html.admin-mode .ap-ledger-editinput {
   border-radius: var(--o-r-xs);
   color: var(--t, var(--ax-t));
   font: inherit; font-size: var(--o-text-2xs);
-  padding: 2px 6px;
+  padding: var(--o-space-05) var(--o-space-15);
   outline: none;
   min-width: 0; flex: 1;
 }
@@ -2938,11 +2938,11 @@ html.admin-mode .ap-ledger-editunit {
 }
 html.admin-mode .ap-ledger-savebtn {
   background: var(--ax-success-bg); border: 1px solid var(--ax-success-border);
-  color: var(--o-success); border-radius: var(--o-r-xs); padding: 2px 6px; cursor: pointer; font-size: var(--o-text-xs);
+  color: var(--o-success); border-radius: var(--o-r-xs); padding: var(--o-space-05) var(--o-space-15); cursor: pointer; font-size: var(--o-text-xs);
 }
 html.admin-mode .ap-ledger-cancelbtn {
   background: transparent; border: none; color: var(--t3, var(--ax-t3));
-  cursor: pointer; font-size: var(--o-text-xs); padding: 2px 4px;
+  cursor: pointer; font-size: var(--o-text-xs); padding: var(--o-space-05) var(--o-space-1);
 }
 html.admin-mode .ap-ledger-budget-editable {
   border-bottom: 1px dashed var(--t3);

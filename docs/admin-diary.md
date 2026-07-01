@@ -1,3 +1,64 @@
+## 2026-07-01 — Front públic: UX d'estats/focus canonitzada en formularis compartits (Canvi #1313, codex)
+
+### Context
+La canonització total no pot quedar només en headers visibles: també ha d'incloure estats, focus, errors, èxits, toggles i CTAs. Primer tall de Codex dins el perímetre acordat de front públic, sense tocar CSS admin core ni la capa d'espaiat de Claude.
+
+### Què s'ha fet
+- `app/components/forms/ContactFormComplete.tsx`: els estats required/error/success/focus/link/CTA deixen classes Tailwind crues (`red-*`, `green-*`, `amber-*`, `orange-*`) i passen a constants locals basades en tokens públics (`--oe-gold`, `--oe-orange`, `--oe-green`, `--grad-gold`, `--bg-main`).
+- `components/security/TurnstileWidget.tsx`: placeholder local de Turnstile passa de `yellow-*` a `--oe-amber`.
+- `app/components/legal/CookieConsent.client.tsx`: toggles i CTAs passen de `gray-*`/gradient amber-orange cru a `--bg-elevated`, `--text-primary` i `--grad-gold`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: formulari de contacte, placeholder Turnstile dev i cookie consent mantenen el mateix comportament, però els estats visuals consumeixen tokens.
+- Validació humana/UX: es comença la canonització invisible: required, error, success, focus, toggle i CTA responen al mateix sistema visual públic.
+
+### Coordinació
+Counter → 1313. Codex treballa només front públic; Claude manté propietat de CSS admin core, espaiat i dashboard.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-01 — Capa espaiat: escala completa + tokenització px→token admin (Canvi #1312, claude)
+
+### Context
+El propietari pregunta com fer que "el contenidor tingui els atributs a l'hora de crear-se" = principi de la canonització (atribut a la classe, no al lloc d'ús). Aplicat a l'espaiat.
+
+### Què s'ha fet
+- **Escala d'espaiat completa** a orbita-tokens.css: afegits mig-passos --o-space-05(2px)/15(6px)/25(10px)/35(14px)/5(20px)/8(32px). Ara TOT padding/gap/margin surt de l'escala.
+- **Tokenització segura** px→token: 182 valors a admin-shell.css + 3 a globals.css, NOMÉS en padding/gap/margin/inset i NOMÉS valors EXACTES de l'escala (8px=--o-space-2=0.5rem=8px → zero canvi visual). Verificat amb captura leads/booking idèntics.
+
+### Validació
+- Validació tècnica: tsc 0; validate:core.
+- Validació funcional: captures leads/booking idèntiques (valors exactes).
+- Validació humana/UX: espaiat ara tokenitzat; canviar l'escala a Studio propaga.
+
+### Coordinació
+Counter → 1312. Capa espaiat iniciada (valors exactes; els no-exactes queden per revisió incremental). Codex: front públic (agent-sync).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-01 — Gutter lateral canònic de fàbrica a .ap-page (Canvi #1311, claude)
+
+### Context
+El propietari: els contenidors toquen les vores. Causa: .ap-content/.ap-kpis/.ap-tabs-nav no tenien padding lateral (el header sí via --head-pad).
+
+### Què s'ha fet
+- Nou token --page-gutter (= lateral del header) a orbita-tokens.css. Aplicat a .ap-content/.ap-kpis/.ap-tabs-nav. Ara tota pàgina AdminPage hereta el gutter DE FÀBRICA; canviar-lo = 1 token.
+- Verificat amb captura: economia/dashboard el contingut respira (no toca vores).
+
+### Validació
+- Validació tècnica: tsc 0; validate:core.
+- Validació funcional: captura contingut amb gutter.
+- Validació humana/UX: contenidors ja no toquen les vores.
+
+### Coordinació
+Counter → 1311.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-01 — Canonització: dashboard /admin + image-manager colors (Canvi #1310, claude+agent)
 
 ### Què s'ha fet
