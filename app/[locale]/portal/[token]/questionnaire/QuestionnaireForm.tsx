@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { QuestionnaireTemplateDTO, QuestionnaireResponseDTO, QuestionnaireQuestion } from '@/lib/services/questionnaireService';
+import { CLIENT_PORTAL_TONE_CLASS } from '@/lib/constants/clientPortalTones';
 
 type Messages = {
   alreadySubmitted: string;
@@ -150,7 +151,7 @@ export default function QuestionnaireForm({
   if (submitted) {
     return (
       <div className="space-y-4 text-center">
-        <p className="text-emerald-300 font-semibold">{m.success}</p>
+        <p className={`${CLIENT_PORTAL_TONE_CLASS.successText} font-semibold`}>{m.success}</p>
         <a
           href={`../`}
           className="inline-flex rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold text-white/80 hover:bg-white/10"
@@ -164,7 +165,7 @@ export default function QuestionnaireForm({
   if (!editing && existingResponse) {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-emerald-300">{m.alreadySubmitted}</p>
+        <p className={`text-sm ${CLIENT_PORTAL_TONE_CLASS.successText}`}>{m.alreadySubmitted}</p>
         <dl className="space-y-3">
           {template.questions.map((q) => (
             <div key={q.id}>
@@ -194,13 +195,13 @@ export default function QuestionnaireForm({
         <p className="text-sm text-white/60">{template.description}</p>
       )}
       {error && (
-        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm text-red-300">{error}</p>
+        <p className={`rounded-lg border px-4 py-2 text-sm ${CLIENT_PORTAL_TONE_CLASS.dangerSoft}`}>{error}</p>
       )}
       {template.questions.map((q) => (
         <div key={q.id}>
           <label htmlFor={`q-${q.id}`} className="block text-sm font-medium text-white/80">
             {q.label}
-            {q.required && <span className="ml-1 text-xs text-red-300" aria-hidden="true">*</span>}
+            {q.required && <span className={`ml-1 text-xs ${CLIENT_PORTAL_TONE_CLASS.dangerText}`} aria-hidden="true">*</span>}
           </label>
           <QuestionField
             question={q}

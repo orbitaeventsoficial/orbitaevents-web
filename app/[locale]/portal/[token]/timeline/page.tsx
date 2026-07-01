@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -21,6 +20,7 @@ import {
 import { resolvePortalAccentHex } from '@/lib/clientPortalUtils';
 import PortalBottomNav from '../PortalBottomNav';
 import { getClientPortalHiddenNavItems, getClientPortalVisibility } from '@/lib/clientPortalVisibility';
+import ClientPortalPageHeader from '@/app/components/public/ClientPortalPageHeader';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -53,7 +53,7 @@ function MilestoneRow({
           className="mt-1 h-4 w-4 flex-none rounded-full border-2"
           style={
             isDone
-              ? { backgroundColor: '#34d399', borderColor: '#34d399' }
+              ? { backgroundColor: 'var(--oe-green)', borderColor: 'var(--oe-green)' }
               : isUpcoming
               ? { backgroundColor: 'transparent', borderColor: accentHex, boxShadow: `0 0 0 3px ${accentHex}33` }
               : { backgroundColor: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.15)' }
@@ -63,7 +63,7 @@ function MilestoneRow({
         {!isLast && (
           <span
             className="mt-1 w-0.5 flex-1"
-            style={{ backgroundColor: isDone ? 'rgba(52,211,153,0.25)' : 'rgba(255,255,255,0.08)' }}
+            style={{ backgroundColor: isDone ? 'color-mix(in oklab, var(--oe-green) 25%, transparent)' : 'rgba(255,255,255,0.08)' }}
             aria-hidden="true"
           />
         )}
@@ -75,7 +75,7 @@ function MilestoneRow({
             className="rounded-full px-2 py-0.5 text-xs font-medium"
             style={
               isDone
-                ? { backgroundColor: 'rgba(52,211,153,0.12)', color: '#a7f3d0' }
+                ? { backgroundColor: 'color-mix(in oklab, var(--oe-green) 12%, transparent)', color: 'color-mix(in oklab, var(--oe-green) 70%, white)' }
                 : isUpcoming
                 ? { backgroundColor: `${accentHex}22`, color: accentHex }
                 : { backgroundColor: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.3)' }
@@ -144,17 +144,14 @@ export default async function ClientPortalTimelinePage({
   return (
     <main className="min-h-screen pb-24 text-white/90 portal-shell-bg">
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-        <header className="mb-6">
-          <Link
-            href={`/${locale}/portal/${params.token}`}
-            className="mb-4 inline-flex items-center gap-1.5 text-xs text-white/35 hover:text-white/60 transition-colors"
-          >
-            ← {t.portalLabel}
-          </Link>
-          <p className="text-xs uppercase tracking-widest mb-1" style={{ color: accentHex }}>{t.timelineLabel}</p>
-          <h1 className="text-2xl font-bold text-white">{t.timelinePageTitle}</h1>
-          <p className="text-sm text-white/40 mt-1">{booking.reference}</p>
-        </header>
+        <ClientPortalPageHeader
+          backHref={`/${locale}/portal/${params.token}`}
+          backLabel={t.portalLabel}
+          eyebrow={t.timelineLabel}
+          title={t.timelinePageTitle}
+          reference={booking.reference}
+          accentColor={accentHex}
+        />
 
         <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-6">
           <ul className="space-y-0" aria-label={t.timelineLabel}>

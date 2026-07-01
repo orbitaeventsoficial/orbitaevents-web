@@ -21,6 +21,8 @@ import {
 import { toRgba, resolvePortalAccentHex } from '@/lib/clientPortalUtils';
 import PortalBottomNav from '../PortalBottomNav';
 import { getClientPortalHiddenNavItems, getClientPortalVisibility } from '@/lib/clientPortalVisibility';
+import ClientPortalPageHeader from '@/app/components/public/ClientPortalPageHeader';
+import { CLIENT_PORTAL_TONE_CLASS } from '@/lib/constants/clientPortalTones';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -77,17 +79,14 @@ export default async function ClientPortalContractPage({
   return (
     <main className="min-h-screen pb-24 text-white/90 portal-shell-bg">
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-        <header className="mb-6">
-          <Link
-            href={`/${locale}/portal/${params.token}`}
-            className="mb-4 inline-flex items-center gap-1.5 text-xs text-white/35 hover:text-white/60 transition-colors"
-          >
-            ← {t.portalLabel}
-          </Link>
-          <p className="text-xs uppercase tracking-widest mb-1" style={{ color: accentHex }}>{t.contract}</p>
-          <h1 className="text-2xl font-bold text-white">{t.contractPageTitle}</h1>
-          <p className="text-sm text-white/40 mt-1">{access.booking.reference}</p>
-        </header>
+        <ClientPortalPageHeader
+          backHref={`/${locale}/portal/${params.token}`}
+          backLabel={t.portalLabel}
+          eyebrow={t.contract}
+          title={t.contractPageTitle}
+          reference={access.booking.reference}
+          accentColor={accentHex}
+        />
 
         {/* Contract & status */}
         <div className="grid gap-4 sm:grid-cols-2 mb-4">
@@ -101,7 +100,7 @@ export default async function ClientPortalContractPage({
             <p className="mt-1 text-lg font-bold text-white">
               {contractStatusLabels[contractSummary.status] || contractSummary.status}
             </p>
-            {signedAt && <p className="text-xs text-emerald-300 mt-0.5">{signedAt}</p>}
+            {signedAt && <p className={`text-xs ${CLIENT_PORTAL_TONE_CLASS.successText} mt-0.5`}>{signedAt}</p>}
           </div>
         </div>
 
@@ -121,7 +120,7 @@ export default async function ClientPortalContractPage({
             {contractSummary.signatureChecklist.map((item) => (
               <div
                 key={item.id}
-                className={`rounded-xl border px-3 py-2 text-xs ${item.complete ? 'border-emerald-300/25 bg-emerald-400/10 text-emerald-100' : 'border-amber-300/25 bg-amber-400/10 text-amber-100'}`}
+                className={`rounded-xl border px-3 py-2 text-xs ${item.complete ? CLIENT_PORTAL_TONE_CLASS.successSoft : CLIENT_PORTAL_TONE_CLASS.warningSoft}`}
               >
                 <span className="font-bold">{item.complete ? '✓' : '○'}</span>
                 <span className="ml-2">{getSignatureRequirementLabel(item.id, t)}</span>
@@ -129,13 +128,13 @@ export default async function ClientPortalContractPage({
             ))}
           </div>
           {contractSummary.signatureState === 'SIGNED' && contractSummary.signatureBlob && (
-            <div className="mt-4 rounded-xl border border-emerald-300/20 bg-emerald-400/10 p-3">
-              <p className="text-xs font-semibold uppercase text-emerald-200 mb-2">{t.signature}</p>
+            <div className={`mt-4 rounded-xl border p-3 ${CLIENT_PORTAL_TONE_CLASS.successSoft}`}>
+              <p className="text-xs font-semibold uppercase mb-2">{t.signature}</p>
               {/* eslint-disable-next-line @next/next/no-img-element -- data:image URL de signatura capturada; next/image no suporta data URIs sense remote patterns */}
               <img
                 src={contractSummary.signatureBlob}
                 alt={t.signatureSigned}
-                className="max-h-28 rounded border border-emerald-200/15 bg-black/20 object-contain"
+                className={`max-h-28 rounded border ${CLIENT_PORTAL_TONE_CLASS.successBorder} bg-black/20 object-contain`}
               />
             </div>
           )}

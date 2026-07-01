@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { SignaturePad } from './SignaturePad';
+import { CLIENT_PORTAL_TONE_CLASS } from '@/lib/constants/clientPortalTones';
 
 type SignFormMessages = {
   signYourName: string;
@@ -71,9 +72,9 @@ export function SignContractForm({
 
   if (status === 'success') {
     return (
-      <div className="rounded-2xl border border-emerald-400/30 bg-emerald-950/20 p-8 text-center">
-        <p className="text-2xl font-bold text-emerald-300">✓</p>
-        <p className="mt-2 text-lg font-semibold text-emerald-200">{m.signSuccess}</p>
+      <div className={`rounded-2xl border p-8 text-center ${CLIENT_PORTAL_TONE_CLASS.successSoft}`}>
+        <p className="text-2xl font-bold">✓</p>
+        <p className="mt-2 text-lg font-semibold">{m.signSuccess}</p>
         <a
           href={`/${locale}/portal/${token}`}
           className="mt-4 inline-flex rounded-lg border px-4 py-2 text-sm font-semibold text-white/90 hover:brightness-110"
@@ -131,7 +132,7 @@ export function SignContractForm({
       </div>
 
       {status === 'error' && (
-        <p className="rounded-lg border border-red-400/30 bg-red-950/20 px-4 py-2 text-sm text-red-300">
+        <p className={`rounded-lg border px-4 py-2 text-sm ${CLIENT_PORTAL_TONE_CLASS.dangerSoft}`}>
           {errorMessage}
         </p>
       )}

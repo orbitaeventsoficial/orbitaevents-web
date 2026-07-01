@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { CLIENT_PORTAL_TONE_CLASS } from '@/lib/constants/clientPortalTones';
 
 type Props = {
   token: string;
@@ -64,8 +65,8 @@ export default function BizumPayButton({
 
   if (declared) {
     return (
-      <div className="mt-4 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3">
-        <p className="text-sm font-semibold text-emerald-300">✓ {labels.successTitle}</p>
+      <div className={`mt-4 rounded-xl border px-4 py-3 ${CLIENT_PORTAL_TONE_CLASS.successSoft}`}>
+        <p className="text-sm font-semibold">✓ {labels.successTitle}</p>
         <p className="text-xs text-white/50 mt-0.5">{labels.successBody}</p>
       </div>
     );
@@ -91,7 +92,7 @@ export default function BizumPayButton({
       </div>
 
       {error && (
-        <p className="text-xs text-red-400">{error}</p>
+        <p className={`text-xs ${CLIENT_PORTAL_TONE_CLASS.dangerText}`}>{error}</p>
       )}
 
       <button

@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -20,6 +19,8 @@ import { toRgba, resolvePortalAccentHex } from '@/lib/clientPortalUtils';
 import PortalBottomNav from '../PortalBottomNav';
 import BizumPayButton from './BizumPayButton';
 import { getClientPortalHiddenNavItems, getClientPortalVisibility } from '@/lib/clientPortalVisibility';
+import ClientPortalPageHeader from '@/app/components/public/ClientPortalPageHeader';
+import { clientPortalPaymentTone } from '@/lib/constants/clientPortalTones';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -102,17 +103,14 @@ export default async function ClientPortalPaymentsPage({
   return (
     <main className="min-h-screen pb-24 text-white/90 portal-shell-bg">
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-        <header className="mb-6">
-          <Link
-            href={`/${locale}/portal/${params.token}`}
-            className="mb-4 inline-flex items-center gap-1.5 text-xs text-white/35 hover:text-white/60 transition-colors"
-          >
-            ← {t.portalLabel}
-          </Link>
-          <p className="text-xs uppercase tracking-widest mb-1" style={{ color: accentHex }}>{t.payments}</p>
-          <h1 className="text-2xl font-bold text-white">{t.paymentPageTitle}</h1>
-          <p className="text-sm text-white/40 mt-1">{booking.reference}</p>
-        </header>
+        <ClientPortalPageHeader
+          backHref={`/${locale}/portal/${params.token}`}
+          backLabel={t.portalLabel}
+          eyebrow={t.payments}
+          title={t.paymentPageTitle}
+          reference={booking.reference}
+          accentColor={accentHex}
+        />
 
         {/* Overview */}
         <div
@@ -133,7 +131,7 @@ export default async function ClientPortalPaymentsPage({
           <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-5">
             <p className="text-xs text-white/35 uppercase tracking-wide mb-1">{t.paymentDeposit}</p>
             <p className="text-2xl font-bold text-white">{formatCurrency(paymentSummary.deposit.amount)}</p>
-            <p className={`text-sm font-medium mt-1 ${paymentSummary.deposit.paid ? 'text-emerald-300' : 'text-amber-300'}`}>
+            <p className={`text-sm font-medium mt-1 ${clientPortalPaymentTone(paymentSummary.deposit.paid)}`}>
               {paymentSummary.deposit.paid ? `✓ ${t.paid}` : `○ ${t.pending}`}
             </p>
             {paymentSummary.deposit.payableOnline && paymentSummary.deposit.paymentUrl ? (
@@ -168,7 +166,7 @@ export default async function ClientPortalPaymentsPage({
           <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-5">
             <p className="text-xs text-white/35 uppercase tracking-wide mb-1">{t.paymentRemaining}</p>
             <p className="text-2xl font-bold text-white">{formatCurrency(paymentSummary.remaining.amount)}</p>
-            <p className={`text-sm font-medium mt-1 ${paymentSummary.remaining.paid ? 'text-emerald-300' : 'text-amber-300'}`}>
+            <p className={`text-sm font-medium mt-1 ${clientPortalPaymentTone(paymentSummary.remaining.paid)}`}>
               {paymentSummary.remaining.paid ? `✓ ${t.paid}` : `○ ${t.pending}`}
             </p>
             {paymentSummary.remaining.payableOnline && paymentSummary.remaining.paymentUrl ? (

@@ -16,6 +16,7 @@ import {
 } from '@/lib/clientPortalContract';
 import { SignContractForm } from './SignContractForm';
 import { toRgba, resolvePortalAccentHex } from '@/lib/clientPortalUtils';
+import ClientPortalPageHeader from '@/app/components/public/ClientPortalPageHeader';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -70,21 +71,14 @@ export default async function SignContractPage({
   return (
     <main className="min-h-screen text-white/90 relative portal-shell-bg">
       <div className="mx-auto max-w-lg px-4 py-8 sm:px-6">
-        <header
-          className="rounded-2xl border bg-white/[0.03] p-6 shadow-xl"
-          style={{ borderColor: accentBorder }}
-        >
-          <p
-            className="text-xs uppercase tracking-[0.2em]"
-            style={{ color: accentHex }}
-          >
-            {t.contract}
-          </p>
-          <h1 className="mt-2 text-2xl font-bold">{t.contractPageTitle}</h1>
-          <p className="mt-1 text-sm text-white/60">
-            {contractSummary.contractReference}
-          </p>
-        </header>
+        <ClientPortalPageHeader
+          eyebrow={t.contract}
+          title={t.contractPageTitle}
+          reference={contractSummary.contractReference}
+          accentColor={accentHex}
+          frameBorderColor={accentBorder}
+          framed
+        />
 
         <section className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-6 space-y-4">
           <p className="text-sm text-white/70">{t.signaturePreparation}</p>

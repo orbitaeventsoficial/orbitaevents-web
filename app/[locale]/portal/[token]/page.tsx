@@ -24,6 +24,7 @@ import StarIcon from '@/app/components/public/StarIcon';
 import { toRgba, resolvePortalAccentHex } from '@/lib/clientPortalUtils';
 import PortalBottomNav from './PortalBottomNav';
 import { getClientPortalHiddenNavItems, getClientPortalVisibility } from '@/lib/clientPortalVisibility';
+import { CLIENT_PORTAL_TONE_CLASS, clientPortalPaymentTone } from '@/lib/constants/clientPortalTones';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -527,7 +528,7 @@ export default async function ClientPortalPage({
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-4">
                   <p className="text-xs text-white/35 mb-1">{t.paymentDeposit}</p>
                   <p className="text-xl font-bold text-white">{formatCurrency(paymentSummary.deposit.amount)}</p>
-                  <p className={`text-xs font-medium mt-1 ${paymentSummary.deposit.paid ? 'text-emerald-300' : 'text-amber-300'}`}>
+                  <p className={`text-xs font-medium mt-1 ${clientPortalPaymentTone(paymentSummary.deposit.paid)}`}>
                     {paymentSummary.deposit.paid ? '✓ ' : '○ '}{paymentSummary.deposit.paid ? t.paid : t.pending}
                   </p>
                   {paymentSummary.deposit.payableOnline && paymentSummary.deposit.paymentUrl && (
@@ -542,7 +543,7 @@ export default async function ClientPortalPage({
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-4">
                   <p className="text-xs text-white/35 mb-1">{t.paymentRemaining}</p>
                   <p className="text-xl font-bold text-white">{formatCurrency(paymentSummary.remaining.amount)}</p>
-                  <p className={`text-xs font-medium mt-1 ${paymentSummary.remaining.paid ? 'text-emerald-300' : 'text-amber-300'}`}>
+                  <p className={`text-xs font-medium mt-1 ${clientPortalPaymentTone(paymentSummary.remaining.paid)}`}>
                     {paymentSummary.remaining.paid ? '✓ ' : '○ '}{paymentSummary.remaining.paid ? t.paid : t.pending}
                   </p>
                   {paymentSummary.remaining.payableOnline && paymentSummary.remaining.paymentUrl && (
@@ -581,7 +582,7 @@ export default async function ClientPortalPage({
                         {CONTRACT_STATUS_LABELS[locale][contractSummary.status] || contractSummary.status}
                       </p>
                       {contractSummary.awaitingInlineSignature && (
-                        <span className="text-xs text-amber-300">{t.inlineSignaturePending}</span>
+                        <span className={`text-xs ${CLIENT_PORTAL_TONE_CLASS.warningText}`}>{t.inlineSignaturePending}</span>
                       )}
                     </div>
                   </div>
@@ -657,7 +658,7 @@ export default async function ClientPortalPage({
                   <p className="text-xs text-white/35 mb-1">{t.travelDistance}</p>
                   <p className="text-sm font-semibold">{formatDistanceKm(totalTravelKm, locale)} km</p>
                   <p className="text-xs text-white/35">{t.travelRoundTripFrom} Granollers</p>
-                  <p className="text-xs text-emerald-300 mt-0.5">{t.travelIncluded}: {INCLUDED_TRAVEL_KM} km</p>
+                  <p className={`text-xs ${CLIENT_PORTAL_TONE_CLASS.successText} mt-0.5`}>{t.travelIncluded}: {INCLUDED_TRAVEL_KM} km</p>
                 </div>
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
                   <p className="text-xs text-white/35 mb-1">{t.travelRate}</p>
@@ -701,7 +702,7 @@ export default async function ClientPortalPage({
             <SectionCard icon={<IconClipboard className="w-4 h-4" />} title={t.questionnaireLabel} accentHex={accentHex}>
               <div className="mb-4 flex items-center gap-2">
                 {activeQuestionnaire.response ? (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-medium text-emerald-200">
+                  <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium ${CLIENT_PORTAL_TONE_CLASS.successSoft}`}>
                     <IconCheck className="w-3 h-3" />
                     {t.questionnaireCompleted}
                   </span>

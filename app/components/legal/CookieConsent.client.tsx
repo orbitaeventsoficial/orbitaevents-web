@@ -220,7 +220,7 @@ export default function CookieConsent() {
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <button
                       onClick={acceptAll}
-                      className="px-4 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full text-black text-xs font-bold whitespace-normal break-words sm:whitespace-nowrap"
+                      className="px-4 py-1.5 bg-[var(--grad-gold)] rounded-full text-[var(--bg-main)] text-xs font-bold whitespace-normal break-words sm:whitespace-nowrap"
                     >
                       {t('acceptAll')}
                     </button>
@@ -251,22 +251,22 @@ export default function CookieConsent() {
                       <span className="text-white text-xs font-medium">{t('analytics.title')}</span>
                       <button
                         onClick={() => setPreferences((p) => ({ ...p, analytics: !p.analytics }))}
-                        className={`w-10 h-5 rounded-full flex items-center px-0.5 transition-colors ${preferences.analytics ? 'bg-oe-gold' : 'bg-gray-600'}`}
+                        className={`w-10 h-5 rounded-full flex items-center px-0.5 transition-colors ${preferences.analytics ? 'bg-oe-gold' : 'bg-[var(--bg-elevated)]'}`}
                       >
-                        <div className={`w-3.5 h-3.5 rounded-full bg-white transition-transform ${preferences.analytics ? 'translate-x-5' : 'translate-x-0'}`} />
+                        <div className={`w-3.5 h-3.5 rounded-full bg-[var(--text-primary)] transition-transform ${preferences.analytics ? 'translate-x-5' : 'translate-x-0'}`} />
                       </button>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-white text-xs font-medium">{t('marketing.title')}</span>
                       <button
                         onClick={() => setPreferences((p) => ({ ...p, marketing: !p.marketing }))}
-                        className={`w-10 h-5 rounded-full flex items-center px-0.5 transition-colors ${preferences.marketing ? 'bg-oe-gold' : 'bg-gray-600'}`}
+                        className={`w-10 h-5 rounded-full flex items-center px-0.5 transition-colors ${preferences.marketing ? 'bg-oe-gold' : 'bg-[var(--bg-elevated)]'}`}
                       >
-                        <div className={`w-3.5 h-3.5 rounded-full bg-white transition-transform ${preferences.marketing ? 'translate-x-5' : 'translate-x-0'}`} />
+                        <div className={`w-3.5 h-3.5 rounded-full bg-[var(--text-primary)] transition-transform ${preferences.marketing ? 'translate-x-5' : 'translate-x-0'}`} />
                       </button>
                     </div>
                     <div className="flex gap-2 pt-1">
-                      <button onClick={savePreferences} className="flex-1 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full text-black text-xs font-bold">
+                      <button onClick={savePreferences} className="flex-1 px-3 py-1.5 bg-[var(--grad-gold)] rounded-full text-[var(--bg-main)] text-xs font-bold">
                         {t('save')}
                       </button>
                       <button onClick={acceptNecessary} className="flex-1 px-3 py-1.5 border border-white/20 rounded-full text-white text-xs font-medium">
@@ -354,11 +354,11 @@ export default function CookieConsent() {
                           setPreferences((p) => ({ ...p, analytics: !p.analytics }))
                         }
                         className={`w-12 h-6 rounded-full flex items-center px-1 transition-colors ${
-                          preferences.analytics ? 'bg-oe-gold' : 'bg-gray-600'
+                          preferences.analytics ? 'bg-oe-gold' : 'bg-[var(--bg-elevated)]'
                         }`}
                       >
                         <div
-                          className={`w-4 h-4 rounded-full bg-white transition-transform ${
+                          className={`w-4 h-4 rounded-full bg-[var(--text-primary)] transition-transform ${
                             preferences.analytics ? 'translate-x-6' : 'translate-x-0'
                           }`}
                         />
@@ -377,11 +377,11 @@ export default function CookieConsent() {
                           setPreferences((p) => ({ ...p, marketing: !p.marketing }))
                         }
                         className={`w-12 h-6 rounded-full flex items-center px-1 transition-colors ${
-                          preferences.marketing ? 'bg-oe-gold' : 'bg-gray-600'
+                          preferences.marketing ? 'bg-oe-gold' : 'bg-[var(--bg-elevated)]'
                         }`}
                       >
                         <div
-                          className={`w-4 h-4 rounded-full bg-white transition-transform ${
+                          className={`w-4 h-4 rounded-full bg-[var(--text-primary)] transition-transform ${
                             preferences.marketing ? 'translate-x-6' : 'translate-x-0'
                           }`}
                         />

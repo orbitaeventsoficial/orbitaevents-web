@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -20,6 +19,8 @@ import {
 import { toRgba, resolvePortalAccentHex } from '@/lib/clientPortalUtils';
 import PortalBottomNav from '../PortalBottomNav';
 import { getClientPortalHiddenNavItems, getClientPortalVisibility } from '@/lib/clientPortalVisibility';
+import ClientPortalPageHeader from '@/app/components/public/ClientPortalPageHeader';
+import { clientPortalPaymentTone } from '@/lib/constants/clientPortalTones';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -67,25 +68,22 @@ export default async function ClientPortalInvoicePage({
     : t.invoicePendingPayment;
 
   const paymentStatusColor = summary.allPaid
-    ? 'text-emerald-300'
+    ? clientPortalPaymentTone(true)
     : summary.deposit.paid
-    ? 'text-amber-300'
+    ? clientPortalPaymentTone(false)
     : 'text-white/50';
 
   return (
     <main className="min-h-screen pb-24 text-white/90 portal-shell-bg">
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-        <header className="mb-6">
-          <Link
-            href={`/${locale}/portal/${params.token}`}
-            className="mb-4 inline-flex items-center gap-1.5 text-xs text-white/35 hover:text-white/60 transition-colors"
-          >
-            ← {t.portalLabel}
-          </Link>
-          <p className="text-xs uppercase tracking-widest mb-1" style={{ color: accentHex }}>{t.invoiceLabel}</p>
-          <h1 className="text-2xl font-bold text-white">{t.invoicePageTitle}</h1>
-          <p className="text-sm text-white/40 mt-1">{booking.reference}</p>
-        </header>
+        <ClientPortalPageHeader
+          backHref={`/${locale}/portal/${params.token}`}
+          backLabel={t.portalLabel}
+          eyebrow={t.invoiceLabel}
+          title={t.invoicePageTitle}
+          reference={booking.reference}
+          accentColor={accentHex}
+        />
 
         {/* Total */}
         <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-6 mb-4">
@@ -105,7 +103,7 @@ export default async function ClientPortalInvoicePage({
               <p className="text-base font-bold text-white">{formatCurrency(summary.deposit.amount)}</p>
             </div>
             <div className="flex items-center justify-between">
-              <p className={`text-sm ${summary.deposit.paid ? 'text-emerald-300' : 'text-amber-300'}`}>
+              <p className={`text-sm ${clientPortalPaymentTone(summary.deposit.paid)}`}>
                 {summary.deposit.paid ? `✓ ${t.paid}` : `○ ${t.pending}`}
               </p>
               {summary.deposit.paidAt && (
@@ -132,7 +130,7 @@ export default async function ClientPortalInvoicePage({
               <p className="text-base font-bold text-white">{formatCurrency(summary.remaining.amount)}</p>
             </div>
             <div className="flex items-center justify-between">
-              <p className={`text-sm ${summary.remaining.paid ? 'text-emerald-300' : 'text-amber-300'}`}>
+              <p className={`text-sm ${clientPortalPaymentTone(summary.remaining.paid)}`}>
                 {summary.remaining.paid ? `✓ ${t.paid}` : `○ ${t.pending}`}
               </p>
               {summary.remaining.paidAt && (

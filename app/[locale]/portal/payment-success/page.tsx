@@ -26,11 +26,11 @@ export default function PaymentSuccessPage({
   return (
     <main className="min-h-screen text-white/90 flex items-center justify-center px-4 portal-shell-bg">
       <div className="w-full max-w-lg">
-        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-950/20 p-8 text-center shadow-xl">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-emerald-500/40 bg-emerald-900/30">
+        <div className="rounded-2xl border border-[color-mix(in_oklab,var(--oe-green)_30%,transparent)] bg-[color-mix(in_oklab,var(--oe-green)_10%,transparent)] p-8 text-center shadow-xl">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-[color-mix(in_oklab,var(--oe-green)_40%,transparent)] bg-[color-mix(in_oklab,var(--oe-green)_18%,transparent)]">
             <svg
               aria-hidden="true"
-              className="h-8 w-8 text-emerald-400"
+              className="h-8 w-8 text-[var(--oe-green)]"
               fill="none"
               stroke="currentColor"
               strokeWidth={2}
@@ -39,7 +39,7 @@ export default function PaymentSuccessPage({
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-emerald-300">{t.paymentSuccessTitle}</h1>
+          <h1 className="text-2xl font-bold text-white">{t.paymentSuccessTitle}</h1>
           {searchParams.ref && (
             <p className="mt-1 text-sm text-white/40">
               {searchParams.ref}

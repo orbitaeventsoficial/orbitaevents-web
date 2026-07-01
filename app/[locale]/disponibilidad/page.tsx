@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { AvailabilityCalendar } from '@/components/calendar/AvailabilityCalendar';
 import ArrowRightIcon from '@/app/components/public/ArrowRightIcon';
+import PublicPageHeader from '@/app/components/public/PublicPageHeader';
 
 export async function generateMetadata({
   params,
@@ -33,15 +34,7 @@ export default function AvailabilityPage({ params }: { params: { locale: string 
   return (
     <main className="min-h-screen pt-24 pb-16 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            {t('hero.title')}
-          </h1>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto">
-            {t('hero.description')}
-          </p>
-        </div>
+        <PublicPageHeader title={t('hero.title')} description={t('hero.description')} />
 
         {/* Calendar */}
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-white/10">
@@ -50,20 +43,20 @@ export default function AvailabilityPage({ params }: { params: { locale: string 
 
         {/* Info Section */}
         <div className="mt-12 grid md:grid-cols-2 gap-6">
-          <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-xl p-6 border border-purple-500/20">
+          <div className="rounded-xl border border-[color-mix(in_oklab,var(--oe-gold)_20%,transparent)] bg-[color-mix(in_oklab,var(--oe-gold)_8%,transparent)] p-6">
             <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
-              <svg className="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-6 h-6 text-[var(--oe-gold)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               {t('howItWorks.title')}
             </h2>
             <ul className="space-y-2 text-white/70">
               <li className="flex items-start gap-2">
-                <span className="text-green-400 mt-1">✓</span>
+                <span className="text-[var(--oe-green)] mt-1">✓</span>
                 <span>{t('howItWorks.items.available')}</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-red-400 mt-1">×</span>
+                <span className="text-[color-mix(in_oklab,var(--oe-orange)_82%,white)] mt-1">×</span>
                 <span>{t('howItWorks.items.booked')}</span>
               </li>
               <li className="flex items-start gap-2">
@@ -73,9 +66,9 @@ export default function AvailabilityPage({ params }: { params: { locale: string 
             </ul>
           </div>
 
-          <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-xl p-6 border border-blue-500/20">
+          <div className="rounded-xl border border-[color-mix(in_oklab,var(--oe-gold)_20%,transparent)] bg-[color-mix(in_oklab,var(--text-primary)_5%,transparent)] p-6">
             <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
-              <svg className="w-6 h-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-6 h-6 text-[var(--oe-gold)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               {t('reserve.title')}
@@ -85,7 +78,7 @@ export default function AvailabilityPage({ params }: { params: { locale: string 
             </p>
             <a
               href="/contacto"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-6 py-3 rounded-lg font-semibold transition-all"
+              className="inline-flex items-center gap-2 rounded-lg bg-[var(--grad-gold)] px-6 py-3 font-semibold text-[var(--bg-main)] transition-all hover:shadow-[var(--shadow-glow-gold)]"
             >
               {t('reserve.cta')}
               <ArrowRightIcon className="w-5 h-5" />

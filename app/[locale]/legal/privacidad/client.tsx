@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { toIntlLocale } from '@/lib/constants';
 import { Link } from '@/lib/navigation';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import PublicPageHeader from '@/app/components/public/PublicPageHeader';
 
 export default function PrivacidadClient() {
   const t = useTranslations('legal.privacidad');
@@ -13,7 +14,7 @@ export default function PrivacidadClient() {
   return (
     <main className="min-h-screen bg-bg-main py-20 relative">
       <div className="container mx-auto px-4 max-w-4xl">
-        <h1 className="text-4xl font-bold text-white mb-8">{t('title')}</h1>
+        <PublicPageHeader title={t('title')} align="left" spacing="compact" />
 
         <div className="prose prose-invert prose-gold max-w-none space-y-8 text-white/80">
           <p className="text-lg" suppressHydrationWarning>
@@ -21,12 +22,12 @@ export default function PrivacidadClient() {
           </p>
 
           {/* Banner Portal de Privacitat */}
-          <div className="not-prose bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 border border-purple-500/30 rounded-xl p-6 my-8">
+          <div className="not-prose bg-[color-mix(in_oklab,var(--oe-gold)_10%,transparent)] border border-[color-mix(in_oklab,var(--oe-gold)_28%,transparent)] rounded-xl p-6 my-8">
             <h3 className="text-xl font-semibold text-white mb-2">{t('portalBanner.title')}</h3>
             <p className="text-white/70 mb-4">{t('portalBanner.description')}</p>
             <Link
               href="/privacitat"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white font-semibold rounded-lg hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--grad-gold)] text-[var(--bg-main)] font-semibold rounded-lg hover:shadow-[var(--shadow-glow-gold)] transition-all"
             >
               {t('portalBanner.button')}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,7 +127,7 @@ export default function PrivacidadClient() {
               <li><strong>{t('section4.providers')}</strong> {t('section4.providersDetail')}</li>
               <li><strong>{t('section4.public')}</strong> {t('section4.publicDetail')}</li>
             </ul>
-            <p className="mt-4 text-amber-400 font-medium">{t('section4.noSale')}</p>
+            <p className="mt-4 text-[var(--oe-amber)] font-medium">{t('section4.noSale')}</p>
           </section>
 
           <section>
@@ -153,7 +154,7 @@ export default function PrivacidadClient() {
               <div className="flex flex-wrap gap-3">
                 <Link
                   href="/privacitat"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-[color-mix(in_oklab,var(--oe-gold)_10%,transparent)] border border-[color-mix(in_oklab,var(--oe-gold)_28%,transparent)] text-[var(--oe-gold)] rounded-lg hover:bg-[color-mix(in_oklab,var(--oe-gold)_16%,transparent)] transition-colors"
                 >
                   {t('section6.portalButton')}
                 </Link>
@@ -224,7 +225,7 @@ export default function PrivacidadClient() {
         <div className="mt-12 text-center">
           <Link
             href="/privacitat"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white font-semibold rounded-xl hover:opacity-90 transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--grad-gold)] text-[var(--bg-main)] font-semibold rounded-xl hover:shadow-[var(--shadow-glow-gold)] transition-all"
           >
             {t('ctaFinal.button')}
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
