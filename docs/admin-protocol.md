@@ -1546,6 +1546,18 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1346 — 2026-07-02 — claude (FET)
+**Compactació: secció de transport del lead a tira única.**
+- El #1345 afegia 4 KPIs alts (251px) → fitxa 1187px. Reescrit a tira compacta `.ap-ledger-travelbar` (inputs + desglòs inline + cost ruta destacat, `flex-wrap`).
+- CSS: `ap-ledger-travelbar/-breakdown/-total` amb tokens (0 hardcode).
+- Validació tècnica: tsc 0; validate:core EXIT 0.
+- Validació funcional: (Playwright) alçada 1187 → 1020px (−167px); mateix càlcul viu.
+- Validació humana/UX: tira compacta amb captura; overflow restant del hero+editor (fora d'abast).
+- Continuació del #1345. Counter → 1346.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1345 — 2026-07-02 — claude (FET)
 **Càlcul de transport EN VIU al bolo del lead (km/integrants/cost ruta).**
 - Schema: `Lead.distanceKm Float?` additiu (mirall de Booking). Migració `20260702010000_add_lead_distance_km` aplicada a Railway.

@@ -1,3 +1,23 @@
+## 2026-07-02 — Compactació: secció de transport del lead a tira única (Canvi #1346, claude)
+
+### Context
+El #1345 va afegir la secció «Desplaçament» amb 4 KPIs alts (251px) → la fitxa del lead passava de ~936 a 1187px (287px d'overflow a 900). El propietari demana que càpiga a la pantalla.
+
+### Què s'ha fet
+- `LeadBoloSection`: la secció de transport passa de capçalera + grid d'inputs + 4 KPIs `.ap-ledger-kpi` (104px c/u) a una **tira compacta única** (`.ap-ledger-travelbar`): inputs km/integrants + desglòs inline (vehicle/conductor/passatgers) + cost de ruta destacat amb vora d'estat, tot en una fila que flueix (`flex-wrap`).
+- CSS: reemplaçades les classes `ap-ledger-travel-grid/head` per `ap-ledger-travelbar/-breakdown/-total`, amb tokens (`--o-space-*`, `--o-text-*`, `--o-stage-won-strong`/`--gold` per l'estat). 0 hardcode.
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0.
+- Validació funcional: (Playwright) alçada de la fitxa 1187 → **1020px** (−167px); la tira mostra km/integrants + desglòs + cost ruta amb el mateix càlcul viu del #1345.
+- Validació humana/UX: secció de transport compacta amb captura; overflow restant (120px) és del hero + editor de línies (contingut nucli), fora d'aquest tall.
+
+### Coordinació
+Counter → 1346. Continuació directa del #1345. Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-02 — Càlcul de transport EN VIU al bolo del lead (km/integrants/cost ruta) (Canvi #1345, claude)
 
 ### Context

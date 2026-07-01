@@ -349,25 +349,21 @@ export default function LeadBoloSection({
 
  {/* Transport en viu (#1345): SEMPRE visible (també en mode compacte de la fitxa),
  perquè km/integrants/cost de ruta són decisió operativa del bolo, no detall d'economia. */}
- {economia && <section className="ap-ledger-econo">
- <div className="ap-ledger-econohead">
- <span>Desplaçament</span>
- <span className="ap-ledger-econonote">cost intern · no és producte contractat</span>
- </div>
- <div className="ap-ledger-travel-grid">
+ {economia && <section className="ap-ledger-econo ap-ledger-travel">
+ <div className="ap-ledger-travelbar">
  <label className="ap-ledger-travel-field">
- <span>Km anada+tornada</span>
+ <span>Km ruta</span>
  <input
  type="number" min={0} step={1} inputMode="numeric"
  className="adm-input"
  value={distanceKm}
  onChange={(e) => { setDistanceKm(e.target.value); setDirty(true); }}
- placeholder={calculatingDistance ? 'Calculant…' : '0'}
+ placeholder={calculatingDistance ? '…' : '0'}
  aria-label="Km anada i tornada de la ruta"
  />
  </label>
  <label className="ap-ledger-travel-field">
- <span>Ajust integrants</span>
+ <span>Integrants</span>
  <input
  type="number" min={0} step={1} inputMode="numeric"
  className="adm-input"
@@ -377,32 +373,17 @@ export default function LeadBoloSection({
  aria-label="Ajust manual d'integrants de la ruta"
  />
  </label>
+ <div className="ap-ledger-travel-breakdown">
+ <span>Vehicle <strong>{formatCurrency(travelBreakdown.vehicleCost)}</strong></span>
+ <span>Conductor <strong>{formatCurrency(travelBreakdown.driverCost)}</strong></span>
+ <span>Passatgers <strong>{formatCurrency(travelBreakdown.passengerCost)}</strong></span>
  </div>
- <div className="ap-ledger-kpis">
- <div className="ap-ledger-kpi" data-level="info">
- <div className="ap-ledger-kpi-val">{formatCurrency(travelBreakdown.vehicleCost)}</div>
- <div className="ap-ledger-kpi-lbl">Vehicle</div>
- <div className="ap-ledger-kpi-sub">{travelBreakdown.roundTripKm} km</div>
- </div>
- <div className="ap-ledger-kpi" data-level="info">
- <div className="ap-ledger-kpi-val">{formatCurrency(travelBreakdown.driverCost)}</div>
- <div className="ap-ledger-kpi-lbl">Conductor</div>
- <div className="ap-ledger-kpi-sub">{travelBreakdown.routeHours} h ruta</div>
- </div>
- <div className="ap-ledger-kpi" data-level="info">
- <div className="ap-ledger-kpi-val">{formatCurrency(travelBreakdown.passengerCost)}</div>
- <div className="ap-ledger-kpi-lbl">Passatgers</div>
- <div className="ap-ledger-kpi-sub">{Math.max(0, travelBreakdown.peopleCount - 1)} pax</div>
- </div>
- <div className="ap-ledger-kpi" data-level={travelBreakdown.laborCostApplies ? 'warn' : 'ok'}>
- <div className="ap-ledger-kpi-val">{formatCurrency(effectiveTravelCost)}</div>
- <div className="ap-ledger-kpi-lbl">Cost ruta</div>
- <div className="ap-ledger-kpi-sub">
- {travelBreakdown.peopleCount} integrants · llindar {travelBreakdown.laborThresholdKm} km
+ <div className="ap-ledger-travel-total" data-level={travelBreakdown.laborCostApplies ? 'warn' : 'ok'}>
+ <span className="ap-ledger-travel-total-lbl">Cost ruta intern</span>
+ <strong>{formatCurrency(effectiveTravelCost)}</strong>
+ <span className="ap-ledger-travel-total-sub">{travelBreakdown.peopleCount} integrants · {travelBreakdown.roundTripKm} km · llindar {travelBreakdown.laborThresholdKm} km</span>
  </div>
  </div>
- </div>
- {distanceMessage && <p className="ap-ledger-econonote">{distanceMessage}</p>}
  </section>}
  </div>
  );
