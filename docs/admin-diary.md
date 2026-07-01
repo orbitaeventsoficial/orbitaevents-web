@@ -1,3 +1,27 @@
+## 2026-07-01 — Eradicació últim reducte: fantasma control-room.css + script debug amb contrasenya (Canvi #1339, claude)
+
+### Context
+El propietari va rebutjar el meu «no hi ha res» inicial (fet només amb 12 guards estàtics). Auditoria de veritat: 60 guards + suite de tests (543 fitxers / 5159 tests / 0 fallos) + greps manuals + classificació tipogràfica. Reductes reals trobats: `control-room.css` (eliminat al #1315) encara referenciat com a fitxer VIU en diversos llocs + un script Playwright de debug al root amb la contrasenya admin en clar.
+
+### Què s'ha fet
+- **Seguretat**: esborrat `.dbg-final5.cjs` (script Playwright sense commit amb `PASS='…+++'` admin en clar al root del repo).
+- **CLAUDE.md**: decision tree §3 (`control-room.css` → `admin-shell.css`) + llista «Fitxers CSS admin» (control-room.css eliminat; `--at-cr-*` plegat a la línia d'`admin-theme.css`).
+- **globals.css:1343**: comentari fantasma «moved to control-room.css» → «consolidat a admin-theme.css».
+- **docs/admin-fitxes-pantalles.md** (×2) + **docs/inventari-recursos.md**: afirmacions «CSS viu: control-room.css» → `.ap-*` + tokens `--at-cr-*` a admin-theme.css.
+- **scripts/check-admin-mode-prefix.mjs**: docstring citava el fitxer eliminat → «app/admin/**.css escanejats dinàmicament».
+- Falsos reductes descartats: 9 `text-[Npx]` eren selectors de xarxa de seguretat CSS (0 en `.tsx`); px afinats d'admin-shell.css NO tokenitzables sense canviar disseny; refs de docs/audit i diari són registre històric correcte.
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0; guard `qa:admin-mode-prefix` verd; 0 afirmacions de fitxer viu restants.
+- Validació funcional: sense canvi de runtime (comentaris/docs + esborrat d'script no importat); build no afectat (ningú importava control-room.css des del #1315).
+- Validació humana/UX: la constitució i les docs ja no menteixen sobre un fitxer inexistent; risc de credencial al repo eliminat.
+
+### Coordinació
+Counter → 1339. Fet DESPRÉS de consolidar el #1338 de Codex (worktree lliure). Fitxers disjunts del #1338. Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-01 — Desplaçament: temps de ruta com a cost intern, no producte (Canvi #1338, codex)
 
 ### Context

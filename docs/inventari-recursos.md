@@ -104,7 +104,7 @@ El que l'esquelet del nou admin (la "pàgina tipus que ho albergarà tot") ha de
 | `useConfirmDialog` + `ConfirmDialog` | `app/admin/components/ConfirmDialog.tsx` | **Mai** `alert()`/`confirm()`. Diàleg canònic. |
 | `useAsyncForm` | `app/admin/components/useAsyncForm.ts` | Submit async amb estat de càrrega/error. |
 | Hooks de domini | `lib/hooks/*` (`usePacks`, `useBookedDates`, `useAnalytics`, `useUtmParams`…) i `app/admin/bookings/use*` | Lògica reutilitzable. |
-| Tokens de tema admin | `app/admin/admin-theme.css`, `app/globals.css`, `app/admin/control-room.css` | Paleta `--at-*`, glass, gradients `.admin-gradient--*`, prefix `html.admin-mode`. |
+| Tokens de tema admin | `app/admin/admin-theme.css`, `app/globals.css`, `app/admin/admin-shell.css` | Paleta `--at-*`/`--at-cr-*`, glass, gradients `.admin-gradient--*`, prefix `html.admin-mode`. |
 | Kanban D&D + view toggle | Tasks/Leads/Bookings | Patró de pipeline arrossegable + `view=kanban|list`. |
 | Semàfor de pagament | (patró) | `depositPaid && remainingPaid` = verd / `depositPaid` = groc / cap = vermell. |
 | Smart GDPR delete | `customerRouteService` | Si té reserves → anonimitza; si no → elimina. |

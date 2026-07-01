@@ -1546,6 +1546,20 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1339 — 2026-07-01 — claude (FET)
+**Eradicació últim reducte: fantasma control-room.css + script debug amb contrasenya.**
+- Auditoria de veritat (no els 12 guards estàtics inicials): 60 guards + suite de tests (543 fitxers / 5159 tests / 0 fallos) + greps manuals.
+- Seguretat: esborrat `.dbg-final5.cjs` (Playwright amb contrasenya admin en clar al root).
+- `control-room.css` (eliminat al #1315) deixava de ser referenciat com a viu: `CLAUDE.md` (×2), `globals.css:1343` (comentari), `docs/admin-fitxes-pantalles.md` (×2), `docs/inventari-recursos.md`, docstring de `scripts/check-admin-mode-prefix.mjs`. `--at-cr-*` viu a `admin-theme.css`.
+- Falsos reductes descartats: 9 `text-[Npx]` eren selectors de xarxa de seguretat (0 en `.tsx`); px afinats d'admin-shell.css no tokenitzables sense regressió; refs històriques (docs/audit, diari) conservades.
+- Validació tècnica: tsc 0; validate:core EXIT 0; `qa:admin-mode-prefix` verd.
+- Validació funcional: 0 canvi runtime (docs/comentaris + esborrat d'script no importat).
+- Validació humana/UX: constitució i docs sense mentides de fitxer; credencial fora del repo.
+- Fet després de consolidar el #1338 de Codex. Counter → 1339.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1338 — 2026-07-01 — codex (FET)
 **Desplaçament: temps de ruta com a cost intern, no producte.**
 - `lib/services/travelLaborCost.ts`: vehicle i temps de persones queden separats; es compten integrants i el temps només s'imputa a partir de `INCLUDED_TRAVEL_KM` mentre no hi hagi un llindar específic decidit pel propietari.

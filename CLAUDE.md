@@ -103,7 +103,7 @@ Exemples: estats, labels, nav meta, ordres, llindars, presets, FAQs, cards, pack
 
 ### 3. És estil reutilitzable o token visual?
 Exemples: colors, superfícies, gradients, animacions compartides, layout chrome, classes reutilitzables.
-- Sí → `app/globals.css`, `app/admin/admin-theme.css`, `app/admin/control-room.css`
+- Sí → `app/globals.css`, `app/admin/admin-theme.css`, `app/admin/admin-shell.css`
 - No → continuar
 
 ### 4. És wiring o presentació exclusivament local del component?
@@ -313,8 +313,7 @@ Quan el propietari demani un canvi visual significant, consultar via `Agent(mode
 
 - `../studio/orbita-tokens.css` — font canònica de tokens visuals compartits entre Studio i admin
 - `admin-shell.css` — shell admin, navegació, error boundary i aliases `.ax-*` consumint tokens de Studio
-- `admin-theme.css` — compatibilitat legacy (`--at-*`), glass i semantic tones mentre dura la migració
-- `control-room.css` — dashboard específic amb tokens `--at-cr-*`
+- `admin-theme.css` — compatibilitat legacy (`--at-*`), glass, semantic tones i tokens del Control Room (`--at-cr-*`) mentre dura la migració
 
 ### Regles de cascada
 

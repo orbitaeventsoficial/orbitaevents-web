@@ -1340,7 +1340,7 @@ textarea:focus-visible {
   width: auto !important;
 }
 
-/* Control Room CSS moved to app/admin/control-room.css */
+/* Control Room CSS consolidat a app/admin/admin-theme.css (tokens --at-cr-*) */
 
 
 

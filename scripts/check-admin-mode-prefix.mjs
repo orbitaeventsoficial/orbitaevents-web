@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
  * qa:admin-mode-prefix
- * Verifica que tots els selectors CSS a admin-theme.css i control-room.css
- * utilitzen `html.admin-mode` com a prefix.
+ * Verifica que tots els selectors CSS admin (app/admin/**.css, escanejats
+ * dinàmicament) utilitzen `html.admin-mode` com a prefix.
  *
  * Raó: CLAUDE.md exigeix que "Tots els CSS admin requereixen html.admin-mode
  * com a prefix" per garantir que les regles admin no afecten la web pública.

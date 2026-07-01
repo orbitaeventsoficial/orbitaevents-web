@@ -705,7 +705,7 @@ TANCAT CHARLIE: no — pendent validacio visual del propietari.
 Estat fitxa: FETA (auditoria forense #1156, claude, 2026-06-25)
 
 Reachability: `/admin/page.tsx` (dashboard, server) consumeix dashboard-widgets (8 exports) + 9 serveis; salut/reporting/analytics són pages + loading amb AdminPage. Tot viu. Passa qa:no-dead-admin-views.
-CSS viu: control-room.css (dashboard) + classes canòniques `.ap-*`. Títols ja canon (.ap-h2/.ap-title del #1146).
+CSS viu: classes canòniques `.ap-*` + tokens `--at-cr-*` a admin-theme.css (control-room.css eliminat al #1315). Títols ja canon (.ap-h2/.ap-title del #1146).
 APIs/serveis vius: adminOperatingCycleService, attributionService, capacityConflictService, captureHealthService, dailyAnomalyService, dailyBriefService, dashboardInsightsService, operationalForecastService, operationalPulseService. Tots consumits pel dashboard.
 Codi mort relacionat: cap.
 Duplicacions: cap (el forecast unificat viu a economicCockpitService #1089; el dashboard consumeix serveis, no els reimplementa).
@@ -741,7 +741,7 @@ TANCAT CHARLIE: no — pendent validacio visual del propietari.
 Estat fitxa: FETA (auditoria forense #1162, claude, 2026-06-25)
 
 Reachability: components clau vius (SettingsClient×5 usos, CronsClient, ScriptsClient, CanvasEditorClient, ActivityClient, EconomiaClient×2). Passa qa:no-dead-admin-views.
-CSS viu: classes canòniques `.ap-*` + control-room.css (cockpit). Títols ja canon (.ap-h2 del #1146).
+CSS viu: classes canòniques `.ap-*` + tokens `--at-cr-*` del cockpit a admin-theme.css (control-room.css eliminat al #1315). Títols ja canon (.ap-h2 del #1146).
 APIs/serveis vius: adminSettings, cron services, economicCockpitService (cockpit), pricing services (economia). Consumits.
 Codi mort / Duplicacions: cap.
 Hardcoded/residu visual: dins canon. EXEMPCIONS legítimes documentades: CanvasEditorClient (editor gràfic, color = disseny d'usuari), css-manager/text-manager/image-manager (dades editables = contingut, no chrome) — tots a EXEMPT del guard de canon.
