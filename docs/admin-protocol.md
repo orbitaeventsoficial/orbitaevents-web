@@ -1546,6 +1546,18 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1344 — 2026-07-02 — claude (FET)
+**Fix d'arrel: fons/tones d'estat transparents — `--at-*` no resolien `--o-*`.**
+- Bug: els aliases `--at-*` (a `html.admin-mode`) referencien `--o-*`, definits NOMÉS a `.ax-root`/`.o-studio-root`/`.fx-root.is-contrast` (descendents) → `--at-*` computaven invàlids a nivell html i heretaven buit avall. 35 cards `admin-tone-bg-*` amb fons transparent + tones al fallback.
+- Fix: afegit `html.admin-mode` a la llista de selectors del bloc `--o-*` a `orbita-tokens.css`. Tota la cadena `--at-*`→`--o-*` resol. Admin-only (0 impacte públic).
+- Validació tècnica: validate:core EXIT 0; qa:studio-integrity OK; qa:admin-canon 0 P1.
+- Validació funcional: (Playwright before/after) transparents 35 → 0; gris fred 0 (cap regressió #1341); tokens sintètics resolen.
+- Validació humana/UX: 4 rutes coherents abans/després; tints d'estat visibles, resta intacta.
+- Alt abast (capa tokens global) amb baseline+after+revert-si-trenca. Autoritzat pel propietari. Counter → 1344.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1343 — 2026-07-02 — claude (FET)
 **Fix marge mentider: reimputa el cost de transport al bolo del lead pur.**
 - Bug: el #1342 amaga les línies `[travel-cost]` de l'API; `LeadBoloSection` passava `travelCost: 0` → el marge del lead ignorava 198€ de ruta (advertència de `docs/disseny-cost-desplacament.md` materialitzada). El cas reserva ja ho comptava (`b.travelCost`); només fallava el lead-pur.

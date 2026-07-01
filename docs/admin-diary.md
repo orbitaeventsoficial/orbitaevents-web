@@ -1,3 +1,23 @@
+## 2026-07-02 — Fix d'arrel: fons/tones d'estat transparents — `--at-*` no resolien `--o-*` (Canvi #1344, claude)
+
+### Context
+Investigant «per què uns contenidors tenen línia blanca i altres no» va sortir un bug d'arrel més gran: 35 cards `admin-tone-bg-*` renderitzaven fons TRANSPARENT (i les vores d'estat queien al fallback). Diagnòstic estàtic del CSS: els aliases `--at-*` (a `html.admin-mode`, admin-theme.css) referencien `--o-*`, però els `--o-*` es definien NOMÉS a `.o-studio-root, .ax-root, .fx-root.is-contrast`. Com que `.ax-root` és DESCENDENT de `html.admin-mode`, els `--at-*` computaven invàlids a nivell html i heretaven el buit avall — fins i tot dins `.ax-root`. Tota la capa `--at-*`→`--o-*` estava trencada silenciosament.
+
+### Què s'ha fet
+- `orbita-tokens.css`: afegit `html.admin-mode` a la llista de selectors del bloc `--o-*` (al costat de `.ax-root`/`.o-studio-root`/`.fx-root.is-contrast`). Ara els `--o-*` existeixen a nivell html → tota la cadena `--at-*` resol. Admin-only (la classe `admin-mode` no existeix al públic → 0 impacte al web).
+- Efecte: `admin-tone-bg-danger/warning/success` recuperen el tint 16%; `admin-tone-bg-neutral` → `--at-raised`; vores d'estat resolen el color-mix real.
+
+### Validació
+- Validació tècnica: validate:core EXIT 0; qa:studio-integrity OK (16 seccions); qa:admin-canon 0 P1.
+- Validació funcional: (Playwright, before/after) cards `admin-tone-bg-*` transparents 35 → **0**; vores de gris fred 0 (cap regressió del #1341); tokens sintètics resolen (danger=oklab .16, neutral=rgb(30,31,39)).
+- Validació humana/UX: dashboard + economia + clientes + leads coherents abans/després; els tints d'estat ara es veuen (subtils, 16%), la resta intacta.
+
+### Coordinació
+Counter → 1344. Canvi d'ALT ABAST (capa de tokens global) fet amb baseline+after i revert-si-trenca; net. Autoritzat pel propietari («tot»). Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-02 — Fix marge mentider: reimputa el cost de transport al bolo del lead (Canvi #1343, claude)
 
 ### Context

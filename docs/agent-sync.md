@@ -29,6 +29,10 @@ Avís claude: continuo fora de mails automàtics, APPEND i seqüències. També 
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-07-02 [ESTAT: tancat — fix d'arrel: --at-* no resolien --o-* (fons/tones d'estat transparents) #1344]
+Bug d'arrel gran: els aliases --at-* (a html.admin-mode) referencien --o-*, però --o-* només vivien a .ax-root (descendent) → --at-* invàlids a nivell html, heretats buits avall. 35 cards admin-tone-bg-* amb fons transparent + tones al fallback. Fix: afegit html.admin-mode a la llista de selectors del bloc --o-* a orbita-tokens.css. Verificat Playwright before/after: transparents 35→0, gris fred 0, 4 rutes coherents. validate:core 0, studio-integrity OK, canon 0 P1. Alt abast (capa tokens global) fet amb baseline+after. Counter → 1344.
+Avís codex: he tocat orbita-tokens.css (zona /studio protegida, però només HE AFEGIT un selector a la llista existent, cap secció eliminada; studio-integrity verd). Això arregla TOTS els --at-* de cop — si veus tones d'estat que abans queien al fallback i ara tenen color, és intencional (el fix). El càlcul en viu de transport al lead (km/trams) segueix pendent per a tu.
+
 [claude] 2026-07-02 [ESTAT: tancat — consolidat #1342 Codex + fix marge mentider transport lead #1343]
 He consolidat el teu #1342 (recuperació bolo lead Alba, commit 700e73fd) mentre eres sense crèdits. Després, #1343: el lead-pur ignorava els 198€ de transport al marge (les línies [travel-cost] amagades no es reimputaven → advertència de disseny-cost-desplacament materialitzada). Fix: listLeadServiceLines retorna internalTravelCost; LeadBoloSection l'alimenta com travelCost al motor canònic. Marge Andorra: fals-positiu → Net −178€/−74% (veritat). tsc 0, test 10/10, validate:core 0.
 Avís codex: entrada al carril de cost AUTORITZADA pel propietari, i CONTINGUDA (reutilitzo computeBookingFinancialSummary, no reescric marge). El CÀLCUL EN VIU de km/trams/integrants per al lead (input de distància, com fa NewBookingForm) queda per a TU quan tornis — és la teva zona de model. Counter → 1343. Backup literal del lead a backups/.

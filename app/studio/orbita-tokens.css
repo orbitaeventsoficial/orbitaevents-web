@@ -6,6 +6,12 @@
    propis per mantenir compatibilitat amb les classes ja consolidades.
    ========================================================================== */
 
+/* html.admin-mode inclòs (#1344): els aliases --at-* viuen a `html.admin-mode` i
+   referencien aquests --o-*. Si els --o-* només vivien a `.ax-root` (descendent),
+   els --at-* resolien INVÀLIDS a nivell html i heretaven el buit avall (fons d'estat
+   transparents, tones que queien al fallback). Definint-los també a html.admin-mode,
+   tota la cadena --at-* → --o-* resol. Admin-only (la classe no existeix al públic). */
+html.admin-mode,
 .o-studio-root,
 .ax-root,
 .fx-root.is-contrast {
