@@ -257,7 +257,7 @@ export default function DiscountCodesPage() {
                 value={form.code}
                 onChange={(e) => updateField('code', e.target.value.toUpperCase())}
                 placeholder="BODA2026"
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 font-mono"
+                className="adm-input mt-1 font-mono"
               />
             </div>
             <div>
@@ -266,22 +266,14 @@ export default function DiscountCodesPage() {
                 <button
                   type="button"
                   onClick={() => updateField('type', 'PERCENTAGE')}
-                  className={`flex-1 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all ${
-                    form.type === 'PERCENTAGE'
-                      ? 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info'
-                      : 'admin-tone-idle'
-                  }`}
+                  className={`ap-tab flex-1 ${form.type === 'PERCENTAGE' ? 'ap-tab--active' : 'ap-tab--idle'}`}
                 >
                   Percentatge %
                 </button>
                 <button
                   type="button"
                   onClick={() => updateField('type', 'FIXED_AMOUNT')}
-                  className={`flex-1 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all ${
-                    form.type === 'FIXED_AMOUNT'
-                      ? 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info'
-                      : 'admin-tone-idle'
-                  }`}
+                  className={`ap-tab flex-1 ${form.type === 'FIXED_AMOUNT' ? 'ap-tab--active' : 'ap-tab--idle'}`}
                 >
                   Import fix
                 </button>
@@ -297,7 +289,7 @@ export default function DiscountCodesPage() {
                 min={0}
                 value={form.value}
                 onChange={(e) => updateField('value', e.target.value)}
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+                className="adm-input mt-1"
               />
             </div>
           </div>
@@ -310,7 +302,7 @@ export default function DiscountCodesPage() {
                 type="date"
                 value={form.validUntil}
                 onChange={(e) => updateField('validUntil', e.target.value)}
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+                className="adm-input mt-1"
               />
             </div>
             <div>
@@ -322,7 +314,7 @@ export default function DiscountCodesPage() {
                 value={form.maxUses}
                 onChange={(e) => updateField('maxUses', e.target.value)}
                 placeholder="Il·limitat"
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+                className="adm-input mt-1"
               />
             </div>
             <div>
@@ -334,7 +326,7 @@ export default function DiscountCodesPage() {
                 value={form.minOrderValue}
                 onChange={(e) => updateField('minOrderValue', e.target.value)}
                 placeholder="Sense mínim"
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+                className="adm-input mt-1"
               />
             </div>
           </div>
@@ -347,7 +339,7 @@ export default function DiscountCodesPage() {
               value={form.description}
               onChange={(e) => updateField('description', e.target.value)}
               placeholder="Descripció interna del codi..."
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+              className="adm-input mt-1"
             />
           </div>
 
@@ -375,7 +367,7 @@ export default function DiscountCodesPage() {
             <button
               type="button"
               onClick={() => { setShowForm(false); reset(); }}
-              className="rounded-xl border px-4 py-2.5 text-sm transition-colors"
+              className="ap-btn"
             >
               Cancel·lar
             </button>
@@ -419,7 +411,7 @@ export default function DiscountCodesPage() {
                 <button
                   type="button"
                   onClick={() => toggleActive(c.id, c.isActive)}
-                  className="rounded-xl border px-3 py-2 text-xs font-medium transition-colors min-h-[44px]"
+                  className="ap-btn ap-btn--xs"
                 >
                   {c.isActive ? 'Desactivar' : 'Activar'}
                 </button>
@@ -487,7 +479,7 @@ export default function DiscountCodesPage() {
                       <button
                         type="button"
                         onClick={() => toggleActive(c.id, c.isActive)}
-                        className="rounded-xl border px-2.5 py-1.5 text-xs font-medium transition-colors"
+                        className="ap-btn ap-btn--xs"
                       >
                         {c.isActive ? 'Desactivar' : 'Activar'}
                       </button>

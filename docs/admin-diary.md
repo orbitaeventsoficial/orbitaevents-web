@@ -1,3 +1,23 @@
+## 2026-07-01 — Fix visual: discount-codes inputs/toggles pelats → canònic (Canvi #1331, claude)
+
+### Context
+Volta de confirmació: el meu escàner comptava "border px-" (que NO són cards sinó inputs/botons/toggles pelats). discount-codes en tenia 11: inputs de formulari amb border a mà (sense fons .adm-input), toggles de tipus, botons d'acció.
+
+### Què s'ha fet
+- `discount-codes/page.tsx`: 6 inputs `rounded-xl border px-3 py-2.5` → `.adm-input`; 2 toggles tipus (Percentatge/Import fix) → `.ap-tab`; botons acció (Crear, Desactivar/Activar) → `.ap-btn`/`--xs`. 0 pelats.
+- Aclariment: els "147 border pelat" de l'escàner eren px- (inputs/botons/pills), NO cards p-. Cards ja totes migrades. El top eren fitxers EXCLOSOS (PdfStudio/StudioPreview/Canvas).
+
+### Validació
+- Validació tècnica: tsc 0; validate:core.
+- Validació funcional: formulari discount-codes amb inputs/toggles canònics.
+- Validació humana/UX: coherent.
+
+### Coordinació
+Counter → 1331. Volta de confirmació: 26 pàgines 375px 0 overflow/error. admin-card-glass 0. Sense 3r sistema ocult. Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-01 — Homogeneïtat: admin-card-glass (2n sistema de card) → .ap-card (Canvi #1329, claude)
 
 ### Context
@@ -19,6 +39,26 @@ Counter → 1329. Homogeneïtat de cards TOTAL (eliminat admin-card-glass). Non-
 - Treballant per: `claude`
 - Tancat per: `claude`
 
+## 2026-07-01 — Transport real: evitar doble cost de vehicle (Canvi #1330, codex)
+
+### Context
+En preparar la reserva real d'Andorra he detectat que el disseny inicial del botó `Aplicar al bolo` podia persistir també la línia `Vehicle ruta` com a `BookingServiceLine`, mentre la reserva ja guarda el cost de vehicle a `travelCost`. Això podia fer que el marge comptés el vehicle dues vegades.
+
+### Què s'ha fet
+- `NewBookingForm`: `applyTravelCostLines` continua substituint les línies `[travel-cost]`, però ara no persisteix la línia `vehicle`; només persisteix conductor/passengers.
+- El cost de vehicle queda a la font existent `distanceKm + fuelCostPerKm + travelCost`; el temps de persones queda en línies de cost, que és la part nova que faltava.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:admin-canon` OK; `git diff --check` OK.
+- Validació funcional: el model evita doble comptabilització: vehicle al camp canònic de reserva, persones a `BookingServiceLine`.
+- Validació humana/UX: el resum de la calculadora continua mostrant vehicle/conductor/passengers, però el marge no queda inflat per duplicació de vehicle.
+
+### Coordinació
+Counter → 1330. Sense schema, sense mails i sense CSS admin core. Renumerat de #1329 a #1330 perquè Claude ja havia registrat #1329 (`admin-card-glass`) en paral·lel.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-01 — Masquerade: Bingo/Batalla visibles i desplegable responsive (Canvi #1328, codex)
 
 ### Context
@@ -32,7 +72,7 @@ El propietari obre la fitxa completa d'un lead i, dins el desplegable de Carlos/
 ### Validació
 - Validació tècnica: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:admin-canon` OK; `git diff --check` OK.
 - Validació funcional: BD viva rellegida després del canvi; Masquerade retorna `Bingo Musical`, `Batalla Musical`, `Animació temàtica`, `Animació amb personatge`, `El secret dels pirates`, `Animació adults 1h`, `Pintacares professional`, `Globoflèxia` en aquest ordre.
-- Validació humana/UX: en una fitxa de lead, en obrir Masquerade, els dos productes musicals han de quedar visibles immediatament i el desplegable ja no queda tallat com un menú flotant.
+- Validació humana/UX: Playwright sobre `/admin/leads/cmr1xh7la0000ug7dj4jnihjr` a desktop 1280 i mòbil 390: Masquerade obre, `Bingo Musical` i `Batalla Musical` són visibles immediatament, i el menú queda dins l'amplada del viewport.
 
 ### Coordinació
 Counter → 1328. Sense schema, sense mails i sense CSS admin core.

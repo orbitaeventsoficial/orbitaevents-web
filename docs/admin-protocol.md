@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1331 — 2026-07-01 — claude (FET)
+**Fix visual: discount-codes inputs/toggles pelats → canònic.**
+- 6 inputs → .adm-input; 2 toggles tipus → .ap-tab; botons acció → .ap-btn. 0 pelats. Aclarit: escàner comptava px- (inputs/botons), no cards; cards ja totes migrades. Volta 375px: 26 pàgines 0 overflow.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1331`; el següent canvi real ha de ser `#1332`.
+- Validació tècnica: tsc 0; validate:core.
+- Validació funcional: discount-codes canònic.
+- Validació humana/UX: coherent.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1329 — 2026-07-01 — claude (FET)
 **Homogeneïtat: admin-card-glass (2n sistema de card) → .ap-card.**
 - 165 usos admin-card-glass (glass legacy) → .ap-card en ~30 fitxers. 0 usos a l'admin (5 a eines es queden). Cards ara totes idèntiques. Fet a mà (agent encallat).
@@ -21676,6 +21687,19 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+### Canvi #1330 — 2026-07-01 — codex (FET)
+**Transport real: el vehicle no es compta dues vegades.**
+- Context: en preparar la reserva real d'Andorra, el botó `Aplicar al bolo` podia persistir `Vehicle ruta` com a `BookingServiceLine` tot i que la reserva ja guarda el vehicle a `travelCost`.
+- `NewBookingForm`: `applyTravelCostLines` filtra la línia `[travel-cost] vehicle` abans de persistir línies. Només queden com a línies de cost el conductor i els passatgers.
+- Regla resultant: vehicle = `distanceKm + fuelCostPerKm + travelCost`; persones al cotxe = `BookingServiceLine` amb `revenueAmount=0` i `costAmount`.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:admin-canon` OK; `git diff --check` OK.
+- Validació funcional: el marge pot sumar transport real sense duplicar vehicle.
+- Validació humana/UX: la calculadora mostra el desglossament complet però només grava com a línies la part que no existia: hores de persones.
+- `ADMIN_CHANGE_COUNTER` puja a `1330`; el següent canvi real ha de ser `#1331`. Renumerat de #1329 a #1330 perquè Claude ja havia registrat #1329 (`admin-card-glass`) en paral·lel.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1328 — 2026-07-01 — codex (FET)
 **Masquerade: Bingo/Batalla visibles al desplegable i menú responsiu.**
 - Context: a la fitxa completa de lead, el desplegable de Carlos/Masquerade mostrava primer les animacions i deixava `Bingo Musical` i `Batalla Musical` enterrats al final d'un menú petit amb scroll, fent pensar que no existien.
@@ -21684,7 +21708,7 @@ px tsc --noEmit OK · git diff --check OK.
 - `BookingServiceLinesSection`: el desplegable de productes de proveïdor deixa de ser un menú flotant; s'obre dins del flux del configurador amb `max-height` responsive i scroll intern.
 - Validació tècnica: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:admin-canon` OK; `git diff --check` OK.
 - Validació funcional: rellegida la BD viva després del canvi: Bingo/Batalla són els dos primers productes actius de Masquerade.
-- Validació humana/UX: el configurador del bolo del lead/reserva ja no amaga els productes musicals ni talla el desplegable en pantalles petites.
+- Validació humana/UX: Playwright sobre `/admin/leads/cmr1xh7la0000ug7dj4jnihjr` a desktop 1280 i mòbil 390: Masquerade obre, `Bingo Musical` i `Batalla Musical` són visibles immediatament, i el menú queda dins l'amplada del viewport.
 - `ADMIN_CHANGE_COUNTER` puja a `1328`; el següent canvi real ha de ser `#1329`.
 - Començat per: `codex`
 - Treballant per: `codex`
