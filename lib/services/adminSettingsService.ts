@@ -17,7 +17,10 @@ type CreateSettingInput = {
 };
 
 function parseSettingValue(value: string, type: string): SettingValue {
-  if (type === 'NUMBER') return parseFloat(value);
+  if (type === 'NUMBER') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
   if (type === 'BOOLEAN') return value === 'true';
   if (type === 'JSON') {
     try {

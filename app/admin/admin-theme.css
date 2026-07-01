@@ -380,9 +380,8 @@ html.admin-mode .admin-gradient--progress-emerald {
   background: linear-gradient(to right, var(--o-success), color-mix(in oklab, var(--o-success) 70%, white));
 }
 
-/* ── Stagger animation global (totes les pàgines admin, no només dashboard) ──
-   admin-control-room té el seu propi selector més específic a control-room.css.
-   Aquí cobrim: leads, tasques, inbox, salut i qualsevol altra pàgina que
+/* ── Stagger animation global (totes les pàgines admin) ──
+   Cobreix: leads, tasques, inbox, salut i qualsevol altra pàgina que
    ja faci servir .admin-stagger-item. ── */
 html.admin-mode .admin-shell .admin-stagger-item {
   animation: admin-stagger-in 0.4s var(--at-ease-out, cubic-bezier(0,0,0.2,1)) both;

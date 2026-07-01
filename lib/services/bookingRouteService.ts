@@ -54,6 +54,22 @@ function sanitizeMoney(value?: number | null): number | null {
   return Math.max(0, Math.round(value * 100) / 100);
 }
 
+function parsePatchMoney(value: unknown): number | null {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return null;
+  return roundMoney(value);
+}
+
+function normalizePatchMoneyField(body: Record<string, unknown>, key: string, options: { nullable?: boolean } = {}) {
+  if (!Object.prototype.hasOwnProperty.call(body, key)) return;
+  if (options.nullable && body[key] === null) return;
+  const value = parsePatchMoney(body[key]);
+  if (value === null) {
+    delete body[key];
+    return;
+  }
+  body[key] = value;
+}
+
 function normalizeServiceLines(lines: BookingServiceLinePatchInput[]) {
   return lines
     .map((line, index) => ({
@@ -148,11 +164,16 @@ export async function prepareBookingPatchData(existing: ExistingBookingRecord, i
   if (typeof body.startTime === 'string') body.eventStartTime = body.startTime;
   if (typeof body.endTime === 'string') body.eventEndTime = body.endTime;
   // Preu pactat manual: és el total final que paga el client
-  const manualTotalPrice = typeof input.totalPrice === 'number' ? (input.totalPrice as number) : null;
+  const manualTotalCandidate = typeof input.totalPrice === 'number' ? sanitizeMoney(input.totalPrice as number) : null;
+  const manualTotalPrice = manualTotalCandidate !== null && manualTotalCandidate > 0 ? manualTotalCandidate : null;
   delete body.totalPrice;
   delete body.startTime;
   delete body.endTime;
   delete body.internalNotes;
+  normalizePatchMoneyField(body, 'depositAmount');
+  normalizePatchMoneyField(body, 'remainingAmount');
+  normalizePatchMoneyField(body, 'cashAmount', { nullable: true });
+  normalizePatchMoneyField(body, 'discount');
 
   const invoiceFieldTouched = Object.prototype.hasOwnProperty.call(body, 'invoiceRequired');
   const fiscalRecalcNeeded = manualTotalPrice !== null || invoiceFieldTouched;

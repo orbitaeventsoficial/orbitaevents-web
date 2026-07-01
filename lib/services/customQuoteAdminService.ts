@@ -19,6 +19,26 @@ function normalizeComponents(components?: unknown[]): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(components || [])) as Prisma.InputJsonValue;
 }
 
+function roundMoney(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function sanitizeMoney(value: number | string | null | undefined, fallback = 0): number {
+  const amount = Number(value);
+  return Number.isFinite(amount) && amount >= 0 ? roundMoney(amount) : fallback;
+}
+
+function sanitizeOptionalMoney(value: number | string | null | undefined): number | null {
+  if (value == null || value === '') return null;
+  const amount = Number(value);
+  return Number.isFinite(amount) && amount >= 0 ? roundMoney(amount) : null;
+}
+
+function sanitizeMarginPct(value: number | string | null | undefined): number {
+  const amount = Number(value);
+  return Number.isFinite(amount) && amount >= 0 ? roundMoney(amount) : 30;
+}
+
 function normalizeCustomQuoteStatus(status?: string | null): CustomQuoteStatus {
   return status === 'SENT' ? 'SENT' : status === 'ACCEPTED' ? 'ACCEPTED' : status === 'REJECTED' ? 'REJECTED' : 'DRAFT';
 }
@@ -38,10 +58,10 @@ export async function createAdminCustomQuote(input: CustomQuoteInput) {
       clientName: input.clientName?.trim() || null,
       clientEmail: input.clientEmail?.trim() || null,
       components: normalizeComponents(input.components),
-      totalCost: Number(input.totalCost) || 0,
-      suggestedPrice: Number(input.suggestedPrice) || 0,
-      marginPct: Number(input.marginPct) || 30,
-      finalPrice: input.finalPrice ? Number(input.finalPrice) : null,
+      totalCost: sanitizeMoney(input.totalCost),
+      suggestedPrice: sanitizeMoney(input.suggestedPrice),
+      marginPct: sanitizeMarginPct(input.marginPct),
+      finalPrice: sanitizeOptionalMoney(input.finalPrice),
       status: normalizeCustomQuoteStatus(input.status),
       notes: input.notes?.trim() || null,
     },
@@ -66,10 +86,10 @@ export async function updateAdminCustomQuote(id: string, input: CustomQuoteInput
       ...(input.clientName !== undefined && { clientName: input.clientName?.trim() || null }),
       ...(input.clientEmail !== undefined && { clientEmail: input.clientEmail?.trim() || null }),
       ...(input.components !== undefined && { components: normalizeComponents(input.components) }),
-      ...(input.totalCost !== undefined && { totalCost: Number(input.totalCost) }),
-      ...(input.suggestedPrice !== undefined && { suggestedPrice: Number(input.suggestedPrice) }),
-      ...(input.marginPct !== undefined && { marginPct: Number(input.marginPct) }),
-      ...(input.finalPrice !== undefined && { finalPrice: input.finalPrice ? Number(input.finalPrice) : null }),
+      ...(input.totalCost !== undefined && { totalCost: sanitizeMoney(input.totalCost) }),
+      ...(input.suggestedPrice !== undefined && { suggestedPrice: sanitizeMoney(input.suggestedPrice) }),
+      ...(input.marginPct !== undefined && { marginPct: sanitizeMarginPct(input.marginPct) }),
+      ...(input.finalPrice !== undefined && { finalPrice: sanitizeOptionalMoney(input.finalPrice) }),
       ...(input.status !== undefined && { status: normalizeCustomQuoteStatus(input.status) }),
       ...(input.sentAt !== undefined && { sentAt: input.sentAt ? new Date(input.sentAt) : null }),
       ...(input.notes !== undefined && { notes: input.notes?.trim() || null }),

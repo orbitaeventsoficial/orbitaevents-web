@@ -29,6 +29,9 @@ export const CUSTOM_BOOKING_PACK_SLUG = 'personalitzat';
 /** Marcador que el formulari de nova reserva envia quan no es tria cap pack de catàleg. */
 export const CUSTOM_BOOKING_PACK_MARKER = '__custom__';
 
+/** Camps que formen un bloc econòmic coherent de proposta. */
+export const PROPOSAL_FINANCIAL_FIELDS = ['subtotal', 'discount', 'vatRate', 'vatAmount', 'total'] as const;
+
 /** Helpers derivats */
 export function roundMoney(amount: number): number {
   return Math.round(amount * 100) / 100;

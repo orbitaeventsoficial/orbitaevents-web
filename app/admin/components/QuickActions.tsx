@@ -108,7 +108,7 @@ export default function QuickActions() {
   }
 
   return (
-    <section className="admin-cr-panel admin-cr-quick-actions" {...helpAttrs(ADMIN_SHARED_HELP.quickActionsPanel)}>
+    <section className="ap-card p-4 space-y-3" {...helpAttrs(ADMIN_SHARED_HELP.quickActionsPanel)}>
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs uppercase">Accions ràpides</p>
@@ -119,43 +119,43 @@ export default function QuickActions() {
         </Link>
       </div>
 
-      <div className="admin-cr-action-grid">
-        <Link href="/admin/inbox/compose" className="admin-cr-command-button" {...helpAttrs(ADMIN_SHARED_HELP.composeEmail)}>
+      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+        <Link href="/admin/inbox/compose" className="ap-btn ap-btn--secondary w-full" {...helpAttrs(ADMIN_SHARED_HELP.composeEmail)}>
           Nou email
         </Link>
-        <Link href="/admin/leads" className="admin-cr-command-button" {...helpAttrs(ADMIN_SHARED_HELP.viewLeads)}>
+        <Link href="/admin/leads" className="ap-btn ap-btn--secondary w-full" {...helpAttrs(ADMIN_SHARED_HELP.viewLeads)}>
           Veure entrades
         </Link>
-        <button type="button" onClick={runCron} disabled={loading} className="admin-cr-command-button disabled:opacity-60" {...helpAttrs(ADMIN_SHARED_HELP.runPostEvent)}>
+        <button type="button" onClick={runCron} disabled={loading} className="ap-btn ap-btn--secondary w-full" {...helpAttrs(ADMIN_SHARED_HELP.runPostEvent)}>
           {loading ? 'Executant...' : 'Executar post-event'}
         </button>
-        <button type="button" onClick={runAll} disabled={loading} className="admin-cr-command-button disabled:opacity-60" {...helpAttrs(ADMIN_SHARED_HELP.runAll)}>
+        <button type="button" onClick={runAll} disabled={loading} className="ap-btn ap-btn--secondary w-full" {...helpAttrs(ADMIN_SHARED_HELP.runAll)}>
           {loading ? 'Executant...' : 'Executar-ho tot'}
         </button>
-        <button type="button" onClick={runDailySummaryNow} disabled={loading} className="admin-cr-command-button disabled:opacity-60" {...helpAttrs(ADMIN_SHARED_HELP.runDailySummary)}>
+        <button type="button" onClick={runDailySummaryNow} disabled={loading} className="ap-btn ap-btn--secondary w-full" {...helpAttrs(ADMIN_SHARED_HELP.runDailySummary)}>
           {loading ? 'Executant...' : 'Resum diari ara'}
         </button>
       </div>
 
       {summary && (
-        <div className="admin-cr-command-result">
+        <div className="ap-card p-2.5 text-xs text-[var(--t2)]">
           Cron OK · Enviats {summary.sent} · Errors {summary.errors}
         </div>
       )}
       {runAllSummary && (
-        <div className="admin-cr-command-result">
+        <div className="ap-card p-2.5 text-xs text-[var(--t2)]">
           Tot OK · Seqüències {runAllSummary.sequences.executed} (correu {runAllSummary.sequences.sentEmail}, WA {runAllSummary.sequences.sentWhatsapp}) ·
           {' '}Tasques 24h {runAllSummary.sla.createdTasks}
         </div>
       )}
       {dailySummary && (
-        <div className="admin-cr-command-result">
+        <div className="ap-card p-2.5 text-xs text-[var(--t2)]">
           Resum enviat · Seqüències {dailySummary.sequences.executed} · Tasques 24h {dailySummary.sla.createdTasks} ·
           {' '}Resposta 24h {(dailySummary.kpi24h.responseRate * 100).toFixed(1)}%
         </div>
       )}
       {error && (
-        <div className="admin-cr-command-result">
+        <div className="ap-card p-2.5 text-xs text-[var(--t2)]">
           {error}
         </div>
       )}

@@ -10,7 +10,7 @@ const ALERT_TONE: Record<AlertLevel, string> = {
 
 export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
   return (
-    <section className="admin-cr-daily-brief rounded-2xl border p-5 space-y-4">
+    <section className="ap-card p-5 space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-sm font-semibold">Resum del dia</h2>
@@ -61,7 +61,7 @@ export default function DailyBriefPanel({ brief }: { brief: DailyBrief }) {
               href={alert.href}
               className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 text-xs transition-colors hover:bg-[var(--raised)] ${ALERT_TONE[alert.level]}`}
             >
-              <span className="admin-cr-alert-mark" aria-hidden="true" />
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--gold)] shrink-0" aria-hidden="true" />
               <div className="min-w-0 flex-1">
                 <span className="font-semibold">{alert.title}</span>
                 <span className="ml-1.5 opacity-70">{alert.detail}</span>

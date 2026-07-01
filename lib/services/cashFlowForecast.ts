@@ -18,6 +18,10 @@ interface CashFlowMonth {
   cumulative: number;
 }
 
+function roundMoney(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
 export async function buildCashFlowForecast(monthsAhead = 6): Promise<CashFlowMonth[]> {
   const now = new Date();
   const config = await getProfitabilityConfig();
@@ -99,10 +103,10 @@ export async function buildCashFlowForecast(monthsAhead = 6): Promise<CashFlowMo
     cumulative += netFlow;
     result.push({
       month,
-      income: Math.round(data.income),
-      costs: Math.round(data.costs),
-      netFlow: Math.round(netFlow),
-      cumulative: Math.round(cumulative),
+      income: roundMoney(data.income),
+      costs: roundMoney(data.costs),
+      netFlow: roundMoney(netFlow),
+      cumulative: roundMoney(cumulative),
     });
   }
 

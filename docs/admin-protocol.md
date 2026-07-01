@@ -1550,6 +1550,55 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1310 — 2026-07-01 — claude (FET)
+**Canonització: dashboard /admin + image-manager.**
+- Dashboard ~888 admin-cr__ → AdminPage/.ap-kpi/.ap-card/.ap-badge (page+widgets+5 panells). Colors crus→admin-tone. control-room.css 1411→266L (bloc mort retallat; compartits conservats). image-manager colors→tone. Dashboard ara homogeni.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1310`; el següent canvi real ha de ser `#1311`.
+- Validació tècnica: `tsc` 0; validate:core EXIT 0; canon 0 P1.
+- Validació funcional: captura dashboard canònic.
+- Validació humana/UX: coherent; pendent validació propietari del nou aspecte.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1309 — 2026-07-01 — claude + codex (FET)
+**Dashboard control-room canonitzat a `AdminPage` / `.ap-*`.**
+- `app/admin/page.tsx`: el dashboard principal deixa el contenidor i classes `admin-cr-*` i passa a `AdminPage`, `AdminSection`, `AdminKpiRow`, `AdminKpi`, `.ap-card`, `.ap-btn` i tons canònics; Codex tanca el warning visual nou del focus value amb límit `max-w` + `truncate`.
+- `app/admin/components/AttributionPanel.tsx`, `CaptureHealthPanel.tsx`, `DailyBriefPanel.tsx`, `QuickActions.tsx` i `WeeklyCapacityForecastPanel.tsx`: retirades dependències `admin-cr-*` i substituïdes per superfícies `.ap-*` / tokens admin.
+- `app/admin/control-room.css`: retirat el gruix de regles pròpies del dashboard; queda només com a fitxer residual compartit/documentat per altres pàgines.
+- `app/admin/image-manager/page.tsx`: feedback error/success passa de colors crus Tailwind a `admin-tone-*`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1309`; el següent canvi real ha de ser `#1310`.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK després de l'estabilització del dashboard; `pnpm run qa:protocol` OK; `git diff --check` OK (només avisos CRLF preexistents en serveis); `pnpm run validate:core` OK; `rg "admin-cr-|cr-" app/admin/page.tsx app/admin/control-room.css app/admin/components app/admin/image-manager/page.tsx` sense matches reals en el dashboard migrat.
+- Validació funcional: `/admin` queda compilable i sense sistema visual propi `admin-cr-*` dins del dashboard renderitzat.
+- Validació humana/UX: el dashboard consumeix el mateix llenguatge de pàgina, cards, botons, KPIs i tons que la resta de l'admin canònic.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `codex`
+
+### Canvi #1308 — 2026-07-01 — codex (FET)
+**Login/auth: CSRF de mutació admin en helper únic.**
+- `lib/middleware/admin-auth.ts`: extret `requireAdminMutationCsrf` per aplicar la mateixa comprovació CSRF a mutacions `/api/admin/*` autenticades amb cookie de sessió o Basic Auth.
+- `__tests__/lib/middleware/admin-auth.test.ts`: cobertura ampliada de 4 a 7 tests: Basic sense CSRF, sessió persistent sense CSRF i sessió persistent amb CSRF coincident.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1308`; el següent canvi real ha de ser `#1309`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\middleware\admin-auth.test.ts` (7 tests OK), clúster `__tests__\lib\middleware\admin-auth.test.ts __tests__\lib\auth.test.ts __tests__\middleware.test.ts` (39 tests OK), `pnpm run qa:protocol` OK i `git diff --check` OK. `npx tsc --noEmit --pretty false` queda bloquejat per JSX concurrent a `app/admin/page.tsx:904` (`Expected corresponding JSX closing tag for 'AdminPage'`), fora del tall #1308.
+- Validació funcional: el login persistent i Basic Auth mantenen el contracte, però la protecció CSRF de mutació admin queda monocapa dins del middleware.
+- Validació humana/UX: cap canvi visible; les mutacions admin continuen protegides sense variar l'accés.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1307 — 2026-07-01 — codex (FET)
+**Login/auth: comparació constant-time al middleware admin.**
+- `lib/middleware/admin-auth.ts`: Bearer, Basic i signatura de cookie `admin-session` passen per `secureCompare` byte a byte en comptes de comparació directa de strings.
+- `__tests__/lib/middleware/admin-auth.test.ts`: cobertura de Basic amb password que conté `:`, credencial errònia, Bearer correcte i cookie de sessió persistent.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1307`; el següent canvi real ha de ser `#1308`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\middleware\admin-auth.test.ts` (4 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK, `git diff --check` OK i `pnpm run validate:core` OK.
+- Validació funcional: el login admin conserva el contracte Basic/Bearer/sessió persistent però evita comparació directa de secrets.
+- Validació humana/UX: cap canvi visible; l'accés admin i la sessió persistent continuen igual.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1306 — 2026-07-01 — claude (FET)
 **Canonització visual V2: tabs → .ap-tab.**
 - 3 sistemes de tab propis (ap-leads-view/admin-economia-tab/admin-catalog-tab) → .ap-tab canònic (catalog/economia/leads season). Regles CSS mortes esborrades. Tabs homogenis.

@@ -1,3 +1,84 @@
+## 2026-07-01 — Canonització: dashboard /admin + image-manager colors (Canvi #1310, claude+agent)
+
+### Què s'ha fet
+- **Dashboard /admin** (la última pàgina amb sistema propi): ~888 usos `admin-cr-*`/`admin-control-room`/`cr-*` → canònic. page.tsx reescrit (AdminPage/AdminSection/.ap-kpi/.ap-card/.ap-btn/.ap-badge), dashboard-widgets.tsx (Button/Card/MetricCard → .ap-*), 5 panells. Colors crus corregits: emerald→success, amber→warning, rose→danger, sky→info via admin-tone-*. Retirats violeta/cyan decoratius (violaven carbó+or).
+- `control-room.css`: 1411 → 266L (retallat bloc mort del dashboard; conservades seccions COMPARTIDES admin-customer-*/admin-booking-*/admin-leads-* que usen altres pàgines).
+- `image-manager/page.tsx`: banners emerald/red → admin-tone-success/danger.
+- El dashboard ara és HOMOGENI amb la resta de l'admin (adopta l'aspecte canònic, no el bespoke antic amb violeta+animacions).
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core` EXIT 0; check-admin-canon 0 P1; 0 admin-cr al dashboard.
+- Validació funcional: captura dashboard canònic (header + KPIs + cards).
+- Validació humana/UX: dashboard coherent amb la resta; PENDENT que el propietari validi el nou aspecte (menys bespoke, més homogeni).
+
+### Coordinació
+Counter → 1310. Última pàgina amb sistema propi canonitzada. Pendent: consolidació CSS (control-room 266L residual compartit, admin-theme/leads-design fusió) + capa espaiat px.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-01 — Dashboard control-room canonitzat a AdminPage/.ap-* (Canvi #1309, claude + codex)
+
+### Context
+El dashboard principal de `/admin` era l'última pantalla gran amb sistema visual propi (`admin-cr-*` / `control-room.css`). Claude ha fet la migració principal; Codex ha entrat darrere seu només per verificar estabilitat, documentar i validar sense trepitjar el treball concurrent.
+
+### Què s'ha fet
+- `app/admin/page.tsx`: migrat el dashboard a `AdminPage`, `AdminSection`, `AdminKpiRow`, `AdminKpi`, `.ap-card`, `.ap-btn` i tons canònics; Codex tanca el warning visual nou del focus value amb límit `max-w` + `truncate`.
+- `app/admin/components/{AttributionPanel,CaptureHealthPanel,DailyBriefPanel,QuickActions,WeeklyCapacityForecastPanel}.tsx`: eliminades dependències `admin-cr-*` i substituïdes per superfícies `.ap-*` / tokens admin.
+- `app/admin/control-room.css`: retirat el gruix de regles pròpies del dashboard; el fitxer queda només com a residu compartit documentat per altres pantalles.
+- `app/admin/image-manager/page.tsx`: feedback error/success passa de colors crus Tailwind a `admin-tone-*`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK després de l'estabilització del dashboard; `pnpm run qa:protocol` OK; `git diff --check` OK (només avisos CRLF preexistents en serveis); `pnpm run validate:core` OK; `rg "admin-cr-|cr-" app/admin/page.tsx app/admin/control-room.css app/admin/components app/admin/image-manager/page.tsx` sense matches reals.
+- Validació funcional: `/admin` queda compilable i sense el sistema `admin-cr-*` propi dins del dashboard migrat.
+- Validació humana/UX: el dashboard consumeix el mateix llenguatge de pàgina, cards, botons, KPIs i tons que la resta de l'admin canònic.
+
+### Coordinació
+Counter → 1309. Claude ha fet la migració de dashboard; Codex ha fet el tancament darrere seu. Queden residus històrics fora del dashboard renderitzat (`admin-theme.css`, `globals.css`, `css-manager`) per un microtall posterior si es vol portar a zero absolut.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `codex`
+
+## 2026-07-01 — Login/auth: CSRF de mutació admin en helper únic (Canvi #1308, codex)
+
+### Context
+El middleware admin comprovava CSRF de mutacions `/api/admin/*` en dos blocs duplicats: camí de cookie de sessió i camí de Basic Auth. El comportament era correcte, però quedava dispers i sense cobertura directa al test del middleware.
+
+### Què s'ha fet
+- `lib/middleware/admin-auth.ts`: extret `requireAdminMutationCsrf` com a helper únic per a mutacions admin autenticades amb cookie o Basic.
+- `__tests__/lib/middleware/admin-auth.test.ts`: ampliat de 4 a 7 tests amb cobertura de POST admin sense CSRF per Basic, POST admin sense CSRF per sessió persistent i POST admin amb cookie/header CSRF coincidents.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\middleware\admin-auth.test.ts` (7 tests OK), clúster `__tests__\lib\middleware\admin-auth.test.ts __tests__\lib\auth.test.ts __tests__\middleware.test.ts` (39 tests OK), `pnpm run qa:protocol` OK i `git diff --check` OK. `npx tsc --noEmit --pretty false` queda bloquejat per JSX concurrent a `app/admin/page.tsx:904` (`Expected corresponding JSX closing tag for 'AdminPage'`), fora del tall #1308.
+- Validació funcional: les mutacions admin autenticades per cookie o Basic continuen exigint CSRF des d'una sola funció compartida.
+- Validació humana/UX: cap canvi visible; només es blinda que el login persistent no pugui mutar admin sense token CSRF.
+
+### Coordinació
+Counter → 1308. Tall limitat a login/auth; no toca dashboard, mails automàtics, APPEND, seqüències, inventari/preus, costEngine, tasks, booking detail/bd, fitxa lead/fxd ni capa visual V2.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-01 — Login/auth: comparació constant-time al middleware admin (Canvi #1307, codex)
+
+### Context
+El middleware admin (`lib/middleware/admin-auth.ts`) validava Bearer, Basic i signatura de cookie de sessió amb comparació directa de strings. `lib/auth.ts` ja feia servir comparació segura per evitar diferències de timing; el middleware quedava com a camí de login menys blindat.
+
+### Què s'ha fet
+- `lib/middleware/admin-auth.ts`: afegit `secureCompare` byte a byte i aplicat a Bearer, Basic i signatura de sessió persistent.
+- `__tests__/lib/middleware/admin-auth.test.ts`: cobertura de Basic amb password que conté `:`, rebuig de credencial errònia, Bearer correcte i reutilització de cookie `admin-session`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\middleware\admin-auth.test.ts` (4 tests OK), `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK, `git diff --check` OK i `pnpm run validate:core` OK.
+- Validació funcional: el login admin manté Basic, Bearer i sessió persistent amb el mateix contracte, però sense comparació directa de secrets.
+- Validació humana/UX: cap canvi visible; l'accés admin continua funcionant igual i la sessió persistent es conserva.
+
+### Coordinació
+Counter → 1307. Tall limitat a login/auth; no toca mails automàtics, APPEND, seqüències, inventari/preus, costEngine, tasks, booking detail/bd, fitxa lead/fxd ni capa visual V2.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-01 — Canonització visual V2: tabs → .ap-tab (Canvi #1306, claude)
 
 ### Context

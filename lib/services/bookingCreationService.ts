@@ -247,6 +247,16 @@ function sanitizeMoney(value?: number | null): number | null {
   return Math.max(0, Math.round(value * 100) / 100);
 }
 
+function normalizeBookingExtras(extras?: BookingExtraInput[]) {
+  if (!Array.isArray(extras)) return [];
+
+  return extras.map((extra) => ({
+    extraId: extra.extraId,
+    quantity: typeof extra.quantity === 'number' && extra.quantity > 0 ? Math.floor(extra.quantity) : 1,
+    price: sanitizeMoney(extra.price) ?? 0,
+  }));
+}
+
 function normalizeServiceLines(lines?: BookingServiceLineInput[]) {
   if (!Array.isArray(lines)) return [];
 
@@ -371,6 +381,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   }
 
   // Bolo personalitzat (sense pack de catàleg): resol el pack tècnic 0€.
+  const hasCatalogPack = Boolean(data.packId && data.packId !== CUSTOM_BOOKING_PACK_MARKER);
   const resolvedPackId = (data.packId === CUSTOM_BOOKING_PACK_MARKER || !data.packId)
     ? await ensureCustomBookingPackId()
     : data.packId;
@@ -394,14 +405,31 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
     packDjHours: pack.djHours,
   });
   const extraHoursPrice = extraHours * pack.extraHourPrice;
-  const extrasPrice = data.extras?.reduce((sum, e) => sum + e.price * (e.quantity || 1), 0) || 0;
+  const normalizedExtras = normalizeBookingExtras(data.extras);
+  const resolvedExtras = normalizedExtras.length > 0
+    ? (await Promise.all(
+        normalizedExtras.map(async (extra) => {
+          const resolvedId = await resolveExtraId(extra.extraId);
+          if (!resolvedId) return null;
+          return {
+            extraId: resolvedId,
+            quantity: extra.quantity,
+            price: extra.price,
+          };
+        })
+      )).filter((extra): extra is { extraId: string; quantity: number; price: number } => extra !== null)
+    : [];
+  const extrasPrice = resolvedExtras.reduce((sum, e) => sum + e.price * e.quantity, 0);
   // Si el payload no porta línies però el lead té un bolo muntat, s'hereten (Fase 2).
   const serviceLinesBase = normalizeServiceLines(
     (data.serviceLines && data.serviceLines.length > 0) ? data.serviceLines : leadBoloLines
   );
   // So llogat automàtic (Isma) quan el bolo porta pack i no té ja línia de so.
-  const serviceLines = await appendSoundRentalLine(serviceLinesBase, Boolean(resolvedPackId));
-  const serviceLinesRevenue = serviceLines.reduce((sum, line) => sum + (line.revenueAmount || 0), 0);
+  const serviceLines = await appendSoundRentalLine(serviceLinesBase, hasCatalogPack);
+  const serviceLinesRevenue = serviceLines.reduce(
+    (sum, line) => sum + (line.revenueAmount || 0) * (line.quantity || 1),
+    0
+  );
   // El pack, les hores extra, els extres i les línies de servei se SUMEN tots
   // (les línies són serveis addicionals, no substitueixen el pack). El total
   // manual (manualTotalPrice), si s'informa, guanya sobre aquest càlcul més avall.
@@ -428,7 +456,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   const travelCost = distanceKm != null ? calculateTravelCost(distanceKm, fuelCostPerKm) : null;
   const travelCharge = distanceKm != null ? calculateTravelCharge(distanceKm) : 0;
   const subtotalCalculated = subtotalBase + travelCharge;
-  const discount = data.discount || 0;
+  const discount = sanitizeMoney(data.discount) ?? 0;
   const invoiceRequired = Boolean(data.invoiceRequired);
   const vatRate = calcVatRate(invoiceRequired);
   const manualTotal = data.manualTotalPrice != null && data.manualTotalPrice > 0
@@ -439,7 +467,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       ? roundMoney(manualTotal * 100 / (100 + vatRate))
       : manualTotal
     : subtotalCalculated;
-  const baseAfterDiscount = manualTotal !== null ? subtotal : subtotal - discount;
+  const baseAfterDiscount = manualTotal !== null ? subtotal : Math.max(0, subtotal - discount);
   // Money es desa com a Float al schema: arrodonir a cèntims evita soroll de
   // coma flotant a BD i desquadres amb Stripe (cobra en cèntims sencers).
   // Mateix patró canònic que publicBookingService.ts.
@@ -451,20 +479,6 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
     : Math.round((baseAfterDiscount + vatAmount) * 100) / 100;
   const depositAmount = calcDeposit(total);
   const reference = await generateReference();
-
-  const resolvedExtras = data.extras
-    ? (await Promise.all(
-        data.extras.map(async (extra) => {
-          const resolvedId = await resolveExtraId(extra.extraId);
-          if (!resolvedId) return null;
-          return {
-            extraId: resolvedId,
-            quantity: extra.quantity || 1,
-            price: extra.price,
-          };
-        })
-      )).filter((extra): extra is { extraId: string; quantity: number; price: number } => extra !== null)
-    : [];
 
   const booking = await prisma.booking.create({
     data: {

@@ -1,5 +1,6 @@
 import Tooltip from './components/Tooltip';
 import Link from 'next/link';
+import { AdminPage, AdminSection, AdminKpiRow, AdminKpi } from './components/AdminPage';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import QuickActions from './components/QuickActions';
@@ -118,9 +119,9 @@ export default async function AdminDashboard() {
     postEventPending: d.postEventPending,
   });
   const operatingCycleTone: Record<AdminOperatingCycleTone, string> = {
-    success: 'admin-cr-step--emerald',
-    warning: 'admin-cr-step--amber',
-    info: 'admin-cr-step--sky',
+    success: 'admin-tone-border-success',
+    warning: 'admin-tone-border-warning',
+    info: 'admin-tone-border-info',
   };
   const nextPriorityHref = d.alerts[0]?.href || '/admin/tasks';
   const nextPriorityTitle = d.alerts[0]?.title || (d.upcomingTasks[0]?.title ? d.upcomingTasks[0].title : 'Revisar la cua de tasques');
@@ -155,14 +156,14 @@ export default async function AdminDashboard() {
     ? pulse.pipelineDrivers.slice(0, 3).map((driver) => {
         const tone = driver.priority === 'CRITICAL'
           ? {
-              card: 'admin-cr-radar-card--rose',
+              card: 'admin-tone-border-danger',
               dot: 'bg-[var(--o-danger)]',
-              value: 'admin-cr-tone-rose',
+              value: 'admin-tone-text-danger',
             }
           : {
-              card: 'admin-cr-radar-card--amber',
+              card: 'admin-tone-border-warning',
               dot: 'bg-[var(--o-warning)]',
-              value: 'admin-cr-tone-amber',
+              value: 'admin-tone-text-warning',
             };
         return {
           href: driver.href,
@@ -182,9 +183,9 @@ export default async function AdminDashboard() {
           tooltip: "Leads NEW/CONTACTED amb >24h sense canvi d'estat",
           value: d.staleLeadsCount,
           detail: 'Leads amb més de 24h sense avançar.',
-          cardClass: d.staleLeadsCount > 0 ? 'admin-cr-radar-card--rose' : 'admin-cr-radar-card--emerald',
+          cardClass: d.staleLeadsCount > 0 ? 'admin-tone-border-danger' : 'admin-tone-border-success',
           dotClass: d.staleLeadsCount > 0 ? 'bg-[var(--o-danger)]' : 'bg-[var(--o-success)]',
-          valueClass: d.staleLeadsCount > 0 ? 'admin-cr-tone-rose' : 'admin-cr-tone-emerald',
+          valueClass: d.staleLeadsCount > 0 ? 'admin-tone-text-danger' : 'admin-tone-text-success',
         },
         {
           href: '/admin/leads',
@@ -192,9 +193,9 @@ export default async function AdminDashboard() {
           tooltip: 'Prioritat HIGH o URGENT, en estat actiu',
           value: d.hotLeadsCount,
           detail: 'Prioritat alta/urgent.',
-          cardClass: d.hotLeadsCount > 0 ? 'admin-cr-radar-card--amber' : 'admin-cr-radar-card--emerald',
+          cardClass: d.hotLeadsCount > 0 ? 'admin-tone-border-warning' : 'admin-tone-border-success',
           dotClass: d.hotLeadsCount > 0 ? 'bg-[var(--o-warning)]' : 'bg-[var(--o-success)]',
-          valueClass: d.hotLeadsCount > 0 ? 'admin-cr-tone-amber' : 'admin-cr-tone-emerald',
+          valueClass: d.hotLeadsCount > 0 ? 'admin-tone-text-warning' : 'admin-tone-text-success',
         },
         {
           href: '/admin/presupuestos',
@@ -202,122 +203,96 @@ export default async function AdminDashboard() {
           tooltip: 'Leads en estat QUOTE_SENT o NEGOTIATING',
           value: d.quotesInFlightCount,
           detail: 'Enviats o negociant.',
-          cardClass: d.quotesInFlightCount > 0 ? 'admin-cr-radar-card--cyan' : 'admin-cr-radar-card--emerald',
+          cardClass: d.quotesInFlightCount > 0 ? 'admin-tone-border-info' : 'admin-tone-border-success',
           dotClass: d.quotesInFlightCount > 0 ? 'bg-[var(--o-info)]' : 'bg-[var(--o-success)]',
-          valueClass: d.quotesInFlightCount > 0 ? 'admin-cr-tone-cyan' : 'admin-cr-tone-emerald',
+          valueClass: d.quotesInFlightCount > 0 ? 'admin-tone-text-info' : 'admin-tone-text-success',
         },
       ];
 
   return (
-    <div className="admin-control-room">
-      {/* ═══ HERO HEADER ═══ */}
-      <div className="admin-hero-header">
-        <div className="admin-hero-glow" />
-        <div className="relative z-10">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="admin-cr-hero-kicker">{getGreeting()}</p>
-              <h1 className="admin-hero-title">Centre de control</h1>
-              <p className="admin-hero-subtitle">Visió general del negoci</p>
-            </div>
-            <div className="admin-cr-hero-actions">
-              <Link href="/admin/analytics" className="hidden sm:inline-flex">
-                <Button variant="secondary" label="Analítica" helpText={ADMIN_DASHBOARD_HELP.analyticsButton} />
-              </Link>
-              <Link href="/admin/leads">
-                <Button variant="primary" icon="+" label="Nou lead" helpText={ADMIN_DASHBOARD_HELP.newLeadButton} />
-              </Link>
-            </div>
-          </div>
-          <Link href={focusHref} className="admin-cr-focus">
-            <span className="admin-cr-focus-status" aria-hidden="true" />
-            <span className="admin-cr-focus-main">
-              <span className="admin-cr-focus-kicker">{focusKicker}</span>
-              <span className="admin-cr-focus-title">{focusTitle}</span>
-              <span className="admin-cr-focus-detail">{focusDetail}</span>
-            </span>
-            <span className="admin-cr-focus-value">{focusValue}</span>
-            <span className="admin-cr-focus-open">Obrir</span>
+    <AdminPage
+      eyebrow={getGreeting()}
+      title="Centre de control"
+      subtitle="Visió general del negoci"
+      actions={
+        <>
+          <Link href="/admin/analytics" className="hidden sm:inline-flex">
+            <Button variant="secondary" label="Analítica" helpText={ADMIN_DASHBOARD_HELP.analyticsButton} />
           </Link>
+          <Link href="/admin/leads">
+            <Button variant="primary" icon="+" label="Nou lead" helpText={ADMIN_DASHBOARD_HELP.newLeadButton} />
+          </Link>
+        </>
+      }
+    >
+      {/* ═══ FOCUS DEL DIA ═══ */}
+      <Link
+        href={focusHref}
+        className="ap-card flex items-stretch overflow-hidden no-underline border-l-[3px] border-l-[var(--gold)]"
+      >
+        <span className="self-center ml-4 w-2 h-2 rounded-full bg-[var(--gold)] shrink-0" aria-hidden="true" />
+        <span className="min-w-0 grid gap-0.5 px-4 py-2.5 flex-1">
+          <span className="text-[var(--gold)] font-[family-name:var(--mono)] text-xs font-bold uppercase tracking-wider leading-none">{focusKicker}</span>
+          <span className="truncate text-[var(--t)] font-[family-name:var(--display)] text-lg font-extrabold leading-tight">{focusTitle}</span>
+          <span className="truncate text-[var(--t3)] text-xs leading-snug">{focusDetail}</span>
+        </span>
+        <span className="hidden sm:grid place-items-center min-w-[7rem] max-w-[10rem] truncate px-4 border-l border-[var(--line)] text-[var(--gold)] font-[family-name:var(--display)] text-lg font-bold">{focusValue}</span>
+        <span className="hidden md:grid place-items-center px-3.5 border-l border-[var(--line)] text-[var(--t3)] text-xs font-bold">Obrir</span>
+      </Link>
 
-          <div className="admin-cr-metrics" aria-label="Resum de comandament">
-            {controlMetrics.map((metric) => (
-              <Link key={metric.label} href={metric.href} className="admin-cr-metric">
-                <span>{metric.label}</span>
-                <b>{metric.value}</b>
-              </Link>
-            ))}
-          </div>
+      {/* ═══ RESUM DE COMANDAMENT ═══ */}
+      <AdminKpiRow>
+        {controlMetrics.map((metric) => (
+          <AdminKpi key={metric.label} label={metric.label} value={metric.value} href={metric.href} />
+        ))}
+      </AdminKpiRow>
 
-          <div className="admin-cr-quick-links">
-            <Link href="/admin/inbox" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.inbox)}>
-              <span className="admin-cr-quick-kicker">Comunicació</span>
-              <span className="admin-cr-quick-label">Inbox IMAP</span>
-            </Link>
-            <Link href="/admin/emails" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.emails)}>
-              <span className="admin-cr-quick-kicker">Automatització</span>
-              <span className="admin-cr-quick-label">Correus</span>
-            </Link>
-            <Link href="/admin/bookings" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.bookings)}>
-              <span className="admin-cr-quick-kicker">Operació</span>
-              <span className="admin-cr-quick-label">Reserves</span>
-            </Link>
-            <Link href="/admin/bookings?payment=overdue" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.overdue)}>
-              <span className="admin-cr-quick-kicker">Risc</span>
-              <span className="admin-cr-quick-label">Vençuts</span>
-            </Link>
-            <Link href="/admin/bookings?payment=due-soon" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.dueSoon)}>
-              <span className="admin-cr-quick-kicker">Proper</span>
-              <span className="admin-cr-quick-label">Vencen aviat</span>
-            </Link>
-            <Link href="/admin/economia" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.economy)}>
-              <span className="admin-cr-quick-kicker">Marge</span>
-              <span className="admin-cr-quick-label">Economia</span>
-            </Link>
-            <Link href="/admin/salut" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.health)}>
-              <span className="admin-cr-quick-kicker">Sistema</span>
-              <span className="admin-cr-quick-label">Salut</span>
-            </Link>
-            <Link href="/admin/calendario" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.calendar)}>
-              <span className="admin-cr-quick-kicker">Agenda</span>
-              <span className="admin-cr-quick-label">Calendari</span>
-            </Link>
-          </div>
-        </div>
+      {/* ═══ ACCÉS RÀPID ═══ */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        {[
+          { href: '/admin/inbox', kicker: 'Comunicació', label: 'Inbox IMAP', help: ADMIN_DASHBOARD_HELP.quickLinks.inbox },
+          { href: '/admin/emails', kicker: 'Automatització', label: 'Correus', help: ADMIN_DASHBOARD_HELP.quickLinks.emails },
+          { href: '/admin/bookings', kicker: 'Operació', label: 'Reserves', help: ADMIN_DASHBOARD_HELP.quickLinks.bookings },
+          { href: '/admin/bookings?payment=overdue', kicker: 'Risc', label: 'Vençuts', help: ADMIN_DASHBOARD_HELP.quickLinks.overdue },
+          { href: '/admin/bookings?payment=due-soon', kicker: 'Proper', label: 'Vencen aviat', help: ADMIN_DASHBOARD_HELP.quickLinks.dueSoon },
+          { href: '/admin/economia', kicker: 'Marge', label: 'Economia', help: ADMIN_DASHBOARD_HELP.quickLinks.economy },
+          { href: '/admin/salut', kicker: 'Sistema', label: 'Salut', help: ADMIN_DASHBOARD_HELP.quickLinks.health },
+          { href: '/admin/calendario', kicker: 'Agenda', label: 'Calendari', help: ADMIN_DASHBOARD_HELP.quickLinks.calendar },
+        ].map((q) => (
+          <Link key={q.href} href={q.href} className="ap-card px-3 py-2.5 grid gap-0.5 no-underline" {...helpAttrs(q.help)}>
+            <span className="text-[var(--t3)] font-[family-name:var(--mono)] text-xs font-bold uppercase tracking-wider">{q.kicker}</span>
+            <span className="text-[var(--t)] text-sm font-bold truncate">{q.label}</span>
+          </Link>
+        ))}
       </div>
 
       <NBAExplainPanel />
 
-      <section className="admin-cr-panel admin-cr-panel--cycle">
-        <div className="admin-cr-panel-row">
-          <div>
-            <p className="admin-cr-kicker">Cicle operatiu</p>
-            <h2 className="admin-cr-h2">On està viu el sistema ara</h2>
-          </div>
-          <Link href="/admin/manual" className="admin-cr-action-link">
-            Obrir manual
-          </Link>
-        </div>
-        <div className="admin-cr-cycle-grid">
+      <AdminSection
+        title="On està viu el sistema ara"
+        description="Cicle operatiu"
+        actions={<Link href="/admin/manual" className="ap-btn ap-btn--secondary ap-btn--xs">Obrir manual</Link>}
+      >
+        <div className="grid gap-2.5 md:grid-cols-2 xl:grid-cols-3">
           {operatingCycle.map((item) => (
             <Link
               key={item.step}
               href={item.href}
-              className={`admin-cr-step ${operatingCycleTone[item.tone]}`}
+              className={`ap-card p-2.5 block no-underline ${operatingCycleTone[item.tone]}`}
             >
-              <div className="admin-cr-step-head">
-                <div>
-                  <p className="admin-cr-step-kicker">Pas {item.step}</p>
-                  <h3 className="admin-cr-step-title">{item.title}</h3>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[var(--t3)] text-xs font-bold uppercase tracking-wider">Pas {item.step}</p>
+                  <h3 className="text-[var(--t)] text-sm font-bold">{item.title}</h3>
                 </div>
-                <span className="admin-cr-step-metric">{item.metric}</span>
+                <span className="ap-badge shrink-0 max-w-[45%] truncate">{item.metric}</span>
               </div>
-              <p className="admin-cr-step-desc">{item.detail}</p>
-              <p className="admin-cr-step-cta">{item.cta}</p>
+              <p className="mt-1 text-[var(--t2)] text-xs">{item.detail}</p>
+              <p className="mt-2 inline-flex text-[var(--t)] text-xs font-bold underline decoration-dotted">{item.cta}</p>
             </Link>
           ))}
         </div>
-      </section>
+      </AdminSection>
 
       {/* ═══ DAILY BRIEF ═══ */}
       <DailyBriefPanel brief={dailyBrief} />
@@ -330,19 +305,19 @@ export default async function AdminDashboard() {
 
       {/* ═══ PRÒXIM BOLO ═══ */}
       {d.nextEvent && (
-        <Link href={buildBookingHref(d.nextEvent.id)} className="block">
-          <section className={`admin-cr-panel admin-cr-next-event ${
+        <Link href={buildBookingHref(d.nextEvent.id)} className="block no-underline">
+          <section className={`ap-card p-4 ${
             d.nextEvent.daysUntil <= 1
-              ? 'admin-tone-border-warning admin-glow-pulse'
+              ? 'admin-tone-border-warning'
               : d.nextEvent.daysUntil <= 3
-                ? 'admin-tone-border-cyan'
+                ? 'admin-tone-border-info'
                 : ''
           }`}>
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <span className={`text-xs font-bold uppercase tracking-wider ${
-                    d.nextEvent.daysUntil <= 1 ? 'admin-tone-text-warning' : 'admin-tone-text-cyan'
+                    d.nextEvent.daysUntil <= 1 ? 'admin-tone-text-warning' : 'admin-tone-text-info'
                   }`}>
                     {d.nextEvent.daysUntil === 0 ? 'AVUI' : d.nextEvent.daysUntil === 1 ? 'DEMÀ' : `D'aquí ${d.nextEvent.daysUntil} dies`}
                   </span>
@@ -391,7 +366,7 @@ export default async function AdminDashboard() {
       )}
 
       {/* ═══ OBJECTIU MENSUAL — amb RadialProgress ═══ */}
-      <section className="admin-cr-panel admin-cr-revenue-goal" {...helpAttrs(ADMIN_DASHBOARD_HELP.revenueGoal)}>
+      <section className="ap-card p-4" {...helpAttrs(ADMIN_DASHBOARD_HELP.revenueGoal)}>
         <div className="flex items-center gap-5">
           <RadialProgress
             value={d.revenueMonthPct}
@@ -410,7 +385,7 @@ export default async function AdminDashboard() {
             </p>
             <div className="w-full h-2 rounded-full bg-[var(--raised)] overflow-hidden mt-2">
               <div
-                className={`h-full rounded-full admin-progress-animated ${
+                className={`h-full rounded-full ${
                   d.revenueMonthPct >= 100 ? 'bg-[var(--o-success)]' : d.revenueMonthPct >= 60 ? 'bg-[var(--o-warning)]' : 'bg-[var(--o-danger)]'
                 }`}
                 style={{ width: `${Math.min(100, d.revenueMonthPct)}%` }}
@@ -420,56 +395,50 @@ export default async function AdminDashboard() {
         </div>
       </section>
 
-      <section className="admin-cr-panel admin-cr-panel--pilot" {...helpAttrs(ADMIN_DASHBOARD_HELP.pilot)}>
-        <div className="admin-cr-panel-head">
-          <div>
-            <p className="admin-cr-kicker admin-cr-kicker--pilot">Mode Solo</p>
-            <h2 className="admin-cr-h2">Pilot automàtic d&apos;avui</h2>
-            <p className="admin-cr-small">No és lineal: pots començar directament pel pas 2 o pas 3.</p>
-          </div>
-          <span className="admin-cr-pill admin-cr-pill--pilot">4 passos clars</span>
+      <AdminSection
+        title="Pilot automàtic d'avui"
+        description="Mode Solo — no és lineal: pots començar directament pel pas 2 o pas 3."
+        actions={<span className="ap-badge ap-badge--success">4 passos clars</span>}
+        help={ADMIN_DASHBOARD_HELP.pilot}
+      >
+        <div className="flex flex-wrap gap-2 mb-2.5">
+          <Link href="/admin/tasks" className="ap-badge ap-badge--warning no-underline" {...helpAttrs(ADMIN_DASHBOARD_HELP.startStep2)}>Comença per pas 2</Link>
+          <Link href="/admin/emails" className="ap-badge ap-badge--danger no-underline" {...helpAttrs(ADMIN_DASHBOARD_HELP.startStep3)}>Comença per pas 3</Link>
         </div>
-        <div className="admin-cr-chip-row">
-          <Link href="/admin/tasks" className="admin-cr-chip admin-cr-chip--amber" {...helpAttrs(ADMIN_DASHBOARD_HELP.startStep2)}>Comença per pas 2</Link>
-          <Link href="/admin/emails" className="admin-cr-chip admin-cr-chip--rose" {...helpAttrs(ADMIN_DASHBOARD_HELP.startStep3)}>Comença per pas 3</Link>
-        </div>
-        <div className="admin-cr-grid-4">
+        <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
           {pilotToday.map((item) => {
-            const toneClasses = item.tone === 'rose' ? 'admin-cr-step--rose'
-              : item.tone === 'amber' ? 'admin-cr-step--amber'
-              : item.tone === 'sky' ? 'admin-cr-step--sky'
-              : 'admin-cr-step--emerald';
+            const toneBorder = item.tone === 'rose' ? 'admin-tone-border-danger'
+              : item.tone === 'amber' ? 'admin-tone-border-warning'
+              : item.tone === 'sky' ? 'admin-tone-border-info'
+              : 'admin-tone-border-success';
             return (
-              <Link key={item.id} href={item.href} className={`admin-cr-step ${toneClasses}`} data-help-title={item.title} data-help-desc={`${item.description}. Acció recomanada: ${item.cta}.`}>
-                <p className="admin-cr-step-kicker">{item.step}</p>
-                <p className="admin-cr-step-title">{item.title}</p>
-                <p className="admin-cr-step-desc">{item.description}</p>
-                <span className="admin-cr-step-cta">{item.cta}</span>
+              <Link key={item.id} href={item.href} className={`ap-card p-2.5 block no-underline ${toneBorder}`} data-help-title={item.title} data-help-desc={`${item.description}. Acció recomanada: ${item.cta}.`}>
+                <p className="text-[var(--t3)] text-xs font-bold uppercase tracking-wider">{item.step}</p>
+                <p className="text-[var(--t)] text-sm font-bold">{item.title}</p>
+                <p className="mt-1 text-[var(--t2)] text-xs">{item.description}</p>
+                <span className="mt-2 inline-flex text-[var(--t)] text-xs font-bold underline decoration-dotted">{item.cta}</span>
               </Link>
             );
           })}
         </div>
-      </section>
+      </AdminSection>
 
-      <section className="admin-cr-panel admin-cr-panel--checklist" {...helpAttrs(ADMIN_DASHBOARD_HELP.checklist)}>
-        <div className="admin-cr-panel-row">
-          <div>
-            <p className="admin-cr-kicker admin-cr-kicker--cyan">Checklist d&apos;avui</p>
-            <h2 className="admin-cr-h2">Control diari de feina</h2>
-            <p className="admin-cr-small admin-cr-small--muted">Marca les tasques com a fetes i avança sense perdre el fil.</p>
+      <AdminSection
+        title="Control diari de feina"
+        description="Checklist d'avui — marca les tasques com a fetes i avança sense perdre el fil."
+        actions={<Link href="/admin/tasks?status=OPEN" className="ap-btn ap-btn--secondary ap-btn--xs">Obrir tasques pendents</Link>}
+        help={ADMIN_DASHBOARD_HELP.checklist}
+      >
+        <div className="grid gap-2.5 sm:grid-cols-3">
+          <div className="ap-kpi ap-kpi--warning">
+            <span className="ap-kpi-label">Pendents</span>
+            <span className="ap-kpi-value">{d.checklistTodayPendingCount}</span>
           </div>
-          <Link href="/admin/tasks?status=OPEN" className="admin-cr-action-link">Obrir tasques pendents</Link>
-        </div>
-        <div className="admin-cr-grid-3">
-          <div className="admin-cr-stat-box admin-cr-stat-box--amber">
-            <p className="admin-cr-stat-label">Pendents</p>
-            <p className="admin-cr-stat-value admin-cr-stat-value--amber">{d.checklistTodayPendingCount}</p>
+          <div className="ap-kpi ap-kpi--success">
+            <span className="ap-kpi-label">Fetes</span>
+            <span className="ap-kpi-value">{d.checklistTodayDoneCount}</span>
           </div>
-          <div className="admin-cr-stat-box admin-cr-stat-box--emerald">
-            <p className="admin-cr-stat-label">Fetes</p>
-            <p className="admin-cr-stat-value admin-cr-stat-value--emerald">{d.checklistTodayDoneCount}</p>
-          </div>
-          <div className="admin-cr-stat-box flex items-center justify-center">
+          <div className="ap-card p-2.5 flex items-center justify-center">
             <RadialProgress
               value={d.checklistTodayDoneCount + d.checklistTodayPendingCount > 0
                 ? Math.round((d.checklistTodayDoneCount / (d.checklistTodayDoneCount + d.checklistTodayPendingCount)) * 100)
@@ -480,29 +449,28 @@ export default async function AdminDashboard() {
             />
           </div>
         </div>
-      </section>
+      </AdminSection>
 
-      <section className="admin-cr-panel admin-cr-panel--command" {...helpAttrs(ADMIN_DASHBOARD_HELP.commandCenter)}>
-        <div className="admin-cr-panel-head-block">
-          <p className="admin-cr-kicker admin-cr-kicker--violet">Centre de comandament</p>
-          <h2 className="admin-cr-h2">Mou estats sense canviar de pantalla</h2>
-          <p className="admin-cr-small admin-cr-small--muted">Accions ràpides de Leads i Reserves des del tauler principal.</p>
-        </div>
-        <div className="admin-cr-grid-2">
-          <div className="admin-cr-command-card">
-            <div className="admin-cr-command-head">
-              <p className="admin-cr-command-title">Leads actius</p>
-              <Link href="/admin/leads" className="admin-cr-link-inline">Obrir Entrades</Link>
+      <AdminSection
+        title="Mou estats sense canviar de pantalla"
+        description="Centre de comandament — accions ràpides de Leads i Reserves des del tauler principal."
+        help={ADMIN_DASHBOARD_HELP.commandCenter}
+      >
+        <div className="grid gap-2.5 lg:grid-cols-2">
+          <div className="ap-card p-2.5">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-bold uppercase text-[var(--t)]">Leads actius</p>
+              <Link href="/admin/leads" className="text-xs text-[var(--t3)] underline hover:text-[var(--gold)]">Obrir Entrades</Link>
             </div>
-            <div className="admin-cr-list">
+            <div className="grid gap-2">
               {d.commandLeads.length === 0 ? (
-                <p className="admin-cr-empty-text">Sense leads actius.</p>
+                <p className="text-xs text-[var(--t3)]">Sense leads actius.</p>
               ) : (
                 d.commandLeads.map((lead) => (
-                  <div key={lead.id} className="admin-cr-list-row">
-                    <div className="admin-cr-list-content">
-                      <Link href={buildLeadWorkspaceHref(lead.id)} className="admin-cr-list-link">{lead.name}</Link>
-                      <p className="admin-cr-meta">Prioritat {lead.priority.toLowerCase()} · {timeAgo(new Date(lead.createdAt))}</p>
+                  <div key={lead.id} className="ap-card p-2 flex items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <Link href={buildLeadWorkspaceHref(lead.id)} className="block truncate text-sm font-semibold text-[var(--t)] hover:text-[var(--gold)]">{lead.name}</Link>
+                      <p className="text-xs text-[var(--t3)]">Prioritat {lead.priority.toLowerCase()} · {timeAgo(new Date(lead.createdAt))}</p>
                     </div>
                     <StatusQuickSelect
                       entityPath={`/api/admin/leads/${lead.id}/status`}
@@ -515,22 +483,22 @@ export default async function AdminDashboard() {
               )}
             </div>
           </div>
-          <div className="admin-cr-command-card">
-            <div className="admin-cr-command-head">
-              <p className="admin-cr-command-title">Reserves actives</p>
-              <Link href="/admin/bookings" className="admin-cr-link-inline">Obrir Reserves</Link>
+          <div className="ap-card p-2.5">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-bold uppercase text-[var(--t)]">Reserves actives</p>
+              <Link href="/admin/bookings" className="text-xs text-[var(--t3)] underline hover:text-[var(--gold)]">Obrir Reserves</Link>
             </div>
-            <div className="admin-cr-list">
+            <div className="grid gap-2">
               {d.commandBookings.length === 0 ? (
-                <p className="admin-cr-empty-text">Sense reserves actives.</p>
+                <p className="text-xs text-[var(--t3)]">Sense reserves actives.</p>
               ) : (
                 d.commandBookings.map((booking) => (
-                  <div key={booking.id} className="admin-cr-list-row">
-                    <div className="admin-cr-list-content">
-                      <Link href={buildBookingHref(booking.id)} className="admin-cr-list-link">
+                  <div key={booking.id} className="ap-card p-2 flex items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <Link href={buildBookingHref(booking.id)} className="block truncate text-sm font-semibold text-[var(--t)] hover:text-[var(--gold)]">
                         {booking.reference} · {booking.clientName}
                       </Link>
-                      <p className="admin-cr-meta">{formatEventDate(new Date(booking.eventDate))}</p>
+                      <p className="text-xs text-[var(--t3)]">{formatEventDate(new Date(booking.eventDate))}</p>
                     </div>
                     <StatusQuickSelect
                       entityPath={`/api/admin/bookings/${booking.id}/status`}
@@ -544,39 +512,38 @@ export default async function AdminDashboard() {
             </div>
           </div>
         </div>
-      </section>
+      </AdminSection>
 
-      <section className="admin-cr-panel admin-cr-panel--radar" {...helpAttrs(ADMIN_DASHBOARD_HELP.executionRadar)}>
-        <div className="admin-cr-panel-head-block">
-          <p className="admin-cr-kicker admin-cr-kicker--cyan">Radar d&apos;execució</p>
-          <h2 className="admin-cr-h2">On posar el focus avui</h2>
-          <p className="admin-cr-small admin-cr-small--muted">Semàfors simples: vermell = urgent, groc = important, verd = controlat.</p>
-        </div>
-        <div className="admin-cr-grid-3">
+      <AdminSection
+        title="On posar el focus avui"
+        description="Radar d'execució — semàfors simples: vermell = urgent, groc = important, verd = controlat."
+        help={ADMIN_DASHBOARD_HELP.executionRadar}
+      >
+        <div className="grid gap-2.5 sm:grid-cols-3">
           {pipelineRadarItems.map((item) => (
-            <Link key={`${item.label}:${item.href}`} href={item.href} className={`admin-cr-radar-card ${item.cardClass}`}>
+            <Link key={`${item.label}:${item.href}`} href={item.href} className={`ap-card p-2.5 block no-underline ${item.cardClass}`}>
               <div className="flex items-center gap-2">
                 <span className={`inline-block w-3 h-3 rounded-full ${item.dotClass}`} />
                 <Tooltip text={item.tooltip}>
-                  <p className="admin-cr-stat-label">{item.label}</p>
+                  <p className="text-xs text-[var(--t3)]">{item.label}</p>
                 </Tooltip>
               </div>
-              <p className={`admin-cr-radar-value ${item.valueClass}`}>{item.value}</p>
-              <p className="admin-cr-small">{item.detail}</p>
+              <p className={`text-xl font-bold mt-0.5 ${item.valueClass}`}>{item.value}</p>
+              <p className="text-xs text-[var(--t2)]">{item.detail}</p>
             </Link>
           ))}
         </div>
-      </section>
+      </AdminSection>
 
       {d.testimonialsPending > 0 && (
-        <div className="admin-cr-banner admin-cr-banner--amber">
+        <div className="ap-card p-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between admin-tone-border-warning">
           <div>
-            <p className="admin-cr-banner-label">Testimonis pendents</p>
-            <p className="admin-cr-banner-value">
+            <p className="text-xs font-semibold text-[var(--t)]">Testimonis pendents</p>
+            <p className="text-base font-bold text-[var(--t)]">
               {d.testimonialsPending} pendent{d.testimonialsPending > 1 ? 's' : ''} d&apos;aprovació
             </p>
           </div>
-          <Link href="/admin/ressenyes" className="admin-cr-banner-action">
+          <Link href="/admin/ressenyes" className="self-start no-underline">
             <Button variant="secondary" icon="⭐" label="Revisar" />
           </Link>
         </div>
@@ -599,19 +566,19 @@ export default async function AdminDashboard() {
       <WeatherWidget />
 
       {d.alerts.length > 0 && (
-        <div className="admin-cr-alert-grid">
+        <div className="grid gap-2.5 xl:grid-cols-3">
           {d.alerts.map((alert, index) => {
-            const palette = alert.type === 'error' ? 'admin-cr-alert admin-cr-alert--error'
-              : alert.type === 'warning' ? 'admin-cr-alert admin-cr-alert--warning'
-              : 'admin-cr-alert admin-cr-alert--info';
+            const tone = alert.type === 'error' ? 'admin-tone-border-danger'
+              : alert.type === 'warning' ? 'admin-tone-border-warning'
+              : 'admin-tone-border-info';
             return (
-              <div key={`${alert.title}-${index}`} className={palette}>
-                <div className="admin-cr-alert-row">
+              <div key={`${alert.title}-${index}`} className={`ap-card p-3 ${tone}`}>
+                <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="admin-cr-alert-title">{alert.title}</p>
-                    <p className="admin-cr-alert-desc">{alert.description}</p>
+                    <p className="text-sm font-bold text-[var(--t)]">{alert.title}</p>
+                    <p className="text-xs text-[var(--t2)] mt-0.5">{alert.description}</p>
                   </div>
-                  <Link href={alert.href} className="admin-cr-link-inline">{alert.action}</Link>
+                  <Link href={alert.href} className="text-xs text-[var(--t3)] underline hover:text-[var(--gold)] shrink-0">{alert.action}</Link>
                 </div>
               </div>
             );
@@ -621,9 +588,9 @@ export default async function AdminDashboard() {
 
       <QuickActions />
 
-      <section className="admin-cr-info-grid">
-        <div className="admin-cr-info-card" {...helpAttrs(ADMIN_DASHBOARD_HELP.businessHealth)}>
-          <p className="admin-cr-kicker">Salut del negoci</p>
+      <section className="grid gap-2.5 lg:grid-cols-3">
+        <div className="ap-card p-3" {...helpAttrs(ADMIN_DASHBOARD_HELP.businessHealth)}>
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)] mb-2">Salut del negoci</p>
           {d.salutSnapshot ? (
             <>
               <div className="flex items-center gap-4 mb-3">
@@ -646,19 +613,19 @@ export default async function AdminDashboard() {
                   </span>
                 )}
               </div>
-              <div className="admin-cr-health-grid" {...helpAttrs(ADMIN_DASHBOARD_HELP.monitoredAreas)}>
+              <div className="grid grid-cols-3 gap-2 mt-2.5" {...helpAttrs(ADMIN_DASHBOARD_HELP.monitoredAreas)}>
                 {d.salutSnapshot.sections.map((section) => {
                   const hasCritical = section.counts.critical > 0;
                   const hasWarning = section.counts.warning > 0;
                   const dot = hasCritical ? 'bg-[var(--o-danger)]' : hasWarning ? 'bg-[var(--o-warning)]' : 'bg-[var(--o-success)]';
-                  const tone = hasCritical ? 'admin-cr-tone-rose' : hasWarning ? 'admin-cr-tone-amber' : 'admin-cr-tone-emerald';
+                  const tone = hasCritical ? 'admin-tone-text-danger' : hasWarning ? 'admin-tone-text-warning' : 'admin-tone-text-success';
                   const count = hasCritical ? section.counts.critical : hasWarning ? section.counts.warning : 0;
                   const href = hasCritical ? '/admin/salut?status=critical' : hasWarning ? '/admin/salut?status=warning' : '/admin/salut';
                   return (
-                    <Link key={section.scope} href={href} className="admin-cr-health-item hover:opacity-80 transition-opacity" data-help-title={section.label} data-help-desc={hasCritical ? `Té ${section.counts.critical} punt${section.counts.critical > 1 ? "s" : ""} crític${section.counts.critical > 1 ? "s" : ""}.` : hasWarning ? `Té ${section.counts.warning} avís${section.counts.warning > 1 ? "os" : ""} actiu${section.counts.warning > 1 ? "s" : ""}.` : "No té incidències obertes ara mateix."}>
+                    <Link key={section.scope} href={href} className="ap-card p-1.5 text-center block no-underline hover:opacity-80 transition-opacity" data-help-title={section.label} data-help-desc={hasCritical ? `Té ${section.counts.critical} punt${section.counts.critical > 1 ? "s" : ""} crític${section.counts.critical > 1 ? "s" : ""}.` : hasWarning ? `Té ${section.counts.warning} avís${section.counts.warning > 1 ? "os" : ""} actiu${section.counts.warning > 1 ? "s" : ""}.` : "No té incidències obertes ara mateix."}>
                       <span className={`inline-block w-2 h-2 rounded-full ${dot}`} />
-                      <p className="admin-cr-health-label">{section.label}</p>
-                      <p className={`admin-cr-health-value ${tone}`}>
+                      <p className="text-xs text-[var(--t3)]">{section.label}</p>
+                      <p className={`text-xs font-bold ${tone}`}>
                         {count > 0 ? count : 'OK'}
                       </p>
                     </Link>
@@ -688,14 +655,14 @@ export default async function AdminDashboard() {
               })()}
             </>
           ) : (
-            <div className="admin-cr-health-grid">
+            <div className="grid grid-cols-3 gap-2 mt-2.5">
               {d.healthItems.map((item) => {
                 const dot = item.status === 'OK' ? 'bg-[var(--o-success)]' : item.status === 'ERROR' ? 'bg-[var(--o-danger)]' : 'bg-[var(--o-warning)]';
                 return (
-                  <div key={item.label} className="admin-cr-health-item">
+                  <div key={item.label} className="ap-card p-1.5 text-center">
                     <span className={`inline-block w-2 h-2 rounded-full ${dot}`} />
-                    <p className="admin-cr-health-label">{item.label}</p>
-                    <p className={`admin-cr-health-value ${item.status === 'OK' ? 'admin-cr-tone-emerald' : item.status === 'ERROR' ? 'admin-cr-tone-rose' : 'admin-cr-tone-amber'}`}>
+                    <p className="text-xs text-[var(--t3)]">{item.label}</p>
+                    <p className={`text-xs font-bold ${item.status === 'OK' ? 'admin-tone-text-success' : item.status === 'ERROR' ? 'admin-tone-text-danger' : 'admin-tone-text-warning'}`}>
                       {item.status}
                     </p>
                   </div>
@@ -704,43 +671,43 @@ export default async function AdminDashboard() {
             </div>
           )}
           <div className="mt-4 flex items-center justify-between gap-3">
-            <p className="admin-cr-footnote">
+            <p className="text-xs text-[var(--t3)]">
               Últim cron: {d.cronMap['emails.cron.lastRun'] ? formatDateTimeFull(d.cronMap['emails.cron.lastRun']) : 'Mai'}
             </p>
-            <Link href="/admin/salut" className="admin-cr-link-inline" {...helpAttrs(ADMIN_DASHBOARD_HELP.openHealth)}>Obrir Salut</Link>
+            <Link href="/admin/salut" className="text-xs text-[var(--t3)] underline hover:text-[var(--gold)]" {...helpAttrs(ADMIN_DASHBOARD_HELP.openHealth)}>Obrir Salut</Link>
           </div>
         </div>
-        <div className="admin-cr-info-card">
-          <p className="admin-cr-kicker">Tasques pendents</p>
-          <div className="admin-cr-list">
+        <div className="ap-card p-3">
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)] mb-2">Tasques pendents</p>
+          <div className="grid gap-2">
             {d.upcomingTasks.length === 0 ? (
-              <p className="admin-cr-empty-text">Sense tasques pendents</p>
+              <p className="text-xs text-[var(--t3)]">Sense tasques pendents</p>
             ) : (
               d.upcomingTasks.map((task) => {
                 const taskHref = task.lead ? buildLeadWorkspaceHref(task.lead.id) : '/admin/tasks';
                 const taskMeta = task.lead?.name || 'Sense lead assignat';
 
                 return (
-                  <Link key={task.id} href={taskHref} className="admin-cr-list-row admin-cr-list-row--link">
-                    <span className="admin-cr-truncate">{task.title}</span>
-                    <span className="admin-cr-meta">{taskMeta}</span>
+                  <Link key={task.id} href={taskHref} className="ap-card p-2 flex items-center justify-between gap-2 no-underline">
+                    <span className="min-w-0 flex-1 truncate text-sm text-[var(--t)]">{task.title}</span>
+                    <span className="text-xs text-[var(--t3)] shrink-0">{taskMeta}</span>
                   </Link>
                 );
               })
             )}
           </div>
         </div>
-        <div className="admin-cr-info-card">
-          <p className="admin-cr-kicker">Timeline</p>
-          <div className="admin-cr-list">
+        <div className="ap-card p-3">
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)] mb-2">Timeline</p>
+          <div className="grid gap-2">
             {d.timeline.length === 0 ? (
-              <p className="admin-cr-empty-text">Cap activitat recent</p>
+              <p className="text-xs text-[var(--t3)]">Cap activitat recent</p>
             ) : (
               d.timeline.map((item) => (
-                <Link key={item.id} href={item.href} className="admin-cr-list-row admin-cr-list-row--link admin-cr-list-row--timeline">
+                <Link key={item.id} href={item.href} className="ap-card p-2 flex items-start gap-2 no-underline">
                   <span>{item.icon}</span>
-                  <span className="admin-cr-truncate">{item.text}</span>
-                  <span className="admin-cr-meta">{item.time}</span>
+                  <span className="min-w-0 flex-1 truncate text-sm text-[var(--t)]">{item.text}</span>
+                  <span className="text-xs text-[var(--t3)] shrink-0">{item.time}</span>
                 </Link>
               ))
             )}
@@ -748,31 +715,31 @@ export default async function AdminDashboard() {
         </div>
       </section>
 
-      <div className="admin-cr-kpi-grid">
-        <div className="admin-stagger-item"><Tooltip text="Quantes reserves tens confirmades ara mateix. Més confirmades = més feina segura."><MetricCard label="Reserves confirmades" value={d.bookingsConfirmed.toString()} change={d.bookingsThisMonth > 0 ? `+${d.bookingsThisMonth} aquest mes` : '-'} changeType="up" accent="emerald" /></Tooltip></div>
-        <div className="admin-stagger-item"><Tooltip text="Consultes noves que han entrat aquest mes. Indica si la web i el màrqueting estan portant feina."><MetricCard label="Consultes del mes" value={d.leadsThisMonth.toString()} change={`${d.leadsCount} totals`} changeType="up" accent="sky" /></Tooltip></div>
-        <div className="admin-stagger-item"><Tooltip text="Clients reals que han contractat. La conversió mostra quin % de consultes acaben en reserva."><MetricCard label="Clients" value={d.customersCount.toString()} change={`${d.conversionRate}% de conversió`} changeType="up" accent="purple" /></Tooltip></div>
-        <div className="admin-stagger-item"><Tooltip text="Nota mitjana de les ressenyes de Google. Afecta directament la confiança dels nous clients."><MetricCard label="Valoració mitjana" value={d.rating} change={`${d.testimonialsApproved} ressenyes`} changeType="up" accent="amber" /></Tooltip></div>
-        <div className="admin-stagger-item"><Tooltip text="Visites a la web els últims 30 dies. Si baixa, pot ser que el màrqueting perdi empenta."><MetricCard label="Sessions web (30d)" value={d.ga4Sessions || '-'} change={d.ga4Users ? `${d.ga4Users} usuaris` : 'GA4 pendent'} changeType="neutral" accent="cyan" /></Tooltip></div>
-        <div className="admin-stagger-item"><Tooltip text="Quant de temps passen els visitants a la web. Més temps = més interès real en el que ofereixes."><MetricCard label="Temps mitjà web" value={d.ga4AvgSessionMin ? `${d.ga4AvgSessionMin} min` : '-'} change={d.ga4PageViews ? `${d.ga4PageViews} pàgines` : 'GA4 pendent'} changeType="neutral" accent="rose" /></Tooltip></div>
-        <div className="admin-stagger-item"><Tooltip text="Percentatge que et queda net de cada reserva després de descomptar costos. Per sobre del 50% és excel·lent."><MetricCard label="Marge mitjà" value={`${d.avgMarginPct}%`} change={d.avgMarginPct >= 50 ? 'Excel·lent' : d.avgMarginPct >= 30 ? 'Acceptable' : d.avgMarginPct >= 15 ? 'Vigilar' : 'Crític'} changeType={d.avgMarginPct >= 30 ? 'up' : 'down'} accent={d.avgMarginPct >= 50 ? 'emerald' : d.avgMarginPct >= 30 ? 'amber' : 'rose'} /></Tooltip></div>
-        <div className="admin-stagger-item"><Tooltip text="Quants diners entraran o sortiran els pròxims 30 dies, segons reserves confirmades i costos previstos."><MetricCard label="Flux net previst" value={`${d.cashFlowNet30 >= 0 ? '+' : ''}${formatCurrency(Math.abs(d.cashFlowNet30))}`} change="Pròxims 30 dies" changeType={d.cashFlowNet30 >= 0 ? 'up' : 'down'} accent={d.cashFlowNet30 >= 0 ? 'emerald' : 'rose'} /></Tooltip></div>
-        <div className="admin-stagger-item"><Tooltip text="Valor estimat de les vendes en curs, ponderat per la probabilitat de tancar cada una."><MetricCard label="Pipeline ponderat" value={formatCurrency(d.pipelineWeighted30)} change="Vendes probables" changeType="neutral" accent="amber" /></Tooltip></div>
-        <div className="admin-stagger-item"><Tooltip text="Total que encara no has cobrat de reserves actives. Inclou bestretes i saldos pendents."><MetricCard label="Pendent de cobrar" value={formatCurrency(d.pendingPayments)} change="Reserves actives" changeType={d.pendingPayments > 0 ? 'down' : 'up'} accent={d.pendingPayments > 5000 ? 'rose' : 'sky'} /></Tooltip></div>
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2.5">
+        <div><Tooltip text="Quantes reserves tens confirmades ara mateix. Més confirmades = més feina segura."><MetricCard label="Reserves confirmades" value={d.bookingsConfirmed.toString()} change={d.bookingsThisMonth > 0 ? `+${d.bookingsThisMonth} aquest mes` : '-'} changeType="up" accent="emerald" /></Tooltip></div>
+        <div><Tooltip text="Consultes noves que han entrat aquest mes. Indica si la web i el màrqueting estan portant feina."><MetricCard label="Consultes del mes" value={d.leadsThisMonth.toString()} change={`${d.leadsCount} totals`} changeType="up" accent="sky" /></Tooltip></div>
+        <div><Tooltip text="Clients reals que han contractat. La conversió mostra quin % de consultes acaben en reserva."><MetricCard label="Clients" value={d.customersCount.toString()} change={`${d.conversionRate}% de conversió`} changeType="up" accent="purple" /></Tooltip></div>
+        <div><Tooltip text="Nota mitjana de les ressenyes de Google. Afecta directament la confiança dels nous clients."><MetricCard label="Valoració mitjana" value={d.rating} change={`${d.testimonialsApproved} ressenyes`} changeType="up" accent="amber" /></Tooltip></div>
+        <div><Tooltip text="Visites a la web els últims 30 dies. Si baixa, pot ser que el màrqueting perdi empenta."><MetricCard label="Sessions web (30d)" value={d.ga4Sessions || '-'} change={d.ga4Users ? `${d.ga4Users} usuaris` : 'GA4 pendent'} changeType="neutral" accent="cyan" /></Tooltip></div>
+        <div><Tooltip text="Quant de temps passen els visitants a la web. Més temps = més interès real en el que ofereixes."><MetricCard label="Temps mitjà web" value={d.ga4AvgSessionMin ? `${d.ga4AvgSessionMin} min` : '-'} change={d.ga4PageViews ? `${d.ga4PageViews} pàgines` : 'GA4 pendent'} changeType="neutral" accent="rose" /></Tooltip></div>
+        <div><Tooltip text="Percentatge que et queda net de cada reserva després de descomptar costos. Per sobre del 50% és excel·lent."><MetricCard label="Marge mitjà" value={`${d.avgMarginPct}%`} change={d.avgMarginPct >= 50 ? 'Excel·lent' : d.avgMarginPct >= 30 ? 'Acceptable' : d.avgMarginPct >= 15 ? 'Vigilar' : 'Crític'} changeType={d.avgMarginPct >= 30 ? 'up' : 'down'} accent={d.avgMarginPct >= 50 ? 'emerald' : d.avgMarginPct >= 30 ? 'amber' : 'rose'} /></Tooltip></div>
+        <div><Tooltip text="Quants diners entraran o sortiran els pròxims 30 dies, segons reserves confirmades i costos previstos."><MetricCard label="Flux net previst" value={`${d.cashFlowNet30 >= 0 ? '+' : ''}${formatCurrency(Math.abs(d.cashFlowNet30))}`} change="Pròxims 30 dies" changeType={d.cashFlowNet30 >= 0 ? 'up' : 'down'} accent={d.cashFlowNet30 >= 0 ? 'emerald' : 'rose'} /></Tooltip></div>
+        <div><Tooltip text="Valor estimat de les vendes en curs, ponderat per la probabilitat de tancar cada una."><MetricCard label="Pipeline ponderat" value={formatCurrency(d.pipelineWeighted30)} change="Vendes probables" changeType="neutral" accent="amber" /></Tooltip></div>
+        <div><Tooltip text="Total que encara no has cobrat de reserves actives. Inclou bestretes i saldos pendents."><MetricCard label="Pendent de cobrar" value={formatCurrency(d.pendingPayments)} change="Reserves actives" changeType={d.pendingPayments > 0 ? 'down' : 'up'} accent={d.pendingPayments > 5000 ? 'rose' : 'sky'} /></Tooltip></div>
       </div>
 
-      <div className="admin-cr-chart-grid">
+      <div className="grid gap-2.5 lg:grid-cols-3">
         <Card title="Trànsit web (30 dies)" subtitle="Sessions i usuaris" noPadding helpText={ADMIN_DASHBOARD_HELP.cards.traffic30d}>
-          <div className="admin-cr-card-pad">
+          <div className="p-2.5">
             <MiniLineChart series={[
               { data: d.ga4SessionsSeries, stroke: ADMIN_CHART_SERIES_COLORS.ga4Sessions, label: 'Sessions', value: d.ga4Sessions || '-' },
               { data: d.ga4UsersSeries, stroke: ADMIN_CHART_SERIES_COLORS.ga4Users, label: 'Usuaris', value: d.ga4Users || '-' },
             ]} />
-            {!d.ga4Available && <p className="admin-cr-footnote">GA4 pendent o sense dades.</p>}
+            {!d.ga4Available && <p className="text-xs text-[var(--t3)] mt-2">GA4 pendent o sense dades.</p>}
           </div>
         </Card>
         <Card title="Entrades i conversió" subtitle="Consultes i tancaments" noPadding helpText={ADMIN_DASHBOARD_HELP.cards.leadsConversion}>
-          <div className="admin-cr-card-pad">
+          <div className="p-2.5">
             <MiniLineChart series={[
               { data: d.leadsSeries, stroke: ADMIN_CHART_SERIES_COLORS.leads, label: 'Entrades', value: d.leadsThisMonth },
               { data: d.leadsWonSeries, stroke: ADMIN_CHART_SERIES_COLORS.leadsWon, label: 'Guanyats', value: d.wonLeads },
@@ -780,7 +747,7 @@ export default async function AdminDashboard() {
           </div>
         </Card>
         <Card title="Reserves i facturació" subtitle="Esdeveniments confirmats" noPadding helpText={ADMIN_DASHBOARD_HELP.cards.bookingsRevenue}>
-          <div className="admin-cr-card-pad">
+          <div className="p-2.5">
             <MiniLineChart series={[
               { data: d.bookingsSeries, stroke: ADMIN_CHART_SERIES_COLORS.bookings, label: 'Reserves', value: d.bookingsConfirmed },
               { data: d.revenueSeries, stroke: ADMIN_CHART_SERIES_COLORS.revenue, label: '€', value: d.revenueTotal30 },
@@ -790,58 +757,58 @@ export default async function AdminDashboard() {
       </div>
 
       {/* ═══ GRÀFIQUES COMPARATIVES ═══ */}
-      <div className="admin-cr-chart-grid">
+      <div className="grid gap-2.5 lg:grid-cols-3">
         <Card title="Ingressos mensuals" subtitle="Comparativa amb any anterior" noPadding helpText={ADMIN_DASHBOARD_HELP.cards.monthlyRevenue}>
-          <div className="admin-cr-card-pad">
+          <div className="p-2.5">
             <MonthlyBarChart data={d.monthlyRevenue} />
           </div>
         </Card>
         <Card title="Distribució per tipus" subtitle="Reserves confirmades/completades" noPadding helpText={ADMIN_DASHBOARD_HELP.cards.eventMix}>
-          <div className="admin-cr-card-pad flex items-center justify-center py-4">
+          <div className="p-2.5 flex items-center justify-center py-4">
             <DonutChart segments={d.eventTypeDistribution} />
           </div>
         </Card>
       </div>
 
-      <div className="admin-cr-main-grid">
-        <div className="admin-cr-main-grid-wide">
+      <div className="grid gap-2.5 xl:grid-cols-4">
+        <div className="xl:col-span-3">
           <Card title="Pròxims esdeveniments" subtitle={`${d.upcomingBookings.length} programats`} action={<Link href="/admin/calendario"><Button variant="ghost" label="Calendari" /></Link>} noPadding>
             {d.upcomingBookings.length > 0 ? (
-              <div className="admin-cr-divide-list">
+              <div className="divide-y divide-[var(--line)]">
                 {d.upcomingBookings.map((booking) => (
-                  <Link key={booking.id} href={buildBookingHref(booking.id)} className="admin-cr-row-link">
-                    <div className="admin-cr-avatar-box">
-                      <span className="admin-cr-avatar-text">{new Date(booking.eventDate).getDate()}</span>
+                  <Link key={booking.id} href={buildBookingHref(booking.id)} className="flex items-center gap-2.5 px-3 py-2.5 adm-row-hover no-underline">
+                    <div className="w-11 h-11 rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] flex items-center justify-center shrink-0">
+                      <span className="text-[var(--t)] font-bold text-sm">{new Date(booking.eventDate).getDate()}</span>
                     </div>
-                    <div className="admin-cr-list-content">
-                      <p className="admin-cr-list-link">{booking.clientName || 'Client'}</p>
-                      <p className="admin-cr-meta admin-cr-truncate">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-[var(--t)]">{booking.clientName || 'Client'}</p>
+                      <p className="min-w-0 flex-1 truncate text-xs text-[var(--t3)]">
                         {formatEventDate(new Date(booking.eventDate))} · {booking.eventType || 'Esdeveniment'}
                       </p>
                     </div>
-                    <svg className="admin-cr-chevron" width={16} height={16} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4 text-[var(--t3)] shrink-0" width={16} height={16} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </Link>
                 ))}
               </div>
             ) : (
-              <div className="admin-cr-empty-block">
-                <p className="admin-cr-small admin-cr-small--muted">No hi ha esdeveniments programats</p>
-                <Link href="/admin/bookings" className="admin-cr-link-inline">Crear nova reserva →</Link>
+              <div className="p-4 text-center">
+                <p className="text-xs text-[var(--t3)]">No hi ha esdeveniments programats</p>
+                <Link href="/admin/bookings" className="text-xs text-[var(--t3)] underline hover:text-[var(--gold)]">Crear nova reserva →</Link>
               </div>
             )}
           </Card>
         </div>
-        <div className="admin-cr-desktop-only">
+        <div className="hidden md:block">
           <Card title="Activitat" subtitle="Últimes accions" helpText={ADMIN_DASHBOARD_HELP.cards.activity}>
-            <div className="admin-cr-list">
+            <div className="grid gap-2">
               {d.activities.map((activity, i) => (
-                <div key={i} className="admin-cr-activity-row">
-                  <span className="admin-cr-activity-icon">{activity.icon}</span>
-                  <div className="admin-cr-list-content">
-                    <p className="admin-cr-small">{activity.text}</p>
-                    {activity.time && <p className="admin-cr-meta">{activity.time}</p>}
+                <div key={i} className="flex items-start gap-2.5 ap-card p-2">
+                  <span className="w-5 h-5 rounded-full border border-[var(--line)] bg-[var(--sunk)] inline-flex items-center justify-center shrink-0 text-xs">{activity.icon}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-[var(--t2)]">{activity.text}</p>
+                    {activity.time && <p className="text-xs text-[var(--t3)]">{activity.time}</p>}
                   </div>
                 </div>
               ))}
@@ -852,23 +819,23 @@ export default async function AdminDashboard() {
 
       <Card title="Entrades recents" subtitle={`${d.leadsCount} totals`} action={<Link href="/admin/leads"><Button variant="secondary" label="Tots" /></Link>} noPadding>
         {d.recentLeads.length > 0 ? (
-          <div className="admin-cr-divide-list">
+          <div className="divide-y divide-[var(--line)]">
             {d.recentLeads.map((lead) => (
-              <Link key={lead.id} href={buildLeadWorkspaceHref(lead.id)} className="admin-cr-row-link">
-                <div className="admin-cr-row-main">
-                  <div className="admin-cr-avatar-round">{lead.name?.charAt(0).toUpperCase() || '?'}</div>
-                  <div className="admin-cr-list-content">
-                    <p className="admin-cr-list-link">{lead.name}</p>
-                    <p className="admin-cr-meta admin-cr-desktop-only-inline">{lead.email}</p>
-                    <p className="admin-cr-meta admin-cr-mobile-only-inline">{timeAgo(new Date(lead.createdAt))}</p>
+              <Link key={lead.id} href={buildLeadWorkspaceHref(lead.id)} className="flex items-center justify-between gap-2.5 px-3 py-2.5 adm-row-hover no-underline">
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className="w-9 h-9 rounded-full border border-[var(--line)] bg-[var(--sunk)] text-[var(--t)] font-bold flex items-center justify-center shrink-0">{lead.name?.charAt(0).toUpperCase() || '?'}</div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-[var(--t)]">{lead.name}</p>
+                    <p className="text-xs text-[var(--t3)] hidden sm:inline">{lead.email}</p>
+                    <p className="text-xs text-[var(--t3)] inline sm:hidden">{timeAgo(new Date(lead.createdAt))}</p>
                   </div>
                 </div>
-                <div className="admin-cr-row-side">
-                  <span className={`admin-cr-status-chip ${lead.status === 'NEW' ? 'admin-cr-status-chip--new' : lead.status === 'WON' ? 'admin-cr-status-chip--won' : 'admin-cr-status-chip--default'}`}>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className={`ap-badge ${lead.status === 'NEW' ? 'ap-badge--info' : lead.status === 'WON' ? 'ap-badge--success' : ''}`}>
                     {lead.status}
                   </span>
-                  <span className="admin-cr-meta admin-cr-desktop-only-inline">{timeAgo(new Date(lead.createdAt))}</span>
-                  <svg className="admin-cr-chevron admin-cr-mobile-only-inline" width={16} height={16} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <span className="text-xs text-[var(--t3)] hidden sm:inline">{timeAgo(new Date(lead.createdAt))}</span>
+                  <svg className="w-4 h-4 text-[var(--t3)] inline sm:hidden" width={16} height={16} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
@@ -876,33 +843,33 @@ export default async function AdminDashboard() {
             ))}
           </div>
         ) : (
-          <div className="admin-cr-empty-block">
-            <p className="admin-cr-small admin-cr-small--muted">Encara no hi ha entrades</p>
-            <p className="admin-cr-meta">Les entrades apareixeran aquí</p>
+          <div className="p-4 text-center">
+            <p className="text-xs text-[var(--t3)]">Encara no hi ha entrades</p>
+            <p className="text-xs text-[var(--t3)]">Les entrades apareixeran aquí</p>
           </div>
         )}
       </Card>
 
-      <div className="admin-cr-mini-grid">
-        <div className="admin-cr-mini-card admin-cr-mini-card--violet" {...helpAttrs(ADMIN_DASHBOARD_HELP.miniCards.conversion)}>
-          <p className="admin-cr-stat-label">Conversió</p>
-          <p className="admin-cr-mini-value">{d.conversionRate}%</p>
-          <p className="admin-cr-meta">{d.wonLeads}/{d.leadsCount} entrades</p>
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-2.5">
+        <div className="ap-card p-2.5" {...helpAttrs(ADMIN_DASHBOARD_HELP.miniCards.conversion)}>
+          <p className="text-xs text-[var(--t3)]">Conversió</p>
+          <p className="text-xl font-bold text-[var(--t)] mt-0.5">{d.conversionRate}%</p>
+          <p className="text-xs text-[var(--t3)]">{d.wonLeads}/{d.leadsCount} entrades</p>
         </div>
-        <div className="admin-cr-mini-card admin-cr-mini-card--amber" {...helpAttrs(ADMIN_DASHBOARD_HELP.miniCards.testimonials)}>
-          <p className="admin-cr-stat-label">Testimonis</p>
-          <p className="admin-cr-mini-value">{d.testimonialsApproved + d.testimonialsPending}</p>
-          <p className="admin-cr-meta">{d.testimonialsPending} pendents</p>
+        <div className="ap-card p-2.5" {...helpAttrs(ADMIN_DASHBOARD_HELP.miniCards.testimonials)}>
+          <p className="text-xs text-[var(--t3)]">Testimonis</p>
+          <p className="text-xl font-bold text-[var(--t)] mt-0.5">{d.testimonialsApproved + d.testimonialsPending}</p>
+          <p className="text-xs text-[var(--t3)]">{d.testimonialsPending} pendents</p>
         </div>
-        <div className="admin-cr-mini-card admin-cr-mini-card--rose" {...helpAttrs(ADMIN_DASHBOARD_HELP.miniCards.rating)}>
-          <p className="admin-cr-stat-label">Valoració</p>
-          <p className="admin-cr-mini-value">⭐ {d.rating}</p>
-          <p className="admin-cr-meta">Mitjana</p>
+        <div className="ap-card p-2.5" {...helpAttrs(ADMIN_DASHBOARD_HELP.miniCards.rating)}>
+          <p className="text-xs text-[var(--t3)]">Valoració</p>
+          <p className="text-xl font-bold text-[var(--t)] mt-0.5">⭐ {d.rating}</p>
+          <p className="text-xs text-[var(--t3)]">Mitjana</p>
         </div>
-        <Link href="/admin/inventory" className="admin-cr-mini-card admin-cr-mini-card--cyan" {...helpAttrs(ADMIN_DASHBOARD_HELP.miniCards.inventory)}>
-          <p className="admin-cr-stat-label">Inventari</p>
-          <p className="admin-cr-mini-value">{d.inventoryAvailable}/{d.inventoryTotal}</p>
-          <p className="admin-cr-meta">
+        <Link href="/admin/inventory" className="ap-card p-2.5 block no-underline" {...helpAttrs(ADMIN_DASHBOARD_HELP.miniCards.inventory)}>
+          <p className="text-xs text-[var(--t3)]">Inventari</p>
+          <p className="text-xl font-bold text-[var(--t)] mt-0.5">{d.inventoryAvailable}/{d.inventoryTotal}</p>
+          <p className="text-xs text-[var(--t3)]">
             {d.inventoryInUse > 0 && `${d.inventoryInUse} en ús · `}
             {d.inventoryMaintenance > 0 && `${d.inventoryMaintenance} mant.`}
             {d.inventoryBroken > 0 && ` · ${d.inventoryBroken} avariat`}
@@ -911,24 +878,24 @@ export default async function AdminDashboard() {
         </Link>
       </div>
 
-      <section className="admin-cr-audit" {...helpAttrs(ADMIN_DASHBOARD_HELP.recentAudit)}>
-        <div className="admin-cr-audit-head">
-          <h3 className="admin-cr-step-title">Auditoria recent</h3>
-          <p className="admin-cr-small admin-cr-small--muted">Últimes accions d&apos;admin</p>
+      <section className="ap-card overflow-hidden" {...helpAttrs(ADMIN_DASHBOARD_HELP.recentAudit)}>
+        <div className="flex items-center justify-between gap-3 border-b border-[var(--line)] px-3 py-2.5">
+          <h3 className="text-sm font-bold text-[var(--t)]">Auditoria recent</h3>
+          <p className="text-xs text-[var(--t3)]">Últimes accions d&apos;admin</p>
         </div>
         {d.recentAdminLogs.length === 0 ? (
-          <div className="admin-cr-empty-block">Sense activitat recent</div>
+          <div className="p-4 text-center text-xs text-[var(--t3)]">Sense activitat recent</div>
         ) : (
-          <div className="admin-cr-divide-list">
+          <div className="divide-y divide-[var(--line)]">
             {d.recentAdminLogs.map((logItem) => (
-              <Link key={logItem.id} href={logItem.href} className="admin-cr-audit-row admin-cr-list-row--link">
-                <span className="admin-cr-truncate">{logItem.text}</span>
-                <span className="admin-cr-meta">{logItem.time}</span>
+              <Link key={logItem.id} href={logItem.href} className="flex items-center justify-between gap-3 px-3 py-2.5 text-xs adm-row-hover no-underline">
+                <span className="min-w-0 flex-1 truncate text-[var(--t)]">{logItem.text}</span>
+                <span className="text-xs text-[var(--t3)] shrink-0">{logItem.time}</span>
               </Link>
             ))}
           </div>
         )}
       </section>
-    </div>
+    </AdminPage>
   );
 }

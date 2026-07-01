@@ -17,7 +17,7 @@ import { prisma } from '@/lib/prisma';
 export type PartnerHub = NonNullable<Awaited<ReturnType<typeof fetchPartnerHub>>>;
 
 function round(value: number): number {
-  return Math.round(value);
+  return Math.round(value * 100) / 100;
 }
 
 export async function fetchPartnerHub(id: string) {
@@ -59,13 +59,14 @@ export async function fetchPartnerHub(id: string) {
   if (!partner) return null;
 
   // Cost que paguem al partner via línies de servei (subcontractació nova).
-  const serviceLinesAgg = await prisma.bookingServiceLine.aggregate({
+  const serviceLines = await prisma.bookingServiceLine.findMany({
     where: { collaboratorId: id },
-    _sum: { costAmount: true },
-    _count: true,
+    select: { costAmount: true, quantity: true },
   });
-  const serviceLinesPaid = round(serviceLinesAgg._sum.costAmount || 0);
-  const serviceLinesCount = serviceLinesAgg._count;
+  const serviceLinesPaid = round(
+    serviceLines.reduce((sum, line) => sum + (line.costAmount || 0) * (line.quantity || 1), 0)
+  );
+  const serviceLinesCount = serviceLines.length;
 
   const { products, members, sourcedLeads, sourcedBookings, ...core } = partner;
 

@@ -50,11 +50,15 @@ async function fetchLeadForQuote(leadId: string): Promise<LeadQuoteRow | null> {
   return rows[0] || null;
 }
 
-function parsePositiveNumber(value: string | null): number | null {
+function parsePositiveNumber(value: unknown): number | null {
   if (!value) return null;
   const num = Number(value);
   if (!Number.isFinite(num) || num <= 0) return null;
   return num;
+}
+
+function parsePackKey(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value.trim().toLowerCase() : null;
 }
 
 export async function handleLeadQuoteGet(req: NextRequest, leadId: string) {
@@ -70,7 +74,7 @@ export async function handleLeadQuoteGet(req: NextRequest, leadId: string) {
     }
 
     const { searchParams } = new URL(req.url);
-    const packKey = searchParams.get('packId')?.toLowerCase() || lead.interestedPackId?.toLowerCase() || 'default';
+    const packKey = parsePackKey(searchParams.get('packId')) || parsePackKey(lead.interestedPackId) || 'default';
     const basePack = await resolveQuotePack(packKey, lead.preferredLocale || 'ca');
     const customPrice = parsePositiveNumber(searchParams.get('customPrice'));
     const customHours = parsePositiveNumber(searchParams.get('customHours'));
@@ -114,13 +118,15 @@ export async function handleLeadQuotePost(req: NextRequest, leadId: string) {
       return NextResponse.json({ error: 'Lead no trobat' }, { status: 404 });
     }
 
-    const packKey = body.packId?.toLowerCase() || lead.interestedPackId?.toLowerCase() || 'default';
+    const packKey = parsePackKey(body.packId) || parsePackKey(lead.interestedPackId) || 'default';
     const basePack = await resolveQuotePack(packKey, lead.preferredLocale || 'ca');
+    const customPrice = parsePositiveNumber(body.customPrice);
+    const customHours = parsePositiveNumber(body.customHours);
 
     const packData = {
       ...basePack,
-      price: body.customPrice ?? basePack.price,
-      djHours: body.customHours ?? basePack.djHours,
+      price: customPrice ?? basePack.price,
+      djHours: customHours ?? basePack.djHours,
     };
 
     const quoteData = createQuoteFromLead(
@@ -150,11 +156,11 @@ export async function handleLeadQuotePost(req: NextRequest, leadId: string) {
 
     const query = new URLSearchParams();
     query.set('packId', packKey);
-    if (typeof body.customPrice === 'number' && Number.isFinite(body.customPrice) && body.customPrice > 0) {
-      query.set('customPrice', String(body.customPrice));
+    if (customPrice !== null) {
+      query.set('customPrice', String(customPrice));
     }
-    if (typeof body.customHours === 'number' && Number.isFinite(body.customHours) && body.customHours > 0) {
-      query.set('customHours', String(body.customHours));
+    if (customHours !== null) {
+      query.set('customHours', String(customHours));
     }
 
     const quoteUrl = `${baseUrl}/api/admin/leads/${leadId}/quote?${query.toString()}`;

@@ -41,13 +41,13 @@ type DonutSegment = {
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
-const accentClassMap: Record<AccentColor, string> = {
-  cyan: 'admin-ui-metric-card--cyan',
-  emerald: 'admin-ui-metric-card--emerald',
-  rose: 'admin-ui-metric-card--rose',
-  amber: 'admin-ui-metric-card--amber',
-  purple: 'admin-ui-metric-card--purple',
-  sky: 'admin-ui-metric-card--sky',
+// Canon carbó+or: les KPI del dashboard NO porten accents cromàtics decoratius
+// (cyan/rose/purple/sky trencaven el canon). Totes consumeixen `.ap-kpi` uniforme;
+// el color només apareix a la variació (up=verd, down=vermell) via admin-tone-*.
+const CHANGE_TONE: Record<'up' | 'down' | 'neutral', string> = {
+  up: 'admin-tone-text-success',
+  down: 'admin-tone-text-danger',
+  neutral: 'text-[var(--t3)]',
 };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -172,26 +172,16 @@ export function MetricCard({
   helpTitle?: string;
   helpText?: string;
 }) {
-  const changeClassMap = {
-    up: 'admin-ui-metric-change--up',
-    down: 'admin-ui-metric-change--down',
-    neutral: 'admin-ui-metric-change--neutral',
-  };
-  const accentClass = accentClassMap[accent];
+  void accent; // accent decoratiu retirat pel canon (carbó+or uniforme)
 
   return (
-    <div className={`admin-ui-metric-card ${accentClass}`} {...helpAttrs(ADMIN_ACTIONS_HELP.dashboardWidget.metricCard(helpTitle || label, helpText))}>
-      <div className="admin-ui-metric-head">
-        <div className="admin-ui-metric-copy">
-          <p className="admin-ui-metric-label">{label}</p>
-          <p className="admin-ui-metric-value">{value}</p>
-        </div>
-      </div>
-      <div className="admin-ui-metric-dot" />
+    <div className="ap-kpi ap-kpi--neutral" {...helpAttrs(ADMIN_ACTIONS_HELP.dashboardWidget.metricCard(helpTitle || label, helpText))}>
+      <span className="ap-kpi-label">{label}</span>
+      <span className="ap-kpi-value">{value}</span>
       {change && (
-        <p className={`admin-ui-metric-change ${changeClassMap[changeType || 'neutral']}`}>
+        <span className={`ap-kpi-trend ${CHANGE_TONE[changeType || 'neutral']}`}>
           {change}
-        </p>
+        </span>
       )}
     </div>
   );
@@ -213,17 +203,17 @@ export function Card({
   helpText?: string;
 }) {
   return (
-    <div className="admin-ui-card" {...helpAttrs(title ? ADMIN_ACTIONS_HELP.dashboardWidget.card(title, helpText) : undefined)}>
+    <div className="ap-card overflow-hidden" {...helpAttrs(title ? ADMIN_ACTIONS_HELP.dashboardWidget.card(title, helpText) : undefined)}>
       {(title || subtitle || action) && (
-        <div className="admin-ui-card-head">
-          <div className="admin-ui-card-head-copy">
-            {title && <h3 className="admin-ui-card-title">{title}</h3>}
-            {subtitle && <p className="admin-ui-card-subtitle">{subtitle}</p>}
+        <div className="flex items-center justify-between gap-3 border-b border-[var(--line)] px-4 py-3">
+          <div className="min-w-0 flex-1">
+            {title && <h3 className="text-sm font-bold text-[var(--t)] truncate">{title}</h3>}
+            {subtitle && <p className="mt-0.5 text-xs text-[var(--t3)] truncate">{subtitle}</p>}
           </div>
-          {action && <div className="admin-ui-card-head-action">{action}</div>}
+          {action && <div className="shrink-0">{action}</div>}
         </div>
       )}
-      <div className={`admin-ui-card-body ${noPadding ? 'admin-ui-card-body--none' : ''}`}>{children}</div>
+      <div className={noPadding ? '' : 'p-4'}>{children}</div>
     </div>
   );
 }
@@ -239,9 +229,11 @@ export function Button({
   label: string;
   helpText?: string;
 }) {
-  const className = `admin-ui-btn admin-ui-btn--${variant} admin-ui-btn--default`;
+  const variantClass = variant === 'primary' ? 'ap-btn ap-btn--primary'
+    : variant === 'secondary' ? 'ap-btn ap-btn--secondary'
+    : 'ap-btn';
   return (
-    <button type="button" className={className} {...helpAttrs(ADMIN_ACTIONS_HELP.dashboardWidget.button(label, helpText))}>
+    <button type="button" className={variantClass} {...helpAttrs(ADMIN_ACTIONS_HELP.dashboardWidget.button(label, helpText))}>
       {icon && <span>{icon}</span>}
       <span>{label}</span>
     </button>

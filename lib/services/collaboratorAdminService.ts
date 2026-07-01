@@ -20,6 +20,21 @@ function normalizePricingModel(value?: string | null): CollaboratorPricingModel 
   return value === 'NET_PLUS_COMMISSION' ? 'NET_PLUS_COMMISSION' : 'DISCOUNT';
 }
 
+function roundMoney(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function sanitizeCommissionPct(value: CollaboratorInput['commissionPct']): number {
+  const amount = Number(value) || 0;
+  return amount > 0 ? roundMoney(amount) : 0;
+}
+
+function sanitizeCostPerHour(value: CollaboratorInput['costPerHour']): number | null {
+  if (value == null || value === '') return null;
+  const amount = Number(value);
+  return Number.isFinite(amount) && amount >= 0 ? roundMoney(amount) : null;
+}
+
 export async function listAdminCollaborators() {
   const collaborators = await prisma.collaborator.findMany({
     orderBy: { createdAt: 'desc' },
@@ -49,7 +64,7 @@ export async function listAdminCollaborators() {
       total: collaborators.length,
       active: collaborators.filter((collaborator) => collaborator.isActive).length,
       totalProducts: allProducts.length,
-      catalogValue: Math.round(catalogValue),
+      catalogValue: roundMoney(catalogValue),
       totalSourcedLeads,
       totalSourcedBookings,
     },
@@ -69,9 +84,9 @@ export async function createAdminCollaborator(input: CollaboratorInput) {
       phone: input.phone?.trim() || null,
       specialty: input.specialty?.trim() || null,
       roles: Array.isArray(input.roles) && input.roles.length > 0 ? input.roles : ['PROVIDER'],
-      commissionPct: Number(input.commissionPct) || 0,
+      commissionPct: sanitizeCommissionPct(input.commissionPct),
       pricingModel: normalizePricingModel(input.pricingModel),
-      costPerHour: input.costPerHour != null ? Number(input.costPerHour) : null,
+      costPerHour: sanitizeCostPerHour(input.costPerHour),
       notes: input.notes?.trim() || null,
     },
   });
@@ -101,9 +116,9 @@ export async function updateAdminCollaborator(id: string, input: CollaboratorInp
       ...(input.phone !== undefined && { phone: input.phone?.trim() || null }),
       ...(input.specialty !== undefined && { specialty: input.specialty?.trim() || null }),
       ...(input.roles !== undefined && { roles: Array.isArray(input.roles) && input.roles.length > 0 ? input.roles : [] }),
-      ...(input.commissionPct !== undefined && { commissionPct: Number(input.commissionPct) }),
+      ...(input.commissionPct !== undefined && { commissionPct: sanitizeCommissionPct(input.commissionPct) }),
       ...(input.pricingModel !== undefined && { pricingModel: normalizePricingModel(input.pricingModel) }),
-      ...(input.costPerHour !== undefined && { costPerHour: input.costPerHour != null ? Number(input.costPerHour) : null }),
+      ...(input.costPerHour !== undefined && { costPerHour: sanitizeCostPerHour(input.costPerHour) }),
       ...(input.notes !== undefined && { notes: input.notes?.trim() || null }),
       ...(input.isActive !== undefined && { isActive: Boolean(input.isActive) }),
       ...(input.isFavorite !== undefined && { isFavorite: Boolean(input.isFavorite) }),

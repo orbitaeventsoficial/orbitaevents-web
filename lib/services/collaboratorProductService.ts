@@ -66,6 +66,20 @@ function clean(value?: string | null): string | null {
   return trimmed ? trimmed : null;
 }
 
+function roundMoney(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function parseNonNegativeMoney(value: number | string | null | undefined): number | null {
+  const amount = Number(value);
+  return Number.isFinite(amount) && amount >= 0 ? roundMoney(amount) : null;
+}
+
+function sanitizeSortOrder(value: number | string | null | undefined): number {
+  const amount = Number(value) || 0;
+  return Math.max(0, Math.round(amount));
+}
+
 function splitIncludes(value?: string | null): string[] {
   return (value || '')
     .split(/·|\n|;|,/)
@@ -271,12 +285,12 @@ export async function createCollaboratorProduct(collaboratorId: string, input: C
   if (!input.name?.trim()) {
     return { status: 400, body: { error: 'El nom del producte és obligatori' } };
   }
-  const costPrice = Number(input.costPrice);
-  const sellPrice = Number(input.sellPrice);
-  if (!Number.isFinite(costPrice) || costPrice < 0) {
+  const costPrice = parseNonNegativeMoney(input.costPrice);
+  const sellPrice = parseNonNegativeMoney(input.sellPrice);
+  if (costPrice == null) {
     return { status: 400, body: { error: 'El cost ha de ser un número positiu' } };
   }
-  if (!Number.isFinite(sellPrice) || sellPrice < 0) {
+  if (sellPrice == null) {
     return { status: 400, body: { error: 'El PVP ha de ser un número positiu' } };
   }
 
@@ -297,7 +311,7 @@ export async function createCollaboratorProduct(collaboratorId: string, input: C
       sellPrice,
       imageUrl: clean(input.imageUrl),
       includes: clean(input.includes),
-      sortOrder: Number(input.sortOrder) || 0,
+      sortOrder: sanitizeSortOrder(input.sortOrder),
     },
   });
 
@@ -306,14 +320,12 @@ export async function createCollaboratorProduct(collaboratorId: string, input: C
 
 export async function updateCollaboratorProduct(productId: string, input: CollaboratorProductInput) {
   if (input.costPrice !== undefined && input.costPrice !== null && input.costPrice !== '') {
-    const costPrice = Number(input.costPrice);
-    if (!Number.isFinite(costPrice) || costPrice < 0) {
+    if (parseNonNegativeMoney(input.costPrice) == null) {
       return { status: 400, body: { error: 'El cost ha de ser un número positiu' } };
     }
   }
   if (input.sellPrice !== undefined && input.sellPrice !== null && input.sellPrice !== '') {
-    const sellPrice = Number(input.sellPrice);
-    if (!Number.isFinite(sellPrice) || sellPrice < 0) {
+    if (parseNonNegativeMoney(input.sellPrice) == null) {
       return { status: 400, body: { error: 'El PVP ha de ser un número positiu' } };
     }
   }
@@ -326,11 +338,11 @@ export async function updateCollaboratorProduct(productId: string, input: Collab
       ...(input.category !== undefined && { category: clean(input.category) }),
       ...(input.crew !== undefined && { crew: clean(input.crew) }),
       ...(input.durationLabel !== undefined && { durationLabel: clean(input.durationLabel) }),
-      ...(input.costPrice !== undefined && { costPrice: Number(input.costPrice) }),
-      ...(input.sellPrice !== undefined && { sellPrice: Number(input.sellPrice) }),
+      ...(input.costPrice !== undefined && { costPrice: parseNonNegativeMoney(input.costPrice) ?? 0 }),
+      ...(input.sellPrice !== undefined && { sellPrice: parseNonNegativeMoney(input.sellPrice) ?? 0 }),
       ...(input.imageUrl !== undefined && { imageUrl: clean(input.imageUrl) }),
       ...(input.includes !== undefined && { includes: clean(input.includes) }),
-      ...(input.sortOrder !== undefined && { sortOrder: Number(input.sortOrder) || 0 }),
+      ...(input.sortOrder !== undefined && { sortOrder: sanitizeSortOrder(input.sortOrder) }),
       ...(input.isActive !== undefined && { isActive: Boolean(input.isActive) }),
     },
   });

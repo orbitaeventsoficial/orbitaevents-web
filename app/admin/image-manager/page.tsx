@@ -191,8 +191,8 @@ export default function ImageManagerPage() {
             />
           </div>
 
-          {error && <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</div>}
-          {success && <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">{success}</div>}
+          {error && <div className="rounded-2xl border admin-tone-border-danger admin-tone-bg-danger px-4 py-3 text-sm admin-tone-text-danger">{error}</div>}
+          {success && <div className="rounded-2xl border admin-tone-border-success admin-tone-bg-success px-4 py-3 text-sm admin-tone-text-success">{success}</div>}
 
           {loading ? (
             <div className="rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-6 text-sm text-[var(--t2)]">Carregant placements...</div>

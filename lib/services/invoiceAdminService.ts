@@ -5,9 +5,14 @@ const DEFAULT_INVOICES_PAGE = 1;
 const DEFAULT_INVOICES_LIMIT = 50;
 const MAX_INVOICES_LIMIT = 200;
 
+function normalizePositiveInteger(value: unknown, fallback: number): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback;
+}
+
 export async function listAdminInvoices(input?: { page?: number; limit?: number }) {
-  const page = Math.max(1, Number(input?.page) || DEFAULT_INVOICES_PAGE);
-  const limit = Math.min(MAX_INVOICES_LIMIT, Math.max(1, Number(input?.limit) || DEFAULT_INVOICES_LIMIT));
+  const page = normalizePositiveInteger(input?.page, DEFAULT_INVOICES_PAGE);
+  const limit = Math.min(MAX_INVOICES_LIMIT, normalizePositiveInteger(input?.limit, DEFAULT_INVOICES_LIMIT));
 
   const [invoices, total] = await Promise.all([
     prisma.invoice.findMany({

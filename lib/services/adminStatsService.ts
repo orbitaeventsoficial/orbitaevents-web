@@ -8,6 +8,11 @@ function getStatDefinition(key: string) {
   return ADMIN_STATS_DEFINITIONS.find((stat) => stat.key === key);
 }
 
+function parseStatFallback(value: unknown): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
+
 async function calculateStats() {
   try {
     const eventsCount = await prisma.booking.count({
@@ -73,7 +78,7 @@ export async function listAdminStats() {
     },
   });
 
-  const settingsMap = new Map(settings.map((setting) => [setting.key, parseFloat(setting.value) || 0]));
+  const settingsMap = new Map(settings.map((setting) => [setting.key, parseStatFallback(setting.value)]));
 
   return ADMIN_STATS_DEFINITIONS.map((stat) => {
     const calculated = calculatedStats[stat.key];
@@ -114,7 +119,7 @@ export async function updateAdminStatFallback(input: {
     return { ok: true as const, message: 'Estadística reseteada al valor calculado' };
   }
 
-  if (typeof input.fallback !== 'number' || input.fallback < 0) {
+  if (typeof input.fallback !== 'number' || !Number.isFinite(input.fallback) || input.fallback < 0) {
     throw new Error('El fallback ha de ser un número positiu');
   }
 

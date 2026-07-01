@@ -1,5 +1,6 @@
 import { Prisma, ProposalStatus } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
+import { PROPOSAL_FINANCIAL_FIELDS, roundMoney } from '@/lib/constants/pricing';
 
 type ProposalListInput = {
   customerId?: string;
@@ -45,9 +46,25 @@ type ProposalUpdateInput = {
   acceptedAt?: string | null;
 };
 
+type ProposalFinancialField = (typeof PROPOSAL_FINANCIAL_FIELDS)[number];
+
+type ProposalFinancialInput = Record<ProposalFinancialField, number>;
+
+export type ProposalFinancialConsistencyIssue = {
+  field: 'vatAmount' | 'total';
+  message: string;
+};
+
 const DEFAULT_PROPOSALS_PAGE = 1;
 const DEFAULT_PROPOSALS_LIMIT = 50;
 const MAX_PROPOSALS_LIMIT = 200;
+
+export class ProposalFinancialConsistencyError extends Error {
+  constructor(public readonly issues: ProposalFinancialConsistencyIssue[]) {
+    super('Proposta econòmicament incoherent');
+    this.name = 'ProposalFinancialConsistencyError';
+  }
+}
 
 function normalizeProposalSnapshot(
   snapshot: Record<string, unknown> | undefined,
@@ -55,6 +72,12 @@ function normalizeProposalSnapshot(
   if (snapshot === undefined) return undefined;
   return JSON.parse(JSON.stringify(snapshot)) as Prisma.InputJsonValue;
 }
+
+function normalizePositiveInteger(value: unknown, fallback: number): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback;
+}
+
 async function generateProposalReference(): Promise<string> {
   const year = new Date().getFullYear();
   const prefix = `PROP-${year}-`;
@@ -68,9 +91,66 @@ async function generateProposalReference(): Promise<string> {
   return `${prefix}${String(next).padStart(4, '0')}`;
 }
 
+function isMoneyClose(actual: number, expected: number): boolean {
+  return Math.abs(roundMoney(actual) - roundMoney(expected)) <= 0.01;
+}
+
+export function getProposalFinancialConsistencyIssues(
+  data: ProposalFinancialInput,
+): ProposalFinancialConsistencyIssue[] {
+  const taxableBase = Math.max(0, roundMoney(data.subtotal - data.discount));
+  const expectedVatAmount = roundMoney(taxableBase * (data.vatRate / 100));
+  const expectedTotal = roundMoney(taxableBase + expectedVatAmount);
+  const issues: ProposalFinancialConsistencyIssue[] = [];
+
+  if (!isMoneyClose(data.vatAmount, expectedVatAmount)) {
+    issues.push({
+      field: 'vatAmount',
+      message: 'IVA incoherent amb subtotal, descompte i vatRate',
+    });
+  }
+  if (!isMoneyClose(data.total, expectedTotal)) {
+    issues.push({
+      field: 'total',
+      message: 'Total incoherent amb subtotal, descompte i IVA',
+    });
+  }
+
+  return issues;
+}
+
+function assertProposalFinancialConsistency(data: ProposalFinancialInput): void {
+  const issues = getProposalFinancialConsistencyIssues(data);
+  if (issues.length > 0) {
+    throw new ProposalFinancialConsistencyError(issues);
+  }
+}
+
+function assertCompleteFinancialUpdate(data: ProposalUpdateInput): void {
+  const presentFinancialFields = PROPOSAL_FINANCIAL_FIELDS.filter((field) => data[field] !== undefined);
+  if (presentFinancialFields.length === 0) return;
+
+  if (presentFinancialFields.length !== PROPOSAL_FINANCIAL_FIELDS.length) {
+    throw new ProposalFinancialConsistencyError([
+      {
+        field: 'total',
+        message: 'Els camps econòmics del pressupost s’han d’actualitzar junts',
+      },
+    ]);
+  }
+
+  assertProposalFinancialConsistency({
+    subtotal: data.subtotal!,
+    discount: data.discount!,
+    vatRate: data.vatRate!,
+    vatAmount: data.vatAmount!,
+    total: data.total!,
+  });
+}
+
 export async function listAdminProposals(input: ProposalListInput) {
-  const page = Math.max(1, Number(input.page) || DEFAULT_PROPOSALS_PAGE);
-  const limit = Math.min(MAX_PROPOSALS_LIMIT, Math.max(1, Number(input.limit) || DEFAULT_PROPOSALS_LIMIT));
+  const page = normalizePositiveInteger(input.page, DEFAULT_PROPOSALS_PAGE);
+  const limit = Math.min(MAX_PROPOSALS_LIMIT, normalizePositiveInteger(input.limit, DEFAULT_PROPOSALS_LIMIT));
   const where = {
     ...(input.customerId ? { customerId: input.customerId } : {}),
     ...(input.leadId ? { leadId: input.leadId } : {}),
@@ -106,6 +186,8 @@ export async function listAdminProposals(input: ProposalListInput) {
 }
 
 export async function createAdminProposal(data: ProposalCreateInput) {
+  assertProposalFinancialConsistency(data);
+
   const reference = await generateProposalReference();
   const customer = data.customerId
     ? await prisma.customer.findUnique({
@@ -160,6 +242,8 @@ export async function getAdminProposalById(id: string) {
 }
 
 export async function updateAdminProposal(id: string, data: ProposalUpdateInput) {
+  assertCompleteFinancialUpdate(data);
+
   const proposal = await prisma.proposal.update({
     where: { id },
     data: {

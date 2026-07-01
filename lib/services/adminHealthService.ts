@@ -134,6 +134,11 @@ function parseIsoDate(value?: string | null): Date | null {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+function sanitizeAlertCount(value?: string | null): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : 0;
+}
+
 function addDays(date: Date, days: number): Date {
   const next = new Date(date);
   next.setDate(next.getDate() + days);
@@ -456,7 +461,7 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
     });
   }
 
-  const systemAutofixFailures = Number(settings['alerts.system.autofixFailureCount'] || '0') || 0;
+  const systemAutofixFailures = sanitizeAlertCount(settings['alerts.system.autofixFailureCount']);
   if (systemAutofixFailures > 0) {
     systemItems.push({
       id: 'system-autofix-open',
@@ -471,7 +476,7 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
     });
   }
 
-  const financeAutofixFailures = Number(settings['alerts.finance.autofixFailureCount'] || '0') || 0;
+  const financeAutofixFailures = sanitizeAlertCount(settings['alerts.finance.autofixFailureCount']);
   if (financeAutofixFailures > 0) {
     financeItems.push({
       id: 'finance-autofix-open',
@@ -914,7 +919,6 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
     generatedAt: new Date().toISOString(),
   };
 }
-
 
 
 
