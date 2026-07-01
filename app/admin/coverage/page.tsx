@@ -143,22 +143,22 @@ export default function CoveragePage() {
     >
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <div className="text-xs font-medium uppercase">Total Ciutats</div>
           <div className="text-3xl font-bold mt-2">{areas.length}</div>
         </div>
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <div className="text-xs font-medium uppercase">Actives</div>
           <div className="text-3xl font-bold mt-2">{activeAreas}</div>
         </div>
-        <div className="rounded-2xl border admin-card-glass p-4">
+        <div className="ap-card p-4">
           <div className="text-xs font-medium uppercase">Províncies</div>
           <div className="text-3xl font-bold mt-2">{provinces.length}</div>
         </div>
       </div>
 
       {/* Add Area Form */}
-      <div className="rounded-2xl border admin-card-glass p-6">
+      <div className="ap-card p-6">
         <h2 className="ap-h2 mb-4">Afegir Ciutat</h2>
         <div className="flex gap-3">
           <input
@@ -194,7 +194,7 @@ export default function CoveragePage() {
       {/* Areas by Province */}
       <div className="space-y-4">
         {provinces.map(province => (
-          <div key={province} className="rounded-2xl border admin-card-glass p-6">
+          <div key={province} className="ap-card p-6">
             <h3 className="font-semibold mb-3">{province}</h3>
             <div className="space-y-2">
               {areas
@@ -202,7 +202,7 @@ export default function CoveragePage() {
                 .map(area => (
                   <div
                     key={area.city}
-                    className="border rounded-xl p-3 flex items-center justify-between"
+                    className="ap-card p-3 flex items-center justify-between"
                   >
                     <span className={`font-medium ${area.enabled ? 'text-[var(--t)]' : 'text-[var(--t3)]'}`}>
                       {area.city}
@@ -211,18 +211,14 @@ export default function CoveragePage() {
                       <button
                         onClick={() => toggleArea(area.city, !area.enabled)}
                         type="button"
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          area.enabled
-                            ? 'admin-tone-soft-success'
-                            : 'bg-[var(--raised)] text-[var(--t3)]'
-                        }`}
+                        className={`ap-btn ap-btn--xs `}
                       >
                         {area.enabled ? '✓ Activa' : '✕ Desactivada'}
                       </button>
                       <button
                         onClick={() => removeArea(area.city)}
                         type="button"
-                        className="px-3 py-1 rounded-full text-xs font-medium transition-colors"
+                        className="ap-btn ap-btn--xs"
                       >
                         Eliminar
                       </button>
