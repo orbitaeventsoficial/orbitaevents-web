@@ -352,22 +352,22 @@ export default async function CatalogPage({
           {activeTab === 'pricing' && (
             <>
               <div className="sm:col-span-2 mt-1 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <article className="rounded-xl border px-4 py-3">
+                <article className="ap-card px-4 py-3">
                   <p className="text-xs font-semibold uppercase tracking-wide">Sa</p>
                   <p className="mt-1 text-2xl font-bold">{greenCount}</p>
                   <p className="text-xs">Marge &gt;= objectiu ({formatPct(targetMarginPct)})</p>
                 </article>
-                <article className="rounded-xl border px-4 py-3">
+                <article className="ap-card px-4 py-3">
                   <p className="text-xs font-semibold uppercase tracking-wide">Vigilar</p>
                   <p className="mt-1 text-2xl font-bold">{amberCount}</p>
                   <p className="text-xs">Marge proper al límit</p>
                 </article>
-                <article className="rounded-xl border px-4 py-3">
+                <article className="ap-card px-4 py-3">
                   <p className="text-xs font-semibold uppercase tracking-wide">Crític</p>
                   <p className="mt-1 text-2xl font-bold">{redCount}</p>
                   <p className="text-xs">Requereix pujar preu o baixar cost</p>
                 </article>
-                <article className="rounded-xl border px-4 py-3">
+                <article className="ap-card px-4 py-3">
                   <p className="text-xs font-semibold uppercase tracking-wide">Marge mitjà</p>
                   <p className="mt-1 text-2xl font-bold">{formatPct(avgMargin)}</p>
                   <p className="text-xs">Objectiu global: {formatPct(targetMarginPct)}</p>

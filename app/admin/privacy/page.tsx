@@ -298,7 +298,7 @@ export default function AdminPrivacyPage() {
 
       {/* Action message */}
       {actionMsg && (
-        <div className="rounded-xl border px-4 py-2 text-sm">
+        <div className="ap-card px-4 py-2 text-sm">
           {actionMsg}
         </div>
       )}

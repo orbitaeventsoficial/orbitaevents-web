@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1323 — 2026-07-01 — claude (FET)
+**Homogeneïtat: 7 contenidors px- restants → .ap-card.**
+- 7 <div> rounded border px- (string simple) → .ap-card (calendario/catalog/privacy). Els 15 restants són BOTONS/TABS (onClick/estat) → .ap-btn/.ap-tab, no card; deixats correctament.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1323`; el següent canvi real ha de ser `#1324`.
+- Validació tècnica: tsc 0; validate:core.
+- Validació funcional: captura catalog.
+- Validació humana/UX: contenidors homogenis.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1321 — 2026-07-01 — codex (FET)
 **Calendari: leads recuperats, dates estrictes i LOST simbòlic.**
 - Dades reals recuperades a BD: Alba Orna l'Aldosa → `2026-09-05`, Alba Orna Aravell → `2026-09-26`, David/Arancha → `2026-09-26`; es deixa traça a `adminLog`.

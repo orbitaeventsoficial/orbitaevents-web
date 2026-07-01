@@ -1,3 +1,20 @@
+## 2026-07-01 — Homogeneïtat: 7 contenidors px- restants → .ap-card (Canvi #1323, claude)
+
+### Què s'ha fet
+- 7 contenidors `<div>` amb `rounded border px-N py-N` (className string simple, no botó) → `.ap-card` a calendario/catalog/privacy.
+- TROBALLA: els 15 restants amb aquest patró són BOTONS/TABS (cuadrant, faq, EditPackForm tabs, inventory editor) amb onClick/transition/estat actiu → NO són contenidors, van a .ap-btn/.ap-tab (criteri diferent). Es deixen per no confondre'ls amb card. L'agent va fer bé d'excloure'ls.
+
+### Validació
+- Validació tècnica: tsc 0; validate:core.
+- Validació funcional: captura catalog coherent.
+- Validació humana/UX: contenidors homogenis; botons/tabs preservats.
+
+### Coordinació
+Counter → 1323. Homogeneïtat de contenidors quasi completa (200+7). Restants = botons/tabs (patró diferent).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-01 — Homogeneïtat: 177 contenidors 'border pelat' → .ap-card (58 fitxers) (Canvi #1322, claude+agent)
 
 ### Context

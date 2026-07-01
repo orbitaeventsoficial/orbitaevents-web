@@ -789,7 +789,7 @@ export default function CalendarMonthClient() {
                 <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
                   {selectedDayData.payload?.reservas?.length ? (
                     selectedDayData.payload.reservas.map((r) => (
-                      <div key={r.id} className="rounded-xl border px-3 py-2.5 transition-all">
+                      <div key={r.id} className="ap-card px-3 py-2.5 transition-all">
                         <div className="flex items-center justify-between gap-2">
                           <div className="font-medium text-sm">{r.clientName ?? 'Client sense nom'}</div>
                           {r.estado && (
@@ -910,7 +910,7 @@ export default function CalendarMonthClient() {
                 <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
                   {selectedDayData.payload?.bloqueos?.length ? (
                     selectedDayData.payload.bloqueos.map((b) => (
-                      <div key={b.id} className="rounded-xl border px-3 py-2.5">
+                      <div key={b.id} className="ap-card px-3 py-2.5">
                         <div className="flex items-center justify-between gap-2">
                           <div className="font-medium text-sm">Bloqueig</div>
                           <button type="button" onClick={() => unblockDay(b.fecha.slice(0, 10))} className="rounded-lg border px-2 py-0.5 text-xs font-medium transition-colors admin-tone-idle">
