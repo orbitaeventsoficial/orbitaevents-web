@@ -1,3 +1,25 @@
+## 2026-07-01 — Consolidació CSS: booking-detail.css ELIMINAT (bd-/bk- → .ap-*) (Canvi #1316, claude+agent)
+
+### Context
+Criteri únic del propietari: zero sistemes propis, tot .ap-* que mira a Studio. Nova directiva: «dona igual que es modifiqui l'aspecte, ja es refarà» → simplificació agressiva a genèrics.
+
+### Què s'ha fet
+- `booking-detail.css` (324L) ESBORRAT + 3 imports fora. 34 classes bd-*/bk- → GENÈRICS .ap-* (cap classe nova):
+  - bk-table-* → .ap-table-*; bk-mobile-card → .ap-card; bk-empty-state → .ap-empty; bk-stats-bar → .ap-detail-stats; bk-detail-bar → .ap-detail-bar; bk-payment-filter → .ap-inline-alert; bk-pipeline-shift-btn → .ap-btn--xs.
+  - bd-total-editor → .ap-input/.ap-badge; bd-gallery-* → .ap-btn + admin-tone; bd-questionnaire-* → Tailwind+tokens.
+- Funcionalitat preservada (galeria drag/share/upload, qüestionari, taula, pipeline, editor total, semàfor pagament); ASPECTE pot variar cap al canònic estàndard (es refarà).
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0; check-admin-canon 0 P1.
+- Validació funcional: 0 bd-/bk- a tot admin; imports fora.
+- Validació humana/UX: booking hipersemblant; aspecte canònic estàndard.
+
+### Coordinació
+Counter → 1316. CSS admin: control-room + booking-detail fora. Codex al front públic en paral·lel (respecta repartiment). Queden admin-shell/admin-theme/leads-design.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-01 — Consolidació CSS: control-room.css ELIMINAT (dels 9 CSS a 8) (Canvi #1315, claude+agent)
 
 ### Què s'ha fet
@@ -18,20 +40,22 @@ Counter → 1315. CSS admin: 5→4 (control-room fora). Queden admin-shell/admin
 - Treballant per: `claude`
 - Tancat per: `claude`
 
-## 2026-07-01 — Front públic: capçaleres i estats legals passen a gramàtica canònica (Canvi #1314, codex)
+## 2026-07-01 — Front públic: capçaleres, portal i estats passen a gramàtica canònica (Canvi #1314, codex)
 
 ### Context
-El propietari detecta que els headers visibles no semblen del mateix sistema i pregunta què passa amb "el que no es veu". Segon tall de Codex sobre front públic: convertir el patró de capçalera i estats interns senzills en una peça compartida i tokens públics, sense tocar CSS admin core ni temàtiques aprovades.
+El propietari detecta que els headers visibles no semblen del mateix sistema i pregunta què passa amb "el que no es veu". Segon tall de Codex sobre front públic: convertir patrons repetits de capçalera, subcapçalera de portal i estats interns en peces compartides i tokens públics, sense tocar CSS admin core ni temàtiques aprovades.
 
 ### Què s'ha fet
-- `app/components/public/PublicPageHeader.tsx`: nou component canònic per a capçaleres públiques simples, amb títol, descripció, eyebrow opcional, alineació i tokens públics.
+- `app/components/public/PublicPageHeader.tsx`: nou component canònic per a capçaleres públiques simples, amb títol, descripció, eyebrow opcional, alineació i espaiat tancat (`default`/`compact`/`none`), sense `className` arbitrari.
+- `app/components/public/ClientPortalPageHeader.tsx` + `lib/constants/clientPortalTones.ts`: subcapçalera canònica del portal client i font única de tons success/warning/danger.
 - Migrades a `PublicPageHeader`: disponibilitat, reservar, reserva confirmada, gràcies, legals (`terminos`, `privacidad`, `cookies`, `aviso-legal`) i portal de privacitat.
 - `disponibilidad`, `reservar`, `reserva-confirmada`, `gracias`, `legal/privacidad` i `privacitat`: violetes/roses/blaus/verds/vermells/ambres crus dels headers, CTAs i estats de feedback passen a `--oe-gold`, `--oe-green`, `--oe-amber`, `--oe-orange`, `--grad-gold` i `color-mix(...)`.
+- Portal client: invoice, contract, payments, questionnaire, timeline, gallery i sign passen a `ClientPortalPageHeader`; payment-success, Bizum, signatura, qüestionari i timeline passen a `portalTones`/tokens públics.
 
 ### Validació
 - Validació tècnica: `npx tsc --noEmit --pretty false` OK.
-- Validació funcional: les pàgines mantenen el mateix contingut i flux, però comparteixen una capçalera pública i estats visuals tokenitzats.
-- Validació humana/UX: els headers simples deixen de tenir una gramàtica diferent per pàgina i els estats interns del portal/legal ja no introdueixen una paleta pròpia invisible.
+- Validació funcional: les pàgines mantenen el mateix contingut i flux, però comparteixen capçaleres públiques, subcapçaleres de portal i estats visuals tokenitzats.
+- Validació humana/UX: els headers simples i el portal deixen de tenir una gramàtica diferent per pàgina i els estats interns ja no introdueixen una paleta pròpia invisible.
 
 ### Coordinació
 Counter → 1314. Codex continua només front públic; Claude manté propietat de CSS admin core, espaiat, dashboard i consolidació admin.

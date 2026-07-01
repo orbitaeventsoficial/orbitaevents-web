@@ -179,7 +179,7 @@ export default function BookingPipelineView() {
                   column?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
                 }}
                 className={`h-2.5 rounded-full transition-all ${
-                  index === activeColumnIndex ? 'w-6 bg-[var(--admin-accent)]' : 'w-2.5 bk-pipeline-dot--inactive'
+                  index === activeColumnIndex ? 'w-6 bg-[var(--admin-accent)]' : 'w-2.5 bg-[var(--line2)]'
                 }`}
                 aria-label={help.title}
                 aria-pressed={index === activeColumnIndex}
@@ -264,7 +264,7 @@ function BookingCard({
                 type="button"
                 onClick={() => onMoveStatus(booking.id, COLUMNS_DEF[statusIndex - 1].status)}
                 disabled={isUpdating}
-                className="bk-pipeline-shift-btn disabled:opacity-50"
+                className="ap-btn ap-btn--xs"
                 title={help.title}
                 aria-label={help.title}
                 {...helpAttrs(help)}
@@ -280,7 +280,7 @@ function BookingCard({
                 type="button"
                 onClick={() => onMoveStatus(booking.id, COLUMNS_DEF[statusIndex + 1].status)}
                 disabled={isUpdating}
-                className="bk-pipeline-shift-btn disabled:opacity-50"
+                className="ap-btn ap-btn--xs"
                 title={help.title}
                 aria-label={help.title}
                 {...helpAttrs(help)}

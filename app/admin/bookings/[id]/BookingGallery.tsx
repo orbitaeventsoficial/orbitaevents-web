@@ -176,7 +176,7 @@ export default function BookingGallery({ bookingId }: Props) {
   if (loading) {
     return (
       <div className="animate-pulse space-y-3">
-        <div className="bd-gallery-skeleton-bar" />
+        <div className="h-6 w-1/4 rounded-lg admin-tone-bg-neutral" />
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {[1, 2, 3, 4].map((i) => <div key={i} className="aspect-square rounded-xl admin-tone-bg-neutral" />)}
         </div>
@@ -202,7 +202,7 @@ export default function BookingGallery({ bookingId }: Props) {
       <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => e.target.files && handleUpload(e.target.files)} />
 
       {photos.length === 0 && (
-        <div onDrop={handleDrop} onDragOver={(e) => e.preventDefault()} className="bd-gallery-dropzone" onClick={() => fileRef.current?.click()} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && fileRef.current?.click()} {...helpAttrs(ADMIN_BOOKING_HELP.gallery.dropzone)}>
+        <div onDrop={handleDrop} onDragOver={(e) => e.preventDefault()} className="cursor-pointer rounded-2xl border-2 border-dashed border-[var(--line2)] p-12 text-center transition-colors hover:border-[var(--line)]" onClick={() => fileRef.current?.click()} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && fileRef.current?.click()} {...helpAttrs(ADMIN_BOOKING_HELP.gallery.dropzone)}>
           <span className="text-4xl block mb-2">📷</span>
           <p className="text-sm">Arrossega fotos aquí o clica per pujar</p>
           <p className="text-xs opacity-50 mt-1">JPG, PNG, WebP · Compressió automàtica a WebP</p>
@@ -215,13 +215,13 @@ export default function BookingGallery({ bookingId }: Props) {
             <div key={photo.id} className={`group relative aspect-square rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${selectedId === photo.id ? 'admin-tone-border-info admin-tone-bg-info' : 'admin-tone-border-neutral hover:admin-tone-border-slate'}`} onClick={() => setSelectedId(selectedId === photo.id ? null : photo.id)} {...helpAttrs(ADMIN_BOOKING_HELP.gallery.photo)}>
               <Image src={photo.photoUrl} alt={photo.caption || 'Foto event'} fill className="object-cover" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" />
               <div className="absolute top-2 left-2 flex gap-1">{photo.isPortal && <span className="ap-badge ap-badge--info text-xs">Portal</span>}{photo.isPortfolio && <span className="ap-badge text-xs">Portfolio</span>}</div>
-              <button type="button" onClick={(e) => { e.stopPropagation(); deletePhoto(photo.id); }} className="bd-gallery-delete-btn" title={ADMIN_BOOKING_HELP.gallery.delete.title} aria-label={ADMIN_BOOKING_HELP.gallery.delete.title} {...helpAttrs(ADMIN_BOOKING_HELP.gallery.delete)}>
+              <button type="button" onClick={(e) => { e.stopPropagation(); deletePhoto(photo.id); }} className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full admin-tone-bg-danger text-[var(--o-admin-light)] opacity-0 transition-opacity group-hover:opacity-100 hover:brightness-110" title={ADMIN_BOOKING_HELP.gallery.delete.title} aria-label={ADMIN_BOOKING_HELP.gallery.delete.title} {...helpAttrs(ADMIN_BOOKING_HELP.gallery.delete)}>
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
           ))}
-          <div onClick={() => fileRef.current?.click()} className="bd-gallery-add-tile" role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && fileRef.current?.click()} {...helpAttrs(ADMIN_BOOKING_HELP.gallery.upload)}>
-            <span className="bd-gallery-add-symbol">+</span>
+          <div onClick={() => fileRef.current?.click()} className="flex aspect-square cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-[var(--line2)] transition-colors hover:border-[var(--line)]" role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && fileRef.current?.click()} {...helpAttrs(ADMIN_BOOKING_HELP.gallery.upload)}>
+            <span className="text-2xl text-[var(--t3)]">+</span>
           </div>
         </div>
       )}

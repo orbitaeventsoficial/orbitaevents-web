@@ -56,9 +56,9 @@ export default function BookingTotalEditor({
   }
 
   return (
-    <span className="bd-total-editor">
+    <span className="inline-flex flex-col gap-1">
       {editing ? (
-        <span className="bd-total-editor__form">
+        <span className="inline-flex items-center gap-1.5">
           <input
             type="number"
             min={0}
@@ -67,7 +67,7 @@ export default function BookingTotalEditor({
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setEditing(false); }}
             autoFocus
-            className="bd-total-editor__input"
+            className="ap-input w-[6.25rem] font-bold text-[var(--gold)]"
           />
           <span className="text-xs text-[var(--t3)]">€</span>
           <button onClick={save} disabled={saving} className="ap-btn ap-btn--primary ap-btn--xs">✓</button>
@@ -76,7 +76,7 @@ export default function BookingTotalEditor({
       ) : (
         <button
           onClick={() => setEditing(true)}
-          className="bd-total-editor__trigger"
+          className="cursor-pointer border-0 border-b border-dashed border-[var(--gold)] bg-transparent p-0 font-bold text-[var(--gold)] hover:opacity-80"
           title="Clic per editar el total"
         >
           {formatCurrency(displayTotal)}
@@ -85,12 +85,12 @@ export default function BookingTotalEditor({
 
       {/* Alerta marge negatiu */}
       {marginAlert && costFloor != null && (
-        <span className="bd-total-editor__alert">
+        <span className="ap-badge ap-badge--danger">
           ⚠ Cost estimat {formatCurrency(costFloor)} · marge {formatCurrency(displayTotal - costFloor)}
           {suggestedPrice != null && (
             <button
               onClick={() => { setValue(String(suggestedPrice)); setEditing(true); }}
-              className="bd-total-editor__suggestion"
+              className="font-bold text-[var(--gold)] hover:text-[var(--t)]"
               title={`Preu suggerit amb marge ${TARGET_MARGIN * 100}%`}
             >
               → {formatCurrency(suggestedPrice)}?

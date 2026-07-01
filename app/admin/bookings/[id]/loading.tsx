@@ -1,5 +1,3 @@
-import './booking-detail.css';
-
 export default function BookingDetailLoading() {
   return (
     <div className="min-h-screen bg-[var(--ax-canvas)] text-[var(--t2)]">

@@ -1,5 +1,4 @@
 // app/admin/bookings/[id]/page.tsx
-import './booking-detail.css';
 import type { ReactNode } from 'react';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';

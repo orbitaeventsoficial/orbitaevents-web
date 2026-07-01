@@ -1551,17 +1551,30 @@ Seqüència obligatòria de registre:
 ---
 
 ### Canvi #1314 — 2026-07-01 — codex (FET)
-**Front públic: capçaleres i estats legals passen a gramàtica canònica.**
-- `app/components/public/PublicPageHeader.tsx`: nou component canònic per a capçaleres públiques simples, amb títol, descripció, eyebrow opcional, alineació i tokens públics.
+**Front públic: capçaleres, portal i estats passen a gramàtica canònica.**
+- `app/components/public/PublicPageHeader.tsx`: nou component canònic per a capçaleres públiques simples, amb títol, descripció, eyebrow opcional, alineació i espaiat tancat (`default`/`compact`/`none`), sense `className` arbitrari.
+- `app/components/public/ClientPortalPageHeader.tsx` + `lib/constants/clientPortalTones.ts`: subcapçalera canònica del portal client i font única de tons success/warning/danger.
 - Migrades a `PublicPageHeader`: disponibilitat, reservar, reserva confirmada, gràcies, legals (`terminos`, `privacidad`, `cookies`, `aviso-legal`) i portal de privacitat.
 - `disponibilidad`, `reservar`, `reserva-confirmada`, `gracias`, `legal/privacidad` i `privacitat`: violetes/roses/blaus/verds/vermells/ambres crus dels headers, CTAs i estats de feedback passen a `--oe-gold`, `--oe-green`, `--oe-amber`, `--oe-orange`, `--grad-gold` i `color-mix(...)`.
+- Portal client: invoice, contract, payments, questionnaire, timeline, gallery i sign passen a `ClientPortalPageHeader`; payment-success, Bizum, signatura, qüestionari i timeline passen a `portalTones`/tokens públics.
 - `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1314`; el següent canvi real ha de ser `#1315`.
 - Validació tècnica: `npx tsc --noEmit --pretty false` OK.
-- Validació funcional: les pàgines mantenen el mateix contingut i flux, però comparteixen una capçalera pública i estats visuals tokenitzats.
-- Validació humana/UX: els headers simples deixen de tenir una gramàtica diferent per pàgina i els estats interns del portal/legal ja no introdueixen una paleta pròpia invisible.
+- Validació funcional: les pàgines mantenen el mateix contingut i flux, però comparteixen capçaleres públiques, subcapçaleres de portal i estats visuals tokenitzats.
+- Validació humana/UX: els headers simples i el portal deixen de tenir una gramàtica diferent per pàgina i els estats interns ja no introdueixen una paleta pròpia invisible.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`
+
+### Canvi #1316 — 2026-07-01 — claude (FET)
+**Consolidació CSS: booking-detail.css ELIMINAT (bd-/bk- → .ap-* genèrics).**
+- 324L esborrades + 3 imports fora. 34 classes → .ap-table-*/.ap-card/.ap-empty/.ap-btn/.ap-input/admin-tone (cap classe nova). Funcionalitat intacta; aspecte canònic estàndard (directiva: es refarà).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1316`; el següent canvi real ha de ser `#1317`.
+- Validació tècnica: tsc 0; validate:core EXIT 0; canon 0 P1.
+- Validació funcional: 0 bd-/bk-; imports fora.
+- Validació humana/UX: booking hipersemblant.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
 
 ### Canvi #1313 — 2026-07-01 — codex (FET)
 **Front públic: UX d'estats/focus canonitzada en formularis compartits.**

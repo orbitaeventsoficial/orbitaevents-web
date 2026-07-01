@@ -1,5 +1,4 @@
 // app/admin/bookings/page.tsx
-import './[id]/booking-detail.css';
 import { log } from '@/lib/logger';
 // Pàgina de gestió de reserves
 import { prisma } from '@/lib/prisma';
@@ -250,13 +249,13 @@ export default async function BookingsPage({
 
       {/* ── Header sticky — mateix patró que la fitxa de reserva ── */}
       <div className="ap-sticky-header">
-        <div className="ap-detail-bar bk-detail-bar-row">
+        <div className="ap-detail-bar">
           {customerId ? (
             <Link href={buildCustomerWorkspaceTabHref(customerId, 'bookings')} className="ap-detail-bar-btn">← Client</Link>
           ) : (
             <span className="ap-detail-kicker">Agenda</span>
           )}
-          <div className="bk-detail-bar-actions">
+          <div className="ap-detail-bar-actions">
             <ExportCsvButton
               filename="reserves"
               headers={['Referència', 'Client', 'Data', 'Tipus', 'Estat', 'Total (€)']}
@@ -279,16 +278,16 @@ export default async function BookingsPage({
       </div>
 
       {paymentFilterLabel && (
-        <div className="bk-payment-filter-banner ap-detail-stats-cell ap-detail-stats-cell--warn">
+        <div className="ap-inline-alert ap-inline-alert--warning flex items-center gap-2.5">
           <span className="ap-detail-stats-label">Focus</span>
           <span className="ap-detail-stats-val text-sm">{paymentFilterLabel}</span>
           <Link href="/admin/bookings" className="text-xs opacity-60 hover:opacity-100 ml-auto">Veure totes →</Link>
         </div>
       )}
 
-      <div className="bk-list-shell bk-list-shell--top">
+      <div className="mx-auto flex w-full max-w-[76.25rem] flex-col gap-2 px-5 py-2">
 
-        <div className="bk-stats-bar ap-detail-stats">
+        <div className="ap-detail-stats">
           <div className="ap-detail-stats-cell ap-detail-stats-cell--gold">
             <span className="ap-detail-stats-label">Total</span>
             <span className="ap-detail-stats-val">{pagination.total} · {formatCurrency(totalRevenue)}</span>
@@ -309,10 +308,10 @@ export default async function BookingsPage({
         <BookingPipelineViewWrapper />
       )}
 
-      {!isKanban && <div className="bk-list-shell"><>
+      {!isKanban && <div className="mx-auto flex w-full max-w-[76.25rem] flex-col gap-2 px-5"><>
       <section className="lg:hidden space-y-3">
         {bookings.length === 0 ? (
-          <div className="ap-card bk-empty-state">
+          <div className="ap-card ap-empty">
             <span className="text-4xl">📅</span>
             <p className="mt-2">Encara no hi ha reserves</p>
             <p className="text-xs mt-1 admin-tone-text-slate">Quan un lead es confirma, es genera una reserva automàticament. També pots crear-ne una manualment.</p>
@@ -329,10 +328,10 @@ export default async function BookingsPage({
             return (
               <article
                 key={booking.id}
-                className={`ap-card bk-mobile-card ${
+                className={`ap-card block p-4 ${
                   isPast && booking.status !== 'COMPLETED'
-                    ? 'bk-mobile-card--past'
-                    : 'bk-mobile-card--normal'
+                    ? 'admin-tone-border-warning'
+                    : ''
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -424,22 +423,22 @@ export default async function BookingsPage({
         )}
       </section>
 
-      <section className="bk-table-section hidden lg:block overflow-hidden">
-          <table className="w-full" aria-label="Llistat de reserves">
-            <thead className="bk-table-head">
+      <section className="ap-table-wrap hidden lg:block">
+          <table className="ap-table" aria-label="Llistat de reserves">
+            <thead className="ap-table-head">
               <tr>
-                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[9%]">Ref.</th>
-                <th scope="col" className="px-3 py-2 text-left bk-th-label">Client</th>
-                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[11%]">Tipus</th>
-                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[11%]">Data</th>
-                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[9%]">Pack</th>
-                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[10%]">Total</th>
-                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[7%]">Marge</th>
-                <th scope="col" className="px-3 py-2 text-left bk-th-label w-[9%]">Estat</th>
-                <th scope="col" className="px-3 py-2 text-right bk-th-label w-[18%]">Accions</th>
+                <th scope="col" className="ap-table-th w-[9%]">Ref.</th>
+                <th scope="col" className="ap-table-th">Client</th>
+                <th scope="col" className="ap-table-th w-[11%]">Tipus</th>
+                <th scope="col" className="ap-table-th w-[11%]">Data</th>
+                <th scope="col" className="ap-table-th w-[9%]">Pack</th>
+                <th scope="col" className="ap-table-th w-[10%]">Total</th>
+                <th scope="col" className="ap-table-th w-[7%]">Marge</th>
+                <th scope="col" className="ap-table-th w-[9%]">Estat</th>
+                <th scope="col" className="ap-table-th w-[18%] text-right">Accions</th>
               </tr>
             </thead>
-            <tbody className="divide-y admin-tone-border-subtle">
+            <tbody className="ap-table-body">
               {bookings.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="px-4 py-12 text-center">
@@ -457,10 +456,10 @@ export default async function BookingsPage({
                   return (
                     <tr
                       key={booking.id}
-                      className={`bk-table-row adm-row-hover${isPast && booking.status !== 'COMPLETED' ? ' bk-table-row--past' : ''}`}
+                      className={isPast && booking.status !== 'COMPLETED' ? 'admin-tone-bg-warning' : undefined}
                     >
                       <td className="px-3 py-2.5">
-                        <Link href={buildBookingHref(booking.id)} className="bk-booking-ref-link block max-w-[7rem] truncate font-mono text-xs hover:opacity-80 whitespace-nowrap">
+                        <Link href={buildBookingHref(booking.id)} className="block max-w-[7rem] truncate font-mono text-xs text-[var(--gold)] hover:opacity-80 whitespace-nowrap">
                           {booking.reference}
                         </Link>
                       </td>
