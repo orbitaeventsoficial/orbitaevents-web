@@ -6,7 +6,7 @@ export default async function BookingQuestionnaireSection({ bookingId }: { booki
   const data = await getBookingQuestionnaire(bookingId);
 
   return (
-    <section className="admin-booking-panel ap-card rounded-xl p-6">
+    <section className="ap-card p-6">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <h2 className="ap-h2">Qüestionari pre-event</h2>
         <Link

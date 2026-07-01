@@ -1,3 +1,44 @@
+## 2026-07-01 — Consolidació CSS: control-room.css ELIMINAT (dels 9 CSS a 8) (Canvi #1315, claude+agent)
+
+### Què s'ha fet
+- `control-room.css` (266L) ESBORRAT del tot + import tret de layout.tsx. Era l'últim CSS residual del dashboard amb classes compartides vives.
+- **BookingMarginCard.tsx**: admin-booking-margin-*/travel-* → .ap-card/.ap-kpi + tokens. Semàfor de marge (marginColor) i funcionalitat (càlcul/viatge/desar) preservats. Tipografia moguda de booking-detail.css → utilitats de token (booking-detail 353→324L).
+- **BookingQuestionnaireSection.tsx**: admin-booking-panel → .ap-card.
+- **SummaryPanel.tsx** (hub client): admin-customer-* → .ap-card + admin-tone-*. Vores decoratives de color dropades → hipersemblança amb els panells germans.
+- Classes mortes del fitxer (sense consumidor) eliminades amb l'esborrat.
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0; check-admin-canon 0 P1.
+- Validació funcional: captura bookings (badges de marge amb tons canònics).
+- Validació humana/UX: panells de booking/hub hipersemblants amb la resta.
+
+### Coordinació
+Counter → 1315. CSS admin: 5→4 (control-room fora). Queden admin-shell/admin-theme/booking-detail/leads-design + globals/tokens/studio/rtl. Codex: front públic.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-01 — Front públic: capçaleres i estats legals passen a gramàtica canònica (Canvi #1314, codex)
+
+### Context
+El propietari detecta que els headers visibles no semblen del mateix sistema i pregunta què passa amb "el que no es veu". Segon tall de Codex sobre front públic: convertir el patró de capçalera i estats interns senzills en una peça compartida i tokens públics, sense tocar CSS admin core ni temàtiques aprovades.
+
+### Què s'ha fet
+- `app/components/public/PublicPageHeader.tsx`: nou component canònic per a capçaleres públiques simples, amb títol, descripció, eyebrow opcional, alineació i tokens públics.
+- Migrades a `PublicPageHeader`: disponibilitat, reservar, reserva confirmada, gràcies, legals (`terminos`, `privacidad`, `cookies`, `aviso-legal`) i portal de privacitat.
+- `disponibilidad`, `reservar`, `reserva-confirmada`, `gracias`, `legal/privacidad` i `privacitat`: violetes/roses/blaus/verds/vermells/ambres crus dels headers, CTAs i estats de feedback passen a `--oe-gold`, `--oe-green`, `--oe-amber`, `--oe-orange`, `--grad-gold` i `color-mix(...)`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: les pàgines mantenen el mateix contingut i flux, però comparteixen una capçalera pública i estats visuals tokenitzats.
+- Validació humana/UX: els headers simples deixen de tenir una gramàtica diferent per pàgina i els estats interns del portal/legal ja no introdueixen una paleta pròpia invisible.
+
+### Coordinació
+Counter → 1314. Codex continua només front públic; Claude manté propietat de CSS admin core, espaiat, dashboard i consolidació admin.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-01 — Front públic: UX d'estats/focus canonitzada en formularis compartits (Canvi #1313, codex)
 
 ### Context

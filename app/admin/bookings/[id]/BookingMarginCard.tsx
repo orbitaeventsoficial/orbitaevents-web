@@ -113,7 +113,6 @@ export default function BookingMarginCard({
 
   const marginTone = getMarginTone(marginPct);
   const marginColor = marginTone.color;
-  const marginBg = `border-${marginTone.tone}-400/30 bg-${marginTone.tone}-950/30`;
 
   const travelTone = getTravelMarginTone(travelMarginPct);
   const travelMarginColor = travelTone.color;
@@ -212,11 +211,11 @@ export default function BookingMarginCard({
 
   return (
     <section
-      className={`admin-booking-margin rounded-xl border shadow-sm p-6 ${marginBg}`}
+      className="ap-card p-6"
       data-help-title="Marge i costos"
       data-help-desc="Explica què costa realment aquest esdeveniment, quin marge deixa i com impacta el transport en la rendibilitat."
     >
-      <div className="admin-booking-margin-hero mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] opacity-70">Cabina econòmica</p>
           <h2 className="mt-2 ap-h2">Marge i costos</h2>
@@ -224,34 +223,34 @@ export default function BookingMarginCard({
             Llegeix en un cop d'ull què deixa la reserva, on marxa cada euro i si el desplaçament està ben cobert.
           </p>
         </div>
-        <div className="admin-booking-margin-badge">
-          <span className={`admin-booking-margin-badge-value ${marginColor}`}>{marginPct.toFixed(1)}%</span>
+        <div className="ap-card flex flex-col gap-1 p-4 sm:items-end">
+          <span className={`text-xl font-bold leading-none ${marginColor}`}>{marginPct.toFixed(1)}%</span>
           <span className="text-xs uppercase tracking-wide opacity-70">Marge actual</span>
         </div>
       </div>
 
       <div
-        className="admin-booking-margin-kpis mb-6 grid gap-4 sm:grid-cols-4"
+        className="mb-6 grid gap-4 sm:grid-cols-4"
         data-help-title="KPI de marge"
         data-help-desc="Resumeixen ingrés total, cost directe, marge net i percentatge de marge d'aquesta reserva."
       >
-        <div className="admin-booking-margin-kpi">
+        <div className="ap-kpi">
           <p className="text-xs font-medium uppercase">Ingrés total</p>
           <p className="text-lg font-bold">{formatCurrency(total)}</p>
         </div>
-        <div className="admin-booking-margin-kpi">
+        <div className="ap-kpi">
           <p className="text-xs font-medium uppercase">Cost directe</p>
           <p className="text-lg font-bold">{formatCurrency(directCost)}</p>
         </div>
-        <div className="admin-booking-margin-kpi">
+        <div className="ap-kpi">
           <p className="text-xs font-medium uppercase">Marge net</p>
           <p className={`text-lg font-bold ${marginColor}`}>{formatCurrency(netMargin)}</p>
         </div>
-        <div className="admin-booking-margin-kpi">
+        <div className="ap-kpi">
           <Tooltip text="Calculat pel motor de cost: pack, extres, transport i cost operacional.">
             <p className="text-xs font-medium uppercase">% marge</p>
           </Tooltip>
-          <p className={`admin-booking-margin-kpi-value ${marginColor}`}>{marginPct.toFixed(1)}%</p>
+          <p className={`text-lg font-bold ${marginColor}`}>{marginPct.toFixed(1)}%</p>
           <p className={`text-xs mt-0.5 ${marginColor}`}>
             {marginPct >= 50 ? 'Excel·lent. Marge sa.' :
              marginPct >= 30 ? 'Acceptable. Encara hi ha marge per optimitzar.' :
@@ -261,7 +260,7 @@ export default function BookingMarginCard({
         </div>
       </div>
 
-      <div className="mb-6 admin-booking-margin-panel ap-card rounded-xl p-4" data-help-title="Sumatori de costos i marge" data-help-desc="Desglossa d'on surt el cost directe i com es compara el marge real amb el marge objectiu.">
+      <div className="mb-6 ap-card p-4" data-help-title="Sumatori de costos i marge" data-help-desc="Desglossa d'on surt el cost directe i com es compara el marge real amb el marge objectiu.">
         <h3 className="text-sm font-semibold mb-3">Sumatori de costos i marge</h3>
         <div className="space-y-1.5 text-xs">
           <div className="flex justify-between"><span>Cost pack (real o estimat)</span><span>{formatCurrency(packCostUsed)}</span></div>
@@ -300,8 +299,8 @@ export default function BookingMarginCard({
       </div>
 
       {total > 0 && (
-        <div className="mb-6 admin-booking-margin-panel rounded-xl border p-4">
-          <h3 className="admin-booking-margin-panel-title">{"On va cada euro d'aquest bolo"}</h3>
+        <div className="mb-6 ap-card p-4">
+          <h3 className="mb-1 text-sm font-semibold">{"On va cada euro d'aquest bolo"}</h3>
           <p className="text-sm mb-4 opacity-70">Desglossament practic de costos i benefici real.</p>
           <div className="space-y-3 text-sm">
             <div className="flex items-start justify-between gap-3">
@@ -357,10 +356,10 @@ export default function BookingMarginCard({
             <div className="border-t admin-tone-border-neutral pt-3 mt-1">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <span className="admin-booking-margin-benefit-label">Benefici net</span>
+                  <span className="font-bold">Benefici net</span>
                   <p className="text-xs opacity-60 mt-0.5">Compte principal — sou, estalvi i reinversio</p>
                 </div>
-                <span className={`admin-booking-margin-benefit-value ${netMargin >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
+                <span className={`shrink-0 font-bold tabular-nums ${netMargin >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
                   {formatCurrency(netMargin)}
                 </span>
               </div>
@@ -374,7 +373,7 @@ export default function BookingMarginCard({
         </div>
       )}
 
-      <div className="admin-booking-margin-breakdown text-sm space-y-1 mb-6 border-t admin-tone-border-neutral pt-4" data-help-title="Desglossament de costos" data-help-desc="Mostra el detall tècnic del cost del pack, extres, hores extra i desplaçament usat per calcular el marge.">
+      <div className="ap-card p-4 text-sm space-y-1 mb-6" data-help-title="Desglossament de costos" data-help-desc="Mostra el detall tècnic del cost del pack, extres, hores extra i desplaçament usat per calcular el marge.">
         <div className="flex justify-between">
           <span>
             {typeof inventoryCostReal === 'number' && inventoryCostReal > 0
@@ -415,7 +414,7 @@ export default function BookingMarginCard({
         </div>
       </div>
 
-      <div className="admin-booking-travel-editor border-t admin-tone-border-neutral pt-4" data-help-title="Desplaçament editable" data-help-desc="Permet ajustar o recalcular la distància del servei i veure com canvien costos, suplement i marge del transport.">
+      <div className="ap-card p-4" data-help-title="Desplaçament editable" data-help-desc="Permet ajustar o recalcular la distància del servei i veure com canvien costos, suplement i marge del transport.">
         <h3 className="text-sm font-semibold mb-3">Desplaçament editable</h3>
         <p className="mb-3 text-xs">
           Inclòs: {INCLUDED_TRAVEL_KM} km totals ({includedOneWayKm} anada + {includedOneWayKm} tornada). Després: {TRAVEL_BLOCK_EUR} € per cada {TRAVEL_BLOCK_KM} km extra.
@@ -450,17 +449,17 @@ export default function BookingMarginCard({
           </div>
         </div>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
-          <div className="admin-booking-travel-card ap-card rounded-xl p-3">
+          <div className="ap-card p-3">
             <p className="text-xs uppercase tracking-wide" title="Inclou benzina, manteniment, assegurança i amortització. Valor recomanat: 0.35-0.50 €/km">Cost vehicle per km</p>
             <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCost)}</p>
             <p className="text-xs">{distanceKm.toFixed(1)} km · {vehicleCostPerKm.toFixed(2)} €/km</p>
           </div>
-          <div className="admin-booking-travel-card ap-card rounded-xl p-3">
+          <div className="ap-card p-3">
             <p className="text-xs uppercase tracking-wide">Ingressos transport</p>
             <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCharge)}</p>
             <p className="text-xs">{travelBlocks} trams · {TRAVEL_BLOCK_EUR} €</p>
           </div>
-          <div className={`admin-booking-travel-card rounded-xl border p-3 ${travelMarginCardBorder} ${travelMarginCardBg}`}>
+          <div className={`rounded-xl border p-3 ${travelMarginCardBorder} ${travelMarginCardBg}`}>
             <p className="text-xs uppercase tracking-wide">Marge real transport</p>
             <p className={`text-sm font-semibold ${travelMarginColor}`}>
               {formatCurrency(travelNetMargin)}

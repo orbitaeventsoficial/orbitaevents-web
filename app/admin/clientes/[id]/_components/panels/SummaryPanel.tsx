@@ -229,7 +229,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
   }, [data.customer]);
 
   return (
-    <section className="admin-customer-summary space-y-4" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.root)}>
+    <section className="space-y-4" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.root)}>
       {alerts.length > 0 && (
         <div className="space-y-2">
           {alerts.map((alert, i) => (
@@ -254,7 +254,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
 
       <CrmStatusBar customer={data.customer} onTagsChange={() => router.refresh()} />
 
-      <div className="admin-customer-card admin-customer-card--contact rounded-2xl border p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.contact)}>
+      <div className="ap-card p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.contact)}>
         <div className="flex items-center justify-between">
           <h2 className="ap-h2">Informació de contacte</h2>
           {!editing ? (
@@ -334,7 +334,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
 
       <ContactsSection customerId={data.customer.id} contacts={data.contacts ?? []} />
 
-      <div className="admin-customer-card admin-customer-card--ops rounded-2xl border p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.operations)}>
+      <div className="ap-card p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.operations)}>
         <h2 className="ap-h2">Resum operatiu</h2>
         <p className="mt-1 text-sm">
           Client des de {formatDate(data.customer.createdAt)}
@@ -358,7 +358,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
         const paid = data.kpis.totalPaid ?? 0;
         const pct = quoted > 0 ? Math.round((paid / quoted) * 100) : 0;
         return (
-          <div className="rounded-2xl border p-5">
+          <div className="ap-card p-5">
             <h2 className="ap-h2">Resum financer</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               <div>
@@ -390,7 +390,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
       })()}
 
       {nextEvent && nextEvent.date && (
-        <div className="rounded-2xl border p-5">
+        <div className="ap-card p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs uppercase tracking-wider">Pròxim esdeveniment</p>
@@ -705,7 +705,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
       </div>
 
       <div
-        className="admin-customer-card admin-customer-card--quick rounded-2xl border p-5"
+        className="ap-card p-5"
         data-testid="customer-summary-quick-actions"
         {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.quickActions)}
       >
@@ -770,7 +770,7 @@ function StatCard({ label, value, detail, color }: { label: string; value: numbe
   };
 
   return (
-    <div className={`admin-customer-stat rounded-xl border p-3 ${colorStyles[color]}`} {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.stat(label))}>
+    <div className={`rounded-xl border p-3 ${colorStyles[color]}`} {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.stat(label))}>
       <p className="text-xs">{label}</p>
       <p className="mt-1 text-2xl font-semibold">{value}</p>
       {detail && <p className="mt-0.5 text-xs">{detail}</p>}
@@ -780,7 +780,7 @@ function StatCard({ label, value, detail, color }: { label: string; value: numbe
 
 function ActionCard({ title, isEmpty, emptyText, content, action }: { title: string; isEmpty: boolean; emptyText: string; content: React.ReactNode; action?: React.ReactNode; }) {
   return (
-    <div className="admin-customer-action-card rounded-2xl border p-4" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.actionCard(title))}>
+    <div className="ap-card p-4" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.actionCard(title))}>
       <div className="flex items-center justify-between">
         <p className="text-xs uppercase tracking-wider">{title}</p>
         {action}
@@ -1018,7 +1018,7 @@ function CrmStatusBar({
   }, [customer.id, onTagsChange]);
 
   return (
-    <div className="rounded-2xl border p-4 space-y-3">
+    <div className="ap-card p-4 space-y-3">
       <div className="flex flex-wrap items-center gap-3">
         {/* Lifecycle badge */}
         <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${CUSTOMER_LIFECYCLE_COLORS[lifecycle]}`}>
@@ -1197,7 +1197,7 @@ function ContactsSection({ customerId, contacts: initialContacts }: { customerId
   const isEditing = adding || editId !== null;
 
   return (
-    <div className="rounded-2xl border p-5">
+    <div className="ap-card p-5">
       <div className="flex items-center justify-between mb-4">
         <h2 className="ap-h2">Persones de contacte</h2>
         {!isEditing && (

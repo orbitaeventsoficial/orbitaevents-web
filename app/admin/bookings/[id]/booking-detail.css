@@ -322,32 +322,3 @@ html.admin-mode .bd-total-editor__suggestion:hover {
   color: var(--t);
 }
 
-/* ═══════════════════════════════════════════════════════════════════════
-   admin-booking-margin — ajustos tipogràfics de la card de marge a la fitxa
-   (la resta d'estils viuen al component BookingMarginCard)
-   ═══════════════════════════════════════════════════════════════════════ */
-html.admin-mode .admin-booking-margin-badge-value,
-html.admin-mode .admin-booking-margin-kpi-value {
-  font-family: var(--display);
-  font-size: var(--o-text-xl);
-  font-weight: var(--o-fw-bold);
-  line-height: 1;
-}
-
-html.admin-mode .admin-booking-margin-panel-title {
-  margin: 0 0 0.25rem;
-  color: var(--t);
-  font-size: var(--o-text-md);
-  font-weight: var(--o-fw-bold);
-}
-
-html.admin-mode .admin-booking-margin-benefit-label,
-html.admin-mode .admin-booking-margin-benefit-value {
-  font-size: var(--o-text-md);
-  font-weight: var(--o-fw-bold);
-}
-
-html.admin-mode .admin-booking-margin-benefit-value {
-  flex-shrink: 0;
-  font-variant-numeric: tabular-nums;
-}

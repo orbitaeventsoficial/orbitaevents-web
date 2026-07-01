@@ -12,7 +12,6 @@ import { ADMIN_CHANGE_COUNTER } from '@/lib/constants/admin';
 import { NAV_GROUPS, getGroupForPath, type NavItem, type NavGroup } from './lib/adminNav';
 import '../studio/orbita-tokens.css';
 import './admin-theme.css';
-import './control-room.css';
 import './admin-shell.css';
 
 /* Grups de navegació + mapa ruta→òrgan: font única a `./lib/adminNav`. */
