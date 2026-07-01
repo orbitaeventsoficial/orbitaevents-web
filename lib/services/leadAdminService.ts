@@ -41,6 +41,25 @@ type LeadCreateInput = {
   priority?: Priority;
 };
 
+function parseLeadEventDate(value?: string): Date | undefined {
+  if (!value) return undefined;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    throw new Error('INVALID_EVENT_DATE_FORMAT');
+  }
+
+  const [year, month, day] = value.split('-').map(Number);
+  const parsed = new Date(Date.UTC(year, month - 1, day, 12, 0, 0, 0));
+  if (
+    parsed.getUTCFullYear() !== year ||
+    parsed.getUTCMonth() !== month - 1 ||
+    parsed.getUTCDate() !== day
+  ) {
+    throw new Error('INVALID_EVENT_DATE_FORMAT');
+  }
+
+  return parsed;
+}
+
 export async function countNewAdminLeads() {
   const count = await prisma.lead.count({
     where: {
@@ -103,7 +122,7 @@ export async function createAdminLead(data: LeadCreateInput) {
   const lead = await prisma.lead.create({
     data: {
       ...leadData,
-      eventDate: leadData.eventDate ? new Date(leadData.eventDate) : undefined,
+      eventDate: parseLeadEventDate(leadData.eventDate),
       eventAddress: leadData.eventAddress || eventVenue || undefined,
       interestedExtras: leadData.interestedExtras || [],
       contactedAt: leadData.status === 'CONTACTED' ? new Date() : undefined,

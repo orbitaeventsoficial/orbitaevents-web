@@ -84,7 +84,7 @@ describe('updateLeadFromInput', () => {
 
     expect(mockPrisma.lead.update).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({ eventDate: expect.any(Date) }),
+        data: expect.objectContaining({ eventDate: new Date('2026-06-15T12:00:00.000Z') }),
       })
     );
   });
@@ -95,6 +95,15 @@ describe('updateLeadFromInput', () => {
     const result = await updateLeadFromInput('l1', { eventDate: 'invalid-date' });
 
     expect(result.status).toBe(400);
+  });
+
+  it('retorna 400 amb data ambigua encara que JS la pogués interpretar', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', status: 'NEW', contactedAt: null });
+
+    const result = await updateLeadFromInput('l1', { eventDate: '26 Setiembre' });
+
+    expect(result.status).toBe(400);
+    expect(mockPrisma.lead.update).not.toHaveBeenCalled();
   });
 
   it('estableix convertedAt quan WON', async () => {

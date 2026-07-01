@@ -88,6 +88,18 @@ describe('POST /api/admin/leads', () => {
     }));
   });
 
+  it('rebutja eventDate ambigu a la creació manual', async () => {
+    const res = await POST(makeRequest({
+      name: 'Maria',
+      email: 'maria@test.com',
+      eventType: 'WEDDING',
+      eventDate: '26 Setiembre',
+    }));
+
+    expect(res.status).toBe(400);
+    expect(mockCreateAdminLead).not.toHaveBeenCalled();
+  });
+
   it('vincula un client existent si hi ha coincidència forta', async () => {
     mockPreviewLeadCustomerLink.mockResolvedValue({
       kind: 'matches-found',

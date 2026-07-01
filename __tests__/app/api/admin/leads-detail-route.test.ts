@@ -149,6 +149,14 @@ describe('PATCH /api/admin/leads/[id]', () => {
     const res = await PATCH(req, params);
     expect(res.status).toBe(400);
   });
+
+  it('rebutja eventDate ambigu al PATCH', async () => {
+    const { req, params } = makePatchRequest('lead-1', { eventDate: '26 Setiembre' });
+    const res = await PATCH(req, params);
+
+    expect(res.status).toBe(400);
+    expect(mockUpdateLead).not.toHaveBeenCalled();
+  });
 });
 
 describe('DELETE /api/admin/leads/[id]', () => {

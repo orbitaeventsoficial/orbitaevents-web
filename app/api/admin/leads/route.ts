@@ -66,7 +66,7 @@ const leadSchema = z.object({
   email: z.string().email(),
   phone: z.string().optional(),
   eventType: z.enum(EVENT_TYPE_VALUES),
-  eventDate: z.string().optional(),
+  eventDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Format YYYY-MM-DD requerit').optional(),
   eventStartTime: z.string().optional(),
   eventEndTime: z.string().optional(),
   eventLocation: z.string().optional(),

@@ -77,9 +77,6 @@ export async function getAdminCalendarMonth(from?: string | null, to?: string | 
           gte: fromDate,
           lte: toDate,
         },
-        status: {
-          notIn: ['LOST'],
-        },
         booking: null,
       },
       select: {
