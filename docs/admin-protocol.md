@@ -1546,6 +1546,19 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1347 — 2026-07-02 — claude (FET)
+**Transport: repercussió al client + franquícia horària dels col·laboradors.**
+- Repercussió (`LeadBoloSection`): `calculateTravelCharge` (50 km inclosos, +10€/20km) suma al total del bolo (client), visible abans de crear pressupost. Alba 240→430€.
+- Franquícia (`travelLaborCost` canònic): `TRAVEL_INCLUDED_HOURS=1`; `chargeableHours = max(0, floor(routeHours−1))`. Cost de persones sobre chargeableHours. Regla propietari: 1a hora inclosa, hores senceres completades (1,5 h→0; 2 h→1 h; es cobra a partir de 2 h al preu/hora).
+- Visibilitat: tira del lead + NewBookingForm mostren «1a hora inclosa · cobren N h de M h». Dos totals: cost intern (marge) vs repercutit (client).
+- Validació tècnica: tsc 0; travelLaborCost 4/4 + leadServiceLine 10/10; serveis+bookings 3065/3065; validate:core 0.
+- Validació funcional: (Playwright, Alba 6,49 h) cobren 5 h → 271€ intern, +190€ client, total 430€.
+- Validació humana/UX: dos conceptes separats + nota; captura.
+- Model canònic `travelLaborCost` (carril Codex) amb autorització del propietari; monocapa reserves+lead. Counter → 1347.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1346 — 2026-07-02 — claude (FET)
 **Compactació: secció de transport del lead a tira única.**
 - El #1345 afegia 4 KPIs alts (251px) → fitxa 1187px. Reescrit a tira compacta `.ap-ledger-travelbar` (inputs + desglòs inline + cost ruta destacat, `flex-wrap`).

@@ -1475,9 +1475,12 @@ html.admin-mode .ap-ledger-travel-total {
   padding-left: var(--o-space-3); border-left: 0.1875rem solid var(--o-stage-won-strong);
 }
 html.admin-mode .ap-ledger-travel-total[data-level="warn"] { border-left-color: var(--gold); }
+html.admin-mode .ap-ledger-travel-total[data-level="gold"] { border-left-color: var(--gold); }
+html.admin-mode .ap-ledger-travel-total[data-level="gold"] strong { color: var(--gold); }
 html.admin-mode .ap-ledger-travel-total strong { font-family: var(--display); font-size: var(--o-text-lg); font-weight: var(--o-fw-bold); color: var(--t); }
 html.admin-mode .ap-ledger-travel-total-lbl { font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t3); }
 html.admin-mode .ap-ledger-travel-total-sub { font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3); }
+html.admin-mode .ap-ledger-travel-note { font-size: var(--o-text-micro); color: var(--gold); max-width: 16rem; }
 html.admin-mode .ap-ledger-kpis {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10.625rem, 1fr));

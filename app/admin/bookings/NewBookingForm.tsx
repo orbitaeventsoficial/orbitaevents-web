@@ -407,7 +407,7 @@ export default function NewBookingForm() {
               <div className="ap-kpi"><p className="text-xs font-medium uppercase">Cost ruta</p><p className="text-lg font-bold">{formatCurrency(travelCostBreakdown.totalCost)}</p></div>
             </div>
             <p className="mt-3 text-xs text-[var(--t3)]">
-              Integrants ruta: {travelCostBreakdown.peopleCount} · llindar temps {travelCostBreakdown.laborThresholdKm} km · el cost de vehicle i temps s'imputa al marge intern, no a productes contractats.
+              Integrants ruta: {travelCostBreakdown.peopleCount} · 1a hora inclosa, es cobra a partir de 2 h ({travelCostBreakdown.chargeableHours} h de {travelCostBreakdown.routeHours} h) · el cost de vehicle i temps s'imputa al marge intern, no a productes contractats.
             </p>
           </AdminSection>
 

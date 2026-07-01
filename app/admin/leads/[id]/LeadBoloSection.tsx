@@ -6,7 +6,7 @@ import { useToast } from '@/app/admin/components/ToastProvider';
 import BookingServiceLinesSection from '@/app/admin/bookings/BookingServiceLinesSection';
 import type { BookingServiceLineFormInput } from '@/app/admin/bookings/booking-form.types';
 import { computeBookingFinancialSummary, aggregateServiceLines, classifyBoloLines } from '@/lib/services/costEngine';
-import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
+import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR, calculateTravelCharge, calculateBillableTravelKm } from '@/lib/services/travelCost';
 import { calculateTravelCostBreakdown } from '@/lib/services/travelLaborCost';
 import { useBookingDistance } from '@/app/admin/bookings/useBookingDistance';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
@@ -155,6 +155,11 @@ export default function LeadBoloSection({
  }, [distanceKm, headcount, vehicleCostPerKm]);
  // Live si hi ha km resolts; si no, fallback al cost recuperat (#1343).
  const effectiveTravelCost = (Number(distanceKm) || 0) > 0 ? travelBreakdown.totalCost : internalTravelCost;
+ // Càrrec al client (#1347): km més enllà dels inclosos → +TRAVEL_BLOCK_EUR/TRAVEL_BLOCK_KM.
+ // Es REPERCUTEIX al client (suma al total del bolo, entra al pressupost).
+ const km = Number(distanceKm) || 0;
+ const travelCharge = calculateTravelCharge(km, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR);
+ const billableKm = calculateBillableTravelKm(km, INCLUDED_TRAVEL_KM);
 
  // Fulla d'economia del bolo (Fase 4 de docs/bolo-flux.md). La pasta NO viu al
  // configurador: cada línia porta el cost amagat i alimenta SOLA aquesta fulla.
@@ -166,8 +171,10 @@ export default function LeadBoloSection({
  // ownCostRatio = 0: un servei propi (DJ) NO imputa cost sobre el seu preu.
  // El cost real de l'equip propi (desgast + amortització + consumibles) ja
  // viu al cost fix operatiu; imputar a més un % seria comptar-lo dos cops.
- const { revenue, cost } = aggregateServiceLines(allLines, 0);
- if (revenue <= 0) return null;
+ const { revenue: linesRevenue, cost } = aggregateServiceLines(allLines, 0);
+ if (linesRevenue <= 0) return null;
+ // El càrrec de desplaçament es REPERCUTEIX al client: suma al total facturable.
+ const revenue = linesRevenue + travelCharge;
  // Cost operatiu real (vegeu docs/bolo-flux.md):
  // - cost fix (desgast + amortització + consumibles) NOMÉS si el bolo porta
  // equip propi d'Òrbita (DJ o material propi); Masquerade sol → 0.
@@ -179,14 +186,14 @@ export default function LeadBoloSection({
  total: revenue,
  packPrice: 0, extrasTotal: 0, extraHours: 0, extraHourPrice: 0,
  distanceKm: Number(distanceKm) || 0, travelCost: effectiveTravelCost,
- serviceLinesRevenue: revenue, serviceLinesCost: cost + rentalTransport,
+ serviceLinesRevenue: linesRevenue, serviceLinesCost: cost + rentalTransport,
  source: source ?? null,
  }, {
  ...PROFITABILITY_MODEL_DEFAULTS,
  fixedOperationalCost: hasOwnEquipment ? PROFITABILITY_MODEL_DEFAULTS.fixedOperationalCost : 0,
  });
  return summary;
- }, [buildVisibleLines, source, vehicleCostPerKm, effectiveTravelCost, distanceKm]);
+ }, [buildVisibleLines, source, vehicleCostPerKm, effectiveTravelCost, distanceKm, travelCharge]);
 
  // Eleva el net al contenidor (perquè visqui al hero de la fitxa, no enterrat a baix).
  useEffect(() => {
@@ -377,11 +384,19 @@ export default function LeadBoloSection({
  <span>Vehicle <strong>{formatCurrency(travelBreakdown.vehicleCost)}</strong></span>
  <span>Conductor <strong>{formatCurrency(travelBreakdown.driverCost)}</strong></span>
  <span>Passatgers <strong>{formatCurrency(travelBreakdown.passengerCost)}</strong></span>
+ <span className="ap-ledger-travel-note">
+ 1a hora inclosa en el preu · cobren {travelBreakdown.chargeableHours} h de {travelBreakdown.routeHours} h de ruta
+ </span>
  </div>
  <div className="ap-ledger-travel-total" data-level={travelBreakdown.laborCostApplies ? 'warn' : 'ok'}>
  <span className="ap-ledger-travel-total-lbl">Cost ruta intern</span>
  <strong>{formatCurrency(effectiveTravelCost)}</strong>
- <span className="ap-ledger-travel-total-sub">{travelBreakdown.peopleCount} integrants · {travelBreakdown.roundTripKm} km · llindar {travelBreakdown.laborThresholdKm} km</span>
+ <span className="ap-ledger-travel-total-sub">{travelBreakdown.peopleCount} integrants · {travelBreakdown.roundTripKm} km</span>
+ </div>
+ <div className="ap-ledger-travel-total" data-level="gold">
+ <span className="ap-ledger-travel-total-lbl">Repercutit al client</span>
+ <strong>+{formatCurrency(travelCharge)}</strong>
+ <span className="ap-ledger-travel-total-sub">{billableKm} km facturables · primers {INCLUDED_TRAVEL_KM} inclosos</span>
  </div>
  </div>
  </section>}

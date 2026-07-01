@@ -4,6 +4,10 @@ export const TRAVEL_DRIVER_HOURLY_RATE = 18;
 export const TRAVEL_PASSENGER_HOURLY_RATE = 15;
 export const TRAVEL_AVG_SPEED_KMH = 65;
 export const TRAVEL_COST_LINE_MARKER = '[travel-cost]';
+// La primera hora de ruta (total anada+tornada) va INCLOSA EN EL PREU (no és gratis:
+// forma part del preu base); els col·laboradors cobren les hores senceres completades
+// per damunt. Decisió del propietari (2026-07-02): «la 1a hora va inclosa; les 2 h cobren 1 h».
+export const TRAVEL_INCLUDED_HOURS = 1;
 
 export type TravelPersonRole = 'DRIVER' | 'PASSENGER';
 
@@ -25,6 +29,8 @@ export type TravelCostBreakdown = {
   roundTripKm: number;
   routeHours: number;
   laborThresholdKm: number;
+  includedHours: number;     // hores de ruta incloses en el preu (1a hora)
+  chargeableHours: number;   // hores senceres que SÍ es cobren (excés per damunt de la inclosa)
   laborCostApplies: boolean;
   peopleCount: number;
   vehicleCost: number;
@@ -66,7 +72,11 @@ export function calculateTravelCostBreakdown(input: {
   );
   const vehicleCostPerKm = sanitizeNonNegative(input.vehicleCostPerKm, DEFAULT_VEHICLE_COST_PER_KM);
   const laborThresholdKm = sanitizeNonNegative(input.laborThresholdKm, INCLUDED_TRAVEL_KM);
-  const laborCostApplies = roundTripKm > laborThresholdKm;
+  // La 1a hora va inclosa en el preu; es cobren les HORES SENCERES completades per damunt
+  // (1,5 h → 0 h cobrades; 2 h → 1 h; 6,49 h → 5 h). Decisió del propietari.
+  const includedHours = TRAVEL_INCLUDED_HOURS;
+  const chargeableHours = Math.max(0, Math.floor(routeHours - includedHours));
+  const laborCostApplies = chargeableHours > 0;
   const vehicleCost = calculateTravelCost(roundTripKm, vehicleCostPerKm);
   const lines: TravelCostLine[] = [];
 
@@ -87,7 +97,7 @@ export function calculateTravelCostBreakdown(input: {
     peopleCount += count;
     if (!laborCostApplies) continue;
     const rate = person.role === 'DRIVER' ? TRAVEL_DRIVER_HOURLY_RATE : TRAVEL_PASSENGER_HOURLY_RATE;
-    const cost = round2(routeHours * rate * count);
+    const cost = round2(chargeableHours * rate * count);
     if (cost <= 0) continue;
     if (person.role === 'DRIVER') driverCost += cost;
     else passengerCost += cost;
@@ -95,7 +105,7 @@ export function calculateTravelCostBreakdown(input: {
       label: `${person.role === 'DRIVER' ? 'Temps ruta conductor' : 'Temps ruta passatger'} · ${person.label}${count > 1 ? ` x${count}` : ''}`,
       costAmount: cost,
       collaboratorId: person.collaboratorId || null,
-      notes: lineNotes(person.role, routeHours, rate),
+      notes: lineNotes(person.role, chargeableHours, rate),
     });
   }
 
@@ -104,6 +114,8 @@ export function calculateTravelCostBreakdown(input: {
     roundTripKm,
     routeHours,
     laborThresholdKm,
+    includedHours,
+    chargeableHours,
     laborCostApplies,
     peopleCount,
     vehicleCost,

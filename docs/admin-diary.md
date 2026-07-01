@@ -1,3 +1,24 @@
+## 2026-07-02 — Transport: repercussió al client + franquícia horària col·laboradors (Canvi #1347, claude)
+
+### Context
+Decisions de producte del propietari sobre el bolo del lead: (1) el desplaçament s'ha de REPERCUTIR al client (cobrar-lo, entra al pressupost), a partir de 50 km inclosos; (2) els col·laboradors NO cobren temps de la 1a hora de ruta (va inclosa en el preu), i cobren les hores senceres completades per damunt («1,5 h → 0; 2 h → 1 h; es cobra a partir de 2 h al preu/hora»).
+
+### Què s'ha fet
+- **Repercussió al client** (`LeadBoloSection`): `calculateTravelCharge` (50 km inclosos, +10€/20km) suma al total del bolo (revenue del client) → visible ABANS de crear pressupost. Total Alba: 240 → 430€ (+190€ desplaçament).
+- **Franquícia horària** (`travelLaborCost` canònic, compartit amb reserves): nova constant `TRAVEL_INCLUDED_HOURS = 1`; `chargeableHours = max(0, floor(routeHours − 1))` (hores senceres). El cost de persones es calcula sobre `chargeableHours`, no sobre el total. Breakdown exposa `includedHours`/`chargeableHours`.
+- **Visibilitat**: la tira del lead i el bloc de `NewBookingForm` mostren «1a hora inclosa · cobren N h de M h de ruta». Dos totals separats: Cost ruta intern (marge) vs Repercutit al client (facturable).
+
+### Validació
+- Validació tècnica: tsc 0; travelLaborCost 4/4 + leadServiceLineService 10/10; suite serveis+bookings 3065/3065 (canvi de model compartit no trenca costEngine/booking pricing); validate:core EXIT 0.
+- Validació funcional: (Playwright, lead Alba 6,49 h) cobren 5 h → Conductor 90€/Passatger 75€/Vehicle 106€ = 271€ intern; Repercutit +190€; total bolo 430€. Regles verificades: 1,5 h→0, 1 h50→0, 2 h→1 h.
+- Validació humana/UX: tira compacta amb els dos conceptes clarament separats + nota explicativa; captura.
+
+### Coordinació
+Counter → 1347. He tocat el model canònic `travelLaborCost` (carril de cost de Codex) amb autorització explícita del propietari; monocapa (reserves i lead comparteixen la regla). Preu/hora conductor=18€, passatger=15€ (constants existents). Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-02 — Compactació: secció de transport del lead a tira única (Canvi #1346, claude)
 
 ### Context
