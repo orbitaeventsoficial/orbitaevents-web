@@ -173,13 +173,21 @@
   --o-r-xl:    20px;   /* cards principals, diàlegs */
   --o-r-pill:  9999px; /* elements completament rodons */
 
-  /* ── Escala d'espaiat canònica (4px-based, en rem) ── */
-  --o-space-1: 0.25rem;  /* 4px  */
-  --o-space-2: 0.5rem;   /* 8px  */
-  --o-space-3: 0.75rem;  /* 12px */
-  --o-space-4: 1rem;     /* 16px */
-  --o-space-6: 1.5rem;   /* 24px */
-  --o-space-12: 3rem;    /* 48px */
+  /* ── Escala d'espaiat canònica (4px-based, en rem). Completa: tot padding/gap/margin
+     de l'admin ha de sortir d'aquí. Els mig-passos (05/15/25/35) cobreixen els ajustos
+     fins que abans anaven en px solts (2/6/10/14px). ── */
+  --o-space-05: 0.125rem; /* 2px  */
+  --o-space-1:  0.25rem;  /* 4px  */
+  --o-space-15: 0.375rem; /* 6px  */
+  --o-space-2:  0.5rem;   /* 8px  */
+  --o-space-25: 0.625rem; /* 10px */
+  --o-space-3:  0.75rem;  /* 12px */
+  --o-space-35: 0.875rem; /* 14px */
+  --o-space-4:  1rem;     /* 16px */
+  --o-space-5:  1.25rem;  /* 20px */
+  --o-space-6:  1.5rem;   /* 24px */
+  --o-space-8:  2rem;     /* 32px */
+  --o-space-12: 3rem;     /* 48px */
 
   --o-sidebar-w: 200px;
 
