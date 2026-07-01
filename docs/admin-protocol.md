@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1320 — 2026-07-01 — claude (FET)
+**Fix visual: cards de packs → .ap-card.**
+- packs/page.tsx ~16 contenidors rounded border p- pelats → .ap-card (fons canònic), tons condicionals conservats. KPI + mini-cards de marge coherents.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1320`; el següent canvi real ha de ser `#1321`.
+- Validació tècnica: tsc 0; validate:core.
+- Validació funcional: captura cards amb fons.
+- Validació humana/UX: hipersemblants.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1319 — 2026-07-01 — claude (FET)
 **Fix visual: bloc «Equips/Lots» d'inventory → inputs canònics.**
 - InventoryListSections: inputs/selects amb border pelat → .adm-input (fons fosc + tàctil); botó candidat→.ap-btn; row lot→.ap-card; filtres categoria/estat sense doble vora. El bloc ja no sembla buit/trencat.

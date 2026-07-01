@@ -288,25 +288,25 @@ export default async function PacksPage({
           <p className="text-xs font-medium uppercase">Total Packs</p>
           <p className="mt-2 text-3xl font-bold">{filteredPacks.length}</p>
         </div>
-        <div className="rounded-2xl border p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Actius</p>
           <p className="mt-2 text-3xl font-bold">
             {filteredPacks.filter((p) => p.isActive).length}
           </p>
         </div>
-        <div className="rounded-2xl border p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Destacats</p>
           <p className="mt-2 text-3xl font-bold">
             {filteredPacks.filter((p) => p.isFeatured).length}
           </p>
         </div>
-        <div className="rounded-2xl border p-4">
+        <div className="ap-card p-4">
           <p className="text-xs font-medium uppercase">Total Reserves</p>
           <p className="mt-2 text-3xl font-bold">
             {filteredPacks.reduce((sum, p) => sum + p._count.bookings, 0)}
           </p>
         </div>
-        <div className={`rounded-2xl border p-4 ${pricingAlertsCount > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : 'admin-tone-border-success admin-tone-bg-success'}`}>
+        <div className={`ap-card p-4 ${pricingAlertsCount > 0 ? 'admin-tone-border-danger admin-tone-bg-danger' : 'admin-tone-border-success admin-tone-bg-success'}`}>
           <p className={`text-xs font-medium uppercase ${pricingAlertsCount > 0 ? 'admin-tone-text-danger' : 'admin-tone-text-success'}`}>Alertes de preu pack</p>
           <p className="mt-2 text-3xl font-bold">{pricingAlertsCount}</p>
         </div>
@@ -378,7 +378,7 @@ export default async function PacksPage({
                     </div>
                     {health && (
                       <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div className="rounded-xl border p-2">
+                        <div className="ap-card p-2">
                           <p className="">Pack recomanat</p>
                           <p className="text-sm font-semibold">{formatCurrencyExact(health.recommendedPrice)}</p>
                         </div>
@@ -390,20 +390,20 @@ export default async function PacksPage({
                           recommendedExtraHourPrice={health.recommendedExtraHourPrice}
                           alertThreshold={pricingConfig.alertDivergencePct}
                         />
-                        <div className="rounded-xl border p-2">
+                        <div className="ap-card p-2">
                           <p className="">Hora extra recomanada</p>
                           <p className="text-sm font-semibold">{formatCurrencyExact(health.recommendedExtraHourPrice)}</p>
                         </div>
-                        <div className={`col-span-2 rounded-xl border p-2 ${divergenceColor}`}>
+                        <div className={`ap-card col-span-2 p-2 ${divergenceColor}`}>
                           <p className="text-xs">Llindar alerta: {pricingConfig.alertDivergencePct}%</p>
                         </div>
-                        <div className="col-span-2 rounded-xl border p-2 text-xs">
+                        <div className="ap-card col-span-2 p-2 text-xs">
                           Equip tècnic: {health.specialistCount} especialista + {health.operatorCount} operari · {health.laborNetCostPerHourUsed.toFixed(2)}€/h net · {health.laborCostPerHourUsed.toFixed(2)}€/h brut (SS {(health.socialSecurityPct * 100).toFixed(1)}%)
                         </div>
-                        <div className="col-span-2 rounded-xl border p-2 text-xs">
+                        <div className="ap-card col-span-2 p-2 text-xs">
                           IRPF {(health.withholdingPct * 100).toFixed(1)}% → net estimat percebut: {health.laborNetAfterWithholdingPerHourUsed.toFixed(2)}€/h
                         </div>
-                        <div className="col-span-2 rounded-xl border p-2 text-xs">
+                        <div className="ap-card col-span-2 p-2 text-xs">
                           Operari extra sempre disponible: {health.recommendedOperatorExtraHourPrice.toFixed(2)}€/h (recomanat)
                         </div>
                       </div>
@@ -542,7 +542,7 @@ export default async function PacksPage({
                     </div>
                     {health && (
                       <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div className="rounded-xl border p-2">
+                        <div className="ap-card p-2">
                           <p className="">Pack recomanat</p>
                           <p className="text-sm font-semibold">{formatCurrencyExact(health.recommendedPrice)}</p>
                         </div>
@@ -554,20 +554,20 @@ export default async function PacksPage({
                           recommendedExtraHourPrice={health.recommendedExtraHourPrice}
                           alertThreshold={pricingConfig.alertDivergencePct}
                         />
-                        <div className="rounded-xl border p-2">
+                        <div className="ap-card p-2">
                           <p className="">Hora extra recomanada</p>
                           <p className="text-sm font-semibold">{formatCurrencyExact(health.recommendedExtraHourPrice)}</p>
                         </div>
-                        <div className={`col-span-2 rounded-xl border p-2 ${divergenceColor}`}>
+                        <div className={`ap-card col-span-2 p-2 ${divergenceColor}`}>
                           <p className="text-xs">Llindar alerta: {pricingConfig.alertDivergencePct}%</p>
                         </div>
-                        <div className="col-span-2 rounded-xl border p-2 text-xs">
+                        <div className="ap-card col-span-2 p-2 text-xs">
                           Equip tècnic: {health.specialistCount} especialista + {health.operatorCount} operari · {health.laborNetCostPerHourUsed.toFixed(2)}€/h net · {health.laborCostPerHourUsed.toFixed(2)}€/h brut (SS {(health.socialSecurityPct * 100).toFixed(1)}%)
                         </div>
-                        <div className="col-span-2 rounded-xl border p-2 text-xs">
+                        <div className="ap-card col-span-2 p-2 text-xs">
                           IRPF {(health.withholdingPct * 100).toFixed(1)}% → net estimat percebut: {health.laborNetAfterWithholdingPerHourUsed.toFixed(2)}€/h
                         </div>
-                        <div className="col-span-2 rounded-xl border p-2 text-xs">
+                        <div className="ap-card col-span-2 p-2 text-xs">
                           Operari extra sempre disponible: {health.recommendedOperatorExtraHourPrice.toFixed(2)}€/h (recomanat)
                         </div>
                       </div>

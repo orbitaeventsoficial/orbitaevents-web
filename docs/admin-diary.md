@@ -1,3 +1,22 @@
+## 2026-07-01 — Fix visual: cards de packs → .ap-card (border pelat → fons canònic) (Canvi #1320, claude)
+
+### Context
+Revisió visual continuada. A /admin/packs: KPI cards (Total/Actius/Destacats/Reserves) i mini-cards de marge dins cada pack usaven `rounded-2xl/xl border p-` pelat (sense fons canònic) → border sol, incoherent amb .ap-card.
+
+### Què s'ha fet
+- `packs/page.tsx`: ~16 contenidors `rounded-2xl border p-4`/`rounded-xl border p-2` → `.ap-card` (fons --panel canònic), conservant els tons condicionals (admin-tone-danger/success, divergenceColor). Ara les cards tenen fons, coherents amb la resta.
+
+### Validació
+- Validació tècnica: tsc 0; validate:core.
+- Validació funcional: captura — KPI + mini-cards amb fons canònic.
+- Validació humana/UX: cards de packs hipersemblants.
+
+### Coordinació
+Counter → 1320. Revisió visual non-stop (inventory #1318 + packs ara). Patró: border pelat → .ap-card.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-01 — Fix visual: bloc «Equips/Lots» d'inventory → inputs canònics (Canvi #1319, claude)
 
 ### Context
