@@ -2724,7 +2724,7 @@ html.admin-mode .ap-subtitle {
 
 /* ── KPIS ────────────────────────────────────────────────────────────────── */
 html.admin-mode .ap-kpis {
-  /* el padding és a ap-kpi-row */
+  padding-inline: var(--page-gutter);
 }
 
 html.admin-mode .ap-kpi-row {
@@ -2830,6 +2830,7 @@ html.admin-mode .ap-tabs-nav {
   display: flex;
   flex-wrap: wrap;
   gap: 0.375rem;
+  padding-inline: var(--page-gutter);
 }
 
 html.admin-mode .ap-tab {
@@ -2870,6 +2871,9 @@ html.admin-mode .ap-content {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  /* Gutter lateral canònic: s'alinea amb el header (--head-pad). De fàbrica per a
+     tota pàgina AdminPage; cap pàgina el defineix a mà. */
+  padding-inline: var(--page-gutter);
 }
 
 /* ── SECTION ─────────────────────────────────────────────────────────────── */

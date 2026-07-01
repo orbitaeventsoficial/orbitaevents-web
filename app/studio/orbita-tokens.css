@@ -334,6 +334,11 @@
     linear-gradient(180deg, color-mix(in oklab, var(--raised) 40%, transparent), transparent 70%),
     color-mix(in oklab, var(--canvas) 92%, transparent);
 
+  /* Gutter lateral de pàgina: MATEIX valor que el lateral del header (--head-pad),
+     perquè el cos (.ap-content, KPIs, tabs) s'alinei amb el header. Tot contenidor
+     de pàgina el consumeix "de fàbrica" via .ap-page — cap pàgina el defineix a mà. */
+  --page-gutter: clamp(0.9rem, 2.4vi, 1.5rem);
+
   /* Font-weight (aliases globals) */
   --fw-normal:    var(--o-fw-normal);
   --fw-book:      var(--o-fw-book);
