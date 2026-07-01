@@ -43,6 +43,20 @@ html.admin-mode [class*="text-[11.8px]"] {
 
 /* text-xs (0.75rem = 12px) és el mínim acceptable — no s'escala */
 
+/* ── Vora canònica per defecte: cap `border` pelat de Tailwind (que cauria al gris
+   fred #e5e7eb del preflight) dins l'admin. `:where()` manté l'especificitat a (0,1,1):
+   venç el default universal del preflight però PERD contra qualsevol color de vora
+   intencional (utilitats `border-<x>` o classes d'estat com `.ap-kpi--*`), que queden
+   intactes. El `:not([class*="border-…-"])` exclou les que ja porten color.
+   Cobreix vora completa + direccionals pelades. Una veritat, un CSS.            ── */
+html.admin-mode :where([class~="border"]:not([class*="border-"]))   { border-color: var(--line); }
+html.admin-mode :where([class~="border-t"]:not([class*="border-t-"])) { border-top-color: var(--line); }
+html.admin-mode :where([class~="border-b"]:not([class*="border-b-"])) { border-bottom-color: var(--line); }
+html.admin-mode :where([class~="border-l"]:not([class*="border-l-"])) { border-left-color: var(--line); }
+html.admin-mode :where([class~="border-r"]:not([class*="border-r-"])) { border-right-color: var(--line); }
+html.admin-mode :where([class~="border-x"]:not([class*="border-x-"])) { border-left-color: var(--line); border-right-color: var(--line); }
+html.admin-mode :where([class~="border-y"]:not([class*="border-y-"])) { border-top-color: var(--line); border-bottom-color: var(--line); }
+
 /* ── Radis normalitzats: HIPERSEMBLANÇA entre pàgines («sèrie, mateix dissenyador»).
    El repo tenia radis dispersos (rounded-xl 12px / 2xl 16px / 3xl 24px barrejats).
    Aquesta capa única els convergeix al radi de card canònic (--o-r-md, 10px) perquè

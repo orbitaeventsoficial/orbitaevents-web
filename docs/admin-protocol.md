@@ -1546,6 +1546,19 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1341 — 2026-07-01 — claude (FET)
+**Canon vora: fuita de gris fred (Tailwind default) → token `--line` monocapa.**
+- Diagnòstic de «la línia blanca»: vora de card = `--line` (blanc càlid 10%); neutres subtil, estats intensificats (color-mix, intencional). Fuita real: `border` pelat → default preflight `#e5e7eb` (gris fred fora de paleta). Runtime scan 12 rutes → 13 fuites en 5 rutes; cap guard les caça.
+- Fix monocapa a `admin-shell.css`: `html.admin-mode :where([class~="border"]:not([class*="border-"])) { border-color: var(--line) }` + direccionals. `:where()` (0,1,1) venç el preflight, perd contra colors intencionals; `:not` exclou les acolorides. Una regla, 0 fitxers de pàgina tocats, 0 clobber.
+- `pricing`: spinner `border-4` → `border-[var(--line)]` (top transparent conservat).
+- Validació tècnica: tsc 0; validate:core EXIT 0.
+- Validació funcional (Playwright, reinici net .next): 5 rutes = 0 fuites; estats conservats.
+- Validació humana/UX: totes les vores de contenidor = mateix blanc càlid canònic.
+- Worktree lliure post-#1340. PENDENT cua: normalització neutre↔estat + divergències mida/línia. Counter → 1341.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1340 — 2026-07-01 — codex (FET)
 **Bingo Musical: tècnic de so sempre assignable + cost ruta net al lead.**
 - `lib/constants/orbita-services.ts`: `partnerProductRequiresSoundTech` converteix `Bingo Musical` i `Batalla Musical` en productes que sempre requereixen línia separada de tècnic, encara que el `crew` vingui buit.

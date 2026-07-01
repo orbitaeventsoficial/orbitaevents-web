@@ -252,7 +252,7 @@ export default function PricingAdminPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-transparent mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-[var(--line)] border-t-transparent mx-auto mb-4"></div>
           <p className="font-medium">Carregant dades...</p>
         </div>
       </div>

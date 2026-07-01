@@ -1,3 +1,24 @@
+## 2026-07-01 — Canon vora: fuita de gris fred (Tailwind default) → token `--line` monocapa (Canvi #1341, claude)
+
+### Context
+El propietari pregunta per «la línia blanca» dels contenidors: per què en uns sí i en altres no. Diagnòstic al DOM+CSS: la vora de card és `--line` (blanc càlid 10%); en cards neutres quasi invisible, en cards d'estat intensificada (color-mix ~40%, intencional). Però hi havia una **fuita real**: `border` pelat de Tailwind (sense classe de color) cau al default del preflight `#e5e7eb` (**gris fred**), que NO pertany a la paleta carbó+or. Escaneig de runtime a 12 rutes: 13 fuites en 5 rutes (/admin, economia, packs, calendario, pricing, ressenyes). Cap guard les caçava (no hi ha classe `gray-*` explícita; és el default implícit).
+
+### Què s'ha fet
+- **Regla monocapa** a `admin-shell.css` (germana del catch-all de radi): `html.admin-mode :where([class~="border"]:not([class*="border-"])) { border-color: var(--line) }` + direccionals (border-t/b/l/r/x/y). El `:where()` manté especificitat (0,1,1): **venç el default del preflight però perd contra qualsevol color intencional** (utilitats `border-<x>` o classes d'estat `.ap-kpi--*`), i el `:not` exclou les que ja porten color. Una regla mata les 13 fuites sense tocar 13 fitxers ni trepitjar colors.
+- `pricing/page.tsx`: spinner `border-4` (amplada numèrica, fora de la regla) → `border-[var(--line)]` (top transparent conservat).
+- Verificat: divergència de radi inline = 0 (catch-all ja governa; cards totes a 10px `--o-r-md`).
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0; qa:admin-mode-prefix + css-monocapa verds.
+- Validació funcional (runtime real, Playwright): reinici net de `.next` (servia CSS ranci); 5 rutes reescanejades = **0 fuites de gris fred**; estats (gauge ambre, tones) conservats — la regla no aplana colors intencionals.
+- Validació humana/UX: totes les vores de contenidor ara són el mateix blanc càlid canònic; el gris fred fora de paleta ha desaparegut.
+
+### Coordinació
+Counter → 1341. Fet amb worktree lliure després del #1340 de Codex. Fitxers disjunts (admin-shell.css + pricing). PENDENT de la cua: normalització neutre↔estat de la línia + caça de divergències mida/línia («color = mida = línia»). Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-01 — Bingo Musical: tècnic de so sempre assignable + cost ruta net al lead (Canvi #1340, codex)
 
 ### Context
