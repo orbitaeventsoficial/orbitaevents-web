@@ -88,12 +88,24 @@ export async function listLeadServiceLines(leadId: string) {
  * Replace-all de les línies del bolo (mateix patró que el booking editor).
  * Esborra les actuals i crea les noves dins una transacció.
  */
-export async function replaceLeadServiceLines(leadId: string, inputLines: LeadServiceLineInput[]) {
+export async function replaceLeadServiceLines(
+  leadId: string,
+  inputLines: LeadServiceLineInput[],
+  distanceKm?: number | null,
+) {
   const lead = await prisma.lead.findUnique({
     where: { id: leadId },
     select: { id: true, booking: { select: { id: true } } },
   });
   if (!lead) return { status: 404, body: { error: 'Lead no trobat' } };
+
+  // Km de ruta (mirall de Booking.distanceKm) per al càlcul de transport en viu (#1345).
+  if (distanceKm !== undefined) {
+    const km = typeof distanceKm === 'number' && Number.isFinite(distanceKm) && distanceKm > 0
+      ? Math.round(distanceKm * 10) / 10
+      : null;
+    await prisma.lead.update({ where: { id: leadId }, data: { distanceKm: km } });
+  }
 
   const clean = (Array.isArray(inputLines) ? inputLines : [])
     .filter((l) => (l.label?.trim() || '') !== '' || (l.revenueAmount ?? 0) > 0)

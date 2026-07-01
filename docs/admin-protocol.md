@@ -1546,6 +1546,19 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1345 — 2026-07-02 — claude (FET)
+**Càlcul de transport EN VIU al bolo del lead (km/integrants/cost ruta).**
+- Schema: `Lead.distanceKm Float?` additiu (mirall de Booking). Migració `20260702010000_add_lead_distance_km` aplicada a Railway.
+- `LeadBoloSection`: reutilitza `calculateTravelCostBreakdown` + `useBookingDistance` de `NewBookingForm`. Distància auto-resolta de la ubicació del lead, integrants derivats (producte=1 + tècnics) + ajust manual, cost viu al marge (fallback al snapshot #1343 si no hi ha km). Secció «Desplaçament» sempre visible + KPIs Vehicle/Conductor/Passatgers/Cost ruta.
+- Persistència: `distanceKm` via PUT service-lines (`replaceLeadServiceLines` l'accepta).
+- Validació tècnica: tsc 0; test 10/10; validate:core EXIT 0.
+- Validació funcional: (Playwright, lead Alba) 422 km auto-resolt; Vehicle 106€/Conductor 117€/Passatgers 97€/Cost ruta 320€.
+- Validació humana/UX: secció visible amb captura; inputs `.adm-input`, KPIs `.ap-ledger-kpi`, 0 hardcode.
+- Reutilitza el motor de Codex (no reescriu). Selecció fina proveïdor/vehicle = pendent Codex. Counter → 1345.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1344 — 2026-07-02 — claude (FET)
 **Fix d'arrel: fons/tones d'estat transparents — `--at-*` no resolien `--o-*`.**
 - Bug: els aliases `--at-*` (a `html.admin-mode`) referencien `--o-*`, definits NOMÉS a `.ax-root`/`.o-studio-root`/`.fx-root.is-contrast` (descendents) → `--at-*` computaven invàlids a nivell html i heretaven buit avall. 35 cards `admin-tone-bg-*` amb fons transparent + tones al fallback.

@@ -1456,6 +1456,14 @@ html.admin-mode .ap-ledger-econobadge {
   color: var(--gold); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold);
 }
 html.admin-mode .ap-ledger-econonote { font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t3); font-weight: var(--o-fw-normal); }
+/* Transport en viu al bolo del lead (#1345): capçalera separada + parella d'inputs km/integrants. */
+html.admin-mode .ap-ledger-travel-head { margin-top: var(--o-space-3); border-top: 1px solid var(--line); }
+html.admin-mode .ap-ledger-travel-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--o-space-25); padding: var(--o-space-25) var(--o-space-35);
+}
+html.admin-mode .ap-ledger-travel-field { display: flex; flex-direction: column; gap: var(--o-space-1); }
+html.admin-mode .ap-ledger-travel-field > span { font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t3); }
 html.admin-mode .ap-ledger-kpis {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10.625rem, 1fr));

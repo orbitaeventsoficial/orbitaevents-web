@@ -141,12 +141,13 @@ type ProposalItem = {
 type DossierItem = { id: string; nom: string; estat: string; mode: string | null; sentAt: string | null; sentTo?: string | null; createdAt: string };
 type LeadDocumentItem = { id: string; type: string; title: string; fileUrl: string; createdAt: string };
 
-export default function LeadDetailClient({ lead, proposals, dossiers, documents, vehicleCostPerKm, bookingEconomia = null }: {
+export default function LeadDetailClient({ lead, proposals, dossiers, documents, vehicleCostPerKm, initialDistanceKm = null, bookingEconomia = null }: {
  lead: LeadDetailData;
  proposals: ProposalItem[];
  dossiers: DossierItem[];
  documents: LeadDocumentItem[];
  vehicleCostPerKm: number;
+ initialDistanceKm?: number | null;
  /** Economia REAL de la reserva vinculada (font canònica). Quan existeix, mana
  * sobre el `boloEcon` provisional del configurador (el lead amb reserva mostra
  * la veritat de la reserva, no el bolo). */
@@ -589,6 +590,7 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  contractedProducts={lead.booking?.contractedProducts ?? []}
  source={lead.channel}
  vehicleCostPerKm={vehicleCostPerKm}
+ initialDistanceKm={initialDistanceKm}
  onEconomiaChange={handleEconomia}
  compactEconomia
  />

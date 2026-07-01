@@ -1,3 +1,24 @@
+## 2026-07-02 — Càlcul de transport EN VIU al bolo del lead (km/integrants/cost ruta) (Canvi #1345, claude)
+
+### Context
+El propietari detecta que el lead pur no calcula els components de transport (km/trams/integrants); el #1343 només reimputava un snapshot estàtic recuperat. El càlcul complet ja existia a `NewBookingForm` (`calculateTravelCostBreakdown` + `useBookingDistance`) però no vivia al lead. A més, el `Lead` no tenia on desar la distància.
+
+### Què s'ha fet
+- **Schema**: nou camp additiu `Lead.distanceKm Float?` (mirall de `Booking.distanceKm`). Migració `20260702010000_add_lead_distance_km` aplicada a Railway (migrate deploy, additiva/reversible).
+- **`LeadBoloSection`**: porta el càlcul de `NewBookingForm` — distància auto-resolta des de la ubicació del lead (`useBookingDistance` → `/api/admin/maps/distance`), integrants derivats del bolo (producte=1 + tècnics de so) amb ajust manual, `calculateTravelCostBreakdown` (vehicle + conductor + passatgers + llindar). El cost viu alimenta el marge (`travelCost`), amb fallback al snapshot recuperat (#1343) quan encara no hi ha km. Secció «Desplaçament» SEMPRE visible (també en mode compacte de la fitxa) amb inputs km/integrants + KPIs Vehicle/Conductor/Passatgers/Cost ruta.
+- **Persistència**: `distanceKm` es desa via el PUT de service-lines (`replaceLeadServiceLines` accepta `distanceKm`; ruta actualitzada).
+
+### Validació
+- Validació tècnica: tsc 0; test `leadServiceLineService` 10/10; validate:core EXIT 0.
+- Validació funcional: (Playwright, lead Alba Andorra) distància auto-resolta 422 km (Granollers→l'Aldosa de Canillo); KPIs Vehicle 106€ · Conductor 117€ (6,49h) · Passatgers 97€ · Cost ruta 320€ · 2 integrants · llindar 50 km. El marge del bolo consumeix el cost viu.
+- Validació humana/UX: secció «Desplaçament» visible a la fitxa amb captura; inputs canònics `.adm-input`, KPIs `.ap-ledger-kpi`, 0 hardcode (tokens `--o-space-*`).
+
+### Coordinació
+Counter → 1345. Entrada al carril de cost/transport autoritzada pel propietari («fes tu el càlcul», «tot»); es REUTILITZA el motor de Codex (`calculateTravelCostBreakdown`, `useBookingDistance`), no es reescriu. PENDENT per a Codex si vol: selecció fina proveïdor/vehicle/conductor al lead (ara Òrbita per defecte; es refina en fer-se reserva). Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-02 — Fix d'arrel: fons/tones d'estat transparents — `--at-*` no resolien `--o-*` (Canvi #1344, claude)
 
 ### Context

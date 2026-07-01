@@ -6,7 +6,9 @@ import { useToast } from '@/app/admin/components/ToastProvider';
 import BookingServiceLinesSection from '@/app/admin/bookings/BookingServiceLinesSection';
 import type { BookingServiceLineFormInput } from '@/app/admin/bookings/booking-form.types';
 import { computeBookingFinancialSummary, aggregateServiceLines, classifyBoloLines } from '@/lib/services/costEngine';
-import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
+import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
+import { calculateTravelCostBreakdown } from '@/lib/services/travelLaborCost';
+import { useBookingDistance } from '@/app/admin/bookings/useBookingDistance';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { formatCurrency } from '@/lib/constants';
 
@@ -34,6 +36,7 @@ export default function LeadBoloSection({
  contractedProducts = [],
  source,
  vehicleCostPerKm = DEFAULT_VEHICLE_COST_PER_KM,
+ initialDistanceKm = null,
  onEconomiaChange,
  compactEconomia = false,
 }: {
@@ -58,13 +61,18 @@ export default function LeadBoloSection({
  }>;
  source?: string | null;
  vehicleCostPerKm?: number;
+ initialDistanceKm?: number | null;
  onEconomiaChange?: (e: BoloEconomia | null) => void;
  compactEconomia?: boolean;
 }) {
  const toast = useToast();
  const [lines, setLines] = useState<BookingServiceLineFormInput[]>([]);
- // Cost intern de ruta (línies [travel-cost] amagades): reimputat al marge.
+ // Cost intern de ruta (línies [travel-cost] amagades del #1342/#1343): fallback
+ // quan encara no hi ha distància calculada en viu.
  const [internalTravelCost, setInternalTravelCost] = useState(0);
+ // Càlcul de transport EN VIU (#1345): km anada+tornada + integrants derivats del bolo.
+ const [distanceKm, setDistanceKm] = useState(initialDistanceKm ? String(initialDistanceKm) : '');
+ const [headcountOverride, setHeadcountOverride] = useState('');
  const [loading, setLoading] = useState(true);
  const [saving, setSaving] = useState(false);
  const [dirty, setDirty] = useState(false);
@@ -118,6 +126,36 @@ export default function LeadBoloSection({
  })), [contractedProducts]);
  const buildVisibleLines = useCallback((): BookingServiceLineFormInput[] => [...baseLines, ...lines], [baseLines, lines]);
 
+ // ── Transport EN VIU (#1345): mirall del càlcul de NewBookingForm ──
+ // Distància auto-resolta des de la ubicació del lead → Granollers.
+ const { calculatingDistance, distanceMessage } = useBookingDistance({
+ eventVenue: documentContext.eventAddress ?? '',
+ eventLocation: documentContext.eventLocation ?? '',
+ onDistanceResolved: (km) => { setDistanceKm(km); setDirty(true); },
+ });
+ // Integrants derivats del bolo: 1 base si hi ha producte + tècnics de so.
+ const derivedHeadcount = useMemo(() => {
+ const all = buildVisibleLines();
+ const hasProduct = all.some((l) => (l.revenueAmount ?? 0) > 0 || l.kind === 'PROVIDER_SERVICE' || l.kind === 'DJ');
+ const soundTech = all.filter((l) => l.kind === 'SOUND_TECH').reduce((s, l) => s + (l.quantity || 1), 0);
+ return (hasProduct ? 1 : 0) + soundTech;
+ }, [buildVisibleLines]);
+ const headcount = headcountOverride ? Math.max(0, Math.floor(Number(headcountOverride) || 0)) : derivedHeadcount;
+ const travelBreakdown = useMemo(() => {
+ const passengerCount = Math.max(0, headcount - 1);
+ return calculateTravelCostBreakdown({
+ roundTripKm: Number(distanceKm) || 0,
+ vehicleCostPerKm,
+ vehicleOwner: { label: 'Òrbita' },
+ people: [
+ ...(headcount > 0 ? [{ role: 'DRIVER' as const, label: 'Òrbita' }] : []),
+ ...(passengerCount > 0 ? [{ role: 'PASSENGER' as const, label: 'Equip ruta', count: passengerCount }] : []),
+ ],
+ });
+ }, [distanceKm, headcount, vehicleCostPerKm]);
+ // Live si hi ha km resolts; si no, fallback al cost recuperat (#1343).
+ const effectiveTravelCost = (Number(distanceKm) || 0) > 0 ? travelBreakdown.totalCost : internalTravelCost;
+
  // Fulla d'economia del bolo (Fase 4 de docs/bolo-flux.md). La pasta NO viu al
  // configurador: cada línia porta el cost amagat i alimenta SOLA aquesta fulla.
  // Cost de cada línia: el cost explícit (partners) o, per a línies pròpies d'Òrbita
@@ -140,7 +178,7 @@ export default function LeadBoloSection({
  const summary = computeBookingFinancialSummary({
  total: revenue,
  packPrice: 0, extrasTotal: 0, extraHours: 0, extraHourPrice: 0,
- distanceKm: 0, travelCost: internalTravelCost,
+ distanceKm: Number(distanceKm) || 0, travelCost: effectiveTravelCost,
  serviceLinesRevenue: revenue, serviceLinesCost: cost + rentalTransport,
  source: source ?? null,
  }, {
@@ -148,7 +186,7 @@ export default function LeadBoloSection({
  fixedOperationalCost: hasOwnEquipment ? PROFITABILITY_MODEL_DEFAULTS.fixedOperationalCost : 0,
  });
  return summary;
- }, [buildVisibleLines, source, vehicleCostPerKm, internalTravelCost]);
+ }, [buildVisibleLines, source, vehicleCostPerKm, effectiveTravelCost, distanceKm]);
 
  // Eleva el net al contenidor (perquè visqui al hero de la fitxa, no enterrat a baix).
  useEffect(() => {
@@ -181,7 +219,7 @@ export default function LeadBoloSection({
  const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/service-lines`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ lines: buildAllLines() }),
+ body: JSON.stringify({ lines: buildAllLines(), distanceKm: Number(distanceKm) || null }),
  });
  if (!res.ok) throw new Error('No s\'ha pogut desar');
  toast.success('Bolo desat.');
@@ -307,6 +345,64 @@ export default function LeadBoloSection({
  </div>
  </div>
  )}
+ </section>}
+
+ {/* Transport en viu (#1345): SEMPRE visible (també en mode compacte de la fitxa),
+ perquè km/integrants/cost de ruta són decisió operativa del bolo, no detall d'economia. */}
+ {economia && <section className="ap-ledger-econo">
+ <div className="ap-ledger-econohead">
+ <span>Desplaçament</span>
+ <span className="ap-ledger-econonote">cost intern · no és producte contractat</span>
+ </div>
+ <div className="ap-ledger-travel-grid">
+ <label className="ap-ledger-travel-field">
+ <span>Km anada+tornada</span>
+ <input
+ type="number" min={0} step={1} inputMode="numeric"
+ className="adm-input"
+ value={distanceKm}
+ onChange={(e) => { setDistanceKm(e.target.value); setDirty(true); }}
+ placeholder={calculatingDistance ? 'Calculant…' : '0'}
+ aria-label="Km anada i tornada de la ruta"
+ />
+ </label>
+ <label className="ap-ledger-travel-field">
+ <span>Ajust integrants</span>
+ <input
+ type="number" min={0} step={1} inputMode="numeric"
+ className="adm-input"
+ value={headcountOverride}
+ onChange={(e) => setHeadcountOverride(e.target.value)}
+ placeholder={String(derivedHeadcount)}
+ aria-label="Ajust manual d'integrants de la ruta"
+ />
+ </label>
+ </div>
+ <div className="ap-ledger-kpis">
+ <div className="ap-ledger-kpi" data-level="info">
+ <div className="ap-ledger-kpi-val">{formatCurrency(travelBreakdown.vehicleCost)}</div>
+ <div className="ap-ledger-kpi-lbl">Vehicle</div>
+ <div className="ap-ledger-kpi-sub">{travelBreakdown.roundTripKm} km</div>
+ </div>
+ <div className="ap-ledger-kpi" data-level="info">
+ <div className="ap-ledger-kpi-val">{formatCurrency(travelBreakdown.driverCost)}</div>
+ <div className="ap-ledger-kpi-lbl">Conductor</div>
+ <div className="ap-ledger-kpi-sub">{travelBreakdown.routeHours} h ruta</div>
+ </div>
+ <div className="ap-ledger-kpi" data-level="info">
+ <div className="ap-ledger-kpi-val">{formatCurrency(travelBreakdown.passengerCost)}</div>
+ <div className="ap-ledger-kpi-lbl">Passatgers</div>
+ <div className="ap-ledger-kpi-sub">{Math.max(0, travelBreakdown.peopleCount - 1)} pax</div>
+ </div>
+ <div className="ap-ledger-kpi" data-level={travelBreakdown.laborCostApplies ? 'warn' : 'ok'}>
+ <div className="ap-ledger-kpi-val">{formatCurrency(effectiveTravelCost)}</div>
+ <div className="ap-ledger-kpi-lbl">Cost ruta</div>
+ <div className="ap-ledger-kpi-sub">
+ {travelBreakdown.peopleCount} integrants · llindar {travelBreakdown.laborThresholdKm} km
+ </div>
+ </div>
+ </div>
+ {distanceMessage && <p className="ap-ledger-econonote">{distanceMessage}</p>}
  </section>}
  </div>
  );

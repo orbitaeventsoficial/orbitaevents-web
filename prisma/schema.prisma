@@ -476,6 +476,7 @@ model Lead {
   // Contacte específic de l'esdeveniment (pot diferir del client)
   eventPhone   String? // telèfon de contacte el dia del bolo
   eventAddress String? // adreça de l'event (venue, domicili, etc.)
+  distanceKm   Float?  // km anada+tornada des de Granollers (mirall de Booking.distanceKm; #1345)
 
   // Audit trail de pèrdua: per què i quan s'ha marcat el lead com LOST
   lostReason String?

@@ -59,6 +59,7 @@ export default async function LeadDetailPage({ params }: Props) {
       assignedTo: true,
       eventPhone: true,
       eventAddress: true,
+      distanceKm: true,
       eventStartTime: true,
       eventEndTime: true,
       sourceCollaboratorId: true,
@@ -214,6 +215,7 @@ export default async function LeadDetailPage({ params }: Props) {
   return (
       <LeadDetailClient
         vehicleCostPerKm={vehicleCostPerKm}
+        initialDistanceKm={lead.distanceKm ?? null}
         bookingEconomia={bookingEconomia}
         proposals={lead.proposals.map((p) => ({
           id: p.id,
