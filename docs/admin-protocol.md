@@ -1546,6 +1546,19 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1342 — 2026-07-02 — codex (FET)
+**Recuperació del bolo al lead Alba sense recrear reserva.**
+- BD viva: restaurades a `LeadServiceLine` les línies literals del backup `adminLog` `CREATE_ANDORRA_BINGO_BOOKING` per al lead `cmr1xh7la0000ug7dj4jnihjr`: Bingo Musical, tècnic de so inclòs i dues línies internes `[travel-cost]` de ruta.
+- `lib/services/leadServiceLineService.ts`: les línies `[travel-cost]` també s'amaguen mentre encara és lead; continuen guardades com a cost intern, però no apareixen com a productes visibles.
+- No es recrea cap reserva per Alba Orna; el cas continua sent lead.
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__/lib/services/leadServiceLineService.test.ts` → 9/9.
+- Validació funcional: `LeadServiceLine` del lead retorna les 4 línies restaurades i `listLeadServiceLines()` filtra `[travel-cost]` també sense reserva.
+- Validació humana/UX: el cas d'Alba continua sent lead i no torna a mostrar costos interns com a productes del bolo.
+- `ADMIN_CHANGE_COUNTER` → `1342`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1341 — 2026-07-01 — claude (FET)
 **Canon vora: fuita de gris fred (Tailwind default) → token `--line` monocapa.**
 - Diagnòstic de «la línia blanca»: vora de card = `--line` (blanc càlid 10%); neutres subtil, estats intensificats (color-mix, intencional). Fuita real: `border` pelat → default preflight `#e5e7eb` (gris fred fora de paleta). Runtime scan 12 rutes → 13 fuites en 5 rutes; cap guard les caça.

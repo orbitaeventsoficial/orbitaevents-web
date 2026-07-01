@@ -1,3 +1,24 @@
+## 2026-07-02 — Recuperació del bolo al lead Alba sense recrear reserva (Canvi #1342, codex)
+
+### Context
+El propietari corregeix el diagnòstic: la reserva d'Alba Orna era falsa i el cas `cmr1xh7la0000ug7dj4jnihjr` ha de continuar sent lead. En desfer la reserva, el lead havia quedat sense les línies del bolo: `LeadServiceLine` estava buit, tot i que el backup a `adminLog` conservava Bingo Musical, tècnic i costos interns de ruta.
+
+### Què s'ha fet
+- BD viva: restaurades a `LeadServiceLine` les línies literals del `adminLog` `CREATE_ANDORRA_BINGO_BOOKING`: `Bingo Musical (Masquerade Events)`, `Tècnic de so inclòs · 1h 30` i dues línies internes `[travel-cost]`.
+- `leadServiceLineService`: les línies `[travel-cost]` també s'amaguen quan encara és lead, no només quan ja hi ha reserva. Queden guardades com a cost intern, però no surten com a productes del bolo.
+- No s'ha recreat cap booking per Alba; la fitxa continua sent lead.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__/lib/services/leadServiceLineService.test.ts` → 9/9.
+- Validació funcional: `LeadServiceLine` del lead retorna les 4 línies restaurades, amb costos/ruta del backup; el servei públic del bolo filtra les línies `[travel-cost]`.
+- Validació humana/UX: la fitxa continua sent lead i el bolo visible no barreja costos interns de ruta amb productes venuts.
+
+### Coordinació
+Counter → 1342. Canvi acotat a dades del lead i servei de línies; sense UI nova.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-01 — Canon vora: fuita de gris fred (Tailwind default) → token `--line` monocapa (Canvi #1341, claude)
 
 ### Context

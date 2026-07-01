@@ -30,6 +30,19 @@ describe('listLeadServiceLines', () => {
     );
   });
 
+  it('si encara es lead, amaga igualment les línies internes de transport', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue(null);
+    mockPrisma.leadServiceLine.findMany.mockResolvedValue([
+      { id: 'producte', label: 'Bingo Musical', notes: null },
+      { id: 'ruta', label: 'Temps ruta conductor', notes: '[travel-cost] DRIVER · 6.00 h' },
+    ]);
+
+    const r = await listLeadServiceLines('lead1');
+
+    expect(r.status).toBe(200);
+    expect(r.body.lines).toEqual([{ id: 'producte', label: 'Bingo Musical', notes: null }]);
+  });
+
   it('si el lead ja te reserva, amaga les línies internes de transport', async () => {
     mockPrisma.lead.findUnique.mockResolvedValue({
       booking: {

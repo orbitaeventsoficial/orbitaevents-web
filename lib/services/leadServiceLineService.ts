@@ -60,7 +60,7 @@ export async function listLeadServiceLines(leadId: string) {
     where: { leadId },
     orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
   });
-  return { status: 200, body: { lines } };
+  return { status: 200, body: { lines: lines.filter((line) => !isTravelCostLine(line)) } };
 }
 
 /**

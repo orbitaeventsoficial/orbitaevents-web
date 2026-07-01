@@ -15,9 +15,9 @@ Avís per l'altre agent: ...
 
 ## Bloc CODEX (Codex CLI)
 
-[codex] 2026-07-01 [ESTAT: treballant — recuperar informació perduda lead ràpida + fitxa lead Andorra]
-Perímetre: flux Comercial/Reserves al voltant de `/admin/leads/cmr1xh7la0000ug7dj4jnihjr`, entrada ràpida prèvia a reserva completa i mapper de dades de lead/reserva. Objectiu: detectar quina informació s'ha deixat de mostrar o de propagar respecte el flux anterior i reparar-ho sense reobrir CSS admin ni canvis aliens.
-Avís claude: worktree ja tenia canvis aliens a `app/admin/admin-shell.css` i `app/admin/pricing/page.tsx`; no els tocaré. Evito capa visual global i em centro en dades/UI funcional del lead ràpid i fitxa.
+[codex] 2026-07-02 [ESTAT: tancat — recuperació bolo lead Alba sense reserva #1342]
+Perímetre: lead `cmr1xh7la0000ug7dj4jnihjr`. Recuperades a `LeadServiceLine` les línies literals del backup `adminLog` de la reserva falsa: Bingo Musical, tècnic inclòs i costos interns `[travel-cost]`. La fitxa continua sent lead, sense booking. `leadServiceLineService` amaga `[travel-cost]` també en lead pur perquè no surtin com a productes visibles.
+Avís claude: cap UI nova, cap CSS global, cap booking recreat. Validació focalitzada: leadServiceLineService 9/9. Counter → 1342.
 
 [codex] 2026-07-01 [ESTAT: tancat — tècnic assignable Bingo + neteja cost ruta lead #1340]
 Perímetre: formulari nova reserva, servei de línies de lead i mapper server de `/admin/leads/[id]`. Bingo Musical/Batalla Musical sempre generen línia separada de `Tècnic de so inclòs` amb selector Òrbita/proveïdor; les línies internes `[travel-cost]` queden ocultes de productes contractats i de càlculs de col·laborador/cost floor. No toco CSS admin ni capa visual de Claude.
