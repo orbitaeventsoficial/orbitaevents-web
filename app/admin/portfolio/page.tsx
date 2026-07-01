@@ -423,8 +423,8 @@ function CategorySection({
           </div>
         </div>
         <div className="flex items-center gap-2 text-xs text-[var(--t2)]">
-          <span className="rounded-full border border-[var(--line)] px-2 py-1">{imageCount} fotos</span>
-          <span className="rounded-full border border-[var(--line)] px-2 py-1">{videoCount} vídeos</span>
+          <span className="ap-badge">{imageCount} fotos</span>
+          <span className="ap-badge">{videoCount} vídeos</span>
           <span className={`text-base transition-transform ${expanded ? 'rotate-180' : ''}`}>â–¾</span>
         </div>
       </button>
@@ -474,8 +474,8 @@ function CategorySection({
                             <p className="text-xs text-[var(--t3)]">ID {item.id.slice(0, 8)} · destí /portfolio/{slug}</p>
                           </div>
                           <div className="flex items-center gap-2 text-xs text-[var(--t3)]">
-                            <span className="rounded-full border border-[var(--line)] px-2 py-1">{item.isStatic ? 'Catàleg públic actual' : 'Drag & drop'}</span>
-                            {item.event ? <span className="rounded-full border admin-tone-border-info px-2 py-1 admin-tone-text-info">Vinculat a {item.event.title}</span> : <span className="rounded-full border border-[var(--line)] px-2 py-1">Sense event</span>}
+                            <span className="ap-badge">{item.isStatic ? 'Catàleg públic actual' : 'Drag & drop'}</span>
+                            {item.event ? <span className="ap-badge ap-badge--info">Vinculat a {item.event.title}</span> : <span className="ap-badge">Sense event</span>}
                           </div>
                         </div>
                         <div>
@@ -628,7 +628,7 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
             <div className="flex flex-col gap-4 md:flex-row md:items-center">
               <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-[var(--line)] bg-black">{eventItem.coverImage ? <Image src={eventItem.coverImage} alt={eventItem.title} fill className="object-cover" sizes="96px" /> : null}</div>
               <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2"><p className="text-sm font-semibold text-[var(--t)]">{eventItem.title}</p><span className={`rounded-full px-2 py-1 text-xs ${eventItem.published ? 'admin-tone-bg-success admin-tone-text-success' : 'bg-[var(--o-admin-light)]/10 text-[var(--t2)]'}`}>{eventItem.published ? 'Publicat' : 'Esborrany'}</span></div>
+                <div className="flex flex-wrap items-center gap-2"><p className="text-sm font-semibold text-[var(--t)]">{eventItem.title}</p><span className={`ap-badge ${eventItem.published ? 'ap-badge--success' : ''}`}>{eventItem.published ? 'Publicat' : 'Esborrany'}</span></div>
                 <p className="mt-1 text-xs text-[var(--t3)]">/{eventItem.categorySlug}/{eventItem.slug} · {eventItem._count?.media || 0} elements vinculats</p>
                 <p className="mt-1 text-xs text-[var(--t3)]">Portada: {eventItem.coverImage || 'pendent'}</p>
               </div>

@@ -275,7 +275,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
                 <p className="mt-1 text-xs text-[var(--t2)]">Això és el que consumirà la resta del sistema quan aquest material entri a packs o càlculs.</p>
               </div>
               {categoryMeta && (
-                <span className="inline-flex items-center rounded-full border border-[var(--line)] bg-[var(--panel)] px-3 py-1 text-xs text-[var(--t2)]">
+                <span className="ap-badge">
                   {categoryMeta.icon} {categoryMeta.label}
                 </span>
               )}

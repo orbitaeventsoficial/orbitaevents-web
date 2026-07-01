@@ -232,7 +232,7 @@ export default async function CatalogPage({
       title="Catàleg"
       subtitle="Punt únic per operar packs, extres, inventari i regles de preu."
       alert={pricingAlerts > 0 ? (
-        <p className="inline-flex rounded-full border admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning px-3 py-1 text-xs font-semibold">
+        <p className="ap-badge ap-badge--warning">
           ⚠ {pricingAlerts} alertes de divergència de preu en packs
         </p>
       ) : undefined}

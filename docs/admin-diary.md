@@ -1,3 +1,23 @@
+## 2026-07-01 — Homogeneïtat: 38 badges/pills fets a mà → .ap-badge (Canvi #1325, claude+agent)
+
+### Context
+Patró sistèmic: badges/pills d'estat/etiqueta fets a mà (`inline-flex rounded-full px-N py-N text-xs`) en comptes de `.ap-badge` canònic → badges lleugerament diferents entre pàgines.
+
+### Què s'ha fet
+- Agent: **38 badges** → `.ap-badge` (22 neutres) + `.ap-badge--{success|warning|danger|info}` (16 amb estat), conservant el significat cromàtic (verd=ok, ambre=avís, vermell=error, blau=info). 17 fitxers: InventoryItemEditor, SummaryPanel, EconomiaClient, salut, portfolio, CalendarMonthClient, catalog, EditPackForm, questionnaires, settings/integrations...
+- DEIXATS correctament (no són badges): dots d'estat (w-2 h-2), avatars (w-8/10), barres de progrés (width dinàmic), botons, i badges amb color per style-map (paymentStateBadge, lifecycle/tag colors — reescriure'ls arriscaria la semàntica). manual (uppercase tags) deixat.
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0; check-admin-canon sense P1.
+- Validació funcional: captura collaborators — badges uniformes.
+- Validació humana/UX: badges hipersemblants a tot l'admin.
+
+### Coordinació
+Counter → 1325. Homogeneïtat de badges. Caça sistèmica: cards+tabs+badges fets. Non-stop.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-01 — Homogeneïtat: tabs/toggles amb border pelat → .ap-tab (Canvi #1324, claude)
 
 ### Context

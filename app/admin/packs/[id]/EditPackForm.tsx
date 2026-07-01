@@ -652,7 +652,7 @@ export default function EditPackForm({
                   <h4 className="mt-1 text-sm font-semibold text-[var(--t)]">Punt de partida, no decisió final</h4>
                   <p className="mt-1 text-sm text-[var(--t2)]">El compositor classifica per nom, codi, categoria i descripció. T'estalvia arrencar de zero, però sempre has de revisar el resultat abans de desar.</p>
                 </div>
-                <span className="inline-flex items-center rounded-full border border-[var(--line)] bg-[var(--panel)] px-3 py-1 text-xs text-[var(--t2)]">
+                <span className="ap-badge">
                   Revisa quantitats i obligatorietat després
                 </span>
               </div>
@@ -793,11 +793,11 @@ export default function EditPackForm({
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="truncate text-sm font-semibold">{item.name}</p>
                           {row.isRequired ? (
-                            <span className="rounded-full border admin-tone-border-success admin-tone-bg-success px-2 py-0.5 text-xs font-semibold admin-tone-text-success">
+                            <span className="ap-badge ap-badge--success">
                               Obligatori
                             </span>
                           ) : (
-                            <span className="rounded-full border border-[var(--line)] bg-[var(--panel)] px-2 py-0.5 text-xs font-semibold text-[var(--t2)]">
+                            <span className="ap-badge">
                               Opcional
                             </span>
                           )}

@@ -1550,6 +1550,17 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #1325 — 2026-07-01 — claude (FET)
+**Homogeneïtat: 38 badges/pills fets a mà → .ap-badge.**
+- Agent: 38 badges → .ap-badge (22 neutres) + --success/warning/danger/info (16 estat), significat cromàtic conservat. 17 fitxers. Dots/avatars/barres/style-maps deixats (no són badges).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` → `1325`; el següent canvi real ha de ser `#1326`.
+- Validació tècnica: tsc 0; validate:core EXIT 0; canon sense P1.
+- Validació funcional: captura collaborators badges uniformes.
+- Validació humana/UX: badges hipersemblants.
+- Començat per: `claude+agent`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1324 — 2026-07-01 — claude (FET)
 **Homogeneïtat: tabs/toggles border pelat → .ap-tab.**
 - EditPackForm pestanyes + cuadrant pills període + inventory editor selector estat → .ap-tab/--active/--idle. faq toggle Actiu/Inactiu deixat (verd/vermell semàntic).

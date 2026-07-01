@@ -39,7 +39,7 @@ function renderPackInventoryPreview(pack: Awaited<ReturnType<typeof getPacks>>[n
           </span>
         ))}
         {pack.inventory.length > 4 && (
-          <span className="inline-flex items-center rounded-full border border-[var(--line)] bg-[var(--raised)] px-2 py-0.5 text-xs font-semibold text-[var(--t2)]">
+          <span className="ap-badge">
             +{pack.inventory.length - 4} més
           </span>
         )}

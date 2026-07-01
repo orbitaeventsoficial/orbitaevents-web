@@ -210,8 +210,8 @@ export default function AttributionPanel({ report }: { report: MultiTouchReport 
                 </div>
                 <div className="flex flex-wrap gap-2 text-xs">
                   <span className="rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-1 admin-tone-text-cyan">First touch</span>
-                  <span className="rounded-full border admin-tone-border-warning admin-tone-bg-warning px-2 py-1 admin-tone-text-warning">Assist</span>
-                  <span className="rounded-full border admin-tone-border-success admin-tone-bg-success px-2 py-1 admin-tone-text-success">Last touch</span>
+                  <span className="ap-badge ap-badge--warning">Assist</span>
+                  <span className="ap-badge ap-badge--success">Last touch</span>
                 </div>
               </div>
               <div className="grid gap-3 md:grid-cols-2">

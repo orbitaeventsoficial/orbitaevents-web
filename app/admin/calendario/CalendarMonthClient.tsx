@@ -390,7 +390,7 @@ export default function CalendarMonthClient() {
               <span className="text-xs uppercase tracking-wide admin-tone-text-success">Reserves</span>
               <span className="text-xl sm:text-2xl font-bold admin-tone-text-success">{stats.totalReservas}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-xs font-medium admin-tone-soft-success admin-tone-border-success admin-tone-text-success">
+            <span className="ap-badge ap-badge--success">
               {stats.reservaDays + stats.mixedDays} dies
             </span>
           </div>
@@ -402,7 +402,7 @@ export default function CalendarMonthClient() {
               <span className="text-xs uppercase tracking-wide admin-tone-text-danger">Bloquejos</span>
               <span className="text-xl sm:text-2xl font-bold admin-tone-text-danger">{stats.totalBloqueos}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-xs font-medium admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger">
+            <span className="ap-badge ap-badge--danger">
               {stats.bloqueadoDays + stats.mixedDays} dies
             </span>
           </div>
@@ -414,7 +414,7 @@ export default function CalendarMonthClient() {
               <span className="text-xs uppercase tracking-wide admin-tone-text-info">Dies lliures</span>
               <span className="text-xl sm:text-2xl font-bold admin-tone-text-info">{stats.freeDays}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-xs font-medium admin-tone-soft-info admin-tone-border-info admin-tone-text-info">
+            <span className="ap-badge ap-badge--info">
               Disponibles
             </span>
           </div>
@@ -426,7 +426,7 @@ export default function CalendarMonthClient() {
               <span className="text-xs uppercase tracking-wide admin-tone-text-warning">Dies mixtes</span>
               <span className="text-xl sm:text-2xl font-bold admin-tone-text-warning">{stats.mixedDays}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-xs font-medium admin-tone-soft-warning admin-tone-border-warning admin-tone-text-warning">
+            <span className="ap-badge ap-badge--warning">
               Reserva + bloqueig
             </span>
           </div>
@@ -438,7 +438,7 @@ export default function CalendarMonthClient() {
               <span className="text-xs uppercase tracking-wide admin-tone-text-info">Tasques</span>
               <span className="text-xl sm:text-2xl font-bold admin-tone-text-info">{stats.totalTasks}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-xs font-medium admin-tone-soft-info admin-tone-border-info admin-tone-text-info">
+            <span className="ap-badge ap-badge--info">
               {stats.workDays} dies
             </span>
           </div>
@@ -450,7 +450,7 @@ export default function CalendarMonthClient() {
               <span className="text-xs uppercase tracking-wide admin-tone-text-warning">Social</span>
               <span className="text-xl sm:text-2xl font-bold admin-tone-text-warning">{stats.totalSocialPosts}</span>
             </div>
-            <span className="rounded-full px-2 py-0.5 text-xs font-medium admin-tone-soft-warning admin-tone-border-warning admin-tone-text-warning">
+            <span className="ap-badge ap-badge--warning">
               Posts
             </span>
           </div>

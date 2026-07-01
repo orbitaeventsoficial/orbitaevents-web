@@ -106,13 +106,13 @@ function InventoryPackLinks({ item, compact = false }: { item: InventoryItem; co
         <Link
           key={packItem.id}
           href={buildPackHref(packItem.pack.id, 'content')}
-          className="inline-flex max-w-full items-center rounded-full border admin-tone-border-info admin-tone-bg-info px-2 py-0.5 text-xs font-semibold admin-tone-text-info transition-colors hover:admin-tone-bg-info"
+          className="ap-badge ap-badge--info max-w-full transition-colors"
         >
           <span className="truncate">{packItem.pack.slug}</span>
         </Link>
       ))}
       {item.packItems.length > 4 && (
-        <span className="inline-flex items-center rounded-full border border-[var(--line)] bg-[var(--raised)] px-2 py-0.5 text-xs font-semibold text-[var(--t2)]">
+        <span className="ap-badge">
           +{item.packItems.length - 4}
         </span>
       )}

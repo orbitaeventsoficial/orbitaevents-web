@@ -419,7 +419,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                               <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${paymentStateBadge(row.remainingPaid)}`}>
                                 Saldo {row.remainingPaid ? 'pagat' : 'pendent'}
                               </span>
-                              <span className="rounded-full border border-[var(--line)] bg-[var(--raised)] px-2 py-0.5 text-xs font-semibold">
+                              <span className="ap-badge">
                                 Veure detall
                               </span>
                             </div>

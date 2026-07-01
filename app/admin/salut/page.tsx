@@ -216,7 +216,7 @@ function renderHealthCard(item: AdminHealthItem, sectionLabel: string) {
           <h3 className="text-base font-semibold text-[var(--t)]">{item.title}</h3>
         </div>
         {typeof item.count === 'number' ? (
-          <span className="rounded-full border border-[var(--line)] px-2.5 py-1 text-xs font-medium text-[var(--t2)]">
+          <span className="ap-badge">
             {item.count}
           </span>
         ) : null}
@@ -346,7 +346,7 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
               <h2 className="ap-h2">Què convé atacar primer</h2>
               <p className="mt-1 text-sm text-[var(--t2)]">Lectura curta perquè no hagis d’escanejar tota la pantalla abans de decidir.</p>
             </div>
-            <span className="rounded-full border border-[var(--line)] px-2.5 py-1 text-xs text-[var(--t2)]">{priorityItems.length} focus</span>
+            <span className="ap-badge">{priorityItems.length} focus</span>
           </div>
           <div className="mt-4 grid gap-4 lg:grid-cols-3">
             {priorityItems.map(({ item, sectionLabel, groupLabel }) => (
@@ -361,7 +361,7 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
                 <div className="mt-4 flex items-center justify-between gap-3">
                   <Link href={item.href} className="ap-btn ap-btn--secondary text-sm">{item.actionLabel}</Link>
                   {typeof item.count === 'number' ? (
-                    <span className="rounded-full border border-[var(--line)] px-2 py-1 text-xs text-[var(--t2)]">{item.count}</span>
+                    <span className="ap-badge">{item.count}</span>
                   ) : null}
                 </div>
               </article>
@@ -406,7 +406,7 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
                           <h3 className="text-base font-semibold text-[var(--t)]">{group.label}</h3>
                           <p className="mt-1 text-sm text-[var(--t2)]">{group.description}</p>
                         </div>
-                        <span className="rounded-full border border-[var(--line)] px-2.5 py-1 text-xs text-[var(--t2)]">
+                        <span className="ap-badge">
                           {group.items.length}
                         </span>
                       </div>

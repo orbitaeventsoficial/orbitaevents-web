@@ -87,7 +87,7 @@ export default function ReplacementSearchButton({ itemId }: { itemId: string }) 
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-1.5">
                     {preferred && (
-                      <span className="inline-flex items-center rounded-full border admin-tone-border-success admin-tone-bg-success px-2 py-0.5 text-2xs font-semibold admin-tone-text-success">DJ Mania 🥇</span>
+                      <span className="ap-badge ap-badge--success">DJ Mania 🥇</span>
                     )}
                     {isCheapest && (
                       <span className="inline-flex items-center rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-0.5 text-2xs font-semibold admin-tone-text-cyan">Més barat</span>

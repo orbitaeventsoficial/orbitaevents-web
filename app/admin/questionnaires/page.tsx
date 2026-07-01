@@ -41,7 +41,7 @@ export default async function QuestionnairesPage() {
                 <div className="flex items-center gap-2">
                   <p className="font-semibold text-[var(--t)] truncate">{tpl.title}</p>
                   {tpl.isActive ? (
-                    <span className="shrink-0 rounded-full admin-tone-bg-success px-2 py-0.5 text-xs admin-tone-text-success">
+                    <span className="ap-badge ap-badge--success shrink-0">
                       Actiu
                     </span>
                   ) : (

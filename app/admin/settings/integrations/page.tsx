@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 
 function BoolBadge({ ok }: { ok: boolean }) {
   return (
-    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${ok ? 'admin-tone-soft-success admin-tone-text-success' : 'admin-tone-soft-warning admin-tone-text-warning'}`}>
+    <span className={`ap-badge ${ok ? 'ap-badge--success' : 'ap-badge--warning'}`}>
       {ok ? 'Connectat' : 'Pendent'}
     </span>
   );

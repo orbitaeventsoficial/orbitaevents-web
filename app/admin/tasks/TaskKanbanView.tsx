@@ -206,7 +206,7 @@ export default function TaskKanbanView() {
                 <h3 className={`text-sm font-bold ${STATUS_LABEL_TONE[col.status]}`}>{col.label}</h3>
                 <p className="mt-0.5 text-xs text-[var(--t3)] opacity-60 md:hidden">Columna {index + 1} de {columns.length}</p>
               </div>
-              <span className="rounded-full border border-[var(--line2)] px-2 text-xs font-bold text-[var(--t3)]">{col.tasks.length}</span>
+              <span className="ap-badge">{col.tasks.length}</span>
             </div>
 
             <div className="flex flex-1 flex-col gap-2 p-2">

@@ -285,8 +285,8 @@ export default function SocialClient({
             <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--t2)]">{operatingLoop.focus}</p>
           </div>
           <div className="flex flex-wrap gap-2 text-xs lg:justify-end">
-            <span className="rounded-full border border-[var(--line)] px-2 py-1">{operatingLoop.evidence}</span>
-            <span className="rounded-full border border-[var(--line)] px-2 py-1">{operatingLoop.captureLabel}</span>
+            <span className="ap-badge">{operatingLoop.evidence}</span>
+            <span className="ap-badge">{operatingLoop.captureLabel}</span>
           </div>
         </div>
       </section>

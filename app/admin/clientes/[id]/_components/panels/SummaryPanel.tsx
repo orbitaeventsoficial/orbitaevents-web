@@ -900,8 +900,8 @@ function RouteSnapshotCard({
       {venue && location && <p className="mt-1 text-xs">{location}</p>}
       <div className="mt-3 flex flex-wrap gap-2 text-xs">
         {distanceLabel && <span className="rounded-full border admin-tone-border-cyan admin-tone-bg-cyan px-2 py-0.5 admin-tone-text-cyan">🚗 {distanceLabel}</span>}
-        {oneWayLabel && <span className="inline-flex items-center rounded-full border border-[var(--line2)] px-2 py-0.5 text-[var(--t2)]">{oneWayLabel}</span>}
-        {liveRoute?.durationText && <span className="inline-flex items-center rounded-full border border-[var(--line2)] px-2 py-0.5 text-[var(--t2)]">⏱️ {liveRoute.durationText}</span>}
+        {oneWayLabel && <span className="ap-badge">{oneWayLabel}</span>}
+        {liveRoute?.durationText && <span className="ap-badge">⏱️ {liveRoute.durationText}</span>}
       </div>
       {sourceLabel && <p className="mt-2 text-xs opacity-70">{sourceLabel}</p>}
       {liveRoute?.originResolved && <p className="mt-1 text-xs opacity-60">Base Òrbita: {liveRoute.originResolved}</p>}

@@ -193,8 +193,8 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
           <h2 className="ap-h2 text-[var(--t)]">{placement.label}</h2>
           <p className="mt-1 text-sm text-[var(--t2)]">{placement.description}</p>
           <div className="mt-2 flex flex-wrap gap-2 text-xs text-[var(--t3)]">
-            <span className="rounded-full border border-[var(--line)] px-3 py-1">{placement.key}</span>
-            <span className="rounded-full border border-[var(--line)] px-3 py-1">{placement.kind}</span>
+            <span className="ap-badge">{placement.key}</span>
+            <span className="ap-badge">{placement.kind}</span>
             <span className={`rounded-full px-3 py-1 ${hasItems ? 'border border-amber-400/30 bg-amber-500/10 text-amber-300' : 'border border-[var(--line)] text-[var(--t3)]'}`}>
               {hasItems ? `manual · ${items.length} asset${items.length > 1 ? 's' : ''}` : 'auto'}
             </span>
