@@ -7,7 +7,7 @@ import BookingServiceLinesSection from '@/app/admin/bookings/BookingServiceLines
 import type { BookingServiceLineFormInput } from '@/app/admin/bookings/booking-form.types';
 import { computeBookingFinancialSummary, aggregateServiceLines, classifyBoloLines } from '@/lib/services/costEngine';
 import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
-import { calculateTravelCostBreakdown, deriveTravelHeadcount } from '@/lib/services/travelLaborCost';
+import { calculateTravelCostBreakdown, deriveTravelHeadcount, computeBoloTransport } from '@/lib/services/travelLaborCost';
 import { useBookingDistance } from '@/app/admin/bookings/useBookingDistance';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { formatCurrency, formatNumber } from '@/lib/constants';
@@ -194,15 +194,17 @@ export default function LeadBoloSection({
  });
  // eslint-disable-next-line react-hooks/exhaustive-deps -- nameFor és un closure estable sobre travelCollaborators (ja dep)
  }, [buildVisibleLines, distanceKm, tollsEur, headcount, vehicleCostPerKm, vehicleOwnerId, driverId, travelCollaborators]);
+ // COST INTERN real del transport (cotxe + temps tripulació + peatges, tots els km).
  // Live si hi ha km resolts; si no, fallback al cost recuperat (#1343).
  const effectiveTravelCost = (Number(distanceKm) || 0) > 0 ? travelBreakdown.totalCost : internalTravelCost;
- // Càrrec al client pel transport (#1363, decisió del propietari): el client paga el
- // COST REAL del desplaçament, amb les dues potes SEPARADES —cotxe per km + gent per
- // hores— tal com es calcula a `travelBreakdown`. Abans era un únic €/km (0,50) que
- // només cobria el cotxe i ignorava el temps de la tripulació («no plou benzina, però
- // tampoc plou el temps»). Ara transport = equilibri (el client paga el que costa).
  const km = Number(distanceKm) || 0;
- const travelCharge = effectiveTravelCost;
+ // CÀRREC al client (#1369, monocapa): UNA crida al cervell econòmic `computeBoloTransport`.
+ // El lead NO calcula el càrrec pel seu compte: demana el número al cervell, que aplica la
+ // franquícia comercial (50 km inclosos al cotxe) i el marge. El breakdown segueix sent el
+ // cost real per al repartiment/marge.
+ const travelCharge = km > 0
+   ? computeBoloTransport({ roundTripKm: km, headcountOverride: headcount, tollsEur: Number(tollsEur) || 0, vehicleCostPerKm }).clientCharge
+   : internalTravelCost;
 
  // Fulla d'economia del bolo (Fase 4 de docs/bolo-flux.md). La pasta NO viu al
  // configurador: cada línia porta el cost amagat i alimenta SOLA aquesta fulla.

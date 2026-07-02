@@ -7067,7 +7067,7 @@
       "travelTotalKm": "{km} km (ida y vuelta)",
       "travelIncludedKm": "{km} km incluidos",
       "travelBillableKm": "{km} km a facturar",
-      "travelBlocks": "{blocks} tramo(s) × {price}",
+      "travelBlocks": "Coche + tiempo de ruta (coste real)",
       "travelIncludedAll": "Desplazamiento incluido — sin suplemento",
       "travelLine": "Suplemento de desplazamiento",
       "travelNote": "Incluido hasta {includedKm} km desde Granollers; después, {blockPrice} por cada {blockKm} km.",

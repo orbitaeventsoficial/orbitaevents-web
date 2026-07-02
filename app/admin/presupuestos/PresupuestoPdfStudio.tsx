@@ -5,7 +5,6 @@ import { EXTRAS, getPacksByService } from '@/app/config/packs-config';
 import { generateQuotePDF, generateContractPDF } from '@/lib/pdf-utils';
 import { resolvePackI18nFeatures, resolvePackI18nKey } from '@/lib/pack-i18n';
 import { computeBookingFinancialSummary } from '@/lib/services/costEngine';
-import { calculateBillableTravelKm, calculateTravelBlocks, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 import { computeBoloTransport } from '@/lib/services/travelLaborCost';
 import { applyDatePricing } from '@/lib/services/pricing/datePricingService';
 import { fetchWithCsrf } from '@/lib/csrf';
@@ -265,14 +264,6 @@ export default function PresupuestoPdfStudio({
     return base + custom;
   }, [mappedSelectedExtras, customExtras]);
 
-  const travelBlocks = useMemo(
-    () => calculateTravelBlocks(travelKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM),
-    [travelKm]
-  );
-  const billableTravelKm = useMemo(
-    () => calculateBillableTravelKm(travelKm, INCLUDED_TRAVEL_KM),
-    [travelKm]
-  );
   // Càrrec de transport (#1369, monocapa): UNA crida al cervell econòmic. Aquest editor
   // de pre-venda no té les línies del bolo estructurades, així que assumeix un bolo típic
   // de 2 persones; quan el pressupost ve d'un lead/reserva, el transport real ja hi és.
@@ -923,8 +914,6 @@ export default function PresupuestoPdfStudio({
         extrasPrice,
         travelCharge,
         travelKm,
-        billableTravelKm,
-        travelBlocks,
         seasonSurcharge,
         seasonLabel: datePricing.appliedRule?.label,
         seasonPct: datePricing.appliedRule ? datePricing.surchargePct : undefined,
@@ -1088,8 +1077,8 @@ export default function PresupuestoPdfStudio({
       ];
       if (travelCharge > 0) {
         payloadExtras.push({
-          name: `Desplaçament (${travelBlocks} trams, ${travelKm.toFixed(1)} km)`,
-          description: `${billableTravelKm.toFixed(1)} km extra sobre ${INCLUDED_TRAVEL_KM} km inclosos`,
+          name: `Desplaçament (${travelKm.toFixed(0)} km)`,
+          description: `Cost real de ruta: cotxe + temps de tripulació`,
           price: travelCharge,
           quantity: 1,
         });
@@ -1503,8 +1492,6 @@ export default function PresupuestoPdfStudio({
         extrasPrice={extrasPrice}
         travelCharge={travelCharge}
         travelKm={travelKm}
-        billableTravelKm={billableTravelKm}
-        travelBlocks={travelBlocks}
         seasonSurcharge={seasonSurcharge}
         seasonLabel={datePricing.appliedRule?.label}
         seasonPct={datePricing.appliedRule ? datePricing.surchargePct : undefined}

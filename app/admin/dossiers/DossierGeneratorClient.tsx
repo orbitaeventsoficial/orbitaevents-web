@@ -29,6 +29,7 @@ interface Props {
   initialTelefon?: string;
   initialEmpresa?: string;
   initialEventDesc?: string;
+  initialDistanceKm?: number | null;
   initialProductIds?: string;
 }
 
@@ -290,7 +291,7 @@ function productIdsFromServiceLines(lines: DossierServiceLine[], products: Anima
   return Array.from(new Set(ids));
 }
 
-export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, leadId: initialLeadId, initialNom, initialEmail, initialTelefon, initialEmpresa, initialEventDesc, initialProductIds }: Props) {
+export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, leadId: initialLeadId, initialNom, initialEmail, initialTelefon, initialEmpresa, initialEventDesc, initialDistanceKm, initialProductIds }: Props) {
   const toast = useToast();
   const validProductIds = useMemo(() => new Set(products.map((p) => p.id)), [products]);
   const productGroups = useMemo(() => (['orbita', 'masquerade', 'tino', 'altres'] as const)
@@ -302,7 +303,9 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
   const [telefon, setTelefon] = useState(initialTelefon ?? '');
   const [email, setEmail] = useState(initialEmail ?? '');
   const [eventDesc, setEventDesc] = useState(initialEventDesc ?? '');
-  const [travelKm, setTravelKm] = useState('');
+  // Hereta els km calculats del lead la primera vegada (#1371): abans quedava buit i
+  // s'havia d'entrar a mà tot i que el lead ja tenia la distància resolta.
+  const [travelKm, setTravelKm] = useState(initialDistanceKm != null && initialDistanceKm > 0 ? String(initialDistanceKm) : '');
   const [salutacio, setSalutacio] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(
     new Set(parseInitialProductIds(initialProductIds).filter((id) => validProductIds.has(id))),

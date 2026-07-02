@@ -63,7 +63,7 @@ const copy: DossierCopy = {
     travelTotalKm: '{km} km (anada i tornada)',
     travelIncludedKm: '{km} km inclosos',
     travelBillableKm: '{km} km a facturar',
-    travelBlocks: '{blocks} tram(s) × {price}',
+    travelBlocks: 'Cotxe + temps de ruta (cost real)',
     travelIncludedAll: 'Desplaçament inclòs — sense suplement',
     travelLine: 'Suplement de desplaçament',
     travelNote: 'Inclòs fins a {includedKm} km; després {blockPrice} per {blockKm} km.',
@@ -276,26 +276,22 @@ describe('buildDossierHtml', () => {
     expect(html).not.toContain('class="bud-page"');
   });
 
-  it('pinta el pressupost desglossat amb total = serveis + suplement de desplaçament', () => {
+  it('ENSENYA els serveis amb preu «des de» però NO suma cap total (#1371)', () => {
     const a: AnimacioProduct = { id: 'orbita:dj', nom: 'DJ', descripcio: ['x'], inclou: ['x'], priceFrom: 200 };
-    // 90 km totals: 50 inclosos → 40 facturables → 2 trams × 10€ = 20€ suplement.
     const html = build(client, [a], { travelKm: 90, location: 'Arenys de Munt' });
     expect(html).toContain('class="bud-page"');
-    expect(html).toContain('Pressupost orientatiu');
-    expect(html).toContain('Arenys de Munt');
-    // Total = 200 (servei) + 20 (transport) = 220
-    expect(html).toContain('bud-total-value');
-    expect(html).toContain('220');
+    // El preu del servei SÍ hi és (el que val), com a referència.
+    expect(html).toContain('200');
+    // El dossier és presentació de valor, NO una factura: cap total sumat que espanti.
+    expect(html).not.toContain('class="bud-total"');
   });
 
-  it('marca "desplaçament inclòs sense suplement" si la distància és dins els km inclosos', () => {
+  it('el transport es comunica com a política (inclòs fins a X km), sense xifra que sumi (#1371)', () => {
     const a: AnimacioProduct = { id: 'orbita:dj', nom: 'DJ', descripcio: ['x'], inclou: ['x'], priceFrom: 150 };
-    // 40 km totals < 50 inclosos → 0 suplement.
     const html = build(client, [a], { travelKm: 40 });
     expect(html).toContain('class="bud-page"');
-    expect(html).toContain('sense suplement');
-    // Total = només el servei (150), sense transport.
     expect(html).toContain('150');
+    expect(html).not.toContain('class="bud-total"');
   });
 
   it('funciona amb llista de productes buida', () => {

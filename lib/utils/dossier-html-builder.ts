@@ -5,10 +5,7 @@ import {
   INCLUDED_TRAVEL_KM,
   TRAVEL_BLOCK_KM,
   TRAVEL_BLOCK_EUR,
-  calculateBillableTravelKm,
-  calculateTravelBlocks,
 } from '@/lib/services/travelCost';
-import { computeBoloTransport } from '@/lib/services/travelLaborCost';
 
 export type DossierClientInfo = {
   nom: string;
@@ -228,40 +225,21 @@ function buildBudgetBlock(
   const fill = (tpl: string, vars: Record<string, string>) =>
     escHtml(Object.entries(vars).reduce((s, [k, v]) => s.split(`{${k}}`).join(v), tpl));
 
-  // Serveis amb preu → línies + subtotal.
+  // Serveis amb preu «des de» (referència de valor, sense sumar total).
   const priced = products.filter((p) => typeof p.priceFrom === 'number');
-  let servicesSubtotal = 0;
   const serviceRows = priced
-    .map((p) => {
-      servicesSubtotal += p.priceFrom as number;
-      return `<li class="bud-row">
+    .map((p) => `<li class="bud-row">
         <span class="bud-row-nom">${escHtml(p.nom)}</span>
         <span class="bud-row-dots" aria-hidden="true"></span>
         <span class="bud-row-val">${money(p.priceFrom as number)}</span>
-      </li>`;
-    })
+      </li>`)
     .join('\n      ');
 
-  // Desplaçament (helpers canònics).
-  const billableKm = calculateBillableTravelKm(travelKm);
-  const blocks = calculateTravelBlocks(travelKm);
-  // Càrrec de transport (#1369, monocapa): UNA crida al cervell econòmic. Dossier de
-  // pre-venda amb bolo típic de 2 persones (si ve de lead/reserva, el transport real ja hi és).
-  const travelCharge = computeBoloTransport({ roundTripKm: travelKm, headcountOverride: 2 }).clientCharge;
-  const total = servicesSubtotal + travelCharge;
-
-  const travelDetail = travelCharge > 0
-    ? `<li class="bud-row bud-row--sub">
-        <span class="bud-row-nom">${fill(copy.budget.travelBillableKm, { km: String(billableKm) })} · ${fill(copy.budget.travelBlocks, { blocks: String(blocks), price: money(TRAVEL_BLOCK_EUR) })}</span>
-        <span class="bud-row-dots" aria-hidden="true"></span>
-        <span class="bud-row-val">${money(travelCharge)}</span>
-      </li>`
-    : `<li class="bud-row bud-row--sub">
-        <span class="bud-row-nom">${escHtml(copy.budget.travelIncludedAll)}</span>
-        <span class="bud-row-dots" aria-hidden="true"></span>
-        <span class="bud-row-val">${money(0)}</span>
-      </li>`;
-
+  // El dossier ENSENYA què fem i què val (decisió del propietari #1371): mostra el preu
+  // «des de» de cada servei com a referència, però NO suma un total (un total sec espanta;
+  // el dossier és presentació de valor, no una factura). El pressupost tancat és un altre
+  // document. El transport es comunica com a POLÍTICA clara (inclòs fins a X km), no com
+  // a xifra que sumi.
   return `
   <section class="bud-page">
     <div class="bud-kicker">${escHtml(copy.budget.kicker)}</div>
@@ -274,19 +252,6 @@ function buildBudgetBlock(
     </ul>
 
     <div class="bud-group-label">${escHtml(copy.budget.travelTitle)}</div>
-    <ul class="bud-list">
-      <li class="bud-row">
-        <span class="bud-row-nom">${location ? fill(copy.budget.travelTo, { location }) : escHtml(copy.budget.travelTitle)} · ${fill(copy.budget.travelTotalKm, { km: String(travelKm) })}</span>
-        <span class="bud-row-dots" aria-hidden="true"></span>
-        <span class="bud-row-val bud-row-val--mute">${fill(copy.budget.travelIncludedKm, { km: String(INCLUDED_TRAVEL_KM) })}</span>
-      </li>
-      ${travelDetail}
-    </ul>
-
-    <div class="bud-total">
-      <span class="bud-total-label">${escHtml(copy.budget.totalLabel)}</span>
-      <span class="bud-total-value">${money(total)}</span>
-    </div>
     <p class="bud-note">${fill(copy.budget.travelNote, { includedKm: String(includedOneWay), blockPrice: money(TRAVEL_BLOCK_EUR), blockKm: String(TRAVEL_BLOCK_KM) })}</p>
     <p class="bud-note">${escHtml(copy.budget.vatNote)}</p>
   </section>`;

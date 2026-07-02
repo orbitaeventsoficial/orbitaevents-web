@@ -7067,7 +7067,7 @@
       "travelTotalKm": "{km} km (round trip)",
       "travelIncludedKm": "{km} km included",
       "travelBillableKm": "{km} km to bill",
-      "travelBlocks": "{blocks} block(s) × {price}",
+      "travelBlocks": "Vehicle + crew time (real cost)",
       "travelIncludedAll": "Travel included — no surcharge",
       "travelLine": "Travel surcharge",
       "travelNote": "Included up to {includedKm} km from Granollers; after that, {blockPrice} per {blockKm} km.",

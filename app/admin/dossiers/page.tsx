@@ -124,6 +124,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
           initialTelefon={searchParams?.telefon ?? leadInitialData?.telefon}
           initialEmpresa={searchParams?.empresa}
           initialEventDesc={searchParams?.eventDesc ?? leadInitialData?.eventDesc}
+          initialDistanceKm={leadInitialData?.distanceKm ?? null}
           initialProductIds={initialProductIds}
         />
       </AdminSection>

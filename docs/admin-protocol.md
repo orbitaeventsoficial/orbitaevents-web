@@ -1547,6 +1547,20 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1371 — 2026-07-03 — claude (FET)
+**Franquícia 50 km al cervell + dossier sense total + lead crida el cervell (monocapa completa).**
+- Context: 3 decisions del propietari — (1) recuperar els 50 km inclosos («desplaçament inclòs fins a 25 km»); (2) dossier sense total (ensenya valor, no factura); (3) dossier hereta els km del lead. + lead migrat al cervell.
+- `computeBoloTransport`: el càrrec al client aplica els primers 50 km (a/t) de cotxe com a inclosos; el cost intern real es manté sencer. Alba transport 271→258€.
+- `LeadBoloSection`: ja no calcula el càrrec pel seu compte → crida `computeBoloTransport().clientCharge`. Monocapa del transport completa.
+- `dossier-html-builder`: tret el total sumat (serveis «des de» + transport com a política). `dossierService`+page+client: hereta `distanceKm` del lead. Text «trams»→«cotxe + temps de ruta» (ca/es/en).
+- Validació tècnica: tsc 0; validate:core EXIT 0; tests serveis verds (dossier 24, travelLabor, bookingCreation 45, bookingRoute 24, collaboratorPayout 7).
+- Validació funcional: Playwright Alba (transport 258€ amb franquícia); dossier hereta 422 km; dossier sense total.
+- Validació humana/UX: text comercial cert; dossier no espanta; lead beu del cervell.
+- Counter → 1371.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1370 — 2026-07-02 — claude (FET)
 **MONOCAPA del transport: un sol cervell (`computeBoloTransport`), les pàgines només criden.**
 - Context: el propietari va detectar que el transport es calculava a ~10 superfícies. Doctrina «un sol cervell, moltes pàgines» → escrita al CLAUDE.md com a norma constitucional.

@@ -248,6 +248,17 @@ export function computeBoloTransport(input: {
       : [],
   });
   const cost = km <= 0 ? tolls : breakdown.totalCost;
+  // Franquícia comercial (decisió del propietari): els primers INCLUDED_TRAVEL_KM (50 km
+  // a/t = 25 anada + 25 tornada) de COTXE van inclosos al càrrec del client («desplaçament
+  // inclòs fins a 25 km»). El COST intern real es manté sencer (la benzina es gasta igual)
+  // → la franquícia és un gest comercial conscient, no un maquillatge del marge. El temps
+  // de la tripulació ja té la seva pròpia franquícia (la 1a hora de ruta).
+  const vehicleCostPerKm = sanitizeNonNegative(input.vehicleCostPerKm, DEFAULT_VEHICLE_COST_PER_KM);
+  const billableKm = Math.max(0, km - INCLUDED_TRAVEL_KM);
+  const clientVehicleCost = calculateTravelCost(billableKm, vehicleCostPerKm);
+  const clientCharge = km <= 0
+    ? round2(tolls * CLIENT_TRAVEL_MARGIN)
+    : round2((clientVehicleCost + breakdown.peopleCost + tolls) * CLIENT_TRAVEL_MARGIN);
   return {
     roundTripKm: km,
     headcount,
@@ -255,7 +266,7 @@ export function computeBoloTransport(input: {
     routeHours: breakdown.routeHours,
     chargeableHours: breakdown.chargeableHours,
     cost,
-    clientCharge: round2(cost * CLIENT_TRAVEL_MARGIN),
+    clientCharge,
     breakdown,
   };
 }

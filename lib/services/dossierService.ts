@@ -29,6 +29,7 @@ export type DossierLeadInitialData = {
   email: string;
   telefon: string;
   eventDesc: string;
+  distanceKm: number | null;
 };
 
 function formatLeadIsoDate(date: Date | null): string {
@@ -92,6 +93,7 @@ export async function getDossierLeadInitialData(leadId?: string | null): Promise
       eventAddress: true,
       guestCount: true,
       message: true,
+      distanceKm: true,
     },
   });
   if (!lead) return null;
@@ -101,6 +103,7 @@ export async function getDossierLeadInitialData(leadId?: string | null): Promise
     email: lead.email,
     telefon: lead.phone ?? '',
     eventDesc: buildDossierLeadEventDesc(lead),
+    distanceKm: lead.distanceKm ?? null,
   };
 }
 

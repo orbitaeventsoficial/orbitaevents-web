@@ -1,3 +1,26 @@
+## 2026-07-03 — Franquícia 50 km al cervell + dossier sense total + lead crida el cervell (Canvi #1371, claude)
+
+### Context
+Tres decisions del propietari durant la revisió: (1) els 50 km inclosos (25 anada + 25 tornada) que promet el text «desplaçament inclòs fins a 25 km» s'havien perdut amb el model de cost real → cal tornar-los a la fórmula; (2) el dossier NO ha de sumar un total (espanta; el dossier ENSENYA què fem i què val, no és una factura); (3) el dossier de leads no heretava els km calculats la primera vegada. A més, es va detectar que el lead encara calculava el càrrec pel seu compte (monocapa incompleta).
+
+### Què s'ha fet
+- **Franquícia al cervell** (`computeBoloTransport`): el CÀRREC al client aplica els primers `INCLUDED_TRAVEL_KM` (50 a/t) de cotxe com a inclosos («desplaçament inclòs fins a 25 km» torna a ser cert; bolos locals = transport 0€). El COST intern real es manté sencer (la franquícia és gest comercial conscient, no maquillatge). Alba: transport client 271→258€ (−13 de franquícia).
+- **Lead migrat al cervell**: `LeadBoloSection` ja NO calcula el `travelCharge` pel seu compte; crida `computeBoloTransport().clientCharge`. Tanca la monocapa del transport (el lead era la superfície que faltava).
+- **Dossier sense total** (`dossier-html-builder`): tret el bloc `bud-total` (suma). Serveis amb preu «des de» (referència) + transport com a política. Presentació de valor, no factura.
+- **Km heretats al dossier** (`dossierService` + `dossiers/page` + `DossierGeneratorClient`): `getDossierLeadInitialData` retorna `distanceKm` → el generador l'usa d'estat inicial. Verificat: lead Alba → dossier hereta 422 km.
+- Text «trams» dels PDFs → «cotxe + temps de ruta (cost real)» (ca/es/en). Fallback vehicle 0,26 als tests.
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0; tests dels serveis verds (dossier 24, travelLabor, bookingCreation 45, bookingRoute 24, collaboratorPayout 7).
+- Validació funcional: Playwright lead Alba (transport 258€ amb franquícia, cost real 271€); dossier del lead hereta 422 km; dossier sense total.
+- Validació humana/UX: el text comercial torna a ser cert; el dossier no espanta amb un total; el lead beu del cervell (monocapa completa).
+
+### Coordinació
+Counter → 1371. Carrils disjunts amb Codex. La franquícia i el marge del transport es decideixen a UNA constant + el cervell (`computeBoloTransport`).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-02 — MONOCAPA del transport: un sol cervell (computeBoloTransport), les pàgines criden (Canvi #1370, claude)
 
 ### Context

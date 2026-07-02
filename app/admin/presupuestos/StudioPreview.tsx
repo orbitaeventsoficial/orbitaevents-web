@@ -23,8 +23,6 @@ export type StudioPreviewProps = {
   extrasPrice: number;
   travelCharge: number;
   travelKm: number;
-  billableTravelKm: number;
-  travelBlocks: number;
   seasonSurcharge?: number;
   seasonLabel?: string;
   seasonPct?: number;
@@ -117,7 +115,7 @@ export default function StudioPreview(props: StudioPreviewProps) {
           </div>
           {props.travelCharge > 0 && (
             <div className="text-xs">
-              {props.travelKm.toFixed(1)} km totals · {props.billableTravelKm.toFixed(1)} km extra · {props.travelBlocks} trams
+              {props.travelKm.toFixed(0)} km · cotxe + temps de ruta (cost real)
             </div>
           )}
           <div className="flex items-center justify-between">
