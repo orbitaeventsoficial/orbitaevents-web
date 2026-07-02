@@ -46,17 +46,17 @@ interface BookingServiceLinesSectionProps {
 }
 
 // ── Classes canòniques locals del configurador (tokens de /studio) ───────────
-const SL_LIST = 'flex flex-col gap-2';
-const SL_ROW = 'flex flex-wrap items-center gap-2';
-const SL_ROW_BASE = 'flex flex-wrap items-center gap-2 rounded-[var(--o-r-sm)] border border-[color-mix(in_oklab,var(--gold)_24%,var(--line))] bg-[color-mix(in_oklab,var(--gold)_6%,transparent)] px-2.5 py-1.5';
-const SL_ROW_PACK = 'flex flex-wrap items-center gap-2 rounded-[var(--o-r-sm)] border border-[color-mix(in_oklab,var(--gold)_30%,var(--line))] bg-[color-mix(in_oklab,var(--gold)_8%,transparent)] px-2.5 py-1.5';
-const SL_LABEL = 'min-w-0 flex-1 basis-[12.5rem]';
-const SL_NUM = `adm-input w-[5.75rem] shrink-0 grow-0 basis-[5.75rem] ${NB_NUM_BARE}`;
-const SL_QTY = `adm-input w-16 shrink-0 grow-0 text-center ${NB_NUM_BARE}`;
-const SL_PAYER = 'adm-input min-w-0 shrink-0 grow-0 basis-40';
-const SL_NOTE = 'inline-flex w-[5.75rem] shrink-0 items-center justify-center text-xs italic text-[var(--t3)]';
-const SL_READONLY = 'inline-flex w-[5.75rem] shrink-0 items-center justify-end text-sm font-semibold text-[var(--t)]';
-const SL_DEL = 'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--o-r-sm)] border border-[color-mix(in_oklab,var(--o-stage-lost)_40%,var(--line))] bg-transparent text-sm text-[var(--o-stage-lost)] transition-colors hover:bg-[color-mix(in_oklab,var(--o-stage-lost)_12%,transparent)]';
+const SL_LIST = 'flex flex-col gap-1';
+const SL_ROW = 'flex items-center gap-1.5';
+const SL_ROW_BASE = 'flex items-center gap-1.5 rounded-[var(--o-r-sm)] border border-[color-mix(in_oklab,var(--gold)_24%,var(--line))] bg-[color-mix(in_oklab,var(--gold)_6%,transparent)] px-2 py-1';
+const SL_ROW_PACK = 'flex items-center gap-1.5 rounded-[var(--o-r-sm)] border border-[color-mix(in_oklab,var(--gold)_30%,var(--line))] bg-[color-mix(in_oklab,var(--gold)_8%,transparent)] px-2 py-1';
+const SL_LABEL = 'min-w-0 flex-1 truncate';
+const SL_NUM = `adm-input h-8 w-[4.25rem] shrink-0 grow-0 basis-[4.25rem] ${NB_NUM_BARE}`;
+const SL_QTY = `adm-input h-8 w-12 shrink-0 grow-0 basis-12 text-center ${NB_NUM_BARE}`;
+const SL_PAYER = 'adm-input h-8 min-w-0 shrink grow-0 basis-32';
+const SL_NOTE = 'inline-flex w-[4.25rem] shrink-0 items-center justify-center text-[length:var(--o-text-2xs)] italic text-[var(--t3)]';
+const SL_READONLY = 'inline-flex w-[4.25rem] shrink-0 items-center justify-end text-sm font-semibold text-[var(--t)]';
+const SL_DEL = 'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--o-r-sm)] border border-[color-mix(in_oklab,var(--o-stage-lost)_40%,var(--line))] bg-transparent text-sm text-[var(--o-stage-lost)] transition-colors hover:bg-[color-mix(in_oklab,var(--o-stage-lost)_12%,transparent)]';
 const GRP = 'overflow-hidden rounded-[var(--o-r-sm)] border border-[var(--line)]';
 const GRP_MENU = 'relative overflow-visible rounded-[var(--o-r-sm)] border border-[var(--line)]';
 const SUMMARY = 'flex cursor-pointer items-center gap-2 list-none bg-[color-mix(in_oklab,var(--raised)_70%,var(--panel))] px-3 py-2.5 text-xs font-semibold text-[var(--t2)] [&::-webkit-details-marker]:hidden [[open]>&]:text-[var(--gold)]';
@@ -206,9 +206,9 @@ export default function BookingServiceLinesSection({
         <p className={NB_HINT}>El lead havia mostrat interès en: {leadHints.join(', ')}</p>
       )}
 
-      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[1fr_18.75rem]">
+      <div className="grid grid-cols-1 items-start gap-2.5 lg:grid-cols-[1fr_15rem]">
         {/* ESQUERRA — el bolo */}
-        <div className="flex min-w-0 flex-col gap-2.5 rounded-[var(--o-r-md)] border border-[var(--line)] bg-[color-mix(in_oklab,var(--panel)_60%,transparent)] p-3.5">
+        <div className="flex min-w-0 flex-col gap-1.5 rounded-[var(--o-r-md)] border border-[var(--line)] bg-[color-mix(in_oklab,var(--panel)_60%,transparent)] p-2.5">
           {!embedded && (
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-[0.05em] text-[var(--t3)]">El bolo</span>
@@ -240,8 +240,8 @@ export default function BookingServiceLinesSection({
                   <span className={`${SL_LABEL} font-semibold text-[var(--t)]`}>{line.label}</span>
                   <span className={SL_READONLY}>{line.revenueAmount ?? 0}€</span>
                   <span className={SL_NOTE}>contractat</span>
-                  <span className="inline-flex w-16 shrink-0 items-center justify-center text-sm text-[var(--t)]">{line.quantity ?? 1}</span>
-                  <span className="inline-flex h-9 w-9 shrink-0 cursor-default items-center justify-center text-[var(--t3)] opacity-45" aria-hidden="true">•</span>
+                  <span className="inline-flex w-12 shrink-0 items-center justify-center text-sm text-[var(--t)]">{line.quantity ?? 1}</span>
+                  <span className="inline-flex h-8 w-8 shrink-0 cursor-default items-center justify-center text-[var(--t3)] opacity-45" aria-hidden="true">•</span>
                 </div>
               ))}
             </div>

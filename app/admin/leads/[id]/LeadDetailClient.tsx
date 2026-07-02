@@ -26,7 +26,6 @@ import { useToast } from '@/app/admin/components/ToastProvider';
 import ConfirmDialog, { useConfirmDialog } from '@/app/admin/components/ConfirmDialog';
 import { SOURCE_LABELS, formatCurrency, formatDateFull, getContractStatusLabel, getProposalStatusDisplay } from '@/lib/constants';
 import { TEAM_MEMBERS } from '@/lib/constants/admin';
-import { INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR } from '@/lib/services/travelCost';
 import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
 
@@ -527,51 +526,12 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  </div>
  </div>
 
- <div className="ap-ledger-profitbar" aria-label="Marge del bolo i rendibilitat">
- <span className="ap-ledger-profitbar-title">
- {bookingEconomia ? 'Marge de la reserva' : 'Marge del bolo'}
- </span>
- {econ ? (
- <>
- <span className="ap-ledger-profitpill">
- <span>Cost serveis</span>
- <strong>{formatCurrency(econ.serviceLinesCost)}</strong>
- </span>
- <span className="ap-ledger-profitpill">
- <span>Operatiu</span>
- <strong>{formatCurrency(econ.fixedOperationalCost)}</strong>
- </span>
- <span className="ap-ledger-profitpill">
- <span>Cost origen</span>
- <strong>{formatCurrency(econ.acquisitionCost)}</strong>
- </span>
- <span className="ap-ledger-profitpill" data-tone={econ.tone}>
- <span>{bookingEconomia ? 'Net real' : 'Net estimat'}</span>
- <strong>{formatCurrency(econ.net)}</strong>
- </span>
- <span className="ap-ledger-profitpill" data-tone={econ.tone}>
- <span>Marge</span>
- <strong>{Math.round(econ.marginPct)}%</strong>
- </span>
- <span className="ap-ledger-profitpill" title={`El pack base inclou ${INCLUDED_TRAVEL_KM / 2} km per sentit des de Granollers. A partir d'aquí, cada ${TRAVEL_BLOCK_KM} km de més es cobren a ${TRAVEL_BLOCK_EUR} € i se sumen al pressupost per trams.`}>
- <span>Desplaçament</span>
- <strong>{INCLUDED_TRAVEL_KM / 2} km incl. · +{TRAVEL_BLOCK_EUR}€/{TRAVEL_BLOCK_KM}km</strong>
- </span>
- </>
- ) : (
- <span className="ap-ledger-profitpill">
- <span>Net estimat</span>
- <strong>pendent</strong>
- </span>
- )}
- </div>
-
  </section>
 
  {/* Àrea zenit CANÒNICA: igual per a TOTS els leads (com Cristina). El bolo
  ocupa tot l'ample. Els cobraments NO viuen al lead: es gestionen a la
  fitxa de reserva (accés des de l'històric comercial al peu). */}
- <div className="ap-ledger-zenith ap-ledger-zenith--solo">
+ <div className="ap-ledger-zenith ap-ledger-zenith--railed">
 
  <main className="ap-ledger-zenith-main" aria-label="Configuració del bolo">
  <LeadBoloSection
@@ -595,6 +555,29 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  compactEconomia
  />
  </main>
+
+ <aside className="ap-ledger-rail ap-ledger-rail--summary" aria-label="Resum financer del bolo">
+ <div className="ap-ledger-summary">
+ <div className="ap-ledger-summary-head">{bookingEconomia ? 'Marge de la reserva' : 'Marge del bolo'}</div>
+ {econ ? (
+ <>
+ <div className="ap-ledger-summary-net" data-tone={econ.tone}>
+ <span className="ap-ledger-summary-net-lbl">{bookingEconomia ? 'Net real' : 'Net estimat'}</span>
+ <strong className="ap-ledger-summary-net-val">{formatCurrency(econ.net)}</strong>
+ <span className="ap-ledger-summary-net-pct">{Math.round(econ.marginPct)}% marge{econ.label ? ` · ${econ.label}` : ''}</span>
+ </div>
+ <div className="ap-ledger-summary-rows">
+ <div><span>Cost serveis</span><strong>{formatCurrency(econ.serviceLinesCost)}</strong></div>
+ <div><span>Operatiu</span><strong>{formatCurrency(econ.fixedOperationalCost)}</strong></div>
+ <div><span>Cost origen</span><strong>{formatCurrency(econ.acquisitionCost)}</strong></div>
+ <div><span>Cost directe</span><strong>{formatCurrency(econ.directCost)}</strong></div>
+ </div>
+ </>
+ ) : (
+ <p className="ap-ledger-econonote">Afegeix línies al bolo per veure el net estimat.</p>
+ )}
+ </div>
+ </aside>
  </div>{/* /ap-ledger-zenith */}
 
  <CommercialDocumentsHistory

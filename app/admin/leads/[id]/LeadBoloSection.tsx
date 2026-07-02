@@ -302,12 +302,53 @@ export default function LeadBoloSection({
  onChange={onLinesChange}
  />
 
- <div className="ap-ledger-bolo-footer">
- <div className="ap-ledger-bolo-total" aria-label="Total del bolo">
- <span>Total bolo</span>
- <strong>{economia ? formatCurrency(economia.total) : '0€'}</strong>
+ {/* ── PRESSUPOST: elements + transport → suma + total, exposat abans de contractar (#1348).
+ Estirat a tota l'amplada. El transport el paga el CLIENT (línia estipulada que suma al total). ── */}
+ {economia && (
+ <div className="ap-ledger-budget" aria-label="Resum del pressupost">
+ <div className="ap-ledger-budget-travel">
+ <label className="ap-ledger-travel-field">
+ <span>Km ruta</span>
+ <input
+ type="number" min={0} step={1} inputMode="numeric" className="adm-input"
+ value={distanceKm}
+ onChange={(e) => { setDistanceKm(e.target.value); setDirty(true); }}
+ placeholder={calculatingDistance ? '…' : '0'}
+ aria-label="Km anada i tornada de la ruta"
+ />
+ </label>
+ <label className="ap-ledger-travel-field">
+ <span>Integrants</span>
+ <input
+ type="number" min={0} step={1} inputMode="numeric" className="adm-input"
+ value={headcountOverride}
+ onChange={(e) => setHeadcountOverride(e.target.value)}
+ placeholder={String(derivedHeadcount)}
+ aria-label="Ajust manual d'integrants de la ruta"
+ />
+ </label>
+ <p className="ap-ledger-budget-travelnote">
+ 1a hora inclosa · cobren {travelBreakdown.chargeableHours} h de {travelBreakdown.routeHours} h · {billableKm} km facturables (primers {INCLUDED_TRAVEL_KM} inclosos) · cost intern {formatCurrency(effectiveTravelCost)}
+ </p>
  </div>
- <div className="ap-ledger-bolo-actions">
+ <div className="ap-ledger-budget-sum">
+ <div className="ap-ledger-budget-row">
+ <span>Serveis contractats</span>
+ <strong>{formatCurrency(economia.total - travelCharge)}</strong>
+ </div>
+ <div className="ap-ledger-budget-row">
+ <span>Transport <em>(el paga el client)</em></span>
+ <strong>+{formatCurrency(travelCharge)}</strong>
+ </div>
+ <div className="ap-ledger-budget-row ap-ledger-budget-row--total">
+ <span>Total</span>
+ <strong>{formatCurrency(economia.total)}</strong>
+ </div>
+ </div>
+ </div>
+ )}
+
+ <div className="ap-ledger-bolo-actions ap-ledger-bolo-actions--full">
  <a className="ap-btn" href={dossierHref} onClick={(event) => openBuilder(event, dossierHref)} aria-disabled={saving}>
  Crear dossier
  </a>
@@ -317,7 +358,6 @@ export default function LeadBoloSection({
  <a className="ap-btn ap-btn--primary" href={`/admin/bookings/new?leadId=${encodeURIComponent(leadId)}`}>
  Crear reserva
  </a>
- </div>
  </div>
  </section>
 
@@ -354,52 +394,6 @@ export default function LeadBoloSection({
  )}
  </section>}
 
- {/* Transport en viu (#1345): SEMPRE visible (també en mode compacte de la fitxa),
- perquè km/integrants/cost de ruta són decisió operativa del bolo, no detall d'economia. */}
- {economia && <section className="ap-ledger-econo ap-ledger-travel">
- <div className="ap-ledger-travelbar">
- <label className="ap-ledger-travel-field">
- <span>Km ruta</span>
- <input
- type="number" min={0} step={1} inputMode="numeric"
- className="adm-input"
- value={distanceKm}
- onChange={(e) => { setDistanceKm(e.target.value); setDirty(true); }}
- placeholder={calculatingDistance ? '…' : '0'}
- aria-label="Km anada i tornada de la ruta"
- />
- </label>
- <label className="ap-ledger-travel-field">
- <span>Integrants</span>
- <input
- type="number" min={0} step={1} inputMode="numeric"
- className="adm-input"
- value={headcountOverride}
- onChange={(e) => setHeadcountOverride(e.target.value)}
- placeholder={String(derivedHeadcount)}
- aria-label="Ajust manual d'integrants de la ruta"
- />
- </label>
- <div className="ap-ledger-travel-breakdown">
- <span>Vehicle <strong>{formatCurrency(travelBreakdown.vehicleCost)}</strong></span>
- <span>Conductor <strong>{formatCurrency(travelBreakdown.driverCost)}</strong></span>
- <span>Passatgers <strong>{formatCurrency(travelBreakdown.passengerCost)}</strong></span>
- <span className="ap-ledger-travel-note">
- 1a hora inclosa en el preu · cobren {travelBreakdown.chargeableHours} h de {travelBreakdown.routeHours} h de ruta
- </span>
- </div>
- <div className="ap-ledger-travel-total" data-level={travelBreakdown.laborCostApplies ? 'warn' : 'ok'}>
- <span className="ap-ledger-travel-total-lbl">Cost ruta intern</span>
- <strong>{formatCurrency(effectiveTravelCost)}</strong>
- <span className="ap-ledger-travel-total-sub">{travelBreakdown.peopleCount} integrants · {travelBreakdown.roundTripKm} km</span>
- </div>
- <div className="ap-ledger-travel-total" data-level="gold">
- <span className="ap-ledger-travel-total-lbl">Repercutit al client</span>
- <strong>+{formatCurrency(travelCharge)}</strong>
- <span className="ap-ledger-travel-total-sub">{billableKm} km facturables · primers {INCLUDED_TRAVEL_KM} inclosos</span>
- </div>
- </div>
- </section>}
  </div>
  );
 }

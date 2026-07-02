@@ -1481,6 +1481,34 @@ html.admin-mode .ap-ledger-travel-total strong { font-family: var(--display); fo
 html.admin-mode .ap-ledger-travel-total-lbl { font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t3); }
 html.admin-mode .ap-ledger-travel-total-sub { font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3); }
 html.admin-mode .ap-ledger-travel-note { font-size: var(--o-text-micro); color: var(--gold); max-width: 16rem; }
+/* Resum del pressupost (#1348): elements + transport → suma + total, estirat a l'amplada,
+   exposat abans de contractar. El transport és línia estipulada que suma al total. */
+html.admin-mode .ap-ledger-budget {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(15rem, 20rem);
+  align-items: start; gap: var(--o-space-3);
+  margin-top: var(--o-space-25); padding: var(--o-space-25) var(--o-space-3);
+  border-top: 1px solid var(--line);
+}
+html.admin-mode .ap-ledger-budget-travel { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--o-space-25); }
+html.admin-mode .ap-ledger-budget-travelnote {
+  flex: 1 1 100%; margin: 0; font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3); line-height: 1.4;
+}
+html.admin-mode .ap-ledger-budget-sum { display: flex; flex-direction: column; gap: 0; }
+html.admin-mode .ap-ledger-budget-row {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2);
+  padding: var(--o-space-1) 0; font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t2);
+}
+html.admin-mode .ap-ledger-budget-row > span > em { font-style: normal; color: var(--t3); font-size: var(--o-text-micro); }
+html.admin-mode .ap-ledger-budget-row > strong { color: var(--t); font-weight: var(--o-fw-semi); font-family: var(--display); }
+html.admin-mode .ap-ledger-budget-row--total {
+  margin-top: var(--o-space-1); padding-top: var(--o-space-15); border-top: 1px solid var(--line);
+}
+html.admin-mode .ap-ledger-budget-row--total > span { font-family: var(--display); font-size: var(--o-text-md); font-weight: var(--o-fw-semi); color: var(--t); }
+html.admin-mode .ap-ledger-budget-row--total > strong { font-size: var(--o-text-xl); font-weight: var(--o-fw-xbold); color: var(--gold); }
+html.admin-mode .ap-ledger-bolo-actions--full { display: flex; flex-wrap: wrap; gap: var(--o-space-15); padding: var(--o-space-25) var(--o-space-3) 0; }
+@media (max-width: 720px) {
+  html.admin-mode .ap-ledger-budget { grid-template-columns: minmax(0, 1fr); }
+}
 html.admin-mode .ap-ledger-kpis {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10.625rem, 1fr));
@@ -2655,6 +2683,64 @@ html.admin-mode .ap-ledger-zenith {
 html.admin-mode .ap-ledger-zenith--solo {
   grid-template-columns: minmax(0, 1fr);
 }
+/* Zenit reconstruït (#1348): bolo (main, esq.) + rail de resum financer (dret, sticky).
+   Aprofita l'espai mort de desktop; a mòbil el rail cau sota el bolo. */
+html.admin-mode .ap-ledger-zenith--railed {
+  grid-template-columns: minmax(0, 1fr) minmax(13rem, 15rem);
+  align-items: start;
+}
+html.admin-mode .ap-ledger-rail--summary {
+  position: sticky;
+  top: var(--o-space-3);
+  align-self: start;
+}
+html.admin-mode .ap-ledger-summary {
+  border: 1px solid var(--line);
+  border-radius: var(--o-r-md);
+  background: var(--panel);
+  overflow: hidden;
+}
+html.admin-mode .ap-ledger-summary-head {
+  padding: var(--o-space-25) var(--o-space-35);
+  border-bottom: 1px solid var(--line);
+  font-family: var(--display); font-size: var(--o-text-md); font-weight: var(--o-fw-semi);
+  color: var(--t);
+}
+html.admin-mode .ap-ledger-summary-net {
+  display: flex; flex-direction: column; gap: var(--o-space-1);
+  padding: var(--o-space-3) var(--o-space-35);
+  border-left: 0.1875rem solid var(--o-stage-won-strong);
+}
+html.admin-mode .ap-ledger-summary-net[data-tone="amber"]  { border-left-color: var(--o-warning); }
+html.admin-mode .ap-ledger-summary-net[data-tone="orange"] { border-left-color: var(--o-stage-new); }
+html.admin-mode .ap-ledger-summary-net[data-tone="rose"]   { border-left-color: var(--o-danger); }
+html.admin-mode .ap-ledger-summary-net-lbl { font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t3); }
+html.admin-mode .ap-ledger-summary-net-val { font-family: var(--display); font-size: var(--o-text-2xl); font-weight: var(--o-fw-xbold); line-height: 1; color: var(--t); }
+html.admin-mode .ap-ledger-summary-net[data-tone="rose"]  .ap-ledger-summary-net-val { color: var(--o-danger); }
+html.admin-mode .ap-ledger-summary-net[data-tone="amber"] .ap-ledger-summary-net-val { color: var(--o-warning); }
+html.admin-mode .ap-ledger-summary-net-pct { font-family: var(--mono); font-size: var(--o-text-2xs); color: var(--t3); }
+html.admin-mode .ap-ledger-summary-rows { display: flex; flex-direction: column; }
+html.admin-mode .ap-ledger-summary-rows > div {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2);
+  padding: var(--o-space-15) var(--o-space-35);
+  border-top: 1px solid color-mix(in oklab, var(--line) 60%, transparent);
+  font-family: var(--mono); font-size: var(--o-text-xs);
+}
+html.admin-mode .ap-ledger-summary-rows > div > span { color: var(--t3); }
+html.admin-mode .ap-ledger-summary-rows > div > strong { color: var(--t); font-weight: var(--o-fw-semi); }
+@media (max-width: 900px) {
+  html.admin-mode .ap-ledger-zenith--railed { grid-template-columns: minmax(0, 1fr); }
+  html.admin-mode .ap-ledger-rail--summary { position: static; }
+}
+/* Mòbil: pipeline i govern (responsable/derivat) NO poden solapar-se — apilats (#1348). */
+@media (max-width: 640px) {
+  html.admin-mode .ap-ledger-phasebar { grid-template-columns: minmax(0, 1fr); }
+  html.admin-mode .ap-ledger-phaseright { justify-content: flex-start; }
+  html.admin-mode .ap-ledger-profitmanage { width: 100%; margin-left: 0; }
+  html.admin-mode .ap-ledger-profitfield { flex: 1 1 8rem; }
+  html.admin-mode .ap-ledger-profitfield select { width: 100%; }
+}
+
 html.admin-mode .ap-ledger-rail,
 html.admin-mode .ap-ledger-zenith-main {
   min-width: 0;

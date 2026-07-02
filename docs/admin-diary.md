@@ -1,3 +1,25 @@
+## 2026-07-02 — Fitxa de lead: reconstrucció visual (marge al rail + bolo a fila única + pressupost integrat) (Canvi #1348, claude)
+
+### Context
+El propietari («que vingui l'enginyer Opus i faci la seva versió»): la fitxa de lead com a model visual grinyolava. Reconstrucció VISUAL (0 canvis de lògica), iterada amb el propietari fins a fixar el que li agrada: header antic (dades event en files a dalt) + marge del bolo al rail dret + bolo aprimat + transport integrat al pressupost.
+
+### Què s'ha fet (només presentació/CSS)
+- **Marge al rail dret** (`LeadDetailClient` + `admin-shell.css`): retirat el `ap-ledger-profitbar` (6 pills al hero); el marge passa a un bloc net `.ap-ledger-summary` al rail dret del zenit (`.ap-ledger-zenith--railed`, 2 col: bolo + rail; una sola col a <900px). Header antic (fila de fets a dalt) intacte.
+- **Bolo aprimat a fila única** (`BookingServiceLinesSection`, component CANÒNIC compartit amb reserves): files `flex` sense `flex-wrap`, nom que creix i es trunca, PVP/cost `basis` fix, quantitat `basis-12` fix (bug: sense basis, `.adm-input` width:100% inflava la qty a 879px). Alçada de fila i paddings reduïts. Millora també el formulari de nova reserva.
+- **Pressupost integrat** (`LeadBoloSection`): el transport (el paga el CLIENT) es mou DINS el panell, abans del total. Resum estirat a l'amplada: Serveis contractats + Transport (+càrrec) = **Total**, exposat abans de «Crear pressupost». El calculador km/integrants queda com a input operatiu amb nota (cost intern).
+- Eliminat bloc CSS mort `.ap-lx-*` (teardown de header descartat pel propietari).
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0 (canon + phantom-tokens/classes + studio-integrity); travelLaborCost 4/4 + leadServiceLine 10/10.
+- Validació funcional: (Playwright, lead Alba) files del bolo en una sola línia (nom 388px / qty 48px); resum Serveis 240€ + Transport +190€ = Total 430€; marge al rail dret (Net −61€). 0 overflow-X a 1440.
+- Validació humana/UX: iterada i aprovada pel propietari (header, marge dret, files, pressupost integrat).
+
+### Coordinació
+Counter → 1348. `BookingServiceLinesSection` és compartit amb Codex (formulari reserva) → l'aprimat hi aplica també (canònic, consistent). Sense canvi de lògica. Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-02 — Transport: repercussió al client + franquícia horària col·laboradors (Canvi #1347, claude)
 
 ### Context

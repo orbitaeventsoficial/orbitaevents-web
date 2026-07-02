@@ -1546,6 +1546,21 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1348 — 2026-07-02 — claude (FET)
+**Fitxa de lead: reconstrucció visual (marge al rail + bolo a fila única + pressupost integrat).**
+- Reconstrucció VISUAL (0 lògica), iterada amb el propietari. Header antic (fets en files a dalt) conservat.
+- `LeadDetailClient` + `admin-shell.css`: retirat `ap-ledger-profitbar`; marge del bolo → bloc `.ap-ledger-summary` al rail dret (`.ap-ledger-zenith--railed`, 2 col; 1 col <900px).
+- `BookingServiceLinesSection` (canònic, compartit amb reserves): files a una sola línia (sense flex-wrap, nom truncable, num/qty basis fix — bug: qty sense basis s'inflava a 879px per `.adm-input` width:100%). Aprimat de paddings/alçada; millora també nova reserva.
+- `LeadBoloSection`: transport (el paga el client) mogut DINS el panell, abans del total; resum estirat Serveis + Transport = Total, exposat abans de contractar.
+- Eliminat bloc CSS mort `.ap-lx-*` (teardown de header descartat).
+- Validació tècnica: tsc 0; validate:core EXIT 0; travelLaborCost 4/4 + leadServiceLine 10/10.
+- Validació funcional: (Playwright) files a una línia; resum 240+190=430€; marge al rail dret.
+- Validació humana/UX: iterada i aprovada pel propietari.
+- Counter → 1348. BookingServiceLinesSection compartit amb Codex.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1347 — 2026-07-02 — claude (FET)
 **Transport: repercussió al client + franquícia horària dels col·laboradors.**
 - Repercussió (`LeadBoloSection`): `calculateTravelCharge` (50 km inclosos, +10€/20km) suma al total del bolo (client), visible abans de crear pressupost. Alba 240→430€.

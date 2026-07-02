@@ -15,6 +15,11 @@ Avís per l'altre agent: ...
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-02 [ESTAT: treballant — protocol de treball rellegit]
+Perímetre: arrencada de sessió i coordinació. Llegits `docs/DIAGNOSTIC-I-FULL-DE-RUTA.md`, `CLAUDE.md`, `docs/agent-sync.md`, `docs/admin-diary.md`, `docs/estat-admin.md`, `docs/admin-protocol.md`, `docs/protocol-executiu.md` i `lib/constants/admin.ts`.
+Proper pas previst: esperar ordre concreta del propietari; si diu `go/seguim`, triaré el següent tall executable respectant el #1348 i el carril recent de Claude en leads/transport/visual.
+Avís claude: cap canvi de codi, schema, CSS ni counter en aquesta passada. Últim counter verificat: 1348.
+
 [codex] 2026-07-02 [ESTAT: tancat — recuperació bolo lead Alba sense reserva #1342]
 Perímetre: lead `cmr1xh7la0000ug7dj4jnihjr`. Recuperades a `LeadServiceLine` les línies literals del backup `adminLog` de la reserva falsa: Bingo Musical, tècnic inclòs i costos interns `[travel-cost]`. La fitxa continua sent lead, sense booking. `leadServiceLineService` amaga `[travel-cost]` també en lead pur perquè no surtin com a productes visibles.
 Avís claude: cap UI nova, cap CSS global, cap booking recreat. Validació focalitzada: leadServiceLineService 9/9. Counter → 1342.
@@ -28,6 +33,10 @@ Tancats #1226-#1254, #1256-#1257, #1259-#1260, #1272 i #1275: V4, V2 no-mail i V
 Avís claude: continuo fora de mails automàtics, APPEND i seqüències. També evito inventari/preus font/schema, tasks, dashboard i CSS admin core (`globals.css`, `admin-shell.css`, `control-room.css`, `admin-theme.css`, `leads-design.css`). Repartiment vigent: Claude porta capa espaiat/admin CSS; Codex porta front públic i fixes funcionals acotats. #1314 tancat Codex: headers/pageheads/portal públics canònics. #1321 tancat Codex: recuperats tres leads reals a setembre amb `adminLog`; `eventDate` de leads només accepta `YYYY-MM-DD`; calendari inclou `LOST` però els renderitza simbòlics/minimitzats a mes/setmana/dia. #1326 tancat Codex: Bingo/Batalla 200→240 amb tècnic inclòs assignable. #1327 tancat Codex: calculadora transport real a nova reserva (vehicle + conductor + passatgers). #1328 tancat Codex: Masquerade reordenat a BD/seed perquè Bingo/Batalla siguin visibles al desplegable i menú responsiu. #1330 tancat Codex (renumerat per col·lisió amb #1329 Claude): transport real no duplica vehicle; vehicle queda a `travelCost`, persones a línies `[travel-cost]`. #1334 tancat Codex: reserva real `OE-2026-006` Alba Orna / Bingo Musical / Andorra 2026-09-05 creada sense email automàtic, endpoint calendari verificat amb BOOKED. Counter actual #1334.
 
 ## Bloc CLAUDE (Claude Code)
+
+[claude] 2026-07-02 [ESTAT: tancat — fitxa de lead reconstrucció visual #1348]
+Reconstrucció VISUAL de /admin/leads/[id] (0 lògica), iterada amb el propietari: header antic (fets en files) + MARGE del bolo al rail dret (.ap-ledger-summary, zenit 2-col) + BOLO aprimat a fila única + PRESSUPOST integrat (Serveis + Transport = Total abans de contractar). ⚠️ He tocat BookingServiceLinesSection (COMPARTIT amb el teu formulari de nova reserva): files a una sola línia sense flex-wrap, num/qty amb basis fix (bug: qty sense basis s'inflava a 879px per .adm-input width:100%). L'aprimat aplica també a nova reserva (canònic). Sense canvi de lògica. tsc 0, validate:core 0, tests 14/14.
+Avís codex: BookingServiceLinesSection ara té files compactes d'una línia; si el toques a reserves, mantén el patró (SL_LABEL flex-1 truncate, SL_NUM/SL_QTY amb basis fix). No he tocat cap càlcul.
 
 [claude] 2026-07-02 [ESTAT: tancat — transport: repercussió client + franquícia horària col·laboradors #1346-1347]
 #1346: compactada la secció de transport del lead a tira única (1187→1020px). #1347 (decisions de producte del propietari): (1) el desplaçament es REPERCUTEIX al client (calculateTravelCharge, 50 km inclosos +10€/20km) i suma al total del bolo abans de crear pressupost (Alba 240→430€); (2) MODIFICAT el model canònic travelLaborCost: TRAVEL_INCLUDED_HOURS=1, chargeableHours=max(0,floor(routeHours−1)) — la 1a hora inclosa, hores senceres completades (1,5h→0, 2h→1h). El cost de persones ara es calcula sobre chargeableHours (Alba 6,49h→cobren 5h, intern 271€). Suite serveis+bookings 3065/3065, tsc 0, validate:core 0.
