@@ -1,3 +1,69 @@
+## 2026-07-02 — Lead Alba: captures i responsive visual del bolo (Canvi #1352, codex)
+
+### Context
+Després d'integrar el tècnic dins la fila del Bingo (#1351), el propietari demana captures i millora visual. A desktop la fila compacta funcionava, però a mobile el producte quedava massa comprimit i perdia lectura.
+
+### Què s'ha fet
+- Captures abans/després de la fitxa real d'Alba en desktop i mobile a `.codex-captures/`.
+- `BookingServiceLinesSection`: la fila compartida del bolo continua compacta a desktop, però en mobile permet wrap ordenat.
+- El nom del producte passa a ocupar tota l'amplada en mobile; PVP, selector de tècnic, cost, quantitat i eliminar baixen a una línia de controls estable.
+- No s'ha tocat preus, costEngine ni la regla de transport; el carril de pricing queda fora d'aquest canvi.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: Playwright autenticat a Alba manté 1 sola línia visible de producte+tècnic, `Transport al client` i `Repartiment ruta`; sense overflow a desktop/mobile.
+- Validació humana/UX: captures `lead-alba-before-*` vs `lead-alba-after-visual-*` mostren el producte llegible en mobile i la fila compacta preservada en desktop.
+
+### Coordinació
+Counter → 1352. Tall només visual/responsive; canvis concurrents de preus a `travelLaborCost` no són d'aquest tall.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-02 — Bolo: tècnic inclòs dins la fila del producte (Canvi #1351, codex)
+
+### Context
+Després del #1350, quedava una fricció de lectura: Bingo Musical apareixia com dues files visibles (`Bingo` + `Tècnic de so inclòs`). El propietari vol una lectura de producte única: el tècnic forma part del Bingo/Batalla i el selector de qui el fa/cobra ha de viure dins la mateixa fila.
+
+### Què s'ha fet
+- `BookingServiceLinesSection`: quan una línia de producte va seguida d'un `SOUND_TECH` inclòs, la UI les agrupa en una sola fila.
+- La fila mostra producte, PVP, selector `Tècnic: ...`, cost del tècnic i quantitat. El selector continua modificant la línia tècnica interna.
+- Es manté la persistència en dues línies (`PROVIDER_SERVICE` + `SOUND_TECH`) per no perdre traçabilitat de cost, assignació i càlcul. Esborrar la fila elimina totes dues línies.
+- El patró aplica igual al lead i al formulari de nova reserva perquè consumeixen el mateix component compartit.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; tests focalitzats `leadServiceLineService`, `travelCost` i `vehicleCost` OK (51/51).
+- Validació funcional: Playwright autenticat a Alba mostra una sola descripció visible `Bingo Musical (Masquerade Events)`, 1 selector `Qui cobra el tècnic de so inclòs`, 0 selectors antics i 1 botó d'eliminar.
+- Validació humana/UX: el bolo ja no sembla dos productes separats; el tècnic queda dins la línia del Bingo sense perdre el cost 40€ ni el selector de payer.
+
+### Coordinació
+Counter → 1351. Tall acotat al component compartit `BookingServiceLinesSection`; sense schema ni costEngine.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-02 — Lead Alba: transport comercial + repartiment de ruta visible (Canvi #1350, codex)
+
+### Context
+El propietari rebutja la lectura visual anterior del transport com a simple despesa interna: a la fitxa de lead, abans de reservar, el transport ja és un import que es repercuteix al client i ha de quedar llegible com a part del pressupost. També faltava veure qui cobra o suporta cada tros de ruta.
+
+### Què s'ha fet
+- `LeadBoloSection`: el pressupost del lead separa `Serveis` → `Transport al client` → `Total client` i afegeix el bloc `Repartiment ruta`.
+- El repartiment mostra vehicle, conductor i passatger/proveïdor amb imports i notes de càlcul. En Alba: vehicle Òrbita, conductor Òrbita i passatger Masquerade com a proveïdor.
+- `LeadDetailClient`: el rail de marge mostra també `Transport client` i `Cost transport`, perquè el marge no amagui aquest tros.
+- BD viva: recuperat del backup `adminLog` el `roundTripKm=422` i persistit a `Lead.distanceKm` del lead `cmr1xh7la0000ug7dj4jnihjr`, de manera que el transport client no depèn d'un càlcul efímer del navegador.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK; `node_modules\.bin\vitest.CMD run __tests__\lib\services\leadServiceLineService.test.ts __tests__\lib\services\travelCost.test.ts __tests__\lib\services\vehicleCost.test.ts` OK (51/51).
+- Validació funcional: BD Alba: serveis 240€, transport client 190€, total client 430€, costos de ruta restaurats 198€; `Lead.distanceKm=422`.
+- Validació humana/UX: Playwright autenticat a `/admin/leads/cmr1xh7la0000ug7dj4jnihjr` HTTP 200, sense errors de consola ni overflow; visibles `Transport al client`, `Repartiment ruta`, `Total client`, 190, 430, vehicle/conductor Òrbita i passatger Masquerade com a proveïdor.
+
+### Coordinació
+Counter → 1350. Tall acotat a fitxa lead/transport visible i persistència de distància del lead Alba. Sense schema ni reserva recreada.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-02 — Fitxa de lead: polish (eyebrow net + pressupost clar + «Següent pas» refinat) (Canvi #1349, claude)
 
 ### Context

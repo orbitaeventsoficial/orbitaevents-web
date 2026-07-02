@@ -47,13 +47,13 @@ interface BookingServiceLinesSectionProps {
 
 // ── Classes canòniques locals del configurador (tokens de /studio) ───────────
 const SL_LIST = 'flex flex-col gap-1';
-const SL_ROW = 'flex items-center gap-1.5';
-const SL_ROW_BASE = 'flex items-center gap-1.5 rounded-[var(--o-r-sm)] border border-[color-mix(in_oklab,var(--gold)_24%,var(--line))] bg-[color-mix(in_oklab,var(--gold)_6%,transparent)] px-2 py-1';
-const SL_ROW_PACK = 'flex items-center gap-1.5 rounded-[var(--o-r-sm)] border border-[color-mix(in_oklab,var(--gold)_30%,var(--line))] bg-[color-mix(in_oklab,var(--gold)_8%,transparent)] px-2 py-1';
-const SL_LABEL = 'min-w-0 flex-1 truncate';
+const SL_ROW = 'flex flex-wrap items-center gap-1.5 sm:flex-nowrap';
+const SL_ROW_BASE = 'flex flex-wrap items-center gap-1.5 rounded-[var(--o-r-sm)] border border-[color-mix(in_oklab,var(--gold)_24%,var(--line))] bg-[color-mix(in_oklab,var(--gold)_6%,transparent)] px-2 py-1 sm:flex-nowrap';
+const SL_ROW_PACK = 'flex flex-wrap items-center gap-1.5 rounded-[var(--o-r-sm)] border border-[color-mix(in_oklab,var(--gold)_30%,var(--line))] bg-[color-mix(in_oklab,var(--gold)_8%,transparent)] px-2 py-1 sm:flex-nowrap';
+const SL_LABEL = 'min-w-0 flex-[1_1_100%] truncate sm:flex-1';
 const SL_NUM = `adm-input h-8 w-[4.25rem] shrink-0 grow-0 basis-[4.25rem] ${NB_NUM_BARE}`;
 const SL_QTY = `adm-input h-8 w-12 shrink-0 grow-0 basis-12 text-center ${NB_NUM_BARE}`;
-const SL_PAYER = 'adm-input h-8 min-w-0 shrink grow-0 basis-32';
+const SL_PAYER = 'adm-input h-8 min-w-0 shrink grow-0 basis-36 sm:basis-32';
 const SL_NOTE = 'inline-flex w-[4.25rem] shrink-0 items-center justify-center text-[length:var(--o-text-2xs)] italic text-[var(--t3)]';
 const SL_READONLY = 'inline-flex w-[4.25rem] shrink-0 items-center justify-end text-sm font-semibold text-[var(--t)]';
 const SL_DEL = 'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--o-r-sm)] border border-[color-mix(in_oklab,var(--o-stage-lost)_40%,var(--line))] bg-transparent text-sm text-[var(--o-stage-lost)] transition-colors hover:bg-[color-mix(in_oklab,var(--o-stage-lost)_12%,transparent)]';
@@ -91,6 +91,10 @@ function orbitaServiceHeadcount(id: string): number {
   return 0;
 }
 
+function isIncludedSoundTechLine(line?: BookingServiceLineFormInput): boolean {
+  return Boolean(line && line.kind === 'SOUND_TECH' && line.label.startsWith('Tècnic de so inclòs'));
+}
+
 export default function BookingServiceLinesSection({
   lines,
   onChange,
@@ -116,7 +120,20 @@ export default function BookingServiceLinesSection({
   const update = (idx: number, patch: Partial<BookingServiceLineFormInput>) => {
     onChange(lines.map((l, i) => (i === idx ? { ...l, ...patch } : l)));
   };
+  const updatePair = (
+    firstIdx: number,
+    firstPatch: Partial<BookingServiceLineFormInput>,
+    secondIdx: number,
+    secondPatch: Partial<BookingServiceLineFormInput>,
+  ) => {
+    onChange(lines.map((l, i) => {
+      if (i === firstIdx) return { ...l, ...firstPatch };
+      if (i === secondIdx) return { ...l, ...secondPatch };
+      return l;
+    }));
+  };
   const remove = (idx: number) => onChange(lines.filter((_, i) => i !== idx));
+  const removePair = (firstIdx: number, secondIdx: number) => onChange(lines.filter((_, i) => i !== firstIdx && i !== secondIdx));
 
   const addOrbitaService = (id: string) => {
     const svc = ORBITA_SERVICES.find((s) => s.id === id);
@@ -199,6 +216,20 @@ export default function BookingServiceLinesSection({
   const linesTotal = lines.reduce((s, l) => s + (l.revenueAmount || 0) * (l.quantity || 1), 0);
   const baseLinesTotal = baseLines.reduce((s, l) => s + (l.revenueAmount || 0) * (l.quantity || 1), 0);
   const boloTotal = packPrice + baseLinesTotal + linesTotal;
+  const serviceLineRows: Array<
+    | { type: 'single'; line: BookingServiceLineFormInput; idx: number }
+    | { type: 'included-tech'; line: BookingServiceLineFormInput; idx: number; techLine: BookingServiceLineFormInput; techIdx: number }
+  > = [];
+  for (let idx = 0; idx < lines.length; idx += 1) {
+    const line = lines[idx];
+    const next = lines[idx + 1];
+    if (line.kind !== 'SOUND_TECH' && isIncludedSoundTechLine(next)) {
+      serviceLineRows.push({ type: 'included-tech', line, idx, techLine: next, techIdx: idx + 1 });
+      idx += 1;
+    } else {
+      serviceLineRows.push({ type: 'single', line, idx });
+    }
+  }
 
   const body = (
     <>
@@ -250,7 +281,50 @@ export default function BookingServiceLinesSection({
           {/* Línies de servei (sumables) */}
           {lines.length > 0 && (
             <div className={SL_LIST}>
-              {lines.map((line, idx) => (
+              {serviceLineRows.map((row) => {
+                const line = row.line;
+                const idx = row.idx;
+                if (row.type === 'included-tech') {
+                  return (
+                    <div key={`${idx}-${row.techIdx}`} className={SL_ROW}>
+                      <input
+                        className={`adm-input ${SL_LABEL}`} placeholder="Descripció"
+                        value={line.label} onChange={(e) => update(idx, { label: e.target.value })}
+                        aria-label="Descripció de la línia"
+                      />
+                      <input
+                        className={SL_NUM} type="number" min={0} placeholder="PVP"
+                        value={line.revenueAmount ?? ''}
+                        onChange={(e) => update(idx, { revenueAmount: e.target.value ? Number(e.target.value) : undefined })}
+                        aria-label="Preu de venda"
+                      />
+                      <select
+                        className={SL_PAYER}
+                        value={row.techLine.collaboratorId ?? ''}
+                        onChange={(e) => update(row.techIdx, { collaboratorId: e.target.value || undefined })}
+                        aria-label="Qui cobra el tècnic de so inclòs"
+                        title="Qui posa (i cobra) el tècnic de so inclòs"
+                      >
+                        <option value="">Tècnic: Òrbita (jo)</option>
+                        {soundTechPayers.map((p) => (
+                          <option key={p.id} value={p.id}>Tècnic: {p.name}</option>
+                        ))}
+                      </select>
+                      <span className={SL_READONLY} title="Cost del tècnic inclòs al producte; es paga a qui indiqui el selector.">{row.techLine.costAmount ?? SOUND_TECH_PRICE}€</span>
+                      <input
+                        className={SL_QTY} type="number" min={1} placeholder="Qt"
+                        value={line.quantity ?? 1}
+                        onChange={(e) => {
+                          const quantity = e.target.value ? Number(e.target.value) : 1;
+                          updatePair(idx, { quantity }, row.techIdx, { quantity });
+                        }}
+                        aria-label="Quantitat"
+                      />
+                      <button type="button" className={SL_DEL} onClick={() => removePair(idx, row.techIdx)} aria-label="Eliminar línia">✕</button>
+                    </div>
+                  );
+                }
+                return (
                 <div key={idx} className={SL_ROW}>
                   <input
                     className={`adm-input ${SL_LABEL}`} placeholder="Descripció"
@@ -299,7 +373,8 @@ export default function BookingServiceLinesSection({
                   />
                   <button type="button" className={SL_DEL} onClick={() => remove(idx)} aria-label="Eliminar línia">✕</button>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
           <button type="button" className={GHOST_BTN} onClick={addFreeLine}>+ Línia lliure</button>

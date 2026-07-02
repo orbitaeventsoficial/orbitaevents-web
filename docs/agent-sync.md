@@ -15,10 +15,20 @@ Avís per l'altre agent: ...
 
 ## Bloc CODEX (Codex CLI)
 
-[codex] 2026-07-02 [ESTAT: treballant — protocol de treball rellegit]
-Perímetre: arrencada de sessió i coordinació. Llegits `docs/DIAGNOSTIC-I-FULL-DE-RUTA.md`, `CLAUDE.md`, `docs/agent-sync.md`, `docs/admin-diary.md`, `docs/estat-admin.md`, `docs/admin-protocol.md`, `docs/protocol-executiu.md` i `lib/constants/admin.ts`.
-Proper pas previst: esperar ordre concreta del propietari; si diu `go/seguim`, triaré el següent tall executable respectant el #1348 i el carril recent de Claude en leads/transport/visual.
-Avís claude: cap canvi de codi, schema, CSS ni counter en aquesta passada. Últim counter verificat: 1348.
+[codex] 2026-07-02 [ESTAT: tancat — visual lead Alba amb captures #1352]
+Perímetre: `/admin/leads/cmr1xh7la0000ug7dj4jnihjr`, només visual/responsive del bolo després del tècnic integrat. Captures abans/després desktop i mobile a `.codex-captures/`; ajustada la fila compartida perquè en mobile el producte ocupi tota l'amplada i els controls baixin ordenats.
+Proper pas previst: revisar amb el propietari la captura after; si es valida, el següent tall visual gran seria canonitzar el patró a Studio.
+Avís claude: no he tocat sistema de preus ni costEngine. Detectats canvis concurrents a `travelLaborCost`; els he deixat intactes.
+
+[codex] 2026-07-02 [ESTAT: tancat — tècnic inclòs dins la fila del Bingo #1351]
+Perímetre: `app/admin/bookings/BookingServiceLinesSection.tsx`. Bingo/Batalla amb tècnic inclòs ara es veu com una sola fila amb selector de qui fa/cobra el tècnic; internament es mantenen dues línies (`PROVIDER_SERVICE` + `SOUND_TECH`) per traçabilitat.
+Proper pas previst: revisió visual del propietari al lead Alba i a nova reserva. El següent fil gros queda la canonització a Studio si es confirma el patró.
+Avís claude: no he tocat schema ni costEngine. Files compactes preservades. Validació: tsc, tests focalitzats 51/51 i Playwright real al lead Alba.
+
+[codex] 2026-07-02 [ESTAT: tancat — lead Alba: transport comercial i repartiment visible #1350]
+Perímetre: `/admin/leads/cmr1xh7la0000ug7dj4jnihjr`. `LeadBoloSection` mostra ara `Transport al client` dins el pressupost i `Repartiment ruta` amb vehicle/conductor/passatger; `LeadDetailClient` mostra `Transport client` i `Cost transport` al rail. Persistit `Lead.distanceKm=422` des del backup `adminLog`.
+Proper pas previst: revisió visual del propietari al lead real; si cal, el següent tall seria modelar transport com línia editable/assignable de pressupost, no només resum calculat.
+Avís claude: #1350 canvia la semàntica visible del transport al lead. Sense schema, sense reserva recreada. Validat amb Playwright real, tests focalitzats 51/51 i validate:core.
 
 [codex] 2026-07-02 [ESTAT: tancat — recuperació bolo lead Alba sense reserva #1342]
 Perímetre: lead `cmr1xh7la0000ug7dj4jnihjr`. Recuperades a `LeadServiceLine` les línies literals del backup `adminLog` de la reserva falsa: Bingo Musical, tècnic inclòs i costos interns `[travel-cost]`. La fitxa continua sent lead, sense booking. `leadServiceLineService` amaga `[travel-cost]` també en lead pur perquè no surtin com a productes visibles.

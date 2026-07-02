@@ -172,6 +172,7 @@ export default async function LeadDetailPage({ params }: Props) {
   // mostrar un marge inflat (la base contractada té cost real, no només ingrés).
   let bookingEconomia: {
     net: number; marginPct: number; total: number; directCost: number;
+    travelCharge: number; travelCost: number;
     acquisitionCost: number; serviceLinesCost: number; fixedOperationalCost: number;
     tone: 'emerald' | 'amber' | 'orange' | 'rose'; label: string;
   } | null = null;
@@ -202,6 +203,8 @@ export default async function LeadDetailPage({ params }: Props) {
         net: summary.netMargin,
         marginPct: summary.marginPct,
         total: summary.total,
+        travelCharge: 0,
+        travelCost: b.travelCost ? Number(b.travelCost) : 0,
         directCost: summary.directCost,
         acquisitionCost: summary.acquisitionCost,
         serviceLinesCost: summary.serviceLinesCost,

@@ -1546,6 +1546,46 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1352 — 2026-07-02 — codex (FET)
+**Lead Alba: captures i responsive visual del bolo.**
+- Captures abans/després de la fitxa real d'Alba en desktop i mobile a `.codex-captures/`.
+- `BookingServiceLinesSection`: la fila compartida producte+tècnic fa wrap només quan cal; en mobile el producte ocupa una línia pròpia i els controls baixen ordenats.
+- Desktop conserva la lectura compacta d'una sola fila, sense tornar a separar el tècnic com a producte.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: Playwright autenticat a Alba sense overflow; producte+tècnic integrat, transport client i repartiment ruta continuen visibles.
+- Validació humana/UX: captures after desktop/mobile revisades; mobile ja no comprimeix el nom del producte.
+- `ADMIN_CHANGE_COUNTER` → `1352`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1351 — 2026-07-02 — codex (FET)
+**Bolo: tècnic inclòs dins la fila del producte.**
+- `BookingServiceLinesSection`: agrupa visualment `PROVIDER_SERVICE`/producte + `SOUND_TECH` inclòs en una sola fila.
+- La fila mostra producte, PVP, selector `Tècnic: ...`, cost del tècnic i quantitat; el selector modifica la línia tècnica interna.
+- Persistència intacta en dues línies per traçabilitat de cost/assignació/càlcul; eliminar la fila elimina totes dues.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; tests focalitzats transport/lead 51/51.
+- Validació funcional: Playwright autenticat a Alba mostra 1 descripció visible del Bingo, 1 selector de tècnic inclòs, 0 selectors antics i 1 botó d'eliminar.
+- Validació humana/UX: el Bingo ja es llegeix com un sol producte amb tècnic integrat.
+- `ADMIN_CHANGE_COUNTER` → `1351`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1350 — 2026-07-02 — codex (FET)
+**Lead Alba: transport comercial + repartiment de ruta visible.**
+- `LeadBoloSection`: el pressupost del lead mostra `Serveis` → `Transport al client` → `Total client` i afegeix `Repartiment ruta`.
+- El repartiment mostra vehicle, conductor i passatger/proveïdor amb imports i notes de càlcul; el passatger de Masquerade queda marcat com a proveïdor.
+- `LeadDetailClient`: el rail de marge mostra `Transport client` i `Cost transport`.
+- BD viva: `Lead.distanceKm` d'Alba (`cmr1xh7la0000ug7dj4jnihjr`) persistit a 422 km recuperats del backup `adminLog`.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK; tests focalitzats transport/lead 51/51.
+- Validació funcional: serveis 240€, transport client 190€, total client 430€, costos de ruta restaurats 198€.
+- Validació humana/UX: Playwright autenticat a la fitxa real HTTP 200, sense errors de consola ni overflow; bloc transport/repartiment visible.
+- `ADMIN_CHANGE_COUNTER` → `1350`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1349 — 2026-07-02 — claude (FET)
 **Fitxa de lead: polish (eyebrow net + pressupost clar + «Següent pas» refinat).**
 - Eyebrow (`LeadDetailClient`): filtra «Altre»/buits → fora el «ALTRE · ALTRE».

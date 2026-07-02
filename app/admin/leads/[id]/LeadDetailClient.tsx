@@ -165,7 +165,25 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  const [savePending, setSavePending] = useState(false);
  // Economia del bolo elevada des de LeadBoloSection per al rail financer compacte.
  const [boloEcon, setBoloEcon] = useState<BoloEconomia | null>(null);
- const handleEconomia = useCallback((e: BoloEconomia | null) => setBoloEcon(e), []);
+ const handleEconomia = useCallback((e: BoloEconomia | null) => {
+ setBoloEcon((prev) => {
+ if (!prev && !e) return prev;
+ if (!prev || !e) return e;
+ const same =
+ prev.net === e.net &&
+ prev.marginPct === e.marginPct &&
+ prev.total === e.total &&
+ prev.travelCharge === e.travelCharge &&
+ prev.travelCost === e.travelCost &&
+ prev.directCost === e.directCost &&
+ prev.acquisitionCost === e.acquisitionCost &&
+ prev.serviceLinesCost === e.serviceLinesCost &&
+ prev.fixedOperationalCost === e.fixedOperationalCost &&
+ prev.tone === e.tone &&
+ prev.label === e.label;
+ return same ? prev : e;
+ });
+ }, []);
  // Si el lead té reserva, mana l'economia REAL de la reserva (font canònica del
  // servidor); si no, el net provisional del configurador del bolo (cas Cristina).
  const econ = bookingEconomia ?? boloEcon;
@@ -571,6 +589,12 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  <span className="ap-ledger-summary-net-pct">{Math.round(econ.marginPct)}% marge{econ.label ? ` · ${econ.label}` : ''}</span>
  </div>
  <div className="ap-ledger-summary-rows">
+ {econ.travelCharge != null && (
+ <div><span>Transport client</span><strong>{formatCurrency(econ.travelCharge)}</strong></div>
+ )}
+ {econ.travelCost != null && (
+ <div><span>Cost transport</span><strong>{formatCurrency(econ.travelCost)}</strong></div>
+ )}
  <div><span>Cost serveis</span><strong>{formatCurrency(econ.serviceLinesCost)}</strong></div>
  <div><span>Operatiu</span><strong>{formatCurrency(econ.fixedOperationalCost)}</strong></div>
  <div><span>Cost origen</span><strong>{formatCurrency(econ.acquisitionCost)}</strong></div>

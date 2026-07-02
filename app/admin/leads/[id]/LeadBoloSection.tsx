@@ -22,6 +22,8 @@ export interface BoloEconomia {
  net: number;
  marginPct: number;
  total: number;
+ travelCharge: number;
+ travelCost: number;
  directCost: number;
  acquisitionCost: number;
  serviceLinesCost: number;
@@ -142,6 +144,8 @@ export default function LeadBoloSection({
  }, [buildVisibleLines]);
  const headcount = headcountOverride ? Math.max(0, Math.floor(Number(headcountOverride) || 0)) : derivedHeadcount;
  const travelBreakdown = useMemo(() => {
+ const providerLine = buildVisibleLines().find((line) => line.kind === 'PROVIDER_SERVICE' && /\(([^)]+)\)/.test(line.label));
+ const providerName = providerLine?.label.match(/\(([^)]+)\)/)?.[1] ?? 'Equip ruta';
  const passengerCount = Math.max(0, headcount - 1);
  return calculateTravelCostBreakdown({
  roundTripKm: Number(distanceKm) || 0,
@@ -149,10 +153,10 @@ export default function LeadBoloSection({
  vehicleOwner: { label: 'Òrbita' },
  people: [
  ...(headcount > 0 ? [{ role: 'DRIVER' as const, label: 'Òrbita' }] : []),
- ...(passengerCount > 0 ? [{ role: 'PASSENGER' as const, label: 'Equip ruta', count: passengerCount }] : []),
+ ...(passengerCount > 0 ? [{ role: 'PASSENGER' as const, label: providerName, collaboratorId: providerLine?.collaboratorId ?? null, count: passengerCount }] : []),
  ],
  });
- }, [distanceKm, headcount, vehicleCostPerKm]);
+ }, [buildVisibleLines, distanceKm, headcount, vehicleCostPerKm]);
  // Live si hi ha km resolts; si no, fallback al cost recuperat (#1343).
  const effectiveTravelCost = (Number(distanceKm) || 0) > 0 ? travelBreakdown.totalCost : internalTravelCost;
  // Càrrec al client (#1347): km més enllà dels inclosos → +TRAVEL_BLOCK_EUR/TRAVEL_BLOCK_KM.
@@ -203,6 +207,8 @@ export default function LeadBoloSection({
  net: economia.netMargin,
  marginPct: economia.marginPct,
  total: economia.total,
+ travelCharge,
+ travelCost: effectiveTravelCost,
  directCost: economia.directCost,
  acquisitionCost: economia.acquisitionCost,
  serviceLinesCost: economia.serviceLinesCost,
@@ -211,7 +217,14 @@ export default function LeadBoloSection({
  label: economia.marginTone.label,
  }
  : null);
- }, [economia, onEconomiaChange]);
+ }, [economia, effectiveTravelCost, onEconomiaChange, travelCharge]);
+
+ const routeSettlementLines = useMemo(() => travelBreakdown.lines.map((line) => ({
+ label: line.label,
+ amount: line.costAmount,
+ owner: line.collaboratorId ? 'proveïdor' : 'Òrbita',
+ notes: line.notes.replace('[travel-cost] ', ''),
+ })), [travelBreakdown.lines]);
 
  // Marge → nivell visual reutilitzant els tons existents (.ap-ledger-kpi data-level).
  const netLevel = !economia
@@ -336,13 +349,35 @@ export default function LeadBoloSection({
  <span>Serveis</span>
  <strong>{formatCurrency(economia.total - travelCharge)}</strong>
  </div>
- <div className="ap-ledger-budget-row">
- <span>Transport<em>{billableKm} km · primers {INCLUDED_TRAVEL_KM} inclosos</em></span>
+ <div className="ap-ledger-budget-row ap-ledger-budget-row--travel">
+ <span>Transport al client<em>{billableKm} km facturables · primers {INCLUDED_TRAVEL_KM} inclosos</em></span>
  <strong>+{formatCurrency(travelCharge)}</strong>
  </div>
  <div className="ap-ledger-budget-row ap-ledger-budget-row--total">
  <span>Total client</span>
  <strong>{formatCurrency(economia.total)}</strong>
+ </div>
+ </div>
+ <div className="ap-ledger-route-settlement" aria-label="Repartiment econòmic del transport">
+ <div className="ap-ledger-route-settlement-head">
+ <span>Repartiment ruta</span>
+ <strong>{formatCurrency(effectiveTravelCost)}</strong>
+ </div>
+ <div className="ap-ledger-route-settlement-grid">
+ {routeSettlementLines.length > 0 ? routeSettlementLines.map((line, idx) => (
+ <div key={`${line.label}-${idx}`} className="ap-ledger-route-settlement-row">
+ <span>
+ {line.label}
+ <em>{line.owner} · {line.notes}</em>
+ </span>
+ <strong>{formatCurrency(line.amount)}</strong>
+ </div>
+ )) : (
+ <div className="ap-ledger-route-settlement-row">
+ <span>Sense cost de ruta<em>afegeix km i integrants per calcular-lo</em></span>
+ <strong>{formatCurrency(0)}</strong>
+ </div>
+ )}
  </div>
  </div>
  </div>

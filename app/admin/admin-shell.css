@@ -1513,6 +1513,69 @@ html.admin-mode .ap-ledger-budget-row--total {
 }
 html.admin-mode .ap-ledger-budget-row--total > span { font-family: var(--display); font-size: var(--o-text-md); font-weight: var(--o-fw-semi); color: var(--t); }
 html.admin-mode .ap-ledger-budget-row--total > strong { font-size: var(--o-text-2xl); font-weight: var(--o-fw-xbold); color: var(--gold); line-height: 1; }
+html.admin-mode .ap-ledger-budget-row--travel > strong { color: var(--gold); }
+html.admin-mode .ap-ledger-route-settlement {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--o-space-15);
+  padding: var(--o-space-25) var(--o-space-3);
+  border: 1px solid color-mix(in oklab, var(--line) 75%, transparent);
+  border-radius: var(--o-r-md);
+  background: color-mix(in oklab, var(--raised) 54%, transparent);
+}
+html.admin-mode .ap-ledger-route-settlement-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--o-space-3);
+  font-family: var(--display);
+  font-size: var(--o-text-md);
+  font-weight: var(--o-fw-semi);
+  color: var(--t);
+}
+html.admin-mode .ap-ledger-route-settlement-head > strong {
+  color: var(--gold);
+  font-family: var(--display);
+  font-size: var(--o-text-lg);
+  font-weight: var(--o-fw-bold);
+}
+html.admin-mode .ap-ledger-route-settlement-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--o-space-15);
+}
+html.admin-mode .ap-ledger-route-settlement-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--o-space-2);
+  min-width: 0;
+  padding: var(--o-space-15) var(--o-space-2);
+  border-top: 1px solid color-mix(in oklab, var(--line) 58%, transparent);
+  font-family: var(--mono);
+  font-size: var(--o-text-xs);
+}
+html.admin-mode .ap-ledger-route-settlement-row > span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.08rem;
+  color: var(--t2);
+}
+html.admin-mode .ap-ledger-route-settlement-row > span > em {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-style: normal;
+  color: var(--t3);
+  font-size: var(--o-text-micro);
+}
+html.admin-mode .ap-ledger-route-settlement-row > strong {
+  flex: 0 0 auto;
+  color: var(--t);
+  font-weight: var(--o-fw-semi);
+}
 html.admin-mode .ap-ledger-bolo-actions--full { display: flex; flex-wrap: wrap; gap: var(--o-space-2); padding: var(--o-space-3); }
 @media (max-width: 720px) {
   html.admin-mode .ap-ledger-budget { grid-template-columns: minmax(0, 1fr); }
