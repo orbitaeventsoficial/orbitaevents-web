@@ -1546,6 +1546,18 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1353 — 2026-07-02 — claude (FET)
+**Transport 30-min + motor canònic de repartiment del bolo (F1).**
+- `travelLaborCost.ts`: `chargeableHours` → blocs de 30 min amunt (`ceil(max(0,routeHours−1)/0,5)×0,5`), 1a hora inclosa. Test actualitzat.
+- NOU `lib/services/repartimentService.ts`: `computeBoloRepartiment(lines)` pur — font única del repartiment (per element/persona/totals), model absolut €, transport atribuït via `collaboratorId`. Reutilitza `aggregateServiceLines`/`classifyBoloLines`. 5 tests.
+- Validació tècnica: tsc 0; validate:core 0; travelLaborCost 4/4 + repartimentService 5/5.
+- Validació funcional: part Òrbita = client − tercers; quadra amb costEngine.
+- Validació humana/UX: F1 (motor sense UI); F2-F4 després.
+- Counter → 1353. F1 del pla del repartiment solidari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1352 — 2026-07-02 — codex (FET)
 **Lead Alba: captures i responsive visual del bolo.**
 - Captures abans/després de la fitxa real d'Alba en desktop i mobile a `.codex-captures/`.

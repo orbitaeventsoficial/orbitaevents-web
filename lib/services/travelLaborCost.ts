@@ -72,10 +72,11 @@ export function calculateTravelCostBreakdown(input: {
   );
   const vehicleCostPerKm = sanitizeNonNegative(input.vehicleCostPerKm, DEFAULT_VEHICLE_COST_PER_KM);
   const laborThresholdKm = sanitizeNonNegative(input.laborThresholdKm, INCLUDED_TRAVEL_KM);
-  // La 1a hora va inclosa en el preu; es cobren les HORES SENCERES completades per damunt
-  // (1,5 h → 0 h cobrades; 2 h → 1 h; 6,49 h → 5 h). Decisió del propietari.
+  // La 1a hora (anada+tornada) va inclosa en el preu; l'excés es cobra en BLOCS DE 30 MIN,
+  // arrodonint AMUNT (recomanació d'anàlisi econòmica: evita els esglaons injustos de l'hora
+  // sencera — p. ex. 1h50 → 1 h, 2h30 → 1,5 h). 1,5 h → 0,5 h; 2 h → 1 h; 6,49 h → 5,5 h.
   const includedHours = TRAVEL_INCLUDED_HOURS;
-  const chargeableHours = Math.max(0, Math.floor(routeHours - includedHours));
+  const chargeableHours = round2(Math.ceil(Math.max(0, routeHours - includedHours) / 0.5) * 0.5);
   const laborCostApplies = chargeableHours > 0;
   const vehicleCost = calculateTravelCost(roundTripKm, vehicleCostPerKm);
   const lines: TravelCostLine[] = [];

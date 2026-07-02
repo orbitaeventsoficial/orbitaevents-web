@@ -54,26 +54,32 @@ describe('travelLaborCost', () => {
     ]);
   });
 
-  it('regla del propietari: 1a hora inclosa, hores senceres completades (1,5 h→0; 2 h→1 h)', () => {
-    const under = calculateTravelCostBreakdown({
+  it('1a hora inclosa, excés en blocs de 30 min amunt (1,5 h→0,5; 1h50→1; 2 h→1)', () => {
+    const oneAndHalf = calculateTravelCostBreakdown({
       roundTripKm: 100, routeHours: 1.5, vehicleCostPerKm: 0.25,
       vehicleOwner: { label: 'Òrbita' }, people: [{ role: 'DRIVER', label: 'Òrbita' }],
     });
-    expect(under.chargeableHours).toBe(0); // floor(1.5-1)=0
-    expect(under.laborCostApplies).toBe(false);
-    expect(under.driverCost).toBe(0);
+    expect(oneAndHalf.chargeableHours).toBe(0.5); // ceil((1.5-1)/0.5)*0.5
+    expect(oneAndHalf.driverCost).toBe(9);        // 0.5 h × 18
 
     const oneE50 = calculateTravelCostBreakdown({
       roundTripKm: 120, routeHours: 1.83, vehicleCostPerKm: 0.25,
       vehicleOwner: { label: 'Òrbita' }, people: [{ role: 'DRIVER', label: 'Òrbita' }],
     });
-    expect(oneE50.chargeableHours).toBe(0); // 1 h 50 min → encara 0
+    expect(oneE50.chargeableHours).toBe(1); // ceil(0.83/0.5)*0.5 = 1
+
+    const under1h = calculateTravelCostBreakdown({
+      roundTripKm: 50, routeHours: 0.8, vehicleCostPerKm: 0.25,
+      vehicleOwner: { label: 'Òrbita' }, people: [{ role: 'DRIVER', label: 'Òrbita' }],
+    });
+    expect(under1h.chargeableHours).toBe(0); // dins la 1a hora inclosa
+    expect(under1h.laborCostApplies).toBe(false);
 
     const two = calculateTravelCostBreakdown({
       roundTripKm: 130, routeHours: 2, vehicleCostPerKm: 0.25,
       vehicleOwner: { label: 'Òrbita' }, people: [{ role: 'DRIVER', label: 'Òrbita' }],
     });
-    expect(two.chargeableHours).toBe(1); // floor(2-1)=1
+    expect(two.chargeableHours).toBe(1); // ceil((2-1)/0.5)*0.5 = 1
     expect(two.driverCost).toBe(18);     // 1 h × 18
   });
 });

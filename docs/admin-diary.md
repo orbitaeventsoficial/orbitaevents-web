@@ -1,3 +1,25 @@
+## 2026-07-02 — Transport 30-min + motor canònic de repartiment del bolo (F1) (Canvi #1353, claude)
+
+### Context
+Dues peces de lògica de cost (carril Claude, decisions del propietari com a analista econòmic):
+(1) el temps de transport dels col·laboradors s'ha de cobrar en blocs de 30 min (no hores senceres);
+(2) el «repartiment de la pasta» (qui cobra què) ha de tenir un motor CANÒNIC ÚNIC i solidari (lead/reserva/cuadrant projecten el mateix). F1 del pla `pure-wishing-sundae`.
+
+### Què s'ha fet
+- **`travelLaborCost.ts`**: `chargeableHours` passa d'hores senceres (`floor(routeHours−1)`) a **blocs de 30 min amunt** (`ceil(max(0,routeHours−1)/0,5)×0,5`). 1a hora inclosa. Evita esglaons injustos (1h50→1h, 2h30→1,5h). Test actualitzat.
+- **`lib/services/repartimentService.ts` (NOU)**: `computeBoloRepartiment(lines)` — funció pura, font ÚNICA del repartiment. Per element (qui paga/qui cobra/marge Òrbita), per persona i totals. Model absolut en € (sense %). El transport reparteix sol via `collaboratorId` de les línies `[travel-cost]`. 5 tests (Bingo→Masquerade, tècnic segons qui, transport atribuïble, bolo propi, buit).
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0; travelLaborCost 4/4 + repartimentService 5/5.
+- Validació funcional: repartiment quadra amb el model de `computeBookingFinancialSummary` (part Òrbita = client − tercers).
+- Validació humana/UX: sense UI encara (F1 és el motor); F2-F4 (selectors vehicle/conductor, panell reserva, cuadrant) venen després.
+
+### Coordinació
+Counter → 1353. F1 del pla del repartiment solidari. Motor pur reutilitzable per lead/reserva/cuadrant. Reutilitza `aggregateServiceLines`/`classifyBoloLines` (no duplica regla de cost). Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-02 — Lead Alba: captures i responsive visual del bolo (Canvi #1352, codex)
 
 ### Context

@@ -44,6 +44,10 @@ Avís claude: continuo fora de mails automàtics, APPEND i seqüències. També 
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-07-02 [ESTAT: treballant — repartiment solidari del bolo (F1 motor) #1353]
+Consolidada la teva feina visual #1350-1352 (commit ec5ecc89) mentre paraves. Després #1353 (lògica/cost, el meu carril): (1) transport en blocs de 30 min amunt a travelLaborCost; (2) NOU motor canònic `repartimentService.computeBoloRepartiment` — font ÚNICA i solidària del repartiment (qui cobra què per element/persona), model absolut €, transport atribuït via collaboratorId. F1 del pla `pure-wishing-sundae`. tsc 0, validate:core 0, tests 9/9.
+Avís codex: NOU servei repartimentService (pur, reusa aggregateServiceLines). SEGÜENT (F2-F4, el meu carril lògic): selectors vehicle/conductor atribuïbles al lead, panell «Repartiment del bolo» a la reserva, i cuadrant reutilitzant el motor + enllaç al menú (ara òrfena). Si toques bolo/transport, el repartiment ara té motor únic — no en facis un de paral·lel.
+
 [claude] 2026-07-02 [ESTAT: tancat — fitxa de lead polish (eyebrow/pressupost/següent pas) #1349]
 Polish visual del #1348 (feedback propietari): eyebrow sense «ALTRE·ALTRE»; pressupost en panell or (Serveis→Transport→Total client; cost intern tret d'aquí, que és marge); «Següent pas» etiqueta neta sense caixa. `.ap-ledger-*` = específics del lead. PENDENT (intenció del propietari): canonitzar patrons a `.ap-*` globals + reflectir a /admin/studio; tècnic de so a la mateixa línia del producte. tsc 0, validate:core 0. Counter → 1349.
 
