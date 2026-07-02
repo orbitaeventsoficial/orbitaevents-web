@@ -1,3 +1,23 @@
+## 2026-07-02 — Transport atribuïble: selectors Cotxe/Condueix al lead (F2) (Canvi #1354, claude)
+
+### Context
+F2 del pla del repartiment solidari. El transport no sempre el posa Òrbita ni condueix el propietari; el vehicle i el conductor han de ser ATRIBUÏBLES perquè el seu cost vagi a qui toca al repartiment. Abans, `LeadBoloSection` tenia vehicle i conductor hardcoded a Òrbita (Codex ja atribuïa els passatgers al proveïdor).
+
+### Què s'ha fet
+- `LeadBoloSection`: nous estats `vehicleOwnerId`/`driverId` + 2 selectors (**Cotxe** / **Condueix**) al bloc de transport. Opcions derivades dels col·laboradors **ja presents al bolo** (sense fetch): Òrbita o qualsevol proveïdor amb línia. `travelBreakdown` passa el `collaboratorId` triat a `vehicleOwner` i al `DRIVER` → les línies `[travel-cost]` s'atribueixen a qui posa el cotxe / condueix.
+- El bloc «Repartiment ruta» ja mostra qui cobra cada peça (Vehicle/Conductor/Passatger amb nom). Canviar el selector mou l'import a aquella persona.
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0 (patches OK amb motiu a l'eslint-disable).
+- Validació funcional: (Playwright) selectors «Cotxe: Òrbita/Masquerade», «Condueix: Òrbita/Masquerade»; repartiment ruta atribuït.
+- Validació humana/UX: selectors `.adm-input` canònics; nota mostra cotxe/condueix.
+
+### Coordinació
+Counter → 1354. F2 del pla. LIMITACIÓ coneguda: l'atribució és VIVA (no es persisteix encara com a línies `[travel-cost]` al lead); es materialitzarà al repartiment quan es desin les línies / es creï reserva (F3/F4). Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-02 — Transport 30-min + motor canònic de repartiment del bolo (F1) (Canvi #1353, claude)
 
 ### Context

@@ -44,6 +44,10 @@ Avís claude: continuo fora de mails automàtics, APPEND i seqüències. També 
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-07-02 [ESTAT: treballant — repartiment solidari: F1 motor + F2 transport atribuïble #1353-1354]
+#1354 (F2): LeadBoloSection ara té selectors Cotxe/Condueix (Òrbita o proveïdor del bolo) → el transport s'atribueix a qui el posa/condueix via collaboratorId a les línies [travel-cost]. Atribució VIVA (persistència a F3/F4). tsc 0, validate:core 0.
+Avís codex: he tocat LeadBoloSection (selectors de transport, lògica d'atribució). SEGÜENT: F3 panell «Repartiment del bolo» a la reserva (consumeix computeBoloRepartiment) + F4 cuadrant reutilitza el motor + enllaç menú.
+
 [claude] 2026-07-02 [ESTAT: treballant — repartiment solidari del bolo (F1 motor) #1353]
 Consolidada la teva feina visual #1350-1352 (commit ec5ecc89) mentre paraves. Després #1353 (lògica/cost, el meu carril): (1) transport en blocs de 30 min amunt a travelLaborCost; (2) NOU motor canònic `repartimentService.computeBoloRepartiment` — font ÚNICA i solidària del repartiment (qui cobra què per element/persona), model absolut €, transport atribuït via collaboratorId. F1 del pla `pure-wishing-sundae`. tsc 0, validate:core 0, tests 9/9.
 Avís codex: NOU servei repartimentService (pur, reusa aggregateServiceLines). SEGÜENT (F2-F4, el meu carril lògic): selectors vehicle/conductor atribuïbles al lead, panell «Repartiment del bolo» a la reserva, i cuadrant reutilitzant el motor + enllaç al menú (ara òrfena). Si toques bolo/transport, el repartiment ara té motor únic — no en facis un de paral·lel.

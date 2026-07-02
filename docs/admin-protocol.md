@@ -1546,6 +1546,17 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1354 — 2026-07-02 — claude (FET)
+**Transport atribuïble: selectors Cotxe/Condueix al lead (F2).**
+- `LeadBoloSection`: estats `vehicleOwnerId`/`driverId` + 2 selectors (opcions = col·laboradors del bolo, sense fetch). `travelBreakdown` atribueix `vehicleOwner`/`DRIVER` al `collaboratorId` triat → línies `[travel-cost]` van a qui posa el cotxe/condueix.
+- Validació tècnica: tsc 0; validate:core 0.
+- Validació funcional: (Playwright) selectors Cotxe/Condueix Òrbita/Masquerade; repartiment ruta atribuït.
+- Validació humana/UX: `.adm-input` canònic.
+- Counter → 1354. F2 del pla. Limitació: atribució viva (persistència a F3/F4).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1353 — 2026-07-02 — claude (FET)
 **Transport 30-min + motor canònic de repartiment del bolo (F1).**
 - `travelLaborCost.ts`: `chargeableHours` → blocs de 30 min amunt (`ceil(max(0,routeHours−1)/0,5)×0,5`), 1a hora inclosa. Test actualitzat.

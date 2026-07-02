@@ -75,6 +75,10 @@ export default function LeadBoloSection({
  // Càlcul de transport EN VIU (#1345): km anada+tornada + integrants derivats del bolo.
  const [distanceKm, setDistanceKm] = useState(initialDistanceKm ? String(initialDistanceKm) : '');
  const [headcountOverride, setHeadcountOverride] = useState('');
+ // Atribució del transport (#1354): qui posa el cotxe i qui condueix. '' = Òrbita;
+ // altrament el collaboratorId d'un proveïdor del bolo → el cost va a aquella persona.
+ const [vehicleOwnerId, setVehicleOwnerId] = useState('');
+ const [driverId, setDriverId] = useState('');
  const [loading, setLoading] = useState(true);
  const [saving, setSaving] = useState(false);
  const [dirty, setDirty] = useState(false);
@@ -143,6 +147,17 @@ export default function LeadBoloSection({
  return (hasProduct ? 1 : 0) + soundTech;
  }, [buildVisibleLines]);
  const headcount = headcountOverride ? Math.max(0, Math.floor(Number(headcountOverride) || 0)) : derivedHeadcount;
+ // Col·laboradors presents al bolo (per triar qui posa el cotxe / condueix).
+ const travelCollaborators = useMemo(() => {
+ const seen = new Map<string, string>();
+ for (const l of buildVisibleLines()) {
+ if (l.collaboratorId && !seen.has(l.collaboratorId)) {
+ seen.set(l.collaboratorId, l.label?.match(/\(([^)]+)\)/)?.[1] ?? l.label ?? 'Col·laborador');
+ }
+ }
+ return [...seen.entries()].map(([id, name]) => ({ id, name }));
+ }, [buildVisibleLines]);
+ const nameFor = (id: string) => (id ? (travelCollaborators.find((c) => c.id === id)?.name ?? 'Proveïdor') : 'Òrbita');
  const travelBreakdown = useMemo(() => {
  const providerLine = buildVisibleLines().find((line) => line.kind === 'PROVIDER_SERVICE' && /\(([^)]+)\)/.test(line.label));
  const providerName = providerLine?.label.match(/\(([^)]+)\)/)?.[1] ?? 'Equip ruta';
@@ -150,13 +165,14 @@ export default function LeadBoloSection({
  return calculateTravelCostBreakdown({
  roundTripKm: Number(distanceKm) || 0,
  vehicleCostPerKm,
- vehicleOwner: { label: 'Òrbita' },
+ vehicleOwner: { label: nameFor(vehicleOwnerId), collaboratorId: vehicleOwnerId || null },
  people: [
- ...(headcount > 0 ? [{ role: 'DRIVER' as const, label: 'Òrbita' }] : []),
+ ...(headcount > 0 ? [{ role: 'DRIVER' as const, label: nameFor(driverId), collaboratorId: driverId || null }] : []),
  ...(passengerCount > 0 ? [{ role: 'PASSENGER' as const, label: providerName, collaboratorId: providerLine?.collaboratorId ?? null, count: passengerCount }] : []),
  ],
  });
- }, [buildVisibleLines, distanceKm, headcount, vehicleCostPerKm]);
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- nameFor és un closure estable sobre travelCollaborators (ja dep)
+ }, [buildVisibleLines, distanceKm, headcount, vehicleCostPerKm, vehicleOwnerId, driverId, travelCollaborators]);
  // Live si hi ha km resolts; si no, fallback al cost recuperat (#1343).
  const effectiveTravelCost = (Number(distanceKm) || 0) > 0 ? travelBreakdown.totalCost : internalTravelCost;
  // Càrrec al client (#1347): km més enllà dels inclosos → +TRAVEL_BLOCK_EUR/TRAVEL_BLOCK_KM.
@@ -340,8 +356,26 @@ export default function LeadBoloSection({
  aria-label="Ajust manual d'integrants de la ruta"
  />
  </label>
+ {travelCollaborators.length > 0 && (
+ <>
+ <label className="ap-ledger-travel-field">
+ <span>Cotxe</span>
+ <select className="adm-input" value={vehicleOwnerId} onChange={(e) => { setVehicleOwnerId(e.target.value); setDirty(true); }} aria-label="Qui posa el cotxe">
+ <option value="">Òrbita</option>
+ {travelCollaborators.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
+ </select>
+ </label>
+ <label className="ap-ledger-travel-field">
+ <span>Condueix</span>
+ <select className="adm-input" value={driverId} onChange={(e) => { setDriverId(e.target.value); setDirty(true); }} aria-label="Qui condueix">
+ <option value="">Òrbita</option>
+ {travelCollaborators.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
+ </select>
+ </label>
+ </>
+ )}
  <p className="ap-ledger-budget-travelnote">
- 1a hora de ruta inclosa · es cobren {travelBreakdown.chargeableHours} h de {travelBreakdown.routeHours} h
+ 1a hora de ruta inclosa · es cobren {travelBreakdown.chargeableHours} h de {travelBreakdown.routeHours} h · cotxe: {nameFor(vehicleOwnerId)} · condueix: {nameFor(driverId)}
  </p>
  </div>
  <div className="ap-ledger-budget-sum">
