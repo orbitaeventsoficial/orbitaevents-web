@@ -252,10 +252,24 @@ export default function LeadBoloSection({
  const handleSave = async (): Promise<boolean> => {
  setSaving(true);
  try {
+ // Persisteix l'atribució del transport (#1357): les línies [travel-cost] amb el
+ // collaboratorId de qui posa el cotxe / condueix / viatja. Es desen amagades
+ // (isTravelCostLine les filtra de la vista) però alimenten el repartiment i el marge.
+ const travelLines: BookingServiceLineFormInput[] = (Number(distanceKm) || 0) > 0
+ ? travelBreakdown.lines.map((line) => ({
+ kind: 'OTHER' as const,
+ label: line.label,
+ revenueAmount: 0,
+ costAmount: line.costAmount,
+ quantity: 1,
+ collaboratorId: line.collaboratorId ?? undefined,
+ notes: line.notes,
+ }))
+ : [];
  const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/service-lines`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ lines: buildAllLines(), distanceKm: Number(distanceKm) || null }),
+ body: JSON.stringify({ lines: [...buildAllLines(), ...travelLines], distanceKm: Number(distanceKm) || null }),
  });
  if (!res.ok) throw new Error('No s\'ha pogut desar');
  toast.success('Bolo desat.');

@@ -1546,11 +1546,23 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1357 — 2026-07-02 — claude (FET)
+**Persistència de l'atribució vehicle/conductor del transport.**
+- `LeadBoloSection.handleSave`: quan hi ha km, persisteix `travelBreakdown.lines` (vehicle/conductor/passatger amb el seu `collaboratorId`) com a línies `[travel-cost]` al PUT. Replace-all → sense duplicar; a la recàrrega es filtren de la vista i sumen a `internalTravelCost`.
+- Validació tècnica: tsc 0; validate:core 0; leadServiceLine 10/10.
+- Validació funcional: (Playwright round-trip) «Condueix»=Masquerade desat → BD `Temps ruta conductor · Masquerade` amb collaboratorId=carlos.
+- Validació humana/UX: atribució persistent, alimenta el repartiment real.
+- Counter → 1357. Tanca el forat de F2.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1356 — 2026-07-02 — claude (FET)
 **Cuadrant + Repartiment enllaçats al menú (F4).**
 - `adminNav.ts`: Cuadrant + Repartiment al grup Operativa; `getGroupForPath` reconeix `/admin/cuadrant`. Eren òrfenes.
 - Validació tècnica: tsc 0; validate:core 0.
 - Validació funcional: (Playwright) menú mostra Cuadrant/Repartiment; pàgines 200.
+- Validació humana/UX: vista de repartiment ara accessible clicant.
 - Counter → 1356. Tanca l'accés. PENDENT no bloquejant: buildPayoutSummary reusa el motor + drill-down.
 - Començat per: `claude`
 - Treballant per: `claude`

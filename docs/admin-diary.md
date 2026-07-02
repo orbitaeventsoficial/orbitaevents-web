@@ -1,3 +1,22 @@
+## 2026-07-02 — Persistència de l'atribució vehicle/conductor del transport (Canvi #1357, claude)
+
+### Context
+El #1354 (F2) feia l'atribució del transport VIVA però no la persistia: en desar el bolo del lead, les línies `[travel-cost]` amb el `collaboratorId` de qui posa el cotxe / condueix / viatja no s'escrivien → el repartiment (reserva/cuadrant) no les recollia. Tancar aquest forat.
+
+### Què s'ha fet
+- `LeadBoloSection.handleSave`: quan hi ha km resolts, converteix `travelBreakdown.lines` (vehicle + conductor + passatgers, cadascuna amb el seu `collaboratorId` atribuït) a `BookingServiceLineFormInput` i les afegeix al payload del PUT (`kind:'OTHER'`, `revenueAmount:0`, `costAmount`, `collaboratorId`, `notes` amb marca `[travel-cost]`). `replaceLeadServiceLines` és replace-all → cada desat regenera les línies de transport fresques (sense duplicar; a la recàrrega `isTravelCostLine` les filtra de la vista però `internalTravelCost` les suma).
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0; leadServiceLineService 10/10.
+- Validació funcional: (Playwright round-trip, lead Alba) posat «Condueix» = Masquerade + desat → BD: `Temps ruta conductor · Masquerade Events` amb `collaboratorId = carlos-lucas-fernandez` (atribució persistida); vehicle Òrbita (no canviat); totes `[travel-cost]`.
+- Validació humana/UX: qui condueix/posa el cotxe queda desat i alimenta el repartiment real.
+
+### Coordinació
+Counter → 1357. Tanca el forat de F2. El transport ara es reparteix a qui toca de forma persistent (no viva). Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-02 — Cuadrant + Repartiment enllaçats al menú (F4) (Canvi #1356, claude)
 
 ### Context

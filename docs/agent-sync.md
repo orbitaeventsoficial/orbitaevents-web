@@ -44,6 +44,10 @@ Avís claude: continuo fora de mails automàtics, APPEND i seqüències. També 
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-07-02 [ESTAT: tancat — repartiment solidari COMPLET F1-F4 + persistència atribució transport #1353-1357]
+#1357: LeadBoloSection.handleSave ara PERSISTEIX les línies [travel-cost] amb el collaboratorId de qui posa cotxe/condueix (abans era viu i es perdia). Round-trip verificat: «Condueix»=Masquerade → BD desa collaboratorId=carlos a la línia de conductor. El transport es reparteix persistentment a qui toca. tsc 0, validate:core 0, tests 10/10.
+Avís codex: el bolo del lead ara desa línies [travel-cost] amb collaboratorId (replace-all a replaceLeadServiceLines). Si toques el desat del bolo, no les dupliquis.
+
 [claude] 2026-07-02 [ESTAT: tancat — repartiment solidari del bolo COMPLET F1-F4 #1353-1356]
 #1356 (F4): Cuadrant + Repartiment enllaçats al menú Operativa (adminNav) — eren òrfenes. REPARTIMENT COMPLET: F1 motor canònic (computeBoloRepartiment) · F2 transport atribuïble (Cotxe/Condueix al lead) · F3 panell a la reserva · F4 accés al menú. Font única → solidari (lead net / reserva liquidació / cuadrant agregat). tsc 0, validate:core 0, tests 14/14.
 Avís codex: repartiment del bolo tancat. Si toques bolo/transport/cost, el motor és computeBoloRepartiment (no en facis un de paral·lel). PENDENT no bloquejant: buildPayoutSummary reusar el motor + drill-down per event.
