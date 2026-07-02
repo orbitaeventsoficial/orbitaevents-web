@@ -14,6 +14,8 @@ import CommunicationPanel from './CommunicationPanel';
 import CalendarSyncButton from './CalendarSyncButton';
 import PostEventEmailButton from './PostEventEmailButton';
 import BookingMarginCard from './BookingMarginCard';
+import RepartimentPanel from './RepartimentPanel';
+import { computeBoloRepartiment } from '@/lib/services/repartimentService';
 import BookingServiceLinesEditor from './BookingServiceLinesEditor';
 import type { BookingServiceLineFormInput } from '../booking-form.types';
 import BookingChecklist from './BookingChecklist';
@@ -133,7 +135,7 @@ async function getBooking(id: string) {
       include: {
         pack: { include: { translations: true, inventory: { include: { item: true } } } },
         extras: { include: { extra: { include: { translations: true } } } },
-        serviceLines: { orderBy: { sortOrder: 'asc' } },
+        serviceLines: { orderBy: { sortOrder: 'asc' }, include: { collaborator: { select: { id: true, name: true } } } },
         inventory: { include: { item: true } },
         lead: {
           include: {
@@ -224,6 +226,23 @@ export default async function BookingDetailPage({ params }: PageProps) {
   const serviceLinesCost    = serviceLinesAgg.cost;
   const extraHours          = typeof bookingCompat.extraHours === 'number' ? bookingCompat.extraHours : 0;
   const extraHourPrice      = booking.pack?.extraHourPrice ? Number(booking.pack.extraHourPrice) : 0;
+  // Repartiment del bolo (#1355): qui cobra què (font única `computeBoloRepartiment`).
+  // Inclou el PACK i els EXTRES com a ingrés d'Òrbita (línies sense collaboratorId)
+  // + les serviceLines (amb el seu collaboratorId) → la part d'Òrbita quadra.
+  const packName = booking.pack?.translations?.find((t: { locale: string; name: string }) => t.locale === 'ca')?.name
+    ?? booking.pack?.translations?.[0]?.name ?? booking.pack?.service ?? 'Pack';
+  const repartimentLines = [
+    ...(packPrice > 0 ? [{ label: `Pack · ${packName}`, kind: 'PACK', revenueAmount: packPrice, costAmount: 0, quantity: 1, collaboratorId: null }] : []),
+    ...(extrasTotal > 0 ? [{ label: 'Extres', kind: 'EXTRA', revenueAmount: extrasTotal, costAmount: 0, quantity: 1, collaboratorId: null }] : []),
+    ...(extraHours > 0 && extraHourPrice > 0 ? [{ label: `Hores extra (${extraHours})`, kind: 'EXTRA_HOURS', revenueAmount: extraHours * extraHourPrice, costAmount: 0, quantity: 1, collaboratorId: null }] : []),
+    ...(booking.serviceLines ?? []),
+  ];
+  const repartiment = computeBoloRepartiment(repartimentLines);
+  const repartimentNames: Record<string, string> = {};
+  for (const l of booking.serviceLines ?? []) {
+    const c = (l as { collaborator?: { id: string; name: string } | null }).collaborator;
+    if (c) repartimentNames[c.id] = c.name;
+  }
   const inventoryCostReal   = inventoryCost.totalCost;
   const inventoryRemainingHoursAvg = inventoryCost.remainingHoursAvg;
   const inventoryRemainingHoursMin = inventoryCost.remainingHoursMin;
@@ -624,6 +643,12 @@ export default async function BookingDetailPage({ params }: PageProps) {
             serviceLinesCost={serviceLinesCost}
           />
         </div>
+
+        {repartiment.elements.length > 0 && (
+          <Panel title="Repartiment del bolo — qui cobra què">
+            <RepartimentPanel repartiment={repartiment} names={repartimentNames} />
+          </Panel>
+        )}
 
         <Panel title="Serveis i productes (fora de pack)">
           <BookingServiceLinesEditor

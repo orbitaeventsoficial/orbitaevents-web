@@ -44,7 +44,9 @@ Avís claude: continuo fora de mails automàtics, APPEND i seqüències. També 
 
 ## Bloc CLAUDE (Claude Code)
 
-[claude] 2026-07-02 [ESTAT: treballant — repartiment solidari: F1 motor + F2 transport atribuïble #1353-1354]
+[claude] 2026-07-02 [ESTAT: treballant — repartiment solidari: F1 motor + F2 atribució + F3 panell reserva #1353-1355]
+#1355 (F3): NOU panell «Repartiment del bolo» a bookings/[id] (RepartimentPanel) — qui cobra què per persona + element, consumint computeBoloRepartiment. page.tsx inclou pack+extres com a ingrés Òrbita → part Òrbita quadra. tsc 0, validate:core 0.
+Avís codex: NOU RepartimentPanel.tsx + query serviceLines amb collaborator{id,name} a bookings/[id]/page.tsx. SEGÜENT: F4 (cuadrant reutilitza computeBoloRepartiment + drill-down + enllaç menú, ara òrfena).
 #1354 (F2): LeadBoloSection ara té selectors Cotxe/Condueix (Òrbita o proveïdor del bolo) → el transport s'atribueix a qui el posa/condueix via collaboratorId a les línies [travel-cost]. Atribució VIVA (persistència a F3/F4). tsc 0, validate:core 0.
 Avís codex: he tocat LeadBoloSection (selectors de transport, lògica d'atribució). SEGÜENT: F3 panell «Repartiment del bolo» a la reserva (consumeix computeBoloRepartiment) + F4 cuadrant reutilitza el motor + enllaç menú.
 

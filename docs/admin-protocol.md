@@ -1546,6 +1546,19 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1355 — 2026-07-02 — claude (FET)
+**Panell «Repartiment del bolo» a la fitxa de reserva (F3).**
+- NOU `bookings/[id]/RepartimentPanel.tsx` (presentacional): per persona + element a element + totals, consumint `computeBoloRepartiment`.
+- `page.tsx`: serviceLines amb `collaborator{id,name}`; línies de repartiment = pack + extres + hores extra (ingrés Òrbita) + serviceLines → part Òrbita quadra. Panell sota el marge.
+- CSS `.ap-rep*` (tokens, responsiu).
+- Validació tècnica: tsc 0; validate:core 0.
+- Validació funcional: (Playwright OE-2026-004) pack 250→Òrbita marge 250; Rufo 80 atribuït.
+- Validació humana/UX: canònic `.ap-*`.
+- Counter → 1355. F3 del pla; solidari amb F1. Falta F4 (cuadrant).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1354 — 2026-07-02 — claude (FET)
 **Transport atribuïble: selectors Cotxe/Condueix al lead (F2).**
 - `LeadBoloSection`: estats `vehicleOwnerId`/`driverId` + 2 selectors (opcions = col·laboradors del bolo, sense fetch). `travelBreakdown` atribueix `vehicleOwner`/`DRIVER` al `collaboratorId` triat → línies `[travel-cost]` van a qui posa el cotxe/condueix.

@@ -1,3 +1,24 @@
+## 2026-07-02 — Panell «Repartiment del bolo» a la fitxa de reserva (F3) (Canvi #1355, claude)
+
+### Context
+F3 del pla del repartiment solidari. La liquidació real (qui cobra què d'aquest bolo) ha de viure a la fitxa de RESERVA. Projecta el motor `computeBoloRepartiment` (F1) — mateixa font que lead i cuadrant → solidari.
+
+### Què s'ha fet
+- NOU `app/admin/bookings/[id]/RepartimentPanel.tsx` (presentacional): agregat per persona (Òrbita destacat + col·laboradors) + taula element a element (Client paga / Qui cobra / Cobra / Marge Òrbita) + totals. Consumeix `computeBoloRepartiment`; 0 lògica de diners pròpia.
+- `bookings/[id]/page.tsx`: serviceLines carreguen `collaborator{ id,name }`; es construeixen les línies de repartiment incloent **pack + extres + hores extra** com a ingrés d'Òrbita + les serviceLines (amb collaboratorId) → la part d'Òrbita quadra amb el pack. Panell muntat sota el marge (secció pròpia).
+- CSS `.ap-rep*` a admin-shell.css (tokens, responsiu <640px).
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0.
+- Validació funcional: (Playwright, OE-2026-004) Pack Party Starter → Client 250€ / Òrbita 250€ marge; DJ Rufo 80€ atribuït; Òrbita (tu) 270€.
+- Validació humana/UX: panell canònic `.ap-*`, per persona + element, responsiu.
+
+### Coordinació
+Counter → 1355. F3 del pla. El motor és el mateix de F1 → solidari amb lead (net) i cuadrant (agregat). Falta F4: cuadrant reutilitza el motor + drill-down + enllaç al menú. Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-02 — Transport atribuïble: selectors Cotxe/Condueix al lead (F2) (Canvi #1354, claude)
 
 ### Context
