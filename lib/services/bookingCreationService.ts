@@ -3,7 +3,8 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { CUSTOMER_ACTIVITY_ACTIONS, TASK_SOURCE } from '@/lib/constants';
 import { recordCustomerBookingCreated } from '@/lib/services/customerActivityService';
-import { calculateTravelCharge, calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
+import { calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
+import { calculateClientTravelCharge, deriveTravelHeadcount } from '@/lib/services/travelLaborCost';
 import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
 import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
 import { ACTIVE_BOOKING_STATUSES } from '@/lib/constants';
@@ -454,7 +455,11 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
     DEFAULT_VEHICLE_COST_PER_KM
   );
   const travelCost = distanceKm != null ? calculateTravelCost(distanceKm, fuelCostPerKm) : null;
-  const travelCharge = distanceKm != null ? calculateTravelCharge(distanceKm) : 0;
+  // Càrrec de transport al client (#1363): cost real amb dues potes (cotxe/km + gent/hores),
+  // no la fórmula antiga per km. El headcount surt de les línies del bolo.
+  const travelCharge = distanceKm != null
+    ? calculateClientTravelCharge(distanceKm, deriveTravelHeadcount(serviceLines, packPrice > 0), fuelCostPerKm)
+    : 0;
   const subtotalCalculated = subtotalBase + travelCharge;
   const discount = sanitizeMoney(data.discount) ?? 0;
   const invoiceRequired = Boolean(data.invoiceRequired);

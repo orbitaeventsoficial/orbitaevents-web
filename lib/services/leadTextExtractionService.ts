@@ -46,6 +46,19 @@ function normalizeWhitespace(input: string): string {
   return input.replace(/\u00a0/g, ' ').replace(/[ \t]+/g, ' ').trim();
 }
 
+function normalizeLeadText(input: string): string {
+  return input
+    .replace(/\u00a0/g, ' ')
+    .split(/\r?\n/)
+    .map((line) => line
+      .replace(/^\s*\[\d{1,2}:\d{2},\s*\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4}\]\s*[^:\n]{1,80}:\s*/u, '')
+      .replace(/[ \t]+/g, ' ')
+      .trim())
+    .filter(Boolean)
+    .join('\n')
+    .trim();
+}
+
 function normalizeLetters(input: string): string {
   return input
     .toLowerCase()
@@ -69,6 +82,12 @@ function cleanTail(input: string, max = 160): string {
 }
 
 function extractName(text: string): string {
+  const emailLine = text.match(/(?:^|\n)\s*([\p{L}' -]{2,80})\s*[-–]\s*[\w.+-]+@[\w-]+\.[a-zA-Z]{2,}/iu);
+  if (emailLine?.[1]) {
+    const name = capitalizeWords(emailLine[1]);
+    if (name.length >= 2) return name;
+  }
+
   const patterns = [
     /\b(?:em dic|me llamo|mi nombre es|el meu nom és|el meu nom es)\s+([\p{L}' -]{2,80})/iu,
     /\b(?:s[oó]c|soy)\s+(?:en|el|la|l'|una?|sr\.?|sra\.?)?\s*([\p{L}' -]{2,80})/iu,
@@ -156,12 +175,30 @@ function extractEventTime(text: string): string {
   if (labeled) return `${labeled[1].padStart(2, '0')}:${labeled[2]}`;
 
   const range = text.match(/\b([01]?\d|2[0-3])[:.]([0-5]\d)\s*(?:h)?\s*(?:-|a|to|hasta)\s*(?:[01]?\d|2[0-3])[:.][0-5]\d\b/i);
-  return range ? `${range[1].padStart(2, '0')}:${range[2]}` : '';
+  if (range) return `${range[1].padStart(2, '0')}:${range[2]}`;
+
+  const hourRange = text.match(
+    /\b(?:horari|horario|de|des de|desde)\s*(?:[:\-]?\s*)?([01]?\d|2[0-3])\s*(?:h)?\s*(?:-|a|to|hasta)\s*([01]?\d|2[0-3])\s*(?:h)?(?:[^\n\r]{0,40}\b(?:vespre|noche|nit)\b)?/i
+  );
+  if (!hourRange?.[1]) return '';
+  let hour = Number(hourRange[1]);
+  const context = normalizeLetters(hourRange[0]);
+  if (hour >= 1 && hour <= 11 && /(vespre|noche|nit)/.test(context)) hour += 12;
+  return `${String(hour).padStart(2, '0')}:00`;
 }
 
 function extractEventEndTime(text: string): string {
   const range = text.match(/\b(?:[01]?\d|2[0-3])[:.][0-5]\d\s*(?:h)?\s*(?:-|a|to|hasta)\s*([01]?\d|2[0-3])[:.]([0-5]\d)\b/i);
-  return range ? `${range[1].padStart(2, '0')}:${range[2]}` : '';
+  if (range) return `${range[1].padStart(2, '0')}:${range[2]}`;
+
+  const hourRange = text.match(
+    /\b(?:horari|horario|de|des de|desde)\s*(?:[:\-]?\s*)?([01]?\d|2[0-3])\s*(?:h)?\s*(?:-|a|to|hasta)\s*([01]?\d|2[0-3])\s*(?:h)?(?:[^\n\r]{0,40}\b(?:vespre|noche|nit)\b)?/i
+  );
+  if (!hourRange?.[2]) return '';
+  let hour = Number(hourRange[2]);
+  const context = normalizeLetters(hourRange[0]);
+  if (hour >= 1 && hour <= 11 && /(vespre|noche|nit)/.test(context)) hour += 12;
+  return `${String(hour).padStart(2, '0')}:00`;
 }
 
 function extractGuestCount(text: string): string {
@@ -189,8 +226,13 @@ function extractBudget(text: string): string {
 }
 
 function extractLocation(text: string): string {
+  const dayLocation = text.match(
+    /(?:^|\n)\s*(?:la\s+)?ubicaci[oó]\s+del\s+dia\s+\d{1,2}\s+(?:és|es|ser[aà]|será)\s+([^\n\r.]{3,160})/im
+  );
+  if (dayLocation?.[1]) return cleanTail(dayLocation[1]);
+
   const labeled = text.match(
-    /(?:^|\n)\s*(?:ubicaci[oó]n?|lloc|lugar|localitat|localidad|ciutat|ciudad|poblaci[oó]n?|municipi)\s*[:\-]\s*([^\n\r]{3,160})/im
+    /(?:^|\n|[.;])\s*(?:ubicaci[oó]n?|lloc|lugar|localitat|localidad|ciutat|ciudad|poblaci[oó]n?|municipi)\s*[:\-]?\s*([^\n\r.]{3,160})/im
   );
   if (labeled?.[1]) return cleanTail(labeled[1]);
 
@@ -210,6 +252,7 @@ function extractAddress(text: string): string {
 
 function inferEventType(text: string): EventType {
   const input = normalizeLetters(text);
+  if (/(bingo musical|bingo)/.test(input)) return 'OTHER';
   if (/(boda|casament|wedding|novios)/.test(input)) return 'WEDDING';
   if (/(cumple|aniversari|birthday|aniversario)/.test(input)) return 'BIRTHDAY';
   if (/(empresa|corporati|corporativo|team building|company)/.test(input)) return 'CORPORATE';
@@ -231,12 +274,13 @@ function inferSource(text: string): LeadSource {
 }
 
 export function extractLeadDataFromText(text: string): ExtractedLeadTextData {
-  const cleaned = normalizeWhitespace(text).slice(0, 4000);
+  const cleaned = normalizeLeadText(text).slice(0, 4000);
+  const original = normalizeWhitespace(text).slice(0, 4000);
 
   return {
     name: extractName(cleaned),
     email: extractEmail(cleaned),
-    phone: extractPhone(cleaned),
+    phone: extractPhone(cleaned) || extractPhone(original),
     dni: extractDni(cleaned),
     address: extractAddress(cleaned),
     eventType: inferEventType(cleaned),

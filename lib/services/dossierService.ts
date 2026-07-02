@@ -5,6 +5,7 @@ import { getDossierCopy, getOrbitaDossierProducts } from '@/lib/constants/dossie
 import { buildDossierHtml, type DossierClientInfo } from '@/lib/utils/dossier-html-builder';
 import { sendEmail } from '@/lib/email';
 import { EMAIL_CONTACT } from '@/lib/constants/email';
+import { getEventLabel } from '@/lib/constants';
 import { recordEmailSend } from '@/lib/services/emailTrackingService';
 import {
   collaboratorProductToAnimacioProduct,
@@ -21,6 +22,87 @@ export type CreateDossierInput = {
   salutacio?: string;
   productIds: string[];
 };
+
+export type DossierLeadInitialData = {
+  id: string;
+  nom: string;
+  email: string;
+  telefon: string;
+  eventDesc: string;
+};
+
+function formatLeadIsoDate(date: Date | null): string {
+  return date ? date.toISOString().slice(0, 10) : '';
+}
+
+function extractLeadMessageAddress(message: string | null): string {
+  return message?.match(/(?:^|\n)\s*adre[cç]a\s*:\s*([^\n\r]+)/i)?.[1]?.trim() ?? '';
+}
+
+function cleanLeadDossierMessage(message: string | null): string {
+  return (message ?? '')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line && !/^adre[cç]a\s*:/i.test(line))
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function buildDossierLeadEventDesc(lead: {
+  eventType: string;
+  eventDate: Date | null;
+  eventStartTime: string | null;
+  eventEndTime: string | null;
+  eventLocation: string | null;
+  eventAddress: string | null;
+  guestCount: number | null;
+  message: string | null;
+}): string {
+  const schedule = lead.eventStartTime && lead.eventEndTime
+    ? `${lead.eventStartTime}-${lead.eventEndTime}`
+    : lead.eventStartTime;
+  const address = lead.eventAddress || extractLeadMessageAddress(lead.message) || lead.eventLocation;
+  const message = cleanLeadDossierMessage(lead.message);
+  const parts = [
+    lead.eventType && lead.eventType !== 'OTHER' ? getEventLabel(lead.eventType) : null,
+    formatLeadIsoDate(lead.eventDate),
+    schedule,
+    address,
+    lead.guestCount ? `${lead.guestCount} pax` : null,
+    message,
+  ].filter((part): part is string => Boolean(part?.trim()));
+  return parts.join(' · ');
+}
+
+export async function getDossierLeadInitialData(leadId?: string | null): Promise<DossierLeadInitialData | null> {
+  if (!leadId) return null;
+  const lead = await prisma.lead.findUnique({
+    where: { id: leadId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      eventType: true,
+      eventDate: true,
+      eventStartTime: true,
+      eventEndTime: true,
+      eventLocation: true,
+      eventAddress: true,
+      guestCount: true,
+      message: true,
+    },
+  });
+  if (!lead) return null;
+  return {
+    id: lead.id,
+    nom: lead.name,
+    email: lead.email,
+    telefon: lead.phone ?? '',
+    eventDesc: buildDossierLeadEventDesc(lead),
+  };
+}
 
 export async function createDossier(input: CreateDossierInput) {
   return prisma.dossier.create({

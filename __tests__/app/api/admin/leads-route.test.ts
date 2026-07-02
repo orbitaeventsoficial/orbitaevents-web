@@ -100,6 +100,41 @@ describe('POST /api/admin/leads', () => {
     expect(mockCreateAdminLead).not.toHaveBeenCalled();
   });
 
+  it('permet crear una entrada manual amb telefon i sense email', async () => {
+    const res = await POST(makeRequest({
+      name: 'Maria',
+      phone: '600123123',
+      eventType: 'WEDDING',
+      eventDate: '2026-09-26',
+      eventStartTime: '18:00',
+    }));
+
+    expect(res.status).toBe(200);
+    expect(mockCreateAdminLead).toHaveBeenCalledWith(expect.objectContaining({
+      name: 'Maria',
+      phone: '600123123',
+      email: expect.stringMatching(/^manual-.+@leads\.orbitaevents\.local$/),
+      eventDate: '2026-09-26',
+      eventStartTime: '18:00',
+      status: 'CONTACTED',
+    }));
+  });
+
+  it('normalitza source EMAIL i eventType desconegut de l’extractor', async () => {
+    const res = await POST(makeRequest({
+      name: 'Maria',
+      email: 'maria@test.com',
+      eventType: 'evento',
+      source: 'EMAIL',
+    }));
+
+    expect(res.status).toBe(200);
+    expect(mockCreateAdminLead).toHaveBeenCalledWith(expect.objectContaining({
+      eventType: 'OTHER',
+      source: 'OTHER',
+    }));
+  });
+
   it('vincula un client existent si hi ha coincidència forta', async () => {
     mockPreviewLeadCustomerLink.mockResolvedValue({
       kind: 'matches-found',

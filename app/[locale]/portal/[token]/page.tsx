@@ -7,7 +7,8 @@ import {
   markPortalAccessHit,
   normalizePortalLocale,
 } from '@/lib/services/clientPortalAccess';
-import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
+import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
+import { calculateClientTravelCharge, calculateTravelCostBreakdown, deriveTravelHeadcount } from '@/lib/services/travelLaborCost';
 import { formatCurrency, toIntlLocale } from '@/lib/constants';
 import { listPortalPhotos } from '@/lib/services/galleryService';
 import Image from 'next/image';
@@ -308,9 +309,17 @@ export default async function ClientPortalPage({
     };
   }>;
   const totalTravelKm = typeof booking.distanceKm === 'number' ? booking.distanceKm : 0;
-  const billableTravelKm = calculateBillableTravelKm(totalTravelKm, INCLUDED_TRAVEL_KM);
-  const travelBlocks = calculateTravelBlocks(totalTravelKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM);
-  const travelCharge = calculateTravelCharge(totalTravelKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR);
+  // Càrrec de transport al client (#1363): font ÚNICA (calculateClientTravelCharge) — cost
+  // real amb dues potes (cotxe/km + gent/hores). El headcount surt de les línies del bolo.
+  const travelHeadcount = deriveTravelHeadcount(booking.serviceLines ?? []);
+  const travelBreakdown = calculateTravelCostBreakdown({
+    roundTripKm: totalTravelKm,
+    vehicleOwner: { label: '' },
+    people: travelHeadcount > 0
+      ? [{ role: 'DRIVER', label: '' }, ...(travelHeadcount > 1 ? [{ role: 'PASSENGER' as const, label: '', count: travelHeadcount - 1 }] : [])]
+      : [],
+  });
+  const travelCharge = calculateClientTravelCharge(totalTravelKm, travelHeadcount);
 
   const progressSteps = getProgressSteps(t, booking as Parameters<typeof getProgressSteps>[1], locale);
   const nextAction = getNextActionLabel(t, paymentSummary, contractSummary);
@@ -662,8 +671,8 @@ export default async function ClientPortalPage({
                 </div>
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
                   <p className="text-xs text-white/35 mb-1">{t.travelRate}</p>
-                  <p className="text-sm font-semibold">{TRAVEL_BLOCK_EUR}€ / {TRAVEL_BLOCK_KM} km extra</p>
-                  <p className="text-xs text-white/35 mt-0.5">{t.travelExtraKm}: {formatDistanceKm(billableTravelKm, locale)} km ({travelBlocks} trams)</p>
+                  <p className="text-sm font-semibold">{formatDistanceKm(totalTravelKm, locale)} km + {travelBreakdown.chargeableHours.toLocaleString(toIntlLocale(locale))} h</p>
+                  <p className="text-xs text-white/35 mt-0.5">{t.travelExtraKm}: {travelHeadcount} pers. · 1a h inclosa</p>
                 </div>
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
                   <p className="text-xs text-white/35 mb-1">{t.travelEstimated}</p>

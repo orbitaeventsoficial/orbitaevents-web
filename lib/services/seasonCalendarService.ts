@@ -13,6 +13,17 @@ export interface SeasonCalendarBookingLink {
   remainingPaid: boolean;
   /** km anada i tornada de la reserva, per estimar l'hora de sortida al calendari. */
   distanceKm: number | null;
+  serviceLines?: SeasonCalendarServiceLine[];
+}
+
+export interface SeasonCalendarServiceLine {
+  id: string;
+  label: string;
+  revenueAmount: number | null;
+  costAmount: number | null;
+  quantity: number | null;
+  hours: number | null;
+  notes: string | null;
 }
 
 export interface SeasonCalendarLeadRaw {
@@ -33,6 +44,8 @@ export interface SeasonCalendarLeadRaw {
   assignedTo: string | null;
   contactedAt: Date | null;
   priority: string | null;
+  distanceKm?: number | null;
+  serviceLines?: SeasonCalendarServiceLine[];
   booking: SeasonCalendarBookingLink | null;
 }
 
@@ -75,6 +88,8 @@ export interface SeasonCalendarEntry {
   assignedTo: string | null;
   contactedAt: Date | null;
   priority: string | null;
+  distanceKm: number | null;
+  serviceLines: SeasonCalendarServiceLine[];
   booking: SeasonCalendarBookingLink | null;
 }
 
@@ -197,6 +212,8 @@ export function buildSeasonCalendar(input: SeasonCalendarInput): SeasonCalendarR
       assignedTo: lead.assignedTo,
       contactedAt: lead.contactedAt,
       priority: lead.priority,
+      distanceKm: lead.distanceKm ?? lead.booking?.distanceKm ?? null,
+      serviceLines: lead.booking?.serviceLines ?? lead.serviceLines ?? [],
       booking: lead.booking,
     };
     if (lead.eventDate) {
@@ -226,6 +243,8 @@ export function buildSeasonCalendar(input: SeasonCalendarInput): SeasonCalendarR
       assignedTo: null,
       contactedAt: null,
       priority: null,
+      distanceKm: null,
+      serviceLines: [],
       booking: null,
     });
   }
@@ -300,6 +319,11 @@ export async function loadSeasonCalendar(
         assignedTo: true,
         contactedAt: true,
         priority: true,
+        distanceKm: true,
+        serviceLines: {
+          orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+          select: { id: true, label: true, revenueAmount: true, costAmount: true, quantity: true, hours: true, notes: true },
+        },
         proposals: {
           where: { status: { in: ['SENT', 'ACCEPTED'] } },
           orderBy: { createdAt: 'desc' },
@@ -308,7 +332,19 @@ export async function loadSeasonCalendar(
         },
         booking: {
           // Si hi ha booking, el seu `total` és la veritat del valor del bolo.
-          select: { id: true, reference: true, status: true, depositPaid: true, remainingPaid: true, total: true, distanceKm: true },
+          select: {
+            id: true,
+            reference: true,
+            status: true,
+            depositPaid: true,
+            remainingPaid: true,
+            total: true,
+            distanceKm: true,
+            serviceLines: {
+              orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+              select: { id: true, label: true, revenueAmount: true, costAmount: true, quantity: true, hours: true, notes: true },
+            },
+          },
         },
       },
       orderBy: { eventDate: 'asc' },
@@ -356,6 +392,8 @@ export async function loadSeasonCalendar(
       assignedTo: l.assignedTo,
       contactedAt: l.contactedAt,
       priority: l.priority as string | null,
+      distanceKm: l.booking?.distanceKm ?? l.distanceKm ?? null,
+      serviceLines: l.booking?.serviceLines ?? l.serviceLines,
       booking: l.booking
         ? {
             id: l.booking.id,
@@ -364,6 +402,7 @@ export async function loadSeasonCalendar(
             depositPaid: l.booking.depositPaid,
             remainingPaid: l.booking.remainingPaid,
             distanceKm: l.booking.distanceKm ?? null,
+            serviceLines: l.booking.serviceLines,
           }
         : null,
     })),

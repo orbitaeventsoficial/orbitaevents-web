@@ -25,12 +25,12 @@ describe('travelLaborCost', () => {
     expect(r.includedHours).toBe(1);
     expect(r.chargeableHours).toBe(4); // floor(5 - 1)
     expect(r.vehicleCost).toBe(98.55);
-    expect(r.driverCost).toBe(72);    // 4 h × 18
+    expect(r.driverCost).toBe(60);    // 4 h × 15
     expect(r.passengerCost).toBe(60); // 4 h × 15
-    expect(r.totalCost).toBe(230.55);
+    expect(r.totalCost).toBe(218.55);
     expect(r.lines).toEqual([
       expect.objectContaining({ label: 'Vehicle ruta · Òrbita', costAmount: 98.55, collaboratorId: null }),
-      expect.objectContaining({ label: 'Temps ruta conductor · Òrbita', costAmount: 72, collaboratorId: null }),
+      expect.objectContaining({ label: 'Temps ruta conductor · Òrbita', costAmount: 60, collaboratorId: null }),
       expect.objectContaining({ label: 'Temps ruta passatger · Carlos', costAmount: 60, collaboratorId: 'carlos' }),
     ]);
     expect(r.lines.every((line) => line.notes.includes(TRAVEL_COST_LINE_MARKER))).toBe(true);
@@ -46,11 +46,11 @@ describe('travelLaborCost', () => {
     });
 
     expect(r.vehicleCost).toBe(7.5);
-    expect(r.driverCost).toBe(36); // 2 h × 18
-    expect(r.totalCost).toBe(43.5);
+    expect(r.driverCost).toBe(30); // 2 h × 15
+    expect(r.totalCost).toBe(37.5);
     expect(r.lines).toEqual([
       expect.objectContaining({ collaboratorId: 'carlos', costAmount: 7.5 }),
-      expect.objectContaining({ collaboratorId: 'carlos', costAmount: 36 }),
+      expect.objectContaining({ collaboratorId: 'carlos', costAmount: 30 }),
     ]);
   });
 
@@ -60,7 +60,7 @@ describe('travelLaborCost', () => {
       vehicleOwner: { label: 'Òrbita' }, people: [{ role: 'DRIVER', label: 'Òrbita' }],
     });
     expect(oneAndHalf.chargeableHours).toBe(0.5); // ceil((1.5-1)/0.5)*0.5
-    expect(oneAndHalf.driverCost).toBe(9);        // 0.5 h × 18
+    expect(oneAndHalf.driverCost).toBe(7.5);      // 0.5 h × 15
 
     const oneE50 = calculateTravelCostBreakdown({
       roundTripKm: 120, routeHours: 1.83, vehicleCostPerKm: 0.25,
@@ -80,6 +80,6 @@ describe('travelLaborCost', () => {
       vehicleOwner: { label: 'Òrbita' }, people: [{ role: 'DRIVER', label: 'Òrbita' }],
     });
     expect(two.chargeableHours).toBe(1); // ceil((2-1)/0.5)*0.5 = 1
-    expect(two.driverCost).toBe(18);     // 1 h × 18
+    expect(two.driverCost).toBe(15);     // 1 h × 15
   });
 });

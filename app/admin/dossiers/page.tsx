@@ -13,8 +13,7 @@ import { ADMIN_DOSSIER_GENERATOR_COPY } from '@/lib/constants/admin';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
 import { getDossierCopy, getOrbitaDossierProducts } from '@/lib/constants/dossier-copy';
-import { getAllDossiers, getDeletedDossiers } from '@/lib/services/dossierService';
-import { listLeadServiceLines } from '@/lib/services/leadServiceLineService';
+import { getAllDossiers, getDeletedDossiers, getDossierLeadInitialData } from '@/lib/services/dossierService';
 import {
   collaboratorProductToAnimacioProduct,
   listDossierCollaboratorProducts,
@@ -56,31 +55,21 @@ type DossierRow = {
   lead?: { id: string; name: string; status: string } | null;
 };
 
-function toDossierProductId(id: string): string {
-  return id.startsWith('collab:') ? id : `collab:${id}`;
-}
-
-async function resolveInitialProductIds(leadId?: string, explicitProductIds?: string): Promise<string | undefined> {
+function resolveInitialProductIds(explicitProductIds?: string): string | undefined {
   if (explicitProductIds?.trim()) return explicitProductIds;
-  if (!leadId) return undefined;
-  const result = await listLeadServiceLines(leadId);
-  const ids = (result.body.lines ?? [])
-    .map((line: { collaboratorId?: string | null }) => line.collaboratorId)
-    .filter((id): id is string => Boolean(id))
-    .map(toDossierProductId);
-  return ids.length > 0 ? Array.from(new Set(ids)).join(',') : undefined;
+  return undefined;
 }
 
 export default async function DossiersPage({ searchParams }: PageProps) {
   const logoDataUri = readLogoDataUri();
-  const [dossiers, deletedDossiers, legacyAnimacioProducts, collaboratorProducts, orbitaProducts, dossierCopy, initialProductIds] = await Promise.all([
+  const [dossiers, deletedDossiers, legacyAnimacioProducts, collaboratorProducts, orbitaProducts, dossierCopy, leadInitialData] = await Promise.all([
     getAllDossiers(50),
     getDeletedDossiers(),
     getAnimacioProducts('ca'),
     listDossierCollaboratorProducts(),
     getOrbitaDossierProducts('ca'),
     getDossierCopy('ca'),
-    resolveInitialProductIds(searchParams?.leadId, searchParams?.productIds),
+    getDossierLeadInitialData(searchParams?.leadId),
   ]) as [
     DossierRow[],
     DossierRow[],
@@ -88,8 +77,9 @@ export default async function DossiersPage({ searchParams }: PageProps) {
     Awaited<ReturnType<typeof listDossierCollaboratorProducts>>,
     Awaited<ReturnType<typeof getOrbitaDossierProducts>>,
     Awaited<ReturnType<typeof getDossierCopy>>,
-    string | undefined,
+    Awaited<ReturnType<typeof getDossierLeadInitialData>>,
   ];
+  const initialProductIds = resolveInitialProductIds(searchParams?.productIds);
   // Bingo/Batalla Musical són productes de MASQUERADE (col·laborador), no propis:
   // surten via `collaboratorProducts`. (El #968 els havia afegit com a propis per
   // error; corregit al #969 — la causa real és que el seed #956 els va desactivar.)
@@ -128,12 +118,12 @@ export default async function DossiersPage({ searchParams }: PageProps) {
           products={generatorProducts}
           dossierCopy={dossierCopy}
           logoDataUri={logoDataUri}
-          leadId={searchParams?.leadId}
-          initialNom={searchParams?.nom}
-          initialEmail={searchParams?.email}
-          initialTelefon={searchParams?.telefon}
+          leadId={leadInitialData?.id ?? searchParams?.leadId}
+          initialNom={searchParams?.nom ?? leadInitialData?.nom}
+          initialEmail={searchParams?.email ?? leadInitialData?.email}
+          initialTelefon={searchParams?.telefon ?? leadInitialData?.telefon}
           initialEmpresa={searchParams?.empresa}
-          initialEventDesc={searchParams?.eventDesc}
+          initialEventDesc={searchParams?.eventDesc ?? leadInitialData?.eventDesc}
           initialProductIds={initialProductIds}
         />
       </AdminSection>

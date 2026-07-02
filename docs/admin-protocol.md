@@ -1042,6 +1042,7 @@ Criteri pràctic:
 **FET** *(2026-05-17 per `codex` — Canvi #603)*: `qa:protocol` exigeix ara que l'entrada actual de `docs/diario.md` inclogui les tres capes de tancament: `Validació tècnica`, `Validació funcional` i `Validació humana/UX`. Efecte: un tall no pot quedar formalment verd només amb tests/coverage; també ha de declarar quin comportament resol i com es llegeix per una persona.
 **FET** *(2026-05-20 per `codex` — Canvi #715)*: la validació pendent del #714 queda tancada. El mock d'Anthropic ja és constructable, la timeline del portal respecta el contracte `done | upcoming | future`, la navegació persistent del portal té catàleg a `lib/constants`, el skeleton de calendari declara scroll horitzontal i `validate:core` + suite completa Vitest tornen a verd.
 **FET documental** *(2026-05-21 per `claude` — Canvi #741)*: el `MÉS ENDAVANT` històric "validació visual de pantalles clau" queda regularitzat com a `FET`. La suite Playwright cobreix les pantalles admin clau: `admin-full-flow.spec.ts` (leads llista+detall, reserves llista+detall+seccions, calendari, sidebar, mòbil, flux complet leads→reserves), `admin-extended.spec.ts`, `admin-audit.spec.ts`, `admin-help-home.spec.ts`, `admin-help-pages.spec.ts`, `admin-help-leads-clients-eco.spec.ts`, `admin-help-calendar-emails.spec.ts`, `responsive-layout.spec.ts`, `performance-audit.spec.ts`, `fase2-audit.spec.ts` — total 9 specs admin amb cobertura de viewport mòbil/tablet/desktop. A nivell estàtic, `qa:visual-overflow` és guard obligatori (#391) i `qa:no-admin-static-css-var-styles`, `qa:no-admin-inline-font-size`, `qa:no-admin-toFixed-currency`, `qa:no-admin-slate-gray` cobreixen consistència visual contínua.
+**FET** *(2026-07-02 per `codex` — Canvi #1359)*: drenats 12 avisos estàtics de `qa:visual-overflow` per `whitespace-nowrap` sense guard a booking detail, pagaments Stripe, Safata i Arxiu de leads. Els labels/badges/imports nowrap ara tenen `max-w-*`, `min-w-0` i/o `truncate`, i el guard torna a `OK` sense riscos evidents.
 **MÉS ENDAVANT**: capturar screenshots de regressió automàtics si apareixen friccions visuals reals sense detecció estàtica.
 
 ## 6.14 Infra / Dev / Operativa
@@ -1545,6 +1546,95 @@ Seqüència obligatòria de registre:
 - `claude` — backend/schema/serveis/tests/visual tokenitzat
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
+
+### Canvi #1368 — 2026-07-02 — claude (FET)
+**Transport = cost real de dues potes + peatges + PANTALLA «Pasta» del col·laborador amb PDF de liquidació.**
+- Context: sessió llarga guiada pel propietari (analista econòmic). Consolida #1363-1368 (counter compartit amb Codex, carrils de codi disjunts). Transport: el client paga el cost real (cotxe €/km + tripulació €/h, tots 15€/h, headcount = persones físiques), + peatges (`tollsEur`, cost real no-km). Nova capacitat: liquidació per col·laborador (què li devem, per estat) amb PDF.
+- Transport (`travelLaborCost`/`travelCost`): `calculateClientTravelCharge` + `deriveTravelHeadcount` (font única), fallback 0,19→0,26 (barem IRPF). Propagat a lead/reserva/portal/pricing/margin/drawer. Peatges al motor + lead.
+- Schema (migrat a producció Railway): `CollaboratorPayment` (per bolo) + `tollsEur` a Lead/Booking.
+- Nous: `collaboratorPayoutService` (pasta per estat Previ/Entregat/Pagat via `computeBoloRepartiment`), pantalla «Pasta» a `/admin/collaborators/[id]` (KPIs+gràfica+marcar pagat cash), `collaboratorPayoutPdfService` (PDF liquidació + logística jornada: sortida/arribada/tornada, 45+45 muntatge/desmuntatge via `computeJornada`).
+- Validació tècnica: tsc 0; validate:core EXIT 0; tests dels serveis verds (costEngine 77, collaboratorPayout 7, PDF 2, travelLabor 4, bookingCreation 45, bookingRoute 24, crew).
+- Validació funcional: Playwright lead Alba (transport +271€/+297€ amb peatge, marge +60€), pantalla Pasta Masquerade (1.972€), PDF liquidació real amb jornada correcta (Alba sortida 13:00/tornada 22:30).
+- Validació humana/UX: el transport no perd diners amagats; la pasta de cada col·laborador és visible, liquidable i imprimible amb la seva veritat (motor únic).
+- Counter → 1368. Carrils disjunts amb Codex (#1364-1367 seus: lead→dossier/intake). PENDENT: 2 PDFs pre-venda amb fórmula transport vella; peatges al write-path de reserves; SENSE COMMIT (worktree barrejat, coordinar).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1363 — 2026-07-02 — claude (FET)
+**Transport al client = cost real de dues potes (cotxe/km + gent/hores, 15 €/h), propagat canònic a tot el flux.**
+- Context: decisió del propietari («no plou benzina»). El càrrec antic (`calculateTravelCharge`, 0,50 €/km) només cobria el cotxe i ignorava el temps de la tripulació → bolos lluny perdien diners. El client paga el cost real amb dues potes (cotxe=km, gent=hores), 15 €/h tothom, headcount = persones físiques (rols d'Òrbita col·lapsen en 1).
+- `lib/services/travelLaborCost.ts`: conductor 18→15 €/h; nous helpers `calculateClientTravelCharge` i `deriveTravelHeadcount` (font única).
+- Propagat: `LeadBoloSection`, `bookingCreationService`, `bookingRouteService`, `useBookingPricing`+`NewBookingForm`+`BookingTravelDiscountSection`+`BookingPricingSummary`, `BookingMarginCard`+`bookings/[id]/page.tsx`, `LeadsSeasonClient`, portal (`clientPortalAccess`+`portal/[token]/page`). «Trams» → dues potes a tot arreu.
+- Dada d'Alba: marge −77 → +60 €; transport 271 € (break-even); integrants 2.
+- Validació tècnica: tsc 0; validate:core EXIT 0; tests 73/73.
+- Validació funcional: Playwright lead Alba desktop+mòbil: Net +60€, Transport +271€, integrants 2.
+- Validació humana/UX: el transport ja no perd diners amagats; el client paga el cost real.
+- Counter → 1363. PENDENT EXPLÍCIT: 2 PDFs de pre-venda (`PresupuestoPdfStudio`, `dossier-html-builder`) encara amb la fórmula vella (necessiten input «persones» + i18n).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1362 — 2026-07-02 — claude (FET)
+**Bug de model del tècnic del Bingo: doble descompte → el tècnic passa a ser ingrés d'Òrbita quan el fa ella.**
+- Context: investigant el marge negatiu d'Alba amb el propietari. Model real (confirmat): el Bingo és producte de Masquerade (cost 200, tècnic inclòs) que Òrbita revèn a 240 (+40 marge); el tècnic sempre val 40 i, si el fa Òrbita, Masquerade li PAGA els 40. El codi rebaixava el Bingo a 160 i comptava el tècnic d'Òrbita com a cost 40 (`collab=Òrbita`) → doble descompte (marge Bingo +80 real, mostrava +40). Alba: fals −77€ (real −37€).
+- `app/admin/bookings/BookingServiceLinesSection.tsx`: el producte (Bingo) manté el cost sencer (200); la línia de tècnic es genera amb `collaboratorId=proveïdor` SEMPRE i `costAmount` 0 (proveïdor el fa, inclòs) / −40 (Òrbita el fa → Masquerade et paga). Els dos selectors trien només QUI el fa (no toquen collaboratorId). Display `inclòs` / `+40€ teu`. `collaboratorId=proveïdor` és clau perquè `aggregateServiceLines`/`computeBoloRepartiment` respectin el cost (ignoren cost en línies `collab=Òrbita`) → cap motor tocat.
+- Dada del lead Alba corregida a BD: Bingo cost 160→200; tècnic `collab=Òrbita cost=40` → `collab=Masquerade cost=−40`.
+- Validació tècnica: tsc 0; validate:core EXIT 0; tests 132/132 (costEngine 77 + repartimentService 5 + useNewBookingSubmit 5 + bookingCreationService 45).
+- Validació funcional: Playwright lead Alba (desktop+mòbil): marge −77→−37€; tècnic «+40€ teu»; Cost serveis 200→160; Total client 430 intacte.
+- Validació humana/UX: el tècnic sempre és un 40 visible (inclòs / +40€ teu); el Bingo sempre 240; confirmat pas a pas amb el propietari.
+- Counter → 1362. Tocat `BookingServiceLinesSection` (component de Codex, #1351); cap motor de cost/repartiment tocat. El transport (−287€) segueix sent el forat gros, pendent decisió de producte.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1361 — 2026-07-02 — claude (FET)
+**Fitxa de lead: benzina/transport del «Repartiment ruta» en català net + diners del pressupost a l'esquerra amb total destacat.**
+- Context: feedback del propietari sobre `/admin/leads/[id]` (Alba). El «Repartiment ruta» mostrava el detall del cost cru i en anglès (`vehicle`/`DRIVER`/`PASSENGER`/`EUR`); els imports del pressupost anaven a la dreta. Tall de PRESENTACIÓ pura (0 model).
+- `app/admin/leads/[id]/LeadBoloSection.tsx`: helper `cleanRouteNote` (treu rol anglès, `EUR`→`€`, `422.0 km`→`422 km`, coma) + `formatNumber` a la nota d'hores.
+- `app/admin/admin-shell.css`: `.ap-ledger-budget-row` amb l'import a l'esquerra (`order:-1`, `min-width`+`text-align:right`), total client destacat.
+- Validació tècnica: tsc 0; validate:core EXIT 0 (guard `qa:no-inline-to-locale-string` va forçar `formatNumber` en lloc de `toLocaleString`).
+- Validació funcional: Playwright desktop+mòbil; benzina/temps en català, diners a l'esquerra, 430€ Total client destacat.
+- Validació humana/UX: pressupost llegible amb el total client destacat a l'esquerra; detall de ruta en català net; validat pel propietari («seguim»).
+- Counter → 1361 (revertit després per edició concurrent de Codex; reconciliat al #1362). NO toca `travelLaborCost`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1360 — 2026-07-02 — codex (FET)
+**El drawer ràpid de `/admin/leads` passa a ser operatiu: Alba mostra contractat, ruta i cap en una pantalla desktop.**
+- Context: el propietari obre Alba Orna des de `/admin/leads`; el drawer de mitja pantalla era massa pobre i mostrava soroll (`160€/h +23% vs mercat`) derivat de dividir 240€ entre 1,5h, quan el producte final contractat és 240€.
+- `lib/services/seasonCalendarService.ts`: el calendari de leads exposa `distanceKm` i línies de bolo visibles; si el lead ja té reserva, prioritza les línies/distància de la reserva; si és lead pur, usa `Lead.distanceKm` i `LeadServiceLine`.
+- `app/admin/leads/page.tsx` + `LeadsSeasonClient.tsx`: el drawer mostra resum operatiu (Horari, Lloc, Contractat, Ruta), detalls de bolo (data, pax, inici/fi, durada, distància, ruta, muntatge, hora de sortida) i panell Contractat amb línies visibles.
+- Eliminat del drawer el hint de tarifa horària/mercat i retirat del cos el bloc «Següent pas» amb accions fortes de canvi d'estat. La fitxa ràpida queda per entendre el bolo; operativa forta a «Fitxa completa».
+- La fase queda editable des del kicker compacte (`Contactat` com a select), reutilitzant el mateix handler i el modal de motiu per `Perdut`.
+- El panell repetitiu «Dades del bolo» es converteix en «Operativa»: data, pax, muntatge, Waze i sortida, sense repetir horari/lloc/ruta/contractat.
+- La capçalera posa `Total client` primer i després el desglossament `Contractat` + `Transport`; per Alba calcula 240€ + 190€ = 430€ amb `calculateTravelCharge`.
+- La sortida del bolo usa només l'anada (`distanceKm / 2`) perquè `distanceKm` és anada+tornada; la ruta total continua mostrant 422 km / 6,5 h anada+tornada.
+- Refinament final: `Total client` és el primer import, el select de fase queda com a control neutral a la dreta del nom i els valors genèrics `Altre` de tipus/canal s'amaguen.
+- `app/admin/admin-shell.css`: ajust `.ap-ledger-*` amb més aire visual, mantenint el cas Alba dins viewport desktop. Correcció canònica posterior: eliminat el token fantasma `--o-space-45` i definits tokens de component `--ap-ledger-drawer-gutter`, `--ap-ledger-drawer-band-y`, `--ap-ledger-drawer-section-gap` i `--ap-ledger-drawer-title-gap`, alimentats per l'escala `--o-space-*`, consumits per hero, stats, resum i graella del drawer.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:no-phantom-tokens` OK.
+- Validació funcional: Playwright obre Alba a `/admin/leads`; captura final `.codex-captures/leads-alba-drawer-stage-neutral-contact-buttons-850.png`. Desktop 850px: `clientHeight=850`, `scrollHeight=850`, `overflow=false`, gutter real `1.25rem`, aire vertical de banda `0.625rem`, separació hero/imports `0.375rem`, imports inset alineats amb targetes, panells Contractat/Operativa amb el mateix border, selector de fase neutral a la dreta del nom, WhatsApp verd i Correu blau, 0 errors. Mobile: captura `.codex-captures/leads-alba-drawer-final-compact-mobile.png`, sense overflow horitzontal.
+- Validació humana/UX: el drawer mostra Total client 430€, Contractat 240€, Transport 190€, Contractat primer, Bingo Musical + tècnic, 422 km / 6,5 h anada/tornada, Operativa sense redundància i sortida 12:45; ja no mostra `160€/h`, `+23% vs mercat`, `Següent pas`, `Passar a Guanyat`, `Marcar perdut`, `Contactat · Altre` ni `Canal Altre`.
+- Counter → 1360. Tall acotat al drawer ràpid de leads; no toca costEngine ni repartiment.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1359 — 2026-07-02 — codex (FET)
+**`qa:visual-overflow` queda sense avisos: 12 `nowrap` tenen límit/truncat explícit.**
+- Context: `validate:core` passava, però `qa:visual-overflow` avisava 12 riscos estàtics `whitespace-nowrap` sense guard a booking detail, StripePaymentPanel, SafataClient i ArxiuClient.
+- `app/admin/bookings/[id]/page.tsx`: divisor de secció i data/actor de timeline amb `max-w-*`/`truncate`.
+- `app/admin/bookings/[id]/StripePaymentPanel.tsx`: badges de pagament amb `max-w-full truncate`.
+- `app/admin/inbox/SafataClient.tsx`: items de nav, pill de vinculació i label d'adjunts amb `min-w-0`, `max-w-full` i `truncate`.
+- `app/admin/leads/arxiu/ArxiuClient.tsx`: percentatges, resum mensual i import estimat amb límits/truncat.
+- Validació tècnica: `pnpm run qa:visual-overflow` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK; `pnpm build` OK.
+- Validació funcional: cap canvi de dades ni accions; només sortida responsiva per a text nowrap.
+- Validació humana/UX: labels, badges i imports conserven lectura compacta sense poder empènyer contenidors.
+- Counter → 1359. Tall de fiabilitat visual; #1358 repartiment intacte.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
 
 ### Canvi #1358 — 2026-07-02 — claude (FET)
 **Cuadrant reusa el motor + drill-down per bolo al repartiment.**
@@ -22069,6 +22159,53 @@ px tsc --noEmit OK · git diff --check OK.
 - Validació funcional: BD viva verificada després del canvi: `Bingo Musical` i `Batalla Musical` actius amb `costPrice=200`, `sellPrice=240`, `crew=Presentador + tècnic de so + equip propi`; duplicat antic `Bingo musical` eliminat.
 - Validació humana/UX: al configurador, el tècnic inclòs queda visible com a línia assignable amb 40€ i selector Òrbita/proveïdor, sense canviar el PVP del producte.
 - `ADMIN_CHANGE_COUNTER` puja a `1326`; el següent canvi real ha de ser `#1327`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1364 — 2026-07-02 — codex (FET)
+**Nova entrada deixa de petar per email/data/source i l’extracció passa a local-first.**
+- Context: a `/admin/intake`, el propietari veia “Dades invàlides” en crear una entrada de lead i l’extracció automàtica arribava al límit molt ràpid amb textos curts.
+- `/admin/intake`: la creació manual accepta `nom + email` o `nom + telèfon`; l’email es pot deixar buit; la data s’envia com `YYYY-MM-DD` i l’hora com `eventStartTime`; els valors extrets de `source/eventType` es normalitzen abans de quedar a l’estat del formulari.
+- `POST /api/admin/leads`: email opcional; quan falta, crea `manual-<uuid>@leads.orbitaevents.local`; `source: EMAIL` passa a `OTHER`; `eventType` desconegut passa a `OTHER`; priorities desconegudes no trenquen la creació.
+- `POST /api/admin/leads/extract`: extractor local-first. Si el regex local ja troba dades útils, no crida Gemini. Si Gemini retorna quota/rate-limit, cooldown de 10 minuts i fallback local sense consumir més intents. La sortida de Gemini es saneja abans d’arribar al client.
+- Refinament de prova real: textos massa curts i sense dades útils (`hola`) no criden Gemini; retornen `fallbackReason: "too-short"` i la UI mostra avís operatiu.
+- Tests: regressió de lead manual amb telèfon sense email; normalització `EMAIL/eventType` desconegut; endpoint d’extracció sense consum IA quan el text curt ja és suficient; text massa curt sense consum IA; cooldown quota.
+- Validació tècnica: `pnpm test:run -- __tests__\app\api\admin\leads-route.test.ts __tests__\app\api\admin\leads-extract-route.test.ts __tests__\lib\services\leadTextExtractionService.test.ts` OK (11 tests); `npx tsc --noEmit --pretty false` OK abans del registre.
+- Validació funcional: regressions cobertes per data separada de l’hora, lead amb telèfon sense email, `source: EMAIL`, `eventType` desconegut, text curt local sense Gemini, text massa curt sense Gemini i cooldown després de quota.
+- Validació humana/UX: prova real HTTP contra `localhost:3000`: text curt amb Maria/tel/boda retorna en 40 ms amb dades locals i sense quota; `hola` retorna en 27 ms amb `fallbackReason: "too-short"`, no `quota`.
+- `ADMIN_CHANGE_COUNTER` puja a `1364`; el següent canvi real ha de ser `#1365`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1365 — 2026-07-02 — codex (FET)
+**Extractor WhatsApp ignora timestamps i no inventa dates parcials.**
+- Context: proves reals a `/admin/intake` amb converses d'Estel Giralt i Alba Orna demostraven que el fallback local podia agafar la data del timestamp de WhatsApp en lloc de la data del client i confondre converses multi-bolo.
+- `lib/services/leadTextExtractionService.ts`: normalitza el text de WhatsApp eliminant prefixos `[hora, data] remitent:` abans d'extreure dades, però conserva el text original per poder recuperar telèfons de remitents.
+- L'extractor ara reconeix nom abans d'email (`Alba Orna - albaop@gmail.com`), ubicacions tipus `La ubicació del dia 5 és ...`, i rangs `Horari 9 a 11 del vespre` com `21:00`-`23:00`.
+- Decisió de seguretat: si el text només diu `dia 5` sense mes/any explícits, no inventa `eventDate`; deixa el camp buit perquè l'admin el confirmi.
+- Tests: `leadTextExtractionService.test.ts` incorpora els dos textos reals i blinda que Estel retorni `2026-07-25` i Alba no es classifiqui com `WEDDING` només perquè la conversa també menciona una boda posterior.
+- Validació HTTP local: `/api/admin/leads/extract` retorna per Estel `2026-07-25`, `21:00`, `23:00`, `Canyamars-Dosrius`; per Alba retorna `Alba Orna`, `+376339491`, `restaurant Calma a l'Aldosa`, `30`, amb data buida.
+- Validació tècnica: `pnpm test:run -- __tests__\lib\services\leadTextExtractionService.test.ts __tests__\app\api\admin\leads-extract-route.test.ts __tests__\app\api\admin\leads-route.test.ts` → 13/13 OK.
+- Validació funcional: crides HTTP locals reals a `/api/admin/leads/extract` amb els textos d'Estel i Alba retornen dades estructurades sense consumir quota IA quan el fallback local ja té senyals suficients.
+- Validació humana/UX: l'admin ja no veu una data falsa del timestamp; els casos amb data incompleta queden explícitament pendents de confirmació manual en lloc d'inventar un mes.
+- `ADMIN_CHANGE_COUNTER` passa a `1365`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1366 — 2026-07-02 — codex (FET)
+**Dossiers hereten el lead complet quan s'obren amb `leadId`.**
+- Context: el lead d'Estel Giralt tenia dades i línies afegides, però `/admin/dossiers?leadId=...` no ho mostrava tot perquè el generador depenia de query params manuals i d'un premap parcial de productes per `collaboratorId`.
+- `lib/services/dossierService.ts`: nou `getDossierLeadInitialData(leadId)` que carrega nom, email, telèfon i una `eventDesc` composta amb tipus, data, horari, adreça/lloc, pax i missatge del lead.
+- `app/admin/dossiers/page.tsx`: quan hi ha `leadId`, el server resol el lead complet i només deixa que `nom/email/telefon/eventDesc` de la URL sobreescriguin si s'han passat explícitament.
+- Productes: eliminat el premap server només per `LeadServiceLine.collaboratorId`; així el client pot executar la sincronització completa existent contra `/api/admin/leads/:id/service-lines` i recuperar també DJ/equipament/altres línies.
+- `__tests__/lib/services/dossierService.test.ts`: cobertura nova per un lead tipus Estel amb data, horari, ubicació/adreça, pax i missatge.
+- Validació tècnica: `pnpm test:run -- __tests__\lib\services\dossierService.test.ts` → 18/18 OK; `npx tsc --noEmit` OK.
+- Validació funcional: `leadId` ja és suficient perquè el generador arrenqui amb les dades persistides del lead i no amb una URL incompleta.
+- Validació humana/UX: el propietari no ha de reintroduir manualment al dossier allò que ja havia escrit al lead; si el lead té línies de bolo, es sincronitzen pel camí canònic existent.
+- `ADMIN_CHANGE_COUNTER` passa a `1366`.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`

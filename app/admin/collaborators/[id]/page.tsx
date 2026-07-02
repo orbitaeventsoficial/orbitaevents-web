@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { AdminPage } from '../../components/AdminPage';
 import { fetchPartnerHub } from '@/lib/services/partnerHubService';
+import { loadCollaboratorPayout } from '@/lib/services/collaboratorPayoutService';
 import { COLLABORATOR_ROLE_OPTIONS } from '@/lib/constants/admin';
 import PartnerHubClient from './PartnerHubClient';
 
@@ -18,6 +19,8 @@ export async function generateMetadata({ params }: Props) {
 export default async function PartnerDetailPage({ params }: Props) {
   const hub = await fetchPartnerHub(params.id);
   if (!hub) notFound();
+
+  const payout = await loadCollaboratorPayout(params.id);
 
   const roleLabels = hub.partner.roles
     .map((role) => COLLABORATOR_ROLE_OPTIONS.find((option) => option.value === role)?.label || role)
@@ -80,7 +83,7 @@ export default async function PartnerDetailPage({ params }: Props) {
       subtitle={roleLabels || 'Partner sense rols assignats'}
       back={{ href: '/admin/collaborators', label: 'Partners' }}
     >
-      <PartnerHubClient data={data} />
+      <PartnerHubClient data={data} payout={payout} />
     </AdminPage>
   );
 }

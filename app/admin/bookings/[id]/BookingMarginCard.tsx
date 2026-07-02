@@ -4,16 +4,12 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { log } from '@/lib/logger';
 import {
-  calculateBillableTravelKm,
-  calculateTravelBlocks,
-  calculateTravelCharge,
   calculateTravelCost,
   DEFAULT_VEHICLE_COST_PER_KM,
   getIncludedTravelOneWayKm,
   INCLUDED_TRAVEL_KM,
-  TRAVEL_BLOCK_EUR,
-  TRAVEL_BLOCK_KM,
 } from '@/lib/services/travelCost';
+import { calculateClientTravelCharge, calculateTravelCostBreakdown } from '@/lib/services/travelLaborCost';
 import { formatCurrency } from '@/lib/constants';
 import { computeDirectCostBreakdown } from '@/lib/services/costEngine';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
@@ -44,6 +40,8 @@ interface BookingMarginProps {
   targetMarginPct: number;
   /** Cost de subcontractació de les línies de servei (animació, pintacares...). */
   serviceLinesCost?: number;
+  /** Persones que viatgen al bolo (#1363): alimenta el càrrec de transport de dues potes. */
+  travelHeadcount?: number;
 }
 
 export default function BookingMarginCard({
@@ -67,6 +65,7 @@ export default function BookingMarginCard({
   fixedOperationalCost,
   targetMarginPct,
   serviceLinesCost = 0,
+  travelHeadcount = 0,
 }: BookingMarginProps) {
   const router = useRouter();
   const toast = useToast();
@@ -79,10 +78,19 @@ export default function BookingMarginCard({
   const [distanceMessage, setDistanceMessage] = useState<string | null>(null);
   const lastDistanceDestinationRef = useRef('');
 
-  const billableKm = calculateBillableTravelKm(distanceKm, INCLUDED_TRAVEL_KM);
-  const travelBlocks = calculateTravelBlocks(distanceKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM);
+  // Transport (#1363): cost real dues potes (cotxe/km + gent/hores). El càrrec al client
+  // = el mateix cost (break-even) via la font única. `calculatedTravelCost` és només el
+  // cotxe (cost intern del vehicle); les hores de gent són cost de col·laborador a part.
+  const travelBreakdown = calculateTravelCostBreakdown({
+    roundTripKm: distanceKm,
+    vehicleCostPerKm,
+    vehicleOwner: { label: '' },
+    people: travelHeadcount > 0
+      ? [{ role: 'DRIVER', label: '' }, ...(travelHeadcount > 1 ? [{ role: 'PASSENGER' as const, label: '', count: travelHeadcount - 1 }] : [])]
+      : [],
+  });
   const calculatedTravelCost = calculateTravelCost(distanceKm, vehicleCostPerKm, INCLUDED_TRAVEL_KM);
-  const calculatedTravelCharge = calculateTravelCharge(distanceKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR);
+  const calculatedTravelCharge = calculateClientTravelCharge(distanceKm, travelHeadcount, vehicleCostPerKm);
   const includedOneWayKm = getIncludedTravelOneWayKm(INCLUDED_TRAVEL_KM);
   const travelNetMargin = calculatedTravelCharge - calculatedTravelCost;
   const travelMarginPct = calculatedTravelCharge > 0 ? (travelNetMargin / calculatedTravelCharge) * 100 : 0;
@@ -399,11 +407,11 @@ export default function BookingMarginCard({
           <span>{formatCurrency(fixedOperationalCost)}</span>
         </div>
         <div className="flex justify-between">
-          <span>Desplaçament ({travelBlocks} trams de {TRAVEL_BLOCK_KM} km)</span>
+          <span>Desplaçament cotxe ({distanceKm.toFixed(0)} km)</span>
           <span>{formatCurrency(calculatedTravelCost)}</span>
         </div>
         <div className="flex justify-between">
-          <span>Suplement client ({travelBlocks} trams)</span>
+          <span>Transport al client (cotxe + {travelBreakdown.chargeableHours} h × {travelHeadcount} pers.)</span>
           <span>{formatCurrency(calculatedTravelCharge)}</span>
         </div>
         <div className="flex justify-between">
@@ -417,7 +425,7 @@ export default function BookingMarginCard({
       <div className="ap-card p-4" data-help-title="Desplaçament editable" data-help-desc="Permet ajustar o recalcular la distància del servei i veure com canvien costos, suplement i marge del transport.">
         <h3 className="text-sm font-semibold mb-3">Desplaçament editable</h3>
         <p className="mb-3 text-xs">
-          Inclòs: {INCLUDED_TRAVEL_KM} km totals ({includedOneWayKm} anada + {includedOneWayKm} tornada). Després: {TRAVEL_BLOCK_EUR} € per cada {TRAVEL_BLOCK_KM} km extra.
+          Transport al client = cost real: cotxe ({vehicleCostPerKm.toFixed(2)} €/km) + temps de la tripulació (15 €/h, 1a hora inclosa).
         </p>
         <div className="grid gap-3 sm:grid-cols-3">
           <div>
@@ -433,18 +441,18 @@ export default function BookingMarginCard({
             />
           </div>
           <div>
-            <label className="block text-xs font-medium mb-1">Km extra</label>
+            <label className="block text-xs font-medium mb-1">Hores tripulació</label>
             <div className="ap-card px-3 py-2 text-sm">
-              {billableKm} km
+              {travelBreakdown.chargeableHours} h × {travelHeadcount} pers.
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium mb-1">Cost viatge</label>
+            <label className="block text-xs font-medium mb-1">Cost viatge (cotxe)</label>
             <div className="ap-card px-3 py-2 text-sm font-bold">
               {formatCurrency(calculatedTravelCost)}
             </div>
             <p className="mt-1 text-xs">
-              {travelBlocks} trams · {TRAVEL_BLOCK_EUR} €
+              {distanceKm.toFixed(0)} km · {vehicleCostPerKm.toFixed(2)} €/km
             </p>
           </div>
         </div>
@@ -457,7 +465,7 @@ export default function BookingMarginCard({
           <div className="ap-card p-3">
             <p className="text-xs uppercase tracking-wide">Ingressos transport</p>
             <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCharge)}</p>
-            <p className="text-xs">{travelBlocks} trams · {TRAVEL_BLOCK_EUR} €</p>
+            <p className="text-xs">cotxe + {travelBreakdown.chargeableHours} h × {travelHeadcount} pers.</p>
           </div>
           <div className={`ap-card p-3 ${travelMarginCardBorder} ${travelMarginCardBg}`}>
             <p className="text-xs uppercase tracking-wide">Marge real transport</p>

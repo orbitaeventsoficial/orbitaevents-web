@@ -12,12 +12,10 @@ import type { BookingDiscountValidation, BookingFormData } from './booking-form.
 
 interface BookingTravelDiscountSectionProps {
   form: Pick<BookingFormData, 'distanceKm' | 'discount' | 'discountCode' | 'notes'>;
-  travelBlocks: number;
   travelCharge: number;
-  billableKm: number;
+  travelHeadcount: number;
+  chargeableHours: number;
   includedTravelKm: number;
-  travelBlockKm: number;
-  travelBlockEur: number;
   fuelReferenceInfo: string | null;
   validatingCode: boolean;
   discountValidation: BookingDiscountValidation | null;
@@ -28,12 +26,10 @@ interface BookingTravelDiscountSectionProps {
 
 export default function BookingTravelDiscountSection({
   form,
-  travelBlocks,
   travelCharge,
-  billableKm,
+  travelHeadcount,
+  chargeableHours,
   includedTravelKm,
-  travelBlockKm,
-  travelBlockEur,
   fuelReferenceInfo,
   validatingCode,
   discountValidation,
@@ -59,7 +55,7 @@ export default function BookingTravelDiscountSection({
               placeholder="0"
               className="adm-input"
             />
-            <p className={NB_HINT}>Inclòs al pack: {includedTravelKm} km</p>
+            <p className={NB_HINT}>La 1a hora de ruta va inclosa</p>
           </div>
           <div className={NB_FIELD}>
             <span className={NB_LABEL}>Resum del càrrec</span>
@@ -68,8 +64,8 @@ export default function BookingTravelDiscountSection({
               aria-label="Resum del cost de desplaçament"
             >
               {[
-                { dt: 'Trams aplicats', dd: travelBlocks },
-                { dt: 'Km facturables', dd: billableKm },
+                { dt: 'Persones', dd: travelHeadcount },
+                { dt: 'Hores tripulació', dd: `${chargeableHours} h` },
                 { dt: 'Càrrec', dd: travelCharge > 0 ? formatCurrencyExact(travelCharge) : '— €' },
               ].map((cell) => (
                 <div key={cell.dt} className="flex flex-col gap-1 bg-[var(--panel)] px-3.5 py-3">
@@ -79,10 +75,10 @@ export default function BookingTravelDiscountSection({
               ))}
             </dl>
             {travelCharge > 0 && (
-              <p className={NB_HINT}>{travelBlockEur} € per cada {travelBlockKm} km extra</p>
+              <p className={NB_HINT}>Cost real: cotxe (km) + tripulació (15 €/h, 1a hora inclosa)</p>
             )}
             {travelCharge === 0 && enteredKm > 0 && (
-              <p className={`${NB_HINT} ${NB_HINT_OK}`}>Dins el tram inclòs · cap cost extra</p>
+              <p className={`${NB_HINT} ${NB_HINT_OK}`}>Dins la 1a hora inclosa · cap cost extra</p>
             )}
             {fuelReferenceInfo && <p className={`${NB_HINT} ${NB_HINT_INFO}`}>{fuelReferenceInfo}</p>}
           </div>

@@ -15,6 +15,7 @@ import CalendarSyncButton from './CalendarSyncButton';
 import PostEventEmailButton from './PostEventEmailButton';
 import BookingMarginCard from './BookingMarginCard';
 import RepartimentPanel from './RepartimentPanel';
+import { deriveTravelHeadcount } from '@/lib/services/travelLaborCost';
 import { computeBoloRepartiment } from '@/lib/services/repartimentService';
 import BookingServiceLinesEditor from './BookingServiceLinesEditor';
 import type { BookingServiceLineFormInput } from '../booking-form.types';
@@ -90,7 +91,7 @@ function SecDivider({ id, children }: { id: string; children: ReactNode }) {
   return (
     <div id={id} className="my-1 flex scroll-mt-24 items-center gap-2.5">
       <span className="h-px flex-1 bg-[var(--o-admin-line)]" />
-      <span className="whitespace-nowrap font-mono text-xs font-extrabold uppercase tracking-[0.12em] text-[var(--ax-fill-bright)]">{children}</span>
+      <span className="max-w-[min(70vw,28rem)] truncate whitespace-nowrap text-center font-mono text-xs font-extrabold uppercase tracking-[0.12em] text-[var(--ax-fill-bright)]">{children}</span>
       <span className="h-px flex-1 bg-[var(--o-admin-line)]" />
     </div>
   );
@@ -641,6 +642,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
             fixedOperationalCost={profitabilityConfig.fixedOperationalCost}
             targetMarginPct={targetMarginPct}
             serviceLinesCost={serviceLinesCost}
+            travelHeadcount={deriveTravelHeadcount(booking.serviceLines ?? [])}
           />
         </div>
 
@@ -743,7 +745,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
                         {description && <p className="hidden">{description}</p>}
                         {entry.link && <Link href={entry.link.href} className="hidden">{entry.link.label}</Link>}
                       </div>
-                      <div className="text-left text-xs leading-tight text-[var(--t3)] sm:whitespace-nowrap sm:text-right">
+                      <div className="max-w-full text-left text-xs leading-tight text-[var(--t3)] sm:max-w-[18rem] sm:whitespace-nowrap sm:text-right">
                         <p className="m-0">{formatDateTimeFull(new Date(entry.occurredAt))}</p>
                         {entry.actor && <p className="m-0 mt-0.5">{entry.actor}</p>}
                       </div>

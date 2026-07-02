@@ -57,6 +57,17 @@ const INITIAL_FORM: FormData = {
 
 const INTAKE_SOURCE_STORAGE_KEY = 'admin.intake.source';
 
+function pickOptionValue<T extends readonly { value: string }[]>(
+  options: T,
+  value: unknown,
+  fallback: string,
+) {
+  if (typeof value !== 'string') return fallback;
+  const normalized = value.trim().toUpperCase();
+  if (normalized === 'EMAIL') return 'OTHER';
+  return options.some((option) => option.value === normalized) ? normalized : fallback;
+}
+
 export default function IntakePage() {
   const toast = useToast();
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
@@ -87,7 +98,7 @@ export default function IntakePage() {
       const { data, fallback, fallbackReason } = await res.json() as {
         data: Partial<FormData>;
         fallback?: boolean;
-        fallbackReason?: 'quota' | 'unavailable';
+        fallbackReason?: 'quota' | 'unavailable' | 'too-short';
       };
       setForm((prev) => ({
         ...prev,
@@ -96,7 +107,7 @@ export default function IntakePage() {
         phone: data.phone || prev.phone,
         dni: data.dni || prev.dni,
         address: data.address || prev.address,
-        eventType: data.eventType || prev.eventType,
+        eventType: pickOptionValue(INTAKE_EVENT_TYPE_OPTIONS, data.eventType, prev.eventType),
         eventDate: data.eventDate || prev.eventDate,
         eventTime: data.eventTime || prev.eventTime,
         eventEndTime: data.eventEndTime || prev.eventEndTime,
@@ -104,14 +115,16 @@ export default function IntakePage() {
         guestCount: data.guestCount || prev.guestCount,
         budget: data.budget || prev.budget,
         message: data.message || prev.message,
-        source: data.source || prev.source,
+        source: pickOptionValue(INTAKE_SOURCE_OPTIONS, data.source, prev.source),
       }));
       setPasteText('');
       if (fallback) {
         toast.warning(
           fallbackReason === 'quota'
             ? 'Extracció local parcial: la quota IA està limitada ara mateix'
-            : 'Extracció local parcial: la IA no ha respost correctament'
+            : fallbackReason === 'too-short'
+              ? 'Text massa curt: enganxa la conversa o dades com nom, telèfon, data o lloc'
+              : 'Extracció local parcial: la IA no ha respost correctament'
         );
       } else {
         toast.success('Camps omplerts automàticament');
@@ -178,8 +191,8 @@ export default function IntakePage() {
   }, [debounceName, debounceEmail, debouncePhone]);
 
   const handleSubmit = useCallback(async () => {
-    if (!form.name || !form.email) {
-      setError('Nom i email són obligatoris');
+    if (!form.name || (!form.email && !form.phone)) {
+      setError('Nom i email o telèfon són obligatoris');
       return;
     }
     const highDup = duplicates.find((d) => d.matchScore >= 80);
@@ -197,20 +210,14 @@ export default function IntakePage() {
       const baseMessage = form.message.trim();
       const fullMessage = [...extraParts, baseMessage].filter(Boolean).join('\n') || undefined;
 
-      const eventDateTime = form.eventDate
-        ? form.eventTime
-          ? `${form.eventDate}T${form.eventTime}`
-          : form.eventDate
-        : undefined;
-
       const body: Record<string, unknown> = {
         name: form.name.trim(),
-        email: form.email.trim(),
+        email: form.email.trim() || undefined,
         phone: form.phone.trim() || undefined,
         dni: form.dni.trim().toUpperCase() || undefined,
         source: form.source || 'OTHER',
         eventType: form.eventType,
-        eventDate: eventDateTime,
+        eventDate: form.eventDate || undefined,
         eventStartTime: form.eventTime || undefined,
         eventEndTime: form.eventEndTime || undefined,
         eventLocation: form.eventLocation.trim() || undefined,
@@ -381,7 +388,7 @@ export default function IntakePage() {
             />
           </label>
           <label className="block" htmlFor="intake-email">
-            <span className="text-xs text-[var(--t2)]">Email *</span>
+            <span className="text-xs text-[var(--t2)]">Email</span>
             <input
               id="intake-email"
               type="email"
@@ -567,7 +574,7 @@ export default function IntakePage() {
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={submitting || !form.name || !form.email}
+          disabled={submitting || !form.name || (!form.email && !form.phone)}
           className="ap-btn ap-btn--primary"
         >
           {submitting ? 'Creant…' : 'Crear entrada'}

@@ -277,6 +277,9 @@ function productIdsFromServiceLines(lines: DossierServiceLine[], products: Anima
         .sort((a, b) => normalizeProductText(b.nom).length - normalizeProductText(a.nom).length)[0];
       if (candidate) return candidate.id;
 
+      if (line.kind === 'EQUIPMENT' && normalizedLabel.includes('caps mobils')) {
+        return 'orbita:pont-llums-caps-mobils';
+      }
       if (line.kind === 'DJ' && /\bdj\b/.test(normalizedLabel)) {
         return DJ_FIRST_PRODUCT_ID;
       }

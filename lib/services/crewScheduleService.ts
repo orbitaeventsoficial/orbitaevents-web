@@ -170,6 +170,53 @@ function personKeyOf(line: CrewLineInput): string {
   return line.collaboratorId ?? OWNER_KEY;
 }
 
+/** Minuts de muntatge i desmuntatge estàndard (decisió del propietari #1364). */
+export const SETUP_MINUTES = 45;
+export const TEARDOWN_MINUTES = 45;
+/** Velocitat mitjana per estimar el temps de ruta (mateixa que travelLaborCost). */
+const JORNADA_AVG_SPEED_KMH = 65;
+
+export interface Jornada {
+  departureTime: string | null; // sortida de casa
+  arrivalTime: string | null;   // arribada al lloc (per començar a muntar)
+  teardownEndTime: string | null; // fi de desmuntatge al lloc
+  returnTime: string | null;    // tornada a casa
+  workHours: number | null;     // jornada total (sortida → tornada), en hores
+}
+
+/**
+ * Jornada d'un bolo (#1364): sortida de casa, arribada al lloc, tornada. Compta 45'
+ * de muntatge abans de l'event i 45' de desmuntatge després, més el temps de ruta
+ * (anada = meitat del round-trip). Retorna null si no hi ha hora d'inici de l'event.
+ */
+export function computeJornada(input: {
+  eventStartTime: string | null;
+  eventEndTime: string | null;
+  roundTripKm: number | null;
+}): Jornada {
+  const startMin = parseHhmmToMin(input.eventStartTime);
+  if (startMin === null) {
+    return { departureTime: null, arrivalTime: null, teardownEndTime: null, returnTime: null, workHours: null };
+  }
+  const km = typeof input.roundTripKm === 'number' && input.roundTripKm > 0 ? input.roundTripKm : 0;
+  const oneWayMin = Math.round((km / JORNADA_AVG_SPEED_KMH / 2) * 60);
+  const endMin = parseHhmmToMin(input.eventEndTime) ?? startMin + DEFAULT_ASSIGNMENT_HOURS * 60;
+  const safeEndMin = endMin > startMin ? endMin : startMin + DEFAULT_ASSIGNMENT_HOURS * 60;
+
+  const arrivalMin = startMin - SETUP_MINUTES;
+  const departureMin = arrivalMin - oneWayMin;
+  const teardownEndMin = safeEndMin + TEARDOWN_MINUTES;
+  const returnMin = teardownEndMin + oneWayMin;
+
+  return {
+    departureTime: minToHhmm(departureMin),
+    arrivalTime: minToHhmm(arrivalMin),
+    teardownEndTime: minToHhmm(teardownEndMin),
+    returnTime: minToHhmm(returnMin),
+    workHours: Math.round(((returnMin - departureMin) / 60) * 100) / 100,
+  };
+}
+
 /** Dos intervals (en minuts) s'encavalquen? */
 export function intervalsOverlap(
   aStart: number,
@@ -394,8 +441,8 @@ export function buildPayoutSummary(
 
 // ─── Loaders (async) ───────────────────────────────────────────────────────────
 
-const LEAD_STATUSES_ACTIVE = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON'] as const;
-const BOOKING_STATUSES_ACTIVE = ['PENDING', 'CONFIRMED', 'PREPARING', 'COMPLETED'] as const;
+export const LEAD_STATUSES_ACTIVE = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON'] as const;
+export const BOOKING_STATUSES_ACTIVE = ['PENDING', 'CONFIRMED', 'PREPARING', 'COMPLETED'] as const;
 
 /** Carrega totes les línies (lead + booking) amb event dins [from, to]. */
 async function loadCrewLines(from: Date, to: Date): Promise<{ lines: CrewLineInput[]; names: Map<string, string> }> {

@@ -40,6 +40,7 @@ import {
   computeSupportableTravelKm,
 } from '@/lib/services/costEngine';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
+import { DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
 import type { ProfitabilityConfig } from '@/lib/services/profitabilityService';
 import { DEFAULT_PROFITABILITY_CONFIG } from '@/lib/services/profitabilityService';
 
@@ -69,7 +70,10 @@ function baseInput(overrides: Record<string, unknown> = {}) {
     extraHours: 1,
     extraHourPrice: 75,
     distanceKm: 80,
-    vehicleCostPerKm: null as number | null,
+    // Fixat a 0.19 explícit (#1364): abans era null i depenia del DEFAULT global, que
+    // ha passat de 0.19 a 0.26 (barem IRPF vigent). Fixar-lo aquí manté els valors
+    // esperats d'aquests tests estables i independents del fallback global.
+    vehicleCostPerKm: 0.19 as number | null,
     travelCost: null as number | null,
     source: null as string | null,
     inventoryCostReal: null as number | null,
@@ -875,7 +879,7 @@ describe('computeSupportableTravelKm', () => {
   });
 
   it('cost/km no vàlid → fallback al cost per km per defecte', () => {
-    expect(computeSupportableTravelKm(38, 0)).toBe(Math.floor(38 / 0.19));
+    expect(computeSupportableTravelKm(38, 0)).toBe(Math.floor(38 / DEFAULT_VEHICLE_COST_PER_KM));
   });
 
   it('cost/km més alt (benzina cara) → menys km assumibles', () => {

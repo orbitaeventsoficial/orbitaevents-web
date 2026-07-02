@@ -1502,12 +1502,14 @@ html.admin-mode .ap-ledger-budget-sum {
   background: color-mix(in oklab, var(--gold) 5%, var(--panel));
 }
 html.admin-mode .ap-ledger-budget-row {
-  display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2);
+  display: flex; align-items: baseline; justify-content: flex-start; gap: var(--o-space-3);
   padding: var(--o-space-1) 0; font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t2);
 }
 html.admin-mode .ap-ledger-budget-row > span { display: flex; flex-direction: column; gap: 0.05rem; font-family: var(--ui); font-size: var(--o-text-sm); color: var(--t2); }
 html.admin-mode .ap-ledger-budget-row > span > em { font-style: normal; color: var(--t3); font-size: var(--o-text-micro); font-family: var(--mono); }
-html.admin-mode .ap-ledger-budget-row > strong { color: var(--t); font-weight: var(--o-fw-bold); font-family: var(--display); font-size: var(--o-text-md); }
+/* Diners a l'ESQUERRA (#1359, ordre del propietari): l'import va primer (order:-1),
+   en columna alineada pels € (text-align:right dins min-width). El label el segueix. */
+html.admin-mode .ap-ledger-budget-row > strong { order: -1; flex: 0 0 auto; min-width: 5.5rem; text-align: right; color: var(--t); font-weight: var(--o-fw-bold); font-family: var(--display); font-size: var(--o-text-md); }
 html.admin-mode .ap-ledger-budget-row--total {
   margin-top: var(--o-space-15); padding-top: var(--o-space-2); border-top: 1px solid color-mix(in oklab, var(--gold) 22%, var(--line));
 }
@@ -1841,6 +1843,10 @@ html.admin-mode .ap-leads-listphase[data-pay="none"] { color: var(--o-danger, va
 html.admin-mode .ap-leads-listnum { text-align: right; font-family: var(--mono); font-weight: var(--o-fw-bold); color: var(--gold); white-space: nowrap; font-variant-numeric: tabular-nums; }
 html.admin-mode .ap-ledger-shade { position: absolute; inset: 0; background: var(--ax-overlay-xl); backdrop-filter: blur(3px); animation: fx-fade 120ms ease both; }
 html.admin-mode .ap-ledger-sheet {
+  --ap-ledger-drawer-gutter: var(--o-space-5);
+  --ap-ledger-drawer-band-y: var(--o-space-25);
+  --ap-ledger-drawer-section-gap: var(--o-space-15);
+  --ap-ledger-drawer-title-gap: var(--o-space-2);
   position: relative; z-index: 1;
   width: min(780px, calc(100vw - 28px)); height: 100dvh; overflow: hidden;
   display: flex; flex-direction: column;
@@ -1889,11 +1895,26 @@ html.admin-mode .ap-ledger-kicker {
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--c);
 }
 html.admin-mode .ap-ledger-kicker::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+html.admin-mode .ap-ledger-hero-main {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--o-space-3);
+  min-width: 0;
+}
 html.admin-mode .ap-ledger-hero h2 {
-  margin: 0; max-width: 100%;
+  margin: 0; max-width: 100%; min-width: 0;
   font-family: var(--display); font-size: var(--o-text-2xl); font-weight: var(--o-fw-xbold);
   letter-spacing: -0.022em; line-height: 1; color: var(--t);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+html.admin-mode .ap-ledger-hero-meta {
+  display: block;
+  margin-top: var(--o-space-1);
+  font-family: var(--mono);
+  font-size: var(--o-text-micro);
+  color: var(--t3);
+  text-transform: uppercase;
 }
 html.admin-mode .ap-ledger-hero p {
   display: block; margin: 3px 0 0; width: 100%; max-width: 100%;
@@ -2131,18 +2152,252 @@ html.admin-mode .ap-ledger-btn--whatsapp:hover:not(:disabled) {
   color: var(--o-success);
   background: color-mix(in oklab, var(--o-success) 16%, var(--raised));
 }
-/* #1014: el botó Correu era blau (--o-info), fora del canon carbó+or. → or (acció).
-   WhatsApp es manté verd (--o-success): reconeixement de marca universal, acceptat. */
+/* Drawer lead: contacte amb codis d'acció reconeixibles.
+   WhatsApp verd; Correu blau d'acció admin. */
 html.admin-mode .ap-ledger-btn--mail {
-  border-color: color-mix(in oklab, var(--gold) 44%, var(--line));
-  background: color-mix(in oklab, var(--gold) 10%, var(--raised));
-  color: var(--gold);
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--gold) 9%, transparent);
+  border-color: color-mix(in oklab, var(--o-info) 44%, var(--line));
+  background: color-mix(in oklab, var(--o-info) 12%, var(--raised));
+  color: var(--o-info);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--o-info) 9%, transparent);
 }
 html.admin-mode .ap-ledger-btn--mail:hover:not(:disabled) {
-  border-color: var(--gold);
+  border-color: var(--o-info);
+  color: var(--o-info);
+  background: color-mix(in oklab, var(--o-info) 16%, var(--raised));
+}
+
+html.admin-mode .ap-ledger-sheet {
+  overflow-y: auto;
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-bar {
+  min-height: 34px;
+  padding: var(--o-space-1) var(--o-space-3);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-back,
+html.admin-mode .ap-ledger-sheet .ap-ledger-close,
+html.admin-mode .ap-ledger-sheet .ap-ledger-full {
+  min-height: 28px;
+  padding-inline: var(--o-space-2);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-close {
+  width: 30px;
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-hero {
+  padding: var(--o-space-25) var(--o-space-35) var(--o-space-15);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-kicker {
+  margin-bottom: var(--o-space-05);
+  font-size: var(--o-text-micro);
+}
+html.admin-mode .ap-ledger-stage-selectwrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  min-width: 8.25rem;
+  max-width: 10rem;
+  border: 1px solid var(--line2);
+  border-radius: var(--o-r-pill);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--t) 8%, transparent), transparent),
+    color-mix(in oklab, var(--raised) 92%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--t) 6%, transparent),
+    0 var(--o-space-05) var(--o-space-2) color-mix(in oklab, var(--ax-overlay-xl) 18%, transparent);
+  transition: border-color 130ms ease, background 130ms ease, box-shadow 130ms ease;
+}
+html.admin-mode .ap-ledger-stage-selectwrap::after {
+  content: "";
+  position: absolute;
+  right: 0.55rem;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-right: 1px solid var(--t2);
+  border-bottom: 1px solid var(--t2);
+  transform: rotate(45deg) translateY(-0.12rem);
+  pointer-events: none;
+  opacity: 0.95;
+}
+html.admin-mode .ap-ledger-stage-select {
+  appearance: none;
+  width: 100%;
+  min-height: 1.65rem;
+  padding: 0 1.5rem 0 var(--o-space-3);
+  border: 0;
+  border-radius: var(--o-r-pill);
+  background: transparent;
+  color: var(--t);
+  font: inherit;
+  font-size: var(--o-text-micro);
+  font-weight: var(--o-fw-bold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+html.admin-mode .ap-ledger-stage-selectwrap:hover {
+  border-color: color-mix(in oklab, var(--gold) 42%, var(--line2));
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--gold) 8%, transparent), transparent),
+    color-mix(in oklab, var(--raised) 94%, transparent);
+}
+html.admin-mode .ap-ledger-stage-select:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+html.admin-mode .ap-ledger-stage-select:focus-visible {
+  outline: none;
+}
+html.admin-mode .ap-ledger-stage-selectwrap:focus-within {
+  border-color: color-mix(in oklab, var(--gold) 56%, var(--line2));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--gold) 9%, transparent),
+    0 0 0 2px color-mix(in oklab, var(--gold) 16%, transparent);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-hero h2 {
+  font-size: var(--o-text-xl-2);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-stats div {
+  padding: var(--o-space-15) var(--o-space-25);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-stats b {
+  font-size: var(--o-text-md);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-stats div:nth-child(1) b,
+html.admin-mode .ap-ledger-sheet .ap-ledger-stats div:nth-child(2) b,
+html.admin-mode .ap-ledger-sheet .ap-ledger-stats div:nth-child(3) b {
   color: var(--gold);
-  background: color-mix(in oklab, var(--gold) 14%, var(--raised));
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-stats div:nth-child(1) {
+  background: color-mix(in oklab, var(--gold) 7%, transparent);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-grid {
+  flex: 0 0 auto;
+  grid-template-rows: none;
+  gap: var(--o-space-25);
+  padding: var(--o-space-3) var(--o-space-35) var(--o-space-4);
+}
+html.admin-mode .ap-ledger-ops {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--o-space-2);
+  padding: var(--o-space-3) var(--o-space-35) var(--o-space-1);
+}
+html.admin-mode .ap-ledger-ops > div {
+  min-width: 0;
+  min-height: 92px;
+  padding: var(--o-space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--o-r-sm-2);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--gold) 6%, transparent), transparent),
+    var(--panel);
+}
+html.admin-mode .ap-ledger-ops span,
+html.admin-mode .ap-ledger-ops em {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: var(--o-text-micro);
+  font-style: normal;
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-ops span {
+  margin-bottom: var(--o-space-1);
+  font-weight: var(--o-fw-bold);
+  text-transform: uppercase;
+}
+html.admin-mode .ap-ledger-ops strong {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--display);
+  font-size: var(--o-text-md);
+  font-weight: var(--o-fw-bold);
+  line-height: 1.1;
+  color: var(--t);
+}
+html.admin-mode .ap-ledger-ops > div:first-child strong,
+html.admin-mode .ap-ledger-ops > div:nth-child(4) strong {
+  color: var(--gold);
+}
+html.admin-mode .ap-ledger-contract-list {
+  display: grid;
+  gap: var(--o-space-15);
+}
+html.admin-mode .ap-ledger-contract-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--o-space-2);
+  min-width: 0;
+  padding-bottom: var(--o-space-15);
+  border-bottom: 1px solid var(--line);
+}
+html.admin-mode .ap-ledger-contract-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+html.admin-mode .ap-ledger-contract-row span,
+html.admin-mode .ap-ledger-contract-row strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html.admin-mode .ap-ledger-contract-row span {
+  color: var(--t);
+  font-weight: var(--o-fw-semi);
+}
+html.admin-mode .ap-ledger-contract-row strong {
+  flex: 0 1 auto;
+  font-family: var(--mono);
+  font-size: var(--o-text-xs);
+  color: var(--gold);
+}
+html.admin-mode .ap-ledger-contract-more {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: var(--o-text-xs);
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-panel {
+  padding: var(--o-space-35) var(--o-space-4);
+  gap: var(--o-space-2);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-panelhead {
+  margin-bottom: var(--o-space-1);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-panelhead span {
+  font-size: var(--o-text-sm);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-rows--contact {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--o-space-05) var(--o-space-1);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-panel--contact {
+  grid-column: 1 / -1;
+  padding-block: var(--o-space-3);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-panel--contact .ap-ledger-panelhead {
+  display: none;
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-panel--contact .ap-ledger-rows--contact dd {
+  font-size: var(--o-text-sm);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-panel--contact .ap-ledger-rows--contact dt {
+  font-size: var(--o-text-micro);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-panel--contact .ap-ledger-actions--contact {
+  margin-top: var(--o-space-2);
+}
+html.admin-mode .ap-ledger-sheet .ap-ledger-panel--contact .ap-ledger-actions--contact .ap-btn {
+  min-height: 26px;
+  padding-inline: var(--o-space-2);
 }
 
 html.admin-mode .ap-ledger-stagepick { display: grid; grid-template-columns: 1fr 1fr; gap: var(--o-space-2); }
@@ -2217,7 +2472,13 @@ html.admin-mode .ap-leads-lostmodal-h {
   html.admin-mode .ap-ledger-stats { grid-template-columns: 1fr 1fr; }
   html.admin-mode .ap-ledger-stats div:nth-child(even) { border-right: 0; }
   html.admin-mode .ap-ledger-stats div:nth-child(n+3) { border-top: 1px solid var(--line); }
+  html.admin-mode .ap-ledger-ops { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-inline: var(--o-space-3); }
+  html.admin-mode .ap-ledger-phase-strip { padding-inline: var(--o-space-3); }
   html.admin-mode .ap-ledger-grid { grid-template-columns: 1fr; padding: var(--o-space-3); }
+}
+@media (max-width: 520px) {
+  html.admin-mode .ap-ledger-ops { grid-template-columns: 1fr; }
+  html.admin-mode .ap-ledger-contract-row { align-items: flex-start; flex-direction: column; }
 }
 html.admin-mode .ap-ledger-fullpage[data-stage="contactat"] { --c: var(--o-stage-contacted); --strong: var(--o-stage-contacted-strong, var(--o-stage-contacted)); }
 html.admin-mode .ap-ledger-fullpage[data-stage="guanyat"]   { --c: var(--o-stage-won);       --strong: var(--o-stage-won-strong,       var(--o-stage-won)); }
@@ -3210,3 +3471,53 @@ html.admin-mode .ap-leads-lanetitle small.ap-leads-lane-forecast { display: bloc
 html.admin-mode .ap-ledger-navlink { color: var(--gold); font-weight: var(--o-fw-semi); white-space: nowrap; }
 html.admin-mode .ap-ledger-departtime { font-weight: var(--o-fw-bold); color: var(--gold); }
 html.admin-mode .ap-ledger-departhint { font-size: var(--o-text-2xs); color: var(--t3); }
+
+/* Drawer ràpid de leads: un sol gutter de component, derivat dels tokens globals. */
+html.admin-mode .ap-ledger-fullpage .ap-ledger-sheet .ap-ledger-hero,
+html.admin-mode .ap-ledger-sheet .ap-ledger-hero {
+  padding: var(--o-space-4) var(--ap-ledger-drawer-gutter) var(--ap-ledger-drawer-band-y);
+}
+
+html.admin-mode .ap-ledger-fullpage .ap-ledger-sheet .ap-ledger-kicker,
+html.admin-mode .ap-ledger-sheet .ap-ledger-kicker {
+  margin-bottom: var(--ap-ledger-drawer-title-gap);
+}
+
+html.admin-mode .ap-ledger-fullpage .ap-ledger-sheet .ap-ledger-kicker--stage,
+html.admin-mode .ap-ledger-sheet .ap-ledger-kicker--stage {
+  margin-bottom: 0;
+}
+
+html.admin-mode .ap-ledger-fullpage .ap-ledger-sheet .ap-ledger-kicker--stage::before,
+html.admin-mode .ap-ledger-sheet .ap-ledger-kicker--stage::before {
+  content: none;
+}
+
+html.admin-mode .ap-ledger-fullpage .ap-ledger-sheet .ap-ledger-stats div,
+html.admin-mode .ap-ledger-sheet .ap-ledger-stats div {
+  padding-block: var(--ap-ledger-drawer-band-y);
+  padding-inline: var(--ap-ledger-drawer-gutter);
+}
+
+html.admin-mode .ap-ledger-fullpage .ap-ledger-sheet .ap-ledger-stats,
+html.admin-mode .ap-ledger-sheet .ap-ledger-stats {
+  margin: var(--ap-ledger-drawer-section-gap) var(--ap-ledger-drawer-gutter) 0;
+  border: 1px solid var(--line);
+  border-radius: var(--o-r-sm-2);
+  overflow: hidden;
+}
+
+html.admin-mode .ap-ledger-fullpage .ap-ledger-sheet .ap-ledger-stats div,
+html.admin-mode .ap-ledger-sheet .ap-ledger-stats div {
+  padding-inline: var(--o-space-3);
+}
+
+html.admin-mode .ap-ledger-fullpage .ap-ledger-sheet .ap-ledger-ops,
+html.admin-mode .ap-ledger-sheet .ap-ledger-ops {
+  padding-inline: var(--ap-ledger-drawer-gutter);
+}
+
+html.admin-mode .fxd > .ap-ledger-sheet > .ap-ledger-grid--drawer {
+  gap: var(--o-space-25);
+  padding: var(--o-space-3) var(--ap-ledger-drawer-gutter) var(--o-space-4);
+}

@@ -79,12 +79,33 @@ interface PartnerHubData {
   products: PartnerProduct[];
 }
 
-type TabKey = 'resum' | 'membres' | 'passa' | 'cataleg' | 'economia' | 'notes';
+interface PayoutBolo {
+  origin: 'lead' | 'booking';
+  parentId: string;
+  parentRef: string;
+  dateKey: string | null;
+  status: 'PREVI' | 'ENTREGAT' | 'PAGAT';
+  amount: number;
+  paidAt: string | null;
+  paymentId: string | null;
+  paymentMethod: string | null;
+}
+interface PayoutMonth { month: string; previ: number; aPagar: number; pagat: number }
+export interface CollaboratorPayoutData {
+  collaboratorId: string;
+  collaboratorName: string;
+  totals: { previ: number; aPagar: number; pagat: number };
+  bolos: PayoutBolo[];
+  months: PayoutMonth[];
+}
+
+type TabKey = 'resum' | 'membres' | 'passa' | 'pasta' | 'cataleg' | 'economia' | 'notes';
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'resum', label: 'Resum' },
   { key: 'membres', label: 'Equip / membres' },
   { key: 'passa', label: 'Bolos que ens passa' },
+  { key: 'pasta', label: 'Pasta' },
   { key: 'cataleg', label: 'Material i catàleg' },
   { key: 'economia', label: 'Economia' },
   { key: 'notes', label: 'Notes i contacte' },
@@ -98,14 +119,45 @@ function Empty({ text }: { text: string }) {
   return <p className="ap-muted text-sm py-4">{text}</p>;
 }
 
-export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
+export default function PartnerHubClient({ data, payout }: { data: PartnerHubData; payout: CollaboratorPayoutData | null }) {
   const router = useRouter();
   const toast = useToast();
   const [tab, setTab] = useState<TabKey>('resum');
   const [newName, setNewName] = useState('');
   const [newRole, setNewRole] = useState('OTHER');
   const [adding, setAdding] = useState(false);
+  const [payingId, setPayingId] = useState<string | null>(null);
   const { partner, economics } = data;
+
+  async function togglePayment(bolo: PayoutBolo) {
+    setPayingId(bolo.parentId);
+    try {
+      if (bolo.status === 'PAGAT' && bolo.paymentId) {
+        const res = await fetchWithCsrf(`/api/admin/collaborators/${partner.id}/payments?paymentId=${encodeURIComponent(bolo.paymentId)}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('delete');
+        toast.success('Pagament desfet.');
+      } else {
+        const res = await fetchWithCsrf(`/api/admin/collaborators/${partner.id}/payments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bookingId: bolo.origin === 'booking' ? bolo.parentId : null,
+            leadId: bolo.origin === 'lead' ? bolo.parentId : null,
+            amount: bolo.amount,
+            method: 'CASH',
+          }),
+        });
+        if (!res.ok) throw new Error('pay');
+        toast.success('Marcat com a pagat (avui, cash).');
+      }
+      router.refresh();
+    } catch (e) {
+      console.error('[partner-payout] togglePayment', e);
+      toast.error('Error registrant el pagament.');
+    } finally {
+      setPayingId(null);
+    }
+  }
 
   async function addMember() {
     if (!newName.trim()) { toast.error('El nom és obligatori'); return; }
@@ -280,6 +332,82 @@ export default function PartnerHubClient({ data }: { data: PartnerHubData }) {
                 ))}
               </tbody>
             </table>
+          )}
+        </section>
+      )}
+
+      {tab === 'pasta' && (
+        <section className="ap-card p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="ap-h2">Pasta · què li devem</h2>
+            <Link href={`/api/admin/collaborators/${partner.id}/payout-pdf`} target="_blank" rel="noopener noreferrer" className="ap-btn ap-btn--xs">PDF liquidació</Link>
+          </div>
+          {!payout || payout.bolos.length === 0 ? (
+            <Empty text="Aquest col·laborador encara no té bolos amb pasta assignada." />
+          ) : (
+            <>
+              <div className="ap-kpi-row mb-4">
+                <div className="ap-kpi"><span className="ap-kpi-label">Previst (futur)</span><span className="ap-kpi-value">{formatCurrency(payout.totals.previ)}</span></div>
+                <div className="ap-kpi ap-kpi--warning"><span className="ap-kpi-label">A pagar (entregat)</span><span className="ap-kpi-value">{formatCurrency(payout.totals.aPagar)}</span></div>
+                <div className="ap-kpi ap-kpi--success"><span className="ap-kpi-label">Pagat (històric)</span><span className="ap-kpi-value">{formatCurrency(payout.totals.pagat)}</span></div>
+              </div>
+
+              {payout.months.length > 0 && (
+                <div className="mb-4">
+                  <h3 className="text-sm font-semibold mb-2">Per mes</h3>
+                  <div className="flex min-h-20 items-end gap-2 overflow-x-auto pb-2">
+                    {payout.months.map((m) => {
+                      const total = m.previ + m.aPagar + m.pagat;
+                      const max = Math.max(...payout.months.map((x) => x.previ + x.aPagar + x.pagat), 1);
+                      const h = (v: number) => `${Math.round((v / max) * 64)}px`;
+                      return (
+                        <div key={m.month} className="flex w-12 shrink-0 flex-col items-center gap-1">
+                          <div className="flex w-full flex-col-reverse" title={`${m.month}: ${formatCurrency(total)}`}>
+                            <div className="admin-tone-bg-success" style={{ height: h(m.pagat) }} />
+                            <div className="admin-tone-bg-warning" style={{ height: h(m.aPagar) }} />
+                            <div className="bg-[var(--line2)]" style={{ height: h(m.previ) }} />
+                          </div>
+                          <span className="ap-muted text-[length:var(--o-text-2xs)]">{m.month.slice(5)}/{m.month.slice(2, 4)}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <p className="ap-muted text-[length:var(--o-text-2xs)]">Verd = pagat · ambre = a pagar · gris = previst</p>
+                </div>
+              )}
+
+              <table className="w-full text-sm">
+                <thead><tr className="text-left ap-muted"><th scope="col" className="py-2">Bolo</th><th scope="col">Data</th><th scope="col">Estat</th><th scope="col" className="text-right">Pasta</th><th scope="col"></th></tr></thead>
+                <tbody>
+                  {payout.bolos.map((bolo) => (
+                    <tr key={bolo.parentId}>
+                      <td className="py-2">
+                        <Link href={bolo.origin === 'booking' ? buildBookingHref(bolo.parentId) : buildLeadWorkspaceHref(bolo.parentId)} className="ap-link">{bolo.parentRef}</Link>
+                      </td>
+                      <td>{bolo.dateKey ? formatDate(new Date(bolo.dateKey)) : '—'}</td>
+                      <td>
+                        <span className={`ap-badge ${bolo.status === 'PAGAT' ? 'admin-tone-text-success' : bolo.status === 'ENTREGAT' ? 'admin-tone-text-warning' : ''}`}>
+                          {bolo.status === 'PAGAT' ? 'Pagat' : bolo.status === 'ENTREGAT' ? 'A pagar' : 'Previst'}
+                        </span>
+                      </td>
+                      <td className="text-right tabular-nums font-semibold">{formatCurrency(bolo.amount)}</td>
+                      <td className="text-right">
+                        {bolo.status !== 'PREVI' && (
+                          <button
+                            type="button"
+                            className={`ap-btn ap-btn--xs ${bolo.status === 'PAGAT' ? '' : 'ap-btn--primary'}`}
+                            disabled={payingId === bolo.parentId}
+                            onClick={() => togglePayment(bolo)}
+                          >
+                            {payingId === bolo.parentId ? '…' : bolo.status === 'PAGAT' ? 'Desfer' : 'Marcar pagat'}
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
           )}
         </section>
       )}

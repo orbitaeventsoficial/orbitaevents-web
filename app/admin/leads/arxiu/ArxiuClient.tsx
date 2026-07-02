@@ -95,7 +95,7 @@ export default function ArxiuClient({ list, stats, pageSize, currentPage, filter
                       style={{ width: `${reasonMax === 0 ? 0 : (r.count / reasonMax) * 100}%` }}
                     />
                   </span>
-                  <span className="whitespace-nowrap text-right font-mono text-[var(--o-text-2xs)] text-[var(--t2)]">
+                  <span className="max-w-[8rem] truncate whitespace-nowrap text-right font-mono text-[var(--o-text-2xs)] text-[var(--t2)]">
                     {r.count} · {r.percentage}%
                   </span>
                 </li>
@@ -125,7 +125,7 @@ export default function ArxiuClient({ list, stats, pageSize, currentPage, filter
                         style={{ width: `${wonPct}%` }}
                       />
                     </span>
-                    <span className="whitespace-nowrap text-right font-mono text-xs text-[var(--t2)]">
+                    <span className="max-w-[12rem] truncate whitespace-nowrap text-right font-mono text-xs text-[var(--t2)]">
                       {m.lost} perduts · {m.won} guanyats
                     </span>
                   </li>
@@ -238,7 +238,7 @@ export default function ArxiuClient({ list, stats, pageSize, currentPage, filter
                   <td>{eventTypeLabel(r.eventType)}{r.eventLocation ? <><br /><small className="text-[var(--t3)]">{r.eventLocation}</small></> : null}</td>
                   <td>{sourceLabel(r.source)}</td>
                   <td>{reasonLabel(r.lostReason)}</td>
-                  <td className="whitespace-nowrap font-mono">{r.estimatedValue ? euro(r.estimatedValue) : '—'}</td>
+                  <td className="max-w-[8rem] overflow-hidden text-ellipsis whitespace-nowrap font-mono">{r.estimatedValue ? euro(r.estimatedValue) : '—'}</td>
                   <td><small className="text-[var(--t3)]">{formatDateUTC(r.archivedAt)}</small><br /><small className="italic text-[var(--t3)]">{r.archivedBy === 'admin' ? 'manual' : 'auto'}</small></td>
                 </tr>
               ))

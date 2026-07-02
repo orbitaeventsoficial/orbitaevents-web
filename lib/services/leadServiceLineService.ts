@@ -92,6 +92,7 @@ export async function replaceLeadServiceLines(
   leadId: string,
   inputLines: LeadServiceLineInput[],
   distanceKm?: number | null,
+  tollsEur?: number | null,
 ) {
   const lead = await prisma.lead.findUnique({
     where: { id: leadId },
@@ -105,6 +106,13 @@ export async function replaceLeadServiceLines(
       ? Math.round(distanceKm * 10) / 10
       : null;
     await prisma.lead.update({ where: { id: leadId }, data: { distanceKm: km } });
+  }
+  // Peatges de la ruta (#1364): cost real que no deriva dels km.
+  if (tollsEur !== undefined) {
+    const tolls = typeof tollsEur === 'number' && Number.isFinite(tollsEur) && tollsEur > 0
+      ? Math.round(tollsEur * 100) / 100
+      : null;
+    await prisma.lead.update({ where: { id: leadId }, data: { tollsEur: tolls } });
   }
 
   const clean = (Array.isArray(inputLines) ? inputLines : [])

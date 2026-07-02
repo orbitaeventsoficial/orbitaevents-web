@@ -160,12 +160,17 @@ export default function BookingServiceLinesSection({
     const p = partnerProducts.find((x) => x.id === id);
     if (!p) return;
     // Si el producte porta tècnic de so intrínsec, el separem com a línia pròpia
-    // (cost SOUND_TECH_PRICE) perquè es pugui triar qui el cobra: el proveïdor
-    // (per defecte) o Òrbita. El total no canvia: el producte baixa el cost del
-    // tècnic i la línia de tècnic el recupera.
+    // per poder triar qui el fa (#1362, model del propietari):
+    // - El producte (Bingo) manté el seu cost SENCER (200): és producte del proveïdor
+    //   que Òrbita li contracta i revèn (200→240, +40 marge).
+    // - El tècnic (40€) SEMPRE existeix i el cobra Masquerade (collaboratorId = proveïdor):
+    //     · el fa Masquerade → cost 0 (ja va inclòs dins els seus 200).
+    //     · el fa Òrbita → cost −40 (Masquerade PAGA els 40 a Òrbita) → marge +40 extra.
+    //   El client sempre paga el mateix (el tècnic no és ingrés de client, és liquidació
+    //   entre Masquerade i Òrbita). Per defecte el fa el proveïdor (cost 0).
     const hasTech = partnerProductRequiresSoundTech({ name: p.name, crew: p.crew });
     const crewMembers = countCrewMembers(p.crew);
-    const productCost = hasTech ? Math.max(0, p.costPrice - SOUND_TECH_PRICE) : p.costPrice;
+    const productCost = p.costPrice;
     // Una línia de lloguer de material (col·laborador EQUIPMENT_RENTAL, p.ex. Tino)
     // és `EQUIPMENT`: això activa el transport d'anar a buscar-lo al càlcul del bolo.
     // La resta de proveïdors presencials (Masquerade) són `PROVIDER_SERVICE`.
@@ -184,11 +189,11 @@ export default function BookingServiceLinesSection({
       return;
     }
     const techLine: BookingServiceLineFormInput = {
-      collaboratorId: p.collaboratorId, // per defecte el tècnic el posa el proveïdor
+      collaboratorId: p.collaboratorId, // SEMPRE el proveïdor (Masquerade): és qui cobra o qui paga el tècnic
       kind: 'SOUND_TECH',
       label: `Tècnic de so inclòs · ${SOUND_TECH_DURATION}`,
-      revenueAmount: 0, // ja inclòs al PVP del producte
-      costAmount: SOUND_TECH_PRICE,
+      revenueAmount: 0, // no és ingrés de client (ja inclòs al PVP del producte)
+      costAmount: 0, // per defecte el fa el proveïdor → cap cost extra (ja va dins els seus 200)
       quantity: 1,
       travelHeadcount: 1,
     };
@@ -300,17 +305,21 @@ export default function BookingServiceLinesSection({
                       />
                       <select
                         className={SL_PAYER}
-                        value={row.techLine.collaboratorId ?? ''}
-                        onChange={(e) => update(row.techIdx, { collaboratorId: e.target.value || undefined })}
-                        aria-label="Qui cobra el tècnic de so inclòs"
-                        title="Qui posa (i cobra) el tècnic de so inclòs"
+                        value={(row.techLine.costAmount ?? 0) < 0 ? 'orbita' : 'provider'}
+                        onChange={(e) => {
+                          // #1362 (model del propietari): el tècnic SEMPRE el cobra/paga el proveïdor
+                          // del producte (collaboratorId fix). El selector només decideix QUI el fa:
+                          //  · proveïdor → cost 0 (va inclòs dins els seus 200).
+                          //  · Òrbita → cost −40 (Masquerade PAGA els 40 a Òrbita) → +40 de marge teu.
+                          update(row.techIdx, { costAmount: e.target.value === 'orbita' ? -SOUND_TECH_PRICE : 0 });
+                        }}
+                        aria-label="Qui fa el tècnic de so inclòs"
+                        title="Qui fa el tècnic de so (el cobra/paga sempre el proveïdor del producte)"
                       >
-                        <option value="">Tècnic: Òrbita (jo)</option>
-                        {soundTechPayers.map((p) => (
-                          <option key={p.id} value={p.id}>Tècnic: {p.name}</option>
-                        ))}
+                        <option value="provider">Tècnic: {soundTechPayers.find((sp) => sp.id === row.techLine.collaboratorId)?.name ?? 'proveïdor'}</option>
+                        <option value="orbita">Tècnic: Òrbita (jo)</option>
                       </select>
-                      <span className={SL_READONLY} title="Cost del tècnic inclòs al producte; es paga a qui indiqui el selector.">{row.techLine.costAmount ?? SOUND_TECH_PRICE}€</span>
+                      <span className={SL_READONLY} title={(row.techLine.costAmount ?? 0) < 0 ? 'El tècnic el fas tu: Masquerade et paga els 40€ (ingrés teu).' : 'El tècnic el fa el proveïdor: va inclòs dins el seu preu.'}>{(row.techLine.costAmount ?? 0) < 0 ? `+${SOUND_TECH_PRICE}€ teu` : 'inclòs'}</span>
                       <input
                         className={SL_QTY} type="number" min={1} placeholder="Qt"
                         value={line.quantity ?? 1}
@@ -340,19 +349,21 @@ export default function BookingServiceLinesSection({
                   {line.kind === 'SOUND_TECH' && (
                     <select
                       className={SL_PAYER}
-                      value={line.collaboratorId ?? ''}
-                      onChange={(e) => update(idx, { collaboratorId: e.target.value || undefined })}
-                      aria-label="Qui cobra el tècnic de so"
-                      title="Qui posa (i cobra) el tècnic de so"
+                      value={(line.costAmount ?? 0) < 0 ? 'orbita' : 'provider'}
+                      onChange={(e) => {
+                        // #1362: el tècnic el cobra/paga el proveïdor (collaboratorId fix); el selector
+                        // tria qui el fa → proveïdor cost 0, Òrbita cost −40 (Masquerade et paga).
+                        update(idx, { costAmount: e.target.value === 'orbita' ? -SOUND_TECH_PRICE : 0 });
+                      }}
+                      aria-label="Qui fa el tècnic de so"
+                      title="Qui fa el tècnic de so (el cobra/paga el proveïdor del producte)"
                     >
-                      <option value="">Tècnic: Òrbita (jo)</option>
-                      {soundTechPayers.map((p) => (
-                        <option key={p.id} value={p.id}>Tècnic: {p.name}</option>
-                      ))}
+                      <option value="provider">Tècnic: {soundTechPayers.find((sp) => sp.id === line.collaboratorId)?.name ?? 'proveïdor'}</option>
+                      <option value="orbita">Tècnic: Òrbita (jo)</option>
                     </select>
                   )}
-                  {line.kind === 'SOUND_TECH' && line.costAmount != null ? (
-                    <span className={SL_READONLY} title={line.collaboratorId ? 'Cost del tècnic inclòs al producte; es paga al proveïdor seleccionat.' : 'Cost intern del tècnic inclòs al producte; queda assignat a Òrbita.'}>{line.costAmount}€</span>
+                  {line.kind === 'SOUND_TECH' ? (
+                    <span className={SL_READONLY} title={(line.costAmount ?? 0) < 0 ? 'El tècnic el fas tu: Masquerade et paga els 40€ (ingrés teu).' : 'El tècnic el fa el proveïdor: va inclòs dins el seu preu.'}>{(line.costAmount ?? 0) < 0 ? `+${SOUND_TECH_PRICE}€ teu` : 'inclòs'}</span>
                   ) : line.collaboratorId ? (
                     <span className={SL_NOTE} title="El cost a pagar al partner es gestiona a la seva fitxa">cost</span>
                   ) : (line.kind === 'DJ' || line.kind === 'EQUIPMENT') ? (

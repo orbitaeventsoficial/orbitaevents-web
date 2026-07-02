@@ -85,6 +85,8 @@ function entryToLead(e: SeasonCalendarEntry, weather: EventWeather | null): Lead
     channel: kind === 'lead' ? sourceLabel(e.source) : '',
     owner: kind === 'lead' ? (e.assignedTo ?? '') : '',
     last: kind === 'lead' ? relativeLastContact(e.contactedAt) : '',
+    distanceKm: e.distanceKm ?? null,
+    serviceLines: e.serviceLines,
     booking: e.booking,
     wx: weather
       ? { kind: weather.kind, tmax: weather.tempMax, tmin: weather.tempMin, forecast: true }

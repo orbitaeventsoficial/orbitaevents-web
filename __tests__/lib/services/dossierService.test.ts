@@ -9,6 +9,9 @@ const { mockPrisma, mockSendEmail, mockBuildHtml } = vi.hoisted(() => ({
       delete: vi.fn(),
       update: vi.fn(),
     },
+    lead: {
+      findUnique: vi.fn(),
+    },
     $executeRaw: vi.fn(),
     $queryRaw: vi.fn(),
   },
@@ -56,6 +59,7 @@ import {
   getDossiersByLead,
   getDossierById,
   getAllDossiers,
+  getDossierLeadInitialData,
   softDeleteDossier,
   restoreDossier,
   purgeDossier,
@@ -107,6 +111,38 @@ describe('createDossier', () => {
     await createDossier({ nom: 'Test', productIds: [] });
     expect(mockPrisma.dossier.create).toHaveBeenCalledWith({
       data: expect.objectContaining({ leadId: null, empresa: null }),
+    });
+  });
+});
+
+describe('getDossierLeadInitialData', () => {
+  it('precarrega dades completes del lead per obrir un dossier vinculat', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({
+      id: 'lead-estel',
+      name: 'Estel Giralt',
+      email: 'estel.giralt@gmail.com',
+      phone: '661431040',
+      eventType: 'BIRTHDAY',
+      eventDate: new Date('2026-07-25T12:00:00.000Z'),
+      eventStartTime: '21:00',
+      eventEndTime: '23:00',
+        eventLocation: 'Dosrius',
+        eventAddress: null,
+        guestCount: 30,
+        message: 'Adreça: Canyamars\nDJ 2 hores aniversari del seu marit',
+    });
+
+    const result = await getDossierLeadInitialData('lead-estel');
+
+    expect(mockPrisma.lead.findUnique).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 'lead-estel' },
+    }));
+    expect(result).toEqual({
+      id: 'lead-estel',
+      nom: 'Estel Giralt',
+      email: 'estel.giralt@gmail.com',
+      telefon: '661431040',
+      eventDesc: 'Aniversari · 2026-07-25 · 21:00-23:00 · Canyamars · 30 pax · DJ 2 hores aniversari del seu marit',
     });
   });
 });

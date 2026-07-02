@@ -21,15 +21,15 @@ import { useToast } from '@/app/admin/components/ToastProvider';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildLeadComposeHref, buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { LEAD_LOST_REASON_LABELS, isLeadLostReason } from '@/lib/constants/leadLoss';
-import { formatCurrency, LEAD_SCORING_STATUS_PROBABILITY, OPEN_PIPELINE_STATUSES } from '@/lib/constants';
+import { formatCurrency, formatNumber, LEAD_SCORING_STATUS_PROBABILITY, OPEN_PIPELINE_STATUSES } from '@/lib/constants';
 import { buildWazeUrl, buildEventLogistics } from '@/lib/admin/eventLogistics';
 import LeadLostStatusPrompt from './LeadLostStatusPrompt';
 import { patchLeadStatus, type LeadStatus } from './leadStatusClient';
 import { buildLeadWhatsAppHref } from './leadWhatsApp';
 import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
-import { SERVICE_HOURLY_RATES, resolveServicePricingKey } from '@/lib/constants/pricing-intelligence';
 import { getPaymentBand } from '@/lib/payment-status';
+import { calculateClientTravelCharge, deriveTravelHeadcount } from '@/lib/services/travelLaborCost';
 
 /* ── Tipus ──────────────────────────────────────────────────────────────── */
 
@@ -46,7 +46,24 @@ export type LeadData = {
   email: string | null;
   priority: LeadPriority;
   channel: string; owner: string; last: string;
-  booking: { id: string; reference: string; status: string; depositPaid: boolean; remainingPaid: boolean; distanceKm: number | null } | null;
+  distanceKm: number | null;
+  serviceLines: {
+    id: string;
+    label: string;
+    revenueAmount: number | null;
+    costAmount: number | null;
+    quantity: number | null;
+    hours: number | null;
+    notes: string | null;
+  }[];
+  booking: {
+    id: string;
+    reference: string;
+    status: string;
+    depositPaid: boolean;
+    remainingPaid: boolean;
+    distanceKm: number | null;
+  } | null;
   wx: WxData;
 };
 
@@ -128,6 +145,54 @@ function durationLabel(start: string, end: string): string {
   const minutes = total % 60;
   if (minutes === 0) return `${hours} h`;
   return `${hours} h ${minutes} min`;
+}
+function minutesLabel(minutes: number): string {
+  if (!minutes || minutes <= 0) return '—';
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  if (hours <= 0) return `${rest} min`;
+  if (rest === 0) return `${hours} h`;
+  return `${hours} h ${rest} min`;
+}
+function isTravelCostLine(line: { notes?: string | null }): boolean {
+  return Boolean(line.notes?.includes('[travel-cost]'));
+}
+function contractedLines(lead: LeadData): LeadData['serviceLines'] {
+  return lead.serviceLines.filter((line) => !isTravelCostLine(line));
+}
+function lineAmount(line: LeadData['serviceLines'][number]): number | null {
+  const unit = typeof line.revenueAmount === 'number' ? line.revenueAmount : null;
+  if (unit === null) return null;
+  return unit * (line.quantity || 1);
+}
+function leadDisplayValue(lead: LeadData): number {
+  if (lead.value > 0) return lead.value;
+  return contractedLines(lead).reduce((sum, line) => sum + (lineAmount(line) ?? 0), 0);
+}
+function serviceLineMeta(line: LeadData['serviceLines'][number]): string {
+  const bits: string[] = [];
+  if (line.quantity && line.quantity > 1) bits.push(`x${line.quantity}`);
+  if (line.hours && line.hours > 0) bits.push(`${formatNumber(line.hours, { maximumFractionDigits: 1 })} h`);
+  const amount = lineAmount(line);
+  if (amount !== null && amount > 0) bits.push(formatCurrency(amount));
+  return bits.join(' · ');
+}
+function contractedSummary(lead: LeadData): string {
+  const lines = contractedLines(lead);
+  if (lines.length === 0) return lead.product || lead.type || 'Contractació pendent';
+  const [first, second] = lines;
+  if (!second) return first.label;
+  return `${first.label} + ${lines.length - 1} més`;
+}
+function meaningfulLeadType(type: string): string | null {
+  const value = type.trim();
+  if (!value || value.toLowerCase() === 'altre') return null;
+  return value;
+}
+function meaningfulLeadChannel(channel: string): string | null {
+  const value = channel.trim();
+  if (!value || value.toLowerCase() === 'altre') return null;
+  return value;
 }
 function leadSummary(lead: LeadData) {
   if (lead.stage === 'nou') return lead.channel ? `Entrat per ${lead.channel}. Cal primer contacte.` : 'Cal primer contacte.';
@@ -265,35 +330,6 @@ type MonthBlock = {
   slots: CalSlot[];
 };
 
-function parseBillableHours(time: string, endTime: string): number {
-  const [sh, sm] = time.split(':').map(Number);
-  const [eh, em] = endTime.split(':').map(Number);
-  if (![sh, sm, eh, em].every(Number.isFinite)) return 0;
-  const startMin = sh * 60 + sm;
-  let endMin = eh * 60 + em;
-  if (endMin <= startMin) endMin += 24 * 60;
-  return (endMin - startMin) / 60;
-}
-
-function PriceHint({ value, time, endTime, type }: { value: number; time: string; endTime: string; type: string }) {
-  if (!value || !time || !endTime) return null;
-  const hours = parseBillableHours(time, endTime);
-  if (hours <= 0) return null;
-  const key = resolveServicePricingKey({ eventType: type });
-  const rate = SERVICE_HOURLY_RATES[key];
-  const perHour = Math.round((value / hours) * 10) / 10;
-  const devPct = Math.round(((perHour - rate.recommended) / rate.recommended) * 100);
-  const level = perHour < rate.min ? 'critical' : perHour < rate.recommended ? 'warn' : 'ok';
-  const sign = devPct >= 0 ? '+' : '';
-  return (
-    <div className="ap-ledger-pricehint" data-level={level}>
-      <span className="ap-ledger-ph-rate">{perHour}€/h</span>
-      <span className="ap-ledger-ph-dev">{sign}{devPct}% vs mercat</span>
-      <span className="ap-ledger-ph-rec">Recomanat: {rate.recommended}€/h</span>
-    </div>
-  );
-}
-
 function BookingInlineActions({ lead }: { lead: LeadData }) {
   const booking = lead.booking;
   if (!booking) return null;
@@ -333,13 +369,25 @@ function LeadDetailPanel({
   const editable = lead.kind === 'lead' && lead.realStatus !== null;
   const pay = paymentState(lead.booking);
   const reason = lostReasonLabel(lead.lostReason);
-  const nextStage: Stage | null = lead.stage === 'nou'
-    ? 'contactat'
-    : lead.stage === 'contactat'
-      ? 'guanyat'
-      : lead.stage === 'perdut'
-        ? 'nou'
-        : null;
+  const lines = contractedLines(lead);
+  const distanceKm = lead.booking?.distanceKm ?? lead.distanceKm;
+  const displayValue = leadDisplayValue(lead);
+  // Càrrec de transport al client (#1363): cost real dues potes (cotxe/km + gent/hores).
+  const travelCharge = distanceKm ? calculateClientTravelCharge(distanceKm, deriveTravelHeadcount(lines)) : 0;
+  const clientTotal = displayValue + travelCharge;
+  const oneWayDistanceKm = distanceKm ? distanceKm / 2 : null;
+  const logistics = buildEventLogistics({
+    phone: lead.phone,
+    address: lead.location,
+    distanceKm: oneWayDistanceKm,
+    eventStartTime: lead.time || null,
+  });
+  const roundTripTravelMinutes = logistics.travelMinutes > 0 ? logistics.travelMinutes * 2 : 0;
+  const routeHours = roundTripTravelMinutes > 0
+    ? formatNumber(roundTripTravelMinutes / 60, { maximumFractionDigits: 1 })
+    : null;
+  const typeLabel = meaningfulLeadType(lead.type);
+  const channelLabel = meaningfulLeadChannel(lead.channel);
 
   return (
     <div className="fxd" data-stage={lead.stage} role="dialog" aria-modal="true" aria-label={`Fitxa de ${lead.name}`}>
@@ -352,8 +400,29 @@ function LeadDetailPanel({
         </header>
 
         <section className="ap-ledger-hero">
-          <span className="ap-ledger-kicker">{STAGE_LABEL[lead.stage]} · {lead.type}</span>
-          <h2>{lead.name}</h2>
+          <div className="ap-ledger-hero-main">
+            <h2>{lead.name}</h2>
+            <span className="ap-ledger-kicker ap-ledger-kicker--stage">
+              {editable ? (
+                <span className="ap-ledger-stage-selectwrap">
+                  <select
+                    className="ap-ledger-stage-select"
+                    aria-label="Canviar fase del lead"
+                    value={lead.stage}
+                    disabled={pending}
+                    onChange={(event) => onMoveLead(lead.id, event.target.value as Stage)}
+                  >
+                    {PIPELINE_STAGES.map((stage) => (
+                      <option key={stage} value={stage}>{STAGE_LABEL[stage]}</option>
+                    ))}
+                  </select>
+                </span>
+              ) : (
+                <span>{STAGE_LABEL[lead.stage]}</span>
+              )}
+            </span>
+          </div>
+          {typeLabel && <span className="ap-ledger-hero-meta">{typeLabel}</span>}
           {reason && <span className="ap-ledger-lost">{reason}</span>}
           {lead.wx.forecast && (
             <span className="ap-ledger-wxrow">
@@ -364,71 +433,85 @@ function LeadDetailPanel({
         </section>
 
         <div className="ap-ledger-stats">
-          <div><span>Valor</span><b>{lead.value ? formatCurrency(lead.value) : '—'}</b></div>
-          <div><span>Durada</span><b>{durationLabel(lead.time, lead.endTime)}</b></div>
-          <div><span>Prioritat</span><b>{PRIORITY_LABEL[lead.priority]}</b></div>
+          <div><span>Total client</span><b>{clientTotal ? formatCurrency(clientTotal) : '—'}</b></div>
+          <div><span>Contractat</span><b>{displayValue ? formatCurrency(displayValue) : '—'}</b></div>
+          <div><span>Transport</span><b>{travelCharge ? formatCurrency(travelCharge) : 'Inclòs'}</b></div>
         </div>
-        <PriceHint value={lead.value} time={lead.time} endTime={lead.endTime} type={lead.type} />
-        <div className="ap-ledger-grid">
-          <section className="ap-ledger-panel">
-            <div className="ap-ledger-panelhead"><span>Següent pas</span></div>
-            <p className="ap-ledger-summary">{leadSummary(lead)}</p>
-            <div className="ap-ledger-actions">
-              {lead.stage === 'guanyat' && !lead.booking && (
-                <Link href={`/admin/bookings/new?leadId=${encodeURIComponent(lead.id)}`} className="ap-btn--primary">
-                  Crear reserva
-                </Link>
-              )}
-              {lead.booking && (
-                <Link href={buildBookingHref(lead.booking.id)} className="ap-btn--primary">
-                  Veure reserva
-                </Link>
-              )}
-              {nextStage && editable && (
-                <button type="button" className="ap-btn--primary" disabled={pending} onClick={() => onMoveLead(lead.id, nextStage)}>
-                  {pending ? 'Guardant...' : `Passar a ${STAGE_LABEL[nextStage]}`}
-                </button>
-              )}
-              {lead.stage !== 'perdut' && editable && (
-                <button type="button" className="ap-btn" disabled={pending} onClick={() => onMoveLead(lead.id, 'perdut')}>
-                  Marcar perdut
-                </button>
-              )}
-            </div>
+        <div className="ap-ledger-ops" aria-label="Resum operatiu del lead">
+          <div>
+            <span>Horari</span>
+            <strong>{lead.time ? `${lead.time}${lead.endTime ? `-${lead.endTime}` : ''}` : 'Pendent'}</strong>
+            <em>{durationLabel(lead.time, lead.endTime)}</em>
+          </div>
+          <div>
+            <span>Lloc</span>
+            <strong>{lead.location || 'Pendent'}</strong>
+            {buildWazeUrl(lead.location) && <em>Navegació preparada</em>}
+          </div>
+          <div>
+            <span>Contractat</span>
+            <strong>{contractedSummary(lead)}</strong>
+            <em>{lines.length ? `${lines.length} ${lines.length === 1 ? 'línia' : 'línies'} de bolo` : 'pendent de tancar'}</em>
+          </div>
+          <div>
+            <span>Ruta</span>
+            <strong>{distanceKm ? `${formatNumber(distanceKm, { maximumFractionDigits: 0 })} km` : 'Sense km'}</strong>
+            <em>{routeHours ? `${routeHours} h anada/tornada` : 'cal calcular distància'}</em>
+          </div>
+        </div>
+        <div className="ap-ledger-grid ap-ledger-grid--drawer">
+          <section className="ap-ledger-panel ap-ledger-panel--contracted">
+            <div className="ap-ledger-panelhead"><span>Contractat</span></div>
+            {lines.length > 0 ? (
+              <div className="ap-ledger-contract-list">
+                {lines.slice(0, 4).map((line) => (
+                  <div key={line.id} className="ap-ledger-contract-row">
+                    <span>{line.label}</span>
+                    <strong>{serviceLineMeta(line) || 'Inclòs'}</strong>
+                  </div>
+                ))}
+                {lines.length > 4 && <p className="ap-ledger-contract-more">+{lines.length - 4} línies més a la fitxa completa</p>}
+              </div>
+            ) : (
+              <p className="ap-ledger-summary">Encara no hi ha línies de bolo desades. Obre la fitxa completa per configurar producte, tècnic i transport.</p>
+            )}
           </section>
 
-          <section className="ap-ledger-panel">
-            <div className="ap-ledger-panelhead"><span>Canviar fase</span></div>
-            <div className="ap-ledger-stagepick">
-              {PIPELINE_STAGES.map((stage) => (
-                <button
-                  key={stage}
-                  type="button"
-                  data-stage={stage}
-                  className={stage === lead.stage ? 'is-on' : ''}
-                  disabled={!editable || pending || stage === lead.stage}
-                  onClick={() => onMoveLead(lead.id, stage)}
-                >
-                  <span className="ap-leads-dot" data-stage={stage} />
-                  {STAGE_LABEL[stage]}
-                </button>
-              ))}
-            </div>
+          <section className="ap-ledger-panel ap-ledger-panel--ops-detail">
+            <div className="ap-ledger-panelhead"><span>Operativa</span></div>
+            <dl className="ap-ledger-rows ap-ledger-rows--event">
+              <div><dt>Data</dt><dd>{lead.dateISO ? fullDate(lead.dateISO) : '—'}</dd></div>
+              <div><dt>Pax</dt><dd>{lead.pax || '—'}</dd></div>
+              <div><dt>Muntatge</dt><dd>{minutesLabel(logistics.setupMinutes)}</dd></div>
+              <div><dt>Navegació</dt><dd>{buildWazeUrl(lead.location) ? <a href={buildWazeUrl(lead.location)!} target="_blank" rel="noopener noreferrer" className="ap-ledger-navlink">Waze</a> : '—'}</dd></div>
+              {(() => {
+                if (!logistics.departureTime || logistics.travelMinutes === 0) return null;
+                return (
+                  <div className="ap-ledger-row--long">
+                    <dt>Sortida</dt>
+                    <dd>
+                      <span className="ap-ledger-departtime">{logistics.departureTime}</span>
+                      <span className="ap-ledger-departhint"> · {minutesLabel(logistics.travelMinutes)} anada + {minutesLabel(logistics.setupMinutes)} de muntatge</span>
+                    </dd>
+                  </div>
+                );
+              })()}
+            </dl>
           </section>
 
-          <section className="ap-ledger-panel">
+          <section className="ap-ledger-panel ap-ledger-panel--contact">
             <div className="ap-ledger-panelhead"><span>Contacte</span></div>
             <dl className="ap-ledger-rows ap-ledger-rows--contact">
               <div><dt>Telèfon</dt><dd>{lead.phone || '—'}</dd></div>
               <div><dt>Email</dt><dd>{lead.email || '—'}</dd></div>
-              <div><dt>Canal</dt><dd>{lead.channel || '—'}</dd></div>
+              {channelLabel && <div><dt>Canal</dt><dd>{channelLabel}</dd></div>}
               <div><dt>Últim contacte</dt><dd>{lead.last || '—'}</dd></div>
             </dl>
             <div className="ap-ledger-actions ap-ledger-actions--contact">
               {(() => {
                 const waHref = buildLeadWhatsAppHref(lead.phone, lead.name);
                 return waHref ? (
-                  <a href={waHref} target="_blank" rel="noopener noreferrer" className="ap-btn">
+                  <a href={waHref} target="_blank" rel="noopener noreferrer" className="ap-btn ap-ledger-btn--whatsapp">
                     <span>{I.phone}</span>WhatsApp
                   </a>
                 ) : (
@@ -436,48 +519,11 @@ function LeadDetailPanel({
                 );
               })()}
               {lead.kind === 'lead' && (
-                <Link href={buildLeadComposeHref(lead.id, 'seguiment')} className="ap-btn">
+                <Link href={buildLeadComposeHref(lead.id, 'seguiment')} className="ap-btn ap-ledger-btn--mail">
                   <span>{I.mail}</span>Correu
                 </Link>
               )}
             </div>
-          </section>
-
-          <section className="ap-ledger-panel">
-            <div className="ap-ledger-panelhead"><span>Dades del bolo</span></div>
-            <dl className="ap-ledger-rows ap-ledger-rows--event">
-              <div><dt>Data</dt><dd>{lead.dateISO ? fullDate(lead.dateISO) : '—'}</dd></div>
-              <div><dt>Pax</dt><dd>{lead.pax || '—'}</dd></div>
-              <div><dt>Inici</dt><dd>{lead.time || '—'}</dd></div>
-              <div><dt>Fi</dt><dd>{lead.endTime || '—'}</dd></div>
-              <div className="ap-ledger-row--long">
-                <dt>Lloc</dt>
-                <dd>
-                  {lead.location || '—'}
-                  {buildWazeUrl(lead.location) && (
-                    <a href={buildWazeUrl(lead.location)!} target="_blank" rel="noopener noreferrer" className="ap-ledger-navlink"> 🧭 Waze</a>
-                  )}
-                </dd>
-              </div>
-              {(() => {
-                // Alarma de sortida: només si hi ha reserva amb km i hora del bolo.
-                const logi = buildEventLogistics({
-                  address: lead.location,
-                  distanceKm: lead.booking?.distanceKm ?? null,
-                  eventStartTime: lead.time || null,
-                });
-                if (!logi.departureTime || logi.travelMinutes === 0) return null;
-                return (
-                  <div className="ap-ledger-row--long">
-                    <dt>Sortir cap al bolo</dt>
-                    <dd>
-                      <span className="ap-ledger-departtime">{logi.departureTime}</span>
-                      <span className="ap-ledger-departhint"> · {logi.travelMinutes} min viatge + {logi.setupMinutes} min muntatge</span>
-                    </dd>
-                  </div>
-                );
-              })()}
-            </dl>
           </section>
 
 

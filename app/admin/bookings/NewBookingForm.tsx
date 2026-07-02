@@ -76,7 +76,7 @@ export default function NewBookingForm() {
   const backLabel = customerId ? 'Client' : leadId ? 'Lead' : 'Agenda';
   const crumbContext = customerId ? 'Client' : 'Agenda';
 
-  const { form, setForm, packs, extras, loading, leadData, partners, fuelReferenceInfo } = useNewBookingInitialData({ leadId, dateParam });
+  const { form, setForm, packs, extras, loading, leadData, leadServiceLines, partners, fuelReferenceInfo } = useNewBookingInitialData({ leadId, dateParam });
   // Autosave de l'esborrany de reserva (hora, lloc, tot). Només actiu un cop
   // carregat el prefill del lead, perquè no machaqui ni el sobreescrigui.
   const autosaveKey = bookingAutosaveKey(leadId, customerId);
@@ -88,6 +88,7 @@ export default function NewBookingForm() {
   const [customPackPrice, setCustomPackPrice] = useState('');
   const [manualTotalPrice, setManualTotalPrice] = useState('');
   const [serviceLines, setServiceLines] = useState<BookingServiceLineFormInput[]>([]);
+  const [leadServiceLinesApplied, setLeadServiceLinesApplied] = useState(false);
   const [travelRouteHours, setTravelRouteHours] = useState('');
   const [travelVehicleOwner, setTravelVehicleOwner] = useState('OWNER');
   const [travelDriver, setTravelDriver] = useState('OWNER');
@@ -100,6 +101,14 @@ export default function NewBookingForm() {
     if (parsed) setManualTotalPrice(parsed);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- només ha de reaccionar quan arriba leadData, no a manualTotalPrice
   }, [leadData]);
+  useEffect(() => {
+    setLeadServiceLinesApplied(false);
+  }, [leadId]);
+  useEffect(() => {
+    if (leadServiceLinesApplied || serviceLines.length > 0 || leadServiceLines.length === 0) return;
+    setServiceLines(leadServiceLines);
+    setLeadServiceLinesApplied(true);
+  }, [leadServiceLines, leadServiceLinesApplied, serviceLines.length]);
   const [invoiceRequired, setInvoiceRequired] = useState(false);
   const fiscalMode = getBookingFiscalMode(invoiceRequired);
   const [showPack, setShowPack] = useState(false);
@@ -339,12 +348,10 @@ export default function NewBookingForm() {
               discountCode: form.discountCode,
               notes: form.notes,
             }}
-            travelBlocks={travelBlocks}
             travelCharge={travelCharge}
-            billableKm={billableKm}
+            travelHeadcount={travelHeadcount}
+            chargeableHours={travelCostBreakdown.chargeableHours}
             includedTravelKm={INCLUDED_TRAVEL_KM}
-            travelBlockKm={TRAVEL_BLOCK_KM}
-            travelBlockEur={TRAVEL_BLOCK_EUR}
             fuelReferenceInfo={fuelReferenceInfo}
             validatingCode={validatingCode}
             discountValidation={discountValidation}

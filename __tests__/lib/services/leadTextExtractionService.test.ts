@@ -61,4 +61,43 @@ describe('extractLeadDataFromText', () => {
     expect(result.eventTime).toBe('18:00');
     expect(result.eventEndTime).toBe('20:00');
   });
+
+  it('ignora timestamps de WhatsApp i prioritza la data real del client', () => {
+    const result = extractLeadDataFromText(`
+      [18:03, 2/7/2026] Òrbita events: Hola Estel
+      [18:03, 2/7/2026] Estel Giralt Canyamars: Hola, soc Estel Giralt
+      [18:03, 2/7/2026] Òrbita events: Passam si pots ubi, data, horari i el que parlàvem no? 2h de Dj. Et passaré dossier amb les possibilitats i preus
+      [18:03, 2/7/2026] Estel Giralt Canyamars: El mail es estel.giralt@gmail.com
+      [18:04, 2/7/2026] Estel Giralt Canyamars: Data 25/7/2026. Lloc Canyamars-Dosrius. Horari 9 a 11
+      [18:05, 2/7/2026] Estel Giralt Canyamars: Del vespre
+    `);
+
+    expect(result.name).toBe('Estel Giralt');
+    expect(result.email).toBe('estel.giralt@gmail.com');
+    expect(result.eventDate).toBe('2026-07-25');
+    expect(result.eventLocation).toBe('Canyamars-Dosrius');
+    expect(result.eventTime).toBe('21:00');
+    expect(result.eventEndTime).toBe('23:00');
+  });
+
+  it('recupera contacte i ubicacio en un WhatsApp multi-bolo sense inventar data parcial', () => {
+    const result = extractLeadDataFromText(`
+      [11:50, 1/7/2026] +376 339 491: Aiiii m'encanta el video del Bingo musical
+      [11:53, 1/7/2026] Òrbita events: Alba + cognom
+      [11:54, 1/7/2026] +376 339 491: Alba Orna - albaop@gmail.com
+      [11:54, 1/7/2026] +376 339 491: perdo... 17h es l'Eglesia però el show hauria de començar despres del sopar
+      [11:55, 1/7/2026] +376 339 491: Si, el dia 5 hauria de ser el bingo musical... sera una celebració d'unes 30 persones
+      [11:56, 1/7/2026] +376 339 491: I la boda de mes fiestuki que som 80 és el 26
+      [12:12, 1/7/2026] +376 339 491: La ubicació del dia 5 és restaurant Calma a l'Aldosa
+      [12:12, 1/7/2026] +376 339 491: La ubicació del dia 26 és Mas d'en Roqueta - Aravell (La Seu d'Urgell)
+    `);
+
+    expect(result.name).toBe('Alba Orna');
+    expect(result.email).toBe('albaop@gmail.com');
+    expect(result.phone).toBe('+376339491');
+    expect(result.eventType).toBe('OTHER');
+    expect(result.eventDate).toBe('');
+    expect(result.eventLocation).toBe("restaurant Calma a l'Aldosa");
+    expect(result.guestCount).toBe('30');
+  });
 });

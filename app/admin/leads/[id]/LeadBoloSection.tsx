@@ -6,11 +6,11 @@ import { useToast } from '@/app/admin/components/ToastProvider';
 import BookingServiceLinesSection from '@/app/admin/bookings/BookingServiceLinesSection';
 import type { BookingServiceLineFormInput } from '@/app/admin/bookings/booking-form.types';
 import { computeBookingFinancialSummary, aggregateServiceLines, classifyBoloLines } from '@/lib/services/costEngine';
-import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR, calculateTravelCharge, calculateBillableTravelKm } from '@/lib/services/travelCost';
-import { calculateTravelCostBreakdown } from '@/lib/services/travelLaborCost';
+import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
+import { calculateTravelCostBreakdown, deriveTravelHeadcount } from '@/lib/services/travelLaborCost';
 import { useBookingDistance } from '@/app/admin/bookings/useBookingDistance';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
-import { formatCurrency } from '@/lib/constants';
+import { formatCurrency, formatNumber } from '@/lib/constants';
 
 /**
  * El BOLO dins la fitxa del lead (Fase 1.4 de docs/bolo-flux.md).
@@ -32,6 +32,23 @@ export interface BoloEconomia {
  label: string;
 }
 
+/**
+ * Neteja de PRESENTACIÓ del detall del cost de ruta (#1359). El model
+ * (`travelLaborCost`) genera el subtext amb etiquetes tècniques en anglès
+ * (`vehicle`/`DRIVER`/`PASSENGER`) i unitats `EUR`. Com que el label de la línia
+ * ja diu qui cobra i què és, aquí només es mostra el detall del càlcul en català
+ * net: es treu el rol anglès redundant, `EUR`→`€` i el decimal amb coma.
+ * No es toca el model (el marge negatiu és el segon pas, de lògica).
+ */
+function cleanRouteNote(raw: string): string {
+ return raw
+ .replace('[travel-cost] ', '')
+ .replace(/^(?:vehicle|DRIVER|PASSENGER)\s·\s/, '')
+ .replace(/(\d+)\.0+(\s?km)/g, '$1$2')
+ .replace(/\bEUR(\/\w+)/g, '€$1')
+ .replace(/(\d)\.(\d)/g, '$1,$2');
+}
+
 export default function LeadBoloSection({
  leadId,
  documentContext,
@@ -39,6 +56,7 @@ export default function LeadBoloSection({
  source,
  vehicleCostPerKm = DEFAULT_VEHICLE_COST_PER_KM,
  initialDistanceKm = null,
+ initialTollsEur = null,
  onEconomiaChange,
  compactEconomia = false,
 }: {
@@ -64,6 +82,7 @@ export default function LeadBoloSection({
  source?: string | null;
  vehicleCostPerKm?: number;
  initialDistanceKm?: number | null;
+ initialTollsEur?: number | null;
  onEconomiaChange?: (e: BoloEconomia | null) => void;
  compactEconomia?: boolean;
 }) {
@@ -74,6 +93,7 @@ export default function LeadBoloSection({
  const [internalTravelCost, setInternalTravelCost] = useState(0);
  // Càlcul de transport EN VIU (#1345): km anada+tornada + integrants derivats del bolo.
  const [distanceKm, setDistanceKm] = useState(initialDistanceKm ? String(initialDistanceKm) : '');
+ const [tollsEur, setTollsEur] = useState(initialTollsEur ? String(initialTollsEur) : '');
  const [headcountOverride, setHeadcountOverride] = useState('');
  // Atribució del transport (#1354): qui posa el cotxe i qui condueix. '' = Òrbita;
  // altrament el collaboratorId d'un proveïdor del bolo → el cost va a aquella persona.
@@ -139,13 +159,13 @@ export default function LeadBoloSection({
  eventLocation: documentContext.eventLocation ?? '',
  onDistanceResolved: (km) => { setDistanceKm(km); setDirty(true); },
  });
- // Integrants derivats del bolo: 1 base si hi ha producte + tècnics de so.
+ // Integrants derivats del bolo (#1363): persones FÍSIQUES via la regla canònica
+ // (deriveTravelHeadcount) — els rols que fa Òrbita col·lapsen en 1. `baseLines` inclou
+ // el pack contractat com a línia OTHER amb PVP; si n'hi ha, ets tu (DJ) → hasOrbitaPack.
  const derivedHeadcount = useMemo(() => {
- const all = buildVisibleLines();
- const hasProduct = all.some((l) => (l.revenueAmount ?? 0) > 0 || l.kind === 'PROVIDER_SERVICE' || l.kind === 'DJ');
- const soundTech = all.filter((l) => l.kind === 'SOUND_TECH').reduce((s, l) => s + (l.quantity || 1), 0);
- return (hasProduct ? 1 : 0) + soundTech;
- }, [buildVisibleLines]);
+ const hasOrbitaPack = baseLines.some((l) => (l.revenueAmount ?? 0) > 0);
+ return deriveTravelHeadcount(lines, hasOrbitaPack);
+ }, [lines, baseLines]);
  const headcount = headcountOverride ? Math.max(0, Math.floor(Number(headcountOverride) || 0)) : derivedHeadcount;
  // Col·laboradors presents al bolo (per triar qui posa el cotxe / condueix).
  const travelCollaborators = useMemo(() => {
@@ -165,6 +185,7 @@ export default function LeadBoloSection({
  return calculateTravelCostBreakdown({
  roundTripKm: Number(distanceKm) || 0,
  vehicleCostPerKm,
+ tollsEur: Number(tollsEur) || 0,
  vehicleOwner: { label: nameFor(vehicleOwnerId), collaboratorId: vehicleOwnerId || null },
  people: [
  ...(headcount > 0 ? [{ role: 'DRIVER' as const, label: nameFor(driverId), collaboratorId: driverId || null }] : []),
@@ -172,14 +193,16 @@ export default function LeadBoloSection({
  ],
  });
  // eslint-disable-next-line react-hooks/exhaustive-deps -- nameFor és un closure estable sobre travelCollaborators (ja dep)
- }, [buildVisibleLines, distanceKm, headcount, vehicleCostPerKm, vehicleOwnerId, driverId, travelCollaborators]);
+ }, [buildVisibleLines, distanceKm, tollsEur, headcount, vehicleCostPerKm, vehicleOwnerId, driverId, travelCollaborators]);
  // Live si hi ha km resolts; si no, fallback al cost recuperat (#1343).
  const effectiveTravelCost = (Number(distanceKm) || 0) > 0 ? travelBreakdown.totalCost : internalTravelCost;
- // Càrrec al client (#1347): km més enllà dels inclosos → +TRAVEL_BLOCK_EUR/TRAVEL_BLOCK_KM.
- // Es REPERCUTEIX al client (suma al total del bolo, entra al pressupost).
+ // Càrrec al client pel transport (#1363, decisió del propietari): el client paga el
+ // COST REAL del desplaçament, amb les dues potes SEPARADES —cotxe per km + gent per
+ // hores— tal com es calcula a `travelBreakdown`. Abans era un únic €/km (0,50) que
+ // només cobria el cotxe i ignorava el temps de la tripulació («no plou benzina, però
+ // tampoc plou el temps»). Ara transport = equilibri (el client paga el que costa).
  const km = Number(distanceKm) || 0;
- const travelCharge = calculateTravelCharge(km, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR);
- const billableKm = calculateBillableTravelKm(km, INCLUDED_TRAVEL_KM);
+ const travelCharge = effectiveTravelCost;
 
  // Fulla d'economia del bolo (Fase 4 de docs/bolo-flux.md). La pasta NO viu al
  // configurador: cada línia porta el cost amagat i alimenta SOLA aquesta fulla.
@@ -238,8 +261,7 @@ export default function LeadBoloSection({
  const routeSettlementLines = useMemo(() => travelBreakdown.lines.map((line) => ({
  label: line.label,
  amount: line.costAmount,
- owner: line.collaboratorId ? 'proveïdor' : 'Òrbita',
- notes: line.notes.replace('[travel-cost] ', ''),
+ notes: cleanRouteNote(line.notes),
  })), [travelBreakdown.lines]);
 
  // Marge → nivell visual reutilitzant els tons existents (.ap-ledger-kpi data-level).
@@ -269,7 +291,7 @@ export default function LeadBoloSection({
  const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/service-lines`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ lines: [...buildAllLines(), ...travelLines], distanceKm: Number(distanceKm) || null }),
+ body: JSON.stringify({ lines: [...buildAllLines(), ...travelLines], distanceKm: Number(distanceKm) || null, tollsEur: Number(tollsEur) || null }),
  });
  if (!res.ok) throw new Error('No s\'ha pogut desar');
  toast.success('Bolo desat.');
@@ -370,6 +392,16 @@ export default function LeadBoloSection({
  aria-label="Ajust manual d'integrants de la ruta"
  />
  </label>
+ <label className="ap-ledger-travel-field">
+ <span>Peatges €</span>
+ <input
+ type="number" min={0} step="0.01" inputMode="decimal" className="adm-input"
+ value={tollsEur}
+ onChange={(e) => { setTollsEur(e.target.value); setDirty(true); }}
+ placeholder="0"
+ aria-label="Peatges de la ruta en euros"
+ />
+ </label>
  {travelCollaborators.length > 0 && (
  <>
  <label className="ap-ledger-travel-field">
@@ -389,7 +421,7 @@ export default function LeadBoloSection({
  </>
  )}
  <p className="ap-ledger-budget-travelnote">
- 1a hora de ruta inclosa · es cobren {travelBreakdown.chargeableHours} h de {travelBreakdown.routeHours} h · cotxe: {nameFor(vehicleOwnerId)} · condueix: {nameFor(driverId)}
+ 1a hora de ruta inclosa · es cobren {formatNumber(travelBreakdown.chargeableHours)} h de {formatNumber(travelBreakdown.routeHours)} h · cotxe: {nameFor(vehicleOwnerId)} · condueix: {nameFor(driverId)}
  </p>
  </div>
  <div className="ap-ledger-budget-sum">
@@ -398,7 +430,7 @@ export default function LeadBoloSection({
  <strong>{formatCurrency(economia.total - travelCharge)}</strong>
  </div>
  <div className="ap-ledger-budget-row ap-ledger-budget-row--travel">
- <span>Transport al client<em>{billableKm} km facturables · primers {INCLUDED_TRAVEL_KM} inclosos</em></span>
+ <span>Transport al client<em>cotxe {km} km + {formatNumber(travelBreakdown.chargeableHours)} h × {headcount} pers.{travelBreakdown.tollsCost > 0 ? ` + ${formatCurrency(travelBreakdown.tollsCost)} peatges` : ''} (1a h inclosa)</em></span>
  <strong>+{formatCurrency(travelCharge)}</strong>
  </div>
  <div className="ap-ledger-budget-row ap-ledger-budget-row--total">
@@ -416,7 +448,7 @@ export default function LeadBoloSection({
  <div key={`${line.label}-${idx}`} className="ap-ledger-route-settlement-row">
  <span>
  {line.label}
- <em>{line.owner} · {line.notes}</em>
+ <em>{line.notes}</em>
  </span>
  <strong>{formatCurrency(line.amount)}</strong>
  </div>

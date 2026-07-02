@@ -220,12 +220,12 @@ export default function StripePaymentPanel({
           </div>
         </div>
         {hasBizumPending && !bothPaid && (
-          <span className="animate-pulse whitespace-nowrap rounded-full border border-[var(--ax-warning-border)] bg-[var(--ax-warning-bg)] px-2.5 py-1 text-xs font-bold text-[var(--o-warning)]">
+          <span className="max-w-full truncate whitespace-nowrap rounded-full border border-[var(--ax-warning-border)] bg-[var(--ax-warning-bg)] px-2.5 py-1 text-xs font-bold text-[var(--o-warning)] animate-pulse">
             ● Bizum pendent
           </span>
         )}
         {bothPaid && (
-          <span className="whitespace-nowrap rounded-full border border-[var(--ax-success-border)] bg-[var(--ax-success-bg)] px-2.5 py-1 text-xs font-bold text-[var(--o-success)]">
+          <span className="max-w-full truncate whitespace-nowrap rounded-full border border-[var(--ax-success-border)] bg-[var(--ax-success-bg)] px-2.5 py-1 text-xs font-bold text-[var(--o-success)]">
             ✓ Tot pagat
           </span>
         )}

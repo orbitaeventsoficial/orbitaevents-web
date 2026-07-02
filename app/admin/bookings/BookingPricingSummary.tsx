@@ -77,7 +77,7 @@ export default function BookingPricingSummary({
         )}
         {pricing.travelCharge > 0 && (
           <div className={ROW}>
-            <span>Desplaçament ({travelBlocks} trams)</span>
+            <span>Desplaçament (transport real)</span>
             <b className={ROW_VAL}>+{formatCurrencyExact(pricing.travelCharge)}</b>
           </div>
         )}

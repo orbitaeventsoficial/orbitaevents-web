@@ -157,6 +157,7 @@ export async function findPortalAccessByRawToken(token: string) {
           pack: { include: { translations: true } },
           extras: { include: { extra: { include: { translations: true } } } },
           inventory: { include: { item: true } },
+          serviceLines: { select: { kind: true, label: true, revenueAmount: true, costAmount: true, collaboratorId: true, quantity: true } },
           proposals: {
             orderBy: { createdAt: 'desc' },
             select: {

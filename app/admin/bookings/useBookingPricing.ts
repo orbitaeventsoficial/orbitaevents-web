@@ -11,13 +11,12 @@ import { aggregateServiceLines, computeDirectCostBreakdown } from '@/lib/service
 import {
   calculateBillableTravelKm,
   calculateTravelBlocks,
-  calculateTravelCharge,
   calculateTravelCost,
   DEFAULT_VEHICLE_COST_PER_KM,
   INCLUDED_TRAVEL_KM,
-  TRAVEL_BLOCK_EUR,
   TRAVEL_BLOCK_KM,
 } from '@/lib/services/travelCost';
+import { calculateClientTravelCharge, deriveTravelHeadcount } from '@/lib/services/travelLaborCost';
 import type { BookingExtra, BookingFormData, BookingPack, BookingSelectedExtras, BookingServiceLineFormInput } from './booking-form.types';
 import { OPERATOR_EXTRA_ID } from './booking-form.types';
 
@@ -54,20 +53,18 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
     return calculateTravelCost(km, rate, INCLUDED_TRAVEL_KM);
   }, [form.distanceKm, form.fuelCostPerKm, internalTravelCostOverride]);
 
+  // Càrrec de transport al client (#1363): cost real amb dues potes (cotxe/km + gent/hores).
+  // El headcount surt de les línies del bolo.
   const travelCharge = useMemo(() => {
     const km = parseFloat(form.distanceKm) || 0;
-    return calculateTravelCharge(km, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR);
-  }, [form.distanceKm]);
+    const rate = parseFloat(form.fuelCostPerKm) || DEFAULT_VEHICLE_COST_PER_KM;
+    return calculateClientTravelCharge(km, deriveTravelHeadcount(serviceLines, Boolean(form.packId)), rate);
+  }, [form.distanceKm, form.fuelCostPerKm, form.packId, serviceLines]);
 
-  const billableKm = useMemo(() => {
-    const km = parseFloat(form.distanceKm) || 0;
-    return calculateBillableTravelKm(km, INCLUDED_TRAVEL_KM);
-  }, [form.distanceKm]);
-
-  const travelBlocks = useMemo(() => {
-    const km = parseFloat(form.distanceKm) || 0;
-    return calculateTravelBlocks(km, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM);
-  }, [form.distanceKm]);
+  // Valors informatius de km (llegat de la visualització per trams #1363): el CÀRREC ja
+  // és el real de dues potes; aquests només descriuen la part de cotxe a la UI antiga.
+  const billableKm = useMemo(() => calculateBillableTravelKm(parseFloat(form.distanceKm) || 0, INCLUDED_TRAVEL_KM), [form.distanceKm]);
+  const travelBlocks = useMemo(() => calculateTravelBlocks(parseFloat(form.distanceKm) || 0, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM), [form.distanceKm]);
 
   const selectedPack = useMemo(() => packs.find((pack) => pack.id === form.packId) || null, [packs, form.packId]);
 

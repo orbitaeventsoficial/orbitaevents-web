@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
-import type { BookingExtra, BookingFormData, BookingLeadData, BookingPack, BookingPartnerOption, RawExtraConfig } from './booking-form.types';
+import type { BookingExtra, BookingFormData, BookingLeadData, BookingPack, BookingPartnerOption, BookingServiceLineFormInput, RawExtraConfig } from './booking-form.types';
 import { INITIAL_BOOKING_FORM, bookingAutosaveKey } from './booking-form.types';
+import { mapLeadServiceLinesToBookingFormLines } from './bookingLeadServiceLineMapper';
 import { hasFormAutosaveDraft } from '@/lib/hooks/useFormAutosave';
 import { log } from '@/lib/logger';
 
@@ -38,12 +39,14 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
   const [extras, setExtras] = useState<BookingExtra[]>([]);
   const [loading, setLoading] = useState(true);
   const [leadData, setLeadData] = useState<BookingLeadData | null>(null);
+  const [leadServiceLines, setLeadServiceLines] = useState<BookingServiceLineFormInput[]>([]);
   const [partners, setPartners] = useState<BookingPartnerOption[]>([]);
   const [fuelReferenceInfo, setFuelReferenceInfo] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
       try {
+        setLeadServiceLines([]);
         const [packsRes, extrasRes, partnersRes] = await Promise.all([
           fetchWithCsrf('/api/admin/packs'),
           fetchWithCsrf('/api/admin/extras'),
@@ -127,6 +130,14 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
               }));
             }
           }
+
+          if (!hasDraft) {
+            const leadLinesRes = await fetchWithCsrf(`/api/admin/leads/${leadId}/service-lines`);
+            if (leadLinesRes.ok) {
+              const leadLinesData = await leadLinesRes.json();
+              setLeadServiceLines(mapLeadServiceLinesToBookingFormLines(leadLinesData?.lines));
+            }
+          }
         }
 
         if (dateParam && !hasDraft) {
@@ -149,6 +160,7 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
     extras,
     loading,
     leadData,
+    leadServiceLines,
     partners,
     fuelReferenceInfo,
   };

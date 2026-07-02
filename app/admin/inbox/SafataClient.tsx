@@ -669,7 +669,7 @@ export default function SafataClient({
               className={`${NAV_ITEM}${active.kind === 'leads' ? ` ${NAV_ITEM_ON}` : ''}`}
               onClick={() => handleTabChange({ kind: 'leads' })}>
               <span className="w-[18px] flex-shrink-0 text-center text-base opacity-90">📥</span>
-              <span className="flex-1 whitespace-nowrap">Leads web</span>
+              <span className="min-w-0 flex-1 truncate whitespace-nowrap">Leads web</span>
               {entranceUnread > 0 && <span className={NAV_BADGE}>{entranceUnread}</span>}
             </button>
           </div>
@@ -683,7 +683,7 @@ export default function SafataClient({
                   className={`${NAV_ITEM}${active.kind === 'folder' && active.path === f.path ? ` ${NAV_ITEM_ON}` : ''}`}
                   onClick={() => handleTabChange({ kind: 'folder', path: f.path, specialUse: f.iconKey })}>
                   <span className="w-[18px] flex-shrink-0 text-center text-base opacity-90">{ICONS[f.iconKey]}</span>
-                  <span className="flex-1 whitespace-nowrap">{FOLDER_LABELS[f.iconKey]}</span>
+                  <span className="min-w-0 flex-1 truncate whitespace-nowrap">{FOLDER_LABELS[f.iconKey]}</span>
                   {f.unread > 0 && <span className={NAV_BADGE}>{f.unread}</span>}
                 </button>
               ))}
@@ -714,7 +714,7 @@ export default function SafataClient({
           </button>
           <a href="/admin/inbox/settings" className={NAV_ITEM}>
             <span className="w-[18px] flex-shrink-0 text-center text-base opacity-90">⚙</span>
-            <span className="flex-1 whitespace-nowrap">Configuració</span>
+            <span className="min-w-0 flex-1 truncate whitespace-nowrap">Configuració</span>
           </a>
         </div>
       </aside>
@@ -853,7 +853,7 @@ export default function SafataClient({
                       <p className="truncate text-xs text-[var(--t3)]">
                         {email.subject}
                         {email.hasAttachments && <span className="ml-1 inline-block text-xs opacity-70"> 📎</span>}
-                        {pill && <span className="ml-1.5 inline-block whitespace-nowrap rounded-[var(--o-r-xs)] border border-[var(--hair-gold)] bg-[color-mix(in_oklab,var(--gold)_10%,var(--panel))] px-1.5 text-xs font-bold tracking-[0.04em] text-[var(--gold-bright)]" title={pill.hint}>🔗 {pill.label}</span>}
+                        {pill && <span className="ml-1.5 inline-block max-w-full truncate whitespace-nowrap rounded-[var(--o-r-xs)] border border-[var(--hair-gold)] bg-[color-mix(in_oklab,var(--gold)_10%,var(--panel))] px-1.5 text-xs font-bold tracking-[0.04em] text-[var(--gold-bright)] align-bottom" title={pill.hint}>🔗 {pill.label}</span>}
                       </p>
                     </button>
                     <div className="flex flex-shrink-0 items-center gap-1">
@@ -1327,7 +1327,7 @@ function Composer({
           <input type="text" value={subject} onChange={e => setSubject(e.target.value)} placeholder="Assumpte" aria-label="Assumpte" className={COMPOSE_INPUT} />
           {forwardAttachments.length > 0 && (
             <div className="flex flex-wrap items-center gap-2 border-b border-[var(--line)] bg-[color-mix(in_oklab,var(--gold)_3%,var(--panel))] px-4 py-2">
-              <span className="whitespace-nowrap text-xs font-bold text-[var(--t3)]">📎 Adjunts:</span>
+              <span className="max-w-full truncate whitespace-nowrap text-xs font-bold text-[var(--t3)]">📎 Adjunts:</span>
               {forwardAttachments.map(a => (
                 <label key={a.partKey} className="inline-flex cursor-pointer items-center gap-1.5 rounded-[var(--o-r-sm)] border border-[var(--line2)] bg-[var(--panel)] px-2 py-1 text-xs text-[var(--t2)] transition-colors has-[:checked]:border-[var(--hair-gold)] has-[:checked]:bg-[color-mix(in_oklab,var(--gold)_8%,var(--panel))] has-[:checked]:text-[var(--gold-bright)]">
                   <input
