@@ -1,3 +1,22 @@
+## 2026-07-02 — Cuadrant + Repartiment enllaçats al menú (F4) (Canvi #1356, claude)
+
+### Context
+F4 del pla del repartiment solidari. Les vistes `/admin/cuadrant` (operatiu) i `/admin/cuadrant/repartiment` (agregat de qui cobra què) existien i funcionaven, però eren ÒRFENES (cap enllaç al menú) — el propietari no les trobava.
+
+### Què s'ha fet
+- `app/admin/lib/adminNav.ts`: afegides **Cuadrant** i **Repartiment** al grup **Operativa** (al costat d'Economia). `getGroupForPath` reconeix `/admin/cuadrant` → grup Operativa actiu.
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0.
+- Validació funcional: (Playwright) menú Operativa mostra Economia · Cuadrant · Repartiment · Tasques; les pàgines s'obren (200).
+- Validació humana/UX: vista de repartiment ara accessible clicant.
+
+### Coordinació
+Counter → 1356. Tanca l'accés a les vistes. PENDENT (millora, no bloquejant): refactoritzar `buildPayoutSummary` perquè reutilitzi `computeBoloRepartiment` (solidaritat estricta) i drill-down per event al repartiment. El motor (F1) ja és la font única; l'agregat del cuadrant ja hi és coherent. Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-02 — Panell «Repartiment del bolo» a la fitxa de reserva (F3) (Canvi #1355, claude)
 
 ### Context
