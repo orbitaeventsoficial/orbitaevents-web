@@ -7058,20 +7058,12 @@
       "customSuffix": "+ bespoke proposals"
     },
     "budget": {
-      "kicker": "The quote",
-      "title": "Indicative quote",
-      "lead": "Here's the breakdown with travel included up to {includedKm} km from Granollers. Since we already know where the party is, we show you all the information, clear and with no surprises.",
-      "servicesLabel": "Selected services",
+      "kicker": "Transparency",
+      "title": "Clear prices, no surprises",
+      "lead": "Here's what each thing costs, with travel included up to {includedKm} km from Granollers. It's not an invoice: it's so you know what we're talking about when we sit down to close it together.",
+      "servicesLabel": "What each proposal includes",
       "travelTitle": "Travel",
-      "travelTo": "To {location}",
-      "travelTotalKm": "{km} km (round trip)",
-      "travelIncludedKm": "{km} km included",
-      "travelBillableKm": "{km} km to bill",
-      "travelBlocks": "Vehicle + crew time (real cost)",
-      "travelIncludedAll": "Travel included — no surcharge",
-      "travelLine": "Travel surcharge",
-      "travelNote": "Included up to {includedKm} km from Granollers; after that, {blockPrice} per {blockKm} km.",
-      "totalLabel": "Indicative total",
+      "travelNote": "Included up to {includedKm} km from Granollers. For longer distances, travel is charged at the real cost of the trip —vehicle and crew time—, always clear and with no surprise fees.",
       "vatNote": "Indicative prices. VAT and final adjustments are set in the definitive proposal."
     },
     "cta": {

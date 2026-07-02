@@ -3,8 +3,6 @@ import { SITE_CONFIG } from '@/app/config/site-config';
 import { formatCurrency } from '@/lib/constants';
 import {
   INCLUDED_TRAVEL_KM,
-  TRAVEL_BLOCK_KM,
-  TRAVEL_BLOCK_EUR,
 } from '@/lib/services/travelCost';
 
 export type DossierClientInfo = {
@@ -51,15 +49,7 @@ export type DossierCopy = {
     lead: string;
     servicesLabel: string;
     travelTitle: string;
-    travelTo: string;
-    travelTotalKm: string;
-    travelIncludedKm: string;
-    travelBillableKm: string;
-    travelBlocks: string;
-    travelIncludedAll: string;
-    travelLine: string;
     travelNote: string;
-    totalLabel: string;
     vatNote: string;
   };
   cta: { label: string };
@@ -252,7 +242,7 @@ function buildBudgetBlock(
     </ul>
 
     <div class="bud-group-label">${escHtml(copy.budget.travelTitle)}</div>
-    <p class="bud-note">${fill(copy.budget.travelNote, { includedKm: String(includedOneWay), blockPrice: money(TRAVEL_BLOCK_EUR), blockKm: String(TRAVEL_BLOCK_KM) })}</p>
+    <p class="bud-note">${fill(copy.budget.travelNote, { includedKm: String(includedOneWay) })}</p>
     <p class="bud-note">${escHtml(copy.budget.vatNote)}</p>
   </section>`;
 }

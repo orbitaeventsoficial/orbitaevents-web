@@ -7058,20 +7058,12 @@
       "customSuffix": "+ propuestas a medida"
     },
     "budget": {
-      "kicker": "El presupuesto",
-      "title": "Presupuesto orientativo",
-      "lead": "Aquí tenéis el desglose con el desplazamiento incluido hasta {includedKm} km desde Granollers. Como ya sabemos dónde será la fiesta, os mostramos toda la información, clara y sin sorpresas.",
-      "servicesLabel": "Servicios seleccionados",
+      "kicker": "Transparencia",
+      "title": "Precios claros, sin sorpresas",
+      "lead": "Aquí tenéis lo que vale cada cosa, con el desplazamiento incluido hasta {includedKm} km desde Granollers. No es una factura: es para que sepáis de qué hablamos cuando nos sentemos a cerrarlo juntos.",
+      "servicesLabel": "Lo que incluye cada propuesta",
       "travelTitle": "Desplazamiento",
-      "travelTo": "Hasta {location}",
-      "travelTotalKm": "{km} km (ida y vuelta)",
-      "travelIncludedKm": "{km} km incluidos",
-      "travelBillableKm": "{km} km a facturar",
-      "travelBlocks": "Coche + tiempo de ruta (coste real)",
-      "travelIncludedAll": "Desplazamiento incluido — sin suplemento",
-      "travelLine": "Suplemento de desplazamiento",
-      "travelNote": "Incluido hasta {includedKm} km desde Granollers; después, {blockPrice} por cada {blockKm} km.",
-      "totalLabel": "Total orientativo",
+      "travelNote": "Incluido hasta {includedKm} km desde Granollers. Para distancias superiores, el desplazamiento se calcula por el coste real del trayecto —vehículo y tiempo del equipo—, siempre claro y sin recargos sorpresa.",
       "vatNote": "Precios orientativos. El IVA y los ajustes finales se cierran en la propuesta definitiva."
     },
     "cta": {

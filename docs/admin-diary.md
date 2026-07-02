@@ -1,3 +1,25 @@
+## 2026-07-03 — Dossier «millor explicat»: to de presentació (no factura) + copy net (Canvi #1372, claude)
+
+### Context
+El propietari, revisant el dossier real d'Alba: (1) el text del desplaçament encara deia «després 10 € per cada 20 km» (fórmula de trams VELLA, ja eliminada → mentia); (2) el dossier es presentava com «Pressupost orientatiu», que sona a factura, quan la decisió era que ENSENYA valor; (3) demanda de revisar TOTS els textos.
+
+### Què s'ha fet
+- **`travelNote` corregit** (ca/es/en): «10 € per cada 20 km» → «per a distàncies superiors, es calcula pel cost real del trajecte —vehicle i temps de l'equip—, sense recàrrecs sorpresa». Ja no menteix.
+- **To de presentació** (ca/es/en): kicker «El pressupost» → «Transparència»; títol «Pressupost orientatiu» → «Preus clars, sense sorpreses»; lead reescrit («No és una factura: és perquè sapigueu de què parlem...»); «Serveis seleccionats» → «El que inclou cada proposta».
+- **Copy mort eliminat**: 8 claus que ja no es renderitzen (`travelTo`, `travelTotalKm`, `travelIncludedKm`, `travelBillableKm`, `travelBlocks`, `travelIncludedAll`, `travelLine`, `totalLabel`) tretes dels 3 messages + del type `DossierCopy` + del mock del test.
+- Auditoria completa de la resta del copy del dossier (portada/intro/chapter/resum/cta): coherent, sense tocar.
+
+### Validació
+- Validació tècnica: tsc 0; test dossier 24/24.
+- Validació funcional: Playwright — dossier real d'Alba renderitzat: «Transparència / Preus clars, sense sorpreses», desplaçament amb text real, sense total sumat.
+- Validació humana/UX: el dossier ja no sembla una factura ni menteix sobre el transport; és una presentació de valor honesta.
+
+### Coordinació
+Counter → 1372. Carrils disjunts amb Codex. PENDENT (abans dels dossiers): peatges al write-path de reserves (només al lead); mirar la reserva d'Alba i treure els costos.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-03 — Franquícia 50 km al cervell + dossier sense total + lead crida el cervell (Canvi #1371, claude)
 
 ### Context

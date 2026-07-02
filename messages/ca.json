@@ -7352,20 +7352,12 @@
       "customSuffix": "+ propostes a mida"
     },
     "budget": {
-      "kicker": "El pressupost",
-      "title": "Pressupost orientatiu",
-      "lead": "Aquí teniu el desglossament amb el desplaçament inclòs fins a {includedKm} km des de Granollers. Com que ja sabem on serà la festa, us mostrem tota la informació, clara i sense sorpreses.",
-      "servicesLabel": "Serveis seleccionats",
+      "kicker": "Transparència",
+      "title": "Preus clars, sense sorpreses",
+      "lead": "Aquí teniu el que val cada cosa, amb el desplaçament inclòs fins a {includedKm} km des de Granollers. No és una factura: és perquè sapigueu de què parlem quan ens asseiem a tancar-ho junts.",
+      "servicesLabel": "El que inclou cada proposta",
       "travelTitle": "Desplaçament",
-      "travelTo": "Fins a {location}",
-      "travelTotalKm": "{km} km (anada i tornada)",
-      "travelIncludedKm": "{km} km inclosos",
-      "travelBillableKm": "{km} km a facturar",
-      "travelBlocks": "Cotxe + temps de ruta (cost real)",
-      "travelIncludedAll": "Desplaçament inclòs — sense suplement",
-      "travelLine": "Suplement de desplaçament",
-      "travelNote": "Inclòs fins a {includedKm} km des de Granollers; després, {blockPrice} per cada {blockKm} km.",
-      "totalLabel": "Total orientatiu",
+      "travelNote": "Inclòs fins a {includedKm} km des de Granollers. Per a distàncies superiors, el desplaçament es calcula pel cost real del trajecte —vehicle i temps de l'equip—, sempre clar i sense recàrrecs sorpresa.",
       "vatNote": "Preus orientatius. L'IVA i els ajustos finals es tanquen a la proposta definitiva."
     },
     "cta": {

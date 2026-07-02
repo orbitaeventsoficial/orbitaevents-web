@@ -1547,6 +1547,19 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1372 — 2026-07-03 — claude (FET)
+**Dossier «millor explicat»: to de presentació (no factura) + copy net.**
+- Context: el propietari revisa el dossier — el text del desplaçament mentia («10€ per 20km», fórmula vella); es presentava com «Pressupost»; demanda de revisar tots els textos.
+- `travelNote` corregit (ca/es/en): cost real del trajecte, sense recàrrecs sorpresa. Kicker «El pressupost»→«Transparència»; títol «Pressupost orientatiu»→«Preus clars, sense sorpreses»; lead reescrit («no és una factura»); «Serveis seleccionats»→«El que inclou cada proposta».
+- Copy mort eliminat: 8 claus `travel*`/`totalLabel` que ja no es renderitzen, dels 3 messages + type DossierCopy + mock del test.
+- Validació tècnica: tsc 0; test dossier 24/24.
+- Validació funcional: Playwright dossier real d'Alba amb el copy nou.
+- Validació humana/UX: el dossier no sembla factura ni menteix sobre transport; presentació de valor.
+- Counter → 1372.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1371 — 2026-07-03 — claude (FET)
 **Franquícia 50 km al cervell + dossier sense total + lead crida el cervell (monocapa completa).**
 - Context: 3 decisions del propietari — (1) recuperar els 50 km inclosos («desplaçament inclòs fins a 25 km»); (2) dossier sense total (ensenya valor, no factura); (3) dossier hereta els km del lead. + lead migrat al cervell.
