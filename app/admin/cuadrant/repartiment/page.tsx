@@ -1,6 +1,7 @@
 import { AdminPage } from '@/app/admin/components/AdminPage';
 import Link from 'next/link';
 import { loadPayoutSummary } from '@/lib/services/crewScheduleService';
+import RepartimentPanel from '@/app/admin/bookings/[id]/RepartimentPanel';
 import { formatCurrency } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
@@ -26,6 +27,9 @@ export default async function RepartimentPage({ searchParams }: { searchParams: 
   const month = searchParams.month && /^\d{4}-\d{2}$/.test(searchParams.month) ? searchParams.month : currentMonth();
   const { from, to, label, prev, next } = monthBounds(month);
   const payout = await loadPayoutSummary(from, to);
+  // Noms per al drill-down (des de la vista per persona; el motor només porta ids).
+  const names: Record<string, string> = {};
+  for (const p of payout.people) if (!p.isOwner) names[p.personKey] = p.personName;
 
   return (
     <AdminPage
@@ -100,6 +104,28 @@ export default async function RepartimentPage({ searchParams }: { searchParams: 
                 </ul>
               )}
             </section>
+          ))}
+        </div>
+      )}
+
+      {/* Drill-down per bolo (#1358): qui cobra què dins de cada event, amb el mateix
+          panell que la fitxa de reserva (font única `computeBoloRepartiment` → solidari). */}
+      {payout.bolos.length > 0 && (
+        <div className="mt-6 space-y-3">
+          <h2 className="ap-h2">Detall per bolo</h2>
+          {payout.bolos.map((bolo) => (
+            <details key={bolo.parentId} className="ap-card overflow-hidden">
+              <summary className="flex cursor-pointer items-center justify-between gap-2 px-3 py-2.5 text-sm adm-row-hover [&::-webkit-details-marker]:hidden">
+                <span className="font-semibold">
+                  {bolo.parentRef}
+                  {bolo.dateKey && <span className="opacity-50"> · {bolo.dateKey.slice(8)}/{bolo.dateKey.slice(5, 7)}</span>}
+                </span>
+                <span className="tabular-nums opacity-70">{formatCurrency(bolo.repartiment.totals.clientTotal)}</span>
+              </summary>
+              <div className="border-t border-[var(--line)] p-3">
+                <RepartimentPanel repartiment={bolo.repartiment} names={names} />
+              </div>
+            </details>
           ))}
         </div>
       )}

@@ -1546,6 +1546,18 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1358 — 2026-07-02 — claude (FET)
+**Cuadrant reusa el motor + drill-down per bolo al repartiment.**
+- `buildPayoutSummary`: refactoritzat — agrupa per bolo i crida `computeBoloRepartiment` (solidaritat estricta, sense partició paral·lela). Exposa `bolos[]` per al drill-down. `assignments` = bolos.
+- `cuadrant/repartiment/page.tsx`: secció «Detall per bolo» — events plegables amb `RepartimentPanel` (mateixa UI que la reserva).
+- Validació tècnica: tsc 0; validate:core 0; crewSchedule 23/23 + repartiment 5/5.
+- Validació funcional: (Playwright) drill-down operatiu (Carlos 2.615€, Cristina 620€).
+- Validació humana/UX: mateix panell reserva/cuadrant.
+- Counter → 1358. Tanca els pendents del repartiment.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1357 — 2026-07-02 — claude (FET)
 **Persistència de l'atribució vehicle/conductor del transport.**
 - `LeadBoloSection.handleSave`: quan hi ha km, persisteix `travelBreakdown.lines` (vehicle/conductor/passatger amb el seu `collaboratorId`) com a línies `[travel-cost]` al PUT. Replace-all → sense duplicar; a la recàrrega es filtren de la vista i sumen a `internalTravelCost`.

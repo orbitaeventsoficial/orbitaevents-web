@@ -16,6 +16,7 @@
 
 import { prisma } from '@/lib/prisma';
 import type { BookingServiceLineKind } from '@prisma/client';
+import { computeBoloRepartiment, REPARTIMENT_OWNER_KEY, type BoloRepartiment } from '@/lib/services/repartimentService';
 
 export const OWNER_KEY = 'OWNER';
 export const OWNER_NAME = 'Òrbita (jo)';
@@ -304,9 +305,17 @@ export interface PayoutByPerson {
   amount: number; // cash total (col·laborador: el que cobra; propietari: la seva part)
   events: PayoutEvent[];
 }
+/** Detall d'un bolo per al drill-down (qui cobra què dins d'aquell event). */
+export interface PayoutBolo {
+  parentId: string;
+  parentRef: string;
+  dateKey: string | null;
+  repartiment: BoloRepartiment;
+}
 export interface PayoutPeriodResult {
   people: PayoutByPerson[];
   totals: { revenue: number; collaboratorCost: number; ownerNet: number };
+  bolos: PayoutBolo[];
 }
 
 /**
@@ -317,64 +326,69 @@ export function buildPayoutSummary(
   lines: CrewLineInput[],
   names: Map<string, string>,
 ): PayoutPeriodResult {
+  // Agrupa les línies per BOLO i reparteix cada bolo amb el motor canònic
+  // (`computeBoloRepartiment`) → solidari amb la fitxa de lead/reserva (una sola
+  // veritat). L'agregat del període és la suma dels repartiments per bolo.
+  const byBolo = new Map<string, { parentRef: string; dateKey: string | null; lines: CrewLineInput[] }>();
+  for (const line of lines) {
+    const bucket = byBolo.get(line.parentId)
+      ?? { parentRef: line.parentRef, dateKey: line.eventDate ? toDateKey(line.eventDate) : null, lines: [] };
+    bucket.lines.push(line);
+    byBolo.set(line.parentId, bucket);
+  }
+
+  const bolos: PayoutBolo[] = [];
+  const person = new Map<string, { name: string; amount: number; count: number; events: PayoutEvent[] }>();
   let totalRevenue = 0;
   let totalCollaboratorCost = 0;
-  const collab = new Map<string, { name: string; amount: number; count: number; events: PayoutEvent[] }>();
-  const ownerEvents: PayoutEvent[] = [];
 
-  for (const line of lines) {
-    const qty = line.quantity || 1;
-    const revenue = (line.revenueAmount || 0) * qty;
-    totalRevenue += revenue;
-    const dateKey = line.eventDate ? toDateKey(line.eventDate) : null;
+  for (const [parentId, bolo] of byBolo.entries()) {
+    const repartiment = computeBoloRepartiment(bolo.lines);
+    bolos.push({ parentId, parentRef: bolo.parentRef, dateKey: bolo.dateKey, repartiment });
+    totalRevenue += repartiment.totals.clientTotal;
+    totalCollaboratorCost += repartiment.totals.aCollaboradors;
 
-    if (line.collaboratorId) {
-      const cost = (line.costAmount || 0) * qty;
-      totalCollaboratorCost += cost;
-      const name = names.get(line.collaboratorId) ?? 'Col·laborador';
-      const bucket = collab.get(line.collaboratorId) ?? { name, amount: 0, count: 0, events: [] };
-      bucket.amount += cost;
+    for (const pp of repartiment.perPersona) {
+      if (pp.rep === 0) continue;
+      const key = pp.esOrbita ? OWNER_KEY : pp.personId;
+      const name = pp.esOrbita ? OWNER_NAME : (names.get(pp.personId) ?? 'Col·laborador');
+      const bucket = person.get(key) ?? { name, amount: 0, count: 0, events: [] };
+      bucket.amount = Math.round((bucket.amount + pp.rep) * 100) / 100;
       bucket.count += 1;
-      bucket.events.push({ parentRef: line.parentRef, dateKey, amount: cost });
-      collab.set(line.collaboratorId, bucket);
-    } else {
-      ownerEvents.push({ parentRef: line.parentRef, dateKey, amount: revenue });
+      bucket.events.push({ parentRef: bolo.parentRef, dateKey: bolo.dateKey, amount: pp.rep });
+      person.set(key, bucket);
     }
   }
 
-  const ownerNet = totalRevenue - totalCollaboratorCost;
-
-  // La part del propietari = ingrés de les seves línies + marge revenent serveis de
-  // tercers. Es fa explícit aquest marge perquè la llista quadri amb el total.
-  const ownerAssignmentCount = ownerEvents.length;
-  const ownEventsSum = ownerEvents.reduce((s, e) => s + e.amount, 0);
-  const resaleMargin = ownerNet - ownEventsSum;
-  if (Math.abs(resaleMargin) >= 0.5) {
-    ownerEvents.push({ parentRef: 'Marge de revenda (serveis de tercers)', dateKey: null, amount: resaleMargin });
-  }
-
+  const ownerBucket = person.get(OWNER_KEY);
   const people: PayoutByPerson[] = [
     {
       personKey: OWNER_KEY,
       personName: OWNER_NAME,
       isOwner: true,
-      assignments: ownerAssignmentCount,
-      amount: ownerNet,
-      events: ownerEvents,
+      assignments: ownerBucket?.count ?? 0,
+      amount: ownerBucket?.amount ?? 0,
+      events: ownerBucket?.events ?? [],
     },
-    ...[...collab.entries()].map(([personKey, b]) => ({
-      personKey,
-      personName: b.name,
-      isOwner: false,
-      assignments: b.count,
-      amount: b.amount,
-      events: b.events,
-    })).sort((x, y) => y.amount - x.amount),
+    ...[...person.entries()]
+      .filter(([key]) => key !== OWNER_KEY)
+      .map(([personKey, b]) => ({
+        personKey, personName: b.name, isOwner: false,
+        assignments: b.count, amount: b.amount, events: b.events,
+      }))
+      .sort((x, y) => y.amount - x.amount),
   ];
+
+  bolos.sort((a, b) => (b.dateKey ?? '').localeCompare(a.dateKey ?? ''));
 
   return {
     people,
-    totals: { revenue: totalRevenue, collaboratorCost: totalCollaboratorCost, ownerNet },
+    totals: {
+      revenue: Math.round(totalRevenue * 100) / 100,
+      collaboratorCost: Math.round(totalCollaboratorCost * 100) / 100,
+      ownerNet: Math.round((totalRevenue - totalCollaboratorCost) * 100) / 100,
+    },
+    bolos,
   };
 }
 

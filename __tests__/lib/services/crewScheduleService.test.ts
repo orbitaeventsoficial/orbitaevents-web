@@ -203,7 +203,9 @@ describe('buildPayoutSummary', () => {
     expect(r.totals.ownerNet).toBe(150); // 380 - 230
     const carlos = r.people.find((p) => p.personKey === 'col_carlos');
     expect(carlos?.amount).toBe(230);
-    expect(carlos?.assignments).toBe(2);
+    // assignments = nre. de BOLOS on surt (no de línies): les 2 línies són del mateix
+    // bolo (parentId 'lead1') → 1 assignació agregada (repartiment per bolo, #1358).
+    expect(carlos?.assignments).toBe(1);
     const owner = r.people.find((p) => p.isOwner);
     expect(owner?.amount).toBe(150);
   });

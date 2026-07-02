@@ -1,3 +1,24 @@
+## 2026-07-02 — Cuadrant reusa el motor + drill-down per bolo al repartiment (Canvi #1358, claude)
+
+### Context
+Pendents no bloquejants del pla del repartiment: (1) `buildPayoutSummary` calculava l'agregat amb lògica pròpia (risc de divergència amb el motor); (2) faltava el drill-down per event al repartiment del cuadrant.
+
+### Què s'ha fet
+- `crewScheduleService.buildPayoutSummary`: **refactoritzat** per agrupar les línies per bolo (`parentId`) i cridar `computeBoloRepartiment` per cada bolo, sumant. Ara reutilitza LITERALMENT el motor canònic → solidaritat estricta (cap partició paral·lela). Exposa `bolos: PayoutBolo[]` (repartiment per event) per al drill-down. Elimina el hack del «marge de revenda». `assignments` passa a comptar bolos (no línies).
+- `app/admin/cuadrant/repartiment/page.tsx`: nova secció **«Detall per bolo»** — cada event plegable (`<details>`) obre el `RepartimentPanel` (la MATEIXA UI que la fitxa de reserva). Noms derivats de la vista per persona.
+- Test crewSchedule actualitzat (assignments = bolos).
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0; crewSchedule 23/23 + repartiment 5/5.
+- Validació funcional: (Playwright) drill-down operatiu — bolos plegables (Carlos 17/07 2.615€, Cristina 11/07 620€) obren el panell element a element.
+- Validació humana/UX: mateix panell a reserva i cuadrant (solidaritat visual); `.ap-*` canònic.
+
+### Coordinació
+Counter → 1358. Tanca els pendents del repartiment. El repartiment és ara UNA sola veritat (`computeBoloRepartiment`) projectada a lead (net), reserva (liquidació) i cuadrant (agregat + drill-down). Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-02 — Persistència de l'atribució vehicle/conductor del transport (Canvi #1357, claude)
 
 ### Context
