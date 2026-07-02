@@ -5,7 +5,8 @@ import { EXTRAS, getPacksByService } from '@/app/config/packs-config';
 import { generateQuotePDF, generateContractPDF } from '@/lib/pdf-utils';
 import { resolvePackI18nFeatures, resolvePackI18nKey } from '@/lib/pack-i18n';
 import { computeBookingFinancialSummary } from '@/lib/services/costEngine';
-import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
+import { calculateBillableTravelKm, calculateTravelBlocks, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
+import { computeBoloTransport } from '@/lib/services/travelLaborCost';
 import { applyDatePricing } from '@/lib/services/pricing/datePricingService';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_PDF_STUDIO_DEFAULTS } from '@/lib/constants/admin';
@@ -272,8 +273,11 @@ export default function PresupuestoPdfStudio({
     () => calculateBillableTravelKm(travelKm, INCLUDED_TRAVEL_KM),
     [travelKm]
   );
+  // Càrrec de transport (#1369, monocapa): UNA crida al cervell econòmic. Aquest editor
+  // de pre-venda no té les línies del bolo estructurades, així que assumeix un bolo típic
+  // de 2 persones; quan el pressupost ve d'un lead/reserva, el transport real ja hi és.
   const travelCharge = useMemo(
-    () => calculateTravelCharge(travelKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR),
+    () => computeBoloTransport({ roundTripKm: travelKm, headcountOverride: 2 }).clientCharge,
     [travelKm]
   );
 

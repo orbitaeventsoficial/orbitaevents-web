@@ -1,3 +1,26 @@
+## 2026-07-02 — MONOCAPA del transport: un sol cervell (computeBoloTransport), les pàgines criden (Canvi #1370, claude)
+
+### Context
+El propietari va detectar el problema d'arrel: el càrrec de transport es calculava a ~10 superfícies diferents, cadascuna amb la seva còpia, i per això un canvi no s'aplicava a tot i ni jo sabia d'on sortia cada número. Doctrina del propietari: «un sol cervell, moltes pàgines» — la lògica de diners viu en UN lloc (el cervell econòmic, capa de serveis) i les pàgines només hi CRIDEN. Escrita al `CLAUDE.md` com a norma constitucional.
+
+### Què s'ha fet
+- **Cervell únic** `computeBoloTransport` (`lib/services/travelLaborCost.ts`): font ÚNICA del transport d'un bolo — retorna `clientCharge`, `cost`, `breakdown`, `headcount`, `chargeableHours`. El marge del transport es decideix a UNA constant `CLIENT_TRAVEL_MARGIN` (ara 1 = break-even; posar-la a 1.15 = +15% a TOT arreu).
+- **Pàgines migrades a CRIDES** (0 càlcul propi): portal del client + els 2 PDFs de pre-venda (`PresupuestoPdfStudio`, `dossier-html-builder`) que encara usaven la fórmula vella. La resta (lead, reserva, drawer, pricing) ja hi bevien via wrapper.
+- **`calculateTravelCharge` (fórmula de trams, 0,50 €/km) ELIMINADA** de `travelCost.ts` — ningú pot tornar a divergir. `calculateClientTravelCharge` queda com a wrapper prim deprecat del cervell.
+- **Doctrina** «Un sol cervell, moltes pàgines» escrita al `CLAUDE.md` (secció pròpia, norma vinculant) amb la llista de cervells de diners consolidats.
+- Fallback vehicle 0,26 (barem IRPF); tests actualitzats.
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0; tests 180/180 (travelCost, travelLaborCost, bookingCreation, bookingRoute, costEngine).
+- Validació funcional: portal i PDFs pre-venda ara demanen el càrrec al cervell (mateixa font que lead/reserva).
+- Validació humana/UX: un canvi de transport ara s'aplica a TOTES les pàgines alhora (una font); el marge es regula des d'UNA línia.
+
+### Coordinació
+Counter → 1370. ⚠️ PENDENT (menor): els textos de «trams» als 2 PDFs de pre-venda queden com a informatius (el NÚMERO ja ve del cervell) fins a una passada visual del PDF; el headcount d'aquests editors manuals assumeix 2 persones (bolo típic). Carrils disjunts amb Codex.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-02 — Transport 2 potes + peatges + PANTALLA «Pasta» del col·laborador amb PDF liquidació (Canvi #1368, claude)
 
 ### Context
@@ -32162,3 +32185,23 @@ No es classifica cap entitat com a client o proveïdor absolut. `Customer` és q
 - No s'ha fet commit ni push.
 - Working tree brut esperat: canvis del #898 + tooling Claude existent (`CLAUDE.md`, `.claude/`, `scripts/hooks/`). No revertir aquests canvis aliens.
 - `git status` final mostra també `lib/services/partnerHubService.ts` i `__tests__/lib/services/partnerHubService.test.ts` no rastrejats; possible feina concurrent/no validada. No assumir que el Partner Hub està acabat sense revisar-los i provar-los.
+
+## 2026-07-02 — Lead Estel: dossier com a preselecció i reserva com a font contractual (Canvi #1369, codex)
+
+### Context
+El propietari ha aclarit el criteri de producte: els dossiers serveixen per ensenyar possibilitats comercials i no són necessàriament el contractat; tot i així, quan s'obren per primer cop des d'un lead han d'arrencar amb el que porta el lead. La reserva és la font que mana després i ha d'heretar les dades i línies seleccionades del lead.
+
+### Canvi
+- Dossier: es manté la sincronització inicial des del lead i es completa el mapping de `Caps mòbils (llum)` cap al producte de dossier `Pont de llums + caps mòbils`.
+- Nova reserva: el formulari carrega les línies visibles del lead via `/api/admin/leads/:id/service-lines` quan no hi ha autosave local i les mostra dins `BookingServiceLinesSection` abans de guardar.
+- Afegit mapper testejat per passar de línies de lead al format editable de reserva sense tocar schema, cost model ni repartiment.
+
+- Validació tècnica: `pnpm test:run -- __tests__\app\admin\bookings\bookingLeadServiceLineMapper.test.ts __tests__\lib\services\dossierService.test.ts` OK (19 tests); `npx tsc --noEmit` OK.
+- Validació funcional: Playwright real a `localhost:3000`: dossier d'Estel hereta dades i 4 productes marcats; nova reserva d'Estel mostra dades del lead i línies DJ, caps mòbils, Bingo i Batalla abans de crear la reserva.
+- Validació humana/UX: el dossier queda com a preselecció comercial editable; la reserva mostra el bolo real que mana abans de guardar.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1369.

@@ -8,7 +8,7 @@ import {
   normalizePortalLocale,
 } from '@/lib/services/clientPortalAccess';
 import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
-import { calculateClientTravelCharge, calculateTravelCostBreakdown, deriveTravelHeadcount } from '@/lib/services/travelLaborCost';
+import { computeBoloTransport } from '@/lib/services/travelLaborCost';
 import { formatCurrency, toIntlLocale } from '@/lib/constants';
 import { listPortalPhotos } from '@/lib/services/galleryService';
 import Image from 'next/image';
@@ -309,17 +309,14 @@ export default async function ClientPortalPage({
     };
   }>;
   const totalTravelKm = typeof booking.distanceKm === 'number' ? booking.distanceKm : 0;
-  // Càrrec de transport al client (#1363): font ÚNICA (calculateClientTravelCharge) — cost
-  // real amb dues potes (cotxe/km + gent/hores). El headcount surt de les línies del bolo.
-  const travelHeadcount = deriveTravelHeadcount(booking.serviceLines ?? []);
-  const travelBreakdown = calculateTravelCostBreakdown({
+  // Transport (#1369, monocapa): UNA crida al cervell econòmic. La vista NO calcula res.
+  const travel = computeBoloTransport({
     roundTripKm: totalTravelKm,
-    vehicleOwner: { label: '' },
-    people: travelHeadcount > 0
-      ? [{ role: 'DRIVER', label: '' }, ...(travelHeadcount > 1 ? [{ role: 'PASSENGER' as const, label: '', count: travelHeadcount - 1 }] : [])]
-      : [],
+    serviceLines: booking.serviceLines ?? [],
+    tollsEur: typeof booking.tollsEur === 'number' ? booking.tollsEur : 0,
   });
-  const travelCharge = calculateClientTravelCharge(totalTravelKm, travelHeadcount);
+  const travelHeadcount = travel.headcount;
+  const travelCharge = travel.clientCharge;
 
   const progressSteps = getProgressSteps(t, booking as Parameters<typeof getProgressSteps>[1], locale);
   const nextAction = getNextActionLabel(t, paymentSummary, contractSummary);
@@ -671,7 +668,7 @@ export default async function ClientPortalPage({
                 </div>
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">
                   <p className="text-xs text-white/35 mb-1">{t.travelRate}</p>
-                  <p className="text-sm font-semibold">{formatDistanceKm(totalTravelKm, locale)} km + {travelBreakdown.chargeableHours.toLocaleString(toIntlLocale(locale))} h</p>
+                  <p className="text-sm font-semibold">{formatDistanceKm(totalTravelKm, locale)} km + {travel.chargeableHours.toLocaleString(toIntlLocale(locale))} h</p>
                   <p className="text-xs text-white/35 mt-0.5">{t.travelExtraKm}: {travelHeadcount} pers. · 1a h inclosa</p>
                 </div>
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3">

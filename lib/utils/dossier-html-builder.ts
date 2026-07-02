@@ -7,8 +7,8 @@ import {
   TRAVEL_BLOCK_EUR,
   calculateBillableTravelKm,
   calculateTravelBlocks,
-  calculateTravelCharge,
 } from '@/lib/services/travelCost';
+import { computeBoloTransport } from '@/lib/services/travelLaborCost';
 
 export type DossierClientInfo = {
   nom: string;
@@ -245,7 +245,9 @@ function buildBudgetBlock(
   // Desplaçament (helpers canònics).
   const billableKm = calculateBillableTravelKm(travelKm);
   const blocks = calculateTravelBlocks(travelKm);
-  const travelCharge = calculateTravelCharge(travelKm);
+  // Càrrec de transport (#1369, monocapa): UNA crida al cervell econòmic. Dossier de
+  // pre-venda amb bolo típic de 2 persones (si ve de lead/reserva, el transport real ja hi és).
+  const travelCharge = computeBoloTransport({ roundTripKm: travelKm, headcountOverride: 2 }).clientCharge;
   const total = servicesSubtotal + travelCharge;
 
   const travelDetail = travelCharge > 0

@@ -116,6 +116,21 @@ Exemples: coordenades calculades, amplades dinàmiques, transform puntual.
 - Sí → inline és acceptable
 - No → ha d'anar a la capa comuna adequada
 
+## Un sol cervell, moltes pàgines (norma vinculant, propietari 2026-07-02)
+
+**Principi constitucional del repo.** Tota lògica de domini —sobretot els diners (transport, cost, marge, pasta, repartiment, tresoreria)— viu en UN sol **cervell** i les **pàgines només hi criden**.
+
+- **Cervell = capa de serveis** (`lib/services/*`): funcions pures, font ÚNICA de veritat de cada càlcul. El cervell és **sagrat**: la seva responsabilitat no es duplica ni es reparteix.
+- **Pàgines/vistes = crides** (`app/**`): poden crear-se, modificar-se o eliminar-se lliurement, però **NO calculen res de domini**. Demanen el número al cervell i el mostren.
+- **Un càlcul = una funció.** Si el mateix número (un càrrec, un marge, un headcount, una pasta) es calcula a més d'una pàgina, és un BUG d'arquitectura que s'ha de consolidar. La regla de tres del propietari: *«un sol cervell, moltes pàgines»*.
+- **Els diners són el domini d'Economia.** Tot el que és pasta viu al cervell econòmic (`costEngine`, `travelLaborCost`, `repartimentService`, `collaboratorPayoutService`…); `/admin/economia` n'és la vista-hub, però lead, reserva, portal i PDFs també hi **criden** — mai reinventen el càlcul.
+- **Cervells de diners consolidats (font única — no en facis de paral·lels):**
+  - Transport al client i cost de ruta → `computeBoloTransport` (`lib/services/travelLaborCost.ts`). El marge del transport es decideix a UNA constant (`CLIENT_TRAVEL_MARGIN`). Headcount → `deriveTravelHeadcount`. Prohibit `calculateTravelCharge` (fórmula de trams, retirada).
+  - Marge/cost del bolo → `computeBookingFinancialSummary` (`costEngine.ts`).
+  - Qui cobra què → `computeBoloRepartiment` (`repartimentService.ts`).
+  - Pasta d'un col·laborador → `loadCollaboratorPayout` (`collaboratorPayoutService.ts`).
+- **Com afegir una pàgina que mostra diners:** importa la funció del cervell, crida-la, mostra el resultat. Zero `reduce`/fórmules/ratios propis sobre imports. Si el cervell no exposa el que necessites, **s'amplia el cervell**, després la pàgina hi crida.
+
 ## Hardcode i monocapa
 
 - **NORMA ABSOLUTA — ZERO HARDCODED EN TOT EL REPO**: Ni hex de color, ni mides de font en px/pt, ni strings de contacte, ni URLs, ni telèfons, ni emails, ni textos reutilitzats, ni `true`/`false` per a flags de domini. Tot ve de:

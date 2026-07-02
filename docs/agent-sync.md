@@ -15,9 +15,9 @@ Avís per l'altre agent: ...
 
 ## Bloc CODEX (Codex CLI)
 
-[codex] 2026-07-02 [ESTAT: treballant — herència lead → dossier/reserva #1367]
-Perímetre previst: `/admin/dossiers?leadId=cmr3vkl990000z4rz9qkyfe5v`, `/admin/bookings/new?leadId=cmr3vkl990000z4rz9qkyfe5v`, prefill de dades i línies seleccionades del lead. Proper canvi: mantenir el dossier com a preselecció inicial editable i fer visible l'herència de línies al formulari de reserva.
-Avís claude: no tocaré repartiment, transport, schema ni cost model; només cablejat lead→dossier/reserva i verificació UI/API.
+[codex] 2026-07-02 [ESTAT: tancat — herència lead → dossier/reserva #1369]
+Perímetre: `/admin/dossiers?leadId=cmr3vkl990000z4rz9qkyfe5v`, `/admin/bookings/new?leadId=cmr3vkl990000z4rz9qkyfe5v`, prefill de dades i línies seleccionades del lead. Fixat/verificat: el dossier hereta com a preselecció inicial editable; la reserva mostra i envia les línies del lead al formulari.
+Avís claude: no he tocat repartiment, schema ni cost model; només cablejat lead→dossier/reserva, mapping de producte i verificació UI/API. Renumerat a #1369 perquè el counter viu ja era #1368.
 
 [codex] 2026-07-02 [ESTAT: tancat — herència lead → dossier #1366]
 Perímetre: `/admin/dossiers?leadId=...`, `dossierService`, test del servei. Fixat: Dossiers carrega el lead complet per `leadId` (nom/email/telèfon/eventDesc amb data/hores/lloc/pax/missatge) i deixa que el client sincronitzi les línies reals del bolo en comptes d'un premap parcial per `collaboratorId`.

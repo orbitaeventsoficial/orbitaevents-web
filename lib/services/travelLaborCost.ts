@@ -197,11 +197,72 @@ export function deriveTravelHeadcount(
 }
 
 /**
- * CÀRREC de transport al CLIENT (#1363, decisió del propietari): el client paga el
- * COST REAL del desplaçament, amb les dues potes SEPARADES —cotxe per km + gent per
- * hores (1a hora inclosa)—. Substitueix la fórmula antiga per km (`calculateTravelCharge`,
- * 0,50 €/km) que només cobria el cotxe i ignorava el temps de la tripulació.
- * `headcount` = persones que viatgen (via `deriveTravelHeadcount`). Break-even amb el cost.
+ * Marge del transport al client (#1369). BREAK-EVEN = 1 (el client paga exactament el
+ * cost). Aquesta és l'ÚNICA palanca per fer que el desplaçament deixi marge: posar-la a
+ * 1.15 = +15%, etc. Es canvia AQUÍ i s'aplica a TOTES les superfícies (monocapa).
+ */
+export const CLIENT_TRAVEL_MARGIN = 1;
+
+export interface BoloTransportResult {
+  roundTripKm: number;
+  headcount: number;
+  tollsEur: number;
+  routeHours: number;
+  chargeableHours: number;
+  cost: number;         // cost real total (cotxe + temps tripulació + peatges)
+  clientCharge: number; // el que paga el client (cost × CLIENT_TRAVEL_MARGIN)
+  breakdown: TravelCostBreakdown;
+}
+
+/**
+ * FONT ÚNICA del transport d'un bolo (#1369, monocapa). QUALSEVOL superfície que
+ * necessiti el transport —lead, reserva, portal, PDFs, pricing— ha de cridar NOMÉS
+ * aquesta funció i llegir-ne el resultat (`clientCharge`, `cost`, `breakdown`,
+ * `headcount`, `chargeableHours`). Prohibit recalcular charge/cost/headcount pel seu
+ * compte. Deriva el headcount de les línies del bolo (regla de persones físiques) i
+ * calcula el cost real de dues potes (cotxe €/km + tripulació €/h) + peatges.
+ */
+export function computeBoloTransport(input: {
+  roundTripKm: number | null;
+  serviceLines?: TravelHeadcountLineLike[];
+  hasOrbitaPack?: boolean;
+  headcountOverride?: number | null;
+  tollsEur?: number | null;
+  vehicleCostPerKm?: number | null;
+}): BoloTransportResult {
+  const km = round2(sanitizeNonNegative(input.roundTripKm, 0));
+  const tolls = round2(sanitizeNonNegative(input.tollsEur, 0));
+  const headcount = input.headcountOverride != null && input.headcountOverride >= 0
+    ? Math.floor(input.headcountOverride)
+    : deriveTravelHeadcount(input.serviceLines ?? [], input.hasOrbitaPack ?? false);
+  const breakdown = calculateTravelCostBreakdown({
+    roundTripKm: km,
+    vehicleCostPerKm: input.vehicleCostPerKm,
+    tollsEur: tolls,
+    vehicleOwner: { label: '' },
+    people: headcount > 0
+      ? [
+          { role: 'DRIVER', label: '' },
+          ...(headcount > 1 ? [{ role: 'PASSENGER' as const, label: '', count: headcount - 1 }] : []),
+        ]
+      : [],
+  });
+  const cost = km <= 0 ? tolls : breakdown.totalCost;
+  return {
+    roundTripKm: km,
+    headcount,
+    tollsEur: tolls,
+    routeHours: breakdown.routeHours,
+    chargeableHours: breakdown.chargeableHours,
+    cost,
+    clientCharge: round2(cost * CLIENT_TRAVEL_MARGIN),
+    breakdown,
+  };
+}
+
+/**
+ * @deprecated Usa `computeBoloTransport` (font única). Wrapper prim que en delega el
+ * càrrec al client; es manté només mentre queden callers per migrar.
  */
 export function calculateClientTravelCharge(
   roundTripKm: number,
@@ -209,22 +270,7 @@ export function calculateClientTravelCharge(
   vehicleCostPerKm?: number | null,
   tollsEur?: number | null,
 ): number {
-  const km = sanitizeNonNegative(roundTripKm, 0);
-  const people = Math.max(0, Math.floor(sanitizeNonNegative(headcount, 0)));
-  const tolls = round2(sanitizeNonNegative(tollsEur, 0));
-  if (km <= 0) return tolls; // sense km però amb peatges (cas límit): el client els paga igualment
-  const breakdown = calculateTravelCostBreakdown({
-    roundTripKm: km,
-    vehicleCostPerKm,
-    tollsEur: tolls,
-    vehicleOwner: { label: '' },
-    people:
-      people > 0
-        ? [
-            { role: 'DRIVER', label: '' },
-            ...(people > 1 ? [{ role: 'PASSENGER' as const, label: '', count: people - 1 }] : []),
-          ]
-        : [],
-  });
-  return breakdown.totalCost;
+  return computeBoloTransport({
+    roundTripKm, headcountOverride: headcount, vehicleCostPerKm, tollsEur,
+  }).clientCharge;
 }

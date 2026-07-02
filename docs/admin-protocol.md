@@ -1547,6 +1547,20 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1370 — 2026-07-02 — claude (FET)
+**MONOCAPA del transport: un sol cervell (`computeBoloTransport`), les pàgines només criden.**
+- Context: el propietari va detectar que el transport es calculava a ~10 superfícies. Doctrina «un sol cervell, moltes pàgines» → escrita al CLAUDE.md com a norma constitucional.
+- `lib/services/travelLaborCost.ts`: `computeBoloTransport` = font única (clientCharge/cost/breakdown/headcount). Marge del transport a UNA constant `CLIENT_TRAVEL_MARGIN`.
+- Pàgines migrades a crides: portal + 2 PDFs de pre-venda (PresupuestoPdfStudio, dossier-html-builder). `calculateTravelCharge` (fórmula de trams) ELIMINADA.
+- Doctrina «Un sol cervell, moltes pàgines» al CLAUDE.md (norma vinculant + llista de cervells de diners).
+- Validació tècnica: tsc 0; validate:core EXIT 0; tests 180/180.
+- Validació funcional: portal i PDFs pre-venda demanen el càrrec al cervell (mateixa font que lead/reserva).
+- Validació humana/UX: un canvi de transport s'aplica a totes les pàgines alhora; el marge es regula des d'UNA línia.
+- Counter → 1370. PENDENT menor: textos de «trams» als 2 PDFs (informatius; el número ja ve del cervell).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1368 — 2026-07-02 — claude (FET)
 **Transport = cost real de dues potes + peatges + PANTALLA «Pasta» del col·laborador amb PDF de liquidació.**
 - Context: sessió llarga guiada pel propietari (analista econòmic). Consolida #1363-1368 (counter compartit amb Codex, carrils de codi disjunts). Transport: el client paga el cost real (cotxe €/km + tripulació €/h, tots 15€/h, headcount = persones físiques), + peatges (`tollsEur`, cost real no-km). Nova capacitat: liquidació per col·laborador (què li devem, per estat) amb PDF.
@@ -22206,6 +22220,21 @@ px tsc --noEmit OK · git diff --check OK.
 - Validació funcional: `leadId` ja és suficient perquè el generador arrenqui amb les dades persistides del lead i no amb una URL incompleta.
 - Validació humana/UX: el propietari no ha de reintroduir manualment al dossier allò que ja havia escrit al lead; si el lead té línies de bolo, es sincronitzen pel camí canònic existent.
 - `ADMIN_CHANGE_COUNTER` passa a `1366`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1369 — 2026-07-02 — codex (FET)
+**Lead → dossier/reserva: preselecció comercial al dossier i herència visible a la reserva.**
+- Context: el propietari aclareix que el dossier és una eina comercial per ensenyar possibilitats, no necessàriament el producte contractat; però si s'obre per primer cop des d'un lead, ha d'arrencar amb el que porta. La reserva és la font contractual i ha d'heretar el lead i les línies seleccionades.
+- Dossier: es manté la sincronització inicial amb `/api/admin/leads/:id/service-lines` i s'afegeix el mapping de `Caps mòbils (llum)` cap a `Pont de llums + caps mòbils`, perquè el lead d'Estel preseleccioni també l'equipament.
+- Reserva: el formulari de nova reserva carrega `/api/admin/leads/:id/service-lines` quan no hi ha autosave local i transforma les línies visibles del lead al format editable de `BookingServiceLinesSection`.
+- Autosave: si ja existeix un esborrany de nova reserva, no es trepitja amb el prefill del lead; l'herència de línies només s'aplica a la primera obertura neta.
+- Test nou: `bookingLeadServiceLineMapper.test.ts` blinda la normalització de tipus, imports, quantitats i labels.
+- Validació tècnica: `pnpm test:run -- __tests__\app\admin\bookings\bookingLeadServiceLineMapper.test.ts __tests__\lib\services\dossierService.test.ts` → 19/19 OK; `npx tsc --noEmit` OK.
+- Validació funcional: Playwright real a `localhost:3000` amb el lead `cmr3vkl990000z4rz9qkyfe5v`. Dossier hereta Estel Giralt, telèfon, email, resum i 4 productes marcats: DJ professional, Pont de llums + caps mòbils, Bingo Musical i Batalla Musical. Nova reserva hereta nom, email, telèfon, data `2026-07-25`, horari `21:00-23:00`, 30 pax, Dosrius, 36.6 km i línies `DJ · 1a hora`, `DJ · hora addicional`, `Caps mòbils (llum)`, `Bingo Musical (Masquerade Events)` i `Batalla Musical (Masquerade Events)`.
+- Validació humana/UX: el dossier queda com a punt de partida comercial editable; la reserva mostra abans de guardar el bolo real que mana després de reservar.
+- `ADMIN_CHANGE_COUNTER` passa a `1369`.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`

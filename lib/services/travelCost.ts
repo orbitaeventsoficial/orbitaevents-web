@@ -53,15 +53,10 @@ export function calculateTravelCost(
   return round2(safeTotalKm * rate);
 }
 
-export function calculateTravelCharge(
-  totalKm: number,
-  includedKm = INCLUDED_TRAVEL_KM,
-  blockKm = TRAVEL_BLOCK_KM,
-  blockPrice = TRAVEL_BLOCK_EUR
-): number {
-  const blocks = calculateTravelBlocks(totalKm, includedKm, blockKm);
-  return round2(blocks * sanitizeNonNegative(blockPrice, TRAVEL_BLOCK_EUR));
-}
+// `calculateTravelCharge` (fórmula de trams, 0,50 €/km) ELIMINADA (#1369). El càrrec de
+// transport al client és font única a `computeBoloTransport` (travelLaborCost.ts) — cost
+// real de dues potes. `calculateTravelBlocks`/`calculateBillableTravelKm` es mantenen
+// només per a textos informatius de km (no per calcular el càrrec).
 
 /**
  * Calcula el cost efectiu per km del vehicle a partir de:
