@@ -1546,6 +1546,19 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1349 — 2026-07-02 — claude (FET)
+**Fitxa de lead: polish (eyebrow net + pressupost clar + «Següent pas» refinat).**
+- Eyebrow (`LeadDetailClient`): filtra «Altre»/buits → fora el «ALTRE · ALTRE».
+- Pressupost (`LeadBoloSection`+CSS): panell or, ordre Serveis → Transport (base km com a subtext) → Total client (2xl). Tret cost intern (és marge).
+- «Següent pas» (CSS): etiqueta neta sense caixa + text `--o-text-sm`.
+- Validació tècnica: tsc 0; validate:core 0.
+- Validació funcional: (Playwright) header i pressupost nets.
+- Validació humana/UX: iterat i aprovat pel propietari.
+- Counter → 1349. PENDENT: canonitzar patrons a `.ap-*` + Studio; tècnic a la línia del producte.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1348 — 2026-07-02 — claude (FET)
 **Fitxa de lead: reconstrucció visual (marge al rail + bolo a fila única + pressupost integrat).**
 - Reconstrucció VISUAL (0 lògica), iterada amb el propietari. Header antic (fets en files a dalt) conservat.

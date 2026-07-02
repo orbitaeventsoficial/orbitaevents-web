@@ -1,3 +1,24 @@
+## 2026-07-02 — Fitxa de lead: polish (eyebrow net + pressupost clar + «Següent pas» refinat) (Canvi #1349, claude)
+
+### Context
+Continuació del #1348 amb feedback visual del propietari («es millorable, enginyer jefe»): l'eyebrow mostrava soroll «ALTRE · ALTRE», el bloc de transport/pressupost barrejava cost intern amb preu al client i tenia tipografia densa, i l'etiqueta «Següent pas» era una caixa daurada feixuga.
+
+### Què s'ha fet (només presentació/CSS)
+- **Eyebrow net** (`LeadDetailClient`): filtra valors buits/«Altre» → mostra només l'estat (i tipus/origen si són significatius). Fora el «ALTRE · ALTRE».
+- **Pressupost clar** (`LeadBoloSection` + CSS): el resum passa a panell or destacat; ordre lògic Serveis → Transport (amb base «km facturables · primers N inclosos» com a subtext) → **Total client** (2xl or). Tret el «cost intern» d'aquí (és marge, ja viu al rail). Nota de ruta reduïda a la lògica d'hores.
+- **«Següent pas» refinat** (CSS): etiqueta neta sense caixa (or discret, eyebrow de secció) + text a `--o-text-sm` llegible.
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0.
+- Validació funcional: (Playwright) header «CONTACTAT / Alba Orna / SEGÜENT PAS …» net; pressupost Serveis 240 + Transport +190 = Total 430€ en panell or.
+- Validació humana/UX: iterat i aprovat pel propietari.
+
+### Coordinació
+Counter → 1349. `.ap-ledger-*` = específics del lead (no propaguen). PENDENT (intenció del propietari): canonitzar aquests patrons a `.ap-*` globals + reflectir-los a `/admin/studio`; i tècnic de so a la mateixa línia del producte. Non-stop.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-02 — Fitxa de lead: reconstrucció visual (marge al rail + bolo a fila única + pressupost integrat) (Canvi #1348, claude)
 
 ### Context

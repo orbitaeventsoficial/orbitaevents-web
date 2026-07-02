@@ -34,6 +34,9 @@ Avís claude: continuo fora de mails automàtics, APPEND i seqüències. També 
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-07-02 [ESTAT: tancat — fitxa de lead polish (eyebrow/pressupost/següent pas) #1349]
+Polish visual del #1348 (feedback propietari): eyebrow sense «ALTRE·ALTRE»; pressupost en panell or (Serveis→Transport→Total client; cost intern tret d'aquí, que és marge); «Següent pas» etiqueta neta sense caixa. `.ap-ledger-*` = específics del lead. PENDENT (intenció del propietari): canonitzar patrons a `.ap-*` globals + reflectir a /admin/studio; tècnic de so a la mateixa línia del producte. tsc 0, validate:core 0. Counter → 1349.
+
 [claude] 2026-07-02 [ESTAT: tancat — fitxa de lead reconstrucció visual #1348]
 Reconstrucció VISUAL de /admin/leads/[id] (0 lògica), iterada amb el propietari: header antic (fets en files) + MARGE del bolo al rail dret (.ap-ledger-summary, zenit 2-col) + BOLO aprimat a fila única + PRESSUPOST integrat (Serveis + Transport = Total abans de contractar). ⚠️ He tocat BookingServiceLinesSection (COMPARTIT amb el teu formulari de nova reserva): files a una sola línia sense flex-wrap, num/qty amb basis fix (bug: qty sense basis s'inflava a 879px per .adm-input width:100%). L'aprimat aplica també a nova reserva (canònic). Sense canvi de lògica. tsc 0, validate:core 0, tests 14/14.
 Avís codex: BookingServiceLinesSection ara té files compactes d'una línia; si el toques a reserves, mantén el patró (SL_LABEL flex-1 truncate, SL_NUM/SL_QTY amb basis fix). No he tocat cap càlcul.

@@ -328,20 +328,20 @@ export default function LeadBoloSection({
  />
  </label>
  <p className="ap-ledger-budget-travelnote">
- 1a hora inclosa · cobren {travelBreakdown.chargeableHours} h de {travelBreakdown.routeHours} h · {billableKm} km facturables (primers {INCLUDED_TRAVEL_KM} inclosos) · cost intern {formatCurrency(effectiveTravelCost)}
+ 1a hora de ruta inclosa · es cobren {travelBreakdown.chargeableHours} h de {travelBreakdown.routeHours} h
  </p>
  </div>
  <div className="ap-ledger-budget-sum">
  <div className="ap-ledger-budget-row">
- <span>Serveis contractats</span>
+ <span>Serveis</span>
  <strong>{formatCurrency(economia.total - travelCharge)}</strong>
  </div>
  <div className="ap-ledger-budget-row">
- <span>Transport <em>(el paga el client)</em></span>
+ <span>Transport<em>{billableKm} km · primers {INCLUDED_TRAVEL_KM} inclosos</em></span>
  <strong>+{formatCurrency(travelCharge)}</strong>
  </div>
  <div className="ap-ledger-budget-row ap-ledger-budget-row--total">
- <span>Total</span>
+ <span>Total client</span>
  <strong>{formatCurrency(economia.total)}</strong>
  </div>
  </div>

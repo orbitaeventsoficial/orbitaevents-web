@@ -376,7 +376,11 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  <section className="ap-ledger-hd">
  <div className="ap-ledger-hd-top">
  <div className="ap-ledger-hd-ident">
- <p className="ap-ledger-hd-eyebrow">{STAGE_LABEL[stage]} · {lead.type} · {sourceLabel(lead.channel)}</p>
+ <p className="ap-ledger-hd-eyebrow">{[
+ STAGE_LABEL[stage],
+ lead.type && !/^altre/i.test(lead.type) ? lead.type : null,
+ (() => { const s = sourceLabel(lead.channel); return s && s !== '—' && !/^altre/i.test(s) ? s : null; })(),
+ ].filter(Boolean).join(' · ')}</p>
  <h2 className="ap-ledger-hd-name">{lead.name}</h2>
  <p className="ap-ledger-hd-next" aria-label="Següent pas recomanat"><span className="ap-ledger-hd-next-tag">Següent pas</span>{leadSummary(lead)}</p>
  </div>
