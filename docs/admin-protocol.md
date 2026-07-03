@@ -1547,6 +1547,22 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1391 — 2026-07-04 — claude (FET)
+**Ticker «Brúixola» a TOTES les pàgines admin + carrousel real (slide lateral) + repertori ampliat.**
+- Context: el propietari vol la brúixola present a TOTES les pàgines admin (no només dashboard + Economia), amb un carrousel de veritat (les frases entren i surten pels laterals), i més màximes.
+- Muntatge: `MaximsTicker` es mou al shell (`app/admin/layout.tsx`, primer fill de `.ax__page`) → apareix a tota ruta `/admin/*`. Tret dels muntatges individuals de `page.tsx` (dashboard) i `EconomiaClient.tsx`.
+- Carrousel real: reescrit amb `framer-motion` (`AnimatePresence` mode="wait") — la frase surt lliscant per l'esquerra (`x:-110%`) i la següent entra per la dreta (`x:110%`). `useReducedMotion` → fos suau si l'usuari ho prefereix. Nou `.ap-maxims-viewport` amb `overflow:hidden` que retalla els laterals.
+- Repertori `ADMIN_ECONOMY_MAXIMS` ampliat de 12 a 26 màximes (dures econòmicament però sanes).
+- Ortografia: 3 correccions — «xòfer»→«xofer» (forma normativa), «Primer el número»→«els números» (idiomàtic, «fer números»), «El caixa és el rei»→«La caixa és la reina» (gènere: caixa/tresoreria és femení).
+- CSS: `.ax__page > .ap-maxims` amb `margin-bottom` (el shell no té gap). Tret el keyframe `apMaximsIn` (ara ho gestiona framer).
+- Validació tècnica: `npx tsc --noEmit` 0; `validate:core` verd.
+- Validació funcional: Playwright a `/admin/leads`, `/admin/bookings`, `/admin/calendario` — el ticker hi és (via shell); fotograma a mig slide confirma el lliscament lateral.
+- Validació humana/UX: la brúixola acompanya tota la navegació sense molestar; el carrousel dóna vida sense distreure (es pausa en hover, respecta reduced-motion).
+- `ADMIN_CHANGE_COUNTER` passa a `1391`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1390 — 2026-07-04 — claude (FET)
 **Ticker «Brúixola»: màximes d'Economia sempre visibles al top (dashboard + Economia).**
 - Context: decisió doctrinal del propietari després de l'anàlisi del transport. Vol una brúixola de gestió sempre present que li recordi que el transport és cost (no negoci), que el marge viu al producte propi i que el temps (els dissabtes) és el recurs escàs.

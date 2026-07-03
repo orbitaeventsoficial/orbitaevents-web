@@ -10,6 +10,7 @@ import { useCsrfFetch } from '@/hooks/useCsrfFetch';
 import { log } from '@/lib/logger';
 import { ADMIN_CHANGE_COUNTER } from '@/lib/constants/admin';
 import { NAV_GROUPS, getGroupForPath, type NavItem, type NavGroup } from './lib/adminNav';
+import MaximsTicker from './components/MaximsTicker';
 import '../studio/orbita-tokens.css';
 import './admin-theme.css';
 import './admin-shell.css';
@@ -136,6 +137,8 @@ function AdminShell({ children }: { children: React.ReactNode }) {
           {/* ── Contingut principal ──────────────────────────────────────── */}
           <div className="ax__workspace">
             <main id="admin-main-content" className="ax__page">
+              {/* Brúixola d'Economia: màximes rotant al top de TOTES les pàgines admin (#1391) */}
+              <MaximsTicker />
               {children}
             </main>
           </div>

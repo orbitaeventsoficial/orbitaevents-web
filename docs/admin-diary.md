@@ -1,3 +1,26 @@
+## 2026-07-04 — Ticker «Brúixola» a totes les pàgines + carrousel real (Canvi #1391, claude)
+
+### Context
+El propietari vol la brúixola a TOTES les pàgines admin (no només dashboard + Economia), amb un carrousel de veritat (frases que entren/surten pels laterals) i més màximes. També demana corregir 3 errades ortogràfiques.
+
+### Què s'ha fet
+- `MaximsTicker` mogut al shell (`layout.tsx`, primer fill de `.ax__page`) → present a tota ruta `/admin/*`. Tret dels muntatges de dashboard i Economia.
+- Carrousel real amb `framer-motion` (`AnimatePresence` mode="wait"): la frase surt per l'esquerra (`x:-110%`) i la nova entra per la dreta (`x:110%`); `useReducedMotion` → fos suau. Nou `.ap-maxims-viewport` (`overflow:hidden`).
+- `ADMIN_ECONOMY_MAXIMS` ampliat de 12 a 26 màximes.
+- 3 correccions ortogràfiques: «xòfer»→«xofer», «Primer el número»→«els números», «El caixa és el rei»→«La caixa és la reina» (gènere).
+- CSS: `margin-bottom` al ticker del shell; tret keyframe `apMaximsIn`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0; `validate:core` verd.
+- Validació funcional: Playwright a leads/bookings/calendari (ticker via shell) + fotograma a mig slide (lliscament lateral confirmat).
+- Validació humana/UX: brúixola omnipresent sense molestar; carrousel viu, es pausa en hover, respecta reduced-motion.
+
+### Coordinació
+Counter → 1391. Carril visual (meu). Worktree barrejat amb Codex → commit selectiu.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-04 — Ticker «Brúixola»: màximes d'Economia al top (Canvi #1390, claude)
 
 ### Context

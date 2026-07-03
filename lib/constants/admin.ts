@@ -58,7 +58,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 1390;
+export const ADMIN_CHANGE_COUNTER = 1391;
 
 /**
  * Màximes d'Economia (#1390): brúixola de gestió sempre visible al top del dashboard i
@@ -76,9 +76,23 @@ export const ADMIN_ECONOMY_MAXIMS = [
   'El pitjor client és el que et té ocupat sense marge.',
   'Un «no» a un mal bolo és un èxit, no un fracàs.',
   'Els euros es recuperen; els dissabtes, no.',
-  'Cada quilòmetre et fa xòfer; cada bolo teu et fa empresari.',
+  'Cada quilòmetre et fa xofer; cada bolo teu et fa empresari.',
   'Si el pressupost honest espanta, el bolo no era teu.',
   'Facturar és vanitat; el marge, seny; el temps, el rei.',
+  'Ocupat no és el mateix que rendible.',
+  'Cada «sí» a un mal bolo és un «no» a un de bo.',
+  'Competeix en el que ningú més sap fer, no en preu.',
+  'El descompte d’avui el pagues tota la temporada.',
+  'Un preu sense marge és una feina que et fa pobre.',
+  'Coneix el teu cost, o el client el decidirà per tu.',
+  'Cobra pel valor, no per les hores.',
+  'Créixer en vendes perdent marge és córrer cap enrere.',
+  'El teu preu diu què vals: no en demanis perdó.',
+  'La feina barata sempre surt cara.',
+  'El marge és oxigen; el volum sol, asfíxia.',
+  'Primer els números, després l’emoció.',
+  'No hi ha clients dolents: hi ha preus mal posats.',
+  'La caixa és la reina; cobra abans, paga després.',
 ] as const;
 
 export const ADMIN_DOSSIER_GENERATOR_COPY = {

@@ -3613,6 +3613,8 @@ html.admin-mode .ap-maxims {
   background: linear-gradient(180deg, var(--raised), var(--panel));
   overflow: hidden;
 }
+/* Al shell (#1391) viu com a primer fill de .ax__page, que no té gap → separa'l del contingut. */
+html.admin-mode .ax__page > .ap-maxims { margin-bottom: var(--o-space-3); }
 html.admin-mode .ap-maxims-eyebrow {
   flex-shrink: 0;
   font-family: var(--mono); font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold);
@@ -3622,11 +3624,16 @@ html.admin-mode .ap-maxims-eyebrow::after {
   content: ''; display: inline-block; width: 1px; height: 0.9em; margin-inline-start: var(--o-space-25);
   background: var(--line2); vertical-align: middle;
 }
+/* Finestra del carrousel: retalla les frases que entren/surten pels laterals (#1391). */
+html.admin-mode .ap-maxims-viewport {
+  position: relative; flex: 1 1 auto; min-width: 0; overflow: hidden;
+  display: flex; align-items: center;
+}
 html.admin-mode .ap-maxims-text {
-  margin: 0; flex: 1 1 auto; min-width: 0;
+  margin: 0; max-width: 100%;
   font-family: var(--display); font-size: var(--o-text-sm); font-weight: var(--o-fw-semi);
   color: var(--ax-t); line-height: 1.35;
-  animation: apMaximsIn 480ms ease both;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 html.admin-mode .ap-maxims-next {
   flex-shrink: 0; display: grid; place-items: center;
@@ -3637,13 +3644,6 @@ html.admin-mode .ap-maxims-next {
 }
 html.admin-mode .ap-maxims-next:hover { color: var(--gold); border-color: var(--gold); }
 html.admin-mode .ap-maxims-next:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-@keyframes apMaximsIn {
-  from { opacity: 0; transform: translateY(0.35rem); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@media (prefers-reduced-motion: reduce) {
-  html.admin-mode .ap-maxims-text { animation: none; }
-}
 @media (max-width: 30rem) {
   html.admin-mode .ap-maxims-text { font-size: var(--o-text-xs); }
 }

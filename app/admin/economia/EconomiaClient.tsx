@@ -5,7 +5,6 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AdminPage } from '../components/AdminPage';
-import MaximsTicker from '../components/MaximsTicker';
 import { ADMIN_ECONOMY_HELP, helpAttrs } from '../components/adminHelpContent';
 import PaymentToggleButton from './PaymentToggleButton';
 import PaymentReminderActions from './PaymentReminderActions';
@@ -84,8 +83,6 @@ export default function EconomiaClient(props: EconomiaClientProps) {
         </div>
       }
     >
-      {/* ═══ BRÚIXOLA — màximes d'Economia sempre al top (#1390) ═══ */}
-      <MaximsTicker />
 
       {/* ═══════════ TAB NAVIGATION ═══════════ */}
       <nav role="tablist" aria-label="Seccions d'economia" className="ap-tabs flex gap-1 ap-card p-1" {...helpAttrs(ADMIN_ECONOMY_HELP.tabs)}>
