@@ -1,3 +1,68 @@
+## 2026-07-03 — Transport lead↔reserva unificat: un component compartit `BoloTripCard` (Canvi #1381, claude)
+
+### Context
+El propietari («tira, unifica el transport lead i reserva») veu que en passar de lead a reserva no s'arrossega el disseny del bolo. El bloc «Desplaçament» del lead (rediseny #1378, targeta de dissenyador amb alarma) i el «Desplaçament editable» de la reserva (graella d'inputs d'enginyer: Distància/Hores/Cost) eren dues UIs diferents del MATEIX concepte. Contra el canon «un sol dissenyador, hipersemblança».
+
+### Què s'ha fet
+- NOU `app/admin/components/BoloTripCard.tsx`: component presentacional, font ÚNICA del disseny «Desplaçament». Extret del JSX inline del lead sense canvi de comportament; ara el consumeixen TANT el lead com la reserva.
+- Adaptatiu SENSE controls falsos (canon regla 8): els camps d'edició són opcionals segons la presència del handler. Lead = editor complet (override d'integrants + peatges + atribució cotxe/condueix + desplegable «qui cobra la ruta»); reserva = vista avall (integrants en LECTURA via `.ap-ledger-trip-ro`, sense peatges ni atribució — s'hereten del lead).
+- Monocapa: `CROWDED_TRIP_THRESHOLD` (alarma >2 persones) exportat des de `BoloTripCard`; lead i reserva l'importen (abans era `const` local del lead).
+- `BookingMarginCard` (reserva): la graella d'inputs d'enginyer se substitueix per `<BoloTripCard>` amb `distanceKm` editable + `travelHeadcount` (de `deriveTravelHeadcount`). Les targetes de marge de Codex (#1377) queden INTACTES.
+- CSS `admin-shell.css`: NOVA `.ap-ledger-trip-ro` (camp en lectura amb l'aspecte de l'input, suport `data-alarm`); corregit token fantasma `--t1` → `--ax-t`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0; `validate:core` verd (qa:no-phantom-tokens/classes, admin-canon, css-monocapa, protocol).
+- Validació funcional: Playwright a lead (Estel, `36.6 km · 1 persona`) i reserva — ambdós rendaritzen `.ap-ledger-trip` idèntic; el badge de la reserva deriva `km · N persones` de `deriveTravelHeadcount(booking.serviceLines)`.
+- Validació humana/UX: les dues pantalles semblen germanes (mateixa capçalera, grup RUTA daurat, inputs, nota humana); diferències correctes per rol, no per descuit.
+
+### Coordinació
+Counter → 1381. Carril DISJUNT del #1379/#1380 de Codex (ell: prefill/hidratació; jo: transport visual). ⚠️ Worktree barrejat amb fitxers dirty de Codex (#1379 sense commit) → NO committejo per no trepitjar-lo; commit del #1381 sobre base neta quan Codex tanqui, o conjunt.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-03 — El xip del counter no pot trencar la hidratació (Canvi #1380, codex)
+
+### Context
+Després del Canvi #1379, React mostra un error d'hidratació a l'admin shell: el servidor renderitza `ADMIN_CHANGE_COUNTER=1379` però el client encara hidrata amb el bundle anterior `1378`. El valor és un xip informatiu del peu lateral, no estat de negoci ni input d'usuari.
+
+### Què s'ha fet
+- `app/admin/layout.tsx`: el xip `ax__change` ara porta `suppressHydrationWarning`.
+- `ADMIN_CHANGE_COUNTER`: puja a `1380` i queda documentat al protocol/diari.
+
+### Validació
+- Validació tècnica: `pnpm run qa:protocol` OK; canvi de render acotat a un únic `<span>`.
+- Validació funcional: el mismatch transitori del número de canvi ja no pot tombar la hidratació de l'admin.
+- Validació humana/UX: el counter és informatiu; si el dev server encara serveix un chunk antic, l'usuari conserva la pantalla operativa.
+
+### Coordinació
+Counter → 1380. Microfix del shell admin; no toca leads, reserves, transport ni economia.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-03 — Crear reserva des d'un lead força herència neta (Canvi #1379, codex)
+
+### Context
+El propietari és a `/admin/leads/cmr3vkl990000z4rz9qkyfe5v` (Estel), selecciona línies al bolo i clica `Crear reserva`, però la nova reserva no hereta dades/línies. Rastreig: el botó `Crear reserva` no passava pel mateix `openBuilder` que dossier/pressupost i, per tant, podia navegar sense desar el bolo brut. A més, un autosave local vell de `/admin/bookings/new?leadId=...` podia guanyar contra el prefill del lead.
+
+### Què s'ha fet
+- `LeadBoloSection`: `Crear reserva` ara usa el mateix flux que `Crear dossier` i `Crear pressupost`: si el bolo està brut, desa primer i després navega.
+- La URL generada passa `prefill=lead`, de manera que la nova reserva sap que ve d'una acció explícita del lead i ha d'heretar el lead fresc.
+- `useNewBookingInitialData`: amb `forceLeadPrefill` ignora l'autosave antic i carrega dades + línies del lead.
+- `useFormAutosave`: nou helper `clearFormAutosaveDraft` per netejar l'esborrany vell abans que el hook pugui restaurar-lo.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\hooks\useFormAutosave.test.ts __tests__\app\admin\bookings\bookingLeadServiceLineMapper.test.ts` OK (9 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: Playwright local amb un autosave fals antic per Estel; clic a `Crear reserva` navega a `/admin/bookings/new?leadId=cmr3vkl990000z4rz9qkyfe5v&prefill=lead`, no restaura l'esborrany i hereta Estel, email, telèfon, data `2026-07-25`, hores `21:00-23:00`, `30` pax, `Dosrius`, `36.6` km i línies `DJ · 1a hora` / `DJ · hora addicional`.
+- Validació humana/UX: el botó que surt del lead fa el que l'usuari espera: abans de crear reserva, conserva el que acaba de seleccionar al lead i no deixa que un esborrany vell tapi la informació bona.
+
+### Coordinació
+Counter → 1379. Tall acotat a herència lead→reserva; no toca el redisseny transport #1378 ni el cervell econòmic.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-03 — Rediseny del bloc de transport del bolo + alarma >2 persones (Canvi #1378, claude)
 
 ### Context

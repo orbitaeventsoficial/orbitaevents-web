@@ -129,7 +129,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             <div className="ax__sidefoot">
               <span className="ax__meav" title="Òrbita Events">OE</span>
               <span className="ax__sidefootname">Òrbita Events</span>
-              <span className="ax__change">#{ADMIN_CHANGE_COUNTER}</span>
+              <span className="ax__change" suppressHydrationWarning>#{ADMIN_CHANGE_COUNTER}</span>
             </div>
           </aside>
 

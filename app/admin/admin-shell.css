@@ -1530,6 +1530,18 @@ html.admin-mode .ap-ledger-trip .adm-input {
   background: var(--o-admin-canvas); border: 1px solid var(--line2);
 }
 html.admin-mode .ap-ledger-trip .adm-input:focus { border-color: var(--gold); }
+/* Camp en LECTURA (reserva): mateix aspecte que l'input però sense edició (heretat del lead). */
+html.admin-mode .ap-ledger-trip-ro {
+  display: flex; align-items: center;
+  min-height: var(--o-row-h); padding: var(--o-space-1) var(--o-space-2);
+  border: 1px solid var(--line2); border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--o-admin-canvas) 70%, transparent);
+  font-family: var(--ui); font-size: var(--o-text-sm); color: var(--ax-t);
+}
+html.admin-mode .ap-ledger-trip-ro[data-alarm="true"] {
+  border-color: color-mix(in oklab, var(--o-danger) 55%, var(--line));
+  color: var(--o-danger); font-weight: var(--o-fw-bold);
+}
 html.admin-mode .ap-ledger-trip-note {
   margin: 0; font-family: var(--ui); font-size: var(--o-text-micro); color: var(--t3); line-height: 1.5;
 }

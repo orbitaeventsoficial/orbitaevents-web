@@ -31,9 +31,10 @@ function humaniseExtraLabel(name?: string | null, slug?: string | null, id?: str
 interface UseNewBookingInitialDataOptions {
   leadId: string | null;
   dateParam: string | null;
+  forceLeadPrefill?: boolean;
 }
 
-export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingInitialDataOptions) {
+export function useNewBookingInitialData({ leadId, dateParam, forceLeadPrefill = false }: UseNewBookingInitialDataOptions) {
   const [form, setForm] = useState<BookingFormData>(INITIAL_BOOKING_FORM);
   const [packs, setPacks] = useState<BookingPack[]>([]);
   const [extras, setExtras] = useState<BookingExtra[]>([]);
@@ -106,7 +107,7 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
         // prefill del lead: l'esborrany ja conté el que l'usuari estava omplint
         // (incloent el que va venir del lead la primera vegada). Evita la cursa
         // prefill↔restore. Igualment carreguem leadData per a la resta de la UI.
-        const hasDraft = hasFormAutosaveDraft(bookingAutosaveKey(leadId, null));
+        const hasDraft = !forceLeadPrefill && hasFormAutosaveDraft(bookingAutosaveKey(leadId, null));
         if (leadId) {
           const leadRes = await fetchWithCsrf(`/api/admin/leads/${leadId}`);
           if (leadRes.ok) {
@@ -151,7 +152,7 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
     }
 
     load();
-  }, [dateParam, leadId]);
+  }, [dateParam, forceLeadPrefill, leadId]);
 
   return {
     form,

@@ -17,6 +17,7 @@ import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { getMarginTone, getTravelMarginTone } from '@/lib/margin-utils';
 import Tooltip from '@/app/admin/components/Tooltip';
+import BoloTripCard, { CROWDED_TRIP_THRESHOLD } from '@/app/admin/components/BoloTripCard';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 interface BookingMarginProps {
@@ -434,40 +435,19 @@ export default function BookingMarginCard({
         </div>
       </div>
 
-      <div className="ap-card p-4" data-help-title="Desplaçament editable" data-help-desc="Permet ajustar o recalcular la distància del servei i veure com canvien costos, suplement i marge del transport.">
-        <h3 className="text-sm font-semibold mb-3">Desplaçament editable</h3>
-        <p className="mb-3 text-xs">
-          Transport al client = cost real: cotxe ({vehicleCostPerKm.toFixed(2)} €/km) + temps de la tripulació (15 €/h, 1a hora inclosa).
-        </p>
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div>
-            <label htmlFor="bmc-distance" className="block text-xs font-medium mb-1">Distància (km)</label>
-            <input
-              id="bmc-distance"
-              type="number"
-              min="0"
-              step="1"
-              value={distanceKm}
-              onChange={(e) => setDistanceKm(Number(e.target.value) || 0)}
-              className="ap-input w-full px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium mb-1">Hores tripulació</label>
-            <div className="ap-card px-3 py-2 text-sm">
-              {travelBreakdown.chargeableHours} h × {travelHeadcount} pers.
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-medium mb-1">Cost viatge (cotxe)</label>
-            <div className="ap-card px-3 py-2 text-sm font-bold">
-              {formatCurrency(calculatedTravelCost)}
-            </div>
-            <p className="mt-1 text-xs">
-              {distanceKm.toFixed(0)} km · {vehicleCostPerKm.toFixed(2)} €/km
-            </p>
-          </div>
-        </div>
+      <div className="ap-card p-4" data-help-title="Desplaçament" data-help-desc="Permet ajustar o recalcular la distància del servei i veure com canvien costos, suplement i marge del transport.">
+        {/* ── DESPLAÇAMENT: MATEIXA targeta compartida que el lead (#1380). La reserva hereta
+        el disseny; integrants en lectura (es decideix al lead). Els números, del cervell. ── */}
+        <BoloTripCard
+          km={distanceKm}
+          distanceKm={String(distanceKm)}
+          onDistanceChange={(v) => setDistanceKm(Number(v) || 0)}
+          calculatingDistance={calculatingDistance}
+          derivedHeadcount={travelHeadcount}
+          headcount={travelHeadcount}
+          chargeableHours={travelBreakdown.chargeableHours}
+          tripCrowded={travelHeadcount > CROWDED_TRIP_THRESHOLD}
+        />
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           <div className="ap-card p-3">
             <p className="text-xs uppercase tracking-wide" title="Inclou benzina, manteniment, assegurança i amortització. Valor recomanat: 0.35-0.50 €/km">Cost vehicle per km</p>

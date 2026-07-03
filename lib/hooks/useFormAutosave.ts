@@ -38,6 +38,15 @@ export function hasFormAutosaveDraft(key: string, ttlMs = DEFAULT_TTL_MS): boole
   }
 }
 
+export function clearFormAutosaveDraft(key: string): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(`${PREFIX}${key}`);
+  } catch {
+    // best-effort
+  }
+}
+
 interface AutosaveOptions {
   debounceMs?: number;
   ttlMs?: number;

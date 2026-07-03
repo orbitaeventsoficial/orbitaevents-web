@@ -1547,6 +1547,49 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1381 — 2026-07-03 — claude (FET)
+**Transport lead↔reserva unificat: UN component compartit `BoloTripCard` (hipersemblança).**
+- Context: el propietari («tira, unifica el transport lead i reserva») veu que la reserva no arrossega el disseny del bolo del lead. El bloc «Desplaçament» del lead (rediseny #1378) i el «Desplaçament editable» de la reserva eren dues UIs diferents del mateix concepte.
+- Font única de disseny: NOU `app/admin/components/BoloTripCard.tsx` — component presentacional que consumeix TANT el lead com la reserva (canon «un sol dissenyador, dues pàgines»). Extret del JSX inline del lead sense canvi de comportament.
+- Adaptatiu SENSE controls falsos (canon regla 8): els camps d'edició són opcionals via presència del handler. Lead = editor complet (override integrants + peatges + atribució cotxe/condueix + «qui cobra la ruta»); Reserva = vista avall (integrants en LECTURA `.ap-ledger-trip-ro`, sense peatges ni atribució — s'hereten del lead).
+- Monocapa: `CROWDED_TRIP_THRESHOLD` (alarma >2 persones) exportat des de `BoloTripCard` com a font única; lead i reserva l'importen (abans era `const` local del lead).
+- `BookingMarginCard`: la graella d'inputs d'enginyer (Distància/Hores/Cost) se substitueix per `<BoloTripCard>`; les targetes de marge de Codex (#1377) queden intactes.
+- CSS (`admin-shell.css`, territori meu — Codex n'està fora): NOVA `.ap-ledger-trip-ro` (camp en lectura amb l'aspecte de l'input); token corregit `--t1` (fantasma) → `--ax-t`.
+- Validació tècnica: `npx tsc --noEmit` 0; `validate:core` (qa:no-phantom-tokens/classes, admin-canon, css-monocapa) verd.
+- Validació funcional: Playwright a lead (Estel) i reserva — ambdós rendaritzen `.ap-ledger-trip` idèntic; el badge de la reserva mostra `km · N persones` derivat de `deriveTravelHeadcount`.
+- Validació humana/UX: les dues pantalles semblen fetes pel mateix dissenyador; diferències correctes per rol (lead editor vs reserva vista avall), sense controls falsos.
+- `ADMIN_CHANGE_COUNTER` passa a `1381`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1380 — 2026-07-03 — codex (FET)
+**El xip del counter no pot trencar la hidratació de l'admin shell.**
+- Context: després del #1379, React reporta mismatch d'hidratació al peu lateral: servidor `1379`, client `1378`. És un desfasament transitori de bundle/HTML del dev server sobre un xip informatiu, però tombava la pantalla.
+- `app/admin/layout.tsx`: `ax__change` passa a renderitzar amb `suppressHydrationWarning`.
+- Decisió: el counter continua visible i canònic via `ADMIN_CHANGE_COUNTER`, però no pot ser una causa de runtime error si el client hidrata amb un chunk vell.
+- Validació tècnica: canvi acotat a un `<span>` del shell; `pnpm run qa:protocol` OK.
+- Validació funcional: el mismatch del número de canvi ja no bloqueja l'admin.
+- Validació humana/UX: el counter és informatiu; la prioritat és conservar la pantalla operativa.
+- `ADMIN_CHANGE_COUNTER` passa a `1380`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1379 — 2026-07-03 — codex (FET)
+**Crear reserva des d'un lead desa el bolo i força herència neta.**
+- Context: el propietari a Estel (`/admin/leads/cmr3vkl990000z4rz9qkyfe5v`) selecciona coses al lead i clica `Crear reserva`, però la nova reserva no hereta. Causa doble: el botó no passava pel desat previ del bolo i un autosave local vell podia guanyar contra el prefill del lead.
+- `LeadBoloSection`: `Crear reserva` reutilitza `openBuilder`; si hi ha `dirty`, desa via `/api/admin/leads/:id/service-lines` abans de navegar.
+- URL nova: `/admin/bookings/new?leadId=...&prefill=lead`; `NewBookingForm` llegeix aquest senyal i neteja l'autosave vell.
+- `useNewBookingInitialData`: amb `forceLeadPrefill`, ignora esborranys locals i torna a carregar dades + línies del lead. `useFormAutosave` guanya helper `clearFormAutosaveDraft`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\hooks\useFormAutosave.test.ts __tests__\app\admin\bookings\bookingLeadServiceLineMapper.test.ts` OK (9 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: Playwright local amb autosave fals antic per Estel; clic `Crear reserva` navega amb `prefill=lead`, no restaura l'esborrany i hereta Estel, email, telèfon, data `2026-07-25`, hores `21:00-23:00`, `30` pax, `Dosrius`, `36.6` km i línies DJ.
+- Validació humana/UX: el botó del lead conserva el que l'usuari acaba de seleccionar i la reserva arrenca amb el lead fresc.
+- `ADMIN_CHANGE_COUNTER` passa a `1379`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1378 — 2026-07-03 — claude (FET)
 **Rediseny del bloc de transport del bolo (ulleres de dissenyador) + alarma >2 persones.**
 - Context: el propietari — el transport/km de la targeta del bolo grinyolava («taula d'enginyer»). Desmuntar i replantejar + alarma si viatgen més de 2 persones.

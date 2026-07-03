@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useFormAutosave } from '@/lib/hooks/useFormAutosave';
+import { clearFormAutosaveDraft, useFormAutosave } from '@/lib/hooks/useFormAutosave';
 
 const KEY = 'test-form';
 const STORAGE_KEY = `orbita.autosave.${KEY}`;
@@ -50,6 +50,15 @@ describe('useFormAutosave', () => {
     act(() => { result.current.clear(); });
     expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
     expect(result.current.restored).toBe(false);
+  });
+
+  it('clearFormAutosaveDraft esborra un esborrany abans de restaurar un prefill forçat', () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ savedAt: Date.now(), value: { name: 'vell' } }));
+    clearFormAutosaveDraft(KEY);
+    const onRestore = vi.fn();
+    renderHook(() => useFormAutosave(KEY, { name: 'lead' }, onRestore));
+    expect(onRestore).not.toHaveBeenCalled();
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
   });
 
   it('desa quan enabled passa de false a true (cas prefill async: !loading)', () => {

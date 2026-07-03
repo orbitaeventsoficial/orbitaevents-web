@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useMemo, type MouseEvent } from 'reac
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import BookingServiceLinesSection from '@/app/admin/bookings/BookingServiceLinesSection';
+import BoloTripCard, { CROWDED_TRIP_THRESHOLD } from '@/app/admin/components/BoloTripCard';
 import type { BookingServiceLineFormInput } from '@/app/admin/bookings/booking-form.types';
 import { computeBookingFinancialSummary, computeServiceLineEconomics, classifyBoloLines } from '@/lib/services/costEngine';
 import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
@@ -181,7 +182,7 @@ export default function LeadBoloSection({
  const headcount = headcountOverride ? Math.max(0, Math.floor(Number(headcountOverride) || 0)) : derivedHeadcount;
  // Alarma de transport (#1377, ordre del propietari): més de 2 persones viatjant encareix
  // molt el transport (cada persona = temps de tripulació a 15 €/h). Senyal vermell + avís.
- const CROWDED_TRIP_THRESHOLD = 2;
+ // Llindar = font única a BoloTripCard (monocapa, #1380).
  const tripCrowded = headcount > CROWDED_TRIP_THRESHOLD;
  // Col·laboradors presents al bolo (per triar qui posa el cotxe / condueix).
  const travelCollaborators = useMemo(() => {
@@ -373,6 +374,7 @@ export default function LeadBoloSection({
 
  const quoteHref = `/admin/presupuestos?leadId=${encodeURIComponent(leadId)}`;
  const dossierHref = buildDossierHref();
+ const bookingHref = `/admin/bookings/new?leadId=${encodeURIComponent(leadId)}&prefill=lead`;
 
  if (loading) {
  return (
@@ -403,108 +405,29 @@ export default function LeadBoloSection({
  Estirat a tota l'amplada. El transport el paga el CLIENT (línia estipulada que suma al total). ── */}
  {economia && (
  <div className="ap-ledger-budget" aria-label="Resum del pressupost">
- {/* ── DESPLAÇAMENT: peça de logística neta (rediseny #1377). Controls agrupats
- per intenció (Ruta / Equip), llenguatge humà, sense text de debug. ── */}
- <div className="ap-ledger-trip">
- <div className="ap-ledger-trip-head">
- <span className="ap-ledger-trip-title">Desplaçament</span>
- <span className="ap-ledger-trip-badge" data-alarm={tripCrowded ? 'true' : undefined}>
- {km > 0 ? `${km} km · ${headcount} ${headcount === 1 ? 'persona' : 'persones'}` : 'sense ruta'}
- </span>
- </div>
- <div className="ap-ledger-trip-grid">
- <div className="ap-ledger-trip-group">
- <span className="ap-ledger-trip-grouplbl">Ruta</span>
- <div className="ap-ledger-trip-fields">
- <label className="ap-ledger-trip-field">
- <span>Km anada+tornada</span>
- <input
- type="number" min={0} step={1} inputMode="numeric" className="adm-input"
- value={distanceKm}
- onChange={(e) => { setDistanceKm(e.target.value); setDirty(true); }}
- placeholder={calculatingDistance ? '…' : '0'}
- aria-label="Km anada i tornada de la ruta"
+ {/* ── DESPLAÇAMENT: targeta compartida (#1380). El MATEIX component que la fitxa
+ de reserva (canon «un sol dissenyador»). Presentacional; els números del cervell. ── */}
+ <BoloTripCard
+ km={km}
+ distanceKm={distanceKm}
+ onDistanceChange={(v) => { setDistanceKm(v); setDirty(true); }}
+ calculatingDistance={calculatingDistance}
+ headcountOverride={headcountOverride}
+ onHeadcountOverrideChange={setHeadcountOverride}
+ derivedHeadcount={derivedHeadcount}
+ headcount={headcount}
+ tollsEur={tollsEur}
+ onTollsChange={(v) => { setTollsEur(v); setDirty(true); }}
+ travelCollaborators={travelCollaborators}
+ vehicleOwnerId={vehicleOwnerId}
+ onVehicleOwnerChange={(v) => { setVehicleOwnerId(v); setDirty(true); }}
+ driverId={driverId}
+ onDriverChange={(v) => { setDriverId(v); setDirty(true); }}
+ chargeableHours={travelBreakdown.chargeableHours}
+ tripCrowded={tripCrowded}
+ effectiveTravelCost={effectiveTravelCost}
+ routeSettlementLines={routeSettlementLines}
  />
- </label>
- <label className="ap-ledger-trip-field">
- <span>Integrants{headcountOverride ? '' : ' · auto'}</span>
- <input
- type="number" min={0} step={1} inputMode="numeric" className="adm-input"
- data-alarm={tripCrowded ? 'true' : undefined}
- value={headcountOverride}
- onChange={(e) => setHeadcountOverride(e.target.value)}
- placeholder={String(derivedHeadcount)}
- aria-label="Integrants que viatgen (auto-calculat; escriu per ajustar)"
- title="Es calcula sol des dels serveis del bolo. Escriu un número per ajustar-lo a mà."
- />
- </label>
- <label className="ap-ledger-trip-field">
- <span>Peatges</span>
- <input
- type="number" min={0} step="0.01" inputMode="decimal" className="adm-input"
- value={tollsEur}
- onChange={(e) => { setTollsEur(e.target.value); setDirty(true); }}
- placeholder="0 €"
- aria-label="Peatges de la ruta en euros"
- />
- </label>
- </div>
- </div>
- {travelCollaborators.length > 0 && (
- <div className="ap-ledger-trip-group">
- <span className="ap-ledger-trip-grouplbl">Equip</span>
- <div className="ap-ledger-trip-fields">
- <label className="ap-ledger-trip-field">
- <span>Posa el cotxe</span>
- <select className="adm-input" value={vehicleOwnerId} onChange={(e) => { setVehicleOwnerId(e.target.value); setDirty(true); }} aria-label="Qui posa el cotxe">
- <option value="">Òrbita</option>
- {travelCollaborators.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
- </select>
- </label>
- <label className="ap-ledger-trip-field">
- <span>Condueix</span>
- <select className="adm-input" value={driverId} onChange={(e) => { setDriverId(e.target.value); setDirty(true); }} aria-label="Qui condueix">
- <option value="">Òrbita</option>
- {travelCollaborators.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
- </select>
- </label>
- </div>
- </div>
- )}
- </div>
- {tripCrowded && (
- <p className="ap-ledger-trip-alarm" role="alert">
- ⚠ Viatgen {headcount} persones: el transport s'encareix molt (cada persona suma temps de tripulació). Revisa qui cal que hi vagi.
- </p>
- )}
- <p className="ap-ledger-trip-note">
- {travelBreakdown.chargeableHours > 0
- ? `La 1a hora de ruta va inclosa · es cobra el temps a partir d'aquí (${formatNumber(travelBreakdown.chargeableHours)} h de tripulació).`
- : 'Ruta curta: dins la 1a hora inclosa, no es cobra temps de tripulació.'}
- </p>
-
- {/* ── REPARTIMENT de la ruta: plegable, DINS la targeta de desplaçament (no orfe).
- Quan és tot Òrbita no cal desplegar; s'obre per veure qui cobra cada peça. ── */}
- {effectiveTravelCost > 0 && routeSettlementLines.length > 0 && (
- <details className="ap-ledger-route-settlement" aria-label="Repartiment econòmic del transport">
- <summary className="ap-ledger-route-settlement-head">
- <span>Qui cobra la ruta</span>
- <strong>{formatCurrency(effectiveTravelCost)}</strong>
- </summary>
- <div className="ap-ledger-route-settlement-grid">
- {routeSettlementLines.map((line, idx) => (
- <div key={`${line.label}-${idx}`} className="ap-ledger-route-settlement-row">
- <span>
- {line.label}
- <em>{line.notes}</em>
- </span>
- <strong>{formatCurrency(line.amount)}</strong>
- </div>
- ))}
- </div>
- </details>
- )}
- </div>
 
  {/* ── PRESSUPOST: la sortida clau del bolo, panell or destacat a tota l'amplada ── */}
  <div className="ap-ledger-budget-sum">
@@ -531,7 +454,7 @@ export default function LeadBoloSection({
  <a className="ap-btn" href={quoteHref} onClick={(event) => openBuilder(event, quoteHref)} aria-disabled={saving}>
  Crear pressupost
  </a>
- <a className="ap-btn ap-btn--primary" href={`/admin/bookings/new?leadId=${encodeURIComponent(leadId)}`}>
+ <a className="ap-btn ap-btn--primary" href={bookingHref} onClick={(event) => openBuilder(event, bookingHref)} aria-disabled={saving}>
  Crear reserva
  </a>
  </div>

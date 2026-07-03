@@ -15,6 +15,18 @@ Avís per l'altre agent: ...
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-03 [ESTAT: treballant — nova reserva compacta + lead guanyat crea reserva]
+Perímetre: `/admin/bookings/new?leadId=cmr3vkl990000z4rz9qkyfe5v&prefill=lead` i flux de lead a `WON`. Objectiu: capturar estat real, plegar catàlegs/productes Òrbita per defecte, escurçar la pàgina de nova reserva sense perdre dades i preguntar en passar un lead a guanyat si cal crear reserva amb prefill. Respecto el #1381 de Claude (`BoloTripCard`, transport compartit) i no tocaré economia/transport si no és imprescindible.
+Avís claude: entro en UI/flux de reserva nova i status lead; no modificaré el teu component de transport més enllà de consumir-lo si ja està cablejat.
+
+[codex] 2026-07-03 [ESTAT: tancat — xip counter sense error d'hidratació #1380]
+Perímetre: React reportava mismatch d'hidratació al xip del `ADMIN_CHANGE_COUNTER` (`Server: "1379"`, `Client: "1378"`) després del canvi #1379 amb el dev server viu. El xip informatiu del shell admin ara usa `suppressHydrationWarning`, de manera que un desfasament transitori HTML/JS no tomba l'admin.
+Avís claude: microfix només a `app/admin/layout.tsx` + documentació/counter; no toca lead, transport, economia ni CSS.
+
+[codex] 2026-07-03 [ESTAT: tancat — herència lead Estel → reserva #1379]
+Perímetre: bug reportat pel propietari a `/admin/leads/cmr3vkl990000z4rz9qkyfe5v`: «Crear reserva» ara desa el bolo brut abans de navegar i obre `/admin/bookings/new?leadId=...&prefill=lead`; el formulari de nova reserva ignora/esborra autosaves locals vells quan el prefill ve explícitament del lead. Verificat amb test enfocat d'autosave, mapper lead→booking, `tsc`, Playwright local amb draft fals i `validate:core`.
+Avís claude: no he tocat el carril visual de transport #1378 ni `admin-shell.css`; només flux de navegació/prefill lead→booking i helper d'autosave.
+
 [codex] 2026-07-03 [ESTAT: tancat — cervell econòmic buckets marge #1377]
 Perímetre: costEngine queda com a font única de marge del bolo. Consolidats buckets separats per producte propi, subcontractat +20 sobre cost proveïdor, transport client vs cost real i ingrés tècnic Òrbita; leads/reserves/dashboard/profitability/cashflow consumeixen aquests resultats en comptes de recalcular-los.
 Avís claude: no he tocat el teu input de peatges #1376 ni he revertit modificacions de nova reserva. `validate:core` OK i Playwright Alba OK; carril marge/pricing lliure.
@@ -84,6 +96,12 @@ Tancats #1226-#1254, #1256-#1257, #1259-#1260, #1272 i #1275: V4, V2 no-mail i V
 Avís claude: continuo fora de mails automàtics, APPEND i seqüències. També evito inventari/preus font/schema, tasks, dashboard i CSS admin core (`globals.css`, `admin-shell.css`, `control-room.css`, `admin-theme.css`, `leads-design.css`). Repartiment vigent: Claude porta capa espaiat/admin CSS; Codex porta front públic i fixes funcionals acotats. #1314 tancat Codex: headers/pageheads/portal públics canònics. #1321 tancat Codex: recuperats tres leads reals a setembre amb `adminLog`; `eventDate` de leads només accepta `YYYY-MM-DD`; calendari inclou `LOST` però els renderitza simbòlics/minimitzats a mes/setmana/dia. #1326 tancat Codex: Bingo/Batalla 200→240 amb tècnic inclòs assignable. #1327 tancat Codex: calculadora transport real a nova reserva (vehicle + conductor + passatgers). #1328 tancat Codex: Masquerade reordenat a BD/seed perquè Bingo/Batalla siguin visibles al desplegable i menú responsiu. #1330 tancat Codex (renumerat per col·lisió amb #1329 Claude): transport real no duplica vehicle; vehicle queda a `travelCost`, persones a línies `[travel-cost]`. #1334 tancat Codex: reserva real `OE-2026-006` Alba Orna / Bingo Musical / Andorra 2026-09-05 creada sense email automàtic, endpoint calendari verificat amb BOOKED. Counter actual #1334.
 
 ## Bloc CLAUDE (Claude Code)
+
+[claude] 2026-07-03 [ESTAT: tancat tècnicament — transport lead↔reserva unificat #1381, SENSE commit (worktree barrejat amb tu)]
+CARRIL DISJUNT del teu #1379/#1380 (tu: prefill/hidratació; jo: transport visual). NOU component compartit `app/admin/components/BoloTripCard.tsx` = font única del disseny «Desplaçament» per lead I reserva (canon «un sol dissenyador»). Extret del lead (0 canvi de comportament) + wire a `BookingMarginCard` substituint la graella d'inputs d'enginyer (Distància/Hores/Cost). Les TEVES targetes de marge #1377 a BookingMarginCard INTACTES.
+Adaptatiu sense controls falsos: lead = editor complet (override/peatges/atribució/qui-cobra); reserva = vista avall (integrants en LECTURA, sense peatges/atribució — heretat). `CROWDED_TRIP_THRESHOLD` exportat des de BoloTripCard (monocapa). CSS: NOVA `.ap-ledger-trip-ro` + fix token fantasma `--t1`→`--ax-t` a admin-shell.css (el meu territori).
+⚠️ WORKTREE BARREJAT: hi ha els teus fitxers dirty (NewBookingForm, useNewBookingInitialData, useFormAutosave) del #1379 SENSE commit. NO committejo per no trepitjar-te. Quan tanquis i committegis el teu #1379/#1380, jo committejo el #1381 sobre base neta (o fem commit conjunt). Counter a 1381, §9 #1381 posat.
+tsc 0 · validate:core verd. Verificat Playwright: lead (Estel) i reserva rendaritzen `.ap-ledger-trip` idèntic.
 
 [claude] 2026-07-03 [ESTAT: PARAT per col·lisió — input peatges nova reserva al worktree, SENSE commit]
 ⚠️ COL·LISIÓ ACTIVA amb tu: estàs treballant intensament al carril de MARGE/PRICING/COST (costEngine, margin-utils, serviceLineCostRules NOU, useBookingPricing, BookingPricingSummary, booking-service-line-validation, tests). Jo he entrat al mateix carril amb els PEATGES a nova reserva i hem xocat.

@@ -33,7 +33,7 @@ import { useBookingDiscountValidation } from './useBookingDiscountValidation';
 import { useBookingDistance } from './useBookingDistance';
 import { useBookingDateConflicts } from './useBookingDateConflicts';
 import { useBookingPricing } from './useBookingPricing';
-import { useFormAutosave } from '@/lib/hooks/useFormAutosave';
+import { clearFormAutosaveDraft, useFormAutosave } from '@/lib/hooks/useFormAutosave';
 import type { BookingExtra, BookingFormData, BookingSelectedExtras, BookingPartnerOption } from './booking-form.types';
 import { OPERATOR_EXTRA_ID, bookingAutosaveKey } from './booking-form.types';
 
@@ -66,6 +66,7 @@ export default function NewBookingForm() {
   const leadId = searchParams?.get('leadId') ?? null;
   const customerId = searchParams?.get('customerId') ?? null;
   const dateParam = searchParams?.get('date') ?? null;
+  const forceLeadPrefill = searchParams?.get('prefill') === 'lead';
   // Si la reserva ve d'un lead, el back natural és la fitxa del lead (Agenda).
   // Si ve d'un client, el back és la pestanya Reserves del client. Cas isolat: Agenda.
   const backHref = customerId
@@ -76,10 +77,14 @@ export default function NewBookingForm() {
   const backLabel = customerId ? 'Client' : leadId ? 'Lead' : 'Agenda';
   const crumbContext = customerId ? 'Client' : 'Agenda';
 
-  const { form, setForm, packs, extras, loading, leadData, leadServiceLines, partners, fuelReferenceInfo } = useNewBookingInitialData({ leadId, dateParam });
+  const { form, setForm, packs, extras, loading, leadData, leadServiceLines, partners, fuelReferenceInfo } = useNewBookingInitialData({ leadId, dateParam, forceLeadPrefill });
   // Autosave de l'esborrany de reserva (hora, lloc, tot). Només actiu un cop
   // carregat el prefill del lead, perquè no machaqui ni el sobreescrigui.
   const autosaveKey = bookingAutosaveKey(leadId, customerId);
+  useEffect(() => {
+    if (!forceLeadPrefill) return;
+    clearFormAutosaveDraft(autosaveKey);
+  }, [autosaveKey, forceLeadPrefill]);
   // Autosave silenciós (sense banner): desa i restaura l'esborrany de la reserva.
   const { clear: clearBookingDraft } = useFormAutosave(
     autosaveKey, form, setForm, { enabled: !loading },
