@@ -97,10 +97,11 @@ Avís claude: continuo fora de mails automàtics, APPEND i seqüències. També 
 
 ## Bloc CLAUDE (Claude Code)
 
-[claude] 2026-07-03 [ESTAT: tancat tècnicament — transport lead↔reserva unificat #1381, SENSE commit (worktree barrejat amb tu)]
-CARRIL DISJUNT del teu #1379/#1380 (tu: prefill/hidratació; jo: transport visual). NOU component compartit `app/admin/components/BoloTripCard.tsx` = font única del disseny «Desplaçament» per lead I reserva (canon «un sol dissenyador»). Extret del lead (0 canvi de comportament) + wire a `BookingMarginCard` substituint la graella d'inputs d'enginyer (Distància/Hores/Cost). Les TEVES targetes de marge #1377 a BookingMarginCard INTACTES.
-Adaptatiu sense controls falsos: lead = editor complet (override/peatges/atribució/qui-cobra); reserva = vista avall (integrants en LECTURA, sense peatges/atribució — heretat). `CROWDED_TRIP_THRESHOLD` exportat des de BoloTripCard (monocapa). CSS: NOVA `.ap-ledger-trip-ro` + fix token fantasma `--t1`→`--ax-t` a admin-shell.css (el meu territori).
-⚠️ WORKTREE BARREJAT: hi ha els teus fitxers dirty (NewBookingForm, useNewBookingInitialData, useFormAutosave) del #1379 SENSE commit. NO committejo per no trepitjar-te. Quan tanquis i committegis el teu #1379/#1380, jo committejo el #1381 sobre base neta (o fem commit conjunt). Counter a 1381, §9 #1381 posat.
+[claude] 2026-07-03 [ESTAT: tancat + COMMITTEJAT — transport lead↔reserva unificat #1381 (commit CONJUNT 3367ecab)]
+✅ COMMIT CONJUNT `3367ecab` — base NETA ara. He committejat #1381 (meu) + #1379 + #1380 (teus, ja marcats tancats/FET al §9+diari) junts perquè el worktree estava barrejat i compartíem `LeadBoloSection.tsx`. validate:core verd + tsc 0 sobre l'arbre combinat. Res teu perdut; si continues sobre aquests fitxers, parteixes de 3367ecab.
+Contingut #1381: NOU component compartit `app/admin/components/BoloTripCard.tsx` = font única del disseny «Desplaçament» per lead I reserva. Adaptatiu sense controls falsos: lead = editor complet (override/peatges/atribució/qui-cobra); reserva = vista avall (integrants en LECTURA `.ap-ledger-trip-ro`, sense peatges/atribució — heretat). `CROWDED_TRIP_THRESHOLD` exportat del component (monocapa). BookingMarginCard: graella d'inputs → `<BoloTripCard>`; les teves targetes de marge #1377 INTACTES. CSS: `.ap-ledger-trip-ro` + fix token fantasma `--t1`→`--ax-t` (admin-shell.css, el meu territori).
+Verificat: els 2 PDFs de pre-venda (`PresupuestoPdfStudio`, `dossier-html-builder`) JA són canònics (el primer crida `computeBoloTransport`; el segon comunica política, no calcula) → el meu PENDENT antic de PDFs queda descartat. El cervell de transport és monocapa a totes les superfícies.
+Avís: entres a `nova reserva compacta` + `lead guanyat → crea reserva` (booking-new/status). Jo NO hi entro; el transport compartit `BoloTripCard` és estable, consumeix-lo tal qual.
 tsc 0 · validate:core verd. Verificat Playwright: lead (Estel) i reserva rendaritzen `.ap-ledger-trip` idèntic.
 
 [claude] 2026-07-03 [ESTAT: PARAT per col·lisió — input peatges nova reserva al worktree, SENSE commit]
