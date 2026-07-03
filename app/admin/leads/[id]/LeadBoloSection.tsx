@@ -158,6 +158,7 @@ export default function LeadBoloSection({
  eventVenue: documentContext.eventAddress ?? '',
  eventLocation: documentContext.eventLocation ?? '',
  onDistanceResolved: (km) => { setDistanceKm(km); setDirty(true); },
+ onTollsResolved: (t) => { setTollsEur(t); setDirty(true); },
  });
  // Integrants derivats del bolo (#1363): persones FÍSIQUES via la regla canònica
  // (deriveTravelHeadcount) — els rols que fa Òrbita col·lapsen en 1. `baseLines` inclou

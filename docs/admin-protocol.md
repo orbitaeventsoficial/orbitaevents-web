@@ -1547,6 +1547,19 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1373 — 2026-07-03 — claude (FET)
+**Peatges al write-path de reserves + peatges automàtics via Routes API (best-effort).**
+- Context: (A) els peatges només arribaven al lead, no a crear/editar reserva; (B) el propietari — «si calcula la ruta, calcularà els peatges?». Google els dona amb la Routes API (no la Distance Matrix clàssica).
+- A: `bookingCreationService` + `bookingRouteService` migrats a `computeBoloTransport` (cervell únic); llegeixen i persisteixen `tollsEur`; càrrec/cost del cervell (franquícia + peatges).
+- B: `googleMapsDistance.fetchOneWayTollsEur` via Routes API v2 (`extraComputations: TOLLS`), best-effort (falla→null→manual). Propagat: endpoint distància → hook `onTollsResolved` → lead omple «Peatges €»; creació de reserva agafa els automàtics.
+- Validació tècnica: tsc 0; validate:core EXIT 0; tests bookingCreation 45 + bookingRoute 24.
+- Validació funcional: prova directa Andorra → 403 API_KEY_SERVICE_BLOCKED (Routes API no activada al projecte Google Cloud). Codi best-effort ho gestiona. ACCIÓ DEL PROPIETARI: activar «Routes API» a la consola de Google Cloud.
+- Validació humana/UX: peatges manuals fins que s'activi l'API; després automàtics amb la ruta.
+- Counter → 1373.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1372 — 2026-07-03 — claude (FET)
 **Dossier «millor explicat»: to de presentació (no factura) + copy net.**
 - Context: el propietari revisa el dossier — el text del desplaçament mentia («10€ per 20km», fórmula vella); es presentava com «Pressupost»; demanda de revisar tots els textos.

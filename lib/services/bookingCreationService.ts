@@ -3,8 +3,8 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { CUSTOMER_ACTIVITY_ACTIONS, TASK_SOURCE } from '@/lib/constants';
 import { recordCustomerBookingCreated } from '@/lib/services/customerActivityService';
-import { calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
-import { calculateClientTravelCharge, deriveTravelHeadcount } from '@/lib/services/travelLaborCost';
+import { DEFAULT_VEHICLE_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
+import { computeBoloTransport } from '@/lib/services/travelLaborCost';
 import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
 import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
 import { ACTIVE_BOOKING_STATUSES } from '@/lib/constants';
@@ -137,6 +137,7 @@ type BookingCreateInput = {
   discountCode?: string;
   notes?: string;
   distanceKm?: number;
+  tollsEur?: number;
   fuelCostPerKm?: number;
   travelCost?: number;
   serviceLines?: BookingServiceLineInput[];
@@ -437,12 +438,14 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   const subtotalBase = packPrice + extraHoursPrice + extrasPrice + serviceLinesRevenue;
 
   let distanceKm = data.distanceKm != null ? sanitizeNonNegative(data.distanceKm, 0) : null;
+  let autoTollsEur: number | null = null;
   if (distanceKm == null) {
     const destination = [data.eventVenue || '', data.eventLocation || ''].filter(Boolean).join(', ').trim();
     if (destination) {
       try {
         const route = await calculateGoogleMapsDistance({ destination });
         distanceKm = sanitizeNonNegative(route.roundTripKm, 0);
+        autoTollsEur = route.tollsEur; // peatges automàtics (#1373) si Google en dona
       } catch {
         distanceKm = null;
       }
@@ -454,12 +457,16 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
     data.fuelCostPerKm ?? fuelReference.costPerKm,
     DEFAULT_VEHICLE_COST_PER_KM
   );
-  const travelCost = distanceKm != null ? calculateTravelCost(distanceKm, fuelCostPerKm) : null;
-  // Càrrec de transport al client (#1363): cost real amb dues potes (cotxe/km + gent/hores),
-  // no la fórmula antiga per km. El headcount surt de les línies del bolo.
-  const travelCharge = distanceKm != null
-    ? calculateClientTravelCharge(distanceKm, deriveTravelHeadcount(serviceLines, packPrice > 0), fuelCostPerKm)
-    : 0;
+  // Peatges: manual (data.tollsEur) prioritari; si no, els automàtics de Google (#1373).
+  const tollsEur = data.tollsEur != null ? sanitizeNonNegative(data.tollsEur, 0) : (autoTollsEur ?? 0);
+  // Transport (#1369, monocapa): UNA crida al cervell econòmic. `cost` = cost intern real
+  // (cotxe + tripulació + peatges); `clientCharge` = el que paga el client (amb franquícia
+  // de 50 km i peatges). El headcount surt de les línies del bolo.
+  const transport = distanceKm != null
+    ? computeBoloTransport({ roundTripKm: distanceKm, serviceLines, hasOrbitaPack: packPrice > 0, tollsEur, vehicleCostPerKm: fuelCostPerKm })
+    : null;
+  const travelCost = transport ? transport.cost : null;
+  const travelCharge = transport ? transport.clientCharge : 0;
   const subtotalCalculated = subtotalBase + travelCharge;
   const discount = sanitizeMoney(data.discount) ?? 0;
   const invoiceRequired = Boolean(data.invoiceRequired);
@@ -505,6 +512,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       packId: resolvedPackId,
       extraHours,
       distanceKm,
+      tollsEur: tollsEur > 0 ? tollsEur : null,
       fuelCostPerKm,
       travelCost,
       subtotal,

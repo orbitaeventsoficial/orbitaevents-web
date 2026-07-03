@@ -2,8 +2,8 @@ import { BOOKING_CALENDAR_SYNC_FIELDS } from '@/lib/constants';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { BookingStatus, EventType } from '@prisma/client';
-import { calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
-import { calculateClientTravelCharge, deriveTravelHeadcount } from '@/lib/services/travelLaborCost';
+import { DEFAULT_VEHICLE_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
+import { computeBoloTransport } from '@/lib/services/travelLaborCost';
 import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
 import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
 import { applyBookingStatusSideEffects, type ManagedBookingStatus } from '@/lib/services/bookingStatusTransitionService';
@@ -21,6 +21,7 @@ type ExistingBookingRecord = {
   vatRate: number | null;
   invoiceRequired: boolean | null;
   distanceKm: number | null;
+  tollsEur: number | null;
   fuelCostPerKm: number | null;
   guestCount: number | null;
   eventType: EventType;
@@ -232,7 +233,7 @@ export async function prepareBookingPatchData(existing: ExistingBookingRecord, i
     }
   }
 
-  const travelFieldTouched = Object.prototype.hasOwnProperty.call(body, 'distanceKm') || Object.prototype.hasOwnProperty.call(body, 'fuelCostPerKm') || Object.prototype.hasOwnProperty.call(body, 'travelCost');
+  const travelFieldTouched = Object.prototype.hasOwnProperty.call(body, 'distanceKm') || Object.prototype.hasOwnProperty.call(body, 'fuelCostPerKm') || Object.prototype.hasOwnProperty.call(body, 'travelCost') || Object.prototype.hasOwnProperty.call(body, 'tollsEur');
   if (travelFieldTouched) {
     const fuelReference = await getFuelCostPerKmReference();
     const distanceKm = Object.prototype.hasOwnProperty.call(body, 'distanceKm')
@@ -241,19 +242,25 @@ export async function prepareBookingPatchData(existing: ExistingBookingRecord, i
     const fuelCostPerKm = Object.prototype.hasOwnProperty.call(body, 'fuelCostPerKm')
       ? sanitizeNonNegative(body.fuelCostPerKm as number, fuelReference.costPerKm)
       : sanitizeNonNegative(existing.fuelCostPerKm ?? fuelReference.costPerKm, DEFAULT_VEHICLE_COST_PER_KM);
+    const tollsEur = Object.prototype.hasOwnProperty.call(body, 'tollsEur')
+      ? sanitizeNonNegative(body.tollsEur as number, 0)
+      : sanitizeNonNegative(existing.tollsEur ?? 0, 0);
 
-    body.distanceKm = distanceKm;
-    body.fuelCostPerKm = fuelCostPerKm;
-    body.travelCost = calculateTravelCost(distanceKm, fuelCostPerKm);
-
-    // Càrrec de transport al client (#1363): cost real amb dues potes (cotxe/km + gent/hores).
+    // Transport (#1369, monocapa): UNA crida al cervell (aplica franquícia + peatges).
     // El headcount surt de les línies del bolo (input si venen, si no les de la reserva).
     const headcountLines = Array.isArray(input.serviceLines)
-      ? (input.serviceLines as Array<{ kind?: string | null; revenueAmount?: number | null; quantity?: number | null }>)
+      ? (input.serviceLines as Array<{ kind?: string | null; label?: string | null; revenueAmount?: number | null; costAmount?: number | null; collaboratorId?: string | null; quantity?: number | null }>)
       : await prisma.bookingServiceLine.findMany({ where: { bookingId: existing.id }, select: { kind: true, label: true, revenueAmount: true, costAmount: true, collaboratorId: true, quantity: true } });
-    const headcount = deriveTravelHeadcount(headcountLines);
-    const travelCharge = calculateClientTravelCharge(distanceKm, headcount, fuelCostPerKm);
-    const baseWithoutTravel = Math.max(0, existing.subtotal - calculateClientTravelCharge(existing.distanceKm || 0, headcount, fuelCostPerKm));
+    const transport = computeBoloTransport({ roundTripKm: distanceKm, serviceLines: headcountLines, tollsEur, vehicleCostPerKm: fuelCostPerKm });
+    const oldTransport = computeBoloTransport({ roundTripKm: existing.distanceKm || 0, serviceLines: headcountLines, tollsEur: existing.tollsEur ?? 0, vehicleCostPerKm: fuelCostPerKm });
+
+    body.distanceKm = distanceKm;
+    body.tollsEur = tollsEur > 0 ? tollsEur : null;
+    body.fuelCostPerKm = fuelCostPerKm;
+    body.travelCost = transport.cost;
+
+    const travelCharge = transport.clientCharge;
+    const baseWithoutTravel = Math.max(0, existing.subtotal - oldTransport.clientCharge);
     const subtotal = baseWithoutTravel + travelCharge;
     const discount = typeof body.discount === 'number' ? body.discount : existing.discount || 0;
     const invoiceReq = Object.prototype.hasOwnProperty.call(body, 'invoiceRequired')

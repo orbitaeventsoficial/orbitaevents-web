@@ -1,3 +1,23 @@
+## 2026-07-03 — Peatges al write-path de reserves + peatges automàtics (Routes API) (Canvi #1373, claude)
+
+### Context
+Dos pendents del transport: (A) els peatges (`tollsEur`) només arribaven al lead, no al write-path de reserves (crear/editar); (B) el propietari: «si calcula la ruta, calcularà els peatges no?» — Google SÍ pot donar-los, però amb la Routes API (no la Distance Matrix clàssica que fem servir).
+
+### Què s'ha fet
+- **A · Peatges al write-path** (`bookingCreationService` + `bookingRouteService`): tots dos migrats a `computeBoloTransport` (cervell únic; abans usaven el wrapper deprecat). Llegeixen i persisteixen `tollsEur` a `Booking`; el càrrec i el cost surten del cervell (franquícia 50 km + peatges). `travelFieldTouched` inclou `tollsEur`. Type `ExistingBookingRecord` + `BookingCreateInput` amb `tollsEur`.
+- **B · Peatges automàtics** (`googleMapsDistance`): nova `fetchOneWayTollsEur` via **Routes API v2** (`computeRoutes` amb `extraComputations: TOLLS`), BEST-EFFORT (mai llança; si falla → null → peatges manuals). El càlcul de distància retorna `tollsEur` (peatge d'un sentit ×2). Propagat: endpoint `/api/admin/maps/distance` → hook `useBookingDistance` (`onTollsResolved`) → lead omple el camp «Peatges €» sol; `bookingCreationService` agafa els automàtics (manual prioritari).
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0; tests bookingCreation 45 + bookingRoute 24 verds.
+- Validació funcional: prova directa Routes API amb Andorra → **403 `API_KEY_SERVICE_BLOCKED`**: la Routes API NO està activada al projecte Google Cloud. El codi ho gestiona (best-effort → null → manual). ⚠️ ACCIÓ DEL PROPIETARI: activar «Routes API» a console.cloud.google.com (projecte 43139339000) perquè els peatges automàtics funcionin.
+- Validació humana/UX: mentre l'API no s'activi, els peatges es posen a mà (camp existent); un cop activada, surten sols amb la ruta.
+
+### Coordinació
+Counter → 1373. El write-path de reserves ja no divergeix (cervell únic amb franquícia + peatges). PENDENT: activar Routes API a Google Cloud (acció del propietari); mirar la reserva d'Alba i treure els costos.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-03 — Dossier «millor explicat»: to de presentació (no factura) + copy net (Canvi #1372, claude)
 
 ### Context
