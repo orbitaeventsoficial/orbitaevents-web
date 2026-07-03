@@ -1547,6 +1547,21 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1374 — 2026-07-03 — claude (FET)
+**Carpeta autosuficient: portabilitat (mou-la i no es trenca res).**
+- Context: el propietari — «la carpeta ha de ser autosuficient». Auditoria de rutes absolutes que lligaven el projecte a `D:\orbitaevents`.
+- `check-nonstop-protocol.mjs`: exigia `defaultWorkspacePath === 'D:\\orbitaevents'` literal (trencava `validate:core` en moure) → ara valida pel basename (`orbitaevents`), portable a qualsevol disc/ubicació.
+- Eliminats scripts d'un sol ús amb ruta absoluta (`tmp-fix-booking-mojibake.mjs` + `-2.mjs`) i el residu `.cap-admin-tmp.cjs`.
+- Test: nou cas de portabilitat (4 ubicacions passen; carpeta no-orbitaevents falla).
+- Auditat NET: `lib/`+`app/` sense rutes absolutes; next/tsconfig/hooks relatius.
+- Validació tècnica: guard OK; test 8/8.
+- Validació funcional: la carpeta es mou a qualsevol lloc sense trencar-se; màquina nova = `pnpm install`.
+- Validació humana/UX: «moc la carpeta i res es trenca» complert.
+- Counter → 1374. Dependències externes (BD Railway, claus API) viuen a `.env.local` (gitignorat, es mou amb la carpeta), mai al git.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1373 — 2026-07-03 — claude (FET)
 **Peatges al write-path de reserves + peatges automàtics via Routes API (best-effort).**
 - Context: (A) els peatges només arribaven al lead, no a crear/editar reserva; (B) el propietari — «si calcula la ruta, calcularà els peatges?». Google els dona amb la Routes API (no la Distance Matrix clàssica).

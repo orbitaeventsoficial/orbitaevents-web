@@ -145,4 +145,28 @@ describe('check-nonstop-protocol', () => {
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain('repository ha de ser "orbitaevents"');
   });
+
+  it('és PORTABLE: accepta qualsevol ubicació/disc mentre la carpeta sigui "orbitaevents" (#1374)', () => {
+    // Moure la carpeta a un altre disc/ruta NO ha de trencar el guard.
+    for (const ws of ['D:\\orbitaevents', 'E:\\projectes\\orbitaevents', '/home/user/orbitaevents', 'C:\\dev\\orbitaevents\\']) {
+      const result = runGuard({
+        'CLAUDE.md': nonstopClause,
+        'docs/protocol-producte-admin-ca.md': nonstopClause,
+        'docs/agent-runtime-policy.json': runtimePolicy({ defaultWorkspacePath: ws }),
+        'package.json': packageJson(),
+      });
+      expect(result.status, `workspace ${ws} hauria de passar`).toBe(0);
+    }
+  });
+
+  it('falla si defaultWorkspacePath apunta a una carpeta que no és orbitaevents', () => {
+    const result = runGuard({
+      'CLAUDE.md': nonstopClause,
+      'docs/protocol-producte-admin-ca.md': nonstopClause,
+      'docs/agent-runtime-policy.json': runtimePolicy({ defaultWorkspacePath: 'D:\\altre-projecte' }),
+      'package.json': packageJson(),
+    });
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('orbitaevents');
+  });
 });

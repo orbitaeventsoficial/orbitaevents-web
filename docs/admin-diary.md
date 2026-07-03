@@ -1,3 +1,25 @@
+## 2026-07-03 — Carpeta autosuficient: portabilitat (mou-la i no es trenca res) (Canvi #1374, claude)
+
+### Context
+El propietari: «la carpeta ha de ser autosuficient — si moc la carpeta que no es trenqui res». Auditoria de portabilitat: buscar tot el que lliga el projecte a la ruta absoluta `D:\orbitaevents` i que trencaria en moure'l a un altre disc/ubicació/màquina.
+
+### Què s'ha fet
+- **Guard `check-nonstop-protocol.mjs`**: exigia `defaultWorkspacePath === 'D:\\orbitaevents'` literal → `validate:core` es trencava en moure la carpeta. Ara valida pel **basename** (la carpeta ha de dir-se `orbitaevents`, independentment del disc/ruta). Portable a `D:\`, `E:\projectes\`, `/home/user/`, etc.
+- **Eliminats** els scripts d'un sol ús amb ruta absoluta hardcoded: `scripts/tmp-fix-booking-mojibake.mjs` i `-2.mjs` (fix de mojibake ja executat, `D:/orbitaevents/...`), i el residu `.cap-admin-tmp.cjs`.
+- **Test** `check-nonstop-protocol.test.ts`: nou cas que blinda la portabilitat (4 ubicacions diferents passen; una carpeta que no és `orbitaevents` falla).
+- Auditat i confirmat NET: codi de producció (`lib/`, `app/`) sense cap ruta absoluta (ja era portable); `next.config`, `tsconfig`, hooks amb rutes relatives; `.env.local`/`uploads/`/`node_modules` dins la carpeta o recreables.
+
+### Validació
+- Validació tècnica: guard nonstop-protocol OK; test 8/8 (2 casos nous de portabilitat).
+- Validació funcional: la carpeta es pot moure a qualsevol disc/ubicació; a màquina nova, `pnpm install` i llest.
+- Validació humana/UX: «moc la carpeta i no es trenca res» — complert per al codi i els guards.
+
+### Coordinació
+Counter → 1374. Les rutes absolutes restants (`docs/agent-runtime-policy.json` valor informatiu, mencions a docs) NO trenquen res funcional (el guard ja no les exigeix). NOTA: les dependències externes que viuen fora del repo i cal recrear en màquina NOVA (BD Railway, clau Google Maps, SerpApi, IMAP...) viuen a `.env.local` (gitignorat, es mou amb la carpeta); mai al git.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-03 — Peatges al write-path de reserves + peatges automàtics (Routes API) (Canvi #1373, claude)
 
 ### Context

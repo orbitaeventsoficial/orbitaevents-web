@@ -67,8 +67,14 @@ function checkRuntimePolicy(file) {
   if (policy.repository !== 'orbitaevents') {
     errors.push('agent-runtime-policy.json: repository ha de ser "orbitaevents"');
   }
-  if (policy.defaultWorkspacePath !== 'D:\\orbitaevents') {
-    errors.push('agent-runtime-policy.json: defaultWorkspacePath ha de ser "D:\\orbitaevents"');
+  // Portabilitat (#1374): NO exigim una ruta absoluta fixa (trencaria en moure la carpeta).
+  // Només que `defaultWorkspacePath` apunti a una carpeta anomenada "orbitaevents" —
+  // independentment del disc o la ubicació. Així la carpeta és autosuficient i movible.
+  const wsBase = policy.defaultWorkspacePath
+    ? path.basename(String(policy.defaultWorkspacePath).replace(/[\\/]+$/, '').replace(/\\/g, '/'))
+    : '';
+  if (wsBase !== 'orbitaevents') {
+    errors.push('agent-runtime-policy.json: defaultWorkspacePath ha d\'apuntar a una carpeta "orbitaevents" (la ubicació/disc és lliure).');
   }
   if (policy.mode !== 'nonstop_until_end') {
     errors.push('agent-runtime-policy.json: mode ha de ser "nonstop_until_end"');
