@@ -1,3 +1,25 @@
+## 2026-07-03 — Camp de peatges al formulari de nova reserva (Canvi #1376, claude)
+
+### Context
+El write-path de reserves ja acceptava peatges (#1373) i el lead ja tenia el camp «Peatges €», però el formulari de NOVA RESERVA (reserva directa, sense lead) no oferia on introduir-los. Es tanca el flux perquè els peatges es puguin posar en crear qualsevol reserva.
+
+### Què s'ha fet
+- `booking-form.types.ts`: nou camp `tollsEur` a `BookingFormData` (+ valor inicial buit).
+- `NewBookingForm.tsx`: `onTollsResolved` al hook de distància (peatges automàtics de Google si n'hi ha) + passa `tollsEur` a la secció de viatge.
+- `BookingTravelDiscountSection.tsx`: input «Peatges (€)» sota el de Km (cost real, p. ex. Túnel del Cadí; es reparteix a qui posa el cotxe).
+- `useNewBookingSubmit.ts`: passa `tollsEur` al payload de creació (`bookingCreationService` ja el compta amb el cervell `computeBoloTransport`).
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0 (worktree conjunt amb #1375 de Codex).
+- Validació funcional: el camp de peatges es desa i es compta en crear la reserva (via el cervell, amb franquícia + peatges).
+- Validació humana/UX: el flux de peatges és complet (lead + reserva directa).
+
+### Coordinació
+Counter → 1376. ⚠️ COL·LISIÓ gestionada amb Codex (#1375 marge/pricing): vaig PARAR el carril de pricing quan Codex hi treballava; NO he tocat `useBookingPricing`/`BookingPricingSummary` (seus) → el resum EN VIU del formulari encara no reflecteix peatges (ho migrarà Codex a `computeBoloTransport` quan toqui). Aquest commit inclou #1375 (Codex, ja documentat) + #1376 perquè la feina estava barrejada al worktree i separar-la era arriscat. La suite de tests i validate:core verds amb tots dos.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-03 — Marge extern i +40€ del tècnic inclòs a leads (Canvi #1375, codex)
 
 ### Context

@@ -1547,6 +1547,18 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1376 — 2026-07-03 — claude (FET)
+**Camp de peatges al formulari de nova reserva (tanca el flux de peatges).**
+- Context: el write-path ja acceptava peatges (#1373) i el lead ja el tenia, però el formulari de nova reserva directa no oferia on introduir-los.
+- `booking-form.types` (tollsEur a BookingFormData), `NewBookingForm` (onTollsResolved + passa tollsEur), `BookingTravelDiscountSection` (input «Peatges (€)»), `useNewBookingSubmit` (tollsEur al payload). El cervell `computeBoloTransport` ja els compta amb franquícia.
+- Validació tècnica: tsc 0; validate:core EXIT 0.
+- Validació funcional: els peatges es desen i es compten en crear la reserva.
+- Validació humana/UX: flux de peatges complet (lead + reserva directa).
+- Counter → 1376. Col·lisió amb Codex (#1375 marge) gestionada: no vaig tocar useBookingPricing/BookingPricingSummary (seus); el resum en viu no reflecteix peatges fins que Codex hi migri. Commit conjunt (#1375 + #1376) per worktree barrejat.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1374 — 2026-07-03 — claude (FET)
 **Carpeta autosuficient: portabilitat (mou-la i no es trenca res).**
 - Context: el propietari — «la carpeta ha de ser autosuficient». Auditoria de rutes absolutes que lligaven el projecte a `D:\orbitaevents`.

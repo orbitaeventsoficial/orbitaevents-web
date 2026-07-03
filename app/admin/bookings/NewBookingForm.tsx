@@ -130,6 +130,7 @@ export default function NewBookingForm() {
     eventVenue: form.eventVenue,
     eventLocation: form.eventLocation,
     onDistanceResolved: (distanceKm) => setForm((prev) => ({ ...prev, distanceKm })),
+    onTollsResolved: (tollsEur) => setForm((prev) => ({ ...prev, tollsEur })),
   });
   const dateConflicts = useBookingDateConflicts(form.eventDate);
 
@@ -344,6 +345,7 @@ export default function NewBookingForm() {
           <BookingTravelDiscountSection
             form={{
               distanceKm: form.distanceKm,
+              tollsEur: form.tollsEur,
               discount: form.discount,
               discountCode: form.discountCode,
               notes: form.notes,

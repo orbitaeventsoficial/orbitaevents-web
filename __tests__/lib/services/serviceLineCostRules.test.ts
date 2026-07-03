@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+  computeSubcontractedMarkupSummary,
   isIncludedSoundTechSettlementLine,
   sanitizeRevenueAmount,
   sanitizeServiceLineCostAmount,
+  SUBCONTRACTED_MARKUP_TARGET_PCT,
 } from '@/lib/services/serviceLineCostRules';
 
 describe('serviceLineCostRules', () => {
@@ -30,5 +32,20 @@ describe('serviceLineCostRules', () => {
     expect(sanitizeRevenueAmount(12.345)).toBe(12.35);
     expect(sanitizeRevenueAmount(-10)).toBe(0);
     expect(sanitizeRevenueAmount(Number.NaN)).toBeNull();
+  });
+
+  it('calcula subcontractats com a +20% sobre cost de proveïdor', () => {
+    const r = computeSubcontractedMarkupSummary([
+      { kind: 'PROVIDER_SERVICE', collaboratorId: 'masquerade', revenueAmount: 240, costAmount: 200, quantity: 1 },
+      { kind: 'SOUND_TECH', collaboratorId: 'masquerade', label: 'Tècnic de so inclòs · 1h 30', revenueAmount: 0, costAmount: -40, quantity: 1 },
+    ]);
+
+    expect(r.targetPct).toBe(SUBCONTRACTED_MARKUP_TARGET_PCT);
+    expect(r.cost).toBe(200);
+    expect(r.revenue).toBe(240);
+    expect(r.markupAmount).toBe(40);
+    expect(r.markupPct).toBe(20);
+    expect(r.ok).toBe(true);
+    expect(r.orbitaTechIncome).toBe(40);
   });
 });

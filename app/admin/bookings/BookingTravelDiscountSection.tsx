@@ -11,7 +11,7 @@ import { NB_FIELD, NB_LABEL, NB_HINT, NB_HINT_OK, NB_HINT_WARN, NB_HINT_INFO } f
 import type { BookingDiscountValidation, BookingFormData } from './booking-form.types';
 
 interface BookingTravelDiscountSectionProps {
-  form: Pick<BookingFormData, 'distanceKm' | 'discount' | 'discountCode' | 'notes'>;
+  form: Pick<BookingFormData, 'distanceKm' | 'tollsEur' | 'discount' | 'discountCode' | 'notes'>;
   travelCharge: number;
   travelHeadcount: number;
   chargeableHours: number;
@@ -19,7 +19,7 @@ interface BookingTravelDiscountSectionProps {
   fuelReferenceInfo: string | null;
   validatingCode: boolean;
   discountValidation: BookingDiscountValidation | null;
-  onFieldChange: (field: 'distanceKm' | 'discount' | 'discountCode' | 'notes', value: string) => void;
+  onFieldChange: (field: 'distanceKm' | 'tollsEur' | 'discount' | 'discountCode' | 'notes', value: string) => void;
   onResetDiscountValidation: () => void;
   onValidateDiscountCode: () => void;
 }
@@ -56,6 +56,18 @@ export default function BookingTravelDiscountSection({
               className="adm-input"
             />
             <p className={NB_HINT}>La 1a hora de ruta va inclosa</p>
+            <label htmlFor="nb-tolls" className={`${NB_LABEL} mt-3`}>Peatges (€)</label>
+            <input
+              id="nb-tolls"
+              type="number"
+              min={0}
+              step="0.01"
+              value={form.tollsEur}
+              onChange={(e) => onFieldChange('tollsEur', e.target.value)}
+              placeholder="0"
+              className="adm-input"
+            />
+            <p className={NB_HINT}>Cost real de peatges (p. ex. Túnel del Cadí). Es reparteix a qui posa el cotxe.</p>
           </div>
           <div className={NB_FIELD}>
             <span className={NB_LABEL}>Resum del càrrec</span>

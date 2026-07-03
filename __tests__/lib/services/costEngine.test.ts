@@ -292,22 +292,6 @@ describe('costEngine', () => {
       expect(result.marginTone.tone).toBe('rose');
     });
 
-    it('perfil extern: 10% de marge ja és acceptable per revenda/proveïdor', () => {
-      const result = computeBookingFinancialSummary(baseInput({
-        total: 500,
-        packPrice: 0,
-        extrasTotal: 0,
-        extraHours: 0,
-        distanceKm: 0,
-        serviceLinesRevenue: 500,
-        serviceLinesCost: 385,
-        marginProfile: 'external',
-      }), defaultConfig);
-
-      expect(result.marginPct).toBe(10);
-      expect(result.marginTone.label).toBe('Acceptable');
-    });
-
     // --- Edge cases ---
 
     it('tot a zero: marge 0%, cap divisió per zero', () => {

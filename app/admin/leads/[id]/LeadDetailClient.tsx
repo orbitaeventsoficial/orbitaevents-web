@@ -181,7 +181,12 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  prev.serviceLinesCost === e.serviceLinesCost &&
  prev.fixedOperationalCost === e.fixedOperationalCost &&
  prev.tone === e.tone &&
- prev.label === e.label;
+ prev.label === e.label &&
+ prev.subcontractedCost === e.subcontractedCost &&
+ prev.subcontractedMarkupAmount === e.subcontractedMarkupAmount &&
+ prev.subcontractedMarkupPct === e.subcontractedMarkupPct &&
+ prev.subcontractedMarkupOk === e.subcontractedMarkupOk &&
+ prev.orbitaTechIncome === e.orbitaTechIncome;
  return same ? prev : e;
  });
  }, []);
@@ -588,9 +593,15 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  <div className="ap-ledger-summary-net" data-tone={econ.tone}>
  <span className="ap-ledger-summary-net-lbl">{bookingEconomia ? 'Net real' : 'Net estimat'}</span>
  <strong className="ap-ledger-summary-net-val">{formatCurrency(econ.net)}</strong>
- <span className="ap-ledger-summary-net-pct">{Math.round(econ.marginPct)}% marge{econ.label ? ` · ${econ.label}` : ''}</span>
+ <span className="ap-ledger-summary-net-pct">{Math.round(econ.marginPct)}% marge global{econ.label ? ` · ${econ.label}` : ''}</span>
  </div>
  <div className="ap-ledger-summary-rows">
+ {econ.subcontractedCost > 0 && (
+ <div><span>Subcontractat</span><strong>+{Math.round(econ.subcontractedMarkupPct)}% sobre cost</strong></div>
+ )}
+ {econ.orbitaTechIncome > 0 && (
+ <div><span>Tècnic Òrbita</span><strong>+{formatCurrency(econ.orbitaTechIncome)}</strong></div>
+ )}
  {econ.travelCharge != null && (
  <div><span>Transport client</span><strong>{formatCurrency(econ.travelCharge)}</strong></div>
  )}

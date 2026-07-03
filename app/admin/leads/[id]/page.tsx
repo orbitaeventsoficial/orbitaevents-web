@@ -6,8 +6,9 @@ import { getWeatherForEvent } from '@/lib/services/weatherService';
 import { getEffectiveVehicleCostPerKm } from '@/lib/services/fuelReferenceService';
 import { DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
 import { TRAVEL_COST_LINE_MARKER } from '@/lib/services/travelLaborCost';
-import { classifyBoloLines, computeBookingFinancialSummary } from '@/lib/services/costEngine';
+import { computeBookingFinancialSummary } from '@/lib/services/costEngine';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
+import { computeSubcontractedMarkupSummary } from '@/lib/services/serviceLineCostRules';
 import type { WxData } from '@/app/admin/components/WxBadge';
 
 export const dynamic = 'force-dynamic';
@@ -176,6 +177,8 @@ export default async function LeadDetailPage({ params }: Props) {
     travelCharge: number; travelCost: number;
     acquisitionCost: number; serviceLinesCost: number; fixedOperationalCost: number;
     tone: 'emerald' | 'amber' | 'orange' | 'rose'; label: string;
+    subcontractedCost: number; subcontractedMarkupAmount: number; subcontractedMarkupPct: number;
+    subcontractedMarkupOk: boolean; orbitaTechIncome: number;
   } | null = null;
   if (lead.booking) {
     const b = lead.booking;
@@ -188,9 +191,7 @@ export default async function LeadDetailPage({ params }: Props) {
         (s, l) => s + Number(l.revenueAmount || 0) * (l.quantity || 1), 0);
       const slCost = visibleServiceLines.reduce(
         (s, l) => s + Number(l.costAmount || 0) * (l.quantity || 1), 0);
-      const { hasOwnEquipment } = classifyBoloLines(visibleServiceLines);
-      const hasExternalProviderService = visibleServiceLines.some((l) => l.kind === 'PROVIDER_SERVICE' && Boolean(l.collaboratorId));
-      const marginProfile = !hasOwnEquipment && hasExternalProviderService ? 'external' : 'own';
+      const subcontracted = computeSubcontractedMarkupSummary(visibleServiceLines);
       const summary = computeBookingFinancialSummary({
         total: Number(b.total),
         packPrice: b.pack?.price ? Number(b.pack.price) : 0,
@@ -202,7 +203,6 @@ export default async function LeadDetailPage({ params }: Props) {
         serviceLinesRevenue: slRevenue,
         serviceLinesCost: slCost,
         source: lead.source,
-        marginProfile,
       }, profitabilityConfig);
       bookingEconomia = {
         net: summary.netMargin,
@@ -216,6 +216,11 @@ export default async function LeadDetailPage({ params }: Props) {
         fixedOperationalCost: summary.fixedOperationalCost,
         tone: summary.marginTone.tone,
         label: summary.marginTone.label,
+        subcontractedCost: subcontracted.cost,
+        subcontractedMarkupAmount: subcontracted.markupAmount,
+        subcontractedMarkupPct: subcontracted.markupPct,
+        subcontractedMarkupOk: subcontracted.ok,
+        orbitaTechIncome: subcontracted.orbitaTechIncome,
       };
     }
   }

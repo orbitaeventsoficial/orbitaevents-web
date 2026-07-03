@@ -148,6 +148,7 @@ export function useNewBookingSubmit({
         notes: notes || undefined,
         serviceLines: serviceLines.length > 0 ? serviceLines : undefined,
         distanceKm: parseFloat(form.distanceKm) || undefined,
+        tollsEur: parseFloat(form.tollsEur) || undefined,
         fuelCostPerKm: parseFloat(form.fuelCostPerKm) || undefined,
         travelCost: internalTravelCost || undefined,
       };

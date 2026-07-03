@@ -10,7 +10,7 @@
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import type { ProfitabilityConfig } from './profitabilityService';
 import { calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM } from './travelCost';
-import { getMarginTone, type MarginProfile, type MarginTone } from '@/lib/margin-utils';
+import { getMarginTone, type MarginTone } from '@/lib/margin-utils';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -30,8 +30,6 @@ interface BookingCostInput {
   serviceLinesRevenue?: number | null;
   /** Cost explícit de línies del bolo (cost real de col·laborador subcontractat). */
   serviceLinesCost?: number | null;
-  /** Perfil comercial del marge: propi o revenda/proveidor extern. */
-  marginProfile?: MarginProfile | null;
 }
 
 interface BookingFinancialSummary {
@@ -215,7 +213,7 @@ export function computeBookingFinancialSummary(
   const total = input.total > 0 ? input.total : serviceLinesRevenue;
   const netMargin = total - directCost - acquisitionCost;
   const marginPct = total > 0 ? (netMargin / total) * 100 : 0;
-  const marginTone = getMarginTone(marginPct, input.marginProfile ?? 'own');
+  const marginTone = getMarginTone(marginPct);
 
   return {
     packCost,
@@ -281,5 +279,4 @@ export function computeCollaboratorNetMargin(
 
   return { netMarginAfterCommission, commissionAmount, collaboratorPrice, marginPctAfterCommission };
 }
-
 

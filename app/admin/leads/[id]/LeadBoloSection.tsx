@@ -11,6 +11,7 @@ import { calculateTravelCostBreakdown, deriveTravelHeadcount, computeBoloTranspo
 import { useBookingDistance } from '@/app/admin/bookings/useBookingDistance';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { formatCurrency, formatNumber } from '@/lib/constants';
+import { computeSubcontractedMarkupSummary } from '@/lib/services/serviceLineCostRules';
 
 /**
  * El BOLO dins la fitxa del lead (Fase 1.4 de docs/bolo-flux.md).
@@ -30,6 +31,11 @@ export interface BoloEconomia {
  fixedOperationalCost: number;
  tone: 'emerald' | 'amber' | 'orange' | 'rose';
  label: string;
+ subcontractedCost: number;
+ subcontractedMarkupAmount: number;
+ subcontractedMarkupPct: number;
+ subcontractedMarkupOk: boolean;
+ orbitaTechIncome: number;
 }
 
 /**
@@ -227,8 +233,6 @@ export default function LeadBoloSection({
  // - el transport d'anar a buscar material de lloguer (Tino) el carrega la
  // pròpia línia de lloguer, sumat al seu cost.
  const { hasOwnEquipment, hasEquipmentRental } = classifyBoloLines(allLines);
- const hasExternalProviderService = allLines.some((l) => l.kind === 'PROVIDER_SERVICE' && Boolean(l.collaboratorId));
- const marginProfile = !hasOwnEquipment && hasExternalProviderService ? 'external' : 'own';
  const rentalTransport = hasEquipmentRental ? EQUIPMENT_RENTAL_TRANSPORT_KM * vehicleCostPerKm : 0;
  const summary = computeBookingFinancialSummary({
  total: revenue,
@@ -236,12 +240,12 @@ export default function LeadBoloSection({
  distanceKm: Number(distanceKm) || 0, travelCost: effectiveTravelCost,
  serviceLinesRevenue: linesRevenue, serviceLinesCost: cost + rentalTransport,
  source: source ?? null,
- marginProfile,
  }, {
  ...PROFITABILITY_MODEL_DEFAULTS,
  fixedOperationalCost: hasOwnEquipment ? PROFITABILITY_MODEL_DEFAULTS.fixedOperationalCost : 0,
  });
- return summary;
+ const subcontracted = computeSubcontractedMarkupSummary(allLines);
+ return { ...summary, subcontracted };
  }, [buildVisibleLines, source, vehicleCostPerKm, effectiveTravelCost, distanceKm, travelCharge]);
 
  // Eleva el net al contenidor (perquè visqui al hero de la fitxa, no enterrat a baix).
@@ -260,6 +264,11 @@ export default function LeadBoloSection({
  fixedOperationalCost: economia.fixedOperationalCost,
  tone: economia.marginTone.tone,
  label: economia.marginTone.label,
+ subcontractedCost: economia.subcontracted.cost,
+ subcontractedMarkupAmount: economia.subcontracted.markupAmount,
+ subcontractedMarkupPct: economia.subcontracted.markupPct,
+ subcontractedMarkupOk: economia.subcontracted.ok,
+ orbitaTechIncome: economia.subcontracted.orbitaTechIncome,
  }
  : null);
  }, [economia, effectiveTravelCost, onEconomiaChange, travelCharge]);

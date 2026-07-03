@@ -65,14 +65,6 @@ describe('margin-utils', () => {
       expect(getMarginBarClass(5)).toBe('o-margin-bar--critical');
     });
 
-    it('usa llindars mes baixos per revenda/proveidor extern', () => {
-      expect(getMarginBand(24.9, 'external')).toBe('acceptable');
-      expect(getMarginBand(10, 'external')).toBe('acceptable');
-      expect(getMarginBand(9.9, 'external')).toBe('watch');
-      expect(getMarginBand(5, 'external')).toBe('watch');
-      expect(getMarginBand(4.9, 'external')).toBe('critical');
-      expect(getMarginTone(9.4, 'external').label).toBe('Vigilar');
-    });
   });
 
   // ─── getMarginTone ──────────────────────────────────────────────────────────

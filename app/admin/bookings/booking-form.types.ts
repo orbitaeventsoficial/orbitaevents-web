@@ -12,6 +12,7 @@ export type BookingFormData = {
   packId: string;
   extraHours: string;
   distanceKm: string;
+  tollsEur: string;
   fuelCostPerKm: string;
   discount: string;
   discountCode: string;
@@ -32,6 +33,7 @@ export const INITIAL_BOOKING_FORM: BookingFormData = {
   packId: '',
   extraHours: '0',
   distanceKm: '',
+  tollsEur: '',
   fuelCostPerKm: '0.19',
   discount: '0',
   discountCode: '',
