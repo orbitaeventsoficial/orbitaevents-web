@@ -84,7 +84,7 @@ describe('travelLaborCost', () => {
     expect(two.driverCost).toBe(15);     // 1 h × 15
   });
 
-  it('el càrrec al client del bolo inclou hores de ruta de conductor i passatger', () => {
+  it('transport a break-even amb dieta en ruta llarga (15 €/h + 30 €/persona)', () => {
     const r = computeBoloTransport({
       roundTripKm: 422,
       vehicleCostPerKm: 0.26,
@@ -92,7 +92,21 @@ describe('travelLaborCost', () => {
     });
 
     expect(r.breakdown.chargeableHours).toBe(5.5);
-    expect(r.breakdown.peopleCost).toBe(165);
-    expect(r.clientCharge).toBe(261.72);
+    expect(r.breakdown.peopleCost).toBe(165);      // tripulació: 5,5 h × 15 × 2
+    expect(r.mealAllowance).toBe(60);              // dieta: 30 × 2 (routeHours 6,49 > 3)
+    // clientCharge = cotxe amb franquícia (372 × 0,26 = 96,72) + tripulació 165 + dieta 60
+    expect(r.clientCharge).toBe(321.72);
+    // cost = cotxe sencer 109,72 + tripulació 165 + dieta 60
+    expect(r.cost).toBe(334.72);
+    // Break-even: l'únic negatiu (−13) és la franquícia del cotxe (gest comercial), no la dieta.
+  });
+
+  it('no aplica dieta en ruta curta (per sota del llindar de 3 h)', () => {
+    const r = computeBoloTransport({
+      roundTripKm: 120, // ~1,85 h a/t < 3 h
+      vehicleCostPerKm: 0.26,
+      headcountOverride: 2,
+    });
+    expect(r.mealAllowance).toBe(0);
   });
 });

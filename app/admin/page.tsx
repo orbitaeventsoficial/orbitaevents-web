@@ -30,6 +30,7 @@ import WeeklyCapacityForecastPanel from './components/WeeklyCapacityForecastPane
 import { buildDashboardOperatingCycle, type AdminOperatingCycleTone } from '@/lib/services/adminOperatingCycleService';
 import NBAExplainPanel from './components/NBAExplainPanel';
 import { getPaymentBand, getPaymentLabel } from '@/lib/payment-status';
+import MaximsTicker from './components/MaximsTicker';
 
 // Removed: all widget components now in lib/dashboard-widgets.tsx
 export const dynamic = 'force-dynamic';
@@ -225,6 +226,9 @@ export default async function AdminDashboard() {
         </>
       }
     >
+      {/* ═══ BRÚIXOLA — màximes d'Economia sempre al top (#1390) ═══ */}
+      <MaximsTicker />
+
       {/* ═══ FOCUS DEL DIA ═══ */}
       <Link
         href={focusHref}

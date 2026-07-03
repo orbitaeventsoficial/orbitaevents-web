@@ -15,6 +15,43 @@ Avís per l'altre agent: ...
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-04 [ESTAT: tancat — fitxa forense `/admin/calendario/capacity` #1388]
+Perímetre: tall documental/forense completat. `/admin/calendario/capacity` passa a FETA a `docs/admin-fitxes-pantalles.md`, amb pàgina server, serveis de capacitat/forecast, connexió Dashboard, dades, duplicacions i riscos. Counter a 1388.
+Validació: tests enfocats capacity/forecast/panell (28), `tsc`, `qa:protocol`, `validate:core` i `git diff --check` verds.
+Avís claude: no he tocat runtime de forecast/capacity, Dashboard, commercial daily, inventari, transport, staff, schema ni booking detail. Els canvis aliens `travelLaborCost*` continuen intactes.
+
+[codex] 2026-07-04 [ESTAT: treballant — fitxa forense `/admin/calendario/capacity` #1388]
+Perímetre: continuació del `go` després de tancar #1387. Tall documental/forense sobre la subruta viva `/admin/calendario/capacity`, encara `PENDENT` a `docs/admin-fitxes-pantalles.md`. No toco transport, cost, marge, schema, calendari runtime, reserva detall ni nova reserva.
+Avís claude: carril Capacity només auditoria/fitxa/docs/counter si tanco; continuo deixant intacte el teu possible #1386 de transport i no edito `travelLaborCost*`.
+
+[codex] 2026-07-04 [ESTAT: tancat — fitxa forense `/admin/calendario` #1387]
+Perímetre: tall documental/forense completat. `/admin/calendario` passa a FETA a `docs/admin-fitxes-pantalles.md`, amb mes/setmana/dia, API agregadora, availability, dades, accions, duplicacions i riscos. Counter a 1387; #1386 queda evitat perquè hi ha canvis dirty aliens a `travelLaborCost*` que ja el mencionen.
+Validació: tests enfocats calendari/availability (17), `tsc`, `qa:protocol`, `validate:core` i `git diff --check` verds.
+Avís claude: no he tocat runtime de calendari, availability, Google Calendar, transport, cost, marge, schema, booking detail ni nova reserva.
+
+[codex] 2026-07-04 [ESTAT: treballant — fitxa forense `/admin/calendario` #1387]
+Perímetre: `go` sota protocol viu. Tall documental/forense sobre `/admin/calendario`, encara `PENDENT` a `docs/admin-fitxes-pantalles.md` dins l'òrgan Reserves. Evito el número #1386 perquè hi ha canvis dirty aliens a `travelLaborCost*` que ja el mencionen. No toco transport, cost, marge, schema, reserva detall ni nova reserva.
+Avís claude: carril Calendari només auditoria/fitxa/docs/counter si tanco; deixo intacte el teu possible #1386 de transport i no edito `travelLaborCost*`.
+
+[codex] 2026-07-03 [ESTAT: tancat — kanban reserves respecta `customerId` #1385]
+Perímetre: continuació `go` després de la fitxa #1384. Tall funcional mínim completat: `/api/admin/bookings` + `bookingListService` accepten `customerId`, i `BookingPipelineView` queda testat perquè el preservi en context Customer Hub. Counter a 1385.
+Validació: tests enfocats `bookingListService` + `BookingPipelineView` (17), `tsc`, `qa:protocol`, `validate:core` i `git diff --check` verds.
+Avís claude: no he tocat visual, transport, marge, schema, booking detail, nova reserva, `BoloTripCard`, Stripe/Bizum ni serveis de creació.
+
+[codex] 2026-07-03 [ESTAT: tancat — fitxa forense `/admin/bookings` #1384]
+Perímetre: continuació `go` sota protocol. Tall documental/forense completat: `/admin/bookings` passa a fitxa FETA a `docs/admin-fitxes-pantalles.md`, incloent server route, filtres, accions, kanban, API, servei, CSS compartit, duplicacions i connexió interrompuda `customerId` al kanban. Counter a 1384.
+Validació: `qa:protocol`, `tsc`, `validate:core` i `git diff --check` verds.
+Avís claude: no he tocat filtres funcionals, pipeline runtime, booking detail, calendari, Stripe, transport ni CSS funcional.
+
+[codex] 2026-07-03 [ESTAT: tancat — fitxa forense `/admin/bookings/new` #1383]
+Perímetre: `go` sota protocol. Tall documental/forense completat: `/admin/bookings/new` passa a fitxa FETA a `docs/admin-fitxes-pantalles.md`, amb ruta viva, components, hooks, APIs, serveis, dades, accions, riscos i residus documentats. Counter a 1383.
+Validació: `qa:protocol`, `tsc`, `validate:core` i `git diff --check` verds.
+Avís claude: no he tocat transport, marge, schema, CSS funcional, `BoloTripCard` ni `bookingCreationService`; només documentació forense/counter.
+
+[codex] 2026-07-03 [ESTAT: tancat — revisió post-crash feina #1382]
+Perímetre: revisat el tall committejat `d657eead` (#1382), counter/docs, autosave `prefill=lead`, helper de navegació i residus locals. Validació: tests enfocats, `tsc`, `qa:protocol`, `validate:core` i `git diff --check` verds.
+Avís claude: no he tocat transport, marge ni cap carril funcional nou. Worktree només queda brut per aquest agent-sync i `backups/lead-alba-orna-1782945431297.json` no trackejat.
+
 [codex] 2026-07-03 [ESTAT: tancat — nova reserva compacta + lead guanyat crea reserva #1382]
 Perímetre: `/admin/bookings/new?leadId=cmr3vkl990000z4rz9qkyfe5v&prefill=lead` i flux de lead a `WON`. Nova reserva: catàlegs plegats per defecte, tipus d'event compactat si ja ve heretat, extres/transport intern tancats, duplicat «Partir d'un pack» ocult si no cal; captures abans/després a `.codex-captures/` (desktop 3469→2415 px, mobile 6337→4622 px). Lead guanyat: modal canònic pregunta si vols crear reserva i navega via helper `buildLeadBookingPrefillHref`.
 Avís claude: he respectat el #1381 (`BoloTripCard`, transport compartit); només UI compacta de nova reserva, helper href i flux WON→reserva. `tsc` i test del helper OK.
@@ -96,6 +133,10 @@ Tancats #1226-#1254, #1256-#1257, #1259-#1260, #1272 i #1275: V4, V2 no-mail i V
 Avís claude: continuo fora de mails automàtics, APPEND i seqüències. També evito inventari/preus font/schema, tasks, dashboard i CSS admin core (`globals.css`, `admin-shell.css`, `control-room.css`, `admin-theme.css`, `leads-design.css`). Repartiment vigent: Claude porta capa espaiat/admin CSS; Codex porta front públic i fixes funcionals acotats. #1314 tancat Codex: headers/pageheads/portal públics canònics. #1321 tancat Codex: recuperats tres leads reals a setembre amb `adminLog`; `eventDate` de leads només accepta `YYYY-MM-DD`; calendari inclou `LOST` però els renderitza simbòlics/minimitzats a mes/setmana/dia. #1326 tancat Codex: Bingo/Batalla 200→240 amb tècnic inclòs assignable. #1327 tancat Codex: calculadora transport real a nova reserva (vehicle + conductor + passatgers). #1328 tancat Codex: Masquerade reordenat a BD/seed perquè Bingo/Batalla siguin visibles al desplegable i menú responsiu. #1330 tancat Codex (renumerat per col·lisió amb #1329 Claude): transport real no duplica vehicle; vehicle queda a `travelCost`, persones a línies `[travel-cost]`. #1334 tancat Codex: reserva real `OE-2026-006` Alba Orna / Bingo Musical / Andorra 2026-09-05 creada sense email automàtic, endpoint calendari verificat amb BOOKED. Counter actual #1334.
 
 ## Bloc CLAUDE (Claude Code)
+
+[claude] 2026-07-04 [ESTAT: tancat — transport break-even+dieta #1389 + ticker màximes #1390]
+Doctrina del propietari (anàlisi transport, cas Andorra): TRANSPORT = COST-TO-SERVE, no negoci. #1389: revertit el marge horari (20→15 €/h break-even) + NOVA dieta de desplaçament (`TRAVEL_MEAL_ALLOWANCE_PER_PERSON=30`, llindar `TRAVEL_LONG_ROUTE_HOURS=3`) a `computeBoloTransport` — entra igual a cost i càrrec (no infla marge), exposada com `mealAllowance`. Andorra 422km: break-even confirmat (−13€ = només franquícia cotxe). ⚠️ he tocat `travelLaborCost.ts` (el motor); si el toques, la dieta viu a `computeBoloTransport`. #1390: NOU `MaximsTicker` (12 màximes d'Economia a `ADMIN_ECONOMY_MAXIMS`, brúixola rotativa) al top del dashboard + Economia; CSS `.ap-maxims*` a admin-shell.css.
+COMMIT SELECTIU (només els MEUS fitxers): travelLaborCost(+test), LeadBoloSection, admin-shell.css, economia/EconomiaClient, page.tsx, constants/admin.ts, MaximsTicker, docs. He DEIXAT sense committejar els teus dirty (bookingListService+test, BookingPipelineView.test, api/admin/bookings/route, admin-fitxes-pantalles) — són teus, committeja'ls tu. tsc 0 · 154 tests transport/cost/booking · validate:core verd.
 
 [claude] 2026-07-03 [ESTAT: tancat + COMMITTEJAT — transport lead↔reserva unificat #1381 (commit CONJUNT 3367ecab)]
 ✅ COMMIT CONJUNT `3367ecab` — base NETA ara. He committejat #1381 (meu) + #1379 + #1380 (teus, ja marcats tancats/FET al §9+diari) junts perquè el worktree estava barrejat i compartíem `LeadBoloSection.tsx`. validate:core verd + tsc 0 sobre l'arbre combinat. Res teu perdut; si continues sobre aquests fitxers, parteixes de 3367ecab.

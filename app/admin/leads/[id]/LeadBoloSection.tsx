@@ -8,7 +8,7 @@ import BoloTripCard, { CROWDED_TRIP_THRESHOLD } from '@/app/admin/components/Bol
 import type { BookingServiceLineFormInput } from '@/app/admin/bookings/booking-form.types';
 import { computeBookingFinancialSummary, computeServiceLineEconomics, classifyBoloLines } from '@/lib/services/costEngine';
 import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
-import { calculateTravelCostBreakdown, deriveTravelHeadcount, computeBoloTransport } from '@/lib/services/travelLaborCost';
+import { calculateTravelCostBreakdown, deriveTravelHeadcount, computeBoloTransport, TRAVEL_MEAL_ALLOWANCE_PER_PERSON } from '@/lib/services/travelLaborCost';
 import { useBookingDistance } from '@/app/admin/bookings/useBookingDistance';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { formatCurrency, formatNumber } from '@/lib/constants';
@@ -212,17 +212,21 @@ export default function LeadBoloSection({
  });
  // eslint-disable-next-line react-hooks/exhaustive-deps -- nameFor és un closure estable sobre travelCollaborators (ja dep)
  }, [buildVisibleLines, distanceKm, tollsEur, headcount, vehicleCostPerKm, vehicleOwnerId, driverId, travelCollaborators]);
- // COST INTERN real del transport (cotxe + temps tripulació + peatges, tots els km).
- // Live si hi ha km resolts; si no, fallback al cost recuperat (#1343).
- const effectiveTravelCost = (Number(distanceKm) || 0) > 0 ? travelBreakdown.totalCost : internalTravelCost;
+ // TRANSPORT del bolo (#1369/#1386, monocapa): UNA sola crida al cervell `computeBoloTransport`.
+ // El lead NO calcula res pel seu compte: cost i càrrec surten de la MATEIXA font, així la dieta
+ // (#1386) entra igual als dos i el marge de transport queda break-even (no fals-positiu).
  const km = Number(distanceKm) || 0;
- // CÀRREC al client (#1369, monocapa): UNA crida al cervell econòmic `computeBoloTransport`.
- // El lead NO calcula el càrrec pel seu compte: demana el número al cervell, que aplica la
- // franquícia comercial (50 km inclosos al cotxe) i el marge. El breakdown segueix sent el
- // cost real per al repartiment/marge.
- const travelCharge = km > 0
-   ? computeBoloTransport({ roundTripKm: km, headcountOverride: headcount, tollsEur: Number(tollsEur) || 0, vehicleCostPerKm }).clientCharge
-   : internalTravelCost;
+ const transport = useMemo(
+   () => (km > 0
+     ? computeBoloTransport({ roundTripKm: km, headcountOverride: headcount, tollsEur: Number(tollsEur) || 0, vehicleCostPerKm })
+     : null),
+   [km, headcount, tollsEur, vehicleCostPerKm],
+ );
+ // Cost intern real (cotxe + temps tripulació + dieta + peatges). Fallback al cost recuperat (#1343).
+ const effectiveTravelCost = transport ? transport.cost : internalTravelCost;
+ // Càrrec al client: franquícia comercial del cotxe (50 km) + tripulació + dieta + peatges.
+ const travelCharge = transport ? transport.clientCharge : internalTravelCost;
+ const mealAllowance = transport?.mealAllowance ?? 0;
 
  // Fulla d'economia del bolo (Fase 4 de docs/bolo-flux.md). La pasta NO viu al
  // configurador: cada línia porta el cost amagat i alimenta SOLA aquesta fulla.
@@ -292,11 +296,23 @@ export default function LeadBoloSection({
  : null);
  }, [economia, effectiveTravelCost, onEconomiaChange, travelCharge]);
 
- const routeSettlementLines = useMemo(() => travelBreakdown.lines.map((line) => ({
+ const routeSettlementLines = useMemo(() => {
+ const lines = travelBreakdown.lines.map((line) => ({
  label: line.label,
  amount: line.costAmount,
  notes: cleanRouteNote(line.notes),
- })), [travelBreakdown.lines]);
+ }));
+ // Dieta de desplaçament (#1386): la cobra qui viatja. Es mostra al desglossament perquè
+ // el total «Qui cobra la ruta» quadri amb el cost real (cotxe + tripulació + dieta + peatges).
+ if (mealAllowance > 0) {
+ lines.push({
+ label: `Dieta desplaçament${headcount > 1 ? ` · ${headcount} pers.` : ''}`,
+ amount: mealAllowance,
+ notes: `${formatCurrency(TRAVEL_MEAL_ALLOWANCE_PER_PERSON)}/persona · ruta llarga`,
+ });
+ }
+ return lines;
+ }, [travelBreakdown.lines, mealAllowance, headcount]);
 
  // Marge → nivell visual reutilitzant els tons existents (.ap-ledger-kpi data-level).
  const netLevel = !economia

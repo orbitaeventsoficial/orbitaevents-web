@@ -1,9 +1,20 @@
 import { DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM, calculateTravelCost, sanitizeNonNegative } from '@/lib/services/travelCost';
 
-// Tarifa del temps de carretera (decisió del propietari #1363): tothom a 15 €/h,
-// tant qui condueix com qui viatja de passatger. La gent consumeix HORES (no km).
+// Tarifa del temps de carretera (decisió del propietari #1363): tothom a 15 €/h, tant qui
+// condueix com qui va de passatger. La gent consumeix HORES (no km). Filosofia del propietari
+// (#1386): el transport és COST NEUTRE — ni marge ni pèrdua. El client paga el que costa i
+// prou; el benefici d'Òrbita viu al PRODUCTE (DJ propi, revenda), no al volant.
 export const TRAVEL_DRIVER_HOURLY_RATE = 15;
 export const TRAVEL_PASSENGER_HOURLY_RATE = 15;
+// Dieta de desplaçament (#1386, decisió del propietari): en rutes llargues (que obliguen a
+// menjar fora / cremen el dia), cada PERSONA que viatja cobra una dieta d'àpat. És cost real
+// repercutit al client (break-even, no marge): cobreix el treballador —o tu— quan el bolo és
+// lluny. Els bolos locals (ruta per sota del llindar) NO en tenen. Monocapa: es canvia AQUÍ i
+// val a totes les superfícies (lead, reserva, portal, PDFs).
+export const TRAVEL_MEAL_ALLOWANCE_PER_PERSON = 30;
+// Llindar (hores de ruta anada+tornada) a partir del qual s'activa la dieta. ~3 h a/t = bolo
+// que ja no és «tornar per dinar/sopar a casa».
+export const TRAVEL_LONG_ROUTE_HOURS = 3;
 export const TRAVEL_AVG_SPEED_KMH = 65;
 export const TRAVEL_COST_LINE_MARKER = '[travel-cost]';
 // La primera hora de ruta (total anada+tornada) va INCLOSA EN EL PREU (no és gratis:
@@ -209,8 +220,9 @@ export interface BoloTransportResult {
   tollsEur: number;
   routeHours: number;
   chargeableHours: number;
-  cost: number;         // cost real total (cotxe + temps tripulació + peatges)
-  clientCharge: number; // el que paga el client (cost × CLIENT_TRAVEL_MARGIN)
+  cost: number;         // cost real total (cotxe + temps tripulació@15 + dieta + peatges)
+  clientCharge: number; // el que paga el client (cotxe amb franquícia + tripulació + dieta + peatges)
+  mealAllowance: number; // dieta de desplaçament (30 €/persona en rutes llargues; 0 si local)
   breakdown: TravelCostBreakdown;
 }
 
@@ -247,7 +259,6 @@ export function computeBoloTransport(input: {
         ]
       : [],
   });
-  const cost = km <= 0 ? tolls : breakdown.totalCost;
   // Franquícia comercial (decisió del propietari): els primers INCLUDED_TRAVEL_KM (50 km
   // a/t = 25 anada + 25 tornada) de COTXE van inclosos al càrrec del client («desplaçament
   // inclòs fins a 25 km»). El COST intern real es manté sencer (la benzina es gasta igual)
@@ -256,17 +267,28 @@ export function computeBoloTransport(input: {
   const vehicleCostPerKm = sanitizeNonNegative(input.vehicleCostPerKm, DEFAULT_VEHICLE_COST_PER_KM);
   const billableKm = Math.max(0, km - INCLUDED_TRAVEL_KM);
   const clientVehicleCost = calculateTravelCost(billableKm, vehicleCostPerKm);
+  // Dieta de desplaçament (#1386): en rutes llargues (routeHours > llindar) cada PERSONA que
+  // viatja cobra una dieta d'àpat. Cost real repercutit al client (break-even): entra igual al
+  // cost i al càrrec → NO mou el marge, cobreix el treballador quan el bolo és lluny. Els bolos
+  // locals (sota el llindar) no en tenen. Font única del headcount = persones físiques.
+  const mealAllowance = breakdown.routeHours > TRAVEL_LONG_ROUTE_HOURS
+    ? round2(TRAVEL_MEAL_ALLOWANCE_PER_PERSON * headcount)
+    : 0;
+  const totalCost = km <= 0 ? round2(tolls + mealAllowance) : round2(breakdown.totalCost + mealAllowance);
+  // El client paga el mateix cost real (transport = cost neutre): cotxe amb franquícia +
+  // tripulació@15 + dieta + peatges. L'única franquícia comercial és la del cotxe (50 km).
   const clientCharge = km <= 0
-    ? round2(tolls * CLIENT_TRAVEL_MARGIN)
-    : round2((clientVehicleCost + breakdown.peopleCost + tolls) * CLIENT_TRAVEL_MARGIN);
+    ? round2((tolls + mealAllowance) * CLIENT_TRAVEL_MARGIN)
+    : round2((clientVehicleCost + breakdown.peopleCost + mealAllowance + tolls) * CLIENT_TRAVEL_MARGIN);
   return {
     roundTripKm: km,
     headcount,
     tollsEur: tolls,
     routeHours: breakdown.routeHours,
     chargeableHours: breakdown.chargeableHours,
-    cost,
+    cost: totalCost,
     clientCharge,
+    mealAllowance,
     breakdown,
   };
 }

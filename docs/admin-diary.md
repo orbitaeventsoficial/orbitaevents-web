@@ -1,3 +1,153 @@
+## 2026-07-04 — Ticker «Brúixola»: màximes d'Economia al top (Canvi #1390, claude)
+
+### Context
+Decisió doctrinal del propietari després de l'anàlisi del transport: vol una brúixola de gestió SEMPRE visible que li recordi la doctrina d'economia extrema (el transport és cost, no negoci; el marge viu al producte propi; el temps —els dissabtes— és el recurs escàs). En volia totes les màximes rotant, sempre presents al top.
+
+### Què s'ha fet
+- NOU `app/admin/components/MaximsTicker.tsx`: ticker rotatiu (7 s, fade suau) que consumeix `ADMIN_ECONOMY_MAXIMS` (12 màximes, font única a `lib/constants/admin.ts`). Respecta `prefers-reduced-motion`, es pausa en hover, botó «→» per avançar, `aria-live="polite"`.
+- Muntat com a primer fill de `<AdminPage>` al dashboard i a Economia → sempre al top.
+- CSS canònic `.ap-maxims*` a `admin-shell.css`: carbó + or, tokens, responsiu. 0 hex, 0 px cru.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0; `validate:core` verd.
+- Validació funcional: Playwright dashboard desktop (1280) + mòbil (375) — «BRÚIXOLA | frase | →», rota i fa wrap net.
+- Validació humana/UX: doctrina sempre a la vista, discreta, germana visual de l'admin.
+
+### Coordinació
+Counter → 1390. Carril visual (meu). Worktree barrejat amb Codex → commit conjunt.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-04 — Transport a break-even amb dieta (Canvi #1389, claude)
+
+### Context
+Anàlisi econòmica del transport amb el propietari (cas Andorra, 422 km). Doctrina adoptada: el transport NO és centre de benefici, és cost-to-serve. Es reverteix la temptativa de marge horari (20 €/h) i s'adopta «transport = cost neutre; el marge viu al producte».
+
+### Què s'ha fet
+- `travelLaborCost.ts`: tripulació a 15 €/h (break-even). NOVES constants `TRAVEL_MEAL_ALLOWANCE_PER_PERSON = 30` + `TRAVEL_LONG_ROUTE_HOURS = 3`. `computeBoloTransport` afegeix la dieta (30 €/persona quan ruta a/t > 3 h) IGUAL a cost i càrrec (no infla marge), exposada com a `mealAllowance`. Bolos locals: sense dieta.
+- `LeadBoloSection`: UNA sola crida al cervell (cost i càrrec de la mateixa font, sense fals-positiu); dieta com a línia al desglossament «Qui cobra la ruta».
+- Monocapa: totes les superfícies llegeixen `computeBoloTransport` → dieta propagada sola.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0; suite transport+cost+booking 154/154; `validate:core` verd.
+- Validació funcional: Playwright lead Andorra — «Qui cobra la ruta» 331 € (cotxe + tripulació 165 + dieta 60) vs Transport 318 €; −13 € = franquícia del cotxe → break-even, la dieta no crea marge.
+- Validació humana/UX: pressupost de rutes llargues honest i entenedor; el transport deixa de ser variable emocional.
+
+### Coordinació
+Counter → 1389. Carril de cost/transport (meu, autoritzat pel propietari). Worktree barrejat amb Codex → commit conjunt.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-04 — Fitxa forense de capacitat operativa (Canvi #1388, codex)
+
+### Context
+Després de tancar `/admin/calendario` al #1387, quedava la subruta viva `/admin/calendario/capacity` com a `PENDENT` dins Reserves. És el detall de capacitat que també rep trànsit des del Dashboard quan el forecast setmanal detecta risc.
+
+### Què s'ha fet
+- `docs/admin-fitxes-pantalles.md`: nova fitxa FETA de `/admin/calendario/capacity`, amb pàgina server, loading, serveis de capacitat/forecast, connexió Dashboard, dades, accions, duplicacions, residus i riscos.
+- La taula de rutes passa `/admin/calendario/capacity` a `FETA (#1388)`.
+- Es documenta la diferència entre càrrega temporal de reserves, forecast i col·lisions d'inventari perquè no es barregin motors.
+
+### Validació
+- Validació tècnica: tests de capacity/forecast/panell, `tsc`, `qa:protocol`, `validate:core` i `git diff --check` executats abans de tancar.
+- Validació funcional: no hi ha canvi de runtime; només documentació forense i counter.
+- Validació humana/UX: la pàgina queda mapada com a detall del forecast; `TANCAT CHARLIE` continua pendent de validació visual del propietari.
+
+### Coordinació
+Counter → 1388. Tall documental; no toca runtime de forecast/capacity, Dashboard, transport, inventari, staff, schema ni booking detail.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-04 — Fitxa forense del calendari operatiu (Canvi #1387, codex)
+
+### Context
+Continuant el `go` sota protocol viu, l'òrgan Reserves encara tenia `/admin/calendario` com a `PENDENT` a `docs/admin-fitxes-pantalles.md`. El repo també tenia canvis dirty aliens a `travelLaborCost*` que mencionen `#1386`; per no col·lidir, aquest tall documental queda registrat com a `#1387`.
+
+### Què s'ha fet
+- `docs/admin-fitxes-pantalles.md`: nova fitxa FETA de `/admin/calendario`, incloent modes mes/setmana/dia, clients, utils, APIs, servei agregador, availability, dades, accions, duplicacions, residus i riscos.
+- La taula de rutes passa `/admin/calendario` a `FETA (#1387)`.
+- Es deixa `/admin/calendario/capacity` com a subruta viva però pendent de fitxa pròpia.
+
+### Validació
+- Validació tècnica: tests de calendari/availability, `tsc`, `qa:protocol`, `validate:core` i `git diff --check` executats abans de tancar.
+- Validació funcional: no hi ha canvi de runtime; només documentació forense i counter.
+- Validació humana/UX: calendari queda mapat abans de qualsevol retoc visual o funcional; `TANCAT CHARLIE` continua pendent de validació del propietari.
+
+### Coordinació
+Counter → 1387. Tall documental; no toca transport, cost, marge, schema, booking detail, nova reserva, Google Calendar ni availability runtime.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-03 — Kanban de reserves conserva el filtre de client (Canvi #1385, codex)
+
+### Context
+La fitxa forense #1384 ha trobat una connexió interrompuda: `/admin/bookings?customerId=...` filtrava bé la llista server, però el kanban (`view=kanban`) carregava dades per `/api/admin/bookings` i `bookingListService`, que no acceptien `customerId`. En context Customer Hub, el kanban podia mostrar reserves fora del client.
+
+### Què s'ha fet
+- `bookingListService`: accepta `customerId?: string | null` i l'afegeix al `where` canònic.
+- `GET /api/admin/bookings`: passa `searchParams.get('customerId')` al servei.
+- `BookingPipelineView`: ja conservava el query param; s'ha blindat amb test perquè no l'esborri quan elimina `page/view`.
+- `docs/admin-fitxes-pantalles.md`: la connexió interrompuda de #1384 queda marcada com a resolta al #1385.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- __tests__\lib\services\bookingListService.test.ts __tests__\app\admin\bookings\BookingPipelineView.test.tsx` OK (17 tests); `npx tsc --noEmit --pretty false` OK; `qa:protocol`, `validate:core` i `git diff --check` executats abans de tancar.
+- Validació funcional: el servei aplica `AND { customerId }` i el kanban crida `/api/admin/bookings?customerId=customer-1&limit=500&pipeline=true`.
+- Validació humana/UX: des del Customer Hub, canviar la llista de reserves a kanban ja no hauria de barrejar reserves d'altres clients.
+
+### Coordinació
+Counter → 1385. Tall petit sobre API/servei/test; no toca visual, booking detail, nova reserva, transport, marge, Stripe/Bizum ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-03 — Fitxa forense de la llista de reserves (Canvi #1384, codex)
+
+### Context
+Continuant el `go`, l'òrgan Reserves encara tenia `/admin/bookings` com a `PENDENT` tot i ser la llista mare i el kanban de reserves. Abans de qualsevol retoc sobre filtres, pipeline o accions, calia deixar-ne la fitxa forense feta.
+
+### Què s'ha fet
+- `docs/admin-fitxes-pantalles.md`: nova fitxa FETA de `/admin/bookings`, amb route server, filtres, accions, kanban, API, servei de llista, CSS compartit, dades, accions i riscos.
+- La taula de rutes passa `/admin/bookings` de `PENDENT` a `FETA (#1384)`.
+- Es documenta la fractura principal: la taula/cards fan query Prisma pròpia a `page.tsx`, mentre el kanban passa per `/api/admin/bookings` i `bookingListService`.
+- Es deixa assenyalada la connexió interrompuda: `customerId` filtra la llista server però no entra a `bookingListService`, de manera que el kanban en context client pot perdre el filtre.
+
+### Validació
+- Validació tècnica: tall documental + counter; `qa:protocol`, `tsc`, `validate:core` i `git diff --check` executats abans de tancar.
+- Validació funcional: cap canvi de runtime; només mapa forense i registre.
+- Validació humana/UX: la llista/kanban queda autoritzada documentalment per futurs talls petits, però `TANCAT CHARLIE` continua pendent de validació visual del propietari.
+
+### Coordinació
+Counter → 1384. Tall acotat a documentació forense/counter; no toca booking detail, nova reserva, transport, marge, Stripe/Bizum, CSS funcional ni schema.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-03 — Fitxa forense de nova reserva (Canvi #1383, codex)
+
+### Context
+Despres de #1379/#1382, `/admin/bookings/new` ha quedat com a pantalla crítica del flux lead → reserva, pero al registre de fitxes encara figurava `PENDENT`. El protocol obliga a tenir fitxa `FETA` abans de qualsevol nou retoc funcional o visual sobre una pantalla admin.
+
+### Què s'ha fet
+- `docs/admin-fitxes-pantalles.md`: nova fitxa completa de `/admin/bookings/new`, amb història, ruta viva, components, hooks, APIs, serveis, dades governades, accions, òrgans veïns, duplicacions, residus i riscos.
+- La taula de rutes passa `/admin/bookings/new` de `PENDENT` a `FETA (#1383)`.
+- Es documenta explícitament que `BookingServiceLinesSection` és compartit amb lead i editor de reserva, i que qualsevol retoc allà és transversal.
+- Es deixa com a residu controlat el `GET /api/admin/collaborator-products` amb `fetch` cru i header `x-admin`, sense tocar codi funcional en aquest tall.
+
+### Validació
+- Validació tècnica: tall documental + counter; `qa:protocol`, `tsc`, `validate:core` i `git diff --check` executats abans de tancar.
+- Validació funcional: no hi ha canvi de runtime ni schema. La fitxa segueix el cable viu fins a `POST /api/admin/bookings` i `bookingCreationService`.
+- Validació humana/UX: la pantalla queda autoritzada documentalment per futurs talls petits, però no es marca `TANCAT CHARLIE` fins a validació visual del propietari.
+
+### Coordinació
+Counter → 1383. Tall acotat a documentació forense/counter; no toca transport, marge, `BoloTripCard`, CSS funcional ni servei de creació.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-03 — Nova reserva compacta i guanyat demana crear reserva (Canvi #1382, codex)
 
 ### Context

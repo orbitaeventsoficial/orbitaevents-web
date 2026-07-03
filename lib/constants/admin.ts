@@ -58,7 +58,28 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 1382;
+export const ADMIN_CHANGE_COUNTER = 1390;
+
+/**
+ * Màximes d'Economia (#1390): brúixola de gestió sempre visible al top del dashboard i
+ * d'Economia (ticker rotatiu). Recorden la doctrina del propietari: el transport és cost,
+ * no negoci; el marge viu al producte propi; el temps (dissabtes) és el recurs escàs.
+ * Font única — es canvien AQUÍ, no al JSX.
+ */
+export const ADMIN_ECONOMY_MAXIMS = [
+  'El marge és el que fas, no el que condueixes.',
+  'Tens 50 dissabtes l’any: gasta’ls en el que et fa ric.',
+  'Ven el teu talent, no els teus quilòmetres.',
+  'Lluny, només amb producte teu.',
+  'El transport no és negoci: és cost. El marge viu al producte.',
+  'Cap taxista s’ha fet ric fent carreres llargues barates.',
+  'El pitjor client és el que et té ocupat sense marge.',
+  'Un «no» a un mal bolo és un èxit, no un fracàs.',
+  'Els euros es recuperen; els dissabtes, no.',
+  'Cada quilòmetre et fa xòfer; cada bolo teu et fa empresari.',
+  'Si el pressupost honest espanta, el bolo no era teu.',
+  'Facturar és vanitat; el marge, seny; el temps, el rei.',
+] as const;
 
 export const ADMIN_DOSSIER_GENERATOR_COPY = {
   page: {
