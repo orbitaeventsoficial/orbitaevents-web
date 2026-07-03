@@ -15,7 +15,7 @@
 import Link from 'next/link';
 import { useState, useTransition, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildLeadBookingPrefillHref, buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
 import LeadBoloSection, { type BoloEconomia } from './LeadBoloSection';
 import CommercialDocumentsHistory, { type CommercialDocumentHistoryItem } from '@/app/admin/components/CommercialDocumentsHistory';
@@ -380,8 +380,16 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  await patchLeadStatus({ leadId: lead.id, status: target === 'nou' ? 'NEW' : target === 'contactat' ? 'CONTACTED' : 'WON' });
  toast.success(`Mogut a ${STAGE_LABEL[target]}.`);
  if (target === 'guanyat' && !lead.booking) {
- startTransition(() => router.push(`/admin/bookings/new?leadId=${encodeURIComponent(lead.id)}`));
+ const createBooking = await confirm({
+ title: 'Crear reserva ara?',
+ message: 'Aquest lead ja està marcat com a guanyat. Vols obrir la nova reserva amb les dades i el bolo heretats del lead?',
+ variant: 'info',
+ confirmLabel: 'Crear reserva',
+ });
+ if (createBooking) {
+ startTransition(() => router.push(buildLeadBookingPrefillHref(lead.id)));
  return;
+ }
  }
  startTransition(() => router.refresh());
  } catch (error) {

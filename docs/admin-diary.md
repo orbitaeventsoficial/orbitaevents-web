@@ -1,3 +1,27 @@
+## 2026-07-03 — Nova reserva compacta i guanyat demana crear reserva (Canvi #1382, codex)
+
+### Context
+El propietari és a `/admin/bookings/new?leadId=cmr3vkl990000z4rz9qkyfe5v&prefill=lead`: ara ja hereta la informació del lead, però la pàgina és massa llarga i els desplegables d'Òrbita arrenquen oberts. També demana que, quan un lead passi a `Guanyat`, el sistema pregunti si vol crear la reserva i obri aquesta mateixa pàgina amb dades heretades.
+
+### Què s'ha fet
+- `BookingServiceLinesSection`: `Packs d'Òrbita Events` arrenca plegat, igual que `Productes d'Òrbita` i proveïdors.
+- `BookingClientEventSection`: si el tipus d'event ja ve heretat, mostra un resum compacte (`Canviar · ...`) i deixa la graella gran tancada fins que cal canviar-lo.
+- `BookingPackExtrasSection`: no mostra el duplicat `Partir d'un pack` quan està plegat i no hi ha pack seleccionat; els extres també queden tancats fins que s'obren o se seleccionen.
+- `NewBookingForm`: la graella baixa de separació, la columna de resum es compacta i `Transport real` arrenca tancat amb resum del cost intern.
+- `leadWorkspaceHref`: nou `buildLeadBookingPrefillHref(leadId)` com a URL canònica `/admin/bookings/new?leadId=...&prefill=lead`.
+- `LeadBoloSection`, `LeadDetailClient` i `LeadsSeasonClient`: totes les entrades cap a crear reserva des d'un lead usen el helper. En passar a `Guanyat` sense reserva, es mostra el `ConfirmDialog` canònic i, si es confirma, navega amb `prefill=lead`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\admin\leadWorkspaceHref.test.ts` OK (4 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: Playwright local amb Basic Auth sobre Estel. Captures abans: `.codex-captures/booking-new-prefill-before-desktop.png` i `...before-mobile.png`; després: `.codex-captures/booking-new-prefill-after-desktop2.png` i `...after-mobile2.png`.
+- Validació humana/UX: alçada real de la pàgina baixa de `3469→2415 px` en desktop i de `6337→4622 px` en mobile; tots els catàlegs `details` arrenquen `open=false`. La prova del modal WON no s'ha aplicat contra BD real perquè Estel ja estava `Guanyat`; el flux queda cobert per codi client tipat i helper testat, i evita `window.confirm`.
+
+### Coordinació
+Counter → 1382. Tall damunt del #1381 de Claude sense revertir `BoloTripCard` ni CSS de transport compartit.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-03 — Transport lead↔reserva unificat: un component compartit `BoloTripCard` (Canvi #1381, claude)
 
 ### Context

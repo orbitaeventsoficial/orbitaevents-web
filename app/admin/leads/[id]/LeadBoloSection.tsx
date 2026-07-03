@@ -12,6 +12,7 @@ import { calculateTravelCostBreakdown, deriveTravelHeadcount, computeBoloTranspo
 import { useBookingDistance } from '@/app/admin/bookings/useBookingDistance';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { formatCurrency, formatNumber } from '@/lib/constants';
+import { buildLeadBookingPrefillHref } from '@/lib/admin/leadWorkspaceHref';
 
 /**
  * El BOLO dins la fitxa del lead (Fase 1.4 de docs/bolo-flux.md).
@@ -374,7 +375,7 @@ export default function LeadBoloSection({
 
  const quoteHref = `/admin/presupuestos?leadId=${encodeURIComponent(leadId)}`;
  const dossierHref = buildDossierHref();
- const bookingHref = `/admin/bookings/new?leadId=${encodeURIComponent(leadId)}&prefill=lead`;
+ const bookingHref = buildLeadBookingPrefillHref(leadId);
 
  if (loading) {
  return (

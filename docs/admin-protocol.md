@@ -1547,6 +1547,22 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1382 — 2026-07-03 — codex (FET)
+**Nova reserva més curta i lead guanyat pregunta si cal crear reserva.**
+- Context: a `/admin/bookings/new?leadId=cmr3vkl990000z4rz9qkyfe5v&prefill=lead` la informació ja s'hereta, però la pàgina s'allarga massa i el catàleg d'Òrbita arrenca obert. També faltava el pas natural: si el lead passa a `Guanyat`, preguntar si es vol crear reserva amb les dades heretades.
+- `BookingServiceLinesSection`: `Packs d'Òrbita Events` arrenca plegat; `Productes d'Òrbita` i proveïdors ja queden plegats.
+- `BookingClientEventSection`: el tipus d'event heretat es mostra com a resum compacte i la graella gran queda tancada fins que l'usuari vol canviar-lo.
+- `BookingPackExtrasSection` i `NewBookingForm`: fora duplicat visible `Partir d'un pack` quan no cal; extres i `Transport real` arrenquen tancats amb resum curt.
+- `leadWorkspaceHref`: nou helper `buildLeadBookingPrefillHref(leadId)`; `LeadBoloSection`, `LeadDetailClient` i `LeadsSeasonClient` l'utilitzen.
+- En passar un lead a `Guanyat` sense reserva, `LeadDetailClient` i `LeadsSeasonClient` mostren `ConfirmDialog` canònic; confirmar obre `/admin/bookings/new?leadId=...&prefill=lead`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\admin\leadWorkspaceHref.test.ts` OK (4 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: Playwright local sobre Estel amb captures abans/després a `.codex-captures/`; desktop `3469→2415 px`, mobile `6337→4622 px`, tots els catàlegs `details` `open=false`.
+- Validació humana/UX: la nova reserva manté dades heretades però arrenca molt més curta; el canvi a `Guanyat` ja ofereix crear reserva sense haver de recordar el botó correcte.
+- `ADMIN_CHANGE_COUNTER` passa a `1382`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1381 — 2026-07-03 — claude (FET)
 **Transport lead↔reserva unificat: UN component compartit `BoloTripCard` (hipersemblança).**
 - Context: el propietari («tira, unifica el transport lead i reserva») veu que la reserva no arrossega el disseny del bolo del lead. El bloc «Desplaçament» del lead (rediseny #1378) i el «Desplaçament editable» de la reserva eren dues UIs diferents del mateix concepte.

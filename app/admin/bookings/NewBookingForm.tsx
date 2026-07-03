@@ -121,6 +121,7 @@ export default function NewBookingForm() {
   const [sourceCollaboratorId, setSourceCollaboratorId] = useState('');
   const [billedCollaboratorId, setBilledCollaboratorId] = useState('');
   const [showSourceBilling, setShowSourceBilling] = useState(false);
+  const [showInternalTravel, setShowInternalTravel] = useState(false);
   useEffect(() => {
     if (sourceCollaboratorId || billedCollaboratorId) setShowSourceBilling(true);
   }, [sourceCollaboratorId, billedCollaboratorId]);
@@ -284,8 +285,8 @@ export default function NewBookingForm() {
         'Omple les dades del client, l\'esdeveniment i selecciona un pack.'
       )}
     >
-      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22.5rem]">
-        <div className="flex min-w-0 flex-col gap-4">
+      <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="flex min-w-0 flex-col gap-3">
           {error && (
             <div className="ap-card ap-card--danger ap-card-body">
               <p className="text-sm text-[var(--t)]">{error}</p>
@@ -367,7 +368,17 @@ export default function NewBookingForm() {
             onValidateDiscountCode={() => void validateDiscountCode(form.discountCode)}
           />
 
-          <AdminSection title="Transport real" description="Cost intern del bolo; no és un producte contractat">
+          <AdminSection
+            title="Transport real"
+            description={`${formatCurrency(travelCostBreakdown.totalCost)} cost intern · ${travelCostBreakdown.peopleCount} integrants`}
+            actions={(
+              <button type="button" className="ap-btn ap-btn--xs" onClick={() => setShowInternalTravel((value) => !value)}>
+                {showInternalTravel ? 'Amagar' : 'Ajustar'}
+              </button>
+            )}
+          >
+            {showInternalTravel ? (
+            <>
             <div className="grid gap-3 md:grid-cols-3">
               <label className={NB_FIELD}>
                 <span className={NB_LABEL}>Hores totals de cotxe</span>
@@ -423,6 +434,12 @@ export default function NewBookingForm() {
             <p className="mt-3 text-xs text-[var(--t3)]">
               Integrants ruta: {travelCostBreakdown.peopleCount} · 1a hora inclosa, es cobra a partir de 2 h ({travelCostBreakdown.chargeableHours} h de {travelCostBreakdown.routeHours} h) · el cost de vehicle i temps s'imputa al marge intern, no a productes contractats.
             </p>
+            </>
+            ) : (
+              <p className="text-xs text-[var(--t3)]">
+                Tancat per defecte per no allargar la reserva. Obre només si cal ajustar hores, vehicle, conductor o integrants.
+              </p>
+            )}
           </AdminSection>
 
           <div className={NB_GROUP}>Preu i tancament</div>

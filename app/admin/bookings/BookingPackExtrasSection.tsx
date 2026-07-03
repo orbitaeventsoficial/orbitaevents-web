@@ -6,6 +6,7 @@
    extres com a llista compacta.
 ============================================================================ */
 
+import { useState } from 'react';
 import { SERVICE_LABELS } from '@/lib/constants';
 import { CUSTOM_BOOKING_PACK_SLUG } from '@/lib/constants/pricing';
 import type { ServiceSlug } from '@/app/config/packs-config';
@@ -54,9 +55,11 @@ export default function BookingPackExtrasSection({
   onUpdateExtraQuantity,
 }: BookingPackExtrasSectionProps) {
   const catalogPacks = packs.filter((pack) => pack.slug !== CUSTOM_BOOKING_PACK_SLUG);
+  const selectedExtrasCount = Object.keys(selectedExtras).length;
+  const [extrasOpen, setExtrasOpen] = useState(selectedExtrasCount > 0);
   return (
     <>
-      <AdminSection
+      {(!collapsed || selectedPackId) && <AdminSection
         title="Partir d'un pack"
         description="Opcional · una tarifa tancada de catàleg"
         actions={(
@@ -127,17 +130,22 @@ export default function BookingPackExtrasSection({
             </div>
           </div>
         )}
-      </AdminSection>
+      </AdminSection>}
 
       {displayExtras.length > 0 && (
         <AdminSection
           title="Extres"
-          description="Opcionals"
+          description={selectedExtrasCount > 0 ? `${selectedExtrasCount} seleccionats` : 'Opcionals'}
           actions={(
-            <a href="/admin/packs/extras" target="_blank" rel="noopener noreferrer" className="ap-btn ap-btn--xs">Gestionar extres ↗</a>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" className="ap-btn ap-btn--xs" onClick={() => setExtrasOpen((value) => !value)}>
+                {extrasOpen ? 'Amagar' : 'Veure extres'}
+              </button>
+              <a href="/admin/packs/extras" target="_blank" rel="noopener noreferrer" className="ap-btn ap-btn--xs">Gestionar extres ↗</a>
+            </div>
           )}
         >
-          <div className="flex flex-col overflow-hidden rounded-[var(--o-r-md)] border border-[var(--line)]">
+          {extrasOpen && <div className="flex flex-col overflow-hidden rounded-[var(--o-r-md)] border border-[var(--line)]">
             {displayExtras.map((extra) => {
               const name = extra.translations[0]?.name || extra.slug;
               const isSelected = !!selectedExtras[extra.id];
@@ -172,7 +180,7 @@ export default function BookingPackExtrasSection({
                 </label>
               );
             })}
-          </div>
+          </div>}
         </AdminSection>
       )}
     </>

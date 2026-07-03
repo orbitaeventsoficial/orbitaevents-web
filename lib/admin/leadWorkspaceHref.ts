@@ -11,6 +11,11 @@ export function buildLeadComposeHref(leadId: string, template?: string | null): 
   return `/admin/inbox/compose?${params.toString()}`;
 }
 
+export function buildLeadBookingPrefillHref(leadId: string): string {
+  const params = new URLSearchParams({ leadId, prefill: 'lead' });
+  return `/admin/bookings/new?${params.toString()}`;
+}
+
 export function buildLeadPaymentsHref(input: {
   leadId: string;
   customerId?: string | null;

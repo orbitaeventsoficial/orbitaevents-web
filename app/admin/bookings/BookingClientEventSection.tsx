@@ -8,6 +8,7 @@
 import { EVENT_TYPE_ICONS, EVENT_TYPE_PLAIN, EVENT_TYPE_VALUES } from '@/lib/constants';
 import { AdminSection } from '../components/AdminPage';
 import { NB_FIELD, NB_LABEL, NB_REQ, NB_HINT, NB_HINT_OK, NB_HINT_WARN, NB_HINT_INFO } from './booking-form-classes';
+import { useEffect, useState } from 'react';
 
 interface LeadData {
   id: string;
@@ -69,6 +70,13 @@ export default function BookingClientEventSection({
   onFieldChange,
 }: BookingClientEventSectionProps) {
   const distanceInfo = humaniseDistanceMessage(distanceMessage);
+  const [eventTypeOpen, setEventTypeOpen] = useState(!form.eventType);
+  useEffect(() => {
+    if (form.eventType) setEventTypeOpen(false);
+  }, [form.eventType]);
+  const selectedEventTypeLabel = form.eventType
+    ? `${EVENT_TYPE_ICONS[form.eventType as keyof typeof EVENT_TYPE_ICONS] ?? ''} ${EVENT_TYPE_PLAIN[form.eventType as keyof typeof EVENT_TYPE_PLAIN] ?? form.eventType}`.trim()
+    : 'Sense tipus';
 
   return (
     <>
@@ -112,32 +120,39 @@ export default function BookingClientEventSection({
 
       <AdminSection title="Detalls de l'esdeveniment">
         <div className={`${NB_FIELD} mb-4`}>
-          <span id="nb-event-type-label" className={NB_LABEL}>Tipus d&apos;event</span>
-          <div
-            role="group"
-            aria-labelledby="nb-event-type-label"
-            className="grid grid-cols-[repeat(auto-fill,minmax(8.75rem,1fr))] gap-2"
-          >
-            {EVENT_TYPE_VALUES.map((value) => {
-              const isOn = form.eventType === value;
-              return (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => onFieldChange('eventType', value)}
-                  aria-pressed={isOn}
-                  className={`flex items-center justify-center gap-2 rounded-[var(--o-r-md)] border px-2.5 py-3 text-sm font-semibold transition-colors ${
-                    isOn
-                      ? 'border-[var(--gold)] bg-[var(--ax-gold-tint-1)] text-[var(--gold-bright)]'
-                      : 'border-[var(--line)] bg-[var(--sunk)] text-[var(--t2)] hover:border-[var(--hair-gold)] hover:text-[var(--t)]'
-                  }`}
-                >
-                  <span className={isOn ? 'text-[var(--gold-bright)]' : 'text-[var(--gold)]'} aria-hidden="true">{EVENT_TYPE_ICONS[value]}</span>
-                  {EVENT_TYPE_PLAIN[value]}
-                </button>
-              );
-            })}
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+            <span id="nb-event-type-label" className={NB_LABEL}>Tipus d&apos;event</span>
+            <button type="button" className="ap-btn ap-btn--xs" onClick={() => setEventTypeOpen((value) => !value)}>
+              {eventTypeOpen ? 'Amagar tipus' : `Canviar · ${selectedEventTypeLabel}`}
+            </button>
           </div>
+          {eventTypeOpen && (
+            <div
+              role="group"
+              aria-labelledby="nb-event-type-label"
+              className="grid grid-cols-[repeat(auto-fill,minmax(8.75rem,1fr))] gap-2"
+            >
+              {EVENT_TYPE_VALUES.map((value) => {
+                const isOn = form.eventType === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => onFieldChange('eventType', value)}
+                    aria-pressed={isOn}
+                    className={`flex items-center justify-center gap-2 rounded-[var(--o-r-md)] border px-2.5 py-3 text-sm font-semibold transition-colors ${
+                      isOn
+                        ? 'border-[var(--gold)] bg-[var(--ax-gold-tint-1)] text-[var(--gold-bright)]'
+                        : 'border-[var(--line)] bg-[var(--sunk)] text-[var(--t2)] hover:border-[var(--hair-gold)] hover:text-[var(--t)]'
+                    }`}
+                  >
+                    <span className={isOn ? 'text-[var(--gold-bright)]' : 'text-[var(--gold)]'} aria-hidden="true">{EVENT_TYPE_ICONS[value]}</span>
+                    {EVENT_TYPE_PLAIN[value]}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">

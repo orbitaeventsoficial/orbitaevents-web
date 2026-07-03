@@ -19,7 +19,7 @@ import Link from 'next/link';
 import './leads-design.css';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
-import { buildLeadComposeHref, buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildLeadBookingPrefillHref, buildLeadComposeHref, buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { LEAD_LOST_REASON_LABELS, isLeadLostReason } from '@/lib/constants/leadLoss';
 import { formatCurrency, formatNumber, LEAD_SCORING_STATUS_PROBABILITY, OPEN_PIPELINE_STATUSES } from '@/lib/constants';
 import { buildWazeUrl, buildEventLogistics } from '@/lib/admin/eventLogistics';
@@ -30,6 +30,7 @@ import WxBadge from '@/app/admin/components/WxBadge';
 import type { WxData } from '@/app/admin/components/WxBadge';
 import { getPaymentBand } from '@/lib/payment-status';
 import { calculateClientTravelCharge, deriveTravelHeadcount } from '@/lib/services/travelLaborCost';
+import ConfirmDialog, { useConfirmDialog } from '@/app/admin/components/ConfirmDialog';
 
 /* ── Tipus ──────────────────────────────────────────────────────────────── */
 
@@ -544,6 +545,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
 }) {
   const router = useRouter();
   const toast = useToast();
+  const { confirm, dialogProps } = useConfirmDialog();
   const [viewMode, setViewMode] = useState<ViewMode>('calendari');
   const [monthStart, setMonthStart] = useState(() => Math.min(initialMonth, MONTH_MAX_START));
   const [pageId, setPageId] = useState<string | null>(null);
@@ -629,8 +631,16 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
       if (target === 'guanyat') {
         const source = effectiveLeads.find((l) => l.id === leadId);
         if (!source?.booking) {
-          router.push(`/admin/bookings/new?leadId=${encodeURIComponent(leadId)}`);
-          return;
+          const createBooking = await confirm({
+            title: 'Crear reserva ara?',
+            message: 'Aquest lead ja està marcat com a guanyat. Vols obrir la nova reserva amb les dades i el bolo heretats del lead?',
+            variant: 'info',
+            confirmLabel: 'Crear reserva',
+          });
+          if (createBooking) {
+            router.push(buildLeadBookingPrefillHref(leadId));
+            return;
+          }
         }
       }
       router.refresh();
@@ -1056,6 +1066,7 @@ export default function AdminLeadsClient({ leads, initialMonth, year }: {
           </div>
         </div>
       )}
+      <ConfirmDialog {...dialogProps} />
     </div>
   );
 }

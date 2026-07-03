@@ -15,9 +15,9 @@ Avís per l'altre agent: ...
 
 ## Bloc CODEX (Codex CLI)
 
-[codex] 2026-07-03 [ESTAT: treballant — nova reserva compacta + lead guanyat crea reserva]
-Perímetre: `/admin/bookings/new?leadId=cmr3vkl990000z4rz9qkyfe5v&prefill=lead` i flux de lead a `WON`. Objectiu: capturar estat real, plegar catàlegs/productes Òrbita per defecte, escurçar la pàgina de nova reserva sense perdre dades i preguntar en passar un lead a guanyat si cal crear reserva amb prefill. Respecto el #1381 de Claude (`BoloTripCard`, transport compartit) i no tocaré economia/transport si no és imprescindible.
-Avís claude: entro en UI/flux de reserva nova i status lead; no modificaré el teu component de transport més enllà de consumir-lo si ja està cablejat.
+[codex] 2026-07-03 [ESTAT: tancat — nova reserva compacta + lead guanyat crea reserva #1382]
+Perímetre: `/admin/bookings/new?leadId=cmr3vkl990000z4rz9qkyfe5v&prefill=lead` i flux de lead a `WON`. Nova reserva: catàlegs plegats per defecte, tipus d'event compactat si ja ve heretat, extres/transport intern tancats, duplicat «Partir d'un pack» ocult si no cal; captures abans/després a `.codex-captures/` (desktop 3469→2415 px, mobile 6337→4622 px). Lead guanyat: modal canònic pregunta si vols crear reserva i navega via helper `buildLeadBookingPrefillHref`.
+Avís claude: he respectat el #1381 (`BoloTripCard`, transport compartit); només UI compacta de nova reserva, helper href i flux WON→reserva. `tsc` i test del helper OK.
 
 [codex] 2026-07-03 [ESTAT: tancat — xip counter sense error d'hidratació #1380]
 Perímetre: React reportava mismatch d'hidratació al xip del `ADMIN_CHANGE_COUNTER` (`Server: "1379"`, `Client: "1378"`) després del canvi #1379 amb el dev server viu. El xip informatiu del shell admin ara usa `suppressHydrationWarning`, de manera que un desfasament transitori HTML/JS no tomba l'admin.

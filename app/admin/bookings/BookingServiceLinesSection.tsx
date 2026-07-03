@@ -395,8 +395,8 @@ export default function BookingServiceLinesSection({
         <aside className="flex flex-col gap-2">
           {/* 1. Packs (excloent) — només al flux de nova reserva */}
           {packsEnabled && (
-          <details className={GRP} open>
-            <summary className={SUMMARY_PACKS}>Packs d&apos;Òrbita Events</summary>
+          <details className={GRP}>
+            <summary className={SUMMARY_PACKS}><span className={CHEVRON} aria-hidden="true">▸</span>Packs d&apos;Òrbita Events</summary>
             <div className="flex flex-col">
               {catalogPacks.map((pack) => (
                 <button
