@@ -53,7 +53,7 @@ const bookingSchema = z.object({
     kind: z.enum(['DJ', 'SOUND_TECH', 'PROVIDER_SERVICE', 'EQUIPMENT', 'OTHER']).optional(),
     label: z.string().min(1),
     revenueAmount: z.number().min(0).nullable().optional(),
-    costAmount: z.number().min(0).nullable().optional(),
+    costAmount: z.number().nullable().optional(),
     quantity: z.number().int().positive().nullable().optional(),
     hours: z.number().positive().nullable().optional(),
     notes: z.string().nullable().optional(),

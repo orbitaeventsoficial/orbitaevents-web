@@ -1,3 +1,26 @@
+## 2026-07-03 — Marge extern i +40€ del tècnic inclòs a leads (Canvi #1375, codex)
+
+### Context
+El propietari revisa `/admin/leads/cmr1xh7la0000ug7dj4jnihjr`: el marge sortia crític tot i ser un servei extern a Òrbita, i la línia del tècnic de so assignada a Òrbita havia de sumar 40€ a caixa d'Òrbita. També qüestiona si el transport compta les hores de ruta.
+
+### Què s'ha fet
+- **Semàfor de marge amb perfil**: `margin-utils` manté el perfil propi 50/30/15 i afegeix perfil `external` per revenda/proveïdor extern (25/10/5). El `costEngine` rep `marginProfile` i el lead/nova reserva l'activen quan hi ha `PROVIDER_SERVICE` extern sense equip propi d'Òrbita.
+- **Cost negatiu controlat per tècnic inclòs**: nova regla compartida `serviceLineCostRules` preserva `costAmount < 0` només per `SOUND_TECH` de "Tècnic de so inclòs"; la resta de costos negatius continuen sanejats. Aplicat a lead, creació de reserva i edició de reserva.
+- **Validació API alineada**: les rutes de reserva deixen passar imports negatius perquè el servei els normalitzi amb la regla canònica, i la validació de línies de col·laborador eximeix només aquest cas d'ingrés d'Òrbita.
+- **Dada real Alba corregida**: `LeadServiceLine cmr4pee53000rj0oaxckudt1t` passa de `costAmount: 0` a `costAmount: -40`, coherent amb la nota existent "assignat a Òrbita".
+- **Transport verificat**: el test de `computeBoloTransport` blinda que 422 km amb 2 persones inclou 5,5 h facturables i 165€ d'hores de ruta dins del càrrec al client.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\vitest.CMD run __tests__\lib\margin-utils.test.ts __tests__\lib\services\costEngine.test.ts __tests__\lib\services\leadServiceLineService.test.ts __tests__\lib\booking-service-line-validation.test.ts __tests__\lib\services\travelLaborCost.test.ts` → 123/123 OK; `npx tsc --noEmit` OK.
+- Validació funcional: script Prisma contra la DB real confirma Alba `costAmount 0 → -40` en la línia "Tècnic de so inclòs · 1h 30"; el motor econòmic ja pot sumar aquest ingrés i pintar el marge amb llindar extern.
+- Validació humana/UX: un bolo purament extern ja no es jutja amb el mateix semàfor que un servei propi; el transport no amaga hores de ruta i el tècnic fet per Òrbita no desapareix en guardar.
+
+### Coordinació
+Counter → 1375. Perímetre limitat a marge de leads/reserves per línies de servei, saneig de cost del tècnic inclòs i dada real d'Alba; sense tocar schema ni catàleg.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-03 — Carpeta autosuficient: portabilitat (mou-la i no es trenca res) (Canvi #1374, claude)
 
 ### Context

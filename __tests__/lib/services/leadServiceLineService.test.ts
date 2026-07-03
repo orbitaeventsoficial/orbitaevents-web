@@ -128,6 +128,22 @@ describe('replaceLeadServiceLines', () => {
     });
   });
 
+  it('preserva el cost negatiu del tècnic inclòs quan el fa Òrbita', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'lead1' });
+
+    const r = await replaceLeadServiceLines('lead1', [
+      { label: 'Tècnic de so inclòs · 1h 30', kind: 'SOUND_TECH', collaboratorId: 'col1', revenueAmount: 0, costAmount: -40, quantity: 1 },
+    ]);
+
+    expect((r.body as { count: number }).count).toBe(1);
+    const createArg = mockPrisma.leadServiceLine.createMany.mock.calls[0][0];
+    expect(createArg.data[0]).toMatchObject({
+      kind: 'SOUND_TECH',
+      label: 'Tècnic de so inclòs · 1h 30',
+      costAmount: -40,
+    });
+  });
+
   it('si no queden línies, només esborra (sense createMany)', async () => {
     mockPrisma.lead.findUnique.mockResolvedValue({ id: 'lead1' });
     const r = await replaceLeadServiceLines('lead1', []);

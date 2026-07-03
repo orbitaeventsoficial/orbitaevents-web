@@ -227,6 +227,8 @@ export default function LeadBoloSection({
  // - el transport d'anar a buscar material de lloguer (Tino) el carrega la
  // pròpia línia de lloguer, sumat al seu cost.
  const { hasOwnEquipment, hasEquipmentRental } = classifyBoloLines(allLines);
+ const hasExternalProviderService = allLines.some((l) => l.kind === 'PROVIDER_SERVICE' && Boolean(l.collaboratorId));
+ const marginProfile = !hasOwnEquipment && hasExternalProviderService ? 'external' : 'own';
  const rentalTransport = hasEquipmentRental ? EQUIPMENT_RENTAL_TRANSPORT_KM * vehicleCostPerKm : 0;
  const summary = computeBookingFinancialSummary({
  total: revenue,
@@ -234,6 +236,7 @@ export default function LeadBoloSection({
  distanceKm: Number(distanceKm) || 0, travelCost: effectiveTravelCost,
  serviceLinesRevenue: linesRevenue, serviceLinesCost: cost + rentalTransport,
  source: source ?? null,
+ marginProfile,
  }, {
  ...PROFITABILITY_MODEL_DEFAULTS,
  fixedOperationalCost: hasOwnEquipment ? PROFITABILITY_MODEL_DEFAULTS.fixedOperationalCost : 0,

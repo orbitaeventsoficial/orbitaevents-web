@@ -10,6 +10,7 @@ import { applyBookingStatusSideEffects, type ManagedBookingStatus } from '@/lib/
 import { syncBookingToGoogleCalendar } from '@/lib/services/googleCalendarSyncService';
 import { mapAdminLogToCanonicalEvent } from '@/lib/services/timelineQueryService';
 import { VAT_RATE_INVOICE, VAT_RATE_NO_INVOICE, calcDeposit, roundMoney } from '@/lib/constants/pricing';
+import { sanitizeRevenueAmount, sanitizeServiceLineCostAmount } from '@/lib/services/serviceLineCostRules';
 
 type ExistingBookingRecord = {
   id: string;
@@ -80,8 +81,8 @@ function normalizeServiceLines(lines: BookingServiceLinePatchInput[]) {
       partyType: line.partyType?.trim() || null,
       kind: line.kind || 'OTHER',
       label: line.label?.trim(),
-      revenueAmount: sanitizeMoney(line.revenueAmount),
-      costAmount: sanitizeMoney(line.costAmount),
+      revenueAmount: sanitizeRevenueAmount(line.revenueAmount),
+      costAmount: sanitizeServiceLineCostAmount({ kind: line.kind || 'OTHER', label: line.label, costAmount: line.costAmount }),
       quantity: typeof line.quantity === 'number' && line.quantity > 0 ? Math.floor(line.quantity) : null,
       hours: typeof line.hours === 'number' && line.hours > 0 ? Math.round(line.hours * 100) / 100 : null,
       notes: line.notes?.trim() || null,

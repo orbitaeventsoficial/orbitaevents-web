@@ -6,7 +6,7 @@ import { getWeatherForEvent } from '@/lib/services/weatherService';
 import { getEffectiveVehicleCostPerKm } from '@/lib/services/fuelReferenceService';
 import { DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
 import { TRAVEL_COST_LINE_MARKER } from '@/lib/services/travelLaborCost';
-import { computeBookingFinancialSummary } from '@/lib/services/costEngine';
+import { classifyBoloLines, computeBookingFinancialSummary } from '@/lib/services/costEngine';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 import type { WxData } from '@/app/admin/components/WxBadge';
 
@@ -188,6 +188,9 @@ export default async function LeadDetailPage({ params }: Props) {
         (s, l) => s + Number(l.revenueAmount || 0) * (l.quantity || 1), 0);
       const slCost = visibleServiceLines.reduce(
         (s, l) => s + Number(l.costAmount || 0) * (l.quantity || 1), 0);
+      const { hasOwnEquipment } = classifyBoloLines(visibleServiceLines);
+      const hasExternalProviderService = visibleServiceLines.some((l) => l.kind === 'PROVIDER_SERVICE' && Boolean(l.collaboratorId));
+      const marginProfile = !hasOwnEquipment && hasExternalProviderService ? 'external' : 'own';
       const summary = computeBookingFinancialSummary({
         total: Number(b.total),
         packPrice: b.pack?.price ? Number(b.pack.price) : 0,
@@ -199,6 +202,7 @@ export default async function LeadDetailPage({ params }: Props) {
         serviceLinesRevenue: slRevenue,
         serviceLinesCost: slCost,
         source: lead.source,
+        marginProfile,
       }, profitabilityConfig);
       bookingEconomia = {
         net: summary.netMargin,

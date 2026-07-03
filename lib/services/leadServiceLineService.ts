@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { updateBookingDetail } from '@/lib/services/bookingRouteService';
 import { TRAVEL_COST_LINE_MARKER } from '@/lib/services/travelLaborCost';
+import { sanitizeRevenueAmount, sanitizeServiceLineCostAmount } from '@/lib/services/serviceLineCostRules';
 import type { BookingServiceLineKind } from '@prisma/client';
 
 const VALID_KINDS: readonly BookingServiceLineKind[] = ['DJ', 'SOUND_TECH', 'PROVIDER_SERVICE', 'EQUIPMENT', 'OTHER'];
@@ -19,11 +20,6 @@ export type LeadServiceLineInput = {
 
 function normalizeKind(value?: string | null): BookingServiceLineKind {
   return value && (VALID_KINDS as readonly string[]).includes(value) ? (value as BookingServiceLineKind) : 'OTHER';
-}
-
-function sanitizeMoney(value?: number | null): number | null {
-  if (typeof value !== 'number' || !Number.isFinite(value)) return null;
-  return Math.max(0, Math.round(value * 100) / 100);
 }
 
 function sanitizeQuantity(value?: number | null): number {
@@ -117,19 +113,22 @@ export async function replaceLeadServiceLines(
 
   const clean = (Array.isArray(inputLines) ? inputLines : [])
     .filter((l) => (l.label?.trim() || '') !== '' || (l.revenueAmount ?? 0) > 0)
-    .map((l, idx) => ({
+    .map((l, idx) => {
+      const kind = normalizeKind(l.kind);
+      return ({
       leadId,
       collaboratorId: l.collaboratorId?.trim() || null,
-      kind: normalizeKind(l.kind),
+      kind,
       label: l.label?.trim() || '',
-      revenueAmount: sanitizeMoney(l.revenueAmount),
-      costAmount: sanitizeMoney(l.costAmount),
+      revenueAmount: sanitizeRevenueAmount(l.revenueAmount),
+      costAmount: sanitizeServiceLineCostAmount({ kind, label: l.label, costAmount: l.costAmount }),
       quantity: sanitizeQuantity(l.quantity),
       hours: sanitizeHours(l.hours),
       notes: l.notes?.trim() || null,
       partyType: l.partyType?.trim() || null,
       sortOrder: idx,
-    }));
+    });
+    });
 
   if (lead.booking) {
     const bookingLines = clean.map(({ leadId: _leadId, ...line }) => line);

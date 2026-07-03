@@ -1,8 +1,11 @@
+import { isIncludedSoundTechSettlementLine } from '@/lib/services/serviceLineCostRules';
+
 export type ServiceLineCostInput = {
   collaboratorId?: string | null;
   revenueAmount?: number | null;
   costAmount?: number | null;
   label?: string | null;
+  kind?: string | null;
 };
 
 export type ServiceLineCostIssue = {
@@ -17,6 +20,8 @@ function hasPositiveCost(value: number | null | undefined) {
 export function findCollaboratorLinesWithoutCost(lines: ServiceLineCostInput[]): ServiceLineCostIssue[] {
   return lines.flatMap((line, index) => {
     const collaboratorId = line.collaboratorId?.trim();
+    const isIncludedTechIncome = typeof line.costAmount === 'number' && line.costAmount < 0 && isIncludedSoundTechSettlementLine(line);
+    if (isIncludedTechIncome) return [];
     if (!collaboratorId || hasPositiveCost(line.costAmount)) return [];
 
     return [{

@@ -7,7 +7,6 @@
 ============================================================================ */
 
 import { formatCurrency, formatCurrencyExact } from '@/lib/constants';
-import { getMarginLabel } from '@/lib/margin-utils';
 import { DEPOSIT_PERCENT } from '@/lib/constants/pricing';
 
 interface BookingPricingSummaryProps {
@@ -31,6 +30,7 @@ interface BookingPricingSummaryProps {
     netMargin: number;
     marginPct: number;
     tone: 'emerald' | 'amber' | 'orange' | 'rose';
+    label: string;
   } | null;
 }
 
@@ -116,7 +116,7 @@ export default function BookingPricingSummary({
             <b className="font-mono font-bold tabular-nums text-[var(--t2)]">{formatCurrencyExact(marginEstimate.directCost)}</b>
           </div>
           <div className="mt-2 flex items-baseline justify-between rounded-[var(--o-r-md)] border border-dashed border-[var(--hair-gold)] bg-[color-mix(in_oklab,var(--gold)_4%,transparent)] px-3.5 py-3">
-            <span className="font-mono text-xs font-bold uppercase tracking-[0.1em] text-[var(--t3)]">Marge net · {getMarginLabel(marginEstimate.marginPct)}</span>
+            <span className="font-mono text-xs font-bold uppercase tracking-[0.1em] text-[var(--t3)]">Marge net · {marginEstimate.label}</span>
             <b className={`text-lg font-bold tabular-nums ${MARGIN_TONE[marginEstimate.tone]}`}>
               {formatCurrency(marginEstimate.netMargin)} <small className="text-xs font-semibold text-[var(--t3)]">· {marginEstimate.marginPct.toFixed(0)}%</small>
             </b>

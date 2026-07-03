@@ -17,16 +17,24 @@ export type MarginTone = {
  *   ≥50 excellent · ≥30 acceptable · ≥15 watch · <15 critical
  */
 export type MarginBand = 'excellent' | 'acceptable' | 'watch' | 'critical';
+export type MarginProfile = 'own' | 'external';
 
-export function getMarginBand(pct: number): MarginBand {
-  if (pct >= 50) return 'excellent';
-  if (pct >= 30) return 'acceptable';
-  if (pct >= 15) return 'watch';
+const MARGIN_THRESHOLDS: Record<MarginProfile, { excellent: number; acceptable: number; watch: number }> = {
+  own: { excellent: 50, acceptable: 30, watch: 15 },
+  // Revenda / proveidor extern: el cost principal ja surt de caixa cap al partner.
+  external: { excellent: 25, acceptable: 10, watch: 5 },
+};
+
+export function getMarginBand(pct: number, profile: MarginProfile = 'own'): MarginBand {
+  const thresholds = MARGIN_THRESHOLDS[profile] ?? MARGIN_THRESHOLDS.own;
+  if (pct >= thresholds.excellent) return 'excellent';
+  if (pct >= thresholds.acceptable) return 'acceptable';
+  if (pct >= thresholds.watch) return 'watch';
   return 'critical';
 }
 
-export function getMarginTone(pct: number): MarginTone {
-  switch (getMarginBand(pct)) {
+export function getMarginTone(pct: number, profile: MarginProfile = 'own'): MarginTone {
+  switch (getMarginBand(pct, profile)) {
     case 'excellent': return { color: 'text-emerald-300', bg: 'bg-emerald-500/20 border-emerald-500/30', label: 'Excel·lent', tone: 'emerald' };
     case 'acceptable': return { color: 'text-amber-300', bg: 'bg-amber-500/20 border-amber-500/30', label: 'Acceptable', tone: 'amber' };
     case 'watch': return { color: 'text-orange-300', bg: 'bg-orange-500/20 border-orange-500/30', label: 'Vigilar', tone: 'orange' };
@@ -41,19 +49,19 @@ const MARGIN_LABEL: Record<MarginBand, string> = {
   watch: 'Vigilar',
   critical: 'Crític',
 };
-export function getMarginLabel(pct: number): string {
-  return MARGIN_LABEL[getMarginBand(pct)];
+export function getMarginLabel(pct: number, profile: MarginProfile = 'own'): string {
+  return MARGIN_LABEL[getMarginBand(pct, profile)];
 }
 
 /**
  * Classes canòniques admin (tokens) per al semàfor de marge de 4 bandes.
  * Definides a admin-shell.css (.o-margin-text--* / .o-margin-bar--*).
  */
-export function getMarginTextClass(pct: number): string {
-  return `o-margin-text--${getMarginBand(pct)}`;
+export function getMarginTextClass(pct: number, profile: MarginProfile = 'own'): string {
+  return `o-margin-text--${getMarginBand(pct, profile)}`;
 }
-export function getMarginBarClass(pct: number): string {
-  return `o-margin-bar--${getMarginBand(pct)}`;
+export function getMarginBarClass(pct: number, profile: MarginProfile = 'own'): string {
+  return `o-margin-bar--${getMarginBand(pct, profile)}`;
 }
 
 export type TravelMarginTone = {

@@ -21,4 +21,10 @@ describe('booking-service-line-validation', () => {
     ]);
     expect(collaboratorLineCostErrorMessage(issues[0])).toContain('cost real');
   });
+
+  it('permet tècnic inclòs amb cost negatiu perquè és ingrés d’Òrbita', () => {
+    expect(findCollaboratorLinesWithoutCost([
+      { collaboratorId: 'partner-1', kind: 'SOUND_TECH', label: 'Tècnic de so inclòs', costAmount: -40 },
+    ])).toEqual([]);
+  });
 });

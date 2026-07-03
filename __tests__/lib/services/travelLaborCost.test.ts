@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   calculateTravelCostBreakdown,
+  computeBoloTransport,
   estimateRoundTripHours,
   TRAVEL_COST_LINE_MARKER,
 } from '@/lib/services/travelLaborCost';
@@ -81,5 +82,17 @@ describe('travelLaborCost', () => {
     });
     expect(two.chargeableHours).toBe(1); // ceil((2-1)/0.5)*0.5 = 1
     expect(two.driverCost).toBe(15);     // 1 h × 15
+  });
+
+  it('el càrrec al client del bolo inclou hores de ruta de conductor i passatger', () => {
+    const r = computeBoloTransport({
+      roundTripKm: 422,
+      vehicleCostPerKm: 0.26,
+      headcountOverride: 2,
+    });
+
+    expect(r.breakdown.chargeableHours).toBe(5.5);
+    expect(r.breakdown.peopleCost).toBe(165);
+    expect(r.clientCharge).toBe(261.72);
   });
 });

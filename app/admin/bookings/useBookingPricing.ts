@@ -6,8 +6,8 @@ import {
   OPERATOR_EXTRA_MIN_PRICE, OPERATOR_EXTRA_FACTOR,
 } from '@/lib/constants/pricing';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
-import { getMarginBand } from '@/lib/margin-utils';
-import { aggregateServiceLines, computeDirectCostBreakdown } from '@/lib/services/costEngine';
+import { getMarginBand, getMarginLabel } from '@/lib/margin-utils';
+import { aggregateServiceLines, classifyBoloLines, computeDirectCostBreakdown } from '@/lib/services/costEngine';
 import {
   calculateBillableTravelKm,
   calculateTravelBlocks,
@@ -144,12 +144,15 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
     }, PROFITABILITY_MODEL_DEFAULTS);
     const netMargin = pricing.total - directCost; // marge en viu: sense CAC (per disseny)
     const marginPct = pricing.total > 0 ? (netMargin / pricing.total) * 100 : 0;
+    const { hasOwnEquipment } = classifyBoloLines(serviceLines);
+    const hasExternalProviderService = serviceLines.some((line) => line.kind === 'PROVIDER_SERVICE' && Boolean(line.collaboratorId));
+    const marginProfile = !selectedPack && !hasOwnEquipment && hasExternalProviderService ? 'external' : 'own';
     // Semàfor de marge canònic (4 bandes, font única getMarginBand): Excel·lent/Acceptable/Vigilar/Crític.
-    const band = getMarginBand(marginPct);
+    const band = getMarginBand(marginPct, marginProfile);
     const tone: 'emerald' | 'amber' | 'orange' | 'rose' =
       band === 'excellent' ? 'emerald' : band === 'acceptable' ? 'amber' : band === 'watch' ? 'orange' : 'rose';
-    return { directCost, netMargin, marginPct, tone };
-  }, [internalTravelCost, pricing]);
+    return { directCost, netMargin, marginPct, tone, label: getMarginLabel(marginPct, marginProfile) };
+  }, [internalTravelCost, pricing, selectedPack, serviceLines]);
 
   return {
     internalTravelCost,

@@ -22294,6 +22294,23 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+### Canvi #1375 — 2026-07-03 — codex (FET)
+**Marge extern i +40€ del tècnic inclòs a leads/reserves.**
+- Context: el lead d'Alba (`/admin/leads/cmr1xh7la0000ug7dj4jnihjr`) sortia com a marge crític tot i ser un bolo extern, i la línia "Tècnic de so inclòs" marcada com assignada a Òrbita no sumava els 40€ a caixa d'Òrbita.
+- `lib/margin-utils.ts`: el semàfor de marge guanya perfil `external` per revenda/proveïdor extern (25/10/5), mantenint intactes els llindars de servei propi (50/30/15).
+- `lib/services/costEngine.ts`, lead detail i nova reserva: el marge pot rebre `marginProfile`; si el bolo és `PROVIDER_SERVICE` extern sense equip propi d'Òrbita, es pinta amb el perfil extern.
+- `lib/services/serviceLineCostRules.ts`: nova regla compartida per preservar `costAmount < 0` només en `SOUND_TECH` "Tècnic de so inclòs"; aplicada a lead service lines, creació i edició de reserva. La resta de negatius continuen sanejats.
+- `app/api/admin/bookings/*` i `booking-service-line-validation`: les APIs deixen arribar el negatiu al servei i la validació només eximeix aquest cas perquè representa ingrés d'Òrbita, no cost pendent de col·laborador.
+- Dada real: la línia `cmr4pee53000rj0oaxckudt1t` d'Alba queda corregida de `costAmount: 0` a `costAmount: -40`, coherent amb la nota "assignat a Òrbita".
+- Tests: marge extern, cost engine amb perfil extern, preservació del cost negatiu del tècnic inclòs, validació de col·laborador i transport amb hores de ruta.
+- Validació tècnica: `vitest` enfocat 123/123 OK; `npx tsc --noEmit` OK.
+- Validació funcional: Prisma confirma la correcció `0 → -40`; `computeBoloTransport` confirma que 422 km amb 2 persones inclou 5,5 h i 165€ d'hores de ruta al càrrec client.
+- Validació humana/UX: els bolos externs ja no es penalitzen amb el semàfor de servei propi i el +40€ del tècnic d'Òrbita no es perd en guardar.
+- `ADMIN_CHANGE_COUNTER` passa a `1375`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 # 10. Veredicte
 
 OrbitaEvents està en fase de **refinament seriós**.

@@ -13,6 +13,7 @@ import { calculateEventDuration } from '@/lib/inventory-utils';
 import { SOUND_RENTAL } from '@/lib/constants/inventory';
 import { sendBookingConfirmationEmail } from '@/lib/services/bookingConfirmationEmailService';
 import { DEFAULT_BOOKING_PAYMENT_METHOD } from '@/lib/constants/booking-payment';
+import { sanitizeRevenueAmount, sanitizeServiceLineCostAmount } from '@/lib/services/serviceLineCostRules';
 
 /**
  * Afegeix automàticament la línia de lloguer de so (Isma) si el bolo porta pack i
@@ -269,8 +270,8 @@ function normalizeServiceLines(lines?: BookingServiceLineInput[]) {
       partyType: line.partyType?.trim() || null,
       kind: line.kind || 'OTHER',
       label: line.label?.trim(),
-      revenueAmount: sanitizeMoney(line.revenueAmount),
-      costAmount: sanitizeMoney(line.costAmount),
+      revenueAmount: sanitizeRevenueAmount(line.revenueAmount),
+      costAmount: sanitizeServiceLineCostAmount({ kind: line.kind || 'OTHER', label: line.label, costAmount: line.costAmount }),
       quantity: typeof line.quantity === 'number' && line.quantity > 0 ? Math.floor(line.quantity) : null,
       hours: typeof line.hours === 'number' && line.hours > 0 ? Math.round(line.hours * 100) / 100 : null,
       notes: line.notes?.trim() || null,
