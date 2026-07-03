@@ -642,6 +642,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
             fixedOperationalCost={profitabilityConfig.fixedOperationalCost}
             targetMarginPct={targetMarginPct}
             serviceLinesCost={serviceLinesCost}
+            serviceLines={booking.serviceLines ?? []}
             travelHeadcount={deriveTravelHeadcount(booking.serviceLines ?? [])}
           />
         </div>

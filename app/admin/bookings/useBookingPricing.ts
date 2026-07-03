@@ -131,7 +131,7 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
     // Cost directe via la font única (computeDirectCostBreakdown), no reimplementat.
     // extraHours=1 + extraHourPrice=extraHoursPrice perquè el preu d'hores extra ja ve
     // agregat (count×preu). travelCost explícit; si és 0, el helper el recalcula a 0.
-    const { directCost } = computeDirectCostBreakdown({
+    const { directCost, ownServiceMargin, subcontractedMarkup, transportMargin, orbitaTechIncome } = computeDirectCostBreakdown({
       total: pricing.total,
       packPrice: pricing.packPrice,
       extrasTotal: pricing.extrasPrice,
@@ -139,8 +139,10 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
       extraHourPrice: pricing.extraHoursPrice,
       distanceKm: 0,
       travelCost: internalTravelCost,
+      travelRevenue: pricing.travelCharge,
       serviceLinesRevenue: pricing.serviceLinesRevenue,
       serviceLinesCost: pricing.serviceLinesCost || 0,
+      serviceLines,
     }, PROFITABILITY_MODEL_DEFAULTS);
     const netMargin = pricing.total - directCost; // marge en viu: sense CAC (per disseny)
     const marginPct = pricing.total > 0 ? (netMargin / pricing.total) * 100 : 0;
@@ -148,8 +150,8 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
     const band = getMarginBand(marginPct);
     const tone: 'emerald' | 'amber' | 'orange' | 'rose' =
       band === 'excellent' ? 'emerald' : band === 'acceptable' ? 'amber' : band === 'watch' ? 'orange' : 'rose';
-    return { directCost, netMargin, marginPct, tone };
-  }, [internalTravelCost, pricing]);
+    return { directCost, netMargin, marginPct, tone, ownServiceMargin, subcontractedMarkup, transportMargin, orbitaTechIncome };
+  }, [internalTravelCost, pricing, serviceLines]);
 
   return {
     internalTravelCost,

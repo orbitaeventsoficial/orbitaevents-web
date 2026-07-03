@@ -1547,6 +1547,36 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1378 — 2026-07-03 — claude (FET)
+**Rediseny del bloc de transport del bolo (ulleres de dissenyador) + alarma >2 persones.**
+- Context: el propietari — el transport/km de la targeta del bolo grinyolava («taula d'enginyer»). Desmuntar i replantejar + alarma si viatgen més de 2 persones.
+- `LeadBoloSection` + `.ap-ledger-trip*` (admin-shell.css): «Desplaçament» amb badge de resum, controls agrupats RUTA/EQUIP (etiquetes daurades), inputs amb fons canvas propi (abans es fonien), a tota l'amplada, text de debug → llenguatge humà, «Qui cobra la ruta» integrat com a `<details>`, pressupost or a sota.
+- Alarma: `headcount>2` → badge/input vermells + avís `role="alert"` (tons `--o-danger`). Camp Integrants amb «· auto» + title explicant l'override manual.
+- Norma reforçada (CLAUDE.md): 8a regla dura del canon «Controls ≠ diners · zero debug com a UI».
+- Validació tècnica: tsc 0; validate:core EXIT 0 (phantom-classes, admin-canon, canon-debt); tests 92/92.
+- Validació funcional: Playwright lead Estel desktop+mòbil (alarma vermella amb 5 persones, inputs visibles, responsiu).
+- Validació humana/UX: de «taula d'enginyer» a peça de dissenyador amb jerarquia real.
+- Counter → 1378. Commit conjunt amb #1377 (Codex); model headcount no tocat (5 correcte: DJ 1 + Bingo 2 + Batalla 2).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1377 — 2026-07-03 — codex (FET)
+**Cervell econòmic amb buckets de marge separats: producte propi, subcontractat, transport i global.**
+- Context: el propietari corregeix el plantejament del #1375. Un producte subcontractat no necessita llindars especials de marge global: la regla comercial és `+20% sobre cost proveïdor` (`200€ → 240€`, marge subcontractat `+40€`). Aquest `+40€` no és el mateix que el `+40€` del tècnic inclòs quan el fa Òrbita, que és un ingrés de liquidació separat. També pregunta si el transport ha d'anar separat: sí.
+- `lib/margin-utils.ts`: eliminat el perfil `external` i els llindars `25/10/5`; el semàfor torna a ser només el marge global canònic.
+- `lib/services/costEngine.ts`: el cervell exposa `computeServiceLineEconomics`, `ownServiceMargin`, `subcontractedMarkup`, `transportMargin` i `orbitaTechIncome`. `aggregateServiceLines` delega al mateix càlcul per no duplicar regles.
+- `computeDirectCostBreakdown`: rep `travelRevenue` a més de `travelCost`; el marge de transport queda com a bucket separat (`client - cost real`) i el marge global continua sumant tots els costos.
+- Lead/nova reserva/fitxa reserva/dashboard/profitability/cashflow: passen línies reals al `costEngine` i mostren els buckets sense recalcular regles locals. Alba queda llegible com: marge global crític, subcontractat OK +20%, tècnic Òrbita +40€, transport amb marge propi.
+- Tests: regressió de subcontractat +20, tècnic Òrbita i separació producte propi/subcontractat/transport.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\costEngine.test.ts __tests__\lib\services\serviceLineCostRules.test.ts` OK (82 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK; `pnpm run qa:protocol` OK final.
+- Validació funcional: Playwright local sobre Alba (`/admin/leads/cmr1xh7la0000ug7dj4jnihjr`) HTTP 200, sense errors runtime; rail amb `marge global`, `Subcontractat`, `Tècnic Òrbita`, `Transport client`, `Cost transport` i `Marge transport`.
+- Validació humana/UX: la regla de subcontractació queda visible com a regla comercial pròpia; el transport ja no queda camuflat dins el marge global.
+- `ADMIN_CHANGE_COUNTER` passa a `1377`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1376 — 2026-07-03 — claude (FET)
 **Camp de peatges al formulari de nova reserva (tanca el flux de peatges).**
 - Context: el write-path ja acceptava peatges (#1373) i el lead ja el tenia, però el formulari de nova reserva directa no oferia on introduir-los.

@@ -1,3 +1,49 @@
+## 2026-07-03 — Rediseny del bloc de transport del bolo + alarma >2 persones (Canvi #1378, claude)
+
+### Context
+El propietari, amb «ulleres de dissenyador»: la targeta del bolo (sobretot el transport/km) grinyolava — era una «taula d'enginyer» (inputs crus barrejats amb outputs, text de debug com a UI, panell desproporcionat pel repartiment). Encàrrec: desmuntar-la i replantejar-la, amb llibertat i reforçant les normes. A més, regla de negoci: si viatgen més de 2 persones, alarma vermella (el transport s'encareix).
+
+### Què s'ha fet
+- **Bloc «Desplaçament» redissenyat** (`LeadBoloSection` + `.ap-ledger-trip*` a admin-shell.css): capçalera amb badge de resum (`36.6 km · 5 persones`); controls AGRUPATS per intenció (**RUTA** km/integrants/peatges + **EQUIP** cotxe/condueix) amb etiquetes daurades `--mono`; inputs amb fons canvas propi que RESSALTA (abans es fonien); a tota l'amplada (abans 2 columnes desalineades amb aire mort); text de debug → llenguatge humà («Ruta curta: dins la 1a hora inclosa»); «Qui cobra la ruta» integrat DINS la targeta com a `<details>` plegable (abans orfe a fora); pressupost or destacat a sota.
+- **Alarma de transport (>2 persones)**: constant `CROWDED_TRIP_THRESHOLD=2`; quan `headcount>2` → badge vermell + camp Integrants vermell + avís `role="alert"` («⚠ Viatgen N persones: el transport s'encareix molt... Revisa qui cal que hi vagi»). Tons via `--o-danger` (canònic).
+- **Camp Integrants clar**: label «· auto» quan usa el càlcul; `title` explica que es pot sobreescriure a mà (l'override manual ja existia però no es notava).
+- **Norma reforçada** (CLAUDE.md, canon visual): nova **8a regla dura** «Controls ≠ diners · zero debug com a UI» — no barrejar inputs crus amb outputs financers sense jerarquia; agrupar per intenció; el debug MAI és interfície; detalls secundaris plegats.
+
+### Validació
+- Validació tècnica: tsc 0; validate:core EXIT 0 (phantom-classes OK, admin-canon 0 P1, canon-debt 0); tests 92/92 (worktree conjunt amb #1377 de Codex).
+- Validació funcional: Playwright lead Estel (desktop+mòbil) — badge/input/avís vermells amb 5 persones; inputs visibles; repartiment plegable integrat; responsiu als 2 breakpoints.
+- Validació humana/UX: el bloc passa de «taula d'enginyer» a peça de dissenyador amb jerarquia real; l'alarma avisa quan el transport s'encareix.
+
+### Coordinació
+Counter → 1378. Commit conjunt amb #1377 (Codex, cervell econòmic amb buckets de marge — ja documentat): worktree compartit, feina barrejada a `LeadBoloSection`/pricing/costEngine (ell la lògica de marge dalt, jo el JSX/CSS baix), coexisteixen amb tsc 0 i tests verds. El model de headcount (`deriveTravelHeadcount`) NO s'ha tocat — el propietari va confirmar que 5 és correcte (DJ 1 + Bingo 2 + Batalla 2).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-03 — Cervell econòmic amb buckets de marge separats (Canvi #1377, codex)
+
+### Context
+El propietari aclareix que els productes subcontractats no s'han de jutjar amb llindars inventats de `5/10/25%`: la regla comercial és sempre `+20% sobre el preu que dona el proveïdor`. També demana si cal separar el marge de producte subcontractat, producte propi i transport. Decisió: sí; el marge global continua existint, però el cervell econòmic ha d'exposar buckets separats.
+
+### Què s'ha fet
+- Eliminat el perfil de marge `external` amb llindars `25/10/5`; el semàfor de marge torna a ser només el marge global canònic `50/30/15`.
+- `costEngine`: `computeServiceLineEconomics` i `computeDirectCostBreakdown` retornen `ownServiceMargin`, `subcontractedMarkup`, `transportMargin` i `orbitaTechIncome`. `aggregateServiceLines` delega al mateix cervell per no duplicar regles.
+- Subcontractat: regla canònica `+20% sobre cost proveïdor` (`200€ → 240€`, marge subcontractat `+40€`). El `+40€` del tècnic Òrbita és un ingrés de liquidació separat, no el mateix concepte.
+- Transport: el motor rep `travelRevenue` i `travelCost` i calcula `transportMargin` separat. Exemple Alba: transport client 258€ vs cost 271€ → marge transport −13€.
+- Lead detail i nova reserva: el rail/resum mostra `marge global`, `Producte propi`, `Subcontractat`, `Marge transport` i `Tècnic Òrbita` quan aplica.
+- Feeders alineats: lead, nova reserva, fitxa reserva, dashboard, profitability i cashflow passen les línies reals al `costEngine` en comptes de recalcular només ingressos/costos locals.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\costEngine.test.ts __tests__\lib\services\serviceLineCostRules.test.ts` OK (82 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK; `pnpm run qa:protocol` OK final.
+- Validació funcional: Playwright local sobre Alba (`/admin/leads/cmr1xh7la0000ug7dj4jnihjr`) HTTP 200, sense errors runtime; rail amb `marge global`, `Subcontractat`, `Tècnic Òrbita`, `Transport client`, `Cost transport` i `Marge transport`.
+- Validació humana/UX: queda clar que el producte subcontractat compleix +20%; el marge global pot ser baix per transport/CAC, i el transport ja surt com a marge propi separat.
+
+### Coordinació
+Counter → 1377. Canvi sobre #1375; no toca schema ni el carril #1376 de peatges de Claude.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-03 — Camp de peatges al formulari de nova reserva (Canvi #1376, claude)
 
 ### Context

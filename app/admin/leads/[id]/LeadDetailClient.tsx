@@ -182,10 +182,16 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  prev.fixedOperationalCost === e.fixedOperationalCost &&
  prev.tone === e.tone &&
  prev.label === e.label &&
+ prev.ownServiceRevenue === e.ownServiceRevenue &&
+ prev.ownServiceCost === e.ownServiceCost &&
+ prev.ownServiceMarginAmount === e.ownServiceMarginAmount &&
+ prev.ownServiceMarginPct === e.ownServiceMarginPct &&
  prev.subcontractedCost === e.subcontractedCost &&
  prev.subcontractedMarkupAmount === e.subcontractedMarkupAmount &&
  prev.subcontractedMarkupPct === e.subcontractedMarkupPct &&
  prev.subcontractedMarkupOk === e.subcontractedMarkupOk &&
+ prev.transportMarginAmount === e.transportMarginAmount &&
+ prev.transportMarginPct === e.transportMarginPct &&
  prev.orbitaTechIncome === e.orbitaTechIncome;
  return same ? prev : e;
  });
@@ -596,8 +602,11 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  <span className="ap-ledger-summary-net-pct">{Math.round(econ.marginPct)}% marge global{econ.label ? ` · ${econ.label}` : ''}</span>
  </div>
  <div className="ap-ledger-summary-rows">
+ {econ.ownServiceRevenue > 0 && (
+ <div><span>Producte propi</span><strong>{formatCurrency(econ.ownServiceMarginAmount)} · {Math.round(econ.ownServiceMarginPct)}%</strong></div>
+ )}
  {econ.subcontractedCost > 0 && (
- <div><span>Subcontractat</span><strong>+{Math.round(econ.subcontractedMarkupPct)}% sobre cost</strong></div>
+ <div><span>Subcontractat</span><strong>{econ.subcontractedMarkupOk ? 'OK' : 'Baix'} · +{Math.round(econ.subcontractedMarkupPct)}% sobre cost</strong></div>
  )}
  {econ.orbitaTechIncome > 0 && (
  <div><span>Tècnic Òrbita</span><strong>+{formatCurrency(econ.orbitaTechIncome)}</strong></div>
@@ -607,6 +616,9 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  )}
  {econ.travelCost != null && (
  <div><span>Cost transport</span><strong>{formatCurrency(econ.travelCost)}</strong></div>
+ )}
+ {(econ.travelCharge > 0 || econ.travelCost > 0 || econ.transportMarginAmount !== 0) && (
+ <div><span>Marge transport</span><strong>{formatCurrency(econ.transportMarginAmount)} · {Math.round(econ.transportMarginPct)}%</strong></div>
  )}
  <div><span>Cost serveis</span><strong>{formatCurrency(econ.serviceLinesCost)}</strong></div>
  <div><span>Operatiu</span><strong>{formatCurrency(econ.fixedOperationalCost)}</strong></div>

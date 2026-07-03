@@ -5,13 +5,12 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import BookingServiceLinesSection from '@/app/admin/bookings/BookingServiceLinesSection';
 import type { BookingServiceLineFormInput } from '@/app/admin/bookings/booking-form.types';
-import { computeBookingFinancialSummary, aggregateServiceLines, classifyBoloLines } from '@/lib/services/costEngine';
+import { computeBookingFinancialSummary, computeServiceLineEconomics, classifyBoloLines } from '@/lib/services/costEngine';
 import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
 import { calculateTravelCostBreakdown, deriveTravelHeadcount, computeBoloTransport } from '@/lib/services/travelLaborCost';
 import { useBookingDistance } from '@/app/admin/bookings/useBookingDistance';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { formatCurrency, formatNumber } from '@/lib/constants';
-import { computeSubcontractedMarkupSummary } from '@/lib/services/serviceLineCostRules';
 
 /**
  * El BOLO dins la fitxa del lead (Fase 1.4 de docs/bolo-flux.md).
@@ -31,10 +30,16 @@ export interface BoloEconomia {
  fixedOperationalCost: number;
  tone: 'emerald' | 'amber' | 'orange' | 'rose';
  label: string;
+ ownServiceRevenue: number;
+ ownServiceCost: number;
+ ownServiceMarginAmount: number;
+ ownServiceMarginPct: number;
  subcontractedCost: number;
  subcontractedMarkupAmount: number;
  subcontractedMarkupPct: number;
  subcontractedMarkupOk: boolean;
+ transportMarginAmount: number;
+ transportMarginPct: number;
  orbitaTechIncome: number;
 }
 
@@ -174,6 +179,10 @@ export default function LeadBoloSection({
  return deriveTravelHeadcount(lines, hasOrbitaPack);
  }, [lines, baseLines]);
  const headcount = headcountOverride ? Math.max(0, Math.floor(Number(headcountOverride) || 0)) : derivedHeadcount;
+ // Alarma de transport (#1377, ordre del propietari): més de 2 persones viatjant encareix
+ // molt el transport (cada persona = temps de tripulació a 15 €/h). Senyal vermell + avís.
+ const CROWDED_TRIP_THRESHOLD = 2;
+ const tripCrowded = headcount > CROWDED_TRIP_THRESHOLD;
  // Col·laboradors presents al bolo (per triar qui posa el cotxe / condueix).
  const travelCollaborators = useMemo(() => {
  const seen = new Map<string, string>();
@@ -223,7 +232,7 @@ export default function LeadBoloSection({
  // ownCostRatio = 0: un servei propi (DJ) NO imputa cost sobre el seu preu.
  // El cost real de l'equip propi (desgast + amortització + consumibles) ja
  // viu al cost fix operatiu; imputar a més un % seria comptar-lo dos cops.
- const { revenue: linesRevenue, cost } = aggregateServiceLines(allLines, 0);
+ const { revenue: linesRevenue, cost } = computeServiceLineEconomics(allLines, 0);
  if (linesRevenue <= 0) return null;
  // El càrrec de desplaçament es REPERCUTEIX al client: suma al total facturable.
  const revenue = linesRevenue + travelCharge;
@@ -237,15 +246,17 @@ export default function LeadBoloSection({
  const summary = computeBookingFinancialSummary({
  total: revenue,
  packPrice: 0, extrasTotal: 0, extraHours: 0, extraHourPrice: 0,
- distanceKm: Number(distanceKm) || 0, travelCost: effectiveTravelCost,
+ distanceKm: Number(distanceKm) || 0, travelCost: effectiveTravelCost, travelRevenue: travelCharge,
  serviceLinesRevenue: linesRevenue, serviceLinesCost: cost + rentalTransport,
+ serviceLines: allLines,
+ serviceLinesOwnCostRatio: 0,
+ serviceLinesCostAdjustment: rentalTransport,
  source: source ?? null,
  }, {
  ...PROFITABILITY_MODEL_DEFAULTS,
  fixedOperationalCost: hasOwnEquipment ? PROFITABILITY_MODEL_DEFAULTS.fixedOperationalCost : 0,
  });
- const subcontracted = computeSubcontractedMarkupSummary(allLines);
- return { ...summary, subcontracted };
+ return summary;
  }, [buildVisibleLines, source, vehicleCostPerKm, effectiveTravelCost, distanceKm, travelCharge]);
 
  // Eleva el net al contenidor (perquè visqui al hero de la fitxa, no enterrat a baix).
@@ -264,11 +275,17 @@ export default function LeadBoloSection({
  fixedOperationalCost: economia.fixedOperationalCost,
  tone: economia.marginTone.tone,
  label: economia.marginTone.label,
- subcontractedCost: economia.subcontracted.cost,
- subcontractedMarkupAmount: economia.subcontracted.markupAmount,
- subcontractedMarkupPct: economia.subcontracted.markupPct,
- subcontractedMarkupOk: economia.subcontracted.ok,
- orbitaTechIncome: economia.subcontracted.orbitaTechIncome,
+ ownServiceRevenue: economia.ownServiceMargin.revenue,
+ ownServiceCost: economia.ownServiceMargin.cost,
+ ownServiceMarginAmount: economia.ownServiceMargin.marginAmount,
+ ownServiceMarginPct: economia.ownServiceMargin.marginPct,
+ subcontractedCost: economia.subcontractedMarkup.cost,
+ subcontractedMarkupAmount: economia.subcontractedMarkup.markupAmount,
+ subcontractedMarkupPct: economia.subcontractedMarkup.markupPct,
+ subcontractedMarkupOk: economia.subcontractedMarkup.ok,
+ transportMarginAmount: economia.transportMargin.marginAmount,
+ transportMarginPct: economia.transportMargin.marginPct,
+ orbitaTechIncome: economia.orbitaTechIncome,
  }
  : null);
  }, [economia, effectiveTravelCost, onEconomiaChange, travelCharge]);
@@ -386,9 +403,21 @@ export default function LeadBoloSection({
  Estirat a tota l'amplada. El transport el paga el CLIENT (línia estipulada que suma al total). ── */}
  {economia && (
  <div className="ap-ledger-budget" aria-label="Resum del pressupost">
- <div className="ap-ledger-budget-travel">
- <label className="ap-ledger-travel-field">
- <span>Km ruta</span>
+ {/* ── DESPLAÇAMENT: peça de logística neta (rediseny #1377). Controls agrupats
+ per intenció (Ruta / Equip), llenguatge humà, sense text de debug. ── */}
+ <div className="ap-ledger-trip">
+ <div className="ap-ledger-trip-head">
+ <span className="ap-ledger-trip-title">Desplaçament</span>
+ <span className="ap-ledger-trip-badge" data-alarm={tripCrowded ? 'true' : undefined}>
+ {km > 0 ? `${km} km · ${headcount} ${headcount === 1 ? 'persona' : 'persones'}` : 'sense ruta'}
+ </span>
+ </div>
+ <div className="ap-ledger-trip-grid">
+ <div className="ap-ledger-trip-group">
+ <span className="ap-ledger-trip-grouplbl">Ruta</span>
+ <div className="ap-ledger-trip-fields">
+ <label className="ap-ledger-trip-field">
+ <span>Km anada+tornada</span>
  <input
  type="number" min={0} step={1} inputMode="numeric" className="adm-input"
  value={distanceKm}
@@ -397,69 +426,73 @@ export default function LeadBoloSection({
  aria-label="Km anada i tornada de la ruta"
  />
  </label>
- <label className="ap-ledger-travel-field">
- <span>Integrants</span>
+ <label className="ap-ledger-trip-field">
+ <span>Integrants{headcountOverride ? '' : ' · auto'}</span>
  <input
  type="number" min={0} step={1} inputMode="numeric" className="adm-input"
+ data-alarm={tripCrowded ? 'true' : undefined}
  value={headcountOverride}
  onChange={(e) => setHeadcountOverride(e.target.value)}
  placeholder={String(derivedHeadcount)}
- aria-label="Ajust manual d'integrants de la ruta"
+ aria-label="Integrants que viatgen (auto-calculat; escriu per ajustar)"
+ title="Es calcula sol des dels serveis del bolo. Escriu un número per ajustar-lo a mà."
  />
  </label>
- <label className="ap-ledger-travel-field">
- <span>Peatges €</span>
+ <label className="ap-ledger-trip-field">
+ <span>Peatges</span>
  <input
  type="number" min={0} step="0.01" inputMode="decimal" className="adm-input"
  value={tollsEur}
  onChange={(e) => { setTollsEur(e.target.value); setDirty(true); }}
- placeholder="0"
+ placeholder="0 €"
  aria-label="Peatges de la ruta en euros"
  />
  </label>
+ </div>
+ </div>
  {travelCollaborators.length > 0 && (
- <>
- <label className="ap-ledger-travel-field">
- <span>Cotxe</span>
+ <div className="ap-ledger-trip-group">
+ <span className="ap-ledger-trip-grouplbl">Equip</span>
+ <div className="ap-ledger-trip-fields">
+ <label className="ap-ledger-trip-field">
+ <span>Posa el cotxe</span>
  <select className="adm-input" value={vehicleOwnerId} onChange={(e) => { setVehicleOwnerId(e.target.value); setDirty(true); }} aria-label="Qui posa el cotxe">
  <option value="">Òrbita</option>
  {travelCollaborators.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
  </select>
  </label>
- <label className="ap-ledger-travel-field">
+ <label className="ap-ledger-trip-field">
  <span>Condueix</span>
  <select className="adm-input" value={driverId} onChange={(e) => { setDriverId(e.target.value); setDirty(true); }} aria-label="Qui condueix">
  <option value="">Òrbita</option>
  {travelCollaborators.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
  </select>
  </label>
- </>
+ </div>
+ </div>
  )}
- <p className="ap-ledger-budget-travelnote">
- 1a hora de ruta inclosa · es cobren {formatNumber(travelBreakdown.chargeableHours)} h de {formatNumber(travelBreakdown.routeHours)} h · cotxe: {nameFor(vehicleOwnerId)} · condueix: {nameFor(driverId)}
+ </div>
+ {tripCrowded && (
+ <p className="ap-ledger-trip-alarm" role="alert">
+ ⚠ Viatgen {headcount} persones: el transport s'encareix molt (cada persona suma temps de tripulació). Revisa qui cal que hi vagi.
  </p>
- </div>
- <div className="ap-ledger-budget-sum">
- <div className="ap-ledger-budget-row">
- <span>Serveis</span>
- <strong>{formatCurrency(economia.total - travelCharge)}</strong>
- </div>
- <div className="ap-ledger-budget-row ap-ledger-budget-row--travel">
- <span>Transport al client<em>cotxe {km} km + {formatNumber(travelBreakdown.chargeableHours)} h × {headcount} pers.{travelBreakdown.tollsCost > 0 ? ` + ${formatCurrency(travelBreakdown.tollsCost)} peatges` : ''} (1a h inclosa)</em></span>
- <strong>+{formatCurrency(travelCharge)}</strong>
- </div>
- <div className="ap-ledger-budget-row ap-ledger-budget-row--total">
- <span>Total client</span>
- <strong>{formatCurrency(economia.total)}</strong>
- </div>
- </div>
- <div className="ap-ledger-route-settlement" aria-label="Repartiment econòmic del transport">
- <div className="ap-ledger-route-settlement-head">
- <span>Repartiment ruta</span>
+ )}
+ <p className="ap-ledger-trip-note">
+ {travelBreakdown.chargeableHours > 0
+ ? `La 1a hora de ruta va inclosa · es cobra el temps a partir d'aquí (${formatNumber(travelBreakdown.chargeableHours)} h de tripulació).`
+ : 'Ruta curta: dins la 1a hora inclosa, no es cobra temps de tripulació.'}
+ </p>
+
+ {/* ── REPARTIMENT de la ruta: plegable, DINS la targeta de desplaçament (no orfe).
+ Quan és tot Òrbita no cal desplegar; s'obre per veure qui cobra cada peça. ── */}
+ {effectiveTravelCost > 0 && routeSettlementLines.length > 0 && (
+ <details className="ap-ledger-route-settlement" aria-label="Repartiment econòmic del transport">
+ <summary className="ap-ledger-route-settlement-head">
+ <span>Qui cobra la ruta</span>
  <strong>{formatCurrency(effectiveTravelCost)}</strong>
- </div>
+ </summary>
  <div className="ap-ledger-route-settlement-grid">
- {routeSettlementLines.length > 0 ? routeSettlementLines.map((line, idx) => (
+ {routeSettlementLines.map((line, idx) => (
  <div key={`${line.label}-${idx}`} className="ap-ledger-route-settlement-row">
  <span>
  {line.label}
@@ -467,12 +500,25 @@ export default function LeadBoloSection({
  </span>
  <strong>{formatCurrency(line.amount)}</strong>
  </div>
- )) : (
- <div className="ap-ledger-route-settlement-row">
- <span>Sense cost de ruta<em>afegeix km i integrants per calcular-lo</em></span>
- <strong>{formatCurrency(0)}</strong>
+ ))}
  </div>
+ </details>
  )}
+ </div>
+
+ {/* ── PRESSUPOST: la sortida clau del bolo, panell or destacat a tota l'amplada ── */}
+ <div className="ap-ledger-budget-sum">
+ <div className="ap-ledger-budget-row">
+ <span>Serveis</span>
+ <strong>{formatCurrency(economia.total - travelCharge)}</strong>
+ </div>
+ <div className="ap-ledger-budget-row ap-ledger-budget-row--travel">
+ <span>Transport{travelBreakdown.tollsCost > 0 ? <em>inclou {formatCurrency(travelBreakdown.tollsCost)} de peatges</em> : null}</span>
+ <strong>+{formatCurrency(travelCharge)}</strong>
+ </div>
+ <div className="ap-ledger-budget-row ap-ledger-budget-row--total">
+ <span>Total client</span>
+ <strong>{formatCurrency(economia.total)}</strong>
  </div>
  </div>
  </div>

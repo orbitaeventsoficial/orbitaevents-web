@@ -36,8 +36,10 @@ import {
   computeSimpleMarginPct,
   computeCollaboratorNetMargin,
   aggregateServiceLines,
+  computeServiceLineEconomics,
   classifyBoloLines,
   computeSupportableTravelKm,
+  SUBCONTRACTED_MARKUP_TARGET_PCT,
 } from '@/lib/services/costEngine';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
@@ -390,6 +392,63 @@ describe('costEngine', () => {
       expect(result.serviceLinesCost).toBe(120);
       expect(result.directCost).toBe(result.fixedOperationalCost + 120);
       expect(result.total).toBe(340);
+    });
+
+    it('calcula subcontractat +20% i tècnic Òrbita dins el resum financer', () => {
+      const serviceLines = [
+        { kind: 'PROVIDER_SERVICE', collaboratorId: 'masquerade', revenueAmount: 240, costAmount: 200, quantity: 1 },
+        { kind: 'SOUND_TECH', collaboratorId: 'masquerade', label: 'Tècnic de so inclòs · 1h 30', revenueAmount: 0, costAmount: -40, quantity: 1 },
+      ];
+      const result = computeBookingFinancialSummary(baseInput({
+        total: 498,
+        packPrice: 0,
+        extrasTotal: 0,
+        extraHours: 0,
+        extraHourPrice: 0,
+        distanceKm: 0,
+        travelCost: 271,
+        serviceLines,
+      }), defaultConfig);
+
+      expect(result.serviceLinesRevenue).toBe(240);
+      expect(result.serviceLinesCost).toBe(160);
+      expect(result.subcontractedMarkup.targetPct).toBe(SUBCONTRACTED_MARKUP_TARGET_PCT);
+      expect(result.subcontractedMarkup.cost).toBe(200);
+      expect(result.subcontractedMarkup.revenue).toBe(240);
+      expect(result.subcontractedMarkup.markupAmount).toBe(40);
+      expect(result.subcontractedMarkup.markupPct).toBe(20);
+      expect(result.subcontractedMarkup.ok).toBe(true);
+      expect(result.orbitaTechIncome).toBe(40);
+      expect(result.directCost).toBe(result.fixedOperationalCost + 271 + 160);
+    });
+
+    it('separa producte propi, subcontractat i transport en buckets economics', () => {
+      const serviceLines = [
+        { kind: 'DJ', revenueAmount: 150, costAmount: 0, quantity: 1 },
+        { kind: 'PROVIDER_SERVICE', collaboratorId: 'masquerade', revenueAmount: 240, costAmount: 200, quantity: 1 },
+      ];
+      const result = computeBookingFinancialSummary(baseInput({
+        total: 648,
+        packPrice: 0,
+        extrasTotal: 0,
+        extraHours: 0,
+        extraHourPrice: 0,
+        distanceKm: 0,
+        travelCost: 271,
+        travelRevenue: 258,
+        serviceLines,
+        serviceLinesOwnCostRatio: 0,
+      }), defaultConfig);
+
+      expect(result.ownServiceMargin.revenue).toBe(150);
+      expect(result.ownServiceMargin.cost).toBe(0);
+      expect(result.ownServiceMargin.marginAmount).toBe(150);
+      expect(result.subcontractedMarkup.cost).toBe(200);
+      expect(result.subcontractedMarkup.markupAmount).toBe(40);
+      expect(result.transportMargin.revenue).toBe(258);
+      expect(result.transportMargin.cost).toBe(271);
+      expect(result.transportMargin.marginAmount).toBe(-13);
+      expect(result.directCost).toBe(result.fixedOperationalCost + 271 + 200);
     });
 
     // --- Config personalitzada ---

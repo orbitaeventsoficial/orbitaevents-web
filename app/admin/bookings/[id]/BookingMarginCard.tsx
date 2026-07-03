@@ -12,6 +12,7 @@ import {
 import { calculateClientTravelCharge, calculateTravelCostBreakdown } from '@/lib/services/travelLaborCost';
 import { formatCurrency } from '@/lib/constants';
 import { computeDirectCostBreakdown } from '@/lib/services/costEngine';
+import type { ServiceLineLike } from '@/lib/services/costEngine';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { getMarginTone, getTravelMarginTone } from '@/lib/margin-utils';
@@ -40,6 +41,8 @@ interface BookingMarginProps {
   targetMarginPct: number;
   /** Cost de subcontractació de les línies de servei (animació, pintacares...). */
   serviceLinesCost?: number;
+  /** Línies reals per alimentar el cervell econòmic (subcontractat +20%, tècnic Òrbita, cost per línia). */
+  serviceLines?: ServiceLineLike[];
   /** Persones que viatgen al bolo (#1363): alimenta el càrrec de transport de dues potes. */
   travelHeadcount?: number;
 }
@@ -65,6 +68,7 @@ export default function BookingMarginCard({
   fixedOperationalCost,
   targetMarginPct,
   serviceLinesCost = 0,
+  serviceLines = [],
   travelHeadcount = 0,
 }: BookingMarginProps) {
   const router = useRouter();
@@ -98,7 +102,13 @@ export default function BookingMarginCard({
   // Cost directe via la font única (computeDirectCostBreakdown), no reimplementat.
   // El helper gestiona pack real-vs-estimat (inventoryCostReal) i usa el travelCost
   // explícit que ja hem calculat. Els ratios vénen dels props (config de la reserva).
-  const { packCost: packCostUsed, extrasCost, extraHoursCost, directCost } = computeDirectCostBreakdown(
+  const {
+    packCost: packCostUsed,
+    extrasCost,
+    extraHoursCost,
+    transportMargin,
+    directCost,
+  } = computeDirectCostBreakdown(
     {
       total,
       packPrice,
@@ -108,8 +118,10 @@ export default function BookingMarginCard({
       distanceKm,
       vehicleCostPerKm,
       travelCost: calculatedTravelCost,
+      travelRevenue: calculatedTravelCharge,
       inventoryCostReal,
       serviceLinesCost,
+      serviceLines,
     },
     { ...PROFITABILITY_MODEL_DEFAULTS, packCostRatio, extraCostRatio, extraHourCostRatio, fixedOperationalCost },
   );
@@ -417,7 +429,7 @@ export default function BookingMarginCard({
         <div className="flex justify-between">
           <span>Marge transport</span>
           <span className={travelMarginColor}>
-            {formatCurrency(travelNetMargin)} {calculatedTravelCharge > 0 ? `(${travelMarginPct.toFixed(1)}%)` : ''}
+            {formatCurrency(transportMargin.marginAmount)} {calculatedTravelCharge > 0 ? `(${transportMargin.marginPct.toFixed(1)}%)` : ''}
           </span>
         </div>
       </div>

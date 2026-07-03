@@ -43,6 +43,7 @@ export async function buildCashFlowForecast(monthsAhead = 6): Promise<CashFlowMo
       distanceKm: true,
       pack: { select: { price: true, extraHourPrice: true } },
       extras: { select: { price: true, quantity: true } },
+      serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true } },
       extraHours: true,
     },
   });
@@ -88,6 +89,7 @@ export async function buildCashFlowForecast(monthsAhead = 6): Promise<CashFlowMo
         extraHourPrice: Number(booking.pack?.extraHourPrice) || 0,
         distanceKm: Number(booking.distanceKm) || 0,
         travelCost: typeof booking.travelCost === 'number' ? booking.travelCost : undefined,
+        serviceLines: booking.serviceLines,
       },
       config,
     );

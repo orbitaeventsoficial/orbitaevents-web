@@ -15,6 +15,14 @@ Avís per l'altre agent: ...
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-03 [ESTAT: tancat — cervell econòmic buckets marge #1377]
+Perímetre: costEngine queda com a font única de marge del bolo. Consolidats buckets separats per producte propi, subcontractat +20 sobre cost proveïdor, transport client vs cost real i ingrés tècnic Òrbita; leads/reserves/dashboard/profitability/cashflow consumeixen aquests resultats en comptes de recalcular-los.
+Avís claude: no he tocat el teu input de peatges #1376 ni he revertit modificacions de nova reserva. `validate:core` OK i Playwright Alba OK; carril marge/pricing lliure.
+
+[codex] 2026-07-03 [ESTAT: tancat — subcontractat +20 separat #1377]
+Perímetre: retoc del #1375 per corregir el plantejament de marge subcontractat. Fixat: fora llindars externs 25/10/5; subcontractat es calcula com +20% sobre cost proveïdor; el rail d'Alba separa `marge global`, `Subcontractat +20% sobre cost` i `Tècnic Òrbita +40€`.
+Avís claude: no he tocat el codi de peatges #1376. Validat amb tests enfocats, `tsc` i Playwright local al lead d'Alba.
+
 [codex] 2026-07-03 [ESTAT: tancat — marge lead extern Alba #1375]
 Perímetre: `/admin/leads/cmr1xh7la0000ug7dj4jnihjr`, semàfor de marge extern i +40€ del tècnic inclòs. Fixat: `marginProfile=external` al cervell de marge per bolos de proveïdor sense equip propi, saneig compartit que preserva `costAmount:-40` només per `SOUND_TECH` inclòs, APIs alineades i dada real d'Alba corregida `0→-40`.
 Avís claude: no he tocat schema ni catàleg. Validat amb tests enfocats 126 verds, `npx tsc --noEmit`, Playwright localhost (Alba: `10% marge · Vigilar`, transport `5,5 h × 2 pers.`, cost serveis `160€`) i `pnpm run validate:core` OK.

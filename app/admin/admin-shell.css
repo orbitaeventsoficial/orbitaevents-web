@@ -1483,15 +1483,73 @@ html.admin-mode .ap-ledger-travel-total-sub { font-family: var(--mono); font-siz
 html.admin-mode .ap-ledger-travel-note { font-size: var(--o-text-micro); color: var(--gold); max-width: 16rem; }
 /* Resum del pressupost (#1348): elements + transport → suma + total, estirat a l'amplada,
    exposat abans de contractar. El transport és línia estipulada que suma al total. */
+/* Rediseny #1377: flux vertical a tota l'amplada (abans 2 columnes que no lligaven i
+   deixaven aire mort). Desplaçament a dalt full-width, pressupost + repartiment a sota. */
 html.admin-mode .ap-ledger-budget {
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(16rem, 21rem);
-  align-items: center; gap: var(--o-space-4);
+  display: flex; flex-direction: column; gap: var(--o-space-3);
   margin-top: var(--o-space-3); padding: var(--o-space-3) var(--o-space-3) 0;
   border-top: 1px solid var(--line);
 }
-html.admin-mode .ap-ledger-budget-travel { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--o-space-25); align-content: flex-start; }
-html.admin-mode .ap-ledger-budget-travelnote {
-  flex: 1 1 100%; margin: 0; font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3); line-height: 1.5;
+
+/* ── DESPLAÇAMENT: peça de logística neta (rediseny #1377) ── */
+html.admin-mode .ap-ledger-trip {
+  display: flex; flex-direction: column; gap: var(--o-space-25);
+  padding: var(--o-space-3);
+  border: 1px solid var(--line2); border-radius: var(--o-r-md);
+  background: var(--panel);
+}
+html.admin-mode .ap-ledger-trip-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2);
+  padding-bottom: var(--o-space-2); border-bottom: 1px solid var(--line);
+}
+html.admin-mode .ap-ledger-trip-title {
+  font-family: var(--display); font-size: var(--o-text-md); font-weight: var(--o-fw-semi); color: var(--t);
+}
+html.admin-mode .ap-ledger-trip-badge {
+  font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3);
+  padding: 0.1rem var(--o-space-15); border-radius: 999px; border: 1px solid var(--line2);
+  background: var(--raised); white-space: nowrap;
+}
+/* Els grups (Ruta / Equip) en fila a desktop, amb un separador subtil entre ells. */
+html.admin-mode .ap-ledger-trip-grid {
+  display: flex; flex-wrap: wrap; gap: var(--o-space-2) var(--o-space-4);
+}
+html.admin-mode .ap-ledger-trip-group { flex: 1 1 auto; min-width: min(100%, 16rem); }
+html.admin-mode .ap-ledger-trip-grouplbl {
+  display: block; margin-bottom: var(--o-space-15);
+  font-family: var(--mono); font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold);
+  text-transform: uppercase; letter-spacing: 0.09em; color: var(--gold);
+}
+html.admin-mode .ap-ledger-trip-fields { display: flex; flex-wrap: wrap; gap: var(--o-space-2); }
+html.admin-mode .ap-ledger-trip-field { display: flex; flex-direction: column; gap: var(--o-space-1); flex: 1 1 6rem; min-width: 5rem; }
+html.admin-mode .ap-ledger-trip-field > span {
+  font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3);
+}
+/* Inputs amb fons propi que RESSALTA sobre el panell (abans es fonien). */
+html.admin-mode .ap-ledger-trip .adm-input {
+  background: var(--o-admin-canvas); border: 1px solid var(--line2);
+}
+html.admin-mode .ap-ledger-trip .adm-input:focus { border-color: var(--gold); }
+html.admin-mode .ap-ledger-trip-note {
+  margin: 0; font-family: var(--ui); font-size: var(--o-text-micro); color: var(--t3); line-height: 1.5;
+}
+/* Alarma de transport (#1377): més de 2 persones viatjant → vermell + avís. */
+html.admin-mode .ap-ledger-trip-badge[data-alarm="true"] {
+  color: var(--o-danger); border-color: color-mix(in oklab, var(--o-danger) 45%, var(--line));
+  background: color-mix(in oklab, var(--o-danger) 12%, var(--panel)); font-weight: var(--o-fw-semi);
+}
+html.admin-mode .ap-ledger-trip-field .adm-input[data-alarm="true"] {
+  border-color: color-mix(in oklab, var(--o-danger) 55%, var(--line));
+  color: var(--o-danger); font-weight: var(--o-fw-bold);
+}
+html.admin-mode .ap-ledger-trip-alarm {
+  margin: 0; display: flex; align-items: flex-start; gap: var(--o-space-1);
+  padding: var(--o-space-15) var(--o-space-2);
+  border: 1px solid color-mix(in oklab, var(--o-danger) 40%, var(--line));
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--o-danger) 10%, transparent);
+  font-family: var(--ui); font-size: var(--o-text-micro); line-height: 1.5;
+  color: color-mix(in oklab, var(--o-danger) 85%, var(--t));
 }
 /* La suma = panell destacat (or subtil): és la sortida clau del bolo abans de contractar. */
 html.admin-mode .ap-ledger-budget-sum {
@@ -1516,26 +1574,37 @@ html.admin-mode .ap-ledger-budget-row--total {
 html.admin-mode .ap-ledger-budget-row--total > span { font-family: var(--display); font-size: var(--o-text-md); font-weight: var(--o-fw-semi); color: var(--t); }
 html.admin-mode .ap-ledger-budget-row--total > strong { font-size: var(--o-text-2xl); font-weight: var(--o-fw-xbold); color: var(--gold); line-height: 1; }
 html.admin-mode .ap-ledger-budget-row--travel > strong { color: var(--gold); }
+/* ── REPARTIMENT de la ruta: <details> plegable i discret (rediseny #1377) ── */
 html.admin-mode .ap-ledger-route-settlement {
   grid-column: 1 / -1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--o-space-15);
-  padding: var(--o-space-25) var(--o-space-3);
+  padding: 0;
   border: 1px solid color-mix(in oklab, var(--line) 75%, transparent);
   border-radius: var(--o-r-md);
-  background: color-mix(in oklab, var(--raised) 54%, transparent);
+  background: color-mix(in oklab, var(--raised) 40%, transparent);
+  overflow: hidden;
 }
 html.admin-mode .ap-ledger-route-settlement-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: var(--o-space-3);
-  font-family: var(--display);
-  font-size: var(--o-text-md);
+  padding: var(--o-space-15) var(--o-space-3);
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--ui);
+  font-size: var(--o-text-sm);
   font-weight: var(--o-fw-semi);
-  color: var(--t);
+  color: var(--t2);
+  transition: color 130ms ease, background 130ms ease;
 }
+html.admin-mode .ap-ledger-route-settlement-head::-webkit-details-marker { display: none; }
+html.admin-mode .ap-ledger-route-settlement-head::after {
+  content: '▾'; margin-left: var(--o-space-1); color: var(--t3); font-size: var(--o-text-xs);
+  transition: transform 130ms ease;
+}
+html.admin-mode .ap-ledger-route-settlement[open] .ap-ledger-route-settlement-head::after { transform: rotate(180deg); }
+html.admin-mode .ap-ledger-route-settlement-head:hover { color: var(--t); background: color-mix(in oklab, var(--raised) 30%, transparent); }
+html.admin-mode .ap-ledger-route-settlement-head > span { margin-right: auto; }
 html.admin-mode .ap-ledger-route-settlement-head > strong {
   color: var(--gold);
   font-family: var(--display);
@@ -1546,6 +1615,7 @@ html.admin-mode .ap-ledger-route-settlement-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
   gap: var(--o-space-15);
+  padding: 0 var(--o-space-3) var(--o-space-25);
 }
 html.admin-mode .ap-ledger-route-settlement-row {
   display: flex;

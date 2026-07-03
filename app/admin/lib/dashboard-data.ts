@@ -276,7 +276,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
         travelCost: true,
         pack: { select: { price: true, extraHourPrice: true } },
         extras: { select: { price: true, quantity: true } },
-        serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true } },
+        serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true } },
       },
     }), CacheTTL.SHORT).catch(() => []),
     // ─── Financial forecasts (abans bloc 4 seqüencial) ─────────────────
@@ -369,7 +369,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     travelCost: number | null;
     pack: { price: number; extraHourPrice: number };
     extras: Array<{ price: number; quantity: number }>;
-    serviceLines: Array<{ revenueAmount: number | null; costAmount: number | null; quantity: number | null; collaboratorId: string | null }>;
+    serviceLines: Array<{ revenueAmount: number | null; costAmount: number | null; quantity: number | null; collaboratorId: string | null; kind?: string | null; label?: string | null }>;
   }>)
     .filter((b) => b.total > 0)
     .map((b) => {
@@ -386,6 +386,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
           travelCost: b.travelCost ?? 0,
           serviceLinesRevenue: serviceLines.revenue,
           serviceLinesCost: serviceLines.cost,
+          serviceLines: b.serviceLines,
         },
         profitConfig,
       );

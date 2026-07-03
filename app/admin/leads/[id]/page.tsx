@@ -8,7 +8,6 @@ import { DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
 import { TRAVEL_COST_LINE_MARKER } from '@/lib/services/travelLaborCost';
 import { computeBookingFinancialSummary } from '@/lib/services/costEngine';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
-import { computeSubcontractedMarkupSummary } from '@/lib/services/serviceLineCostRules';
 import type { WxData } from '@/app/admin/components/WxBadge';
 
 export const dynamic = 'force-dynamic';
@@ -177,8 +176,9 @@ export default async function LeadDetailPage({ params }: Props) {
     travelCharge: number; travelCost: number;
     acquisitionCost: number; serviceLinesCost: number; fixedOperationalCost: number;
     tone: 'emerald' | 'amber' | 'orange' | 'rose'; label: string;
+    ownServiceRevenue: number; ownServiceCost: number; ownServiceMarginAmount: number; ownServiceMarginPct: number;
     subcontractedCost: number; subcontractedMarkupAmount: number; subcontractedMarkupPct: number;
-    subcontractedMarkupOk: boolean; orbitaTechIncome: number;
+    subcontractedMarkupOk: boolean; transportMarginAmount: number; transportMarginPct: number; orbitaTechIncome: number;
   } | null = null;
   if (lead.booking) {
     const b = lead.booking;
@@ -191,7 +191,6 @@ export default async function LeadDetailPage({ params }: Props) {
         (s, l) => s + Number(l.revenueAmount || 0) * (l.quantity || 1), 0);
       const slCost = visibleServiceLines.reduce(
         (s, l) => s + Number(l.costAmount || 0) * (l.quantity || 1), 0);
-      const subcontracted = computeSubcontractedMarkupSummary(visibleServiceLines);
       const summary = computeBookingFinancialSummary({
         total: Number(b.total),
         packPrice: b.pack?.price ? Number(b.pack.price) : 0,
@@ -202,6 +201,8 @@ export default async function LeadDetailPage({ params }: Props) {
         travelCost: b.travelCost ? Number(b.travelCost) : 0,
         serviceLinesRevenue: slRevenue,
         serviceLinesCost: slCost,
+        serviceLines: visibleServiceLines,
+        serviceLinesOwnCostRatio: 0,
         source: lead.source,
       }, profitabilityConfig);
       bookingEconomia = {
@@ -216,11 +217,17 @@ export default async function LeadDetailPage({ params }: Props) {
         fixedOperationalCost: summary.fixedOperationalCost,
         tone: summary.marginTone.tone,
         label: summary.marginTone.label,
-        subcontractedCost: subcontracted.cost,
-        subcontractedMarkupAmount: subcontracted.markupAmount,
-        subcontractedMarkupPct: subcontracted.markupPct,
-        subcontractedMarkupOk: subcontracted.ok,
-        orbitaTechIncome: subcontracted.orbitaTechIncome,
+        ownServiceRevenue: summary.ownServiceMargin.revenue,
+        ownServiceCost: summary.ownServiceMargin.cost,
+        ownServiceMarginAmount: summary.ownServiceMargin.marginAmount,
+        ownServiceMarginPct: summary.ownServiceMargin.marginPct,
+        subcontractedCost: summary.subcontractedMarkup.cost,
+        subcontractedMarkupAmount: summary.subcontractedMarkup.markupAmount,
+        subcontractedMarkupPct: summary.subcontractedMarkup.markupPct,
+        subcontractedMarkupOk: summary.subcontractedMarkup.ok,
+        transportMarginAmount: summary.transportMargin.marginAmount,
+        transportMarginPct: summary.transportMargin.marginPct,
+        orbitaTechIncome: summary.orbitaTechIncome,
       };
     }
   }

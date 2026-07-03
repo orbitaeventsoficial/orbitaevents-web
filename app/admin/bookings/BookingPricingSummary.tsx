@@ -31,6 +31,23 @@ interface BookingPricingSummaryProps {
     netMargin: number;
     marginPct: number;
     tone: 'emerald' | 'amber' | 'orange' | 'rose';
+    ownServiceMargin?: {
+      revenue: number;
+      marginAmount: number;
+      marginPct: number;
+    };
+    subcontractedMarkup?: {
+      cost: number;
+      markupPct: number;
+      ok: boolean;
+    };
+    transportMargin?: {
+      revenue: number;
+      cost: number;
+      marginAmount: number;
+      marginPct: number;
+    };
+    orbitaTechIncome?: number;
   } | null;
 }
 
@@ -121,6 +138,30 @@ export default function BookingPricingSummary({
               {formatCurrency(marginEstimate.netMargin)} <small className="text-xs font-semibold text-[var(--t3)]">· {marginEstimate.marginPct.toFixed(0)}%</small>
             </b>
           </div>
+          {(marginEstimate.subcontractedMarkup?.cost ?? 0) > 0 && (
+            <div className={ROW_MUTED}>
+              <span>Subcontractat</span>
+              <b className="font-mono font-bold tabular-nums text-[var(--t2)]">{marginEstimate.subcontractedMarkup?.ok ? 'OK' : 'Baix'} · +{Math.round(marginEstimate.subcontractedMarkup?.markupPct ?? 0)}% sobre cost</b>
+            </div>
+          )}
+          {(marginEstimate.ownServiceMargin?.revenue ?? 0) > 0 && (
+            <div className={ROW_MUTED}>
+              <span>Producte propi</span>
+              <b className="font-mono font-bold tabular-nums text-[var(--t2)]">{formatCurrencyExact(marginEstimate.ownServiceMargin?.marginAmount ?? 0)} · {Math.round(marginEstimate.ownServiceMargin?.marginPct ?? 0)}%</b>
+            </div>
+          )}
+          {((marginEstimate.transportMargin?.revenue ?? 0) > 0 || (marginEstimate.transportMargin?.cost ?? 0) > 0) && (
+            <div className={ROW_MUTED}>
+              <span>Marge transport</span>
+              <b className="font-mono font-bold tabular-nums text-[var(--t2)]">{formatCurrencyExact(marginEstimate.transportMargin?.marginAmount ?? 0)} · {Math.round(marginEstimate.transportMargin?.marginPct ?? 0)}%</b>
+            </div>
+          )}
+          {(marginEstimate.orbitaTechIncome ?? 0) > 0 && (
+            <div className={ROW_MUTED}>
+              <span>Tècnic Òrbita</span>
+              <b className="font-mono font-bold tabular-nums text-[var(--t2)]">+{formatCurrencyExact(marginEstimate.orbitaTechIncome ?? 0)}</b>
+            </div>
+          )}
         </>
       )}
     </div>
