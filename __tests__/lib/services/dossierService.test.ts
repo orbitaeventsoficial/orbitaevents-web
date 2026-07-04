@@ -48,7 +48,7 @@ vi.mock('@/lib/constants/dossier-copy', () => ({
       summaryOfferLabel: '', summaryFormatLabel: '', summaryFormatValue: '', summaryGoalLabel: '', summaryGoalValue: '',
     },
     chapter: { eyebrow: '', priceLabel: '', priceFromPrefix: '', priceCustom: '', durationLabel: '', includesTitle: '', noteLabel: '' },
-    resum: { kicker: '', title: '', lead: '', totalLabel: '' },
+    resum: { kicker: '', title: '', lead: '' },
     cta: { label: '' },
   })),
   getOrbitaDossierProducts: vi.fn(async () => []),

@@ -210,10 +210,10 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
     salutacio: dossier.salutacio ?? undefined,
   };
   // Desplaçament al dossier enviat (#1394): el generador ja passa `travelKm` en viu, però
-  // l'email no ho feia → la secció de pressupost (serveis + desplaçament, catàleg SENSE total)
-  // quedava buida (`buildBudgetBlock` surt si travelKm<=0). El dossier no desa el km; si ve
-  // d'un lead, l'agafem del lead (font única) perquè el catàleg surti sencer i el client
-  // decideixi conscientment. Sense total: el dossier és catàleg, no factura.
+  // l'email no ho feia → la secció de desplaçament de la pàgina de proposta (que només es
+  // pinta si travelKm>0) quedava buida. El dossier no desa el km; si ve d'un lead, l'agafem
+  // del lead (font única) perquè la proposta surti sencera i el client decideixi conscient.
+  // Sense suma dels elements: el dossier és catàleg, no factura (#1396/#1397).
   let travelKm: number | undefined;
   let travelLocation: string | undefined;
   if (dossier.leadId) {

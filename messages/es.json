@@ -7053,14 +7053,10 @@
     "resum": {
       "kicker": "En resumen",
       "title": "Todo lo que os proponemos",
-      "lead": "Aquí tenéis, de un vistazo, todo lo que hemos pensado para vosotros. Los precios son un punto de partida —el «desde»—, todavía sin extras ni desplazamiento; lo acabamos de cerrar juntos cuando sepamos todos los detalles.",
-      "totalLabel": "La propuesta"
+      "lead": "Aquí tenéis, de un vistazo, el precio de partida —el «desde»— de cada propuesta y cómo funciona el desplazamiento. Todavía sin extras: no es una factura, es para que sepáis de qué hablamos cuando nos sentemos a cerrarlo juntos."
     },
     "budget": {
-      "kicker": "Transparencia",
-      "title": "Precios claros, sin sorpresas",
-      "lead": "Aquí tenéis lo que vale cada cosa, con el desplazamiento incluido hasta {includedKm} km desde Granollers. No es una factura: es para que sepáis de qué hablamos cuando nos sentemos a cerrarlo juntos.",
-      "servicesLabel": "Lo que incluye cada propuesta",
+      "servicesLabel": "Las propuestas",
       "travelTitle": "Desplazamiento",
       "travelNote": "Incluido hasta {includedKm} km desde Granollers. Para distancias superiores, el desplazamiento se calcula por el coste real del trayecto —vehículo y tiempo del equipo—, siempre claro y sin recargos sorpresa.",
       "travelRoute": "Vuestro evento es en {location}, a unos {km} km (ida y vuelta) desde Granollers. El desplazamiento se aplica sobre esta ruta.",

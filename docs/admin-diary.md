@@ -1,3 +1,29 @@
+## 2026-07-04 — Dossier: fusió resum+transparència en UNA pàgina (preu no repetit, transport explicat) (Canvi #1397, claude)
+
+### Context
+El propietari, fent de consultor-dissenyador: (1) el preu es repetia (resum i transparència eren quasi la mateixa pàgina); (2) volia el transport just després dels productes, explicat; (3) va PREGUNTAR si recomanava exposar les hores dels tècnics + dietes >150km. Em va demanar mirar el PDF sencer abans de construir.
+
+### Recomanació d'estratega (aprovada pel propietari amb «endavant»)
+- Fusionar sí (el preu a un sol lloc de recap).
+- Transport just després dels productes: sí.
+- Explicar el transport a nivell de PRINCIPI («temps de l'equip + vehicle, a cost, sense sorpreses» — ja a la copy), però NO itemitzar dietes ni el llindar de km: mou el marc mental del client cap al teu cost intern, sona a nickel-and-diming, i el llindar real són hores (no 150km).
+
+### Què s'ha fet (mirant el document sencer amb Playwright)
+- `buildResumBlock` + `buildBudgetBlock` → **una sola** `buildProposalBlock` (una `resum-page`): capçalera càlida + «Les propostes» amb «des de» (mai suma) + **just després** el bloc «Desplaçament» (principi + ruta real + caixa daurada `.bud-travel-price` amb el cost via `computeBoloTransport`). Transport només si `travelKm>0`. Eliminada la `bud-page` duplicada.
+- Copy 3 idiomes: `resum.lead` reescrit (presenta preus + desplaçament); `servicesLabel`→«Les propostes»; retirats `resum.totalLabel` i `budget.kicker/title/lead`. CSS mort netejat.
+
+### Validació
+- Validació tècnica: `tsc` 0; tests dossier-builder + dossierService 40/40; `validate:core` verd.
+- Validació funcional: dossier sencer capturat amb Playwright — UNA pàgina «Tot el que us proposem» (01 DJ 250€ / 02 Bingo 240€) + Desplaçament 322€ (Alba 422 km); cap `bud-page` ni suma; local 40 km sense bloc de transport.
+- Validació humana/UX: preu no repetit, transport on toca i explicat sense sonar a factura; document d'una sola mà.
+- ⚠️ `pnpm build` diferit (dev viu).
+
+### Coordinació
+Counter → 1397. Només dossier (builder + copy + comentari dossierService). NO he tocat els 5 fitxers dirty de Codex. Commit selectiu.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-04 — Dossier: fora la suma dels elements, preu del transport ben clar (Canvi #1396, claude)
 
 ### Context

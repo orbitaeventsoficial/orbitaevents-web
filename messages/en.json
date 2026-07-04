@@ -7053,14 +7053,10 @@
     "resum": {
       "kicker": "In short",
       "title": "Everything we propose",
-      "lead": "Here's everything we've thought up for you, at a glance. The figures are a starting point —the \"from\"—, still without extras or travel; we finalise it together once we know all the details.",
-      "totalLabel": "The proposal"
+      "lead": "Here, at a glance, is the starting price —the \"from\"— of each proposal and how travel works. Still without extras: it's not an invoice, it's so you know what we're talking about when we sit down to close it together."
     },
     "budget": {
-      "kicker": "Transparency",
-      "title": "Clear prices, no surprises",
-      "lead": "Here's what each thing costs, with travel included up to {includedKm} km from Granollers. It's not an invoice: it's so you know what we're talking about when we sit down to close it together.",
-      "servicesLabel": "What each proposal includes",
+      "servicesLabel": "The proposals",
       "travelTitle": "Travel",
       "travelNote": "Included up to {includedKm} km from Granollers. For longer distances, travel is charged at the real cost of the trip —vehicle and crew time—, always clear and with no surprise fees.",
       "travelRoute": "Your event is in {location}, about {km} km (round trip) from Granollers. Travel applies to this route.",

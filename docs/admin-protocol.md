@@ -1547,6 +1547,19 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1397 — 2026-07-04 — claude (FET)
+**Dossier: fusió del resum + transparència en UNA pàgina de proposta (el preu no es repeteix; transport just després, explicat a nivell de principi).**
+- Context: el propietari, com a consultor-dissenyador, detecta que el preu es repetia (resum + transparència eren quasi la mateixa pàgina) i demana el transport just després dels productes, explicat. Pregunta si recomano exposar hores de tècnics + dietes >150km. Resposta d'estratega (aprovada): fusionar sí; explicar el transport a nivell de PRINCIPI (temps de l'equip + vehicle, a cost, sense sorpreses) però NO itemitzar dietes ni el llindar de km (nickel-and-diming + exposa cost intern + el llindar real són hores, no 150km).
+- Fix: `buildResumBlock` + `buildBudgetBlock` fusionats en `buildProposalBlock` (una `resum-page`). Cada servei amb «des de» (referència, mai suma) i JUST DESPRÉS el bloc «Desplaçament» (política de principi + ruta real + caixa daurada `.bud-travel-price` amb el cost concret via `computeBoloTransport`). El transport només si `travelKm>0`. Eliminada la pàgina `bud-page` duplicada.
+- Copy: `resum.lead` reescrit (presenta preus + desplaçament); `budget.servicesLabel`→«Les propostes»; retirats `resum.totalLabel`, `budget.kicker/title/lead` (3 idiomes). CSS mort netejat (`resum-total*`, `bud-page/kicker/title/lead/list/row*/total*`).
+- Validació tècnica: `tsc` 0; tests dossier-builder + dossierService 40/40; `validate:core` verd.
+- Validació funcional: dossier sencer capturat amb Playwright — UNA pàgina «Tot el que us proposem» (01 DJ des de 250€ / 02 Bingo des de 240€) + Desplaçament 322€ (Alba/Andorra 422 km); cap `bud-page` ni suma; local 40 km → sense bloc de transport.
+- Validació humana/UX: el preu no es repeteix, el transport surt on toca i explicat sense sonar a factura; el document sembla d'una sola mà.
+- `ADMIN_CHANGE_COUNTER` passa a `1397`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1396 — 2026-07-04 — claude (FET)
 **Dossier: fora la suma dels elements; el transport, després i ben clar a la pàgina de transparència.**
 - Context: el propietari, mirant el dossier generat en viu, veia al peu del resum «La proposta, a partir de · **des de 490€**» que SUMAVA els elements (250 DJ + 240 Bingo). «des de 490€ sí que suma i no vull que sumi». I l'acord: (1) no sumar els elements, (2) el transport **després i ben clar**, no barrejat al resum.

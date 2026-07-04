@@ -7347,14 +7347,10 @@
     "resum": {
       "kicker": "En resum",
       "title": "Tot el que us proposem",
-      "lead": "Aquí teniu, d'un cop d'ull, tot el que hem pensat per a vosaltres. Els preus són un punt de partida —el «des de»—, encara sense extres ni desplaçament; ho acabem de tancar junts quan sapiguem tots els detalls.",
-      "totalLabel": "La proposta"
+      "lead": "Aquí teniu, d'un cop d'ull, el preu de partida —el «des de»— de cada proposta i com funciona el desplaçament. Encara sense extres: no és una factura, és perquè sapigueu de què parlem quan ens asseiem a tancar-ho junts."
     },
     "budget": {
-      "kicker": "Transparència",
-      "title": "Preus clars, sense sorpreses",
-      "lead": "Aquí teniu el que val cada cosa, amb el desplaçament inclòs fins a {includedKm} km des de Granollers. No és una factura: és perquè sapigueu de què parlem quan ens asseiem a tancar-ho junts.",
-      "servicesLabel": "El que inclou cada proposta",
+      "servicesLabel": "Les propostes",
       "travelTitle": "Desplaçament",
       "travelNote": "Inclòs fins a {includedKm} km des de Granollers. Per a distàncies superiors, el desplaçament es calcula pel cost real del trajecte —vehicle i temps de l'equip—, sempre clar i sense recàrrecs sorpresa.",
       "travelRoute": "El vostre esdeveniment és a {location}, a uns {km} km (anada i tornada) des de Granollers. El desplaçament s'aplica sobre aquesta ruta.",
