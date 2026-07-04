@@ -1,3 +1,24 @@
+## 2026-07-04 — El dossier enviat no mostrava el desplaçament + ruta concreta (Canvi #1395, claude)
+
+### Context
+El propietari: «que surti tot, el client ha d'entendre una decisió conscient… però no la suma total, perquè el dossier és un catàleg». El dossier enviat per email no mostrava la secció de pressupost.
+
+### Què s'ha fet
+- Causa: `sendDossierByEmail` no passava `travelKm` a `buildDossierHtml` → `buildBudgetBlock` sortia buit i tota la secció desapareixia (el generador en viu sí que el passava).
+- Fix: carrega `distanceKm` + `eventLocation` del lead (via `dossier.leadId`) i els passa. Secció renderitzada: serveis «des de» + desplaçament, CAP total (catàleg, doctrina #1371 intacta).
+- Decisió conscient: NOVA copy `dossier.budget.travelRoute` (ca/es/en) amb la ruta real de l'esdeveniment; `buildBudgetBlock` la pinta quan hi ha `location`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0; test builder 25/25 (ruta concreta + no-total); `validate:core` verd (i18n-keys-sync); `pnpm build`.
+- Validació funcional: builder amb 422 km + «l'Aldosa» conté ambdós i cap `bud-total`.
+- Validació humana/UX: el dossier ensenya el desplaçament honest i concret sense ser factura.
+
+### Coordinació
+Counter → 1395. Toca `dossierService` + `dossier-html-builder` + copy (carril dossier de Codex, ara net al worktree). Worktree barrejat → commit selectiu.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-04 — Bug: la reserva des d'un lead no heretava els km (Canvi #1394, claude)
 
 ### Context

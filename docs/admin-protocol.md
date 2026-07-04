@@ -1547,6 +1547,20 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1395 — 2026-07-04 — claude (FET)
+**El dossier enviat per email no mostrava el desplaçament + ruta concreta (catàleg, sense total).**
+- Context: el propietari («que surti tot, el client ha d'entendre una decisió conscient… el que no ha de sortir és la suma total perquè el dossier és un catàleg»). El dossier ENVIAT no mostrava la secció de pressupost.
+- Causa: `sendDossierByEmail` no passava `travelKm` a `buildDossierHtml` → `buildBudgetBlock` sortia buit (`travelKm<=0`) i tota la secció (serveis + desplaçament) desapareixia. El generador en viu sí que el passava; l'email no.
+- Fix: `sendDossierByEmail` carrega `distanceKm` + `eventLocation` del lead (via `dossier.leadId`, el dossier no els desa) i els passa. Ara la secció es renderitza: serveis amb «des de», desplaçament, i CAP total (catàleg, no factura — es manté la doctrina #1371).
+- Decisió conscient: NOVA copy `dossier.budget.travelRoute` (ca/es/en, monocapa) que diu la ruta REAL de l'esdeveniment («El vostre esdeveniment és a {location}, a uns {km} km…»). `buildBudgetBlock` la pinta quan hi ha `location`. El client veu on és el seu bolo i quants km → decideix conscient, però sense total.
+- Validació tècnica: `npx tsc --noEmit` 0; test `dossier-html-builder` 25/25 (nou cas ruta concreta + no-total); `validate:core` verd (i18n-keys-sync amb les 3 claus); `pnpm build`.
+- Validació funcional: el builder amb `travelKm:422, location:"l'Aldosa"` conté «l'Aldosa» + «422» i cap `bud-total`.
+- Validació humana/UX: el dossier torna a ensenyar el desplaçament de forma honesta i concreta, sense convertir-se en factura.
+- `ADMIN_CHANGE_COUNTER` passa a `1395`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1394 — 2026-07-04 — claude (FET)
 **Bug: la reserva creada des d'un lead no heretava els km ni els peatges (començava a 0).**
 - Context: el propietari detecta que en crear reserva des d'un lead, el transport no arrossega («no recull els km ni el municipi»). El municipi (`eventLocation`) sí que arribava; els km calculats al lead (p. ex. Alba/Andorra 422) es perdien i la reserva naixia amb 0, esperant re-geocodificar.

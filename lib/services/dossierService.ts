@@ -209,7 +209,26 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
     eventDesc: dossier.eventDesc ?? undefined,
     salutacio: dossier.salutacio ?? undefined,
   };
-  const html = buildDossierHtml(clientInfo, products, dossierCopy, { locale: 'ca-ES' });
+  // Desplaçament al dossier enviat (#1394): el generador ja passa `travelKm` en viu, però
+  // l'email no ho feia → la secció de pressupost (serveis + desplaçament, catàleg SENSE total)
+  // quedava buida (`buildBudgetBlock` surt si travelKm<=0). El dossier no desa el km; si ve
+  // d'un lead, l'agafem del lead (font única) perquè el catàleg surti sencer i el client
+  // decideixi conscientment. Sense total: el dossier és catàleg, no factura.
+  let travelKm: number | undefined;
+  let travelLocation: string | undefined;
+  if (dossier.leadId) {
+    const lead = await prisma.lead.findUnique({
+      where: { id: dossier.leadId },
+      select: { distanceKm: true, eventLocation: true },
+    });
+    if (lead?.distanceKm != null && lead.distanceKm > 0) travelKm = lead.distanceKm;
+    if (lead?.eventLocation) travelLocation = lead.eventLocation;
+  }
+  const html = buildDossierHtml(clientInfo, products, dossierCopy, {
+    locale: 'ca-ES',
+    travelKm,
+    location: travelLocation,
+  });
 
   const productsLabel = products.map((p) => p.nom).join(', ');
   const subject = `Dossier Òrbita Events — ${dossier.nom}`;

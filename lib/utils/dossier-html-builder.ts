@@ -50,6 +50,7 @@ export type DossierCopy = {
     servicesLabel: string;
     travelTitle: string;
     travelNote: string;
+    travelRoute: string;
     vatNote: string;
   };
   cta: { label: string };
@@ -243,6 +244,7 @@ function buildBudgetBlock(
 
     <div class="bud-group-label">${escHtml(copy.budget.travelTitle)}</div>
     <p class="bud-note">${fill(copy.budget.travelNote, { includedKm: String(includedOneWay) })}</p>
+    ${location ? `<p class="bud-note bud-note--route">${fill(copy.budget.travelRoute, { location, km: String(Math.round(travelKm)) })}</p>` : ''}
     <p class="bud-note">${escHtml(copy.budget.vatNote)}</p>
   </section>`;
 }

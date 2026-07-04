@@ -7064,6 +7064,7 @@
       "servicesLabel": "What each proposal includes",
       "travelTitle": "Travel",
       "travelNote": "Included up to {includedKm} km from Granollers. For longer distances, travel is charged at the real cost of the trip —vehicle and crew time—, always clear and with no surprise fees.",
+      "travelRoute": "Your event is in {location}, about {km} km (round trip) from Granollers. Travel applies to this route.",
       "vatNote": "Indicative prices. VAT and final adjustments are set in the definitive proposal."
     },
     "cta": {

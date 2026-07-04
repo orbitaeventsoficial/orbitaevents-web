@@ -60,6 +60,7 @@ const copy: DossierCopy = {
     servicesLabel: 'El que inclou cada proposta',
     travelTitle: 'Desplaçament',
     travelNote: 'Inclòs fins a {includedKm} km; després, cost real del trajecte.',
+    travelRoute: 'El vostre esdeveniment és a {location}, a uns {km} km des de Granollers.',
     vatNote: "Preus orientatius; l'IVA es tanca a la proposta.",
   },
   cta: { label: 'Per confirmar disponibilitat o per a qualsevol dubte' },
@@ -275,6 +276,16 @@ describe('buildDossierHtml', () => {
     // El preu del servei SÍ hi és (el que val), com a referència.
     expect(html).toContain('200');
     // El dossier és presentació de valor, NO una factura: cap total sumat que espanti.
+    expect(html).not.toContain('class="bud-total"');
+  });
+
+  it('mostra la RUTA concreta de l\'esdeveniment per a una decisió conscient (#1394)', () => {
+    const a: AnimacioProduct = { id: 'orbita:dj', nom: 'DJ', descripcio: ['x'], inclou: ['x'], priceFrom: 200 };
+    const html = build(client, [a], { travelKm: 422, location: "l'Aldosa" });
+    // El client veu ON és el seu bolo i quants km → decideix conscientment.
+    expect(html).toContain("l'Aldosa");
+    expect(html).toContain('422');
+    // Segueix sent catàleg: cap total.
     expect(html).not.toContain('class="bud-total"');
   });
 

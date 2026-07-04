@@ -7358,6 +7358,7 @@
       "servicesLabel": "El que inclou cada proposta",
       "travelTitle": "Desplaçament",
       "travelNote": "Inclòs fins a {includedKm} km des de Granollers. Per a distàncies superiors, el desplaçament es calcula pel cost real del trajecte —vehicle i temps de l'equip—, sempre clar i sense recàrrecs sorpresa.",
+      "travelRoute": "El vostre esdeveniment és a {location}, a uns {km} km (anada i tornada) des de Granollers. El desplaçament s'aplica sobre aquesta ruta.",
       "vatNote": "Preus orientatius. L'IVA i els ajustos finals es tanquen a la proposta definitiva."
     },
     "cta": {
