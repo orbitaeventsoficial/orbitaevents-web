@@ -58,7 +58,7 @@ export type DossierCopy = {
     includesTitle: string;
     noteLabel: string;
   };
-  resum: { kicker: string; title: string; lead: string; totalLabel: string; travelLabel: string };
+  resum: { kicker: string; title: string; lead: string; totalLabel: string };
   budget: {
     kicker: string;
     title: string;
@@ -157,15 +157,14 @@ function buildProductBlock(product: AnimacioProduct, num: number, copy: DossierC
 /**
  * Resum de la proposta. Decisió del propietari (#1396): el dossier ENSENYA cada servei
  * amb el seu preu «des de» com a referència, però NO suma un total dels elements (un total
- * sec espanta i el dossier és presentació de valor, no una factura). L'ÚNIC import concret
- * del peu és el desplaçament d'aquesta ruta —cost real i transparent (font única
- * `computeBoloTransport`, mai fórmula pròpia)— perquè el client decideixi conscientment.
+ * sec espanta i el dossier és presentació de valor, no una factura). El desplaçament NO surt
+ * aquí: es mostra DESPRÉS i ben clar a la pàgina «Transparència» (`buildBudgetBlock`), perquè
+ * al resum no barregem catàleg amb la xifra del transport.
  */
 function buildResumBlock(
   products: AnimacioProduct[],
   copy: DossierCopy,
   locale: string,
-  travelKm: number,
 ): string {
   if (products.length === 0) return '';
 
@@ -188,15 +187,6 @@ function buildResumBlock(
     })
     .join('\n      ');
 
-  // Peu: proposta (sense suma) + desplaçament clar (l'únic € concret) si es coneix la ruta.
-  const travelCharge = dossierTravelCharge(travelKm);
-  const travelBlock = travelCharge > 0
-    ? `<div class="resum-total-right">
-        <span class="resum-total-label">${escHtml(copy.resum.travelLabel)}</span>
-        <span class="resum-total-value">${escHtml(formatCurrency(travelCharge, locale))}</span>
-      </div>`
-    : '';
-
   return `
   <section class="resum-page">
     <div class="resum-kicker">${escHtml(copy.resum.kicker)}</div>
@@ -206,11 +196,8 @@ function buildResumBlock(
       ${rows}
     </ul>
     <div class="resum-total">
-      <div class="resum-total-left">
-        <span class="resum-total-label">${escHtml(copy.resum.totalLabel)}</span>
-        <span class="resum-total-hint">${formatOfferCount(copy, products.length)}</span>
-      </div>
-      ${travelBlock}
+      <span class="resum-total-label">${escHtml(copy.resum.totalLabel)}</span>
+      <span class="resum-total-hint">${formatOfferCount(copy, products.length)}</span>
     </div>
   </section>`;
 }
@@ -289,7 +276,7 @@ export function buildDossierHtml(
     .map((p, i) => buildProductBlock(p, i + 1, copy, locale, options.logoDataUri, false))
     .join('\n');
 
-  const resumBloc = buildResumBlock(products, copy, locale, options.travelKm ?? 0);
+  const resumBloc = buildResumBlock(products, copy, locale);
   const budgetBloc = buildBudgetBlock(products, copy, locale, options.travelKm ?? 0, options.location);
 
   const salutacioHtml = escHtml(salutacio).replace(/\n\n/g, '<br><br>');
@@ -523,20 +510,18 @@ export function buildDossierHtml(
     .resum-row-preu { font-size: 18px; font-weight: 600; color: var(--o-ink); white-space: nowrap; }
     .resum-row-preu--mida { color: var(--o-ink-mute); font-style: italic; }
     .resum-total {
-      display: flex; align-items: center; justify-content: space-between; gap: 24px;
+      display: flex; flex-direction: column; align-items: center; text-align: center; gap: 7px;
       background: linear-gradient(120deg, var(--o-carbon-2), var(--o-carbon));
-      color: #fff; padding: 28px 32px; border: 1px solid var(--o-gold-deep); position: relative;
+      color: #fff; padding: 22px 32px; border: 1px solid var(--o-gold-deep); position: relative;
     }
     .resum-total::before {
       content: ''; position: absolute; inset: 5px; border: 1px solid rgba(215,184,110,0.22); pointer-events: none;
     }
     .resum-total-label {
-      display: block; font-family: 'Inter', Arial, sans-serif; font-size: 10px; letter-spacing: 0.22em;
-      text-transform: uppercase; color: rgba(215,184,110,0.85); font-weight: 600; margin-bottom: 8px;
+      font-family: 'Inter', Arial, sans-serif; font-size: 10px; letter-spacing: 0.24em;
+      text-transform: uppercase; color: rgba(215,184,110,0.9); font-weight: 600;
     }
-    .resum-total-hint { display: block; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: rgba(255,255,255,0.55); }
-    .resum-total-right { text-align: right; }
-    .resum-total-value { display: block; font-size: 40px; font-weight: 600; color: var(--o-gold-bright); letter-spacing: 0.005em; }
+    .resum-total-hint { font-family: 'Inter', Arial, sans-serif; font-size: 13px; color: rgba(255,255,255,0.62); letter-spacing: 0.01em; }
 
     /* ---------- PRESSUPOST DESGLOSSAT ---------- */
     .bud-page { page-break-inside: avoid; page-break-before: always; break-before: page; padding-top: 60px; margin-bottom: 56px; }
@@ -590,9 +575,6 @@ export function buildDossierHtml(
       .resum-row { flex-wrap: wrap; }
       .resum-row-dots { display: none; }
       .resum-row-preu { margin-left: auto; }
-      .resum-total { flex-direction: column; align-items: flex-start; gap: 14px; }
-      .resum-total-right { text-align: left; }
-      .resum-total-value { font-size: 32px; }
       .bud-title { font-size: 32px; }
       .bud-row { flex-wrap: wrap; }
       .bud-row-dots { display: none; }

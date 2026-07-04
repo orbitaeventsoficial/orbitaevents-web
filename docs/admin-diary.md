@@ -1,18 +1,18 @@
 ## 2026-07-04 — Dossier: fora la suma dels elements, preu del transport ben clar (Canvi #1396, claude)
 
 ### Context
-El propietari, mirant el dossier generat en viu: veia un peu de resum «La proposta, a partir de · 2 propostes · **des de 490€**» que SUMAVA els elements (250 DJ + 240 Bingo). «des de 490€ sí que suma i no vull que sumi». I recordava l'acord: (1) NO sumar el preu dels elements, (2) SÍ mostrar clar el preu del transport. El #1371 havia tret el total del `buildBudgetBlock` però el `buildResumBlock` s'havia quedat sumant; i el transport es comunicava només com a política (inclòs fins a X km), sense xifra.
+El propietari, mirant el dossier generat en viu: (1) al peu del resum veia «La proposta, a partir de · **des de 490€**» que SUMAVA els elements (250 DJ + 240 Bingo) → «des de 490€ sí que suma i no vull que sumi»; (2) l'acord era el transport **després i ben clar**, no barrejat al resum («Transparència així no · el transport després i ben clar»). Em va demanar comportar-me com un dissenyador sènior i mirar el PDF SENCER abans de construir.
 
-### Què s'ha fet
-- `buildResumBlock` (dossier-html-builder): **eliminada la suma** dels `priceFrom`. Cada servei manté el seu «des de» com a referència; el peu ja no pinta cap total dels elements. L'únic € concret del peu és el **desplaçament d'aquesta ruta** (si es coneixen els km).
-- `buildBudgetBlock`: a la secció «Desplaçament», nova línia `.bud-travel-price` amb el **cost del desplaçament** clar (abans només política).
-- Font única del càrrec: **`computeBoloTransport({ roundTripKm, headcountOverride: 2 })`** (mateixa convenció pre-venda que `PresupuestoPdfStudio`; nou helper `dossierTravelCharge`). Zero fórmula pròpia. Rutes locals (càrrec 0) no mostren cap xifra.
-- Copy nova als 3 idiomes: `resum.travelLabel`, `budget.travelPriceLabel`; `resum.totalLabel` sense «a partir de»; retirat `resum.customSuffix` (i CSS `.resum-total-mida` mort).
+### Què s'ha fet (mirant el document sencer amb Playwright, pàgina a pàgina)
+- `buildResumBlock`: **eliminada la suma** dels `priceFrom`. Cada servei manté el «des de» com a referència. La banda fosca del peu (abans «total») passa a **tancament centrat i intencional** («La proposta / N propostes per a vosaltres»), sense columna dreta buida — un dissenyador no deixa una caixa mig buida.
+- El transport NO surt al resum: es mostra **només a la pàgina «Transparència»** (`buildBudgetBlock`), amb caixa daurada destacada `.bud-travel-price` «Cost del desplaçament · {import}».
+- Font única del càrrec: **`computeBoloTransport({ roundTripKm, headcountOverride: 2 })`** (convenció pre-venda com `PresupuestoPdfStudio`; helper `dossierTravelCharge`). Zero fórmula pròpia. Rutes locals (càrrec 0) no mostren xifra.
+- Copy 3 idiomes: `budget.travelPriceLabel` nou; `resum.totalLabel` sense «a partir de»; retirats `resum.customSuffix` i `resum.travelLabel`. CSS mort netejat (`resum-total-value/right/mida`).
 
 ### Validació
-- Validació tècnica: `npx tsc --noEmit` 0; `validate:core` verd (i18n-keys-sync quadra les 3 llengües); tests dossier-builder + dossierService + profitabilityService 60/60.
-- Validació funcional: cervell únic verificat — 40 km (local) → 0€ (sense línia); 422 km (Andorra/Alba) → **321,72€** de transport clar; la suma 490€ dels elements no apareix mai al resum.
-- Validació humana/UX: el dossier ensenya el valor de cada cosa sense fer de factura, i el desplaçament és una decisió conscient amb xifra real.
+- Validació tècnica: `npx tsc --noEmit` 0; `validate:core` verd (i18n-keys-sync + qa:protocol); tests dossier-builder + dossierService + profitabilityService 60/60.
+- Validació funcional (VISUAL, dissenyador): dossier sencer capturat amb Playwright — resum net (250/240, mai 490) amb tancament centrat equilibrat; Transparència amb desplaçament **322€** (Alba/Andorra 422 km); local 40 km → 0€ sense línia.
+- Validació humana/UX: el resum és catàleg que no espanta; el transport surt després i ben clar; el document sembla fet per una sola mà.
 - ⚠️ `pnpm build` diferit: el dev server és viu (propietari verificant); build clobbeja el dev (`.next` compartit). A fer en tancar sessió.
 
 ### A banda (base neta)

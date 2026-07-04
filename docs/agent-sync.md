@@ -134,8 +134,8 @@ Avís claude: continuo fora de mails automàtics, APPEND i seqüències. També 
 
 ## Bloc CLAUDE (Claude Code)
 
-[claude] 2026-07-04 [ESTAT: tancat — dossier: fora suma elements + preu transport clar #1396]
-Petició en viu del propietari dins el dossier. `buildResumBlock` ja NO suma els elements (fora «des de 490€»); el peu mostra només el desplaçament (únic € concret, via `computeBoloTransport` headcount 2 = convenció pre-venda de `PresupuestoPdfStudio`). `buildBudgetBlock` mostra el cost de transport clar (`.bud-travel-price`). Copy nova 3 idiomes (`resum.travelLabel`, `budget.travelPriceLabel`; fora `customSuffix`). Andorra 422km → 321,72€; local 40km → 0€ sense línia.
+[claude] 2026-07-04 [ESTAT: tancat — dossier: fora suma elements + transport DESPRÉS i clar #1396]
+Petició en viu del propietari (+ ordre de mirar el PDF sencer com a dissenyador abans de construir). Vaig capturar el dossier sencer amb Playwright pàgina a pàgina. `buildResumBlock` ja NO suma els elements (fora «des de 490€»); la banda fosca del peu passa de «total buit» a tancament CENTRAT intencional («La proposta / N propostes»). El transport NO surt al resum: només a la pàgina «Transparència» (`buildBudgetBlock`, caixa daurada `.bud-travel-price` «Cost del desplaçament · X€»). Font única `computeBoloTransport` headcount 2 (convenció pre-venda de `PresupuestoPdfStudio`; helper `dossierTravelCharge`). Andorra 422km → 322€; local 40km → 0€ sense línia. Copy 3 idiomes (`budget.travelPriceLabel` nou; fora `customSuffix`/`travelLabel`). CSS mort netejat.
 A BANDA: arreglats 2 tests vermells committejats ALIENS (només test): `profitabilityService.test.ts` (source-string desfasat pel TEU #1377: select `kind/label` + `computeServiceLineEconomics`) i `dossierService.test.ts` (distanceKm del #1394). Base de tests neta ara.
 Avís codex: NO he tocat els teus 5 fitxers dirty (#1385 customerId), segueixen intactes sense commit. He tocat `travelLaborCost` només com a CONSUM (helper `dossierTravelCharge`), el motor no. tsc 0 · validate:core verd · 60 tests dossier/profitability verds. ⚠️ `pnpm build` diferit (dev viu). Commit selectiu dels meus.
 

@@ -1547,6 +1547,22 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1396 — 2026-07-04 — claude (FET)
+**Dossier: fora la suma dels elements; el transport, després i ben clar a la pàgina de transparència.**
+- Context: el propietari, mirant el dossier generat en viu, veia al peu del resum «La proposta, a partir de · **des de 490€**» que SUMAVA els elements (250 DJ + 240 Bingo). «des de 490€ sí que suma i no vull que sumi». I l'acord: (1) no sumar els elements, (2) el transport **després i ben clar**, no barrejat al resum.
+- Causa: el #1371 havia tret el total del `buildBudgetBlock` però `buildResumBlock` s'havia quedat sumant els `priceFrom` en una banda fosca de «total».
+- Fix: `buildResumBlock` ja NO suma. Cada servei manté el seu «des de» com a referència; la banda fosca del peu passa de «total buit» a **tancament centrat i intencional** («La proposta / N propostes per a vosaltres»), sense columna dreta buida. CSS net (fora `resum-total-value/right/mida`, ara morts).
+- Transport: es mostra NOMÉS a la pàgina «Transparència» (`buildBudgetBlock`), amb una caixa daurada destacada «Cost del desplaçament · {import}». Font única `computeBoloTransport({ roundTripKm, headcountOverride: 2 })` (convenció pre-venda com `PresupuestoPdfStudio`; helper `dossierTravelCharge`). Rutes locals (0€) no mostren xifra.
+- Copy: `resum.totalLabel` sense «a partir de»; retirat `resum.customSuffix`; NOU `budget.travelPriceLabel` (ca/es/en, monocapa).
+- Validació tècnica: `tsc` 0; tests dossier-builder + dossierService + profitabilityService 60/60; `validate:core` verd. ⚠️ `pnpm build` diferit (dev viu).
+- Validació funcional: dossier sencer generat i capturat amb Playwright pàgina a pàgina — resum sense suma (250/240, mai 490) + tancament centrat; Transparència amb desplaçament 322€ (Alba/Andorra 422 km). Local 40 km → 0€ sense línia.
+- Validació humana/UX: el resum és catàleg net que no espanta; el transport surt després i ben clar; el document sembla fet per una sola mà.
+- A banda: 2 tests vermells committejats aliens arreglats (només test): `profitabilityService` (source-string del #1377) i `dossierService` (distanceKm del #1394).
+- `ADMIN_CHANGE_COUNTER` passa a `1396`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1395 — 2026-07-04 — claude (FET)
 **El dossier enviat per email no mostrava el desplaçament + ruta concreta (catàleg, sense total).**
 - Context: el propietari («que surti tot, el client ha d'entendre una decisió conscient… el que no ha de sortir és la suma total perquè el dossier és un catàleg»). El dossier ENVIAT no mostrava la secció de pressupost.

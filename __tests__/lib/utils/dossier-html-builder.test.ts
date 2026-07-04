@@ -51,7 +51,6 @@ const copy: DossierCopy = {
     title: 'Resum de la proposta',
     lead: 'Una mirada de conjunt.',
     totalLabel: 'La proposta',
-    travelLabel: "Desplaçament d'aquesta ruta",
   },
   budget: {
     kicker: 'Transparència',
@@ -238,7 +237,7 @@ describe('buildDossierHtml', () => {
     expect(html).not.toContain('490');
   });
 
-  it('el peu del resum mostra el DESPLAÇAMENT com a únic € concret quan es coneix la ruta (#1396)', () => {
+  it('el resum NO mostra la xifra del transport: va després, a la pàgina de transparència (#1396)', () => {
     const a: AnimacioProduct = {
       id: 'orbita:dj-base',
       nom: 'DJ base',
@@ -246,13 +245,14 @@ describe('buildDossierHtml', () => {
       inclou: ['DJ professional'],
       priceFrom: 250,
     };
-    const senseRuta = build(client, [a]);
-    // Sense km coneguts, el peu no inventa cap xifra de transport.
-    expect(senseRuta).not.toContain("Desplaçament d'aquesta ruta");
-
-    const ambRuta = build(client, [a], { travelKm: 422, location: "l'Aldosa" });
-    expect(ambRuta).toContain("Desplaçament d'aquesta ruta");
-    expect(ambRuta).toContain('resum-total-value');
+    const html = build(client, [a], { travelKm: 422, location: "l'Aldosa" });
+    // El resum és catàleg net: cap valor a la dreta del peu (ni suma ni transport).
+    expect(html).not.toContain('resum-total-value');
+    // El transport surt DESPRÉS, a la pàgina «Preus clars» (bud-page).
+    const budIndex = html.indexOf('class="bud-travel-price"');
+    const resumIndex = html.indexOf('class="resum-page"');
+    expect(budIndex).toBeGreaterThan(resumIndex);
+    expect(html).toContain('Cost del desplaçament');
   });
 
   it('no pinta el resum econòmic amb llista de productes buida', () => {
