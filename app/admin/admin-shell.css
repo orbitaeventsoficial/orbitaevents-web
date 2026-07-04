@@ -3616,18 +3616,22 @@ html.admin-mode .ap-maxims {
 }
 /* Al shell (#1391) viu com a primer fill de .ax__page, que no té gap → separa'l del contingut. */
 html.admin-mode .ax__page > .ap-maxims { margin-bottom: var(--o-space-3); }
-/* Segell fix daurat (substitueix l'etiqueta de text): absolut a l'esquerra perquè la frase
-   quedi centrada al centre ABSOLUT de la barra i el ✦ no es mogui mai. */
+/* Segells daurats simètrics: un a cada extrem (absoluts, fixos) enmarquen la frase centrada
+   → la barra queda equilibrada i el conjunt se sent centrat. No es mouen mai. */
 html.admin-mode .ap-maxims-mark {
-  position: absolute; left: var(--o-space-35); top: 50%; transform: translateY(-50%);
-  color: var(--gold); font-size: var(--o-text-sm); line-height: 1; opacity: 0.85;
+  position: absolute; top: 50%; transform: translateY(-50%);
+  color: var(--gold); font-size: var(--o-text-sm); line-height: 1; opacity: 0.7;
 }
+html.admin-mode .ap-maxims-mark--left { left: var(--o-space-35); }
+html.admin-mode .ap-maxims-mark--right { right: var(--o-space-35); }
 html.admin-mode .ap-maxims-viewport {
-  flex: 1 1 auto; min-width: 0;
+  position: relative; flex: 1 1 auto; min-width: 0;
   display: flex; align-items: center; justify-content: center; min-height: 1.5rem;
 }
+/* Absolut + centrat: la frase sortint i l'entrant se superposen al mateix lloc → crossfade
+   solapat real (mai queda buit), i el centrat no es mou entre frases. */
 html.admin-mode .ap-maxims-item {
-  margin: 0; text-align: center;
+  position: absolute; left: 0; right: 0; margin: 0; text-align: center;
   font-family: var(--display); font-size: var(--o-text-sm); font-weight: var(--o-fw-semi);
   color: var(--ax-t); line-height: 1.35;
 }

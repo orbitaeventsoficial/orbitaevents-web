@@ -11,8 +11,8 @@ import { ADMIN_ECONOMY_MAXIMS } from '@/lib/constants/admin';
  * l'ull no persegueix res. Es pausa en hover; respecta `prefers-reduced-motion` (canvi net).
  * Presentacional: les frases són font única a `ADMIN_ECONOMY_MAXIMS` (constants).
  */
-const HOLD_MS = 9000;      // estàtic llarg abans de fondre a la següent
-const FADE_S = 1.8;        // fosa molt progressiva
+const HOLD_MS = 11000;     // estàtic llarg abans de fondre a la següent
+const FADE_S = 2.8;        // fosa molt suau i lenta (crossfade solapat, sense buit)
 
 export default function MaximsTicker() {
   const [index, setIndex] = useState(0);
@@ -35,9 +35,11 @@ export default function MaximsTicker() {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <span className="ap-maxims-mark" aria-hidden="true">✦</span>
+      <span className="ap-maxims-mark ap-maxims-mark--left" aria-hidden="true">✦</span>
       <div className="ap-maxims-viewport">
-        <AnimatePresence mode="wait">
+        {/* Sense mode="wait": la frase vella i la nova se superposen (position absolute al CSS)
+            i fan un crossfade real — l'una s'esvaeix mentre l'altra apareix, sense buit. */}
+        <AnimatePresence initial={false}>
           <motion.p
             key={index}
             className="ap-maxims-item"
@@ -51,6 +53,7 @@ export default function MaximsTicker() {
           </motion.p>
         </AnimatePresence>
       </div>
+      <span className="ap-maxims-mark ap-maxims-mark--right" aria-hidden="true">✦</span>
     </div>
   );
 }

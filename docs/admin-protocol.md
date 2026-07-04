@@ -1547,6 +1547,20 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1393 — 2026-07-04 — claude (FET)
+**Ticker de màximes: crossfade solapat més suau i lent (la fosa amb buit encara distreia).**
+- Context: el `mode="wait"` (#1392) deixava un buit entre frases (surt del tot → entra) que encara es notava. Es passa a crossfade solapat real, més lent.
+- `MaximsTicker`: tret `mode="wait"` de l'`AnimatePresence` → la frase sortint i l'entrant se superposen i es fonen alhora (mai queda buit). `HOLD_MS` 9000→11000, `FADE_S` 1.8→2.8 (fosa més lenta i suau).
+- CSS: `.ap-maxims-item` passa a `position: absolute` (left/right 0, centrat) perquè les dues frases se superposin al mateix lloc durant el crossfade; `.ap-maxims-viewport` `position: relative` + `min-height` manté l'alçada estable.
+- Segells ✦ simètrics: un a cada extrem (`--left`/`--right`, absoluts) enmarquen la frase → la barra queda equilibrada i el conjunt se sent centrat (abans un sol ✦ a l'esquerra desequilibrava).
+- Validació tècnica: `npx tsc --noEmit` 0; `validate:core` verd.
+- Validació funcional: Playwright desktop + mòbil — frase centrada, alçada estable, ✦ ancorat.
+- Validació humana/UX: la transició és imperceptible (crossfade suau sense buit); informa sense robar atenció.
+- `ADMIN_CHANGE_COUNTER` passa a `1393`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1392 — 2026-07-04 — claude (FET)
 **Ticker de màximes: de carrousel amb moviment a frase estàtica + fosa lenta (no distreu).**
 - Context: el propietari prova el slide (#1391) i el marquee continu i tots dos el distreuen (el moviment de translació capta la visió perifèrica). Decisió: frase ESTÀTICA molts segons + fosa d'opacitat molt progressiva, zero translació.

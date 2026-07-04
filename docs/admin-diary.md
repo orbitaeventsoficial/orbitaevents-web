@@ -1,3 +1,23 @@
+## 2026-07-04 — Ticker: crossfade solapat més suau i lent (Canvi #1393, claude)
+
+### Context
+El `mode="wait"` (#1392) deixava un buit entre frases que encara es notava. Crossfade solapat real, més lent.
+
+### Què s'ha fet
+- `MaximsTicker`: tret `mode="wait"` → frase sortint i entrant es fonen alhora (sense buit). `HOLD_MS` 9→11 s, `FADE_S` 1,8→2,8 s.
+- CSS: `.ap-maxims-item` `position:absolute` (centrat) per superposar les frases; viewport `relative` + `min-height` estable.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0; `validate:core` verd.
+- Validació funcional: Playwright desktop + mòbil — centrat, alçada estable.
+- Validació humana/UX: transició imperceptible, no roba atenció.
+
+### Coordinació
+Counter → 1393. Carril visual (meu). Worktree barrejat amb Codex → commit selectiu.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-04 — Ticker: frase estàtica + fosa lenta (no distreu) (Canvi #1392, claude)
 
 ### Context
