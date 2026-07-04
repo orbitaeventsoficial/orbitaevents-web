@@ -3629,9 +3629,11 @@ html.admin-mode .ap-maxims-viewport {
   display: flex; align-items: center; justify-content: center; min-height: 1.5rem;
 }
 /* Absolut + centrat: la frase sortint i l'entrant se superposen al mateix lloc → crossfade
-   solapat real (mai queda buit), i el centrat no es mou entre frases. */
+   solapat real (mai queda buit). Centrat amb margin auto + fit-content (framer fixa la width
+   al contingut, per això left/right 0 sol no estira; margin auto sí que centra). */
 html.admin-mode .ap-maxims-item {
-  position: absolute; left: 0; right: 0; margin: 0; text-align: center;
+  position: absolute; left: 0; right: 0; margin-inline: auto;
+  width: fit-content; max-width: 100%; text-align: center;
   font-family: var(--display); font-size: var(--o-text-sm); font-weight: var(--o-fw-semi);
   color: var(--ax-t); line-height: 1.35;
 }
