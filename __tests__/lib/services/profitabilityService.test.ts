@@ -152,8 +152,8 @@ describe('profitabilityService', () => {
     });
 
     it('carrega serviceLines i les passa al motor de marge', () => {
-      expect(source).toContain('serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true } }');
-      expect(source).toContain('aggregateServiceLines(serviceLinesObj)');
+      expect(source).toContain('serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true } }');
+      expect(source).toContain('computeServiceLineEconomics(serviceLinesObj)');
       expect(source).toContain('serviceLinesRevenue: row.serviceLinesRevenue');
       expect(source).toContain('serviceLinesCost: row.serviceLinesCost');
     });

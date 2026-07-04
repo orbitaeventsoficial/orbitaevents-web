@@ -7054,8 +7054,8 @@
       "kicker": "En resumen",
       "title": "Todo lo que os proponemos",
       "lead": "Aquí tenéis, de un vistazo, todo lo que hemos pensado para vosotros. Los precios son un punto de partida —el «desde»—, todavía sin extras ni desplazamiento; lo acabamos de cerrar juntos cuando sepamos todos los detalles.",
-      "totalLabel": "La propuesta, a partir de",
-      "customSuffix": "+ propuestas a medida"
+      "totalLabel": "La propuesta",
+      "travelLabel": "Desplazamiento de esta ruta"
     },
     "budget": {
       "kicker": "Transparencia",
@@ -7065,6 +7065,7 @@
       "travelTitle": "Desplazamiento",
       "travelNote": "Incluido hasta {includedKm} km desde Granollers. Para distancias superiores, el desplazamiento se calcula por el coste real del trayecto —vehículo y tiempo del equipo—, siempre claro y sin recargos sorpresa.",
       "travelRoute": "Vuestro evento es en {location}, a unos {km} km (ida y vuelta) desde Granollers. El desplazamiento se aplica sobre esta ruta.",
+      "travelPriceLabel": "Coste del desplazamiento",
       "vatNote": "Precios orientativos. El IVA y los ajustes finales se cierran en la propuesta definitiva."
     },
     "cta": {

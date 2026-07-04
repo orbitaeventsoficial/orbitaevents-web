@@ -1,3 +1,29 @@
+## 2026-07-04 — Dossier: fora la suma dels elements, preu del transport ben clar (Canvi #1396, claude)
+
+### Context
+El propietari, mirant el dossier generat en viu: veia un peu de resum «La proposta, a partir de · 2 propostes · **des de 490€**» que SUMAVA els elements (250 DJ + 240 Bingo). «des de 490€ sí que suma i no vull que sumi». I recordava l'acord: (1) NO sumar el preu dels elements, (2) SÍ mostrar clar el preu del transport. El #1371 havia tret el total del `buildBudgetBlock` però el `buildResumBlock` s'havia quedat sumant; i el transport es comunicava només com a política (inclòs fins a X km), sense xifra.
+
+### Què s'ha fet
+- `buildResumBlock` (dossier-html-builder): **eliminada la suma** dels `priceFrom`. Cada servei manté el seu «des de» com a referència; el peu ja no pinta cap total dels elements. L'únic € concret del peu és el **desplaçament d'aquesta ruta** (si es coneixen els km).
+- `buildBudgetBlock`: a la secció «Desplaçament», nova línia `.bud-travel-price` amb el **cost del desplaçament** clar (abans només política).
+- Font única del càrrec: **`computeBoloTransport({ roundTripKm, headcountOverride: 2 })`** (mateixa convenció pre-venda que `PresupuestoPdfStudio`; nou helper `dossierTravelCharge`). Zero fórmula pròpia. Rutes locals (càrrec 0) no mostren cap xifra.
+- Copy nova als 3 idiomes: `resum.travelLabel`, `budget.travelPriceLabel`; `resum.totalLabel` sense «a partir de»; retirat `resum.customSuffix` (i CSS `.resum-total-mida` mort).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0; `validate:core` verd (i18n-keys-sync quadra les 3 llengües); tests dossier-builder + dossierService + profitabilityService 60/60.
+- Validació funcional: cervell únic verificat — 40 km (local) → 0€ (sense línia); 422 km (Andorra/Alba) → **321,72€** de transport clar; la suma 490€ dels elements no apareix mai al resum.
+- Validació humana/UX: el dossier ensenya el valor de cada cosa sense fer de factura, i el desplaçament és una decisió conscient amb xifra real.
+- ⚠️ `pnpm build` diferit: el dev server és viu (propietari verificant); build clobbeja el dev (`.next` compartit). A fer en tancar sessió.
+
+### A banda (base neta)
+Trobats 2 tests vermells committejats aliens al dossier i arreglats (només test, 0 canvi de comportament): `profitabilityService.test.ts` (source-string desfasat pel #1377 de Codex: `serviceLines` select amb `kind/label` + `aggregateServiceLines`→`computeServiceLineEconomics`) i `dossierService.test.ts` (`getDossierLeadInitialData` retorna `distanceKm` des del #1394).
+
+### Coordinació
+Counter → 1396. Toca `dossier-html-builder` + copy + `travelLaborCost` (només consum, no motor) + 3 tests. NO he tocat els 5 fitxers dirty de Codex (#1385 customerId). Worktree barrejat → commit selectiu dels meus.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-04 — El dossier enviat no mostrava el desplaçament + ruta concreta (Canvi #1395, claude)
 
 ### Context

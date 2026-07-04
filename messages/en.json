@@ -7054,8 +7054,8 @@
       "kicker": "In short",
       "title": "Everything we propose",
       "lead": "Here's everything we've thought up for you, at a glance. The figures are a starting point —the \"from\"—, still without extras or travel; we finalise it together once we know all the details.",
-      "totalLabel": "The proposal, from",
-      "customSuffix": "+ bespoke proposals"
+      "totalLabel": "The proposal",
+      "travelLabel": "Travel for this route"
     },
     "budget": {
       "kicker": "Transparency",
@@ -7065,6 +7065,7 @@
       "travelTitle": "Travel",
       "travelNote": "Included up to {includedKm} km from Granollers. For longer distances, travel is charged at the real cost of the trip —vehicle and crew time—, always clear and with no surprise fees.",
       "travelRoute": "Your event is in {location}, about {km} km (round trip) from Granollers. Travel applies to this route.",
+      "travelPriceLabel": "Travel cost",
       "vatNote": "Indicative prices. VAT and final adjustments are set in the definitive proposal."
     },
     "cta": {

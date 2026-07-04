@@ -4,6 +4,22 @@ import { formatCurrency } from '@/lib/constants';
 import {
   INCLUDED_TRAVEL_KM,
 } from '@/lib/services/travelCost';
+import { computeBoloTransport } from '@/lib/services/travelLaborCost';
+
+/**
+ * Tripulació assumida per calcular el desplaçament a la pre-venda (dossier i
+ * pressupost estudi comparteixen convenció): 2 persones (p. ex. DJ + tècnic).
+ * El càlcul real per bolo deriva el headcount de les línies; aquí, sense
+ * serviceLines encara, s'usa aquesta base conscient. Font única del càrrec:
+ * `computeBoloTransport` (mai fórmula pròpia).
+ */
+const DOSSIER_TRAVEL_HEADCOUNT = 2;
+
+/** Càrrec de transport al client per a la ruta del dossier (un sol cervell). */
+function dossierTravelCharge(travelKm: number): number {
+  if (travelKm <= 0) return 0;
+  return computeBoloTransport({ roundTripKm: travelKm, headcountOverride: DOSSIER_TRAVEL_HEADCOUNT }).clientCharge;
+}
 
 export type DossierClientInfo = {
   nom: string;
@@ -42,7 +58,7 @@ export type DossierCopy = {
     includesTitle: string;
     noteLabel: string;
   };
-  resum: { kicker: string; title: string; lead: string; totalLabel: string; customSuffix: string };
+  resum: { kicker: string; title: string; lead: string; totalLabel: string; travelLabel: string };
   budget: {
     kicker: string;
     title: string;
@@ -51,6 +67,7 @@ export type DossierCopy = {
     travelTitle: string;
     travelNote: string;
     travelRoute: string;
+    travelPriceLabel: string;
     vatNote: string;
   };
   cta: { label: string };
@@ -138,14 +155,20 @@ function buildProductBlock(product: AnimacioProduct, num: number, copy: DossierC
 }
 
 /**
- * Resum econòmic de la proposta. Suma els priceFrom no-nuls (mai hardcoded → formatCurrency).
- * Si algun producte no té priceFrom, el total es marca "des de {suma} + a mida".
+ * Resum de la proposta. Decisió del propietari (#1396): el dossier ENSENYA cada servei
+ * amb el seu preu «des de» com a referència, però NO suma un total dels elements (un total
+ * sec espanta i el dossier és presentació de valor, no una factura). L'ÚNIC import concret
+ * del peu és el desplaçament d'aquesta ruta —cost real i transparent (font única
+ * `computeBoloTransport`, mai fórmula pròpia)— perquè el client decideixi conscientment.
  */
-function buildResumBlock(products: AnimacioProduct[], copy: DossierCopy, locale: string): string {
+function buildResumBlock(
+  products: AnimacioProduct[],
+  copy: DossierCopy,
+  locale: string,
+  travelKm: number,
+): string {
   if (products.length === 0) return '';
 
-  let suma = 0;
-  let hasMida = false;
   const fromPrefix = escHtml(copy.chapter.priceFromPrefix);
 
   const rows = products
@@ -153,27 +176,26 @@ function buildResumBlock(products: AnimacioProduct[], copy: DossierCopy, locale:
       const num = chapterLabel(i + 1);
       const nom = escHtml(p.nom);
       const cat = p.categoria ? `<span class="resum-row-cat">${escHtml(p.categoria)}</span>` : '';
-      if (typeof p.priceFrom === 'number') {
-        suma += p.priceFrom;
-        return `<li class="resum-row">
-          <span class="resum-row-num">${num}</span>
-          <span class="resum-row-nom">${nom}${cat}</span>
-          <span class="resum-row-dots" aria-hidden="true"></span>
-          <span class="resum-row-preu">${fromPrefix} ${escHtml(formatCurrency(p.priceFrom, locale))}</span>
-        </li>`;
-      }
-      hasMida = true;
+      const preu = typeof p.priceFrom === 'number'
+        ? `<span class="resum-row-preu">${fromPrefix} ${escHtml(formatCurrency(p.priceFrom, locale))}</span>`
+        : `<span class="resum-row-preu resum-row-preu--mida">${escHtml(copy.chapter.priceCustom)}</span>`;
       return `<li class="resum-row">
         <span class="resum-row-num">${num}</span>
         <span class="resum-row-nom">${nom}${cat}</span>
         <span class="resum-row-dots" aria-hidden="true"></span>
-        <span class="resum-row-preu resum-row-preu--mida">${escHtml(copy.chapter.priceCustom)}</span>
+        ${preu}
       </li>`;
     })
     .join('\n      ');
 
-  const totalValue = `${fromPrefix} ${escHtml(formatCurrency(suma, locale))}`;
-  const totalSuffix = hasMida ? `<span class="resum-total-mida">${escHtml(copy.resum.customSuffix)}</span>` : '';
+  // Peu: proposta (sense suma) + desplaçament clar (l'únic € concret) si es coneix la ruta.
+  const travelCharge = dossierTravelCharge(travelKm);
+  const travelBlock = travelCharge > 0
+    ? `<div class="resum-total-right">
+        <span class="resum-total-label">${escHtml(copy.resum.travelLabel)}</span>
+        <span class="resum-total-value">${escHtml(formatCurrency(travelCharge, locale))}</span>
+      </div>`
+    : '';
 
   return `
   <section class="resum-page">
@@ -188,10 +210,7 @@ function buildResumBlock(products: AnimacioProduct[], copy: DossierCopy, locale:
         <span class="resum-total-label">${escHtml(copy.resum.totalLabel)}</span>
         <span class="resum-total-hint">${formatOfferCount(copy, products.length)}</span>
       </div>
-      <div class="resum-total-right">
-        <span class="resum-total-value">${totalValue}</span>
-        ${totalSuffix}
-      </div>
+      ${travelBlock}
     </div>
   </section>`;
 }
@@ -226,11 +245,12 @@ function buildBudgetBlock(
       </li>`)
     .join('\n      ');
 
-  // El dossier ENSENYA què fem i què val (decisió del propietari #1371): mostra el preu
-  // «des de» de cada servei com a referència, però NO suma un total (un total sec espanta;
-  // el dossier és presentació de valor, no una factura). El pressupost tancat és un altre
-  // document. El transport es comunica com a POLÍTICA clara (inclòs fins a X km), no com
-  // a xifra que sumi.
+  // El dossier ENSENYA què fem i què val: mostra el preu «des de» de cada servei com a
+  // referència, però NO suma un total dels elements (un total sec espanta; el dossier és
+  // presentació de valor, no una factura). En canvi, el DESPLAÇAMENT sí que es mostra amb la
+  // seva xifra concreta (decisió del propietari #1396): és un cost real i transparent
+  // d'aquesta ruta, no un element del catàleg. Font única del càrrec: `computeBoloTransport`.
+  const travelCharge = dossierTravelCharge(travelKm);
   return `
   <section class="bud-page">
     <div class="bud-kicker">${escHtml(copy.budget.kicker)}</div>
@@ -245,6 +265,10 @@ function buildBudgetBlock(
     <div class="bud-group-label">${escHtml(copy.budget.travelTitle)}</div>
     <p class="bud-note">${fill(copy.budget.travelNote, { includedKm: String(includedOneWay) })}</p>
     ${location ? `<p class="bud-note bud-note--route">${fill(copy.budget.travelRoute, { location, km: String(Math.round(travelKm)) })}</p>` : ''}
+    ${travelCharge > 0 ? `<div class="bud-travel-price">
+      <span class="bud-travel-price-label">${escHtml(copy.budget.travelPriceLabel)}</span>
+      <span class="bud-travel-price-val">${money(travelCharge)}</span>
+    </div>` : ''}
     <p class="bud-note">${escHtml(copy.budget.vatNote)}</p>
   </section>`;
 }
@@ -265,7 +289,7 @@ export function buildDossierHtml(
     .map((p, i) => buildProductBlock(p, i + 1, copy, locale, options.logoDataUri, false))
     .join('\n');
 
-  const resumBloc = buildResumBlock(products, copy, locale);
+  const resumBloc = buildResumBlock(products, copy, locale, options.travelKm ?? 0);
   const budgetBloc = buildBudgetBlock(products, copy, locale, options.travelKm ?? 0, options.location);
 
   const salutacioHtml = escHtml(salutacio).replace(/\n\n/g, '<br><br>');
@@ -513,7 +537,6 @@ export function buildDossierHtml(
     .resum-total-hint { display: block; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: rgba(255,255,255,0.55); }
     .resum-total-right { text-align: right; }
     .resum-total-value { display: block; font-size: 40px; font-weight: 600; color: var(--o-gold-bright); letter-spacing: 0.005em; }
-    .resum-total-mida { display: block; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: rgba(255,255,255,0.6); font-style: italic; margin-top: 4px; }
 
     /* ---------- PRESSUPOST DESGLOSSAT ---------- */
     .bud-page { page-break-inside: avoid; page-break-before: always; break-before: page; padding-top: 60px; margin-bottom: 56px; }
@@ -531,6 +554,9 @@ export function buildDossierHtml(
     .bud-total { display: flex; align-items: center; justify-content: space-between; gap: 24px; background: linear-gradient(120deg, var(--o-carbon-2), var(--o-carbon)); color: #fff; padding: 24px 28px; border: 1px solid var(--o-gold-deep); margin-top: 22px; }
     .bud-total-label { font-family: 'Inter', Arial, sans-serif; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(215,184,110,0.85); font-weight: 600; }
     .bud-total-value { font-size: 36px; font-weight: 600; color: var(--o-gold-bright); }
+    .bud-travel-price { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-top: 14px; padding: 14px 20px; background: var(--o-paper-card); border: 1px solid var(--o-gold); border-left: 3px solid var(--o-gold-deep); }
+    .bud-travel-price-label { font-family: 'Inter', Arial, sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: var(--o-ink); }
+    .bud-travel-price-val { font-size: 26px; font-weight: 600; color: var(--o-gold-deep); white-space: nowrap; }
     .bud-note { font-family: 'Inter', Arial, sans-serif; font-size: 11px; color: var(--o-ink-mute); margin-top: 12px; line-height: 1.6; }
 
     /* ---------- CTA + PEU ---------- */
@@ -573,6 +599,8 @@ export function buildDossierHtml(
       .bud-row-val { margin-left: auto; }
       .bud-total { flex-direction: column; align-items: flex-start; gap: 10px; }
       .bud-total-value { font-size: 30px; }
+      .bud-travel-price { flex-wrap: wrap; gap: 6px 16px; }
+      .bud-travel-price-val { font-size: 22px; }
     }
 
     @media print {
