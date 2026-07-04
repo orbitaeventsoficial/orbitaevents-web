@@ -1,3 +1,24 @@
+## 2026-07-04 — Ticker: frase estàtica + fosa lenta (no distreu) (Canvi #1392, claude)
+
+### Context
+El slide (#1391) i el marquee continu distreien el propietari (el moviment de translació capta la visió perifèrica). Decisió: frase estàtica molts segons + fosa d'opacitat molt progressiva, zero translació. També pregunta per què deia «Brúixola».
+
+### Què s'ha fet
+- `MaximsTicker` reescrit amb `framer-motion` (mode="wait", només opacity). Frase quieta 9 s, fosa 1,8 s. Pausa en hover; `useReducedMotion` → canvi net.
+- «Brúixola» (text) substituït per segell gràfic ✦ daurat.
+- CSS: tret el marquee/track/fades/separadors; viewport simple amb `min-height`; `.ap-maxims-mark`. Contenidor més sobri.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0; `validate:core` verd.
+- Validació funcional: Playwright `/admin/bookings` desktop + mòbil — frase quieta llegible, segell ✦, sense moviment.
+- Validació humana/UX: informa sense distreure; res es desplaça.
+
+### Coordinació
+Counter → 1392. Carril visual (meu). Worktree barrejat amb Codex → commit selectiu.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-04 — Ticker «Brúixola» a totes les pàgines + carrousel real (Canvi #1391, claude)
 
 ### Context

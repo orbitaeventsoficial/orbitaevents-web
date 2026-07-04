@@ -1547,6 +1547,20 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1392 — 2026-07-04 — claude (FET)
+**Ticker de màximes: de carrousel amb moviment a frase estàtica + fosa lenta (no distreu).**
+- Context: el propietari prova el slide (#1391) i el marquee continu i tots dos el distreuen (el moviment de translació capta la visió perifèrica). Decisió: frase ESTÀTICA molts segons + fosa d'opacitat molt progressiva, zero translació.
+- `MaximsTicker`: reescrit amb `framer-motion` (`AnimatePresence` mode="wait", només `opacity`). Frase quieta `HOLD_MS=9000` ms, fosa `FADE_S=1.8` s. Es pausa en hover; `useReducedMotion` → canvi net.
+- Etiqueta de text «Brúixola» substituïda per un segell gràfic ✦ daurat (el propietari preguntava què volia dir; s'elimina el text i s'ancora amb una marca sòbria).
+- CSS: tret el marquee (`.ap-maxims-track`, keyframe, fades laterals, separadors); `.ap-maxims-viewport` simple amb `min-height` per no saltar; `.ap-maxims-mark` (✦ or). Contenidor més sobri (fons `--raised`, inset hairline).
+- Validació tècnica: `npx tsc --noEmit` 0; `validate:core` verd.
+- Validació funcional: Playwright a `/admin/bookings` desktop (1280) + mòbil (375) — frase quieta llegible, segell ✦, sense moviment.
+- Validació humana/UX: la brúixola informa sense distreure; res es desplaça, l'ull no persegueix res.
+- `ADMIN_CHANGE_COUNTER` passa a `1392`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1391 — 2026-07-04 — claude (FET)
 **Ticker «Brúixola» a TOTES les pàgines admin + carrousel real (slide lateral) + repertori ampliat.**
 - Context: el propietari vol la brúixola present a TOTES les pàgines admin (no només dashboard + Economia), amb un carrousel de veritat (les frases entren i surten pels laterals), i més màximes.
