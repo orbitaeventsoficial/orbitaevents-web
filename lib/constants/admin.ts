@@ -58,7 +58,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 1393;
+export const ADMIN_CHANGE_COUNTER = 1394;
 
 /**
  * Màximes d'Economia (#1390): brúixola de gestió sempre visible al top del dashboard i

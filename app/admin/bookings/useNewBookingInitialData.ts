@@ -126,6 +126,11 @@ export function useNewBookingInitialData({ leadId, dateParam, forceLeadPrefill =
                 eventEndTime: lead.eventEndTime || prev.eventEndTime,
                 eventLocation: lead.eventLocation || prev.eventLocation,
                 eventVenue: lead.eventAddress || prev.eventVenue,
+                // Hereta la distància i els peatges JA calculats al lead (#1394): la reserva
+                // no els recalcula (un sol cervell) — si el lead va resoldre 422 km, la reserva
+                // parteix de 422, no de 0 esperant re-geocodificar el municipi.
+                distanceKm: lead.distanceKm != null ? String(lead.distanceKm) : prev.distanceKm,
+                tollsEur: lead.tollsEur != null ? String(lead.tollsEur) : prev.tollsEur,
                 guestCount: lead.guestCount ? String(lead.guestCount) : prev.guestCount,
                 packId: lead.interestedPackId || prev.packId,
               }));

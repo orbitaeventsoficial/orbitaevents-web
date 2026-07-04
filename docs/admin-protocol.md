@@ -1547,6 +1547,19 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1394 — 2026-07-04 — claude (FET)
+**Bug: la reserva creada des d'un lead no heretava els km ni els peatges (començava a 0).**
+- Context: el propietari detecta que en crear reserva des d'un lead, el transport no arrossega («no recull els km ni el municipi»). El municipi (`eventLocation`) sí que arribava; els km calculats al lead (p. ex. Alba/Andorra 422) es perdien i la reserva naixia amb 0, esperant re-geocodificar.
+- Causa doble: (1) `getLeadDetail` (`leadRouteService.ts`) NO seleccionava `distanceKm` ni `tollsEur` → l'API del lead els retornava `undefined`; (2) el prefill de `useNewBookingInitialData` no els copiava al formulari encara que hi fossin.
+- Fix: afegits `distanceKm` + `tollsEur` al `select` de `getLeadDetail`, al tipus `BookingLeadData` i al prefill (`setForm`). La reserva HERETA el km ja resolt al lead (un sol cervell: no el recalcula).
+- Validació tècnica: `npx tsc --noEmit` 0; API del lead retorna `distanceKm: 422`; tests bookingCreation + mapper 46/46; `validate:core` verd.
+- Validació funcional: Playwright a `/admin/bookings/new?leadId=...&prefill=lead` (Alba) — `nb-km`=422 i `nb-location`=«l'Aldosa» heretats (abans km=0).
+- Validació humana/UX: el transport de la reserva ja no parteix de zero; el que el lead va calcular es conserva.
+- `ADMIN_CHANGE_COUNTER` passa a `1394`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #1393 — 2026-07-04 — claude (FET)
 **Ticker de màximes: crossfade solapat més suau i lent (la fosa amb buit encara distreia).**
 - Context: el `mode="wait"` (#1392) deixava un buit entre frases (surt del tot → entra) que encara es notava. Es passa a crossfade solapat real, més lent.

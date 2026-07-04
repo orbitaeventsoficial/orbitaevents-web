@@ -1,3 +1,23 @@
+## 2026-07-04 — Bug: la reserva des d'un lead no heretava els km (Canvi #1394, claude)
+
+### Context
+El propietari detecta que en crear reserva des d'un lead, el transport no arrossega els km ni els peatges. El municipi (`eventLocation`) sí que arribava; els km calculats al lead (Alba/Andorra 422) es perdien i la reserva naixia amb 0.
+
+### Què s'ha fet
+- Causa doble: (1) `getLeadDetail` no seleccionava `distanceKm`/`tollsEur` → l'API els retornava `undefined`; (2) el prefill de `useNewBookingInitialData` no els copiava.
+- Fix: afegits `distanceKm` + `tollsEur` al `select` de `getLeadDetail`, al tipus `BookingLeadData` i al prefill. La reserva hereta el km ja resolt (un sol cervell, no recalcula).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0; API lead retorna `distanceKm: 422`; tests bookingCreation+mapper 46/46; `validate:core` verd.
+- Validació funcional: Playwright nova reserva prefill lead Alba — `nb-km`=422, `nb-location`=«l'Aldosa» heretats (abans 0).
+- Validació humana/UX: el transport de la reserva ja no parteix de zero.
+
+### Coordinació
+Counter → 1394. Toca `leadRouteService` (carril compartit) + prefill de reserva. Worktree barrejat amb Codex → commit selectiu.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-04 — Ticker: crossfade solapat més suau i lent (Canvi #1393, claude)
 
 ### Context

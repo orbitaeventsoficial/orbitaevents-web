@@ -41,6 +41,8 @@ export async function getLeadDetail(id: string): Promise<LeadRouteResult> {
       eventLocation: true,
       eventPhone: true,
       eventAddress: true,
+      distanceKm: true,
+      tollsEur: true,
       guestCount: true,
       budget: true,
       message: true,

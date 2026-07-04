@@ -75,6 +75,8 @@ export type BookingLeadData = {
   eventEndTime?: string | null;
   eventLocation: string | null;
   eventAddress?: string | null;
+  distanceKm?: number | null;
+  tollsEur?: number | null;
   guestCount: number | null;
   budget: string | null;
   interestedPackId?: string | null;
