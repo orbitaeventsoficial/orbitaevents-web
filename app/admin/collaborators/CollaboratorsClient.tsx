@@ -62,6 +62,12 @@ export default function CollaboratorsClient() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(ADMIN_COLLABORATOR_EMPTY_FORM);
+  // Filtre per rol (fa operatiu CLIENT_PARTNER = «Ens contracta com a partner»):
+  // permet aïllar els socis-clients de la resta de col·laboradors.
+  const [roleFilter, setRoleFilter] = useState<string>('ALL');
+  const visibleCollaborators = roleFilter === 'ALL'
+    ? collaborators
+    : collaborators.filter((c) => (c.roles || []).includes(roleFilter));
 
   const load = useCallback(async () => {
     try {
@@ -204,6 +210,39 @@ export default function CollaboratorsClient() {
         </button>
       </div>
 
+      <div className="ap-card p-3">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-[var(--t3)]">Filtra per rol</p>
+            <p className="mt-1 text-sm text-[var(--t2)]">Aïlla proveïdors, prescriptors o socis-clients com Masquerade.</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              className={`ap-btn ${roleFilter === 'ALL' ? 'ap-btn--primary' : 'ap-btn--secondary'} ap-btn--xs`}
+              aria-pressed={roleFilter === 'ALL'}
+              onClick={() => setRoleFilter('ALL')}
+            >
+              Tots ({collaborators.length})
+            </button>
+            {COLLABORATOR_ROLE_OPTIONS.map((role) => {
+              const count = collaborators.filter((c) => (c.roles || []).includes(role.value)).length;
+              return (
+                <button
+                  key={role.value}
+                  type="button"
+                  className={`ap-btn ${roleFilter === role.value ? 'ap-btn--primary' : 'ap-btn--secondary'} ap-btn--xs`}
+                  aria-pressed={roleFilter === role.value}
+                  onClick={() => setRoleFilter(role.value)}
+                >
+                  {role.label} ({count})
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
       {showForm && (
         <form onSubmit={handleSubmit} className="ap-card space-y-4 rounded-xl p-6">
           <h3 className="ap-h2">{editingId ? 'Editar partner' : 'Nou partner'}</h3>
@@ -343,9 +382,14 @@ export default function CollaboratorsClient() {
           <p className="ap-empty-title">Encara no tens col·laboradors</p>
           <p className="ap-empty-desc">Afegeix col·laboradors que revenen els teus serveis</p>
         </div>
+      ) : visibleCollaborators.length === 0 ? (
+        <div className="ap-card ap-empty rounded-xl">
+          <p className="ap-empty-title">Cap partner amb aquest rol</p>
+          <p className="ap-empty-desc">Canvia el filtre o assigna aquest rol a la fitxa del partner.</p>
+        </div>
       ) : (
         <div className="space-y-4">
-          {collaborators.map((c) => (
+          {visibleCollaborators.map((c) => (
             <div
               key={c.id}
               className={`ap-card rounded-xl p-5 transition-colors ${

@@ -30,6 +30,7 @@ type CollaboratorProductForDossier = {
   category: string | null;
   crew: string | null;
   durationLabel: string | null;
+  costPrice: number;
   sellPrice: number;
   imageUrl: string | null;
   includes: string | null;
@@ -51,6 +52,7 @@ export type DossierCollaboratorProduct = {
   descripcio: string[];
   inclou: string[];
   sellPrice: number;
+  costPrice: number;
   imageUrl?: string;
 };
 
@@ -189,6 +191,7 @@ export function collaboratorProductToDossierProduct(product: CollaboratorProduct
     descripcio: description ? [description] : ['Proposta seleccionada i gestionada per Òrbita Events.'],
     inclou: includes.length > 0 ? includes : ['Servei gestionat per Òrbita Events'],
     sellPrice: product.sellPrice,
+    costPrice: product.costPrice,
     imageUrl: product.imageUrl || undefined,
   };
 }
@@ -207,6 +210,7 @@ export function collaboratorProductToAnimacioProduct(product: DossierCollaborato
     sourceProviderName: product.colaborador,
     sourceProviderId: product.sourceProviderId,
     sourceProductId: product.sourceProductId,
+    sourceCostPrice: product.costPrice,
   };
 }
 

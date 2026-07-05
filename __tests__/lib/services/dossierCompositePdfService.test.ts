@@ -61,6 +61,7 @@ describe('generateDossierCompositePDF', () => {
           colaborador: 'Masquerade Events',
           descripcio: ['Musical infantil amb aventura pirata.'],
           inclou: ['2 actors', 'Decoració', 'Tècnic de so'],
+          costPrice: 320,
           sellPrice: 385,
         },
       ],

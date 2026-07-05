@@ -29,6 +29,33 @@ export function getPaymentBand(depositPaid: boolean, remainingPaid: boolean, cov
   return 'pending';
 }
 
+/**
+ * Import PENDENT de cobrar d'una reserva (font única). Regla canònica: si la bestreta
+ * no s'ha cobrat, es deu; si el saldo restant no s'ha cobrat, es deu (total − bestreta).
+ * **L'efectiu ja cobrat (`cashAmount`, paymentMethod=CASH) redueix el pendent** — al negoci
+ * el normal és cobrar-ho tot en efectiu el mateix dia del bolo, així que un bolo pagat en
+ * efectiu NO és deute encara que els flags online (depositPaid/remainingPaid) siguin false.
+ * Coherent amb `getPaymentBand` (que ja tracta cashAmount ≥ total com a «pagat»).
+ * Consolidat aquí perquè cap pantalla reimplementi la fórmula.
+ */
+export function bookingOutstandingAmount(booking: {
+  total: number;
+  depositAmount: number;
+  depositPaid: boolean;
+  remainingPaid: boolean;
+  cashAmount?: number | null;
+}): number {
+  const total = normalizeAmount(booking.total);
+  const deposit = normalizeAmount(booking.depositAmount);
+  const cash = normalizeAmount(booking.cashAmount);
+  let pending = 0;
+  if (!booking.depositPaid && deposit > 0) pending += deposit;
+  if (!booking.remainingPaid) pending += Math.max(0, total - deposit);
+  // L'efectiu cobrat cobreix el pendent (fins on arribi).
+  pending = Math.max(0, pending - cash);
+  return Math.round(pending * 100) / 100;
+}
+
 const PAYMENT_LABEL: Record<PaymentBand, string> = {
   paid: 'Pagat',
   partial: 'Parcial',

@@ -6,12 +6,23 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_DOSSIER_GENERATOR_COPY } from '@/lib/constants/admin';
 import { getEventLabel } from '@/lib/constants';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
-import { DJ_EXTRA_HOUR_PRICE, DJ_FIRST_HOUR_PRICE, djPriceForHours } from '@/lib/constants/orbita-services';
+import { DJ_EXTRA_HOUR_PRICE, DJ_FIRST_HOUR_PRICE } from '@/lib/constants/orbita-services';
 import { buildDossierHtml, type DossierCopy } from '@/lib/utils/dossier-html-builder';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { AdminSection } from '../components/AdminPage';
-
-const DJ_FIRST_PRODUCT_ID = 'orbita:dj-primera-hora';
+import { computeDossierMarginGuard } from '@/lib/services/dossierMarginGuardService';
+import { buildDossierLineSnapshot } from '@/lib/services/dossierSnapshotService';
+import {
+  buildDossierProductsForSelection,
+  DOSSIER_DJ_PRODUCT_ID,
+  dossierDjHoursFromServiceLines,
+  dossierProductGroupKey,
+  dossierProductPriceValue,
+  normalizeDossierProductText,
+  productIdsFromDossierServiceLines,
+  productToDossierServiceLine,
+  type DossierProductGroupKey,
+} from '@/lib/services/dossierProductMappingService';
 
 // Classes canòniques reutilitzades dins el generador (label de camp, capsa de
 // resultats del cercador i ítem de resultat) — tokens del sistema, zero hex local.
@@ -29,6 +40,7 @@ interface Props {
   initialTelefon?: string;
   initialEmpresa?: string;
   initialEventDesc?: string;
+  initialTravelLocation?: string;
   initialDistanceKm?: number | null;
   initialProductIds?: string;
 }
@@ -80,23 +92,12 @@ type ExtractLeadResult = {
   fallbackReason?: 'quota' | 'unavailable';
 };
 
-type ProductGroupKey = 'orbita' | 'masquerade' | 'tino' | 'altres';
-
 type DossierServiceLine = {
   collaboratorId?: string | null;
   kind?: string | null;
   label?: string | null;
   revenueAmount?: number | null;
   quantity?: number | null;
-};
-
-type LeadServiceLinePayload = {
-  collaboratorId?: string | null;
-  kind: 'DJ' | 'SOUND_TECH' | 'PROVIDER_SERVICE' | 'EQUIPMENT' | 'OTHER';
-  label: string;
-  revenueAmount?: number | null;
-  quantity?: number | null;
-  notes?: string | null;
 };
 
 function parseInitialProductIds(value?: string): string[] {
@@ -108,7 +109,7 @@ function parseInitialProductIds(value?: string): string[] {
 
 function productPriceLabel(product: AnimacioProduct): string | null {
   // El DJ es construeix per hores: primera hora + cada hora addicional (font única).
-  if (product.id === DJ_FIRST_PRODUCT_ID) return `des de ${DJ_FIRST_HOUR_PRICE}€ · +${DJ_EXTRA_HOUR_PRICE}€/h`;
+  if (product.id === DOSSIER_DJ_PRODUCT_ID) return `des de ${DJ_FIRST_HOUR_PRICE}€ · +${DJ_EXTRA_HOUR_PRICE}€/h`;
   const tierPrice = product.trams?.find((tier) => tier.price !== null)?.price;
   if (typeof tierPrice === 'number') return `des de ${tierPrice}€`;
   const djPrice = product.djOptions?.find((option) => option.price !== null)?.price;
@@ -117,40 +118,21 @@ function productPriceLabel(product: AnimacioProduct): string | null {
   return null;
 }
 
-function productPriceValue(product: AnimacioProduct, djHours = 1): number | null {
-  // El DJ es construeix per hores (font única `djPriceForHours`): 1a hora + extres.
-  if (product.id === DJ_FIRST_PRODUCT_ID) return djPriceForHours(djHours);
-  const tierPrice = product.trams?.find((tier) => tier.price !== null)?.price;
-  if (typeof tierPrice === 'number') return tierPrice;
-  const djPrice = product.djOptions?.find((option) => option.price !== null)?.price;
-  if (typeof djPrice === 'number') return djPrice;
-  if (typeof product.priceFrom === 'number') return product.priceFrom;
-  return null;
-}
-
 function formatEuro(value: number): string {
   return `${value}€`;
 }
 
-function productGroupKey(product: AnimacioProduct): ProductGroupKey {
-  if (!product.id.startsWith('collab:')) return 'orbita';
-  const provider = normalizeProductText(product.sourceProviderName);
-  if (provider.includes('tino')) return 'tino';
-  if (provider.includes('masquerade') || provider.includes('carlos')) return 'masquerade';
-  return 'altres';
-}
-
-function productGroupTitle(group: ProductGroupKey): string {
+function productGroupTitle(group: DossierProductGroupKey): string {
   return ADMIN_DOSSIER_GENERATOR_COPY.catalog.groups[group].title;
 }
 
-function productGroupSubtitle(group: ProductGroupKey): string {
+function productGroupSubtitle(group: DossierProductGroupKey): string {
   return ADMIN_DOSSIER_GENERATOR_COPY.catalog.groups[group].subtitle;
 }
 
 function productBadge(product: AnimacioProduct): string {
   const category = product.categoria ?? '';
-  const normalized = normalizeProductText(category);
+  const normalized = normalizeDossierProductText(category);
   if (normalized.includes('infantil')) return 'Infantil';
   if (normalized.includes('adulta')) return 'Adults';
   if (normalized.includes('casament')) return 'Boda';
@@ -163,40 +145,17 @@ function productBadge(product: AnimacioProduct): string {
   return product.id.startsWith('collab:') ? 'Partner' : 'Òrbita';
 }
 
-function productToServiceLine(product: AnimacioProduct, djHours = 1): LeadServiceLinePayload {
-  const revenueAmount = productPriceValue(product, djHours);
-  if (product.id === DJ_FIRST_PRODUCT_ID) {
-    return { kind: 'DJ', label: djHours > 1 ? `DJ · ${djHours} hores` : 'DJ · primera hora', revenueAmount, quantity: 1 };
+function marginGuardToneClass(band: string): string {
+  switch (band) {
+    case 'excellent':
+      return 'admin-tone-border-success admin-tone-bg-success';
+    case 'acceptable':
+      return 'admin-tone-border-warning admin-tone-bg-warning';
+    case 'watch':
+      return 'admin-tone-border-warning admin-tone-bg-warning';
+    default:
+      return 'admin-tone-border-danger admin-tone-bg-danger';
   }
-  if (product.id === 'orbita:bombolles') {
-    return { kind: 'EQUIPMENT', label: 'Màquina de bombolles', revenueAmount, quantity: 1 };
-  }
-  if (product.id === 'orbita:pont-llums-caps-mobils') {
-    return { kind: 'EQUIPMENT', label: 'Pont de llums + caps mòbils', revenueAmount, quantity: 1 };
-  }
-  if (product.id === 'orbita:operari-extra') {
-    return { kind: 'OTHER', label: 'Operari extra', revenueAmount, quantity: 1 };
-  }
-  const group = productGroupKey(product);
-  return {
-    collaboratorId: product.sourceProviderId ?? null,
-    kind: group === 'tino' ? 'EQUIPMENT' : 'PROVIDER_SERVICE',
-    label: product.sourceProviderName ? `${product.nom} · ${product.sourceProviderName}` : product.nom,
-    revenueAmount,
-    quantity: 1,
-    notes: product.sourceProductId ? `Producte de catàleg: ${product.sourceProductId}` : null,
-  };
-}
-
-function normalizeProductText(value?: string | null): string {
-  return (value ?? '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/\([^)]*\)/g, ' ')
-    .replace(/[·–—-]/g, ' ')
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
 }
 
 function normalizeCustomerText(value?: string | null): string {
@@ -226,76 +185,11 @@ function buildEventDescription(data: ExtractedLeadData): string {
   return parts.join(' · ');
 }
 
-function isDjExtraLabel(label: string): boolean {
-  return label.includes('dj') &&
-    (label.includes('hora addicional') || label.includes('hora extra') || label.includes('extra'));
-}
-
-function isDjFirstHourLabel(label: string): boolean {
-  return label.includes('dj') &&
-    (label.includes('1a hora') || label.includes('primera hora'));
-}
-
-/**
- * Deriva el nombre d'hores de DJ d'unes línies de servei. Inverteix el preu
- * canònic (`djPriceForHours`) sobre el revenue total de les línies DJ, de manera
- * que tant «DJ · 3 hores» (1 línia 350€) com «primera hora» + «hora addicional ×2»
- * (150 + 100 + 100) tornin 3 hores. Mínim 1.
- */
-function djHoursFromServiceLines(lines: DossierServiceLine[]): number {
-  const djRevenue = lines
-    .filter((line) => line.kind === 'DJ')
-    .reduce((sum, line) => sum + (line.revenueAmount ?? 0) * (line.quantity ?? 1), 0);
-  if (djRevenue <= 0) return 1;
-  const extras = Math.round((djRevenue - DJ_FIRST_HOUR_PRICE) / DJ_EXTRA_HOUR_PRICE);
-  return Math.max(1, 1 + Math.max(0, extras));
-}
-
-function productIdsFromServiceLines(lines: DossierServiceLine[], products: AnimacioProduct[], validProductIds: Set<string>): string[] {
-  const byName = new Map(products.map((product) => [normalizeProductText(product.nom), product.id]));
-  const ids = lines
-    .map((line) => {
-      const directId = line.collaboratorId
-        ? (line.collaboratorId.startsWith('collab:') ? line.collaboratorId : `collab:${line.collaboratorId}`)
-        : null;
-      if (directId && validProductIds.has(directId)) return directId;
-
-      const normalizedLabel = normalizeProductText(line.label);
-      // El DJ és un sol capítol al dossier: tant la primera hora com qualsevol
-      // hora extra apunten al producte DJ únic (l'hora extra ja no és un capítol propi).
-      if (line.kind === 'DJ' && (isDjExtraLabel(normalizedLabel) || isDjFirstHourLabel(normalizedLabel))) return DJ_FIRST_PRODUCT_ID;
-      const exactName = byName.get(normalizedLabel);
-      if (exactName) return exactName;
-
-      const candidate = products
-        .filter((product) => {
-          const normalizedName = normalizeProductText(product.nom);
-          return normalizedName && (
-            normalizedLabel.startsWith(normalizedName) ||
-            normalizedName.startsWith(normalizedLabel)
-          );
-        })
-        .sort((a, b) => normalizeProductText(b.nom).length - normalizeProductText(a.nom).length)[0];
-      if (candidate) return candidate.id;
-
-      if (line.kind === 'EQUIPMENT' && normalizedLabel.includes('caps mobils')) {
-        return 'orbita:pont-llums-caps-mobils';
-      }
-      if (line.kind === 'DJ' && /\bdj\b/.test(normalizedLabel)) {
-        return DJ_FIRST_PRODUCT_ID;
-      }
-      return null;
-    })
-    .filter((id): id is string => typeof id === 'string' && validProductIds.has(id));
-
-  return Array.from(new Set(ids));
-}
-
-export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, leadId: initialLeadId, initialNom, initialEmail, initialTelefon, initialEmpresa, initialEventDesc, initialDistanceKm, initialProductIds }: Props) {
+export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, leadId: initialLeadId, initialNom, initialEmail, initialTelefon, initialEmpresa, initialEventDesc, initialTravelLocation, initialDistanceKm, initialProductIds }: Props) {
   const toast = useToast();
   const validProductIds = useMemo(() => new Set(products.map((p) => p.id)), [products]);
   const productGroups = useMemo(() => (['orbita', 'masquerade', 'tino', 'altres'] as const)
-    .map((group) => ({ group, items: products.filter((product) => productGroupKey(product) === group) }))
+    .map((group) => ({ group, items: products.filter((product) => dossierProductGroupKey(product) === group) }))
     .filter(({ items }) => items.length > 0), [products]);
   const [linkedLeadId, setLinkedLeadId] = useState(initialLeadId ?? '');
   const [nom, setNom] = useState(initialNom ?? '');
@@ -303,6 +197,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
   const [telefon, setTelefon] = useState(initialTelefon ?? '');
   const [email, setEmail] = useState(initialEmail ?? '');
   const [eventDesc, setEventDesc] = useState(initialEventDesc ?? '');
+  const [travelLocation, setTravelLocation] = useState(initialTravelLocation ?? '');
   // Hereta els km calculats del lead la primera vegada (#1371): abans quedava buit i
   // s'havia d'entrar a mà tot i que el lead ja tenia la distància resolta.
   const [travelKm, setTravelKm] = useState(initialDistanceKm != null && initialDistanceKm > 0 ? String(initialDistanceKm) : '');
@@ -314,14 +209,18 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
   const selectedProducts = useMemo(() => products.filter((product) => selectedIds.has(product.id)), [products, selectedIds]);
   // Productes tal com surten al dossier: el DJ porta el preu i la durada de les hores triades.
   const dossierProducts = useMemo(
-    () => selectedProducts.map((p) =>
-      p.id === DJ_FIRST_PRODUCT_ID
-        ? { ...p, priceFrom: djPriceForHours(djHours), durada: `${djHours}h` }
-        : p,
-    ),
-    [selectedProducts, djHours],
+    () => buildDossierProductsForSelection(selectedProducts, selectedIds, djHours),
+    [selectedProducts, selectedIds, djHours],
   );
-  const selectedTotal = selectedProducts.reduce((sum, product) => sum + (productPriceValue(product, djHours) ?? 0), 0);
+  const selectedTotal = selectedProducts.reduce((sum, product) => sum + (dossierProductPriceValue(product, djHours) ?? 0), 0);
+  const marginGuardLines = useMemo(() => selectedProducts.map((p) => productToDossierServiceLine(p, djHours)), [selectedProducts, djHours]);
+  const marginGuard = useMemo(() => {
+    const km = Number(travelKm);
+    return computeDossierMarginGuard({
+      serviceLines: marginGuardLines,
+      travelKm: Number.isFinite(km) && km > 0 ? km : 0,
+    });
+  }, [marginGuardLines, travelKm]);
   const [createLeadOnSave, setCreateLeadOnSave] = useState(false);
   const [sendOnSave, setSendOnSave] = useState(false);
   const [linkedCustomerId, setLinkedCustomerId] = useState('');
@@ -409,16 +308,16 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
       if (!res.ok) return;
       const data = await res.json() as LeadServiceLineResult;
       const lines = data.lines ?? [];
-      const ids = productIdsFromServiceLines(lines, products, validProductIds);
+      const ids = productIdsFromDossierServiceLines(lines, products, validProductIds);
       setSelectedIds(new Set(ids));
-      setDjHours(djHoursFromServiceLines(lines));
+      setDjHours(dossierDjHoursFromServiceLines(lines));
     } catch (err) {
       console.error('[DossierGenerator] syncProductsFromLead error:', err);
     }
   }, [products, validProductIds]);
 
   const syncProductsToLead = useCallback(async (leadId: string) => {
-    const lines = selectedProducts.map((p) => productToServiceLine(p, djHours));
+    const lines = selectedProducts.map((p) => productToDossierServiceLine(p, djHours));
     const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/service-lines`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -462,6 +361,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
     if (lead.eventDate) parts.push(lead.eventDate.slice(0, 10));
     if (lead.eventLocation) parts.push(lead.eventLocation);
     setEventDesc(parts.join(' · '));
+    setTravelLocation(lead.eventLocation ?? '');
     setSearchQuery('');
     setShowResults(false);
     setSavedId(null);
@@ -500,6 +400,8 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
     setEmail('');
     setTelefon('');
     setEventDesc('');
+    setTravelLocation('');
+    setTravelKm('');
     setSelectedIds(new Set());
     setCreateLeadOnSave(false);
     setSendOnSave(false);
@@ -546,6 +448,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
       setEmail(data.email || email);
       setTelefon(data.phone || telefon);
       if (nextEventDesc) setEventDesc(nextEventDesc);
+      if (data.eventLocation) setTravelLocation(data.eventLocation);
       setCustomerConflict(null);
       const existingCustomer = await findExistingCustomerMatchFor({
         email: data.email || email,
@@ -590,7 +493,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
         logoDataUri,
         locale: 'ca-ES',
         travelKm: Number.isFinite(km) && km > 0 ? km : undefined,
-        location: eventDesc.trim() || undefined,
+        location: travelLocation.trim() || undefined,
       });
       const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
       const url = URL.createObjectURL(blob);
@@ -675,6 +578,11 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
           eventDesc: eventDesc.trim() || undefined,
           salutacio: salutacio.trim() || undefined,
           productIds: Array.from(selectedIds),
+          lineSnapshot: buildDossierLineSnapshot({
+            products: dossierProducts,
+            travelKm: Number.isFinite(Number(travelKm)) && Number(travelKm) > 0 ? Number(travelKm) : null,
+            travelLocation: travelLocation.trim() || null,
+          }),
         }),
       });
       if (!res.ok) throw new Error('Error desant');
@@ -880,6 +788,10 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
               <label htmlFor="dg-travel-km" className={LABEL_CLS}>Km desplaçament (anada + tornada)</label>
               <input id="dg-travel-km" type="number" min={0} step={1} className="adm-input" value={travelKm} onChange={(e) => setTravelKm(e.target.value)} placeholder="Ex: 70" autoComplete="off" />
             </div>
+            <div className="flex flex-col gap-1.5 md:col-span-2 xl:col-span-3">
+              <label htmlFor="dg-travel-location" className={LABEL_CLS}>Lloc del desplaçament</label>
+              <input id="dg-travel-location" type="text" className="adm-input" value={travelLocation} onChange={(e) => setTravelLocation(e.target.value)} placeholder="Ex: l'Aldosa" autoComplete="off" />
+            </div>
             <div className="flex flex-col gap-1.5 md:col-span-2 xl:col-span-4">
               <label htmlFor="dg-salutacio" className={LABEL_CLS}>
                 {ADMIN_DOSSIER_GENERATOR_COPY.client.introLabel}
@@ -906,13 +818,13 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
             {selectedProducts.length > 0 ? (
               <div className="flex flex-col gap-2">
                 {selectedProducts.map((product) => {
-                  const isDj = product.id === DJ_FIRST_PRODUCT_ID;
-                  const price = productPriceValue(product, djHours);
+                  const isDj = product.id === DOSSIER_DJ_PRODUCT_ID;
+                  const price = dossierProductPriceValue(product, djHours);
                   return (
                     <div key={product.id} className="flex items-center justify-between gap-3 rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)] px-3 py-2.5">
                       <div>
                         <span className="block font-semibold text-[var(--t)]">{product.nom}{isDj ? ` · ${djHours}h` : ''}</span>
-                        <span className="mt-0.5 block text-xs text-[var(--t3)]">{productGroupTitle(productGroupKey(product))} · {productBadge(product)}</span>
+                        <span className="mt-0.5 block text-xs text-[var(--t3)]">{productGroupTitle(dossierProductGroupKey(product))} · {productBadge(product)}</span>
                         {isDj && (
                           <div className="mt-2 flex flex-wrap items-center gap-2" role="group" aria-label="Hores de DJ">
                             <button
@@ -947,6 +859,45 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
               <p className="text-sm text-[var(--t3)]">{ADMIN_DOSSIER_GENERATOR_COPY.bolo.empty}</p>
             )}
           </section>
+
+          {selectedProducts.length > 0 && (
+            <section className={`rounded-[var(--o-r-sm)] border px-4 py-3.5 ${marginGuardToneClass(marginGuard.band)}`} aria-label={ADMIN_DOSSIER_GENERATOR_COPY.bolo.marginTitle}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h3 className="font-mono text-xs font-bold uppercase tracking-[0.08em] text-[var(--t)]">{ADMIN_DOSSIER_GENERATOR_COPY.bolo.marginTitle}</h3>
+                  <p className="mt-1 text-xs text-[var(--t2)]">{ADMIN_DOSSIER_GENERATOR_COPY.bolo.marginHint}</p>
+                </div>
+                <div className="text-right">
+                  <span className={`block font-mono text-xs uppercase tracking-[0.08em] o-margin-text--${marginGuard.band}`}>{marginGuard.label}</span>
+                  <strong className={`block text-xl leading-tight o-margin-text--${marginGuard.band}`}>{marginGuard.marginPct}%</strong>
+                </div>
+              </div>
+              <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                <div className="rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)] px-2.5 py-2">
+                  <span className="block text-[var(--t3)]">{ADMIN_DOSSIER_GENERATOR_COPY.bolo.revenueLabel}</span>
+                  <strong className="font-mono text-[var(--t)]">{formatEuro(Math.round(marginGuard.totalRevenue))}</strong>
+                </div>
+                <div className="rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)] px-2.5 py-2">
+                  <span className="block text-[var(--t3)]">{ADMIN_DOSSIER_GENERATOR_COPY.bolo.directCostLabel}</span>
+                  <strong className="font-mono text-[var(--t)]">{formatEuro(Math.round(marginGuard.directCost + marginGuard.acquisitionCost))}</strong>
+                </div>
+                <div className="rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)] px-2.5 py-2">
+                  <span className="block text-[var(--t3)]">{ADMIN_DOSSIER_GENERATOR_COPY.bolo.netMarginLabel}</span>
+                  <strong className={`font-mono o-margin-text--${marginGuard.band}`}>{formatEuro(Math.round(marginGuard.netMargin))}</strong>
+                </div>
+              </div>
+              {marginGuard.subcontractedMarkupPct > 0 && (
+                <p className={`mt-2 text-xs ${marginGuard.subcontractedMarkupOk ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
+                  {ADMIN_DOSSIER_GENERATOR_COPY.bolo.subcontractedLabel}: {marginGuard.subcontractedMarkupPct.toFixed(1)}%
+                </p>
+              )}
+              {marginGuard.warnings.length > 0 && (
+                <ul className="mt-2 flex flex-col gap-1 text-xs text-[var(--t)]">
+                  {marginGuard.warnings.map((warning) => <li key={warning}>• {warning}</li>)}
+                </ul>
+              )}
+            </section>
+          )}
 
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3 rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)] px-4 py-3">
             {!linkedLeadId && (

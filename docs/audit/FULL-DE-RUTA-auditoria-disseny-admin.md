@@ -14,6 +14,28 @@
 > Aquest document és «l'ull que tot ho veu»: la font de veritat única. NO es tanca res
 > sense passar per aquí. Cap peça queda sense auditar.
 
+## Baseline runtime visual #1416 — 2026-07-04
+
+**Radiografia real creada per `codex`**: `docs/audit/AUDITORIA-VISUAL-GLOBAL-1416.md`.
+
+- Eina nova: `pnpm run audit:visual:admin` (`scripts/admin-visual-audit.mjs`).
+- Baseline final: 94 rutes admin auditables x 3 viewports = 282 renders i 282 captures.
+- Checks finals: 0 fallits (HTTP, shell admin, overflow, pantalla buida, Next error, consola, assets, requests accionables, captura).
+- Evidència local regenerable: `.codex-captures/visual-audit-1416-final/`.
+- Fix fet durant la passada: `/admin/analytics` ja no emet warning React per `key` duplicada a dades GA4.
+
+Aquest baseline **no declara el disseny perfecte**. Declara que la superfície admin renderitza neta i queda preparada per a la fase manual d'inspecció visual profunda: radiografia real -> zenit -> full de ruta.
+
+## Visor interactiu #1417 — 2026-07-05
+
+El baseline anterior ara té superfície de treball a `/admin/docs/visual-audit`.
+
+- Font: `.codex-captures/visual-audit-1416-final/visual-audit-results.json`.
+- Servei: `visualAuditAtlasService`, amb test focal.
+- UI: rutes agrupades per òrgan, captures desktop/tablet/mobile, filtres i dimensions de revisió.
+- Criteri: tots els ítems arrenquen com a `Revisió pendent`; runtime net no equival a veredicte visual final.
+- Ús: abans d'una revisió profunda d'un òrgan, filtrar-lo al visor, mirar captures i obrir la ruta concreta.
+
 ## Objectiu clar
 Que tot l'admin sigui IMPECABLE i sembli fet pel mateix dissenyador a nivell
 mil·limètric — i que tot FUNCIONI de debò: cap incoherència visual, tot canònic i
@@ -287,7 +309,7 @@ G. Cost: col·laborador (real) vs propi (imputat per ratio)
 
 | Peça | Vis | Coh | Typ | Notes |
 |---|---|---|---|---|
-| welcome lead | ⬜ | ⬜ | ⬜ | |
+| welcome lead | ⬜ | ⬜ | ⬜ | Runtime enviament automàtic resolt #1418; queda auditar HTML/copy de la plantilla `welcome` i captures de l'email. |
 | pressupost enviat | ⬜ | ⬜ | ⬜ | |
 | recordatori pagament | ⬜ | ⬜ | ⬜ | |
 | post-event (informe/enquesta) | ⬜ | ⬜ | ⬜ | |

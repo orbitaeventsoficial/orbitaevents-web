@@ -7032,6 +7032,7 @@
     "intro": {
       "kicker": "Imaginémoslo juntos",
       "title": "Un anticipo de lo que podemos vivir juntos, antes de hablar de números.",
+      "greeting": "Hola {name},",
       "greetingDefault": "¡Gracias por pensar en nosotros! Hemos preparado estas páginas para que os imaginéis cómo sería vuestra fiesta con calma, sin tener que mirar todavía los precios.\n\nEn cada página os explicamos una propuesta: qué es, cómo se vive y qué encontraréis. Quedaos con las que más ilusión os hagan y, cuando lo tengáis claro, os pasamos el presupuesto a medida solo con lo que elijáis.",
       "offerCountOne": "1 propuesta para vosotros",
       "offerCountMany": "{count} propuestas para vosotros",
@@ -7053,12 +7054,12 @@
     "resum": {
       "kicker": "En resumen",
       "title": "Todo lo que os proponemos",
-      "lead": "Aquí tenéis, de un vistazo, el precio de partida —el «desde»— de cada propuesta y cómo funciona el desplazamiento. Todavía sin extras: no es una factura, es para que sepáis de qué hablamos cuando nos sentemos a cerrarlo juntos."
+      "lead": "Aquí tenéis el punto de partida de cada propuesta y, justo después, el desplazamiento calculado para esta ruta. No cerramos ningún total aquí: es una guía clara para decidir qué os encaja antes de preparar la propuesta definitiva."
     },
     "budget": {
       "servicesLabel": "Las propuestas",
       "travelTitle": "Desplazamiento",
-      "travelNote": "Incluido hasta {includedKm} km desde Granollers. Para distancias superiores, el desplazamiento se calcula por el coste real del trayecto —vehículo y tiempo del equipo—, siempre claro y sin recargos sorpresa.",
+      "travelNote": "Incluido hasta {includedKm} km desde Granollers. En rutas más largas, el desplazamiento se calcula de forma transparente según la distancia y el equipo que hay que mover.",
       "travelRoute": "Vuestro evento es en {location}, a unos {km} km (ida y vuelta) desde Granollers. El desplazamiento se aplica sobre esta ruta.",
       "travelPriceLabel": "Coste del desplazamiento",
       "vatNote": "Precios orientativos. El IVA y los ajustes finales se cierran en la propuesta definitiva."

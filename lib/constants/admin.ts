@@ -58,7 +58,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 1397;
+export const ADMIN_CHANGE_COUNTER = 1419;
 
 /**
  * Màximes d'Economia (#1390): brúixola de gestió sempre visible al top del dashboard i
@@ -104,6 +104,21 @@ export const ADMIN_DOSSIER_GENERATOR_COPY = {
     railCatalog: 'serveis',
     railSaved: 'dossiers',
   },
+  draftSuggestions: {
+    title: 'Dossiers a preparar',
+    description: 'Leads oberts sense dossier actiu. Obre el generador preomplert; no envia res.',
+    rail: 'cua segura',
+    prepareAction: 'Preparar dossier',
+    createDraftAction: 'Crear esborrany',
+    draftBadge: 'Esborrany',
+    leadAction: 'Obrir lead',
+    scoreLabel: 'Prioritat',
+    serviceLinesLabel: 'línies de bolo',
+    eventNoDate: 'Sense data',
+    eventToday: 'Avui',
+    eventTomorrow: 'Demà',
+    eventInDays: 'dies',
+  },
   client: {
     title: 'Dades del client',
     hint: 'Tria un lead, un client existent o omple les dades abans de crear el flux CRM.',
@@ -142,6 +157,12 @@ export const ADMIN_DOSSIER_GENERATOR_COPY = {
     hint: 'Serveis contractats i imports orientatius abans de crear el dossier.',
     totalLabel: 'Total bolo',
     empty: 'Cap servei seleccionat.',
+    marginTitle: 'Marge abans d’enviar',
+    marginHint: 'Estimació interna amb serveis, cost de partner, CAC i desplaçament.',
+    revenueLabel: 'Ingressos',
+    directCostLabel: 'Cost + CAC',
+    netMarginLabel: 'Marge net',
+    subcontractedLabel: 'Markup partner',
   },
   catalog: {
     title: 'Catàleg disponible',

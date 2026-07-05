@@ -78,6 +78,7 @@ describe('dossier collaborator product mapping', () => {
     category: 'Musical',
     crew: '2 actors + tècnic de so',
     durationLabel: '70 min',
+    costPrice: 320,
     sellPrice: 385,
     imageUrl: '/img/pirates.jpg',
     includes: "Vestuari d'alta qualitat · Desplaçament inclòs · Disponible en català",
@@ -99,6 +100,7 @@ describe('dossier collaborator product mapping', () => {
     expect(product.inclou).toContain('2 actors + tècnic de so');
     expect(product.inclou).toContain('Disponible en català');
     expect(product.sellPrice).toBe(385);
+    expect(product.costPrice).toBe(320);
   });
 
   it('sanititza qualsevol menció de marca de proveïdor del text client-facing', () => {
@@ -121,6 +123,7 @@ describe('dossier collaborator product mapping', () => {
     expect(dossierProduct.nom).toBe('El secret dels pirates');
     expect(dossierProduct.inclou).toContain('Desplaçament inclòs');
     expect(dossierProduct.noInclou).toContain('IVA');
+    expect(dossierProduct.sourceCostPrice).toBe(320);
   });
 });
 

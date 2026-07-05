@@ -338,6 +338,97 @@ Decisió de treball:
 - El proper tall funcional/visual sobre Documents ha de ser l'editor PDF intern: migrar `PresupuestoPdfStudio`/`StudioPreview` a carcassa canònica `pr__*` o component compartit, reduir utilitaris visuals ad-hoc i decidir si l'acció d'enviament ha de quedar en una sola semàntica visible.
 - No tocar pricing, càlcul de transport, IVA ni generació PDF sense una ordre funcional explícita.
 
+### `/admin/bookings`
+
+Pantalla: Reserves / llista i pipeline
+Ruta: `/admin/bookings`
+Estat inventari: 🟢
+TANCAT CHARLIE: no — pendent validacio visual final del propietari.
+Estat fitxa: FETA — auditoria forense inicial completada el 2026-07-03 (Canvi #1384).
+
+Història:
+- Canvis antics de producte van convertir `/admin/bookings` en el centre de consulta de reserves amb llista, cards mobile, filtres, export i kanban.
+- Canvi #1142: drenats contenidors/glass P2 del llistat (`bk-list-shell`, `bk-empty-state`, `bk-mobile-card` en la fase anterior).
+- Canvi #1149: drenats dot mòbil i botons de pipeline a classes canòniques.
+- Canvi #1154: `BookingFilters` elimina l'amplada inline del camp de cerca i passa a classe governada.
+- Canvis #1294/#1316/#1322: consolidacio posterior del detall/lista cap a patrons `ap-*`; avui la llista viu sobre `ap-sticky-header`, `ap-detail-*`, `ap-table`, `ap-card` i `PipelineBoard`.
+- Canvis #1379/#1382/#1383: el flux de nova reserva queda fitxat i vinculat des de la llista via `/admin/bookings/new`.
+
+Component viu:
+- `app/admin/bookings/page.tsx`: server component viu. Llegeix query params (`page`, `status`, `eventType`, `fromDate`, `toDate`, `search`, `view`, `payment`, `customerId`), fa query Prisma cachejada i renderitza header, KPIs, filtres, llista mobile, taula desktop, paginacio i wrapper kanban.
+- `BookingFilters.tsx`: client component viu. Gestiona cerca debounced, filtres d'estat/tipus/cobrament/dates, reset i toggle llista/kanban.
+- `BookingActions.tsx`: client component viu a cards/taula. Canvia estat, elimina reserves permeses, enllaça calendari/client/detall i usa `ConfirmDialog`.
+- `BookingPipelineView.tsx`: client component viu carregat amb `next/dynamic` quan `view=kanban`. Carrega dades per API, mostra metrics, tauler `PipelineBoard`, drag/touch i botons de moviment.
+- `PipelineBoard.tsx`: component compartit viu per kanbans; no és propi de reserves.
+
+CSS viu:
+- No hi ha CSS local exclusiu de `/admin/bookings`.
+- Carcassa viva: `app/admin/admin-shell.css` (`ap-sticky-header`, `ap-detail-*`, `ap-btn`, `ap-card`) i `app/globals.css` (`ap-table-*`, `ap-empty`).
+- Drag/drop viu: `app/admin/admin-theme.css` (`admin-drag-item`) i classes compartides de `PipelineBoard`.
+- Residus `bk-*` històrics documentats en fitxes antigues ja no governen la llista principal actual; la pantalla viu sobre `ap-*`.
+
+APIs/serveis vius:
+- Llista server: `page.tsx` usa `prisma.booking.findMany`, `groupBy`, `count` i `findMany` d'export dins `cachedQuery(CacheTTL.VERY_SHORT)`.
+- Config de marge: `getProfitabilityConfig`.
+- Càlculs locals de marge: `aggregateServiceLines` i `computeSimpleMarginPct`.
+- Kanban/API: `BookingPipelineView` fa `GET /api/admin/bookings?...&pipeline=true`; la ruta crida `listAdminBookings`.
+- Mutacions de fila/card: `PATCH /api/admin/bookings/[id]/status` -> `changeBookingStatus`; `DELETE /api/admin/bookings/[id]` -> `deleteBookingIfAllowed`.
+- Navegacio canònica: `buildBookingHref`, `buildCustomerHubHref`, `buildCustomerWorkspaceTabHref`, `buildCustomerBookingListHref`.
+
+Dades que governa:
+- Vista agregada de reserves, estats, ingressos per estat, total paginat, export CSV, filtres comercials i focus de cobrament.
+- Estat de reserva des del llistat/kanban.
+- Eliminacio de reserves només en estats permesos (`DELETABLE_BOOKING_STATUSES`).
+
+Accions que governa:
+- Crear nova reserva.
+- Filtrar i cercar reserves.
+- Canviar vista llista/kanban.
+- Exportar CSV de reserves filtrades.
+- Obrir detall de reserva i Customer Hub.
+- Saltar a calendari pel dia de la reserva.
+- Canviar estat i eliminar reserves elegibles.
+
+Òrgans veïns:
+- upstream: Dashboard, Salut, Economia, Customer Hub i alertes poden enllaçar cap a `/admin/bookings` amb filtres.
+- downstream: nova reserva, reserva detall, Customer Hub, Calendari, API de reserves, servei de status i timeline/admin logs derivats de mutacions.
+
+Codi mort relacionat:
+- No s'ha detectat arrel de llista morta: `page.tsx`, `BookingFilters`, `BookingActions` i `BookingPipelineView` estan connectats des de la ruta viva.
+- `PipelineBoard` és compartit amb leads i altres pipelines; no podar ni especialitzar des de Reserves sense revisar consumidors.
+
+Duplicacions:
+- Duplicacio principal: `page.tsx` construeix `buildBookingsWhere` i llegeix Prisma directament, mentre `/api/admin/bookings` usa `bookingListService`. Els filtres de pagament i cerca estan duplicats en dos llocs.
+- L'ordenacio no és idèntica: la llista server ordena `eventDate desc`; `bookingListService` ordena `eventDate asc`.
+- El llistat server calcula marge amb `computeSimpleMarginPct`; altres pantalles de detall tenen motors més complets de marge/cost. No canviar criteri en aquesta fitxa.
+
+Hardcoded/residu visual:
+- Hi ha emojis/símbols locals visibles (`📅`, `←`, `→`, `✕`, `+ Nova`, `👤`) i un SVG inline de lupa a `BookingFilters`. Són residu visual menor a revisar si es fa una passada UI, no bloqueig funcional.
+- Hi ha classes Tailwind arbitràries i utilitats locals dins la llista (`bg-[var(--ax-canvas)]`, `text-[var(--t2)]`, `w-[...]`, `max-w-[...]`, `text-[var(--gold)]`). Els guards actuals ho toleren, pero si es retoca visualment s'ha de migrar a patró `ap-*`/tokens compartits.
+- El loading del dynamic import del kanban és un spinner Tailwind local; acceptable com a estat existent, però no és patró de loading admin ric.
+
+Connexions interrompudes:
+- Resolt #1385: `customerId` ja passa per `/api/admin/bookings` i `listAdminBookings`, de manera que `view=kanban` dins context client conserva el mateix filtre que la llista server.
+- La font de dades de taula/cards i kanban no és única. Això pot produir diferències de count, order, locale/translations i filtres.
+
+Riscos:
+- Unificar llista server i API és funcional: afecta cerca, paginacio, export, kanban i Customer Hub; necessita tests de `bookingListService` i verificacio de customer context.
+- Canviar `BookingActions` afecta mutacions reals de status i eliminacio; requereix CSRF/status route tests.
+- Canviar `PipelineBoard` afecta altres pipelines compartits.
+
+Evidència d'auditoria:
+- Fitxers llegits línia per línia: `app/admin/bookings/page.tsx`, `BookingFilters.tsx`, `BookingActions.tsx`, `BookingPipelineView.tsx`, `app/admin/components/PipelineBoard.tsx`, `app/api/admin/bookings/route.ts`, `app/api/admin/bookings/[id]/status/route.ts`, `app/api/admin/bookings/[id]/route.ts`, `lib/services/bookingListService.ts`, tests de `bookingListService` i `BookingPipelineView`.
+- Imports/exports verificats: `page.tsx` -> `BookingFilters`/`BookingActions`/dynamic `BookingPipelineView`; `BookingPipelineView` -> `PipelineBoard`; API -> `listAdminBookings`; actions -> status/detail routes.
+- Selectors CSS verificats contra DOM: `ap-sticky-header`, `ap-detail-*`, `ap-card`, `ap-table-*`, `ap-empty`, `admin-drag-item` i classes de `PipelineBoard`.
+- Serveis/APIs seguits: query Prisma server, `/api/admin/bookings`, `/api/admin/bookings/[id]/status`, `/api/admin/bookings/[id]`, `bookingListService`, `bookingRouteService`.
+- Proves/guards executats en aquest tall: `qa:protocol`, `tsc`, `validate:core` i `git diff --check` abans de tancar.
+
+Decisió de treball:
+- La ruta es conserva: és viva i operativa com a llista/pipeline de reserves.
+- Proper tall funcional recomanat: unificar progressivament la resta de filtres/ordenacio entre `page.tsx` i `bookingListService`, sense barrejar-ho amb visual.
+- No tocar en aquesta fitxa: booking detail, nova reserva, transport, marge global, Stripe/Bizum, CSS funcional ni schema.
+- Validacio pendent del propietari: visual final de llista/kanban abans de `TANCAT CHARLIE`.
+
 ### `/admin/bookings/[id]`
 
 Pantalla: Reserva detall / cabina operativa
@@ -435,6 +526,276 @@ Decisió de treball:
 - Proper tall executable dins Reserva detall: si es continua en aquest òrgan, atacar un P2 acotat de questionnaire/gallery/share o pipeline, sense tocar lògica Stripe/Bizum ni regles de preu.
 - No tocar: schema, webhook Stripe, càlculs de total/IVA, cost engine, llista de reserves ni refeta visual global de la fitxa.
 - Validació pendent del propietari: visual final de la cabina abans de marcar `TANCAT CHARLIE`.
+
+### `/admin/bookings/new`
+
+Pantalla: Nova reserva / configurador contractual precreacio
+Ruta: `/admin/bookings/new`
+Estat inventari: 🟢
+TANCAT CHARLIE: no — pendent validacio visual final del propietari.
+Estat fitxa: FETA — auditoria forense inicial completada el 2026-07-03 (Canvi #1383), despres dels canvis #1379/#1382 sobre herencia de lead i compactacio.
+
+Història:
+- Canvis #906-#910: base del formulari de nova reserva amb autosave, carrega de packs/extres/col·laboradors i submit cap a creacio canònica.
+- Canvi #1157: `BookingTravelDiscountSection` deixa inline layout P3 i passa a classes `nb__*`.
+- Canvi #1158: `BookingClientEventSection` deixa marges/display inline i passa a classes `nb__*`.
+- Canvis #1326-#1330: el configurador incorpora proveïdors, tecnic inclos, transport real i evita duplicar vehicle com a linia de cost.
+- Canvi #1369: la nova reserva hereta dades i linies visibles d'un lead quan entra amb `leadId`.
+- Canvi #1379: `prefill=lead` força herencia neta i ignora autosaves locals vells quan l'accio ve explicitament del lead.
+- Canvi #1382: pantalla compactada: catalegs plegats, tipus d'event resumit si ve heretat, extres/transport tancats i flux `Guanyat` -> crear reserva.
+
+Component viu:
+- `app/admin/bookings/new/page.tsx`: route server mínima; renderitza directament `NewBookingForm`.
+- `app/admin/bookings/NewBookingForm.tsx`: arrel client viva. Orquestra query params (`leadId`, `customerId`, `date`, `prefill=lead`), autosave, dades inicials, pricing, distancia, conflictes, descompte, linies de servei, transport intern i submit.
+- Components fills vius: `BookingClientEventSection`, `BookingServiceLinesSection`, `BookingPackExtrasSection`, `BookingTravelDiscountSection`, `BookingPricingSummary`.
+- Hooks/helpers vius: `useNewBookingInitialData`, `useNewBookingSubmit`, `useBookingPricing`, `useBookingDistance`, `useBookingDateConflicts`, `useBookingDiscountValidation`, `bookingLeadServiceLineMapper`, `booking-form.types`, `booking-form-classes`.
+
+CSS viu:
+- No hi ha CSS local exclusiu de ruta. La pantalla usa carcassa `AdminPage`/`AdminSection`, classes globals admin (`adm-input`, `ap-btn`, `ap-card`) i constants visuals `NB_*` a `booking-form-classes.ts`.
+- Les classes `nb__*` existents cobreixen estats i files compactes del formulari; els residus inline coneguts de `BookingTravelDiscountSection` i `BookingClientEventSection` van quedar drenats als #1157/#1158.
+- No s'ha fet cap retoc CSS en aquesta fitxa.
+
+APIs/serveis vius:
+- Inicialitzacio: `useNewBookingInitialData` carrega packs, extres, col·laboradors i fuel reference; si hi ha `leadId`, consulta `/api/admin/leads/:id` i `/api/admin/leads/:id/service-lines`.
+- Productes proveïdor: `BookingServiceLinesSection` consulta `GET /api/admin/collaborator-products`, que passa per `listActiveCollaboratorProductsForBooking`.
+- Distancia: `useBookingDistance` fa `POST /api/admin/maps/distance` via `fetchWithCsrf`.
+- Conflictes: `useBookingDateConflicts` fa `GET /api/admin/bookings?fromDate=...&toDate=...&limit=10` i filtra estats actius.
+- Creacio: `useNewBookingSubmit` envia `POST /api/admin/bookings` via `fetchWithCsrf`; la ruta valida auth, CSRF, permisos i schema abans de `createBookingFromInput`.
+- Servei canònic: `lib/services/bookingCreationService.ts` genera referencia, normalitza pack/extres/linies, hereta linies del lead si cal, calcula distancia/transport/tolls/IVA/senyal, crea booking/inventari/activity/task, marca lead `WON`, crea availability, adminLog i envia email no blocant.
+
+Dades que governa:
+- Esborrany local de nova reserva (`bookingAutosaveKey`), dades client/event, pack/extres, linies de servei, transport intern, descompte, fiscalitat, notes, origen lead/customer i total manual.
+- Abans de guardar, és configurador contractual; despres de guardar, la veritat passa a `Booking` i `BookingServiceLine`.
+
+Accions que governa:
+- Prefill des de lead/customer/data.
+- Recalcular distancia i peatges.
+- Detectar conflictes de data.
+- Configurar pack, extres, serveis Òrbita, productes de proveïdor, tecnic inclos i linies lliures.
+- Calcular resum de preu/marge i crear la reserva.
+- En exit, neteja autosave i navega a `buildLeadWorkspaceHref(leadId)` si ve de lead o a `buildBookingHref(booking.id)` si no.
+
+Òrgans veïns:
+- upstream: Lead workspace, llista/calendari de leads, Customer Hub i quick actions obren la pantalla via helpers (`buildLeadBookingPrefillHref`, `buildCustomerWorkspaceTabHref`, `buildLeadWorkspaceHref`).
+- downstream: Reserva detall, Calendari/availability, Customer Activity, tasques, inventari, email de confirmacio, admin log i lead `WON`.
+
+Codi mort relacionat:
+- No s'ha detectat una segona arrel viva de nova reserva: `page.tsx` -> `NewBookingForm` és l'unic cami.
+- `BookingServiceLinesSection` no és mort: el comparteixen nova reserva, editor de linies de reserva i bolo de lead. Qualsevol canvi allà és transversal.
+
+Duplicacions:
+- `BookingServiceLinesSection` és component compartit lead/reserva/editor; és monocapa funcional, pero el risc és que canvis visuals locals sobre nova reserva afectin també lead i fitxa reserva.
+- `useNewBookingSubmit` encara suporta camps antics de `relationshipContext`; el formulari actual ja envia el cami explicit de `serviceLines`. Es conserva com a compatibilitat latent, no com a segona UI.
+- La lectura inicial de linies del lead existeix al hook i el servei backend tambe pot heretar linies si el payload les omet; no és duplicacio activa: frontend mostra/editable, backend protegeix el cas sense payload.
+
+Hardcoded/residu visual:
+- No s'han trobat colors o mides locals nous dins aquest tall documental.
+- Residus coneguts: `BookingServiceLinesSection` conserva agrupacions i labels locals de configurador; com que és component compartit i de negoci, qualsevol extraccio a constants ha de ser tall propi amb tests.
+- `BookingServiceLinesSection` fa `fetch('/api/admin/collaborator-products', { headers: { 'x-admin': '1' } })` en cru. És `GET` autenticat i no necessita CSRF, pero queda com a residu de patró perquè altres mutacions ja passen per `fetchWithCsrf`.
+
+Connexions interrompudes:
+- No hi ha cable principal trencat en el flux lead -> nova reserva -> booking: `prefill=lead` força carrega fresca, esborra autosave vell i el submit acaba en servei canònic.
+- Friccio pendent: la pantalla concentra configuracio comercial, cost intern i marge abans de crear la reserva. La compactacio #1382 ajuda, pero futurs canvis han de preservar la separacio mental lead/pre-reserva vs booking/veritat contractual.
+
+Riscos:
+- Tocar `BookingServiceLinesSection` sense mirar els altres dos consumidors pot trencar lead i editor de reserva.
+- Tocar `bookingCreationService` afecta diners, availability, emails, lead status i inventari; requereix tests de servei i ruta.
+- Tocar autosave/prefill pot reintroduir el bug #1379 on un esborrany local trepitja dades fresques del lead.
+
+Evidència d'auditoria:
+- Fitxers llegits línia per línia: `app/admin/bookings/new/page.tsx`, `NewBookingForm.tsx`, `useNewBookingInitialData.ts`, `useNewBookingSubmit.ts`, `BookingClientEventSection.tsx`, `BookingServiceLinesSection.tsx`, `BookingPackExtrasSection.tsx`, `BookingTravelDiscountSection.tsx`, `BookingPricingSummary.tsx`, `useBookingPricing.ts`, `useBookingDistance.ts`, `useBookingDateConflicts.ts`, `bookingLeadServiceLineMapper.ts`, `booking-form.types.ts`, `booking-form-classes.ts`, `app/api/admin/bookings/route.ts`, `lib/services/bookingCreationService.ts`, `app/api/admin/collaborator-products/route.ts`.
+- Imports/exports verificats: `page.tsx` -> `NewBookingForm`; `NewBookingForm` -> hooks/sections; shared `BookingServiceLinesSection` -> lead/editor/nova reserva.
+- Selectors CSS verificats contra DOM: pantalla sense CSS propi; classes `NB_*`, `adm-input`, `ap-btn`, `ap-card` i `AdminPage`/`AdminSection` identificades com a carcassa viva.
+- Serveis/APIs seguits: lead detail/service-lines, collaborator-products, maps distance, bookings GET/POST i `bookingCreationService`.
+- Proves/guards executats per context recent: tests enfocats `leadWorkspaceHref`, `useFormAutosave` i mapper; `tsc`; `qa:protocol`; `validate:core`; `git diff --check` verds en revisio post-crash #1382. Aquest tall documental executa de nou protocol/validacio abans de tancar.
+
+Decisió de treball:
+- La ruta es conserva i queda fitxada com a pantalla viva i crítica de Reserves.
+- Qualsevol millora funcional posterior ha d'entrar per tall petit: autosave/prefill, configurador compartit o servei de creacio, no tot alhora.
+- No tocar en aquest tall: schema, transport, marge, `BoloTripCard`, CSS funcional ni calculs economics.
+- Validacio pendent del propietari: ergonomia visual final de nova reserva abans de `TANCAT CHARLIE`.
+
+### `/admin/calendario`
+
+Pantalla: Calendari operatiu / agenda de reserves, leads, bloquejos i feina
+Ruta: `/admin/calendario`
+Estat inventari: 🟢
+TANCAT CHARLIE: no — pendent validacio visual final del propietari.
+Estat fitxa: FETA — auditoria forense inicial completada el 2026-07-04 (Canvi #1387).
+
+Història:
+- `app/admin/calendario/page.tsx` és una ruta viva amb tres modes (`month`, `week`, `day`) governats per query param `view`.
+- Canvi #325: reserves i follow-ups vinculats van deixar d'obrir lead literal i passen per helper de workspace.
+- Canvi #898: el calendari mostra multiples leads del mateix dia, no només el primer.
+- Canvi #1321: els leads `LOST` es mantenen al calendari com a senyal simbòlic/minimitzat.
+- Canvi #1334: verificacio real que la reserva Alba Orna/OE-2026-006 apareixia a `/api/admin/calendario/mes`.
+- Canvis #1383/#1384/#1385: nova reserva, llista de reserves i kanban queden fitxats; calendari és el tercer node principal pendent de l'òrgan Reserves.
+
+Component viu:
+- `app/admin/calendario/page.tsx`: server component mínim. `dynamic = 'force-dynamic'`; tria `CalendarDayClient`, `CalendarWeekClient` o `CalendarMonthClient` segons `searchParams.view`.
+- `CalendarMonthClient.tsx`: client principal. Carrega rang mensual, mostra KPIs, llegenda/capes, graella, detall de dia, bloqueig/desbloqueig i drag/drop per moure data de reserva.
+- `CalendarWeekClient.tsx`: client setmanal. Reutilitza el mateix endpoint de rang i mostra agenda per setmana amb capes, bloqueig/desbloqueig i enllaços cap a reserves/leads/tasques/social.
+- `CalendarDayClient.tsx`: client diari. Reutilitza el mateix endpoint amb rang d'un dia, pinta timeline horària, resum lateral, bloquejos i feina del dia.
+- `calendar-utils.ts`: tipus i helpers compartits de dies, hores, tons, labels, format de data, packs i temps.
+- `loading.tsx`: skeleton admin canònic per calendari.
+
+CSS viu:
+- No hi ha CSS local exclusiu de `/admin/calendario`.
+- Carcassa viva: `AdminPage`, `ADMIN_CALENDAR_HELP`, `ap-card`, `ap-btn`, `ap-input`, `ap-badge`, `ToastProvider` i tokens globals admin.
+- Persisten classes utilitàries locals i arbitràries dins els clients (`bg-[var(--raised)]`, `border-[var(--line)]`, rings de drag/drop, grid/layout Tailwind). Són residu visual admissible mentre la pantalla no es retoca, però no són patró nou a copiar.
+
+APIs/serveis vius:
+- Lectura agregada: `GET /api/admin/calendario/mes?from=...&to=...` valida auth i crida `getAdminCalendarMonth(from, to)`.
+- `getAdminCalendarMonth`: agrega `Lead` sense booking, `Booking` no cancel·lada, `Availability` bloquejada, `Task` oberta/en curs, `SocialPost` draft/scheduled i follow-ups pendents del dia actual.
+- Disponibilitat admin: `POST /api/admin/availability` i `DELETE /api/admin/availability` amb CSRF; servei `availabilityAdminService` crea/actualitza/elimina bloquejos amb data a migdia per evitar problemes de zona horària.
+- Moviment de reserva: el mes fa `PATCH /api/admin/bookings/[id]` amb `eventDate` quan es deixa anar una reserva sobre un altre dia.
+- Navegacio canònica: `buildBookingHref`, `buildLeadCustomerHref`, `buildCustomerWorkspaceTabHref` en mes i helpers compartits de lead/booking en dia/setmana.
+
+Dades que governa:
+- Agenda operativa de reserves: id, lead/customer, data, client, ubicacio, estat, tipus, total, horari i pack.
+- Leads amb data d'event i sense reserva, inclosos `LOST` com a senyal simbolic.
+- Bloquejos de disponibilitat admin.
+- Tasques amb venciment, posts socials programats i follow-ups pendents.
+- Preferencia visual local de capes activades/desactivades dins cada client.
+
+Accions que governa:
+- Canviar vista mes/setmana/dia i navegar dates.
+- Activar/desactivar capes de lectura.
+- Obrir reserva, lead/customer, tasques i social.
+- Crear reserva amb data preomplerta (`/admin/bookings/new?date=...`) i crear client des del context del dia.
+- Bloquejar o desbloquejar dies.
+- Reprogramar reserva arrossegant-la en vista mensual o canviant data des del detall mensual.
+
+Òrgans veïns:
+- upstream: llista de reserves, nova reserva, Customer Hub, leads, dashboard i quick actions poden portar cap al calendari per data o context.
+- downstream: reserva detall, nova reserva, Customer Hub, Lead workspace, Tasks, Social, Availability pública/admin i la subruta `/admin/calendario/capacity`.
+- `/admin/calendario/capacity` és una ruta viva però queda fora d'aquesta fitxa; continua pendent de fitxa pròpia a la taula.
+
+Codi mort relacionat:
+- No s'ha detectat arrel morta: els tres clients estan connectats per `page.tsx` i el query param `view`.
+- `calendar-utils.ts` és compartit pels tres clients; no podar helpers sense revisar mes/setmana/dia.
+- `capacity/page.tsx` no és mort: és una subruta separada amb serveis de capacitat/forecast.
+
+Duplicacions:
+- Els tres clients dupliquen fetch del rang, estat `loading/error/data`, toggles de capes i lògica de bloqueig/desbloqueig.
+- L'endpoint es diu `/mes`, però dia i setmana també el consumeixen com a agregador de rang. Funciona, però el nom del contracte és legacy i pot confondre futurs canvis.
+- Month té moviment de reserva per drag/drop i canvi de data; week/day no tenen la mateixa capacitat. La diferència és funcional, no només visual.
+- `CalendarWeekClient` no usa `buildCustomerWorkspaceTabHref` com el mes; cal revisar coherència d'enllaços si es toca navegacio.
+
+Hardcoded/residu visual:
+- Metadata sense accents: `"Calendari d'ocupacio | Orbita Admin"`; és admin intern, però si es toca copy s'ha d'alinear.
+- Icones/emoji visibles locals (`📣`, `☎`, `👤`) i labels interns directes als components.
+- Classes Tailwind arbitràries i rings locals en estats de drag/drop. Si hi ha passada visual, migrar cap a tokens/classes admin compartides.
+
+Connexions interrompudes:
+- No hi ha tall principal de dades: API i servei retornen les sis capes que els clients esperen.
+- Risc funcional conegut: l'agregador inclou follow-ups només al `todayKey`; en rangs futurs/passats la capa no és històrica, sinó una safata del dia actual projectada sobre el calendari.
+- La creacio de reserva des de calendari només passa `date`; qualsevol herencia de client/lead ha d'entrar per fluxos propis, no inventar-se al calendari.
+
+Riscos:
+- Tocar `getAdminCalendarMonth` afecta mes, setmana i dia simultaniament; qualsevol canvi ha de cobrir serveis i com a mínim una vista client.
+- Tocar availability afecta disponibilitat pública/admin i integracions de reserva; validar `availabilityAdminService` i rutes amb CSRF.
+- Tocar `PATCH /api/admin/bookings/[id]` des del calendari afecta reserva real; no barrejar moviments de data amb transport, marge o status.
+
+Evidència d'auditoria:
+- Fitxers llegits línia per línia o per perímetre complet: `app/admin/calendario/page.tsx`, `CalendarMonthClient.tsx`, `CalendarWeekClient.tsx`, `CalendarDayClient.tsx`, `calendar-utils.ts`, `loading.tsx`, `app/api/admin/calendario/mes/route.ts`, `lib/services/adminCalendarMonthService.ts`, `app/api/admin/availability/route.ts`, `lib/services/availabilityAdminService.ts`.
+- Tests llegits: `__tests__/app/admin/calendario/CalendarMonthClient.test.ts`, `__tests__/lib/services/adminCalendarMonthService.test.ts`, `__tests__/lib/services/availabilityAdminService.test.ts`.
+- Imports/exports verificats: `page.tsx` -> tres clients; clients -> `calendar-utils`; endpoint calendari -> servei mes; availability route -> servei availability.
+- Serveis/APIs seguits: calendari mes, availability admin i PATCH booking per canvi de data.
+- Proves/guards a executar abans de tancar aquest tall: tests de calendari/availability, `tsc`, `qa:protocol`, `validate:core` i `git diff --check`.
+
+Decisió de treball:
+- La ruta es conserva: és l'agenda operativa viva de Reserves i feina planificada.
+- Proper tall recomanat: si es toca funcionalment, extreure fetch/block/layers a helper compartit o normalitzar el contracte de rang abans de polir UI.
+- No tocar en aquesta fitxa: transport, marge, cost de bolo, booking detail, nova reserva, schema ni Google Calendar.
+- Validacio pendent del propietari: visual final de mes/setmana/dia abans de `TANCAT CHARLIE`.
+
+### `/admin/calendario/capacity`
+
+Pantalla: Capacitat operativa / càrrega i forecast
+Ruta: `/admin/calendario/capacity`
+Estat inventari: 🟢
+TANCAT CHARLIE: no — pendent validacio visual final del propietari.
+Estat fitxa: FETA — auditoria forense inicial completada el 2026-07-04 (Canvi #1388).
+
+Història:
+- La ruta neix com a extensió del calendari per llegir capacitat operativa abans que el calendari mensual sigui massa dens.
+- Canvis #747/#748/#749: `operationalForecastService` afegeix forecast setmanal, el Dashboard mostra `WeeklyCapacityForecastPanel` quan hi ha alertes i el resum diari email/WhatsApp rep les setmanes `WARNING`/`CRITICAL`.
+- Canvi #750: tests de `WeeklyCapacityForecastPanel` blinden render condicional, CTA a `/admin/calendario/capacity`, alertes i YoY.
+- Canvis #987-#1322: la pàgina i el panell han passat per homogeneïtzació visual massiva cap a `.ap-*` i `admin-tone-*`.
+- Canvi #1387: el calendari base queda fitxat; aquesta subruta queda com a detall de capacitat separat i viu.
+
+Component viu:
+- `app/admin/calendario/capacity/page.tsx`: server component viu. Carrega `loadWeekCapacity(now, 14)` i `loadWeeklyCapacityForecast(now, 4)` en paral·lel i renderitza KPIs, graella de 14 dies, llegenda i forecast de 4 setmanes.
+- `loading.tsx`: reexporta `AdminLoadingSkeletonList`.
+- `app/admin/components/WeeklyCapacityForecastPanel.tsx`: panell de Dashboard que filtra setmanes `WARNING`/`CRITICAL` i enllaça a aquesta ruta com a detall.
+- No hi ha client component propi ni mutacions a la ruta.
+
+CSS viu:
+- No hi ha CSS local exclusiu.
+- Carcassa viva: `AdminPage`, `ap-card`, `ap-btn`, `admin-tone-*`, tokens globals i utilitats responsive.
+- Residus visuals locals: mapes `LOAD_CONFIG` i `ALERT_CONFIG` dins la pàgina amb classes Tailwind arbitràries (`text-[var(--t3)]`, `bg-[var(--o-admin-fill-1)]`, `border-[var(--line)]`, dots `bg-[var(--o-*)]`). Són dades visuals de presentació, no font de negoci.
+
+APIs/serveis vius:
+- `bookingCapacityService.ts`: `buildWeekCapacity(input)` pura i `loadWeekCapacity(startDate, days)` sobre `prisma.booking`.
+- `loadWeekCapacity`: compta reserves amb status `PENDING`, `CONFIRMED` i `PREPARING`, dins finestra `[start, end)`, ordenades per `eventDate`.
+- `operationalForecastService.ts`: `buildWeeklyCapacityForecast(input)` pura i `loadWeeklyCapacityForecast(now, weeksAhead, options)` sobre reserves properes i reserves de l'any anterior.
+- `automationThresholds.ts`: `CAPACITY_FORECAST_THRESHOLDS` és la font canònica dels llindars del forecast (`maxBookingsPerDay=2`, `weekWarningBookings=5`, `weekCriticalBookings=7`, `defaultWeeksAhead=4`).
+- Dashboard: `app/admin/page.tsx` carrega `loadWeeklyCapacityForecast()` i renderitza `WeeklyCapacityForecastPanel`.
+
+Dades que governa:
+- Capacitat de 14 dies: dies lliures, total reserves, dies sobrecarregats, dia més ocupat, càrrega per dia, convidats totals i reserves clicables.
+- Nivells de càrrega de dia: `FREE`, `LIGHT`, `FULL`, `OVERLOADED`.
+- Forecast 4 setmanes: reserves, convidats, dies sobrecarregats, reserves mateixa finestra de l'any anterior, delta YoY, alert level i missatge.
+- No governa availability ni bloquejos; això viu al calendari base i serveis d'availability.
+
+Accions que governa:
+- Obrir la reserva afectada amb `buildBookingHref`.
+- Tornar a calendari via `back`.
+- Llegir setmanes futures amb alerta i decidir intervencio manual fora d'aquesta pàgina.
+- Des del Dashboard, saltar a `/admin/calendario/capacity` quan el panell condicional detecta risc.
+
+Òrgans veïns:
+- upstream: Dashboard (`WeeklyCapacityForecastPanel`), calendari base, resum diari comercial i alertes operatives.
+- downstream: reserva detall per cada booking, calendari base per context d'agenda, manual admin per capacitat/conflictes.
+- relacionat però separat: `capacityConflictService` detecta col·lisions d'inventari; aquesta ruta només llegeix càrrega temporal de reserves i forecast.
+
+Codi mort relacionat:
+- La ruta és viva: apareix a `app/admin/calendario/capacity/page.tsx`, al CTA del Dashboard i al manual.
+- `WeeklyCapacityForecastPanel` no és mort encara que retorni `null` sense alertes; és un panell condicional deliberat i testat.
+- `bookingCapacityService` i `operationalForecastService` tenen tests de builder/loader.
+
+Duplicacions:
+- La pàgina duplica localment configuracions visuals `LOAD_CONFIG`/`ALERT_CONFIG`; `WeeklyCapacityForecastPanel` té el seu propi `ALERT_STYLE`. Si es fa una passada visual, caldria compartir mapa de presentació o portar-ho a constants UI.
+- `bookingCapacityService` usa `DEFAULT_MAX_PER_DAY = 2`; `operationalForecastService` usa `CAPACITY_FORECAST_THRESHOLDS.maxBookingsPerDay = 2`. Mateix valor en dues fonts; el forecast ja és canònic, la capacitat de 14 dies encara té default local.
+- Els llindars són de volum de reserves, no de persones, hores, equip ni staff. No interpretar `OVERLOADED` com a capacitat logística completa.
+
+Hardcoded/residu visual:
+- Textos de pàgina/admin en JSX directe; és admin intern i coherent amb la resta, però si es converteix en superfície pública o multiidioma caldria extreure.
+- Classes arbitràries de color/token dins configs locals, tolerades pels guards actuals però no ideals com a patró nou.
+- Comentaris JSX (`Summary KPIs`, `Day grid`, `Legend`, `Forecast 4 setmanes`) són orientatius; no afecten runtime.
+
+Connexions interrompudes:
+- No hi ha cable principal trencat: Dashboard -> capacity -> booking detail funciona amb helpers.
+- Connexio parcial: la pàgina no enllaça cap a la data concreta del calendari base; només cap a reserva o calendari general. Si el propietari demana drill-down de dia, fer tall petit.
+- La comparativa YoY compta reserves per offset setmanal respecte a l'any anterior; no ajusta festius, temporada ni tipus d'event.
+
+Riscos:
+- Canviar `loadWeekCapacity` afecta lectura de 14 dies i pot alterar semàfors del propietari; validar tests de `bookingCapacityService`.
+- Canviar `loadWeeklyCapacityForecast` afecta Dashboard, resum diari i aquesta pàgina; validar servei, panell i automatitzacio comercial si es toca contracte.
+- No barrejar aquesta ruta amb inventari/transport/staff: són dimensions relacionades però servides per altres motors.
+
+Evidència d'auditoria:
+- Fitxers llegits línia per línia o per perímetre complet: `app/admin/calendario/capacity/page.tsx`, `loading.tsx`, `lib/services/bookingCapacityService.ts`, `lib/services/operationalForecastService.ts`, `lib/constants/automationThresholds.ts`, `app/admin/components/WeeklyCapacityForecastPanel.tsx`, connexió al Dashboard dins `app/admin/page.tsx`.
+- Tests llegits: `__tests__/lib/services/bookingCapacityService.test.ts`, `__tests__/lib/services/operationalForecastService.test.ts`, `__tests__/app/admin/components/WeeklyCapacityForecastPanel.test.tsx`.
+- Imports/exports verificats: capacity page -> serveis; Dashboard -> `WeeklyCapacityForecastPanel`; panell -> CTA `/admin/calendario/capacity`.
+- Proves/guards a executar abans de tancar aquest tall: tests de capacity/forecast/panell, `tsc`, `qa:protocol`, `validate:core` i `git diff --check`.
+
+Decisió de treball:
+- La ruta es conserva: és el detall operatiu del forecast de capacitat i complementa el calendari base.
+- Proper tall recomanat: si es toca, unificar els llindars `maxPerDay` i els mapes visuals de forecast entre pàgina i panell.
+- No tocar en aquesta fitxa: inventari, transport, staff, booking detail, schema, cron/commercial daily ni CSS funcional.
+- Validacio pendent del propietari: utilitat visual de la graella 14 dies i forecast abans de `TANCAT CHARLIE`.
 
 ### `/admin/clientes/[id]`
 
@@ -748,6 +1109,61 @@ Hardcoded/residu visual: dins canon. EXEMPCIONS legítimes documentades: CanvasE
 Connexions interrompudes: cap. cockpit↔economicCockpitService (forecast unificat #1089), economia↔costEngine.
 
 Decisio de treball: organ SA. `/studio` queda protegit a part (qa:studio-integrity). Editors (canvas/managers) són exempts legítims. Cap canvi de codi. Pendent validacio visual del propietari.
+
+### `/admin/docs/visual-audit`
+
+Pantalla: Auditoria visual — visor del baseline runtime visual #1416.
+Ruta: `/admin/docs/visual-audit`
+Estat inventari: 🟢
+TANCAT CHARLIE: no — pendent validació visual del propietari.
+Estat fitxa: FETA (auditoria forense compacta #1417, codex, 2026-07-05)
+
+Història:
+- Neix després del baseline #1416, que genera `.codex-captures/visual-audit-1416-final/visual-audit-results.json` amb 94 rutes i 282 captures.
+- El #1417 converteix aquest arxiu en superfície admin consultable, perquè la revisió visual no depengui només de fitxers locals.
+
+Reachability:
+- `app/admin/docs/visual-audit/page.tsx` és ruta Next real, `dynamic = 'force-dynamic'`.
+- `app/admin/docs/visual-audit/VisualAuditClient.tsx` és importat només per la page i governa filtres/captures.
+- `app/admin/docs/visual-audit/loading.tsx` existeix.
+- `app/admin/lib/adminNav.ts` enllaça `Auditoria visual` dins Sistema.
+- Passa `qa:no-dead-admin-views`.
+
+Component viu:
+- Page server: carrega `loadVisualAuditAtlas()`, pinta `AdminPage`, KPIs i delega a `VisualAuditClient`.
+- Client: filtra per òrgan/cerca, mostra síntesi radiografia real → zenit → full de ruta, resums per òrgan i targetes de ruta amb captures desktop/tablet/mobile.
+
+CSS viu:
+- Sense CSS local. Consumeix classes globals admin (`AdminPage`, `.ap-card`, `.ap-btn`, `.ap-badge`, `admin-tone-*`) i utilitats responsive.
+- No introdueix tokens, hex ni rgba locals.
+
+APIs/serveis vius:
+- `lib/services/visualAuditAtlasService.ts`: loader filesystem + composició pura del baseline.
+- `lib/constants/visual-audit.ts`: ordre d'òrgans, viewports, dimensions de revisió i principis zenit.
+- `/api/admin/visual-audit/screenshot`: GET read-only amb `requireAuth`, validació de `run`/`file` i confinament a `.codex-captures/<run>/screenshots`.
+
+Dades que governa:
+- Només llegeix el baseline regenerable `.codex-captures/visual-audit-1416-final/visual-audit-results.json` i captures PNG associades.
+- No governa negoci, schema, clients, leads, reserves, diners, emails ni PDF runtime.
+
+Accions que governa:
+- Filtrar i obrir captures/rutes. Cap mutació.
+- Serveix com a punt de partida per decidir quina pantalla passa a revisió profunda.
+
+Òrgans veïns:
+- upstream: `scripts/admin-visual-audit.mjs` i documents `AUDITORIA-VISUAL-GLOBAL-1416.md` / `FULL-DE-RUTA-auditoria-disseny-admin.md`.
+- downstream: `docs/admin-fitxes-pantalles.md` abans de tocar una pantalla concreta; rutes admin reals que s'obren des del visor.
+
+Codi mort relacionat: cap evidència; servei, ruta, client, endpoint i nav són vius.
+Duplicacions: no duplica l'atles elèctric; aquest visor mira runtime visual/captures, l'atles elèctric mira filesystem/cables/símbols.
+Hardcoded/residu visual: strings admin locals acceptables per pantalla interna; semàntica estable de dimensions viu a `visual-audit.ts`.
+Connexions interrompudes: cap. Si falta el baseline local, la pantalla mostra empty state i instrucció d'executar l'auditoria visual.
+
+Evidència d'auditoria:
+- Fitxers llegits/tocats: `page.tsx`, `VisualAuditClient.tsx`, `loading.tsx`, endpoint screenshot, `visualAuditAtlasService`, constants i test.
+- Proves/guards: test servei 3/3, `tsc`, `validate:core`, `pnpm build`, `qa:protocol`, auditor visual acotat 3/3 OK a `.codex-captures/visual-audit-1417-route-final/`.
+
+Decisio de treball: conservar com a eina viva de retorn visual. Proper pas real: usar-la per revisar un òrgan concret amb les 9 dimensions del full de ruta visual, no fer canvis genèrics sense fitxa.
 
 ### `/admin/campaigns`
 
@@ -1095,11 +1511,11 @@ Decisio de treball:
 | `/admin/blog` | `app/admin/blog/page.tsx` | PENDENT | codex/claude | Blog llista |
 | `/admin/blog/edit/[id]` | `app/admin/blog/edit/[id]/page.tsx` | PENDENT | codex/claude | Blog edició |
 | `/admin/blog/new` | `app/admin/blog/new/page.tsx` | PENDENT | codex/claude | Nou blog |
-| `/admin/bookings` | `app/admin/bookings/page.tsx` | PENDENT | codex/claude | Reserves llista — contenidors/glass P2 drenats #1142; pipeline dots/botons P2 drenats #1149 |
+| `/admin/bookings` | `app/admin/bookings/page.tsx` | FETA | codex | Reserves llista — fitxa forense #1384; contenidors/glass P2 drenats #1142; pipeline dots/botons P2 drenats #1149 |
 | `/admin/bookings/[id]` | `app/admin/bookings/[id]/page.tsx` | FETA | codex | Reserva detall — fitxa forense #1112 |
-| `/admin/bookings/new` | `app/admin/bookings/new/page.tsx` | PENDENT | codex/claude | Nova reserva — TravelDiscount inline layout P3 drenat #1157; ClientEvent marges inline drenats #1158 |
-| `/admin/calendario` | `app/admin/calendario/page.tsx` | PENDENT | codex/claude | Calendari legacy/compatibilitat |
-| `/admin/calendario/capacity` | `app/admin/calendario/capacity/page.tsx` | PENDENT | codex/claude | Capacitat |
+| `/admin/bookings/new` | `app/admin/bookings/new/page.tsx` | FETA | codex | Nova reserva — fitxa forense #1383; TravelDiscount inline layout P3 drenat #1157; ClientEvent marges inline drenats #1158 |
+| `/admin/calendario` | `app/admin/calendario/page.tsx` | FETA | codex | Calendari mes/setmana/dia — fitxa forense #1387 |
+| `/admin/calendario/capacity` | `app/admin/calendario/capacity/page.tsx` | FETA | codex | Capacitat operativa — fitxa forense #1388 |
 | `/admin/campaigns` | `app/admin/campaigns/page.tsx` | FETA | codex | Campanyes — fitxa forense #1206 |
 | `/admin/canvas` | `app/admin/canvas/page.tsx` | PENDENT | codex/claude | Canvas |
 | `/admin/catalog` | `app/admin/catalog/page.tsx` | PENDENT | codex/claude | Catàleg |
@@ -1120,6 +1536,7 @@ Decisio de treball:
 | `/admin/docs/full-de-ruta` | `app/admin/docs/full-de-ruta/page.tsx` | PENDENT | codex/claude | Full de ruta |
 | `/admin/docs/organisme` | `app/admin/docs/organisme/page.tsx` | PENDENT | codex/claude | Organisme |
 | `/admin/docs/protocol` | `app/admin/docs/protocol/page.tsx` | PENDENT | codex/claude | Protocol |
+| `/admin/docs/visual-audit` | `app/admin/docs/visual-audit/page.tsx` | FETA | codex | Auditoria visual — fitxa forense compacta #1417 |
 | `/admin/dossiers` | `app/admin/dossiers/page.tsx` | PENDENT | codex/claude | Dossiers |
 | `/admin/economia` | `app/admin/economia/page.tsx` | PENDENT | codex/claude | Economia |
 | `/admin/email-templates` | `app/admin/email-templates/page.tsx` | PENDENT | codex/claude | Plantilles email |

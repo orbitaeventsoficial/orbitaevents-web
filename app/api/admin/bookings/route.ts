@@ -81,6 +81,7 @@ export async function GET(req: NextRequest) {
       toDate: searchParams.get('toDate'),
       search: searchParams.get('search'),
       payment: searchParams.get('payment'),
+      customerId: searchParams.get('customerId'),
       page: safeParseInt(searchParams.get('page'), 1, 1),
       limit: safeParseInt(searchParams.get('limit'), 25, 1, isPipeline ? 1000 : 200),
     }));

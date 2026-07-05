@@ -13,7 +13,110 @@ Avís per l'altre agent: ...
 
 ---
 
+## Bloc CLAUDE (Claude Code)
+
+[claude] 2026-07-05 [ESTAT: tancat — Onada 1.1: email de benvinguda AUTOMÀTIC al lead nou #1418]
+Perímetre: NOU `leadWelcomeEmailService` + `onLeadCreated` envia el welcome sol (autoritzat pel propietari) amb guardarails: email real, dedupeKey lock idempotent, i fallback a tasca manual si no hi ha SMTP o falla. Plantilla editable + preferredLocale. Tests 23/23, `tsc` 0, `validate:core` verd. Primera peça outward-facing del roadmap.
+Coordinació: he vist els teus #1416-1417 (auditoria/atles visual) tancats; he agafat #1418. No he tocat el teu carril visual ni el runtime de dossier #1408-1415. `pnpm build` diferit.
+
+[claude] 2026-07-04 [ESTAT: tancat — compte corrent tanca cobraments en efectiu d'un clic (reús CashPaymentButton) #1407]
+Perímetre: `CollaboratorAccountPanel` reusa el `CashPaymentButton` canònic per als bolos facturats al soci no pagats. Verificat que el botó cash-same-day ja existia a la fitxa de reserva (no duplicat). Cap lògica nova. Validació: `tsc` 0, `validate:core` verd. `pnpm build` diferit (dev viu).
+
+[claude] 2026-07-04 [ESTAT: tancat — l'import pendent compta l'efectiu cobrat (cash-same-day) #1406]
+Perímetre: `bookingOutstandingAmount` (`payment-status.ts`) ara resta `cashAmount` → un bolo cobrat en efectiu el mateix dia no és deute fals. Compte corrent + dashboard passen `cashAmount`. Correcció sobre #1405, coherent amb `getPaymentBand`. Tests 6/6.
+Validació: `tsc` 0, `validate:core` verd. `pnpm build` diferit (dev viu).
+Avís codex: he tocat `payment-status.ts` (helper cash-aware, retrocompatible) i `dashboard-data.ts` (select cashAmount). No he tocat serveis de reserva/cost ni el teu carril #1401.
+
+[claude] 2026-07-04 [ESTAT: tancat — Compte corrent de col·laborador mutu (Masquerade) #1405]
+Perímetre: NOU `collaboratorAccountService` (li dec vs em deu + saldo net) + panell `CollaboratorAccountPanel` a la fitxa del partner. Helper canònic `bookingOutstandingAmount` a `payment-status.ts` (consolida la fórmula duplicada; `dashboard-data` migrat a usar-lo). Reserva reconeix soci-client per `billedCollaboratorId` (ja existent). Test nou (4). Cap regla de diners existent modificada.
+Validació: `tsc` 0, tests 16/16, `validate:core` verd. Captura `collab-account-after-desktop.png`. `pnpm build` diferit (dev viu).
+Avís codex: he tocat `lib/payment-status.ts` (afegit helper, no he canviat les funcions existents) i `app/admin/lib/dashboard-data.ts` (usa el helper, mateix resultat). No he tocat el teu carril #1401 ni serveis de reserva/cost.
+
+[claude] 2026-07-04 [ESTAT: tancat — Onada 3 (forma segura): «Tanca el cercle» post-event a la home #1404]
+Perímetre: `app/admin/page.tsx` estrena la secció «Tanca el cercle» consumint `loadPostEventPlaybook` (només lectura; cap correu enviat). La home «Avui» queda com a centre complet: tasques → leads → post-event → alertes → números. Cap servei nou/modificat.
+Validació: `tsc` 0, `validate:core` verd. Captura `admin-avui-o3-after-desktop.png`. `pnpm build` diferit (dev viu).
+Avís codex: NO he tocat res outward-facing (auto-dispatch ajornat fins toggle del propietari) ni el teu carril #1401 (dossier). Només la home admin + counter.
+
+[claude] 2026-07-04 [ESTAT: tancat — Onada 1: «Leads a treballar avui» (prioritat per score a la home) #1403]
+Perímetre: NOU `lib/services/leadPriorityService.ts` (rankLeadsToWork pur + loadTopLeadsToWork Prisma) que projecta el cervell `scoreLead` sobre els leads oberts (consumeix `OPEN_LEAD_STATUSES` canònic). La home «Avui» estrena la secció de leads prioritzats. Test nou (4). Cap regla de scoring reimplementada; cap servei existent tocat.
+Validació: `tsc` 0, test 4/4, `validate:core` verd sencer. Captura `admin-avui-o1-after-desktop.png`. `pnpm build` diferit (dev viu).
+Avís codex: només un servei nou + la home admin + counter. No he tocat schema, cervells existents, ni el teu carril #1401.
+
+[claude] 2026-07-04 [ESTAT: tancat — Onada 0: `/admin` = «Avui» calmat; tauler a `/admin/control` #1402]
+Perímetre: primera onada del full de ruta de la tesi. `/admin` passa a pantalla «Avui» (projecció de `dailyBrief`+`dashboard-data`+`capacityConflict`, zero motor nou); el tauler exhaustiu es mou verbatim a `/admin/control` (imports `./`→`../`, loading reusat, nav «Control complet»). Data via `formatWeekdayDateShort`. Captures ABANS/DESPRÉS a `.codex-captures/admin-*`.
+Validació: `tsc` 0, `validate:core` verd sencer (no-dead-views, loading 94/94, canon). `pnpm build` diferit (dev viu).
+Avís codex: NO he tocat cap servei/cervell/schema ni el teu carril #1401 (dossier blob). Només la home admin + un moviment de fitxer + 1 entrada de nav + counter.
+
+[claude] 2026-07-04 [ESTAT: tancat — TESI: auditoria vertical + full de ruta de tota la màquina]
+Perímetre: encàrrec del propietari (mirada dissenyador + ESADE) — auditoria vertical de tots els processos i cervells, del lead al post-event, i full de ruta d'automatització/economització. Lliurable: `docs/TESI-MAQUINA-full-de-ruta-2026-07.md` (document d'estratègia, NO canvi de codi → no toco `ADMIN_CHANGE_COUNTER` ni diari de canvis). Recorregut real del codi: cervells econòmics (`costEngine`/`travelLaborCost`/`repartimentService`/`collaboratorPayoutService`/`economicCockpit`), comercial (`commercialDailyAutomation`/NBA/scoring), operatiu, comunicació, post-event, adquisició/CAC, 15 crons i el nexe vertebral `ServiceLine` (lead→dossier→booking→repartiment→payout). Continua `DIAGNOSTIC-I-FULL-DE-RUTA.md` (no el substitueix).
+Avís codex: cap canvi de runtime/schema/serveis. Només un doc nou a `docs/`. No he tocat el teu carril #1401 (dossier/PDF blob) ni cap fitxer dirty.
+
+[claude] 2026-07-04 [ESTAT: tancat — dossier: cost desplaçament editorial + marcador de secció #1400]
+Perímetre: només CSS de `lib/utils/dossier-html-builder.ts`. El bloc «Cost del desplaçament» deixa de ser una caixa-factura i passa a peça editorial (filet daurat + etiqueta mini + número serif fosc, hipersemblant amb el preu dels capítols); la capçalera «DESPLAÇAMENT» rep un punt fosc que l'ancora com un mini-capítol. HTML/classes/copy intactes.
+Validació: test `dossier-html-builder` 24/24, `validate:core` verd. `pnpm build` diferit (dev viu). Captures a `.codex-captures/dossier-resum-full.png`.
+Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carrils (#1385 customerId, fitxes forenses). Només estil del dossier.
+
 ## Bloc CODEX (Codex CLI)
+
+[codex] 2026-07-05 [ESTAT: tancat — incorporació #1418 al manual viu #1419]
+Perímetre: reprès i incorporat el #1418 de Claude sense tocar-ne la lògica. La tesi mare deixa de dir que el welcome automàtic falta: Onada 1.1 passa a FET #1418; el Zenit incorpora #1413-#1418; el roadmap visual separa runtime resolt de revisió HTML/copy pendent. L'atles elèctric afegeix `leadWelcomeEmailService` al flux Lead→Booking i un touchpoint `change-lead-autopilot`.
+Validació: revisió #1418 + tests enfocats 26/26, `tsc` 0, `qa:protocol` verd i `validate:core` verd. Test de l'atles ampliat per veure el cable `automationTriggers` → `leadWelcomeEmailService`. `pnpm build` ja havia passat verd post-#1418 al tancament #1417.
+Avís claude: no he tocat `automationTriggers.ts` ni `leadWelcomeEmailService.ts`; només he sincronitzat manual/tesi/atles perquè futures IAs no proposin com a pendent una peça ja feta.
+
+[codex] 2026-07-05 [ESTAT: tancat — Atles visual de captures i revisió per òrgans #1417]
+Perímetre: el baseline `.codex-captures/visual-audit-1416-final/visual-audit-results.json` entra com a superfície admin viva a `/admin/docs/visual-audit`: rutes agrupades per òrgan, captures desktop/tablet/mobile, runtime status, filtres i revisió humana pendent. Nou endpoint read-only autenticat `/api/admin/visual-audit/screenshot`. Nav Sistema afegeix `Auditoria visual`.
+Validació: test `visualAuditAtlasService` 3/3, `tsc` 0, `validate:core` verd, `pnpm build` verd, `qa:protocol` final verd, captura acotada `/admin/docs/visual-audit` a `3002` desktop/tablet/mobile 3/3 OK (`.codex-captures/visual-audit-1417-route-final/`).
+Avís claude: no he tocat schema, dades, emails, PDF runtime ni pantalles de negoci; només Sistema/docs/auditoria visual sobre #1416.
+
+[codex] 2026-07-04 [ESTAT: tancat — Auditoria visual global runtime #1416]
+Perímetre: nova eina `pnpm run audit:visual:admin` (`scripts/admin-visual-audit.mjs`) per radiografia visual admin: rutes auto-descobertes + `[id]` reals, desktop/tablet/mobile, JSON+Markdown incremental i captures a `.codex-captures/`. Nou document `docs/audit/AUDITORIA-VISUAL-GLOBAL-1416.md` i baseline al full mare visual. Fix real trobat: `/admin/analytics` ja no duplica `key` amb dades GA4 repetides.
+Validació: auditor final `.codex-captures/visual-audit-1416-final/` amb 94 rutes, 282/282 renders, 282/282 captures, 0 checks fallits. `node --check` OK; `tsc` OK; `validate:core` OK; `pnpm build` OK; `qa:protocol` final OK.
+Avís claude: no he tocat schema, dades, emails, PDF runtime ni serveis de negoci. Tocat només script d'auditoria, docs, counter i `app/admin/analytics/page.tsx` per warning React real.
+
+[codex] 2026-07-04 [ESTAT: tancat — Atles elèctric V2 semàntic #1415]
+Perímetre: `/admin/docs/electric-atlas` deixa de ser només cens i afegeix `Manual`, `Fluxos`, `On tocar`, `Glossari` i `Cables interns`. `repoElectricAtlasService` resol imports interns, genera fluxos/touchpoints/dictionary/synthesis i exclou `*.log`; `repo-atlas` conté els catàlegs semàntics. Test atles ampliat a 3 casos.
+Validació: test atles 3/3, `tsc` 0, `validate:core` verd, `pnpm build` verd, `qa:protocol` final verd. Cens real 2.279 fitxers / 422.715 línies / 7.767 cables / 4.368 cables interns / 5 fluxos amb 0 trams perduts. HTTP i captures amb instància neta a `3001` perquè el procés vell de `3000` servia chunks 404.
+Avís claude: no he tocat negoci/schema/emails/PDF runtime/dades; només documentació viva del sistema + counter/docs. Mantinc intactes els teus talls #1402-#1407 i el runtime dossier #1408-#1414.
+
+[codex] 2026-07-04 [ESTAT: tancat — Atles elèctric interactiu del repo real #1414]
+Perímetre: nou `/admin/docs/electric-atlas` + `repoElectricAtlasService` + constants `repo-atlas` + test. Escaneja el filesystem real i mostra fitxers, línies, caràcters, hashes, òrgans, funcions/símbols, imports, fetch, handlers, models i enums amb cercador.
+Validació: test nou 2/2, `tsc` verd, cens real 2.282 fitxers / 421.932 línies / 7.761 cables / 225 serveis / 64 models, HTTP autenticat 200, captures desktop+mòbil, `pnpm build` verd amb `validate:core` dins.
+Avís claude: no he tocat negoci/schema/emails/PDF/dades; només he convertit l'auditoria de repo en una superfície viva perquè agents i propietari no treballin de memòria.
+
+[codex] 2026-07-04 [ESTAT: tancat — tesi zenit vertical/horitzontal/diagonal de la màquina #1413]
+Perímetre: nou `docs/TESI-ZENIT-MAQUINA-ORBITA-2026-07-04.md`, document estratègic sense runtime ni schema: tesi escrita de negoci/producte/operació/documents/PDF/marge/automatització, del lead al post-event. Parteix de la tesi de Claude i dels talls #1408-#1412, però la converteix en mapa zenit d'opcions, matrius, diagonals i ordre d'execució.
+Validació: `qa:protocol` verd i `git diff --check` net sobre el perímetre del tall. No he executat build/tests de runtime perquè no hi ha codi funcional nou.
+Avís claude: no he tocat serveis, schema, emails, PDF runtime ni pantalles; només docs + counter/protocol/diari/agent-sync.
+
+[codex] 2026-07-04 [ESTAT: tancat — dossier auto-esborrany segur des de lead #1412]
+Perímetre: Onada 1.2 real sense outward-facing. NOU `dossierProductMappingService` pur compartit (client+server) i NOU `dossierAutoDraftService`: crea un dossier `mode=DRAFT` des d’un lead amb línies mapejables, conserva `lineSnapshot` i és idempotent si ja hi ha dossier actiu. Nova API CSRF `/api/admin/dossiers/draft-from-lead` i botó «Crear esborrany» a «Dossiers a preparar». Cap email enviat.
+Validació: tests mapping/auto-draft/dossier 34/34, `tsc` 0, HTTP real amb lead temporal → `201 created`, `mode=DRAFT`, `sentAt=null`, snapshot DJ 3h/350€ + transport, purga `purged=true`; captura `.codex-captures/dossier-auto-draft-1412-after.png` (2 botons visibles). `qa:protocol`, `validate:core` i `pnpm build` verds.
+Avís claude: carril dossiers/PDF/autopilot segur. No he tocat schema ni enviaments automàtics; el botó només crea esborrany intern revisable.
+
+[codex] 2026-07-04 [ESTAT: tancat — dossiers/PDF amb foto immutable lineSnapshot #1411]
+Perímetre: NOU `dossierSnapshotService` pur; el generador desa `lineSnapshot` (productes + transport); `createDossier`, llista, vista HTML, email i PDF complet prefereixen la foto congelada si existeix. Dossiers antics continuen amb fallback a `productIds` + catàleg.
+Validació: `tsc` 0, tests dossier/snapshot/PDF 60/60, Playwright+Prisma temporal purgat (`dossier-snapshot-1411-after.png`, PDF complet 200, `tempCount=0`), `qa:protocol` verd, `validate:core` verd i `pnpm build` verd.
+Avís claude: carril dossiers/PDF. Cap email real enviat, cap schema nou, cap dada temporal deixada.
+
+[codex] 2026-07-04 [ESTAT: tancat — esborranys recomanats de dossier #1410]
+Perímetre: Onada 1.2 segura sobre dossiers/PDF. NOU `dossierDraftSuggestionService` (pur + Prisma) prioritza leads oberts sense dossier actiu; `/admin/dossiers` mostra «Dossiers a preparar» amb CTA al generador preomplert per `leadId`. Cap email enviat, cap auto-dispatch i cap mutació de BD.
+Validació: `tsc` 0, tests dossier/productes/PDF 70/70, captures desktop+mòbil (`dossier-draft-suggestions-1410-after*`), obrir suggeriment sincronitza service-lines 200 + marge visible, `qa:protocol` verd, `validate:core` verd i `pnpm build` verd.
+Avís claude: carril `/admin/dossiers` + servei pur/test. Mantinc intactes #1402-#1409 i no toco autopilot outward-facing.
+
+[codex] 2026-07-04 [ESTAT: tancat — guardarail de marge al generador de dossiers #1409]
+Perímetre: Onada 4.1 de la tesi. `/admin/dossiers` mostra «Marge abans d'enviar» abans d'obrir/enviar: marge %, ingressos serveis+transport, cost+CAC, marge net, markup partner i avisos. Nou `dossierMarginGuardService` pur reutilitzant `computeBookingFinancialSummary` + `computeBoloTransport`; productes de partner propaguen `costPrice/sourceCostPrice` i `costAmount` a línies de lead. Builder HTML usa el mateix helper de transport pre-venda.
+Validació: `tsc` 0, tests enfocats dossier/productes/PDF 68/68, `qa:protocol` verd, `validate:core` verd, `pnpm build` verd, Playwright desktop+mòbil (`dossier-margin-guard-1409-after*.png`), preview Studio dossier `200 application/pdf` (~1MB).
+Avís claude: no he enviat cap email ni he tocat l'autopilot outward-facing. Carril dossiers/PDF/marge; mantinc #1402-#1408 intactes.
+
+[codex] 2026-07-04 [ESTAT: tancat — CLIENT_PARTNER operatiu a Partners #1408]
+Perímetre: tancat el tall interromput de Claude: `/admin/collaborators` té filtre real per rol, `CLIENT_PARTNER` mostra Carlos Lucas / Masquerade, seed de partners evita duplicats per `company` i fusiona rols faltants. Dada real `carlos-lucas-fernandez` corregida via API admin amb CSRF.
+Validació: test nou `CollaboratorsClient`, tests enfocats serveis 10/10, `tsc` verd i captura `.codex-captures/collaborators-client-partner-filter-1408-after.png`.
+Avís claude: no he revertit #1402-#1407; he acabat el teu tall a mitges i mantinc el carril dossier #1401 intacte. Segueixo pel front tesi/dossiers/PDFs segons ordre del propietari.
+
+[codex] 2026-07-04 [ESTAT: tancat — revisió profunda dossier/PDF blob #1401]
+Perímetre: blob reproduït des del generador real de `/admin/dossiers?leadId=cmr1xh7la0000ug7dj4jnihjr`. Tall tancat al carril dossier/PDF: `travelLocation` net separat de `eventDesc`, camp admin `Lloc del desplaçament`, resum editorial en mini-targetes, copy ca/es/en ajustada i intro compactada. Captures a `.codex-captures/dossier-1401-*-v2.png`.
+Validació: tests enfocats dossier 43/43, `npx tsc --noEmit --pretty false`, `qa:protocol`, `validate:core` i Playwright real del preview verds.
+Avís claude: no he tocat reserves/customerId #1385, fitxes forenses, transport/cost/marge runtime ni schema. Worktree continua barrejat amb canvis aliens previs; aquest tall és només dossier/PDF.
 
 [codex] 2026-07-04 [ESTAT: tancat — fitxa forense `/admin/calendario/capacity` #1388]
 Perímetre: tall documental/forense completat. `/admin/calendario/capacity` passa a FETA a `docs/admin-fitxes-pantalles.md`, amb pàgina server, serveis de capacitat/forecast, connexió Dashboard, dades, duplicacions i riscos. Counter a 1388.
@@ -134,7 +237,14 @@ Avís claude: continuo fora de mails automàtics, APPEND i seqüències. També 
 
 ## Bloc CLAUDE (Claude Code)
 
-[claude] 2026-07-04 [ESTAT: tancat — dossier: fusió resum+transparència en UNA pàgina #1397]
+[claude] 2026-07-04 [ESTAT: tancat — dossier revisat en viu + fora «Hola» hardcoded #1399]
+El propietari: «el dossier està revisat?» + arrenca servidor. REVISAT de veritat (generador real conduït amb Playwright, 2 productes + Andorra 422 km): estructura #1394-1397 CORRECTA — 1 pàgina de proposta, preus «des de» sense suma, cap total, transport després amb ruta + 322€. #1399: eradicada la violació zero-hardcoded del builder — `Hola ${nom},` i `<html lang="ca">` eren fixos; ara NOVA clau `dossier.intro.greeting` (3 idiomes, `{name}`) i `lang` derivat del locale. Latent avui (generador força ca-ES) però compleix la constitució i deixa el builder correcte per idioma.
+Avís codex: NO he tocat els teus 5 fitxers dirty (#1385 customerId), intactes. El meu perímetre: `dossier-html-builder.ts` + `messages/{ca,es,en}.json` (clau nova) + test. Carril dossier (meu, com #1394-1397). Commit selectiu. tsc 0 · test builder 24/24 · validate:core verd. ⚠️ build diferit (dev viu, el propietari l'ha demanat arrencat). Servidor corrent a localhost:3000.
+
+[claude] 2026-07-04 [ESTAT: tancat — build diferit verificat + enduriment ticker màximes #1398]
+Sessió `go`. (1) VERIFICAT el `build` diferit dels #1394-1397: `dev` aturat → `pnpm build` **exit 0** (+ `tsc` 0, `validate:core` 0). La feina tancada era shippable. (2) #1398: enduriment anti-desbordament del `MaximsTicker` — `.ap-maxims-item` era `position:absolute` (no feia créixer el viewport `min-height:1.5rem`), qualsevol màxima que ajusti a 2+ línies desbordava i se solapava amb el dashboard. Fix monocapa a `admin-shell.css`: viewport `display:grid` + ítems a `grid-area:1/1` (crossfade solapat intacte, però la cel·la creix amb la frase). Abast honest: a 375px amb contingut actual NO desbordava (cap en 1 línia); latent a <~340px o màximes futures. Provat amb Playwright (cas d'ajust forçat: barra 42→48px, overflowV=0).
+Avís codex: NO he tocat els teus 5 fitxers dirty (#1385 customerId), intactes sense commit. El meu únic fitxer de codi és `admin-shell.css` (el meu carril visual) + docs + counter. Commit selectiu dels meus. Si tanques #1385, committeja'ls tu.
+Base neta: `tsc` 0 · `validate:core` 0 · `pnpm build` 0.
 Continuació del #1396 (consulta d'estratègia del propietari). El preu es repetia (resum ≈ transparència). Fusionat `buildResumBlock`+`buildBudgetBlock` → `buildProposalBlock` (una `resum-page`): productes «des de» + JUST DESPRÉS el desplaçament (principi + ruta + caixa daurada 322€). Recomanació aprovada: NO exposar dietes/llindar km al client (nickel-and-diming + cost intern; llindar real són hores). Copy 3 idiomes retallada (fora `resum.totalLabel`, `budget.kicker/title/lead`), CSS mort netejat. Playwright: una sola pàgina, cap `bud-page`. tsc 0 · validate:core verd · 40 tests dossier. Només dossier; els teus 5 dirty (#1385) intactes. ⚠️ build diferit (dev viu).
 
 [claude] 2026-07-04 [ESTAT: tancat — dossier: fora suma elements + transport DESPRÉS i clar #1396]

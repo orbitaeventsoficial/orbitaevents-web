@@ -28,6 +28,7 @@ export async function listAdminBookings(input: {
   toDate?: string | null;
   search?: string | null;
   payment?: string | null;
+  customerId?: string | null;
   page: number;
   limit: number;
 }, now: Date = new Date()) {
@@ -71,6 +72,9 @@ export async function listAdminBookings(input: {
         { eventLocation: { contains: input.search, mode: 'insensitive' } },
       ],
     });
+  }
+  if (input.customerId) {
+    andClauses.push({ customerId: input.customerId });
   }
   if (paymentFilter === 'deposit-pending') {
     andClauses.push({ depositPaid: false });

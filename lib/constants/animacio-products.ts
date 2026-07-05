@@ -34,6 +34,8 @@ export type AnimacioProduct = {
   sourceProviderId?: string;
   /** ID del producte original quan el producte ve de catàleg extern. */
   sourceProductId?: string;
+  /** Cost net del producte extern. Només per càlcul intern de marge; mai client-facing. */
+  sourceCostPrice?: number;
 };
 
 export const ANIMACIO_PRODUCT_CATEGORIES: Record<string, string> = {

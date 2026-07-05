@@ -18,10 +18,13 @@ import {
   collaboratorProductToAnimacioProduct,
   listDossierCollaboratorProducts,
 } from '@/lib/services/collaboratorProductService';
+import { loadDossierDraftSuggestions } from '@/lib/services/dossierDraftSuggestionService';
 import { formatDateShort } from '@/lib/constants';
 import Link from 'next/link';
 import { DossierListActions } from './DossierListActions';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { productsFromDossierLineSnapshot } from '@/lib/services/dossierSnapshotService';
+import { DossierDraftCreateButton } from './DossierDraftCreateButton';
 
 export const metadata = { title: 'Dossiers' };
 
@@ -52,6 +55,8 @@ type DossierRow = {
   createdAt: Date | string; sentAt?: Date | string | null; sentTo?: string | null;
   email?: string | null; eventDesc?: string | null; telefon?: string | null;
   salutacio?: string | null; deletedAt?: Date | string | null;
+  mode?: string | null;
+  lineSnapshot?: unknown;
   lead?: { id: string; name: string; status: string } | null;
 };
 
@@ -60,9 +65,24 @@ function resolveInitialProductIds(explicitProductIds?: string): string | undefin
   return undefined;
 }
 
+const DRAFT_SUGGESTION_TONE: Record<'ALTA' | 'MITJANA' | 'BAIXA', string> = {
+  ALTA: 'admin-tone-border-danger',
+  MITJANA: 'admin-tone-border-warning',
+  BAIXA: 'admin-tone-border-info',
+};
+
+function formatDraftEventLabel(suggestion: Awaited<ReturnType<typeof loadDossierDraftSuggestions>>[number]): string {
+  const copy = ADMIN_DOSSIER_GENERATOR_COPY.draftSuggestions;
+  if (suggestion.daysUntilEvent === 0) return copy.eventToday;
+  if (suggestion.daysUntilEvent === 1) return copy.eventTomorrow;
+  if (suggestion.daysUntilEvent !== null) return `${suggestion.daysUntilEvent} ${copy.eventInDays}`;
+  if (suggestion.eventDate) return formatDateShort(suggestion.eventDate.toISOString());
+  return copy.eventNoDate;
+}
+
 export default async function DossiersPage({ searchParams }: PageProps) {
   const logoDataUri = readLogoDataUri();
-  const [dossiers, deletedDossiers, legacyAnimacioProducts, collaboratorProducts, orbitaProducts, dossierCopy, leadInitialData] = await Promise.all([
+  const [dossiers, deletedDossiers, legacyAnimacioProducts, collaboratorProducts, orbitaProducts, dossierCopy, leadInitialData, draftSuggestions] = await Promise.all([
     getAllDossiers(50),
     getDeletedDossiers(),
     getAnimacioProducts('ca'),
@@ -70,6 +90,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
     getOrbitaDossierProducts('ca'),
     getDossierCopy('ca'),
     getDossierLeadInitialData(searchParams?.leadId),
+    loadDossierDraftSuggestions(3),
   ]) as [
     DossierRow[],
     DossierRow[],
@@ -78,6 +99,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
     Awaited<ReturnType<typeof getOrbitaDossierProducts>>,
     Awaited<ReturnType<typeof getDossierCopy>>,
     Awaited<ReturnType<typeof getDossierLeadInitialData>>,
+    Awaited<ReturnType<typeof loadDossierDraftSuggestions>>,
   ];
   const initialProductIds = resolveInitialProductIds(searchParams?.productIds);
   // Bingo/Batalla Musical són productes de MASQUERADE (col·laborador), no propis:
@@ -97,6 +119,51 @@ export default async function DossiersPage({ searchParams }: PageProps) {
       title="Dossiers"
       subtitle="Genera i gestiona els dossiers comercials per als clients."
     >
+      {draftSuggestions.length > 0 && (
+        <AdminSection
+          title={ADMIN_DOSSIER_GENERATOR_COPY.draftSuggestions.title}
+          description={ADMIN_DOSSIER_GENERATOR_COPY.draftSuggestions.description}
+          actions={<span className="ap-badge">{ADMIN_DOSSIER_GENERATOR_COPY.draftSuggestions.rail}</span>}
+        >
+          <div className="grid gap-2 lg:grid-cols-3">
+            {draftSuggestions.map((suggestion) => (
+              <div key={suggestion.leadId} className={`ap-card ap-card-body flex flex-col gap-3 border ${DRAFT_SUGGESTION_TONE[suggestion.band]}`}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="truncate text-base font-semibold text-[var(--t)]">{suggestion.name}</div>
+                    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-[var(--t3)]">
+                      <span className="ap-badge">{suggestion.status}</span>
+                      <span>{formatDraftEventLabel(suggestion)}</span>
+                      <span>{suggestion.serviceLinesCount} {ADMIN_DOSSIER_GENERATOR_COPY.draftSuggestions.serviceLinesLabel}</span>
+                    </div>
+                  </div>
+                  <span className="shrink-0 font-mono text-xs font-bold tabular-nums text-[var(--gold-bright)]">
+                    {ADMIN_DOSSIER_GENERATOR_COPY.draftSuggestions.scoreLabel} {suggestion.score}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {suggestion.reasons.map((reason) => (
+                    <span key={reason} className="ap-badge">{reason}</span>
+                  ))}
+                </div>
+                <div className="mt-auto flex flex-wrap items-center gap-2">
+                  <DossierDraftCreateButton
+                    leadId={suggestion.leadId}
+                    label={ADMIN_DOSSIER_GENERATOR_COPY.draftSuggestions.createDraftAction}
+                  />
+                  <Link href={suggestion.href} className="ap-btn ap-btn--primary ap-btn--xs">
+                    {ADMIN_DOSSIER_GENERATOR_COPY.draftSuggestions.prepareAction}
+                  </Link>
+                  <Link href={buildLeadWorkspaceHref(suggestion.leadId)} className="ap-btn ap-btn--secondary ap-btn--xs">
+                    {ADMIN_DOSSIER_GENERATOR_COPY.draftSuggestions.leadAction}
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </AdminSection>
+      )}
+
       {/* Generador */}
       <AdminSection
         title={
@@ -124,6 +191,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
           initialTelefon={searchParams?.telefon ?? leadInitialData?.telefon}
           initialEmpresa={searchParams?.empresa}
           initialEventDesc={searchParams?.eventDesc ?? leadInitialData?.eventDesc}
+          initialTravelLocation={leadInitialData?.travelLocation}
           initialDistanceKm={leadInitialData?.distanceKm ?? null}
           initialProductIds={initialProductIds}
         />
@@ -134,10 +202,9 @@ export default async function DossiersPage({ searchParams }: PageProps) {
         <AdminSection title={`Dossiers desats (${dossiers.length})`}>
           <div className="flex flex-col gap-2">
             {dossiers.map((d) => {
-              const productNames = lookupProducts
-                .filter((p) => d.productIds.includes(p.id))
-                .map((p) => p.nom)
-                .join(' · ');
+              const snapshotProducts = productsFromDossierLineSnapshot(d.lineSnapshot);
+              const resolvedProducts = snapshotProducts ?? lookupProducts.filter((p) => d.productIds.includes(p.id));
+              const productNames = resolvedProducts.map((p) => p.nom).join(' · ');
               return (
                 <div key={d.id} className="ap-card ap-card-body flex flex-wrap items-center justify-between gap-4">
                   <div className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -152,6 +219,11 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                         Enviat {formatDateShort(typeof d.sentAt === 'string' ? d.sentAt : d.sentAt.toISOString())} → {d.sentTo}
                       </span>
                     )}
+                    {d.mode === 'DRAFT' && !d.sentAt && (
+                      <span className="text-xs text-[var(--gold-bright)]">
+                        {ADMIN_DOSSIER_GENERATOR_COPY.draftSuggestions.draftBadge}
+                      </span>
+                    )}
                     {d.lead && (
                       <Link href={buildLeadWorkspaceHref(d.lead.id)} className="text-xs text-[var(--t3)] transition-colors hover:text-[var(--gold-bright)]">
                         Lead: {d.lead.name} ({d.lead.status})
@@ -164,6 +236,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                     nom={d.nom}
                     productIds={d.productIds}
                     products={lookupProducts}
+                    snapshotProducts={snapshotProducts ?? undefined}
                     dossierCopy={dossierCopy}
                     clientInfo={{
                       nom: d.nom,
@@ -191,10 +264,9 @@ export default async function DossiersPage({ searchParams }: PageProps) {
         >
           <div className="flex flex-col gap-2">
             {deletedDossiers.map((d) => {
-              const productNames = lookupProducts
-                .filter((p) => d.productIds.includes(p.id))
-                .map((p) => p.nom)
-                .join(' · ');
+              const snapshotProducts = productsFromDossierLineSnapshot(d.lineSnapshot);
+              const resolvedProducts = snapshotProducts ?? lookupProducts.filter((p) => d.productIds.includes(p.id));
+              const productNames = resolvedProducts.map((p) => p.nom).join(' · ');
               return (
                 <div key={d.id} className="ap-card ap-card-body flex flex-wrap items-center justify-between gap-4 opacity-70">
                   <div className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -211,6 +283,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                     nom={d.nom}
                     productIds={d.productIds}
                     products={lookupProducts}
+                    snapshotProducts={snapshotProducts ?? undefined}
                     dossierCopy={dossierCopy}
                     clientInfo={{
                       nom: d.nom,

@@ -44,11 +44,12 @@ vi.mock('@/lib/constants/dossier-copy', () => ({
   getDossierCopy: vi.fn(async () => ({
     portada: { eyebrow: '', clientLabel: '', bottom: '' },
     intro: {
-      kicker: '', title: '', greetingDefault: '', offerCountOne: '', offerCountMany: '',
+      kicker: '', title: '', greeting: '', greetingDefault: '', offerCountOne: '', offerCountMany: '',
       summaryOfferLabel: '', summaryFormatLabel: '', summaryFormatValue: '', summaryGoalLabel: '', summaryGoalValue: '',
     },
     chapter: { eyebrow: '', priceLabel: '', priceFromPrefix: '', priceCustom: '', durationLabel: '', includesTitle: '', noteLabel: '' },
     resum: { kicker: '', title: '', lead: '' },
+    budget: { servicesLabel: '', travelTitle: '', travelNote: '', travelRoute: '', travelPriceLabel: '', vatNote: '' },
     cta: { label: '' },
   })),
   getOrbitaDossierProducts: vi.fn(async () => []),
@@ -84,6 +85,7 @@ const mockDossier = {
   eventDesc: null,
   salutacio: null,
   productIds: ['bingo-musical'],
+  lineSnapshot: null,
   sentAt: null,
   sentTo: null,
   deletedAt: null,
@@ -111,6 +113,37 @@ describe('createDossier', () => {
     await createDossier({ nom: 'Test', productIds: [] });
     expect(mockPrisma.dossier.create).toHaveBeenCalledWith({
       data: expect.objectContaining({ leadId: null, empresa: null }),
+    });
+  });
+
+  it('desa la foto immutable del dossier quan arriba lineSnapshot', async () => {
+    mockPrisma.dossier.create.mockResolvedValue(mockDossier);
+    await createDossier({
+      nom: 'Joan Pla',
+      productIds: ['collab:bingo'],
+      lineSnapshot: {
+        version: 1,
+        products: [{
+          id: 'collab:bingo',
+          nom: 'Bingo Musical congelat',
+          descripcio: ['Text del moment'],
+          inclou: ['Equip'],
+          priceFrom: 240,
+        }],
+        travelKm: 70,
+        travelLocation: 'Granollers',
+      },
+    });
+
+    expect(mockPrisma.dossier.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        lineSnapshot: expect.objectContaining({
+          version: 1,
+          travelKm: 70,
+          travelLocation: 'Granollers',
+          products: [expect.objectContaining({ id: 'collab:bingo', nom: 'Bingo Musical congelat' })],
+        }),
+      }),
     });
   });
 });
@@ -143,6 +176,7 @@ describe('getDossierLeadInitialData', () => {
       email: 'estel.giralt@gmail.com',
       telefon: '661431040',
       eventDesc: 'Aniversari · 2026-07-25 · 21:00-23:00 · Canyamars · 30 pax · DJ 2 hores aniversari del seu marit',
+      travelLocation: 'Canyamars',
       distanceKm: null,
     });
   });
@@ -291,6 +325,57 @@ describe('sendDossierByEmail', () => {
       expect.arrayContaining([expect.objectContaining({ id: 'bingo-musical' })]),
       expect.anything(),
       expect.anything(),
+    );
+  });
+
+  it('envia usant el lineSnapshot si existeix, no el cataleg actual', async () => {
+    mockPrisma.dossier.findUnique.mockResolvedValue({
+      ...mockDossier,
+      productIds: ['bingo-musical'],
+      lineSnapshot: {
+        version: 1,
+        products: [{
+          id: 'bingo-musical',
+          nom: 'Bingo Musical congelat',
+          descripcio: ['Text snapshot'],
+          inclou: ['Equip snapshot'],
+          priceFrom: 999,
+        }],
+        travelKm: 123,
+        travelLocation: 'Snapshot City',
+      },
+    });
+    mockSendEmail.mockResolvedValue(undefined);
+    mockPrisma.dossier.update.mockResolvedValue(mockDossier);
+
+    await sendDossierByEmail('dos-1');
+
+    expect(mockPrisma.lead.findUnique).not.toHaveBeenCalled();
+    expect(mockBuildHtml).toHaveBeenCalledWith(
+      expect.objectContaining({ nom: 'Joan Pla' }),
+      [expect.objectContaining({ id: 'bingo-musical', nom: 'Bingo Musical congelat', priceFrom: 999 })],
+      expect.anything(),
+      expect.objectContaining({ travelKm: 123, location: 'Snapshot City' }),
+    );
+  });
+
+  it('envia el dossier amb ubicació de ruta neta del lead, no amb el resum complet de l\'event', async () => {
+    mockPrisma.dossier.findUnique.mockResolvedValue({
+      ...mockDossier,
+      eventDesc: "2026-09-05 · 17:00-18:30 · l'Aldosa · 30 pax",
+      productIds: ['bingo-musical'],
+    });
+    mockPrisma.lead.findUnique.mockResolvedValue({ distanceKm: 422, eventLocation: "l'Aldosa" });
+    mockSendEmail.mockResolvedValue(undefined);
+    mockPrisma.dossier.update.mockResolvedValue(mockDossier);
+
+    await sendDossierByEmail('dos-1');
+
+    expect(mockBuildHtml).toHaveBeenCalledWith(
+      expect.objectContaining({ eventDesc: "2026-09-05 · 17:00-18:30 · l'Aldosa · 30 pax" }),
+      expect.anything(),
+      expect.anything(),
+      expect.objectContaining({ travelKm: 422, location: "l'Aldosa" }),
     );
   });
 });

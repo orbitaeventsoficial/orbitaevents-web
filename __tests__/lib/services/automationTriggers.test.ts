@@ -144,7 +144,7 @@ describe('onLeadCreated', () => {
     const result = await onLeadCreated('l1');
 
     expect(result.triggered).toBe(false);
-    expect(result.detail).toBe('Welcome email already queued');
+    expect(result.detail).toBe('Welcome email already handled');
   });
 
   it('no peta si prisma.task.createMany falla', async () => {

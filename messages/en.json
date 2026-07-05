@@ -7032,6 +7032,7 @@
     "intro": {
       "kicker": "Let's picture it together",
       "title": "A taste of what we can enjoy together, before talking numbers.",
+      "greeting": "Hi {name},",
       "greetingDefault": "Thank you for thinking of us! We've put these pages together so you can picture your party with no rush, without having to look at prices just yet.\n\nOn each page we explain a proposal: what it is, how it feels and what you'll find. Keep the ones you love most and, once you're sure, we'll send you a tailored quote with only what you choose.",
       "offerCountOne": "1 proposal for you",
       "offerCountMany": "{count} proposals for you",
@@ -7053,12 +7054,12 @@
     "resum": {
       "kicker": "In short",
       "title": "Everything we propose",
-      "lead": "Here, at a glance, is the starting price —the \"from\"— of each proposal and how travel works. Still without extras: it's not an invoice, it's so you know what we're talking about when we sit down to close it together."
+      "lead": "Here is the starting point for each proposal and, just after that, the travel calculated for this route. We are not closing a total here: it is a clear guide to decide what fits before preparing the definitive proposal."
     },
     "budget": {
       "servicesLabel": "The proposals",
       "travelTitle": "Travel",
-      "travelNote": "Included up to {includedKm} km from Granollers. For longer distances, travel is charged at the real cost of the trip —vehicle and crew time—, always clear and with no surprise fees.",
+      "travelNote": "Included up to {includedKm} km from Granollers. On longer routes, travel is calculated transparently according to distance and the crew that needs to move.",
       "travelRoute": "Your event is in {location}, about {km} km (round trip) from Granollers. Travel applies to this route.",
       "travelPriceLabel": "Travel cost",
       "vatNote": "Indicative prices. VAT and final adjustments are set in the definitive proposal."

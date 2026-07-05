@@ -7,6 +7,7 @@ import { getDossierById } from '@/lib/services/dossierService';
 import { generateDossierCompositePDF } from '@/lib/services/dossierCompositePdfService';
 import { getDossierCollaboratorProductsByIds } from '@/lib/services/collaboratorProductService';
 import type { DossierClientInfo } from '@/lib/utils/dossier-html-builder';
+import { productsFromDossierLineSnapshot } from '@/lib/services/dossierSnapshotService';
 
 function readLogoDataUri(): string | undefined {
   try {
@@ -25,11 +26,12 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   const dossier = await getDossierById(params.id);
   if (!dossier) return NextResponse.json({ error: 'No trobat' }, { status: 404 });
 
-  const allProducts = await getAnimacioProducts('ca');
-  const collaboratorProducts = await getDossierCollaboratorProductsByIds(dossier.productIds);
+  const snapshotProducts = productsFromDossierLineSnapshot(dossier.lineSnapshot);
+  const allProducts = snapshotProducts ? [] : await getAnimacioProducts('ca');
+  const collaboratorProducts = snapshotProducts ? [] : await getDossierCollaboratorProductsByIds(dossier.productIds);
   // Només productes propis d'animació aquí; els de col·laborador entren via
   // `collaboratorProducts` (el generador ja els converteix). Evita duplicats.
-  const products = allProducts.filter((product) => dossier.productIds.includes(product.id));
+  const products = snapshotProducts ?? allProducts.filter((product) => dossier.productIds.includes(product.id));
   const client: DossierClientInfo = {
     nom: dossier.nom,
     empresa: dossier.empresa ?? undefined,

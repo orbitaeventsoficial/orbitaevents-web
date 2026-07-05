@@ -55,9 +55,12 @@ export const NAV_GROUPS: NavGroup[] = [
     id: 'sistema', label: 'Sistema',
     items: [
       { label: 'Configuració', href: '/admin/settings' },
+      { label: 'Control complet', href: '/admin/control', secondary: true },
       { label: 'Studio', href: '/admin/studio' },
       { label: 'Manual', href: '/admin/manual' },
       { label: 'Atles', href: '/admin/docs/organisme', secondary: true },
+      { label: 'Atles elèctric', href: '/admin/docs/electric-atlas', secondary: true },
+      { label: 'Auditoria visual', href: '/admin/docs/visual-audit', secondary: true },
       { label: 'Esquema absolut', href: '/admin/docs/esquema', secondary: true },
       { label: 'Full de ruta', href: '/admin/docs/full-de-ruta', secondary: true },
     ],

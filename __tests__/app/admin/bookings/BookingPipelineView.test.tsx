@@ -108,6 +108,17 @@ describe('BookingPipelineView', () => {
     expect(screen.getByText('+ 1 cancel·lada (ocultes del kanban)')).toBeInTheDocument();
   });
 
+  it('preserva customerId quan el kanban s’obre des del Customer Hub', async () => {
+    mockUseSearchParams.mockReturnValue(new URLSearchParams('customerId=customer-1&view=kanban&page=2'));
+    mockFetchWithCsrf.mockResolvedValueOnce(mockJsonResponse({ data: { bookings: [] } }));
+
+    render(<BookingPipelineView />);
+
+    await waitFor(() => expect(mockFetchWithCsrf).toHaveBeenCalledTimes(1));
+    const [url] = mockFetchWithCsrf.mock.calls[0];
+    expect(url).toBe('/api/admin/bookings?customerId=customer-1&limit=500&pipeline=true');
+  });
+
   it('mou una reserva endavant i mostra toast d’èxit quan el PATCH respon OK', async () => {
     mockFetchWithCsrf
       .mockResolvedValueOnce(mockJsonResponse({ data: { bookings: [makeBooking()] } }))

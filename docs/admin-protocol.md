@@ -636,6 +636,8 @@ Criteri pràctic:
 
 ## 6.1 Fonaments de producte
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
+**FET** *(2026-07-04 per `codex` — Canvi #1415)*: l'**Atles elèctric** deixa de ser només cens i passa a manual operatiu viu: `Manual`, `Fluxos`, `On tocar`, `Glossari` i `Cables interns` resolts. Serveix per entendre el repo abans de tocar-lo: quins fitxers entren en lead→booking, marge/cash, dossiers/PDF, partners/Masquerade i post-event; quina font de veritat mana cada concepte; quin ordre segur i quines validacions calen per intervenir.
+**FET** *(2026-07-04 per `codex` — Canvi #1414)*: l'admin incorpora l'**Atles elèctric** a `/admin/docs/electric-atlas`, una documentació viva que escaneja el repo real i el converteix en esquema consultable. Serveix de recurs per al propietari i per a qualsevol IA: fitxers, línies, caràcters, hashes, òrgans, funcions/símbols, imports, `fetch`, handlers, models i enums. A diferència dels docs estàtics antics, no pretén recordar de memòria: llegeix el filesystem actual i permet buscar el cable exacte abans de tocar res.
 **FET**: base molt potent, schema ric, serveis, admin ampli, tests i infraestructura.
 **FET** *(2026-04-10 fins Canvi #55)*: workspaces sagrats ja tenen direcció operativa clara: Daily Brief, Operational Pulse, Customer/Lead insights, Task Queue, Inbox context, Social, Reporting i Capacity.
 **FET** *(2026-05-18 per `codex` — Canvi #668)*: el vell `EN MARXA` de passar de conjunt potent a sistema coherent queda regularitzat com a tancat. La narrativa mare ja viu a `docs/product-operating-system-ca.md` (#606), el manual la desplega amb flux, gates, checklists, excepcions, evidències i handoffs, i el Dashboard ja mostra el `Cicle operatiu` amb mètriques vives (#666). El pendent residual és evitar dispersió futura, no construir de zero aquesta narrativa.
@@ -943,6 +945,8 @@ Criteri pràctic:
 ## 6.11 UX / Visual / Marca
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
 **FET**: navegació millorada. Customer Hub i Bookings pujats visualment. Pintura forta de Claude.
+**FET** *(2026-07-05 per `codex` — Canvi #1417)*: el baseline visual #1416 deixa de ser només JSON/Markdown local i entra com a superfície admin viva a `/admin/docs/visual-audit`. El visor llegeix `.codex-captures/visual-audit-1416-final/visual-audit-results.json`, agrupa les 94 rutes per òrgan, mostra captures desktop/tablet/mobile, runtime status i dimensions de revisió humana pendent. Les captures es serveixen per endpoint autenticat i confinat a `.codex-captures/`. Efecte: la radiografia real ja és navegable per propietari i futures IAs abans de tocar disseny.
+**FET** *(2026-07-04 per `codex` — Canvi #1416)*: baseline runtime visual global de l'admin. Nova eina `pnpm run audit:visual:admin` descobreix rutes admin, resol `[id]` via el smoke detail existent, captura desktop/tablet/mobile i genera JSON + Markdown incremental a `.codex-captures/`. Radiografia final: 94 rutes auditables, 1 ruta `[id]` omesa per manca de dades, 282/282 renders, 282/282 captures i 0 checks fallits (HTTP, shell admin, overflow, pantalla buida, Next error, consola, assets, requests accionables, captura). El document de govern visual queda a `docs/audit/AUDITORIA-VISUAL-GLOBAL-1416.md`; el full mare `FULL-DE-RUTA-auditoria-disseny-admin.md` referencia aquest baseline. També queda resolt el warning real de React a `/admin/analytics` per `key` duplicada en dades GA4.
 **FET** *(2026-04-26 per `codex` — Canvi #410)*: el vell `EN MARXA` de l'auditoria visual/overflow global queda regularitzat com a feina ja consolidada. La base factual ja estava documentada a `§6.13` des dels Canvis `#385 + #388 + #389 + #391`: suite 100% verda, `qa:visual-overflow` obligatori dins `validate:core` i barrera automàtica contínua. A `§6.11` no quedava un segon tall de producte pendent; només faltava sincronitzar el checklist visual amb l'estat real del pipeline.
 **FET** *(2026-04-10 per `claude`)*: visual premium aplicat a Lead detail (executive KPIs → glass+stagger, booking section → glass cards), Tasks (llista → glass cards amb indicador vençut), Social (KPIs → glass+stagger, posts → glass cards, idees → glass, calendari → glass). 0 hex hardcoded nous.
 **FET** *(2026-04-10 per `claude` — Canvi #74)*: Activity — KPI stats cards, mobile cards i desktop table amb `admin-card-glass` + `admin-stagger-item` + hover subtle. Empty state coherent.
@@ -1546,6 +1550,289 @@ Seqüència obligatòria de registre:
 - `claude` — backend/schema/serveis/tests/visual tokenitzat
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
+
+### Canvi #1419 — 2026-07-05 — codex (FET)
+**Incorporació de #1418 al manual viu: la tesi, l'atles elèctric i el roadmap visual ja tracten el welcome automàtic com a estat real.**
+- Context: Claude va tancar #1418 (welcome email automàtic al lead nou) amb tests i guards, però la tesi mare encara deia que `onLeadCreated` només encuava una task i que "faltava que s'enviï sol". Això deixava el manual de la màquina un pas enrere respecte al repo real. També calia que l'atles elèctric indiqués on tocar aquesta peça outward-facing sense duplicar enviaments.
+- Fix documental + atles: `TESI-MAQUINA-full-de-ruta-2026-07.md` passa Onada 1.1 a **FET #1418** i actualitza la cadena Captació; `TESI-ZENIT-MAQUINA-ORBITA-2026-07-04.md` incorpora #1413-#1418 a l'estat viu; `FULL-DE-RUTA-auditoria-disseny-admin.md` separa runtime resolt de revisió visual/copy pendent de la plantilla `welcome`. `lib/constants/repo-atlas.ts` afegeix `leadWelcomeEmailService` al flux Lead→Booking i un touchpoint nou `change-lead-autopilot` amb ordre segur (decisió outward-facing, `dedupeKey`, no placeholders, plantilla editable, fallback manual).
+- Validació tècnica: #1418 revisat per Codex; tests enfocats verds (26/26: `leadWelcomeEmailService`, `automationTriggers`, `repoElectricAtlasService`), `tsc` 0, `qa:protocol` verd i `validate:core` verd.
+- Validació funcional: el test de l'atles elèctric ara exigeix que el touchpoint de lead autopilot detecti `leadWelcomeEmailService` i el cable `automationTriggers` → `leadWelcomeEmailService`; el full de ruta ja marca Onada 1.1 com a FET #1418.
+- Validació humana/UX: qualsevol IA que entri per la tesi o per `/admin/docs/electric-atlas` ja no proposarà com a pendent el welcome automàtic; veurà què està fet, què queda (HTML/copy visual de la plantilla) i quins fitxers tocar si cal intervenir.
+- `ADMIN_CHANGE_COUNTER` passa a `1419`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1418 — 2026-07-05 — claude (FET)
+**Onada 1.1 (autopilot comercial): l'email de BENVINGUDA s'envia AUTOMÀTICAMENT al lead nou (decisió del propietari) amb guardarails i fallback manual.**
+- Context: el propietari autoritza explícitament («no no, automàtic · el de benvinguda automàtic», 2026-07-05) l'enviament automàtic del welcome email. Fins ara `onLeadCreated` només creava una tasca manual que ningú enviava (la màquina pensava, no actuava). Onada 1.1 de la tesi.
+- Fix (autopilot outward-facing amb xarxa): NOU `leadWelcomeEmailService.sendLeadWelcomeEmail` (mateix patró que `bookingConfirmationEmailService`: `getTemplate('welcome', preferredLocale, {clientName})` + `sendEmail`, degradació segura). `onLeadCreated` ara: (1) valida email real (mai placeholder `@leads.local`); (2) crea la tasca amb `dedupeKey` ÚNIC com a LOCK idempotent + audit; (3) si hi ha SMTP → envia l'email sol i marca la tasca DONE; (4) si NO hi ha SMTP o l'enviament falla → la tasca queda OBERTA com a fallback manual. Mai es duplica (dedupeKey), mai es perd.
+- Validació tècnica: `tsc` 0; test nou `leadWelcomeEmailService` 4/4 + `automationTriggers` 19/19 (actualitzat 1 string `already handled`); `validate:core` verd sencer.
+- Validació funcional: el welcome usa la plantilla editable de BD (canviar-la a /admin/email-templates canvia l'email real) i el `preferredLocale` del lead. En entorn sense SMTP, degrada a tasca manual (verificat pel comportament del test).
+- Validació humana/UX: cada lead nou amb email rep resposta en segons, sol; el propietari només actua si la màquina no ha pogut (fallback visible com a tasca oberta).
+- `ADMIN_CHANGE_COUNTER` passa a `1418`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1417 — 2026-07-05 — codex (FET)
+**Atles visual interactiu: el baseline #1416 entra a l'admin com a radiografia navegable per òrgan, captures i revisió pendent.**
+- Context: el #1416 va generar la radiografia runtime real de l'admin (94 rutes auditables, 282/282 captures, 0 checks fallits), però el resultat vivia com a JSON/Markdown i captures locals. Per continuar amb la "bíblia" operativa demanada pel propietari, calia una superfície viva que permeti veure, filtrar i reutilitzar aquesta radiografia abans de tocar cap pantalla.
+- Fix tècnic: nou `lib/constants/visual-audit.ts` i nou `lib/services/visualAuditAtlasService.ts`. El servei carrega `.codex-captures/visual-audit-1416-final/visual-audit-results.json`, normalitza summary, rutes, òrgans, omissions, checks i captures desktop/tablet/mobile; exposa `composeVisualAuditAtlas()` pura i `loadVisualAuditAtlas()` filesystem. Test nou (3).
+- Fix visible: nova ruta admin `/admin/docs/visual-audit` amb `loading.tsx`, KPIs, cards de Radiografia real / Zenit visual / Full de ruta, filtres per òrgan i cerca, resums per òrgan i cards per ruta amb captures als tres viewports, estat runtime i dimensions de revisió humana pendent. Nav Sistema afegeix `Auditoria visual`.
+- Fix de seguretat/servei: nova API read-only `/api/admin/visual-audit/screenshot` amb `requireAuth`, validació estricta de `run` i `file`, i resolució confinada a `.codex-captures/<run>/screenshots`. No hi ha mutació, schema, dades de negoci, emails ni PDF runtime.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\visualAuditAtlasService.test.ts` verd (3/3); `npx tsc --noEmit --pretty false` verd; `pnpm run validate:core` verd sencer; `pnpm build` verd; `pnpm run qa:protocol` final verd.
+- Validació funcional: el loader converteix el baseline #1416 en un atles amb 94 rutes, òrgans del JSON, captures autenticades i revisió humana marcada com a pendent. La pantalla queda accessible des de Sistema i conserva la separació radiografia real → zenit → full de ruta. Captura final acotada contra `next start` net a `3002`: `.codex-captures/visual-audit-1417-route-final/` → desktop/tablet/mobile 3/3 OK, 0 checks fallits.
+- Validació humana/UX: el propietari i futures IAs ja no depenen de llegir fitxers locals per veure la radiografia visual; poden obrir l'admin, comparar captures per viewport i decidir quin òrgan passa a revisió profunda.
+- `ADMIN_CHANGE_COUNTER` passa a `1417`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1416 — 2026-07-04 — codex (FET)
+**Auditoria visual global runtime: radiografia real de l'admin, eina reutilitzable, baseline 282 captures i fix del warning d'Analytics.**
+- Context: el propietari concreta el model correcte: cal separar **radiografia real** (estat actual verificat), **zenit** (model ideal de marca/gestió/continuïtat) i **full de ruta** (distància entre tots dos convertida en talls). Després de l'atles semàntic #1415 faltava la capa visual: no només comptar fitxers, sinó veure la màquina renderitzada en desktop/tablet/mobile amb captures i checks.
+- Fix/eina: nou `scripts/admin-visual-audit.mjs` + script `pnpm run audit:visual:admin`. Descobreix rutes admin estàtiques, importa el resolver de `scripts/smoke-render-detail.mjs` per rutes `[id]`, carrega `.env.local` abans de Basic Auth, captura `desktop/tablet/mobile`, escriu JSON + Markdown incremental i guarda captures regenerables a `.codex-captures/`. Els checks cobreixen HTTP, shell admin real, overflow, pantalla buida, overlay Next, consola/pageerror, assets, requests accionables i captura creada. Les `net::ERR_ABORTED` de prefetch es registren però no inflen falsos vermells.
+- Radiografia final: `VISUAL_AUDIT_BASE=http://127.0.0.1:3001`, sortida `.codex-captures/visual-audit-1416-final/`: 94 rutes auditables, 1 ruta omesa (`/admin/questionnaires/[id]`, sense id de dades), 3 viewports, 282/282 renders, 282/282 captures, 0 checks fallits i 0 rutes amb problemes. El primer run brut va detectar un reset transitori del dev server i soroll de prefetch; el rerun final net és la font de veritat del tall.
+- Fix real durant l'auditoria: `/admin/analytics` emetia warning React per `key` duplicada quan GA4 repetia dimensió (`/en`). `app/admin/analytics/page.tsx` ara usa clau composta `dimension + index` a les llistes GA4 de pàgines, fonts i temps real. Rerun enfocat `/admin/analytics` desktop/tablet/mobile: 3/3 OK.
+- Documentació viva: nou `docs/audit/AUDITORIA-VISUAL-GLOBAL-1416.md` amb la doctrina radiografia → zenit → full de ruta, metodologia d'ús per futures IAs, resultats, limitacions i fases següents. `docs/audit/FULL-DE-RUTA-auditoria-disseny-admin.md` referencia aquest baseline al capdamunt.
+- Validació tècnica: `node --check scripts/admin-visual-audit.mjs` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK; `pnpm build` OK; `pnpm run qa:protocol` final OK.
+- Validació funcional: auditor visual final `.codex-captures/visual-audit-1416-final/` amb 94 rutes auditables, 282/282 renders, 282/282 captures, 0 checks fallits. Rerun enfocat d'Analytics després del fix: 3/3 OK.
+- Validació humana/UX: el document `AUDITORIA-VISUAL-GLOBAL-1416.md` fixa el model radiografia real → zenit → full de ruta perquè propietari i futures IAs no confonguin "renderitza" amb "és perfecte" ni treballin sense punt de partida visual.
+- `ADMIN_CHANGE_COUNTER` passa a `1416`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1415 — 2026-07-04 — codex (FET)
+**Atles elèctric V2 semàntic: manual operatiu, fluxos de negoci, punts d'intervenció, glossari i cables interns resolts.**
+- Context: el propietari va encertar la crítica: l'atles #1414 era útil com a cens viu, però encara podia quedar massa a prop de "he comptat caràcters". El que calia era una eina de retorn per al propietari i per a futures IAs: no noms metafòrics a la UI, sinó manual operatiu que digui què fa la màquina, quins cables interns existeixen, on tocar, què no duplicar i com validar.
+- Fix semàntic: `lib/constants/repo-atlas.ts` guanya la capa de coneixement de domini (`REPO_ATLAS_FLOW_DEFINITIONS`, `REPO_ATLAS_TOUCHPOINT_DEFINITIONS`, `REPO_ATLAS_DOMAIN_DICTIONARY`, `REPO_ATLAS_SYNTHESIS`). No són dades disperses al JSX: són catàlegs canònics de fluxos, intervencions, termes i regles d'ús.
+- Fix tècnic: `repoElectricAtlasService` ara resol imports interns (`@/...` i relatius) contra fitxers reals, exposa `internalCables`, construeix `flows`, `touchpoints`, `dictionary` i `synthesis`, i exclou també `*.log` perquè els logs temporals de dev no embrutin l'atles. Test ampliat a 3 casos: cens base + secrets/generats/logs exclosos + fluxos/punts/glossari/cables interns.
+- Fix visible: `/admin/docs/electric-atlas` estrena pestanyes `Manual`, `Fluxos`, `On tocar`, `Glossari` i `Cables interns`, mantenint les pestanyes de cens (`Circuit`, `Òrgans`, `Fitxers`, `Funcions`, `Cables`, `Rutes`, `BD`). La primera pantalla ja no és una taula: és síntesi mare, regles, ús i KPIs de fluxos/glossari/cables.
+- Cens funcional real del tall: 2.279 fitxers llegits, 2.120 de text, 422.715 línies, 46.020.605 caràcters, 9.150 símbols, 7.767 cables, 4.368 cables interns resolts, 378 route handlers, 225 serveis, 64 models Prisma, 39 enums, 18 òrgans, 5 fluxos, 0 trams de flux sense trobar, 5 punts d'intervenció i 11 entrades de glossari.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/repoElectricAtlasService.test.ts` verd (3/3); `npx tsc --noEmit --pretty false` verd; `pnpm run validate:core` verd sencer; `pnpm build` verd; `pnpm run qa:protocol` final verd; HTTP real contra Next a `3001` sense assets 404 i amb `admin-mode` actiu.
+- Validació funcional: captures finals `.codex-captures/electric-atlas-1415-v2-after-desktop.png` i `.codex-captures/electric-atlas-1415-v2-after-mobile.png`; l'atles mostra manual, cercador, pestanyes i KPIs semàntics de forma responsive. El servidor vell de `3000` tenia chunks 404; s'ha validat amb instància neta a `3001`.
+- Validació humana/UX: ara l'atles respon "què he de fer amb això?": abans de tocar marge, preus, dossier/PDF, partner/Masquerade, cash o post-event, diu quins fitxers llegir, quin ordre seguir, què no fer i quines proves passar. No toca negoci, schema, emails, PDF runtime ni dades.
+- `ADMIN_CHANGE_COUNTER` passa a `1415`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1414 — 2026-07-04 — codex (FET)
+**Atles elèctric interactiu del repo real: fitxers, funcions, cables, rutes, models i òrgans escanejats des del filesystem.**
+- Context: el propietari demana una auditoria real de tot el repo, no una tesi de memòria ni un document bonic. Vol un atles com un esquema elèctric/electrònic que serveixi a ell i a futures IAs per saber què hi ha, on viu cada cosa, quins cables existeixen i on cal tocar abans d'afegir més codi.
+- Fix visible: nova ruta admin `/admin/docs/electric-atlas`, accessible des de Sistema com a `Atles elèctric`. La pàgina és interactiva: pestanyes `Circuit`, `Òrgans`, `Fitxers`, `Funcions`, `Cables`, `Rutes` i `BD`, cercador global i taules filtrables.
+- Fix tècnic: nou `lib/services/repoElectricAtlasService.ts`, que recorre el repo real excloent generats i secrets (`.git`, `.next`, `node_modules`, `uploads`, `.env*`, claus/certificats), calcula línies/caràcters/bytes/hash per fitxer, classifica òrgans i detecta símbols, imports, `require`, dynamic imports, `fetch`, handlers API i models/enums Prisma. Constants de l'escàner a `lib/constants/repo-atlas.ts` (monocapa).
+- Cens funcional real del tall: 2.282 fitxers llegits, 2.120 de text, 421.932 línies, 46.099.152 caràcters, 9.102 símbols, 7.761 cables, 377 route handlers, 225 serveis, 64 models Prisma, 39 enums i 18 òrgans.
+- Test nou: `__tests__/lib/services/repoElectricAtlasService.test.ts` cobreix cens de fitxers/símbols/imports/fetch/ruta/model i que no exposa `.env.local` ni `node_modules`.
+- Validació tècnica: test nou 2/2 verd; `npx tsc --noEmit --pretty false` verd; `pnpm build` verd (inclou `validate:core` verd amb service-coverage 261 fitxers, missing-loading 95 pàgines admin i schema-drift 64 models).
+- Validació funcional: `/admin/docs/electric-atlas` renderitza el mapa viu, amb `loading.tsx`, nav sota Sistema i cerca per ruta, servei, funció, model, endpoint o hash; el cens real via `tsx` retorna els números anteriors; HTTP autenticat local retorna `200`, títol i cercador presents.
+- Validació humana/UX: el propietari té un recurs de retorn abans de demanar canvis: no cal confiar en memòria d'agent; es pot obrir l'atles, buscar un cable i decidir on tocar. Captures: `.codex-captures/electric-atlas-1414-after-desktop.png` i `.codex-captures/electric-atlas-1414-after-mobile.png`.
+- `ADMIN_CHANGE_COUNTER` passa a `1414`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1413 — 2026-07-04 — codex (FET)
+**Tesi zenit vertical/horitzontal/diagonal de la màquina: negoci, marge, documents, PDF, operació, partners, simplificació i automatització.**
+- Context: el propietari demana pujar la tesi al màxim nivell i "deixar-ho tot per escrit": no només opcions genèriques, sinó una lectura doctoral de tot el sistema des de l'entrada del lead fins a l'última operació post-event, amb preus, marges, presentació, documents/PDF, dinamització, simplificació i automatització. La tesi anterior de Claude ja existia (`docs/TESI-MAQUINA-full-de-ruta-2026-07.md`) i els talls #1402-#1412 ja n'han executat parts; calia una versió actualitzada que separi el que ja està encarrilat del que és següent palanca real.
+- Fix documental: nou `docs/TESI-ZENIT-MAQUINA-ORBITA-2026-07-04.md`. Estructura la màquina en tres dimensions (vertical: lead→post-event; horitzontal: dada/preu/marge/temps/risc/document/presentació/operació/automatització; diagonal: escenaris reals com client normal, bolo lluny, dissabte escàs, Masquerade client-partner, revenda de partner i post-event). Inclou cadena pas a pas, matriu econòmica, doctrina documental/PDF, escala d'automatització per risc, simplificació sense esborrat agressiu i opcions de grans programes.
+- Criteri important: el document ja considera #1402-#1412 com a base executada o encarrilada (`Avui`, leads prioritaris, post-event visible, compte corrent Masquerade, `CLIENT_PARTNER`, marge abans d'enviar, dossiers recomanats, snapshot i auto-esborrany). No reobre aquests talls; els usa com a fonament.
+- Validació tècnica: canvi documental + counter; `qa:protocol` executat en aquest tall.
+- Validació funcional: el document nou queda localitzable a `docs/` i recull l'estat viu posterior a #1402-#1412, sense crear cap ruta, servei, email ni automatització.
+- Validació humana/UX: el propietari té una peça escrita de decisió abans de demanar noves implementacions; evita saltar directament a codi sense mapa.
+- `ADMIN_CHANGE_COUNTER` passa a `1413`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1412 — 2026-07-04 — codex (FET)
+**Onada 1.2 segura: auto-esborrany de dossier des d’un lead, sense enviar res.**
+- Context: la tesi demana “Dossier/pressupost auto-esborrany”: no només una cua de leads a preparar (#1410), sinó un pas intern que generi un dossier revisable perquè el propietari no hagi de refer el mapping manual. S’implementa en versió segura: cap correu, cap auto-dispatch, cap enviament real.
+- Fix monocapa: NOU `lib/services/dossierProductMappingService.ts` extreu del client del generador les regles compartides de mapping `LeadServiceLine → productIds`, DJ per hores, productes de partner amb cost intern i línies de lead. `DossierGeneratorClient` passa a consumir aquest helper, de manera que UI i server comparteixen la mateixa regla.
+- Fix autopilot intern: NOU `lib/services/dossierAutoDraftService.ts` (`composeDossierDraftFromLead` pura + `createDossierDraftFromLead` Prisma) crea un `Dossier` `mode='DRAFT'` des d’un lead amb línies mapejables, desa `lineSnapshot` amb productes + transport (#1411), i és idempotent si el lead ja té dossier actiu. Nova API CSRF `/api/admin/dossiers/draft-from-lead` i botó «Crear esborrany» a la secció «Dossiers a preparar». La llista mostra el badge «Esborrany» si `mode=DRAFT` i encara no s’ha enviat.
+- Validació tècnica: `npx tsc --noEmit --pretty false` verd; tests enfocats mapping/auto-draft/dossier 34/34 verds; `git diff --check` verd (només avisos CRLF aliens preexistents); `qa:protocol` verd; `validate:core` verd; `pnpm build` verd.
+- Validació funcional: HTTP real contra Next amb lead temporal `codex-draft-1412-lead`: POST `/api/admin/dossiers/draft-from-lead` retorna `201`, crea `mode=DRAFT`, `sentAt=null`, `productIds=['orbita:dj-primera-hora']`, `lineSnapshot` amb DJ 3h/350€ + `travelKm=42`; purga final `purged=true`. Captura `.codex-captures/dossier-auto-draft-1412-after.png` amb 2 botons «Crear esborrany» visibles a la cua.
+- Validació humana/UX: el propietari ja pot convertir un lead recomanat en dossier desat i revisable d’un clic, mantenint decisió humana abans d’enviar al client.
+- `ADMIN_CHANGE_COUNTER` passa a `1412`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1411 — 2026-07-04 — codex (FET)
+**Dossiers/PDF blindats: `lineSnapshot` guarda la foto immutable del dossier desat i els reusos la respecten.**
+- Context: el model `Dossier` ja tenia `lineSnapshot` (“foto del bolo”), però `createDossier` no l'omplia. Això deixava un risc real: un dossier desat/reenviat podia canviar si més tard es modificava el catàleg, preus, textos o productes de partner. Per documents comercials i PDF, el que es va preparar ha de quedar congelat.
+- Fix: NOU `lib/services/dossierSnapshotService.ts` (pur, client+server) construeix/parseja snapshots de productes i transport. `DossierGeneratorClient` envia `lineSnapshot` en desar; `createDossier` el valida i el persisteix. La llista de dossiers, `DossierListActions` (vista HTML), `sendDossierByEmail` i `/api/admin/dossiers/[id]/composite` prefereixen els productes del snapshot quan existeix; els dossiers antics continuen amb fallback a `productIds` + catàleg actual.
+- Validació tècnica: `npx tsc --noEmit --pretty false` verd; tests enfocats dossier/snapshot/PDF 60/60 verds; `git diff --check` verd (només avisos CRLF aliens preexistents); `qa:protocol` verd; `validate:core` verd; `pnpm build` verd.
+- Validació funcional: Playwright + Prisma temporal purgat (`codex-snapshot-1411-temp`): `/admin/dossiers` mostra el producte congelat `Bingo Musical congelat 1411` des de `lineSnapshot`; `/api/admin/dossiers/codex-snapshot-1411-temp/composite` retorna `200 application/pdf`; captura `.codex-captures/dossier-snapshot-1411-after.png`; comprovació posterior `tempCount=0`.
+- Validació humana/UX: un dossier desat passa a ser una prova comercial estable. Reenviar, previsualitzar o obrir el PDF complet no canvia perquè algú hagi retocat el catàleg després.
+- `ADMIN_CHANGE_COUNTER` passa a `1411`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1410 — 2026-07-04 — codex (FET)
+**Onada 1.2 segura: Dossiers a preparar — cua de leads oberts sense dossier actiu dins `/admin/dossiers`.**
+- Context: la tesi demana que dossiers/PDF deixin de ser una eina manual aïllada i passin a ser una cua de treball comercial. Després del guardarail de marge #1409, faltava dir al propietari quins leads mereixen preparar dossier ara. Tall segur: cap email, cap auto-dispatch, cap escriptura a BD; només priorització i enllaç al generador existent.
+- Fix: NOU `lib/services/dossierDraftSuggestionService.ts` (pur + wrapper Prisma) prioritza leads oberts (`OPEN_LEAD_STATUSES`) sense dossier actiu (`deletedAt=null`), exclou dates passades i puntua per estat comercial, prioritat, línies de bolo, data propera i desplaçament calculat. `/admin/dossiers` mostra «Dossiers a preparar» amb els 3 primers, motius i CTA «Preparar dossier» cap a `/admin/dossiers?leadId=...`. El generador ja sincronitza línies del lead i manté el panell de marge #1409.
+- Validació tècnica: `npx tsc --noEmit --pretty false` verd; tests enfocats dossier/productes/PDF 70/70 verds; `git diff --check` verd (només avisos CRLF aliens preexistents); `qa:protocol` verd; `validate:core` verd sencer; `pnpm build` verd.
+- Validació funcional: Playwright real a `/admin/dossiers`; captura `.codex-captures/dossier-draft-suggestions-1410-after.png` amb 2 leads recomanats i CTA a `leadId`. Captura mòbil `.codex-captures/dossier-draft-suggestions-1410-after-mobile.png`. Obrir el primer suggeriment carrega Alba Orna, fetch `/api/admin/leads/.../service-lines` 200, 2 productes seleccionats i «Marge abans d'enviar» visible (`dossier-draft-suggestion-open-1410-after.png`).
+- Validació humana/UX: el propietari veu una cua concreta de dossiers que val la pena preparar, sense enviar res a clients i sense duplicar el mapping de productes; la decisió final continua humana.
+- `ADMIN_CHANGE_COUNTER` passa a `1410`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1409 — 2026-07-04 — codex (FET)
+**Onada 4.1: el generador de dossiers mostra un guardarail de marge abans d'enviar.**
+- Context: la tesi marca explícitament el front 4.1: abans de fer dossier/quote, si el marge és baix o el markup subcontractat queda sota el 20%, la màquina ho ha de posar davant de la decisió. El generador ja convertia els productes seleccionats en línies de lead, però els productes de partner no propagaven `costAmount`; per tant el marge subcontractat no podia avisar de veritat.
+- Fix monocapa: nou `lib/services/dossierMarginGuardService.ts` (pur) que reutilitza `computeBookingFinancialSummary`, `computeBoloTransport` i els llindars de `margin-utils`. També centralitza la hipòtesi pre-venda del dossier (`DOSSIER_TRAVEL_HEADCOUNT = 2`) i el builder HTML del dossier passa a llegir el transport a través d'aquest helper.
+- Fix dades: `DossierCollaboratorProduct` i `AnimacioProduct` incorporen `costPrice/sourceCostPrice` intern (mai client-facing). `productToServiceLine` del generador ara envia `costAmount` quan el producte ve de partner; així el lead hereta la línia amb PVP i cost real.
+- Fix UI: `/admin/dossiers` pinta el panell «Marge abans d'enviar» sota el resum del bolo: banda (`Excel·lent/Acceptable/Vigilar/Crític`), marge %, ingressos estimats (serveis + desplaçament), cost + CAC, marge net, markup partner i avisos accionables (markup sota 20%, desplaçament sota cost, marge crític/just).
+- Validació tècnica: `npx tsc --noEmit --pretty false` verd; tests enfocats dossier/productes/PDF 68/68 verds (`dossierMarginGuardService`, `collaboratorProductService`, `dossierCompositePdfService`, `dossier-html-builder`, `dossierService`); `qa:protocol` verd; `validate:core` verd sencer (canon-debt 0); `pnpm build` verd.
+- Validació funcional: Playwright real a `/admin/dossiers?leadId=cmr1xh7la0000ug7dj4jnihjr`; captura `.codex-captures/dossier-margin-guard-1409-after.png` + mòbil. Cas real Alba Orna: DJ 2h + Bingo + 422 km → `Vigilar 18.4%`, ingressos 812€, cost+CAC 662€, marge 150€, markup partner 20%, avisos de marge just i desplaçament sota cost. Studio preview dossier `/api/admin/studio/preview/dossier` retorna `200 application/pdf` (~1MB).
+- Validació humana/UX: el propietari veu si el bolo val la pena abans d'obrir/enviar el dossier, sense recalcular fora del sistema ni convertir el PDF en factura.
+- `ADMIN_CHANGE_COUNTER` passa a `1409`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1408 — 2026-07-04 — codex (FET)
+**`CLIENT_PARTNER` deixa de ser una etiqueta morta: filtre real de socis-clients a Partners + Masquerade corregit.**
+- Context: després del fil Masquerade/Carlos Lucas, Claude havia començat a fer operatiu el rol `CLIENT_PARTNER`, però el tall va quedar interromput pel límit de sessió: `roleFilter` i `visibleCollaborators` existien a `CollaboratorsClient`, però la llista seguia renderitzant `collaborators.map(...)` i no hi havia cap control que canviés el filtre. A més, la dada real de Carlos/Masquerade només portava `PROVIDER`, tot i que el seed canònic ja el defineix com `PROVIDER + CLIENT_PARTNER + REFERRER`.
+- Fix UI: `/admin/collaborators` incorpora una barra de filtre per rol (`Tots`, `Proveïdor`, `Porta bolos`, `Ens contracta com a partner`, etc.) amb comptador per rol; la llista renderitza `visibleCollaborators` i mostra un empty state específic quan un rol no té partners.
+- Fix de dades/catàleg: el registre real `carlos-lucas-fernandez` s'ha actualitzat per API admin amb CSRF a `['PROVIDER','CLIENT_PARTNER','REFERRER']`, de manera que el filtre «Ens contracta com a partner» mostra Carlos Lucas / Masquerade. `scripts/seed-partners.mjs` també queda reforçat: busca per `name` o `company` i, si troba un registre existent, fusiona rols faltants sense trepitjar dades editades ni crear duplicats.
+- Validació tècnica: test nou `CollaboratorsClient.test.tsx` verd; tests enfocats `collaboratorAccountService` + `leadPriorityService` 10/10; `npx tsc --noEmit --pretty false` verd.
+- Validació funcional: Playwright real a `/admin/collaborators` amb Basic auth; captura `.codex-captures/collaborators-client-partner-filter-1408-after.png`. El filtre mostra `Ens contracta com a partner (1)` i renderitza Carlos Lucas Fernández / Masquerade Events, sense empty state.
+- Validació humana/UX: el cas que el propietari ha definit («Carlos Lucas i Masquerade és el mateix; de vegades ell em contracta») queda consultable sense barrejar-lo amb proveïdors normals ni duplicar fitxes.
+- `ADMIN_CHANGE_COUNTER` passa a `1408`.
+- Començat per: `claude` (interromput)
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1407 — 2026-07-04 — claude (FET)
+**El compte corrent del soci tanca cobraments en efectiu d'un clic (reús del `CashPaymentButton` canònic).**
+- Context: verificat que el botó «Cobrat en efectiu» ja existeix a la fitxa de reserva (`CashPaymentButton`: 1 clic → dipòsit+resta pagats, `paymentMethod=CASH`, `cashAmount=total`). No cal duplicar-lo; falta a la vista on ara té més sentit: el compte corrent del soci mutu, per tancar el que «em deu» sense obrir cada reserva.
+- Fix (reús, zero lògica nova): `CollaboratorAccountPanel` renderitza el `CashPaymentButton` canònic per a cada bolo facturat al soci encara no pagat. Un clic marca el cobrament i el saldo del compte corrent s'actualitza (via `bookingOutstandingAmount` cash-aware del #1406).
+- Validació tècnica: `tsc` 0; `validate:core` verd sencer (inclosos els guards no-*-split amb l'import creuat del component).
+- Validació funcional: el botó surt només per als bolos `billedCollaboratorId` no pagats; en no haver-n'hi cap ara per Masquerade, no es pinta (correcte).
+- Validació humana/UX: coherent amb el cobrament en efectiu el mateix dia; el soci-client es liquida des del seu compte corrent.
+- `ADMIN_CHANGE_COUNTER` passa a `1407`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1406 — 2026-07-04 — claude (FET)
+**L'import pendent d'una reserva compta l'EFECTIU cobrat (cash-same-day): fix de correcció al compte corrent i al dashboard.**
+- Context: el propietari avisa que «normalment es paga tot en efectiu el mateix dia del bolo; és estrany el dia que no». `bookingOutstandingAmount` (#1405) i el `pendingPayments` del dashboard NO miraven `cashAmount` → un bolo cobrat en efectiu (flags online `depositPaid`/`remainingPaid` = false) sortia com a deute FALS. Crític al compte corrent, que inclou bolos COMPLETATS (on ja s'ha cobrat el cash). Divergia del canònic `getPaymentBand`, que ja tracta `cashAmount ≥ total` com a pagat.
+- Fix: `bookingOutstandingAmount` accepta `cashAmount` i el resta del pendent (`pending = max(0, pending − cash)`) — cobreix els dos casos (efectiu total → 0 deute; sense pagar → deute; parcial → redueix). El compte corrent (`collaboratorAccountService`) i el dashboard (`dashboard-data`) ara seleccionen i passen `cashAmount`. Tests nous (efectiu total + parcial).
+- Validació tècnica: `tsc` 0; test compte corrent 6/6; `validate:core` verd sencer.
+- Validació funcional: un bolo `total 500 · cashAmount 500 · flags false` → outstanding 0, `paid: true` (test). Coherent amb `getPaymentBand`.
+- Validació humana/UX: el compte corrent i el «pendent de cobrar» ja no menteixen al negoci real (cobrament en efectiu el mateix dia).
+- `ADMIN_CHANGE_COUNTER` passa a `1406`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1405 — 2026-07-04 — claude (FET)
+**Compte corrent de col·laborador mutu (cas Masquerade/Carlos Lucas): «li dec» vs «em deu» + saldo net a la fitxa del partner.**
+- Context: pregunta del propietari — quan Masquerade el contracta, el client és Masquerade (un sol registre: `Collaborator` amb name=«Carlos Lucas Fernández» + company=«Masquerade Events»), no un client final. Model verificat al codi: la reserva reconeix el soci-client per `billedCollaboratorId` (ja cablejat a Nova reserva) i va igual al calendari (el dia s'ocupa igual). Faltava la VISTA que unifiqui el diner de les dues direccions, perquè `collaboratorPayout` només mira «el que Òrbita li deu».
+- Fix (extensió + consolidació, cap regla nova): (1) helper canònic `bookingOutstandingAmount` a `lib/payment-status.ts` (import pendent d'una reserva) — consolida la fórmula que es repetia inline al dashboard (migrat) i als recordatoris. (2) NOU `lib/services/collaboratorAccountService.ts` (`composeCollaboratorAccount` pura + `loadCollaboratorAccount` Prisma): creua el payout (li dec = pasta ENTREGADA sense pagar) amb les reserves `billedCollaboratorId` (em deu = pendent de cobrar) → saldo net. (3) NOU panell presentacional `CollaboratorAccountPanel` a la fitxa del col·laborador. Test nou (4).
+- Validació tècnica: `tsc` 0; tests serveis 16/16 (nous + payment-status); `validate:core` verd sencer (layer-catalogs, admin-canon, service-coverage).
+- Validació funcional: captura `.codex-captures/collab-account-after-desktop.png` — «Carlos Lucas Fernández · SALDO NET En paus · Em deu 0€ · Li dec: previst 1.873€».
+- Validació humana/UX: el propietari veu en un lloc el que li deu i el que li deuen el soci mutu, i el saldo real que canvia de mans. Confirma que persona i empresa són el mateix registre.
+- `ADMIN_CHANGE_COUNTER` passa a `1405`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1404 — 2026-07-04 — claude (FET)
+**Onada 3 (volant post-event, forma segura): «Tanca el cercle» — la pantalla «Avui» mostra els bolos fets amb feina de post-event pendent.**
+- Context: el volant post-event és el CAC més barat (client content → ressenya/testimoni/referral). El cervell `postEventPlaybookService` ja calcula les 4 accions per bolo completat, però no era visible al comandament diari. Aquesta passada l'exposa (només LECTURA — no envia cap correu; l'auto-dispatch queda per quan el propietari activi el toggle outward-facing).
+- Fix (projecció pura): `app/admin/page.tsx` estrena la secció «Tanca el cercle» consumint `loadPostEventPlaybook`. Mostra els 3 bolos més prioritaris amb el cercle obert (`priority !== DONE`): progrés `completedCount/totalCount`, la propera acció (`nextAction.label`), dies des de l'event i to de vora per prioritat (`PLAYBOOK_TONE`: ALTA vermell, MITJANA ambre). Enllaç a `/admin/post-event`. Només es pinta si hi ha feina (es manté calmat).
+- Validació tècnica: `tsc` 0; `validate:core` verd sencer (admin-canon, no-dead-views, canon-debt 0).
+- Validació funcional: captura `.codex-captures/admin-avui-o3-after-desktop.png` — «Kimera / Carlos Lucas / Alejandro García · 0/4 · Ara toca: Email d'agraïment · ALTA».
+- Validació humana/UX: la home ara tanca el cicle sencer en una superfície: tasques → leads → post-event → alertes → números. El propietari veu el CAC gratuït que se li escapa.
+- `ADMIN_CHANGE_COUNTER` passa a `1404`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1403 — 2026-07-04 — claude (FET)
+**Onada 1 (autopilot comercial): «Leads a treballar avui» — la pantalla «Avui» prioritza els leads oberts pel score comercial.**
+- Context: continuació del full de ruta de la tesi (Onada 1, «del lead al sí»). Troballa a l'exploració: el score comercial (`scoreLead`) ja es calcula però NO es veu enlloc que ajudi el propietari a decidir per quin lead començar; i la welcome-email es crea com a task manual que ningú envia sol (candidat outward-facing, ajornat per control del propietari).
+- Fix (extensió del cervell + projecció): NOU `lib/services/leadPriorityService.ts` amb `rankLeadsToWork` (pura) + `loadTopLeadsToWork` (Prisma) — carrega els leads oberts (`OPEN_LEAD_STATUSES` canònic de `lib/constants`, no duplicat), els puntua amb el cervell únic `scoreLead` (cap regla nova) i en torna els N prioritaris amb raó/risc principal. La pantalla «Avui» (`app/admin/page.tsx`) estrena la secció «Leads a treballar avui»: badge de score amb to per banda (verd/ambre/neutre), nom, raó i estat, enllaç a la fitxa. Test nou `__tests__/lib/services/leadPriorityService.test.ts` (4).
+- Validació tècnica: `tsc` 0; test servei 4/4; `validate:core` verd sencer (inclòs `arch:layer:check` després de consumir el catàleg canònic, `service-coverage`, `admin-canon`).
+- Validació funcional: captura `.codex-captures/admin-avui-o1-after-desktop.png` — «Alba Orna 65 · Té telèfon · data → CONTACTED», rànquing viu a la home.
+- Validació humana/UX: la màquina ja no només diu «tasques»; diu «treballa aquest lead primer». Prioritització comercial sense obrir cap altra pàgina.
+- `ADMIN_CHANGE_COUNTER` passa a `1403`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1402 — 2026-07-04 — claude (FET)
+**Onada 0 del full de ruta «La Màquina»: `/admin` passa a ser la pantalla «Avui» calmada; el tauler exhaustiu es preserva íntegre a `/admin/control`.**
+- Context: la tesi `docs/TESI-MAQUINA-full-de-ruta-2026-07.md` diagnostica que el coll d'ampolla del propietari és cognitiu — la home «Centre de control» és un mur de ~30 seccions (9.481px d'alçada al capture ABANS). L'Onada 0 («la màquina et parla») ho cura: aterrar en UNA superfície amb la lectura del dia, les 3 accions prioritzades, les alertes que criden i 6 números clau. Ordre explícit del propietari: «endavant» + «la millora ha de ser global».
+- Fix (global, sense motor nou): (1) el tauler complet actual es MOU verbatim a `app/admin/control/page.tsx` (imports relatius `./`→`../`, header «← Avui») + `loading.tsx` que reusa el skeleton; entrada de nav «Control complet» (Sistema, secundària). (2) NOVA `app/admin/page.tsx` = pantalla «Avui»: projecta els cervells ja existents (`loadDailyBrief` → greeting/summary/actions/alerts/kpis, `fetchDashboardData`, `loadCapacityConflicts`). Zero càlcul de domini nou; només projecció. Data via helper canònic `formatWeekdayDateShort` (no `toLocaleDateString` inline).
+- Validació tècnica: `tsc` 0; `validate:core` verd sencer (inclou `no-dead-admin-views`, `missing-loading-tsx` 94/94, `admin-canon`, `no-inline-to-locale-date-time`, canon-debt 0).
+- Validació funcional: captures a `.codex-captures/` — ABANS `admin-home-before-desktop.png` (9.481px), DESPRÉS `admin-avui-after-desktop.png` (una pantalla calmada) + `admin-control-after-desktop.png` (tauler íntegre preservat) + mòbil. La màquina «parla»: «13 tasques vençudes» → 3 accions clicables.
+- Validació humana/UX: la home passa de mur ingestionable a brúixola del dia; el detall no es perd (a un clic). És el desbloqueig d'ús de tota la resta (del 20% al 100%).
+- `ADMIN_CHANGE_COUNTER` passa a `1402`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1401 — 2026-07-04 — codex (FET)
+**Dossier blob revisat a fons: ruta de desplaçament neta, resum menys factura i introducció més compacta.**
+- Context: el propietari ha passat un `blob:http://localhost:3000/...` del dossier real. El blob no és reobrible fora del navegador, així que s'ha reproduït des de `/admin/dossiers?leadId=cmr1xh7la0000ug7dj4jnihjr` amb el generador real i s'ha capturat el popup HTML. La revisió ha detectat tres punts: el camp de ruta podia rebre el resum complet de l'esdeveniment com si fos ubicació, el resum de proposta encara tenia una lectura massa de línia de factura i la introducció quedava amb massa aire vertical.
+- Fix funcional: `getDossierLeadInitialData` exposa `travelLocation` net (`eventAddress` → adreça del missatge → `eventLocation`) i el generador manté aquest camp separat de `eventDesc`. El preview i l'enviament de dossier passen `travel.location` neta al builder; el text final queda «l'Aldosa, 422 km...» i no el resum complet amb data/hora/pax.
+- Fix editorial: el resum passa de files amb punts líders a mini-targetes editorials (`resum-card`) amb numeració, categoria i bloc `PREU / des de...`; la copy ca/es/en deixa clar que és una guia per decidir, no un total tancat. La introducció deixa el `100vh` forçat i queda més compacta per no empènyer el document amb aire mort.
+- Admin visible: el generador de dossier incorpora el camp `Lloc del desplaçament`, editable des de l'admin, perquè el preview no depengui d'una inferència amagada quan el lead no porti una ubicació clara.
+- Validació tècnica: tests enfocats `dossier-html-builder` + `dossierService` 43/43, `npx tsc --noEmit --pretty false` verd, `qa:protocol` verd i `validate:core` verd.
+- Validació funcional: Playwright sobre el preview real amb Basic auth; captures `.codex-captures/dossier-1401-preview-full-v2.png`, `.codex-captures/dossier-1401-intro-v2.png` i `.codex-captures/dossier-1401-resum-v2.png`. Ruta verificada: «El vostre esdeveniment és a l'Aldosa, a uns 422 km...».
+- Validació humana/UX: el resum deixa de llegir-se com una factura amb línies de punts, la ruta ja no barreja data/hora/pax dins la ubicació i la introducció ocupa menys aire mort sense perdre to editorial.
+- `ADMIN_CHANGE_COUNTER` passa a `1401`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1400 — 2026-07-04 — claude (FET)
+**Dossier: el «Cost del desplaçament» deixa de semblar una factura i el bloc Desplaçament s'ancora com un mini-capítol (hipersemblança editorial).**
+- Context: el propietari, revisant el dossier real (Alba Orna · Andorra 422 km · DJ 2h + Bingo Musical), va dir que l'aspecte del cost del desplaçament «no acabava de molar» i va demanar captures comparades amb la resta del PDF. La comparació ho confirma: els capítols presenten el preu com a peça editorial (mini-etiqueta daurada `PREU` + número serif fosc + filet daurat + marcador numeral gran a la columna esquerra), mentre el Desplaçament era una caixa plena emmarcada amb barra gruixuda i número daurat fort = sensació de «total a pagar», contradient la copy («no és una factura»).
+- Fix (només `dossier-html-builder.ts`; copy/claus intactes): (1) `.bud-travel-price` fora la caixa → filet daurat fi a l'esquerra + etiqueta mini daurada + número serif fosc `--o-ink`, hipersemblant amb «PREU / des de 250 €». (2) Desplaçament = mini-capítol: adopta la mateixa estructura de marcador que els capítols (columna esquerra amb marca + filet vertical, contingut indentat a la dreta), amb un punt fosc `--o-carbon` de 18px (14px mòbil) en comptes del numeral gran — l'ancora «com un producte» sense ser-ho. (3) El títol «Desplaçament» deixa de ser una mini-etiqueta uppercase ridícula i passa a **títol serif** (`.bud-travel-title`, Cormorant 34px / 26px mòbil, `--o-ink`) a l'alçada dels títols dels capítols (`.producte-nom`). Petit embolcall HTML nou; classe de test `bud-travel-price` i tots els textos intactes. `@media` mòbil + print actualitzats.
+- Validació tècnica: test `dossier-html-builder` 24/24 (text i `bud-travel-price` intactes, només estil/estructura); `validate:core` verd.
+- Validació funcional: captures `.codex-captures/dossier-99-resum.png` (desktop) + `dossier-resum-MOBILE.png` (375px) — el cost parla el mateix idioma editorial que els capítols i el bloc s'ancora coherentment.
+- Validació humana/UX: el Desplaçament ja no sembla una factura ni un dot penjat; llegeix com un mini-capítol de la mateixa mà que la resta del dossier.
+- `ADMIN_CHANGE_COUNTER` passa a `1400`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1399 — 2026-07-04 — claude (FET)
+**Dossier: eradicat el «Hola» hardcoded de la salutació + `lang` del document per locale (zero-hardcoded + builder correcte per idioma).**
+- Context: revisant el dossier en viu (petició del propietari «el dossier està revisat?»), auditat el `buildDossierHtml` end-to-end. Estructura #1394-1397 CORRECTA (1 pàgina de proposta, preus «des de» sense suma, transport després amb ruta + 322€, cap total). Però dues violacions de la norma ABSOLUTA zero-hardcoded al builder: `Hola ${nom},` (string de salutació fix) i `<html lang="ca">` (idioma fix) en un document de cara al client. Latents avui (el generador força `locale:'ca-ES'`), però prohibides per la constitució i un obstacle per a dossiers es/en.
+- Fix (monocapa): NOVA clau `dossier.intro.greeting` als 3 idiomes (`"Hola {name},"` ca/es · `"Hi {name},"` en), amb placeholder `{name}`. El builder consumeix `copy.intro.greeting` (interpolant el nom, escapat) en comptes del «Hola» hardcoded, i deriva `<html lang>` del `locale` (`ca-ES`→`ca`). Type `DossierCopy.intro.greeting` afegit; `getDossierCopy` ja el propaga via `t.raw('intro')` (cap canvi).
+- Validació tècnica: `tsc` 0; test `dossier-html-builder` 24/24 (2 nous: salutació monocapa amb `{name}` interpolat + `lang` derivat `en-GB`→`en`); `validate:core` verd (i18n-keys-sync confirma les 3 JSON en sync).
+- Validació funcional: dossier ca segueix mostrant «Hola {nom},» (ara des de copy, no hardcoded); build del builder en `en-GB` produeix `lang="en"` i «Hi {nom},».
+- Validació humana/UX: el dossier català es veu idèntic; el builder queda net i preparat per idioma sense cap «Hola» clavat al codi.
+- `ADMIN_CHANGE_COUNTER` passa a `1399`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #1398 — 2026-07-04 — claude (FET)
+**Ticker de màximes d'Economia: enduriment anti-desbordament (patró absolut → graella d'una cel·la).**
+- Context: sessió `go`. Base verificada verda primer (`tsc` 0, `validate:core` 0, `pnpm build` 0 — el `build` havia quedat diferit als #1394-1397). Revisant el `MaximsTicker` (#1390-1393, tancat amb 4 iteracions ràpides en viu), detectat que `.ap-maxims-item` era `position:absolute` sense `top/bottom` dins un viewport amb `min-height:1.5rem` (una línia): un ítem absolut NO fa créixer el viewport, així que qualsevol màxima que ajusti a 2+ línies desbordava per sota la barra i se solapava amb el contingut del dashboard (no hi ha `overflow:hidden`). El ticker viu al top de TOTES les pàgines admin.
+- Abast honest del bug: amb el contingut ACTUAL a 375px la màxima més llarga (299px) cap en UNA línia → no desbordava a aquest breakpoint. Però era **latentment trencat**: a amplades <~340px (iPhone SE 320px) o amb màximes futures més llargues (`ADMIN_ECONOMY_MAXIMS` és una llista viva) ajusta i desborda. Enduriment defensiu, no un bug visible a tot mòbil.
+- Fix (monocapa, `admin-shell.css`): `.ap-maxims-viewport` passa a `display:grid` (`align-items/justify-items:center`) i els dos `.ap-maxims-item` comparteixen la MATEIXA cel·la (`grid-area:1/1`) → es mantenen superposats per al crossfade solapat (mai queda buit) però la cel·la creix amb la frase més alta, així la barra s'eixampla en comptes de desbordar. Substitueix `position:absolute; left/right; margin-inline; width:fit-content`.
+- Validació tècnica: `tsc` 0; `validate:core` 0; `pnpm build` 0.
+- Validació funcional: Playwright, 3 casos — 375px contingut actual = 1 línia, 0 desbordament (V i H); desktop = 1 línia, 0 desbordament; **cas d'ajust forçat (text llarg → 2 línies) a 375px = la barra creix 42→48px, overflowV=0** (prova que el fix resol l'ajust). `display:grid` confirmat. Captures `.codex-captures/maxims-1398-{mobile,desktop}.png`.
+- Validació humana/UX: desktop i 375px idèntics abans/després; només canvia el comportament quan una màxima ajusta (ara eixampla, abans desbordava). Zero contrapartida.
+- `ADMIN_CHANGE_COUNTER` passa a `1398`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
 
 ### Canvi #1397 — 2026-07-04 — claude (FET)
 **Dossier: fusió del resum + transparència en UNA pàgina de proposta (el preu no es repeteix; transport just després, explicat a nivell de principi).**

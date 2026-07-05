@@ -7326,6 +7326,7 @@
     "intro": {
       "kicker": "Imaginem-ho junts",
       "title": "Un tast del que podem viure plegats, abans de parlar de números.",
+      "greeting": "Hola {name},",
       "greetingDefault": "Gràcies per pensar en nosaltres! Hem preparat aquestes pàgines perquè us imagineu com seria la vostra festa amb tranquil·litat, sense haver de mirar encara els preus.\n\nA cada pàgina us expliquem una proposta: què és, com es viu i què hi trobareu. Quedeu-vos amb les que us facin més il·lusió i, quan ho tingueu clar, us passem el pressupost a mida només amb el que trieu.",
       "offerCountOne": "1 proposta per a vosaltres",
       "offerCountMany": "{count} propostes per a vosaltres",
@@ -7347,12 +7348,12 @@
     "resum": {
       "kicker": "En resum",
       "title": "Tot el que us proposem",
-      "lead": "Aquí teniu, d'un cop d'ull, el preu de partida —el «des de»— de cada proposta i com funciona el desplaçament. Encara sense extres: no és una factura, és perquè sapigueu de què parlem quan ens asseiem a tancar-ho junts."
+      "lead": "Aquí teniu el punt de partida de cada proposta i, just després, el desplaçament calculat per aquesta ruta. No tanquem cap total aquí: és una guia clara per decidir què us encaixa abans de fer la proposta definitiva."
     },
     "budget": {
       "servicesLabel": "Les propostes",
       "travelTitle": "Desplaçament",
-      "travelNote": "Inclòs fins a {includedKm} km des de Granollers. Per a distàncies superiors, el desplaçament es calcula pel cost real del trajecte —vehicle i temps de l'equip—, sempre clar i sense recàrrecs sorpresa.",
+      "travelNote": "Inclòs fins a {includedKm} km des de Granollers. En rutes més llargues, el desplaçament es calcula de manera transparent segons la distància i l'equip que cal moure.",
       "travelRoute": "El vostre esdeveniment és a {location}, a uns {km} km (anada i tornada) des de Granollers. El desplaçament s'aplica sobre aquesta ruta.",
       "travelPriceLabel": "Cost del desplaçament",
       "vatNote": "Preus orientatius. L'IVA i els ajustos finals es tanquen a la proposta definitiva."

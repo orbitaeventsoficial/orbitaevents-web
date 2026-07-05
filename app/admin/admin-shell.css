@@ -3626,14 +3626,15 @@ html.admin-mode .ap-maxims-mark--left { left: var(--o-space-35); }
 html.admin-mode .ap-maxims-mark--right { right: var(--o-space-35); }
 html.admin-mode .ap-maxims-viewport {
   position: relative; flex: 1 1 auto; min-width: 0;
-  display: flex; align-items: center; justify-content: center; min-height: 1.5rem;
+  display: grid; align-items: center; justify-items: center; min-height: 1.5rem;
 }
-/* Absolut + centrat: la frase sortint i l'entrant se superposen al mateix lloc → crossfade
-   solapat real (mai queda buit). Centrat amb margin auto + fit-content (framer fixa la width
-   al contingut, per això left/right 0 sol no estira; margin auto sí que centra). */
+/* Graella d'una cel·la: la frase sortint i l'entrant comparteixen la MATEIXA cel·la
+   (grid-area 1/1) → crossfade solapat real (mai queda buit), però la cel·la creix amb la
+   frase més alta. Així una màxima que ajusta a 2 línies a mòbil eixampla la barra en comptes
+   de desbordar per sota i solapar-se amb el contingut del dashboard (#1398). El patró absolut
+   anterior no feia créixer el viewport (min-height 1 línia) i la 2a línia se sortia. */
 html.admin-mode .ap-maxims-item {
-  position: absolute; left: 0; right: 0; margin-inline: auto;
-  width: fit-content; max-width: 100%; text-align: center;
+  grid-area: 1 / 1; max-width: 100%; text-align: center;
   font-family: var(--display); font-size: var(--o-text-sm); font-weight: var(--o-fw-semi);
   color: var(--ax-t); line-height: 1.35;
 }

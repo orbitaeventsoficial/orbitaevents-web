@@ -11,6 +11,11 @@ import {
   collaboratorProductToAnimacioProduct,
   getDossierCollaboratorProductsByIds,
 } from '@/lib/services/collaboratorProductService';
+import {
+  parseDossierLineSnapshot,
+  productsFromDossierLineSnapshot,
+  transportFromDossierLineSnapshot,
+} from '@/lib/services/dossierSnapshotService';
 
 export type CreateDossierInput = {
   leadId?: string;
@@ -21,6 +26,8 @@ export type CreateDossierInput = {
   eventDesc?: string;
   salutacio?: string;
   productIds: string[];
+  lineSnapshot?: unknown;
+  mode?: string;
 };
 
 export type DossierLeadInitialData = {
@@ -29,6 +36,7 @@ export type DossierLeadInitialData = {
   email: string;
   telefon: string;
   eventDesc: string;
+  travelLocation: string;
   distanceKm: number | null;
 };
 
@@ -63,7 +71,7 @@ function buildDossierLeadEventDesc(lead: {
   const schedule = lead.eventStartTime && lead.eventEndTime
     ? `${lead.eventStartTime}-${lead.eventEndTime}`
     : lead.eventStartTime;
-  const address = lead.eventAddress || extractLeadMessageAddress(lead.message) || lead.eventLocation;
+  const address = buildDossierLeadTravelLocation(lead);
   const message = cleanLeadDossierMessage(lead.message);
   const parts = [
     lead.eventType && lead.eventType !== 'OTHER' ? getEventLabel(lead.eventType) : null,
@@ -74,6 +82,14 @@ function buildDossierLeadEventDesc(lead: {
     message,
   ].filter((part): part is string => Boolean(part?.trim()));
   return parts.join(' · ');
+}
+
+function buildDossierLeadTravelLocation(lead: {
+  eventLocation: string | null;
+  eventAddress: string | null;
+  message: string | null;
+}): string {
+  return lead.eventAddress || extractLeadMessageAddress(lead.message) || lead.eventLocation || '';
 }
 
 export async function getDossierLeadInitialData(leadId?: string | null): Promise<DossierLeadInitialData | null> {
@@ -103,11 +119,13 @@ export async function getDossierLeadInitialData(leadId?: string | null): Promise
     email: lead.email,
     telefon: lead.phone ?? '',
     eventDesc: buildDossierLeadEventDesc(lead),
+    travelLocation: buildDossierLeadTravelLocation(lead),
     distanceKm: lead.distanceKm ?? null,
   };
 }
 
 export async function createDossier(input: CreateDossierInput) {
+  const lineSnapshot = parseDossierLineSnapshot(input.lineSnapshot);
   return prisma.dossier.create({
     data: {
       leadId: input.leadId || null,
@@ -118,6 +136,8 @@ export async function createDossier(input: CreateDossierInput) {
       eventDesc: input.eventDesc || null,
       salutacio: input.salutacio || null,
       productIds: input.productIds,
+      lineSnapshot: lineSnapshot || undefined,
+      mode: input.mode || null,
     },
   });
 }
@@ -194,11 +214,11 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
     getOrbitaDossierProducts('ca'),
     getDossierCopy('ca'),
   ]);
-  const collaboratorProducts = await getDossierCollaboratorProductsByIds(dossier.productIds);
-  const products = [
+  const snapshotProducts = productsFromDossierLineSnapshot(dossier.lineSnapshot);
+  const products = snapshotProducts ?? [
     ...orbitaProducts.filter((p) => dossier.productIds.includes(p.id)),
     ...allProducts.filter((p) => dossier.productIds.includes(p.id)),
-    ...collaboratorProducts.map(collaboratorProductToAnimacioProduct),
+    ...(await getDossierCollaboratorProductsByIds(dossier.productIds)).map(collaboratorProductToAnimacioProduct),
   ];
   const recipientEmail = dossier.email!;
   const clientInfo: DossierClientInfo = {
@@ -214,9 +234,10 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
   // pinta si travelKm>0) quedava buida. El dossier no desa el km; si ve d'un lead, l'agafem
   // del lead (font única) perquè la proposta surti sencera i el client decideixi conscient.
   // Sense suma dels elements: el dossier és catàleg, no factura (#1396/#1397).
-  let travelKm: number | undefined;
-  let travelLocation: string | undefined;
-  if (dossier.leadId) {
+  const snapshotTransport = transportFromDossierLineSnapshot(dossier.lineSnapshot);
+  let travelKm: number | undefined = snapshotTransport.travelKm;
+  let travelLocation: string | undefined = snapshotTransport.travelLocation;
+  if (!snapshotProducts && dossier.leadId) {
     const lead = await prisma.lead.findUnique({
       where: { id: dossier.leadId },
       select: { distanceKm: true, eventLocation: true },

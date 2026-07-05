@@ -28,6 +28,7 @@ const copy: DossierCopy = {
   intro: {
     kicker: "Una mirada a l'experiència",
     title: "Un dossier per imaginar l'esdeveniment abans de parlar de números.",
+    greeting: 'Hola {name},',
     greetingDefault: 'Gràcies per contactar amb nosaltres.',
     offerCountOne: '1 proposta activada',
     offerCountMany: '{count} propostes activades',
@@ -148,6 +149,17 @@ describe('buildDossierHtml', () => {
     expect(html).toContain('Benvingut al dossier exclusiu.');
   });
 
+  it('genera la salutació des de la copy (monocapa, {name} interpolat, sense «Hola» hardcoded)', () => {
+    const html = build(client, [productWithTrams]);
+    expect(html).toContain('Hola Joan Pla,');
+  });
+
+  it('deriva l\'idioma del document del locale (en-GB → lang="en")', () => {
+    const html = build(client, [productWithTrams], { locale: 'en-GB' });
+    expect(html).toContain('<html lang="en">');
+    expect(html).not.toContain('<html lang="ca">');
+  });
+
   it('escapeja caràcters HTML perillosos', () => {
     const html = build({ ...client, nom: '<script>alert("xss")</script>' }, [productWithTrams]);
     expect(html).not.toContain('<script>');
@@ -225,8 +237,10 @@ describe('buildDossierHtml', () => {
     expect(html).not.toContain('490');
     // Fusió #1397: una sola pàgina de proposta, cap pàgina de pressupost paral·lela.
     expect(html.match(/class="resum-page"/g)?.length).toBe(1);
+    expect(html.match(/class="resum-card"/g)?.length).toBe(2);
     expect(html).not.toContain('class="bud-page"');
     expect(html).not.toContain('class="resum-total"');
+    expect(html).not.toContain('resum-row-dots');
   });
 
   it('el transport surt JUST DESPRÉS dels productes, a la MATEIXA pàgina, amb xifra clara (#1397)', () => {

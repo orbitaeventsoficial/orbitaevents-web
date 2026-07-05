@@ -8,6 +8,7 @@ import { buildCashFlowForecast } from '@/lib/services/cashFlowForecast';
 import { buildPipelineForecast } from '@/lib/services/pipelineForecast';
 import { formatDateSimple, PLACEHOLDER_EMAIL_DOMAIN, EVENT_TYPE_CHART_COLORS, TASK_SOURCE } from '@/lib/constants';
 import { isImapConfigured, isSmtpConfigured } from '@/lib/env';
+import { bookingOutstandingAmount } from '@/lib/payment-status';
 import { getBookingChecklist, DEFAULT_BOOKING_CHECKLIST_ITEMS } from '@/lib/services/bookingChecklistService';
 import { isBuildPrerenderPhase } from '@/lib/build-phase';
 import { getAdminHealthSnapshot, type AdminHealthSnapshot } from '@/lib/services/adminHealthService';
@@ -287,7 +288,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
         status: { in: ['CONFIRMED', 'PREPARING'] },
         OR: [{ depositPaid: false }, { remainingPaid: false }],
       },
-      select: { total: true, depositAmount: true, depositPaid: true, remainingPaid: true },
+      select: { total: true, depositAmount: true, depositPaid: true, remainingPaid: true, cashAmount: true },
     }), CacheTTL.SHORT).catch(() => []),
     // ─── Next event + revenue (abans bloc 5 seqüencial) ────────────────
     cachedQuery(`admin:dashboard:next-event:${dayKey}`, () => prisma.booking.findFirst({
@@ -490,11 +491,8 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   const cashFlowNet30 = (cashFlowResult as Array<{ netFlow: number }>).length > 0 ? (cashFlowResult as Array<{ netFlow: number }>)[0].netFlow : 0;
   const pipelineWeighted30 = (pipelineResult as Array<{ combined: number }>).length > 0 ? (pipelineResult as Array<{ combined: number }>)[0].combined : 0;
   let pendingPayments = 0;
-  for (const b of pendingBookingsResult as Array<{ total: number; depositAmount: number; depositPaid: boolean; remainingPaid: boolean }>) {
-    const deposit = Number(b.depositAmount) || 0;
-    const total = Number(b.total) || 0;
-    if (!b.depositPaid && deposit > 0) pendingPayments += deposit;
-    if (!b.remainingPaid) pendingPayments += Math.max(0, total - deposit);
+  for (const b of pendingBookingsResult as Array<{ total: number; depositAmount: number; depositPaid: boolean; remainingPaid: boolean; cashAmount: number | null }>) {
+    pendingPayments += bookingOutstandingAmount(b);
   }
 
   let nextEvent: DashboardData['nextEvent'] = null;

@@ -91,6 +91,14 @@ describe('listAdminBookings', () => {
     expect(searchClause.OR).toHaveLength(4);
   });
 
+  it('filtra per customerId quan la llista ve del Customer Hub o del kanban', async () => {
+    await listAdminBookings({ locale: 'ca', page: 1, limit: 10, customerId: 'customer-1' });
+
+    const call = mockPrisma.booking.findMany.mock.calls[0][0];
+    const andClauses = call.where.AND as Record<string, unknown>[];
+    expect(andClauses.some((c: Record<string, unknown>) => c.customerId === 'customer-1')).toBe(true);
+  });
+
   it('agrupa estadístiques per status', async () => {
     mockPrisma.booking.groupBy.mockResolvedValue([
       { status: 'CONFIRMED', _count: 5, _sum: { total: 3000 } },
