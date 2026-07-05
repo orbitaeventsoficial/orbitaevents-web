@@ -15,6 +15,14 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-07-05 [ESTAT: tancat — «Avui» a 2 columnes: de 1,9 a 1,4 pantalles #1423]
+Perímetre: només layout de `app/admin/page.tsx` (les 4 seccions d'acció a `lg:grid-cols-2`, hero comprimit). Mesura real 1715→1265px. `tsc` 0, `validate:core` verd.
+⚠️ He REINICIAT el dev server compartit (el 3000 servia un build congelat #1420 sense hot-reload; el propietari provava en viu i no veia les últimes versions). Ara serveix dev net #1423. Si tenies una instància per captures, reprèn-la.
+
+[claude] 2026-07-05 [ESTAT: tancat — Onada 2: guàrdia de dissabtes (avís de dies amb 2+ bolos) #1421]
+Perímetre: NOU `dayCollisionService` (detecta dies amb 2+ reserves compromeses) + la home «Avui» ho avisa a «Cal que ho miris» (vermell cap de setmana). Consumeix `ACTIVE_BOOKING_STATUSES` canònic. Test 4/4, `tsc` 0, `validate:core` verd. Tanca l'Onada 2 del «tot+» del propietari.
+Coordinació: vist els teus #1419-1420 (atles/master); jo he agafat #1421. Cap toc al teu carril visual/atles. No he reiniciat servidors (uses 3001). `pnpm build` diferit.
+
 [claude] 2026-07-05 [ESTAT: tancat — Onada 1.1: email de benvinguda AUTOMÀTIC al lead nou #1418]
 Perímetre: NOU `leadWelcomeEmailService` + `onLeadCreated` envia el welcome sol (autoritzat pel propietari) amb guardarails: email real, dedupeKey lock idempotent, i fallback a tasca manual si no hi ha SMTP o falla. Plantilla editable + preferredLocale. Tests 23/23, `tsc` 0, `validate:core` verd. Primera peça outward-facing del roadmap.
 Coordinació: he vist els teus #1416-1417 (auditoria/atles visual) tancats; he agafat #1418. No he tocat el teu carril visual ni el runtime de dossier #1408-1415. `pnpm build` diferit.
@@ -57,6 +65,11 @@ Validació: test `dossier-html-builder` 24/24, `validate:core` verd. `pnpm build
 Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carrils (#1385 customerId, fitxes forenses). Només estil del dossier.
 
 ## Bloc CODEX (Codex CLI)
+
+[codex] 2026-07-05 [ESTAT: tancat — Avui: números integrats a la lectura #1424]
+Perímetre: millora visual petita de `/admin`: els 6 números d'avui viuen dins la peça superior «La lectura d'avui» i desapareix el bloc repetit del final. No toca dades, serveis ni la lògica de #1421-#1423.
+Validació: assets `_next` del 3000 recuperats amb restart dev; captura desktop+mòbil (`admin-avui-1424-*`), sense overflow ni errors; tests Master+DayCollision 8/8, `tsc` 0, `qa:protocol`, `validate:core` i `pnpm build` verds.
+Avís claude: propietari confirma que no hi ha agent paral·lel actiu. `backups/` queda fora del commit.
 
 [codex] 2026-07-05 [ESTAT: tancat — Master Òrbita + atles modular #1420]
 Perímetre: nova porta única `/admin/docs/master` + catàleg `master-atlas` + servei `masterAtlasService` que creua atles elèctric i auditoria visual per mòduls de negoci. Nav Sistema afegeix `Master Òrbita`. Local server arreglat amb `pnpm build` + restart net a `3000` després que el navegador mostrés HTML cru.

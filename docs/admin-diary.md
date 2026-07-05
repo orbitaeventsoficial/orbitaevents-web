@@ -1,3 +1,84 @@
+## 2026-07-05 — Avui integra els números clau dins la lectura superior (Canvi #1424, codex)
+
+### Context
+El propietari pregunta si `/admin` es pot millorar després del tall visual #1423. Primer es verifica el problema real: el `3000` tornava a servir HTML per chunks `_next` i per això la pantalla es veia sense CSS/JS. Reiniciat el dev server, els assets carreguen correctament i la pantalla real queda bona, però amb una millora clara: els números clau continuaven al final, sota el fold.
+
+### Què s'ha fet
+- **`app/admin/page.tsx`**: «La lectura d'avui» i «Els números d'avui» passen a una sola card superior. Els KPIs reutilitzen `AdminKpiRow`/`AdminKpi`; no hi ha CSS nou ni càlcul de domini.
+- Eliminada la secció de KPIs del final perquè la informació ja viu a dalt i no es duplica.
+
+### Validació
+- Validació tècnica: `tsc` 0; `qa:protocol`, `validate:core` i `pnpm build` finals verds.
+- Validació funcional: captura `.codex-captures/admin-avui-1424-desktop.png`; assets `_next` sense 404/MIME; scroll 1440x900 de 1,41 a 1,25 pantalles.
+- Validació humana/UX: el primer viewport ara conté lectura, números, accions, leads, post-event i alertes. El que queda a partir d'aquí és criteri visual final del propietari.
+
+### Coordinació
+Counter → 1424. El propietari confirma que som sols; no hi ha agent paral·lel actiu. Tall només de jerarquia a `/admin`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-05 — Pantalla «Avui» a 2 columnes: de 1,9 a 1,4 pantalles (Canvi #1423, claude)
+
+### Context
+El propietari, provant l'«Avui» en viu, pregunta si cap en una sola pantalla. Mesura real (Playwright, 1440×900): **1.715px = 1,9 pantalles**. Anava tot apilat en una columna full-width, desaprofitant l'espai horitzontal.
+
+### Què s'ha fet (només layout)
+- Les 4 seccions d'acció (Fes això avui · Leads a treballar · Tanca el cercle · Cal que ho miris) passen a `lg:grid-cols-2` (2 columnes al desktop, apilades a mòbil). Hero comprimit (p-5→p-4, text-2xl→text-xl). Números full-width a sota.
+- Detectat i comunicat al propietari que el localhost:3000 servia un **build congelat #1420** (no hot-reload); reiniciat a instància dev neta per verificar de veritat.
+
+### Validació
+- Validació tècnica: `tsc` 0; `validate:core` verd sencer.
+- Validació funcional: mesura real **1.715px → 1.265px (1,4 pantalles)**; captura `avui-fit-check.png` (2 col, responsiu).
+- Validació humana/UX: molt més a prop del «d'un cop d'ull». Caber EXACTA en 1 pantalla requeriria retallar ítems → decisió de producte del propietari.
+
+### Coordinació
+Counter → 1423. Toca només `app/admin/page.tsx` (layout). Reiniciat el dev server compartit (el 3000 estava congelat) — avisat Codex. Codex actiu #1422 (Master sync).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-07-05 — Master Òrbita sincronitzat amb la guàrdia de dissabtes (Canvi #1422, codex)
+
+### Context
+Claude tanca #1421: `dayCollisionService` detecta dies amb 2+ bolos compromesos i la pantalla `Avui` ho mostra a «Cal que ho miris». El Master #1420 encara ho llegia com a propera peça pendent. Això és perillós perquè el Master és la porta d'entrada de futures IAs: si menteix, es torna a construir o proposar el que ja existeix.
+
+### Què s'ha fet
+- **`lib/constants/master-atlas.ts`**: `dayCollisionService` entra a Comandament i Reserves com a font de veritat. La «Guàrdia de dissabtes a Avui» passa a `FET`; el que queda pendent queda separat i honest: confirmació/gate en crear o acceptar el segon bolo d'un dia ja ocupat.
+- **`masterAtlasService` test**: nova asserció perquè el mòdul Reserves detecti `lib/services/dayCollisionService.ts`, el tingui com a `sourceOfTruth` i marqui la guàrdia de dissabtes com a `FET`.
+- **Tesis**: `TESI-MAQUINA-full-de-ruta-2026-07.md` i `TESI-ZENIT-MAQUINA-ORBITA-2026-07-04.md` incorporen #1421: l'avís visible existeix; el refinament restant és portar-lo al moment de decisió.
+
+### Validació
+- Validació tècnica: tests enfocats Master+DayCollision 8/8; `tsc` 0; `validate:core` i `pnpm build` finals verds.
+- Validació funcional: el Master detecta `lib/services/dayCollisionService.ts` dins Reserves, el tracta com a font de veritat i deixa la guàrdia de dissabtes en estat `FET`.
+- Validació humana/UX: el propietari i futures IAs ja veuen què existeix (#1421) i què queda de veritat (gate en crear/acceptar el segon bolo), sense reobrir feina ja feta.
+
+### Coordinació
+Counter → 1422. Codex agafa el relleu de #1421 sense tocar la lògica de Claude; només sincronitza Sistema/docs/atles i valida el paquet. El `backups/` local continua fora del commit.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-05 — Onada 2: guàrdia de dissabtes — avís de dies amb 2+ bolos a la home (Canvi #1421, claude)
+
+### Context
+Última peça del «tot+» del propietari. El recurs escàs és el temps (els ~50 dissabtes): no pots ser a dos llocs alhora. `capacityConflictService` mira stock d'inventari; faltava la PRESÈNCIA humana (2+ bolos el mateix dia).
+
+### Què s'ha fet (servei nou + projecció a l'Avui)
+- **NOU `lib/services/dayCollisionService.ts`**: `detectDayCollisions` (pura) + `loadDayCollisions` (Prisma). Agrupa reserves compromeses futures (`ACTIVE_BOOKING_STATUSES` canònic) per dia → dies amb 2+ bolos, marcant cap de setmana i ordenant per hora. Test nou (4).
+- **`app/admin/page.tsx`**: la secció «Cal que ho miris» estrena els avisos de col·lisió de dia (to vermell cap de setmana / ambre entre setmana) amb data, hores i clients, enllaç al calendari. Avís, no bloqueig.
+
+### Validació
+- Validació tècnica: `tsc` 0; test 4/4; `validate:core` verd sencer (corregit un `arch:layer:check` → consumeix `ACTIVE_BOOKING_STATUSES` en comptes de duplicar el catàleg).
+- Validació funcional: es pinta només si hi ha dies amb 2+ bolos (ara cap → no es mostra, correcte). Test cobreix detecció, marcatge de cap de setmana i ordre.
+- Validació humana/UX: el propietari veu si s'ha compromès a dos bolos el mateix dia abans que sigui un problema. ⚠️ Captura no aplicable (sense col·lisions actuals; evito reiniciar servidors per no disrupcionar Codex). ⚠️ `pnpm build` diferit.
+
+### Coordinació
+Counter → 1421. Toca `dayCollisionService.ts` (nou) + test + `app/admin/page.tsx`. Tanca l'Onada 2 del «tot+». Codex actiu en paral·lel (#1419-1420, atles/master); jo he agafat #1421 sense tocar el seu carril.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-05 — Master Òrbita: porta única + atles modular per capacitats de negoci (Canvi #1420, codex)
 
 ### Context

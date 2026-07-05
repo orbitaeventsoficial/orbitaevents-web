@@ -16,6 +16,7 @@ import { fetchDashboardData } from './lib/dashboard-data';
 import { formatCurrency, formatDate, formatWeekdayDateShort, getEventLabel } from '@/lib/constants';
 import { loadDailyBrief } from '@/lib/services/dailyBriefService';
 import { loadCapacityConflicts } from '@/lib/services/capacityConflictService';
+import { loadDayCollisions } from '@/lib/services/dayCollisionService';
 import { loadTopLeadsToWork } from '@/lib/services/leadPriorityService';
 import { loadPostEventPlaybook } from '@/lib/services/postEventPlaybookService';
 import { getPaymentBand, getPaymentLabel } from '@/lib/payment-status';
@@ -46,12 +47,13 @@ const PLAYBOOK_TONE: Record<'ALTA' | 'MITJANA' | 'BAIXA' | 'DONE', string> = {
 };
 
 export default async function AdminTodayPage() {
-  const [d, brief, capacity, topLeads, playbook] = await Promise.all([
+  const [d, brief, capacity, topLeads, playbook, dayCollisions] = await Promise.all([
     fetchDashboardData(),
     loadDailyBrief(),
     loadCapacityConflicts(),
     loadTopLeadsToWork(5),
     loadPostEventPlaybook(),
+    loadDayCollisions(),
   ]);
 
   const actions = brief.actions.slice(0, 3);
@@ -60,6 +62,8 @@ export default async function AdminTodayPage() {
   const closeLoop = playbook.items.filter((it) => it.priority !== 'DONE' && it.nextAction).slice(0, 3);
   const alerts = brief.alerts.filter((a) => a.level !== 'INFO').slice(0, 4);
   const conflicts = capacity.conflicts.slice(0, 2);
+  // Guàrdia de dissabtes: dies amb 2+ bolos (no pots ser a dos llocs). Els 3 primers.
+  const collisions = dayCollisions.slice(0, 3);
 
   const ne = d.nextEvent;
   const nePaymentBand = ne ? getPaymentBand(ne.depositPaid, ne.remainingPaid) : null;
@@ -79,7 +83,7 @@ export default async function AdminTodayPage() {
     { label: 'Pipeline', value: formatCurrency(d.pipelineWeighted30), href: '/admin/leads' },
   ];
 
-  const hasSignals = actions.length > 0 || alerts.length > 0 || conflicts.length > 0;
+  const hasSignals = actions.length > 0 || alerts.length > 0 || conflicts.length > 0 || collisions.length > 0;
 
   return (
     <AdminPage
@@ -98,11 +102,25 @@ export default async function AdminTodayPage() {
       }
     >
       {/* ═══ LA LECTURA DE LA MÀQUINA ═══ */}
-      <section className="ap-card p-5 border-l-[3px] border-l-[var(--gold)]">
-        <p className="text-[var(--gold)] font-[family-name:var(--mono)] text-xs font-bold uppercase tracking-wider">La lectura d&apos;avui</p>
-        <p className="mt-2 text-[var(--t)] font-[family-name:var(--display)] text-xl sm:text-2xl font-bold leading-snug max-w-[60ch]">{brief.summary}</p>
+      <section className="ap-card p-4 border-l-[3px] border-l-[var(--gold)]">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,0.9fr)_minmax(34rem,1.3fr)] xl:items-center">
+          <div className="min-w-0">
+            <p className="text-[var(--gold)] font-[family-name:var(--mono)] text-xs font-bold uppercase tracking-wider">La lectura d&apos;avui</p>
+            <p className="mt-1.5 text-[var(--t)] font-[family-name:var(--display)] text-lg sm:text-xl font-bold leading-snug">{brief.summary}</p>
+          </div>
+          <div className="min-w-0">
+            <p className="mb-2 text-[var(--t3)] font-[family-name:var(--mono)] text-xs font-bold uppercase tracking-wider">Els números d&apos;avui</p>
+            <AdminKpiRow>
+              {kpis.map((k) => (
+                <AdminKpi key={k.label} label={k.label} value={k.value} href={k.href} />
+              ))}
+            </AdminKpiRow>
+          </div>
+        </div>
       </section>
 
+      {/* ═══ GRAELLA D'ACCIÓ — 2 columnes al desktop perquè càpiga d'un cop d'ull ═══ */}
+      <div className="grid items-start gap-4 lg:grid-cols-2">
       {/* ═══ FES AIXÒ AVUI (top 3 accions) ═══ */}
       <AdminSection
         title="Fes això avui"
@@ -176,10 +194,21 @@ export default async function AdminTodayPage() {
         </AdminSection>
       )}
 
-      {/* ═══ CAL QUE HO MIRIS (alertes + conflictes de capacitat) ═══ */}
-      {(alerts.length > 0 || conflicts.length > 0) && (
-        <AdminSection title="Cal que ho miris" description="Avisos i xocs de capacitat oberts.">
+      {/* ═══ CAL QUE HO MIRIS (alertes + xocs de capacitat + guàrdia de dissabtes) ═══ */}
+      {(alerts.length > 0 || conflicts.length > 0 || collisions.length > 0) && (
+        <AdminSection title="Cal que ho miris" description="Avisos, xocs de capacitat i dies amb més d'un bolo.">
           <div className="grid gap-2.5 md:grid-cols-2">
+            {collisions.map((c) => (
+              <Link key={`collision-${c.date}`} href="/admin/calendario" className={`ap-card p-3 no-underline ${c.isWeekend ? 'admin-tone-border-danger' : 'admin-tone-border-warning'}`}>
+                <div className="flex items-start gap-2.5">
+                  <span className={`mt-1 inline-block h-2.5 w-2.5 shrink-0 rounded-full ${c.isWeekend ? 'bg-[var(--o-danger)]' : 'bg-[var(--o-warning)]'}`} />
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-[var(--t)]">🗓 {c.count} bolos el mateix dia{c.isWeekend ? ' (cap de setmana)' : ''}</p>
+                    <p className="mt-0.5 text-xs text-[var(--t2)]">{formatDate(c.date)} · {c.bookings.map((b) => `${b.eventStartTime ? b.eventStartTime + ' ' : ''}${b.clientName}`).join(' · ')}</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
             {alerts.map((alert, i) => {
               const tone = ALERT_TONE[alert.level];
               return (
@@ -208,6 +237,7 @@ export default async function AdminTodayPage() {
           </div>
         </AdminSection>
       )}
+      </div>
 
       {/* ═══ EL FOCUS: PRÒXIM BOLO ═══ */}
       {ne && (
@@ -234,15 +264,6 @@ export default async function AdminTodayPage() {
           </Link>
         </AdminSection>
       )}
-
-      {/* ═══ ELS NÚMEROS D'AVUI ═══ */}
-      <AdminSection title="Els números d'avui" description="Sis xifres per prendre el pols. Toca'n una per anar-hi.">
-        <AdminKpiRow>
-          {kpis.map((k) => (
-            <AdminKpi key={k.label} label={k.label} value={k.value} href={k.href} />
-          ))}
-        </AdminKpiRow>
-      </AdminSection>
 
       {/* ═══ PEU CALM: la porta al detall ═══ */}
       {!hasSignals && (

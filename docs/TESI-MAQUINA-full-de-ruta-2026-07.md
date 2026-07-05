@@ -77,7 +77,7 @@ cada estació i **els nexes** (com passa la informació d'una a l'altra).
 | 3 | **Qualificació** | `commercialScoring`, `slaAutomationService`, `commercialSequenceService`, `nextBestActionService` (745 L), `dailyBriefService`, `leadPipelineSuggestionsService` | Estat: `NEW→CONTACTED→QUOTE_SENT→NEGOTIATING` |
 | 4 | **Proposta** | `dossierService`+`dossier-html-builder`, `quotePdfService`, `proposalAdminService`, `leadServiceLineService` (les línies del bolo), `computeBoloTransport` | Es fixen les `LeadServiceLine`; s'envia dossier/pressupost |
 | 5 | **Tancament** | `bookingCreationService` (**copia** `lead.serviceLines`→`booking.serviceLines`), `bookingStripePaymentService`, `bookingBizumService`, `contractService`+`contractPdfService`, `invoiceService` | Lead `WON` → `Booking PENDING`; `onBookingConfirmed` |
-| 6 | **Operativa** | `crewScheduleService`, `capacityConflictService`, `bookingCapacityService`, `bookingInventoryService`, `repartimentService`, `seasonCalendarService` | Checklist pre-event, assignació d'inventari, repartiment |
+| 6 | **Operativa** | `crewScheduleService`, `capacityConflictService`, `dayCollisionService`, `bookingCapacityService`, `bookingInventoryService`, `repartimentService`, `seasonCalendarService` | Checklist pre-event, assignació d'inventari, col·lisions de dia, repartiment |
 | 7 | **Esdeveniment** | `bookingChecklistService`, `googleCalendarSyncService`, `crewBlock`/`Availability` | Estat `PREPARING→COMPLETED` |
 | 8 | **Post-event** | `postEventPlaybookService`, `postEventDispatchService`, `questionnaireService`, `reviewsSyncService`, `referralsService`, `reactivationService` | Testimoni→portfolio; referral→**nou lead** (volant) |
 | ∞ | **Client hub** | `fetchCustomerHub`, `customerSegmentationService`, `customerActivityService`, `customerInsightsService`, `clientPortalAccess` | El client viu per sobre de tot el cicle |
@@ -128,7 +128,8 @@ copilot comercial complet; el repte és que el propietari el *miri* i s'hi *refi
 
 ### 3. Cervell operatiu — 🟡 POTENT però poc cablejat a la realitat diària
 `crewScheduleService` (qui treballa quan), `capacityConflictService` (solapaments d'inventari
-i equip), `operationalForecastService` (previsió de capacitat setmanal), `bookingCapacityService`,
+i equip), `dayCollisionService` (dies amb 2+ bolos compromesos, sobretot dissabtes),
+`operationalForecastService` (previsió de capacitat setmanal), `bookingCapacityService`,
 `seasonCalendarService`. El cuadrant + repartiment (memòria `project-cuadrant-repartiment`)
 és la vista operativa. **El recurs escàs —els dissabtes— viu aquí; és on més valor hi ha per
 protegir.**
@@ -229,9 +230,10 @@ El problema #1 del propietari és cognitiu (93 pàgines). La solució ja existei
 ### 🌊 Onada 2 — Autopilot operatiu (del «sí» a l'escenari) · esforç MITJÀ · impacte MITJÀ-ALT
 - **2.1 Checklist pre-event que es dispara i recorda.** `onBookingConfirmed` ja el crea;
   afegir recordatoris T-7/T-2 dies i assignació automàtica d'inventari (`bookingInventoryService`).
-- **2.2 Guàrdia de capacitat proactiva.** `capacityConflictService`+`operationalForecastService`
-  ja detecten solapaments; falta que *bloquegin/alertin en acceptar* un bolo que xoca amb un
-  altre o crema un dissabte ja compromès.
+- **2.2 Guàrdia de capacitat proactiva — FET parcial #1421.** `capacityConflictService`+
+  `operationalForecastService` ja detecten solapaments d'inventari/capacitat, i
+  `dayCollisionService` ja porta a «Avui» els dies amb 2+ bolos compromesos. Pendent com a
+  següent refinament: elevar aquest avís al moment de crear/acceptar el segon bolo del dia.
 - **2.3 Repartiment i pagament de col·laboradors semi-auto.** `collaboratorPayoutService` ja
   sap qui cobra què; afegir «marcar pagat» en bloc i recordatori del que s'ha entregat i no
   pagat (estat ENTREGAT).

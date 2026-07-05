@@ -123,6 +123,7 @@ convertit peces en producte.
 | #1416-#1417 | La radiografia visual runtime de l'admin ja te baseline global i visor viu a `/admin/docs/visual-audit`. |
 | #1418 | El lead nou amb email real ja rep welcome automatic amb plantilla editable, `preferredLocale`, lock `dedupeKey` i fallback manual. |
 | #1420 | `/admin/docs/master` ja es la porta unica: atles modular per capacitats de negoci que creua repo real, baseline visual, riscos, validacions i properes peces. |
+| #1421 | La home `Avui` ja te guardia de dissabtes: `dayCollisionService` avisa dies amb 2+ bolos compromesos i separa presencia humana de xoc d'inventari. |
 
 Per tant, el front viu ja no es "crear la base". La base s'esta convertint en maquina.
 El front viu ara es pujar de nivell: criteri, automatitzacio segura, simplificacio i
@@ -219,7 +220,7 @@ Opcions:
 1. **Gate de tancament**: no crear reserva sense data, lloc, serveis i cobrament clar.
 2. **Deposits/efectiu segons cas**: si el normal es cash same-day, el sistema ho ha de reflectir.
 3. **Contracte i portal**: generar sense repetir dades.
-4. **Alertes de dissabtes**: abans de confirmar, dir si la data es cara/escassa.
+4. **Alertes de dissabtes**: `Avui` ja avisa si hi ha 2+ bolos el mateix dia; pendent elevar-ho al moment de crear/confirmar si la data ja esta ocupada.
 5. **Reserva de partner-client**: Masquerade com a `billedCollaborator`, sense client final.
 
 Risc principal: que la reserva sigui una copia parcial del lead i despres es desalinei.

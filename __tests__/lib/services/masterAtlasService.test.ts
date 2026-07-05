@@ -102,6 +102,7 @@ function buildAtlas(): MasterAtlas {
       'lib/services/dossierService.ts',
       'lib/services/dossierSnapshotService.ts',
       'lib/services/costEngine.ts',
+      'lib/services/dayCollisionService.ts',
       'lib/services/collaboratorAccountService.ts',
       'app/admin/docs/electric-atlas/page.tsx',
       'docs/TESI-MAQUINA-full-de-ruta-2026-07.md',
@@ -143,5 +144,14 @@ describe('masterAtlasService', () => {
     expect(atlas.summary.failedVisualChecks).toBe(2);
     expect(economia?.coverage.failedVisualChecks).toBe(2);
     expect(economia?.score).toBeLessThan(100);
+  });
+
+  it('incorpora la guàrdia de dissabtes #1421 al mòdul de reserves', () => {
+    const atlas = buildAtlas();
+    const reserves = atlas.modules.find((m) => m.id === 'reserves');
+
+    expect(reserves?.files.some((f) => f.path === 'lib/services/dayCollisionService.ts')).toBe(true);
+    expect(reserves?.sourceOfTruth).toContain('dayCollisionService');
+    expect(reserves?.nextMoves.find((move) => move.label.includes('dissabtes'))?.status).toBe('FET');
   });
 });
