@@ -211,7 +211,7 @@ export const MASTER_ATLAS_ACTUAL_TO_ZENIT: Record<string, MasterAtlasActualToZen
     ],
   },
   economia: {
-    current: 'CostEngine, transport, cash-aware outstanding i compte corrent ja existeixen com a cervells reutilitzables.',
+    current: 'CostEngine, transport, cash-aware outstanding, compte corrent i franja executiva d Economia ja existeixen com a cervells reutilitzables/visibles.',
     zenit: 'Cap decisió comercial o operativa important es pren sense marge, caixa, CAC, temps escàs i risc visibles.',
     superintendentRead: 'Mirada ESADE: no es tracta de vendre més bolos, sinó de vendre millor, cobrar abans, protegir dies premium i automatitzar frens quan el marge no acompanya.',
     improvements: [
@@ -228,12 +228,12 @@ export const MASTER_ATLAS_ACTUAL_TO_ZENIT: Record<string, MasterAtlasActualToZen
       {
         label: 'Cash forecast accionable',
         area: 'MARGE',
-        current: 'Hi ha lectura de caixa i pendent cash-aware.',
+        current: 'Hi ha lectura de caixa i pendent cash-aware; Economia ja prioritza vençuts, venciments, marge baix, packs crítics i cash flow al top (#1426).',
         zenit: 'El propietari veu quins cobraments moure avui i quin impacte tenen a 7/30 dies.',
         why: 'La caixa operativa és una palanca de tranquil·litat i decisió.',
         impact: 'ALT',
         effort: 'MITJA',
-        status: 'PENDENT',
+        status: 'EN_CURS',
       },
       {
         label: 'Auditoria de tarifes per marge real',
@@ -528,11 +528,12 @@ export const MASTER_ATLAS_MODULES: MasterAtlasModuleDefinition[] = [
     electricPatterns: ['costEngine', 'travelLaborCost', 'cashFlowForecast', 'economicCockpit', 'payment-status', 'bookingOutstandingAmount', 'collaboratorPayout', 'collaboratorAccount'],
     sourceOfTruth: ['costEngine', 'travelLaborCost', 'computeBookingFinancialSummary', 'bookingOutstandingAmount', 'collaboratorPayoutService', 'collaboratorAccountService'],
     docs: ['docs/TESI-MAQUINA-full-de-ruta-2026-07.md', 'docs/admin-protocol.md'],
-    operations: ['Calcular marge', 'Calcular transport', 'Veure pendent cash-aware', 'Liquidar col·laboradors', 'Mesurar CAC'],
+    operations: ['Calcular marge', 'Calcular transport', 'Veure pendent cash-aware', 'Llegir decisió executiva de caixa/marge al top', 'Liquidar col·laboradors', 'Mesurar CAC'],
     risks: ['Fer toFixed+€ a la UI', 'Ignorar cashAmount', 'Duplicar costEngine', 'Barrejar preu client amb cost intern'],
     safeTouch: ['Canviar cervell econòmic, no JSX', 'Usar helpers monetaris canònics', 'Afegir test de cas econòmic', 'Validar dashboard i fitxa que consumeixen el número'],
     validations: ['costEngine tests', 'payment-status tests', 'collaboratorAccount tests', 'qa:no-admin-toFixed-currency'],
     nextMoves: [
+      { label: 'Capa executiva Economia', why: 'La pantalla ja prioritza cobrar, revisar marge, packs crítics o tresoreria abans de baixar a tabs (#1426).', impact: 'ALT', effort: 'MITJA', status: 'FET' },
       { label: 'Quadre de marge per dissabte ocupat', why: 'El temps escàs no és un dia: és un actiu econòmic.', impact: 'ALT', effort: 'MITJA', status: 'PENDENT' },
       { label: 'Revisió de preus per marge real i CAC', why: 'Puja preus on el sistema demostri que el marge és baix.', impact: 'ALT', effort: 'ALT', status: 'PENDENT' },
     ],

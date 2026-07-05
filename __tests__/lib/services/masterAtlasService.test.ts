@@ -158,6 +158,15 @@ describe('masterAtlasService', () => {
     expect(reserves?.nextMoves.find((move) => move.label.includes('dissabtes'))?.status).toBe('FET');
   });
 
+  it('incorpora la capa executiva #1426 al mòdul d economia', () => {
+    const atlas = buildAtlas();
+    const economia = atlas.modules.find((m) => m.id === 'economia');
+
+    expect(economia?.operations).toContain('Llegir decisió executiva de caixa/marge al top');
+    expect(economia?.nextMoves.find((move) => move.label === 'Capa executiva Economia')?.status).toBe('FET');
+    expect(economia?.actualToZenit.improvements.find((improvement) => improvement.label === 'Cash forecast accionable')?.status).toBe('EN_CURS');
+  });
+
   it('exposa el pont Actual -> Zenit amb palanques comercials i operatives', () => {
     const atlas = buildAtlas();
     const economia = atlas.modules.find((m) => m.id === 'economia');

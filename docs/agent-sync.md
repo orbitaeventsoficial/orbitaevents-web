@@ -66,6 +66,11 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-05 [ESTAT: tancat — Passada visual Zenit amb captures i diagnòstic #1426]
+Perímetre: revisió visual real guiada pel Master Actual→Zenit. Aplicat primer paquet segur: Economia guanya franja executiva amb caixa/marge/decisió recomanada, Dossiers mòbil respira en la llista de dossiers desats, i l'auditor visual deixa de donar per bona una pantalla encara en loader.
+Validació: `node --check scripts/admin-visual-audit.mjs` OK; `tsc` 0; auditor final enfocat `.codex-captures/visual-zenit-1426-final-focus/` amb 10 rutes, 20/20 captures, 0 checks fallits. `/admin/bookings/new` recapturat amb contingut real a `.codex-captures/visual-zenit-1426-bookings-new-after-wait/`.
+Avís claude: propietari confirma que ara estem sols. No es marca cap pantalla com `TANCAT CHARLIE`; queda per a passada visual humana. `backups/` queda fora del commit.
+
 [codex] 2026-07-05 [ESTAT: tancat — Master Actual→Zenit: mapa de millores comercials i operatives #1425]
 Perímetre: el Master/atles ja té capa visible d'estat actual, Zenit i palanques concretes per vendre millor, operar millor i protegir marge per cada mòdul. Economia queda amb mirada ESADE; `cashFlowForecast` passa per `bookingOutstandingAmount` i ja resta `cashAmount`.
 Validació: tests enfocats Master+economia 128/128; `tsc` 0; `qa:protocol`, `validate:core` i `pnpm build` verds. `/admin/docs/master` verificat en Playwright desktop+mòbil; pestanya `Actual → Zenit`, assets `_next` nets i mòbil sense overflow. Dev server 3000 reiniciat net després que retingués la ruta temporal `covtmp` d'un test.

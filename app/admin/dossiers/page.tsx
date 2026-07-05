@@ -206,16 +206,16 @@ export default async function DossiersPage({ searchParams }: PageProps) {
               const resolvedProducts = snapshotProducts ?? lookupProducts.filter((p) => d.productIds.includes(p.id));
               const productNames = resolvedProducts.map((p) => p.nom).join(' · ');
               return (
-                <div key={d.id} className="ap-card ap-card-body flex flex-wrap items-center justify-between gap-4">
+                <article key={d.id} className="ap-card ap-card-body grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
                   <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                    <span className="truncate text-base font-semibold text-[var(--t)]">{d.nom}{d.empresa ? ` — ${d.empresa}` : ''}</span>
-                    <span className="text-xs text-[var(--t3)]">
+                    <span className="text-base font-semibold leading-snug text-[var(--t)] sm:truncate">{d.nom}{d.empresa ? ` — ${d.empresa}` : ''}</span>
+                    <span className="line-clamp-2 break-words text-xs leading-relaxed text-[var(--t3)]">
                       {productNames || 'Sense productes'}
                       {' · '}
                       {formatDateShort(typeof d.createdAt === 'string' ? d.createdAt : d.createdAt.toISOString())}
                     </span>
                     {d.sentAt && (
-                      <span className="text-xs text-[var(--gold-bright)]">
+                      <span className="line-clamp-1 text-xs text-[var(--gold-bright)]">
                         Enviat {formatDateShort(typeof d.sentAt === 'string' ? d.sentAt : d.sentAt.toISOString())} → {d.sentTo}
                       </span>
                     )}
@@ -225,7 +225,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                       </span>
                     )}
                     {d.lead && (
-                      <Link href={buildLeadWorkspaceHref(d.lead.id)} className="text-xs text-[var(--t3)] transition-colors hover:text-[var(--gold-bright)]">
+                      <Link href={buildLeadWorkspaceHref(d.lead.id)} className="break-words text-xs text-[var(--t3)] transition-colors hover:text-[var(--gold-bright)]">
                         Lead: {d.lead.name} ({d.lead.status})
                       </Link>
                     )}
@@ -249,7 +249,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                     alreadySent={!!d.sentAt}
                     logoDataUri={logoDataUri}
                   />
-                </div>
+                </article>
               );
             })}
           </div>
@@ -268,10 +268,10 @@ export default async function DossiersPage({ searchParams }: PageProps) {
               const resolvedProducts = snapshotProducts ?? lookupProducts.filter((p) => d.productIds.includes(p.id));
               const productNames = resolvedProducts.map((p) => p.nom).join(' · ');
               return (
-                <div key={d.id} className="ap-card ap-card-body flex flex-wrap items-center justify-between gap-4 opacity-70">
+                <article key={d.id} className="ap-card ap-card-body grid gap-4 opacity-70 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
                   <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                    <span className="truncate text-base font-semibold text-[var(--t)]">{d.nom}{d.empresa ? ` — ${d.empresa}` : ''}</span>
-                    <span className="text-xs text-[var(--t3)]">
+                    <span className="text-base font-semibold leading-snug text-[var(--t)] sm:truncate">{d.nom}{d.empresa ? ` — ${d.empresa}` : ''}</span>
+                    <span className="line-clamp-2 break-words text-xs leading-relaxed text-[var(--t3)]">
                       {productNames || 'Sense productes'}
                       {' · '}
                       {d.deletedAt ? `Eliminat ${formatDateShort(typeof d.deletedAt === 'string' ? d.deletedAt : d.deletedAt.toISOString())}` : 'Eliminat'}
@@ -297,7 +297,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                     logoDataUri={logoDataUri}
                     isDeleted
                   />
-                </div>
+                </article>
               );
             })}
           </div>

@@ -1,3 +1,24 @@
+## 2026-07-05 — Passada visual Zenit amb Economia ESADE i captures reals (Canvi #1426, codex)
+
+### Context
+El propietari pregunta si realment es pot dir que el sistema és Zenit sense captures. Resposta operativa: no. Es fa una passada enfocada amb Playwright sobre Comandament, Reserves, Nova reserva, Master, Dossiers, Economia i leads clau. La conclusió és matisada: moltes pantalles són sanes i funcionals, però `render OK` no és `TANCAT CHARLIE`.
+
+### Què s'ha fet
+- **Economia**: nova franja executiva al capdamunt amb caixa/cobrament, marge/preu i decisió recomanada. Si hi ha vençuts, prioritza cobrar; si no, venciments, marge baix, packs crítics, tresoreria o previsió. No duplica fórmules: reutilitza props i serveis existents.
+- **Dossiers**: la llista de dossiers desats i paperera deixa de competir per ample en mòbil. Cards responsive, text llarg controlat i accions en graella amb icones lucide.
+- **Auditoria visual**: `scripts/admin-visual-audit.mjs` espera contingut admin estable i afegeix check `loading-state`. El cas `/admin/bookings/new` ja no passa amb una captura de loader.
+
+### Validació
+- Validació tècnica: `node --check scripts/admin-visual-audit.mjs` OK; `npx tsc --noEmit --pretty false` OK; auditor final enfocat 20/20 captures i 0 checks fallits.
+- Validació funcional: `.codex-captures/visual-zenit-1426-final-focus/` cobreix 10 rutes clau en desktop/mòbil; `/admin/bookings/new` queda recapturat amb contingut real a `.codex-captures/visual-zenit-1426-bookings-new-after-wait/`.
+- Validació humana/UX: Economia ara parla en decisions de negoci i Dossiers mòbil és accionable; encara no es marca cap pantalla com `TANCAT CHARLIE` perquè la validació visual final és del propietari.
+
+### Coordinació
+Counter → 1426. El `backups/` local continua fora del commit. Aquesta passada deixa evidència per començar la revisió visual conjunta sense vendre fum: hi ha millores reals, però el Zenit final encara passa per ull humà.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-05 — Master Actual→Zenit i economia cash-aware (Canvi #1425, codex)
 
 ### Context

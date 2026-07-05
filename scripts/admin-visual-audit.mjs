@@ -15,6 +15,7 @@
  *   VISUAL_AUDIT_ROUTE_LIMIT=25
  *   VISUAL_AUDIT_VIEWPORTS=desktop,tablet,mobile
  *   VISUAL_AUDIT_FULL_PAGE=0
+ *   VISUAL_AUDIT_CONTENT_TIMEOUT=12000
  */
 import { chromium } from 'playwright';
 import fs from 'node:fs/promises';
@@ -32,6 +33,7 @@ const ROUTE_LIMIT = Number.parseInt(process.env.VISUAL_AUDIT_ROUTE_LIMIT || '0',
 const ROUTE_MATCH_RAW = process.env.VISUAL_AUDIT_ROUTE_MATCH || '';
 const ROUTE_MATCH = ROUTE_MATCH_RAW ? new RegExp(ROUTE_MATCH_RAW) : null;
 const FULL_PAGE = process.env.VISUAL_AUDIT_FULL_PAGE !== '0';
+const CONTENT_WAIT_TIMEOUT = Number.parseInt(process.env.VISUAL_AUDIT_CONTENT_TIMEOUT || '12000', 10);
 
 const VIEWPORT_PRESETS = {
   desktop: { id: 'desktop', width: 1440, height: 1000, isMobile: false },
@@ -171,6 +173,26 @@ function selectedViewports() {
 
 function isAssetUrl(url) {
   return /\/_next\/|\.css(?:\?|$)|\.js(?:\?|$)|\.(?:png|jpg|jpeg|webp|avif|svg|ico|woff2?)(?:\?|$)/i.test(url);
+}
+
+async function waitForAdminContent(page) {
+  if (!Number.isFinite(CONTENT_WAIT_TIMEOUT) || CONTENT_WAIT_TIMEOUT <= 0) return;
+  try {
+    await page.waitForFunction(() => {
+      const root = document.querySelector('#admin-main-content') || document.querySelector('main') || document.body;
+      const text = (root?.innerText || document.body?.innerText || '').trim();
+      const lower = text.toLowerCase();
+      const loadingTextOnly = (lower.includes('carregant') || lower.includes('loading')) && text.length < 400;
+      const visibleLoadingNode = Array.from(document.querySelectorAll('.animate-spin, [aria-busy="true"]')).some((node) => {
+        const rect = node.getBoundingClientRect();
+        const style = window.getComputedStyle(node);
+        return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+      });
+      return text.length > 180 && !loadingTextOnly && !visibleLoadingNode;
+    }, null, { timeout: CONTENT_WAIT_TIMEOUT });
+  } catch {
+    // The later checks will report blank/loading screens; do not abort capture.
+  }
 }
 
 function topIssues(results) {
@@ -322,6 +344,12 @@ function buildChecks({ status, metrics, consoleErrors, pageErrors, failedRequest
     message: metrics.textLength > 80 && metrics.bodyHeight > 100 ? 'contingut present' : `possible pantalla buida: text=${metrics.textLength}, height=${metrics.bodyHeight}`,
   });
   checks.push({
+    id: 'loading-state',
+    ok: !metrics.loadingLike,
+    severity: 'high',
+    message: metrics.loadingLike ? `possible captura en loader: text=${metrics.textLength}, loaders=${metrics.visibleLoadingNodes}` : 'sense loader visible al moment de captura',
+  });
+  checks.push({
     id: 'next-error-overlay',
     ok: !metrics.nextError,
     severity: 'critical',
@@ -399,7 +427,8 @@ async function auditRoute(context, route, viewport, index, total) {
     } catch {
       // Some admin screens keep dev/HMR or third-party requests open.
     }
-    await page.waitForTimeout(viewport.id === 'mobile' ? 900 : 700);
+    await waitForAdminContent(page);
+    await page.waitForTimeout(viewport.id === 'mobile' ? 300 : 250);
   } catch (error) {
     consoleErrors.push(`navigation: ${error.message.slice(0, 500)}`);
   }
@@ -409,6 +438,12 @@ async function auditRoute(context, route, viewport, index, total) {
     const html = document.documentElement;
     const body = document.body;
     const text = bodyText.toLowerCase();
+    const visibleLoadingNodes = Array.from(document.querySelectorAll('.animate-spin, [aria-busy="true"]')).filter((node) => {
+      const rect = node.getBoundingClientRect();
+      const style = window.getComputedStyle(node);
+      return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+    }).length;
+    const loadingTextOnly = (text.includes('carregant') || text.includes('loading')) && bodyText.trim().length < 400;
     return {
       adminMode: html.classList.contains('admin-mode') || body.classList.contains('admin-mode'),
       adminShell: Boolean(document.querySelector('.ax-root, #admin-main-content')),
@@ -419,6 +454,8 @@ async function auditRoute(context, route, viewport, index, total) {
       bodyHeight: Math.max(body.scrollHeight, body.offsetHeight, html.scrollHeight),
       textLength: bodyText.trim().length,
       horizontalOverflow: html.scrollWidth > window.innerWidth + 2,
+      visibleLoadingNodes,
+      loadingLike: visibleLoadingNodes > 0 || loadingTextOnly,
       nextError: text.includes('application error') || text.includes('unhandled runtime error') || text.includes('hydration failed') || text.includes('this page could not be found'),
       title: document.title,
     };
@@ -432,6 +469,8 @@ async function auditRoute(context, route, viewport, index, total) {
     bodyHeight: 0,
     textLength: 0,
     horizontalOverflow: true,
+    visibleLoadingNodes: 0,
+    loadingLike: true,
     nextError: true,
     title: `metrics failed: ${error.message}`,
   }));

@@ -1551,6 +1551,19 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1426 — 2026-07-05 — codex (FET)
+**Passada visual Zenit amb captures reals: Economia guanya capa executiva, Dossiers mòbil respira i l'auditor ja no dona per bona una pantalla en loader.**
+- Context: el propietari demana comprovar amb captures si el sistema està realment al Zenit i entrar a Economia amb ulleres ESADE. La revisió de 10 rutes d'alt impacte confirma que render OK no és Zenit: Economia tenia cervell però faltava decisió executiva, Dossiers mòbil comprimien massa els dossiers desats, i l'auditor podia capturar `/admin/bookings/new` encara carregant sense fallar.
+- Fix visible: `app/admin/economia/EconomiaClient.tsx` afegeix una franja executiva abans de les pestanyes amb caixa/cobrament, marge/preu i decisió recomanada basada en dades existents. Les pestanyes mòbils passen a graella 3x2. `app/admin/dossiers/page.tsx` i `DossierListActions.tsx` reorganitzen dossiers desats/paperera en cards responsive, text amb clamp i accions mòbils tocables amb icones lucide.
+- Fix d'eina: `scripts/admin-visual-audit.mjs` espera contingut admin estable i afegeix check `loading-state`, de manera que un `Carregant...` visible ja no pot passar com a captura vàlida.
+- Validació tècnica: `node --check scripts/admin-visual-audit.mjs` OK; `npx tsc --noEmit --pretty false` OK; auditor final enfocat 20/20 captures i 0 checks fallits.
+- Validació funcional: captures finals a `.codex-captures/visual-zenit-1426-final-focus/` cobreixen `/admin`, reserves, nova reserva, Master, Dossiers, Economia i leads clau en desktop+mòbil. El rerun específic de `/admin/bookings/new` (`.codex-captures/visual-zenit-1426-bookings-new-after-wait/`) ja mostra formulari real, no loader.
+- Validació humana/UX: Economia passa de cockpit financer per pestanyes a lectura de propietari: si hi ha vençuts, cobra; si no, mira venciments, marge baix, packs crítics o cash flow. Dossiers mòbil deixa de semblar una llista tècnica estreta i es pot accionar sense trencar línies. Encara no es marca cap pantalla com `TANCAT CHARLIE`: queda per a la passada visual conjunta amb el propietari.
+- `ADMIN_CHANGE_COUNTER` passa a `1426`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1425 — 2026-07-05 — codex (FET)
 **Master Actual→Zenit: mapa de palanques comercials/operatives i correcció cash-aware del forecast econòmic.**
 - Context: el propietari detecta que el Master i l'atles ja existien, però faltava el pont entre l'estat actual i el Zenit: què simplificar, què automatitzar, què millorar per vendre millor i operar millor. També demana mirada de superintendent comercial/gestió d'esdeveniments i, especialment, ulleres ESADE a Economia per guanyar marge i caixa.

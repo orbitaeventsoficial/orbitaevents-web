@@ -2,10 +2,15 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Eye, FileText, RotateCcw, Send, Trash2, XCircle } from 'lucide-react';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import { buildDossierHtml, type DossierClientInfo, type DossierCopy } from '@/lib/utils/dossier-html-builder';
+
+const ACTIONS_WRAP = 'grid w-full grid-cols-2 gap-2 sm:grid-cols-4 md:flex md:w-auto md:flex-wrap md:items-center md:justify-end';
+const ACTION_BTN = 'ap-btn ap-btn--xs min-h-10 justify-center gap-1.5';
+const ACTION_ICON = 'h-3.5 w-3.5 shrink-0';
 
 interface Props {
   dossierId: string;
@@ -118,29 +123,35 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
 
   if (isDeleted) {
     return (
-      <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
-        <button type="button" onClick={preview} className="ap-btn ap-btn--xs" title="Previsualitzar">
+      <div className={ACTIONS_WRAP}>
+        <button type="button" onClick={preview} className={ACTION_BTN} title="Previsualitzar">
+          <Eye className={ACTION_ICON} aria-hidden="true" />
           Vista
         </button>
-        <button type="button" onClick={openCompositePdf} className="ap-btn ap-btn--primary ap-btn--xs" title="Obrir dossier + fitxes en un sol PDF">
+        <button type="button" onClick={openCompositePdf} className={`${ACTION_BTN} ap-btn--primary`} title="Obrir dossier + fitxes en un sol PDF">
+          <FileText className={ACTION_ICON} aria-hidden="true" />
           PDF complet
         </button>
-        <button type="button" onClick={restore} disabled={restoring} className="ap-btn ap-btn--xs" title="Restaurar de la paperera">
-          {restoring ? '…' : '↩ Restaurar'}
+        <button type="button" onClick={restore} disabled={restoring} className={ACTION_BTN} title="Restaurar de la paperera">
+          <RotateCcw className={ACTION_ICON} aria-hidden="true" />
+          {restoring ? '…' : 'Restaurar'}
         </button>
-        <button type="button" onClick={purge} disabled={purging} className="ap-btn ap-btn--danger ap-btn--xs" aria-label={`Eliminar permanentment dossier de ${nom}`} title="Eliminar permanentment">
-          {purging ? '…' : '✕ Eliminar'}
+        <button type="button" onClick={purge} disabled={purging} className={`${ACTION_BTN} ap-btn--danger`} aria-label={`Eliminar permanentment dossier de ${nom}`} title="Eliminar permanentment">
+          <XCircle className={ACTION_ICON} aria-hidden="true" />
+          {purging ? '…' : 'Eliminar'}
         </button>
       </div>
     );
   }
 
   return (
-    <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
-      <button type="button" onClick={preview} className="ap-btn ap-btn--xs" title="Previsualitzar">
+    <div className={ACTIONS_WRAP}>
+      <button type="button" onClick={preview} className={ACTION_BTN} title="Previsualitzar">
+        <Eye className={ACTION_ICON} aria-hidden="true" />
         Vista
       </button>
-      <button type="button" onClick={openCompositePdf} className="ap-btn ap-btn--primary ap-btn--xs" title="Obrir dossier + fitxes en un sol PDF">
+      <button type="button" onClick={openCompositePdf} className={`${ACTION_BTN} ap-btn--primary`} title="Obrir dossier + fitxes en un sol PDF">
+        <FileText className={ACTION_ICON} aria-hidden="true" />
         PDF complet
       </button>
       {email && (
@@ -148,9 +159,10 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
           type="button"
           onClick={send}
           disabled={sending}
-          className="ap-btn ap-btn--xs"
+          className={ACTION_BTN}
           title={alreadySent ? 'Reenviar' : 'Enviar per email'}
         >
+          <Send className={ACTION_ICON} aria-hidden="true" />
           {sending ? '…' : alreadySent ? 'Reenviar' : 'Enviar'}
         </button>
       )}
@@ -158,11 +170,12 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
         type="button"
         onClick={moveToTrash}
         disabled={deleting}
-        className="ap-btn ap-btn--danger ap-btn--xs"
+        className={`${ACTION_BTN} ap-btn--danger`}
         aria-label={`Mou a la paperera dossier de ${nom}`}
         title="Moure a la paperera (30 dies per restaurar)"
       >
-        {deleting ? '…' : '🗑'}
+        <Trash2 className={ACTION_ICON} aria-hidden="true" />
+        {deleting ? '…' : 'Paperera'}
       </button>
     </div>
   );

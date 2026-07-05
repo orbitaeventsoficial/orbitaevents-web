@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { ArrowRight, Banknote, BarChart3, ShieldAlert, TrendingUp, WalletCards } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AdminPage } from '../components/AdminPage';
 import { ADMIN_ECONOMY_HELP, helpAttrs } from '../components/adminHelpContent';
@@ -28,6 +29,159 @@ import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
 
 
 const VALID_TABS: Tab[] = ['resum', 'cobraments', 'rendibilitat', 'tresoreria', 'previsions', 'config'];
+
+type ExecutiveTone = 'success' | 'warning' | 'danger';
+
+const EXECUTIVE_ICON = 'h-4 w-4 shrink-0';
+
+function executiveToneClass(tone: ExecutiveTone) {
+  if (tone === 'danger') return 'admin-tone-border-danger';
+  if (tone === 'warning') return 'admin-tone-border-warning';
+  return 'admin-tone-border-success';
+}
+
+function ExecutiveMetric({ label, value, hint, tone = 'success' }: {
+  label: string;
+  value: string | number;
+  hint?: string;
+  tone?: ExecutiveTone;
+}) {
+  const valueClass = tone === 'danger'
+    ? 'admin-tone-text-danger'
+    : tone === 'warning'
+      ? 'admin-tone-text-warning'
+      : 'text-[var(--t)]';
+
+  return (
+    <div className="min-w-0 border-l border-[var(--line)] pl-3 first:border-l-0 first:pl-0">
+      <dt className="text-xs font-semibold uppercase text-[var(--t3)]">{label}</dt>
+      <dd className={`mt-1 font-[family-name:var(--display)] text-[length:var(--o-text-xl)] font-bold leading-none ${valueClass}`}>{value}</dd>
+      {hint ? <dd className="mt-1 text-xs text-[var(--t3)]">{hint}</dd> : null}
+    </div>
+  );
+}
+
+function EconomyExecutiveStrip({
+  props,
+  setActiveTab,
+}: {
+  props: EconomiaClientProps;
+  setActiveTab: (tab: Tab) => void;
+}) {
+  const cashMonth = props.cashFlow?.[0] ?? null;
+  const targetPackMargin = props.packPricingConfig.marginTargetPct;
+  const packNeedsReview = props.packPricingRows.find((row) => row.marginPct < targetPackMargin);
+
+  let action: {
+    tone: ExecutiveTone;
+    title: string;
+    description: string;
+    tab: Tab;
+    label: string;
+    Icon: typeof Banknote;
+  };
+
+  if (props.overdueTotal > 0) {
+    action = {
+      tone: 'danger',
+      title: 'Cobrar abans de vendre més',
+      description: `${money(props.overdueTotal)} fora de termini. Ataca primer bestretes i restes vençudes: és caixa real i baixa risc operatiu.`,
+      tab: 'cobraments',
+      label: 'Obrir cobraments',
+      Icon: Banknote,
+    };
+  } else if (props.dueSoonTotal > 0) {
+    action = {
+      tone: 'warning',
+      title: 'Blindar els pròxims venciments',
+      description: `${money(props.dueSoonTotal)} vencen en 7 dies. Prepara recordatoris abans que es converteixin en problema.`,
+      tab: 'cobraments',
+      label: 'Veure venciments',
+      Icon: WalletCards,
+    };
+  } else if (props.riskProfitability.length > 0) {
+    action = {
+      tone: 'danger',
+      title: 'Tallafoc de marge baix',
+      description: `${props.riskProfitability.length} bolos estan en risc de marge. Revisa preu, desplaçament, extres i cost abans de repetir aquesta venda.`,
+      tab: 'rendibilitat',
+      label: 'Auditar marge',
+      Icon: TrendingUp,
+    };
+  } else if (props.packPricingSummary.critical > 0) {
+    action = {
+      tone: 'danger',
+      title: 'No vendre packs crítics sense revisar',
+      description: `${props.packPricingSummary.critical} packs queden per sota del model. El primer és ${packNeedsReview?.name ?? 'un pack actiu'}: puja PVP, ajusta cost o canvia paquetització.`,
+      tab: 'config',
+      label: 'Revisar packs',
+      Icon: ShieldAlert,
+    };
+  } else if (cashMonth && cashMonth.netFlow < 0) {
+    action = {
+      tone: 'warning',
+      title: 'Protegir caixa del mes',
+      description: `${cashMonth.month} projecta ${money(cashMonth.netFlow)} de flux net. Mira quin cobrament o cost mou més l'acumulat.`,
+      tab: 'tresoreria',
+      label: 'Veure tresoreria',
+      Icon: WalletCards,
+    };
+  } else {
+    action = {
+      tone: 'success',
+      title: 'Buscar venda millor, no més soroll',
+      description: 'La foto immediata no crema. El següent salt és mirar previsió, CAC i packs per decidir on pujar preu amb disciplina.',
+      tab: 'previsions',
+      label: 'Veure previsió',
+      Icon: BarChart3,
+    };
+  }
+
+  const actionToneClass = executiveToneClass(action.tone);
+
+  return (
+    <section className="grid gap-3 lg:grid-cols-[1fr_1fr_1.1fr]" aria-label="Lectura executiva d'economia">
+      <article className="ap-card p-5">
+        <div className="flex items-center gap-2 text-[var(--t3)]">
+          <WalletCards className={EXECUTIVE_ICON} aria-hidden="true" />
+          <p className="text-xs font-semibold uppercase">Caixa i cobrament</p>
+        </div>
+        <h2 className="mt-2 ap-h2">Què entra i què falta cobrar</h2>
+        <dl className="mt-4 grid gap-3 sm:grid-cols-3">
+          <ExecutiveMetric label="Pendent" value={money(props.outstandingTotal)} hint="total per cobrar" tone={props.outstandingTotal > 0 ? 'warning' : 'success'} />
+          <ExecutiveMetric label="Vençut" value={money(props.overdueTotal)} hint={`${props.atRiskRows.length} casos`} tone={props.overdueTotal > 0 ? 'danger' : 'success'} />
+          <ExecutiveMetric label="7 dies" value={money(props.dueSoonTotal)} hint={`${props.upcomingDueRows.length} pròxims`} tone={props.dueSoonTotal > 0 ? 'warning' : 'success'} />
+        </dl>
+      </article>
+
+      <article className="ap-card p-5">
+        <div className="flex items-center gap-2 text-[var(--t3)]">
+          <TrendingUp className={EXECUTIVE_ICON} aria-hidden="true" />
+          <p className="text-xs font-semibold uppercase">Marge i preu</p>
+        </div>
+        <h2 className="mt-2 ap-h2">Si vens, que respiri marge</h2>
+        <dl className="mt-4 grid gap-3 sm:grid-cols-3">
+          <ExecutiveMetric label="Realitzat" value={pct(props.realized.avgMarginPct)} hint={money(props.realized.netMargin)} tone={props.realized.avgMarginPct < 0.15 ? 'danger' : props.realized.avgMarginPct < 0.3 ? 'warning' : 'success'} />
+          <ExecutiveMetric label="Previst" value={pct(props.forecast.avgMarginPct)} hint={`${props.forecast.bookings} bolos`} tone={props.forecast.avgMarginPct < 0.15 ? 'danger' : props.forecast.avgMarginPct < 0.3 ? 'warning' : 'success'} />
+          <ExecutiveMetric label="Packs crítics" value={props.packPricingSummary.critical} hint={`${props.packPricingSummary.warning} a vigilar`} tone={props.packPricingSummary.critical > 0 ? 'danger' : props.packPricingSummary.warning > 0 ? 'warning' : 'success'} />
+        </dl>
+      </article>
+
+      <article className={`ap-card border-l-2 p-5 ${actionToneClass}`}>
+        <div className="flex items-center gap-2 text-[var(--t3)]">
+          <action.Icon className={EXECUTIVE_ICON} aria-hidden="true" />
+          <p className="text-xs font-semibold uppercase">Decisió recomanada</p>
+        </div>
+        <h2 className="mt-2 ap-h2">{action.title}</h2>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--t2)]">{action.description}</p>
+        <button type="button" onClick={() => setActiveTab(action.tab)} className="ap-btn ap-btn--primary mt-4 justify-center gap-2 text-sm">
+          {action.label}
+          <ArrowRight className={EXECUTIVE_ICON} aria-hidden="true" />
+        </button>
+      </article>
+    </section>
+  );
+}
 
 export default function EconomiaClient(props: EconomiaClientProps) {
   const searchParams = useSearchParams();
@@ -84,8 +238,10 @@ export default function EconomiaClient(props: EconomiaClientProps) {
       }
     >
 
+      <EconomyExecutiveStrip props={props} setActiveTab={setActiveTab} />
+
       {/* ═══════════ TAB NAVIGATION ═══════════ */}
-      <nav role="tablist" aria-label="Seccions d'economia" className="ap-tabs flex gap-1 ap-card p-1" {...helpAttrs(ADMIN_ECONOMY_HELP.tabs)}>
+      <nav role="tablist" aria-label="Seccions d'economia" className="ap-tabs grid grid-cols-3 gap-1 ap-card p-1 sm:flex" {...helpAttrs(ADMIN_ECONOMY_HELP.tabs)}>
         {TABS.map((tab) => {
           const isActive = activeTab === tab.id;
           const showBadge = tab.id === 'cobraments' && props.atRiskRows.length > 0;
@@ -95,11 +251,11 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               role="tab"
               aria-selected={isActive}
               onClick={() => setActiveTab(tab.id)}
-              className={`ap-tab relative flex-1 rounded-[var(--o-r-sm)] px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
+              className={`ap-tab relative flex min-w-0 items-center justify-center gap-1 rounded-[var(--o-r-sm)] px-3 py-2.5 text-sm font-semibold transition-all duration-200 sm:flex-1 ${
                 isActive ? 'ap-tab--active' : 'ap-tab--idle'
               }`}
             >
-              <span className="mr-1">{tab.icon}</span>
+              <span aria-hidden="true">{tab.icon}</span>
               <span className="hidden sm:inline">{tab.label}</span>
               <span className="sm:hidden">{tab.mobileLabel}</span>
               {showBadge && (
