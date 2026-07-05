@@ -1,8 +1,18 @@
-import { MASTER_ATLAS_GATES, MASTER_ATLAS_MODULES, MASTER_ATLAS_PRINCIPLES, type MasterAtlasModuleDefinition, type MasterAtlasNextMove } from '@/lib/constants/master-atlas';
+import {
+  MASTER_ATLAS_ACTUAL_TO_ZENIT,
+  MASTER_ATLAS_GATES,
+  MASTER_ATLAS_MODULES,
+  MASTER_ATLAS_PRINCIPLES,
+  type MasterAtlasActualToZenit,
+  type MasterAtlasModuleDefinition,
+  type MasterAtlasNextMove,
+  type MasterAtlasZenitImprovement,
+} from '@/lib/constants/master-atlas';
 import { loadRepoElectricAtlas, type RepoAtlasFileRef, type RepoElectricAtlas } from '@/lib/services/repoElectricAtlasService';
 import { loadVisualAuditAtlas, type VisualAuditAtlas, type VisualAuditRouteSummary } from '@/lib/services/visualAuditAtlasService';
 
 export type MasterAtlasModule = MasterAtlasModuleDefinition & {
+  actualToZenit: MasterAtlasActualToZenit;
   files: RepoAtlasFileRef[];
   docsPresent: RepoAtlasFileRef[];
   visualRoutes: VisualAuditRouteSummary[];
@@ -14,6 +24,7 @@ export type MasterAtlasModule = MasterAtlasModuleDefinition & {
     visualRoutes: number;
     failedVisualChecks: number;
     pendingMoves: number;
+    pendingZenitImprovements: number;
   };
 };
 
@@ -31,6 +42,9 @@ export type MasterAtlas = {
     filesIndexed: number;
     visualRoutesIndexed: number;
     pendingMoves: number;
+    zenitImprovements: number;
+    pendingZenitImprovements: number;
+    highImpactZenitImprovements: number;
     failedVisualChecks: number;
   };
   modules: MasterAtlasModule[];
@@ -120,17 +134,26 @@ function pendingMoves(moves: readonly MasterAtlasNextMove[]) {
   return moves.filter((move) => move.status !== 'FET').length;
 }
 
+function pendingZenitImprovements(improvements: readonly MasterAtlasZenitImprovement[]) {
+  return improvements.filter((improvement) => improvement.status !== 'FET').length;
+}
+
 export function composeMasterAtlas(input: {
   electric: RepoElectricAtlas;
   visual: VisualAuditAtlas;
   generatedAt?: string;
 }): MasterAtlas {
   const modules = MASTER_ATLAS_MODULES.map((definition) => {
+    const actualToZenit = MASTER_ATLAS_ACTUAL_TO_ZENIT[definition.id];
+    if (!actualToZenit) {
+      throw new Error(`Master Atlas module "${definition.id}" is missing actual-to-zenit definition`);
+    }
     const files = findModuleFiles(input.electric, definition);
     const docsPresent = findDocs(input.electric, definition);
     const visualRoutes = findVisualRoutes(input.visual, definition);
     const failedVisualChecks = visualRoutes.reduce((sum, route) => sum + route.failedChecks, 0);
     const pending = pendingMoves(definition.nextMoves);
+    const pendingZenit = pendingZenitImprovements(actualToZenit.improvements);
     const score = computeScore({
       files: files.length,
       docs: docsPresent.length,
@@ -141,6 +164,7 @@ export function composeMasterAtlas(input: {
 
     return {
       ...definition,
+      actualToZenit,
       files,
       docsPresent,
       visualRoutes,
@@ -152,12 +176,16 @@ export function composeMasterAtlas(input: {
         visualRoutes: visualRoutes.length,
         failedVisualChecks,
         pendingMoves: pending,
+        pendingZenitImprovements: pendingZenit,
       },
     };
   });
 
   const summary = modules.reduce((acc, module) => {
     acc.pendingMoves += module.coverage.pendingMoves;
+    acc.zenitImprovements += module.actualToZenit.improvements.length;
+    acc.pendingZenitImprovements += module.coverage.pendingZenitImprovements;
+    acc.highImpactZenitImprovements += module.actualToZenit.improvements.filter((improvement) => improvement.impact === 'ALT').length;
     if (module.status === 'FORT') acc.strongModules += 1;
     if (module.status === 'EN_PROGRES') acc.inProgressModules += 1;
     if (module.status === 'FRAGIL') acc.fragileModules += 1;
@@ -170,6 +198,9 @@ export function composeMasterAtlas(input: {
     filesIndexed: input.electric.summary.files,
     visualRoutesIndexed: input.visual.summary.routeCount,
     pendingMoves: 0,
+    zenitImprovements: 0,
+    pendingZenitImprovements: 0,
+    highImpactZenitImprovements: 0,
     failedVisualChecks: input.visual.summary.failedChecks,
   });
 

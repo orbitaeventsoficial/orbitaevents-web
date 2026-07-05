@@ -1551,6 +1551,20 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1425 — 2026-07-05 — codex (FET)
+**Master Actual→Zenit: mapa de palanques comercials/operatives i correcció cash-aware del forecast econòmic.**
+- Context: el propietari detecta que el Master i l'atles ja existien, però faltava el pont entre l'estat actual i el Zenit: què simplificar, què automatitzar, què millorar per vendre millor i operar millor. També demana mirada de superintendent comercial/gestió d'esdeveniments i, especialment, ulleres ESADE a Economia per guanyar marge i caixa.
+- Fix (Master viu): `lib/constants/master-atlas.ts` afegeix `MASTER_ATLAS_ACTUAL_TO_ZENIT` amb lectura actual, Zenit, criteri de superintendent i palanques per mòdul (`VENDA`, `OPERACIO`, `MARGE`, `MARCA`, `SISTEMA`). `masterAtlasService` ho incorpora al model i resumeix palanques totals, pendents i d'impacte alt.
+- Fix (visible): `/admin/docs/master` estrena pestanya `Actual → Zenit`, KPIs de palanques Zenit i fitxes per mòdul amb "Ara", "Zenit" i millores concretes. Economia queda marcada amb mirada ESADE: vendre millor, cobrar abans, protegir dies premium i automatitzar frens si el marge no acompanya.
+- Fix (economia real): `cashFlowForecast` deixa de calcular ingressos pendents amb fórmula pròpia i passa per `bookingOutstandingAmount`; ara resta `cashAmount` i respecta `remainingAmount=0` explícit. Això evita inflar caixa pendent quan un bolo ja s'ha cobrat en efectiu.
+- Validació tècnica: tests enfocats Master+economia 128/128 (`masterAtlasService`, `payment-status`, `cashFlowForecast`, `costEngine`, `travelLaborCost`, `dossierMarginGuardService`, `economicCockpitService`, `collaboratorAccountService`); `tsc` 0; `qa:protocol`, `validate:core` i `pnpm build` verds.
+- Validació funcional: el Master exposa el pont Actual→Zenit i el mòdul Economia conté palanques de marge/preu/cash; el forecast de caixa ja no compta com a pendent una reserva cobrada en efectiu i no reobre una resta explícita a zero. Captures locals: `.codex-captures/master-actual-zenit-1425-desktop.png` i `.codex-captures/master-actual-zenit-1425-mobile.png`.
+- Validació humana/UX: el propietari ja pot entrar al Master per veure, pantalla per pantalla, quina millora aproxima el sistema al Zenit abans de començar la passada visual conjunta. Playwright confirma pestanya `Actual → Zenit`, mirada ESADE, palanca `Preu mínim recomanat`, assets `_next` nets i mòbil sense overflow.
+- `ADMIN_CHANGE_COUNTER` passa a `1425`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1424 — 2026-07-05 — codex (FET)
 **Avui integra els números clau dins la lectura superior: menys scroll i més comandament al primer viewport.**
 - Context: el propietari pregunta si `/admin` es pot millorar després del tall #1423. Abans de tocar visual, Codex detecta que el `3000` servia assets `_next` trencats (HTML per CSS/JS); després de reiniciar dev i verificar `bad: []`, la pantalla real ja és bona però encara deixa els 6 números clau amagats al bloc final.

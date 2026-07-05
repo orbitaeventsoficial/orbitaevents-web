@@ -102,6 +102,9 @@ function buildAtlas(): MasterAtlas {
       'lib/services/dossierService.ts',
       'lib/services/dossierSnapshotService.ts',
       'lib/services/costEngine.ts',
+      'lib/services/cashFlowForecast.ts',
+      'lib/services/economicCockpitService.ts',
+      'lib/payment-status.ts',
       'lib/services/dayCollisionService.ts',
       'lib/services/collaboratorAccountService.ts',
       'app/admin/docs/electric-atlas/page.tsx',
@@ -153,5 +156,20 @@ describe('masterAtlasService', () => {
     expect(reserves?.files.some((f) => f.path === 'lib/services/dayCollisionService.ts')).toBe(true);
     expect(reserves?.sourceOfTruth).toContain('dayCollisionService');
     expect(reserves?.nextMoves.find((move) => move.label.includes('dissabtes'))?.status).toBe('FET');
+  });
+
+  it('exposa el pont Actual -> Zenit amb palanques comercials i operatives', () => {
+    const atlas = buildAtlas();
+    const economia = atlas.modules.find((m) => m.id === 'economia');
+
+    expect(atlas.summary.zenitImprovements).toBeGreaterThanOrEqual(atlas.summary.modules * 3);
+    expect(atlas.summary.pendingZenitImprovements).toBeGreaterThan(0);
+    expect(atlas.summary.highImpactZenitImprovements).toBeGreaterThan(0);
+    expect(economia?.actualToZenit.superintendentRead).toContain('Mirada ESADE');
+    expect(economia?.actualToZenit.improvements.some((improvement) => (
+      improvement.area === 'MARGE'
+      && improvement.label.includes('Preu mínim')
+      && improvement.status === 'PENDENT'
+    ))).toBe(true);
   });
 });

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  getPaymentBand, getPaymentLabel, getPaymentTextClass, getPaymentDotClass,
+  bookingOutstandingAmount, getPaymentBand, getPaymentLabel, getPaymentTextClass, getPaymentDotClass,
 } from '@/lib/payment-status';
 
 describe('payment-status — estat de pagament canònic', () => {
@@ -43,5 +43,41 @@ describe('payment-status — estat de pagament canònic', () => {
     expect(getPaymentDotClass(true, false)).toBe('admin-tone-bg-warning');
     expect(getPaymentDotClass(false, true)).toBe('admin-tone-bg-warning');
     expect(getPaymentDotClass(false, false)).toBe('admin-tone-bg-danger');
+  });
+
+  it('bookingOutstandingAmount resta efectiu cobrat abans de dir que hi ha caixa pendent', () => {
+    expect(bookingOutstandingAmount({
+      total: 500,
+      depositAmount: 100,
+      depositPaid: false,
+      remainingPaid: false,
+      cashAmount: 500,
+    })).toBe(0);
+
+    expect(bookingOutstandingAmount({
+      total: 500,
+      depositAmount: 100,
+      depositPaid: false,
+      remainingPaid: false,
+      cashAmount: 200,
+    })).toBe(300);
+  });
+
+  it('bookingOutstandingAmount respecta remainingAmount explícit per descomptes o regularitzacions', () => {
+    expect(bookingOutstandingAmount({
+      total: 500,
+      depositAmount: 100,
+      remainingAmount: 300,
+      depositPaid: true,
+      remainingPaid: false,
+    })).toBe(300);
+
+    expect(bookingOutstandingAmount({
+      total: 500,
+      depositAmount: 100,
+      remainingAmount: 0,
+      depositPaid: true,
+      remainingPaid: false,
+    })).toBe(0);
   });
 });

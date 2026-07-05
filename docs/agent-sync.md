@@ -66,6 +66,11 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-05 [ESTAT: tancat — Master Actual→Zenit: mapa de millores comercials i operatives #1425]
+Perímetre: el Master/atles ja té capa visible d'estat actual, Zenit i palanques concretes per vendre millor, operar millor i protegir marge per cada mòdul. Economia queda amb mirada ESADE; `cashFlowForecast` passa per `bookingOutstandingAmount` i ja resta `cashAmount`.
+Validació: tests enfocats Master+economia 128/128; `tsc` 0; `qa:protocol`, `validate:core` i `pnpm build` verds. `/admin/docs/master` verificat en Playwright desktop+mòbil; pestanya `Actual → Zenit`, assets `_next` nets i mòbil sense overflow. Dev server 3000 reiniciat net després que retingués la ruta temporal `covtmp` d'un test.
+Avís claude: propietari confirma que ara estem sols. `backups/` queda fora del commit.
+
 [codex] 2026-07-05 [ESTAT: tancat — Avui: números integrats a la lectura #1424]
 Perímetre: millora visual petita de `/admin`: els 6 números d'avui viuen dins la peça superior «La lectura d'avui» i desapareix el bloc repetit del final. No toca dades, serveis ni la lògica de #1421-#1423.
 Validació: assets `_next` del 3000 recuperats amb restart dev; captura desktop+mòbil (`admin-avui-1424-*`), sense overflow ni errors; tests Master+DayCollision 8/8, `tsc` 0, `qa:protocol`, `validate:core` i `pnpm build` verds.

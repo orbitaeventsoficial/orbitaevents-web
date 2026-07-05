@@ -5,10 +5,11 @@ import Link from 'next/link';
 import { formatNumber } from '@/lib/constants';
 import type { MasterAtlas, MasterAtlasModule } from '@/lib/services/masterAtlasService';
 
-type TabKey = 'modules' | 'flow' | 'intervention';
+type TabKey = 'modules' | 'zenit' | 'flow' | 'intervention';
 
 const TABS: Array<{ key: TabKey; label: string }> = [
   { key: 'modules', label: 'Mòduls' },
+  { key: 'zenit', label: 'Actual → Zenit' },
   { key: 'flow', label: 'Flux complet' },
   { key: 'intervention', label: 'Com intervenir' },
 ];
@@ -17,6 +18,20 @@ const STATUS_BADGE: Record<MasterAtlasModule['status'], string> = {
   FORT: 'ap-badge ap-badge--success',
   EN_PROGRES: 'ap-badge ap-badge--warning',
   FRAGIL: 'ap-badge ap-badge--danger',
+};
+
+const MOVE_STATUS_BADGE: Record<MasterAtlasModule['nextMoves'][number]['status'], string> = {
+  FET: 'ap-badge ap-badge--success',
+  EN_CURS: 'ap-badge ap-badge--warning',
+  PENDENT: 'ap-badge ap-badge--danger',
+};
+
+const AREA_TONE: Record<MasterAtlasModule['actualToZenit']['improvements'][number]['area'], string> = {
+  VENDA: 'Venda',
+  OPERACIO: 'Operació',
+  MARGE: 'Marge',
+  MARCA: 'Marca',
+  SISTEMA: 'Sistema',
 };
 
 function includesQuery(values: Array<string | number | null | undefined>, query: string) {
@@ -146,6 +161,58 @@ function ModuleCard({ module }: { module: MasterAtlasModule }) {
   );
 }
 
+function ZenitModuleCard({ module }: { module: MasterAtlasModule }) {
+  const pending = module.actualToZenit.improvements.filter((improvement) => improvement.status !== 'FET').length;
+  const highImpact = module.actualToZenit.improvements.filter((improvement) => improvement.impact === 'ALT').length;
+
+  return (
+    <article className="ap-card p-4">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div className="min-w-0">
+          <p className="font-mono text-xs uppercase text-[var(--gold)]">{module.id}</p>
+          <h2 className="mt-1 text-xl font-semibold text-[var(--t)]">{module.title}</h2>
+          <p className="mt-1 text-sm text-[var(--t2)]">{module.actualToZenit.superintendentRead}</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <span className="ap-badge">{formatNumber(module.actualToZenit.improvements.length)} millores</span>
+          <span className={pending > 0 ? 'ap-badge ap-badge--warning' : 'ap-badge ap-badge--success'}>{formatNumber(pending)} pendents</span>
+          <span className="ap-badge ap-badge--danger">{formatNumber(highImpact)} impacte alt</span>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 lg:grid-cols-2">
+        <div className="rounded-md border border-[var(--line)] p-3">
+          <p className="font-mono text-xs uppercase text-[var(--t3)]">Actual</p>
+          <p className="mt-2 text-sm text-[var(--t2)]">{module.actualToZenit.current}</p>
+        </div>
+        <div className="rounded-md border border-[var(--line)] p-3">
+          <p className="font-mono text-xs uppercase text-[var(--gold)]">Zenit</p>
+          <p className="mt-2 text-sm text-[var(--t)]">{module.actualToZenit.zenit}</p>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 lg:grid-cols-3">
+        {module.actualToZenit.improvements.map((improvement) => (
+          <div key={improvement.label} className="rounded-md border border-[var(--line)] p-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={MOVE_STATUS_BADGE[improvement.status]}>{improvement.status}</span>
+              <span className="ap-badge">{AREA_TONE[improvement.area]}</span>
+              <span className="font-mono text-xs text-[var(--t3)]">Impacte {improvement.impact}</span>
+              <span className="font-mono text-xs text-[var(--t3)]">Esforç {improvement.effort}</span>
+            </div>
+            <p className="mt-3 text-sm font-semibold text-[var(--t)]">{improvement.label}</p>
+            <div className="mt-3 space-y-2 text-sm">
+              <p className="text-[var(--t3)]"><span className="font-semibold text-[var(--t2)]">Ara:</span> {improvement.current}</p>
+              <p className="text-[var(--t2)]"><span className="font-semibold text-[var(--t)]">Zenit:</span> {improvement.zenit}</p>
+              <p className="text-[var(--t3)]">{improvement.why}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </article>
+  );
+}
+
 export default function MasterAtlasClient({ atlas }: { atlas: MasterAtlas }) {
   const [tab, setTab] = useState<TabKey>('modules');
   const [query, setQuery] = useState('');
@@ -159,6 +226,10 @@ export default function MasterAtlasClient({ atlas }: { atlas: MasterAtlas }) {
     module.sourceOfTruth.join(' '),
     module.files.map((file) => file.path).join(' '),
     module.nextMoves.map((move) => `${move.label} ${move.why}`).join(' '),
+    module.actualToZenit.current,
+    module.actualToZenit.zenit,
+    module.actualToZenit.superintendentRead,
+    module.actualToZenit.improvements.map((improvement) => `${improvement.label} ${improvement.area} ${improvement.current} ${improvement.zenit} ${improvement.why}`).join(' '),
   ], query)), [atlas.modules, query]);
 
   return (
@@ -192,6 +263,27 @@ export default function MasterAtlasClient({ atlas }: { atlas: MasterAtlas }) {
       {tab === 'modules' && (
         <div className="space-y-4">
           {modules.map((module) => <ModuleCard key={module.id} module={module} />)}
+        </div>
+      )}
+
+      {tab === 'zenit' && (
+        <div className="space-y-4">
+          <section className="ap-card p-4">
+            <div className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-start">
+              <div>
+                <h2 className="text-xl font-semibold text-[var(--t)]">Del que tenim al Zenit</h2>
+                <p className="mt-1 text-sm text-[var(--t2)]">
+                  Lectura executiva per vendre més car, simplificar operació, automatitzar feina repetible i protegir marge abans de comprometre dates bones.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <span className="ap-badge">{formatNumber(atlas.summary.zenitImprovements)} palanques</span>
+                <span className="ap-badge ap-badge--warning">{formatNumber(atlas.summary.pendingZenitImprovements)} pendents</span>
+                <span className="ap-badge ap-badge--danger">{formatNumber(atlas.summary.highImpactZenitImprovements)} impacte alt</span>
+              </div>
+            </div>
+          </section>
+          {modules.map((module) => <ZenitModuleCard key={module.id} module={module} />)}
         </div>
       )}
 

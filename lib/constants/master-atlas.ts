@@ -6,6 +6,24 @@ export type MasterAtlasNextMove = {
   status: 'FET' | 'EN_CURS' | 'PENDENT';
 };
 
+export type MasterAtlasZenitImprovement = {
+  label: string;
+  area: 'VENDA' | 'OPERACIO' | 'MARGE' | 'MARCA' | 'SISTEMA';
+  current: string;
+  zenit: string;
+  why: string;
+  impact: 'ALT' | 'MITJA' | 'BAIX';
+  effort: 'BAIX' | 'MITJA' | 'ALT';
+  status: 'FET' | 'EN_CURS' | 'PENDENT';
+};
+
+export type MasterAtlasActualToZenit = {
+  current: string;
+  zenit: string;
+  superintendentRead: string;
+  improvements: MasterAtlasZenitImprovement[];
+};
+
 export type MasterAtlasModuleDefinition = {
   id: string;
   title: string;
@@ -42,6 +60,379 @@ export const MASTER_ATLAS_GATES = [
   'Validacio humana/UX escrita.',
   'Diari + protocol + counter sincronitzats.',
 ] as const;
+
+export const MASTER_ATLAS_ACTUAL_TO_ZENIT: Record<string, MasterAtlasActualToZenit> = {
+  comandament: {
+    current: 'Avui ja concentra tasques, leads, post-event, alertes de capacitat i números principals; el control complet queda separat.',
+    zenit: 'Una cabina executiva que decideix la jornada: què vendre, què protegir, què cobrar i què no acceptar.',
+    superintendentRead: 'El propietari no necessita més dades; necessita ordre de batalla, prioritat i frens abans de comprometre dissabtes cars.',
+    improvements: [
+      {
+        label: 'Brief executiu abans d obrir l admin',
+        area: 'OPERACIO',
+        current: 'El brief existeix dins la pantalla Avui.',
+        zenit: 'Arriba sol amb les 3 decisions del dia, riscos i oportunitats de venda.',
+        why: 'Redueix fricció i converteix el dashboard en agenda real.',
+        impact: 'ALT',
+        effort: 'MITJA',
+        status: 'PENDENT',
+      },
+      {
+        label: 'Semàfor de dissabtes i dies premium',
+        area: 'MARGE',
+        current: 'La col·lisió de dia ja s avisa quan hi ha 2+ bolos.',
+        zenit: 'Cada data escassa té lectura econòmica: marge esperat, equip, risc i preu mínim recomanat.',
+        why: 'Un dissabte no es ven com un dimarts; és inventari premium.',
+        impact: 'ALT',
+        effort: 'MITJA',
+        status: 'EN_CURS',
+      },
+      {
+        label: 'Accions de 1 clic des de Cal que ho miris',
+        area: 'SISTEMA',
+        current: 'Les alertes expliquen què passa i envien al detall.',
+        zenit: 'Cada alerta proposa el següent clic segur: confirmar, crear tasca, obrir reserva o preparar missatge.',
+        why: 'La pantalla ha de treure feina, no només assenyalar-la.',
+        impact: 'ALT',
+        effort: 'MITJA',
+        status: 'PENDENT',
+      },
+    ],
+  },
+  comercial: {
+    current: 'Els leads tenen scoring, prioritat a Avui i welcome automàtic amb fallback manual.',
+    zenit: 'Una màquina comercial que respon ràpid, segmenta valor, prepara oferta i no deixa cap oportunitat bona refredar-se.',
+    superintendentRead: 'La venda de milers d euros depèn de rapidesa, percepció premium i una propera acció sempre clara.',
+    improvements: [
+      {
+        label: 'Guió comercial per tipus de client i esdeveniment',
+        area: 'VENDA',
+        current: 'El sistema prioritza leads però no sempre diu quin angle de venda usar.',
+        zenit: 'Cada lead obre amb argumentari, objeccions probables i paquet recomanat.',
+        why: 'Millora conversió sense carregar el propietari de pensar des de zero.',
+        impact: 'ALT',
+        effort: 'MITJA',
+        status: 'PENDENT',
+      },
+      {
+        label: 'Oferta recomanada amb paquet, extres i marge',
+        area: 'MARGE',
+        current: 'LeadServiceLine configura abans de reserva i els dossiers poden mapar línies.',
+        zenit: 'El lead suggereix una proposta premium defensable amb upsells i marge visible abans d enviar.',
+        why: 'La web ha de vendre valor i protegir benefici, no només prendre nota.',
+        impact: 'ALT',
+        effort: 'ALT',
+        status: 'PENDENT',
+      },
+      {
+        label: 'Cadència multicanal amb aturada humana',
+        area: 'VENDA',
+        current: 'Welcome automàtic resol el primer toc.',
+        zenit: 'Seqüència email/WhatsApp/tasca que s atura si el client respon o si hi ha risc de soroll.',
+        why: 'Cap lead calent hauria de morir per silenci.',
+        impact: 'ALT',
+        effort: 'ALT',
+        status: 'PENDENT',
+      },
+    ],
+  },
+  documents: {
+    current: 'Dossiers i PDFs ja tenen snapshot, marge previ, auto-esborrany segur i PDF compost.',
+    zenit: 'Un sistema de proposta que sembla agència premium: explica valor, justifica preu i accelera el sí sense ensenyar la cuina.',
+    superintendentRead: 'El dossier és el venedor quan el propietari no hi és; ha de convertir confiança en preu acceptat.',
+    improvements: [
+      {
+        label: 'Revisió editorial del dossier complet',
+        area: 'MARCA',
+        current: 'La infraestructura és forta i estable.',
+        zenit: 'La narrativa, jerarquia visual i prova social estan afinades per vendre imports alts.',
+        why: 'Una proposta cara necessita percepció cara, clara i segura.',
+        impact: 'ALT',
+        effort: 'MITJA',
+        status: 'PENDENT',
+      },
+      {
+        label: 'Comparativa de paquets i upsells dins proposta',
+        area: 'VENDA',
+        current: 'El client veu proposta i serveis seleccionats.',
+        zenit: 'El document guia cap a una opció recomanada i mostra extres naturals sense semblar un catàleg fred.',
+        why: 'Augmenta ticket mitjà sense pressionar.',
+        impact: 'ALT',
+        effort: 'MITJA',
+        status: 'PENDENT',
+      },
+      {
+        label: 'Control final abans d enviar',
+        area: 'MARGE',
+        current: 'Hi ha marge abans d enviar.',
+        zenit: 'El botó d enviament resumeix marge, risc, data premium, snapshot i copy client-facing.',
+        why: 'Evita enviar propostes boniques però poc rendibles.',
+        impact: 'ALT',
+        effort: 'MITJA',
+        status: 'EN_CURS',
+      },
+    ],
+  },
+  reserves: {
+    current: 'La reserva governa després del sí; hi ha checklist, inventari, calendari, capacitat i guàrdia de dies amb 2+ bolos.',
+    zenit: 'Una torre de control d esdeveniments: cap bolo confirmat sense equip, inventari, timings, caixa i risc entesos.',
+    superintendentRead: 'La venda només és bona si el dia s executa impecable i no crema el següent bolo.',
+    improvements: [
+      {
+        label: 'Gate de data ocupada en crear reserva',
+        area: 'OPERACIO',
+        current: 'Avui avisa quan ja existeixen col·lisions de dia.',
+        zenit: 'El sistema demana confirmació abans de comprometre el segon bolo en una data ocupada.',
+        why: 'Prevenir costa menys que arreglar agenda compromesa.',
+        impact: 'ALT',
+        effort: 'MITJA',
+        status: 'PENDENT',
+      },
+      {
+        label: 'Checklist intel·ligent T-7/T-2',
+        area: 'OPERACIO',
+        current: 'El checklist existeix però encara depèn massa de revisió manual.',
+        zenit: 'Recordatoris i tasques canòniques apareixen segons data, estat i risc del bolo.',
+        why: 'La qualitat d execució no pot dependre de memòria oral.',
+        impact: 'ALT',
+        effort: 'MITJA',
+        status: 'PENDENT',
+      },
+      {
+        label: 'Fitxa de producció premium',
+        area: 'MARCA',
+        current: 'La fitxa reserva concentra informació interna.',
+        zenit: 'La fitxa és un runbook clar: qui, què, quan, risc, equip, cobrament i pla B.',
+        why: 'Fa que cada bolo sembli produït per una empresa gran.',
+        impact: 'ALT',
+        effort: 'ALT',
+        status: 'PENDENT',
+      },
+    ],
+  },
+  economia: {
+    current: 'CostEngine, transport, cash-aware outstanding i compte corrent ja existeixen com a cervells reutilitzables.',
+    zenit: 'Cap decisió comercial o operativa important es pren sense marge, caixa, CAC, temps escàs i risc visibles.',
+    superintendentRead: 'Mirada ESADE: no es tracta de vendre més bolos, sinó de vendre millor, cobrar abans, protegir dies premium i automatitzar frens quan el marge no acompanya.',
+    improvements: [
+      {
+        label: 'Preu mínim recomanat per data i risc',
+        area: 'MARGE',
+        current: 'El marge es calcula, però encara no governa prou la decisió de preu.',
+        zenit: 'El sistema recomana preu mínim segons cost, CAC, dissabte, equip i ocupació.',
+        why: 'Evita regalar dates cares i força disciplina comercial.',
+        impact: 'ALT',
+        effort: 'ALT',
+        status: 'PENDENT',
+      },
+      {
+        label: 'Cash forecast accionable',
+        area: 'MARGE',
+        current: 'Hi ha lectura de caixa i pendent cash-aware.',
+        zenit: 'El propietari veu quins cobraments moure avui i quin impacte tenen a 7/30 dies.',
+        why: 'La caixa operativa és una palanca de tranquil·litat i decisió.',
+        impact: 'ALT',
+        effort: 'MITJA',
+        status: 'PENDENT',
+      },
+      {
+        label: 'Auditoria de tarifes per marge real',
+        area: 'VENDA',
+        current: 'Els preus existeixen en catàlegs i serveis.',
+        zenit: 'Els packs i extres indiquen marge real i recomanació de pujada o paquetització.',
+        why: 'Un negoci premium ha de pujar preus on el sistema demostra valor i cost.',
+        impact: 'ALT',
+        effort: 'ALT',
+        status: 'PENDENT',
+      },
+    ],
+  },
+  partners: {
+    current: 'Partners i CLIENT_PARTNER ja tenen fitxa, productes, compte corrent i distinció li dec/em deu.',
+    zenit: 'Una xarxa de col·laboradors que amplia oferta sense desordenar marge, responsabilitat ni experiència client.',
+    superintendentRead: 'Els partners han de fer vendre més i operar millor; si embruten comptes o qualitat, resten.',
+    improvements: [
+      {
+        label: 'Scorecard de partner',
+        area: 'OPERACIO',
+        current: 'La fitxa mostra relació i compte corrent.',
+        zenit: 'Cada partner té fiabilitat, marge, incidències, volum i propera liquidació.',
+        why: 'Permet decidir amb qui créixer i amb qui anar amb cura.',
+        impact: 'ALT',
+        effort: 'MITJA',
+        status: 'PENDENT',
+      },
+      {
+        label: 'Catàleg partner amb cost i markup garantits',
+        area: 'MARGE',
+        current: 'Els productes de partner poden entrar a dossier i cost.',
+        zenit: 'Cap producte de partner es ven sense cost, preu, marge i responsabilitat clars.',
+        why: 'Evita marge fictici i problemes de servei.',
+        impact: 'ALT',
+        effort: 'MITJA',
+        status: 'PENDENT',
+      },
+      {
+        label: 'Liquidació mensual guiada',
+        area: 'SISTEMA',
+        current: 'El compte corrent explica saldo.',
+        zenit: 'El sistema proposa què pagar, què cobrar i què deixar pendent amb traça.',
+        why: 'Tanca el mes sense fulls paral·lels.',
+        impact: 'MITJA',
+        effort: 'MITJA',
+        status: 'PENDENT',
+      },
+    ],
+  },
+  comunicacions: {
+    current: 'Plantilles, inbox, tracking i welcome automàtic existeixen amb dedupe i fallback.',
+    zenit: 'Una veu comercial coherent: cada missatge és oportú, editable, rastrejable i premium.',
+    superintendentRead: 'La captació passa per confiança; cada email o WhatsApp ha de semblar escrit per algú que domina el bolo.',
+    improvements: [
+      {
+        label: 'Biblioteca de veu premium per moments',
+        area: 'MARCA',
+        current: 'Hi ha plantilles i serveis d enviament.',
+        zenit: 'Cada moment té una plantilla revisada: entrada, proposta, recordatori, confirmació, post-event i referral.',
+        why: 'Coherència de marca i menys improvisació.',
+        impact: 'ALT',
+        effort: 'MITJA',
+        status: 'PENDENT',
+      },
+      {
+        label: 'Control d oportunitat abans d enviar',
+        area: 'VENDA',
+        current: 'El sistema pot enviar i trackejar.',
+        zenit: 'Abans de sortir, el missatge sap estat del lead, idioma, dossier, marge i risc.',
+        why: 'Evita missatges correctes en el moment equivocat.',
+        impact: 'ALT',
+        effort: 'ALT',
+        status: 'PENDENT',
+      },
+      {
+        label: 'Inbox com a motor de captació',
+        area: 'VENDA',
+        current: 'L inbox pot importar i crear traça.',
+        zenit: 'Entrada nova es converteix en lead qualificat, resposta recomanada i següent tasca.',
+        why: 'Cap client que entra per la porta hauria de quedar sense circuit.',
+        impact: 'ALT',
+        effort: 'ALT',
+        status: 'PENDENT',
+      },
+    ],
+  },
+  'post-event': {
+    current: 'Post-event ja apareix a Avui i hi ha playbook intern per tancar el cercle.',
+    zenit: 'Cada bolo genera ressenya, testimoni, aprenentatge, referral i actiu comercial reutilitzable.',
+    superintendentRead: 'El bolo no acaba quan es recull el material; acaba quan ha creat la propera venda.',
+    improvements: [
+      {
+        label: 'Auto-esborrany de ressenya i testimoni',
+        area: 'MARCA',
+        current: 'La pantalla indica accions pendents.',
+        zenit: 'El sistema prepara missatges personalitzats i fragments de testimoni revisables.',
+        why: 'Prova social fresca ven més que qualsevol promesa genèrica.',
+        impact: 'ALT',
+        effort: 'MITJA',
+        status: 'PENDENT',
+      },
+      {
+        label: 'Informe intern d aprenentatge',
+        area: 'OPERACIO',
+        current: 'Hi ha bases de report i enquestes.',
+        zenit: 'Cada incidència, extra o èxit alimenta producte, pricing i checklist.',
+        why: 'El sistema ha d aprendre de la realitat dels bolos.',
+        impact: 'MITJA',
+        effort: 'MITJA',
+        status: 'PENDENT',
+      },
+      {
+        label: 'Referral amb timing i context',
+        area: 'VENDA',
+        current: 'El referral existeix com a front pendent.',
+        zenit: 'Clients contents reben una petició concreta quan l experiència encara és recent.',
+        why: 'És captació barata i amb confiança heretada.',
+        impact: 'ALT',
+        effort: 'MITJA',
+        status: 'PENDENT',
+      },
+    ],
+  },
+  cataleg: {
+    current: 'Packs, extras, inventari, productes de partner i pricing existeixen, però el valor client-facing encara pot ser més comercial.',
+    zenit: 'Un catàleg que ven experiències, no llistes: valor percebut, cost intern, marge i prova visual alineats.',
+    superintendentRead: 'El catàleg és on el client entén per què paga més; si només lista noms, baixa el ticket.',
+    improvements: [
+      {
+        label: 'Fitxa comercial de producte premium',
+        area: 'MARCA',
+        current: 'Els productes estan modelats i es poden mostrar en diferents pantalles.',
+        zenit: 'Cada producte té promesa, per a qui és, què inclou, prova visual i upsell natural.',
+        why: 'Ajuda a vendre valor abans de discutir preu.',
+        impact: 'ALT',
+        effort: 'MITJA',
+        status: 'PENDENT',
+      },
+      {
+        label: 'Preu-cost-font per cada pack i extra',
+        area: 'MARGE',
+        current: 'Hi ha fonts canòniques, però cal auditoria de consistència.',
+        zenit: 'Cada pack explica PVP, cost, marge, vida útil i origen del preu.',
+        why: 'Sense font i marge, el catàleg pot semblar bonic però ser perillós.',
+        impact: 'ALT',
+        effort: 'ALT',
+        status: 'PENDENT',
+      },
+      {
+        label: 'Ordenació per conversió i ticket',
+        area: 'VENDA',
+        current: 'El catàleg és navegable.',
+        zenit: 'El sistema destaca productes que converteixen, pugen ticket o resolen objeccions.',
+        why: 'La millor oferta no sempre és la més barata ni la primera alfabètica.',
+        impact: 'MITJA',
+        effort: 'MITJA',
+        status: 'PENDENT',
+      },
+    ],
+  },
+  'visual-sistema': {
+    current: 'Existeixen atles elèctric, auditoria visual, Master, Studio, protocol i guards.',
+    zenit: 'Un centre de comandament per humans i IAs: què hi ha, què falla, què vendre millor i què tocar primer.',
+    superintendentRead: 'El sistema ja pot mirar-se a si mateix; ara ha de convertir aquesta mirada en ordre de millora.',
+    improvements: [
+      {
+        label: 'Passada visual humana per mòdul',
+        area: 'MARCA',
+        current: 'L auditoria diu si renderitza i captura bé.',
+        zenit: 'Cada pantalla rep criteri humà: jerarquia, densitat, conversió, confiança i acció següent.',
+        why: 'Renderitzar no és vendre ni operar bé.',
+        impact: 'ALT',
+        effort: 'ALT',
+        status: 'PENDENT',
+      },
+      {
+        label: 'Master com a llista de prioritats viva',
+        area: 'SISTEMA',
+        current: 'El Master agrupa mòduls, riscos i properes accions.',
+        zenit: 'El Master ordena millores per impacte comercial, risc operatiu i esforç.',
+        why: 'Evita saltar de pantalla en pantalla sense criteri.',
+        impact: 'ALT',
+        effort: 'MITJA',
+        status: 'EN_CURS',
+      },
+      {
+        label: 'Comparador Actual -> Zenit visible',
+        area: 'SISTEMA',
+        current: 'La tesi Zenit viu als docs i el Master diu què existeix.',
+        zenit: 'La distància entre realitat i ambició queda visible dins `/admin/docs/master`.',
+        why: 'És exactament el pont que faltava per treballar de la mà sense perdre el nord.',
+        impact: 'ALT',
+        effort: 'BAIX',
+        status: 'EN_CURS',
+      },
+    ],
+  },
+};
 
 export const MASTER_ATLAS_MODULES: MasterAtlasModuleDefinition[] = [
   {

@@ -184,6 +184,38 @@ describe('buildCashFlowForecast', () => {
     expect(result[0].income).toBe(3500);
   });
 
+  it('resta cashAmount dels ingressos pendents perquè la caixa no quedi inflada', async () => {
+    mockPrisma.booking.findMany.mockResolvedValue([
+      makeBooking(0, {
+        total: 3000,
+        depositAmount: 1000,
+        depositPaid: false,
+        remainingPaid: false,
+        cashAmount: 3000,
+      }),
+    ]);
+
+    const result = await buildCashFlowForecast(3);
+
+    expect(result[0].income).toBe(0);
+  });
+
+  it('respecta remainingAmount explícit a zero', async () => {
+    mockPrisma.booking.findMany.mockResolvedValue([
+      makeBooking(0, {
+        total: 3000,
+        depositAmount: 1000,
+        remainingAmount: 0,
+        depositPaid: true,
+        remainingPaid: false,
+      }),
+    ]);
+
+    const result = await buildCashFlowForecast(3);
+
+    expect(result[0].income).toBe(0);
+  });
+
   it('respecta el paràmetre monthsAhead', async () => {
     mockPrisma.booking.findMany.mockResolvedValue([]);
 

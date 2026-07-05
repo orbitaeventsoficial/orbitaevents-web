@@ -1,3 +1,25 @@
+## 2026-07-05 — Master Actual→Zenit i economia cash-aware (Canvi #1425, codex)
+
+### Context
+El propietari detecta el forat correcte: ja hi ha Master i atles, però faltava la capa entre l'estat actual i el Zenit. Demana mirada de superintendent de vendes i gestió d'esdeveniments: vendre imports alts, captar millor, simplificar, automatitzar i mirar Economia amb ulleres ESADE perquè el sistema ajudi a guanyar pasta.
+
+### Què s'ha fet
+- **Master Actual→Zenit**: `lib/constants/master-atlas.ts` afegeix una lectura per cada mòdul amb `current`, `zenit`, criteri de superintendent i palanques etiquetades per `VENDA`, `OPERACIO`, `MARGE`, `MARCA` i `SISTEMA`.
+- **Servei Master**: `masterAtlasService` incorpora aquesta capa al model i resumeix total de palanques, pendents i impacte alt.
+- **UI visible**: `/admin/docs/master` afegeix pestanya `Actual → Zenit`, KPIs de palanques i fitxes "Ara / Zenit / millores" per treballar després la passada visual amb criteri.
+- **Economia real**: `cashFlowForecast` passa a usar `bookingOutstandingAmount`; resta `cashAmount` i respecta `remainingAmount=0` explícit. La previsió de caixa ja no infla ingressos pendents per bolos cobrats en efectiu.
+
+### Validació
+- Validació tècnica: tests enfocats Master+economia 128/128; `tsc` 0; `qa:protocol`, `validate:core` i `pnpm build` verds.
+- Validació funcional: Master mostra el pont Actual→Zenit i Economia queda marcada amb mirada ESADE (preu mínim, marge, cash, dies premium). El forecast cash-aware cobreix cash total/parcial i remainingAmount explícit.
+- Validació humana/UX: el propietari ja no ha de comparar docs mentalment; el Master diu què tenim, quin és el Zenit i quina palanca toca per vendre millor, operar millor o protegir marge. Captures: `.codex-captures/master-actual-zenit-1425-desktop.png` i `.codex-captures/master-actual-zenit-1425-mobile.png`.
+
+### Coordinació
+Counter → 1425. Tall fet amb el propietari indicant que no hi ha agent paral·lel actiu. `backups/` local continua fora del commit.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-05 — Avui integra els números clau dins la lectura superior (Canvi #1424, codex)
 
 ### Context

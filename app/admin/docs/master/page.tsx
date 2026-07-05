@@ -19,7 +19,8 @@ export default async function MasterAtlasPage() {
           <AdminKpi label="Mòduls" value={formatNumber(atlas.summary.modules)} />
           <AdminKpi label="Forts" value={formatNumber(atlas.summary.strongModules)} tone="success" />
           <AdminKpi label="En progrés" value={formatNumber(atlas.summary.inProgressModules)} tone="warning" />
-          <AdminKpi label="Properes peces" value={formatNumber(atlas.summary.pendingMoves)} />
+          <AdminKpi label="Palanques Zenit" value={formatNumber(atlas.summary.zenitImprovements)} />
+          <AdminKpi label="Zenit pendents" value={formatNumber(atlas.summary.pendingZenitImprovements)} tone="warning" />
         </AdminKpiRow>
       )}
     >

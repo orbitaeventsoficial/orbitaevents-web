@@ -7,6 +7,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { bookingOutstandingAmount } from '@/lib/payment-status';
 import { getProfitabilityConfig } from './profitabilityService';
 import { computeBookingFinancialSummary } from './costEngine';
 
@@ -39,6 +40,7 @@ export async function buildCashFlowForecast(monthsAhead = 6): Promise<CashFlowMo
       depositPaid: true,
       remainingPaid: true,
       remainingAmount: true,
+      cashAmount: true,
       travelCost: true,
       distanceKm: true,
       pack: { select: { price: true, extraHourPrice: true } },
@@ -69,10 +71,18 @@ export async function buildCashFlowForecast(monthsAhead = 6): Promise<CashFlowMo
     // Ingressos pendents de cobrar
     const total = Number(booking.total) || 0;
     const depositAmount = Number(booking.depositAmount) || 0;
-    const remainingAmount = Number(booking.remainingAmount) || Math.max(0, total - depositAmount);
-    let pendingIncome = 0;
-    if (!booking.depositPaid) pendingIncome += depositAmount;
-    if (!booking.remainingPaid) pendingIncome += Math.max(0, remainingAmount);
+    const remainingAmount = booking.remainingAmount == null
+      ? Math.max(0, total - depositAmount)
+      : Math.max(0, Number(booking.remainingAmount) || 0);
+    const cashAmount = booking.cashAmount == null ? null : Math.max(0, Number(booking.cashAmount) || 0);
+    const pendingIncome = bookingOutstandingAmount({
+      total,
+      depositAmount,
+      remainingAmount,
+      depositPaid: booking.depositPaid,
+      remainingPaid: booking.remainingPaid,
+      cashAmount,
+    });
     entry.income += pendingIncome;
 
     // Cost estimat

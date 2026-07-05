@@ -41,16 +41,20 @@ export function getPaymentBand(depositPaid: boolean, remainingPaid: boolean, cov
 export function bookingOutstandingAmount(booking: {
   total: number;
   depositAmount: number;
+  remainingAmount?: number | null;
   depositPaid: boolean;
   remainingPaid: boolean;
   cashAmount?: number | null;
 }): number {
   const total = normalizeAmount(booking.total);
   const deposit = normalizeAmount(booking.depositAmount);
+  const remaining = typeof booking.remainingAmount === 'number' && Number.isFinite(booking.remainingAmount)
+    ? normalizeAmount(booking.remainingAmount)
+    : Math.max(0, total - deposit);
   const cash = normalizeAmount(booking.cashAmount);
   let pending = 0;
   if (!booking.depositPaid && deposit > 0) pending += deposit;
-  if (!booking.remainingPaid) pending += Math.max(0, total - deposit);
+  if (!booking.remainingPaid) pending += remaining;
   // L'efectiu cobrat cobreix el pendent (fins on arribi).
   pending = Math.max(0, pending - cash);
   return Math.round(pending * 100) / 100;
