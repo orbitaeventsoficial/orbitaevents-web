@@ -1,3 +1,25 @@
+## 2026-07-05 — Master Òrbita: porta única + atles modular per capacitats de negoci (Canvi #1420, codex)
+
+### Context
+El propietari demana "fes-ho tot" per al Master: una capa que no sigui un altre document solt, sinó la porta única perquè el propietari i qualsevol IA entenguin la màquina. Ja hi havia peces molt fortes (#1414 atles elèctric, #1416-#1417 auditoria visual, #1413 tesi zenit, #1419 incorporació welcome), però faltava el nivell modular: entendre Òrbita per capacitats de negoci, no per fitxers.
+
+### Què s'ha fet
+- **NOU `lib/constants/master-atlas.ts`**: catàleg canònic de mòduls (Comandament, Comercial, Documents/PDF, Reserves, Economia, Partners, Comunicacions, Post-event, Catàleg/Inventari, Visual/Sistema), amb missió, rutes, fonts, riscos, validacions, gates i properes accions.
+- **NOU `lib/services/masterAtlasService.ts`**: composa el Master creuant atles elèctric + auditoria visual. Per cada mòdul resol fitxers, docs presents, rutes visuals, checks fallits, score, estat (`FORT` / `EN_PROGRES` / `FRAGIL`) i properes accions. Test nou (3).
+- **NOVA ruta `/admin/docs/master`**: KPIs, cercador, tabs `Mòduls` / `Flux complet` / `Com intervenir`, cards modulars i enllaços cap a atles elèctric, auditoria visual, control i Studio. `loading.tsx` inclòs. Nav Sistema afegeix `Master Òrbita`.
+- **Local server**: abans d'avançar, corregit el problema del navegador que veia HTML cru. Causa probable: `.next`/servidor stale. Fet `pnpm build` i restart net a `3000`; `/studio` serveix CSS/JS amb content-type correcte.
+
+### Validació
+- Validació tècnica: `masterAtlasService` 3/3, `tsc` 0, `pnpm build` verd (amb `validate:core` dins) abans del restart local.
+- Validació funcional: el Master detecta l'autopilot comercial (`leadWelcomeEmailService`), les rutes visuals, els riscos i les properes accions per mòdul; el resum global usa el baseline visual real sense duplicar checks entre mòduls.
+- Validació humana/UX: ara hi ha una porta única per saber on tocar: mòdul → missió → fonts → rutes → riscos → validacions → següent tall. Això redueix la dependència de memòria oral i de llegir 10 documents separats.
+
+### Coordinació
+Counter → 1420. Canvi només Sistema/docs/atles; no toca schema, diners, enviaments reals ni PDF runtime. `backups/lead-alba-orna-1782945431297.json` continua fora del repo versionat.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-05 — Incorporació de #1418 al manual viu: tesi + atles elèctric + roadmap visual (Canvi #1419, codex)
 
 ### Context

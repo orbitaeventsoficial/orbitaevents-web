@@ -122,6 +122,7 @@ convertit peces en producte.
 | #1414-#1415 | L'atles electric ja no es nomes cens: es manual operatiu viu del repo, fluxos, punts d'intervencio i cables. |
 | #1416-#1417 | La radiografia visual runtime de l'admin ja te baseline global i visor viu a `/admin/docs/visual-audit`. |
 | #1418 | El lead nou amb email real ja rep welcome automatic amb plantilla editable, `preferredLocale`, lock `dedupeKey` i fallback manual. |
+| #1420 | `/admin/docs/master` ja es la porta unica: atles modular per capacitats de negoci que creua repo real, baseline visual, riscos, validacions i properes peces. |
 
 Per tant, el front viu ja no es "crear la base". La base s'esta convertint en maquina.
 El front viu ara es pujar de nivell: criteri, automatitzacio segura, simplificacio i

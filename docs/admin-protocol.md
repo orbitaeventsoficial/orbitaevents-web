@@ -1551,6 +1551,19 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1420 — 2026-07-05 — codex (FET)
+**Master Òrbita: porta única `/admin/docs/master` + atles modular per capacitats de negoci.**
+- Context: després de #1414-#1419 ja existien atles elèctric, auditoria visual, tesi, zenit i roadmap, però encara faltava la capa superior que el propietari demanava com a "master": no un altre Markdown dispers, sinó una consola de coneixement que digui per mòduls què fa la màquina, on viu, què no tocar, com validar i quin és el següent moviment.
+- Fix canònic: NOU `lib/constants/master-atlas.ts` amb el catàleg modular estable (Comandament, Comercial, Documents/PDF, Reserves, Economia, Partners, Comunicacions, Post-event, Catàleg/Inventari, Visual/Sistema), principis i gates. NOU `lib/services/masterAtlasService.ts` que compon el Master creuant `repoElectricAtlasService` + `visualAuditAtlasService`: fitxers detectats, docs presents, rutes visuals, checks fallits, score, estat (`FORT` / `EN_PROGRES` / `FRAGIL`) i properes accions per mòdul. Test nou (3).
+- Fix visible: nova ruta admin `/admin/docs/master` amb `loading.tsx` i `MasterAtlasClient`: KPIs, cercador, tabs `Mòduls` / `Flux complet` / `Com intervenir`, cards modulars amb missió, pregunta del propietari, riscos, validacions, fonts, rutes, fitxers i properes accions. Nav Sistema afegeix `Master Òrbita` abans dels atles detallats.
+- Validació tècnica: test `masterAtlasService` verd (3/3) i `tsc` 0 abans de documentar. El local server que es veia com HTML cru s'ha reparat amb `pnpm build` (inclou `validate:core`) i restart net a `3000`; `/studio` 200 i assets `_next` amb `text/css` / `application/javascript`.
+- Validació funcional: el Master detecta el cable comercial `automationTriggers` → `leadWelcomeEmailService`, propaga riscos visuals del baseline sense duplicar-los al resum global, i exposa el flux modular de negoci en una ruta admin real.
+- Validació humana/UX: el propietari i futures IAs ja tenen una porta única per orientar-se abans de tocar: del mòdul de negoci al fitxer, del risc al guard, del zenit al següent tall.
+- `ADMIN_CHANGE_COUNTER` passa a `1420`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #1419 — 2026-07-05 — codex (FET)
 **Incorporació de #1418 al manual viu: la tesi, l'atles elèctric i el roadmap visual ja tracten el welcome automàtic com a estat real.**
 - Context: Claude va tancar #1418 (welcome email automàtic al lead nou) amb tests i guards, però la tesi mare encara deia que `onLeadCreated` només encuava una task i que "faltava que s'enviï sol". Això deixava el manual de la màquina un pas enrere respecte al repo real. També calia que l'atles elèctric indiqués on tocar aquesta peça outward-facing sense duplicar enviaments.

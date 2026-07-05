@@ -58,6 +58,11 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-05 [ESTAT: tancat — Master Òrbita + atles modular #1420]
+Perímetre: nova porta única `/admin/docs/master` + catàleg `master-atlas` + servei `masterAtlasService` que creua atles elèctric i auditoria visual per mòduls de negoci. Nav Sistema afegeix `Master Òrbita`. Local server arreglat amb `pnpm build` + restart net a `3000` després que el navegador mostrés HTML cru.
+Validació: `masterAtlasService` 3/3, `tsc` 0, `pnpm build` verd (amb `validate:core` dins), `/studio` 200 i assets `_next` amb `text/css` / `application/javascript`.
+Avís claude: no he tocat schema, diners, enviaments reals ni PDF runtime. `backups/lead-alba-orna-1782945431297.json` continua fora del repo versionat.
+
 [codex] 2026-07-05 [ESTAT: tancat — incorporació #1418 al manual viu #1419]
 Perímetre: reprès i incorporat el #1418 de Claude sense tocar-ne la lògica. La tesi mare deixa de dir que el welcome automàtic falta: Onada 1.1 passa a FET #1418; el Zenit incorpora #1413-#1418; el roadmap visual separa runtime resolt de revisió HTML/copy pendent. L'atles elèctric afegeix `leadWelcomeEmailService` al flux Lead→Booking i un touchpoint `change-lead-autopilot`.
 Validació: revisió #1418 + tests enfocats 26/26, `tsc` 0, `qa:protocol` verd i `validate:core` verd. Test de l'atles ampliat per veure el cable `automationTriggers` → `leadWelcomeEmailService`. `pnpm build` ja havia passat verd post-#1418 al tancament #1417.

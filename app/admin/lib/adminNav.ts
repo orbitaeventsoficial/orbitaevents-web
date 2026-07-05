@@ -58,6 +58,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: 'Control complet', href: '/admin/control', secondary: true },
       { label: 'Studio', href: '/admin/studio' },
       { label: 'Manual', href: '/admin/manual' },
+      { label: 'Master Òrbita', href: '/admin/docs/master', secondary: true },
       { label: 'Atles', href: '/admin/docs/organisme', secondary: true },
       { label: 'Atles elèctric', href: '/admin/docs/electric-atlas', secondary: true },
       { label: 'Auditoria visual', href: '/admin/docs/visual-audit', secondary: true },
