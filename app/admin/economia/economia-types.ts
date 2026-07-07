@@ -26,6 +26,12 @@ export interface PaymentRow {
   remainingAmount: number;
   remainingPaid: boolean;
   remainingPaidAt: string | null;
+  cashAmount: number | null;
+  depositOutstandingAmount: number;
+  remainingOutstandingAmount: number;
+  outstandingAmount: number;
+  depositSettled: boolean;
+  remainingSettled: boolean;
   depositDueAt: string;
   remainingDueAt: string;
   overdueDeposit: boolean;
@@ -179,8 +185,8 @@ export function marginBg(pctValue: number): string {
   return getMarginBarClass(pctValue * 100);
 }
 
-export function paymentStateBadge(paid: boolean) {
-  return paid
+export function paymentStateBadge(settled: boolean) {
+  return settled
     ? 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success'
     : 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger';
 }

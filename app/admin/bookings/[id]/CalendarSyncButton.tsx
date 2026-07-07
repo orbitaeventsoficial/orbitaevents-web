@@ -34,6 +34,7 @@ export default function CalendarSyncButton({ bookingId }: { bookingId: string })
       );
       router.refresh();
     } catch (error) {
+      console.error('[CalendarSyncButton] Error sincronitzant Google Calendar', error);
       setIsError(true);
       setMessage(error instanceof Error ? error.message : 'Error inesperat');
     } finally {
@@ -47,12 +48,16 @@ export default function CalendarSyncButton({ bookingId }: { bookingId: string })
         type="button"
         onClick={syncNow}
         disabled={loading}
+        aria-invalid={isError ? true : undefined}
         className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs disabled:opacity-60"
       >
         {loading ? 'Sincronitzant...' : 'Sincronitza Google Calendar ara'}
       </button>
       {message && (
-        <p className={`text-xs ${isError ? 'admin-tone-text-danger' : 'admin-tone-text-success'}`}>
+        <p
+          role={isError ? 'alert' : 'status'}
+          className={`text-xs ${isError ? 'admin-tone-text-danger' : 'admin-tone-text-success'}`}
+        >
           {message}
         </p>
       )}

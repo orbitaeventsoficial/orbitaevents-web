@@ -5,7 +5,6 @@ import { prisma } from '@/lib/prisma';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
-import { Prisma } from '@prisma/client';
 import BookingActions from './BookingActions';
 import BookingFilters from './BookingFilters';
 import { BOOKING_OVERVIEW_STATUS_CARDS, formatDate, formatDateShort, formatCurrency, getBookingStatusDisplay, getEventLabel } from '@/lib/constants';
@@ -16,8 +15,8 @@ import { aggregateServiceLines, computeSimpleMarginPct } from '@/lib/services/co
 import { getTranslatedPackName } from '@/lib/pack-name';
 import ExportCsvButton from '../components/ExportCsvButton';
 import dynamicImport from 'next/dynamic';
-import { ADMIN_BOOKING_PAYMENT_FILTER_OPTIONS } from '@/lib/constants/admin';
 import { buildCustomerBookingListHref, buildCustomerWorkspaceTabHref, buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildBookingsWhere, getPaymentFilterLabel, type BookingSearchParams } from '@/lib/services/bookingPaymentFilter';
 
 const BookingPipelineViewWrapper = dynamicImport(
   () => import('./BookingPipelineView'),
@@ -29,126 +28,6 @@ export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'Reserves | Òrbita Admin',
 };
-
-type BookingPaymentFilter = 'deposit-pending' | 'overdue' | 'due-soon';
-
-interface BookingSearchParams {
-  page?: string;
-  status?: string;
-  eventType?: string;
-  fromDate?: string;
-  toDate?: string;
-  search?: string;
-  view?: string;
-  payment?: string;
-  customerId?: string;
-}
-
-function addDays(date: Date, days: number) {
-  const next = new Date(date);
-  next.setDate(next.getDate() + days);
-  return next;
-}
-
-function resolvePaymentFilter(value?: string): BookingPaymentFilter | null {
-  switch (value) {
-    case 'deposit-pending':
-    case 'overdue':
-    case 'due-soon':
-      return value;
-    default:
-      return null;
-  }
-}
-
-function getPaymentFilterLabel(value: BookingPaymentFilter | null) {
-  if (!value) return null;
-  const match = ADMIN_BOOKING_PAYMENT_FILTER_OPTIONS.find((option) => option.id === value);
-  return match?.label ?? null;
-}
-
-function buildBookingsWhere(params: BookingSearchParams) {
-  const now = new Date();
-  const paymentFilter = resolvePaymentFilter(params.payment);
-  const overdueEventDateLimit = addDays(now, 30);
-  const overdueRemainingDateLimit = addDays(now, 7);
-  const dueSoonDepositFrom = addDays(now, 30);
-  const dueSoonDepositTo = addDays(now, 37);
-  const dueSoonRemainingFrom = addDays(now, 7);
-  const dueSoonRemainingTo = addDays(now, 14);
-
-  const andClauses: Prisma.BookingWhereInput[] = [];
-  if (params.status) {
-    andClauses.push({
-      status: params.status as Prisma.BookingWhereInput['status'],
-    });
-  }
-  if (params.eventType) {
-    andClauses.push({
-      eventType: params.eventType as Prisma.BookingWhereInput['eventType'],
-    });
-  }
-  if (params.fromDate || params.toDate) {
-    const eventDate: Prisma.DateTimeFilter = {};
-    if (params.fromDate) {
-      eventDate.gte = new Date(params.fromDate);
-    }
-    if (params.toDate) {
-      eventDate.lte = new Date(params.toDate + 'T23:59:59');
-    }
-    andClauses.push({ eventDate });
-  }
-  if (params.search) {
-    const q = params.search;
-    andClauses.push({
-      OR: [
-        { clientName: { contains: q, mode: 'insensitive' } },
-        { reference: { contains: q, mode: 'insensitive' } },
-        { eventLocation: { contains: q, mode: 'insensitive' } },
-        { clientEmail: { contains: q, mode: 'insensitive' } },
-      ],
-    });
-  }
-  if (params.customerId) {
-    andClauses.push({ customerId: params.customerId });
-  }
-  if (paymentFilter === 'deposit-pending') {
-    andClauses.push({ depositPaid: false });
-  }
-  if (paymentFilter === 'overdue') {
-    andClauses.push({
-      OR: [
-        { depositPaid: false, eventDate: { lt: overdueEventDateLimit } },
-        { remainingPaid: false, eventDate: { lt: overdueRemainingDateLimit } },
-      ],
-    });
-  }
-  if (paymentFilter === 'due-soon') {
-    andClauses.push({
-      OR: [
-        {
-          depositPaid: false,
-          eventDate: {
-            gte: dueSoonDepositFrom,
-            lte: dueSoonDepositTo,
-          },
-        },
-        {
-          remainingPaid: false,
-          eventDate: {
-            gte: dueSoonRemainingFrom,
-            lte: dueSoonRemainingTo,
-          },
-        },
-      ],
-    });
-  }
-
-  return {
-    paymentFilter,
-    where: andClauses.length > 0 ? { AND: andClauses } : {},
-  } satisfies { paymentFilter: BookingPaymentFilter | null; where: Prisma.BookingWhereInput };
-}
 
 async function getBookings(params: BookingSearchParams) {
   try {

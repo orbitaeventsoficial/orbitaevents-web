@@ -25,6 +25,7 @@ import {
 } from './economia-components';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
+import { RECOMMENDED_SELLING_PRICE_STEP } from '@/lib/constants/pricing';
 
 
 
@@ -569,11 +570,11 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                               </p>
                             </div>
                             <div className="flex flex-wrap items-center justify-end gap-2">
-                              <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${paymentStateBadge(row.depositPaid)}`}>
-                                Bestreta {row.depositPaid ? 'pagada' : 'pendent'}
+                              <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${paymentStateBadge(row.depositSettled)}`}>
+                                Bestreta {row.depositSettled ? 'coberta' : 'pendent'}
                               </span>
-                              <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${paymentStateBadge(row.remainingPaid)}`}>
-                                Saldo {row.remainingPaid ? 'pagat' : 'pendent'}
+                              <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${paymentStateBadge(row.remainingSettled)}`}>
+                                Saldo {row.remainingSettled ? 'cobert' : 'pendent'}
                               </span>
                               <span className="ap-badge">
                                 Veure detall
@@ -590,20 +591,20 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                             </Link>
                           </div>
                           <div className="mb-3 grid gap-2 sm:grid-cols-2">
-                            <div className={`ap-card p-3 ${row.depositPaid ? 'admin-tone-border-success admin-tone-bg-success' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
+                            <div className={`ap-card p-3 ${row.depositSettled ? 'admin-tone-border-success admin-tone-bg-success' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
                               <div className="flex items-center justify-between mb-1">
-                                <p className={`text-xs font-semibold ${row.depositPaid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>Bestreta</p>
-                                <p className={`text-sm font-bold ${row.depositPaid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>{money(row.depositAmount)}</p>
+                                <p className={`text-xs font-semibold ${row.depositSettled ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>Bestreta pendent</p>
+                                <p className={`text-sm font-bold ${row.depositSettled ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>{money(row.depositOutstandingAmount)}</p>
                               </div>
                               <p className="text-xs mb-2">
                                 Venciment: {formatDateSimple(row.depositDueAt)}
                               </p>
                               <PaymentToggleButton bookingId={row.id} field="depositPaid" currentValue={row.depositPaid} />
                             </div>
-                            <div className={`ap-card p-3 ${row.remainingPaid ? 'admin-tone-border-success admin-tone-bg-success' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
+                            <div className={`ap-card p-3 ${row.remainingSettled ? 'admin-tone-border-success admin-tone-bg-success' : 'admin-tone-border-danger admin-tone-bg-danger'}`}>
                               <div className="flex items-center justify-between mb-1">
-                                <p className={`text-xs font-semibold ${row.remainingPaid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>Saldo restant</p>
-                                <p className={`text-sm font-bold ${row.remainingPaid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>{money(row.remainingAmount)}</p>
+                                <p className={`text-xs font-semibold ${row.remainingSettled ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>Saldo pendent</p>
+                                <p className={`text-sm font-bold ${row.remainingSettled ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>{money(row.remainingOutstandingAmount)}</p>
                               </div>
                               <p className="text-xs mb-2">
                                 Venciment: {formatDateSimple(row.remainingDueAt)}
@@ -617,7 +618,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                           <PaymentReminderActions
                             bookingId={row.id}
                             phone={row.clientPhone}
-                            message={`Hola ${row.clientName}, et recordem el cobrament pendent del teu esdeveniment ${row.reference}. Gràcies.`}
+                            message={`Hola ${row.clientName}, et recordem el cobrament pendent (${money(row.outstandingAmount)}) del teu esdeveniment ${row.reference}. Gràcies.`}
                           />
                         </div>
                       </motion.details>
@@ -653,8 +654,8 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                           <p className="text-xs">{formatDateSimple(row.eventDate)}</p>
                         </div>
                         <div className="text-right shrink-0">
-                          {row.dueSoonDeposit && <p className="text-xs">Bestreta: {money(row.depositAmount)}</p>}
-                          {row.dueSoonRemaining && <p className="text-xs">Saldo: {money(row.remainingAmount)}</p>}
+                          {row.dueSoonDeposit && <p className="text-xs">Bestreta: {money(row.depositOutstandingAmount)}</p>}
+                          {row.dueSoonRemaining && <p className="text-xs">Saldo: {money(row.remainingOutstandingAmount)}</p>}
                         </div>
                         <Link href={buildBookingHref(row.id)} className="shrink-0 text-xs">
                           &rarr;
@@ -996,7 +997,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   <div>
                     <h2 className="ap-h2">Semàfor de packs (clar)</h2>
                     <p className="text-xs">
-                      Mostra PVP, hora extra, cost estimat i benefici real estimat per pack.
+                      Mostra PVP actual, PVP recomanat arrodonit amunt a {RECOMMENDED_SELLING_PRICE_STEP} €, hora extra, cost estimat i benefici real estimat per pack.
                     </p>
                   </div>
                   <p className="text-xs">
@@ -1020,16 +1021,18 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 </div>
 
                 <div className="mt-4 overflow-x-auto rounded-xl border border-[var(--line)]">
-                  <table className="min-w-[1250px] w-full text-sm" aria-label="Rendibilitat per pack">
+                  <table className="min-w-[1450px] w-full text-sm" aria-label="Rendibilitat per pack">
                     <thead className="">
                       <tr className="text-left text-xs uppercase tracking-wider">
                         <th scope="col" className="px-3 py-2">Pack</th>
                         <th scope="col" className="px-3 py-2">Semàfor</th>
                         <th scope="col" className="px-3 py-2 text-right">PVP</th>
+                        <th scope="col" className="px-3 py-2 text-right">PVP recomanat</th>
                         <th scope="col" className="px-3 py-2 text-right">Cost estimat</th>
                         <th scope="col" className="px-3 py-2 text-right">Benefici</th>
                         <th scope="col" className="px-3 py-2 text-right">Marge</th>
                         <th scope="col" className="px-3 py-2 text-right">Hora extra</th>
+                        <th scope="col" className="px-3 py-2 text-right">H. extra recom.</th>
                         <th scope="col" className="px-3 py-2 text-right">Cost/h extra</th>
                         <th scope="col" className="px-3 py-2 text-right">Benefici/h extra</th>
                         <th scope="col" className="px-3 py-2 text-right">Marge h extra</th>
@@ -1053,10 +1056,12 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                               </span>
                             </td>
                             <td className="px-3 py-2 text-right">{money(row.price)}</td>
+                            <td className="px-3 py-2 text-right font-semibold">{money(row.recommendedPrice)}</td>
                             <td className="px-3 py-2 text-right">{money(row.directCost)}</td>
                             <td className={`px-3 py-2 text-right font-semibold ${row.profit >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>{money(row.profit)}</td>
                             <td className="px-3 py-2 text-right">{pct(row.marginPct)}</td>
                             <td className="px-3 py-2 text-right">{money(row.extraHourPrice)}</td>
+                            <td className="px-3 py-2 text-right font-semibold">{money(row.recommendedExtraHourPrice)}</td>
                             <td className="px-3 py-2 text-right">{money(row.extraHourCostEstimated)}</td>
                             <td className={`px-3 py-2 text-right font-semibold ${row.extraHourProfit >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>{money(row.extraHourProfit)}</td>
                             <td className="px-3 py-2 text-right">{pct(row.extraHourMarginPct)}</td>

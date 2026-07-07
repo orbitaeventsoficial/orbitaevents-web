@@ -1,6 +1,7 @@
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import {
   findPortalAccessByRawToken,
   markPortalAccessHit,
@@ -95,7 +96,7 @@ export default async function ClientPortalTimelinePage({
 }: {
   params: { locale: string; token: string };
 }) {
-  const locale = normalizePortalLocale(params.locale) as ClientPortalLocale;
+  const locale = normalizePortalLocale(params.locale);
   const t = CLIENT_PORTAL_MESSAGES[locale];
   const intlLocale = toIntlLocale(locale);
 
@@ -113,20 +114,8 @@ export default async function ClientPortalTimelinePage({
 
   const accentHex = resolvePortalAccentHex(access.personalization);
 
-  const booking = access.booking as {
-    createdAt: Date;
-    eventDate: Date;
-    reference: string;
-    depositPaid: boolean;
-    depositPaidAt: Date | null;
-    remainingPaid: boolean;
-    remainingPaidAt: Date | null;
-  };
-
-  const proposals = (access.booking.proposals as Array<{
-    createdAt: Date;
-    contractSignedAt: Date | null;
-  }>);
+  const booking = access.booking;
+  const proposals = access.booking.proposals;
 
   const milestones = getClientPortalTimeline(booking, proposals);
 
@@ -157,12 +146,11 @@ export default async function ClientPortalTimelinePage({
           <ul className="space-y-0" aria-label={t.timelineLabel}>
             {milestones.map((milestone, idx) => {
               const msgKey = PORTAL_TIMELINE_MILESTONE_MESSAGE_KEYS[milestone.key];
-              const label = msgKey ? (t[msgKey] ?? milestone.key) : milestone.key;
               return (
                 <MilestoneRow
                   key={milestone.key}
                   milestone={milestone}
-                  label={label}
+                  label={t[msgKey]}
                   statusLabel={statusLabel(milestone.status)}
                   date={formatDate(milestone.date ? new Date(milestone.date) : null)}
                   isLast={idx === milestones.length - 1}
@@ -174,13 +162,14 @@ export default async function ClientPortalTimelinePage({
         </div>
 
         <footer className="mt-10 text-center">
-          <p className="text-xs text-white/15">Òrbita Events</p>
+          <p className="text-xs text-white/15">{SITE_CONFIG.business.name}</p>
         </footer>
       </div>
       <PortalBottomNav
         basePath={`/${locale}/portal/${params.token}`}
         accentHex={accentHex}
         labels={{
+          ariaLabel: t.portalNavigationLabel,
           hub: t.portalLabel,
           payments: t.payments,
           timeline: t.timelineLabel,

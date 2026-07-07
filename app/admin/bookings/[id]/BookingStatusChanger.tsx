@@ -28,7 +28,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [showConfirmComplete, setShowConfirmComplete] = useState(false);
-  const { confirm: confirmDialog, dialogProps } = useConfirmDialog();
+  const { dialogProps } = useConfirmDialog();
   const ref = useRef<HTMLDivElement>(null);
 
   const conf = getBookingStatusDisplay(currentStatus);
@@ -51,13 +51,14 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
   const updateStatus = async (newStatus: string) => {
     setIsLoading(true);
     setError(null);
+    setSuccessMsg(null);
     try {
       const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'Error canviant estat');
       router.refresh();
       const msgs: string[] = [];
@@ -68,6 +69,11 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
         setTimeout(() => setSuccessMsg(null), 5000);
       }
     } catch (err) {
+      console.error('[BookingStatusChanger] Error canviant estat de reserva', {
+        bookingId,
+        nextStatus: newStatus,
+        error: err,
+      });
       setError(err instanceof Error ? err.message : 'Error desconegut');
     } finally {
       setIsLoading(false);
@@ -84,6 +90,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
         disabled={isLoading}
         aria-haspopup="listbox"
         aria-expanded={open}
+        aria-invalid={error ? true : undefined}
         className={`inline-flex h-8 cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border pl-2.5 pr-3 text-sm font-semibold transition-opacity hover:opacity-80 disabled:cursor-wait disabled:opacity-60 ${conf.bg} ${conf.text} ${conf.border}`}
       >
         <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT[currentStatus] ?? 'bg-[var(--t3)]'}`} />
@@ -117,12 +124,12 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
       )}
 
       {successMsg && (
-        <p className="absolute top-full left-0 mt-1 text-xs text-[var(--o-success)] whitespace-nowrap pointer-events-none">
+        <p role="status" className="absolute top-full left-0 mt-1 text-xs text-[var(--o-success)] whitespace-nowrap pointer-events-none">
           ✓ {successMsg}
         </p>
       )}
       {error && (
-        <p className="absolute top-full left-0 mt-1 text-xs text-[var(--o-danger)] whitespace-nowrap pointer-events-none">
+        <p role="alert" className="absolute top-full left-0 mt-1 text-xs text-[var(--o-danger)] whitespace-nowrap pointer-events-none">
           ⚠ {error}
         </p>
       )}
@@ -142,6 +149,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
                 Cancel·lar
               </button>
               <button onClick={() => void updateStatus('COMPLETED')} disabled={isLoading} type="button"
+                aria-invalid={error ? true : undefined}
                 className="ap-btn ap-btn--primary">
                 {isLoading ? 'Actualitzant…' : 'Completar'}
               </button>

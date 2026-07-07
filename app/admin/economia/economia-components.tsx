@@ -100,7 +100,7 @@ export function PaymentTimelineBar({ row }: { row: PaymentRow }) {
   const depositPct = Math.max(0, Math.min(100, rawDepositPct));
   const remainingPct = 100 - depositPct;
 
-  const depositColor = row.depositPaid
+  const depositColor = row.depositSettled
     ? 'bg-[var(--o-success)]'
     : row.overdueDeposit
       ? 'bg-[var(--o-danger)]'
@@ -108,7 +108,7 @@ export function PaymentTimelineBar({ row }: { row: PaymentRow }) {
         ? 'bg-[var(--o-warning)]'
         : 'bg-[var(--raised)]';
 
-  const remainingColor = row.remainingPaid
+  const remainingColor = row.remainingSettled
     ? 'bg-[var(--o-success)]'
     : row.overdueRemaining
       ? 'bg-[var(--o-danger)]'
@@ -116,8 +116,8 @@ export function PaymentTimelineBar({ row }: { row: PaymentRow }) {
         ? 'bg-[var(--o-warning)]'
         : 'bg-[var(--raised)]';
 
-  const depositLabel = `Diposit: ${money(row.depositAmount)} ${row.depositPaid ? '(pagat)' : '(pendent)'}`;
-  const remainingLabel = `Resta: ${money(row.remainingAmount)} ${row.remainingPaid ? '(pagat)' : '(pendent)'}`;
+  const depositLabel = `Diposit pendent: ${money(row.depositOutstandingAmount)} ${row.depositSettled ? '(cobert)' : '(pendent)'}`;
+  const remainingLabel = `Resta pendent: ${money(row.remainingOutstandingAmount)} ${row.remainingSettled ? '(coberta)' : '(pendent)'}`;
 
   return (
     <div className="space-y-1" {...helpAttrs(ADMIN_ECONOMY_HELP.paymentTimeline)}>
@@ -156,10 +156,10 @@ export function PaymentTimelineBar({ row }: { row: PaymentRow }) {
       <div className="flex justify-between text-xs text-[var(--t3)]">
         <span className="flex items-center gap-1">
           <span className={`inline-block w-1.5 h-1.5 rounded-full ${depositColor}`} />
-          Diposit {row.depositPaid ? '✓' : ''}
+          Diposit {row.depositSettled ? '✓' : ''}
         </span>
         <span className="flex items-center gap-1">
-          Resta {row.remainingPaid ? '✓' : ''}
+          Resta {row.remainingSettled ? '✓' : ''}
           <span className={`inline-block w-1.5 h-1.5 rounded-full ${remainingColor}`} />
         </span>
       </div>
@@ -200,7 +200,7 @@ export function CobramentFiltersSection({
 
     switch (filter) {
       case 'pendents':
-        rows = rows.filter((r) => !r.depositPaid || !r.remainingPaid);
+        rows = rows.filter((r) => r.outstandingAmount > 0);
         break;
       case 'vencits':
         rows = rows.filter((r) => r.overdueDeposit || r.overdueRemaining);
@@ -209,7 +209,7 @@ export function CobramentFiltersSection({
         rows = rows.filter((r) => r.dueSoonDeposit || r.dueSoonRemaining);
         break;
       case 'pagats':
-        rows = rows.filter((r) => r.depositPaid && r.remainingPaid);
+        rows = rows.filter((r) => r.outstandingAmount <= 0);
         break;
     }
 
@@ -271,17 +271,21 @@ export function CobramentFiltersSection({
     Total: r.total,
     Diposit: r.depositAmount,
     'Diposit pagat': r.depositPaid ? 'Sí' : 'No',
+    'Diposit pendent': r.depositOutstandingAmount,
     Resta: r.remainingAmount,
     'Resta pagat': r.remainingPaid ? 'Sí' : 'No',
+    'Resta pendent': r.remainingOutstandingAmount,
+    'Pendent total': r.outstandingAmount,
+    'Efectiu registrat': r.cashAmount ?? 0,
     Estat: r.status,
   }));
 
   const filterChips: { id: PaymentFilter; label: string; count?: number }[] = [
     { id: 'tots', label: 'Tots', count: allRows.length },
-    { id: 'pendents', label: 'Pendents', count: allRows.filter((r) => !r.depositPaid || !r.remainingPaid).length },
+    { id: 'pendents', label: 'Pendents', count: allRows.filter((r) => r.outstandingAmount > 0).length },
     { id: 'vencits', label: 'Vencits', count: overdueDepositCount + overdueRemainingCount },
     { id: 'proxims', label: 'Pròxims 7d', count: dueSoonDepositCount + dueSoonRemainingCount },
-    { id: 'pagats', label: 'Pagats', count: allRows.filter((r) => r.depositPaid && r.remainingPaid).length },
+    { id: 'pagats', label: 'Pagats', count: allRows.filter((r) => r.outstandingAmount <= 0).length },
   ];
 
   return (
@@ -309,8 +313,12 @@ export function CobramentFiltersSection({
                 { header: 'Total', accessor: (r) => Number(r.Total || 0) },
                 { header: 'Dipòsit', accessor: (r) => Number(r.Diposit || 0) },
                 { header: 'Dipòsit pagat', accessor: (r) => String(r['Diposit pagat'] || '') },
+                { header: 'Dipòsit pendent', accessor: (r) => Number(r['Diposit pendent'] || 0) },
                 { header: 'Resta', accessor: (r) => Number(r.Resta || 0) },
                 { header: 'Resta pagat', accessor: (r) => String(r['Resta pagat'] || '') },
+                { header: 'Resta pendent', accessor: (r) => Number(r['Resta pendent'] || 0) },
+                { header: 'Pendent total', accessor: (r) => Number(r['Pendent total'] || 0) },
+                { header: 'Efectiu registrat', accessor: (r) => Number(r['Efectiu registrat'] || 0) },
                 { header: 'Estat', accessor: (r) => String(r.Estat || '') },
               ]}
             />
@@ -389,7 +397,7 @@ export function CobramentFiltersSection({
               <th scope="col" className="px-2 py-2 hidden md:table-cell">Progrés</th>
               <th scope="col" className="px-2 py-2 text-right">Dipòsit</th>
               <th scope="col" className="px-2 py-2 text-right">Resta</th>
-              <th scope="col" className="px-2 py-2 text-right hidden sm:table-cell">Total</th>
+              <th scope="col" className="px-2 py-2 text-right hidden sm:table-cell">Pendent</th>
               <th scope="col" className="px-2 py-2 w-10"></th>
             </tr>
           </thead>
@@ -418,16 +426,16 @@ export function CobramentFiltersSection({
                   <PaymentTimelineBar row={row} />
                 </td>
                 <td className="px-2 py-2 text-right">
-                  <span className={`text-xs font-medium ${row.depositPaid ? 'admin-tone-text-success' : row.overdueDeposit ? 'admin-tone-text-danger' : 'text-[var(--t2)]'}`}>
-                    {money(row.depositAmount)}
+                  <span className={`text-xs font-medium ${row.depositSettled ? 'admin-tone-text-success' : row.overdueDeposit ? 'admin-tone-text-danger' : 'text-[var(--t2)]'}`}>
+                    {money(row.depositOutstandingAmount)}
                   </span>
                 </td>
                 <td className="px-2 py-2 text-right">
-                  <span className={`text-xs font-medium ${row.remainingPaid ? 'admin-tone-text-success' : row.overdueRemaining ? 'admin-tone-text-danger' : 'text-[var(--t2)]'}`}>
-                    {money(row.remainingAmount)}
+                  <span className={`text-xs font-medium ${row.remainingSettled ? 'admin-tone-text-success' : row.overdueRemaining ? 'admin-tone-text-danger' : 'text-[var(--t2)]'}`}>
+                    {money(row.remainingOutstandingAmount)}
                   </span>
                 </td>
-                <td className="px-2 py-2 text-right hidden sm:table-cell font-semibold text-xs">{money(row.total)}</td>
+                <td className="px-2 py-2 text-right hidden sm:table-cell font-semibold text-xs">{money(row.outstandingAmount)}</td>
                 <td className="px-2 py-2">
                   <Link
                     href={buildBookingHref(row.id)}

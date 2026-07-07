@@ -40,7 +40,7 @@ function futureDate(daysAhead: number): Date {
 }
 
 function makeBooking(overrides: Record<string, unknown> = {}) {
-  return {
+  const booking = {
     id: 'booking-1',
     reference: 'ORB-001',
     clientName: 'Joan Garcia',
@@ -48,11 +48,17 @@ function makeBooking(overrides: Record<string, unknown> = {}) {
     eventDate: futureDate(10),
     total: 3000,
     depositAmount: 1000,
+    remainingAmount: 2000,
     depositPaid: false,
     remainingPaid: false,
+    cashAmount: null,
     preferredLocale: 'ca',
     ...overrides,
   };
+  if (!Object.prototype.hasOwnProperty.call(overrides, 'remainingAmount')) {
+    booking.remainingAmount = Number(booking.total || 0) - Number(booking.depositAmount || 0);
+  }
+  return booking;
 }
 
 // ─── Tests ──────────────────────────────────────────────────────────────────
@@ -78,6 +84,14 @@ describe('sendPaymentReminders', () => {
       expect.objectContaining({
         to: 'joan@example.com',
         subject: expect.stringContaining('ORB-001'),
+      }),
+    );
+    expect(mockPrisma.booking.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        select: expect.objectContaining({
+          remainingAmount: true,
+          cashAmount: true,
+        }),
       }),
     );
     expect(mockPrisma.adminLog.create).toHaveBeenCalledOnce();
@@ -132,6 +146,21 @@ describe('sendPaymentReminders', () => {
     expect(mockSendEmail).not.toHaveBeenCalled();
   });
 
+  it('salta si l\'efectiu cobreix tot el pendent encara que els flags siguin falsos', async () => {
+    mockPrisma.booking.findMany.mockResolvedValue([
+      makeBooking({ total: 3000, depositAmount: 1000, remainingAmount: 2000, cashAmount: 3000 }),
+    ]);
+    mockPrisma.adminLog.findFirst.mockResolvedValue(null);
+
+    const result = await sendPaymentReminders();
+
+    expect(result.checked).toBe(1);
+    expect(result.skipped).toBe(1);
+    expect(result.sent).toBe(0);
+    expect(mockSendEmail).not.toHaveBeenCalled();
+    expect(mockPrisma.adminLog.create).not.toHaveBeenCalled();
+  });
+
   it('calcula correctament import pendent (dipòsit + resta)', async () => {
     mockPrisma.booking.findMany.mockResolvedValue([
       makeBooking({ total: 5000, depositAmount: 2000, depositPaid: false, remainingPaid: false }),
@@ -149,6 +178,35 @@ describe('sendPaymentReminders', () => {
         }),
       }),
     );
+  });
+
+  it('resta efectiu parcial i no llista el tram que ja queda cobert', async () => {
+    mockPrisma.booking.findMany.mockResolvedValue([
+      makeBooking({
+        total: 3000,
+        depositAmount: 1000,
+        remainingAmount: 2000,
+        depositPaid: false,
+        remainingPaid: false,
+        cashAmount: 1000,
+      }),
+    ]);
+    mockPrisma.adminLog.findFirst.mockResolvedValue(null);
+    mockPrisma.adminLog.create.mockResolvedValue({});
+
+    await sendPaymentReminders();
+
+    expect(mockPrisma.adminLog.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          details: expect.objectContaining({ pendingAmount: 2000 }),
+        }),
+      }),
+    );
+    const email = mockSendEmail.mock.calls[0]?.[0] as { html: string };
+    expect(email.html).toContain('Import pendent: 2000 €');
+    expect(email.html).toContain('<li>Resta: 2000 €</li>');
+    expect(email.html).not.toContain('<li>Dipòsit:');
   });
 
   it('envia només resta si dipòsit ja pagat', async () => {

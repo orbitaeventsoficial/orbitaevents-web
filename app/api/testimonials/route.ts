@@ -12,18 +12,28 @@ function resolveLocale(request: NextRequest): PublicTestimonialApiLocale {
   return 'es';
 }
 
+const optionalContextString = z.union([z.string(), z.null(), z.undefined()]).transform((value) => {
+  const trimmed = typeof value === 'string' ? value.trim() : '';
+  return trimmed || undefined;
+});
+
+const optionalUrlString = z.preprocess((value) => {
+  if (typeof value !== 'string') return undefined;
+  return value.trim() || undefined;
+}, z.string().url().optional());
+
 const testimonialSchema = z.object({
   rating: z.number().min(1).max(5),
-  comment: z.string().min(10),
-  name: z.string().min(2),
-  email: z.string().email(),
-  phone: z.string().optional(),
-  photoUrl: z.string().url().optional().or(z.literal('')),
-  videoUrl: z.string().url().optional().or(z.literal('')),
+  comment: z.string().trim().min(10),
+  name: z.string().trim().min(2),
+  email: z.string().trim().email(),
+  phone: z.string().trim().optional(),
+  photoUrl: optionalUrlString,
+  videoUrl: optionalUrlString,
   allowGoogleShare: z.boolean().default(false),
   consentPhotoPublication: z.boolean().default(false),
-  token: z.string().optional(),
-  bookingRef: z.string().optional(),
+  token: optionalContextString,
+  bookingRef: optionalContextString,
 });
 
 export async function POST(request: NextRequest) {

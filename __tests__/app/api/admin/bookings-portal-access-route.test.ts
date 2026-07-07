@@ -36,6 +36,14 @@ function makePostReq(id: string, body: Record<string, unknown> = {}) {
     params: { params: { id } },
   };
 }
+function makeRawPostReq(id: string, body: string) {
+  return {
+    req: new NextRequest(`http://localhost/api/admin/bookings/${id}/portal-access`, {
+      method: 'POST', body, headers: { 'Content-Type': 'application/json' },
+    }),
+    params: { params: { id } },
+  };
+}
 function makeDeleteReq(id = 'book-1') {
   return { req: new NextRequest(`http://localhost/api/admin/bookings/${id}/portal-access`, { method: 'DELETE' }), params: { params: { id } } };
 }
@@ -91,6 +99,95 @@ describe('POST /api/admin/bookings/[id]/portal-access', () => {
     expect(body.ok).toBe(true);
     expect(body.url).toBe('https://portal.test/abc');
     expect(body.token).toBe('tok-1');
+  });
+
+  it('tolera body JSON no objecte sense trencar la route', async () => {
+    const { req, params } = makeRawPostReq('book-1', 'null');
+
+    const res = await POST(req, params);
+
+    expect(res.status).toBe(200);
+    expect(mockNormalizeLocale).toHaveBeenCalledWith(undefined);
+    expect(mockIssue).toHaveBeenCalledWith(expect.objectContaining({
+      expiresInDays: undefined,
+      personalization: undefined,
+    }));
+  });
+
+  it('preserva la visibilitat del qüestionari dins la personalització', async () => {
+    const { req, params } = makePostReq('book-1', {
+      locale: 'ca',
+      personalization: { showQuestionnaire: false },
+    });
+
+    await POST(req, params);
+
+    expect(mockIssue).toHaveBeenCalledWith(
+      expect.objectContaining({
+        personalization: expect.objectContaining({
+          showQuestionnaire: false,
+        }),
+      }),
+    );
+  });
+
+  it('no persisteix flags visibles perquè true és el default del portal', async () => {
+    const { req, params } = makePostReq('book-1', {
+      locale: 'ca',
+      personalization: {
+        showTimeline: true,
+        showPayments: true,
+        showDocuments: true,
+        showPostEvent: true,
+        showQuestionnaire: true,
+      },
+    });
+
+    await POST(req, params);
+
+    expect(mockIssue).toHaveBeenCalledWith(
+      expect.objectContaining({
+        personalization: undefined,
+      }),
+    );
+  });
+
+  it('normalitza el color accent abans de guardar-lo', async () => {
+    const { req, params } = makePostReq('book-1', {
+      locale: 'ca',
+      personalization: {
+        accentColor: ' 06b6d4 ',
+      },
+    });
+
+    await POST(req, params);
+
+    expect(mockIssue).toHaveBeenCalledWith(
+      expect.objectContaining({
+        personalization: expect.objectContaining({
+          accentColor: '#06b6d4',
+        }),
+      }),
+    );
+  });
+
+  it('descarta el color accent invàlid', async () => {
+    const { req, params } = makePostReq('book-1', {
+      locale: 'ca',
+      personalization: {
+        accentColor: '#1234',
+      },
+    });
+
+    await POST(req, params);
+
+    expect(mockIssue).toHaveBeenCalledWith(
+      expect.objectContaining({
+        personalization: expect.not.objectContaining({
+          accentColor: expect.any(String),
+        }),
+      }),
+    );
   });
 
   it('retorna 404 si booking no existeix', async () => {

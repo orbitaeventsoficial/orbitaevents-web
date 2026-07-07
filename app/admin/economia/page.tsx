@@ -11,14 +11,9 @@ import { buildCacAnalysis } from '@/lib/services/cacAnalysis';
 import { fetchCanonicalCommunicationEventsForBookings } from '@/lib/services/timelineQueryService';
 import { readPackPricingModelHistory, readProfitabilityConfigHistory } from '@/lib/services/adminConfigHistoryService';
 import EconomiaClient from './EconomiaClient';
+import { buildEconomiaPaymentRow, summarizeEconomiaPaymentRows } from './economia-payments';
 
 export const dynamic = 'force-dynamic';
-
-function addDays(date: Date, days: number) {
-  const d = new Date(date);
-  d.setDate(d.getDate() + days);
-  return d;
-}
 
 function startOfMonth(date: Date) {
   return new Date(date.getFullYear(), date.getMonth(), 1);
@@ -27,7 +22,6 @@ function startOfMonth(date: Date) {
 export default async function EconomiaPage() {
   const now = new Date();
   const monthStart = startOfMonth(now);
-  const weekAhead = addDays(now, 7);
 
   // ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢
   // 1. FINANCES DATA
@@ -47,6 +41,7 @@ export default async function EconomiaPage() {
     remainingAmount: number;
     remainingPaid: boolean;
     remainingPaidAt: Date | null;
+    cashAmount: number | null;
   }> = [];
 
   let canonicalCommEventsByBooking: Record<string, Awaited<ReturnType<typeof fetchCanonicalCommunicationEventsForBookings>>[string]> = {};
@@ -69,6 +64,7 @@ export default async function EconomiaPage() {
         remainingAmount: true,
         remainingPaid: true,
         remainingPaidAt: true,
+        cashAmount: true,
       },
       take: 500,
     });
@@ -86,53 +82,22 @@ export default async function EconomiaPage() {
   }
 
   const rows = bookings.map((booking) => {
-    const depositDueAt = addDays(new Date(booking.eventDate), -30);
-    const remainingDueAt = addDays(new Date(booking.eventDate), -7);
-    const overdueDeposit = !booking.depositPaid && depositDueAt < now;
-    const overdueRemaining = !booking.remainingPaid && remainingDueAt < now;
-    const dueSoonDeposit = !booking.depositPaid && depositDueAt >= now && depositDueAt <= weekAhead;
-    const dueSoonRemaining = !booking.remainingPaid && remainingDueAt >= now && remainingDueAt <= weekAhead;
     const paymentFlow = deriveFlowStatusFromTimeline(canonicalCommEventsByBooking[booking.id] || [], 'PAYMENT');
 
-    return {
-      ...booking,
-      eventDate: booking.eventDate.toISOString(),
-      depositPaidAt: booking.depositPaidAt?.toISOString() ?? null,
-      remainingPaidAt: booking.remainingPaidAt?.toISOString() ?? null,
-      depositDueAt: depositDueAt.toISOString(),
-      remainingDueAt: remainingDueAt.toISOString(),
-      overdueDeposit,
-      overdueRemaining,
-      dueSoonDeposit,
-      dueSoonRemaining,
+    return buildEconomiaPaymentRow(booking, {
+      now,
       paymentFlowState: paymentFlow.state,
-    };
+    });
   });
 
-  const outstandingTotal = rows.reduce((sum, row) => {
-    return sum + (row.depositPaid ? 0 : row.depositAmount) + (row.remainingPaid ? 0 : row.remainingAmount);
-  }, 0);
-  const overdueTotal = rows.reduce((sum, row) => {
-    return sum + (row.overdueDeposit ? row.depositAmount : 0) + (row.overdueRemaining ? row.remainingAmount : 0);
-  }, 0);
-  const dueSoonTotal = rows.reduce((sum, row) => {
-    return sum + (row.dueSoonDeposit ? row.depositAmount : 0) + (row.dueSoonRemaining ? row.remainingAmount : 0);
-  }, 0);
-  const monthCollected = rows.reduce((sum, row) => {
-    const depositCollected = row.depositPaidAt && new Date(row.depositPaidAt) >= monthStart ? row.depositAmount : 0;
-    const remainingCollected = row.remainingPaidAt && new Date(row.remainingPaidAt) >= monthStart ? row.remainingAmount : 0;
-    return sum + depositCollected + remainingCollected;
-  }, 0);
-
-  const atRiskRows = rows
-    .filter((row) => row.overdueDeposit || row.overdueRemaining)
-    .sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime())
-    .slice(0, 30);
-
-  const upcomingDueRows = rows
-    .filter((row) => row.dueSoonDeposit || row.dueSoonRemaining)
-    .sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime())
-    .slice(0, 30);
+  const {
+    outstandingTotal,
+    overdueTotal,
+    dueSoonTotal,
+    monthCollected,
+    atRiskRows,
+    upcomingDueRows,
+  } = summarizeEconomiaPaymentRows(rows, monthStart);
 
   // ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢
   // 2. PROFITABILITY DATA

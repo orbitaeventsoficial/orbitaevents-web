@@ -23,6 +23,7 @@ export default function ReferralsClient({ summary }: Props) {
   const [filter, setFilter] = useState<'ALL' | ReferralCandidate['priority']>('ALL');
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState<string | null>(null);
+  const [copyError, setCopyError] = useState<{ candidateId: string; message: string } | null>(null);
 
   const visibleCandidates = useMemo(() => {
     return summary.candidates.filter((c) => {
@@ -41,12 +42,20 @@ export default function ReferralsClient({ summary }: Props) {
   }
 
   async function handleCopyMessage(candidate: ReferralCandidate) {
+    setCopyError(null);
     try {
       await navigator.clipboard.writeText(candidate.suggestedMessage);
       setCopied(candidate.id);
       setTimeout(() => setCopied(null), 2000);
-    } catch {
-      // navigator.clipboard not available
+    } catch (error) {
+      console.error('[ReferralsClient] Error copiant missatge de referral', {
+        candidateId: candidate.id,
+        error,
+      });
+      setCopyError({
+        candidateId: candidate.id,
+        message: 'No s\'ha pogut copiar el missatge.',
+      });
     }
   }
 
@@ -226,6 +235,8 @@ export default function ReferralsClient({ summary }: Props) {
                   <button
                     type="button"
                     onClick={() => handleCopyMessage(c)}
+                    aria-invalid={copyError?.candidateId === c.id ? true : undefined}
+                    aria-describedby={copyError?.candidateId === c.id ? `referral-copy-error-${c.id}` : undefined}
                     className="ap-btn ap-btn--xs flex-1 sm:flex-none"
                   >
                     {copied === c.id ? '✓ Copiat' : 'Copiar missatge'}
@@ -244,6 +255,15 @@ export default function ReferralsClient({ summary }: Props) {
                     Descartar
                   </button>
                 </div>
+                {copyError?.candidateId === c.id && (
+                  <p
+                    id={`referral-copy-error-${c.id}`}
+                    role="alert"
+                    className="ap-card-body pt-0 text-xs admin-tone-text-danger"
+                  >
+                    {copyError.message}
+                  </p>
+                )}
               </article>
             ))}
           </div>

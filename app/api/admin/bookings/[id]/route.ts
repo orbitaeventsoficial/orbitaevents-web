@@ -23,6 +23,11 @@ type DeleteBookingPayload = {
 };
 
 const MANAGED_BOOKING_STATUSES: ManagedBookingStatus[] = ['PENDING', 'CONFIRMED', 'PREPARING', 'COMPLETED', 'CANCELLED'];
+const EVENT_TYPES = ['WEDDING', 'BIRTHDAY', 'CORPORATE', 'COMMUNION', 'BAPTISM', 'GRADUATION', 'ANNIVERSARY', 'PRIVATE_PARTY', 'OTHER'] as const;
+const requiredTrimmedString = z.string().trim().min(1);
+const optionalTrimmedString = z.string().trim().optional();
+const nullableTrimmedString = z.string().trim().nullable().optional();
+const nullableTrimmedNonEmptyString = z.string().trim().min(1).nullable().optional();
 
 function isDeleteBookingPayload(value: unknown): value is DeleteBookingPayload {
   if (!value || typeof value !== 'object') return false;
@@ -36,47 +41,53 @@ function isDeleteBookingPayload(value: unknown): value is DeleteBookingPayload {
 }
 
 const serviceLineSchema = z.object({
-  collaboratorId: z.string().nullable().optional(),
+  collaboratorId: nullableTrimmedNonEmptyString,
   sortOrder: z.number().int().optional(),
-  partyType: z.string().nullable().optional(),
+  partyType: nullableTrimmedString,
   kind: z.enum(['DJ', 'SOUND_TECH', 'PROVIDER_SERVICE', 'EQUIPMENT', 'OTHER']).optional(),
-  label: z.string().min(1),
+  label: requiredTrimmedString,
   revenueAmount: z.number().min(0).nullable().optional(),
   costAmount: z.number().nullable().optional(),
   quantity: z.number().int().positive().nullable().optional(),
   hours: z.number().positive().nullable().optional(),
-  notes: z.string().nullable().optional(),
+  notes: nullableTrimmedString,
 });
 
 const updateBookingSchema = z.object({
   status: z.enum(['PENDING', 'CONFIRMED', 'PREPARING', 'COMPLETED', 'CANCELLED']).optional(),
-  eventDate: z.string().optional(),
-  eventLocation: z.string().optional(),
-  sourceCollaboratorId: z.string().nullable().optional(),
-  billedCollaboratorId: z.string().nullable().optional(),
+  clientName: requiredTrimmedString.optional(),
+  clientEmail: z.string().trim().email().optional(),
+  clientPhone: requiredTrimmedString.optional(),
+  eventType: z.enum(EVENT_TYPES).optional(),
+  eventDate: requiredTrimmedString.optional(),
+  eventLocation: requiredTrimmedString.optional(),
+  sourceCollaboratorId: nullableTrimmedNonEmptyString,
+  billedCollaboratorId: nullableTrimmedNonEmptyString,
   guestCount: z.number().optional(),
-  eventVenue: z.string().optional(),
+  eventVenue: optionalTrimmedString,
   totalPrice: z.number().positive().optional(),
   depositAmount: z.number().min(0).optional(),
   depositPaid: z.boolean().optional(),
-  depositPaidAt: z.string().nullable().optional(),
+  depositPaidAt: nullableTrimmedString,
   remainingAmount: z.number().min(0).optional(),
   remainingPaid: z.boolean().optional(),
-  remainingPaidAt: z.string().nullable().optional(),
-  notes: z.string().optional(),
-  internalNotes: z.string().optional(),
-  startTime: z.string().optional(),
-  endTime: z.string().optional(),
+  remainingPaidAt: nullableTrimmedString,
+  notes: optionalTrimmedString,
+  internalNotes: optionalTrimmedString,
+  startTime: optionalTrimmedString,
+  endTime: optionalTrimmedString,
   distanceKm: z.number().min(0).optional(),
   fuelCostPerKm: z.number().min(0).optional(),
+  tollsEur: z.number().min(0).optional(),
   travelCost: z.number().min(0).optional(),
+  discount: z.number().min(0).optional(),
   paymentMethod: z.enum(['INVOICE', 'CASH', 'TRANSFER']).optional(),
   invoiceRequired: z.boolean().optional(),
   cashAmount: z.number().min(0).nullable().optional(),
-  eventPhone: z.string().nullable().optional(),
-  eventAddress: z.string().nullable().optional(),
-  eventStartTime: z.string().nullable().optional(),
-  eventEndTime: z.string().nullable().optional(),
+  eventPhone: nullableTrimmedString,
+  eventAddress: nullableTrimmedString,
+  eventStartTime: nullableTrimmedString,
+  eventEndTime: nullableTrimmedString,
   serviceLines: z.array(serviceLineSchema).optional(),
 }).strict().superRefine((data, ctx) => {
   const issue = findCollaboratorLinesWithoutCost(data.serviceLines ?? [])[0];

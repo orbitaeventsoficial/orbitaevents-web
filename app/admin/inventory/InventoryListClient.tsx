@@ -115,8 +115,10 @@ export default function InventoryListClient() {
   const loadBundles = useCallback(async () => {
     try {
       const res = await fetchWithCsrf('/api/admin/inventory/bundles');
-      if (!res.ok) return;
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as { bundles?: BundleApiItem[]; error?: string; message?: string };
+      if (!res.ok) {
+        throw new Error(data.error || data.message || 'No s\'han pogut carregar els lots.');
+      }
       const next = Array.isArray(data?.bundles)
         ? data.bundles.map((b: BundleApiItem) => ({
             id: String(b.id),
@@ -126,8 +128,10 @@ export default function InventoryListClient() {
         : [];
       setBundles(next);
       if (!selectedBundleId && next.length > 0) setSelectedBundleId(next[0].id);
-    } catch {
-      setBundleMessage('No s\'han pogut carregar els lots.');
+      setBundleMessage(null);
+    } catch (error) {
+      log.error('[Inventory] Error carregant lots', error);
+      setBundleMessage(error instanceof Error ? error.message : 'No s\'han pogut carregar els lots.');
     }
   }, [selectedBundleId]);
 

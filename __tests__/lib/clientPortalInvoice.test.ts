@@ -61,6 +61,15 @@ describe('getClientPortalInvoiceSummary', () => {
     expect(getClientPortalInvoiceSummary(booking, []).allPaid).toBe(true);
   });
 
+  it('allPaid true quan cashAmount cobreix tot encara que els flags siguin falsos', () => {
+    const booking = makeBooking({ total: 1000, cashAmount: 1000 });
+    const result = getClientPortalInvoiceSummary(booking, []);
+
+    expect(result.allPaid).toBe(true);
+    expect(result.deposit.paid).toBe(true);
+    expect(result.remaining.paid).toBe(true);
+  });
+
   it('allPaid false si qualsevol import pendent', () => {
     expect(getClientPortalInvoiceSummary(makeBooking({ depositPaid: true }), []).allPaid).toBe(false);
     expect(getClientPortalInvoiceSummary(makeBooking(), []).allPaid).toBe(false);

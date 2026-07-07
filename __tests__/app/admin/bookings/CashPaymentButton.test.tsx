@@ -52,11 +52,18 @@ describe('CashPaymentButton', () => {
     await waitFor(() => expect(screen.getByText(/Cobrat en efectiu ·/)).toBeInTheDocument());
   });
 
-  it('mostra error i no canvia si el PATCH falla', async () => {
-    mockFetchWithCsrf.mockResolvedValue({ ok: false });
+  it('mostra error visible i no canvia si el PATCH falla', async () => {
+    mockFetchWithCsrf.mockResolvedValue({
+      ok: false,
+      json: async () => ({ error: 'Import no validat' }),
+    });
     render(<CashPaymentButton bookingId="b1" total={500} fullyPaid={false} />);
     fireEvent.click(screen.getByRole('button', { name: /Cobrat en efectiu/ }));
-    await waitFor(() => expect(toastApi.error).toHaveBeenCalled());
-    expect(screen.getByRole('button', { name: /Cobrat en efectiu/ })).toBeInTheDocument();
+
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Import no validat'));
+
+    expect(toastApi.error).toHaveBeenCalledWith('Import no validat');
+    expect(screen.getByRole('button', { name: /Cobrat en efectiu/ })).toHaveAttribute('aria-invalid', 'true');
+    expect(mockRefresh).not.toHaveBeenCalled();
   });
 });

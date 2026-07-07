@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useId } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
+import { getClientPortalGalleryPhotoLabel } from '@/lib/clientPortalMessages';
 
 type Photo = {
   id: string;
@@ -15,8 +16,10 @@ type GalleryLabels = {
   galleryClose: string;
   galleryDownload: string;
   galleryOf: string;
+  galleryPhotoLabel: string;
   galleryPrev: string;
   galleryNext: string;
+  opensInNewTab: string;
 };
 
 type Props = {
@@ -27,6 +30,7 @@ type Props = {
 export default function GalleryClient({ photos, labels }: Props) {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const shouldReduceMotion = useReducedMotion();
+  const photoPositionId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
   const touchStartX = useRef<number>(0);
 
@@ -83,33 +87,45 @@ export default function GalleryClient({ photos, labels }: Props) {
     : { duration: 0.22, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] };
 
   const selectedPhoto = selectedIdx !== null ? photos[selectedIdx] : null;
+  const selectedPhotoLabel = selectedPhoto !== null && selectedIdx !== null
+    ? getClientPortalGalleryPhotoLabel(labels.galleryPhotoLabel, selectedPhoto.caption, selectedIdx)
+    : labels.gallery;
+  const downloadNewTabLabel = `${labels.galleryDownload} (${labels.opensInNewTab})`;
 
   return (
     <>
       <div className="columns-2 sm:columns-3 md:columns-4 gap-3 space-y-3">
-        {photos.map((photo, idx) => (
-          <button
-            key={photo.id}
-            type="button"
-            className="group relative block w-full overflow-hidden rounded-xl border border-white/[0.06] bg-white/5 hover:border-white/20 transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
-            onClick={() => open(idx)}
-            aria-label={photo.caption || `${labels.gallery} ${idx + 1}`}
-          >
-            <Image
-              src={photo.photoUrl}
-              alt={photo.caption || `${labels.gallery} ${idx + 1}`}
-              width={400}
-              height={400}
-              className="w-full object-cover transition-transform duration-300 group-hover:scale-105"
-              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
-            />
-            {photo.caption && (
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-2 text-xs text-white/80 opacity-0 group-hover:opacity-100 transition-opacity">
-                {photo.caption}
-              </div>
-            )}
-          </button>
-        ))}
+        {photos.map((photo, idx) => {
+          const photoLabel = getClientPortalGalleryPhotoLabel(
+            labels.galleryPhotoLabel,
+            photo.caption,
+            idx,
+          );
+
+          return (
+            <button
+              key={photo.id}
+              type="button"
+              className="group relative block w-full overflow-hidden rounded-xl border border-white/[0.06] bg-white/5 hover:border-white/20 transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+              onClick={() => open(idx)}
+              aria-label={photoLabel}
+            >
+              <Image
+                src={photo.photoUrl}
+                alt={photoLabel}
+                width={400}
+                height={400}
+                className="w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+              />
+              {photo.caption && (
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-2 text-xs text-white/80 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {photo.caption}
+                </div>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       <AnimatePresence>
@@ -118,7 +134,8 @@ export default function GalleryClient({ photos, labels }: Props) {
             className="fixed inset-0 z-50 flex items-center justify-center"
             role="dialog"
             aria-modal="true"
-            aria-label={labels.gallery}
+            aria-label={selectedPhotoLabel}
+            aria-describedby={photoPositionId}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -142,7 +159,7 @@ export default function GalleryClient({ photos, labels }: Props) {
             >
               <Image
                 src={selectedPhoto.photoUrl}
-                alt={selectedPhoto.caption || labels.gallery}
+                alt={selectedPhotoLabel}
                 width={1200}
                 height={900}
                 className="max-h-[80vh] max-w-[88vw] rounded-xl object-contain shadow-2xl"
@@ -157,7 +174,10 @@ export default function GalleryClient({ photos, labels }: Props) {
 
             {/* Top controls */}
             <div className="absolute inset-x-0 top-4 z-10 flex items-center justify-between px-4">
-              <span className="rounded-full bg-black/60 px-3 py-1 text-xs text-white/50 backdrop-blur-sm">
+              <span
+                id={photoPositionId}
+                className="rounded-full bg-black/60 px-3 py-1 text-xs text-white/50 backdrop-blur-sm"
+              >
                 {selectedIdx + 1} {labels.galleryOf} {photos.length}
               </span>
               <div className="flex items-center gap-2">
@@ -167,8 +187,8 @@ export default function GalleryClient({ photos, labels }: Props) {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white/60 hover:text-white backdrop-blur-sm transition-colors"
-                  aria-label={labels.galleryDownload}
-                  title={labels.galleryDownload}
+                  aria-label={downloadNewTabLabel}
+                  title={downloadNewTabLabel}
                 >
                   <svg width={15} height={15} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />

@@ -174,6 +174,19 @@ describe('createSocialPost', () => {
     expect(call.data.scheduledAt).toBeInstanceOf(Date);
   });
 
+  it('bloqueja programar post-event pendent de revisio al servei', async () => {
+    await expect(createSocialPost({
+      title: 'Post-event pendent',
+      platforms: ['INSTAGRAM'],
+      status: 'SCHEDULED',
+      scheduledAt: '2026-05-01T10:00:00Z',
+      bookingId: 'booking-1',
+      category: 'EVENT_SHOWCASE',
+      notes: 'Revisar consentiment, imatges i dades personals abans de publicar. No publicat automaticament.',
+    })).rejects.toThrow('Revisa consentiment');
+    expect(mockPrisma.socialPost.create).not.toHaveBeenCalled();
+  });
+
   it("peta si l'input és invàlid", async () => {
     await expect(
       createSocialPost({ title: '', platforms: ['INSTAGRAM'] })
@@ -282,6 +295,18 @@ describe('updateSocialPost', () => {
     const call = mockPrisma.socialPost.update.mock.calls[0][0];
     expect(call.data.status).toBe('PUBLISHED');
     expect(call.data.publishedAt).toBeInstanceOf(Date);
+  });
+
+  it('bloqueja publicar post-event pendent de revisio al servei', async () => {
+    mockPrisma.socialPost.findUnique.mockResolvedValue({
+      ...existingPost,
+      bookingId: 'booking-1',
+      category: 'EVENT_SHOWCASE',
+      notes: 'Creat des del playbook. Revisar consentiment, imatges i dades personals abans de publicar. No publicat automaticament.',
+    });
+
+    await expect(updateSocialPost('sp-1', { status: 'PUBLISHED' })).rejects.toThrow('Revisa consentiment');
+    expect(mockPrisma.socialPost.update).not.toHaveBeenCalled();
   });
 
   it('no sobrescriu publishedAt existent', async () => {

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildSocialWorkspaceHref } from '@/lib/admin/socialWorkspaceHref';
 import { useRouter } from 'next/navigation';
 import { formatDateShort, formatDateFull } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
@@ -11,7 +12,7 @@ import { ADMIN_CALENDAR_HELP, helpAttrs } from '../components/adminHelpContent';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { CalendarApiDay, CalendarApiResponse } from './calendar-utils';
-import { weekdayLabelsFull as weekdayLabels, formatKey, getWeekDays, isToday, resolveServiceLabel, resolveTimeLabel, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel } from './calendar-utils';
+import { weekdayLabelsFull as weekdayLabels, formatKey, getWeekDays, isToday, resolveServiceLabel, resolveTimeLabel, getCalendarTone, getCalendarToneClasses, getCalendarEconomicRiskClasses, summarizeCalendarEconomicRisk, selectCalendarEconomicRiskBooking, formatCalendarEconomicRiskActionReason, resolveCalendarEconomicRiskActionHash, formatCalendarEconomicRiskSummary, resolveWorkTimeLabel } from './calendar-utils';
 
 type CalendarLayer = 'bookings' | 'blocks' | 'leads' | 'tasks' | 'social' | 'followUps';
 
@@ -115,6 +116,11 @@ export default function CalendarWeekClient() {
     let tasks = 0;
     let social = 0;
     let followUps = 0;
+    const economicRisk = { total: 0, critical: 0, warning: 0 };
+    let economicRiskBookingId: string | null = null;
+    let economicRiskBookingLevel: 'critical' | 'warning' | null = null;
+    let economicRiskActionReason: string | null = null;
+    let economicRiskActionHash: 'sec-finances' | 'sec-marge' | null = null;
     for (const day of weekDays) {
       const key = formatKey(day);
       const dayData = data?.days?.[key];
@@ -125,9 +131,23 @@ export default function CalendarWeekClient() {
         tasks += dayData.tasks.length;
         social += dayData.socialPosts.length;
         followUps += dayData.followUps.length;
+        const dayEconomicRisk = summarizeCalendarEconomicRisk(dayData);
+        economicRisk.total += dayEconomicRisk.total;
+        economicRisk.critical += dayEconomicRisk.critical;
+        economicRisk.warning += dayEconomicRisk.warning;
+        const actionBooking = selectCalendarEconomicRiskBooking(dayData);
+        if (
+          actionBooking?.economicRisk &&
+          (!economicRiskBookingId || (economicRiskBookingLevel !== 'critical' && actionBooking.economicRisk.level === 'critical'))
+        ) {
+          economicRiskBookingId = actionBooking.id;
+          economicRiskBookingLevel = actionBooking.economicRisk.level;
+          economicRiskActionReason = formatCalendarEconomicRiskActionReason(actionBooking);
+          economicRiskActionHash = resolveCalendarEconomicRiskActionHash(actionBooking);
+        }
       }
     }
-    return { reservas, bloqueos, leads, tasks, social, followUps };
+    return { reservas, bloqueos, leads, tasks, social, followUps, economicRisk, economicRiskBookingId, economicRiskActionReason, economicRiskActionHash };
   }, [weekDays, data]);
 
   return (
@@ -185,6 +205,18 @@ export default function CalendarWeekClient() {
           </div>
           <div className="text-sm">
             {stats.reservas} reserves · {stats.leads} entrades · {stats.bloqueos} bloquejos · {stats.tasks + stats.social + stats.followUps} feines
+          </div>
+          <div className={`text-xs font-semibold ${stats.economicRisk.critical > 0 ? 'admin-tone-text-danger' : stats.economicRisk.total > 0 ? 'admin-tone-text-warning' : ''}`}>
+            Risc econòmic: {formatCalendarEconomicRiskSummary(stats.economicRisk)}
+            {stats.economicRiskActionReason ? ` · Motiu: ${stats.economicRiskActionReason}` : ''}
+            {stats.economicRiskBookingId && (
+              <>
+                {' · '}
+                <Link href={buildBookingHref(stats.economicRiskBookingId, stats.economicRiskActionHash)} className="text-[var(--gold)] no-underline hover:text-[var(--gold-bright)]">
+                  Obrir reserva amb risc
+                </Link>
+              </>
+            )}
           </div>
           {loading && (
             <div className="flex items-center gap-2 text-sm" role="status" aria-live="polite">
@@ -337,7 +369,7 @@ export default function CalendarWeekClient() {
                 {visibleLayers.social && dayData.socialPosts.map((post) => (
                   <Link
                     key={post.id}
-                    href="/admin/social"
+                    href={buildSocialWorkspaceHref(post.id)}
                     className="ap-card block px-2.5 py-2 transition-all admin-tone-soft-warning"
                   >
                     <div className="truncate text-xs font-semibold">📣 {post.title}</div>
@@ -404,6 +436,11 @@ export default function CalendarWeekClient() {
                       {resolveServiceLabel(r)}
                       {r.ubicacion ? ` · ${r.ubicacion}` : ''}
                     </div>
+                    {r.economicRisk && (
+                      <div className={`mt-1 truncate rounded border px-1.5 py-0.5 text-xs font-semibold ${getCalendarEconomicRiskClasses(r.economicRisk)}`}>
+                        {r.economicRisk.label}
+                      </div>
+                    )}
                   </Link>
                 ))}
                 {(!visibleLayers.bookings || !hasReservas) && (!visibleLayers.blocks || !hasBloqueos) && (!visibleLayers.leads || !hasLeads) && (!visibleLayers.tasks || dayData.tasks.length === 0) && (!visibleLayers.social || dayData.socialPosts.length === 0) && (!visibleLayers.followUps || dayData.followUps.length === 0) && (

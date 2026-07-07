@@ -1,4 +1,5 @@
 import type { ClientPortalNavKey } from '@/lib/constants/clientPortalNavigation';
+import { coercePortalPersonalization } from '@/lib/clientPortalUtils';
 
 export type ClientPortalVisibility = {
   payments: boolean;
@@ -10,22 +11,19 @@ export type ClientPortalVisibility = {
 
 export type ClientPortalHiddenNavItems = Partial<Record<ClientPortalNavKey, boolean>>;
 
-function asFlag(source: Record<string, unknown>, key: string): boolean {
-  return source[key] !== false;
+function asVisibleFlag(value: boolean | undefined): boolean {
+  return value !== false;
 }
 
 export function getClientPortalVisibility(personalization: unknown): ClientPortalVisibility {
-  const source =
-    personalization && typeof personalization === 'object'
-      ? personalization as Record<string, unknown>
-      : {};
+  const source = coercePortalPersonalization(personalization);
 
   return {
-    payments: asFlag(source, 'showPayments'),
-    timeline: asFlag(source, 'showTimeline'),
-    documents: asFlag(source, 'showDocuments'),
-    postEvent: asFlag(source, 'showPostEvent'),
-    questionnaire: asFlag(source, 'showQuestionnaire'),
+    payments: asVisibleFlag(source.showPayments),
+    timeline: asVisibleFlag(source.showTimeline),
+    documents: asVisibleFlag(source.showDocuments),
+    postEvent: asVisibleFlag(source.showPostEvent),
+    questionnaire: asVisibleFlag(source.showQuestionnaire),
   };
 }
 

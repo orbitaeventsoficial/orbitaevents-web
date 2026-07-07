@@ -1,5 +1,6 @@
 import { formatCurrencyExact } from '@/lib/constants';
 import type { BookingDTO, CustomerHubDTO, LeadDTO, TaskDTO, MessageDTO } from '@/lib/customer-hub/dto';
+import { bookingOutstandingAmount } from '@/lib/payment-status';
 
 // ─── Types ──────────────────────────────────────────────────────────────
 
@@ -56,17 +57,21 @@ function computeRecurrence(bookings: BookingDTO[]): number {
   return bookings.filter((b) => b.status === 'COMPLETED').length;
 }
 
+function getBookingPendingPayment(booking: BookingDTO): number {
+  return bookingOutstandingAmount({
+    total: booking.totalAmount || 0,
+    depositAmount: booking.depositAmount || 0,
+    remainingAmount: booking.remainingAmount,
+    depositPaid: Boolean(booking.depositPaid),
+    remainingPaid: Boolean(booking.remainingPaid),
+    cashAmount: booking.cashAmount,
+  });
+}
+
 function computePendingPayment(bookings: BookingDTO[]): number {
   return bookings
     .filter((b) => b.status !== 'CANCELLED' && b.status !== 'COMPLETED')
-    .reduce((sum, b) => {
-      const total = b.totalAmount || 0;
-      const deposit = b.depositAmount || 0;
-      let paid = 0;
-      if (b.depositPaid) paid += deposit;
-      if (b.remainingPaid) paid += total - deposit;
-      return sum + Math.max(0, total - paid);
-    }, 0);
+    .reduce((sum, b) => sum + getBookingPendingPayment(b), 0);
 }
 
 function deriveCommercialRisk(data: {
@@ -141,7 +146,7 @@ function deriveNextAction(data: {
   // 2. Pending payment on active bookings
   if (pendingPaymentTotal > 0) {
     const unpaidBooking = bookings.find((b) =>
-      b.status !== 'CANCELLED' && b.status !== 'COMPLETED' && !b.remainingPaid,
+      b.status !== 'CANCELLED' && b.status !== 'COMPLETED' && getBookingPendingPayment(b) > 0,
     );
     if (unpaidBooking) {
       return {

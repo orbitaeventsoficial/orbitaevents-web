@@ -22,7 +22,9 @@ function makeBooking(overrides: Partial<PlaybookBookingInput> = {}): PlaybookBoo
     postEventEmailSent: false,
     postEventEmailSentAt: null,
     hasTestimonial: false,
+    hasTestimonialAskDecision: false,
     hasPublishedSocialPost: false,
+    hasSocialPostDecision: false,
     hasReferralAskTask: false,
     ...overrides,
   };
@@ -72,6 +74,33 @@ describe('buildPostEventPlaybook', () => {
     const result = buildPostEventPlaybook({ bookings: [booking], now: NOW });
     const social = result.items[0].actions.find((a) => a.key === 'social_post')!;
     expect(social.status).toBe('PENDING');
+  });
+
+  it('mostra social preparat sense marcar-lo publicat', () => {
+    const booking = makeBooking({
+      eventDate: daysAgo(10),
+      hasPublishedSocialPost: false,
+      hasSocialPostDecision: true,
+      socialPostId: 'social-1',
+    });
+    const result = buildPostEventPlaybook({ bookings: [booking], now: NOW });
+    const social = result.items[0].actions.find((a) => a.key === 'social_post')!;
+
+    expect(social.status).toBe('PENDING');
+    expect(social.note).toBe('Preparat, no publicat');
+    expect(social.socialPostId).toBe('social-1');
+  });
+
+  it('prioritza Publicat sobre Preparat si el social ja existeix', () => {
+    const booking = makeBooking({
+      hasPublishedSocialPost: true,
+      hasSocialPostDecision: true,
+    });
+    const result = buildPostEventPlaybook({ bookings: [booking], now: NOW });
+    const social = result.items[0].actions.find((a) => a.key === 'social_post')!;
+
+    expect(social.status).toBe('DONE');
+    expect(social.note).toBe('Publicat');
   });
 
   it('marks social_post as OVERDUE after 14 days', () => {
@@ -130,6 +159,33 @@ describe('buildPostEventPlaybook', () => {
     });
     const result = buildPostEventPlaybook({ bookings: [booking], now: NOW });
     expect(result.items[0].nextAction?.key).toBe('testimonial');
+  });
+
+  it('marca testimoni com sol.licitat quan hi ha decisio registrada', () => {
+    const booking = makeBooking({
+      postEventEmailSent: true,
+      postEventEmailSentAt: daysAgo(1),
+      hasTestimonial: false,
+      hasTestimonialAskDecision: true,
+    });
+    const result = buildPostEventPlaybook({ bookings: [booking], now: NOW });
+    const testimonial = result.items[0].actions.find((a) => a.key === 'testimonial')!;
+
+    expect(testimonial.status).toBe('DONE');
+    expect(testimonial.note).toBe('Sol.licitat');
+    expect(result.items[0].nextAction?.key).toBe('social_post');
+  });
+
+  it('prioritza Rebut sobre Sol.licitat si ja hi ha testimoni aprovat', () => {
+    const booking = makeBooking({
+      hasTestimonial: true,
+      hasTestimonialAskDecision: true,
+    });
+    const result = buildPostEventPlaybook({ bookings: [booking], now: NOW });
+    const testimonial = result.items[0].actions.find((a) => a.key === 'testimonial')!;
+
+    expect(testimonial.status).toBe('DONE');
+    expect(testimonial.note).toBe('Rebut');
   });
 
   it('sorts items by priority then by daysSinceEvent desc', () => {

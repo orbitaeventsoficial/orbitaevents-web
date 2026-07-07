@@ -72,6 +72,45 @@ describe('getAdminCalendarMonth', () => {
     expect(day15.reservas[0].packName).toBe('Premium');
   });
 
+  it('afegeix risc economic quan una reserva confirmada te marge critic', async () => {
+    mockPrisma.booking.findMany.mockResolvedValue([
+      {
+        id: 'b-risk',
+        leadId: null,
+        customerId: 'c1',
+        eventDate: new Date('2026-09-15T18:00:00Z'),
+        clientName: 'Client marge',
+        eventLocation: 'Barcelona',
+        eventVenue: null,
+        status: 'CONFIRMED',
+        eventType: 'WEDDING',
+        total: 250,
+        depositAmount: 250,
+        remainingAmount: null,
+        depositPaid: true,
+        remainingPaid: true,
+        cashAmount: null,
+        extraHours: 0,
+        travelCost: 0,
+        distanceKm: 0,
+        eventStartTime: '18:00',
+        eventEndTime: '22:00',
+        extras: [],
+        serviceLines: [],
+        pack: { slug: 'premium', price: 900, extraHourPrice: 50, translations: [{ locale: 'ca', name: 'Premium' }] },
+      },
+    ]);
+
+    const result = await getAdminCalendarMonth('2026-09-01', '2026-09-30');
+    const booking = result.body.days!['2026-09-15'].reservas[0];
+
+    expect(booking.economicRisk).toMatchObject({
+      level: 'critical',
+      reasons: expect.arrayContaining([expect.stringContaining('Marge')]),
+    });
+    expect(booking.economicRisk?.marginPct).toBeLessThan(25);
+  });
+
   it('manté leads perduts al calendari com a senyal simbòlic', async () => {
     mockPrisma.lead.findMany.mockResolvedValue([
       {

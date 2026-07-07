@@ -118,6 +118,16 @@ function buildEventPayload(form: EventFormState) {
   };
 }
 
+async function readPortfolioMutationError(response: Response, fallback: string) {
+  const data = await response.json().catch(() => null);
+  if (data && typeof data === 'object') {
+    const record = data as { error?: unknown; message?: unknown };
+    if (typeof record.error === 'string' && record.error.trim()) return record.error;
+    if (typeof record.message === 'string' && record.message.trim()) return record.message;
+  }
+  return fallback;
+}
+
 function FullscreenPreview({ preview, onClose }: { preview: PreviewState | null; onClose: () => void }) {
   useEffect(() => {
     if (!preview) return;
@@ -224,11 +234,14 @@ function CategorySection({
   }, [expanded, loadMedia]);
   const persistSortOrder = useCallback(async (items: MediaItem[]) => {
     for (let index = 0; index < items.length; index += 1) {
-      await fetchWithCsrf('/api/admin/portfolio/media', {
+      const response = await fetchWithCsrf('/api/admin/portfolio/media', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mediaId: items[index].id, sortOrder: index }),
       });
+      if (!response.ok) {
+        throw new Error(await readPortfolioMutationError(response, "No s'ha pogut guardar el nou ordre"));
+      }
     }
   }, []);
 
@@ -254,16 +267,13 @@ function CategorySection({
           method: 'POST',
           body: formData,
         });
-        if (!uploadResponse.ok) {
-          const data = await uploadResponse.json().catch(() => ({}));
-          throw new Error(data?.error || 'Error pujant fitxer');
-        }
+        if (!uploadResponse.ok) throw new Error(await readPortfolioMutationError(uploadResponse, 'Error pujant fitxer'));
 
         const uploadData = await uploadResponse.json();
         const created = uploadData.data as MediaItem;
 
         if (replacement) {
-          await fetchWithCsrf('/api/admin/portfolio/media', {
+          const updateResponse = await fetchWithCsrf('/api/admin/portfolio/media', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -273,17 +283,26 @@ function CategorySection({
               eventId: replacement.event?.id ?? null,
             }),
           });
+          if (!updateResponse.ok) {
+            throw new Error(await readPortfolioMutationError(updateResponse, "No s'ha pogut conservar les dades de la media substituida"));
+          }
 
           const coverRefs = coverMap.get(replacement.mediaUrl) || [];
           for (const eventItem of coverRefs) {
-            await fetchWithCsrf('/api/admin/portfolio/events', {
+            const coverResponse = await fetchWithCsrf('/api/admin/portfolio/events', {
               method: 'PATCH',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ id: eventItem.id, coverImage: created.mediaUrl }),
             });
+            if (!coverResponse.ok) {
+              throw new Error(await readPortfolioMutationError(coverResponse, "No s'ha pogut actualitzar la portada vinculada"));
+            }
           }
 
-          await fetchWithCsrf(`/api/admin/portfolio/media?mediaId=${replacement.id}`, { method: 'DELETE' });
+          const deleteResponse = await fetchWithCsrf(`/api/admin/portfolio/media?mediaId=${replacement.id}`, { method: 'DELETE' });
+          if (!deleteResponse.ok) {
+            throw new Error(await readPortfolioMutationError(deleteResponse, "No s'ha pogut eliminar la media substituida"));
+          }
           await onEventsRefresh();
         }
       }
@@ -309,11 +328,14 @@ function CategorySection({
     setSavingId(item.id);
     setError(null);
     try {
-      await fetchWithCsrf('/api/admin/portfolio/media', {
+      const response = await fetchWithCsrf('/api/admin/portfolio/media', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mediaId: item.id, caption }),
       });
+      if (!response.ok) {
+        throw new Error(await readPortfolioMutationError(response, "No s'ha pogut guardar el caption"));
+      }
       setMedia((current) => current.map((entry) => (entry.id === item.id ? { ...entry, caption } : entry)));
     } catch (err) {
       log.error('Error guardant caption', err);
@@ -327,11 +349,14 @@ function CategorySection({
     setSavingId(item.id);
     setError(null);
     try {
-      await fetchWithCsrf('/api/admin/portfolio/media', {
+      const response = await fetchWithCsrf('/api/admin/portfolio/media', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mediaId: item.id, eventId: eventId || null }),
       });
+      if (!response.ok) {
+        throw new Error(await readPortfolioMutationError(response, "No s'ha pogut assignar l'event"));
+      }
       await loadMedia();
     } catch (err) {
       log.error('Error assignant event', err);
@@ -345,11 +370,14 @@ function CategorySection({
     setSavingId(eventId);
     setError(null);
     try {
-      await fetchWithCsrf('/api/admin/portfolio/events', {
+      const response = await fetchWithCsrf('/api/admin/portfolio/events', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: eventId, coverImage: mediaUrl }),
       });
+      if (!response.ok) {
+        throw new Error(await readPortfolioMutationError(response, "No s'ha pogut actualitzar la portada"));
+      }
       await onEventsRefresh();
     } catch (err) {
       log.error('Error actualitzant portada', err);
@@ -374,7 +402,10 @@ function CategorySection({
       if (coverRefs.length > 0) {
         throw new Error('Aquesta imatge és portada d\'un event. Substitueix-la o assigna una altra portada abans d\'eliminar-la.');
       }
-      await fetchWithCsrf(`/api/admin/portfolio/media?mediaId=${item.id}`, { method: 'DELETE' });
+      const response = await fetchWithCsrf(`/api/admin/portfolio/media?mediaId=${item.id}`, { method: 'DELETE' });
+      if (!response.ok) {
+        throw new Error(await readPortfolioMutationError(response, "No s'ha pogut eliminar la media"));
+      }
       await loadMedia();
     } catch (err) {
       log.error('Error eliminant media', err);
@@ -401,7 +432,7 @@ function CategorySection({
       await persistSortOrder(normalized);
     } catch (err) {
       log.error('Error reordenant media', err);
-      setError('No s\'ha pogut guardar el nou ordre');
+      setError(err instanceof Error ? err.message : "No s'ha pogut guardar el nou ordre");
       await loadMedia();
     }
   }, [draggingId, loadMedia, media, persistSortOrder]);
@@ -541,8 +572,7 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
         body: JSON.stringify(buildEventPayload(form)),
       });
       if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data?.error || 'Error creant event');
+        throw new Error(await readPortfolioMutationError(response, 'Error creant event'));
       }
       setForm(EMPTY_EVENT_FORM);
       setShowForm(false);
@@ -557,11 +587,14 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
 
   const togglePublished = useCallback(async (eventItem: PortfolioEvent) => {
     try {
-      await fetchWithCsrf('/api/admin/portfolio/events', {
+      const response = await fetchWithCsrf('/api/admin/portfolio/events', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: eventItem.id, published: !eventItem.published }),
       });
+      if (!response.ok) {
+        throw new Error(await readPortfolioMutationError(response, "No s'ha pogut actualitzar l'event"));
+      }
       await onEventsRefresh();
     } catch (err) {
       log.error('Error actualitzant event', err);
@@ -578,7 +611,10 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
     });
     if (!confirmed) return;
     try {
-      await fetchWithCsrf(`/api/admin/portfolio/events?id=${id}`, { method: 'DELETE' });
+      const response = await fetchWithCsrf(`/api/admin/portfolio/events?id=${id}`, { method: 'DELETE' });
+      if (!response.ok) {
+        throw new Error(await readPortfolioMutationError(response, "No s'ha pogut eliminar l'event"));
+      }
       await onEventsRefresh();
     } catch (err) {
       log.error('Error eliminant event', err);
@@ -710,7 +746,6 @@ export default function AdminPortfolioPage() {
     </AdminPage>
   );
 }
-
 
 
 

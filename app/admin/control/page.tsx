@@ -64,6 +64,7 @@ export default async function AdminDashboard() {
       clientName: d.nextEvent.clientName,
       depositPaid: d.nextEvent.depositPaid,
       remainingPaid: d.nextEvent.remainingPaid,
+      outstandingAmount: d.nextEvent.outstandingAmount,
     } : null,
     inventoryMaintenance: d.inventoryMaintenance,
     inventoryBroken: d.inventoryBroken,
@@ -91,11 +92,14 @@ export default async function AdminDashboard() {
     ...step,
     ...pilotDynamic[step.id],
   }));
+  const nextEventPaymentCoverage = d.nextEvent
+    ? { total: d.nextEvent.total, cashAmount: Math.max(0, d.nextEvent.total - d.nextEvent.outstandingAmount) }
+    : undefined;
   const nextEventPaymentBand = d.nextEvent
-    ? getPaymentBand(d.nextEvent.depositPaid, d.nextEvent.remainingPaid)
+    ? getPaymentBand(d.nextEvent.depositPaid, d.nextEvent.remainingPaid, nextEventPaymentCoverage)
     : null;
   const nextEventPaymentLabel = d.nextEvent
-    ? getPaymentLabel(d.nextEvent.depositPaid, d.nextEvent.remainingPaid)
+    ? getPaymentLabel(d.nextEvent.depositPaid, d.nextEvent.remainingPaid, nextEventPaymentCoverage)
     : '';
   const nextEventPaymentTooltip = nextEventPaymentBand === 'paid'
     ? 'Tot pagat'

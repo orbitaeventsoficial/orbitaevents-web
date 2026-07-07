@@ -16,74 +16,72 @@ async function runSafe(name: string, fn: () => Promise<unknown>) {
   }
 }
 
+const CRON_ENDPOINTS = {
+  reviewsSync: '/api/cron/reviews-sync',
+  commercialDaily: '/api/cron/commercial-daily',
+  postEvent: '/api/cron/post-event',
+  fuelDaily: '/api/cron/fuel-daily',
+  invoiceSync: '/api/cron/invoice-sync',
+  packPricingCheck: '/api/cron/pack-pricing-check',
+} as const;
+
+function getSchedulerBaseUrl() {
+  const explicitUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.APP_BASE_URL ||
+    process.env.SITE_URL ||
+    (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : undefined);
+
+  return (explicitUrl || 'https://orbitaevents.com').replace(/\/$/, '');
+}
+
+async function runCronEndpoint(name: string, path: string) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
+    throw new Error('CRON_SECRET no configurat per scheduler');
+  }
+
+  const response = await fetch(`${getSchedulerBaseUrl()}${path}`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${cronSecret}` },
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    const detail = await response.text().catch(() => '');
+    throw new Error(`${name} HTTP ${response.status}: ${detail.slice(0, 240)}`);
+  }
+}
+
 async function startCronScheduler() {
   // Esperar 60s perquè el servidor estigui completament llest
   await new Promise((resolve) => setTimeout(resolve, 60_000));
 
-  // ── Imports dinàmics (opacs per webpack — evitar bundle nodemailer) ───
-  const imp = new Function('m', 'return import(m)') as (m: string) => Promise<any>;
-  const { syncReviews } = await imp('@/lib/services/reviewsSyncService');
-  const { runCommercialDailyAutomation } = await imp('@/lib/services/commercialDailyAutomationService');
-  const { listPendingPostEventBookings, sendPostEventEmailForBooking } = await imp('@/lib/services/postEventDispatchService');
-  const { runFuelDailyRefresh } = await imp('@/lib/services/fuelReferenceService');
-  const { runInvoiceSyncCron } = await imp('@/lib/services/invoiceService');
-  const { runPackPricingCheck } = await imp('@/lib/services/packPricingCheckService');
-  const { saveCronRunStatus } = await imp('@/lib/services/cronRunStatusService');
-
-  // ── Post-event dispatch (mateixa lògica que la ruta cron) ──────────────
-  async function runPostEventDispatch() {
-    const bookings = await listPendingPostEventBookings();
-    const BATCH_SIZE = 5;
-    let sent = 0, skipped = 0, errors = 0;
-
-    for (let i = 0; i < bookings.length; i += BATCH_SIZE) {
-      const batch = bookings.slice(i, i + BATCH_SIZE);
-      const results = await Promise.all(
-        batch.map(async (b: { id: string }) => {
-          try {
-            return await sendPostEventEmailForBooking(b.id);
-          } catch {
-            return { status: 'error' as const };
-          }
-        })
-      );
-      for (const r of results) {
-        if (r.status === 'sent') sent++;
-        else if (r.status === 'skipped') skipped++;
-        else errors++;
-      }
-    }
-
-    await saveCronRunStatus({
-      prefix: 'automation.postEvent',
-      status: errors > 0 ? 'error' : 'ok',
-      summary: { processed: bookings.length, sent, skipped, errors },
-    });
-  }
+  const runSchedulerCron = (name: string, path: string) => runCronEndpoint(name, path);
 
   // ── Primera execució (escalonada per no saturar) ───────────────────────
   console.log('[scheduler] Executant primera ronda de crons...');
-  await runSafe('reviews-sync', syncReviews);
-  await runSafe('commercial-daily', runCommercialDailyAutomation);
-  await runSafe('post-event', runPostEventDispatch);
-  await runSafe('fuel-daily', runFuelDailyRefresh);
-  await runSafe('invoice-sync', runInvoiceSyncCron);
-  await runSafe('pack-pricing-check', runPackPricingCheck);
+  await runSafe('reviews-sync', () => runSchedulerCron('reviews-sync', CRON_ENDPOINTS.reviewsSync));
+  await runSafe('commercial-daily', () => runSchedulerCron('commercial-daily', CRON_ENDPOINTS.commercialDaily));
+  await runSafe('post-event', () => runSchedulerCron('post-event', CRON_ENDPOINTS.postEvent));
+  await runSafe('fuel-daily', () => runSchedulerCron('fuel-daily', CRON_ENDPOINTS.fuelDaily));
+  await runSafe('invoice-sync', () => runSchedulerCron('invoice-sync', CRON_ENDPOINTS.invoiceSync));
+  await runSafe('pack-pricing-check', () => runSchedulerCron('pack-pricing-check', CRON_ENDPOINTS.packPricingCheck));
   console.log('[scheduler] Primera ronda completada.');
 
   // ── Intervals recurrents ───────────────────────────────────────────────
   // Cada 12h: reviews, post-event, invoice-sync
   setInterval(() => {
-    runSafe('reviews-sync', syncReviews);
-    runSafe('post-event', runPostEventDispatch);
-    runSafe('invoice-sync', runInvoiceSyncCron);
+    runSafe('reviews-sync', () => runSchedulerCron('reviews-sync', CRON_ENDPOINTS.reviewsSync));
+    runSafe('post-event', () => runSchedulerCron('post-event', CRON_ENDPOINTS.postEvent));
+    runSafe('invoice-sync', () => runSchedulerCron('invoice-sync', CRON_ENDPOINTS.invoiceSync));
   }, TWELVE_HOURS);
 
   // Cada 24h: commercial-daily, fuel, pack-pricing
   setInterval(() => {
-    runSafe('commercial-daily', runCommercialDailyAutomation);
-    runSafe('fuel-daily', runFuelDailyRefresh);
-    runSafe('pack-pricing-check', runPackPricingCheck);
+    runSafe('commercial-daily', () => runSchedulerCron('commercial-daily', CRON_ENDPOINTS.commercialDaily));
+    runSafe('fuel-daily', () => runSchedulerCron('fuel-daily', CRON_ENDPOINTS.fuelDaily));
+    runSafe('pack-pricing-check', () => runSchedulerCron('pack-pricing-check', CRON_ENDPOINTS.packPricingCheck));
   }, TWENTY_FOUR_HOURS);
 
   console.log('[scheduler] Crons programats: 12h (reviews, post-event, invoice) + 24h (commercial, fuel, pack-pricing)');

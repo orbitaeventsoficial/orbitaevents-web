@@ -16,6 +16,7 @@ import {
   productsFromDossierLineSnapshot,
   transportFromDossierLineSnapshot,
 } from '@/lib/services/dossierSnapshotService';
+import { DOCUMENT_ADMIN_LOG_ACTIONS, recordDocumentAdminLog } from '@/lib/services/documentAuditTrailService';
 
 export type CreateDossierInput = {
   leadId?: string;
@@ -38,6 +39,13 @@ export type DossierLeadInitialData = {
   eventDesc: string;
   travelLocation: string;
   distanceKm: number | null;
+};
+
+export type DossierTraceOrigin = {
+  leadId: string | null;
+  leadName: string | null;
+  customerId: string | null;
+  customerName: string | null;
 };
 
 function formatLeadIsoDate(date: Date | null): string {
@@ -124,6 +132,29 @@ export async function getDossierLeadInitialData(leadId?: string | null): Promise
   };
 }
 
+export async function resolveDossierTraceOrigin(leadId?: string | null): Promise<DossierTraceOrigin> {
+  if (!leadId) {
+    return { leadId: null, leadName: null, customerId: null, customerName: null };
+  }
+
+  const lead = await prisma.lead.findUnique({
+    where: { id: leadId },
+    select: {
+      id: true,
+      name: true,
+      customerId: true,
+      customer: { select: { name: true } },
+    },
+  });
+
+  return {
+    leadId,
+    leadName: lead?.name ?? null,
+    customerId: lead?.customerId ?? null,
+    customerName: lead?.customer?.name ?? null,
+  };
+}
+
 export async function createDossier(input: CreateDossierInput) {
   const lineSnapshot = parseDossierLineSnapshot(input.lineSnapshot);
   return prisma.dossier.create({
@@ -153,10 +184,11 @@ export async function getAllDossiers(limit = 50) {
   return prisma.$queryRaw<unknown[]>`
     SELECT d.*,
       CASE WHEN d."leadId" IS NOT NULL THEN
-        jsonb_build_object('id', l.id, 'name', l.name, 'status', l.status)
+        jsonb_build_object('id', l.id, 'name', l.name, 'status', l.status, 'customerId', l."customerId", 'customerName', c.name)
       END AS lead
     FROM "dossiers" d
     LEFT JOIN "leads" l ON l.id = d."leadId"
+    LEFT JOIN "customers" c ON c.id = l."customerId"
     WHERE d."deletedAt" IS NULL
     ORDER BY d."createdAt" DESC
     LIMIT ${limit}
@@ -183,10 +215,11 @@ export async function getDeletedDossiers() {
   return prisma.$queryRaw<unknown[]>`
     SELECT d.*,
       CASE WHEN d."leadId" IS NOT NULL THEN
-        jsonb_build_object('id', l.id, 'name', l.name, 'status', l.status)
+        jsonb_build_object('id', l.id, 'name', l.name, 'status', l.status, 'customerId', l."customerId", 'customerName', c.name)
       END AS lead
     FROM "dossiers" d
     LEFT JOIN "leads" l ON l.id = d."leadId"
+    LEFT JOIN "customers" c ON c.id = l."customerId"
     WHERE d."deletedAt" IS NOT NULL
     ORDER BY d."deletedAt" DESC
   `;
@@ -208,6 +241,7 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
   const dossier = await prisma.dossier.findUnique({ where: { id } });
   if (!dossier) return { ok: false, error: 'Dossier no trobat' };
   if (!dossier.email) return { ok: false, error: 'El dossier no té email de destinatari' };
+  const origin = await resolveDossierTraceOrigin(dossier.leadId);
 
   const [allProducts, orbitaProducts, dossierCopy] = await Promise.all([
     getAnimacioProducts('ca'),
@@ -299,6 +333,30 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
         imapError: sendResult.imapSent.error ?? null,
       });
     }
+
+    await recordDocumentAdminLog({
+      action: DOCUMENT_ADMIN_LOG_ACTIONS.DOSSIER_SENT,
+      entity: 'dossier',
+      entityId: id,
+      details: {
+        documentType: 'DOSSIER',
+        source: 'dossier_email_send',
+        dataSource: snapshotProducts ? 'snapshot' : 'live_catalog',
+        dossierId: id,
+        leadId: origin.leadId,
+        leadName: origin.leadName,
+        customerId: origin.customerId,
+        customerName: origin.customerName,
+        to: recipientEmail,
+        subject,
+        productIds: dossier.productIds,
+        productCount: products.length,
+        emailSendId: tracking?.id ?? null,
+        orbitaKind: orbitaCtx.kind,
+        orbitaId: orbitaCtx.id,
+        orbitaOrigin: orbitaCtx.origin,
+      },
+    });
 
     return { ok: true };
   } catch (err) {

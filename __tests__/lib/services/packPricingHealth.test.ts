@@ -71,15 +71,31 @@ describe('computePackPricingHealth', () => {
     expect(typeof result.hasAlert).toBe('boolean');
   });
 
-  it('calcula preu recomanat = baseCost / (1 - marginTarget)', () => {
+  it('calcula preu recomanat i l\'arrodoneix amunt a desenes', () => {
     const config = makeConfig({ marginTargetPct: 0.5, fixedPackCost: 0 });
     const pack = makePack({ djHours: 1, inventory: [] });
 
     const result = computePackPricingHealth(pack, config);
 
     // baseCost = (0 * 1) + (specialistCost * 1) + 0 = 29.7
-    // recommendedPrice = 29.7 / (1 - 0.5) = 59.4
-    expect(result.recommendedPrice).toBeCloseTo(59.4, 1);
+    // targetPrice = 29.7 / (1 - 0.5) = 59.4; PVP recomanat = 60.
+    expect(result.recommendedPrice).toBe(60);
+    expect(result.recommendedExtraHourPrice).toBe(60);
+    expect(result.recommendedOperatorExtraHourPrice).toBe(50);
+  });
+
+  it('no arrodoneix avall un preu recomanat que ja acaba en 0', () => {
+    const config = makeConfig({
+      marginTargetPct: 0.5,
+      fixedPackCost: 20.3,
+      specialistCostPerHour: 29.7,
+    });
+    const pack = makePack({ djHours: 1, inventory: [] });
+
+    const result = computePackPricingHealth(pack, config);
+
+    // targetPrice = (29.7 + 20.3) / 0.5 = 100.
+    expect(result.recommendedPrice).toBe(100);
   });
 
   it('inclou cost inventari al càlcul', () => {
@@ -168,7 +184,7 @@ describe('computePackPricingHealth', () => {
 
   it('hasAlert = false si divergència dins llindar (pack + extra hour)', () => {
     const config = makeConfig({ marginTargetPct: 0.5, fixedPackCost: 0, alertDivergencePct: 20 });
-    // recomanat pack ~59.4, recomanat extraHour ~59.4
+    // recomanat pack i extraHour = 60.
     const pack = makePack({ price: 60, extraHourPrice: 60, djHours: 1 });
 
     const result = computePackPricingHealth(pack, config);
@@ -189,7 +205,7 @@ describe('computePackPricingHealth', () => {
     const config = makeConfig({ alertDivergencePct: 5, marginTargetPct: 0.5, fixedPackCost: 0 });
     // Pack amb preu proper al recomanat però extraHourPrice molt baix
     const pack = makePack({
-      price: 60, // proper al recomanat ~59.4
+      price: 60, // igual al recomanat arrodonit
       extraHourPrice: 1, // molt per sota
       djHours: 1,
     });

@@ -10,6 +10,7 @@ import PipelineBoard, { type PipelineCardContext } from '@/app/admin/components/
 import { ADMIN_PIPELINE_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { bookingOutstandingBreakdown } from '@/lib/payment-status';
 
 type PipelineBooking = {
   id: string;
@@ -19,7 +20,11 @@ type PipelineBooking = {
   eventDate: string;
   eventType: string;
   total: number;
+  depositAmount: number;
   depositPaid: boolean;
+  remainingAmount: number;
+  remainingPaid: boolean;
+  cashAmount: number | null;
   status: string;
   leadId: string | null;
   marginPct: number | null;
@@ -62,7 +67,11 @@ export default function BookingPipelineView() {
         eventDate: b.eventDate as string,
         eventType: b.eventType as string,
         total: Number(b.total) || 0,
+        depositAmount: Number(b.depositAmount) || 0,
         depositPaid: Boolean(b.depositPaid),
+        remainingAmount: Number(b.remainingAmount) || 0,
+        remainingPaid: Boolean(b.remainingPaid),
+        cashAmount: typeof b.cashAmount === 'number' ? b.cashAmount : null,
         status: b.status as string,
         leadId: (b.leadId as string) || (b.lead as Record<string, unknown>)?.id as string || null,
         marginPct: typeof b.marginPct === 'number' ? b.marginPct : null,
@@ -239,6 +248,15 @@ function BookingCard({
   const canForward = statusIndex < columnCount - 1;
   const canBack = statusIndex > 0;
   const cardHelp = ADMIN_PIPELINE_HELP.booking.card(booking.reference, booking.clientName);
+  const paymentBreakdown = bookingOutstandingBreakdown({
+    total: booking.total,
+    depositAmount: booking.depositAmount,
+    remainingAmount: booking.remainingAmount,
+    depositPaid: booking.depositPaid,
+    remainingPaid: booking.remainingPaid,
+    cashAmount: booking.cashAmount,
+  });
+  const hasPendingDeposit = paymentBreakdown.depositAmount > 0;
 
   return (
     <div
@@ -308,7 +326,7 @@ function BookingCard({
             {booking.marginPct.toFixed(0)}%
           </span>
         )}
-        {!booking.depositPaid && (
+        {hasPendingDeposit && (
           <span className="inline-flex items-center rounded-full border px-1.5 py-0.5 text-xs font-medium">
             Paga pendent
           </span>

@@ -281,6 +281,7 @@ Formularis validats          → client + servidor
 - **ServiceSlug**: `'fiestas' | 'bodas' | 'discomovil' | 'empresas'` — sense produccion ni alquiler.
 - **Semàfor pagament**: `depositPaid && remainingPaid` = verd, `depositPaid` = groc, cap = vermell.
 - **Client hub**: `fetchCustomerHub()` és la font única per a tota la fitxa client.
+- **Herència de context**: qualsevol peça comercial ha de poder tornar a la cadena `Customer → Lead → Dossier/Proposal/Quote → Booking → Invoice/Contract/Documents → Post-event`. `resolveCustomerHubCustomerId()` és el resolutor canònic per entrar al Customer Hub des de client, lead, reserva, proposta, dossier, factura, tasques, activitats o documents quan la dada existeix.
 
 ### Emails
 
@@ -314,6 +315,10 @@ Quan el propietari demani un canvi visual significant, consultar via `Agent(mode
 **Quan activar:** canvis a `orbita-tokens.css`, tipografia admin, nous components visuals importants.
 
 **Tokens de referència (#874+#875):** canvas `#111116`, T3 `#9a9286`, `--o-lh-*`, `--o-row-h`, `--ax-action`.
+
+### Manolo — mirada comercial digital
+
+Quan el propietari invoqui `Manolo`, l'agent aplica la mirada definida a `docs/admin-protocol.md` §0.1.2: Expert/a en Experiència Comercial Digital, fred, tallant i àcid amb la peça, sense diplomàcia amb el que no ven, no transmet confiança, no sembla premium o no es pot operar. Manolo combina UX/UI, CRO, marca, service design, negoci d'esdeveniments, revenue, arquitectura d'informació, copy comercial, direcció visual i growth. La sortida mínima és veredicte, problema real, tres millores, tall recomanat i risc de no fer-ho.
 
 ## CSS architecture admin
 

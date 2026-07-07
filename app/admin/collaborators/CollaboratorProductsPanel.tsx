@@ -22,6 +22,8 @@ export interface CollaboratorProduct {
   includes: string | null;
   sortOrder: number;
   isActive: boolean;
+  visibleInDossier: boolean;
+  visibleInBooking: boolean;
 }
 
 interface Props {
@@ -35,6 +37,11 @@ function marginBadge(costPrice: number, sellPrice: number) {
   const markupPct = costPrice > 0 ? (net / costPrice) * 100 : 0;
   const cls = net > 0 ? 'ap-badge ap-badge--success' : net === 0 ? 'ap-badge ap-badge--warning' : 'ap-badge ap-badge--danger';
   return { net, markupPct, cls };
+}
+
+async function readProductMutationError(res: Response, fallback: string): Promise<string> {
+  const payload = (await res.json().catch(() => ({}))) as { error?: string; message?: string };
+  return payload.error || payload.message || fallback;
 }
 
 export default function CollaboratorProductsPanel({ collaboratorId, products, onChanged }: Props) {
@@ -84,13 +91,13 @@ export default function CollaboratorProductsPanel({ collaboratorId, products, on
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(await readProductMutationError(res, 'No s’ha pogut desar el producte'));
       toast.success(editingId ? 'Producte actualitzat' : 'Producte creat');
       resetForm();
       onChanged();
     } catch (err) {
       console.error('Error desant producte', err);
-      toast.error('Error desant el producte');
+      toast.error(err instanceof Error ? err.message : 'No s’ha pogut desar el producte');
     } finally {
       setSaving(false);
     }
@@ -108,6 +115,8 @@ export default function CollaboratorProductsPanel({ collaboratorId, products, on
       includes: p.includes || '',
       imageUrl: p.imageUrl || '',
       isActive: p.isActive,
+      visibleInDossier: p.visibleInDossier,
+      visibleInBooking: p.visibleInBooking,
     });
     setEditingId(p.id);
     setShowForm(true);
@@ -118,12 +127,12 @@ export default function CollaboratorProductsPanel({ collaboratorId, products, on
     if (!ok) return;
     try {
       const res = await fetchWithCsrf(`/api/admin/collaborators/${collaboratorId}/products/${p.id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(await readProductMutationError(res, 'No s’ha pogut eliminar el producte'));
       toast.success('Producte eliminat');
       onChanged();
     } catch (err) {
       console.error('Error eliminant producte', err);
-      toast.error('Error eliminant el producte');
+      toast.error(err instanceof Error ? err.message : 'No s’ha pogut eliminar el producte');
     }
   };
 
@@ -184,6 +193,18 @@ export default function CollaboratorProductsPanel({ collaboratorId, products, on
                 Actiu
               </label>
             </div>
+            <div className="flex items-end gap-2">
+              <label htmlFor="prod-visible-dossier" className="flex items-center gap-2 text-xs admin-tone-text-neutral">
+                <input id="prod-visible-dossier" type="checkbox" checked={form.visibleInDossier} onChange={(e) => setForm({ ...form, visibleInDossier: e.target.checked })} />
+                Visible al dossier
+              </label>
+            </div>
+            <div className="flex items-end gap-2">
+              <label htmlFor="prod-visible-booking" className="flex items-center gap-2 text-xs admin-tone-text-neutral">
+                <input id="prod-visible-booking" type="checkbox" checked={form.visibleInBooking} onChange={(e) => setForm({ ...form, visibleInBooking: e.target.checked })} />
+                Visible al bolo
+              </label>
+            </div>
           </div>
           <div>
             <label htmlFor="prod-description" className="mb-1 block text-xs admin-tone-text-neutral">
@@ -229,6 +250,7 @@ export default function CollaboratorProductsPanel({ collaboratorId, products, on
                       {p.category && <p className="text-xs text-[color:var(--ax-gold)]">{p.category}</p>}
                     </div>
                     {!p.isActive && <span className="ap-badge">Inactiu</span>}
+                    {p.isActive && !p.visibleInDossier && <span className="ap-badge">Intern</span>}
                   </div>
                   {(p.crew || p.durationLabel) && (
                     <p className="text-xs admin-tone-text-slate">

@@ -10,6 +10,10 @@ const product: AnimacioProduct = {
   inclou: ['Dinamitzacio', 'Musica', 'Premis opcionals'],
 };
 
+function pdfText(doc: Awaited<ReturnType<typeof generateDossierCompositePDF>>): string {
+  return String((doc as unknown as { internal: { pages: unknown[][] } }).internal.pages.flat().join('\n'));
+}
+
 describe('generateDossierCompositePDF', () => {
   it('genera un dossier editorial: portada + introducció + capítol narratiu', async () => {
     const doc = await generateDossierCompositePDF({
@@ -25,6 +29,25 @@ describe('generateDossierCompositePDF', () => {
     // Portada + introducció + 1 capítol = 3 pàgines (els preus van per capítol, sense annex).
     expect(doc.internal.pages.length - 1).toBeGreaterThanOrEqual(3);
     expect(doc.output('arraybuffer').byteLength).toBeGreaterThan(1000);
+  });
+
+  it('obre la introducció amb narrativa de valor, no amb una frase genèrica de catàleg', async () => {
+    const doc = await generateDossierCompositePDF({
+      client: {
+        nom: 'Joan Pla',
+        eventDesc: 'Festa privada',
+      },
+      products: [product],
+      productIds: ['bingo-musical'],
+      locale: 'ca',
+    });
+    const text = pdfText(doc);
+
+    expect(text).toContain('Ritme, joc i moments que la gent');
+    expect(text).toContain('recorda.');
+    expect(text).toContain('Aquest dossier ordena una opció');
+    expect(text).toContain('què anima, què acompanya');
+    expect(text).not.toContain('Mireu què podem portar a la vostra festa.');
   });
 
   it('manté el dossier encara que no hi hagi servei de cataleg resolt', async () => {

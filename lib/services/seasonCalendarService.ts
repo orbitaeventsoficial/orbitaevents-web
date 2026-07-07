@@ -9,8 +9,10 @@ export interface SeasonCalendarBookingLink {
   id: string;
   reference: string;
   status: string;
+  total: number;
   depositPaid: boolean;
   remainingPaid: boolean;
+  cashAmount: number | null;
   /** km anada i tornada de la reserva, per estimar l'hora de sortida al calendari. */
   distanceKm: number | null;
   serviceLines?: SeasonCalendarServiceLine[];
@@ -336,9 +338,10 @@ export async function loadSeasonCalendar(
             id: true,
             reference: true,
             status: true,
+            total: true,
             depositPaid: true,
             remainingPaid: true,
-            total: true,
+            cashAmount: true,
             distanceKm: true,
             serviceLines: {
               orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
@@ -399,8 +402,10 @@ export async function loadSeasonCalendar(
             id: l.booking.id,
             reference: l.booking.reference,
             status: l.booking.status,
+            total: l.booking.total,
             depositPaid: l.booking.depositPaid,
             remainingPaid: l.booking.remainingPaid,
+            cashAmount: l.booking.cashAmount,
             distanceKm: l.booking.distanceKm ?? null,
             serviceLines: l.booking.serviceLines,
           }

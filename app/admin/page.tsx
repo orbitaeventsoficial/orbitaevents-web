@@ -10,6 +10,8 @@
 import Link from 'next/link';
 import { AdminPage, AdminSection, AdminKpiRow, AdminKpi } from './components/AdminPage';
 import { Button } from './lib/dashboard-widgets';
+import { buildPostEventNextActionHref } from './lib/post-event-actions';
+import { projectAdminTodayActions, projectNextEventEconomicTodayAction, projectPostEventTodayAction } from './lib/today-actions';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { fetchDashboardData } from './lib/dashboard-data';
@@ -18,6 +20,7 @@ import { loadDailyBrief } from '@/lib/services/dailyBriefService';
 import { loadCapacityConflicts } from '@/lib/services/capacityConflictService';
 import { loadDayCollisions } from '@/lib/services/dayCollisionService';
 import { loadTopLeadsToWork } from '@/lib/services/leadPriorityService';
+import { loadNextBestActions } from '@/lib/services/nextBestActionService';
 import { loadPostEventPlaybook } from '@/lib/services/postEventPlaybookService';
 import { getPaymentBand, getPaymentLabel } from '@/lib/payment-status';
 
@@ -47,31 +50,77 @@ const PLAYBOOK_TONE: Record<'ALTA' | 'MITJANA' | 'BAIXA' | 'DONE', string> = {
 };
 
 export default async function AdminTodayPage() {
-  const [d, brief, capacity, topLeads, playbook, dayCollisions] = await Promise.all([
+  const now = new Date();
+  const capacityPromise = loadCapacityConflicts(now);
+  const [d, brief, capacity, topLeads, playbook, dayCollisions, nba] = await Promise.all([
     fetchDashboardData(),
-    loadDailyBrief(),
-    loadCapacityConflicts(),
+    loadDailyBrief(now),
+    capacityPromise,
     loadTopLeadsToWork(5),
     loadPostEventPlaybook(),
     loadDayCollisions(),
+    capacityPromise.then((report) => loadNextBestActions(now, { capacity: report })),
   ]);
 
-  const actions = brief.actions.slice(0, 3);
   // Bolos fets amb el cercle encara obert (agraïment/ressenya/testimoni/referral):
   // el CAC més barat. Només els que tenen feina, els 3 més prioritaris.
-  const closeLoop = playbook.items.filter((it) => it.priority !== 'DONE' && it.nextAction).slice(0, 3);
+  const closeLoopItems = playbook.items
+    .filter((it) => it.priority !== 'DONE' && it.nextAction)
+    .slice(0, 3)
+    .map((it) => ({ ...it, actionHref: buildPostEventNextActionHref(it) }));
+  const postEventTodayActions = closeLoopItems.map((it) => projectPostEventTodayAction({
+    bookingId: it.bookingId,
+    href: it.actionHref,
+    clientName: it.clientName,
+    nextActionLabel: it.nextAction?.label ?? 'Post-event',
+    daysSinceEvent: it.daysSinceEvent,
+    priority: it.priority,
+  }));
   const alerts = brief.alerts.filter((a) => a.level !== 'INFO').slice(0, 4);
   const conflicts = capacity.conflicts.slice(0, 2);
   // Guàrdia de dissabtes: dies amb 2+ bolos (no pots ser a dos llocs). Els 3 primers.
   const collisions = dayCollisions.slice(0, 3);
 
   const ne = d.nextEvent;
-  const nePaymentBand = ne ? getPaymentBand(ne.depositPaid, ne.remainingPaid) : null;
+  const economicTodayActions = d.economicRiskBookings
+    .map((booking) => projectNextEventEconomicTodayAction({
+      bookingId: booking.id,
+      href: buildBookingHref(booking.id),
+      clientName: booking.clientName,
+      daysUntil: booking.daysUntil,
+      marginPct: booking.marginPct,
+      netMargin: booking.netMargin,
+      outstandingAmount: booking.outstandingAmount,
+    }))
+    .filter((action): action is NonNullable<typeof action> => Boolean(action));
+  const supplementalTodayActions = [
+    ...economicTodayActions,
+    ...postEventTodayActions,
+  ];
+  const actions = projectAdminTodayActions(nba.actions, brief.actions, 3, supplementalTodayActions);
+  const surfacedPostEventIds = new Set(
+    actions.filter((action) => action.source === 'postEvent').map((action) => action.sourceId)
+  );
+  const closeLoop = closeLoopItems.filter((it) => !surfacedPostEventIds.has(it.bookingId));
+  const nePaymentCoverage = ne
+    ? { cashAmount: Math.max(0, ne.total - ne.outstandingAmount), total: ne.total }
+    : undefined;
+  const nePaymentBand = ne ? getPaymentBand(ne.depositPaid, ne.remainingPaid, nePaymentCoverage) : null;
   const nePaymentDot = nePaymentBand === 'paid'
     ? 'bg-[var(--o-success)]'
     : nePaymentBand === 'partial'
       ? 'bg-[var(--o-warning)]'
       : 'bg-[var(--o-danger)]';
+  const neMarginClass = ne && ne.marginPct >= 45
+    ? 'admin-tone-text-success'
+    : ne && ne.marginPct >= 25
+      ? 'admin-tone-text-warning'
+      : 'admin-tone-text-danger';
+  const neOutstandingClass = ne && ne.outstandingAmount <= 0
+    ? 'admin-tone-text-success'
+    : ne && ne.daysUntil <= 3
+      ? 'admin-tone-text-danger'
+      : 'admin-tone-text-warning';
 
   // Els 6 números que mereixen la mirada del dia (tot ja calculat pels cervells).
   const kpis = [
@@ -123,19 +172,22 @@ export default async function AdminTodayPage() {
       <div className="grid items-start gap-4 lg:grid-cols-2">
       {/* ═══ FES AIXÒ AVUI (top 3 accions) ═══ */}
       <AdminSection
-        title="Fes això avui"
-        description="Les accions que la màquina prioritza ara mateix."
-        actions={<Link href="/admin/tasks" className="ap-btn ap-btn--secondary ap-btn--xs">Totes les tasques</Link>}
+        title="Fes això ara"
+        description="Ranking transversal de leads, clients, tasques, seguiments, capacitat i pipeline."
+        actions={<Link href="/admin/control" className="ap-btn ap-btn--secondary ap-btn--xs">Control complet</Link>}
       >
         {actions.length > 0 ? (
           <div className="grid gap-2.5">
             {actions.map((action, i) => (
-              <Link key={`${action.href}-${i}`} href={action.href} className="ap-card ap-card-body flex items-center gap-4 no-underline">
+              <Link key={action.id} href={action.href} className="ap-card ap-card-body flex items-center gap-4 no-underline">
                 <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[var(--gold)] font-[family-name:var(--display)] text-base font-bold text-[var(--gold-bright)]">{i + 1}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-base font-semibold text-[var(--t)]">{action.label}</span>
                   <span className="block truncate text-sm text-[var(--t3)]">{action.detail}</span>
                 </span>
+                {action.badge && (
+                  <span className={`${action.badgeClass} hidden shrink-0 sm:inline-flex`}>{action.badge}</span>
+                )}
                 <span className="shrink-0 text-sm font-bold text-[var(--t3)]">Obrir →</span>
               </Link>
             ))}
@@ -181,7 +233,7 @@ export default async function AdminTodayPage() {
         >
           <div className="grid gap-2">
             {closeLoop.map((it) => (
-              <Link key={it.bookingId} href="/admin/post-event" className={`ap-card p-3 flex items-center gap-3 no-underline ${PLAYBOOK_TONE[it.priority]}`}>
+              <Link key={it.bookingId} href={it.actionHref} className={`ap-card p-3 flex items-center gap-3 no-underline ${PLAYBOOK_TONE[it.priority]}`}>
                 <span className="ap-badge shrink-0 font-mono tabular-nums" title={`${it.completedCount}/${it.totalCount} accions fetes`}>{it.completedCount}/{it.totalCount}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold text-[var(--t)]">{it.clientName}</span>
@@ -252,12 +304,26 @@ export default async function AdminTodayPage() {
                 <p className="mt-1 text-sm text-[var(--t3)]">
                   {[formatDate(ne.eventDate), ne.eventStartTime, ne.eventType ? getEventLabel(ne.eventType) : null, ne.eventVenue || ne.eventLocation].filter(Boolean).join(' · ')}
                 </p>
+                <div className="mt-3 grid gap-2 text-xs sm:grid-cols-3">
+                  <span className="rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--raised)] px-2.5 py-2">
+                    <span className="block font-mono uppercase tracking-wider text-[var(--t3)]">Marge</span>
+                    <strong className={neMarginClass}>{ne.marginPct}% · {formatCurrency(ne.netMargin)}</strong>
+                  </span>
+                  <span className="rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--raised)] px-2.5 py-2">
+                    <span className="block font-mono uppercase tracking-wider text-[var(--t3)]">Pendent</span>
+                    <strong className={neOutstandingClass}>{formatCurrency(ne.outstandingAmount)}</strong>
+                  </span>
+                  <span className="rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--raised)] px-2.5 py-2">
+                    <span className="block font-mono uppercase tracking-wider text-[var(--t3)]">Checklist</span>
+                    <strong className="text-[var(--t)]">{ne.checklistDone}/{ne.checklistTotal}</strong>
+                  </span>
+                </div>
               </div>
               <div className="shrink-0 text-right">
                 <p className="font-mono text-2xl font-bold tabular-nums text-[var(--t)]">{formatCurrency(ne.total)}</p>
                 <div className="mt-2 flex items-center justify-end gap-1.5">
                   <span className={`inline-block h-2.5 w-2.5 rounded-full ${nePaymentDot}`} />
-                  <span className="text-xs text-[var(--t3)]">{getPaymentLabel(ne.depositPaid, ne.remainingPaid)}</span>
+                  <span className="text-xs text-[var(--t3)]">{getPaymentLabel(ne.depositPaid, ne.remainingPaid, nePaymentCoverage)}</span>
                 </div>
               </div>
             </div>

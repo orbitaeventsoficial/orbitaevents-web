@@ -120,6 +120,15 @@ function formatWindowLabel(days: number): string {
   return days === 1 ? 'les últimes 24h' : `els últims ${days} dies`;
 }
 
+async function readActivityLoadError(response: Response): Promise<string> {
+  try {
+    const payload = await response.json() as { error?: string; message?: string };
+    return payload.error || payload.message || 'Error carregant activitat';
+  } catch {
+    return 'Error carregant activitat';
+  }
+}
+
 export default function ActivityClient() {
   const toast = useToast();
   const [data, setData] = useState<ActivityResponse | null>(null);
@@ -138,7 +147,7 @@ export default function ActivityClient() {
         limit: '50',
       });
       const res = await fetch(`/api/admin/activity?${params}`);
-      if (!res.ok) throw new Error('Error carregant activitat');
+      if (!res.ok) throw new Error(await readActivityLoadError(res));
       const json: ActivityResponse = await res.json();
       setData(json);
     } catch (err) {

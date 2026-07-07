@@ -6,10 +6,9 @@ import { log } from '@/lib/logger';
 import {
   calculateTravelCost,
   DEFAULT_VEHICLE_COST_PER_KM,
-  getIncludedTravelOneWayKm,
   INCLUDED_TRAVEL_KM,
 } from '@/lib/services/travelCost';
-import { calculateClientTravelCharge, calculateTravelCostBreakdown } from '@/lib/services/travelLaborCost';
+import { computeBoloTransport } from '@/lib/services/travelLaborCost';
 import { formatCurrency } from '@/lib/constants';
 import { computeDirectCostBreakdown } from '@/lib/services/costEngine';
 import type { ServiceLineLike } from '@/lib/services/costEngine';
@@ -29,6 +28,8 @@ interface BookingMarginProps {
   extraHourPrice: number;
   distanceKm: number | null;
   vehicleCostPerKm?: number | null;
+  storedTravelCost?: number | null;
+  tollsEur?: number | null;
   eventLocation?: string | null;
   eventVenue?: string | null;
   inventoryCostReal?: number | null;
@@ -57,6 +58,8 @@ export default function BookingMarginCard({
   extraHourPrice,
   distanceKm: initialDistanceKm,
   vehicleCostPerKm: initialVehicleCostPerKm,
+  storedTravelCost,
+  tollsEur: initialTollsEur,
   eventLocation,
   eventVenue,
   inventoryCostReal,
@@ -76,27 +79,36 @@ export default function BookingMarginCard({
   const toast = useToast();
 
   const [distanceKm, setDistanceKm] = useState(initialDistanceKm ?? 0);
+  const [tollsEur, setTollsEur] = useState(
+    typeof initialTollsEur === 'number' && Number.isFinite(initialTollsEur)
+      ? Math.max(0, initialTollsEur)
+      : 0,
+  );
   const resolvedCostPerKm = initialVehicleCostPerKm ?? DEFAULT_VEHICLE_COST_PER_KM;
   const [vehicleCostPerKm] = useState(resolvedCostPerKm);
   const [saving, setSaving] = useState(false);
   const [calculatingDistance, setCalculatingDistance] = useState(false);
   const [distanceMessage, setDistanceMessage] = useState<string | null>(null);
+  const [travelSaveError, setTravelSaveError] = useState<string | null>(null);
   const lastDistanceDestinationRef = useRef('');
 
-  // Transport (#1363): cost real dues potes (cotxe/km + gent/hores). El càrrec al client
-  // = el mateix cost (break-even) via la font única. `calculatedTravelCost` és només el
-  // cotxe (cost intern del vehicle); les hores de gent són cost de col·laborador a part.
-  const travelBreakdown = calculateTravelCostBreakdown({
+  const hasChanged = distanceKm !== (initialDistanceKm ?? 0);
+
+  // Transport (#1369): una sola font per cost/càrrec/headcount. Si la reserva ja té
+  // `travelCost` guardat, és la veritat fins que l'operador canvia la distància.
+  const transport = computeBoloTransport({
     roundTripKm: distanceKm,
     vehicleCostPerKm,
-    vehicleOwner: { label: '' },
-    people: travelHeadcount > 0
-      ? [{ role: 'DRIVER', label: '' }, ...(travelHeadcount > 1 ? [{ role: 'PASSENGER' as const, label: '', count: travelHeadcount - 1 }] : [])]
-      : [],
+    headcountOverride: travelHeadcount,
+    tollsEur,
   });
-  const calculatedTravelCost = calculateTravelCost(distanceKm, vehicleCostPerKm, INCLUDED_TRAVEL_KM);
-  const calculatedTravelCharge = calculateClientTravelCharge(distanceKm, travelHeadcount, vehicleCostPerKm);
-  const includedOneWayKm = getIncludedTravelOneWayKm(INCLUDED_TRAVEL_KM);
+  const travelBreakdown = transport.breakdown;
+  const vehicleOnlyTravelCost = calculateTravelCost(distanceKm, vehicleCostPerKm, INCLUDED_TRAVEL_KM);
+  const calculatedTravelCost = !hasChanged && typeof storedTravelCost === 'number' && storedTravelCost > 0
+    ? storedTravelCost
+    : transport.cost;
+  const calculatedTravelCharge = transport.clientCharge;
+  const effectiveTravelHeadcount = transport.headcount;
   const travelNetMargin = calculatedTravelCharge - calculatedTravelCost;
   const travelMarginPct = calculatedTravelCharge > 0 ? (travelNetMargin / calculatedTravelCharge) * 100 : 0;
 
@@ -142,6 +154,7 @@ export default function BookingMarginCard({
 
   const handleSave = useCallback(async () => {
     setSaving(true);
+    setTravelSaveError(null);
     try {
       const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}`, {
         method: 'PATCH',
@@ -149,7 +162,8 @@ export default function BookingMarginCard({
         body: JSON.stringify({
           distanceKm,
           fuelCostPerKm: vehicleCostPerKm,
-          travelCost: calculatedTravelCost,
+          tollsEur,
+          travelCost: transport.cost,
         }),
       });
 
@@ -161,22 +175,31 @@ export default function BookingMarginCard({
       toast.success('Costos de viatge desats');
       router.refresh();
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Error desant costos';
       log.error('Error saving travel cost', error);
-      toast.error(error instanceof Error ? error.message : 'Error desant costos');
+      setTravelSaveError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
-  }, [bookingId, distanceKm, vehicleCostPerKm, calculatedTravelCost, router, toast]);
+  }, [bookingId, distanceKm, vehicleCostPerKm, tollsEur, transport.cost, router, toast]);
 
-  const persistDistance = useCallback(async (nextDistanceKm: number) => {
+  const persistDistance = useCallback(async (nextDistanceKm: number, nextTollsEur = tollsEur) => {
     try {
+      const nextTransport = computeBoloTransport({
+        roundTripKm: nextDistanceKm,
+        vehicleCostPerKm,
+        headcountOverride: travelHeadcount,
+        tollsEur: nextTollsEur,
+      });
       const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           distanceKm: nextDistanceKm,
           fuelCostPerKm: vehicleCostPerKm,
-          travelCost: calculateTravelCost(nextDistanceKm, vehicleCostPerKm, INCLUDED_TRAVEL_KM),
+          tollsEur: nextTollsEur,
+          travelCost: nextTransport.cost,
         }),
       });
       if (!res.ok) {
@@ -187,7 +210,7 @@ export default function BookingMarginCard({
       log.error('[BookingMarginCard] Error desant distancia', err);
       toast.error('Error desant la distància');
     }
-  }, [bookingId, vehicleCostPerKm, toast]);
+  }, [bookingId, tollsEur, travelHeadcount, vehicleCostPerKm, toast]);
 
   const calculateDistanceForDestination = useCallback(async (destination: string) => {
     setCalculatingDistance(true);
@@ -205,9 +228,13 @@ export default function BookingMarginCard({
       }
 
       const nextDistanceKm = Number(data.roundTripKm || 0);
+      const nextTollsEur = typeof data.tollsEur === 'number' && data.tollsEur > 0
+        ? data.tollsEur
+        : tollsEur;
       setDistanceKm(nextDistanceKm);
+      setTollsEur(nextTollsEur);
       lastDistanceDestinationRef.current = destination;
-      void persistDistance(nextDistanceKm);
+      void persistDistance(nextDistanceKm, nextTollsEur);
       setDistanceMessage(`Ruta: ${data.oneWayKm || 0} km anada · ${data.roundTripKm || 0} km anada i tornada`);
     } catch (error) {
       setDistanceMessage(error instanceof Error ? error.message : 'Error calculant ruta');
@@ -227,8 +254,6 @@ export default function BookingMarginCard({
 
     return () => clearTimeout(timer);
   }, [eventLocation, eventVenue, calculateDistanceForDestination]);
-
-  const hasChanged = distanceKm !== (initialDistanceKm ?? 0);
 
   return (
     <section
@@ -281,7 +306,7 @@ export default function BookingMarginCard({
         </div>
       </div>
 
-      <div className="mb-6 ap-card p-4" data-help-title="Sumatori de costos i marge" data-help-desc="Desglossa d'on surt el cost directe i com es compara el marge real amb el marge objectiu.">
+      <div id="booking-margin-costs" className="mb-6 scroll-mt-40 ap-card p-4" data-help-title="Sumatori de costos i marge" data-help-desc="Desglossa d'on surt el cost directe i com es compara el marge real amb el marge objectiu.">
         <h3 className="text-sm font-semibold mb-3">Sumatori de costos i marge</h3>
         <div className="space-y-1.5 text-xs">
           <div className="flex justify-between"><span>Cost pack (real o estimat)</span><span>{formatCurrency(packCostUsed)}</span></div>
@@ -420,11 +445,29 @@ export default function BookingMarginCard({
           <span>{formatCurrency(fixedOperationalCost)}</span>
         </div>
         <div className="flex justify-between">
-          <span>Desplaçament cotxe ({distanceKm.toFixed(0)} km)</span>
+          <span>Cost transport intern ({distanceKm.toFixed(0)} km)</span>
           <span>{formatCurrency(calculatedTravelCost)}</span>
         </div>
+        {tollsEur > 0 && (
+          <div className="flex justify-between">
+            <span>Peatges inclosos</span>
+            <span>{formatCurrency(tollsEur)}</span>
+          </div>
+        )}
+        {travelBreakdown.peopleCost > 0 && (
+          <div className="flex justify-between">
+            <span>Temps tripulació transport</span>
+            <span>{formatCurrency(travelBreakdown.peopleCost)}</span>
+          </div>
+        )}
+        {transport.mealAllowance > 0 && (
+          <div className="flex justify-between">
+            <span>Dieta transport</span>
+            <span>{formatCurrency(transport.mealAllowance)}</span>
+          </div>
+        )}
         <div className="flex justify-between">
-          <span>Transport al client (cotxe + {travelBreakdown.chargeableHours} h × {travelHeadcount} pers.)</span>
+          <span>Transport al client (vehicle + {travelBreakdown.chargeableHours} h × {effectiveTravelHeadcount} pers.)</span>
           <span>{formatCurrency(calculatedTravelCharge)}</span>
         </div>
         <div className="flex justify-between">
@@ -441,23 +484,28 @@ export default function BookingMarginCard({
         <BoloTripCard
           km={distanceKm}
           distanceKm={String(distanceKm)}
-          onDistanceChange={(v) => setDistanceKm(Number(v) || 0)}
+          onDistanceChange={(v) => {
+            setDistanceKm(Number(v) || 0);
+            setTravelSaveError(null);
+          }}
           calculatingDistance={calculatingDistance}
-          derivedHeadcount={travelHeadcount}
-          headcount={travelHeadcount}
+          derivedHeadcount={effectiveTravelHeadcount}
+          headcount={effectiveTravelHeadcount}
           chargeableHours={travelBreakdown.chargeableHours}
-          tripCrowded={travelHeadcount > CROWDED_TRIP_THRESHOLD}
+          tripCrowded={effectiveTravelHeadcount > CROWDED_TRIP_THRESHOLD}
         />
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           <div className="ap-card p-3">
-            <p className="text-xs uppercase tracking-wide" title="Inclou benzina, manteniment, assegurança i amortització. Valor recomanat: 0.35-0.50 €/km">Cost vehicle per km</p>
+            <p className="text-xs uppercase tracking-wide" title="Inclou vehicle, tripulació de ruta, dieta i peatges quan apliquen.">Cost transport intern</p>
             <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCost)}</p>
-            <p className="text-xs">{distanceKm.toFixed(1)} km · {vehicleCostPerKm.toFixed(2)} €/km</p>
+            <p className="text-xs">
+              vehicle {formatCurrency(vehicleOnlyTravelCost)} · {distanceKm.toFixed(1)} km · {vehicleCostPerKm.toFixed(2)} €/km{tollsEur > 0 ? ` · peatges ${formatCurrency(tollsEur)}` : ''}
+            </p>
           </div>
           <div className="ap-card p-3">
             <p className="text-xs uppercase tracking-wide">Ingressos transport</p>
             <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCharge)}</p>
-            <p className="text-xs">cotxe + {travelBreakdown.chargeableHours} h × {travelHeadcount} pers.</p>
+            <p className="text-xs">vehicle + {travelBreakdown.chargeableHours} h × {effectiveTravelHeadcount} pers.</p>
           </div>
           <div className={`ap-card p-3 ${travelMarginCardBorder} ${travelMarginCardBg}`}>
             <p className="text-xs uppercase tracking-wide">Marge real transport</p>
@@ -477,10 +525,16 @@ export default function BookingMarginCard({
           <button
             onClick={handleSave}
             disabled={saving}
+            aria-invalid={travelSaveError ? true : undefined}
             className="mt-3 ap-btn ap-btn--primary text-sm disabled:opacity-50"
           >
             {saving ? 'Desant...' : 'Desar canvis'}
           </button>
+        )}
+        {travelSaveError && (
+          <p role="alert" className="mt-2 rounded-[var(--o-r-md)] border border-[var(--ax-danger-border)] px-3 py-2 text-xs font-semibold text-[var(--o-danger)]">
+            {travelSaveError}
+          </p>
         )}
       </div>
     </section>

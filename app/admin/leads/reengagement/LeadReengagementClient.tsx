@@ -38,6 +38,7 @@ export default function LeadReengagementClient({ initialCandidates }: Props) {
   const [reasonFilter, setReasonFilter] = useState<string | null>(null);
   const [dismissed, setDismissed]     = useState<Set<string>>(new Set());
   const [copied, setCopied]           = useState<string | null>(null);
+  const [copyError, setCopyError]     = useState<{ leadId: string; message: string } | null>(null);
 
   const visible = useMemo(() =>
     initialCandidates.filter((c) => {
@@ -68,12 +69,20 @@ export default function LeadReengagementClient({ initialCandidates }: Props) {
   }
 
   async function handleCopyMessage(candidate: SerializedCandidate) {
+    setCopyError(null);
     try {
       await navigator.clipboard.writeText(candidate.suggestedMessage);
       setCopied(candidate.leadId);
       setTimeout(() => setCopied(null), 2000);
-    } catch {
-      // clipboard no disponible
+    } catch (error) {
+      console.error('[LeadReengagementClient] Error copiant missatge de reengagement', {
+        leadId: candidate.leadId,
+        error,
+      });
+      setCopyError({
+        leadId: candidate.leadId,
+        message: 'No s\'ha pogut copiar el missatge.',
+      });
     }
   }
 
@@ -266,6 +275,12 @@ export default function LeadReengagementClient({ initialCandidates }: Props) {
                 <button
                   type="button"
                   onClick={() => handleCopyMessage(c)}
+                  aria-invalid={copyError?.leadId === c.leadId ? true : undefined}
+                  aria-describedby={
+                    copyError?.leadId === c.leadId
+                      ? `lead-reengagement-copy-error-${c.leadId}`
+                      : undefined
+                  }
                   className="ap-btn ap-btn--xs flex-1 sm:flex-none"
                 >
                   {copied === c.leadId ? '✓ Copiat' : 'Copiar missatge'}
@@ -284,6 +299,15 @@ export default function LeadReengagementClient({ initialCandidates }: Props) {
                   Descartar
                 </button>
               </div>
+              {copyError?.leadId === c.leadId && (
+                <p
+                  id={`lead-reengagement-copy-error-${c.leadId}`}
+                  role="alert"
+                  className="ap-card-body pt-0 text-xs admin-tone-text-danger"
+                >
+                  {copyError.message}
+                </p>
+              )}
             </article>
           ))}
         </div>

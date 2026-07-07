@@ -47,11 +47,17 @@ export default function PostEventEmailButton({ bookingId }: { bookingId: string 
             ? 'ap-btn--secondary admin-tone-border-success admin-tone-bg-success admin-tone-text-success'
             : 'ap-btn--primary'
         }`}
+        aria-invalid={error ? true : undefined}
       >
         {sent ? '✓ Enviat!' : sending ? 'Enviant...' : 'Envia post-event al client'}
       </button>
+      {sent && (
+        <span role="status" className="sr-only">
+          Email post-event enviat
+        </span>
+      )}
       {error && (
-        <span className="admin-tone-text-danger mt-1 text-xs">{error}</span>
+        <span role="alert" className="admin-tone-text-danger mt-1 text-xs">{error}</span>
       )}
     </div>
   );

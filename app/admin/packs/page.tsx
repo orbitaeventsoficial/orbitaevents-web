@@ -8,7 +8,7 @@ import PackPriceQuickEditor from './PackPriceQuickEditor';
 import { getAllPacks } from '@/config/packs-config';
 import { computePackPricingHealth, getPackPricingModelConfig, type PackPricingHealth } from '@/lib/services/packPricingHealth';
 import { AdminPage } from '../components/AdminPage';
-import { PACK_SERVICE_OPTIONS, formatCurrencyExact } from '@/lib/constants';
+import { PACK_SERVICE_OPTIONS, formatCurrency, formatCurrencyExact } from '@/lib/constants';
 import { ORBITA_SERVICES } from '@/lib/constants/orbita-services';
 import { calculateCostPerHour } from '@/lib/inventory-utils';
 import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
@@ -380,7 +380,7 @@ export default async function PacksPage({
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="ap-card p-2">
                           <p className="">Pack recomanat</p>
-                          <p className="text-sm font-semibold">{formatCurrencyExact(health.recommendedPrice)}</p>
+                          <p className="text-sm font-semibold">{formatCurrency(health.recommendedPrice)}</p>
                         </div>
                         <PackPriceQuickEditor
                           packId={pack.id}
@@ -392,7 +392,7 @@ export default async function PacksPage({
                         />
                         <div className="ap-card p-2">
                           <p className="">Hora extra recomanada</p>
-                          <p className="text-sm font-semibold">{formatCurrencyExact(health.recommendedExtraHourPrice)}</p>
+                          <p className="text-sm font-semibold">{formatCurrency(health.recommendedExtraHourPrice)}</p>
                         </div>
                         <div className={`ap-card col-span-2 p-2 ${divergenceColor}`}>
                           <p className="text-xs">Llindar alerta: {pricingConfig.alertDivergencePct}%</p>
@@ -404,7 +404,7 @@ export default async function PacksPage({
                           IRPF {(health.withholdingPct * 100).toFixed(1)}% → net estimat percebut: {health.laborNetAfterWithholdingPerHourUsed.toFixed(2)}€/h
                         </div>
                         <div className="ap-card col-span-2 p-2 text-xs">
-                          Operari extra sempre disponible: {health.recommendedOperatorExtraHourPrice.toFixed(2)}€/h (recomanat)
+                          Operari extra sempre disponible: {formatCurrency(health.recommendedOperatorExtraHourPrice)}/h (recomanat)
                         </div>
                       </div>
                     )}
@@ -544,7 +544,7 @@ export default async function PacksPage({
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="ap-card p-2">
                           <p className="">Pack recomanat</p>
-                          <p className="text-sm font-semibold">{formatCurrencyExact(health.recommendedPrice)}</p>
+                          <p className="text-sm font-semibold">{formatCurrency(health.recommendedPrice)}</p>
                         </div>
                         <PackPriceQuickEditor
                           packId={pack.id}
@@ -556,7 +556,7 @@ export default async function PacksPage({
                         />
                         <div className="ap-card p-2">
                           <p className="">Hora extra recomanada</p>
-                          <p className="text-sm font-semibold">{formatCurrencyExact(health.recommendedExtraHourPrice)}</p>
+                          <p className="text-sm font-semibold">{formatCurrency(health.recommendedExtraHourPrice)}</p>
                         </div>
                         <div className={`ap-card col-span-2 p-2 ${divergenceColor}`}>
                           <p className="text-xs">Llindar alerta: {pricingConfig.alertDivergencePct}%</p>
@@ -568,7 +568,7 @@ export default async function PacksPage({
                           IRPF {(health.withholdingPct * 100).toFixed(1)}% → net estimat percebut: {health.laborNetAfterWithholdingPerHourUsed.toFixed(2)}€/h
                         </div>
                         <div className="ap-card col-span-2 p-2 text-xs">
-                          Operari extra sempre disponible: {health.recommendedOperatorExtraHourPrice.toFixed(2)}€/h (recomanat)
+                          Operari extra sempre disponible: {formatCurrency(health.recommendedOperatorExtraHourPrice)}/h (recomanat)
                         </div>
                       </div>
                     )}

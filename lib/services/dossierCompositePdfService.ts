@@ -104,6 +104,7 @@ function drawIntro(doc: jsPDFType, client: DossierClientInfo, productCount: numb
   doc.addPage();
   doc.setFillColor(...COLORS.paperBg);
   doc.rect(0, 0, PAGE.width, PAGE.height, 'F');
+  const optionLabel = productCount === 1 ? 'una opció' : productCount > 1 ? `${productCount} opcions` : 'algunes opcions';
 
   let y = 42;
   doc.setTextColor(...COLORS.gold);
@@ -114,19 +115,19 @@ function drawIntro(doc: jsPDFType, client: DossierClientInfo, productCount: numb
 
   doc.setTextColor(...COLORS.paperText);
   doc.setFontSize(22);
-  doc.text(doc.splitTextToSize('Mireu què podem portar a la vostra festa.', 150), PDF_DESIGN.left, y);
+  doc.text(doc.splitTextToSize('Ritme, joc i moments que la gent recorda.', 150), PDF_DESIGN.left, y);
   y += 30;
 
   setStyleBody(doc);
   const greeting = client.salutacio ||
-    `Hola ${client.nom}, gràcies per pensar en nosaltres! En aquestes pàgines hi trobareu les nostres animacions i espectacles, explicats amb calma. Mireu-los amb tranquil·litat i quedeu-vos amb els que us facin il·lusió per al vostre dia.`;
+    `Hola ${client.nom}, gràcies per pensar en nosaltres! Aquest dossier ordena ${optionLabel} perquè pugueu imaginar el ritme del dia: què anima, què acompanya i què pot quedar com a moment especial. Mireu-ho amb calma; després acabem d'ajustar-ho a espai, horaris i convidats.`;
   doc.text(doc.splitTextToSize(greeting, 150), PDF_DESIGN.left, y);
   y += 42;
 
   y = drawCanonicalSectionTitle(doc, y, 'Com està ordenat');
   const paragraphs = [
     'Ho hem separat per moments: animació per a adults, animació per als més petits i el suport musical. Així és fàcil veure què va bé per a cada estona de la festa.',
-    'Cada proposta porta el seu preu de referència. Els extres i els detalls els acabem de tancar junts quan sapiguem quanta gent vindrà, els horaris i l\'espai.',
+    'Cada proposta porta el seu preu de referència. Els extres i els detalls els tanquem junts quan sapiguem quanta gent vindrà, els horaris i l\'espai.',
   ];
   paragraphs.forEach((paragraph) => {
     setStyleBody(doc);

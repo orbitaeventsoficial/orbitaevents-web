@@ -10,6 +10,7 @@ import { loadCommTimeline } from '@/lib/services/commTimelineService';
 import { detectPendingFollowUps, deriveLeadResponseState } from '@/lib/services/responseTrackingService';
 import { generateReactivationCandidates } from '@/lib/services/reactivationService';
 import { fetchCanonicalEventsForCustomer } from '@/lib/services/timelineQueryService';
+import { bookingOutstandingAmount } from '@/lib/payment-status';
 import {
   type CustomerHubTaskLite,
   fetchCustomerHubCollections,
@@ -51,6 +52,9 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
   const proposalsMapped = proposals.map((proposal: Proposal) => ({
     id: proposal.id,
     reference: proposal.reference,
+    customerId: proposal.customerId || null,
+    leadId: proposal.leadId || null,
+    bookingId: proposal.bookingId || null,
     status: proposal.status as 'DRAFT' | 'SENT' | 'VIEWED' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED',
     total: Number(proposal.total || 0),
     createdAt: proposal.createdAt.toISOString(),
@@ -59,6 +63,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     snapshot: (proposal.snapshot as Record<string, unknown> | null) || undefined,
     contractReference: proposal.contractReference || null,
     contractStatus: proposal.contractStatus || null,
+    contractPdfUrl: proposal.contractPdfUrl || null,
     contractSentAt: proposal.contractSentAt?.toISOString() || null,
     contractSignedAt: proposal.contractSignedAt?.toISOString() || null,
   }));
@@ -82,7 +87,9 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
       venue: bookingRow.eventVenue || undefined,
       distanceKm: typeof bookingRow.distanceKm === 'number' ? bookingRow.distanceKm : undefined,
       depositAmount: typeof bookingRow.depositAmount === 'number' ? bookingRow.depositAmount : undefined,
+      remainingAmount: typeof bookingRow.remainingAmount === 'number' ? bookingRow.remainingAmount : undefined,
       totalAmount: typeof bookingRow.total === 'number' ? bookingRow.total : undefined,
+      cashAmount: typeof bookingRow.cashAmount === 'number' ? bookingRow.cashAmount : undefined,
       eventType: bookingRow.eventType || undefined,
       packName,
       guestCount: typeof bookingRow.guestCount === 'number' ? bookingRow.guestCount : undefined,
@@ -213,16 +220,17 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
 
   const totalQuoted = proposalsMapped.reduce((sum, proposal) => sum + (proposal.total || 0), 0);
   const totalPaid = bookingsRows.reduce((sum, bookingRow) => {
-    let paid = 0;
-    if (bookingRow.depositPaid && typeof bookingRow.depositAmount === 'number') paid += bookingRow.depositAmount;
-    if (
-      bookingRow.remainingPaid &&
-      typeof bookingRow.total === 'number' &&
-      typeof bookingRow.depositAmount === 'number'
-    ) {
-      paid += bookingRow.total - bookingRow.depositAmount;
-    }
-    return sum + paid;
+    const total = typeof bookingRow.total === 'number' ? bookingRow.total : 0;
+    const depositAmount = typeof bookingRow.depositAmount === 'number' ? bookingRow.depositAmount : 0;
+    const outstanding = bookingOutstandingAmount({
+      total,
+      depositAmount,
+      remainingAmount: typeof bookingRow.remainingAmount === 'number' ? bookingRow.remainingAmount : undefined,
+      depositPaid: Boolean(bookingRow.depositPaid),
+      remainingPaid: Boolean(bookingRow.remainingPaid),
+      cashAmount: bookingRow.cashAmount,
+    });
+    return sum + Math.max(0, total - outstanding);
   }, 0);
 
   const marginEstimated =
@@ -300,6 +308,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
           total: lead.booking.total,
           depositAmount: typeof lead.booking.depositAmount === 'number' ? lead.booking.depositAmount : undefined,
           remainingAmount: typeof lead.booking.remainingAmount === 'number' ? lead.booking.remainingAmount : undefined,
+          cashAmount: typeof lead.booking.cashAmount === 'number' ? lead.booking.cashAmount : undefined,
           discountCode: lead.booking.discountCode || undefined,
           eventType: lead.booking.eventType || undefined,
           date: lead.booking.eventDate?.toISOString(),

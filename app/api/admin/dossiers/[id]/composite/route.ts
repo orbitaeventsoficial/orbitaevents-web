@@ -3,11 +3,12 @@ import { join } from 'path';
 import { requireAuth } from '@/lib/auth';
 import { NextResponse, type NextRequest } from 'next/server';
 import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
-import { getDossierById } from '@/lib/services/dossierService';
+import { getDossierById, resolveDossierTraceOrigin } from '@/lib/services/dossierService';
 import { generateDossierCompositePDF } from '@/lib/services/dossierCompositePdfService';
 import { getDossierCollaboratorProductsByIds } from '@/lib/services/collaboratorProductService';
 import type { DossierClientInfo } from '@/lib/utils/dossier-html-builder';
 import { productsFromDossierLineSnapshot } from '@/lib/services/dossierSnapshotService';
+import { DOCUMENT_ADMIN_LOG_ACTIONS, recordDocumentAdminLog } from '@/lib/services/documentAuditTrailService';
 
 function readLogoDataUri(): string | undefined {
   try {
@@ -64,6 +65,28 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   });
   const pdf = Buffer.from(doc.output('arraybuffer'));
   const filename = `dossier-complet-${params.id}.pdf`;
+  const origin = await resolveDossierTraceOrigin(dossier.leadId);
+  await recordDocumentAdminLog({
+    action: DOCUMENT_ADMIN_LOG_ACTIONS.DOSSIER_COMPOSITE_PDF_GENERATED,
+    entity: 'dossier',
+    entityId: params.id,
+    details: {
+      documentType: 'DOSSIER',
+      source: 'dossier_composite_pdf',
+      dataSource: snapshotProducts ? 'snapshot' : 'live_catalog',
+      dossierId: params.id,
+      leadId: origin.leadId,
+      leadName: origin.leadName,
+      customerId: origin.customerId,
+      customerName: origin.customerName,
+      filename,
+      clientName: dossier.nom,
+      productIds: dossier.productIds,
+      productCount: products.length,
+      collaboratorProductCount: collaboratorProducts.length,
+      extrasCount: extras.length,
+    },
+  });
 
   return new NextResponse(pdf, {
     headers: {

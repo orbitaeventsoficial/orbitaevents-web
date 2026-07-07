@@ -34,6 +34,7 @@ import {
 } from '@/lib/admin/customerWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { getLeadPriorityColorDisplay } from '@/app/admin/leads/colorTheme';
+import { bookingOutstandingBreakdown } from '@/lib/payment-status';
 
 type CustomerEditableFields = {
   name: string;
@@ -42,6 +43,27 @@ type CustomerEditableFields = {
   instagram?: string;
   preferredLocale: string;
 };
+
+type TopLeadBooking = NonNullable<CustomerHubDTO['leads'][number]['booking']>;
+
+function getTopLeadBookingPaymentState(booking: TopLeadBooking) {
+  const depositAmount = booking.depositAmount ?? 0;
+  const breakdown = bookingOutstandingBreakdown({
+    total: booking.total,
+    depositAmount,
+    remainingAmount: booking.remainingAmount,
+    depositPaid: booking.depositPaid === true,
+    remainingPaid: booking.remainingPaid === true,
+    cashAmount: booking.cashAmount,
+  });
+  const hasDeposit = depositAmount > 0;
+  const label = breakdown.total <= 0
+    ? 'tancat'
+    : hasDeposit && breakdown.depositAmount <= 0
+      ? 'parcial'
+      : 'pendent';
+  return { breakdown, label };
+}
 
 export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
   const router = useRouter();
@@ -108,20 +130,17 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
         ? 'Prioritat del pas: Informativa'
         : null;
   const topLeadBookingDaysUntil = topLead?.booking?.date ? getDaysUntil(topLead.booking.date) : null;
+  const topLeadPaymentState = topLead?.booking ? getTopLeadBookingPaymentState(topLead.booking) : null;
   const topLeadPaymentRisk = topLead?.booking
-    && typeof topLead.booking.remainingAmount === 'number'
-    && topLead.booking.remainingAmount > 0
-    && topLead.booking.remainingPaid !== true
+    && topLeadPaymentState
+    && topLeadPaymentState.breakdown.total > 0
     && topLeadBookingDaysUntil !== null
     && topLeadBookingDaysUntil <= 14
-      ? `Risc temporal: queden ${topLeadBookingDaysUntil} dies i ${formatCurrency(topLead.booking.remainingAmount)} pendents`
-      : null;
+      ? `Risc temporal: queden ${topLeadBookingDaysUntil} dies i ${formatCurrency(topLeadPaymentState.breakdown.total)} pendents`
+    : null;
   const topLeadPaymentSummary = topLead?.booking
-    ? topLead.booking.remainingPaid === true || topLead.booking.remainingAmount === 0
-      ? 'Estat econòmic: cobrament tancat'
-      : topLead.booking.depositPaid
-        ? 'Estat econòmic: cobrament parcial'
-        : 'Estat econòmic: cobrament pendent'
+    && topLeadPaymentState
+    ? `Estat econòmic: cobrament ${topLeadPaymentState.label}`
     : null;
   const reactivationTaskHref = data.reactivation
     ? buildReactivationTaskHref(data.customer.id, data.customer.name, data.reactivation)
@@ -531,11 +550,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                 )}
                 {topLead.booking && (
                   <p className="mt-1 text-xs opacity-60">
-                    Cobrament: {topLead.booking.depositPaid && topLead.booking.remainingPaid
-                      ? 'Pagada'
-                      : topLead.booking.depositPaid
-                        ? 'Bestreta cobrada'
-                        : 'Pagament pendent'}
+                    Cobrament: {topLeadPaymentState?.label ?? 'cobrament pendent'}
                   </p>
                 )}
                 {topLeadActionChannel && (
@@ -970,6 +985,18 @@ function buildReactivationTaskHref(
 // CRM STATUS BAR — Lifecycle badge, health score, tags
 // ═══════════════════════════════════════════════════════════════════════════
 
+type CustomerTagMutationPayload = {
+  ok?: boolean;
+  error?: unknown;
+  message?: unknown;
+};
+
+function readCustomerTagMutationError(data: CustomerTagMutationPayload, fallback: string) {
+  if (typeof data.error === 'string' && data.error.trim()) return data.error;
+  if (typeof data.message === 'string' && data.message.trim()) return data.message;
+  return fallback;
+}
+
 function CrmStatusBar({
   customer,
   onTagsChange,
@@ -980,6 +1007,7 @@ function CrmStatusBar({
   const [addingTag, setAddingTag] = useState(false);
   const [newTag, setNewTag] = useState('');
   const [saving, setSaving] = useState(false);
+  const [tagError, setTagError] = useState('');
 
   const lifecycle = (customer.lifecycleStage || 'NEW') as CustomerLifecycleValue;
   const healthScore = customer.healthScore;
@@ -988,32 +1016,47 @@ function CrmStatusBar({
   const handleAddTag = useCallback(async (tag: string) => {
     if (!tag.trim()) return;
     setSaving(true);
+    setTagError('');
     try {
-      await fetchWithCsrf(`/api/admin/customers/${customer.id}/tags`, {
+      const res = await fetchWithCsrf(`/api/admin/customers/${customer.id}/tags`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'add', tags: [tag.trim()] }),
       });
+      const data = await res.json().catch(() => ({})) as CustomerTagMutationPayload;
+      if (!res.ok || data.ok === false) {
+        throw new Error(readCustomerTagMutationError(data, "No s'ha pogut afegir el tag"));
+      }
       setNewTag('');
       setAddingTag(false);
       onTagsChange();
-    } catch {
-      console.error('Error afegint tag');
+    } catch (err) {
+      console.error('Error afegint tag', err);
+      setTagError(err instanceof Error ? err.message : "No s'ha pogut afegir el tag");
     } finally {
       setSaving(false);
     }
   }, [customer.id, onTagsChange]);
 
   const handleRemoveTag = useCallback(async (tag: string) => {
+    setSaving(true);
+    setTagError('');
     try {
-      await fetchWithCsrf(`/api/admin/customers/${customer.id}/tags`, {
+      const res = await fetchWithCsrf(`/api/admin/customers/${customer.id}/tags`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'remove', tags: [tag] }),
       });
+      const data = await res.json().catch(() => ({})) as CustomerTagMutationPayload;
+      if (!res.ok || data.ok === false) {
+        throw new Error(readCustomerTagMutationError(data, "No s'ha pogut eliminar el tag"));
+      }
       onTagsChange();
-    } catch {
-      console.error('Error eliminant tag');
+    } catch (err) {
+      console.error('Error eliminant tag', err);
+      setTagError(err instanceof Error ? err.message : "No s'ha pogut eliminar el tag");
+    } finally {
+      setSaving(false);
     }
   }, [customer.id, onTagsChange]);
 
@@ -1051,6 +1094,9 @@ function CrmStatusBar({
           </span>
         )}
       </div>
+      {tagError && (
+        <p role="alert" className="rounded-lg border admin-tone-border-danger px-3 py-2 text-xs admin-tone-text-danger">{tagError}</p>
+      )}
 
       {/* Tags */}
       <div className="flex flex-wrap items-center gap-1.5">
@@ -1134,6 +1180,19 @@ type ContactForm = {
 
 const EMPTY_FORM: ContactForm = { name: '', role: '', email: '', phone: '', notes: '', isPrimary: false };
 
+type ContactMutationPayload = {
+  ok?: boolean;
+  contact?: CustomerContactDTO;
+  error?: unknown;
+  message?: unknown;
+};
+
+function readContactMutationError(data: ContactMutationPayload, fallback: string) {
+  if (typeof data.error === 'string' && data.error.trim()) return data.error;
+  if (typeof data.message === 'string' && data.message.trim()) return data.message;
+  return fallback;
+}
+
 function ContactsSection({ customerId, contacts: initialContacts }: { customerId: string; contacts: CustomerContactDTO[] }) {
   const [contacts, setContacts] = useState<CustomerContactDTO[]>(initialContacts);
   const [adding, setAdding] = useState(false);
@@ -1161,8 +1220,8 @@ function ContactsSection({ customerId, contacts: initialContacts }: { customerId
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, email: form.email || null }),
       });
-      const data = await res.json() as { ok: boolean; contact?: CustomerContactDTO; error?: string };
-      if (!data.ok) { setError(data.error || 'Error'); return; }
+      const data = await res.json().catch(() => ({})) as ContactMutationPayload;
+      if (!res.ok || !data.ok) { setError(readContactMutationError(data, 'Error')); return; }
       if (data.contact) {
         if (editId) {
           setContacts(prev => prev.map(c => c.id === editId ? data.contact! : c));
@@ -1183,12 +1242,18 @@ function ContactsSection({ customerId, contacts: initialContacts }: { customerId
 
   const handleDelete = async (id: string) => {
     setSaving(true);
+    setError('');
     try {
-      await fetchWithCsrf(`/api/admin/customers/${customerId}/contacts/${id}`, { method: 'DELETE' });
+      const res = await fetchWithCsrf(`/api/admin/customers/${customerId}/contacts/${id}`, { method: 'DELETE' });
+      const data = await res.json().catch(() => ({})) as ContactMutationPayload;
+      if (!res.ok || data.ok === false) {
+        throw new Error(readContactMutationError(data, "No s'ha pogut eliminar el contacte"));
+      }
       setContacts(prev => prev.filter(c => c.id !== id));
       if (editId === id) { setEditId(null); setForm(EMPTY_FORM); }
     } catch (err) {
       console.error('[ContactsSection] delete error:', err);
+      setError(err instanceof Error ? err.message : 'Error eliminant contacte');
     } finally {
       setSaving(false);
     }
@@ -1213,6 +1278,9 @@ function ContactsSection({ customerId, contacts: initialContacts }: { customerId
 
       {contacts.length === 0 && !adding && (
         <p className="text-sm opacity-50">Cap contacte addicional registrat.</p>
+      )}
+      {error && !isEditing && (
+        <p role="alert" className="mb-3 rounded-lg border admin-tone-border-danger px-3 py-2 text-xs admin-tone-text-danger">{error}</p>
       )}
 
       <div className="flex flex-col gap-3">

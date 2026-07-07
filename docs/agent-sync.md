@@ -66,6 +66,1611 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-07 [ESTAT: tancat — Productes partner amb visibilitat dossier/booking #1723]
+Perimetre: `CollaboratorProduct` visibility migration, `collaboratorProductService`, panell de productes partner, configurador de bolos, seeds Bingo Musical KIDS/Isma, registres i deploy conjunt; #1722 i #1721 queden inclosos en el mateix paquet de validacio/deploy.
+Ultim canvi: #1723.
+Validacio: test focal #1722 (19/19), test focal #1723 (25/25), test seed Railway (2/2), `prisma format`, `prisma generate`, `pnpm build` OK (`validate:core`, 72 tests scripts/627 asserts, `tsc`, Next build), migracio i seeds aplicats a produccio, Railway deploy `753c9191-7bab-4dbb-937e-619d80041294` online, health 200, Albert Aujas verificat al servei de calendari de produccio el `2026-07-17`, Bingo KIDS i Isma verificats a BD amb visibilitat correcta.
+Proper pas previst: commit+push global segons ordre del propietari i continuar amb el seguent tall de l'auditoria Zenit quan el repo quedi versionat.
+Avis claude: `collaborator_products` ara separa visibilitat dossier/booking; Bingo KIDS es producte dossier+booking de Masquerade (cost 160, PVP 200), Isma altaveus es cost intern booking-only (cost 50, PVP 0). No he tocat `app/admin/tasks`, regles de PVP base DJ, reserves existents ni dades de client fora de la verificacio d'Albert Aujas.
+
+[codex] 2026-07-07 [ESTAT: tancat — Partner hub membres/favorit conserven error backend #1710]
+Perimetre: `app/admin/collaborators/[id]/PartnerHubClient.tsx`, test focal, `lib/constants/admin.ts` i registres; si afegir/eliminar membre o marcar favorit falla, mostrar el motiu backend en comptes d'un placeholder local.
+Ultim canvi: #1710.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\collaborators\PartnerHubClient-member-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Proper pas previst: continuar el següent tall petit d'errors genèrics o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API collaborators/members, serveis de partners, schema Prisma ni migracions; tall limitat al feedback UI del partner hub.
+
+[codex] 2026-07-07 [ESTAT: tancat — Portfolio mutacions no menteixen si backend falla #1711]
+Perimetre: `app/admin/portfolio/page.tsx`, test focal, `lib/constants/admin.ts` i registres; les mutacions de media/events comproven `res.ok` i propaguen `error/message` abans de refrescar o actualitzar estat local.
+Ultim canvi: #1711.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\portfolio\PortfolioPage-mutation-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`; `pnpm run qa:protocol`.
+Proper pas previst: continuar el següent tall petit d'errors genèrics o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API portfolio, serveis de media/events, schema Prisma ni migracions; tall limitat al feedback UI i coherencia local del gestor de portfolio.
+
+[codex] 2026-07-07 [ESTAT: tancat — Contactes client no desapareixen si delete falla #1712]
+Perimetre: `app/admin/clientes/[id]/_components/panels/SummaryPanel.tsx`, test focal, `lib/constants/admin.ts` i registres; eliminar un contacte comprova `res.ok`/`ok` i conserva el motiu backend abans d'actualitzar la llista local.
+Ultim canvi: #1712.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\clientes\SummaryPanel.test.tsx` (7/7); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`; `pnpm run qa:protocol`.
+Proper pas previst: continuar el següent tall petit d'errors genèrics o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API customers/contacts, serveis Customer Hub, schema Prisma ni migracions; tall limitat al feedback UI de contactes dins Customer Hub.
+
+[codex] 2026-07-07 [ESTAT: tancat — Studio marca proposta enviada només si backend confirma #1713]
+Perimetre: `app/admin/presupuestos/PresupuestoPdfStudio.tsx`, test focal, `lib/constants/admin.ts` i registres; després d'enviar email, el `POST /api/admin/proposals/[id]/send` comprova `res.ok`/`ok` i propaga `error/message`.
+Ultim canvi: #1713.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\presupuestos\PresupuestoPdfStudio-customer-search.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`; `pnpm run qa:protocol`.
+Proper pas previst: continuar el següent tall petit d'errors genèrics o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API proposals/send, serveis de propostes, PDF utils, schema Prisma ni migracions; tall limitat al feedback UI de l'Studio.
+
+[codex] 2026-07-07 [ESTAT: tancat — Tags client no refresquen si backend falla #1714]
+Perimetre: `app/admin/clientes/[id]/_components/panels/SummaryPanel.tsx`, test focal, `lib/constants/admin.ts` i registres; afegir/treure tags del Customer Hub comprova `res.ok`/`ok` i mostra `error/message` abans de refrescar.
+Ultim canvi: #1714.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\clientes\SummaryPanel-tags-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`; `pnpm run qa:protocol`.
+Proper pas previst: continuar el següent tall petit d'errors genèrics o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API customers/tags, serveis Customer Hub, schema Prisma ni migracions; tall limitat al feedback UI de tags dins Customer Hub.
+
+[codex] 2026-07-07 [ESTAT: aturat temporalment — Image manager no recarrega si mutacio falla #1715]
+Perimetre: `app/admin/image-manager/ImagePlacementCard.tsx`, test focal, `lib/constants/admin.ts` i registres; delete, auto, alt i reorder han de comprovar `res.ok`/`ok` i mostrar `error/message` abans de recarregar placements.
+Ultim canvi: #1714.
+Validacio: pendent per interrupcio directa del propietari abans d'executar test focal/tsc/guards.
+Proper pas previst: reprendre validacio i tancament formal despres del tall urgent intake #1716.
+Avis claude: no toco `app/admin/tasks`, API image-manager, config de placements, processament d'imatges, schema Prisma ni migracions; tall limitat al feedback UI del gestor d'imatges.
+
+[codex] 2026-07-07 [ESTAT: tancat — Intake nou lead preserva notes en extraccio parcial #1716]
+Perimetre: `app/admin/intake/page.tsx`, `lib/services/leadTextExtractionService.ts`, ruta d'extraccio si cal, tests focals, `lib/constants/admin.ts` i registres; enganxar WhatsApp llarg no pot esborrar notes existents ni convertir conversa bruta en notes.
+Ultim canvi: #1716.
+Validacio: `pnpm test:run -- --run __tests__\lib\services\leadTextExtractionService.test.ts __tests__\app\api\admin\leads-extract-route.test.ts __tests__\app\admin\intake\intake-message.test.ts` (11/11).
+Proper pas previst: respondre el tall del propietari a `/admin/dossiers`: nou element de dossier i separacio infantil/adult.
+Avis claude: no toco `app/admin/tasks`, schema Prisma, migracions, bookings ni fluxos de reserva; tall limitat a intake/nou lead i preservacio de notes.
+
+[codex] 2026-07-07 [ESTAT: tancat — Partners no cau pel KPI de bookings #1718]
+Perimetre: `lib/services/collaboratorAdminService.ts`, `app/admin/collaborators/CollaboratorsClient.tsx`, tests focals, `lib/constants/admin.ts` i registres; `/admin/collaborators` ha de carregar proveidors/productes encara que falli un comptador informatiu de bolos passats.
+Ultim canvi: #1718.
+Validacio: `pnpm test:run -- --run __tests__\lib\services\collaboratorAdminService.test.ts __tests__\app\admin\collaborators\CollaboratorsClient-errors.test.ts __tests__\app\admin\collaborators\CollaboratorsClient.test.tsx __tests__\lib\utils\dossier-html-builder.test.ts __tests__\lib\constants\dossier-copy-products.test.ts __tests__\lib\services\collaboratorProductService.test.ts __tests__\app\admin\dossiers\DossierGeneratorClient-catalog-layout.test.ts` (64/64); `npx tsc --noEmit --pretty false`; servei local retorna 6 col·laboradors i 15 productes.
+Proper pas previst: continuar validacio protocol i, si el propietari ho vol en produccio immediata, desplegar aquest tall.
+Avis claude: no toco schema Prisma, migracions, bookings, dades ni `app/admin/tasks`; tall limitat a fer robust el llistat de partners i desbloquejar creacio de productes de dossier.
+
+[codex] 2026-07-07 [ESTAT: tancat — Dossier cataleg per infantil/adult, productes nous i imatges #1717]
+Perimetre: `app/admin/dossiers/DossierGeneratorClient.tsx`, `lib/services/collaboratorProductService.ts`, `lib/utils/dossier-html-builder.ts`, `lib/constants/dossier-copy.ts`, tests focals, `lib/constants/admin.ts` i registres; producte actiu nou de partner surt al dossier, selector proveidor -> audiencia i imatge al selector/dossier quan existeix.
+Ultim canvi: #1717.
+Validacio: bloc combinat de dossiers inclos dins els 64/64 de #1718.
+Proper pas previst: crear productes nous des de `/admin/collaborators` -> proveidor -> Productes.
+Avis claude: no toco `app/admin/tasks`, schema Prisma, migracions ni rutes de dossiers; tall limitat al cataleg seleccionable/generat del dossier.
+
+[codex] 2026-07-07 [ESTAT: tancat — Qüestionaris accions no fallen en silenci #1709]
+Perimetre: `app/admin/questionnaires/QuestionnaireTemplateActions.tsx`, test focal, `lib/constants/admin.ts` i registres; si activar/desactivar o eliminar una plantilla falla, mostrar el motiu backend i no refrescar com si hagués anat bé.
+Ultim canvi: #1709.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\questionnaires\QuestionnaireTemplateActions-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Proper pas previst: continuar el següent tall petit d'errors genèrics o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API questionnaires, servei questionnaire, schema Prisma ni migracions; tall limitat al feedback UI d'accions de qüestionaris.
+
+[codex] 2026-07-07 [ESTAT: tancat — Dossiers llistat no confirma mutacions fallides #1708]
+Perimetre: `app/admin/dossiers/DossierListActions.tsx`, test focal, `lib/constants/admin.ts` i registres; si enviar, moure a paperera, restaurar o purgar falla, mostrar el motiu backend i no confirmar èxit fals.
+Ultim canvi: #1708.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\dossiers\DossierListActions-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Proper pas previst: continuar el següent tall petit d'errors genèrics o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API dossiers, servei dossier, schema Prisma ni migracions; tall limitat al feedback UI del llistat de dossiers.
+
+[codex] 2026-07-07 [ESTAT: tancat — Activitat conserva error backend #1707]
+Perimetre: `app/admin/activity/ActivityClient.tsx`, test focal, `lib/constants/admin.ts` i registres; si `/api/admin/activity` falla, mostrar el motiu backend en comptes de "Error carregant activitat".
+Ultim canvi: #1707.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\activity\ActivityClient-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Proper pas previst: continuar el següent tall petit d'errors genèrics o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API activity, servei timeline, schema Prisma ni migracions; tall limitat al feedback UI del registre d'activitat.
+
+[codex] 2026-07-07 [ESTAT: tancat — Calculadora costos conserva error backend #1706]
+Perimetre: `app/admin/cost-calculator/CostCalculatorClient.tsx`, test focal, `lib/constants/admin.ts` i registres; si guardar un pressupost personalitzat falla, mostrar el motiu backend en comptes d'un error genèric.
+Ultim canvi: #1706.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\cost-calculator\CostCalculatorClient-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`; `rg` de placeholders sense resultats fora de `app/admin/tasks`.
+Proper pas previst: continuar el següent tall petit d'errors genèrics o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API custom-quotes, servei de custom quotes, schema Prisma ni migracions; tall limitat al feedback UI de la calculadora de costos.
+
+[codex] 2026-07-07 [ESTAT: tancat — Bloquejos cuadrant conserven error backend #1705]
+Perimetre: `app/admin/cuadrant/CrewBlockManager.tsx`, test focal, `lib/constants/admin.ts` i registres; si afegir/treure bloqueig manual falla, mostrar el motiu backend en comptes de `fail`.
+Ultim canvi: #1705.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\cuadrant\CrewBlockManager-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Proper pas previst: continuar el següent tall petit d'errors genèrics o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API cuadrant/blocks, serveis de crew schedule, schema Prisma ni migracions; tall limitat a feedback UI de bloquejos manuals.
+
+[codex] 2026-07-07 [ESTAT: tancat — Payout partner conserva error backend #1704]
+Perimetre: `app/admin/collaborators/[id]/PartnerHubClient.tsx`, test focal, `lib/constants/admin.ts` i registres; si marcar/desfer pagament de partner falla, mostrar el motiu backend en comptes de `delete/pay`.
+Ultim canvi: #1704.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\collaborators\PartnerHubClient-payment-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Proper pas previst: continuar el següent tall petit d'errors genèrics o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API collaborators/payments, serveis de payout, schema Prisma, migracions, membres ni productes; tall limitat a feedback de pagaments del partner hub.
+
+[codex] 2026-07-07 [ESTAT: tancat — Plantilles email no fan fals buit #1703]
+Perimetre: `app/admin/email-templates/EmailTemplatesClient.tsx`, test focal, `lib/constants/admin.ts` i registres; si falla carregar plantilles, mostrar el motiu i no calcular "cap plantilla" com si fos estat real.
+Ultim canvi: #1703.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\email-templates\EmailTemplatesClient-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Proper pas previst: continuar el següent tall petit d'errors genèrics o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API email-templates, servei de plantilles, schema Prisma ni migracions; tall limitat a UI de llistat de plantilles email.
+
+[codex] 2026-07-07 [ESTAT: tancat — Social conserva error backend #1702]
+Perimetre: `app/admin/social/SocialClient.tsx`, test focal, `lib/constants/admin.ts` i registres; si eliminar o canviar estat d'una publicació falla, mostrar el motiu backend en comptes d'un error genèric.
+Ultim canvi: #1702.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\social\SocialClient.test.tsx` (7/7); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Proper pas previst: continuar el següent tall petit d'errors genèrics o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API social-posts, servei social, schema Prisma, migracions ni el guard de revisió post-event; tall limitat a feedback UI de Social.
+
+[codex] 2026-07-07 [ESTAT: tancat — Selector ràpid d'estat avisa fallida #1701]
+Perimetre: `app/admin/components/StatusQuickSelect.tsx`, test focal, `lib/constants/admin.ts` i registres; si el PATCH d'estat falla, mostrar el motiu i no deixar l'error només al log.
+Ultim canvi: #1701.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\components\StatusQuickSelect-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Proper pas previst: continuar el següent tall petit d'errors genèrics o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, `app/admin/control/page.tsx`, APIs de leads/bookings, serveis ni schema; tall limitat al component compartit de canvi ràpid d'estat.
+
+[codex] 2026-07-07 [ESTAT: tancat — Despesa màrqueting no fa fals buit #1700]
+Perimetre: `app/admin/economia/MarketingSpendPanel.tsx`, test focal, `lib/constants/admin.ts` i registres; si carregar/desar/eliminar despesa falla, mostrar el motiu i no confondre càrrega fallida amb cap despesa.
+Ultim canvi: #1700.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\economia\MarketingSpendPanel-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Proper pas previst: continuar el següent tall petit d'errors genèrics o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API marketing/spend, serveis d'economia, schema Prisma ni migracions; tall limitat a UI de despesa de màrqueting.
+
+[codex] 2026-07-07 [ESTAT: tancat — Col·laboradors conserven error backend #1699]
+Perimetre: `app/admin/collaborators/CollaboratorsClient.tsx`, test focal, `lib/constants/admin.ts` i registres; si crear/editar/eliminar/activar partner falla, mostrar el motiu del backend en comptes d'un error genèric.
+Ultim canvi: #1699.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\collaborators\CollaboratorsClient-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Proper pas previst: continuar el següent tall petit d'errors genèrics o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API collaborators, serveis de partners, schema Prisma ni migracions; tall limitat a UI de col·laboradors.
+
+[codex] 2026-07-07 [ESTAT: tancat — Productes partner conserven error backend #1698]
+Perimetre: `app/admin/collaborators/CollaboratorProductsPanel.tsx`, test focal, `lib/constants/admin.ts` i registres; si crear/editar/eliminar producte de partner falla, mostrar el motiu del backend en comptes d'un error genèric.
+Ultim canvi: #1698.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\collaborators\CollaboratorProductsPanel-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Proper pas previst: continuar el següent tall petit d'errors genèrics o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API collaborators/products, serveis de partners, schema Prisma ni migracions; tall limitat a UI de productes de col·laborador.
+
+[codex] 2026-07-07 [ESTAT: tancat — Línies de servei avisen productes partner fallits #1697]
+Perimetre: `app/admin/bookings/BookingServiceLinesSection.tsx`, test focal, `lib/constants/admin.ts` i registres; si `/api/admin/collaborator-products` falla, mostrar error i no amagar productes externs com si no existissin.
+Ultim canvi: #1697.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingServiceLinesSection-partner-products.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Proper pas previst: continuar el següent tall petit de fallades silencioses o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API collaborator-products, serveis de reserves/partners, schema Prisma ni migracions; tall limitat a UI de línies de servei.
+
+[codex] 2026-07-07 [ESTAT: tancat — Studio pressupostos avisa cerca clients fallida #1696]
+Perimetre: `app/admin/presupuestos/PresupuestoPdfStudio.tsx`, test focal, `lib/constants/admin.ts` i registres; si el selector de clients del Studio no pot llegir clients, mostrar error i no confondre-ho amb cap resultat.
+Ultim canvi: #1696.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\presupuestos\PresupuestoPdfStudio-customer-search.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Proper pas previst: continuar el següent tall petit de fallades silencioses o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API customers, serveis de pressupostos/PDF, schema Prisma ni migracions; tall limitat a UI del selector de clients del Studio.
+
+[codex] 2026-07-07 [ESTAT: tancat — Dossiers avisen cerca de leads fallida #1695]
+Perimetre: `app/admin/dossiers/DossierGeneratorClient.tsx`, test focal existent, `lib/constants/admin.ts` i registres; si la cerca de leads del generador falla, mostrar error i no confondre-ho amb cap resultat.
+Ultim canvi: #1695.
+Validacio: `rg "if \(!res\.ok\) return|if \(!response\.ok\) return|if \(!data\.ok\) return" app\admin --glob "!app/admin/tasks/**" -n` (sense coincidencies); `pnpm test:run -- --run __tests__\app\admin\dossiers\DossierGeneratorClient-customer-lookup.test.ts` (3/3); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Proper pas previst: continuar el següent tall petit de fallades silencioses o traçabilitat feble fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API leads, serveis de dossier/CRM, schema Prisma ni migracions; tall limitat a cerca de leads del generador.
+
+[codex] 2026-07-07 [ESTAT: tancat — Pressupostos avisen cerca de vincles fallida #1694]
+Perimetre: `app/admin/presupuestos/ProposalOwnerPanel.tsx`, test focal, `lib/constants/admin.ts` i registres; si la cerca de client/lead/reserva per reassignar pressupost falla, mostrar error i no confondre-ho amb cap resultat.
+Ultim canvi: #1694.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\presupuestos\ProposalOwnerPanel-search-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Proper pas previst: continuar el següent tall petit de fallades API silencioses fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API proposals, API customers/leads/bookings, serveis, schema Prisma ni migracions; tall limitat a UI de reassignació de pressupostos i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Inventari/Packs avisen lots no carregats #1693]
+Perimetre: `app/admin/inventory/InventoryListClient.tsx`, `app/admin/packs/[id]/EditPackForm.tsx`, test focal, `lib/constants/admin.ts` i registres; si `/api/admin/inventory/bundles` falla, mostrar error i no confondre-ho amb llista buida.
+Ultim canvi: #1693.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\inventory\bundles-load-errors.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (nomes avisos CRLF coneguts); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Proper pas previst: continuar el següent tall petit de fallades API silencioses fora de `app/admin/tasks`.
+Avis claude: no toco `app/admin/tasks`, API inventory/bundles, serveis d'inventari, schema Prisma ni migracions; tall limitat a UI de càrrega de lots i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Safata lead marca estat fallit #1687]
+Perimetre: `app/admin/inbox/SafataClient.tsx`, `__tests__/app/admin/inbox/SafataClient.test.tsx`, `lib/constants/admin.ts` i registres; mostrar error accessible si marcar un lead com llegit/no llegit falla.
+Ultim canvi: #1687.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\inbox\SafataClient.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF, inclòs `ScriptsClient.tsx` per tall anterior); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no toco `app/admin/tasks`, APIs inbox/leads, serveis IMAP, schema Prisma ni migracions; tall limitat a UI Safata lead detail i test focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Scripts avisa còpia fallida #1686]
+Perimetre: `app/admin/scripts/ScriptsClient.tsx`, `__tests__/app/admin/scripts/ScriptsClient.test.tsx`, `lib/constants/admin.ts` i registres; mostrar error accessible si copiar una comanda de script falla.
+Ultim canvi: #1686.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\scripts\ScriptsClient.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF, inclòs `ScriptsClient.tsx` per fitxer tocat); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no toco `app/admin/tasks`, catàleg/serveis de scripts, execució real, schema Prisma ni migracions; tall limitat a UI de còpia i test focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Reengagement leads avisa còpia fallida #1685]
+Perimetre: `app/admin/leads/reengagement/LeadReengagementClient.tsx`, `__tests__/app/admin/leads/reengagement/LeadReengagementClient.test.tsx`, `lib/constants/admin.ts` i registres; mostrar error accessible si copiar el missatge suggerit de reengagement falla.
+Ultim canvi: #1685.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\leads\reengagement\LeadReengagementClient.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no toco `app/admin/tasks`, serveis leadReengagement, CRM, schema Prisma ni migracions; tall limitat a UI de reengagement i test focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Reactivació avisa còpia fallida #1684]
+Perimetre: `app/admin/clientes/reactivation/ReactivationClient.tsx`, `__tests__/app/admin/clientes/reactivation/ReactivationClient.test.tsx`, `lib/constants/admin.ts` i registres; mostrar error accessible si copiar el missatge suggerit de reactivació falla.
+Ultim canvi: #1684.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\clientes\reactivation\ReactivationClient.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no toco `app/admin/tasks`, serveis referrals/reactivation, CRM, schema Prisma ni migracions; tall limitat a UI de reactivació i test focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Referrals avisa còpia fallida #1683]
+Perimetre: `app/admin/clientes/referrals/ReferralsClient.tsx`, `__tests__/app/admin/clientes/referrals/ReferralsClient.test.tsx`, `lib/constants/admin.ts` i registres; mostrar error accessible si copiar missatge suggerit de referral falla.
+Ultim canvi: #1683.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\clientes\referrals\ReferralsClient.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no toco `app/admin/tasks`, serveis referrals, CRM, schema Prisma ni migracions; tall limitat a UI referrals i test focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Pagaments avisen còpia fallida #1682]
+Perimetre: `app/admin/bookings/[id]/StripePaymentPanel.tsx`, `__tests__/app/admin/bookings/StripePaymentPanel.test.tsx`, `lib/constants/admin.ts` i registres; mostrar error accessible si copiar un link Stripe falla.
+Ultim canvi: #1682.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\StripePaymentPanel.test.tsx` (7/7); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no toco `app/admin/tasks`, APIs stripe-checkout/confirm-bizum, cost engine, schema Prisma ni migracions; tall limitat a UI de fitxa reserva i test focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Recordatoris Economia marquen acció fallida #1681]
+Perimetre: `app/admin/economia/PaymentReminderActions.tsx`, `__tests__/app/admin/economia/PaymentReminderActions.test.tsx`, `lib/constants/admin.ts` i registres; separar errors d'Email, WA API i Marcar WA enviat.
+Ultim canvi: #1681.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\economia\PaymentReminderActions.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no toco `app/admin/tasks`, API communications, booking comm service, schema Prisma ni migracions; tall limitat a UI Economia i test focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Inventari reserva marca control fallit #1680]
+Perimetre: `app/admin/bookings/[id]/BookingInventorySection.tsx`, `__tests__/app/admin/bookings/BookingInventorySection.test.tsx`, `lib/constants/admin.ts` i registres; separar errors d'assignar item/pack/lot, treure, sortida i retorn d'inventari.
+Ultim canvi: #1680.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingInventorySection.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no toco `app/admin/tasks`, API inventory, serveis d'inventari, schema Prisma ni migracions; tall limitat a UI de fitxa reserva i test focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Pagaments reserva marquen tram fallit #1679]
+Perimetre: `app/admin/bookings/[id]/StripePaymentPanel.tsx`, `__tests__/app/admin/bookings/StripePaymentPanel.test.tsx`, `lib/constants/admin.ts` i registres; separar errors de generar link Stripe i confirmar Bizum per tram.
+Ultim canvi: #1679.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\StripePaymentPanel.test.tsx` (6/6); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no toco `app/admin/tasks`, APIs stripe-checkout/confirm-bizum, cost engine, schema Prisma ni migracions; tall limitat a UI de fitxa reserva i test focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Factura reserva marca acció fallida #1678]
+Perimetre: `app/admin/bookings/[id]/InvoiceSection.tsx`, `__tests__/app/admin/bookings/InvoiceSection.test.tsx`, `lib/constants/admin.ts` i registres; separar errors de crear, reintentar sync, marcar pagada i cancel·lar factura.
+Ultim canvi: #1678.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\InvoiceSection.test.tsx` (4/4); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no toco `app/admin/tasks`, API invoices, serveis Holded, schema Prisma ni migracions; tall limitat a UI de fitxa reserva i test focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Link galeria reserva marca acció fallida #1677]
+Perimetre: `app/admin/bookings/[id]/GallerySharePanel.tsx`, `__tests__/app/admin/bookings/GallerySharePanel.test.tsx`, `lib/constants/admin.ts` i registres; separar errors de carregar, crear, copiar i revocar el link de galeria perquè cada control respongui al seu error.
+Ultim canvi: #1677.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\GallerySharePanel.test.tsx` (4/4); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no toco `app/admin/tasks`, API gallery-share, portal públic, schema Prisma ni migracions; tall limitat a UI de fitxa reserva i test focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Vincle client reserva marca acció fallida #1676]
+Perimetre: `app/admin/bookings/[id]/BookingCustomerLinkPanel.tsx`, `__tests__/app/admin/bookings/BookingCustomerLinkPanel.test.tsx`, `lib/constants/admin.ts` i registres; separar l'error de vincular cada coincidència i crear client perquè només quedi marcat el control fallit.
+Ultim canvi: #1676.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingCustomerLinkPanel.test.tsx` (3/3); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no toco `app/admin/tasks`, API customer-link, serveis CRM, schema Prisma ni migracions; tall limitat a UI de fitxa reserva i test focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Portal reserva marca acció fallida #1675]
+Perimetre: `app/admin/bookings/[id]/ClientPortalAccessPanel.tsx`, `__tests__/app/admin/bookings/ClientPortalAccessPanel.test.tsx`, `lib/constants/admin.ts` i registres; separar l'error de generar, copiar i revocar el portal perquè només quedi marcat el control fallit.
+Ultim canvi: #1675.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx` (7/7); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no toco `app/admin/tasks`, API portal-access, schema Prisma, migracions ni serveis de portal; tall limitat a UI de fitxa reserva i test focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Línies reserva marquen desat fallit #1674]
+Perimetre: `app/admin/bookings/[id]/BookingServiceLinesEditor.tsx`, `__tests__/app/admin/bookings/BookingServiceLinesEditor.test.tsx`, `lib/constants/admin.ts` i registres; si validar o desar línies falla, marca el CTA de desat.
+Ultim canvi: #1674.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingServiceLinesEditor.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no toco `app/admin/tasks`, schema Prisma, migracions, API bookings, BookingServiceLinesSection ni cost engine; tall limitat al wrapper de fitxa i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Checklist reserva marca accions fallides #1673]
+Perimetre: `app/admin/bookings/[id]/BookingChecklist.tsx`, `__tests__/app/admin/bookings/BookingChecklist.test.tsx`, `lib/constants/admin.ts` i registres; si marcar/eliminar/afegir falla, conserva rollback i marca el control concret.
+Ultim canvi: #1673.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingChecklist.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no toco `app/admin/tasks`, schema Prisma, migracions, API checklist ni altres components de reserva; tall limitat a UI de checklist i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Galeria reserva marca controls fallits #1672]
+Perimetre: `app/admin/bookings/[id]/BookingGallery.tsx`, `__tests__/app/admin/bookings/BookingGallery.test.tsx`, `lib/constants/admin.ts` i registres; si pujar/publicar/canviar carpeta/eliminar/desar nota falla, marca el control concret.
+Ultim canvi: #1672.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingGallery.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no toco `app/admin/tasks`, schema Prisma, migracions, API gallery, storage, portal public ni `GallerySharePanel`; tall limitat a UI de fitxa i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Comunicacions reserva marca errors #1671]
+Perimetre: `app/admin/bookings/[id]/CommunicationPanel.tsx`, `__tests__/app/admin/bookings/CommunicationPanel.test.tsx`, `lib/constants/admin.ts` i registres; si email/WhatsApp/log/resposta falla, marca el flux i conserva traça tècnica.
+Ultim canvi: #1671.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\CommunicationPanel.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no toco `app/admin/tasks`, schema Prisma, migracions, API communications ni serveis email/WhatsApp; tall limitat a UI de fitxa i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Link galeria marca errors #1670]
+Perimetre: `app/admin/bookings/[id]/GallerySharePanel.tsx`, `__tests__/app/admin/bookings/GallerySharePanel.test.tsx`, `lib/constants/admin.ts` i registres; si carregar/copiar/generar/revocar link falla, marca accions amb error.
+Ultim canvi: #1670.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\GallerySharePanel.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API gallery-share ni galeria principal; tall limitat a UI del link compartit i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Total reserva alerta errors #1669]
+Perimetre: `app/admin/bookings/[id]/BookingTotalEditor.tsx`, `__tests__/app/admin/bookings/BookingTotalEditor.test.tsx`, `lib/constants/admin.ts` i registres; si desar total falla, mostra error persistent i marca l'acció.
+Ultim canvi: #1669.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingTotalEditor.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API bookings ni càlculs de marge; tall limitat a editor de total i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Marge transport alerta errors #1668]
+Perimetre: `app/admin/bookings/[id]/BookingMarginCard.tsx`, `__tests__/app/admin/bookings/BookingMarginCard.test.tsx`, `lib/constants/admin.ts` i registres; si desar costos de viatge falla, mostra error persistent i marca el botó sense tocar cervells econòmics.
+Ultim canvi: #1668.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingMarginCard.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, costEngine, computeBoloTransport, API bookings ni càlculs de marge; tall limitat a UI de fitxa i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Field notes reserva alerta errors #1667]
+Perimetre: `app/admin/bookings/[id]/BookingFieldNotesComposer.tsx`, `__tests__/app/admin/bookings/BookingFieldNotesComposer.test.tsx`, `lib/constants/admin.ts` i registres; si pujar foto+nota falla, anuncia error accessible i marca l'acció.
+Ultim canvi: #1667.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingFieldNotesComposer.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API gallery ni galeria principal; tall limitat al compositor de field notes i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Estat reserva alerta errors #1666]
+Perimetre: `app/admin/bookings/[id]/BookingStatusChanger.tsx`, `__tests__/app/admin/bookings/BookingStatusChanger.test.tsx`, `lib/constants/admin.ts` i registres; si canviar estat falla, anuncia error accessible, marca el selector i no refresca.
+Ultim canvi: #1666.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingStatusChanger.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API status, estadístiques públiques ni Calendar sync; tall limitat a UI de fitxa i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Inventari reserva separa errors i èxits #1665]
+Perimetre: `app/admin/bookings/[id]/BookingInventorySection.tsx`, `__tests__/app/admin/bookings/BookingInventorySection.test.tsx`, `lib/constants/admin.ts` i registres; separa missatges d'error/èxit i marca accions d'inventari quan una assignació falla.
+Ultim canvi: #1665.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingInventorySection.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API inventory, catàlegs d'inventari ni serveis de disponibilitat; tall limitat a UI de fitxa i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Pagaments Stripe/Bizum alerta errors #1664]
+Perimetre: `app/admin/bookings/[id]/StripePaymentPanel.tsx`, `__tests__/app/admin/bookings/StripePaymentPanel.test.tsx`, `lib/constants/admin.ts` i registres; si generar link Stripe o confirmar Bizum falla, anuncia error accessible, marca l'acció i deixa traça.
+Ultim canvi: #1664.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\StripePaymentPanel.test.tsx` (5/5); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API stripe-checkout/confirm-bizum, serveis de pagament ni cost engine; tall limitat a UI de fitxa i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Factura reserva alerta errors #1663]
+Perimetre: `app/admin/bookings/[id]/InvoiceSection.tsx`, `__tests__/app/admin/bookings/InvoiceSection.test.tsx`, `lib/constants/admin.ts` i registres; si crear la factura falla, anuncia error accessible, marca l'acció i deixa traça.
+Ultim canvi: #1663.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\InvoiceSection.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API invoice, serveis PDF/factura, Holded ni calendari; tall limitat a UI de fitxa i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Sync Calendar reserva alerta errors #1662]
+Perimetre: `app/admin/bookings/[id]/CalendarSyncButton.tsx`, `__tests__/app/admin/bookings/CalendarSyncButton.test.tsx`, `lib/constants/admin.ts` i registres; si la sincronitzacio amb Google Calendar falla, anuncia error accessible, marca el botó i deixa traça.
+Ultim canvi: #1662.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\CalendarSyncButton.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API calendar-sync, serveis Google Calendar ni calendari admin; tall limitat al botó de fitxa i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Email post-event reserva alerta errors #1661]
+Perimetre: `app/admin/bookings/[id]/PostEventEmailButton.tsx`, `__tests__/app/admin/bookings/PostEventEmailButton.test.tsx`, `lib/constants/admin.ts` i registres; si enviar email post-event falla, mostra alerta accessible, marca l'acció i conserva traça via logger.
+Ultim canvi: #1661.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\PostEventEmailButton.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API d'email, serveis post-event ni plantilles; tall limitat al botó de fitxa i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Portal client reserva alerta errors #1660]
+Perimetre: `app/admin/bookings/[id]/ClientPortalAccessPanel.tsx`, `__tests__/app/admin/bookings/ClientPortalAccessPanel.test.tsx`, `lib/constants/admin.ts` i registres; generar/copiar/revocar link de portal client anuncia errors amb `role="alert"`, marca accions i deixa traça tècnica.
+Ultim canvi: #1660.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx` (5/5); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API portal-access, servei de portal ni portal public; tall limitat al panell admin i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Línies servei reserva mostren error persistent #1659]
+Perimetre: `app/admin/bookings/[id]/BookingServiceLinesEditor.tsx`, `__tests__/app/admin/bookings/BookingServiceLinesEditor.test.tsx`, `lib/constants/admin.ts` i registres; si desar línies de servei falla, deixa error visible estable i no refresca com si marge/total s'haguessin recalculat.
+Ultim canvi: #1659.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingServiceLinesEditor.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API de reserva, BookingServiceLinesSection real ni cervells de pricing; tall limitat a l'editor wrapper i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Toggle pagament reserva mostra error persistent #1658]
+Perimetre: `app/admin/bookings/[id]/PaymentToggle.tsx`, `__tests__/app/admin/bookings/PaymentToggle.test.tsx`, `lib/constants/admin.ts` i registres; si el PATCH de bestreta/resta falla, reverteix optimista, deixa error visible llegint payload d'API i no refresca com si s'hagues aplicat.
+Ultim canvi: #1658.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\PaymentToggle.test.tsx` (5/5); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API de reserva, serveis de pagament ni càlculs cash-aware; tall limitat al toggle de pagament de fitxa i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Cobrament efectiu mostra error persistent #1657]
+Perimetre: `app/admin/bookings/[id]/CashPaymentButton.tsx`, `__tests__/app/admin/bookings/CashPaymentButton.test.tsx`, `lib/constants/admin.ts` i registres; si el PATCH de cobrament en efectiu falla, mostra error visible estable, llegeix payload d'API i no refresca com si fos cobrat.
+Ultim canvi: #1657.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\CashPaymentButton.test.tsx` (5/5); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API de reserva, serveis de pagament ni càlculs cash-aware; tall limitat al botó de fitxa i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Vincle reserva-client mostra errors #1656]
+Perimetre: `app/admin/bookings/[id]/BookingCustomerLinkPanel.tsx`, `__tests__/app/admin/bookings/BookingCustomerLinkPanel.test.tsx`, `lib/constants/admin.ts` i registres; crear/vincular client des d'una reserva mostra error visible si falla i no refresca com si el CRM s'hagues actualitzat.
+Ultim canvi: #1656.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingCustomerLinkPanel.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API de customer-link, serveis CRM ni Safata; tall limitat al panell client de la fitxa de reserva i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Checklist reserva no deixa estat fals #1655]
+Perimetre: `app/admin/bookings/[id]/BookingChecklist.tsx`, `__tests__/app/admin/bookings/BookingChecklist.test.tsx`, `lib/constants/admin.ts` i registres; si falla el PUT de checklist, reverteix la mutacio optimista, mostra error visible i conserva el text d'un item nou.
+Ultim canvi: #1655.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingChecklist.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API de checklist ni serveis de reserva; tall limitat al client de checklist i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Link compartit de galeria mostra errors #1654]
+Perimetre: `app/admin/bookings/[id]/GallerySharePanel.tsx`, `__tests__/app/admin/bookings/GallerySharePanel.test.tsx`, `lib/constants/admin.ts` i registres; carregar, copiar, crear o revocar el link compartit de galeria mostra error visible quan falla.
+Ultim canvi: #1654.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\GallerySharePanel.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API de gallery-share, serveis de galeria ni portal public; tall limitat al client de la fitxa de reserva i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Galeria reserva mostra errors de mutacio #1653]
+Perimetre: `app/admin/bookings/[id]/BookingGallery.tsx`, `__tests__/app/admin/bookings/BookingGallery.test.tsx`, `lib/constants/admin.ts` i registres; carregar, marcar portal/portfolio, canviar carpeta, eliminar o desar nota de foto mostren error visible quan la ruta de galeria falla.
+Ultim canvi: #1653.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingGallery.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API de galeria, serveis de fitxers/storage ni portal public; tall limitat al client de la fitxa de reserva i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Recordatoris Economia mostren error de comunicacio #1652]
+Perimetre: `app/admin/economia/PaymentReminderActions.tsx`, `__tests__/app/admin/economia/PaymentReminderActions.test.tsx`, `lib/constants/admin.ts` i registres; email/WA API/marcar WA enviat de cobrament mostren error visible i no refresquen si `/communications` rebutja l'accio.
+Ultim canvi: #1652.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\economia\PaymentReminderActions.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API de comunicacions, serveis d'email/WhatsApp ni factures; tall limitat al client d'Economia i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Economia mostra error si falla toggle de pagament #1651]
+Perimetre: `app/admin/economia/PaymentToggleButton.tsx`, `__tests__/app/admin/economia/PaymentToggleButton.test.tsx`, `lib/constants/admin.ts` i registres; els toggles de bestreta/resta de `/admin/economia` mostren error visible i no refresquen si el PATCH de reserva es rebutja.
+Ultim canvi: #1651.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\economia\PaymentToggleButton.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, API de reserva, bulk-payment, factures ni serveis backend; tall limitat al client d'Economia i guard focal.
+
+[codex] 2026-07-07 [ESTAT: tancat — Fitxa reserva usa travelCost persistent #1650]
+Perimetre: `app/admin/bookings/[id]/BookingMarginCard.tsx`, `app/admin/bookings/[id]/page.tsx`, `app/admin/bookings/[id]/booking-utils.ts`, `app/admin/lib/booking-economic-guard.ts`, tests focals, `lib/constants/admin.ts` i registres; marge/guard usen `travelCost` guardat i no perden peatges o temps de ruta.
+Ultim canvi: #1650.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\booking-economic-guard.test.ts __tests__\app\admin\bookings\BookingMarginCard-travel-cost-source.test.ts` (4/4); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, API de reserva, migracions, factures ni reserves existents; tall limitat a lectura/càlcul client de la fitxa.
+
+[codex] 2026-07-07 [ESTAT: tancat — Comunicacions de reserva mostren error HTTP #1649]
+Perimetre: `app/admin/bookings/[id]/CommunicationPanel.tsx`, `__tests__/app/admin/bookings/CommunicationPanel.test.tsx`, `lib/constants/admin.ts` i registres; les accions de comunicacio capturen error de `/communications` i el mostren sense refresh fals.
+Ultim canvi: #1649.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\CommunicationPanel.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, API de comunicacions, serveis d'email/WhatsApp, schema Prisma, factures ni reserves existents; tall limitat al client de la fitxa.
+
+[codex] 2026-07-07 [ESTAT: tancat — Editor total no canta èxit si PATCH falla #1648]
+Perimetre: `app/admin/bookings/[id]/BookingTotalEditor.tsx`, `__tests__/app/admin/bookings/BookingTotalEditor.test.tsx`, `lib/constants/admin.ts` i registres; l'editor de total comprova `res.ok` abans de fer optimisme, toast d'èxit o refresh.
+Ultim canvi: #1648.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingTotalEditor.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, API, schema Prisma, factures, pagaments globals, serveis ni reserves existents; tall limitat al comportament client de l'editor de total.
+
+[codex] 2026-07-07 [ESTAT: tancat — PATCH reserva alinea contracte amb servei #1647]
+Perimetre: `app/api/admin/bookings/[id]/route.ts`, `__tests__/app/api/admin/bookings-detail-route.test.ts`, `lib/constants/admin.ts` i registres; el PATCH canonic accepta i trimmeja els camps que `bookingRouteService` ja sap aplicar o sincronitzar.
+Ultim canvi: #1647.
+Validacio: `pnpm test:run -- --run __tests__\app\api\admin\bookings-detail-route.test.ts` (21/21); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, UI de detall, pagaments, factures ni reserves existents; tall limitat al contracte de la ruta PATCH.
+
+[codex] 2026-07-07 [ESTAT: tancat — API conserva peatges manuals de nova reserva #1646]
+Perimetre: `app/api/admin/bookings/route.ts`, `__tests__/app/api/admin/bookings-route.test.ts`, `lib/constants/admin.ts` i registres; el POST admin conserva `tollsEur` fins a `createBookingFromInput` perquè el servei el prioritza sobre peatges automàtics.
+Ultim canvi: #1646.
+Validacio: `pnpm test:run -- --run __tests__\app\api\admin\bookings-route.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, UI, pagaments, factures ni reserves existents; tall limitat al contracte de la ruta POST.
+
+[codex] 2026-07-07 [ESTAT: tancat — API reserva rebutja camps obligatoris en blanc #1645]
+Perimetre: `app/api/admin/bookings/route.ts`, `__tests__/app/api/admin/bookings-route.test.ts`, `lib/constants/admin.ts` i registres; el POST admin trimmeja i rebutja camps obligatoris en blanc abans d'arribar a `createBookingFromInput`.
+Ultim canvi: #1645.
+Validacio: `pnpm test:run -- --run __tests__\app\api\admin\bookings-route.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, serveis de creació, UI de reserves, pagaments, factures ni reserves existents.
+
+[codex] 2026-07-07 [ESTAT: tancat — gate visible de reserva amb dades mínimes #1644]
+Perimetre: `app/admin/bookings/NewBookingForm.tsx`, `__tests__/app/admin/bookings/NewBookingForm-required-submit-gate.test.ts`, guard #1643 ajustat, `lib/constants/admin.ts` i registres; el CTA de nova reserva exigeix nom, email, telèfon, data, ubicació i bolo no buit abans de crear.
+Ultim canvi: #1644.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\NewBookingForm-date-conflict-gate.test.ts __tests__\app\admin\bookings\NewBookingForm-required-submit-gate.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, serveis de creació, pagaments, factures ni reserves existents; tall limitat al gate visible de `/admin/bookings/new`.
+
+[codex] 2026-07-07 [ESTAT: tancat — nova reserva exigeix revisar conflicte de dia #1643]
+Perimetre: `app/admin/bookings/NewBookingForm.tsx`, `__tests__/app/admin/bookings/NewBookingForm-date-conflict-gate.test.ts`, `lib/constants/admin.ts` i registres; `/admin/bookings/new` bloqueja crear una reserva en un dia amb bolos actius fins que l'operador marca que els ha revisat.
+Ultim canvi: #1643.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\NewBookingForm-date-conflict-gate.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pagaments, factures, calendari, imports de reserves existents ni rutes de reserva; tall limitat a la frontera de creació manual.
+
+[codex] 2026-07-07 [ESTAT: tancat — packAdminService normalitza PVP acabat en 0 #1642]
+Perimetre: `lib/services/packAdminService.ts`, `__tests__/lib/services/packAdminService.test.ts`, `lib/constants/admin.ts` i registres; crear/actualitzar/sincronitzar pack normalitza `price` i `extraHourPrice` amb `roundRecommendedSellingPrice()`.
+Ultim canvi: #1642.
+Validacio: `pnpm test:run -- --run __tests__\lib\services\packAdminService.test.ts __tests__\app\admin\packs-recommended-price-format.test.ts __tests__\app\admin\packs-edit-recommended-pricing.test.ts` (15/15); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, factures, imports de reserves existents, Stripe/Bizum, cash-aware ni rutes de reserva.
+
+[codex] 2026-07-07 [ESTAT: tancat — Pols operatiu cobrament cash-aware #1638]
+Perimetre: `lib/services/operationalPulseService.ts`, `__tests__/lib/services/operationalPulseService.test.ts`, `lib/constants/admin.ts` i registres; la mètrica `Cobrament` del pols operatiu compta reserves liquidades per saldo real amb `bookingOutstandingAmount`, inclòs efectiu total.
+Ultim canvi: #1638.
+Validacio: `pnpm test:run -- --run __tests__/lib/services/operationalPulseService.test.ts` (26/26); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `git diff --check` (només avisos CRLF); `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, Stripe/Bizum, social ni pricing; tall limitat al càlcul de cobrament del pols operatiu.
+
+[codex] 2026-07-07 [ESTAT: tancat — Bizum cash-aware #1637]
+Perimetre: `lib/services/bookingBizumService.ts`, `app/admin/bookings/[id]/StripePaymentPanel.tsx`, tests de Bizum/panell, `lib/constants/admin.ts` i registres; Bizum ja no declara ni confirma trams coberts per `cashAmount`, i el panell no mostra pendents antics liquidats.
+Ultim canvi: #1637.
+Validacio: `pnpm test:run -- --run __tests__/lib/services/bookingBizumService.test.ts __tests__/app/api/portal/bizum-notify-route.test.ts __tests__/app/api/admin/bookings-confirm-bizum-route.test.ts __tests__/app/admin/bookings/StripePaymentPanel.test.tsx` (25/25); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `git diff --check` (només avisos CRLF); `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, Stripe checkout, social ni pricing; tall limitat a pagaments Bizum/cash.
+
+[codex] 2026-07-07 [ESTAT: tancat — PDF factura cash-aware #1636]
+Perimetre: `lib/services/invoicePdfService.ts`, `__tests__/lib/services/invoicePdfService.test.ts`, `lib/constants/admin.ts` i registres; el PDF de factura deriva bestreta/resta de `bookingOutstandingBreakdown` i ja contempla `cashAmount` complet o parcial.
+Ultim canvi: #1636.
+Validacio: `pnpm test:run -- --run __tests__/lib/services/invoicePdfService.test.ts` (8/8); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `git diff --check` (només avisos CRLF); `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, Stripe/Bizum, social ni pricing; tall limitat a Documents/PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — Stripe checkout cash-aware #1635]
+Perimetre: `lib/services/bookingStripePaymentService.ts`, `app/admin/bookings/[id]/StripePaymentPanel.tsx`, `app/admin/bookings/[id]/page.tsx`, `__tests__/lib/services/bookingStripePaymentService.test.ts`, `__tests__/app/api/admin/bookings-stripe-checkout-route.test.ts`, `__tests__/app/admin/bookings/StripePaymentPanel.test.tsx`, `lib/constants/admin.ts` i registres; Stripe queda bloquejat si `cashAmount` cobreix o redueix parcialment un tram.
+Ultim canvi: #1635.
+Validacio: `pnpm test:run -- --run __tests__/lib/services/bookingStripePaymentService.test.ts __tests__/app/api/admin/bookings-stripe-checkout-route.test.ts __tests__/app/admin/bookings/StripePaymentPanel.test.tsx` (18/18); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, social, PDFs ni pricing; aquest tall sí toca l'API/servei Stripe perquè és prevenció de sobrecobrament.
+
+[codex] 2026-07-07 [ESTAT: tancat — fitxa reserva trams cash-aware #1634]
+Perimetre: `app/admin/bookings/[id]/page.tsx`, `app/admin/bookings/[id]/booking-payment-display.ts`, `__tests__/app/admin/bookings/booking-payment-display.test.ts`, `lib/constants/admin.ts` i registres; les caixes de Paga i senyal/Resta i el botó cash de la fitxa segueixen `bookingOutstandingBreakdown`.
+Ultim canvi: #1634.
+Validacio: `pnpm test:run -- --run __tests__/app/admin/bookings/booking-payment-display.test.ts __tests__/app/admin/bookings/CashPaymentButton.test.tsx` (8/8); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, APIs de cobrament, Stripe/Bizum, social, PDFs ni pricing; tall limitat al display de pagaments de la fitxa.
+
+[codex] 2026-07-07 [ESTAT: tancat — kanban reserves pill pagament cash-aware #1633]
+Perimetre: `app/admin/bookings/BookingPipelineView.tsx`, `__tests__/app/admin/bookings/BookingPipelineView.test.tsx`, `lib/constants/admin.ts` i registres; la pill `Paga pendent` del kanban deriva de `bookingOutstandingBreakdown`.
+Ultim canvi: #1633.
+Validacio: `pnpm test:run -- --run __tests__/app/admin/bookings/BookingPipelineView.test.tsx` (6/6); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, APIs de cobrament, social, PDFs ni pricing; tall limitat a la targeta kanban de reserves.
+
+[codex] 2026-07-07 [ESTAT: tancat — agenda leads pagament cash-aware #1632]
+Perimetre: `lib/services/seasonCalendarService.ts`, `app/admin/leads/LeadsSeasonClient.tsx`, `__tests__/lib/services/seasonCalendarService.test.ts`, `lib/constants/admin.ts` i registres; el semàfor de pagament de reserves vinculades a l'Agenda ja rep `cashAmount/total`.
+Ultim canvi: #1632.
+Validacio: `pnpm test:run -- --run __tests__/lib/services/seasonCalendarService.test.ts` (24/24); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, APIs de cobrament, portal, social, PDFs ni pricing; tall limitat al badge econòmic de l'Agenda.
+
+[codex] 2026-07-07 [ESTAT: tancat — timeline portal cash-aware #1631]
+Perimetre: `lib/clientPortalTimeline.ts`, `__tests__/lib/clientPortalTimeline.test.ts`, `lib/constants/admin.ts` i registres de protocol/roadmap; la pàgina `Procés` del portal client deriva bestreta/resta de `bookingOutstandingBreakdown` i ja no ignora `cashAmount`.
+Ultim canvi: #1631.
+Validacio: `pnpm test:run -- --run __tests__/lib/clientPortalTimeline.test.ts` (10/10); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, APIs de cobrament, Stripe/Bizum, social, PDFs ni pricing; tall limitat al portal timeline.
+
+[codex] 2026-07-07 [ESTAT: tancat — Customer Hub cobrat cash-aware #1630]
+Perimetre: `lib/customer-hub/data.ts`, `lib/customer-hub/dto.ts`, `lib/customer-hub/fetchCustomerHub.ts`, `app/admin/clientes/[id]/_components/panels/SummaryPanel.tsx`, `app/admin/clientes/[id]/_components/panels/BookingsPanel.tsx`, `lib/constants/admin.ts` i `__tests__/lib/customer-hub/fetchCustomerHub.test.ts`; `totalPaid`, resum de cobrament i pills de reserva del Customer Hub ja incorporen `cashAmount`.
+Ultim canvi: #1630.
+Validacio: `pnpm test:run -- --run __tests__/lib/customer-hub/fetchCustomerHub.test.ts` (8/8); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, APIs de pagament, portal, social, PDFs ni pricing; tall limitat a lectura de Customer Hub.
+
+[codex] 2026-07-07 [ESTAT: tancat — portal client pagaments cash-aware #1629]
+Perimetre: `lib/clientPortalPayment.ts`, `lib/clientPortalInvoice.ts`, `app/[locale]/portal/[token]/page.tsx`, `lib/constants/admin.ts`, `__tests__/lib/clientPortalPayment.test.ts` i `__tests__/lib/clientPortalInvoice.test.ts`; el portal client deriva pagaments, proper pas i CTAs de `bookingOutstandingBreakdown`.
+Ultim canvi: #1629.
+Validacio: `pnpm test:run -- --run __tests__/lib/clientPortalPayment.test.ts __tests__/lib/clientPortalInvoice.test.ts` (20/20); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, APIs de Stripe/Bizum, social, PDFs ni pricing; social-review estructurat continua opcional posterior/no executat.
+
+[codex] 2026-07-07 [ESTAT: tancat — API/Kanban reserves pagament cash-aware #1628]
+Perimetre: `lib/services/bookingPaymentFilter.ts`, `lib/services/bookingListService.ts`, `app/admin/bookings/page.tsx`, `lib/constants/admin.ts`, `__tests__/lib/services/bookingPaymentFilter.test.ts` i `__tests__/lib/services/bookingListService.test.ts`; `/api/admin/bookings` i `BookingPipelineView` comparteixen el mateix `where` cash-aware que el llistat server.
+Ultim canvi: #1628.
+Validacio: `pnpm test:run -- --run __tests__/lib/services/bookingPaymentFilter.test.ts __tests__/lib/services/bookingListService.test.ts` (18/18); `npx tsc --noEmit --pretty false`; `pnpm run qa:service-coverage`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, social, portal, PDFs, crons ni pricing; social-review estructurat continua opcional posterior/no executat.
+
+[codex] 2026-07-07 [ESTAT: tancat — filtres reserves pagament cash-aware #1627]
+Perimetre: `app/admin/bookings/page.tsx`, `app/admin/bookings/booking-payment-filter.ts`, `lib/constants/admin.ts` i `__tests__/app/admin/bookings/booking-payment-filter.test.ts`; `payment=deposit-pending/overdue/due-soon` filtra amb `cashAmount` vs `depositAmount`/`remainingAmount`/`total`, no només flags crus.
+Ultim canvi: #1627.
+Validacio: `pnpm test:run -- --run __tests__/app/admin/bookings/booking-payment-filter.test.ts` (4/4); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, social, portal, PDFs, crons ni pricing; social-review estructurat continua opcional posterior/no executat.
+
+[codex] 2026-07-07 [ESTAT: tancat — breakdown pagament cash-aware Salut #1624]
+Perimetre: `lib/payment-status.ts`, `lib/services/paymentReminderService.ts`, `lib/services/adminHealthService.ts`, `__tests__/lib/payment-status.test.ts`, `__tests__/lib/services/paymentReminderService.test.ts` i `__tests__/lib/services/adminHealthService.test.ts`; breakdown canònic dipòsit/resta/total cash-aware i Salut ja no compta trams coberts en efectiu com a cobraments vençuts/proxims.
+Ultim canvi: #1624.
+Validacio: `pnpm test:run -- --run __tests__/lib/payment-status.test.ts __tests__/lib/services/paymentReminderService.test.ts __tests__/lib/services/adminHealthService.test.ts` (29/29); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, UI grossa, crons, pricing, portal ni PDFs; la migracio social-review queda renumerada a #1625 i continua opcional/no executada.
+
+[codex] 2026-07-07 [ESTAT: tancat — avisos proxim bolo cash-aware #1623]
+Perimetre: `app/admin/lib/dashboard-data.ts`, `app/admin/control/page.tsx`, `lib/services/dashboardInsightsService.ts` i `__tests__/lib/services/dashboardInsightsService.test.ts`; els avisos/insights/semàfor del pròxim bolo usen `outstandingAmount` i no marquen pagament pendent si l'efectiu ja cobreix el total.
+Ultim canvi: #1623.
+Validacio: `pnpm test:run -- --run __tests__/lib/services/dashboardInsightsService.test.ts` (44/44); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, crons, emails, pricing, portal, PDFs ni APIs externes; la migracio social-review queda renumerada a #1624 i continua opcional/no executada.
+
+[codex] 2026-07-07 [ESTAT: tancat — recordatoris pagament cash-aware #1622]
+Perimetre: `lib/services/paymentReminderService.ts` i `__tests__/lib/services/paymentReminderService.test.ts`; els recordatoris automàtics usen `bookingOutstandingAmount`/`cashAmount`, no envien emails falsos quan una reserva ja està coberta en efectiu i itemitzen només els trams realment pendents.
+Ultim canvi: #1622.
+Validacio: `pnpm test:run -- --run __tests__/lib/services/paymentReminderService.test.ts` (14/14); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, UI, pricing, portal, PDFs ni APIs externes; la migracio social-review queda renumerada a #1623 i continua opcional/no executada.
+
+[codex] 2026-07-07 [ESTAT: tancat — Customer Hub pendent cash-aware #1621]
+Perimetre: `lib/customer-hub/dto.ts`, `lib/customer-hub/fetchCustomerHub.ts`, `lib/services/customerInsightsService.ts` i `__tests__/lib/services/customerInsightsService.test.ts`; Customer Hub calcula `pendingPaymentTotal` i `COLLECT_PAYMENT` amb `bookingOutstandingAmount`/`cashAmount`, evitant accions falses si l'efectiu ja cobreix el total.
+Ultim canvi: #1621.
+Validacio: `pnpm test:run -- --run __tests__/lib/services/customerInsightsService.test.ts __tests__/lib/customer-hub/fetchCustomerHub.test.ts` (33/33); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, UI, pagaments, pricing, portal, PDFs ni APIs externes; la migracio social-review queda renumerada a #1622 i continua opcional/no executada.
+
+[codex] 2026-07-07 [ESTAT: tancat — dailyBrief cobraments cash-aware #1620]
+Perimetre: `lib/services/dailyBriefService.ts` i `__tests__/lib/services/dailyBriefService.test.ts`; el dailyBrief compta cobraments pendents amb `bookingOutstandingAmount` i `cashAmount`, evitant KPI/resum/fallback falsos per reserves cobertes en efectiu.
+Ultim canvi: #1620.
+Validacio: `pnpm test:run -- --run __tests__/lib/services/dailyBriefService.test.ts` (42/42); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, UI, pagaments, pricing, portal, PDFs ni APIs externes; la migracio social-review queda renumerada a #1621 i continua opcional/no executada.
+
+[codex] 2026-07-07 [ESTAT: tancat — NBA cobrament cash-aware #1619]
+Perimetre: `lib/services/nextBestActionService.ts`, `__tests__/lib/services/nextBestActionServiceQueries.test.ts` i `__tests__/lib/services/nextBestActionService.test.ts`; NBA client usa `bookingOutstandingAmount` amb `cashAmount` i deixa de proposar `COLLECT_PAYMENT` si el total ja consta cobrat en efectiu.
+Ultim canvi: #1619.
+Validacio: `pnpm test:run -- --run __tests__/lib/services/nextBestActionServiceQueries.test.ts __tests__/lib/services/nextBestActionService.test.ts` (35/35); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF aliens); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, UI, pagaments, pricing, portal, PDFs ni APIs externes; la migracio social-review queda renumerada a #1620 i continua opcional/no executada.
+
+[codex] 2026-07-07 [ESTAT: tancat — guardia caixa 7 dies Avui #1618]
+Perimetre: `lib/admin/bookingEconomics.ts`, `app/admin/lib/today-actions.ts`, `__tests__/app/admin/next-event-economics.test.ts` i `__tests__/app/admin/today-actions.test.ts`; caixa pendent dins 7 dies ara entra al risc economic i a `Fes això ara`, fora de finestra no.
+Ultim canvi: #1618.
+Validacio: `pnpm test:run -- --run __tests__/app/admin/today-actions.test.ts __tests__/app/admin/next-event-economics.test.ts` (15/15); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF aliens); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, UI grossa de la home, pagaments, pricing, portal, PDFs ni APIs externes; la migracio social-review queda renumerada a #1619 i continua opcional/no executada.
+
+[codex] 2026-07-07 [ESTAT: tancat — Avui omple buits amb dailyBrief #1617]
+Perimetre: `app/admin/lib/today-actions.ts` i `__tests__/app/admin/today-actions.test.ts`; `Fes això ara` manté NBA/economia/post-event com a cua principal però omple buits amb `dailyBrief` i evita duplicar fallback amb el mateix `href`.
+Ultim canvi: #1617.
+Validacio: `pnpm test:run -- --run __tests__/app/admin/today-actions.test.ts` (10/10); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF aliens); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, serveis Prisma, UI de la home ni APIs externes; la migracio social-review queda renumerada a #1618 i continua opcional/no executada.
+
+[codex] 2026-07-07 [ESTAT: tancat — trust public sense reembors #1616]
+Perimetre: corregit el trust item public `booking.trust.items.2.description`, que amb titol `Sense compromís/No commitment` encara prometia reemborsament 100% com si ja hi hagues senyal; limitat a `messages/*`, test de promesa publica i docs del tall.
+Ultim canvi: #1616.
+Validacio: configurator-public-promise 6/6; `pnpm run qa:i18n-keys-sync`; parse JSON messages; cerca residual exacta neta; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal UI, PDFs ni APIs externes; la migracio social-review queda renumerada a #1617 i continua opcional/no executada.
+
+[codex] 2026-07-07 [ESTAT: tancat — checkout final price public #1615]
+Perimetre: corregit `checkout.finalPrice` public que encara deia preu final (`El teu/Tu/Your final price`) dins un flux que dona estimacio i proposta revisable; limitat a `messages/*`, test de promesa publica i docs del tall.
+Ultim canvi: #1615.
+Validacio: configurator-public-promise 5/5; `pnpm run qa:i18n-keys-sync`; parse JSON messages; cerca residual exacta neta; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal UI, PDFs ni APIs externes; la migracio social-review queda renumerada a #1616 i continua opcional/no executada.
+
+[codex] 2026-07-07 [ESTAT: tancat — FAQ preu automatic public #1614]
+Perimetre: corregit FAQ/copy public que deia que els `preus/prices` es calculen automaticament com a preu final, quan el flux real dona estimacio automatica i pressupost/proposta revisable; limitat a `messages/*`, test de promesa publica i docs del tall.
+Ultim canvi: #1614.
+Validacio: configurator-public-promise 5/5; `pnpm run qa:i18n-keys-sync`; parse JSON messages; cerca residual exacta neta; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal UI, PDFs ni APIs externes; la migracio social-review queda renumerada a #1615 i continua opcional/no executada.
+
+[codex] 2026-07-07 [ESTAT: tancat — pressupost instantani public #1613]
+Perimetre: corregit copy public que prometia `pressupost/presupuesto/quote instantani` quan el flux real dona estimacio i proposta revisable; limitat a `messages/*` i al guard de promesa publica.
+Ultim canvi: #1613.
+Validacio: configurator-public-promise 4/4; `pnpm run qa:i18n-keys-sync`; parse JSON messages; cerca residual neta; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal UI, PDFs ni APIs externes; la migracio social-review queda renumerada a #1614 i continua opcional/no executada.
+
+[codex] 2026-07-07 [ESTAT: tancat — captacio publica residual #1612]
+Perimetre: corregit copy public residual de captacio (home/calendari/Halloween/Mon Magic) que encara parlava de reserva/book/data reservada abans de proposta/revisio; ampliat el guard de promesa publica.
+Ultim canvi: #1612.
+Validacio: configurator-public-promise 3/3; `pnpm run qa:i18n-keys-sync`; parse JSON messages; cerca residual neta; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal UI, PDFs ni APIs externes; tampoc he fet la migracio social-review marcada com opcional.
+
+[codex] 2026-07-07 [ESTAT: tancat — canon admin font-px P3 #1611]
+Perimetre: eliminades les 4 troballes P3 `font-px` de `qa:admin-canon` en calendari mensual i playbook post-event, canviant mides arbitraries `text-[10px]`/`text-[11px]` per `text-[length:var(--o-text-2xs)]`.
+Ultim canvi: #1611.
+Validacio: `pnpm run qa:admin-canon -- --strict --list` (0 troballes); tests calendari/post-event/recurrence 56/56; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal UI, PDFs ni APIs externes.
+
+[codex] 2026-07-07 [ESTAT: tancat — catalegs locals a constants #1610]
+Perimetre: reparat el fall de `validate:core` a `arch:layer:check`: timeline portal, errors reserva publica, locales publics, risc economic calendari, traces documentals, decisions post-event i guard social mouen catalegs declaratius a `lib/constants/*`, mantenint reexports compatibles.
+Ultim canvi: #1610.
+Validacio: `pnpm run arch:layer:check`; tests constants/serveis/social 67/67; tests nous documentAuditTrailService + bookingEconomics 4/4; `pnpm run qa:service-coverage`; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal UI, PDFs ni APIs externes. El possible social review amb migracio queda a #1612 nomes si el propietari el demana.
+
+[codex] 2026-07-07 [ESTAT: tancat — public CTA residual audit #1609]
+Perimetre: CTAs publics residuals de captacio (`common.buttons`, `reviews.cta`, `urgency`, `flashOffer`, `packsOffers`, `heroUrgency` i about EN) passen de reserva/book a proposta, pressupost o disponibilitat, coherent amb backend de sol.licitud/proposta.
+Ultim canvi: #1609.
+Validacio: configurator-public-promise 3/3; cerca `rg` de promeses antigues sense resultats; `pnpm run qa:i18n-keys-sync`; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal, PDFs ni APIs externes. El possible social review amb migracio queda a #1612 nomes si el propietari el demana.
+
+[codex] 2026-07-07 [ESTAT: tancat — configurator subtitle promise #1608]
+Perimetre: `configurator.step4.subtitle` ca/es/en passa de "reserva ara" a demanar proposta, dins el mateix guard de promesa publica.
+Ultim canvi: #1608.
+Validacio: configurator-public-promise 2/2; `npx tsc --noEmit --pretty false`; `pnpm run qa:i18n-keys-sync`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal, PDFs ni APIs externes.
+
+[codex] 2026-07-07 [ESTAT: tancat — public offer promise #1607]
+Perimetre: `checkout` i `offerModal` publics passen de reserva/confirmacio immediata a proposta amb descompte i validacio de disponibilitat.
+Ultim canvi: #1607.
+Validacio: configurator-public-promise 2/2; `npx tsc --noEmit --pretty false`; `pnpm run qa:i18n-keys-sync`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal, PDFs ni APIs externes.
+
+[codex] 2026-07-07 [ESTAT: tancat — public promise audit #1606]
+Perimetre: copy step4 del configurador public baixa de reserva/confirmacio/reemborsament a sol.licitud/proposta/revisio humana, amb test de regressio.
+Ultim canvi: #1606.
+Validacio: configurator-public-promise 1/1; `npx tsc --noEmit --pretty false`; `pnpm run qa:i18n-keys-sync`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal, PDFs ni APIs externes.
+
+[codex] 2026-07-07 [ESTAT: tancat — timeline documents filter #1605]
+Perimetre: timeline del Customer Hub afegeix filtre `Documents` i separa traces documentals de comunicacions generiques consumint metadata existent.
+Ultim canvi: #1605.
+Validacio: TimelinePanel + timelineQueryService 42/42; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal, PDFs ni APIs externes.
+
+[codex] 2026-07-07 [ESTAT: tancat — dossier timeline visual #1604]
+Perimetre: `TimelinePanel` destaca traces documentals de dossier amb franja informativa i badge, consumint metadata existent i conservant CTA/origen.
+Ultim canvi: #1604.
+Validacio: TimelinePanel + timelineQueryService 41/41; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal, PDFs ni APIs externes.
+
+[codex] 2026-07-07 [ESTAT: tancat — risc economic accio fitxa #1603]
+Perimetre: fitxa de reserva mostra microaccio de caixa o marge quan el guard economic detecta pendent o marge watch/critic, amb anchors a pagaments/enllacos/costos/total.
+Ultim canvi: #1603.
+Validacio: booking-risk-action + calendar-utils 11/11; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+
+[codex] 2026-07-07 [ESTAT: tancat — social review sense schema #1602]
+Perimetre: guard compartit UI+servei impedeix programar/publicar social post-event amb revisio pendent, sense schema.
+Ultim canvi: #1602.
+Validacio: SocialClient + socialPostService 39/39; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+
+[codex] 2026-07-07 [ESTAT: tancat — dossier origen en traça #1601]
+Perimetre: dossier enviat i PDF compost registren `DOCUMENT_DOSSIER_*` amb origen lead/client i timeline els recupera per customer/lead.
+Ultim canvi: #1601.
+Validacio: dossier route/service + timeline 63/63; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+
+[codex] 2026-07-07 [ESTAT: tancat — agenda economic next action #1600]
+Perimetre: el CTA de risc economic del calendari obre `#sec-finances` o `#sec-marge` de la reserva segons `economicRisk` existent, sense recalcular.
+Ultim canvi: #1600.
+Validacio: calendar-utils + bookingWorkspaceHref + CalendarMonth deps 8/8; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+
+[codex] 2026-07-07 [ESTAT: tancat — dossier origen al llistat #1598]
+Perimetre: llistat i paperera de dossiers mostren origen amb links a entrada i client derivats del lead, sense schema/PDF.
+Ultim canvi: #1598.
+Validacio: dossierService 21/21; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDFs.
+
+[codex] 2026-07-07 [ESTAT: tancat — agenda economica amb rao #1597]
+Perimetre: el CTA economic del calendari mostra `Motiu` des de `economicRisk.reasons` o label existent, sense recalcular marge.
+Ultim canvi: #1597.
+Validacio: calendar-utils + CalendarMonth deps 5/5; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+
+[codex] 2026-07-07 [ESTAT: tancat — timeline documental amb origen #1596]
+Perimetre: `TimelineEventDTO.originLinks` i `TimelinePanel` mostren origen client/entrada/reserva als events documentals.
+Ultim canvi: #1596.
+Validacio: customer-hub timeline + TimelinePanel 5/5; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+
+[codex] 2026-07-07 [ESTAT: tancat — agenda economica cap a copilot #1595]
+Perimetre: mes/setmana/dia del calendari mostren CTA a la reserva amb `economicRisk`, prioritzant critic sobre avis.
+Ultim canvi: #1595.
+Validacio: calendar-utils + CalendarMonth deps 4/4; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+
+[codex] 2026-07-07 [ESTAT: tancat — consentiment social resolt #1594]
+Perimetre: `SocialClient` afegeix `Marcar revisió feta` i persisteix la resolucio a `SocialPost.notes` sense schema.
+Ultim canvi: #1594.
+Validacio: SocialClient + socialPostService 37/37; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+
+[codex] 2026-07-07 [ESTAT: tancat — ruta origen documents comercials #1593]
+Perimetre: `ProposalDTO` propaga `customerId`/`leadId`/`bookingId` i el Customer Hub mostra origen amb links a client, entrada i reserva.
+Ultim canvi: #1593.
+Validacio: ProposalsPanel + fetchCustomerHub 10/10; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+
+[codex] 2026-07-07 [ESTAT: tancat — resum economic a agenda #1592]
+Perimetre: mes/setmana/dia del calendari resumeixen reserves amb `economicRisk` des del DTO existent, sense recalcular ni tocar schema.
+Ultim canvi: #1592.
+Validacio: calendari utils/month deps 3/3; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+
+[codex] 2026-07-07 [ESTAT: tancat — contracte signat a timeline business #1590]
+Perimetre: `buildCustomerBusinessTimelineEvents` projecta `contractSignedAt` com `Contracte signat` amb CTA al PDF signat o al workspace del contracte.
+Ultim canvi: #1590.
+Validacio: customer-hub timeline 4/4; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni layout PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — calendari social deep link canonic #1589]
+Perimetre: posts socials dins calendari month/week/day obren `/admin/social?postId=...` amb helper canonic.
+Ultim canvi: #1589.
+Validacio: `socialWorkspaceHref` 2/2; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes de xarxes.
+
+[codex] 2026-07-07 [ESTAT: tancat — consentiment visible social post-event #1588]
+Perimetre: `SocialClient` mostra revisio de consentiment pendent i bloqueja `SCHEDULED`/`PUBLISHED` en drafts post-event fins que la nota interna es resol.
+Ultim canvi: #1588.
+Validacio: SocialClient + socialPostService tests 36/36; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes de xarxes.
+
+[codex] 2026-07-07 [ESTAT: tancat — documents signats dins Customer Hub #1587]
+Perimetre: `ProposalDTO` porta `contractPdfUrl` i `ProposalsPanel` mostra `Contracte signat` amb CTA al PDF signat o al workspace del contracte.
+Ultim canvi: #1587.
+Validacio: ProposalsPanel + customer-hub tests 15/15; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni layout PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — risc economic visible a calendari #1586]
+Perimetre: calendari month/week/day mostra `economicRisk` per reserves amb marge critic o caixa pendent imminent, reutilitzant `lib/admin/bookingEconomics`.
+Ultim canvi: #1586.
+Validacio: adminCalendarMonth + next-event-economics tests 11/11; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+
+[codex] 2026-07-07 [ESTAT: tancat — social draft visible des del playbook #1585]
+Perimetre: `socialPostId` del playbook obre `/admin/social?postId=...` i el modal d'edicio del draft concret, sense publicar ni crear APIs externes.
+Ultim canvi: #1585.
+Validacio: post-event/social focused tests 48/48; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes de xarxes.
+
+[codex] 2026-07-07 [ESTAT: tancat — CTA documental especific al timeline #1584]
+Perimetre: `timelineQueryService` diferencia `Obrir pressupost` i `Obrir contracte` segons traça documental, sense rutes noves.
+Ultim canvi: #1584.
+Validacio: `timelineQueryService` 38/38; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni layout PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — prioritat economica multi-bolo #1583]
+Perimetre: `/admin` eleva riscos de marge/caixa dels proxims 7 dies, no nomes del proper bolo, reutilitzant `computeDashboardNextEventEconomics`.
+Ultim canvi: #1583.
+Validacio: `next-event-economics` + `today-actions` 12/12; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+
+[codex] 2026-07-07 [ESTAT: tancat — publicacio social amb aprovacio explicita #1582]
+Perimetre: decisio `social_post` del playbook crea/reutilitza `SocialPost` intern `DRAFT`, vinculat al booking, sense publicar ni sincronitzar APIs externes.
+Ultim canvi: #1582.
+Validacio: post-event/timeline tests 86/86; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes de xarxes.
+
+[codex] 2026-07-07 [ESTAT: tancat — documents al customer hub #1581]
+Perimetre: `ProposalsPanel` mostra `quoteSnapshot`/`contractSnapshot` com a `Foto documental`; timeline de proposta enviada/acceptada obre el pressupost.
+Ultim canvi: #1581.
+Validacio: `ProposalsPanel` + customer-hub timeline 4/4; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni layout PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — economia dins cua executiva #1580]
+Perimetre: `/admin` projecta marge critic o caixa pendent imminent del proper bolo com a accio `economic` dins "Fes això ara".
+Ultim canvi: #1580.
+Validacio: `today-actions` 9/9; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni publicacio social.
+
+[codex] 2026-07-07 [ESTAT: tancat — social post-event segur #1579]
+Perimetre: el playbook mostra social `Preparat, no publicat` si hi ha decisio registrada, sense marcar-lo publicat ni permetre registrar-lo repetidament.
+Ultim canvi: #1579.
+Validacio: post-event playbook/load/actions/route tests 43/43; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni publicacio social.
+
+[codex] 2026-07-07 [ESTAT: tancat — guàrdia comercial Studio pressupost #1572]
+Perimetre: `PresupuestoPdfStudio` mostra cost directe, marge net i CAC estimat abans dels botons descarregar/imprimir/enviar.
+Ultim canvi: #1572.
+Validacio: presupuestos-commercial-guard tests 4/4; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF layout.
+
+[codex] 2026-07-07 [ESTAT: tancat — snapshots documentals contracte #1571]
+Perimetre: contracte desa `contractSnapshot` v1 dins `Proposal.snapshot`; render/generate/send/signed PDF prioritzen aquesta foto sobre booking/cataleg vius.
+Ultim canvi: #1571.
+Validacio: contractService tests 51/51; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni redisseny PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — post-event preparat #1570]
+Perimetre: `/admin/post-event/playbook` mostra accio preparada, draft segur, CTA especific i etiqueta `Preparat, no enviat` per cada propera accio.
+Ultim canvi: #1570.
+Validacio: post-event-actions/playbook tests 32/32; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal, PDF ni dispatch post-event.
+
+[codex] 2026-07-07 [ESTAT: tancat — guàrdia econòmica fitxa reserva #1569]
+Perimetre: `/admin/bookings/[id]` mostra `Marge` i `Pendent caixa` a la capçalera, calculats per helper pur amb motors canònics.
+Ultim canvi: #1569.
+Validacio: booking-economic-guard/payment-status/costEngine tests 89/89; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — traçabilitat documents pressupost/contracte #1568]
+Perimetre: pressupost enviat i cicle de contracte registren traça documental global a `adminLog` amb helper tolerant.
+Ultim canvi: #1568.
+Validacio: contract/proposal/timeline tests 92/92; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni redisseny de PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — playbook post-event href canònic #1567]
+Perimetre: `/admin/post-event/playbook` consumeix `buildPostEventNextActionHref()` per al CTA de següent acció, igual que la home Avui.
+Ultim canvi: #1567.
+Validacio: post-event-actions/playbook tests 27/27; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — focus cash-aware #1566]
+Perimetre: el punt/label de pagament del proper bolo a `/admin` usa cobertura derivada de `total - outstandingAmount`, coherent amb cash/pending real.
+Ultim canvi: #1566.
+Validacio: payment-status/next-event-economics tests 10/10; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — documents snapshot #1565]
+Perimetre: `GET /api/admin/dossiers/[id]/composite` registra `GENERATE_DOSSIER_COMPOSITE_PDF` a `adminLog` amb productes/extres/origen; fallback si falla el log.
+Ultim canvi: #1565.
+Validacio: dossier composite route/PDF tests 6/6; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe ni portal. PDF només traça, no layout.
+
+[codex] 2026-07-07 [ESTAT: tancat — post-event accionable #1564]
+Perimetre: "Tanca el cercle" calcula href per nextAction (`thank_you`, `testimonial`, `social_post`, `referral_ask`) i deixa de linkar tot a `/admin/post-event`.
+Ultim canvi: #1564.
+Validacio: post-event/playbook/today-actions tests 31/31; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — guàrdia econòmica proper bolo #1563]
+Perimetre: `fetchDashboardData().nextEvent` exposa pendent/marge/cost i `/admin` mostra marge, pendent i checklist a "El focus"; helper pur amb tests.
+Ultim canvi: #1563.
+Validacio: next-event-economics/payment tests 10/10; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — deduplicació capacity Avui/NBA #1562]
+Perimetre: `loadNextBestActions()` accepta capacity pre-carregada i `/admin` reutilitza la mateixa `capacityPromise`; test blinda que no es torna a consultar.
+Ultim canvi: #1562.
+Validacio: nextBestAction/today-actions tests 37/37; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — roadmap nocturn executable #1561]
+Perimetre: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` guanya full viu amb fronts, estat, evidència #1552-#1560, següents talls i stop rules.
+Ultim canvi: #1561.
+Validacio: `git diff --check`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — traçabilitat accions Avui #1560]
+Perimetre: nou `app/admin/lib/today-actions.ts` projecta NBA/dailyBrief a accions d'Avui amb domini+finestra, fallback i tests; `/admin` consumeix el helper.
+Ultim canvi: #1560.
+Validacio: today-actions/NBA tests 33/33; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — resiliència API NBA #1559]
+Perimetre: `/api/admin/ai/nba-explain` degrada a resposta buida 200 si fallen el motor NBA o el builder IA, amb log intern i tests de regressió.
+Ultim canvi: #1559.
+Validacio: route/NBA/AI tests 43/43; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — copilot Avui amb NBA #1558]
+Perimetre: `app/admin/page.tsx` connecta `loadNextBestActions()` a la home Avui i projecta el top 3 transversal com a "Fes això ara", amb fallback a `dailyBrief.actions`.
+Ultim canvi: #1558.
+Validacio: NBA tests 39/39; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — FAQ disponibilitat pending #1557]
+Perimetre: `messages/{ca,es,en}.json`. Objectiu complert: la disponibilitat publica passa de "reservar/confirmacio per email" a sol.licitar data + email amb sol.licitud i propers passos.
+Ultim canvi: #1557.
+Validacio: `pnpm run qa:i18n-keys-sync`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, runtime, schema, pricing, Stripe, portal ni PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — trims requerits reserva publica #1556]
+Perimetre: `lib/services/publicBookingService.ts`, `app/api/booking/route.ts` i tests enfocats. Objectiu complert: servei i route no accepten camps textuals requerits buits despres de `trim`, i el servei valida email directament.
+Ultim canvi: #1556.
+Validacio: `pnpm test:run -- --run __tests__\lib\services\publicBookingService.test.ts __tests__\app\api\booking-route.test.ts __tests__\components\booking\BookingForm.test.tsx __tests__\lib\email-public-booking-request.test.ts` 38/38; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+
+[codex] 2026-07-07 [ESTAT: tancat — email reserva publica pending #1555]
+Perimetre: `lib/email.ts` i `__tests__/lib/email-public-booking-request.test.ts`. Objectiu complert: el correu enviat per `createPublicBooking` no promet confirmacio definitiva quan el `Booking` neix `PENDING`; client i admin veuen sol.licitud rebuda/revisio.
+Ultim canvi: #1555.
+Validacio: `pnpm test:run -- --run __tests__\lib\email-public-booking-request.test.ts __tests__\lib\services\publicBookingService.test.ts __tests__\app\api\booking-route.test.ts` 29/29; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF; plantilla editable `booking_confirmation` intacta per al flux de confirmacio real admin.
+
+[codex] 2026-07-07 [ESTAT: tancat — promesa publica pending #1554]
+Perimetre: `messages/{ca,es,en}.json`, `__tests__/components/booking/BookingForm.test.tsx` i `__tests__/app/reserva-confirmada-page.test.tsx`. Objectiu complert: la promesa publica queda alineada amb `Booking.status=PENDING` i `depositAmount=0`; el client veu sol.licitud rebuda i bloqueig provisional, no confirmacio definitiva.
+Ultim canvi: #1554.
+Validacio: `pnpm run qa:i18n-keys-sync`; `pnpm test:run -- --run __tests__\components\booking\BookingForm.test.tsx __tests__\app\reserva-confirmada-page.test.tsx __tests__\lib\services\publicBookingService.test.ts __tests__\app\api\booking-route.test.ts` 34/34; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, backend, schema, migracions, pricing core, Stripe, portal ni PDF. Ruta `/reserva-confirmada` conservada per compatibilitat.
+
+[codex] 2026-07-07 [ESTAT: tancat — traçabilitat reserva publica #1553]
+Perimetre: `lib/services/publicBookingService.ts` i test enfocat. Objectiu complert: la reserva publica deixa `AdminLog` amb origen `public_booking`, desglossament economic i Availability amb referencia real.
+Ultim canvi: #1553.
+Validacio: `pnpm test:run -- --run __tests__\lib\services\publicBookingService.test.ts __tests__\app\api\booking-route.test.ts __tests__\components\booking\BookingForm.test.tsx` 33/33; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF. La decisio gran pendent continua sent si el flux futur ha de crear lead revisable abans de booking pendent.
+
+[codex] 2026-07-07 [ESTAT: tancat — reserva publica confiable #1552]
+Perimetre: `components/booking/BookingForm.tsx`, `messages/{ca,es,en}.json` i test del component. Objectiu complert: el preu visible del formulari de reserva publica ara mostra base, IVA 21% i total final amb la mateixa regla que `publicBookingService`.
+Ultim canvi: #1552.
+Validacio: `pnpm test:run -- --run __tests__\components\booking\BookingForm.test.tsx __tests__\lib\services\publicBookingService.test.ts __tests__\app\api\booking-route.test.ts` 32/32; `pnpm run qa:i18n-keys-sync`; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF. Seguent front Zenit: contracte/traçabilitat de reserva publica (reserva forta vs lead revisable).
+
+[codex] 2026-07-07 [ESTAT: tancat — Manolo reset total supermegaauditoria #1551]
+Perimetre: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`, protocol, diari, counter i sync. Objectiu complert: reinici de zero sota Manolo, amb auditoria total definida i cua Zenit accionable.
+Ultim canvi: #1551.
+Validacio: `pnpm run qa:protocol` pendent d'executar immediatament despres del registre; lectura local del document nou.
+Avis claude: no he tocat runtime, schema, migracions, pricing core, Stripe, portal, PDF ni `app/admin/tasks`. Seguent tall executable: #1552 reserva publica confiable (total visible igual al backend).
+
+[codex] 2026-07-07 [ESTAT: tancat — captacio conserva ubicacio i idioma #1550]
+Perimetre: `/api/contact` schema/route, `contactLeadCaptureService`, payload minim de `ContactFormComplete` i configurador, i tests enfocats. Objectiu complert: el que escriu el client (`location`, `locale`) arriba a `Lead.eventLocation` i `preferredLocale`.
+Ultim canvi: #1550.
+Validacio: `pnpm test:run -- --run __tests__\api\contact\contact-copy.test.ts __tests__\app\api\contact-route.test.ts __tests__\lib\services\contactLeadCaptureService.test.ts` 41/41; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: he tocat `ContactFormComplete` i `app/[locale]/configurador/client.tsx` nomes amb payload minim; no he tocat `app/admin/tasks`, schema, pricing core, Stripe, portal ni PDF. Seguent front Manolo: semantica de reserva publica.
+
+[codex] 2026-07-07 [ESTAT: tancat — contacte sense lead no es exit #1549]
+Perimetre: `/api/contact` + test nou `__tests__/app/api/contact-route.test.ts`. Objectiu complert: primer fix real Manolo del comandament #1548; cap `ok: true` sense `Lead` persistent i resposta amb id real guardat.
+Ultim canvi: #1549.
+Validacio: `pnpm test:run -- --run __tests__\app\api\contact-route.test.ts __tests__\lib\services\contactLeadCaptureService.test.ts` 11/11; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: no he tocat `app/admin/tasks`, schema, pricing core, Stripe, portal, PDF ni `ContactFormComplete`; queda per al seguent cicle Manolo cosir `location` i `locale` de contacte/configurador.
+
+[codex] 2026-07-07 [ESTAT: tancat — Manolo nonstop comandament total #1548]
+Perimetre: `docs/audit/MANOLO-ZENIT-COMANDAMENT-NONSTOP-1548.md`, protocol, diari, counter i sync. Objectiu complert: convertir l'ordre de supermega auditoria total + Zenit en comandament mestre nonstop amb fronts, criteris, pipeline i primera accio executable.
+Ultim canvi: #1548.
+Validacio: `pnpm run qa:protocol`; revisio de trailing whitespace del document nou.
+Avis claude: no he tocat runtime, schema, pricing core, Stripe, portal, PDF ni `app/admin/tasks`; continuo ara amb #1549 sobre `/api/contact`, primer fix real de la frontissa captacio.
+
+[codex] 2026-07-06 [ESTAT: tancat — frontissa captacio #1547]
+Perimetre: `docs/audit/MANOLO-ZENIT-FRONTISSA-CAPTACIO-1547.md`, protocol, diari, counter i sync. Objectiu complert: primer tall real Manolo despres de master/atles, traçant contacte/configurador/reserva publica -> API -> servei -> model -> recepcio admin.
+Ultim canvi: #1547.
+Validacio: `pnpm run qa:protocol`; revisio de trailing whitespace del document nou.
+Avis claude: no he tocat runtime, schema, pricing core, Stripe, portal, PDF ni `app/admin/tasks`; el primer tall de codi recomanat queda com #1548: contracte dur de persistencia a `/api/contact` perquè no hi hagi `ok: true` sense `Lead`.
+
+[codex] 2026-07-06 [ESTAT: tancat — Manolo master+atles #1546]
+Perimetre: `docs/audit/MANOLO-ZENIT-ANALISI-MASTER-ATLES-1546.md`, protocol, diari, counter i sync. Objectiu complert: alinear el mandat Manolo #1545 amb `docs/ATLES-FUNCIONAL.md`, `docs/admin-organisme-atles.md`, `docs/TESI-MAQUINA-full-de-ruta-2026-07.md` i `docs/TESI-ZENIT-MAQUINA-ORBITA-2026-07-04.md` abans d'obrir auditories de codi.
+Ultim canvi: #1546.
+Validacio: `pnpm run qa:protocol`; `git diff --check` del perimetre documental.
+Avis claude: no he tocat runtime, schema, pricing, Stripe, portal, public web ni `app/admin/tasks`; el primer tall recomanat queda com a frontissa de captacio public -> API -> Lead/Booking -> admin.
+
+[codex] 2026-07-06 [ESTAT: tancat — full de treball Manolo Zenit #1545]
+Perimetre: `docs/audit/MANOLO-ZENIT-FULL-DE-TREBALL-1545.md`, protocol, diari, counter i sync. Objectiu complert: convertir l'ordre Manolo d'auditoria total i millora fins al Zenit en un full de treball viu i executable.
+Ultim canvi: #1545.
+Validacio: `pnpm run qa:protocol`.
+Avis claude: #1545 es repurposa del polish de valoracio a document estratègic per ordre directa del propietari; el polish del `TestimonialForm` queda com a tall posterior, sense tocar schema Prisma, pricing, Stripe, emails templates, portal access, shared gallery, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — valoracio mobile focus #1544]
+Perimetre: `LayoutWrapper`, `publicChrome` i `/[locale]/valoracio`. Objectiu complert: `/valoracio` queda sense bottom nav/footer/CTAs mobils i el formulari ja no porta padding compensatori.
+Ultim canvi: #1544.
+Validacio: `pnpm test:run -- --run __tests__\lib\constants\publicChrome.test.ts __tests__\app\valoracio-page.test.tsx` 5/5; `npx tsc --noEmit --pretty false`; captura Playwright mobile a `.codex-captures/valoracio-mobile-focus-1544/mobile.png`.
+Avis claude: carril valoracio mobile focus tancat per #1544; no he tocat schema Prisma, pricing, Stripe, emails templates, portal access, shared gallery, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — valoracio visual shell #1543]
+Perimetre: `/[locale]/valoracio` client i missatges. Objectiu complert: la pantalla negra centrada passa a seccio post-event localitzada amb titol, context comercial, senyals de recompensa i formulari compacte.
+Ultim canvi: #1543.
+Validacio: `pnpm test:run -- --run __tests__\app\valoracio-page.test.tsx` 3/3; `pnpm run qa:i18n-keys-sync`; `npx tsc --noEmit --pretty false`; captures Playwright desktop/mobile a `.codex-captures/valoracio-visual-1543-final/`.
+Avis claude: carril visual valoracio tancat per #1543; no he tocat schema Prisma, pricing, Stripe, emails templates, portal access, shared gallery, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — post-event review url builder #1542]
+Perimetre: `postEventDispatchService` i test associat. Objectiu complert: `reviewUrl` es construeix amb `URL.searchParams`, sense concatenar query manual.
+Ultim canvi: #1542.
+Validacio: `pnpm test:run -- --run __tests__\lib\services\postEventDispatchService.test.ts` 9/9; `npx tsc --noEmit --pretty false`.
+Avis claude: carril review url builder tancat per #1542; no he tocat schema Prisma, pricing, Stripe, emails templates, portal access, shared gallery, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — testimonial api media url trim #1541]
+Perimetre: `/api/testimonials` schema i test de route. Objectiu complert: photoUrl/videoUrl opcionals es trimmegen i buits/null compten com absents.
+Ultim canvi: #1541.
+Validacio: `pnpm test:run -- --run __tests__\app\api\testimonials-route.test.ts` 8/8; `npx tsc --noEmit --pretty false`.
+Avis claude: carril api media url trim tancat per #1541; no he tocat schema Prisma, pricing, Stripe, emails, portal access, shared gallery, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — testimonial api trim required fields #1540]
+Perimetre: `/api/testimonials` schema i test de route. Objectiu complert: nom, email, telefon i comentari es trimmegen abans de validar/enviar al servei.
+Ultim canvi: #1540.
+Validacio: `pnpm test:run -- --run __tests__\app\api\testimonials-route.test.ts` 7/7; `npx tsc --noEmit --pretty false`.
+Avis claude: carril api trim fields tancat per #1540; no he tocat schema Prisma, pricing, Stripe, emails, portal access, shared gallery, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — testimonial api null context #1539]
+Perimetre: `/api/testimonials` schema i test de route. Objectiu complert: `token/bookingRef` nuls o buits compten com a absents i strings es trimmegen.
+Ultim canvi: #1539.
+Validacio: `pnpm test:run -- --run __tests__\app\api\testimonials-route.test.ts` 5/5; `npx tsc --noEmit --pretty false`.
+Avis claude: carril api null context tancat per #1539; no he tocat schema Prisma, pricing, Stripe, emails, portal access, shared gallery, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — testimonial null context payload #1538]
+Perimetre: `TestimonialForm` submit payload i test del component. Objectiu complert: no s'envien `token`/`bookingRef` nuls a l'API publica de testimonials.
+Ultim canvi: #1538.
+Validacio: `pnpm test:run -- --run __tests__\app\components\reviews\TestimonialForm.test.tsx` 3/3; `npx tsc --noEmit --pretty false`.
+Avis claude: carril null context payload tancat per #1538; no he tocat schema, pricing, Stripe, emails, portal access, shared gallery, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — testimonials pagination guard #1537]
+Perimetre: `publicTestimonialService` i test associat. Objectiu complert: limit/offset publics es normalitzen abans de Prisma.
+Ultim canvi: #1537.
+Validacio: `pnpm test:run -- --run __tests__\lib\services\publicTestimonialService.test.ts` 19/19; `npx tsc --noEmit --pretty false`.
+Avis claude: carril testimonials pagination guard tancat per #1537; no he tocat schema, pricing, Stripe, emails, portal access, shared gallery, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — valoracio nav accessible names #1536]
+Perimetre: navegacio del `TestimonialForm`. Objectiu complert: fletxes/check decoratius no embruten el nom accessible dels botons.
+Ultim canvi: #1536.
+Validacio: `pnpm test:run -- --run __tests__\app\components\reviews\TestimonialForm.test.tsx` 2/2; `npx tsc --noEmit --pretty false`.
+Avis claude: carril nav accessible names tancat per #1536; no he tocat schema, pricing, Stripe, emails, portal access, shared gallery, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — valoracio field labels #1535]
+Perimetre: `TestimonialForm` de post-event i clau i18n d'email. Objectiu complert: textarea, URL de foto/video i camps de contacte tenen nom accessible associat.
+Ultim canvi: #1535.
+Validacio: `pnpm test:run -- --run __tests__\app\components\reviews\TestimonialForm.test.tsx` 2/2; `pnpm run qa:i18n-keys-sync`; `npx tsc --noEmit --pretty false`.
+Avis claude: carril field labels tancat per #1535; no he tocat schema, pricing, Stripe, emails, portal access, shared gallery, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — valoracio submit error alert #1534]
+Perimetre: `TestimonialForm` de post-event. Objectiu complert: error d'enviament anunciat com a alerta accessible.
+Ultim canvi: #1534.
+Validacio: `pnpm test:run -- --run __tests__\app\components\reviews\TestimonialForm.test.tsx` 2/2; `npx tsc --noEmit --pretty false`.
+Avis claude: carril submit error alert tancat per #1534; no he tocat schema, pricing, Stripe, emails, portal access, shared gallery, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — valoracio rating accessible #1533]
+Perimetre: `TestimonialForm` de post-event i missatges associats. Objectiu complert: estrelles amb nom accessible localitzat i estat seleccionat.
+Ultim canvi: #1533.
+Validacio: `pnpm test:run -- --run __tests__\app\components\reviews\TestimonialForm.test.tsx` 1/1; `pnpm run qa:i18n-keys-sync`; `npx tsc --noEmit --pretty false`.
+Avis claude: carril rating accessible tancat per #1533; no he tocat schema, pricing, Stripe, emails, portal access, shared gallery, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — valoracio post-event metadata/query #1532]
+Perimetre: entrada publica `/[locale]/valoracio`. Objectiu complert: metadata per locale i `token/ref` sanejats abans d'entrar al formulari.
+Ultim canvi: #1532.
+Validacio: `pnpm test:run -- --run __tests__\app\valoracio-page.test.tsx` 3/3; `pnpm run qa:metadata-i18n-namespaces`; `npx tsc --noEmit --pretty false`.
+Avis claude: carril valoracio post-event tancat per #1532; no he tocat schema, pricing, Stripe, emails, portal access, shared gallery, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — shared gallery password alert #1531]
+Perimetre: gate de contrasenya de galeria pública compartida. Objectiu complert: contrasenya incorrecta s'anuncia com a alerta accessible.
+Ultim canvi: #1530.
+Validacio: `pnpm test:run -- --run __tests__\app\gallery\shared-gallery-page.test.tsx` 4/4; `npx tsc --noEmit --pretty false`.
+Avis claude: carril shared gallery password alert tancat per #1531; no he tocat schema, APIs backend, portal access, Stripe, emails, pricing, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — shared gallery external link labels #1530]
+Perimetre: enllaços de fotos a la galeria pública compartida. Objectiu complert: si obren pestanya nova, el nom accessible també ho anuncia.
+Ultim canvi: #1529.
+Validacio: `pnpm test:run -- --run __tests__\app\gallery\shared-gallery-page.test.tsx` 4/4; `npx tsc --noEmit --pretty false`.
+Avis claude: carril shared gallery external link labels tancat per #1530; no he tocat schema, APIs backend, portal access, Stripe, emails, pricing, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — shared gallery localized copy #1529]
+Perimetre: galeria pública compartida `/[locale]/gallery/[shareToken]`. Objectiu complert: copy i marca venen de missatges/locales i SITE_CONFIG; password array sanejat.
+Ultim canvi: #1528.
+Validacio: `pnpm test:run -- --run __tests__\app\gallery\shared-gallery-page.test.tsx __tests__\lib\clientPortalMessages.test.ts __tests__\lib\services\galleryService.test.ts` 51/51; `npx tsc --noEmit --pretty false`; `rg` sense hardcoded català/manual al path.
+Avis claude: carril shared gallery localized copy tancat per #1529; no he tocat schema, APIs backend, portal access, Stripe, emails, pricing, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal visibility uses personalization coercion #1528]
+Perimetre: motor de visibilitat del portal client. Objectiu complert: visibilitat consumeix `coercePortalPersonalization()` i només `false` explícit amaga seccions.
+Ultim canvi: #1527.
+Validacio: `pnpm test:run -- --run __tests__\lib\clientPortalVisibility.test.ts __tests__\lib\clientPortalUtils.test.ts` 9/9; `npx tsc --noEmit --pretty false`.
+Avis claude: carril portal visibility coercion tancat per #1528; no he tocat schema, APIs backend, Stripe service, emails, pricing, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal personalization type consumers #1527]
+Perimetre: imports de `PortalPersonalization` a panell admin i route del portal. Objectiu complert: consumidors directes del tipus l'agafen de constants; el servei conserva reexport compat.
+Ultim canvi: #1526.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx __tests__\app\api\admin\bookings-portal-access-route.test.ts __tests__\lib\constants\clientPortalPersonalization.test.ts` 21/21; `npx tsc --noEmit --pretty false`.
+Avis claude: carril portal personalization type consumers tancat per #1527; no he tocat schema, APIs backend, Stripe service, emails, pricing, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal payment success search params #1526]
+Perimetre: pantalla pública `portal/payment-success`. Objectiu complert: `searchParams` accepta `string | string[] | undefined` i renderitza només el primer valor net.
+Ultim canvi: #1525.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\payment-success-page.test.tsx` 3/3; `npx tsc --noEmit --pretty false`.
+Avis claude: carril portal payment-success search params tancat per #1526; no he tocat schema, APIs backend, Stripe service, emails, pricing, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal payment success generic fallback #1525]
+Perimetre: pantalla pública `portal/payment-success`. Objectiu complert: si `type` no és `deposit` ni `remaining`, mostra el copy genèric existent.
+Ultim canvi: #1524.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\payment-success-page.test.tsx` 2/2; `npx tsc --noEmit --pretty false`.
+Avis claude: carril portal payment-success copy fallback tancat per #1525; no he tocat schema, APIs backend, Stripe service, emails, pricing, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal locale return type #1524]
+Perimetre: normalització de locale del portal client. Objectiu complert: `normalizePortalLocale()` retorna `ClientPortalLocale` i les pàgines ja no fan casts repetits.
+Ultim canvi: #1523.
+Validacio: `pnpm test:run -- --run __tests__\lib\services\clientPortalAccess.test.ts __tests__\app\portal\portalHubExternalLinks.test.ts __tests__\app\portal\portalSubpageExternalLinks.test.ts __tests__\app\portal\portalSignVisibility.test.ts __tests__\app\portal\portalSignAccessHit.test.ts __tests__\app\portal\portalIntroMessageRendering.test.ts __tests__\app\portal\portalPostEventFeedbackSource.test.ts __tests__\lib\clientPortalMessages.test.ts` 38/38; `npx tsc --noEmit --pretty false`; `rg` sense casts de locale.
+Avis claude: carril portal client locale typing tancat per #1524; no he tocat schema, APIs backend, generació PDF, emails, pricing, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal personalization type home #1523]
+Perimetre: contracte de tipus `PortalPersonalization`. Objectiu complert: el tipus viu amb les constants del domini i el servei el reexporta per compatibilitat.
+Ultim canvi: #1522.
+Validacio: `pnpm test:run -- --run __tests__\lib\constants\clientPortalPersonalization.test.ts __tests__\lib\clientPortalUtils.test.ts __tests__\lib\services\clientPortalAccess.test.ts` 28/28; `npx tsc --noEmit --pretty false`.
+Avis claude: carril portal client personalization type home tancat per #1523; no he tocat schema, APIs backend, generació PDF, emails, pricing, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal action error body guard #1522]
+Perimetre: formularis client-side de signatura i Bizum del portal. Objectiu complert: errors de resposta llegits amb `readPortalActionError()` en lloc de casts locals sobre `res.json()`.
+Ultim canvi: #1521.
+Validacio: `pnpm test:run -- --run __tests__\lib\clientPortalUtils.test.ts __tests__\app\portal\SignContractForm.test.tsx __tests__\app\portal\BizumPayButton.test.tsx` 15/15; `npx tsc --noEmit --pretty false`.
+Avis claude: carril portal client action error guard tancat per #1522; no he tocat schema, APIs backend, generació PDF, emails, pricing, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal access route body guard #1521]
+Perimetre: route admin de creació d'accés al portal client. Objectiu complert: el POST llegeix el body JSON com a objecte segur i tolera `null` sense 500.
+Ultim canvi: #1520.
+Validacio: `pnpm test:run -- --run __tests__\app\api\admin\bookings-portal-access-route.test.ts` 16/16; `npx tsc --noEmit --pretty false`.
+Avis claude: carril portal client route body guard tancat per #1521; no he tocat schema, APIs de cobrament, generació PDF, emails, pricing, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal personalization read guard #1520]
+Perimetre: sanejament de lectura de `personalization` del portal client. Objectiu complert: el hub coacciona JSON brut abans de llegir headline/intro/accent, i `resolvePortalAccentHex()` comparteix el mateix helper.
+Ultim canvi: #1519.
+Validacio: `pnpm test:run -- --run __tests__\lib\clientPortalUtils.test.ts __tests__\app\portal\portalIntroMessageRendering.test.ts __tests__\app\portal\portalHubExternalLinks.test.ts __tests__\app\portal\portalPostEventFeedbackSource.test.ts` 7/7; `npx tsc --noEmit --pretty false`.
+Avis claude: carril portal client personalization read guard tancat per #1520; no he tocat schema, APIs de negoci, generació PDF, emails, pricing, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal hub booking casts cleanup #1519]
+Perimetre: neteja canònica del hub principal del portal client. Objectiu complert: el hub consumeix `booking`, `proposals` i `extras` directament des del servei sense casts redundants.
+Ultim canvi: #1518.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\portalHubExternalLinks.test.ts __tests__\app\portal\portalIntroMessageRendering.test.ts __tests__\app\portal\portalPostEventFeedbackSource.test.ts __tests__\app\portal\portalBusinessSource.test.ts __tests__\app\portal\portalBrandSource.test.ts __tests__\app\portal\portalProgressAccessibility.test.ts __tests__\app\portal\portalDecorativeArrows.test.ts __tests__\app\portal\portalDecorativeQuantity.test.ts __tests__\lib\clientPortalEventDisplay.test.ts` 12/12; `npx tsc --noEmit --pretty false`.
+Avis claude: carril portal client hub typing tancat per #1519; no he tocat schema, APIs de negoci, generació PDF, emails, pricing, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal payment invoice type cleanup #1518]
+Perimetre: neteja canònica petita a factura/pagaments del portal client. Objectiu complert: `invoice` i `payments` consumeixen `access.booking` directament sense casts locals.
+Ultim canvi: #1517.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\BizumPayButton.test.tsx __tests__\app\portal\portalSubpageExternalLinks.test.ts __tests__\lib\clientPortalMessages.test.ts` 15/15; `npx tsc --noEmit --pretty false`.
+Avis claude: carril portal client invoice/payments typing tancat per #1518; no he tocat schema, APIs de cobrament, generació PDF, emails, pricing, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal contract proposals type cleanup #1517]
+Perimetre: neteja canònica petita a contracte/signatura del portal client. Objectiu complert: `access.booking.proposals` passa directe a `getClientPortalContractSummary()` sense casts locals.
+Ultim canvi: #1516.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\portalContractChecklistAccessibility.test.ts __tests__\app\portal\portalSignAccessHit.test.ts __tests__\app\portal\portalSignVisibility.test.ts __tests__\app\portal\SignContractForm.test.tsx` 9/9; `npx tsc --noEmit --pretty false`.
+Avis claude: carril portal client contract/sign typing tancat per #1517; no he tocat schema, APIs de negoci, generació PDF, emails, pricing, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal subpages booking type cleanup #1516]
+Perimetre: neteja canònica petita a subpàgines del portal client. Objectiu complert: galeria, qüestionari i timeline ja no inventen formes locals de `access.booking` quan el servei ja les tipa.
+Ultim canvi: #1515.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\portalGalleryCountAccessibility.test.ts __tests__\app\portal\GalleryClient.test.tsx __tests__\app\portal\QuestionnaireForm.test.tsx __tests__\lib\clientPortalTimeline.test.ts` 14/14; `npx tsc --noEmit --pretty false`.
+Avis claude: carril portal client typing/subpages tancat per #1516; no he tocat schema, APIs de negoci, contracte PDF, emails, pricing, cataleg ni `app/admin/tasks`.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal visibility stores only false #1515]
+Perimetre: sanejament de flags de visibilitat del portal client. Objectiu complert: persisteix només overrides `false`, perquè `true` és el comportament per defecte del motor.
+Ultim canvi: #1514.
+Validacio: `pnpm test:run -- --run __tests__\app\api\admin\bookings-portal-access-route.test.ts __tests__\lib\clientPortalVisibility.test.ts` 18/18; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client dades/visibilitat tancat per #1515; no he tocat schema, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal accent sanitize route #1514]
+Perimetre: sanejament del color accent a la route admin del portal client. Objectiu complert: no guarda accents invàlids que el portal després ignoraria.
+Ultim canvi: #1513.
+Validacio: `pnpm test:run -- --run __tests__\lib\clientPortalUtils.test.ts __tests__\app\api\admin\bookings-portal-access-route.test.ts` 17/17; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client validació/route tancat per #1514; no he tocat schema, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal route no default max #1513]
+Perimetre: sanejament de personalització a la route admin del portal client. Objectiu complert: eliminat el límit fantasma `300` de `toOptionalString`; els limits són explícits.
+Ultim canvi: #1512.
+Validacio: `pnpm test:run -- --run __tests__\app\api\admin\bookings-portal-access-route.test.ts` 12/12; `npx tsc --noEmit --pretty false`; `rg` sense `max = 300`; `pnpm run qa:protocol`.
+Avis claude: carril portal client constants/route tancat per #1513; no he tocat schema, APIs de negoci, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal default accent constant #1512]
+Perimetre: color accent per defecte del portal client. Objectiu complert: `CLIENT_PORTAL_DEFAULT_ACCENT_COLOR` viu a la capa de constants compartides del portal.
+Ultim canvi: #1511.
+Validacio: `pnpm test:run -- --run __tests__\lib\constants\clientPortalPersonalization.test.ts __tests__\lib\clientPortalUtils.test.ts __tests__\app\portal\QuestionnaireForm.test.tsx __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx` 11/11; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client constants/visual tancat per #1512; no he tocat schema, APIs de negoci, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal accent hex strict #1511]
+Perimetre: validació del color accent del portal client. Objectiu complert: accepta només hex de 3 o 6 dígits i fa fallback si arriba un valor invàlid.
+Ultim canvi: #1510.
+Validacio: `pnpm test:run -- --run __tests__\lib\clientPortalUtils.test.ts __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx` 6/6; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client visual/validació tancat per #1511; no he tocat schema, API de resposta, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal limits constants #1510]
+Perimetre: limits de personalització i caducitat del portal client. Objectiu complert: `120/1200/20` i `1/365/30` surten de route/servei/panell i viuen en constants compartides.
+Ultim canvi: #1509.
+Validacio: `pnpm test:run -- --run __tests__\lib\constants\clientPortalPersonalization.test.ts __tests__\lib\services\clientPortalAccess.test.ts __tests__\app\api\admin\bookings-portal-access-route.test.ts __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx` 39/39; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client constants/monocapa tancat per #1510; no he tocat schema, API de resposta del qüestionari, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal questionnaire visibility wiring #1509]
+Perimetre: personalització i visibilitat del qüestionari al portal client. Objectiu complert: `showQuestionnaire` queda cablejat des del panell admin fins a la route i el tipus canònic.
+Ultim canvi: #1508.
+Validacio: `pnpm test:run -- --run __tests__\app\api\admin\bookings-portal-access-route.test.ts __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx __tests__\lib\clientPortalVisibility.test.ts` 19/19; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client visibilitat/admin UI tancat per #1509; no he tocat schema, API de resposta del qüestionari, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal sign visibility guard #1508]
+Perimetre: pagina de signatura inline del portal client. Objectiu complert: respecta `showDocuments` també a `/sign`, no només a contracte/factura.
+Ultim canvi: #1507.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\portalSignVisibility.test.ts __tests__\app\portal\portalSignAccessHit.test.ts __tests__\app\portal\portalSubpageExternalLinks.test.ts` 3/3; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client visibilitat/seguretat tancat per #1508; no he tocat schema, API de signatura, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal sign back arrow a11y #1507]
+Perimetre: link de retorn de la pagina de signatura del portal client. Objectiu complert: la fletxa visual queda fora del nom accessible.
+Ultim canvi: #1506.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\portalDecorativeArrows.test.ts __tests__\app\portal\portalSignAccessHit.test.ts` 2/2; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client a11y/front-only tancat per #1507; no he tocat schema, API de signatura, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal sign access hit #1506]
+Perimetre: pagina de signatura inline del portal client. Objectiu complert: marca `lastAccessedAt` també quan el client entra directament a signar.
+Ultim canvi: #1505.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\portalSignAccessHit.test.ts __tests__\app\portal\portalSubpageExternalLinks.test.ts` 2/2; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client de tracking/lectura tancat per #1506; no he tocat schema, API de signatura, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal personalization type canonical #1505]
+Perimetre: tipus de personalització del portal client en hub i panell admin. Objectiu complert: eliminades les definicions locals de `headline/introMessage/accentColor`; ara hereten `PortalPersonalization` del servei.
+Ultim canvi: #1504.
+Validacio: `rg` de definicions locals duplicades; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril tipus/canon del portal client tancat per #1505; no he tocat runtime, schema, API, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — admin portal maxLength #1504]
+Perimetre: camps de personalització del panell admin del portal client. Objectiu complert: `maxLength` visual queda alineat amb els límits de sanejament de la route.
+Ultim canvi: #1503.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx` 3/3; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril admin UI petit del portal client tancat per #1504; no he tocat schema, API, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — admin portal caducitat clamp UI #1503]
+Perimetre: camp de caducitat del panell admin del portal client. Objectiu complert: la UI s'alinea amb el clamp 1..365 del servei i evita que 0 salti visualment a 30.
+Ultim canvi: #1502.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx` 2/2; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril admin UI petit del portal client tancat per #1503; no he tocat schema, API, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — admin portal intro textarea #1502]
+Perimetre: panell admin d'enllaç del portal client dins fitxa de reserva. Objectiu complert: `introMessage` s'edita amb textarea, coherent amb el seu límit de 1200 caràcters.
+Ultim canvi: #1501.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx` 1/1; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril admin UI petit del portal client tancat per #1502; no he tocat schema, API, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal caducitat clamp zero #1501]
+Perimetre: emissió d'accessos del portal client. Objectiu complert: respecta el clamp 1..365 també quan `expiresInDays` arriba a 0, en lloc de convertir-ho en 30 dies per `||`.
+Ultim canvi: #1500.
+Validacio: `pnpm test:run -- --run __tests__\lib\services\clientPortalAccess.test.ts` 22/22; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client de servei petit tancat per #1501; no he tocat schema, UI admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal locale trim #1500]
+Perimetre: normalització de locale del portal client. Objectiu complert: accepta locales amb espais accidentals abans de decidir l'idioma del portal.
+Ultim canvi: #1499.
+Validacio: `pnpm test:run -- --run __tests__\lib\services\clientPortalAccess.test.ts` 21/21; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client de servei petit tancat per #1500; no he tocat schema, UI admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal post-event select minim #1499]
+Perimetre: query de lectura del portal client. Objectiu complert: es carrega només `id` de `postEventReport` i `clientFeedback`, perquè el hub només necessita saber si existeixen.
+Ultim canvi: #1498.
+Validacio: `pnpm test:run -- --run __tests__\lib\services\clientPortalAccess.test.ts` 20/20; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client de lectura tancat per #1499; no he tocat schema, escriptures, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal post-event feedback real #1498]
+Perimetre: lectura del portal client i bloc post-event del hub. Objectiu complert: es carrega `clientFeedback` i el portal deixa de marcar el tancament com pendent quan el feedback ja existeix.
+Ultim canvi: #1497.
+Validacio: `pnpm test:run -- --run __tests__\lib\services\clientPortalAccess.test.ts __tests__\app\portal\portalPostEventFeedbackSource.test.ts` 21/21; grup portal+acces 76/76; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client de lectura tancat per #1498; no he tocat schema, escriptures, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal introMessage visible #1497]
+Perimetre: hub del portal client. Objectiu complert: el `introMessage` personalitzat ja existent es mostra sanejat i amb fallback localitzat, perquè el camp de l'admin no sigui mort.
+Ultim canvi: #1496.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\portalIntroMessageRendering.test.ts __tests__\lib\clientPortalEventDisplay.test.ts` 5/5; grup portal 55/55; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client front-only tancat per #1497; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal headline fallback trim #1496]
+Perimetre: headline personalitzat del greeting del portal client. Objectiu complert: el portal fa fallback al text per defecte si la personalització és buida o només espais.
+Ultim canvi: #1495.
+Validacio: `pnpm test:run -- --run __tests__\lib\clientPortalEventDisplay.test.ts` 4/4; grup portal 54/54; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client front-only tancat per #1496; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal customer first name trim #1495]
+Perimetre: nom de client al greeting del hub del portal. Objectiu complert: el primer nom s'extreu després de sanejar espais, no amb `split(' ')[0]` directe.
+Ultim canvi: #1495.
+Validacio: `pnpm test:run -- --run __tests__\lib\clientPortalEventDisplay.test.ts` 3/3; grup portal 53/53; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client front-only tancat per #1495; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal guest count plural #1494]
+Perimetre: pax visible del hero del portal client. Objectiu complert: `eventGuests.toLowerCase()` substituït per singular/plural localitzat.
+Ultim canvi: #1494.
+Validacio: `pnpm test:run -- --run __tests__\lib\clientPortalEventDisplay.test.ts` 2/2; grup portal 52/52; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client i18n/front-only tancat per #1494; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal event place join #1493]
+Perimetre: ubicació visible de l'esdeveniment al hub del portal client. Objectiu complert: espai i localitat s'uneixen només amb parts reals, sense separadors penjats.
+Ultim canvi: #1493.
+Validacio: `pnpm test:run -- --run __tests__\lib\clientPortalEventDisplay.test.ts` 1/1; grup portal 51/51; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client front-only tancat per #1493; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal hub progress a11y #1492]
+Perimetre: barra de progrés del hub del portal client. Objectiu complert: cada pas exposa label i estat en text accessible, també en mòbil.
+Ultim canvi: #1492.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\portalProgressAccessibility.test.ts` 1/1; grup portal 50/50; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client a11y/front-only tancat per #1492; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal contract checklist status a11y #1491]
+Perimetre: checklist de signatura del contracte al portal client. Objectiu complert: l'estat complet/pendent s'exposa en text accessible, no només amb color o símbol.
+Ultim canvi: #1491.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\portalContractChecklistAccessibility.test.ts` 1/1; grup portal 49/49; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client a11y/front-only tancat per #1491; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal bizum error normalization #1490]
+Perimetre: botó Bizum del portal client. Objectiu complert: errors de backend normalitzats a claus conegudes i errors desconeguts blindats contra sortida crua.
+Ultim canvi: #1490.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\BizumPayButton.test.tsx` 4/4; grup portal 48/48; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client front-only tancat per #1490; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal gallery download new-tab label #1489]
+Perimetre: enllaç de descàrrega del visor de galeria del portal client. Objectiu complert: el nom accessible avisa que la descàrrega obre pestanya nova.
+Ultim canvi: #1489.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\GalleryClient.test.tsx` 1/1; grup portal 47/47; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client a11y/front-only tancat per #1489; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal subpage external link note #1488]
+Perimetre: enllaços externs de pagaments, factura, contracte i signatura del portal client. Objectiu complert: els enllaços externs avisen assistivament quan obren pestanya nova.
+Ultim canvi: #1488.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\portalSubpageExternalLinks.test.ts __tests__\lib\clientPortalMessages.test.ts` 11/11; grup portal 47/47; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client a11y/front-only tancat per #1488; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal hub external link note #1487]
+Perimetre: enllaços externs del hub del portal client. Objectiu complert: els CTAs externs avisen assistivament quan obren una pestanya nova.
+Ultim canvi: #1487.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\portalHubExternalLinks.test.ts __tests__\lib\clientPortalMessages.test.ts` 11/11; grup portal 46/46; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client a11y/front-only tancat per #1487; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal sign error normalization #1486]
+Perimetre: formulari de signatura del portal client. Objectiu complert: errors de backend normalitzats a claus conegudes i errors desconeguts blindats contra sortida crua a la UI.
+Ultim canvi: #1486.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\SignContractForm.test.tsx` 6/6; grup portal 45/45; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client front-only tancat per #1486; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal timeline milestone typed labels #1485]
+Perimetre: timeline del portal client. Objectiu complert: les claus de milestone són tipades i la UI ja no té fallback visible a `milestone.key` intern.
+Ultim canvi: #1485.
+Validacio: `pnpm test:run -- --run __tests__\lib\clientPortalTimeline.test.ts` 8/8; grup portal+timeline 44/44; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client i18n/front-only tancat per #1485; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal gallery CTA count a11y #1484]
+Perimetre: CTA de galeria del hub del portal client. Objectiu complert: el recompte visible `(N)` és decoratiu i el nom accessible usa el recompte localitzat de fotos.
+Ultim canvi: #1484.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\portalGalleryCountAccessibility.test.ts __tests__\lib\clientPortalMessages.test.ts` 11/11; grup portal 36/36; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client a11y front-only tancat per #1484; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal gallery modal label #1483]
+Perimetre: `GalleryClient` del portal client. Objectiu complert: el diàleg del visor de fotos anuncia la foto concreta oberta i queda descrit pel comptador de posició.
+Ultim canvi: #1483.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\GalleryClient.test.tsx` 1/1; grup portal 35/35; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client a11y front-only tancat per #1483; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal bizum feedback roles #1482]
+Perimetre: feedback d'error i èxit del botó Bizum del portal client. Objectiu complert: els errors s'anuncien com alertes i els estats d'èxit/declaració com estat.
+Ultim canvi: #1482.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\BizumPayButton.test.tsx` 3/3; grup portal 35/35; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client a11y front-only tancat per #1482; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal hub CTA arrows a11y #1468]
+Perimetre: `app/[locale]/portal/[token]/page.tsx` i test estàtic de fletxes decoratives. Objectiu complert: les fletxes visuals `→` dels CTAs del hub ja no formen part del nom accessible dels links.
+Ultim canvi: #1468.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\portalDecorativeArrows.test.ts` 1/1; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client a11y front-only tancat; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal header back arrow a11y #1467]
+Perimetre: `app/components/public/ClientPortalPageHeader.tsx` i test de component. Objectiu complert: la fletxa visual de retorn del header del portal ja no forma part del nom accessible del link.
+Ultim canvi: #1467.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\ClientPortalPageHeader.test.tsx` 1/1; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client a11y front-only tancat; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal brand source canonical #1466]
+Perimetre: pagines del portal client, `app/config/site-config.ts` com a font canònica i test estàtic del literal. Objectiu complert: el nom de marca del portal ja no viu copiat com `Òrbita Events` al JSX; hereta `SITE_CONFIG.business.name`.
+Ultim canvi: #1466.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\portalBrandSource.test.ts` 1/1; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client marca/copy front-only tancat; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal pack label i18n #1465]
+Perimetre: `app/[locale]/portal/[token]/page.tsx`, `lib/clientPortalMessages.ts` i test del diccionari. Objectiu complert: el label curt `Pack` del hub del portal ja no viu hardcoded al JSX; hereta `packLabel` del locale.
+Ultim canvi: #1465.
+Validacio: `pnpm test:run -- --run __tests__\lib\clientPortalMessages.test.ts` 6/6; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client copy front-only tancat; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal pack slug fallback segur #1464]
+Perimetre: `app/[locale]/portal/[token]/page.tsx`, `lib/clientPortalMessages.ts` i test de diccionari. Objectiu complert: el hub del portal ja no mostra `booking.pack.slug` ni `extra.extra.slug` si falta traduccio; cau a copy segur del locale.
+Ultim canvi: #1464.
+Validacio: `pnpm test:run -- --run __tests__\lib\clientPortalMessages.test.ts` 5/5; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client copy/fallback front-only tancat; no he tocat API, schema, booking admin, contracte PDF, emails, pricing ni cataleg.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal countdown labels i18n #1463]
+Perimetre: `app/[locale]/portal/[token]/CountdownTimer.tsx`, `app/[locale]/portal/[token]/page.tsx`, `lib/clientPortalMessages.ts` i test de component. Objectiu complert: les etiquetes `dies/hores/minuts` del countdown ja no viuen com a diccionari local dins UI; venen de `CLIENT_PORTAL_MESSAGES`.
+Ultim canvi: #1463.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\CountdownTimer.test.tsx __tests__\lib\clientPortalMessages.test.ts` 5/5; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client i18n front-only tancat; no he tocat API, schema, booking admin, contracte PDF, emails ni pricing.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal bottom nav aria i18n #1462]
+Perimetre: `app/[locale]/portal/[token]/PortalBottomNav.tsx`, pagines consumidores del portal, `lib/clientPortalMessages.ts` i test de component. Objectiu complert: el bottom nav del portal ja no te `aria-label` en catala hardcoded; hereta `portalNavigationLabel` del locale.
+Ultim canvi: #1462.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\PortalBottomNav.test.tsx __tests__\lib\clientPortalMessages.test.ts` 5/5; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avis claude: carril portal client a11y/i18n front-only tancat; no he tocat API, contracte PDF, schema, emails, booking admin ni pricing.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal status fallback segur #1461]
+Perimetre: `app/[locale]/portal/[token]/page.tsx`, `app/[locale]/portal/[token]/contract/page.tsx`, `lib/clientPortalMessages.ts` i test del diccionari/helper. Objectiu complert: el hub i la pagina de contracte ja no mostren enums interns de reserva/contracte si arriba un estat no etiquetat; cauen a copy segur del locale.
+Ultim canvi: #1461.
+Validacio: `pnpm test:run -- --run __tests__\lib\clientPortalMessages.test.ts` 4/4; `npx tsc --noEmit --pretty false`.
+Avis claude: carril portal client status/copy-helper tancat; no he tocat API, contracte PDF, schema, emails, booking admin ni pricing.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal contracte status fallback segur #1460]
+Perimetre: `app/[locale]/portal/[token]/sign/page.tsx`, `lib/clientPortalMessages.ts` i test del diccionari/helper. Objectiu complert: la pagina de signatura ja no mostra un `contractStatus` intern si arriba un estat no etiquetat; cau a copy segur del locale.
+Ultim canvi: #1460.
+Validacio: `pnpm test:run -- --run __tests__\lib\clientPortalMessages.test.ts __tests__\app\portal\SignContractForm.test.tsx` 8/8; `npx tsc --noEmit --pretty false`.
+Avis claude: carril portal client sign/copy-helper tancat; no he tocat API, contracte PDF, schema, emails, booking, admin ni pricing.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal contracte sign submit localitzat #1459]
+Perimetre: `app/[locale]/portal/[token]/sign/SignContractForm.tsx`, `app/[locale]/portal/[token]/sign/page.tsx`, `lib/clientPortalMessages.ts` i test de component. Objectiu complert: el boto de signatura ja no passa a un `...` mut; mostra estat de carrega en el locale del portal.
+Ultim canvi: #1459.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\SignContractForm.test.tsx __tests__\lib\clientPortalMessages.test.ts` 7/7; `npx tsc --noEmit --pretty false`.
+Avis claude: carril portal client sign/front-only tancat; no he tocat API de signatura, contracte PDF, schema, emails, booking, admin ni pricing.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal Bizum amount label i18n #1458]
+Perimetre: `app/[locale]/portal/[token]/payments/BizumPayButton.tsx`, `app/[locale]/portal/[token]/payments/page.tsx`, `lib/clientPortalMessages.ts` i test de component. Objectiu complert: el portal de pagaments ja no pinta `Import` hardcoded; l'etiqueta d'import hereta el locale del portal.
+Ultim canvi: #1458.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\BizumPayButton.test.tsx` 1/1; `npx tsc --noEmit --pretty false`.
+Avis claude: carril portal client copy/front-only tancat; no he tocat admin, APIs, serveis, schema, emails, booking ni pricing.
+
+[codex] 2026-07-06 [ESTAT: tancat — usePacks no propaga error tecnic #1457]
+Perimetre: `lib/hooks/usePacks.ts` i test existent del hook. Objectiu complert: si falla el fetch de packs publics, el hook conserva fallback pero no retorna `error.message` tecnic al contracte public.
+Ultim canvi: #1457.
+Validacio: `pnpm test:run -- --run __tests__\lib\hooks\usePacks.test.ts` 4/4; `npx tsc --noEmit --pretty false`.
+Avis claude: carril public hook-only tancat; no he tocat UI, API, admin, schema, emails, booking ni pricing.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal client openQuote ES #1456]
+Perimetre: `lib/clientPortalMessages.ts` i test del diccionari del portal. Objectiu complert: el portal client en castellà no mostra `Obrir pressupost`; el CTA de proposta és castellà i el contracte de claus queda blindat.
+Ultim canvi: #1456.
+Validacio: `pnpm test:run -- --run __tests__\lib\clientPortalMessages.test.ts` 2/2; `npx tsc --noEmit --pretty false`.
+Avis claude: carril portal client copy-only tancat; no he tocat admin, APIs, serveis, schema, emails, booking ni pricing.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal questionnaire required i18n #1455]
+Perimetre: `app/[locale]/portal/[token]/questionnaire/QuestionnaireForm.tsx`, `page.tsx`, `lib/clientPortalMessages.ts` i test de component. Objectiu complert: el portal client no mostra la frase hardcoded catalana `"X" es un camp obligatori`; l'error required hereta el locale del portal.
+Ultim canvi: #1455.
+Validacio: `pnpm test:run -- --run __tests__\app\portal\QuestionnaireForm.test.tsx` 2/2; `npx tsc --noEmit --pretty false`.
+Avis claude: carril portal client front-only tancat; no he tocat admin questionnaires, serveis, schema, emails, booking ni pricing.
+
+[codex] 2026-07-06 [ESTAT: tancat — error boundary public sense missatge intern #1454]
+Perimetre: `app/[locale]/error.tsx` i test de pagina. Objectiu complert: l'error boundary public no pinta `error.message`; el detall queda a logs/Sentry i la UI mostra `errorPage.defaultMessage` amb digest si existeix.
+Ultim canvi: #1454.
+Validacio: `pnpm test:run -- --run __tests__\app\error-page.test.tsx` 1/1; `npx tsc --noEmit --pretty false`.
+Avis claude: carril public front-only tancat; no he tocat admin, APIs, serveis, schema, emails, booking ni pricing.
+
+[codex] 2026-07-06 [ESTAT: tancat — portal privacitat errors localitzats #1453]
+Perimetre: `app/[locale]/privacitat/client.tsx` i test de component. Objectiu complert: el formulari public de drets RGPD no pinta `data.error` ni errors JSON crus; errors controlats i fallades de connexio cauen a copy localitzat existent.
+Ultim canvi: #1453.
+Validacio: `pnpm test:run -- --run __tests__\app\privacitat-client.test.tsx` 3/3; `npx tsc --noEmit --pretty false`.
+Avis claude: carril public legal/front-only tancat; no he tocat admin privacy, serveis RGPD, schema, emails, booking ni pricing.
+
+[codex] 2026-07-06 [ESTAT: tancat — formulari valoracio publica errors localitzats #1452]
+Perimetre: `app/components/reviews/TestimonialForm.tsx`, `messages/{ca,es,en}.json` i test de component. Objectiu complert: el formulari public de ressenya no pinta `data.error`, `Failed to fetch` ni errors JSON crus; qualsevol fallada cau a `testimonialForm.errors.submitError`.
+Ultim canvi: #1452.
+Validacio: `pnpm test:run -- --run __tests__\components\reviews\TestimonialForm.test.tsx` 3/3; `npx tsc --noEmit --pretty false`; `pnpm run qa:i18n-keys-sync`; `pnpm run qa:encoding -- --paths messages app\components\reviews __tests__\components\reviews`.
+Avis claude: carril public front-only tancat; no he tocat admin, schema, booking service, pricing, emails ni economia runtime.
+
+[codex] 2026-07-05 [ESTAT: tancat — calendari disponibilitat errors localitzats #1451]
+Perímetre: `components/calendar/AvailabilityCalendar.tsx`, test focalitzat i registre protocolari. Objectiu complert: el calendari públic no concatena errors crus del backend o de xarxa; mostra només `calendar.error` localitzat.
+Últim canvi: #1451.
+Validació: `pnpm test:run -- --run __tests__\components\calendar\AvailabilityCalendar.test.tsx` 2/2; `npx tsc --noEmit --pretty false`.
+Avís claude: carril públic calendari front-only tancat; no he tocat home admin, economia runtime, schema, backend, pricing ni emails.
+
+[codex] 2026-07-05 [ESTAT: tancat — calendari disponibilitat sense dates UTC #1450]
+Perímetre: `components/calendar/AvailabilityCalendar.tsx`, test focalitzat i registre protocolari. Objectiu complert: les claus `YYYY-MM-DD` del calendari públic (query from/to, cel·les i avui) es calculen en data local, no amb `toISOString()`.
+Últim canvi: #1450.
+Validació: `pnpm test:run -- --run __tests__\components\calendar\AvailabilityCalendar.test.tsx __tests__\lib\date-input.test.ts` 3/3; `npx tsc --noEmit --pretty false`; grep del patró UTC a `AvailabilityCalendar.tsx` sense resultats.
+Avís claude: carril públic calendari front-only tancat; no he tocat home admin, economia runtime, schema, backend, pricing ni emails.
+
+[codex] 2026-07-05 [ESTAT: tancat — data mínima local formularis públics #1449]
+Perímetre: `BookingForm`, configurador públic, `ContactFormComplete`, helper pur de data input, tests focalitzats i registre protocolari. Objectiu complert: els camps data no calculen `min` amb UTC (`toISOString`) i no permeten "ahir" en hores post-mitjanit locals.
+Últim canvi: #1449.
+Validació: `pnpm test:run -- --run __tests__\lib\date-input.test.ts __tests__\components\booking\BookingForm.test.tsx` 7/7; `npx tsc --noEmit --pretty false`; grep del patró UTC als tres fitxers tocats sense resultats.
+Avís claude: carril públic front-only tancat; no he tocat home admin, economia runtime, schema, backend, pricing ni emails.
+
+[codex] 2026-07-05 [ESTAT: tancat — reserva pública no filtra errors tècnics #1448]
+Perímetre: `components/booking/BookingForm.tsx`, test de component i registre protocolari. Objectiu complert: errors de xarxa o JSON malformat no es pinten com a missatge tècnic anglès al client; només errors controlats pel formulari mostren text específic i la resta cau a `booking.form.errors.processing`.
+Últim canvi: #1448.
+Validació: `pnpm test:run -- --run __tests__\components\booking\BookingForm.test.tsx` 4/4; `npx tsc --noEmit --pretty false`.
+Avís claude: carril públic front-only tancat; no he tocat home admin, economia runtime, schema, backend, pricing ni emails.
+
+[codex] 2026-07-05 [ESTAT: tancat — errors reserva pública traduïbles #1447]
+Perímetre: `publicBookingService`, `/api/booking`, `BookingForm`, `messages/{ca,es,en}.json`, `lib/public-booking-errors.ts` i tests focalitzats. Objectiu complert: el formulari no mostra literals anglesos del backend quan una reserva pública falla; consumeix codis d'error traduïbles.
+Últim canvi: #1447.
+Validació: `pnpm test:run -- --run __tests__\lib\public-booking-errors.test.ts __tests__\app\api\booking-route.test.ts __tests__\lib\services\publicBookingService.test.ts __tests__\components\booking\BookingForm.test.tsx` 30/30; `npx tsc --noEmit --pretty false`; `pnpm run qa:i18n-keys-sync`; `pnpm run qa:encoding -- --paths messages components lib app`.
+Avís claude: carril públic UX/API booking tancat; no he tocat home admin, economia runtime, schema, pricing ni emails.
+
+[codex] 2026-07-05 [ESTAT: tancat — reserva pública valida data al servei #1446]
+Perímetre: `lib/services/publicBookingService.ts`, `/api/booking` i test del servei. Objectiu: la validació de data invàlida/passada viu al servei abans de consultar BD, no només a la route. Sense formulari, messages, schema, pricing, emails ni admin.
+Últim canvi: #1446.
+Validació: `pnpm test:run -- --run __tests__\lib\services\publicBookingService.test.ts` 22/22; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`; regressió combinada public booking/locale/form/confirmació 28/28; `git diff --check -- . ':!backups'`; `/ca/reservar` 200.
+Avís claude: carril públic API/booking tancat; no he tocat home admin, economia runtime ni schema.
+
+[codex] 2026-07-05 [ESTAT: tancat — reserva pública valida quantitats #1445]
+Perímetre: `lib/services/publicBookingService.ts` i tests del servei. Objectiu: el backend públic rebutja `guestCount` no positiu i `extraHours` negatives/no numèriques abans de consultar packs o obrir transacció; strings numèrics nets es coerceixen. Sense formulari, messages, schema, pricing global, emails ni admin.
+Últim canvi: #1445.
+Validació: `pnpm test:run -- --run __tests__\lib\services\publicBookingService.test.ts` 20/20; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`; regressió combinada public booking/locale/form/confirmació 26/26; `git diff --check -- . ':!backups'`.
+Avís claude: carril públic API/booking tancat; no he tocat home admin, economia runtime ni schema.
+
+[codex] 2026-07-05 [ESTAT: tancat — preferredLocale públic normalitzat #1444]
+Perímetre: `lib/public-locale.ts`, `publicBookingService`, `BookingForm`, confirmació de reserva i tests. Objectiu: Customer/Booking no desen `preferredLocale` brut; `en-US` passa a `en`, invàlid torna a `ca`, i front+backend consumeixen el mateix helper. Sense schema, pricing, emails, packs, extres ni admin.
+Últim canvi: #1444.
+Validació: `pnpm test:run -- --run __tests__\lib\public-locale.test.ts __tests__\lib\services\publicBookingService.test.ts __tests__\components\booking\BookingForm.test.tsx __tests__\app\reserva-confirmada-page.test.tsx` 23/23; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`; `git diff --check -- . ':!backups'`; `/ca/reservar` 200; `/ca/reserva-confirmada?ref=OE-2026-TEST` 200.
+Avís claude: carril públic locale/booking tancat; no he tocat home admin, economia runtime, schema ni carrils de Claude.
+
+[codex] 2026-07-05 [ESTAT: tancat — BookingForm copy a messages #1443]
+Perímetre: `components/booking/BookingForm.tsx`, `messages/{ca,es,en}.json` i test de component. Objectiu: treure literals públics del formulari de reserva i consumir `booking.form.*`. Sense API, booking service, schema, pricing, emails ni admin.
+Últim canvi: #1443.
+Validació: `pnpm test:run -- --run __tests__/components/booking/BookingForm.test.tsx` 1/1; `npx tsc --noEmit --pretty false`; `pnpm run qa:i18n-keys-sync`; `pnpm run qa:encoding -- --paths messages components`; `pnpm run qa:protocol`.
+Avís claude: carril public i18n del formulari; no tocaré backend ni dades.
+
+[codex] 2026-07-05 [ESTAT: tancat — public booking valida EventType #1442]
+Perímetre: `lib/services/publicBookingService.ts` i el seu test. Objectiu: `/api/booking` no depèn del client; qualsevol `eventType` fora de Prisma `EventType` retorna 400 abans de tocar BD. Sense schema, formulari, pricing, emails, messages ni admin.
+Últim canvi: #1442.
+Validació: `pnpm test:run -- --run __tests__/lib/services/publicBookingService.test.ts` 15/15; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avís claude: carril backend públic molt petit, sense migracions.
+
+[codex] 2026-07-05 [ESTAT: tancat — BookingForm elimina EventType impossible #1441]
+Perímetre: `components/booking/BookingForm.tsx` i test de component. Objectiu: el select públic de reserva no pot enviar `THEMED_PARTY`, perquè Prisma `EventType` no el té; festa temàtica queda sota `PRIVATE_PARTY`. Sense schema, API, booking service, messages, pricing ni emails.
+Últim canvi: #1441.
+Validació: `pnpm test:run -- --run __tests__/components/booking/BookingForm.test.tsx` 1/1; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avís claude: carril públic mínim, sense migracions ni backend.
+
+[codex] 2026-07-05 [ESTAT: tancat — link legal de reserva conserva locale #1440]
+Perímetre: `components/booking/BookingForm.tsx` i el test de component existent. Objectiu: el link de termes del formulari públic de reserva apunta a `/{locale}/legal/terminos`. Sense tocar API, booking service, messages, emails, schema ni pricing.
+Últim canvi: #1440.
+Validació: `pnpm test:run -- --run __tests__/components/booking/BookingForm.test.tsx` 1/1; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avís claude: carril públic minúscul dins BookingForm; no tocaré backend ni admin.
+
+[codex] 2026-07-05 [ESTAT: tancat — confirmació de reserva i18n #1439]
+Perímetre: `app/[locale]/reserva-confirmada/page.tsx`, `messages/{ca,es,en}.json` i test de pàgina. Objectiu: treure el castellà hardcoded de la confirmació i consumir `booking.confirmed.*` per locale. Sense tocar formulari, API, booking service, emails, schema, pricing ni admin.
+Últim canvi: #1439.
+Validació: `pnpm test:run -- --run __tests__/app/reserva-confirmada-page.test.tsx` 1/1; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avís claude: carril públic confirmació/i18n; no tocaré backend ni Customer Hub.
+
+[codex] 2026-07-05 [ESTAT: tancat — confirmació manté enllaços localitzats #1438]
+Perímetre: `app/[locale]/reserva-confirmada/page.tsx` i test de pàgina. Objectiu: els CTAs de la confirmació de reserva tornen a `/{locale}` i `/{locale}/portfolio`, no a rutes arrel sense idioma. Sense tocar formulari, API, booking service, emails, schema ni pricing.
+Últim canvi: #1438.
+Validació: `pnpm test:run -- --run __tests__/app/reserva-confirmada-page.test.tsx` 1/1; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avís claude: carril públic de confirmació molt petit; no tocaré admin ni backend.
+
+[codex] 2026-07-05 [ESTAT: tancat — reserva confirmada conserva locale #1437]
+Perímetre: `components/booking/BookingForm.tsx` i test de component. Objectiu: després de crear una reserva pública, el redirect va a `/{locale}/reserva-confirmada?ref=...` i no a una ruta sense idioma. Sense tocar API, servei de booking, pricing, emails, schema ni textos del formulari.
+Últim canvi: #1437.
+Validació: `pnpm test:run -- --run __tests__/components/booking/BookingForm.test.tsx` 1/1; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avís claude: carril públic molt petit; no tocaré admin booking, Customer Hub ni runtime econòmic.
+
+[codex] 2026-07-05 [ESTAT: tancat — reserva pública hereta Client 360 #1436]
+Perímetre: `lib/services/publicBookingService.ts` i el seu test. Objectiu: la reserva pública (`/[locale]/reservar` -> `/api/booking`) crea/actualitza Customer i desa `Booking.customerId` en la mateixa transacció perquè no neixi com a illa documental. Sense tocar formulari, pricing, emails, schema ni booking admin.
+Últim canvi: #1436.
+Validació: `pnpm test:run -- --run __tests__/lib/services/publicBookingService.test.ts` 14/14; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avís claude: carril frontissa pública/booking molt acotat; no tocaré home admin, economia runtime ni components visuals.
+
+[codex] 2026-07-05 [ESTAT: tancat — frontissa web→lead conserva locale del path #1435]
+Perímetre: `useUtmParams` i el seu test. Objectiu: qualsevol formulari públic que ja envia UTM/landingPage cap a `/api/contact` també enviï el `locale` real (`/ca`, `/es`, `/en`) perquè el lead no depengui del header del navegador. Sense tocar API, schema, formularis, emails ni pricing.
+Últim canvi: #1435.
+Validació: `pnpm test:run -- --run __tests__/lib/hooks/useUtmParams.test.ts` 5/5; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avís claude: carril frontissa pública petit tancat; no he tocat Inbox, SMTP, lead admin ni booking creation.
+
+[codex] 2026-07-05 [ESTAT: tancat — factura: context client/lead a reserva #1434]
+Perímetre: `InvoiceSection` i el cablejat de `/admin/bookings/[id]` perquè el bloc de factura ensenyi la cadena operativa cap a Client 360 i Lead origen. Sense tocar Holded, serveis de factura, schema, PDFs ni càlculs.
+Últim canvi: #1434.
+Validació: `pnpm test:run -- --run __tests__/app/admin/bookings/InvoiceSection.test.tsx` 1/1; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avís claude: carril petit dins fitxa reserva/documents tancat; no he tocat home admin, economia runtime ni rutes d'invoices.
+
+[codex] 2026-07-05 [ESTAT: tancat — informe executiu PDF: decisió recomanada #1433]
+Perímetre: cinquè tall de la revisió PDF un a un. `exportExecutiveReportPdf` obre amb decisió recomanada derivada de `generateReportingInsights()`, sense tocar mètriques, reporting runtime, schema, rutes ni càlculs.
+Últim canvi: #1433.
+Validació: `pnpm test:run -- --run __tests__/lib/services/executiveReportPdfService.test.ts` 6/6; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avís claude: carril PDF/informe tancat; no he tocat catàleg/pressupost/dossier/contracte més enllà dels talls #1429-#1432, ni economia runtime.
+
+[codex] 2026-07-05 [ESTAT: tancat — catàleg PDF: CTA Manolo #1432]
+Perímetre: quart tall de la revisió PDF un a un. `catalogPdfService` substitueix el CTA genèric `sense compromís` per una frase de decisió en ca/es/en, sense tocar catàleg, imports, packs, productes, schema, enviaments reals ni rutes.
+Últim canvi: #1432.
+Validació: `pnpm test:run -- --run __tests__/lib/services/catalogPdfService.test.ts` 8/8; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avís claude: carril PDF/catàleg tancat; no he tocat dossier/pressupost/contracte més enllà dels talls #1429-#1431, ni economia, ni catàleg de dades.
+
+[codex] 2026-07-05 [ESTAT: tancat — dossier PDF: intro comercial Manolo #1431]
+Perímetre: tercer tall de la revisió PDF un a un. `generateDossierCompositePDF` deixa d'obrir amb `Mireu què podem portar a la vostra festa` i passa a vendre ritme, joc i moments memorables sense tocar catàleg, preus, schema, enviaments reals ni rutes.
+Últim canvi: #1431.
+Validació: `pnpm test:run -- --run __tests__/lib/services/dossierCompositePdfService.test.ts` 4/4; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avís claude: carril PDF/dossier tancat; no he tocat pressupost/contracte més enllà dels talls #1429-#1430, ni economia, ni productes Masquerade.
+
+[codex] 2026-07-05 [ESTAT: tancat — pressupost PDF: labels i microcopy Manolo #1430]
+Perímetre: segon tall de la revisió PDF un a un. `generateQuotePDF` saneja català i castellà visibles: accents, `Resum econòmic`, `Per què escollir-nos`, `días` i CTA `Reserva amb paga i senyal`. Sense tocar imports, càlculs, schema, enviaments reals ni fluxos de reserva.
+Últim canvi: #1430.
+Validació: `pnpm test:run -- --run __tests__/lib/services/quotePdfService.test.ts` 8/8; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avís claude: carril PDF/pressupost tancat; no he tocat contracte més enllà del #1429, ni dossier runtime, ni economia.
+
+[codex] 2026-07-05 [ESTAT: tancat — PDFs un a un + contracte paga i senyal #1429]
+Perímetre: ledger Manolo dels 6 PDFs vius (`pressupost`, `contracte`, `catàleg`, `informe`, `factura`, `dossier`) i primer fix segur al contracte. `Aval (dipòsit)` / `Venciment aval` passen a `Paga i senyal` / `Venciment paga i senyal`; traducció latent `signName` ES corregida.
+Últim canvi: #1429.
+Validació: `pnpm test:run -- --run __tests__/lib/services/contractPdfService.test.ts` 6/6; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avís claude: no he tocat schema, imports, càlculs, enviaments reals ni rutes. Proper tall natural: pressupost o dossier, perquè són els PDFs que venen abans de decidir.
+
+[codex] 2026-07-05 [ESTAT: tancat — herència de context Customer→Lead→Documents→Booking #1428]
+Perímetre: resposta al mandat "per davant i per darrere, per un costat i per un altre": norma nova de cadena client/lead/document/reserva + fix real al Customer Hub. `resolveCustomerHubCustomerId()` ara resol des de client, lead, reserva, proposta, dossier, factura, tasques, activitats i documents de lead; el 360 carrega propostes/reserves per `customerId OR leadId`.
+Últim canvi: #1428.
+Validació: `pnpm test:run -- --run __tests__/lib/customer-hub/data.test.ts` 10/10; `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+Avís claude: no he tocat schema ni enviaments reals. Proper tall natural: revisar PDFs un a un amb aquesta regla d'herència perquè cap PDF sigui un arxiu cec.
+
+[codex] 2026-07-05 [ESTAT: tancat — protocol Manolo #1427]
+Perímetre: només norma documental. `Manolo` queda com a rol invocable pel propietari per revisar qualsevol peça amb criteri transversal de web, visual, disseny, vendes, esdeveniments, UX, marca, operació i marge. Sense runtime ni UI.
+Últim canvi: #1427.
+Validació: `pnpm run qa:protocol` verd.
+Avís claude: Manolo viu a `docs/admin-protocol.md` §0.1.2, resumit a `docs/protocol-executiu.md` i apuntat a `CLAUDE.md`.
+
+[codex] 2026-07-05 [ESTAT: tancat — local server arrencat i verificat]
+Perímetre: només operativa local. `pnpm dev` aixecat en background al port 3000, logs a `.next-dev.out.log` / `.next-dev.err.log`. Sense codi, sense counter i sense tocar carrils de producte.
+Últim canvi: #1426.
+Validació: `127.0.0.1:3000` retorna 200; `_next/static/chunks/webpack.js` retorna `application/javascript`; `/admin` retorna 401 sense auth, correcte.
+Avís claude: server viu al PID 24432.
+
 [codex] 2026-07-05 [ESTAT: tancat — Passada visual Zenit amb captures i diagnòstic #1426]
 Perímetre: revisió visual real guiada pel Master Actual→Zenit. Aplicat primer paquet segur: Economia guanya franja executiva amb caixa/marge/decisió recomanada, Dossiers mòbil respira en la llista de dossiers desats, i l'auditor visual deixa de donar per bona una pantalla encara en loader.
 Validació: `node --check scripts/admin-visual-audit.mjs` OK; `tsc` 0; auditor final enfocat `.codex-captures/visual-zenit-1426-final-focus/` amb 10 rutes, 20/20 captures, 0 checks fallits. `/admin/bookings/new` recapturat amb contingut real a `.codex-captures/visual-zenit-1426-bookings-new-after-wait/`.

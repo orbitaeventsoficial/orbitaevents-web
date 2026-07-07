@@ -12,6 +12,15 @@ const ACTIONS_WRAP = 'grid w-full grid-cols-2 gap-2 sm:grid-cols-4 md:flex md:w-
 const ACTION_BTN = 'ap-btn ap-btn--xs min-h-10 justify-center gap-1.5';
 const ACTION_ICON = 'h-3.5 w-3.5 shrink-0';
 
+async function readDossierListActionError(response: Response, fallback: string): Promise<string> {
+  try {
+    const payload = await response.json() as { error?: string; message?: string };
+    return payload.error || payload.message || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 interface Props {
   dossierId: string;
   email?: string;
@@ -58,8 +67,7 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
     try {
       const res = await fetchWithCsrf(`/api/admin/dossiers/${dossierId}/send`, { method: 'POST' });
       if (!res.ok) {
-        const data = await res.json() as { error?: string };
-        throw new Error(data.error || 'Error enviant');
+        throw new Error(await readDossierListActionError(res, 'Error enviant el dossier'));
       }
       toast.success(`Dossier enviat a ${email}`);
       router.refresh();
@@ -74,12 +82,13 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
   async function moveToTrash() {
     setDeleting(true);
     try {
-      await fetchWithCsrf(`/api/admin/dossiers/${dossierId}`, { method: 'DELETE' });
+      const res = await fetchWithCsrf(`/api/admin/dossiers/${dossierId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(await readDossierListActionError(res, 'Error movent el dossier a la paperera'));
       toast.success('Dossier mogut a la paperera (30 dies per restaurar)');
       router.refresh();
     } catch (err) {
       console.error('[DossierListActions] delete error:', err);
-      toast.error('Error movent el dossier a la paperera');
+      toast.error(err instanceof Error ? err.message : 'Error movent el dossier a la paperera');
     } finally {
       setDeleting(false);
     }
@@ -88,16 +97,17 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
   async function restore() {
     setRestoring(true);
     try {
-      await fetchWithCsrf(`/api/admin/dossiers/${dossierId}`, {
+      const res = await fetchWithCsrf(`/api/admin/dossiers/${dossierId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'restore' }),
       });
+      if (!res.ok) throw new Error(await readDossierListActionError(res, 'Error restaurant el dossier'));
       toast.success('Dossier restaurat');
       router.refresh();
     } catch (err) {
       console.error('[DossierListActions] restore error:', err);
-      toast.error('Error restaurant el dossier');
+      toast.error(err instanceof Error ? err.message : 'Error restaurant el dossier');
     } finally {
       setRestoring(false);
     }
@@ -106,16 +116,17 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
   async function purge() {
     setPurging(true);
     try {
-      await fetchWithCsrf(`/api/admin/dossiers/${dossierId}`, {
+      const res = await fetchWithCsrf(`/api/admin/dossiers/${dossierId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'purge' }),
       });
+      if (!res.ok) throw new Error(await readDossierListActionError(res, 'Error eliminant el dossier'));
       toast.success('Dossier eliminat permanentment');
       router.refresh();
     } catch (err) {
       console.error('[DossierListActions] purge error:', err);
-      toast.error('Error eliminant el dossier');
+      toast.error(err instanceof Error ? err.message : 'Error eliminant el dossier');
     } finally {
       setPurging(false);
     }

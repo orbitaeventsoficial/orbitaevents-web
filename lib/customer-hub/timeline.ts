@@ -9,6 +9,7 @@ import {
 } from '@/lib/services/timelineQueryService';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 
 type BuildTimelineInput = {
   proposals: ProposalDTO[];
@@ -24,17 +25,27 @@ type BuildTimelineInput = {
 type BusinessTimelineInput = Pick<BuildTimelineInput, 'proposals' | 'bookings' | 'tasks' | 'messages'>;
 type ActivityTimelineInput = Pick<BuildTimelineInput, 'customerActivities' | 'leadActivities' | 'adminLogs' | 'canonicalEvents'>;
 
+function buildProposalOriginLinks(proposal: ProposalDTO): Array<{ label: string; href: string }> {
+  return [
+    proposal.customerId ? { label: 'Client origen', href: buildCustomerHubHref(proposal.customerId) } : null,
+    proposal.leadId ? { label: 'Entrada origen', href: buildLeadWorkspaceHref(proposal.leadId) } : null,
+    proposal.bookingId ? { label: 'Reserva origen', href: buildBookingHref(proposal.bookingId) } : null,
+  ].filter((link): link is { label: string; href: string } => Boolean(link));
+}
+
 export function buildCustomerBusinessTimelineEvents(input: BusinessTimelineInput): TimelineEventDTO[] {
   const events: TimelineEventDTO[] = [];
   const bookingStatusLabel = (status: string) => labelEstatReserva(status).toLowerCase();
 
   for (const p of input.proposals) {
+    const originLinks = buildProposalOriginLinks(p);
     events.push({
       id: `proposal:${p.id}:created`,
       type: 'PROPOSAL_CREATED',
       at: p.createdAt,
       title: `Pressupost creat (${p.reference})`,
       link: { label: 'Obrir', href: `/admin/presupuestos?proposalId=${p.id}` },
+      ...(originLinks.length > 0 ? { originLinks } : {}),
     });
     if (p.sentAt) {
       events.push({
@@ -42,6 +53,8 @@ export function buildCustomerBusinessTimelineEvents(input: BusinessTimelineInput
         type: 'PROPOSAL_SENT',
         at: p.sentAt,
         title: `Pressupost enviat (${p.reference})`,
+        link: { label: 'Obrir pressupost', href: `/admin/presupuestos?proposalId=${p.id}` },
+        ...(originLinks.length > 0 ? { originLinks } : {}),
       });
     }
     if (p.acceptedAt) {
@@ -50,6 +63,25 @@ export function buildCustomerBusinessTimelineEvents(input: BusinessTimelineInput
         type: 'PROPOSAL_ACCEPTED',
         at: p.acceptedAt,
         title: `Pressupost acceptat (${p.reference})`,
+        link: { label: 'Obrir pressupost', href: `/admin/presupuestos?proposalId=${p.id}` },
+        ...(originLinks.length > 0 ? { originLinks } : {}),
+      });
+    }
+    if (p.contractSignedAt) {
+      events.push({
+        id: `proposal:${p.id}:contract-signed`,
+        type: 'ACTIVITY',
+        at: p.contractSignedAt,
+        title: `Contracte signat (${p.contractReference || p.reference})`,
+        meta: {
+          documentType: 'CONTRACT',
+          contractReference: p.contractReference || null,
+          ...(p.contractPdfUrl ? { contractPdfUrl: p.contractPdfUrl } : {}),
+        },
+        link: p.contractPdfUrl
+          ? { label: 'Obrir PDF signat', href: p.contractPdfUrl }
+          : { label: 'Obrir contracte', href: `/admin/presupuestos?proposalId=${p.id}` },
+        ...(originLinks.length > 0 ? { originLinks } : {}),
       });
     }
   }

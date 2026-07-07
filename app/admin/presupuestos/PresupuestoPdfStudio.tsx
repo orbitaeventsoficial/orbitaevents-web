@@ -14,16 +14,30 @@ import { log } from '@/lib/logger';
 import SortableList from '@/app/admin/components/SortableList';
 import AiCopySuggestionsInline from '@/app/admin/components/AiCopySuggestionsInline';
 import StudioPreview from './StudioPreview';
+import { buildProposalCommercialGuard } from './commercial-guard';
 import {
   type DocMode, type SectionId, type Locale, type CustomExtra,
   type PricingCatalogState, type PricingCatalogPack, type PricingCatalogExtra,
-  type PricingCatalogResponse, type ProfitabilityConfigResponse, type StudioProps, type ExtraDefinition, type ServiceSlug,
+  type PricingCatalogResponse, type PricingCatalogCustomer, type ProfitabilityConfigResponse, type StudioProps, type ExtraDefinition, type ServiceSlug,
   SECTION_LABELS, DEFAULT_SECTION_ORDER, STUDIO_DRAFT_KEY, CUSTOM_PACK_ID,
   OPERATOR_PDF_EXTRA_ID, STUDIO_COPY, SERVICE_LABEL, ALL_SERVICES,
   quoteStudioSchema, normalizeStudioLocale, formatEUR, toFeatureLines,
   buildPackFromForm, translateBatchForPdf,
 } from './studio-utils';
 
+const CUSTOMER_SEARCH_ERROR = 'No s’ha pogut consultar clients. Torna-ho a provar abans de generar el pressupost.';
+
+type StudioMutationPayload = {
+  ok?: boolean;
+  error?: unknown;
+  message?: unknown;
+};
+
+function readStudioMutationError(data: StudioMutationPayload, fallback: string) {
+  if (typeof data.error === 'string' && data.error.trim()) return data.error;
+  if (typeof data.message === 'string' && data.message.trim()) return data.message;
+  return fallback;
+}
 
 export default function PresupuestoPdfStudio({
   initialCustomerId = '',
@@ -58,6 +72,7 @@ export default function PresupuestoPdfStudio({
   const [customerResults, setCustomerResults] = useState<Array<{ id: string; name: string; email: string; phone?: string }>>([]);
   const [showCustomerPicker, setShowCustomerPicker] = useState(false);
   const [searchingCustomers, setSearchingCustomers] = useState(false);
+  const [customerSearchError, setCustomerSearchError] = useState('');
   const [proposalId, setProposalId] = useState(initialProposalId);
   const [issueDate, setIssueDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [eventDate, setEventDate] = useState(initialEventDate || '');
@@ -297,6 +312,10 @@ export default function PresupuestoPdfStudio({
       profitabilityConfig,
     );
   }, [profitabilityConfig, total, basePrice, extrasPrice, travelKm]);
+  const commercialGuard = useMemo(
+    () => buildProposalCommercialGuard(financialSummary),
+    [financialSummary],
+  );
 
   useEffect(() => {
     const destination = eventLocation.trim();
@@ -564,20 +583,31 @@ export default function PresupuestoPdfStudio({
 
   // --- Customer search autocomplete -------------------------------
   useEffect(() => {
-    if (!showCustomerPicker) return;
+    if (!showCustomerPicker) {
+      setCustomerSearchError('');
+      return;
+    }
     const q = customerSearch.trim();
-    if (q.length < 2) { setCustomerResults([]); return; }
+    if (q.length < 2) { setCustomerResults([]); setCustomerSearchError(''); return; }
+    let cancelled = false;
 
     const timer = window.setTimeout(async () => {
       setSearchingCustomers(true);
       try {
+        setCustomerSearchError('');
         const res = await fetchWithCsrf(`/api/admin/customers?q=${encodeURIComponent(q)}&limit=8`, { credentials: 'include' });
-        const data: PricingCatalogResponse = await res.json().catch(() => ({}));
+        const data = (await res.json().catch(() => ({}))) as PricingCatalogResponse & { customers?: PricingCatalogCustomer[]; message?: string };
+        if (!res.ok) {
+          throw new Error(data.error || data.message || CUSTOMER_SEARCH_ERROR);
+        }
         const apiCustomers = Array.isArray(data?.data?.customers)
           ? data.data.customers
-          : [];
+          : Array.isArray(data?.customers)
+          ? data.customers
+          : null;
 
-        if (res.ok && Array.isArray(apiCustomers)) {
+        if (Array.isArray(apiCustomers)) {
+          if (cancelled) return;
           setCustomerResults(
             apiCustomers.map((customer) => ({
               id: customer.id,
@@ -587,13 +617,24 @@ export default function PresupuestoPdfStudio({
             }))
           );
         } else {
-          setCustomerResults([]);
+          throw new Error(CUSTOMER_SEARCH_ERROR);
         }
-      } catch (error) { log.error('Error cercant clients', error); }
-      finally { setSearchingCustomers(false); }
+      } catch (error) {
+        log.error('Error cercant clients', error);
+        if (!cancelled) {
+          setCustomerResults([]);
+          setCustomerSearchError(error instanceof Error ? error.message : CUSTOMER_SEARCH_ERROR);
+        }
+      }
+      finally {
+        if (!cancelled) setSearchingCustomers(false);
+      }
     }, 350);
 
-    return () => window.clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
   }, [customerSearch, showCustomerPicker]);
 
   function selectCustomer(c: { id: string; name: string; email: string; phone?: string }) {
@@ -604,6 +645,7 @@ export default function PresupuestoPdfStudio({
     setShowCustomerPicker(false);
     setCustomerSearch('');
     setCustomerResults([]);
+    setCustomerSearchError('');
   }
 
   function clearSelectedCustomer() {
@@ -612,6 +654,7 @@ export default function PresupuestoPdfStudio({
     setClientEmail('');
     setClientPhone('');
     setClientContact('');
+    setCustomerSearchError('');
   }
 
   // --- Step validation helpers ----------------------------------
@@ -1106,15 +1149,19 @@ export default function PresupuestoPdfStudio({
         }),
       });
 
-      const data = await response.json().catch(() => ({}));
+      const data = await response.json().catch(() => ({})) as StudioMutationPayload;
       if (!response.ok) {
-        throw new Error(data?.error || 'No s\'ha pogut enviar el pressupost');
+        throw new Error(readStudioMutationError(data, 'No s\'ha pogut enviar el pressupost'));
       }
 
       const savedProposalId = await saveProposalDraft('SENT');
       const targetProposalId = savedProposalId || proposalId;
       if (targetProposalId) {
-        await fetchWithCsrf(`/api/admin/proposals/${targetProposalId}/send`, { method: 'POST' });
+        const markSentResponse = await fetchWithCsrf(`/api/admin/proposals/${targetProposalId}/send`, { method: 'POST' });
+        const markSentData = await markSentResponse.json().catch(() => ({})) as StudioMutationPayload;
+        if (!markSentResponse.ok || markSentData.ok === false) {
+          throw new Error(readStudioMutationError(markSentData, "No s'ha pogut marcar la proposta com enviada"));
+        }
       }
 
       setMessage(`Pressupost enviat correctament a ${clientEmail.trim()}.`);
@@ -1218,8 +1265,13 @@ export default function PresupuestoPdfStudio({
             </div>
             {showCustomerPicker && (
               <div className="mb-4 rounded-xl border p-3">
-                <input className={inputClass} placeholder="Cerca per nom, email o telèfon..." value={customerSearch} onChange={(e) => setCustomerSearch(e.target.value)} autoFocus />
+                <input className={inputClass} placeholder="Cerca per nom, email o telèfon..." value={customerSearch} onChange={(e) => { setCustomerSearch(e.target.value); setCustomerSearchError(''); }} autoFocus />
                 {searchingCustomers && <p className="mt-2 text-xs">Cercant...</p>}
+                {customerSearchError && (
+                  <div className="ap-inline-alert ap-inline-alert--danger mt-2" role="alert">
+                    {customerSearchError}
+                  </div>
+                )}
                 {customerResults.length > 0 && (
                   <div className="mt-2 max-h-48 space-y-1 overflow-y-auto">
                     {customerResults.filter((c) => c.id !== customerId).map((c) => (
@@ -1230,7 +1282,7 @@ export default function PresupuestoPdfStudio({
                     ))}
                   </div>
                 )}
-                {customerSearch.trim().length >= 2 && !searchingCustomers && customerResults.length === 0 && (<p className="mt-2 text-xs opacity-60">Cap resultat trobat</p>)}
+                {customerSearch.trim().length >= 2 && !searchingCustomers && !customerSearchError && customerResults.length === 0 && (<p className="mt-2 text-xs opacity-60">Cap resultat trobat</p>)}
               </div>
             )}
             {isCustomerScoped && (
@@ -1427,6 +1479,22 @@ export default function PresupuestoPdfStudio({
               </ul>
             </div>
           )}
+          <div className={`mb-3 rounded-xl border px-3 py-2 text-sm ${commercialGuard.className}`}>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="font-semibold">{commercialGuard.label}</span>
+              <span className="text-xs opacity-80">{commercialGuard.detail}</span>
+            </div>
+            {commercialGuard.facts.length > 0 && (
+              <div className="mt-2 grid gap-2 text-xs sm:grid-cols-3">
+                {commercialGuard.facts.map((fact) => (
+                  <div key={fact.label} className="flex items-center justify-between gap-2 rounded-lg border border-current/20 px-2 py-1">
+                    <span className="opacity-75">{fact.label}</span>
+                    <strong className="font-mono">{fact.value}</strong>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
           <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"

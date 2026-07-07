@@ -58,7 +58,10 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 1426;
+export const ADMIN_CHANGE_COUNTER = 1723;
+
+export const ADMIN_BOOKING_DEPOSIT_DUE_DAYS = 30;
+export const ADMIN_ECONOMY_PAYMENT_DUE_SOON_DAYS = 7;
 
 /**
  * Màximes d'Economia (#1390): brúixola de gestió sempre visible al top del dashboard i
@@ -167,6 +170,19 @@ export const ADMIN_DOSSIER_GENERATOR_COPY = {
   catalog: {
     title: 'Catàleg disponible',
     hint: 'Tria només els serveis que formaran part del dossier final.',
+    serviceCountLabel: 'serveis',
+    audiences: {
+      infantil: {
+        title: 'Infantils',
+        subtitle: 'Casals, escoles, festes familiars i propostes per a mainada.',
+        empty: 'Cap servei infantil actiu.',
+      },
+      adult: {
+        title: 'Adults i general',
+        subtitle: 'Bingo, batalla, DJ, material i serveis transversals.',
+        empty: 'Cap servei adult o general actiu.',
+      },
+    },
     groups: {
       orbita: {
         title: 'Serveis d’Òrbita',
@@ -236,6 +252,14 @@ export const ADMIN_ACTIVITY_ACTION_META: Record<string, { label: string; icon: s
   CALENDAR_SYNC: { label: 'Sync calendari', icon: '📅', tone: 'admin-tone-text-info' },
   CALENDAR_SYNC_ERROR: { label: 'Error sync calendari', icon: '❌', tone: 'admin-tone-text-danger' },
   PORTAL_AUTO_CREATED: { label: 'Portal client creat', icon: '🔑', tone: 'admin-tone-text-violet' },
+  DOCUMENT_PROPOSAL_SENT: { label: 'Pressupost enviat', icon: '📄', tone: 'admin-tone-text-info' },
+  DOCUMENT_DOSSIER_SENT: { label: 'Dossier enviat', icon: '📤', tone: 'admin-tone-text-info' },
+  DOCUMENT_DOSSIER_COMPOSITE_PDF_GENERATED: { label: 'PDF dossier generat', icon: '📎', tone: 'admin-tone-text-info' },
+  DOCUMENT_CONTRACT_GENERATED: { label: 'Contracte generat', icon: '📝', tone: 'admin-tone-text-info' },
+  DOCUMENT_CONTRACT_SENT: { label: 'Contracte enviat', icon: '📤', tone: 'admin-tone-text-info' },
+  DOCUMENT_CONTRACT_SIGNED: { label: 'Contracte signat', icon: '✍️', tone: 'admin-tone-text-success' },
+  DOCUMENT_CONTRACT_CANCELLED: { label: 'Contracte cancel·lat', icon: '⛔', tone: 'admin-tone-text-warning' },
+  DOCUMENT_CONTRACT_SIGNED_PDF_GENERATED: { label: 'PDF signat generat', icon: '📎', tone: 'admin-tone-text-success' },
   CREATE: { label: 'Creat', icon: '➕', tone: 'admin-tone-text-success' },
   UPDATE: { label: 'Actualitzat', icon: '✏️', tone: 'admin-tone-text-info' },
   DELETE: { label: 'Eliminat', icon: '🗑️', tone: 'admin-tone-text-danger' },
@@ -244,6 +268,7 @@ export const ADMIN_ACTIVITY_ACTION_META: Record<string, { label: string; icon: s
 
 export const CUSTOMER_TIMELINE_FILTER_OPTIONS = [
   { key: 'all', label: 'Tot', icon: '📋' },
+  { key: 'documents', label: 'Documents', icon: '📎' },
   { key: 'proposals', label: 'Pressupostos', icon: '📄' },
   { key: 'bookings', label: 'Reserves', icon: '📅' },
   { key: 'tasks', label: 'Tasques', icon: '✅' },
@@ -345,6 +370,7 @@ export const ADMIN_ACTIVITY_ENTITY_LINKS: Record<string, string> = {
   lead: '/admin/leads',
   pack: '/admin/packs',
   customer: '/admin/clientes',
+  proposal: '/admin/presupuestos',
 };
 
 export const ADMIN_ACTIVITY_CATEGORY_MAP: Record<string, string> = {
@@ -366,6 +392,14 @@ export const ADMIN_ACTIVITY_CATEGORY_MAP: Record<string, string> = {
   CALENDAR_SYNC: 'system',
   CALENDAR_SYNC_ERROR: 'system',
   PORTAL_AUTO_CREATED: 'system',
+  DOCUMENT_PROPOSAL_SENT: 'comms',
+  DOCUMENT_DOSSIER_SENT: 'comms',
+  DOCUMENT_DOSSIER_COMPOSITE_PDF_GENERATED: 'system',
+  DOCUMENT_CONTRACT_GENERATED: 'system',
+  DOCUMENT_CONTRACT_SENT: 'comms',
+  DOCUMENT_CONTRACT_SIGNED: 'system',
+  DOCUMENT_CONTRACT_CANCELLED: 'system',
+  DOCUMENT_CONTRACT_SIGNED_PDF_GENERATED: 'system',
   CREATE: 'crud',
   UPDATE: 'crud',
   DELETE: 'crud',
@@ -447,6 +481,8 @@ export const ADMIN_COLLABORATOR_PRODUCT_EMPTY_FORM: {
   includes: string;
   imageUrl: string;
   isActive: boolean;
+  visibleInDossier: boolean;
+  visibleInBooking: boolean;
 } = {
   name: '',
   description: '',
@@ -458,6 +494,8 @@ export const ADMIN_COLLABORATOR_PRODUCT_EMPTY_FORM: {
   includes: '',
   imageUrl: '',
   isActive: true,
+  visibleInDossier: true,
+  visibleInBooking: true,
 };
 
 export const ADMIN_FEATURE_DEFINITIONS = [

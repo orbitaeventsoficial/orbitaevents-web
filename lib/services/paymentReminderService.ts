@@ -18,6 +18,7 @@ import {
   formatDateFull,
 } from '@/lib/constants';
 import { log } from '@/lib/logger';
+import { bookingOutstandingBreakdown } from '@/lib/payment-status';
 import { recordBookingCommunicationLog } from '@/lib/services/bookingCommunicationLogService';
 
 interface PaymentReminderResult {
@@ -29,11 +30,39 @@ interface PaymentReminderResult {
 
 type Locale = keyof typeof PAYMENT_REMINDER_COPY;
 
+type PaymentReminderBooking = {
+  total: number;
+  depositAmount: number;
+  remainingAmount?: number | null;
+  depositPaid: boolean;
+  remainingPaid: boolean;
+  cashAmount?: number | null;
+};
+
 function normalizeLocale(value?: string | null): Locale {
   const raw = String(value || '').toLowerCase();
   if (raw.startsWith('en')) return 'en';
   if (raw.startsWith('ca')) return 'ca';
   return 'es';
+}
+
+function buildPendingReminderItems(
+  booking: PaymentReminderBooking,
+  locale: Locale,
+  labels: { deposit: string; remaining: string },
+): { pendingAmount: number; pendingItems: string[] } {
+  const breakdown = bookingOutstandingBreakdown(booking);
+  const pendingItems: string[] = [];
+
+  if (breakdown.depositAmount > 0) {
+    pendingItems.push(`${labels.deposit}: ${formatCurrency(breakdown.depositAmount, locale)}`);
+  }
+
+  if (breakdown.remainingAmount > 0) {
+    pendingItems.push(`${labels.remaining}: ${formatCurrency(breakdown.remainingAmount, locale)}`);
+  }
+
+  return { pendingAmount: breakdown.total, pendingItems };
 }
 
 export async function sendPaymentReminders(): Promise<PaymentReminderResult> {
@@ -58,8 +87,10 @@ export async function sendPaymentReminders(): Promise<PaymentReminderResult> {
       eventDate: true,
       total: true,
       depositAmount: true,
+      remainingAmount: true,
       depositPaid: true,
       remainingPaid: true,
+      cashAmount: true,
       preferredLocale: true,
     },
   });
@@ -88,25 +119,9 @@ export async function sendPaymentReminders(): Promise<PaymentReminderResult> {
         continue;
       }
 
-      const depositAmount = Number(booking.depositAmount) || 0;
-      const total = Number(booking.total) || 0;
-      let pendingAmount = 0;
-
       const locale = normalizeLocale(booking.preferredLocale);
       const t = PAYMENT_REMINDER_COPY[locale];
-      const pendingItems: string[] = [];
-
-      if (!booking.depositPaid && depositAmount > 0) {
-        pendingAmount += depositAmount;
-        pendingItems.push(`${t.deposit}: ${formatCurrency(depositAmount, locale)}`);
-      }
-      if (!booking.remainingPaid) {
-        const remaining = total - depositAmount;
-        if (remaining > 0) {
-          pendingAmount += remaining;
-          pendingItems.push(`${t.remaining}: ${formatCurrency(remaining, locale)}`);
-        }
-      }
+      const { pendingAmount, pendingItems } = buildPendingReminderItems(booking, locale, t);
 
       if (pendingAmount <= 0) {
         result.skipped++;

@@ -46,6 +46,31 @@ function normalizeWhitespace(input: string): string {
   return input.replace(/\u00a0/g, ' ').replace(/[ \t]+/g, ' ').trim();
 }
 
+function extractWhatsappClientLines(input: string): string[] {
+  const lines: string[] = [];
+  let sawWhatsappPrefix = false;
+  let currentSenderIsClient = false;
+
+  for (const rawLine of input.replace(/\u00a0/g, ' ').split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    const match = line.match(/^\s*\[\d{1,2}:\d{2},\s*\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4}\]\s*([^:\n]{1,80}):\s*(.*)$/u);
+    if (match) {
+      sawWhatsappPrefix = true;
+      const sender = normalizeLetters(match[1] || '');
+      currentSenderIsClient = !/\borbita\b/.test(sender);
+      const body = normalizeWhitespace(match[2] || '');
+      if (currentSenderIsClient && body) lines.push(body);
+      continue;
+    }
+    if (sawWhatsappPrefix && currentSenderIsClient) {
+      lines.push(normalizeWhitespace(line));
+    }
+  }
+
+  return sawWhatsappPrefix ? lines : [];
+}
+
 function normalizeLeadText(input: string): string {
   return input
     .replace(/\u00a0/g, ' ')
@@ -81,11 +106,27 @@ function cleanTail(input: string, max = 160): string {
     .slice(0, max);
 }
 
+function looksLikePersonNameLine(input: string): boolean {
+  const line = normalizeWhitespace(input);
+  if (!/^[\p{L}' -]{2,80}$/u.test(line)) return false;
+  if (!/\s/.test(line)) return false;
+  return !/\b(?:bon|bona|hola|salutacions|gracies|gràcies|vesprada|casal|horari|activitat|infants|pati|escola)\b/i.test(line);
+}
+
 function extractName(text: string): string {
   const emailLine = text.match(/(?:^|\n)\s*([\p{L}' -]{2,80})\s*[-–]\s*[\w.+-]+@[\w-]+\.[a-zA-Z]{2,}/iu);
   if (emailLine?.[1]) {
     const name = capitalizeWords(emailLine[1]);
     if (name.length >= 2) return name;
+  }
+
+  const lines = text.split(/\r?\n/).map((line) => normalizeWhitespace(line)).filter(Boolean);
+  for (let index = 1; index < lines.length; index += 1) {
+    if (!/[\w.+-]+@[\w-]+\.[a-zA-Z]{2,}/.test(lines[index])) continue;
+    const previous = lines[index - 1];
+    if (looksLikePersonNameLine(previous)) {
+      return capitalizeWords(previous);
+    }
   }
 
   const patterns = [
@@ -203,7 +244,7 @@ function extractEventEndTime(text: string): string {
 
 function extractGuestCount(text: string): string {
   const match = text.match(
-    /\b(?:unes?|aprox(?:imadament|imadamente)?\s*)?(\d{1,4})\s*(?:persones?|personas?|convidats?|invitad[oa]s?|assistents?|asistentes?|guests?|people)\b/i
+    /\b(?:unes?|aprox(?:imadament|imadamente)?\s*)?(\d{1,4})\s*(?:persones?|personas?|convidats?|invitad[oa]s?|assistents?|asistentes?|infants?|nens?|nenes?|niñ[oa]s?|guests?|people)\b/i
   );
   if (!match?.[1]) return '';
   const value = Number(match[1]);
@@ -226,6 +267,9 @@ function extractBudget(text: string): string {
 }
 
 function extractLocation(text: string): string {
+  const school = text.match(/\b(?:pati\s+d['’]una\s+)?escola\s+de\s+([\p{L}' -]{3,80}?)(?=\s+(?:i|ens|per|on)\b|[.,;\n]|$)/iu);
+  if (school?.[1]) return cleanTail(school[1], 80);
+
   const dayLocation = text.match(
     /(?:^|\n)\s*(?:la\s+)?ubicaci[oó]\s+del\s+dia\s+\d{1,2}\s+(?:és|es|ser[aà]|será)\s+([^\n\r.]{3,160})/im
   );
@@ -265,6 +309,7 @@ function inferEventType(text: string): EventType {
 
 function inferSource(text: string): LeadSource {
   const input = normalizeLetters(text);
+  if (/\[\d{1,2}:\d{2},\s*\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4}\]/.test(text)) return 'WHATSAPP';
   if (/(whatsapp|wa\.me|\bwp\b)/.test(input)) return 'WHATSAPP';
   if (/(instagram|\big\b)/.test(input)) return 'INSTAGRAM';
   if (/(wallapop)/.test(input)) return 'WALLAPOP';
@@ -273,24 +318,112 @@ function inferSource(text: string): LeadSource {
   return 'OTHER';
 }
 
+function pushUnique(parts: string[], value: string) {
+  const cleaned = cleanTail(value, 220);
+  if (!cleaned) return;
+  const normalized = normalizeLetters(cleaned);
+  if (parts.some((part) => normalizeLetters(part) === normalized)) return;
+  parts.push(cleaned);
+}
+
+function extractAgeRange(text: string): string {
+  const range = text.match(/\b(?:de\s*)?(\d{1,2})\s*(?:a|fins a|-|–)\s*(\d{1,2})\s*anys\b/i);
+  if (range?.[1] && range[2]) return `infants de ${range[1]} a ${range[2]} anys`;
+  return '';
+}
+
+function extractThemeSummary(text: string): string {
+  const theme = text.match(/\btem[aà]tica\s+(?:del\s+casal\s+)?(?:és|es)\s+([^\n.]{8,180})/i);
+  if (theme?.[1]) return `temàtica: ${cleanTail(theme[1], 180)}`;
+  return '';
+}
+
+function extractDurationSummary(text: string): string {
+  if (/\bactivitat\s+d['’]una\s+hora\b/i.test(text) || /\buna\s+hora\s+de\s+festa\b/i.test(text)) {
+    return "activitat d'una hora";
+  }
+  const range = text.match(/\b(?:de\s+)?([01]?\d|2[0-3])[:.]([0-5]\d)\s*(?:h)?\s*(?:-|a|fins a|hasta)\s*([01]?\d|2[0-3])[:.]([0-5]\d)\s*h?\b/i);
+  if (range) {
+    return `horari ${range[1].padStart(2, '0')}:${range[2]}-${range[3].padStart(2, '0')}:${range[4]}`;
+  }
+  return '';
+}
+
+function extractRequestSummary(text: string): string {
+  if (/\bactivitats?\s+o\s+espectacles?\b/i.test(text)) {
+    return "demanen opcions d'activitats o espectacles amb pressupost";
+  }
+  if (/\bproposta\b/i.test(text) && /\bpressupost\b/i.test(text)) {
+    return 'demanen proposta amb opcions i pressupost';
+  }
+  return '';
+}
+
+function extractVenueContextSummary(text: string): string {
+  if (/\bpati\s+d['’]una\s+escola\b/i.test(text)) return "al pati d'una escola";
+  if (/\buna\s+escola\s+de\s+[\p{L}' -]{3,80}/iu.test(text)) return 'a una escola';
+  return '';
+}
+
+function extractOrganizationSummary(text: string): string {
+  const organization = text.match(/\b(?:s[oó]c|soy)\s+(?:en|el|la|l')?[\p{L}' -]{2,80}?\s+de\s+(?:l'|la|el|els|las|los)?\s*([^\n.]{4,120})/iu);
+  if (!organization?.[1]) return '';
+  return `contacte de ${cleanTail(organization[1], 120)}`;
+}
+
+function firstUsefulSentence(text: string): string {
+  const sentences = text
+    .replace(/\r?\n+/g, '. ')
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => cleanTail(sentence, 220))
+    .filter((sentence) => sentence.length >= 24)
+    .filter((sentence) => !/^(bon dia|hola|moltes gr[aà]cies|salutacions|a vosaltres)\b/i.test(sentence))
+    .filter((sentence) => !/^[\p{L}' -]{2,80}$/u.test(sentence))
+    .filter((sentence) => !/^[\w.+-]+@[\w-]+\.[a-zA-Z]{2,}$/i.test(sentence));
+  return sentences[0] || '';
+}
+
+function buildLeadRequestSummary(sourceText: string): string {
+  const text = normalizeWhitespace(sourceText);
+  if (!text) return '';
+
+  const parts: string[] = [];
+  pushUnique(parts, extractOrganizationSummary(text));
+  if (/\bvesprada\s+de\s+casal\b/i.test(text)) pushUnique(parts, 'vesprada de casal');
+  pushUnique(parts, extractRequestSummary(text));
+  pushUnique(parts, extractDurationSummary(text));
+  pushUnique(parts, extractVenueContextSummary(text));
+  pushUnique(parts, extractAgeRange(text));
+  pushUnique(parts, extractThemeSummary(text));
+
+  if (parts.length === 0) pushUnique(parts, firstUsefulSentence(text));
+  if (parts.length === 0) return '';
+
+  const summary = parts.join(' · ');
+  return summary.endsWith('.') ? summary : `${summary}.`;
+}
+
 export function extractLeadDataFromText(text: string): ExtractedLeadTextData {
   const cleaned = normalizeLeadText(text).slice(0, 4000);
-  const original = normalizeWhitespace(text).slice(0, 4000);
+  const original = text.replace(/\u00a0/g, ' ').slice(0, 4000);
+  const originalCompact = normalizeWhitespace(text).slice(0, 4000);
+  const clientLines = extractWhatsappClientLines(original);
+  const extractionText = clientLines.length ? clientLines.join('\n') : cleaned;
 
   return {
-    name: extractName(cleaned),
-    email: extractEmail(cleaned),
-    phone: extractPhone(cleaned) || extractPhone(original),
-    dni: extractDni(cleaned),
-    address: extractAddress(cleaned),
-    eventType: inferEventType(cleaned),
-    eventDate: extractEventDate(cleaned),
-    eventTime: extractEventTime(cleaned),
-    eventEndTime: extractEventEndTime(cleaned),
-    eventLocation: extractLocation(cleaned),
-    guestCount: extractGuestCount(cleaned),
-    budget: extractBudget(cleaned),
-    message: cleaned,
-    source: inferSource(cleaned),
+    name: extractName(extractionText),
+    email: extractEmail(extractionText),
+    phone: extractPhone(extractionText) || extractPhone(originalCompact),
+    dni: extractDni(extractionText),
+    address: extractAddress(extractionText),
+    eventType: inferEventType(extractionText),
+    eventDate: extractEventDate(extractionText),
+    eventTime: extractEventTime(extractionText),
+    eventEndTime: extractEventEndTime(extractionText),
+    eventLocation: extractLocation(extractionText),
+    guestCount: extractGuestCount(extractionText),
+    budget: extractBudget(extractionText),
+    message: buildLeadRequestSummary(extractionText),
+    source: inferSource(original),
   };
 }

@@ -6,6 +6,7 @@ import { ADMIN_CUSTOMER_PANEL_HELP, helpAttrs } from '@/app/admin/components/adm
 import { AdminSection } from '@/app/admin/components/AdminPage';
 import { buildCustomerBookingCreateHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { bookingOutstandingBreakdown } from '@/lib/payment-status';
 
 const PILL_BASE = 'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold leading-tight';
 const STATUS_BASE = `${PILL_BASE} border`;
@@ -25,18 +26,28 @@ function getBookingStatusBadgeClass(status: string) {
 function PaymentIndicator({ booking }: { booking: BookingDTO }) {
   const deposit = booking.depositAmount ?? 0;
   const total = booking.totalAmount ?? 0;
-  const remaining = total - deposit;
+  const remaining = booking.remainingAmount ?? Math.max(0, total - deposit);
+  const breakdown = bookingOutstandingBreakdown({
+    total,
+    depositAmount: deposit,
+    remainingAmount: remaining,
+    depositPaid: booking.depositPaid === true,
+    remainingPaid: booking.remainingPaid === true,
+    cashAmount: booking.cashAmount,
+  });
+  const depositSettled = breakdown.depositAmount <= 0;
+  const remainingSettled = breakdown.remainingAmount <= 0;
 
   return (
     <div className="mt-2 flex flex-wrap gap-2" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.payment)}>
       {deposit > 0 && (
-        <span className={`${PILL_BASE} ${booking.depositPaid ? PILL_TONE.success : PILL_TONE.danger}`}>
-          Dipòsit {formatNumber(deposit)} € {booking.depositPaid ? '✓' : '✗'}
+        <span className={`${PILL_BASE} ${depositSettled ? PILL_TONE.success : PILL_TONE.danger}`}>
+          Dipòsit {formatNumber(deposit)} € {depositSettled ? '✓' : '✗'}
         </span>
       )}
       {remaining > 0 && (
-        <span className={`${PILL_BASE} ${booking.remainingPaid ? PILL_TONE.success : PILL_TONE.muted}`}>
-          Resta {formatNumber(remaining)} € {booking.remainingPaid ? '✓' : ''}
+        <span className={`${PILL_BASE} ${remainingSettled ? PILL_TONE.success : PILL_TONE.muted}`}>
+          Resta {formatNumber(remaining)} € {remainingSettled ? '✓' : ''}
         </span>
       )}
     </div>

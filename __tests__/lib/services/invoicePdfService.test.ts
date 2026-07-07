@@ -4,7 +4,7 @@ vi.mock('@/lib/logo-lockup-light-base64', () => ({
   ORBITA_LOGO_LOCKUP_LIGHT_BASE64: 'data:image/png;base64,fake',
 }));
 
-import { generateInvoicePDF } from '@/lib/services/invoicePdfService';
+import { generateInvoicePDF, resolveInvoicePaymentRows } from '@/lib/services/invoicePdfService';
 
 const BASE_DATA = {
   invoiceNumber: 'FAC-2026-001',
@@ -32,6 +32,29 @@ const BASE_DATA = {
   remainingAmount: 350,
   remainingPaid: false,
 };
+
+describe('resolveInvoicePaymentRows', () => {
+  it('marca la bestreta pagada si cashAmount la cobreix', () => {
+    const rows = resolveInvoicePaymentRows({ ...BASE_DATA, cashAmount: 150 });
+
+    expect(rows.deposit).toMatchObject({ amount: 150, paid: true, paidAt: null });
+    expect(rows.remaining).toMatchObject({ amount: 350, paid: false, paidAt: null });
+  });
+
+  it('mostra pendent real de bestreta si cashAmount nomes en cobreix una part', () => {
+    const rows = resolveInvoicePaymentRows({ ...BASE_DATA, cashAmount: 50 });
+
+    expect(rows.deposit).toMatchObject({ amount: 100, paid: false, paidAt: null });
+    expect(rows.remaining).toMatchObject({ amount: 350, paid: false, paidAt: null });
+  });
+
+  it('marca tots els trams pagats si cashAmount cobreix el total amb flags falsos', () => {
+    const rows = resolveInvoicePaymentRows({ ...BASE_DATA, cashAmount: 500 });
+
+    expect(rows.deposit).toMatchObject({ amount: 150, paid: true, paidAt: null });
+    expect(rows.remaining).toMatchObject({ amount: 350, paid: true, paidAt: null });
+  });
+});
 
 describe('generateInvoicePDF', () => {
   it('returns a jsPDF instance with PDF magic bytes', async () => {

@@ -26,6 +26,8 @@ type SearchResult = {
   secondary?: string;
 };
 
+const OWNER_SEARCH_ERROR = 'No s’ha pogut completar la cerca de vincles.';
+
 async function searchEntities(entity: SearchEntity, query: string): Promise<SearchResult[]> {
   const trimmed = query.trim();
   if (trimmed.length < 2) return [];
@@ -36,11 +38,13 @@ async function searchEntities(entity: SearchEntity, query: string): Promise<Sear
       ? `/api/admin/leads?search=${encodeURIComponent(trimmed)}&limit=8`
       : `/api/admin/bookings?search=${encodeURIComponent(trimmed)}&limit=8`;
   const res = await fetch(url, { cache: 'no-store' });
-  if (!res.ok) return [];
   const payload = (await res.json().catch(() => null)) as
-    | { customers?: Array<{ id: string; name: string; email: string }>; leads?: Array<{ id: string; name: string; email: string }>; bookings?: Array<{ id: string; reference: string; status: string }> }
+    | { customers?: Array<{ id: string; name: string; email: string }>; leads?: Array<{ id: string; name: string; email: string }>; bookings?: Array<{ id: string; reference: string; status: string }>; error?: string; message?: string }
     | null;
-  if (!payload) return [];
+  if (!res.ok) {
+    throw new Error(payload?.error || payload?.message || OWNER_SEARCH_ERROR);
+  }
+  if (!payload) throw new Error(OWNER_SEARCH_ERROR);
   if (entity === 'customer' && payload.customers) {
     return payload.customers.map((c) => ({ id: c.id, primary: c.name, secondary: c.email }));
   }
@@ -84,6 +88,7 @@ export default function ProposalOwnerPanel({
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searchError, setSearchError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const config = open ? ENTITY_LABELS[open] : null;
 
@@ -91,22 +96,38 @@ export default function ProposalOwnerPanel({
     if (!open) {
       setQuery('');
       setResults([]);
+      setSearchError('');
       return;
     }
     let cancelled = false;
     setLoading(true);
+    setSearchError('');
     const t = setTimeout(async () => {
-      const items = await searchEntities(open, query);
-      if (!cancelled) {
-        setResults(items);
-        setLoading(false);
+      try {
+        const items = await searchEntities(open, query);
+        if (!cancelled) {
+          setResults(items);
+          setSearchError('');
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : OWNER_SEARCH_ERROR;
+        console.error('[ProposalOwnerPanel] Error cercant vincles', err);
+        if (!cancelled) {
+          setResults([]);
+          setSearchError(message);
+          toast.error(message);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }, 250);
     return () => {
       cancelled = true;
       clearTimeout(t);
     };
-  }, [open, query]);
+  }, [open, query, toast]);
 
   const submitChange = async (changes: Partial<Record<'customerId' | 'leadId' | 'bookingId', string | null>>) => {
     setSubmitting(true);
@@ -240,7 +261,11 @@ export default function ProposalOwnerPanel({
               className="adm-input mt-3"
             />
             <div className="mt-3 max-h-64 overflow-y-auto">
-              {loading ? (
+              {searchError ? (
+                <div className="ap-inline-alert ap-inline-alert--danger" role="alert">
+                  {searchError}
+                </div>
+              ) : loading ? (
                 <p className="px-1 py-2 text-xs text-[var(--t3)]">Cercant…</p>
               ) : results.length === 0 ? (
                 <p className="px-1 py-2 text-xs text-[var(--t3)]">{config.emptyHint}</p>

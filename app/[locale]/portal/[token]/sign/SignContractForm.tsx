@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { SignaturePad } from './SignaturePad';
 import { CLIENT_PORTAL_TONE_CLASS } from '@/lib/constants/clientPortalTones';
+import { readPortalActionError } from '@/lib/clientPortalUtils';
 
 type SignFormMessages = {
   signYourName: string;
   signNamePlaceholder: string;
   signAcceptTerms: string;
   signSubmit: string;
+  signSubmitting: string;
   signSuccess: string;
   signSuccessBack: string;
   signError: string;
@@ -29,6 +31,12 @@ type Props = {
   messages: SignFormMessages;
 };
 
+type SignContractErrorKey = 'ALREADY_SIGNED' | 'NOT_SIGNABLE' | 'GENERIC';
+
+function normalizeSignContractErrorKey(error: unknown): SignContractErrorKey {
+  return error === 'ALREADY_SIGNED' || error === 'NOT_SIGNABLE' ? error : 'GENERIC';
+}
+
 export function SignContractForm({
   token,
   locale,
@@ -42,7 +50,7 @@ export function SignContractForm({
   const [accepted, setAccepted] = useState(false);
   const [signatureBlob, setSignatureBlob] = useState<string | null>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [errorKey, setErrorKey] = useState<string | null>(null);
+  const [errorKey, setErrorKey] = useState<SignContractErrorKey | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -56,7 +64,7 @@ export function SignContractForm({
     }).catch(() => null);
 
     if (!res) {
-      setErrorKey('NETWORK_ERROR');
+      setErrorKey('GENERIC');
       setStatus('error');
       return;
     }
@@ -64,16 +72,16 @@ export function SignContractForm({
     if (res.ok) {
       setStatus('success');
     } else {
-      const data = await res.json().catch(() => ({}));
-      setErrorKey((data as Record<string, string>).error || 'UNKNOWN');
+      const data = await res.json().catch(() => null);
+      setErrorKey(normalizeSignContractErrorKey(readPortalActionError(data)));
       setStatus('error');
     }
   }
 
   if (status === 'success') {
     return (
-      <div className={`rounded-2xl border p-8 text-center ${CLIENT_PORTAL_TONE_CLASS.successSoft}`}>
-        <p className="text-2xl font-bold">✓</p>
+      <div className={`rounded-2xl border p-8 text-center ${CLIENT_PORTAL_TONE_CLASS.successSoft}`} role="status">
+        <p className="text-2xl font-bold" aria-hidden="true">✓</p>
         <p className="mt-2 text-lg font-semibold">{m.signSuccess}</p>
         <a
           href={`/${locale}/portal/${token}`}
@@ -132,7 +140,7 @@ export function SignContractForm({
       </div>
 
       {status === 'error' && (
-        <p className={`rounded-lg border px-4 py-2 text-sm ${CLIENT_PORTAL_TONE_CLASS.dangerSoft}`}>
+        <p className={`rounded-lg border px-4 py-2 text-sm ${CLIENT_PORTAL_TONE_CLASS.dangerSoft}`} role="alert">
           {errorMessage}
         </p>
       )}
@@ -143,7 +151,7 @@ export function SignContractForm({
         className="w-full rounded-lg px-4 py-3 text-sm font-semibold text-white disabled:opacity-40 disabled:cursor-not-allowed hover:brightness-110 transition-all"
         style={{ backgroundColor: accentHex }}
       >
-        {status === 'loading' ? '…' : m.signSubmit}
+        {status === 'loading' ? m.signSubmitting : m.signSubmit}
       </button>
     </form>
   );

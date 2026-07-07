@@ -40,10 +40,19 @@ export function roundMoney(amount: number): number {
 /** Increment per defecte de revenda de serveis de proveïdor (sobre el cost). */
 export const RESELL_MARKUP = 0.20;
 
+/** Salt comercial per a PVP recomanats premium: acabat en 0 i sempre amunt. */
+export const RECOMMENDED_SELLING_PRICE_STEP = 10;
+
 /** Arrodoneix un import a l'alça al múltiple de `step` (per defecte 5 → preus acabats en 0 o 5). */
 export function ceilToStep(amount: number, step = 5): number {
   if (step <= 0) return amount;
   return Math.ceil(amount / step) * step;
+}
+
+/** PVP recomanat canònic: mai baixa el preu calculat i acaba en 0. */
+export function roundRecommendedSellingPrice(amount: number, step = RECOMMENDED_SELLING_PRICE_STEP): number {
+  if (!Number.isFinite(amount) || amount <= 0) return 0;
+  return ceilToStep(amount, step);
 }
 
 /** Preu de venda canònic d'un servei revenut: cost + marge, arrodonit a l'alça a múltiple de 5. */

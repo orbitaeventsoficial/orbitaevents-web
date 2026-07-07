@@ -31,6 +31,7 @@ export default function ReactivationClient({ initialCandidates }: Props) {
   const [filter, setFilter] = useState<'ALL' | ReactivationPriority>('ALL');
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState<string | null>(null);
+  const [copyError, setCopyError] = useState<{ customerId: string; message: string } | null>(null);
 
   const visible = useMemo(() => {
     return initialCandidates.filter((c) => {
@@ -64,12 +65,20 @@ export default function ReactivationClient({ initialCandidates }: Props) {
   }
 
   async function handleCopyMessage(candidate: ReactivationCandidate) {
+    setCopyError(null);
     try {
       await navigator.clipboard.writeText(candidate.suggestedMessage);
       setCopied(candidate.customerId);
       setTimeout(() => setCopied(null), 2000);
-    } catch {
-      // navigator.clipboard not available
+    } catch (error) {
+      console.error('[ReactivationClient] Error copiant missatge de reactivacio', {
+        customerId: candidate.customerId,
+        error,
+      });
+      setCopyError({
+        customerId: candidate.customerId,
+        message: 'No s\'ha pogut copiar el missatge.',
+      });
     }
   }
 
@@ -204,6 +213,12 @@ export default function ReactivationClient({ initialCandidates }: Props) {
                 <button
                   type="button"
                   onClick={() => handleCopyMessage(c)}
+                  aria-invalid={copyError?.customerId === c.customerId ? true : undefined}
+                  aria-describedby={
+                    copyError?.customerId === c.customerId
+                      ? `reactivation-copy-error-${c.customerId}`
+                      : undefined
+                  }
                   className="ap-btn ap-btn--xs flex-1 sm:flex-none"
                 >
                   {copied === c.customerId ? '✓ Copiat' : 'Copiar missatge'}
@@ -222,6 +237,15 @@ export default function ReactivationClient({ initialCandidates }: Props) {
                   Descartar
                 </button>
               </div>
+              {copyError?.customerId === c.customerId && (
+                <p
+                  id={`reactivation-copy-error-${c.customerId}`}
+                  role="alert"
+                  className="ap-card-body pt-0 text-xs admin-tone-text-danger"
+                >
+                  {copyError.message}
+                </p>
+              )}
             </article>
           ))}
         </div>

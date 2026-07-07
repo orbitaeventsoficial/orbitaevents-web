@@ -11,6 +11,24 @@ interface ChecklistItem {
   checked: boolean;
 }
 
+type ChecklistSaveErrorTarget = 'toggle' | 'remove' | 'add';
+
+type ChecklistSaveError = {
+  message: string;
+  target: ChecklistSaveErrorTarget;
+  itemId?: string;
+};
+
+const CHECKLIST_LOAD_ERROR = "No s'ha pogut carregar la checklist";
+const CHECKLIST_SAVE_ERROR = "No s'ha pogut desar la checklist";
+
+async function readChecklistError(response: Response, fallback: string) {
+  const data = (await response.json().catch(() => null)) as { error?: unknown; message?: unknown } | null;
+  if (typeof data?.error === 'string' && data.error.trim()) return data.error;
+  if (typeof data?.message === 'string' && data.message.trim()) return data.message;
+  return fallback;
+}
+
 function progressTone(pct: number) {
   if (pct === 100) return { bar: 'admin-tone-bg-success', text: 'admin-tone-text-success', check: 'ap-badge ap-badge--success' };
   if (pct >= 50) return { bar: 'admin-tone-bg-warning', text: 'admin-tone-text-warning', check: 'ap-badge ap-badge--warning' };
@@ -21,6 +39,8 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
   const [items, setItems] = useState<ChecklistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<ChecklistSaveError | null>(null);
+  const [saving, setSaving] = useState(false);
   const [adding, setAdding] = useState(false);
   const [newLabel, setNewLabel] = useState('');
   const toast = useToast();
@@ -29,15 +49,15 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
     try {
       setLoadError(null);
       const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/checklist`, { credentials: 'include' });
-      if (!res.ok) throw new Error("No s'ha pogut carregar la checklist");
+      if (!res.ok) throw new Error(await readChecklistError(res, CHECKLIST_LOAD_ERROR));
       const data = await res.json();
       if (data.ok) {
         setItems(data.items);
       } else {
-        throw new Error("No s'ha pogut carregar la checklist");
+        throw new Error(typeof data.error === 'string' ? data.error : CHECKLIST_LOAD_ERROR);
       }
     } catch (error) {
-      setLoadError(error instanceof Error ? error.message : "No s'ha pogut carregar la checklist");
+      setLoadError(error instanceof Error ? error.message : CHECKLIST_LOAD_ERROR);
     } finally {
       setLoading(false);
     }
@@ -47,7 +67,15 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
     load();
   }, [load]);
 
-  async function save(updated: ChecklistItem[]) {
+  async function save(
+    updated: ChecklistItem[],
+    previous: ChecklistItem[],
+    errorTarget: { target: ChecklistSaveErrorTarget; itemId?: string },
+    onFailure?: () => void,
+  ) {
+    if (saving) return;
+    setSaveError(null);
+    setSaving(true);
     setItems(updated);
     try {
       const response = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/checklist`, {
@@ -56,30 +84,46 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
         credentials: 'include',
         body: JSON.stringify({ items: updated }),
       });
-      if (!response.ok) throw new Error('Error desant checklist');
+      if (!response.ok) throw new Error(await readChecklistError(response, CHECKLIST_SAVE_ERROR));
     } catch (error) {
-      console.error('Error desant checklist', error);
-      toast.error(error instanceof Error ? error.message : 'Error desant checklist');
+      const message = error instanceof Error ? error.message : CHECKLIST_SAVE_ERROR;
+      setItems(previous);
+      setSaveError({ message, ...errorTarget });
+      onFailure?.();
+      console.error(CHECKLIST_SAVE_ERROR, error);
+      toast.error(message);
+    } finally {
+      setSaving(false);
     }
   }
 
   function toggle(id: string) {
+    if (saving) return;
+    const previous = items;
     const updated = items.map((item) => (item.id === id ? { ...item, checked: !item.checked } : item));
-    save(updated);
+    void save(updated, previous, { target: 'toggle', itemId: id });
   }
 
   function addItem() {
+    if (saving) return;
     if (!newLabel.trim()) return;
+    const previous = items;
+    const label = newLabel.trim();
     const id = `custom-${Date.now()}`;
-    const updated = [...items, { id, label: newLabel.trim(), checked: false }];
-    save(updated);
+    const updated = [...items, { id, label, checked: false }];
+    void save(updated, previous, { target: 'add' }, () => {
+      setNewLabel(label);
+      setAdding(true);
+    });
     setNewLabel('');
     setAdding(false);
   }
 
   function removeItem(id: string) {
+    if (saving) return;
+    const previous = items;
     const updated = items.filter((item) => item.id !== id);
-    save(updated);
+    void save(updated, previous, { target: 'remove', itemId: id });
   }
 
   if (loading) {
@@ -92,7 +136,7 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
 
   if (loadError) {
     return (
-      <div className="ap-card rounded-2xl p-5 text-sm admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger">
+      <div className="ap-card rounded-2xl p-5 text-sm admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger" role="alert">
         {loadError}
       </div>
     );
@@ -124,7 +168,9 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
             <button
               type="button"
               onClick={() => toggle(item.id)}
+              disabled={saving}
               className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border-2 transition-all ${item.checked ? 'admin-tone-border-success admin-tone-bg-success' : 'admin-tone-border-neutral hover:admin-tone-border-slate'}`}
+              aria-invalid={saveError?.target === 'toggle' && saveError.itemId === item.id ? true : undefined}
               aria-label={item.checked ? `Desmarcar: ${item.label}` : `Marcar: ${item.label}`}
             >
               {item.checked && (
@@ -135,13 +181,19 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
             </button>
             <span className={`flex-1 text-sm ${item.checked ? 'line-through opacity-40' : ''}`}>{item.label}</span>
             {item.id.startsWith('custom-') && (
-              <button type="button" onClick={() => removeItem(item.id)} className="text-xs opacity-0 transition-opacity group-hover:opacity-60 hover:!opacity-100" aria-label={`Eliminar: ${item.label}`}>
+              <button type="button" onClick={() => removeItem(item.id)} disabled={saving} aria-invalid={saveError?.target === 'remove' && saveError.itemId === item.id ? true : undefined} className="text-xs opacity-0 transition-opacity group-hover:opacity-60 hover:!opacity-100 disabled:cursor-not-allowed disabled:opacity-30" aria-label={`Eliminar: ${item.label}`}>
                 ✕
               </button>
             )}
           </li>
         ))}
       </ul>
+
+      {saveError && (
+        <p role="alert" className="mt-3 rounded-xl border admin-tone-border-danger px-3 py-2 text-sm admin-tone-text-danger">
+          {saveError.message}
+        </p>
+      )}
 
       {adding ? (
         <div className="mt-3 flex gap-2">
@@ -152,21 +204,22 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
             onKeyDown={(e) => e.key === 'Enter' && addItem()}
             placeholder="Nou ítem..."
             className="ap-input flex-1 px-3 py-2 text-sm"
+            disabled={saving}
+            aria-invalid={saveError?.target === 'add' ? true : undefined}
             autoFocus
           />
-          <button type="button" onClick={addItem} className="ap-btn ap-btn--primary">
+          <button type="button" onClick={addItem} disabled={saving} aria-invalid={saveError?.target === 'add' ? true : undefined} className="ap-btn ap-btn--primary">
             Afegir
           </button>
-          <button type="button" onClick={() => { setAdding(false); setNewLabel(''); }} className="ap-btn ap-btn--secondary">
+          <button type="button" onClick={() => { setAdding(false); setNewLabel(''); }} disabled={saving} className="ap-btn ap-btn--secondary">
             ✕
           </button>
         </div>
       ) : (
-        <button type="button" onClick={() => setAdding(true)} className="admin-tone-idle mt-3 w-full rounded-xl border border-dashed px-3 py-2 text-center text-sm transition-colors" {...helpAttrs(ADMIN_BOOKING_HELP_2.checklist.add)}>
+        <button type="button" onClick={() => setAdding(true)} disabled={saving} aria-invalid={saveError?.target === 'add' ? true : undefined} className="admin-tone-idle mt-3 w-full rounded-xl border border-dashed px-3 py-2 text-center text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-60" {...helpAttrs(ADMIN_BOOKING_HELP_2.checklist.add)}>
           + Afegir ítem
         </button>
       )}
     </section>
   );
 }
-

@@ -10,6 +10,7 @@ const { mockRequireAuth, mockLoadNBA, mockExplain } = vi.hoisted(() => ({
 vi.mock('@/lib/auth', () => ({ requireAuth: mockRequireAuth }));
 vi.mock('@/lib/services/nextBestActionService', () => ({ loadNextBestActions: mockLoadNBA }));
 vi.mock('@/lib/services/nbaAiExplainService', () => ({ generateNBAExplanation: mockExplain }));
+vi.mock('@/lib/logger', () => ({ log: { error: vi.fn() } }));
 
 import { GET } from '@/app/api/admin/ai/nba-explain/route';
 
@@ -91,5 +92,33 @@ describe('GET /api/admin/ai/nba-explain', () => {
     const body = await res.json();
     expect(body.explanation).toBe('');
     expect(res.status).toBe(200);
+  });
+
+  it('degrada a resposta buida si el motor NBA falla', async () => {
+    mockLoadNBA.mockRejectedValue(new Error('nba down'));
+
+    const res = await GET(makeReq());
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body).toEqual({
+      explanation: '',
+      actions: [],
+      generatedAt: expect.any(String),
+    });
+  });
+
+  it('degrada a resposta buida si el builder IA falla inesperadament', async () => {
+    mockExplain.mockRejectedValue(new Error('ai down'));
+
+    const res = await GET(makeReq());
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body).toEqual({
+      explanation: '',
+      actions: [],
+      generatedAt: expect.any(String),
+    });
   });
 });

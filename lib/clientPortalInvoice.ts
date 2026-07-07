@@ -4,6 +4,7 @@ import {
 } from '@/lib/clientPortalPayment';
 
 export type ClientPortalInvoiceBooking = {
+  total?: number | null;
   depositAmount: number;
   depositPaid: boolean;
   depositPaidAt: Date | null;
@@ -12,6 +13,7 @@ export type ClientPortalInvoiceBooking = {
   remainingPaid: boolean;
   remainingPaidAt: Date | null;
   remainingPaymentUrl?: string | null;
+  cashAmount?: number | null;
 };
 
 export type ClientPortalInvoiceProposal = {
@@ -43,23 +45,23 @@ export function getClientPortalInvoiceSummary(
   return {
     proposalReference: latestWithPdf?.reference ?? null,
     pdfUrl: latestWithPdf?.pdfUrl ?? null,
-    total: booking.depositAmount + booking.remainingAmount,
+    total: booking.total ?? booking.depositAmount + booking.remainingAmount,
     deposit: {
-      amount: booking.depositAmount,
-      paid: booking.depositPaid,
+      amount: paymentSummary.deposit.amount,
+      paid: paymentSummary.deposit.paid,
       paidAt: booking.depositPaidAt,
       paymentUrl: paymentSummary.deposit.paymentUrl,
       payableOnline: paymentSummary.deposit.payableOnline,
     },
     remaining: {
-      amount: booking.remainingAmount,
-      paid: booking.remainingPaid,
+      amount: paymentSummary.remaining.amount,
+      paid: paymentSummary.remaining.paid,
       paidAt: booking.remainingPaidAt,
       paymentUrl: paymentSummary.remaining.paymentUrl,
       payableOnline: paymentSummary.remaining.payableOnline,
     },
     nextPayment: paymentSummary.nextPayment,
     paymentNotice: paymentSummary.notice,
-    allPaid: booking.depositPaid && booking.remainingPaid,
+    allPaid: paymentSummary.deposit.paid && paymentSummary.remaining.paid,
   };
 }

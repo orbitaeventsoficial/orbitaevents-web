@@ -15,21 +15,37 @@ interface TemplateInfo {
   variables: string[];
 }
 
+type EmailTemplatesResponse = {
+  templates?: TemplateInfo[];
+  error?: string;
+  message?: string;
+};
+
+async function readEmailTemplatesResponse(res: Response): Promise<EmailTemplatesResponse> {
+  return (await res.json().catch(() => ({}))) as EmailTemplatesResponse;
+}
 
 export default function EmailTemplatesClient() {
   const toast = useToast();
   const [templates, setTemplates] = useState<TemplateInfo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   const fetch_ = useCallback(async () => {
+    setLoading(true);
+    setLoadError('');
     try {
       const res = await fetch('/api/admin/email-templates');
-      if (!res.ok) throw new Error('Error');
-      const data = await res.json();
+      const data = await readEmailTemplatesResponse(res);
+      if (!res.ok) {
+        throw new Error(data.error || data.message || "No s'han pogut carregar les plantilles email");
+      }
       setTemplates(data.templates || []);
     } catch (err) {
+      const message = err instanceof Error && err.message ? err.message : "No s'han pogut carregar les plantilles email";
       console.error('Error carregant llista de plantilles email', err);
-      toast.error(err instanceof Error ? err.message : 'Error carregant');
+      setLoadError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -44,6 +60,17 @@ export default function EmailTemplatesClient() {
       <div className="flex items-center gap-2 text-sm admin-tone-text-neutral" role="status">
         <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
         Carregant plantilles...
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="ap-inline-alert ap-inline-alert--danger" role="alert">
+        <p className="m-0">{loadError}</p>
+        <button type="button" onClick={fetch_} className="ap-btn ap-btn--secondary mt-3 text-xs">
+          Reintentar
+        </button>
       </div>
     );
   }

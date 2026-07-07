@@ -18,6 +18,7 @@ import {
   type SocialContentType,
   type SocialCategory,
 } from '@/lib/constants';
+import { validateSocialPostReviewGate } from '@/lib/socialPostReviewGuard';
 
 // ───────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -88,6 +89,13 @@ export function validateSocialPostInput(input: SocialPostCreateInput): string | 
 export async function createSocialPost(input: SocialPostCreateInput): Promise<SocialPost> {
   const error = validateSocialPostInput(input);
   if (error) throw new Error(error);
+  const reviewError = validateSocialPostReviewGate({
+    status: input.status ?? SOCIAL_POST_STATUSES.IDEA,
+    bookingId: input.bookingId,
+    category: input.category,
+    notes: input.notes,
+  });
+  if (reviewError) throw new Error(reviewError);
 
   const data: Prisma.SocialPostCreateInput = {
     title: input.title.trim(),
@@ -163,6 +171,13 @@ export async function updateSocialPost(id: string, input: SocialPostUpdateInput)
     const error = validateSocialPostInput(merged);
     if (error) throw new Error(error);
   }
+  const reviewError = validateSocialPostReviewGate({
+    status: input.status ?? existing.status,
+    bookingId: input.bookingId !== undefined ? input.bookingId : existing.bookingId,
+    category: input.category !== undefined ? input.category : existing.category,
+    notes: input.notes !== undefined ? input.notes : existing.notes,
+  });
+  if (reviewError) throw new Error(reviewError);
 
   const data: Prisma.SocialPostUpdateInput = {};
   if (input.title !== undefined) data.title = input.title.trim();
@@ -249,4 +264,3 @@ export async function getSocialPostCounts(): Promise<Record<SocialPostStatus, nu
   }
   return counts;
 }
-

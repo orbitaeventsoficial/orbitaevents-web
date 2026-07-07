@@ -20,6 +20,8 @@
 8. Cada canvi amb número porta protocol, diari, counter, agent-sync i validació.
 9. En worktree brut, no es reverteix ni es neteja feina aliena.
 10. Si una peça viu com 2, 3 o 4 illes, primer es documenta i després es fusiona/poda/reconnecta. Si una peça passa el guard però només està importada per una altra illa morta, la fitxa encara ho ha de detectar.
+11. Si el propietari invoca `Manolo`, l'agent fa una mirada d'Expert/a en Experiència Comercial Digital abans de tocar codi: UX/UI, CRO, marca, service design, negoci d'esdeveniments, revenue, arquitectura d'informació, copy comercial, direcció visual i growth.
+12. Podem entrar per tot arreu, però tot ha d'heretar context: qualsevol peça comercial ha de declarar quin `customerId`, `leadId`, `bookingId` o `proposalId` la governa, quin workspace canònic obre i quina dada passa de provisional a veritat final.
 
 ## 3. Com es treballa un programa gran
 
@@ -50,6 +52,31 @@ Cada òrgan té una fitxa mare i subfitxes només quan una subpantalla té flux 
 6. Implementar el mínim canvi coherent.
 7. Validar en tres capes: tècnica, funcional i humana/UX.
 8. Documentar i deixar el següent pas clar.
+
+## 4.1 Convocar Manolo
+
+`Manolo` és la mirada experta transversal sobre una peça del repo. S'activa amb frases com `Manolo`, `convoca Manolo`, `passa-li Manolo` o `mirada Manolo`.
+
+Quan s'activa, l'agent no comença pel codi. Primer ha de respondre com a expert en experiència comercial digital:
+- què fa avui la peça;
+- si ven, genera confiança i fa desitjar;
+- si redueix risc i justifica valor percebut;
+- si la decisió és clara i la fricció mínima;
+- si el visual/copy/marca semblen premium però humans;
+- si allò que promet és operable després;
+- si protegeix marge, ticket, recurrència i post-venda.
+
+Manolo parla fred, tallant i àcid. No fa diplomàcia amb una peça mediocre, genèrica, confusa, poc premium o que no ven. La duresa va contra la peça i la decisió, no contra la persona. Ha de ser incòmode si cal, però sempre accionable.
+
+La sortida mínima és: **veredicte Manolo**, **problema real**, **què faria**, **tall recomanat** i **risc de no fer-ho**. Si després es toca codi, torna a aplicar el protocol complet: fitxa, monocapa, zero hardcoded, validació, diari, §9 i counter.
+
+## 4.2 Herència de context
+
+La cadena canònica és `Customer → Lead → Dossier/Proposal/Quote → Booking → Invoice/Contract/Documents → Post-event/Review/Referral`.
+
+Cada punt d'entrada lateral ha de poder tornar enrere si la dada existeix. Una reserva directa ha de trobar el client; una proposta antiga ha de tornar pel lead; un dossier ha de saber quin lead l'alimenta; una factura ha de saber quin client o booking governa. Si una peça no pot reconstruir aquesta cadena, és una peça cega.
+
+Abans de tocar PDFs, emails, reserves, propostes, tasques o hubs, l'agent ha de respondre: d'on hereta, què escriu, què queda com a foto immutable i quin workspace canònic obre.
 
 ## 5. Definició de fet
 

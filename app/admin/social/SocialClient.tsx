@@ -1,11 +1,17 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import AiCopySuggestionsInline from '../components/AiCopySuggestionsInline';
 import { buildSocialOperatingLoop } from '@/lib/socialOperatingLoop';
+import {
+  SOCIAL_REVIEW_BLOCKED_MESSAGE,
+  SOCIAL_REVIEW_GATED_STATUSES,
+  requiresPostEventReview,
+  resolvePostEventReviewNotes,
+} from '@/lib/socialPostReviewGuard';
 import {
   SOCIAL_PLATFORM_LABELS,
   SOCIAL_POST_STATUS_LABELS,
@@ -84,6 +90,12 @@ type PostSeed = {
 
 type Counts = Record<SocialPostStatus, number>;
 
+type SocialMutationResponse = {
+  ok?: boolean;
+  error?: string;
+  message?: string;
+};
+
 const IDEA_SOURCE_ICON: Record<SerializedIdea['source'], string> = {
   booking: '📅',
   testimonial: '⭐',
@@ -126,16 +138,26 @@ function formatDateTime(iso: string | null): string {
   return formatDateTimeCanonical(iso);
 }
 
+async function readSocialMutationPayload(res: Response): Promise<SocialMutationResponse> {
+  return (await res.json().catch(() => ({}))) as SocialMutationResponse;
+}
+
+function resolveSocialMutationError(payload: SocialMutationResponse, fallback: string): string {
+  return payload.error || payload.message || fallback;
+}
+
 export default function SocialClient({
   initialPosts,
   initialCounts,
   initialIdeas = [],
   initialContentPulse,
+  focusPostId = null,
 }: {
   initialPosts: SerializedPost[];
   initialCounts: Counts;
   initialIdeas?: SerializedIdea[];
   initialContentPulse: SerializedContentPulse;
+  focusPostId?: string | null;
 }) {
   const router = useRouter();
   const { confirm, dialogProps } = useConfirmDialog();
@@ -149,6 +171,25 @@ export default function SocialClient({
   const [postSeed, setPostSeed] = useState<PostSeed | null>(null);
   const [showIdeas, setShowIdeas] = useState(true);
   const [flash, setFlash] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [openedFocusPostId, setOpenedFocusPostId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!focusPostId || openedFocusPostId === focusPostId) return;
+    const focusedPost = posts.find((post) => post.id === focusPostId);
+    setOpenedFocusPostId(focusPostId);
+    setPostSeed(null);
+
+    if (!focusedPost) {
+      setFlash({ type: 'error', text: 'No he trobat aquest esborrany social' });
+      return;
+    }
+
+    setView('list');
+    setStatusFilter('all');
+    setEditingPost(focusedPost);
+    setShowCreate(true);
+    setFlash({ type: 'success', text: 'Esborrany social obert des del playbook' });
+  }, [focusPostId, openedFocusPostId, posts]);
 
   const filteredPosts = useMemo(() => {
     if (statusFilter === 'all') return posts;
@@ -205,30 +246,47 @@ export default function SocialClient({
     if (!ok) return;
     try {
       const res = await fetchWithCsrf(`/api/admin/social-posts/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error();
+      const data = await readSocialMutationPayload(res);
+      if (!res.ok || data.ok === false) {
+        throw new Error(resolveSocialMutationError(data, "No s'ha pogut eliminar la publicació"));
+      }
       setPosts((prev) => prev.filter((p) => p.id !== id));
       setFlash({ type: 'success', text: 'Publicació eliminada' });
       router.refresh();
     } catch (err) {
       console.error('Error eliminant publicació social', err);
-      setFlash({ type: 'error', text: 'Error eliminant publicació' });
+      setFlash({
+        type: 'error',
+        text: err instanceof Error && err.message ? err.message : "No s'ha pogut eliminar la publicació",
+      });
     }
   }
 
   async function handleStatusChange(id: string, newStatus: string) {
+    const post = posts.find((item) => item.id === id);
+    if (post && SOCIAL_REVIEW_GATED_STATUSES.has(newStatus) && requiresPostEventReview(post)) {
+      setFlash({ type: 'error', text: SOCIAL_REVIEW_BLOCKED_MESSAGE });
+      return;
+    }
+
     try {
       const res = await fetchWithCsrf(`/api/admin/social-posts/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
-      const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error();
+      const data = await readSocialMutationPayload(res);
+      if (!res.ok || !data.ok) {
+        throw new Error(resolveSocialMutationError(data, "No s'ha pogut canviar l'estat"));
+      }
       setPosts((prev) => prev.map((p) => p.id === id ? { ...p, status: newStatus, updatedAt: new Date().toISOString() } : p));
       setFlash({ type: 'success', text: `Estat canviat a ${SOCIAL_POST_STATUS_LABELS[newStatus as SocialPostStatus] || newStatus}` });
     } catch (err) {
       console.error('Error canviant estat publicació social', err);
-      setFlash({ type: 'error', text: 'Error canviant estat' });
+      setFlash({
+        type: 'error',
+        text: err instanceof Error && err.message ? err.message : "No s'ha pogut canviar l'estat",
+      });
     }
   }
 
@@ -250,6 +308,13 @@ export default function SocialClient({
 
   function handleDismissIdea(ideaId: string) {
     setIdeas((prev) => prev.filter((i) => i.id !== ideaId));
+  }
+
+  function closePostModal() {
+    setShowCreate(false);
+    setEditingPost(null);
+    setPostSeed(null);
+    if (focusPostId) router.replace('/admin/social');
   }
 
   const totalPosts = counts.IDEA + counts.DRAFT + counts.SCHEDULED + counts.PUBLISHED + counts.ARCHIVED;
@@ -469,6 +534,11 @@ export default function SocialClient({
                     {post.hashtags.length > 0 && (
                       <p className="mt-1 text-xs admin-tone-text-cyan">{post.hashtags.map((h) => `#${h}`).join(' ')}</p>
                     )}
+                    {requiresPostEventReview(post) && (
+                      <p className="mt-2 inline-flex rounded-full border admin-tone-border-warning admin-tone-bg-warning px-2 py-0.5 text-xs font-semibold admin-tone-text-warning">
+                        Revisió consentiment pendent
+                      </p>
+                    )}
                   </div>
                   <div className="flex flex-col gap-2 text-left sm:max-w-none sm:shrink-0 sm:items-end sm:text-right max-w-full">
                     <span className="text-xs opacity-50">
@@ -583,7 +653,7 @@ export default function SocialClient({
         <SocialPostModal
           post={editingPost}
           seed={postSeed}
-          onClose={() => { setShowCreate(false); setEditingPost(null); setPostSeed(null); }}
+          onClose={closePostModal}
           onSaved={(saved) => {
             if (editingPost) {
               setPosts((prev) => prev.map((p) => p.id === saved.id ? saved : p));
@@ -602,6 +672,7 @@ export default function SocialClient({
             setEditingPost(null);
             setPostSeed(null);
             setFlash({ type: 'success', text: editingPost ? 'Publicació actualitzada' : 'Publicació creada' });
+            if (focusPostId) router.replace('/admin/social');
             router.refresh();
           }}
         />
@@ -639,11 +710,22 @@ function SocialPostModal({
   const [notes, setNotes] = useState(post?.notes ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const pendingPostEventReview = requiresPostEventReview({
+    bookingId: post?.bookingId ?? seed?.bookingId ?? null,
+    category,
+    notes,
+  });
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     setError(null);
+
+    if (SOCIAL_REVIEW_GATED_STATUSES.has(status) && pendingPostEventReview) {
+      setError(SOCIAL_REVIEW_BLOCKED_MESSAGE);
+      setSaving(false);
+      return;
+    }
 
     const body: Record<string, unknown> = {
       title: title.trim(),
@@ -704,6 +786,20 @@ function SocialPostModal({
         <h2 className="ap-h2">{post ? 'Editar publicació' : 'Nova publicació'}</h2>
 
         {error && <p className="rounded-lg border admin-tone-border-danger admin-tone-bg-danger px-3 py-2 text-sm admin-tone-text-danger">{error}</p>}
+        {pendingPostEventReview && (
+          <div className="rounded-lg border admin-tone-border-warning admin-tone-bg-warning px-3 py-2 text-sm admin-tone-text-warning">
+            <p className="m-0">
+              Revisió obligatòria: confirma consentiment, imatges i dades personals abans de programar o publicar.
+            </p>
+            <button
+              type="button"
+              onClick={() => setNotes((current) => resolvePostEventReviewNotes(current))}
+              className="mt-2 rounded border border-current px-2 py-1 text-xs font-semibold transition-colors hover:bg-[var(--raised)]"
+            >
+              Marcar revisió feta
+            </button>
+          </div>
+        )}
 
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wider opacity-70 mb-1">Títol *</label>

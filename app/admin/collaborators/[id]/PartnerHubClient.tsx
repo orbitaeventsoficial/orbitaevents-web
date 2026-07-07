@@ -101,6 +101,11 @@ export interface CollaboratorPayoutData {
 
 type TabKey = 'resum' | 'membres' | 'passa' | 'pasta' | 'cataleg' | 'economia' | 'notes';
 
+type PartnerHubMutationError = {
+  error?: string;
+  message?: string;
+};
+
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'resum', label: 'Resum' },
   { key: 'membres', label: 'Equip / membres' },
@@ -119,6 +124,11 @@ function Empty({ text }: { text: string }) {
   return <p className="ap-muted text-sm py-4">{text}</p>;
 }
 
+async function readPartnerHubMutationError(res: Response, fallback: string): Promise<string> {
+  const payload = (await res.json().catch(() => ({}))) as PartnerHubMutationError;
+  return payload.error || payload.message || fallback;
+}
+
 export default function PartnerHubClient({ data, payout }: { data: PartnerHubData; payout: CollaboratorPayoutData | null }) {
   const router = useRouter();
   const toast = useToast();
@@ -134,7 +144,7 @@ export default function PartnerHubClient({ data, payout }: { data: PartnerHubDat
     try {
       if (bolo.status === 'PAGAT' && bolo.paymentId) {
         const res = await fetchWithCsrf(`/api/admin/collaborators/${partner.id}/payments?paymentId=${encodeURIComponent(bolo.paymentId)}`, { method: 'DELETE' });
-        if (!res.ok) throw new Error('delete');
+        if (!res.ok) throw new Error(await readPartnerHubMutationError(res, "No s'ha pogut desfer el pagament."));
         toast.success('Pagament desfet.');
       } else {
         const res = await fetchWithCsrf(`/api/admin/collaborators/${partner.id}/payments`, {
@@ -147,13 +157,13 @@ export default function PartnerHubClient({ data, payout }: { data: PartnerHubDat
             method: 'CASH',
           }),
         });
-        if (!res.ok) throw new Error('pay');
+        if (!res.ok) throw new Error(await readPartnerHubMutationError(res, "No s'ha pogut marcar com a pagat."));
         toast.success('Marcat com a pagat (avui, cash).');
       }
       router.refresh();
     } catch (e) {
       console.error('[partner-payout] togglePayment', e);
-      toast.error('Error registrant el pagament.');
+      toast.error(e instanceof Error && e.message ? e.message : 'Error registrant el pagament.');
     } finally {
       setPayingId(null);
     }
@@ -168,13 +178,13 @@ export default function PartnerHubClient({ data, payout }: { data: PartnerHubDat
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newName.trim(), role: newRole }),
       });
-      if (!res.ok) throw new Error('No s\'ha pogut afegir');
+      if (!res.ok) throw new Error(await readPartnerHubMutationError(res, "No s'ha pogut afegir el membre."));
       setNewName(''); setNewRole('OTHER');
       toast.success('Membre afegit.');
       router.refresh();
     } catch (e) {
       console.error('[PartnerHub] addMember', e);
-      toast.error('Error afegint el membre.');
+      toast.error(e instanceof Error && e.message ? e.message : 'Error afegint el membre.');
     } finally {
       setAdding(false);
     }
@@ -187,24 +197,24 @@ export default function PartnerHubClient({ data, payout }: { data: PartnerHubDat
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isFavorite: !partner.isFavorite }),
       });
-      if (!res.ok) throw new Error('No s\'ha pogut desar');
+      if (!res.ok) throw new Error(await readPartnerHubMutationError(res, "No s'ha pogut desar el favorit."));
       toast.success(partner.isFavorite ? 'Tret de favorits.' : 'Marcat com a favorit. Sortirà als desplegables de reserva.');
       router.refresh();
     } catch (e) {
       console.error('[PartnerHub] toggleFavorite', e);
-      toast.error('Error desant el favorit.');
+      toast.error(e instanceof Error && e.message ? e.message : 'Error desant el favorit.');
     }
   }
 
   async function removeMember(memberId: string) {
     try {
       const res = await fetchWithCsrf(`/api/admin/collaborators/${partner.id}/members/${memberId}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('No s\'ha pogut eliminar');
+      if (!res.ok) throw new Error(await readPartnerHubMutationError(res, "No s'ha pogut eliminar el membre."));
       toast.success('Membre eliminat.');
       router.refresh();
     } catch (e) {
       console.error('[PartnerHub] removeMember', e);
-      toast.error('Error eliminant el membre.');
+      toast.error(e instanceof Error && e.message ? e.message : 'Error eliminant el membre.');
     }
   }
 

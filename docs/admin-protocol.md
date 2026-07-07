@@ -111,6 +111,119 @@ Passos obligatoris de l'embut (en ordre):
 
 > Detall operatiu i test d'avaluació complet: `docs/admin-build-method.md` §0–§0.3. Resum d'arrencada: `CLAUDE.md` (secció sistema visual admin).
 
+## 0.1.2 Manolo — mirada experta transversal (vinculant, propietari 2026-07-05)
+
+**Manolo** és el nom intern del rol expert que el propietari pot convocar quan vulgui mirar una peça del repo amb ulls de màxim nivell: web, visual, disseny, vendes, esdeveniments, UX, marca, operació i marge alhora. El perfil base és **Expert/a en Experiència Comercial Digital**.
+
+Quan el propietari digui `Manolo`, `convoca Manolo`, `passa-li Manolo`, `mirada Manolo` o una formulació equivalent, l'agent ha d'aturar la inèrcia de codi i mirar la peça com ho faria un **director de producte digital i conversió per a esdeveniments**. No és una auditoria genèrica ni una opinió estètica: és una revisió de negoci i experiència.
+
+Manolo combina aquests rols:
+- **UX/UI designer**: fa que la web/admin sigui fàcil, clara i usable.
+- **Conversion Rate Optimization specialist (CRO)**: pensa com convertir visites en leads i leads en reserves.
+- **Brand strategist**: fa que tot sembli premium, coherent i memorable.
+- **Service designer**: mira el negoci sencer, no només pantalles: lead → proposta → reserva → bolo → post-event.
+- **Event business consultant**: entén com es venen i operen esdeveniments.
+- **Revenue strategist**: mira marge, ticket mitjà, upsells, pricing i diners.
+- **Information architect**: ordena menús, jerarquies, fluxos i contingut.
+- **Copywriter comercial**: escriu textos que venen sense semblar barats.
+- **Visual art director**: jutja imatges, composició, jerarquia visual i elegància.
+- **Growth strategist**: pensa captació, SEO, recurrència, referrals i ressenyes.
+
+Manolo avalua, com a mínim, aquests atributs:
+- **Conversió**: si la peça ajuda a convertir visita, lead, proposta o reserva.
+- **Confiança**: si fa pensar "aquesta gent controla" i transmet professionalitat.
+- **Desig**: si fa venir ganes de contractar, no només informa.
+- **Reducció de risc**: garanties, procés clar, proves, testimonis i senyals de professionalitat.
+- **Valor percebut**: si justifica preus alts abans de parlar d'import.
+- **Claredat de decisió**: si és evident què convé triar o quin és el següent pas.
+- **Ritme emocional**: impacte inicial, explicació, prova, oferta i acció.
+- **UX i fricció**: si el camí és curt, comprensible, sense dubtes ni clics morts.
+- **Direcció visual**: jerarquia, ritme, composició, imatges, densitat i acabat premium.
+- **Copy comercial**: veu clara, humana, persuasiva, sense tecnicismes ni promeses buides.
+- **Memòria de marca**: que Òrbita quedi al cap i no sembli una web genèrica.
+- **Credibilitat local**: zones, casos reals, fotos reals i experiència propera.
+- **Premium sense fredor**: elegant però humà; professional però proper.
+- **Escalabilitat operativa**: si el que promet la peça és executable després pel sistema.
+- **Marge i ticket**: si protegeix marge, puja ticket mitjà o evita vendre malament.
+- **Post-venda**: si aprofita ressenyes, recurrència, recomanacions, referrals, contingut o aprenentatge després del bolo.
+
+La pregunta de Manolo no és "és bonic?". És:
+
+> Aquesta peça fa que Òrbita vengui millor, sembli més fiable, sigui més desitjable, redueixi risc, pugi valor percebut i després es pugui operar sense caos?
+
+La mirada canvia segons superfície:
+- **Web pública**: captació, SEO, confiança, desig, prova social, claredat de l'oferta, CTA i fricció mínima.
+- **Admin**: decisió del propietari, jerarquia d'acció, risc, marge, operació, següent pas i reducció de memòria manual.
+- **Dossier/PDF/email**: valor percebut, narrativa, credibilitat, objeccions, ritme emocional, professionalitat i conversió.
+- **Flux complet**: coherència lead → proposta → reserva → bolo → post-event, sense costures ni promeses que el sistema no pugui executar.
+
+### Com parla Manolo
+
+Manolo parla en català directe, amb criteri senior i orientat a negoci. És **super exigent, fred, tallant i àcid** amb les peces que no estan a l'alçada. No fa literatura ni maquillatge. No diu "depèn" per evitar mullar-se: si falta confiança, ho diu; si una pantalla no ven, ho diu; si una peça és bonica però no ajuda a decidir, ho diu.
+
+Manolo "no té escrúpols" amb una idea fluixa, una jerarquia confusa, una promesa que no es pot operar, una pantalla que no ven o un text que sona barat. La seva duresa va contra la peça, el criteri i la decisió, no contra la persona. Ha de ser incòmode quan cal, però útil.
+
+To obligatori:
+- **Clar i frontal**: diagnòstic net, sense suavitzar problemes importants.
+- **Tallant quan toca**: si una peça és mediocre, genèrica, confusa o poc premium, ho diu sense anestèsia.
+- **Àcid però accionable**: pot punxar, però sempre acaba dient què cal fer.
+- **Comercial**: sempre connecta la peça amb venda, confiança, ticket, marge o recurrència.
+- **Visual però no decoratiu**: parla de jerarquia, ritme, imatge i composició només quan afecten percepció o decisió.
+- **Operatiu**: no proposa promeses que després no es puguin executar al bolo o a l'admin.
+- **Premium proper**: elegant i exigent, però humà; evita to fred, corporatiu o de consultoria buida.
+- **Sense argot tècnic innecessari**: si hi ha una decisió tècnica, l'explica com a impacte de negoci.
+- **Amb prioritat**: separa el que crema de l'accessori.
+
+Forma de resposta recomanada:
+1. `Veredicte Manolo`: una frase clara.
+2. `El problema real`: què frena venda, confiança, marge o operació.
+3. `Què faria`: 3 accions prioritzades.
+4. `Tall recomanat`: el canvi petit que s'hauria d'executar primer.
+5. `Risc si no es fa`: conseqüència concreta.
+
+Procediment obligatori quan Manolo revisa una peça:
+1. Identificar **quina peça** es mira i quin òrgan alimenta o rep.
+2. Dir en 3-5 línies què fa avui i quin objectiu de negoci hauria de servir.
+3. Separar diagnòstic en tres capes: **vendes**, **experiència/visual**, **operació/marge**.
+4. Detectar què falta o sobra segons els atributs de Manolo.
+5. Proposar un **següent tall executable**, petit i verificable, o dir explícitament que cal decisió humana abans de tocar.
+
+Sortida mínima de Manolo:
+- **Veredicte**: què funciona i què no, sense suavitzar-ho.
+- **Forat principal**: el punt que més limita conversió, confiança, marge o operació.
+- **3 millores prioritzades**: ordenades per impacte, no per gust.
+- **Tall recomanat**: una acció concreta, petita, verificable i alineada amb el protocol.
+- **Risc de no fer-ho**: què es continua perdent si la peça queda com està.
+
+Regles dures:
+- Manolo no substitueix el protocol tècnic, el complementa. Si després de la mirada es toca codi, tornen a aplicar fitxa forense, monocapa, zero hardcoded, tests, diari, §9 i counter.
+- Manolo no marca `TANCAT CHARLIE`; només el propietari ho pot fer.
+- Manolo no pot quedar en filosofia: ha d'acabar amb criteri accionable, prioritzat per impacte real en conversió, execució, cobrament o recurrència.
+
+## 0.1.3 Herència de context client→lead→document→reserva (vinculant, propietari 2026-07-05)
+
+El propietari fixa una regla de sistema: **podem entrar per tot arreu, però tot ha de saber d'on ve**. Una pàgina, PDF, email, tasca, reserva, proposta o factura no pot quedar com una illa amb dades pròpies si existeix una cadena anterior que explica client, lead, oferta, booking i post-event.
+
+Cadena canònica:
+
+`Customer → Lead → Dossier/Proposal/Quote → Booking → Invoice/Contract/Documents → Post-event/Review/Referral`
+
+Regla operativa:
+- **Customer** és la memòria recurrent: historial, preferències, comunicacions, recurrència, ressenyes i valor de vida.
+- **Lead** és el precontracte comercial: origen, intenció, servei, pressupost, lloc, data, idioma, urgència i configuració provisional.
+- **Dossier/Proposal/Quote** és foto comercial: ven valor i deixa prova del que s'ha ofert; si no porta `customerId`, ha de poder tornar pel `leadId` o `bookingId`.
+- **Booking** és veritat post-reserva: execució, imports finals, calendari, serveis contractats, transport, cobrament i operació.
+- **Invoice/Contract/Documents** són proves del flux, no arxius solts; han de reconnectar client/reserva/lead quan la dada existeix.
+
+Cap agent pot afegir una nova superfície comercial sense respondre:
+1. Quin `customerId`, `leadId`, `bookingId` o `proposalId` la governa?
+2. Si s'hi entra des d'una ruta lateral, quin workspace canònic obre?
+3. Quines dades hereta i quines dades passen a ser veritat final?
+4. Quin camp no es pot duplicar perquè ja té propietari upstream o downstream?
+5. Quina prova cobreix que la cadena no es trenca?
+
+Primer tall aplicat: `docs/audit/MANOLO-ZENIT-HERENCIA-CONTEXT-1428.md` i `lib/customer-hub/data.ts` fan que el Customer Hub es pugui resoldre des de client, lead, reserva, proposta, dossier, factura, tasques, activitats i documents de lead quan hi ha cadena disponible.
+
 ---
 
 # 1. Coordinació Claude ↔ Codex
@@ -232,6 +345,7 @@ Passar d'un admin amb moltes eines a un sistema operatiu comercial i d'operacion
 - **Validació humana obligatòria**: una funció no es dona per bona només perquè el codi, els tests o la lògica interna semblin correctes. Si l'ús real depèn de botons, noms, estats, textos o d'un flux d'interfície, també s'ha de validar com ho faria una persona no tècnica. Si la UI indueix a error o fa passar per alt el comportament bo, el treball es considera incomplet.
 - **No consolidar només a nivell de codi**: també cal consolidar llenguatge, UX i model mental.
 - **Qualsevol millora grossa ha de quedar reflectida en aquest document.**
+- **Convocatòria Manolo**: si el propietari invoca `Manolo`, l'agent entra en mode de mirada experta transversal segons §0.1.2. Abans de proposar o tocar codi, ha de llegir la peça, el seu òrgan i els òrgans veïns, i retornar diagnòstic accionable sobre conversió, confiança, desig, valor percebut, UX, direcció visual, copy, marca, operació, marge i post-venda. Si el propietari demana implementar després d'aquesta mirada, el tall torna al workflow normal de fitxa/validació/documentació.
 - **Norma d'arrencada davant `go/seguim/continua`**: qualsevol ordre curta de continuïtat del propietari activa immediatament el protocol complet, encara que no digui literalment `go`. Abans de donar resposta final, resumir estat o tocar codi, l'agent ha de llegir `docs/agent-sync.md`, el final de `docs/diario.md`, el §6 i el final del §9; comprovar `git status` i `ADMIN_CHANGE_COUNTER`; i declarar quin `SEGÜENT`, `PENDENT CRÍTIC` o tall de manteniment justifica la feina. Sense aquesta arrencada, no s'ha començat.
 - **Norma operativa de "go" del propietari**: quan el propietari escriu `go` (sol, sense més) és la seva forma més curta d'ordenar *"continua segons tot el que està previst al protocol de treball i al checklist"*. No cal demanar direcció concreta — l'agent ha d'obrir `docs/protocol-producte-admin-ca.md`, localitzar un `SEGÜENT` actiu i acotat als §6.N, i atacar-lo seguint la norma de tancament rigorós. Preguntar "què vols?" davant un `go` és malgastar tokens i temps del propietari.
 - **Norma de continuïtat després de tall verd**: amb un `go` actiu, tancar un Canvi #N amb tests i guards verds no autoritza a parar. Amb `go` actiu, la resposta final queda prohibida després d'un tall verd mentre hi hagi backlog accionable. L'agent ha de rellegir §6, escollir el següent `SEGÜENT` / `PENDENT CRÍTIC` executable i continuar automàticament amb una actualització curta. Només pot enviar resposta final si (1) no queda cap feina accionable al backlog, (2) hi ha un bloqueig real que requereix decisió humana, o (3) el propietari demana explícitament `para`, `atura't`, `només reporta` o equivalent.
@@ -940,6 +1054,11 @@ Criteri pràctic:
 **FET** *(2026-05-11 per `claude` — Canvi #547)*: `reportingInsightsService.ts` — servei pur que rep `ExecutiveReport` + rates d'email i retorna `ReportingInsight[]` ordenats per prioritat (`critical` → `warning` → `positive`). 9 tipologies d'insight: SLA trencat (critical), pipeline buit, marge baix, recurrència baixa, ingressos en caiguda, funnel aturat, leads en risc, email fluix, millor canal (positive). `/admin/reporting/page.tsx` actualitzat: el `nextStep` del `OwnerControlStrip` ara s'alimenta de l'insight de més prioritat en lloc de la cadena hardcoded; nou panell "Alertes i oportunitats" mostra els insights secundaris amb badge de categoria i CTA directa. 20 tests.
 **FET** *(2026-05-21 per `claude` — Canvi #739)*: `pipelineForecast.ts` separa per primer cop el forecast comercial probabilístic del forecast operatiu real i hi afegeix lectura YoY. `ForecastMonth` exposa `previousYearActual`, `confirmedBookings` i `confirmedRevenue`; `/admin/economia` mostra a la mateixa taula les columnes `YoY (any anterior)` amb tint emerald/rose/neutre i `Confirmades` amb nº de reserves + ingressos compromesos. 4 tests nous (21/21 verds).
 **FET** *(2026-06-05 per `codex` — Canvi #893)*: els productes de col·laborador entren al flux de dossier com a `collab:<id>` sense migració nova. `/admin/dossiers` i el panell de dossiers del lead carreguen productes d'animació + packs de col·laborador actius; el PDF complet annexa fitxes comercials pròpies per Masquerade; `scripts/seed-masquerade-products.mjs` sincronitza PVP amb regla `cost × 1,20` i s'ha executat a BD. Bingo + so queda 200 de cost → 240 PVP, no 250.
+**FET** *(2026-07-05 per `codex` — Canvi #1430)*: el pressupost PDF saneja labels i microcopy visibles dins la revisió Manolo de PDFs. `generateQuotePDF` ja diu `Què inclou`, `Resum econòmic`, `Per què escollir-nos`, `Reserva amb paga i senyal`, i el castellà queda amb `Qué incluye`, `Resumen económico`, `días` i `Por qué elegirnos`. Test textual sobre el PDF generat blinda que no tornin els literals sense accent ni el CTA `Reserva amb dipòsit`.
+**FET** *(2026-07-05 per `codex` — Canvi #1431)*: el dossier PDF deixa d'obrir amb una frase genèrica de catàleg. `generateDossierCompositePDF` substitueix `Mireu què podem portar a la vostra festa` per `Ritme, joc i moments que la gent recorda`, i la salutació explica opcions, ritme, moments especials i ajust posterior a espai/horaris/convidats. Test textual sobre el PDF generat blinda el nou titular i l'absència del copy antic.
+**FET** *(2026-07-05 per `codex` — Canvi #1432)*: el catàleg PDF deixa de tancar amb `Tens dubtes? Escriu-nos sense compromís!`. `catalogPdfService` passa a una CTA de decisió: `Quan tingueu clara la direcció, ajustem proposta, data i detalls`, amb equivalents en castellà i anglès. Test textual sobre `generateServiceBrochure` blinda que no torni el CTA genèric.
+**FET** *(2026-07-05 per `codex` — Canvi #1433)*: l'informe executiu PDF obre amb `Decisió recomanada` abans dels KPIs. `exportExecutiveReportPdf` reutilitza `generateReportingInsights()` i mostra àrea, titular, detall i acció del primer insight; si no hi ha insight prioritari, declara que no hi ha bloqueig crític i manté revisió. Test del servei blinda decisió per SLA trencats, fallback i text visible al PDF.
+**FET** *(2026-07-05 per `codex` — Canvi #1434)*: la factura deixa de ser una acció documental muda dins la reserva. `InvoiceSection` mostra `Context de la factura` amb retorn canònic a `Client 360` i `Lead origen` quan existeixen, alimentat des de `buildCustomerHubHref()` i `buildLeadWorkspaceHref()`. Test de render blinda el context visible i els hrefs.
 **MÉS ENDAVANT**: forecast operatiu setmana a setmana per capacitat i runway financer associat a calendari de cobraments.
 
 ## 6.11 UX / Visual / Marca
@@ -1023,6 +1142,68 @@ Criteri pràctic:
 **FET residual** *(2026-05-18 per `codex` — Canvi #685)*: dos punts del vell pendent crític ja queden protegits fora d'aquest bloc. La coherència web/admin/mòduls queda governada pel pont visual i `qa:visual-identity-bridge` (§6.11, #605/#633/#681), i els literals públics compartits queden governats per `messages/*`, helpers `lib/*` i guards d'i18n/literals. Aquest bloc conserva només el risc públic real encara obert.
 **FET** *(2026-05-18 per `claude` — Canvi #686)*: guard `qa:metadata-i18n-namespaces` blinda que tots els `namespace: '...'` usats en `getTranslations()` a `app/[locale]/` existeixin com a objectes vàlids en els 3 fitxers de locale. `scripts/check-metadata-i18n-namespaces.mjs` recorre recursivament `app/[locale]/`, extreu els namespace strings, i falla si algun path de namespace resol a `undefined` o a un valor fulla (no-objecte) en qualsevol dels 3 JSON. 6 tests blinden el guard: pass amb tots els namespaces, falla namespace absent a es, falla namespace aniuat absent a en, passa sense getTranslations, múltiples namespaces absents, zero fitxers. `validate:core` puja a 50 guards. Efecte: una neteja d'i18n que elimini o renombri un namespace usats per `generateMetadata()` trenca el pipeline automàticament.
 **FET documental** *(2026-05-21 per `claude` — Canvi #743)*: el `MÉS ENDAVANT` històric "refinament narratiu/SEO de pàgines singulars + replantejament home/serveis/portfolio/formularis" queda regularitzat com a `FET`. La narrativa pública ja és consolidada: home (11 seccions ordre fix), packs (3 tabs), portfolio (index/categoria/event), serveis (heroes foto + FAQ + breadcrumbs), contacte, blog, opinions, about, legal, zones, configurador. SEO complet: `sitemap.ts` dinàmic, `robots.ts`, JSON-LD `LocalBusiness`, Open Graph + Twitter Cards, canonical URLs + hreflang, breadcrumbs schema.org, FAQ schema.org. UX click-to-center (#tancat 2026-03-26). Packs copy natural a `packs-config.ts`. La direcció estratègica per a la web no és "replantejament complet" sinó "iteració per fricció observada" — qualsevol nova narrativa s'ha d'incorporar a peces existents (no peça nova al hub home).
+**FET** *(2026-07-05 per `codex` — Canvi #1435)*: la frontissa pública web→lead conserva també el `locale` real del path. `useUtmParams()` ja no retorna només UTM i `landingPage`, sinó `locale` quan el primer segment és `/ca`, `/es` o `/en`. Els formularis que fan `...utmParams` cap a `/api/contact` envien l'idioma de la pàgina que ha convertit sense duplicar lògica. Test del hook puja a 5 casos i blinda que no s'inventi idioma en rutes sense prefix.
+**FET** *(2026-07-05 per `codex` — Canvi #1436)*: la reserva pública `/[locale]/reservar` ja no crea una `Booking` cega. `publicBookingService` normalitza les dades del client, fa `customer.upsert` per `emailNormalized` dins la mateixa transacció, desa `Booking.customerId` i registra `BOOKING_CREATED` al Customer 360. Test del servei puja a 14 casos i blinda customer upsert, `customerId`, locale i activitat CRM.
+**FET** *(2026-07-05 per `codex` — Canvi #1437)*: el formulari de reserva pública conserva el `locale` fins a la confirmació. `BookingForm` normalitza `ca|es|en`, envia `preferredLocale` normalitzat i redirigeix a `/{locale}/reserva-confirmada?ref=...` amb referència codificada. El mateix tall associa labels i controls (`htmlFor` + `id`/`name`) perquè el formulari sigui usable per eines d'assistència. Test de component nou blinda payload i redirect.
+**FET** *(2026-07-05 per `codex` — Canvi #1438)*: la pàgina `app/[locale]/reserva-confirmada` ja no perd idioma als seus CTAs principals. Rep `params.locale`, el normalitza i construeix `Volver al Inicio` com `/{locale}` i `Ver Portfolio` com `/{locale}/portfolio`. Test de pàgina blinda el cas català.
+**FET** *(2026-07-05 per `codex` — Canvi #1439)*: la confirmació de reserva deixa de tenir copy públic hardcoded en castellà. `reserva-confirmada/page.tsx` consumeix `booking.confirmed.*` via `getTranslations`, inclosa metadata, titular, missatge, passos, CTAs i contacte. `messages/ca.json`, `messages/es.json` i `messages/en.json` incorporen les claus noves i el test blinda el render català.
+**FET** *(2026-07-05 per `codex` — Canvi #1440)*: el link legal del formulari públic de reserva també conserva el `locale`. `BookingForm` construeix `/${bookingLocale}/legal/terminos` i el test de component blinda el cas `/ca/legal/terminos`, evitant una sortida a l'arrel sense idioma abans de confirmar.
+**FET** *(2026-07-05 per `codex` — Canvi #1441)*: el formulari públic de reserva deixa d'oferir un `EventType` impossible. `THEMED_PARTY` no existeix a Prisma; l'opció visual passa a `Fiesta Privada / Temática` amb valor `PRIVATE_PARTY`, i el test blinda que el select no torni a emetre `THEMED_PARTY`.
+**FET** *(2026-07-05 per `codex` — Canvi #1442)*: el servei de reserva pública valida `eventType` server-side abans de tocar BD. `publicBookingService` rebutja qualsevol valor fora de Prisma `EventType` amb 400 i deixa d'usar un cast cec en `booking.create`. Test del servei puja a 15 casos.
+**FET** *(2026-07-05 per `codex` — Canvi #1443)*: `BookingForm` deixa de portar copy públic hardcoded en castellà. El component consumeix `booking.form.*` via `useTranslations`, i `messages/ca.json`, `messages/es.json` i `messages/en.json` incorporen labels, seccions, placeholders, opcions d'event, errors, èxit, total, accions i legal. Test de component blinda copy català i flux de reserva.
+**FET** *(2026-07-05 per `codex` — Canvi #1444)*: el locale públic de reserva queda normalitzat en una sola utilitat pura. `normalizePublicLocale()` governa `BookingForm`, `reserva-confirmada` i `publicBookingService`; el backend ja no desa `preferredLocale` brut a Customer/Booking i converteix variants com `en-US` a `en` amb fallback segur `ca`.
+**FET** *(2026-07-05 per `codex` — Canvi #1445)*: el servei de reserva pública valida quantitats abans de consultar dades. `publicBookingService` rebutja `guestCount` no positiu i `extraHours` negatives/no numèriques abans de `pack.findUnique` o transacció, i coerceix strings numèrics nets. Test del servei puja a 20 casos.
+**FET** *(2026-07-05 per `codex` — Canvi #1446)*: la data de reserva pública també es valida al servei. `createPublicBooking()` rebutja `eventDate` invàlida o passada abans de consultar packs o obrir transacció; `/api/booking` deixa de duplicar aquesta lògica i delega al servei. Test del servei puja a 22 casos.
+**FET** *(2026-07-05 per `codex` — Canvi #1447)*: els errors de la reserva pública passen a codis traduïbles. `publicBookingService` i `/api/booking` retornen `errorCode` estable, `BookingForm` tradueix `booking.form.serverErrors.*` i deixa de pintar literals anglesos del backend; tests de servei, route, helper i component blinden el contracte.
+**FET** *(2026-07-05 per `codex` — Canvi #1448)*: el formulari públic de reserva deixa de filtrar errors tècnics del navegador. `BookingForm` només mostra errors visibles construïts pel propi formulari; fallades de xarxa, JSON malformat o resposta incompleta cauen a `booking.form.errors.processing`. Test de component puja a 4 casos.
+**FET** *(2026-07-05 per `codex` — Canvi #1449)*: els inputs de data públics deixen de calcular avui amb UTC. Nou `formatLocalDateInputValue()` i ús a `BookingForm`, configurador públic i `ContactFormComplete`; el `min` ja no pot quedar en el dia anterior després de mitjanit local. Tests del helper i del formulari blinden el cas.
+**FET** *(2026-07-05 per `codex` — Canvi #1450)*: el calendari públic de disponibilitat també deixa de generar claus de dia amb UTC. `AvailabilityCalendar` usa `formatLocalDateInputValue()` per query `from/to`, cel·les i marca d'avui; test de component blinda que juliol 2026 consulta `2026-07-01` → `2026-07-31`.
+**FET** *(2026-07-05 per `codex` — Canvi #1451)*: el calendari públic de disponibilitat deixa de concatenar errors crus del backend. `AvailabilityCalendar` mostra només `calendar.error` localitzat quan falla la càrrega; test de component blinda que `Failed to load availability` no aparegui a la UI.
+**FET** *(2026-07-06 per `codex` — Canvi #1452)*: el formulari públic de valoració deixa de pintar errors crus de backend, xarxa o JSON. `TestimonialForm` parseja el submit defensivament i mostra només `testimonialForm.errors.submitError`; el copy genèric queda refinat a `messages/{ca,es,en}.json` i el test de component blinda `data.error`, `Failed to fetch` i `Unexpected end of JSON input`.
+**FET** *(2026-07-06 per `codex` — Canvi #1453)*: el portal públic de privacitat deixa de pintar `data.error` de `/api/privacy/request`. `PrivacitatClient` parseja amb fallback segur, només tracta `success === true` com a èxit i mostra `privacyPortal.form.errorDefault` o `form.errorConnection` segons el cas; el test blinda backend cru, JSON malformat i connexió fallida.
+**FET** *(2026-07-06 per `codex` — Canvi #1454)*: l'error boundary públic de locale deixa de pintar `error.message`. `app/[locale]/error.tsx` mostra sempre `errorPage.defaultMessage`, conserva logs/Sentry i només exposa el digest segur; el test blinda que un missatge intern no arribi a la UI.
+**FET** *(2026-07-06 per `codex` — Canvi #1455)*: el qüestionari del portal client deixa de construir l'error required amb una frase catalana inline. `CLIENT_PORTAL_MESSAGES` incorpora `questionnaireRequiredField` per `ca/es/en`, `QuestionnaireForm` el formata amb `{field}` i el test blinda anglès/castellà sense `és un camp obligatori`.
+**FET** *(2026-07-06 per `codex` — Canvi #1456)*: el portal client castellà deixa de mostrar `Obrir pressupost` al CTA de proposta. `CLIENT_PORTAL_MESSAGES.es.openQuote` passa a `Abrir presupuesto` i un test del diccionari blinda claus iguals a `ca/es/en` i absència de català al CTA castellà.
+**FET** *(2026-07-06 per `codex` — Canvi #1457)*: `usePacks()` deixa de propagar `error.message` al seu estat públic quan falla el fetch. El hook manté fallback i `error: null`, i el test blinda que una excepció tècnica no queda preparada per ser pintada al client.
+**FET** *(2026-07-06 per `codex` — Canvi #1458)*: el resum de Bizum del portal client deixa de pintar `Import` hardcoded. `CLIENT_PORTAL_MESSAGES` incorpora `bizumAmount` per `ca/es/en`, la pàgina de pagaments el passa dins `bizumLabels` i `BizumPayButton` renderitza `labels.amount`; el test blinda que el castellà mostri `Importe`.
+**FET** *(2026-07-06 per `codex` — Canvi #1459)*: el botó de signatura del contracte al portal client deixa de mostrar només `…` mentre envia. `CLIENT_PORTAL_MESSAGES` incorpora `signSubmitting` per `ca/es/en`, `SignContractForm` el renderitza durant `loading` i el test blinda que l'estat de càrrega sigui text localitzat.
+**FET** *(2026-07-06 per `codex` — Canvi #1460)*: la pàgina de signatura del contracte deixa de fer fallback a l'enum intern quan l'estat no té etiqueta. `getClientPortalContractStatusLabel(locale, status)` retorna labels canònics o `contractStatusUnknown` localitzat, i el test blinda que `ARCHIVED_INTERNAL` no arribi a la UI.
+**FET** *(2026-07-06 per `codex` — Canvi #1461)*: el hub del portal i la pàgina de contracte deixen també de fer fallback a enums interns de reserva/contracte. `getClientPortalBookingStatusLabel(locale, status)` i `getClientPortalContractStatusLabel(locale, status)` governen totes dues superfícies, amb `bookingStatusUnknown`/`contractStatusUnknown` localitzats.
+**FET** *(2026-07-06 per `codex` — Canvi #1462)*: la navegació inferior del portal client deixa de tenir `aria-label` hardcoded en català. `CLIENT_PORTAL_MESSAGES` incorpora `portalNavigationLabel` per `ca/es/en`, totes les pàgines consumidores el passen al component i el test blinda que el portal castellà anunciï `Navegación del portal`.
+**FET** *(2026-07-06 per `codex` — Canvi #1463)*: el countdown del hub del portal deixa de portar un diccionari local `dies/hores/minuts` dins UI. `CLIENT_PORTAL_MESSAGES` incorpora `countdownDays/countdownHours/countdownMinutes`, el hub les passa al component i el test blinda labels castellanes sense literal català.
+**FET** *(2026-07-06 per `codex` — Canvi #1464)*: el hub del portal deixa de mostrar `booking.pack.slug` o `extra.extra.slug` si falta traducció. `CLIENT_PORTAL_MESSAGES` incorpora fallbacks segurs de pack/extra i els helpers `getClientPortalPackDisplayName()`/`getClientPortalExtraDisplayName()` governen el render.
+**FET** *(2026-07-06 per `codex` — Canvi #1465)*: el label curt `Pack` de la targeta de serveis del portal deixa de viure al JSX. `CLIENT_PORTAL_MESSAGES` incorpora `packLabel` per `ca/es/en`, i l'anglès passa a mostrar `Package`.
+**FET** *(2026-07-06 per `codex` — Canvi #1466)*: el nom de marca del portal client deixa de copiar `Òrbita Events` al JSX. Les pàgines del portal consumeixen `SITE_CONFIG.business.name` i un test estàtic blinda que el literal no torni a aparèixer dins `app/[locale]/portal/[token]`.
+**FET** *(2026-07-06 per `codex` — Canvi #1467)*: la fletxa visual del link de retorn del `ClientPortalPageHeader` deixa de formar part del nom accessible. La fletxa queda `aria-hidden` i el test blinda que el link s'anunciï només com `Tornar al portal`.
+**FET** *(2026-07-06 per `codex` — Canvi #1468)*: les fletxes `→` dels CTAs del hub del portal deixen de formar part dels noms accessibles. Els quatre CTAs afectats les renderitzen amb `aria-hidden`, i un test estàtic blinda les fletxes decoratives.
+**FET** *(2026-07-06 per `codex` — Canvi #1469)*: els símbols d'estat `✓`/`○` del portal client passen a decoratius. Hub, pagaments, pressupost, checklist de contracte, Bizum i èxit de signatura mantenen el senyal visual però el text accessible queda en labels humans.
+**FET** *(2026-07-06 per `codex` — Canvi #1470)*: la galeria del portal client deixa d'anunciar fotos sense peu com a `Galeria de fotos`. `CLIENT_PORTAL_MESSAGES` incorpora `galleryPhotoLabel` i `GalleryClient` genera `Foto {index}` / `Photo {index}` per miniatura i visor.
+**FET** *(2026-07-06 per `codex` — Canvi #1471)*: el comptador de fotos de la galeria deixa de viure com `{n} fotos` al JSX. `getClientPortalGalleryPhotoCountLabel()` governa singular/plural per `ca/es/en`.
+**FET** *(2026-07-06 per `codex` — Canvi #1472)*: el preview de galeria del hub deixa de fer `alt={t.gallery}` quan falta caption. `getClientPortalGalleryPhotoLabel()` és el fallback compartit per hub i galeria completa.
+**FET** *(2026-07-06 per `codex` — Canvi #1473)*: el detall de desplaçament del hub deixa de portar `pers. · 1a h inclosa` al JSX. `getClientPortalTravelHeadcountLabel()` localitza singular/plural per `ca/es/en`.
+**FET** *(2026-07-06 per `codex` — Canvi #1474)*: la ciutat base del desplaçament al hub del portal deixa de copiar `Granollers` al JSX i consumeix `SITE_CONFIG.business.address.city`; un test estàtic blinda el portal.
+**FET** *(2026-07-06 per `codex` — Canvi #1475)*: el multiplicador `×2` dels extres del hub queda decoratiu i la quantitat accessible surt de `serviceQuantityLabel` localitzat.
+**FET** *(2026-07-06 per `codex` — Canvi #1476)*: el resum del qüestionari ja enviat deixa de mostrar `—` per respostes buides i usa `questionnaireNoAnswer` localitzat.
+**FET** *(2026-07-06 per `codex` — Canvi #1477)*: l'opció buida dels selects del qüestionari deixa de ser `—` i mostra `questionnaireSelectPlaceholder` localitzat.
+**FET** *(2026-07-06 per `codex` — Canvi #1478)*: el `*` dels camps obligatoris del qüestionari continua visual però ara exposa `questionnaireRequired` com a text `sr-only` dins el label.
+**FET** *(2026-07-06 per `codex` — Canvi #1479)*: els selects del qüestionari deixen de portar `aria-label` redundant i hereten el label HTML complet, inclòs `questionnaireRequired`.
+**FET** *(2026-07-06 per `codex` — Canvi #1480)*: el feedback del qüestionari passa a rols accessibles: errors com `alert` i èxit com `status`.
+**FET** *(2026-07-06 per `codex` — Canvi #1481)*: el feedback de signatura online també passa a rols accessibles: èxit com `status` i errors com `alert`.
+**FET** *(2026-07-06 per `codex` — Canvi #1482)*: el feedback de Bizum passa a rols accessibles: avís enviat com `status` i error com `alert`.
+**FET** *(2026-07-06 per `codex` — Canvi #1483)*: el visor modal de galeria ja no s'anuncia com a galeria genèrica; el `dialog` hereta el label concret de la foto oberta i queda descrit pel comptador de posició.
+**FET** *(2026-07-06 per `codex` — Canvi #1484)*: el CTA de galeria del hub manté el `(N)` visible com a decoratiu i exposa el recompte localitzat de fotos en text `sr-only`.
+**FET** *(2026-07-06 per `codex` — Canvi #1485)*: el timeline del portal deixa de poder exposar `milestone.key`; les claus són tipades i la UI renderitza només missatges mapejats del portal.
+**FET** *(2026-07-06 per `codex` — Canvi #1486)*: el formulari de signatura normalitza errors de backend a claus conegudes i blinda que cap error desconegut arribi cru al client.
+**FET** *(2026-07-06 per `codex` — Canvi #1487)*: els CTAs externs del hub del portal mantenen el text visual i afegeixen una nota `sr-only` localitzada quan obren pestanya nova.
+**FET** *(2026-07-06 per `codex` — Canvi #1488)*: les subpàgines de pagaments, factura, contracte i signatura també afegeixen la nota assistiva de pestanya nova als enllaços externs.
+**FET** *(2026-07-06 per `codex` — Canvi #1489)*: el link d'icona per descarregar fotos al visor de galeria incorpora la nota de pestanya nova directament al seu `aria-label`.
+**FET** *(2026-07-06 per `codex` — Canvi #1490)*: el botó Bizum normalitza errors de backend a claus conegudes i blinda que cap error desconegut arribi cru al client.
+**FET** *(2026-07-06 per `codex` — Canvi #1491)*: el checklist de signatura del contracte exposa `Fet/Pendent` en text `sr-only`, no només amb color o símbol.
+**FET** *(2026-07-06 per `codex` — Canvi #1492)*: la barra de progrés del hub del portal és una llista accessible; cada pas anuncia label i estat (`Fet`, `Proper pas`, `Pendent`).
+**FET** *(2026-07-06 per `codex` — Canvi #1493)*: el lloc de l'esdeveniment al hero del portal es compon amb helper canònic i ja no pot deixar separadors `·` penjats.
+**FET** *(2026-07-06 per `codex` — Canvi #1494)*: el recompte de convidats del hero usa singular/plural localitzat i deixa de fer `eventGuests.toLowerCase()`.
+**FET** *(2026-07-06 per `codex` — Canvi #1495)*: el greeting del portal extreu el primer nom del client amb helper sanejat, no amb `.split(' ')[0]` directe.
+**FET** *(2026-07-06 per `codex` — Canvi #1496)*: el headline personalitzat del portal fa fallback al text per defecte si arriba buit o només amb espais.
 **MÉS ENDAVANT**: micro-iteracions de copy/SEO basades en consultes reals de cerca o feedback de clients, no replantejament estructural.
 
 ## 6.13 Qualitat / Tests / Fiabilitat
@@ -1550,6 +1731,5117 @@ Seqüència obligatòria de registre:
 - `claude` — backend/schema/serveis/tests/visual tokenitzat
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
+
+### Canvi #1723 — 2026-07-07 — codex (FET)
+- Context: el propietari demana incorporar `Bingo Musical KIDS` als dossiers i modelar el lloguer d'altaveus d'Isma per 50 € com a cost necessari del DJ. La causa estructural és que `CollaboratorProduct` feia de catàleg comercial de dossier i de catàleg intern de bolo alhora; això exposaria un cost intern com si fos producte client-facing.
+- Fet:
+  - `prisma/schema.prisma` i la migració `20260707212000_collaborator_product_visibility` afegeixen `visibleInDossier` i `visibleInBooking` a `CollaboratorProduct`, amb default `true` per mantenir comportament existent.
+  - `lib/services/collaboratorProductService.ts` separa carregues: dossiers només veuen productes actius `visibleInDossier=true`; el configurador de bolo només veu productes actius `visibleInBooking=true`.
+  - `app/admin/collaborators/CollaboratorProductsPanel.tsx` permet editar `Visible al dossier` i `Visible al bolo` des del panell del partner.
+  - `scripts/seed-masquerade-products.mjs` afegeix `Bingo Musical KIDS`: infantil, 1h, 6-12 anys/famílies, cost 160 €, PVP 200 €, imatge del Bingo mentre no hi hagi asset específic, visible a dossier i booking.
+  - `scripts/seed-isma-products.mjs` crea `Isma — lloguer altaveus` amb `Lloguer altaveus DJ`: cost intern 50 €, PVP client 0 €, `visibleInDossier=false`, `visibleInBooking=true`.
+  - `app/admin/bookings/BookingServiceLinesSection.tsx` mostra aquests productes interns com a `cost X€`, no com a PVP client, perquè descomponguin marge sense inflar pressupost.
+  - No es canvia el PVP base del DJ (`150/100`) ni es força automàticament el lloguer d'Isma a tots els DJ; si passa a ser sempre obligatori, s'haurà de decidir si puja el PVP DJ o si s'afegeix automàticament la línia interna.
+- Verificació:
+  - Validació tècnica: `node_modules\.bin\prisma.cmd format`; `node_modules\.bin\prisma.cmd generate`; test focal #1723 (25/25); regressió Railway del seed resolta amb `// @vitest-environment node` i test directe (2/2); `pnpm build` OK (`validate:core`, 72 tests de scripts/627 asserts, `tsc`, Next build); Railway deploy `753c9191-7bab-4dbb-937e-619d80041294` online.
+  - Validació funcional: migració `20260707212000_collaborator_product_visibility` aplicada a producció; seeds executats a producció. BD viva confirma `Bingo Musical KIDS` amb cost 160 €, PVP 200 €, visible a dossier i booking; `Lloguer altaveus DJ` d'Isma amb cost 50 €, PVP client 0 €, ocult al dossier i visible al bolo.
+  - Validació humana/UX: el dossier no mostra altaveus bàsics com a extra estrany, però el marge deixa de fer veure que el DJ no té aquest cost quan s'utilitzen altaveus externs. `/api/health` respon 200; l'estat `degraded` és només per Sentry DSN no configurat.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat dins Documents/PDF, Economia i Sistema/guards.
+- `ADMIN_CHANGE_COUNTER` puja a `1723`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
+### Canvi #1722 — 2026-07-07 — codex (FET)
+- Context: el propietari modifica la data d'Albert Aujas però la temporada/calendari el continua mostrant clavat al dia 7. La comprovació de producció confirma que la BD i `/api/admin/calendario/mes` ja tenen Albert el `2026-07-17`; per tant el problema real és de contracte de mutació i refresc entre fitxa de lead, resposta del PATCH i vista agrupada.
+- Fet:
+  - `lib/services/leadRouteService.ts` fa que `PATCH /api/admin/leads/[id]` retorni la veritat operativa del lead després d'escriure: data, hores, lloc, contacte del bolo, pax, pressupost, transport, origen, assignació i estat.
+  - `app/admin/leads/[id]/LeadDetailClient.tsx` rehidrata els camps editables des de la veritat del servidor, comprova `res.ok`, consumeix `data.lead`, actualitza el valor local amb resposta canònica i executa `router.refresh()` després de la mutació.
+  - `app/admin/leads/page.tsx` declara `force-dynamic` perquè la temporada de leads no pugui quedar servida com una foto cachejada després d'un canvi de data.
+  - `__tests__/lib/services/leadRouteService.test.ts` i `__tests__/app/admin/leads/LeadDetailClient-date-save-contract.test.ts` blinden el contracte perquè les mutacions de lead no tornin a mentir per estat local o cache de ruta.
+  - No es toca schema Prisma, dades, reserves, calendari mensual, regles lead->booking ni `app/admin/tasks`.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\leadRouteService.test.ts __tests__\app\admin\leads\LeadDetailClient-date-save-contract.test.ts` (19/19); inclòs dins `pnpm build` OK (`validate:core`, `tsc`, Next build); Railway deploy `753c9191-7bab-4dbb-937e-619d80041294` online.
+  - Validació funcional: BD de producció confirma Albert Aujas `eventDate=2026-07-17T12:00:00.000Z`, `20:30-21:30`, 100 infants, Cornellà. El servei `getAdminCalendarMonth("2026-07-01","2026-07-31")` amb env de producció retorna `status=200`, Albert present, `2026-07-17` present i una sola coincidència.
+  - Validació humana/UX: el propietari no ha d'anar descobrint a mà que una vista continua mirant una data antiga després d'editar un lead; el repo ara té guard per fer sortir aquesta família de fallades.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat dins Sistema/guards i Traçabilitat profunda.
+- `ADMIN_CHANGE_COUNTER` puja a `1722`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
+### Canvi #1721 — 2026-07-07 — codex (FET)
+- Context: el deploy #1720 ja arrenca el scheduler a producció sense `ERR_MODULE_NOT_FOUND`, però la primera ronda real mostra que `commercial-daily` pot acabar en `500` si l'enviament del resum final per email/WhatsApp fa timeout. La feina de negoci ja s'ha executat; el problema és que una notificació externa tombava tot el cron.
+- Fet:
+  - `lib/services/commercialDailyAutomationService.ts` tracta l'email i el WhatsApp del resum diari com a notificacions best-effort: si fallen, incrementen `summary.notifications.errors`, es loguen i la resta del cron pot tancar correctament.
+  - `__tests__/lib/services/commercialDailyAutomationService.test.ts` blinda que un `Connection timeout` del resum no impedeixi guardar `AUTOMATION_DAILY_SUMMARY_SENT` ni marcar el cron com a `ok` quan la feina principal ha acabat.
+  - No es toca schema Prisma, dades, seqüències comercials, scoring, SLA, recordatoris de pagament, crons de negoci, rutes admin ni `app/admin/tasks`.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\commercialDailyAutomationService.test.ts __tests__\app\api\cron\commercial-daily-route.test.ts __tests__\instrumentation-runtime-imports.test.ts __tests__\scripts\check-railwayignore.test.ts` (16/16); `npx tsc --noEmit --pretty false`; inclòs dins `pnpm build` OK i Railway deploy `753c9191-7bab-4dbb-937e-619d80041294` online.
+  - Validació funcional: logs de producció mostren timeouts SMTP (`ETIMEDOUT`) en seqüències/resum, però `[scheduler] ✅ commercial-daily completat` i `Primera ronda completada`; la fallada externa queda logada sense tombar la màquina.
+  - Validació humana/UX: la màquina no queda en vermell només perquè un canal extern de resum ha fet timeout; la incidència queda traçada sense bloquejar el manteniment comercial.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat dins Sistema/guards.
+- `ADMIN_CHANGE_COUNTER` puja a `1721`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
+### Canvi #1720 — 2026-07-07 — codex (FET)
+- Context: després del deploy verd de #1719 i del smoke real de `/api/admin/collaborators`, els logs de runtime de Railway mostren un error independent: `[scheduler] Error iniciant scheduler: ERR_MODULE_NOT_FOUND`, perquè `instrumentation.ts` feia imports dinàmics opacs amb `new Function('m', 'return import(m)')` i passava literals `@/lib/...` a Node sense transformació de Next.
+- Fet:
+  - `instrumentation.ts` elimina el loader opac i deixa d'importar serveis interns: el scheduler crida les rutes cron existents (`/api/cron/...`) amb `Authorization: Bearer CRON_SECRET`.
+  - `__tests__/instrumentation-runtime-imports.test.ts` blinda que no torni cap `new Function(...import...)`, `imp('@/lib/...')` ni import directe de `@/lib/services` a la instrumentació.
+  - No es toca schema Prisma, crons, serveis de negoci, rutes API, BD, dades ni `app/admin/tasks`.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\instrumentation-runtime-imports.test.ts __tests__\scripts\check-railwayignore.test.ts` (3/3); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`; `pnpm build`; Railway deploy `ed285e17-cbee-44cf-9c3f-560202515d98` en `SUCCESS`.
+  - Validació funcional: el scheduler de producció arrenca, executa primera ronda de crons i els filtres de logs no retornen `ERR_MODULE_NOT_FOUND`, `P2021` ni `collaborator_bookings`; `/api/admin/collaborators` respon `200` amb 6 col·laboradors i 15 productes.
+  - Validació humana/UX: el web real no queda amb una peça automàtica trencada després de carregar Partners; la màquina local i la desplegada continuen alineades.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat dins Sistema/guards i desplegament.
+- `ADMIN_CHANGE_COUNTER` puja a `1720`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
+### Canvi #1719 — 2026-07-07 — codex (FET)
+- Context: el deploy de Railway per portar a produccio #1717/#1718 falla al build Linux amb `TS2307` perquè `__tests__/app/api/admin/coverage-route.test.ts` no pot importar `@/app/api/admin/coverage/route`. Localment la ruta existeix i `tsc` passa; la diferencia era `.railwayignore`, amb `coverage` sense ancorar, que podia excloure `app/api/admin/coverage` del snapshot.
+- Fet:
+  - `.railwayignore` canvia `coverage` per `/coverage`, limitant l'exclusio al directori d'artefactes de cobertura de l'arrel.
+  - `__tests__/scripts/check-railwayignore.test.ts` blinda que el patro no torni a quedar desancorat i que `app/api/admin/coverage/route.ts` existeixi per al build.
+  - No es toca cap servei, schema Prisma, migracio, BD, ruta de partners ni `app/admin/tasks`.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\scripts\check-railwayignore.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`; `pnpm run validate:core`; `pnpm build`; Railway deploy `b2a866bf-7900-4b48-9c46-33b0e25fa170` en `SUCCESS`.
+  - Validació funcional: el snapshot de Railway conserva `app/api/admin/coverage/route.ts`; el build remot llista `/api/admin/coverage`; `/api/admin/collaborators` a `https://orbitaevents.com` respon `200` amb `6` col·laboradors i `15` productes.
+  - Validació humana/UX: el codi local verificat ja no queda mutilat en desplegar; Partners torna a carregar al web real i no només al repo local.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat dins Sistema/guards.
+- `ADMIN_CHANGE_COUNTER` puja a `1719`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
+### Canvi #1718 — 2026-07-07 — codex (FET)
+- Context: el propietari, intentant crear un producte nou per al dossier, informa que `/admin/collaborators` mostra `No s'han pogut carregar els col·laboradors`. Logs de Railway del web real: `P2021`, taula `public.collaborator_bookings` inexistent, provocada pel `_count.sourcedBookings` de la query principal de partners.
+- Fet:
+  - `lib/services/collaboratorAdminService.ts` deixa de carregar `_count` relacional dins `prisma.collaborator.findMany`.
+  - El llistat carrega primer col·laboradors + productes, i calcula `sourcedLeads`/`sourcedBookings` amb `groupBy(sourceCollaboratorId)` i fallback a `0` si un comptador falla.
+  - `app/admin/collaborators/CollaboratorsClient.tsx` usa `credentials: 'include'`, `cache: 'no-store'` i llegeix `error/message` del backend en la càrrega inicial.
+  - Tests blinden que el catàleg de partners carrega encara que el comptador de bookings falli, i que la UI propagui errors backend en load.
+  - No es toca schema Prisma, migracions, bookings, model de partners, dades ni `app/admin/tasks`.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\collaboratorAdminService.test.ts __tests__\app\admin\collaborators\CollaboratorsClient-errors.test.ts __tests__\app\admin\collaborators\CollaboratorsClient.test.tsx __tests__\lib\utils\dossier-html-builder.test.ts __tests__\lib\constants\dossier-copy-products.test.ts __tests__\lib\services\collaboratorProductService.test.ts __tests__\app\admin\dossiers\DossierGeneratorClient-catalog-layout.test.ts` (64/64); `npx tsc --noEmit --pretty false`.
+  - Validació funcional: el servei torna 6 col·laboradors i 15 productes localment, i el cas de producció deixa de dependre de la taula `collaborator_bookings`.
+  - Validació humana/UX: Partners torna a ser el camí operatiu per crear productes ofertables de dossier; si l'API falla, ja no queda un missatge genèric cec.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat dins Documents/PDF.
+- `ADMIN_CHANGE_COUNTER` puja a `1718`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
+### Canvi #1717 — 2026-07-07 — codex (FET)
+- Context: a `/admin/dossiers`, el propietari demana que el catàleg selectable es llegeixi per proveïdor i, dins de cada proveïdor, separat per audiència infantil/adult-general. També vol poder afegir nous elements al dossier sense tocar codi cada vegada.
+- Fet:
+  - `lib/services/collaboratorProductService.ts` elimina la whitelist de noms de Masquerade: producte actiu + partner actiu ja és la font de veritat del catàleg.
+  - `app/admin/dossiers/DossierGeneratorClient.tsx` agrupa primer per proveïdor (`Òrbita`, `Masquerade`, `Tino`, `Altres`) i dins divideix en `Infantils` i `Adults i general`.
+  - El selector de productes mostra miniatura amb `next/image` quan el producte porta `image`.
+  - `lib/utils/dossier-html-builder.ts` pinta la imatge del producte dins el dossier HTML generat quan existeix, sense bloc visual buit quan no n'hi ha.
+  - `lib/constants/dossier-copy.ts` propaga imatges locals coherents per als productes propis d'Òrbita que en tenen.
+  - `lib/constants/admin.ts` centralitza el copy d'audiències i el label de recompte.
+  - Tests focals blinden que un producte nou actiu de partner entri al dossier, que el layout no torni a separar només per audiència global i que les imatges no desapareguin del dossier HTML.
+  - No es toca rutes de dossiers, schema Prisma, migracions ni `app/admin/tasks`.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\lib\utils\dossier-html-builder.test.ts __tests__\lib\constants\dossier-copy-products.test.ts __tests__\lib\services\collaboratorProductService.test.ts __tests__\app\admin\dossiers\DossierGeneratorClient-catalog-layout.test.ts` (48 tests dins el bloc combinat 64/64).
+  - Validació funcional: qualsevol producte actiu nou d'un partner actiu apareix al generador sense whitelist hardcoded, separat per proveïdor/audiència i amb imatge al dossier si existeix.
+  - Validació humana/UX: cada proveïdor conserva el seu bloc, dins es pot decidir infantil vs adult/general, i el producte ofertat torna a tenir suport visual real.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat dins Documents/PDF.
+- `ADMIN_CHANGE_COUNTER` puja a `1717`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
+### Canvi #1716 — 2026-07-07 — codex (FET)
+- Context: a `/admin/intake`, una conversa real de WhatsApp de vesprada de casal a Cornellà podia caure en extracció local parcial i convertir el text netejat complet en `message`, aixafant o contaminant les notes existents.
+- Fet:
+  - `lib/services/leadTextExtractionService.ts` separa línies de client en WhatsApp, ignora respostes d'Òrbita i sintetitza context no estructurat.
+  - El cas real extreu Albert Aujas, email, telèfon, data, horari, Cornellà, 100 infants i resum de vesprada/edats/temàtica.
+  - `app/api/admin/leads/extract/route.ts` ja no posa `originalText.trim()` com a fallback de `message`.
+  - `app/admin/intake/intake-message.ts` afegeix merge idempotent: conserva notes humanes, rebutja text brut i no duplica si es torna a extreure.
+  - `/admin/intake` usa el merge en lloc de substituir notes amb `data.message`.
+  - No es toca `app/admin/tasks`, schema Prisma, migracions, bookings ni fluxos de reserva.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\leadTextExtractionService.test.ts __tests__\app\api\admin\leads-extract-route.test.ts __tests__\app\admin\intake\intake-message.test.ts` (11/11).
+  - Validació funcional: el WhatsApp llarg omple camps estructurats i deixa només resum sintètic en notes.
+  - Validació humana/UX: les notes no s'aixafen i repetir l'extracció no crea duplicats.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat dins Documents/PDF / intake i traçabilitat comercial.
+- `ADMIN_CHANGE_COUNTER` puja a `1716`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
+### Canvi #1715 — 2026-07-07 — codex (FET)
+- Context: `ImagePlacementCard` governa imatges públiques i podia recarregar placements després de delete/auto/alt/reordre sense comprovar si `/api/admin/image-manager` havia acceptat la mutació.
+- Fet:
+  - `app/admin/image-manager/ImagePlacementCard.tsx` afegeix `assertImageManagerMutation` i lectura de `error/message`.
+  - Upload, delete, tornar a auto, desar alt i reordenar col·lecció comproven `res.ok` i `ok === false` abans de `onReload()`.
+  - Els catch mostren el missatge backend quan existeix.
+  - `__tests__/app/admin/image-manager/ImagePlacementCard-errors.test.ts` blinda que no tornin mutacions d'image-manager sense assert.
+  - No es toca API image-manager, config de placements, processament d'imatges, schema Prisma, migracions ni `app/admin/tasks`.
+- Verificació:
+  - Validació tècnica: pendent d'executar en aquest tall (`test focal`, `tsc`, `diff --check`, `qa:protocol`, `qa:zenit-roadmap`, `validate:core`).
+  - Validació funcional: cap canvi visual de placement recarrega com si hagués funcionat quan el backend rebutja la mutació.
+  - Validació humana/UX: l'operador veu si falla storage, permisos o validació abans de creure que una imatge pública ha canviat.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1715 dins Guàrdia econòmica de bolos / no èxits falsos.
+- `ADMIN_CHANGE_COUNTER` puja a `1715`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
+### Canvi #1714 — 2026-07-07 — codex (FET)
+- Context: la barra CRM del Customer Hub afegia/treia tags amb `PATCH /api/admin/customers/[id]/tags` i cridava `onTagsChange()` sense comprovar `res.ok`; un error backend podia semblar un canvi aplicat.
+- Fet:
+  - `app/admin/clientes/[id]/_components/panels/SummaryPanel.tsx` afegeix `readCustomerTagMutationError` per llegir `error/message`.
+  - Afegir tag comprova `res.ok` i `ok === false` abans de tancar l'input i refrescar.
+  - Treure tag comprova `res.ok` i `ok === false` abans de refrescar.
+  - Els errors de tags es mostren amb `role="alert"` dins la barra CRM.
+  - `__tests__/app/admin/clientes/SummaryPanel-tags-errors.test.ts` blinda que no torni el `fetchWithCsrf` de tags sense resposta verificada.
+  - No es toca API customers/tags, serveis Customer Hub, schema Prisma, migracions ni `app/admin/tasks`.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\clientes\SummaryPanel-tags-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF coneguts); `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+  - Validació funcional: afegir/treure tags només refresca si el backend confirma; si falla, l'operador veu el motiu.
+  - Validació humana/UX: la barra CRM no promet que un client ha canviat de segment si el tag no s'ha desat.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1714 dins Guàrdia econòmica de bolos / no èxits falsos.
+- `ADMIN_CHANGE_COUNTER` puja a `1714`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
+### Canvi #1713 — 2026-07-07 — codex (FET)
+- Context: l'Studio de pressupostos enviava l'email i després cridava `/api/admin/proposals/[id]/send` sense comprovar resposta; si el marcatge backend fallava, la UI podia mostrar èxit igualment.
+- Fet:
+  - `app/admin/presupuestos/PresupuestoPdfStudio.tsx` afegeix `readStudioMutationError` per llegir `error/message`.
+  - L'error de `/api/admin/emails/quote` també pot conservar `message`.
+  - El `POST /api/admin/proposals/[id]/send` comprova `res.ok` i `ok === false` abans de mostrar èxit.
+  - `__tests__/app/admin/presupuestos/PresupuestoPdfStudio-customer-search.test.ts` blinda que no torni el `fetchWithCsrf(.../send)` sense resposta verificada.
+  - No es toca API proposals/send, serveis de propostes, PDF utils, schema Prisma, migracions ni `app/admin/tasks`.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\presupuestos\PresupuestoPdfStudio-customer-search.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF coneguts); `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+  - Validació funcional: l'Studio només mostra èxit si l'email i el marcatge backend de proposta enviada confirmen.
+  - Validació humana/UX: l'operador no confon "email sortit" amb "proposta marcada com enviada" si el segon pas falla.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1713 dins Guàrdia econòmica de bolos / no èxits falsos.
+- `ADMIN_CHANGE_COUNTER` puja a `1713`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
+### Canvi #1712 — 2026-07-07 — codex (FET)
+- Context: el Customer Hub mostrava contactes del client, però el delete de contacte cridava `/api/admin/customers/[id]/contacts/[contactId]` i retirava el contacte de la llista local sense comprovar `res.ok`.
+- Fet:
+  - `app/admin/clientes/[id]/_components/panels/SummaryPanel.tsx` afegeix `readContactMutationError` per llegir `error/message` del backend.
+  - Guardar contacte comprova també `res.ok` i conserva `message` si el backend el retorna.
+  - Eliminar contacte comprova `res.ok` i `ok === false` abans de filtrar la llista local.
+  - L'error de delete es mostra amb `role="alert"` encara que no hi hagi formulari obert.
+  - `__tests__/app/admin/clientes/SummaryPanel.test.tsx` cobreix que un delete rebutjat manté el contacte visible i mostra el motiu backend.
+  - No es toca API customers/contacts, serveis Customer Hub, schema Prisma, migracions ni `app/admin/tasks`.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\clientes\SummaryPanel.test.tsx` (7/7); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF coneguts); `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+  - Validació funcional: si el backend rebutja eliminar un contacte, la UI no l'amaga i mostra el motiu real.
+  - Validació humana/UX: l'operador no perd de vista contactes crítics per un fals èxit de pantalla.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1712 dins Guàrdia econòmica de bolos / no èxits falsos.
+- `ADMIN_CHANGE_COUNTER` puja a `1712`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
+### Canvi #1711 — 2026-07-07 — codex (FET)
+- Context: el gestor de portfolio administra actius públics reals (media, portades i events); algunes mutacions cridaven `/api/admin/portfolio/*` sense comprovar `res.ok`, podent refrescar o actualitzar estat local encara que el backend hagués rebutjat l'operació.
+- Fet:
+  - `app/admin/portfolio/page.tsx` afegeix `readPortfolioMutationError` per llegir `error/message` de backend.
+  - Pujada/substitució de media, patch de caption, assignació a event, canvi de portada, reordre i delete comproven `res.ok` abans de continuar.
+  - Crear, publicar/despublicar i eliminar events comproven `res.ok` abans d'executar `onEventsRefresh`.
+  - El reordre de media conserva el motiu backend i recarrega el llistat si falla.
+  - `__tests__/app/admin/portfolio/PortfolioPage-mutation-errors.test.ts` blinda que el fitxer no recuperi mutacions de portfolio sense resposta verificada.
+  - No es toca API portfolio, serveis de media/events, schema Prisma, migracions ni `app/admin/tasks`.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\portfolio\PortfolioPage-mutation-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF coneguts); `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+  - Validació funcional: cap mutació de portfolio ha de donar refresh/estat local d'èxit si el backend retorna error.
+  - Validació humana/UX: l'operador veu si el problema és storage, permisos, validació o BBDD abans de donar per canviat un actiu públic.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1711 dins Guàrdia econòmica de bolos / no èxits falsos.
+- `ADMIN_CHANGE_COUNTER` puja a `1711`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
+### Canvi #1710 — 2026-07-07 — codex (FET)
+
+**Partner hub membres/favorit conserven error backend.**
+
+- Context: el hub de partner ja preservava errors backend en pagaments, però afegir/eliminar membres i marcar favorit encara llençaven placeholders locals.
+- UI: els toasts de membres/favorit mostren el motiu backend real quan l'API rebutja l'acció.
+- Flux: `readPartnerHubMutationError` es reutilitza a afegir membre, marcar favorit i eliminar membre, amb fallback diferenciat.
+- Guard: `__tests__/app/admin/collaborators/PartnerHubClient-member-errors.test.ts` protegeix contra placeholders locals.
+- Abast: sense tocar API collaborators/members, serveis de partners, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1710 dins Guàrdia econòmica de bolos.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\collaborators\PartnerHubClient-member-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si afegir/eliminar membre o marcar favorit falla, el partner hub mostra el motiu backend i no el redueix a "Error...".
+- Validació humana/UX: l'operador sap si el problema és dades del membre, permisos o infraestructura abans d'organitzar el proveïdor.
+- `ADMIN_CHANGE_COUNTER` puja a `1710`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1709 — 2026-07-07 — codex (FET)
+
+**Qüestionaris accions no fallen en silenci.**
+
+- Context: el llistat de plantilles de qüestionari podia activar/desactivar o eliminar i refrescar sense comprovar `res.ok`.
+- UI: el component mostra un error accessible amb `role="alert"` quan PATCH/DELETE fallen.
+- Flux: nou helper `readQuestionnaireActionError` llegeix `error/message`, bloqueja botons durant la mutació i evita refresh si la resposta no és OK.
+- Guard: `__tests__/app/admin/questionnaires/QuestionnaireTemplateActions-errors.test.ts` protegeix contra PATCH/DELETE muts.
+- Abast: sense tocar API questionnaires, servei questionnaire, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1709 dins Traçabilitat profunda.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\questionnaires\QuestionnaireTemplateActions-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si activar/desactivar o eliminar una plantilla falla, el llistat mostra el motiu backend i no refresca com si hagués funcionat.
+- Validació humana/UX: l'operador sap que la plantilla continua igual quan el backend rebutja el canvi.
+- `ADMIN_CHANGE_COUNTER` puja a `1709`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1708 — 2026-07-07 — codex (FET)
+
+**Dossiers llistat no confirma mutacions fallides.**
+
+- Context: el llistat de dossiers permet enviar, moure a paperera, restaurar i eliminar permanentment; paperera/restaurar/purgar no comprovaven `res.ok`.
+- UI: les mutacions del llistat mostren el motiu backend real quan l'API les rebutja.
+- Flux: nou helper `readDossierListActionError` llegeix `error/message`; paperera/restaurar/purgar no mostren èxit ni refresquen si la resposta no és OK.
+- Guard: `__tests__/app/admin/dossiers/DossierListActions-errors.test.ts` protegeix contra èxits falsos i toasts genèrics.
+- Abast: sense tocar API dossiers, servei dossier, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1708 dins Documents/PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\dossiers\DossierListActions-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si enviar, moure a paperera, restaurar o purgar falla, el llistat mostra el motiu backend i no confirma l'acció.
+- Validació humana/UX: l'operador no dona per enviat, restaurat o eliminat un dossier que el backend ha rebutjat.
+- `ADMIN_CHANGE_COUNTER` puja a `1708`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1707 — 2026-07-07 — codex (FET)
+
+**Activitat conserva error backend.**
+
+- Context: `/admin/activity` és la traça transversal d'AdminLog, timeline i activitat de clients/leads; si `/api/admin/activity` fallava, el client mostrava un error genèric.
+- UI: el toast de càrrega mostra el motiu backend real quan falla carregar el registre d'activitat.
+- Flux: nou helper `readActivityLoadError` llegeix `error/message` i manté fallback específic de lectura.
+- Guard: `__tests__/app/admin/activity/ActivityClient-errors.test.ts` protegeix contra el missatge dur en `throw new Error`.
+- Abast: sense tocar API activity, servei timeline, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1707 dins Traçabilitat profunda.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\activity\ActivityClient-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si el registre d'activitat falla, la pantalla mostra el motiu backend i no el redueix a "Error carregant activitat".
+- Validació humana/UX: l'operador pot distingir si la traça falla per auth, servei o infraestructura abans de donar per buit el registre.
+- `ADMIN_CHANGE_COUNTER` puja a `1707`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1706 — 2026-07-07 — codex (FET)
+
+**Calculadora costos conserva error backend.**
+
+- Context: la calculadora de costos desa pressupostos personalitzats contra `/api/admin/custom-quotes`; si l'API rebutjava el desat, el codi llençava un `Error` buit.
+- UI: el toast de desat mostra el motiu backend real quan falla guardar el pressupost personalitzat.
+- Flux: nou helper `readCustomQuoteSaveError` llegeix `error/message` i aplica fallback específic de desat.
+- Guard: `__tests__/app/admin/cost-calculator/CostCalculatorClient-errors.test.ts` protegeix contra `throw new Error()` buit i toast genèric.
+- Abast: sense tocar API custom-quotes, servei de custom quotes, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1706 dins Guàrdia econòmica de bolos.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\cost-calculator\CostCalculatorClient-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si el desat d'un pressupost personalitzat falla, la calculadora mostra el motiu backend i no el redueix a "Error desant".
+- Validació humana/UX: l'operador sap si el problema és validació, permisos o infraestructura abans de confiar en una simulació econòmica.
+- `ADMIN_CHANGE_COUNTER` puja a `1706`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1705 — 2026-07-07 — codex (FET)
+
+**Bloquejos cuadrant conserven error backend.**
+
+- Context: el cuadrant permet crear i treure bloquejos manuals de disponibilitat; si l'API rebutjava l'acció, el codi llençava `fail`.
+- UI: afegir bloqueig i treure bloqueig mostren el motiu backend real al toast.
+- Flux: nou helper `readCrewBlockMutationError` llegeix `error/message` i aplica fallback diferenciat per acció.
+- Guard: `__tests__/app/admin/cuadrant/CrewBlockManager-errors.test.ts` protegeix contra placeholders i missatge genèric de migració.
+- Abast: sense tocar API cuadrant/blocks, serveis de crew schedule, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1705 dins Guàrdia econòmica de bolos.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\cuadrant\CrewBlockManager-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si un bloqueig manual falla, el cuadrant mostra el motiu backend i no el redueix a `fail`.
+- Validació humana/UX: l'operador sap si el problema és de dades, permisos o infraestructura abans d'organitzar disponibilitat de bolos.
+- `ADMIN_CHANGE_COUNTER` puja a `1705`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1704 — 2026-07-07 — codex (FET)
+
+**Payout partner conserva error backend.**
+
+- Context: el hub de partner permet marcar bolos com a pagats o desfer pagaments; si l'API de payments rebutjava l'acció, el codi llençava placeholders `delete`/`pay`.
+- UI: el toast de pagament mostra el motiu backend real quan falla marcar o desfer.
+- Flux: nou helper `readPartnerHubMutationError` llegeix `error/message` i aplica fallback diferenciat per acció.
+- Guard: `__tests__/app/admin/collaborators/PartnerHubClient-payment-errors.test.ts` protegeix contra placeholders `delete/pay`.
+- Abast: sense tocar API collaborators/payments, serveis de payout, schema Prisma, migracions, membres, productes ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1704 dins Guàrdia econòmica de bolos.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\collaborators\PartnerHubClient-payment-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si el pagament de partner falla, el hub mostra el motiu backend i no redueix la incidència a "Error registrant".
+- Validació humana/UX: l'operador sap si el problema és marcar pagat o desfer un pagament ja existent.
+- `ADMIN_CHANGE_COUNTER` puja a `1704`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1703 — 2026-07-07 — codex (FET)
+
+**Plantilles email no fan fals buit.**
+
+- Context: el llistat de plantilles email alimenta correus automàtics, notificacions i post-event; si `/api/admin/email-templates` fallava, la pantalla podia semblar sense catàleg.
+- UI: la càrrega separa `loadError` de catàleg buit, mostra alerta accessible i ofereix reintent.
+- Flux: nou helper `readEmailTemplatesResponse` llegeix `error/message` del backend abans de caure al fallback segur.
+- Guard: `__tests__/app/admin/email-templates/EmailTemplatesClient-errors.test.ts` protegeix contra fals buit i `throw new Error('Error')`.
+- Abast: sense tocar API email-templates, servei de plantilles, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1703 dins Post-event i recurrència.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\email-templates\EmailTemplatesClient-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si el catàleg de plantilles no es pot llegir, l'admin mostra error i no ho confon amb cap plantilla carregada.
+- Validació humana/UX: l'operador no pren decisions editorials sobre un catàleg aparentment buit quan el problema és de lectura.
+- `ADMIN_CHANGE_COUNTER` puja a `1703`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1702 — 2026-07-07 — codex (FET)
+
+**Social conserva error backend.**
+
+- Context: el calendari social permet eliminar publicacions i canviar-ne l'estat; si `/api/admin/social-posts` rebutjava una mutació, la UI perdia el motiu real.
+- UI: eliminar publicació mostra el missatge backend i no treu la publicació de la llista quan falla.
+- Flux: canviar estat parseja `error/message`, mostra el motiu real i no aplica cap estat local fals quan el PATCH falla.
+- Guard: `__tests__/app/admin/social/SocialClient.test.tsx` cobreix error backend en canvi d'estat i en eliminació.
+- Abast: sense tocar API social-posts, servei social, schema Prisma, migracions, `app/admin/tasks` ni el guard de revisió post-event.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1702 dins Post-event i recurrència.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\social\SocialClient.test.tsx` (7/7); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si una mutació social falla, Social mostra el motiu backend i no pinta èxit ni estat local enganyós.
+- Validació humana/UX: el calendari editorial deixa clar per què no es pot publicar, arxivar o eliminar una peça.
+- `ADMIN_CHANGE_COUNTER` puja a `1702`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1701 — 2026-07-07 — codex (FET)
+
+**Selector ràpid d'estat avisa fallida.**
+
+- Context: el selector ràpid d'estat de `/admin/control` permet moure leads i reserves sense obrir la fitxa; si el PATCH fallava, només quedava un `log.error` intern.
+- UI: el component mostra una alerta accessible sota el selector quan la mutació falla, i neteja l'error en cada intent nou.
+- Flux: nou helper `readStatusUpdateError` llegeix `error/message` del backend abans de caure al fallback segur.
+- Guard: `__tests__/app/admin/components/StatusQuickSelect-errors.test.ts` protegeix contra `throw new Error()` buit i contra errors que quedin només al log.
+- Abast: sense tocar `app/admin/control/page.tsx`, APIs de leads/bookings, serveis, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1701 dins Traçabilitat profunda.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\components\StatusQuickSelect-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si una mutació ràpida d'estat falla, el control mostra el motiu i no queda només al log intern.
+- Validació humana/UX: el comandament ràpid deixa de crear dubte operatiu sobre si el lead o la reserva han canviat realment d'estat.
+- `ADMIN_CHANGE_COUNTER` puja a `1701`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1700 — 2026-07-07 — codex (FET)
+
+**Despesa màrqueting no fa fals buit.**
+
+- Context: el panell de despesa de màrqueting alimenta el CAC real; si fallava carregar `/api/admin/marketing/spend`, podia acabar mostrant el buit de "encara no hi ha despesa" i les mutacions retornaven errors tècnics genèrics.
+- UI: la càrrega separa `loadError` de llista buida, mostra alert accessible i no pinta "sense despesa" quan la lectura ha fallat.
+- Flux: nou helper `readMarketingSpendError` llegeix `error/message` del backend; desar i eliminar despesa propaguen el motiu real al toast.
+- Guard: `__tests__/app/admin/economia/MarketingSpendPanel-errors.test.ts` protegeix contra fals buit i errors `load/save/delete failed`.
+- Abast: sense tocar API marketing/spend, serveis d'economia, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1700 dins Guàrdia econòmica de bolos.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\economia\MarketingSpendPanel-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si no es pot llegir la despesa de màrqueting, Economia mostra error i no ho confon amb cap despesa carregada.
+- Validació humana/UX: el CAC real no queda sustentat sobre un buit ambigu quan la lectura de costos ha fallat.
+- `ADMIN_CHANGE_COUNTER` puja a `1700`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1699 — 2026-07-07 — codex (FET)
+
+**Col·laboradors conserven error backend.**
+
+- Context: el panell de col·laboradors crea, edita, elimina i activa/desactiva partners; algunes mutacions perdien el motiu real del backend i mostraven errors genèrics.
+- UI: crear/editar col·laborador, eliminar col·laborador i activar/desactivar propaguen el missatge real al toast.
+- Flux: nou helper local `readCollaboratorMutationError` llegeix `error/message` del backend amb fallback segur.
+- Guard: `__tests__/app/admin/collaborators/CollaboratorsClient-errors.test.ts` protegeix contra `throw new Error()` genèric en aquestes mutacions.
+- Abast: sense tocar API collaborators, serveis de partners, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1699 dins Guàrdia econòmica de bolos.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\collaborators\CollaboratorsClient-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si una mutació de partner falla, el toast mostra el motiu del backend.
+- Validació humana/UX: l'operador sap per què no s'ha pogut crear, editar, eliminar o activar un partner.
+- `ADMIN_CHANGE_COUNTER` puja a `1699`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1698 — 2026-07-07 — codex (FET)
+
+**Productes partner conserven error backend.**
+
+- Context: el panell de productes d'un col·laborador crea, edita i elimina productes de partner; si el backend rebutjava una mutació, el codi feia `throw new Error()` i el toast perdia el motiu real.
+- UI: crear/editar producte i eliminar producte propaguen el missatge real al toast.
+- Flux: nou helper local `readProductMutationError` llegeix `error/message` del backend amb fallback segur.
+- Guard: `__tests__/app/admin/collaborators/CollaboratorProductsPanel-errors.test.ts` protegeix contra `throw new Error()` genèric en aquestes mutacions.
+- Abast: sense tocar API collaborators/products, serveis de partners, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1698 dins Guàrdia econòmica de bolos.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\collaborators\CollaboratorProductsPanel-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si una mutació de producte partner falla, el toast mostra el motiu del backend.
+- Validació humana/UX: l'operador sap si el problema és validació, dependències o una fallada general, no només "Error desant".
+- `ADMIN_CHANGE_COUNTER` puja a `1698`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1697 — 2026-07-07 — codex (FET)
+
+**Línies de servei avisen productes partner fallits.**
+
+- Context: el configurador de línies de servei carrega `/api/admin/collaborator-products` per oferir productes de proveïdors externs; si fallava, només quedava un `console.error` i el catàleg extern podia semblar buit.
+- UI: el catàleg de línies mostra un alert accessible quan falten productes externs per fallada de càrrega.
+- Flux: la càrrega parseja `error/message` del backend i converteix resposta no OK, `ok:false` o payload inesperat en error visible, amb cancel·lació en unmount.
+- Guard: `__tests__/app/admin/bookings/BookingServiceLinesSection-partner-products.test.ts` protegeix que la fallada no torni a quedar només en consola.
+- Abast: sense tocar API collaborator-products, serveis de reserves/partners, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1697 dins Guàrdia econòmica de bolos.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingServiceLinesSection-partner-products.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si no carreguen productes de partner, el configurador ho avisa i no fa veure que no hi ha proveïdors.
+- Validació humana/UX: l'operador no construeix un bolo sense productes externs pensant que el catàleg és complet.
+- `ADMIN_CHANGE_COUNTER` puja a `1697`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1696 — 2026-07-07 — codex (FET)
+
+**Studio pressupostos avisa cerca clients fallida.**
+
+- Context: el Studio de pressupostos obliga a seleccionar client abans de generar/enviar, però el selector de clients amagava fallades de `/api/admin/customers`: podia buidar resultats o deixar només una traça tècnica.
+- UI: el picker manté `customerSearchError`, mostra alert accessible i evita pintar "Cap resultat trobat" quan la cerca ha fallat.
+- Flux: el selector parseja `error/message` del backend, converteix respostes no OK o payload inesperat en error visible i cancel·la timers/fetchs en curs quan canvia el terme o es tanca el picker.
+- Guard: `__tests__/app/admin/presupuestos/PresupuestoPdfStudio-customer-search.test.ts` protegeix que el Studio no torni a deixar la fallada només en `log.error` ni en llista buida.
+- Abast: sense tocar API customers, serveis de pressupostos/PDF, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1696 dins Documents/PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\presupuestos\PresupuestoPdfStudio-customer-search.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si el Studio no pot llegir clients, l'operador veu error i no ho confon amb cap coincidència.
+- Validació humana/UX: abans de generar/enviar un pressupost, queda clar si falta seleccionar client perquè no existeix o perquè la lectura CRM ha fallat.
+- `ADMIN_CHANGE_COUNTER` puja a `1696`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1695 — 2026-07-07 — codex (FET)
+
+**Dossiers avisen cerca de leads fallida.**
+
+- Context: el generador de dossiers permet cercar un lead existent abans d'omplir o crear dades manuals; si `/api/admin/leads` fallava, `searchLeads` feia `return` i el generador podia semblar sense leads trobats o quedar sense explicació.
+- UI: el bloc del cercador de leads mostra `leadSearchError` en un alert accessible i diferencia "Cap lead trobat" de "no he pogut consultar leads".
+- Flux: la cerca de leads parseja l'error del backend i converteix respostes no OK en error real.
+- Guard: `__tests__/app/admin/dossiers/DossierGeneratorClient-customer-lookup.test.ts` ampliat a 3 casos perquè clients, import de productes i cerca de leads no tornin a fallar en silenci.
+- Auditoria: no queda cap `if (!res.ok) return` / `if (!response.ok) return` / `if (!data.ok) return` a `app/admin` fora de `app/admin/tasks`.
+- Abast: sense tocar API leads, serveis de dossier/CRM, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1695 dins Documents/PDF.
+- Validació tècnica: `rg "if \(!res\.ok\) return|if \(!response\.ok\) return|if \(!data\.ok\) return" app\admin --glob "!app/admin/tasks/**" -n` (sense coincidències); `pnpm test:run -- --run __tests__\app\admin\dossiers\DossierGeneratorClient-customer-lookup.test.ts` (3/3); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si la cerca de leads falla, el generador mostra error i no ho confon amb cap coincidència.
+- Validació humana/UX: l'operador sap que la lectura CRM no és fiable abans de crear o omplir un dossier manualment.
+- `ADMIN_CHANGE_COUNTER` puja a `1695`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1694 — 2026-07-07 — codex (FET)
+
+**Pressupostos avisen cerca de vincles fallida.**
+
+- Context: el panell de vincles d'un pressupost permet reassignar-lo a client, lead o reserva; si la cerca contra `/api/admin/customers`, `/api/admin/leads` o `/api/admin/bookings` fallava, el component retornava `[]` i el diàleg podia semblar simplement sense resultats.
+- UI: el diàleg separa `searchError` de la llista buida, mostra alert accessible i toast quan la cerca falla, i neteja l'error en tancar o canviar la cerca.
+- Flux: `searchEntities` parseja l'error del backend i converteix respostes no OK en error real en comptes de retornar `[]`.
+- Guard: `__tests__/app/admin/presupuestos/ProposalOwnerPanel-search-errors.test.ts` protegeix que la cerca de vincles no torni a tractar `!res.ok` com a zero resultats.
+- Abast: sense tocar API proposals, API customers/leads/bookings, serveis, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1694 dins Documents/PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\presupuestos\ProposalOwnerPanel-search-errors.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si la cerca de vincles falla, Pressupostos mostra error i no ho confon amb cap coincidència.
+- Validació humana/UX: l'operador sap que no pot reassignar el pressupost perquè falta lectura fiable, no perquè no existeixi client, lead o reserva.
+- `ADMIN_CHANGE_COUNTER` puja a `1694`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1693 — 2026-07-07 — codex (FET)
+
+**Inventari/Packs avisen lots no carregats.**
+
+- Context: Inventari i l'editor de packs carreguen `/api/admin/inventory/bundles` per reutilitzar lots d'equip; si la resposta no era OK, el codi feia `return` i la pantalla podia semblar simplement sense lots.
+- UI: Inventari mostra `bundleMessage` i Packs mostra un alert accessible dins el bloc "Lots reutilitzables" quan la càrrega falla.
+- Flux: les dues pantalles parsegen l'error del backend, converteixen respostes no OK en error real i deixen traça tècnica.
+- Guard: `__tests__/app/admin/inventory/bundles-load-errors.test.ts` protegeix que Inventari i Packs no tornin a tractar `!res.ok` com a llista buida.
+- Abast: sense tocar API inventory/bundles, serveis d'inventari, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1693 dins Guàrdia econòmica de bolos.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\inventory\bundles-load-errors.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si no es poden carregar els lots, Inventari i Packs mostren error en comptes de confondre fallada amb llista buida.
+- Validació humana/UX: l'operador sap que falta informació operativa abans de recompondre packs o lots.
+- `ADMIN_CHANGE_COUNTER` puja a `1693`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1692 — 2026-07-07 — codex (FET)
+
+**Dossiers avisen si no importen productes del lead.**
+
+- Context: quan el generador de dossiers estava vinculat a un lead, intentava importar les seves línies de servei; si `/api/admin/leads/:id/service-lines` fallava, el dossier podia semblar buit sense explicar que no s'havia pogut heretar la configuració.
+- UI: l'error queda visible com a toast i com a alert accessible dins el generador, prop del lead vinculat.
+- Flux: `syncProductsFromLead` parseja l'error del backend, converteix respostes no OK en error real i conserva la sortida manual perquè l'operador pugui seleccionar productes a mà.
+- Guard: `__tests__/app/admin/dossiers/DossierGeneratorClient-customer-lookup.test.ts` queda amb 2 casos: lookup de clients i import de productes del lead.
+- Abast: sense tocar API leads/service-lines, serveis de dossier/CRM, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1692 dins Documents/PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\dossiers\DossierGeneratorClient-customer-lookup.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si el dossier no pot importar productes del lead, l'operador veu l'error i no interpreta el buit com una configuració realment buida.
+- Validació humana/UX: el generador diferencia "lead sense productes" de "no he pogut llegir-los".
+- `ADMIN_CHANGE_COUNTER` puja a `1692`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1691 — 2026-07-07 — codex (FET)
+
+**Dossiers no creen client si lookup falla.**
+
+- Context: el generador de dossiers consultava `/api/admin/customers` per evitar duplicar clients, però si la resposta no era OK retornava `[]`; una fallada de lookup podia semblar "cap client existent".
+- UI: el cercador de clients mostra un alert accessible quan la consulta falla, en lloc de mostrar "cap client trobat".
+- Flux: `loadCustomers` parseja l'error del backend i llença error; el desat propaga aquest missatge i no continua creant lead/client nou a cegues.
+- Guard: `__tests__/app/admin/dossiers/DossierGeneratorClient-customer-lookup.test.ts` protegeix que `!res.ok` no torni a ser una llista buida.
+- Abast: sense tocar API dossiers/leads/customers, serveis CRM, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1691 dins Documents/PDF i traçabilitat CRM.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\dossiers\DossierGeneratorClient-customer-lookup.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si el lookup de clients falla, el generador no interpreta el resultat com a zero coincidències i no continua creant client/lead nou.
+- Validació humana/UX: l'operador veu que la cerca de clients no és fiable i pot reintentar abans de duplicar CRM.
+- `ADMIN_CHANGE_COUNTER` puja a `1691`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1690 — 2026-07-07 — codex (FET)
+
+**Nova reserva bloqueja conflictes no verificats.**
+
+- Context: `/admin/bookings/new` bloquejava si detectava reserves actives del mateix dia, però si la consulta de conflictes fallava el hook ignorava l'error i el formulari podia continuar com si no hi hagués cap risc.
+- UI: la secció de dades de l'esdeveniment mostra un alert accessible de disponibilitat no verificada i el resum lateral bloqueja el CTA de crear reserva.
+- Hook: `useBookingDateConflicts` retorna `dateConflictError`, diferencia aborts reals d'errors de consulta, parseja l'error del backend i deixa `console.error`.
+- Guard: `__tests__/app/admin/bookings/NewBookingForm-date-conflict-gate.test.ts` queda amb 2 casos: bloqueig per conflictes detectats i bloqueig per verificació fallida.
+- Abast: sense tocar API bookings, serveis de reserva, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1690 dins Guàrdia econòmica de bolos.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\NewBookingForm-date-conflict-gate.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si la comprovació de conflictes de data falla, el formulari no permet crear la reserva fins que la disponibilitat es pugui verificar.
+- Validació humana/UX: l'operador veu que el risc no és "cap reserva", sinó "no ho hem pogut comprovar".
+- `ADMIN_CHANGE_COUNTER` puja a `1690`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1689 — 2026-07-07 — codex (FET)
+
+**Safata auto-refresh leads avisa fallada.**
+
+- Context: l'auto-refresh de leads de `/admin/inbox` cada 60s tenia un catch silenciós i també ignorava respostes no OK; si fallava, l'operador podia seguir amb una llista antiga sense cap avís.
+- UI: el refresh de leads parseja l'error del backend, converteix respostes no OK en error real i mostra feedback global accessible a la Safata.
+- Traça: el catch deixa `console.error` amb context de refresh.
+- Guard: `__tests__/app/admin/inbox/SafataClient.test.tsx` queda amb 3 casos: toggle manual fallit, marcatge automàtic fallit en seleccionar un lead nou i auto-refresh fallit.
+- Abast: sense tocar API inbox/leads, IMAP, composer, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1689 dins traçabilitat/Inbox.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\inbox\SafataClient.test.tsx` (3/3); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si Safata no pot refrescar la llista de leads, conserva l'estat actual i no amaga que pot estar desactualitzat.
+- Validació humana/UX: l'operador veu l'avís de sincronització fallida i no treballa assumint una llista fresca falsa.
+- `ADMIN_CHANGE_COUNTER` puja a `1689`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1688 — 2026-07-07 — codex (FET)
+
+**Safata autolectura lead avisa fallada.**
+
+- Context: quan l'operador seleccionava un lead `NEW` a `/admin/inbox`, Safata intentava marcar-lo automàticament com `CONTACTED`, però si el PATCH fallava no mostrava cap error.
+- UI: el marcatge automàtic `NEW → CONTACTED` llegeix l'error del backend, no aplica estat local si la resposta no és OK i mostra feedback global accessible a la Safata.
+- Traça: el catch deixa `console.error` amb `leadId`.
+- Guard: `__tests__/app/admin/inbox/SafataClient.test.tsx` queda amb 2 casos: toggle manual fallit i marcatge automàtic fallit en seleccionar un lead nou.
+- Abast: sense tocar API de leads, IMAP, composer, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1688 dins traçabilitat/Inbox.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\inbox\SafataClient.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si Safata no pot marcar automàticament un lead nou com llegit/contactat, el lead no queda actualitzat en fals i es veu l'error.
+- Validació humana/UX: l'operador sap que la Safata no ha pogut persistir l'acció implícita en obrir el lead.
+- `ADMIN_CHANGE_COUNTER` puja a `1688`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1687 — 2026-07-07 — codex (FET)
+
+**Safata lead marca estat fallit.**
+
+- Context: a la fitxa de lead de `/admin/inbox`, el botó `Llegit/No llegit` ignorava `res.ok=false` i també tenia un catch silenciós.
+- UI: el toggle de lectura del detall de lead llegeix l'error del backend, no crida `onStatusChange` si la resposta no és OK, marca `aria-invalid` i apunta a un alert accessible.
+- Traça: el catch deixa `console.error` amb `leadId` i missatge persistent al detall.
+- Guard: `__tests__/app/admin/inbox/SafataClient.test.tsx` força `PATCH` fallit i comprova alerta, botó marcat i payload correcte.
+- Abast: sense tocar API de leads, IMAP, composer, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1687 dins traçabilitat/Inbox.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\inbox\SafataClient.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si marcar un lead com llegit/no llegit falla, el detall no fa veure que s'ha aplicat.
+- Validació humana/UX: l'operador sap que la Safata no ha persistit l'estat del lead i pot repetir o revisar permisos.
+- `ADMIN_CHANGE_COUNTER` puja a `1687`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1686 — 2026-07-07 — codex (FET)
+
+**Scripts avisa còpia fallida.**
+
+- Context: `ScriptsClient` permetia copiar comandes del catàleg de scripts, però si el navegador rebutjava el porta-retalls només netejava l'estat local i no mostrava cap error.
+- UI: el catch de copiar comanda desa error per comanda; el botó `Copiar` afectat marca `aria-invalid` i apunta a un alert accessible dins la mateixa targeta.
+- Estat: el panell superior informa quina comanda no s'ha pogut copiar.
+- Guard: `__tests__/app/admin/scripts/ScriptsClient.test.tsx` cobreix diverses comandes i només marca la que no s'ha pogut copiar.
+- Abast: sense tocar catàleg de scripts, execució real, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1686 dins sistema/scripts.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\scripts\ScriptsClient.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si copiar una comanda falla, només queda marcat aquell botó i no es fa veure que la comanda és al porta-retalls.
+- Validació humana/UX: l'operador no enganxa una comanda antiga o equivocada pensant que ha copiat la correcta.
+- `ADMIN_CHANGE_COUNTER` puja a `1686`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1685 — 2026-07-07 — codex (FET)
+
+**Reengagement leads avisa còpia fallida.**
+
+- Context: `LeadReengagementClient` permetia copiar missatges suggerits de reengagement, però si el navegador rebutjava el porta-retalls no mostrava cap error.
+- UI: el catch del clipboard desa error per lead; el botó `Copiar missatge` afectat marca `aria-invalid` i apunta a un alert accessible.
+- Protecció: es manté missatge suggerit, dismiss local, filtres de prioritat/motiu, WhatsApp, email i navegació a fitxa de lead.
+- Guard: `__tests__/app/admin/leads/reengagement/LeadReengagementClient.test.tsx` cobreix dos leads i només marca el que no s'ha pogut copiar.
+- Abast: sense servei leadReengagement, CRM, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1685 dins recurrència/reengagement; social-review estructurat queda només si cal rigor legal superior.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\reengagement\LeadReengagementClient.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si copiar el missatge de reengagement falla, només queda marcat aquell lead.
+- Validació humana/UX: l'operador no pensa que ha copiat un missatge comercial que el navegador ha rebutjat.
+- `ADMIN_CHANGE_COUNTER` puja a `1685`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1684 — 2026-07-07 — codex (FET)
+
+**Reactivació avisa còpia fallida.**
+
+- Context: `ReactivationClient` permetia copiar missatges suggerits de reactivació, però si el navegador rebutjava el porta-retalls no mostrava cap error.
+- UI: el catch del clipboard desa error per candidat; el botó `Copiar missatge` afectat marca `aria-invalid` i apunta a un alert accessible.
+- Protecció: es manté missatge suggerit, dismiss local, filtres, WhatsApp, mailto i navegació a fitxa de client.
+- Guard: `__tests__/app/admin/clientes/reactivation/ReactivationClient.test.tsx` cobreix dos candidats i només marca el que no s'ha pogut copiar.
+- Abast: sense servei reactivation, CRM, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1684 dins recurrència/reactivació; reengagement de leads queda com a següent silenci probable.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\clientes\reactivation\ReactivationClient.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si copiar el missatge de reactivació falla, només queda marcat aquell candidat.
+- Validació humana/UX: l'operador no pensa que ha copiat un missatge comercial que el navegador ha rebutjat.
+- `ADMIN_CHANGE_COUNTER` puja a `1684`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1683 — 2026-07-07 — codex (FET)
+
+**Referrals avisa còpia fallida.**
+
+- Context: `ReferralsClient` permetia copiar missatges suggerits de referral, però si el navegador rebutjava el porta-retalls no mostrava cap error.
+- UI: el catch del clipboard desa error per candidat; el botó `Copiar missatge` afectat marca `aria-invalid` i apunta a un alert accessible.
+- Protecció: es manté missatge suggerit, dismiss local, filtres, WhatsApp, mailto i navegació a fitxa de client.
+- Guard: `__tests__/app/admin/clientes/referrals/ReferralsClient.test.tsx` cobreix dos candidats i només marca el que no s'ha pogut copiar.
+- Abast: sense servei referrals, CRM, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1683 dins lifecycle/referrals; social-review estructurat passa a #1684+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\clientes\referrals\ReferralsClient.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si copiar el missatge de referral falla, només queda marcat aquell candidat.
+- Validació humana/UX: l'operador no pensa que ha copiat un missatge comercial que el navegador ha rebutjat.
+- `ADMIN_CHANGE_COUNTER` puja a `1683`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1682 — 2026-07-07 — codex (FET)
+
+**Pagaments avisen còpia fallida.**
+
+- Context: `StripePaymentPanel` generava feedback si fallava Stripe o Bizum, però la còpia del link de pagament al porta-retalls fallava en silenci.
+- UI: el catch del clipboard crea error accessible `copy` per tram; el botó de copiar afectat marca `aria-invalid` i regenerar Stripe queda intacte.
+- Protecció: es manté generació Stripe, confirmació Bizum, estat `copied`, links existents, imports i bloqueig per efectiu parcial.
+- Guard: `__tests__/app/admin/bookings/StripePaymentPanel.test.tsx` afegeix clipboard rebutjat amb alerta visible, còpia marcada i regeneració no marcada.
+- Abast: sense APIs de cobrament, cost engine, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1682 dins pagaments de reserva; social-review estructurat passa a #1683+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\StripePaymentPanel.test.tsx` (7/7); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si el link Stripe no es copia, l'operador veu l'error i només queda marcat el botó de còpia.
+- Validació humana/UX: la màquina no fa veure que ha copiat un enllaç que el navegador ha rebutjat.
+- `ADMIN_CHANGE_COUNTER` puja a `1682`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1681 — 2026-07-07 — codex (FET)
+
+**Recordatoris Economia marquen acció fallida.**
+
+- Context: `PaymentReminderActions` ja mostrava errors accessibles quan fallava un recordatori de pagament, però Email, WA API i Marcar WA enviat compartien error global.
+- UI: l'error guarda `message` i `actionKey`; cada botó marca `aria-invalid` i `aria-describedby` només quan falla aquella acció.
+- Protecció: es manté payload de communications, `router.refresh()` en èxit, link directe de WhatsApp i missatge accessible.
+- Guard: `__tests__/app/admin/economia/PaymentReminderActions.test.tsx` comprova que una fallada de WA API no marca Email ni el registre manual.
+- Abast: sense API communications, booking comm service, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1681 dins Economia/cobraments; social-review estructurat passa a #1682+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\economia\PaymentReminderActions.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: una fallada de recordatori només marca el canal que s'ha intentat.
+- Validació humana/UX: l'operador d'Economia sap si ha de repetir email, WA API o només registrar el WhatsApp manual.
+- `ADMIN_CHANGE_COUNTER` puja a `1681`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1680 — 2026-07-07 — codex (FET)
+
+**Inventari reserva marca control fallit.**
+
+- Context: `BookingInventorySection` ja mostrava errors accessibles d'inventari, però pack, lot, item, sortida, retorn i treure compartien error global.
+- UI: el missatge d'inventari afegeix `target`, `itemId` i `assignmentId`; cada control marca `aria-invalid` només quan és l'acció afectada.
+- Protecció: es manté càrrega, cerca, bundles, pack template, confirmació de treure, `skippedDetails`, fetch de refresc i contracte de l'API inventory.
+- Guard: `__tests__/app/admin/bookings/BookingInventorySection.test.tsx` cobreix assignació fallida i dos items disponibles amb només l'item fallit marcat.
+- Abast: sense API inventory, serveis d'inventari, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1680 dins inventari de reserva; social-review estructurat passa a #1681+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingInventorySection.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: una fallada d'inventari no marca controls aliens al gest que s'ha intentat.
+- Validació humana/UX: l'operador pot corregir l'element, lot o estat concret sense dubtar de tota la secció d'equip.
+- `ADMIN_CHANGE_COUNTER` puja a `1680`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1679 — 2026-07-07 — codex (FET)
+
+**Pagaments reserva marquen tram fallit.**
+
+- Context: `StripePaymentPanel` ja mostrava errors accessibles quan fallava generar link Stripe o confirmar Bizum, però l'error era global per als dos trams.
+- UI: l'error guarda `message`, `action` i `paymentType`; Stripe i Bizum només marquen el tram/acció que ha fallat.
+- Protecció: es manté contracte de `stripe-checkout` i `confirm-bizum`, imports, bloqueig per efectiu parcial, `window.location.reload()` en èxit i clipboard existent.
+- Guard: `__tests__/app/admin/bookings/StripePaymentPanel.test.tsx` cobreix generar Stripe, confirmar Bizum i dos Bizums pendents amb només el tram fallit marcat.
+- Abast: sense APIs de cobrament, cost engine, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1679 dins pagaments de reserva; social-review estructurat passa a #1680+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\StripePaymentPanel.test.tsx` (6/6); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: una fallada d'un tram de pagament no marca l'altre tram ni una altra acció.
+- Validació humana/UX: l'operador sap si ha de repetir Stripe/Bizum de paga i senyal o del pagament final.
+- `ADMIN_CHANGE_COUNTER` puja a `1679`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1678 — 2026-07-07 — codex (FET)
+
+**Factura reserva marca acció fallida.**
+
+- Context: `InvoiceSection` ja mostrava errors accessibles en accions de factura, però crear, reintentar sync, marcar pagada i cancel·lar compartien error global.
+- UI: l'error guarda `message`, `target` i `invoiceId` opcional; cada acció només marca `aria-invalid` quan falla aquella acció/factura.
+- Protecció: es manté contracte d'API, `router.refresh()` només en èxit, confirmació de cancel·lació, context client/lead i enllaç Holded.
+- Guard: `__tests__/app/admin/bookings/InvoiceSection.test.tsx` cobreix crear, sync fallit i marcar pagada fallit amb controls no afectats sense `aria-invalid`.
+- Abast: sense API invoices, serveis Holded, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1678 dins facturació de reserva; social-review estructurat passa a #1679+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\InvoiceSection.test.tsx` (4/4); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: una fallada de sync o cobrament de factura no marca accions que no s'han executat.
+- Validació humana/UX: l'operador sap si ha de repetir sync, cobrament, creació o cancel·lació sense dubtar de tota la factura.
+- `ADMIN_CHANGE_COUNTER` puja a `1678`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1677 — 2026-07-07 — codex (FET)
+
+**Link galeria reserva marca acció fallida.**
+
+- Context: `GallerySharePanel` ja mostrava errors accessibles del link de galeria compartida, però carregar, crear, copiar i revocar compartien error global.
+- UI: l'error guarda `message` i `target`; la càrrega fallida marca el CTA principal, crear marca camp i `Crear`, copiar/revocar només el seu botó.
+- Protecció: es manté contracte de `gallery-share`, password opcional, clipboard esperat, estat `copied`, càrrega inicial i portal públic.
+- Guard: `__tests__/app/admin/bookings/GallerySharePanel.test.tsx` cobreix càrrega, còpia, creació i revocació amb controls no afectats sense `aria-invalid`.
+- Abast: sense API `gallery-share`, portal públic, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1677 dins galeria compartida de reserva; social-review estructurat passa a #1678+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\GallerySharePanel.test.tsx` (4/4); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: cada error del link de galeria apunta només al gest que cal repetir.
+- Validació humana/UX: l'operador distingeix si ha fallat carregar estat, crear, copiar o revocar el link compartit.
+- `ADMIN_CHANGE_COUNTER` puja a `1677`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1676 — 2026-07-07 — codex (FET)
+
+**Vincle client reserva marca acció fallida.**
+
+- Context: `BookingCustomerLinkPanel` ja mostrava error i bloquejava refresh quan fallava vincular o crear client, però l'error era global.
+- UI: l'error guarda `message` i `pendingId`; cada botó `Vincular` o `Crear client` només marca `aria-invalid` si falla aquella acció.
+- Protecció: es manté payload `link/create`, toasts, `router.refresh()` només en èxit i traça tècnica en errors de xarxa.
+- Guard: `__tests__/app/admin/bookings/BookingCustomerLinkPanel.test.tsx` cobreix dues coincidències CRM, marca només la coincidència fallida i manté l'alta fallida marcada.
+- Abast: sense API `customer-link`, serveis CRM, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1676 dins vinculació CRM de reserva; social-review estructurat passa a #1677+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingCustomerLinkPanel.test.tsx` (3/3); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si falla vincular una coincidència o crear client, només queda marcat el control que cal repetir.
+- Validació humana/UX: l'operador no descarta totes les coincidències CRM quan només ha fallat una acció.
+- `ADMIN_CHANGE_COUNTER` puja a `1676`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1675 — 2026-07-07 — codex (FET)
+
+**Portal reserva marca acció fallida.**
+
+- Context: `ClientPortalAccessPanel` ja mostrava errors accessibles quan fallava generar, copiar o revocar el portal, però l'estat d'error era global.
+- UI: els botons `Generar/Rotar enllaç`, `Copiar enllaç` i `Revocar` només marquen `aria-invalid` quan falla aquella acció concreta.
+- Protecció: es manté payload de personalització, caducitat, clipboard, estat actiu, missatges accessibles i flux de portal existent.
+- Guard: `__tests__/app/admin/bookings/ClientPortalAccessPanel.test.tsx` cobreix fallada de generar, copiar i revocar amb marcatge específic i controls no afectats sense `aria-invalid`.
+- Abast: sense API `portal-access`, serveis de portal, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1675 dins configuració de portal de reserva; social-review estructurat passa a #1676+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx` (7/7); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si falla generar, copiar o revocar el portal, només queda marcat el control que cal repetir.
+- Validació humana/UX: l'operador no interpreta que tot el portal està trencat quan només ha fallat una acció puntual.
+- `ADMIN_CHANGE_COUNTER` puja a `1675`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1674 — 2026-07-07 — codex (FET)
+
+**Línies reserva marquen desat fallit.**
+
+- Context: `BookingServiceLinesEditor` ja mostrava error persistent quan fallava validar o desar línies, però el CTA de desat no quedava marcat.
+- UI: el botó `Desar línies de servei` marca `aria-invalid` quan hi ha error.
+- Protecció: es manté payload, validació de costos de col·laborador, toast, error persistent i absència de refresh si falla.
+- Guard: `__tests__/app/admin/bookings/BookingServiceLinesEditor.test.tsx` cobreix PATCH fallit amb alerta accessible, CTA marcat, absència de refresh i traça.
+- Abast: sense `BookingServiceLinesSection`, API bookings, pricing, cost engine, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1674 dins configuració de línies i marge de reserva; social-review estructurat passa a #1675+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingServiceLinesEditor.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si desar línies falla, el CTA de desat queda marcat i el total/marge no semblen recalculats.
+- Validació humana/UX: l'operador sap que ha de reintentar el desat abans de confiar en la cabina econòmica.
+- `ADMIN_CHANGE_COUNTER` puja a `1674`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1673 — 2026-07-07 — codex (FET)
+
+**Checklist reserva marca accions fallides.**
+
+- Context: `BookingChecklist` ja revertia mutacions fallides, però l'error no marcava quin control de la checklist havia fallat.
+- UI: l'error de desat porta `target` i `itemId`; marcar/desmarcar, eliminar i afegir ítem marquen `aria-invalid` quan fallen.
+- Protecció: es manté el rollback, la recuperació del text de l'ítem nou, `console.error` i `toast.error`.
+- Guard: `__tests__/app/admin/bookings/BookingChecklist.test.tsx` cobreix toggle i alta fallits amb alerta accessible, control marcat, rollback i traça.
+- Abast: sense API checklist, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1673 dins checklist/preparació de reserva; social-review estructurat passa a #1674+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingChecklist.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si marcar o afegir no es desa, la UI torna a l'estat anterior i marca el control fallit.
+- Validació humana/UX: l'operador sap quina acció de preparació del bolo ha de repetir.
+- `ADMIN_CHANGE_COUNTER` puja a `1673`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1672 — 2026-07-07 — codex (FET)
+
+**Galeria reserva marca controls fallits.**
+
+- Context: `BookingGallery` ja anunciava errors de càrrega/mutació, però l'alerta era global i no marcava quin control havia fallat.
+- UI: l'error de galeria porta `target` i `photoId`; pujar, portal, portfolio, carpeta, eliminar i desar nota marquen `aria-invalid` quan fallen.
+- Protecció: la mutació rebutjada no queda com a clic mort ni com a acció aplicada; no es toca storage ni l'API de galeria.
+- Guard: `__tests__/app/admin/bookings/BookingGallery.test.tsx` cobreix PATCH de visibilitat i DELETE fallits amb alerta accessible i control marcat.
+- Abast: sense API gallery, storage, portal públic, `GallerySharePanel`, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1672 dins galeria/portal/portfolio de fitxa; social-review estructurat passa a #1673+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingGallery.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si publicar o eliminar una foto falla, el control concret queda marcat i la foto no sembla actualitzada.
+- Validació humana/UX: l'operador sap quina acció de la galeria ha de repetir abans d'afectar portal o portfolio.
+- `ADMIN_CHANGE_COUNTER` puja a `1672`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1671 — 2026-07-07 — codex (FET)
+
+**Comunicacions reserva marca errors.**
+
+- Context: `CommunicationPanel` ja anunciava errors HTTP de `/communications`, però el flux fallit no marcava les accions i el `catch` no deixava traça tècnica.
+- UI: els botons `Correu`, `Envia per API de WhatsApp`, `Marcar enviat` i `Marcar respost` marquen `aria-invalid` quan aquell flux falla.
+- Protecció: el `catch` registra reserva, flux, acció, canal i error original amb `console.error`; la fitxa no refresca si la comunicació no s'ha persistit.
+- Guard: `__tests__/app/admin/bookings/CommunicationPanel.test.tsx` cobreix fallada amb alerta accessible, botons marcats, absència de refresh i traça.
+- Abast: sense API communications, serveis email/WhatsApp, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1671 dins traçabilitat/comunicacions de fitxa; social-review estructurat passa a #1672+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\CommunicationPanel.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si email/WhatsApp/log/resposta falla, el flux queda marcat i no sembla executat.
+- Validació humana/UX: l'operador veu quin bloc de comunicació ha fallat i pot reintentar-lo sense confiar en un fals èxit.
+- `ADMIN_CHANGE_COUNTER` puja a `1671`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1670 — 2026-07-07 — codex (FET)
+
+**Link galeria marca errors.**
+
+- Context: `GallerySharePanel` ja anunciava errors, però els controls de generar/copiar/revocar no quedaven marcats com a invàlids.
+- UI: generar, copiar, revocar, crear i l'input de contrasenya marquen `aria-invalid` quan hi ha error.
+- Protecció: la fallada de clipboard conserva l'error real al logger.
+- Guard: `__tests__/app/admin/bookings/GallerySharePanel.test.tsx` cobreix càrrega i còpia fallida amb alerta accessible i `aria-invalid`.
+- Abast: sense API gallery-share, galeria principal, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1670 dins galeria/portal de fitxa; social-review estructurat passa a #1671+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\GallerySharePanel.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si el link de galeria falla, l'acció concreta queda marcada i no sembla completada.
+- Validació humana/UX: l'operador sap que no pot copiar o compartir el link sense revisar l'error.
+- `ADMIN_CHANGE_COUNTER` puja a `1670`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1669 — 2026-07-07 — codex (FET)
+
+**Total reserva alerta errors.**
+
+- Context: `BookingTotalEditor` ja no cantava èxit amb PATCH fallit, però l'error només quedava al toast i no persistia dins l'editor.
+- UI: error visible amb `role="alert"`; input i botó de desar marquen `aria-invalid` quan hi ha error.
+- Protecció: l'error es neteja quan l'operador modifica l'import; el total no refresca si no s'ha persistit.
+- Guard: `__tests__/app/admin/bookings/BookingTotalEditor.test.tsx` cobreix PATCH fallit amb alerta accessible, `aria-invalid`, absència de refresh i traça.
+- Abast: sense API bookings, càlculs de marge, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1669 dins cabina econòmica de fitxa; social-review estructurat passa a #1670+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingTotalEditor.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si desar el total falla, el total no sembla persistit i la fitxa no refresca.
+- Validació humana/UX: l'operador veu exactament per què l'import no s'ha guardat i pot corregir-lo sense dependre només del toast.
+- `ADMIN_CHANGE_COUNTER` puja a `1669`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1668 — 2026-07-07 — codex (FET)
+
+**Marge transport alerta errors.**
+
+- Context: `BookingMarginCard` desa km/cost de viatge, però una fallada de PATCH només quedava al toast i no deixava error persistent dins la targeta.
+- UI: afegeix `travelSaveError`; `Desar canvis` marca `aria-invalid` quan falla i l'error usa `role="alert"` sota desplaçament.
+- Protecció: l'error es neteja quan l'operador torna a modificar la distància; no es canvien càlculs de marge ni transport.
+- Guard: nou `__tests__/app/admin/bookings/BookingMarginCard.test.tsx` cobreix canvi de km, PATCH rebutjat, alerta persistent, `aria-invalid`, toast, log i absència de refresh.
+- Abast: sense `costEngine`, `computeBoloTransport`, API bookings, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1668 dins cabina econòmica/transport de fitxa; social-review estructurat passa a #1669+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingMarginCard.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si guardar transport falla, la reserva no refresca ni sembla haver persistit km/cost.
+- Validació humana/UX: l'operador veu dins la cabina econòmica que el transport no s'ha desat i pot reintentar abans de confiar en el marge.
+- `ADMIN_CHANGE_COUNTER` puja a `1668`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1667 — 2026-07-07 — codex (FET)
+
+**Field notes reserva alerta errors.**
+
+- Context: `BookingFieldNotesComposer` pujava foto+nota interna de bolo, però l'error visible no era alerta accessible ni marcava el botó.
+- UI: el botó `+ Foto` marca `aria-invalid` quan hi ha error; l'error usa `role="alert"` i l'èxit `role="status"`.
+- Protecció: la cobertura existent ara comprova que una pujada fallida no refresca i queda anunciada.
+- Guard: `__tests__/app/admin/bookings/BookingFieldNotesComposer.test.tsx` cobreix error amb alerta accessible i `aria-invalid`, i èxit amb `role="status"`.
+- Abast: sense API gallery, galeria principal, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1667 dins documentació operativa de fitxa; social-review estructurat passa a #1668+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingFieldNotesComposer.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si pujar la captura falla, la fitxa no refresca ni sembla haver guardat la foto.
+- Validació humana/UX: l'operador sap que la nota de camp no ha quedat documentada i pot repetir la captura.
+- `ADMIN_CHANGE_COUNTER` puja a `1667`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1666 — 2026-07-07 — codex (FET)
+
+**Estat reserva alerta errors.**
+
+- Context: `BookingStatusChanger` canvia l'estat d'una reserva i pot disparar stats/calendari, però els errors no eren alertes accessibles ni marcaven el selector.
+- UI: el selector principal marca `aria-invalid` quan hi ha error, l'error usa `role="alert"` i l'èxit `role="status"`.
+- Protecció: lectura JSON resilient i `console.error` amb reserva, estat destí i error; una fallada de PATCH no refresca la fitxa.
+- Guard: nou `__tests__/app/admin/bookings/BookingStatusChanger.test.tsx` cobreix PATCH rebutjat amb alerta accessible, `aria-invalid`, payload correcte, absència de refresh i traça.
+- Abast: sense API status, estadístiques públiques, Calendar sync, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1666 dins estat/traçabilitat de fitxa; social-review estructurat passa a #1667+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingStatusChanger.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si canviar l'estat falla, la reserva no es refresca com si el canvi s'hagués aplicat.
+- Validació humana/UX: l'operador sap que l'estat no ha canviat i que no pot assumir stats/calendari actualitzats.
+- `ADMIN_CHANGE_COUNTER` puja a `1666`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1665 — 2026-07-07 — codex (FET)
+
+**Inventari reserva separa errors i èxits.**
+
+- Context: `BookingInventorySection` gestionava equipament amb un únic missatge per errors i èxits, sense marcar accions quan una assignació fallava.
+- UI: afegeix `messageKind`; errors amb `role="alert"`, èxits amb `role="status"` i accions mutadores amb `aria-invalid` quan hi ha error.
+- Protecció: les fallades HTTP/xarxa de càrrega, assignació, pack, lot, eliminar, sortida i retorn deixen `console.error` amb context.
+- Guard: nou `__tests__/app/admin/bookings/BookingInventorySection.test.tsx` cobreix càrrega inicial real i assignació rebutjada amb alerta accessible, `aria-invalid`, payload correcte i traça.
+- Abast: sense API inventory, catàlegs, serveis de disponibilitat, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1665 dins operativa d'inventari de fitxa; social-review estructurat passa a #1666+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingInventorySection.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si assignar equipament falla, la fitxa no ho barreja amb un èxit i l'acció queda clarament fallida.
+- Validació humana/UX: l'operador sap que el material no ha quedat reservat i pot revisar disponibilitat abans de prometre'l.
+- `ADMIN_CHANGE_COUNTER` puja a `1665`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1664 — 2026-07-07 — codex (FET)
+
+**Pagaments Stripe/Bizum alerta errors.**
+
+- Context: `StripePaymentPanel` generava links Stripe i confirmava Bizum, però els errors HTTP no eren alertes accessibles i les excepcions de xarxa no tenien catch propi.
+- UI: l'error del panell usa `role="alert"` i els botons de generar link o confirmar Bizum marquen `aria-invalid` quan hi ha error.
+- Protecció: les fallades HTTP/xarxa deixen `console.error` amb context, i una resposta Stripe `ok` sense URL es transforma en error visible.
+- Guard: `__tests__/app/admin/bookings/StripePaymentPanel.test.tsx` cobreix rebuig Stripe i rebuig Bizum amb alerta accessible, `aria-invalid`, payload correcte i traça.
+- Abast: sense API stripe-checkout/confirm-bizum, serveis de pagament, cost engine, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1664 dins economia/cobraments de fitxa; social-review estructurat passa a #1665+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\StripePaymentPanel.test.tsx` (5/5); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si Stripe o Bizum fallen, la fitxa no deixa l'acció com a implícitament resolta i l'error queda anunciat.
+- Validació humana/UX: l'operador sap si ha fallat el link de cobrament o la confirmació Bizum i no assumeix que el client pugui pagar o que el tram ja s'ha confirmat.
+- `ADMIN_CHANGE_COUNTER` puja a `1664`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1663 — 2026-07-07 — codex (FET)
+
+**Factura reserva alerta errors.**
+
+- Context: `InvoiceSection` executava accions de factura des de la fitxa, però els errors d'API quedaven com a text no anunciat i sense traça de catch.
+- UI: les accions mutadores marquen `aria-invalid` quan hi ha error, l'error d'acció usa `role="alert"` i l'error de sync Holded existent també queda anunciat.
+- Protecció: el catch registra `console.error` amb URL i error; una fallada de creació de factura no refresca la fitxa com si la factura existís.
+- Guard: `__tests__/app/admin/bookings/InvoiceSection.test.tsx` cobreix creació fallida amb alerta accessible, `aria-invalid`, absència de refresh i traça.
+- Abast: sense API invoice, serveis PDF/factura, Holded, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1663 dins traçabilitat/economia de fitxa; social-review estructurat passa a #1664+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\InvoiceSection.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si crear factura falla, la fitxa no refresca com si la factura existís i l'error queda visible/anunciat.
+- Validació humana/UX: l'operador sap que facturació/Holded no ha completat l'acció i pot revisar credencials o reintentar.
+- `ADMIN_CHANGE_COUNTER` puja a `1663`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1662 — 2026-07-07 — codex (FET)
+
+**Sync Calendar reserva alerta errors.**
+
+- Context: `CalendarSyncButton` sincronitzava manualment la reserva amb Google Calendar, però l'error visible no era alerta accessible ni quedava associat al botó.
+- UI: el botó marca `aria-invalid` quan hi ha error, el missatge fallit usa `role="alert"` i els missatges correctes usen `role="status"`.
+- Protecció: el catch deixa `console.error` amb context i una fallada de `/calendar-sync` no refresca la fitxa com si la sincronització hagués anat bé.
+- Guard: nou `__tests__/app/admin/bookings/CalendarSyncButton.test.tsx` cobreix API fallida, alerta accessible, `aria-invalid`, absència de refresh i URL de sincronització.
+- Abast: sense API calendar-sync, serveis Google Calendar, calendari admin, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1662 dins traçabilitat de fitxa; social-review estructurat passa a #1663+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\CalendarSyncButton.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si Google Calendar falla, la fitxa no refresca com si hagués sincronitzat i l'error queda visible/anunciat.
+- Validació humana/UX: l'operador sap que el calendari extern no ha quedat alineat i pot revisar permisos o reintentar.
+- `ADMIN_CHANGE_COUNTER` puja a `1662`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1661 — 2026-07-07 — codex (FET)
+
+**Email post-event reserva alerta errors.**
+
+- Context: `PostEventEmailButton` enviava el correu post-event però l'error visible no era alerta accessible ni quedava associat al botó.
+- UI: el botó marca `aria-invalid` quan hi ha error, el missatge fallit usa `role="alert"` i l'estat enviat queda anunciat amb `role="status"`.
+- Protecció: una fallada de l'API queda visible i traçada pel logger existent.
+- Guard: nou `__tests__/app/admin/bookings/PostEventEmailButton.test.tsx` cobreix API fallida amb alerta accessible i `aria-invalid`.
+- Abast: sense API d'email, serveis post-event, plantilles, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1661 dins post-event/client-facing de fitxa; social-review estructurat passa a #1662+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\PostEventEmailButton.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si enviar el post-event falla, l'acció no queda muda i l'error queda anunciat.
+- Validació humana/UX: l'operador sap que el correu de tancament no ha sortit i pot reintentar o revisar SMTP/servei.
+- `ADMIN_CHANGE_COUNTER` puja a `1661`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1660 — 2026-07-07 — codex (FET)
+
+**Portal client reserva alerta errors.**
+
+- Context: `ClientPortalAccessPanel` genera, copia i revoca l'enllaç privat del client, però els errors no eren alertes accessibles ni deixaven els botons marcats.
+- UI: els errors passen a `role="alert"`, els èxits a `role="status"` i els botons de generar/copiar/revocar reben `aria-invalid` quan hi ha error.
+- Protecció: els catch de generar, copiar i revocar deixen traça tècnica amb `console.error`.
+- Guard: `__tests__/app/admin/bookings/ClientPortalAccessPanel.test.tsx` afegeix test renderitzat per API fallida en generar link.
+- Abast: sense API `portal-access`, servei de portal, portal públic, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1660 dins traçabilitat/client-facing de fitxa; social-review estructurat passa a #1661+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx` (5/5); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si generar/copiar/revocar el portal falla, l'error queda anunciat i associat als botons, sense semblar una acció completada.
+- Validació humana/UX: l'operador no envia un link assumit al client sense veure clar que el portal no s'ha generat o no s'ha pogut copiar/revocar.
+- `ADMIN_CHANGE_COUNTER` puja a `1660`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1659 — 2026-07-07 — codex (FET)
+
+**Línies servei reserva mostren error persistent.**
+
+- Context: `BookingServiceLinesEditor` desa línies que recalculen servei, total, cost i marge, però un PATCH fallit només quedava en toast.
+- UI: l'editor incorpora estat d'error local i renderitza `role="alert"` sota l'acció de desar.
+- Protecció: una resposta fallida no executa `router.refresh()`, l'error es neteja en modificar o reintentar i la validació de cost de col·laborador també queda persistent.
+- Guard: nou `__tests__/app/admin/bookings/BookingServiceLinesEditor.test.tsx` mockeja el selector de línies i cobreix PATCH fallit amb missatge d'API visible.
+- Abast: sense API de reserva, `BookingServiceLinesSection` real, cervells de pricing, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1659 dins guàrdia econòmica i traçabilitat operativa de fitxa; social-review estructurat passa a #1660+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingServiceLinesEditor.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: un desat de línies rebutjat pel backend no sembla recalculat i deixa l'error visible al mateix editor.
+- Validació humana/UX: l'operador no perd el context de per què total/marge no s'han actualitzat.
+- `ADMIN_CHANGE_COUNTER` puja a `1659`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1658 — 2026-07-07 — codex (FET)
+
+**Toggle pagament reserva mostra error persistent.**
+
+- Context: `PaymentToggle` ja revertia l'optimista si el PATCH fallava, però l'error només quedava en un toast genèric.
+- UI: el toggle llegeix el payload d'error de l'API, conserva estat d'error i mostra `role="alert"` sota el botó.
+- Protecció: una bestreta/resta rebutjada torna a l'estat anterior, no executa `router.refresh()` i deixa el botó amb `aria-invalid`.
+- Guard: `__tests__/app/admin/bookings/PaymentToggle.test.tsx` cobreix que l'error d'API queda visible, el toast porta el mateix text i no hi ha refresh fals.
+- Abast: sense API de reserva, serveis de pagament, càlculs cash-aware, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1658 dins guàrdia econòmica de fitxa; social-review estructurat passa a #1659+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\PaymentToggle.test.tsx` (5/5); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: una bestreta/resta rebutjada pel backend torna al seu estat anterior i deixa l'error visible.
+- Validació humana/UX: l'operador no depèn d'un toast per saber que el pagament no s'ha actualitzat.
+- `ADMIN_CHANGE_COUNTER` puja a `1658`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1657 — 2026-07-07 — codex (FET)
+
+**Cobrament efectiu mostra error persistent.**
+
+- Context: `CashPaymentButton` registra diners reals a la fitxa de reserva, però si el PATCH fallava només deixava un toast efímer.
+- UI: el botó llegeix el payload d'error de l'API, conserva estat d'error i mostra `role="alert"` sota l'acció.
+- Protecció: un cobrament rebutjat no marca `done`, no executa `router.refresh()` i deixa el botó amb `aria-invalid`.
+- Guard: `__tests__/app/admin/bookings/CashPaymentButton.test.tsx` cobreix que l'error d'API queda visible, el toast porta el mateix text i no hi ha refresh fals.
+- Abast: sense API de reserva, serveis de pagament, càlculs cash-aware, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1657 dins guàrdia econòmica de fitxa; social-review estructurat passa a #1658+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\CashPaymentButton.test.tsx` (5/5); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si el backend rebutja el cobrament en efectiu, la reserva no queda aparentment cobrada i l'error queda visible.
+- Validació humana/UX: l'operador sap que el cash no s'ha registrat i pot reintentar o revisar l'import sense confiar en un toast efímer.
+- `ADMIN_CHANGE_COUNTER` puja a `1657`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1656 — 2026-07-07 — codex (FET)
+
+**Vincle reserva-client mostra errors.**
+
+- Context: `BookingCustomerLinkPanel` podia deixar una excepció de xarxa sense error persistent dins la fitxa mentre l'operador intentava crear o vincular client des d'una reserva.
+- UI: el panell incorpora error local visible amb `role="alert"` i manté els toasts existents com a reforç.
+- Protecció: les respostes HTTP fallides i els errors de xarxa no fan `router.refresh()` i el botó mutador queda marcat amb `aria-invalid`.
+- Guard: nou `__tests__/app/admin/bookings/BookingCustomerLinkPanel.test.tsx` cobreix error d'API vinculant un client existent i error de xarxa creant client nou.
+- Abast: sense API de `customer-link`, serveis CRM, schema Prisma, migracions, Safata ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1656 dins traçabilitat/CRM de fitxa; social-review estructurat passa a #1657+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingCustomerLinkPanel.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si crear o vincular client des d'una reserva falla, no hi ha refresh fals i l'error queda visible dins la fitxa.
+- Validació humana/UX: l'operador no queda dubtant sobre si la reserva ja forma part del CRM; veu el problema i pot reintentar o revisar les dades.
+- `ADMIN_CHANGE_COUNTER` puja a `1656`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1655 — 2026-07-07 — codex (FET)
+
+**Checklist reserva no deixa estat fals.**
+
+- Context: `BookingChecklist` aplicava toggle, eliminar o afegir ítem de manera optimista i, si el PUT fallava, només avisava amb toast; la preparació podia semblar desada quan el servidor l'havia rebutjada.
+- UI: el component incorpora error de desat visible amb `role="alert"`, estat `saving` i lectura del payload d'error de la ruta checklist.
+- Protecció: una mutació rebutjada restaura l'estat anterior; si falla crear un ítem nou, es recupera el text escrit i es reobre l'editor.
+- Guard: nou `__tests__/app/admin/bookings/BookingChecklist.test.tsx` cobreix rollback de toggle optimista i recuperació del text d'un ítem nou amb PUT fallit.
+- Abast: sense API de checklist, servei de reserva, schema Prisma, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1655 dins traçabilitat/operativa de fitxa; social-review estructurat passa a #1656+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingChecklist.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: una acció de checklist rebutjada pel servidor ja no queda marcada com a feta ni perd el text que l'operador acabava d'escriure.
+- Validació humana/UX: la preparació del bolo no menteix; si no s'ha desat, l'operador ho veu i pot reintentar sense reconstruir la feina.
+- `ADMIN_CHANGE_COUNTER` puja a `1655`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1654 — 2026-07-07 — codex (FET)
+
+**Link compartit de galeria mostra errors.**
+
+- Context: `GallerySharePanel` podia fallar carregant el link compartit o copiant-lo al portapapers i deixar-ho només a `log.error`, amb risc d'assumir un link de client disponible quan no ho era.
+- UI: el panell llegeix errors de `gallery-share` i mostra `role="alert"` per GET, crear, copiar i revocar quan fallen.
+- Protecció: copiar un link de galeria ja no queda com acció muda si el portapapers falla; carregar/revocar també donen missatge visible.
+- Guard: nou `__tests__/app/admin/bookings/GallerySharePanel.test.tsx` cobreix GET fallit i còpia al portapapers fallida.
+- Abast: sense API `gallery-share`, serveis de galeria, schema Prisma, migracions, portal públic ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1654 dins traçabilitat profunda de fitxa/portal/galeria; social-review estructurat passa a #1655+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\GallerySharePanel.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si el link compartit no carrega o no es pot copiar, la fitxa ho mostra i no ho deixa com acció aparentment feta.
+- Validació humana/UX: l'operador no envia ni enganxa un link de galeria assumit; veu l'error i pot reintentar o revisar permisos.
+- `ADMIN_CHANGE_COUNTER` puja a `1654`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1653 — 2026-07-07 — codex (FET)
+
+**Galeria reserva mostra errors de mutació.**
+
+- Context: `BookingGallery` mostrava errors de pujada, però podia callar quan fallaven la càrrega inicial, marcar portal/portfolio, canviar carpeta, eliminar foto o desar nota.
+- UI: la galeria centralitza lectura d'errors de la ruta, reaprofita l'estat `error` existent i renderitza `role="alert"` per respostes HTTP fallides o errors de xarxa.
+- Protecció: PATCH/DELETE ja no queden com a clics morts; si el backend rebutja la mutació, la foto no sembla publicada, eliminada o anotada.
+- Guard: nou `__tests__/app/admin/bookings/BookingGallery.test.tsx` cobreix PATCH de visibilitat fallit i DELETE fallit amb error visible.
+- Abast: sense API de galeria, serveis de fitxers/storage, schema Prisma, migracions, portal públic ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1653 dins traçabilitat profunda de fitxa/portal/portfolio; social-review estructurat passa a #1654+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingGallery.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: una mutació de foto rebutjada queda visible i no sembla aplicada.
+- Validació humana/UX: l'operador sap que la foto no s'ha publicat, eliminat o actualitzat i pot corregir/reintentar abans que afecti client o portfolio.
+- `ADMIN_CHANGE_COUNTER` puja a `1653`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1652 — 2026-07-07 — codex (FET)
+
+**Recordatoris Economia mostren error de comunicació.**
+
+- Context: `PaymentReminderActions` de `/admin/economia` podia llençar excepcions invisibles quan `/api/admin/bookings/[id]/communications` rebutjava enviar email, enviar WhatsApp API o marcar WhatsApp enviat.
+- UI: les tres mutacions passen per un executor comú que llegeix el payload, comprova `res.ok` i `ok:false`, captura errors HTTP/xarxa i mostra `role="alert"`.
+- Protecció: una fallada de communications no executa `router.refresh()` i marca els botons mutadors amb `aria-invalid` mentre l'error és visible.
+- Guard: nou `__tests__/app/admin/economia/PaymentReminderActions.test.tsx` cobreix email OK amb refresh i WhatsApp API amb `ok:false` sense refresh.
+- Abast: sense API de comunicacions, serveis d'email/WhatsApp, schema Prisma, migracions, factures ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1652 dins la guàrdia econòmica d'Economia; social-review estructurat passa a #1653+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\economia\PaymentReminderActions.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: un recordatori rebutjat per `/communications` queda visible i no refresca Economia com si s'hagués aplicat.
+- Validació humana/UX: l'operador sap si el recordatori de cobrament no ha sortit i pot corregir canal, permisos o reintentar.
+- `ADMIN_CHANGE_COUNTER` puja a `1652`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1651 — 2026-07-07 — codex (FET)
+
+**Economia mostra error si falla toggle de pagament.**
+
+- Context: `PaymentToggleButton` de `/admin/economia` podia llençar una excepció si `PATCH /api/admin/bookings/[id]` rebutjava el canvi de `depositPaid` o `remainingPaid`, deixant l'operador sense error visible en una acció de cobrament.
+- UI: el component incorpora estat d'error, neteja l'error en cada intent i mostra el missatge retornat per l'API o un fallback sota el botó amb `role="alert"`.
+- Protecció: `router.refresh()` només s'executa quan el PATCH és OK; si falla, el botó queda en pantalla amb `aria-invalid` i no hi ha confirmació falsa.
+- Guard: nou `__tests__/app/admin/economia/PaymentToggleButton.test.tsx` cobreix èxit amb refresh i fallada HTTP amb error visible sense refresh.
+- Abast: sense API de reserva, `bulk-payment`, schema Prisma, migracions, factures, serveis backend ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1651 dins la guàrdia econòmica d'Economia; social-review estructurat passa a #1652+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\economia\PaymentToggleButton.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: un pagament rebutjat pel backend queda visible i no força refresh fals d'Economia.
+- Validació humana/UX: l'operador sap que el cobrament no s'ha actualitzat i pot reintentar o revisar permisos/dades.
+- `ADMIN_CHANGE_COUNTER` puja a `1651`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1650 — 2026-07-07 — codex (FET)
+
+**Fitxa reserva usa travelCost persistent.**
+
+- Context: el POST/PATCH ja conserven `tollsEur`, però el guard econòmic i la targeta de marge de la fitxa encara podien recalcular transport com `distanceKm × cost/km`, perdent peatges, temps de tripulació o dieta guardats a `travelCost`.
+- Guard econòmic: `computeBookingEconomicGuard` accepta `travelCost` i el prioritza sobre el càlcul aproximat per km.
+- Fitxa: `app/admin/bookings/[id]/page.tsx` passa `travelCost` i `tollsEur` persistents cap al guard i `BookingMarginCard`.
+- Targeta de marge: `BookingMarginCard` usa `storedTravelCost` fins que es canvia la distància; en recàlcul usa `computeBoloTransport` i persisteix `travelCost` + `tollsEur`.
+- UX econòmica: el desglossament visual separa cost transport intern, vehicle, peatges, temps de tripulació i dieta quan apliquen.
+- Guards: `__tests__/app/admin/booking-economic-guard.test.ts` blinda prioritat de `travelCost`; `__tests__/app/admin/bookings/BookingMarginCard-travel-cost-source.test.ts` blinda `computeBoloTransport` i evita tornar al wrapper antic.
+- Abast: sense API de reserva, schema Prisma, migracions, factures, reserves existents ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1650 dins el gate econòmic de fitxa de reserva; social-review estructurat passa a #1651+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\booking-economic-guard.test.ts __tests__\app\admin\bookings\BookingMarginCard-travel-cost-source.test.ts` (4/4); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: peatges i cost real de transport guardat entren al risc/marge de la fitxa.
+- Validació humana/UX: l'operador veu el marge amb el cost de transport real, no amb una aproximació incompleta.
+- `ADMIN_CHANGE_COUNTER` puja a `1650`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1649 — 2026-07-07 — codex (FET)
+
+**Comunicacions de reserva mostren error HTTP.**
+
+- Context: `CommunicationPanel` podia llençar error dins una promesa d'event handler quan `/communications` fallava, deixant l'operador sense missatge visible ni criteri de reintent.
+- UI: les accions de correu, WhatsApp API, marcar enviat i marcar respost llegeixen el payload, comproven `res.ok` i `ok:false`, i mostren l'error dins el flux afectat.
+- Protecció: una fallada HTTP ja no fa `router.refresh()` ni queda com una acció aparentment aplicada.
+- Guard: nou `__tests__/app/admin/bookings/CommunicationPanel.test.tsx` cobreix èxit amb refresh i fallada amb error visible sense refresh.
+- Abast: sense API de comunicacions, serveis d'email/WhatsApp, schema Prisma, factures, reserves existents ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1649 dins el gate de traçabilitat/comunicacions de fitxa; social-review estructurat passa a #1650+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\CommunicationPanel.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: una comunicació rebutjada pel backend queda visible i no refresca la fitxa.
+- Validació humana/UX: l'operador sap que el correu/WhatsApp no ha sortit i pot actuar sense suposar èxit.
+- `ADMIN_CHANGE_COUNTER` puja a `1649`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1648 — 2026-07-07 — codex (FET)
+
+**Editor total no canta èxit si PATCH falla.**
+
+- Context: `BookingTotalEditor` no comprovava `res.ok` després d'enviar `totalPrice`; una resposta 400/500 podia acabar en `Total actualitzat.`, `pendingTotal` i `router.refresh()`.
+- UI: el guardat del total pactat llegeix l'error del payload i només aplica estat optimista, toast d'èxit i refresh quan el PATCH retorna OK.
+- Protecció: en fallada HTTP es conserva el mode edició i es mostra el missatge real retornat per l'API o un fallback.
+- Guard: nou `__tests__/app/admin/bookings/BookingTotalEditor.test.tsx` cobreix èxit i fallada sense success ni refresh.
+- Abast: sense API, serveis, schema Prisma, factures, pagaments globals, reserves existents ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1648 dins el gate econòmic de fitxa de reserva; social-review estructurat passa a #1649+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\BookingTotalEditor.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: si l'API rebutja el total, el client no el tracta com a guardat.
+- Validació humana/UX: l'operador no rep confirmació falsa sobre el preu pactat.
+- `ADMIN_CHANGE_COUNTER` puja a `1648`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1647 — 2026-07-07 — codex (FET)
+
+**PATCH reserva alinea contracte amb servei.**
+
+- Context: `bookingRouteService` ja processava contacte del client, tipus d'esdeveniment, descompte i peatges manuals, però el schema estricte de `PATCH /api/admin/bookings/[id]` no declarava part d'aquests camps.
+- API: `updateBookingSchema` accepta `clientName`, `clientEmail`, `clientPhone`, `eventType`, `discount` i `tollsEur`, amb trim a la frontera HTTP.
+- Contracte: `sourceCollaboratorId`, `billedCollaboratorId`, `serviceLines.collaboratorId`, `serviceLines.label` i `serviceLines.notes` queden normalitzats abans de cridar `updateBookingDetail`.
+- Guard: `__tests__/app/api/admin/bookings-detail-route.test.ts` comprova propagació trimmejada cap al servei i rebuig 400 quan editables obligatoris són només espais.
+- Abast: sense UI de detall, servei de ruta, schema Prisma, migracions, pagaments, factures, reserves existents ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1647 dins el gate operatiu/econòmic de reserva; social-review estructurat passa a #1648+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\bookings-detail-route.test.ts` (21/21); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: el PATCH canònic deixa passar els camps que el servei ja sap aplicar i continua rebutjant payloads buits o desconeguts.
+- Validació humana/UX: les edicions presents o futures de fitxa de reserva ja no queden bloquejades pel contracte HTTP quan canvien contacte, tipus, descompte o peatges.
+- `ADMIN_CHANGE_COUNTER` puja a `1647`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1646 — 2026-07-07 — codex (FET)
+
+**API conserva peatges manuals de nova reserva.**
+
+- Context: `NewBookingForm` enviava `tollsEur` i `bookingCreationService` el prioritza sobre peatges automàtics, però `POST /api/admin/bookings` no declarava el camp al schema Zod.
+- API: `bookingSchema` accepta `tollsEur` com a número no negatiu opcional.
+- Cablejat: els peatges manuals ja travessen UI/API i arriben a `createBookingFromInput` en la creació admin de reserva.
+- Guard: `__tests__/app/api/admin/bookings-route.test.ts` comprova que `tollsEur: 12.5` arriba al servei junt amb el payload trimmejat.
+- Abast: sense UI, servei de creació, schema Prisma, calendari, imports, pagaments, factures, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1646 dins el gate operatiu/econòmic de creació de reserva; social-review estructurat passa a #1647+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\bookings-route.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: un peatge manual informat en crear reserva ja no queda descartat per la frontera HTTP.
+- Validació humana/UX: el valor que l'operador introdueix com a peatge afecta el càlcul del bolo en lloc de perdre's en silenci.
+- `ADMIN_CHANGE_COUNTER` puja a `1646`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1645 — 2026-07-07 — codex (FET)
+
+**API reserva rebutja obligatoris en blanc.**
+
+- Context: després del #1644 la UI ja bloquejava camps mínims, però `POST /api/admin/bookings` encara acceptava strings només d'espais perquè `z.string().min(1)` no trimmeja.
+- API: `bookingSchema` incorpora `requiredTrimmedString` i `optionalTrimmedString`.
+- Contracte: `clientName`, `clientEmail`, `clientPhone`, `eventDate`, `eventLocation` i `packId` es trimmegen i es rebutgen si queden buits.
+- Neteja d'entrada: camps textuals opcionals i labels d'extres/línies de servei també es normalitzen amb trim a la frontera HTTP.
+- Guard: nou `__tests__/app/api/admin/bookings-route.test.ts` verifica trim abans de `createBookingFromInput` i rebuig 400 sense cridar el servei.
+- Abast: sense servei de creació, schema Prisma, UI, calendari, imports, pagaments, factures, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1645 dins el gate operatiu de creació de reserva; social-review estructurat passa a #1646+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\bookings-route.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: una reserva enviada amb espais al voltant queda normalitzada; una reserva amb obligatoris només d'espais queda bloquejada abans del servei.
+- Validació humana/UX: el sistema no confia només en la pantalla per protegir dades bàsiques de reserva.
+- `ADMIN_CHANGE_COUNTER` puja a `1645`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1644 — 2026-07-07 — codex (FET)
+
+**Nova reserva bloqueja CTA sense dades mínimes.**
+
+- Context: `useNewBookingSubmit` ja rebutjava telèfon, data i ubicació buits, però `/admin/bookings/new` només desactivava el CTA per nom, email i bolo no buit.
+- UI: `NewBookingForm` afegeix `hasClientBasics`, `hasEventBasics` i `submitBlockedByMissingBasics`.
+- Protecció: `submitDisabled` queda alineat amb el contracte real del hook i també conserva el bloqueig #1643 de conflicte de dia.
+- CTA: el botó mostra `Completa client i contacte`, `Completa data i lloc`, `Afegeix servei o pack` o `Confirma conflicte de dia` segons el primer bloqueig accionable.
+- Guard: nou `__tests__/app/admin/bookings/NewBookingForm-required-submit-gate.test.ts`; el guard #1643 queda ajustat al nou `submitLabel`.
+- Abast: sense servei de creació, schema, calendari, imports, pagaments, factures, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1644 dins el gate operatiu de creació de reserva; social-review estructurat passa a #1645+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\NewBookingForm-date-conflict-gate.test.ts __tests__\app\admin\bookings\NewBookingForm-required-submit-gate.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: el CTA no permet crear reserva sense telèfon, data, ubicació i bolo; si hi ha conflicte de dia, encara exigeix revisió marcada.
+- Validació humana/UX: el propietari veu què falta abans del clic i no ha de descobrir requisits mínims a través d'un error posterior.
+- `ADMIN_CHANGE_COUNTER` puja a `1644`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1643 — 2026-07-07 — codex (FET)
+
+**Nova reserva exigeix revisar conflicte de dia.**
+
+- Context: `/admin/bookings/new` ja detectava reserves actives del mateix dia amb `useBookingDateConflicts`, però el CTA `Crear reserva` continuava disponible sense confirmació explícita.
+- UI: `NewBookingForm` afegeix `dateConflictAcknowledged` i mostra un control `He revisat les reserves d'aquest dia` quan hi ha conflictes.
+- Protecció: `submitDisabled` incorpora `submitBlockedByDateConflict`; el botó no crea una segona reserva del dia fins que l'operador ho reconeix.
+- Estat: la confirmació es reinicia quan canvia la data o la signatura dels conflictes detectats.
+- Guard: nou `__tests__/app/admin/bookings/NewBookingForm-date-conflict-gate.test.ts` blinda el gate i evita tornar a un `window.confirm`.
+- Abast: sense schema, calendari, rutes de reserva existents, imports, pagaments, factures, migracions ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1643 dins Guàrdia econòmica/operativa de bolos; social-review estructurat passa a #1644+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\NewBookingForm-date-conflict-gate.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: amb reserves actives el mateix dia, el formulari no permet crear la nova reserva sense revisió marcada; sense conflictes el flux queda igual.
+- Validació humana/UX: el sistema obliga a fer una decisió conscient abans de comprometre capacitat en un dia ja ocupat.
+- `ADMIN_CHANGE_COUNTER` puja a `1643`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1642 — 2026-07-07 — codex (FET)
+
+**Servei de packs normalitza PVP acabat en 0.**
+
+- Context: el recomanat comercial ja era canònic a #1639-#1641, però `createAdminPack` / `updateAdminPack` encara podien persistir `price` o `extraHourPrice` decimals si entraven per UI, API o sync.
+- Servei: `packAdminService` incorpora una normalització interna basada en `roundRecommendedSellingPrice()` per a PVP de pack i hora extra.
+- Creació: `createAdminPack` desa `price` i `extraHourPrice` normalitzats i registra al `adminLog` el PVP ja arrodonit.
+- Actualització: `updateAdminPack` normalitza `price` i `extraHourPrice` abans de passar-los a Prisma.
+- Sync: `syncAdminPacksFromConfig` també normalitza `priceValue`, evitant una porta lateral des del config.
+- Tests: `packAdminService.test.ts` cobreix creació `340.01 -> 350`, hora extra `75.1 -> 80` i actualització `49.99 -> 50`.
+- Abast: sense schema, migracions, rutes, factures, imports pactats de reserves existents, Stripe/Bizum, cash-aware ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1642 dins Guàrdia econòmica i llista de talls fets; social-review estructurat passa a #1643+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\packAdminService.test.ts __tests__\app\admin\packs-recommended-price-format.test.ts __tests__\app\admin\packs-edit-recommended-pricing.test.ts` (15/15); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: cap escriptura de pack pot deixar PVP comercial decimal si passa pel servei admin.
+- Validació humana/UX: el criteri premium acabat en 0 ja governa recomanació, aplicació i persistència.
+- `ADMIN_CHANGE_COUNTER` puja a `1642`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1641 — 2026-07-07 — codex (FET)
+
+**Editor de pack aplica recomanat acabat en 0.**
+
+- Context: el motor #1639 i el llistat #1640 ja treballaven amb PVP recomanat acabat en `0`, però `app/admin/packs/[id]/EditPackForm.tsx` recalculava recomanats locals amb `round2()` i els podia aplicar com a decimals.
+- Monocapa: l'editor detallat importa `roundRecommendedSellingPrice()` i aplica el mateix criteri canònic que `computePackPricingHealth`.
+- Accions: `Preu automàtic` i `Aplicar recomanat ara` ja escriuen `recommended.pack` / `recommended.extra` arrodonits amunt, sense `round2(recommended...)`.
+- UI: els imports recomanats del detall usen `formatCurrency()`; costos interns, deltes i imports exactes continuen amb `formatCurrencyExact()`.
+- Guard: nou `__tests__/app/admin/packs-edit-recommended-pricing.test.ts` blinda que l'editor segueixi usant `roundRecommendedSellingPrice()` i no torni a `round2(recommended...)`.
+- Abast: sense API de packs, schema, migracions, imports pactats, factures, Stripe/Bizum, cash-aware ni `app/admin/tasks`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1641 dins Guàrdia econòmica i llista de talls fets; social-review estructurat passa a #1642+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\packs-recommended-price-format.test.ts __tests__\app\admin\packs-edit-recommended-pricing.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: l'editor de pack ja no pot aplicar un recomanat comercial decimal generat per un segon càlcul local.
+- Validació humana/UX: Economia, llistat i detall de Packs tenen una sola doctrina visual i operativa de preu premium.
+- `ADMIN_CHANGE_COUNTER` puja a `1641`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1640 — 2026-07-07 — codex (FET)
+
+**Packs comunica recomanats premium sense decimals.**
+
+- Context: el #1639 va portar el motor econòmic a PVP recomanat acabat en `0`, però `/admin/packs` encara mostrava aquests recomanats amb format exacte decimal i l'operari extra amb `toFixed(2)`.
+- UI: `Pack recomanat`, `Hora extra recomanada` i `Operari extra sempre disponible` usen `formatCurrency()`, comunicant imports comercials nets sense cèntims visuals.
+- Precisió interna: `formatCurrencyExact()` es conserva per serveis/catàleg quan els cèntims són dada exacta; els costos laborals interns continuen amb decimals.
+- Guard: nou `__tests__/app/admin/packs-recommended-price-format.test.ts` evita regressar recomanats de packs a `formatCurrencyExact(health.recommended...)` o `recommendedOperatorExtraHourPrice.toFixed(2)`.
+- Abast: sense schema, migracions, imports pactats, factures, Stripe/Bizum, cash-aware ni `app/admin/tasks`; el canvi només alinea la comunicació visual adjacent al motor #1639.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1640 dins Guàrdia econòmica i llista de talls fets; social-review estructurat passa a #1641+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\packs-recommended-price-format.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: `/admin/packs` ja no contradiu el recomanat premium acabat en 0 amb decimals visuals.
+- Validació humana/UX: Packs i Economia parlen el mateix criteri de preu net, fiable i defensable.
+- `ADMIN_CHANGE_COUNTER` puja a `1640`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1639 — 2026-07-07 — codex (FET)
+
+**Economia PVP recomanat acabat en 0.**
+
+- Context: el propietari demana criteri Manolo sobre si Economia ha d'arrodonir preus a acabat en `0` sempre amunt o usar preu psicològic `.99`; el criteri triat és premium net, no `.99`, per al backoffice econòmic.
+- Monocapa: `lib/constants/pricing.ts` exposa `RECOMMENDED_SELLING_PRICE_STEP = 10` i `roundRecommendedSellingPrice()`.
+- Cervell: `computePackPricingHealth` conserva el càlcul econòmic exacte i aplica l'arrodoniment només al PVP recomanat comercial: pack, hora extra i operari extra.
+- UI: `/admin/economia` mostra `PVP recomanat` i `H. extra recom.` dins el semàfor de packs, i el model de packs explica que el recomanat s'arrodoneix amunt a acabat en 0.
+- Tests: nou test de helper de pricing i regressions de `packPricingHealth` per `59,4 -> 60`, preu ja acabat en 0 i imports no vendibles.
+- Abast: sense schema, migracions, factures, totals pactats, Stripe/Bizum, cash-aware ni `app/admin/tasks`; el canvi afecta recomanacions de pricing, no imports contractuals existents.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1639 dins Guàrdia econòmica i llista de talls fets; social-review estructurat passa a #1640+.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\constants\pricing.test.ts __tests__\lib\services\packPricingHealth.test.ts` (19/19); `npx tsc --noEmit --pretty false`.
+- Validació funcional: `340 -> 340`, `340.01 -> 350`, `349.99 -> 350`; `syncPackPublicPricesToRecommended()` heretarà recomanats acabats en 0 quan s'executi sobre alerts.
+- Validació humana/UX: Economia parla amb preus nets i defensables, no decimals ni `.99`, i el propietari veu el PVP recomanat directament a la taula.
+- `ADMIN_CHANGE_COUNTER` puja a `1639`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1638 — 2026-07-07 — codex (FET)
+
+**Pols operatiu cobrament cash-aware.**
+
+- Context: `loadOperationalPulse` calculava `paymentCollectionRate` amb un count de `remainingPaid=true`, ignorant reserves liquidades amb `cashAmount` però flags manuals falsos.
+- Servei: el wrapper carrega reserves recents amb `total`, `depositAmount`, `remainingAmount`, `depositPaid`, `remainingPaid` i `cashAmount`.
+- Càlcul: nou `calculatePaymentCollectionRate` usa `bookingOutstandingAmount` per comptar reserves realment liquidades.
+- Robustesa: el helper normalitza imports tipus número/string/Decimal serialitzable abans de calcular.
+- Tests: `operationalPulseService.test.ts` cobreix finestra buida, flags pagats, efectiu total amb flags falsos, efectiu parcial i decimals serialitzables.
+- Abast: sense `app/admin/tasks`, schema, migracions, Stripe/Bizum, social ni pricing.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1638 dins Guàrdia econòmica i llista de talls fets.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/operationalPulseService.test.ts` (26/26); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: la mètrica `Cobrament` del pols operatiu compta com a cobrades les reserves amb saldo real zero, inclòs efectiu total.
+- Validació humana/UX: el cockpit deixa de degradar la salut de cobrament per una reserva que el negoci ja té liquidada.
+- `ADMIN_CHANGE_COUNTER` puja a `1638`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1637 — 2026-07-07 — codex (FET)
+
+**Bizum cash-aware.**
+
+- Context: el portal de pagaments ja mostra imports pendents amb `bookingOutstandingBreakdown`, però el servei Bizum encara acceptava declaracions/confirmacions mirant només flags crus.
+- Servei: `bookingBizumService` selecciona `total`, `depositAmount`, `remainingAmount` i `cashAmount` i calcula pendent real amb `bookingOutstandingBreakdown`.
+- Declaració: `declareBizumPayment` retorna `ALREADY_PAID` si la bestreta o la resta ja queden cobertes per efectiu, encara que el flag manual sigui fals.
+- Confirmació: `confirmBizumPayment` aplica la mateixa regla abans de marcar `depositPaid`/`remainingPaid`.
+- UI: `StripePaymentPanel` no mostra banner/item `Bizum pendent` quan la declaració antiga correspon a un tram que el display cash-aware ja considera liquidat.
+- Tests: servei Bizum, rutes API portal/admin i panell cobreixen cobertura cash, parcial permès i banner antic ocult.
+- Abast: sense `app/admin/tasks`, schema, migracions, Stripe checkout, social ni pricing.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1637 dins Guàrdia econòmica i llista de talls fets.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/bookingBizumService.test.ts __tests__/app/api/portal/bizum-notify-route.test.ts __tests__/app/api/admin/bookings-confirm-bizum-route.test.ts __tests__/app/admin/bookings/StripePaymentPanel.test.tsx` (25/25); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: no es poden declarar ni confirmar Bizum de trams ja coberts per efectiu; els imports parcials pendents continuen passant per confirmació humana.
+- Validació humana/UX: l'admin deixa de veure o confirmar Bizum pendent quan la reserva ja està liquidada pel saldo real.
+- `ADMIN_CHANGE_COUNTER` puja a `1637`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1636 — 2026-07-07 — codex (FET)
+
+**PDF factura cash-aware.**
+
+- Context: el generador de PDF de factura encara pintava `Dipòsit` i `Resta` amb `depositPaid`/`remainingPaid` crus, tot i que la resta del circuit ja calcula saldo real amb `cashAmount`.
+- Contracte: `InvoicePdfData` accepta `cashAmount` com a cobertura opcional.
+- Servei: nou `resolveInvoicePaymentRows` a `lib/services/invoicePdfService.ts`, que usa `bookingOutstandingBreakdown` per decidir import visible i estat de bestreta/resta.
+- PDF: `generateInvoicePDF` consumeix aquestes files resoltes i manté label/date de pagament sense inventar dates quan el tram queda cobert per efectiu.
+- Tests: `__tests__/lib/services/invoicePdfService.test.ts` cobreix efectiu que cobreix bestreta, efectiu parcial i efectiu total amb flags falsos.
+- Abast: sense `app/admin/tasks`, schema, migracions, Stripe/Bizum, social ni pricing.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1636 dins Documents/PDF i llista de talls fets.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/invoicePdfService.test.ts` (8/8); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: el PDF de factura ja no marca pendent un tram cobert o reduït per efectiu registrat.
+- Validació humana/UX: el document segueix el mateix criteri de cobrament que l'admin i evita contradiccions fora de pantalla.
+- `ADMIN_CHANGE_COUNTER` puja a `1636`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1635 — 2026-07-07 — codex (FET)
+
+**Stripe checkout cash-aware.**
+
+- Context: el portal ja bloquejava links online antics quan `cashAmount` reduïa un tram, però l'admin podia generar/regenerar Stripe mirant només flags crus.
+- Servei: `lib/services/bookingStripePaymentService.ts` usa `bookingOutstandingBreakdown`; retorna `ALREADY_PAID` si el tram queda cobert i `PARTIAL_CASH_REQUIRES_MANUAL` si l'efectiu parcial faria ambigu l'import online.
+- Flux: si la bestreta queda coberta per efectiu, el pagament final es pot generar sense exigir `depositPaid=true`.
+- UI: `StripePaymentPanel` rep trams cash-aware, amaga URLs/generació en imports parcials i mostra `Import parcial`.
+- Tests: `bookingStripePaymentService`, ruta admin `stripe-checkout` i `StripePaymentPanel` cobreixen cash complet, parcial i resta amb bestreta coberta per efectiu.
+- Abast: sense `app/admin/tasks`, schema, migracions, social, PDFs ni pricing.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1635 dins Guàrdia econòmica i llista de talls fets.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/bookingStripePaymentService.test.ts __tests__/app/api/admin/bookings-stripe-checkout-route.test.ts __tests__/app/admin/bookings/StripePaymentPanel.test.tsx` (18/18); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: no es poden generar ni exposar links Stripe d'import complet quan `cashAmount` ja ha canviat el saldo del tram.
+- Validació humana/UX: l'admin veu el bloqueig com `Import parcial` i evita sobrecobrar.
+- `ADMIN_CHANGE_COUNTER` puja a `1635`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1634 — 2026-07-07 — codex (FET)
+
+**Fitxa reserva trams cash-aware.**
+
+- Context: la capçalera de la fitxa de reserva ja calculava `Pagament` amb `cashAmount`, però les caixes `Paga i senyal`/`Resta` seguien pintant color i import amb flags crus.
+- Helper: `app/admin/bookings/[id]/booking-payment-display.ts` deriva display de trams amb `bookingOutstandingBreakdown`.
+- UI: `app/admin/bookings/[id]/page.tsx` usa el display per fons, color, import visible i visibilitat del `CashPaymentButton`; els `PaymentToggle` continuen representant els flags manuals.
+- Tests: `__tests__/app/admin/bookings/booking-payment-display.test.ts` cobreix flags pagats, bestreta coberta per efectiu i efectiu parcial; `CashPaymentButton` continua verd.
+- Abast: sense `app/admin/tasks`, schema, migracions, APIs de cobrament, Stripe/Bizum, social, PDFs ni pricing.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1634 dins Guàrdia econòmica i llista de talls fets.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/admin/bookings/booking-payment-display.test.ts __tests__/app/admin/bookings/CashPaymentButton.test.tsx` (8/8); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: el detall de reserva ja no mostra trams pendents si el saldo real queda cobert per efectiu.
+- Validació humana/UX: la fitxa manté els controls manuals però deixa de contradir el KPI superior de pagament.
+- `ADMIN_CHANGE_COUNTER` puja a `1634`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1633 — 2026-07-07 — codex (FET)
+
+**Kanban reserves pill pagament cash-aware.**
+
+- Context: #1628 havia fet cash-aware el filtre API/Kanban, però la targeta de `BookingPipelineView` encara mostrava `Paga pendent` només perquè `depositPaid=false`.
+- Dades: el mapper del kanban llegeix `depositAmount`, `remainingAmount`, `remainingPaid` i `cashAmount` de la resposta de `/api/admin/bookings`.
+- UI: la pill `Paga pendent` deriva de `bookingOutstandingBreakdown` i només surt si queda bestreta pendent real.
+- Tests: `__tests__/app/admin/bookings/BookingPipelineView.test.tsx` cobreix cash que cobreix bestreta i cash parcial insuficient.
+- Abast: sense `app/admin/tasks`, schema, migracions, APIs de cobrament, social, PDFs ni pricing.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1633 dins Guàrdia econòmica i llista de talls fets.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/admin/bookings/BookingPipelineView.test.tsx` (6/6); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: el kanban no mostra bestreta pendent si l'efectiu ja la cobreix.
+- Validació humana/UX: la targeta queda alineada amb filtres i llistat sense canviar el disseny.
+- `ADMIN_CHANGE_COUNTER` puja a `1633`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1632 — 2026-07-07 — codex (FET)
+
+**Agenda leads pagament cash-aware.**
+
+- Context: l'Agenda de leads/reserves vinculades és `TANCAT CHARLIE`, però el seu semàfor econòmic encara cridava `getPaymentBand` sense cobertura `cashAmount`.
+- Dades: `lib/services/seasonCalendarService.ts` propaga `total` i `cashAmount` dins `SeasonCalendarBookingLink`.
+- UI: `app/admin/leads/LeadsSeasonClient.tsx` passa `cashAmount/total` a `getPaymentBand` sense tocar layout, classes ni interaccions de l'Agenda.
+- Tests: `__tests__/lib/services/seasonCalendarService.test.ts` comprova que `total/cashAmount` arriben a l'entrada de temporada.
+- Abast: sense `app/admin/tasks`, schema, migracions, APIs de cobrament, portal, social, PDFs ni pricing.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1632 dins Guàrdia econòmica i llista de talls fets.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/seasonCalendarService.test.ts` (24/24); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: el semàfor de pagament de l'Agenda ja no contradiu reserves cobrades en efectiu.
+- Validació humana/UX: la peça conserva l'aparença validada i només corregeix la veritat econòmica mostrada.
+- `ADMIN_CHANGE_COUNTER` puja a `1632`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1631 — 2026-07-07 — codex (FET)
+
+**Timeline portal cash-aware.**
+
+- Context: el portal client ja feia cash-aware pagaments i factura, però `lib/clientPortalTimeline.ts` encara decidia `deposit_paid` i `remaining_paid` amb flags crus.
+- Helper: `getClientPortalTimeline` consumeix `bookingOutstandingBreakdown` per liquidar bestreta/resta quan `cashAmount` cobreix el tram.
+- Dates: la timeline conserva `depositPaidAt`/`remainingPaidAt` reals i no inventa dates si el tram queda cobert només per efectiu.
+- Tests: `__tests__/lib/clientPortalTimeline.test.ts` cobreix bestreta coberta per efectiu i cobrament total en efectiu amb flags falsos.
+- Abast: sense `app/admin/tasks`, schema, migracions, APIs de cobrament, Stripe/Bizum, social, PDFs ni pricing.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1631 dins Guàrdia econòmica i llista de talls fets.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/clientPortalTimeline.test.ts` (10/10); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: el portal `Procés` deixa de reclamar com a pendents trams coberts per efectiu.
+- Validació humana/UX: `Pagaments`, `Factura` i `Procés` queden alineats en la mateixa veritat de caixa.
+- `ADMIN_CHANGE_COUNTER` puja a `1631`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1630 — 2026-07-07 — codex (FET)
+
+**Customer Hub cobrat cash-aware.**
+
+- Context: el Customer Hub ja evitava pendents falsos, però `totalPaid`, el top lead i els badges de reserva encara podien llegir `depositPaid`/`remainingPaid` sense `cashAmount`.
+- KPI: `lib/customer-hub/fetchCustomerHub.ts` calcula `totalPaid` com `total - bookingOutstandingAmount(...)`.
+- Dades: `lib/customer-hub/data.ts`, `dto.ts` i el mapper propaguen `cashAmount` també a la reserva vinculada del lead.
+- UI: `SummaryPanel` i `BookingsPanel` deriven risc, resum i badges amb `bookingOutstandingBreakdown`.
+- Tests: `__tests__/lib/customer-hub/fetchCustomerHub.test.ts` cobreix una reserva coberta per efectiu amb flags falsos.
+- Abast: sense `app/admin/tasks`, schema, migracions, APIs de pagament, portal, social, PDFs ni pricing.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1630 dins Guàrdia econòmica i llista de talls fets.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/customer-hub/fetchCustomerHub.test.ts` (8/8); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: el Customer Hub suma efectiu com a cobrat i deixa de pintar trams coberts com a pendents.
+- Validació humana/UX: el client 360 queda alineat amb Economia, Reserves i Portal.
+- `ADMIN_CHANGE_COUNTER` puja a `1630`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1629 — 2026-07-07 — codex (FET)
+
+**Portal client pagaments cash-aware.**
+
+- Context: el portal client encara derivava pagaments amb `depositPaid`/`remainingPaid`, mentre l'admin ja tractava `cashAmount` com a cobertura real.
+- Helper: `lib/clientPortalPayment.ts` consumeix `bookingOutstandingBreakdown` per calcular `paid`, `nextPayment`, `notice` i imports pendents.
+- Antisobrecobrament: els links Stripe només queden actius si l'import pendent coincideix amb el tram complet del link; amb efectiu parcial es força pendent manual.
+- Factura: `lib/clientPortalInvoice.ts` reutilitza el resum cash-aware per `allPaid`, imports, estat i CTAs.
+- Portada: el pas de bestreta del progrés del portal segueix `paymentSummary.deposit.paid`, no el flag cru.
+- Tests: `__tests__/lib/clientPortalPayment.test.ts` i `__tests__/lib/clientPortalInvoice.test.ts` cobreixen efectiu complet, bestreta coberta i parcial que amaga link antic.
+- Abast: sense `app/admin/tasks`, schema, migracions, APIs de Stripe/Bizum, social, PDFs ni pricing.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1629 dins Guàrdia econòmica i llista de talls fets.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/clientPortalPayment.test.ts __tests__/lib/clientPortalInvoice.test.ts` (20/20); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: el portal deixa de reclamar al client trams coberts per efectiu i evita links online amb import antic quan queda un parcial.
+- Validació humana/UX: client i admin veuen una mateixa veritat de caixa.
+- `ADMIN_CHANGE_COUNTER` puja a `1629`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1628 — 2026-07-07 — codex (FET)
+
+**API/Kanban reserves pagament cash-aware.**
+
+- Context: #1627 ja havia corregit el filtre de pagament del llistat server, però `/api/admin/bookings` i el pipeline continuaven depenent de `bookingListService` amb condicions crues.
+- Helper compartit: `lib/services/bookingPaymentFilter.ts` centralitza `resolvePaymentFilter`, `getPaymentFilterLabel` i `buildBookingsWhere`.
+- Monocapa: `app/admin/bookings/page.tsx` i `lib/services/bookingListService.ts` consumeixen el mateix constructor de `where`.
+- Cash-aware API: `payment=deposit-pending/overdue/due-soon` compara `cashAmount` contra `depositAmount`, `remainingAmount` o `total` també quan ve del kanban/API.
+- Validació de filtres: `status` i `eventType` invalids no entren al `where` compartit.
+- Tests: `__tests__/lib/services/bookingPaymentFilter.test.ts` i `__tests__/lib/services/bookingListService.test.ts` cobreixen helper, dates injectades i field refs de Prisma.
+- Abast: sense `app/admin/tasks`, schema, migracions, social, portal, PDFs, crons ni pricing.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1628 dins Guàrdia econòmica i llista de talls fets.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/bookingPaymentFilter.test.ts __tests__/lib/services/bookingListService.test.ts` (18/18); `npx tsc --noEmit --pretty false`; `pnpm run qa:service-coverage`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: l'API de reserves i el pipeline deixen de tenir una segona definició de deute pendent.
+- Validació humana/UX: la pantalla de reserves i el kanban ja no poden discrepar per efectiu cobert.
+- `ADMIN_CHANGE_COUNTER` puja a `1628`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1627 — 2026-07-07 — codex (FET)
+
+**Filtres de reserves pagament cash-aware.**
+
+- Context: el badge de pagament del llistat ja era cash-aware, però `payment=deposit-pending/overdue/due-soon` encara filtrava amb flags crus.
+- Helper: nou `app/admin/bookings/booking-payment-filter.ts` centralitza `resolvePaymentFilter`, `getPaymentFilterLabel` i `buildBookingsWhere`.
+- Cash-aware: bestreta pendent exigeix `cashAmount < depositAmount`; saldo pendent compara amb `remainingAmount` si la bestreta està pagada i amb `total` si encara no ho està.
+- UI/server: `app/admin/bookings/page.tsx` consumeix el helper i elimina el `where` inline duplicat.
+- Constant: `ADMIN_BOOKING_DEPOSIT_DUE_DAYS` explicita els 30 dies de bestreta al costat de la finestra de 7 dies.
+- Tests: `__tests__/app/admin/bookings/booking-payment-filter.test.ts` comprova els field refs de Prisma per bestreta, saldo i total.
+- Abast: sense `app/admin/tasks`, schema, migracions, social, portal, PDFs, crons ni pricing.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1627 dins Guàrdia econòmica i llista de talls fets.
+- Coordinació: el possible social review estructurat amb migració queda com a tall opcional posterior, no executat.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/admin/bookings/booking-payment-filter.test.ts` (4/4); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: el focus de cobrament de `Reserves` exclou trams coberts en efectiu i manté paginació/totals al servidor.
+- Validació humana/UX: el listat deixa de contradir el badge de pagament i redueix soroll operatiu.
+- `ADMIN_CHANGE_COUNTER` puja a `1627`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1626 — 2026-07-07 — codex (FET)
+
+**Economia cobraments cash-aware.**
+
+- Context: `/admin/economia` encara calculava pendent, venciments i filtres amb flags `depositPaid`/`remainingPaid`, sense aplicar `cashAmount`.
+- Helper: nou `app/admin/economia/economia-payments.ts` projecta cada fila amb `bookingOutstandingBreakdown`, separant flags reals de reserva i saldo real pendent.
+- Dades: `app/admin/economia/page.tsx` selecciona `cashAmount` i deriva KPI, `atRiskRows` i `upcomingDueRows` del helper cash-aware.
+- UI: `economia-types`, `economia-components` i `EconomiaClient` mostren `depositSettled`/`remainingSettled` i imports pendents reals, mentre els toggles continuen actuant sobre `depositPaid`/`remainingPaid`.
+- Constant: la finestra de 7 dies passa a `ADMIN_ECONOMY_PAYMENT_DUE_SOON_DAYS`.
+- Tests: `__tests__/app/admin/economia-payments.test.ts` cobreix flags falsos amb efectiu complet i efectiu parcial imputat primer a bestreta.
+- Abast: sense `app/admin/tasks`, schema, migracions, social, portal, PDFs, crons ni pricing.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1626 dins Guàrdia econòmica i llista de talls fets.
+- Coordinació: el possible social review estructurat amb migració queda com a tall opcional posterior, no executat.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/admin/economia-payments.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: Economia ja calcula pendent, vençuts i pròxims amb saldo real cash-aware i no amb flags interns sols.
+- Validació humana/UX: Finances deixa de perseguir cobraments coberts en efectiu i conserva accions manuals explícites sobre flags.
+- `ADMIN_CHANGE_COUNTER` puja a `1626`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1625 — 2026-07-07 — codex (FET)
+
+**Google Calendar pagament cash-aware.**
+
+- Context: el payload de Google Calendar descrivia `Cobrament:` amb flags `depositPaid`/`remainingPaid` i ignorava l'efectiu registrat.
+- Servei: `lib/services/googleCalendarSyncService.ts` usa `getPaymentBand` amb `cashAmount` i `total` per decidir `Pagament complet/parcial/pendent`.
+- Dades: la sync individual i la reconciliació seleccionen `cashAmount`.
+- Tests: `__tests__/lib/services/googleCalendarSyncService.test.ts` cobreix reserva amb flags falsos i `cashAmount=total` exportada com `Pagament complet`.
+- Abast: sense `app/admin/tasks`, schema, migracions, UI, crons nous, pricing, portal ni PDFs.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1625 dins Guàrdia econòmica i sortides operatives.
+- Coordinació: el possible social review estructurat amb migració queda com a tall opcional posterior, no executat.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/googleCalendarSyncService.test.ts` (12/12); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: Google Calendar ja no propaga `Pagament pendent` si l'efectiu cobreix el total.
+- Validació humana/UX: el calendari deixa de contradir la caixa real i millora la confiança fora de l'admin.
+- `ADMIN_CHANGE_COUNTER` puja a `1625`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1624 — 2026-07-07 — codex (FET)
+
+**Breakdown de pagament cash-aware a Salut.**
+
+- Context: `paymentReminderService` ja era cash-aware, però la itemització de trams era local; `adminHealthService` encara comptava bestretes/restes amb flags crus.
+- Canon: `lib/payment-status.ts` afegeix `bookingOutstandingBreakdown` i `bookingOutstandingAmount` en deriva el total.
+- Recordatoris: `lib/services/paymentReminderService.ts` usa el breakdown compartit per llistar només trams pendents reals.
+- Salut: `lib/services/adminHealthService.ts` selecciona imports i `cashAmount`, i calcula sense bestreta, vençuts i propers amb el breakdown cash-aware.
+- Tests: `__tests__/lib/payment-status.test.ts`, `__tests__/lib/services/paymentReminderService.test.ts` i `__tests__/lib/services/adminHealthService.test.ts` cobreixen el comportament.
+- Abast: sense `app/admin/tasks`, schema, migracions, UI grossa, crons, pricing, portal ni PDFs.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1624 dins Guàrdia econòmica i sistema monocapa.
+- Coordinació: el possible social review estructurat amb migració queda com a tall opcional posterior, no executat.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/payment-status.test.ts __tests__/lib/services/paymentReminderService.test.ts __tests__/lib/services/adminHealthService.test.ts` (29/29); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: Salut i recordatoris comparteixen la mateixa descomposició de caixa pendent i no compten trams coberts amb efectiu.
+- Validació humana/UX: menys falses alarmes internes i menys soroll de cobrament sense alterar cap pagament real.
+- `ADMIN_CHANGE_COUNTER` puja a `1624`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1623 — 2026-07-07 — codex (FET)
+
+**Avisos del pròxim bolo cash-aware.**
+
+- Context: després de cash-aware a NBA/dailyBrief/Customer Hub/recordatoris, el dashboard encara podia marcar el pròxim bolo com a pendent amb flags crus malgrat `outstandingAmount=0`.
+- Dashboard: `app/admin/lib/dashboard-data.ts` fa que `Pagament pendent imminent` miri `nextEvent.outstandingAmount > 0` i mostri l'import real.
+- Insights: `lib/services/dashboardInsightsService.ts` accepta `nextEvent.outstandingAmount` i només genera `next-event-payment` si queda pendent real, mantenint fallback per callers antics.
+- Control: `app/admin/control/page.tsx` propaga `outstandingAmount` i deriva el semàfor de pagament amb cobertura `total - outstandingAmount`.
+- Tests: `__tests__/lib/services/dashboardInsightsService.test.ts` cobreix event proper cobert amb efectiu i flags falsos sense danger de cobrament.
+- Abast: sense `app/admin/tasks`, schema, migracions, crons, emails, pricing, portal, PDFs ni APIs externes.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1623 dins Copilot Avui i Guàrdia econòmica.
+- Coordinació: el possible social review estructurat amb migració queda com a tall opcional posterior, no executat.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/dashboardInsightsService.test.ts` (44/44); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: el dashboard/control només alerta pel pròxim bolo si l'import pendent calculat és real.
+- Validació humana/UX: el propietari veu un senyal econòmic més fiable i no confon un bolo cobert en efectiu amb un impagat.
+- `ADMIN_CHANGE_COUNTER` puja a `1623`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1622 — 2026-07-07 — codex (FET)
+
+**Recordatoris de pagament cash-aware.**
+
+- Context: `paymentReminderService` enviava emails automàtics de cobrament a partir de `depositPaid`/`remainingPaid` i calculava el pendent manualment, ignorant `cashAmount`.
+- Servei: `lib/services/paymentReminderService.ts` reutilitza `bookingOutstandingAmount` per decidir l'import pendent real.
+- Dades: la query de reserves selecciona `remainingAmount` i `cashAmount`.
+- Email: la itemització de dipòsit/resta reparteix l'efectiu registrat i no mostra trams ja coberts.
+- Tests: `__tests__/lib/services/paymentReminderService.test.ts` cobreix cash complet, cash parcial i select de camps canònics.
+- Abast: sense `app/admin/tasks`, schema, migracions, UI, pricing, portal, PDFs ni APIs externes.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1622 dins Guàrdia econòmica.
+- Coordinació: el possible social review estructurat amb migració queda com a tall opcional posterior, no executat.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/paymentReminderService.test.ts` (14/14); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: el cron comercial deixa d'enviar recordatoris quan `cashAmount` cobreix el total i comunica només la resta real si l'efectiu és parcial.
+- Validació humana/UX: les automatitzacions comercials redueixen falsos positius i no persegueixen clients que ja han pagat.
+- `ADMIN_CHANGE_COUNTER` puja a `1622`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1621 — 2026-07-07 — codex (FET)
+
+**Customer Hub pendent cash-aware.**
+
+- Context: `customerInsightsService` calculava `pendingPaymentTotal` manualment amb `depositPaid`/`remainingPaid` i ignorava `cashAmount`, creant possibles next actions `COLLECT_PAYMENT` falses al workspace de client.
+- DTO: `lib/customer-hub/dto.ts` afegeix `remainingAmount` i `cashAmount` a `BookingDTO`.
+- Dades: `lib/customer-hub/fetchCustomerHub.ts` propaga aquests camps des de les reserves carregades.
+- Servei: `lib/services/customerInsightsService.ts` reutilitza `bookingOutstandingAmount` per calcular pendent total i per trobar la reserva que dona context a l'acció de cobrament.
+- Tests: `__tests__/lib/services/customerInsightsService.test.ts` cobreix efectiu complet i parcial; `__tests__/lib/customer-hub/fetchCustomerHub.test.ts` continua verd amb el DTO ampliat.
+- Abast: sense `app/admin/tasks`, schema, migracions, UI, pagaments, pricing, portal, PDFs ni APIs externes.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1621 dins Guàrdia econòmica i Traçabilitat profunda.
+- Coordinació: el possible social review estructurat amb migració queda com a tall opcional posterior, no executat.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/customerInsightsService.test.ts __tests__/lib/customer-hub/fetchCustomerHub.test.ts` (33/33); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: Customer Hub deixa de recomanar cobraments si `cashAmount` cobreix el total i només reclama la resta real quan l'efectiu és parcial.
+- Validació humana/UX: la next action del client és més fiable i no envia el propietari a perseguir pagaments ja resolts.
+- `ADMIN_CHANGE_COUNTER` puja a `1621`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1620 — 2026-07-07 — codex (FET)
+
+**dailyBrief compta cobraments amb efectiu.**
+
+- Context: després del #1619, NBA ja era cash-aware, però `loadDailyBrief` encara comptava pagaments pendents amb `booking.count()` sobre `remainingPaid=false`, ignorant `cashAmount`.
+- Servei: `lib/services/dailyBriefService.ts` afegeix `countPendingPaymentBookings` i reutilitza `bookingOutstandingAmount` per comptar només reserves amb pendent real.
+- Query: `loadDailyBrief` passa de `count()` a `findMany()` amb camps mínims de pagament (`total`, `depositAmount`, `remainingAmount`, `depositPaid`, `remainingPaid`, `cashAmount`) i filtra per flags pendents.
+- Tests: `__tests__/lib/services/dailyBriefService.test.ts` cobreix reserva totalment coberta en efectiu i efectiu parcial.
+- Abast: sense `app/admin/tasks`, schema, migracions, UI, pagaments, pricing, portal, PDFs ni APIs externes.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1620 dins Copilot Avui i Guàrdia econòmica.
+- Coordinació: el possible social review estructurat amb migració queda com a tall opcional posterior, no executat.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/dailyBriefService.test.ts` (42/42); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: resum, KPI i fallback d'Avui deixen de marcar cobraments pendents si l'efectiu ja cobreix el total.
+- Validació humana/UX: la home redueix falsos positius de caixa i evita perseguir cobraments ja resolts.
+- `ADMIN_CHANGE_COUNTER` puja a `1620`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1619 — 2026-07-07 — codex (FET)
+
+**NBA client cash-aware en cobraments.**
+
+- Context: `loadNextBestActions` calculava el pendent de clients a mà amb `depositPaid`/`remainingPaid` i ignorava `cashAmount`; això podia generar accions `COLLECT_PAYMENT` falses quan un bolo ja estava cobrat en efectiu.
+- Servei: `lib/services/nextBestActionService.ts` reutilitza `bookingOutstandingAmount` per agregar el pendent de les reserves del client.
+- Query: els bookings de client dins NBA seleccionen ara `remainingAmount` i `cashAmount`, a més de total, senyal i flags de pagament.
+- Tests: `__tests__/lib/services/nextBestActionServiceQueries.test.ts` comprova la selecció dels camps cash-aware i que un client cobrat del tot en efectiu no genera `COLLECT_PAYMENT`; la suite pura de `nextBestActionService` continua verda.
+- Abast: sense `app/admin/tasks`, schema, migracions, UI, pagaments, pricing, portal, PDFs ni APIs externes.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1619 dins Copilot Avui i Guàrdia econòmica.
+- Coordinació: el possible social review estructurat amb migració queda com a tall opcional posterior, no executat.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/nextBestActionServiceQueries.test.ts __tests__/lib/services/nextBestActionService.test.ts` (35/35); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF aliens); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: NBA deixa de proposar cobraments pendents quan el total ja consta cobert en efectiu.
+- Validació humana/UX: `Fes això ara` redueix falsos positius de caixa i protegeix la confiança en la cua executiva.
+- `ADMIN_CHANGE_COUNTER` puja a `1619`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1618 — 2026-07-07 — codex (FET)
+
+**Avui puja caixa pendent dins 7 dies.**
+
+- Context: el roadmap Manolo diu que els riscos econòmics dels pròxims 7 dies poden entrar a la cua principal d'Avui, però el filtre de caixa pendent encara tallava a 3 dies.
+- Runtime: `lib/admin/bookingEconomics.ts` introdueix `DASHBOARD_ECONOMIC_RISK_WINDOW_DAYS = 7` i inclou cobraments pendents dins aquesta finestra a `projectDashboardEconomicRiskBookings`.
+- Projecció: `app/admin/lib/today-actions.ts` reutilitza la mateixa constant perquè `projectNextEventEconomicTodayAction` no descarti un risc ja calculat pel servei.
+- Tests: `__tests__/app/admin/next-event-economics.test.ts` cobreix caixa pendent a 7 dies i fora de finestra; `__tests__/app/admin/today-actions.test.ts` cobreix l'acció `Cobrar pendent` a 6 dies i null a 8 dies.
+- Abast: sense `app/admin/tasks`, schema, migracions, UI grossa de la home, pagaments, pricing, portal, PDFs ni APIs externes.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1618 dins Copilot Avui i Guàrdia econòmica.
+- Coordinació: el possible social review estructurat amb migració queda com a tall opcional posterior, no executat.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/admin/today-actions.test.ts __tests__/app/admin/next-event-economics.test.ts` (15/15); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF aliens); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: els cobraments pendents dins la setmana operativa poden pujar a `Fes això ara` abans que quedin a només tres dies.
+- Validació humana/UX: el propietari rep abans un avís accionable de caixa sense obrir avisos indefinits més enllà de 7 dies.
+- `ADMIN_CHANGE_COUNTER` puja a `1618`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1617 — 2026-07-07 — codex (FET)
+
+**Avui omple buits de la cua amb dailyBrief.**
+
+- Context: `Fes això ara` ja prioritzava NBA, risc econòmic i post-event, però si aquestes fonts només donaven una o dues accions, la cua quedava curta i amagava accions del `dailyBrief` que ja estaven calculades.
+- Runtime: `app/admin/lib/today-actions.ts` afegeix el `dailyBrief` com a fallback de baixa prioritat després de les accions principals, mantenint el límit configurat.
+- Guard: la deduplicació només salta fallback del `dailyBrief` quan el mateix `href` ja ha sortit abans; no elimina accions NBA diferents que comparteixin workspace.
+- Tests: `__tests__/app/admin/today-actions.test.ts` cobreix que post-event continua davant del brief, que el brief omple buits i que no es repeteix un fallback amb `href` duplicat.
+- Abast: sense `app/admin/tasks`, schema, migracions, serveis Prisma, UI de la home, pricing, portal, PDFs ni APIs externes.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1617 dins `Copilot Avui`.
+- Coordinació: el possible social review estructurat amb migració queda com a tall opcional posterior, no executat.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/admin/today-actions.test.ts` (10/10); `npx tsc --noEmit --pretty false`; `git diff --check` (només avisos CRLF aliens); `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: la cua executiva d'Avui pot completar fins al límit amb accions operatives ja existents quan el ranking principal no omple totes les posicions.
+- Validació humana/UX: la primera pantalla ofereix més proper moviment sense duplicar la mateixa porta ni crear soroll nou.
+- `ADMIN_CHANGE_COUNTER` puja a `1617`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1616 — 2026-07-07 — codex (FET)
+
+**Trust públic no promet reemborsament abans de confirmar.**
+
+- Context: després del #1615, el checkout públic ja parlava de preu estimat, però `booking.trust.items.2` combinava títol `Sense compromís/No commitment` amb descripció de reemborsament 100% a +60 dies, una política post-senyal dins captació pre-confirmació.
+- Copy: `messages/ca.json`, `messages/es.json` i `messages/en.json` canvien la descripció a `Revisió final abans de confirmar`, `Revisión final antes de confirmar` i `Final review before confirmation`.
+- Guard: `__tests__/app/configurador/configurator-public-promise.test.ts` comprova aquest trust item i rebutja `Retorn 100%`, `Devolución 100%` i `100% refund` en aquest context.
+- Abast: es mantenen intactes les polítiques de cancel·lació i reemborsament on sí són condicions reals post-senyal; no canvia càlculs, pricing core, configurador runtime, schema, migracions, Stripe, portal UI, PDFs ni APIs externes.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1616 dins public web/configurador; el possible social review amb migració queda renumerat a #1617 si el propietari el demana.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal UI, PDFs ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/configurador/configurator-public-promise.test.ts` (6/6); `pnpm run qa:i18n-keys-sync`; parse JSON de `messages/ca|es|en`; cerca residual exacta neta; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: el formulari públic promet revisió final abans de confirmar, no reemborsament d'un pagament que encara no s'ha fet.
+- Validació humana/UX: la confiança queda alineada amb sol·licitud/proposta/revisió abans de confirmació.
+- `ADMIN_CHANGE_COUNTER` puja a `1616`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1615 — 2026-07-07 — codex (FET)
+
+**Checkout públic deixa de dir preu final.**
+
+- Context: després del #1614, la FAQ ja parlava d'estimació orientativa, però `checkout.finalPrice` encara mostrava `El teu/Tu/Your final price` dins un flux públic que demana proposta i validació posterior.
+- Copy: `messages/ca.json`, `messages/es.json` i `messages/en.json` canvien `checkout.finalPrice` a `Preu estimat`, `Precio estimado` i `Estimated price`.
+- Guard: `__tests__/app/configurador/configurator-public-promise.test.ts` comprova aquesta etiqueta i rebutja `preu final`, `precio final` i `final price` dins el checkout públic.
+- Abast: no canvia càlculs, pricing core, configurador runtime, schema, migracions, Stripe, portal UI, PDFs ni APIs externes.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1615 dins public web/configurador; el possible social review amb migració queda renumerat a #1616 si el propietari el demana.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal UI, PDFs ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/configurador/configurator-public-promise.test.ts` (5/5); `pnpm run qa:i18n-keys-sync`; parse JSON de `messages/ca|es|en`; cerca residual exacta neta; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: el checkout públic mostra preu estimat dins una proposta revisable, no import final tancat.
+- Validació humana/UX: l'usuari entén l'estalvi i el valor sense interpretar-lo com a confirmació econòmica final.
+- `ADMIN_CHANGE_COUNTER` puja a `1615`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1614 — 2026-07-07 — codex (FET)
+
+**FAQ pública no ven preu final automàtic.**
+
+- Context: després del #1613, subtítols i metadades del configurador ja parlaven d'estimació, però FAQ pública encara deia que els `preus/prices` es calculaven automàticament, una promesa més forta que el flux real d'estimació automàtica i pressupost/proposta revisable.
+- Copy: `messages/ca.json`, `messages/es.json` i `messages/en.json` actualitzen la FAQ global; CA/ES actualitzen també les FAQs duplicades de landing/secció que repetien la mateixa frase.
+- Guard: `__tests__/app/configurador/configurator-public-promise.test.ts` recorre tots els strings de `messages/*` i rebutja `Els preus es calculen automàticament`, `Los precios se calculan automáticamente` i `Prices are calculated automatically`.
+- Abast: es mantenen les mencions legítimes a pressupost personalitzat quan són el pas manual posterior; no canvia càlculs, pricing core, configurador runtime, schema, migracions, Stripe, portal UI, PDFs ni APIs externes.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1614 dins public web/configurador; el possible social review amb migració queda renumerat a #1615 si el propietari el demana.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal UI, PDFs ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/configurador/configurator-public-promise.test.ts` (5/5); `pnpm run qa:i18n-keys-sync`; parse JSON de `messages/ca|es|en`; cerca residual exacta neta; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: la FAQ pública parla d'estimació orientativa calculada pel configurador, no de preu final tancat automàticament.
+- Validació humana/UX: el client rep una resposta ràpida i clara de preu orientatiu sense confondre-la amb proposta final.
+- `ADMIN_CHANGE_COUNTER` puja a `1614`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1613 — 2026-07-07 — codex (FET)
+
+**Pressupost instantani públic passa a estimació revisable.**
+
+- Context: després del #1612, la captació pública ja no prometia reserva immediata, però `messages/*` encara tenia subtítols i metadades que venien `pressupost/presupuesto/quote instantani` o `en 1 minut` com si fos un pressupost final, mentre el flux real dona estimació i proposta revisable.
+- Copy: `messages/ca.json`, `messages/es.json` i `messages/en.json` actualitzen `pages.weddings.heroSubtitle`, `pages.mobile.heroSubtitle`, `pages.rental.heroSubtitle` i `configuradorPage.meta.*` perquè parlin d'estimació orientativa/estimate.
+- Guard: `__tests__/app/configurador/configurator-public-promise.test.ts` cobreix aquests subtítols i metadades SEO/OG i rebutja `Pressupost instantani`, `Presupuesto instantáneo`, `Pressupost en 1 Minut`, `Presupuesto en 1 Minuto`, `receive your quote instantly` i `quote in 1 minute`.
+- Abast: no canvia càlculs, pricing core, configurador runtime, schema, migracions, Stripe, portal UI, PDFs ni APIs externes.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1613 dins public web/configurador; el possible social review amb migració queda renumerat a #1614 si el propietari el demana.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal UI, PDFs ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/configurador/configurator-public-promise.test.ts` (4/4); `pnpm run qa:i18n-keys-sync`; parse JSON de `messages/ca|es|en`; cerca residual de promeses antigues neta; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: les superfícies públiques afectades prometen estimació orientativa i proposta revisable, no pressupost final instantani.
+- Validació humana/UX: la web conserva rapidesa comercial sense mentir sobre una decisió que encara necessita revisió humana.
+- `ADMIN_CHANGE_COUNTER` puja a `1613`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1612 — 2026-07-07 — codex (FET)
+
+**Captació pública residual passa a disponibilitat/proposta.**
+
+- Context: després del #1606-#1609, quedaven textos públics de captació fora del configurador principal que encara prometien `reserva`, `book` o data reservada 48h abans de proposta/revisió.
+- Copy: `messages/ca.json`, `messages/es.json` i `messages/en.json` actualitzen `calendar`, `mobileExperience.cta.guarantee`, `homeSections.ctaFinal.guarantee`, `halloweenPage`, `monMagicPage` i `heroUrgency.monMagic`.
+- Guard: `__tests__/app/configurador/configurator-public-promise.test.ts` cobreix ara aquestes claus perquè no torni `Reserva el teu Halloween`, `Reserva en {days}`, `Vols reservar una data`, `Book your experience`, ni data reservada 48h en captació.
+- Abast: no es toca cap text intern on reserva/confirmació és legítim: contractes, emails de reserva confirmada, portal, admin o procés amb senyal.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1612 dins public web/configurador; el possible social review amb migració queda renumerat a #1613 si el propietari el demana.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal UI, PDFs ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/configurador/configurator-public-promise.test.ts` (3/3); `pnpm run qa:i18n-keys-sync`; parse JSON de `messages/ca|es|en`; cerca residual de promeses antigues neta; `npx tsc --noEmit --pretty false`; `git diff --check`.
+- Validació funcional: home/calendari/Halloween/Món Màgic de captació demanen proposta o disponibilitat, no reserva confirmada.
+- Validació humana/UX: la urgència comercial queda alineada amb el backend: primer sol·licitud/proposta/revisió, després confirmació amb senyal.
+- `ADMIN_CHANGE_COUNTER` puja a `1612`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1611 — 2026-07-07 — codex (FET)
+
+**Canon admin elimina font-px P3.**
+
+- Context: després del #1610, `pnpm run qa:admin-canon -- --strict --list` ja no tenia P1 però encara detectava 4 P3 `font-px` en calendari mensual i playbook post-event.
+- Canvi visual: `app/admin/calendario/CalendarMonthClient.tsx`, `app/admin/post-event/playbook/page.tsx` i `app/admin/post-event/playbook/RecordRecurrenceDecisionButton.tsx` deixen `text-[10px]`/`text-[11px]` i passen a `text-[length:var(--o-text-2xs)]`.
+- Abast: no canvia dades, fluxos, accions, schema, APIs, pricing, Stripe, portal UI ni PDFs; només elimina mides tipogràfiques locals en peces admin.
+- Guard: `qa:admin-canon` passa a 0 troballes.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1611 dins Visual/Studio; el possible social review amb migració queda renumerat a #1612 si el propietari el demana.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal UI, PDFs ni APIs externes.
+- Validació tècnica: `pnpm run qa:admin-canon -- --strict --list` (0 troballes); `pnpm test:run -- --run __tests__/app/admin/calendario/calendar-utils.test.ts __tests__/lib/services/adminCalendarMonthService.test.ts __tests__/lib/services/postEventPlaybookService.test.ts __tests__/lib/services/postEventPlaybookLoadService.test.ts __tests__/app/admin/post-event-actions.test.ts __tests__/app/api/admin/post-event-recurrence-decision-route.test.ts` (56/56); `npx tsc --noEmit --pretty false`; `git diff --check`.
+- Validació funcional: els badges de risc econòmic i d'acció preparada continuen apareixent igual en calendari/playbook, però la mida surt del token canònic.
+- Validació humana/UX: la microtipografia admin deixa de tenir píxels arbitraris i queda alineada amb Studio.
+- `ADMIN_CHANGE_COUNTER` puja a `1611`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1610 — 2026-07-07 — codex (FET)
+
+**Catàlegs locals tornen a constants canòniques.**
+
+- Context: el `validate:core` executat després del #1609 ha fallat a `arch:layer:check` per catàlegs declaratius locals fora de `lib/constants/*`.
+- Constants noves: `lib/constants/clientPortalTimeline.ts`, `publicBooking.ts`, `publicLocale.ts`, `adminCalendar.ts`, `documentAuditTrail.ts`, `postEventRecurrence.ts` i `socialPostReview.ts`.
+- Recablejat: `clientPortalTimeline`, `public-booking-errors`, `public-locale`, `adminCalendarMonthService`, `documentAuditTrailService`, `postEventRecurrenceDecisionService` i `socialPostReviewGuard` importen les fonts canòniques.
+- Compatibilitat: es mantenen reexports quan altres superfícies ja importaven des del helper antic; no hi ha canvi de comportament.
+- Guard: `arch:layer:check` deixa de trobar catàlegs locals i torna a passar.
+- Cobertura: `documentAuditTrailService` i `bookingEconomics` guanyen tests propis perquè `qa:service-coverage` també quedi verd.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1610.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal UI, PDFs ni APIs externes.
+- Validació tècnica: `pnpm run arch:layer:check`; tests constants/serveis/social (67/67); tests nous `documentAuditTrailService` + `bookingEconomics` (4/4); `pnpm run qa:service-coverage`; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`; `pnpm run validate:core`.
+- Validació funcional: els imports públics existents continuen resolent, però la font declarativa és canònica.
+- Validació humana/UX: cap pantalla canvia; el repo guanya coherència de monocapa i el guard deixa d'avisar de deute real.
+- `ADMIN_CHANGE_COUNTER` puja a `1610`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1609 — 2026-07-07 — codex (FET)
+
+**CTAs públics residuals passen a proposta.**
+
+- Context: després del #1606-#1608, el configurador i les ofertes principals ja eren coherents, però `messages/*` encara tenia CTAs de captació amb `RESERVA AVUI`, `Reserva ara`, `Book now`, flash offers i urgències que no creen una reserva confirmada.
+- Copy: `common.buttons`, `reviews.cta`, `urgency`, `flashOffer`, `packsOffers.earlyBird` i `heroUrgency` passen a proposta, pressupost o disponibilitat en ca/es/en.
+- Copy anglès: `pages.about.cta.description` deixa de dir `reserve your date before it flies` i passa a `check availability`.
+- Criteri: no es toquen textos on la reserva amb senyal és el pas posterior real, com `gracias.nextSteps`.
+- Guard: `configurator-public-promise.test.ts` amplia la cobertura a aquests CTAs residuals i blinda que no tornin `Reserva ara`, `Book now`, `Book today` ni equivalents en captació pública.
+- i18n: cap clau nova; sincronització ca/es/en intacta.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1609.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal, PDFs ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\configurador\configurator-public-promise.test.ts` (3/3); `rg` de promeses antigues sense resultats; `pnpm run qa:i18n-keys-sync`; `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: els CTAs públics de captació demanen proposta/disponibilitat, coherents amb backend de sol·licitud i revisió humana.
+- Validació humana/UX: la web manté urgència comercial sense prometre reserva instantània on només hi ha contacte o proposta.
+- `ADMIN_CHANGE_COUNTER` puja a `1609`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1608 — 2026-07-07 — codex (FET)
+
+**Subtítol del configurador també parla de proposta.**
+
+- Context: després del #1606/#1607, `configurator.step4.subtitle` encara deia “Reserva ara i estalvia” dins un flux de sol·licitud.
+- Copy: ca/es/en canvien el subtítol a demanar proposta amb estalvi.
+- Guard: `configurator-public-promise.test.ts` comprova també `step4.subtitle`.
+- i18n: cap clau nova; sincronització ca/es/en intacta.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1608.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal, PDFs ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\configurador\configurator-public-promise.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `pnpm run qa:i18n-keys-sync`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: tot el pas final del configurador queda alineat amb sol·licitud/proposta.
+- Validació humana/UX: la urgència comercial ja no es contradiu amb el backend.
+- `ADMIN_CHANGE_COUNTER` puja a `1608`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1607 — 2026-07-07 — codex (FET)
+
+**Ofertes públiques passen de reserva a proposta.**
+
+- Context: `checkout.offerReason` i `offerModal` encara prometien reserva/confirmació immediata tot i que el circuit públic demana proposta i validació.
+- Checkout: ca/es/en passen de “reserva ara” a demanar proposta i expliquen que es revisa disponibilitat abans de preparar pressupost final.
+- Modal oferta: ca/es/en passen de “reserva avui” a “sol·licita proposta avui”.
+- Descripció: el descompte queda vinculat a propostes sol·licitades avui, no a reserves confirmades avui.
+- Guard: `configurator-public-promise.test.ts` cobreix `checkout`, `offerModal` i el pas final del configurador.
+- i18n: cap clau nova; només copy sincronitzat a ca/es/en.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1607.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal, PDFs ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\configurador\configurator-public-promise.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `pnpm run qa:i18n-keys-sync`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: l'oferta pública continua accionable però ja no promet una reserva confirmada que el backend no fa automàticament.
+- Validació humana/UX: la urgència comercial queda honesta i coherent amb proposta/validació.
+- `ADMIN_CHANGE_COUNTER` puja a `1607`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1606 — 2026-07-07 — codex (FET)
+
+**Configurador públic no promet reserva confirmada.**
+
+- Context: el configurador públic crea sol·licitud/lead, però alguns textos encara prometien confirmació instantània, confirmació enviada i reemborsament sense pagament.
+- Copy: `messages/ca.json`, `messages/es.json` i `messages/en.json` passen de reserva/confirmació a sol·licitud/proposta final/revisió humana.
+- CTA: el pas final demana proposta amb descompte, no reserva confirmada.
+- Garantia: deixa de parlar de reemborsament i explica que enviar la sol·licitud no compromet ni activa pagament.
+- Èxit: el missatge final diu que la sol·licitud s'ha rebut i que es validarà disponibilitat i detalls.
+- Guard: test nou `configurator-public-promise.test.ts` impedeix tornar a prometre reserva instantània, confirmació final o reemborsament en aquest flux.
+- i18n: claus sincronitzades a ca/es/en; no s'afegeixen claus noves.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1606.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal, PDFs ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\configurador\configurator-public-promise.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `pnpm run qa:i18n-keys-sync`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: el configurador comunica sol·licitud/proposta i no reserva final, coherent amb el backend.
+- Validació humana/UX: la promesa pública baixa al que la màquina pot garantir i evita falsa confiança.
+- `ADMIN_CHANGE_COUNTER` puja a `1606`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1605 — 2026-07-07 — codex (FET)
+
+**Timeline de client pot aïllar documents.**
+
+- Context: després de destacar dossiers documentals, faltava poder revisar documents dins la timeline sense barrejar-los amb comunicacions ordinàries.
+- Filtre: `CUSTOMER_TIMELINE_FILTER_OPTIONS` incorpora `Documents`.
+- UI: `TimelinePanel` detecta documents per `meta.documentType`, `meta.contractPdfUrl` o metadades de dossier.
+- Semàntica: el filtre `Comunicacions` exclou documents detectats, de manera que dossiers/contractes no semblen emails o notes.
+- Guard: no es duplica el panell de documents, no hi ha fetch nou i no es toca backend/schema/PDF.
+- Tests: `TimelinePanel.test.tsx` cobreix que `Documents` mostra dossier i amaga email, i `Comunicacions` fa l'invers.
+- Nota de roadmap: s'evita la migració social prevista com a opcional perquè el propietari no ha demanat més rigor legal de schema i el bypass server ja està tancat.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1605.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal, PDFs ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\clientes\TimelinePanel.test.tsx __tests__\lib\services\timelineQueryService.test.ts` (42/42); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: la cronologia pot aïllar documents i deixa les comunicacions netes de traces documentals.
+- Validació humana/UX: el client 360 guanya una lectura documental clara sense obrir cap mòdul paral·lel.
+- `ADMIN_CHANGE_COUNTER` puja a `1605`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1604 — 2026-07-07 — codex (FET)
+
+**Timeline de client destaca dossiers documentals.**
+
+- Context: les traces `DOCUMENT_DOSSIER_*` ja arribaven al Customer Hub, però visualment quedaven com una activitat genèrica dins la cronologia.
+- UI: `TimelinePanel` detecta dossier documental via `meta.documentType`, `meta.entityType` o `meta.dossierId`.
+- Visual: la targeta rep franja informativa, fons subtil i badge `Document dossier`, mantenint la mateixa timeline i filtres.
+- Navegació: el CTA existent (`Obrir dossiers`) i els links d'origen es conserven; no es duplica el panell de documents.
+- Guard: no es toca `timelineQueryService`, schema, PDF ni servei de dossier; només es pinta metadata existent.
+- Tests: `TimelinePanel.test.tsx` cobreix un event `ACTIVITY` de dossier amb badge, preview i link; `timelineQueryService` continua cobrint la traça d'origen.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1604.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal, PDFs ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\clientes\TimelinePanel.test.tsx __tests__\lib\services\timelineQueryService.test.ts` (41/41); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: una traça de dossier continua dins la cronologia existent però queda diferenciada com a document.
+- Validació humana/UX: el client 360 deixa clar que aquell event és un dossier generat/enviat i no una nota tècnica genèrica.
+- `ADMIN_CHANGE_COUNTER` puja a `1604`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1603 — 2026-07-07 — codex (FET)
+
+**Risc econòmic aterra en acció dins la fitxa.**
+
+- Context: el calendari ja obria `#sec-finances` o `#sec-marge`, però la fitxa encara no convertia aquell aterratge en una microacció explícita.
+- Helper: nou `booking-risk-action.ts` amb resolució pura de CTA de finances i CTA de marge a partir del guard econòmic existent.
+- Finances: `Resum Econòmic` mostra acció recomanada si queda import pendent i apunta als toggles de pagament i enllaços/Bizum.
+- Marge: la secció `Marge` mostra acció recomanada si el marge és `watch` o `critical` i apunta al desglossament de costos i al total.
+- Anchor: `BookingMarginCard` exposa `booking-margin-costs` perquè el salt aterri al sumatori real de costos.
+- Guard: no es recalcula economia, no es canvien imports i no s'automatitzen cobraments; només es guia sobre controls existents.
+- Tests: `booking-risk-action.test.ts` cobreix caixa pendent, marge sa, marge en vigilància i marge crític; `calendar-utils` manté el contracte de salt.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1603.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\booking-risk-action.test.ts __tests__\app\admin\calendario\calendar-utils.test.ts` (11/11); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: risc de caixa i risc de marge aterren en una acció visible dins la fitxa sense sortir del circuit canònic.
+- Validació humana/UX: la màquina ja diu què revisar després del salt des del calendari, reduint memòria manual.
+- `ADMIN_CHANGE_COUNTER` puja a `1603`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1602 — 2026-07-07 — codex (FET)
+
+**Revisió social blindada també al servei.**
+
+- Context: la UI bloquejava programar/publicar posts post-event amb consentiment pendent, però la regla no estava al servei.
+- Helper: nou `lib/socialPostReviewGuard.ts` amb marcadors, nota resolta, estats bloquejats i validació pura.
+- UI: `SocialClient` reutilitza el helper compartit i deixa de portar la regla duplicada.
+- Servei: `createSocialPost()` i `updateSocialPost()` rebutgen `SCHEDULED/PUBLISHED` quan hi ha `bookingId`, categoria `EVENT_SHOWCASE` i notes pendents.
+- Guard: sense schema ni migració; la decisió resolta continua a `SocialPost.notes`, però el bypass server queda tancat.
+- Tests: Social UI i `socialPostService` cobreixen bloqueig i flux resolt.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1602.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\social\SocialClient.test.tsx __tests__\lib\services\socialPostService.test.ts` (39/39); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: la regla de revisió social s'aplica tant des del modal com des del servei.
+- Validació humana/UX: la publicació post-event queda protegida per la màquina i no per memòria manual.
+- `ADMIN_CHANGE_COUNTER` puja a `1602`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1601 — 2026-07-07 — codex (FET)
+
+**Dossier deixa traça documental amb origen.**
+
+- Context: els dossiers ja mostraven origen al llistat, però el PDF compost i l'enviament no deixaven una traça documental completa amb client/entrada.
+- Accions: `documentAuditTrailService` afegeix `DOCUMENT_DOSSIER_SENT` i `DOCUMENT_DOSSIER_COMPOSITE_PDF_GENERATED`.
+- Enviament: `sendDossierByEmail()` registra dossier enviat amb `dossierId`, `leadId`, `customerId`, destinatari, productes i font snapshot/catàleg.
+- PDF: `/api/admin/dossiers/[id]/composite` registra el PDF compost via `recordDocumentAdminLog()` i deixa origen lead/client.
+- Timeline: `timelineQueryService` mapeja dossiers documentals, els linka a `/admin/dossiers` i els recupera per `details.customerId` o `details.leadId`.
+- Activitat: `DOCUMENT_DOSSIER_SENT` entra a comunicacions i `DOCUMENT_DOSSIER_COMPOSITE_PDF_GENERATED` a sistema.
+- Tests: servei de dossier, ruta PDF i timeline cobreixen la nova traça.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1601.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\dossiers-composite-route.test.ts __tests__\lib\services\dossierService.test.ts __tests__\lib\services\timelineQueryService.test.ts` (63/63); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: dossier enviat i PDF compost queden reconstruïbles des d'adminLog i timelines associades.
+- Validació humana/UX: el document comercial queda lligat a client/entrada sense demanar memòria manual al propietari.
+- `ADMIN_CHANGE_COUNTER` puja a `1601`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1600 — 2026-07-07 — codex (FET)
+
+**Agenda econòmica obre la secció accionable.**
+
+- Context: el calendari ja mostrava reserva amb risc i motiu, però el CTA obria la fitxa de reserva de forma genèrica.
+- Helper: `buildBookingHref()` accepta hash opcional sense trencar callers existents.
+- Helper: `resolveCalendarEconomicRiskActionHash()` transforma `economicRisk` existent en `sec-finances` o `sec-marge`.
+- UI: mes, setmana i dia obren `#sec-finances` quan hi ha pendent/cobrament/caixa i `#sec-marge` quan el problema és marge.
+- Guard: no es recalcula economia al front; només es consumeixen `economicRisk.label`, `reasons`, `outstandingAmount` i `marginPct`.
+- Tests: `calendar-utils` cobreix finances/marge/null i `bookingWorkspaceHref` cobreix hashes amb i sense `#`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1600.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\calendario\calendar-utils.test.ts __tests__\lib\admin\bookingWorkspaceHref.test.ts __tests__\app\admin\calendario\CalendarMonthClient.test.ts` (8/8); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: el CTA de risc econòmic salta al bloc intern correcte de la reserva segons el tipus de risc.
+- Validació humana/UX: el calendari redueix un pas mental i porta el propietari directament al punt de decisió.
+- `ADMIN_CHANGE_COUNTER` puja a `1600`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1598 — 2026-07-07 — codex (FET)
+
+**Dossiers mostren origen lead/client.**
+
+- Context: el llistat de dossiers podia mostrar lead, però no client origen, i la paperera perdia aquest context visual.
+- Query: `getAllDossiers()` i `getDeletedDossiers()` deriven `customerId`/`customerName` des de `Lead.customerId` amb join a `customers`.
+- UI: `DossiersPage` mostra franja `Origen` amb links a Entrada i Client quan existeixen.
+- Paperera: els dossiers eliminats també mostren origen si el conserven.
+- Tests: `dossierService` verifica el join a customer i les claus d'origen en queries de llistat.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1598.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDFs.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\dossierService.test.ts` (21/21); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: des del llistat de dossiers es pot saltar a l'entrada i al client d'origen.
+- Validació humana/UX: el dossier queda situat dins la cadena comercial i deixa de ser un fitxer aïllat.
+- `ADMIN_CHANGE_COUNTER` puja a `1598`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1597 — 2026-07-07 — codex (FET)
+
+**Agenda econòmica mostra el motiu del risc.**
+
+- Context: el calendari ja obria una reserva amb risc, però el resum no explicava per què aquella era l'acció.
+- Helper: `calendar-utils` afegeix `formatCalendarEconomicRiskActionReason()`, amb primera `reason` i fallback al `label`.
+- UI: mes, setmana i dia mostren `Motiu: ...` al costat del CTA `Obrir reserva amb risc`.
+- Guard: no es recalcula economia al front; només es consumeix `economicRisk` existent.
+- Tests: cobertura unitària del format de raó accionable.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1597.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\calendario\calendar-utils.test.ts __tests__\app\admin\calendario\CalendarMonthClient.test.ts` (5/5); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: el calendari mostra el motiu del risc econòmic abans d'obrir la reserva afectada.
+- Validació humana/UX: l'agenda explica el problema i el següent clic, no només pinta un avis.
+- `ADMIN_CHANGE_COUNTER` puja a `1597`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1596 — 2026-07-07 — codex (FET)
+
+**Timeline documental mostra origen.**
+
+- Context: el panell de pressupostos ja mostrava origen, però la cronologia documental encara només obria el document.
+- DTO: `TimelineEventDTO` incorpora `originLinks` opcionals.
+- Builder: `buildCustomerBusinessTimelineEvents()` afegeix Client origen, Entrada origen i Reserva origen als events de proposta/contracte quan hi ha IDs.
+- UI: `TimelinePanel` renderitza franja `Origen` sota l'enllaç principal de l'event.
+- Tests: regressió del builder de timeline i del panell visual.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1596.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\customer-hub\timeline.test.ts __tests__\app\admin\clientes\TimelinePanel.test.tsx` (5/5); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: cada event documental pot obrir el document i també l'origen client/entrada/reserva.
+- Validació humana/UX: la cronologia explica la cadena comercial del document sense obligar a reconstruir-la mentalment.
+- `ADMIN_CHANGE_COUNTER` puja a `1596`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1595 — 2026-07-07 — codex (FET)
+
+**Agenda econòmica obre la reserva amb risc.**
+
+- Context: el calendari ja resumia `economicRisk`, però encara no proposava quina reserva calia obrir.
+- Helper: `calendar-utils` afegeix `selectCalendarEconomicRiskBooking()`, prioritzant risc crític i degradant a avís.
+- UI: mes, setmana i dia mostren CTA `Obrir reserva amb risc` cap a la fitxa de reserva.
+- Agregació: mes/setmana prefereixen un crític posterior abans que un avís anterior.
+- Tests: cobertura unitària del selector crític/avís.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1595.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\calendario\calendar-utils.test.ts __tests__\app\admin\calendario\CalendarMonthClient.test.ts` (4/4); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: el resum econòmic del calendari obre directament una reserva amb risc.
+- Validació humana/UX: l'agenda passa d'avisar a proposar el primer bolo que cal revisar.
+- `ADMIN_CHANGE_COUNTER` puja a `1595`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1594 — 2026-07-07 — codex (FET)
+
+**Consentiment social resolt sense schema.**
+
+- Context: el #1588 bloquejava programar/publicar drafts post-event pendents de revisió, però la resolució depenia d'editar manualment les notes.
+- UI: `SocialClient` afegeix `Marcar revisió feta` dins l'avís de revisió obligatòria.
+- Persistència: l'acció neteja els marcadors pendents i escriu una nota persistent de revisió resolta dins `SocialPost.notes`.
+- Guard: programar/publicar continua bloquejat mentre la revisió no s'hagi resolt.
+- Tests: regressió que resol la revisió, publica i comprova el `PATCH` sense marcadors pendents.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1594.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\social\SocialClient.test.tsx __tests__\lib\services\socialPostService.test.ts` (37/37); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: un draft post-event només es pot programar/publicar després de marcar la revisió feta, i la decisió queda a notes.
+- Validació humana/UX: el propietari té un botó clar per tancar consentiment/imatges/privacitat sense editar frases tècniques a mà.
+- `ADMIN_CHANGE_COUNTER` puja a `1594`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1593 — 2026-07-07 — codex (FET)
+
+**Documents comercials mostren ruta d'origen.**
+
+- Context: el Customer Hub mostrava pressupost/contracte i snapshots, però no feia visible de quin client/entrada/reserva sortia cada document.
+- DTO: `ProposalDTO` incorpora `customerId`, `leadId` i `bookingId`.
+- Mapping: `fetchCustomerHub()` propaga aquests IDs des de `Proposal` al DTO i a la timeline de negoci.
+- UI: `ProposalsPanel` mostra `Origen` amb links canònics a Client origen, Entrada origen i Reserva origen.
+- Tests: regressions del mapping del Customer Hub i del panell de pressupostos.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1593.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\clientes\ProposalsPanel.test.tsx __tests__\lib\customer-hub\fetchCustomerHub.test.ts` (10/10); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: des del Customer Hub es pot saltar del document comercial al seu origen real sense cerca manual.
+- Validació humana/UX: els documents comercials queden situats dins la cadena client -> entrada -> reserva -> pressupost/contracte.
+- `ADMIN_CHANGE_COUNTER` puja a `1593`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1592 — 2026-07-07 — codex (FET)
+
+**Agenda mostra resum de risc econòmic.**
+
+- Context: el calendari ja mostrava `economicRisk` per reserva, però mes/setmana/dia no resumien quants bolos requerien atenció econòmica.
+- Helper: `calendar-utils` afegeix `summarizeCalendarEconomicRisk()` i `formatCalendarEconomicRiskSummary()` com a lògica compartida.
+- UI: mes afegeix KPI `Risc econòmic`; setmana i dia exposen el resum als blocs existents.
+- Tests: cobertura unitària del recompte crític/avís i del format de resum.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1592.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\calendario\calendar-utils.test.ts __tests__\app\admin\calendario\CalendarMonthClient.test.ts` (3/3); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: l'agenda permet veure el risc econòmic agregat sense entrar reserva per reserva.
+- Validació humana/UX: el calendari passa a ser un radar de marge/caixa, no només una graella d'ocupació.
+- `ADMIN_CHANGE_COUNTER` puja a `1592`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1590 — 2026-07-07 — codex (FET)
+
+**Timeline del Customer Hub mostra contracte signat.**
+
+- Context: el PDF signat ja era accionable al panell, però la timeline de negoci encara saltava la signatura.
+- Timeline: `buildCustomerBusinessTimelineEvents()` emet `proposal:<id>:contract-signed` quan existeix `contractSignedAt`.
+- Metadata: `documentType: CONTRACT`, `contractReference` i `contractPdfUrl` si existeix.
+- CTA: `Obrir PDF signat` quan hi ha URL; fallback `Obrir contracte` al workspace de pressupostos.
+- Tests: regressió de timeline de negoci amb contracte signat.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1590.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni layout PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\customer-hub\timeline.test.ts` (4/4); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: el Customer Hub mostra la signatura contractual com a fita de negoci i obre el PDF quan existeix.
+- Validació humana/UX: la timeline ja no talla el relat en el pressupost acceptat; arriba fins al document signat.
+- `ADMIN_CHANGE_COUNTER` puja a `1590`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1589 — 2026-07-07 — codex (FET)
+
+**Calendari social obre el post concret.**
+
+- Context: el deep link social existia, però el calendari encara enviava a `/admin/social` genèric.
+- UI: `CalendarMonthClient`, `CalendarWeekClient` i `CalendarDayClient` usen `buildSocialWorkspaceHref(post.id)`.
+- Contracte: test nou de `buildSocialWorkspaceHref()` per base i `postId` codificat.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1589.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes de xarxes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\admin\socialWorkspaceHref.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: els posts socials del calendari obren el post concret al workspace social.
+- Validació humana/UX: calendari i social queden cablejats; no cal buscar manualment la peça.
+- `ADMIN_CHANGE_COUNTER` puja a `1589`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1588 — 2026-07-07 — codex (FET)
+
+**Social post-event bloqueja publicació sense revisió.**
+
+- Context: el draft social del playbook ja era editable, però la nota de consentiment podia quedar ignorada en canviar estat.
+- Detecció: `SocialClient` identifica drafts amb `bookingId`, `EVENT_SHOWCASE` i notes amb marcadors de revisió/consentiment.
+- UI: llista amb badge `Revisió consentiment pendent`.
+- Modal: franja `Revisió obligatòria` abans d'editar/programar/publicar.
+- Guard: `handleStatusChange()` bloqueja `SCHEDULED`/`PUBLISHED` mentre la nota pendent segueixi present.
+- Guard: el formulari aplica el mateix bloqueig si es canvia l'estat des del modal.
+- Compatibilitat: sense schema nou; després de revisar, actualitzar les notes permet avançar.
+- Tests: `SocialClient` + regressió de `socialPostService`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1588.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes de xarxes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\social\SocialClient.test.tsx __tests__\lib\services\socialPostService.test.ts` (36/36); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: un post-event social pendent de consentiment no pot passar a programat/publicat sense resoldre la nota interna de revisió.
+- Validació humana/UX: el sistema fa visible el risc legal/imatge abans de sortir a xarxes.
+- `ADMIN_CHANGE_COUNTER` puja a `1588`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1587 — 2026-07-07 — codex (FET)
+
+**Contracte signat accionable al Customer Hub.**
+
+- Context: el Customer Hub mostrava snapshots documentals, però no l'accés directe al PDF signat del contracte.
+- DTO: `ProposalDTO` incorpora `contractPdfUrl`.
+- Data: `fetchCustomerHub()` mapeja `proposal.contractPdfUrl`.
+- UI: `ProposalsPanel` mostra una franja `Contracte signat` quan `contractStatus === SIGNED` o hi ha `contractSignedAt`.
+- CTA: si existeix `contractPdfUrl`, obre `Obrir PDF signat`; si no, degrada a `Obrir contracte` al workspace de pressupostos.
+- Tests: panell de propostes amb contracte signat i PDF, més regressions de Customer Hub.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1587.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni layout PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\clientes\ProposalsPanel.test.tsx __tests__\lib\customer-hub\data.test.ts __tests__\lib\customer-hub\timeline.test.ts` (15/15); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: des del client 360 es pot obrir el PDF signat del contracte si està guardat a la proposta.
+- Validació humana/UX: el Customer Hub ja no deixa el contracte signat com una etiqueta morta; el converteix en document accionable.
+- `ADMIN_CHANGE_COUNTER` puja a `1587`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1586 — 2026-07-07 — codex (FET)
+
+**Calendari mostra risc econòmic de reserves.**
+
+- Context: `/admin` ja elevava riscos economics, però calendari/agenda encara era cec a marge i caixa.
+- Monocapa: `bookingEconomics` passa a `lib/admin/bookingEconomics.ts`; l'antic `app/admin/lib/next-event-economics.ts` re-exporta.
+- Servei: `getAdminCalendarMonth()` carrega camps economics de reserva, pack, extres i línies de servei.
+- DTO: cada reserva pot baixar `economicRisk` amb nivell, label, motius, marge, pendent, marge net i dies fins al bolo.
+- Criteri: només reserves `CONFIRMED/PREPARING/COMPLETED`; risc per marge `<25%` o pendent imminent `<=7 dies`.
+- UI: month/week/day mostren el badge econòmic amb `getCalendarEconomicRiskClasses()`.
+- Tests: calendari mensual amb marge crític i helper econòmic re-exportat.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1586.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\adminCalendarMonthService.test.ts __tests__\app\admin\next-event-economics.test.ts` (11/11); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: el calendari pot mostrar risc econòmic en reserves reals sense recalcular a cada component.
+- Validació humana/UX: l'agenda informa de diners, no només de dates, i evita que un bolo problemàtic quedi amagat en una cel·la verda.
+- `ADMIN_CHANGE_COUNTER` puja a `1586`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1585 — 2026-07-07 — codex (FET)
+
+**Esborrany social accionable des del playbook.**
+
+- Context: el playbook podia crear un `SocialPost` `DRAFT`, però després només enviava a `/admin/social` genèric.
+- Href: nou `buildSocialWorkspaceHref(postId?)` a `lib/admin/socialWorkspaceHref.ts`.
+- Servei: `recordPostEventRecurrenceDecision()` desa i retorna `/admin/social?postId=...` quan hi ha draft social.
+- Playbook: `PlaybookAction` guanya `socialPostId` opcional i el loader el reconstrueix des de `CustomerActivity.details`.
+- UI: el botó de decisió mostra `Obrir esborrany` quan el draft s'ha creat o ja estava registrat.
+- Social: `/admin/social?postId=...` obre directament el modal d'edició del post concret; si no existeix, mostra error.
+- Tests: servei de decisió, playbook pur/loader, projector d'accions i `SocialClient`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1585.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes de xarxes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\postEventRecurrenceDecisionService.test.ts __tests__\lib\services\postEventPlaybookService.test.ts __tests__\lib\services\postEventPlaybookLoadService.test.ts __tests__\app\admin\post-event-actions.test.ts __tests__\app\admin\social\SocialClient.test.tsx` (48/48); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: el flux post-event social passa de crear un draft intern a poder obrir el draft exacte des del playbook.
+- Validació humana/UX: la decisió social queda accionable i revisable sense cerca manual ni risc de publicació automàtica.
+- `ADMIN_CHANGE_COUNTER` puja a `1585`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1584 — 2026-07-07 — codex (FET)
+
+**Timeline documental amb CTA especific.**
+
+- Context: les traces documentals ja eren llegibles, però el link de qualsevol `proposal` encara deia `Obrir`.
+- Servei: `buildAdminLogLink()` rep metadata i classifica traces de pressupost vs contracte.
+- Pressupost: `DOCUMENT_PROPOSAL_SENT`, `documentType: PROPOSAL` o `proposalReference` mostra `Obrir pressupost`.
+- Contracte: `DOCUMENT_CONTRACT_*`, `documentType: CONTRACT` o `contractReference` mostra `Obrir contracte`.
+- Compatibilitat: propostes sense traça documental conserven el fallback `Obrir`; no es crea cap ruta nova.
+- Tests: regressió de pressupost enviat i contracte enviat dins `timelineQueryService`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1584.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni rutes noves.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\timelineQueryService.test.ts` (38/38); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: una traça documental de pressupost o contracte continua obrint el workspace de pressupostos pel mateix `proposalId`, però el CTA diu quin document recupera.
+- Validació humana/UX: el timeline deixa de ser ambigu en documents crítics i actua com a fil operatiu reconstruïble.
+- `ADMIN_CHANGE_COUNTER` puja a `1584`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1583 — 2026-07-07 — codex (FET)
+
+**Avui eleva riscos econòmics dels pròxims bolos.**
+
+- Context: #1580 protegia el proper bolo; faltava mirar la resta de bolos imminents amb marge/caixa en risc.
+- Helper: nou `projectDashboardEconomicRiskBookings()` a `next-event-economics.ts`, reutilitzant `computeDashboardNextEventEconomics()`.
+- Prioritat: marge critic o caixa pendent avui/dema puja abans; despres dies mes propers i marge mes feble.
+- Data: `dashboard-data.ts` carrega reserves `CONFIRMED/PREPARING` dels pròxims 7 dies amb select economic.
+- Contracte: `DashboardData` guanya `economicRiskBookings`.
+- UI: `/admin` projecta tots els riscos economics cap a la mateixa cua "Fes això ara" que NBA/post-event.
+- Tests: helper economic multi-bolo i projector de cua.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1583.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\next-event-economics.test.ts __tests__\app\admin\today-actions.test.ts` (12/12); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: un bolo dels proxims 7 dies pot entrar al top d'accions si crema marge o caixa, encara que no sigui el proper event.
+- Validació humana/UX: la home protegeix millor la setmana operativa, no només el primer bolo visible.
+- `ADMIN_CHANGE_COUNTER` puja a `1583`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1582 — 2026-07-07 — codex (FET)
+
+**Social post-event crea esborrany intern, no publicació.**
+
+- Context: el playbook ja distingia social preparat de social publicat; faltava convertir l'aprovacio explicita en peça editable sense publicar.
+- Servei: `recordPostEventRecurrenceDecision()` crea o reutilitza `SocialPost` quan `actionKey === 'social_post'`.
+- Seguretat: el post surt `DRAFT`, `TEXT`, `EVENT_SHOWCASE`, `publishedAt: null`, vinculat al booking i amb notes de consentiment/revisio.
+- Side-effects: no s'utilitza `createSocialPost()` per evitar sincronitzar Google Calendar o qualsevol efecte extern des del playbook.
+- Traça: `CustomerActivity.details` desa `socialPostId`, `socialPostStatus` i `safety: DRAFT_NOT_PUBLISHED`.
+- UI: el botó social diu `Crear esborrany social` i després `Esborrany creat`.
+- Timeline: `DRAFT_NOT_PUBLISHED` es projecta com `Esborrany social, no publicat`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1582.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni APIs externes de xarxes.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\postEventRecurrenceDecisionService.test.ts __tests__\app\api\admin\post-event-recurrence-decision-route.test.ts __tests__\lib\services\timelineQueryService.test.ts __tests__\lib\services\postEventPlaybookService.test.ts __tests__\lib\services\postEventPlaybookLoadService.test.ts __tests__\app\admin\post-event-actions.test.ts` (86/86); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: el playbook pot crear una peça social interna revisable; publicar continua requerint passar pel workspace Social.
+- Validació humana/UX: "preparar" ja deixa un artefacte real, però no travessa la línia vermella de publicar sense consentiment.
+- `ADMIN_CHANGE_COUNTER` puja a `1582`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1581 — 2026-07-07 — codex (FET)
+
+**Customer Hub fa visibles les fotos documentals.**
+
+- Context: `quoteSnapshot` i `contractSnapshot` ja es desaven, pero al Customer Hub quedaven amagats dins `proposal.snapshot`.
+- UI: `ProposalsPanel` detecta `quoteSnapshot` i `contractSnapshot` i mostra franja `Foto documental`.
+- UI: badges `Pressupost congelat` i `Contracte congelat` fan visible que el document es reconstruïble des de snapshot.
+- CTA: la franja afegeix `Obrir document` cap a `buildCustomerProposalHref(customerId, proposal.id)`.
+- Timeline: `Pressupost enviat` i `Pressupost acceptat` també enllacen a `Obrir pressupost`.
+- Tests: render del panell de propostes i timeline del Customer Hub.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1581.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni layout PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\clientes\ProposalsPanel.test.tsx __tests__\lib\customer-hub\timeline.test.ts` (4/4); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: des del client 360 es veu si pressupost/contracte tenen foto documental i es pot obrir el workspace correcte.
+- Validació humana/UX: la traça documental deixa d'estar amagada en JSON i passa a ser lectura operativa.
+- `ADMIN_CHANGE_COUNTER` puja a `1581`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1580 — 2026-07-07 — codex (FET)
+
+**Economia del proper bolo entra a la cua executiva.**
+
+- Context: marge i pendent del proper bolo eren visibles a "El focus", pero no sempre pujaven a "Fes això ara".
+- Helper: `AdminTodayAction` guanya `queuePriority` i `source: economic`.
+- Helper: nou `projectNextEventEconomicTodayAction()` genera accio si el proper bolo te marge critic o caixa pendent imminent.
+- Prioritzacio: `projectAdminTodayActions()` ordena NBA i accions suplementaries per prioritat; economia critica pot superar un NBA alt no critic.
+- UI: `/admin` passa el risc economic del proper bolo al mateix canal de cua que NBA/post-event, amb CTA a la reserva.
+- Tests: `today-actions` cobreix risc economic, cas sa sense accio i ordenacio contra NBA.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1580.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal, dispatch post-event ni publicacio social.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\today-actions.test.ts` (9/9); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: un proper bolo amb marge/caixa en risc pot entrar al top d'accions del dia amb link directe a la fitxa de reserva.
+- Validació humana/UX: l'economia deixa de ser lectura passiva quan crema i passa a ser una cosa que toca fer ara.
+- `ADMIN_CHANGE_COUNTER` puja a `1580`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1579 — 2026-07-07 — codex (FET)
+
+**Social post-event segur: preparat no és publicat.**
+
+- Context: registrar una decisio de social havia de quedar com a preparacio segura, no com a publicacio ni com a accio repetible.
+- Servei: `PlaybookBookingInput` guanya `hasSocialPostDecision`.
+- Wrapper: `loadPostEventPlaybook()` llegeix `POST_EVENT_RECURRENCE_DECIDED` amb `actionKey: social_post` per booking concret.
+- Estat: el social registrat mostra `Preparat, no publicat` i continua `PENDING`; `Publicat` continua sent l'unic cas `DONE`.
+- UI: `/admin/post-event/playbook` deshabilita el registre com `Registrat` quan la decisio ja existeix.
+- Tests: playbook pur, wrapper Prisma, accions preparades i ruta de recurrencia continuen verds.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1579.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal, dispatch post-event ni publicacio social.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\postEventPlaybookService.test.ts __tests__\lib\services\postEventPlaybookLoadService.test.ts __tests__\app\admin\post-event-actions.test.ts __tests__\app\api\admin\post-event-recurrence-decision-route.test.ts` (43/43); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`; `pnpm run qa:zenit-roadmap`.
+- Validació funcional: una decisio social registrada ja no es repeteix i tampoc es confon amb una publicacio real.
+- Validació humana/UX: el playbook diu la veritat operativa: preparat i segur, pero pendent de publicar.
+- `ADMIN_CHANGE_COUNTER` puja a `1579`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1578 — 2026-07-07 — codex (FET)
+
+**Timeline fa llegibles documents i decisions post-event.**
+
+- Context: les noves traces de post-event/document ja existien, pero el mapper canonic podia mostrar codis interns o bodies poc reconstruibles.
+- CustomerActivity: `POST_EVENT_RECURRENCE_DECIDED` es tradueix a `Testimoni sol.licitat`, `Referral sol.licitat`, `Social preparat` o decisio post-event.
+- CustomerActivity body: booking ref, `Registrat, no enviat` i esborrany truncat.
+- AdminLog documental: `DOCUMENT_*` descriu referencia, destinatari, total i source.
+- Timeline type: `DOCUMENT_PROPOSAL_SENT` sobre `proposal` passa a `PROPOSAL_SENT`.
+- Tests: mappers purs i customer hub continuen verds.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1578.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni runtime extern.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\timelineQueryService.test.ts __tests__\lib\customer-hub\data.test.ts` (46/46); `npx tsc --noEmit --pretty false`.
+- Validació funcional: les pantalles que consumeixen timeline canònic veuen documents i decisions post-event amb títol/body humans.
+- Validació humana/UX: la traça deixa de ser codi intern i passa a ser historial de negoci llegible.
+- `ADMIN_CHANGE_COUNTER` puja a `1578`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1577 — 2026-07-07 — codex (FET)
+
+**Avui integra post-event a la cua principal.**
+
+- Context: `/admin` ja mostrava post-event en seccio propia, pero la cua principal podia quedar curta mentre hi havia bolos fets amb cercle obert.
+- Helper: `AdminTodayAction` guanya `source` i `sourceId` per evitar duplicats entre cua principal i seccions especialitzades.
+- Helper: nou `projectPostEventTodayAction()` converteix un item del playbook en accio executiva amb badge `Post-event`.
+- Cua: `projectAdminTodayActions()` omple buits NBA amb post-event abans de caure al `dailyBrief`.
+- UI: `/admin` projecta post-event cap a "Fes això ara" i filtra "Tanca el cercle" per no repetir el mateix booking.
+- Tests: `today-actions` cobreix suplement post-event i cua principal sense NBA.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1577.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni dispatch post-event.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\today-actions.test.ts __tests__\app\admin\post-event-actions.test.ts __tests__\lib\services\postEventPlaybookService.test.ts` (40/40); `npx tsc --noEmit --pretty false`.
+- Validació funcional: el post-event pendent pot entrar al top d'accions del dia i deixa de duplicar-se a la seccio secundaria.
+- Validació humana/UX: "Avui" actua mes com a cua executiva unica i menys com a collage de blocs.
+- `ADMIN_CHANGE_COUNTER` puja a `1577`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1576 — 2026-07-07 — codex (FET)
+
+**Playbook avança quan el testimoni ja està sol·licitat.**
+
+- Context: el #1573 registrava decisions post-event, pero `Demanar testimoni` seguia pendent fins que existia un testimoni aprovat.
+- Contracte pur: `PlaybookBookingInput` guanya `hasTestimonialAskDecision`.
+- Playbook: l'accio `testimonial` queda `DONE` amb nota `Sol.licitat` quan hi ha decisio registrada; `Rebut` continua guanyant si ja hi ha testimoni aprovat.
+- Wrapper Prisma: `loadPostEventPlaybook()` llegeix `POST_EVENT_RECURRENCE_DECIDED` amb `actionKey: testimonial` per booking concret.
+- Seguretat: no envia email, no crea tasca, no publica res i no toca `postEventDispatchService`.
+- Tests: playbook pur, wrapper Prisma, servei de registre, ruta API i helper d'accions post-event.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1576.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni dispatch post-event.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\postEventPlaybookService.test.ts __tests__\lib\services\postEventPlaybookLoadService.test.ts __tests__\lib\services\postEventRecurrenceDecisionService.test.ts __tests__\app\api\admin\post-event-recurrence-decision-route.test.ts __tests__\app\admin\post-event-actions.test.ts` (44/44); `npx tsc --noEmit --pretty false`.
+- Validació funcional: registrar la peticio de testimoni fa avançar la cua post-event en comptes de repetir la mateixa recomanacio.
+- Validació humana/UX: el playbook distingeix `Sol.licitat` de `Rebut` i reflecteix millor el treball real fet pel propietari.
+- `ADMIN_CHANGE_COUNTER` puja a `1576`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1575 — 2026-07-07 — codex (FET)
+
+**Guard condicional del roadmap Zenit.**
+
+- Context: el roadmap Manolo s'ha convertit en full de treball viu del torn nonstop, pero la seva actualitzacio encara depenia de disciplina manual.
+- Guard: `scripts/check-zenit-roadmap.mjs` llegeix el canvi actual del protocol i comprova el roadmap nomes si aquell canvi declara `MANOLO-ZENIT-RESET-TOTAL-1551.md`.
+- Contracte: si el protocol diu que aquest roadmap s'ha actualitzat, el fitxer ha de contenir `#N` del canvi actual.
+- Pipeline: afegit `qa:zenit-roadmap` a `package.json` i a `validate:core` despres de `qa:roadmap-canvis`.
+- Tests: fixture de cas verd, falta de canvi al roadmap, canvi normal sense roadmap i guard absent de `validate:core`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1575.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni runtime de producte.
+- Validació tècnica: `pnpm run qa:zenit-roadmap`; `pnpm test:run -- --run __tests__\scripts\check-zenit-roadmap.test.ts __tests__\scripts\check-roadmap-canvis.test.ts __tests__\scripts\check-nonstop-protocol.test.ts __tests__\scripts\check-product-operating-system.test.ts` (22/22); `npx tsc --noEmit --pretty false`.
+- Validació funcional: un canvi Zenit no pot afirmar que el roadmap esta actualitzat si el `#N` no apareix al full Manolo.
+- Validació humana/UX: el full de ruta que guia la nit queda protegit per guard, no per memoria de l'agent.
+- `ADMIN_CHANGE_COUNTER` puja a `1575`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1574 — 2026-07-07 — codex (FET)
+
+**Pressupost enviat congela snapshot documental v1.**
+
+- Context: el contracte ja tenia foto immutable (#1571), pero el pressupost enviat encara no tenia `quoteSnapshot` normalitzat separat del formulari viu de l'Studio.
+- Servei: `sendAdminProposal()` construeix `quoteSnapshot` v1 abans de posar `status: SENT`.
+- Contracte: el snapshot inclou referencia, proposta, locale, moneda, validesa, client, event, pack, features, extres, condicions, why, marca, imports validats i trace `QUOTE_SNAPSHOT_V1`.
+- Persistencia: es desa dins `Proposal.snapshot.quoteSnapshot` conservant la resta de snapshot existent, inclos `contractSnapshot`.
+- Seguretat: no toca layout PDF, no toca schema, no recalcula economia fora dels camps validats de `Proposal`.
+- Tests: `proposalDispatchService` cobreix congelacio i preservacio de snapshots; rutes admin de proposals continuen verdes.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1574.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni redisseny PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\proposalDispatchService.test.ts __tests__\app\api\admin\proposals-send-route.test.ts __tests__\app\api\admin\proposals-route.test.ts __tests__\app\api\admin\proposals-detail-route.test.ts` (34/34); `npx tsc --noEmit --pretty false`.
+- Validació funcional: l'enviament deixa una foto documental v1 reconstruible del pressupost comercial.
+- Validació humana/UX: el propietari pot auditar que es va enviar sense dependre de cataleg o estat viu posterior.
+- `ADMIN_CHANGE_COUNTER` puja a `1574`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1573 — 2026-07-07 — codex (FET)
+
+**Playbook registra recurrencia post-event segura.**
+
+- Context: el playbook ja preparava drafts revisables (#1570), pero l'aprovacio manual d'un testimoni/referral/social no quedava com a decisio comercial traçable.
+- Servei: `postEventRecurrenceDecisionService` valida customer+booking, exigeix que la reserva correspongui al client i crea `CustomerActivity`.
+- Contracte: nova accio canonica `POST_EVENT_RECURRENCE_DECIDED` amb `actionKey`, booking, draft, href, source i `safety: DECIDED_NOT_SENT`.
+- API/UI: `POST /api/admin/post-event/recurrence-decision` amb auth+CSRF; el playbook mostra `Registrar decisio` per testimoni, social i referral.
+- Playbook: els referrals registrats via activity compten com a programats per la reserva concreta, sense tocar `app/admin/tasks`.
+- Seguretat: no envia emails, no publica social, no crea tasques, no toca dispatch post-event i no afegeix schema.
+- Tests: servei de decisio, ruta API, wrapper de lectura del playbook, pure playbook i helper d'accions post-event.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1573.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal, dispatch post-event ni publicacio externa.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\postEventRecurrenceDecisionService.test.ts __tests__\lib\services\postEventPlaybookLoadService.test.ts __tests__\app\api\admin\post-event-recurrence-decision-route.test.ts __tests__\lib\services\postEventPlaybookService.test.ts __tests__\app\admin\post-event-actions.test.ts` (41/41); `npx tsc --noEmit --pretty false`.
+- Validació funcional: l'admin pot registrar una decisio preparada i el referral deixa rastre que el mateix playbook reconeix.
+- Validació humana/UX: el post-event passa de "preparat" a "aprovat i traçat" sense cap accio externa accidental.
+- `ADMIN_CHANGE_COUNTER` puja a `1573`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1572 — 2026-07-07 — codex (FET)
+
+**Studio pressupost mostra guàrdia comercial abans d'enviar.**
+
+- Context: l'Studio ja calculava marge per al preview, però el bloc final d'accions no posava cost directe, marge i CAC davant del botó d'enviar.
+- Helper: `app/admin/presupuestos/commercial-guard.ts` converteix `financialSummary.marginTone` en lectura operativa testejada.
+- UI: `PresupuestoPdfStudio` mostra `Marge sa`, `Vigila abans d'enviar`, `Risc alt abans d'enviar` o `Marge pendent` al costat dels botons finals.
+- Contracte: cap motor nou; només es projecta `computeBookingFinancialSummary()` amb cost directe, marge net i CAC estimat.
+- Tests: `presupuestos-commercial-guard` cobreix degradació sense config, marge crític, watch i marge sa.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1572.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF layout.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\presupuestos-commercial-guard.test.ts` (4/4); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+- Validació funcional: abans d'enviar o generar pressupost, l'operador veu cost directe, marge net i CAC estimat en el mateix bloc d'acció.
+- Validació humana/UX: el risc comercial queda davant del gest d'enviar i redueix l'opció d'enviar una oferta dolenta per inèrcia.
+- `ADMIN_CHANGE_COUNTER` puja a `1572`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1571 — 2026-07-07 — codex (FET)
+
+**Contracte guarda snapshot documental immutable.**
+
+- Context: la traça documental (#1568) deia que el contracte s'havia generat, però el PDF regenerat encara podia mirar dades vives de booking/catàleg si no hi havia foto contractual congelada.
+- Contracte: `Proposal.snapshot.contractSnapshot` v1 guarda empresa, client, event, pack, extres, service lines, totals, venciments, clàusules i trace.
+- Render: `renderContractPDF()` usa primer el snapshot existent i només consumeix booking viu quan el contracte encara no té foto congelada.
+- Persistència: `generateContractFromProposal()`, `sendContract()` i `generateSignedContractPdf()` escriuen/conserven el snapshot sense schema ni migració.
+- Tests: `contractService` comprova que es desa snapshot v1 i que un snapshot existent guanya sobre canvis posteriors del booking viu.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1571.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni redisseny PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\contractService.test.ts` (51/51); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+- Validació funcional: generar/enviar/regenerar PDF signat ja conserva la mateixa foto contractual encara que el booking o catàleg canviïn després.
+- Validació humana/UX: el document signable deixa de dependre de memòria manual o de dades vives que poden mutar silenciosament.
+- `ADMIN_CHANGE_COUNTER` puja a `1571`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1570 — 2026-07-07 — codex (FET)
+
+**Playbook post-event prepara accio segura.**
+
+- Context: el playbook ja sabia quin front faltava i on anar (#1567), pero encara no preparava el moviment concret per agraiment, testimoni, social o referral.
+- Helper: `buildPreparedPostEventAction()` retorna `title`, `detail`, `draft`, `ctaLabel`, `href` i `safetyLabel` per cada `nextAction`.
+- UI: `/admin/post-event/playbook` mostra el bloc `Preparat, no enviat` amb esborrany curt i CTA especific, sense moure l'accio fora del playbook canonic.
+- Seguretat: no toca `postEventDispatchService`, no crea tokens, no envia emails, no publica posts i no canvia cap dada.
+- Tests: `post-event-actions` cobreix routing, esborranys, social sense nom del client i degradacio a null.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1570.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal, PDF ni dispatch post-event.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\post-event-actions.test.ts __tests__\lib\services\postEventPlaybookService.test.ts` (32/32); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+- Validació funcional: el playbook ja mostra que fer, quin text base revisar i quin desti obrir per cada propera accio post-event.
+- Validació humana/UX: converteix una cua de pendents en feina preparada i aprovable, sense risc d'enviament o publicacio accidental.
+- `ADMIN_CHANGE_COUNTER` puja a `1570`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1569 — 2026-07-07 — codex (FET)
+
+**Fitxa de reserva mostra marge i pendent al capdamunt.**
+
+- Context: `Avui` ja mostrava marge/pendent del proper bolo (#1563), però `/admin/bookings/[id]` encara amagava la lectura econòmica fins a la secció de marge.
+- Servei: nou `app/admin/lib/booking-economic-guard.ts` resumeix pendent de caixa i marge directe amb `bookingOutstandingAmount()` i `computeDirectCostBreakdown()`.
+- UI: la capçalera KPI de la fitxa de reserva guanya `Marge` i `Pendent caixa`, amb semàfor `ok/warn/err` ja existent.
+- Contracte: no hi ha fórmula nova al JSX; el helper pur consumeix motors canònics i respecta cash, inventari real, transport, extres, hores extra i service lines.
+- Tests: `booking-economic-guard` cobreix cash-aware i marge amb pack/extres/transport/línies.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1569.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\booking-economic-guard.test.ts __tests__\lib\payment-status.test.ts __tests__\lib\services\costEngine.test.ts` (89/89); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+- Validació funcional: la reserva exposa marge i pendent de caixa abans de qualsevol acció d'edició.
+- Validació humana/UX: el propietari veu si el bolo és rendible i si falta cobrar sense baixar ni canviar de secció.
+- `ADMIN_CHANGE_COUNTER` puja a `1569`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1568 — 2026-07-07 — codex (FET)
+
+**Pressupost i contracte deixen traça documental global.**
+
+- Context: dossier complet ja deixava rastre (#1565), però pressupost enviat i contracte vivien repartits entre `customerActivity`, `leadActivity` i estat de `Proposal` sense una entrada global reconstruïble a `adminLog`.
+- Servei: nou `lib/services/documentAuditTrailService.ts` centralitza accions documentals i normalitza `details` per `adminLog`.
+- Pressupost: `sendAdminProposal()` registra `DOCUMENT_PROPOSAL_SENT` amb referència, client, lead, booking, total, idioma i destinatari.
+- Contracte: `generateContractFromProposal()`, `sendContract()`, `markContractSigned()`, `cancelContract()` i `generateSignedContractPdf()` registren `DOCUMENT_CONTRACT_*`.
+- Resiliència: si `adminLog` falla, pressupost/contracte continuen funcionant; la traça és important però no pot tombar l'entrega del document.
+- Activitat: `ADMIN_ACTIVITY_ACTION_META`, `ADMIN_ACTIVITY_CATEGORY_MAP` i `ADMIN_ACTIVITY_ENTITY_LINKS` entenen les noves accions i link de `proposal`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1568.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni redisseny de PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\contractService.test.ts __tests__\lib\services\proposalDispatchService.test.ts __tests__\lib\services\timelineQueryService.test.ts` (92/92); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+- Validació funcional: el flux documental crític queda reconstruïble a `adminLog` de punta a punta.
+- Validació humana/UX: el propietari pot veure a l'activitat global què s'ha enviat/generat/signat/cancel·lat sense dependre de memòria manual.
+- `ADMIN_CHANGE_COUNTER` puja a `1568`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1567 — 2026-07-07 — codex (FET)
+
+**Playbook post-event usa el mateix href accionable.**
+
+- Context: el #1564 va crear `buildPostEventNextActionHref()` per la home, però `/admin/post-event/playbook` encara enviava “Gestionar” sempre a la reserva.
+- UI: `app/admin/post-event/playbook/page.tsx` consumeix el helper compartit per al CTA de següent acció.
+- Contracte: home Avui i playbook comparteixen routing per `thank_you`, `testimonial`, `social_post` i `referral_ask`.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat amb #1567.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\post-event-actions.test.ts __tests__\lib\services\postEventPlaybookService.test.ts` (27/27); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+- Validació funcional: els CTAs post-event ja no divergeixen entre home i playbook.
+- Validació humana/UX: el mateix següent pas obre el mateix destí arreu.
+- `ADMIN_CHANGE_COUNTER` puja a `1567`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1566 — 2026-07-07 — codex (FET)
+
+**Focus del proper bolo: pagament cash-aware.**
+
+- Context: després del #1563, el focus mostrava `outstandingAmount`, però el punt/label de pagament encara depenia només de `depositPaid/remainingPaid`.
+- Fix: `app/admin/page.tsx` passa a `getPaymentBand()` i `getPaymentLabel()` una cobertura derivada de `total - outstandingAmount`.
+- Contracte: no es duplica la fórmula; es continua consumint `payment-status` com a font canònica.
+- Roadmap: guàrdia econòmica actualitzada a `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\payment-status.test.ts __tests__\app\admin\next-event-economics.test.ts` (10/10); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+- Validació funcional: el label de pagament del proper bolo queda coherent amb el pendent real i l'efectiu.
+- Validació humana/UX: desapareix la contradicció possible entre `Pendent 0€` i semàfor vermell.
+- `ADMIN_CHANGE_COUNTER` puja a `1566`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1565 — 2026-07-07 — codex (FET)
+
+**Dossier complet PDF deixa traça documental.**
+
+- Context: `GET /api/admin/dossiers/[id]/composite` generava i retornava el PDF complet, però no deixava rastre a `adminLog`.
+- Traça: la route registra `GENERATE_DOSSIER_COMPOSITE_PDF` amb `filename`, client, `productIds`, recompte de productes propis/col·laborador, extres i origen `snapshot`/`live_catalog`.
+- Resiliència: si `adminLog` falla, el PDF continua sortint.
+- Tests: route coberta per log correcte i fallback quan falla el log; servei PDF existent es manté verd.
+- Roadmap: documents/PDF passa a `EN CURS` a `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe ni portal; no hi ha redisseny de PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\dossiers-composite-route.test.ts __tests__\lib\services\dossierCompositePdfService.test.ts` (6/6); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+- Validació funcional: la generació del dossier complet queda reconstruïble a activity/timeline.
+- Validació humana/UX: el propietari pot saber que un dossier complet s'ha generat i amb quins productes/extres.
+- `ADMIN_CHANGE_COUNTER` puja a `1565`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1564 — 2026-07-07 — codex (FET)
+
+**Tanca el cercle obre el destí accionable.**
+
+- Context: la home Avui mostrava accions post-event pendents, però totes les files obrien `/admin/post-event` genèric tot i que el playbook ja portava `bookingId`, `customerId` i `nextAction`.
+- Helper: `app/admin/lib/post-event-actions.ts` crea `buildPostEventNextActionHref()`.
+- Routing: `thank_you` obre la reserva concreta `#sec-client`; `testimonial` obre comunicacions del client; `social_post` obre `/admin/social`; `referral_ask` obre `/admin/clientes/referrals`; fallback a playbook.
+- UI: `app/admin/page.tsx` usa l'href accionable per cada fila de “Tanca el cercle”.
+- Tests: `__tests__/app/admin/post-event-actions.test.ts` cobreix els cinc destins.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` passa post-event a `EN CURS`.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\post-event-actions.test.ts __tests__\lib\services\postEventPlaybookService.test.ts __tests__\app\admin\today-actions.test.ts` (31/31); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+- Validació funcional: cada acció post-event de la home obre el destí més útil per executar-la.
+- Validació humana/UX: el propietari no ha de buscar manualment dins Post-event; el clic ja apunta al següent pas.
+- `ADMIN_CHANGE_COUNTER` puja a `1564`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1563 — 2026-07-07 — codex (FET)
+
+**Avui: el proper bolo mostra marge, pendent i checklist.**
+
+- Context: “El focus” de `/admin` mostrava el proper bolo com agenda i total, però no feia visible marge, caixa pendent ni preparació.
+- Helper: `app/admin/lib/next-event-economics.ts` calcula pendent, cost directe, marge net i marge % amb `bookingOutstandingAmount`, `aggregateServiceLines` i `computeBookingFinancialSummary`.
+- Dades: `fetchDashboardData().nextEvent` carrega cash, senyal/resta, pack, extres, travelCost i serviceLines per exposar `outstandingAmount`, `directCost`, `netMargin` i `marginPct`.
+- UI: la targeta “El focus” mostra marge, pendent i checklist dins la primera pantalla.
+- Tests: regressions per pendent amb efectiu i marge estimat amb pack/extres/transport/línies.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` passa la guàrdia econòmica a `EN CURS`.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\next-event-economics.test.ts __tests__\lib\payment-status.test.ts` (10/10); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+- Validació funcional: el proper bolo d'Avui ja incorpora salut econòmica i caixa pendent.
+- Validació humana/UX: el propietari pot veure risc de marge o cobrament abans d'obrir la reserva.
+- `ADMIN_CHANGE_COUNTER` puja a `1563`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1562 — 2026-07-07 — codex (FET)
+
+**Avui/NBA reutilitza la lectura de capacity.**
+
+- Context: `/admin` necessitava `loadCapacityConflicts()` per pintar alertes i `loadNextBestActions()` tornava a cridar el mateix servei dins el mateix render.
+- Wrapper: `loadNextBestActions(now, { capacity })` accepta capacity pre-carregada i evita tornar a cridar `loadCapacityConflicts()`.
+- Home: `app/admin/page.tsx` crea una sola `capacityPromise`, la reutilitza a la secció d'alertes i la passa al motor NBA.
+- Tests: `nextBestActionServiceQueries` comprova que amb capacity pre-carregada el servei no es consulta de nou.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` reflecteix #1562 com a tancat.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\nextBestActionServiceQueries.test.ts __tests__\lib\services\nextBestActionService.test.ts __tests__\app\admin\today-actions.test.ts` (37/37); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+- Validació funcional: Avui manté el mateix resultat visible i evita una lectura duplicada clara.
+- Validació humana/UX: la pantalla principal de gestió guanya eficiència sense canviar el model mental del propietari.
+- `ADMIN_CHANGE_COUNTER` puja a `1562`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1561 — 2026-07-07 — codex (FET)
+
+**Roadmap Manolo nocturn visible i executable.**
+
+- Context: el propietari ha exigit que la superauditoria treballi contra un full de ruta clar; el #1551 existia, però faltava estat viu de fronts, evidència i pròxims talls.
+- Document: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` guanya el bloc “Full de treball nocturn viu”.
+- Contingut: estat executiu per fronts, criteri de prioritat, roadmap operatiu per blocs, feina feta #1552-#1560, següents talls probables i stop rules.
+- Coordinació: `docs/agent-sync.md` reflecteix que #1561 és roadmap nocturn executable abans de tornar a codi.
+- Validació tècnica: `git diff --check`; `pnpm run qa:protocol`.
+- Validació funcional: la feina nonstop queda governada per un comandament visible i no només per microcanvis locals.
+- Validació humana/UX: el propietari pot veure què s'ha fet, què està en curs i quin bloc ve després.
+- `ADMIN_CHANGE_COUNTER` puja a `1561`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1560 — 2026-07-07 — codex (FET)
+
+**Avui: projecció d'accions pura, testejada i traçable.**
+
+- Context: després del #1558, la conversió de `NextBestAction`/`BriefAction` a targeta d'Avui vivia inline dins `app/admin/page.tsx` i no tenia regressió pròpia.
+- Helper: `app/admin/lib/today-actions.ts` crea `projectAdminTodayActions()` per prioritzar top 3 NBA, fer fallback a `dailyBrief.actions` i assegurar `href` segur cap a `/admin/control`.
+- Traça: les accions NBA mostren badge de domini + finestra temporal (`Lead · Ara`, `Client · Avui`, etc.) amb color per urgència.
+- Tests: `__tests__/app/admin/today-actions.test.ts` cobreix preferència NBA, fallback dailyBrief, límit top 3 i `href` buit.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\today-actions.test.ts __tests__\lib\services\nextBestActionService.test.ts` (33/33); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+- Validació funcional: la home admin conserva el comportament de #1558 però la regla de projecció queda unit-testada.
+- Validació humana/UX: el propietari veu d'on surt cada prioritat del copilot i no només una ordre opaca.
+- `ADMIN_CHANGE_COUNTER` puja a `1560`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1559 — 2026-07-07 — codex (FET)
+
+**API d'explicació NBA degrada sense 500.**
+
+- Context: `/api/admin/ai/nba-explain` assumia que el motor NBA i el builder IA sempre acabaven bé; qualsevol excepció inesperada podia convertir el panell auxiliar en un 500.
+- Fix route: la càrrega `loadNextBestActions()` i `generateNBAExplanation()` queden embolcallades amb `try/catch`.
+- Fallback: si alguna peça falla, la ruta registra `log.error` i retorna `200` amb `explanation: ''`, `actions: []` i `generatedAt`.
+- Tests: regressions per motor NBA caigut i builder IA amb excepció inesperada.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\ai\nba-explain-route.test.ts __tests__\lib\services\nextBestActionService.test.ts __tests__\lib\services\nbaAiExplainService.test.ts` (43/43); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+- Validació funcional: una fallada del copilot IA ja no tomba la resposta HTTP; el panell es degrada a buit.
+- Validació humana/UX: el centre de control no mostra una ruptura per una explicació secundària; queda rastre tècnic al log.
+- `ADMIN_CHANGE_COUNTER` puja a `1559`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1558 — 2026-07-07 — codex (FET)
+
+**Avui connecta el motor transversal de next-best-action.**
+
+- Context: `/admin` ja era “Avui”, però el bloc d'acció principal només projectava `dailyBrief.actions`; el motor `loadNextBestActions()` ja agregava leads, clients, tasques, follow-ups, capacitat i pipeline.
+- Cablejat: `app/admin/page.tsx` carrega `loadNextBestActions()` en paral·lel amb la resta de cervells d'Avui i projecta el top 3 del ranking transversal.
+- UX: el bloc passa a “Fes això ara”, mostra raó i finestra temporal de cada acció i apunta el detall a `/admin/control`.
+- Fallback: si NBA no retorna accions, es manté `dailyBrief.actions` perquè la pantalla no quedi buida.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\nextBestActionService.test.ts __tests__\lib\services\nextBestActionServiceQueries.test.ts __tests__\lib\services\nbaAiExplainService.test.ts` (39/39); `npx tsc --noEmit --pretty false`; `git diff --check`; `pnpm run qa:protocol`.
+- Validació funcional: la home admin consumeix el mateix ranking transversal que ja alimenta el centre de control.
+- Validació humana/UX: Avui prioritza una acció executable del dia en lloc de limitar-se a sumar targetes de dominis diferents.
+- `ADMIN_CHANGE_COUNTER` puja a `1558`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1557 — 2026-07-07 — codex (FET)
+
+**Disponibilitat pública: sol·licitar data, no confirmació immediata.**
+
+- Context: la pàgina/secció de disponibilitat conservava “Reservar ara” i una FAQ amb “confirmació per email”, contradient el contracte corregit de reserva pública pendent.
+- Fix copy: `messages/ca.json`, `messages/es.json`, `messages/en.json` passen el CTA a sol·licitar data i expliquen que es revisaran disponibilitat i detalls.
+- FAQ: el client rep un email amb la sol·licitud i els propers passos, no una confirmació definitiva.
+- Coordinació: sense `app/admin/tasks`, runtime, schema, pricing core, Stripe, portal ni PDF.
+- Validació tècnica: `pnpm run qa:i18n-keys-sync`; `git diff --check`.
+- Validació funcional: la disponibilitat pública queda alineada amb `Booking.status=PENDING`.
+- Validació humana/UX: menys risc que el client interpreti un clic com a reserva final tancada.
+- `ADMIN_CHANGE_COUNTER` puja a `1557`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1556 — 2026-07-07 — codex (FET)
+
+**Reserva pública: camps requerits trimmejats i email validat al servei.**
+
+- Context: `/api/booking` comprovava camps obligatoris, però `createPublicBooking` podia acceptar strings només amb espais i depenia massa de la route per validar email.
+- Fix servei: normalitzadors interns per strings requerits/opcionals; `clientName`, `clientEmail`, `clientPhone`, `eventLocation` i `packId` buits després de `trim` retornen `MISSING_REQUIRED_FIELDS`.
+- Fix email: `createPublicBooking` retorna `INVALID_EMAIL` si el servei es crida directament amb email invàlid.
+- Persistència: `eventLocation`, `eventVenue` i `notes` es desen trimmejats.
+- Fix route: camps obligatoris amb només espais compten com a absents abans d'entrar al servei.
+- Tests: route i servei blinden espais, email invàlid i persistència trimmejada.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\publicBookingService.test.ts __tests__\app\api\booking-route.test.ts __tests__\components\booking\BookingForm.test.tsx __tests__\lib\email-public-booking-request.test.ts` (38/38); `npx tsc --noEmit --pretty false`; `git diff --check`.
+- Validació funcional: la reserva pública ja no pot crear registres amb requerits textuals buits després de normalització.
+- Validació humana/UX: menys brutícia a admin i menys feina manual per interpretar entrades mal formades.
+- `ADMIN_CHANGE_COUNTER` puja a `1556`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1555 — 2026-07-07 — codex (FET)
+
+**Email de reserva pública pendent: sol·licitud rebuda, no confirmació final.**
+
+- Context: després del #1554, la web ja no prometia confirmació definitiva, però `sendBookingConfirmation()` encara enviava al client “¡Reserva Confirmada!” i “Tu reserva ha sido confirmada” tot i que la booking pública neix `PENDING`.
+- Fix: `sendBookingConfirmation()` passa a construir el contingut amb `buildPublicBookingRequestEmail()`, un builder pur localitzat en CA/ES/EN segons `preferredLocale`.
+- Copy client: data bloquejada provisionalment, revisió de disponibilitat/encaix tècnic, proposta o contracte, i paga i senyal per confirmar definitivament.
+- Copy admin: notificació interna passa a “Nueva solicitud de reserva” i mostra `PENDING · revisión necesaria` abans de confirmació final.
+- Test: nou `__tests__/lib/email-public-booking-request.test.ts` blinda copy CA/EN i nega les frases fortes antigues.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF; no es toca la plantilla editable `booking_confirmation`, perquè pertany al flux de confirmació real gestionat per admin.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\email-public-booking-request.test.ts __tests__\lib\services\publicBookingService.test.ts __tests__\app\api\booking-route.test.ts` (29/29); `npx tsc --noEmit --pretty false`; `git diff --check`.
+- Validació funcional: el correu públic queda alineat amb `Booking.status=PENDING` i amb l'absència de paga i senyal.
+- Validació humana/UX: el client rep una expectativa honesta i el propietari no queda exposat per un email que prometia més del que el sistema havia tancat.
+- `ADMIN_CHANGE_COUNTER` puja a `1555`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1554 — 2026-07-07 — codex (FET)
+
+**Promesa pública coherent: sol·licitud rebuda, no reserva confirmada.**
+
+- Context: el formulari i `/[locale]/reserva-confirmada` deien “Reserva confirmada”, però `publicBookingService` crea `Booking.status = PENDING` amb `depositAmount = 0`; la confirmació final encara depèn de revisió, contracte/proposta i paga i senyal.
+- Fix copy: `messages/ca.json`, `messages/es.json`, `messages/en.json` passen el flux públic a “sol·licitud de reserva rebuda / booking request received”.
+- Formulari: meta/hero, success state, legal prefix i CTA deixen de prometre confirmació final; el botó passa a sol·licitar la reserva.
+- Pàgina final: explica que la data queda bloquejada provisionalment mentre es revisen disponibilitat, encaix tècnic i detalls; es manté la ruta existent per compatibilitat.
+- Tests: `BookingForm` i `reserva-confirmada` blinden el nou copy, a més de mantenir servei i route de booking en verd.
+- Coordinació: sense `app/admin/tasks`, backend, schema, migracions, pricing core, Stripe, portal ni PDF.
+- Validació tècnica: `pnpm run qa:i18n-keys-sync`; `pnpm test:run -- --run __tests__\components\booking\BookingForm.test.tsx __tests__\app\reserva-confirmada-page.test.tsx __tests__\lib\services\publicBookingService.test.ts __tests__\app\api\booking-route.test.ts` (34/34); `npx tsc --noEmit --pretty false`; `git diff --check`.
+- Validació funcional: la promesa pública queda alineada amb l'estat real `PENDING` i amb l'absència de paga i senyal.
+- Validació humana/UX: el client veu una resposta honesta i el propietari no queda exposat a defensar una “confirmació” que la màquina encara no ha tancat.
+- `ADMIN_CHANGE_COUNTER` puja a `1554`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1553 — 2026-07-07 — codex (FET)
+
+**Reserva pública traçable: adminLog i calendari amb referència real.**
+
+- Context: el #1552 alinea import visible i backend, però la reserva pública encara no deixava `AdminLog` complet i la nota d'Availability no tenia referència real un cop creat el `Booking`.
+- Fix: `publicBookingService` construeix una nota coherent de `Reserva pública pendent`, primer sense referència i després amb `OE-...` quan el `Booking` ja existeix.
+- Rastre: la mateixa transacció crea `AdminLog` `CREATE` sobre `booking` amb `source: public_booking`, `reference`, `customerId`, client, locale, data, tipus, ubicació, pack, extres, base, IVA, total, estat i `availabilityStatus`.
+- Test: `publicBookingService` blinda que la Availability queda amb referència auditable i que el log administratiu conté origen públic i desglossament econòmic.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF; no es decideix encara si el flux futur ha de crear un lead revisable en comptes d'una booking pendent.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\publicBookingService.test.ts __tests__\app\api\booking-route.test.ts __tests__\components\booking\BookingForm.test.tsx` (33/33); `npx tsc --noEmit --pretty false`; `git diff --check`.
+- Validació funcional: cada reserva pública deixa un rastre administratiu auditable amb origen, preu i estat.
+- Validació humana/UX: el propietari no ha de reconstruir la història d'una reserva pública a mà; el sistema conserva la pista mínima per revisar-la.
+- `ADMIN_CHANGE_COUNTER` puja a `1553`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1552 — 2026-07-07 — codex (FET)
+
+**Reserva pública confiable: total visible amb IVA igual que backend.**
+
+- Context: el reset Manolo #1551 revalida que `BookingForm` mostrava pack+extres+hores sense IVA, pero `publicBookingService` grava `subtotal + IVA 21%`; el client podia veure un import i el sistema guardar-ne un altre.
+- Fix: el resum de preu public calcula base, IVA i total final amb `roundMoney`, `calcVatAmount`, `VAT_RATE_INVOICE` i `formatCurrencyExact`, la mateixa font de pricing que el backend.
+- Copy: missatges CA/ES/EN sincronitzats per base del servei, IVA, total final estimat i nota de confirmació; hores extra/extres deixen de concatenar `€` manualment.
+- Test: `BookingForm` blinda que un pack de 500 EUR mostra 105 EUR d'IVA i 605 EUR de total final visible; servei i route de booking continuen verds.
+- Coordinació: sense `app/admin/tasks`, schema, migracions, pricing core, Stripe, portal ni PDF; `BookingForm.tsx` ja estava dirty i el patch es limita al contracte de preu visible.
+- Validació tècnica: `pnpm test:run -- --run __tests__\components\booking\BookingForm.test.tsx __tests__\lib\services\publicBookingService.test.ts __tests__\app\api\booking-route.test.ts` (32/32); `pnpm run qa:i18n-keys-sync`; `npx tsc --noEmit --pretty false`; `git diff --check`.
+- Validació funcional: el total visible al formulari de reserva pública coincideix amb la regla guardada pel backend.
+- Validació humana/UX: el client veu una proposta més honesta i el propietari no ha de defensar una diferència creada pel sistema.
+- `ADMIN_CHANGE_COUNTER` puja a `1552`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1551 — 2026-07-07 — codex (FET)
+
+**Manolo reset total: auditoria brutal i cua Zenit.**
+
+- Context: el propietari ordena repetir de zero; Manolo ha de fer la supermega auditoria exhaustiva total i despres portar la maquina al Zenit, encara que calgui refer peces.
+- Fix documental: nou `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` amb reset de criteri, fonts obligatories, definicio d'exhaustivitat, criteri Zenit, inventari viu del repo i cua de talls executables.
+- Inventari local: 829 fitxers a `app/`, 171 pagines, 97 pagines admin, 72 pagines publiques locale, 224 API routes, 229 serveis, 64 models Prisma, 604 tests, 136 scripts i 1362 exports/funcions detectades a serveis.
+- Primera troballa revalidada: la reserva publica mostra subtotal sense IVA mentre el backend guarda total amb IVA; queda com a primer tall Zenit #1552.
+- Coordinació: sense runtime, schema, pricing core, Stripe, portal, PDF ni `app/admin/tasks`; el document substitueix com a comandament viu les conclusions anteriors no verificades en aquest reset.
+- Validació tècnica: lectura local del document nou; `pnpm run qa:protocol` en el registre del tall.
+- Validació funcional: la feina queda formalment dividida en auditoria Manolo total i execucio Zenit amb talls validats.
+- Validació humana/UX: el criteri rector passa a fiabilitat, simplicitat, traçabilitat, visual coherent i copilot automatic per gestionar Orbita.
+- `ADMIN_CHANGE_COUNTER` puja a `1551`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1550 — 2026-07-07 — codex (FET)
+
+**Captació pública conserva ubicació i idioma.**
+
+- Context: el #1547 va detectar que `ContactFormComplete` enviava `location`, però `/api/contact` la descartava al schema i el servei no podia persistir-la a `Lead.eventLocation`; també faltava locale explícit al contacte/configurador.
+- Fix: `contactSchema` accepta `location` i `eventLocation`; la route normalitza aquesta dada i la passa a `contactLeadCaptureService`; el servei desa `eventLocation` en create/update de `Lead`.
+- Payload public: `ContactFormComplete` envia `locale` derivat del path i el configurador envia el `locale` de `useLocale()`.
+- Test: schema accepta ubicació, route passa `eventLocation/preferredLocale`, i servei persisteix `eventLocation`.
+- Coordinació: `ContactFormComplete` i `app/[locale]/configurador/client.tsx` ja estaven dirty; patch mínim i sense tocar `app/admin/tasks`, schema, pricing core, Stripe, portal ni PDF.
+- Validació tècnica: `pnpm test:run -- --run __tests__\api\contact\contact-copy.test.ts __tests__\app\api\contact-route.test.ts __tests__\lib\services\contactLeadCaptureService.test.ts` (41/41); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: les dades que el client escriu a captació arriben a admin sense perdre ubicació ni idioma.
+- Validació humana/UX: el propietari recupera context territorial i idioma real de pàgina per decidir transport, marge, weather i resposta comercial.
+- `ADMIN_CHANGE_COUNTER` puja a `1550`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1549 — 2026-07-07 — codex (FET)
+
+**Contacte públic: cap èxit sense Lead persistent.**
+
+- Context: el #1547 va detectar que `/api/contact` podia respondre `ok: true` encara que `persistContactLead` retornés `leadId: null`; el #1548 fixa que la màquina no pot prometre una captació si no queda guardada.
+- Fix: `app/api/contact/route.ts` exigeix `savedLeadId` després de persistir. Si no hi ha id real, entra al camí 500 existent i no envia emails d'èxit.
+- Contracte: la resposta pública `leadId` passa a ser l'id real del `Lead` persistent, no una referència efímera `OE-*`.
+- Test: nou `__tests__/app/api/contact-route.test.ts` cobreix id real retornat i fallada de persistència sense `ok` ni emails.
+- Coordinació: sense `app/admin/tasks`, schema, pricing core, Stripe, portal, PDF ni `ContactFormComplete`; el següent cicle Manolo queda per `location` i `locale` de captació.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\contact-route.test.ts __tests__\lib\services\contactLeadCaptureService.test.ts` (11/11); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: cap captació pública pot dir-se enviada correctament si no existeix una entrada real a admin.
+- Validació humana/UX: el propietari deixa de rebre una falsa promesa d'èxit quan la BD no ha creat el lead.
+- `ADMIN_CHANGE_COUNTER` puja a `1549`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1548 — 2026-07-07 — codex (FET)
+
+**Manolo Zenit: comandament nonstop de la superauditoria total.**
+
+- Context: el propietari aclareix que el mandat no es una auditoria parcial, sino una supermega auditoria total absoluta i despres portar la maquina al Zenit com a millor programa de gestio possible per a Orbita Events.
+- Fix documental: nou `docs/audit/MANOLO-ZENIT-COMANDAMENT-NONSTOP-1548.md` amb definicio de Zenit, rol de Manolo, fotografia viva del repo, 12 fronts obligatoris, matriu de direccions i pipeline nonstop.
+- Inventari local: 829 fitxers a `app/`, 171 pagines, 97 pagines admin, 224 API routes, 229 serveis, 64 models Prisma, 603 tests i 142 scripts.
+- Regla operativa: cada cicle audita, classifica, decideix `REFER/COSIR/PODAR/PROTEGIR/DEIXAR`, implementa si el fix es clar, valida, registra i continua sense demanar pausa.
+- Proxim tall: #1549 comença el primer fix real de la frontissa captacio: `/api/contact` no pot retornar `ok: true` sense `Lead` persistent.
+- Coordinació: sense runtime, schema, pricing, Stripe, portal, PDF ni `app/admin/tasks`; aquest tall fixa el comandament i obre la continuacio nonstop.
+- Validació tècnica: `pnpm run qa:protocol`; revisio de trailing whitespace del document nou.
+- Validació funcional: la superauditoria queda governada per un mapa mestre i no per respostes parcials al xat.
+- Validació humana/UX: el propietari pot entendre que l'objectiu final es confiança total, claredat, marge, operativa i una sola veritat en tota la maquina.
+- `ADMIN_CHANGE_COUNTER` puja a `1548`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1547 — 2026-07-06 — codex (FET)
+
+**Manolo Zenit: auditoria de la frontissa captació pública -> admin.**
+
+- Context: després de mirar `master` i `atles` al #1546, el primer tall real de l'auditoria havia de seguir l'entrada de negoci fins a admin, no una pantalla aïllada.
+- Fix documental: nou `docs/audit/MANOLO-ZENIT-FRONTISSA-CAPTACIO-1547.md` amb mapa de `ContactFormComplete`, configurador, `BookingForm`, `/api/contact`, `/api/booking`, serveis, models Prisma i recepcio admin.
+- Diagnòstic escrit: el contacte pot respondre `ok: true` sense `Lead`, `location` es perd al schema, el locale de contacte/configurador no es contracte explicit, la referencia `OE-*` no es l'id real, i la reserva publica crea `Booking`/`Availability BOOKED` sense nervi `Lead/ServiceLine`.
+- Prioritat fixada: #1548 ha de blindar el contracte de persistencia de `/api/contact` abans de cap polish visual; cap exit public sense entrada real a admin.
+- Coordinació: sense runtime, schema, pricing, Stripe, portal, PDF ni `app/admin/tasks`; aquest tall nomes documenta evidencies i ordre de reconstruccio.
+- Validació tècnica: `pnpm run qa:protocol`; revisio de trailing whitespace del document nou.
+- Validació funcional: l'auditoria Manolo passa de mandat general a traça executable public -> API -> servei -> model -> admin.
+- Validació humana/UX: el propietari pot veure quines promeses publiques poden perdre dades o crear una reserva massa forta abans de tocar codi.
+- `ADMIN_CHANGE_COUNTER` puja a `1547`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1546 — 2026-07-06 — codex (FET)
+
+**Manolo Zenit: master i atles com a mapa rector abans de l'auditoria total.**
+
+- Context: el propietari corregeix el rumb abans d'obrir l'auditoria exhaustiva i recorda que ja existeixen `master` i `atles`; cal mirar-los be abans de començar una passada nova pel repo.
+- Fix documental: nou `docs/audit/MANOLO-ZENIT-ANALISI-MASTER-ATLES-1546.md` que subordina el mandat Manolo #1545 a `ATLES-FUNCIONAL`, `admin-organisme-atles`, `TESI-MAQUINA` i `TESI-ZENIT`.
+- Diagnòstic escrit: el zenit no es una auditoria cega ni una reescriptura massiva; es una serie de disseccions verticals governades pel flux `lead -> cash`, els organs de l'atles i els deutes ja detectats.
+- Prioritat fixada: primer tall recomanat `contacte/configurador/reserva publica -> API -> Lead/Booking -> admin`, per verificar la frontissa que l'atles marca pendent abans de tocar navegacio D9 o podar Transversal.
+- Coordinació: sense runtime, schema, pricing, Stripe, portal, public web ni `app/admin/tasks`; aquest tall nomes fixa el mapa rector i el primer audit executable.
+- Validació tècnica: `pnpm run qa:protocol`; `git diff --check` del perimetre documental.
+- Validació funcional: el mandat Manolo queda alineat amb els documents mestres i separa diagnostics ja fets de verificacions pendents.
+- Validació humana/UX: el propietari pot seguir per que l'auditoria comença per la frontissa d'entrada de negoci i no per una pantalla solta.
+- `ADMIN_CHANGE_COUNTER` puja a `1546`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1545 — 2026-07-06 — codex (FET)
+
+**Full de treball Manolo Zenit: auditoria total i millora fins al límit.**
+
+- Context: el propietari recupera la instrucció donada a Manolo: auditoria extensíssima, exhaustiva, vertical, horitzontal, diagonal, frontal, posterior, de perfil, pas a pas i end to end de tot el programa, amb permís per refer tot el necessari fins al Zenit.
+- Fix documental: nou `docs/audit/MANOLO-ZENIT-FULL-DE-TREBALL-1545.md` amb mandat, abast, capes obligatòries, preguntes per peça, sortida mínima, regla de reconstrucció i ordre de treball.
+- Criteri escrit: tot el que el propietari ha dit i tot el que s'ha afegit es pot millorar, però només entra si reforça conversió, execució, cobrament, recurrència, confiança, claredat o fiabilitat.
+- Coordinació: el #1545 que estava preassignat a polish de valoració es repurposa a aquest full per ordre directa del propietari; el polish de `TestimonialForm` queda com a tall posterior.
+- Validació tècnica: `pnpm run qa:protocol`.
+- Validació funcional: el full de treball deixa una entrada única i localitzable per executar futures auditories Manolo sense reconstruir el mandat des del xat.
+- Validació humana/UX: el propietari pot convocar Manolo amb una definició operativa de què mirar, què millorar i com separar millora real de remenar per gust.
+- `ADMIN_CHANGE_COUNTER` puja a `1545`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1544 — 2026-07-06 — codex (FET)
+
+**Valoració post-event: focus mòbil sense chrome distractor.**
+
+- Context: després del shell #1543, el mòbil encara mostrava bottom nav, CTAs i footer llarg dins d'un flux que només ha de portar el client a completar la ressenya.
+- Fix: nova font `lib/constants/publicChrome.ts` amb `shouldHidePublicMobileChrome()`; `LayoutWrapper` consumeix aquesta regla en lloc de tenir condicions inline.
+- Ruta: `/valoracio` passa a chromeless en mòbil; es retira el padding extra del formulari que només compensava la nav fixa.
+- Test: `publicChrome` cobreix rutes focalitzades i falsos positius; `valoracio-page` continua blindant copy i props.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\constants\publicChrome.test.ts __tests__\app\valoracio-page.test.tsx` (5/5); `npx tsc --noEmit --pretty false`.
+- Validació funcional: Playwright mobile a `/ca/valoracio?token=test-token&ref=BK-1544` renderitza sense bottom nav, footer ni CTA flotant.
+- Validació humana/UX: captura `.codex-captures/valoracio-mobile-focus-1544/mobile.png`; el client veu post-event + formulari, no navegació comercial competint.
+- `ADMIN_CHANGE_COUNTER` puja a `1544`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1543 — 2026-07-06 — codex (FET)
+
+**Valoració post-event: shell visual amb context comercial.**
+
+- Context: `/[locale]/valoracio` funcionava com a formulari, però semblava una targeta tècnica flotant en un buit negre i no explicava confiança, recompensa ni memòria de marca.
+- Fix: la ruta guanya secció visual localitzada amb eyebrow, títol, descripció i tres senyals comercials; el formulari queda dins d'un layout responsive amb espai per la nav fixa mòbil.
+- Semàntica: la peça deixa de crear un `main` dins del `main` global i usa `section aria-labelledby`; es mantenen `token/ref` normalitzats.
+- Test: `valoracio-page` cobreix copy i props del formulari; i18n queda sincronitzat a `ca/es/en`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\valoracio-page.test.tsx` (3/3); `pnpm run qa:i18n-keys-sync`; `npx tsc --noEmit --pretty false`.
+- Validació funcional: HTTP local a `/ca/valoracio` retorna 200 i Playwright captura `/ca/valoracio?token=test-token&ref=BK-1543` amb el formulari viu.
+- Validació humana/UX: captures a `.codex-captures/valoracio-visual-1543-final/desktop.png` i `mobile.png`; la pantalla ja diu post-event, valor i recompensa, i en mòbil la navegació fixa no trepitja el formulari.
+- `ADMIN_CHANGE_COUNTER` puja a `1543`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1542 — 2026-07-06 — codex (FET)
+
+**Post-event: `reviewUrl` amb URLSearchParams.**
+
+- Context: el link de valoració de l'email post-event concatenava `token` i `ref` manualment.
+- Fix: `buildPostEventReviewUrl()` construeix la URL amb `new URL()` i `searchParams.set()`.
+- Test: dispatch cobreix token/ref amb `+`, `/` i slash a la referència; també mocka questionnaire/portal per deixar la suite sense soroll.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\postEventDispatchService.test.ts` (9/9); `npx tsc --noEmit --pretty false`.
+- Validació funcional: l'email continua apuntant a `/{locale}/valoracio`, però la query queda codificada sempre.
+- Validació humana/UX: el link cap a la ressenya és menys fràgil davant referències o tokens especials.
+- `ADMIN_CHANGE_COUNTER` puja a `1542`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1541 — 2026-07-06 — codex (FET)
+
+**Testimonial API: URLs opcionals sanejades.**
+
+- Context: `photoUrl` i `videoUrl` opcionals no es trimmejaven i un camp d'espais no quedava com absent.
+- Fix: `optionalUrlString` trimmeja URL i converteix buit/null/absent a `undefined` abans de validar `.url()`.
+- Test: route cobreix foto amb espais i vídeo buit.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\testimonials-route.test.ts` (8/8); `npx tsc --noEmit --pretty false`.
+- Validació funcional: les URLs vàlides continuen arribant al servei; buits no fallen.
+- Validació humana/UX: menys fricció si el client enganxa una URL amb espais sobrants.
+- `ADMIN_CHANGE_COUNTER` puja a `1541`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1540 — 2026-07-06 — codex (FET)
+
+**Testimonial API: camps obligatoris trimmejats.**
+
+- Context: `comment`, `name` i `email` es validaven sense trim previ, i podien arribar bruts al servei.
+- Fix: la schema Zod de `/api/testimonials` trimmeja `comment`, `name`, `email` i `phone`; `comment` es valida després del trim.
+- Test: route cobreix trim abans de `submitPublicTestimonial` i rebuig d'un comentari només d'espais.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\testimonials-route.test.ts` (7/7); `npx tsc --noEmit --pretty false`.
+- Validació funcional: les submissions vàlides mantenen resposta i payload, però arriben netes.
+- Validació humana/UX: menys dades brutes i menys ressenyes buides al post-event.
+- `ADMIN_CHANGE_COUNTER` puja a `1540`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1539 — 2026-07-06 — codex (FET)
+
+**Testimonial API: context nul tolerat.**
+
+- Context: una crida directa a `/api/testimonials` amb `token: null` o `bookingRef: null` encara podia fallar validació Zod.
+- Fix: `optionalContextString` accepta `string | null | undefined`, trimmeja i converteix buit/null a `undefined`.
+- Test: route cobreix nulls tolerats i trim de token/ref abans de cridar `submitPublicTestimonial`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\testimonials-route.test.ts` (5/5); `npx tsc --noEmit --pretty false`.
+- Validació funcional: context real continua arribant al servei; context absent deixa de ser error.
+- Validació humana/UX: l'entrada de ressenyes resisteix millor clients o integracions amb payload imperfecte.
+- `ADMIN_CHANGE_COUNTER` puja a `1539`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1538 — 2026-07-06 — codex (FET)
+
+**Testimonial: payload sense context nul.**
+
+- Context: sense `token/ref` a la URL, el formulari podia enviar `token: null` i `bookingRef: null`, incompatibles amb l'API Zod.
+- Fix: `TestimonialForm` construeix el payload i només inclou `token`/`bookingRef` quan tenen valor real, trimmejat.
+- Test: submit correcte sense context inspecciona el body de `fetch` i comprova que no existeixen aquests camps.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\components\reviews\TestimonialForm.test.tsx` (3/3); `npx tsc --noEmit --pretty false`.
+- Validació funcional: links amb context continuen enviant-lo; formularis manuals deixen d'enviar nulls.
+- Validació humana/UX: la porta de valoració no queda bloquejada si el client entra sense token de reserva.
+- `ADMIN_CHANGE_COUNTER` puja a `1538`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1537 — 2026-07-06 — codex (FET)
+
+**Testimonials públics: paginació sanejada.**
+
+- Context: `listApprovedPublicTestimonials()` podia rebre `NaN`, negatius o límits massa grans des del GET públic.
+- Fix: nova normalització de paginació amb default `10`, offset mínim `0`, limit mínim `1` i màxim `50` abans de Prisma.
+- Test: servei cobreix NaN, negatius, decimals, límit gran i `hasMore` amb valors sanejats.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\publicTestimonialService.test.ts` (19/19); `npx tsc --noEmit --pretty false`.
+- Validació funcional: la llista pública conserva sortida i format; només evita `take/skip` invàlids o excessius.
+- Validació humana/UX: URLs de testimonials malformades no trenquen ni degraden la resposta pública.
+- `ADMIN_CHANGE_COUNTER` puja a `1537`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1536 — 2026-07-06 — codex (FET)
+
+**Valoració post-event: noms nets als botons.**
+
+- Context: fletxes i check decoratius dels botons del formulari entraven al nom accessible.
+- Fix: els símbols de navegació i submit passen a `aria-hidden`; el spinner també queda ocult a tecnologia assistiva.
+- Test: el flux de `TestimonialForm` localitza `Següent` i `Enviar opinió` amb nom exacte.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\components\reviews\TestimonialForm.test.tsx` (2/2); `npx tsc --noEmit --pretty false`.
+- Validació funcional: cap canvi en passos, validació ni POST.
+- Validació humana/UX: les accions del post-event es llegeixen com accions netes, sense soroll decoratiu.
+- `ADMIN_CHANGE_COUNTER` puja a `1536`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1535 — 2026-07-06 — codex (FET)
+
+**Valoració post-event: labels associats als camps.**
+
+- Context: textarea, URL de foto/vídeo i camps de contacte tenien text visual però no tots quedaven associats al control.
+- Fix: `TestimonialForm` usa `useId()` i connecta textarea, foto, vídeo, nom, email i telèfon amb `aria-labelledby` o `htmlFor`.
+- Copy: `testimonialForm.form.email` passa a i18n en ca/es/en.
+- Test: el test del component localitza comentari, foto, vídeo, nom i email pel seu nom accessible.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\components\reviews\TestimonialForm.test.tsx` (2/2); `pnpm run qa:i18n-keys-sync`; `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien dades enviades ni validació; només canvia l'accessibilitat semàntica dels controls.
+- Validació humana/UX: el formulari post-event és més usable amb teclat/lector de pantalla i menys dependent de l'ordre visual.
+- `ADMIN_CHANGE_COUNTER` puja a `1535`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1534 — 2026-07-06 — codex (FET)
+
+**Valoració post-event: error d'enviament com alert.**
+
+- Context: el missatge de fallada del formulari de valoració era visible però no tenia rol accessible.
+- Fix: el bloc d'error de `TestimonialForm` guanya `role="alert"`.
+- Test: el test del component recorre rating → comentari → media → contacte, força un `fetch` fallit i comprova l'alerta.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\components\reviews\TestimonialForm.test.tsx` (2/2); `npx tsc --noEmit --pretty false`.
+- Validació funcional: la crida a `/api/testimonials` i el missatge de fallada mantenen el mateix contracte.
+- Validació humana/UX: un client amb lector de pantalla rep feedback immediat si el post-event no es pot enviar.
+- `ADMIN_CHANGE_COUNTER` puja a `1534`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1533 — 2026-07-06 — codex (FET)
+
+**Valoració post-event: estrelles accessibles.**
+
+- Context: les cinc estrelles del primer pas eren botons visuals sense nom accessible diferenciat ni estat seleccionat explícit.
+- Fix: cada estrella rep `aria-label` localitzat amb puntuació/label humà i `aria-pressed` segons la selecció actual.
+- Test: `TestimonialForm` comprova el nom accessible de la quarta estrella i el canvi d'`aria-pressed` en clicar.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\components\reviews\TestimonialForm.test.tsx` (1/1); `pnpm run qa:i18n-keys-sync`; `npx tsc --noEmit --pretty false`.
+- Validació funcional: el càlcul de puntuació, recompensa i avanç de pas no canvia.
+- Validació humana/UX: la primera decisió del post-event ja és comprensible també amb tecnologia assistiva.
+- `ADMIN_CHANGE_COUNTER` puja a `1533`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1532 — 2026-07-06 — codex (FET)
+
+**Valoració post-event: metadata localitzada i query net.**
+
+- Context: `/[locale]/valoracio` tenia metadata catalana fixa i passava `token/ref` crus al formulari.
+- Fix: `generateMetadata()` usa `testimonialForm.metadata`, `normalizePublicLocale()` i `SITE_CONFIG.business.name`; `ValoracioClient` retalla `token/ref` i descarta valors buits.
+- Test: `valoracio-page` cobreix query neta, valors buits i metadata anglesa normalitzada des d'`en-US`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\valoracio-page.test.tsx` (3/3); `pnpm run qa:metadata-i18n-namespaces`; `npx tsc --noEmit --pretty false`.
+- Validació funcional: el POST de testimoni continua rebent el mateix context quan existeix, però sense espais ni strings buits.
+- Validació humana/UX: la porta post-event respecta l'idioma del client i evita soroll de query en una acció de confiança.
+- `ADMIN_CHANGE_COUNTER` puja a `1532`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1531 — 2026-07-06 — codex (FET)
+
+**Galeria compartida: error de contrasenya com alert.**
+
+- Context: el gate de contrasenya marcava l'error visualment, però no amb rol accessible.
+- Fix: missatge de contrasenya incorrecta amb `role="alert"`.
+- Test: el test del gate comprova l'alerta.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\gallery\shared-gallery-page.test.tsx` (4/4); `npx tsc --noEmit --pretty false`.
+- Validació funcional: el flux de password no canvia.
+- Validació humana/UX: el feedback d'error arriba també a tecnologia assistiva.
+- `ADMIN_CHANGE_COUNTER` puja a `1531`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1530 — 2026-07-06 — codex (FET)
+
+**Galeria compartida: fotos anuncien pestanya nova.**
+
+- Context: els links de foto obrien pestanya nova però el nom accessible no ho deia.
+- Fix: `aria-label` de cada foto afegeix `({t.opensInNewTab})`; l'alt de la imatge es manté net.
+- Test: galeria compartida amb foto sense caption en anglès.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\gallery\shared-gallery-page.test.tsx` (4/4); `npx tsc --noEmit --pretty false`.
+- Validació funcional: les fotos continuen obrint el fitxer original en pestanya nova.
+- Validació humana/UX: el client amb lector de pantalla rep avís explícit del canvi de pestanya.
+- `ADMIN_CHANGE_COUNTER` puja a `1530`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1529 — 2026-07-06 — codex (FET)
+
+**Galeria compartida: copy localitzat i marca canònica.**
+
+- Context: `/[locale]/gallery/[shareToken]` tenia textos catalans hardcoded i marca manual `Orbita Events`.
+- Fix: page/gate consumeixen `CLIENT_PORTAL_MESSAGES`, `normalizePortalLocale()` i `SITE_CONFIG.business.name`; password repetit usa el primer valor.
+- Test: render espanyol, password array i gate protegit amb labels injectats.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\gallery\shared-gallery-page.test.tsx __tests__\lib\clientPortalMessages.test.ts __tests__\lib\services\galleryService.test.ts` (51/51); `npx tsc --noEmit --pretty false`; `rg` sense hardcoded català/manual al path.
+- Validació funcional: token/password i galeria pública continuen igual; canvia només la font de copy/marca i la robustesa del query.
+- Validació humana/UX: clients en es/en veuen la galeria en el seu idioma i amb marca coherent.
+- `ADMIN_CHANGE_COUNTER` puja a `1529`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1528 — 2026-07-06 — codex (FET)
+
+**Portal: visibilitat consumeix `coercePortalPersonalization`.**
+
+- Context: el motor de visibilitat parsejava JSON de personalització amb un cast propi.
+- Fix: `getClientPortalVisibility()` consumeix `coercePortalPersonalization()` i només amaga amb `false` explícit.
+- Test: visibilitat i utils cobreixen flags no booleans.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\clientPortalVisibility.test.ts __tests__\lib\clientPortalUtils.test.ts` (9/9); `npx tsc --noEmit --pretty false`.
+- Validació funcional: defaults visibles i flags `false` conserven el comportament; valors legacy no booleans s'ignoren.
+- Validació humana/UX: dades brutes no amaguen seccions per accident.
+- `ADMIN_CHANGE_COUNTER` puja a `1528`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1527 — 2026-07-06 — codex (FET)
+
+**Portal: consumidors importen `PortalPersonalization` des de constants.**
+
+- Context: després del #1523, panell admin i route encara importaven el tipus des del servei reexportat.
+- Fix: `ClientPortalAccessPanel` i la route admin consumeixen el tipus des de `lib/constants/clientPortalPersonalization`.
+- Test: panel, route i constants continuen verds.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx __tests__\app\api\admin\bookings-portal-access-route.test.ts __tests__\lib\constants\clientPortalPersonalization.test.ts` (21/21); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien dades, payloads ni runtime; només es completa la font canònica del tipus.
+- Validació humana/UX: cap canvi visible; més claredat de manteniment entre UI, route i servei.
+- `ADMIN_CHANGE_COUNTER` puja a `1527`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1526 — 2026-07-06 — codex (FET)
+
+**Portal: `payment-success` saneja `searchParams` array.**
+
+- Context: App Router pot entregar `searchParams` com `string[]`, però la pàgina assumia `string`.
+- Fix: `SearchParamValue` + `firstSearchParam()` per llegir `type` i `ref`; la referència es trimmeja i només es mostra si és real.
+- Test: render amb arrays en `type` i `ref`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\payment-success-page.test.tsx` (3/3); `npx tsc --noEmit --pretty false`.
+- Validació funcional: URLs normals mantenen comportament i params duplicats no generen copy ambigu.
+- Validació humana/UX: es mostra una sola referència neta i un missatge coherent.
+- `ADMIN_CHANGE_COUNTER` puja a `1526`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1525 — 2026-07-06 — codex (FET)
+
+**Portal: `payment-success` usa fallback genèric.**
+
+- Context: la pàgina de confirmació de pagament tenia copy genèric però qualsevol `type` desconegut es tractava com a paga i senyal.
+- Fix: `getPaymentSuccessBody()` separa `deposit`, `remaining` i fallback genèric.
+- Test: render de pagament final i de tipus desconegut.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\payment-success-page.test.tsx` (2/2); `npx tsc --noEmit --pretty false`.
+- Validació funcional: valors Stripe esperats mantenen copy específic i valors inesperats no prometen confirmació de reserva.
+- Validació humana/UX: el client rep un missatge cert encara que el tipus de pagament arribi mal format.
+- `ADMIN_CHANGE_COUNTER` puja a `1525`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1524 — 2026-07-06 — codex (FET)
+
+**Portal: `normalizePortalLocale` retorna `ClientPortalLocale`.**
+
+- Context: les pàgines del portal repetien casts després de normalitzar el locale, tot i que el helper ja limitava a `ca|es|en`.
+- Fix: `normalizePortalLocale()` retorna `ClientPortalLocale` i es retiren els casts de hub, subpàgines i payment-success.
+- Test: servei de portal, missatges i subpàgines continuen verds; `rg` confirma que no queda el cast repetit.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\clientPortalAccess.test.ts __tests__\app\portal\portalHubExternalLinks.test.ts __tests__\app\portal\portalSubpageExternalLinks.test.ts __tests__\app\portal\portalSignVisibility.test.ts __tests__\app\portal\portalSignAccessHit.test.ts __tests__\app\portal\portalIntroMessageRendering.test.ts __tests__\app\portal\portalPostEventFeedbackSource.test.ts __tests__\lib\clientPortalMessages.test.ts` (38/38); `npx tsc --noEmit --pretty false`; `rg` sense casts de locale.
+- Validació funcional: la normalització manté `ca` com a fallback i els mateixos idiomes suportats.
+- Validació humana/UX: cap canvi visible; menys assertions repetides i més coherència de locale al portal.
+- `ADMIN_CHANGE_COUNTER` puja a `1524`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1523 — 2026-07-06 — codex (FET)
+
+**Portal: tipus de personalització viu a constants.**
+
+- Context: `clientPortalUtils` havia d'importar `PortalPersonalization` des del servei, tot i que és contracte compartit de dades.
+- Fix: `PortalPersonalization` passa a `lib/constants/clientPortalPersonalization.ts`; el servei el reexporta per compatibilitat.
+- Test: constants, utils i servei d'accés continuen verds; `tsc` valida tots els imports existents.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\constants\clientPortalPersonalization.test.ts __tests__\lib\clientPortalUtils.test.ts __tests__\lib\services\clientPortalAccess.test.ts` (28/28); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien payloads, serialització ni lectura del portal.
+- Validació humana/UX: cap canvi visible; manteniment més clar perquè el tipus viu amb els límits/defaults del mateix domini.
+- `ADMIN_CHANGE_COUNTER` puja a `1523`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1522 — 2026-07-06 — codex (FET)
+
+**Portal: errors d'accions client-side sense casts locals.**
+
+- Context: signatura i Bizum llegien `res.json()` amb casts locals per extreure `error`.
+- Fix: nou `readPortalActionError(payload)` a `clientPortalUtils`, consumit per `SignContractForm` i `BizumPayButton`.
+- Test: utilitats cobreixen objecte, `null` i array; formularis mantenen normalització d'errors coneguts/desconeguts.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\clientPortalUtils.test.ts __tests__\app\portal\SignContractForm.test.tsx __tests__\app\portal\BizumPayButton.test.tsx` (15/15); `npx tsc --noEmit --pretty false`.
+- Validació funcional: errors coneguts continuen produint missatges específics i els desconeguts no surten en cru.
+- Validació humana/UX: el client rep feedback net encara que la resposta del backend sigui irregular.
+- `ADMIN_CHANGE_COUNTER` puja a `1522`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1521 — 2026-07-06 — codex (FET)
+
+**Portal: route d'accés tolera body JSON no objecte.**
+
+- Context: el POST de la route admin assumia que `req.json()` retornaria un objecte i podia petar amb JSON `null`.
+- Fix: nou `toRecord()` per llegir body i personalització com a objectes segurs; `locale`, `expiresInDays` i `personalization` ja no depenen de casts directes.
+- Test: regressió amb body `null` confirma resposta 200 i defaults sanejats.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\bookings-portal-access-route.test.ts` (16/16); `npx tsc --noEmit --pretty false`.
+- Validació funcional: payloads no objecte ja no trenquen la creació d'accés; payloads vàlids mantenen el mateix comportament.
+- Validació humana/UX: l'admin evita errors opacs per body mal format i continua amb defaults segurs.
+- `ADMIN_CHANGE_COUNTER` puja a `1521`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1520 — 2026-07-06 — codex (FET)
+
+**Portal: lectura segura de personalization JSON.**
+
+- Context: el hub feia cast directe de `access.personalization` tot i que ve de JSON i pot contenir valors legacy o bruts.
+- Fix: nou `coercePortalPersonalization(value)` a `clientPortalUtils`, reutilitzat també per `resolvePortalAccentHex()`.
+- Test: utilitats cobreixen `headline` no string, flag no booleà i accent normalitzat; el hub continua renderitzant intro/post-event/enllaços.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\clientPortalUtils.test.ts __tests__\app\portal\portalIntroMessageRendering.test.ts __tests__\app\portal\portalHubExternalLinks.test.ts __tests__\app\portal\portalPostEventFeedbackSource.test.ts` (7/7); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien fallbacks ni flags vàlids; es descarten valors de tipus incorrecte abans del render.
+- Validació humana/UX: si hi ha personalització corrupta, el client veu textos fallback en lloc d'una pantalla trencada.
+- `ADMIN_CHANGE_COUNTER` puja a `1520`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1519 — 2026-07-06 — codex (FET)
+
+**Portal: hub principal sense casts de booking redundants.**
+
+- Context: el hub principal encara recreava formes locals per `proposals`, pagaments, progrés i extres.
+- Fix: `page.tsx` consumeix directament `booking.proposals`, `booking`, `booking.extras` i passa `booking` a `getProgressSteps()`.
+- Test: grup focalitzat del hub i helpers visibles del portal continua verd; `tsc` confirma la inferència real del servei.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\portalHubExternalLinks.test.ts __tests__\app\portal\portalIntroMessageRendering.test.ts __tests__\app\portal\portalPostEventFeedbackSource.test.ts __tests__\app\portal\portalBusinessSource.test.ts __tests__\app\portal\portalBrandSource.test.ts __tests__\app\portal\portalProgressAccessibility.test.ts __tests__\app\portal\portalDecorativeArrows.test.ts __tests__\app\portal\portalDecorativeQuantity.test.ts __tests__\lib\clientPortalEventDisplay.test.ts` (12/12); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvia cap bloc del hub ni cap ruta; només desapareixen casts redundants.
+- Validació humana/UX: l'experiència del client és idèntica, amb menys risc de drift tècnic entre servei i pantalla.
+- `ADMIN_CHANGE_COUNTER` puja a `1519`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1518 — 2026-07-06 — codex (FET)
+
+**Portal: factura i pagaments sense casts locals.**
+
+- Context: factura i pagaments recreaven formes locals de `booking`/`proposals` abans de cridar els resums canònics.
+- Fix: `invoice/page.tsx` i `payments/page.tsx` consumeixen directament `access.booking` i `access.booking.proposals`.
+- Test: pagaments, enllaços externs i missatges del portal continuen verds; `tsc` confirma que el tipus real del servei encaixa.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\BizumPayButton.test.tsx __tests__\app\portal\portalSubpageExternalLinks.test.ts __tests__\lib\clientPortalMessages.test.ts` (15/15); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien imports, estat de pagament, Bizum, PDFs ni APIs; només s'elimina una forma local redundant.
+- Validació humana/UX: el client veu el mateix flux de pagament/factura, amb implementació més alineada amb la font de veritat.
+- `ADMIN_CHANGE_COUNTER` puja a `1518`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1517 — 2026-07-06 — codex (FET)
+
+**Portal: contracte i signatura sense cast de proposals.**
+
+- Context: contracte i signatura feien cast de `access.booking.proposals` abans de passar-ho a `getClientPortalContractSummary()`.
+- Fix: les dues pàgines passen el resultat del servei directament i eliminen imports de tipus només usats per forçar la forma.
+- Test: contracte, signatura, visibilitat i formulari de signatura continuen verds; `tsc` confirma compatibilitat estricta.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\portalContractChecklistAccessibility.test.ts __tests__\app\portal\portalSignAccessHit.test.ts __tests__\app\portal\portalSignVisibility.test.ts __tests__\app\portal\SignContractForm.test.tsx` (9/9); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien contracte, PDF, estat de signatura ni permisos de visibilitat.
+- Validació humana/UX: el flux visible és idèntic, amb menys risc que una forma local inventada amagui drift futur.
+- `ADMIN_CHANGE_COUNTER` puja a `1517`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1516 — 2026-07-06 — codex (FET)
+
+**Portal: subpàgines sense casts redundants de booking.**
+
+- Context: galeria, qüestionari i timeline del portal llegien `access.booking` amb casts locals tot i que el servei ja retorna la forma tipada.
+- Fix: les tres subpàgines passen a consumir directament `access.booking` i `access.booking.proposals` quan TypeScript ja pot verificar els camps.
+- Test: galeria, formulari de qüestionari i timeline continuen verds; `tsc` confirma que els casts no eren necessaris.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\portalGalleryCountAccessibility.test.ts __tests__\app\portal\GalleryClient.test.tsx __tests__\app\portal\QuestionnaireForm.test.tsx __tests__\lib\clientPortalTimeline.test.ts` (14/14); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien query, payloads ni comportament visible; les pàgines continuen llegint la mateixa reserva del mateix accés.
+- Validació humana/UX: el portal queda igual per al client, però la implementació és més honesta: menys formes locals inventades i més herència directa del servei.
+- `ADMIN_CHANGE_COUNTER` puja a `1516`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1515 — 2026-07-06 — codex (FET)
+
+**Portal: visibilitat desa només overrides false.**
+
+- Context: el motor interpreta flags absents com a visibles, però la route podia persistir `showTimeline: true`, `showPayments: true`, etc.
+- Fix: el sanejador només guarda els flags quan són `false`.
+- Test: route POST comprova que `true` no es persisteix i que `showQuestionnaire: false` sí; el motor de visibilitat continua verd.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\bookings-portal-access-route.test.ts __tests__\lib\clientPortalVisibility.test.ts` (18/18); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien defaults ni UI; visible continua sent el comportament per defecte i només s'emmagatzemen els amagats.
+- Validació humana/UX: la personalització guardada reflecteix decisions reals, no soroll redundant.
+- `ADMIN_CHANGE_COUNTER` puja a `1515`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1514 — 2026-07-06 — codex (FET)
+
+**Portal: accent sanejat abans de guardar.**
+
+- Context: el render feia fallback si l'accent era invàlid, però la route podia guardar qualsevol text curt com `accentColor`.
+- Fix: `normalizePortalAccentHex()` centralitza la normalització i la route descarta accents invàlids abans de cridar `issueClientPortalAccess`.
+- Test: `clientPortalUtils.test.ts` i `bookings-portal-access-route.test.ts` cobreixen trim, normalització i descart.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\clientPortalUtils.test.ts __tests__\app\api\admin\bookings-portal-access-route.test.ts` (17/17); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien schema, emails, pricing ni PDFs; només s'evita persistir un accent que el portal no podria pintar.
+- Validació humana/UX: l'admin no queda amb un color aparentment guardat que el client mai veuria.
+- `ADMIN_CHANGE_COUNTER` puja a `1514`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1513 — 2026-07-06 — codex (FET)
+
+**Portal: route sense límit fantasma.**
+
+- Context: després de portar els límits a constants, `toOptionalString(value, max = 300)` mantenia un `300` sense contracte real.
+- Fix: `toOptionalString` exigeix `max` explícit; tots els camps passen `CLIENT_PORTAL_PERSONALIZATION_LIMITS`.
+- Test: route POST continua verd i `rg` confirma que no queda `max = 300`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\bookings-portal-access-route.test.ts` (12/12); `npx tsc --noEmit --pretty false`; `rg` confirma que no queda `max = 300`.
+- Validació funcional: no canvien valors ni payloads; només es retira un fallback intern no utilitzat.
+- Validació humana/UX: els límits del portal continuen venint només de la font compartida.
+- `ADMIN_CHANGE_COUNTER` puja a `1513`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1512 — 2026-07-06 — codex (FET)
+
+**Portal: accent per defecte a constants.**
+
+- Context: el color accent per defecte vivia dins `clientPortalUtils` i encara hi havia un default directe al formulari de qüestionari.
+- Fix: `CLIENT_PORTAL_DEFAULT_ACCENT_COLOR` passa a `lib/constants/clientPortalPersonalization.ts`; `clientPortalUtils` el consumeix i el reexporta per compatibilitat.
+- Test: constants, utilitats, qüestionari i panell admin continuen verds.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\constants\clientPortalPersonalization.test.ts __tests__\lib\clientPortalUtils.test.ts __tests__\app\portal\QuestionnaireForm.test.tsx __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx` (11/11); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvia el color per defecte ni cap payload; només canvia la font de veritat.
+- Validació humana/UX: el portal i l'admin comparteixen el mateix accent de fallback sense literals dispersos.
+- `ADMIN_CHANGE_COUNTER` puja a `1512`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1511 — 2026-07-06 — codex (FET)
+
+**Portal: hex accent estricte.**
+
+- Context: `resolvePortalAccentHex()` acceptava hex de 4 o 5 dígits, però `toRgba()` només suportava 3 o 6.
+- Fix: el color accent fa `trim()` i només accepta hex de 3 o 6 dígits; la resta cau al color canònic.
+- Test: `clientPortalUtils.test.ts` cobreix hex curt, llarg, trim i fallback; el panell admin continua verd.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\clientPortalUtils.test.ts __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx` (6/6); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien schema, API, emails, pricing ni PDFs; només es fa fallback al color canònic quan el valor accent és invàlid.
+- Validació humana/UX: el portal no perd color per un accent CSS invàlid o mig escrit.
+- `ADMIN_CHANGE_COUNTER` puja a `1511`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1510 — 2026-07-06 — codex (FET)
+
+**Portal: límits de personalització a constants.**
+
+- Context: els límits `120/1200/20` i `1/365/30` vivien repetits entre route, servei i panell admin.
+- Fix: nova font única `lib/constants/clientPortalPersonalization.ts` amb `CLIENT_PORTAL_PERSONALIZATION_LIMITS` i `CLIENT_PORTAL_ACCESS_EXPIRY_LIMITS`.
+- Test: constants, servei, route i panell consumeixen el mateix contracte.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\constants\clientPortalPersonalization.test.ts __tests__\lib\services\clientPortalAccess.test.ts __tests__\app\api\admin\bookings-portal-access-route.test.ts __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx` (39/39); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien valors ni payloads; només es mouen límits a una font compartida.
+- Validació humana/UX: el que l'admin pot escriure coincideix amb el que el backend conservarà, sense divergències silencioses.
+- `ADMIN_CHANGE_COUNTER` puja a `1510`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1509 — 2026-07-06 — codex (FET)
+
+**Portal: visibilitat del qüestionari cablejada.**
+
+- Context: `clientPortalVisibility` suportava `showQuestionnaire`, però el tipus canònic, la route d'emissió i el panell admin no el cablejaven.
+- Fix: `PortalPersonalization` incorpora `showQuestionnaire`, la route el saneja, i el panell admin afegeix estat, payload i checkbox `Qüestionari`.
+- Test: route POST preserva `showQuestionnaire: false`; el panell i el motor de visibilitat queden coberts.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\bookings-portal-access-route.test.ts __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx __tests__\lib\clientPortalVisibility.test.ts` (19/19); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien schema, API de resposta del qüestionari, emails, pricing ni PDFs; ara el flag ja existent arriba fins a la personalització guardada.
+- Validació humana/UX: l'admin pot ocultar també el qüestionari pre-event quan no toca mostrar-lo al client.
+- `ADMIN_CHANGE_COUNTER` puja a `1509`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1508 — 2026-07-06 — codex (FET)
+
+**Portal: signatura respecta visibilitat de documents.**
+
+- Context: `/contract` i `/invoice` respectaven `showDocuments`, però `/sign` podia obrir-se per URL directa sense comprovar aquest flag.
+- Fix: `sign/page.tsx` calcula `getClientPortalVisibility(access.personalization)` i fa `notFound()` si `documents` està desactivat.
+- Test: `portalSignVisibility.test.ts` comprova que el guard passa abans del tracking; `portalSignAccessHit` i `portalSubpageExternalLinks` continuen verds.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\portalSignVisibility.test.ts __tests__\app\portal\portalSignAccessHit.test.ts __tests__\app\portal\portalSubpageExternalLinks.test.ts` (3/3); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien API de signatura, schema, contracte PDF, emails ni pricing; només es tanca l'accés directe quan documents està ocult.
+- Validació humana/UX: la configuració de visibilitat del portal és coherent també en el pas crític de signatura.
+- `ADMIN_CHANGE_COUNTER` puja a `1508`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1507 — 2026-07-06 — codex (FET)
+
+**Portal: fletxa de retorn de signatura decorativa.**
+
+- Context: el link de retorn de `sign/page.tsx` mostrava `← {t.backHome}` i la fletxa entrava al nom accessible.
+- Fix: la fletxa queda dins `span aria-hidden="true"`.
+- Test: `portalDecorativeArrows.test.ts` cobreix també `sign/page.tsx`; `portalSignAccessHit.test.ts` continua verd.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\portalDecorativeArrows.test.ts __tests__\app\portal\portalSignAccessHit.test.ts` (2/2); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien rutes, API de signatura, contracte PDF, emails ni pricing; només el nom accessible del link.
+- Validació humana/UX: el lector de pantalla escolta el text de retorn sense soroll de fletxa.
+- `ADMIN_CHANGE_COUNTER` puja a `1507`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1506 — 2026-07-06 — codex (FET)
+
+**Portal: signatura directa marca accés.**
+
+- Context: les subpàgines del portal marcaven `lastAccessedAt`, però la pàgina de signatura inline no ho feia.
+- Fix: `sign/page.tsx` crida `markPortalAccessHit()` amb IP i user-agent després de validar el token.
+- Test: `portalSignAccessHit.test.ts` cobreix el tracking i `portalSubpageExternalLinks.test.ts` confirma que el CTA extern continua etiquetat.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\portalSignAccessHit.test.ts __tests__\app\portal\portalSubpageExternalLinks.test.ts` (2/2); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien API de signatura, schema, contracte PDF, emails ni pricing; només es registra la visita com la resta de subpàgines del portal.
+- Validació humana/UX: l'admin veu activitat real del client encara que entri directament a la pantalla de signatura.
+- `ADMIN_CHANGE_COUNTER` puja a `1506`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1505 — 2026-07-06 — codex (FET)
+
+**Portal: tipus de personalització canònic.**
+
+- Context: el hub del portal i el panell admin repetien localment la forma de `personalization`, tot i que el servei ja exportava `PortalPersonalization`.
+- Fix: les dues superfícies importen `PortalPersonalization` com a tipus i deixen d'enumerar els camps a mà.
+- Test: `rg` confirma que les definicions locals han desaparegut.
+- Validació tècnica: `rg -n "headline\?: string|introMessage\?: string|accentColor\?: string|PortalPersonalization" ...`; `npx tsc --noEmit --pretty false`.
+- Validació funcional: canvi només de tipus; no canvien runtime, payload, API, schema, emails, pricing ni PDFs.
+- Validació humana/UX: els camps visibles del portal i l'admin hereten la mateixa definició, reduint divergències futures.
+- `ADMIN_CHANGE_COUNTER` puja a `1505`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1504 — 2026-07-06 — codex (FET)
+
+**Admin portal: límits visibles de personalització.**
+
+- Context: la route retalla `headline` a 120 caràcters, `introMessage` a 1200 i `accentColor` a 20, però el panell admin no exposava aquests límits.
+- Fix: `ClientPortalAccessPanel` afegeix `maxLength` als tres camps de personalització segons el sanejament backend.
+- Test: `ClientPortalAccessPanel.test.tsx` cobreix els límits visibles.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx` (3/3); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien payload, API, schema, emails, pricing ni PDFs; només s'evita escriure més del que el backend conservaria.
+- Validació humana/UX: l'admin veu límits coherents i no perd copy comercial per truncament silenciós.
+- `ADMIN_CHANGE_COUNTER` puja a `1504`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1503 — 2026-07-06 — codex (FET)
+
+**Admin portal: caducitat clampada a la UI.**
+
+- Context: el servei clampa `expiresInDays` a `1..365`, però el camp admin feia `Number(...) || 30`; escriure `0` saltava visualment a 30.
+- Fix: `ClientPortalAccessPanel` afegeix `clampPortalExpiryDays()` i el camp usa el mateix rang `1..365`.
+- Test: `ClientPortalAccessPanel.test.tsx` cobreix el clamp i evita tornar al `|| 30`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx` (2/2); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien API, schema, emails, pricing ni PDFs; la UI envia el mateix camp però ja no transforma 0 en 30.
+- Validació humana/UX: l'admin veu una caducitat coherent amb la regla real del sistema, sense salts silenciosos.
+- `ADMIN_CHANGE_COUNTER` puja a `1503`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1502 — 2026-07-06 — codex (FET)
+
+**Admin portal: introMessage en textarea.**
+
+- Context: el `introMessage` del portal client admet fins a 1200 caràcters però s'editava en un input d'una sola línia.
+- Fix: `ClientPortalAccessPanel` usa `textarea` de 3 files amb resize vertical per al missatge personalitzat.
+- Test: `ClientPortalAccessPanel.test.tsx` comprova que el camp llarg es manté com a textarea.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\ClientPortalAccessPanel.test.tsx` (1/1); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien payload, API, schema, emails, pricing ni PDFs; el mateix `introMessage` s'envia sanejat com abans.
+- Validació humana/UX: l'admin pot escriure i revisar una frase comercial de portal sense fer-ho dins una caixa d'una sola línia.
+- `ADMIN_CHANGE_COUNTER` puja a `1502`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1501 — 2026-07-06 — codex (FET)
+
+**Portal: caducitat zero clampada a 1 dia.**
+
+- Context: `issueClientPortalAccess()` feia `input.expiresInDays || DEFAULT_EXPIRY_DAYS`; un `0` saltava el clamp i es convertia en 30 dies.
+- Fix: la caducitat usa `input.expiresInDays ?? DEFAULT_EXPIRY_DAYS`, de manera que `0` entra al clamp `1..365`.
+- Test: `clientPortalAccess.test.ts` fixa el rellotge i comprova que `expiresInDays: 0` caduca en 1 dia.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\clientPortalAccess.test.ts` (22/22); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien schema, UI admin, emails, pricing ni PDFs; només es fa coherent la regla de caducitat mínima ja declarada.
+- Validació humana/UX: un accés amb valor límit no queda obert 30 dies per accident.
+- `ADMIN_CHANGE_COUNTER` puja a `1501`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1500 — 2026-07-06 — codex (FET)
+
+**Portal: locale amb espais normalitzat.**
+
+- Context: `normalizePortalLocale()` feia lowercase però no `trim`; un valor com ` es ` podia caure al fallback català.
+- Fix: el locale es saneja amb `trim().toLowerCase()` abans de comprovar-lo contra `SUPPORTED_LOCALES`.
+- Test: `clientPortalAccess.test.ts` cobreix ` es ` i ` EN `.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\clientPortalAccess.test.ts` (21/21); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien schema, UI admin, emails, pricing ni PDFs; només s'accepten millor valors de locale amb espais accidentals.
+- Validació humana/UX: el client rep el portal en l'idioma esperat encara que el valor d'origen arribi amb espais.
+- `ADMIN_CHANGE_COUNTER` puja a `1500`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1499 — 2026-07-06 — codex (FET)
+
+**Portal: select mínim post-event.**
+
+- Context: el hub només necessita saber si existeixen `postEventReport` i `clientFeedback`, però la query carregava la fila sencera de cada relació.
+- Fix: `findPortalAccessByRawToken()` selecciona només `id` per a les dues relacions post-event.
+- Test: `clientPortalAccess.test.ts` exigeix `select: { id: true }` i evita tornar al `true` complet.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\clientPortalAccess.test.ts` (20/20); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien estats visibles, API, schema, escriptures, admin, emails, pricing ni PDFs; el hub manté la mateixa decisió booleana.
+- Validació humana/UX: mateixa resposta per al client, però amb menys exposició de dades internes del post-event.
+- `ADMIN_CHANGE_COUNTER` puja a `1499`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1498 — 2026-07-06 — codex (FET)
+
+**Portal: post-event llegeix feedback real.**
+
+- Context: el hub mirava `clientFeedback` amb un cast, però `findPortalAccessByRawToken()` no incloïa la relació i podia mostrar `Pendent de tancament` encara que el feedback existís.
+- Fix: la query del portal inclou `clientFeedback` i el JSX consumeix `booking.clientFeedback` tipat.
+- Test: `clientPortalAccess.test.ts` comprova la relació carregada; `portalPostEventFeedbackSource.test.ts` impedeix tornar al cast cru.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\clientPortalAccess.test.ts __tests__\app\portal\portalPostEventFeedbackSource.test.ts` (21/21); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien schema, escriptures, admin, emails, pricing ni PDFs; només es carrega una relació de lectura que el hub ja intentava mostrar.
+- Validació humana/UX: el client no rep un estat de tancament falsament pendent quan ja hi ha feedback registrat.
+- `ADMIN_CHANGE_COUNTER` puja a `1498`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1497 — 2026-07-06 — codex (FET)
+
+**Portal: introMessage visible al hub.**
+
+- Context: l'admin permetia escriure `introMessage` i la route el desava, però el hub del client no el mostrava.
+- Fix: el hub calcula `introText` amb `getClientPortalPersonalizedText(personalization.introMessage, t.defaultIntro)` i el pinta sota la referència de reserva.
+- Test: `portalIntroMessageRendering.test.ts` comprova la connexió del camp i el fallback localitzat; `clientPortalEventDisplay.test.ts` manté el sanejament del helper.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\portalIntroMessageRendering.test.ts __tests__\lib\clientPortalEventDisplay.test.ts` (5/5); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien API, schema, admin, booking, contracte PDF, emails ni pricing; només es fa visible un camp de personalització ja existent.
+- Validació humana/UX: el portal pot obrir amb una frase humana i contextual, no només amb pack i referència freda.
+- `ADMIN_CHANGE_COUNTER` puja a `1497`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1496 — 2026-07-06 — codex (FET)
+
+**Portal: headline personalitzat amb fallback sanejat.**
+
+- Context: el greeting feia `personalization.headline || defaultHeadline`; una cadena amb espais bloquejava el fallback i podia deixar el text buit.
+- Fix: `getClientPortalPersonalizedText(value, fallback)` saneja el text personalitzat i el hub el fa servir abans d'afegir el nom del client.
+- Test: `clientPortalEventDisplay.test.ts` cobreix text personalitzat net, espais i `null`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\clientPortalEventDisplay.test.ts` (4/4); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien dades, personalització, API, schema, booking admin, contracte PDF, emails ni pricing; només el fallback visible del headline.
+- Validació humana/UX: el portal no queda amb un greeting buit si la personalització arriba només amb espais.
+- `ADMIN_CHANGE_COUNTER` puja a `1496`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1495 — 2026-07-06 — codex (FET)
+
+**Portal: primer nom del client sanejat.**
+
+- Context: el greeting del hub extreia el primer nom amb `.split(' ')[0]` directe; amb espais inicials o múltiples espais podia perdre el nom del client.
+- Fix: `getClientPortalFirstName()` fa `trim()` i separació per espais múltiples; el hub el consumeix per Customer o Booking.
+- Test: `clientPortalEventDisplay.test.ts` cobreix nom amb espais, nom simple, buit i `null`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\clientPortalEventDisplay.test.ts` (3/3); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien dades, personalització, API, schema, booking admin, contracte PDF, emails ni pricing; només la composició del nom curt al greeting.
+- Validació humana/UX: el portal no perd el nom del client per espais bruts a la dada d'origen.
+- `ADMIN_CHANGE_COUNTER` puja a `1495`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1494 — 2026-07-06 — codex (FET)
+
+**Portal: pax del hero amb singular/plural localitzat.**
+
+- Context: el hero mostrava pax com `{guestCount} {eventGuests.toLowerCase()}`, depenent del títol plural i amb risc de singular incorrecte.
+- Fix: `CLIENT_PORTAL_MESSAGES` incorpora `eventGuestSingular/eventGuestPlural` per `ca/es/en`, `formatClientPortalGuestCount()` els aplica i el hub deixa de fer `toLowerCase()`.
+- Test: `clientPortalEventDisplay.test.ts` cobreix singular/plural en català, castellà i anglès.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\clientPortalEventDisplay.test.ts` (2/2); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien dades, pax, API, schema, booking admin, contracte PDF, emails ni pricing; només el text visible del recompte de convidats.
+- Validació humana/UX: el portal diu `1 convidat` i `2 convidats` amb formes pròpies per idioma, sense manipular el títol plural.
+- `ADMIN_CHANGE_COUNTER` puja a `1494`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1493 — 2026-07-06 — codex (FET)
+
+**Portal: ubicació d'esdeveniment sense separadors penjats.**
+
+- Context: el hero del hub concatenava espai i localitat com `venue · location` directament al JSX; si una part arribava buida, podia quedar un separador visual penjat.
+- Fix: nou helper `formatClientPortalEventPlace()` que saneja, filtra parts buides i uneix només les parts reals; el hub només renderitza ubicació si hi ha alguna part real.
+- Test: `clientPortalEventDisplay.test.ts` cobreix dues parts, només venue, només location i buit total.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\clientPortalEventDisplay.test.ts` (1/1); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien dades, data, pax, API, schema, booking admin, contracte PDF, emails ni pricing; només la composició visible del lloc de l'esdeveniment.
+- Validació humana/UX: el client veu una ubicació neta encara que falti espai o localitat.
+- `ADMIN_CHANGE_COUNTER` puja a `1493`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1492 — 2026-07-06 — codex (FET)
+
+**Portal: progrés del hub amb estat accessible.**
+
+- Context: la barra de progrés amagava labels en mòbil i marcava passos completats amb una icona; el procés era clar visualment però incomplet per tecnologia assistiva.
+- Fix: `page.tsx` converteix el progrés en `role="list"`, cada pas en `role="listitem"` amb `aria-label` `label: estat`, i deixa connectors/cercle com a visuals.
+- Test: `portalProgressAccessibility.test.ts` blinda que el patró accessible del progrés es mantingui.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\portalProgressAccessibility.test.ts` (1/1); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien fites, ordre, estat, CTAs, API, schema, booking admin, contracte PDF, emails ni pricing; només la semàntica accessible del progrés.
+- Validació humana/UX: el client assistiu entén cada pas i si està fet, pendent o és el proper pas, també en mòbil.
+- `ADMIN_CHANGE_COUNTER` puja a `1492`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1491 — 2026-07-06 — codex (FET)
+
+**Portal: checklist de contracte amb estat accessible.**
+
+- Context: el checklist de signatura marcava requisits complets o pendents amb color i símbols `✓/○`, però el text accessible només deia el requisit.
+- Fix: `contract/page.tsx` afegeix `sr-only` amb `Fet` o `Pendent` segons `item.complete`.
+- Test: `portalContractChecklistAccessibility.test.ts` blinda que el checklist exposi l'estat en text i mantingui el símbol com a decoratiu.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\portalContractChecklistAccessibility.test.ts` (1/1); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien contracte, signatura, checklist de dades, API, schema, booking admin, contracte PDF, emails ni pricing; només la lectura assistiva dels requisits.
+- Validació humana/UX: el client assistiu sap si cada requisit està fet o pendent, no només quin requisit és.
+- `ADMIN_CHANGE_COUNTER` puja a `1491`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1490 — 2026-07-06 — codex (FET)
+
+**Portal: errors Bizum normalitzats.**
+
+- Context: el botó Bizum ja mostrava copy genèric per errors desconeguts, però comparava directament `data.error` del backend com a string lliure.
+- Fix: `BizumPayButton` introdueix `BizumNotifyErrorKey` i normalitza qualsevol error a `ALREADY_DECLARED`, `ALREADY_PAID` o `GENERIC`.
+- Test: `BizumPayButton.test.tsx` cobreix que un error desconegut del backend no es mostri cru i caigui a l'alerta localitzada genèrica.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\BizumPayButton.test.tsx` (4/4); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien notificació Bizum, endpoint, payload, API, schema, booking admin, contracte PDF, emails ni pricing; només es tanca el domini d'errors visibles del botó.
+- Validació humana/UX: si Bizum retorna un codi inesperat, el client rep un missatge humà i accionable.
+- `ADMIN_CHANGE_COUNTER` puja a `1490`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1489 — 2026-07-06 — codex (FET)
+
+**Portal: descàrrega de galeria anuncia pestanya nova.**
+
+- Context: el visor de galeria tenia un enllaç d'icona amb `target="_blank"` i `aria-label`; per tant la nota de pestanya nova havia d'entrar al label.
+- Fix: `GalleryClient` rep `opensInNewTab` i construeix el label de descàrrega com `Descarregar foto (s'obre en una pestanya nova)` segons locale.
+- Test: `GalleryClient.test.tsx` comprova que el link de descàrrega s'anunciï amb la nota de pestanya nova.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\GalleryClient.test.tsx` (1/1); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien fotos, descàrrega, modal, API, schema, booking admin, contracte PDF, emails ni pricing; només el nom accessible del link d'icona.
+- Validació humana/UX: el client assistiu sap que la descàrrega de foto sortirà del visor cap a una pestanya nova.
+- `ADMIN_CHANGE_COUNTER` puja a `1489`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1488 — 2026-07-06 — codex (FET)
+
+**Portal: subpàgines externes anuncien pestanya nova.**
+
+- Context: pagaments, factura, contracte i signatura tenien enllaços `target="_blank"` cap a passarel·les o PDFs sense avisar assistivament que obrien una pestanya nova.
+- Fix: aquestes subpàgines afegeixen la nota `sr-only` `opensInNewTab` als seus enllaços externs.
+- Test: `portalSubpageExternalLinks.test.ts` blinda que cada `target="_blank"` d'aquestes subpàgines tingui la nota localitzada.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\portalSubpageExternalLinks.test.ts __tests__\lib\clientPortalMessages.test.ts` (11/11); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien URLs, pagaments, PDFs, API, schema, booking admin, contracte PDF, emails ni pricing; només el nom accessible dels enllaços externs de subpàgina.
+- Validació humana/UX: el client assistiu rep el mateix avís de pestanya nova fora del hub.
+- `ADMIN_CHANGE_COUNTER` puja a `1488`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1487 — 2026-07-06 — codex (FET)
+
+**Portal: CTAs externs del hub anuncien pestanya nova.**
+
+- Context: el hub del portal client tenia quatre CTAs amb `target="_blank"` que obrien una pestanya nova sense avisar en el nom accessible.
+- Fix: `CLIENT_PORTAL_MESSAGES` incorpora `opensInNewTab` en `ca/es/en` i el hub afegeix una nota `sr-only` localitzada als CTAs externs.
+- Test: `portalHubExternalLinks.test.ts` blinda que cada `target="_blank"` del hub tingui `t.opensInNewTab`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\portalHubExternalLinks.test.ts __tests__\lib\clientPortalMessages.test.ts` (11/11); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien URLs, pagaments, PDFs, proposta, API, schema, booking admin, contracte PDF, emails ni pricing; només el nom accessible dels CTAs externs del hub.
+- Validació humana/UX: el client assistiu sap abans d'activar el CTA que sortirà a una pestanya nova.
+- `ADMIN_CHANGE_COUNTER` puja a `1487`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1486 — 2026-07-06 — codex (FET)
+
+**Portal: errors de signatura normalitzats.**
+
+- Context: el formulari de signatura ja mostrava copy genèric per errors desconeguts, però internament guardava strings lliures (`UNKNOWN`, errors del backend) com a estat d'error.
+- Fix: `SignContractForm` introdueix `SignContractErrorKey` i normalitza qualsevol error a `ALREADY_SIGNED`, `NOT_SIGNABLE` o `GENERIC`.
+- Test: `SignContractForm.test.tsx` cobreix que un error desconegut del backend no es mostri com a text cru i caigui al missatge localitzat genèric.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\SignContractForm.test.tsx` (6/6); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien signatura, ruta, payload, API, schema, booking admin, contracte PDF, emails ni pricing; només es tanca el domini d'errors visibles del formulari.
+- Validació humana/UX: si el backend retorna un codi estrany, el client veu un missatge humà i no un literal tècnic.
+- `ADMIN_CHANGE_COUNTER` puja a `1486`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1485 — 2026-07-06 — codex (FET)
+
+**Portal: timeline sense fallback de clau interna.**
+
+- Context: la pàgina de timeline podia renderitzar `milestone.key` com a fallback si una clau de missatge faltava, exposant literals interns com `proposal_sent`.
+- Fix: `ClientPortalTimelineMilestone.key` passa a ser `ClientPortalTimelineMilestoneKey`, derivat del mapa canònic, i `timeline/page.tsx` renderitza només `t[msgKey]`.
+- Test: `clientPortalTimeline.test.ts` comprova que totes les claus produïdes estan mapades i que `ca/es/en` tenen text per cada milestone.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\clientPortalTimeline.test.ts` (8/8); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien ordre, estat ni data dels milestones, API, schema, booking admin, contracte PDF, emails ni pricing; només es tanca el fallback tècnic visible.
+- Validació humana/UX: el client mai hauria de veure claus internes si una traducció del procés queda desalineada.
+- `ADMIN_CHANGE_COUNTER` puja a `1485`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1484 — 2026-07-06 — codex (FET)
+
+**Portal: recompte de galeria accessible al hub.**
+
+- Context: el CTA `Veure totes les fotos (N)` del hub mantenia un número nu dins el nom accessible quan hi havia més de sis fotos.
+- Fix: el `(N)` visible queda `aria-hidden` i `page.tsx` afegeix un `sr-only` amb `getClientPortalGalleryPhotoCountLabel(locale, portalPhotos.length)`.
+- Test: `portalGalleryCountAccessibility.test.ts` blinda que el recompte visual i el recompte accessible localitzat continuïn separats.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\portalGalleryCountAccessibility.test.ts __tests__\lib\clientPortalMessages.test.ts` (11/11); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien fotos, enllaç de galeria, API, schema, booking admin, contracte PDF, emails ni pricing; només la lectura assistiva del recompte del CTA.
+- Validació humana/UX: visualment el CTA manté el número compacte, però el client assistiu escolta un recompte humà i localitzat.
+- `ADMIN_CHANGE_COUNTER` puja a `1484`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1483 — 2026-07-06 — codex (FET)
+
+**Portal: modal de galeria amb label concret.**
+
+- Context: el visor modal de la galeria encara anunciava `Galeria de fotos` com a nom del `dialog`, encara que la imatge oberta ja tenia label concret.
+- Fix: `GalleryClient` usa `selectedPhotoLabel` com a `aria-label` del `dialog` i associa el comptador `1 de N` com a descripció.
+- Test: `GalleryClient.test.tsx` cobreix que el diàleg obert s'anunciï com `Foto 1`, amb descripció `1 de 2`, i no com a galeria genèrica.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\GalleryClient.test.tsx` (1/1); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien fotos, navegació, descàrrega, API, schema, booking admin, contracte PDF, emails ni pricing; només el nom accessible del visor.
+- Validació humana/UX: el client assistiu sap quina foto concreta ha obert i en quina posició està dins la galeria.
+- `ADMIN_CHANGE_COUNTER` puja a `1483`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1482 — 2026-07-06 — codex (FET)
+
+**Portal: feedback Bizum amb rols accessibles.**
+
+- Context: el botó de Bizum mostrava confirmació i error sense rols semàntics.
+- Fix: l'avís enviat passa a `role="status"` i l'error a `role="alert"`.
+- Test: `BizumPayButton.test.tsx` cobreix estat ja notificat i error de xarxa anunciat com alerta.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\BizumPayButton.test.tsx` (3/3); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien notificació Bizum, API, schema, imports, booking admin, contracte PDF, emails ni pricing; només es millora l'anunci assistiu de feedback.
+- Validació humana/UX: el client rep confirmació o error de Bizum quan passa.
+- `ADMIN_CHANGE_COUNTER` puja a `1482`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1481 — 2026-07-06 — codex (FET)
+
+**Portal: feedback de signatura amb rols accessibles.**
+
+- Context: el formulari de signatura mostrava èxit i errors sense rols semàntics després d'una acció del client.
+- Fix: el bloc d'èxit passa a `role="status"` i els errors passen a `role="alert"`.
+- Test: `SignContractForm.test.tsx` comprova èxit i errors mitjançant rols accessibles.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\SignContractForm.test.tsx` (5/5); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien signatura, API, schema, contracte PDF, booking admin, emails ni pricing; només es millora l'anunci assistiu de feedback.
+- Validació humana/UX: la confirmació o l'error de signatura s'anuncia quan passa.
+- `ADMIN_CHANGE_COUNTER` puja a `1481`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1480 — 2026-07-06 — codex (FET)
+
+**Portal: feedback del qüestionari amb rols accessibles.**
+
+- Context: el formulari de qüestionari mostrava errors i èxit sense rols semàntics. El feedback apareix després d'una acció del client i s'ha d'anunciar.
+- Fix: errors visibles amb `role="alert"` i missatge d'èxit amb `role="status"`.
+- Test: `QuestionnaireForm.test.tsx` comprova que l'error required sigui accessible com a alerta.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\QuestionnaireForm.test.tsx` (4/4); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien preguntes, respostes, API, schema, booking admin, contracte PDF, emails ni pricing; només es millora l'anunci assistiu del feedback.
+- Validació humana/UX: el client que no mira la pantalla rep els errors i l'èxit quan passen.
+- `ADMIN_CHANGE_COUNTER` puja a `1480`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1479 — 2026-07-06 — codex (FET)
+
+**Portal: select del qüestionari hereta el label.**
+
+- Context: el select del qüestionari tenia `aria-label={question.label}` i això substituïa el `<label>` real, impedint que el text assistiu d'obligatorietat formés part del nom accessible.
+- Fix: s'elimina l'`aria-label` redundant i el control passa a heretar el label HTML complet.
+- Test: `QuestionnaireForm.test.tsx` comprova que un select obligatori tingui nom accessible amb `required field`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\QuestionnaireForm.test.tsx` (4/4); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien preguntes, respostes, placeholder, validació, API, schema, booking admin, contracte PDF, emails ni pricing; només s'elimina un atribut redundant.
+- Validació humana/UX: tots els tipus de camp anuncien obligatorietat de manera coherent.
+- `ADMIN_CHANGE_COUNTER` puja a `1479`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1478 — 2026-07-06 — codex (FET)
+
+**Portal: camps obligatoris del qüestionari accessibles.**
+
+- Context: el formulari de qüestionari marcava obligatorietat només amb `*` visual decoratiu. `questionnaireRequired` existia al diccionari però no arribava al nom accessible del camp.
+- Fix: el `*` es manté `aria-hidden` i s'afegeix `({m.required})` com a `sr-only` dins el label.
+- Test: `QuestionnaireForm.test.tsx` comprova que el textbox obligatori tingui nom accessible amb `required field`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\QuestionnaireForm.test.tsx __tests__\lib\clientPortalMessages.test.ts` (14/14); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien preguntes, respostes, validació, API, schema, booking admin, contracte PDF, emails ni pricing; només s'exposa una etiqueta assistiva.
+- Validació humana/UX: el client que navega amb lector de pantalla sap que el camp és obligatori abans de fallar l'enviament.
+- `ADMIN_CHANGE_COUNTER` puja a `1478`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1477 — 2026-07-06 — codex (FET)
+
+**Portal: placeholder del select de qüestionari localitzat.**
+
+- Context: els selects del qüestionari mostraven `—` com a opció buida. Això no diu cap acció i no és copy localitzat.
+- Fix: `questionnaireSelectPlaceholder` entra al diccionari del portal; `QuestionnaireForm` el rep i el mostra mantenint `value=""`.
+- Test: `QuestionnaireForm.test.tsx` cobreix `Choose an option` i blinda que l'opció `—` no aparegui.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\QuestionnaireForm.test.tsx __tests__\lib\clientPortalMessages.test.ts` (14/14); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien preguntes, respostes, validació, API, schema, booking admin, contracte PDF, emails ni pricing; només es localitza el placeholder del select.
+- Validació humana/UX: el client rep una instrucció clara abans de triar.
+- `ADMIN_CHANGE_COUNTER` puja a `1477`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1476 — 2026-07-06 — codex (FET)
+
+**Portal: resposta buida del qüestionari localitzada.**
+
+- Context: el resum d'un qüestionari ja enviat mostrava `—` quan una resposta estava buida. Era un fallback mut i no localitzat.
+- Fix: `questionnaireNoAnswer` entra al diccionari del portal; `QuestionnaireForm` el rep i el fa servir per strings buits i arrays buits.
+- Test: `QuestionnaireForm.test.tsx` cobreix text buit i multiselect buit sense mostrar `—`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\QuestionnaireForm.test.tsx __tests__\lib\clientPortalMessages.test.ts` (13/13); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien preguntes, respostes, API, schema, booking admin, contracte PDF, emails ni pricing; només es neteja el resum ja enviat.
+- Validació humana/UX: l'absència de resposta queda dita en l'idioma del portal, no amagada en un signe.
+- `ADMIN_CHANGE_COUNTER` puja a `1476`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1475 — 2026-07-06 — codex (FET)
+
+**Portal: quantitat d'extres accessible.**
+
+- Context: els extres contractats al hub mostraven quantitat amb `×2` dins el text accessible. Visualment és correcte, però no és una frase humana per lector de pantalla.
+- Fix: `serviceQuantityLabel` entra al diccionari del portal, `getClientPortalServiceQuantityLabel()` formata la quantitat i el signe `×` queda `aria-hidden` amb text `sr-only` localitzat.
+- Test: `portalDecorativeQuantity.test.ts` blinda que `×` no aparegui sense `aria-hidden`; `clientPortalMessages.test.ts` cobreix `ca/es/en`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\portalDecorativeQuantity.test.ts __tests__\lib\clientPortalMessages.test.ts` (11/11); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien imports, quantitats, preus, rutes, API, schema, booking admin, contracte PDF, emails ni pricing; només es neteja la semàntica accessible del multiplicador.
+- Validació humana/UX: la UI manté el format compacte i el lector de pantalla rep una quantitat localitzada.
+- `ADMIN_CHANGE_COUNTER` puja a `1475`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1474 — 2026-07-06 — codex (FET)
+
+**Portal: ciutat base del desplaçament des de SITE_CONFIG.**
+
+- Context: el hub del portal copiava `Granollers` directament al JSX dins el bloc de desplaçament, tot i que la ciutat base del negoci ja és dada central a `SITE_CONFIG`.
+- Fix: `page.tsx` consumeix `SITE_CONFIG.business.address.city` i elimina el literal de ciutat del portal.
+- Test: `__tests__/app/portal/portalBusinessSource.test.ts` recorre els `.tsx` del portal i falla si `Granollers` reapareix copiat.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\portalBusinessSource.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien càlculs de transport, imports, rutes, API, schema, booking admin, contracte PDF, emails ni pricing; només es canvia la font de la ciutat visible.
+- Validació humana/UX: el portal hereta la dada del negoci i deixa de dependre d'una còpia manual.
+- `ADMIN_CHANGE_COUNTER` puja a `1474`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1473 — 2026-07-06 — codex (FET)
+
+**Portal: detall de desplaçament localitzat.**
+
+- Context: el hub del portal mostrava `pers. · 1a h inclosa` dins el JSX del bloc de desplaçament. Era copy visible fixat en català i massa abreujat.
+- Fix: `CLIENT_PORTAL_MESSAGES` afegeix plantilles singular/plural per al detall de persones i `getClientPortalTravelHeadcountLabel(locale, count)` centralitza la frase.
+- Test: `clientPortalMessages.test.ts` comprova català, castellà i anglès amb singular/plural.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\clientPortalMessages.test.ts` (9/9); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien càlculs de transport, imports, rutes, API, schema, booking admin, contracte PDF, emails ni pricing; només es localitza la frase visible.
+- Validació humana/UX: el detall de transport deixa de barrejar idiomes i explica millor la primera hora inclosa.
+- `ADMIN_CHANGE_COUNTER` puja a `1473`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1472 — 2026-07-06 — codex (FET)
+
+**Portal: labels de foto compartits entre hub i galeria.**
+
+- Context: el hub mostrava un preview de fotos però feia fallback a `t.gallery` quan faltava caption. Això anunciava la secció, no la foto.
+- Fix: `getClientPortalGalleryPhotoLabel(template, caption, index)` centralitza el fallback de foto i el consumeixen tant `GalleryClient` com el preview del hub.
+- Test: `clientPortalMessages.test.ts` cobreix fallback concret (`Photo 1`) i que una caption real amb espais es conserva neta.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\clientPortalMessages.test.ts __tests__\app\portal\GalleryClient.test.tsx` (9/9); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien rutes, API, schema, pujada de fotos, booking admin, contracte PDF, emails ni pricing; només es neteja l'alt text del preview de galeria.
+- Validació humana/UX: hub i galeria completa parlen igual i cada imatge sense caption continua tenint identitat pròpia.
+- `ADMIN_CHANGE_COUNTER` puja a `1472`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1471 — 2026-07-06 — codex (FET)
+
+**Portal: comptador de fotos localitzat a la galeria.**
+
+- Context: la pàgina de galeria mostrava `{photos.length} fotos` directament al JSX. Era copy visible no localitzat i en anglès trencava la coherència lingüística del portal.
+- Fix: `CLIENT_PORTAL_MESSAGES` afegeix plantilles singular/plural per al comptador i `getClientPortalGalleryPhotoCountLabel(locale, count)` centralitza la decisió.
+- Test: `clientPortalMessages.test.ts` comprova `1 foto`, `2 fotos`, `1 photo` i `3 photos`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\clientPortalMessages.test.ts __tests__\app\portal\GalleryClient.test.tsx` (8/8); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien rutes, API, schema, pujada de fotos, booking admin, contracte PDF, emails ni pricing; només es localitza el comptador visible de la galeria.
+- Validació humana/UX: cada idioma manté el seu to i el singular deixa de sonar mecànic.
+- `ADMIN_CHANGE_COUNTER` puja a `1471`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1470 — 2026-07-06 — codex (FET)
+
+**Portal: labels de foto concrets a la galeria.**
+
+- Context: quan una foto del portal no tenia peu, la miniatura feia fallback a `Galeria de fotos 1` i el visor a `Galeria de fotos`. En una galeria privada de client, això és soroll genèric i pobre per accessibilitat.
+- Fix: `CLIENT_PORTAL_MESSAGES` afegeix `galleryPhotoLabel` per `ca/es/en`, `gallery/page.tsx` el passa a `GalleryClient`, i el component genera labels concrets amb l'índex de foto per miniatura i visor.
+- Test: `__tests__/app/portal/GalleryClient.test.tsx` renderitza la galeria i blinda que una foto sense peu s'anunciï com `Foto 1`, no com a títol genèric de galeria.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\GalleryClient.test.tsx __tests__\lib\clientPortalMessages.test.ts` (7/7); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien rutes, API, schema, pujada de fotos, booking admin, contracte PDF, emails ni pricing; només es neteja el fallback de nom de la galeria.
+- Validació humana/UX: cada foto queda identificada com una peça concreta, no com una repetició del nom de secció.
+- `ADMIN_CHANGE_COUNTER` puja a `1470`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1469 — 2026-07-06 — codex (FET)
+
+**Portal: símbols d'estat decoratius.**
+
+- Context: `✓` i `○` sortien com a text en estats de pagament, checklist de contracte, Bizum i signatura. Quan el label humà ja existeix, aquests símbols són ornament visual.
+- Fix: els símbols afectats passen a `<span aria-hidden="true">` o a nodes amb `aria-hidden="true"` mantenint intactes els labels `paid/pending/success`.
+- Test: `__tests__/app/portal/portalDecorativeStatusSymbols.test.ts` recorre els `.tsx` del portal i falla si `✓`/`○` apareixen sense `aria-hidden`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\portalDecorativeStatusSymbols.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien imports, estats, rutes, API, schema, contracte PDF, emails, booking admin ni pricing; només es neteja la capa accessible de símbols visuals.
+- Validació humana/UX: visualment el portal conserva semàfors i confirmacions, però el lector de pantalla rep labels humans.
+- `ADMIN_CHANGE_COUNTER` puja a `1469`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1468 — 2026-07-06 — codex (FET)
+
+**Portal: fletxes CTA decoratives al hub.**
+
+- Context: el hub del portal afegia `→` directament als links de pagaments, procés, galeria i qüestionari. Són senyals visuals, no part de l'acció.
+- Fix: les quatre fletxes passen a `<span aria-hidden="true">→</span>`.
+- Test: `__tests__/app/portal/portalDecorativeArrows.test.ts` escaneja el hub i `ClientPortalPageHeader` perquè les fletxes `→`/`←` revisades no quedin sense `aria-hidden`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\portalDecorativeArrows.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien rutes, API, schema, contracte PDF, emails, booking admin, pricing ni catàleg; només es netegen noms accessibles de CTAs del hub.
+- Validació humana/UX: es conserva la direcció visual del CTA, però l'acció llegida queda neta.
+- `ADMIN_CHANGE_COUNTER` puja a `1468`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1467 — 2026-07-06 — codex (FET)
+
+**Portal: fletxa de retorn decorativa al header.**
+
+- Context: `ClientPortalPageHeader` renderitzava `← {backLabel}` dins el link. Visualment és correcte, però el nom accessible podia incloure una fletxa inútil.
+- Fix: la fletxa passa a `<span aria-hidden="true">←</span>` i el text queda separat en un segon `span`.
+- Test: `__tests__/app/portal/ClientPortalPageHeader.test.tsx` comprova que el link sigui `Tornar al portal` i no `← Tornar al portal`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\ClientPortalPageHeader.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien rutes, API, schema, contracte PDF, emails, booking admin, pricing ni catàleg; només es neteja el nom accessible del link de retorn.
+- Validació humana/UX: la UI manté el senyal visual, però el lector de pantalla rep una acció neta.
+- `ADMIN_CHANGE_COUNTER` puja a `1467`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1466 — 2026-07-06 — codex (FET)
+
+**Portal: marca des de `SITE_CONFIG`.**
+
+- Context: el portal repetia `Òrbita Events` al pill de marca del hub i als footers de les subpàgines. El nom del negoci és dada estable i ja viu a `SITE_CONFIG.business.name`.
+- Fix: `page.tsx`, `contract/page.tsx`, `invoice/page.tsx`, `payments/page.tsx`, `timeline/page.tsx`, `gallery/page.tsx` i `questionnaire/page.tsx` importen `SITE_CONFIG` i renderitzen `SITE_CONFIG.business.name`.
+- Test: `__tests__/app/portal/portalBrandSource.test.ts` recorre els `.tsx` del portal i falla si reapareix el literal `Òrbita Events`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\portalBrandSource.test.ts` (1/1); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien API, schema, contracte PDF, emails, booking admin, pricing ni catàleg; només es canvia la font del nom de marca visible del portal.
+- Validació humana/UX: la marca queda governada per una única font i no per còpies locals repartides.
+- `ADMIN_CHANGE_COUNTER` puja a `1466`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1465 — 2026-07-06 — codex (FET)
+
+**Portal: label de pack localitzat.**
+
+- Context: després de sanejar els fallbacks de nom de pack, la targeta de serveis del hub encara portava el label curt `Pack` escrit al JSX. En anglès havia de ser `Package` i, en general, és copy visible de portal.
+- Fix: `CLIENT_PORTAL_MESSAGES` guanya `packLabel` per `ca/es/en`; el hub del portal renderitza `t.packLabel` en lloc del literal.
+- Test: `__tests__/lib/clientPortalMessages.test.ts` comprova que `CLIENT_PORTAL_MESSAGES.en.packLabel` sigui `Package` i no `Pack`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\clientPortalMessages.test.ts` (6/6); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien API, schema, contracte PDF, emails, booking admin, pricing ni catàleg; només es localitza un label visible del hub del portal.
+- Validació humana/UX: el portal anglès usa llenguatge natural de client, no una etiqueta heretada del català/castellà.
+- `ADMIN_CHANGE_COUNTER` puja a `1465`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1464 — 2026-07-06 — codex (FET)
+
+**Portal: fallback segur de pack i extres, no slugs interns.**
+
+- Context: el hub del portal usava `packTranslation?.name || booking.pack.slug` i `translation?.name || extra.extra.slug`. Si faltava una traducció, el client podia veure identificadors interns en una pantalla comercial.
+- Fix: `CLIENT_PORTAL_MESSAGES` guanya `packNameFallback` i `extraNameFallback` per `ca/es/en`; els helpers `getClientPortalPackDisplayName()` i `getClientPortalExtraDisplayName()` retornen traducció trimada o fallback segur; el hub consumeix aquests helpers.
+- Test: `__tests__/lib/clientPortalMessages.test.ts` comprova que noms buits o absents caiguin a `Pack contratado` / `Booked extra` i no a slugs com `disco-premium` o `confetti-xl`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\clientPortalMessages.test.ts` (5/5); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien API, schema, contracte PDF, emails, booking admin, pricing ni catàleg; només es saneja el fallback visible del hub del portal.
+- Validació humana/UX: el client veu una etiqueta de servei comprensible si falta traducció, no una peça interna del sistema.
+- `ADMIN_CHANGE_COUNTER` puja a `1464`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1463 — 2026-07-06 — codex (FET)
+
+**Portal: countdown amb labels del diccionari.**
+
+- Context: `CountdownTimer.tsx` tenia un `LABELS` local amb `dies/hores/minuts`, `días/horas/minutos` i `days/hours/minutes`. Era copy visible compartit fora de `CLIENT_PORTAL_MESSAGES` i un component UI decidint idioma.
+- Fix: `CLIENT_PORTAL_MESSAGES` guanya `countdownDays`, `countdownHours` i `countdownMinutes` per `ca/es/en`; el hub del portal passa aquestes labels; `CountdownTimer` elimina el diccionari local i només renderitza les props rebudes.
+- Test: `__tests__/app/portal/CountdownTimer.test.tsx` fixa `Date.now()`, renderitza el countdown amb labels castellanes i comprova que apareguin `días`, `horas`, `minutos` sense el literal català `dies`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\CountdownTimer.test.tsx __tests__\lib\clientPortalMessages.test.ts` (5/5); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien API, schema, contracte PDF, emails, booking admin ni pricing; només es mou copy visible del countdown al diccionari del portal.
+- Validació humana/UX: el compte enrere queda governat pel mateix locale que la resta del portal i no per un micro-diccionari dispers.
+- `ADMIN_CHANGE_COUNTER` puja a `1463`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1462 — 2026-07-06 — codex (FET)
+
+**Portal: bottom nav accessible localitzat.**
+
+- Context: `PortalBottomNav` tenia labels visibles localitzats però el contenidor `nav` anunciava sempre `Navegació del portal`. El castellà i l'anglès quedaven traduïts visualment però no per tecnologia assistiva.
+- Fix: `CLIENT_PORTAL_MESSAGES` guanya `portalNavigationLabel` per `ca/es/en`; `PortalBottomNav` rep `labels.ariaLabel`; les set pàgines del portal que renderitzen el bottom nav passen `t.portalNavigationLabel`.
+- Test: `__tests__/app/portal/PortalBottomNav.test.tsx` renderitza el portal castellà, comprova el role `navigation` amb `Navegación del portal`, blinda absència del literal català i valida l'`aria-current` de `Pagos`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\PortalBottomNav.test.tsx __tests__\lib\clientPortalMessages.test.ts` (5/5); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien API, contracte PDF, schema, emails, booking admin ni pricing; només es localitza el nom accessible del bottom nav del portal.
+- Validació humana/UX: l'usuari amb lector de pantalla rep la navegació inferior en el mateix idioma que la resta del portal.
+- `ADMIN_CHANGE_COUNTER` puja a `1462`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1461 — 2026-07-06 — codex (FET)
+
+**Portal: estats de reserva i contracte sense fallback a enum intern.**
+
+- Context: `contract/page.tsx` i el hub `portal/[token]/page.tsx` encara feien `label || status` per contracte o reserva. Un estat nou podia sortir al client com a codi tècnic.
+- Fix: `CLIENT_PORTAL_MESSAGES` guanya `bookingStatusUnknown` per `ca/es/en`; `getClientPortalBookingStatusLabel(locale, status)` centralitza el fallback de reserva; el contracte i el hub consumeixen helpers en lloc d'accedir a maps locals.
+- Test: `__tests__/lib/clientPortalMessages.test.ts` comprova que els estats coneguts continuen etiquetats i que `SYNC_PENDING_INTERNAL`/`ARCHIVED_INTERNAL` cauen a copy segur.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\clientPortalMessages.test.ts` (4/4); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien API, contracte PDF, schema, emails, booking admin ni pricing; només es saneja el fallback visible d'estat al portal.
+- Validació humana/UX: el client no veu enums interns si el sistema rep un estat no previst.
+- `ADMIN_CHANGE_COUNTER` puja a `1461`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1460 — 2026-07-06 — codex (FET)
+
+**Portal contracte: fallback d'estat segur, no enum intern.**
+
+- Context: quan la pàgina de signatura no era accionable, `sign/page.tsx` mostrava `contractLabels[contractSummary.status] || contractSummary.status`. Un estat futur o no etiquetat podia acabar visible com a codi intern.
+- Fix: `CLIENT_PORTAL_MESSAGES` guanya `contractStatusUnknown` per `ca/es/en`; `getClientPortalContractStatusLabel(locale, status)` centralitza el label o fallback segur; la pàgina consumeix el helper.
+- Test: `__tests__/lib/clientPortalMessages.test.ts` comprova que `SENT` continua etiquetat i que `ARCHIVED_INTERNAL` cau a `Estado pendiente de confirmar`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\clientPortalMessages.test.ts __tests__\app\portal\SignContractForm.test.tsx` (8/8); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien API de signatura, contracte PDF, schema, emails, booking, admin ni pricing; només es saneja el fallback visible d'estat.
+- Validació humana/UX: el client no veu enums interns en una pantalla legal/comercial si apareix un estat no previst.
+- `ADMIN_CHANGE_COUNTER` puja a `1460`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1459 — 2026-07-06 — codex (FET)
+
+**Portal contracte: el botó de signatura mostra càrrega localitzada.**
+
+- Context: `SignContractForm` deixava el botó en un `…` durant l'enviament. En una acció de signatura, això és massa mut i no hereta el locale.
+- Fix: `CLIENT_PORTAL_MESSAGES` guanya `signSubmitting` per `ca/es/en`, `sign/page.tsx` el passa al formulari i `SignContractForm` renderitza `m.signSubmitting` durant `loading`.
+- Test: `__tests__/app/portal/SignContractForm.test.tsx` manté el fetch pendent i comprova que aparegui `Signant contracte...` en lloc de `…`; `__tests__/lib/clientPortalMessages.test.ts` blinda claus iguals entre locales.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\SignContractForm.test.tsx __tests__\lib\clientPortalMessages.test.ts` (7/7); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien API de signatura, contracte PDF, schema, emails, booking, admin ni pricing; només es localitza l'estat visible del botó.
+- Validació humana/UX: el client no perd context mentre confirma una acció legal/comercial crítica.
+- `ADMIN_CHANGE_COUNTER` puja a `1459`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1458 — 2026-07-06 — codex (FET)
+
+**Portal pagaments: etiqueta d'import Bizum localitzada.**
+
+- Context: `BizumPayButton` ja rebia instrucció, concepte, CTA i errors des de `CLIENT_PORTAL_MESSAGES`, però la fila de l'import encara tenia `Import` escrit al component.
+- Fix: `CLIENT_PORTAL_MESSAGES` guanya `bizumAmount` per `ca/es/en`, `payments/page.tsx` el cableja a `bizumLabels` i el component renderitza `labels.amount`.
+- Test: `__tests__/app/portal/BizumPayButton.test.tsx` comprova que el component pot mostrar `Importe` i que no conserva el literal `Import`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\BizumPayButton.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien API, serveis, schema, emails, booking ni pricing; només es localitza una etiqueta visible del resum de pagament.
+- Validació humana/UX: el client castellà o anglès no veu català dins una peça de pagament.
+- `ADMIN_CHANGE_COUNTER` puja a `1458`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1457 — 2026-07-06 — codex (FET)
+
+**usePacks: fallback públic sense propagar `error.message`.**
+
+- Context: `usePacks()` ja tenia fallback localitzat dels packs, però si `fetchPublicPacks()` fallava guardava `error.message` dins l'estat. Avui els callers no el pinten, però el contracte públic quedava contaminat amb detall tècnic.
+- Fix: el catch manté `localizedFallback`, posa `loading: false` i deixa `error: null`.
+- Test: `__tests__/lib/hooks/usePacks.test.ts` comprova que una excepció conserva fallback i no propaga `api down`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\hooks\usePacks.test.ts` (4/4); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien UI, API, schema, emails, booking ni pricing; només es saneja l'estat públic d'error del hook.
+- Validació humana/UX: si demà un component decideix mostrar `error`, no heretarà una frase tècnica del fetch.
+- `ADMIN_CHANGE_COUNTER` puja a `1457`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1456 — 2026-07-06 — codex (FET)
+
+**Portal client: CTA de pressupost en castellà, no català.**
+
+- Context: `CLIENT_PORTAL_MESSAGES.es.openQuote` deia `Obrir pressupost`. Aquest text es mostra al portal privat quan hi ha una proposta vinculada, just en una acció comercial sensible.
+- Fix: el missatge castellà passa a `Abrir presupuesto`; el català conserva `Obrir pressupost` i l'anglès conserva `Open quote`.
+- Test: `__tests__/lib/clientPortalMessages.test.ts` blinda que els tres locales comparteixin claus i que el CTA castellà no contingui `Obrir` ni `pressupost`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\clientPortalMessages.test.ts` (2/2); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien rutes, components, serveis, schema, emails ni admin; només es corregeix el catàleg canònic del portal client.
+- Validació humana/UX: el client castellà no veu català en un CTA de proposta.
+- `ADMIN_CHANGE_COUNTER` puja a `1456`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1455 — 2026-07-06 — codex (FET)
+
+**Portal client: validació required del qüestionari hereta el locale.**
+
+- Context: `QuestionnaireForm` rebia copy del portal client, però l'error de camp obligatori feia `setError("\"...\" és un ...")`. En castellà o anglès, el portal podia respondre amb una frase catalana.
+- Catàleg: `lib/clientPortalMessages.ts` afegeix `questionnaireRequiredField` per `ca`, `es` i `en` amb placeholder `{field}`.
+- UI: `QuestionnaireForm` formata aquest missatge amb el label del camp i deixa d'inventar la frase dins el component.
+- Wiring: la pàgina del qüestionari passa `t.questionnaireRequiredField` dins `messages`.
+- Test: `__tests__/app/portal/QuestionnaireForm.test.tsx` comprova anglès i castellà i blinda que no torni el literal català.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\portal\QuestionnaireForm.test.tsx` (2/2); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien API, serveis de qüestionari, schema, emails, booking ni admin; només es localitza el missatge client-side de required.
+- Validació humana/UX: el portal client manté idioma coherent també quan el client s'equivoca.
+- `ADMIN_CHANGE_COUNTER` puja a `1455`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1454 — 2026-07-06 — codex (FET)
+
+**Error boundary públic: cap `error.message` visible al client.**
+
+- Context: `app/[locale]/error.tsx` pintava `error?.message || t('defaultMessage')`. Això pot filtrar literals interns en qualsevol caiguda global de la web pública.
+- Fix: la UI mostra sempre `errorPage.defaultMessage`; el detall tècnic queda a `Sentry.captureException(error)` i `log.error(...)`.
+- Referència segura: el digest continua visible perquè suport pugui identificar l'incident sense exposar el missatge intern.
+- Test: `__tests__/app/error-page.test.tsx` blinda que un missatge tipus `Database connection string leaked` no aparegui a pantalla i que el digest sí aparegui.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\error-page.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien rutes, APIs, serveis, schema, emails ni admin; només es saneja la superfície visible de fallada global.
+- Validació humana/UX: la pàgina d'error ja no sembla una pantalla de debug; dona calma, acció i referència.
+- `ADMIN_CHANGE_COUNTER` puja a `1454`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1453 — 2026-07-06 — codex (FET)
+
+**Portal públic de privacitat: errors de sol·licitud només localitzats.**
+
+- Context: `app/[locale]/privacitat/client.tsx` mostrava `data.error || t('form.errorDefault')` quan `/api/privacy/request` no retornava èxit. En una pàgina RGPD pública, un literal intern del backend o un error JSON no pot aparèixer com a resposta al client.
+- Fix: el submit parseja `res.json()` amb fallback segur, només tracta `success === true` com a èxit i ignora qualsevol `data.error` visible.
+- UI: respostes no exitoses o JSON malformat mostren `privacyPortal.form.errorDefault`; fallades reals de connexió mantenen `privacyPortal.form.errorConnection`.
+- Test: `__tests__/app/privacitat-client.test.tsx` cobreix backend cru, JSON malformat i connexió fallida sense exposar literals tècnics.
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\privacitat-client.test.tsx` (3/3); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien API, servei RGPD, schema, emails, admin ni processos legals; només es saneja la capa visible del formulari públic.
+- Validació humana/UX: la superfície legal respon amb copy controlat, no amb una avaria interna.
+- `ADMIN_CHANGE_COUNTER` puja a `1453`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1452 — 2026-07-06 — codex (FET)
+
+**Formulari públic de valoració: errors de submit només localitzats.**
+
+- Context: després de `BookingForm` i `AvailabilityCalendar`, quedava una altra porta pública amb el mateix patró brut: `TestimonialForm` llegia `data.error`, feia `throw new Error(...)` i mostrava `err.message`. Això podia posar davant del client errors interns com `Database connection failed`, `Failed to fetch` o `Unexpected end of JSON input`.
+- Fix: `TestimonialForm` parseja JSON amb fallback segur, valida que la resposta d'èxit porti `discountCode` i `discountPercent`, i qualsevol desviació cau al missatge genèric localitzat.
+- Copy: `testimonialForm.errors.submitError` queda refinat a `messages/ca.json`, `messages/es.json` i `messages/en.json`.
+- Test: `__tests__/components/reviews/TestimonialForm.test.tsx` cobreix backend cru, xarxa fallida i JSON malformat sense exposar el literal tècnic a pantalla.
+- Validació tècnica: `pnpm test:run -- --run __tests__\components\reviews\TestimonialForm.test.tsx` (3/3); `npx tsc --noEmit --pretty false`; `pnpm run qa:i18n-keys-sync`; `pnpm run qa:encoding -- --paths messages app\components\reviews __tests__\components\reviews`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien API, servei, schema, booking, pricing, emails ni admin; només es saneja la capa visible del formulari públic de ressenya.
+- Validació humana/UX: una fallada ja no sembla una avaria interna exposada; el client veu un missatge localitzat que pot entendre i repetir.
+- `ADMIN_CHANGE_COUNTER` puja a `1452`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1451 — 2026-07-05 — codex (FET)
+
+**Calendari públic: errors de disponibilitat només localitzats.**
+
+- Context: després del #1450, el calendari ja generava dates locals, però en cas de fallada continuava guardant i mostrant un missatge cru (`Failed to load availability`) darrere de `calendar.error`.
+- Fix: `AvailabilityCalendar` passa d'un string d'error a un booleà `hasError`; la UI mostra només `t('error')`.
+- Test: `__tests__/components/calendar/AvailabilityCalendar.test.tsx` blinda que una resposta `success:false` amb error anglès no pinti el literal backend.
+- Validació tècnica: `pnpm test:run -- --run __tests__\components\calendar\AvailabilityCalendar.test.tsx` (2/2); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien API, servei, schema, pricing, emails ni admin; només es neteja el text visible de fallada del calendari públic.
+- Validació humana/UX: el client veu l'error en l'idioma de la pàgina, no una frase tècnica anglesa.
+- `ADMIN_CHANGE_COUNTER` passa a `1451`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1450 — 2026-07-05 — codex (FET)
+
+**Calendari públic: claus de disponibilitat locals, no UTC.**
+
+- Context: `AvailabilityCalendar` encara construïa `from`, `to`, les claus de cel·la i la detecció d'avui amb `toISOString().split('T')[0]`. En zona horària positiva això pot desplaçar dates del calendari públic.
+- Fix: `components/calendar/AvailabilityCalendar.tsx` reutilitza `formatLocalDateInputValue()` per `from/to`, padding days, dies del mes, dies següents i `isToday`.
+- Test: `__tests__/components/calendar/AvailabilityCalendar.test.tsx` blinda que `initialMonth="2026-07"` demana `/api/availability?from=2026-07-01&to=2026-07-31`.
+- Validació tècnica: `pnpm test:run -- --run __tests__\components\calendar\AvailabilityCalendar.test.tsx __tests__\lib\date-input.test.ts` (3/3); `npx tsc --noEmit --pretty false`; grep del patró UTC a `AvailabilityCalendar.tsx` sense resultats.
+- Validació funcional: no canvien API, servei, schema, pricing, emails ni admin; el calendari manté el mateix contracte `YYYY-MM-DD`, però el genera en data local.
+- Validació humana/UX: el client veu i consulta el mes real, sense dies moguts per UTC.
+- `ADMIN_CHANGE_COUNTER` passa a `1450`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1449 — 2026-07-05 — codex (FET)
+
+**Web pública: data mínima local als formularis, no UTC.**
+
+- Context: `BookingForm`, el configurador públic i `ContactFormComplete` calculaven la data mínima amb `new Date().toISOString().split('T')[0]`. A Europa, just després de mitjanit local, això pot donar encara el dia UTC anterior i deixar seleccionar "ahir" al front.
+- Helper: nou `lib/date-input.ts` amb `formatLocalDateInputValue()` (`YYYY-MM-DD` amb `getFullYear/getMonth/getDate` locals).
+- Ús: `BookingForm` usa el helper directament; configurador i contacte el fan servir dins el `useEffect` hydration-safe de `minDate`.
+- Test: `__tests__/lib/date-input.test.ts` blinda format local i zeros; `BookingForm.test.tsx` comprova que el `min` és el dia local a les 00:30.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\date-input.test.ts __tests__\components\booking\BookingForm.test.tsx` (7/7); `npx tsc --noEmit --pretty false`; `rg -n "toISOString\(\)\.split\('T'\)\[0\]" components\booking\BookingForm.tsx app\[locale]\configurador\client.tsx app\components\forms\ContactFormComplete.tsx` sense resultats.
+- Validació funcional: no canvien API, servei, schema, pricing, emails, packs, extres ni Customer Hub; només es corregeix el dia mínim visible als formularis públics.
+- Validació humana/UX: el client no pot veure "ahir" com a data seleccionable per culpa d'UTC quan ja és un dia nou local.
+- `ADMIN_CHANGE_COUNTER` passa a `1449`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1448 — 2026-07-05 — codex (FET)
+
+**Reserva pública: el formulari no mostra errors tècnics de xarxa o JSON.**
+
+- Context: el #1447 va impedir que el backend pintés literals anglesos per errors controlats, però una fallada de `fetch()` o una resposta no JSON encara podia acabar mostrant `Failed to fetch` o `Unexpected end of JSON input` al client.
+- Fix: `BookingForm` encapsula els errors visibles en `BookingFormVisibleError`; només aquests missatges es mostren directament a l'usuari.
+- Fallback: errors de xarxa, JSON malformat o resposta success sense referència cauen a `booking.form.errors.processing`, ja localitzat.
+- Test: `__tests__/components/booking/BookingForm.test.tsx` puja a 4 casos i blinda que no apareguin els literals tècnics anglesos.
+- Validació tècnica: `pnpm test:run -- --run __tests__\components\booking\BookingForm.test.tsx` (4/4); `npx tsc --noEmit --pretty false`.
+- Validació funcional: no canvien API, servei, schema, pricing, emails, packs, extres ni Customer Hub; només es neteja el tractament d'excepcions del front.
+- Validació humana/UX: si la xarxa cau o la resposta arriba malformada, el client veu un missatge clar en l'idioma de la pàgina, no una traça tècnica.
+- `ADMIN_CHANGE_COUNTER` passa a `1448`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1447 — 2026-07-05 — codex (FET)
+
+**Reserva pública: errors backend amb codis traduïbles al formulari.**
+
+- Context: després del #1446, la reserva pública ja validava eventType, locale, quantitats i data, però quan el backend fallava el `BookingForm` podia pintar literalment missatges anglesos (`This date is not available...`) en una pàgina catalana o castellana.
+- Contracte: nou `lib/public-booking-errors.ts` amb codis estables; `publicBookingService` i `/api/booking` retornen `errorCode` al costat del missatge legacy.
+- UX/i18n: `BookingForm` ignora el literal cru per pintar l'error i resol `booking.form.serverErrors.*` a `messages/ca.json`, `messages/es.json` i `messages/en.json`; si el codi no és conegut, cau a l'error genèric localitzat.
+- Tests: cobertura nova de helper, route i component; el servei blinda `errorCode` als 400 coneguts.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\public-booking-errors.test.ts __tests__\app\api\booking-route.test.ts __tests__\lib\services\publicBookingService.test.ts __tests__\components\booking\BookingForm.test.tsx` (30/30); `npx tsc --noEmit --pretty false`; `pnpm run qa:i18n-keys-sync`; `pnpm run qa:encoding -- --paths messages components lib app`.
+- Validació funcional: no canvien schema, pricing, emails, packs, extres ni Customer Hub; només s'estabilitza el contracte d'errors web→API→form.
+- Validació humana/UX: un client en `/ca/reservar` ja no veu errors anglesos del backend; l'error de data ocupada surt en català i manté la decisió clara.
+- `ADMIN_CHANGE_COUNTER` passa a `1447`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1446 — 2026-07-05 — codex (FET)
+
+**Reserva pública: la validació de data baixa de la route al servei canònic.**
+
+- Context: #1445 va tallar quantitats absurdes al servei, però la data invàlida/passada continuava validant-se només a `/api/booking`. Això deixava `createPublicBooking()` menys autosuficient i duplicava responsabilitat entre route i servei.
+- Fix: `lib/services/publicBookingService.ts` afegeix resolució runtime d'`eventDate`; si no és data vàlida o és anterior a avui, retorna `400` abans de consultar `pack.findUnique`, `extra.findMany` o obrir transacció.
+- Route neta: `app/api/booking/route.ts` conserva validació HTTP de camps requerits i email, però delega la data al servei.
+- Test: `__tests__/lib/services/publicBookingService.test.ts` puja a 22 casos i blinda `not-a-date` i `2020-01-01` sense cap query de BD.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\publicBookingService.test.ts` (22/22); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien schema, formulari, pricing, emails, packs, extres ni Customer Hub; només es posa la mateixa barrera de data al cervell que escriu la reserva.
+- Validació humana/UX: una reserva pública ja no pot néixer per cap camí amb una data impossible o passada; la route queda més prima i el servei més fiable.
+- `ADMIN_CHANGE_COUNTER` passa a `1446`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1445 — 2026-07-05 — codex (FET)
+
+**Reserva pública: el backend rebutja quantitats impossibles abans de tocar BD.**
+
+- Context: `/api/booking` validava email i data, però el servei `createPublicBooking()` encara podia rebre `guestCount` negatiu o `extraHours` negatives/no numèriques si el payload no venia del formulari actual. Això podia crear una reserva amb aforament impossible o alterar el subtotal amb hores negatives.
+- Fix: `lib/services/publicBookingService.ts` afegeix normalització runtime de quantitats: `guestCount` ha de ser enter positiu; `extraHours` ha de ser número finit no negatiu i per defecte `0`.
+- Tall abans de BD: els valors invàlids retornen `400` amb error controlat abans de `pack.findUnique`, `extra.findMany` o `$transaction`.
+- Compatibilitat: strings numèrics nets (`"120"`, `"2"`) es coerceixen perquè el servei sigui robust si una entrada JSON lateral arriba amb números com a text.
+- Test: `__tests__/lib/services/publicBookingService.test.ts` puja a 20 casos, amb regressions per `guestCount:-5`, `extraHours:-1` i coerció de quantitats string.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\publicBookingService.test.ts` (20/20); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien schema, formulari, pricing global, emails, packs, extres ni Customer Hub; només s'impedeix que una reserva pública neixi amb quantitats que el negoci no pot operar.
+- Validació humana/UX: el client no rep ni genera una reserva basada en números absurds; el propietari no ha de descobrir després una reserva amb aforament negatiu o hores que descompten import.
+- `ADMIN_CHANGE_COUNTER` passa a `1445`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1444 — 2026-07-05 — codex (FET)
+
+**Reserva pública: `preferredLocale` queda normalitzat server-side i compartit amb el front.**
+
+- Context: #1437-#1443 havien arreglat locale visible, redirect, legal link, confirmació i copy del formulari, però `publicBookingService` encara acceptava `body.preferredLocale` tal com venia i el desava a `Customer` i `Booking`. Un client vell, manipulat o amb variant regional podia deixar `en-US`, `fr` o brutícia com a idioma preferit.
+- Fix de monocapa: nou `lib/public-locale.ts` amb `PUBLIC_LOCALES`, `DEFAULT_PUBLIC_LOCALE` i `normalizePublicLocale(value, fallback)`.
+- Backend: `lib/services/publicBookingService.ts` normalitza `preferredLocale` abans del `customer.upsert` i del `booking.create`; falta de locale o valor invàlid torna a `ca`, i variants regionals `ca-ES`, `es_ES`, `en-US` es redueixen a `ca|es|en`.
+- Front: `components/booking/BookingForm.tsx` i `app/[locale]/reserva-confirmada/page.tsx` deixen de tenir normalitzadors locals i consumeixen el mateix helper amb fallback `es`, preservant el comportament visible actual.
+- Tests: `__tests__/lib/public-locale.test.ts` cobreix exactes, variants regionals i fallbacks; `__tests__/lib/services/publicBookingService.test.ts` puja a 17 casos i blinda `en-US -> en` i que `xx<script>` no es desa.
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\public-locale.test.ts __tests__\lib\services\publicBookingService.test.ts __tests__\components\booking\BookingForm.test.tsx __tests__\app\reserva-confirmada-page.test.tsx` (23/23); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien schema, pricing, emails, packs, extres ni Customer Hub; només es tanca el contracte d'idioma perquè Customer/Booking no heretin un valor brut.
+- Validació humana/UX: el client no queda enganxat a un idioma impossible després de reservar; la cadena reserva -> Customer 360 -> comunicacions parteix d'un locale net.
+- `ADMIN_CHANGE_COUNTER` passa a `1444`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1443 — 2026-07-05 — codex (FET)
+
+**Reserva pública: `BookingForm` consumeix `booking.form.*` i deixa de tenir copy castellà incrustat.**
+
+- Context: després de localitzar confirmació i links, el formulari central de reserva encara tenia seccions, labels, placeholders, errors, estat d'èxit, CTA i legal hardcoded en castellà. En una ruta `[locale]`, això és fricció i incompliment de protocol públic.
+- Fix: `components/booking/BookingForm.tsx` importa `useTranslations` i consumeix `booking.form`.
+- Copy mogut: seccions (`client`, `event`, `pack`, `extras`), labels, placeholders, event types, pack hours, total, accions, errors, èxit i legal.
+- Catàleg i18n: `messages/ca.json`, `messages/es.json` i `messages/en.json` afegeixen `booking.form.*` amb claus sincronitzades.
+- Test: `__tests__/components/booking/BookingForm.test.tsx` mockeja `next-intl`, comprova copy català, link legal `/ca/legal/terminos`, absència de `THEMED_PARTY`, payload `preferredLocale: 'ca'` i redirect `/ca/reserva-confirmada`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/components/booking/BookingForm.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `pnpm run qa:i18n-keys-sync`; `pnpm run qa:encoding -- --paths messages components`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien API, public booking service, Customer Hub, schema, pricing ni emails; només es treu copy públic del component i es passa a la font i18n.
+- Validació humana/UX: el formulari de reserva ja segueix l'idioma real del flux en què el client està decidint.
+- `ADMIN_CHANGE_COUNTER` passa a `1443`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1442 — 2026-07-05 — codex (FET)
+
+**Reserva pública: el backend rebutja `eventType` fora de Prisma abans de tocar BD.**
+
+- Context: #1441 corregeix el select, però `publicBookingService` continuava fent `body.eventType as EventType`. Un client antic o manipulat podia enviar `THEMED_PARTY` i fer petar la reserva al create.
+- Fix: `lib/services/publicBookingService.ts` afegeix `resolvePublicBookingEventType(value)` amb `Object.values(EventType)`.
+- Comportament: si el valor no existeix a l'enum, el servei retorna `400` amb `Invalid event type selected` abans de consultar packs/extres o obrir transacció.
+- Create segur: `booking.create` usa l'`eventType` resolt, no un cast cec.
+- Test: `__tests__/lib/services/publicBookingService.test.ts` puja a 15 casos i comprova que `THEMED_PARTY` retorna 400 sense cridar `pack.findUnique` ni `$transaction`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/publicBookingService.test.ts` (15/15); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien schema, formulari, pricing, emails, Customer Hub ni admin; només es valida el contracte server-side.
+- Validació humana/UX: una reserva amb payload vell o manipulat falla de forma neta i comprensible, no com error intern.
+- `ADMIN_CHANGE_COUNTER` passa a `1442`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1441 — 2026-07-05 — codex (FET)
+
+**Reserva pública: el select d'esdeveniment ja no pot enviar `THEMED_PARTY`.**
+
+- Context: `components/booking/BookingForm.tsx` tenia `<option value="THEMED_PARTY">Fiesta Temática</option>`, però `prisma/schema.prisma` no defineix aquest valor a `EventType`. Una reserva pública podia fallar al create si el client triava aquesta opció.
+- Fix conservador: no es toca schema ni es crea migració; la festa temàtica queda dins l'opció vàlida `PRIVATE_PARTY`.
+- Resultat visible: l'opció passa a `Fiesta Privada / Temática`.
+- Test: `__tests__/components/booking/BookingForm.test.tsx` comprova que el select no conté `THEMED_PARTY`, a més de mantenir les regressions de locale, legal link i redirect.
+- Validació tècnica: `pnpm test:run -- --run __tests__/components/booking/BookingForm.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien API, booking service, Customer Hub, pricing, emails, schema ni messages; només s'elimina un payload impossible.
+- Validació humana/UX: el client continua entenent que pot reservar una festa privada o temàtica, però el sistema rep una categoria que sap operar.
+- `ADMIN_CHANGE_COUNTER` passa a `1441`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1440 — 2026-07-05 — codex (FET)
+
+**Reserva pública: l'enllaç legal del formulari manté el locale.**
+
+- Context: el formulari ja enviava `preferredLocale` normalitzat i redirigia a `/{locale}/reserva-confirmada`, però el link de termes continuava a `/legal/terminos`. Era una sortida de context abans de confirmar.
+- Fix: `components/booking/BookingForm.tsx` construeix l'href legal com `/${bookingLocale}/legal/terminos`.
+- Test: `__tests__/components/booking/BookingForm.test.tsx` comprova que amb `locale="ca"` el link `términos y condiciones` apunta a `/ca/legal/terminos`, i manté la regressió de payload + redirect.
+- Validació tècnica: `pnpm test:run -- --run __tests__/components/booking/BookingForm.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien API, booking service, Customer Hub, copy, emails, pricing ni schema; només es manté el flux localitzat del link legal.
+- Validació humana/UX: el client pot consultar condicions sense sortir de l'idioma de la pàgina on està reservant.
+- `ADMIN_CHANGE_COUNTER` passa a `1440`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1439 — 2026-07-05 — codex (FET)
+
+**Confirmació de reserva: el copy públic surt de `messages`, no de literals castellans al component.**
+
+- Context: amb #1437 i #1438 el flux ja conservava `locale`, però `app/[locale]/reserva-confirmada/page.tsx` encara renderitzava titular, missatge, passos, CTAs i contacte en castellà hardcoded. Això trenca i18n i confiança en `/ca` i `/en`.
+- Fix de capa pública: la pàgina importa `getTranslations` i consumeix `booking.confirmed`.
+- Metadata: `generateMetadata` llegeix `booking.confirmed.meta.title` i `booking.confirmed.meta.description`.
+- Copy visible: `title`, `referenceLabel`, `message`, `nextSteps.*`, `actions.*` i `contact.question` passen a `messages`.
+- Catàleg i18n: `messages/ca.json`, `messages/es.json` i `messages/en.json` incorporen `booking.confirmed.*`.
+- Test: `__tests__/app/reserva-confirmada-page.test.tsx` mockeja `next-intl/server`, renderitza `locale: 'ca'`, blinda copy català i conserva `/ca` + `/ca/portfolio`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/reserva-confirmada-page.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien formulari, API, servei de booking, Customer Hub, pricing, emails ni schema; només es mou text públic a la font i18n correcta.
+- Validació humana/UX: el client que reserva en català o anglès rep una pantalla coherent amb l'idioma del seu flux, no una confirmació genèrica en castellà.
+- `ADMIN_CHANGE_COUNTER` passa a `1439`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1438 — 2026-07-05 — codex (FET)
+
+**Confirmació de reserva: els CTAs principals mantenen el locale.**
+
+- Context: després del #1437, el client arriba a `/{locale}/reserva-confirmada`, però dins la pàgina els botons `Volver al Inicio` i `Ver Portfolio` encara apuntaven a `/` i `/portfolio`. Era una pèrdua de context idiomàtic immediata després de reservar.
+- Fix: `app/[locale]/reserva-confirmada/page.tsx` rep `params.locale`, el normalitza a `ca`, `es` o `en` amb fallback `es`, i construeix els hrefs amb aquest prefix.
+- Resultat visible: `Volver al Inicio` apunta a `/{locale}` i `Ver Portfolio` a `/{locale}/portfolio`.
+- Test: `__tests__/app/reserva-confirmada-page.test.tsx` renderitza la pàgina amb `locale: 'ca'` i blinda `/ca` + `/ca/portfolio`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/reserva-confirmada-page.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien formulari, API, booking service, emails, pricing, schema ni Customer Hub; només es manté la navegació localitzada de la confirmació.
+- Validació humana/UX: el client pot tornar a inici o portfolio sense sortir del context d'idioma que l'ha portat fins a la reserva.
+- `ADMIN_CHANGE_COUNTER` passa a `1438`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1437 — 2026-07-05 — codex (FET)
+
+**Reserva pública: la confirmació manté el locale i el formulari guanya labels accessibles.**
+
+- Context: `app/[locale]/reserva-confirmada` existeix sota locale, però `BookingForm` feia `router.push('/reserva-confirmada?ref=...')`. El client podia sortir del flux localitzat just després de reservar. En provar el component també s'ha detectat que els labels visibles no apuntaven als inputs.
+- Fix de flux: `components/booking/BookingForm.tsx` normalitza el locale rebut a `ca`, `es` o `en` amb fallback `es`.
+- Payload: el POST a `/api/booking` envia `preferredLocale: bookingLocale`, no el valor cru.
+- Redirect: el `router.push` final passa a `/${bookingLocale}/reserva-confirmada?ref=${encodeURIComponent(reference)}`.
+- Accessibilitat: els camps principals del formulari guanyen `htmlFor` + `id`/`name` estables (`clientName`, `clientEmail`, `clientPhone`, esdeveniment, data, ubicació, convidats, notes).
+- Test: `__tests__/components/booking/BookingForm.test.tsx` omple el formulari, simula resposta de `/api/booking`, comprova `preferredLocale: 'ca'` i blinda el redirect `/ca/reserva-confirmada?ref=...`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/components/booking/BookingForm.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien API, servei de booking, Customer Hub, pricing, emails, schema ni textos comercials; només es manté el flux localitzat i es millora l'associació label-control.
+- Validació humana/UX: després de reservar, el client continua en el mateix idioma i el formulari és menys hostil per assistència i navegació semàntica.
+- `ADMIN_CHANGE_COUNTER` passa a `1437`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1436 — 2026-07-05 — codex (FET)
+
+**Reserva pública: Customer 360 creat/vinculat dins la transacció de booking.**
+
+- Context: el mandat Manolo #1428 diu que es pot entrar per qualsevol porta, però cap peça pot perdre la cadena. La ruta pública `/[locale]/reservar` creava una `Booking` directa via `/api/booking`, però no creava ni vinculava `Customer`, de manera que una reserva real podia néixer fora del Client 360.
+- Fix canònic: `lib/services/publicBookingService.ts` normalitza `clientName`, `clientEmail` i `clientPhone` amb `normalizeName`, `normalizeEmail` i `normalizePhone`.
+- Transacció: abans de `booking.create`, el servei fa `tx.customer.upsert({ where: { emailNormalized } ... })` amb `source: 'WEBSITE'` i `preferredLocale` real.
+- Herència: `booking.create` desa `customerId: customer.id`, conservant `Booking` com a veritat post-reserva sense inventar un Lead retroactiu.
+- Traça CRM: la mateixa transacció crida `recordCustomerBookingCreated(..., tx)` i deixa `BOOKING_CREATED` al Customer 360.
+- Test: `__tests__/lib/services/publicBookingService.test.ts` passa a 14 casos i blinda upsert de Customer, normalització Gmail/telèfon/nom, `customerId` al booking, `preferredLocale` i activitat CRM.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/publicBookingService.test.ts` (14/14); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien formulari públic, endpoint, pricing, packs, extres, emails, schema ni admin booking; la reserva pública només guanya cadena Customer→Booking.
+- Validació humana/UX: el propietari no ha de reconstruir manualment el client després d'una reserva web; el 360 ja té memòria i activitat des del primer moment.
+- `ADMIN_CHANGE_COUNTER` passa a `1436`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1435 — 2026-07-05 — codex (FET)
+
+**Frontissa web→lead: el locale real del path viatja amb UTM i landingPage.**
+
+- Context: l'atles v2 pendent demana revisar la frontissa formulari públic → endpoint → Lead. `/api/contact` ja acceptava `locale`, però els formularis que envien `useUtmParams()` només passaven UTM i `landingPage`; una visita a `/ca/...` podia quedar a mercè del header del navegador.
+- Fix canònic: `lib/hooks/useUtmParams.ts` deriva `locale` del primer segment del path quan és `ca`, `es` o `en`.
+- Efecte de cablejat: `ContactFormComplete` i `configurador/client.tsx` ja fan `...utmParams`, així que hereten el `locale` sense tocar formularis ni duplicar lògica.
+- Test: `__tests__/lib/hooks/useUtmParams.test.ts` passa a 5 casos i blinda UTM + landing + locale, landing amb locale, no-locale si no hi ha prefix, truncament UTM i truncament landing.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/hooks/useUtmParams.test.ts` (5/5); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien API, schema, emails, pricing ni rutes; només s'envia una dada que l'API ja entenia perquè el lead desi l'idioma de la pàgina de captació.
+- Validació humana/UX: el primer seguiment, welcome i proposta tenen més opcions de sortir en l'idioma real de captació; menys fricció i menys sensació de resposta genèrica.
+- `ADMIN_CHANGE_COUNTER` passa a `1435`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1434 — 2026-07-05 — codex (FET)
+
+**Factura dins reserva: context client/lead visible, no document illa.**
+
+- Context: el ledger Manolo #1429 marcava que la factura PDF ja era correcta com a prova econòmica; el risc real era de context. Una factura no pot quedar com un botó cap a Holded/PDF sense recordar de quin client, lead i reserva surt.
+- Fix visible: `app/admin/bookings/[id]/InvoiceSection.tsx` afegeix `Context de la factura`, amb text curt i accions `Client 360` i `Lead origen` quan la reserva té aquests vincles.
+- Cablejat canònic: `app/admin/bookings/[id]/page.tsx` passa `customerHref` via `buildCustomerHubHref(customer.id)` i `leadHref` via `buildLeadWorkspaceHref(booking.lead.id)`. Cap ruta manual nova.
+- Test: `__tests__/app/admin/bookings/InvoiceSection.test.tsx` blinda que el context aparegui encara sense factura creada i que els hrefs canònics siguin correctes.
+- Auditoria: `docs/audit/MANOLO-ZENIT-PDFS-1429.md` marca la factura/context com a tall aplicat #1434 i tanca la passada PDF un a un.
+- Validació tècnica: `pnpm test:run -- --run __tests__/app/admin/bookings/InvoiceSection.test.tsx` (1/1); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien Holded, serveis de factura, PDF, schema, imports ni càlculs; només s'exposa el retorn operatiu a client/lead dins el bloc de factura.
+- Validació humana/UX: el propietari no ha de recordar mentalment la cadena; la factura mostra d'on ve i cap a quin workspace cal tornar.
+- `ADMIN_CHANGE_COUNTER` passa a `1434`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1433 — 2026-07-05 — codex (FET)
+
+**Informe executiu PDF: abans dels números hi ha una decisió recomanada.**
+
+- Context: el ledger Manolo #1429 marcava que l'informe intern parlava de negoci, però encara no era prou "què faig ara". Un PDF executiu que només ensenya indicadors informa; no governa.
+- Cervell reutilitzat: `lib/services/executiveReportPdfService.ts` importa `generateReportingInsights()` i afegeix `buildExecutiveReportPdfDecision(report)` per projectar el primer insight prioritzat.
+- Fix visible: `exportExecutiveReportPdf()` dibuixa un bloc `DECISIÓ RECOMANADA` abans del KPI strip, amb àrea, titular, detall i `Acció: ...`.
+- Fallback: si no hi ha insights prioritaris, el PDF obre amb `Cap bloqueig crític detectat` i recomana mantenir revisió de marge, embut i recurrència.
+- Test: `__tests__/lib/services/executiveReportPdfService.test.ts` blinda decisió per SLA trencats, fallback sense insights i text visible dins el PDF.
+- Auditoria: `docs/audit/MANOLO-ZENIT-PDFS-1429.md` marca l'informe executiu com a tall aplicat #1433 dins la revisió PDF un a un.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/executiveReportPdfService.test.ts` (6/6); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien mètriques, queries, reporting runtime, schema ni rutes; només la jerarquia del PDF intern.
+- Validació humana/UX: el propietari veu primer la decisió, després els números que l'expliquen.
+- `ADMIN_CHANGE_COUNTER` passa a `1433`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1432 — 2026-07-05 — codex (FET)
+
+**Catàleg PDF: el CTA deixa de ser genèric i passa a orientar decisió.**
+
+- Context: el ledger Manolo #1429 detectava que `Tens dubtes? Escriu-nos sense compromís!` feia de fulletó barat, no de peça premium que ordena decisió.
+- Fix visible: `lib/services/catalogPdfService.ts` substitueix el CTA català per `Quan tingueu clara la direcció, ajustem proposta, data i detalls.`.
+- i18n del mateix PDF: castellà `Cuando tengáis clara la dirección, ajustamos propuesta, fecha y detalles.` i anglès `When the direction is clear, we tailor the proposal, date, and details.`.
+- Test: `__tests__/lib/services/catalogPdfService.test.ts` afegeix extracció de text intern del PDF i regressions perquè no tornin `Tens dubtes? Escriu-nos sense compromís!`, `¿Tienes dudas? ¡Escríbenos sin compromiso!` ni `Have questions? Contact us with no obligation!`.
+- Auditoria: `docs/audit/MANOLO-ZENIT-PDFS-1429.md` marca el catàleg com a tall aplicat #1432 dins la revisió PDF un a un.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/catalogPdfService.test.ts` (8/8); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien packs, preus, extres, compatibilitats, rutes, schema ni enviaments reals.
+- Validació humana/UX: el catàleg ja no demana "dubtes"; empeny el client a triar direcció i convertir-la en proposta, data i detalls.
+- `ADMIN_CHANGE_COUNTER` passa a `1432`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1431 — 2026-07-05 — codex (FET)
+
+**Dossier PDF: la introducció deixa de sonar a catàleg i passa a vendre ritme, joc i moments memorables.**
+
+- Context: el ledger Manolo #1429 marcava el dossier com la peça amb més ànima, però amb una obertura massa genèrica: `Mireu què podem portar a la vostra festa`.
+- Fix visible: `lib/services/dossierCompositePdfService.ts` substitueix el titular d'introducció per `Ritme, joc i moments que la gent recorda.`.
+- Copy comercial honest: la salutació deixa clar que el dossier ordena opcions perquè el client imagini el ritme del dia — què anima, què acompanya i què pot quedar com a moment especial — sense fingir una proposta tancada abans de saber espai, horaris i convidats.
+- Es conserva intacte el model del dossier: portada, introducció, capítols, productes, col·laboradors, extres, preus de referència i footers continuen sortint pel mateix generador.
+- Test: `__tests__/lib/services/dossierCompositePdfService.test.ts` afegeix extracció de text intern del PDF i blinda que el titular nou existeixi i que `Mireu què podem portar a la vostra festa` no torni.
+- Auditoria: `docs/audit/MANOLO-ZENIT-PDFS-1429.md` marca el dossier com a tall aplicat #1431 dins la revisió PDF un a un.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/dossierCompositePdfService.test.ts` (4/4); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: no canvien productes, preus, annexos, imatges, rutes, schema ni enviaments reals.
+- Validació humana/UX: el dossier ja no obre com "mira coses"; obre com una peça que ordena desig, valor percebut i decisió.
+- `ADMIN_CHANGE_COUNTER` passa a `1431`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1430 — 2026-07-05 — codex (FET)
+
+**Pressupost PDF: labels i microcopy visibles sanejats amb criteri Manolo.**
+
+- Context: després del ledger #1429, el pressupost és el següent document comercial abans de la decisió. Tenia accents trencats i un CTA `Reserva amb dipòsit` més fred del que toca per a esdeveniments.
+- Fix visible català: `lib/services/quotePdfService.ts` passa de `Que inclou`, `Resum economic`, `Per que escollir-nos` i `Reserva amb dipòsit` a `Què inclou`, `Resum econòmic`, `Per què escollir-nos` i `Reserva amb paga i senyal`.
+- Fix visible castellà: `Que incluye`, `Resumen economico`, `dias` i `Por que elegirnos` passen a `Qué incluye`, `Resumen económico`, `días` i `Por qué elegirnos`.
+- Microcopy de decisió: la banda final del pressupost parla en passos de proposta (`Accepta la proposta`, `Reserva amb paga i senyal`, `Esdeveniment assegurat`) sense tocar imports, IVA, transport, càlculs, schema ni enviaments reals.
+- Test: `__tests__/lib/services/quotePdfService.test.ts` afegeix extracció de text intern del PDF i regressions de català/castellà contra els literals antics.
+- Auditoria: `docs/audit/MANOLO-ZENIT-PDFS-1429.md` marca el pressupost com a tall aplicat #1430 dins la revisió PDF un a un.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/quotePdfService.test.ts` (8/8); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: el document continua sortint del mateix `QuoteData` i del mateix generador; només canvia el llenguatge visible que veu el client.
+- Validació humana/UX: el pressupost deixa de semblar una plantilla amb errors menors i puja percepció de cura, confiança i professionalitat abans del total.
+- `ADMIN_CHANGE_COUNTER` passa a `1430`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1429 — 2026-07-05 — codex (FET)
+
+**PDFs un a un: queda el ledger Manolo dels 6 documents vius i el contracte substitueix `Aval (dipòsit)` per `Paga i senyal`.**
+
+- Context: el propietari ordena revisar PDFs un a un dins el camí al Zenit. S'aplica la regla #1428: cada PDF ha de dir d'on hereta, què ven/protegeix/opera/cobra i quin pas obre.
+- Auditoria: `docs/audit/MANOLO-ZENIT-PDFS-1429.md` recorre `pressupost`, `contracte`, `catàleg`, `informe`, `factura` i `dossier` amb font de dades, veredicte Manolo, risc i tall recomanat.
+- Fix visible: `lib/services/contractPdfService.ts` canvia el català del pagament al contracte de `Aval (dipòsit)` / `Venciment aval` a `Paga i senyal` / `Venciment paga i senyal`.
+- Fix de traducció latent: el `signName` castellà deixa de ser `Nom i cognoms` i passa a `Nombre y apellidos`.
+- Test: `__tests__/lib/services/contractPdfService.test.ts` afegeix extracció de text intern del PDF i blinda que el contracte català generat contingui `Paga i senyal` i no contingui `Aval (dipòsit)`.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/services/contractPdfService.test.ts` (6/6); `npx tsc --noEmit --pretty false`; `pnpm run qa:protocol`.
+- Validació funcional: el contracte deixa d'usar un concepte confús de garantia bancària i passa a llenguatge natural de reserva d'esdeveniment, sense canviar imports, schema ni enviaments.
+- Validació humana/UX: el primer PDF legal/comercial ja parla amb més confiança; el ledger deixa com a següents talls naturals pressupost i dossier, que són els documents que venen abans de decidir.
+- `ADMIN_CHANGE_COUNTER` passa a `1429`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1428 — 2026-07-05 — codex (FET)
+
+**Herència de context: el Customer Hub ja pot reconstruir client/lead des de reserva, proposta, dossier i factura, i queda escrita la regla "podem entrar per tot arreu però tot ha de saber d'on ve".**
+
+- Context: el propietari demana recórrer el repo de dalt a baix i fixa el criteri central: cada lead/client ha d'entrar a cada pas possible, els fluxos han de poder obrir-se des de qualsevol costat i la informació ha d'heretar d'una cadena anterior.
+- Norma nova: `§0.1.3 Herència de context client→lead→document→reserva` declara la cadena `Customer → Lead → Dossier/Proposal/Quote → Booking → Invoice/Contract/Documents → Post-event/Review/Referral` i obliga qualsevol superfície comercial a respondre quin ID la governa, quin workspace canònic obre, què hereta i què passa a veritat final.
+- Document de tall: `docs/audit/MANOLO-ZENIT-HERENCIA-CONTEXT-1428.md` fixa el veredicte Manolo, el contracte d'herència i el següent tall natural: revisar PDFs un a un amb aquesta regla.
+- Fix de cablejat: `lib/customer-hub/data.ts` amplia `resolveCustomerHubCustomerId()` amb helpers de lead/booking i resolució des de `Customer`, `Lead`, `Booking`, `Proposal`, `Dossier`, `Invoice`, tasques, activitats i documents de lead quan la cadena existeix.
+- Fix de col·lecció 360: `fetchCustomerHubCollections()` ja carrega propostes i reserves per `customerId OR leadId`, de manera que una proposta o reserva nascuda quan només existia el lead no desapareix del Customer Hub després de vincular client.
+- `docs/protocol-executiu.md` i `CLAUDE.md` incorporen el recordatori curt perquè futures entrades no tractin PDFs, emails, reserves, propostes o tasques com a illes.
+- Validació tècnica: `pnpm test:run -- --run __tests__/lib/customer-hub/data.test.ts` (10/10); validació final `tsc` i `qa:protocol` executada al tancament.
+- Validació funcional: regressions cobertes per reserva directa amb `customerId`, reserva via `leadId`, proposta via `leadId`, proposta via `bookingId`, dossier via `leadId`, factura via `customerId`, i query `customerId OR leadId` per propostes/reserves del 360.
+- Validació humana/UX: el 360 deixa de ser només "fitxa per ID de client" i passa a ser entrada de continuïtat comercial des de documents i operació; això respon al mandat "per davant, per darrere, per un costat o per un altre".
+- `ADMIN_CHANGE_COUNTER` passa a `1428`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #1427 — 2026-07-05 — codex (FET)
+
+**Manolo queda incorporat al protocol com a mirada experta transversal de conversió, disseny, vendes, esdeveniments, UX, marca, operació i marge.**
+
+- Context: el propietari vol poder convocar un perfil extremadament exigent per revisar qualsevol peça del repo sense quedar-se en una auditoria estètica o tècnica. El rol rep el nom intern `Manolo`.
+- `docs/admin-protocol.md`: nova secció `§0.1.2 Manolo` amb perfil base `Expert/a en Experiència Comercial Digital`, rols combinats (UX/UI, CRO, brand strategy, service design, event business, revenue, information architecture, copy comercial, visual art direction i growth) i atributs obligatoris: confiança, desig, reducció de risc, valor percebut, claredat de decisió, ritme emocional, escalabilitat operativa, memòria de marca, credibilitat local, post-venda, premium sense fredor i fricció mínima.
+- El protocol defineix també **com parla Manolo**: fred, tallant, àcid i sense diplomàcia amb peces mediocres, genèriques, confuses, poc premium o que no venen; dur amb la peça i la decisió, no amb la persona.
+- `docs/protocol-executiu.md`: resum operatiu perquè qualsevol agent sàpiga que `Manolo`, `convoca Manolo`, `passa-li Manolo` o `mirada Manolo` activen aquesta revisió abans de tocar codi.
+- `CLAUDE.md`: apunt d'arrencada perquè el rol sigui visible des de la constitució del repo.
+- Sortida mínima fixada: `veredicte Manolo`, `problema real`, `què faria`, `tall recomanat` i `risc de no fer-ho`.
+- No hi ha canvi de runtime, UI, serveis ni schema.
+- Validació tècnica: `pnpm run qa:protocol`.
+- Validació funcional: el protocol ja defineix què activa Manolo, què mira, com parla i quina sortida mínima ha de donar.
+- Validació humana/UX: el propietari pot convocar Manolo sense explicar de nou el perfil; l'agent ha de tornar amb veredicte, problema real, què faria, tall recomanat i risc de no fer-ho.
+- `ADMIN_CHANGE_COUNTER` passa a `1427`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
 
 ### Canvi #1426 — 2026-07-05 — codex (FET)
 **Passada visual Zenit amb captures reals: Economia guanya capa executiva, Dossiers mòbil respira i l'auditor ja no dona per bona una pantalla en loader.**

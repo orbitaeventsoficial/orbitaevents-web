@@ -15,6 +15,12 @@ export type PaymentCoverageInput = {
   total?: number | null;
 };
 
+export type BookingOutstandingBreakdown = {
+  depositAmount: number;
+  remainingAmount: number;
+  total: number;
+};
+
 function normalizeAmount(value: number | null | undefined): number {
   return typeof value === 'number' && Number.isFinite(value) ? Math.max(0, value) : 0;
 }
@@ -46,18 +52,40 @@ export function bookingOutstandingAmount(booking: {
   remainingPaid: boolean;
   cashAmount?: number | null;
 }): number {
+  return bookingOutstandingBreakdown(booking).total;
+}
+
+export function bookingOutstandingBreakdown(booking: {
+  total: number;
+  depositAmount: number;
+  remainingAmount?: number | null;
+  depositPaid: boolean;
+  remainingPaid: boolean;
+  cashAmount?: number | null;
+}): BookingOutstandingBreakdown {
   const total = normalizeAmount(booking.total);
   const deposit = normalizeAmount(booking.depositAmount);
   const remaining = typeof booking.remainingAmount === 'number' && Number.isFinite(booking.remainingAmount)
     ? normalizeAmount(booking.remainingAmount)
     : Math.max(0, total - deposit);
-  const cash = normalizeAmount(booking.cashAmount);
-  let pending = 0;
-  if (!booking.depositPaid && deposit > 0) pending += deposit;
-  if (!booking.remainingPaid) pending += remaining;
-  // L'efectiu cobrat cobreix el pendent (fins on arribi).
-  pending = Math.max(0, pending - cash);
-  return Math.round(pending * 100) / 100;
+  let cash = normalizeAmount(booking.cashAmount);
+  let pendingDeposit = booking.depositPaid ? 0 : deposit;
+  let pendingRemaining = booking.remainingPaid ? 0 : remaining;
+
+  const cashForDeposit = Math.min(pendingDeposit, cash);
+  pendingDeposit = Math.max(0, pendingDeposit - cashForDeposit);
+  cash = Math.max(0, cash - cashForDeposit);
+
+  const cashForRemaining = Math.min(pendingRemaining, cash);
+  pendingRemaining = Math.max(0, pendingRemaining - cashForRemaining);
+
+  const depositAmount = Math.round(pendingDeposit * 100) / 100;
+  const remainingAmount = Math.round(pendingRemaining * 100) / 100;
+  return {
+    depositAmount,
+    remainingAmount,
+    total: Math.round((depositAmount + remainingAmount) * 100) / 100,
+  };
 }
 
 const PAYMENT_LABEL: Record<PaymentBand, string> = {

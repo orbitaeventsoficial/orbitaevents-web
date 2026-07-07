@@ -4,13 +4,14 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildSocialWorkspaceHref } from '@/lib/admin/socialWorkspaceHref';
 import { formatDateFull, formatWeekdayLong, getBookingStatusBadgeDisplay } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 import { ADMIN_CALENDAR_HELP, helpAttrs } from '../components/adminHelpContent';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { CalendarApiDay, CalendarApiResponse } from './calendar-utils';
-import { formatKey, isToday, resolveServiceLabel, HOURS, parseHour, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel } from './calendar-utils';
+import { formatKey, isToday, resolveServiceLabel, HOURS, parseHour, getCalendarTone, getCalendarToneClasses, getCalendarEconomicRiskClasses, summarizeCalendarEconomicRisk, selectCalendarEconomicRiskBooking, formatCalendarEconomicRiskActionReason, resolveCalendarEconomicRiskActionHash, formatCalendarEconomicRiskSummary, resolveWorkTimeLabel } from './calendar-utils';
 
 type CalendarLayer = 'bookings' | 'blocks' | 'leads' | 'tasks' | 'social' | 'followUps';
 
@@ -42,6 +43,10 @@ export default function CalendarDayClient() {
     return data.days[dateKey];
   }, [data, dateKey]);
   const dayLeads = dayData.leads ?? [];
+  const dayEconomicRisk = summarizeCalendarEconomicRisk(dayData);
+  const dayEconomicRiskBooking = selectCalendarEconomicRiskBooking(dayData);
+  const dayEconomicRiskReason = formatCalendarEconomicRiskActionReason(dayEconomicRiskBooking);
+  const dayEconomicRiskHash = resolveCalendarEconomicRiskActionHash(dayEconomicRiskBooking);
 
   const isBlocked = dayData.bloqueos.length > 0;
   const isTodayDate = isToday(currentDate);
@@ -300,6 +305,11 @@ export default function CalendarDayClient() {
                                 <>
                                   <span className="font-medium">{resolveServiceLabel(b)}</span>
                                   {b.clientName && <span className=" ml-2">{b.clientName}</span>}
+                                  {b.economicRisk && (
+                                    <span className={`ml-2 rounded border px-1.5 py-0.5 font-semibold ${getCalendarEconomicRiskClasses(b.economicRisk)}`}>
+                                      {b.economicRisk.label}
+                                    </span>
+                                  )}
                                 </>
                               )}
                             </Link>
@@ -322,6 +332,11 @@ export default function CalendarDayClient() {
                       >
                         <span className="text-sm font-medium">{resolveServiceLabel(b)}</span>
                         {b.clientName && <span className="text-xs  ml-2">{b.clientName}</span>}
+                        {b.economicRisk && (
+                          <div className={`mt-1 rounded border px-2 py-1 text-xs font-semibold ${getCalendarEconomicRiskClasses(b.economicRisk)}`}>
+                            Risc econòmic · {b.economicRisk.label}
+                          </div>
+                        )}
                       </Link>
                     ))}
                   </div>
@@ -351,6 +366,20 @@ export default function CalendarDayClient() {
                 <div className="flex justify-between">
                   <span className="">Feina pendent</span>
                   <span className="font-medium">{(visibleLayers.tasks ? dayData.tasks.length : 0) + (visibleLayers.social ? dayData.socialPosts.length : 0) + (visibleLayers.followUps ? dayData.followUps.length : 0)}</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span className="">Risc econòmic</span>
+                  <div className={`text-right font-medium ${dayEconomicRisk.critical > 0 ? 'admin-tone-text-danger' : dayEconomicRisk.total > 0 ? 'admin-tone-text-warning' : ''}`}>
+                    <span>{visibleLayers.bookings ? formatCalendarEconomicRiskSummary(dayEconomicRisk) : 'Cap'}</span>
+                    {visibleLayers.bookings && dayEconomicRiskReason && (
+                      <span className="mt-0.5 block text-xs opacity-80">Motiu: {dayEconomicRiskReason}</span>
+                    )}
+                    {visibleLayers.bookings && dayEconomicRiskBooking && (
+                      <Link href={buildBookingHref(dayEconomicRiskBooking.id, dayEconomicRiskHash)} className="mt-0.5 block text-xs text-[var(--gold)] no-underline hover:text-[var(--gold-bright)]">
+                        Obrir reserva amb risc →
+                      </Link>
+                    )}
+                  </div>
                 </div>
                 <div className="flex justify-between">
                   <span className="">Estat</span>
@@ -406,7 +435,7 @@ export default function CalendarDayClient() {
                     </Link>
                   ))}
                   {visibleLayers.social && dayData.socialPosts.map((post) => (
-                    <Link key={post.id} href="/admin/social" className="block rounded-xl border px-3 py-2 admin-tone-soft-warning">
+                    <Link key={post.id} href={buildSocialWorkspaceHref(post.id)} className="block rounded-xl border px-3 py-2 admin-tone-soft-warning">
                       <div className="truncate text-sm font-medium">📣 {post.title}</div>
                       <div className="mt-1 text-xs opacity-70">{resolveWorkTimeLabel(post.scheduledAt)} · {post.platforms.join(', ')}</div>
                     </Link>
@@ -463,6 +492,11 @@ export default function CalendarDayClient() {
                     <p className="text-xs  mt-1">
                       {b.eventStartTime}{b.eventEndTime ? ` – ${b.eventEndTime}` : ''}
                     </p>
+                  )}
+                  {b.economicRisk && (
+                    <div className={`mt-3 rounded-lg border px-2 py-1 text-xs font-semibold ${getCalendarEconomicRiskClasses(b.economicRisk)}`}>
+                      Risc econòmic · {b.economicRisk.label}
+                    </div>
                   )}
                 </Link>
               );

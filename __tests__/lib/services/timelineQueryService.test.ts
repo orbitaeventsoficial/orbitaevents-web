@@ -68,6 +68,46 @@ describe('mapCustomerActivityToCanonicalEvent', () => {
     expect(event.timelineType).toBe('ACTIVITY');
     expect(event.title).toBe('UNKNOWN_XYZ');
   });
+
+  it('mapeja decisio post-event registrada amb lectura humana', () => {
+    const event = mapCustomerActivityToCanonicalEvent({
+      id: 'ca-post',
+      action: 'POST_EVENT_RECURRENCE_DECIDED',
+      createdAt: new Date('2026-01-01T10:00:00Z'),
+      details: {
+        actionKey: 'testimonial',
+        bookingRef: 'OE-2026-001',
+        safety: 'DECIDED_NOT_SENT',
+        draft: 'Hola Maria, em deixaries un testimoni curt?',
+      },
+    });
+
+    expect(event.title).toBe('Testimoni sol.licitat');
+    expect(event.body).toContain('Ref. OE-2026-001');
+    expect(event.body).toContain('Registrat, no enviat');
+    expect(event.timelineType).toBe('ACTIVITY');
+    expect(event.metadata).toMatchObject({ actionKey: 'testimonial' });
+  });
+
+  it('mapeja esborrany social post-event sense exposar codis interns', () => {
+    const event = mapCustomerActivityToCanonicalEvent({
+      id: 'ca-social',
+      action: 'POST_EVENT_RECURRENCE_DECIDED',
+      createdAt: new Date('2026-01-01T10:00:00Z'),
+      details: {
+        actionKey: 'social_post',
+        bookingRef: 'OE-2026-002',
+        safety: 'DRAFT_NOT_PUBLISHED',
+        socialPostId: 'social-1',
+        draft: 'Bolo pendent de revisar abans de publicar.',
+      },
+    });
+
+    expect(event.title).toBe('Social preparat');
+    expect(event.body).toContain('Esborrany social, no publicat');
+    expect(event.body).toContain('Esborrany social social-1');
+    expect(event.body).not.toContain('DRAFT_NOT_PUBLISHED');
+  });
 });
 
 describe('mapLeadActivityToCanonicalEvent', () => {
@@ -147,6 +187,88 @@ describe('mapAdminLogToCanonicalEvent', () => {
     });
     expect(event.timelineType).toBe('PROPOSAL_SENT');
     expect(event.title).toBe('Pressupost enviat');
+  });
+
+  it('mapeja traça documental de pressupost enviat amb body reconstruible', () => {
+    const event = mapAdminLogToCanonicalEvent({
+      id: 'al-prop-doc',
+      action: 'DOCUMENT_PROPOSAL_SENT',
+      entity: 'proposal',
+      entityId: 'prop-1',
+      details: {
+        documentType: 'PROPOSAL',
+        source: 'admin_proposal_send',
+        reference: 'OE-Q-2026-001',
+        proposalReference: 'OE-Q-2026-001',
+        total: 1500,
+        to: 'maria@test.com',
+      },
+      createdAt: new Date('2026-01-01T10:00:00Z'),
+      userId: null,
+    });
+
+    expect(event.title).toBe('Pressupost enviat');
+    expect(event.body).toBe('Ref. OE-Q-2026-001 · a maria@test.com · 1500.00 EUR · admin_proposal_send');
+    expect(event.timelineType).toBe('PROPOSAL_SENT');
+    expect(event.link?.label).toBe('Obrir pressupost');
+    expect(event.link?.href).toBe('/admin/presupuestos?proposalId=prop-1');
+  });
+
+  it('mapeja traça documental de contracte amb CTA especific', () => {
+    const event = mapAdminLogToCanonicalEvent({
+      id: 'al-contract-doc',
+      action: 'DOCUMENT_CONTRACT_SENT',
+      entity: 'proposal',
+      entityId: 'prop-2',
+      details: {
+        documentType: 'CONTRACT',
+        source: 'admin_contract_send',
+        reference: 'CTR-2026-001',
+        contractReference: 'CTR-2026-001',
+        to: 'maria@test.com',
+      },
+      createdAt: new Date('2026-01-01T10:00:00Z'),
+      userId: null,
+    });
+
+    expect(event.title).toBe('Contracte enviat');
+    expect(event.body).toBe('Ref. CTR-2026-001 · a maria@test.com · admin_contract_send');
+    expect(event.timelineType).toBe('ACTIVITY');
+    expect(event.link).toEqual({
+      label: 'Obrir contracte',
+      href: '/admin/presupuestos?proposalId=prop-2',
+    });
+  });
+
+  it('mapeja traça documental de dossier amb origen i CTA de dossiers', () => {
+    const event = mapAdminLogToCanonicalEvent({
+      id: 'al-dossier-doc',
+      action: 'DOCUMENT_DOSSIER_SENT',
+      entity: 'dossier',
+      entityId: 'dos-1',
+      details: {
+        documentType: 'DOSSIER',
+        source: 'dossier_email_send',
+        dossierId: 'dos-1',
+        leadId: 'lead-1',
+        customerId: 'cust-1',
+        to: 'joan@test.com',
+      },
+      createdAt: new Date('2026-01-01T10:00:00Z'),
+      userId: null,
+    });
+
+    expect(event.title).toBe('Dossier enviat');
+    expect(event.body).toBe('a joan@test.com · dossier_email_send');
+    expect(event.link).toEqual({
+      label: 'Obrir dossiers',
+      href: '/admin/dossiers',
+    });
+    expect(event.metadata).toMatchObject({
+      dossierId: 'dos-1',
+      leadId: 'lead-1',
+      customerId: 'cust-1',
+    });
   });
 
   it('mapeja PAYMENT_RECORDED de Stripe com a activitat de reserva llegible', () => {
@@ -296,7 +418,9 @@ describe('fetchCanonicalEventsForCustomer', () => {
     const adminLogCall = mockPrisma.adminLog.findMany.mock.calls[0][0];
     expect(adminLogCall.where.OR).toEqual([
       { entity: 'customer', entityId: 'cust-1' },
+      { entity: 'dossier', details: { path: ['customerId'], equals: 'cust-1' } },
       { entity: 'lead', entityId: { in: ['lead-1'] } },
+      { entity: 'dossier', details: { path: ['leadId'], equals: 'lead-1' } },
       { entity: 'booking', entityId: { in: ['booking-1'] } },
     ]);
   });
@@ -380,7 +504,14 @@ describe('fetchCanonicalEventsForLead', () => {
       expect.objectContaining({ where: { leadId: 'lead-1' } })
     );
     expect(mockPrisma.adminLog.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { entity: 'lead', entityId: 'lead-1' } })
+      expect.objectContaining({
+        where: {
+          OR: [
+            { entity: 'lead', entityId: 'lead-1' },
+            { entity: 'dossier', details: { path: ['leadId'], equals: 'lead-1' } },
+          ],
+        },
+      })
     );
   });
 
@@ -693,7 +824,19 @@ describe('fetchCanonicalAdminActivityPage', () => {
     expect(mockPrisma.adminLog.findMany).toHaveBeenCalledWith({
       where: {
         createdAt: { gte: new Date('2025-12-31T00:00:00Z') },
-        action: { in: ['COMM_SENT', 'COMM_RESPONDED', 'COMM_SEQUENCE_EXEC', 'COMM_SEQUENCE_BATCH', 'SEND_POST_EVENT_EMAIL', 'PAYMENT_REMINDER_SENT'] },
+        action: {
+          in: [
+            'COMM_SENT',
+            'COMM_RESPONDED',
+            'COMM_SEQUENCE_EXEC',
+            'COMM_SEQUENCE_BATCH',
+            'SEND_POST_EVENT_EMAIL',
+            'PAYMENT_REMINDER_SENT',
+            'DOCUMENT_PROPOSAL_SENT',
+            'DOCUMENT_DOSSIER_SENT',
+            'DOCUMENT_CONTRACT_SENT',
+          ],
+        },
       },
       orderBy: { createdAt: 'desc' },
       skip: 25,

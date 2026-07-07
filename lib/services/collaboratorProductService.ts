@@ -20,6 +20,8 @@ export type CollaboratorProductInput = {
   includes?: string | null;
   sortOrder?: number | string | null;
   isActive?: boolean | null;
+  visibleInDossier?: boolean | null;
+  visibleInBooking?: boolean | null;
 };
 
 type CollaboratorProductForDossier = {
@@ -35,6 +37,8 @@ type CollaboratorProductForDossier = {
   imageUrl: string | null;
   includes: string | null;
   sortOrder: number;
+  visibleInDossier?: boolean;
+  visibleInBooking?: boolean;
   collaborator: {
     name: string;
     company: string | null;
@@ -89,15 +93,6 @@ function splitIncludes(value?: string | null): string[] {
     .filter(Boolean);
 }
 
-function normalizeCatalogName(value: string): string {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
-}
-
 /**
  * Marques/noms de prove\u00efdor que MAI poden apar\u00e8ixer al text client-facing del
  * dossier: tot es presenta com a \u00d2rbita. S'apliquen a descripcions, inclou i
@@ -126,29 +121,6 @@ export function stripProviderBrand(text: string): string {
     .replace(/^\s*\u00b7\s*/, '')
     .replace(/\s*\u00b7\s*$/, '')
     .trim();
-}
-
-function isMasqueradeProduct(product: CollaboratorProductForDossier): boolean {
-  const collaboratorName = product.collaborator.company || product.collaborator.name;
-  return normalizeCatalogName(collaboratorName).includes('masquerade');
-}
-
-function shouldShowDossierCollaboratorProduct(product: CollaboratorProductForDossier): boolean {
-  if (!isMasqueradeProduct(product)) return true;
-  // Productes de Masquerade ofertables al dossier (noms canònics). Inclou els
-  // extres (pintacares, globoflèxia): ara són seleccionables al generador i entren
-  // al pressupost desglossat com a línia.
-  const name = normalizeCatalogName(product.name);
-  return [
-    'animacio tematica',
-    'animacio amb personatge',
-    'el secret dels pirates',
-    'animacio adults 1h',
-    'bingo musical',
-    'batalla musical',
-    'pintacares professional',
-    'globoflexia',
-  ].includes(name);
 }
 
 function dossierProductDisplayName(product: CollaboratorProductForDossier): string {
@@ -225,6 +197,7 @@ export async function listDossierCollaboratorProducts(): Promise<DossierCollabor
   const products = await prisma.collaboratorProduct.findMany({
     where: {
       isActive: true,
+      visibleInDossier: true,
       collaborator: { isActive: true },
     },
     include: {
@@ -238,14 +211,13 @@ export async function listDossierCollaboratorProducts(): Promise<DossierCollabor
   });
 
   return products
-    .filter(shouldShowDossierCollaboratorProduct)
     .map(collaboratorProductToDossierProduct);
 }
 
 /** Productes actius de partners actius, format pla per a l'editor de línies de reserva. */
 export async function listActiveCollaboratorProductsForBooking() {
   const products = await prisma.collaboratorProduct.findMany({
-    where: { isActive: true, collaborator: { isActive: true } },
+    where: { isActive: true, visibleInBooking: true, collaborator: { isActive: true } },
     include: { collaborator: { select: { name: true, company: true, roles: true } } },
     orderBy: [{ collaborator: { company: 'asc' } }, { sortOrder: 'asc' }, { createdAt: 'asc' }],
   });
@@ -259,6 +231,8 @@ export async function listActiveCollaboratorProductsForBooking() {
     collaboratorId: p.collaboratorId,
     collaboratorName: p.collaborator.company || p.collaborator.name,
     roles: p.collaborator.roles,
+    visibleInDossier: p.visibleInDossier,
+    visibleInBooking: p.visibleInBooking,
   }));
 }
 
@@ -272,6 +246,7 @@ export async function getDossierCollaboratorProductsByIds(productIds: string[]):
     where: {
       id: { in: ids },
       isActive: true,
+      visibleInDossier: true,
       collaborator: { isActive: true },
     },
     include: {
@@ -316,6 +291,9 @@ export async function createCollaboratorProduct(collaboratorId: string, input: C
       imageUrl: clean(input.imageUrl),
       includes: clean(input.includes),
       sortOrder: sanitizeSortOrder(input.sortOrder),
+      isActive: input.isActive ?? true,
+      visibleInDossier: input.visibleInDossier ?? true,
+      visibleInBooking: input.visibleInBooking ?? true,
     },
   });
 
@@ -348,6 +326,8 @@ export async function updateCollaboratorProduct(productId: string, input: Collab
       ...(input.includes !== undefined && { includes: clean(input.includes) }),
       ...(input.sortOrder !== undefined && { sortOrder: sanitizeSortOrder(input.sortOrder) }),
       ...(input.isActive !== undefined && { isActive: Boolean(input.isActive) }),
+      ...(input.visibleInDossier !== undefined && { visibleInDossier: Boolean(input.visibleInDossier) }),
+      ...(input.visibleInBooking !== undefined && { visibleInBooking: Boolean(input.visibleInBooking) }),
     },
   });
 

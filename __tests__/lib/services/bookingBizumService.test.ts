@@ -25,8 +25,12 @@ const TOKEN = 'test-token';
 
 const baseBooking = {
   id: BOOKING_ID,
+  total: 1000,
+  depositAmount: 300,
+  remainingAmount: 700,
   depositPaid: false,
   remainingPaid: false,
+  cashAmount: null,
   depositBizumDeclaredAt: null,
   remainingBizumDeclaredAt: null,
 };
@@ -56,6 +60,25 @@ describe('declareBizumPayment', () => {
     mockPrisma.booking.findUnique.mockResolvedValue({ ...baseBooking, depositPaid: true });
     const result = await declareBizumPayment({ rawToken: TOKEN, paymentType: 'deposit' });
     expect(result).toEqual({ ok: false, reason: 'ALREADY_PAID' });
+  });
+
+  it('retorna ALREADY_PAID si cashAmount ja cobreix el dipòsit', async () => {
+    mockFindPortalAccess.mockResolvedValue({ id: 'access-1', bookingId: BOOKING_ID });
+    mockPrisma.booking.findUnique.mockResolvedValue({ ...baseBooking, cashAmount: 300 });
+    const result = await declareBizumPayment({ rawToken: TOKEN, paymentType: 'deposit' });
+    expect(result).toEqual({ ok: false, reason: 'ALREADY_PAID' });
+    expect(mockPrisma.booking.update).not.toHaveBeenCalled();
+  });
+
+  it('permet declarar Bizum si cashAmount nomes redueix parcialment el dipòsit', async () => {
+    mockFindPortalAccess.mockResolvedValue({ id: 'access-1', bookingId: BOOKING_ID });
+    mockPrisma.booking.findUnique.mockResolvedValue({ ...baseBooking, cashAmount: 100 });
+    const result = await declareBizumPayment({ rawToken: TOKEN, paymentType: 'deposit' });
+    expect(result).toEqual({ ok: true });
+    expect(mockPrisma.booking.update).toHaveBeenCalledWith({
+      where: { id: BOOKING_ID },
+      data: expect.objectContaining({ depositBizumDeclaredAt: expect.any(Date) }),
+    });
   });
 
   it('retorna ALREADY_DECLARED si ja hi havia declaració pendent', async () => {
@@ -90,6 +113,14 @@ describe('declareBizumPayment', () => {
       data: expect.objectContaining({ remainingBizumDeclaredAt: expect.any(Date) }),
     });
   });
+
+  it('retorna ALREADY_PAID si cashAmount cobreix tot el pendent de resta', async () => {
+    mockFindPortalAccess.mockResolvedValue({ id: 'access-1', bookingId: BOOKING_ID });
+    mockPrisma.booking.findUnique.mockResolvedValue({ ...baseBooking, cashAmount: 1000 });
+    const result = await declareBizumPayment({ rawToken: TOKEN, paymentType: 'remaining' });
+    expect(result).toEqual({ ok: false, reason: 'ALREADY_PAID' });
+    expect(mockPrisma.booking.update).not.toHaveBeenCalled();
+  });
 });
 
 describe('confirmBizumPayment', () => {
@@ -103,6 +134,17 @@ describe('confirmBizumPayment', () => {
     mockPrisma.booking.findUnique.mockResolvedValue({ ...baseBooking, depositPaid: true });
     const result = await confirmBizumPayment({ bookingId: BOOKING_ID, paymentType: 'deposit' });
     expect(result).toEqual({ ok: false, reason: 'ALREADY_PAID' });
+  });
+
+  it('retorna ALREADY_PAID si cashAmount ja ha liquidat el dipòsit declarat', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({
+      ...baseBooking,
+      cashAmount: 300,
+      depositBizumDeclaredAt: new Date(),
+    });
+    const result = await confirmBizumPayment({ bookingId: BOOKING_ID, paymentType: 'deposit' });
+    expect(result).toEqual({ ok: false, reason: 'ALREADY_PAID' });
+    expect(mockPrisma.booking.update).not.toHaveBeenCalled();
   });
 
   it('retorna NO_DECLARATION si no hi havia declaració prèvia', async () => {
@@ -143,5 +185,16 @@ describe('confirmBizumPayment', () => {
         remainingBizumDeclaredAt: null,
       },
     });
+  });
+
+  it('retorna ALREADY_PAID si cashAmount ja ha liquidat la resta declarada', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({
+      ...baseBooking,
+      cashAmount: 1000,
+      remainingBizumDeclaredAt: new Date(),
+    });
+    const result = await confirmBizumPayment({ bookingId: BOOKING_ID, paymentType: 'remaining' });
+    expect(result).toEqual({ ok: false, reason: 'ALREADY_PAID' });
+    expect(mockPrisma.booking.update).not.toHaveBeenCalled();
   });
 });

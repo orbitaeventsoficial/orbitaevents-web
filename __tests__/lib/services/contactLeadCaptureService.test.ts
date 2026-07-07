@@ -45,6 +45,7 @@ const baseInput = {
   clientPhone: '612345678',
   eventType: 'WEDDING' as const,
   eventDate: '2026-06-15',
+  eventLocation: 'Barcelona',
   guestCount: 150,
   estimatedPrice: 2500,
   message: 'Vull la millor festa!',
@@ -79,6 +80,7 @@ describe('persistContactLead', () => {
         data: expect.objectContaining({
           name: 'Joan Garcia',
           email: 'joan@example.com',
+          eventLocation: 'Barcelona',
           status: 'NEW',
           priority: 'MEDIUM',
         }),
@@ -96,6 +98,7 @@ describe('persistContactLead', () => {
       id: 'lead-existing',
       phone: '600000000',
       eventDate: null,
+      eventLocation: null,
       guestCount: null,
       budget: null,
       message: null,
@@ -119,6 +122,7 @@ describe('persistContactLead', () => {
           name: 'Joan Garcia',
           phone: '612345678',
           eventType: 'WEDDING',
+          eventLocation: 'Barcelona',
         }),
       }),
     );

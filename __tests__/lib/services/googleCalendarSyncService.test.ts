@@ -43,6 +43,7 @@ const mockBooking = {
   notes: 'Notes test',
   status: 'CONFIRMED',
   total: 2000,
+  cashAmount: null,
   depositPaid: true,
   remainingPaid: false,
 };
@@ -165,6 +166,43 @@ describe('syncBookingToGoogleCalendar', () => {
 
     // Descripció inclou resum d'alarmes
     expect(capturedPayload!.description).toContain('Alarmes:');
+
+    delete process.env.GOOGLE_OAUTH_CLIENT_ID;
+    delete process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+  });
+
+  it('marca cobrament complet al calendari si cashAmount cobreix el total', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({
+      ...mockBooking,
+      depositPaid: false,
+      remainingPaid: false,
+      cashAmount: 2000,
+    });
+    mockPrisma.setting.findMany.mockResolvedValue([
+      { key: 'integrations.googleCalendar.refreshToken', value: 'rt123' },
+      { key: 'integrations.googleCalendar.calendarId', value: 'cal1' },
+    ]);
+
+    let capturedPayload: Record<string, unknown> | undefined;
+    globalThis.fetch = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ access_token: 'at123' }),
+      })
+      .mockImplementationOnce((_url, init) => {
+        capturedPayload = JSON.parse(String((init as RequestInit).body));
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ id: 'gcal-event-cash' }),
+        });
+      });
+
+    process.env.GOOGLE_OAUTH_CLIENT_ID = 'test-id';
+    process.env.GOOGLE_OAUTH_CLIENT_SECRET = 'test-secret';
+
+    await syncBookingToGoogleCalendar('b1');
+
+    expect(capturedPayload?.description).toContain('Cobrament: Pagament complet');
 
     delete process.env.GOOGLE_OAUTH_CLIENT_ID;
     delete process.env.GOOGLE_OAUTH_CLIENT_SECRET;

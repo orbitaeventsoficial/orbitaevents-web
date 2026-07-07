@@ -87,14 +87,15 @@ export default function BookingFieldNotesComposer({ bookingId }: { bookingId: st
           type="button"
           onClick={handlePickPhoto}
           disabled={sending}
+          aria-invalid={error ? true : undefined}
           className="ap-btn ap-btn--primary ap-btn--xs"
         >
           {sending ? 'Guardant...' : '+ Foto'}
         </button>
       </div>
 
-      {error && <p className="col-span-full m-0 rounded-[var(--o-r-md)] border border-[var(--ax-danger-border)] px-2.5 py-1.5 text-xs font-bold text-[var(--o-danger)]">{error}</p>}
-      {success && <p className="col-span-full m-0 rounded-[var(--o-r-md)] border border-[var(--ax-success-border)] px-2.5 py-1.5 text-xs font-bold text-[var(--o-success)]">{success}</p>}
+      {error && <p role="alert" className="col-span-full m-0 rounded-[var(--o-r-md)] border border-[var(--ax-danger-border)] px-2.5 py-1.5 text-xs font-bold text-[var(--o-danger)]">{error}</p>}
+      {success && <p role="status" className="col-span-full m-0 rounded-[var(--o-r-md)] border border-[var(--ax-success-border)] px-2.5 py-1.5 text-xs font-bold text-[var(--o-success)]">{success}</p>}
     </section>
   );
 }

@@ -24,6 +24,8 @@ interface PartnerProductOption {
   collaboratorId: string;
   collaboratorName: string;
   roles: string[];
+  visibleInDossier?: boolean;
+  visibleInBooking?: boolean;
 }
 
 interface BookingServiceLinesSectionProps {
@@ -67,6 +69,7 @@ const ITEM = 'flex w-full items-center justify-between gap-2 border-t border-[co
 const ITEM_NAME = 'min-w-0 overflow-hidden text-ellipsis whitespace-nowrap';
 const ITEM_PRICE = 'shrink-0 font-semibold tabular-nums text-[var(--gold)]';
 const GHOST_BTN = 'min-h-9 self-start rounded-[var(--o-r-sm)] border border-dashed border-[var(--line)] bg-transparent px-3.5 text-xs font-semibold text-[var(--t2)] transition-colors hover:border-[var(--gold)] hover:text-[var(--gold)]';
+const PARTNER_PRODUCTS_LOAD_ERROR = 'No s’han pogut carregar els productes de proveïdors externs.';
 
 function packLabel(pack: BookingPack): string {
   return pack.translations?.[0]?.name || pack.slug;
@@ -109,12 +112,33 @@ export default function BookingServiceLinesSection({
 }: BookingServiceLinesSectionProps) {
   const packsEnabled = !!onPackSelect;
   const [partnerProducts, setPartnerProducts] = useState<PartnerProductOption[]>([]);
+  const [partnerProductsError, setPartnerProductsError] = useState('');
 
   useEffect(() => {
-    fetch('/api/admin/collaborator-products', { headers: { 'x-admin': '1' } })
-      .then((r) => r.json())
-      .then((d) => { if (d?.ok && Array.isArray(d.products)) setPartnerProducts(d.products); })
-      .catch((e) => console.error('[ServiceLines] Error carregant productes', e));
+    let cancelled = false;
+    async function loadPartnerProducts() {
+      try {
+        setPartnerProductsError('');
+        const res = await fetch('/api/admin/collaborator-products', { headers: { 'x-admin': '1' } });
+        const data = (await res.json().catch(() => ({}))) as { ok?: boolean; products?: PartnerProductOption[]; error?: string; message?: string };
+        if (!res.ok || !data?.ok || !Array.isArray(data.products)) {
+          throw new Error(data.error || data.message || PARTNER_PRODUCTS_LOAD_ERROR);
+        }
+        if (!cancelled) {
+          setPartnerProducts(data.products);
+        }
+      } catch (error) {
+        console.error('[ServiceLines] Error carregant productes', error);
+        if (!cancelled) {
+          setPartnerProducts([]);
+          setPartnerProductsError(error instanceof Error ? error.message : PARTNER_PRODUCTS_LOAD_ERROR);
+        }
+      }
+    }
+    void loadPartnerProducts();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const update = (idx: number, patch: Partial<BookingServiceLineFormInput>) => {
@@ -218,6 +242,9 @@ export default function BookingServiceLinesSection({
   const soundTechPayers = Array.from(
     new Map(partnerProducts.map((p) => [p.collaboratorId, p.collaboratorName])).entries()
   ).map(([id, name]) => ({ id, name }));
+  const productCatalogPriceLabel = (p: PartnerProductOption) => (
+    p.sellPrice > 0 ? `${p.sellPrice}€` : p.costPrice > 0 && p.visibleInDossier === false ? `cost ${p.costPrice}€` : '0€'
+  );
   const linesTotal = lines.reduce((s, l) => s + (l.revenueAmount || 0) * (l.quantity || 1), 0);
   const baseLinesTotal = baseLines.reduce((s, l) => s + (l.revenueAmount || 0) * (l.quantity || 1), 0);
   const boloTotal = packPrice + baseLinesTotal + linesTotal;
@@ -433,6 +460,12 @@ export default function BookingServiceLinesSection({
             </div>
           </details>
 
+          {partnerProductsError && (
+            <div className="ap-inline-alert ap-inline-alert--danger" role="alert">
+              {partnerProductsError}
+            </div>
+          )}
+
           {/* 3. Proveïdors externs — un desplegable per proveïdor, tancat per
               defecte (no surt fins que el cliques). El nom apareix un sol cop. */}
           {Object.keys(partnersByName).length > 0 && (
@@ -445,7 +478,7 @@ export default function BookingServiceLinesSection({
                 {prods.map((p) => (
                   <button type="button" key={p.id} className={ITEM} onClick={() => addPartnerProduct(p.id)}>
                     <span className={ITEM_NAME}>{p.name}</span>
-                    <span className={ITEM_PRICE}>{p.sellPrice}€</span>
+                    <span className={ITEM_PRICE}>{productCatalogPriceLabel(p)}</span>
                   </button>
                 ))}
               </div>

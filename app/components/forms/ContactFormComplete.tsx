@@ -21,6 +21,7 @@ import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { trackLead, trackCTAClick } from '@/lib/analytics';
+import { formatLocalDateInputValue } from '@/lib/date-input';
 import TurnstileWidget from '@/components/security/TurnstileWidget';
 import { useUtmParams } from '@/lib/hooks/useUtmParams';
 
@@ -152,7 +153,7 @@ export default function ContactFormComplete({
 
   // Set minDate on client to avoid hydration mismatch
   useEffect(() => {
-    setMinDate(new Date().toISOString().split('T')[0]);
+    setMinDate(formatLocalDateInputValue());
   }, []);
 
   // Update form
@@ -214,7 +215,10 @@ export default function ContactFormComplete({
     const controller = new AbortController();
     timeoutId = setTimeout(() => controller.abort(), 15000);
 
-  try {
+    try {
+      const pathSegments = window.location.pathname.split('/').filter(Boolean);
+      const pageLocale = ['ca', 'es', 'en'].includes(pathSegments[0]) ? pathSegments[0] : undefined;
+
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -229,6 +233,7 @@ export default function ContactFormComplete({
           eventStartTime: formData.eventStartTime || undefined,
           eventEndTime: formData.eventEndTime || undefined,
           location: formData.location,
+          locale: pageLocale,
           message: formData.message,
           timestamp: new Date().toISOString(),
           source: 'contact-form-complete',

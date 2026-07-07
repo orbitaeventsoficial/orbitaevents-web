@@ -9,6 +9,7 @@ import {
   drawAllPageFooters,
 } from '@/lib/pdf-header';
 import type { ExecutiveReport } from '@/lib/services/executiveReportService';
+import { generateReportingInsights } from '@/lib/services/reportingInsightsService';
 
 type RGB = [number, number, number];
 type jsPDFType = import('jspdf').jsPDF;
@@ -261,6 +262,65 @@ interface KpiItem {
   accent?: RGB;
 }
 
+export type ExecutiveReportPdfDecision = {
+  area: string;
+  headline: string;
+  detail: string;
+  ctaLabel: string;
+};
+
+export function buildExecutiveReportPdfDecision(report: ExecutiveReport): ExecutiveReportPdfDecision {
+  const insight = generateReportingInsights(report)[0];
+  if (insight) {
+    return {
+      area: insight.area,
+      headline: insight.headline,
+      detail: insight.detail,
+      ctaLabel: insight.ctaLabel,
+    };
+  }
+
+  return {
+    area: 'Seguiment',
+    headline: 'Cap bloqueig crític detectat',
+    detail: 'El reporting no mostra una alarma principal. Mantén el seguiment de marge, embut i recurrència abans d\'escalar pressupost o volum.',
+    ctaLabel: 'Mantenir revisió',
+  };
+}
+
+function drawDecisionBlock(doc: jsPDFType, y: number, decision: ExecutiveReportPdfDecision): number {
+  const headlineLines = doc.splitTextToSize(decision.headline, PDF_DESIGN.width - 18).slice(0, 2);
+  const detailLines = doc.splitTextToSize(decision.detail, PDF_DESIGN.width - 18).slice(0, 3);
+  const h = 18 + headlineLines.length * 5.2 + detailLines.length * 4.8 + 8;
+
+  doc.setFillColor(...COLORS.white);
+  doc.setDrawColor(...COLORS.gold);
+  doc.setLineWidth(0.35);
+  doc.roundedRect(PDF_DESIGN.left, y, PDF_DESIGN.width, h, 1.8, 1.8, 'FD');
+  doc.setFillColor(...COLORS.gold);
+  doc.rect(PDF_DESIGN.left, y, 2.4, h, 'F');
+
+  setStyleLabel(doc);
+  doc.setTextColor(...COLORS.gold);
+  doc.text('DECISIÓ RECOMANADA', PDF_DESIGN.left + 7, y + 7, { charSpace: 0.5 });
+  doc.setTextColor(...COLORS.paperMuted);
+  doc.text(decision.area.toUpperCase(), PDF_DESIGN.right - 4, y + 7, { align: 'right', charSpace: 0.4 });
+
+  setStyleValue(doc);
+  doc.setTextColor(...COLORS.paperText);
+  doc.text(headlineLines, PDF_DESIGN.left + 7, y + 15);
+
+  setStyleBody(doc);
+  doc.setTextColor(...COLORS.paperMuted);
+  doc.text(detailLines, PDF_DESIGN.left + 7, y + 18 + headlineLines.length * 5.2);
+
+  setStyleCaption(doc);
+  doc.setTextColor(...COLORS.gold);
+  doc.text(`Acció: ${decision.ctaLabel}`, PDF_DESIGN.left + 7, y + h - 4);
+
+  return y + h + PDF_DESIGN.blockGap;
+}
+
 function drawKpiStrip(
   doc: jsPDFType,
   y: number,
@@ -409,6 +469,7 @@ export async function exportExecutiveReportPdf(report: ExecutiveReport): Promise
     subtitle: `Període: ${periodLabel}`,
     ref: `Generat ${genDate}`,
   });
+  y = drawDecisionBlock(doc, y, buildExecutiveReportPdfDecision(report));
 
   // ── KPI Strip ────────────────────────────────────────────────────────────
   const kpis: KpiItem[] = [

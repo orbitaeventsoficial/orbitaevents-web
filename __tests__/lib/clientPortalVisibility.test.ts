@@ -31,6 +31,19 @@ describe('getClientPortalVisibility', () => {
     });
   });
 
+  it('ignora flags legacy que no siguin booleans', () => {
+    expect(getClientPortalVisibility({
+      showPayments: 'false',
+      showTimeline: 0,
+    })).toEqual({
+      payments: true,
+      timeline: true,
+      documents: true,
+      postEvent: true,
+      questionnaire: true,
+    });
+  });
+
   it('deriva els elements amagats de la nav inferior des del mateix contracte', () => {
     const visibility = getClientPortalVisibility({
       showPayments: false,

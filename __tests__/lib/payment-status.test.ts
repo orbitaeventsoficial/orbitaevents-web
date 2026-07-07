@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  bookingOutstandingAmount, getPaymentBand, getPaymentLabel, getPaymentTextClass, getPaymentDotClass,
+  bookingOutstandingAmount, bookingOutstandingBreakdown, getPaymentBand, getPaymentLabel, getPaymentTextClass, getPaymentDotClass,
 } from '@/lib/payment-status';
 
 describe('payment-status — estat de pagament canònic', () => {
@@ -79,5 +79,33 @@ describe('payment-status — estat de pagament canònic', () => {
       depositPaid: true,
       remainingPaid: false,
     })).toBe(0);
+  });
+
+  it('bookingOutstandingBreakdown reparteix efectiu sobre bestreta i resta pendents', () => {
+    expect(bookingOutstandingBreakdown({
+      total: 500,
+      depositAmount: 100,
+      remainingAmount: 400,
+      depositPaid: false,
+      remainingPaid: false,
+      cashAmount: 125,
+    })).toEqual({
+      depositAmount: 0,
+      remainingAmount: 375,
+      total: 375,
+    });
+
+    expect(bookingOutstandingBreakdown({
+      total: 500,
+      depositAmount: 100,
+      remainingAmount: 400,
+      depositPaid: true,
+      remainingPaid: false,
+      cashAmount: 150,
+    })).toEqual({
+      depositAmount: 0,
+      remainingAmount: 250,
+      total: 250,
+    });
   });
 });

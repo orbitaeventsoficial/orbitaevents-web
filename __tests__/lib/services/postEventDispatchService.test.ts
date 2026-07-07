@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockPrisma, mockSendEmail } = vi.hoisted(() => ({
+const { mockPrisma, mockSendEmail, mockGetBookingQuestionnaire, mockIssueClientPortalAccess } = vi.hoisted(() => ({
   mockPrisma: {
     booking: {
       findMany: vi.fn(),
@@ -9,6 +9,8 @@ const { mockPrisma, mockSendEmail } = vi.hoisted(() => ({
     },
   },
   mockSendEmail: vi.fn(),
+  mockGetBookingQuestionnaire: vi.fn(),
+  mockIssueClientPortalAccess: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
@@ -40,8 +42,18 @@ vi.mock('@/lib/services/customerActivityService', () => ({
 vi.mock('@/lib/services/bookingCommunicationLogService', () => ({
   recordBookingCommunicationLog: vi.fn(),
 }));
+vi.mock('@/lib/services/questionnaireService', () => ({
+  getBookingQuestionnaire: mockGetBookingQuestionnaire,
+}));
+vi.mock('@/lib/services/clientPortalAccess', () => ({
+  issueClientPortalAccess: mockIssueClientPortalAccess,
+}));
 
-import { listPendingPostEventBookings, sendPostEventEmailForBooking } from '@/lib/services/postEventDispatchService';
+import {
+  buildPostEventReviewUrl,
+  listPendingPostEventBookings,
+  sendPostEventEmailForBooking,
+} from '@/lib/services/postEventDispatchService';
 import { recordCustomerPostEventEmailSent } from '@/lib/services/customerActivityService';
 import { recordBookingCommunicationLog } from '@/lib/services/bookingCommunicationLogService';
 
@@ -51,6 +63,8 @@ beforeEach(() => {
   mockPrisma.booking.findUnique.mockResolvedValue(null);
   mockPrisma.booking.update.mockResolvedValue({});
   mockSendEmail.mockResolvedValue({});
+  mockGetBookingQuestionnaire.mockResolvedValue(null);
+  mockIssueClientPortalAccess.mockResolvedValue({ url: 'https://test.orbita.events/ca/portal/token' });
 });
 
 describe('listPendingPostEventBookings', () => {
@@ -68,6 +82,24 @@ describe('listPendingPostEventBookings', () => {
         }),
       })
     );
+  });
+});
+
+describe('buildPostEventReviewUrl', () => {
+  it('codifica token i referencia amb URLSearchParams', () => {
+    const reviewUrl = buildPostEventReviewUrl({
+      baseUrl: 'https://test.orbita.events',
+      locale: 'ca',
+      reviewToken: 'tok+1/2',
+      bookingReference: 'OE-2026-ABCD/42',
+    });
+
+    const parsed = new URL(reviewUrl);
+    expect(parsed.pathname).toBe('/ca/valoracio');
+    expect(parsed.searchParams.get('token')).toBe('tok+1/2');
+    expect(parsed.searchParams.get('ref')).toBe('OE-2026-ABCD/42');
+    expect(reviewUrl).toContain('token=tok%2B1%2F2');
+    expect(reviewUrl).toContain('ref=OE-2026-ABCD%2F42');
   });
 });
 

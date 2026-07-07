@@ -32,12 +32,12 @@ export async function getDossierCopy(locale = 'ca'): Promise<DossierCopy> {
  * veritat absoluta `DJ_FIRST_HOUR_PRICE`/`DJ_EXTRA_HOUR_PRICE`). El preu i la
  * categoria són domini estructural; els textos, monocapa a messages.
  */
-type OwnProductDef = { msgKey: string; serviceId: string; categoria: string };
+type OwnProductDef = { msgKey: string; serviceId: string; categoria: string; image?: string };
 
 const ORBITA_DOSSIER_PRODUCTS: ReadonlyArray<{ id: string } & OwnProductDef> = [
-  { id: 'orbita:dj-primera-hora', msgKey: 'dj-primera-hora', serviceId: 'dj-primera-hora', categoria: 'DJ' },
+  { id: 'orbita:dj-primera-hora', msgKey: 'dj-primera-hora', serviceId: 'dj-primera-hora', categoria: 'DJ', image: '/img/portfolio/discomovil/discomovil-01.avif' },
   { id: 'orbita:bombolles', msgKey: 'bombolles', serviceId: 'bombolles', categoria: 'Efectes' },
-  { id: 'orbita:pont-llums-caps-mobils', msgKey: 'pont-llums-caps-mobils', serviceId: 'caps-mobils', categoria: 'Llums' },
+  { id: 'orbita:pont-llums-caps-mobils', msgKey: 'pont-llums-caps-mobils', serviceId: 'caps-mobils', categoria: 'Llums', image: '/img/portfolio/produccion-tecnica/produccion-tecnica-01.avif' },
   { id: 'orbita:operari-extra', msgKey: 'operari-extra', serviceId: 'operari-extra', categoria: 'Operativa' },
 ];
 
@@ -62,6 +62,7 @@ export async function getOrbitaDossierProducts(locale = 'ca'): Promise<AnimacioP
       inclou: (raw.inclou ?? []).map(interp),
       priceFrom: service.defaultPrice,
       categoria: def.categoria,
+      image: def.image,
       sourceProviderName: 'Òrbita Events',
     } as AnimacioProduct];
   });

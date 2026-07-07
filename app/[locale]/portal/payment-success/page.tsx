@@ -1,27 +1,36 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { CLIENT_PORTAL_MESSAGES, type ClientPortalLocale } from '@/lib/clientPortalMessages';
+import { CLIENT_PORTAL_MESSAGES } from '@/lib/clientPortalMessages';
 import { normalizePortalLocale } from '@/lib/services/clientPortalAccess';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+type SearchParamValue = string | string[] | undefined;
+
+function firstSearchParam(value: SearchParamValue): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function getPaymentSuccessBody(messages: Record<string, string>, type: SearchParamValue): string {
+  const normalizedType = firstSearchParam(type);
+  if (normalizedType === 'deposit') return messages.paymentSuccessDepositBody;
+  if (normalizedType === 'remaining') return messages.paymentSuccessRemainingBody;
+  return messages.paymentSuccessGenericBody;
+}
+
 export default function PaymentSuccessPage({
   params,
   searchParams,
 }: {
   params: { locale: string };
-  searchParams: { type?: string; ref?: string };
+  searchParams: { type?: SearchParamValue; ref?: SearchParamValue };
 }) {
-  const locale = normalizePortalLocale(params.locale) as ClientPortalLocale;
+  const locale = normalizePortalLocale(params.locale);
   const t = CLIENT_PORTAL_MESSAGES[locale];
-  const paymentType = searchParams.type === 'remaining' ? 'remaining' : 'deposit';
-
-  const body =
-    paymentType === 'deposit'
-      ? t.paymentSuccessDepositBody
-      : t.paymentSuccessRemainingBody;
+  const body = getPaymentSuccessBody(t, searchParams.type);
+  const reference = firstSearchParam(searchParams.ref)?.trim();
 
   return (
     <main className="min-h-screen text-white/90 flex items-center justify-center px-4 portal-shell-bg">
@@ -40,9 +49,9 @@ export default function PaymentSuccessPage({
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-white">{t.paymentSuccessTitle}</h1>
-          {searchParams.ref && (
+          {reference && (
             <p className="mt-1 text-sm text-white/40">
-              {searchParams.ref}
+              {reference}
             </p>
           )}
           <p className="mt-4 text-white/80">{body}</p>

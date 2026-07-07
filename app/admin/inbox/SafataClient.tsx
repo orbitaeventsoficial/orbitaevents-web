@@ -286,12 +286,20 @@ export default function SafataClient({
   const refreshLeads = useCallback(async () => {
     try {
       const res = await fetch('/api/admin/inbox/refresh-leads', { headers: { 'x-admin': '1' } });
-      if (!res.ok) return;
-      const data = await res.json() as { leads?: SafataLead[]; stats?: SafataStats };
+      const data = (await res.json().catch(() => ({}))) as { leads?: SafataLead[]; stats?: SafataStats; error?: string; message?: string };
+      if (!res.ok) {
+        throw new Error(data.error || data.message || "No s'ha pogut refrescar la llista de leads.");
+      }
       if (data.leads) setLocalLeads(data.leads);
       if (data.stats) setLocalStats(data.stats);
-    } catch { /* silenci */ }
-  }, []);
+    } catch (error) {
+      console.error('[Safata] Error refrescant leads de la safata', { error });
+      flashFeedback(
+        'error',
+        error instanceof Error ? error.message : "No s'ha pogut refrescar la llista de leads."
+      );
+    }
+  }, [flashFeedback]);
 
   useEffect(() => {
     refreshRef.current = setInterval(refreshLeads, 60_000);
@@ -379,11 +387,22 @@ export default function SafataClient({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: 'CONTACTED' }),
         });
-        if (res.ok) {
-          updateLocalStatus(lead.id, 'CONTACTED');
-          setLocalStats(prev => ({ ...prev, unreadLeads: Math.max(0, prev.unreadLeads - 1) }));
+        const data = (await res.json().catch(() => ({}))) as { error?: string; message?: string };
+        if (!res.ok) {
+          throw new Error(data.error || data.message || "No s'ha pogut marcar el lead com llegit.");
         }
-      } catch { /* silenci */ }
+        updateLocalStatus(lead.id, 'CONTACTED');
+        setLocalStats(prev => ({ ...prev, unreadLeads: Math.max(0, prev.unreadLeads - 1) }));
+      } catch (error) {
+        console.error('[Safata] Error marcant lead nou com contactat', {
+          leadId: lead.id,
+          error,
+        });
+        flashFeedback(
+          'error',
+          error instanceof Error ? error.message : "No s'ha pogut marcar el lead com llegit."
+        );
+      }
     }
   };
 
@@ -1381,18 +1400,30 @@ function LeadDetail({
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState('');
   const [markingStatus, setMarkingStatus] = useState(false);
+  const [statusError, setStatusError] = useState('');
 
   const handleToggleRead = async () => {
     const next = lead.status === 'NEW' ? 'CONTACTED' : 'NEW';
     setMarkingStatus(true);
+    setStatusError('');
     try {
       const res = await fetchWithCsrf(`/api/admin/leads/${lead.id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: next }),
       });
+      const data = (await res.json().catch(() => ({}))) as { error?: string; message?: string };
+      if (!res.ok) {
+        throw new Error(data.error || data.message || "No s'ha pogut actualitzar l'estat del lead.");
+      }
       if (res.ok) onStatusChange(lead.id, next);
-    } catch { /* silenci */ } finally { setMarkingStatus(false); }
+    } catch (error) {
+      console.error('[Safata] Error actualitzant estat de lectura del lead', {
+        leadId: lead.id,
+        error,
+      });
+      setStatusError(error instanceof Error ? error.message : "No s'ha pogut actualitzar l'estat del lead.");
+    } finally { setMarkingStatus(false); }
   };
 
   const handleCreateCustomer = async () => {
@@ -1424,13 +1455,29 @@ function LeadDetail({
           </div>
         </div>
         <div className="flex flex-shrink-0 flex-wrap items-center justify-end gap-2">
-          <button type="button" onClick={handleToggleRead} disabled={markingStatus} className="ap-btn ap-btn--xs">
+          <button
+            type="button"
+            onClick={handleToggleRead}
+            disabled={markingStatus}
+            aria-invalid={statusError ? true : undefined}
+            aria-describedby={statusError ? `lead-read-status-error-${lead.id}` : undefined}
+            className="ap-btn ap-btn--xs"
+          >
             {lead.status === 'NEW' ? '○ No llegit' : '● Llegit'}
           </button>
           <button type="button" onClick={onCompose} className="ap-btn ap-btn--primary">✉ Respondre</button>
           <button type="button" onClick={onClose} className={CLOSE_BTN} aria-label="Tancar">✕</button>
         </div>
       </div>
+      {statusError && (
+        <p
+          id={`lead-read-status-error-${lead.id}`}
+          role="alert"
+          className="border-b border-[var(--line)] px-5 py-2 text-xs admin-tone-text-danger"
+        >
+          {statusError}
+        </p>
+      )}
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
         <div className="grid grid-cols-2 gap-px border-b border-[var(--line)] bg-[var(--line)]">
           {lead.eventType && <div className="flex flex-col gap-1 bg-[color-mix(in_oklab,var(--panel)_70%,var(--canvas))] px-[1.125rem] py-3.5"><p className={DATA_LABEL}>Tipus d&apos;event</p><p className="text-base font-semibold text-[var(--t)]">{lead.eventType}</p></div>}

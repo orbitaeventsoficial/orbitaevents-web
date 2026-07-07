@@ -60,7 +60,7 @@ export function usePacks(options: {
         setState({
           packs: localizedFallback,
           loading: false,
-          error: error instanceof Error ? error.message : 'Error carregant packs',
+          error: null,
         });
       }
     };

@@ -23,6 +23,7 @@ import { formatDateShort } from '@/lib/constants';
 import Link from 'next/link';
 import { DossierListActions } from './DossierListActions';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import { productsFromDossierLineSnapshot } from '@/lib/services/dossierSnapshotService';
 import { DossierDraftCreateButton } from './DossierDraftCreateButton';
 
@@ -57,7 +58,7 @@ type DossierRow = {
   salutacio?: string | null; deletedAt?: Date | string | null;
   mode?: string | null;
   lineSnapshot?: unknown;
-  lead?: { id: string; name: string; status: string } | null;
+  lead?: { id: string; name: string; status: string; customerId?: string | null; customerName?: string | null } | null;
 };
 
 function resolveInitialProductIds(explicitProductIds?: string): string | undefined {
@@ -225,9 +226,17 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                       </span>
                     )}
                     {d.lead && (
-                      <Link href={buildLeadWorkspaceHref(d.lead.id)} className="break-words text-xs text-[var(--t3)] transition-colors hover:text-[var(--gold-bright)]">
-                        Lead: {d.lead.name} ({d.lead.status})
-                      </Link>
+                      <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs">
+                        <span className="font-semibold uppercase tracking-[0.08em] text-[var(--t3)]">Origen</span>
+                        <Link href={buildLeadWorkspaceHref(d.lead.id)} className="rounded-full border border-[var(--o-admin-line)] bg-[var(--sunk)] px-2 py-0.5 font-semibold text-[var(--t2)] no-underline transition-colors hover:text-[var(--gold-bright)]">
+                          Entrada: {d.lead.name} ({d.lead.status})
+                        </Link>
+                        {d.lead.customerId && (
+                          <Link href={buildCustomerHubHref(d.lead.customerId)} className="rounded-full border border-[var(--o-admin-line)] bg-[var(--sunk)] px-2 py-0.5 font-semibold text-[var(--t2)] no-underline transition-colors hover:text-[var(--gold-bright)]">
+                            Client: {d.lead.customerName || d.nom}
+                          </Link>
+                        )}
+                      </div>
                     )}
                   </div>
                   <DossierListActions
@@ -276,6 +285,19 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                       {' · '}
                       {d.deletedAt ? `Eliminat ${formatDateShort(typeof d.deletedAt === 'string' ? d.deletedAt : d.deletedAt.toISOString())}` : 'Eliminat'}
                     </span>
+                    {d.lead && (
+                      <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs">
+                        <span className="font-semibold uppercase tracking-[0.08em] text-[var(--t3)]">Origen</span>
+                        <Link href={buildLeadWorkspaceHref(d.lead.id)} className="rounded-full border border-[var(--o-admin-line)] bg-[var(--sunk)] px-2 py-0.5 font-semibold text-[var(--t2)] no-underline transition-colors hover:text-[var(--gold-bright)]">
+                          Entrada: {d.lead.name} ({d.lead.status})
+                        </Link>
+                        {d.lead.customerId && (
+                          <Link href={buildCustomerHubHref(d.lead.customerId)} className="rounded-full border border-[var(--o-admin-line)] bg-[var(--sunk)] px-2 py-0.5 font-semibold text-[var(--t2)] no-underline transition-colors hover:text-[var(--gold-bright)]">
+                            Client: {d.lead.customerName || d.nom}
+                          </Link>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <DossierListActions
                     dossierId={d.id}

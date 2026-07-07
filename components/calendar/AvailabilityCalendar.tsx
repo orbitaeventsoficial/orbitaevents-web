@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { formatLocalDateInputValue } from '@/lib/date-input';
 import { log } from '@/lib/logger';
 
 interface AvailabilityDate {
@@ -58,21 +59,21 @@ export function AvailabilityCalendar({
   // Availability data
   const [availability, setAvailability] = useState<Map<string, AvailabilityDate>>(new Map());
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [hasError, setHasError] = useState(false);
 
   // Fetch availability for current month
   useEffect(() => {
     const fetchAvailability = async () => {
       setLoading(true);
-      setError(null);
+      setHasError(false);
 
       try {
         // Get first and last day of month
         const firstDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
         const lastDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
 
-        const from = firstDay.toISOString().split('T')[0];
-        const to = lastDay.toISOString().split('T')[0];
+        const from = formatLocalDateInputValue(firstDay);
+        const to = formatLocalDateInputValue(lastDay);
 
         const response = await fetch(`/api/availability?from=${from}&to=${to}`);
         const data = await response.json();
@@ -84,11 +85,11 @@ export function AvailabilityCalendar({
           });
           setAvailability(map);
         } else {
-          setError(data.error || 'Failed to load availability');
+          setHasError(true);
         }
       } catch (err) {
         log.error('Error fetching availability', err);
-        setError('Failed to load availability');
+        setHasError(true);
       } finally {
         setLoading(false);
       }
@@ -127,7 +128,7 @@ export function AvailabilityCalendar({
 
     for (let i = paddingDays; i > 0; i--) {
       const date = new Date(year, month, 1 - i);
-      const dateString = date.toISOString().split('T')[0];
+      const dateString = formatLocalDateInputValue(date);
       days.push({
         date,
         dateString,
@@ -139,7 +140,7 @@ export function AvailabilityCalendar({
     // Add current month days
     for (let day = 1; day <= lastDay.getDate(); day++) {
       const date = new Date(year, month, day);
-      const dateString = date.toISOString().split('T')[0];
+      const dateString = formatLocalDateInputValue(date);
       days.push({
         date,
         dateString,
@@ -153,7 +154,7 @@ export function AvailabilityCalendar({
     if (remainingDays < 7) {
       for (let i = 1; i <= remainingDays; i++) {
         const date = new Date(year, month + 1, i);
-        const dateString = date.toISOString().split('T')[0];
+        const dateString = formatLocalDateInputValue(date);
         days.push({
           date,
           dateString,
@@ -222,14 +223,14 @@ export function AvailabilityCalendar({
         </div>
       )}
 
-      {error && (
+      {hasError && (
         <div className="text-center py-8 text-red-400">
-          {t('error')}: {error}
+          {t('error')}
         </div>
       )}
 
       {/* Calendar Grid */}
-      {!loading && !error && (
+      {!loading && !hasError && (
         <>
           {/* Week day headers */}
           <div className={`grid grid-cols-7 gap-2 mb-2 ${compact ? 'text-xs' : 'text-sm'}`}>
@@ -244,7 +245,7 @@ export function AvailabilityCalendar({
           <div className={`grid grid-cols-7 gap-2 ${compact ? 'gap-1' : 'gap-2'}`}>
             {days.map((day, index) => {
               const isToday =
-                day.dateString === new Date().toISOString().split('T')[0];
+                day.dateString === formatLocalDateInputValue();
               const isPast = day.date < new Date(new Date().setHours(0, 0, 0, 0));
 
               return (
@@ -273,7 +274,7 @@ export function AvailabilityCalendar({
       )}
 
       {/* Legend */}
-      {showLegend && !loading && !error && (
+      {showLegend && !loading && !hasError && (
         <div className="mt-6 flex flex-wrap gap-4 justify-center text-sm">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded border bg-green-500/20 border-green-500"></div>

@@ -46,6 +46,18 @@ function buildReviewToken(bookingId: string, randomize: boolean) {
     : Buffer.from(`${bookingId}:${Date.now()}`).toString('base64url');
 }
 
+export function buildPostEventReviewUrl(params: {
+  baseUrl: string;
+  locale: string;
+  reviewToken: string;
+  bookingReference: string;
+}) {
+  const url = new URL(`/${params.locale}/valoracio`, params.baseUrl);
+  url.searchParams.set('token', params.reviewToken);
+  url.searchParams.set('ref', params.bookingReference);
+  return url.toString();
+}
+
 export async function sendPostEventEmailForBooking(
   bookingId: string,
   options?: { randomizeToken?: boolean; skipIfAlreadySent?: boolean; createAdminLog?: boolean }
@@ -101,7 +113,12 @@ export async function sendPostEventEmailForBooking(
 
   const reviewToken = buildReviewToken(booking.id, options?.randomizeToken !== false);
   const baseUrl = getAppBaseUrl();
-  const reviewUrl = `${baseUrl}/${locale}/valoracio?token=${reviewToken}&ref=${booking.reference}`;
+  const reviewUrl = buildPostEventReviewUrl({
+    baseUrl,
+    locale,
+    reviewToken,
+    bookingReference: booking.reference,
+  });
   const packName = resolvePackName(booking.pack?.translations, locale);
 
   // Enquesta de satisfacció: si hi ha una plantilla activa i encara no s'ha

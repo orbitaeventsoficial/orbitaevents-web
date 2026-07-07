@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import {
   findPortalAccessByRawToken,
   markPortalAccessHit,
@@ -9,13 +10,12 @@ import {
 } from '@/lib/services/clientPortalAccess';
 import { toIntlLocale } from '@/lib/constants';
 import {
-  CLIENT_PORTAL_CONTRACT_STATUS_LABELS,
   CLIENT_PORTAL_MESSAGES,
+  getClientPortalContractStatusLabel,
   type ClientPortalLocale,
 } from '@/lib/clientPortalMessages';
 import {
   getClientPortalContractSummary,
-  type ClientPortalContractProposal,
   type ClientPortalContractSignatureState,
 } from '@/lib/clientPortalContract';
 import { toRgba, resolvePortalAccentHex } from '@/lib/clientPortalUtils';
@@ -47,9 +47,8 @@ export default async function ClientPortalContractPage({
 }: {
   params: { locale: string; token: string };
 }) {
-  const locale = normalizePortalLocale(params.locale) as ClientPortalLocale;
+  const locale = normalizePortalLocale(params.locale);
   const t = CLIENT_PORTAL_MESSAGES[locale];
-  const contractStatusLabels = CLIENT_PORTAL_CONTRACT_STATUS_LABELS[locale];
 
   const access = await findPortalAccessByRawToken(params.token);
   if (!access) notFound();
@@ -67,9 +66,7 @@ export default async function ClientPortalContractPage({
   const accentBorder = toRgba(accentHex, 0.35) || 'rgba(6,182,212,0.35)';
   const accentBg = toRgba(accentHex, 0.12) || 'rgba(6,182,212,0.12)';
 
-  const contractSummary = getClientPortalContractSummary(
-    access.booking.proposals as ClientPortalContractProposal[],
-  );
+  const contractSummary = getClientPortalContractSummary(access.booking.proposals);
   if (!contractSummary) notFound();
 
   const signedAt = contractSummary.signedAt
@@ -98,7 +95,7 @@ export default async function ClientPortalContractPage({
           <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-5">
             <p className="text-xs text-white/35 uppercase tracking-wide">{t.contractStatus}</p>
             <p className="mt-1 text-lg font-bold text-white">
-              {contractStatusLabels[contractSummary.status] || contractSummary.status}
+              {getClientPortalContractStatusLabel(locale, contractSummary.status)}
             </p>
             {signedAt && <p className={`text-xs ${CLIENT_PORTAL_TONE_CLASS.successText} mt-0.5`}>{signedAt}</p>}
           </div>
@@ -122,8 +119,11 @@ export default async function ClientPortalContractPage({
                 key={item.id}
                 className={`rounded-xl border px-3 py-2 text-xs ${item.complete ? CLIENT_PORTAL_TONE_CLASS.successSoft : CLIENT_PORTAL_TONE_CLASS.warningSoft}`}
               >
-                <span className="font-bold">{item.complete ? '✓' : '○'}</span>
-                <span className="ml-2">{getSignatureRequirementLabel(item.id, t)}</span>
+                <span className="font-bold" aria-hidden="true">{item.complete ? '✓' : '○'}</span>
+                <span className="ml-2">
+                  {getSignatureRequirementLabel(item.id, t)}
+                  <span className="sr-only">: {item.complete ? t.milestoneDone : t.pending}</span>
+                </span>
               </div>
             ))}
           </div>
@@ -160,18 +160,20 @@ export default async function ClientPortalContractPage({
               style={{ borderColor: accentBorder, backgroundColor: accentBg }}
             >
               {t.openContract}
+              <span className="sr-only"> ({t.opensInNewTab})</span>
             </a>
           )}
         </div>
 
         <footer className="mt-10 text-center">
-          <p className="text-xs text-white/15">Òrbita Events</p>
+          <p className="text-xs text-white/15">{SITE_CONFIG.business.name}</p>
         </footer>
       </div>
       <PortalBottomNav
         basePath={`/${locale}/portal/${params.token}`}
         accentHex={accentHex}
         labels={{
+          ariaLabel: t.portalNavigationLabel,
           hub: t.portalLabel,
           payments: t.payments,
           timeline: t.timelineLabel,

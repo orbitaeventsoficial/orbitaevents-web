@@ -51,6 +51,15 @@ function getPricingBadge(pricingModel: Collaborator['pricingModel']) {
     : 'ap-badge ap-badge--info';
 }
 
+async function readCollaboratorMutationError(res: Response, fallback: string): Promise<string> {
+  const payload = (await res.json().catch(() => ({}))) as { error?: string; message?: string };
+  return payload.error || payload.message || fallback;
+}
+
+async function readCollaboratorLoadError(res: Response, fallback: string): Promise<string> {
+  const payload = (await res.json().catch(() => ({}))) as { error?: string; message?: string };
+  return payload.error || payload.message || fallback;
+}
 
 export default function CollaboratorsClient() {
   const toast = useToast();
@@ -72,8 +81,8 @@ export default function CollaboratorsClient() {
   const load = useCallback(async () => {
     try {
       setLoadError(null);
-      const res = await fetch('/api/admin/collaborators');
-      if (!res.ok) throw new Error("No s'han pogut carregar els col·laboradors");
+      const res = await fetch('/api/admin/collaborators', { credentials: 'include', cache: 'no-store' });
+      if (!res.ok) throw new Error(await readCollaboratorLoadError(res, "No s'han pogut carregar els col·laboradors"));
       const data = await res.json();
       setCollaborators(data.collaborators || []);
       setKpis(data.kpis || null);
@@ -106,7 +115,7 @@ export default function CollaboratorsClient() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(await readCollaboratorMutationError(res, "No s'ha pogut desar el col·laborador"));
       toast.success(editingId ? 'Col·laborador actualitzat' : 'Col·laborador creat');
       setShowForm(false);
       setEditingId(null);
@@ -114,7 +123,7 @@ export default function CollaboratorsClient() {
       load();
     } catch (err) {
       console.error('Error desant col·laborador', err);
-      toast.error('Error desant');
+      toast.error(err instanceof Error ? err.message : "No s'ha pogut desar el col·laborador");
     }
   };
 
@@ -140,7 +149,7 @@ export default function CollaboratorsClient() {
     if (!ok) return;
     try {
       const response = await fetchWithCsrf(`/api/admin/collaborators/${id}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error("No s'ha pogut eliminar el col·laborador");
+      if (!response.ok) throw new Error(await readCollaboratorMutationError(response, "No s'ha pogut eliminar el col·laborador"));
       toast.success('Col·laborador eliminat');
       await load();
     } catch (error) {
@@ -156,7 +165,7 @@ export default function CollaboratorsClient() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isActive: !c.isActive }),
       });
-      if (!response.ok) throw new Error("No s'ha pogut actualitzar l'estat del col·laborador");
+      if (!response.ok) throw new Error(await readCollaboratorMutationError(response, "No s'ha pogut actualitzar l'estat del col·laborador"));
       toast.success(c.isActive ? 'Desactivat' : 'Activat');
       await load();
     } catch (error) {

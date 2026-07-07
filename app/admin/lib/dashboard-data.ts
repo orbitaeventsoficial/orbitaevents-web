@@ -4,9 +4,14 @@ import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import { generateDailyChecklistTasks } from '@/lib/services/dailyChecklist';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 import { aggregateServiceLines, computeSimpleMarginPct } from '@/lib/services/costEngine';
+import {
+  computeDashboardNextEventEconomics,
+  projectDashboardEconomicRiskBookings,
+  type DashboardEconomicRiskBooking,
+} from './next-event-economics';
 import { buildCashFlowForecast } from '@/lib/services/cashFlowForecast';
 import { buildPipelineForecast } from '@/lib/services/pipelineForecast';
-import { formatDateSimple, PLACEHOLDER_EMAIL_DOMAIN, EVENT_TYPE_CHART_COLORS, TASK_SOURCE } from '@/lib/constants';
+import { formatCurrency, formatDateSimple, PLACEHOLDER_EMAIL_DOMAIN, EVENT_TYPE_CHART_COLORS, TASK_SOURCE } from '@/lib/constants';
 import { isImapConfigured, isSmtpConfigured } from '@/lib/env';
 import { bookingOutstandingAmount } from '@/lib/payment-status';
 import { getBookingChecklist, DEFAULT_BOOKING_CHECKLIST_ITEMS } from '@/lib/services/bookingChecklistService';
@@ -149,6 +154,7 @@ export interface DashboardData {
   cashFlowNet30: number;
   pipelineWeighted30: number;
   pendingPayments: number;
+  economicRiskBookings: DashboardEconomicRiskBooking[];
   // Next event ("pròxim bolo")
   nextEvent: {
     id: string;
@@ -167,6 +173,10 @@ export interface DashboardData {
     daysUntil: number;
     checklistDone: number;
     checklistTotal: number;
+    outstandingAmount: number;
+    directCost: number;
+    netMargin: number;
+    marginPct: number;
   } | null;
   // Monthly revenue
   revenueThisMonth: number;
@@ -199,6 +209,8 @@ export async function fetchDashboardData(): Promise<DashboardData> {
 
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
   const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+  const nextWeekEnd = new Date(now);
+  nextWeekEnd.setDate(nextWeekEnd.getDate() + 7);
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const seriesStart = new Date(now);
   seriesStart.setDate(now.getDate() - 30);
@@ -229,7 +241,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     marginBookings,
     // Blocs 4+5+6 (abans seqüencials, ara paral·lels)
     cashFlowResult, pipelineResult, pendingBookingsResult,
-    nextEventRaw, monthlyRevenueAgg, revenueTargetSetting,
+    nextEventRaw, economicRiskRows, monthlyRevenueAgg, revenueTargetSetting,
     monthlyRevenueData, eventTypeData,
   ] = await Promise.all([
     cachedQuery('admin:dashboard:leads:count', () => prisma.lead.count(), CacheTTL.SHORT).catch(() => 0),
@@ -297,10 +309,31 @@ export async function fetchDashboardData(): Promise<DashboardData> {
       select: {
         id: true, reference: true, clientName: true, eventDate: true,
         eventStartTime: true, eventLocation: true, eventVenue: true, eventType: true,
-        total: true, depositPaid: true, remainingPaid: true, status: true,
-        pack: { select: { translations: { where: { locale: 'ca' }, select: { name: true } } } },
+        total: true, depositAmount: true, remainingAmount: true, cashAmount: true,
+        depositPaid: true, remainingPaid: true, status: true,
+        extraHours: true, travelCost: true, distanceKm: true,
+        extras: { select: { price: true, quantity: true } },
+        serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true } },
+        pack: { select: { price: true, extraHourPrice: true, translations: { where: { locale: 'ca' }, select: { name: true } } } },
       },
     }), CacheTTL.SHORT).catch(() => null),
+    cachedQuery(`admin:dashboard:economic-risk-bookings:${dayKey}`, () => prisma.booking.findMany({
+      where: {
+        eventDate: { gte: now, lte: nextWeekEnd },
+        status: { in: ['CONFIRMED', 'PREPARING'] },
+      },
+      orderBy: { eventDate: 'asc' },
+      take: 10,
+      select: {
+        id: true, reference: true, clientName: true, eventDate: true,
+        total: true, depositAmount: true, remainingAmount: true, cashAmount: true,
+        depositPaid: true, remainingPaid: true,
+        extraHours: true, travelCost: true, distanceKm: true,
+        extras: { select: { price: true, quantity: true } },
+        serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true } },
+        pack: { select: { price: true, extraHourPrice: true } },
+      },
+    }), CacheTTL.SHORT).catch(() => []),
     cachedQuery(`admin:dashboard:revenue-month:${startOfMonth.toISOString().slice(0, 10)}`, () => prisma.booking.aggregate({
       where: { status: { in: ['CONFIRMED', 'COMPLETED'] }, eventDate: { gte: startOfMonth } },
       _sum: { total: true },
@@ -494,6 +527,11 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   for (const b of pendingBookingsResult as Array<{ total: number; depositAmount: number; depositPaid: boolean; remainingPaid: boolean; cashAmount: number | null }>) {
     pendingPayments += bookingOutstandingAmount(b);
   }
+  const economicRiskBookings = projectDashboardEconomicRiskBookings(
+    economicRiskRows as Parameters<typeof projectDashboardEconomicRiskBookings>[0],
+    now,
+    profitConfig,
+  );
 
   let nextEvent: DashboardData['nextEvent'] = null;
   if (nextEventRaw) {
@@ -506,6 +544,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     ).catch(() => DEFAULT_BOOKING_CHECKLIST_ITEMS);
     const checklistTotal = checklistItems.length;
     const checklistDone = checklistItems.filter((item: { checked: boolean }) => item.checked).length;
+    const economics = computeDashboardNextEventEconomics(nextEventRaw, profitConfig);
     nextEvent = {
       id: nextEventRaw.id,
       reference: nextEventRaw.reference,
@@ -523,6 +562,10 @@ export async function fetchDashboardData(): Promise<DashboardData> {
       daysUntil,
       checklistDone,
       checklistTotal,
+      outstandingAmount: economics.outstandingAmount,
+      directCost: economics.directCost,
+      netMargin: economics.netMargin,
+      marginPct: economics.marginPct,
     };
   }
 
@@ -545,12 +588,12 @@ export async function fetchDashboardData(): Promise<DashboardData> {
       });
     }
   }
-  // Unpaid + event in 3 days
-  if (nextEvent && nextEvent.daysUntil <= 3 && !nextEvent.depositPaid) {
+  // Pagament pendent real + event in 3 days
+  if (nextEvent && nextEvent.daysUntil <= 3 && nextEvent.outstandingAmount > 0) {
     alerts.push({
       type: 'warning',
       title: 'Pagament pendent imminent',
-      description: `${nextEvent.clientName} no ha pagat la paga i senyal i el bolo és ${nextEvent.daysUntil === 0 ? 'avui' : `d'aquí ${nextEvent.daysUntil} dies`}.`,
+      description: `${nextEvent.clientName} té ${formatCurrency(nextEvent.outstandingAmount)} pendents i el bolo és ${nextEvent.daysUntil === 0 ? 'avui' : `d'aquí ${nextEvent.daysUntil} dies`}.`,
       href: buildBookingHref(nextEvent.id),
       action: 'Gestionar pagament',
     });
@@ -590,6 +633,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     cashFlowNet30,
     pipelineWeighted30,
     pendingPayments,
+    economicRiskBookings,
     nextEvent,
     revenueThisMonth,
     revenueTarget,

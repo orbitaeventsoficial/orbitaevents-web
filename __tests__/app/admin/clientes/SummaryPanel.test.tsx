@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { render, screen, within, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, within, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import SummaryPanel from '@/app/admin/clientes/[id]/_components/panels/SummaryPanel';
@@ -293,7 +293,7 @@ describe('SummaryPanel', () => {
     expect(screen.getByText('Horari: 18:00 - 02:00')).toBeInTheDocument();
     expect(screen.getByText('Aforament previst: 120 convidats')).toBeInTheDocument();
     expect(screen.getByText(/Valor de la reserva:/)).toBeInTheDocument();
-    expect(screen.getByText('Cobrament: Bestreta cobrada')).toBeInTheDocument();
+    expect(screen.getByText('Cobrament: parcial')).toBeInTheDocument();
     expect(screen.getByText('Canal suggerit: Fitxa reserva')).toBeInTheDocument();
     expect(screen.getAllByText('Obrir reserva').length).toBeGreaterThan(0);
     expect(screen.getByText('Obrir reserva vinculada')).toBeInTheDocument();
@@ -335,5 +335,43 @@ describe('SummaryPanel', () => {
     expect(taskHref).toContain('customerId=cust-1');
     expect(taskHref).toContain('taskSource=REACTIVATION');
     expect(taskHref).toContain('dedupeKey=reactivation%3Acust-1');
+  });
+
+  it('manté el contacte visible i mostra error backend si eliminar falla', async () => {
+    mockFetchWithCsrf.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({ ok: false, error: 'Contacte vinculat a un pressupost actiu' }),
+    } as Response);
+
+    const hubWithContact: CustomerHubDTO = {
+      ...HUB,
+      contacts: [
+        {
+          id: 'contact-1',
+          name: 'Marta Producció',
+          role: 'Producció',
+          email: 'marta@example.com',
+          phone: '+34 600 444 555',
+          notes: 'Contacte operatiu',
+          isPrimary: false,
+          createdAt: '2026-07-01T09:00:00.000Z',
+        },
+      ],
+    };
+
+    render(<SummaryPanel data={hubWithContact} />);
+
+    const deleteButton = screen.getByText('🗑').closest('button');
+    expect(deleteButton).not.toBeNull();
+    fireEvent.click(deleteButton!);
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Contacte vinculat a un pressupost actiu');
+    });
+    expect(screen.getByText('Marta Producció')).toBeInTheDocument();
+    expect(mockFetchWithCsrf).toHaveBeenCalledWith(
+      '/api/admin/customers/cust-1/contacts/contact-1',
+      { method: 'DELETE' }
+    );
   });
 });

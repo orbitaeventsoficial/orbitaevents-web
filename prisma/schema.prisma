@@ -1945,17 +1945,19 @@ model CollaboratorProduct {
   collaboratorId String
   collaborator   Collaborator @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
 
-  name          String
-  description   String? @db.Text
-  category      String? // "Animació infantil", "Musical", "Extra", "Bingo"...
-  crew          String? // "Animador + tècnic de so"
-  durationLabel String? // "1h", "70 min"
-  costPrice     Float // Cost net que ens cobra el col·laborador (sense IVA)
-  sellPrice     Float // El nostre PVP (cost + marge)
-  imageUrl      String?
-  includes      String? @db.Text // Què inclou el producte
-  sortOrder     Int     @default(0)
-  isActive      Boolean @default(true)
+  name             String
+  description      String? @db.Text
+  category         String? // "Animació infantil", "Musical", "Extra", "Bingo"...
+  crew             String? // "Animador + tècnic de so"
+  durationLabel    String? // "1h", "70 min"
+  costPrice        Float // Cost net que ens cobra el col·laborador (sense IVA)
+  sellPrice        Float // El nostre PVP (cost + marge)
+  imageUrl         String?
+  includes         String? @db.Text // Què inclou el producte
+  sortOrder        Int     @default(0)
+  isActive         Boolean @default(true)
+  visibleInDossier Boolean @default(true) // Capítol/oferta client-facing en dossiers
+  visibleInBooking Boolean @default(true) // Línia seleccionable al configurador de bolo
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

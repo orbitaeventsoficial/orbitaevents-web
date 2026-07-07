@@ -112,6 +112,21 @@ describe('buildDossierHtml', () => {
     expect(html).toContain('Bingo Musical');
   });
 
+  it('pinta la imatge del producte quan el catàleg en porta una', () => {
+    const html = build(client, [{
+      ...productWithTrams,
+      image: '/img/collaborators/masquerade/bingo-musical.jpg',
+    }]);
+    expect(html).toContain('class="producte-media"');
+    expect(html).toContain('src="/img/collaborators/masquerade/bingo-musical.jpg"');
+    expect(html).toContain('alt="Bingo Musical"');
+  });
+
+  it('no crea cap bloc visual buit quan el producte no té imatge', () => {
+    const html = build(client, [productWithTrams]);
+    expect(html).not.toContain('class="producte-media"');
+  });
+
   it('no duplica taules de preus dins el dossier editorial', () => {
     const html = build(client, [productWithTrams]);
     expect(html).toContain('Bingo Musical');

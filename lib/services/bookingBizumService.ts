@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { findPortalAccessByRawToken } from '@/lib/services/clientPortalAccess';
+import { bookingOutstandingBreakdown } from '@/lib/payment-status';
 
 export type BizumNotifyResult =
   | { ok: true }
@@ -20,23 +21,28 @@ export async function declareBizumPayment(input: {
     where: { id: access.bookingId },
     select: {
       id: true,
+      total: true,
+      depositAmount: true,
+      remainingAmount: true,
       depositPaid: true,
       remainingPaid: true,
+      cashAmount: true,
       depositBizumDeclaredAt: true,
       remainingBizumDeclaredAt: true,
     },
   });
   if (!booking) return { ok: false, reason: 'NOT_FOUND' };
+  const outstanding = bookingOutstandingBreakdown(booking);
 
   if (input.paymentType === 'deposit') {
-    if (booking.depositPaid) return { ok: false, reason: 'ALREADY_PAID' };
+    if (outstanding.depositAmount <= 0) return { ok: false, reason: 'ALREADY_PAID' };
     if (booking.depositBizumDeclaredAt) return { ok: false, reason: 'ALREADY_DECLARED' };
     await prisma.booking.update({
       where: { id: booking.id },
       data: { depositBizumDeclaredAt: new Date() },
     });
   } else {
-    if (booking.remainingPaid) return { ok: false, reason: 'ALREADY_PAID' };
+    if (outstanding.remainingAmount <= 0) return { ok: false, reason: 'ALREADY_PAID' };
     if (booking.remainingBizumDeclaredAt) return { ok: false, reason: 'ALREADY_DECLARED' };
     await prisma.booking.update({
       where: { id: booking.id },
@@ -64,16 +70,21 @@ export async function confirmBizumPayment(input: {
     where: { id: input.bookingId },
     select: {
       id: true,
+      total: true,
+      depositAmount: true,
+      remainingAmount: true,
       depositPaid: true,
       remainingPaid: true,
+      cashAmount: true,
       depositBizumDeclaredAt: true,
       remainingBizumDeclaredAt: true,
     },
   });
   if (!booking) return { ok: false, reason: 'NOT_FOUND' };
+  const outstanding = bookingOutstandingBreakdown(booking);
 
   if (input.paymentType === 'deposit') {
-    if (booking.depositPaid) return { ok: false, reason: 'ALREADY_PAID' };
+    if (outstanding.depositAmount <= 0) return { ok: false, reason: 'ALREADY_PAID' };
     if (!booking.depositBizumDeclaredAt) return { ok: false, reason: 'NO_DECLARATION' };
     await prisma.booking.update({
       where: { id: booking.id },
@@ -84,7 +95,7 @@ export async function confirmBizumPayment(input: {
       },
     });
   } else {
-    if (booking.remainingPaid) return { ok: false, reason: 'ALREADY_PAID' };
+    if (outstanding.remainingAmount <= 0) return { ok: false, reason: 'ALREADY_PAID' };
     if (!booking.remainingBizumDeclaredAt) return { ok: false, reason: 'NO_DECLARATION' };
     await prisma.booking.update({
       where: { id: booking.id },

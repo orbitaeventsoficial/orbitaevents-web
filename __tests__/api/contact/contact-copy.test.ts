@@ -143,6 +143,22 @@ describe('contactSchema', () => {
     expect(result.success).toBe(true);
   });
 
+  it('accepta ubicació pública com a location o eventLocation', () => {
+    expect(schema.safeParse({
+      name: 'Joan Garcia',
+      contact: 'joan@example.com',
+      event: 'boda',
+      location: 'Barcelona',
+    }).success).toBe(true);
+
+    expect(schema.safeParse({
+      name: 'Joan Garcia',
+      contact: 'joan@example.com',
+      event: 'boda',
+      eventLocation: 'Girona',
+    }).success).toBe(true);
+  });
+
   it('rebutja nom massa curt', () => {
     const result = schema.safeParse({
       name: 'J',

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildSocialWorkspaceHref } from '@/lib/admin/socialWorkspaceHref';
 import { useRouter } from 'next/navigation';
 import { formatDateShort, formatDateFull } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
@@ -12,7 +13,7 @@ import { ADMIN_CALENDAR_HELP, helpAttrs } from '../components/adminHelpContent';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { CalendarApiDay, CalendarApiResponse, MonthYear, CalendarCell } from './calendar-utils';
-import { weekdayLabels, resolveServiceLabel, resolveTimeLabel, getMonthDays, addMonths, monthLabel, isToday, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel } from './calendar-utils';
+import { weekdayLabels, resolveServiceLabel, resolveTimeLabel, getMonthDays, addMonths, monthLabel, isToday, getCalendarTone, getCalendarToneClasses, getCalendarEconomicRiskClasses, summarizeCalendarEconomicRisk, selectCalendarEconomicRiskBooking, formatCalendarEconomicRiskActionReason, resolveCalendarEconomicRiskActionHash, formatCalendarEconomicRiskSummary, resolveWorkTimeLabel } from './calendar-utils';
 
 type OwnerTone = 'info' | 'warning' | 'success';
 type OwnerStripConfig = {
@@ -223,6 +224,10 @@ export default function CalendarMonthClient() {
         mixedDays: 0,
         totalTasks: 0,
         totalSocialPosts: 0,
+        economicRisk: { total: 0, critical: 0, warning: 0 },
+        economicRiskBookingId: null as string | null,
+        economicRiskActionReason: null as string | null,
+        economicRiskActionHash: null as 'sec-finances' | 'sec-marge' | null,
         workDays: 0,
       };
     }
@@ -236,6 +241,11 @@ export default function CalendarMonthClient() {
     let mixedDays = 0;
     let totalTasks = 0;
     let totalSocialPosts = 0;
+    const economicRisk = { total: 0, critical: 0, warning: 0 };
+    let economicRiskBookingId: string | null = null;
+    let economicRiskBookingLevel: 'critical' | 'warning' | null = null;
+    let economicRiskActionReason: string | null = null;
+    let economicRiskActionHash: 'sec-finances' | 'sec-marge' | null = null;
     let workDays = 0;
 
     for (const cell of cells) {
@@ -260,6 +270,20 @@ export default function CalendarMonthClient() {
       totalBloqueos += dayData.bloqueos.length;
       totalTasks += dayData.tasks.length;
       totalSocialPosts += dayData.socialPosts.length;
+      const dayEconomicRisk = summarizeCalendarEconomicRisk(dayData);
+      economicRisk.total += dayEconomicRisk.total;
+      economicRisk.critical += dayEconomicRisk.critical;
+      economicRisk.warning += dayEconomicRisk.warning;
+      const actionBooking = selectCalendarEconomicRiskBooking(dayData);
+      if (
+        actionBooking?.economicRisk &&
+        (!economicRiskBookingId || (economicRiskBookingLevel !== 'critical' && actionBooking.economicRisk.level === 'critical'))
+      ) {
+        economicRiskBookingId = actionBooking.id;
+        economicRiskBookingLevel = actionBooking.economicRisk.level;
+        economicRiskActionReason = formatCalendarEconomicRiskActionReason(actionBooking);
+        economicRiskActionHash = resolveCalendarEconomicRiskActionHash(actionBooking);
+      }
       if (hasWork) workDays += 1;
 
       if (!hasReservas && !hasBloqueos) {
@@ -277,6 +301,10 @@ export default function CalendarMonthClient() {
       totalReservas,
       totalLeads,
       totalBloqueos,
+      economicRisk,
+      economicRiskBookingId,
+      economicRiskActionReason,
+      economicRiskActionHash,
       freeDays,
       reservaDays,
       bloqueadoDays,
@@ -383,7 +411,7 @@ export default function CalendarMonthClient() {
         ))}
       </div>
       {/* Stats ràpids del mes visible */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-6" {...helpAttrs(ADMIN_CALENDAR_HELP.stats)}>
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4 xl:grid-cols-7" {...helpAttrs(ADMIN_CALENDAR_HELP.stats)}>
         <div className="ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-success admin-tone-border-success">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
@@ -394,6 +422,28 @@ export default function CalendarMonthClient() {
               {stats.reservaDays + stats.mixedDays} dies
             </span>
           </div>
+        </div>
+
+        <div className={`ap-card p-2.5 sm:p-3 transition-all ${stats.economicRisk.critical > 0 ? 'admin-tone-soft-danger admin-tone-border-danger' : 'admin-tone-soft-warning admin-tone-border-warning'}`}>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex min-w-0 flex-col">
+              <span className={`text-xs uppercase tracking-wide ${stats.economicRisk.critical > 0 ? 'admin-tone-text-danger' : 'admin-tone-text-warning'}`}>Risc econòmic</span>
+              <span className={`text-xl sm:text-2xl font-bold ${stats.economicRisk.critical > 0 ? 'admin-tone-text-danger' : 'admin-tone-text-warning'}`}>{stats.economicRisk.total}</span>
+            </div>
+            <span className={`ap-badge ${stats.economicRisk.critical > 0 ? 'ap-badge--danger' : 'ap-badge--warning'}`}>
+              {formatCalendarEconomicRiskSummary(stats.economicRisk)}
+            </span>
+          </div>
+          {stats.economicRiskBookingId && (
+            <div className="mt-2 space-y-1 text-xs">
+              {stats.economicRiskActionReason && (
+                <p className="m-0 font-medium opacity-80">Motiu: {stats.economicRiskActionReason}</p>
+              )}
+              <Link href={buildBookingHref(stats.economicRiskBookingId, stats.economicRiskActionHash)} className="inline-flex font-semibold text-[var(--gold)] no-underline hover:text-[var(--gold-bright)]">
+                Obrir reserva amb risc →
+              </Link>
+            </div>
+          )}
         </div>
 
         <div className="ap-card p-2.5 sm:p-3 transition-all admin-tone-soft-danger admin-tone-border-danger">
@@ -583,6 +633,11 @@ export default function CalendarMonthClient() {
                         <div className="truncate">
                           {resolveTimeLabel(r)} · {resolveServiceLabel(r)}
                         </div>
+                        {r.economicRisk && (
+                          <div className={`mt-0.5 truncate rounded border px-1 py-0.5 text-[length:var(--o-text-2xs)] font-semibold ${getCalendarEconomicRiskClasses(r.economicRisk)}`}>
+                            {r.economicRisk.label}
+                          </div>
+                        )}
                       </div>
                     ))}
                     {dayData.reservas.length > 2 && (
@@ -802,6 +857,11 @@ export default function CalendarMonthClient() {
                           {r.ubicacion && <>{r.ubicacion}{' · '}</>}
                           {resolveTimeLabel(r)} · {resolveServiceLabel(r)}
                         </div>
+                        {r.economicRisk && (
+                          <div className={`mt-2 rounded-lg border px-2 py-1 text-xs font-semibold ${getCalendarEconomicRiskClasses(r.economicRisk)}`}>
+                            Risc econòmic · {r.economicRisk.label}
+                          </div>
+                        )}
                         <div className="mt-2 flex flex-wrap items-center gap-2">
                           <Link href={buildBookingHref(r.id)} onClick={(e) => e.stopPropagation()} className="text-xs font-medium hover:underline">
                             Reserva →
@@ -873,7 +933,7 @@ export default function CalendarMonthClient() {
                     </Link>
                   ))}
                   {visibleLayers.social && selectedDayData.payload?.socialPosts?.map((post) => (
-                    <Link key={post.id} href="/admin/social" className="ap-card block px-3 py-2.5 transition-all">
+                    <Link key={post.id} href={buildSocialWorkspaceHref(post.id)} className="ap-card block px-3 py-2.5 transition-all">
                       <div className="truncate text-sm font-medium">{post.title}</div>
                       <div className="mt-1 text-xs opacity-70">Social · {resolveWorkTimeLabel(post.scheduledAt)} · {post.platforms.join(', ')}</div>
                     </Link>

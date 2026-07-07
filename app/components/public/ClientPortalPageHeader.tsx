@@ -29,7 +29,8 @@ export default function ClientPortalPageHeader({
           href={backHref}
           className="mb-4 inline-flex items-center gap-1.5 text-xs text-white/35 transition-colors hover:text-white/60"
         >
-          ← {backLabel}
+          <span aria-hidden="true">←</span>
+          <span>{backLabel}</span>
         </Link>
       )}
       <p className="mb-1 text-xs uppercase tracking-widest" style={{ color: accentColor }}>

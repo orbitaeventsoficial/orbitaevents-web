@@ -61,8 +61,10 @@ export type LeadData = {
     id: string;
     reference: string;
     status: string;
+    total: number;
     depositPaid: boolean;
     remainingPaid: boolean;
+    cashAmount: number | null;
     distanceKm: number | null;
   } | null;
   wx: WxData;
@@ -71,7 +73,10 @@ export type LeadData = {
 type PayState = 'full' | 'part' | 'none';
 function paymentState(booking: LeadData['booking']): PayState | null {
   if (!booking) return null;
-  const band = getPaymentBand(booking.depositPaid, booking.remainingPaid);
+  const band = getPaymentBand(booking.depositPaid, booking.remainingPaid, {
+    cashAmount: booking.cashAmount,
+    total: booking.total,
+  });
   return band === 'paid' ? 'full' : band === 'partial' ? 'part' : 'none';
 }
 type Stage = LeadData['stage'];

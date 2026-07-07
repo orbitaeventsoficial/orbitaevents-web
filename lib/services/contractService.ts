@@ -6,6 +6,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import type { Prisma } from '@prisma/client';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { EMAIL_CONTACT } from '@/lib/constants/email';
 import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
@@ -13,6 +14,7 @@ import { generateContractPDF, type ContractPdfData } from '@/lib/pdf-utils';
 import { type ContractData } from '@/lib/services/documentService';
 import { log } from '@/lib/logger';
 import { recordLeadContractCancelled, recordLeadContractSent, recordLeadContractSigned } from '@/lib/services/leadActivityService';
+import { DOCUMENT_ADMIN_LOG_ACTIONS, recordDocumentAdminLog } from '@/lib/services/documentAuditTrailService';
 import { uploadFile } from '@/lib/storage';
 
 export async function getCompanyConfig() {
@@ -32,6 +34,75 @@ export async function getCompanyConfig() {
 }
 
 import type { Locale as SupportedLocale } from '@/i18n';
+
+type ContractTrace = {
+  proposalId: string;
+  proposalReference: string;
+  customerId: string | null;
+  leadId: string | null;
+  bookingId: string | null;
+  total: number;
+  locale: string;
+};
+
+export type ContractLineSnapshot = {
+  name: string;
+  price: number;
+  quantity: number;
+};
+
+export type ContractDocumentSnapshot = {
+  version: 1;
+  createdAt: string;
+  contractDate: string;
+  contractReference: string;
+  locale: string;
+  company: {
+    name: string;
+    legalName: string;
+    nif: string;
+    address: string;
+    iban: string;
+    phone: string;
+    email: string;
+  };
+  client: {
+    name: string;
+    nif: string | null;
+    email: string;
+    phone: string | null;
+  };
+  event: {
+    type: string;
+    date: string;
+    time: string | null;
+    endTime: string | null;
+    location: string;
+    guestCount: number;
+  };
+  pack: {
+    name: string;
+    price: number;
+    djHours: number;
+  };
+  extras: ContractLineSnapshot[];
+  serviceLines: ContractLineSnapshot[];
+  totals: {
+    subtotal: number;
+    discount: number;
+    vatRate: number;
+    vatAmount: number;
+    total: number;
+    depositAmount: number;
+    depositDueDate: string;
+    finalPaymentDue: string;
+  };
+  terms: {
+    cancellationPolicy: string;
+    additionalClauses: string;
+  };
+  trace: ContractTrace;
+};
 
 function generateContractNumber(): string {
   const year = new Date().getFullYear();
@@ -108,6 +179,247 @@ export function getDefaultTermsAndConditions(locale: SupportedLocale = 'ca'): st
   return terms[locale];
 }
 
+function cleanJsonRecord(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  return JSON.parse(JSON.stringify(value)) as Record<string, unknown>;
+}
+
+function cleanString(value: unknown, fallback = ''): string {
+  return typeof value === 'string' ? value : fallback;
+}
+
+function cleanNullableString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value : null;
+}
+
+function cleanNumber(value: unknown, fallback = 0): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? Math.round(parsed * 100) / 100 : fallback;
+}
+
+function cleanDate(value: unknown, fallback: Date | string): Date {
+  const date = value instanceof Date ? value : new Date(String(value ?? ''));
+  if (Number.isFinite(date.getTime())) return date;
+  const fallbackDate = fallback instanceof Date ? fallback : new Date(fallback);
+  return Number.isFinite(fallbackDate.getTime()) ? fallbackDate : new Date(0);
+}
+
+function isoFromPdfDateInput(value: Date | string): string {
+  return cleanDate(value, new Date(0)).toISOString();
+}
+
+function toPrismaJson(value: Record<string, unknown>): Prisma.InputJsonValue {
+  return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
+}
+
+function cleanLines(value: unknown): ContractLineSnapshot[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((line) => {
+      if (!line || typeof line !== 'object') return null;
+      const raw = line as Record<string, unknown>;
+      const name = cleanString(raw.name).trim();
+      if (!name) return null;
+      return {
+        name,
+        price: cleanNumber(raw.price),
+        quantity: cleanNumber(raw.quantity, 1) || 1,
+      };
+    })
+    .filter((line): line is ContractLineSnapshot => Boolean(line));
+}
+
+export function readContractDocumentSnapshot(snapshot: unknown): ContractDocumentSnapshot | null {
+  const root = cleanJsonRecord(snapshot);
+  const raw = cleanJsonRecord(root.contractSnapshot);
+  if (raw.version !== 1) return null;
+
+  const company = cleanJsonRecord(raw.company);
+  const client = cleanJsonRecord(raw.client);
+  const event = cleanJsonRecord(raw.event);
+  const pack = cleanJsonRecord(raw.pack);
+  const totals = cleanJsonRecord(raw.totals);
+  const terms = cleanJsonRecord(raw.terms);
+  const trace = cleanJsonRecord(raw.trace);
+  const contractReference = cleanString(raw.contractReference).trim();
+  if (!contractReference) return null;
+
+  return {
+    version: 1,
+    createdAt: cleanString(raw.createdAt, new Date(0).toISOString()),
+    contractDate: cleanString(raw.contractDate, cleanString(raw.createdAt, new Date(0).toISOString())),
+    contractReference,
+    locale: cleanString(raw.locale, 'ca'),
+    company: {
+      name: cleanString(company.name),
+      legalName: cleanString(company.legalName),
+      nif: cleanString(company.nif),
+      address: cleanString(company.address),
+      iban: cleanString(company.iban),
+      phone: cleanString(company.phone),
+      email: cleanString(company.email),
+    },
+    client: {
+      name: cleanString(client.name),
+      nif: cleanNullableString(client.nif),
+      email: cleanString(client.email),
+      phone: cleanNullableString(client.phone),
+    },
+    event: {
+      type: cleanString(event.type, 'OTHER'),
+      date: cleanString(event.date, new Date(0).toISOString()),
+      time: cleanNullableString(event.time),
+      endTime: cleanNullableString(event.endTime),
+      location: cleanString(event.location),
+      guestCount: cleanNumber(event.guestCount),
+    },
+    pack: {
+      name: cleanString(pack.name),
+      price: cleanNumber(pack.price),
+      djHours: cleanNumber(pack.djHours),
+    },
+    extras: cleanLines(raw.extras),
+    serviceLines: cleanLines(raw.serviceLines),
+    totals: {
+      subtotal: cleanNumber(totals.subtotal),
+      discount: cleanNumber(totals.discount),
+      vatRate: cleanNumber(totals.vatRate),
+      vatAmount: cleanNumber(totals.vatAmount),
+      total: cleanNumber(totals.total),
+      depositAmount: cleanNumber(totals.depositAmount),
+      depositDueDate: cleanString(totals.depositDueDate, new Date(0).toISOString()),
+      finalPaymentDue: cleanString(totals.finalPaymentDue, new Date(0).toISOString()),
+    },
+    terms: {
+      cancellationPolicy: cleanString(terms.cancellationPolicy),
+      additionalClauses: cleanString(terms.additionalClauses),
+    },
+    trace: {
+      proposalId: cleanString(trace.proposalId),
+      proposalReference: cleanString(trace.proposalReference),
+      customerId: cleanNullableString(trace.customerId),
+      leadId: cleanNullableString(trace.leadId),
+      bookingId: cleanNullableString(trace.bookingId),
+      total: cleanNumber(trace.total),
+      locale: cleanString(trace.locale, cleanString(raw.locale, 'ca')),
+    },
+  };
+}
+
+export function buildContractDocumentSnapshot(input: {
+  pdfData: ContractPdfData;
+  trace: ContractTrace;
+  createdAt?: Date;
+}): ContractDocumentSnapshot {
+  const createdAt = input.createdAt ?? new Date();
+  const data = input.pdfData;
+  return {
+    version: 1,
+    createdAt: createdAt.toISOString(),
+    contractDate: isoFromPdfDateInput(data.contractDate),
+    contractReference: data.contractReference,
+    locale: input.trace.locale,
+    company: {
+      name: data.companyName,
+      legalName: data.companyLegalName,
+      nif: data.companyNIF,
+      address: data.companyAddress,
+      iban: data.companyIBAN,
+      phone: data.companyPhone,
+      email: data.companyEmail,
+    },
+    client: {
+      name: data.clientName,
+      nif: data.clientNIF ?? null,
+      email: data.clientEmail,
+      phone: data.clientPhone ?? null,
+    },
+    event: {
+      type: data.eventType,
+      date: isoFromPdfDateInput(data.eventDate),
+      time: data.eventTime ?? null,
+      endTime: data.eventEndTime ?? null,
+      location: data.eventLocation,
+      guestCount: data.guestCount,
+    },
+    pack: {
+      name: data.packName,
+      price: data.packPrice,
+      djHours: data.djHours,
+    },
+    extras: data.extras ?? [],
+    serviceLines: data.serviceLines ?? [],
+    totals: {
+      subtotal: data.subtotal,
+      discount: data.discount,
+      vatRate: data.vatRate,
+      vatAmount: data.vatAmount,
+      total: data.total,
+      depositAmount: data.depositAmount,
+      depositDueDate: isoFromPdfDateInput(data.depositDueDate),
+      finalPaymentDue: isoFromPdfDateInput(data.finalPaymentDue),
+    },
+    terms: {
+      cancellationPolicy: data.cancellationPolicy,
+      additionalClauses: data.additionalClauses ?? '',
+    },
+    trace: input.trace,
+  };
+}
+
+export function mergeContractDocumentSnapshot(
+  snapshot: unknown,
+  contractSnapshot: ContractDocumentSnapshot,
+): Record<string, unknown> {
+  return {
+    ...cleanJsonRecord(snapshot),
+    contractSnapshot,
+  };
+}
+
+function contractSnapshotToPdfData(
+  snapshot: ContractDocumentSnapshot,
+  fallback: ContractPdfData,
+): ContractPdfData {
+  return {
+    ...fallback,
+    contractReference: snapshot.contractReference,
+    contractDate: cleanDate(snapshot.contractDate, fallback.contractDate),
+    companyName: snapshot.company.name || fallback.companyName,
+    companyLegalName: snapshot.company.legalName || fallback.companyLegalName,
+    companyNIF: snapshot.company.nif || fallback.companyNIF,
+    companyAddress: snapshot.company.address || fallback.companyAddress,
+    companyIBAN: snapshot.company.iban || fallback.companyIBAN,
+    companyPhone: snapshot.company.phone || fallback.companyPhone,
+    companyEmail: snapshot.company.email || fallback.companyEmail,
+    clientName: snapshot.client.name || fallback.clientName,
+    clientNIF: snapshot.client.nif ?? fallback.clientNIF,
+    clientEmail: snapshot.client.email || fallback.clientEmail,
+    clientPhone: snapshot.client.phone ?? fallback.clientPhone,
+    eventType: snapshot.event.type || fallback.eventType,
+    eventDate: cleanDate(snapshot.event.date, fallback.eventDate),
+    eventTime: snapshot.event.time ?? fallback.eventTime,
+    eventEndTime: snapshot.event.endTime ?? fallback.eventEndTime,
+    eventLocation: snapshot.event.location || fallback.eventLocation,
+    guestCount: snapshot.event.guestCount,
+    packName: snapshot.pack.name || fallback.packName,
+    packPrice: snapshot.pack.price,
+    djHours: snapshot.pack.djHours,
+    extras: snapshot.extras,
+    serviceLines: snapshot.serviceLines,
+    subtotal: snapshot.totals.subtotal,
+    discount: snapshot.totals.discount,
+    vatRate: snapshot.totals.vatRate,
+    vatAmount: snapshot.totals.vatAmount,
+    total: snapshot.totals.total,
+    depositAmount: snapshot.totals.depositAmount,
+    depositDueDate: cleanDate(snapshot.totals.depositDueDate, fallback.depositDueDate),
+    finalPaymentDue: cleanDate(snapshot.totals.finalPaymentDue, fallback.finalPaymentDue),
+    cancellationPolicy: snapshot.terms.cancellationPolicy || fallback.cancellationPolicy,
+    additionalClauses: snapshot.terms.additionalClauses || fallback.additionalClauses,
+  };
+}
+
 export async function renderContractPDF(proposalId: string): Promise<{
   contractReference: string;
   pdfBuffer: Buffer;
@@ -116,6 +428,9 @@ export async function renderContractPDF(proposalId: string): Promise<{
   finalPaymentDue: Date;
   cancellationPolicy: string;
   additionalClauses: string;
+  trace: ContractTrace;
+  contractSnapshot: ContractDocumentSnapshot;
+  proposalSnapshot: Record<string, unknown>;
 }> {
   const proposal = await prisma.proposal.findUniqueOrThrow({
     where: { id: proposalId },
@@ -183,7 +498,17 @@ export async function renderContractPDF(proposalId: string): Promise<{
       quantity: line.quantity || 1,
     }));
 
-  const pdfData: ContractPdfData = {
+  const trace: ContractTrace = {
+    proposalId: proposal.id,
+    proposalReference: proposal.reference,
+    customerId: proposal.customerId,
+    leadId: proposal.leadId,
+    bookingId: proposal.bookingId,
+    total: proposal.total,
+    locale,
+  };
+
+  const livePdfData: ContractPdfData = {
     contractReference,
     contractDate: now,
     companyName: company.name,
@@ -225,11 +550,34 @@ export async function renderContractPDF(proposalId: string): Promise<{
     signatureIp: proposal.contractSignatureIp || undefined,
   };
 
+  const existingContractSnapshot = readContractDocumentSnapshot(proposal.snapshot);
+  const contractSnapshot = existingContractSnapshot ?? buildContractDocumentSnapshot({
+    pdfData: livePdfData,
+    trace,
+    createdAt: now,
+  });
+  const pdfData = existingContractSnapshot
+    ? contractSnapshotToPdfData(existingContractSnapshot, livePdfData)
+    : livePdfData;
+
   const pdfDoc = await generateContractPDF(pdfData, locale);
   const pdfArrayBuffer = pdfDoc.output('arraybuffer');
   const pdfBuffer = Buffer.from(pdfArrayBuffer);
+  const renderedDepositDueDate = cleanDate(pdfData.depositDueDate, depositDueDate);
+  const renderedFinalPaymentDue = cleanDate(pdfData.finalPaymentDue, finalPaymentDue);
 
-  return { contractReference, pdfBuffer, depositAmount, depositDueDate, finalPaymentDue, cancellationPolicy, additionalClauses };
+  return {
+    contractReference: pdfData.contractReference,
+    pdfBuffer,
+    depositAmount: pdfData.depositAmount,
+    depositDueDate: renderedDepositDueDate,
+    finalPaymentDue: renderedFinalPaymentDue,
+    cancellationPolicy: pdfData.cancellationPolicy,
+    additionalClauses: pdfData.additionalClauses || '',
+    trace,
+    contractSnapshot,
+    proposalSnapshot: mergeContractDocumentSnapshot(proposal.snapshot, contractSnapshot),
+  };
 }
 
 export async function generateContractFromProposal(proposalId: string): Promise<{ contractReference: string; pdfBuffer: Buffer; }> {
@@ -245,6 +593,24 @@ export async function generateContractFromProposal(proposalId: string): Promise<
       finalPaymentDue: result.finalPaymentDue,
       cancellationPolicy: result.cancellationPolicy,
       additionalClauses: result.additionalClauses,
+      snapshot: toPrismaJson(result.proposalSnapshot),
+    },
+  });
+
+  await recordDocumentAdminLog({
+    action: DOCUMENT_ADMIN_LOG_ACTIONS.CONTRACT_GENERATED,
+    entity: 'proposal',
+    entityId: proposalId,
+    details: {
+      documentType: 'CONTRACT',
+      source: 'admin_contract_generate',
+      reference: result.contractReference,
+      contractReference: result.contractReference,
+      contractStatus: 'DRAFT',
+      depositAmount: result.depositAmount,
+      depositDueDate: result.depositDueDate.toISOString(),
+      finalPaymentDue: result.finalPaymentDue.toISOString(),
+      ...result.trace,
     },
   });
 
@@ -268,7 +634,8 @@ export async function sendContract(proposalId: string): Promise<void> {
     throw new Error('El contracte ja està signat');
   }
 
-  const { pdfBuffer } = await renderContractPDF(proposalId);
+  const rendered = await renderContractPDF(proposalId);
+  const { pdfBuffer } = rendered;
   const { sendEmail } = await import('@/lib/email');
 
   const locale = (proposal.locale || 'ca') as SupportedLocale;
@@ -293,7 +660,32 @@ export async function sendContract(proposalId: string): Promise<void> {
 
   await prisma.proposal.update({
     where: { id: proposalId },
-    data: { contractStatus: 'SENT', contractSentAt: new Date() },
+    data: {
+      contractStatus: 'SENT',
+      contractSentAt: new Date(),
+      snapshot: toPrismaJson(rendered.proposalSnapshot),
+    },
+  });
+
+  await recordDocumentAdminLog({
+    action: DOCUMENT_ADMIN_LOG_ACTIONS.CONTRACT_SENT,
+    entity: 'proposal',
+    entityId: proposalId,
+    details: {
+      documentType: 'CONTRACT',
+      source: 'admin_contract_send',
+      reference: proposal.contractReference,
+      contractReference: proposal.contractReference,
+      contractStatus: 'SENT',
+      proposalId: proposal.id,
+      proposalReference: proposal.reference,
+      customerId: proposal.customerId,
+      leadId: proposal.leadId,
+      bookingId: proposal.bookingId,
+      total: proposal.total,
+      locale: proposal.locale,
+      to: proposal.customer.email,
+    },
   });
 
   if (proposal.leadId) {
@@ -318,7 +710,7 @@ export async function sendContract(proposalId: string): Promise<void> {
 }
 
 export async function generateSignedContractPdf(proposalId: string): Promise<{ contractPdfUrl: string; contractPdfKey: string }> {
-  const { contractReference, pdfBuffer } = await renderContractPDF(proposalId);
+  const { contractReference, pdfBuffer, trace, proposalSnapshot } = await renderContractPDF(proposalId);
   const safeReference = contractReference.replace(/[^A-Za-z0-9_-]/g, '-');
   const contractPdfKey = `contracts/${proposalId}/${safeReference}-signed.pdf`;
   const uploaded = await uploadFile(contractPdfKey, pdfBuffer);
@@ -328,6 +720,22 @@ export async function generateSignedContractPdf(proposalId: string): Promise<{ c
     data: {
       contractPdfUrl: uploaded.publicUrl,
       contractPdfKey: uploaded.path,
+      snapshot: toPrismaJson(proposalSnapshot),
+    },
+  });
+
+  await recordDocumentAdminLog({
+    action: DOCUMENT_ADMIN_LOG_ACTIONS.CONTRACT_SIGNED_PDF_GENERATED,
+    entity: 'proposal',
+    entityId: proposalId,
+    details: {
+      documentType: 'CONTRACT',
+      source: 'contract_signature_pdf',
+      reference: contractReference,
+      contractReference,
+      contractPdfUrl: uploaded.publicUrl,
+      contractPdfKey: uploaded.path,
+      ...trace,
     },
   });
 
@@ -366,13 +774,44 @@ export async function markContractSigned(proposalId: string, signedBy: string): 
     });
   }
 
+  await recordDocumentAdminLog({
+    action: DOCUMENT_ADMIN_LOG_ACTIONS.CONTRACT_SIGNED,
+    entity: 'proposal',
+    entityId: proposalId,
+    details: {
+      documentType: 'CONTRACT',
+      source: 'admin_contract_sign',
+      reference: proposal.contractReference,
+      contractReference: proposal.contractReference,
+      contractStatus: 'SIGNED',
+      proposalId: proposal.id,
+      proposalReference: proposal.reference,
+      customerId: proposal.customerId,
+      leadId: proposal.leadId,
+      bookingId: proposal.bookingId,
+      total: proposal.total,
+      locale: proposal.locale,
+      signedBy,
+    },
+  });
+
   log.info(`Contracte signat: ${proposal.contractReference} per ${signedBy}`);
 }
 
 export async function cancelContract(proposalId: string) {
   const proposal = await prisma.proposal.findUniqueOrThrow({
     where: { id: proposalId },
-    select: { contractStatus: true, contractReference: true, leadId: true },
+    select: {
+      id: true,
+      reference: true,
+      customerId: true,
+      leadId: true,
+      bookingId: true,
+      total: true,
+      locale: true,
+      contractStatus: true,
+      contractReference: true,
+    },
   });
 
   if (!proposal.contractStatus || !proposal.contractReference) {
@@ -398,6 +837,26 @@ export async function cancelContract(proposalId: string) {
       contractReference: proposal.contractReference,
     });
   }
+
+  await recordDocumentAdminLog({
+    action: DOCUMENT_ADMIN_LOG_ACTIONS.CONTRACT_CANCELLED,
+    entity: 'proposal',
+    entityId: proposalId,
+    details: {
+      documentType: 'CONTRACT',
+      source: 'admin_contract_cancel',
+      reference: proposal.contractReference,
+      contractReference: proposal.contractReference,
+      contractStatus: 'CANCELLED',
+      proposalId: proposal.id,
+      proposalReference: proposal.reference,
+      customerId: proposal.customerId,
+      leadId: proposal.leadId,
+      bookingId: proposal.bookingId,
+      total: proposal.total,
+      locale: proposal.locale,
+    },
+  });
 
   return { status: 200, body: { ok: true, status: 'CANCELLED' } };
 }

@@ -31,6 +31,7 @@ import { resolvePackI18nKey, resolvePackI18nFeatures } from '@/lib/pack-i18n';
 // jspdf carrega lazy — només quan l'usuari clica "Descarregar PDF"
 import TurnstileWidget from '@/components/security/TurnstileWidget';
 import { toIntlLocale } from '@/lib/constants';
+import { formatLocalDateInputValue } from '@/lib/date-input';
 import { getLocalizedWhatsAppUrl } from '@/config/site-config';
 
 import { type EventType, type ConfigState, type AppliedDiscountCode, type PricingSummary, type ClosingPricingSummary, EVENT_TYPE_SERVICE_MAP, EVENT_TYPE_CARDS, EVENT_AMBIENTS, getPacksForEventType, getMinPriceForEventType, calculatePricingSummary, calculateClosingPricing, toggleExtraSelection, filterUnavailableExtras, getSelectedExtraNames } from './configurador-utils';
@@ -492,7 +493,7 @@ export default function ConfiguradorClient() {
 
   // Set minDate on client to avoid hydration mismatch
   useEffect(() => {
-    setMinDate(new Date().toISOString().split('T')[0]);
+    setMinDate(formatLocalDateInputValue());
   }, []);
 
   const getDiscountCodeErrorText = (reason: string) => {
@@ -1031,6 +1032,7 @@ export default function ConfiguradorClient() {
     buildPayload: (leadFormData, token) => ({
       name: leadFormData.name,
       contact: leadFormData.contact,
+      locale,
       event: selectedEvent,
       message: t('requestMessage', { amount: earlyBirdDiscount }),
       packId: selectedPackId,
@@ -1247,8 +1249,6 @@ export default function ConfiguradorClient() {
     </div>
   );
 }
-
-
 
 
 

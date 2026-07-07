@@ -145,6 +145,11 @@ export async function runCommercialDailyAutomation() {
         message: w.alertMessage,
       })),
     },
+    notifications: {
+      emailSent: false,
+      whatsappSent: false,
+      errors: 0,
+    },
   };
 
   const subject = `Resum diari comercial · ${new Date().toLocaleDateString('ca-ES')}`;
@@ -210,7 +215,13 @@ export async function runCommercialDailyAutomation() {
   `;
 
   const recipient = (await getRecipientsAsString('reports')) || SITE_CONFIG.business.email;
-  await sendEmail({ to: recipient, subject, html });
+  try {
+    await sendEmail({ to: recipient, subject, html });
+    summary.notifications.emailSent = true;
+  } catch (err) {
+    summary.notifications.errors += 1;
+    log.error('Commercial daily email summary failed', err);
+  }
 
   const waTo = (process.env.ADMIN_WHATSAPP || SITE_CONFIG.business.phone).replace(/[^\d]/g, '');
   if (waTo) {
@@ -243,7 +254,16 @@ export async function runCommercialDailyAutomation() {
       }
     }
     const waText = waLines.join('\n');
-    await sendWhatsAppText({ to: waTo, text: waText });
+    try {
+      const result = await sendWhatsAppText({ to: waTo, text: waText });
+      summary.notifications.whatsappSent = result.ok;
+      if (!result.ok) {
+        summary.notifications.errors += 1;
+      }
+    } catch (err) {
+      summary.notifications.errors += 1;
+      log.error('Commercial daily WhatsApp summary failed', err);
+    }
   }
 
   await prisma.adminLog.create({

@@ -74,7 +74,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
     <section className="ap-card p-5">
       <h2 className="ap-h2">Model econòmic de packs</h2>
       <p className="mt-1 text-xs">
-        Aquesta configuració calcula PVP recomanat, hora extra recomanada i alertes de divergència a packs.
+        Aquesta configuració calcula PVP recomanat, hora extra recomanada i alertes de divergència a packs. El recomanat comercial s'arrodoneix sempre amunt a desenes.
       </p>
 
       <div className="mt-4 grid gap-4 xl:grid-cols-[1.6fr,1fr]">
@@ -197,7 +197,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
             </div>
             <div className="rounded-[var(--o-r-md)] border border-[var(--line)] bg-[var(--sunk)] p-3">
               <p>Cost equip/hora usat al càlcul = inventari/h + personal/h + cost fix.</p>
-              <p className="mt-1">PVP recomanat = cost / (1 - objectiu marge).</p>
+              <p className="mt-1">PVP recomanat = cost / (1 - objectiu marge), arrodonit amunt a acabat en 0.</p>
             </div>
           </div>
         </aside>

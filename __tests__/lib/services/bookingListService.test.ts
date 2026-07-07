@@ -3,6 +3,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     booking: {
+      fields: {
+        depositAmount: { name: 'depositAmount' },
+        remainingAmount: { name: 'remainingAmount' },
+        total: { name: 'total' },
+      },
       findMany: vi.fn(),
       count: vi.fn(),
       groupBy: vi.fn(),
@@ -13,6 +18,10 @@ const { mockPrisma } = vi.hoisted(() => ({
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 
 import { listAdminBookings } from '@/lib/services/bookingListService';
+
+function fieldName(fieldRef: unknown): string | undefined {
+  return (fieldRef as { name?: string })?.name;
+}
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -136,9 +145,13 @@ describe('propagació de `now` a filtres de pagament', () => {
 
     const call = mockPrisma.booking.findMany.mock.calls[0][0];
     const andClauses = call.where.AND as Record<string, unknown>[];
-    const orClause = andClauses.find((c) => c.OR) as { OR: Array<{ eventDate?: { lt: Date } }> };
-    expect(orClause.OR[0].eventDate?.lt).toEqual(new Date('2026-07-15T00:00:00Z'));
-    expect(orClause.OR[1].eventDate?.lt).toEqual(new Date('2026-06-22T00:00:00Z'));
+    const orClause = andClauses.find((c) => c.OR) as { OR: any[] };
+    const [deposit, remaining] = orClause.OR;
+    expect(deposit.eventDate?.lt).toEqual(new Date('2026-07-15T00:00:00Z'));
+    expect(fieldName(deposit.OR[1].cashAmount.lt)).toBe('depositAmount');
+    expect(remaining.eventDate?.lt).toEqual(new Date('2026-06-22T00:00:00Z'));
+    expect(fieldName(remaining.OR[1].cashAmount.lt)).toBe('remainingAmount');
+    expect(fieldName(remaining.OR[2].cashAmount.lt)).toBe('total');
   });
 
   it('payment=due-soon: usa `now` injectat per a les finestres de deposit/remaining', async () => {
@@ -151,15 +164,19 @@ describe('propagació de `now` a filtres de pagament', () => {
 
     const call = mockPrisma.booking.findMany.mock.calls[0][0];
     const andClauses = call.where.AND as Record<string, unknown>[];
-    const orClause = andClauses.find((c) => c.OR) as { OR: Array<{ eventDate?: { gte: Date; lte: Date } }> };
-    expect(orClause.OR[0].eventDate).toEqual({
+    const orClause = andClauses.find((c) => c.OR) as { OR: any[] };
+    const [deposit, remaining] = orClause.OR;
+    expect(deposit.eventDate).toEqual({
       gte: new Date('2026-07-15T00:00:00Z'),
       lte: new Date('2026-07-22T00:00:00Z'),
     });
-    expect(orClause.OR[1].eventDate).toEqual({
+    expect(fieldName(deposit.OR[1].cashAmount.lt)).toBe('depositAmount');
+    expect(remaining.eventDate).toEqual({
       gte: new Date('2026-06-22T00:00:00Z'),
       lte: new Date('2026-06-29T00:00:00Z'),
     });
+    expect(fieldName(remaining.OR[1].cashAmount.lt)).toBe('remainingAmount');
+    expect(fieldName(remaining.OR[2].cashAmount.lt)).toBe('total');
   });
 
   it('sense `now` explícit, usa un default (Date) i no llança', async () => {

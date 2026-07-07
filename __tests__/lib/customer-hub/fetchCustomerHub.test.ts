@@ -221,6 +221,7 @@ describe('fetchCustomerHub', () => {
           total: 1250,
           depositAmount: 300,
           remainingAmount: 950,
+          cashAmount: 500,
           discountCode: null,
           eventType: 'WEDDING',
           eventDate: new Date('2026-06-20T18:00:00Z'),
@@ -249,7 +250,9 @@ describe('fetchCustomerHub', () => {
           eventVenue: 'Masia Can Riera',
           distanceKm: 86.4,
           depositAmount: 300,
+          remainingAmount: 950,
           total: 1250,
+          cashAmount: 500,
           eventType: 'WEDDING',
           guestCount: 120,
           depositPaid: true,
@@ -272,6 +275,47 @@ describe('fetchCustomerHub', () => {
     expect(result.leads[0].booking).toMatchObject({
       id: 'booking-lead-1',
       distanceKm: 86.4,
+      cashAmount: 500,
+    });
+  });
+
+  it('calcula totalPaid amb cashAmount encara que els flags estiguin pendents', async () => {
+    mockFetchCustomerHubCollections.mockResolvedValue({
+      proposals: [],
+      bookingsRows: [
+        {
+          id: 'booking-cash-1',
+          reference: 'ORB-CASH-1',
+          eventDate: new Date('2026-06-20T18:00:00Z'),
+          eventStartTime: '18:00',
+          eventEndTime: '02:00',
+          status: 'CONFIRMED',
+          eventLocation: 'Girona',
+          eventVenue: null,
+          distanceKm: null,
+          depositAmount: 300,
+          remainingAmount: 700,
+          total: 1000,
+          cashAmount: 1000,
+          eventType: 'WEDDING',
+          guestCount: 120,
+          depositPaid: false,
+          remainingPaid: false,
+          discountCode: null,
+          pack: null,
+        },
+      ],
+      customerTasks: [],
+      activityLog: [],
+      customerDiscountCodes: [],
+    });
+
+    const result = await fetchCustomerHub('cust-1');
+
+    expect(result.kpis.totalPaid).toBe(1000);
+    expect(result.bookings[0]).toMatchObject({
+      id: 'booking-cash-1',
+      cashAmount: 1000,
     });
   });
 
@@ -289,6 +333,54 @@ describe('fetchCustomerHub', () => {
     expect(mockFetchCanonicalEventsForCustomer).toHaveBeenCalledWith('cust-1', 250);
     expect(mockBuildCustomerActivityTimelineEvents).toHaveBeenCalledWith(expect.objectContaining({
       canonicalEvents: [],
+    }));
+  });
+
+  it("propaga l'origen lead/booking/customer de les propostes", async () => {
+    mockFetchCustomerHubCollections.mockResolvedValue({
+      proposals: [
+        {
+          id: 'prop-1',
+          reference: 'P-2026-001',
+          customerId: 'cust-1',
+          leadId: 'lead-1',
+          bookingId: 'booking-1',
+          status: 'SENT',
+          total: 900,
+          createdAt: new Date('2026-04-10T10:00:00Z'),
+          sentAt: new Date('2026-04-11T10:00:00Z'),
+          acceptedAt: null,
+          snapshot: {},
+          contractReference: null,
+          contractStatus: null,
+          contractPdfUrl: null,
+          contractSentAt: null,
+          contractSignedAt: null,
+        },
+      ],
+      bookingsRows: [],
+      customerTasks: [],
+      activityLog: [],
+      customerDiscountCodes: [],
+    });
+
+    const result = await fetchCustomerHub('cust-1');
+
+    expect(result.proposals[0]).toMatchObject({
+      id: 'prop-1',
+      customerId: 'cust-1',
+      leadId: 'lead-1',
+      bookingId: 'booking-1',
+    });
+    expect(mockBuildCustomerBusinessTimelineEvents).toHaveBeenCalledWith(expect.objectContaining({
+      proposals: [
+        expect.objectContaining({
+          id: 'prop-1',
+          customerId: 'cust-1',
+          leadId: 'lead-1',
+          bookingId: 'booking-1',
+        }),
+      ],
     }));
   });
 

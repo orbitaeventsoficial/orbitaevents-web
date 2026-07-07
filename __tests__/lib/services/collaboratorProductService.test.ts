@@ -22,6 +22,8 @@ import {
   parseDossierCollaboratorProductId,
   toDossierCollaboratorProductId,
   listCollaboratorProducts,
+  listDossierCollaboratorProducts,
+  listActiveCollaboratorProductsForBooking,
   createCollaboratorProduct,
   updateCollaboratorProduct,
   deleteCollaboratorProduct,
@@ -101,6 +103,7 @@ describe('dossier collaborator product mapping', () => {
     expect(product.inclou).toContain('Disponible en català');
     expect(product.sellPrice).toBe(385);
     expect(product.costPrice).toBe(320);
+    expect(product.imageUrl).toBe('/img/pirates.jpg');
   });
 
   it('sanititza qualsevol menció de marca de proveïdor del text client-facing', () => {
@@ -124,6 +127,64 @@ describe('dossier collaborator product mapping', () => {
     expect(dossierProduct.inclou).toContain('Desplaçament inclòs');
     expect(dossierProduct.noInclou).toContain('IVA');
     expect(dossierProduct.sourceCostPrice).toBe(320);
+    expect(dossierProduct.image).toBe('/img/pirates.jpg');
+  });
+
+  it('inclou qualsevol producte actiu de partner al catàleg del dossier', async () => {
+    mockPrisma.collaboratorProduct.findMany.mockResolvedValue([
+      {
+        ...rawProduct,
+        id: 'prod-nou',
+        name: 'Viatge musical pel món',
+        category: 'Animació infantil',
+        collaboratorId: 'collab-1',
+        isActive: true,
+      },
+    ]);
+
+    const products = await listDossierCollaboratorProducts();
+
+    expect(mockPrisma.collaboratorProduct.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { isActive: true, visibleInDossier: true, collaborator: { isActive: true } },
+    }));
+    expect(products).toHaveLength(1);
+    expect(products[0]).toEqual(expect.objectContaining({
+      id: 'collab:prod-nou',
+      nom: 'Viatge musical pel món',
+      categoria: 'Animació infantil',
+    }));
+  });
+
+  it('separa productes de dossier i productes interns de configurador', async () => {
+    mockPrisma.collaboratorProduct.findMany.mockResolvedValue([
+      {
+        ...rawProduct,
+        id: 'isma-altaveus',
+        name: 'Lloguer altaveus DJ',
+        category: 'Cost intern DJ',
+        collaboratorId: 'isma-lloguer-altaveus',
+        costPrice: 50,
+        sellPrice: 0,
+        visibleInDossier: false,
+        visibleInBooking: true,
+        collaborator: { name: 'Isma', company: 'Isma — lloguer altaveus', roles: ['EQUIPMENT_RENTAL', 'PROVIDER'] },
+      },
+    ]);
+
+    const products = await listActiveCollaboratorProductsForBooking();
+
+    expect(mockPrisma.collaboratorProduct.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { isActive: true, visibleInBooking: true, collaborator: { isActive: true } },
+    }));
+    expect(products[0]).toEqual(expect.objectContaining({
+      id: 'isma-altaveus',
+      name: 'Lloguer altaveus DJ',
+      sellPrice: 0,
+      costPrice: 50,
+      visibleInDossier: false,
+      visibleInBooking: true,
+      roles: ['EQUIPMENT_RENTAL', 'PROVIDER'],
+    }));
   });
 });
 
@@ -169,6 +230,8 @@ describe('createCollaboratorProduct', () => {
     expect(data.costPrice).toBe(200.13);
     expect(data.sellPrice).toBe(250.46);
     expect(data.sortOrder).toBe(0);
+    expect(data.visibleInDossier).toBe(true);
+    expect(data.visibleInBooking).toBe(true);
   });
 });
 

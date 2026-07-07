@@ -7,7 +7,7 @@
  * Ús: node scripts/seed-masquerade-products.mjs
  */
 import { PrismaClient } from '@prisma/client';
-import { resellPrice } from '../lib/constants/pricing.ts';
+import { resellPrice, roundRecommendedSellingPrice } from '../lib/constants/pricing.ts';
 import { getIncludedTravelOneWayKm } from '../lib/services/travelCost.ts';
 
 const prisma = new PrismaClient();
@@ -25,6 +25,10 @@ function productPrice(costPrice) {
   return resellPrice(costPrice);
 }
 
+function commercialProductPrice(costPrice) {
+  return roundRecommendedSellingPrice(productPrice(costPrice));
+}
+
 const PRODUCTS = [
   {
     name: 'Animació temàtica',
@@ -38,6 +42,21 @@ const PRODUCTS = [
     description: "Els nostres personatges més entranyables vénen a descobrir-te un nou món de màgia i de color. Una animació on els jocs i els balls són els protagonistes, en un xou totalment dinàmic i ple de música. Pregunta'ns pels personatges disponibles!",
     includes: INCLUDES,
     sortOrder: 3,
+  },
+  {
+    name: 'Bingo Musical KIDS',
+    category: CHILDREN_CATEGORY,
+    crew: 'Presentador + tècnic de so + equip propi',
+    durationLabel: '1h',
+    costPrice: 160,
+    sellPrice: commercialProductPrice(160),
+    imageUrl: `${IMG}/bingo-musical.jpg`,
+    description: "Versió infantil i familiar del Bingo Musical, especialment pensada per a nens i nenes de 6 a 12 anys i també per als pares. Una hora de música, joc i participació amb cançons enfocades al jovent actual, dinàmiques per a la mainada, dues línies i el bingo final. Manté l'energia del format gran però amb una durada més curta i un ritme adaptat a casals, escoles i festes familiars.",
+    includes: `${INCLUDES} · Cartons i gomets de bingo · Dinàmiques infantils · Dues línies i bingo final`,
+    isActive: true,
+    visibleInDossier: true,
+    visibleInBooking: true,
+    sortOrder: 2,
   },
   {
     name: 'Animació amb personatge',
@@ -93,7 +112,7 @@ const PRODUCTS = [
     description: "Els temazos sonen des del primer minut, sempre des de la part que tothom reconeix, mentre el presentador porta l'energia. Cada participant té el seu cartró i els seus gomets; el joc acumula línies i, quan s'omplen, els guanyadors surten al davant per als reptes musicals. Tres rondes, cada cop diferent, mentre el públic canta i anima fins que algú canta bingo.",
     includes: INCLUDES,
     isActive: true,
-    sortOrder: 1,
+    sortOrder: 10,
   },
   {
     name: 'Batalla Musical',
@@ -107,7 +126,7 @@ const PRODUCTS = [
     description: "Hora i mitja de competició musical. Els participants es divideixen en equips i s'enfronten en reptes: karaoke col·lectiu, endevina la cançó, ball, preguntes musicals, concurs de talent… Cada repte suma punts i, al final, un sol equip s'emporta la Batalla Musical. Qui no vulgui competir pot fer de jurat.",
     includes: INCLUDES,
     isActive: true,
-    sortOrder: 2,
+    sortOrder: 11,
   },
   {
     name: 'Pintacares professional',

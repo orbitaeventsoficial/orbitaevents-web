@@ -44,6 +44,15 @@ const AVAILABLE_COMPONENTS: AvailableComponent[] = [
 
 let nextId = 1;
 
+async function readCustomQuoteSaveError(response: Response): Promise<string> {
+  try {
+    const payload = await response.json() as { error?: string; message?: string };
+    return payload.error || payload.message || 'Error desant el pressupost';
+  } catch {
+    return 'Error desant el pressupost';
+  }
+}
+
 // ─── Main Component ─────────────────────────────────────────────────────────
 
 export default function CostCalculatorClient() {
@@ -154,14 +163,14 @@ export default function CostCalculatorClient() {
           marginPct: totals.marginPct,
         }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(await readCustomQuoteSaveError(res));
       toast.success('Pressupost desat');
       setQuoteName('');
       setClientName('');
       setComponents([]);
     } catch (err) {
       console.error('Error desant pressupost', err);
-      toast.error('Error desant');
+      toast.error(err instanceof Error ? err.message : 'Error desant el pressupost');
     } finally {
       setSaving(false);
     }
@@ -375,5 +384,4 @@ export default function CostCalculatorClient() {
     </div>
   );
 }
-
 

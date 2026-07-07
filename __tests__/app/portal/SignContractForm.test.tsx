@@ -25,6 +25,7 @@ const messages = {
   signNamePlaceholder: 'Escriu el teu nom',
   signAcceptTerms: 'Accepto signar el contracte',
   signSubmit: 'Signar contracte',
+  signSubmitting: 'Signant contracte...',
   signSuccess: 'Contracte signat correctament',
   signSuccessBack: 'Tornar al portal',
   signError: 'No hem pogut signar el contracte',
@@ -89,8 +90,22 @@ describe('SignContractForm', () => {
         body: JSON.stringify({ signedBy: 'Maria Garcia', signatureBlob: 'data:image/png;base64,abc123' }),
       })),
     );
-    expect(await screen.findByText('Contracte signat correctament')).toBeInTheDocument();
+    expect(await screen.findByRole('status')).toHaveTextContent('Contracte signat correctament');
     expect(screen.getByRole('link', { name: 'Tornar al portal' })).toHaveAttribute('href', '/ca/portal/raw-token');
+  });
+
+  it('mostra el text de carrega localitzat mentre envia la signatura', async () => {
+    vi.mocked(fetch).mockReturnValueOnce(new Promise(() => {}) as unknown as Promise<Response>);
+
+    renderForm();
+
+    fireEvent.change(screen.getByLabelText('Nom complet'), { target: { value: 'Maria Garcia' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Dibuixa la signatura' }));
+    fireEvent.click(screen.getByLabelText(/Accepto signar el contracte/));
+    fireEvent.click(screen.getByRole('button', { name: 'Signar contracte' }));
+
+    expect(await screen.findByRole('button', { name: 'Signant contracte...' })).toBeDisabled();
+    expect(screen.queryByRole('button', { name: '…' })).not.toBeInTheDocument();
   });
 
   it('mostra el missatge específic per contracte ja signat', async () => {
@@ -106,7 +121,24 @@ describe('SignContractForm', () => {
     fireEvent.click(screen.getByLabelText(/Accepto signar el contracte/));
     fireEvent.click(screen.getByRole('button', { name: 'Signar contracte' }));
 
-    expect(await screen.findByText('Aquest contracte ja està signat')).toBeInTheDocument();
+    expect(await screen.findByRole('alert')).toHaveTextContent('Aquest contracte ja està signat');
+  });
+
+  it('no mostra errors desconeguts del backend com a text cru', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: false,
+      json: vi.fn().mockResolvedValue({ error: 'STACK_TRACE_500' }),
+    } as unknown as Response);
+
+    renderForm();
+
+    fireEvent.change(screen.getByLabelText('Nom complet'), { target: { value: 'Maria Garcia' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Dibuixa la signatura' }));
+    fireEvent.click(screen.getByLabelText(/Accepto signar el contracte/));
+    fireEvent.click(screen.getByRole('button', { name: 'Signar contracte' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('No hem pogut signar el contracte');
+    expect(screen.queryByText('STACK_TRACE_500')).not.toBeInTheDocument();
   });
 
   it('recupera l’estat interactiu si falla la xarxa', async () => {
@@ -119,7 +151,7 @@ describe('SignContractForm', () => {
     fireEvent.click(screen.getByLabelText(/Accepto signar el contracte/));
     fireEvent.click(screen.getByRole('button', { name: 'Signar contracte' }));
 
-    expect(await screen.findByText('No hem pogut signar el contracte')).toBeInTheDocument();
+    expect(await screen.findByRole('alert')).toHaveTextContent('No hem pogut signar el contracte');
     expect(screen.getByRole('button', { name: 'Signar contracte' })).toBeEnabled();
   });
 });

@@ -5,6 +5,7 @@ import { getAllPacks } from '@/config/packs-config';
 import { resolvePackI18nFeatures, resolvePackI18nKey } from '@/lib/pack-i18n';
 import { log } from '@/lib/logger';
 import { SUPPORTED_LOCALES } from '@/lib/constants';
+import { roundRecommendedSellingPrice } from '@/lib/constants/pricing';
 
 type PackTranslationInput = {
   locale: string;
@@ -41,6 +42,11 @@ type PackInventoryInput = {
   quantity?: number | string;
   isRequired?: boolean;
 };
+
+function normalizePackSellingPrice(value: number | undefined): number | undefined {
+  if (value === undefined) return undefined;
+  return roundRecommendedSellingPrice(Number(value));
+}
 
 async function completePackTranslations(input: unknown): Promise<PackTranslationInput[] | undefined> {
   if (!Array.isArray(input) || input.length === 0) return undefined;
@@ -142,13 +148,16 @@ export async function createAdminPack(input: CreatePackInput) {
     return { status: 400, body: { error: 'slug, price i djHours són obligatoris' } };
   }
 
+  const normalizedPrice = normalizePackSellingPrice(price) ?? price;
+  const normalizedExtraHourPrice = normalizePackSellingPrice(extraHourPrice || 75) ?? 75;
+
   const pack = await prisma.pack.create({
     data: {
       slug,
       service: service || null,
-      price,
+      price: normalizedPrice,
       originalPrice,
-      extraHourPrice: extraHourPrice || 75,
+      extraHourPrice: normalizedExtraHourPrice,
       djHours,
       soundWatts: soundWatts || 4000,
       includesFog: includesFog ?? true,
@@ -165,7 +174,7 @@ export async function createAdminPack(input: CreatePackInput) {
       action: 'CREATE',
       entity: 'pack',
       entityId: pack.id,
-      details: { slug, price },
+      details: { slug, price: normalizedPrice },
     },
   });
 
@@ -206,9 +215,9 @@ export async function updateAdminPack(id: string, input: UpdatePackInput) {
 
   const updateData: Record<string, unknown> = {
     service: input.service,
-    price: input.price,
+    price: normalizePackSellingPrice(input.price),
     originalPrice: input.originalPrice,
-    extraHourPrice: input.extraHourPrice,
+    extraHourPrice: normalizePackSellingPrice(input.extraHourPrice),
     djHours: input.djHours,
     soundWatts: input.soundWatts,
     includesFog: input.includesFog,
@@ -288,7 +297,7 @@ export async function syncAdminPacksFromConfig() {
         const packData = {
           code: pack.id,
           service: pack.service,
-          price: pack.priceValue,
+          price: normalizePackSellingPrice(pack.priceValue) ?? pack.priceValue,
           originalPrice: pack.priceOriginalValue || null,
           djHours: pack.durationHours || 4,
           isFeatured: pack.popular || false,

@@ -13,6 +13,9 @@ export type ProposalStatus = 'DRAFT' | 'SENT' | 'VIEWED' | 'ACCEPTED' | 'REJECTE
 export type ProposalDTO = {
   id: string;
   reference: string;
+  customerId?: string | null;
+  leadId?: string | null;
+  bookingId?: string | null;
   status: ProposalStatus;
   total: number;
   createdAt: string;
@@ -22,6 +25,7 @@ export type ProposalDTO = {
   // Contract fields
   contractReference?: string | null;
   contractStatus?: string | null;
+  contractPdfUrl?: string | null;
   contractSentAt?: string | null;
   contractSignedAt?: string | null;
 };
@@ -36,7 +40,9 @@ export type BookingDTO = {
   venue?: string;
   distanceKm?: number;
   depositAmount?: number;
+  remainingAmount?: number;
   totalAmount?: number;
+  cashAmount?: number;
   reference?: string;
   eventType?: string;
   packName?: string;
@@ -137,6 +143,7 @@ export type TimelineEventDTO = {
   title: string;
   meta?: Record<string, unknown>;
   link?: { label: string; href: string };
+  originLinks?: Array<{ label: string; href: string }>;
 };
 
 export type ActiveDocumentDTO = {
@@ -167,6 +174,7 @@ export type LeadDTO = {
     total: number;
     depositAmount?: number;
     remainingAmount?: number;
+    cashAmount?: number;
     discountCode?: string;
     eventType?: string;
     date?: string;

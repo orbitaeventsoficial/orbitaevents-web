@@ -60,12 +60,12 @@ describe('usePacks', () => {
     expect(result.current.packs[0].name).toBe('Pack F');
   });
 
-  it('estableix error i usa el fallback si el fetch llença una excepció', async () => {
+  it('usa el fallback i no propaga errors tècnics si el fetch llença una excepció', async () => {
     mockFetchPublicPacks.mockRejectedValue(new Error('api down'));
     const fallback = [stubPack('FB')];
     const { result } = renderHook(() => usePacks({ locale: 'ca', fallback }));
     await waitFor(() => expect(result.current.loading).toBe(false));
-    expect(result.current.error).toBe('api down');
+    expect(result.current.error).toBeNull();
     expect(result.current.packs[0].name).toBe('Pack FB');
   });
 });

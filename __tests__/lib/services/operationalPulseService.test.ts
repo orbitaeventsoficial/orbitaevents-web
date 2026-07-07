@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { generateOperationalPulse, type PulseInput, type PulseLevel } from '@/lib/services/operationalPulseService';
+import {
+  calculatePaymentCollectionRate,
+  generateOperationalPulse,
+  type PulseInput,
+  type PulseLevel,
+} from '@/lib/services/operationalPulseService';
 
 const NOW = new Date('2026-04-10T10:00:00Z');
 
@@ -168,5 +173,44 @@ describe('generateOperationalPulse', () => {
     const m = result.metrics.find((m) => m.key === 'pipelineHealth')!;
     expect(m.level).toBe('CRITICAL');
     expect(m.value).toBe(0);
+  });
+});
+
+describe('calculatePaymentCollectionRate', () => {
+  it('retorna 100 si no hi ha reserves dins la finestra', () => {
+    expect(calculatePaymentCollectionRate([])).toBe(100);
+  });
+
+  it('compta una reserva amb flags pagats com a cobrada', () => {
+    expect(calculatePaymentCollectionRate([
+      { total: 1000, depositAmount: 300, remainingAmount: 700, depositPaid: true, remainingPaid: true, cashAmount: null },
+    ])).toBe(100);
+  });
+
+  it('compta cashAmount total com a cobrat encara que els flags siguin falsos', () => {
+    expect(calculatePaymentCollectionRate([
+      { total: 1000, depositAmount: 300, remainingAmount: 700, depositPaid: false, remainingPaid: false, cashAmount: 1000 },
+    ])).toBe(100);
+  });
+
+  it('no compta cashAmount parcial com a reserva liquidada', () => {
+    expect(calculatePaymentCollectionRate([
+      { total: 1000, depositAmount: 300, remainingAmount: 700, depositPaid: false, remainingPaid: false, cashAmount: 300 },
+      { total: 900, depositAmount: 270, remainingAmount: 630, depositPaid: true, remainingPaid: true, cashAmount: null },
+    ])).toBe(50);
+  });
+
+  it('normalitza decimals serialitzables de Prisma abans de calcular', () => {
+    const decimal = (value: string) => ({ toString: () => value });
+    expect(calculatePaymentCollectionRate([
+      {
+        total: decimal('1000'),
+        depositAmount: decimal('300'),
+        remainingAmount: decimal('700'),
+        depositPaid: false,
+        remainingPaid: false,
+        cashAmount: decimal('1000'),
+      },
+    ])).toBe(100);
   });
 });

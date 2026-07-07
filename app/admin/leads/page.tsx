@@ -14,6 +14,8 @@ import { EVENT_TYPE_PLAIN, LEAD_STATUS_VALUES, PRIORITY_VALUES, SOURCE_LABELS } 
 import AdminLeadsClient, { type LeadData } from './LeadsSeasonClient';
 import type { LeadStatus } from './leadStatusClient';
 
+export const dynamic = 'force-dynamic';
+
 function toLeadStatus(status: string): LeadStatus | null {
   return (LEAD_STATUS_VALUES as readonly string[]).includes(status) ? (status as LeadStatus) : null;
 }

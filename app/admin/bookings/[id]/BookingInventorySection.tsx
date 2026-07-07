@@ -54,6 +54,21 @@ interface SkippedDetail {
   itemName: string;
 }
 
+type InventoryMessageKind = 'success' | 'error';
+type InventoryErrorTarget =
+  | 'load'
+  | 'assign-item'
+  | 'assign-pack'
+  | 'assign-bundle'
+  | 'remove'
+  | 'checkout'
+  | 'checkin';
+type InventoryMessageMeta = {
+  target?: InventoryErrorTarget;
+  itemId?: string;
+  assignmentId?: string;
+};
+
 export default function BookingInventorySection({ bookingId }: { bookingId: string }) {
   const [assigned, setAssigned] = useState<Assignment[]>([]);
   const [available, setAvailable] = useState<InventoryItem[]>([]);
@@ -65,8 +80,32 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
   const [loading, setLoading] = useState(true);
   const [showSearch, setShowSearch] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [messageKind, setMessageKind] = useState<InventoryMessageKind | null>(null);
+  const [messageMeta, setMessageMeta] = useState<InventoryMessageMeta | null>(null);
   const [skippedDetails, setSkippedDetails] = useState<SkippedDetail[]>([]);
   const { confirm, dialogProps } = useConfirmDialog();
+
+  const showInventoryMessage = useCallback((text: string, kind: InventoryMessageKind, meta?: InventoryMessageMeta) => {
+    setMessage(text);
+    setMessageKind(kind);
+    setMessageMeta(kind === 'error' ? meta ?? null : null);
+  }, []);
+
+  const clearInventoryMessage = useCallback(() => {
+    setMessage(null);
+    setMessageKind(null);
+    setMessageMeta(null);
+  }, []);
+
+  const hasInventoryError = (
+    target: InventoryErrorTarget,
+    ids?: { itemId?: string; assignmentId?: string },
+  ) => (
+    messageKind === 'error'
+    && messageMeta?.target === target
+    && (!ids?.itemId || messageMeta.itemId === ids.itemId)
+    && (!ids?.assignmentId || messageMeta.assignmentId === ids.assignmentId)
+  );
 
   const reasonLabel = (reason: string) => {
     if (reason === 'OVERLAP') return 'Ocupat en una altra reserva activa';
@@ -91,12 +130,13 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       if (!selectedBundleId && Array.isArray(data.bundles) && data.bundles.length > 0) {
         setSelectedBundleId(data.bundles[0].id);
       }
-    } catch {
-      setMessage('No s\'ha pogut carregar l\'inventari de la reserva.');
+    } catch (error) {
+      console.error('[BookingInventorySection] Error carregant inventari de reserva', { bookingId, error });
+      showInventoryMessage('No s\'ha pogut carregar l\'inventari de la reserva.', 'error', { target: 'load' });
     } finally {
       setLoading(false);
     }
-  }, [bookingId, selectedBundleId]);
+  }, [bookingId, selectedBundleId, showInventoryMessage]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -120,19 +160,26 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setMessage(data?.error || 'Error assignant');
+        console.error('[BookingInventorySection] Resposta rebutjada assignant element', {
+          bookingId,
+          itemId,
+          status: res.status,
+          error: data?.error,
+        });
+        showInventoryMessage(data?.error || 'Error assignant', 'error', { target: 'assign-item', itemId });
         setSkippedDetails([]);
         return;
       }
 
-      setMessage('Element afegit correctament.');
+      showInventoryMessage('Element afegit correctament.', 'success');
       setSkippedDetails([]);
       fetchData(searchQuery);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Error assignant element');
+      console.error('[BookingInventorySection] Error assignant element', { bookingId, itemId, error });
+      showInventoryMessage(error instanceof Error ? error.message : 'Error assignant element', 'error', { target: 'assign-item', itemId });
       setSkippedDetails([]);
     }
-  }, [bookingId, searchQuery, fetchData]);
+  }, [bookingId, searchQuery, fetchData, showInventoryMessage]);
 
   const handleAssignPack = useCallback(async () => {
     try {
@@ -143,7 +190,12 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) {
-        setMessage(data?.error || 'Error afegint l\'inventari del pack');
+        console.error('[BookingInventorySection] Resposta rebutjada afegint inventari del pack', {
+          bookingId,
+          status: res.status,
+          error: data?.error,
+        });
+        showInventoryMessage(data?.error || 'Error afegint l\'inventari del pack', 'error', { target: 'assign-pack' });
         setSkippedDetails([]);
         return;
       }
@@ -152,17 +204,18 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       const skipped = Array.isArray(data.skipped) ? data.skipped.length : 0;
       const details = Array.isArray(data.skippedDetails) ? data.skippedDetails : [];
       setSkippedDetails(details);
-      setMessage(`Pack afegit: ${created} element(s) assignat(s)${skipped > 0 ? ` · ${skipped} no disponibles` : ''}.`);
+      showInventoryMessage(`Pack afegit: ${created} element(s) assignat(s)${skipped > 0 ? ` · ${skipped} no disponibles` : ''}.`, 'success');
       fetchData(searchQuery);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Error afegint inventari del pack');
+      console.error('[BookingInventorySection] Error afegint inventari del pack', { bookingId, error });
+      showInventoryMessage(error instanceof Error ? error.message : 'Error afegint inventari del pack', 'error', { target: 'assign-pack' });
       setSkippedDetails([]);
     }
-  }, [bookingId, fetchData, searchQuery]);
+  }, [bookingId, fetchData, searchQuery, showInventoryMessage]);
 
   const handleAssignBundle = useCallback(async () => {
     if (!selectedBundleId) {
-      setMessage('Selecciona un lot.');
+      showInventoryMessage('Selecciona un lot.', 'error', { target: 'assign-bundle' });
       return;
     }
     try {
@@ -173,7 +226,13 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) {
-        setMessage(data?.error || 'Error afegint lot');
+        console.error('[BookingInventorySection] Resposta rebutjada afegint lot', {
+          bookingId,
+          bundleId: selectedBundleId,
+          status: res.status,
+          error: data?.error,
+        });
+        showInventoryMessage(data?.error || 'Error afegint lot', 'error', { target: 'assign-bundle' });
         setSkippedDetails([]);
         return;
       }
@@ -181,13 +240,14 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       const skipped = Array.isArray(data.skipped) ? data.skipped.length : 0;
       const details = Array.isArray(data.skippedDetails) ? data.skippedDetails : [];
       setSkippedDetails(details);
-      setMessage(`Lot afegit: ${created} element(s) assignat(s)${skipped > 0 ? ` · ${skipped} no disponibles` : ''}.`);
+      showInventoryMessage(`Lot afegit: ${created} element(s) assignat(s)${skipped > 0 ? ` · ${skipped} no disponibles` : ''}.`, 'success');
       fetchData(searchQuery);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Error afegint lot');
+      console.error('[BookingInventorySection] Error afegint lot', { bookingId, bundleId: selectedBundleId, error });
+      showInventoryMessage(error instanceof Error ? error.message : 'Error afegint lot', 'error', { target: 'assign-bundle' });
       setSkippedDetails([]);
     }
-  }, [selectedBundleId, bookingId, fetchData, searchQuery]);
+  }, [selectedBundleId, bookingId, fetchData, searchQuery, showInventoryMessage]);
 
   const handleRemove = useCallback(async (assignmentId: string) => {
     const ok = await confirm({ title: 'Treure element', message: 'Segur que vols treure aquest element de la reserva?', confirmLabel: 'Treure', variant: 'warning' });
@@ -200,15 +260,21 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       );
 
       if (!res.ok) {
-        setMessage('Error eliminant assignació');
+        console.error('[BookingInventorySection] Resposta rebutjada eliminant assignació', {
+          bookingId,
+          assignmentId,
+          status: res.status,
+        });
+        showInventoryMessage('Error eliminant assignació', 'error', { target: 'remove', assignmentId });
         return;
       }
 
       fetchData(searchQuery);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Error eliminant');
+      console.error('[BookingInventorySection] Error eliminant assignació', { bookingId, assignmentId, error });
+      showInventoryMessage(error instanceof Error ? error.message : 'Error eliminant', 'error', { target: 'remove', assignmentId });
     }
-  }, [bookingId, searchQuery, fetchData, confirm]);
+  }, [bookingId, searchQuery, fetchData, confirm, showInventoryMessage]);
 
   const handleToggleCheckout = useCallback(async (assignment: Assignment) => {
     try {
@@ -221,12 +287,21 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
         }),
       });
 
-      if (!res.ok) { setMessage('Error marcant sortida'); return; }
+      if (!res.ok) {
+        console.error('[BookingInventorySection] Resposta rebutjada marcant sortida', {
+          bookingId,
+          assignmentId: assignment.id,
+          status: res.status,
+        });
+        showInventoryMessage('Error marcant sortida', 'error', { target: 'checkout', assignmentId: assignment.id });
+        return;
+      }
       fetchData(searchQuery);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Error marcant sortida');
+      console.error('[BookingInventorySection] Error marcant sortida', { bookingId, assignmentId: assignment.id, error });
+      showInventoryMessage(error instanceof Error ? error.message : 'Error marcant sortida', 'error', { target: 'checkout', assignmentId: assignment.id });
     }
-  }, [bookingId, searchQuery, fetchData]);
+  }, [bookingId, searchQuery, fetchData, showInventoryMessage]);
 
   const handleCheckin = useCallback(async (assignment: Assignment, conditionAfter: string) => {
     try {
@@ -240,12 +315,21 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
         }),
       });
 
-      if (!res.ok) { setMessage('Error marcant retorn'); return; }
+      if (!res.ok) {
+        console.error('[BookingInventorySection] Resposta rebutjada marcant retorn', {
+          bookingId,
+          assignmentId: assignment.id,
+          status: res.status,
+        });
+        showInventoryMessage('Error marcant retorn', 'error', { target: 'checkin', assignmentId: assignment.id });
+        return;
+      }
       fetchData(searchQuery);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Error marcant retorn');
+      console.error('[BookingInventorySection] Error marcant retorn', { bookingId, assignmentId: assignment.id, error });
+      showInventoryMessage(error instanceof Error ? error.message : 'Error marcant retorn', 'error', { target: 'checkin', assignmentId: assignment.id });
     }
-  }, [bookingId, searchQuery, fetchData]);
+  }, [bookingId, searchQuery, fetchData, showInventoryMessage]);
 
   if (loading) {
     return (
@@ -272,6 +356,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
             type="button"
             onClick={handleAssignPack}
             disabled={packTemplate.length === 0}
+            aria-invalid={hasInventoryError('assign-pack') ? true : undefined}
             className="ap-btn ap-btn--xs disabled:opacity-50"
           >
             + Afegir inventari del pack
@@ -286,9 +371,12 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
         </div>
       </div>
       {message && (
-        <div className="mb-3 flex items-center gap-2 rounded-xl border px-3 py-2 text-xs" role="alert">
+        <div
+          className="mb-3 flex items-center gap-2 rounded-xl border px-3 py-2 text-xs"
+          role={messageKind === 'error' ? 'alert' : 'status'}
+        >
           <span className="flex-1">{message}</span>
-          <button type="button" onClick={() => setMessage(null)} className="" aria-label="Tancar missatge">✕</button>
+          <button type="button" onClick={clearInventoryMessage} className="" aria-label="Tancar missatge">✕</button>
         </div>
       )}
       {skippedDetails.length > 0 && (
@@ -321,6 +409,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
           <button
             type="button"
             onClick={handleAssignBundle}
+            aria-invalid={hasInventoryError('assign-bundle') ? true : undefined}
             className="ap-btn ap-btn--xs"
           >
             + Afegir lot
@@ -361,6 +450,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                 <button
                   type="button"
                   onClick={() => handleToggleCheckout(a)}
+                  aria-invalid={hasInventoryError('checkout', { assignmentId: a.id }) ? true : undefined}
                   className={`rounded-xl px-2 py-1 text-xs font-medium transition-all ${
                     a.checkedOut
                       ? 'ap-badge ap-badge--success'
@@ -377,6 +467,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                       if (e.target.value) handleCheckin(a, e.target.value);
                     }}
                     defaultValue=""
+                    aria-invalid={hasInventoryError('checkin', { assignmentId: a.id }) ? true : undefined}
                     className="rounded-xl border px-2 py-1 text-xs"
                     aria-label="Condició de retorn"
                   >
@@ -397,6 +488,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                 <button
                   type="button"
                   onClick={() => handleRemove(a.id)}
+                  aria-invalid={hasInventoryError('remove', { assignmentId: a.id }) ? true : undefined}
                   className="rounded-xl px-2 py-1 text-xs transition-colors"
                 >
                   Treure
@@ -441,6 +533,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                   <button
                     type="button"
                     onClick={() => handleAssign(item.id)}
+                    aria-invalid={hasInventoryError('assign-item', { itemId: item.id }) ? true : undefined}
                     className="rounded-xl border px-2 py-1 text-xs font-medium transition-colors shrink-0"
                   >
                     Afegir
@@ -455,8 +548,5 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
     </section>
   );
 }
-
-
-
 
 

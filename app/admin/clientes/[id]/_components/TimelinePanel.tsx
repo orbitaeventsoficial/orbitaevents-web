@@ -12,7 +12,7 @@ import { buildCustomerCommercialRiskLink } from '@/lib/customer-hub/nextActionLi
 // TYPES I CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
 
-type TimelineFilter = 'all' | 'proposals' | 'bookings' | 'tasks' | 'comms';
+type TimelineFilter = 'all' | 'documents' | 'proposals' | 'bookings' | 'tasks' | 'comms';
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -75,6 +75,32 @@ function groupByDay(events: TimelineEventDTO[]): Array<{ date: string; label: st
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
+function getTimelineMetaString(event: TimelineEventDTO, key: string): string | null {
+  const value = event.meta?.[key];
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+}
+
+function isDossierDocumentEvent(event: TimelineEventDTO): boolean {
+  const documentType = getTimelineMetaString(event, 'documentType')?.toUpperCase();
+  const entityType = getTimelineMetaString(event, 'entityType');
+  return documentType === 'DOSSIER'
+    || entityType === 'dossier'
+    || Boolean(getTimelineMetaString(event, 'dossierId'));
+}
+
+function isDocumentTimelineEvent(event: TimelineEventDTO): boolean {
+  return Boolean(getTimelineMetaString(event, 'documentType'))
+    || Boolean(getTimelineMetaString(event, 'contractPdfUrl'))
+    || isDossierDocumentEvent(event);
+}
+
+function matchesTimelineFilter(event: TimelineEventDTO, filter: TimelineFilter): boolean {
+  if (filter === 'all') return true;
+  if (filter === 'documents') return isDocumentTimelineEvent(event);
+  if (filter === 'comms' && isDocumentTimelineEvent(event)) return false;
+  return CUSTOMER_TIMELINE_EVENT_META[event.type]?.filter === filter;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // COMPONENT PRINCIPAL
 // ═══════════════════════════════════════════════════════════════════════════
@@ -109,8 +135,7 @@ export default function TimelinePanel({
   }), [customerId, customerName, customerPhone, followUpSummary, insights.commercialRisk]);
 
   const filteredTimeline = useMemo(() => {
-    if (filter === 'all') return timeline;
-    return timeline.filter((event) => CUSTOMER_TIMELINE_EVENT_META[event.type]?.filter === filter);
+    return timeline.filter((event) => matchesTimelineFilter(event, filter));
   }, [timeline, filter]);
 
   const groupedTimeline = useMemo(() => {
@@ -244,8 +269,9 @@ export default function TimelinePanel({
 
 function EventCard({ event }: { event: TimelineEventDTO }) {
   const meta = CUSTOMER_TIMELINE_EVENT_META[event.type];
-  const icon = meta?.icon || '•';
-  const toneClass = meta?.toneClass || 'border-l-[var(--o-admin-line)]';
+  const dossierDocument = isDossierDocumentEvent(event);
+  const icon = dossierDocument ? '📄' : meta?.icon || '•';
+  const toneClass = dossierDocument ? 'border-l-[var(--o-info)] bg-[var(--ax-info-bg)]' : meta?.toneClass || 'border-l-[var(--o-admin-line)]';
   const preview = typeof event.meta?.preview === 'string' ? event.meta.preview.trim() : '';
   const direction = typeof event.meta?.direction === 'string' ? event.meta.direction : null;
   const channel = typeof event.meta?.channel === 'string' ? event.meta.channel : null;
@@ -255,11 +281,16 @@ function EventCard({ event }: { event: TimelineEventDTO }) {
 
   return (
     <article
-      className={`min-w-0 overflow-hidden rounded-[var(--o-r-lg)] border-l-2 bg-[var(--o-admin-fill-1)] py-2.5 pl-3 pr-2.5 ${toneClass}`}
+      className={`min-w-0 overflow-hidden rounded-[var(--o-r-lg)] border-l-2 py-2.5 pl-3 pr-2.5 ${dossierDocument ? 'ring-1 ring-[var(--ax-info-border)]' : 'bg-[var(--o-admin-fill-1)]'} ${toneClass}`}
     >
       <div className="flex items-start gap-2">
         <span className="text-sm leading-[1.35]">{icon}</span>
         <div className="flex-1 min-w-0">
+          {dossierDocument && (
+            <span className="mb-1 inline-flex max-w-full rounded-full border admin-tone-border-info admin-tone-bg-info px-2 py-0.5 text-[0.68rem] font-bold uppercase tracking-[0.08em] admin-tone-text-info">
+              Document dossier
+            </span>
+          )}
           <p className="m-0 break-words text-xs font-semibold text-[var(--t)]">
             {sanitizeEventTitle(event.title)}
           </p>
@@ -287,6 +318,20 @@ function EventCard({ event }: { event: TimelineEventDTO }) {
           {event.link.label} →
         </Link>
       )}
+      {event.originLinks && event.originLinks.length > 0 && (
+        <div className="mt-1.5 flex flex-wrap items-center gap-1 text-xs">
+          <span className="font-semibold uppercase tracking-[0.08em] text-[var(--t3)]">Origen</span>
+          {event.originLinks.map((link) => (
+            <Link
+              key={`${link.label}:${link.href}`}
+              href={link.href}
+              className="rounded-full border border-[var(--o-admin-line)] bg-[var(--sunk)] px-2 py-0.5 font-semibold text-[var(--t2)] no-underline hover:text-[var(--gold)]"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+      )}
     </article>
   );
 }
@@ -294,6 +339,7 @@ function EventCard({ event }: { event: TimelineEventDTO }) {
 function EmptyState({ filter }: { filter: TimelineFilter }) {
   const messages: Record<TimelineFilter, string> = {
     all: 'Encara no hi ha activitat registrada.',
+    documents: 'Sense documents.',
     proposals: 'Sense pressupostos.',
     bookings: 'Sense reserves.',
     tasks: 'Sense tasques.',

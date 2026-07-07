@@ -9,6 +9,7 @@ const { mockPrisma, mockGenerateContractPDF, mockSendEmail, mockUploadFile } = v
     },
     setting: { findMany: vi.fn() },
     leadDocument: { create: vi.fn() },
+    adminLog: { create: vi.fn() },
   },
   mockGenerateContractPDF: vi.fn(),
   mockSendEmail: vi.fn(),
@@ -60,6 +61,7 @@ const COMPANY_SETTINGS = [
 function makeProposal(overrides = {}) {
   return {
     id: 'prop-1',
+    reference: 'PROP-2026-0001',
     status: 'ACCEPTED',
     locale: 'ca',
     contractReference: null,
@@ -112,11 +114,73 @@ function makeProposal(overrides = {}) {
 
 const fakePdfDoc = { output: vi.fn(() => new ArrayBuffer(100)) };
 
+const FROZEN_CONTRACT_SNAPSHOT = {
+  version: 1,
+  createdAt: '2026-05-01T10:00:00.000Z',
+  contractDate: '2026-05-01T10:00:00.000Z',
+  contractReference: 'CTR-2026-FROZEN',
+  locale: 'ca',
+  company: {
+    name: 'Òrbita congelada',
+    legalName: 'Legal congelat',
+    nif: 'NIF-FROZEN',
+    address: 'Adreça congelada',
+    iban: 'IBAN-FROZEN',
+    phone: '+34000000000',
+    email: 'frozen@example.com',
+  },
+  client: {
+    name: 'Client congelat',
+    nif: 'DNI-FROZEN',
+    email: 'client-frozen@example.com',
+    phone: '+34999000000',
+  },
+  event: {
+    type: 'CORPORATE',
+    date: '2026-11-20T00:00:00.000Z',
+    time: '19:00',
+    endTime: '23:00',
+    location: 'Sala congelada',
+    guestCount: 88,
+  },
+  pack: {
+    name: 'Pack congelat',
+    price: 333,
+    djHours: 2,
+  },
+  extras: [{ name: 'Extra congelat', price: 44, quantity: 1 }],
+  serviceLines: [{ name: 'Servei congelat', price: 55, quantity: 1 }],
+  totals: {
+    subtotal: 432,
+    discount: 10,
+    vatRate: 21,
+    vatAmount: 88.62,
+    total: 510.62,
+    depositAmount: 153.19,
+    depositDueDate: '2026-10-20T00:00:00.000Z',
+    finalPaymentDue: '2026-11-13T00:00:00.000Z',
+  },
+  terms: {
+    cancellationPolicy: 'Política congelada',
+    additionalClauses: 'Clàusules congelades',
+  },
+  trace: {
+    proposalId: 'prop-1',
+    proposalReference: 'PROP-2026-0001',
+    customerId: 'cust-1',
+    leadId: 'lead-1',
+    bookingId: 'booking-1',
+    total: 510.62,
+    locale: 'ca',
+  },
+};
+
 beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.setting.findMany.mockResolvedValue(COMPANY_SETTINGS);
   mockPrisma.proposal.update.mockResolvedValue({});
   mockPrisma.leadDocument.create.mockResolvedValue({});
+  mockPrisma.adminLog.create.mockResolvedValue({});
   mockGenerateContractPDF.mockResolvedValue(fakePdfDoc);
   mockSendEmail.mockResolvedValue(undefined);
   mockUploadFile.mockResolvedValue({
@@ -162,6 +226,38 @@ describe('generateContractFromProposal', () => {
     );
   });
 
+  it('registra traça adminLog quan genera el contracte', async () => {
+    mockPrisma.proposal.findUniqueOrThrow.mockResolvedValue(makeProposal());
+
+    await generateContractFromProposal('prop-1');
+
+    expect(mockPrisma.adminLog.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        action: 'DOCUMENT_CONTRACT_GENERATED',
+        entity: 'proposal',
+        entityId: 'prop-1',
+        details: expect.objectContaining({
+          documentType: 'CONTRACT',
+          source: 'admin_contract_generate',
+          contractStatus: 'DRAFT',
+          proposalId: 'prop-1',
+          proposalReference: expect.any(String),
+          reference: expect.stringMatching(/^CTR-/),
+        }),
+      }),
+    });
+  });
+
+  it('no bloqueja el PDF si falla la traça adminLog', async () => {
+    mockPrisma.proposal.findUniqueOrThrow.mockResolvedValue(makeProposal());
+    mockPrisma.adminLog.create.mockRejectedValueOnce(new Error('audit down'));
+
+    const result = await generateContractFromProposal('prop-1');
+
+    expect(result.contractReference).toMatch(/^CTR-/);
+    expect(result.pdfBuffer).toBeInstanceOf(Buffer);
+  });
+
   it('calcula deposit com 30% del total si no està definit', async () => {
     mockPrisma.proposal.findUniqueOrThrow.mockResolvedValue(makeProposal());
 
@@ -204,6 +300,66 @@ describe('generateContractFromProposal', () => {
         total: 968,
         eventType: 'WEDDING',
         companyName: 'Òrbita Events',
+      }),
+      'ca'
+    );
+  });
+
+  it('desa contractSnapshot v1 quan genera el contracte', async () => {
+    const proposal = makeProposal();
+    mockPrisma.proposal.findUniqueOrThrow.mockResolvedValue({
+      ...proposal,
+      booking: {
+        ...proposal.booking,
+        serviceLines: [
+          { label: 'Bingo Musical', revenueAmount: 240, quantity: 1 },
+          { label: 'Cost intern', revenueAmount: 0, quantity: 1 },
+        ],
+      },
+    });
+
+    await generateContractFromProposal('prop-1');
+
+    const updateCall = mockPrisma.proposal.update.mock.calls[0][0];
+    expect(updateCall.data.snapshot.contractSnapshot).toMatchObject({
+      version: 1,
+      contractReference: expect.stringMatching(/^CTR-/),
+      pack: { name: 'Premium', price: 800, djHours: 6 },
+      totals: { total: 968, vatAmount: 168 },
+      trace: { proposalId: 'prop-1', proposalReference: 'PROP-2026-0001' },
+    });
+    expect(updateCall.data.snapshot.contractSnapshot.serviceLines).toEqual([
+      { name: 'Bingo Musical', price: 240, quantity: 1 },
+    ]);
+  });
+
+  it('renderitza des del contractSnapshot existent encara que el booking viu canviï', async () => {
+    mockPrisma.proposal.findUniqueOrThrow.mockResolvedValue(makeProposal({
+      contractReference: 'CTR-2026-LIVE',
+      snapshot: { contractSnapshot: FROZEN_CONTRACT_SNAPSHOT },
+      booking: {
+        ...makeProposal().booking,
+        eventLocation: 'Ubicacio viva',
+        pack: {
+          slug: 'live',
+          price: 999,
+          djHours: 9,
+          translations: [{ locale: 'ca', name: 'Pack viu' }],
+        },
+      },
+    }));
+
+    const result = await generateContractFromProposal('prop-1');
+
+    expect(result.contractReference).toBe('CTR-2026-FROZEN');
+    expect(mockGenerateContractPDF).toHaveBeenCalledWith(
+      expect.objectContaining({
+        contractReference: 'CTR-2026-FROZEN',
+        companyName: 'Òrbita congelada',
+        clientName: 'Client congelat',
+        eventLocation: 'Sala congelada',
+        packName: 'Pack congelat',
+        total: 510.62,
       }),
       'ca'
     );
@@ -345,6 +501,34 @@ describe('sendContract', () => {
     expect(mockPrisma.leadDocument.create).toHaveBeenCalled();
   });
 
+  it('registra traça adminLog quan envia contracte', async () => {
+    mockPrisma.proposal.findUniqueOrThrow
+      .mockResolvedValueOnce(makeProposal({
+        contractReference: 'CTR-2026-AB12',
+        contractStatus: 'DRAFT',
+      }))
+      .mockResolvedValueOnce(makeProposal({
+        contractReference: 'CTR-2026-AB12',
+        contractStatus: 'DRAFT',
+      }));
+
+    await sendContract('prop-1');
+
+    expect(mockPrisma.adminLog.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        action: 'DOCUMENT_CONTRACT_SENT',
+        entity: 'proposal',
+        entityId: 'prop-1',
+        details: expect.objectContaining({
+          documentType: 'CONTRACT',
+          source: 'admin_contract_send',
+          reference: 'CTR-2026-AB12',
+          to: 'joan@example.com',
+        }),
+      }),
+    });
+  });
+
   it('subject en castellà per locale es', async () => {
     mockPrisma.proposal.findUniqueOrThrow
       .mockResolvedValueOnce(makeProposal({
@@ -406,6 +590,27 @@ describe('markContractSigned', () => {
     });
   });
 
+  it('registra traça adminLog quan es marca signat manualment', async () => {
+    mockPrisma.proposal.findUniqueOrThrow.mockResolvedValue(
+      makeProposal({ contractReference: 'CTR-2026-TEST', contractStatus: 'SENT', leadId: 'lead-1' })
+    );
+
+    await markContractSigned('prop-1', 'Joan Garcia');
+
+    expect(mockPrisma.adminLog.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        action: 'DOCUMENT_CONTRACT_SIGNED',
+        entity: 'proposal',
+        entityId: 'prop-1',
+        details: expect.objectContaining({
+          reference: 'CTR-2026-TEST',
+          signedBy: 'Joan Garcia',
+          source: 'admin_contract_sign',
+        }),
+      }),
+    });
+  });
+
   it('error si no hi ha contracte', async () => {
     mockPrisma.proposal.findUniqueOrThrow.mockResolvedValue(
       makeProposal({ contractReference: null })
@@ -452,10 +657,22 @@ describe('generateSignedContractPdf', () => {
     );
     expect(mockPrisma.proposal.update).toHaveBeenCalledWith({
       where: { id: 'prop-1' },
-      data: {
+      data: expect.objectContaining({
         contractPdfUrl: '/api/uploads/contracts/prop-1/CTR-2026-AB12-signed.pdf',
         contractPdfKey: 'contracts/prop-1/CTR-2026-AB12-signed.pdf',
-      },
+        snapshot: expect.objectContaining({ contractSnapshot: expect.objectContaining({ version: 1 }) }),
+      }),
+    });
+    expect(mockPrisma.adminLog.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        action: 'DOCUMENT_CONTRACT_SIGNED_PDF_GENERATED',
+        entity: 'proposal',
+        entityId: 'prop-1',
+        details: expect.objectContaining({
+          reference: 'CTR-2026-AB12',
+          contractPdfKey: 'contracts/prop-1/CTR-2026-AB12-signed.pdf',
+        }),
+      }),
     });
     expect(result).toEqual({
       contractPdfUrl: '/api/uploads/contracts/prop-1/CTR-2026-AB12-signed.pdf',
@@ -498,6 +715,35 @@ describe('cancelContract', () => {
     expect(recordLeadContractCancelled).toHaveBeenCalledWith({
       leadId: 'lead-1',
       contractReference: 'CTR-2026-TEST',
+    });
+  });
+
+  it('registra traça adminLog quan es cancel·la', async () => {
+    mockPrisma.proposal.findUniqueOrThrow.mockResolvedValue({
+      id: 'prop-1',
+      reference: 'PROP-2026-0001',
+      customerId: 'cust-1',
+      leadId: 'lead-1',
+      bookingId: 'booking-1',
+      total: 968,
+      locale: 'ca',
+      contractStatus: 'SENT',
+      contractReference: 'CTR-2026-TEST',
+    });
+
+    await cancelContract('prop-1');
+
+    expect(mockPrisma.adminLog.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        action: 'DOCUMENT_CONTRACT_CANCELLED',
+        entity: 'proposal',
+        entityId: 'prop-1',
+        details: expect.objectContaining({
+          reference: 'CTR-2026-TEST',
+          proposalReference: 'PROP-2026-0001',
+          source: 'admin_contract_cancel',
+        }),
+      }),
     });
   });
 

@@ -138,7 +138,18 @@ export default function NewBookingForm() {
     onDistanceResolved: (distanceKm) => setForm((prev) => ({ ...prev, distanceKm })),
     onTollsResolved: (tollsEur) => setForm((prev) => ({ ...prev, tollsEur })),
   });
-  const dateConflicts = useBookingDateConflicts(form.eventDate);
+  const { dateConflicts, dateConflictError } = useBookingDateConflicts(form.eventDate);
+  const dateConflictSignature = useMemo(
+    () => dateConflicts.map((conflict) => conflict.id).join('|'),
+    [dateConflicts],
+  );
+  const hasDateConflicts = dateConflicts.length > 0;
+  const hasDateConflictError = Boolean(dateConflictError);
+  const [dateConflictAcknowledged, setDateConflictAcknowledged] = useState(false);
+
+  useEffect(() => {
+    setDateConflictAcknowledged(false);
+  }, [form.eventDate, dateConflictSignature]);
 
   const updateField = (field: keyof BookingFormData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -266,7 +277,25 @@ export default function NewBookingForm() {
 
   // El bolo no pot ser buit: pack de catàleg, o serveis/productes, o total pactat.
   const boloNotEmpty = !!form.packId || serviceLines.length > 0 || Object.keys(selectedExtras).length > 0 || (!!manualTotalPrice && Number(manualTotalPrice) > 0);
-  const submitDisabled = submitting || !form.clientName || !form.clientEmail || !boloNotEmpty;
+  const hasClientBasics = Boolean(form.clientName.trim() && form.clientEmail.trim() && form.clientPhone.trim());
+  const hasEventBasics = Boolean(form.eventDate && form.eventLocation.trim());
+  const submitBlockedByMissingBasics = !hasClientBasics || !hasEventBasics || !boloNotEmpty;
+  const submitBlockedByDateConflictCheck = hasDateConflictError;
+  const submitBlockedByDateConflict = hasDateConflicts && !dateConflictAcknowledged;
+  const submitDisabled = submitting || submitBlockedByMissingBasics || submitBlockedByDateConflictCheck || submitBlockedByDateConflict;
+  const submitLabel = submitting
+    ? 'Creant reserva…'
+    : !hasClientBasics
+      ? 'Completa client i contacte'
+      : !hasEventBasics
+        ? 'Completa data i lloc'
+        : !boloNotEmpty
+          ? 'Afegeix servei o pack'
+          : submitBlockedByDateConflictCheck
+            ? 'Verifica disponibilitat'
+          : submitBlockedByDateConflict
+            ? 'Confirma conflicte de dia'
+            : 'Crear reserva';
 
   const narrowField = `${NB_FIELD} max-w-[12.5rem] flex-1 basis-40`;
 
@@ -317,6 +346,7 @@ export default function NewBookingForm() {
             calculatingDistance={calculatingDistance}
             distanceMessage={distanceMessage}
             dateConflicts={dateConflicts}
+            dateConflictError={dateConflictError}
             onFieldChange={updateField}
           />
 
@@ -534,13 +564,35 @@ export default function NewBookingForm() {
             />
           )}
           <div className="flex flex-col gap-2">
+            {dateConflictError && (
+              <div className="ap-card ap-card--danger ap-card-body" role="alert">
+                <p className="text-sm font-semibold text-[var(--t)]">No es pot crear sense verificar disponibilitat.</p>
+                <p className="mt-1 text-xs text-[var(--t2)]">{dateConflictError}</p>
+              </div>
+            )}
+            {hasDateConflicts && (
+              <div className="ap-card ap-card--warning ap-card-body">
+                <label className="flex items-start gap-2.5 text-sm text-[var(--t)]">
+                  <input
+                    type="checkbox"
+                    checked={dateConflictAcknowledged}
+                    onChange={(e) => setDateConflictAcknowledged(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 accent-[var(--gold)]"
+                  />
+                  <span>
+                    <span className="block font-semibold">He revisat les reserves d&apos;aquest dia</span>
+                    <span className="mt-1 block text-xs text-[var(--t2)]">Només continua si horaris, equip i transport encaixen.</span>
+                  </span>
+                </label>
+              </div>
+            )}
             <button
               type="button"
               onClick={handleSubmit}
               disabled={submitDisabled}
               className="ap-btn ap-btn--primary w-full"
             >
-              {submitting ? 'Creant reserva…' : 'Crear reserva'}
+              {submitLabel}
             </button>
             <Link href={backHref} className="ap-btn w-full">
               Cancel·lar

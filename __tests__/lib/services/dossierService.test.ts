@@ -12,6 +12,9 @@ const { mockPrisma, mockSendEmail, mockBuildHtml } = vi.hoisted(() => ({
     lead: {
       findUnique: vi.fn(),
     },
+    adminLog: {
+      create: vi.fn(),
+    },
     $executeRaw: vi.fn(),
     $queryRaw: vi.fn(),
   },
@@ -73,6 +76,7 @@ import {
 beforeEach(() => {
   vi.clearAllMocks();
   mockBuildHtml.mockReturnValue('<html>dossier</html>');
+  mockPrisma.adminLog.create.mockResolvedValue({});
 });
 
 const mockDossier = {
@@ -91,6 +95,15 @@ const mockDossier = {
   deletedAt: null,
   createdAt: new Date(),
 };
+
+function lastRawQueryText(): string {
+  const firstArg = mockPrisma.$queryRaw.mock.calls.at(-1)?.[0] as unknown;
+  if (Array.isArray(firstArg)) return firstArg.join('');
+  if (firstArg && typeof firstArg === 'object' && Array.isArray((firstArg as { raw?: unknown }).raw)) {
+    return ((firstArg as { raw: string[] }).raw).join('');
+  }
+  return String(firstArg ?? '');
+}
 
 describe('createDossier', () => {
   it('crea el dossier amb les dades', async () => {
@@ -214,6 +227,8 @@ describe('getAllDossiers', () => {
     mockPrisma.$queryRaw.mockResolvedValue([mockDossier]);
     const result = await getAllDossiers();
     expect(mockPrisma.$queryRaw).toHaveBeenCalled();
+    expect(lastRawQueryText()).toContain('LEFT JOIN "customers"');
+    expect(lastRawQueryText()).toContain("'customerId'");
     expect(result).toHaveLength(1);
   });
 });
@@ -248,6 +263,8 @@ describe('getDeletedDossiers', () => {
     mockPrisma.$queryRaw.mockResolvedValue([deleted]);
     const result = await getDeletedDossiers();
     expect(mockPrisma.$queryRaw).toHaveBeenCalled();
+    expect(lastRawQueryText()).toContain('LEFT JOIN "customers"');
+    expect(lastRawQueryText()).toContain("'customerName'");
     expect(result).toHaveLength(1);
   });
 });
@@ -302,6 +319,53 @@ describe('sendDossierByEmail', () => {
     );
   });
 
+  it('registra traça documental amb origen client/lead en enviar dossier', async () => {
+    mockPrisma.dossier.findUnique.mockResolvedValue({
+      ...mockDossier,
+      lineSnapshot: {
+        version: 1,
+        products: [{
+          id: 'bingo-musical',
+          nom: 'Bingo Musical congelat',
+          descripcio: ['Text snapshot'],
+          inclou: ['Equip snapshot'],
+          priceFrom: 999,
+        }],
+      },
+    });
+    mockPrisma.lead.findUnique.mockResolvedValue({
+      id: 'lead-1',
+      name: 'Lead Joan',
+      customerId: 'cust-1',
+      customer: { name: 'Client Joan' },
+    });
+    mockSendEmail.mockResolvedValue(undefined);
+    mockPrisma.dossier.update.mockResolvedValue(mockDossier);
+
+    const result = await sendDossierByEmail('dos-1');
+
+    expect(result).toEqual({ ok: true });
+    expect(mockPrisma.adminLog.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        action: 'DOCUMENT_DOSSIER_SENT',
+        entity: 'dossier',
+        entityId: 'dos-1',
+        details: expect.objectContaining({
+          documentType: 'DOSSIER',
+          source: 'dossier_email_send',
+          dataSource: 'snapshot',
+          dossierId: 'dos-1',
+          leadId: 'lead-1',
+          leadName: 'Lead Joan',
+          customerId: 'cust-1',
+          customerName: 'Client Joan',
+          to: 'joan@example.com',
+          productCount: 1,
+        }),
+      }),
+    });
+  });
+
   it('retorna error si sendEmail falla', async () => {
     mockPrisma.dossier.findUnique.mockResolvedValue(mockDossier);
     mockSendEmail.mockRejectedValue(new Error('SMTP error'));
@@ -350,7 +414,10 @@ describe('sendDossierByEmail', () => {
 
     await sendDossierByEmail('dos-1');
 
-    expect(mockPrisma.lead.findUnique).not.toHaveBeenCalled();
+    expect(mockPrisma.lead.findUnique).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 'lead-1' },
+      select: expect.objectContaining({ customerId: true }),
+    }));
     expect(mockBuildHtml).toHaveBeenCalledWith(
       expect.objectContaining({ nom: 'Joan Pla' }),
       [expect.objectContaining({ id: 'bingo-musical', nom: 'Bingo Musical congelat', priceFrom: 999 })],

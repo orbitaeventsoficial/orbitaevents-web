@@ -171,6 +171,55 @@ describe('PATCH /api/admin/bookings/[id]', () => {
     expect(mockUpdateBooking).toHaveBeenCalledWith('book-1', { status: 'PREPARING' });
   });
 
+  it('trimmeja i propaga camps editables que bookingRouteService ja suporta', async () => {
+    const { req, params } = makePatchRequest('book-1', {
+      clientName: ' Maria Soler ',
+      clientEmail: ' maria@example.com ',
+      clientPhone: ' 600 111 222 ',
+      eventType: 'CORPORATE',
+      eventLocation: ' Girona ',
+      sourceCollaboratorId: ' collab-source ',
+      billedCollaboratorId: null,
+      discount: 25,
+      tollsEur: 12.5,
+      serviceLines: [
+        {
+          collaboratorId: ' partner-1 ',
+          kind: 'PROVIDER_SERVICE',
+          label: ' Animacio partner ',
+          revenueAmount: 300,
+          costAmount: 120,
+          notes: ' Porta facturable ',
+        },
+      ],
+    });
+
+    const res = await PATCH(req, params);
+
+    expect(res.status).toBe(200);
+    expect(mockUpdateBooking).toHaveBeenCalledWith('book-1', {
+      clientName: 'Maria Soler',
+      clientEmail: 'maria@example.com',
+      clientPhone: '600 111 222',
+      eventType: 'CORPORATE',
+      eventLocation: 'Girona',
+      sourceCollaboratorId: 'collab-source',
+      billedCollaboratorId: null,
+      discount: 25,
+      tollsEur: 12.5,
+      serviceLines: [
+        {
+          collaboratorId: 'partner-1',
+          kind: 'PROVIDER_SERVICE',
+          label: 'Animacio partner',
+          revenueAmount: 300,
+          costAmount: 120,
+          notes: 'Porta facturable',
+        },
+      ],
+    });
+  });
+
   it('dispara auto-trigger quan status és CONFIRMED', async () => {
     mockUpdateBooking.mockResolvedValueOnce({
       status: 200,
@@ -200,6 +249,19 @@ describe('PATCH /api/admin/bookings/[id]', () => {
   it('rebutja totalPrice negatiu', async () => {
     const { req, params } = makePatchRequest('book-1', { totalPrice: -100 });
     const res = await PATCH(req, params);
+    expect(res.status).toBe(400);
+    expect(mockUpdateBooking).not.toHaveBeenCalled();
+  });
+
+  it('rebutja editables obligatoris formats nomes per espais', async () => {
+    const { req, params } = makePatchRequest('book-1', {
+      clientName: '   ',
+      eventLocation: '   ',
+      serviceLines: [{ kind: 'DJ', label: '   ', revenueAmount: 100 }],
+    });
+
+    const res = await PATCH(req, params);
+
     expect(res.status).toBe(400);
     expect(mockUpdateBooking).not.toHaveBeenCalled();
   });

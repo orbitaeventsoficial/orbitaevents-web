@@ -43,6 +43,25 @@ interface Props {
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ACCEPT_IMAGES = 'image/jpeg,image/png,image/webp,image/gif,image/avif,image/svg+xml';
 
+type ImageManagerMutationPayload = {
+  ok?: boolean;
+  error?: unknown;
+  message?: unknown;
+};
+
+function readImageManagerMutationError(data: ImageManagerMutationPayload, fallback: string) {
+  if (typeof data.error === 'string' && data.error.trim()) return data.error;
+  if (typeof data.message === 'string' && data.message.trim()) return data.message;
+  return fallback;
+}
+
+async function assertImageManagerMutation(response: Response, fallback: string) {
+  const data = await response.json().catch(() => ({})) as ImageManagerMutationPayload;
+  if (!response.ok || data.ok === false) {
+    throw new Error(readImageManagerMutationError(data, fallback));
+  }
+}
+
 export default function ImagePlacementCard({ placement, onReload }: Props) {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -76,16 +95,11 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
         method: 'POST',
         body: formData,
       });
-      const data = await res.json();
-      if (!data.ok) {
-        log.error('Error pujant imatge', data.error);
-        setLocalError(typeof data.error === 'string' ? data.error : 'No s ha pogut pujar la imatge');
-        return;
-      }
+      await assertImageManagerMutation(res, "No s'ha pogut pujar la imatge");
       onReload();
     } catch (err) {
       log.error('Error pujant imatge', err);
-      setLocalError('Error pujant imatge');
+      setLocalError(err instanceof Error ? err.message : 'Error pujant imatge');
     } finally {
       setUploading(false);
     }
@@ -106,31 +120,33 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
 
   const handleDelete = useCallback(async (assetId?: string) => {
     try {
-      await fetchWithCsrf('/api/admin/image-manager', {
+      const res = await fetchWithCsrf('/api/admin/image-manager', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key: placement.key, assetId }),
       });
+      await assertImageManagerMutation(res, "No s'ha pogut eliminar l'asset");
       setLocalError(null);
       onReload();
     } catch (err) {
       log.error('Error eliminant asset', err);
-      setLocalError('Error eliminant asset');
+      setLocalError(err instanceof Error ? err.message : 'Error eliminant asset');
     }
   }, [placement.key, onReload]);
 
   const handleSetAuto = useCallback(async () => {
     try {
-      await fetchWithCsrf('/api/admin/image-manager', {
+      const res = await fetchWithCsrf('/api/admin/image-manager', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ modifications: { [placement.key]: { mode: 'auto' } } }),
       });
+      await assertImageManagerMutation(res, "No s'ha pogut tornar a mode automatic");
       setLocalError(null);
       onReload();
     } catch (err) {
       log.error('Error canviant a auto', err);
-      setLocalError('Error tornant a mode automatic');
+      setLocalError(err instanceof Error ? err.message : 'Error tornant a mode automatic');
     }
   }, [placement.key, onReload]);
 
@@ -139,17 +155,18 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
       const body = isCollection
         ? { modifications: { [placement.key]: { mode: 'manual', items: [{ id: assetId, alt }] } } }
         : { modifications: { [placement.key]: { mode: 'manual', alt } } };
-      await fetchWithCsrf('/api/admin/image-manager', {
+      const res = await fetchWithCsrf('/api/admin/image-manager', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
+      await assertImageManagerMutation(res, "No s'ha pogut desar el text alternatiu");
       setEditAlt(null);
       setLocalError(null);
       onReload();
     } catch (err) {
       log.error('Error desant alt', err);
-      setLocalError('Error desant l alt');
+      setLocalError(err instanceof Error ? err.message : 'Error desant l alt');
     }
   }, [placement.key, isCollection, onReload]);
 
@@ -166,16 +183,17 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
     });
 
     try {
-      await fetchWithCsrf('/api/admin/image-manager', {
+      const res = await fetchWithCsrf('/api/admin/image-manager', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key: placement.key, items: reordered }),
       });
+      await assertImageManagerMutation(res, "No s'ha pogut reordenar la colleccio");
       setLocalError(null);
       onReload();
     } catch (err) {
       log.error('Error reordenant', err);
-      setLocalError('Error reordenant la colleccio');
+      setLocalError(err instanceof Error ? err.message : 'Error reordenant la colleccio');
     }
   }, [placement.key, items, onReload]);
 

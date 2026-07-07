@@ -6,6 +6,7 @@
 // següent acció. Part pura + wrapper que carrega des de Prisma.
 // ═══════════════════════════════════════════════════════════════════════════
 
+import { CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
 import { prisma } from '@/lib/prisma';
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -22,6 +23,7 @@ export type PlaybookAction = {
   status: PlaybookActionStatus;
   daysSinceEvent: number;
   note: string | null;
+  socialPostId?: string | null;
 };
 
 export type PlaybookPriority = 'ALTA' | 'MITJANA' | 'BAIXA' | 'DONE';
@@ -37,7 +39,10 @@ export type PlaybookBookingInput = {
   postEventEmailSent: boolean;
   postEventEmailSentAt: Date | null;
   hasTestimonial: boolean;
+  hasTestimonialAskDecision: boolean;
   hasPublishedSocialPost: boolean;
+  hasSocialPostDecision: boolean;
+  socialPostId?: string | null;
   hasReferralAskTask: boolean;
 };
 
@@ -127,12 +132,13 @@ export function buildPostEventPlaybook(input: PlaybookInput): PlaybookSummary {
     });
 
     // 2. Testimonial
+    const testimonialDone = booking.hasTestimonial || booking.hasTestimonialAskDecision;
     actions.push({
       key: 'testimonial',
       label: ACTION_LABELS.testimonial,
-      status: computeStatus(booking.hasTestimonial, daysSinceEvent, ACTION_DUE_DAYS.testimonial),
+      status: computeStatus(testimonialDone, daysSinceEvent, ACTION_DUE_DAYS.testimonial),
       daysSinceEvent,
-      note: booking.hasTestimonial ? 'Rebut' : null,
+      note: booking.hasTestimonial ? 'Rebut' : booking.hasTestimonialAskDecision ? 'Sol.licitat' : null,
     });
 
     // 3. Social post
@@ -145,7 +151,8 @@ export function buildPostEventPlaybook(input: PlaybookInput): PlaybookSummary {
         ACTION_DUE_DAYS.social_post
       ),
       daysSinceEvent,
-      note: booking.hasPublishedSocialPost ? 'Publicat' : null,
+      note: booking.hasPublishedSocialPost ? 'Publicat' : booking.hasSocialPostDecision ? 'Preparat, no publicat' : null,
+      socialPostId: booking.socialPostId ?? null,
     });
 
     // 4. Referral ask — només si hi ha customerId
@@ -322,8 +329,47 @@ export async function loadPostEventPlaybook(
       })
     : [];
 
+  const recurrenceDecisions = customerIds.length > 0
+    ? await prisma.customerActivity.findMany({
+        where: {
+          customerId: { in: customerIds },
+          action: CUSTOMER_ACTIVITY_ACTIONS.POST_EVENT_RECURRENCE_DECIDED,
+        },
+        select: { customerId: true, details: true },
+      })
+    : [];
+
   const publishedSocialByBooking = new Set(socialPosts.map((p) => p.bookingId));
   const referralByCustomer = new Set(referralTasks.map((t) => t.customerId).filter((x): x is string => !!x));
+  const referralByCustomerBooking = new Set(
+    recurrenceDecisions
+      .filter((activity) => isReferralAskDecision(activity.details))
+      .map((activity) => {
+        const details = activity.details as Record<string, unknown>;
+        return `${activity.customerId}:${String(details.bookingId ?? '')}`;
+      })
+      .filter((key) => !key.endsWith(':'))
+  );
+  const testimonialAskByCustomerBooking = new Set(
+    recurrenceDecisions
+      .filter((activity) => isTestimonialAskDecision(activity.details))
+      .map((activity) => {
+        const details = activity.details as Record<string, unknown>;
+        return `${activity.customerId}:${String(details.bookingId ?? '')}`;
+      })
+      .filter((key) => !key.endsWith(':'))
+  );
+  const socialPostByCustomerBooking = new Map<string, string | null>();
+  for (const activity of recurrenceDecisions) {
+    if (!isSocialPostDecision(activity.details)) continue;
+    const details = activity.details as Record<string, unknown>;
+    const bookingId = typeof details.bookingId === 'string' ? details.bookingId.trim() : '';
+    if (!bookingId) continue;
+    const socialPostId = typeof details.socialPostId === 'string' && details.socialPostId.trim()
+      ? details.socialPostId
+      : null;
+    socialPostByCustomerBooking.set(`${activity.customerId}:${bookingId}`, socialPostId);
+  }
 
   const bookings: PlaybookBookingInput[] = rows.map((r) => {
     // Ha rebut testimoni? Mirem testimonis del customer amb eventDate propera (±7 dies)
@@ -333,6 +379,8 @@ export async function loadPostEventPlaybook(
       const delta = Math.abs(t.eventDate.getTime() - r.eventDate.getTime());
       return delta <= 7 * DAY_MS;
     });
+
+    const customerBookingKey = r.customerId ? `${r.customerId}:${r.id}` : null;
 
     return {
       id: r.id,
@@ -345,10 +393,31 @@ export async function loadPostEventPlaybook(
       postEventEmailSent: r.postEventEmailSent,
       postEventEmailSentAt: r.postEventEmailSentAt,
       hasTestimonial,
+      hasTestimonialAskDecision: !!r.customerId && testimonialAskByCustomerBooking.has(`${r.customerId}:${r.id}`),
       hasPublishedSocialPost: publishedSocialByBooking.has(r.id),
-      hasReferralAskTask: !!r.customerId && referralByCustomer.has(r.customerId),
+      hasSocialPostDecision: !!customerBookingKey && socialPostByCustomerBooking.has(customerBookingKey),
+      socialPostId: customerBookingKey ? socialPostByCustomerBooking.get(customerBookingKey) ?? null : null,
+      hasReferralAskTask: !!r.customerId && (
+        referralByCustomer.has(r.customerId) ||
+        referralByCustomerBooking.has(`${r.customerId}:${r.id}`)
+      ),
     };
   });
 
   return buildPostEventPlaybook({ bookings, now });
+}
+
+function isReferralAskDecision(details: unknown): boolean {
+  if (!details || typeof details !== 'object' || Array.isArray(details)) return false;
+  return (details as Record<string, unknown>).actionKey === 'referral_ask';
+}
+
+function isTestimonialAskDecision(details: unknown): boolean {
+  if (!details || typeof details !== 'object' || Array.isArray(details)) return false;
+  return (details as Record<string, unknown>).actionKey === 'testimonial';
+}
+
+function isSocialPostDecision(details: unknown): boolean {
+  if (!details || typeof details !== 'object' || Array.isArray(details)) return false;
+  return (details as Record<string, unknown>).actionKey === 'social_post';
 }

@@ -7,6 +7,7 @@ export type UtmParams = {
   utmMedium?: string;
   utmCampaign?: string;
   landingPage?: string;
+  locale?: 'ca' | 'es' | 'en';
 };
 
 /**
@@ -25,7 +26,10 @@ export function useUtmParams(): UtmParams {
     if (src) result.utmSource = src.slice(0, 200);
     if (med) result.utmMedium = med.slice(0, 200);
     if (cam) result.utmCampaign = cam.slice(0, 200);
-    result.landingPage = window.location.pathname.slice(0, 500);
+    const pathname = window.location.pathname;
+    const locale = pathname.split('/').filter(Boolean)[0];
+    if (locale === 'ca' || locale === 'es' || locale === 'en') result.locale = locale;
+    result.landingPage = pathname.slice(0, 500);
     return result;
   }, []);
 }

@@ -1010,12 +1010,111 @@ export async function sendTestimonialReceivedEmail(params: {
   });
 }
 
-/**
- * Send booking confirmation email to client
- */
-export async function sendBookingConfirmation(booking: BookingEmailModel): Promise<void> {
+type PublicBookingRequestEmailCopy = {
+  subject: (reference: string) => string;
+  title: string;
+  referenceLabel: string;
+  greeting: string;
+  intro: string;
+  eventDetailsTitle: string;
+  dateLabel: string;
+  timeLabel: string;
+  locationLabel: string;
+  venueLabel: string;
+  guestsLabel: string;
+  guestsUnit: string;
+  servicesTitle: string;
+  extraHoursLabel: string;
+  totalLabel: string;
+  nextStepsTitle: string;
+  nextSteps: string[];
+  contactPrompt: string;
+  footer: string;
+};
+
+const PUBLIC_BOOKING_REQUEST_EMAIL_COPY: Record<EmailLocale, PublicBookingRequestEmailCopy> = {
+  ca: {
+    subject: (reference) => `Sol·licitud de reserva rebuda #${reference} - Òrbita Events`,
+    title: 'Sol·licitud de reserva rebuda',
+    referenceLabel: 'Referència',
+    greeting: 'Hola',
+    intro: 'Hem rebut la teva sol·licitud de reserva. La data queda bloquejada provisionalment mentre revisem disponibilitat, encaix tècnic i detalls.',
+    eventDetailsTitle: "Detalls de l'esdeveniment",
+    dateLabel: 'Data',
+    timeLabel: 'Horari',
+    locationLabel: 'Ubicació',
+    venueLabel: 'Local',
+    guestsLabel: 'Convidats',
+    guestsUnit: 'persones',
+    servicesTitle: 'Serveis sol·licitats',
+    extraHoursLabel: 'Hores extra',
+    totalLabel: 'Total estimat',
+    nextStepsTitle: 'Propers passos',
+    nextSteps: [
+      'Revisarem la disponibilitat i els detalls tècnics durant les properes 24 h.',
+      'T\'enviarem la proposta o contracte amb les condicions del servei.',
+      'Quan tot estigui validat, podràs deixar la reserva confirmada amb la paga i senyal.',
+    ],
+    contactPrompt: 'Si tens qualsevol pregunta, respon aquest email o contacta amb nosaltres:',
+    footer: 'Òrbita Events - Barcelona i Girona',
+  },
+  es: {
+    subject: (reference) => `Solicitud de reserva recibida #${reference} - Òrbita Events`,
+    title: 'Solicitud de reserva recibida',
+    referenceLabel: 'Referencia',
+    greeting: 'Hola',
+    intro: 'Hemos recibido tu solicitud de reserva. La fecha queda bloqueada provisionalmente mientras revisamos disponibilidad, encaje técnico y detalles.',
+    eventDetailsTitle: 'Detalles del evento',
+    dateLabel: 'Fecha',
+    timeLabel: 'Horario',
+    locationLabel: 'Ubicación',
+    venueLabel: 'Local',
+    guestsLabel: 'Invitados',
+    guestsUnit: 'personas',
+    servicesTitle: 'Servicios solicitados',
+    extraHoursLabel: 'Horas extra',
+    totalLabel: 'Total estimado',
+    nextStepsTitle: 'Próximos pasos',
+    nextSteps: [
+      'Revisaremos la disponibilidad y los detalles técnicos durante las próximas 24 h.',
+      'Te enviaremos la propuesta o contrato con las condiciones del servicio.',
+      'Cuando todo esté validado, podrás dejar la reserva confirmada con la señal.',
+    ],
+    contactPrompt: 'Si tienes cualquier pregunta, responde a este email o contacta con nosotros:',
+    footer: 'Òrbita Events - Barcelona y Girona',
+  },
+  en: {
+    subject: (reference) => `Booking request received #${reference} - Orbita Events`,
+    title: 'Booking request received',
+    referenceLabel: 'Reference',
+    greeting: 'Hi',
+    intro: 'We have received your booking request. The date is provisionally blocked while we review availability, technical fit and details.',
+    eventDetailsTitle: 'Event details',
+    dateLabel: 'Date',
+    timeLabel: 'Time',
+    locationLabel: 'Location',
+    venueLabel: 'Venue',
+    guestsLabel: 'Guests',
+    guestsUnit: 'people',
+    servicesTitle: 'Requested services',
+    extraHoursLabel: 'Extra hours',
+    totalLabel: 'Estimated total',
+    nextStepsTitle: 'Next steps',
+    nextSteps: [
+      'We will review availability and technical details within the next 24 h.',
+      'We will send you the proposal or contract with the service terms.',
+      'Once everything is validated, you can confirm the booking with the deposit.',
+    ],
+    contactPrompt: 'If you have any questions, reply to this email or contact us:',
+    footer: 'Orbita Events - Barcelona and Girona',
+  },
+};
+
+export function buildPublicBookingRequestEmail(booking: BookingEmailModel): { subject: string; html: string } {
+  const locale = normalizeEmailLocale(booking.preferredLocale);
+  const copy = PUBLIC_BOOKING_REQUEST_EMAIL_COPY[locale];
   const eventDate = new Date(booking.eventDate);
-  const formattedDate = eventDate.toLocaleDateString(toIntlLocaleEmail((booking.preferredLocale || 'ca') as EmailLocale), {
+  const formattedDate = eventDate.toLocaleDateString(toIntlLocaleEmail(locale), {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -1023,7 +1122,7 @@ export async function sendBookingConfirmation(booking: BookingEmailModel): Promi
   });
 
   const packName =
-    booking.pack.translations.find((t: BookingEmailTranslation) => t.locale === booking.preferredLocale)?.name ||
+    booking.pack.translations.find((t: BookingEmailTranslation) => t.locale === locale)?.name ||
     booking.pack.slug;
 
   let extrasHtml = '';
@@ -1031,19 +1130,22 @@ export async function sendBookingConfirmation(booking: BookingEmailModel): Promi
     extrasHtml = booking.extras
       .map((extra: BookingEmailExtraLine) => {
         const extraName =
-          extra.extra.translations.find((t: BookingEmailTranslation) => t.locale === booking.preferredLocale)?.name ||
+          extra.extra.translations.find((t: BookingEmailTranslation) => t.locale === locale)?.name ||
           extra.extra.slug;
         return `<li>${escapeHtml(extraName)} - ${extra.price}€</li>`;
       })
       .join('');
   }
 
-  await sendEmail({
-    to: booking.clientEmail,
-    subject: `Confirmación de Reserva #${booking.reference} - Òrbita Events`,
+  const nextStepsHtml = copy.nextSteps
+    .map((step) => `<li>${escapeHtml(step)}</li>`)
+    .join('');
+
+  return {
+    subject: copy.subject(booking.reference),
     html: `
       <!DOCTYPE html>
-      <html>
+      <html lang="${locale}">
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1053,59 +1155,59 @@ export async function sendBookingConfirmation(booking: BookingEmailModel): Promi
           <!-- Header -->
           <div style="padding: 32px 20px; background: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%); text-align: center;">
             <h1 style="margin: 0; font-size: 28px; color: #fff; font-weight: bold;">
-              ¡Reserva Confirmada! 🎉
+              ${escapeHtml(copy.title)}
             </h1>
             <p style="margin: 12px 0 0 0; font-size: 14px; color: rgba(255,255,255,0.9);">
-              Referencia: <strong>${escapeHtml(booking.reference)}</strong>
+              ${escapeHtml(copy.referenceLabel)}: <strong>${escapeHtml(booking.reference)}</strong>
             </p>
           </div>
 
           <!-- Content -->
           <div style="padding: 32px 20px;">
             <p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6; color: #ccc;">
-              Hola <strong>${escapeHtml(booking.clientName)}</strong>,
+              ${escapeHtml(copy.greeting)} <strong>${escapeHtml(booking.clientName)}</strong>,
             </p>
 
             <p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6; color: #ccc;">
-              Tu reserva ha sido confirmada. A continuación encontrarás todos los detalles:
+              ${escapeHtml(copy.intro)}
             </p>
 
             <!-- Event Details -->
             <div style="background: #1a1a1a; border-left: 4px solid #7C3AED; padding: 20px; margin-bottom: 24px;">
-              <h2 style="margin: 0 0 16px 0; font-size: 18px; color: #fff;">📅 Detalles del Evento</h2>
+              <h2 style="margin: 0 0 16px 0; font-size: 18px; color: #fff;">${escapeHtml(copy.eventDetailsTitle)}</h2>
               <table style="width: 100%; border-collapse: collapse;">
                 <tr>
-                  <td style="padding: 8px 0; color: #999; font-size: 14px;">Fecha:</td>
+                  <td style="padding: 8px 0; color: #999; font-size: 14px;">${escapeHtml(copy.dateLabel)}:</td>
                   <td style="padding: 8px 0; color: #fff; font-size: 14px; font-weight: bold; text-align: right;">
-                    ${formattedDate}
+                    ${escapeHtml(formattedDate)}
                   </td>
                 </tr>
                 ${booking.eventStartTime ? `
                 <tr>
-                  <td style="padding: 8px 0; color: #999; font-size: 14px;">Horario:</td>
+                  <td style="padding: 8px 0; color: #999; font-size: 14px;">${escapeHtml(copy.timeLabel)}:</td>
                   <td style="padding: 8px 0; color: #fff; font-size: 14px; text-align: right;">
                     ${escapeHtml(booking.eventStartTime)}${booking.eventEndTime ? ` - ${escapeHtml(booking.eventEndTime)}` : ''}
                   </td>
                 </tr>
                 ` : ''}
                 <tr>
-                  <td style="padding: 8px 0; color: #999; font-size: 14px;">Ubicación:</td>
+                  <td style="padding: 8px 0; color: #999; font-size: 14px;">${escapeHtml(copy.locationLabel)}:</td>
                   <td style="padding: 8px 0; color: #fff; font-size: 14px; text-align: right;">
                     ${escapeHtml(booking.eventLocation)}
                   </td>
                 </tr>
                 ${booking.eventVenue ? `
                 <tr>
-                  <td style="padding: 8px 0; color: #999; font-size: 14px;">Local:</td>
+                  <td style="padding: 8px 0; color: #999; font-size: 14px;">${escapeHtml(copy.venueLabel)}:</td>
                   <td style="padding: 8px 0; color: #fff; font-size: 14px; text-align: right;">
                     ${escapeHtml(booking.eventVenue)}
                   </td>
                 </tr>
                 ` : ''}
                 <tr>
-                  <td style="padding: 8px 0; color: #999; font-size: 14px;">Invitados:</td>
+                  <td style="padding: 8px 0; color: #999; font-size: 14px;">${escapeHtml(copy.guestsLabel)}:</td>
                   <td style="padding: 8px 0; color: #fff; font-size: 14px; text-align: right;">
-                    ${booking.guestCount} personas
+                    ${booking.guestCount} ${escapeHtml(copy.guestsUnit)}
                   </td>
                 </tr>
               </table>
@@ -1113,18 +1215,18 @@ export async function sendBookingConfirmation(booking: BookingEmailModel): Promi
 
             <!-- Services -->
             <div style="background: #1a1a1a; border-left: 4px solid #EC4899; padding: 20px; margin-bottom: 24px;">
-              <h2 style="margin: 0 0 16px 0; font-size: 18px; color: #fff;">🎵 Servicios Contratados</h2>
+              <h2 style="margin: 0 0 16px 0; font-size: 18px; color: #fff;">${escapeHtml(copy.servicesTitle)}</h2>
               <ul style="margin: 0; padding-left: 20px; color: #ccc; line-height: 1.8;">
                 <li><strong>${escapeHtml(packName)}</strong> - ${booking.pack.price}€</li>
                 ${extrasHtml}
                 ${booking.extraHours > 0 && booking.pack.extraHourPrice
-                  ? `<li>Horas extra (${booking.extraHours}h) - ${booking.pack.extraHourPrice * booking.extraHours}€</li>`
+                  ? `<li>${escapeHtml(copy.extraHoursLabel)} (${booking.extraHours}h) - ${booking.pack.extraHourPrice * booking.extraHours}€</li>`
                   : ''}
               </ul>
 
               <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #333;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span style="font-size: 18px; color: #999;">Total:</span>
+                  <span style="font-size: 18px; color: #999;">${escapeHtml(copy.totalLabel)}:</span>
                   <span style="font-size: 24px; font-weight: bold; color: #7C3AED;">
                     ${booking.total}€
                   </span>
@@ -1134,16 +1236,14 @@ export async function sendBookingConfirmation(booking: BookingEmailModel): Promi
 
             <!-- Next Steps -->
             <div style="background: #1a1a1a; padding: 20px; margin-bottom: 24px;">
-              <h2 style="margin: 0 0 16px 0; font-size: 18px; color: #fff;">📋 Próximos Pasos</h2>
+              <h2 style="margin: 0 0 16px 0; font-size: 18px; color: #fff;">${escapeHtml(copy.nextStepsTitle)}</h2>
               <ol style="margin: 0; padding-left: 20px; color: #ccc; line-height: 1.8;">
-                <li>Nos pondremos en contacto contigo en las próximas 24h para confirmar todos los detalles</li>
-                <li>Recibirás un contrato con las condiciones del servicio</li>
-                <li>Te informaremos sobre las modalidades de pago disponibles</li>
+                ${nextStepsHtml}
               </ol>
             </div>
 
             <p style="margin: 24px 0 0 0; font-size: 14px; line-height: 1.6; color: #999;">
-              Si tienes cualquier pregunta, no dudes en contactarnos:
+              ${escapeHtml(copy.contactPrompt)}
             </p>
             <p style="margin: 8px 0 0 0; font-size: 14px; color: #ccc;">
               📧 ${SITE_CONFIG.business.email}<br>
@@ -1154,13 +1254,25 @@ export async function sendBookingConfirmation(booking: BookingEmailModel): Promi
           <!-- Footer -->
           <div style="padding: 20px; background: #0a0a0a; text-align: center;">
             <p style="margin: 0; font-size: 12px; color: #666;">
-              ${new Date().getFullYear()} Òrbita Events - Barcelona y Girona
+              ${new Date().getFullYear()} ${escapeHtml(copy.footer)}
             </p>
           </div>
         </div>
       </body>
       </html>
     `,
+  };
+}
+
+/**
+ * Send public booking request email to client.
+ */
+export async function sendBookingConfirmation(booking: BookingEmailModel): Promise<void> {
+  const email = buildPublicBookingRequestEmail(booking);
+  await sendEmail({
+    to: booking.clientEmail,
+    subject: email.subject,
+    html: email.html,
   });
 }
 
@@ -1180,7 +1292,7 @@ export async function sendBookingNotificationToAdmin(booking: BookingEmailModel)
 
   await sendEmail({
     to: adminEmail,
-    subject: `🎉 Nueva Reserva #${booking.reference} - ${booking.clientName}`,
+    subject: `Nueva solicitud de reserva #${booking.reference} - ${booking.clientName}`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -1189,9 +1301,10 @@ export async function sendBookingNotificationToAdmin(booking: BookingEmailModel)
       </head>
       <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
         <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #7C3AED;">Nueva Reserva Recibida</h1>
+          <h1 style="color: #7C3AED;">Nueva solicitud de reserva recibida</h1>
 
           <p><strong>Referencia:</strong> ${escapeHtml(booking.reference)}</p>
+          <p><strong>Estado:</strong> PENDING · revisión necesaria antes de confirmación final</p>
 
           <h2>Cliente</h2>
           <ul>
@@ -1232,8 +1345,6 @@ export async function sendBookingNotificationToAdmin(booking: BookingEmailModel)
     `,
   });
 }
-
-
 
 
 

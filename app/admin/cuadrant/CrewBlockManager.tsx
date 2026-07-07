@@ -20,6 +20,16 @@ export interface BlockManagerBlock {
   reason: string | null;
 }
 
+type CrewBlockMutationError = {
+  error?: string;
+  message?: string;
+};
+
+async function readCrewBlockMutationError(res: Response, fallback: string): Promise<string> {
+  const payload = (await res.json().catch(() => ({}))) as CrewBlockMutationError;
+  return payload.error || payload.message || fallback;
+}
+
 export default function CrewBlockManager({
   people,
   blocks,
@@ -49,13 +59,13 @@ export default function CrewBlockManager({
           date, startTime: startTime || null, endTime: endTime || null, reason: reason || null,
         }),
       });
-      if (!res.ok) throw new Error('fail');
+      if (!res.ok) throw new Error(await readCrewBlockMutationError(res, "No s'ha pogut afegir el bloqueig."));
       toast.success('Bloqueig afegit.');
       setDate(''); setStartTime(''); setEndTime(''); setReason('');
       router.refresh();
     } catch (e) {
       console.error('[CrewBlock] add', e);
-      toast.error('No s\'ha pogut afegir (cal desplegar la migració?).');
+      toast.error(e instanceof Error && e.message ? e.message : "No s'ha pogut afegir el bloqueig.");
     } finally {
       setSaving(false);
     }
@@ -64,12 +74,12 @@ export default function CrewBlockManager({
   const remove = async (id: string) => {
     try {
       const res = await fetchWithCsrf(`/api/admin/cuadrant/blocks?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('fail');
+      if (!res.ok) throw new Error(await readCrewBlockMutationError(res, "No s'ha pogut treure el bloqueig."));
       toast.success('Bloqueig tret.');
       router.refresh();
     } catch (e) {
       console.error('[CrewBlock] remove', e);
-      toast.error('No s\'ha pogut treure.');
+      toast.error(e instanceof Error && e.message ? e.message : "No s'ha pogut treure el bloqueig.");
     }
   };
 

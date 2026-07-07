@@ -11,11 +11,32 @@ import { generateCampaigns, type Campaign } from './campaignService';
 import { deriveLeadResponseState, loadPendingFollowUps } from '@/lib/services/responseTrackingService';
 import { loadPipelineSuggestions } from '@/lib/services/leadPipelineSuggestionsService';
 import { loadSocialContentPulse } from '@/lib/services/socialContentPulseService';
+import { bookingOutstandingAmount } from '@/lib/payment-status';
 
 // Wrapper de la font canònica `parseBudgetAmount` (lib/constants); retorna 0 en
 // comptes de null per als consumidors que sumen el valor.
 export function parseBudgetValue(input?: string | null): number {
   return parseBudgetAmount(input) ?? 0;
+}
+
+export type DailyBriefPaymentBooking = {
+  total: number | null;
+  depositAmount: number | null;
+  remainingAmount?: number | null;
+  depositPaid: boolean | null;
+  remainingPaid: boolean | null;
+  cashAmount?: number | null;
+};
+
+export function countPendingPaymentBookings(bookings: DailyBriefPaymentBooking[]): number {
+  return bookings.filter((booking) => bookingOutstandingAmount({
+    total: booking.total || 0,
+    depositAmount: booking.depositAmount || 0,
+    remainingAmount: booking.remainingAmount,
+    depositPaid: Boolean(booking.depositPaid),
+    remainingPaid: Boolean(booking.remainingPaid),
+    cashAmount: booking.cashAmount,
+  }) > 0).length;
 }
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -430,7 +451,7 @@ export async function loadDailyBrief(now: Date = new Date()): Promise<DailyBrief
     openLeads,
     overdueTasksCount,
     upcomingBookings7d,
-    pendingPaymentsCount,
+    pendingPaymentBookings,
     slaBroken,
     staleLeadsCount,
     postEventPending,
@@ -457,7 +478,21 @@ export async function loadDailyBrief(now: Date = new Date()): Promise<DailyBrief
     prisma.lead.count({ where: { status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] } } }),
     prisma.task.count({ where: { status: { in: ['OPEN', 'IN_PROGRESS'] }, dueDate: { lt: todayStart } } }),
     prisma.booking.count({ where: { status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] }, eventDate: { gte: todayStart, lt: weekAhead } } }),
-    prisma.booking.count({ where: { status: { in: ['CONFIRMED', 'COMPLETED'] }, remainingPaid: false, eventDate: { lt: todayStart } } }),
+    prisma.booking.findMany({
+      where: {
+        status: { in: ['CONFIRMED', 'COMPLETED'] },
+        eventDate: { lt: todayStart },
+        OR: [{ depositPaid: false }, { remainingPaid: false }],
+      },
+      select: {
+        total: true,
+        depositAmount: true,
+        remainingAmount: true,
+        depositPaid: true,
+        remainingPaid: true,
+        cashAmount: true,
+      },
+    }),
     prisma.lead.count({ where: { status: 'NEW', createdAt: { lte: new Date(now.getTime() - 24 * 60 * 60 * 1000) } } }),
     prisma.lead.count({ where: { status: { in: ['NEW', 'CONTACTED'] }, updatedAt: { lt: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) } } }),
     prisma.booking.count({ where: { status: 'COMPLETED', postEventEmailSent: false, eventDate: { lt: todayStart } } }),
@@ -505,6 +540,8 @@ export async function loadDailyBrief(now: Date = new Date()): Promise<DailyBrief
     const prob = LEAD_SCORING_STATUS_PROBABILITY[lead.status] ?? 0.15;
     return sum + budget * prob;
   }, 0);
+
+  const pendingPaymentsCount = countPendingPaymentBookings(pendingPaymentBookings);
 
   const pendingFollowUps = pendingFollowUpSummary.total;
   const urgentFollowUps = pendingFollowUpSummary.urgent;

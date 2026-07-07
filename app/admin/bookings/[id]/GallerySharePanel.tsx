@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 
+const GALLERY_SHARE_ERROR_FALLBACK = 'No s\'ha pogut gestionar el link de galeria';
+
 interface Props {
   bookingId: string;
 }
@@ -13,6 +15,24 @@ interface ShareInfo {
   passwordProtected: boolean;
 }
 
+type GalleryShareErrorTarget = 'load' | 'create' | 'copy' | 'revoke';
+
+function getGalleryShareErrorMessage(data: unknown, fallback = GALLERY_SHARE_ERROR_FALLBACK): string {
+  if (data && typeof data === 'object' && 'error' in data) {
+    const message = (data as { error?: unknown }).error;
+    if (typeof message === 'string' && message.trim()) {
+      return message;
+    }
+  }
+
+  return fallback;
+}
+
+async function readGalleryShareError(res: Response, fallback = GALLERY_SHARE_ERROR_FALLBACK): Promise<string> {
+  const data = await res.json().catch(() => null);
+  return getGalleryShareErrorMessage(data, fallback);
+}
+
 export default function GallerySharePanel({ bookingId }: Props) {
   const [info, setInfo] = useState<ShareInfo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -20,14 +40,25 @@ export default function GallerySharePanel({ bookingId }: Props) {
   const [copied, setCopied] = useState(false);
   const [showPasswordInput, setShowPasswordInput] = useState(false);
   const [passwordDraft, setPasswordDraft] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ message: string; target: GalleryShareErrorTarget } | null>(null);
+
+  const hasError = (target: GalleryShareErrorTarget) => error?.target === target;
 
   const loadInfo = useCallback(async () => {
+    setError(null);
     try {
       const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/gallery-share`, { cache: 'no-store' });
-      if (res.ok) setInfo(await res.json());
+      if (!res.ok) {
+        setError({
+          message: await readGalleryShareError(res, 'No s\'ha pogut carregar el link de galeria'),
+          target: 'load',
+        });
+        return;
+      }
+      setInfo(await res.json());
     } catch (err) {
       log.error('Error carregant gallery share info', err);
+      setError({ message: 'No s\'ha pogut carregar el link de galeria', target: 'load' });
     } finally {
       setLoading(false);
     }
@@ -41,12 +72,14 @@ export default function GallerySharePanel({ bookingId }: Props) {
 
   const handleCopy = async () => {
     if (!shareUrl) return;
+    setError(null);
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      log.error('Error copiant al portapapers', null);
+    } catch (err) {
+      log.error('Error copiant al portapapers', err);
+      setError({ message: 'No s\'ha pogut copiar el link', target: 'copy' });
     }
   };
 
@@ -64,12 +97,14 @@ export default function GallerySharePanel({ bookingId }: Props) {
         setShowPasswordInput(false);
         await loadInfo();
       } else {
-        const d = await res.json().catch(() => ({}));
-        setError(d?.error || 'Error generant el link');
+        setError({
+          message: await readGalleryShareError(res, 'Error generant el link'),
+          target: 'create',
+        });
       }
     } catch (err) {
       log.error('Error creant gallery share', err);
-      setError('Error generant el link');
+      setError({ message: 'Error generant el link', target: 'create' });
     } finally {
       setWorking(false);
     }
@@ -83,11 +118,14 @@ export default function GallerySharePanel({ bookingId }: Props) {
       if (res.ok) {
         setInfo({ token: null, passwordProtected: false });
       } else {
-        setError('Error revocant el link');
+        setError({
+          message: await readGalleryShareError(res, 'Error revocant el link'),
+          target: 'revoke',
+        });
       }
     } catch (err) {
       log.error('Error revocant gallery share', err);
-      setError('Error revocant el link');
+      setError({ message: 'Error revocant el link', target: 'revoke' });
     } finally {
       setWorking(false);
     }
@@ -115,6 +153,7 @@ export default function GallerySharePanel({ bookingId }: Props) {
             type="button"
             onClick={() => setShowPasswordInput((v) => !v)}
             disabled={working}
+            aria-invalid={hasError('load') ? true : undefined}
             className="ap-btn ap-btn--xs"
           >
             Generar link
@@ -125,6 +164,7 @@ export default function GallerySharePanel({ bookingId }: Props) {
               type="button"
               onClick={handleCopy}
               disabled={working}
+              aria-invalid={hasError('copy') ? true : undefined}
               className="ap-btn ap-btn--xs"
             >
               {copied ? 'Copiat!' : 'Copiar'}
@@ -133,6 +173,7 @@ export default function GallerySharePanel({ bookingId }: Props) {
               type="button"
               onClick={handleRevoke}
               disabled={working}
+              aria-invalid={hasError('revoke') ? true : undefined}
               className="ap-btn ap-btn--xs admin-tone-border-danger admin-tone-text-danger"
             >
               Revocar
@@ -159,12 +200,14 @@ export default function GallerySharePanel({ bookingId }: Props) {
               value={passwordDraft}
               onChange={(e) => setPasswordDraft(e.target.value)}
               placeholder="Sense contrasenya"
+              aria-invalid={hasError('create') ? true : undefined}
               className="ap-input flex-1 px-3 py-2 text-sm"
             />
             <button
               type="button"
               onClick={handleCreate}
               disabled={working}
+              aria-invalid={hasError('create') ? true : undefined}
               className="ap-btn ap-btn--primary"
             >
               {working ? 'Generant...' : 'Crear'}
@@ -173,7 +216,7 @@ export default function GallerySharePanel({ bookingId }: Props) {
         </div>
       )}
 
-      {error && <p className="text-xs admin-tone-text-danger">{error}</p>}
+      {error && <p role="alert" className="text-xs admin-tone-text-danger">{error.message}</p>}
     </div>
   );
 }

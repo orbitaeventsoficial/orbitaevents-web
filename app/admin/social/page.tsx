@@ -10,7 +10,17 @@ export const metadata = {
   title: 'Social Media | Òrbita Admin',
 };
 
-export default async function SocialPage() {
+type SocialPageProps = {
+  searchParams?: { postId?: string | string[] };
+};
+
+function getSingleParam(value: string | string[] | undefined): string | null {
+  if (Array.isArray(value)) return value[0] ?? null;
+  return value ?? null;
+}
+
+export default async function SocialPage({ searchParams }: SocialPageProps) {
+  const focusPostId = getSingleParam(searchParams?.postId);
   const [posts, counts, ideas, contentPulse] = await Promise.all([
     listSocialPosts(),
     getSocialPostCounts(),
@@ -41,6 +51,7 @@ export default async function SocialPage() {
         initialCounts={counts}
         initialIdeas={serializedIdeas}
         initialContentPulse={contentPulse}
+        focusPostId={focusPostId}
       />
     </AdminPage>
   );

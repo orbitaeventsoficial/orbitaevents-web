@@ -17,6 +17,8 @@ const MATCH_LABELS: Record<'email' | 'phone' | 'name', string> = {
   name: 'mateix nom',
 };
 
+const CUSTOMER_LINK_ERROR = 'No s’ha pogut vincular el client';
+
 function formatMatchedBy(matchedBy: BookingCustomerMatchSummary['matchedBy']): string {
   if (matchedBy.length === 0) return '';
   return matchedBy.map((kind) => MATCH_LABELS[kind]).join(' · ');
@@ -32,12 +34,14 @@ export default function BookingCustomerLinkPanel({
   const router = useRouter();
   const toast = useToast();
   const [submitting, setSubmitting] = useState<string | null>(null);
+  const [error, setError] = useState<{ message: string; pendingId: string } | null>(null);
 
   const submit = async (
     action: 'link' | 'create',
     options: { customerId?: string; pendingId: string },
   ) => {
     setSubmitting(options.pendingId);
+    setError(null);
     try {
       const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/customer-link`, {
         method: 'POST',
@@ -56,7 +60,9 @@ export default function BookingCustomerLinkPanel({
         alreadyLinked?: boolean;
       };
       if (!res.ok || !payload.ok) {
-        toast.error(payload.error || 'No s’ha pogut vincular el client');
+        const message = payload.error || CUSTOMER_LINK_ERROR;
+        setError({ message, pendingId: options.pendingId });
+        toast.error(message);
         return;
       }
       if (payload.alreadyLinked) {
@@ -67,6 +73,11 @@ export default function BookingCustomerLinkPanel({
         toast.success('Reserva vinculada al client existent');
       }
       router.refresh();
+    } catch (submitError) {
+      const message = submitError instanceof Error ? submitError.message : CUSTOMER_LINK_ERROR;
+      setError({ message, pendingId: options.pendingId });
+      console.error(CUSTOMER_LINK_ERROR, submitError);
+      toast.error(message);
     } finally {
       setSubmitting(null);
     }
@@ -108,6 +119,7 @@ export default function BookingCustomerLinkPanel({
                       void submit('link', { customerId: match.customerId, pendingId })
                     }
                     disabled={isSubmitting || submitting !== null}
+                    aria-invalid={error?.pendingId === pendingId ? true : undefined}
                     className="ap-btn ap-btn--primary ap-btn--xs"
                   >
                     {isSubmitting ? 'Vinculant…' : 'Vincular'}
@@ -117,6 +129,11 @@ export default function BookingCustomerLinkPanel({
             );
           })}
         </ul>
+        {error && (
+          <p role="alert" className="basis-full rounded-[var(--o-r-lg)] border border-[var(--ax-danger-border)] bg-[var(--ax-danger-bg)] px-2.5 py-1.5 text-xs font-semibold text-[var(--ax-danger-text)]">
+            {error.message}
+          </p>
+        )}
       </section>
     );
   }
@@ -135,12 +152,18 @@ export default function BookingCustomerLinkPanel({
       </div>
       <button
         type="button"
-        onClick={() => void submit('create', { pendingId })}
-        disabled={isSubmitting || submitting !== null}
-        className="ap-btn ap-btn--primary ap-btn--xs"
-      >
+      onClick={() => void submit('create', { pendingId })}
+      disabled={isSubmitting || submitting !== null}
+      aria-invalid={error?.pendingId === pendingId ? true : undefined}
+      className="ap-btn ap-btn--primary ap-btn--xs"
+    >
         {isSubmitting ? 'Creant…' : 'Crear client'}
       </button>
+      {error && (
+        <p role="alert" className="basis-full rounded-[var(--o-r-lg)] border border-[var(--ax-danger-border)] bg-[var(--ax-danger-bg)] px-2.5 py-1.5 text-xs font-semibold text-[var(--ax-danger-text)]">
+          {error.message}
+        </p>
+      )}
     </section>
   );
 }

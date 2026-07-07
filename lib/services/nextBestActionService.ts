@@ -17,6 +17,7 @@ import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
 import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { bookingOutstandingAmount } from '@/lib/payment-status';
 import type { LeadStatus } from '@prisma/client';
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -603,7 +604,14 @@ const ACTIVE_LEAD_STATUSES: LeadStatus[] = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'N
 const EMPTY_FOLLOWUPS: FollowUpSummary = { generatedAt: '', total: 0, urgent: 0, normal: 0, low: 0, items: [] };
 const EMPTY_CAPACITY: CapacityConflictReport = { generatedAt: '', windowDays: 14, conflicts: [], verdict: '' };
 
-export async function loadNextBestActions(now: Date = new Date()): Promise<NBAReport> {
+export type LoadNextBestActionsOptions = {
+  capacity?: CapacityConflictReport;
+};
+
+export async function loadNextBestActions(
+  now: Date = new Date(),
+  options: LoadNextBestActionsOptions = {},
+): Promise<NBAReport> {
   const [leadsRaw, customersRaw, tasksRaw, followUps, capacity, pipelineSuggestions] = await Promise.all([
     // Active leads with overdue task count
     prisma.lead.findMany({
@@ -636,7 +644,14 @@ export async function loadNextBestActions(now: Date = new Date()): Promise<NBARe
         lastContactedAt: true, totalSpent: true,
         bookings: {
           where: { status: { in: ['CONFIRMED', 'PREPARING'] } },
-          select: { total: true, depositAmount: true, depositPaid: true, remainingPaid: true },
+          select: {
+            total: true,
+            depositAmount: true,
+            remainingAmount: true,
+            depositPaid: true,
+            remainingPaid: true,
+            cashAmount: true,
+          },
         },
         tasks: { where: { status: { notIn: ['DONE', 'CANCELLED'] } }, select: { id: true } },
       },
@@ -664,7 +679,7 @@ export async function loadNextBestActions(now: Date = new Date()): Promise<NBARe
     }).catch((err) => { log.error('NBA: tasks failed', err); return []; }),
 
     loadPendingFollowUps(now).catch((err) => { log.error('NBA: followUps failed', err); return EMPTY_FOLLOWUPS; }),
-    loadCapacityConflicts(now).catch((err) => { log.error('NBA: capacity failed', err); return EMPTY_CAPACITY; }),
+    options.capacity ?? loadCapacityConflicts(now).catch((err) => { log.error('NBA: capacity failed', err); return EMPTY_CAPACITY; }),
     loadPipelineSuggestions(now).catch((err) => { log.error('NBA: pipeline failed', err); return [] as PipelineSuggestion[]; }),
   ]);
 
@@ -697,17 +712,26 @@ export async function loadNextBestActions(now: Date = new Date()): Promise<NBARe
   const customers: NBACustomerInput[] = (customersRaw as Array<{
     id: string; name: string; lifecycleStage: string | null; healthScore: number | null;
     lastContactedAt: Date | null; totalSpent: number;
-    bookings: Array<{ total: number | null; depositAmount: number | null; depositPaid: boolean | null; remainingPaid: boolean | null }>;
+    bookings: Array<{
+      total: number | null;
+      depositAmount: number | null;
+      remainingAmount: number | null;
+      depositPaid: boolean | null;
+      remainingPaid: boolean | null;
+      cashAmount: number | null;
+    }>;
     tasks: { id: string }[];
   }>).map((c) => {
     let pendingPayment = 0;
     for (const b of c.bookings) {
-      const total = b.total || 0;
-      const deposit = b.depositAmount || 0;
-      let paid = 0;
-      if (b.depositPaid) paid += deposit;
-      if (b.remainingPaid) paid += total - deposit;
-      pendingPayment += Math.max(0, total - paid);
+      pendingPayment += bookingOutstandingAmount({
+        total: b.total || 0,
+        depositAmount: b.depositAmount || 0,
+        remainingAmount: b.remainingAmount,
+        depositPaid: Boolean(b.depositPaid),
+        remainingPaid: Boolean(b.remainingPaid),
+        cashAmount: b.cashAmount,
+      });
     }
     return {
       id: c.id,

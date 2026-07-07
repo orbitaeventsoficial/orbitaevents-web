@@ -35,21 +35,66 @@ function sanitizeCostPerHour(value: CollaboratorInput['costPerHour']): number | 
   return Number.isFinite(amount) && amount >= 0 ? roundMoney(amount) : null;
 }
 
+function rowsToSourceCollaboratorCountMap(
+  rows: Array<{ sourceCollaboratorId: string | null; _count: { _all: number } }>,
+): Map<string, number> {
+  return new Map(
+    rows
+      .filter((row) => row.sourceCollaboratorId)
+      .map((row) => [row.sourceCollaboratorId as string, row._count._all]),
+  );
+}
+
+async function countLeadsBySourceCollaborator(): Promise<Map<string, number>> {
+  try {
+    const rows = await prisma.lead.groupBy({
+      by: ['sourceCollaboratorId'],
+      where: { sourceCollaboratorId: { not: null } },
+      _count: { _all: true },
+    });
+    return rowsToSourceCollaboratorCountMap(rows);
+  } catch {
+    // Els comptadors son informatius: mai han de bloquejar carregar proveidors/productes.
+    return new Map();
+  }
+}
+
+async function countBookingsBySourceCollaborator(): Promise<Map<string, number>> {
+  try {
+    const rows = await prisma.booking.groupBy({
+      by: ['sourceCollaboratorId'],
+      where: { sourceCollaboratorId: { not: null } },
+      _count: { _all: true },
+    });
+    return rowsToSourceCollaboratorCountMap(rows);
+  } catch {
+    // Els comptadors son informatius: mai han de bloquejar carregar proveidors/productes.
+    return new Map();
+  }
+}
+
 export async function listAdminCollaborators() {
-  const collaborators = await prisma.collaborator.findMany({
+  const rawCollaborators = await prisma.collaborator.findMany({
     orderBy: { createdAt: 'desc' },
     include: {
       products: {
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
       },
-      _count: {
-        select: {
-          sourcedLeads: true,
-          sourcedBookings: true,
-        },
-      },
     },
   });
+
+  const [sourcedLeadCounts, sourcedBookingCounts] = await Promise.all([
+    countLeadsBySourceCollaborator(),
+    countBookingsBySourceCollaborator(),
+  ]);
+
+  const collaborators = rawCollaborators.map((collaborator) => ({
+    ...collaborator,
+    _count: {
+      sourcedLeads: sourcedLeadCounts.get(collaborator.id) || 0,
+      sourcedBookings: sourcedBookingCounts.get(collaborator.id) || 0,
+    },
+  }));
 
   const allProducts = collaborators.flatMap((collaborator) => collaborator.products || []);
   const catalogValue = allProducts

@@ -39,6 +39,9 @@ import BookingTotalEditor from './BookingTotalEditor';
 import PaymentToggle from './PaymentToggle';
 import CashPaymentButton from './CashPaymentButton';
 import { getPaymentBand, getPaymentLabel } from '@/lib/payment-status';
+import { resolveBookingPaymentDisplay } from './booking-payment-display';
+import { computeBookingEconomicGuard } from '@/app/admin/lib/booking-economic-guard';
+import { resolveBookingFinanceRiskAction, resolveBookingMarginRiskAction, type BookingRiskAction } from './booking-risk-action';
 import { getBookingFiscalMode, getBookingPaymentMethodHelp, getBookingPaymentMethodLabel } from '@/lib/constants/booking-payment';
 import { previewBookingCustomerLink } from '@/lib/services/bookings/bookingCustomerLinkService';
 import { getLeadStatusDisplay, getEventLabel, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull, getContractStatusLabel, getInvoiceStatusLabel, getProposalStatusDisplay } from '@/lib/constants';
@@ -80,6 +83,43 @@ function describeBookingTimelineEntry(entry: CanonicalTimelineEvent): string {
   const channel   = typeof metadata.channel   === 'string' ? metadata.channel   : '';
   const reference = typeof metadata.reference === 'string' ? metadata.reference : '';
   return [flow, channel, reference ? `Ref. ${reference}` : ''].filter(Boolean).join(' · ');
+}
+
+function getMarginStatClass(band: string): string {
+  if (band === 'critical') return 'ap-detail-stats-cell--err';
+  if (band === 'watch') return 'ap-detail-stats-cell--warn';
+  return 'ap-detail-stats-cell--ok';
+}
+
+const BOOKING_RISK_ACTION_TONE: Record<BookingRiskAction['tone'], { box: string; text: string }> = {
+  warning: { box: 'admin-tone-border-warning admin-tone-bg-warning', text: 'admin-tone-text-warning' },
+  danger: { box: 'admin-tone-border-danger admin-tone-bg-danger', text: 'admin-tone-text-danger' },
+};
+
+function BookingRiskActionCallout({ action, value }: { action: BookingRiskAction; value: ReactNode }) {
+  const tone = BOOKING_RISK_ACTION_TONE[action.tone];
+  return (
+    <div className={`rounded-[var(--o-r-lg)] border px-3 py-2.5 ${tone.box}`} role="note" aria-label={action.title}>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+        <div className="min-w-0">
+          <p className={`m-0 font-mono text-xs font-extrabold uppercase tracking-[0.1em] ${tone.text}`}>{action.eyebrow}</p>
+          <p className="m-0 mt-1 text-sm font-extrabold leading-tight text-[var(--t)]">{action.title}</p>
+          <p className="m-0 mt-1 text-xs leading-snug text-[var(--t2)]">{action.summary}</p>
+        </div>
+        <div className="flex flex-col gap-2 sm:items-end">
+          <p className={`m-0 text-sm font-bold ${tone.text}`}>
+            <span className="mr-1 text-xs font-medium text-[var(--t3)]">{action.metricLabel}</span>{value}
+          </p>
+          <div className="flex flex-wrap justify-start gap-2 sm:justify-end">
+            <a href={action.primaryHref} className="ap-btn ap-btn--primary ap-btn--xs">{action.primaryLabel}</a>
+            {action.secondaryHref && action.secondaryLabel && (
+              <a href={action.secondaryHref} className="ap-btn ap-btn--secondary ap-btn--xs">{action.secondaryLabel}</a>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // ── Helpers de presentació (token-utility, hipersemblança amb la fitxa de client) ──
@@ -247,6 +287,24 @@ export default async function BookingDetailPage({ params }: PageProps) {
   const inventoryCostReal   = inventoryCost.totalCost;
   const inventoryRemainingHoursAvg = inventoryCost.remainingHoursAvg;
   const inventoryRemainingHoursMin = inventoryCost.remainingHoursMin;
+  const bookingCashAmount = booking.cashAmount ? Number(booking.cashAmount) : null;
+  const economicGuard = computeBookingEconomicGuard({
+    total: Number(booking.total),
+    depositAmount: Number(booking.depositAmount),
+    remainingAmount: Number(booking.remainingAmount),
+    depositPaid: booking.depositPaid,
+    remainingPaid: booking.remainingPaid,
+    cashAmount: bookingCashAmount,
+    packPrice,
+    extrasTotal,
+    extraHours,
+    extraHourPrice,
+    distanceKm: typeof bookingCompat.distanceKm === 'number' ? bookingCompat.distanceKm : null,
+    vehicleCostPerKm: typeof bookingCompat.vehicleCostPerKm === 'number' ? bookingCompat.vehicleCostPerKm : typeof bookingCompat.fuelCostPerKm === 'number' ? bookingCompat.fuelCostPerKm : null,
+    travelCost: typeof bookingCompat.travelCost === 'number' ? bookingCompat.travelCost : null,
+    inventoryCostReal: inventoryCostReal > 0 ? Number(inventoryCostReal.toFixed(2)) : null,
+    serviceLines: booking.serviceLines ?? [],
+  }, profitabilityConfig);
 
   const daysUntil = Math.ceil((booking.eventDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
   const isPast    = daysUntil < 0;
@@ -256,14 +314,33 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
   // KPI payment state helpers (label canònic via lib/payment-status)
   const paymentCoverage = {
-    cashAmount: booking.cashAmount ? Number(booking.cashAmount) : null,
+    cashAmount: bookingCashAmount,
     total: Number(booking.total),
   };
+  const paymentDisplay = resolveBookingPaymentDisplay({
+    total: Number(booking.total),
+    depositAmount: Number(booking.depositAmount),
+    remainingAmount: Number(booking.remainingAmount),
+    depositPaid: booking.depositPaid,
+    remainingPaid: booking.remainingPaid,
+    cashAmount: bookingCashAmount,
+  });
   const paymentBand     = getPaymentBand(booking.depositPaid, booking.remainingPaid, paymentCoverage);
   const paymentLabel    = getPaymentLabel(booking.depositPaid, booking.remainingPaid, paymentCoverage);
   const fiscalMode      = getBookingFiscalMode(booking.invoiceRequired);
   const paymentMethodLabel = getBookingPaymentMethodLabel(booking.paymentMethod);
   const paymentMethodHelp  = getBookingPaymentMethodHelp(booking.paymentMethod);
+  const financeRiskAction = resolveBookingFinanceRiskAction({
+    outstandingAmount: economicGuard.outstandingAmount,
+    outstandingBand: economicGuard.outstandingBand,
+    depositPaid: booking.depositPaid,
+    remainingPaid: booking.remainingPaid,
+    cashAmount: bookingCashAmount,
+    total: Number(booking.total),
+  });
+  const marginRiskAction = resolveBookingMarginRiskAction({
+    marginBand: economicGuard.marginBand,
+  });
 
   const flowLabel    = reviewFlowStatus === 'RESPONDIDO' ? 'Respost' : reviewFlowStatus === 'ENVIADO' ? 'Enviat' : 'Falta enviar';
 
@@ -373,6 +450,20 @@ export default async function BookingDetailPage({ params }: PageProps) {
             <div className="ap-detail-stats-cell ap-detail-stats-cell--gold">
               <p className="ap-detail-stats-label">Total reserva</p>
               <p className="ap-detail-stats-val">{formatCurrency(booking.total)}</p>
+            </div>
+            <div className={`ap-detail-stats-cell ${getMarginStatClass(economicGuard.marginBand)}`}>
+              <p className="ap-detail-stats-label">
+                <span className={`ap-detail-stats-dot ap-detail-stats-dot--${economicGuard.marginBand === 'critical' ? 'err' : economicGuard.marginBand === 'watch' ? 'warn' : 'ok'}`} />
+                Marge
+              </p>
+              <p className="ap-detail-stats-val">{formatCurrency(economicGuard.netMargin)} · {economicGuard.marginPct.toFixed(0)}%</p>
+            </div>
+            <div className={`ap-detail-stats-cell ap-detail-stats-cell--${economicGuard.outstandingBand}`}>
+              <p className="ap-detail-stats-label">
+                <span className={`ap-detail-stats-dot ap-detail-stats-dot--${economicGuard.outstandingBand}`} />
+                Pendent caixa
+              </p>
+              <p className="ap-detail-stats-val">{formatCurrency(economicGuard.outstandingAmount)}</p>
             </div>
             <div className={`ap-detail-stats-cell ${paymentBand === 'paid' ? 'ap-detail-stats-cell--ok' : paymentBand === 'partial' ? 'ap-detail-stats-cell--warn' : 'ap-detail-stats-cell--err'}`}>
               <p className="ap-detail-stats-label">
@@ -555,6 +646,11 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
           {/* ── Finances ── */}
           <Panel id="sec-finances" title="Resum Econòmic" help={helpAttrs(ADMIN_BOOKING_HELP.detail.finances)}>
+            {financeRiskAction && (
+              <div className="mb-3">
+                <BookingRiskActionCallout action={financeRiskAction} value={formatCurrency(economicGuard.outstandingAmount)} />
+              </div>
+            )}
             <div className="flex flex-col gap-0.5">
               <div className="flex justify-between gap-3 border-b border-[var(--o-admin-line)] py-1.5 text-sm text-[var(--t2)]"><span>Subtotal</span><span>{formatCurrency(booking.subtotal)}</span></div>
               {booking.discount > 0 && (
@@ -569,36 +665,38 @@ export default async function BookingDetailPage({ params }: PageProps) {
               <div className="mt-1.5 flex items-center justify-between gap-3 border-t border-[var(--o-admin-line)] pt-2.5 text-base font-bold text-[var(--gold)]"><span>Total</span><BookingTotalEditor bookingId={booking.id} total={Number(booking.total)} /></div>
             </div>
             <p className="mt-1 text-xs text-[var(--t3)]">{paymentMethodHelp}</p>
-            <div className="mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-[var(--o-r-lg)] border border-[var(--o-admin-line)] bg-[var(--o-admin-line)]">
-              <div className={`px-3 py-2.5 ${booking.depositPaid ? 'bg-[var(--ax-success-bg)]' : 'bg-[var(--ax-danger-bg)]'}`}>
+            <div id="booking-payment-status" className="mt-3 grid scroll-mt-40 grid-cols-2 gap-px overflow-hidden rounded-[var(--o-r-lg)] border border-[var(--o-admin-line)] bg-[var(--o-admin-line)]">
+              <div className={`px-3 py-2.5 ${paymentDisplay.depositSettled ? 'bg-[var(--ax-success-bg)]' : 'bg-[var(--ax-danger-bg)]'}`}>
                 <p className="m-0 mb-1 font-mono text-xs font-bold uppercase tracking-[0.1em] text-[var(--t3)]">Paga i senyal</p>
-                <p className={`m-0 font-bold ${booking.depositPaid ? 'text-[var(--o-success)]' : 'text-[var(--o-danger)]'}`}>{formatCurrency(booking.depositAmount)}</p>
+                <p className={`m-0 font-bold ${paymentDisplay.depositSettled ? 'text-[var(--o-success)]' : 'text-[var(--o-danger)]'}`}>{formatCurrency(paymentDisplay.depositAmount)}</p>
                 <div className="text-xs text-[var(--t3)]">
                   <PaymentToggle bookingId={booking.id} field="depositPaid" paid={booking.depositPaid} />
                 </div>
               </div>
-              <div className={`px-3 py-2.5 ${booking.remainingPaid ? 'bg-[var(--ax-success-bg)]' : 'bg-[var(--ax-warning-bg)]'}`}>
+              <div className={`px-3 py-2.5 ${paymentDisplay.remainingSettled ? 'bg-[var(--ax-success-bg)]' : 'bg-[var(--ax-warning-bg)]'}`}>
                 <p className="m-0 mb-1 font-mono text-xs font-bold uppercase tracking-[0.1em] text-[var(--t3)]">Resta</p>
-                <p className={`m-0 font-bold ${booking.remainingPaid ? 'text-[var(--o-success)]' : 'text-[var(--o-warning)]'}`}>{formatCurrency(booking.remainingAmount)}</p>
+                <p className={`m-0 font-bold ${paymentDisplay.remainingSettled ? 'text-[var(--o-success)]' : 'text-[var(--o-warning)]'}`}>{formatCurrency(paymentDisplay.remainingAmount)}</p>
                 <div className="text-xs text-[var(--t3)]">
                   <PaymentToggle bookingId={booking.id} field="remainingPaid" paid={booking.remainingPaid} />
                 </div>
               </div>
             </div>
             <div className="mt-2 flex justify-end">
-              <CashPaymentButton bookingId={booking.id} total={Number(booking.total)} fullyPaid={booking.depositPaid && booking.remainingPaid} />
+              <CashPaymentButton bookingId={booking.id} total={Number(booking.total)} fullyPaid={paymentDisplay.allSettled} />
             </div>
-            <div className="mt-3">
+            <div id="booking-payment-links" className="mt-3 scroll-mt-40">
               <StripePaymentPanel
                 bookingId={booking.id}
-                depositPaid={booking.depositPaid}
+                depositPaid={paymentDisplay.depositSettled}
                 depositPaymentUrl={booking.depositPaymentUrl}
                 depositBizumDeclaredAt={(booking as { depositBizumDeclaredAt?: Date | null }).depositBizumDeclaredAt ?? null}
-                remainingPaid={booking.remainingPaid}
+                remainingPaid={paymentDisplay.remainingSettled}
                 remainingPaymentUrl={booking.remainingPaymentUrl}
                 remainingBizumDeclaredAt={(booking as { remainingBizumDeclaredAt?: Date | null }).remainingBizumDeclaredAt ?? null}
-                depositAmount={booking.depositAmount}
-                remainingAmount={booking.remainingAmount}
+                depositAmount={paymentDisplay.depositAmount}
+                remainingAmount={paymentDisplay.remainingAmount}
+                depositOnlineBlocked={!paymentDisplay.depositSettled && paymentDisplay.depositAmount !== Number(booking.depositAmount)}
+                remainingOnlineBlocked={paymentDisplay.depositSettled && !paymentDisplay.remainingSettled && paymentDisplay.remainingAmount !== Number(booking.remainingAmount)}
                 stripeConfigured={!!process.env.STRIPE_SECRET_KEY}
               />
             </div>
@@ -620,6 +718,12 @@ export default async function BookingDetailPage({ params }: PageProps) {
         )}
 
         <SecDivider id="sec-marge">Marge</SecDivider>
+        {marginRiskAction && (
+          <BookingRiskActionCallout
+            action={marginRiskAction}
+            value={`${economicGuard.marginPct.toFixed(0)}% · ${formatCurrency(economicGuard.netMargin)}`}
+          />
+        )}
         <div>
           <BookingMarginCard
             bookingId={booking.id}
@@ -630,6 +734,8 @@ export default async function BookingDetailPage({ params }: PageProps) {
             extraHourPrice={extraHourPrice}
             distanceKm={typeof bookingCompat.distanceKm === 'number' ? bookingCompat.distanceKm : null}
             vehicleCostPerKm={typeof bookingCompat.vehicleCostPerKm === 'number' ? bookingCompat.vehicleCostPerKm : typeof bookingCompat.fuelCostPerKm === 'number' ? bookingCompat.fuelCostPerKm : null}
+            storedTravelCost={typeof bookingCompat.travelCost === 'number' ? bookingCompat.travelCost : null}
+            tollsEur={typeof bookingCompat.tollsEur === 'number' ? bookingCompat.tollsEur : null}
             eventLocation={booking.eventLocation}
             eventVenue={booking.eventVenue}
             inventoryCostReal={inventoryCostReal > 0 ? Number(inventoryCostReal.toFixed(2)) : null}
@@ -692,6 +798,8 @@ export default async function BookingDetailPage({ params }: PageProps) {
           />
           <InvoiceSection
             bookingId={booking.id}
+            customerHref={customer ? buildCustomerHubHref(customer.id) : null}
+            leadHref={booking.lead ? buildLeadWorkspaceHref(booking.lead.id) : null}
             invoices={(booking.invoices as BookingInvoiceRow[]).map((inv) => ({
               id: inv.id, reference: inv.reference, status: inv.status,
               total: Number(inv.total), holdedInvoiceUrl: inv.holdedInvoiceUrl,

@@ -26,6 +26,10 @@ interface RequestTypeConfig {
   descriptionLabel?: string;
 }
 
+type PrivacyRequestSubmitResponse = {
+  success?: unknown;
+};
+
 const COLOR_CLASSES: Record<string, { bg: string; text: string; border: string; hover: string }> = {
   blue: {
     bg: 'bg-[color-mix(in_oklab,var(--oe-gold)_12%,transparent)]',
@@ -187,12 +191,12 @@ export default function PrivacitatClient() {
         }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => null) as PrivacyRequestSubmitResponse | null;
 
-      if (data.success) {
+      if (data?.success === true) {
         setStep('success');
       } else {
-        setError(data.error || t('form.errorDefault'));
+        setError(t('form.errorDefault'));
       }
     } catch {
       setError(t('form.errorConnection'));

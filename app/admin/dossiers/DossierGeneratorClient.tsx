@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import Image from 'next/image';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_DOSSIER_GENERATOR_COPY } from '@/lib/constants/admin';
@@ -29,6 +30,9 @@ import {
 const LABEL_CLS = 'flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.06em] text-[var(--t2)]';
 const RESULTS_CLS = 'absolute left-0 right-0 top-[calc(100%+0.25rem)] z-50 m-0 list-none overflow-hidden rounded-[var(--o-r-md)] border border-[var(--line2)] bg-[var(--raised)] p-1 shadow-lg';
 const RESULT_BTN_CLS = 'flex w-full flex-col gap-0.5 rounded-[var(--o-r-sm)] border-none bg-transparent px-3 py-2.5 text-left transition-colors hover:bg-[var(--panel)]';
+const CUSTOMER_LOOKUP_ERROR = 'No he pogut consultar clients existents. Torna-ho a provar abans de crear lead/client.';
+const LEAD_LOOKUP_ERROR = 'No he pogut consultar leads existents. Torna-ho a provar abans d’omplir el dossier manualment.';
+const LEAD_PRODUCTS_SYNC_ERROR = 'No he pogut carregar la configuració del lead. Revisa la fitxa o selecciona els productes manualment.';
 
 interface Props {
   products: AnimacioProduct[];
@@ -145,6 +149,15 @@ function productBadge(product: AnimacioProduct): string {
   return product.id.startsWith('collab:') ? 'Partner' : 'Òrbita';
 }
 
+function isInfantilDossierProduct(product: AnimacioProduct): boolean {
+  const text = normalizeDossierProductText([
+    product.categoria,
+    product.nom,
+    ...(product.descripcio ?? []),
+  ].filter(Boolean).join(' '));
+  return /\b(infantil|infantils|nens|nenes|mainada|casal|escola|pirates|personatge|pintacares|globoflexia)\b/.test(text);
+}
+
 function marginGuardToneClass(band: string): string {
   switch (band) {
     case 'excellent':
@@ -188,8 +201,18 @@ function buildEventDescription(data: ExtractedLeadData): string {
 export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, leadId: initialLeadId, initialNom, initialEmail, initialTelefon, initialEmpresa, initialEventDesc, initialTravelLocation, initialDistanceKm, initialProductIds }: Props) {
   const toast = useToast();
   const validProductIds = useMemo(() => new Set(products.map((p) => p.id)), [products]);
-  const productGroups = useMemo(() => (['orbita', 'masquerade', 'tino', 'altres'] as const)
-    .map((group) => ({ group, items: products.filter((product) => dossierProductGroupKey(product) === group) }))
+  const productProviderGroups = useMemo(() => (['orbita', 'masquerade', 'tino', 'altres'] as const)
+    .map((group) => {
+      const groupProducts = products.filter((product) => dossierProductGroupKey(product) === group);
+      return {
+        group,
+        items: groupProducts,
+        audienceColumns: [
+          { key: 'infantil' as const, items: groupProducts.filter(isInfantilDossierProduct) },
+          { key: 'adult' as const, items: groupProducts.filter((product) => !isInfantilDossierProduct(product)) },
+        ],
+      };
+    })
     .filter(({ items }) => items.length > 0), [products]);
   const [linkedLeadId, setLinkedLeadId] = useState(initialLeadId ?? '');
   const [nom, setNom] = useState(initialNom ?? '');
@@ -234,10 +257,13 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
   const [searchResults, setSearchResults] = useState<LeadResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [leadSearchError, setLeadSearchError] = useState('');
+  const [leadSyncError, setLeadSyncError] = useState('');
   const [customerQuery, setCustomerQuery] = useState('');
   const [customerResults, setCustomerResults] = useState<CustomerResult[]>([]);
   const [customerSearching, setCustomerSearching] = useState(false);
   const [showCustomerResults, setShowCustomerResults] = useState(false);
+  const [customerSearchError, setCustomerSearchError] = useState('');
   const [customerConflict, setCustomerConflict] = useState<CustomerResult | null>(null);
   const [receivedText, setReceivedText] = useState('');
   const [extractingText, setExtractingText] = useState(false);
@@ -247,16 +273,22 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
   const initialLeadSyncRef = useRef(false);
 
   const searchLeads = useCallback(async (q: string) => {
-    if (q.length < 2) { setSearchResults([]); setShowResults(false); return; }
+    if (q.length < 2) { setSearchResults([]); setShowResults(false); setLeadSearchError(''); return; }
     setSearching(true);
     try {
+      setLeadSearchError('');
       const res = await fetch(`/api/admin/leads?search=${encodeURIComponent(q)}&limit=8`);
-      if (!res.ok) return;
-      const data = await res.json() as { leads?: LeadResult[] };
+      const data = (await res.json().catch(() => ({}))) as { leads?: LeadResult[]; error?: string; message?: string };
+      if (!res.ok) {
+        throw new Error(data.error || data.message || LEAD_LOOKUP_ERROR);
+      }
       setSearchResults(data.leads ?? []);
       setShowResults(true);
     } catch (err) {
       console.error('[DossierGenerator] searchLeads error:', err);
+      setSearchResults([]);
+      setShowResults(false);
+      setLeadSearchError(err instanceof Error ? err.message : LEAD_LOOKUP_ERROR);
     } finally {
       setSearching(false);
     }
@@ -264,20 +296,26 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
 
   const loadCustomers = useCallback(async (q: string): Promise<CustomerResult[]> => {
     const res = await fetchWithCsrf(`/api/admin/customers?q=${encodeURIComponent(q)}&limit=8`, { method: 'GET' });
-    if (!res.ok) return [];
-    const payload = await res.json() as { customers?: CustomerResult[]; data?: { customers?: CustomerResult[] } };
+    const payload = (await res.json().catch(() => ({}))) as { customers?: CustomerResult[]; data?: { customers?: CustomerResult[] }; error?: string; message?: string };
+    if (!res.ok) {
+      throw new Error(payload.error || payload.message || CUSTOMER_LOOKUP_ERROR);
+    }
     return extractCustomers(payload);
   }, []);
 
   const searchCustomers = useCallback(async (q: string) => {
-    if (q.length < 2) { setCustomerResults([]); setShowCustomerResults(false); return; }
+    if (q.length < 2) { setCustomerResults([]); setShowCustomerResults(false); setCustomerSearchError(''); return; }
     setCustomerSearching(true);
     try {
+      setCustomerSearchError('');
       const customers = await loadCustomers(q);
       setCustomerResults(customers);
       setShowCustomerResults(true);
     } catch (err) {
       console.error('[DossierGenerator] searchCustomers error:', err);
+      setCustomerResults([]);
+      setShowCustomerResults(false);
+      setCustomerSearchError(err instanceof Error ? err.message : CUSTOMER_LOOKUP_ERROR);
     } finally {
       setCustomerSearching(false);
     }
@@ -304,17 +342,23 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
 
   const syncProductsFromLead = useCallback(async (leadId: string) => {
     try {
+      setLeadSyncError('');
       const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/service-lines`);
-      if (!res.ok) return;
-      const data = await res.json() as LeadServiceLineResult;
+      const data = (await res.json().catch(() => ({}))) as LeadServiceLineResult & { error?: string; message?: string };
+      if (!res.ok) {
+        throw new Error(data.error || data.message || LEAD_PRODUCTS_SYNC_ERROR);
+      }
       const lines = data.lines ?? [];
       const ids = productIdsFromDossierServiceLines(lines, products, validProductIds);
       setSelectedIds(new Set(ids));
       setDjHours(dossierDjHoursFromServiceLines(lines));
     } catch (err) {
       console.error('[DossierGenerator] syncProductsFromLead error:', err);
+      const message = err instanceof Error ? err.message : LEAD_PRODUCTS_SYNC_ERROR;
+      setLeadSyncError(message);
+      toast.error(message);
     }
-  }, [products, validProductIds]);
+  }, [products, toast, validProductIds]);
 
   const syncProductsToLead = useCallback(async (leadId: string) => {
     const lines = selectedProducts.map((p) => productToDossierServiceLine(p, djHours));
@@ -335,6 +379,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
   function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
     const q = e.target.value;
     setSearchQuery(q);
+    setLeadSearchError('');
     if (searchTimer.current) clearTimeout(searchTimer.current);
     searchTimer.current = setTimeout(() => searchLeads(q), 280);
   }
@@ -343,6 +388,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
     const q = e.target.value;
     setCustomerQuery(q);
     setCustomerConflict(null);
+    setCustomerSearchError('');
     if (customerSearchTimer.current) clearTimeout(customerSearchTimer.current);
     customerSearchTimer.current = setTimeout(() => searchCustomers(q), 280);
   }
@@ -365,6 +411,8 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
     setSearchQuery('');
     setShowResults(false);
     setSavedId(null);
+    setLeadSearchError('');
+    setLeadSyncError('');
     void syncProductsFromLead(lead.id);
   }
 
@@ -372,6 +420,8 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
     setLinkedCustomerId(customer.id);
     setLinkedCustomerLabel(customer.name);
     setCustomerConflict(null);
+    setCustomerSearchError('');
+    setLeadSearchError('');
     setNom(customer.name);
     setEmail(customer.email ?? '');
     setTelefon(customer.phone ?? '');
@@ -388,6 +438,8 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
     setCustomerResults([]);
     setShowCustomerResults(false);
     setCustomerConflict(null);
+    setCustomerSearchError('');
+    setLeadSearchError('');
     setSavedId(null);
   }
 
@@ -396,6 +448,9 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
     setLinkedCustomerId('');
     setLinkedCustomerLabel('');
     setCustomerConflict(null);
+    setCustomerSearchError('');
+    setLeadSearchError('');
+    setLeadSyncError('');
     setNom('');
     setEmail('');
     setTelefon('');
@@ -601,7 +656,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
       }
     } catch (err) {
       console.error('[DossierGenerator] saveDossier error:', err);
-      toast.error('Error desant el dossier');
+      toast.error(err instanceof Error ? err.message : 'Error desant el dossier');
     } finally {
       setSaving(false);
     }
@@ -668,6 +723,11 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
                 autoComplete="off"
               />
               {searching && <span className="absolute right-3 top-9 text-xs text-[var(--t3)]">Cercant…</span>}
+              {leadSearchError && (
+                <div className="ap-inline-alert ap-inline-alert--danger mt-1" role="alert">
+                  {leadSearchError}
+                </div>
+              )}
               {showResults && searchResults.length > 0 && (
                 <ul className={RESULTS_CLS}>
                   {searchResults.map((lead) => (
@@ -687,6 +747,11 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
               {showResults && searchResults.length === 0 && !searching && searchQuery.length >= 2 && (
                 <div className="mt-1 rounded-[var(--o-r-sm)] border border-[var(--line)] px-3 py-2.5 text-sm text-[var(--t3)]">Cap lead trobat. Omple les dades manualment.</div>
               )}
+            </div>
+          )}
+          {leadSyncError && (
+            <div className="ap-inline-alert ap-inline-alert--danger max-w-[42rem]" role="alert">
+              {leadSyncError}
             </div>
           )}
           {!linkedLeadId && (
@@ -714,6 +779,11 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
                     autoComplete="off"
                   />
                   {customerSearching && <span className="absolute right-3 top-9 text-xs text-[var(--t3)]">Cercant…</span>}
+                  {customerSearchError && (
+                    <div className="ap-inline-alert ap-inline-alert--danger mt-1" role="alert">
+                      {customerSearchError}
+                    </div>
+                  )}
                   {showCustomerResults && customerResults.length > 0 && (
                     <ul className={RESULTS_CLS}>
                       {customerResults.map((customer) => (
@@ -944,43 +1014,74 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
         <section className="ap-card ap-card-body min-w-0">
           <h2 className="text-base font-semibold text-[var(--t)]">{ADMIN_DOSSIER_GENERATOR_COPY.catalog.title}</h2>
           <p className="mb-4 mt-1 text-sm text-[var(--t3)]">{ADMIN_DOSSIER_GENERATOR_COPY.catalog.hint}</p>
-          {productGroups.length === 0 && (
+          {products.length === 0 && (
             <p className="mt-2 rounded-[var(--o-r-sm)] border border-dashed border-[var(--line2)] bg-[var(--sunk)] p-5 text-center text-sm text-[var(--t3)]">
               Encara no hi ha cap servei al catàleg. Activa productes a Òrbita o als col·laboradors per poder muntar el dossier.
             </p>
           )}
-          <div className="flex flex-col gap-4">
-            {productGroups.map(({ group, items }) => (
-              <section key={group} className="flex flex-col gap-2.5">
-                <div className="flex items-baseline gap-3 border-b border-[var(--line)] pb-2">
-                  <span className="font-mono text-xs font-bold uppercase tracking-[0.08em] text-[var(--gold-bright)]">{productGroupTitle(group)}</span>
-                  <span className="text-xs text-[var(--t3)]">{productGroupSubtitle(group)}</span>
-                </div>
-                <div className="grid grid-cols-1 gap-2.5 xl:grid-cols-2">
-                  {items.map((p) => {
-                    const checked = selectedIds.has(p.id);
-                    const priceLabel = productPriceLabel(p);
-                    return (
-                      <label
-                        key={p.id}
-                        className={`flex min-h-16 cursor-pointer items-center gap-3 rounded-[var(--o-r-sm)] border bg-[var(--sunk)] px-3.5 py-3 transition-colors hover:border-[var(--gold)] ${checked ? 'border-[var(--gold)] bg-[var(--ax-gold-tint-1)]' : 'border-[var(--line)]'}`}
-                      >
-                        <input type="checkbox" checked={checked} onChange={() => toggleProduct(p.id)} className="sr-only" aria-label={`Incloure ${p.nom}`} />
-                        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                          <span className="flex min-w-0 items-center gap-2">
-                            <span className="font-semibold text-[var(--t)]">{p.nom}</span>
-                            <span className="ap-badge shrink-0">{productBadge(p)}</span>
-                          </span>
-                          {priceLabel && <span className="text-xs text-[var(--t3)]">{priceLabel}</span>}
-                        </div>
-                        <div className={`flex h-[1.375rem] w-[1.375rem] items-center justify-center rounded-full border-2 text-xs ${checked ? 'border-[var(--gold)] bg-[var(--gold)] text-[var(--canvas)]' : 'border-[var(--line2)] text-transparent'}`}>✓</div>
-                      </label>
-                    );
-                  })}
-                </div>
-              </section>
-            ))}
-          </div>
+          {products.length > 0 && (
+            <div className="flex flex-col gap-4">
+              {productProviderGroups.map(({ group, audienceColumns, items }) => {
+                return (
+                  <section key={group} className="flex min-w-0 flex-col gap-3 rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--panel)] p-3">
+                    <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-[var(--line)] pb-2">
+                      <div className="min-w-0">
+                        <span className="block font-mono text-xs font-bold uppercase tracking-[0.08em] text-[var(--gold-bright)]">{productGroupTitle(group)}</span>
+                        <span className="text-xs text-[var(--t3)]">{productGroupSubtitle(group)}</span>
+                      </div>
+                      <span className="ap-badge shrink-0">{items.length} {ADMIN_DOSSIER_GENERATOR_COPY.catalog.serviceCountLabel}</span>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+                      {audienceColumns.map(({ key, items: audienceItems }) => {
+                        const audienceCopy = ADMIN_DOSSIER_GENERATOR_COPY.catalog.audiences[key];
+                        return (
+                          <section key={key} className="flex min-w-0 flex-col gap-2.5 rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)] p-2.5">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <span className="font-mono text-xs font-bold uppercase tracking-[0.08em] text-[var(--t2)]">{audienceCopy.title}</span>
+                              <span className="text-xs text-[var(--t3)]">{audienceItems.length}</span>
+                            </div>
+                            {audienceItems.length === 0 ? (
+                              <p className="rounded-[var(--o-r-sm)] border border-dashed border-[var(--line2)] px-3 py-2.5 text-xs text-[var(--t3)]">
+                                {audienceCopy.empty}
+                              </p>
+                            ) : (
+                              <div className="grid grid-cols-1 gap-2.5">
+                                {audienceItems.map((p) => {
+                                  const checked = selectedIds.has(p.id);
+                                  const priceLabel = productPriceLabel(p);
+                                  return (
+                                    <label
+                                      key={p.id}
+                                      className={`flex min-h-16 cursor-pointer items-center gap-3 rounded-[var(--o-r-sm)] border bg-[var(--panel)] px-3.5 py-3 transition-colors hover:border-[var(--gold)] ${checked ? 'border-[var(--gold)] bg-[var(--ax-gold-tint-1)]' : 'border-[var(--line)]'}`}
+                                    >
+                                      <input type="checkbox" checked={checked} onChange={() => toggleProduct(p.id)} className="sr-only" aria-label={`Incloure ${p.nom}`} />
+                                      {p.image && (
+                                        <span className="relative h-14 w-20 shrink-0 overflow-hidden rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)]">
+                                          <Image src={p.image} alt="" fill sizes="5rem" className="object-cover" />
+                                        </span>
+                                      )}
+                                      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                                        <span className="flex min-w-0 items-center gap-2">
+                                          <span className="font-semibold text-[var(--t)]">{p.nom}</span>
+                                          <span className="ap-badge shrink-0">{productBadge(p)}</span>
+                                        </span>
+                                        {priceLabel && <span className="text-xs text-[var(--t3)]">{priceLabel}</span>}
+                                      </div>
+                                      <div className={`flex h-[1.375rem] w-[1.375rem] items-center justify-center rounded-full border-2 text-xs ${checked ? 'border-[var(--gold)] bg-[var(--gold)] text-[var(--canvas)]' : 'border-[var(--line2)] text-transparent'}`}>✓</div>
+                                    </label>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </section>
+                        );
+                      })}
+                    </div>
+                  </section>
+                );
+              })}
+            </div>
+          )}
           {selectedIds.size === 0 && <p className="mt-3 text-sm text-[var(--o-stage-lost)]">Selecciona almenys un producte per generar el dossier.</p>}
         </section>
       </div>

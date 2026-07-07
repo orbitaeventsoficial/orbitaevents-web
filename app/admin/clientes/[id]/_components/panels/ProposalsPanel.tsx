@@ -9,9 +9,61 @@ import { formatCurrency, formatDateSimple, getContractStatusDisplay, getProposal
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_CUSTOMER_PANEL_HELP_2, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import { AdminSection, AdminEmptyState } from '@/app/admin/components/AdminPage';
-import { buildCustomerProposalHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildCustomerHubHref, buildCustomerProposalHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 
 const STATUS_PILL = 'inline-flex items-center rounded-full border border-current px-2 py-0.5 text-xs font-semibold leading-tight';
+
+type DocumentSnapshotBadge = {
+  key: string;
+  label: string;
+  detail: string;
+  className: string;
+};
+
+type ProposalOriginLink = {
+  key: string;
+  label: string;
+  href: string;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function buildDocumentSnapshotBadges(proposal: ProposalDTO): DocumentSnapshotBadge[] {
+  const snapshot = proposal.snapshot;
+  if (!isRecord(snapshot)) return [];
+
+  const badges: DocumentSnapshotBadge[] = [];
+  if (isRecord(snapshot.quoteSnapshot)) {
+    badges.push({
+      key: 'quote',
+      label: 'Pressupost congelat',
+      detail: 'Foto enviada reconstruïble',
+      className: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
+    });
+  }
+  if (isRecord(snapshot.contractSnapshot)) {
+    badges.push({
+      key: 'contract',
+      label: 'Contracte congelat',
+      detail: 'Regenera des de snapshot',
+      className: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
+    });
+  }
+  return badges;
+}
+
+function buildProposalOriginLinks(proposal: ProposalDTO, fallbackCustomerId: string): ProposalOriginLink[] {
+  const customerId = proposal.customerId || fallbackCustomerId;
+  return [
+    customerId ? { key: 'customer', label: 'Client origen', href: buildCustomerHubHref(customerId) } : null,
+    proposal.leadId ? { key: 'lead', label: 'Entrada origen', href: buildLeadWorkspaceHref(proposal.leadId) } : null,
+    proposal.bookingId ? { key: 'booking', label: 'Reserva origen', href: buildBookingHref(proposal.bookingId) } : null,
+  ].filter((link): link is ProposalOriginLink => Boolean(link));
+}
 
 export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
   const router = useRouter();
@@ -98,6 +150,11 @@ function ProposalCard({ proposal, busyId, isConfirming, onConfirm, onCancelConfi
   const canGenerateContract = proposal.status === 'ACCEPTED' && !contractStatus;
   const canSendContract = contractStatus === 'DRAFT';
   const canMarkSigned = contractStatus === 'SENT';
+  const documentSnapshotBadges = buildDocumentSnapshotBadges(proposal);
+  const proposalHref = buildCustomerProposalHref(customerId, proposal.id);
+  const hasSignedContract = contractStatus === 'SIGNED' || Boolean(proposal.contractSignedAt);
+  const signedContractHref = proposal.contractPdfUrl || proposalHref;
+  const originLinks = buildProposalOriginLinks(proposal, customerId);
 
   const generateContract = async () => { setContractBusy(true); setContractError(null); try { const res = await fetchWithCsrf(`/api/admin/proposals/${proposal.id}/contract`, { method: 'POST', headers: { 'Content-Type': 'application/json' } }); if (!res.ok) { const payload = await res.json().catch(() => ({})); throw new Error(payload?.error || 'Error generant contracte'); } const blob = await res.blob(); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `contracte-${res.headers.get('X-Contract-Reference') || proposal.reference}.pdf`; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(url), 10000); router.refresh(); } catch (err) { setContractError(err instanceof Error ? err.message : 'Error'); } finally { setContractBusy(false); } };
   const sendContractEmail = async () => { setContractBusy(true); setContractError(null); try { const res = await fetchWithCsrf(`/api/admin/proposals/${proposal.id}/contract/send`, { method: 'POST', headers: { 'Content-Type': 'application/json' } }); const payload = await res.json().catch(() => ({})); if (!res.ok || !payload?.ok) throw new Error(payload?.error || 'Error enviant contracte'); router.refresh(); } catch (err) { setContractError(err instanceof Error ? err.message : 'Error'); } finally { setContractBusy(false); } };
@@ -114,11 +171,38 @@ function ProposalCard({ proposal, busyId, isConfirming, onConfirm, onCancelConfi
           <p className="m-0 mt-1 text-xs leading-snug text-[var(--t3)]">Creat {formatDateSimple(proposal.createdAt)} ·<span className="font-semibold text-[var(--t2)]"> {formatCurrency(proposal.total)}</span></p>
           {proposal.sentAt && <p className="m-0 mt-1 text-xs leading-snug text-[var(--t3)]">Enviat {formatDateSimple(proposal.sentAt)}</p>}
           {proposal.acceptedAt && <p className="m-0 mt-1 text-xs leading-snug text-[var(--t3)]">✓ Acceptat {formatDateSimple(proposal.acceptedAt)}</p>}
+          {originLinks.length > 0 && (
+            <div className="mt-2 flex flex-wrap items-center gap-1.5 text-xs">
+              <span className="font-semibold uppercase tracking-wider text-[var(--t3)]">Origen</span>
+              {originLinks.map((link) => (
+                <Link
+                  key={link.key}
+                  href={link.href}
+                  className="inline-flex items-center rounded-full border border-[var(--o-admin-line)] bg-[var(--sunk)] px-2 py-0.5 font-semibold text-[var(--t2)] no-underline hover:text-[var(--gold)]"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          )}
+          {documentSnapshotBadges.length > 0 && (
+            <div className="mt-2 flex flex-wrap items-center gap-1.5 text-xs">
+              <span className="font-semibold uppercase tracking-wider text-[var(--t3)]">Foto documental</span>
+              {documentSnapshotBadges.map((badge) => (
+                <span key={badge.key} className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-semibold ${badge.className}`} title={badge.detail}>
+                  {badge.label}
+                </span>
+              ))}
+              <Link href={proposalHref} className="font-semibold text-[var(--gold)] no-underline hover:text-[var(--gold-bright)]">
+                Obrir document →
+              </Link>
+            </div>
+          )}
         </div>
         <div className="text-lg font-semibold leading-tight text-[var(--t)]">{formatCurrency(proposal.total)}</div>
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <Link href={buildCustomerProposalHref(customerId, proposal.id)} className="ap-btn ap-btn--xs">✏️ Editar</Link>
+        <Link href={proposalHref} className="ap-btn ap-btn--xs">✏️ Editar</Link>
         {canSend && !isConfirming && <button type="button" onClick={onConfirm} disabled={isBusy} className="ap-btn ap-btn--xs">📤 Enviar</button>}
         {canSend && isConfirming && (
           <div className="flex flex-wrap items-center gap-1.5 rounded-[var(--o-r-xl)] border border-[var(--o-admin-line)] px-2 py-1.5 text-xs text-[var(--t2)]">
@@ -140,6 +224,20 @@ function ProposalCard({ proposal, busyId, isConfirming, onConfirm, onCancelConfi
             {canMarkSigned && <button type="button" onClick={() => updateContractStatus('SIGNED')} disabled={contractBusy} className="ap-btn ap-btn--xs">✍️ Marcar signat</button>}
             {contractStatus && contractStatus !== 'CANCELLED' && contractStatus !== 'SIGNED' && <button type="button" onClick={() => updateContractStatus('CANCELLED')} disabled={contractBusy} className="ap-btn ap-btn--xs">🚫 Cancel·lar</button>}
           </div>
+          {hasSignedContract && (
+            <div className="mt-2 flex flex-wrap items-center gap-2 rounded-[var(--o-r-xl)] border border-[var(--o-admin-line)] bg-[var(--sunk)] px-3 py-2 text-xs">
+              <span className="font-semibold text-[var(--t)]">Contracte signat</span>
+              {proposal.contractSignedAt && <span className="text-[var(--t3)]">Signat {formatDateSimple(proposal.contractSignedAt)}</span>}
+              <Link
+                href={signedContractHref}
+                target={proposal.contractPdfUrl ? '_blank' : undefined}
+                rel={proposal.contractPdfUrl ? 'noreferrer' : undefined}
+                className="font-semibold text-[var(--gold)] no-underline hover:text-[var(--gold-bright)]"
+              >
+                {proposal.contractPdfUrl ? 'Obrir PDF signat' : 'Obrir contracte'} →
+              </Link>
+            </div>
+          )}
           {contractError && <p className="m-0 mt-2 text-xs leading-snug text-[var(--o-danger)]">{contractError}</p>}
         </div>
       )}

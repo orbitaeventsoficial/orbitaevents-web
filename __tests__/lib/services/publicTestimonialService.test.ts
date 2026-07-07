@@ -33,6 +33,7 @@ vi.mock('@/lib/services/customerActivityService', () => ({
 import {
   listApprovedPublicTestimonials,
   listApprovedDatabaseReviews,
+  normalizePublicTestimonialPagination,
   submitPublicTestimonial,
 } from '@/lib/services/publicTestimonialService';
 import { recordCustomerTestimonialSubmitted } from '@/lib/services/customerActivityService';
@@ -119,6 +120,25 @@ describe('listApprovedPublicTestimonials', () => {
     const result = await listApprovedPublicTestimonials(10, 0, 'ca');
 
     expect(result.hasMore).toBe(true);
+  });
+
+  it('normalitza paginacio publica abans de consultar Prisma', async () => {
+    mockPrisma.customerTestimonial.count.mockResolvedValue(100);
+
+    const result = await listApprovedPublicTestimonials(Number.NaN, -30, 'ca');
+
+    expect(mockPrisma.customerTestimonial.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ take: 10, skip: 0 }),
+    );
+    expect(result.hasMore).toBe(true);
+  });
+});
+
+describe('normalizePublicTestimonialPagination', () => {
+  it('descarta NaN, negatius i limita peticions massa grans', () => {
+    expect(normalizePublicTestimonialPagination(Number.NaN, Number.NaN)).toEqual({ limit: 10, offset: 0 });
+    expect(normalizePublicTestimonialPagination(0, -1)).toEqual({ limit: 1, offset: 0 });
+    expect(normalizePublicTestimonialPagination(500, 2.8)).toEqual({ limit: 50, offset: 2 });
   });
 });
 

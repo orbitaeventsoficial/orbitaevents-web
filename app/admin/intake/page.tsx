@@ -9,6 +9,7 @@ import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import { INTAKE_EVENT_TYPE_OPTIONS, INTAKE_PRIORITY_OPTIONS, INTAKE_SOURCE_OPTIONS } from '@/lib/constants';
 import { AdminPage, AdminSection } from '@/app/admin/components/AdminPage';
+import { mergeExtractedLeadMessage } from './intake-message';
 
 type DuplicateWarning = {
   id: string;
@@ -114,7 +115,7 @@ export default function IntakePage() {
         eventLocation: data.eventLocation || prev.eventLocation,
         guestCount: data.guestCount || prev.guestCount,
         budget: data.budget || prev.budget,
-        message: data.message || prev.message,
+        message: mergeExtractedLeadMessage(prev.message, data.message, text),
         source: pickOptionValue(INTAKE_SOURCE_OPTIONS, data.source, prev.source),
       }));
       setPasteText('');

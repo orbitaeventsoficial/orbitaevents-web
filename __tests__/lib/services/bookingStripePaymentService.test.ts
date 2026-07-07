@@ -37,10 +37,12 @@ const booking = {
   id: 'booking-1',
   reference: 'OE-2026-001',
   clientEmail: 'client@test.com',
+  total: 1000,
   depositAmount: 300,
   depositPaid: false,
   remainingAmount: 700,
   remainingPaid: false,
+  cashAmount: null,
 };
 
 describe('createBookingStripeCheckoutLink', () => {
@@ -84,6 +86,65 @@ describe('createBookingStripeCheckoutLink', () => {
     });
 
     expect(result).toEqual({ status: 409, body: { error: 'DEPOSIT_NOT_PAID' } });
+    expect(mockCreateStripeCheckoutSession).not.toHaveBeenCalled();
+  });
+
+  it('bloqueja la paga i senyal si cashAmount ja la cobreix', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({ ...booking, cashAmount: 300 });
+
+    const result = await createBookingStripeCheckoutLink({
+      bookingId: 'booking-1',
+      paymentType: 'deposit',
+      baseUrl: 'https://orbita.test',
+    });
+
+    expect(result).toEqual({ status: 409, body: { error: 'ALREADY_PAID' } });
+    expect(mockCreateStripeCheckoutSession).not.toHaveBeenCalled();
+  });
+
+  it('bloqueja link online si cashAmount redueix parcialment la paga i senyal', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({ ...booking, cashAmount: 100 });
+
+    const result = await createBookingStripeCheckoutLink({
+      bookingId: 'booking-1',
+      paymentType: 'deposit',
+      baseUrl: 'https://orbita.test',
+    });
+
+    expect(result).toEqual({ status: 409, body: { error: 'PARTIAL_CASH_REQUIRES_MANUAL' } });
+    expect(mockCreateStripeCheckoutSession).not.toHaveBeenCalled();
+  });
+
+  it('permet generar la resta si la paga i senyal queda coberta per cashAmount', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({ ...booking, cashAmount: 300 });
+    mockCreateStripeCheckoutSession.mockResolvedValue({
+      sessionId: 'cs_test_456',
+      url: 'https://checkout.stripe.com/c/pay_remaining',
+    });
+
+    const result = await createBookingStripeCheckoutLink({
+      bookingId: 'booking-1',
+      paymentType: 'remaining',
+      baseUrl: 'https://orbita.test',
+    });
+
+    expect(result).toEqual({ status: 200, body: { url: 'https://checkout.stripe.com/c/pay_remaining' } });
+    expect(mockCreateStripeCheckoutSession).toHaveBeenCalledWith(expect.objectContaining({
+      paymentType: 'remaining',
+      amountEur: 700,
+    }));
+  });
+
+  it('bloqueja link online si cashAmount redueix parcialment la resta', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({ ...booking, depositPaid: true, cashAmount: 100 });
+
+    const result = await createBookingStripeCheckoutLink({
+      bookingId: 'booking-1',
+      paymentType: 'remaining',
+      baseUrl: 'https://orbita.test',
+    });
+
+    expect(result).toEqual({ status: 409, body: { error: 'PARTIAL_CASH_REQUIRES_MANUAL' } });
     expect(mockCreateStripeCheckoutSession).not.toHaveBeenCalled();
   });
 

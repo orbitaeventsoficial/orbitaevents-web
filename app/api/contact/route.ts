@@ -60,6 +60,8 @@ export async function POST(req: NextRequest) {
       packName,
       estimatedPrice,
       eventDate,
+      location,
+      eventLocation,
       eventStartTime,
       eventEndTime,
       guests,
@@ -84,8 +86,8 @@ export async function POST(req: NextRequest) {
     const isEmail = Boolean(clientEmail);
     const displayContact = clientEmail || clientPhone || normalizedContact;
     const parsedGuests = parseGuestCount(guests ?? guestCount);
+    const resolvedEventLocation = (eventLocation || location || '').trim() || undefined;
 
-    const leadId = `OE-${Date.now().toString(36).toUpperCase()}`;
     const timestamp = new Date().toLocaleString(toIntlLocale(locale), {
       timeZone: 'Europe/Madrid',
       dateStyle: 'full',
@@ -97,12 +99,13 @@ export async function POST(req: NextRequest) {
     const mappedEventType = mapEventType(event);
     const leadSource = determineSource(packId, packName);
 
-    const { leadId: _savedLeadId } = await persistContactLead({
+    const { leadId: savedLeadId } = await persistContactLead({
       name,
       clientEmail,
       clientPhone,
       eventType: mappedEventType,
       eventDate,
+      eventLocation: resolvedEventLocation,
       eventStartTime: eventStartTime || undefined,
       eventEndTime: eventEndTime || undefined,
       guestCount: parsedGuests,
@@ -119,6 +122,12 @@ export async function POST(req: NextRequest) {
       updateNote: `${t.noteNewWebContact}: ${eventLabel}${packName ? ` - ${t.notePack}: ${packName}` : ''}${message ? `\n${t.noteMessage}: ${message}` : ''}`,
       createNote: `${t.noteLeadCreatedVia} ${packId ? t.viaConfigurator : t.viaWebForm}${packName ? ` - ${t.noteInterestedPack}: ${packName}` : ''}${!clientEmail ? ` (${t.notePhoneContact}: ${clientPhone})` : ''}`,
     });
+
+    if (!savedLeadId) {
+      throw new Error('CONTACT_LEAD_NOT_PERSISTED');
+    }
+
+    const leadId = savedLeadId;
 
     // Registre de consentiment RGPD (compliment legal): en enviar el formulari, el client
     // accepta el tractament bàsic de dades. Degradació segura: no bloqueja el lead.
@@ -141,13 +150,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (_savedLeadId && clientEmail) {
+    if (clientEmail) {
       try {
         const { notifyNewLead } = await import('@/lib/services/notificationService');
 
         Promise.resolve(
           notifyNewLead({
-            id: _savedLeadId,
+            id: savedLeadId,
             name,
             email: clientEmail,
             phone: clientPhone,
@@ -400,5 +409,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
-

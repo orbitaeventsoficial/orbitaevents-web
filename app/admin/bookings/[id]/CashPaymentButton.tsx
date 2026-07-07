@@ -6,6 +6,17 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import { formatCurrency } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
 
+const CASH_PAYMENT_ERROR = 'No s’ha pogut registrar el cobrament en efectiu.';
+
+async function readCashPaymentError(response: Response) {
+  const data = typeof response.json === 'function'
+    ? ((await response.json().catch(() => null)) as { error?: unknown; message?: unknown } | null)
+    : null;
+  if (typeof data?.error === 'string' && data.error.trim()) return data.error;
+  if (typeof data?.message === 'string' && data.message.trim()) return data.message;
+  return CASH_PAYMENT_ERROR;
+}
+
 /**
  * Registra el cobrament COMPLET en efectiu d'una reserva: marca dipòsit i resta
  * com a pagats, fixa paymentMethod=CASH i cashAmount=total. Resol el cas en què
@@ -25,6 +36,7 @@ export default function CashPaymentButton({
   const toast = useToast();
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Si ja està tot pagat, els toggles de dipòsit/resta ja mostren l'estat;
   // el botó d'efectiu només té sentit mentre quedi import per cobrar.
@@ -32,6 +44,7 @@ export default function CashPaymentButton({
 
   async function markCash() {
     setSaving(true);
+    setError(null);
     try {
       const now = new Date().toISOString();
       const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}`, {
@@ -46,13 +59,15 @@ export default function CashPaymentButton({
           cashAmount: total,
         }),
       });
-      if (!res.ok) throw new Error('PATCH failed');
+      if (!res.ok) throw new Error(await readCashPaymentError(res));
       setDone(true);
       toast.success(`Cobrament en efectiu registrat (${formatCurrency(total)}).`);
       router.refresh();
     } catch (error) {
+      const message = error instanceof Error ? error.message : CASH_PAYMENT_ERROR;
       console.error('[CashPaymentButton] Error', error);
-      toast.error('No s’ha pogut registrar el cobrament en efectiu.');
+      setError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -65,14 +80,22 @@ export default function CashPaymentButton({
   }
 
   return (
-    <button
-      type="button"
-      onClick={markCash}
-      disabled={saving}
-      className="ap-btn ap-btn--secondary ap-btn--xs"
-      title="Marca dipòsit i resta com a pagats en efectiu"
-    >
-      {saving ? 'Registrant…' : '💵 Cobrat en efectiu'}
-    </button>
+    <div className="inline-flex flex-col items-start gap-1.5">
+      <button
+        type="button"
+        onClick={markCash}
+        disabled={saving}
+        aria-invalid={error ? true : undefined}
+        className="ap-btn ap-btn--secondary ap-btn--xs"
+        title="Marca dipòsit i resta com a pagats en efectiu"
+      >
+        {saving ? 'Registrant…' : '💵 Cobrat en efectiu'}
+      </button>
+      {error && (
+        <p role="alert" className="max-w-xs text-xs font-semibold admin-tone-text-danger">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }

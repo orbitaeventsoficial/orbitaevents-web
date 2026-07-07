@@ -88,6 +88,9 @@ describe('buildTimeline', () => {
       proposals: [{
         id: 'prop-1',
         reference: 'P-001',
+        customerId: 'cust-1',
+        leadId: 'lead-1',
+        bookingId: 'booking-1',
         status: 'SENT',
         total: 1000,
         createdAt: '2026-04-10T10:00:00.000Z',
@@ -99,6 +102,17 @@ describe('buildTimeline', () => {
     });
 
     expect(business.map((event) => event.type)).toEqual(['PROPOSAL_CREATED', 'PROPOSAL_SENT']);
+    expect(business[1]).toMatchObject({
+      link: {
+        label: 'Obrir pressupost',
+        href: '/admin/presupuestos?proposalId=prop-1',
+      },
+      originLinks: [
+        { label: 'Client origen', href: '/admin/clientes/cust-1' },
+        { label: 'Entrada origen', href: '/admin/leads/lead-1' },
+        { label: 'Reserva origen', href: '/admin/bookings/booking-1' },
+      ],
+    });
 
     const combined = buildTimeline({
       proposals: [],
@@ -138,6 +152,47 @@ describe('buildTimeline', () => {
         label: 'Veure entrada',
         href: '/admin/leads/lead-1',
       },
+    });
+  });
+
+  it('projecta contracte signat com event de negoci amb link al PDF', () => {
+    const events = buildCustomerBusinessTimelineEvents({
+      proposals: [{
+        id: 'prop-1',
+        reference: 'P-001',
+        customerId: 'cust-1',
+        leadId: 'lead-1',
+        bookingId: 'booking-1',
+        status: 'ACCEPTED',
+        total: 1000,
+        createdAt: '2026-04-10T10:00:00.000Z',
+        acceptedAt: '2026-04-11T10:00:00.000Z',
+        contractReference: 'CTR-2026-001',
+        contractStatus: 'SIGNED',
+        contractPdfUrl: 'https://cdn.test/contracte.pdf',
+        contractSignedAt: '2026-04-12T10:00:00.000Z',
+      }],
+      bookings: [],
+      tasks: [],
+      messages: [],
+    });
+
+    expect(events.find((event) => event.id === 'proposal:prop-1:contract-signed')).toMatchObject({
+      type: 'ACTIVITY',
+      title: 'Contracte signat (CTR-2026-001)',
+      link: {
+        label: 'Obrir PDF signat',
+        href: 'https://cdn.test/contracte.pdf',
+      },
+      meta: {
+        documentType: 'CONTRACT',
+        contractReference: 'CTR-2026-001',
+      },
+      originLinks: [
+        { label: 'Client origen', href: '/admin/clientes/cust-1' },
+        { label: 'Entrada origen', href: '/admin/leads/lead-1' },
+        { label: 'Reserva origen', href: '/admin/bookings/booking-1' },
+      ],
     });
   });
 });

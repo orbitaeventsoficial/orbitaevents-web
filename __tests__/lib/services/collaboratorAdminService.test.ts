@@ -9,6 +9,12 @@ const { mockPrisma } = vi.hoisted(() => ({
       update: vi.fn(),
       delete: vi.fn(),
     },
+    lead: {
+      groupBy: vi.fn(),
+    },
+    booking: {
+      groupBy: vi.fn(),
+    },
   },
 }));
 
@@ -29,6 +35,8 @@ beforeEach(() => {
   mockPrisma.collaborator.create.mockResolvedValue({ id: 'c1', name: 'Test' });
   mockPrisma.collaborator.update.mockResolvedValue({ id: 'c1' });
   mockPrisma.collaborator.delete.mockResolvedValue({});
+  mockPrisma.lead.groupBy.mockResolvedValue([]);
+  mockPrisma.booking.groupBy.mockResolvedValue([]);
 });
 
 describe('listAdminCollaborators', () => {
@@ -36,7 +44,6 @@ describe('listAdminCollaborators', () => {
     mockPrisma.collaborator.findMany.mockResolvedValue([
       {
         id: 'c1', isActive: true,
-        _count: { sourcedLeads: 2, sourcedBookings: 1 },
         bookings: [
           { commissionAmount: 100, isPaid: false, booking: { total: 1000 } },
           { commissionAmount: 200, isPaid: true, booking: { total: 2000 } },
@@ -48,14 +55,28 @@ describe('listAdminCollaborators', () => {
       },
       {
         id: 'c2', isActive: false,
-        _count: { sourcedLeads: 1, sourcedBookings: 0 },
         bookings: [],
         products: [{ id: 'p3', isActive: true, sellPrice: 40.15 }],
       },
     ]);
+    mockPrisma.lead.groupBy.mockResolvedValue([
+      { sourceCollaboratorId: 'c1', _count: { _all: 2 } },
+      { sourceCollaboratorId: 'c2', _count: { _all: 1 } },
+    ]);
+    mockPrisma.booking.groupBy.mockResolvedValue([
+      { sourceCollaboratorId: 'c1', _count: { _all: 1 } },
+    ]);
 
     const result = await listAdminCollaborators();
 
+    expect(mockPrisma.collaborator.findMany).toHaveBeenCalledWith({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        products: {
+          orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+        },
+      },
+    });
     expect(result.kpis.total).toBe(2);
     expect(result.kpis.active).toBe(1);
     expect(result.kpis.totalProducts).toBe(3);
@@ -63,6 +84,24 @@ describe('listAdminCollaborators', () => {
     // Comissions retirades (#1196): el cost de col·laborador va per línies de servei (+20%).
     expect(result.kpis.totalSourcedLeads).toBe(3);
     expect(result.kpis.totalSourcedBookings).toBe(1);
+  });
+
+  it('carrega el cataleg encara que falli un comptador informatiu', async () => {
+    mockPrisma.collaborator.findMany.mockResolvedValue([
+      {
+        id: 'c1',
+        isActive: true,
+        products: [{ id: 'p1', isActive: true, sellPrice: 100 }],
+      },
+    ]);
+    mockPrisma.lead.groupBy.mockResolvedValue([{ sourceCollaboratorId: 'c1', _count: { _all: 2 } }]);
+    mockPrisma.booking.groupBy.mockRejectedValue(new Error('missing collaborator_bookings'));
+
+    const result = await listAdminCollaborators();
+
+    expect(result.collaborators).toHaveLength(1);
+    expect(result.collaborators[0]._count).toEqual({ sourcedLeads: 2, sourcedBookings: 0 });
+    expect(result.kpis.totalProducts).toBe(1);
   });
 });
 

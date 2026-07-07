@@ -41,6 +41,7 @@ interface BookingClientEventSectionProps {
   calculatingDistance: boolean;
   distanceMessage: string | null;
   dateConflicts: DateConflict[];
+  dateConflictError: string;
   onFieldChange: (field: 'clientName' | 'clientEmail' | 'clientPhone' | 'eventType' | 'eventDate' | 'eventStartTime' | 'eventEndTime' | 'eventLocation' | 'eventVenue' | 'guestCount', value: string) => void;
 }
 
@@ -67,6 +68,7 @@ export default function BookingClientEventSection({
   calculatingDistance,
   distanceMessage,
   dateConflicts,
+  dateConflictError,
   onFieldChange,
 }: BookingClientEventSectionProps) {
   const distanceInfo = humaniseDistanceMessage(distanceMessage);
@@ -199,6 +201,19 @@ export default function BookingClientEventSection({
             />
           </div>
         </div>
+
+        {dateConflictError && (
+          <div
+            className="mt-2 flex gap-2.5 rounded-[var(--o-r-md)] border border-[var(--o-danger)] bg-[var(--o-danger-soft)] px-3.5 py-3 text-sm leading-snug text-[var(--t)]"
+            role="alert"
+          >
+            <span className="shrink-0 text-[var(--o-danger)]" aria-hidden="true">!</span>
+            <div>
+              <strong className="mb-1 block">Disponibilitat no verificada</strong>
+              <span className="block text-xs text-[var(--t2)]">{dateConflictError}</span>
+            </div>
+          </div>
+        )}
 
         {dateConflicts.length > 0 && (
           <div

@@ -25,7 +25,7 @@
     "cta": {
       "reserve": "I want an immersive Halloween",
       "whatsapp": "direct WhatsApp",
-      "reserve2025": "Book your Halloween {year}",
+      "reserve2025": "Request a Halloween {year} proposal",
       "requestInfo": "Choose this format"
     },
     "gallery": {
@@ -178,7 +178,7 @@
     },
     "urgency": {
       "title": "Halloween {year}",
-      "subtitle": "Saturdays in October fly by. Book soon.",
+      "subtitle": "Saturdays in October fly by. Check availability early.",
       "octobrerDates": "October Saturdays:",
       "dates": [
         "Oct 4",
@@ -253,12 +253,12 @@
       "select": "Select",
       "selected": "Selected ✓",
       "goToConfigurator": "Go to the configurator",
-      "requestQuote": "BOOK TODAY",
+      "requestQuote": "REQUEST A PROPOSAL",
       "leaveReview": "Leave a comment",
       "requestQuoteFree": "Request a free quote",
       "calculate": "Calculate the price",
       "calculatePrice": "Calculate the price",
-      "reserveToday": "🔥 BOOK TODAY",
+      "reserveToday": "🔥 REQUEST A PROPOSAL TODAY",
       "portfolio": "See Portfolio",
       "learnMore": "More information",
       "getStarted": "Begin",
@@ -459,14 +459,14 @@
     "commitmentText": "More than 50 successful celebrations and the average opinion is excellent."
   },
   "checkout": {
-    "title": "Last step for your event!",
-    "subtitle": "Book now and save {amount}€",
-    "laterPrice": "If you book later:",
+    "title": "Last step to receive the proposal",
+    "subtitle": "Request a proposal now and save {amount}€",
+    "laterPrice": "If you request it later:",
     "normalPrice": "normal price",
-    "finalPrice": "Your final price:",
+    "finalPrice": "Estimated price:",
     "savings": "You save {amount}€",
     "whyOffer": "Why this offer?",
-    "offerReason": "When you book today, we can confirm your date instantly and start getting ready. The earlier you book, the better we can plan."
+    "offerReason": "When you request the proposal today, we can review availability and prepare the final quote sooner. The earlier we have the details, the better we can plan."
   },
   "notifications": {
     "newReservation": "New reservation",
@@ -1982,17 +1982,17 @@
     "step4": {
       "offerExpires": "Offer valid today",
       "title": "Your proposal is ready",
-      "subtitle": "Book now and save {amount}€",
+      "subtitle": "Request a proposal now and save {amount}€",
       "laterPrice": "Standard price:",
-      "bookToday": "Book today",
+      "bookToday": "Request today",
       "finalPrice": "Estimated price:",
       "requestProposal": "Request final proposal",
       "youSave": "You save {amount}€",
       "normalPrice": "normal price",
-      "guarantee": "Satisfaction Guarantee",
-      "guaranteeText": "If you change your mind in the next 48 hours, we will refund 100% of your money. No questions. No fine print. Zero risk.",
+      "guarantee": "No commitment",
+      "guaranteeText": "Sending the request does not commit you or trigger any payment. We will review availability, technical fit and the final proposal before confirming anything.",
       "whyOffer": "Why this offer?",
-      "whyOfferText": "When you book today, we can confirm your date instantly and start getting ready. The sooner we start, the better your event will be. Every day that passes, we lose customization time.",
+      "whyOfferText": "When you send the request today, we can review availability and prepare a final proposal sooner. The earlier we have the details, the better we can personalize the event.",
       "reviewConfig": "← Check my settings again",
       "lastStep": "Leave your details and we'll contact you today",
       "yourName": "Your name *",
@@ -2000,13 +2000,13 @@
       "emailOrPhone": "Email or phone *",
       "contactPlaceholder": "tu@email.com or 600 123 456",
       "sending": "Sending...",
-      "reserveWithDiscount": "Book with {amount}€ discount",
+      "reserveWithDiscount": "Request proposal with {amount}€ discount",
       "successTitle": "Request sent!",
       "successMessage": "We will contact you in less than 2 hours",
       "youSaved": "You have saved {amount}€!",
-      "checkEmail": "Check your email/phone. We have sent you confirmation.",
+      "checkEmail": "Check your email or phone. We have received the request and will contact you to validate availability and details.",
       "responseTime": "Response in less than 2 hours",
-      "satisfactionGuaranteed": "100% satisfaction guaranteed",
+      "satisfactionGuaranteed": "Human review before confirmation",
       "errorName": "Enter your full name",
       "errorContact": "Enter your email or phone number",
       "errorCaptcha": "Please complete the security check",
@@ -2062,7 +2062,7 @@
       },
       "2": {
         "question": "How much does it cost to hire Òrbita for my wedding/party/event?",
-        "answer": "We work with clear packs and configurators according to needs. Prices are calculated automatically based on schedule, equipment and type of event. You can see all the options in the configurator or request a personalized quote through our form and we will respond to you in less than 2 hours."
+        "answer": "We work with clear packs and configurators according to needs. The configurator calculates an indicative estimate based on schedule, equipment and event type. You can see all the options in the configurator or request a personalized quote through our form and we will respond in less than 2 hours."
       },
       "3": {
         "question": "Do you work outside of Barcelona? Do you cover Girona and the Costa Brava?",
@@ -2442,7 +2442,7 @@
       },
       "cta": {
         "title": "Ready for your Unforgettable Party?",
-        "description": "Discomóvil, themed weddings, Magic World themed parties or children's parties with entertainment. Contact us and reserve your date before it flies!",
+    "description": "Discomóvil, themed weddings, Magic World themed parties or children's parties with entertainment. Contact us and check availability before dates go!",
         "button": "Request Information (Response in 2 hours)",
         "location": "📍 Barcelona and surroundings · 🚚 Itinerant discomobile · 🎉 Immediate availability"
       }
@@ -3205,7 +3205,7 @@
       "subtitle": "Professional equipment at your fingertips",
       "description": "Rental of sound, lighting and DJ equipment for your event.",
       "heroTitle": "Rental of Professional Equipment",
-      "heroSubtitle": "Select the equipment you need and receive your quote instantly",
+      "heroSubtitle": "Select the equipment you need and receive a quick estimate",
       "categories": {
         "all": "All",
         "sound": "Sound",
@@ -3935,13 +3935,13 @@
     "nextSaturday": "Next Saturday at:",
     "saturdaysAvailable": "Saturdays available",
     "nextMonths": "the next few months",
-    "cta": "Book now",
+    "cta": "Request a proposal now",
     "defaultMessage": "Check our availability",
     "loadingTitle": "Weekends fill up fast",
     "loadingSubtitle": "Check availability for your date",
     "checkAvailability": "Check availability",
     "normalTitle": "Do you have a date in mind?",
-    "normalSubtitle": "Check availability and book your event",
+    "normalSubtitle": "Check availability and request a proposal for your event",
     "requestQuote": "Request quote",
     "urgentTitle": "There are only",
     "urgentTitleEnd": "in",
@@ -3951,7 +3951,7 @@
     "contactNow": "contact NOW!",
     "ifYouHave": "If you already have your event in mind,",
     "responseTime": "Response in less than 2 hours",
-    "bookingTime": "Reserve 48 hours in advance",
+    "bookingTime": "Request at least 48 hours in advance",
     "ctaButton": "Request your quote now",
     "lastBooking": "Last booking: {time} ago · {type} in {location}"
   },
@@ -4093,10 +4093,10 @@
     "ariaLabel": "Last minute offer",
     "close": "Close",
     "badge": "Last minute offer",
-    "title": "Book today and get",
+    "title": "Request a proposal today and get",
     "discount": "10% discount",
-    "description": "Valid for new reservations confirmed today. Technical production, mobile disco, DJ, theming, FX.",
-    "cta": "Take advantage of 10% now",
+    "description": "Valid for new proposals requested today. Technical production, mobile disco, DJ, theming, FX.",
+    "cta": "Request proposal with 10%",
     "later": "After",
     "code": "Code: LAST10 · Discount applied to the final budget."
   },
@@ -4110,7 +4110,7 @@
     "subtitle": "Green days are available; In red there are already closed events.",
     "viewFullCalendar": "See full calendar",
     "cta": {
-      "title": "Do you want to reserve a date?",
+      "title": "Want to check a date?",
       "subtitle": "Tell us when you celebrate and we will send you a quote in less than 2 hours."
     },
     "labels": {
@@ -4127,9 +4127,9 @@
     "viewCalendar": "See full calendar",
     "socialPressure": "8 people checking dates this week",
     "saturdaysWarning": "Only {count} free Saturdays left!",
-    "earlyBird": "Book within {days} days and save 15%",
+    "earlyBird": "Request a proposal within {days} days and save 15%",
     "modal": {
-      "whatsappMsg": "Hello! I want to book the date {date} for my event. Can you send me more information?"
+      "whatsappMsg": "Hello! I want to check availability for {date}. Can you send me more information?"
     }
   },
   "stickyCta": {
@@ -4469,7 +4469,7 @@
   },
   "flashOffer": {
     "badge": "⚡ FLASH OFFER - LIMITED TIME",
-    "title": "Book before time runs out!",
+    "title": "Request before time runs out!",
     "description": "Complete private party: DJ + Sound + Lights (up to 50 people)",
     "features": [
       "🎧 Professional DJ 2 hours",
@@ -4477,7 +4477,7 @@
       "💡 LED lighting",
       "✨ Smoke machine included"
     ],
-    "cta": "Book now for {price}€",
+    "cta": "Request proposal for {price}€",
     "finePrint": "*Offer valid for the indicated time. Up to 50 people. Subject to availability.",
     "save": "Save {amount}€!",
     "countdown": "Offer ends in:",
@@ -4561,7 +4561,7 @@
       "trustYears": "🎯 +3 years of experience",
       "trustLocation": "📍 Barcelona and Girona",
       "trustResponse": "⚡ Response in 2 hours",
-      "guarantee": "✓ No-obligation quote · 100% refund if cancelled 60+ days before · Date reserved for 48h"
+      "guarantee": "✓ No-obligation quote · Clear cancellation policy · We check availability before confirming the date"
     },
     "testimonis": {
       "0": {
@@ -4602,8 +4602,8 @@
   },
   "packsOffers": {
     "earlyBird": {
-      "name": "Early booking",
-      "description": "Book today and save 10% on your pack",
+      "name": "Early proposal",
+      "description": "Request a proposal today and save 10% on your pack",
       "badge": "🔥 LIMITED OFFER"
     },
     "packsBadges": {
@@ -4696,6 +4696,29 @@
     }
   },
   "testimonialForm": {
+    "metadata": {
+      "title": "Review your experience | {brand}",
+      "description": "Tell us how your event with {brand} went and help us close the post-event loop."
+    },
+    "page": {
+      "eyebrow": "Post-event",
+      "title": "How was your event?",
+      "description": "Your review helps us take better care of every party and gives you a discount code for your next event.",
+      "signals": {
+        "trust": {
+          "title": "2 minutes",
+          "text": "Four short steps and no account required."
+        },
+        "reward": {
+          "title": "Up to 25%",
+          "text": "More discount if you add a photo, video or Google review."
+        },
+        "memory": {
+          "title": "Real memory",
+          "text": "It helps us improve and show authentic experiences."
+        }
+      }
+    },
     "validation": {
       "emailInvalid": "Invalid email",
       "nameMin": "The name must be at least 2 characters",
@@ -4722,7 +4745,7 @@
       "fileType": "File type not allowed. Use JPG, PNG, WebP or GIF.",
       "fileTooLarge": "The image is too large. Maximum 5MB.",
       "uploadError": "Error uploading image",
-      "submitError": "Error sending review",
+      "submitError": "We couldn't send your review. Please try again.",
       "photoMax": "The photo must be a maximum of 5MB",
       "videoMax": "The video must be a maximum of 50MB",
       "uploadPhotoError": "Error uploading photo",
@@ -4754,6 +4777,7 @@
         "5": "Excellent!"
       },
       "name": "Name",
+      "email": "Email",
       "nameOptional": "Name (optional)",
       "phoneOptional": "Telephone (optional)",
       "cityOptional": "City (optional)",
@@ -4814,7 +4838,8 @@
       },
       "rating": {
         "title": "How was the experience?",
-        "subtitle": "Your opinion helps us improve"
+        "subtitle": "Your opinion helps us improve",
+        "starLabel": "Rating {rating} out of 5: {label}"
       },
       "comment": {
         "title": "tell us more",
@@ -4844,6 +4869,14 @@
         "dataProcessing": "I accept the processing of data according to the",
         "showName": "Show my name on the website (if not, it will appear as \"Verified Customer\")",
         "receiveOffers": "I want to receive exclusive offers from Òrbita Events"
+      },
+      "rewards": {
+        "photo": "Photo +5%",
+        "video": "Video +10%",
+        "google": "Google +5%",
+        "photoDone": "Photo added",
+        "videoDone": "Video added",
+        "googleDone": "Google enabled"
       },
       "navigation": {
         "previous": "Former",
@@ -5302,9 +5335,9 @@
   "configuradorPage": {
     "meta": {
       "title": "Calculate the Price of your DJ for Wedding | Instant Quote | Orbita Events",
-      "description": "Calculate the price of your DJ + sound + lights instantly. Set up your wedding or event step by step, compare packs and receive a quote in 1 minute. No registration. Totally free.",
-      "ogTitle": "Calculate the Price of your DJ | Quote in 1 Minute",
-      "ogDescription": "Set up your event and calculate the price instantly. Compare packs, choose extras and receive a personalized quote. No commitment."
+      "description": "Calculate an estimate for your DJ + sound + lights instantly. Set up your wedding or event step by step, compare packs and receive an estimate in 1 minute. No registration. Totally free.",
+      "ogTitle": "Calculate the Price of your DJ | Estimate in 1 Minute",
+      "ogDescription": "Set up your event and calculate a quick estimate. Compare packs, choose extras and receive a personalized estimate. No commitment."
     },
     "breadcrumbs": {
       "home": "Start",
@@ -6320,7 +6353,7 @@
     "cta": {
       "title": "Ready to create",
       "titleHighlight": "magic",
-      "description": "Weekend dates are going fast. Book your Hogwarts experience now.",
+      "description": "Weekend dates are going fast. Request a proposal for your Hogwarts experience.",
       "buttons": {
         "quote": "Request a Free Quote",
         "whatsapp": "WhatsApp Direct"
@@ -6445,7 +6478,7 @@
         "limited": "🔥 It's over!",
         "available": "✓ Available"
       },
-      "guarantee": "✓ No-obligation quote · 100% refund if cancelled 60+ days before · Date reserved for 48h"
+      "guarantee": "✓ No-obligation quote · Clear cancellation policy · We check availability before confirming the date"
     },
     "heroVideo": {
       "badge": "✨ Creators of Immersive Experiences",
@@ -6485,7 +6518,7 @@
       "saturdaysFree": "{count} Saturdays off {month}",
       "lastOnes": "Latest dates!",
       "soldOut": "Exhausted",
-      "reserveNow": "Book now"
+      "reserveNow": "Check availability"
     },
     "nextDates": {
       "title": "Upcoming dates ({month} {year}):",
@@ -6495,11 +6528,11 @@
     "monMagic": {
       "title": "Magic World:",
       "available": "Available all year round",
-      "bookNow": "Book your experience",
+      "bookNow": "Request proposal",
       "soldOut": "Temporarily unavailable"
     },
     "cta": {
-      "reserveNow": "Book now →"
+      "reserveNow": "Request proposal →"
     }
   },
   "mobileHero": {
@@ -6771,9 +6804,9 @@
       }
     },
     "reserve": {
-      "title": "Want to book?",
-      "description": "If you found an available date, don't wait. Contact us to lock it in.",
-      "cta": "Book now"
+      "title": "Want to request this date?",
+      "description": "If you found an available date, send us the request and we will review availability and details.",
+      "cta": "Request date"
     },
     "faq": {
       "title": "Frequently Asked Questions",
@@ -6788,19 +6821,96 @@
         },
         "3": {
           "question": "Is it updated in real time?",
-          "answer": "The calendar is updated every 15 minutes. If you just made an inquiry and don't see your reservation yet, that's normal. You'll receive a confirmation email."
+          "answer": "The calendar is updated every 15 minutes. If you just sent a request and don't see it reflected yet, that's normal. You'll receive an email with the request and next steps."
         }
       }
     }
   },
   "booking": {
     "meta": {
-      "title": "Book your Event | Orbita Events",
-      "description": "Book your DJ and event services for weddings, parties and corporate events. No commitment."
+      "title": "Request your Event | Orbita Events",
+      "description": "Request your DJ and event services for weddings, parties and corporate events. No commitment."
     },
     "hero": {
-      "title": "Reserve your Event",
-      "description": "Complete the form and reserve your date. We'll contact you in under 2 hours to confirm all the details."
+      "title": "Request your Event",
+      "description": "Complete the form and request your date. We'll contact you in under 2 hours to confirm availability and details."
+    },
+    "form": {
+      "errors": {
+        "create": "Could not create the booking",
+        "processing": "Error processing the booking. Please try again."
+      },
+      "success": {
+        "title": "Request received!",
+        "email": "We have received your request and will review availability and details before confirming it.",
+        "redirecting": "Redirecting..."
+      },
+      "sections": {
+        "client": "Your details",
+        "event": "Event details",
+        "pack": "Select your pack",
+        "extras": "Extras (optional)"
+      },
+      "labels": {
+        "clientName": "Full name",
+        "email": "Email",
+        "phone": "Phone",
+        "eventType": "Event type",
+        "eventDate": "Event date",
+        "startTime": "Start time",
+        "endTime": "End time",
+        "location": "Location",
+        "venue": "Venue (optional)",
+        "guestCount": "Number of guests",
+        "extraHours": "Extra hours (optional)",
+        "notes": "Additional notes (optional)"
+      },
+      "placeholders": {
+        "clientName": "Your name",
+        "email": "you@email.com",
+        "phone": "+34 600 000 000",
+        "location": "Barcelona, Girona...",
+        "venue": "Venue name",
+        "notes": "Tell us more details about your event..."
+      },
+      "eventTypes": {
+        "wedding": "Wedding",
+        "birthday": "Birthday",
+        "corporate": "Corporate event",
+        "privateParty": "Private / themed party",
+        "other": "Other"
+      },
+      "pack": {
+        "serviceHours": "{hours} h of service",
+        "extraHourPrice": "+{price}/extra h"
+      },
+      "total": {
+        "base": "Service base",
+        "vat": "VAT ({rate}%)",
+        "label": "Estimated final total:",
+        "note": "* Includes VAT; subject to final availability and detail confirmation."
+      },
+      "actions": {
+        "processing": "Processing...",
+        "submit": "Request booking"
+      },
+      "legal": {
+        "prefix": "By sending the request, you accept our",
+        "terms": "terms and conditions"
+      },
+      "serverErrors": {
+        "MISSING_REQUIRED_FIELDS": "Complete all required fields.",
+        "INVALID_EMAIL": "Enter a valid email address.",
+        "INVALID_EVENT_TYPE": "This event type is not valid. Please select it again.",
+        "INVALID_EVENT_DATE": "The event date is not valid.",
+        "EVENT_DATE_PAST": "The event date cannot be in the past.",
+        "INVALID_GUEST_COUNT": "Enter a valid number of guests.",
+        "INVALID_EXTRA_HOURS": "Extra hours cannot be negative.",
+        "INVALID_PACK": "This pack is no longer available. Please select it again.",
+        "INVALID_EXTRAS": "One of the extras is no longer available. Review your selection.",
+        "DATE_UNAVAILABLE": "This date is no longer available. Choose another one.",
+        "BOOKING_CREATE_FAILED": "Could not create the booking. Please try again."
+      }
     },
     "trust": {
       "items": {
@@ -6810,7 +6920,7 @@
         },
         "2": {
           "title": "No commitment",
-          "description": "100% refund if cancelled 60+ days before"
+          "description": "Final review before confirmation"
         },
         "3": {
           "title": "5.0 rating",
@@ -6822,6 +6932,37 @@
       "title": "Need help deciding?",
       "contact": "Contact us",
       "availability": "See availability"
+    },
+    "confirmed": {
+      "meta": {
+        "title": "Booking request received | Orbita Events",
+        "description": "We have received your booking request and will send you the next steps."
+      },
+      "title": "Booking request received",
+      "referenceLabel": "Reference",
+      "message": "We have received your booking request and provisionally blocked the date while we review availability and details.",
+      "nextSteps": {
+        "title": "Next steps:",
+        "review": {
+          "title": "Availability review",
+          "description": "Our team will review the request, technical fit and event details within the next 24 hours."
+        },
+        "finalConfirmation": {
+          "title": "Final confirmation",
+          "description": "We will send you the proposal or contract with all service details so you can review and confirm it."
+        },
+        "payment": {
+          "title": "Deposit",
+          "description": "Once everything is validated, you will receive the instructions to confirm the booking with the deposit."
+        }
+      },
+      "actions": {
+        "home": "Back to home",
+        "portfolio": "View portfolio"
+      },
+      "contact": {
+        "question": "Have a question?"
+      }
     }
   },
   "blog": {

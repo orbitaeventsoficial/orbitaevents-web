@@ -185,6 +185,27 @@ describe('runCommercialDailyAutomation', () => {
       commResponded: 5,
       responseRate: 0.25,
     });
+    expect(result.notifications).toEqual({ emailSent: true, whatsappSent: true, errors: 0 });
+  });
+
+  it('no tomba el cron si falla la notificació del resum', async () => {
+    mockSendEmail.mockRejectedValueOnce(new Error('Connection timeout'));
+
+    const result = await runCommercialDailyAutomation();
+
+    expect(result.notifications).toEqual({ emailSent: false, whatsappSent: true, errors: 1 });
+    expect(mockPrisma.adminLog.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ action: 'AUTOMATION_DAILY_SUMMARY_SENT' }),
+      })
+    );
+    expect(mockSaveCronRunStatus).toHaveBeenCalledWith(
+      expect.objectContaining({
+        prefix: 'automation.commercial',
+        status: 'ok',
+        category: 'config',
+      })
+    );
   });
 
   it("inclou alertes CRITICAL del Daily Brief al resum guardat i a l'email", async () => {

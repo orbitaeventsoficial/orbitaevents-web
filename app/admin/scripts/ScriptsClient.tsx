@@ -230,6 +230,7 @@ const SCRIPTS: ScriptInfo[] = [
 export default function ScriptsClient() {
   const [filter, setFilter] = useState<string | null>(null);
   const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
+  const [copyError, setCopyError] = useState<{ command: string; message: string } | null>(null);
 
   const filtered = useMemo(() => {
     if (!filter) return SCRIPTS;
@@ -258,12 +259,18 @@ export default function ScriptsClient() {
       : 'Amb la categoria acotada, el següent pas bo és copiar la comanda correcta i executar-la al terminal amb el context adequat.';
 
   const copyCommand = async (cmd: string) => {
+    setCopyError(null);
     try {
       await navigator.clipboard.writeText(cmd);
       setCopiedCommand(cmd);
       setTimeout(() => setCopiedCommand(null), 2000);
-    } catch {
+    } catch (error) {
+      console.error('[ScriptsClient] Error copiant comanda de script', { command: cmd, error });
       setCopiedCommand(null);
+      setCopyError({
+        command: cmd,
+        message: "No s'ha pogut copiar la comanda.",
+      });
     }
   };
 
@@ -293,6 +300,8 @@ export default function ScriptsClient() {
               : 'No hi ha scripts marcats com a destructius.',
             copiedCommand
               ? `Última comanda copiada: ${copiedCommand}`
+              : copyError
+                ? `No s'ha pogut copiar: ${copyError.command}`
               : 'Encara no has copiat cap comanda en aquesta sessió.',
           ],
         }}
@@ -352,10 +361,30 @@ export default function ScriptsClient() {
                       <p className="mt-1 text-xs leading-relaxed admin-tone-text-neutral">{s.description}</p>
                       <div className="mt-2 flex items-center gap-2">
                         <code className="ap-badge rounded-lg border px-2 py-1 font-mono text-xs">{s.command}</code>
-                        <button type="button" onClick={() => copyCommand(s.command)} className="ap-btn ap-btn--secondary px-2 py-1 text-xs" title="Copiar comanda">
+                        <button
+                          type="button"
+                          onClick={() => copyCommand(s.command)}
+                          aria-invalid={copyError?.command === s.command ? true : undefined}
+                          aria-describedby={
+                            copyError?.command === s.command
+                              ? `script-copy-error-${s.file.replace(/[^a-zA-Z0-9_-]/g, '-')}-${s.name.replace(/[^a-zA-Z0-9_-]/g, '-')}`
+                              : undefined
+                          }
+                          className="ap-btn ap-btn--secondary px-2 py-1 text-xs"
+                          title="Copiar comanda"
+                        >
                           {copiedCommand === s.command ? 'Copiat' : 'Copiar'}
                         </button>
                       </div>
+                      {copyError?.command === s.command && (
+                        <p
+                          id={`script-copy-error-${s.file.replace(/[^a-zA-Z0-9_-]/g, '-')}-${s.name.replace(/[^a-zA-Z0-9_-]/g, '-')}`}
+                          role="alert"
+                          className="mt-2 text-xs admin-tone-text-danger"
+                        >
+                          {copyError.message}
+                        </p>
+                      )}
                       {s.args && (
                         <div className="mt-1 text-xs admin-tone-text-slate">
                           Arguments opcionals: <code className="font-mono">{s.args}</code>

@@ -18,6 +18,23 @@ type SubmitPublicTestimonialInput = {
   bookingRef?: string;
 };
 
+const DEFAULT_PUBLIC_TESTIMONIAL_LIMIT = 10;
+const MAX_PUBLIC_TESTIMONIAL_LIMIT = 50;
+
+export function normalizePublicTestimonialPagination(limit: number, offset: number) {
+  const safeLimit = Number.isFinite(limit)
+    ? Math.trunc(limit)
+    : DEFAULT_PUBLIC_TESTIMONIAL_LIMIT;
+  const safeOffset = Number.isFinite(offset)
+    ? Math.trunc(offset)
+    : 0;
+
+  return {
+    limit: Math.min(Math.max(safeLimit, 1), MAX_PUBLIC_TESTIMONIAL_LIMIT),
+    offset: Math.max(safeOffset, 0),
+  };
+}
+
 function generateDiscountCode(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let code = 'OE-';
@@ -55,6 +72,7 @@ async function reserveDiscountCode() {
 }
 
 export async function listApprovedPublicTestimonials(limit: number, offset: number, locale: Locale) {
+  const pagination = normalizePublicTestimonialPagination(limit, offset);
   const testimonials = await prisma.customerTestimonial.findMany({
     where: {
       isApproved: true,
@@ -69,8 +87,8 @@ export async function listApprovedPublicTestimonials(limit: number, offset: numb
     orderBy: {
       createdAt: 'desc',
     },
-    take: limit,
-    skip: offset,
+    take: pagination.limit,
+    skip: pagination.offset,
   });
 
   const total = await prisma.customerTestimonial.count({
@@ -88,7 +106,7 @@ export async function listApprovedPublicTestimonials(limit: number, offset: numb
       createdAt: testimonial.createdAt,
     })),
     total,
-    hasMore: offset + limit < total,
+    hasMore: pagination.offset + pagination.limit < total,
   };
 }
 

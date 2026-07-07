@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { CLIENT_PORTAL_TONE_CLASS } from '@/lib/constants/clientPortalTones';
+import { readPortalActionError } from '@/lib/clientPortalUtils';
 
 type Props = {
   token: string;
@@ -13,6 +14,7 @@ type Props = {
   labels: {
     instruction: string;
     concept: string;
+    amount: string;
     button: string;
     sending: string;
     successTitle: string;
@@ -22,6 +24,12 @@ type Props = {
   };
   alreadyDeclared: boolean;
 };
+
+type BizumNotifyErrorKey = 'ALREADY_DECLARED' | 'ALREADY_PAID' | 'GENERIC';
+
+function normalizeBizumNotifyErrorKey(error: unknown): BizumNotifyErrorKey {
+  return error === 'ALREADY_DECLARED' || error === 'ALREADY_PAID' ? error : 'GENERIC';
+}
 
 export default function BizumPayButton({
   token,
@@ -47,8 +55,9 @@ export default function BizumPayButton({
         body: JSON.stringify({ paymentType }),
       });
       if (!res.ok) {
-        const data = await res.json().catch(() => ({})) as { error?: string };
-        if (data.error === 'ALREADY_DECLARED' || data.error === 'ALREADY_PAID') {
+        const data = await res.json().catch(() => null);
+        const errorKey = normalizeBizumNotifyErrorKey(readPortalActionError(data));
+        if (errorKey === 'ALREADY_DECLARED' || errorKey === 'ALREADY_PAID') {
           setDeclared(true);
         } else {
           setError(labels.errorRetry);
@@ -65,8 +74,8 @@ export default function BizumPayButton({
 
   if (declared) {
     return (
-      <div className={`mt-4 rounded-xl border px-4 py-3 ${CLIENT_PORTAL_TONE_CLASS.successSoft}`}>
-        <p className="text-sm font-semibold">✓ {labels.successTitle}</p>
+      <div className={`mt-4 rounded-xl border px-4 py-3 ${CLIENT_PORTAL_TONE_CLASS.successSoft}`} role="status">
+        <p className="text-sm font-semibold"><span aria-hidden="true">✓</span> {labels.successTitle}</p>
         <p className="text-xs text-white/50 mt-0.5">{labels.successBody}</p>
       </div>
     );
@@ -87,12 +96,12 @@ export default function BizumPayButton({
       </div>
 
       <div className="flex items-center justify-between gap-2 rounded-lg border border-white/[0.07] bg-black/20 px-3 py-2">
-        <span className="text-xs text-white/40">Import</span>
+        <span className="text-xs text-white/40">{labels.amount}</span>
         <span className="font-bold text-white tabular-nums">{amount}</span>
       </div>
 
       {error && (
-        <p className={`text-xs ${CLIENT_PORTAL_TONE_CLASS.dangerText}`}>{error}</p>
+        <p className={`text-xs ${CLIENT_PORTAL_TONE_CLASS.dangerText}`} role="alert">{error}</p>
       )}
 
       <button

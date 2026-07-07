@@ -122,6 +122,76 @@ function leadSummary(lead: LeadDetailData): string {
 }
 
 type EditableField = 'phone' | 'email' | 'eventPhone' | 'eventAddress' | 'eventDate' | 'eventStartTime' | 'eventEndTime' | 'eventLocation' | 'guestCount' | 'budget';
+type EditableFieldValues = Record<EditableField, string>;
+type EditableLeadSource = Partial<{
+ phone: string | null;
+ email: string | null;
+ eventPhone: string | null;
+ eventAddress: string | null;
+ eventDate: string | Date | null;
+ dateISO: string | null;
+ eventStartTime: string | null;
+ time: string | null;
+ eventEndTime: string | null;
+ endTime: string | null;
+ eventLocation: string | null;
+ location: string | null;
+ guestCount: number | string | null;
+ pax: number | string | null;
+ budget: number | string | null;
+ value: number | string | null;
+}>;
+
+const EDITABLE_FIELD_RESPONSE_KEYS: Record<EditableField, Array<keyof EditableLeadSource>> = {
+ phone: ['phone'],
+ email: ['email'],
+ eventPhone: ['eventPhone'],
+ eventAddress: ['eventAddress'],
+ eventDate: ['eventDate', 'dateISO'],
+ eventStartTime: ['eventStartTime', 'time'],
+ eventEndTime: ['eventEndTime', 'endTime'],
+ eventLocation: ['eventLocation', 'location'],
+ guestCount: ['guestCount', 'pax'],
+ budget: ['budget', 'value'],
+};
+
+function stringInputValue(value: unknown): string {
+ return value === null || value === undefined ? '' : String(value);
+}
+
+function dateInputValue(value: unknown): string {
+ if (!value) return '';
+ if (value instanceof Date) return value.toISOString().slice(0, 10);
+ if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value)) return value.slice(0, 10);
+ return '';
+}
+
+export function editableFieldsFromLeadSource(source: EditableLeadSource): EditableFieldValues {
+ return {
+ phone: stringInputValue(source.phone),
+ email: stringInputValue(source.email),
+ eventPhone: stringInputValue(source.eventPhone),
+ eventAddress: stringInputValue(source.eventAddress),
+ eventDate: dateInputValue(source.eventDate ?? source.dateISO),
+ eventStartTime: stringInputValue(source.eventStartTime ?? source.time),
+ eventEndTime: stringInputValue(source.eventEndTime ?? source.endTime),
+ eventLocation: stringInputValue(source.eventLocation ?? source.location),
+ guestCount: stringInputValue(source.guestCount ?? source.pax),
+ budget: stringInputValue(source.budget ?? source.value),
+ };
+}
+
+export function fieldValueFromLeadPatchResponse(
+ responseLead: unknown,
+ field: EditableField,
+ fallback: string,
+): string {
+ if (!responseLead || typeof responseLead !== 'object') return fallback;
+ const source = responseLead as EditableLeadSource;
+ const hasCanonicalValue = EDITABLE_FIELD_RESPONSE_KEYS[field].some((key) => key in source);
+ if (!hasCanonicalValue) return fallback;
+ return editableFieldsFromLeadSource(source)[field];
+}
 
 type ProposalItem = {
  id: string;
@@ -249,18 +319,22 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  })),
  ];
 
- const [fields, setFields] = useState({
- phone: lead.phone ?? '',
- email: lead.email ?? '',
- eventPhone: lead.eventPhone ?? '',
- eventAddress: lead.eventAddress ?? '',
- eventDate: lead.dateISO ? lead.dateISO.slice(0, 10) : '',
- eventStartTime: lead.time ?? '',
- eventEndTime: lead.endTime ?? '',
- eventLocation: lead.location ?? '',
- guestCount: lead.pax ? String(lead.pax) : '',
- budget: lead.value ? String(lead.value) : '',
- });
+ const [fields, setFields] = useState(() => editableFieldsFromLeadSource(lead));
+
+ useEffect(() => {
+ setFields(editableFieldsFromLeadSource(lead));
+ }, [
+ lead.phone,
+ lead.email,
+ lead.eventPhone,
+ lead.eventAddress,
+ lead.dateISO,
+ lead.time,
+ lead.endTime,
+ lead.location,
+ lead.pax,
+ lead.value,
+ ]);
 
  useEffect(() => {
  fetch('/api/admin/collaborators')
@@ -341,20 +415,29 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  if (!editField || savePending) return;
  setSavePending(true);
  try {
+ const field = editField;
  const value = editField === 'guestCount'
  ? (editValue ? parseInt(editValue, 10) : null)
  : editValue || null;
- await fetchWithCsrf(`/api/admin/leads/${lead.id}`, {
+ const res = await fetchWithCsrf(`/api/admin/leads/${lead.id}`, {
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ [editField]: value }),
+ body: JSON.stringify({ [field]: value }),
  });
- setFields((f) => ({ ...f, [editField!]: editValue }));
+ const data = await res.json().catch(() => ({}));
+ if (!res.ok) {
+ throw new Error(typeof data?.error === 'string' ? data.error : 'No s\'ha pogut desar el camp.');
+ }
+ setFields((f) => ({
+ ...f,
+ [field]: fieldValueFromLeadPatchResponse(data?.lead, field, editValue),
+ }));
  toast.success('Desat.');
  setEditField(null);
+ startTransition(() => router.refresh());
  } catch (error) {
  console.error('[LeadDetailClient] Error saving field', error);
- toast.error('Error desant el camp.');
+ toast.error(error instanceof Error ? error.message : 'Error desant el camp.');
  } finally {
  setSavePending(false);
  }
@@ -492,7 +575,7 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  <span className="ap-ledger-fact-lbl">Temps</span>
  <span className="ap-ledger-fact-val ap-ledger-fact-val--ro ap-ledger-fact-wx">
  <WxBadge wx={lead.wx} size="sm" />
- {lead.dateISO && <span className="ap-ledger-fact-wxdate">{fullDate(lead.dateISO.slice(0, 10))}</span>}
+ {fields.eventDate && <span className="ap-ledger-fact-wxdate">{fullDate(fields.eventDate)}</span>}
  </span>
  </div>
  )}

@@ -1,6 +1,7 @@
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import {
   findPortalAccessByRawToken,
   markPortalAccessHit,
@@ -27,7 +28,7 @@ export default async function ClientPortalQuestionnairePage({
 }: {
   params: { locale: string; token: string };
 }) {
-  const locale = normalizePortalLocale(params.locale) as ClientPortalLocale;
+  const locale = normalizePortalLocale(params.locale);
   const t = CLIENT_PORTAL_MESSAGES[locale];
 
   const access = await findPortalAccessByRawToken(params.token);
@@ -53,7 +54,7 @@ export default async function ClientPortalQuestionnairePage({
           backLabel={t.portalLabel}
           eyebrow={t.questionnaireLabel}
           title={t.questionnairePageTitle}
-          reference={(access.booking as { reference: string }).reference}
+          reference={access.booking.reference}
           accentColor={accentHex}
         />
 
@@ -75,19 +76,23 @@ export default async function ClientPortalQuestionnairePage({
                 successBack: t.questionnaireSuccessBack,
                 error: t.questionnaireError,
                 required: t.questionnaireRequired,
+                requiredField: t.questionnaireRequiredField,
+                noAnswer: t.questionnaireNoAnswer,
+                selectPlaceholder: t.questionnaireSelectPlaceholder,
               }}
             />
           )}
         </div>
 
         <footer className="mt-10 text-center">
-          <p className="text-xs text-white/15">Òrbita Events</p>
+          <p className="text-xs text-white/15">{SITE_CONFIG.business.name}</p>
         </footer>
       </div>
       <PortalBottomNav
         basePath={`/${locale}/portal/${params.token}`}
         accentHex={accentHex}
         labels={{
+          ariaLabel: t.portalNavigationLabel,
           hub: t.portalLabel,
           payments: t.payments,
           timeline: t.timelineLabel,

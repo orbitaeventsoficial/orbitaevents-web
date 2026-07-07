@@ -1,6 +1,7 @@
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import {
   findPortalAccessByRawToken,
   markPortalAccessHit,
@@ -46,7 +47,7 @@ export default async function ClientPortalPaymentsPage({
 }: {
   params: { locale: string; token: string };
 }) {
-  const locale = normalizePortalLocale(params.locale) as ClientPortalLocale;
+  const locale = normalizePortalLocale(params.locale);
   const t = CLIENT_PORTAL_MESSAGES[locale];
 
   const access = await findPortalAccessByRawToken(params.token);
@@ -67,18 +68,7 @@ export default async function ClientPortalPaymentsPage({
   const accentBorder = toRgba(accentHex, 0.35) || 'rgba(6,182,212,0.35)';
   const accentBg = toRgba(accentHex, 0.12) || 'rgba(6,182,212,0.12)';
 
-  const booking = access.booking as {
-    reference: string;
-    depositAmount: number;
-    depositPaid: boolean;
-    depositPaymentUrl?: string | null;
-    depositBizumDeclaredAt?: Date | null;
-    remainingAmount: number;
-    remainingPaid: boolean;
-    remainingPaymentUrl?: string | null;
-    remainingBizumDeclaredAt?: Date | null;
-  };
-
+  const booking = access.booking;
   const paymentSummary = getClientPortalPaymentSummary(booking);
 
   const bizumPhone = process.env.BIZUM_PHONE ?? null;
@@ -92,6 +82,7 @@ export default async function ClientPortalPaymentsPage({
   const bizumLabels = {
     instruction: t.bizumInstruction,
     concept: t.bizumConcept,
+    amount: t.bizumAmount,
     button: t.bizumButton,
     sending: t.bizumSending,
     successTitle: t.bizumSuccessTitle,
@@ -132,7 +123,7 @@ export default async function ClientPortalPaymentsPage({
             <p className="text-xs text-white/35 uppercase tracking-wide mb-1">{t.paymentDeposit}</p>
             <p className="text-2xl font-bold text-white">{formatCurrency(paymentSummary.deposit.amount)}</p>
             <p className={`text-sm font-medium mt-1 ${clientPortalPaymentTone(paymentSummary.deposit.paid)}`}>
-              {paymentSummary.deposit.paid ? `✓ ${t.paid}` : `○ ${t.pending}`}
+              <span aria-hidden="true">{paymentSummary.deposit.paid ? '✓' : '○'}</span> {paymentSummary.deposit.paid ? t.paid : t.pending}
             </p>
             {paymentSummary.deposit.payableOnline && paymentSummary.deposit.paymentUrl ? (
               <a
@@ -143,6 +134,7 @@ export default async function ClientPortalPaymentsPage({
                 style={{ backgroundColor: accentHex }}
               >
                 {t.payDepositOnline}
+                <span className="sr-only"> ({t.opensInNewTab})</span>
               </a>
             ) : !paymentSummary.deposit.paid && bizumPhone ? (
               <BizumPayButton
@@ -167,7 +159,7 @@ export default async function ClientPortalPaymentsPage({
             <p className="text-xs text-white/35 uppercase tracking-wide mb-1">{t.paymentRemaining}</p>
             <p className="text-2xl font-bold text-white">{formatCurrency(paymentSummary.remaining.amount)}</p>
             <p className={`text-sm font-medium mt-1 ${clientPortalPaymentTone(paymentSummary.remaining.paid)}`}>
-              {paymentSummary.remaining.paid ? `✓ ${t.paid}` : `○ ${t.pending}`}
+              <span aria-hidden="true">{paymentSummary.remaining.paid ? '✓' : '○'}</span> {paymentSummary.remaining.paid ? t.paid : t.pending}
             </p>
             {paymentSummary.remaining.payableOnline && paymentSummary.remaining.paymentUrl ? (
               <a
@@ -178,6 +170,7 @@ export default async function ClientPortalPaymentsPage({
                 style={{ backgroundColor: accentHex }}
               >
                 {t.payRemainingOnline}
+                <span className="sr-only"> ({t.opensInNewTab})</span>
               </a>
             ) : !paymentSummary.remaining.paid && bizumPhone && paymentSummary.deposit.paid ? (
               <BizumPayButton
@@ -199,13 +192,14 @@ export default async function ClientPortalPaymentsPage({
         </div>
 
         <footer className="mt-10 text-center">
-          <p className="text-xs text-white/15">Òrbita Events</p>
+          <p className="text-xs text-white/15">{SITE_CONFIG.business.name}</p>
         </footer>
       </div>
       <PortalBottomNav
         basePath={`/${locale}/portal/${params.token}`}
         accentHex={accentHex}
         labels={{
+          ariaLabel: t.portalNavigationLabel,
           hub: t.portalLabel,
           payments: t.payments,
           timeline: t.timelineLabel,

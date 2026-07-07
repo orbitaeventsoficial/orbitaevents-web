@@ -54,11 +54,16 @@ describe('PaymentToggle', () => {
   });
 
   it('reverteix l’estat òptim si el PATCH falla', async () => {
-    mockFetchWithCsrf.mockResolvedValue({ ok: false });
+    mockFetchWithCsrf.mockResolvedValue({
+      ok: false,
+      json: async () => ({ error: 'Pagament bloquejat' }),
+    });
     render(<PaymentToggle bookingId="b3" field="depositPaid" paid={false} />);
     fireEvent.click(screen.getByRole('button', { name: 'Marcar pagat' }));
 
-    await waitFor(() => expect(toastApi.error).toHaveBeenCalled());
-    expect(screen.getByRole('button', { name: 'Marcar pagat' })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Pagament bloquejat'));
+    expect(toastApi.error).toHaveBeenCalledWith('Pagament bloquejat');
+    expect(screen.getByRole('button', { name: 'Marcar pagat' })).toHaveAttribute('aria-invalid', 'true');
+    expect(mockRefresh).not.toHaveBeenCalled();
   });
 });

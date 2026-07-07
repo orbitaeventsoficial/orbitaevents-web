@@ -75,7 +75,7 @@ function sanitizeExtractedLeadData(raw: Record<string, unknown>, originalText: s
     eventLocation: coerceString(raw.eventLocation),
     guestCount: coerceString(raw.guestCount),
     budget: coerceString(raw.budget),
-    message: coerceString(raw.message) || originalText.trim(),
+    message: coerceString(raw.message),
     source: normalizeExtractedSource(raw.source),
   };
 }

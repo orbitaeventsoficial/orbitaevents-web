@@ -17,11 +17,17 @@ interface SpendEntry {
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
+async function readMarketingSpendError(res: Response, fallback: string): Promise<string> {
+  const payload = (await res.json().catch(() => ({}))) as { error?: string; message?: string };
+  return payload.error || payload.message || fallback;
+}
+
 export default function MarketingSpendPanel() {
   const router = useRouter();
   const toast = useToast();
   const [entries, setEntries] = useState<SpendEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [saving, setSaving] = useState(false);
 
   const now = new Date();
@@ -32,13 +38,16 @@ export default function MarketingSpendPanel() {
 
   const load = useCallback(async () => {
     try {
+      setLoadError('');
       const res = await fetch('/api/admin/marketing/spend');
-      if (!res.ok) throw new Error('load failed');
+      if (!res.ok) throw new Error(await readMarketingSpendError(res, 'No s’ha pogut carregar la despesa.'));
       const data = await res.json();
       setEntries(data.entries ?? []);
     } catch (error) {
       console.error('[MarketingSpendPanel] load', error);
-      toast.error('No s’ha pogut carregar la despesa.');
+      const message = error instanceof Error ? error.message : 'No s’ha pogut carregar la despesa.';
+      setLoadError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -61,7 +70,7 @@ export default function MarketingSpendPanel() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ channel, year, month, amount: value, notes: notes.trim() || null }),
       });
-      if (!res.ok) throw new Error('save failed');
+      if (!res.ok) throw new Error(await readMarketingSpendError(res, 'No s’ha pogut desar la despesa.'));
       toast.success('Despesa desada.');
       setAmount('');
       setNotes('');
@@ -69,7 +78,7 @@ export default function MarketingSpendPanel() {
       router.refresh(); // recalcula el CAC real al servidor
     } catch (error) {
       console.error('[MarketingSpendPanel] save', error);
-      toast.error('No s’ha pogut desar la despesa.');
+      toast.error(error instanceof Error ? error.message : 'No s’ha pogut desar la despesa.');
     } finally {
       setSaving(false);
     }
@@ -78,13 +87,13 @@ export default function MarketingSpendPanel() {
   async function remove(id: string) {
     try {
       const res = await fetchWithCsrf(`/api/admin/marketing/spend?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('delete failed');
+      if (!res.ok) throw new Error(await readMarketingSpendError(res, 'No s’ha pogut eliminar la despesa.'));
       toast.success('Despesa eliminada.');
       await load();
       router.refresh();
     } catch (error) {
       console.error('[MarketingSpendPanel] delete', error);
-      toast.error('No s’ha pogut eliminar.');
+      toast.error(error instanceof Error ? error.message : 'No s’ha pogut eliminar la despesa.');
     }
   }
 
@@ -92,6 +101,11 @@ export default function MarketingSpendPanel() {
     <section className="ap-card p-5">
       <h2 className="ap-h2 mb-1">Despesa de màrqueting</h2>
       <p className="text-xs mb-4">Carrega la inversió real per canal i mes. El CAC real es calcula dividint-la pels clients guanyats del mateix període.</p>
+      {loadError && (
+        <div className="ap-inline-alert ap-inline-alert--danger mb-4" role="alert">
+          {loadError}
+        </div>
+      )}
 
       <div className="flex flex-wrap items-end gap-3 mb-4">
         <label className="flex flex-col gap-1 text-xs">
@@ -121,7 +135,7 @@ export default function MarketingSpendPanel() {
 
       {loading ? (
         <p className="text-xs">Carregant…</p>
-      ) : entries.length === 0 ? (
+      ) : loadError ? null : entries.length === 0 ? (
         <p className="text-xs">Encara no hi ha despesa carregada. El CAC real es mostrarà quan n’afegeixis.</p>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-[var(--line)]">

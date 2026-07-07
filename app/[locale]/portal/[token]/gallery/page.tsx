@@ -1,13 +1,18 @@
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import {
   findPortalAccessByRawToken,
   markPortalAccessHit,
   normalizePortalLocale,
 } from '@/lib/services/clientPortalAccess';
 import { listPortalPhotos } from '@/lib/services/galleryService';
-import { CLIENT_PORTAL_MESSAGES, type ClientPortalLocale } from '@/lib/clientPortalMessages';
+import {
+  CLIENT_PORTAL_MESSAGES,
+  getClientPortalGalleryPhotoCountLabel,
+  type ClientPortalLocale,
+} from '@/lib/clientPortalMessages';
 import { resolvePortalAccentHex } from '@/lib/clientPortalUtils';
 import PortalBottomNav from '../PortalBottomNav';
 import GalleryClient from './GalleryClient';
@@ -24,7 +29,7 @@ export default async function ClientPortalGalleryPage({
 }: {
   params: { locale: string; token: string };
 }) {
-  const locale = normalizePortalLocale(params.locale) as ClientPortalLocale;
+  const locale = normalizePortalLocale(params.locale);
   const t = CLIENT_PORTAL_MESSAGES[locale];
 
   const access = await findPortalAccessByRawToken(params.token);
@@ -39,7 +44,7 @@ export default async function ClientPortalGalleryPage({
   });
 
   const accentHex = resolvePortalAccentHex(access.personalization);
-  const booking = access.booking as { id: string; reference: string };
+  const booking = access.booking;
 
   let photos: { id: string; photoUrl: string; caption: string | null }[] = [];
   try {
@@ -60,7 +65,9 @@ export default async function ClientPortalGalleryPage({
             accentColor={accentHex}
           />
           {photos.length > 0 && (
-            <span className="mt-10 text-sm text-white/35">{photos.length} fotos</span>
+            <span className="mt-10 text-sm text-white/35">
+              {getClientPortalGalleryPhotoCountLabel(locale, photos.length)}
+            </span>
           )}
         </div>
 
@@ -76,20 +83,23 @@ export default async function ClientPortalGalleryPage({
               galleryClose: t.galleryClose,
               galleryDownload: t.galleryDownload,
               galleryOf: t.galleryOf,
+              galleryPhotoLabel: t.galleryPhotoLabel,
               galleryPrev: t.galleryPrev,
               galleryNext: t.galleryNext,
+              opensInNewTab: t.opensInNewTab,
             }}
           />
         )}
 
         <footer className="mt-10 text-center">
-          <p className="text-xs text-white/15">Òrbita Events</p>
+          <p className="text-xs text-white/15">{SITE_CONFIG.business.name}</p>
         </footer>
       </div>
       <PortalBottomNav
         basePath={`/${locale}/portal/${params.token}`}
         accentHex={accentHex}
         labels={{
+          ariaLabel: t.portalNavigationLabel,
           hub: t.portalLabel,
           payments: t.payments,
           timeline: t.timelineLabel,

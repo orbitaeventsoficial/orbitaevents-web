@@ -4,8 +4,9 @@ import Link from 'next/link';
 import NextImage from 'next/image';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
-import { DEFAULT_EXPECTED_LIFE_HOURS, SUPPORTED_LOCALES, formatCurrencyExact } from '@/lib/constants';
+import { DEFAULT_EXPECTED_LIFE_HOURS, SUPPORTED_LOCALES, formatCurrency, formatCurrencyExact } from '@/lib/constants';
 import { ADMIN_PACK_EDITOR_TABS, type PackEditorTab } from '@/lib/constants/admin';
+import { roundRecommendedSellingPrice } from '@/lib/constants/pricing';
 import type { InventoryBundle } from '@/lib/inventory-bundles-contract';
 import { AdminHelpPanel } from '../../components/AdminHelpPanel';
 import { log } from '@/lib/logger';
@@ -89,6 +90,7 @@ const calcCostHour = (price: number | null, life: number | null) =>
 const divPct = (pub: number, rec: number) => (rec > 0 ? ((pub - rec) / rec) * 100 : 0);
 const semClass = (d: number, t: number) => Math.abs(d) >= t ? 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger' : Math.abs(d) >= t * 0.5 ? 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning' : 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success';
 const eur = formatCurrencyExact;
+const commercialEur = formatCurrency;
 
 function getMarginSignal(currentPrice: number, recommendedPrice: number, thresholdPct: number) {
   const diffPct = divPct(currentPrice, recommendedPrice);
@@ -141,6 +143,7 @@ export default function EditPackForm({
   const [autoPricing, setAutoPricing] = useState(true);
   const [bundles, setBundles] = useState<InventoryBundle[]>([]);
   const [selectedBundleId, setSelectedBundleId] = useState('');
+  const [bundleLoadError, setBundleLoadError] = useState('');
 
   const [formData, setFormData] = useState({
     slug: pack.slug,
@@ -179,9 +182,11 @@ export default function EditPackForm({
     const withOperator = h >= pricingModel.supportOperatorMinDjHours || guests >= pricingModel.supportOperatorMinGuests || watts >= pricingModel.supportOperatorMinWatts;
     const laborCostHour = pricingModel.specialistCostPerHour + (withOperator ? pricingModel.operatorCostPerHour : 0);
     const marginBase = Math.max(0.1, 1 - pricingModel.marginTargetPct);
+    const recommendedPackRaw = round2(((inventoryCostHour + laborCostHour) * h + pricingModel.fixedPackCost) / marginBase);
+    const recommendedExtraRaw = round2((inventoryCostHour + laborCostHour) / marginBase);
     return {
-      pack: round2(((inventoryCostHour + laborCostHour) * h + pricingModel.fixedPackCost) / marginBase),
-      extra: round2((inventoryCostHour + laborCostHour) / marginBase),
+      pack: roundRecommendedSellingPrice(recommendedPackRaw),
+      extra: roundRecommendedSellingPrice(recommendedExtraRaw),
       inventoryCostHour: round2(inventoryCostHour),
       laborCostHour: round2(laborCostHour),
     };
@@ -218,8 +223,8 @@ export default function EditPackForm({
 
   useEffect(() => {
     if (!autoPricing) return;
-    const nextPack = Math.max(1, round2(recommended.pack || pricingHint.recommendedPrice || 1));
-    const nextExtra = Math.max(1, round2(recommended.extra || pricingHint.recommendedExtraHourPrice || 1));
+    const nextPack = Math.max(1, recommended.pack || pricingHint.recommendedPrice || 1);
+    const nextExtra = Math.max(1, recommended.extra || pricingHint.recommendedExtraHourPrice || 1);
     setFormData((prev) => ({
       ...prev,
       price: nextPack,
@@ -232,8 +237,10 @@ export default function EditPackForm({
     const loadBundles = async () => {
       try {
         const res = await fetchWithCsrf('/api/admin/inventory/bundles');
-        if (!res.ok) return;
-        const data = await res.json().catch(() => ({}));
+        const data = (await res.json().catch(() => ({}))) as { bundles?: RawBundleResponse[]; error?: string; message?: string };
+        if (!res.ok) {
+          throw new Error(data.error || data.message || 'No s\'han pogut carregar els lots.');
+        }
         if (cancelled) return;
         const next = Array.isArray(data?.bundles)
           ? data.bundles.map((b: RawBundleResponse) => ({
@@ -246,8 +253,12 @@ export default function EditPackForm({
         if (!selectedBundleId && next.length > 0) {
           setSelectedBundleId(next[0].id);
         }
+        setBundleLoadError('');
       } catch (error) {
         log.error('[EditPackForm] Error carregant bundles', error);
+        if (!cancelled) {
+          setBundleLoadError(error instanceof Error ? error.message : 'No s\'han pogut carregar els lots.');
+        }
       }
     };
     void loadBundles();
@@ -438,11 +449,11 @@ export default function EditPackForm({
           <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div className="ap-card p-3">
               <p className="text-xs">Preu recomanat pack</p>
-              <p className="text-lg font-semibold">{eur(recommended.pack)}</p>
+              <p className="text-lg font-semibold">{commercialEur(recommended.pack)}</p>
             </div>
             <div className="ap-card p-3">
               <p className="text-xs">Hora extra recomanada</p>
-              <p className="text-lg font-semibold">{eur(recommended.extra)}</p>
+              <p className="text-lg font-semibold">{commercialEur(recommended.extra)}</p>
             </div>
             <div className={`ap-card p-3 ${semClass(packDiv, pricingHint.alertThreshold)}`}>
               <p className="text-xs font-semibold">Semàfor pack</p>
@@ -466,7 +477,7 @@ export default function EditPackForm({
               type="button"
               onClick={() => {
                 setAutoPricing(false);
-                setFormData((prev) => ({ ...prev, price: Math.max(1, round2(recommended.pack)), extraHourPrice: Math.max(1, round2(recommended.extra)) }));
+                setFormData((prev) => ({ ...prev, price: Math.max(1, recommended.pack), extraHourPrice: Math.max(1, recommended.extra) }));
                 setInfo('Preus recomanats aplicats una vegada.');
               }}
               className="rounded-xl border px-3 py-1.5 text-xs font-semibold"
@@ -682,6 +693,11 @@ export default function EditPackForm({
               <p className="text-xs font-semibold uppercase tracking-wide text-[var(--t3)]">Lots reutilitzables</p>
               <h4 className="mt-1 text-sm font-semibold text-[var(--t)]">Afegeix peces que sempre viatgen juntes</h4>
               <p className="mt-1 text-sm text-[var(--t2)]">Els lots serveixen quan el pack repeteix una combinació real. Redueixen errors i acceleren la composició.</p>
+              {bundleLoadError && (
+                <div className="ap-inline-alert ap-inline-alert--danger mt-3" role="alert">
+                  {bundleLoadError}
+                </div>
+              )}
               {bundlePreview ? (
                 <div className="mt-4 ap-card p-4">
                   <p className="text-sm font-semibold text-[var(--t)]">{bundlePreview.name}</p>

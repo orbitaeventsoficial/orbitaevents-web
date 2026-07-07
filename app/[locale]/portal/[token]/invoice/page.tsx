@@ -1,6 +1,7 @@
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import {
   findPortalAccessByRawToken,
   markPortalAccessHit,
@@ -13,8 +14,6 @@ import {
 } from '@/lib/clientPortalMessages';
 import {
   getClientPortalInvoiceSummary,
-  type ClientPortalInvoiceBooking,
-  type ClientPortalInvoiceProposal,
 } from '@/lib/clientPortalInvoice';
 import { toRgba, resolvePortalAccentHex } from '@/lib/clientPortalUtils';
 import PortalBottomNav from '../PortalBottomNav';
@@ -32,7 +31,7 @@ export default async function ClientPortalInvoicePage({
 }: {
   params: { locale: string; token: string };
 }) {
-  const locale = normalizePortalLocale(params.locale) as ClientPortalLocale;
+  const locale = normalizePortalLocale(params.locale);
   const t = CLIENT_PORTAL_MESSAGES[locale];
   const intlLocale = toIntlLocale(locale);
 
@@ -52,8 +51,8 @@ export default async function ClientPortalInvoicePage({
   const accentBorder = toRgba(accentHex, 0.35) || 'rgba(6,182,212,0.35)';
   const accentBg = toRgba(accentHex, 0.12) || 'rgba(6,182,212,0.12)';
 
-  const booking = access.booking as ClientPortalInvoiceBooking & { reference: string };
-  const proposals = (access.booking.proposals as ClientPortalInvoiceProposal[]);
+  const booking = access.booking;
+  const proposals = access.booking.proposals;
   const summary = getClientPortalInvoiceSummary(booking, proposals);
 
   function formatDate(d: Date | null): string | null {
@@ -104,7 +103,7 @@ export default async function ClientPortalInvoicePage({
             </div>
             <div className="flex items-center justify-between">
               <p className={`text-sm ${clientPortalPaymentTone(summary.deposit.paid)}`}>
-                {summary.deposit.paid ? `✓ ${t.paid}` : `○ ${t.pending}`}
+                <span aria-hidden="true">{summary.deposit.paid ? '✓' : '○'}</span> {summary.deposit.paid ? t.paid : t.pending}
               </p>
               {summary.deposit.paidAt && (
                 <p className="text-xs text-white/30">{formatDate(summary.deposit.paidAt)}</p>
@@ -119,6 +118,7 @@ export default async function ClientPortalInvoicePage({
                 style={{ borderColor: accentBorder, backgroundColor: accentBg }}
               >
                 {t.payDepositOnline}
+                <span className="sr-only"> ({t.opensInNewTab})</span>
               </a>
             )}
           </div>
@@ -131,7 +131,7 @@ export default async function ClientPortalInvoicePage({
             </div>
             <div className="flex items-center justify-between">
               <p className={`text-sm ${clientPortalPaymentTone(summary.remaining.paid)}`}>
-                {summary.remaining.paid ? `✓ ${t.paid}` : `○ ${t.pending}`}
+                <span aria-hidden="true">{summary.remaining.paid ? '✓' : '○'}</span> {summary.remaining.paid ? t.paid : t.pending}
               </p>
               {summary.remaining.paidAt && (
                 <p className="text-xs text-white/30">{formatDate(summary.remaining.paidAt)}</p>
@@ -146,6 +146,7 @@ export default async function ClientPortalInvoicePage({
                 style={{ borderColor: accentBorder, backgroundColor: accentBg }}
               >
                 {t.payRemainingOnline}
+                <span className="sr-only"> ({t.opensInNewTab})</span>
               </a>
             )}
           </div>
@@ -161,6 +162,7 @@ export default async function ClientPortalInvoicePage({
             style={{ borderColor: accentBorder, backgroundColor: accentBg }}
           >
             {t.invoiceDownloadPdf}
+            <span className="sr-only"> ({t.opensInNewTab})</span>
             {summary.proposalReference && (
               <span className="text-white/30 ml-1">({summary.proposalReference})</span>
             )}
@@ -168,13 +170,14 @@ export default async function ClientPortalInvoicePage({
         )}
 
         <footer className="mt-10 text-center">
-          <p className="text-xs text-white/15">Òrbita Events</p>
+          <p className="text-xs text-white/15">{SITE_CONFIG.business.name}</p>
         </footer>
       </div>
       <PortalBottomNav
         basePath={`/${locale}/portal/${params.token}`}
         accentHex={accentHex}
         labels={{
+          ariaLabel: t.portalNavigationLabel,
           hub: t.portalLabel,
           payments: t.payments,
           timeline: t.timelineLabel,

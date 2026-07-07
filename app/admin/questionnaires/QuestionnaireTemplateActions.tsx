@@ -1,10 +1,22 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { buildQuestionnaireHref } from '@/lib/admin/questionnaireWorkspaceHref';
 import { fetchWithCsrf } from '@/lib/csrf';
+
+type BusyAction = 'toggle' | 'delete' | null;
+
+async function readQuestionnaireActionError(response: Response, fallback: string): Promise<string> {
+  try {
+    const payload = await response.json() as { error?: string; message?: string };
+    return payload.error || payload.message || fallback;
+  } catch {
+    return fallback;
+  }
+}
 
 export default function QuestionnaireTemplateActions({
   id,
@@ -15,14 +27,25 @@ export default function QuestionnaireTemplateActions({
 }) {
   const router = useRouter();
   const { confirm, dialogProps } = useConfirmDialog();
+  const [busyAction, setBusyAction] = useState<BusyAction>(null);
+  const [error, setError] = useState('');
 
   async function handleToggle() {
-    await fetchWithCsrf(`/api/admin/questionnaires/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ isActive: !isActive }),
-    });
-    router.refresh();
+    setBusyAction('toggle');
+    setError('');
+    try {
+      const res = await fetchWithCsrf(`/api/admin/questionnaires/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: !isActive }),
+      });
+      if (!res.ok) throw new Error(await readQuestionnaireActionError(res, "No s'ha pogut actualitzar la plantilla"));
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No s'ha pogut actualitzar la plantilla");
+    } finally {
+      setBusyAction(null);
+    }
   }
 
   async function handleDelete() {
@@ -33,8 +56,17 @@ export default function QuestionnaireTemplateActions({
       variant: 'danger',
     });
     if (!ok) return;
-    await fetchWithCsrf(`/api/admin/questionnaires/${id}`, { method: 'DELETE' });
-    router.refresh();
+    setBusyAction('delete');
+    setError('');
+    try {
+      const res = await fetchWithCsrf(`/api/admin/questionnaires/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(await readQuestionnaireActionError(res, "No s'ha pogut eliminar la plantilla"));
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No s'ha pogut eliminar la plantilla");
+    } finally {
+      setBusyAction(null);
+    }
   }
 
   return (
@@ -48,19 +80,26 @@ export default function QuestionnaireTemplateActions({
         </Link>
         <button
           onClick={handleToggle}
+          disabled={busyAction !== null}
           className="ap-btn ap-btn--xs inline-flex"
           type="button"
         >
-          {isActive ? 'Desactivar' : 'Activar'}
+          {busyAction === 'toggle' ? '…' : isActive ? 'Desactivar' : 'Activar'}
         </button>
         <button
           onClick={handleDelete}
+          disabled={busyAction !== null}
           className="ap-btn ap-btn--xs admin-tone-border-danger admin-tone-text-danger"
           type="button"
         >
-          Eliminar
+          {busyAction === 'delete' ? '…' : 'Eliminar'}
         </button>
       </div>
+      {error && (
+        <p className="w-full text-xs admin-tone-text-danger" role="alert">
+          {error}
+        </p>
+      )}
       <ConfirmDialog {...dialogProps} />
     </>
   );

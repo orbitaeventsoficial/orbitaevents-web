@@ -62,7 +62,7 @@ describe('adminHealthService', () => {
     queueExtraCounts(0, 0);
     mockPrisma.extra.findMany.mockResolvedValue([]);
     mockPrisma.lead.count.mockResolvedValue(0);
-    queueBookingCounts(0, 0);
+    queueBookingCounts(0);
     mockPrisma.booking.findMany.mockResolvedValue([]);
     mockPrisma.task.count.mockResolvedValue(0);
     mockPrisma.customer.count.mockResolvedValue(0);
@@ -155,25 +155,37 @@ describe('adminHealthService', () => {
     ]);
     mockPrisma.lead.count.mockResolvedValue(5);
     mockPrisma.booking.count.mockReset();
-    queueBookingCounts(6, 1);
+    queueBookingCounts(1);
     mockPrisma.booking.findMany.mockResolvedValue([
       {
         id: 'booking-overdue-deposit',
         eventDate: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000),
+        total: 3000,
+        depositAmount: 1000,
+        remainingAmount: 2000,
         depositPaid: false,
         remainingPaid: false,
+        cashAmount: null,
       },
       {
         id: 'booking-overdue-remaining',
         eventDate: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000),
+        total: 3000,
+        depositAmount: 1000,
+        remainingAmount: 2000,
         depositPaid: true,
         remainingPaid: false,
+        cashAmount: null,
       },
       {
         id: 'booking-due-soon',
         eventDate: new Date(now.getTime() + 35 * 24 * 60 * 60 * 1000),
+        total: 3000,
+        depositAmount: 1000,
+        remainingAmount: 2000,
         depositPaid: false,
         remainingPaid: false,
+        cashAmount: null,
       },
     ]);
     mockPrisma.task.count.mockResolvedValue(7);
@@ -259,6 +271,29 @@ describe('adminHealthService', () => {
     expect(operationsSection?.items.some((item) => item.title.includes('Cobraments de reserves vençuts'))).toBe(true);
     expect(operationsSection?.items.some((item) => item.title.includes('Cobraments a punt de vèncer'))).toBe(true);
     expect(operationsSection?.items.some((item) => item.href === '/admin/leads')).toBe(true);
+  });
+
+  it('no compta cobraments de Salut si l\'efectiu ja cobreix els trams pendents', async () => {
+    const now = new Date();
+    mockPrisma.booking.findMany.mockResolvedValue([
+      {
+        id: 'booking-cash-covered',
+        eventDate: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000),
+        total: 3000,
+        depositAmount: 1000,
+        remainingAmount: 2000,
+        depositPaid: false,
+        remainingPaid: false,
+        cashAmount: 3000,
+      },
+    ]);
+
+    const snapshot = await getAdminHealthSnapshot();
+    const operationsSection = snapshot.sections.find((section) => section.scope === 'operations');
+
+    expect(operationsSection?.items.some((item) => item.id === 'operations-upcoming-unpaid')).toBe(false);
+    expect(operationsSection?.items.some((item) => item.id === 'operations-bookings-payments-overdue')).toBe(false);
+    expect(operationsSection?.items.some((item) => item.id === 'operations-bookings-payments-due-soon')).toBe(false);
   });
 
   it('detecta inventari a fi de vida útil (critical >95%) i envellint (warning >80%)', async () => {

@@ -34,13 +34,18 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       'packId',
     ];
 
-    const missingFields = requiredFields.filter((field) => !body[field as keyof PublicBookingRequest]);
+    const missingFields = requiredFields.filter((field) => {
+      const value = body[field as keyof PublicBookingRequest];
+      if (typeof value === 'string') return value.trim().length === 0;
+      return !value;
+    });
 
     if (missingFields.length > 0) {
       return NextResponse.json(
         {
           success: false,
           error: `Missing required fields: ${missingFields.join(', ')}`,
+          errorCode: 'MISSING_REQUIRED_FIELDS',
         },
         { status: 400 }
       );
@@ -52,29 +57,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         {
           success: false,
           error: 'Invalid email format',
-        },
-        { status: 400 }
-      );
-    }
-
-    const eventDate = new Date(body.eventDate);
-    if (Number.isNaN(eventDate.getTime())) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Invalid event date',
-        },
-        { status: 400 }
-      );
-    }
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (eventDate < today) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Event date cannot be in the past',
+          errorCode: 'INVALID_EMAIL',
         },
         { status: 400 }
       );
@@ -88,6 +71,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         {
           success: false,
           error: 'This date is not available. Please choose another date.',
+          errorCode: 'DATE_UNAVAILABLE',
         },
         { status: 409 }
       );
@@ -99,6 +83,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       {
         success: false,
         error: 'Failed to create booking. Please try again later.',
+        errorCode: 'BOOKING_CREATE_FAILED',
       },
       { status: 500 }
     );

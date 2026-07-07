@@ -1,22 +1,24 @@
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import {
   findPortalAccessByRawToken,
+  markPortalAccessHit,
   normalizePortalLocale,
 } from '@/lib/services/clientPortalAccess';
 import {
-  CLIENT_PORTAL_CONTRACT_STATUS_LABELS,
   CLIENT_PORTAL_MESSAGES,
+  getClientPortalContractStatusLabel,
   type ClientPortalLocale,
 } from '@/lib/clientPortalMessages';
 import {
   getClientPortalContractSummary,
-  type ClientPortalContractProposal,
 } from '@/lib/clientPortalContract';
 import { SignContractForm } from './SignContractForm';
 import { toRgba, resolvePortalAccentHex } from '@/lib/clientPortalUtils';
 import ClientPortalPageHeader from '@/app/components/public/ClientPortalPageHeader';
+import { getClientPortalVisibility } from '@/lib/clientPortalVisibility';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -28,15 +30,22 @@ export default async function SignContractPage({
 }: {
   params: { locale: string; token: string };
 }) {
-  const locale = normalizePortalLocale(params.locale) as ClientPortalLocale;
+  const locale = normalizePortalLocale(params.locale);
   const t = CLIENT_PORTAL_MESSAGES[locale];
-  const contractLabels = CLIENT_PORTAL_CONTRACT_STATUS_LABELS[locale];
 
   const access = await findPortalAccessByRawToken(params.token);
   if (!access) notFound();
+  const visibility = getClientPortalVisibility(access.personalization);
+  if (!visibility.documents) notFound();
 
-  const proposals = access.booking.proposals as ClientPortalContractProposal[];
-  const contractSummary = getClientPortalContractSummary(proposals);
+  const requestHeaders = headers();
+  await markPortalAccessHit({
+    accessId: access.id,
+    ip: requestHeaders.get('x-forwarded-for') || requestHeaders.get('x-real-ip'),
+    userAgent: requestHeaders.get('user-agent'),
+  });
+
+  const contractSummary = getClientPortalContractSummary(access.booking.proposals);
 
   if (!contractSummary || !contractSummary.awaitingInlineSignature) {
     const portalUrl = `/${locale}/portal/${params.token}`;
@@ -50,7 +59,7 @@ export default async function SignContractPage({
           </p>
           {contractSummary?.status && (
             <p className="text-sm text-white/50">
-              {contractLabels[contractSummary.status] || contractSummary.status}
+              {getClientPortalContractStatusLabel(locale, contractSummary.status)}
             </p>
           )}
           <Link
@@ -95,6 +104,7 @@ export default async function SignContractPage({
               signNamePlaceholder: t.signNamePlaceholder,
               signAcceptTerms: t.signAcceptTerms,
               signSubmit: t.signSubmit,
+              signSubmitting: t.signSubmitting,
               signSuccess: t.signSuccess,
               signSuccessBack: t.signSuccessBack,
               signError: t.signError,
@@ -115,6 +125,7 @@ export default async function SignContractPage({
               style={{ borderColor: accentBorder, backgroundColor: accentBg }}
             >
               {t.openContract}
+              <span className="sr-only"> ({t.opensInNewTab})</span>
             </a>
           )}
         </section>
@@ -124,7 +135,7 @@ export default async function SignContractPage({
             href={`/${locale}/portal/${params.token}`}
             className="text-sm text-white/40 hover:text-white/70"
           >
-            ← {t.backHome}
+            <span aria-hidden="true">←</span> {t.backHome}
           </Link>
         </div>
       </div>

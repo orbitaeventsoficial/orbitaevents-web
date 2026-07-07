@@ -99,6 +99,10 @@ function buildProductBlock(product: AnimacioProduct, num: number, copy: DossierC
     ? `<span class="producte-categoria">${escHtml(product.categoria)}</span>`
     : '';
 
+  const imageHtml = product.image
+    ? `<figure class="producte-media"><img src="${escHtml(product.image)}" alt="${escHtml(product.nom)}"></figure>`
+    : '';
+
   // Preu canònic "des de X €" (de priceFrom; mai hardcoded). Consistent amb el jsPDF.
   const priceValue =
     typeof product.priceFrom === 'number'
@@ -122,6 +126,7 @@ function buildProductBlock(product: AnimacioProduct, num: number, copy: DossierC
       </div>
     </header>
     <div class="producte-body">
+      ${imageHtml}
       <div class="producte-desc">
         ${descripcio}
       </div>
@@ -425,6 +430,11 @@ export function buildDossierHtml(
     }
     .producte-nom { font-size: 42px; line-height: 1.05; font-weight: 600; color: var(--o-ink); margin-top: 8px; letter-spacing: -0.01em; }
     .producte-body { display: grid; grid-template-columns: 1fr 200px; gap: 34px; margin-bottom: 32px; align-items: start; }
+    .producte-media {
+      grid-column: 1 / -1; margin: -4px 0 2px; padding: 8px;
+      border: 1px solid var(--o-line); background: rgba(255,255,255,0.18);
+    }
+    .producte-media img { display: block; width: 100%; height: 230px; object-fit: cover; object-position: center; }
     .producte-desc { font-size: 17px; color: var(--o-ink-soft); line-height: 1.92; }
     .producte-desc p + p { margin-top: 16px; }
     .producte-desc p:first-child::first-letter {
@@ -535,6 +545,7 @@ export function buildDossierHtml(
       .intro-summary div:last-child { border-bottom: 0; }
       .producte-nom { font-size: 30px; }
       .producte-body { grid-template-columns: 1fr; gap: 22px; }
+      .producte-media img { height: 180px; }
       .producte-aside { border-left: 0; border-top: 1px solid var(--o-gold-bright); padding-left: 0; padding-top: 18px; }
       .producte-inclou { grid-template-columns: 1fr; }
       .producte-marker-num { font-size: 44px; }
@@ -565,6 +576,7 @@ export function buildDossierHtml(
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
       }
       .product-page, .resum-page { padding-top: 0; }
+      .producte-media img { height: 200px; }
       .producte, .resum-card, .bud-travel, .bud-travel-price, .cta, .peu { page-break-inside: avoid; }
     }
   </style>

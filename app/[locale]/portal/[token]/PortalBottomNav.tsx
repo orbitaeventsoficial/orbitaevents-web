@@ -12,6 +12,7 @@ interface Props {
   basePath: string;
   accentHex: string;
   labels: {
+    ariaLabel: string;
     hub: string;
     payments: string;
     timeline: string;
@@ -76,7 +77,7 @@ export default function PortalBottomNav({ basePath, accentHex, labels, hiddenIte
 
   return (
     <nav
-      aria-label="Navegació del portal"
+      aria-label={labels.ariaLabel}
       className="fixed bottom-0 inset-x-0 z-40"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >

@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { formatCurrency } from '@/lib/constants';
+import { getPaymentBand } from '@/lib/payment-status';
 import {
   GOOGLE_CALENDAR_BOOKING_REMINDERS,
   GOOGLE_CALENDAR_BOOKING_REMINDER_SUMMARY,
@@ -48,6 +49,7 @@ type BookingData = {
   notes: string | null;
   status: string;
   total: number;
+  cashAmount: number | null;
   depositPaid: boolean;
   remainingPaid: boolean;
 };
@@ -125,9 +127,13 @@ function parseTime(baseDate: Date, hhmm: string | null): Date | null {
 function buildEventPayload(booking: BookingData) {
   const title = `${booking.reference} · ${booking.clientName} · ${booking.eventType}`;
   const location = [booking.eventVenue, booking.eventLocation].filter(Boolean).join(' · ');
-  const paymentStatus = booking.depositPaid && booking.remainingPaid
+  const paymentBand = getPaymentBand(booking.depositPaid, booking.remainingPaid, {
+    cashAmount: booking.cashAmount,
+    total: booking.total,
+  });
+  const paymentStatus = paymentBand === 'paid'
     ? 'Pagament complet'
-    : booking.depositPaid
+    : paymentBand === 'partial'
       ? 'Pagament parcial'
       : 'Pagament pendent';
 
@@ -394,6 +400,7 @@ export async function reconcileGoogleCalendar(): Promise<GoogleCalendarReconcile
         notes: true,
         status: true,
         total: true,
+        cashAmount: true,
         depositPaid: true,
         remainingPaid: true,
       },
@@ -584,6 +591,7 @@ export async function syncBookingToGoogleCalendar(
       notes: true,
       status: true,
       total: true,
+      cashAmount: true,
       depositPaid: true,
       remainingPaid: true,
     },

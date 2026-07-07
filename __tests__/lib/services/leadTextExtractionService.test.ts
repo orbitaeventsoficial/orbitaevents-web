@@ -100,4 +100,51 @@ describe('extractLeadDataFromText', () => {
     expect(result.eventLocation).toBe("restaurant Calma a l'Aldosa");
     expect(result.guestCount).toBe('30');
   });
+
+  it('sintetitza una conversa WhatsApp de casal sense copiar-la sencera a notes', () => {
+    const result = extractLeadDataFromText(`
+      [14:24, 7/7/2026] +34 673 04 83 68: Bon dia, Albert,
+
+      Em poso en contacte amb vostè perquè estem organitzant una vesprada de casal a una escola de Cornellà i ens agradaria saber si té disponibilitat i ens pot fer arribar un pressupost.
+
+      Vesprada de casal
+
+      📅 Divendres 17 de juliol
+      🕣 Horari: de 20.30 a 21.30 h (aprox.)
+      👧👦 Uns 100 infants
+
+      Ens agradaria saber quines activitats o espectacles ens podria oferir per fer una hora de festa.
+
+      Si ens pot confirmar la disponibilitat i fer-nos arribar una proposta amb les diferents opcions i el pressupost, li ho agrairem.
+
+      Moltes gràcies i quedem pendents de la seva resposta.
+
+      Salutacions,
+      [14:28, 7/7/2026] Òrbita events: Bon dia! I tant, la mainada quina edat té? Us preparo un dossier i us ho faig arribar.
+      [14:28, 7/7/2026] +34 673 04 83 68: de 3 a 12 anys
+      [14:30, 7/7/2026] Òrbita events: Dacord, ho preparo, et confirmo disponibilitat per aquell dia i seguim parlant.
+      [14:30, 7/7/2026] +34 673 04 83 68: Seria una activitat d'una hora aproximadament, dins de la vesprada del casal, al pati d'una escola. Els infants tenen entre 3 i 12 anys. Aquest any la temàtica del casal és un DJ que ha perdut la inspiració i viatja pel món a través de la música.
+      [14:30, 7/7/2026] +34 673 04 83 68: A vosaltres
+      [14:33, 7/7/2026] Òrbita events: Necessitaria el seu nom i cognom i un correu electronic sisplaiu, aixi us incoprporo a la base de dades
+      [14:36, 7/7/2026] +34 673 04 83 68: Albert Aujas
+      [14:36, 7/7/2026] +34 673 04 83 68: casals@controlplay.cat
+    `);
+
+    expect(result.name).toBe('Albert Aujas');
+    expect(result.email).toBe('casals@controlplay.cat');
+    expect(result.phone).toBe('+34673048368');
+    expect(result.eventDate.endsWith('-07-17')).toBe(true);
+    expect(result.eventTime).toBe('20:30');
+    expect(result.eventEndTime).toBe('21:30');
+    expect(result.eventLocation).toBe('Cornellà');
+    expect(result.guestCount).toBe('100');
+    expect(result.source).toBe('WHATSAPP');
+    expect(result.message).toContain('vesprada de casal');
+    expect(result.message).toContain("activitat d'una hora");
+    expect(result.message).toContain("al pati d'una escola");
+    expect(result.message).toContain('infants de 3 a 12 anys');
+    expect(result.message).toContain('temàtica: un DJ que ha perdut la inspiració');
+    expect(result.message).not.toContain('[14:24');
+    expect(result.message.length).toBeLessThan(280);
+  });
 });
