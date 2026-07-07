@@ -66,6 +66,13 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-07 [ESTAT: tancat — Bingo KIDS amb presentador i portfolio triat #1725]
+Perimetre: asset propi de `Bingo Musical KIDS`, seleccio de 174 imatges locals, portfolio infantil/bodes/Halloween/produccio tecnica, seed/test, BD viva i documentacio.
+Ultim canvi: #1725.
+Validacio: test focal #1725 (16/16), `pnpm build` OK (`validate:core`, 72 tests scripts/628 asserts, `tsc`, Next build), BD viva actualitzada amb `imageUrl=/img/collaborators/masquerade/bingo-musical-kids.avif`, mosaic final revisat sense cares infantils identificables en les imatges infantils publicades.
+Proper pas previst: commit+push/deploy del paquet d'assets; despres continuar auditoria Zenit amb el seguent error real.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, reserves, leads ni dades de clients; tall limitat a assets publics, seed/config de portfolio, BD viva del producte Masquerade/Bingo KIDS i documentacio.
+
 [codex] 2026-07-07 [ESTAT: tancat — Dossiers imatges/guards + DJ continuacio #1724]
 Perimetre: `/admin/dossiers`, rehidratacio d'imatges de snapshots, PDF/email de dossier, producte propi `Hora extra DJ amb equip muntat`, desglossament de desplaçament en dossier, guards de hard-delete de col·laboradors/productes, portfolio infantil i seed/BD de Bingo Musical KIDS.
 Ultim canvi: #1724.

@@ -11,7 +11,7 @@ describe('partner product seeds visibility', () => {
     expect(masqueradeSeed).toContain("name: 'Bingo Musical KIDS'");
     expect(masqueradeSeed).toContain('category: CHILDREN_CATEGORY');
     expect(masqueradeSeed).toContain('sellPrice: commercialProductPrice(160)');
-    expect(masqueradeSeed).toContain("BINGO_KIDS_IMG = '/img/portfolio/fiestas-infantiles/fiestas-infantiles-06.avif'");
+    expect(masqueradeSeed).toContain('BINGO_KIDS_IMG = `${IMG}/bingo-musical-kids.avif`');
     expect(masqueradeSeed).toContain('imageUrl: BINGO_KIDS_IMG');
     expect(masqueradeSeed).toContain('visibleInDossier: true');
     expect(masqueradeSeed).toContain('visibleInBooking: true');

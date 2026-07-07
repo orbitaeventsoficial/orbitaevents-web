@@ -1,3 +1,26 @@
+## 2026-07-07 — Bingo KIDS amb presentador i portfolio triat sense cares infantils (Canvi #1725, codex)
+
+### Context
+El propietari detecta que la foto de `Bingo Musical KIDS` no ensenya prou el presentador i demana revisar el paquet nou de `Downloads` per aprofitar només les millors imatges. Criteri explícit: si surten nens, les cares s'han de pixelar abans de publicar-les.
+
+### Què s'ha fet
+- S'han inspeccionat 174 imatges locals amb contact sheets i selecció manual; s'han descartat repeticions, fotos fluixes i imatges infantils amb cares identificables.
+- `Bingo Musical KIDS` deixa d'apuntar al portfolio genèric i passa a tenir asset propi de producte: `/img/collaborators/masquerade/bingo-musical-kids.avif`, amb presentador visible.
+- El seed canònic de Masquerade i el test de seed apunten a la nova ruta; la BD viva queda sincronitzada amb la mateixa `imageUrl`.
+- Portfolio: es reemplacen quatre imatges infantils per presentador/equip/escena sense cares infantils identificables, i s'afegeixen dues imatges a `bodas`, dues a `fiestas-tematicas-halloween` i una a `produccion-tecnica`.
+- `app/config/portfolio-images.ts` queda regenerat perquè les noves peces siguin visibles des del catàleg públic.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\scripts\seed-partner-product-visibility.test.ts __tests__\lib\services\publicServiceMediaService.test.ts` (16/16); `pnpm build` OK (`validate:core`, 72 tests de scripts/628 asserts, `tsc`, Next build).
+- Validació funcional: BD viva consultada i actualitzada amb Prisma; `Bingo Musical KIDS` queda `isActive=true`, `visibleInDossier=true`, `visibleInBooking=true` i `imageUrl=/img/collaborators/masquerade/bingo-musical-kids.avif`.
+- Validació humana/UX: mosaic final revisat a `D:\tmp\orbita-download-images\selected-output.jpg`; el producte mostra presentador i no s'han publicat cares de nens identificables en les imatges infantils seleccionades.
+
+### Coordinació
+Counter → 1725. Canvi limitat a assets públics, seed, configuració de portfolio, BD viva del producte i documentació.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-07 — Dossiers amb catàleg net, imatges rehidratades i guards d'esborrat (Canvi #1724, codex)
 
 ### Context

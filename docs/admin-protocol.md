@@ -1732,6 +1732,24 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1725 — 2026-07-07 — codex (FET)
+- Context: el propietari detecta que la imatge escollida per `Bingo Musical KIDS` no mostra el presentador/conductor i demana revisar el nou paquet de `Downloads` sense publicar cares identificables de nens; si una imatge amb nens s'aprofita, cal pixelar-la abans.
+- Fet:
+  - S'han inspeccionat 174 imatges locals amb contact sheets i selecció manual; no s'han publicat repeticions ni imatges infantils amb cares de nens identificables.
+  - `Bingo Musical KIDS` té asset propi a `public/img/collaborators/masquerade/bingo-musical-kids.avif`, amb el presentador visible, separat del portfolio general.
+  - `scripts/seed-masquerade-products.mjs` i el test de seed apunten el producte a `/img/collaborators/masquerade/bingo-musical-kids.avif`.
+  - `public/img/portfolio/fiestas-infantiles/fiestas-infantiles-06..09.avif` es reemplacen per imatges de presentador/equip/escena sense cares infantils identificables.
+  - S'afegeixen al portfolio públic dues imatges de `bodas`, dues de `fiestas-tematicas-halloween` i una de `produccion-tecnica`; `app/config/portfolio-images.ts` queda regenerat.
+  - BD viva: `Bingo Musical KIDS` queda actiu i visible a dossier/booking amb `imageUrl=/img/collaborators/masquerade/bingo-musical-kids.avif`.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\scripts\seed-partner-product-visibility.test.ts __tests__\lib\services\publicServiceMediaService.test.ts` (16/16); `pnpm build` OK (`validate:core`, 72 tests scripts/628 asserts, `tsc`, Next build).
+  - Validació funcional: consulta Prisma a BD viva abans/després confirma que `Bingo Musical KIDS` passa de `/img/portfolio/fiestas-infantiles/fiestas-infantiles-06.avif` a `/img/collaborators/masquerade/bingo-musical-kids.avif` mantenint `isActive=true`, `visibleInDossier=true` i `visibleInBooking=true`.
+  - Validació humana/UX: mosaic final revisat a `D:\tmp\orbita-download-images\selected-output.jpg`; el producte mostra presentador, les imatges infantils seleccionades eviten cares de nens identificables, i les peces noves queden classificades per ús real (infantil, bodes, Halloween i producció tècnica).
+- `ADMIN_CHANGE_COUNTER` puja a `1725`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1724 — 2026-07-07 — codex (FET)
 - Context: el propietari detecta que `/admin/dossiers` mostra columnes d'audiència buides, alguns productes/dossiers perden imatge, i l'esborrat de peces inactives de Masquerade/proveïdors necessita guardes reals perquè la BD no quedi trencada ni l'admin peti. També demana separar la continuació de DJ amb equip muntat i fer més transparent el desplaçament llarg.
 - Fet:

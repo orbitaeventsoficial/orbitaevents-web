@@ -14,7 +14,7 @@ const prisma = new PrismaClient();
 
 const COLLABORATOR_ID = 'carlos-lucas-fernandez';
 const IMG = '/img/collaborators/masquerade';
-const BINGO_KIDS_IMG = '/img/portfolio/fiestas-infantiles/fiestas-infantiles-06.avif';
+const BINGO_KIDS_IMG = `${IMG}/bingo-musical-kids.avif`;
 // Km inclosos canònics (font única: travelCost). Avui 20 km/sentit des de Granollers.
 const INCLUDED_KM = getIncludedTravelOneWayKm();
 const INCLUDES = `Vestuari d'alta qualitat · Desplaçament inclòs fins a ${INCLUDED_KM} km · Disponible en català`;
