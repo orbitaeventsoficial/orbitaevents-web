@@ -66,6 +66,13 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-07 [ESTAT: tancat — Dossiers imatges/guards + DJ continuacio #1724]
+Perimetre: `/admin/dossiers`, rehidratacio d'imatges de snapshots, PDF/email de dossier, producte propi `Hora extra DJ amb equip muntat`, desglossament de desplaçament en dossier, guards de hard-delete de col·laboradors/productes, portfolio infantil i seed/BD de Bingo Musical KIDS.
+Ultim canvi: #1724.
+Validacio: test focal #1724 (108/108), `pnpm build` OK (`validate:core`, 72 tests scripts/628 asserts, `tsc`, Next build), BD viva auditada amb `deadDossierRefs=[]` i `missingRelations` buits; Bingo KIDS actiu/visible amb imatge `/img/portfolio/fiestas-infantiles/fiestas-infantiles-06.avif`; `Tècnic de so` Masquerade inactiu i ocult.
+Proper pas previst: commit+push/deploy del tall perquè les imatges noves existeixin a producció; després continuar auditoria Zenit amb el següent error real.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, reserves existents ni dades de clients; sí que he actualitzat BD viva per la imatge de Bingo KIDS i per ocultar el producte antic inactiu `Tècnic de so` de Masquerade.
+
 [codex] 2026-07-07 [ESTAT: tancat — Productes partner amb visibilitat dossier/booking #1723]
 Perimetre: `CollaboratorProduct` visibility migration, `collaboratorProductService`, panell de productes partner, configurador de bolos, seeds Bingo Musical KIDS/Isma, registres i deploy conjunt; #1722 i #1721 queden inclosos en el mateix paquet de validacio/deploy.
 Ultim canvi: #1723.

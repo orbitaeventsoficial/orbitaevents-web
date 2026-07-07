@@ -10,6 +10,11 @@ vi.mock('next-intl/server', () => ({
         descripcio: ['Primera hora {first}; extres {extra}.'],
         inclou: ['DJ professional'],
       },
+      'dj-hora-equip-muntat': {
+        nom: 'Hora extra DJ amb equip muntat',
+        descripcio: ['Continuació {continuation}.'],
+        inclou: ['DJ professional'],
+      },
       bombolles: {
         nom: 'Bombolles',
         descripcio: ['Bombolles gegants.'],
@@ -37,6 +42,7 @@ describe('getOrbitaDossierProducts', () => {
     const byId = new Map(products.map((product) => [product.id, product]));
 
     expect(byId.get('orbita:dj-primera-hora')?.image).toBe('/img/portfolio/discomovil/discomovil-01.avif');
+    expect(byId.get('orbita:dj-hora-equip-muntat')?.image).toBe('/img/portfolio/discomovil/discomovil-01.avif');
     expect(byId.get('orbita:pont-llums-caps-mobils')?.image).toBe('/img/portfolio/produccion-tecnica/produccion-tecnica-01.avif');
     expect(byId.get('orbita:bombolles')?.image).toBeUndefined();
     expect(byId.get('orbita:operari-extra')?.image).toBeUndefined();

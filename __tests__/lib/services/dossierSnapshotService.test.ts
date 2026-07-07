@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildDossierLineSnapshot,
+  hydrateDossierSnapshotProductImages,
   parseDossierLineSnapshot,
   productsFromDossierLineSnapshot,
   transportFromDossierLineSnapshot,
@@ -70,5 +71,42 @@ describe('dossierSnapshotService', () => {
       travelKm: 50,
       travelLocation: 'Granollers',
     });
+  });
+
+  it('rehidrata imatges de productes congelats sense canviar el text del snapshot', () => {
+    const hydrated = hydrateDossierSnapshotProductImages(
+      [
+        {
+          ...product,
+          nom: 'Bingo Musical congelat',
+          image: undefined,
+        },
+        {
+          ...product,
+          id: 'collab:amb-imatge',
+          sourceProductId: 'amb-imatge',
+          image: '/img/snapshot.webp',
+        },
+      ],
+      [
+        {
+          ...product,
+          nom: 'Bingo Musical actual',
+          image: '/img/catalog.webp',
+        },
+        {
+          ...product,
+          id: 'collab:amb-imatge',
+          sourceProductId: 'amb-imatge',
+          image: '/img/catalog-ignored.webp',
+        },
+      ],
+    );
+
+    expect(hydrated?.[0]).toEqual(expect.objectContaining({
+      nom: 'Bingo Musical congelat',
+      image: '/img/catalog.webp',
+    }));
+    expect(hydrated?.[1].image).toBe('/img/snapshot.webp');
   });
 });

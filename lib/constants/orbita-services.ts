@@ -37,6 +37,7 @@ export interface OrbitaService {
 //   N hores = 150 + (N-1)×100  →  1h=150 · 2h=250 · 5h=550.
 export const DJ_FIRST_HOUR_PRICE = 150;
 export const DJ_EXTRA_HOUR_PRICE = 100;
+export const DJ_CONTINUATION_HOUR_PRICE = DJ_EXTRA_HOUR_PRICE;
 
 // Tècnic de so d'Òrbita: 40 € per 1,5 h. Font única del cost del tècnic, sigui
 // que es vengui sol o que substitueixi el tècnic inclòs en un producte de
@@ -77,6 +78,7 @@ export function djPriceForHours(hours: number): number {
 export const ORBITA_SERVICES: OrbitaService[] = [
   { id: 'dj-primera-hora', kind: 'DJ', label: 'DJ · 1a hora', defaultPrice: DJ_FIRST_HOUR_PRICE, unit: 'unit', optional: false },
   { id: 'dj-hora-addicional', kind: 'DJ', label: 'DJ · hora addicional', defaultPrice: DJ_EXTRA_HOUR_PRICE, unit: 'hour', optional: false },
+  { id: 'dj-hora-equip-muntat', kind: 'DJ', label: 'DJ · hora extra amb equip muntat', defaultPrice: DJ_CONTINUATION_HOUR_PRICE, unit: 'unit', optional: true },
   { id: 'tecnic-so', kind: 'SOUND_TECH', label: `Tècnic de so · ${SOUND_TECH_DURATION}`, defaultPrice: SOUND_TECH_PRICE, unit: 'unit', optional: true },
   { id: 'bombolles', kind: 'EQUIPMENT', label: 'Màquina de bombolles', defaultPrice: 50, unit: 'unit', optional: true },
   { id: 'caps-mobils', kind: 'EQUIPMENT', label: 'Caps mòbils (llum)', defaultPrice: 120, unit: 'unit', optional: true },

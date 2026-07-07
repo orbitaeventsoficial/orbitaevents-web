@@ -1,7 +1,13 @@
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
-import { DJ_EXTRA_HOUR_PRICE, DJ_FIRST_HOUR_PRICE, djPriceForHours } from '@/lib/constants/orbita-services';
+import {
+  DJ_CONTINUATION_HOUR_PRICE,
+  DJ_EXTRA_HOUR_PRICE,
+  DJ_FIRST_HOUR_PRICE,
+  djPriceForHours,
+} from '@/lib/constants/orbita-services';
 
 export const DOSSIER_DJ_PRODUCT_ID = 'orbita:dj-primera-hora';
+export const DOSSIER_DJ_CONTINUATION_PRODUCT_ID = 'orbita:dj-hora-equip-muntat';
 
 export type DossierProductGroupKey = 'orbita' | 'masquerade' | 'tino' | 'altres';
 
@@ -37,6 +43,7 @@ export function normalizeDossierProductText(value?: string | null): string {
 
 export function dossierProductPriceValue(product: AnimacioProduct, djHours = 1): number | null {
   if (product.id === DOSSIER_DJ_PRODUCT_ID) return djPriceForHours(djHours);
+  if (product.id === DOSSIER_DJ_CONTINUATION_PRODUCT_ID) return DJ_CONTINUATION_HOUR_PRICE;
   const tierPrice = product.trams?.find((tier) => tier.price !== null)?.price;
   if (typeof tierPrice === 'number') return tierPrice;
   const djPrice = product.djOptions?.find((option) => option.price !== null)?.price;
@@ -57,6 +64,15 @@ export function productToDossierServiceLine(product: AnimacioProduct, djHours = 
   const revenueAmount = dossierProductPriceValue(product, djHours);
   if (product.id === DOSSIER_DJ_PRODUCT_ID) {
     return { kind: 'DJ', label: djHours > 1 ? `DJ · ${djHours} hores` : 'DJ · primera hora', revenueAmount, quantity: 1 };
+  }
+  if (product.id === DOSSIER_DJ_CONTINUATION_PRODUCT_ID) {
+    return {
+      kind: 'DJ',
+      label: 'DJ · hora extra amb equip muntat',
+      revenueAmount: DJ_CONTINUATION_HOUR_PRICE,
+      quantity: 1,
+      notes: 'Hora de DJ afegida quan el so ja està muntat per un servei previ.',
+    };
   }
   if (product.id === 'orbita:bombolles') {
     return { kind: 'EQUIPMENT', label: 'Màquina de bombolles', revenueAmount, quantity: 1 };
@@ -84,6 +100,11 @@ function isDjExtraLabel(label: string): boolean {
     (label.includes('hora addicional') || label.includes('hora extra') || label.includes('extra'));
 }
 
+function isDjContinuationLabel(label: string): boolean {
+  return label.includes('dj') &&
+    (label.includes('equip muntat') || label.includes('continuacio') || label.includes('continuada'));
+}
+
 function isDjFirstHourLabel(label: string): boolean {
   return label.includes('dj') &&
     (label.includes('1a hora') || label.includes('primera hora'));
@@ -91,7 +112,7 @@ function isDjFirstHourLabel(label: string): boolean {
 
 export function dossierDjHoursFromServiceLines(lines: DossierServiceLineLike[]): number {
   const djRevenue = lines
-    .filter((line) => line.kind === 'DJ')
+    .filter((line) => line.kind === 'DJ' && !isDjContinuationLabel(normalizeDossierProductText(line.label)))
     .reduce((sum, line) => sum + (line.revenueAmount ?? 0) * (line.quantity ?? 1), 0);
   if (djRevenue <= 0) return 1;
   const extras = Math.round((djRevenue - DJ_FIRST_HOUR_PRICE) / DJ_EXTRA_HOUR_PRICE);
@@ -112,6 +133,11 @@ export function productIdsFromDossierServiceLines(
       if (directId && validProductIds.has(directId)) return directId;
 
       const normalizedLabel = normalizeDossierProductText(line.label);
+      if (
+        line.kind === 'DJ' &&
+        isDjContinuationLabel(normalizedLabel) &&
+        validProductIds.has(DOSSIER_DJ_CONTINUATION_PRODUCT_ID)
+      ) return DOSSIER_DJ_CONTINUATION_PRODUCT_ID;
       if (line.kind === 'DJ' && (isDjExtraLabel(normalizedLabel) || isDjFirstHourLabel(normalizedLabel))) return DOSSIER_DJ_PRODUCT_ID;
       const exactName = byName.get(normalizedLabel);
       if (exactName) return exactName;

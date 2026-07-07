@@ -3,11 +3,18 @@ import { join } from 'path';
 import { requireAuth } from '@/lib/auth';
 import { NextResponse, type NextRequest } from 'next/server';
 import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
+import { getOrbitaDossierProducts } from '@/lib/constants/dossier-copy';
 import { getDossierById, resolveDossierTraceOrigin } from '@/lib/services/dossierService';
 import { generateDossierCompositePDF } from '@/lib/services/dossierCompositePdfService';
-import { getDossierCollaboratorProductsByIds } from '@/lib/services/collaboratorProductService';
+import {
+  collaboratorProductToAnimacioProduct,
+  getDossierCollaboratorProductsByIds,
+} from '@/lib/services/collaboratorProductService';
 import type { DossierClientInfo } from '@/lib/utils/dossier-html-builder';
-import { productsFromDossierLineSnapshot } from '@/lib/services/dossierSnapshotService';
+import {
+  hydrateDossierSnapshotProductImages,
+  productsFromDossierLineSnapshot,
+} from '@/lib/services/dossierSnapshotService';
 import { DOCUMENT_ADMIN_LOG_ACTIONS, recordDocumentAdminLog } from '@/lib/services/documentAuditTrailService';
 
 function readLogoDataUri(): string | undefined {
@@ -27,12 +34,20 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   const dossier = await getDossierById(params.id);
   if (!dossier) return NextResponse.json({ error: 'No trobat' }, { status: 404 });
 
-  const snapshotProducts = productsFromDossierLineSnapshot(dossier.lineSnapshot);
-  const allProducts = snapshotProducts ? [] : await getAnimacioProducts('ca');
-  const collaboratorProducts = snapshotProducts ? [] : await getDossierCollaboratorProductsByIds(dossier.productIds);
+  const [legacyProducts, orbitaProducts, collaboratorProducts] = await Promise.all([
+    getAnimacioProducts('ca'),
+    getOrbitaDossierProducts('ca'),
+    getDossierCollaboratorProductsByIds(dossier.productIds),
+  ]);
+  const collaboratorCatalogProducts = collaboratorProducts.map(collaboratorProductToAnimacioProduct);
+  const snapshotProducts = hydrateDossierSnapshotProductImages(
+    productsFromDossierLineSnapshot(dossier.lineSnapshot),
+    [...orbitaProducts, ...legacyProducts, ...collaboratorCatalogProducts],
+  );
   // Només productes propis d'animació aquí; els de col·laborador entren via
   // `collaboratorProducts` (el generador ja els converteix). Evita duplicats.
-  const products = snapshotProducts ?? allProducts.filter((product) => dossier.productIds.includes(product.id));
+  const products = snapshotProducts ?? [...orbitaProducts, ...legacyProducts].filter((product) => dossier.productIds.includes(product.id));
+  const pdfCollaboratorProducts = snapshotProducts ? [] : collaboratorProducts;
   const client: DossierClientInfo = {
     nom: dossier.nom,
     empresa: dossier.empresa ?? undefined,
@@ -58,7 +73,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     client,
     products,
     productIds: dossier.productIds,
-    collaboratorProducts,
+    collaboratorProducts: pdfCollaboratorProducts,
     extras,
     locale: 'ca',
     logoDataUri: readLogoDataUri(),
@@ -83,7 +98,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       clientName: dossier.nom,
       productIds: dossier.productIds,
       productCount: products.length,
-      collaboratorProductCount: collaboratorProducts.length,
+      collaboratorProductCount: pdfCollaboratorProducts.length,
       extrasCount: extras.length,
     },
   });

@@ -161,6 +161,27 @@ export function productsFromDossierLineSnapshot(value: unknown): AnimacioProduct
   return parseDossierLineSnapshot(value)?.products ?? null;
 }
 
+export function hydrateDossierSnapshotProductImages(
+  snapshotProducts: AnimacioProduct[] | null | undefined,
+  catalogProducts: readonly AnimacioProduct[],
+): AnimacioProduct[] | null {
+  if (!snapshotProducts) return null;
+  const byId = new Map(catalogProducts.map((product) => [product.id, product]));
+  const bySourceProductId = new Map(
+    catalogProducts
+      .filter((product) => product.sourceProductId)
+      .map((product) => [product.sourceProductId as string, product]),
+  );
+
+  return snapshotProducts.map((product) => {
+    if (product.image) return product;
+    const liveProduct = byId.get(product.id) ?? (
+      product.sourceProductId ? bySourceProductId.get(product.sourceProductId) : undefined
+    );
+    return liveProduct?.image ? { ...product, image: liveProduct.image } : product;
+  });
+}
+
 export function transportFromDossierLineSnapshot(value: unknown): { travelKm?: number; travelLocation?: string } {
   const snapshot = parseDossierLineSnapshot(value);
   if (!snapshot) return {};

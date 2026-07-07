@@ -11,6 +11,8 @@ describe('partner product seeds visibility', () => {
     expect(masqueradeSeed).toContain("name: 'Bingo Musical KIDS'");
     expect(masqueradeSeed).toContain('category: CHILDREN_CATEGORY');
     expect(masqueradeSeed).toContain('sellPrice: commercialProductPrice(160)');
+    expect(masqueradeSeed).toContain("BINGO_KIDS_IMG = '/img/portfolio/fiestas-infantiles/fiestas-infantiles-06.avif'");
+    expect(masqueradeSeed).toContain('imageUrl: BINGO_KIDS_IMG');
     expect(masqueradeSeed).toContain('visibleInDossier: true');
     expect(masqueradeSeed).toContain('visibleInBooking: true');
   });
@@ -22,5 +24,9 @@ describe('partner product seeds visibility', () => {
     expect(ismaSeed).toContain('sellPrice: 0');
     expect(ismaSeed).toContain('visibleInDossier: false');
     expect(ismaSeed).toContain('visibleInBooking: true');
+  });
+
+  it('quan desactiva productes obsolets de Masquerade també els oculta', () => {
+    expect(masqueradeSeed).toContain('data: { isActive: false, visibleInDossier: false, visibleInBooking: false }');
   });
 });

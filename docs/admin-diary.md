@@ -1,3 +1,28 @@
+## 2026-07-07 — Dossiers amb catàleg net, imatges rehidratades i guards d'esborrat (Canvi #1724, codex)
+
+### Context
+El propietari detecta tres problemes reals en el mateix flux: a `/admin/dossiers` apareixen columnes buides per audiència, alguns dossiers/productes deixen de mostrar imatges encara que el catàleg les tingui, i després d'esborrar coses inactives cal assegurar que col·laboradors/productes/proveïdors no puguin trencar referències de BD sense avisar. També demana separar el DJ autònom de la continuació de DJ quan l'equip ja està muntat i mostrar millor el desplaçament llarg.
+
+### Què s'ha fet
+- `/admin/dossiers`: el catàleg continua agrupat per proveïdor i audiència, però ja no pinta columnes buides; si un proveïdor només té infantils o només adults, només mostra la columna real.
+- Snapshots de dossier: si el producte congelat no té `image`, el servei rehidrata només la imatge des del catàleg viu sense canviar nom, text, preu ni cost congelats; s'aplica al llistat, email i PDF compost.
+- `Bingo Musical KIDS`: s'afegeixen quatre imatges infantils seleccionades al portfolio, el seed canònic apunta el producte a `/img/portfolio/fiestas-infantiles/fiestas-infantiles-06.avif`, i la BD viva queda actualitzada amb aquesta ruta.
+- DJ: s'afegeix el producte propi `Hora extra DJ amb equip muntat` a 100 €, separat de `DJ · primera hora` a 150 €, per poder sumar DJ després d'un bingo/animació sense cobrar una segona arrencada.
+- Desplaçament de dossier: el bloc client manté un sol concepte comercial de desplaçament, però mostra desglossament de vehicle/combustible, operaris en ruta, peatges i dietes quan apliquen.
+- Esborrat segur: eliminar col·laboradors o productes de col·laborador ara comprova dependències abans de borrar; si hi ha productes, membres, leads, reserves, línies, pagaments, bloquejos o dossiers vinculats, retorna `409` amb impacte. Si la BD no pot verificar les dependències, també bloqueja l'esborrat.
+- Masquerade: el producte antic inactiu `Tècnic de so` queda ocult a dossier i booking; el tècnic correcte és el servei propi `tecnic-so` d'Òrbita a 40 €.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\dossiers\DossierGeneratorClient-catalog-layout.test.ts __tests__\app\api\admin\dossiers-composite-route.test.ts __tests__\lib\constants\dossier-copy-products.test.ts __tests__\lib\services\collaboratorAdminService.test.ts __tests__\lib\services\collaboratorProductService.test.ts __tests__\lib\services\dossierMarginGuardService.test.ts __tests__\lib\services\dossierProductMappingService.test.ts __tests__\lib\services\dossierService.test.ts __tests__\lib\services\dossierSnapshotService.test.ts __tests__\lib\utils\dossier-html-builder.test.ts __tests__\scripts\seed-partner-product-visibility.test.ts` (108/108); `pnpm build` OK (`validate:core`, 72 tests de scripts/628 asserts, `tsc`, Next build).
+- Validació funcional: BD viva auditada després del canvi: `deadDossierRefs=[]`; `missingRelations.leadServiceLines=[]`, `bookingServiceLines=[]`, `collaboratorPayments=[]`, `crewBlocks=[]`; `Bingo Musical KIDS` actiu i visible a dossier/booking amb imatge `/img/portfolio/fiestas-infantiles/fiestas-infantiles-06.avif`; `Tècnic de so` Masquerade inactiu i ocult.
+- Validació humana/UX: el dossier deixa de mostrar columnes buides, recupera imatges quan hi ha catàleg viu, diferencia clarament DJ autònom de DJ continuació amb equip ja muntat, i l'admin ja no permet esborrar peces amb dependències sense explicar què ho bloqueja.
+
+### Coordinació
+Counter → 1724. Roadmap Manolo actualitzat dins Sistema/guards, Guardia econòmica i Documents/PDF.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-07 — Productes partner amb visibilitat per context: Bingo KIDS i altaveus Isma (Canvi #1723, codex)
 
 ### Context

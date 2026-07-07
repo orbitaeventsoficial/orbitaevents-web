@@ -1732,6 +1732,26 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1724 — 2026-07-07 — codex (FET)
+- Context: el propietari detecta que `/admin/dossiers` mostra columnes d'audiència buides, alguns productes/dossiers perden imatge, i l'esborrat de peces inactives de Masquerade/proveïdors necessita guardes reals perquè la BD no quedi trencada ni l'admin peti. També demana separar la continuació de DJ amb equip muntat i fer més transparent el desplaçament llarg.
+- Fet:
+  - `app/admin/dossiers/DossierGeneratorClient.tsx` filtra columnes d'audiència buides per proveïdor i només fa dues columnes quan realment hi ha infantil i adult.
+  - `dossierSnapshotService`, `dossierService`, `/api/admin/dossiers/[id]/composite` i el llistat de dossiers rehidraten la imatge des del catàleg viu quan el snapshot antic no en tenia, sense alterar text/preu/cost congelats.
+  - `public/img/portfolio/fiestas-infantiles/*-06..09.avif` i `app/config/portfolio-images.ts` incorporen quatre imatges infantils seleccionades; `Bingo Musical KIDS` passa al seed i a la BD viva amb `/img/portfolio/fiestas-infantiles/fiestas-infantiles-06.avif`.
+  - `orbita-services`, `dossier-copy` i `dossierProductMappingService` afegeixen `Hora extra DJ amb equip muntat` a 100 €, separada de la primera hora de DJ a 150 €.
+  - `dossierMarginGuardService` i `dossier-html-builder` exposen desglossament comercial de desplaçament: vehicle/combustible, operaris en ruta, peatges i dietes quan aplica.
+  - `collaboratorAdminService` i `collaboratorProductService` bloquegen hard-delete amb `409` i impacte si hi ha dependències o si no es poden verificar; el seed de Masquerade també oculta productes obsolets quan els desactiva.
+  - BD viva: `Tècnic de so` antic de Masquerade queda inactiu i ocult a dossier/booking; la font bona del tècnic és el servei propi `tecnic-so`.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\dossiers\DossierGeneratorClient-catalog-layout.test.ts __tests__\app\api\admin\dossiers-composite-route.test.ts __tests__\lib\constants\dossier-copy-products.test.ts __tests__\lib\services\collaboratorAdminService.test.ts __tests__\lib\services\collaboratorProductService.test.ts __tests__\lib\services\dossierMarginGuardService.test.ts __tests__\lib\services\dossierProductMappingService.test.ts __tests__\lib\services\dossierService.test.ts __tests__\lib\services\dossierSnapshotService.test.ts __tests__\lib\utils\dossier-html-builder.test.ts __tests__\scripts\seed-partner-product-visibility.test.ts` (108/108); `pnpm build` OK (`validate:core`, 72 tests scripts/628 asserts, `tsc`, Next build).
+  - Validació funcional: BD viva auditada: `deadDossierRefs=[]`; `missingRelations.leadServiceLines=[]`, `bookingServiceLines=[]`, `collaboratorPayments=[]`, `crewBlocks=[]`; `Bingo Musical KIDS` actiu/visible amb la nova imatge; `Tècnic de so` Masquerade inactiu i ocult.
+  - Validació humana/UX: el propietari deixa de veure columnes buides, el dossier recupera imatge quan el catàleg la coneix, pot sumar DJ després d'un servei amb equip muntat sense cobrar una segona primera hora, veu el desplaçament explicat i rep motius reals si intenta eliminar peces vinculades.
+- Roadmap: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` actualitzat dins Sistema/guards, Guardia econòmica i Documents/PDF.
+- `ADMIN_CHANGE_COUNTER` puja a `1724`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1723 — 2026-07-07 — codex (FET)
 - Context: el propietari demana incorporar `Bingo Musical KIDS` als dossiers i modelar el lloguer d'altaveus d'Isma per 50 € com a cost necessari del DJ. La causa estructural és que `CollaboratorProduct` feia de catàleg comercial de dossier i de catàleg intern de bolo alhora; això exposaria un cost intern com si fos producte client-facing.
 - Fet:

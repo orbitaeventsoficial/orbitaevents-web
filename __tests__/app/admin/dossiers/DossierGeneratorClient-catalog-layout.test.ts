@@ -11,7 +11,10 @@ describe('DossierGeneratorClient catalog layout', () => {
     expect(source).toContain('dossierProductGroupKey(product) === group');
     expect(source).toContain("key: 'infantil' as const");
     expect(source).toContain("key: 'adult' as const");
+    expect(source).toContain('].filter(({ items }) => items.length > 0)');
+    expect(source).toContain("audienceColumns.length > 1 ? 'xl:grid-cols-2' : ''");
     expect(source).toContain('ADMIN_DOSSIER_GENERATOR_COPY.catalog.audiences[key]');
+    expect(source).not.toContain('{audienceCopy.empty}');
     expect(source).not.toContain('const productAudienceColumns = useMemo');
   });
 

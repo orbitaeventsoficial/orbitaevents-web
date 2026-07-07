@@ -21,6 +21,9 @@ describe('dossierMarginGuardService', () => {
     expect(budget.km).toBe(120);
     expect(budget.cost).toBeGreaterThan(0);
     expect(budget.clientCharge).toBeGreaterThan(0);
+    expect(budget.clientVehicleCost).toBeGreaterThan(0);
+    expect(budget.peopleCost).toBeGreaterThan(0);
+    expect(budget.chargeableHours).toBeGreaterThan(0);
   });
 
   it('marca OK un subcontractat amb +20% sobre cost', () => {

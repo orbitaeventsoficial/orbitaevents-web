@@ -11,9 +11,23 @@ const { mockPrisma } = vi.hoisted(() => ({
     },
     lead: {
       groupBy: vi.fn(),
+      count: vi.fn(),
     },
     booking: {
       groupBy: vi.fn(),
+      count: vi.fn(),
+    },
+    leadServiceLine: {
+      count: vi.fn(),
+    },
+    bookingServiceLine: {
+      count: vi.fn(),
+    },
+    collaboratorPayment: {
+      count: vi.fn(),
+    },
+    crewBlock: {
+      count: vi.fn(),
     },
   },
 }));
@@ -36,7 +50,13 @@ beforeEach(() => {
   mockPrisma.collaborator.update.mockResolvedValue({ id: 'c1' });
   mockPrisma.collaborator.delete.mockResolvedValue({});
   mockPrisma.lead.groupBy.mockResolvedValue([]);
+  mockPrisma.lead.count.mockResolvedValue(0);
   mockPrisma.booking.groupBy.mockResolvedValue([]);
+  mockPrisma.booking.count.mockResolvedValue(0);
+  mockPrisma.leadServiceLine.count.mockResolvedValue(0);
+  mockPrisma.bookingServiceLine.count.mockResolvedValue(0);
+  mockPrisma.collaboratorPayment.count.mockResolvedValue(0);
+  mockPrisma.crewBlock.count.mockResolvedValue(0);
 });
 
 describe('listAdminCollaborators', () => {
@@ -218,9 +238,53 @@ describe('updateAdminCollaborator', () => {
 
 describe('deleteAdminCollaborator', () => {
   it('elimina per id', async () => {
+    mockPrisma.collaborator.findUnique.mockResolvedValue({
+      id: 'c1',
+      _count: { products: 0, members: 0 },
+    });
     const result = await deleteAdminCollaborator('c1');
 
     expect(result.status).toBe(200);
     expect(mockPrisma.collaborator.delete).toHaveBeenCalledWith({ where: { id: 'c1' } });
+  });
+
+  it('retorna 404 si el col·laborador no existeix', async () => {
+    mockPrisma.collaborator.findUnique.mockResolvedValue(null);
+
+    const result = await deleteAdminCollaborator('ghost');
+
+    expect(result.status).toBe(404);
+    expect(mockPrisma.collaborator.delete).not.toHaveBeenCalled();
+  });
+
+  it('bloqueja l esborrat si encara té dependències operatives', async () => {
+    mockPrisma.collaborator.findUnique.mockResolvedValue({
+      id: 'c1',
+      _count: { products: 1, members: 0 },
+    });
+    mockPrisma.bookingServiceLine.count.mockResolvedValueOnce(2);
+
+    const result = await deleteAdminCollaborator('c1');
+
+    expect(result.status).toBe(409);
+    expect(result.body.impact).toEqual(expect.objectContaining({
+      products: 1,
+      bookingServiceLines: 2,
+    }));
+    expect(mockPrisma.collaborator.delete).not.toHaveBeenCalled();
+  });
+
+  it('bloqueja l esborrat si no pot verificar totes les dependències', async () => {
+    mockPrisma.collaborator.findUnique.mockResolvedValue({
+      id: 'c1',
+      _count: { products: 0, members: 0 },
+    });
+    mockPrisma.leadServiceLine.count.mockRejectedValueOnce(new Error('relation missing'));
+
+    const result = await deleteAdminCollaborator('c1');
+
+    expect(result.status).toBe(409);
+    expect(result.body.impact).toEqual({ verificationFailed: ['leadServiceLines'] });
+    expect(mockPrisma.collaborator.delete).not.toHaveBeenCalled();
   });
 });

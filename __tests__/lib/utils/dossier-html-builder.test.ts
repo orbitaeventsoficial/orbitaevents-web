@@ -58,6 +58,11 @@ const copy: DossierCopy = {
     travelNote: 'Inclòs fins a {includedKm} km; després, cost real del trajecte.',
     travelRoute: 'El vostre esdeveniment és a {location}, a uns {km} km des de Granollers.',
     travelPriceLabel: 'Cost del desplaçament',
+    travelBreakdownLabel: 'Desglossament',
+    travelBreakdownVehicle: 'Vehicle i combustible',
+    travelBreakdownPeople: '{headcount} operaris en ruta · {hours} h',
+    travelBreakdownTolls: 'Peatges de ruta',
+    travelBreakdownMeals: 'Dietes de ruta llarga',
     vatNote: "Preus orientatius; l'IVA es tanca a la proposta.",
   },
   cta: { label: 'Per confirmar disponibilitat o per a qualsevol dubte' },
@@ -270,6 +275,10 @@ describe('buildDossierHtml', () => {
     expect(html).toContain("l'Aldosa");
     expect(html).toContain('422');
     expect(html).toContain('Cost del desplaçament');
+    expect(html).toContain('Desglossament');
+    expect(html).toContain('Vehicle i combustible');
+    expect(html).toContain('2 operaris en ruta');
+    expect(html).toContain('Dietes de ruta llarga');
     // Tot dins la mateixa (única) pàgina de proposta.
     expect(html.match(/class="resum-page"/g)?.length).toBe(1);
   });

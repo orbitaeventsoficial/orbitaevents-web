@@ -210,7 +210,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
         audienceColumns: [
           { key: 'infantil' as const, items: groupProducts.filter(isInfantilDossierProduct) },
           { key: 'adult' as const, items: groupProducts.filter((product) => !isInfantilDossierProduct(product)) },
-        ],
+        ].filter(({ items }) => items.length > 0),
       };
     })
     .filter(({ items }) => items.length > 0), [products]);
@@ -1031,7 +1031,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
                       </div>
                       <span className="ap-badge shrink-0">{items.length} {ADMIN_DOSSIER_GENERATOR_COPY.catalog.serviceCountLabel}</span>
                     </div>
-                    <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+                    <div className={`grid grid-cols-1 gap-3 ${audienceColumns.length > 1 ? 'xl:grid-cols-2' : ''}`}>
                       {audienceColumns.map(({ key, items: audienceItems }) => {
                         const audienceCopy = ADMIN_DOSSIER_GENERATOR_COPY.catalog.audiences[key];
                         return (
@@ -1040,39 +1040,33 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
                               <span className="font-mono text-xs font-bold uppercase tracking-[0.08em] text-[var(--t2)]">{audienceCopy.title}</span>
                               <span className="text-xs text-[var(--t3)]">{audienceItems.length}</span>
                             </div>
-                            {audienceItems.length === 0 ? (
-                              <p className="rounded-[var(--o-r-sm)] border border-dashed border-[var(--line2)] px-3 py-2.5 text-xs text-[var(--t3)]">
-                                {audienceCopy.empty}
-                              </p>
-                            ) : (
-                              <div className="grid grid-cols-1 gap-2.5">
-                                {audienceItems.map((p) => {
-                                  const checked = selectedIds.has(p.id);
-                                  const priceLabel = productPriceLabel(p);
-                                  return (
-                                    <label
-                                      key={p.id}
-                                      className={`flex min-h-16 cursor-pointer items-center gap-3 rounded-[var(--o-r-sm)] border bg-[var(--panel)] px-3.5 py-3 transition-colors hover:border-[var(--gold)] ${checked ? 'border-[var(--gold)] bg-[var(--ax-gold-tint-1)]' : 'border-[var(--line)]'}`}
-                                    >
-                                      <input type="checkbox" checked={checked} onChange={() => toggleProduct(p.id)} className="sr-only" aria-label={`Incloure ${p.nom}`} />
-                                      {p.image && (
-                                        <span className="relative h-14 w-20 shrink-0 overflow-hidden rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)]">
-                                          <Image src={p.image} alt="" fill sizes="5rem" className="object-cover" />
-                                        </span>
-                                      )}
-                                      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                                        <span className="flex min-w-0 items-center gap-2">
-                                          <span className="font-semibold text-[var(--t)]">{p.nom}</span>
-                                          <span className="ap-badge shrink-0">{productBadge(p)}</span>
-                                        </span>
-                                        {priceLabel && <span className="text-xs text-[var(--t3)]">{priceLabel}</span>}
-                                      </div>
-                                      <div className={`flex h-[1.375rem] w-[1.375rem] items-center justify-center rounded-full border-2 text-xs ${checked ? 'border-[var(--gold)] bg-[var(--gold)] text-[var(--canvas)]' : 'border-[var(--line2)] text-transparent'}`}>✓</div>
-                                    </label>
-                                  );
-                                })}
-                              </div>
-                            )}
+                            <div className="grid grid-cols-1 gap-2.5">
+                              {audienceItems.map((p) => {
+                                const checked = selectedIds.has(p.id);
+                                const priceLabel = productPriceLabel(p);
+                                return (
+                                  <label
+                                    key={p.id}
+                                    className={`flex min-h-16 cursor-pointer items-center gap-3 rounded-[var(--o-r-sm)] border bg-[var(--panel)] px-3.5 py-3 transition-colors hover:border-[var(--gold)] ${checked ? 'border-[var(--gold)] bg-[var(--ax-gold-tint-1)]' : 'border-[var(--line)]'}`}
+                                  >
+                                    <input type="checkbox" checked={checked} onChange={() => toggleProduct(p.id)} className="sr-only" aria-label={`Incloure ${p.nom}`} />
+                                    {p.image && (
+                                      <span className="relative h-14 w-20 shrink-0 overflow-hidden rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)]">
+                                        <Image src={p.image} alt="" fill sizes="5rem" className="object-cover" />
+                                      </span>
+                                    )}
+                                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                                      <span className="flex min-w-0 items-center gap-2">
+                                        <span className="font-semibold text-[var(--t)]">{p.nom}</span>
+                                        <span className="ap-badge shrink-0">{productBadge(p)}</span>
+                                      </span>
+                                      {priceLabel && <span className="text-xs text-[var(--t3)]">{priceLabel}</span>}
+                                    </div>
+                                    <div className={`flex h-[1.375rem] w-[1.375rem] items-center justify-center rounded-full border-2 text-xs ${checked ? 'border-[var(--gold)] bg-[var(--gold)] text-[var(--canvas)]' : 'border-[var(--line2)] text-transparent'}`}>✓</div>
+                                  </label>
+                                );
+                              })}
+                            </div>
                           </section>
                         );
                       })}

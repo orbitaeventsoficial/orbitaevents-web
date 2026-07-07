@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockPrisma, mockSendEmail, mockBuildHtml } = vi.hoisted(() => ({
+const {
+  mockPrisma,
+  mockSendEmail,
+  mockBuildHtml,
+  mockGetDossierCollaboratorProductsByIds,
+  mockCollaboratorProductToAnimacioProduct,
+} = vi.hoisted(() => ({
   mockPrisma: {
     dossier: {
       create: vi.fn(),
@@ -20,11 +26,17 @@ const { mockPrisma, mockSendEmail, mockBuildHtml } = vi.hoisted(() => ({
   },
   mockSendEmail: vi.fn(),
   mockBuildHtml: vi.fn(),
+  mockGetDossierCollaboratorProductsByIds: vi.fn(),
+  mockCollaboratorProductToAnimacioProduct: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }));
 vi.mock('@/lib/utils/dossier-html-builder', () => ({ buildDossierHtml: mockBuildHtml }));
+vi.mock('@/lib/services/collaboratorProductService', () => ({
+  getDossierCollaboratorProductsByIds: mockGetDossierCollaboratorProductsByIds,
+  collaboratorProductToAnimacioProduct: mockCollaboratorProductToAnimacioProduct,
+}));
 vi.mock('@/lib/constants/animacio-products', () => ({
   ANIMACIO_PRODUCTS: [
     { id: 'bingo-musical', nom: 'Bingo Musical', descripcio: [], inclou: [] },
@@ -52,7 +64,19 @@ vi.mock('@/lib/constants/dossier-copy', () => ({
     },
     chapter: { eyebrow: '', priceLabel: '', priceFromPrefix: '', priceCustom: '', durationLabel: '', includesTitle: '', noteLabel: '' },
     resum: { kicker: '', title: '', lead: '' },
-    budget: { servicesLabel: '', travelTitle: '', travelNote: '', travelRoute: '', travelPriceLabel: '', vatNote: '' },
+    budget: {
+      servicesLabel: '',
+      travelTitle: '',
+      travelNote: '',
+      travelRoute: '',
+      travelPriceLabel: '',
+      travelBreakdownLabel: '',
+      travelBreakdownVehicle: '',
+      travelBreakdownPeople: '',
+      travelBreakdownTolls: '',
+      travelBreakdownMeals: '',
+      vatNote: '',
+    },
     cta: { label: '' },
   })),
   getOrbitaDossierProducts: vi.fn(async () => []),
@@ -76,6 +100,8 @@ import {
 beforeEach(() => {
   vi.clearAllMocks();
   mockBuildHtml.mockReturnValue('<html>dossier</html>');
+  mockGetDossierCollaboratorProductsByIds.mockResolvedValue([]);
+  mockCollaboratorProductToAnimacioProduct.mockImplementation((product: unknown) => product);
   mockPrisma.adminLog.create.mockResolvedValue({});
 });
 

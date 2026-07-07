@@ -335,6 +335,55 @@ export async function updateCollaboratorProduct(productId: string, input: Collab
 }
 
 export async function deleteCollaboratorProduct(productId: string) {
+  const product = await prisma.collaboratorProduct.findUnique({
+    where: { id: productId },
+    select: {
+      id: true,
+      name: true,
+      isActive: true,
+      visibleInDossier: true,
+      visibleInBooking: true,
+    },
+  });
+  if (!product) {
+    return { status: 404, body: { error: 'Producte no trobat' } };
+  }
+
+  const dossierRef = toDossierCollaboratorProductId(productId);
+  let dossierCount: number;
+  try {
+    dossierCount = await prisma.dossier.count({ where: { productIds: { has: dossierRef } } });
+  } catch {
+    return {
+      status: 409,
+      body: {
+        error: 'No s’han pogut verificar els dossiers vinculats a aquest producte. No s’elimina res fins que la base de dades respongui correctament.',
+        impact: {
+          isActive: product.isActive,
+          visibleInDossier: product.visibleInDossier,
+          visibleInBooking: product.visibleInBooking,
+          verificationFailed: ['dossierRefs'],
+        },
+      },
+    };
+  }
+  if (product.isActive || dossierCount > 0) {
+    return {
+      status: 409,
+      body: {
+        error: dossierCount > 0
+          ? 'Aquest producte encara apareix en dossiers guardats. Desactiva’l; no l’eliminis del tot.'
+          : 'Aquest producte encara és actiu. Desactiva’l abans d’eliminar-lo.',
+        impact: {
+          isActive: product.isActive,
+          visibleInDossier: product.visibleInDossier,
+          visibleInBooking: product.visibleInBooking,
+          dossierRefs: dossierCount,
+        },
+      },
+    };
+  }
+
   await prisma.collaboratorProduct.delete({ where: { id: productId } });
   return { status: 200, body: { ok: true } };
 }

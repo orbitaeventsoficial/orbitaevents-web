@@ -7203,6 +7203,11 @@
       "travelNote": "Incluido hasta {includedKm} km desde Granollers. En rutas más largas, el desplazamiento se calcula de forma transparente según la distancia y el equipo que hay que mover.",
       "travelRoute": "Vuestro evento es en {location}, a unos {km} km (ida y vuelta) desde Granollers. El desplazamiento se aplica sobre esta ruta.",
       "travelPriceLabel": "Coste del desplazamiento",
+      "travelBreakdownLabel": "Desglose",
+      "travelBreakdownVehicle": "Vehículo y combustible",
+      "travelBreakdownPeople": "{headcount} operarios en ruta · {hours} h",
+      "travelBreakdownTolls": "Peajes de ruta",
+      "travelBreakdownMeals": "Dietas de ruta larga",
       "vatNote": "Precios orientativos. El IVA y los ajustes finales se cierran en la propuesta definitiva."
     },
     "cta": {
@@ -7219,6 +7224,18 @@
           "DJ profesional",
           "Primera hora ({first})",
           "Cada hora de más (+{extra})"
+        ]
+      },
+      "dj-hora-equip-muntat": {
+        "nom": "Hora extra DJ con equipo montado",
+        "descripcio": [
+          "Una hora de DJ para alargar la fiesta cuando el sonido ya está montado por una animación, un bingo o una propuesta previa.",
+          "Es la forma correcta de sumar música después de un servicio que ya lleva equipo operativo: {continuation} por hora, sin volver a cobrar el arranque del DJ autónomo."
+        ],
+        "inclou": [
+          "DJ profesional",
+          "Hora adicional con equipo ya montado ({continuation})",
+          "Continuidad musical después de la actividad principal"
         ]
       },
       "bombolles": {

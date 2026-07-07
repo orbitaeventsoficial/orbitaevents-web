@@ -24,7 +24,10 @@ import Link from 'next/link';
 import { DossierListActions } from './DossierListActions';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
-import { productsFromDossierLineSnapshot } from '@/lib/services/dossierSnapshotService';
+import {
+  hydrateDossierSnapshotProductImages,
+  productsFromDossierLineSnapshot,
+} from '@/lib/services/dossierSnapshotService';
 import { DossierDraftCreateButton } from './DossierDraftCreateButton';
 
 export const metadata = { title: 'Dossiers' };
@@ -203,7 +206,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
         <AdminSection title={`Dossiers desats (${dossiers.length})`}>
           <div className="flex flex-col gap-2">
             {dossiers.map((d) => {
-              const snapshotProducts = productsFromDossierLineSnapshot(d.lineSnapshot);
+              const snapshotProducts = hydrateDossierSnapshotProductImages(productsFromDossierLineSnapshot(d.lineSnapshot), lookupProducts);
               const resolvedProducts = snapshotProducts ?? lookupProducts.filter((p) => d.productIds.includes(p.id));
               const productNames = resolvedProducts.map((p) => p.nom).join(' · ');
               return (
@@ -273,7 +276,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
         >
           <div className="flex flex-col gap-2">
             {deletedDossiers.map((d) => {
-              const snapshotProducts = productsFromDossierLineSnapshot(d.lineSnapshot);
+              const snapshotProducts = hydrateDossierSnapshotProductImages(productsFromDossierLineSnapshot(d.lineSnapshot), lookupProducts);
               const resolvedProducts = snapshotProducts ?? lookupProducts.filter((p) => d.productIds.includes(p.id));
               const productNames = resolvedProducts.map((p) => p.nom).join(' · ');
               return (

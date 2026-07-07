@@ -12,6 +12,7 @@ import {
   getDossierCollaboratorProductsByIds,
 } from '@/lib/services/collaboratorProductService';
 import {
+  hydrateDossierSnapshotProductImages,
   parseDossierLineSnapshot,
   productsFromDossierLineSnapshot,
   transportFromDossierLineSnapshot,
@@ -243,16 +244,21 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
   if (!dossier.email) return { ok: false, error: 'El dossier no té email de destinatari' };
   const origin = await resolveDossierTraceOrigin(dossier.leadId);
 
-  const [allProducts, orbitaProducts, dossierCopy] = await Promise.all([
+  const [allProducts, orbitaProducts, dossierCopy, collaboratorDossierProducts] = await Promise.all([
     getAnimacioProducts('ca'),
     getOrbitaDossierProducts('ca'),
     getDossierCopy('ca'),
+    getDossierCollaboratorProductsByIds(dossier.productIds),
   ]);
-  const snapshotProducts = productsFromDossierLineSnapshot(dossier.lineSnapshot);
+  const collaboratorProducts = collaboratorDossierProducts.map(collaboratorProductToAnimacioProduct);
+  const snapshotProducts = hydrateDossierSnapshotProductImages(
+    productsFromDossierLineSnapshot(dossier.lineSnapshot),
+    [...orbitaProducts, ...allProducts, ...collaboratorProducts],
+  );
   const products = snapshotProducts ?? [
     ...orbitaProducts.filter((p) => dossier.productIds.includes(p.id)),
     ...allProducts.filter((p) => dossier.productIds.includes(p.id)),
-    ...(await getDossierCollaboratorProductsByIds(dossier.productIds)).map(collaboratorProductToAnimacioProduct),
+    ...collaboratorProducts,
   ];
   const recipientEmail = dossier.email!;
   const clientInfo: DossierClientInfo = {

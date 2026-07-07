@@ -14,6 +14,7 @@ const prisma = new PrismaClient();
 
 const COLLABORATOR_ID = 'carlos-lucas-fernandez';
 const IMG = '/img/collaborators/masquerade';
+const BINGO_KIDS_IMG = '/img/portfolio/fiestas-infantiles/fiestas-infantiles-06.avif';
 // Km inclosos canònics (font única: travelCost). Avui 20 km/sentit des de Granollers.
 const INCLUDED_KM = getIncludedTravelOneWayKm();
 const INCLUDES = `Vestuari d'alta qualitat · Desplaçament inclòs fins a ${INCLUDED_KM} km · Disponible en català`;
@@ -50,7 +51,7 @@ const PRODUCTS = [
     durationLabel: '1h',
     costPrice: 160,
     sellPrice: commercialProductPrice(160),
-    imageUrl: `${IMG}/bingo-musical.jpg`,
+    imageUrl: BINGO_KIDS_IMG,
     description: "Versió infantil i familiar del Bingo Musical, especialment pensada per a nens i nenes de 6 a 12 anys i també per als pares. Una hora de música, joc i participació amb cançons enfocades al jovent actual, dinàmiques per a la mainada, dues línies i el bingo final. Manté l'energia del format gran però amb una durada més curta i un ritme adaptat a casals, escoles i festes familiars.",
     includes: `${INCLUDES} · Cartons i gomets de bingo · Dinàmiques infantils · Dues línies i bingo final`,
     isActive: true,
@@ -200,7 +201,7 @@ async function main() {
       name: { notIn: canonicalNames },
       isActive: true,
     },
-    data: { isActive: false },
+    data: { isActive: false, visibleInDossier: false, visibleInBooking: false },
   });
   if (obsolete.count > 0) {
     console.log(`\n${obsolete.count} producte(s) antic(s) de Masquerade desactivat(s) perquè no surten al Word.`);

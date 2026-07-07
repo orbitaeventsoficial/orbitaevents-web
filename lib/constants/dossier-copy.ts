@@ -4,6 +4,7 @@ import { formatCurrency, toIntlLocale } from '@/lib/constants';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import type { DossierCopy } from '@/lib/utils/dossier-html-builder';
 import {
+  DJ_CONTINUATION_HOUR_PRICE,
   DJ_FIRST_HOUR_PRICE,
   DJ_EXTRA_HOUR_PRICE,
   ORBITA_SERVICES,
@@ -36,6 +37,7 @@ type OwnProductDef = { msgKey: string; serviceId: string; categoria: string; ima
 
 const ORBITA_DOSSIER_PRODUCTS: ReadonlyArray<{ id: string } & OwnProductDef> = [
   { id: 'orbita:dj-primera-hora', msgKey: 'dj-primera-hora', serviceId: 'dj-primera-hora', categoria: 'DJ', image: '/img/portfolio/discomovil/discomovil-01.avif' },
+  { id: 'orbita:dj-hora-equip-muntat', msgKey: 'dj-hora-equip-muntat', serviceId: 'dj-hora-equip-muntat', categoria: 'DJ', image: '/img/portfolio/discomovil/discomovil-01.avif' },
   { id: 'orbita:bombolles', msgKey: 'bombolles', serviceId: 'bombolles', categoria: 'Efectes' },
   { id: 'orbita:pont-llums-caps-mobils', msgKey: 'pont-llums-caps-mobils', serviceId: 'caps-mobils', categoria: 'Llums', image: '/img/portfolio/produccion-tecnica/produccion-tecnica-01.avif' },
   { id: 'orbita:operari-extra', msgKey: 'operari-extra', serviceId: 'operari-extra', categoria: 'Operativa' },
@@ -46,8 +48,12 @@ export async function getOrbitaDossierProducts(locale = 'ca'): Promise<AnimacioP
   const intl = toIntlLocale(locale);
   const firstHourLabel = formatCurrency(DJ_FIRST_HOUR_PRICE, intl);
   const extraHourLabel = formatCurrency(DJ_EXTRA_HOUR_PRICE, intl);
+  const continuationHourLabel = formatCurrency(DJ_CONTINUATION_HOUR_PRICE, intl);
   const interp = (value: string) =>
-    value.replace(/\{first\}/g, firstHourLabel).replace(/\{extra\}/g, extraHourLabel);
+    value
+      .replace(/\{first\}/g, firstHourLabel)
+      .replace(/\{extra\}/g, extraHourLabel)
+      .replace(/\{continuation\}/g, continuationHourLabel);
 
   const byId = new Map(ORBITA_SERVICES.map((service) => [service.id, service]));
 

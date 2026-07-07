@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     collaboratorProduct: {
+      findUnique: vi.fn(),
       findMany: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
@@ -10,6 +11,9 @@ const { mockPrisma } = vi.hoisted(() => ({
     },
     collaborator: {
       findUnique: vi.fn(),
+    },
+    dossier: {
+      count: vi.fn(),
     },
   },
 }));
@@ -32,6 +36,14 @@ import {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockPrisma.collaboratorProduct.findUnique.mockResolvedValue({
+    id: 'p1',
+    name: 'Producte inactiu',
+    isActive: false,
+    visibleInDossier: false,
+    visibleInBooking: false,
+  });
+  mockPrisma.dossier.count.mockResolvedValue(0);
 });
 
 describe('stripProviderBrand', () => {
@@ -263,10 +275,64 @@ describe('updateCollaboratorProduct', () => {
 });
 
 describe('deleteCollaboratorProduct', () => {
-  it('elimina el producte', async () => {
+  it('elimina el producte només si és inactiu i sense dossiers vinculats', async () => {
     mockPrisma.collaboratorProduct.delete.mockResolvedValue({});
     const res = await deleteCollaboratorProduct('p1');
     expect(res.status).toBe(200);
+    expect(mockPrisma.dossier.count).toHaveBeenCalledWith({
+      where: { productIds: { has: 'collab:p1' } },
+    });
     expect(mockPrisma.collaboratorProduct.delete).toHaveBeenCalledWith({ where: { id: 'p1' } });
+  });
+
+  it('retorna 404 si el producte no existeix', async () => {
+    mockPrisma.collaboratorProduct.findUnique.mockResolvedValueOnce(null);
+
+    const res = await deleteCollaboratorProduct('ghost');
+
+    expect(res.status).toBe(404);
+    expect(mockPrisma.collaboratorProduct.delete).not.toHaveBeenCalled();
+  });
+
+  it('bloqueja esborrar un producte actiu visible', async () => {
+    mockPrisma.collaboratorProduct.findUnique.mockResolvedValueOnce({
+      id: 'p1',
+      name: 'Bingo Musical KIDS',
+      isActive: true,
+      visibleInDossier: true,
+      visibleInBooking: true,
+    });
+
+    const res = await deleteCollaboratorProduct('p1');
+
+    expect(res.status).toBe(409);
+    expect(res.body.impact).toEqual(expect.objectContaining({
+      isActive: true,
+      visibleInDossier: true,
+      visibleInBooking: true,
+    }));
+    expect(mockPrisma.collaboratorProduct.delete).not.toHaveBeenCalled();
+  });
+
+  it('bloqueja esborrar un producte inactiu si algun dossier el referencia', async () => {
+    mockPrisma.dossier.count.mockResolvedValueOnce(2);
+
+    const res = await deleteCollaboratorProduct('p1');
+
+    expect(res.status).toBe(409);
+    expect(res.body.impact).toEqual(expect.objectContaining({ dossierRefs: 2 }));
+    expect(mockPrisma.collaboratorProduct.delete).not.toHaveBeenCalled();
+  });
+
+  it('bloqueja esborrar si no pot verificar dossiers vinculats', async () => {
+    mockPrisma.dossier.count.mockRejectedValueOnce(new Error('db down'));
+
+    const res = await deleteCollaboratorProduct('p1');
+
+    expect(res.status).toBe(409);
+    expect(res.body.impact).toEqual(expect.objectContaining({
+      verificationFailed: ['dossierRefs'],
+    }));
+    expect(mockPrisma.collaboratorProduct.delete).not.toHaveBeenCalled();
   });
 });

@@ -6,8 +6,11 @@ const {
   mockGetDossierById,
   mockResolveDossierTraceOrigin,
   mockGetAnimacioProducts,
+  mockGetOrbitaProducts,
   mockGetCollaboratorProducts,
+  mockCollaboratorToAnimacioProduct,
   mockProductsFromSnapshot,
+  mockHydrateSnapshot,
   mockGeneratePdf,
   mockAdminLogCreate,
 } = vi.hoisted(() => ({
@@ -15,21 +18,31 @@ const {
   mockGetDossierById: vi.fn(),
   mockResolveDossierTraceOrigin: vi.fn(),
   mockGetAnimacioProducts: vi.fn(),
+  mockGetOrbitaProducts: vi.fn(),
   mockGetCollaboratorProducts: vi.fn(),
+  mockCollaboratorToAnimacioProduct: vi.fn(),
   mockProductsFromSnapshot: vi.fn(),
+  mockHydrateSnapshot: vi.fn(),
   mockGeneratePdf: vi.fn(),
   mockAdminLogCreate: vi.fn(),
 }));
 
 vi.mock('@/lib/auth', () => ({ requireAuth: mockRequireAuth }));
 vi.mock('@/lib/constants/animacio-products-resolver', () => ({ getAnimacioProducts: mockGetAnimacioProducts }));
+vi.mock('@/lib/constants/dossier-copy', () => ({ getOrbitaDossierProducts: mockGetOrbitaProducts }));
 vi.mock('@/lib/services/dossierService', () => ({
   getDossierById: mockGetDossierById,
   resolveDossierTraceOrigin: mockResolveDossierTraceOrigin,
 }));
 vi.mock('@/lib/services/dossierCompositePdfService', () => ({ generateDossierCompositePDF: mockGeneratePdf }));
-vi.mock('@/lib/services/collaboratorProductService', () => ({ getDossierCollaboratorProductsByIds: mockGetCollaboratorProducts }));
-vi.mock('@/lib/services/dossierSnapshotService', () => ({ productsFromDossierLineSnapshot: mockProductsFromSnapshot }));
+vi.mock('@/lib/services/collaboratorProductService', () => ({
+  getDossierCollaboratorProductsByIds: mockGetCollaboratorProducts,
+  collaboratorProductToAnimacioProduct: mockCollaboratorToAnimacioProduct,
+}));
+vi.mock('@/lib/services/dossierSnapshotService', () => ({
+  productsFromDossierLineSnapshot: mockProductsFromSnapshot,
+  hydrateDossierSnapshotProductImages: mockHydrateSnapshot,
+}));
 vi.mock('@/lib/prisma', () => ({ prisma: { adminLog: { create: mockAdminLogCreate } } }));
 
 import { GET } from '@/app/api/admin/dossiers/[id]/composite/route';
@@ -64,7 +77,10 @@ describe('GET /api/admin/dossiers/[id]/composite', () => {
     mockGetAnimacioProducts.mockResolvedValue([
       { id: 'p1', nom: 'Bingo', durada: '1h', descripcio: ['Desc'], inclou: ['Equip'] },
     ]);
+    mockGetOrbitaProducts.mockResolvedValue([]);
     mockGetCollaboratorProducts.mockResolvedValue([]);
+    mockCollaboratorToAnimacioProduct.mockImplementation((product: unknown) => product);
+    mockHydrateSnapshot.mockImplementation((products: unknown) => products);
     mockGeneratePdf.mockResolvedValue({
       output: () => new Uint8Array([1, 2, 3]).buffer,
     });

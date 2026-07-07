@@ -5,9 +5,8 @@ import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 import { computeDossierTransportBudget } from '@/lib/services/dossierMarginGuardService';
 
 /** Càrrec de transport al client per a la ruta del dossier (un sol cervell). */
-function dossierTravelCharge(travelKm: number): number {
-  if (travelKm <= 0) return 0;
-  return computeDossierTransportBudget(travelKm).clientCharge;
+function dossierTravelBudget(travelKm: number) {
+  return computeDossierTransportBudget(travelKm);
 }
 
 export type DossierClientInfo = {
@@ -55,6 +54,11 @@ export type DossierCopy = {
     travelNote: string;
     travelRoute: string;
     travelPriceLabel: string;
+    travelBreakdownLabel: string;
+    travelBreakdownVehicle: string;
+    travelBreakdownPeople: string;
+    travelBreakdownTolls: string;
+    travelBreakdownMeals: string;
     vatNote: string;
   };
   cta: { label: string };
@@ -166,8 +170,9 @@ function buildProposalBlock(
   const money = (n: number) => escHtml(formatCurrency(n, locale));
   const fromPrefix = escHtml(copy.chapter.priceFromPrefix);
   const includedOneWay = Math.round(INCLUDED_TRAVEL_KM / 2);
-  const fill = (tpl: string, vars: Record<string, string>) =>
-    escHtml(Object.entries(vars).reduce((s, [k, v]) => s.split(`{${k}}`).join(v), tpl));
+  const fillRaw = (tpl: string, vars: Record<string, string>) =>
+    Object.entries(vars).reduce((s, [k, v]) => s.split(`{${k}}`).join(v), tpl);
+  const fill = (tpl: string, vars: Record<string, string>) => escHtml(fillRaw(tpl, vars));
 
   const rows = products
     .map((p, i) => {
@@ -191,10 +196,33 @@ function buildProposalBlock(
     })
     .join('\n      ');
 
-  // Desplaçament JUST DESPRÉS dels productes: explicació de principi (la copy ja diu «temps de
-  // l'equip + vehicle, a cost, sense sorpreses» — sense itemitzar dietes ni exposar el cost
-  // intern) + la ruta real + el cost concret d'aquesta ruta si es coneix.
-  const travelCharge = dossierTravelCharge(travelKm);
+  // Desplaçament JUST DESPRÉS dels productes: ruta real, cost client i desglossament
+  // comercial dels conceptes que expliquen el preu sense convertir-los en productes.
+  const travelBudget = dossierTravelBudget(travelKm);
+  const travelCharge = travelBudget.clientCharge;
+  const travelBreakdownRows = [
+    travelBudget.clientVehicleCost > 0
+      ? { label: copy.budget.travelBreakdownVehicle, amount: travelBudget.clientVehicleCost }
+      : null,
+    travelBudget.peopleCost > 0
+      ? {
+          label: fillRaw(copy.budget.travelBreakdownPeople, {
+            headcount: String(travelBudget.headcount),
+            hours: new Intl.NumberFormat(locale, {
+              minimumFractionDigits: travelBudget.chargeableHours % 1 === 0 ? 0 : 1,
+              maximumFractionDigits: 1,
+            }).format(travelBudget.chargeableHours),
+          }),
+          amount: travelBudget.peopleCost,
+        }
+      : null,
+    travelBudget.tollsCost > 0
+      ? { label: copy.budget.travelBreakdownTolls, amount: travelBudget.tollsCost }
+      : null,
+    travelBudget.mealAllowance > 0
+      ? { label: copy.budget.travelBreakdownMeals, amount: travelBudget.mealAllowance }
+      : null,
+  ].filter((row): row is { label: string; amount: number } => Boolean(row));
   const travelSection = travelKm > 0 ? `
     <div class="bud-travel">
       <div class="bud-travel-marker" aria-hidden="true">
@@ -208,6 +236,10 @@ function buildProposalBlock(
         ${travelCharge > 0 ? `<div class="bud-travel-price">
           <span class="bud-travel-price-label">${escHtml(copy.budget.travelPriceLabel)}</span>
           <span class="bud-travel-price-val">${money(travelCharge)}</span>
+          ${travelBreakdownRows.length > 0 ? `<div class="bud-travel-breakdown">
+            <span class="bud-travel-breakdown-title">${escHtml(copy.budget.travelBreakdownLabel)}</span>
+            ${travelBreakdownRows.map((row) => `<span class="bud-travel-breakdown-row"><span>${escHtml(row.label)}</span><strong>${money(row.amount)}</strong></span>`).join('')}
+          </div>` : ''}
         </div>` : ''}
       </div>
     </div>` : '';
@@ -521,6 +553,17 @@ export function buildDossierHtml(
     .bud-travel-price { margin-top: 22px; border-left: 1px solid var(--o-gold-bright); padding-left: 20px; }
     .bud-travel-price-label { display: block; font-family: 'Inter', Arial, sans-serif; font-size: 9px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--o-gold); margin-bottom: 6px; }
     .bud-travel-price-val { display: block; font-size: 26px; font-weight: 600; color: var(--o-ink); letter-spacing: 0.005em; }
+    .bud-travel-breakdown { margin-top: 14px; display: grid; gap: 7px; max-width: 420px; }
+    .bud-travel-breakdown-title {
+      display: block; font-family: 'Inter', Arial, sans-serif; font-size: 9px; font-weight: 600;
+      letter-spacing: 0.16em; text-transform: uppercase; color: var(--o-ink-mute); margin-bottom: 2px;
+    }
+    .bud-travel-breakdown-row {
+      display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 16px; align-items: baseline;
+      font-family: 'Inter', Arial, sans-serif; font-size: 11px; line-height: 1.45; color: var(--o-ink-soft);
+      border-top: 1px solid var(--o-line-soft); padding-top: 7px;
+    }
+    .bud-travel-breakdown-row strong { color: var(--o-ink); font-size: 12px; white-space: nowrap; }
     .bud-note { font-family: 'Inter', Arial, sans-serif; font-size: 11px; color: var(--o-ink-mute); margin-top: 12px; line-height: 1.6; }
 
     /* ---------- CTA + PEU ---------- */
@@ -559,6 +602,7 @@ export function buildDossierHtml(
       .bud-travel-dot { width: 14px; height: 14px; }
       .bud-travel-title { font-size: 26px; }
       .bud-travel-price-val { font-size: 22px; }
+      .bud-travel-breakdown-row { grid-template-columns: 1fr; gap: 2px; }
     }
 
     @media print {

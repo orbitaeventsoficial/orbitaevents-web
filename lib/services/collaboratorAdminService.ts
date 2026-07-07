@@ -73,6 +73,14 @@ async function countBookingsBySourceCollaborator(): Promise<Map<string, number>>
   }
 }
 
+async function safeDeleteDependencyCount(label: string, count: Promise<number>): Promise<{ label: string; count: number | null }> {
+  try {
+    return { label, count: await count };
+  } catch {
+    return { label, count: null };
+  }
+}
+
 export async function listAdminCollaborators() {
   const rawCollaborators = await prisma.collaborator.findMany({
     orderBy: { createdAt: 'desc' },
@@ -174,6 +182,56 @@ export async function updateAdminCollaborator(id: string, input: CollaboratorInp
 }
 
 export async function deleteAdminCollaborator(id: string) {
+  const collaborator = await prisma.collaborator.findUnique({
+    where: { id },
+    include: { _count: { select: { products: true, members: true } } },
+  });
+  if (!collaborator) {
+    return { status: 404, body: { error: 'No trobat' } };
+  }
+
+  const countRows = await Promise.all([
+    safeDeleteDependencyCount('sourcedLeads', prisma.lead.count({ where: { sourceCollaboratorId: id } })),
+    safeDeleteDependencyCount('sourceBookings', prisma.booking.count({ where: { sourceCollaboratorId: id } })),
+    safeDeleteDependencyCount('billedBookings', prisma.booking.count({ where: { billedCollaboratorId: id } })),
+    safeDeleteDependencyCount('leadServiceLines', prisma.leadServiceLine.count({ where: { collaboratorId: id } })),
+    safeDeleteDependencyCount('bookingServiceLines', prisma.bookingServiceLine.count({ where: { collaboratorId: id } })),
+    safeDeleteDependencyCount('payments', prisma.collaboratorPayment.count({ where: { collaboratorId: id } })),
+    safeDeleteDependencyCount('crewBlocks', prisma.crewBlock.count({ where: { collaboratorId: id } })),
+  ]);
+  const verificationFailed = countRows.filter((row) => row.count === null).map((row) => row.label);
+  if (verificationFailed.length > 0) {
+    return {
+      status: 409,
+      body: {
+        error: 'No s’han pogut verificar totes les vinculacions del col·laborador. No s’elimina res fins que la base de dades respongui correctament.',
+        impact: { verificationFailed },
+      },
+    };
+  }
+  const counts = new Map(countRows.map((row) => [row.label, row.count ?? 0]));
+  const impact = {
+    products: collaborator._count.products,
+    members: collaborator._count.members,
+    sourcedLeads: counts.get('sourcedLeads') ?? 0,
+    sourceBookings: counts.get('sourceBookings') ?? 0,
+    billedBookings: counts.get('billedBookings') ?? 0,
+    leadServiceLines: counts.get('leadServiceLines') ?? 0,
+    bookingServiceLines: counts.get('bookingServiceLines') ?? 0,
+    payments: counts.get('payments') ?? 0,
+    crewBlocks: counts.get('crewBlocks') ?? 0,
+  };
+  const hasImpact = Object.values(impact).some((count) => count > 0);
+  if (hasImpact) {
+    return {
+      status: 409,
+      body: {
+        error: 'Aquest col·laborador té dades vinculades. Desactiva’l en lloc d’eliminar-lo, o neteja primer les vinculacions.',
+        impact,
+      },
+    };
+  }
+
   await prisma.collaborator.delete({ where: { id } });
   return { status: 200, body: { ok: true } };
 }

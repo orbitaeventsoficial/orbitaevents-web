@@ -221,6 +221,22 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-05.avif",
       "alt": "Fiestas infantiles – Fiestas infantiles  05"
+    },
+    {
+      "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-06.avif",
+      "alt": "Fiestas infantiles – Fiestas infantiles  06"
+    },
+    {
+      "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-07.avif",
+      "alt": "Fiestas infantiles – Fiestas infantiles  07"
+    },
+    {
+      "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-08.avif",
+      "alt": "Fiestas infantiles – Fiestas infantiles  08"
+    },
+    {
+      "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-09.avif",
+      "alt": "Fiestas infantiles – Fiestas infantiles  09"
     }
   ],
   "fiestas-privadas": [

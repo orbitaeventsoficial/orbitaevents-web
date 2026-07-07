@@ -21,6 +21,11 @@ export type DossierTransportBudget = {
   cost: number;
   clientCharge: number;
   headcount: number;
+  chargeableHours: number;
+  clientVehicleCost: number;
+  peopleCost: number;
+  tollsCost: number;
+  mealAllowance: number;
 };
 
 export type DossierMarginGuard = {
@@ -44,6 +49,10 @@ function round1(value: number): number {
   return Math.round(value * 10) / 10;
 }
 
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
 function pct(value: number): string {
   return `${round1(value)}%`;
 }
@@ -53,11 +62,22 @@ export function computeDossierTransportBudget(roundTripKm?: number | null): Doss
     roundTripKm: roundTripKm ?? 0,
     headcountOverride: DOSSIER_TRAVEL_HEADCOUNT,
   });
+  const peopleCost = transport.breakdown.peopleCost;
+  const tollsCost = transport.tollsEur;
+  const clientVehicleCost = round2(Math.max(
+    0,
+    transport.clientCharge - peopleCost - tollsCost - transport.mealAllowance,
+  ));
   return {
     km: transport.roundTripKm,
     cost: transport.cost,
     clientCharge: transport.clientCharge,
     headcount: transport.headcount,
+    chargeableHours: transport.chargeableHours,
+    clientVehicleCost,
+    peopleCost,
+    tollsCost,
+    mealAllowance: transport.mealAllowance,
   };
 }
 
