@@ -1732,6 +1732,23 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1727 — 2026-07-08 — codex (FET)
+- Context: el propietari detecta a `/admin/portfolio` un error de confiança: la pantalla pot marcar `0 fotos` i `0 videos` en categories que tenen catàleg visible perquè el comptador surt de l'estat editable abans de carregar. També demana una pestanya clara d'imatges i un drop-in per categoria que faci la feina de carpeta, nom i optimització.
+- Fet:
+  - La pestanya visible `Media` passa a `Imatges`, mantenint el hash intern `#media` per compatibilitat.
+  - Cada categoria exposa un drop-in de drag/drop i clic que reutilitza `/api/admin/portfolio/media`.
+  - El drop-in explica el destí `/api/uploads/portfolio/{slug}/...avif`; el backend continua fent `buildPortfolioUploadImagePath(slug, fileName)`, nom segur, `normalizePortfolioImageBuffer(fileBuffer)` i registre a `PortfolioMedia`.
+  - Els comptadors de fotos/videos usen `buildStaticMediaItems(slug)` com a fallback fins que la categoria ha carregat la media editable, evitant el `0` fals inicial.
+  - El frontend rebutja fitxers que no siguin imatge o vídeo abans de construir el `FormData`.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\portfolio\PortfolioPage-mutation-errors.test.ts` (2/2); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm build` OK (`validate:core`, 72 tests scripts/628 asserts, `tsc`, Next build).
+  - Validació funcional: el flux de pujada queda en una sola ruta canònica (`/api/admin/portfolio/media`) i els comptadors ja no depenen d'un array buit abans de la primera càrrega.
+  - Validació humana/UX: l'admin diferencia `Imatges` d'`Events`, mostra un contenidor clar per categoria i deixa d'ensenyar zeros enganyosos quan hi ha catàleg visible.
+- `ADMIN_CHANGE_COUNTER` puja a `1727`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1726 — 2026-07-08 — codex (FET)
 - Context: el propietari aprova `IMG_20260612_202647` com a bona direcció per `Bingo Musical KIDS` perquè mostra el presentador amb la canalla, amb la condició explícita que les cares de menors quedin pixelades; també demana millorar les imatges de `Bingo Musical` adult i `Batalla Musical`.
 - Fet:

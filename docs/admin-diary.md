@@ -1,3 +1,26 @@
+## 2026-07-08 — Portfolio amb drop-in per categoria i comptadors no falsos (Canvi #1727, codex)
+
+### Context
+El propietari entra a `https://orbitaevents.com/admin/portfolio` i detecta un error de confiança: categories que tenen catàleg visible poden aparèixer amb `0 fotos` i `0 videos` abans d'obrir-se. També demana que Portfolio tingui una pestanya clara per gestionar imatges i un contenidor on llençar fitxers nous per categoria, deixant que el sistema faci la feina de carpeta, nom i optimització.
+
+### Què s'ha fet
+- La pestanya visible `Media` passa a dir `Imatges`, mantenint el hash intern `#media` per no trencar enllaços existents.
+- Cada categoria de `/admin/portfolio` té un drop-in de drag/drop i clic que reutilitza `/api/admin/portfolio/media`.
+- El pipeline existent queda verificat i exposat: pujada a `portfolio/{slug}/...`, nom segur, normalització d'imatge a AVIF i registre a `PortfolioMedia`.
+- Els comptadors de fotos/videos ja no parteixen de `media=[]` quan la categoria encara no ha carregat: abans de la càrrega usen el catàleg estàtic visible com a fallback.
+- El frontend rebutja fitxers que no siguin imatge o vídeo abans d'enviar-los al backend.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\portfolio\PortfolioPage-mutation-errors.test.ts` (2/2); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm build` OK (`validate:core`, 72 tests scripts/628 asserts, `tsc`, Next build).
+- Validació funcional: el drop-in continua passant per `/api/admin/portfolio/media`; el codi comprova `buildPortfolioUploadImagePath(slug, fileName)` i `normalizePortfolioImageBuffer(fileBuffer)` com a camí canònic de carpeta/nom/AVIF.
+- Validació humana/UX: la pantalla separa millor `Imatges` d'`Events`, mostra el destí de pujada dins cada categoria i deixa de comunicar `0` quan encara no ha carregat l'estat editable.
+
+### Coordinació
+Counter → 1727. Canvi limitat a `/admin/portfolio`, test focal, protocol i comptador; sense tocar schema, BD viva, dossiers, reserves, leads ni productes Masquerade.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Imatges millors per Bingo KIDS, Bingo Musical i Batalla Musical (Canvi #1726, codex)
 
 ### Context

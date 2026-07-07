@@ -66,6 +66,13 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-08 [ESTAT: tancat — Portfolio imatges amb drop per categoria #1727]
+Perimetre: `/admin/portfolio` nomes; pestanya visible `Imatges`, drop-in drag/drop per categoria i comptadors que no marquin `0` fals abans de carregar media editable.
+Ultim canvi: #1727.
+Validacio: test focal portfolio 2/2; `tsc --noEmit` OK; `pnpm run qa:protocol` OK; `pnpm build` OK (`validate:core`, 72 tests scripts/628 asserts, `tsc`, Next build).
+Proper pas previst: commit+push+deploy del paquet #1727; despres continuar auditoria Zenit amb el seguent error real.
+Avis claude: no toco schema Prisma, productes Masquerade, dossiers, reserves, leads ni BD viva; tall estrictament UI/admin portfolio.
+
 [codex] 2026-07-08 [ESTAT: tancat — Imatges millors Bingo KIDS/Bingo/Batalla #1726]
 Perimetre: revisar candidates locals ja extretes de `Downloads`, triar imatge millor per `Bingo Musical KIDS` amb presentador i canalla pixelada si hi ha cares, millorar imatges de `Bingo Musical` adult i `Batalla Musical`, actualitzar assets/seed/BD/docs i validar.
 Ultim canvi: #1726.

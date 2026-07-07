@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type DragEvent } from 'react';
 import Image from 'next/image';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
@@ -179,12 +179,14 @@ function CategorySection({
   onOpenPreview: (preview: PreviewState) => void;
 }) {
   const [media, setMedia] = useState<MediaItem[]>([]);
+  const [loaded, setLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [dropActive, setDropActive] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const replaceFileRef = useRef<HTMLInputElement>(null);
   const replaceTargetRef = useRef<MediaItem | null>(null);
@@ -214,9 +216,11 @@ function CategorySection({
       const data = await response.json();
       const items = Array.isArray(data.data) ? data.data : [];
       setMedia(items.length > 0 ? items : fallbackItems);
+      setLoaded(true);
     } catch (err) {
       log.error(`Error carregant ${slug}`, err);
       setMedia(fallbackItems);
+      setLoaded(true);
       setError(
         fallbackItems.length > 0
           ? "No s'ha pogut llegir el portfolio editable; es mostra el catàleg públic actual en mode lectura."
@@ -253,6 +257,10 @@ function CategorySection({
     setError(null);
     try {
       for (const file of entries) {
+        const isVideoType = file.type.startsWith('video/');
+        if (!isImageType(file.type) && !isVideoType) {
+          throw new Error(`${file.name} no és una imatge o vídeo compatible`);
+        }
         const maxSize = isImageType(file.type) ? PORTFOLIO_MEDIA_IMAGE_MAX_SIZE : PORTFOLIO_MEDIA_VIDEO_MAX_SIZE;
         if (file.size > maxSize) {
           throw new Error(`${file.name} supera el límit permès`);
@@ -318,6 +326,21 @@ function CategorySection({
       replaceTargetRef.current = null;
     }
   }, [coverMap, loadMedia, onEventsRefresh, slug]);
+
+  const handleDropZoneDrag = useCallback((event: DragEvent<HTMLButtonElement>, active: boolean) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setDropActive(active);
+  }, []);
+
+  const handleDropZoneUpload = useCallback((event: DragEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setDropActive(false);
+    if (event.dataTransfer.files.length > 0) {
+      void handleUpload(event.dataTransfer.files);
+    }
+  }, [handleUpload]);
 
   const handleReplaceSelection = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files || !replaceTargetRef.current) return;
@@ -437,8 +460,9 @@ function CategorySection({
     }
   }, [draggingId, loadMedia, media, persistSortOrder]);
 
-  const imageCount = media.filter((item) => item.mediaType === 'image').length;
-  const videoCount = media.filter((item) => item.mediaType === 'video').length;
+  const visibleCountItems = loaded ? media : buildStaticMediaItems(slug);
+  const imageCount = visibleCountItems.filter((item) => item.mediaType === 'image').length;
+  const videoCount = visibleCountItems.filter((item) => item.mediaType === 'video').length;
 
   return (
     <div className="ap-card overflow-hidden rounded-2xl">
@@ -447,10 +471,9 @@ function CategorySection({
 
       <button type="button" onClick={() => setExpanded((current) => !current)} className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-[var(--raised)]">
         <div className="flex items-center gap-3">
-          <span className="text-lg">🖼️</span>
           <div>
             <p className="font-semibold text-[var(--t)]">{name}</p>
-            <p className="text-xs text-[var(--t3)]">{slug}</p>
+            <p className="text-xs text-[var(--t3)]">{slug} · carpeta de portfolio</p>
           </div>
         </div>
         <div className="flex items-center gap-2 text-xs text-[var(--t2)]">
@@ -464,16 +487,23 @@ function CategorySection({
         <div className="space-y-4 border-t border-[var(--line)] p-5">
           {error && <p className="rounded-xl border admin-tone-border-danger px-3 py-2 text-sm admin-tone-text-danger">{error}</p>}
           <div className="grid gap-3 lg:grid-cols-3">
-            <AdminHelpLegend title="Portada" body="És la imatge principal de cada event. La pots marcar des de qualsevol miniatura." />
+            <AdminHelpLegend title="Drop-in" body="Arrossega fitxers dins la categoria correcta. El backend els deixa a la carpeta del slug i normalitza el nom." />
             <AdminHelpLegend title="Assignació" body="Vincula una peça a un event concret perquè sàpigues on surt i la puguis reutilitzar amb criteri." />
             <AdminHelpLegend title="Ordre" body="L'ordre controla la galeria pública. Arrossega targetes per canviar-lo sense tocar codi." />
           </div>
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
-            <button type="button" onClick={() => fileRef.current?.click()} className="rounded-2xl border-2 border-dashed border-[var(--line)] p-8 text-left transition-colors hover:border-[var(--hair-gold)] adm-row-hover">
-              <span className="mb-3 block text-3xl">ï¼‹</span>
-              <p className="text-sm font-medium text-[var(--t)]">Afegir media a {name}</p>
-              <p className="mt-1 text-xs text-[var(--t3)]">Puja des de l'admin. El backend converteix imatges a AVIF, conserva l'ordre i deixa traça a la BBDD.</p>
-              <p className="mt-2 text-xs text-[var(--t3)]">{uploading ? 'Pujant...' : `Límit imatge: ${PORTFOLIO_MEDIA_IMAGE_MAX_SIZE / (1024 * 1024)}MB · vídeo: ${PORTFOLIO_MEDIA_VIDEO_MAX_SIZE / (1024 * 1024)}MB`}</p>
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              onDragEnter={(event) => handleDropZoneDrag(event, true)}
+              onDragOver={(event) => handleDropZoneDrag(event, true)}
+              onDragLeave={(event) => handleDropZoneDrag(event, false)}
+              onDrop={handleDropZoneUpload}
+              className={`rounded-2xl border-2 border-dashed p-8 text-left transition-colors adm-row-hover ${dropActive ? 'border-[var(--hair-gold)] bg-[var(--raised)]' : 'border-[var(--line)] hover:border-[var(--hair-gold)]'}`}
+            >
+              <p className="text-sm font-medium text-[var(--t)]">Drop-in d'imatges · {name}</p>
+              <p className="mt-1 text-xs text-[var(--t3)]">Destí: `/api/uploads/portfolio/{slug}/...avif` · nom segur · AVIF optimitzat · registre a BBDD.</p>
+              <p className="mt-2 text-xs text-[var(--t3)]">{uploading ? 'Processant...' : `Arrossega aquí o fes clic · imatge ${PORTFOLIO_MEDIA_IMAGE_MAX_SIZE / (1024 * 1024)}MB · vídeo ${PORTFOLIO_MEDIA_VIDEO_MAX_SIZE / (1024 * 1024)}MB`}</p>
             </button>
             <div className="ap-card p-4">
               <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--t3)]">Events d'aquesta categoria</p>
@@ -726,14 +756,14 @@ export default function AdminPortfolioPage() {
     >
       <FullscreenPreview preview={preview} onClose={() => setPreview(null)} />
       <div className="grid gap-3 lg:grid-cols-3">
-        <AdminHelpLegend title="Què estàs veient" body="Media gestiona fitxers i ordre. Events gestiona la pàgina pública i les seves metadades." />
-        <AdminHelpLegend title="Com treballar" body="Primer crea o revisa l'event. Després vincula les imatges, tria portada i ordena la galeria des de Media." />
+        <AdminHelpLegend title="Què estàs veient" body="Imatges gestiona fitxers, categoria, ordre i portada. Events gestiona la pàgina pública i les seves metadades." />
+        <AdminHelpLegend title="Com treballar" body="Primer deixa cada imatge dins la seva categoria. Després vincula-la a l'event, tria portada i ordena la galeria." />
         <AdminHelpLegend title="Protecció" body="Les peces marcades com a portada no es deixen eliminar a cegues. Així s'evita trencar la web sense voler." />
       </div>
       <div id="media" />
       <div id="events" />
       <div className="flex gap-2">
-        <button type="button" onClick={() => setTab('media')} className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${tab === 'media' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'}`}>Media</button>
+        <button type="button" onClick={() => setTab('media')} className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${tab === 'media' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'}`}>Imatges</button>
         <button type="button" onClick={() => setTab('events')} className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${tab === 'events' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'}`}>Events</button>
       </div>
       {tab === 'media' ? (
@@ -746,8 +776,6 @@ export default function AdminPortfolioPage() {
     </AdminPage>
   );
 }
-
-
 
 
 
