@@ -1732,6 +1732,23 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1726 — 2026-07-08 — codex (FET)
+- Context: el propietari aprova `IMG_20260612_202647` com a bona direcció per `Bingo Musical KIDS` perquè mostra el presentador amb la canalla, amb la condició explícita que les cares de menors quedin pixelades; també demana millorar les imatges de `Bingo Musical` adult i `Batalla Musical`.
+- Fet:
+  - `public/img/collaborators/masquerade/bingo-musical-kids.jpg` es genera des de `IMG_20260612_202647` amb presentador visible, ambient infantil i pixelació manual de les cares de menors.
+  - `public/img/collaborators/masquerade/bingo-musical.jpg` substitueix el binari antic per una escena adulta amb presentadora, públic i material de bingo visible.
+  - `public/img/collaborators/masquerade/batalla-musical.jpg` substitueix el binari antic per una escena de repte musical amb millor acció i resolució.
+  - `scripts/seed-masquerade-products.mjs` i `__tests__/scripts/seed-partner-product-visibility.test.ts` apunten `Bingo Musical KIDS` a `/img/collaborators/masquerade/bingo-musical-kids.jpg`.
+  - BD viva: `Bingo Musical KIDS` passa de `/img/collaborators/masquerade/bingo-musical-kids.avif` a `/img/collaborators/masquerade/bingo-musical-kids.jpg`; `Bingo Musical` i `Batalla Musical` ja apuntaven a les rutes JPG canòniques.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\scripts\seed-partner-product-visibility.test.ts __tests__\lib\services\publicServiceMediaService.test.ts` (16/16); `pnpm build` OK (`validate:core`, 72 tests scripts/628 asserts, `tsc`, Next build).
+  - Validació funcional: consulta Prisma abans/després confirma `Bingo Musical KIDS` amb `imageUrl=/img/collaborators/masquerade/bingo-musical-kids.jpg`, `isActive=true`, `visibleInDossier=true` i `visibleInBooking=true`; Bingo adult i Batalla continuen a `/img/collaborators/masquerade/bingo-musical.jpg` i `/img/collaborators/masquerade/batalla-musical.jpg`.
+  - Validació humana/UX: revisió visual directa de les tres imatges finals i del mosaic `.codex-captures/product-image-candidates-1726.jpg`; KIDS manté el valor comercial de presenter+canalla i no publica cares infantils identificables.
+- `ADMIN_CHANGE_COUNTER` puja a `1726`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1725 — 2026-07-07 — codex (FET)
 - Context: el propietari detecta que la imatge escollida per `Bingo Musical KIDS` no mostra el presentador/conductor i demana revisar el nou paquet de `Downloads` sense publicar cares identificables de nens; si una imatge amb nens s'aprofita, cal pixelar-la abans.
 - Fet:

@@ -1,3 +1,26 @@
+## 2026-07-08 — Imatges millors per Bingo KIDS, Bingo Musical i Batalla Musical (Canvi #1726, codex)
+
+### Context
+El propietari confirma que `IMG_20260612_202647` és un bon exemple per a `Bingo Musical KIDS`: ha de sortir el presentador amb la canalla, però qualsevol cara de menor s'ha de pixelar abans de publicar. També demana millorar les imatges de `Bingo Musical` adult i `Batalla Musical`.
+
+### Què s'ha fet
+- `Bingo Musical KIDS` passa a l'asset nou `/img/collaborators/masquerade/bingo-musical-kids.jpg`, generat des de `IMG_20260612_202647` amb presentador visible i cares de menors pixelades manualment.
+- `Bingo Musical` adult reemplaça el JPG antic per una foto d'acció amb presentadora, públic i material de bingo visible.
+- `Batalla Musical` reemplaça el JPG antic per una escena de repte musical amb més acció i millor resolució.
+- `scripts/seed-masquerade-products.mjs` i el test de seed apunten `Bingo Musical KIDS` al JPG nou; Bingo adult i Batalla mantenen les rutes JPG canòniques existents.
+- BD viva sincronitzada: `Bingo Musical KIDS` passa de `/img/collaborators/masquerade/bingo-musical-kids.avif` a `/img/collaborators/masquerade/bingo-musical-kids.jpg`; Bingo adult i Batalla ja estaven a les rutes JPG correctes.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\scripts\seed-partner-product-visibility.test.ts __tests__\lib\services\publicServiceMediaService.test.ts` (16/16); `pnpm build` OK (`validate:core`, 72 tests scripts/628 asserts, `tsc`, Next build).
+- Validació funcional: consulta Prisma a BD viva abans/després confirma KIDS amb `imageUrl=/img/collaborators/masquerade/bingo-musical-kids.jpg`, `isActive=true`, `visibleInDossier=true` i `visibleInBooking=true`; Bingo adult i Batalla continuen a `/img/collaborators/masquerade/bingo-musical.jpg` i `/img/collaborators/masquerade/batalla-musical.jpg`.
+- Validació humana/UX: revisió visual directa de `bingo-musical-kids.jpg`, `bingo-musical.jpg`, `batalla-musical.jpg` i del mosaic `.codex-captures/product-image-candidates-1726.jpg`; KIDS conserva l'energia presenter+canalla i les cares infantils visibles queden pixelades.
+
+### Coordinació
+Counter → 1726. Canvi limitat a assets públics de Masquerade, seed/test, BD viva i documentació; sense tocar schema, reserves, leads ni regles econòmiques.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-07 — Bingo KIDS amb presentador i portfolio triat sense cares infantils (Canvi #1725, codex)
 
 ### Context

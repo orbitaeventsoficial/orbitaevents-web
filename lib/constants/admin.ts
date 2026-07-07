@@ -58,7 +58,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 1725;
+export const ADMIN_CHANGE_COUNTER = 1726;
 
 export const ADMIN_BOOKING_DEPOSIT_DUE_DAYS = 30;
 export const ADMIN_ECONOMY_PAYMENT_DUE_SOON_DAYS = 7;

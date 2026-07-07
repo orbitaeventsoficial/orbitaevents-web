@@ -66,6 +66,13 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-08 [ESTAT: tancat — Imatges millors Bingo KIDS/Bingo/Batalla #1726]
+Perimetre: revisar candidates locals ja extretes de `Downloads`, triar imatge millor per `Bingo Musical KIDS` amb presentador i canalla pixelada si hi ha cares, millorar imatges de `Bingo Musical` adult i `Batalla Musical`, actualitzar assets/seed/BD/docs i validar.
+Ultim canvi: #1726.
+Validacio: test focal de seed/media 16/16; `pnpm run qa:protocol` OK; `pnpm build` OK (`validate:core`, 72 tests scripts/628 asserts, `tsc`, Next build); BD viva final verificada amb KIDS a `/img/collaborators/masquerade/bingo-musical-kids.jpg`.
+Proper pas previst: commit+push+deploy del paquet #1726; despres continuar auditoria Zenit amb el seguent error real.
+Avis claude: no he tocat `app/admin/tasks`, schema Prisma, migracions, reserves, leads ni regles economiques; tall limitat a imatges publiques, seed/config de productes Masquerade, BD viva i documentacio.
+
 [codex] 2026-07-07 [ESTAT: tancat — Bingo KIDS amb presentador i portfolio triat #1725]
 Perimetre: asset propi de `Bingo Musical KIDS`, seleccio de 174 imatges locals, portfolio infantil/bodes/Halloween/produccio tecnica, seed/test, BD viva i documentacio.
 Ultim canvi: #1725.
