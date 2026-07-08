@@ -172,7 +172,7 @@ function drawProductChapter(doc: jsPDFType, product: AnimacioProduct, index: num
   if (imageDataUrl) {
     try {
       const imgBoxW = PDF_DESIGN.right - PDF_DESIGN.left;
-      const imgBoxH = product.id.includes('secret-pirates') ? 96 : 88;
+      const imgBoxH = 104;
       const props = doc.getImageProperties(imageDataUrl);
       const fitted = fitWithin(props.width, props.height, imgBoxW, imgBoxH);
       const imgX = PDF_DESIGN.left + (imgBoxW - fitted.width) / 2;

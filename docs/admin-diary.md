@@ -1,3 +1,26 @@
+## 2026-07-08 — Lead crea dossier directe i imatges sempre senceres (Canvi #1746, codex)
+
+### Context
+El propietari detecta dos problemes de flux: si el lead ja té les dades, `Crear dossier` no hauria d'enviar al generador buit sinó crear/obrir el dossier directament; i el fix d'imatges no pot estar pensat per una foto concreta, ha de funcionar per qualsevol producte del dossier.
+
+### Què s'ha fet
+- `/admin/leads/[id]` deixa de construir una URL manual cap a `/admin/dossiers`: el botó `Crear dossier` desa el bolo si està brut, crida `/api/admin/dossiers/draft-from-lead` i obre el PDF compost del dossier creat o existent.
+- El flux reutilitza el servei canònic `createDossierDraftFromLead`; no crea una segona manera de composar dossiers ni duplica mapping de productes.
+- El dossier HTML elimina la capsa quadrada fixa de `.producte-media`: qualsevol imatge de producte manté la seva ràtio, amb `object-fit: contain` i límits responsius.
+- El PDF compost elimina l'excepció per producte concret i dona la mateixa caixa visual més generosa a tots els capítols.
+- Tests del lead i del builder blinden que el dossier es crea via API i que el render no torna a imposar `aspect-ratio: 1 / 1` ni `object-fit: cover`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\lib\utils\dossier-html-builder.test.ts __tests__\lib\services\dossierCompositePdfService.test.ts __tests__\lib\services\dossierAutoDraftService.test.ts` OK (41/41); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK; `pnpm run validate:core` OK.
+- Validació funcional: Playwright contra el builder amb imatges reals de Masquerade confirma `objectFit=contain` per Bingo Musical, Batalla Musical i El secret dels pirates; el servidor local respon a `http://127.0.0.1:3000`.
+- Validació humana/UX: el lead fa el pas natural d'una venda preparada: crear dossier i veure el PDF, sense pantalla intermèdia; les imatges es veuen senceres per regla global, no per pegat d'una foto.
+
+### Coordinació
+Counter -> 1746. Canvi limitat a flux lead -> dossier, render d'imatges de dossier, tests, roadmap, protocol, diari i sync; sense schema, BD, `app/admin/tasks` ni motors econòmics.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Manolo simplifica lead, ruta, partner i imatge de dossier (Canvi #1745, codex)
 
 ### Context

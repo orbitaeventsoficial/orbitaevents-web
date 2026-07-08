@@ -66,6 +66,13 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-08 [ESTAT: tancat — Lead crea dossier directe #1746]
+Perimetre: botó `Crear dossier` de `/admin/leads/[id]` reutilitza `/api/admin/dossiers/draft-from-lead`, obre el PDF compost directament i el dossier aplica imatge sencera per regla global; sense tocar schema, BD, motors econòmics ni `app/admin/tasks`.
+Ultim canvi: #1746.
+Validacio: tests focalitzats 41/41 OK; Playwright DOM amb Bingo/Batalla/Pirates `objectFit=contain` OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `qa:zenit-roadmap` OK; `git diff --check` OK; `validate:core` OK.
+Proper pas previst: E2E complet lead -> dossier -> reserva quan el propietari ho demani, o següent tall petit de fiabilitat Manolo.
+Avis claude: carril petit de flux lead -> dossier i render de dossier; no he creat una segona manera de compondre dossiers ni cap excepció d'imatge per producte.
+
 [codex] 2026-07-08 [ESTAT: tancat — Manolo simplifica lead/dossier #1745]
 Perimetre: `/admin/leads/[id]`, `RepartimentPanel`, `BoloTripCard`, dossier HTML/PDF, generador de dossiers, copy de pressupost i docs. Objectiu complert: lead curt i decisional, detall intern reservat a reserva/economia, dossier amb imatges completes.
 Ultim canvi: #1745.

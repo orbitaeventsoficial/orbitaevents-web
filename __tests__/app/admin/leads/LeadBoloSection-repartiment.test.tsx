@@ -1,8 +1,9 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockFetchWithCsrf, toastApi } = vi.hoisted(() => ({
+const { mockFetchWithCsrf, mockRouterRefresh, toastApi } = vi.hoisted(() => ({
   mockFetchWithCsrf: vi.fn(),
+  mockRouterRefresh: vi.fn(),
   toastApi: { success: vi.fn(), error: vi.fn(), warning: vi.fn(), info: vi.fn() },
 }));
 
@@ -12,6 +13,10 @@ vi.mock('@/lib/csrf', () => ({
 
 vi.mock('@/app/admin/components/ToastProvider', () => ({
   useToast: () => toastApi,
+}));
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ refresh: mockRouterRefresh }),
 }));
 
 vi.mock('@/app/admin/bookings/BookingServiceLinesSection', () => ({
@@ -184,5 +189,57 @@ describe('LeadBoloSection repartiment', () => {
     });
 
     expect(screen.queryByText('peatges no informats')).not.toBeInTheDocument();
+  });
+
+  it('crea el dossier directament des del lead i obre el PDF resultant', async () => {
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    mockFetchWithCsrf
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          internalTravelCost: 0,
+          lines: [
+            {
+              collaboratorId: 'masquerade',
+              kind: 'PROVIDER_SERVICE',
+              label: 'Bingo Musical (Masquerade)',
+              revenueAmount: 240,
+              costAmount: 160,
+              quantity: 1,
+              notes: null,
+            },
+          ],
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ ok: true, status: 'created', dossierId: 'dos-1' }),
+      });
+
+    render(
+      <LeadBoloSection
+        leadId="lead-1"
+        documentContext={{ name: 'Lead Andorra', eventLocation: 'Andorra' }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Pacte amb partner')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Crear dossier' }));
+
+    await waitFor(() => {
+      expect(mockFetchWithCsrf).toHaveBeenCalledWith(
+        '/api/admin/dossiers/draft-from-lead',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({ leadId: 'lead-1' }),
+        }),
+      );
+    });
+    expect(openSpy).toHaveBeenCalledWith('/api/admin/dossiers/dos-1/composite', '_blank', 'noopener,noreferrer');
+    expect(mockRouterRefresh).toHaveBeenCalledTimes(1);
+    openSpy.mockRestore();
   });
 });

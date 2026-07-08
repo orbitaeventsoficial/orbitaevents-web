@@ -1733,6 +1733,25 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1746 — 2026-07-08 — codex (FET)
+- Context: el propietari detecta que, si el lead ja porta dades de bolo, `Crear dossier` no hauria d'obrir el generador perquè l'operador torni a validar el mateix; ha de crear/obrir el dossier directament. També fixa el criteri visual: les millores d'imatge han de funcionar per totes les fotos, no per un producte concret.
+- Fet:
+  - `LeadBoloSection` elimina la URL manual cap al generador de dossiers i fa POST a `/api/admin/dossiers/draft-from-lead`.
+  - Si el bolo està brut, el botó desa primer i només després crea/reutilitza el dossier; quan l'API retorna `dossierId`, obre `/api/admin/dossiers/[id]/composite` en pestanya nova.
+  - El flux reutilitza `createDossierDraftFromLead` i el mapping canònic de productes; cap segona composició de dossier ni duplicació de catàleg.
+  - El dossier HTML elimina les caixes quadrades forçades de `.producte-media`; qualsevol imatge manté la ràtio amb `object-fit: contain` i límits responsius.
+  - El PDF compost elimina l'excepció `secret-pirates` i aplica la mateixa caixa visual més generosa a tots els productes.
+  - Tests del lead i del builder actualitzats per blindar la creació directa i la regla global d'imatge sencera.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\lib\utils\dossier-html-builder.test.ts __tests__\lib\services\dossierCompositePdfService.test.ts __tests__\lib\services\dossierAutoDraftService.test.ts` OK (41/41); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK; `pnpm run validate:core` OK.
+  - Validació funcional: Playwright contra el builder del dossier amb assets reals de Masquerade confirma `objectFit=contain` per Bingo Musical, Batalla Musical i El secret dels pirates; el servidor local respon a `http://127.0.0.1:3000`.
+  - Validació humana/UX: el lead es comporta com un lloc de tancament comercial: de dades validades a dossier PDF, sense pantalla intermèdia; les fotos del dossier es veuen senceres per norma global.
+- Roadmap Manolo actualitzat amb #1746 dins de lead -> dossier i documents/dossier.
+- `ADMIN_CHANGE_COUNTER` puja a `1746`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1745 — 2026-07-08 — codex (FET)
 - Context: el lead havia crescut massa després dels talls de transport/repartiment: `Desplaçament`, `Pacte amb partner` i el rail de marge repetien imports, fórmules i costos interns. En paral·lel, el dossier podia ensenyar imatges de producte massa retallades o massa petites, com el Bingo Musical amb sostre dominant.
 - Fet:

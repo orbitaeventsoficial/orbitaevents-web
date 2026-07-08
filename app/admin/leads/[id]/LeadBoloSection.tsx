@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useMemo, type MouseEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import BookingServiceLinesSection from '@/app/admin/bookings/BookingServiceLinesSection';
@@ -56,6 +57,13 @@ export interface BoloEconomia {
  transportMarginPct: number;
  orbitaTechIncome: number;
 }
+
+type DossierDraftResponse = {
+ ok?: boolean;
+ status?: 'created' | 'existing';
+ dossierId?: string;
+ error?: string;
+};
 
 /**
  * Neteja de PRESENTACIÓ del detall del cost de ruta (#1359). El model
@@ -119,6 +127,7 @@ export default function LeadBoloSection({
  compactEconomia?: boolean;
 }) {
  const toast = useToast();
+ const router = useRouter();
  const [lines, setLines] = useState<BookingServiceLineFormInput[]>([]);
  // Cost intern de ruta (línies [travel-cost] amagades del #1342/#1343): fallback
  // quan encara no hi ha distància calculada en viu.
@@ -133,6 +142,7 @@ export default function LeadBoloSection({
  const [driverId, setDriverId] = useState('');
  const [loading, setLoading] = useState(true);
  const [saving, setSaving] = useState(false);
+ const [creatingDossier, setCreatingDossier] = useState(false);
  const [dirty, setDirty] = useState(false);
 
  useEffect(() => {
@@ -421,29 +431,6 @@ export default function LeadBoloSection({
  }
  };
 
- const buildDossierHref = () => {
- const params = new URLSearchParams({ leadId });
- params.set('nom', documentContext.name);
- if (documentContext.email) params.set('email', documentContext.email);
- if (documentContext.phone) params.set('telefon', documentContext.phone);
- const eventParts = [
- documentContext.eventDate,
- documentContext.eventStartTime && documentContext.eventEndTime
- ? `${documentContext.eventStartTime}-${documentContext.eventEndTime}`
- : documentContext.eventStartTime,
- documentContext.eventLocation,
- documentContext.eventAddress,
- documentContext.guestCount ? `${documentContext.guestCount} pax` : null,
- ].filter(Boolean);
- if (eventParts.length > 0) params.set('eventDesc', eventParts.join(' · '));
- const productIds = buildAllLines()
- .map((line) => line.collaboratorId)
- .filter((id): id is string => Boolean(id))
- .map((id) => id.startsWith('collab:') ? id : `collab:${id}`);
- if (productIds.length > 0) params.set('productIds', Array.from(new Set(productIds)).join(','));
- return `/admin/dossiers?${params.toString()}`;
- };
-
  const openBuilder = async (
  event: MouseEvent<HTMLAnchorElement>,
  href: string,
@@ -454,8 +441,34 @@ export default function LeadBoloSection({
  if (saved) window.location.assign(href);
  };
 
+ const createDossierFromLead = async () => {
+ setCreatingDossier(true);
+ try {
+ if (dirty) {
+ const saved = await handleSave();
+ if (!saved) return;
+ }
+ const res = await fetchWithCsrf('/api/admin/dossiers/draft-from-lead', {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ leadId }),
+ });
+ const data = await res.json().catch(() => ({})) as DossierDraftResponse;
+ if (!res.ok || !data.dossierId) {
+ throw new Error(data.error || 'No he pogut crear el dossier.');
+ }
+ toast.success(data.status === 'existing' ? 'Aquest lead ja tenia un dossier actiu.' : 'Dossier creat.');
+ router.refresh();
+ window.open(`/api/admin/dossiers/${data.dossierId}/composite`, '_blank', 'noopener,noreferrer');
+ } catch (e) {
+ console.error('[LeadBolo] crear dossier', e);
+ toast.error(e instanceof Error ? e.message : 'Error creant el dossier.');
+ } finally {
+ setCreatingDossier(false);
+ }
+ };
+
  const quoteHref = `/admin/presupuestos?leadId=${encodeURIComponent(leadId)}`;
- const dossierHref = buildDossierHref();
  const bookingHref = buildLeadBookingPrefillHref(leadId);
 
  if (loading) {
@@ -544,9 +557,9 @@ export default function LeadBoloSection({
  )}
 
  <div className="ap-ledger-bolo-actions ap-ledger-bolo-actions--full">
- <a className="ap-btn" href={dossierHref} onClick={(event) => openBuilder(event, dossierHref)} aria-disabled={saving}>
- Crear dossier
- </a>
+ <button type="button" className="ap-btn" onClick={createDossierFromLead} disabled={saving || creatingDossier} aria-busy={creatingDossier}>
+ {creatingDossier ? 'Creant dossier...' : 'Crear dossier'}
+ </button>
  <a className="ap-btn" href={quoteHref} onClick={(event) => openBuilder(event, quoteHref)} aria-disabled={saving}>
  Crear pressupost
  </a>

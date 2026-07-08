@@ -133,9 +133,10 @@ describe('buildDossierHtml', () => {
       ...productWithTrams,
       image: '/img/collaborators/masquerade/secret-pirates.jpg',
     }]);
-    expect(html).toContain('aspect-ratio: 1 / 1');
+    expect(html).toContain('display: flex; align-items: center; justify-content: center');
     expect(html).toContain('object-fit: contain !important');
-    expect(html).toContain('max-width: 100%; max-height: 100%');
+    expect(html).toContain('max-width: 100%; max-height: min(72vh, 640px)');
+    expect(html).not.toContain('aspect-ratio: 1 / 1');
     expect(html).not.toContain('object-fit: cover');
   });
 
