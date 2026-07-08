@@ -281,14 +281,20 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
   let travelKm: number | undefined = snapshotTransport.travelKm;
   let travelTollsEur: number | undefined = snapshotTransport.travelTollsEur;
   let travelLocation: string | undefined = snapshotTransport.travelLocation;
-  if (!snapshotProducts && dossier.leadId) {
+  const transportFallbackLeadId = dossier.leadId;
+  const needsLeadTransportFallback = transportFallbackLeadId && (
+    travelKm == null ||
+    travelTollsEur == null ||
+    !travelLocation
+  );
+  if (needsLeadTransportFallback) {
     const lead = await prisma.lead.findUnique({
-      where: { id: dossier.leadId },
+      where: { id: transportFallbackLeadId },
       select: { distanceKm: true, tollsEur: true, eventLocation: true },
     });
-    if (lead?.distanceKm != null && lead.distanceKm > 0) travelKm = lead.distanceKm;
-    if (lead?.tollsEur != null && lead.tollsEur > 0) travelTollsEur = lead.tollsEur;
-    if (lead?.eventLocation) travelLocation = lead.eventLocation;
+    if (travelKm == null && lead?.distanceKm != null && lead.distanceKm > 0) travelKm = lead.distanceKm;
+    if (travelTollsEur == null && lead?.tollsEur != null && lead.tollsEur > 0) travelTollsEur = lead.tollsEur;
+    if (!travelLocation && lead?.eventLocation) travelLocation = lead.eventLocation;
   }
   const html = buildDossierHtml(clientInfo, products, dossierCopy, {
     locale: 'ca-ES',

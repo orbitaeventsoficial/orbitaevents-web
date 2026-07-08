@@ -1,3 +1,25 @@
+## 2026-07-08 — Manolo: snapshots antics de dossier recuperen peatges del lead (Canvi #1735, codex)
+
+### Context
+En l'auditoria `lead -> dossier -> snapshot/PDF`, el servei d'enviament de dossier només consultava el lead per transport quan no hi havia snapshot de productes. Això protegia la foto comercial, però deixava un forat: un snapshot antic amb productes congelats però sense `travelTollsEur` podia impedir recuperar peatges del lead i enviar un dossier/PDF sense aquest cost ja conegut.
+
+### Què s'ha fet
+- `sendDossierByEmail` manté els productes congelats del snapshot, però calcula fallback de transport camp a camp.
+- Si `travelKm`, `travelTollsEur` o `travelLocation` falten al snapshot i el dossier té `leadId`, el servei consulta el lead i només omple els camps absents.
+- Afegit test que simula snapshot antic amb producte congelat i sense peatges, i verifica que `buildDossierHtml` rep `travelTollsEur` del lead.
+- El full Manolo queda actualitzat amb #1735 dins del recorregut lead -> dossier -> snapshot.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\dossierService.test.ts` (23/23); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff --check` OK.
+- Validació funcional: productes congelats i imatge/snapshot es mantenen immutables, però els peatges absents es poden recuperar del lead.
+- Validació humana/UX: un dossier antic no perd peatges només perquè ja tenia foto de productes congelada.
+
+### Coordinació
+Counter → 1735. Canvi limitat a `dossierService`, test, roadmap, protocol, diari i sync; sense schema ni BD viva.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Manolo: seleccionar lead al dossier conserva km i peatges (Canvi #1734, codex)
 
 ### Context

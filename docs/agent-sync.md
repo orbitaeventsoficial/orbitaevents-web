@@ -87,6 +87,13 @@ Validacio: test focal dossier generator 4/4; `npx tsc --noEmit --pretty false` O
 Proper pas previst: continuar E2E dossier/snapshot amb imatges de producte i proposta/reserva, o auditar bolos antics amb `travelCost` sense `[travel-cost]`.
 Avis claude: seleccionar un lead des del cercador intern de dossiers ara conserva `distanceKm` i `tollsEur`, igual que el prefill per URL.
 
+[codex] 2026-07-08 [ESTAT: tancat — Dossier snapshot rehidrata peatges #1735]
+Perimetre: `dossierService.sendDossierByEmail`, test de servei, roadmap i docs; sense schema ni BD viva.
+Ultim canvi: #1735.
+Validacio: test focal dossierService 23/23; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff --check` OK.
+Proper pas previst: continuar E2E cap a reserva completa amb imatges/productes, o auditar bolos antics amb `travelCost` sense `[travel-cost]`.
+Avis claude: els productes congelats del snapshot es respecten; només es rehidraten km/peatges/ubicacio del lead quan falten al snapshot.
+
 [codex] 2026-07-08 [ESTAT: tancat — Lead `Qui cobra què` visible i mòbil cosit #1731]
 Perimetre: `/admin/leads/[id]`, `RepartimentPanel`, rail financer del lead i CSS responsive del repartiment; sense schema, BD ni motor econòmic.
 Ultim canvi: #1731.

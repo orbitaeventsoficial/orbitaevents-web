@@ -1732,6 +1732,22 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1735 — 2026-07-08 — codex (FET)
+- Context: auditoria E2E `lead -> dossier -> snapshot/PDF`. `sendDossierByEmail` només feia fallback al lead per transport si no hi havia snapshot de productes. Un snapshot antic amb productes congelats però sense `travelTollsEur` podia enviar el dossier sense peatges tot i que el lead els tingués.
+- Fet:
+  - `sendDossierByEmail` manté productes del snapshot, però rehidrata transport camp a camp.
+  - Si falta `travelKm`, `travelTollsEur` o `travelLocation`, el servei consulta el lead i només omple els camps absents.
+  - Test nou: snapshot antic amb producte congelat i sense peatges recupera `travelTollsEur` del lead abans de cridar `buildDossierHtml`.
+  - Roadmap Manolo actualitzat amb #1735 dins del bloc lead -> dossier -> snapshot.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\dossierService.test.ts` (23/23); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff --check` OK.
+  - Validació funcional: snapshot de productes i peatges del lead poden conviure sense convertir el dossier en catàleg viu.
+  - Validació humana/UX: un dossier antic amb productes congelats ja no perd peatges coneguts pel simple fet de tenir snapshot.
+- `ADMIN_CHANGE_COUNTER` puja a `1735`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1734 — 2026-07-08 — codex (FET)
 - Context: auditoria E2E `lead -> dossier`. El prefill per URL del generador de dossiers ja heretava `distanceKm` i `tollsEur`, però seleccionar un lead des del cercador intern només copiava contacte/data/lloc/productes. Això podia fer perdre km/peatges ja resolts abans de desar o enviar el dossier.
 - Fet:

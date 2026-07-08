@@ -453,6 +453,44 @@ describe('sendDossierByEmail', () => {
     );
   });
 
+  it('rehidrata peatges del lead si un snapshot antic de productes no els portava', async () => {
+    mockPrisma.dossier.findUnique.mockResolvedValue({
+      ...mockDossier,
+      productIds: ['bingo-musical'],
+      lineSnapshot: {
+        version: 1,
+        products: [{
+          id: 'bingo-musical',
+          nom: 'Bingo Musical congelat',
+          descripcio: ['Text snapshot'],
+          inclou: ['Equip snapshot'],
+          priceFrom: 999,
+        }],
+        travelKm: 422,
+        travelLocation: "l'Aldosa",
+      },
+    });
+    mockPrisma.lead.findUnique
+      .mockResolvedValueOnce({
+        id: 'lead-1',
+        name: 'Lead Joan',
+        customerId: null,
+        customer: null,
+      })
+      .mockResolvedValueOnce({ distanceKm: 422, tollsEur: 18.5, eventLocation: "l'Aldosa" });
+    mockSendEmail.mockResolvedValue(undefined);
+    mockPrisma.dossier.update.mockResolvedValue(mockDossier);
+
+    await sendDossierByEmail('dos-1');
+
+    expect(mockBuildHtml).toHaveBeenCalledWith(
+      expect.objectContaining({ nom: 'Joan Pla' }),
+      [expect.objectContaining({ id: 'bingo-musical', nom: 'Bingo Musical congelat', priceFrom: 999 })],
+      expect.anything(),
+      expect.objectContaining({ travelKm: 422, travelTollsEur: 18.5, location: "l'Aldosa" }),
+    );
+  });
+
   it('envia el dossier amb ubicació de ruta neta del lead, no amb el resum complet de l\'event', async () => {
     mockPrisma.dossier.findUnique.mockResolvedValue({
       ...mockDossier,
