@@ -25,6 +25,7 @@ import { SITE_CONFIG } from '@/app/config/site-config';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { computeDossierTransportBudget } from '@/lib/services/dossierMarginGuardService';
+import { orderDossierProductsForDossier } from '@/lib/services/dossierProductMappingService';
 
 /** Carrega una imatge de /public com a data URL per a jsPDF. Retorna null si no existeix. */
 async function loadImageDataUrl(imageUrl?: string | null): Promise<string | null> {
@@ -383,24 +384,10 @@ export async function generateDossierCompositePDF(input: GenerateDossierComposit
   const collaboratorChapters = (input.collaboratorProducts ?? []).map(collaboratorProductToAnimacioProduct);
   const merged = [...input.products, ...collaboratorChapters];
 
-  // Agrupa per categoria preservant l'ordre de primera aparició. Els productes sense
-  // categoria queden a "Els nostres serveis".
+  // Ordena editorialment igual que l'HTML: experiències principals primer i
+  // extres/equipament al final. Els productes sense categoria queden a suport.
   const fallbackCategory = 'Els nostres serveis';
-  // Ordre canònic: animació primer; el suport musical (DJ/so) va al final (opcional).
-  const CATEGORY_PRIORITY = ['Animació adulta', 'Animació infantil', 'DJ', 'DJ i so per a casaments'];
-  const categoryOrder: string[] = [];
-  for (const product of merged) {
-    const cat = product.categoria || fallbackCategory;
-    if (!categoryOrder.includes(cat)) categoryOrder.push(cat);
-  }
-  categoryOrder.sort((a, b) => {
-    const ia = CATEGORY_PRIORITY.indexOf(a);
-    const ib = CATEGORY_PRIORITY.indexOf(b);
-    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
-  });
-  const allChapters = categoryOrder.flatMap((cat) =>
-    merged.filter((product) => (product.categoria || fallbackCategory) === cat),
-  );
+  const allChapters = orderDossierProductsForDossier(merged);
   const chapterImages = await Promise.all(allChapters.map((product) => loadImageDataUrl(product.image)));
 
   drawCover(doc, input.client, input.logoDataUri);

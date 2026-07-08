@@ -115,4 +115,38 @@ describe('generateDossierCompositePDF', () => {
     expect(doc.internal.pages.length - 1).toBe(4);
     expect(doc.output('arraybuffer').byteLength).toBeGreaterThan(1000);
   });
+
+  it('manté el mateix ordre editorial que el dossier HTML: espectacle principal abans que extra', async () => {
+    const doc = await generateDossierCompositePDF({
+      client: { nom: 'Joan Pla' },
+      products: [
+        {
+          id: 'orbita:bombolles',
+          nom: 'Màquina de bombolles',
+          categoria: 'Efectes',
+          descripcio: ['Extra visual.'],
+          inclou: ['Màquina'],
+          priceFrom: 50,
+          dossierSortOrder: 1,
+        },
+        {
+          id: 'collab:pirates',
+          nom: 'El secret dels pirates',
+          categoria: 'Animació infantil',
+          image: '/img/collaborators/masquerade/secret-pirates.jpg',
+          descripcio: ['Musical infantil amb aventura pirata.'],
+          inclou: ['2 actors'],
+          priceFrom: 385,
+          dossierSortOrder: 5,
+        },
+      ],
+      productIds: ['orbita:bombolles', 'collab:pirates'],
+      locale: 'ca',
+    });
+    const text = pdfText(doc);
+
+    expect(text.indexOf('El secret dels pirates')).toBeGreaterThan(-1);
+    expect(text.indexOf('Màquina de bombolles')).toBeGreaterThan(-1);
+    expect(text.indexOf('El secret dels pirates')).toBeLessThan(text.indexOf('Màquina de bombolles'));
+  });
 });

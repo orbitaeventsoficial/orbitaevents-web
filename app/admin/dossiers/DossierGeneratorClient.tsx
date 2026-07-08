@@ -20,6 +20,7 @@ import {
   dossierProductGroupKey,
   dossierProductPriceValue,
   normalizeDossierProductText,
+  orderDossierProductsForDossier,
   productIdsFromDossierServiceLines,
   productToDossierServiceLine,
   type DossierProductGroupKey,
@@ -233,7 +234,10 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
     new Set(parseInitialProductIds(initialProductIds).filter((id) => validProductIds.has(id))),
   );
   const [djHours, setDjHours] = useState(1);
-  const selectedProducts = useMemo(() => products.filter((product) => selectedIds.has(product.id)), [products, selectedIds]);
+  const selectedProducts = useMemo(
+    () => orderDossierProductsForDossier(products.filter((product) => selectedIds.has(product.id))),
+    [products, selectedIds],
+  );
   // Productes tal com surten al dossier: el DJ porta el preu i la durada de les hores triades.
   const dossierProducts = useMemo(
     () => buildDossierProductsForSelection(selectedProducts, selectedIds, djHours),
@@ -642,7 +646,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
           email: email.trim() || undefined,
           eventDesc: eventDesc.trim() || undefined,
           salutacio: salutacio.trim() || undefined,
-          productIds: Array.from(selectedIds),
+          productIds: dossierProducts.map((product) => product.id),
           lineSnapshot: buildDossierLineSnapshot({
             products: dossierProducts,
             travelKm: Number.isFinite(Number(travelKm)) && Number(travelKm) > 0 ? Number(travelKm) : null,

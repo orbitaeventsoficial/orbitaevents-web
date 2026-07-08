@@ -60,6 +60,7 @@ const copy: DossierCopy = {
     travelPriceLabel: 'Cost del desplaçament',
     travelBreakdownLabel: 'Desglossament',
     travelBreakdownVehicle: 'Vehicle i combustible',
+    travelBreakdownVehicleDetail: '{km} km anada i tornada · {rate}/km',
     travelBreakdownPeople: '{headcount} operaris en ruta · {hours} h',
     travelBreakdownTolls: 'Peatges de ruta',
     travelBreakdownMeals: 'Dietes de ruta llarga',
@@ -125,6 +126,16 @@ describe('buildDossierHtml', () => {
     expect(html).toContain('class="producte-media"');
     expect(html).toContain('src="/img/collaborators/masquerade/bingo-musical.jpg"');
     expect(html).toContain('alt="Bingo Musical"');
+  });
+
+  it('usa contenidors responsius i no retalla les imatges del dossier', () => {
+    const html = build(client, [{
+      ...productWithTrams,
+      image: '/img/collaborators/masquerade/secret-pirates.jpg',
+    }]);
+    expect(html).toContain('aspect-ratio: 16 / 10');
+    expect(html).toContain('object-fit: contain');
+    expect(html).not.toContain('object-fit: cover');
   });
 
   it('pot absolutitzar imatges quan la preview viu en un blob', () => {
@@ -206,6 +217,33 @@ describe('buildDossierHtml', () => {
     expect(html).toContain('Capítol 02');
   });
 
+  it('ordena el resum i els capítols perquè els extres no passin davant d\'un espectacle principal', () => {
+    const bubble: AnimacioProduct = {
+      id: 'orbita:bombolles',
+      nom: 'Màquina de bombolles',
+      categoria: 'Efectes',
+      descripcio: ['Extra visual.'],
+      inclou: ['Màquina'],
+      priceFrom: 50,
+      dossierSortOrder: 1,
+    };
+    const pirates: AnimacioProduct = {
+      id: 'collab:pirates',
+      nom: 'El secret dels pirates',
+      categoria: 'Animació infantil',
+      image: '/img/collaborators/masquerade/secret-pirates.jpg',
+      descripcio: ['Musical infantil.'],
+      inclou: ['2 actors'],
+      priceFrom: 385,
+      dossierSortOrder: 5,
+    };
+    const html = build(client, [bubble, pirates]);
+
+    expect(html.indexOf('Capítol 01')).toBeLessThan(html.indexOf('El secret dels pirates'));
+    expect(html.indexOf('El secret dels pirates')).toBeLessThan(html.indexOf('Màquina de bombolles'));
+    expect(html.indexOf('<span class="resum-card-num">01</span>')).toBeLessThan(html.indexOf('<h3>El secret dels pirates</h3>'));
+  });
+
   it('inclou portada carbon amb logo si es proporciona logoDataUri', () => {
     const html = build(client, [productWithTrams], {
       logoDataUri: 'data:image/png;base64,abc',
@@ -285,6 +323,7 @@ describe('buildDossierHtml', () => {
     expect(html).toContain('Cost del desplaçament');
     expect(html).toContain('Desglossament');
     expect(html).toContain('Vehicle i combustible');
+    expect(html).toContain('422 km anada i tornada');
     expect(html).toContain('2 operaris en ruta');
     expect(html).toContain('Peatges de ruta');
     expect(html).toContain('Dietes de ruta llarga');

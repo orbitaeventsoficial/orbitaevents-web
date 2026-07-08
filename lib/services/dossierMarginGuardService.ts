@@ -1,5 +1,6 @@
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { formatCurrency } from '@/lib/constants';
+import { DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 import { getMarginBand, getMarginLabel, type MarginBand } from '@/lib/margin-utils';
 import {
   computeBookingFinancialSummary,
@@ -22,6 +23,8 @@ export type DossierTransportBudget = {
   clientCharge: number;
   headcount: number;
   chargeableHours: number;
+  vehicleKm: number;
+  vehicleCostPerKm: number;
   clientVehicleCost: number;
   peopleCost: number;
   tollsCost: number;
@@ -65,6 +68,8 @@ export function computeDossierTransportBudget(roundTripKm?: number | null, tolls
   });
   const peopleCost = transport.breakdown.peopleCost;
   const tollsCost = transport.tollsEur;
+  const vehicleKm = transport.roundTripKm > INCLUDED_TRAVEL_KM ? transport.roundTripKm : 0;
+  const vehicleCostPerKm = DEFAULT_VEHICLE_COST_PER_KM;
   const clientVehicleCost = round2(Math.max(
     0,
     transport.clientCharge - peopleCost - tollsCost - transport.mealAllowance,
@@ -75,6 +80,8 @@ export function computeDossierTransportBudget(roundTripKm?: number | null, tolls
     clientCharge: transport.clientCharge,
     headcount: transport.headcount,
     chargeableHours: transport.chargeableHours,
+    vehicleKm,
+    vehicleCostPerKm,
     clientVehicleCost,
     peopleCost,
     tollsCost,

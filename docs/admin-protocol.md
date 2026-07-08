@@ -1733,6 +1733,41 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1741 — 2026-07-08 — codex (FET)
+- Context: el propietari revisa el desplaçament del dossier de l'Aldosa i detecta que el client veia el vehicle amb franquícia de 50 km aplicada, mentre el repartiment pagava a qui posa el cotxe sobre la ruta completa. La primera hora de persones ha de continuar inclosa, però el vehicle de ruta llarga no pot quedar amb dues bases diferents.
+- Fet:
+  - `computeBoloTransport` continua deixant inclosa la primera hora de persones, però cobra el vehicle sobre la ruta completa quan se supera la franquícia local de 25 km per sentit.
+  - El dossier reutilitza el pressupost de transport amb `vehicleKm` i `vehicleCostPerKm`, i mostra el detall dinàmic de km anada i tornada + €/km.
+  - `messages/ca|es|en` incorporen `travelBreakdownVehicleDetail` com a copy editable.
+  - Tests de transport, guard de marge, builder HTML, PDF compost i lead/repartiment actualitzats.
+  - Roadmap Manolo actualitzat amb #1741 dins del bloc economia/dossier.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\travelLaborCost.test.ts __tests__\lib\services\dossierMarginGuardService.test.ts __tests__\lib\utils\dossier-html-builder.test.ts __tests__\lib\services\dossierCompositePdfService.test.ts __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx` OK (50/50).
+  - Validació funcional: una ruta llarga ja no presenta vehicle client amb km extres mentre el repartiment liquida km reals; la primera hora de persones continua inclosa.
+  - Validació humana/UX: el dossier deixa clar el càlcul del vehicle i el pacte amb partner pot explicar el mateix import que cobra qui posa el cotxe.
+- `ADMIN_CHANGE_COUNTER` puja a `1741`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
+### Canvi #1740 — 2026-07-08 — codex (FET)
+- Context: el propietari revisa el dossier després del fix de blobs i detecta dos problemes comercials: productes amb i sense imatge queden sense jerarquia, un extra com `Màquina de bombolles` pot aparèixer abans d'un espectacle més important com `El secret dels pirates`, i les imatges de presentacions/cos sencer queden tallades pels contenidors.
+- Fet:
+  - Nou helper canònic `orderDossierProductsForDossier`: experiències visuals primer, serveis principals sense imatge després i extres/equipament al final.
+  - El `sortOrder` dels productes de partner viatja com `dossierSortOrder` fins al producte de dossier i queda congelat als snapshots.
+  - El generador, la llista de dossiers, el builder HTML i el PDF compost consumeixen el mateix ordre editorial.
+  - El HTML del dossier canvia els contenidors d'imatge a proporció responsiva amb `object-fit: contain`, evitant retalls de cossos o presentacions verticals.
+  - Tests nous blinden ordre comercial, CSS sense `cover` i coherència HTML/PDF.
+  - Roadmap Manolo actualitzat amb #1740 dins del bloc documents/dossier.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\dossierProductMappingService.test.ts __tests__\lib\utils\dossier-html-builder.test.ts __tests__\lib\services\dossierCompositePdfService.test.ts` OK (40/40); `npx tsc --noEmit --pretty false` OK.
+  - Validació funcional: un extra/equipament com `Màquina de bombolles` queda darrere d'una experiència principal amb imatge com `El secret dels pirates`; el mateix ordre s'aplica a preview HTML, dossier desat i PDF complet.
+  - Validació humana/UX: el dossier torna a llegir-se com una proposta comercial, no com una llista accidental; les imatges verticals/quadrades es veuen senceres en contenidors responsius.
+- `ADMIN_CHANGE_COUNTER` puja a `1740`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1739 — 2026-07-08 — codex (FET)
 - Context: el propietari obre una preview `blob:http://localhost:3000/...` del generador de dossiers i no veu imatges. El flux viu era `/admin/dossiers?...productIds=collab:carlos-lucas-fernandez`. Els fitxers de Masquerade existeixen a `public/img/collaborators/masquerade`, però el blob HTML podia deixar `src="/img/..."` sense origen de servidor.
 - Fet:

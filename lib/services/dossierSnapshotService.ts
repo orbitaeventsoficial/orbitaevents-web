@@ -21,6 +21,7 @@ export type DossierProductSnapshot = Pick<
   | 'sourceProviderId'
   | 'sourceProductId'
   | 'sourceCostPrice'
+  | 'dossierSortOrder'
 >;
 
 export type DossierLineSnapshot = {
@@ -124,6 +125,8 @@ export function snapshotProduct(product: AnimacioProduct | Record<string, unknow
   if (sourceProductId) snap.sourceProductId = sourceProductId;
   const sourceCostPrice = cleanNumber(source.sourceCostPrice);
   if (sourceCostPrice !== null) snap.sourceCostPrice = sourceCostPrice;
+  const dossierSortOrder = cleanNumber(source.dossierSortOrder);
+  if (dossierSortOrder !== null) snap.dossierSortOrder = dossierSortOrder;
   return snap;
 }
 

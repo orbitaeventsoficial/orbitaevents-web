@@ -29,6 +29,7 @@ import {
   productsFromDossierLineSnapshot,
 } from '@/lib/services/dossierSnapshotService';
 import { DossierDraftCreateButton } from './DossierDraftCreateButton';
+import { orderDossierProductsForDossier } from '@/lib/services/dossierProductMappingService';
 
 export const metadata = { title: 'Dossiers' };
 
@@ -208,7 +209,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
           <div className="flex flex-col gap-2">
             {dossiers.map((d) => {
               const snapshotProducts = hydrateDossierSnapshotProductImages(productsFromDossierLineSnapshot(d.lineSnapshot), lookupProducts);
-              const resolvedProducts = snapshotProducts ?? lookupProducts.filter((p) => d.productIds.includes(p.id));
+              const resolvedProducts = orderDossierProductsForDossier(snapshotProducts ?? lookupProducts.filter((p) => d.productIds.includes(p.id)));
               const productNames = resolvedProducts.map((p) => p.nom).join(' · ');
               return (
                 <article key={d.id} className="ap-card ap-card-body grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
@@ -278,7 +279,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
           <div className="flex flex-col gap-2">
             {deletedDossiers.map((d) => {
               const snapshotProducts = hydrateDossierSnapshotProductImages(productsFromDossierLineSnapshot(d.lineSnapshot), lookupProducts);
-              const resolvedProducts = snapshotProducts ?? lookupProducts.filter((p) => d.productIds.includes(p.id));
+              const resolvedProducts = orderDossierProductsForDossier(snapshotProducts ?? lookupProducts.filter((p) => d.productIds.includes(p.id)));
               const productNames = resolvedProducts.map((p) => p.nom).join(' · ');
               return (
                 <article key={d.id} className="ap-card ap-card-body grid gap-4 opacity-70 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">

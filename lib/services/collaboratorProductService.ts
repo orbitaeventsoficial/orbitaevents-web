@@ -58,6 +58,7 @@ export type DossierCollaboratorProduct = {
   sellPrice: number;
   costPrice: number;
   imageUrl?: string;
+  dossierSortOrder?: number;
 };
 
 /** Profit net (€) i markup d'un producte. % calculat sobre el cost del col·laborador. */
@@ -165,6 +166,7 @@ export function collaboratorProductToDossierProduct(product: CollaboratorProduct
     sellPrice: product.sellPrice,
     costPrice: product.costPrice,
     imageUrl: product.imageUrl || undefined,
+    dossierSortOrder: product.sortOrder,
   };
 }
 
@@ -183,6 +185,7 @@ export function collaboratorProductToAnimacioProduct(product: DossierCollaborato
     sourceProviderId: product.sourceProviderId,
     sourceProductId: product.sourceProductId,
     sourceCostPrice: product.costPrice,
+    dossierSortOrder: product.dossierSortOrder,
   };
 }
 

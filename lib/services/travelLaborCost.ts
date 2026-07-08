@@ -290,14 +290,13 @@ export function computeBoloTransport(input: {
         ]
       : [],
   });
-  // Franquícia comercial (decisió del propietari): els primers INCLUDED_TRAVEL_KM (50 km
-  // a/t = 25 anada + 25 tornada) de COTXE van inclosos al càrrec del client («desplaçament
-  // inclòs fins a 25 km»). El COST intern real es manté sencer (la benzina es gasta igual)
-  // → la franquícia és un gest comercial conscient, no un maquillatge del marge. El temps
-  // de la tripulació ja té la seva pròpia franquícia (la 1a hora de ruta).
+  // Vehicle al client (#1741): dins els primers INCLUDED_TRAVEL_KM (50 km a/t = 25 per
+  // sentit) el desplaçament queda inclòs. Quan la ruta supera aquesta franquícia, el vehicle
+  // es cobra sobre la ruta real completa, perquè ha de quadrar amb la liquidació a qui posa
+  // el cotxe.
   const vehicleCostPerKm = sanitizeNonNegative(input.vehicleCostPerKm, DEFAULT_VEHICLE_COST_PER_KM);
-  const billableKm = Math.max(0, km - INCLUDED_TRAVEL_KM);
-  const clientVehicleCost = calculateTravelCost(billableKm, vehicleCostPerKm);
+  const clientVehicleKm = km > INCLUDED_TRAVEL_KM ? km : 0;
+  const clientVehicleCost = calculateTravelCost(clientVehicleKm, vehicleCostPerKm);
   // Dieta de desplaçament (#1386): en rutes llargues (routeHours > llindar) cada PERSONA que
   // viatja cobra una dieta d'àpat. Cost real repercutit al client (break-even): entra igual al
   // cost i al càrrec → NO mou el marge, cobreix el treballador quan el bolo és lluny. Els bolos
@@ -306,8 +305,8 @@ export function computeBoloTransport(input: {
     ? round2(TRAVEL_MEAL_ALLOWANCE_PER_PERSON * headcount)
     : 0;
   const totalCost = km <= 0 ? round2(tolls + mealAllowance) : round2(breakdown.totalCost + mealAllowance);
-  // El client paga el mateix cost real (transport = cost neutre): cotxe amb franquícia +
-  // tripulació@15 + dieta + peatges. L'única franquícia comercial és la del cotxe (50 km).
+  // El client paga el mateix cost real (transport = cost neutre): cotxe de la ruta llarga +
+  // tripulació@15 + dieta + peatges. En ruta local, el cotxe queda inclòs.
   const clientCharge = km <= 0
     ? round2((tolls + mealAllowance) * CLIENT_TRAVEL_MARGIN)
     : round2((clientVehicleCost + breakdown.peopleCost + mealAllowance + tolls) * CLIENT_TRAVEL_MARGIN);

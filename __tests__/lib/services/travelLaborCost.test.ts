@@ -95,11 +95,11 @@ describe('travelLaborCost', () => {
     expect(r.breakdown.chargeableHours).toBe(5.5);
     expect(r.breakdown.peopleCost).toBe(165);      // tripulació: 5,5 h × 15 × 2
     expect(r.mealAllowance).toBe(60);              // dieta: 30 × 2 (routeHours 6,49 > 3)
-    // clientCharge = cotxe amb franquícia (372 × 0,26 = 96,72) + tripulació 165 + dieta 60
-    expect(r.clientCharge).toBe(321.72);
+    // clientCharge = cotxe sencer 109,72 + tripulació 165 + dieta 60
+    expect(r.clientCharge).toBe(334.72);
     // cost = cotxe sencer 109,72 + tripulació 165 + dieta 60
     expect(r.cost).toBe(334.72);
-    // Break-even: l'únic negatiu (−13) és la franquícia del cotxe (gest comercial), no la dieta.
+    // Break-even: la ruta llarga cobra el mateix vehicle que es liquida a qui posa el cotxe.
   });
 
   it('no aplica dieta en ruta curta (per sota del llindar de 3 h)', () => {

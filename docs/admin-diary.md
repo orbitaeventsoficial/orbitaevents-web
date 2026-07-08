@@ -1,3 +1,49 @@
+## 2026-07-08 — Transport llarg: vehicle cobrat igual que es liquida (Canvi #1741, codex)
+
+### Context
+En revisar el dossier de l'Aldosa, el propietari detecta una incoherència econòmica: el dossier mostra el vehicle i combustible amb la franquícia de 50 km aplicada al client, però el repartiment liquida a qui posa el cotxe sobre tota la ruta real. Això fa que Masquerade o Òrbita puguin cobrar més de vehicle del que el client veu al desglossament, mentre la primera hora de persones sí que ha de continuar inclosa.
+
+### Què s'ha fet
+- `computeBoloTransport` manté la primera hora de ruta inclosa per a persones, però en rutes que superen els 25 km per sentit cobra el vehicle sobre la ruta completa.
+- El transport local dins la franquícia continua inclòs; el canvi només afecta rutes llargues.
+- El pressupost de dossier exposa els km i €/km del vehicle al desglossament perquè el número sigui auditable.
+- `messages/ca|es|en` afegeixen la copy editable del detall de vehicle.
+- Tests focalitzats actualitzats per blindar que el dossier, el lead i el motor central comparteixen la mateixa regla.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\travelLaborCost.test.ts __tests__\lib\services\dossierMarginGuardService.test.ts __tests__\lib\utils\dossier-html-builder.test.ts __tests__\lib\services\dossierCompositePdfService.test.ts __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx` OK (50/50).
+- Validació funcional: per 411,4 km i sense peatges, el vehicle deixa de ser 93,96 € client vs 106,96 € liquidació; en ruta llarga el client i qui posa el vehicle comparteixen base de km real.
+- Validació humana/UX: el dossier explica "km anada i tornada · €/km"; el partner pot validar què cobra sense veure una xifra diferent a la que es presenta al client.
+
+### Coordinació
+Counter → 1741. Canvi limitat al motor central de transport, pressupost de dossier, copy i tests; sense schema, BD ni tocar `app/admin/tasks`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-08 — Dossier: ordre comercial i imatges completes (Canvi #1740, codex)
+
+### Context
+Després que les previews `blob:` tornin a carregar imatges, el propietari revisa el dossier i detecta un problema de jerarquia i de presentació: ítems amb imatge i sense imatge queden desendreçats, un extra menor com `Màquina de bombolles` pot aparèixer abans d'una peça de més valor comercial com `El secret dels pirates`, i les imatges de presentacions/cos sencer es tallen perquè el contenidor les força amb `object-fit: cover`.
+
+### Què s'ha fet
+- Afegit `orderDossierProductsForDossier` com a helper únic d'ordre editorial: experiències visuals primer, serveis principals sense imatge després i extres/equipament al final.
+- El `sortOrder` dels productes de partner passa a `dossierSortOrder` i queda preservat també dins del snapshot del dossier.
+- El generador de dossiers, la llista de dossiers, el builder HTML i el PDF compost consumeixen el mateix ordre.
+- Els contenidors d'imatge del dossier HTML passen a proporció responsiva i `object-fit: contain`, de manera que una imatge vertical/quadrada es veu sencera en lloc de retallada.
+- Tests nous blinden ordre, CSS d'imatge i coherència HTML/PDF.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\dossierProductMappingService.test.ts __tests__\lib\utils\dossier-html-builder.test.ts __tests__\lib\services\dossierCompositePdfService.test.ts` OK (40/40); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: `El secret dels pirates` queda abans que `Màquina de bombolles` encara que l'extra tingui un `sortOrder` inferior; preview HTML, dossier desat i PDF complet comparteixen ordre.
+- Validació humana/UX: el dossier deixa de semblar una graella accidental i recupera jerarquia comercial; les imatges no amputen cossos ni escenes de presentació.
+
+### Coordinació
+Counter → 1740. Canvi limitat a producte de dossier, mapping/snapshot, builder HTML, PDF compost, generador/listat, tests, roadmap, protocol, diari i sync; sense schema ni BD.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Dossier: les previews blob carreguen imatges reals (Canvi #1739, codex)
 
 ### Context

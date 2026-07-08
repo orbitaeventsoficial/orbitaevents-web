@@ -60,6 +60,48 @@ export function dossierProductGroupKey(product: AnimacioProduct): DossierProduct
   return 'altres';
 }
 
+function hasDossierImage(product: AnimacioProduct): boolean {
+  return typeof product.image === 'string' && product.image.trim().length > 0;
+}
+
+function isDossierSupportProduct(product: AnimacioProduct): boolean {
+  const text = normalizeDossierProductText([
+    product.id,
+    product.categoria,
+    product.nom,
+  ].filter(Boolean).join(' '));
+  return /\b(extra|efecte|efectes|llum|llums|material|lloguer|equipament|operativa|operari|bombolles|globoflexia|pintacares|pont|caps mobils|hora equip muntat)\b/.test(text);
+}
+
+function dossierCategoryRank(product: AnimacioProduct): number {
+  const category = normalizeDossierProductText(product.categoria);
+  if (category.includes('adulta')) return 10;
+  if (category.includes('infantil')) return 20;
+  if (category.includes('dj') || category.includes('casament') || category.includes('so')) return 30;
+  return 40;
+}
+
+function dossierEditorialRank(product: AnimacioProduct): number {
+  if (isDossierSupportProduct(product)) return hasDossierImage(product) ? 70 : 75;
+  if (!hasDossierImage(product)) return 55;
+  return dossierCategoryRank(product);
+}
+
+/** Ordre comercial del dossier: experiències amb imatge primer, extres/equipament al final. */
+export function orderDossierProductsForDossier(products: AnimacioProduct[]): AnimacioProduct[] {
+  return products
+    .map((product, index) => ({ product, index }))
+    .sort((a, b) => {
+      const rank = dossierEditorialRank(a.product) - dossierEditorialRank(b.product);
+      if (rank !== 0) return rank;
+      const sortA = a.product.dossierSortOrder ?? a.index;
+      const sortB = b.product.dossierSortOrder ?? b.index;
+      if (sortA !== sortB) return sortA - sortB;
+      return a.index - b.index;
+    })
+    .map(({ product }) => product);
+}
+
 export function productToDossierServiceLine(product: AnimacioProduct, djHours = 1): DossierLeadServiceLinePayload {
   const revenueAmount = dossierProductPriceValue(product, djHours);
   if (product.id === DOSSIER_DJ_PRODUCT_ID) {
@@ -172,11 +214,12 @@ export function buildDossierProductsForSelection(
   djHours = 1,
 ): AnimacioProduct[] {
   const selected = new Set(selectedIds);
-  return products
+  const dossierProducts = products
     .filter((product) => selected.has(product.id))
     .map((product) => (
       product.id === DOSSIER_DJ_PRODUCT_ID
         ? { ...product, priceFrom: djPriceForHours(djHours), durada: `${djHours}h` }
         : product
     ));
+  return orderDossierProductsForDossier(dossierProducts);
 }

@@ -5,6 +5,7 @@ import {
   DOSSIER_DJ_PRODUCT_ID,
   buildDossierProductsForSelection,
   dossierDjHoursFromServiceLines,
+  orderDossierProductsForDossier,
   productIdsFromDossierServiceLines,
   productToDossierServiceLine,
 } from '@/lib/services/dossierProductMappingService';
@@ -64,5 +65,44 @@ describe('dossierProductMappingService', () => {
       costAmount: 200,
       notes: 'Producte de catàleg: masq-bingo',
     });
+  });
+
+  it('ordena el dossier amb experiències visuals abans que extres/equipament', () => {
+    const bubble: AnimacioProduct = {
+      id: 'orbita:bombolles',
+      nom: 'Màquina de bombolles',
+      categoria: 'Efectes',
+      descripcio: ['Extra visual.'],
+      inclou: ['Màquina'],
+      priceFrom: 50,
+      dossierSortOrder: 1,
+    };
+    const pirates: AnimacioProduct = {
+      id: 'collab:pirates',
+      nom: 'El secret dels pirates',
+      categoria: 'Animació infantil',
+      image: '/img/collaborators/masquerade/secret-pirates.jpg',
+      descripcio: ['Musical infantil.'],
+      inclou: ['2 actors'],
+      priceFrom: 385,
+      dossierSortOrder: 5,
+    };
+    const noImageMain: AnimacioProduct = {
+      id: 'collab:adults',
+      nom: 'Animació adults 1h',
+      categoria: 'Animació adulta',
+      descripcio: ['Animació principal sense foto.'],
+      inclou: ['Animador'],
+      priceFrom: 192,
+      dossierSortOrder: 2,
+    };
+
+    const ordered = orderDossierProductsForDossier([bubble, noImageMain, pirates]);
+
+    expect(ordered.map((product) => product.nom)).toEqual([
+      'El secret dels pirates',
+      'Animació adults 1h',
+      'Màquina de bombolles',
+    ]);
   });
 });

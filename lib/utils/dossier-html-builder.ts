@@ -3,6 +3,7 @@ import { SITE_CONFIG } from '@/app/config/site-config';
 import { formatCurrency } from '@/lib/constants';
 import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 import { computeDossierTransportBudget } from '@/lib/services/dossierMarginGuardService';
+import { orderDossierProductsForDossier } from '@/lib/services/dossierProductMappingService';
 
 /** Càrrec de transport al client per a la ruta del dossier (un sol cervell). */
 function dossierTravelBudget(travelKm: number, travelTollsEur = 0) {
@@ -56,6 +57,7 @@ export type DossierCopy = {
     travelPriceLabel: string;
     travelBreakdownLabel: string;
     travelBreakdownVehicle: string;
+    travelBreakdownVehicleDetail: string;
     travelBreakdownPeople: string;
     travelBreakdownTolls: string;
     travelBreakdownMeals: string;
@@ -188,6 +190,7 @@ function buildProposalBlock(
   if (products.length === 0) return '';
 
   const money = (n: number) => escHtml(formatCurrency(n, locale));
+  const decimal = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   const fromPrefix = escHtml(copy.chapter.priceFromPrefix);
   const includedOneWay = Math.round(INCLUDED_TRAVEL_KM / 2);
   const fillRaw = (tpl: string, vars: Record<string, string>) =>
@@ -222,7 +225,14 @@ function buildProposalBlock(
   const travelCharge = travelBudget.clientCharge;
   const travelBreakdownRows = [
     travelBudget.clientVehicleCost > 0
-      ? { label: copy.budget.travelBreakdownVehicle, amount: travelBudget.clientVehicleCost }
+      ? {
+          label: copy.budget.travelBreakdownVehicle,
+          detail: fillRaw(copy.budget.travelBreakdownVehicleDetail, {
+            km: decimal.format(travelBudget.vehicleKm),
+            rate: formatCurrency(travelBudget.vehicleCostPerKm, locale),
+          }),
+          amount: travelBudget.clientVehicleCost,
+        }
       : null,
     travelBudget.peopleCost > 0
       ? {
@@ -242,7 +252,7 @@ function buildProposalBlock(
     travelBudget.mealAllowance > 0
       ? { label: copy.budget.travelBreakdownMeals, amount: travelBudget.mealAllowance }
       : null,
-  ].filter((row): row is { label: string; amount: number } => Boolean(row));
+  ].filter((row): row is { label: string; detail?: string; amount: number } => Boolean(row));
   const travelSection = travelKm > 0 ? `
     <div class="bud-travel">
       <div class="bud-travel-marker" aria-hidden="true">
@@ -258,7 +268,7 @@ function buildProposalBlock(
           <span class="bud-travel-price-val">${money(travelCharge)}</span>
           ${travelBreakdownRows.length > 0 ? `<div class="bud-travel-breakdown">
             <span class="bud-travel-breakdown-title">${escHtml(copy.budget.travelBreakdownLabel)}</span>
-            ${travelBreakdownRows.map((row) => `<span class="bud-travel-breakdown-row"><span>${escHtml(row.label)}</span><strong>${money(row.amount)}</strong></span>`).join('')}
+            ${travelBreakdownRows.map((row) => `<span class="bud-travel-breakdown-row"><span class="bud-travel-breakdown-copy"><span>${escHtml(row.label)}</span>${row.detail ? `<small>${escHtml(row.detail)}</small>` : ''}</span><strong>${money(row.amount)}</strong></span>`).join('')}
           </div>` : ''}
         </div>` : ''}
       </div>
@@ -294,12 +304,13 @@ export function buildDossierHtml(
   const salutacio = client.salutacio || copy.intro.greetingDefault;
   // Salutació monocapa des de la copy (mai «Hola» hardcoded): {name} → nom del client.
   const greetingHtml = escHtml(copy.intro.greeting.split('{name}').join(client.nom));
+  const orderedProducts = orderDossierProductsForDossier(products);
 
-  const producteBlocs = products
+  const producteBlocs = orderedProducts
     .map((p, i) => buildProductBlock(p, i + 1, copy, locale, options.logoDataUri, false, options.assetBaseUrl))
     .join('\n');
 
-  const proposalBloc = buildProposalBlock(products, copy, locale, options.travelKm ?? 0, options.travelTollsEur ?? 0, options.location);
+  const proposalBloc = buildProposalBlock(orderedProducts, copy, locale, options.travelKm ?? 0, options.travelTollsEur ?? 0, options.location);
 
   const salutacioHtml = escHtml(salutacio).replace(/\n\n/g, '<br><br>');
 
@@ -484,9 +495,11 @@ export function buildDossierHtml(
     .producte-body { display: grid; grid-template-columns: 1fr 200px; gap: 34px; margin-bottom: 32px; align-items: start; }
     .producte-media {
       grid-column: 1 / -1; margin: -4px 0 2px; padding: 8px;
-      border: 1px solid var(--o-line); background: rgba(255,255,255,0.18);
+      border: 1px solid var(--o-line); background: var(--o-paper-card);
+      display: grid; place-items: center; width: 100%;
+      aspect-ratio: 16 / 10; max-height: 360px; overflow: hidden;
     }
-    .producte-media img { display: block; width: 100%; height: 230px; object-fit: cover; object-position: center; }
+    .producte-media img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; }
     .producte-desc { font-size: 17px; color: var(--o-ink-soft); line-height: 1.92; }
     .producte-desc p + p { margin-top: 16px; }
     .producte-desc p:first-child::first-letter {
@@ -583,6 +596,8 @@ export function buildDossierHtml(
       font-family: 'Inter', Arial, sans-serif; font-size: 11px; line-height: 1.45; color: var(--o-ink-soft);
       border-top: 1px solid var(--o-line-soft); padding-top: 7px;
     }
+    .bud-travel-breakdown-copy { display: grid; gap: 1px; min-width: 0; }
+    .bud-travel-breakdown-copy small { color: var(--o-ink-mute); font-size: 10px; line-height: 1.35; }
     .bud-travel-breakdown-row strong { color: var(--o-ink); font-size: 12px; white-space: nowrap; }
     .bud-note { font-family: 'Inter', Arial, sans-serif; font-size: 11px; color: var(--o-ink-mute); margin-top: 12px; line-height: 1.6; }
 
@@ -608,7 +623,7 @@ export function buildDossierHtml(
       .intro-summary div:last-child { border-bottom: 0; }
       .producte-nom { font-size: 30px; }
       .producte-body { grid-template-columns: 1fr; gap: 22px; }
-      .producte-media img { height: 180px; }
+      .producte-media { aspect-ratio: 4 / 3; max-height: 260px; }
       .producte-aside { border-left: 0; border-top: 1px solid var(--o-gold-bright); padding-left: 0; padding-top: 18px; }
       .producte-inclou { grid-template-columns: 1fr; }
       .producte-marker-num { font-size: 44px; }
@@ -640,7 +655,7 @@ export function buildDossierHtml(
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
       }
       .product-page, .resum-page { padding-top: 0; }
-      .producte-media img { height: 200px; }
+      .producte-media { aspect-ratio: 16 / 9; max-height: 255px; }
       .producte, .resum-card, .bud-travel, .bud-travel-price, .cta, .peu { page-break-inside: avoid; }
     }
   </style>

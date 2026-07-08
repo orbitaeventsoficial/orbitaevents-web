@@ -66,6 +66,20 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-08 [ESTAT: tancat — Transport llarg cobra vehicle real #1741]
+Perimetre: `computeBoloTransport`, pressupost de transport de dossier, copy i tests. Objectiu complert: en rutes que superen els 25 km per sentit, el vehicle es cobra al client sobre la ruta completa igual que es liquida a qui posa el cotxe; la primera hora de persones continua inclosa.
+Ultim canvi: #1741.
+Validacio: `pnpm test:run -- --run __tests__\lib\services\travelLaborCost.test.ts __tests__\lib\services\dossierMarginGuardService.test.ts __tests__\lib\utils\dossier-html-builder.test.ts __tests__\lib\services\dossierCompositePdfService.test.ts __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx` OK (50/50).
+Proper pas previst: regenerar preview del dossier del lead amb km reals i informar/afegir peatges manuals si el propietari dona l'import.
+Avis claude: el transport local continua inclos i la primera hora de ruta de persones no canvia; el canvi nomes elimina la doble base del vehicle en ruta llarga.
+
+[codex] 2026-07-08 [ESTAT: tancat — Dossier ordena productes i mostra imatges completes #1740]
+Perimetre: `buildDossierHtml`, ordre de productes de dossier, `dossierSortOrder`, snapshots, generador/llistat, PDF compost i tests. Objectiu complert: el dossier posa experiencies visuals abans d'extres/equipament, conserva ordre de partner i mostra imatges en contenidors responsius amb `contain`, sense retallar cos/presentacio.
+Ultim canvi: #1740.
+Validacio: `pnpm test:run -- --run __tests__\lib\services\dossierProductMappingService.test.ts __tests__\lib\utils\dossier-html-builder.test.ts __tests__\lib\services\dossierCompositePdfService.test.ts` OK (40/40); `npx tsc --noEmit --pretty false` OK.
+Proper pas previst: regenerar preview nova del dossier; el blob antic no s'actualitza. Despres continuar E2E lead -> dossier -> reserva amb cas complet.
+Avis claude: no he tocat `app/admin/tasks`, schema, BD ni motors economics; el canvi es nomes documents/dossier i ordre visual/comercial.
+
 [codex] 2026-07-08 [ESTAT: tancat — Dossier blob amb imatges reals #1739]
 Perimetre: `buildDossierHtml`, generador/llistat de dossiers i test del builder. Objectiu complert: les previews `blob:` absolutitzen imatges amb `window.location.origin`, de manera que `/img/...` carrega des del servidor local/prod. Sense schema, BD, `app/admin/tasks` ni PDF jsPDF.
 Ultim canvi: #1739.
