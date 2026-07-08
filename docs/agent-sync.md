@@ -72,10 +72,10 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
-[codex] 2026-07-08 [ESTAT: treballant — protocol de treball post-petada, sense codi]
+[codex] 2026-07-08 [ESTAT: tancat — protocol de treball post-petada, sense codi]
 Perimetre: lectura del protocol viu i coordinacio despres de l'avís del propietari que les passades amb Claude peten. Cap canvi funcional, cap schema, cap BD, cap runtime, cap commit i cap entrada nova de counter.
-Ultim canvi: #1751.
-Proper pas previst: rellegir diari/protocol/admin viu, confirmar ownership de Claude/Codex i respondre amb la regla operativa: no entrar a cap carril de Claude sense `agent-sync`, worktree i validacions alineades.
+Ultim canvi: #1752.
+Proper pas previst: si el propietari diu `go`/`seguim`, començar per `git status`, counter, §6/§9 i una decisio explicita de carril que no trepitgi Claude; si hi ha dubte de solapament, aturar el carril i revalidar abans d'editar.
 Avis claude: no competeixo cap front teu; aquesta passada nomes fixa coordinacio i criteri de no-col.lisio.
 
 [codex] 2026-07-08 [ESTAT: tancat — Lead Alba canònic visual + Isma intern #1751]
