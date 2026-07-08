@@ -66,6 +66,12 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-08 [ESTAT: tancat — lectura protocol de treball]
+Perimetre: lectura del protocol viu demanada pel propietari i resum operatiu; sense codi, sense schema, sense BD, sense runtime i sense `ADMIN_CHANGE_COUNTER`.
+Ultim canvi: #1744.
+Proper pas previst: si el propietari diu `go`/`seguim`, arrencar pel tall viu del §6/roadmap, comprovant worktree, counter i no-col·lisió.
+Avis claude: no entro a cap carril funcional; només protocol/coord.
+
 [codex] 2026-07-08 [ESTAT: tancat — Dossier no esborra liquidació de ruta del lead #1744]
 Perimetre: `DossierGeneratorClient`, test focalitzat, roadmap i docs. Objectiu complert: quan el generador sincronitza productes cap al lead, conserva `routeCostLines` ocultes `[travel-cost]` i no trenca el pacte de ruta validat al lead/reserva.
 Ultim canvi: #1744.
