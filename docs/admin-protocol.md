@@ -1732,6 +1732,22 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1728 — 2026-07-08 — codex (FET)
+- Context: el propietari demana veure el repartiment de la pasta també al lead, perquè abans de formalitzar reserva el lead és on es configura el bolo i es preparen dossiers/pressupostos.
+- Fet:
+  - `LeadBoloSection` importa i crida `computeBoloRepartiment` sobre les línies vives del bolo, sense crear cap càlcul paral·lel.
+  - La fitxa del lead renderitza `Repartiment estimat del lead` amb el mateix `RepartimentPanel` que la reserva: client paga, qui cobra, import que cobra i marge Òrbita.
+  - Els noms de col·laborador es deriven de les línies del bolo (`Producte (Proveïdor)` o línies de ruta), sense tocar schema ni BD.
+  - La reserva conserva la veritat final; el lead mostra la lectura pre-reserva per decidir abans de dossier/pressupost.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx` (1/1); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm build` OK (`validate:core`, 72 tests scripts/628 asserts, `tsc`, Next build).
+  - Validació funcional: test de component amb una línia `Bingo Musical (Masquerade)` confirma que el panell apareix al lead i mostra el proveïdor.
+  - Validació humana/UX: el repartiment queda visible al mateix lloc on es decideix el bolo, de manera coherent amb dossiers i reserva posterior.
+- `ADMIN_CHANGE_COUNTER` puja a `1728`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1727 — 2026-07-08 — codex (FET)
 - Context: el propietari detecta a `/admin/portfolio` un error de confiança: la pantalla pot marcar `0 fotos` i `0 videos` en categories que tenen catàleg visible perquè el comptador surt de l'estat editable abans de carregar. També demana una pestanya clara d'imatges i un drop-in per categoria que faci la feina de carpeta, nom i optimització.
 - Fet:

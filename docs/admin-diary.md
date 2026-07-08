@@ -1,3 +1,25 @@
+## 2026-07-08 — Repartiment estimat visible a la fitxa del lead (Canvi #1728, codex)
+
+### Context
+El propietari demana veure el repartiment de la pasta també abans de formalitzar la reserva: el lead és on es construeix el bolo, es decideixen productes/proveïdors i es generen dossiers o pressupostos. Si el repartiment només apareix a la reserva, la decisió comercial pre-reserva queda cega.
+
+### Què s'ha fet
+- `app/admin/leads/[id]/LeadBoloSection.tsx` reutilitza el mateix `computeBoloRepartiment` que la fitxa de reserva i el Cuadrant.
+- El lead mostra un panell nou `Repartiment estimat del lead` dins d'`El bolo`, amb la mateixa taula `RepartimentPanel`: client paga, qui cobra, quant cobra i marge Òrbita.
+- El panell deriva els noms dels col·laboradors de les línies del bolo (`Producte (Proveïdor)` i línies de ruta), sense afegir cap camp nou ni tocar schema.
+- La reserva continua sent la veritat final; al lead és una estimació viva abans de contractar.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx` (1/1); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm build` OK (`validate:core`, 72 tests scripts/628 asserts, `tsc`, Next build).
+- Validació funcional: el test carrega una línia de proveïdor al lead i comprova que apareix el repartiment estimat amb `Masquerade` i la línia `Bingo Musical (Masquerade)`.
+- Validació humana/UX: el lead deixa de ser una caixa negra econòmica abans de reserva; la lectura de “qui cobra què” queda al costat del configurador que alimenta dossier/pressupost/reserva.
+
+### Coordinació
+Counter → 1728. Canvi limitat a `/admin/leads/[id]`, test focal, protocol i comptador; sense tocar schema, APIs de reserva, costEngine, repartimentService, dossiers ni BD viva.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Portfolio amb drop-in per categoria i comptadors no falsos (Canvi #1727, codex)
 
 ### Context

@@ -4,9 +4,11 @@ import { useEffect, useState, useCallback, useMemo, type MouseEvent } from 'reac
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import BookingServiceLinesSection from '@/app/admin/bookings/BookingServiceLinesSection';
+import RepartimentPanel from '@/app/admin/bookings/[id]/RepartimentPanel';
 import BoloTripCard, { CROWDED_TRIP_THRESHOLD } from '@/app/admin/components/BoloTripCard';
 import type { BookingServiceLineFormInput } from '@/app/admin/bookings/booking-form.types';
 import { computeBookingFinancialSummary, computeServiceLineEconomics, classifyBoloLines } from '@/lib/services/costEngine';
+import { computeBoloRepartiment } from '@/lib/services/repartimentService';
 import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
 import { calculateTravelCostBreakdown, deriveTravelHeadcount, computeBoloTransport, TRAVEL_MEAL_ALLOWANCE_PER_PERSON } from '@/lib/services/travelLaborCost';
 import { useBookingDistance } from '@/app/admin/bookings/useBookingDistance';
@@ -60,6 +62,13 @@ function cleanRouteNote(raw: string): string {
  .replace(/(\d+)\.0+(\s?km)/g, '$1$2')
  .replace(/\bEUR(\/\w+)/g, '€$1')
  .replace(/(\d)\.(\d)/g, '$1,$2');
+}
+
+function collaboratorNameFromLineLabel(label?: string | null): string | null {
+ const match = label?.match(/\(([^)]+)\)/);
+ if (match?.[1]) return match[1].trim();
+ const routeMatch = label?.match(/^(?:Vehicle ruta|Temps ruta conductor|Temps ruta passatger|Peatges ruta)\s·\s(.+)$/);
+ return routeMatch?.[1]?.replace(/\sx\d+$/, '').trim() || null;
 }
 
 export default function LeadBoloSection({
@@ -164,6 +173,15 @@ export default function LeadBoloSection({
  quantity: item.quantity || 1,
  })), [contractedProducts]);
  const buildVisibleLines = useCallback((): BookingServiceLineFormInput[] => [...baseLines, ...lines], [baseLines, lines]);
+ const repartimentNames = useMemo(() => {
+ const names: Record<string, string> = {};
+ for (const line of buildVisibleLines()) {
+ if (!line.collaboratorId) continue;
+ names[line.collaboratorId] = collaboratorNameFromLineLabel(line.label) ?? names[line.collaboratorId] ?? 'Col·laborador';
+ }
+ return names;
+ }, [buildVisibleLines]);
+ const repartiment = useMemo(() => computeBoloRepartiment(buildVisibleLines()), [buildVisibleLines]);
 
  // ── Transport EN VIU (#1345): mirall del càlcul de NewBookingForm ──
  // Distància auto-resolta des de la ubicació del lead → Granollers.
@@ -461,6 +479,16 @@ export default function LeadBoloSection({
  <strong>{formatCurrency(economia.total)}</strong>
  </div>
  </div>
+ </div>
+ )}
+
+ {repartiment.elements.length > 0 && (
+ <div className="ap-ledger-budget" aria-label="Repartiment estimat del lead">
+ <div className="ap-ledger-econohead">
+ <span>Repartiment estimat del lead</span>
+ <span className="ap-ledger-econonote">qui cobra què · abans de formalitzar reserva</span>
+ </div>
+ <RepartimentPanel repartiment={repartiment} names={repartimentNames} />
  </div>
  )}
 

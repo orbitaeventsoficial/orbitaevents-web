@@ -66,6 +66,13 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-08 [ESTAT: tancat — Repartiment estimat visible al lead #1728]
+Perimetre: `/admin/leads/[id]` nomes; mostrar al lead el mateix cervell `computeBoloRepartiment` que ja usa la reserva, com a estimacio pre-reserva per dossiers/decisio comercial.
+Ultim canvi: #1728.
+Validacio: test focal lead repartiment 1/1; `tsc --noEmit` OK; `pnpm run qa:protocol` OK; `pnpm build` OK (`validate:core`, 72 tests scripts/628 asserts, `tsc`, Next build).
+Proper pas previst: commit+push+deploy del paquet #1728; despres continuar auditoria Zenit amb el seguent error real.
+Avis claude: no toco schema Prisma, APIs de reserva, costEngine, repartimentService, dossiers ni BD viva; tall UI/admin lead consumint cervell existent.
+
 [codex] 2026-07-08 [ESTAT: tancat — Portfolio imatges amb drop per categoria #1727]
 Perimetre: `/admin/portfolio` nomes; pestanya visible `Imatges`, drop-in drag/drop per categoria i comptadors que no marquin `0` fals abans de carregar media editable.
 Ultim canvi: #1727.
