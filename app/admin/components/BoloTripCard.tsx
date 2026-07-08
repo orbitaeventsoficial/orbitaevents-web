@@ -51,6 +51,8 @@ export interface BoloTripCardProps {
   /** Cost real de la ruta (per al desplegable «qui cobra»). */
   effectiveTravelCost?: number;
   routeSettlementLines?: RouteSettlementLine[];
+  /** Notes de formula ja calculades pel pare; aquest component nomes les pinta. */
+  calculationNotes?: string[];
 }
 
 export default function BoloTripCard({
@@ -73,6 +75,7 @@ export default function BoloTripCard({
   tripCrowded,
   effectiveTravelCost = 0,
   routeSettlementLines = [],
+  calculationNotes = [],
 }: BoloTripCardProps) {
   const headcountEditable = typeof onHeadcountOverrideChange === 'function';
   const showTolls = typeof onTollsChange === 'function';
@@ -167,6 +170,13 @@ export default function BoloTripCard({
           ? `La 1a hora de ruta va inclosa · es cobra el temps a partir d'aquí (${formatNumber(chargeableHours)} h de tripulació).`
           : 'Ruta curta: dins la 1a hora inclosa, no es cobra temps de tripulació.'}
       </p>
+      {calculationNotes.length > 0 && routeSettlementLines.length === 0 && (
+        <div className="ap-ledger-trip-formula" aria-label="Càlcul del desplaçament">
+          {calculationNotes.map((note) => (
+            <span key={note}>{note}</span>
+          ))}
+        </div>
+      )}
 
       {effectiveTravelCost > 0 && routeSettlementLines.length > 0 && (
         <details className="ap-ledger-route-settlement" aria-label="Repartiment econòmic del transport">
@@ -175,6 +185,13 @@ export default function BoloTripCard({
             <strong>{formatCurrency(effectiveTravelCost)}</strong>
           </summary>
           <div className="ap-ledger-route-settlement-grid">
+            {calculationNotes.length > 0 && (
+              <div className="ap-ledger-trip-formula ap-ledger-trip-formula--settlement" aria-label="Càlcul del desplaçament">
+                {calculationNotes.map((note) => (
+                  <span key={note}>{note}</span>
+                ))}
+              </div>
+            )}
             {routeSettlementLines.map((line, idx) => (
               <div key={`${line.label}-${idx}`} className="ap-ledger-route-settlement-row">
                 <span>

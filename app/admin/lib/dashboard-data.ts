@@ -289,7 +289,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
         travelCost: true,
         pack: { select: { price: true, extraHourPrice: true } },
         extras: { select: { price: true, quantity: true } },
-        serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true } },
+        serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true, notes: true } },
       },
     }), CacheTTL.SHORT).catch(() => []),
     // ─── Financial forecasts (abans bloc 4 seqüencial) ─────────────────
@@ -313,7 +313,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
         depositPaid: true, remainingPaid: true, status: true,
         extraHours: true, travelCost: true, distanceKm: true,
         extras: { select: { price: true, quantity: true } },
-        serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true } },
+        serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true, notes: true } },
         pack: { select: { price: true, extraHourPrice: true, translations: { where: { locale: 'ca' }, select: { name: true } } } },
       },
     }), CacheTTL.SHORT).catch(() => null),
@@ -330,7 +330,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
         depositPaid: true, remainingPaid: true,
         extraHours: true, travelCost: true, distanceKm: true,
         extras: { select: { price: true, quantity: true } },
-        serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true } },
+        serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true, notes: true } },
         pack: { select: { price: true, extraHourPrice: true } },
       },
     }), CacheTTL.SHORT).catch(() => []),
@@ -403,7 +403,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     travelCost: number | null;
     pack: { price: number; extraHourPrice: number };
     extras: Array<{ price: number; quantity: number }>;
-    serviceLines: Array<{ revenueAmount: number | null; costAmount: number | null; quantity: number | null; collaboratorId: string | null; kind?: string | null; label?: string | null }>;
+    serviceLines: Array<{ revenueAmount: number | null; costAmount: number | null; quantity: number | null; collaboratorId: string | null; kind?: string | null; label?: string | null; notes?: string | null }>;
   }>)
     .filter((b) => b.total > 0)
     .map((b) => {

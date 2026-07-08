@@ -8,8 +8,15 @@ import {
   DEFAULT_VEHICLE_COST_PER_KM,
   INCLUDED_TRAVEL_KM,
 } from '@/lib/services/travelCost';
-import { computeBoloTransport } from '@/lib/services/travelLaborCost';
-import { formatCurrency } from '@/lib/constants';
+import {
+  computeBoloTransport,
+  TRAVEL_AVG_SPEED_KMH,
+  TRAVEL_DRIVER_HOURLY_RATE,
+  TRAVEL_INCLUDED_HOURS,
+  TRAVEL_LONG_ROUTE_HOURS,
+  TRAVEL_MEAL_ALLOWANCE_PER_PERSON,
+} from '@/lib/services/travelLaborCost';
+import { formatCurrency, formatCurrencyExact, formatNumber } from '@/lib/constants';
 import { computeDirectCostBreakdown } from '@/lib/services/costEngine';
 import type { ServiceLineLike } from '@/lib/services/costEngine';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
@@ -111,6 +118,18 @@ export default function BookingMarginCard({
   const effectiveTravelHeadcount = transport.headcount;
   const travelNetMargin = calculatedTravelCharge - calculatedTravelCost;
   const travelMarginPct = calculatedTravelCharge > 0 ? (travelNetMargin / calculatedTravelCharge) * 100 : 0;
+  const travelCalculationNotes = distanceKm > 0
+    ? [
+        `Hores ruta: ${formatNumber(distanceKm, { maximumFractionDigits: 1 })} km / ${TRAVEL_AVG_SPEED_KMH} km/h = ${formatNumber(travelBreakdown.routeHours, { maximumFractionDigits: 2 })} h.`,
+        ...(travelBreakdown.chargeableHours > 0 ? [
+          `Temps cobrable: ${formatNumber(travelBreakdown.routeHours, { maximumFractionDigits: 2 })} h - ${formatNumber(TRAVEL_INCLUDED_HOURS, { maximumFractionDigits: 1 })} h inclosa = ${formatNumber(travelBreakdown.chargeableHours, { maximumFractionDigits: 1 })} h.`,
+          `Hores de cotxe: ${formatNumber(travelBreakdown.chargeableHours, { maximumFractionDigits: 1 })} h x ${formatCurrencyExact(TRAVEL_DRIVER_HOURLY_RATE)}/h = ${formatCurrencyExact(travelBreakdown.chargeableHours * TRAVEL_DRIVER_HOURLY_RATE)} per persona; ${effectiveTravelHeadcount} ${effectiveTravelHeadcount === 1 ? 'persona' : 'persones'} = ${formatCurrencyExact(travelBreakdown.peopleCost)}.`,
+        ] : []),
+        ...(transport.mealAllowance > 0 ? [
+          `Dietes: ruta > ${TRAVEL_LONG_ROUTE_HOURS} h; ${formatCurrencyExact(TRAVEL_MEAL_ALLOWANCE_PER_PERSON)} x ${effectiveTravelHeadcount} ${effectiveTravelHeadcount === 1 ? 'persona' : 'persones'} = ${formatCurrencyExact(transport.mealAllowance)}.`,
+        ] : []),
+      ]
+    : [];
 
   // Cost directe via la font única (computeDirectCostBreakdown), no reimplementat.
   // El helper gestiona pack real-vs-estimat (inventoryCostReal) i usa el travelCost
@@ -493,6 +512,7 @@ export default function BookingMarginCard({
           headcount={effectiveTravelHeadcount}
           chargeableHours={travelBreakdown.chargeableHours}
           tripCrowded={effectiveTravelHeadcount > CROWDED_TRIP_THRESHOLD}
+          calculationNotes={travelCalculationNotes}
         />
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           <div className="ap-card p-3">

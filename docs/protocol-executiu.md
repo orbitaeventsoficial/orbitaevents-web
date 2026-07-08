@@ -20,7 +20,7 @@
 8. Cada canvi amb número porta protocol, diari, counter, agent-sync i validació.
 9. En worktree brut, no es reverteix ni es neteja feina aliena.
 10. Si una peça viu com 2, 3 o 4 illes, primer es documenta i després es fusiona/poda/reconnecta. Si una peça passa el guard però només està importada per una altra illa morta, la fitxa encara ho ha de detectar.
-11. Si el propietari invoca `Manolo`, l'agent fa una mirada d'Expert/a en Experiència Comercial Digital abans de tocar codi: UX/UI, CRO, marca, service design, negoci d'esdeveniments, revenue, arquitectura d'informació, copy comercial, direcció visual i growth.
+11. Si el propietari invoca `Manolo`, l'agent fa una mirada d'Expert/a en Experiència Comercial Digital abans de tocar codi: UX/UI, CRO, marca, service design, negoci d'esdeveniments, revenue, arquitectura d'informació, copy comercial, direcció visual i growth. Un cop activat en un front o sessió, Manolo continua governant tota la passada fins que el propietari l'aturi o canviï explícitament de criteri.
 12. Podem entrar per tot arreu, però tot ha d'heretar context: qualsevol peça comercial ha de declarar quin `customerId`, `leadId`, `bookingId` o `proposalId` la governa, quin workspace canònic obre i quina dada passa de provisional a veritat final.
 
 ## 3. Com es treballa un programa gran
@@ -56,6 +56,8 @@ Cada òrgan té una fitxa mare i subfitxes només quan una subpantalla té flux 
 ## 4.1 Convocar Manolo
 
 `Manolo` és la mirada experta transversal sobre una peça del repo. S'activa amb frases com `Manolo`, `convoca Manolo`, `passa-li Manolo` o `mirada Manolo`.
+
+Quan s'activa en un front o sessió, no és una resposta única: continua sent el criteri de treball de tota la passada fins que el propietari digui prou o canviï explícitament de criteri.
 
 Quan s'activa, l'agent no comença pel codi. Primer ha de respondre com a expert en experiència comercial digital:
 - què fa avui la peça;

@@ -716,7 +716,7 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  <div><span>Cost origen</span><strong>{formatCurrency(econ.acquisitionCost)}</strong></div>
  <div><span>Cost directe</span><strong>{formatCurrency(econ.directCost)}</strong></div>
  </div>
- <a className="ap-ledger-summary-jump" href="#lead-repartiment">Veure qui cobra què</a>
+ <a className="ap-ledger-summary-jump" href="#lead-repartiment">Validar pacte partner</a>
  </>
  ) : (
  <p className="ap-ledger-econonote">Afegeix línies al bolo per veure el net estimat.</p>

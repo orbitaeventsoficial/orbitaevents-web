@@ -29,6 +29,6 @@ describe('LeadDetailClient date save contract', () => {
 
   it('el rail financer pot saltar al repartiment del lead', () => {
     expect(detailSource).toContain('href="#lead-repartiment"');
-    expect(detailSource).toContain('Veure qui cobra què');
+    expect(detailSource).toContain('Validar pacte partner');
   });
 });

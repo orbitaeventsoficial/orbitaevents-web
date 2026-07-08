@@ -10,10 +10,21 @@ import type { BookingServiceLineFormInput } from '@/app/admin/bookings/booking-f
 import { computeBookingFinancialSummary, computeServiceLineEconomics, classifyBoloLines } from '@/lib/services/costEngine';
 import { buildBoloRepartimentLines, computeBoloRepartiment } from '@/lib/services/repartimentService';
 import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
-import { calculateTravelCostBreakdown, deriveTravelHeadcount, computeBoloTransport, buildTravelMealAllowanceLines, type TravelPersonInput } from '@/lib/services/travelLaborCost';
+import {
+ calculateTravelCostBreakdown,
+ deriveTravelHeadcount,
+ computeBoloTransport,
+ buildTravelMealAllowanceLines,
+ TRAVEL_AVG_SPEED_KMH,
+ TRAVEL_DRIVER_HOURLY_RATE,
+ TRAVEL_INCLUDED_HOURS,
+ TRAVEL_LONG_ROUTE_HOURS,
+ TRAVEL_MEAL_ALLOWANCE_PER_PERSON,
+ type TravelPersonInput,
+} from '@/lib/services/travelLaborCost';
 import { useBookingDistance } from '@/app/admin/bookings/useBookingDistance';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
-import { formatCurrency } from '@/lib/constants';
+import { formatCurrency, formatCurrencyExact, formatNumber } from '@/lib/constants';
 import { buildLeadBookingPrefillHref } from '@/lib/admin/leadWorkspaceHref';
 
 /**
@@ -239,9 +250,37 @@ export default function LeadBoloSection({
  const effectiveTravelCost = transport ? transport.cost : internalTravelCost;
  // Càrrec al client: franquícia comercial del cotxe (50 km) + tripulació + dieta + peatges.
  const travelCharge = transport ? transport.clientCharge : internalTravelCost;
+ const tollsValue = Number(tollsEur) || 0;
+ const tollsHint = tollsValue > 0
+   ? `inclou ${formatCurrency(tollsValue)} de peatges`
+   : km > 0 && tollsEur.trim() === ''
+     ? 'peatges no informats'
+     : km > 0
+       ? 'sense peatges'
+       : null;
  const mealAllowance = transport?.mealAllowance ?? 0;
  const travelMealLines = useMemo(() => buildTravelMealAllowanceLines(travelPeople, mealAllowance), [travelPeople, mealAllowance]);
  const routeCostLines = useMemo(() => [...travelBreakdown.lines, ...travelMealLines], [travelBreakdown.lines, travelMealLines]);
+ const travelCalculationNotes = useMemo(() => {
+ if (km <= 0) return [];
+ const notes = [
+ `Hores ruta: ${formatNumber(km, { maximumFractionDigits: 1 })} km / ${TRAVEL_AVG_SPEED_KMH} km/h = ${formatNumber(travelBreakdown.routeHours, { maximumFractionDigits: 2 })} h.`,
+ ];
+ if (travelBreakdown.chargeableHours > 0) {
+ notes.push(`Temps cobrable: ${formatNumber(travelBreakdown.routeHours, { maximumFractionDigits: 2 })} h - ${formatNumber(TRAVEL_INCLUDED_HOURS, { maximumFractionDigits: 1 })} h inclosa = ${formatNumber(travelBreakdown.chargeableHours, { maximumFractionDigits: 1 })} h.`);
+ const perPersonLabor = travelBreakdown.chargeableHours * TRAVEL_DRIVER_HOURLY_RATE;
+ notes.push(`Hores de cotxe: ${formatNumber(travelBreakdown.chargeableHours, { maximumFractionDigits: 1 })} h x ${formatCurrencyExact(TRAVEL_DRIVER_HOURLY_RATE)}/h = ${formatCurrencyExact(perPersonLabor)} per persona; ${headcount} ${headcount === 1 ? 'persona' : 'persones'} = ${formatCurrencyExact(travelBreakdown.peopleCost)}.`);
+ }
+ if (mealAllowance > 0) {
+ notes.push(`Dietes: ruta > ${TRAVEL_LONG_ROUTE_HOURS} h; ${formatCurrencyExact(TRAVEL_MEAL_ALLOWANCE_PER_PERSON)} x ${headcount} ${headcount === 1 ? 'persona' : 'persones'} = ${formatCurrencyExact(mealAllowance)}.`);
+ }
+ if (tollsValue > 0) {
+ notes.push(`Peatges: ${formatCurrencyExact(tollsValue)} informats a la ruta.`);
+ } else if (tollsHint === 'peatges no informats') {
+ notes.push('Peatges: ruta amb km però sense import informat.');
+ }
+ return notes;
+ }, [headcount, km, mealAllowance, tollsHint, tollsValue, travelBreakdown.chargeableHours, travelBreakdown.peopleCost, travelBreakdown.routeHours]);
  const repartimentInputLines = useMemo(() => buildBoloRepartimentLines({
  serviceLines: buildVisibleLines(),
  travelCharge,
@@ -470,6 +509,7 @@ export default function LeadBoloSection({
  tripCrowded={tripCrowded}
  effectiveTravelCost={effectiveTravelCost}
  routeSettlementLines={routeSettlementLines}
+ calculationNotes={travelCalculationNotes}
  />
 
  {/* ── PRESSUPOST: la sortida clau del bolo, panell or destacat a tota l'amplada ── */}
@@ -479,7 +519,7 @@ export default function LeadBoloSection({
  <strong>{formatCurrency(economia.total - travelCharge)}</strong>
  </div>
  <div className="ap-ledger-budget-row ap-ledger-budget-row--travel">
- <span>Transport{travelBreakdown.tollsCost > 0 ? <em>inclou {formatCurrency(travelBreakdown.tollsCost)} de peatges</em> : null}</span>
+ <span>Transport{tollsHint ? <em>{tollsHint}</em> : null}</span>
  <strong>+{formatCurrency(travelCharge)}</strong>
  </div>
  <div className="ap-ledger-budget-row ap-ledger-budget-row--total">
@@ -493,10 +533,10 @@ export default function LeadBoloSection({
  {repartiment.elements.length > 0 && (
  <div id="lead-repartiment" className="ap-ledger-budget ap-ledger-budget--repartiment" aria-label="Qui cobra què al lead">
  <div className="ap-ledger-econohead">
- <span>Qui cobra què</span>
- <span className="ap-ledger-econonote">estimació pre-reserva · serveis, transport i dietes</span>
+ <span>Pacte amb partner</span>
+ <span className="ap-ledger-econonote">pre-proposta · import a validar abans de crear dossier o pressupost</span>
  </div>
- <RepartimentPanel repartiment={repartiment} names={repartimentNames} />
+ <RepartimentPanel repartiment={repartiment} names={repartimentNames} mode="preproposal" detailsDefaultOpen={false} preproposalNotes={travelCalculationNotes} />
  </div>
  )}
 

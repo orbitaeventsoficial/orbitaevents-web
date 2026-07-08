@@ -12,6 +12,7 @@ import type { ProfitabilityConfig } from './profitabilityService';
 import { calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM } from './travelCost';
 import { getMarginTone, type MarginTone } from '@/lib/margin-utils';
 import { isIncludedSoundTechSettlementLine } from '@/lib/services/serviceLineCostRules';
+import { TRAVEL_COST_LINE_MARKER } from '@/lib/services/travelLaborCost';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -74,6 +75,7 @@ export interface ServiceLineLike {
   collaboratorId?: string | null;
   kind?: string | null;
   label?: string | null;
+  notes?: string | null;
 }
 
 export const SUBCONTRACTED_MARKUP_TARGET_PCT = 20;
@@ -107,6 +109,8 @@ export type ServiceLineEconomics = {
 /**
  * Suma l'ingrés i el cost d'un conjunt de línies de servei.
  * Font ÚNICA de la regla de cost per línia (no duplicar inline):
+ * - les línies `[travel-cost]` són atribució de repartiment; el seu cost econòmic
+ *   viu a `booking.travelCost`/`travelCost` per no duplicar ruta;
  * - cost explícit si la línia en porta (partners → costAmount del catàleg) o té
  *   `collaboratorId` (el cost es gestiona a la seva fitxa, mai imputat);
  * - si és una línia pròpia d'Òrbita sense cost, s'imputa cost intern via
@@ -128,6 +132,10 @@ function quantityOf(line: ServiceLineLike): number {
   return typeof line.quantity === 'number' && Number.isFinite(line.quantity) && line.quantity > 0
     ? line.quantity
     : 1;
+}
+
+function isTravelCostLine(line: ServiceLineLike): boolean {
+  return Boolean(line.notes?.includes(TRAVEL_COST_LINE_MARKER));
 }
 
 function emptySubcontractedMarkup(): SubcontractedMarkupSummary {
@@ -166,6 +174,7 @@ export function computeServiceLineEconomics(
   let orbitaTechIncome = 0;
 
   for (const line of lines) {
+    if (isTravelCostLine(line)) continue;
     const qty = quantityOf(line);
     const rev = (line.revenueAmount || 0) * qty;
     revenue += rev;

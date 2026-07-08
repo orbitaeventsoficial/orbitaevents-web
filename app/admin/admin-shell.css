@@ -1553,6 +1553,20 @@ html.admin-mode .ap-ledger-trip-ro[data-alarm="true"] {
 html.admin-mode .ap-ledger-trip-note {
   margin: 0; font-family: var(--ui); font-size: var(--o-text-micro); color: var(--t3); line-height: 1.5;
 }
+html.admin-mode .ap-ledger-trip-formula {
+  display: grid;
+  gap: var(--o-space-1);
+  padding: var(--o-space-2);
+  border: 1px solid color-mix(in oklab, var(--gold) 16%, var(--line));
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--gold) 4%, transparent);
+  font-family: var(--mono);
+  font-size: var(--o-text-micro);
+  line-height: 1.45;
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-trip-formula > span { min-width: 0; overflow-wrap: anywhere; }
+html.admin-mode .ap-ledger-trip-formula--settlement { grid-column: 1 / -1; }
 /* Alarma de transport (#1377): més de 2 persones viatjant → vermell + avís. */
 html.admin-mode .ap-ledger-trip-badge[data-alarm="true"] {
   color: var(--o-danger); border-color: color-mix(in oklab, var(--o-danger) 45%, var(--line));
@@ -1676,6 +1690,19 @@ html.admin-mode .ap-ledger-bolo-actions--full { display: flex; flex-wrap: wrap; 
 /* Panell «Repartiment del bolo» a la fitxa de reserva (#1355): qui cobra què,
    per persona + element a element. Presentació del motor `computeBoloRepartiment`. */
 html.admin-mode .ap-rep { display: flex; flex-direction: column; gap: var(--o-space-3); }
+html.admin-mode .ap-rep-purpose {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+  gap: var(--o-space-2);
+  padding: var(--o-space-2) var(--o-space-25);
+  border: 1px solid color-mix(in oklab, var(--gold) 18%, var(--line));
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--gold) 5%, transparent);
+  font-family: var(--ui); font-size: var(--o-text-xs); color: var(--t2);
+}
+html.admin-mode .ap-rep-purpose strong {
+  color: var(--gold); font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
 html.admin-mode .ap-rep-people { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: var(--o-space-2); }
 html.admin-mode .ap-rep-person {
   display: flex; flex-direction: column; gap: var(--o-space-05);
@@ -1690,6 +1717,80 @@ html.admin-mode .ap-rep-person-name { font-family: var(--mono); font-size: var(-
 html.admin-mode .ap-rep-person-amount { font-family: var(--display); font-size: var(--o-text-lg); font-weight: var(--o-fw-xbold); color: var(--t); }
 html.admin-mode .ap-rep-person[data-owner="true"] .ap-rep-person-amount { color: var(--gold); }
 html.admin-mode .ap-rep-person-sub { font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3); }
+html.admin-mode .ap-rep-partner { display: flex; flex-direction: column; gap: var(--o-space-2); }
+html.admin-mode .ap-rep-formula {
+  display: grid;
+  gap: var(--o-space-1);
+  padding: var(--o-space-2);
+  border: 1px solid color-mix(in oklab, var(--gold) 16%, var(--line));
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--gold) 4%, transparent);
+  font-family: var(--mono);
+  font-size: var(--o-text-micro);
+  line-height: 1.45;
+  color: var(--t3);
+}
+html.admin-mode .ap-rep-formula > span { min-width: 0; overflow-wrap: anywhere; }
+html.admin-mode .ap-rep-partner-card {
+  display: flex; flex-direction: column; gap: var(--o-space-15);
+  border: 1px solid var(--line);
+  border-radius: var(--o-r-md);
+  background: color-mix(in oklab, var(--raised) 36%, transparent);
+  padding: var(--o-space-2);
+}
+html.admin-mode .ap-rep-partner-head,
+html.admin-mode .ap-rep-partner-line {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2);
+}
+html.admin-mode .ap-rep-partner-head > span {
+  font-family: var(--mono); font-size: var(--o-text-micro); color: var(--gold);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+html.admin-mode .ap-rep-partner-head > strong {
+  font-family: var(--display); font-size: var(--o-text-lg); color: var(--t);
+}
+html.admin-mode .ap-rep-partner-lines { display: grid; gap: var(--o-space-1); }
+html.admin-mode .ap-rep-partner-line {
+  padding-top: var(--o-space-1);
+  border-top: 1px solid color-mix(in oklab, var(--line) 64%, transparent);
+  font-family: var(--mono); font-size: var(--o-text-xs);
+}
+html.admin-mode .ap-rep-partner-line > span {
+  display: flex; min-width: 0; flex-direction: column; gap: 0.05rem; color: var(--t2);
+}
+html.admin-mode .ap-rep-partner-line > span > em {
+  font-style: normal; color: var(--t3); font-size: var(--o-text-micro);
+}
+html.admin-mode .ap-rep-partner-line > strong {
+  flex: 0 0 auto; font-weight: var(--o-fw-bold); color: var(--t);
+}
+html.admin-mode .ap-rep-partner-line[data-settlement="true"] > strong { color: var(--gold); }
+html.admin-mode .ap-rep-detail {
+  border: 1px solid var(--line);
+  border-radius: var(--o-r-md);
+  background: color-mix(in oklab, var(--raised) 35%, transparent);
+  overflow: hidden;
+}
+html.admin-mode .ap-rep-detail-summary {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2);
+  padding: var(--o-space-2) var(--o-space-25);
+  cursor: pointer; list-style: none;
+  font-family: var(--ui); font-size: var(--o-text-sm); font-weight: var(--o-fw-semi); color: var(--t2);
+}
+html.admin-mode .ap-rep-detail-summary::-webkit-details-marker { display: none; }
+html.admin-mode .ap-rep-detail-summary::after {
+  content: '+'; color: var(--gold); font-family: var(--mono); font-size: var(--o-text-sm); font-weight: var(--o-fw-bold);
+}
+html.admin-mode .ap-rep-detail[open] .ap-rep-detail-summary::after { content: '-'; }
+html.admin-mode .ap-rep-detail-summary > span { margin-right: auto; }
+html.admin-mode .ap-rep-detail-summary > strong {
+  color: var(--t3); font-family: var(--mono); font-size: var(--o-text-micro); font-weight: var(--o-fw-bold);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+html.admin-mode .ap-rep-detail-body {
+  display: flex; flex-direction: column; gap: var(--o-space-3);
+  padding: 0 var(--o-space-25) var(--o-space-25);
+}
 html.admin-mode .ap-rep-table { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--o-r-md); overflow: hidden; }
 html.admin-mode .ap-rep-row {
   display: grid; grid-template-columns: minmax(0, 2fr) repeat(5, minmax(4rem, 1fr));

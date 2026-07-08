@@ -1,3 +1,73 @@
+## 2026-07-08 — Dossier: les previews blob carreguen imatges reals (Canvi #1739, codex)
+
+### Context
+El propietari obre una preview `blob:http://localhost:3000/...` del generador de dossiers i no veu les imatges. El log local apunta al flux `/admin/dossiers?...productIds=collab:carlos-lucas-fernandez`. La causa no és que faltin assets: `public/img/collaborators/masquerade/` conté `bingo-musical.jpg`, `batalla-musical.jpg`, `bingo-musical-kids.jpg`, etc. El problema és que l'HTML preview s'obre com a `blob:` i els `src="/img/..."` poden quedar resolts contra l'origen del blob en comptes del servidor.
+
+### Què s'ha fet
+- `buildDossierHtml` accepta `assetBaseUrl` i absolutitza només imatges relatives/root-relative quan cal; per defecte manté el comportament anterior.
+- El generador de dossiers passa `assetBaseUrl: window.location.origin` quan obre preview/PDF HTML blob.
+- Les accions de la llista de dossiers fan el mateix per la preview `Vista`.
+- Test nou blinda que `/img/...` es converteix en `http://localhost:3000/img/...` quan el builder rep `assetBaseUrl`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\utils\dossier-html-builder.test.ts __tests__\app\admin\dossiers\DossierGeneratorClient-customer-lookup.test.ts` OK (31/31); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: `public\img\collaborators\masquerade` conté les imatges reals; el blob ja rep URLs absolutes cap al servidor local/prod.
+- Validació humana/UX: una preview oberta en pestanya nova deixa de semblar un dossier trencat només perquè el document viu en un blob del navegador.
+
+### Coordinació
+Counter → 1739. Canvi limitat al builder HTML de dossier, generador/listat de dossiers, test, roadmap, protocol, diari i sync; sense schema ni BD.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-08 — Manolo: pacte partner sense net Òrbita i amb ruta explicada (Canvi #1738, codex)
+
+### Context
+El propietari valida que el bloc `Qui cobra què` serveix com a gestió interna, però no com a lectura per Masquerade abans de fer proposta: no ha de restar ni ensenyar el net d'Òrbita com a protagonista, i el partner ha de saber d'on surten hores de viatge, dietes, peatges i import final. El lead real `cmr1xh7la0000ug7dj4jnihjr` té `distanceKm=411.4` i `tollsEur=null`, per això no hi havia cap línia de peatge informada.
+
+### Què s'ha fet
+- El bloc del lead passa de `Qui cobra què` a `Pacte amb partner`.
+- En mode pre-proposta, només es destaca l'import del partner i el detall intern queda plegat.
+- El partner veu el seu detall a validar: serveis, hores de ruta/passatge, dietes i compensacions cap a Òrbita quan el tècnic inclòs el fa Òrbita.
+- La targeta de desplaçament i el pacte mostren la fórmula de ruta: km / 65 km/h, primera hora inclosa, hores cobrables, 15 €/h per persona, dietes de 30 €/persona i peatges informats o no informats.
+- `tollsEur=null` amb km coneguts ja no queda mut: el pressupost mostra `peatges no informats`.
+- El repartiment conserva `sourceCollaboratorId` per poder explicar una liquidació negativa del partner com a compensació a Òrbita sense perdre l'origen.
+- El protocol fa persistent Manolo quan el propietari l'invoca en un front o sessió.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\lib\services\repartimentService.test.ts __tests__\app\admin\leads\LeadDetailClient-date-save-contract.test.ts` OK (13/13); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: consulta BD viva del lead `cmr1xh7la0000ug7dj4jnihjr`: `distanceKm=411.4`, `tollsEur=null`; la UI ara ho tradueix a `peatges no informats` i no a absència silenciosa.
+- Validació humana/UX: Masquerade pot validar hores, dietes i import sense veure el benefici net d'Òrbita com a peça principal; Òrbita conserva el detall intern plegat.
+
+### Coordinació
+Counter → 1738. Canvi limitat a lead/repartiment/transport visible, builder compartit de targeta de ruta, protocol Manolo, tests, roadmap, protocol, diari i sync; sense schema ni migració.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+## 2026-07-08 — Manolo: Economia no duplica el cost de transport detallat (Canvi #1737, codex)
+
+### Context
+Auditoria del bloc `Economia de bolos antics` del full Manolo. La pregunta era si les reserves amb `travelCost` però sense línies `[travel-cost]` necessitaven migració. La consulta read-only contra BD viva ha trobat 4 reserves amb `travelCost > 0` i 0 amb línies `[travel-cost]` detallades alhora. Per tant, no cal migració de dades ara. Però el codi sí deixava una porta oberta: si una reserva heretava línies de ruta des del lead i també desava `booking.travelCost`, el motor de marge podia comptar dues vegades el mateix desplaçament.
+
+### Què s'ha fet
+- `costEngine` reconeix `notes` a `ServiceLineLike` i ignora línies amb marcador `[travel-cost]` dins de `computeServiceLineEconomics` / `aggregateServiceLines`.
+- El cost de ruta queda amb una sola font econòmica: `travelCost`. Les línies `[travel-cost]` continuen servint per al repartiment i traçabilitat de qui posa vehicle, hores, peatges o dietes.
+- Els selectors econòmics de rendibilitat, dashboard, cashflow i calendari carreguen `notes`, perquè el motor pugui reconèixer el marcador.
+- Tests nous cobreixen que `booking.travelCost` + línies `[travel-cost]` no dupliquen `directCost`.
+- El full Manolo queda actualitzat amb #1737 dins d'Economia/bolos antics.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\costEngine.test.ts __tests__\lib\services\profitabilityService.test.ts __tests__\app\admin\booking-economic-guard.test.ts __tests__\app\admin\next-event-economics.test.ts` OK (104/104); `npx tsc --noEmit --pretty false` OK; selector static `rg --pcre2` confirma que no queda cap selector econòmic de service lines sense `notes`; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff --check` OK.
+- Validació funcional: BD viva read-only: 4 reserves amb `travelCost > 0`, 0 afectades amb línies `[travel-cost]`; el canvi evita la regressió latent sense tocar dades.
+- Validació humana/UX: el marge i Economia no poden tornar a presentar un bolo pitjor del real per comptar dues vegades la ruta.
+
+### Coordinació
+Counter → 1737. Canvi limitat a motor econòmic, selectors de service lines, tests, roadmap, protocol, diari i sync; sense schema ni migració.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Manolo: PDF compost de dossier amb desplaçament (Canvi #1736, codex)
 
 ### Context

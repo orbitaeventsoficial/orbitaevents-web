@@ -82,7 +82,25 @@ function chapterLabel(num: number): string {
   return String(num).padStart(2, '0');
 }
 
-function buildProductBlock(product: AnimacioProduct, num: number, copy: DossierCopy, locale: string, logoDataUri?: string, isLast = false): string {
+function resolveDossierAssetSrc(src: string, assetBaseUrl?: string): string {
+  if (!assetBaseUrl) return src;
+  if (/^(?:data:|blob:|https?:\/\/)/i.test(src)) return src;
+  try {
+    return new URL(src, assetBaseUrl).toString();
+  } catch {
+    return src;
+  }
+}
+
+function buildProductBlock(
+  product: AnimacioProduct,
+  num: number,
+  copy: DossierCopy,
+  locale: string,
+  logoDataUri?: string,
+  isLast = false,
+  assetBaseUrl?: string,
+): string {
   const descripcio = product.descripcio
     .map((p) => `<p>${escHtml(p)}</p>`)
     .join('\n      ');
@@ -103,8 +121,9 @@ function buildProductBlock(product: AnimacioProduct, num: number, copy: DossierC
     ? `<span class="producte-categoria">${escHtml(product.categoria)}</span>`
     : '';
 
-  const imageHtml = product.image
-    ? `<figure class="producte-media"><img src="${escHtml(product.image)}" alt="${escHtml(product.nom)}"></figure>`
+  const imageSrc = product.image ? resolveDossierAssetSrc(product.image, assetBaseUrl) : '';
+  const imageHtml = imageSrc
+    ? `<figure class="producte-media"><img src="${escHtml(imageSrc)}" alt="${escHtml(product.nom)}"></figure>`
     : '';
 
   // Preu canònic "des de X €" (de priceFrom; mai hardcoded). Consistent amb el jsPDF.
@@ -264,7 +283,7 @@ export function buildDossierHtml(
   client: DossierClientInfo,
   products: AnimacioProduct[],
   copy: DossierCopy,
-  options: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; travelTollsEur?: number; location?: string } = {},
+  options: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; travelTollsEur?: number; location?: string; assetBaseUrl?: string } = {},
 ): string {
   const locale = options.locale || 'ca-ES';
   // Idioma del document derivat del locale (ca-ES → ca), mai hardcoded.
@@ -277,7 +296,7 @@ export function buildDossierHtml(
   const greetingHtml = escHtml(copy.intro.greeting.split('{name}').join(client.nom));
 
   const producteBlocs = products
-    .map((p, i) => buildProductBlock(p, i + 1, copy, locale, options.logoDataUri, false))
+    .map((p, i) => buildProductBlock(p, i + 1, copy, locale, options.logoDataUri, false, options.assetBaseUrl))
     .join('\n');
 
   const proposalBloc = buildProposalBlock(products, copy, locale, options.travelKm ?? 0, options.travelTollsEur ?? 0, options.location);

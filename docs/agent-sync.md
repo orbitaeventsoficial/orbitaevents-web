@@ -66,6 +66,27 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-08 [ESTAT: tancat — Dossier blob amb imatges reals #1739]
+Perimetre: `buildDossierHtml`, generador/llistat de dossiers i test del builder. Objectiu complert: les previews `blob:` absolutitzen imatges amb `window.location.origin`, de manera que `/img/...` carrega des del servidor local/prod. Sense schema, BD, `app/admin/tasks` ni PDF jsPDF.
+Ultim canvi: #1739.
+Validacio: `pnpm test:run -- --run __tests__\lib\utils\dossier-html-builder.test.ts __tests__\app\admin\dossiers\DossierGeneratorClient-customer-lookup.test.ts` OK (31/31); `npx tsc --noEmit --pretty false` OK; assets Masquerade verificats a `public/img/collaborators/masquerade`.
+Proper pas previst: reobrir la preview des del generador/llistat; el blob vell del navegador no es pot reparar en calent.
+Avis claude: he entrat al carril dossier només per petició directa del propietari (`blob:` sense imatges); no he tocat serveis d'enviament ni el PDF composite.
+
+[codex] 2026-07-08 [ESTAT: tancat — Pacte partner i criteri Manolo persistent #1738]
+Perimetre: fitxa lead/repartiment/transport visible, `RepartimentPanel`, targeta compartida de ruta, regla Manolo al protocol, tests i docs. Objectiu complert: `Qui cobra què` passa a `Pacte amb partner`, Masquerade veu import, hores reals, hores pagades, dietes, peatges i compensacions; net/brut/cost d'Òrbita queda plegat internament.
+Ultim canvi: #1738.
+Validacio: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\lib\services\repartimentService.test.ts __tests__\app\admin\leads\LeadDetailClient-date-save-contract.test.ts` OK (13/13); `npx tsc --noEmit --pretty false` OK; BD viva lead `cmr1xh7la0000ug7dj4jnihjr` = 411.4 km i `tollsEur=null`.
+Proper pas previst: continuar E2E lead -> dossier -> reserva amb un cas complet i imatges, sense reobrir `app/admin/tasks`.
+Avis claude: el protocol ara diu que Manolo governa tota la passada quan el propietari l'invoca fins que ell l'aturi o canviï criteri.
+
+[codex] 2026-07-08 [ESTAT: tancat — arrencada protocol + servidor local reiniciat]
+Perimetre: rellegits `CLAUDE.md`, `docs/agent-sync.md`, `docs/admin-diary.md`, `docs/estat-admin.md`, `docs/admin-protocol.md` i `docs/protocol-executiu.md`; reiniciat el dev server local al port 3000. Sense schema, BD, runtime de producte ni UI.
+Ultim canvi: #1737 ja tancat al diari/protocol i `ADMIN_CHANGE_COUNTER=1737`.
+Validacio: port 3000 escoltant amb `node.exe` PID 5820; `/admin` respon 401 esperat per auth; logs Next `Ready in 9.4s`.
+Proper pas previst: si es continua, obrir #1738 des del full Manolo/§6 amb el seguent tall executable, sense tocar `app/admin/tasks` ni carrils aliens.
+Avis claude: aquesta entrada es nomes coordinacio d'arrencada i reinici local; no modifica el tall #1737 existent.
+
 [codex] 2026-07-08 [ESTAT: tancat — Manolo roadmap viu #1725-#1732]
 Perimetre: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`, protocol, diari, counter i sync; sense schema, BD ni runtime.
 Ultim canvi: #1732.
@@ -100,6 +121,12 @@ Ultim canvi: #1736.
 Validacio: tests focalitzats 30/30; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff --check` OK.
 Proper pas previst: continuar E2E cap a reserva completa amb imatges/productes, o auditar bolos antics amb `travelCost` sense `[travel-cost]`.
 Avis claude: PDF compost i email/HTML ja comparteixen transport resolt; el PDF pinta una pagina `DESPLAÇAMENT` quan hi ha km.
+
+[codex] 2026-07-08 [ESTAT: treballant — auditoria economia bolos antics #1737]
+Perimetre previst: reserves antigues amb `travelCost` sense linies `[travel-cost]`, repartiment/economia i tests; sense schema, sense migracio destructiva i sense tocar `app/admin/tasks`.
+Ultim canvi: #1736.
+Proper pas previst: verificar BD/codi, decidir si el fallback actual es suficient o cal tall real per evitar numeros falsos.
+Avis claude: no tocaré el carril media/dossiers ni `tasks`; si entra algu, aquest tall es només economia transport/repartiment.
 
 [codex] 2026-07-08 [ESTAT: tancat — Lead `Qui cobra què` visible i mòbil cosit #1731]
 Perimetre: `/admin/leads/[id]`, `RepartimentPanel`, rail financer del lead i CSS responsive del repartiment; sense schema, BD ni motor econòmic.

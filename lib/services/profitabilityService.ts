@@ -141,13 +141,13 @@ async function fetchProfitabilityBookings() {
   const includeWithLead = {
     pack: { select: { price: true, extraHourPrice: true } },
     extras: { select: { price: true, quantity: true } },
-    serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true } },
+    serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true, notes: true } },
     lead: { select: { source: true } },
   };
   const includeWithoutLead = {
     pack: { select: { price: true, extraHourPrice: true } },
     extras: { select: { price: true, quantity: true } },
-    serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true } },
+    serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true, notes: true } },
   };
 
   const readAll = async (include: typeof includeWithLead | typeof includeWithoutLead) => {

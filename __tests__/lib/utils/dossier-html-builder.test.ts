@@ -71,7 +71,7 @@ const copy: DossierCopy = {
 function build(
   c: DossierClientInfo,
   products: AnimacioProduct[],
-  options?: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; travelTollsEur?: number; location?: string },
+  options?: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; travelTollsEur?: number; location?: string; assetBaseUrl?: string },
 ): string {
   return buildDossierHtml(c, products, copy, { locale: 'ca-ES', ...options });
 }
@@ -125,6 +125,14 @@ describe('buildDossierHtml', () => {
     expect(html).toContain('class="producte-media"');
     expect(html).toContain('src="/img/collaborators/masquerade/bingo-musical.jpg"');
     expect(html).toContain('alt="Bingo Musical"');
+  });
+
+  it('pot absolutitzar imatges quan la preview viu en un blob', () => {
+    const html = build(client, [{
+      ...productWithTrams,
+      image: '/img/collaborators/masquerade/bingo-musical.jpg',
+    }], { assetBaseUrl: 'http://localhost:3000' });
+    expect(html).toContain('src="http://localhost:3000/img/collaborators/masquerade/bingo-musical.jpg"');
   });
 
   it('no crea cap bloc visual buit quan el producte no té imatge', () => {

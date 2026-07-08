@@ -37,6 +37,7 @@ export interface RepartimentElement {
   kind: string;
   clientPaga: number;      // revenueAmount × quantity
   beneficiariId: string;   // collaboratorId | REPARTIMENT_OWNER_KEY
+  sourceCollaboratorId?: string | null; // tercer original de la línia, també si liquida cap a Òrbita
   esOrbita: boolean;
   cobra: number;           // import que es queda/cobra el beneficiari visible de la línia
   cost: number;            // cost o liquidació visible en positiu
@@ -154,6 +155,7 @@ export function computeBoloRepartiment(lines: RepartimentLine[]): BoloRepartimen
         label: l.label || '', kind: l.kind || 'OTHER',
         clientPaga,
         beneficiariId: isLiquidacioCapAOrbita ? REPARTIMENT_OWNER_KEY : l.collaboratorId,
+        sourceCollaboratorId: l.collaboratorId,
         esOrbita: isLiquidacioCapAOrbita,
         cobra: visibleCost,
         cost: visibleCost,
@@ -169,6 +171,7 @@ export function computeBoloRepartiment(lines: RepartimentLine[]): BoloRepartimen
       elements.push({
         label: l.label || '', kind: l.kind || 'OTHER',
         clientPaga, beneficiariId: REPARTIMENT_OWNER_KEY, esOrbita: true,
+        sourceCollaboratorId: null,
         cobra: clientPaga > 0 ? clientPaga : ownCost,
         cost: ownCost,
         costExtern: 0,

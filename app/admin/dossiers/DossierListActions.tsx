@@ -48,7 +48,11 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
       const filteredProducts = snapshotProducts && snapshotProducts.length > 0
         ? snapshotProducts
         : products.filter((p) => productIds.includes(p.id));
-      const html = buildDossierHtml(clientInfo, filteredProducts, dossierCopy, { logoDataUri, locale: 'ca-ES' });
+      const html = buildDossierHtml(clientInfo, filteredProducts, dossierCopy, {
+        logoDataUri,
+        locale: 'ca-ES',
+        assetBaseUrl: window.location.origin,
+      });
       const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
       window.open(URL.createObjectURL(blob), '_blank', 'noopener,noreferrer');
     } catch (err) {

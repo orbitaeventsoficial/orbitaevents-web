@@ -199,6 +199,7 @@ Regles dures:
 - Manolo no substitueix el protocol tècnic, el complementa. Si després de la mirada es toca codi, tornen a aplicar fitxa forense, monocapa, zero hardcoded, tests, diari, §9 i counter.
 - Manolo no marca `TANCAT CHARLIE`; només el propietari ho pot fer.
 - Manolo no pot quedar en filosofia: ha d'acabar amb criteri accionable, prioritzat per impacte real en conversió, execució, cobrament o recurrència.
+- Manolo és persistent quan el propietari l'invoca en un front o sessió: no és una resposta única. Governa totes les decisions visibles, comercials, operatives i de marge de la passada fins que el propietari l'aturi o canviï explícitament de criteri.
 
 ## 0.1.3 Herència de context client→lead→document→reserva (vinculant, propietari 2026-07-05)
 
@@ -345,7 +346,7 @@ Passar d'un admin amb moltes eines a un sistema operatiu comercial i d'operacion
 - **Validació humana obligatòria**: una funció no es dona per bona només perquè el codi, els tests o la lògica interna semblin correctes. Si l'ús real depèn de botons, noms, estats, textos o d'un flux d'interfície, també s'ha de validar com ho faria una persona no tècnica. Si la UI indueix a error o fa passar per alt el comportament bo, el treball es considera incomplet.
 - **No consolidar només a nivell de codi**: també cal consolidar llenguatge, UX i model mental.
 - **Qualsevol millora grossa ha de quedar reflectida en aquest document.**
-- **Convocatòria Manolo**: si el propietari invoca `Manolo`, l'agent entra en mode de mirada experta transversal segons §0.1.2. Abans de proposar o tocar codi, ha de llegir la peça, el seu òrgan i els òrgans veïns, i retornar diagnòstic accionable sobre conversió, confiança, desig, valor percebut, UX, direcció visual, copy, marca, operació, marge i post-venda. Si el propietari demana implementar després d'aquesta mirada, el tall torna al workflow normal de fitxa/validació/documentació.
+- **Convocatòria Manolo**: si el propietari invoca `Manolo`, l'agent entra en mode de mirada experta transversal segons §0.1.2. Abans de proposar o tocar codi, ha de llegir la peça, el seu òrgan i els òrgans veïns, i retornar diagnòstic accionable sobre conversió, confiança, desig, valor percebut, UX, direcció visual, copy, marca, operació, marge i post-venda. Quan Manolo s'activa en un front o sessió, continua governant tota la passada fins que el propietari l'aturi o canviï explícitament de criteri. Si el propietari demana implementar després d'aquesta mirada, el tall torna al workflow normal de fitxa/validació/documentació.
 - **Norma d'arrencada davant `go/seguim/continua`**: qualsevol ordre curta de continuïtat del propietari activa immediatament el protocol complet, encara que no digui literalment `go`. Abans de donar resposta final, resumir estat o tocar codi, l'agent ha de llegir `docs/agent-sync.md`, el final de `docs/diario.md`, el §6 i el final del §9; comprovar `git status` i `ADMIN_CHANGE_COUNTER`; i declarar quin `SEGÜENT`, `PENDENT CRÍTIC` o tall de manteniment justifica la feina. Sense aquesta arrencada, no s'ha començat.
 - **Norma operativa de "go" del propietari**: quan el propietari escriu `go` (sol, sense més) és la seva forma més curta d'ordenar *"continua segons tot el que està previst al protocol de treball i al checklist"*. No cal demanar direcció concreta — l'agent ha d'obrir `docs/protocol-producte-admin-ca.md`, localitzar un `SEGÜENT` actiu i acotat als §6.N, i atacar-lo seguint la norma de tancament rigorós. Preguntar "què vols?" davant un `go` és malgastar tokens i temps del propietari.
 - **Norma de continuïtat després de tall verd**: amb un `go` actiu, tancar un Canvi #N amb tests i guards verds no autoritza a parar. Amb `go` actiu, la resposta final queda prohibida després d'un tall verd mentre hi hagi backlog accionable. L'agent ha de rellegir §6, escollir el següent `SEGÜENT` / `PENDENT CRÍTIC` executable i continuar automàticament amb una actualització curta. Només pot enviar resposta final si (1) no queda cap feina accionable al backlog, (2) hi ha un bloqueig real que requereix decisió humana, o (3) el propietari demana explícitament `para`, `atura't`, `només reporta` o equivalent.
@@ -1731,6 +1732,60 @@ Seqüència obligatòria de registre:
 - `claude` — backend/schema/serveis/tests/visual tokenitzat
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
+
+### Canvi #1739 — 2026-07-08 — codex (FET)
+- Context: el propietari obre una preview `blob:http://localhost:3000/...` del generador de dossiers i no veu imatges. El flux viu era `/admin/dossiers?...productIds=collab:carlos-lucas-fernandez`. Els fitxers de Masquerade existeixen a `public/img/collaborators/masquerade`, però el blob HTML podia deixar `src="/img/..."` sense origen de servidor.
+- Fet:
+  - `buildDossierHtml` accepta `assetBaseUrl` i absolutitza imatges relatives només quan el caller ho demana.
+  - `DossierGeneratorClient` passa `window.location.origin` a les previews/PDF HTML blob.
+  - `DossierListActions` fa el mateix a la preview `Vista` dels dossiers guardats.
+  - Test nou blinda que una imatge `/img/...` es converteix en URL absoluta quan el builder rep `assetBaseUrl`.
+  - Roadmap Manolo actualitzat amb #1739 dins del bloc documents/dossier.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\lib\utils\dossier-html-builder.test.ts __tests__\app\admin\dossiers\DossierGeneratorClient-customer-lookup.test.ts` OK (31/31); `npx tsc --noEmit --pretty false` OK.
+  - Validació funcional: `public\img\collaborators\masquerade` conté `bingo-musical.jpg`, `batalla-musical.jpg`, `bingo-musical-kids.jpg` i altres assets; el blob ja rep URLs absolutes cap a l'origen actual.
+  - Validació humana/UX: la preview en pestanya nova torna a mostrar producte real i no una fitxa sense imatge.
+- `ADMIN_CHANGE_COUNTER` puja a `1739`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
+### Canvi #1738 — 2026-07-08 — codex (FET)
+- Context: el bloc `Qui cobra què` del lead era útil internament, però massa exposat per validar imports amb Masquerade abans de crear proposta. El propietari demana no ensenyar el net d'Òrbita com a protagonista, no fer una lectura de restes, i explicar al partner d'on surten hores de ruta, dietes, peatges i import final. El lead `cmr1xh7la0000ug7dj4jnihjr` té `distanceKm=411.4` i `tollsEur=null`.
+- Fet:
+  - El lead canvia `Qui cobra què` per `Pacte amb partner`.
+  - En mode pre-proposta, el resum destaca només imports del partner; el detall intern de marge/costos d'Òrbita queda plegat.
+  - El detall visible per partner mostra serveis, hores de ruta/passatge, dietes i compensacions a Òrbita quan el partner liquida part del servei.
+  - La targeta de ruta i el pacte mostren la fórmula: km / 65 km/h, primera hora inclosa, hores cobrables en blocs de 30 min, 15 €/h per persona, dieta 30 €/persona en ruta llarga i estat de peatges.
+  - Quan hi ha km i `tollsEur` buit, el resum de transport diu `peatges no informats`.
+  - `computeBoloRepartiment` conserva `sourceCollaboratorId` per explicar liquidacions negatives del partner sense perdre l'origen.
+  - `Manolo` queda com a criteri persistent de front/sessió al protocol i al protocol executiu.
+  - Roadmap Manolo actualitzat amb #1738.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\lib\services\repartimentService.test.ts __tests__\app\admin\leads\LeadDetailClient-date-save-contract.test.ts` OK (13/13); `npx tsc --noEmit --pretty false` OK.
+  - Validació funcional: consulta BD viva del lead `cmr1xh7la0000ug7dj4jnihjr`: `distanceKm=411.4`, `tollsEur=null`; la UI ja mostra `peatges no informats` en lloc de silenci.
+  - Validació humana/UX: Masquerade pot entendre què cobra i per què; Òrbita conserva el detall de brut/cost/net només dins del desplegable intern.
+- `ADMIN_CHANGE_COUNTER` puja a `1738`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
+### Canvi #1737 — 2026-07-08 — codex (FET)
+- Context: auditoria Manolo del front Economia/transport. La BD viva no tenia cap reserva actual amb `travelCost > 0` i línies `[travel-cost]` detallades alhora, però el codi podia arribar-hi per herència server-side de lead -> reserva. En aquest cas `costEngine` hauria sumat `booking.travelCost` i, a més, els `costAmount` de les línies `[travel-cost]`, inflant costos/marge de reserva, dashboard, cashflow, rendibilitat i calendari.
+- Fet:
+  - `costEngine` tracta les línies `[travel-cost]` com a atribució de repartiment, no com a línies econòmiques de servei.
+  - `computeServiceLineEconomics` i `aggregateServiceLines` ignoren aquestes línies perquè el cost real de ruta viu a `travelCost`.
+  - Els selectors econòmics de `profitabilityService`, `dashboard-data`, `cashFlowForecast` i `adminCalendarMonthService` carreguen `notes` per poder reconèixer el marcador.
+  - Tests nous blinden que un `booking.travelCost` amb línies `[travel-cost]` no duplica cost directe.
+  - Roadmap Manolo actualitzat amb #1737 dins del bloc economia/bolos antics.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\costEngine.test.ts __tests__\lib\services\profitabilityService.test.ts __tests__\app\admin\booking-economic-guard.test.ts __tests__\app\admin\next-event-economics.test.ts` (104/104); `npx tsc --noEmit --pretty false` OK; `rg --pcre2 "serviceLines:\s*\{ select: \{ revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true(?!, notes: true)" -n app lib __tests__` sense resultats; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff --check` OK.
+  - Validació funcional: consulta read-only a BD viva: 4 reserves amb `travelCost > 0`, 0 afectades amb línies `[travel-cost]`; el canvi blinda el cas latent sense migració.
+  - Validació humana/UX: Economia i marge deixen de poder castigar dues vegades el mateix desplaçament quan una reserva moderna conserva línies de repartiment de ruta.
+- `ADMIN_CHANGE_COUNTER` puja a `1737`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
 
 ### Canvi #1736 — 2026-07-08 — codex (FET)
 - Context: l'email/HTML del dossier ja rehidratava transport del lead, però el PDF compost `/api/admin/dossiers/[id]/composite` no passava cap transport a `generateDossierCompositePDF`. Resultat possible: email amb desplaçament i PDF complet sense desplaçament.

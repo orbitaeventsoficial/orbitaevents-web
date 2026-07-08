@@ -45,7 +45,7 @@ export async function buildCashFlowForecast(monthsAhead = 6): Promise<CashFlowMo
       distanceKm: true,
       pack: { select: { price: true, extraHourPrice: true } },
       extras: { select: { price: true, quantity: true } },
-      serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true } },
+      serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true, notes: true } },
       extraHours: true,
     },
   });

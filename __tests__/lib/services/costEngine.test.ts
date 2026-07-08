@@ -422,6 +422,29 @@ describe('costEngine', () => {
       expect(result.directCost).toBe(result.fixedOperationalCost + 271 + 160);
     });
 
+    it('no duplica cost de ruta quan booking.travelCost ja porta el transport i hi ha línies [travel-cost]', () => {
+      const serviceLines = [
+        { kind: 'PROVIDER_SERVICE', collaboratorId: 'masquerade', revenueAmount: 240, costAmount: 200, quantity: 1 },
+        { kind: 'OTHER', label: 'Vehicle ruta · Òrbita', revenueAmount: 0, costAmount: 75, quantity: 1, notes: '[travel-cost] vehicle · 422.0 km' },
+        { kind: 'OTHER', label: 'Temps ruta conductor · Òrbita', revenueAmount: 0, costAmount: 83, quantity: 1, notes: '[travel-cost] DRIVER · 5.50 h' },
+      ];
+      const result = computeBookingFinancialSummary(baseInput({
+        total: 555,
+        packPrice: 0,
+        extrasTotal: 0,
+        extraHours: 0,
+        extraHourPrice: 0,
+        distanceKm: 0,
+        travelCost: 158,
+        serviceLines,
+      }), defaultConfig);
+
+      expect(result.travelCost).toBe(158);
+      expect(result.serviceLinesRevenue).toBe(240);
+      expect(result.serviceLinesCost).toBe(200);
+      expect(result.directCost).toBe(result.fixedOperationalCost + 158 + 200);
+    });
+
     it('separa producte propi, subcontractat i transport en buckets economics', () => {
       const serviceLines = [
         { kind: 'DJ', revenueAmount: 150, costAmount: 0, quantity: 1 },
@@ -872,6 +895,15 @@ describe('aggregateServiceLines', () => {
     const r = aggregateServiceLines([{ revenueAmount: 100, costAmount: 40, quantity: 3 }]);
     expect(r.revenue).toBe(300);
     expect(r.cost).toBe(120);
+  });
+
+  it('ignora línies [travel-cost] perquè el transport viu a booking.travelCost', () => {
+    const r = aggregateServiceLines([
+      { revenueAmount: 240, costAmount: 200, collaboratorId: 'masquerade', quantity: 1 },
+      { revenueAmount: 0, costAmount: 75, quantity: 1, notes: '[travel-cost] vehicle · 422.0 km' },
+    ]);
+    expect(r.revenue).toBe(240);
+    expect(r.cost).toBe(200);
   });
 
   it('barreja de línies (pròpia imputada + partner + explícita)', () => {

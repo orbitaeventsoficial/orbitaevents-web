@@ -97,6 +97,7 @@ type CalendarBookingEconomicInput = {
     collaboratorId?: string | null;
     kind?: string | null;
     label?: string | null;
+    notes?: string | null;
   }> | null;
 };
 
@@ -216,7 +217,7 @@ export async function getAdminCalendarMonth(from?: string | null, to?: string | 
         eventStartTime: true,
         eventEndTime: true,
         extras: { select: { price: true, quantity: true } },
-        serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true } },
+        serviceLines: { select: { revenueAmount: true, costAmount: true, quantity: true, collaboratorId: true, kind: true, label: true, notes: true } },
         pack: {
           select: {
             slug: true,

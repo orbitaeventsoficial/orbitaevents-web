@@ -184,8 +184,8 @@ continuen sent la lectura de domini; aquesta taula és el resum executiu fresc d
 |---|---|---|
 | #1725-#1726 | Dossiers / portfolio / productes | Bingo Musical KIDS, Bingo Musical adult i Batalla Musical tenen imatges de producte millorades, amb presentador visible i cares infantils pixelades quan cal. |
 | #1727 | Portfolio | `/admin/portfolio` deixa de marcar zero fals, exposa la pestanya `Imatges` i permet drop-in per categoria amb pipeline canònic de carpeta, nom i optimització. |
-| #1728-#1731, #1733 | Lead / economia / repartiment | El lead veu `Qui cobra què` abans de reserva, amb serveis, transport, hores, peatges, dietes, brut Òrbita, cost intern i benefici net, amb entrada visible des del rail i sense perdre `hours`/`partyType` en convertir-se en reserva. |
-| #1729-#1730, #1734-#1736 | Dossier / reserva / booking legacy | Els peatges i el desplaçament llarg es congelen al dossier; seleccionar un lead dins del generador també hereta km/peatges, snapshots antics amb productes poden rehidratar peatges del lead, el PDF compost pinta desplaçament i les reserves antigues amb `travelCost` sense línies detallades tenen fallback de cost intern sense migració. |
+| #1728-#1731, #1733, #1738 | Lead / economia / repartiment | El lead veu el repartiment abans de reserva, però el transforma en `Pacte amb partner`: Masquerade valida import, hores reals, hores pagades, dietes i peatges sense veure el net d'Òrbita com a peça principal; `hours`/`partyType` es conserven en convertir-se en reserva. |
+| #1729-#1730, #1734-#1737, #1739 | Dossier / reserva / booking legacy | Els peatges i el desplaçament llarg es congelen al dossier; seleccionar un lead dins del generador hereta km/peatges, snapshots antics poden rehidratar peatges, el PDF compost pinta desplaçament, les reserves amb `travelCost` i línies `[travel-cost]` no dupliquen cost, i les previews blob del dossier carreguen imatges absolutes. |
 | #1732 | Roadmap / auditoria | Aquest full torna a ser viu: incorpora #1725-#1731, defineix els següents talls probables i queda protegit pel guard `qa:zenit-roadmap`. |
 
 ### 7.2 Criteri de prioritat de la nit
@@ -379,6 +379,9 @@ continuen sent la lectura de domini; aquesta taula és el resum executiu fresc d
 - **#1734**: seleccionar un lead des del cercador del generador de dossiers també omple `travelKm` i `travelTollsEur`, no només el prefill per URL amb `leadId`.
 - **#1735**: l'email/PDF de dossier pot rehidratar `tollsEur` del lead encara que el snapshot antic ja tingui productes congelats però no peatges.
 - **#1736**: el PDF compost de dossier rep el transport resolt i afegeix pàgina de desplaçament quan hi ha km, alineant-lo amb l'email/HTML.
+- **#1737**: `costEngine` ignora línies `[travel-cost]` quan ja hi ha `booking.travelCost`, evitant duplicar el cost de ruta en Economia, dashboard, cashflow, rendibilitat i calendari.
+- **#1738**: el lead converteix `Qui cobra què` en `Pacte amb partner`: visible només el pacte del partner amb fórmula de ruta, hores pagades, dietes i peatges; net/brut/cost d'Òrbita queda plegat internament.
+- **#1739**: les previews HTML `blob:` del dossier absolutitzen imatges amb l'origen actual, de manera que productes Masquerade tornen a mostrar assets reals en pestanya nova.
 - **#1681**: els recordatoris de pagament d'Economia marquen nomes Email, WA API o registre manual quan falla aquell canal.
 - **#1682**: la copia del link Stripe deixa de fallar en silenci i marca nomes el boto de copiar del tram afectat.
 - **#1683**: referrals mostra error accessible si copiar missatge suggerit falla i marca nomes aquell candidat.
@@ -396,9 +399,9 @@ continuen sent la lectura de domini; aquesta taula és el resum executiu fresc d
 
 ### 7.5 Següents talls probables
 
-1. **E2E lead -> dossier -> reserva.** Reproduir un lead real amb productes, desplaçament, peatges, dietes, imatges i `Qui cobra què`; #1733 blinda `hours`/`partyType`, #1734 blinda km/peatges en seleccionar lead dins del generador, #1735 blinda peatges en snapshots antics i #1736 alinea PDF compost amb email/HTML, falta verificar reserva sobre un cas complet amb imatges.
+1. **E2E lead -> dossier -> reserva.** Reproduir un lead real amb productes, desplaçament, peatges, dietes, imatges i pacte partner; #1733 blinda `hours`/`partyType`, #1734 blinda km/peatges en seleccionar lead dins del generador, #1735 blinda peatges en snapshots antics, #1736 alinea PDF compost amb email/HTML, #1738 explica el pacte partner i #1739 arregla previews blob amb imatges. Falta verificar reserva sobre un cas complet amb imatges.
 2. **Portfolio/media pipeline.** Provar drop-in per categoria, assets públics i productes Masquerade perquè cada imatge surt d'on toca: portfolio per galeria, producte per dossier, snapshot per documents ja enviats.
-3. **Economia de bolos antics.** Auditar reserves amb `travelCost` sense línies `[travel-cost]`, decidir si el fallback és suficient o si cal migració explícita amb dry-run.
+3. **Economia de bolos antics.** #1737 blinda la duplicació latent entre `travelCost` i línies `[travel-cost]`; el següent tall econòmic hauria de mirar riscos visibles de marge/cobrament, no migració de ruta sense evidència.
 4. **Copilot de gestió.** Convertir els fallos reals detectats en accions executives a `Avui`, no en pantalles amagades: cobrament, marge, documents pendents, post-event i lead calent.
 
 ### 7.6 Stop rules
