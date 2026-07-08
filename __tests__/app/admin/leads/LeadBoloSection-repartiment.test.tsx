@@ -94,8 +94,8 @@ describe('LeadBoloSection repartiment', () => {
     const panel = screen.getByLabelText('Pacte amb partner al lead');
     expect(panel).toHaveAttribute('id', 'lead-repartiment');
     expect(panel).toHaveClass('ap-ledger-budget--repartiment');
-    expect(screen.getByText('lead · valida import abans de dossier, pressupost o reserva')).toBeInTheDocument();
-    expect(screen.getByText('import a validar')).toBeInTheDocument();
+    expect(screen.getByText('lead · import curt abans de formalitzar')).toBeInTheDocument();
+    expect(screen.getByText('a validar')).toBeInTheDocument();
     expect(panel.textContent).toContain('Masquerade');
     expect(panel.textContent).not.toContain('Òrbita (tu)');
     expect(screen.queryByText('Òrbita (tu)')).not.toBeInTheDocument();
@@ -158,17 +158,20 @@ describe('LeadBoloSection repartiment', () => {
 
     expect(screen.queryByText('Transport client')).not.toBeInTheDocument();
     expect(screen.queryByText('Temps ruta conductor · Òrbita')).not.toBeInTheDocument();
-    expect(screen.getAllByText('Temps ruta passatger').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Temps ruta passatger')).not.toBeInTheDocument();
     expect(screen.queryByText('Peatges ruta · Òrbita')).not.toBeInTheDocument();
     expect(screen.queryByText('Dieta desplaçament · Òrbita')).not.toBeInTheDocument();
-    expect(screen.getAllByText('Dieta desplaçament').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Dieta desplaçament')).not.toBeInTheDocument();
     expect(screen.queryByText('Què cobra Masquerade')).not.toBeInTheDocument();
     expect(screen.getByText((text) => text.includes('Total ruta') && text.includes('340.22'))).toBeInTheDocument();
     expect(screen.getByText('Vehicle: 96.72')).toBeInTheDocument();
     expect(screen.getByText('Equip ruta: 165')).toBeInTheDocument();
     expect(screen.getByText('Dietes: 60')).toBeInTheDocument();
     expect(screen.getByText('Peatges: 18.5')).toBeInTheDocument();
-    expect(screen.getByText('Tècnic de so inclòs · 1h 30')).toBeInTheDocument();
+    expect(screen.getByText('Ruta')).toBeInTheDocument();
+    expect(screen.getByText('temps + dieta')).toBeInTheDocument();
+    expect(screen.getByText('Compensació a Òrbita')).toBeInTheDocument();
+    expect(screen.getByText('tècnic inclòs')).toBeInTheDocument();
     expect(screen.getByText('-40 €')).toBeInTheDocument();
     expect(screen.queryByText('Operari Òrbita')).not.toBeInTheDocument();
     expect(screen.queryByText('Cost intern Òrbita')).not.toBeInTheDocument();

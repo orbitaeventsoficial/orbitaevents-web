@@ -14,6 +14,7 @@ const prisma = new PrismaClient();
 
 const COLLABORATOR_ID = 'carlos-lucas-fernandez';
 const IMG = '/img/collaborators/masquerade';
+const BINGO_ADULT_IMG = `${IMG}/bingo-musical-cover.jpg`;
 const BINGO_KIDS_IMG = `${IMG}/bingo-musical-kids.jpg`;
 // Km inclosos canònics (font única: travelCost). Avui 20 km/sentit des de Granollers.
 const INCLUDED_KM = getIncludedTravelOneWayKm();
@@ -109,7 +110,7 @@ const PRODUCTS = [
     // explícit per reactivar-lo (el seed #956 l'havia desactivat: no era al Word).
     costPrice: 200,
     sellPrice: productPrice(200),
-    imageUrl: `${IMG}/bingo-musical.jpg`,
+    imageUrl: BINGO_ADULT_IMG,
     description: "Els temazos sonen des del primer minut, sempre des de la part que tothom reconeix, mentre el presentador porta l'energia. Cada participant té el seu cartró i els seus gomets; el joc acumula línies i, quan s'omplen, els guanyadors surten al davant per als reptes musicals. Tres rondes, cada cop diferent, mentre el públic canta i anima fins que algú canta bingo.",
     includes: INCLUDES,
     isActive: true,

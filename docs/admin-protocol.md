@@ -1733,6 +1733,24 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1747 — 2026-07-08 — codex (FET)
+- Context: el propietari torna a mirar `Pacte amb partner` i marca que encara és massa explicatiu per a lead: per validar amb Masquerade no cal llistar `Temps ruta passatger` i `Dieta desplaçament` com si fossin dues decisions. També confirma que la millor candidata actual per al Bingo Musical adult és la portada amb públic i cartrons.
+- Fet:
+  - `RepartimentPanel` en mode `preproposal` agrega les línies del partner en tres peces: servei, ruta i compensació Òrbita.
+  - El lead deixa d'ensenyar `Temps ruta passatger` i `Dieta desplaçament` com a files pròpies del pacte; la ruta surt com a `Ruta · temps + dieta`.
+  - La microcopy passa a `lead · import curt abans de formalitzar`, i la targeta del partner marca l'import com `a validar`.
+  - Afegit `public/img/collaborators/masquerade/bingo-musical-cover.jpg`; el seed de Masquerade posa el Bingo Musical adult a aquesta imatge.
+  - Sincronitzada la BD configurada: `CollaboratorProduct.imageUrl` de `Bingo Musical` passa a `/img/collaborators/masquerade/bingo-musical-cover.jpg`.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\scripts\seed-partner-product-visibility.test.ts` OK (8/8); `node --check scripts\seed-masquerade-products.mjs` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK; `pnpm run validate:core` OK.
+  - Validació funcional: Prisma confirma el canvi d'`imageUrl` del Bingo Musical adult i el test del lead blinda que el pacte ja no renderitza `Temps ruta passatger` ni `Dieta desplaçament` com a files independents.
+  - Validació humana/UX: el pacte queda en format de conversa: `Bingo Musical` + `Ruta` - `Compensació a Òrbita`; la liquidació completa continua sent responsabilitat de reserva/economia.
+- Roadmap Manolo actualitzat amb #1747 dins de lead -> dossier i media de producte.
+- `ADMIN_CHANGE_COUNTER` puja a `1747`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1746 — 2026-07-08 — codex (FET)
 - Context: el propietari detecta que, si el lead ja porta dades de bolo, `Crear dossier` no hauria d'obrir el generador perquè l'operador torni a validar el mateix; ha de crear/obrir el dossier directament. També fixa el criteri visual: les millores d'imatge han de funcionar per totes les fotos, no per un producte concret.
 - Fet:

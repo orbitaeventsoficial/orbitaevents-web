@@ -1,3 +1,26 @@
+## 2026-07-08 — Pacte partner encara més curt i Bingo adult amb portada bona (Canvi #1747, codex)
+
+### Context
+El propietari revisa el bloc `Pacte amb partner` i encara el troba sobredimensionat: per validar amb Masquerade no cal veure `Temps ruta passatger` i `Dieta desplaçament` com a línies separades. En paral·lel, confirma que la millor candidata actual per al Bingo Musical adult és la imatge amb públic i cartrons, no la versió on domina el sostre.
+
+### Què s'ha fet
+- `RepartimentPanel` en mode lead agrega el partner en tres decisions: servei, ruta i compensació Òrbita.
+- La targeta del partner deixa d'ensenyar línies de ruta redundants i passa a lectura curta: `Bingo Musical`, `Ruta` i `Compensació a Òrbita`.
+- La microcopy del lead baixa de `valida import abans de dossier, pressupost o reserva` a `lead · import curt abans de formalitzar`.
+- Afegit l'asset `bingo-musical-cover.jpg` a `public/img/collaborators/masquerade/` i el seed de Masquerade apunta el Bingo Musical adult a aquesta portada.
+- La BD configurada s'ha sincronitzat: `CollaboratorProduct.imageUrl` del Bingo Musical adult passa a `/img/collaborators/masquerade/bingo-musical-cover.jpg`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\scripts\seed-partner-product-visibility.test.ts` OK (8/8); `node --check scripts\seed-masquerade-products.mjs` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK; `pnpm run validate:core` OK.
+- Validació funcional: Prisma confirma que Bingo Musical adult tenia `/img/collaborators/masquerade/bingo-musical.jpg` i queda amb `/img/collaborators/masquerade/bingo-musical-cover.jpg`; el pacte ja no mostra `Temps ruta passatger` ni `Dieta desplaçament` com a files pròpies.
+- Validació humana/UX: Masquerade valida un import curt i llegible: servei + ruta agregada - compensació; la liquidació completa queda per reserva/economia.
+
+### Coordinació
+Counter -> 1747. Canvi limitat a lectura del pacte al lead, asset/seed de Bingo Musical adult, sincronització BD, tests, roadmap, protocol, diari i sync; sense schema, motors econòmics ni `app/admin/tasks`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Lead crea dossier directe i imatges sempre senceres (Canvi #1746, codex)
 
 ### Context

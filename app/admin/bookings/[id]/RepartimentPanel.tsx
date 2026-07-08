@@ -56,6 +56,7 @@ export default function RepartimentPanel({
       .replace(` · ${provider}`, '')
       .replace(/\s+x\d+$/, '');
   };
+  const isRoutePartnerLabel = (label: string) => /^(?:Vehicle ruta|Temps ruta|Peatges ruta|Dieta desplaçament)/.test(label);
   const partnerRows = (personId: string) => elements
     .filter((e) => (e.beneficiariId === personId && !e.esOrbita) || (e.sourceCollaboratorId === personId && e.liquidacioOrbita > 0))
     .map((e) => ({
@@ -65,6 +66,41 @@ export default function RepartimentPanel({
       meta: e.sourceCollaboratorId === personId && e.liquidacioOrbita > 0 ? 'compensació Òrbita' : 'partner',
       settlement: e.sourceCollaboratorId === personId && e.liquidacioOrbita > 0,
     }));
+  const partnerSummaryRows = (personId: string) => {
+    const rows = partnerRows(personId);
+    const serviceRows = rows.filter((row) => !row.settlement && !isRoutePartnerLabel(row.label));
+    const routeRows = rows.filter((row) => !row.settlement && isRoutePartnerLabel(row.label));
+    const settlementRows = rows.filter((row) => row.settlement);
+    const serviceAmount = serviceRows.reduce((sum, row) => sum + row.amount, 0);
+    const routeAmount = routeRows.reduce((sum, row) => sum + row.amount, 0);
+    const settlementAmount = settlementRows.reduce((sum, row) => sum + row.amount, 0);
+    const firstService = serviceRows[0]?.label;
+    const hasMeal = routeRows.some((row) => row.label.startsWith('Dieta desplaçament'));
+    const hasRouteTime = routeRows.some((row) => row.label.startsWith('Temps ruta'));
+    return [
+      serviceAmount > 0 ? {
+        key: `${personId}:services`,
+        label: serviceRows.length === 1 && firstService ? firstService : `${serviceRows.length} serveis`,
+        meta: 'servei',
+        amount: serviceAmount,
+        settlement: false,
+      } : null,
+      routeAmount > 0 ? {
+        key: `${personId}:route`,
+        label: 'Ruta',
+        meta: [hasRouteTime ? 'temps' : null, hasMeal ? 'dieta' : null].filter(Boolean).join(' + ') || 'desplaçament',
+        amount: routeAmount,
+        settlement: false,
+      } : null,
+      settlementAmount > 0 ? {
+        key: `${personId}:settlement`,
+        label: 'Compensació a Òrbita',
+        meta: 'tècnic inclòs',
+        amount: settlementAmount,
+        settlement: true,
+      } : null,
+    ].filter((row): row is { key: string; label: string; meta: string; amount: number; settlement: boolean } => Boolean(row));
+  };
 
   return (
     <div className={`ap-rep${isPreproposal ? ' ap-rep--preproposal' : ''}`}>
@@ -84,11 +120,11 @@ export default function RepartimentPanel({
           {visiblePeople.map((p) => (
             <div key={`${p.personId}:detail`} className="ap-rep-partner-card ap-rep-partner-card--compact">
               <div className="ap-rep-partner-head">
-                <span>{nameOf(p.personId)}<em>import a validar</em></span>
+                <span>{nameOf(p.personId)}<em>a validar</em></span>
                 <strong>{formatCurrency(p.rep)}</strong>
               </div>
               <div className="ap-rep-partner-lines">
-                {partnerRows(p.personId).map((row) => (
+                {partnerSummaryRows(p.personId).map((row) => (
                   <div key={row.key} className="ap-rep-partner-line" data-settlement={row.settlement ? 'true' : undefined}>
                     <span>{row.label}<em>{row.meta}</em></span>
                     <strong>{row.settlement ? '-' : ''}{formatCurrency(row.amount)}</strong>

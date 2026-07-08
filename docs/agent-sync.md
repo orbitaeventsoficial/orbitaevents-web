@@ -66,6 +66,13 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-08 [ESTAT: tancat — Pacte partner curt + Bingo adult portada #1747]
+Perimetre: `Pacte amb partner` del lead compactat a servei + ruta agregada + compensació; nou asset `bingo-musical-cover.jpg`; Bingo Musical adult apuntat al seed i a la BD configurada. Sense schema, portfolio, motors econòmics ni `app/admin/tasks`.
+Ultim canvi: #1747.
+Validacio: tests focalitzats 8/8 OK; `node --check scripts\seed-masquerade-products.mjs` OK; asset local HTTP 200; Prisma confirma `imageUrl` nou; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `qa:zenit-roadmap` OK; `git diff --check` OK; `validate:core` OK.
+Proper pas previst: E2E complet lead -> dossier -> reserva quan el propietari ho demani, o següent tall Manolo petit amb evidència viva.
+Avis claude: canvi de lectura pre-proposta i selecció d'imatge de producte; la liquidació completa continua a reserva/economia.
+
 [codex] 2026-07-08 [ESTAT: tancat — Lead crea dossier directe #1746]
 Perimetre: botó `Crear dossier` de `/admin/leads/[id]` reutilitza `/api/admin/dossiers/draft-from-lead`, obre el PDF compost directament i el dossier aplica imatge sencera per regla global; sense tocar schema, BD, motors econòmics ni `app/admin/tasks`.
 Ultim canvi: #1746.

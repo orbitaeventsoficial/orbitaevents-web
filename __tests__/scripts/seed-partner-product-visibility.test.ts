@@ -17,6 +17,12 @@ describe('partner product seeds visibility', () => {
     expect(masqueradeSeed).toContain('visibleInBooking: true');
   });
 
+  it('sembra Bingo Musical adult amb la portada editorial sense sostre dominant', () => {
+    expect(masqueradeSeed).toContain('BINGO_ADULT_IMG = `${IMG}/bingo-musical-cover.jpg`');
+    expect(masqueradeSeed).toContain("name: 'Bingo Musical'");
+    expect(masqueradeSeed).toContain('imageUrl: BINGO_ADULT_IMG');
+  });
+
   it('sembra els altaveus d Isma com a cost intern de booking, no com a dossier', () => {
     expect(ismaSeed).toContain("COLLABORATOR_ID = 'isma-lloguer-altaveus'");
     expect(ismaSeed).toContain("name: 'Lloguer altaveus DJ'");
