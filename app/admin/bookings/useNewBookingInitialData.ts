@@ -41,6 +41,7 @@ export function useNewBookingInitialData({ leadId, dateParam, forceLeadPrefill =
   const [loading, setLoading] = useState(true);
   const [leadData, setLeadData] = useState<BookingLeadData | null>(null);
   const [leadServiceLines, setLeadServiceLines] = useState<BookingServiceLineFormInput[]>([]);
+  const [leadRouteCostLines, setLeadRouteCostLines] = useState<BookingServiceLineFormInput[]>([]);
   const [partners, setPartners] = useState<BookingPartnerOption[]>([]);
   const [fuelReferenceInfo, setFuelReferenceInfo] = useState<string | null>(null);
 
@@ -48,6 +49,7 @@ export function useNewBookingInitialData({ leadId, dateParam, forceLeadPrefill =
     async function load() {
       try {
         setLeadServiceLines([]);
+        setLeadRouteCostLines([]);
         const [packsRes, extrasRes, partnersRes] = await Promise.all([
           fetchWithCsrf('/api/admin/packs'),
           fetchWithCsrf('/api/admin/extras'),
@@ -142,6 +144,7 @@ export function useNewBookingInitialData({ leadId, dateParam, forceLeadPrefill =
             if (leadLinesRes.ok) {
               const leadLinesData = await leadLinesRes.json();
               setLeadServiceLines(mapLeadServiceLinesToBookingFormLines(leadLinesData?.lines));
+              setLeadRouteCostLines(mapLeadServiceLinesToBookingFormLines(leadLinesData?.routeCostLines));
             }
           }
         }
@@ -167,6 +170,7 @@ export function useNewBookingInitialData({ leadId, dateParam, forceLeadPrefill =
     loading,
     leadData,
     leadServiceLines,
+    leadRouteCostLines,
     partners,
     fuelReferenceInfo,
   };

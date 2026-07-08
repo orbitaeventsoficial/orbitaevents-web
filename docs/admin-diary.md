@@ -1,3 +1,26 @@
+## 2026-07-08 — Lead -> reserva conserva la liquidació de ruta (Canvi #1743, codex)
+
+### Context
+Després de simplificar el lead i el pacte amb partner (#1742), el següent risc Zenit era el handoff: el que es valida amb Masquerade al lead havia d'arribar igual a la reserva. El lead ja desava línies ocultes `[travel-cost]`, però l'API de prefill només retornava les línies visibles; en crear reserva, el formulari podia recalcular transport amb defaults i perdre qui cobra vehicle, passatger, dietes o peatges.
+
+### Què s'ha fet
+- `/api/admin/leads/[id]/service-lines` manté `lines` com a productes visibles, però afegeix `routeCostLines` amb les línies internes `[travel-cost]` i `internalTravelCost` també quan el lead ja té reserva.
+- `useNewBookingInitialData` carrega `leadRouteCostLines` separades del bolo visible.
+- `NewBookingForm` conserva les línies de ruta del lead si km/peatges no han canviat i no s'ha ajustat el transport intern; si l'operador toca ruta, genera línies ocultes noves amb vehicle, conductor, passatgers, peatges i dietes.
+- `useNewBookingSubmit` envia les línies visibles i les de ruta juntes al POST de booking, però les de ruta no compten com a producte visible ni arrosseguen `travelHeadcount`.
+- `useBookingPricing` suma `tollsEur` al càrrec visible de transport perquè el formulari no ensenyi menys del que acabarà desat.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\leadServiceLineService.test.ts __tests__\app\admin\bookings\useNewBookingSubmit.test.tsx __tests__\app\admin\bookings\useBookingPricing.test.ts __tests__\app\admin\bookings\bookingLeadServiceLineMapper.test.ts` OK (21/21); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK; `pnpm build` OK (inclou `validate:core` + `next build`).
+- Validació funcional: el prefill lead -> reserva ara transporta `routeCostLines` ocultes; una reserva creada des del lead pot conservar la liquidació pactada amb Masquerade sense mostrar-la com a producte editable.
+- Validació humana/UX: el lead continua servint per ensenyar a Masquerade què cobrarà, i la reserva deixa de perdre aquella conversa quan es materialitza el bolo.
+
+### Coordinació
+Counter -> 1743. Canvi limitat a handoff lead -> nova reserva, pricing de transport amb peatges, tests, roadmap, protocol, diari i sync; sense schema, BD, dossier ni `app/admin/tasks`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Lead: pacte partner curt i ruta amb 50 km inclosos (Canvi #1742, codex)
 
 ### Context

@@ -66,6 +66,13 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-08 [ESTAT: tancat — Lead -> reserva conserva liquidació de ruta #1743]
+Perimetre: `LeadServiceLine` API, prefill de `/admin/bookings/new`, submit de nova reserva, pricing de transport amb peatges, tests i docs. Objectiu complert: el lead conserva `routeCostLines` ocultes `[travel-cost]` cap a la reserva sense mostrar-les com a productes, i el resum de nova reserva suma `tollsEur`.
+Ultim canvi: #1743.
+Validacio: tests focalitzats 21/21 OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `qa:zenit-roadmap` OK; `git diff --check` OK; `pnpm build` OK (`validate:core` + `next build`).
+Proper pas previst: continuar Manolo amb E2E lead -> dossier final amb imatges/peatges/reserva, o següent tall de fiabilitat del roadmap si apareix més petit.
+Avis claude: no he tocat `app/admin/tasks`, schema, BD ni dossier; carril limitat a handoff lead/reserva i transport visible.
+
 [codex] 2026-07-08 [ESTAT: tancat — Lead pacte partner simplificat i ruta amb 50 km inclosos #1742]
 Perimetre: `/admin/leads/[id]`, `travelLaborCost`, `RepartimentPanel`, `BoloTripCard`, tests i docs. Objectiu complert: fitxa de lead curta per a Òrbita i presentable a Masquerade, amb detall desplegable, sense marges duplicats, i ruta calculada com `km totals - 50 km inclosos`, persones amb 1h inclosa i dietes només si passa de 150 km.
 Ultim canvi: #1742.

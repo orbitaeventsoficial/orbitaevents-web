@@ -62,7 +62,15 @@ export async function listLeadServiceLines(leadId: string) {
     },
   });
   if (lead?.booking) {
-    return { status: 200, body: { lines: lead.booking.serviceLines.filter((line) => !isTravelCostLine(line)) } };
+    const lines = lead.booking.serviceLines;
+    return {
+      status: 200,
+      body: {
+        lines: lines.filter((line) => !isTravelCostLine(line)),
+        routeCostLines: lines.filter(isTravelCostLine),
+        internalTravelCost: sumTravelCostLines(lines),
+      },
+    };
   }
 
   const lines = await prisma.leadServiceLine.findMany({
@@ -73,6 +81,7 @@ export async function listLeadServiceLines(leadId: string) {
     status: 200,
     body: {
       lines: lines.filter((line) => !isTravelCostLine(line)),
+      routeCostLines: lines.filter(isTravelCostLine),
       // Lead pur (sense reserva): el cost de ruta viu a les línies [travel-cost],
       // amagades de productes però reimputades al marge via aquest total.
       internalTravelCost: sumTravelCostLines(lines),

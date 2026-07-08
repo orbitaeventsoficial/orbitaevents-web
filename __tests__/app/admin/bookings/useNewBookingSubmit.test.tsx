@@ -182,4 +182,62 @@ describe('useNewBookingSubmit', () => {
       },
     ]);
   });
+
+  it('afegeix les línies ocultes de ruta al payload sense fer-les visibles al formulari', async () => {
+    const { result } = renderHook(() => useNewBookingSubmit({
+      form: validForm(),
+      selectedExtras: {},
+      leadId: 'lead-1',
+      leadData: null,
+      customerId: null,
+      internalTravelCost: 298,
+      serviceLines: [
+        {
+          kind: 'PROVIDER_SERVICE',
+          label: 'Bingo Musical',
+          revenueAmount: 240,
+          costAmount: 200,
+          quantity: 1,
+          travelHeadcount: 1,
+        },
+      ],
+      routeCostLines: [
+        {
+          kind: 'OTHER',
+          label: 'Temps ruta passatger · Masquerade Events',
+          revenueAmount: 0,
+          costAmount: 82.5,
+          quantity: 1,
+          collaboratorId: 'masquerade',
+          notes: '[travel-cost] PASSENGER · 5.50 h · 15 EUR/h',
+          travelHeadcount: 1,
+        },
+      ],
+    }));
+
+    await act(async () => {
+      await result.current.submit();
+    });
+
+    const [, init] = mockFetchWithCsrf.mock.calls[0];
+    const body = JSON.parse(String(init?.body));
+    expect(body.serviceLines).toEqual([
+      {
+        kind: 'PROVIDER_SERVICE',
+        label: 'Bingo Musical',
+        revenueAmount: 240,
+        costAmount: 200,
+        quantity: 1,
+      },
+      {
+        kind: 'OTHER',
+        label: 'Temps ruta passatger · Masquerade Events',
+        revenueAmount: 0,
+        costAmount: 82.5,
+        quantity: 1,
+        collaboratorId: 'masquerade',
+        notes: '[travel-cost] PASSENGER · 5.50 h · 15 EUR/h',
+      },
+    ]);
+  });
 });

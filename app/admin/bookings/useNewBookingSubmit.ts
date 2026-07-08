@@ -22,6 +22,8 @@ interface UseNewBookingSubmitOptions {
   /** Línies de servei explícites (editor obert). Si s'informen, tenen prioritat
    *  sobre les derivades del relationshipContext (sistema antic). */
   serviceLines?: BookingServiceLineFormInput[];
+  /** Línies internes de liquidació de ruta. No compten com a producte visible. */
+  routeCostLines?: BookingServiceLineFormInput[];
   /** Partner que factura el bolo (si no és el client final). */
   billedCollaboratorId?: string;
   relationshipContext?: {
@@ -71,6 +73,11 @@ function buildServiceLines(input?: UseNewBookingSubmitOptions['relationshipConte
   return lines;
 }
 
+function stripFormOnlyFields(line: BookingServiceLineFormInput): Omit<BookingServiceLineFormInput, 'travelHeadcount'> {
+  const { travelHeadcount: _travelHeadcount, ...cleanLine } = line;
+  return cleanLine;
+}
+
 export function useNewBookingSubmit({
   form,
   selectedExtras,
@@ -83,6 +90,7 @@ export function useNewBookingSubmit({
   manualTotalPrice,
   invoiceRequired = false,
   serviceLines: explicitServiceLines,
+  routeCostLines,
   billedCollaboratorId: explicitBilledCollaboratorId,
   onSuccess,
   relationshipContext,
@@ -112,9 +120,13 @@ export function useNewBookingSubmit({
     setError(null);
 
     try {
-      const serviceLines = explicitServiceLines && explicitServiceLines.length > 0
-        ? explicitServiceLines.map(({ travelHeadcount: _travelHeadcount, ...line }) => line)
+      const visibleServiceLines = explicitServiceLines && explicitServiceLines.length > 0
+        ? explicitServiceLines.map(stripFormOnlyFields)
         : buildServiceLines(relationshipContext);
+      const routeSettlementLines = routeCostLines && routeCostLines.length > 0
+        ? routeCostLines.map(stripFormOnlyFields)
+        : [];
+      const serviceLines = [...visibleServiceLines, ...routeSettlementLines];
       const billedCollaboratorId = explicitBilledCollaboratorId
         ?? (relationshipContext?.mode === 'PARTNER_HIRES_ORBITA' ? relationshipContext.partnerId || undefined : undefined);
       const notes = form.notes.trim();
@@ -174,7 +186,7 @@ export function useNewBookingSubmit({
     } finally {
       setSubmitting(false);
     }
-  }, [customerId, form, internalTravelCost, leadData, leadId, manualTotalPrice, relationshipContext, router, selectedExtras, sourceCollaboratorId, customPackPrice, invoiceRequired, explicitServiceLines, explicitBilledCollaboratorId]);
+  }, [customerId, form, internalTravelCost, leadData, leadId, manualTotalPrice, relationshipContext, router, selectedExtras, sourceCollaboratorId, customPackPrice, invoiceRequired, explicitServiceLines, routeCostLines, explicitBilledCollaboratorId]);
 
   return {
     submitting,

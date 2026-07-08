@@ -32,7 +32,7 @@ function calculateEventDuration(startTime: string | null | undefined, endTime: s
 }
 
 interface UseBookingPricingOptions {
-  form: Pick<BookingFormData, 'packId' | 'extraHours' | 'eventStartTime' | 'eventEndTime' | 'distanceKm' | 'fuelCostPerKm' | 'discount'>;
+  form: Pick<BookingFormData, 'packId' | 'extraHours' | 'eventStartTime' | 'eventEndTime' | 'distanceKm' | 'tollsEur' | 'fuelCostPerKm' | 'discount'>;
   packs: BookingPack[];
   extras: BookingExtra[];
   selectedExtras: BookingSelectedExtras;
@@ -57,9 +57,10 @@ export function useBookingPricing({ form, packs, extras, selectedExtras, customP
   // El headcount surt de les línies del bolo.
   const travelCharge = useMemo(() => {
     const km = parseFloat(form.distanceKm) || 0;
+    const tolls = parseFloat(form.tollsEur) || 0;
     const rate = parseFloat(form.fuelCostPerKm) || DEFAULT_VEHICLE_COST_PER_KM;
-    return calculateClientTravelCharge(km, deriveTravelHeadcount(serviceLines, Boolean(form.packId)), rate);
-  }, [form.distanceKm, form.fuelCostPerKm, form.packId, serviceLines]);
+    return calculateClientTravelCharge(km, deriveTravelHeadcount(serviceLines, Boolean(form.packId)), rate, tolls);
+  }, [form.distanceKm, form.fuelCostPerKm, form.packId, form.tollsEur, serviceLines]);
 
   // Valors informatius de km (llegat de la visualització per trams #1363): el CÀRREC ja
   // és el real de dues potes; aquests només descriuen la part de cotxe a la UI antiga.

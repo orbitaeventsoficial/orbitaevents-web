@@ -1733,6 +1733,25 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1743 — 2026-07-08 — codex (FET)
+- Context: després del #1742, el lead ja servia per pactar amb Masquerade import, hores, dietes i ruta, però la creació de reserva podia perdre les línies ocultes `[travel-cost]` perquè el prefill només consumia productes visibles. També hi havia una incoherència veïna: `tollsEur` s'heretava al formulari, però el càrrec visible de transport no el sumava.
+- Fet:
+  - `listLeadServiceLines` manté `lines` com a línies visibles i afegeix `routeCostLines` separades amb la liquidació interna de ruta; `internalTravelCost` també torna quan el lead ja té reserva.
+  - `useNewBookingInitialData` carrega `leadRouteCostLines` sense barrejar-les amb l'editor de serveis.
+  - `NewBookingForm` conserva les `routeCostLines` del lead quan km/peatges no han canviat i no s'ha ajustat el transport intern; si es toca ruta, genera línies ocultes noves amb vehicle, conductor, passatgers, peatges i dietes.
+  - `useNewBookingSubmit` envia línies visibles + línies de ruta al POST de booking, retirant `travelHeadcount` i sense comptar ruta com a producte visible.
+  - `useBookingPricing` incorpora `tollsEur` al càrrec visible de transport.
+  - Tests de lead service lines, submit, pricing i mapper actualitzats.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\leadServiceLineService.test.ts __tests__\app\admin\bookings\useNewBookingSubmit.test.tsx __tests__\app\admin\bookings\useBookingPricing.test.ts __tests__\app\admin\bookings\bookingLeadServiceLineMapper.test.ts` OK (21/21); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK; `pnpm build` OK (inclou `validate:core` + `next build`).
+  - Validació funcional: el handoff lead -> reserva preserva línies de ruta pactades amb partner sense ensenyar-les com a productes editables; si l'operador canvia ruta a la reserva, es recreen línies ocultes coherents.
+  - Validació humana/UX: Masquerade pot validar què cobrarà al lead i aquella lectura no es perd quan Òrbita crea la reserva; els peatges ja no desapareixen del resum visible.
+- Roadmap Manolo actualitzat amb #1743 dins del bloc `Lead -> reserva`.
+- `ADMIN_CHANGE_COUNTER` puja a `1743`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1742 — 2026-07-08 — codex (FET)
 - Context: el propietari rectifica el criteri final del lead de l'Aldosa: la lectura ha de servir a Òrbita i a Masquerade, però sense pantalla infinita ni marge duplicat. El criteri vigent és `km totals - 50 km inclosos`, persones amb `1 h` inclosa, i dietes només si la ruta supera `150 km`.
 - Fet:

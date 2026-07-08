@@ -17,7 +17,11 @@ import { useSearchParams } from 'next/navigation';
 import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
-import { calculateTravelCostBreakdown } from '@/lib/services/travelLaborCost';
+import {
+  buildTravelMealAllowanceLines,
+  calculateTravelCostBreakdown,
+  computeBoloTransport,
+} from '@/lib/services/travelLaborCost';
 import { useToast } from '../components/ToastProvider';
 import { AdminPage, AdminSection } from '../components/AdminPage';
 import { NB_FIELD, NB_LABEL, NB_HINT, NB_GROUP } from './booking-form-classes';
@@ -77,7 +81,7 @@ export default function NewBookingForm() {
   const backLabel = customerId ? 'Client' : leadId ? 'Lead' : 'Agenda';
   const crumbContext = customerId ? 'Client' : 'Agenda';
 
-  const { form, setForm, packs, extras, loading, leadData, leadServiceLines, partners, fuelReferenceInfo } = useNewBookingInitialData({ leadId, dateParam, forceLeadPrefill });
+  const { form, setForm, packs, extras, loading, leadData, leadServiceLines, leadRouteCostLines, partners, fuelReferenceInfo } = useNewBookingInitialData({ leadId, dateParam, forceLeadPrefill });
   // Autosave de l'esborrany de reserva (hora, lloc, tot). Només actiu un cop
   // carregat el prefill del lead, perquè no machaqui ni el sobreescrigui.
   const autosaveKey = bookingAutosaveKey(leadId, customerId);
@@ -179,19 +183,63 @@ export default function NewBookingForm() {
   const travelHeadcount = travelHeadcountOverride
     ? Math.max(0, Math.floor(Number(travelHeadcountOverride) || 0))
     : derivedTravelHeadcount;
-  const travelCostBreakdown = useMemo(() => {
+  const travelPeople = useMemo(() => {
     const passengerCount = Math.max(0, travelHeadcount - 1);
+    const passengerMeta = travelPartner
+      ? { label: travelPartnerLabel, collaboratorId: travelPartner.id }
+      : { label: 'Equip ruta' };
+    return [
+      ...(travelHeadcount > 0 ? [{ role: 'DRIVER' as const, ...travelDriverMeta }] : []),
+      ...(passengerCount > 0 ? [{ role: 'PASSENGER' as const, ...passengerMeta, count: passengerCount }] : []),
+    ];
+  }, [travelDriverMeta, travelHeadcount, travelPartner, travelPartnerLabel]);
+  const travelCostBreakdown = useMemo(() => {
     return calculateTravelCostBreakdown({
       roundTripKm: Number(form.distanceKm) || 0,
       vehicleCostPerKm: Number(form.fuelCostPerKm) || DEFAULT_VEHICLE_COST_PER_KM,
+      tollsEur: Number(form.tollsEur) || 0,
       routeHours: travelRouteHours ? Number(travelRouteHours) : undefined,
       vehicleOwner: travelVehicleOwnerMeta,
-      people: [
-        ...(travelHeadcount > 0 ? [{ role: 'DRIVER' as const, ...travelDriverMeta }] : []),
-        ...(passengerCount > 0 ? [{ role: 'PASSENGER' as const, label: 'Equip ruta', count: passengerCount }] : []),
-      ],
+      people: travelPeople,
     });
-  }, [form.distanceKm, form.fuelCostPerKm, travelDriverMeta, travelHeadcount, travelRouteHours, travelVehicleOwnerMeta]);
+  }, [form.distanceKm, form.fuelCostPerKm, form.tollsEur, travelPeople, travelRouteHours, travelVehicleOwnerMeta]);
+  const travelTransport = useMemo(() => computeBoloTransport({
+    roundTripKm: Number(form.distanceKm) || 0,
+    headcountOverride: travelHeadcount,
+    tollsEur: Number(form.tollsEur) || 0,
+    vehicleCostPerKm: Number(form.fuelCostPerKm) || DEFAULT_VEHICLE_COST_PER_KM,
+  }), [form.distanceKm, form.fuelCostPerKm, form.tollsEur, travelHeadcount]);
+  const currentRouteCostLines = useMemo<BookingServiceLineFormInput[]>(() => {
+    if ((Number(form.distanceKm) || 0) <= 0) return [];
+    const mealLines = buildTravelMealAllowanceLines(travelPeople, travelTransport.mealAllowance);
+    return [...travelCostBreakdown.lines, ...mealLines].map((line) => ({
+      collaboratorId: line.collaboratorId || undefined,
+      kind: 'OTHER',
+      label: line.label,
+      revenueAmount: 0,
+      costAmount: line.costAmount,
+      quantity: 1,
+      notes: line.notes,
+    }));
+  }, [form.distanceKm, travelCostBreakdown.lines, travelPeople, travelTransport.mealAllowance]);
+  const routeInputsAdjusted = Boolean(
+    travelRouteHours ||
+    travelVehicleOwner !== 'OWNER' ||
+    travelDriver !== 'OWNER' ||
+    travelPartnerId ||
+    travelHeadcountOverride,
+  );
+  const leadDistance = typeof leadData?.distanceKm === 'number' ? leadData.distanceKm : null;
+  const leadTolls = typeof leadData?.tollsEur === 'number' ? leadData.tollsEur : 0;
+  const leadRouteStillMatches = leadDistance != null
+    && Math.abs((Number(form.distanceKm) || 0) - leadDistance) < 0.05
+    && Math.abs((Number(form.tollsEur) || 0) - leadTolls) < 0.01;
+  const useLeadRouteCostLines = leadRouteCostLines.length > 0 && leadRouteStillMatches && !routeInputsAdjusted;
+  const routeCostLinesForSubmit = useLeadRouteCostLines ? leadRouteCostLines : currentRouteCostLines;
+  const leadRouteCostTotal = leadRouteCostLines.reduce((sum, line) => sum + (line.costAmount || 0) * (line.quantity || 1), 0);
+  const internalTravelCostForPricing = useLeadRouteCostLines && leadRouteCostTotal > 0
+    ? leadRouteCostTotal
+    : travelTransport.cost;
 
   const {
     internalTravelCost,
@@ -211,7 +259,7 @@ export default function NewBookingForm() {
     manualTotalPrice: manualTotalPrice ? Number(manualTotalPrice) : undefined,
     invoiceRequired,
     serviceLines,
-    internalTravelCostOverride: travelCostBreakdown.totalCost,
+    internalTravelCostOverride: internalTravelCostForPricing,
   });
 
   useEffect(() => {
@@ -242,6 +290,7 @@ export default function NewBookingForm() {
     manualTotalPrice: manualTotalPrice ? Number(manualTotalPrice) : undefined,
     invoiceRequired,
     serviceLines: serviceLines.length > 0 ? serviceLines : undefined,
+    routeCostLines: routeCostLinesForSubmit,
     billedCollaboratorId: billedCollaboratorId || undefined,
   });
 
@@ -400,7 +449,7 @@ export default function NewBookingForm() {
 
           <AdminSection
             title="Transport real"
-            description={`${formatCurrency(travelCostBreakdown.totalCost)} cost intern · ${travelCostBreakdown.peopleCount} integrants`}
+            description={`${formatCurrency(internalTravelCostForPricing)} cost intern · ${travelCostBreakdown.peopleCount} integrants`}
             actions={(
               <button type="button" className="ap-btn ap-btn--xs" onClick={() => setShowInternalTravel((value) => !value)}>
                 {showInternalTravel ? 'Amagar' : 'Ajustar'}
@@ -459,7 +508,7 @@ export default function NewBookingForm() {
               <div className="ap-kpi"><p className="text-xs font-medium uppercase">Vehicle</p><p className="text-lg font-bold">{formatCurrency(travelCostBreakdown.vehicleCost)}</p></div>
               <div className="ap-kpi"><p className="text-xs font-medium uppercase">Conductor</p><p className="text-lg font-bold">{formatCurrency(travelCostBreakdown.driverCost)}</p></div>
               <div className="ap-kpi"><p className="text-xs font-medium uppercase">Passatgers</p><p className="text-lg font-bold">{formatCurrency(travelCostBreakdown.passengerCost)}</p></div>
-              <div className="ap-kpi"><p className="text-xs font-medium uppercase">Cost ruta</p><p className="text-lg font-bold">{formatCurrency(travelCostBreakdown.totalCost)}</p></div>
+              <div className="ap-kpi"><p className="text-xs font-medium uppercase">Cost ruta</p><p className="text-lg font-bold">{formatCurrency(internalTravelCostForPricing)}</p></div>
             </div>
             <p className="mt-3 text-xs text-[var(--t3)]">
               Integrants ruta: {travelCostBreakdown.peopleCount} · 1a hora inclosa, es cobra a partir de 2 h ({travelCostBreakdown.chargeableHours} h de {travelCostBreakdown.routeHours} h) · el cost de vehicle i temps s'imputa al marge intern, no a productes contractats.

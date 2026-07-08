@@ -41,6 +41,7 @@ describe('listLeadServiceLines', () => {
 
     expect(r.status).toBe(200);
     expect(r.body.lines).toEqual([{ id: 'producte', label: 'Bingo Musical', notes: null }]);
+    expect(r.body.routeCostLines).toEqual([{ id: 'ruta', label: 'Temps ruta conductor', notes: '[travel-cost] DRIVER · 6.00 h' }]);
   });
 
   it('reimputa el cost intern de transport al marge (internalTravelCost)', async () => {
@@ -55,6 +56,7 @@ describe('listLeadServiceLines', () => {
 
     // el producte es visible; el transport s'amaga PERO el seu cost es reimputa
     expect(r.body.lines).toHaveLength(1);
+    expect(r.body.routeCostLines).toHaveLength(2);
     expect(r.body.internalTravelCost).toBe(198); // 108 + 90 → menja marge, no menteix
   });
 
@@ -72,6 +74,7 @@ describe('listLeadServiceLines', () => {
 
     expect(r.status).toBe(200);
     expect(r.body.lines).toEqual([{ id: 'producte', label: 'Bingo Musical', notes: null }]);
+    expect(r.body.routeCostLines).toEqual([{ id: 'ruta', label: 'Temps ruta passatger', notes: '[travel-cost] PASSENGER · 6.00 h' }]);
     expect(mockPrisma.leadServiceLine.findMany).not.toHaveBeenCalled();
   });
 });
