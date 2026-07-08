@@ -63,6 +63,8 @@ export interface BoloTripCardProps {
   calculationNotes?: string[];
   /** Els controls queden oberts a reserves; al lead es pot deixar plegat per reduir soroll. */
   controlsDefaultOpen?: boolean;
+  /** Lead #1750: els ajustos de ruta han d'estar sempre visibles mentre es negocia el pacte. */
+  controlsAlwaysVisible?: boolean;
 }
 
 export default function BoloTripCard({
@@ -90,6 +92,7 @@ export default function BoloTripCard({
   routeSummaryDensity = 'items',
   calculationNotes = [],
   controlsDefaultOpen = true,
+  controlsAlwaysVisible = false,
 }: BoloTripCardProps) {
   const headcountEditable = typeof onHeadcountOverrideChange === 'function';
   const showTolls = typeof onTollsChange === 'function';
@@ -115,7 +118,12 @@ export default function BoloTripCard({
           ? `La 1a hora de ruta va inclosa · es cobra el temps a partir d'aquí (${formatNumber(chargeableHours)} h de tripulació).`
           : 'Ruta curta: dins la 1a hora inclosa, no es cobra temps de tripulació.'}
       </p>
-      <details className="ap-ledger-trip-controls" open={controlsDefaultOpen}>
+      <details
+        className="ap-ledger-trip-controls"
+        open={controlsDefaultOpen || controlsAlwaysVisible}
+        data-always-visible={controlsAlwaysVisible ? 'true' : undefined}
+        onToggle={controlsAlwaysVisible ? (event) => { event.currentTarget.open = true; } : undefined}
+      >
         <summary className="ap-ledger-trip-controls-summary">
           <span>Ajustos de ruta</span>
           <strong>{showTolls && tollsEur ? `peatges ${tollsEur} €` : 'editar km, equip i peatges'}</strong>

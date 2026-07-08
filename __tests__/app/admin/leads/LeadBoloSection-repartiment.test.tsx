@@ -32,14 +32,42 @@ vi.mock('@/app/admin/components/BoloTripCard', () => ({
     compactRouteSummary = false,
     effectiveTravelCost = 0,
     routeSummaryDensity = 'items',
+    controlsAlwaysVisible = false,
+    travelCollaborators = [],
+    vehicleOwnerId = '',
+    onVehicleOwnerChange,
+    driverId = '',
+    onDriverChange,
   }: {
     calculationNotes?: string[];
     routeSummaryItems?: Array<{ label: string; amount: number }>;
     compactRouteSummary?: boolean;
     effectiveTravelCost?: number;
     routeSummaryDensity?: 'items' | 'sentence';
+    controlsAlwaysVisible?: boolean;
+    travelCollaborators?: Array<{ id: string; name: string }>;
+    vehicleOwnerId?: string;
+    onVehicleOwnerChange?: (value: string) => void;
+    driverId?: string;
+    onDriverChange?: (value: string) => void;
   }) => (
-    <div data-testid="trip-card">
+    <div data-testid="trip-card" data-controls-always-visible={controlsAlwaysVisible ? 'true' : 'false'}>
+      {travelCollaborators.length > 0 && (
+        <div>
+          <select aria-label="Qui posa el cotxe" value={vehicleOwnerId} onChange={(event) => onVehicleOwnerChange?.(event.target.value)}>
+            <option value="">Òrbita</option>
+            {travelCollaborators.map((collaborator) => (
+              <option key={collaborator.id} value={collaborator.id}>{collaborator.name}</option>
+            ))}
+          </select>
+          <select aria-label="Qui condueix" value={driverId} onChange={(event) => onDriverChange?.(event.target.value)}>
+            <option value="">Òrbita</option>
+            {travelCollaborators.map((collaborator) => (
+              <option key={collaborator.id} value={collaborator.id}>{collaborator.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
       {compactRouteSummary ? (
         <>
           <p>Total ruta {effectiveTravelCost}</p>
@@ -98,12 +126,12 @@ describe('LeadBoloSection repartiment', () => {
     const panel = screen.getByLabelText('Pacte amb partner al lead');
     expect(panel).toHaveAttribute('id', 'lead-repartiment');
     expect(panel).toHaveClass('ap-ledger-budget--repartiment');
-    expect(screen.getByText('resum per validar · detall plegat')).toBeInTheDocument();
-    expect(screen.getByText((text) => text.includes('a validar') && text.includes('detall plegat'))).toBeInTheDocument();
+    expect(screen.getByText('resum per validar · detall visible')).toBeInTheDocument();
+    expect(screen.getByText((text) => text.includes('a validar') && text.includes('detall visible'))).toBeInTheDocument();
     expect(panel.textContent).toContain('Masquerade');
     const partnerDetails = panel.querySelector('.ap-rep-partner-card') as HTMLDetailsElement | null;
     expect(partnerDetails?.tagName).toBe('DETAILS');
-    expect(partnerDetails?.open).toBe(false);
+    expect(partnerDetails?.open).toBe(true);
     expect(panel.textContent).not.toContain('Òrbita (tu)');
     expect(screen.queryByText('Òrbita (tu)')).not.toBeInTheDocument();
     expect(screen.queryByText('Detall intern de costos i ruta')).not.toBeInTheDocument();
@@ -177,7 +205,8 @@ describe('LeadBoloSection repartiment', () => {
     expect(screen.queryByText('Dietes: 60')).not.toBeInTheDocument();
     expect(screen.queryByText('Peatges: 18.5')).not.toBeInTheDocument();
     expect(screen.getByText('Ruta')).toBeInTheDocument();
-    expect(screen.getByText('temps + dieta')).toBeInTheDocument();
+    expect(screen.getByText('temps 83 € + dieta 30 €')).toBeInTheDocument();
+    expect(screen.getByTestId('trip-card')).toHaveAttribute('data-controls-always-visible', 'true');
     expect(screen.getByText('Compensació a Òrbita')).toBeInTheDocument();
     expect(screen.getByText('tècnic inclòs')).toBeInTheDocument();
     expect(screen.getByText('-40 €')).toBeInTheDocument();
@@ -187,6 +216,57 @@ describe('LeadBoloSection repartiment', () => {
     expect(screen.queryByText('Operari Òrbita')).not.toBeInTheDocument();
     expect(screen.queryByText('Cost intern Òrbita')).not.toBeInTheDocument();
     expect(screen.queryByText('Benefici net Òrbita')).not.toBeInTheDocument();
+  });
+
+  it('aplica el canvi de cotxe i conductor al pacte del partner', async () => {
+    mockFetchWithCsrf.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        internalTravelCost: 0,
+        lines: [
+          {
+            collaboratorId: 'masquerade',
+            kind: 'PROVIDER_SERVICE',
+            label: 'Bingo Musical (Masquerade)',
+            revenueAmount: 240,
+            costAmount: 200,
+            quantity: 1,
+            notes: null,
+          },
+          {
+            kind: 'DJ',
+            label: 'DJ · 1a hora',
+            revenueAmount: 150,
+            costAmount: 0,
+            quantity: 1,
+            notes: null,
+          },
+        ],
+      }),
+    });
+
+    render(
+      <LeadBoloSection
+        leadId="lead-1"
+        documentContext={{ name: 'Lead Andorra', eventLocation: 'Andorra' }}
+        initialDistanceKm={411.4}
+        vehicleCostPerKm={0.25}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Pacte amb partner')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('temps 83 € + dieta 30 €')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText('Qui posa el cotxe'), { target: { value: 'masquerade' } });
+    fireEvent.change(screen.getByLabelText('Qui condueix'), { target: { value: 'masquerade' } });
+
+    await waitFor(() => {
+      expect(screen.getByText('vehicle 90 € + temps 165 € + dieta 60 €')).toBeInTheDocument();
+    });
+    expect(screen.getByLabelText('Pacte amb partner al lead').textContent).toContain('315');
   });
 
   it('no embruta la lectura curta quan hi ha ruta sense peatges informats', async () => {

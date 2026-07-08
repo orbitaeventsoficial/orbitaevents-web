@@ -66,6 +66,13 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-08 [ESTAT: tancat — Ruta i pacte partner sempre visibles #1750]
+Perimetre: ajustos de ruta i pacte partner sempre oberts al lead; la fila `Ruta` explica imports en la mateixa linia i hereta en viu qui posa cotxe / qui condueix. Sense reobrir liquidacio completa ni tocar motors economics/schema/media/tasks.
+Ultim canvi: #1750.
+Validacio: test focalitzat 5/5 OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `git diff --check` OK; `validate:core` OK; Playwright a `/admin/leads/cmr1xh7la0000ug7dj4jnihjr` confirma ajustos oberts, pacte obert i canvi Masquerade: `Ruta` passa de `temps 83 € + dieta 30 € = 113 €` a `vehicle 90 € + temps 165 € + dieta 60 € = 315 €`.
+Proper pas previst: si el propietari vol, persistencia/handoff complet d'aquesta atribucio fins reserva; de moment el lead calcula i desa les linies `[travel-cost]` amb el collaboratorId correcte.
+Avis claude: no recuperis el detall complet al lead ni l'endpoint `draft-from-lead`; el resum curt ara es visible i accionable.
+
 [codex] 2026-07-08 [ESTAT: tancat — Manolo camins Documents/Lead/Reserva #1749]
 Perimetre: eliminat l'endpoint llegat `/api/admin/dossiers/draft-from-lead`, helper canonic de URLs de dossier, lead en lectura de decisio (ruta en frase, partner plegat, dossier primari, reserva secundaria) i fitxa `/admin/dossiers` marcada com a feta. Sense schema, motors economics, PDF render, media ni `app/admin/tasks`.
 Ultim canvi: #1749.

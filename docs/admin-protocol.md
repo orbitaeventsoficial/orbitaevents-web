@@ -1733,6 +1733,23 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1750 — 2026-07-08 — codex (FET)
+- Context: el propietari valida el resum del pacte partner, però marca que `Ruta · temps + dieta · 113 €` encara és massa opac, i que els ajustos de ruta i el pacte han d'estar sempre visibles mentre es negocia. Si cotxe/conductor passen a Masquerade, la ruta del partner ha de recalcular en viu.
+- Fet:
+  - `BoloTripCard` afegeix mode d'ajustos sempre visibles i el lead l'activa per km, integrants, peatges, cotxe i conductor.
+  - `RepartimentPanel` agrega igualment la ruta del partner en una sola fila, però el subtítol passa a mostrar imports per concepte: `temps 83 € + dieta 30 €` o `vehicle 90 € + temps 165 € + dieta 60 €` quan Masquerade posa cotxe i condueix.
+  - El `Pacte amb partner` del lead queda obert per defecte i deixa de dir `detall plegat`.
+  - El lead continua ocultant les files llargues `Temps ruta passatger` i `Dieta desplaçament`; només es fa més llegible el resum.
+  - Actualitzat el test del lead per blindar el nou microdesglossament, l'obertura permanent i el recàlcul quan el vehicle/conductor passen al partner.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx` OK (5/5); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK; `pnpm run validate:core` OK.
+  - Validació funcional: Playwright contra `/admin/leads/cmr1xh7la0000ug7dj4jnihjr` confirma ajustos de ruta oberts, pacte partner obert i ruta desglossada dins la mateixa línia.
+  - Validació humana/UX: el lead explica la xifra de ruta sense recuperar comptabilitat interna; el detall complet continua sent responsabilitat de reserva/economia.
+- `ADMIN_CHANGE_COUNTER` puja a `1750`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1749 — 2026-07-08 — codex (FET)
 - Context: el propietari marca que la versio compactada del lead encara no fa el pes: massa lectura de ruta/partner i accions massa planes. La regla queda fixada: lead = decisio i pacte curt; reserva/economia = liquidacio completa.
 - Fet:

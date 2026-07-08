@@ -511,7 +511,7 @@ export default function LeadBoloSection({
  onDistanceChange={(v) => { setDistanceKm(v); setDirty(true); }}
  calculatingDistance={calculatingDistance}
  headcountOverride={headcountOverride}
- onHeadcountOverrideChange={setHeadcountOverride}
+ onHeadcountOverrideChange={(v) => { setHeadcountOverride(v); setDirty(true); }}
  derivedHeadcount={derivedHeadcount}
  headcount={headcount}
  tollsEur={tollsEur}
@@ -529,7 +529,8 @@ export default function LeadBoloSection({
  compactRouteSummary
  routeSummaryDensity="sentence"
  calculationNotes={travelCalculationNotes}
- controlsDefaultOpen={false}
+ controlsDefaultOpen
+ controlsAlwaysVisible
  />
 
  {/* ── PRESSUPOST: la sortida clau del bolo, panell or destacat a tota l'amplada ── */}
@@ -554,9 +555,9 @@ export default function LeadBoloSection({
  <div id="lead-repartiment" className="ap-ledger-budget ap-ledger-budget--repartiment" aria-label="Pacte amb partner al lead">
  <div className="ap-ledger-econohead">
  <span>Pacte amb partner</span>
- <span className="ap-ledger-econonote">resum per validar · detall plegat</span>
+ <span className="ap-ledger-econonote">resum per validar · detall visible</span>
  </div>
- <RepartimentPanel repartiment={repartiment} names={repartimentNames} mode="preproposal" detailsDefaultOpen={false} />
+ <RepartimentPanel repartiment={repartiment} names={repartimentNames} mode="preproposal" />
  </div>
  )}
 

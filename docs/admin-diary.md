@@ -1,3 +1,27 @@
+## 2026-07-08 — Ruta i pacte partner sempre visibles al lead (Canvi #1750, codex)
+
+### Context
+El propietari revisa el `Pacte amb partner` del lead i detecta dues friccions: `Ruta · temps + dieta · 113 €` és massa opaca, i si canvia `Posa el cotxe` / `Condueix` a Masquerade, el pacte ha de moure la ruta al partner en viu. També demana que tant els ajustos de ruta com el pacte del partner quedin sempre visibles.
+
+### Què s'ha fet
+- `BoloTripCard` pot deixar els ajustos de ruta sempre oberts; el lead ho activa per veure km, integrants, peatges, cotxe i conductor sense desplegar.
+- `RepartimentPanel` manté la fila agregada `Ruta`, però el subtítol ara desglossa imports dins la mateixa línia: `temps 83 € + dieta 30 €`, o `vehicle 90 € + temps 165 € + dieta 60 €` quan Masquerade posa cotxe i condueix.
+- El `Pacte amb partner` del lead queda obert per defecte i la microcopy passa a `detall visible`.
+- El lead conserva el criteri #1749: no reapareixen `Temps ruta passatger` ni `Dieta desplaçament` com a files separades.
+- El canvi d'integrants, peatges, cotxe o conductor marca el bolo com a pendent de desar.
+- El test del lead blinda que el pacte partner mostra el desglossament curt, queda visible i recalcula quan el cotxe/conductor passen a Masquerade.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx` OK (5/5); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `git diff --check` OK; `pnpm run validate:core` OK.
+- Validació funcional: Playwright contra `/admin/leads/cmr1xh7la0000ug7dj4jnihjr` confirma ajustos de ruta oberts, pacte partner obert i ruta desglossada dins la mateixa línia.
+- Validació humana/UX: es veu el perquè del 113 € sense convertir el lead en una liquidació; la reserva/economia continua sent el lloc del detall complet.
+
+### Coordinació
+Counter -> 1750. Canvi limitat a visibilitat i resum de ruta del partner al lead, test, protocol, diari i sync; sense schema, motors economics, endpoints, PDF, media ni `app/admin/tasks`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Manolo simplifica camins i lectura del lead (Canvi #1749, codex)
 
 ### Context

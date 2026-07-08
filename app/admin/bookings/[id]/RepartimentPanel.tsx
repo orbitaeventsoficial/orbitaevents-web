@@ -75,8 +75,18 @@ export default function RepartimentPanel({
     const routeAmount = routeRows.reduce((sum, row) => sum + row.amount, 0);
     const settlementAmount = settlementRows.reduce((sum, row) => sum + row.amount, 0);
     const firstService = serviceRows[0]?.label;
-    const hasMeal = routeRows.some((row) => row.label.startsWith('Dieta desplaçament'));
-    const hasRouteTime = routeRows.some((row) => row.label.startsWith('Temps ruta'));
+    const routeMetaParts = [
+      ['vehicle', 'Vehicle ruta'],
+      ['peatges', 'Peatges ruta'],
+      ['temps', 'Temps ruta'],
+      ['dieta', 'Dieta desplaçament'],
+    ].map(([label, prefix]) => {
+      const amount = routeRows
+        .filter((row) => row.label.startsWith(prefix))
+        .reduce((sum, row) => sum + row.amount, 0);
+      if (amount <= 0) return null;
+      return `${label} ${formatCurrency(amount)}`;
+    }).filter(Boolean);
     return [
       serviceAmount > 0 ? {
         key: `${personId}:services`,
@@ -88,7 +98,7 @@ export default function RepartimentPanel({
       routeAmount > 0 ? {
         key: `${personId}:route`,
         label: 'Ruta',
-        meta: [hasRouteTime ? 'temps' : null, hasMeal ? 'dieta' : null].filter(Boolean).join(' + ') || 'desplaçament',
+        meta: routeMetaParts.join(' + ') || 'desplaçament',
         amount: routeAmount,
         settlement: false,
       } : null,
@@ -120,7 +130,7 @@ export default function RepartimentPanel({
           {visiblePeople.map((p) => (
             <details key={`${p.personId}:detail`} className="ap-rep-partner-card" open={detailsDefaultOpen}>
               <summary className="ap-rep-partner-head">
-                <span>{nameOf(p.personId)}<em>a validar · detall plegat</em></span>
+                <span>{nameOf(p.personId)}<em>{detailsDefaultOpen ? 'a validar · detall visible' : 'a validar · detall plegat'}</em></span>
                 <strong>{formatCurrency(p.rep)}</strong>
               </summary>
               <div className="ap-rep-partner-lines">
