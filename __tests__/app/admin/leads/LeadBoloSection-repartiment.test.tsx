@@ -126,8 +126,9 @@ describe('LeadBoloSection repartiment', () => {
     const panel = screen.getByLabelText('Pacte amb partner al lead');
     expect(panel).toHaveAttribute('id', 'lead-repartiment');
     expect(panel).toHaveClass('ap-ledger-budget--repartiment');
-    expect(screen.getByText('resum per validar · detall visible')).toBeInTheDocument();
-    expect(screen.getByText((text) => text.includes('a validar') && text.includes('detall visible'))).toBeInTheDocument();
+    // Microcopy útil (#1752, Manolo): la nota diu QUÈ és l'import i ON viu el
+    // detall complet, no descriu l'estat de la UI.
+    expect(screen.getByText('import a validar amb el partner · la liquidació completa viu a la reserva')).toBeInTheDocument();
     expect(panel.textContent).toContain('Masquerade');
     const partnerDetails = panel.querySelector('.ap-rep-partner-card') as HTMLDetailsElement | null;
     expect(partnerDetails?.tagName).toBe('DETAILS');

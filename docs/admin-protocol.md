@@ -1733,6 +1733,24 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1752 — 2026-07-08 — claude (FET)
+- Context: el propietari convoca Manolo sobre la fitxa del lead d'Alba i ordena executar el tall recomanat més una passada visual premium (alineacions, fonts, mides, colors). Diagnòstic Manolo: la fitxa informa però no mana — el `VALOR` del header demanava «Afegir» mentre la mateixa pantalla calculava 805 € de total client (dues fonts pel mateix número), i a mòbil el número de decisió (net estimat) quedava enterrat al final, sota l'històric.
+- Fet:
+  - `VALOR` del header hereta el total client COMPUTAT del bolo quan no hi ha valor manual ni pressupost enviat (cadena: manual → proposta enviada → `econ.total`). La pantalla ja no demana un número que ella mateixa calcula.
+  - Mòbil = pantalla de decisió: el rail «Marge del bolo» puja davant del configurador (`order: -1` a ≤900px); el net estimat i el semàfor es veuen a la primera pantalla.
+  - Dígits tabulars (`font-variant-numeric: tabular-nums`) a tots els blocs de diners del lead: banda de pressupost, rail de marge, files de resum i total de ruta — els € s'alineen en columna.
+  - Microcopy útil, no autodescriptiva: el head del pacte passa de «resum per validar · detall visible» a «import a validar amb el partner · la liquidació completa viu a la reserva»; la subnota del partner al `RepartimentPanel` passa a «import a validar» (l'estat obert/plegat ja el mostra el `<details>`); `BoloTripCard` amaga la pista «editar km, equip i peatges» quan els ajustos són sempre visibles.
+  - `ap-ledger-econohead` amb `flex-wrap` + títol `nowrap`: a mòbil el títol no s'esmicola en 3 línies; la nota salta sencera a sota.
+  - Test obsolet reparat (deriva pre-existent del commit `82f3d242`, no d'aquest canvi): `NewBookingForm-required-submit-gate` blindava la porta antiga sense `submitBlockedByDateConflictCheck`; ara blinda la línia completa real.
+- Verificació:
+  - Validació tècnica: `npx tsc --noEmit` OK; vitest focalitzat (gate + LeadBoloSection + bookings) 89/89 OK; `pnpm run validate:core` verd (2 passades, la segona després del CSS).
+  - Validació funcional: Playwright real a `/admin/leads/cmr1xh7la0000ug7dj4jnihjr` desktop 1440 i mòbil 375 (`.codex-captures/manolo-lead-*.png`): `VALOR 805 €` al header, marge primer bloc a mòbil, pacte amb copy nou, sense «editar km…», títol del pacte sencer a mòbil.
+  - Validació humana/UX: mirada Manolo — la fitxa passa d'informar a manar: el net et mira a la cara abans de configurar res, i cap text d'UI es descriu a si mateix.
+- `ADMIN_CHANGE_COUNTER` puja a `1752`.
+- Començat per: `claude`.
+- Treballant per: `claude`.
+- Tancat per: `claude`.
+
 ### Canvi #1751 — 2026-07-08 — codex (FET)
 - Context: el propietari demana que el lead d'Alba sigui la primera pagina canonica despres de molts canvis: la informacio ja serveix, pero cal millor repartiment de textos, contrastos, mides, captures i una base visual extrapolable a la resta del repo. També aclareix que Isma no s'ha de veure com a proveidor: 50 € del preu DJ es liquiden a ell pels altaveus.
 - Fet:

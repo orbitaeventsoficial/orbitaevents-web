@@ -591,7 +591,7 @@ export default function LeadBoloSection({
  <div id="lead-repartiment" className="ap-ledger-budget ap-ledger-budget--repartiment" aria-label="Pacte amb partner al lead">
  <div className="ap-ledger-econohead">
  <span>Pacte amb partner</span>
- <span className="ap-ledger-econonote">resum per validar · detall visible</span>
+ <span className="ap-ledger-econonote">import a validar amb el partner · la liquidació completa viu a la reserva</span>
  </div>
  <RepartimentPanel repartiment={repartiment} names={repartimentNames} mode="preproposal" />
  </div>

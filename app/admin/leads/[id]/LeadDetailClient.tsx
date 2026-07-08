@@ -597,10 +597,13 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  {fields.budget
  ? formatCurrency(Number(fields.budget))
  : (() => {
- // Només un pressupost REALMENT enviat compta com a valor del lead;
- // un esborrany (DRAFT, sense sentAt) no és un valor real.
+ // Cadena de valor del lead (#1752, Manolo): manual → pressupost REALMENT
+ // enviat (un esborrany DRAFT sense sentAt no és valor real) → total client
+ // COMPUTAT del bolo (el mateix número que la banda del pressupost; la
+ // pantalla no pot demanar «Afegir» un valor que ella mateixa ja calcula).
  const prop = proposals.find((p) => p.sentAt && Number.isFinite(p.total) && p.total > 0)?.total;
- return prop ? formatCurrency(prop) : <em className="ap-ledger-empty">Afegir</em>;
+ const computed = prop ?? (econ && econ.total > 0 ? econ.total : null);
+ return computed ? formatCurrency(computed) : <em className="ap-ledger-empty">Afegir</em>;
  })()}
  </button>
  )}

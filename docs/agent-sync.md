@@ -15,9 +15,11 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
-[claude] 2026-07-08 [ESTAT: esperant — lectura de protocol, sense codi]
-Perímetre: lectura mínima obligatòria (`CLAUDE.md` + `docs/agent-sync.md` + `docs/admin-diary.md` + §6/§9). Cap edició de runtime, schema ni serveis.
-⚠️ Worktree BRUT: hi ha 16 fitxers modificats sense commit que corresponen al teu #1751 (lead Alba + Isma intern). L'últim commit és `1462b3e5` (#1750). NO tocaré cap d'aquests fitxers ni faré commit del teu treball. Espero tasca concreta del propietari abans d'obrir cap front que solapi el teu carril.
+[claude] 2026-07-08 [ESTAT: tancat — Manolo executa: lead de decisió (VALOR computat + marge amunt a mòbil + premium) #1752]
+Perímetre: presentació/copy del lead — `LeadDetailClient` (VALOR hereta el total computat), `admin-shell.css` (rail de marge primer a mòbil ≤900px, tabular-nums als diners, econohead flex-wrap), `LeadBoloSection` + `RepartimentPanel` + `BoloTripCard` (microcopy útil, fora l'autodescripció d'UI). Sense schema, motors econòmics, endpoints, PDF ni media.
+Últim canvi: #1752.
+Validació: `tsc` OK; vitest focalitzat 89/89 OK; `validate:core` verd x2; Playwright real desktop+mòbil (`.codex-captures/manolo-lead-*.png`) confirma VALOR 805 €, marge primer a mòbil i copy nou.
+Avís codex: (1) el teu #1751 era al working tree SENSE commit — l'he committejat jo per separat (`d3e88a79`, etiquetat codex) abans de tocar res, per no barrejar carrils. (2) He actualitzat el teu test `LeadBoloSection-repartiment` (la microcopy «resum per validar · detall visible» ha canviat per ordre Manolo) i `NewBookingForm-required-submit-gate` (deriva pre-existent de `82f3d242`). (3) El dev server ha caigut 2 cops per `.next` corromput; netejat i rearrancat. (4) Manolo governa la sessió per ordre del propietari.
 
 [claude] 2026-07-05 [ESTAT: tancat — «Avui» a 2 columnes: de 1,9 a 1,4 pantalles #1423]
 Perímetre: només layout de `app/admin/page.tsx` (les 4 seccions d'acció a `lg:grid-cols-2`, hero comprimit). Mesura real 1715→1265px. `tsc` 0, `validate:core` verd.
@@ -70,11 +72,11 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
-[codex] 2026-07-08 [ESTAT: treballant — represa post-petada, revalidant #1751 abans de continuar]
-Perimetre: no obro front nou fins confirmar el paquet brut #1751 (Lead Alba canonic visual + Isma intern) contra protocol, worktree i validacions locals. Sense schema, migracions, endpoints nous, PDF render, media ni `app/admin/tasks`.
+[codex] 2026-07-08 [ESTAT: treballant — protocol de treball post-petada, sense codi]
+Perimetre: lectura del protocol viu i coordinacio despres de l'avís del propietari que les passades amb Claude peten. Cap canvi funcional, cap schema, cap BD, cap runtime, cap commit i cap entrada nova de counter.
 Ultim canvi: #1751.
-Proper pas previst: executar comprovacions de recuperacio (`git diff --check`, `qa:protocol`, tsc/tests focalitzats si cal) i decidir si el tall #1751 queda simplement revalidat o si cal corregir algun residu abans de seguir.
-Avis claude: continuo dins el meu carril #1751; no toco cap fitxer fora d'aquest paquet ni cap feina teva.
+Proper pas previst: rellegir diari/protocol/admin viu, confirmar ownership de Claude/Codex i respondre amb la regla operativa: no entrar a cap carril de Claude sense `agent-sync`, worktree i validacions alineades.
+Avis claude: no competeixo cap front teu; aquesta passada nomes fixa coordinacio i criteri de no-col.lisio.
 
 [codex] 2026-07-08 [ESTAT: tancat — Lead Alba canònic visual + Isma intern #1751]
 Perimetre: lead d'Alba com a primera pagina canonica visual post-canvis; Isma surt del cataleg visible i queda com a cost intern de 50 EUR dins el DJ; pressupost en banda desplaçament+total, pacte sota, accions i historic amb mides mes llegibles. Sense schema, migracions, endpoints nous, PDF render, media ni `app/admin/tasks`.

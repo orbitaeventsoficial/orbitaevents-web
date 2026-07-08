@@ -10,7 +10,9 @@ describe('/admin/bookings/new required submit gate', () => {
     expect(source).toContain('const hasClientBasics = Boolean(form.clientName.trim() && form.clientEmail.trim() && form.clientPhone.trim());');
     expect(source).toContain('const hasEventBasics = Boolean(form.eventDate && form.eventLocation.trim());');
     expect(source).toContain('const submitBlockedByMissingBasics = !hasClientBasics || !hasEventBasics || !boloNotEmpty;');
-    expect(source).toContain('const submitDisabled = submitting || submitBlockedByMissingBasics || submitBlockedByDateConflict;');
+    // La porta real inclou també el bloqueig mentre la comprovació de conflicte
+    // de data està pendent (82f3d242); el test blinda la línia completa.
+    expect(source).toContain('const submitDisabled = submitting || submitBlockedByMissingBasics || submitBlockedByDateConflictCheck || submitBlockedByDateConflict;');
     expect(source).toContain("'Completa client i contacte'");
     expect(source).toContain("'Completa data i lloc'");
     expect(source).toContain("'Afegeix servei o pack'");

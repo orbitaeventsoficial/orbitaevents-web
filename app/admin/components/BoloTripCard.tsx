@@ -126,7 +126,11 @@ export default function BoloTripCard({
       >
         <summary className="ap-ledger-trip-controls-summary">
           <span>Ajustos de ruta</span>
-          <strong>{showTolls && tollsEur ? `peatges ${tollsEur} €` : 'editar km, equip i peatges'}</strong>
+          {/* Sempre-visible (#1752, Manolo): la pista «editar…» és UI que es descriu
+              a si mateixa quan el bloc ja no es pot plegar; només queda el dat útil. */}
+          {showTolls && tollsEur
+            ? <strong>peatges {tollsEur} €</strong>
+            : !controlsAlwaysVisible && <strong>editar km, equip i peatges</strong>}
         </summary>
         <div className="ap-ledger-trip-grid">
           <div className="ap-ledger-trip-group">

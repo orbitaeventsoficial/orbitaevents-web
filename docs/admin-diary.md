@@ -1,3 +1,28 @@
+## 2026-07-08 — Manolo executa: lead de decisió (VALOR computat + marge amunt a mòbil + afinat premium) (Canvi #1752, claude)
+
+### Context
+El propietari convoca Manolo sobre el lead d'Alba i ordena executar el tall recomanat més una millora visual premium (alineacions, fonts, mides, colors). El veredicte de Manolo: la fitxa informa però no mana — el `VALOR` del header demanava «Afegir» mentre la pròpia pantalla calculava 805 € de total client, i a mòbil el número de decisió (net estimat) era l'últim de la pàgina, sota l'històric.
+
+### Què s'ha fet
+- `VALOR` hereta el total client computat del bolo quan no hi ha valor manual ni pressupost enviat: una sola font pel mateix número.
+- A mòbil (≤900px) el rail «Marge del bolo» puja davant del configurador: el net i el semàfor es veuen a la primera pantalla, no al soterrani.
+- Dígits tabulars a tots els blocs de diners del lead (banda de pressupost, rail de marge, resum, total de ruta): els € s'alineen en columna.
+- Microcopy que diu QUÈ és l'import, no com està la UI: head del pacte («import a validar amb el partner · la liquidació completa viu a la reserva»), subnota del partner («import a validar») i fora la pista «editar km, equip i peatges» quan els ajustos són sempre visibles.
+- `ap-ledger-econohead` amb flex-wrap + títol nowrap: a mòbil «Pacte amb partner» ja no s'esmicola en 3 línies.
+- Reparat test obsolet pre-existent (deriva del commit `82f3d242`): `NewBookingForm-required-submit-gate` ara blinda la porta real amb `submitBlockedByDateConflictCheck`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; vitest focalitzat (gate + LeadBoloSection + bookings) 89/89 OK; `pnpm run validate:core` verd (2 passades, la segona després del CSS).
+- Validació funcional: Playwright real a `/admin/leads/cmr1xh7la0000ug7dj4jnihjr` desktop 1440 + mòbil 375 (`.codex-captures/manolo-lead-*.png`): VALOR 805 € al header, marge com a primer bloc a mòbil, copy nou del pacte, títol sencer a mòbil, sense overflow.
+- Validació humana/UX: mirada Manolo — la fitxa passa d'informar a manar: el net i el semàfor es veuen abans de configurar res (sobretot a mòbil), el VALOR ja no contradiu el total computat i cap text d'UI es descriu a si mateix.
+- Nota d'infra: el dev server compartit ha caigut dos cops per `.next` corromput durant la sessió; netejat (`.next` + `.next-corrupt-*` eliminats) i rearrancat net.
+
+### Coordinació
+Counter -> 1752. Canvi limitat a presentació/copy del lead (`LeadDetailClient`, `LeadBoloSection`, `BoloTripCard`, `RepartimentPanel`, `admin-shell.css`), 2 tests i docs; sense schema, motors econòmics, endpoints, PDF ni media. El #1751 de codex (que era al working tree sense commit) s'ha committejat primer per separat (`d3e88a79`) per no barrejar carrils.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-07-08 — Lead Alba canònic: visual premium i Isma com a cost intern DJ (Canvi #1751, codex)
 
 ### Context

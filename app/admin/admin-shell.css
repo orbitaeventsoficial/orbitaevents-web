@@ -1444,12 +1444,15 @@ html.admin-mode .ap-ledger-econo {
   overflow: hidden;
 }
 html.admin-mode .ap-ledger-econohead {
-  display: flex; align-items: baseline; gap: var(--o-space-25);
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--o-space-1) var(--o-space-25);
   padding: var(--o-space-25) var(--o-space-35);
   border-bottom: 1px solid var(--line);
   font-family: var(--ui); font-size: var(--o-text-md-2); font-weight: var(--o-fw-bold);
   letter-spacing: 0; color: var(--t);
 }
+/* El títol no es trenca en columna estreta (#1752): si la nota no hi cap al
+   costat, salta SENCERA a la línia de sota (flex-wrap), no esmicola el títol. */
+html.admin-mode .ap-ledger-econohead > span:first-child { white-space: nowrap; }
 html.admin-mode .ap-ledger-econobadge {
   padding: 0.0625rem 0.375rem; border-radius: var(--o-r-xs);
   background: color-mix(in oklab, var(--gold) 12%, transparent);
@@ -1688,7 +1691,7 @@ html.admin-mode .ap-ledger-budget-row > span { display: flex; flex-direction: co
 html.admin-mode .ap-ledger-budget-row > span > em { font-style: normal; color: var(--t3); font-size: var(--o-text-micro); font-family: var(--mono); }
 /* Diners a l'ESQUERRA (#1359, ordre del propietari): l'import va primer (order:-1),
    en columna alineada pels € (text-align:right dins min-width). El label el segueix. */
-html.admin-mode .ap-ledger-budget-row > strong { order: -1; flex: 0 0 auto; min-width: 4.8rem; text-align: right; color: var(--t); font-weight: var(--o-fw-bold); font-family: var(--ui); font-size: var(--o-text-lg); letter-spacing: 0; }
+html.admin-mode .ap-ledger-budget-row > strong { order: -1; flex: 0 0 auto; min-width: 4.8rem; text-align: right; color: var(--t); font-weight: var(--o-fw-bold); font-family: var(--ui); font-size: var(--o-text-lg); letter-spacing: 0; font-variant-numeric: tabular-nums; }
 html.admin-mode .ap-ledger-budget-row--total {
   margin-top: var(--o-space-15); padding-top: var(--o-space-2); border-top: 1px solid color-mix(in oklab, var(--gold) 22%, var(--line));
 }
@@ -1731,6 +1734,7 @@ html.admin-mode .ap-ledger-route-settlement-head > strong {
   font-family: var(--display);
   font-size: var(--o-text-lg);
   font-weight: var(--o-fw-bold);
+  font-variant-numeric: tabular-nums;
 }
 html.admin-mode .ap-ledger-route-settlement-grid {
   display: grid;
@@ -3487,7 +3491,7 @@ html.admin-mode .ap-ledger-summary-net[data-tone="amber"]  { border-left-color: 
 html.admin-mode .ap-ledger-summary-net[data-tone="orange"] { border-left-color: var(--o-stage-new); }
 html.admin-mode .ap-ledger-summary-net[data-tone="rose"]   { border-left-color: var(--o-danger); }
 html.admin-mode .ap-ledger-summary-net-lbl { font-family: var(--ui); font-size: var(--o-text-sm); font-weight: var(--o-fw-semi); color: var(--t2); }
-html.admin-mode .ap-ledger-summary-net-val { font-family: var(--ui); font-size: var(--o-text-2xl); font-weight: var(--o-fw-bold); line-height: 1; color: var(--t); letter-spacing: 0; }
+html.admin-mode .ap-ledger-summary-net-val { font-family: var(--ui); font-size: var(--o-text-2xl); font-weight: var(--o-fw-bold); line-height: 1; color: var(--t); letter-spacing: 0; font-variant-numeric: tabular-nums; }
 html.admin-mode .ap-ledger-summary-net[data-tone="rose"]  .ap-ledger-summary-net-val { color: var(--o-danger); }
 html.admin-mode .ap-ledger-summary-net[data-tone="amber"] .ap-ledger-summary-net-val { color: var(--o-warning); }
 html.admin-mode .ap-ledger-summary-net-pct { font-family: var(--ui); font-size: var(--o-text-sm); color: var(--t2); line-height: var(--o-lh-snug); }
@@ -3499,7 +3503,7 @@ html.admin-mode .ap-ledger-summary-rows > div {
   font-family: var(--ui); font-size: var(--o-text-sm);
 }
 html.admin-mode .ap-ledger-summary-rows > div > span { color: var(--t2); }
-html.admin-mode .ap-ledger-summary-rows > div > strong { color: var(--t); font-size: var(--o-text-base); font-weight: var(--o-fw-semi); letter-spacing: 0; }
+html.admin-mode .ap-ledger-summary-rows > div > strong { color: var(--t); font-size: var(--o-text-base); font-weight: var(--o-fw-semi); letter-spacing: 0; font-variant-numeric: tabular-nums; }
 html.admin-mode .ap-ledger-summary-jump {
   display: flex;
   align-items: center;
@@ -3523,7 +3527,9 @@ html.admin-mode .ap-ledger-summary-jump:hover {
 }
 @media (max-width: 900px) {
   html.admin-mode .ap-ledger-zenith--railed { grid-template-columns: minmax(0, 1fr); }
-  html.admin-mode .ap-ledger-rail--summary { position: static; }
+  /* Mòbil = pantalla de DECISIÓ (#1752, Manolo): el marge és el número que decideix
+     si el bolo val la pena; puja davant del configurador, no enterrat al final. */
+  html.admin-mode .ap-ledger-rail--summary { position: static; order: -1; }
 }
 /* Mòbil: pipeline i govern (responsable/derivat) NO poden solapar-se — apilats (#1348). */
 @media (max-width: 640px) {

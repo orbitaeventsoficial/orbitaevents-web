@@ -130,7 +130,9 @@ export default function RepartimentPanel({
           {visiblePeople.map((p) => (
             <details key={`${p.personId}:detail`} className="ap-rep-partner-card" open={detailsDefaultOpen}>
               <summary className="ap-rep-partner-head">
-                <span>{nameOf(p.personId)}<em>{detailsDefaultOpen ? 'a validar · detall visible' : 'a validar · detall plegat'}</em></span>
+                {/* La nota diu QUÈ és l'import (#1752, Manolo); l'estat obert/plegat
+                    ja el mostra el propi <details>, no cal narrar-lo. */}
+                <span>{nameOf(p.personId)}<em>import a validar</em></span>
                 <strong>{formatCurrency(p.rep)}</strong>
               </summary>
               <div className="ap-rep-partner-lines">
