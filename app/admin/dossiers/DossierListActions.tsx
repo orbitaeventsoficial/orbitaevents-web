@@ -7,6 +7,7 @@ import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import { buildDossierHtml, type DossierClientInfo, type DossierCopy } from '@/lib/utils/dossier-html-builder';
+import { buildDossierCompositePdfHref } from '@/lib/admin/dossierWorkspaceHref';
 
 const ACTIONS_WRAP = 'grid w-full grid-cols-2 gap-2 sm:grid-cols-4 md:flex md:w-auto md:flex-wrap md:items-center md:justify-end';
 const ACTION_BTN = 'ap-btn ap-btn--xs min-h-10 justify-center gap-1.5';
@@ -62,7 +63,7 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
   }
 
   function openCompositePdf() {
-    window.open(`/api/admin/dossiers/${dossierId}/composite`, '_blank', 'noopener,noreferrer');
+    window.open(buildDossierCompositePdfHref(dossierId), '_blank', 'noopener,noreferrer');
   }
 
   async function send() {

@@ -17,6 +17,7 @@ import { useState, useTransition, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { buildLeadBookingPrefillHref, buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
+import { buildDossierCompositePdfHref } from '@/lib/admin/dossierWorkspaceHref';
 import LeadBoloSection, { type BoloEconomia } from './LeadBoloSection';
 import CommercialDocumentsHistory, { type CommercialDocumentHistoryItem } from '@/app/admin/components/CommercialDocumentsHistory';
 import { buildLeadWhatsAppHref } from '../leadWhatsApp';
@@ -305,7 +306,7 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  statusLabel: d.estat,
  createdAt: d.createdAt,
  sentAt: d.sentAt,
- href: `/api/admin/dossiers/${d.id}/composite`,
+ href: buildDossierCompositePdfHref(d.id),
  targetBlank: true,
  })),
  ...documents.map((doc) => ({

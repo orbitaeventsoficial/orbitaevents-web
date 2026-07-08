@@ -31,17 +31,21 @@ vi.mock('@/app/admin/components/BoloTripCard', () => ({
     routeSummaryItems = [],
     compactRouteSummary = false,
     effectiveTravelCost = 0,
+    routeSummaryDensity = 'items',
   }: {
     calculationNotes?: string[];
     routeSummaryItems?: Array<{ label: string; amount: number }>;
     compactRouteSummary?: boolean;
     effectiveTravelCost?: number;
+    routeSummaryDensity?: 'items' | 'sentence';
   }) => (
     <div data-testid="trip-card">
       {compactRouteSummary ? (
         <>
           <p>Total ruta {effectiveTravelCost}</p>
-          {routeSummaryItems.map((item) => <p key={item.label}>{item.label}: {item.amount}</p>)}
+          {routeSummaryDensity === 'sentence'
+            ? <p>Inclou {routeSummaryItems.map((item) => item.label.toLowerCase()).join(', ')}.</p>
+            : routeSummaryItems.map((item) => <p key={item.label}>{item.label}: {item.amount}</p>)}
         </>
       ) : (
         calculationNotes.map((note) => <p key={note}>{note}</p>)
@@ -94,9 +98,12 @@ describe('LeadBoloSection repartiment', () => {
     const panel = screen.getByLabelText('Pacte amb partner al lead');
     expect(panel).toHaveAttribute('id', 'lead-repartiment');
     expect(panel).toHaveClass('ap-ledger-budget--repartiment');
-    expect(screen.getByText('lead · import curt abans de formalitzar')).toBeInTheDocument();
-    expect(screen.getByText('a validar')).toBeInTheDocument();
+    expect(screen.getByText('resum per validar · detall plegat')).toBeInTheDocument();
+    expect(screen.getByText((text) => text.includes('a validar') && text.includes('detall plegat'))).toBeInTheDocument();
     expect(panel.textContent).toContain('Masquerade');
+    const partnerDetails = panel.querySelector('.ap-rep-partner-card') as HTMLDetailsElement | null;
+    expect(partnerDetails?.tagName).toBe('DETAILS');
+    expect(partnerDetails?.open).toBe(false);
     expect(panel.textContent).not.toContain('Òrbita (tu)');
     expect(screen.queryByText('Òrbita (tu)')).not.toBeInTheDocument();
     expect(screen.queryByText('Detall intern de costos i ruta')).not.toBeInTheDocument();
@@ -164,15 +171,19 @@ describe('LeadBoloSection repartiment', () => {
     expect(screen.queryByText('Dieta desplaçament')).not.toBeInTheDocument();
     expect(screen.queryByText('Què cobra Masquerade')).not.toBeInTheDocument();
     expect(screen.getByText((text) => text.includes('Total ruta') && text.includes('340.22'))).toBeInTheDocument();
-    expect(screen.getByText('Vehicle: 96.72')).toBeInTheDocument();
-    expect(screen.getByText('Equip ruta: 165')).toBeInTheDocument();
-    expect(screen.getByText('Dietes: 60')).toBeInTheDocument();
-    expect(screen.getByText('Peatges: 18.5')).toBeInTheDocument();
+    expect(screen.getByText('Inclou vehicle, equip ruta, dietes, peatges.')).toBeInTheDocument();
+    expect(screen.queryByText('Vehicle: 96.72')).not.toBeInTheDocument();
+    expect(screen.queryByText('Equip ruta: 165')).not.toBeInTheDocument();
+    expect(screen.queryByText('Dietes: 60')).not.toBeInTheDocument();
+    expect(screen.queryByText('Peatges: 18.5')).not.toBeInTheDocument();
     expect(screen.getByText('Ruta')).toBeInTheDocument();
     expect(screen.getByText('temps + dieta')).toBeInTheDocument();
     expect(screen.getByText('Compensació a Òrbita')).toBeInTheDocument();
     expect(screen.getByText('tècnic inclòs')).toBeInTheDocument();
     expect(screen.getByText('-40 €')).toBeInTheDocument();
+    expect(screen.getByText('Següent pas')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Crear dossier' })).toHaveClass('ap-btn--primary');
+    expect(screen.getByRole('link', { name: 'Crear reserva' })).not.toHaveClass('ap-btn--primary');
     expect(screen.queryByText('Operari Òrbita')).not.toBeInTheDocument();
     expect(screen.queryByText('Cost intern Òrbita')).not.toBeInTheDocument();
     expect(screen.queryByText('Benefici net Òrbita')).not.toBeInTheDocument();

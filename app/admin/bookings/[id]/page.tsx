@@ -8,6 +8,7 @@ import { buildCustomerComposeHref, buildCustomerHubHref } from '@/lib/admin/cust
 import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
 import { buildEventLogistics } from '@/lib/admin/eventLogistics';
 import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
+import { buildDossierCompositePdfHref } from '@/lib/admin/dossierWorkspaceHref';
 import { notFound } from 'next/navigation';
 import { BookingStatusChanger } from './BookingStatusChanger';
 import CommunicationPanel from './CommunicationPanel';
@@ -425,7 +426,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       statusLabel: d.sentAt ? 'enviat' : 'esborrany',
       createdAt: d.createdAt,
       sentAt: d.sentAt,
-      href: `/api/admin/dossiers/${d.id}/composite`,
+      href: buildDossierCompositePdfHref(d.id),
       targetBlank: true,
     })),
     ...(booking.lead?.documents || []).map((doc) => ({

@@ -1537,7 +1537,7 @@ Decisio de treball:
 | `/admin/docs/organisme` | `app/admin/docs/organisme/page.tsx` | PENDENT | codex/claude | Organisme |
 | `/admin/docs/protocol` | `app/admin/docs/protocol/page.tsx` | PENDENT | codex/claude | Protocol |
 | `/admin/docs/visual-audit` | `app/admin/docs/visual-audit/page.tsx` | FETA | codex | Auditoria visual — fitxa forense compacta #1417 |
-| `/admin/dossiers` | `app/admin/dossiers/page.tsx` | PENDENT | codex/claude | Dossiers |
+| `/admin/dossiers` | `app/admin/dossiers/page.tsx` | FETA | codex | Dossiers — òrgan Documents #1155; camí canònic de creació unificat #1748-#1749 |
 | `/admin/economia` | `app/admin/economia/page.tsx` | PENDENT | codex/claude | Economia |
 | `/admin/email-templates` | `app/admin/email-templates/page.tsx` | PENDENT | codex/claude | Plantilles email |
 | `/admin/email-templates/[slug]` | `app/admin/email-templates/[slug]/page.tsx` | PENDENT | codex/claude | Editor plantilla |

@@ -1733,6 +1733,25 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1749 — 2026-07-08 — codex (FET)
+- Context: el propietari marca que la versio compactada del lead encara no fa el pes: massa lectura de ruta/partner i accions massa planes. La regla queda fixada: lead = decisio i pacte curt; reserva/economia = liquidacio completa.
+- Fet:
+  - Eliminat l'endpoint llegat `/api/admin/dossiers/draft-from-lead`; el contracte unic de creacio continua sent `POST /api/admin/dossiers` amb `leadId`.
+  - Nou helper `lib/admin/dossierWorkspaceHref.ts` per centralitzar URLs de llista de dossiers i PDF compost, consumit per lead, dossier i reserva.
+  - `BoloTripCard` accepta lectura de ruta en mode frase i el lead deixa de renderitzar per defecte els xips `Vehicle`, `Equip ruta`, `Dietes` i `Peatges`.
+  - `RepartimentPanel` en mode pre-proposta mostra el partner com a `details` plegat per defecte: import visible, detall nomes si cal validar-lo.
+  - `LeadBoloSection` dona jerarquia al seguent pas: `Crear dossier` es l'accio primaria; pressupost i reserva queden despres quan el pacte ja esta clar.
+  - Afegits tests de contracte unic i helper de rutes; `/admin/dossiers` queda registrat com a fitxa feta.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\app\api\admin\dossiers-route.test.ts __tests__\app\api\admin\dossiers-single-entrypoint.test.ts __tests__\lib\admin\dossierWorkspaceHref.test.ts __tests__\lib\services\dossierDraftSuggestionService.test.ts __tests__\lib\services\dossierAutoDraftService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK; `pnpm run validate:core` OK.
+  - Validació funcional: `rg` sobre `app lib __tests__` confirma que `draft-from-lead` nomes queda com a guard de test; Playwright confirma que el lead pinta frase de ruta, partner plegat, CTA de dossier primari i reserva secundaria.
+  - Validació humana/UX: el lead queda com a pantalla de decisio i no com a informe de liquidacio; el propietari veu total de ruta, pacte curt i el pas natural de crear dossier.
+- Roadmap Manolo actualitzat amb #1749 dins del bloc lead -> dossier -> reserva.
+- `ADMIN_CHANGE_COUNTER` puja a `1749`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1748 — 2026-07-08 — codex (FET)
 - Context: el propietari detecta que la creacio de dossier divergia entre `/admin/leads/[id]` i `/admin/dossiers`; la regla de producte queda fixada com una sola cadena lead -> dossier -> pressupost -> reserva.
 - Fet:

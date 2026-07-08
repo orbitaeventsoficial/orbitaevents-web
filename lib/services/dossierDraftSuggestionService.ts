@@ -3,6 +3,7 @@
 // i no muta cap dada: només prioritza leads oberts sense dossier actiu.
 
 import { OPEN_LEAD_STATUSES } from '@/lib/constants';
+import { buildDossierListHref } from '@/lib/admin/dossierWorkspaceHref';
 import { prisma } from '@/lib/prisma';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -104,8 +105,7 @@ function bandForScore(score: number): DossierDraftSuggestionBand {
 }
 
 export function buildDossierDraftHref(leadId: string): string {
-  const params = new URLSearchParams({ leadId });
-  return `/admin/dossiers?${params.toString()}`;
+  return buildDossierListHref(leadId);
 }
 
 function reasonsForLead(lead: DossierDraftLeadInput, serviceLinesCount: number, days: number | null): string[] {

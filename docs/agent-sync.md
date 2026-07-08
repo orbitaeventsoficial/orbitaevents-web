@@ -66,6 +66,13 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-08 [ESTAT: tancat — Manolo camins Documents/Lead/Reserva #1749]
+Perimetre: eliminat l'endpoint llegat `/api/admin/dossiers/draft-from-lead`, helper canonic de URLs de dossier, lead en lectura de decisio (ruta en frase, partner plegat, dossier primari, reserva secundaria) i fitxa `/admin/dossiers` marcada com a feta. Sense schema, motors economics, PDF render, media ni `app/admin/tasks`.
+Ultim canvi: #1749.
+Validacio: tests focalitzats 22/22 OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `qa:zenit-roadmap` OK; `git diff --check` OK; `validate:core` OK; Playwright real a `/admin/leads/cmr1xh7la0000ug7dj4jnihjr` confirma ruta curta, partner `details` plegat, `Crear dossier` primari i `Crear reserva` secundaria; servidor local `http://127.0.0.1:3000` HTTP 200.
+Proper pas previst: E2E complet lead -> dossier -> pressupost -> reserva quan el propietari vulgui validar el recorregut sencer amb dades reals.
+Avis claude: no recuperis `draft-from-lead`; el contracte unic es `/api/admin/dossiers` amb `leadId`. La liquidacio completa continua a reserva/economia, no al lead.
+
 [codex] 2026-07-08 [ESTAT: tancat — Creació dossier unificada #1748]
 Perimetre: `/api/admin/dossiers` esdeve contracte unic quan hi ha `leadId`; lead, botó de draft i generador de `/admin/dossiers` creen/reutilitzen dossier pel mateix servei `createDossierDraftFromLead`. Sense schema, motors economics, portfolio, render PDF, media ni `app/admin/tasks`.
 Ultim canvi: #1748.

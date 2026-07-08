@@ -26,6 +26,7 @@ import { useBookingDistance } from '@/app/admin/bookings/useBookingDistance';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { formatCurrency, formatCurrencyExact, formatNumber } from '@/lib/constants';
 import { buildLeadBookingPrefillHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildDossierCompositePdfHref } from '@/lib/admin/dossierWorkspaceHref';
 
 /**
  * El BOLO dins la fitxa del lead (Fase 1.4 de docs/bolo-flux.md).
@@ -461,7 +462,7 @@ export default function LeadBoloSection({
  }
  toast.success(data.status === 'existing' ? 'Aquest lead ja tenia un dossier actiu.' : 'Dossier creat.');
  router.refresh();
- window.open(`/api/admin/dossiers/${dossierId}/composite`, '_blank', 'noopener,noreferrer');
+ window.open(buildDossierCompositePdfHref(dossierId), '_blank', 'noopener,noreferrer');
  } catch (e) {
  console.error('[LeadBolo] crear dossier', e);
  toast.error(e instanceof Error ? e.message : 'Error creant el dossier.');
@@ -526,6 +527,7 @@ export default function LeadBoloSection({
  routeSettlementLines={routeSettlementLines}
  routeSummaryItems={routeSummaryItems}
  compactRouteSummary
+ routeSummaryDensity="sentence"
  calculationNotes={travelCalculationNotes}
  controlsDefaultOpen={false}
  />
@@ -552,20 +554,24 @@ export default function LeadBoloSection({
  <div id="lead-repartiment" className="ap-ledger-budget ap-ledger-budget--repartiment" aria-label="Pacte amb partner al lead">
  <div className="ap-ledger-econohead">
  <span>Pacte amb partner</span>
- <span className="ap-ledger-econonote">lead · import curt abans de formalitzar</span>
+ <span className="ap-ledger-econonote">resum per validar · detall plegat</span>
  </div>
  <RepartimentPanel repartiment={repartiment} names={repartimentNames} mode="preproposal" detailsDefaultOpen={false} />
  </div>
  )}
 
  <div className="ap-ledger-bolo-actions ap-ledger-bolo-actions--full">
- <button type="button" className="ap-btn" onClick={createDossierFromLead} disabled={saving || creatingDossier} aria-busy={creatingDossier}>
+ <span className="ap-ledger-bolo-next">
+ <strong>Següent pas</strong>
+ <em>Dossier primer; pressupost i reserva quan el pacte ja està clar.</em>
+ </span>
+ <button type="button" className="ap-btn ap-btn--primary" onClick={createDossierFromLead} disabled={saving || creatingDossier} aria-busy={creatingDossier}>
  {creatingDossier ? 'Creant dossier...' : 'Crear dossier'}
  </button>
  <a className="ap-btn" href={quoteHref} onClick={(event) => openBuilder(event, quoteHref)} aria-disabled={saving}>
  Crear pressupost
  </a>
- <a className="ap-btn ap-btn--primary" href={bookingHref} onClick={(event) => openBuilder(event, bookingHref)} aria-disabled={saving}>
+ <a className="ap-btn ap-btn--secondary" href={bookingHref} onClick={(event) => openBuilder(event, bookingHref)} aria-disabled={saving}>
  Crear reserva
  </a>
  </div>

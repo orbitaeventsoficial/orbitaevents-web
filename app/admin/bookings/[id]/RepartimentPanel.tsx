@@ -118,11 +118,11 @@ export default function RepartimentPanel({
       {isPreproposal && visiblePeople.length > 0 && (
         <div className="ap-rep-partner">
           {visiblePeople.map((p) => (
-            <div key={`${p.personId}:detail`} className="ap-rep-partner-card ap-rep-partner-card--compact">
-              <div className="ap-rep-partner-head">
-                <span>{nameOf(p.personId)}<em>a validar</em></span>
+            <details key={`${p.personId}:detail`} className="ap-rep-partner-card" open={detailsDefaultOpen}>
+              <summary className="ap-rep-partner-head">
+                <span>{nameOf(p.personId)}<em>a validar · detall plegat</em></span>
                 <strong>{formatCurrency(p.rep)}</strong>
-              </div>
+              </summary>
               <div className="ap-rep-partner-lines">
                 {partnerSummaryRows(p.personId).map((row) => (
                   <div key={row.key} className="ap-rep-partner-line" data-settlement={row.settlement ? 'true' : undefined}>
@@ -131,7 +131,7 @@ export default function RepartimentPanel({
                   </div>
                 ))}
               </div>
-            </div>
+            </details>
           ))}
         </div>
       )}

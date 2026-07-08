@@ -58,6 +58,7 @@ export interface BoloTripCardProps {
   routeSettlementLines?: RouteSettlementLine[];
   routeSummaryItems?: RouteSummaryItem[];
   compactRouteSummary?: boolean;
+  routeSummaryDensity?: 'items' | 'sentence';
   /** Notes de formula ja calculades pel pare; aquest component nomes les pinta. */
   calculationNotes?: string[];
   /** Els controls queden oberts a reserves; al lead es pot deixar plegat per reduir soroll. */
@@ -86,6 +87,7 @@ export default function BoloTripCard({
   routeSettlementLines = [],
   routeSummaryItems = [],
   compactRouteSummary = false,
+  routeSummaryDensity = 'items',
   calculationNotes = [],
   controlsDefaultOpen = true,
 }: BoloTripCardProps) {
@@ -205,11 +207,13 @@ export default function BoloTripCard({
             <strong>{formatCurrency(effectiveTravelCost)}</strong>
           </div>
           <p>
-            {chargeableHours > 0
-              ? `${formatNumber(chargeableHours)} h facturables · ${routeCompactConcepts || 'ruta'}`
-              : `Ruta curta · ${routeCompactConcepts || 'vehicle i equip'} dins la base`}
+            {routeSummaryDensity === 'sentence'
+              ? `Inclou ${routeCompactConcepts || 'vehicle i equip'}. El detall de liquidació queda per reserva.`
+              : chargeableHours > 0
+                ? `${formatNumber(chargeableHours)} h facturables · ${routeCompactConcepts || 'ruta'}`
+                : `Ruta curta · ${routeCompactConcepts || 'vehicle i equip'} dins la base`}
           </p>
-          {routeSummaryItems.length > 0 && (
+          {routeSummaryDensity === 'items' && routeSummaryItems.length > 0 && (
             <div className="ap-ledger-route-compact-items">
               {routeSummaryItems.map((item) => (
                 <span key={item.label}>

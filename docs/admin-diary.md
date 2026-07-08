@@ -1,3 +1,27 @@
+## 2026-07-08 — Manolo simplifica camins i lectura del lead (Canvi #1749, codex)
+
+### Context
+El propietari valida que el resum anterior anava en la direccio correcta, pero encara no fa el pes: `Desplaçament`, `Pacte amb partner` i les accions finals segueixen semblant una auditoria de costos abans d'hora. La decisio queda clara: el lead ha de servir per decidir i validar el pacte curt; el detall de liquidacio completa viu a la reserva/economia.
+
+### Què s'ha fet
+- Eliminat l'endpoint llegat `/api/admin/dossiers/draft-from-lead`: el cami unic de creacio de dossier es `POST /api/admin/dossiers` amb `leadId`.
+- Afegit un helper canonic de rutes de dossier per evitar construir URLs a ma entre lead, dossier i reserva.
+- El lead mostra el desplaçament com a total + frase curta; amaga el desglossament de vehicle/equip/dietes per defecte.
+- El pacte amb partner queda plegat per defecte: import a validar visible, detall obrir/tancar, i liquidacio completa fora del lead.
+- Les accions finals del lead passen a jerarquia operativa: `Crear dossier` com a pas principal; pressupost i reserva queden com a passos posteriors quan el pacte esta clar.
+- La fitxa de `/admin/dossiers` queda marcada com a feta dins l'index de fitxes, perquè la creacio ja no divergeix del lead.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\app\api\admin\dossiers-route.test.ts __tests__\app\api\admin\dossiers-single-entrypoint.test.ts __tests__\lib\admin\dossierWorkspaceHref.test.ts __tests__\lib\services\dossierDraftSuggestionService.test.ts __tests__\lib\services\dossierAutoDraftService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK; `pnpm run validate:core` OK.
+- Validació funcional: `rg` confirma que el vell `draft-from-lead` ja no existeix a runtime; Playwright verifica que el lead renderitza la frase de ruta, el pacte plegat i `Crear dossier` com a accio primaria.
+- Validació humana/UX: el lead ja no obliga a llegir liquidacio interna per decidir el seguent pas; dossier primer, pressupost/reserva quan el pacte ja esta clar.
+
+### Coordinació
+Counter -> 1749. Canvi limitat a camins Documents/Lead/Reserva, lectura del lead, tests, fitxes, roadmap, protocol, diari i sync; sense schema, motors economics, PDF render, media ni `app/admin/tasks`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Creacio de dossier unificada entre leads i dossiers (Canvi #1748, codex)
 
 ### Context
