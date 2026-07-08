@@ -7,6 +7,8 @@ type LeadServiceLineForBooking = {
   revenueAmount?: number | null;
   costAmount?: number | null;
   quantity?: number | null;
+  hours?: number | null;
+  partyType?: string | null;
   notes?: string | null;
 };
 
@@ -24,6 +26,10 @@ function normalizeQuantity(value?: number | null): number | undefined {
   return typeof value === 'number' && Number.isFinite(value) && value > 0 ? Math.floor(value) : undefined;
 }
 
+function normalizeHours(value?: number | null): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? Math.round(value * 100) / 100 : undefined;
+}
+
 export function mapLeadServiceLinesToBookingFormLines(
   lines: LeadServiceLineForBooking[] | null | undefined,
 ): BookingServiceLineFormInput[] {
@@ -38,6 +44,8 @@ export function mapLeadServiceLinesToBookingFormLines(
         revenueAmount: normalizeMoney(line.revenueAmount),
         costAmount: normalizeMoney(line.costAmount),
         quantity: normalizeQuantity(line.quantity),
+        hours: normalizeHours(line.hours),
+        partyType: line.partyType?.trim() || undefined,
         notes: line.notes?.trim() || undefined,
       };
     })

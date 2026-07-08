@@ -11,6 +11,8 @@ describe('mapLeadServiceLinesToBookingFormLines', () => {
         revenueAmount: 240,
         costAmount: 160,
         quantity: 1,
+        hours: 1.5,
+        partyType: ' infantil ',
         notes: ' inclou tècnic ',
       },
       {
@@ -33,6 +35,8 @@ describe('mapLeadServiceLinesToBookingFormLines', () => {
         revenueAmount: 240,
         costAmount: 160,
         quantity: 1,
+        hours: 1.5,
+        partyType: 'infantil',
         notes: 'inclou tècnic',
       },
       {

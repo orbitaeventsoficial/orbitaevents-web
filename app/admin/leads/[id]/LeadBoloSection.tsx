@@ -135,7 +135,7 @@ export default function LeadBoloSection({
  const d = await linesRes.json();
  const loaded = (d.lines || []).map((l: {
  collaboratorId?: string | null; kind: string; label: string;
- revenueAmount?: number | null; costAmount?: number | null; quantity?: number | null; notes?: string | null;
+ revenueAmount?: number | null; costAmount?: number | null; quantity?: number | null; hours?: number | null; partyType?: string | null; notes?: string | null;
  }) => ({
  collaboratorId: l.collaboratorId ?? undefined,
  kind: l.kind as BookingServiceLineFormInput['kind'],
@@ -143,6 +143,8 @@ export default function LeadBoloSection({
  revenueAmount: l.revenueAmount ?? undefined,
  costAmount: l.costAmount ?? undefined,
  quantity: l.quantity ?? 1,
+ hours: l.hours ?? undefined,
+ partyType: l.partyType ?? undefined,
  notes: l.notes ?? undefined,
  }));
  setLines(loaded);

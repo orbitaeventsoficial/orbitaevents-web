@@ -598,8 +598,8 @@ describe('createBookingFromInput', () => {
         customerId: null,
         sourceCollaboratorId: null,
         serviceLines: [
-          { collaboratorId: null, kind: 'DJ', label: 'DJ · 2 hores', revenueAmount: 250, costAmount: null, quantity: 1, hours: null, notes: null },
-          { collaboratorId: 'col1', kind: 'PROVIDER_SERVICE', label: 'Animació', revenueAmount: 240, costAmount: 200, quantity: 1, hours: null, notes: null },
+          { collaboratorId: null, kind: 'DJ', label: 'DJ · 2 hores', revenueAmount: 250, costAmount: null, quantity: 1, hours: 2, partyType: null, notes: null },
+          { collaboratorId: 'col1', kind: 'PROVIDER_SERVICE', label: 'Animació', revenueAmount: 240, costAmount: 200, quantity: 1, hours: 1.5, partyType: 'infantil', notes: null },
         ],
       });
 
@@ -607,7 +607,8 @@ describe('createBookingFromInput', () => {
 
       const createArg = mockPrisma.booking.create.mock.calls[0][0];
       expect(createArg.data.serviceLines?.create).toHaveLength(2);
-      expect(createArg.data.serviceLines.create[0]).toMatchObject({ kind: 'DJ', label: 'DJ · 2 hores' });
+      expect(createArg.data.serviceLines.create[0]).toMatchObject({ kind: 'DJ', label: 'DJ · 2 hores', hours: 2 });
+      expect(createArg.data.serviceLines.create[1]).toMatchObject({ label: 'Animació', hours: 1.5, partyType: 'infantil' });
     });
 
     it('si el payload porta línies, tenen prioritat sobre les del lead', async () => {

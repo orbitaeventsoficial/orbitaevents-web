@@ -1,3 +1,27 @@
+## 2026-07-08 — Manolo: lead → reserva conserva hores i audiència (Canvi #1733, codex)
+
+### Context
+Auditoria E2E del full Manolo sobre `lead -> dossier -> reserva`. El backend ja podia heretar `LeadServiceLine -> BookingServiceLine` si la reserva no portava línies explícites, però el formulari de nova reserva carrega les línies del lead i després les envia com a payload. Aquesta volta pel client descartava `hours` i `partyType`, de manera que una línia amb durada o audiència podia arribar a la reserva sense aquesta informació.
+
+### Què s'ha fet
+- `BookingServiceLineFormInput` incorpora `hours` i `partyType` com a camps estructurals preservats.
+- `mapLeadServiceLinesToBookingFormLines` conserva `hours` i `partyType` quan pre-carrega el bolo del lead al formulari de reserva.
+- `useNewBookingSubmit` continua eliminant només `travelHeadcount` perquè és metadada local, però envia `hours` i `partyType` a l'API.
+- `LeadBoloSection` ja no perd aquests camps quan carrega línies existents i les torna a desar.
+- `createBookingFromInput` també hereta `partyType` en el camí server-side directe, a més de `hours`.
+- El full Manolo queda actualitzat amb #1733 dins del tall E2E lead -> reserva.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\bookingLeadServiceLineMapper.test.ts __tests__\app\admin\bookings\useNewBookingSubmit.test.tsx __tests__\lib\services\bookingCreationService.test.ts` (51/51); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff --check` OK.
+- Validació funcional: el mapper, el submit i la creació server-side conserven `hours` i `partyType` mentre `travelHeadcount` segueix fora del payload.
+- Validació humana/UX: convertir un lead en reserva no fa desaparèixer durada/audiència de línies que el planning, el cuadrant o lectures posteriors poden necessitar.
+
+### Coordinació
+Counter → 1733. Canvi limitat al cable E2E de línies lead/reserva, tests, roadmap, protocol, diari i sync; sense schema ni BD viva.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Manolo: roadmap viu sincronitzat amb #1725-#1731 (Canvi #1732, codex)
 
 ### Context

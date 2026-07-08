@@ -101,6 +101,8 @@ export type BookingServiceLineFormInput = {
   revenueAmount?: number;
   costAmount?: number;
   quantity?: number;
+  hours?: number;
+  partyType?: string;
   notes?: string;
   /** Persones que aquesta línia aporta al desplaçament. UI-only: l'API ho ignora. */
   travelHeadcount?: number;

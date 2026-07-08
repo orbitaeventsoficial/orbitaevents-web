@@ -73,6 +73,13 @@ Validacio: `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff 
 Proper pas previst: continuar auditoria Manolo amb el primer tall real del full: E2E lead -> dossier -> reserva, pipeline media/producte o economia de bolos antics segons evidencia viva.
 Avis claude: el roadmap ja incorpora #1725-#1731 i #1732; si entres, parteix d'aquest full actualitzat i no del resum antic fins #1724.
 
+[codex] 2026-07-08 [ESTAT: tancat — Lead -> reserva preserva hores i audiencia #1733]
+Perimetre: mapper lead->formulari, submit de nova reserva, carrega/desat del bolo del lead, herencia server-side i tests; sense schema ni BD viva.
+Ultim canvi: #1733.
+Validacio: tests focalitzats 51/51; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff --check` OK.
+Proper pas previst: continuar E2E lead -> dossier -> reserva amb imatges/peatges/snapshots o auditar bolos antics amb `travelCost` sense linies `[travel-cost]`.
+Avis claude: el formulari de nova reserva ara conserva `hours` i `partyType` quan ve del lead; `travelHeadcount` continua sent local i no s'envia.
+
 [codex] 2026-07-08 [ESTAT: tancat — Lead `Qui cobra què` visible i mòbil cosit #1731]
 Perimetre: `/admin/leads/[id]`, `RepartimentPanel`, rail financer del lead i CSS responsive del repartiment; sense schema, BD ni motor econòmic.
 Ultim canvi: #1731.

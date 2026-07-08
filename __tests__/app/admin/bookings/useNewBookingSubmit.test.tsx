@@ -141,7 +141,7 @@ describe('useNewBookingSubmit', () => {
     ]);
   });
 
-  it('no envia travelHeadcount perquè és metadada local del formulari', async () => {
+  it('conserva hores/partyType i no envia travelHeadcount perquè és metadada local del formulari', async () => {
     const { result } = renderHook(() => useNewBookingSubmit({
       form: validForm(),
       selectedExtras: {},
@@ -150,7 +150,16 @@ describe('useNewBookingSubmit', () => {
       customerId: null,
       internalTravelCost: 105,
       serviceLines: [
-        { kind: 'PROVIDER_SERVICE', label: 'Bingo Musical', revenueAmount: 240, costAmount: 160, quantity: 1, travelHeadcount: 2 },
+        {
+          kind: 'PROVIDER_SERVICE',
+          label: 'Bingo Musical',
+          revenueAmount: 240,
+          costAmount: 160,
+          quantity: 1,
+          hours: 1.5,
+          partyType: 'infantil',
+          travelHeadcount: 2,
+        },
       ],
     }));
 
@@ -162,7 +171,15 @@ describe('useNewBookingSubmit', () => {
     const body = JSON.parse(String(init?.body));
     expect(body.travelCost).toBe(105);
     expect(body.serviceLines).toEqual([
-      { kind: 'PROVIDER_SERVICE', label: 'Bingo Musical', revenueAmount: 240, costAmount: 160, quantity: 1 },
+      {
+        kind: 'PROVIDER_SERVICE',
+        label: 'Bingo Musical',
+        revenueAmount: 240,
+        costAmount: 160,
+        quantity: 1,
+        hours: 1.5,
+        partyType: 'infantil',
+      },
     ]);
   });
 });

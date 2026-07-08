@@ -353,7 +353,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
         sourceCollaboratorId: true,
         serviceLines: {
           orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
-          select: { collaboratorId: true, kind: true, label: true, revenueAmount: true, costAmount: true, quantity: true, hours: true, notes: true },
+          select: { collaboratorId: true, kind: true, label: true, revenueAmount: true, costAmount: true, quantity: true, hours: true, partyType: true, notes: true },
         },
       },
     });
@@ -369,6 +369,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       costAmount: l.costAmount ?? undefined,
       quantity: l.quantity ?? undefined,
       hours: l.hours ?? undefined,
+      partyType: l.partyType ?? undefined,
       notes: l.notes ?? undefined,
     }));
   }

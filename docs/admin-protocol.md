@@ -1732,6 +1732,24 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1733 — 2026-07-08 — codex (FET)
+- Context: auditoria E2E del carril `lead -> dossier -> reserva`. El backend podia heretar línies del lead si no hi havia payload, però el formulari de nova reserva pre-carregava aquestes línies i les reenviava sense `hours` ni `partyType`. Això podia fer que una reserva nascuda d'un lead perdés durada/audiència encara que el lead ho tingués.
+- Fet:
+  - `BookingServiceLineFormInput` incorpora `hours` i `partyType` com a camps preservables.
+  - `mapLeadServiceLinesToBookingFormLines` conserva `hours` i `partyType` quan el formulari importa línies del lead.
+  - `useNewBookingSubmit` continua eliminant només `travelHeadcount` del payload i manté `hours`/`partyType`.
+  - `LeadBoloSection` preserva aquests camps quan carrega/desa línies existents.
+  - `createBookingFromInput` inclou `partyType` en l'herència server-side directa de `LeadServiceLine -> BookingServiceLine`.
+  - Roadmap Manolo actualitzat amb #1733 dins del bloc E2E lead -> reserva.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\bookings\bookingLeadServiceLineMapper.test.ts __tests__\app\admin\bookings\useNewBookingSubmit.test.tsx __tests__\lib\services\bookingCreationService.test.ts` (51/51); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff --check` OK.
+  - Validació funcional: el mapper, el submit i la creació server-side conserven `hours` i `partyType`; `travelHeadcount` segueix sent local i no entra al payload.
+  - Validació humana/UX: una reserva creada des d'un lead manté durada/audiència de les línies, evitant que planning/cuadrant perdin context després de formalitzar el bolo.
+- `ADMIN_CHANGE_COUNTER` puja a `1733`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1732 — 2026-07-08 — codex (FET)
 - Context: el full Manolo de nit seguia arribat al #1724 mentre el repo ja havia tancat #1725-#1731 en imatges, portfolio, dossiers, lead i repartiment. Si el roadmap no sap què s'ha fet, la següent auditoria neix amb brúixola vella.
 - Fet:
