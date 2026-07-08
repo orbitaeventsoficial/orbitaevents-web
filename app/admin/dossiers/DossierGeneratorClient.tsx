@@ -12,7 +12,6 @@ import { buildDossierHtml, type DossierCopy } from '@/lib/utils/dossier-html-bui
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { AdminSection } from '../components/AdminPage';
 import { computeDossierMarginGuard } from '@/lib/services/dossierMarginGuardService';
-import { buildDossierLineSnapshot } from '@/lib/services/dossierSnapshotService';
 import {
   buildDossierProductsForSelection,
   DOSSIER_DJ_PRODUCT_ID,
@@ -258,7 +257,6 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
       travelTollsEur: Number.isFinite(Number(travelTollsEur)) && Number(travelTollsEur) > 0 ? Number(travelTollsEur) : 0,
     });
   }, [marginGuardLines, travelKm, travelTollsEur]);
-  const [createLeadOnSave, setCreateLeadOnSave] = useState(false);
   const [sendOnSave, setSendOnSave] = useState(false);
   const [linkedCustomerId, setLinkedCustomerId] = useState('');
   const [linkedCustomerLabel, setLinkedCustomerLabel] = useState('');
@@ -449,7 +447,6 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
     setTelefon(customer.phone ?? '');
     setCustomerQuery('');
     setShowCustomerResults(false);
-    setCreateLeadOnSave(true);
     setSavedId(null);
   }
 
@@ -479,8 +476,8 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
     setEventDesc('');
     setTravelLocation('');
     setTravelKm('');
+    setTravelTollsEur('');
     setSelectedIds(new Set());
-    setCreateLeadOnSave(false);
     setSendOnSave(false);
     setSavedId(null);
   }
@@ -603,12 +600,8 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
         toast.error('Cal email per enviar el dossier.');
         return;
       }
-      const shouldCreateLead = !dossierLeadId && (createLeadOnSave || sendOnSave || Boolean(linkedCustomerId));
+      const shouldCreateLead = !dossierLeadId;
       if (shouldCreateLead) {
-        if (!email.trim()) {
-          toast.error('Cal email per crear lead/client.');
-          return;
-        }
         if (!linkedCustomerId) {
           const existingCustomer = await findExistingCustomerMatch();
           if (existingCustomer) {
@@ -643,34 +636,21 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
           setLinkedCustomerId(leadData.customerLink.customerId);
           setLinkedCustomerLabel(linkedCustomerLabel || nom.trim());
         }
-        await syncProductsToLead(dossierLeadId);
-        setCreateLeadOnSave(false);
       }
+      if (!dossierLeadId) throw new Error('No hi ha cap lead per crear el dossier');
+      await syncProductsToLead(dossierLeadId);
       const res = await fetchWithCsrf('/api/admin/dossiers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          leadId: dossierLeadId,
-          nom: nom.trim(),
-          empresa: empresa.trim() || undefined,
-          telefon: telefon.trim() || undefined,
-          email: email.trim() || undefined,
-          eventDesc: eventDesc.trim() || undefined,
-          salutacio: salutacio.trim() || undefined,
-          productIds: dossierProducts.map((product) => product.id),
-          lineSnapshot: buildDossierLineSnapshot({
-            products: dossierProducts,
-            travelKm: Number.isFinite(Number(travelKm)) && Number(travelKm) > 0 ? Number(travelKm) : null,
-            travelTollsEur: Number.isFinite(Number(travelTollsEur)) && Number(travelTollsEur) > 0 ? Number(travelTollsEur) : null,
-            travelLocation: travelLocation.trim() || null,
-          }),
-        }),
+        body: JSON.stringify({ leadId: dossierLeadId }),
       });
       if (!res.ok) throw new Error('Error desant');
-      const data = await res.json() as { id: string };
-      setSavedId(data.id);
+      const data = await res.json() as { id?: string; dossierId?: string; status?: 'created' | 'existing' };
+      const dossierId = data.dossierId ?? data.id;
+      if (!dossierId) throw new Error('El dossier s’ha creat sense id retornat');
+      setSavedId(dossierId);
       if (sendOnSave) {
-        const sendRes = await fetchWithCsrf(`/api/admin/dossiers/${data.id}/send`, { method: 'POST' });
+        const sendRes = await fetchWithCsrf(`/api/admin/dossiers/${dossierId}/send`, { method: 'POST' });
         if (!sendRes.ok) {
           // El dossier ja s'ha desat: l'error és només d'enviament, no de desat.
           toast.error('Dossier desat, però no s\'ha pogut enviar. Reenvia\'l des de la llista.');
@@ -678,7 +658,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
         }
         toast.success('Dossier desat i enviat correctament');
       } else {
-        toast.success('Dossier desat correctament');
+        toast.success(data.status === 'existing' ? 'Aquest lead ja tenia un dossier actiu' : 'Dossier desat correctament');
       }
     } catch (err) {
       console.error('[DossierGenerator] saveDossier error:', err);
@@ -1000,17 +980,13 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
           )}
 
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3 rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)] px-4 py-3">
-            {!linkedLeadId && (
-              <label className="inline-flex cursor-pointer items-center gap-2.5 font-mono text-xs text-[var(--t2)]">
-                <input
-                  type="checkbox"
-                  className="accent-[var(--gold)]"
-                  checked={createLeadOnSave}
-                  onChange={(event) => setCreateLeadOnSave(event.target.checked)}
-                />
-                <span>{linkedCustomerId ? ADMIN_DOSSIER_GENERATOR_COPY.actions.createLeadForCustomer : ADMIN_DOSSIER_GENERATOR_COPY.actions.createCrmFlow}</span>
-              </label>
-            )}
+            <span className="font-mono text-xs text-[var(--t2)]">
+              {linkedLeadId
+                ? ADMIN_DOSSIER_GENERATOR_COPY.actions.useLinkedLead
+                : linkedCustomerId
+                  ? ADMIN_DOSSIER_GENERATOR_COPY.actions.createLeadForCustomer
+                  : ADMIN_DOSSIER_GENERATOR_COPY.actions.createCrmFlow}
+            </span>
             <label className="inline-flex cursor-pointer items-center gap-2.5 font-mono text-xs text-[var(--t2)]">
               <input
                 type="checkbox"

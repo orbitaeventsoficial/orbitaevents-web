@@ -61,6 +61,7 @@ export interface BoloEconomia {
 type DossierDraftResponse = {
  ok?: boolean;
  status?: 'created' | 'existing';
+ id?: string;
  dossierId?: string;
  error?: string;
 };
@@ -448,18 +449,19 @@ export default function LeadBoloSection({
  const saved = await handleSave();
  if (!saved) return;
  }
- const res = await fetchWithCsrf('/api/admin/dossiers/draft-from-lead', {
+ const res = await fetchWithCsrf('/api/admin/dossiers', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ leadId }),
  });
  const data = await res.json().catch(() => ({})) as DossierDraftResponse;
- if (!res.ok || !data.dossierId) {
+ const dossierId = data.dossierId ?? data.id;
+ if (!res.ok || !dossierId) {
  throw new Error(data.error || 'No he pogut crear el dossier.');
  }
  toast.success(data.status === 'existing' ? 'Aquest lead ja tenia un dossier actiu.' : 'Dossier creat.');
  router.refresh();
- window.open(`/api/admin/dossiers/${data.dossierId}/composite`, '_blank', 'noopener,noreferrer');
+ window.open(`/api/admin/dossiers/${dossierId}/composite`, '_blank', 'noopener,noreferrer');
  } catch (e) {
  console.error('[LeadBolo] crear dossier', e);
  toast.error(e instanceof Error ? e.message : 'Error creant el dossier.');

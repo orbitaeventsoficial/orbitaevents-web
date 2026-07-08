@@ -39,6 +39,20 @@ describe('DossierGeneratorClient customer lookup guard', () => {
     expect(syncBlock).toContain('body: JSON.stringify({ lines: [...lines, ...routeCostLines] }),');
   });
 
+  it('desa dossiers pel mateix contracte canonic del lead', () => {
+    const start = source.indexOf('async function saveDossier');
+    const end = source.indexOf('const canGenerate');
+    const saveBlock = source.slice(start, end);
+
+    expect(source).not.toContain("import { buildDossierLineSnapshot");
+    expect(source).not.toContain('createLeadOnSave');
+    expect(saveBlock).toContain('const shouldCreateLead = !dossierLeadId;');
+    expect(saveBlock).toContain('await syncProductsToLead(dossierLeadId);');
+    expect(saveBlock).toContain("const res = await fetchWithCsrf('/api/admin/dossiers', {");
+    expect(saveBlock).toContain('body: JSON.stringify({ leadId: dossierLeadId }),');
+    expect(saveBlock).not.toContain('lineSnapshot:');
+  });
+
   it('avisa si no pot cercar leads existents', () => {
     const start = source.indexOf('const searchLeads');
     const end = source.indexOf('const loadCustomers');

@@ -1,3 +1,27 @@
+## 2026-07-08 — Creacio de dossier unificada entre leads i dossiers (Canvi #1748, codex)
+
+### Context
+El propietari detecta que `Crear dossier` des del lead i la creacio des de `/admin/dossiers` han divergit. La decisio de producte es que la cadena sigui una sola: lead -> dossier -> pressupost -> reserva. Per tant, si hi ha un lead, el dossier no s'ha de composar amb un payload manual diferent.
+
+### Què s'ha fet
+- `/api/admin/dossiers` passa a ser el contracte unic d'entrada: si rep `leadId`, delega a `createDossierDraftFromLead` i retorna el mateix `dossierId`/`status` que el flux del lead.
+- `/admin/leads/[id]` i `DossierDraftCreateButton` deixen de cridar `/api/admin/dossiers/draft-from-lead` i usen el mateix POST canonic `/api/admin/dossiers`.
+- El generador de `/admin/dossiers` deixa de crear snapshots manuals quan desa: crea o reutilitza lead, sincronitza productes cap al lead i crea el dossier des del `leadId`.
+- Eliminat el checkbox opcional de crear lead: guardar un dossier sense lead ja no es presenta com a variant normal de producte.
+- En desvincular un lead al generador, tambe es buiden els peatges heretats per no arrossegar estat de ruta.
+- Tests ampliats a API, lead i generador perquè el contracte unic quedi blindat.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\dossiers-route.test.ts __tests__\app\admin\dossiers\DossierGeneratorClient-customer-lookup.test.ts __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\lib\services\dossierAutoDraftService.test.ts` OK (20/20); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK; `pnpm run validate:core` OK.
+- Validació funcional: els dos camins visibles creen dossier amb `POST /api/admin/dossiers` + `leadId`; l'API reutilitza el dossier actiu amb estat 200 i crea un de nou amb estat 201.
+- Validació humana/UX: el propietari ja no ha de recordar dues maneres de crear dossier; el generador entra dins la mateixa cadena comercial que el lead.
+
+### Coordinació
+Counter -> 1748. Canvi limitat a contracte de creacio dossier, generador, botons de lead/dossiers, tests, roadmap, protocol, diari i sync; sense schema, motors economics, PDF render, media ni `app/admin/tasks`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Pacte partner encara més curt i Bingo adult amb portada bona (Canvi #1747, codex)
 
 ### Context

@@ -6,6 +6,7 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '../components/ToastProvider';
 
 type DraftResponse = {
+  id?: string;
   status?: 'created' | 'existing';
   dossierId?: string;
   error?: string;
@@ -19,13 +20,13 @@ export function DossierDraftCreateButton({ leadId, label }: { leadId: string; la
   async function createDraft() {
     setCreating(true);
     try {
-      const res = await fetchWithCsrf('/api/admin/dossiers/draft-from-lead', {
+      const res = await fetchWithCsrf('/api/admin/dossiers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ leadId }),
       });
       const data = await res.json().catch(() => ({})) as DraftResponse;
-      if (!res.ok) throw new Error(data.error || 'No he pogut crear l’esborrany');
+      if (!res.ok || !(data.dossierId ?? data.id)) throw new Error(data.error || 'No he pogut crear l’esborrany');
       toast.success(data.status === 'existing' ? 'Aquest lead ja tenia un dossier actiu' : 'Esborrany de dossier creat');
       router.refresh();
     } catch (error) {

@@ -1733,6 +1733,25 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1748 — 2026-07-08 — codex (FET)
+- Context: el propietari detecta que la creacio de dossier divergia entre `/admin/leads/[id]` i `/admin/dossiers`; la regla de producte queda fixada com una sola cadena lead -> dossier -> pressupost -> reserva.
+- Fet:
+  - `/api/admin/dossiers` accepta `leadId` i delega en `createDossierDraftFromLead`, retornant `id` + `dossierId` i el mateix `status` (`created`/`existing`) que el flux canonic de lead.
+  - `LeadBoloSection` i `DossierDraftCreateButton` deixen de cridar `/api/admin/dossiers/draft-from-lead` i passen pel POST unic `/api/admin/dossiers`.
+  - `DossierGeneratorClient` crea o reutilitza lead abans de desar, sincronitza productes cap al lead i crea el dossier amb `{ leadId }`, sense muntar `lineSnapshot` propi.
+  - El generador elimina el checkbox opcional de crear lead i comunica directament si usa lead vinculat, crea lead per client o crea flux CRM.
+  - En netejar el lead vinculat, el generador tambe buida peatges heretats per no arrossegar ruta d'un cas anterior.
+  - Tests d'API, lead i generador ampliats per blindar el contracte unic i la reutilitzacio de dossier actiu.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\api\admin\dossiers-route.test.ts __tests__\app\admin\dossiers\DossierGeneratorClient-customer-lookup.test.ts __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\lib\services\dossierAutoDraftService.test.ts` OK (20/20); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK; `pnpm run validate:core` OK.
+  - Validació funcional: des del lead i des del generador, el cami visible acaba en `POST /api/admin/dossiers` amb `leadId`; si el lead ja te dossier actiu es reutilitza amb 200 i si no en crea un nou amb 201.
+  - Validació humana/UX: desapareix la doble logica mental de "crear dossier des del lead" vs "crear dossier des de dossiers"; el generador queda subordinat al mateix lead comercial.
+- Roadmap Manolo actualitzat amb #1748 dins del bloc lead -> dossier.
+- `ADMIN_CHANGE_COUNTER` puja a `1748`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1747 — 2026-07-08 — codex (FET)
 - Context: el propietari torna a mirar `Pacte amb partner` i marca que encara és massa explicatiu per a lead: per validar amb Masquerade no cal llistar `Temps ruta passatger` i `Dieta desplaçament` com si fossin dues decisions. També confirma que la millor candidata actual per al Bingo Musical adult és la portada amb públic i cartrons.
 - Fet:

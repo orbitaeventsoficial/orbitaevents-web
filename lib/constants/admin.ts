@@ -58,7 +58,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 1747;
+export const ADMIN_CHANGE_COUNTER = 1748;
 
 export const ADMIN_BOOKING_DEPOSIT_DUE_DAYS = 30;
 export const ADMIN_ECONOMY_PAYMENT_DUE_SOON_DAYS = 7;
@@ -205,6 +205,7 @@ export const ADMIN_DOSSIER_GENERATOR_COPY = {
   actions: {
     createCrmFlow: 'Crear lead i client en desar',
     createLeadForCustomer: 'Crear lead vinculat al client',
+    useLinkedLead: 'Crear dossier des del lead vinculat',
     sendOnSave: 'Enviar per email en desar',
   },
 } as const;

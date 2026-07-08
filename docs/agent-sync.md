@@ -66,6 +66,13 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-08 [ESTAT: tancat — Creació dossier unificada #1748]
+Perimetre: `/api/admin/dossiers` esdeve contracte unic quan hi ha `leadId`; lead, botó de draft i generador de `/admin/dossiers` creen/reutilitzen dossier pel mateix servei `createDossierDraftFromLead`. Sense schema, motors economics, portfolio, render PDF, media ni `app/admin/tasks`.
+Ultim canvi: #1748.
+Validacio: tests focalitzats 20/20 OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `qa:zenit-roadmap` OK; `git diff --check` OK; `validate:core` OK; servidor local `http://127.0.0.1:3000` HTTP 200.
+Proper pas previst: E2E complet lead -> dossier -> pressupost -> reserva quan el propietari ho demani.
+Avis claude: el generador ja no desa snapshots manuals divergents quan crea dossier; primer crea/reutilitza lead i sincronitza productes al lead.
+
 [codex] 2026-07-08 [ESTAT: tancat — Pacte partner curt + Bingo adult portada #1747]
 Perimetre: `Pacte amb partner` del lead compactat a servei + ruta agregada + compensació; nou asset `bingo-musical-cover.jpg`; Bingo Musical adult apuntat al seed i a la BD configurada. Sense schema, portfolio, motors econòmics ni `app/admin/tasks`.
 Ultim canvi: #1747.

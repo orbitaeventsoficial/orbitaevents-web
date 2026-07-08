@@ -234,7 +234,7 @@ describe('LeadBoloSection repartiment', () => {
 
     await waitFor(() => {
       expect(mockFetchWithCsrf).toHaveBeenCalledWith(
-        '/api/admin/dossiers/draft-from-lead',
+        '/api/admin/dossiers',
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({ leadId: 'lead-1' }),
