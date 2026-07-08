@@ -1453,6 +1453,13 @@ html.admin-mode .ap-ledger-econohead {
 /* El títol no es trenca en columna estreta (#1752): si la nota no hi cap al
    costat, salta SENCERA a la línia de sota (flex-wrap), no esmicola el títol. */
 html.admin-mode .ap-ledger-econohead > span:first-child { white-space: nowrap; }
+/* UNA acció de validació del pacte (#1753): viu al head del bloc, alineada a la
+   dreta; a mòbil cau a la seva pròpia línia via el flex-wrap del head. */
+html.admin-mode .ap-ledger-pact-action { margin-left: auto; flex: 0 0 auto; }
+/* Pacte validat: la vora del bloc passa a to d'èxit — es veu d'un cop d'ull. */
+html.admin-mode .ap-ledger-budget--repartiment[data-validated="true"] {
+  border-color: color-mix(in oklab, var(--o-stage-won-strong) 38%, var(--line));
+}
 html.admin-mode .ap-ledger-econobadge {
   padding: 0.0625rem 0.375rem; border-radius: var(--o-r-xs);
   background: color-mix(in oklab, var(--gold) 12%, transparent);
@@ -3524,6 +3531,13 @@ html.admin-mode .ap-ledger-summary-jump::after {
 html.admin-mode .ap-ledger-summary-jump:hover {
   background: color-mix(in oklab, var(--gold) 9%, transparent);
   color: var(--gold-bright);
+}
+/* Pacte ja validat (#1753): el salt del rail passa a to d'èxit amb ✓. */
+html.admin-mode .ap-ledger-summary-jump--done { color: var(--o-stage-won-strong); }
+html.admin-mode .ap-ledger-summary-jump--done::after { content: '✓'; color: var(--o-stage-won-strong); }
+html.admin-mode .ap-ledger-summary-jump--done:hover {
+  background: color-mix(in oklab, var(--o-stage-won-strong) 9%, transparent);
+  color: var(--o-stage-won-strong);
 }
 @media (max-width: 900px) {
   html.admin-mode .ap-ledger-zenith--railed { grid-template-columns: minmax(0, 1fr); }

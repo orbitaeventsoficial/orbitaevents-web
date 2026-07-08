@@ -43,6 +43,8 @@ const updateLeadSchema = z.object({
   eventEndTime: nullableString,
   eventPhone: nullableString,
   eventAddress: nullableString,
+  // Validació del pacte amb el partner (#1753): true = validat ara, false = desfer.
+  partnerPactValidated: z.boolean().optional(),
 }).strict();
 
 export async function GET(req: NextRequest, { params }: Params) {

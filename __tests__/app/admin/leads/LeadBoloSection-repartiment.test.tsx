@@ -212,7 +212,9 @@ describe('LeadBoloSection repartiment', () => {
     expect(screen.getByText('tècnic inclòs')).toBeInTheDocument();
     expect(screen.getByText('-40 €')).toBeInTheDocument();
     expect(screen.getByText('Següent pas')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Crear dossier' })).toHaveClass('ap-btn--primary');
+    // Amb partner PENDENT de validar (#1753), el dossier encara no és el pas primari.
+    expect(screen.getByRole('button', { name: 'Crear dossier' })).not.toHaveClass('ap-btn--primary');
+    expect(screen.getByRole('button', { name: 'Validar pacte' })).toHaveClass('ap-btn--primary');
     expect(screen.getByRole('link', { name: 'Crear reserva' })).not.toHaveClass('ap-btn--primary');
     expect(screen.queryByText('Operari Òrbita')).not.toBeInTheDocument();
     expect(screen.queryByText('Cost intern Òrbita')).not.toBeInTheDocument();
@@ -336,5 +338,64 @@ describe('LeadBoloSection repartiment', () => {
     expect(openSpy).toHaveBeenCalledWith('/api/admin/dossiers/dos-1/composite', '_blank', 'noopener,noreferrer');
     expect(mockRouterRefresh).toHaveBeenCalledTimes(1);
     openSpy.mockRestore();
+  });
+
+  it('valida el pacte amb UNA acció i encén el dossier com a pas primari (#1753)', async () => {
+    render(
+      <LeadBoloSection
+        leadId="lead-1"
+        documentContext={{ name: 'Lead Andorra', eventLocation: 'Andorra' }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Pacte amb partner')).toBeInTheDocument();
+    });
+
+    // Pendent: la validació és el pas manat; el dossier encara no és primari.
+    expect(screen.getByText('Valida el pacte amb el partner; el dossier és el pas següent.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Crear dossier' })).not.toHaveClass('ap-btn--primary');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Validar pacte' }));
+
+    await waitFor(() => {
+      expect(mockFetchWithCsrf).toHaveBeenCalledWith(
+        '/api/admin/leads/lead-1',
+        expect.objectContaining({
+          method: 'PATCH',
+          body: JSON.stringify({ partnerPactValidated: true }),
+        }),
+      );
+    });
+
+    // Validat: acció única resolta, dossier primari i estat visible al bloc.
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Desfer validació' })).toBeInTheDocument();
+    });
+    expect(screen.queryByRole('button', { name: 'Validar pacte' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Crear dossier' })).toHaveClass('ap-btn--primary');
+    expect(screen.getByText('Dossier primer; pressupost i reserva quan el pacte ja està clar.')).toBeInTheDocument();
+    expect(screen.getByText((text) => text.startsWith('validat el '))).toBeInTheDocument();
+  });
+
+  it('arrenca en estat validat quan el lead ja porta la validació persistida (#1753)', async () => {
+    render(
+      <LeadBoloSection
+        leadId="lead-1"
+        documentContext={{ name: 'Lead Andorra', eventLocation: 'Andorra' }}
+        initialPartnerPactValidatedAt="2026-07-08T12:00:00.000Z"
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Pacte amb partner')).toBeInTheDocument();
+    });
+
+    expect(screen.getByRole('button', { name: 'Desfer validació' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Validar pacte' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Crear dossier' })).toHaveClass('ap-btn--primary');
+    // La fila del partner no contradiu el head: amb pacte validat diu «import validat».
+    expect(screen.getByText('import validat')).toBeInTheDocument();
+    expect(screen.queryByText('import a validar')).not.toBeInTheDocument();
   });
 });

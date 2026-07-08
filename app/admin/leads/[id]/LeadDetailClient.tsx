@@ -211,7 +211,7 @@ type ProposalItem = {
 type DossierItem = { id: string; nom: string; estat: string; mode: string | null; sentAt: string | null; sentTo?: string | null; createdAt: string };
 type LeadDocumentItem = { id: string; type: string; title: string; fileUrl: string; createdAt: string };
 
-export default function LeadDetailClient({ lead, proposals, dossiers, documents, vehicleCostPerKm, initialDistanceKm = null, initialTollsEur = null, bookingEconomia = null }: {
+export default function LeadDetailClient({ lead, proposals, dossiers, documents, vehicleCostPerKm, initialDistanceKm = null, initialTollsEur = null, initialPartnerPactValidatedAt = null, bookingEconomia = null }: {
  lead: LeadDetailData;
  proposals: ProposalItem[];
  dossiers: DossierItem[];
@@ -219,6 +219,8 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  vehicleCostPerKm: number;
  initialDistanceKm?: number | null;
  initialTollsEur?: number | null;
+ /** Quan el propietari va validar el pacte amb el partner (#1753); null = pendent. */
+ initialPartnerPactValidatedAt?: string | null;
  /** Economia REAL de la reserva vinculada (font canònica). Quan existeix, mana
  * sobre el `boloEcon` provisional del configurador (el lead amb reserva mostra
  * la veritat de la reserva, no el bolo). */
@@ -237,6 +239,14 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  const [savePending, setSavePending] = useState(false);
  // Economia del bolo elevada des de LeadBoloSection per al rail financer compacte.
  const [boloEcon, setBoloEcon] = useState<BoloEconomia | null>(null);
+ // Estat del pacte partner elevat des de LeadBoloSection (#1753): el rail el reflecteix.
+ const [pactState, setPactState] = useState<{ hasPartner: boolean; validated: boolean }>({
+ hasPartner: false,
+ validated: Boolean(initialPartnerPactValidatedAt),
+ });
+ const handlePactState = useCallback((s: { hasPartner: boolean; validated: boolean }) => {
+ setPactState((prev) => (prev.hasPartner === s.hasPartner && prev.validated === s.validated ? prev : s));
+ }, []);
  const handleEconomia = useCallback((e: BoloEconomia | null) => {
  setBoloEcon((prev) => {
  if (!prev && !e) return prev;
@@ -681,7 +691,9 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  vehicleCostPerKm={vehicleCostPerKm}
  initialDistanceKm={initialDistanceKm}
  initialTollsEur={initialTollsEur}
+ initialPartnerPactValidatedAt={initialPartnerPactValidatedAt}
  onEconomiaChange={handleEconomia}
+ onPactStateChange={handlePactState}
  compactEconomia
  />
  </main>
@@ -708,7 +720,11 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  )}
  <div><span>Cost total estimat</span><strong>{formatCurrency(econ.directCost)}</strong></div>
  </div>
- <a className="ap-ledger-summary-jump" href="#lead-repartiment">Validar partner</a>
+ {pactState.hasPartner && (
+ pactState.validated
+ ? <a className="ap-ledger-summary-jump ap-ledger-summary-jump--done" href="#lead-repartiment">Pacte validat</a>
+ : <a className="ap-ledger-summary-jump" href="#lead-repartiment">Validar partner</a>
+ )}
  </>
  ) : (
  <p className="ap-ledger-econonote">Afegeix línies al bolo per veure el net estimat.</p>

@@ -479,6 +479,7 @@ model Lead {
   eventAddress String? // adreça de l'event (venue, domicili, etc.)
   distanceKm   Float? // km anada+tornada des de Granollers (mirall de Booking.distanceKm; #1345)
   tollsEur     Float? // peatges de la ruta (manual; no deriva dels km) — cost real de transport (#1364)
+  partnerPactValidatedAt DateTime? // quan el propietari valida el pacte amb el partner (#1753); null = pendent
 
   // Audit trail de pèrdua: per què i quan s'ha marcat el lead com LOST
   lostReason String?

@@ -12,11 +12,14 @@ export default function RepartimentPanel({
   names,
   mode = 'internal',
   detailsDefaultOpen = true,
+  pactValidated = false,
 }: {
   repartiment: BoloRepartiment;
   names: Record<string, string>;
   mode?: 'internal' | 'preproposal';
   detailsDefaultOpen?: boolean;
+  /** Pacte validat pel propietari (#1753): les files del partner ho reflecteixen. */
+  pactValidated?: boolean;
 }) {
   const nameOf = (id: string) => (id === REPARTIMENT_OWNER_KEY ? 'Òrbita' : names[id] ?? 'Col·laborador');
   const { elements, perPersona, totals } = repartiment;
@@ -131,8 +134,9 @@ export default function RepartimentPanel({
             <details key={`${p.personId}:detail`} className="ap-rep-partner-card" open={detailsDefaultOpen}>
               <summary className="ap-rep-partner-head">
                 {/* La nota diu QUÈ és l'import (#1752, Manolo); l'estat obert/plegat
-                    ja el mostra el propi <details>, no cal narrar-lo. */}
-                <span>{nameOf(p.personId)}<em>import a validar</em></span>
+                    ja el mostra el propi <details>. Amb el pacte validat (#1753),
+                    la fila no pot contradir el head. */}
+                <span>{nameOf(p.personId)}<em>{pactValidated ? 'import validat' : 'import a validar'}</em></span>
                 <strong>{formatCurrency(p.rep)}</strong>
               </summary>
               <div className="ap-rep-partner-lines">

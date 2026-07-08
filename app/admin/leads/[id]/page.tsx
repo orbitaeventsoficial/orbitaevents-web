@@ -61,6 +61,7 @@ export default async function LeadDetailPage({ params }: Props) {
       eventAddress: true,
       distanceKm: true,
       tollsEur: true,
+      partnerPactValidatedAt: true,
       eventStartTime: true,
       eventEndTime: true,
       sourceCollaboratorId: true,
@@ -237,6 +238,7 @@ export default async function LeadDetailPage({ params }: Props) {
         vehicleCostPerKm={vehicleCostPerKm}
         initialDistanceKm={lead.distanceKm ?? null}
         initialTollsEur={lead.tollsEur ?? null}
+        initialPartnerPactValidatedAt={lead.partnerPactValidatedAt ? lead.partnerPactValidatedAt.toISOString() : null}
         bookingEconomia={bookingEconomia}
         proposals={lead.proposals.map((p) => ({
           id: p.id,

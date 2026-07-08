@@ -25,7 +25,7 @@ import {
 } from '@/lib/services/travelLaborCost';
 import { useBookingDistance } from '@/app/admin/bookings/useBookingDistance';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
-import { formatCurrency, formatCurrencyExact, formatNumber } from '@/lib/constants';
+import { formatCurrency, formatCurrencyExact, formatDateFull, formatNumber } from '@/lib/constants';
 import { buildLeadBookingPrefillHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildDossierCompositePdfHref } from '@/lib/admin/dossierWorkspaceHref';
 
@@ -125,7 +125,9 @@ export default function LeadBoloSection({
  vehicleCostPerKm = DEFAULT_VEHICLE_COST_PER_KM,
  initialDistanceKm = null,
  initialTollsEur = null,
+ initialPartnerPactValidatedAt = null,
  onEconomiaChange,
+ onPactStateChange,
  compactEconomia = false,
 }: {
  leadId: string;
@@ -151,7 +153,11 @@ export default function LeadBoloSection({
  vehicleCostPerKm?: number;
  initialDistanceKm?: number | null;
  initialTollsEur?: number | null;
+ /** Quan es va validar el pacte amb el partner (#1753); null = pendent. */
+ initialPartnerPactValidatedAt?: string | null;
  onEconomiaChange?: (e: BoloEconomia | null) => void;
+ /** Eleva l'estat del pacte al contenidor (#1753): el rail de marge el reflecteix. */
+ onPactStateChange?: (s: { hasPartner: boolean; validated: boolean }) => void;
  compactEconomia?: boolean;
 }) {
  const toast = useToast();
@@ -172,6 +178,9 @@ export default function LeadBoloSection({
  const [saving, setSaving] = useState(false);
  const [creatingDossier, setCreatingDossier] = useState(false);
  const [dirty, setDirty] = useState(false);
+ // Pacte amb partner (#1753): UNA acció de validació, persistida al Lead.
+ const [pactValidatedAt, setPactValidatedAt] = useState<string | null>(initialPartnerPactValidatedAt);
+ const [pactSaving, setPactSaving] = useState(false);
 
  useEffect(() => {
  let alive = true;
@@ -343,6 +352,33 @@ export default function LeadBoloSection({
  return names;
  }, [repartimentInputLines]);
  const repartiment = useMemo(() => computeBoloRepartiment(repartimentInputLines), [repartimentInputLines]);
+ // Estat del pacte (#1753): hi ha partner si el repartiment té elements; el pacte
+ // està CLAR si no hi ha partner o si el propietari l'ha validat explícitament.
+ const hasPartner = repartiment.elements.length > 0;
+ const pactClear = !hasPartner || Boolean(pactValidatedAt);
+ useEffect(() => {
+ onPactStateChange?.({ hasPartner, validated: Boolean(pactValidatedAt) });
+ }, [hasPartner, pactValidatedAt, onPactStateChange]);
+
+ // Persisteix la validació del pacte al Lead: una sola acció, un sol lloc.
+ const savePactValidated = async (validated: boolean) => {
+ setPactSaving(true);
+ try {
+ const res = await fetchWithCsrf(`/api/admin/leads/${leadId}`, {
+ method: 'PATCH',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ partnerPactValidated: validated }),
+ });
+ if (!res.ok) throw new Error('No s\'ha pogut desar');
+ setPactValidatedAt(validated ? new Date().toISOString() : null);
+ toast.success(validated ? 'Pacte validat.' : 'Validació del pacte desfeta.');
+ } catch (e) {
+ console.error('[LeadBolo] validar pacte', e);
+ toast.error('Error desant la validació del pacte.');
+ } finally {
+ setPactSaving(false);
+ }
+ };
 
  // Fulla d'economia del bolo (Fase 4 de docs/bolo-flux.md). La pasta NO viu al
  // configurador: cada línia porta el cost amagat i alimenta SOLA aquesta fulla.
@@ -587,22 +623,42 @@ export default function LeadBoloSection({
  </div>
  )}
 
- {repartiment.elements.length > 0 && (
- <div id="lead-repartiment" className="ap-ledger-budget ap-ledger-budget--repartiment" aria-label="Pacte amb partner al lead">
+ {hasPartner && (
+ <div id="lead-repartiment" className="ap-ledger-budget ap-ledger-budget--repartiment" data-validated={pactValidatedAt ? 'true' : undefined} aria-label="Pacte amb partner al lead">
  <div className="ap-ledger-econohead">
  <span>Pacte amb partner</span>
- <span className="ap-ledger-econonote">import a validar amb el partner · la liquidació completa viu a la reserva</span>
+ <span className="ap-ledger-econonote">
+ {pactValidatedAt
+ ? `validat el ${formatDateFull(pactValidatedAt)} · la liquidació completa viu a la reserva`
+ : 'import a validar amb el partner · la liquidació completa viu a la reserva'}
+ </span>
+ {/* UNA sola acció de validació (#1753): viu al bloc del pacte, no repartida. */}
+ <span className="ap-ledger-pact-action">
+ {pactValidatedAt ? (
+ <button type="button" className="ap-btn ap-btn--xs" onClick={() => savePactValidated(false)} disabled={pactSaving} aria-busy={pactSaving}>
+ Desfer validació
+ </button>
+ ) : (
+ <button type="button" className="ap-btn ap-btn--primary ap-btn--xs" onClick={() => savePactValidated(true)} disabled={pactSaving} aria-busy={pactSaving}>
+ Validar pacte
+ </button>
+ )}
+ </span>
  </div>
- <RepartimentPanel repartiment={repartiment} names={repartimentNames} mode="preproposal" />
+ <RepartimentPanel repartiment={repartiment} names={repartimentNames} mode="preproposal" pactValidated={Boolean(pactValidatedAt)} />
  </div>
  )}
 
  <div className="ap-ledger-bolo-actions ap-ledger-bolo-actions--full">
  <span className="ap-ledger-bolo-next">
  <strong>Següent pas</strong>
- <em>Dossier primer; pressupost i reserva quan el pacte ja està clar.</em>
+ {/* El pas següent DEPÈN de l'estat del pacte (#1753): amb partner pendent,
+ primer es valida; el dossier s'encén (primari) quan el pacte està clar. */}
+ <em>{pactClear
+ ? 'Dossier primer; pressupost i reserva quan el pacte ja està clar.'
+ : 'Valida el pacte amb el partner; el dossier és el pas següent.'}</em>
  </span>
- <button type="button" className="ap-btn ap-btn--primary" onClick={createDossierFromLead} disabled={saving || creatingDossier} aria-busy={creatingDossier}>
+ <button type="button" className={pactClear ? 'ap-btn ap-btn--primary' : 'ap-btn'} onClick={createDossierFromLead} disabled={saving || creatingDossier} aria-busy={creatingDossier}>
  {creatingDossier ? 'Creant dossier...' : 'Crear dossier'}
  </button>
  <a className="ap-btn" href={quoteHref} onClick={(event) => openBuilder(event, quoteHref)} aria-disabled={saving}>
