@@ -24,6 +24,7 @@ import { ORBITA_LOGO_LOCKUP_LIGHT_BASE64 } from '@/lib/logo-lockup-light-base64'
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { computeDossierTransportBudget } from '@/lib/services/dossierMarginGuardService';
 
 /** Carrega una imatge de /public com a data URL per a jsPDF. Retorna null si no existeix. */
 async function loadImageDataUrl(imageUrl?: string | null): Promise<string | null> {
@@ -40,6 +41,11 @@ async function loadImageDataUrl(imageUrl?: string | null): Promise<string | null
 }
 
 export type DossierExtra = { nom: string; preu: number };
+export type DossierCompositeTransport = {
+  travelKm?: number;
+  travelTollsEur?: number;
+  travelLocation?: string;
+};
 
 export type GenerateDossierCompositePdfInput = {
   client: DossierClientInfo;
@@ -47,6 +53,7 @@ export type GenerateDossierCompositePdfInput = {
   productIds: string[];
   collaboratorProducts?: DossierCollaboratorProduct[];
   extras?: DossierExtra[];
+  transport?: DossierCompositeTransport;
   locale?: SupportedLocale;
   logoDataUri?: string;
 };
@@ -302,6 +309,62 @@ function drawExtras(doc: jsPDFType, extras: DossierExtra[], locale: SupportedLoc
   });
 }
 
+function drawTravelSummary(doc: jsPDFType, transport: DossierCompositeTransport | undefined, locale: SupportedLocale): void {
+  const km = typeof transport?.travelKm === 'number' && transport.travelKm > 0 ? transport.travelKm : 0;
+  if (km <= 0) return;
+  const tolls = typeof transport?.travelTollsEur === 'number' && transport.travelTollsEur > 0 ? transport.travelTollsEur : 0;
+  const budget = computeDossierTransportBudget(km, tolls);
+  const moneyLocale = locale === 'ca' ? 'ca-ES' : locale;
+
+  doc.addPage();
+  doc.setFillColor(...COLORS.paperBg);
+  doc.rect(0, 0, PAGE.width, PAGE.height, 'F');
+
+  let y = 42;
+  doc.setTextColor(...COLORS.gold);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.text('DESPLAÇAMENT', PDF_DESIGN.left, y, { charSpace: 0.8 });
+  y += 14;
+
+  doc.setTextColor(...COLORS.paperText);
+  doc.setFontSize(24);
+  doc.text('Cost del desplaçament', PDF_DESIGN.left, y);
+  y += 15;
+
+  setStyleMuted(doc);
+  const routeLabel = transport?.travelLocation
+    ? `${transport.travelLocation} · ${Math.round(km)} km anada i tornada`
+    : `${Math.round(km)} km anada i tornada`;
+  doc.text(doc.splitTextToSize(routeLabel, 150), PDF_DESIGN.left, y);
+  y += 18;
+
+  doc.setTextColor(...COLORS.gold);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(26);
+  doc.text(formatCurrency(budget.clientCharge, moneyLocale), PDF_DESIGN.left, y);
+  y += 18;
+
+  const rows: Array<[string, number]> = [
+    ['Vehicle i combustible', budget.clientVehicleCost],
+    [`${budget.headcount} operaris en ruta`, budget.peopleCost],
+  ];
+  if (budget.tollsCost > 0) rows.push(['Peatges de ruta', budget.tollsCost]);
+  if (budget.mealAllowance > 0) rows.push(['Dietes de ruta llarga', budget.mealAllowance]);
+
+  rows.forEach(([label, amount]) => {
+    doc.setDrawColor(...COLORS.grayLight);
+    doc.roundedRect(PDF_DESIGN.left, y, PDF_DESIGN.width, 12, 1.5, 1.5);
+    setStyleBody(doc);
+    doc.setTextColor(...COLORS.paperText);
+    doc.text(label, PDF_DESIGN.left + 5, y + 7.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...COLORS.gold);
+    doc.text(formatCurrency(amount, moneyLocale), PDF_DESIGN.right - 4, y + 7.5, { align: 'right' });
+    y += 16;
+  });
+}
+
 function drawFootersExceptCover(doc: jsPDFType): void {
   const totalPages = doc.internal.pages.length - 1;
   const website = normalizeWebsite(SITE_CONFIG.web.url);
@@ -351,6 +414,7 @@ export async function generateDossierCompositePDF(input: GenerateDossierComposit
     lastCategory = category;
   });
 
+  drawTravelSummary(doc, input.transport, locale);
   drawExtras(doc, input.extras ?? [], locale);
 
   drawFootersExceptCover(doc);

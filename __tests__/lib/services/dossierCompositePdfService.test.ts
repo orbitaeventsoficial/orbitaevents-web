@@ -61,6 +61,27 @@ describe('generateDossierCompositePDF', () => {
     expect(doc.internal.pages.length - 1).toBe(3);
   });
 
+  it('afegeix desplaçament al PDF complet quan el dossier porta transport', async () => {
+    const doc = await generateDossierCompositePDF({
+      client: { nom: 'Joan Pla' },
+      products: [product],
+      productIds: ['bingo-musical'],
+      transport: {
+        travelKm: 422,
+        travelTollsEur: 18.5,
+        travelLocation: "l'Aldosa",
+      },
+      locale: 'ca',
+    });
+    const text = pdfText(doc);
+
+    expect(doc.internal.pages.length - 1).toBeGreaterThanOrEqual(4);
+    expect(text).toContain('DESPLAÇAMENT');
+    expect(text).toContain('Cost del desplaçament');
+    expect(text).toContain("l'Aldosa · 422 km");
+    expect(text).toContain('Peatges de ruta');
+  });
+
   it('presenta els productes de col·laborador com a capítols propis', async () => {
     const doc = await generateDossierCompositePDF({
       client: { nom: 'Joan Pla' },

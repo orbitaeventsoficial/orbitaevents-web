@@ -50,6 +50,12 @@ export type DossierTraceOrigin = {
   customerName: string | null;
 };
 
+export type DossierOutputTransport = {
+  travelKm?: number;
+  travelTollsEur?: number;
+  travelLocation?: string;
+};
+
 function formatLeadIsoDate(date: Date | null): string {
   return date ? date.toISOString().slice(0, 10) : '';
 }
@@ -177,6 +183,29 @@ export async function createDossier(input: CreateDossierInput) {
   });
 }
 
+export async function resolveDossierTransportOutput(input: {
+  lineSnapshot: unknown;
+  leadId?: string | null;
+}): Promise<DossierOutputTransport> {
+  const snapshotTransport = transportFromDossierLineSnapshot(input.lineSnapshot);
+  let travelKm: number | undefined = snapshotTransport.travelKm;
+  let travelTollsEur: number | undefined = snapshotTransport.travelTollsEur;
+  let travelLocation: string | undefined = snapshotTransport.travelLocation;
+  const fallbackLeadId = input.leadId ?? null;
+
+  if (fallbackLeadId && (travelKm == null || travelTollsEur == null || !travelLocation)) {
+    const lead = await prisma.lead.findUnique({
+      where: { id: fallbackLeadId },
+      select: { distanceKm: true, tollsEur: true, eventLocation: true },
+    });
+    if (travelKm == null && lead?.distanceKm != null && lead.distanceKm > 0) travelKm = lead.distanceKm;
+    if (travelTollsEur == null && lead?.tollsEur != null && lead.tollsEur > 0) travelTollsEur = lead.tollsEur;
+    if (!travelLocation && lead?.eventLocation) travelLocation = lead.eventLocation;
+  }
+
+  return { travelKm, travelTollsEur, travelLocation };
+}
+
 export async function getDossiersByLead(leadId: string) {
   return prisma.dossier.findMany({
     where: { leadId },
@@ -277,25 +306,10 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
   // pinta si travelKm>0) quedava buida. El dossier no desa el km; si ve d'un lead, l'agafem
   // del lead (font única) perquè la proposta surti sencera i el client decideixi conscient.
   // Sense suma dels elements: el dossier és catàleg, no factura (#1396/#1397).
-  const snapshotTransport = transportFromDossierLineSnapshot(dossier.lineSnapshot);
-  let travelKm: number | undefined = snapshotTransport.travelKm;
-  let travelTollsEur: number | undefined = snapshotTransport.travelTollsEur;
-  let travelLocation: string | undefined = snapshotTransport.travelLocation;
-  const transportFallbackLeadId = dossier.leadId;
-  const needsLeadTransportFallback = transportFallbackLeadId && (
-    travelKm == null ||
-    travelTollsEur == null ||
-    !travelLocation
-  );
-  if (needsLeadTransportFallback) {
-    const lead = await prisma.lead.findUnique({
-      where: { id: transportFallbackLeadId },
-      select: { distanceKm: true, tollsEur: true, eventLocation: true },
-    });
-    if (travelKm == null && lead?.distanceKm != null && lead.distanceKm > 0) travelKm = lead.distanceKm;
-    if (travelTollsEur == null && lead?.tollsEur != null && lead.tollsEur > 0) travelTollsEur = lead.tollsEur;
-    if (!travelLocation && lead?.eventLocation) travelLocation = lead.eventLocation;
-  }
+  const { travelKm, travelTollsEur, travelLocation } = await resolveDossierTransportOutput({
+    lineSnapshot: dossier.lineSnapshot,
+    leadId: dossier.leadId,
+  });
   const html = buildDossierHtml(clientInfo, products, dossierCopy, {
     locale: 'ca-ES',
     travelKm,

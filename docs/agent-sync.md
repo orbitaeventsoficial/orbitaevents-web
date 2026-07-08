@@ -94,6 +94,13 @@ Validacio: test focal dossierService 23/23; `npx tsc --noEmit --pretty false` OK
 Proper pas previst: continuar E2E cap a reserva completa amb imatges/productes, o auditar bolos antics amb `travelCost` sense `[travel-cost]`.
 Avis claude: els productes congelats del snapshot es respecten; només es rehidraten km/peatges/ubicacio del lead quan falten al snapshot.
 
+[codex] 2026-07-08 [ESTAT: tancat — PDF compost de dossier amb transport #1736]
+Perimetre: ruta composite, `dossierCompositePdfService`, resolver compartit de transport, tests i docs; sense schema ni BD viva.
+Ultim canvi: #1736.
+Validacio: tests focalitzats 30/30; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff --check` OK.
+Proper pas previst: continuar E2E cap a reserva completa amb imatges/productes, o auditar bolos antics amb `travelCost` sense `[travel-cost]`.
+Avis claude: PDF compost i email/HTML ja comparteixen transport resolt; el PDF pinta una pagina `DESPLAÇAMENT` quan hi ha km.
+
 [codex] 2026-07-08 [ESTAT: tancat — Lead `Qui cobra què` visible i mòbil cosit #1731]
 Perimetre: `/admin/leads/[id]`, `RepartimentPanel`, rail financer del lead i CSS responsive del repartiment; sense schema, BD ni motor econòmic.
 Ultim canvi: #1731.

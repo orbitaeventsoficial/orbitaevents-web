@@ -4,7 +4,7 @@ import { requireAuth } from '@/lib/auth';
 import { NextResponse, type NextRequest } from 'next/server';
 import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
 import { getOrbitaDossierProducts } from '@/lib/constants/dossier-copy';
-import { getDossierById, resolveDossierTraceOrigin } from '@/lib/services/dossierService';
+import { getDossierById, resolveDossierTraceOrigin, resolveDossierTransportOutput } from '@/lib/services/dossierService';
 import { generateDossierCompositePDF } from '@/lib/services/dossierCompositePdfService';
 import {
   collaboratorProductToAnimacioProduct,
@@ -56,6 +56,10 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     eventDesc: dossier.eventDesc ?? undefined,
     salutacio: dossier.salutacio ?? undefined,
   };
+  const transport = await resolveDossierTransportOutput({
+    lineSnapshot: dossier.lineSnapshot,
+    leadId: dossier.leadId,
+  });
 
   // Extres opcionals via query: ?extras=Nom:preu,Nom2:preu2
   const extrasParam = req.nextUrl.searchParams.get('extras');
@@ -75,6 +79,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     productIds: dossier.productIds,
     collaboratorProducts: pdfCollaboratorProducts,
     extras,
+    transport,
     locale: 'ca',
     logoDataUri: readLogoDataUri(),
   });
@@ -100,6 +105,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       productCount: products.length,
       collaboratorProductCount: pdfCollaboratorProducts.length,
       extrasCount: extras.length,
+      travelKm: transport.travelKm ?? null,
+      travelTollsEur: transport.travelTollsEur ?? null,
     },
   });
 

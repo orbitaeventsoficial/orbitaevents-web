@@ -1,3 +1,26 @@
+## 2026-07-08 — Manolo: PDF compost de dossier amb desplaçament (Canvi #1736, codex)
+
+### Context
+Després del #1735, l'email/HTML del dossier ja podia rehidratar peatges del lead sense trencar els productes congelats. Però `/api/admin/dossiers/[id]/composite` no passava cap transport a `generateDossierCompositePDF` i el PDF complet podia sortir sense desplaçament encara que el dossier enviat per email sí que el mostrés.
+
+### Què s'ha fet
+- `dossierService` exposa `resolveDossierTransportOutput`, helper compartit per resoldre `travelKm`, `travelTollsEur` i `travelLocation` des de snapshot + fallback de lead.
+- `sendDossierByEmail` consumeix aquest helper, mantenint el comportament del #1735.
+- La ruta del PDF compost resol transport i el passa a `generateDossierCompositePDF`; també deixa km/peatges a la traça documental.
+- `generateDossierCompositePDF` accepta `transport` i afegeix una pàgina `DESPLAÇAMENT` quan hi ha km, calculada amb `computeDossierTransportBudget`.
+- Tests: ruta composite comprova que passa transport al PDF; servei PDF comprova text de desplaçament i peatges; servei dossier conserva el fallback de peatges.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\dossierCompositePdfService.test.ts __tests__\app\api\admin\dossiers-composite-route.test.ts __tests__\lib\services\dossierService.test.ts` (30/30); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff --check` OK.
+- Validació funcional: email/HTML i PDF complet comparteixen el mateix transport resolt; si hi ha km, el PDF incorpora pàgina de desplaçament.
+- Validació humana/UX: el botó de PDF complet ja no dona un dossier més pobre que l'enviament per email.
+
+### Coordinació
+Counter → 1736. Canvi limitat a PDF compost de dossier, resolver compartit de transport, tests, roadmap, protocol, diari i sync; sense schema ni BD viva.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Manolo: snapshots antics de dossier recuperen peatges del lead (Canvi #1735, codex)
 
 ### Context

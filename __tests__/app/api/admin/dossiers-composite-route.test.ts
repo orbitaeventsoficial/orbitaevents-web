@@ -5,6 +5,7 @@ const {
   mockRequireAuth,
   mockGetDossierById,
   mockResolveDossierTraceOrigin,
+  mockResolveDossierTransportOutput,
   mockGetAnimacioProducts,
   mockGetOrbitaProducts,
   mockGetCollaboratorProducts,
@@ -17,6 +18,7 @@ const {
   mockRequireAuth: vi.fn(),
   mockGetDossierById: vi.fn(),
   mockResolveDossierTraceOrigin: vi.fn(),
+  mockResolveDossierTransportOutput: vi.fn(),
   mockGetAnimacioProducts: vi.fn(),
   mockGetOrbitaProducts: vi.fn(),
   mockGetCollaboratorProducts: vi.fn(),
@@ -33,6 +35,7 @@ vi.mock('@/lib/constants/dossier-copy', () => ({ getOrbitaDossierProducts: mockG
 vi.mock('@/lib/services/dossierService', () => ({
   getDossierById: mockGetDossierById,
   resolveDossierTraceOrigin: mockResolveDossierTraceOrigin,
+  resolveDossierTransportOutput: mockResolveDossierTransportOutput,
 }));
 vi.mock('@/lib/services/dossierCompositePdfService', () => ({ generateDossierCompositePDF: mockGeneratePdf }));
 vi.mock('@/lib/services/collaboratorProductService', () => ({
@@ -74,6 +77,11 @@ describe('GET /api/admin/dossiers/[id]/composite', () => {
       customerId: 'cust-1',
       customerName: 'Anna client',
     });
+    mockResolveDossierTransportOutput.mockResolvedValue({
+      travelKm: 422,
+      travelTollsEur: 18.5,
+      travelLocation: "l'Aldosa",
+    });
     mockGetAnimacioProducts.mockResolvedValue([
       { id: 'p1', nom: 'Bingo', durada: '1h', descripcio: ['Desc'], inclou: ['Equip'] },
     ]);
@@ -94,6 +102,17 @@ describe('GET /api/admin/dossiers/[id]/composite', () => {
 
     expect(res.status).toBe(200);
     expect(res.headers.get('Content-Type')).toBe('application/pdf');
+    expect(mockResolveDossierTransportOutput).toHaveBeenCalledWith({
+      lineSnapshot: null,
+      leadId: 'lead-1',
+    });
+    expect(mockGeneratePdf).toHaveBeenCalledWith(expect.objectContaining({
+      transport: {
+        travelKm: 422,
+        travelTollsEur: 18.5,
+        travelLocation: "l'Aldosa",
+      },
+    }));
     expect(mockAdminLogCreate).toHaveBeenCalledWith({
       data: expect.objectContaining({
         action: 'DOCUMENT_DOSSIER_COMPOSITE_PDF_GENERATED',
@@ -112,6 +131,8 @@ describe('GET /api/admin/dossiers/[id]/composite', () => {
           productCount: 1,
           collaboratorProductCount: 0,
           extrasCount: 1,
+          travelKm: 422,
+          travelTollsEur: 18.5,
         }),
       }),
     });

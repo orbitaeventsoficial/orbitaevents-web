@@ -1732,6 +1732,23 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1736 — 2026-07-08 — codex (FET)
+- Context: l'email/HTML del dossier ja rehidratava transport del lead, però el PDF compost `/api/admin/dossiers/[id]/composite` no passava cap transport a `generateDossierCompositePDF`. Resultat possible: email amb desplaçament i PDF complet sense desplaçament.
+- Fet:
+  - `dossierService` exposa `resolveDossierTransportOutput`, compartit per email i PDF compost.
+  - La ruta composite resol transport del snapshot/lead i el passa a `generateDossierCompositePDF`.
+  - `generateDossierCompositePDF` accepta `transport` i pinta una pàgina `DESPLAÇAMENT` amb `computeDossierTransportBudget` quan hi ha km.
+  - La traça documental del PDF compost inclou `travelKm` i `travelTollsEur`.
+  - Roadmap Manolo actualitzat amb #1736 dins del bloc lead -> dossier -> snapshot/PDF.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\dossierCompositePdfService.test.ts __tests__\app\api\admin\dossiers-composite-route.test.ts __tests__\lib\services\dossierService.test.ts` (30/30); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff --check` OK.
+  - Validació funcional: el mateix transport resolt alimenta email/HTML i PDF compost; el PDF afegeix desplaçament quan hi ha km.
+  - Validació humana/UX: el PDF complet deixa de ser una versió incompleta del dossier enviat.
+- `ADMIN_CHANGE_COUNTER` puja a `1736`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1735 — 2026-07-08 — codex (FET)
 - Context: auditoria E2E `lead -> dossier -> snapshot/PDF`. `sendDossierByEmail` només feia fallback al lead per transport si no hi havia snapshot de productes. Un snapshot antic amb productes congelats però sense `travelTollsEur` podia enviar el dossier sense peatges tot i que el lead els tingués.
 - Fet:
