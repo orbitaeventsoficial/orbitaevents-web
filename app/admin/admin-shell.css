@@ -1684,7 +1684,7 @@ html.admin-mode .ap-rep-person[data-owner="true"] .ap-rep-person-amount { color:
 html.admin-mode .ap-rep-person-sub { font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3); }
 html.admin-mode .ap-rep-table { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--o-r-md); overflow: hidden; }
 html.admin-mode .ap-rep-row {
-  display: grid; grid-template-columns: minmax(0, 2fr) repeat(4, minmax(4rem, 1fr));
+  display: grid; grid-template-columns: minmax(0, 2fr) repeat(5, minmax(4rem, 1fr));
   gap: var(--o-space-2); align-items: baseline;
   padding: var(--o-space-15) var(--o-space-25);
   border-top: 1px solid color-mix(in oklab, var(--line) 55%, transparent);
@@ -1694,6 +1694,7 @@ html.admin-mode .ap-rep-row > span:not(.ap-rep-cell-label) { text-align: right; 
 html.admin-mode .ap-rep-row--head { border-top: 0; background: var(--raised); color: var(--t3); font-size: var(--o-text-micro); text-transform: uppercase; letter-spacing: 0.08em; }
 html.admin-mode .ap-rep-cell-label { color: var(--t); font-family: var(--ui); }
 html.admin-mode .ap-rep-row [data-owner="true"] { color: var(--gold); }
+html.admin-mode .ap-rep-cell-liquidacio { color: var(--gold); }
 html.admin-mode .ap-rep-cell-marge { color: var(--t); font-weight: var(--o-fw-semi); }
 html.admin-mode .ap-rep-totals { display: flex; flex-wrap: wrap; gap: var(--o-space-4); justify-content: flex-end; padding-top: var(--o-space-2); border-top: 1px solid var(--line); }
 html.admin-mode .ap-rep-totals > div { display: flex; flex-direction: column; align-items: flex-end; gap: var(--o-space-05); font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t3); }

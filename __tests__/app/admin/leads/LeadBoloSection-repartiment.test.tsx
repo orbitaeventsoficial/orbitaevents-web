@@ -88,5 +88,8 @@ describe('LeadBoloSection repartiment', () => {
     expect(screen.getByText('Temps ruta conductor · Òrbita')).toBeInTheDocument();
     expect(screen.getByText('Peatges ruta · Òrbita')).toBeInTheDocument();
     expect(screen.getByText('Dieta desplaçament · Òrbita')).toBeInTheDocument();
+    expect(screen.getByText('Operari Òrbita')).toBeInTheDocument();
+    expect(screen.getByText('Cost intern Òrbita')).toBeInTheDocument();
+    expect(screen.getByText('Benefici net Òrbita')).toBeInTheDocument();
   });
 });

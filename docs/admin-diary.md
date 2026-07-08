@@ -1,3 +1,28 @@
+## 2026-07-08 — Manolo: repartiment real net/brut/cost intern (Canvi #1730, codex)
+
+### Context
+El propietari detecta que `Qui cobra què` encara enganya: les hores, vehicle i dietes d'Òrbita no són benefici d'Òrbita, són costos reals d'operari/vehicle. A més, el tècnic inclòs fet per Òrbita sortia com a cobrament negatiu de Masquerade. Mirada Manolo: una màquina de gestió no pot confondre caixa bruta amb benefici net.
+
+### Què s'ha fet
+- `computeBoloRepartiment` separa `pagamentsCollaboradors`, `liquidacionsCapAOrbita`, `brutOrbita`, `costInternOrbita` i `partOrbita` net.
+- Les liquidacions negatives de proveïdor es mostren com a cobrament cap a Òrbita, no com a `cobra -40`.
+- Els costos propis d'Òrbita (vehicle, operari, dietes, fallback transport) resten del benefici net i es veuen element a element.
+- `RepartimentPanel` canvia llenguatge i taula: cost/liquidació, qui cobra, import, net Òrbita, brut, cost intern i benefici net.
+- El cuadrant mensual hereta el mateix net/brut/cost intern; collaborator payout ja no marca imports negatius com a pagaments.
+- La fitxa de reserva afegeix `Transport client` via `computeBoloTransport` i fallback `Cost intern transport · Òrbita` quan una reserva antiga té `travelCost` però no línies `[travel-cost]`.
+- Auditoria read-only de BD: el lead Alba Orna queda en client `808,96 €`, Masquerade `272,50 €`, brut Òrbita `536,46 €`, cost intern `219,46 €`, net Òrbita `317 €`; també s'han detectat 4 reserves antigues amb `travelCost` sense línies de ruta, cobertes pel fallback.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\repartimentService.test.ts __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\lib\services\crewScheduleService.test.ts __tests__\lib\services\collaboratorPayoutService.test.ts __tests__\lib\services\leadServiceLineService.test.ts` (49/49); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:smoke-detail` OK; `pnpm build` OK.
+- Validació funcional: els tests blinden tècnic inclòs compensat a Òrbita, costos de ruta propis restats del net, combinació Bingo+DJ+transport, i la UI del lead exigint `Operari Òrbita`, `Cost intern Òrbita` i `Benefici net Òrbita`.
+- Validació humana/UX: el panell deixa d'ensenyar brut com a benefici; el propietari veu producte, hores, cotxe, dietes, qui cobra i net real abans i després de reserva.
+
+### Coordinació
+Counter → 1730. Canvi limitat al motor de repartiment, panells de lead/reserva/cuadrant, fallback de reserva antiga, payout de col·laborador i tests; sense schema ni migració.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Manolo: `Qui cobra què` complet al lead i peatges heretats al dossier (Canvi #1729, codex)
 
 ### Context

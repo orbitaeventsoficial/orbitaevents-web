@@ -15,7 +15,7 @@ import CalendarSyncButton from './CalendarSyncButton';
 import PostEventEmailButton from './PostEventEmailButton';
 import BookingMarginCard from './BookingMarginCard';
 import RepartimentPanel from './RepartimentPanel';
-import { deriveTravelHeadcount } from '@/lib/services/travelLaborCost';
+import { computeBoloTransport, deriveTravelHeadcount, TRAVEL_COST_LINE_MARKER } from '@/lib/services/travelLaborCost';
 import { computeBoloRepartiment } from '@/lib/services/repartimentService';
 import BookingServiceLinesEditor from './BookingServiceLinesEditor';
 import type { BookingServiceLineFormInput } from '../booking-form.types';
@@ -95,6 +95,10 @@ const BOOKING_RISK_ACTION_TONE: Record<BookingRiskAction['tone'], { box: string;
   warning: { box: 'admin-tone-border-warning admin-tone-bg-warning', text: 'admin-tone-text-warning' },
   danger: { box: 'admin-tone-border-danger admin-tone-bg-danger', text: 'admin-tone-text-danger' },
 };
+
+function isTravelCostLine(line: { notes?: string | null }): boolean {
+  return Boolean(line.notes?.includes(TRAVEL_COST_LINE_MARKER));
+}
 
 function BookingRiskActionCallout({ action, value }: { action: BookingRiskAction; value: ReactNode }) {
   const tone = BOOKING_RISK_ACTION_TONE[action.tone];
@@ -272,15 +276,46 @@ export default async function BookingDetailPage({ params }: PageProps) {
   // + les serviceLines (amb el seu collaboratorId) → la part d'Òrbita quadra.
   const packName = booking.pack?.translations?.find((t: { locale: string; name: string }) => t.locale === 'ca')?.name
     ?? booking.pack?.translations?.[0]?.name ?? booking.pack?.service ?? 'Pack';
+  const bookingServiceLines = booking.serviceLines ?? [];
+  const hasDetailedTravelCostLines = bookingServiceLines.some(isTravelCostLine);
+  const repartimentTravel = typeof bookingCompat.distanceKm === 'number' && bookingCompat.distanceKm > 0
+    ? computeBoloTransport({
+        roundTripKm: bookingCompat.distanceKm,
+        serviceLines: bookingServiceLines,
+        hasOrbitaPack: packPrice > 0,
+        tollsEur: typeof bookingCompat.tollsEur === 'number' ? bookingCompat.tollsEur : 0,
+        vehicleCostPerKm: bookingCompat.fuelCostPerKm ?? undefined,
+      })
+    : null;
+  const storedTravelCost = typeof bookingCompat.travelCost === 'number' && bookingCompat.travelCost > 0
+    ? Number(bookingCompat.travelCost.toFixed(2))
+    : 0;
   const repartimentLines = [
     ...(packPrice > 0 ? [{ label: `Pack · ${packName}`, kind: 'PACK', revenueAmount: packPrice, costAmount: 0, quantity: 1, collaboratorId: null }] : []),
     ...(extrasTotal > 0 ? [{ label: 'Extres', kind: 'EXTRA', revenueAmount: extrasTotal, costAmount: 0, quantity: 1, collaboratorId: null }] : []),
     ...(extraHours > 0 && extraHourPrice > 0 ? [{ label: `Hores extra (${extraHours})`, kind: 'EXTRA_HOURS', revenueAmount: extraHours * extraHourPrice, costAmount: 0, quantity: 1, collaboratorId: null }] : []),
-    ...(booking.serviceLines ?? []),
+    ...(repartimentTravel && repartimentTravel.clientCharge > 0 ? [{
+      label: 'Transport client',
+      kind: 'OTHER',
+      revenueAmount: repartimentTravel.clientCharge,
+      costAmount: 0,
+      quantity: 1,
+      collaboratorId: null,
+    }] : []),
+    ...bookingServiceLines,
+    ...(!hasDetailedTravelCostLines && storedTravelCost > 0 ? [{
+      label: 'Cost intern transport · Òrbita',
+      kind: 'OTHER',
+      revenueAmount: 0,
+      costAmount: storedTravelCost,
+      quantity: 1,
+      collaboratorId: null,
+      notes: `${TRAVEL_COST_LINE_MARKER} booking.travelCost fallback`,
+    }] : []),
   ];
   const repartiment = computeBoloRepartiment(repartimentLines);
   const repartimentNames: Record<string, string> = {};
-  for (const l of booking.serviceLines ?? []) {
+  for (const l of bookingServiceLines) {
     const c = (l as { collaborator?: { id: string; name: string } | null }).collaborator;
     if (c) repartimentNames[c.id] = c.name;
   }

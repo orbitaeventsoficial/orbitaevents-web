@@ -8,10 +8,13 @@
    Model (decisió del propietari): cost ABSOLUT en € per línia (sense comissió %).
    - Cada línia porta `revenueAmount` (el que paga el client), `costAmount` (el que
      cobra qui la fa) i `collaboratorId` (qui la fa; buit = Òrbita).
-   - Un col·laborador rep `costAmount × quantity` de les seves línies.
-   - Òrbita rep la resta del que paga el client: `clientTotal − Σ(costos tercers)`.
-     (El cost operatiu propi i el CAC són costos INTERNS d'Òrbita — no són repartiment;
-      viuen a `computeBookingFinancialSummary` per al marge net real.)
+   - Un col·laborador rep el saldo net positiu de les seves línies. Si `costAmount`
+     és negatiu en una línia amb `collaboratorId`, és una liquidació cap a Òrbita
+     (ex.: el tècnic inclòs el posa Òrbita i el proveïdor el compensa).
+   - Òrbita té dues magnituds separades:
+     `brutOrbita = clientTotal − saldoTercers` i
+     `partOrbita = brutOrbita − costosInternsOrbita`.
+     Això evita confondre caixa bruta amb benefici real.
    - El transport reparteix sol: les línies `[travel-cost]` porten el `collaboratorId`
      de qui posa el cotxe / condueix / viatja → el seu cost va a aquella persona.
 ============================================================================ */
@@ -35,17 +38,22 @@ export interface RepartimentElement {
   clientPaga: number;      // revenueAmount × quantity
   beneficiariId: string;   // collaboratorId | REPARTIMENT_OWNER_KEY
   esOrbita: boolean;
-  cobra: number;           // el que rep el beneficiari d'aquesta línia
-  cost: number;            // costAmount × quantity (informatiu; útil quan clientPaga = 0)
-  margeOrbita: number;     // clientPaga − cobra (marge de revenda d'Òrbita en aquesta línia)
+  cobra: number;           // import que es queda/cobra el beneficiari visible de la línia
+  cost: number;            // cost o liquidació visible en positiu
+  costExtern: number;      // saldo signat del tercer (pot ser negatiu si liquida cap a Òrbita)
+  costInternOrbita: number;// cost real assumit per Òrbita: operari, cotxe, dieta, peatges...
+  liquidacioOrbita: number;// import que un tercer ha de compensar a Òrbita
+  margeOrbita: number;     // impacte net d'aquesta línia sobre Òrbita
 }
 
 /** Agregat per persona (qui rep quant en total d'aquest bolo). */
 export interface RepartimentPerson {
   personId: string;        // collaboratorId | REPARTIMENT_OWNER_KEY
   esOrbita: boolean;
-  rep: number;             // total que rep
+  rep: number;             // tercers: saldo que cobren; Òrbita: benefici net conegut
   linies: number;          // nre. de línies que li corresponen
+  brut?: number;           // només Òrbita: caixa bruta abans de costos interns
+  costIntern?: number;     // només Òrbita: costos interns coneguts
 }
 
 export interface BoloRepartiment {
@@ -53,8 +61,12 @@ export interface BoloRepartiment {
   perPersona: RepartimentPerson[];
   totals: {
     clientTotal: number;    // suma del que paga el client
-    aCollaboradors: number; // suma del que cobren els tercers
-    partOrbita: number;     // clientTotal − aCollaboradors (part bruta d'Òrbita)
+    aCollaboradors: number; // saldo net dels tercers (pagaments - liquidacions cap a Òrbita)
+    pagamentsCollaboradors: number; // suma positiva que s'ha de pagar a tercers
+    liquidacionsCapAOrbita: number; // compensacions que tercers fan a Òrbita
+    costInternOrbita: number; // costos interns coneguts d'Òrbita
+    brutOrbita: number;     // clientTotal − aCollaboradors
+    partOrbita: number;     // brutOrbita − costInternOrbita
   };
 }
 
@@ -64,6 +76,10 @@ function round2(value: number): number {
 
 function nonNegativeMoney(value?: number | null): number {
   return round2(typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0);
+}
+
+function positiveQuantity(value?: number | null): number {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 1;
 }
 
 /**
@@ -111,41 +127,85 @@ export function computeBoloRepartiment(lines: RepartimentLine[]): BoloRepartimen
   const collab = new Map<string, { rep: number; linies: number }>();
   let clientTotal = 0;
   let aCollaboradors = 0;
+  let pagamentsCollaboradors = 0;
+  let liquidacionsCapAOrbita = 0;
+  let costInternOrbita = 0;
+  let liniesOrbita = 0;
 
   for (const l of lines) {
-    const qty = l.quantity || 1;
+    const qty = positiveQuantity(l.quantity);
     const clientPaga = round2((l.revenueAmount || 0) * qty);
-    const cost = round2((l.costAmount || 0) * qty);
+    const signedCost = round2((l.costAmount || 0) * qty);
+    const visibleCost = round2(Math.abs(signedCost));
     clientTotal = round2(clientTotal + clientPaga);
 
     if (l.collaboratorId) {
-      aCollaboradors = round2(aCollaboradors + cost);
+      aCollaboradors = round2(aCollaboradors + signedCost);
+      if (signedCost > 0) pagamentsCollaboradors = round2(pagamentsCollaboradors + signedCost);
+      if (signedCost < 0) liquidacionsCapAOrbita = round2(liquidacionsCapAOrbita + Math.abs(signedCost));
       const bucket = collab.get(l.collaboratorId) ?? { rep: 0, linies: 0 };
-      bucket.rep = round2(bucket.rep + cost);
+      bucket.rep = round2(bucket.rep + signedCost);
       bucket.linies += 1;
       collab.set(l.collaboratorId, bucket);
+
+      const isLiquidacioCapAOrbita = signedCost < 0;
+      if (isLiquidacioCapAOrbita) liniesOrbita += 1;
       elements.push({
         label: l.label || '', kind: l.kind || 'OTHER',
-        clientPaga, beneficiariId: l.collaboratorId, esOrbita: false,
-        cobra: cost, cost, margeOrbita: round2(clientPaga - cost),
+        clientPaga,
+        beneficiariId: isLiquidacioCapAOrbita ? REPARTIMENT_OWNER_KEY : l.collaboratorId,
+        esOrbita: isLiquidacioCapAOrbita,
+        cobra: visibleCost,
+        cost: visibleCost,
+        costExtern: signedCost,
+        costInternOrbita: 0,
+        liquidacioOrbita: isLiquidacioCapAOrbita ? visibleCost : 0,
+        margeOrbita: round2(clientPaga - signedCost),
       });
     } else {
-      // Òrbita executa: es queda el PVP de la línia (la seva part d'aquesta peça).
+      const ownCost = signedCost > 0 ? signedCost : 0;
+      costInternOrbita = round2(costInternOrbita + ownCost);
+      liniesOrbita += 1;
       elements.push({
         label: l.label || '', kind: l.kind || 'OTHER',
         clientPaga, beneficiariId: REPARTIMENT_OWNER_KEY, esOrbita: true,
-        cobra: clientPaga, cost, margeOrbita: clientPaga,
+        cobra: clientPaga > 0 ? clientPaga : ownCost,
+        cost: ownCost,
+        costExtern: 0,
+        costInternOrbita: ownCost,
+        liquidacioOrbita: 0,
+        margeOrbita: round2(clientPaga - ownCost),
       });
     }
   }
 
-  const partOrbita = round2(clientTotal - aCollaboradors);
+  const brutOrbita = round2(clientTotal - aCollaboradors);
+  const partOrbita = round2(brutOrbita - costInternOrbita);
   const perPersona: RepartimentPerson[] = [
-    { personId: REPARTIMENT_OWNER_KEY, esOrbita: true, rep: partOrbita, linies: elements.filter((e) => e.esOrbita).length },
+    {
+      personId: REPARTIMENT_OWNER_KEY,
+      esOrbita: true,
+      rep: partOrbita,
+      linies: liniesOrbita,
+      brut: brutOrbita,
+      costIntern: costInternOrbita,
+    },
     ...[...collab.entries()]
       .map(([personId, b]) => ({ personId, esOrbita: false, rep: b.rep, linies: b.linies }))
       .sort((a, b) => b.rep - a.rep),
   ];
 
-  return { elements, perPersona, totals: { clientTotal, aCollaboradors, partOrbita } };
+  return {
+    elements,
+    perPersona,
+    totals: {
+      clientTotal,
+      aCollaboradors,
+      pagamentsCollaboradors,
+      liquidacionsCapAOrbita,
+      costInternOrbita,
+      brutOrbita,
+      partOrbita,
+    },
+  };
 }

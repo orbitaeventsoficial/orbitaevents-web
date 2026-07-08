@@ -131,7 +131,7 @@ export async function loadCollaboratorPayout(collaboratorId: string): Promise<Co
     const repartiment = computeBoloRepartiment(lines);
     const mine = repartiment.perPersona.find((p) => !p.esOrbita && p.personId === collaboratorId);
     const amount = round2(mine?.rep ?? 0);
-    if (amount === 0) return; // no cobra res en aquest bolo
+    if (amount <= 0) return; // no hi ha import positiu a pagar-li en aquest bolo
     const payment = paidByParent.get(parentId);
     const isFuture = ctx.eventDate ? ctx.eventDate.getTime() > now.getTime() : false;
     const status: PayoutBoloStatus = payment ? 'PAGAT' : isFuture ? 'PREVI' : 'ENTREGAT';

@@ -1732,6 +1732,23 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1730 — 2026-07-08 — codex (FET)
+- Context: el propietari detecta que `Qui cobra què` encara no era un repartiment real: les hores, vehicle i dietes d'Òrbita es veien com si fossin benefici, i una compensació de tècnic inclòs podia aparèixer com a cobrament negatiu de Masquerade. Mirada Manolo: cal separar caixa bruta, cost intern i benefici net abans que el lead/reserva sigui fiable.
+- Fet:
+  - `computeBoloRepartiment` separa `pagamentsCollaboradors`, `liquidacionsCapAOrbita`, `brutOrbita`, `costInternOrbita` i `partOrbita` net.
+  - Les liquidacions negatives de proveïdor es mostren com a cobrament cap a Òrbita, no com a `cobra -40`; els pagaments de col·laborador ignoren imports negatius.
+  - Els costos propis d'Òrbita (vehicle, operari, dietes i fallback de transport de reserva antiga) resten del benefici net i es veuen element a element.
+  - `RepartimentPanel` i el cuadrant mensual adopten el mateix llenguatge: cost/liquidació, qui cobra, import, brut Òrbita, cost intern i benefici net.
+  - La fitxa de reserva afegeix `Transport client` via `computeBoloTransport` i fallback `Cost intern transport · Òrbita` si hi ha `travelCost` però no línies `[travel-cost]`.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\repartimentService.test.ts __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\lib\services\crewScheduleService.test.ts __tests__\lib\services\collaboratorPayoutService.test.ts __tests__\lib\services\leadServiceLineService.test.ts` (49/49); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:smoke-detail` OK; `pnpm build` OK.
+  - Validació funcional: BD read-only sobre Alba Orna dona client `808,96 €`, Masquerade `272,50 €`, brut Òrbita `536,46 €`, cost intern `219,46 €` i net Òrbita `317 €`; també es detecten 4 reserves antigues amb `travelCost` sense línies de ruta, cobertes pel fallback.
+  - Validació humana/UX: el panell deixa d'ensenyar brut com a benefici; el propietari veu producte, hores, cotxe, dietes, qui cobra i net real abans i després de reserva.
+- `ADMIN_CHANGE_COUNTER` puja a `1730`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1729 — 2026-07-08 — codex (FET)
 - Context: el propietari pregunta si al `qui cobra què` del lead falten transport, hores de viatge i dietes, i si el dossier queda prou especificat. Mirada Manolo: un canvi no és Zenit si lead, dossier i reserva mostren la pasta en fragments que no quadren.
 - Fet:

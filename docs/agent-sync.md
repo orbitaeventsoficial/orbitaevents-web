@@ -66,12 +66,12 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
-[codex] 2026-07-08 [ESTAT: tancat — Manolo: transport/hores/dietes dins qui cobra que + peatges dossier #1729]
-Perimetre: `/admin/leads/[id]`, cervells `repartimentService`/`travelLaborCost`, transport de dossier i snapshot; `Qui cobra què` del lead inclou serveis + transport client + vehicle + hores + peatges + dietes, i el dossier hereta/congela peatges.
-Ultim canvi: #1729.
-Validacio: test focal 68/68; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm build` OK (`validate:core`, 72 tests scripts/628 asserts, `tsc`, Next build).
-Proper pas previst: commit+push+deploy del paquet #1729; despres continuar auditoria Zenit amb el seguent error real.
-Avis claude: no he tocat schema Prisma ni BD viva; tall de cablejat i UI admin amb cervells compartits, stage split lead estimat vs reserva veritat final intacte.
+[codex] 2026-07-08 [ESTAT: tancat — Manolo: repartiment real net/brut/cost intern #1730]
+Perimetre: `repartimentService`, `RepartimentPanel`, lead/reserva/cuadrant/payout i fallback de reserves antigues amb `travelCost` sense `[travel-cost]`; sense schema ni migració.
+Ultim canvi: #1730.
+Validacio: tests focalitzats 49/49; `npx tsc --noEmit --pretty false` OK; BD read-only Alba Orna net Òrbita 317 € i Masquerade 272,50 €; `pnpm run qa:smoke-detail` OK; `pnpm build` OK.
+Proper pas previst: continuar auditoria Manolo E2E pels altres punts recents, prioritzant fallos reals de BD/UI abans d'afegir funcio nova.
+Avis claude: el contracte de `BoloRepartiment` ara separa brut, cost intern i net; no tornar a usar `partOrbita` com a caixa bruta. Booking antic amb `travelCost` sense línies té fallback visual, no migració.
 
 [codex] 2026-07-08 [ESTAT: tancat — Repartiment estimat visible al lead #1728]
 Perimetre: `/admin/leads/[id]` nomes; mostrar al lead el mateix cervell `computeBoloRepartiment` que ja usa la reserva, com a estimacio pre-reserva per dossiers/decisio comercial.

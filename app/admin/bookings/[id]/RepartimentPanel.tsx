@@ -16,6 +16,26 @@ export default function RepartimentPanel({
 }) {
   const nameOf = (id: string) => (id === REPARTIMENT_OWNER_KEY ? 'Òrbita' : names[id] ?? 'Col·laborador');
   const { elements, perPersona, totals } = repartiment;
+  const ownerMovementLabel = (label: string) => {
+    if (label.startsWith('Temps ruta')) return 'Operari Òrbita';
+    if (label.startsWith('Vehicle ruta')) return 'Vehicle Òrbita';
+    if (label.startsWith('Peatges ruta')) return 'Vehicle Òrbita';
+    if (label.startsWith('Dieta desplaçament')) return 'Dieta Òrbita';
+    return 'Òrbita';
+  };
+  const payeeLabel = (e: BoloRepartiment['elements'][number]) => {
+    if (!e.esOrbita) return nameOf(e.beneficiariId);
+    if (e.costInternOrbita > 0 && e.clientPaga === 0) return ownerMovementLabel(e.label);
+    return nameOf(e.beneficiariId);
+  };
+  const personSub = (p: BoloRepartiment['perPersona'][number]) => {
+    if (!p.esOrbita) return `saldo net · ${p.linies} ${p.linies === 1 ? 'línia' : 'línies'}`;
+    return `benefici net · brut ${formatCurrency(p.brut ?? p.rep)} · cost intern ${formatCurrency(p.costIntern ?? 0)}`;
+  };
+  const costOrSettlement = (e: BoloRepartiment['elements'][number]) => {
+    if (e.liquidacioOrbita > 0) return `+${formatCurrency(e.liquidacioOrbita)}`;
+    return e.cost > 0 ? formatCurrency(e.cost) : '—';
+  };
 
   return (
     <div className="ap-rep">
@@ -25,7 +45,7 @@ export default function RepartimentPanel({
           <div key={p.personId} className="ap-rep-person" data-owner={p.esOrbita ? 'true' : undefined}>
             <span className="ap-rep-person-name">{nameOf(p.personId)}{p.esOrbita ? ' (tu)' : ''}</span>
             <strong className="ap-rep-person-amount">{formatCurrency(p.rep)}</strong>
-            <span className="ap-rep-person-sub">{p.linies} {p.linies === 1 ? 'línia' : 'línies'}</span>
+            <span className="ap-rep-person-sub">{personSub(p)}</span>
           </div>
         ))}
       </div>
@@ -35,16 +55,18 @@ export default function RepartimentPanel({
         <div className="ap-rep-row ap-rep-row--head" role="row">
           <span role="columnheader">Element</span>
           <span role="columnheader">Client paga</span>
+          <span role="columnheader">Cost/liquid.</span>
           <span role="columnheader">Qui cobra</span>
-          <span role="columnheader">Cobra</span>
-          <span role="columnheader">Marge Òrbita</span>
+          <span role="columnheader">Import</span>
+          <span role="columnheader">Net Òrbita</span>
         </div>
         {elements.map((e, i) => (
           <div key={i} className="ap-rep-row" role="row">
             <span className="ap-rep-cell-label" role="cell">{e.label || '—'}</span>
             <span role="cell">{formatCurrency(e.clientPaga)}</span>
-            <span role="cell" data-owner={e.esOrbita ? 'true' : undefined}>{nameOf(e.beneficiariId)}</span>
-            <span role="cell">{e.esOrbita ? '—' : formatCurrency(e.cobra)}</span>
+            <span role="cell" className={e.liquidacioOrbita > 0 ? 'ap-rep-cell-liquidacio' : undefined}>{costOrSettlement(e)}</span>
+            <span role="cell" data-owner={e.esOrbita ? 'true' : undefined}>{payeeLabel(e)}</span>
+            <span role="cell">{e.cobra > 0 ? formatCurrency(e.cobra) : '—'}</span>
             <span role="cell" className="ap-rep-cell-marge">{formatCurrency(e.margeOrbita)}</span>
           </div>
         ))}
@@ -53,8 +75,13 @@ export default function RepartimentPanel({
       {/* Totals */}
       <div className="ap-rep-totals">
         <div><span>Client paga</span><strong>{formatCurrency(totals.clientTotal)}</strong></div>
-        <div><span>A col·laboradors</span><strong>{formatCurrency(totals.aCollaboradors)}</strong></div>
-        <div className="ap-rep-totals--orbita"><span>Part Òrbita</span><strong>{formatCurrency(totals.partOrbita)}</strong></div>
+        <div><span>Pagaments tercers</span><strong>{formatCurrency(totals.pagamentsCollaboradors)}</strong></div>
+        {totals.liquidacionsCapAOrbita > 0 && (
+          <div><span>Liquidació a Òrbita</span><strong>{formatCurrency(totals.liquidacionsCapAOrbita)}</strong></div>
+        )}
+        <div><span>Brut Òrbita</span><strong>{formatCurrency(totals.brutOrbita)}</strong></div>
+        <div><span>Cost intern Òrbita</span><strong>{formatCurrency(totals.costInternOrbita)}</strong></div>
+        <div className="ap-rep-totals--orbita"><span>Benefici net Òrbita</span><strong>{formatCurrency(totals.partOrbita)}</strong></div>
       </div>
     </div>
   );

@@ -10,8 +10,9 @@
  *   SOLAPAMENTS (mateixa persona, franges que xoquen) i disponibilitat.
  * - Repartiment: qui cobra què per període (cash a col·laboradors + part del propietari).
  *
- * Diners: el repartiment és FLUX DE CAIXA (costAmount real per línia de col·laborador),
- * no marge — el marge/net segueix vivint a costEngine. No es reimplementa cap regla.
+ * Diners: el repartiment separa caixa client, saldo de tercers, cost intern d'Òrbita
+ * i benefici net conegut. El marge financer complet (CAC, operatiu general...) segueix
+ * vivint a costEngine. No es reimplementa cap regla.
  */
 
 import { prisma } from '@/lib/prisma';
@@ -361,13 +362,21 @@ export interface PayoutBolo {
 }
 export interface PayoutPeriodResult {
   people: PayoutByPerson[];
-  totals: { revenue: number; collaboratorCost: number; ownerNet: number };
+  totals: {
+    revenue: number;
+    collaboratorCost: number;
+    collaboratorPayments: number;
+    collaboratorSettlements: number;
+    ownerGross: number;
+    internalCost: number;
+    ownerNet: number;
+  };
   bolos: PayoutBolo[];
 }
 
 /**
- * Repartiment de caixa: per col·laborador, el que cobra (Σ costAmount×qty de les
- * seves línies); per al propietari, la seva part = ingrés total − pagat a col·laboradors.
+ * Repartiment de caixa i cost: per col·laborador, el saldo net que cobra; per al
+ * propietari, benefici net conegut = brut d'Òrbita − costos interns.
  */
 export function buildPayoutSummary(
   lines: CrewLineInput[],
@@ -388,19 +397,30 @@ export function buildPayoutSummary(
   const person = new Map<string, { name: string; amount: number; count: number; events: PayoutEvent[] }>();
   let totalRevenue = 0;
   let totalCollaboratorCost = 0;
+  let totalCollaboratorPayments = 0;
+  let totalCollaboratorSettlements = 0;
+  let totalOwnerGross = 0;
+  let totalInternalCost = 0;
+  let totalOwnerNet = 0;
+  const roundMoney = (value: number) => Math.round(value * 100) / 100;
 
   for (const [parentId, bolo] of byBolo.entries()) {
     const repartiment = computeBoloRepartiment(bolo.lines);
     bolos.push({ parentId, parentRef: bolo.parentRef, dateKey: bolo.dateKey, repartiment });
-    totalRevenue += repartiment.totals.clientTotal;
-    totalCollaboratorCost += repartiment.totals.aCollaboradors;
+    totalRevenue = roundMoney(totalRevenue + repartiment.totals.clientTotal);
+    totalCollaboratorCost = roundMoney(totalCollaboratorCost + repartiment.totals.aCollaboradors);
+    totalCollaboratorPayments = roundMoney(totalCollaboratorPayments + repartiment.totals.pagamentsCollaboradors);
+    totalCollaboratorSettlements = roundMoney(totalCollaboratorSettlements + repartiment.totals.liquidacionsCapAOrbita);
+    totalOwnerGross = roundMoney(totalOwnerGross + repartiment.totals.brutOrbita);
+    totalInternalCost = roundMoney(totalInternalCost + repartiment.totals.costInternOrbita);
+    totalOwnerNet = roundMoney(totalOwnerNet + repartiment.totals.partOrbita);
 
     for (const pp of repartiment.perPersona) {
       if (pp.rep === 0) continue;
       const key = pp.esOrbita ? OWNER_KEY : pp.personId;
       const name = pp.esOrbita ? OWNER_NAME : (names.get(pp.personId) ?? 'Col·laborador');
       const bucket = person.get(key) ?? { name, amount: 0, count: 0, events: [] };
-      bucket.amount = Math.round((bucket.amount + pp.rep) * 100) / 100;
+      bucket.amount = roundMoney(bucket.amount + pp.rep);
       bucket.count += 1;
       bucket.events.push({ parentRef: bolo.parentRef, dateKey: bolo.dateKey, amount: pp.rep });
       person.set(key, bucket);
@@ -431,9 +451,13 @@ export function buildPayoutSummary(
   return {
     people,
     totals: {
-      revenue: Math.round(totalRevenue * 100) / 100,
-      collaboratorCost: Math.round(totalCollaboratorCost * 100) / 100,
-      ownerNet: Math.round((totalRevenue - totalCollaboratorCost) * 100) / 100,
+      revenue: roundMoney(totalRevenue),
+      collaboratorCost: roundMoney(totalCollaboratorCost),
+      collaboratorPayments: roundMoney(totalCollaboratorPayments),
+      collaboratorSettlements: roundMoney(totalCollaboratorSettlements),
+      ownerGross: roundMoney(totalOwnerGross),
+      internalCost: roundMoney(totalInternalCost),
+      ownerNet: roundMoney(totalOwnerNet),
     },
     bolos,
   };

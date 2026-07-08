@@ -46,17 +46,26 @@ export default async function RepartimentPage({ searchParams }: { searchParams: 
       </div>
 
       {/* Totals */}
-      <div className="mb-5 grid grid-cols-1 gap-2 sm:grid-cols-3">
+      <div className="mb-5 grid grid-cols-1 gap-2 sm:grid-cols-4">
         <div className="ap-card p-3 text-center">
           <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Facturat (client)</p>
           <p className="text-xl font-bold">{formatCurrency(payout.totals.revenue)}</p>
         </div>
         <div className="rounded-xl border admin-tone-border-warning admin-tone-bg-warning p-3 text-center">
-          <p className="text-xs font-semibold uppercase tracking-wider opacity-50">A col·laboradors</p>
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Saldo tercers</p>
           <p className="text-xl font-bold admin-tone-text-warning">{formatCurrency(payout.totals.collaboratorCost)}</p>
+          <p className="text-[11px] opacity-50">
+            {formatCurrency(payout.totals.collaboratorPayments)} pagaments
+            {payout.totals.collaboratorSettlements > 0 ? ` · ${formatCurrency(payout.totals.collaboratorSettlements)} a Òrbita` : ''}
+          </p>
         </div>
         <div className="rounded-xl border admin-tone-border-success admin-tone-bg-success p-3 text-center">
-          <p className="text-xs font-semibold uppercase tracking-wider opacity-50">La teva part</p>
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Brut Òrbita</p>
+          <p className="text-xl font-bold admin-tone-text-success">{formatCurrency(payout.totals.ownerGross)}</p>
+          <p className="text-[11px] opacity-50">{formatCurrency(payout.totals.internalCost)} cost intern</p>
+        </div>
+        <div className="rounded-xl border admin-tone-border-success admin-tone-bg-success p-3 text-center">
+          <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Benefici net</p>
           <p className="text-xl font-bold admin-tone-text-success">{formatCurrency(payout.totals.ownerNet)}</p>
         </div>
       </div>
@@ -86,7 +95,7 @@ export default async function RepartimentPage({ searchParams }: { searchParams: 
                     </Link>
                   )}
                   <span className="text-xs font-normal opacity-50">
-                    {person.isOwner ? 'es queda' : 'cobra'} · {person.assignments} {person.assignments === 1 ? 'feina' : 'feines'}
+                    {person.isOwner ? 'net' : 'cobra'} · {person.assignments} {person.assignments === 1 ? 'feina' : 'feines'}
                   </span>
                 </h3>
                 <span className={`text-lg font-bold tabular-nums ${person.isOwner ? 'admin-tone-text-success' : 'admin-tone-text-warning'}`}>
