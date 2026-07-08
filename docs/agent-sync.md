@@ -66,6 +66,13 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-08 [ESTAT: tancat — Manolo simplifica lead/dossier #1745]
+Perimetre: `/admin/leads/[id]`, `RepartimentPanel`, `BoloTripCard`, dossier HTML/PDF, generador de dossiers, copy de pressupost i docs. Objectiu complert: lead curt i decisional, detall intern reservat a reserva/economia, dossier amb imatges completes.
+Ultim canvi: #1745.
+Validacio: tests focalitzats 40/40 OK; `npx tsc --noEmit --pretty false` OK; `qa:protocol` OK; `qa:zenit-roadmap` OK; `git diff --check` OK; `validate:core` OK.
+Proper pas previst: commit i push del #1745; després continuar E2E lead -> dossier -> reserva si el propietari ho demana.
+Avis claude: no he tocat schema, BD, motors econòmics ni `app/admin/tasks`; el canvi és presentació/lectura i documentació.
+
 [codex] 2026-07-08 [ESTAT: tancat — lectura protocol de treball]
 Perimetre: lectura del protocol viu demanada pel propietari i resum operatiu; sense codi, sense schema, sense BD, sense runtime i sense `ADMIN_CHANGE_COUNTER`.
 Ultim canvi: #1744.

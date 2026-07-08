@@ -1733,6 +1733,25 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1745 — 2026-07-08 — codex (FET)
+- Context: el lead havia crescut massa després dels talls de transport/repartiment: `Desplaçament`, `Pacte amb partner` i el rail de marge repetien imports, fórmules i costos interns. En paral·lel, el dossier podia ensenyar imatges de producte massa retallades o massa petites, com el Bingo Musical amb sostre dominant.
+- Fet:
+  - `BoloTripCard` estrena resum compacte de ruta per al lead: total + conceptes agregats (`Vehicle`, `Equip ruta`, `Dietes`, `Peatges`) en comptes de fórmula llarga i liquidació per persona.
+  - `RepartimentPanel` en mode `preproposal` deixa de renderitzar la taula interna i passa a una targeta plana de partner: import a validar, línies netes i compensació Òrbita com a resta.
+  - El rail de marge del lead passa de 10 files comptables a una lectura de decisió: net, producte propi, partner, transport i cost total estimat.
+  - El pressupost deixa de dir `cost real de ruta`; el dossier canvia el detall de vehicle a `km facturables`.
+  - Dossier HTML, PDF compost i selector del generador forcen imatge completa amb `contain`, contenidors més alts/quadrats i capítol PDF amb imatge ampla, no retallada.
+  - Nova auditoria Manolo: `docs/audit/MANOLO-FLUX-LEAD-DOSSIER-PRESSUPOST-RESERVA-1745.md`.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\lib\utils\dossier-html-builder.test.ts __tests__\lib\services\dossierCompositePdfService.test.ts __tests__\app\admin\dossiers\DossierGeneratorClient-catalog-layout.test.ts` OK (40/40); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK; `pnpm run validate:core` OK.
+  - Validació funcional: el lead ja no mostra `Detall intern de costos i ruta`; la ruta surt agregada, el partner es valida sense duplicacions i el dossier força imatges senceres tant en HTML com en PDF/selector.
+  - Validació humana/UX: el propietari veu una decisió curta en lloc d'una auditoria; Masquerade veu només el saldo que ha de validar; el client rep un dossier amb imatges completes i copy comercial net.
+- Roadmap Manolo actualitzat amb #1745 dins de lead/economia/repartiment i dossier.
+- `ADMIN_CHANGE_COUNTER` puja a `1745`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1744 — 2026-07-08 — codex (FET)
 - Context: el #1743 preservava la liquidació oculta `[travel-cost]` quan el lead passava a reserva, però el generador de dossiers encara podia fer un `PUT` de productes al lead amb només línies visibles. Això podia esborrar vehicle, hores, dietes i peatges pactats abans de crear la reserva.
 - Fet:

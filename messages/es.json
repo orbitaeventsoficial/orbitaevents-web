@@ -7205,7 +7205,7 @@
       "travelPriceLabel": "Coste del desplazamiento",
       "travelBreakdownLabel": "Desglose",
       "travelBreakdownVehicle": "Vehículo y combustible",
-      "travelBreakdownVehicleDetail": "{km} km ida y vuelta · {rate}/km",
+      "travelBreakdownVehicleDetail": "{km} km facturables · {rate}/km",
       "travelBreakdownPeople": "{headcount} operarios en ruta · {hours} h",
       "travelBreakdownTolls": "Peajes de ruta",
       "travelBreakdownMeals": "Dietas de ruta larga",

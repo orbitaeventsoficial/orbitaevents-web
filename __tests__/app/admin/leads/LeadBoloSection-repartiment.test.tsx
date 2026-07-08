@@ -21,9 +21,26 @@ vi.mock('@/app/admin/bookings/BookingServiceLinesSection', () => ({
 }));
 
 vi.mock('@/app/admin/components/BoloTripCard', () => ({
-  default: ({ calculationNotes = [] }: { calculationNotes?: string[] }) => (
+  default: ({
+    calculationNotes = [],
+    routeSummaryItems = [],
+    compactRouteSummary = false,
+    effectiveTravelCost = 0,
+  }: {
+    calculationNotes?: string[];
+    routeSummaryItems?: Array<{ label: string; amount: number }>;
+    compactRouteSummary?: boolean;
+    effectiveTravelCost?: number;
+  }) => (
     <div data-testid="trip-card">
-      {calculationNotes.map((note) => <p key={note}>{note}</p>)}
+      {compactRouteSummary ? (
+        <>
+          <p>Total ruta {effectiveTravelCost}</p>
+          {routeSummaryItems.map((item) => <p key={item.label}>{item.label}: {item.amount}</p>)}
+        </>
+      ) : (
+        calculationNotes.map((note) => <p key={note}>{note}</p>)
+      )}
     </div>
   ),
   CROWDED_TRIP_THRESHOLD: 2,
@@ -57,7 +74,7 @@ describe('LeadBoloSection repartiment', () => {
     });
   });
 
-  it('mostra el qui cobra que del lead abans de formalitzar reserva', async () => {
+  it('mostra el pacte curt amb partner abans de formalitzar reserva', async () => {
     render(
       <LeadBoloSection
         leadId="lead-1"
@@ -69,26 +86,23 @@ describe('LeadBoloSection repartiment', () => {
       expect(screen.getByText('Pacte amb partner')).toBeInTheDocument();
     });
 
-    const panel = screen.getByLabelText('Qui cobra què al lead');
+    const panel = screen.getByLabelText('Pacte amb partner al lead');
     expect(panel).toHaveAttribute('id', 'lead-repartiment');
     expect(panel).toHaveClass('ap-ledger-budget--repartiment');
-    expect(screen.getByText('pre-proposta · import a validar abans de crear dossier o pressupost')).toBeInTheDocument();
-    expect(screen.getByText("Lectura per validar amb el partner: què cobra i d'on surt.")).toBeInTheDocument();
-    expect(screen.getByText('import a validar · 1 línia')).toBeInTheDocument();
-    const peopleSummary = panel.querySelector('.ap-rep-people');
-    expect(peopleSummary?.textContent).toContain('Masquerade');
-    expect(peopleSummary?.textContent).not.toContain('Òrbita');
+    expect(screen.getByText('lead · valida import abans de dossier, pressupost o reserva')).toBeInTheDocument();
+    expect(screen.getByText('import a validar')).toBeInTheDocument();
+    expect(panel.textContent).toContain('Masquerade');
+    expect(panel.textContent).not.toContain('Òrbita (tu)');
     expect(screen.queryByText('Òrbita (tu)')).not.toBeInTheDocument();
-    expect(screen.getByText('Detall intern de costos i ruta').closest('details')).not.toHaveAttribute('open');
-    expect(screen.getAllByText('Bingo Musical (Masquerade)').length).toBeGreaterThan(0);
-    const firstRow = screen.getAllByText('Bingo Musical (Masquerade)').find((node) => node.closest('.ap-rep-row'))?.closest('.ap-rep-row');
-    expect(firstRow?.querySelector('[data-label="Client paga"]')).not.toBeNull();
-    expect(firstRow?.querySelector('[data-label="Cost/liquid."]')).not.toBeNull();
-    expect(firstRow?.querySelector('[data-label="Qui cobra"]')).not.toBeNull();
-    expect(firstRow?.querySelector('[data-label="Net Òrbita"]')).not.toBeNull();
+    expect(screen.queryByText('Detall intern de costos i ruta')).not.toBeInTheDocument();
+    expect(screen.queryByText('Detall element a element')).not.toBeInTheDocument();
+    expect(screen.getAllByText('Bingo Musical').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Client paga')).not.toBeInTheDocument();
+    expect(screen.queryByText('Cost/liquid.')).not.toBeInTheDocument();
+    expect(screen.queryByText('Net Òrbita')).not.toBeInTheDocument();
   });
 
-  it('inclou transport, hores de ruta, peatges i dietes al repartiment del lead', async () => {
+  it('manté ruta i dieta al pacte sense ensenyar auditoria interna al lead', async () => {
     mockFetchWithCsrf.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
@@ -134,25 +148,26 @@ describe('LeadBoloSection repartiment', () => {
     );
 
     await waitFor(() => {
-    expect(screen.getByText('Pacte amb partner')).toBeInTheDocument();
+      expect(screen.getByText('Pacte amb partner')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('Transport client')).toBeInTheDocument();
-    expect(screen.getByText('Transport client').closest('.ap-rep-row')?.querySelector('[data-label="Net Òrbita"]')).not.toBeNull();
-    expect(screen.getByText('Temps ruta conductor · Òrbita')).toBeInTheDocument();
-    expect(screen.getAllByText('Temps ruta passatger · Masquerade').length).toBeGreaterThan(0);
-    expect(screen.getByText('Peatges ruta · Òrbita')).toBeInTheDocument();
-    expect(screen.getByText('Dieta desplaçament · Òrbita')).toBeInTheDocument();
-    expect(screen.getAllByText('Dieta desplaçament · Masquerade').length).toBeGreaterThan(0);
-    expect(screen.getByText('Què cobra Masquerade')).toBeInTheDocument();
-    expect(screen.getAllByText((text) => text.includes('Vehicle: 422 km - 50 inclosos = 372 km facturables') && text.includes('96,72')).length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Persones: 6,49 h - 1 h inclosa = 5,5 h facturables arrodonides.').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Hores de ruta: 5,5 h x 15,00 €/h = 82,50 € per persona.').length).toBeGreaterThan(0);
-    expect(screen.getAllByText((text) => text.includes('Dietes: 422 km > 150 km; 30,00') && text.includes('2 persones = 60,00')).length).toBeGreaterThan(0);
-    expect(screen.getByText('Compensació a Òrbita · Tècnic de so inclòs · 1h 30')).toBeInTheDocument();
-    expect(screen.getByText('Operari Òrbita')).toBeInTheDocument();
-    expect(screen.getByText('Cost intern Òrbita')).toBeInTheDocument();
-    expect(screen.getByText('Benefici net Òrbita')).toBeInTheDocument();
+    expect(screen.queryByText('Transport client')).not.toBeInTheDocument();
+    expect(screen.queryByText('Temps ruta conductor · Òrbita')).not.toBeInTheDocument();
+    expect(screen.getAllByText('Temps ruta passatger').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Peatges ruta · Òrbita')).not.toBeInTheDocument();
+    expect(screen.queryByText('Dieta desplaçament · Òrbita')).not.toBeInTheDocument();
+    expect(screen.getAllByText('Dieta desplaçament').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Què cobra Masquerade')).not.toBeInTheDocument();
+    expect(screen.getByText((text) => text.includes('Total ruta') && text.includes('340.22'))).toBeInTheDocument();
+    expect(screen.getByText('Vehicle: 96.72')).toBeInTheDocument();
+    expect(screen.getByText('Equip ruta: 165')).toBeInTheDocument();
+    expect(screen.getByText('Dietes: 60')).toBeInTheDocument();
+    expect(screen.getByText('Peatges: 18.5')).toBeInTheDocument();
+    expect(screen.getByText('Tècnic de so inclòs · 1h 30')).toBeInTheDocument();
+    expect(screen.getByText('-40 €')).toBeInTheDocument();
+    expect(screen.queryByText('Operari Òrbita')).not.toBeInTheDocument();
+    expect(screen.queryByText('Cost intern Òrbita')).not.toBeInTheDocument();
+    expect(screen.queryByText('Benefici net Òrbita')).not.toBeInTheDocument();
   });
 
   it('no embruta la lectura curta quan hi ha ruta sense peatges informats', async () => {

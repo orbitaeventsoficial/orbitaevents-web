@@ -694,29 +694,17 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  </div>
  <div className="ap-ledger-summary-rows">
  {econ.ownServiceRevenue > 0 && (
- <div><span>Producte propi</span><strong>{formatCurrency(econ.ownServiceMarginAmount)} · {Math.round(econ.ownServiceMarginPct)}%</strong></div>
+ <div><span>Producte propi</span><strong>{formatCurrency(econ.ownServiceMarginAmount)} net</strong></div>
  )}
  {econ.subcontractedCost > 0 && (
- <div><span>Subcontractat</span><strong>{econ.subcontractedMarkupOk ? 'OK' : 'Baix'} · +{Math.round(econ.subcontractedMarkupPct)}% sobre cost</strong></div>
- )}
- {econ.orbitaTechIncome > 0 && (
- <div><span>Tècnic Òrbita</span><strong>+{formatCurrency(econ.orbitaTechIncome)}</strong></div>
+ <div><span>Partner</span><strong>{econ.subcontractedMarkupOk ? 'OK' : 'Revisar'} · {formatCurrency(econ.subcontractedMarkupAmount + econ.orbitaTechIncome)} marge</strong></div>
  )}
  {econ.travelCharge != null && (
- <div><span>Transport client</span><strong>{formatCurrency(econ.travelCharge)}</strong></div>
+ <div><span>Transport</span><strong>{formatCurrency(econ.travelCharge)} · {Math.abs(econ.transportMarginAmount) < 0.01 ? 'sense marge' : `${formatCurrency(econ.transportMarginAmount)} marge`}</strong></div>
  )}
- {econ.travelCost != null && (
- <div><span>Cost transport</span><strong>{formatCurrency(econ.travelCost)}</strong></div>
- )}
- {(econ.travelCharge > 0 || econ.travelCost > 0 || econ.transportMarginAmount !== 0) && (
- <div><span>Marge transport</span><strong>{formatCurrency(econ.transportMarginAmount)} · {Math.round(econ.transportMarginPct)}%</strong></div>
- )}
- <div><span>Cost serveis</span><strong>{formatCurrency(econ.serviceLinesCost)}</strong></div>
- <div><span>Operatiu</span><strong>{formatCurrency(econ.fixedOperationalCost)}</strong></div>
- <div><span>Cost origen</span><strong>{formatCurrency(econ.acquisitionCost)}</strong></div>
- <div><span>Cost directe</span><strong>{formatCurrency(econ.directCost)}</strong></div>
+ <div><span>Cost total estimat</span><strong>{formatCurrency(econ.directCost)}</strong></div>
  </div>
- <a className="ap-ledger-summary-jump" href="#lead-repartiment">Validar pacte partner</a>
+ <a className="ap-ledger-summary-jump" href="#lead-repartiment">Validar partner</a>
  </>
  ) : (
  <p className="ap-ledger-econonote">Afegeix línies al bolo per veure el net estimat.</p>

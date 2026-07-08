@@ -165,34 +165,33 @@ function drawProductChapter(doc: jsPDFType, product: AnimacioProduct, index: num
   doc.setFillColor(...COLORS.paperBg);
   doc.rect(0, 0, PAGE.width, PAGE.height, 'F');
 
-  // Imatge del producte a la cantonada superior dreta sense retallar; el text flueix a l'esquerra.
+  // Imatge del producte com a peça visual completa: mai es retalla, el text comença a sota.
   let textWidth = 150;
   let imageBottom = 0;
+  let y = 40;
   if (imageDataUrl) {
     try {
-      const imgBoxW = 62;
-      const imgBoxH = product.id.includes('secret-pirates') ? 74 : 56;
+      const imgBoxW = PDF_DESIGN.right - PDF_DESIGN.left;
+      const imgBoxH = product.id.includes('secret-pirates') ? 96 : 88;
       const props = doc.getImageProperties(imageDataUrl);
       const fitted = fitWithin(props.width, props.height, imgBoxW, imgBoxH);
-      const imgX = PDF_DESIGN.right - fitted.width;
-      const imgY = 32;
+      const imgX = PDF_DESIGN.left + (imgBoxW - fitted.width) / 2;
+      const imgY = 28;
       const format = getImageFormatFromDataUrl(imageDataUrl);
       doc.addImage(imageDataUrl, format, imgX, imgY, fitted.width, fitted.height);
-      textWidth = imgX - PDF_DESIGN.left - 6;
       imageBottom = imgY + fitted.height;
-      // Durada sota la imatge (no solapada amb el header)
       if (product.durada) {
         setStyleCaption(doc);
         doc.setTextColor(...COLORS.gold);
-        doc.text(product.durada, imgX + fitted.width, imageBottom + 5, { align: 'right' });
+        doc.text(product.durada, PDF_DESIGN.right, imageBottom + 5, { align: 'right' });
         imageBottom += 7;
       }
+      y = imageBottom + 14;
     } catch {
       // Si la imatge falla, el capítol continua sense ella.
     }
   }
 
-  let y = 40;
   // Capçalera de categoria (eyebrow) quan comença una secció nova; si no, número de capítol.
   doc.setTextColor(...COLORS.gold);
   doc.setFont('helvetica', 'bold');

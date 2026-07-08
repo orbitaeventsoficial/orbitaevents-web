@@ -1121,7 +1121,7 @@ export default function PresupuestoPdfStudio({
       if (travelCharge > 0) {
         payloadExtras.push({
           name: `Desplaçament (${travelKm.toFixed(0)} km)`,
-          description: `Cost real de ruta: cotxe + temps de tripulació`,
+          description: `Desplaçament calculat per ruta i equip`,
           price: travelCharge,
           quantity: 1,
         });

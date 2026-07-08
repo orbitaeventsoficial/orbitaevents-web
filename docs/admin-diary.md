@@ -1,3 +1,27 @@
+## 2026-07-08 — Manolo simplifica lead, ruta, partner i imatge de dossier (Canvi #1745, codex)
+
+### Context
+El propietari detecta que el lead ha quedat massa gran: `Desplaçament`, `Pacte amb partner` i `Marge del bolo` repeteixen imports, fórmules i costos interns. També avisa que al dossier el Bingo Musical pot quedar mal llegit visualment perquè la imatge ensenya massa sostre i no sempre es percep sencera.
+
+### Què s'ha fet
+- `BoloTripCard` pot mostrar al lead un resum agregat de ruta: total + vehicle/equip/dietes/peatges, sense fórmula llarga ni liquidació per persona.
+- `RepartimentPanel` en mode pre-proposta deixa de renderitzar el detall intern i mostra una targeta plana del partner amb l'import a validar i les línies que afecten el saldo.
+- El rail de marge del lead passa a lectura curta: net, producte propi, partner, transport i cost total estimat.
+- El pressupost i el dossier netegen copy: fora `cost real de ruta`, i el vehicle del dossier diu `km facturables`.
+- Dossier HTML, PDF compost i selector del generador passen a imatge completa sempre (`contain`, contenidor més quadrat/alt i capítol PDF amb imatge ampla).
+- Nova auditoria de flux: `docs/audit/MANOLO-FLUX-LEAD-DOSSIER-PRESSUPOST-RESERVA-1745.md`.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\lib\utils\dossier-html-builder.test.ts __tests__\lib\services\dossierCompositePdfService.test.ts __tests__\app\admin\dossiers\DossierGeneratorClient-catalog-layout.test.ts` OK (40/40); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK; `pnpm run validate:core` OK.
+- Validació funcional: el lead ja no mostra `Detall intern de costos i ruta`, el desplaçament queda sintetitzat, el pacte amb partner no duplica capçaleres/imports i el dossier força imatge sencera en HTML/PDF/generador.
+- Validació humana/UX: menys full de càlcul i més decisió: Òrbita veu si el bolo val la pena, Masquerade veu què valida i el client rep una imatge de producte sencera.
+
+### Coordinació
+Counter -> 1745. Canvi limitat a presentació de lead/dossier/pressupost, tests, roadmap, protocol, diari i sync; sense schema, BD, `app/admin/tasks` ni motors econòmics.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Dossier conserva la liquidació de ruta del lead (Canvi #1744, codex)
 
 ### Context

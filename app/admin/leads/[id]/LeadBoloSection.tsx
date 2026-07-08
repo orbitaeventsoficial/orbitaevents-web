@@ -372,6 +372,12 @@ export default function LeadBoloSection({
  notes: cleanRouteNote(line.notes),
  }));
  }, [routeCostLines]);
+ const routeSummaryItems = useMemo(() => [
+ ...(travelBreakdown.vehicleCost > 0 ? [{ label: 'Vehicle', amount: travelBreakdown.vehicleCost }] : []),
+ ...(travelBreakdown.peopleCost > 0 ? [{ label: 'Equip ruta', amount: travelBreakdown.peopleCost }] : []),
+ ...(mealAllowance > 0 ? [{ label: 'Dietes', amount: mealAllowance }] : []),
+ ...(tollsValue > 0 ? [{ label: 'Peatges', amount: tollsValue }] : []),
+ ], [mealAllowance, tollsValue, travelBreakdown.peopleCost, travelBreakdown.vehicleCost]);
 
  // Marge → nivell visual reutilitzant els tons existents (.ap-ledger-kpi data-level).
  const netLevel = !economia
@@ -503,6 +509,8 @@ export default function LeadBoloSection({
  tripCrowded={tripCrowded}
  effectiveTravelCost={effectiveTravelCost}
  routeSettlementLines={routeSettlementLines}
+ routeSummaryItems={routeSummaryItems}
+ compactRouteSummary
  calculationNotes={travelCalculationNotes}
  controlsDefaultOpen={false}
  />
@@ -526,12 +534,12 @@ export default function LeadBoloSection({
  )}
 
  {repartiment.elements.length > 0 && (
- <div id="lead-repartiment" className="ap-ledger-budget ap-ledger-budget--repartiment" aria-label="Qui cobra què al lead">
+ <div id="lead-repartiment" className="ap-ledger-budget ap-ledger-budget--repartiment" aria-label="Pacte amb partner al lead">
  <div className="ap-ledger-econohead">
  <span>Pacte amb partner</span>
- <span className="ap-ledger-econonote">pre-proposta · import a validar abans de crear dossier o pressupost</span>
+ <span className="ap-ledger-econonote">lead · valida import abans de dossier, pressupost o reserva</span>
  </div>
- <RepartimentPanel repartiment={repartiment} names={repartimentNames} mode="preproposal" detailsDefaultOpen={false} preproposalNotes={travelCalculationNotes} />
+ <RepartimentPanel repartiment={repartiment} names={repartimentNames} mode="preproposal" detailsDefaultOpen={false} />
  </div>
  )}
 

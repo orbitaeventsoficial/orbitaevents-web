@@ -12,18 +12,17 @@ export default function RepartimentPanel({
   names,
   mode = 'internal',
   detailsDefaultOpen = true,
-  preproposalNotes = [],
 }: {
   repartiment: BoloRepartiment;
   names: Record<string, string>;
   mode?: 'internal' | 'preproposal';
   detailsDefaultOpen?: boolean;
-  preproposalNotes?: string[];
 }) {
   const nameOf = (id: string) => (id === REPARTIMENT_OWNER_KEY ? 'Òrbita' : names[id] ?? 'Col·laborador');
   const { elements, perPersona, totals } = repartiment;
   const isPreproposal = mode === 'preproposal';
   const visiblePeople = isPreproposal ? perPersona.filter((p) => !p.esOrbita) : perPersona;
+  const showInternalDetail = !isPreproposal;
   const ownerMovementLabel = (label: string) => {
     if (label.startsWith('Temps ruta')) return 'Operari Òrbita';
     if (label.startsWith('Vehicle ruta')) return 'Vehicle Òrbita';
@@ -48,26 +47,29 @@ export default function RepartimentPanel({
     if (e.liquidacioOrbita > 0) return `+${formatCurrency(e.liquidacioOrbita)}`;
     return e.cost > 0 ? formatCurrency(e.cost) : '—';
   };
+  const simplifyPartnerLabel = (label: string, personId: string) => {
+    const provider = nameOf(personId);
+    return label
+      .replace(` (${provider})`, '')
+      .replace(' (Masquerade)', '')
+      .replace(' (Masquerade Events)', '')
+      .replace(` · ${provider}`, '')
+      .replace(/\s+x\d+$/, '');
+  };
   const partnerRows = (personId: string) => elements
     .filter((e) => (e.beneficiariId === personId && !e.esOrbita) || (e.sourceCollaboratorId === personId && e.liquidacioOrbita > 0))
     .map((e) => ({
       key: `${personId}:${e.label}:${e.cobra}:${e.liquidacioOrbita}`,
-      label: e.sourceCollaboratorId === personId && e.liquidacioOrbita > 0 ? `Compensació a Òrbita · ${e.label}` : e.label,
+      label: simplifyPartnerLabel(e.label, personId),
       amount: e.sourceCollaboratorId === personId && e.liquidacioOrbita > 0 ? e.liquidacioOrbita : e.cobra,
-      meta: e.sourceCollaboratorId === personId && e.liquidacioOrbita > 0 ? 'es descompta del saldo pactat' : 'se li paga al partner',
+      meta: e.sourceCollaboratorId === personId && e.liquidacioOrbita > 0 ? 'compensació Òrbita' : 'partner',
       settlement: e.sourceCollaboratorId === personId && e.liquidacioOrbita > 0,
     }));
 
   return (
     <div className={`ap-rep${isPreproposal ? ' ap-rep--preproposal' : ''}`}>
-      {isPreproposal && (
-        <div className="ap-rep-purpose">
-          <span>Lectura per validar amb el partner: què cobra i d'on surt.</span>
-        </div>
-      )}
-
       {/* Agregat per persona */}
-      <div className="ap-rep-people">
+      {!isPreproposal && <div className="ap-rep-people">
         {visiblePeople.map((p) => (
           <div key={p.personId} className="ap-rep-person" data-owner={p.esOrbita ? 'true' : undefined}>
             <span className="ap-rep-person-name">{nameOf(p.personId)}{p.esOrbita ? ' (tu)' : ''}</span>
@@ -75,41 +77,33 @@ export default function RepartimentPanel({
             <span className="ap-rep-person-sub">{personSub(p)}</span>
           </div>
         ))}
-      </div>
+      </div>}
 
       {isPreproposal && visiblePeople.length > 0 && (
         <div className="ap-rep-partner">
-          {preproposalNotes.length > 0 && (
-            <details className="ap-rep-formula-details">
-              <summary className="ap-rep-formula-summary">D'on surt la ruta</summary>
-              <div className="ap-rep-formula" aria-label="Càlcul de ruta per validar amb partner">
-                {preproposalNotes.map((note) => <span key={note}>{note}</span>)}
-              </div>
-            </details>
-          )}
           {visiblePeople.map((p) => (
-            <details key={`${p.personId}:detail`} className="ap-rep-partner-card">
-              <summary className="ap-rep-partner-head">
-                <span>Què cobra {nameOf(p.personId)}</span>
+            <div key={`${p.personId}:detail`} className="ap-rep-partner-card ap-rep-partner-card--compact">
+              <div className="ap-rep-partner-head">
+                <span>{nameOf(p.personId)}<em>import a validar</em></span>
                 <strong>{formatCurrency(p.rep)}</strong>
-              </summary>
+              </div>
               <div className="ap-rep-partner-lines">
                 {partnerRows(p.personId).map((row) => (
                   <div key={row.key} className="ap-rep-partner-line" data-settlement={row.settlement ? 'true' : undefined}>
                     <span>{row.label}<em>{row.meta}</em></span>
-                    <strong>{formatCurrency(row.amount)}</strong>
+                    <strong>{row.settlement ? '-' : ''}{formatCurrency(row.amount)}</strong>
                   </div>
                 ))}
               </div>
-            </details>
+            </div>
           ))}
         </div>
       )}
 
       {/* Detall element a element */}
-      <details className="ap-rep-detail" open={detailsDefaultOpen}>
+      {showInternalDetail && <details className="ap-rep-detail" open={detailsDefaultOpen}>
         <summary className="ap-rep-detail-summary">
-          <span>{isPreproposal ? 'Detall intern de costos i ruta' : 'Detall element a element'}</span>
+          <span>Detall element a element</span>
           <strong>{elements.length} línies</strong>
         </summary>
         <div className="ap-rep-detail-body">
@@ -146,7 +140,7 @@ export default function RepartimentPanel({
             <div className="ap-rep-totals--orbita"><span>Benefici net Òrbita</span><strong>{formatCurrency(totals.partOrbita)}</strong></div>
           </div>
         </div>
-      </details>
+      </details>}
     </div>
   );
 }

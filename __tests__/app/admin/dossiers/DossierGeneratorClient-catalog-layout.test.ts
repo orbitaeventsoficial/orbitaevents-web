@@ -23,5 +23,7 @@ describe('DossierGeneratorClient catalog layout', () => {
     expect(source).toContain('{p.image && (');
     expect(source).toContain('<Image src={p.image}');
     expect(source).toContain('sizes="5rem"');
+    expect(source).toContain('className="object-contain p-1"');
+    expect(source).not.toContain('className="object-cover"');
   });
 });

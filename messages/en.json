@@ -7205,7 +7205,7 @@
       "travelPriceLabel": "Travel cost",
       "travelBreakdownLabel": "Breakdown",
       "travelBreakdownVehicle": "Vehicle and fuel",
-      "travelBreakdownVehicleDetail": "{km} round-trip km · {rate}/km",
+      "travelBreakdownVehicleDetail": "{km} billable km · {rate}/km",
       "travelBreakdownPeople": "{headcount} crew on the road · {hours} h",
       "travelBreakdownTolls": "Route tolls",
       "travelBreakdownMeals": "Long-route meal allowance",

@@ -7499,7 +7499,7 @@
       "travelPriceLabel": "Cost del desplaçament",
       "travelBreakdownLabel": "Desglossament",
       "travelBreakdownVehicle": "Vehicle i combustible",
-      "travelBreakdownVehicleDetail": "{km} km anada i tornada · {rate}/km",
+      "travelBreakdownVehicleDetail": "{km} km facturables · {rate}/km",
       "travelBreakdownPeople": "{headcount} operaris en ruta · {hours} h",
       "travelBreakdownTolls": "Peatges de ruta",
       "travelBreakdownMeals": "Dietes de ruta llarga",

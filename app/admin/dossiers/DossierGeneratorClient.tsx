@@ -1082,7 +1082,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
                                     <input type="checkbox" checked={checked} onChange={() => toggleProduct(p.id)} className="sr-only" aria-label={`Incloure ${p.nom}`} />
                                     {p.image && (
                                       <span className="relative h-14 w-20 shrink-0 overflow-hidden rounded-[var(--o-r-sm)] border border-[var(--line)] bg-[var(--sunk)]">
-                                        <Image src={p.image} alt="" fill sizes="5rem" className="object-cover" />
+                                        <Image src={p.image} alt="" fill sizes="5rem" className="object-contain p-1" />
                                       </span>
                                     )}
                                     <div className="flex min-w-0 flex-1 flex-col gap-0.5">

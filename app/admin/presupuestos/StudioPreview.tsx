@@ -115,7 +115,7 @@ export default function StudioPreview(props: StudioPreviewProps) {
           </div>
           {props.travelCharge > 0 && (
             <div className="text-xs">
-              {props.travelKm.toFixed(0)} km · cotxe + temps de ruta (cost real)
+              {props.travelKm.toFixed(0)} km · desplaçament i equip
             </div>
           )}
           <div className="flex items-center justify-between">

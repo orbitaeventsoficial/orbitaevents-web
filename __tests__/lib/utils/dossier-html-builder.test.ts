@@ -60,7 +60,7 @@ const copy: DossierCopy = {
     travelPriceLabel: 'Cost del desplaçament',
     travelBreakdownLabel: 'Desglossament',
     travelBreakdownVehicle: 'Vehicle i combustible',
-    travelBreakdownVehicleDetail: '{km} km anada i tornada · {rate}/km',
+    travelBreakdownVehicleDetail: '{km} km facturables · {rate}/km',
     travelBreakdownPeople: '{headcount} operaris en ruta · {hours} h',
     travelBreakdownTolls: 'Peatges de ruta',
     travelBreakdownMeals: 'Dietes de ruta llarga',
@@ -133,8 +133,9 @@ describe('buildDossierHtml', () => {
       ...productWithTrams,
       image: '/img/collaborators/masquerade/secret-pirates.jpg',
     }]);
-    expect(html).toContain('aspect-ratio: 16 / 10');
-    expect(html).toContain('object-fit: contain');
+    expect(html).toContain('aspect-ratio: 1 / 1');
+    expect(html).toContain('object-fit: contain !important');
+    expect(html).toContain('max-width: 100%; max-height: 100%');
     expect(html).not.toContain('object-fit: cover');
   });
 
@@ -317,13 +318,13 @@ describe('buildDossierHtml', () => {
     const travelIndex = html.indexOf('class="bud-travel-price"');
     expect(productsIndex).toBeGreaterThan(-1);
     expect(travelIndex).toBeGreaterThan(productsIndex);
-    // El client veu la ruta real i el cost concret del desplaçament.
+    // El client veu la ruta real i el cost concret del desplaçament; el vehicle usa km facturables.
     expect(html).toContain("l'Aldosa");
     expect(html).toContain('422');
     expect(html).toContain('Cost del desplaçament');
     expect(html).toContain('Desglossament');
     expect(html).toContain('Vehicle i combustible');
-    expect(html).toContain('422 km anada i tornada');
+    expect(html).toContain('372 km facturables');
     expect(html).toContain('2 operaris en ruta');
     expect(html).toContain('Peatges de ruta');
     expect(html).toContain('Dietes de ruta llarga');

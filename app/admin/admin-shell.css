@@ -1589,6 +1589,56 @@ html.admin-mode .ap-ledger-trip-formula {
 }
 html.admin-mode .ap-ledger-trip-formula > span { min-width: 0; overflow-wrap: anywhere; }
 html.admin-mode .ap-ledger-trip-formula--settlement { grid-column: 1 / -1; }
+html.admin-mode .ap-ledger-route-compact {
+  display: grid;
+  gap: var(--o-space-15);
+  padding: var(--o-space-25);
+  border: 1px solid color-mix(in oklab, var(--gold) 20%, var(--line));
+  border-radius: var(--o-r-md);
+  background: color-mix(in oklab, var(--gold) 5%, var(--panel));
+}
+html.admin-mode .ap-ledger-route-compact-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--o-space-3);
+}
+html.admin-mode .ap-ledger-route-compact-head > span {
+  font-family: var(--mono);
+  font-size: var(--o-text-xs);
+  color: var(--t3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+html.admin-mode .ap-ledger-route-compact-head > strong {
+  font-family: var(--display);
+  font-size: var(--o-text-xl);
+  color: var(--gold);
+}
+html.admin-mode .ap-ledger-route-compact > p {
+  margin: 0;
+  font-family: var(--ui);
+  font-size: var(--o-text-xs);
+  color: var(--t2);
+}
+html.admin-mode .ap-ledger-route-compact-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--o-space-1);
+}
+html.admin-mode .ap-ledger-route-compact-items > span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--o-space-1);
+  padding: 0.18rem var(--o-space-15);
+  border: 1px solid color-mix(in oklab, var(--line) 72%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--raised) 50%, transparent);
+  font-family: var(--mono);
+  font-size: var(--o-text-micro);
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-route-compact-items strong { color: var(--t); font-weight: var(--o-fw-semi); }
 /* Alarma de transport (#1377): més de 2 persones viatjant → vermell + avís. */
 html.admin-mode .ap-ledger-trip-badge[data-alarm="true"] {
   color: var(--o-danger); border-color: color-mix(in oklab, var(--o-danger) 45%, var(--line));
@@ -1789,12 +1839,27 @@ html.admin-mode .ap-rep-partner-head::after {
   content: '+'; color: var(--t3); font-family: var(--mono); font-size: var(--o-text-xs);
 }
 html.admin-mode .ap-rep-partner-card[open] .ap-rep-partner-head::after { content: '-'; }
+html.admin-mode .ap-rep-partner-card--compact .ap-rep-partner-head {
+  cursor: default;
+  padding-bottom: var(--o-space-15);
+}
+html.admin-mode .ap-rep-partner-card--compact .ap-rep-partner-head::after { content: none; }
 html.admin-mode .ap-rep-partner-line {
   display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2);
 }
 html.admin-mode .ap-rep-partner-head > span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.08rem;
   font-family: var(--mono); font-size: var(--o-text-micro); color: var(--gold);
   text-transform: uppercase; letter-spacing: 0.08em;
+}
+html.admin-mode .ap-rep-partner-head > span > em {
+  font-style: normal;
+  color: var(--t3);
+  text-transform: none;
+  letter-spacing: 0;
 }
 html.admin-mode .ap-rep-partner-head > strong {
   font-family: var(--display); font-size: var(--o-text-lg); color: var(--t);

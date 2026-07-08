@@ -497,9 +497,13 @@ export function buildDossierHtml(
       grid-column: 1 / -1; margin: -4px 0 2px; padding: 8px;
       border: 1px solid var(--o-line); background: var(--o-paper-card);
       display: grid; place-items: center; width: 100%;
-      aspect-ratio: 16 / 10; max-height: 360px; overflow: hidden;
+      aspect-ratio: 1 / 1; min-height: 340px; max-height: 520px; overflow: visible;
     }
-    .producte-media img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; }
+    .producte-media img {
+      display: block;
+      width: auto; height: auto; max-width: 100%; max-height: 100%;
+      object-fit: contain !important; object-position: center;
+    }
     .producte-desc { font-size: 17px; color: var(--o-ink-soft); line-height: 1.92; }
     .producte-desc p + p { margin-top: 16px; }
     .producte-desc p:first-child::first-letter {
@@ -623,7 +627,7 @@ export function buildDossierHtml(
       .intro-summary div:last-child { border-bottom: 0; }
       .producte-nom { font-size: 30px; }
       .producte-body { grid-template-columns: 1fr; gap: 22px; }
-      .producte-media { aspect-ratio: 4 / 3; max-height: 260px; }
+      .producte-media { aspect-ratio: 1 / 1; min-height: 260px; max-height: 340px; }
       .producte-aside { border-left: 0; border-top: 1px solid var(--o-gold-bright); padding-left: 0; padding-top: 18px; }
       .producte-inclou { grid-template-columns: 1fr; }
       .producte-marker-num { font-size: 44px; }
@@ -655,7 +659,7 @@ export function buildDossierHtml(
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
       }
       .product-page, .resum-page { padding-top: 0; }
-      .producte-media { aspect-ratio: 16 / 9; max-height: 255px; }
+      .producte-media { aspect-ratio: 1 / 1; min-height: 250px; max-height: 320px; }
       .producte, .resum-card, .bud-travel, .bud-travel-price, .cta, .peu { page-break-inside: avoid; }
     }
   </style>

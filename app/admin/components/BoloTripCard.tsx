@@ -23,6 +23,11 @@ export interface RouteSettlementLine {
   notes: string;
 }
 
+export interface RouteSummaryItem {
+  label: string;
+  amount: number;
+}
+
 export interface BoloTripCardProps {
   km: number;
   distanceKm: string;
@@ -51,6 +56,8 @@ export interface BoloTripCardProps {
   /** Cost real de la ruta (per al desplegable «qui cobra»). */
   effectiveTravelCost?: number;
   routeSettlementLines?: RouteSettlementLine[];
+  routeSummaryItems?: RouteSummaryItem[];
+  compactRouteSummary?: boolean;
   /** Notes de formula ja calculades pel pare; aquest component nomes les pinta. */
   calculationNotes?: string[];
   /** Els controls queden oberts a reserves; al lead es pot deixar plegat per reduir soroll. */
@@ -77,12 +84,16 @@ export default function BoloTripCard({
   tripCrowded,
   effectiveTravelCost = 0,
   routeSettlementLines = [],
+  routeSummaryItems = [],
+  compactRouteSummary = false,
   calculationNotes = [],
   controlsDefaultOpen = true,
 }: BoloTripCardProps) {
   const headcountEditable = typeof onHeadcountOverrideChange === 'function';
   const showTolls = typeof onTollsChange === 'function';
   const showAttribution = travelCollaborators.length > 0 && typeof onVehicleOwnerChange === 'function' && typeof onDriverChange === 'function';
+  const hasRouteSettlement = effectiveTravelCost > 0 && routeSettlementLines.length > 0;
+  const routeCompactConcepts = routeSummaryItems.map((item) => item.label.toLowerCase()).join(', ');
 
   return (
     <div className="ap-ledger-trip">
@@ -187,7 +198,30 @@ export default function BoloTripCard({
         </div>
       )}
 
-      {effectiveTravelCost > 0 && routeSettlementLines.length > 0 && (
+      {hasRouteSettlement && compactRouteSummary && (
+        <div className="ap-ledger-route-compact" aria-label="Resum econòmic del transport">
+          <div className="ap-ledger-route-compact-head">
+            <span>Total ruta</span>
+            <strong>{formatCurrency(effectiveTravelCost)}</strong>
+          </div>
+          <p>
+            {chargeableHours > 0
+              ? `${formatNumber(chargeableHours)} h facturables · ${routeCompactConcepts || 'ruta'}`
+              : `Ruta curta · ${routeCompactConcepts || 'vehicle i equip'} dins la base`}
+          </p>
+          {routeSummaryItems.length > 0 && (
+            <div className="ap-ledger-route-compact-items">
+              {routeSummaryItems.map((item) => (
+                <span key={item.label}>
+                  {item.label} <strong>{formatCurrency(item.amount)}</strong>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {hasRouteSettlement && !compactRouteSummary && (
         <details className="ap-ledger-route-settlement" aria-label="Repartiment econòmic del transport">
           <summary className="ap-ledger-route-settlement-head">
             <span>Qui cobra la ruta</span>
