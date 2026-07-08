@@ -1733,6 +1733,23 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1744 — 2026-07-08 — codex (FET)
+- Context: el #1743 preservava la liquidació oculta `[travel-cost]` quan el lead passava a reserva, però el generador de dossiers encara podia fer un `PUT` de productes al lead amb només línies visibles. Això podia esborrar vehicle, hores, dietes i peatges pactats abans de crear la reserva.
+- Fet:
+  - `DossierGeneratorClient` rellegeix `/api/admin/leads/[id]/service-lines` abans de sincronitzar productes cap al lead.
+  - `syncProductsToLead` conserva `routeCostLines` i envia `productes visibles + línies ocultes de ruta` al `PUT`.
+  - El tipus local `DossierServiceLine` accepta `costAmount`, `hours`, `partyType` i `notes` per poder reenviar línies de ruta completes.
+  - Test focalitzat afegit perquè el generador no torni a enviar només línies visibles.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\dossiers\DossierGeneratorClient-customer-lookup.test.ts` OK (5/5); `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK.
+  - Validació funcional: sincronitzar un dossier des d'un lead conserva les línies ocultes `[travel-cost]`; el dossier no trenca el pacte de ruta que després ha de viatjar cap a reserva.
+  - Validació humana/UX: Òrbita pot preparar dossier, pacte amb Masquerade i reserva en cadena sense que una pantalla intermèdia faci desaparèixer la ruta validada.
+- Roadmap Manolo actualitzat amb #1744 dins del bloc `Lead -> reserva / dossiers`.
+- `ADMIN_CHANGE_COUNTER` puja a `1744`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1743 — 2026-07-08 — codex (FET)
 - Context: després del #1742, el lead ja servia per pactar amb Masquerade import, hores, dietes i ruta, però la creació de reserva podia perdre les línies ocultes `[travel-cost]` perquè el prefill només consumia productes visibles. També hi havia una incoherència veïna: `tollsEur` s'heretava al formulari, però el càrrec visible de transport no el sumava.
 - Fet:

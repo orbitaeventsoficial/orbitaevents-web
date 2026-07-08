@@ -75,6 +75,7 @@ type CustomerResult = {
 
 type LeadServiceLineResult = {
   lines?: DossierServiceLine[];
+  routeCostLines?: DossierServiceLine[];
 };
 
 type CreateLeadResult = {
@@ -105,7 +106,11 @@ type DossierServiceLine = {
   kind?: string | null;
   label?: string | null;
   revenueAmount?: number | null;
+  costAmount?: number | null;
   quantity?: number | null;
+  hours?: number | null;
+  partyType?: string | null;
+  notes?: string | null;
 };
 
 function parseInitialProductIds(value?: string): string[] {
@@ -371,10 +376,16 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
 
   const syncProductsToLead = useCallback(async (leadId: string) => {
     const lines = selectedProducts.map((p) => productToDossierServiceLine(p, djHours));
+    const currentRes = await fetchWithCsrf(`/api/admin/leads/${leadId}/service-lines`);
+    const currentData = (await currentRes.json().catch(() => ({}))) as LeadServiceLineResult & { error?: string; message?: string };
+    if (!currentRes.ok) {
+      throw new Error(currentData.error || currentData.message || LEAD_PRODUCTS_SYNC_ERROR);
+    }
+    const routeCostLines = currentData.routeCostLines ?? [];
     const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/service-lines`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ lines }),
+      body: JSON.stringify({ lines: [...lines, ...routeCostLines] }),
     });
     if (!res.ok) throw new Error('Error sincronitzant la configuració del lead');
   }, [selectedProducts, djHours]);

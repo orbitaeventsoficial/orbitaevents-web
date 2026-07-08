@@ -28,6 +28,17 @@ describe('DossierGeneratorClient customer lookup guard', () => {
     expect(syncBlock).not.toContain('if (!res.ok) return;');
   });
 
+  it('preserva les línies ocultes de ruta quan sincronitza productes cap al lead', () => {
+    const start = source.indexOf('const syncProductsToLead');
+    const end = source.indexOf('useEffect(() =>');
+    const syncBlock = source.slice(start, end);
+
+    expect(source).toContain('routeCostLines?: DossierServiceLine[];');
+    expect(syncBlock).toContain('const currentRes = await fetchWithCsrf(`/api/admin/leads/${leadId}/service-lines`);');
+    expect(syncBlock).toContain('const routeCostLines = currentData.routeCostLines ?? [];');
+    expect(syncBlock).toContain('body: JSON.stringify({ lines: [...lines, ...routeCostLines] }),');
+  });
+
   it('avisa si no pot cercar leads existents', () => {
     const start = source.indexOf('const searchLeads');
     const end = source.indexOf('const loadCustomers');

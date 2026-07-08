@@ -1,3 +1,25 @@
+## 2026-07-08 — Dossier conserva la liquidació de ruta del lead (Canvi #1744, codex)
+
+### Context
+Després del #1743, el handoff lead -> reserva ja preservava les línies ocultes `[travel-cost]`. El següent risc era més discret: el generador de dossiers pot sincronitzar productes cap al lead amb un `PUT /service-lines`; si només enviava els productes visibles seleccionats, podia esborrar la liquidació de ruta pactada al lead abans de crear la reserva.
+
+### Què s'ha fet
+- `DossierGeneratorClient` llegeix l'estat actual de `/api/admin/leads/[id]/service-lines` abans de sincronitzar productes cap al lead.
+- La sincronització conserva `routeCostLines` ocultes i envia `productes visibles + línies ocultes de ruta` al `PUT`.
+- El tipus local `DossierServiceLine` accepta els camps necessaris de ruta (`costAmount`, `hours`, `partyType`, `notes`) perquè la còpia sigui completa.
+- Test focalitzat al generador de dossiers blinda que `syncProductsToLead` no torni a enviar només línies visibles.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\dossiers\DossierGeneratorClient-customer-lookup.test.ts` OK (5/5); `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK.
+- Validació funcional: un dossier creat o desat des d'un lead ja no pot netejar les línies ocultes `[travel-cost]` que expliquen vehicle, hores, dietes o peatges.
+- Validació humana/UX: Òrbita pot preparar dossier i reserva sense perdre el que ja s'ha pactat amb Masquerade; el partner no ha de revalidar imports perquè una sincronització intermèdia hagi buidat la ruta.
+
+### Coordinació
+Counter -> 1744. Canvi limitat a `DossierGeneratorClient`, test focalitzat, roadmap, protocol, diari i sync; sense schema, BD, `app/admin/tasks` ni motors econòmics.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Lead -> reserva conserva la liquidació de ruta (Canvi #1743, codex)
 
 ### Context

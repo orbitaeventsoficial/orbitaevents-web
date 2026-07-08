@@ -66,6 +66,13 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-08 [ESTAT: tancat — Dossier no esborra liquidació de ruta del lead #1744]
+Perimetre: `DossierGeneratorClient`, test focalitzat, roadmap i docs. Objectiu complert: quan el generador sincronitza productes cap al lead, conserva `routeCostLines` ocultes `[travel-cost]` i no trenca el pacte de ruta validat al lead/reserva.
+Ultim canvi: #1744.
+Validacio: test focalitzat 5/5 OK; `npx tsc --noEmit --pretty false` OK; `validate:core` OK; `qa:protocol` OK; `qa:zenit-roadmap` OK; `git diff --check` OK.
+Proper pas previst: continuar Manolo amb E2E lead -> dossier -> reserva o el següent tall petit de fiabilitat que aparegui al roadmap.
+Avis claude: no he tocat schema, BD, `app/admin/tasks` ni motors econòmics; carril limitat a dossier/lead.
+
 [codex] 2026-07-08 [ESTAT: tancat — Lead -> reserva conserva liquidació de ruta #1743]
 Perimetre: `LeadServiceLine` API, prefill de `/admin/bookings/new`, submit de nova reserva, pricing de transport amb peatges, tests i docs. Objectiu complert: el lead conserva `routeCostLines` ocultes `[travel-cost]` cap a la reserva sense mostrar-les com a productes, i el resum de nova reserva suma `tollsEur`.
 Ultim canvi: #1743.
