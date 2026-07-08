@@ -1732,6 +1732,22 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1731 — 2026-07-08 — codex (FET)
+- Context: el propietari no veu `Qui cobra què` al lead d'Alba Orna en local. Captura real: el bolo i el rail de marge carreguen, però el repartiment queda massa enterrat i al mòbil la taula és difícil d'entendre. Mirada Manolo: una lectura crítica de diners no pot existir només si saps on buscar-la.
+- Fet:
+  - El rail `Marge del bolo` afegeix `Veure qui cobra què`, enllaçat a `#lead-repartiment`.
+  - El bloc del lead rep `id="lead-repartiment"`, `aria-label="Qui cobra què al lead"` i classe visual pròpia `ap-ledger-budget--repartiment`.
+  - `RepartimentPanel` afegeix `data-label` per cel·la (`Element`, `Client paga`, `Cost/liquid.`, `Qui cobra`, `Import`, `Net Òrbita`), de manera que el mòbil no depèn de capçalera de taula amagada.
+  - El CSS mòbil converteix cada línia en fitxa llegible amb labels i totals que no s'aixafen.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\app\admin\leads\LeadDetailClient-date-save-contract.test.ts __tests__\lib\services\repartimentService.test.ts` (12/12); `npx tsc --noEmit --pretty false` OK; `git diff --check` OK.
+  - Validació funcional: Playwright local sobre `/admin/leads/cmr1xh7la0000ug7dj4jnihjr` confirma `jump=1`, `repartiment=1` i els 6 `data-label` per fila; captures a `.codex-captures/lead-repartiment-1731/`.
+  - Validació humana/UX: l'usuari té entrada visible des del rail financer i el mòbil mostra cada import amb etiqueta pròpia.
+- `ADMIN_CHANGE_COUNTER` puja a `1731`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1730 — 2026-07-08 — codex (FET)
 - Context: el propietari detecta que `Qui cobra què` encara no era un repartiment real: les hores, vehicle i dietes d'Òrbita es veien com si fossin benefici, i una compensació de tècnic inclòs podia aparèixer com a cobrament negatiu de Masquerade. Mirada Manolo: cal separar caixa bruta, cost intern i benefici net abans que el lead/reserva sigui fiable.
 - Fet:

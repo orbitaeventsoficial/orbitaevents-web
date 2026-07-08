@@ -1490,6 +1490,14 @@ html.admin-mode .ap-ledger-budget {
   margin-top: var(--o-space-3); padding: var(--o-space-3) var(--o-space-3) 0;
   border-top: 1px solid var(--line);
 }
+html.admin-mode .ap-ledger-budget--repartiment {
+  padding-bottom: var(--o-space-3);
+  border: 1px solid color-mix(in oklab, var(--gold) 24%, var(--line));
+  border-radius: var(--o-r-md);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--gold) 5%, transparent), transparent 40%),
+    color-mix(in oklab, var(--panel) 88%, transparent);
+}
 
 /* ── DESPLAÇAMENT: peça de logística neta (rediseny #1377) ── */
 html.admin-mode .ap-ledger-trip {
@@ -1701,8 +1709,52 @@ html.admin-mode .ap-rep-totals > div { display: flex; flex-direction: column; al
 html.admin-mode .ap-rep-totals > div > strong { font-family: var(--display); font-size: var(--o-text-md); color: var(--t); }
 html.admin-mode .ap-rep-totals--orbita > strong { color: var(--gold); font-size: var(--o-text-lg); }
 @media (max-width: 640px) {
-  html.admin-mode .ap-rep-row { grid-template-columns: minmax(0, 1fr) minmax(3.5rem, auto); grid-auto-rows: min-content; }
+  html.admin-mode .ap-rep-row:not(.ap-rep-row--head) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding: var(--o-space-25);
+    border-top-color: color-mix(in oklab, var(--line) 72%, transparent);
+  }
   html.admin-mode .ap-rep-row--head { display: none; }
+  html.admin-mode .ap-rep-row:not(.ap-rep-row--head) > span {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--o-space-3);
+    min-width: 0;
+    padding-block: 0.18rem;
+    text-align: right;
+  }
+  html.admin-mode .ap-rep-row:not(.ap-rep-row--head) > span::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    max-width: 45%;
+    font-family: var(--mono);
+    font-size: var(--o-text-micro);
+    color: var(--t3);
+    text-align: left;
+  }
+  html.admin-mode .ap-rep-row:not(.ap-rep-row--head) > .ap-rep-cell-label {
+    display: block;
+    margin-bottom: var(--o-space-05);
+    padding-bottom: var(--o-space-15);
+    border-bottom: 1px solid color-mix(in oklab, var(--line) 55%, transparent);
+    text-align: left;
+    white-space: normal;
+  }
+  html.admin-mode .ap-rep-row:not(.ap-rep-row--head) > .ap-rep-cell-label::before {
+    display: block;
+    max-width: none;
+    margin-bottom: 0.08rem;
+  }
+  html.admin-mode .ap-rep-totals {
+    justify-content: stretch;
+    gap: var(--o-space-2);
+  }
+  html.admin-mode .ap-rep-totals > div {
+    flex: 1 1 8rem;
+    align-items: flex-start;
+  }
 }
 
 html.admin-mode .ap-ledger-kpis {
@@ -3180,6 +3232,27 @@ html.admin-mode .ap-ledger-summary-rows > div {
 }
 html.admin-mode .ap-ledger-summary-rows > div > span { color: var(--t3); }
 html.admin-mode .ap-ledger-summary-rows > div > strong { color: var(--t); font-weight: var(--o-fw-semi); }
+html.admin-mode .ap-ledger-summary-jump {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--o-space-2);
+  padding: var(--o-space-25) var(--o-space-35);
+  border-top: 1px solid color-mix(in oklab, var(--gold) 26%, var(--line));
+  color: var(--gold);
+  font-family: var(--mono);
+  font-size: var(--o-text-xs);
+  font-weight: var(--o-fw-semi);
+  text-decoration: none;
+}
+html.admin-mode .ap-ledger-summary-jump::after {
+  content: '↓';
+  color: var(--t3);
+}
+html.admin-mode .ap-ledger-summary-jump:hover {
+  background: color-mix(in oklab, var(--gold) 9%, transparent);
+  color: var(--gold-bright);
+}
 @media (max-width: 900px) {
   html.admin-mode .ap-ledger-zenith--railed { grid-template-columns: minmax(0, 1fr); }
   html.admin-mode .ap-ledger-rail--summary { position: static; }

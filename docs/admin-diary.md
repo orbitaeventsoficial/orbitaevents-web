@@ -1,3 +1,26 @@
+## 2026-07-08 — Manolo: `Qui cobra què` visible, ancorat i llegible (Canvi #1731, codex)
+
+### Context
+El propietari obre el lead d'Alba Orna en local i no veu `Qui cobra què`. Captura real: la pàgina carregava el bolo i el rail de marge, però el repartiment quedava enterrat sota el resum i al mòbil la taula perdia les capçaleres. Mirada Manolo: si una lectura crítica de diners existeix però el propietari no la troba o no l'entén al mòbil, no està cosida.
+
+### Què s'ha fet
+- El rail `Marge del bolo` afegeix l'enllaç visible `Veure qui cobra què`, apuntant a l'àncora estable `#lead-repartiment`.
+- El bloc del lead rep `id="lead-repartiment"`, `aria-label="Qui cobra què al lead"` i classe pròpia `ap-ledger-budget--repartiment`.
+- `RepartimentPanel` afegeix `data-label` a cada cel·la (`Element`, `Client paga`, `Cost/liquid.`, `Qui cobra`, `Import`, `Net Òrbita`) perquè el mòbil no depengui d'una capçalera amagada.
+- El CSS mòbil transforma cada fila en fitxa llegible amb labels visibles per import i totals que no queden aixafats.
+- Captures reals renovades a `.codex-captures/lead-repartiment-1731/`: primer viewport desktop amb el salt del rail, `Qui cobra què` desktop i `Qui cobra què` mòbil.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\app\admin\leads\LeadDetailClient-date-save-contract.test.ts __tests__\lib\services\repartimentService.test.ts` (12/12); `npx tsc --noEmit --pretty false` OK; `git diff --check` OK.
+- Validació funcional: Playwright local sobre `/admin/leads/cmr1xh7la0000ug7dj4jnihjr` confirma `jump=1`, `repartiment=1` i els 6 `data-label` per fila.
+- Validació humana/UX: el propietari veu una entrada clara des del rail i, en mòbil, cada línia diu què és cada import sense haver d'endevinar columnes.
+
+### Coordinació
+Counter → 1731. Canvi limitat a visibilitat/cablejat UX de `Qui cobra què`, CSS responsiu, contractes DOM i captures; sense tocar motor econòmic, schema ni BD.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Manolo: repartiment real net/brut/cost intern (Canvi #1730, codex)
 
 ### Context

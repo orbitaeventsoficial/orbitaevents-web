@@ -66,6 +66,13 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-08 [ESTAT: tancat — Lead `Qui cobra què` visible i mòbil cosit #1731]
+Perimetre: `/admin/leads/[id]`, `RepartimentPanel`, rail financer del lead i CSS responsive del repartiment; sense schema, BD ni motor econòmic.
+Ultim canvi: #1731.
+Validacio: test focal lead/repartiment 12/12; `npx tsc --noEmit --pretty false` OK; `git diff --check` OK; Playwright local Alba Orna amb `jump=1`, `repartiment=1` i 6 labels per fila; captures a `.codex-captures/lead-repartiment-1731/`.
+Proper pas previst: passar `qa:protocol`, commit/push del tall #1731 i continuar auditoria Manolo pels altres fallos reals.
+Avis claude: el #1731 només fa visible i llegible el repartiment ja calculat al #1730; no reobrir `computeBoloRepartiment` per aquest tall.
+
 [codex] 2026-07-08 [ESTAT: tancat — Manolo: repartiment real net/brut/cost intern #1730]
 Perimetre: `repartimentService`, `RepartimentPanel`, lead/reserva/cuadrant/payout i fallback de reserves antigues amb `travelCost` sense `[travel-cost]`; sense schema ni migració.
 Ultim canvi: #1730.

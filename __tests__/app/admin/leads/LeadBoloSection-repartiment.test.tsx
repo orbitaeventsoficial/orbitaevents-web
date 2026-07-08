@@ -65,9 +65,17 @@ describe('LeadBoloSection repartiment', () => {
       expect(screen.getByText('Qui cobra què')).toBeInTheDocument();
     });
 
+    const panel = screen.getByLabelText('Qui cobra què al lead');
+    expect(panel).toHaveAttribute('id', 'lead-repartiment');
+    expect(panel).toHaveClass('ap-ledger-budget--repartiment');
     expect(screen.getByText('estimació pre-reserva · serveis, transport i dietes')).toBeInTheDocument();
     expect(screen.getAllByText('Masquerade')).toHaveLength(2);
     expect(screen.getByText('Bingo Musical (Masquerade)')).toBeInTheDocument();
+    const firstRow = screen.getByText('Bingo Musical (Masquerade)').closest('.ap-rep-row');
+    expect(firstRow?.querySelector('[data-label="Client paga"]')).not.toBeNull();
+    expect(firstRow?.querySelector('[data-label="Cost/liquid."]')).not.toBeNull();
+    expect(firstRow?.querySelector('[data-label="Qui cobra"]')).not.toBeNull();
+    expect(firstRow?.querySelector('[data-label="Net Òrbita"]')).not.toBeNull();
   });
 
   it('inclou transport, hores de ruta, peatges i dietes al repartiment del lead', async () => {
@@ -85,6 +93,7 @@ describe('LeadBoloSection repartiment', () => {
     });
 
     expect(screen.getByText('Transport client')).toBeInTheDocument();
+    expect(screen.getByText('Transport client').closest('.ap-rep-row')?.querySelector('[data-label="Net Òrbita"]')).not.toBeNull();
     expect(screen.getByText('Temps ruta conductor · Òrbita')).toBeInTheDocument();
     expect(screen.getByText('Peatges ruta · Òrbita')).toBeInTheDocument();
     expect(screen.getByText('Dieta desplaçament · Òrbita')).toBeInTheDocument();

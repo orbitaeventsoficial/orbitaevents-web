@@ -62,12 +62,12 @@ export default function RepartimentPanel({
         </div>
         {elements.map((e, i) => (
           <div key={i} className="ap-rep-row" role="row">
-            <span className="ap-rep-cell-label" role="cell">{e.label || '—'}</span>
-            <span role="cell">{formatCurrency(e.clientPaga)}</span>
-            <span role="cell" className={e.liquidacioOrbita > 0 ? 'ap-rep-cell-liquidacio' : undefined}>{costOrSettlement(e)}</span>
-            <span role="cell" data-owner={e.esOrbita ? 'true' : undefined}>{payeeLabel(e)}</span>
-            <span role="cell">{e.cobra > 0 ? formatCurrency(e.cobra) : '—'}</span>
-            <span role="cell" className="ap-rep-cell-marge">{formatCurrency(e.margeOrbita)}</span>
+            <span className="ap-rep-cell-label" role="cell" data-label="Element">{e.label || '—'}</span>
+            <span role="cell" data-label="Client paga">{formatCurrency(e.clientPaga)}</span>
+            <span role="cell" data-label="Cost/liquid." className={e.liquidacioOrbita > 0 ? 'ap-rep-cell-liquidacio' : undefined}>{costOrSettlement(e)}</span>
+            <span role="cell" data-label="Qui cobra" data-owner={e.esOrbita ? 'true' : undefined}>{payeeLabel(e)}</span>
+            <span role="cell" data-label="Import">{e.cobra > 0 ? formatCurrency(e.cobra) : '—'}</span>
+            <span role="cell" data-label="Net Òrbita" className="ap-rep-cell-marge">{formatCurrency(e.margeOrbita)}</span>
           </div>
         ))}
       </div>

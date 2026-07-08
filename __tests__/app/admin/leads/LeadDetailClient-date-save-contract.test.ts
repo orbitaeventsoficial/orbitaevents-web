@@ -26,4 +26,9 @@ describe('LeadDetailClient date save contract', () => {
   it('la temporada de leads no queda cachejada entre mutacions', () => {
     expect(leadsPageSource).toContain("export const dynamic = 'force-dynamic';");
   });
+
+  it('el rail financer pot saltar al repartiment del lead', () => {
+    expect(detailSource).toContain('href="#lead-repartiment"');
+    expect(detailSource).toContain('Veure qui cobra què');
+  });
 });

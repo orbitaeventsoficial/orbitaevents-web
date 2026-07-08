@@ -489,7 +489,7 @@ export default function LeadBoloSection({
  )}
 
  {repartiment.elements.length > 0 && (
- <div className="ap-ledger-budget" aria-label="Qui cobra què al lead">
+ <div id="lead-repartiment" className="ap-ledger-budget ap-ledger-budget--repartiment" aria-label="Qui cobra què al lead">
  <div className="ap-ledger-econohead">
  <span>Qui cobra què</span>
  <span className="ap-ledger-econonote">estimació pre-reserva · serveis, transport i dietes</span>
