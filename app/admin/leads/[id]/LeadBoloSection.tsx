@@ -8,12 +8,12 @@ import RepartimentPanel from '@/app/admin/bookings/[id]/RepartimentPanel';
 import BoloTripCard, { CROWDED_TRIP_THRESHOLD } from '@/app/admin/components/BoloTripCard';
 import type { BookingServiceLineFormInput } from '@/app/admin/bookings/booking-form.types';
 import { computeBookingFinancialSummary, computeServiceLineEconomics, classifyBoloLines } from '@/lib/services/costEngine';
-import { computeBoloRepartiment } from '@/lib/services/repartimentService';
+import { buildBoloRepartimentLines, computeBoloRepartiment } from '@/lib/services/repartimentService';
 import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
-import { calculateTravelCostBreakdown, deriveTravelHeadcount, computeBoloTransport, TRAVEL_MEAL_ALLOWANCE_PER_PERSON } from '@/lib/services/travelLaborCost';
+import { calculateTravelCostBreakdown, deriveTravelHeadcount, computeBoloTransport, buildTravelMealAllowanceLines, type TravelPersonInput } from '@/lib/services/travelLaborCost';
 import { useBookingDistance } from '@/app/admin/bookings/useBookingDistance';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
-import { formatCurrency, formatNumber } from '@/lib/constants';
+import { formatCurrency } from '@/lib/constants';
 import { buildLeadBookingPrefillHref } from '@/lib/admin/leadWorkspaceHref';
 
 /**
@@ -67,7 +67,7 @@ function cleanRouteNote(raw: string): string {
 function collaboratorNameFromLineLabel(label?: string | null): string | null {
  const match = label?.match(/\(([^)]+)\)/);
  if (match?.[1]) return match[1].trim();
- const routeMatch = label?.match(/^(?:Vehicle ruta|Temps ruta conductor|Temps ruta passatger|Peatges ruta)\s·\s(.+)$/);
+ const routeMatch = label?.match(/^(?:Vehicle ruta|Temps ruta conductor|Temps ruta passatger|Peatges ruta|Dieta desplaçament)\s·\s(.+)$/);
  return routeMatch?.[1]?.replace(/\sx\d+$/, '').trim() || null;
 }
 
@@ -173,15 +173,6 @@ export default function LeadBoloSection({
  quantity: item.quantity || 1,
  })), [contractedProducts]);
  const buildVisibleLines = useCallback((): BookingServiceLineFormInput[] => [...baseLines, ...lines], [baseLines, lines]);
- const repartimentNames = useMemo(() => {
- const names: Record<string, string> = {};
- for (const line of buildVisibleLines()) {
- if (!line.collaboratorId) continue;
- names[line.collaboratorId] = collaboratorNameFromLineLabel(line.label) ?? names[line.collaboratorId] ?? 'Col·laborador';
- }
- return names;
- }, [buildVisibleLines]);
- const repartiment = useMemo(() => computeBoloRepartiment(buildVisibleLines()), [buildVisibleLines]);
 
  // ── Transport EN VIU (#1345): mirall del càlcul de NewBookingForm ──
  // Distància auto-resolta des de la ubicació del lead → Granollers.
@@ -214,22 +205,24 @@ export default function LeadBoloSection({
  return [...seen.entries()].map(([id, name]) => ({ id, name }));
  }, [buildVisibleLines]);
  const nameFor = (id: string) => (id ? (travelCollaborators.find((c) => c.id === id)?.name ?? 'Proveïdor') : 'Òrbita');
- const travelBreakdown = useMemo(() => {
+ const travelPeople = useMemo<TravelPersonInput[]>(() => {
  const providerLine = buildVisibleLines().find((line) => line.kind === 'PROVIDER_SERVICE' && /\(([^)]+)\)/.test(line.label));
  const providerName = providerLine?.label.match(/\(([^)]+)\)/)?.[1] ?? 'Equip ruta';
  const passengerCount = Math.max(0, headcount - 1);
- return calculateTravelCostBreakdown({
+ return [
+ ...(headcount > 0 ? [{ role: 'DRIVER' as const, label: nameFor(driverId), collaboratorId: driverId || null }] : []),
+ ...(passengerCount > 0 ? [{ role: 'PASSENGER' as const, label: providerName, collaboratorId: providerLine?.collaboratorId ?? null, count: passengerCount }] : []),
+ ];
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- nameFor és un closure estable sobre travelCollaborators (ja dep)
+ }, [buildVisibleLines, headcount, driverId, travelCollaborators]);
+ const travelBreakdown = useMemo(() => calculateTravelCostBreakdown({
  roundTripKm: Number(distanceKm) || 0,
  vehicleCostPerKm,
  tollsEur: Number(tollsEur) || 0,
  vehicleOwner: { label: nameFor(vehicleOwnerId), collaboratorId: vehicleOwnerId || null },
- people: [
- ...(headcount > 0 ? [{ role: 'DRIVER' as const, label: nameFor(driverId), collaboratorId: driverId || null }] : []),
- ...(passengerCount > 0 ? [{ role: 'PASSENGER' as const, label: providerName, collaboratorId: providerLine?.collaboratorId ?? null, count: passengerCount }] : []),
- ],
- });
+ people: travelPeople,
  // eslint-disable-next-line react-hooks/exhaustive-deps -- nameFor és un closure estable sobre travelCollaborators (ja dep)
- }, [buildVisibleLines, distanceKm, tollsEur, headcount, vehicleCostPerKm, vehicleOwnerId, driverId, travelCollaborators]);
+ }), [distanceKm, tollsEur, vehicleCostPerKm, vehicleOwnerId, travelPeople, travelCollaborators]);
  // TRANSPORT del bolo (#1369/#1386, monocapa): UNA sola crida al cervell `computeBoloTransport`.
  // El lead NO calcula res pel seu compte: cost i càrrec surten de la MATEIXA font, així la dieta
  // (#1386) entra igual als dos i el marge de transport queda break-even (no fals-positiu).
@@ -245,6 +238,29 @@ export default function LeadBoloSection({
  // Càrrec al client: franquícia comercial del cotxe (50 km) + tripulació + dieta + peatges.
  const travelCharge = transport ? transport.clientCharge : internalTravelCost;
  const mealAllowance = transport?.mealAllowance ?? 0;
+ const travelMealLines = useMemo(() => buildTravelMealAllowanceLines(travelPeople, mealAllowance), [travelPeople, mealAllowance]);
+ const routeCostLines = useMemo(() => [...travelBreakdown.lines, ...travelMealLines], [travelBreakdown.lines, travelMealLines]);
+ const repartimentInputLines = useMemo(() => buildBoloRepartimentLines({
+ serviceLines: buildVisibleLines(),
+ travelCharge,
+ travelCostLines: routeCostLines.map((line) => ({
+ kind: 'OTHER',
+ label: line.label,
+ revenueAmount: 0,
+ costAmount: line.costAmount,
+ quantity: 1,
+ collaboratorId: line.collaboratorId ?? undefined,
+ })),
+ }), [buildVisibleLines, routeCostLines, travelCharge]);
+ const repartimentNames = useMemo(() => {
+ const names: Record<string, string> = {};
+ for (const line of repartimentInputLines) {
+ if (!line.collaboratorId) continue;
+ names[line.collaboratorId] = collaboratorNameFromLineLabel(line.label) ?? names[line.collaboratorId] ?? 'Col·laborador';
+ }
+ return names;
+ }, [repartimentInputLines]);
+ const repartiment = useMemo(() => computeBoloRepartiment(repartimentInputLines), [repartimentInputLines]);
 
  // Fulla d'economia del bolo (Fase 4 de docs/bolo-flux.md). La pasta NO viu al
  // configurador: cada línia porta el cost amagat i alimenta SOLA aquesta fulla.
@@ -315,22 +331,12 @@ export default function LeadBoloSection({
  }, [economia, effectiveTravelCost, onEconomiaChange, travelCharge]);
 
  const routeSettlementLines = useMemo(() => {
- const lines = travelBreakdown.lines.map((line) => ({
+ return routeCostLines.map((line) => ({
  label: line.label,
  amount: line.costAmount,
  notes: cleanRouteNote(line.notes),
  }));
- // Dieta de desplaçament (#1386): la cobra qui viatja. Es mostra al desglossament perquè
- // el total «Qui cobra la ruta» quadri amb el cost real (cotxe + tripulació + dieta + peatges).
- if (mealAllowance > 0) {
- lines.push({
- label: `Dieta desplaçament${headcount > 1 ? ` · ${headcount} pers.` : ''}`,
- amount: mealAllowance,
- notes: `${formatCurrency(TRAVEL_MEAL_ALLOWANCE_PER_PERSON)}/persona · ruta llarga`,
- });
- }
- return lines;
- }, [travelBreakdown.lines, mealAllowance, headcount]);
+ }, [routeCostLines]);
 
  // Marge → nivell visual reutilitzant els tons existents (.ap-ledger-kpi data-level).
  const netLevel = !economia
@@ -346,7 +352,7 @@ export default function LeadBoloSection({
  // collaboratorId de qui posa el cotxe / condueix / viatja. Es desen amagades
  // (isTravelCostLine les filtra de la vista) però alimenten el repartiment i el marge.
  const travelLines: BookingServiceLineFormInput[] = (Number(distanceKm) || 0) > 0
- ? travelBreakdown.lines.map((line) => ({
+ ? routeCostLines.map((line) => ({
  kind: 'OTHER' as const,
  label: line.label,
  revenueAmount: 0,
@@ -483,10 +489,10 @@ export default function LeadBoloSection({
  )}
 
  {repartiment.elements.length > 0 && (
- <div className="ap-ledger-budget" aria-label="Repartiment estimat del lead">
+ <div className="ap-ledger-budget" aria-label="Qui cobra què al lead">
  <div className="ap-ledger-econohead">
- <span>Repartiment estimat del lead</span>
- <span className="ap-ledger-econonote">qui cobra què · abans de formalitzar reserva</span>
+ <span>Qui cobra què</span>
+ <span className="ap-ledger-econonote">estimació pre-reserva · serveis, transport i dietes</span>
  </div>
  <RepartimentPanel repartiment={repartiment} names={repartimentNames} />
  </div>

@@ -29,6 +29,7 @@ const lead = {
   eventDesc: 'Boda · 2026-09-05',
   travelLocation: 'Andorra',
   distanceKm: 422,
+  tollsEur: 18.5,
 };
 
 describe('composeDossierDraftFromLead', () => {
@@ -54,6 +55,7 @@ describe('composeDossierDraftFromLead', () => {
     expect(result.input.lineSnapshot).toMatchObject({
       version: 1,
       travelKm: 422,
+      travelTollsEur: 18.5,
       travelLocation: 'Andorra',
       products: [
         expect.objectContaining({ id: DOSSIER_DJ_PRODUCT_ID, priceFrom: 350, durada: '3h' }),

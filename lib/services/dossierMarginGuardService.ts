@@ -57,10 +57,11 @@ function pct(value: number): string {
   return `${round1(value)}%`;
 }
 
-export function computeDossierTransportBudget(roundTripKm?: number | null): DossierTransportBudget {
+export function computeDossierTransportBudget(roundTripKm?: number | null, tollsEur?: number | null): DossierTransportBudget {
   const transport = computeBoloTransport({
     roundTripKm: roundTripKm ?? 0,
     headcountOverride: DOSSIER_TRAVEL_HEADCOUNT,
+    tollsEur,
   });
   const peopleCost = transport.breakdown.peopleCost;
   const tollsCost = transport.tollsEur;
@@ -84,11 +85,12 @@ export function computeDossierTransportBudget(roundTripKm?: number | null): Doss
 export function computeDossierMarginGuard(input: {
   serviceLines: ServiceLineLike[];
   travelKm?: number | null;
+  travelTollsEur?: number | null;
   source?: string | null;
   config?: ProfitabilityConfig;
 }): DossierMarginGuard {
   const config = input.config ?? PROFITABILITY_MODEL_DEFAULTS;
-  const transport = computeDossierTransportBudget(input.travelKm ?? 0);
+  const transport = computeDossierTransportBudget(input.travelKm ?? 0, input.travelTollsEur ?? 0);
   const servicesRevenue = input.serviceLines.reduce(
     (sum, line) => sum + (line.revenueAmount || 0) * (line.quantity || 1),
     0,

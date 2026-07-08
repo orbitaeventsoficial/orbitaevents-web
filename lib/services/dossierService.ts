@@ -40,6 +40,7 @@ export type DossierLeadInitialData = {
   eventDesc: string;
   travelLocation: string;
   distanceKm: number | null;
+  tollsEur: number | null;
 };
 
 export type DossierTraceOrigin = {
@@ -119,6 +120,7 @@ export async function getDossierLeadInitialData(leadId?: string | null): Promise
       guestCount: true,
       message: true,
       distanceKm: true,
+      tollsEur: true,
     },
   });
   if (!lead) return null;
@@ -130,6 +132,7 @@ export async function getDossierLeadInitialData(leadId?: string | null): Promise
     eventDesc: buildDossierLeadEventDesc(lead),
     travelLocation: buildDossierLeadTravelLocation(lead),
     distanceKm: lead.distanceKm ?? null,
+    tollsEur: lead.tollsEur ?? null,
   };
 }
 
@@ -276,18 +279,21 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
   // Sense suma dels elements: el dossier és catàleg, no factura (#1396/#1397).
   const snapshotTransport = transportFromDossierLineSnapshot(dossier.lineSnapshot);
   let travelKm: number | undefined = snapshotTransport.travelKm;
+  let travelTollsEur: number | undefined = snapshotTransport.travelTollsEur;
   let travelLocation: string | undefined = snapshotTransport.travelLocation;
   if (!snapshotProducts && dossier.leadId) {
     const lead = await prisma.lead.findUnique({
       where: { id: dossier.leadId },
-      select: { distanceKm: true, eventLocation: true },
+      select: { distanceKm: true, tollsEur: true, eventLocation: true },
     });
     if (lead?.distanceKm != null && lead.distanceKm > 0) travelKm = lead.distanceKm;
+    if (lead?.tollsEur != null && lead.tollsEur > 0) travelTollsEur = lead.tollsEur;
     if (lead?.eventLocation) travelLocation = lead.eventLocation;
   }
   const html = buildDossierHtml(clientInfo, products, dossierCopy, {
     locale: 'ca-ES',
     travelKm,
+    travelTollsEur,
     location: travelLocation,
   });
 

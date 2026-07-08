@@ -156,6 +156,37 @@ export function calculateTravelCostBreakdown(input: {
   };
 }
 
+/**
+ * Dietes de ruta llarga com a línies de cost atribuïdes a qui viatja.
+ * `computeBoloTransport` decideix SI hi ha dieta i l'import total; aquest helper només
+ * reparteix aquell total entre les persones de la ruta perquè lead/reserva/repartiment
+ * puguin mostrar qui cobra la dieta sense recalcular la regla.
+ */
+export function buildTravelMealAllowanceLines(
+  people: TravelPersonInput[],
+  mealAllowance: number,
+): TravelCostLine[] {
+  const totalPeople = (people || []).reduce((sum, person) => {
+    const count = Math.max(1, Math.floor(sanitizeNonNegative(person.count ?? 1, 1)));
+    return sum + count;
+  }, 0);
+  const total = round2(sanitizeNonNegative(mealAllowance, 0));
+  if (total <= 0 || totalPeople <= 0) return [];
+
+  const amountPerPerson = round2(total / totalPeople);
+  return (people || []).map((person) => {
+    const count = Math.max(1, Math.floor(sanitizeNonNegative(person.count ?? 1, 1)));
+    const amount = round2(amountPerPerson * count);
+    const label = person.label?.trim() || 'Equip ruta';
+    return {
+      label: `Dieta desplaçament · ${label}${count > 1 ? ` x${count}` : ''}`,
+      costAmount: amount,
+      collaboratorId: person.collaboratorId || null,
+      notes: `${TRAVEL_COST_LINE_MARKER} dieta · ${amountPerPerson.toFixed(2)} EUR/persona`,
+    };
+  });
+}
+
 /** Línia mínima del bolo per derivar quanta gent viatja. */
 export interface TravelHeadcountLineLike {
   kind?: string | null;

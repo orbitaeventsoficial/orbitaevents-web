@@ -53,7 +53,7 @@ describe('LeadBoloSection repartiment', () => {
     });
   });
 
-  it('mostra el repartiment estimat del lead abans de formalitzar reserva', async () => {
+  it('mostra el qui cobra que del lead abans de formalitzar reserva', async () => {
     render(
       <LeadBoloSection
         leadId="lead-1"
@@ -62,11 +62,31 @@ describe('LeadBoloSection repartiment', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Repartiment estimat del lead')).toBeInTheDocument();
+      expect(screen.getByText('Qui cobra què')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('qui cobra què · abans de formalitzar reserva')).toBeInTheDocument();
+    expect(screen.getByText('estimació pre-reserva · serveis, transport i dietes')).toBeInTheDocument();
     expect(screen.getAllByText('Masquerade')).toHaveLength(2);
     expect(screen.getByText('Bingo Musical (Masquerade)')).toBeInTheDocument();
+  });
+
+  it('inclou transport, hores de ruta, peatges i dietes al repartiment del lead', async () => {
+    render(
+      <LeadBoloSection
+        leadId="lead-1"
+        documentContext={{ name: 'Lead Andorra', eventLocation: 'Andorra' }}
+        initialDistanceKm={422}
+        initialTollsEur={18.5}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Qui cobra què')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('Transport client')).toBeInTheDocument();
+    expect(screen.getByText('Temps ruta conductor · Òrbita')).toBeInTheDocument();
+    expect(screen.getByText('Peatges ruta · Òrbita')).toBeInTheDocument();
+    expect(screen.getByText('Dieta desplaçament · Òrbita')).toBeInTheDocument();
   });
 });

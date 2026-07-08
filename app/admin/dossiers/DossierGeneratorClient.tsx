@@ -46,6 +46,7 @@ interface Props {
   initialEventDesc?: string;
   initialTravelLocation?: string;
   initialDistanceKm?: number | null;
+  initialTollsEur?: number | null;
   initialProductIds?: string;
 }
 
@@ -198,7 +199,7 @@ function buildEventDescription(data: ExtractedLeadData): string {
   return parts.join(' · ');
 }
 
-export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, leadId: initialLeadId, initialNom, initialEmail, initialTelefon, initialEmpresa, initialEventDesc, initialTravelLocation, initialDistanceKm, initialProductIds }: Props) {
+export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, leadId: initialLeadId, initialNom, initialEmail, initialTelefon, initialEmpresa, initialEventDesc, initialTravelLocation, initialDistanceKm, initialTollsEur, initialProductIds }: Props) {
   const toast = useToast();
   const validProductIds = useMemo(() => new Set(products.map((p) => p.id)), [products]);
   const productProviderGroups = useMemo(() => (['orbita', 'masquerade', 'tino', 'altres'] as const)
@@ -224,6 +225,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
   // Hereta els km calculats del lead la primera vegada (#1371): abans quedava buit i
   // s'havia d'entrar a mà tot i que el lead ja tenia la distància resolta.
   const [travelKm, setTravelKm] = useState(initialDistanceKm != null && initialDistanceKm > 0 ? String(initialDistanceKm) : '');
+  const [travelTollsEur, setTravelTollsEur] = useState(initialTollsEur != null && initialTollsEur > 0 ? String(initialTollsEur) : '');
   const [salutacio, setSalutacio] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(
     new Set(parseInitialProductIds(initialProductIds).filter((id) => validProductIds.has(id))),
@@ -242,8 +244,9 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
     return computeDossierMarginGuard({
       serviceLines: marginGuardLines,
       travelKm: Number.isFinite(km) && km > 0 ? km : 0,
+      travelTollsEur: Number.isFinite(Number(travelTollsEur)) && Number(travelTollsEur) > 0 ? Number(travelTollsEur) : 0,
     });
-  }, [marginGuardLines, travelKm]);
+  }, [marginGuardLines, travelKm, travelTollsEur]);
   const [createLeadOnSave, setCreateLeadOnSave] = useState(false);
   const [sendOnSave, setSendOnSave] = useState(false);
   const [linkedCustomerId, setLinkedCustomerId] = useState('');
@@ -543,11 +546,13 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
         salutacio: salutacio.trim() || undefined,
       };
       const km = Number(travelKm);
+      const tolls = Number(travelTollsEur);
       const html = buildDossierHtml(clientInfo, selected, dossierCopy, {
         autoPrint: mode === 'pdf',
         logoDataUri,
         locale: 'ca-ES',
         travelKm: Number.isFinite(km) && km > 0 ? km : undefined,
+        travelTollsEur: Number.isFinite(tolls) && tolls > 0 ? tolls : undefined,
         location: travelLocation.trim() || undefined,
       });
       const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
@@ -636,6 +641,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
           lineSnapshot: buildDossierLineSnapshot({
             products: dossierProducts,
             travelKm: Number.isFinite(Number(travelKm)) && Number(travelKm) > 0 ? Number(travelKm) : null,
+            travelTollsEur: Number.isFinite(Number(travelTollsEur)) && Number(travelTollsEur) > 0 ? Number(travelTollsEur) : null,
             travelLocation: travelLocation.trim() || null,
           }),
         }),
@@ -858,7 +864,11 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
               <label htmlFor="dg-travel-km" className={LABEL_CLS}>Km desplaçament (anada + tornada)</label>
               <input id="dg-travel-km" type="number" min={0} step={1} className="adm-input" value={travelKm} onChange={(e) => setTravelKm(e.target.value)} placeholder="Ex: 70" autoComplete="off" />
             </div>
-            <div className="flex flex-col gap-1.5 md:col-span-2 xl:col-span-3">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="dg-travel-tolls" className={LABEL_CLS}>Peatges</label>
+              <input id="dg-travel-tolls" type="number" min={0} step="0.01" className="adm-input" value={travelTollsEur} onChange={(e) => setTravelTollsEur(e.target.value)} placeholder="Ex: 18,50" autoComplete="off" />
+            </div>
+            <div className="flex flex-col gap-1.5 md:col-span-2 xl:col-span-2">
               <label htmlFor="dg-travel-location" className={LABEL_CLS}>Lloc del desplaçament</label>
               <input id="dg-travel-location" type="text" className="adm-input" value={travelLocation} onChange={(e) => setTravelLocation(e.target.value)} placeholder="Ex: l'Aldosa" autoComplete="off" />
             </div>

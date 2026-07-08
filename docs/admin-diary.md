@@ -1,3 +1,26 @@
+## 2026-07-08 — Manolo: `Qui cobra què` complet al lead i peatges heretats al dossier (Canvi #1729, codex)
+
+### Context
+El propietari detecta que el repartiment pre-reserva podia quedar massa poc clar: faltaven transport, hores de ruta i dietes dins la lectura general de “qui cobra què”. També pregunta si el dossier queda prou especificat després dels canvis recents. Mirada Manolo: si el lead, el dossier i la reserva expliquen la pasta amb llenguatges diferents, el sistema no és Zenit encara que cada peça funcioni sola.
+
+### Què s'ha fet
+- `LeadBoloSection` canvia el bloc visible a `Qui cobra què` i alimenta el repartiment amb serveis + `Transport client` + vehicle + hores de ruta + peatges + dietes.
+- `repartimentService` incorpora `buildBoloRepartimentLines`, helper canònic perquè la pàgina no inventi com entra el transport al repartiment.
+- `travelLaborCost` incorpora `buildTravelMealAllowanceLines`, que reparteix la dieta entre les persones que viatgen segons el total decidit per `computeBoloTransport`.
+- En desar el bolo del lead, les dietes també queden persistides com a línies internes `[travel-cost]`, igual que vehicle/hores/peatges.
+- El dossier hereta i congela `tollsEur`: `getDossierLeadInitialData`, generador, snapshot, auto-draft, HTML i email del dossier poden transportar peatges a més de km i lloc.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\lib\services\travelLaborCost.test.ts __tests__\lib\services\dossierMarginGuardService.test.ts __tests__\lib\utils\dossier-html-builder.test.ts __tests__\lib\services\dossierSnapshotService.test.ts __tests__\lib\services\dossierService.test.ts __tests__\lib\services\dossierAutoDraftService.test.ts` (68/68); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: el test del lead comprova `Transport client`, `Temps ruta conductor`, `Peatges ruta` i `Dieta desplaçament` dins `Qui cobra què`; els tests de dossier comproven que els peatges entren al pressupost, al snapshot i a l'HTML.
+- Validació humana/UX: el lead deixa de separar “qui cobra què” del desplaçament; el dossier ja no perd peatges quan ve d'un lead i manté el desglossament comercial de vehicle/persones/peatges/dietes.
+
+### Coordinació
+Counter → 1729. Canvi limitat a lead bolo, cervells de repartiment/transport, dossier transport snapshot i tests; sense tocar schema Prisma ni dades vives.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Repartiment estimat visible a la fitxa del lead (Canvi #1728, codex)
 
 ### Context

@@ -71,7 +71,7 @@ const copy: DossierCopy = {
 function build(
   c: DossierClientInfo,
   products: AnimacioProduct[],
-  options?: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; location?: string },
+  options?: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; travelTollsEur?: number; location?: string },
 ): string {
   return buildDossierHtml(c, products, copy, { locale: 'ca-ES', ...options });
 }
@@ -265,7 +265,7 @@ describe('buildDossierHtml', () => {
 
   it('el transport surt JUST DESPRÉS dels productes, a la MATEIXA pàgina, amb xifra clara (#1397)', () => {
     const a: AnimacioProduct = { id: 'orbita:dj', nom: 'DJ', descripcio: ['x'], inclou: ['x'], priceFrom: 200 };
-    const html = build(client, [a], { travelKm: 422, location: "l'Aldosa" });
+    const html = build(client, [a], { travelKm: 422, travelTollsEur: 18.5, location: "l'Aldosa" });
     // Ordre: la llista de productes va abans que el bloc de desplaçament.
     const productsIndex = html.indexOf('class="resum-list"');
     const travelIndex = html.indexOf('class="bud-travel-price"');
@@ -278,6 +278,7 @@ describe('buildDossierHtml', () => {
     expect(html).toContain('Desglossament');
     expect(html).toContain('Vehicle i combustible');
     expect(html).toContain('2 operaris en ruta');
+    expect(html).toContain('Peatges de ruta');
     expect(html).toContain('Dietes de ruta llarga');
     // Tot dins la mateixa (única) pàgina de proposta.
     expect(html.match(/class="resum-page"/g)?.length).toBe(1);

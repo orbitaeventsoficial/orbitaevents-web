@@ -55,6 +55,7 @@ export function composeDossierDraftFromLead(input: {
   const snapshot = buildDossierLineSnapshot({
     products: dossierProducts,
     travelKm: input.lead.distanceKm,
+    travelTollsEur: input.lead.tollsEur,
     travelLocation: input.lead.travelLocation,
   });
 

@@ -5,8 +5,8 @@ import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 import { computeDossierTransportBudget } from '@/lib/services/dossierMarginGuardService';
 
 /** Càrrec de transport al client per a la ruta del dossier (un sol cervell). */
-function dossierTravelBudget(travelKm: number) {
-  return computeDossierTransportBudget(travelKm);
+function dossierTravelBudget(travelKm: number, travelTollsEur = 0) {
+  return computeDossierTransportBudget(travelKm, travelTollsEur);
 }
 
 export type DossierClientInfo = {
@@ -163,6 +163,7 @@ function buildProposalBlock(
   copy: DossierCopy,
   locale: string,
   travelKm: number,
+  travelTollsEur: number,
   location?: string,
 ): string {
   if (products.length === 0) return '';
@@ -198,7 +199,7 @@ function buildProposalBlock(
 
   // Desplaçament JUST DESPRÉS dels productes: ruta real, cost client i desglossament
   // comercial dels conceptes que expliquen el preu sense convertir-los en productes.
-  const travelBudget = dossierTravelBudget(travelKm);
+  const travelBudget = dossierTravelBudget(travelKm, travelTollsEur);
   const travelCharge = travelBudget.clientCharge;
   const travelBreakdownRows = [
     travelBudget.clientVehicleCost > 0
@@ -263,7 +264,7 @@ export function buildDossierHtml(
   client: DossierClientInfo,
   products: AnimacioProduct[],
   copy: DossierCopy,
-  options: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; location?: string } = {},
+  options: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; travelTollsEur?: number; location?: string } = {},
 ): string {
   const locale = options.locale || 'ca-ES';
   // Idioma del document derivat del locale (ca-ES → ca), mai hardcoded.
@@ -279,7 +280,7 @@ export function buildDossierHtml(
     .map((p, i) => buildProductBlock(p, i + 1, copy, locale, options.logoDataUri, false))
     .join('\n');
 
-  const proposalBloc = buildProposalBlock(products, copy, locale, options.travelKm ?? 0, options.location);
+  const proposalBloc = buildProposalBlock(products, copy, locale, options.travelKm ?? 0, options.travelTollsEur ?? 0, options.location);
 
   const salutacioHtml = escHtml(salutacio).replace(/\n\n/g, '<br><br>');
 

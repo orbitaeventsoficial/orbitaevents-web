@@ -217,6 +217,7 @@ describe('getDossierLeadInitialData', () => {
       eventDesc: 'Aniversari · 2026-07-25 · 21:00-23:00 · Canyamars · 30 pax · DJ 2 hores aniversari del seu marit',
       travelLocation: 'Canyamars',
       distanceKm: null,
+      tollsEur: null,
     });
   });
 });

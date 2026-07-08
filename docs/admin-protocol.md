@@ -1732,6 +1732,23 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1729 — 2026-07-08 — codex (FET)
+- Context: el propietari pregunta si al `qui cobra què` del lead falten transport, hores de viatge i dietes, i si el dossier queda prou especificat. Mirada Manolo: un canvi no és Zenit si lead, dossier i reserva mostren la pasta en fragments que no quadren.
+- Fet:
+  - `LeadBoloSection` rebateja el bloc visible a `Qui cobra què` i el nodreix amb serveis + línia `Transport client` + vehicle + hores de ruta + peatges + dietes.
+  - `repartimentService` afegeix `buildBoloRepartimentLines`, helper canònic per construir el repartiment complet sense lògica local de pàgina.
+  - `travelLaborCost` afegeix `buildTravelMealAllowanceLines`, que converteix la dieta total de `computeBoloTransport` en línies atribuïbles a qui viatja.
+  - En desar el lead, les dietes també es persisteixen com a línies internes `[travel-cost]`, igual que vehicle, hores i peatges.
+  - El dossier passa a transportar `tollsEur`: prefill des del lead, input manual al generador, `computeDossierTransportBudget`, `buildDossierHtml`, `lineSnapshot`, auto-draft i email enviat.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx __tests__\lib\services\travelLaborCost.test.ts __tests__\lib\services\dossierMarginGuardService.test.ts __tests__\lib\utils\dossier-html-builder.test.ts __tests__\lib\services\dossierSnapshotService.test.ts __tests__\lib\services\dossierService.test.ts __tests__\lib\services\dossierAutoDraftService.test.ts` (68/68); `npx tsc --noEmit --pretty false` OK.
+  - Validació funcional: el test del lead exigeix `Transport client`, `Temps ruta conductor`, `Peatges ruta` i `Dieta desplaçament` dins `Qui cobra què`; els tests de dossier exigeixen peatges en pressupost, snapshot i HTML.
+  - Validació humana/UX: el lead ja no obliga a mirar un panell separat per entendre el desplaçament, i el dossier no perd peatges quan ve d'un lead.
+- `ADMIN_CHANGE_COUNTER` puja a `1729`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1728 — 2026-07-08 — codex (FET)
 - Context: el propietari demana veure el repartiment de la pasta també al lead, perquè abans de formalitzar reserva el lead és on es configura el bolo i es preparen dossiers/pressupostos.
 - Fet:

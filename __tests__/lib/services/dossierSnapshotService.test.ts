@@ -28,12 +28,14 @@ describe('dossierSnapshotService', () => {
     const snapshot = buildDossierLineSnapshot({
       products: [product],
       travelKm: 422.345,
+      travelTollsEur: 18.456,
       travelLocation: " l'Aldosa ",
     });
 
     expect(snapshot).toMatchObject({
       version: 1,
       travelKm: 422.35,
+      travelTollsEur: 18.46,
       travelLocation: "l'Aldosa",
       products: [
         expect.objectContaining({
@@ -63,12 +65,14 @@ describe('dossierSnapshotService', () => {
     const snapshot = buildDossierLineSnapshot({
       products: [product],
       travelKm: 50,
+      travelTollsEur: 12.5,
       travelLocation: 'Granollers',
     });
 
     expect(productsFromDossierLineSnapshot(snapshot)?.map((p) => p.id)).toEqual(['collab:bingo']);
     expect(transportFromDossierLineSnapshot(snapshot)).toEqual({
       travelKm: 50,
+      travelTollsEur: 12.5,
       travelLocation: 'Granollers',
     });
   });

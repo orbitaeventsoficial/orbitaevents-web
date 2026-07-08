@@ -56,4 +56,13 @@ describe('dossierMarginGuardService', () => {
     expect(guard.travelCost).toBeGreaterThan(0);
     expect(guard.totalRevenue).toBe(250 + guard.travelRevenue);
   });
+
+  it('inclou els peatges del lead al pressupost de transport del dossier', () => {
+    const withoutTolls = computeDossierTransportBudget(180, 0);
+    const withTolls = computeDossierTransportBudget(180, 18.5);
+
+    expect(withTolls.tollsCost).toBe(18.5);
+    expect(withTolls.clientCharge).toBe(withoutTolls.clientCharge + 18.5);
+    expect(withTolls.cost).toBe(withoutTolls.cost + 18.5);
+  });
 });

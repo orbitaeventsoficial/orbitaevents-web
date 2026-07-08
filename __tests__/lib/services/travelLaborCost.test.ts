@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  buildTravelMealAllowanceLines,
   calculateTravelCostBreakdown,
   computeBoloTransport,
   estimateRoundTripHours,
@@ -108,5 +109,18 @@ describe('travelLaborCost', () => {
       headcountOverride: 2,
     });
     expect(r.mealAllowance).toBe(0);
+  });
+
+  it('reparteix la dieta entre les persones que viatgen', () => {
+    const lines = buildTravelMealAllowanceLines([
+      { role: 'DRIVER', label: 'Òrbita' },
+      { role: 'PASSENGER', label: 'Masquerade', collaboratorId: 'masquerade', count: 2 },
+    ], 90);
+
+    expect(lines).toEqual([
+      expect.objectContaining({ label: 'Dieta desplaçament · Òrbita', costAmount: 30, collaboratorId: null }),
+      expect.objectContaining({ label: 'Dieta desplaçament · Masquerade x2', costAmount: 60, collaboratorId: 'masquerade' }),
+    ]);
+    expect(lines.every((line) => line.notes.includes(TRAVEL_COST_LINE_MARKER))).toBe(true);
   });
 });

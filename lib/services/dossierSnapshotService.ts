@@ -27,6 +27,7 @@ export type DossierLineSnapshot = {
   version: 1;
   products: DossierProductSnapshot[];
   travelKm: number | null;
+  travelTollsEur: number | null;
   travelLocation: string | null;
 };
 
@@ -129,6 +130,7 @@ export function snapshotProduct(product: AnimacioProduct | Record<string, unknow
 export function buildDossierLineSnapshot(input: {
   products: AnimacioProduct[];
   travelKm?: number | null;
+  travelTollsEur?: number | null;
   travelLocation?: string | null;
 }): DossierLineSnapshot {
   return {
@@ -137,6 +139,7 @@ export function buildDossierLineSnapshot(input: {
       .map((product) => snapshotProduct(product))
       .filter((product): product is DossierProductSnapshot => Boolean(product)),
     travelKm: cleanNumber(input.travelKm),
+    travelTollsEur: cleanNumber(input.travelTollsEur),
     travelLocation: cleanText(input.travelLocation) ?? null,
   };
 }
@@ -153,6 +156,7 @@ export function parseDossierLineSnapshot(value: unknown): DossierLineSnapshot | 
     version: 1,
     products,
     travelKm: cleanNumber(raw.travelKm),
+    travelTollsEur: cleanNumber(raw.travelTollsEur),
     travelLocation: cleanText(raw.travelLocation) ?? null,
   };
 }
@@ -182,11 +186,12 @@ export function hydrateDossierSnapshotProductImages(
   });
 }
 
-export function transportFromDossierLineSnapshot(value: unknown): { travelKm?: number; travelLocation?: string } {
+export function transportFromDossierLineSnapshot(value: unknown): { travelKm?: number; travelTollsEur?: number; travelLocation?: string } {
   const snapshot = parseDossierLineSnapshot(value);
   if (!snapshot) return {};
   return {
     travelKm: snapshot.travelKm ?? undefined,
+    travelTollsEur: snapshot.travelTollsEur ?? undefined,
     travelLocation: snapshot.travelLocation ?? undefined,
   };
 }

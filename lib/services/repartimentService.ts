@@ -62,6 +62,45 @@ function round2(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
+function nonNegativeMoney(value?: number | null): number {
+  return round2(typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0);
+}
+
+/**
+ * Construeix la foto de repartiment completa d'un bolo quan hi ha transport.
+ * La pàgina no ha de decidir com entra el desplaçament al "qui cobra què": afegeix
+ * una línia d'ingrés `Transport client` i les línies de cost de ruta ja calculades
+ * pel cervell de transport (vehicle, hores, peatges, dietes).
+ */
+export function buildBoloRepartimentLines(input: {
+  serviceLines: RepartimentLine[];
+  travelCharge?: number | null;
+  travelCostLines?: RepartimentLine[];
+}): RepartimentLine[] {
+  const travelCharge = nonNegativeMoney(input.travelCharge);
+  const travelCostLines = (input.travelCostLines ?? [])
+    .filter((line) => nonNegativeMoney(line.costAmount) > 0)
+    .map((line) => ({
+      ...line,
+      kind: line.kind ?? 'OTHER',
+      revenueAmount: 0,
+      quantity: line.quantity ?? 1,
+    }));
+
+  return [
+    ...(input.serviceLines ?? []),
+    ...(travelCharge > 0 ? [{
+      label: 'Transport client',
+      kind: 'OTHER',
+      revenueAmount: travelCharge,
+      costAmount: 0,
+      quantity: 1,
+      collaboratorId: null,
+    }] : []),
+    ...travelCostLines,
+  ];
+}
+
 /**
  * Reparteix un bolo. Pura i determinista. La usen lead (estimació), reserva
  * (liquidació) i cuadrant (agregat) perquè el repartiment sigui SOLIDARI: canviar
