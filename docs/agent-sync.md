@@ -66,6 +66,13 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-08 [ESTAT: tancat — Lead pacte partner simplificat i ruta amb 50 km inclosos #1742]
+Perimetre: `/admin/leads/[id]`, `travelLaborCost`, `RepartimentPanel`, `BoloTripCard`, tests i docs. Objectiu complert: fitxa de lead curta per a Òrbita i presentable a Masquerade, amb detall desplegable, sense marges duplicats, i ruta calculada com `km totals - 50 km inclosos`, persones amb 1h inclosa i dietes només si passa de 150 km.
+Ultim canvi: #1742.
+Validacio: tests focalitzats 22/22 OK; `npx tsc --noEmit --pretty false` OK; Playwright real sobre `cmr1xh7la0000ug7dj4jnihjr` OK; `qa:protocol` OK; `qa:zenit-roadmap` OK; `git diff --check` OK; `pnpm build` OK.
+Proper pas previst: commit i push del paquet #1740-#1742; despres continuar el proper tall Manolo segons prioritat viva.
+Avis claude: no he tocat `app/admin/tasks`; #1742 rectifica/supedita el criteri de vehicle del #1741 per la regla final del propietari.
+
 [codex] 2026-07-08 [ESTAT: tancat — Transport llarg cobra vehicle real #1741]
 Perimetre: `computeBoloTransport`, pressupost de transport de dossier, copy i tests. Objectiu complert: en rutes que superen els 25 km per sentit, el vehicle es cobra al client sobre la ruta completa igual que es liquida a qui posa el cotxe; la primera hora de persones continua inclosa.
 Ultim canvi: #1741.

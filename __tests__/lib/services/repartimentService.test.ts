@@ -44,17 +44,17 @@ describe('computeBoloRepartiment', () => {
   it('costos propis de ruta: vehicle, hores i dietes resten del benefici net', () => {
     const r = computeBoloRepartiment([
       { label: 'Transport client', kind: 'OTHER', revenueAmount: 315, costAmount: 0, quantity: 1, collaboratorId: null },
-      { label: 'Vehicle ruta · Òrbita', kind: 'OTHER', revenueAmount: 0, costAmount: 103, quantity: 1, collaboratorId: null },
+      { label: 'Vehicle ruta · Òrbita', kind: 'OTHER', revenueAmount: 0, costAmount: 90, quantity: 1, collaboratorId: null },
       { label: 'Temps ruta conductor · Òrbita', kind: 'OTHER', revenueAmount: 0, costAmount: 83, quantity: 1, collaboratorId: null },
       { label: 'Dieta desplaçament · Òrbita', kind: 'OTHER', revenueAmount: 0, costAmount: 30, quantity: 1, collaboratorId: null },
     ]);
 
     expect(r.totals.clientTotal).toBe(315);
     expect(r.totals.brutOrbita).toBe(315);
-    expect(r.totals.costInternOrbita).toBe(216);
-    expect(r.totals.partOrbita).toBe(99);
+    expect(r.totals.costInternOrbita).toBe(203);
+    expect(r.totals.partOrbita).toBe(112);
     expect(r.perPersona.find((p) => p.esOrbita)?.brut).toBe(315);
-    expect(r.perPersona.find((p) => p.esOrbita)?.costIntern).toBe(216);
+    expect(r.perPersona.find((p) => p.esOrbita)?.costIntern).toBe(203);
     expect(r.elements.find((e) => e.label.startsWith('Temps ruta conductor'))?.margeOrbita).toBe(-83);
   });
 
@@ -65,7 +65,7 @@ describe('computeBoloRepartiment', () => {
       { label: 'DJ · 1a hora', kind: 'DJ', revenueAmount: 150, costAmount: 0, quantity: 1, collaboratorId: null },
       { label: 'DJ · hora addicional', kind: 'DJ', revenueAmount: 100, costAmount: 0, quantity: 1, collaboratorId: null },
       { label: 'Transport client', kind: 'OTHER', revenueAmount: 315, costAmount: 0, quantity: 1, collaboratorId: null },
-      { label: 'Vehicle ruta · Òrbita', kind: 'OTHER', revenueAmount: 0, costAmount: 103, quantity: 1, collaboratorId: null },
+      { label: 'Vehicle ruta · Òrbita', kind: 'OTHER', revenueAmount: 0, costAmount: 90, quantity: 1, collaboratorId: null },
       { label: 'Temps ruta conductor · Òrbita', kind: 'OTHER', revenueAmount: 0, costAmount: 83, quantity: 1, collaboratorId: null },
       { label: 'Temps ruta passatger · Masquerade', kind: 'OTHER', revenueAmount: 0, costAmount: 83, quantity: 1, collaboratorId: 'masquerade' },
       { label: 'Dieta desplaçament · Òrbita', kind: 'OTHER', revenueAmount: 0, costAmount: 30, quantity: 1, collaboratorId: null },
@@ -77,10 +77,10 @@ describe('computeBoloRepartiment', () => {
     expect(r.totals.liquidacionsCapAOrbita).toBe(40);
     expect(r.totals.aCollaboradors).toBe(273);
     expect(r.totals.brutOrbita).toBe(532);
-    expect(r.totals.costInternOrbita).toBe(216);
-    expect(r.totals.partOrbita).toBe(316);
+    expect(r.totals.costInternOrbita).toBe(203);
+    expect(r.totals.partOrbita).toBe(329);
     expect(r.perPersona.find((p) => p.personId === 'masquerade')?.rep).toBe(273);
-    expect(r.perPersona.find((p) => p.esOrbita)?.rep).toBe(316);
+    expect(r.perPersona.find((p) => p.esOrbita)?.rep).toBe(329);
   });
 
   it('bolo 100% propi (DJ Òrbita): tot va a Òrbita si no hi ha cost intern explícit', () => {

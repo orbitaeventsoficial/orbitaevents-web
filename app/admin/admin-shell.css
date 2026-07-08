@@ -1553,6 +1553,28 @@ html.admin-mode .ap-ledger-trip-ro[data-alarm="true"] {
 html.admin-mode .ap-ledger-trip-note {
   margin: 0; font-family: var(--ui); font-size: var(--o-text-micro); color: var(--t3); line-height: 1.5;
 }
+html.admin-mode .ap-ledger-trip-controls {
+  border: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--raised) 24%, transparent);
+  overflow: hidden;
+}
+html.admin-mode .ap-ledger-trip-controls-summary {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2);
+  padding: var(--o-space-15) var(--o-space-2);
+  cursor: pointer; list-style: none;
+  font-family: var(--ui); font-size: var(--o-text-sm); color: var(--t2);
+}
+html.admin-mode .ap-ledger-trip-controls-summary::-webkit-details-marker { display: none; }
+html.admin-mode .ap-ledger-trip-controls-summary::after {
+  content: '+'; color: var(--t3); font-family: var(--mono); font-size: var(--o-text-xs);
+}
+html.admin-mode .ap-ledger-trip-controls[open] .ap-ledger-trip-controls-summary::after { content: '-'; }
+html.admin-mode .ap-ledger-trip-controls-summary > span { margin-right: auto; font-weight: var(--o-fw-semi); }
+html.admin-mode .ap-ledger-trip-controls-summary > strong {
+  font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3); font-weight: var(--o-fw-semi);
+}
+html.admin-mode .ap-ledger-trip-controls .ap-ledger-trip-grid { padding: 0 var(--o-space-2) var(--o-space-2); }
 html.admin-mode .ap-ledger-trip-formula {
   display: grid;
   gap: var(--o-space-1);
@@ -1718,6 +1740,24 @@ html.admin-mode .ap-rep-person-amount { font-family: var(--display); font-size: 
 html.admin-mode .ap-rep-person[data-owner="true"] .ap-rep-person-amount { color: var(--gold); }
 html.admin-mode .ap-rep-person-sub { font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3); }
 html.admin-mode .ap-rep-partner { display: flex; flex-direction: column; gap: var(--o-space-2); }
+html.admin-mode .ap-rep-formula-details {
+  border: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
+  border-radius: var(--o-r-sm);
+  background: color-mix(in oklab, var(--raised) 20%, transparent);
+  overflow: hidden;
+}
+html.admin-mode .ap-rep-formula-summary {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--o-space-2);
+  padding: var(--o-space-15) var(--o-space-2);
+  cursor: pointer; list-style: none;
+  font-family: var(--ui); font-size: var(--o-text-sm); font-weight: var(--o-fw-semi); color: var(--t2);
+}
+html.admin-mode .ap-rep-formula-summary::-webkit-details-marker { display: none; }
+html.admin-mode .ap-rep-formula-summary::after { content: '+'; color: var(--t3); font-family: var(--mono); }
+html.admin-mode .ap-rep-formula-details[open] .ap-rep-formula-summary::after { content: '-'; }
+html.admin-mode .ap-rep-formula-details .ap-rep-formula {
+  margin: 0 var(--o-space-2) var(--o-space-2);
+}
 html.admin-mode .ap-rep-formula {
   display: grid;
   gap: var(--o-space-1);
@@ -1732,13 +1772,23 @@ html.admin-mode .ap-rep-formula {
 }
 html.admin-mode .ap-rep-formula > span { min-width: 0; overflow-wrap: anywhere; }
 html.admin-mode .ap-rep-partner-card {
-  display: flex; flex-direction: column; gap: var(--o-space-15);
+  display: block;
   border: 1px solid var(--line);
   border-radius: var(--o-r-md);
   background: color-mix(in oklab, var(--raised) 36%, transparent);
-  padding: var(--o-space-2);
+  padding: 0;
+  overflow: hidden;
 }
-html.admin-mode .ap-rep-partner-head,
+html.admin-mode .ap-rep-partner-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2);
+  padding: var(--o-space-2);
+  cursor: pointer; list-style: none;
+}
+html.admin-mode .ap-rep-partner-head::-webkit-details-marker { display: none; }
+html.admin-mode .ap-rep-partner-head::after {
+  content: '+'; color: var(--t3); font-family: var(--mono); font-size: var(--o-text-xs);
+}
+html.admin-mode .ap-rep-partner-card[open] .ap-rep-partner-head::after { content: '-'; }
 html.admin-mode .ap-rep-partner-line {
   display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2);
 }
@@ -1749,7 +1799,7 @@ html.admin-mode .ap-rep-partner-head > span {
 html.admin-mode .ap-rep-partner-head > strong {
   font-family: var(--display); font-size: var(--o-text-lg); color: var(--t);
 }
-html.admin-mode .ap-rep-partner-lines { display: grid; gap: var(--o-space-1); }
+html.admin-mode .ap-rep-partner-lines { display: grid; gap: var(--o-space-1); padding: 0 var(--o-space-2) var(--o-space-2); }
 html.admin-mode .ap-rep-partner-line {
   padding-top: var(--o-space-1);
   border-top: 1px solid color-mix(in oklab, var(--line) 64%, transparent);

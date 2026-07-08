@@ -12,8 +12,9 @@ export const TRAVEL_PASSENGER_HOURLY_RATE = 15;
 // lluny. Els bolos locals (ruta per sota del llindar) NO en tenen. Monocapa: es canvia AQUÍ i
 // val a totes les superfícies (lead, reserva, portal, PDFs).
 export const TRAVEL_MEAL_ALLOWANCE_PER_PERSON = 30;
-// Llindar (hores de ruta anada+tornada) a partir del qual s'activa la dieta. ~3 h a/t = bolo
-// que ja no és «tornar per dinar/sopar a casa».
+// Llindar de ruta anada+tornada a partir del qual s'activa la dieta. Manolo #1742:
+// si passa de 150 km, apareix dieta; si no, no apareix.
+export const TRAVEL_LONG_ROUTE_KM = 150;
 export const TRAVEL_LONG_ROUTE_HOURS = 3;
 export const TRAVEL_AVG_SPEED_KMH = 65;
 export const TRAVEL_COST_LINE_MARKER = '[travel-cost]';
@@ -93,7 +94,8 @@ export function calculateTravelCostBreakdown(input: {
   const includedHours = TRAVEL_INCLUDED_HOURS;
   const chargeableHours = round2(Math.ceil(Math.max(0, routeHours - includedHours) / 0.5) * 0.5);
   const laborCostApplies = chargeableHours > 0;
-  const vehicleCost = calculateTravelCost(roundTripKm, vehicleCostPerKm);
+  const vehicleBillableKm = round2(Math.max(0, roundTripKm - laborThresholdKm));
+  const vehicleCost = calculateTravelCost(vehicleBillableKm, vehicleCostPerKm);
   const lines: TravelCostLine[] = [];
 
   if (vehicleCost > 0 && input.vehicleOwner) {
@@ -101,7 +103,7 @@ export function calculateTravelCostBreakdown(input: {
       label: `Vehicle ruta · ${input.vehicleOwner.label}`,
       costAmount: vehicleCost,
       collaboratorId: input.vehicleOwner.collaboratorId || null,
-      notes: `${TRAVEL_COST_LINE_MARKER} vehicle · ${roundTripKm.toFixed(1)} km · ${vehicleCostPerKm.toFixed(2)} EUR/km`,
+      notes: `${TRAVEL_COST_LINE_MARKER} vehicle · ${vehicleBillableKm.toFixed(1)} km facturables · ${vehicleCostPerKm.toFixed(2)} EUR/km · ${laborThresholdKm.toFixed(1)} km inclosos`,
     });
   }
 
@@ -290,26 +292,20 @@ export function computeBoloTransport(input: {
         ]
       : [],
   });
-  // Vehicle al client (#1741): dins els primers INCLUDED_TRAVEL_KM (50 km a/t = 25 per
-  // sentit) el desplaçament queda inclòs. Quan la ruta supera aquesta franquícia, el vehicle
-  // es cobra sobre la ruta real completa, perquè ha de quadrar amb la liquidació a qui posa
-  // el cotxe.
-  const vehicleCostPerKm = sanitizeNonNegative(input.vehicleCostPerKm, DEFAULT_VEHICLE_COST_PER_KM);
-  const clientVehicleKm = km > INCLUDED_TRAVEL_KM ? km : 0;
-  const clientVehicleCost = calculateTravelCost(clientVehicleKm, vehicleCostPerKm);
-  // Dieta de desplaçament (#1386): en rutes llargues (routeHours > llindar) cada PERSONA que
+  // Vehicle (#1742): km totals - 50 km inclosos = km facturables. La mateixa base governa
+  // el que veu el client i el que cobra qui posa el cotxe.
+  // Dieta de desplaçament (#1386/#1742): en rutes llargues (km > llindar) cada PERSONA que
   // viatja cobra una dieta d'àpat. Cost real repercutit al client (break-even): entra igual al
   // cost i al càrrec → NO mou el marge, cobreix el treballador quan el bolo és lluny. Els bolos
   // locals (sota el llindar) no en tenen. Font única del headcount = persones físiques.
-  const mealAllowance = breakdown.routeHours > TRAVEL_LONG_ROUTE_HOURS
+  const mealAllowance = km > TRAVEL_LONG_ROUTE_KM
     ? round2(TRAVEL_MEAL_ALLOWANCE_PER_PERSON * headcount)
     : 0;
   const totalCost = km <= 0 ? round2(tolls + mealAllowance) : round2(breakdown.totalCost + mealAllowance);
-  // El client paga el mateix cost real (transport = cost neutre): cotxe de la ruta llarga +
-  // tripulació@15 + dieta + peatges. En ruta local, el cotxe queda inclòs.
+  // El client paga: vehicle facturable + persones (1a hora inclosa) + dieta si >150 km + peatges.
   const clientCharge = km <= 0
     ? round2((tolls + mealAllowance) * CLIENT_TRAVEL_MARGIN)
-    : round2((clientVehicleCost + breakdown.peopleCost + mealAllowance + tolls) * CLIENT_TRAVEL_MARGIN);
+    : round2((breakdown.vehicleCost + breakdown.peopleCost + mealAllowance + tolls) * CLIENT_TRAVEL_MARGIN);
   return {
     roundTripKm: km,
     headcount,

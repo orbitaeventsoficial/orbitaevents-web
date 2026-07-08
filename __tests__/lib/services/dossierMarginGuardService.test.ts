@@ -22,7 +22,7 @@ describe('dossierMarginGuardService', () => {
     expect(budget.cost).toBeGreaterThan(0);
     expect(budget.clientCharge).toBeGreaterThan(0);
     expect(budget.clientVehicleCost).toBeGreaterThan(0);
-    expect(budget.vehicleKm).toBe(120);
+    expect(budget.vehicleKm).toBe(70);
     expect(budget.peopleCost).toBeGreaterThan(0);
     expect(budget.chargeableHours).toBeGreaterThan(0);
   });

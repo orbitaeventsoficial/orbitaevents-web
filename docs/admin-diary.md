@@ -1,3 +1,26 @@
+## 2026-07-08 — Lead: pacte partner curt i ruta amb 50 km inclosos (Canvi #1742, codex)
+
+### Context
+Després del #1741, el propietari concreta el criteri final per al lead `cmr1xh7la0000ug7dj4jnihjr`: la fitxa no ha de repetir marge perquè ja el marca el lateral, el bloc de desplaçament/pacte havia quedat massa llarg, i la lectura ha de servir tant per a Òrbita com per ensenyar a Masquerade què cobrarà. La regla vigent passa a ser: `km totals - 50 km inclosos`, persones amb `1 h` inclosa, i dietes només si la ruta supera `150 km`.
+
+### Què s'ha fet
+- `calculateTravelCostBreakdown` ja genera la línia `Vehicle ruta` amb km facturables (`km - 50`) i no amb la ruta sencera; el que veu el client i el que cobra qui posa el cotxe comparteixen base.
+- `computeBoloTransport` conserva la font única: vehicle facturable, persones a 15 €/h amb 1 h inclosa, dietes si `km > 150` i peatges quan existeixen.
+- `/admin/leads/[id]` deixa el desplaçament i el pacte de partner plegats per defecte; el visible queda en resum i el detall mostra la fórmula curta.
+- `Pacte amb partner` passa a lectura presentable: Masquerade veu l'import, pot desplegar "d'on surt la ruta" i pot desplegar "què cobra Masquerade"; l'auditoria interna de costos queda plegada.
+- Tests de transport, guard de dossier, repartiment i lead actualitzats per blindar 50 km inclosos, 1 h inclosa, dieta >150 km i absència de `peatges no informats` quan no hi ha import.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\travelLaborCost.test.ts __tests__\lib\services\dossierMarginGuardService.test.ts __tests__\lib\services\repartimentService.test.ts __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx` OK (22/22); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK; `pnpm build` OK (inclou `validate:core` + `next build`).
+- Validació funcional: Playwright real a `http://localhost:3000/admin/leads/cmr1xh7la0000ug7dj4jnihjr` mostra `Qui cobra la ruta 315 €`; desplegat: `Vehicle: 411,4 km - 50 inclosos = 361,4 km facturables (90,35 €)`, `Persones: 6,33 h - 1 h inclosa = 5,5 h`, `Hores de ruta: 5,5 h x 15 €/h = 82,50 € per persona`, `Dietes: 411,4 km > 150 km`.
+- Validació humana/UX: el lead queda curt d'entrada i presentable al partner: Masquerade veu `273 €` i les quatre línies que expliquen què cobra; el marge/net d'Òrbita no domina la lectura.
+
+### Coordinació
+Counter → 1742. Canvi limitat a transport/repartiment visible del lead, motor de ruta, tests, roadmap, protocol, diari i sync; sense schema, BD ni tocar `app/admin/tasks`. Rectifica el criteri de vehicle del #1741 segons l'última decisió del propietari.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Transport llarg: vehicle cobrat igual que es liquida (Canvi #1741, codex)
 
 ### Context

@@ -53,6 +53,8 @@ export interface BoloTripCardProps {
   routeSettlementLines?: RouteSettlementLine[];
   /** Notes de formula ja calculades pel pare; aquest component nomes les pinta. */
   calculationNotes?: string[];
+  /** Els controls queden oberts a reserves; al lead es pot deixar plegat per reduir soroll. */
+  controlsDefaultOpen?: boolean;
 }
 
 export default function BoloTripCard({
@@ -76,6 +78,7 @@ export default function BoloTripCard({
   effectiveTravelCost = 0,
   routeSettlementLines = [],
   calculationNotes = [],
+  controlsDefaultOpen = true,
 }: BoloTripCardProps) {
   const headcountEditable = typeof onHeadcountOverrideChange === 'function';
   const showTolls = typeof onTollsChange === 'function';
@@ -89,77 +92,6 @@ export default function BoloTripCard({
           {km > 0 ? `${km} km · ${headcount} ${headcount === 1 ? 'persona' : 'persones'}` : 'sense ruta'}
         </span>
       </div>
-      <div className="ap-ledger-trip-grid">
-        <div className="ap-ledger-trip-group">
-          <span className="ap-ledger-trip-grouplbl">Ruta</span>
-          <div className="ap-ledger-trip-fields">
-            <label className="ap-ledger-trip-field">
-              <span>Km anada+tornada</span>
-              <input
-                type="number" min={0} step={1} inputMode="numeric" className="adm-input"
-                value={distanceKm}
-                onChange={(e) => onDistanceChange(e.target.value)}
-                placeholder={calculatingDistance ? '…' : '0'}
-                aria-label="Km anada i tornada de la ruta"
-              />
-            </label>
-            {headcountEditable ? (
-              <label className="ap-ledger-trip-field">
-                <span>Integrants{headcountOverride ? '' : ' · auto'}</span>
-                <input
-                  type="number" min={0} step={1} inputMode="numeric" className="adm-input"
-                  data-alarm={tripCrowded ? 'true' : undefined}
-                  value={headcountOverride}
-                  onChange={(e) => onHeadcountOverrideChange!(e.target.value)}
-                  placeholder={String(derivedHeadcount)}
-                  aria-label="Integrants que viatgen (auto-calculat; escriu per ajustar)"
-                  title="Es calcula sol des dels serveis del bolo. Escriu un número per ajustar-lo a mà."
-                />
-              </label>
-            ) : (
-              <div className="ap-ledger-trip-field">
-                <span>Integrants</span>
-                <div className="ap-ledger-trip-ro" data-alarm={tripCrowded ? 'true' : undefined} aria-label={`${headcount} integrants que viatgen`}>
-                  {headcount}
-                </div>
-              </div>
-            )}
-            {showTolls && (
-              <label className="ap-ledger-trip-field">
-                <span>Peatges</span>
-                <input
-                  type="number" min={0} step="0.01" inputMode="decimal" className="adm-input"
-                  value={tollsEur}
-                  onChange={(e) => onTollsChange!(e.target.value)}
-                  placeholder="0 €"
-                  aria-label="Peatges de la ruta en euros"
-                />
-              </label>
-            )}
-          </div>
-        </div>
-        {showAttribution && (
-          <div className="ap-ledger-trip-group">
-            <span className="ap-ledger-trip-grouplbl">Equip</span>
-            <div className="ap-ledger-trip-fields">
-              <label className="ap-ledger-trip-field">
-                <span>Posa el cotxe</span>
-                <select className="adm-input" value={vehicleOwnerId} onChange={(e) => onVehicleOwnerChange!(e.target.value)} aria-label="Qui posa el cotxe">
-                  <option value="">Òrbita</option>
-                  {travelCollaborators.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
-                </select>
-              </label>
-              <label className="ap-ledger-trip-field">
-                <span>Condueix</span>
-                <select className="adm-input" value={driverId} onChange={(e) => onDriverChange!(e.target.value)} aria-label="Qui condueix">
-                  <option value="">Òrbita</option>
-                  {travelCollaborators.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
-                </select>
-              </label>
-            </div>
-          </div>
-        )}
-      </div>
       {tripCrowded && (
         <p className="ap-ledger-trip-alarm" role="alert">
           ⚠ Viatgen {headcount} persones: el transport s'encareix molt (cada persona suma temps de tripulació). Revisa qui cal que hi vagi.
@@ -170,6 +102,83 @@ export default function BoloTripCard({
           ? `La 1a hora de ruta va inclosa · es cobra el temps a partir d'aquí (${formatNumber(chargeableHours)} h de tripulació).`
           : 'Ruta curta: dins la 1a hora inclosa, no es cobra temps de tripulació.'}
       </p>
+      <details className="ap-ledger-trip-controls" open={controlsDefaultOpen}>
+        <summary className="ap-ledger-trip-controls-summary">
+          <span>Ajustos de ruta</span>
+          <strong>{showTolls && tollsEur ? `peatges ${tollsEur} €` : 'editar km, equip i peatges'}</strong>
+        </summary>
+        <div className="ap-ledger-trip-grid">
+          <div className="ap-ledger-trip-group">
+            <span className="ap-ledger-trip-grouplbl">Ruta</span>
+            <div className="ap-ledger-trip-fields">
+              <label className="ap-ledger-trip-field">
+                <span>Km anada+tornada</span>
+                <input
+                  type="number" min={0} step={1} inputMode="numeric" className="adm-input"
+                  value={distanceKm}
+                  onChange={(e) => onDistanceChange(e.target.value)}
+                  placeholder={calculatingDistance ? '…' : '0'}
+                  aria-label="Km anada i tornada de la ruta"
+                />
+              </label>
+              {headcountEditable ? (
+                <label className="ap-ledger-trip-field">
+                  <span>Integrants{headcountOverride ? '' : ' · auto'}</span>
+                  <input
+                    type="number" min={0} step={1} inputMode="numeric" className="adm-input"
+                    data-alarm={tripCrowded ? 'true' : undefined}
+                    value={headcountOverride}
+                    onChange={(e) => onHeadcountOverrideChange!(e.target.value)}
+                    placeholder={String(derivedHeadcount)}
+                    aria-label="Integrants que viatgen (auto-calculat; escriu per ajustar)"
+                    title="Es calcula sol des dels serveis del bolo. Escriu un número per ajustar-lo a mà."
+                  />
+                </label>
+              ) : (
+                <div className="ap-ledger-trip-field">
+                  <span>Integrants</span>
+                  <div className="ap-ledger-trip-ro" data-alarm={tripCrowded ? 'true' : undefined} aria-label={`${headcount} integrants que viatgen`}>
+                    {headcount}
+                  </div>
+                </div>
+              )}
+              {showTolls && (
+                <label className="ap-ledger-trip-field">
+                  <span>Peatges</span>
+                  <input
+                    type="number" min={0} step="0.01" inputMode="decimal" className="adm-input"
+                    value={tollsEur}
+                    onChange={(e) => onTollsChange!(e.target.value)}
+                    placeholder="0 €"
+                    aria-label="Peatges de la ruta en euros"
+                  />
+                </label>
+              )}
+            </div>
+          </div>
+          {showAttribution && (
+            <div className="ap-ledger-trip-group">
+              <span className="ap-ledger-trip-grouplbl">Equip</span>
+              <div className="ap-ledger-trip-fields">
+                <label className="ap-ledger-trip-field">
+                  <span>Posa el cotxe</span>
+                  <select className="adm-input" value={vehicleOwnerId} onChange={(e) => onVehicleOwnerChange!(e.target.value)} aria-label="Qui posa el cotxe">
+                    <option value="">Òrbita</option>
+                    {travelCollaborators.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
+                  </select>
+                </label>
+                <label className="ap-ledger-trip-field">
+                  <span>Condueix</span>
+                  <select className="adm-input" value={driverId} onChange={(e) => onDriverChange!(e.target.value)} aria-label="Qui condueix">
+                    <option value="">Òrbita</option>
+                    {travelCollaborators.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
+                  </select>
+                </label>
+              </div>
+            </div>
+          )}
+        </div>
+      </details>
       {calculationNotes.length > 0 && routeSettlementLines.length === 0 && (
         <div className="ap-ledger-trip-formula" aria-label="Càlcul del desplaçament">
           {calculationNotes.map((note) => (

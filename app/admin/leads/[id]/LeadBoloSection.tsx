@@ -9,16 +9,15 @@ import BoloTripCard, { CROWDED_TRIP_THRESHOLD } from '@/app/admin/components/Bol
 import type { BookingServiceLineFormInput } from '@/app/admin/bookings/booking-form.types';
 import { computeBookingFinancialSummary, computeServiceLineEconomics, classifyBoloLines } from '@/lib/services/costEngine';
 import { buildBoloRepartimentLines, computeBoloRepartiment } from '@/lib/services/repartimentService';
-import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM } from '@/lib/services/travelCost';
+import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 import {
  calculateTravelCostBreakdown,
  deriveTravelHeadcount,
  computeBoloTransport,
  buildTravelMealAllowanceLines,
- TRAVEL_AVG_SPEED_KMH,
  TRAVEL_DRIVER_HOURLY_RATE,
  TRAVEL_INCLUDED_HOURS,
- TRAVEL_LONG_ROUTE_HOURS,
+ TRAVEL_LONG_ROUTE_KM,
  TRAVEL_MEAL_ALLOWANCE_PER_PERSON,
  type TravelPersonInput,
 } from '@/lib/services/travelLaborCost';
@@ -253,34 +252,29 @@ export default function LeadBoloSection({
  const tollsValue = Number(tollsEur) || 0;
  const tollsHint = tollsValue > 0
    ? `inclou ${formatCurrency(tollsValue)} de peatges`
-   : km > 0 && tollsEur.trim() === ''
-     ? 'peatges no informats'
-     : km > 0
-       ? 'sense peatges'
-       : null;
+   : null;
  const mealAllowance = transport?.mealAllowance ?? 0;
  const travelMealLines = useMemo(() => buildTravelMealAllowanceLines(travelPeople, mealAllowance), [travelPeople, mealAllowance]);
  const routeCostLines = useMemo(() => [...travelBreakdown.lines, ...travelMealLines], [travelBreakdown.lines, travelMealLines]);
  const travelCalculationNotes = useMemo(() => {
  if (km <= 0) return [];
+ const billableKm = Math.max(0, km - INCLUDED_TRAVEL_KM);
  const notes = [
- `Hores ruta: ${formatNumber(km, { maximumFractionDigits: 1 })} km / ${TRAVEL_AVG_SPEED_KMH} km/h = ${formatNumber(travelBreakdown.routeHours, { maximumFractionDigits: 2 })} h.`,
+ `Vehicle: ${formatNumber(km, { maximumFractionDigits: 1 })} km - ${formatNumber(INCLUDED_TRAVEL_KM, { maximumFractionDigits: 0 })} inclosos = ${formatNumber(billableKm, { maximumFractionDigits: 1 })} km facturables (${formatCurrencyExact(travelBreakdown.vehicleCost)}).`,
  ];
  if (travelBreakdown.chargeableHours > 0) {
- notes.push(`Temps cobrable: ${formatNumber(travelBreakdown.routeHours, { maximumFractionDigits: 2 })} h - ${formatNumber(TRAVEL_INCLUDED_HOURS, { maximumFractionDigits: 1 })} h inclosa = ${formatNumber(travelBreakdown.chargeableHours, { maximumFractionDigits: 1 })} h.`);
- const perPersonLabor = travelBreakdown.chargeableHours * TRAVEL_DRIVER_HOURLY_RATE;
- notes.push(`Hores de cotxe: ${formatNumber(travelBreakdown.chargeableHours, { maximumFractionDigits: 1 })} h x ${formatCurrencyExact(TRAVEL_DRIVER_HOURLY_RATE)}/h = ${formatCurrencyExact(perPersonLabor)} per persona; ${headcount} ${headcount === 1 ? 'persona' : 'persones'} = ${formatCurrencyExact(travelBreakdown.peopleCost)}.`);
+ const laborPerPerson = travelBreakdown.chargeableHours * TRAVEL_DRIVER_HOURLY_RATE;
+ notes.push(`Persones: ${formatNumber(travelBreakdown.routeHours, { maximumFractionDigits: 2 })} h - ${formatNumber(TRAVEL_INCLUDED_HOURS, { maximumFractionDigits: 1 })} h inclosa = ${formatNumber(travelBreakdown.chargeableHours, { maximumFractionDigits: 1 })} h facturables arrodonides.`);
+ notes.push(`Hores de ruta: ${formatNumber(travelBreakdown.chargeableHours, { maximumFractionDigits: 1 })} h x ${formatCurrencyExact(TRAVEL_DRIVER_HOURLY_RATE)}/h = ${formatCurrencyExact(laborPerPerson)} per persona.`);
  }
  if (mealAllowance > 0) {
- notes.push(`Dietes: ruta > ${TRAVEL_LONG_ROUTE_HOURS} h; ${formatCurrencyExact(TRAVEL_MEAL_ALLOWANCE_PER_PERSON)} x ${headcount} ${headcount === 1 ? 'persona' : 'persones'} = ${formatCurrencyExact(mealAllowance)}.`);
+ notes.push(`Dietes: ${formatNumber(km, { maximumFractionDigits: 1 })} km > ${TRAVEL_LONG_ROUTE_KM} km; ${formatCurrencyExact(TRAVEL_MEAL_ALLOWANCE_PER_PERSON)} x ${headcount} ${headcount === 1 ? 'persona' : 'persones'} = ${formatCurrencyExact(mealAllowance)}.`);
  }
  if (tollsValue > 0) {
  notes.push(`Peatges: ${formatCurrencyExact(tollsValue)} informats a la ruta.`);
- } else if (tollsHint === 'peatges no informats') {
- notes.push('Peatges: ruta amb km però sense import informat.');
  }
  return notes;
- }, [headcount, km, mealAllowance, tollsHint, tollsValue, travelBreakdown.chargeableHours, travelBreakdown.peopleCost, travelBreakdown.routeHours]);
+ }, [headcount, km, mealAllowance, tollsValue, travelBreakdown.chargeableHours, travelBreakdown.routeHours, travelBreakdown.vehicleCost]);
  const repartimentInputLines = useMemo(() => buildBoloRepartimentLines({
  serviceLines: buildVisibleLines(),
  travelCharge,
@@ -510,6 +504,7 @@ export default function LeadBoloSection({
  effectiveTravelCost={effectiveTravelCost}
  routeSettlementLines={routeSettlementLines}
  calculationNotes={travelCalculationNotes}
+ controlsDefaultOpen={false}
  />
 
  {/* ── PRESSUPOST: la sortida clau del bolo, panell or destacat a tota l'amplada ── */}

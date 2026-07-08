@@ -62,8 +62,7 @@ export default function RepartimentPanel({
     <div className={`ap-rep${isPreproposal ? ' ap-rep--preproposal' : ''}`}>
       {isPreproposal && (
         <div className="ap-rep-purpose">
-          <span>Lectura per pactar imports abans de crear dossier o pressupost.</span>
-          <strong>Sense restar costos interns davant del partner.</strong>
+          <span>Lectura per validar amb el partner: què cobra i d'on surt.</span>
         </div>
       )}
 
@@ -81,16 +80,19 @@ export default function RepartimentPanel({
       {isPreproposal && visiblePeople.length > 0 && (
         <div className="ap-rep-partner">
           {preproposalNotes.length > 0 && (
-            <div className="ap-rep-formula" aria-label="Càlcul de ruta per validar amb partner">
-              {preproposalNotes.map((note) => <span key={note}>{note}</span>)}
-            </div>
+            <details className="ap-rep-formula-details">
+              <summary className="ap-rep-formula-summary">D'on surt la ruta</summary>
+              <div className="ap-rep-formula" aria-label="Càlcul de ruta per validar amb partner">
+                {preproposalNotes.map((note) => <span key={note}>{note}</span>)}
+              </div>
+            </details>
           )}
           {visiblePeople.map((p) => (
-            <article key={`${p.personId}:detail`} className="ap-rep-partner-card">
-              <div className="ap-rep-partner-head">
-                <span>Detall a validar amb {nameOf(p.personId)}</span>
+            <details key={`${p.personId}:detail`} className="ap-rep-partner-card">
+              <summary className="ap-rep-partner-head">
+                <span>Què cobra {nameOf(p.personId)}</span>
                 <strong>{formatCurrency(p.rep)}</strong>
-              </div>
+              </summary>
               <div className="ap-rep-partner-lines">
                 {partnerRows(p.personId).map((row) => (
                   <div key={row.key} className="ap-rep-partner-line" data-settlement={row.settlement ? 'true' : undefined}>
@@ -99,7 +101,7 @@ export default function RepartimentPanel({
                   </div>
                 ))}
               </div>
-            </article>
+            </details>
           ))}
         </div>
       )}

@@ -68,7 +68,7 @@ export function computeDossierTransportBudget(roundTripKm?: number | null, tolls
   });
   const peopleCost = transport.breakdown.peopleCost;
   const tollsCost = transport.tollsEur;
-  const vehicleKm = transport.roundTripKm > INCLUDED_TRAVEL_KM ? transport.roundTripKm : 0;
+  const vehicleKm = Math.max(0, transport.roundTripKm - INCLUDED_TRAVEL_KM);
   const vehicleCostPerKm = DEFAULT_VEHICLE_COST_PER_KM;
   const clientVehicleCost = round2(Math.max(
     0,

@@ -1733,6 +1733,25 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1742 — 2026-07-08 — codex (FET)
+- Context: el propietari rectifica el criteri final del lead de l'Aldosa: la lectura ha de servir a Òrbita i a Masquerade, però sense pantalla infinita ni marge duplicat. El criteri vigent és `km totals - 50 km inclosos`, persones amb `1 h` inclosa, i dietes només si la ruta supera `150 km`.
+- Fet:
+  - `calculateTravelCostBreakdown` calcula `Vehicle ruta` sobre km facturables (`km - 50`) i deixa de liquidar el vehicle sobre la ruta sencera.
+  - `computeBoloTransport` manté una sola font per a client i liquidació visible: vehicle facturable, persones a 15 €/h amb 1 h inclosa, dieta si `km > 150` i peatges si existeixen.
+  - `BoloTripCard` pot plegar ajustos de ruta al lead, mantenint reserves obertes per defecte.
+  - `RepartimentPanel` en mode pre-proposta mostra una lectura de partner curta: import de Masquerade, fórmula desplegable i línies de què cobra; el detall intern queda plegat.
+  - `/admin/leads/[id]` canvia la fórmula visible a vehicle `km - 50`, persones `hores - 1 h`, hores a 15 €/h i dietes només per rutes de més de 150 km; desapareix `peatges no informats` quan no hi ha import.
+  - Tests de transport, guard de dossier, repartiment i lead actualitzats.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\lib\services\travelLaborCost.test.ts __tests__\lib\services\dossierMarginGuardService.test.ts __tests__\lib\services\repartimentService.test.ts __tests__\app\admin\leads\LeadBoloSection-repartiment.test.tsx` OK (22/22); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:zenit-roadmap` OK; `git diff --check` OK; `pnpm build` OK (inclou `validate:core` + `next build`).
+  - Validació funcional: Playwright real a `/admin/leads/cmr1xh7la0000ug7dj4jnihjr` confirma `Qui cobra la ruta 315 €` i, desplegat, vehicle `411,4 - 50 = 361,4 km facturables`, persones `6,33 h - 1 h = 5,5 h`, `82,50 € per persona` i dietes només perquè `411,4 km > 150 km`.
+  - Validació humana/UX: la pantalla d'entrada queda curta; Masquerade veu `273 €` i pot desplegar exactament d'on surt sense que el net d'Òrbita ocupi la conversa.
+- Roadmap Manolo actualitzat amb #1742 dins del bloc lead/repartiment.
+- `ADMIN_CHANGE_COUNTER` puja a `1742`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1741 — 2026-07-08 — codex (FET)
 - Context: el propietari revisa el desplaçament del dossier de l'Aldosa i detecta que el client veia el vehicle amb franquícia de 50 km aplicada, mentre el repartiment pagava a qui posa el cotxe sobre la ruta completa. La primera hora de persones ha de continuar inclosa, però el vehicle de ruta llarga no pot quedar amb dues bases diferents.
 - Fet:

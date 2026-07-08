@@ -12,7 +12,7 @@ describe('travelLaborCost', () => {
     expect(estimateRoundTripHours(394.2)).toBe(6.06);
   });
 
-  it('calcula vehicle, conductor i passatger amb la 1a hora inclosa (routeHours 5 → cobra 4 h)', () => {
+  it('calcula vehicle facturable, conductor i passatger amb 50 km i 1a hora inclosos', () => {
     const r = calculateTravelCostBreakdown({
       roundTripKm: 394.2,
       vehicleCostPerKm: 0.25,
@@ -26,19 +26,19 @@ describe('travelLaborCost', () => {
 
     expect(r.includedHours).toBe(1);
     expect(r.chargeableHours).toBe(4); // floor(5 - 1)
-    expect(r.vehicleCost).toBe(98.55);
+    expect(r.vehicleCost).toBe(86.05);
     expect(r.driverCost).toBe(60);    // 4 h × 15
     expect(r.passengerCost).toBe(60); // 4 h × 15
-    expect(r.totalCost).toBe(218.55);
+    expect(r.totalCost).toBe(206.05);
     expect(r.lines).toEqual([
-      expect.objectContaining({ label: 'Vehicle ruta · Òrbita', costAmount: 98.55, collaboratorId: null }),
+      expect.objectContaining({ label: 'Vehicle ruta · Òrbita', costAmount: 86.05, collaboratorId: null }),
       expect.objectContaining({ label: 'Temps ruta conductor · Òrbita', costAmount: 60, collaboratorId: null }),
       expect.objectContaining({ label: 'Temps ruta passatger · Carlos', costAmount: 60, collaboratorId: 'carlos' }),
     ]);
     expect(r.lines.every((line) => line.notes.includes(TRAVEL_COST_LINE_MARKER))).toBe(true);
   });
 
-  it('assigna vehicle i conductor al col·laborador quan el cotxe el posa el proveïdor', () => {
+  it('no liquida vehicle dins els 50 km inclosos i assigna conductor al col·laborador', () => {
     const r = calculateTravelCostBreakdown({
       roundTripKm: 30,
       vehicleCostPerKm: 0.25,
@@ -47,11 +47,10 @@ describe('travelLaborCost', () => {
       people: [{ role: 'DRIVER', label: 'Carlos', collaboratorId: 'carlos' }],
     });
 
-    expect(r.vehicleCost).toBe(7.5);
+    expect(r.vehicleCost).toBe(0);
     expect(r.driverCost).toBe(30); // 2 h × 15
-    expect(r.totalCost).toBe(37.5);
+    expect(r.totalCost).toBe(30);
     expect(r.lines).toEqual([
-      expect.objectContaining({ collaboratorId: 'carlos', costAmount: 7.5 }),
       expect.objectContaining({ collaboratorId: 'carlos', costAmount: 30 }),
     ]);
   });
@@ -94,15 +93,24 @@ describe('travelLaborCost', () => {
 
     expect(r.breakdown.chargeableHours).toBe(5.5);
     expect(r.breakdown.peopleCost).toBe(165);      // tripulació: 5,5 h × 15 × 2
-    expect(r.mealAllowance).toBe(60);              // dieta: 30 × 2 (routeHours 6,49 > 3)
-    // clientCharge = cotxe sencer 109,72 + tripulació 165 + dieta 60
-    expect(r.clientCharge).toBe(334.72);
-    // cost = cotxe sencer 109,72 + tripulació 165 + dieta 60
-    expect(r.cost).toBe(334.72);
-    // Break-even: la ruta llarga cobra el mateix vehicle que es liquida a qui posa el cotxe.
+    expect(r.mealAllowance).toBe(60);              // dieta: 30 × 2 (422 km > 150)
+    // clientCharge = (422 - 50 inclosos) × 0,26 + tripulació 165 + dieta 60
+    expect(r.clientCharge).toBe(321.72);
+    // cost = mateixa base visible: vehicle facturable 96,72 + tripulació 165 + dieta 60
+    expect(r.cost).toBe(321.72);
+    // El client i qui posa el cotxe comparteixen la base de 50 km inclosos.
   });
 
-  it('no aplica dieta en ruta curta (per sota del llindar de 3 h)', () => {
+  it('aplica dieta quan la ruta supera 150 km', () => {
+    const r = computeBoloTransport({
+      roundTripKm: 160,
+      vehicleCostPerKm: 0.26,
+      headcountOverride: 2,
+    });
+    expect(r.mealAllowance).toBe(60);
+  });
+
+  it('no aplica dieta en ruta curta (150 km o menys)', () => {
     const r = computeBoloTransport({
       roundTripKm: 120, // ~1,85 h a/t < 3 h
       vehicleCostPerKm: 0.26,

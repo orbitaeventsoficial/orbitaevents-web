@@ -73,7 +73,7 @@ describe('LeadBoloSection repartiment', () => {
     expect(panel).toHaveAttribute('id', 'lead-repartiment');
     expect(panel).toHaveClass('ap-ledger-budget--repartiment');
     expect(screen.getByText('pre-proposta · import a validar abans de crear dossier o pressupost')).toBeInTheDocument();
-    expect(screen.getByText('Sense restar costos interns davant del partner.')).toBeInTheDocument();
+    expect(screen.getByText("Lectura per validar amb el partner: què cobra i d'on surt.")).toBeInTheDocument();
     expect(screen.getByText('import a validar · 1 línia')).toBeInTheDocument();
     const peopleSummary = panel.querySelector('.ap-rep-people');
     expect(peopleSummary?.textContent).toContain('Masquerade');
@@ -144,18 +144,18 @@ describe('LeadBoloSection repartiment', () => {
     expect(screen.getByText('Peatges ruta · Òrbita')).toBeInTheDocument();
     expect(screen.getByText('Dieta desplaçament · Òrbita')).toBeInTheDocument();
     expect(screen.getAllByText('Dieta desplaçament · Masquerade').length).toBeGreaterThan(0);
-    expect(screen.getByText('Detall a validar amb Masquerade')).toBeInTheDocument();
-    expect(screen.getAllByText('Hores ruta: 422 km / 65 km/h = 6,49 h.').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Temps cobrable: 6,49 h - 1 h inclosa = 5,5 h.').length).toBeGreaterThan(0);
-    expect(screen.getAllByText((text) => text.includes('Hores de cotxe: 5,5 h x 15,00') && text.includes('82,50') && text.includes('2 persones = 165,00')).length).toBeGreaterThan(0);
-    expect(screen.getAllByText((text) => text.includes('Dietes: ruta > 3 h; 30,00') && text.includes('2 persones = 60,00')).length).toBeGreaterThan(0);
+    expect(screen.getByText('Què cobra Masquerade')).toBeInTheDocument();
+    expect(screen.getAllByText((text) => text.includes('Vehicle: 422 km - 50 inclosos = 372 km facturables') && text.includes('96,72')).length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Persones: 6,49 h - 1 h inclosa = 5,5 h facturables arrodonides.').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Hores de ruta: 5,5 h x 15,00 €/h = 82,50 € per persona.').length).toBeGreaterThan(0);
+    expect(screen.getAllByText((text) => text.includes('Dietes: 422 km > 150 km; 30,00') && text.includes('2 persones = 60,00')).length).toBeGreaterThan(0);
     expect(screen.getByText('Compensació a Òrbita · Tècnic de so inclòs · 1h 30')).toBeInTheDocument();
     expect(screen.getByText('Operari Òrbita')).toBeInTheDocument();
     expect(screen.getByText('Cost intern Òrbita')).toBeInTheDocument();
     expect(screen.getByText('Benefici net Òrbita')).toBeInTheDocument();
   });
 
-  it('fa explícit quan hi ha ruta però els peatges no estan informats', async () => {
+  it('no embruta la lectura curta quan hi ha ruta sense peatges informats', async () => {
     render(
       <LeadBoloSection
         leadId="lead-1"
@@ -168,6 +168,6 @@ describe('LeadBoloSection repartiment', () => {
       expect(screen.getByText('Pacte amb partner')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('peatges no informats')).toBeInTheDocument();
+    expect(screen.queryByText('peatges no informats')).not.toBeInTheDocument();
   });
 });
