@@ -35,6 +35,7 @@ vi.mock('@/lib/services/fuelReferenceService', () => ({
 }));
 
 import { createBookingFromInput } from '@/lib/services/bookingCreationService';
+import { SOUND_RENTAL } from '@/lib/constants/inventory';
 
 const BASE_INPUT = {
   clientName: 'Joan Garcia',
@@ -145,7 +146,7 @@ describe('createBookingFromInput', () => {
     expect(arg.depositAmount).toBeGreaterThan(0);
   });
 
-  it('afegeix la línia de lloguer de so (Isma) quan el bolo porta pack', async () => {
+  it('afegeix la liquidació interna de so Isma quan el bolo porta pack', async () => {
     mockPrisma.collaborator.findFirst.mockResolvedValue({ id: 'isma-1' });
     await createBookingFromInput(BASE_INPUT);
 
@@ -157,7 +158,7 @@ describe('createBookingFromInput', () => {
     expect(sound.revenueAmount).toBe(0); // no es factura a part: només resta al marge
   });
 
-  it('NO afegeix línia de so si el col·laborador de lloguer no existeix', async () => {
+  it('NO afegeix línia de so si el col·laborador intern no existeix', async () => {
     mockPrisma.collaborator.findFirst.mockResolvedValue(null);
     await createBookingFromInput(BASE_INPUT);
 
@@ -698,7 +699,7 @@ describe('createBookingFromInput', () => {
       );
     });
 
-    it('no afegeix so llogat automatic quan el bolo no porta pack de cataleg', async () => {
+    it('afegeix so Isma quan un bolo personalitzat porta línia DJ', async () => {
       setupDefaults();
       mockPrisma.collaborator.findFirst.mockResolvedValue({ id: 'isma-1' });
       mockPrisma.pack.findUnique.mockImplementation(({ where }: { where: { slug?: string; id?: string } }) => {
@@ -715,10 +716,10 @@ describe('createBookingFromInput', () => {
       });
 
       const createArg = mockPrisma.booking.create.mock.calls[0][0];
-      expect(createArg.data.serviceLines.create).toHaveLength(1);
+      expect(createArg.data.serviceLines.create).toHaveLength(2);
       expect(createArg.data.serviceLines.create[0]).toMatchObject({ kind: 'DJ', label: 'DJ Òrbita' });
-      expect(createArg.data.serviceLines.create).not.toContainEqual(
-        expect.objectContaining({ collaboratorId: 'isma-1', label: 'Lloguer equip de so (Isma)' }),
+      expect(createArg.data.serviceLines.create).toContainEqual(
+        expect.objectContaining({ collaboratorId: 'isma-1', label: SOUND_RENTAL.label, costAmount: SOUND_RENTAL.costPerEvent, revenueAmount: 0 }),
       );
     });
   });

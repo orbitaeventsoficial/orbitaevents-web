@@ -5,6 +5,7 @@
  */
 import { prisma } from '@/lib/prisma';
 import type { AnimacioProduct } from '@/lib/constants/animacio-products';
+import { SOUND_RENTAL } from '@/lib/constants/inventory';
 
 export const DOSSIER_COLLABORATOR_PRODUCT_PREFIX = 'collab:';
 
@@ -92,6 +93,11 @@ function splitIncludes(value?: string | null): string[] {
     .split(/·|\n|;|,/)
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+function isIncludedSoundRentalCatalogProduct(product: { collaboratorId?: string | null; name?: string | null }): boolean {
+  const normalizedName = product.name?.toLowerCase() || '';
+  return product.collaboratorId === SOUND_RENTAL.collaboratorId && /so|altaveu|speaker/.test(normalizedName);
 }
 
 /**
@@ -214,6 +220,7 @@ export async function listDossierCollaboratorProducts(): Promise<DossierCollabor
   });
 
   return products
+    .filter((p) => !isIncludedSoundRentalCatalogProduct(p))
     .map(collaboratorProductToDossierProduct);
 }
 
@@ -224,7 +231,7 @@ export async function listActiveCollaboratorProductsForBooking() {
     include: { collaborator: { select: { name: true, company: true, roles: true } } },
     orderBy: [{ collaborator: { company: 'asc' } }, { sortOrder: 'asc' }, { createdAt: 'asc' }],
   });
-  return products.map((p) => ({
+  return products.filter((p) => !isIncludedSoundRentalCatalogProduct(p)).map((p) => ({
     id: p.id,
     name: p.name,
     category: p.category,
@@ -256,7 +263,9 @@ export async function getDossierCollaboratorProductsByIds(productIds: string[]):
       collaborator: { select: { name: true, company: true } },
     },
   });
-  const byId = new Map(products.map((product) => [product.id, collaboratorProductToDossierProduct(product)]));
+  const byId = new Map(products
+    .filter((product) => !isIncludedSoundRentalCatalogProduct(product))
+    .map((product) => [product.id, collaboratorProductToDossierProduct(product)]));
 
   return ids
     .map((id) => byId.get(id))

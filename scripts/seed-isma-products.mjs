@@ -1,10 +1,10 @@
 /**
- * Sembra el catàleg intern d'Isma com a lloguer d'equip per a bolos DJ.
+ * Manté Isma com a liquidació interna de so DJ, no com a producte seleccionable.
  *
  * Model:
- * - visibleInBooking=true: es pot afegir al configurador de bolo per imputar cost real.
- * - visibleInDossier=false: no és un capítol comercial del client; el client compra DJ.
- * - sellPrice=0 i costPrice=50: descompon el marge del DJ sense inflar el pressupost.
+ * - El client compra DJ a preu tancat.
+ * - 50€ d'aquest preu es liquiden a Isma pels altaveus.
+ * - Isma no apareix al catàleg de proveïdors/productes del configurador.
  *
  * Ús: node scripts/seed-isma-products.mjs
  */
@@ -23,12 +23,12 @@ const PRODUCTS = [
     costPrice: 50,
     sellPrice: 0,
     imageUrl: null,
-    description: 'Cost intern de lloguer dels altaveus d’Isma quan el servei DJ necessita equip de so extern. No es mostra com a producte del dossier.',
-    includes: 'Altaveus per al servei DJ',
+    description: 'Liquidació interna: 50€ del preu DJ corresponen al so d’Isma. No es mostra com a producte seleccionable.',
+    includes: 'So inclòs dins el servei DJ',
     sortOrder: 1,
-    isActive: true,
+    isActive: false,
     visibleInDossier: false,
-    visibleInBooking: true,
+    visibleInBooking: false,
   },
 ];
 
@@ -37,17 +37,17 @@ async function main() {
     where: { id: COLLABORATOR_ID },
     update: {
       name: 'Isma',
-      company: 'Isma — lloguer altaveus',
-      specialty: 'Lloguer d’altaveus per a DJ',
-      roles: ['EQUIPMENT_RENTAL', 'PROVIDER'],
+      company: 'Isma — so DJ inclòs',
+      specialty: 'Altaveus inclosos dins el preu DJ',
+      roles: ['EQUIPMENT_RENTAL'],
       isActive: true,
     },
     create: {
       id: COLLABORATOR_ID,
       name: 'Isma',
-      company: 'Isma — lloguer altaveus',
-      specialty: 'Lloguer d’altaveus per a DJ',
-      roles: ['EQUIPMENT_RENTAL', 'PROVIDER'],
+      company: 'Isma — so DJ inclòs',
+      specialty: 'Altaveus inclosos dins el preu DJ',
+      roles: ['EQUIPMENT_RENTAL'],
       commissionPct: 0,
       isActive: true,
     },
@@ -63,18 +63,18 @@ async function main() {
     } else {
       await prisma.collaboratorProduct.create({ data: { collaboratorId: collaborator.id, ...product } });
     }
-    console.log(`${existing ? '↻' : '✓'} ${product.name}: cost intern ${product.costPrice}€, PVP client ${product.sellPrice}€`);
+    console.log(`${existing ? '↻' : '✓'} ${product.name}: retirat del catàleg; liquidació interna ${product.costPrice}€`);
   }
 
   const canonicalNames = PRODUCTS.map((product) => product.name);
   const obsolete = await prisma.collaboratorProduct.updateMany({
     where: { collaboratorId: collaborator.id, name: { notIn: canonicalNames }, isActive: true },
-    data: { isActive: false },
+    data: { isActive: false, visibleInDossier: false, visibleInBooking: false },
   });
   if (obsolete.count > 0) {
     console.log(`${obsolete.count} producte(s) antic(s) d'Isma desactivat(s).`);
   }
-  console.log(`Fet. ${PRODUCTS.length} productes sincronitzats per a ${collaborator.name}.`);
+  console.log(`Fet. ${collaborator.name} queda fora del catàleg seleccionable; la liquidació viu dins el preu DJ.`);
 }
 
 main()

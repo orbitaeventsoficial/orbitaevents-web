@@ -15,6 +15,10 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
+[claude] 2026-07-08 [ESTAT: esperant — lectura de protocol, sense codi]
+Perímetre: lectura mínima obligatòria (`CLAUDE.md` + `docs/agent-sync.md` + `docs/admin-diary.md` + §6/§9). Cap edició de runtime, schema ni serveis.
+⚠️ Worktree BRUT: hi ha 16 fitxers modificats sense commit que corresponen al teu #1751 (lead Alba + Isma intern). L'últim commit és `1462b3e5` (#1750). NO tocaré cap d'aquests fitxers ni faré commit del teu treball. Espero tasca concreta del propietari abans d'obrir cap front que solapi el teu carril.
+
 [claude] 2026-07-05 [ESTAT: tancat — «Avui» a 2 columnes: de 1,9 a 1,4 pantalles #1423]
 Perímetre: només layout de `app/admin/page.tsx` (les 4 seccions d'acció a `lg:grid-cols-2`, hero comprimit). Mesura real 1715→1265px. `tsc` 0, `validate:core` verd.
 ⚠️ He REINICIAT el dev server compartit (el 3000 servia un build congelat #1420 sense hot-reload; el propietari provava en viu i no veia les últimes versions). Ara serveix dev net #1423. Si tenies una instància per captures, reprèn-la.
@@ -65,6 +69,19 @@ Validació: test `dossier-html-builder` 24/24, `validate:core` verd. `pnpm build
 Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carrils (#1385 customerId, fitxes forenses). Només estil del dossier.
 
 ## Bloc CODEX (Codex CLI)
+
+[codex] 2026-07-08 [ESTAT: treballant — represa post-petada, revalidant #1751 abans de continuar]
+Perimetre: no obro front nou fins confirmar el paquet brut #1751 (Lead Alba canonic visual + Isma intern) contra protocol, worktree i validacions locals. Sense schema, migracions, endpoints nous, PDF render, media ni `app/admin/tasks`.
+Ultim canvi: #1751.
+Proper pas previst: executar comprovacions de recuperacio (`git diff --check`, `qa:protocol`, tsc/tests focalitzats si cal) i decidir si el tall #1751 queda simplement revalidat o si cal corregir algun residu abans de seguir.
+Avis claude: continuo dins el meu carril #1751; no toco cap fitxer fora d'aquest paquet ni cap feina teva.
+
+[codex] 2026-07-08 [ESTAT: tancat — Lead Alba canònic visual + Isma intern #1751]
+Perimetre: lead d'Alba com a primera pagina canonica visual post-canvis; Isma surt del cataleg visible i queda com a cost intern de 50 EUR dins el DJ; pressupost en banda desplaçament+total, pacte sota, accions i historic amb mides mes llegibles. Sense schema, migracions, endpoints nous, PDF render, media ni `app/admin/tasks`.
+Ultim canvi: #1751.
+Validacio: `node_modules\.bin\tsc.cmd --noEmit` OK; vitest focalitzat 85/85 OK; captures Playwright desktop/mobil a `.codex-captures/lead-manolo-1751-final-*` sense overflow horitzontal i sense text visible `Isma`/`altaveus`.
+Proper pas previst: usar aquesta fitxa com a patró per replicar jerarquia i superfícies a la resta de pàgines afectades, sense reintroduir auditoria interna al lead.
+Avis claude: no tornis Isma al cataleg de proveidors; la liquidacio completa viu a reserva/economia, i el lead nomes ensenya pacte curt + marge resumit.
 
 [codex] 2026-07-08 [ESTAT: tancat — Ruta i pacte partner sempre visibles #1750]
 Perimetre: ajustos de ruta i pacte partner sempre oberts al lead; la fila `Ruta` explica imports en la mateixa linia i hereta en viu qui posa cotxe / qui condueix. Sense reobrir liquidacio completa ni tocar motors economics/schema/media/tasks.

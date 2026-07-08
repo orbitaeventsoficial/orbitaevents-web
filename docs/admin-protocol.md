@@ -1733,6 +1733,24 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1751 — 2026-07-08 — codex (FET)
+- Context: el propietari demana que el lead d'Alba sigui la primera pagina canonica despres de molts canvis: la informacio ja serveix, pero cal millor repartiment de textos, contrastos, mides, captures i una base visual extrapolable a la resta del repo. També aclareix que Isma no s'ha de veure com a proveidor: 50 € del preu DJ es liquiden a ell pels altaveus.
+- Fet:
+  - `SOUND_RENTAL` queda definit com a liquidacio interna de 50 € dins el servei DJ, no com a producte seleccionable.
+  - El lead afegeix aquesta linia oculta al calcul economic quan hi ha DJ facturable, de manera que el marge incorpora el cost real sense ensenyar Isma al pacte partner.
+  - `listLeadServiceLines` amaga la linia interna d'Isma a la UI del lead, i el cataleg de productes col·laborador l'exclou tant del configurador com del dossier encara que la BD antiga el tingui visible.
+  - Les seeds d'Isma queden alineades: producte inactiu, `visibleInDossier=false`, `visibleInBooking=false`, i notes de liquidacio interna.
+  - La banda de pressupost del lead passa a graella canonica: desplaçament + total client en una mateixa superficie a desktop, una columna en mobil, pacte partner sota i accions finals alineades.
+  - Retoc visual Manolo: tipografia UI en resum economic, pacte partner, contacte del header i historic; mes contrast i mides mes llegibles; el control de ruta sempre visible ja no sembla plegable.
+- Verificació:
+  - Validació tècnica: `node_modules\.bin\tsc.cmd --noEmit` OK; `node_modules\.bin\vitest.cmd run __tests__/lib/services/bookingCreationService.test.ts __tests__/lib/services/collaboratorProductService.test.ts __tests__/lib/services/leadServiceLineService.test.ts __tests__/scripts/seed-partner-product-visibility.test.ts` OK (85/85).
+  - Validació funcional: Playwright real a `/admin/leads/cmr1xh7la0000ug7dj4jnihjr` genera captures desktop/mobil i confirma sense overflow horitzontal, sense text visible `Isma`/`altaveus`, pressupost en dues columnes desktop i una columna mobil, i marge net amb els 50 € interns imputats.
+  - Validació humana/UX: el lead conserva la informacio bona però la reparteix en superficies de decisio; ruta, total, pacte, marge i seguent pas es poden escanejar sense tornar a una auditoria interna.
+- `ADMIN_CHANGE_COUNTER` puja a `1751`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1750 — 2026-07-08 — codex (FET)
 - Context: el propietari valida el resum del pacte partner, però marca que `Ruta · temps + dieta · 113 €` encara és massa opac, i que els ajustos de ruta i el pacte han d'estar sempre visibles mentre es negocia. Si cotxe/conductor passen a Masquerade, la ruta del partner ha de recalcular en viu.
 - Fet:

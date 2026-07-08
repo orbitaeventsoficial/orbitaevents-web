@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { listLeadServiceLines, replaceLeadServiceLines } from '@/lib/services/leadServiceLineService';
+import { SOUND_RENTAL } from '@/lib/constants/inventory';
 
 const { mockPrisma, mockUpdateBookingDetail } = vi.hoisted(() => ({
   mockPrisma: {
@@ -42,6 +43,19 @@ describe('listLeadServiceLines', () => {
     expect(r.status).toBe(200);
     expect(r.body.lines).toEqual([{ id: 'producte', label: 'Bingo Musical', notes: null }]);
     expect(r.body.routeCostLines).toEqual([{ id: 'ruta', label: 'Temps ruta conductor', notes: '[travel-cost] DRIVER · 6.00 h' }]);
+  });
+
+  it('amaga del lead la liquidació interna de so Isma', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue(null);
+    mockPrisma.leadServiceLine.findMany.mockResolvedValue([
+      { id: 'dj', label: 'DJ · 1a hora', notes: null },
+      { id: 'isma', label: SOUND_RENTAL.label, collaboratorId: SOUND_RENTAL.collaboratorId, notes: `${SOUND_RENTAL.notesMarker} Cost inclos` },
+    ]);
+
+    const r = await listLeadServiceLines('lead1');
+
+    expect(r.status).toBe(200);
+    expect(r.body.lines).toEqual([{ id: 'dj', label: 'DJ · 1a hora', notes: null }]);
   });
 
   it('reimputa el cost intern de transport al marge (internalTravelCost)', async () => {

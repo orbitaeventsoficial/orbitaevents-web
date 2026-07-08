@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { updateBookingDetail } from '@/lib/services/bookingRouteService';
 import { TRAVEL_COST_LINE_MARKER } from '@/lib/services/travelLaborCost';
 import { sanitizeRevenueAmount, sanitizeServiceLineCostAmount } from '@/lib/services/serviceLineCostRules';
+import { SOUND_RENTAL } from '@/lib/constants/inventory';
 import type { BookingServiceLineKind } from '@prisma/client';
 
 const VALID_KINDS: readonly BookingServiceLineKind[] = ['DJ', 'SOUND_TECH', 'PROVIDER_SERVICE', 'EQUIPMENT', 'OTHER'];
@@ -32,6 +33,14 @@ function sanitizeHours(value?: number | null): number | null {
 
 function isTravelCostLine(line: { notes?: string | null }): boolean {
   return Boolean(line.notes?.includes(TRAVEL_COST_LINE_MARKER));
+}
+
+function isIncludedSoundRentalLine(line: { collaboratorId?: string | null; notes?: string | null; label?: string | null }): boolean {
+  const normalizedLabel = line.label?.toLowerCase() || '';
+  return Boolean(
+    line.notes?.includes(SOUND_RENTAL.notesMarker) ||
+    (line.collaboratorId === SOUND_RENTAL.collaboratorId && /so|altaveu|speaker/.test(normalizedLabel)),
+  );
 }
 
 /**
@@ -66,7 +75,7 @@ export async function listLeadServiceLines(leadId: string) {
     return {
       status: 200,
       body: {
-        lines: lines.filter((line) => !isTravelCostLine(line)),
+        lines: lines.filter((line) => !isTravelCostLine(line) && !isIncludedSoundRentalLine(line)),
         routeCostLines: lines.filter(isTravelCostLine),
         internalTravelCost: sumTravelCostLines(lines),
       },
@@ -80,7 +89,7 @@ export async function listLeadServiceLines(leadId: string) {
   return {
     status: 200,
     body: {
-      lines: lines.filter((line) => !isTravelCostLine(line)),
+      lines: lines.filter((line) => !isTravelCostLine(line) && !isIncludedSoundRentalLine(line)),
       routeCostLines: lines.filter(isTravelCostLine),
       // Lead pur (sense reserva): el cost de ruta viu a les línies [travel-cost],
       // amagades de productes però reimputades al marge via aquest total.

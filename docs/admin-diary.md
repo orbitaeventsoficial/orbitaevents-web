@@ -1,3 +1,28 @@
+## 2026-07-08 — Lead Alba canònic: visual premium i Isma com a cost intern DJ (Canvi #1751, codex)
+
+### Context
+El propietari demana convertir el lead d'Alba en la primera pàgina canònica després de molts canvis: la informació ja és prou bona, però cal una distribució més eficient, tipografia menys radical, millor contrast, captures reals i un model clar per replicar a la resta del repo. També aclareix que Isma no és un proveïdor seleccionable: 50 € del preu de DJ es liquiden a ell pels altaveus.
+
+### Què s'ha fet
+- El lead imputa automàticament una línia oculta `SOUND_RENTAL` de 50 € quan hi ha servei DJ facturable, de manera que el marge baixa sense ensenyar Isma com a producte ni partner comercial.
+- `listLeadServiceLines` filtra la liquidació interna d'Isma de la UI del lead, però la conserva en persistència i reserva.
+- El catàleg de productes de col·laborador exclou el producte intern d'Isma tant al configurador com al dossier, encara que una base de dades antiga el tingui visible.
+- Les seeds d'Isma queden alineades com a liquidació interna: producte inactiu, no visible a dossier ni booking, i partner amb rol de lloguer intern.
+- La banda del lead passa a patró canònic: desplaçament i total client comparteixen superfície en desktop; el pacte partner queda sota, accions al final i històric comercial a mida normal.
+- S'han pujat mides i contrastos del header de contacte, resum de marge, pacte partner, accions i històric, eliminant la tipografia display/mono massa radical del resum econòmic.
+- El control de ruta sempre visible deixa de semblar plegable: sense signe `-` i sense cursor de desplegable.
+
+### Validació
+- Validació tècnica: `node_modules\.bin\tsc.cmd --noEmit` OK; `node_modules\.bin\vitest.cmd run __tests__/lib/services/bookingCreationService.test.ts __tests__/lib/services/collaboratorProductService.test.ts __tests__/lib/services/leadServiceLineService.test.ts __tests__/scripts/seed-partner-product-visibility.test.ts` OK (85/85).
+- Validació funcional: Playwright real a `localhost:3000/admin/leads/cmr1xh7la0000ug7dj4jnihjr` confirma que Isma/altaveus ja no apareixen al catàleg visible, no hi ha overflow horitzontal en desktop ni mòbil, el pressupost usa dues columnes en desktop i una en mòbil, i el marge net incorpora els 50 € interns d'Isma.
+- Validació humana/UX: el lead queda com a pantalla de decisió densa però llegible: el total client, la ruta, el pacte partner, el marge i el pas següent tenen jerarquia pròpia sense recuperar la taula d'auditoria interna.
+
+### Coordinació
+Counter -> 1751. Canvi limitat a lead/economia visual, liquidació interna d'Isma, catàleg de productes col·laborador, seeds, tests, protocol, diari i sync; sense schema, migracions, endpoints nous, PDF render, media ni `app/admin/tasks`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Ruta i pacte partner sempre visibles al lead (Canvi #1750, codex)
 
 ### Context

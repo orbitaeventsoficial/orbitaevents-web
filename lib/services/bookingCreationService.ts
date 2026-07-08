@@ -16,21 +16,37 @@ import { DEFAULT_BOOKING_PAYMENT_METHOD } from '@/lib/constants/booking-payment'
 import { sanitizeRevenueAmount, sanitizeServiceLineCostAmount } from '@/lib/services/serviceLineCostRules';
 
 /**
- * Afegeix automàticament la línia de lloguer de so (Isma) si el bolo porta pack i
- * encara no en té cap. revenueAmount=0 (no es factura a part al client); costAmount
- * resta al marge via el col·laborador. Degradació segura: si Isma no existeix, no fa res.
+ * Imputa el so d'Isma com a cost inclos dins el DJ. No es factura a part i no
+ * depen del cataleg de proveidors: si el bolo porta pack o linia DJ, 50 eur del
+ * preu DJ es liquiden a Isma.
  */
 async function appendSoundRentalLine(
   lines: ReturnType<typeof normalizeServiceLines>,
   hasPack: boolean,
 ) {
-  if (!SOUND_RENTAL.enabled || !hasPack) return lines;
+  const hasDjLine = lines.some((l) => {
+    const label = (l.label ?? '').toLowerCase();
+    return (l.revenueAmount || 0) > 0 && (l.kind === 'DJ' || /\bdj\b/.test(label));
+  });
+  if (!SOUND_RENTAL.enabled || (!hasPack && !hasDjLine)) return lines;
   const alreadyHasSound = lines.some(
-    (l) => l.kind === 'EQUIPMENT' && (l.label ?? '').toLowerCase().includes('so'),
+    (l) => {
+      const label = (l.label ?? '').toLowerCase();
+      return Boolean(
+        l.notes?.includes(SOUND_RENTAL.notesMarker) ||
+        (l.collaboratorId === SOUND_RENTAL.collaboratorId && /so|altaveu|speaker/.test(label)) ||
+        (l.kind === 'EQUIPMENT' && label.includes('so')),
+      );
+    },
   );
   if (alreadyHasSound) return lines;
   const rental = await prisma.collaborator.findFirst({
-    where: { name: SOUND_RENTAL.collaboratorName, roles: { has: 'EQUIPMENT_RENTAL' } },
+    where: {
+      OR: [
+        { id: SOUND_RENTAL.collaboratorId },
+        { name: SOUND_RENTAL.collaboratorName, roles: { has: 'EQUIPMENT_RENTAL' } },
+      ],
+    },
     select: { id: true },
   });
   if (!rental) return lines;
@@ -46,7 +62,7 @@ async function appendSoundRentalLine(
       costAmount: SOUND_RENTAL.costPerEvent,
       quantity: 1,
       hours: null,
-      notes: 'Afegit automàticament — so llogat per bolo (mentre no hi hagi altaveus propis).',
+      notes: `${SOUND_RENTAL.notesMarker} Cost inclos dins el preu del DJ; no es factura a part al client.`,
     },
   ];
 }
@@ -428,7 +444,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   const serviceLinesBase = normalizeServiceLines(
     (data.serviceLines && data.serviceLines.length > 0) ? data.serviceLines : leadBoloLines
   );
-  // So llogat automàtic (Isma) quan el bolo porta pack i no té ja línia de so.
+  // So Isma inclos dins el DJ: cost real sense producte extra client-facing.
   const serviceLines = await appendSoundRentalLine(serviceLinesBase, hasCatalogPack);
   const serviceLinesRevenue = serviceLines.reduce(
     (sum, line) => sum + (line.revenueAmount || 0) * (line.quantity || 1),

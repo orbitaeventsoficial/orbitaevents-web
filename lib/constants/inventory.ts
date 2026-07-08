@@ -10,15 +10,15 @@
 export const PREFERRED_REPLACEMENT_SOURCES = ['dj mania', 'djmania'] as const;
 
 /**
- * Lloguer de so per bolo (propietari 2026-06-28): mentre no es comprin altaveus
- * propis (EV ETX-12P, desig futur), el so es lloga al col·laborador "Isma" per un
- * cost fix per esdeveniment. S'afegeix automàticament com a línia de servei a la
- * creació de reserves amb pack, i el cost es resta al marge (com qualsevol col·laborador).
- * Quan es comprin els altaveus propis: posar `enabled: false` o cost 0.
+ * So DJ inclos dins el preu del DJ (decisio propietari 2026-07-08).
+ * Dels serveis DJ, 50 eur son liquidacio real a Isma pels altaveus, pero NO es
+ * ven com a producte/proveidor seleccionable: el client compra DJ a preu tancat.
  */
 export const SOUND_RENTAL = {
   enabled: true,
+  collaboratorId: 'isma-lloguer-altaveus',
   collaboratorName: 'Isma',
   costPerEvent: 50,
-  label: 'Lloguer so (PA) — Isma',
+  label: 'So DJ inclos - Isma',
+  notesMarker: '[included-sound-rental]',
 } as const;

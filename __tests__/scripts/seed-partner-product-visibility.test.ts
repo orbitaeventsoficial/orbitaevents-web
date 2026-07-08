@@ -29,7 +29,7 @@ describe('partner product seeds visibility', () => {
     expect(ismaSeed).toContain('costPrice: 50');
     expect(ismaSeed).toContain('sellPrice: 0');
     expect(ismaSeed).toContain('visibleInDossier: false');
-    expect(ismaSeed).toContain('visibleInBooking: true');
+    expect(ismaSeed).toContain('visibleInBooking: false');
   });
 
   it('quan desactiva productes obsolets de Masquerade també els oculta', () => {

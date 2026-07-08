@@ -167,7 +167,7 @@ describe('dossier collaborator product mapping', () => {
     }));
   });
 
-  it('separa productes de dossier i productes interns de configurador', async () => {
+  it('oculta del configurador el producte intern de so Isma', async () => {
     mockPrisma.collaboratorProduct.findMany.mockResolvedValue([
       {
         ...rawProduct,
@@ -188,15 +188,7 @@ describe('dossier collaborator product mapping', () => {
     expect(mockPrisma.collaboratorProduct.findMany).toHaveBeenCalledWith(expect.objectContaining({
       where: { isActive: true, visibleInBooking: true, collaborator: { isActive: true } },
     }));
-    expect(products[0]).toEqual(expect.objectContaining({
-      id: 'isma-altaveus',
-      name: 'Lloguer altaveus DJ',
-      sellPrice: 0,
-      costPrice: 50,
-      visibleInDossier: false,
-      visibleInBooking: true,
-      roles: ['EQUIPMENT_RENTAL', 'PROVIDER'],
-    }));
+    expect(products).toEqual([]);
   });
 });
 

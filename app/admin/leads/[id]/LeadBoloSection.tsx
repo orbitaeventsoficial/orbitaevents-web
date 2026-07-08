@@ -11,6 +11,7 @@ import type { BookingServiceLineFormInput } from '@/app/admin/bookings/booking-f
 import { computeBookingFinancialSummary, computeServiceLineEconomics, classifyBoloLines } from '@/lib/services/costEngine';
 import { buildBoloRepartimentLines, computeBoloRepartiment } from '@/lib/services/repartimentService';
 import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
+import { SOUND_RENTAL } from '@/lib/constants/inventory';
 import {
  calculateTravelCostBreakdown,
  deriveTravelHeadcount,
@@ -89,6 +90,31 @@ function collaboratorNameFromLineLabel(label?: string | null): string | null {
  if (match?.[1]) return match[1].trim();
  const routeMatch = label?.match(/^(?:Vehicle ruta|Temps ruta conductor|Temps ruta passatger|Peatges ruta|Dieta desplaçament)\s·\s(.+)$/);
  return routeMatch?.[1]?.replace(/\sx\d+$/, '').trim() || null;
+}
+
+function isBillableDjLine(line: BookingServiceLineFormInput): boolean {
+ const normalizedLabel = line.label?.toLowerCase() || '';
+ return Number(line.revenueAmount || 0) > 0 && (line.kind === 'DJ' || /\bdj\b/.test(normalizedLabel));
+}
+
+function isIncludedSoundRentalLine(line: BookingServiceLineFormInput): boolean {
+ const normalizedLabel = line.label?.toLowerCase() || '';
+ return Boolean(
+ line.notes?.includes(SOUND_RENTAL.notesMarker) ||
+ (line.collaboratorId === SOUND_RENTAL.collaboratorId && /so|altaveu|speaker/.test(normalizedLabel)),
+ );
+}
+
+function buildIncludedSoundRentalLine(): BookingServiceLineFormInput {
+ return {
+ collaboratorId: SOUND_RENTAL.collaboratorId,
+ kind: 'EQUIPMENT',
+ label: SOUND_RENTAL.label,
+ revenueAmount: 0,
+ costAmount: SOUND_RENTAL.costPerEvent,
+ quantity: 1,
+ notes: `${SOUND_RENTAL.notesMarker} Cost inclos dins el preu del DJ; no es factura a part al client.`,
+ };
 }
 
 export default function LeadBoloSection({
@@ -197,6 +223,17 @@ export default function LeadBoloSection({
  quantity: item.quantity || 1,
  })), [contractedProducts]);
  const buildVisibleLines = useCallback((): BookingServiceLineFormInput[] => [...baseLines, ...lines], [baseLines, lines]);
+ const visibleLines = useMemo(() => buildVisibleLines(), [buildVisibleLines]);
+ const includedSoundRentalLine = useMemo(() => {
+ if (!SOUND_RENTAL.enabled) return null;
+ if (!visibleLines.some(isBillableDjLine)) return null;
+ if (visibleLines.some(isIncludedSoundRentalLine)) return null;
+ return buildIncludedSoundRentalLine();
+ }, [visibleLines]);
+ const economicLines = useMemo(
+ () => (includedSoundRentalLine ? [...visibleLines, includedSoundRentalLine] : visibleLines),
+ [includedSoundRentalLine, visibleLines],
+ );
 
  // ── Transport EN VIU (#1345): mirall del càlcul de NewBookingForm ──
  // Distància auto-resolta des de la ubicació del lead → Granollers.
@@ -221,16 +258,16 @@ export default function LeadBoloSection({
  // Col·laboradors presents al bolo (per triar qui posa el cotxe / condueix).
  const travelCollaborators = useMemo(() => {
  const seen = new Map<string, string>();
- for (const l of buildVisibleLines()) {
+ for (const l of visibleLines) {
  if (l.collaboratorId && !seen.has(l.collaboratorId)) {
  seen.set(l.collaboratorId, l.label?.match(/\(([^)]+)\)/)?.[1] ?? l.label ?? 'Col·laborador');
  }
  }
  return [...seen.entries()].map(([id, name]) => ({ id, name }));
- }, [buildVisibleLines]);
+ }, [visibleLines]);
  const nameFor = (id: string) => (id ? (travelCollaborators.find((c) => c.id === id)?.name ?? 'Proveïdor') : 'Òrbita');
  const travelPeople = useMemo<TravelPersonInput[]>(() => {
- const providerLine = buildVisibleLines().find((line) => line.kind === 'PROVIDER_SERVICE' && /\(([^)]+)\)/.test(line.label));
+ const providerLine = visibleLines.find((line) => line.kind === 'PROVIDER_SERVICE' && /\(([^)]+)\)/.test(line.label));
  const providerName = providerLine?.label.match(/\(([^)]+)\)/)?.[1] ?? 'Equip ruta';
  const passengerCount = Math.max(0, headcount - 1);
  return [
@@ -238,7 +275,7 @@ export default function LeadBoloSection({
  ...(passengerCount > 0 ? [{ role: 'PASSENGER' as const, label: providerName, collaboratorId: providerLine?.collaboratorId ?? null, count: passengerCount }] : []),
  ];
  // eslint-disable-next-line react-hooks/exhaustive-deps -- nameFor és un closure estable sobre travelCollaborators (ja dep)
- }, [buildVisibleLines, headcount, driverId, travelCollaborators]);
+ }, [visibleLines, headcount, driverId, travelCollaborators]);
  const travelBreakdown = useMemo(() => calculateTravelCostBreakdown({
  roundTripKm: Number(distanceKm) || 0,
  vehicleCostPerKm,
@@ -262,9 +299,7 @@ export default function LeadBoloSection({
  // Càrrec al client: franquícia comercial del cotxe (50 km) + tripulació + dieta + peatges.
  const travelCharge = transport ? transport.clientCharge : internalTravelCost;
  const tollsValue = Number(tollsEur) || 0;
- const tollsHint = tollsValue > 0
-   ? `inclou ${formatCurrency(tollsValue)} de peatges`
-   : null;
+ const transportLabel = tollsValue > 0 ? 'Transport + peatges' : 'Transport';
  const mealAllowance = transport?.mealAllowance ?? 0;
  const travelMealLines = useMemo(() => buildTravelMealAllowanceLines(travelPeople, mealAllowance), [travelPeople, mealAllowance]);
  const routeCostLines = useMemo(() => [...travelBreakdown.lines, ...travelMealLines], [travelBreakdown.lines, travelMealLines]);
@@ -288,7 +323,7 @@ export default function LeadBoloSection({
  return notes;
  }, [headcount, km, mealAllowance, tollsValue, travelBreakdown.chargeableHours, travelBreakdown.routeHours, travelBreakdown.vehicleCost]);
  const repartimentInputLines = useMemo(() => buildBoloRepartimentLines({
- serviceLines: buildVisibleLines(),
+ serviceLines: visibleLines,
  travelCharge,
  travelCostLines: routeCostLines.map((line) => ({
  kind: 'OTHER',
@@ -298,7 +333,7 @@ export default function LeadBoloSection({
  quantity: 1,
  collaboratorId: line.collaboratorId ?? undefined,
  })),
- }), [buildVisibleLines, routeCostLines, travelCharge]);
+ }), [routeCostLines, travelCharge, visibleLines]);
  const repartimentNames = useMemo(() => {
  const names: Record<string, string> = {};
  for (const line of repartimentInputLines) {
@@ -315,7 +350,7 @@ export default function LeadBoloSection({
  // sense cost, s'imputa cost intern via `orbitaServiceCostRatio` (el DJ no és cost 0).
  // Els agregats passen a `computeBookingFinancialSummary` (font única de marge).
  const economia = useMemo(() => {
- const allLines = buildVisibleLines();
+ const allLines = economicLines;
  // ownCostRatio = 0: un servei propi (DJ) NO imputa cost sobre el seu preu.
  // El cost real de l'equip propi (desgast + amortització + consumibles) ja
  // viu al cost fix operatiu; imputar a més un % seria comptar-lo dos cops.
@@ -328,7 +363,7 @@ export default function LeadBoloSection({
  // equip propi d'Òrbita (DJ o material propi); Masquerade sol → 0.
  // - el transport d'anar a buscar material de lloguer (Tino) el carrega la
  // pròpia línia de lloguer, sumat al seu cost.
- const { hasOwnEquipment, hasEquipmentRental } = classifyBoloLines(allLines);
+ const { hasOwnEquipment, hasEquipmentRental } = classifyBoloLines(visibleLines);
  const rentalTransport = hasEquipmentRental ? EQUIPMENT_RENTAL_TRANSPORT_KM * vehicleCostPerKm : 0;
  const summary = computeBookingFinancialSummary({
  total: revenue,
@@ -344,7 +379,7 @@ export default function LeadBoloSection({
  fixedOperationalCost: hasOwnEquipment ? PROFITABILITY_MODEL_DEFAULTS.fixedOperationalCost : 0,
  });
  return summary;
- }, [buildVisibleLines, source, vehicleCostPerKm, effectiveTravelCost, distanceKm, travelCharge]);
+ }, [economicLines, visibleLines, source, vehicleCostPerKm, effectiveTravelCost, distanceKm, travelCharge]);
 
  // Eleva el net al contenidor (perquè visqui al hero de la fitxa, no enterrat a baix).
  useEffect(() => {
@@ -415,10 +450,11 @@ export default function LeadBoloSection({
  notes: line.notes,
  }))
  : [];
+ const hiddenSoundLines = includedSoundRentalLine ? [includedSoundRentalLine] : [];
  const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/service-lines`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ lines: [...buildAllLines(), ...travelLines], distanceKm: Number(distanceKm) || null, tollsEur: Number(tollsEur) || null }),
+ body: JSON.stringify({ lines: [...buildAllLines(), ...hiddenSoundLines, ...travelLines], distanceKm: Number(distanceKm) || null, tollsEur: Number(tollsEur) || null }),
  });
  if (!res.ok) throw new Error('No s\'ha pogut desar');
  toast.success('Bolo desat.');
@@ -540,7 +576,7 @@ export default function LeadBoloSection({
  <strong>{formatCurrency(economia.total - travelCharge)}</strong>
  </div>
  <div className="ap-ledger-budget-row ap-ledger-budget-row--travel">
- <span>Transport{tollsHint ? <em>{tollsHint}</em> : null}</span>
+ <span>{transportLabel}</span>
  <strong>+{formatCurrency(travelCharge)}</strong>
  </div>
  <div className="ap-ledger-budget-row ap-ledger-budget-row--total">
