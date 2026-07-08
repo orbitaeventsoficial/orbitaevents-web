@@ -66,6 +66,13 @@ Avís codex: no he tocat transport/cost/marge runtime, schema, ni els teus carri
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-08 [ESTAT: tancat — Manolo roadmap viu #1725-#1732]
+Perimetre: `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md`, protocol, diari, counter i sync; sense schema, BD ni runtime.
+Ultim canvi: #1732.
+Validacio: `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff --check` OK.
+Proper pas previst: continuar auditoria Manolo amb el primer tall real del full: E2E lead -> dossier -> reserva, pipeline media/producte o economia de bolos antics segons evidencia viva.
+Avis claude: el roadmap ja incorpora #1725-#1731 i #1732; si entres, parteix d'aquest full actualitzat i no del resum antic fins #1724.
+
 [codex] 2026-07-08 [ESTAT: tancat — Lead `Qui cobra què` visible i mòbil cosit #1731]
 Perimetre: `/admin/leads/[id]`, `RepartimentPanel`, rail financer del lead i CSS responsive del repartiment; sense schema, BD ni motor econòmic.
 Ultim canvi: #1731.

@@ -155,7 +155,7 @@ Ordre inicial de talls, reavaluable despres de cada prova:
 
 ## 7. Full de treball nocturn viu
 
-Actualitzat el 2026-07-07 durant el torn nonstop. Aquest bloc es el tauler de comandament
+Actualitzat el 2026-07-08 durant el torn nonstop. Aquest bloc es el tauler de comandament
 del roadmap Manolo: no substitueix el protocol, pero evita que la feina quedi com una llista
 de microcanvis sense direccio.
 
@@ -174,6 +174,19 @@ de microcanvis sense direccio.
 | Documents/PDF | EN CURS | #1565, #1568, #1571, #1574, #1581, #1584, #1587, #1590, #1593, #1596, #1598, #1601, #1604, #1605, #1636, #1691, #1692, #1694, #1695, #1696, #1708, #1716, #1717, #1718, #1723, #1724 | El dossier complet i el cicle pressupost/contracte deixen traça; contracte i pressupost enviat congelen snapshots v1, el Customer Hub els fa visibles, la timeline diferencia "obrir pressupost" de "obrir contracte", el PDF signat queda accionable també com a fita de negoci i cada document mostra ruta d'origen client/entrada/reserva també a la cronologia, al llistat de dossiers i a les traces de dossier enviat/PDF compost; les traces de dossier ja no semblen activitat generica, la timeline pot aillar documents sense duplicar panells, el PDF de factura pinta bestreta/resta amb el mateix pendent real cash-aware que la resta de la maquina, el generador de dossiers no crea lead/client nou si no pot verificar clients existents, avisa si no pot importar productes del lead i tampoc confon la cerca de leads fallida amb cap resultat, la reassignacio de pressupostos no confon una cerca de vincles fallida amb cap resultat, el Studio de pressupostos avisa quan no pot llegir clients del CRM, el llistat de dossiers no confirma enviaments, paperera, restauracio o purga si el backend ho rebutja, intake sintetitza WhatsApps llargs sense aixafar ni duplicar notes abans de crear dossier/lead, el cataleg del generador separa proveidor -> audiencia mentre accepta productes actius nous sense whitelist i torna a pintar imatges de producte quan existeixen, Bingo Musical KIDS entra com a producte infantil ofertable amb PVP 200, Partners no cau si un KPI de bolos passats apunta a una relacio absent de produccio, les columnes buides d'audiència desapareixen del generador i els snapshots antics poden recuperar imatge viva sense perdre la foto comercial congelada. |
 | Visual/Studio | TRANSVERSAL | #1611 | `qa:admin-canon` queda a 0 troballes: les microtipografies residuals de calendari i playbook post-event passen de píxels locals al token `--o-text-2xs`. |
 | Traçabilitat profunda | TRANSVERSAL | #1575, #1578, #1584, #1590, #1596, #1621, #1649, #1653, #1654, #1655, #1656, #1660, #1687, #1688, #1689, #1701, #1707, #1709, #1722 | AdminLog, activity, timeline, snapshots, Customer Hub i guards han de poder reconstruir cada decisio important, amb CTA documental semantic, contracte signat a timeline, origen visible, pendent de cobrament cash-aware, comunicacions de reserva amb error visible quan el backend rebutja l'accio, galeria de reserva sense mutacions invisibles cap a portal/portfolio, link compartit de galeria sense errors muts de càrrega/còpia, checklist de reserva sense estat optimista fals quan el desat falla, vincle reserva-client sense refresh fals ni dubte CRM quan falla, portal client amb errors accessibles abans d'enviar link, Safata sense canvi de llegit/no llegit fals, sense autolectura muda quan el PATCH del lead falla ni auto-refresh de leads mut, selector ràpid d'estat, registre d'activitat i accions de qüestionaris sense fallida amagada al log, fitxa/temporada de leads sense data antiga després d'un PATCH i el full de ruta que la governa. |
+
+### 7.1.1 Actualització viva #1725-#1732
+
+Aquest complement manté el comandament alineat amb la ronda recent. Les files llargues de 7.1
+continuen sent la lectura de domini; aquesta taula és el resum executiu fresc de la nit.
+
+| Canvis | Front | Impacte Zenit |
+|---|---|---|
+| #1725-#1726 | Dossiers / portfolio / productes | Bingo Musical KIDS, Bingo Musical adult i Batalla Musical tenen imatges de producte millorades, amb presentador visible i cares infantils pixelades quan cal. |
+| #1727 | Portfolio | `/admin/portfolio` deixa de marcar zero fals, exposa la pestanya `Imatges` i permet drop-in per categoria amb pipeline canònic de carpeta, nom i optimització. |
+| #1728-#1731 | Lead / economia / repartiment | El lead veu `Qui cobra què` abans de reserva, amb serveis, transport, hores, peatges, dietes, brut Òrbita, cost intern i benefici net, i amb entrada visible des del rail. |
+| #1729-#1730 | Dossier / reserva / booking legacy | Els peatges i el desplaçament llarg es congelen al dossier; les reserves antigues amb `travelCost` sense línies detallades tenen fallback de cost intern sense migració. |
+| #1732 | Roadmap / auditoria | Aquest full torna a ser viu: incorpora #1725-#1731, defineix els següents talls probables i queda protegit pel guard `qa:zenit-roadmap`. |
 
 ### 7.2 Criteri de prioritat de la nit
 
@@ -354,6 +367,14 @@ de microcanvis sense direccio.
 - **#1722**: la fitxa de lead i la temporada consumeixen la veritat retornada pel PATCH i forcen ruta dinamica; una data editada com Albert Aujas no pot quedar enganxada a l'estat local o a una vista cachejada sense que el guard ho detecti.
 - **#1723**: `CollaboratorProduct` separa visibilitat de dossier i booking; Bingo Musical KIDS entra com a producte infantil ofertable i els altaveus d'Isma entren com a cost intern de DJ sense sortir al dossier.
 - **#1724**: dossiers amaga columnes buides, rehidrata imatges de snapshots, afegeix imatges infantils a portfolio/Bingo KIDS, separa DJ continuacio amb equip muntat, desglossa desplaçament llarg i blinda hard-delete de col·laboradors/productes amb auditoria BD.
+- **#1725**: Bingo Musical KIDS guanya asset propi amb presentador; portfolio rep seleccio manual de 174 imatges locals sense publicar cares infantils identificables.
+- **#1726**: Bingo Musical KIDS, Bingo Musical adult i Batalla Musical reben candidates millors; KIDS passa a JPG amb canalla pixelada i BD/seed alineats.
+- **#1727**: Portfolio afegeix pestanya `Imatges`, drop-in per categoria i comptadors que no fan zero fals abans de carregar l'estat editable.
+- **#1728**: la fitxa del lead mostra repartiment estimat pre-reserva reutilitzant `computeBoloRepartiment`, sense crear segona veritat.
+- **#1729**: `Qui cobra què` del lead incorpora transport, vehicle, hores de ruta, peatges i dietes; el dossier hereta `tollsEur`.
+- **#1730**: el repartiment separa caixa bruta d'Òrbita, cost intern i benefici net real; booking/cuadrant/payout deixen de confondre brut amb marge.
+- **#1731**: `Qui cobra què` queda ancorat, visible des del rail i llegible en mòbil amb labels per cel·la.
+- **#1732**: aquest roadmap queda sincronitzat amb la ronda #1725-#1731 i converteix la següent auditoria en talls probables verificables.
 - **#1681**: els recordatoris de pagament d'Economia marquen nomes Email, WA API o registre manual quan falla aquell canal.
 - **#1682**: la copia del link Stripe deixa de fallar en silenci i marca nomes el boto de copiar del tram afectat.
 - **#1683**: referrals mostra error accessible si copiar missatge suggerit falla i marca nomes aquell candidat.
@@ -371,7 +392,10 @@ de microcanvis sense direccio.
 
 ### 7.5 Següents talls probables
 
-1. **#1690+ - social review estructurat amb migracio.** Nomes si el propietari demana rigor legal superior; ara el bypass server ja esta tancat sense schema.
+1. **E2E lead -> dossier -> reserva.** Reproduir un lead real amb productes, desplaçament, peatges, dietes, imatges i `Qui cobra què`; verificar que dossier, proposta i reserva no perden cap dada ni creen doble veritat.
+2. **Portfolio/media pipeline.** Provar drop-in per categoria, assets públics i productes Masquerade perquè cada imatge surt d'on toca: portfolio per galeria, producte per dossier, snapshot per documents ja enviats.
+3. **Economia de bolos antics.** Auditar reserves amb `travelCost` sense línies `[travel-cost]`, decidir si el fallback és suficient o si cal migració explícita amb dry-run.
+4. **Copilot de gestió.** Convertir els fallos reals detectats en accions executives a `Avui`, no en pantalles amagades: cobrament, marge, documents pendents, post-event i lead calent.
 
 ### 7.6 Stop rules
 

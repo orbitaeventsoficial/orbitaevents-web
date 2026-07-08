@@ -1,3 +1,25 @@
+## 2026-07-08 — Manolo: roadmap viu sincronitzat amb #1725-#1731 (Canvi #1732, codex)
+
+### Context
+Després dels talls de Bingo KIDS, portfolio, dossiers, lead i repartiment, el full Manolo `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` encara només arribava fins al #1724. Això deixava el checklist nocturn desfasat respecte al codi i feia perillós continuar l'auditoria com si el tauler fos viu.
+
+### Què s'ha fet
+- El full Manolo passa a data 2026-07-08 i afegeix el bloc `7.1.1 Actualització viva #1725-#1732`.
+- El resum executiu incorpora la ronda recent: imatges de producte/portfolio, drop-in de media, repartiment pre-reserva, transport/peatges/dietes, net/brut/cost intern i visibilitat mòbil de `Qui cobra què`.
+- `7.4 Fet aquesta nit` afegeix les entrades #1725-#1732 perquè el guard i el lector humà trobin cada tall al mateix full.
+- `7.5 Següents talls probables` deixa de mirar només una migració social antiga i passa a prioritzar E2E lead -> dossier -> reserva, pipeline de media, economia de bolos antics i copilot executiu.
+
+### Validació
+- Validació tècnica: `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff --check` OK.
+- Validació funcional: el roadmap cita #1725-#1732 i els propers talls surten dels fallos reals treballats les últimes hores, no d'una llista antiga.
+- Validació humana/UX: el propietari pot marxar a dormir amb un full de treball que diu què s'ha fet, què falta i on atacar sense haver de redescobrir els mateixos errors a mà.
+
+### Coordinació
+Counter → 1732. Canvi documental/governança: full Manolo, protocol, diari, counter i sync; sense tocar schema, BD ni runtime.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Manolo: `Qui cobra què` visible, ancorat i llegible (Canvi #1731, codex)
 
 ### Context

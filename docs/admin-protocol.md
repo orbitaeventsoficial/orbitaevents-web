@@ -1732,6 +1732,22 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1732 — 2026-07-08 — codex (FET)
+- Context: el full Manolo de nit seguia arribat al #1724 mentre el repo ja havia tancat #1725-#1731 en imatges, portfolio, dossiers, lead i repartiment. Si el roadmap no sap què s'ha fet, la següent auditoria neix amb brúixola vella.
+- Fet:
+  - `docs/audit/MANOLO-ZENIT-RESET-TOTAL-1551.md` passa a data 2026-07-08 i incorpora `7.1.1 Actualització viva #1725-#1732`.
+  - El full resumeix #1725-#1731 per fronts: producte/portfolio, drop-in de media, repartiment pre-reserva, transport/peatges/dietes, net/brut/cost intern i visibilitat mòbil de `Qui cobra què`.
+  - `7.4 Fet aquesta nit` afegeix #1725-#1732 perquè el guard i el lector humà trobin cada tall recent al full Manolo.
+  - `7.5 Següents talls probables` queda reorientat cap a E2E lead -> dossier -> reserva, pipeline de media, economia de bolos antics i copilot executiu.
+- Verificació:
+  - Validació tècnica: `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff --check` OK.
+  - Validació funcional: el guard del roadmap troba #1732 al full Manolo i el llistat recent ja no s'atura al #1724.
+  - Validació humana/UX: el full de treball nocturn torna a explicar què està fet i quin és el següent atac real, sense obligar el propietari a trobar els errors a mà.
+- `ADMIN_CHANGE_COUNTER` puja a `1732`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1731 — 2026-07-08 — codex (FET)
 - Context: el propietari no veu `Qui cobra què` al lead d'Alba Orna en local. Captura real: el bolo i el rail de marge carreguen, però el repartiment queda massa enterrat i al mòbil la taula és difícil d'entendre. Mirada Manolo: una lectura crítica de diners no pot existir només si saps on buscar-la.
 - Fet:
