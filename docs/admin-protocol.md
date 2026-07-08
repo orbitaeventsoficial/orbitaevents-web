@@ -1732,6 +1732,22 @@ Seqüència obligatòria de registre:
 - `codex` — producte/UI/navegació/workspaces
 - `user` — decisions manuals o interventions directes
 
+### Canvi #1734 — 2026-07-08 — codex (FET)
+- Context: auditoria E2E `lead -> dossier`. El prefill per URL del generador de dossiers ja heretava `distanceKm` i `tollsEur`, però seleccionar un lead des del cercador intern només copiava contacte/data/lloc/productes. Això podia fer perdre km/peatges ja resolts abans de desar o enviar el dossier.
+- Fet:
+  - `LeadResult` del generador de dossiers incorpora `distanceKm` i `tollsEur`.
+  - `selectLead` omple `travelKm` i `travelTollsEur` quan el lead seleccionat els porta.
+  - El test de contracte del generador comprova que el bloc `selectLead` conserva km i peatges.
+  - Roadmap Manolo actualitzat amb #1734 dins del bloc lead -> dossier.
+- Verificació:
+  - Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\dossiers\DossierGeneratorClient-customer-lookup.test.ts` (4/4); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff --check` OK.
+  - Validació funcional: el generador conserva km/peatges tant quan arriba amb `leadId` a la URL com quan l'operador tria un lead del cercador.
+  - Validació humana/UX: el dossier deixa de demanar de nou un desplaçament que el lead ja havia calculat.
+- `ADMIN_CHANGE_COUNTER` puja a `1734`.
+- Començat per: `codex`.
+- Treballant per: `codex`.
+- Tancat per: `codex`.
+
 ### Canvi #1733 — 2026-07-08 — codex (FET)
 - Context: auditoria E2E del carril `lead -> dossier -> reserva`. El backend podia heretar línies del lead si no hi havia payload, però el formulari de nova reserva pre-carregava aquestes línies i les reenviava sense `hours` ni `partyType`. Això podia fer que una reserva nascuda d'un lead perdés durada/audiència encara que el lead ho tingués.
 - Fet:

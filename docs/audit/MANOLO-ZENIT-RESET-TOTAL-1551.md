@@ -185,7 +185,7 @@ continuen sent la lectura de domini; aquesta taula és el resum executiu fresc d
 | #1725-#1726 | Dossiers / portfolio / productes | Bingo Musical KIDS, Bingo Musical adult i Batalla Musical tenen imatges de producte millorades, amb presentador visible i cares infantils pixelades quan cal. |
 | #1727 | Portfolio | `/admin/portfolio` deixa de marcar zero fals, exposa la pestanya `Imatges` i permet drop-in per categoria amb pipeline canònic de carpeta, nom i optimització. |
 | #1728-#1731, #1733 | Lead / economia / repartiment | El lead veu `Qui cobra què` abans de reserva, amb serveis, transport, hores, peatges, dietes, brut Òrbita, cost intern i benefici net, amb entrada visible des del rail i sense perdre `hours`/`partyType` en convertir-se en reserva. |
-| #1729-#1730 | Dossier / reserva / booking legacy | Els peatges i el desplaçament llarg es congelen al dossier; les reserves antigues amb `travelCost` sense línies detallades tenen fallback de cost intern sense migració. |
+| #1729-#1730, #1734 | Dossier / reserva / booking legacy | Els peatges i el desplaçament llarg es congelen al dossier; seleccionar un lead dins del generador també hereta km/peatges, i les reserves antigues amb `travelCost` sense línies detallades tenen fallback de cost intern sense migració. |
 | #1732 | Roadmap / auditoria | Aquest full torna a ser viu: incorpora #1725-#1731, defineix els següents talls probables i queda protegit pel guard `qa:zenit-roadmap`. |
 
 ### 7.2 Criteri de prioritat de la nit
@@ -376,6 +376,7 @@ continuen sent la lectura de domini; aquesta taula és el resum executiu fresc d
 - **#1731**: `Qui cobra què` queda ancorat, visible des del rail i llegible en mòbil amb labels per cel·la.
 - **#1732**: aquest roadmap queda sincronitzat amb la ronda #1725-#1731 i converteix la següent auditoria en talls probables verificables.
 - **#1733**: el pas lead -> nova reserva preserva `hours` i `partyType` en mapper, submit, càrrega de lead i herència server-side, evitant que planning/cuadrant perdin durada o audiència.
+- **#1734**: seleccionar un lead des del cercador del generador de dossiers també omple `travelKm` i `travelTollsEur`, no només el prefill per URL amb `leadId`.
 - **#1681**: els recordatoris de pagament d'Economia marquen nomes Email, WA API o registre manual quan falla aquell canal.
 - **#1682**: la copia del link Stripe deixa de fallar en silenci i marca nomes el boto de copiar del tram afectat.
 - **#1683**: referrals mostra error accessible si copiar missatge suggerit falla i marca nomes aquell candidat.
@@ -393,7 +394,7 @@ continuen sent la lectura de domini; aquesta taula és el resum executiu fresc d
 
 ### 7.5 Següents talls probables
 
-1. **E2E lead -> dossier -> reserva.** Reproduir un lead real amb productes, desplaçament, peatges, dietes, imatges i `Qui cobra què`; #1733 ja blinda `hours`/`partyType`, falta verificar dossier/proposta/reserva sobre un cas complet amb imatges i peatges.
+1. **E2E lead -> dossier -> reserva.** Reproduir un lead real amb productes, desplaçament, peatges, dietes, imatges i `Qui cobra què`; #1733 blinda `hours`/`partyType` i #1734 blinda km/peatges quan el lead es selecciona dins del generador, falta verificar proposta/reserva sobre un cas complet amb imatges.
 2. **Portfolio/media pipeline.** Provar drop-in per categoria, assets públics i productes Masquerade perquè cada imatge surt d'on toca: portfolio per galeria, producte per dossier, snapshot per documents ja enviats.
 3. **Economia de bolos antics.** Auditar reserves amb `travelCost` sense línies `[travel-cost]`, decidir si el fallback és suficient o si cal migració explícita amb dry-run.
 4. **Copilot de gestió.** Convertir els fallos reals detectats en accions executives a `Avui`, no en pantalles amagades: cobrament, marge, documents pendents, post-event i lead calent.

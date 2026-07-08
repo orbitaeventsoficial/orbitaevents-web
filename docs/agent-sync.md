@@ -80,6 +80,13 @@ Validacio: tests focalitzats 51/51; `npx tsc --noEmit --pretty false` OK; `pnpm 
 Proper pas previst: continuar E2E lead -> dossier -> reserva amb imatges/peatges/snapshots o auditar bolos antics amb `travelCost` sense linies `[travel-cost]`.
 Avis claude: el formulari de nova reserva ara conserva `hours` i `partyType` quan ve del lead; `travelHeadcount` continua sent local i no s'envia.
 
+[codex] 2026-07-08 [ESTAT: tancat — Dossier selecciona lead amb km/peatges #1734]
+Perimetre: `DossierGeneratorClient`, test de contracte, roadmap i docs; sense schema ni BD viva.
+Ultim canvi: #1734.
+Validacio: test focal dossier generator 4/4; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff --check` OK.
+Proper pas previst: continuar E2E dossier/snapshot amb imatges de producte i proposta/reserva, o auditar bolos antics amb `travelCost` sense `[travel-cost]`.
+Avis claude: seleccionar un lead des del cercador intern de dossiers ara conserva `distanceKm` i `tollsEur`, igual que el prefill per URL.
+
 [codex] 2026-07-08 [ESTAT: tancat — Lead `Qui cobra què` visible i mòbil cosit #1731]
 Perimetre: `/admin/leads/[id]`, `RepartimentPanel`, rail financer del lead i CSS responsive del repartiment; sense schema, BD ni motor econòmic.
 Ultim canvi: #1731.

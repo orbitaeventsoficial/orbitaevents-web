@@ -59,6 +59,8 @@ type LeadResult = {
   status: string;
   eventDate: string | null;
   eventLocation: string | null;
+  distanceKm?: number | null;
+  tollsEur?: number | null;
 };
 
 type CustomerResult = {
@@ -411,6 +413,8 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
     if (lead.eventLocation) parts.push(lead.eventLocation);
     setEventDesc(parts.join(' · '));
     setTravelLocation(lead.eventLocation ?? '');
+    setTravelKm(lead.distanceKm != null && lead.distanceKm > 0 ? String(lead.distanceKm) : '');
+    setTravelTollsEur(lead.tollsEur != null && lead.tollsEur > 0 ? String(lead.tollsEur) : '');
     setSearchQuery('');
     setShowResults(false);
     setSavedId(null);

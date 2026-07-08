@@ -1,3 +1,25 @@
+## 2026-07-08 — Manolo: seleccionar lead al dossier conserva km i peatges (Canvi #1734, codex)
+
+### Context
+Seguint l'auditoria E2E `lead -> dossier -> reserva`, el prefill de `/admin/dossiers?leadId=...` ja portava `distanceKm` i `tollsEur`, però si l'operador entrava al generador i seleccionava un lead des del cercador intern, només es copiaven dades de contacte, data, lloc i productes. El dossier podia perdre km/peatges ja calculats al lead i tornar a demanar-los manualment.
+
+### Què s'ha fet
+- `LeadResult` del generador de dossiers reconeix `distanceKm` i `tollsEur`.
+- `selectLead` omple `travelKm` i `travelTollsEur` quan el lead seleccionat porta aquests valors.
+- El contracte de test del generador blinda que aquesta herència existeix dins del bloc `selectLead`.
+- El full Manolo queda actualitzat amb #1734 com a part del recorregut lead -> dossier.
+
+### Validació
+- Validació tècnica: `pnpm test:run -- --run __tests__\app\admin\dossiers\DossierGeneratorClient-customer-lookup.test.ts` (4/4); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:zenit-roadmap` OK; `pnpm run qa:protocol` OK; `git diff --check` OK.
+- Validació funcional: el generador de dossiers ara conserva km i peatges tant si arriba per URL amb `leadId` com si el lead es tria des del cercador de la pantalla.
+- Validació humana/UX: l'operador no ha de redescobrir el desplaçament ja resolt al lead abans de guardar o enviar un dossier.
+
+### Coordinació
+Counter → 1734. Canvi limitat al generador de dossiers, test, roadmap, protocol, diari i sync; sense schema ni BD viva.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Manolo: lead → reserva conserva hores i audiència (Canvi #1733, codex)
 
 ### Context
