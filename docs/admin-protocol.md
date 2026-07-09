@@ -28799,6 +28799,7 @@ px tsc --noEmit OK · git diff --check OK.
 ### Canvi #1837 — 2026-07-09 — codex (FET)
 **Documents comercials: IVA seleccionable i recàrrec de temporada visible.**
 - Context: el `+ IVA` del pressupost s'aplicava sense control visible i el recàrrec d'alta temporada només estava cablejat al Studio de pressupostos, no al dossier ni al resum econòmic del lead.
+- Autorització explícita propietari: el propietari va ordenar `validació amb partner fora`, `blinda Manolo` i després `fesho`; aquest canvi retira l'estat/API de pacte introduït al lead i fa visible IVA/temporada en els documents comercials.
 - `/admin/presupuestos`: nou selector `Factura / IVA`; `taxableBase`, `vatRate`, `vatAmount` i `total` governen preview, PDF, proposta desada i contracte. El marge comercial continua calculant-se sobre el total abans d'impostos.
 - Quote PDF: desglossa base imposable i IVA quan s'aplica; quan no s'aplica, manté el resum compacte i mostra copy de sense IVA aplicat.
 - `/admin/leads/[id]`: `applyDatePricing` entra al resum Manolo sobre els serveis del bolo, suma al `Total client` i al marge, però no altera la liquidació del col·laborador.
