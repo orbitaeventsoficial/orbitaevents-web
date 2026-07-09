@@ -574,7 +574,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
       return;
     }
 
-    const pendingWindow = target === 'new-tab' ? window.open('about:blank', '_blank', 'noopener,noreferrer') : null;
+    const pendingWindow = target === 'new-tab' ? window.open('', '_blank') : null;
     if (pendingWindow) pendingWindow.opener = null;
     setGenerating(true);
     try {

@@ -71,6 +71,8 @@ describe('DossierGeneratorClient customer lookup guard', () => {
     expect(source).toContain("import { buildDossierPreviewHref } from '@/lib/admin/dossierWorkspaceHref';");
     expect(previewBlock).toContain("if (!linkedLeadId) {");
     expect(previewBlock).toContain("generate('preview', target);");
+    expect(previewBlock).toContain("window.open('', '_blank')");
+    expect(previewBlock).not.toContain("window.open('about:blank'");
     expect(previewBlock).toContain('await syncProductsToLead(linkedLeadId);');
     expect(previewBlock).toContain('const href = buildDossierPreviewHref(linkedLeadId);');
     expect(previewBlock).toContain('pendingWindow.location.href = href;');
