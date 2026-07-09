@@ -7209,6 +7209,7 @@
       "travelBreakdownPeople": "{headcount} crew on the road · {hours} h",
       "travelBreakdownTolls": "Route tolls",
       "travelBreakdownMeals": "Long-route meal allowance",
+      "seasonDetail": "+{pct}% on {base} of services for the event date.",
       "vatNote": "Indicative prices. VAT and final adjustments are set in the definitive proposal."
     },
     "cta": {

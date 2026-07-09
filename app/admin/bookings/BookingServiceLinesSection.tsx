@@ -394,7 +394,7 @@ export default function BookingServiceLinesSection({
                   ) : line.collaboratorId ? (
                     <span className={SL_NOTE} title="El cost a pagar al partner es gestiona a la seva fitxa">cost</span>
                   ) : (line.kind === 'DJ' || line.kind === 'EQUIPMENT') ? (
-                    <span className={SL_NOTE} title="Cost d'equip propi (DJ / material): ja inclòs al cost operatiu fix del bolo. No es compta per línia (es duplicaria).">a operatiu</span>
+                    <span className={SL_NOTE} title="Cost d'equip propi (DJ / material): ja inclòs al cost operatiu fix del bolo. No es compta per línia (es duplicaria).">inclòs</span>
                   ) : (
                     <input
                       className={SL_NUM} type="number" min={0} placeholder="Cost"

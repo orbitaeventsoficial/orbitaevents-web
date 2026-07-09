@@ -1,3 +1,7 @@
+// TANCAT CHARLIE - validat pel propietari (2026-07-09, Canvi #1759).
+// Ruta protegida: no reobrir /admin/leads/[id] per auditories generiques; nomes
+// per ordre explicita del propietari o regressio demostrable.
+
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import '../leads-design.css';
@@ -61,7 +65,6 @@ export default async function LeadDetailPage({ params }: Props) {
       eventAddress: true,
       distanceKm: true,
       tollsEur: true,
-      partnerPactValidatedAt: true,
       eventStartTime: true,
       eventEndTime: true,
       sourceCollaboratorId: true,
@@ -238,7 +241,6 @@ export default async function LeadDetailPage({ params }: Props) {
         vehicleCostPerKm={vehicleCostPerKm}
         initialDistanceKm={lead.distanceKm ?? null}
         initialTollsEur={lead.tollsEur ?? null}
-        initialPartnerPactValidatedAt={lead.partnerPactValidatedAt ? lead.partnerPactValidatedAt.toISOString() : null}
         bookingEconomia={bookingEconomia}
         proposals={lead.proposals.map((p) => ({
           id: p.id,

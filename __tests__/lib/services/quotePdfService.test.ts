@@ -87,6 +87,34 @@ describe('generateQuotePDF', () => {
     expect(output.byteLength).toBeGreaterThan(500);
   });
 
+  it('mostra el desglossament d’IVA quan el pressupost l’aplica', async () => {
+    const doc = await generateQuotePDF(makeQuoteData({
+      taxableBase: 1000,
+      vatRate: 21,
+      vatAmount: 210,
+      total: 1210,
+    }));
+    const text = pdfText(doc);
+
+    expect(text).toContain('Base imposable');
+    expect(text).toContain('IVA 21%');
+    expect(text).toContain('Preus amb IVA desglossat.');
+    expect(text).not.toContain('Preus sense IVA.');
+  });
+
+  it('mostra explícitament que no hi ha IVA aplicat quan vatRate és 0', async () => {
+    const doc = await generateQuotePDF(makeQuoteData({
+      taxableBase: 1000,
+      vatRate: 0,
+      vatAmount: 0,
+      total: 1000,
+    }));
+    const text = pdfText(doc);
+
+    expect(text).toContain('Preus sense IVA aplicat.');
+    expect(text).not.toContain('IVA 21%');
+  });
+
   it('funciona sense dades de client opcionals', async () => {
     const doc = await generateQuotePDF(makeQuoteData({
       clientName: undefined,

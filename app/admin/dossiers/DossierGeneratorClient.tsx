@@ -45,6 +45,7 @@ interface Props {
   initialTelefon?: string;
   initialEmpresa?: string;
   initialEventDesc?: string;
+  initialEventDate?: string | null;
   initialTravelLocation?: string;
   initialDistanceKm?: number | null;
   initialTollsEur?: number | null;
@@ -208,7 +209,7 @@ function buildEventDescription(data: ExtractedLeadData): string {
   return parts.join(' · ');
 }
 
-export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, leadId: initialLeadId, initialNom, initialEmail, initialTelefon, initialEmpresa, initialEventDesc, initialTravelLocation, initialDistanceKm, initialTollsEur, initialProductIds, initialAction }: Props) {
+export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, leadId: initialLeadId, initialNom, initialEmail, initialTelefon, initialEmpresa, initialEventDesc, initialEventDate, initialTravelLocation, initialDistanceKm, initialTollsEur, initialProductIds, initialAction }: Props) {
   const toast = useToast();
   const validProductIds = useMemo(() => new Set(products.map((p) => p.id)), [products]);
   const productProviderGroups = useMemo(() => (['orbita', 'masquerade', 'tino', 'altres'] as const)
@@ -230,6 +231,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
   const [telefon, setTelefon] = useState(initialTelefon ?? '');
   const [email, setEmail] = useState(initialEmail ?? '');
   const [eventDesc, setEventDesc] = useState(initialEventDesc ?? '');
+  const [eventDate, setEventDate] = useState(initialEventDate ?? '');
   const [travelLocation, setTravelLocation] = useState(initialTravelLocation ?? '');
   // Hereta els km calculats del lead la primera vegada (#1371): abans quedava buit i
   // s'havia d'entrar a mà tot i que el lead ja tenia la distància resolta.
@@ -441,6 +443,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
     if (lead.eventDate) parts.push(lead.eventDate.slice(0, 10));
     if (lead.eventLocation) parts.push(lead.eventLocation);
     setEventDesc(parts.join(' · '));
+    setEventDate(lead.eventDate ? lead.eventDate.slice(0, 10) : '');
     setTravelLocation(lead.eventLocation ?? '');
     setTravelKm(lead.distanceKm != null && lead.distanceKm > 0 ? String(lead.distanceKm) : '');
     setTravelTollsEur(lead.tollsEur != null && lead.tollsEur > 0 ? String(lead.tollsEur) : '');
@@ -490,6 +493,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
     setEmail('');
     setTelefon('');
     setEventDesc('');
+    setEventDate('');
     setTravelLocation('');
     setTravelKm('');
     setTravelTollsEur('');
@@ -538,6 +542,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
       setEmail(data.email || email);
       setTelefon(data.phone || telefon);
       if (nextEventDesc) setEventDesc(nextEventDesc);
+      if (data.eventDate) setEventDate(data.eventDate);
       if (data.eventLocation) setTravelLocation(data.eventLocation);
       setCustomerConflict(null);
       const existingCustomer = await findExistingCustomerMatchFor({
@@ -615,6 +620,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
         travelKm: Number.isFinite(km) && km > 0 ? km : undefined,
         travelTollsEur: Number.isFinite(tolls) && tolls > 0 ? tolls : undefined,
         location: travelLocation.trim() || undefined,
+        eventDate: eventDate || undefined,
         assetBaseUrl: window.location.origin,
       });
       const blob = new Blob([html], { type: 'text/html;charset=utf-8' });

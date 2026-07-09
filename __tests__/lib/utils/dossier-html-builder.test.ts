@@ -64,6 +64,7 @@ const copy: DossierCopy = {
     travelBreakdownPeople: '{headcount} operaris en ruta · {hours} h',
     travelBreakdownTolls: 'Peatges de ruta',
     travelBreakdownMeals: 'Dietes de ruta llarga',
+    seasonDetail: '+{pct}% sobre {base} de serveis per la data de l\'esdeveniment.',
     vatNote: "Preus orientatius; l'IVA es tanca a la proposta.",
   },
   cta: { label: 'Per confirmar disponibilitat o per a qualsevol dubte' },
@@ -72,7 +73,7 @@ const copy: DossierCopy = {
 function build(
   c: DossierClientInfo,
   products: AnimacioProduct[],
-  options?: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; travelTollsEur?: number; location?: string; assetBaseUrl?: string },
+  options?: { autoPrint?: boolean; logoDataUri?: string; locale?: string; travelKm?: number; travelTollsEur?: number; location?: string; eventDate?: string; assetBaseUrl?: string },
 ): string {
   return buildDossierHtml(c, products, copy, { locale: 'ca-ES', ...options });
 }
@@ -331,6 +332,30 @@ describe('buildDossierHtml', () => {
     expect(html).toContain('Dietes de ruta llarga');
     // Tot dins la mateixa (única) pàgina de proposta.
     expect(html.match(/class="resum-page"/g)?.length).toBe(1);
+  });
+
+  it('mostra el recàrrec de temporada al dossier quan la data del lead l’aplica', () => {
+    const a: AnimacioProduct = {
+      id: 'orbita:dj-base', nom: 'DJ base', descripcio: ['Servei base de DJ.'], inclou: ['DJ professional'], priceFrom: 250,
+    };
+    const b: AnimacioProduct = {
+      id: 'orbita:bingo', nom: 'Bingo Musical', descripcio: ['Bingo animat.'], inclou: ['Animador'], priceFrom: 240,
+    };
+    const html = build(client, [a, b], { eventDate: '2026-07-17' });
+
+    expect(html).toContain('class="bud-season"');
+    expect(html).toContain('Recàrrec alta temporada');
+    expect(html).toContain('+15% sobre');
+    expect(html).toContain('490');
+    expect(html).toContain('74');
+  });
+
+  it('no mostra cap recàrrec de temporada si el dossier no té data', () => {
+    const a: AnimacioProduct = { id: 'orbita:dj', nom: 'DJ', descripcio: ['x'], inclou: ['x'], priceFrom: 150 };
+    const html = build(client, [a]);
+
+    expect(html).not.toContain('class="bud-season"');
+    expect(html).not.toContain('Recàrrec alta temporada');
   });
 
   it('sense km coneguts NO es pinta la secció de transport (#1397)', () => {

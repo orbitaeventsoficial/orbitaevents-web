@@ -12,14 +12,11 @@ export default function RepartimentPanel({
   names,
   mode = 'internal',
   detailsDefaultOpen = true,
-  pactValidated = false,
 }: {
   repartiment: BoloRepartiment;
   names: Record<string, string>;
   mode?: 'internal' | 'preproposal';
   detailsDefaultOpen?: boolean;
-  /** Pacte validat pel propietari (#1753): les files del partner ho reflecteixen. */
-  pactValidated?: boolean;
 }) {
   const nameOf = (id: string) => (id === REPARTIMENT_OWNER_KEY ? 'Òrbita' : names[id] ?? 'Col·laborador');
   const { elements, perPersona, totals } = repartiment;
@@ -41,7 +38,7 @@ export default function RepartimentPanel({
   const personSub = (p: BoloRepartiment['perPersona'][number]) => {
     if (!p.esOrbita) {
       const linesLabel = `${p.linies} ${p.linies === 1 ? 'línia' : 'línies'}`;
-      return isPreproposal ? `import a validar · ${linesLabel}` : `saldo net · ${linesLabel}`;
+      return isPreproposal ? `tarifa Òrbita · ${linesLabel}` : `saldo net · ${linesLabel}`;
     }
     if (isPreproposal) return `lectura interna · brut ${formatCurrency(p.brut ?? p.rep)} · cost intern ${formatCurrency(p.costIntern ?? 0)}`;
     return `benefici net · brut ${formatCurrency(p.brut ?? p.rep)} · cost intern ${formatCurrency(p.costIntern ?? 0)}`;
@@ -66,7 +63,7 @@ export default function RepartimentPanel({
       key: `${personId}:${e.label}:${e.cobra}:${e.liquidacioOrbita}`,
       label: simplifyPartnerLabel(e.label, personId),
       amount: e.sourceCollaboratorId === personId && e.liquidacioOrbita > 0 ? e.liquidacioOrbita : e.cobra,
-      meta: e.sourceCollaboratorId === personId && e.liquidacioOrbita > 0 ? 'compensació Òrbita' : 'partner',
+      meta: e.sourceCollaboratorId === personId && e.liquidacioOrbita > 0 ? 'compensació Òrbita' : 'col·laborador',
       settlement: e.sourceCollaboratorId === personId && e.liquidacioOrbita > 0,
     }));
   const partnerSummaryRows = (personId: string) => {
@@ -133,11 +130,10 @@ export default function RepartimentPanel({
           {visiblePeople.map((p) => (
             <details key={`${p.personId}:detail`} className="ap-rep-partner-card" open={detailsDefaultOpen}>
               <summary className="ap-rep-partner-head">
-                {/* La nota diu QUÈ és l'import (#1752, Manolo); l'estat obert/plegat
-                    ja el mostra el propi <details>. Amb el pacte validat (#1753),
-                    la fila no pot contradir el head. */}
-                <span>{nameOf(p.personId)}<em>{pactValidated ? 'import validat' : 'import a validar'}</em></span>
-                <strong>{formatCurrency(p.rep)}</strong>
+                {/* La nota diu QUÈ és l'import (#1757, Manolo); l'estat obert/plegat
+                    ja el mostra el propi <details>. */}
+                <span>{nameOf(p.personId)}</span>
+                <strong>{formatCurrency(p.rep)}<em>tarifa Òrbita</em></strong>
               </summary>
               <div className="ap-rep-partner-lines">
                 {partnerSummaryRows(p.personId).map((row) => (

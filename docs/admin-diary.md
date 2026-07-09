@@ -1,3 +1,26 @@
+## 2026-07-09 — Documents comercials: IVA seleccionable i recàrrec de temporada visible (Canvi #1837, codex)
+
+### Context
+El propietari detecta que el `+ IVA` no es pot seleccionar al Studio de pressupostos i que el recàrrec d'alta temporada no apareix al dossier ni al resum Manolo del lead.
+
+### Canvi
+- `/admin/presupuestos`: selector `Factura / IVA` amb opció d'aplicar IVA o deixar-lo sense IVA aplicat. El càlcul alimenta preview, PDF, proposta desada i contracte amb `taxableBase`, `vatRate`, `vatAmount` i total final coherents.
+- Quote PDF: quan hi ha IVA mostra base imposable i IVA desglossat; quan no n'hi ha, manté el bloc compacte i ho diu explícitament.
+- `/admin/leads/[id]`: el recàrrec de data usa `applyDatePricing` sobre els serveis del bolo i suma al `Total client`, però no entra al repartiment ni al cost del col·laborador.
+- Dossiers: el snapshot congela `eventDate`; el builder HTML mostra el recàrrec de temporada al bloc de proposta quan la data l'aplica, amb copy via `messages/*.json`.
+- Lead Manolo: fora la validació persistent de pacte partner; el bloc queda com a `Cost col·laborador` i els botons de dossier/preview passen pel flux canònic.
+
+### Validació
+- Validació tècnica: tests focals OK (82/82); `npx tsc --noEmit --pretty false` OK; `pnpm build` OK.
+- Validació funcional: lead de juliol amb serveis 240 aplica `Recàrrec alta temporada` +15% i total client 276 sense tocar el cost col·laborador; dossier amb serveis 490 mostra línia de recàrrec de temporada; pressupost pot alternar IVA/sense IVA.
+- Validació humana/UX: impostos i temporada deixen de ser càlculs amagats; el client veu el criteri comercial abans de tancar pressupost i el partner no queda implicat en un recàrrec que és tarifa d'Òrbita.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 1837.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-08 — Manolo executa: lead de decisió (VALOR computat + marge amunt a mòbil + afinat premium) (Canvi #1752, claude)
 
 ### Context

@@ -79,6 +79,7 @@ vi.mock('@/lib/constants/dossier-copy', () => ({
       travelBreakdownPeople: '',
       travelBreakdownTolls: '',
       travelBreakdownMeals: '',
+      seasonDetail: '',
       vatNote: '',
     },
     cta: { label: '' },
@@ -225,6 +226,7 @@ describe('getDossierLeadInitialData', () => {
       email: 'estel.giralt@gmail.com',
       telefon: '661431040',
       eventDesc: 'Aniversari · 2026-07-25 · 21:00-23:00 · Canyamars · 30 pax · DJ 2 hores aniversari del seu marit',
+      eventDate: '2026-07-25',
       travelLocation: 'Canyamars',
       distanceKm: null,
       tollsEur: null,
@@ -277,6 +279,7 @@ describe('buildDossierHtmlForDossier', () => {
         travelKm: 123,
         travelTollsEur: 4.5,
         travelLocation: 'Snapshot City',
+        eventDate: '2026-07-17',
       },
     });
 
@@ -300,6 +303,7 @@ describe('buildDossierHtmlForDossier', () => {
         travelKm: 123,
         travelTollsEur: 4.5,
         location: 'Snapshot City',
+        eventDate: '2026-07-17',
       }),
     );
     expect(result?.dataSource).toBe('snapshot');

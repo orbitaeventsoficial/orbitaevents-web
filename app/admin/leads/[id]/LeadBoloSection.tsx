@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useCallback, useMemo, type MouseEvent } from 'react';
-import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import BookingServiceLinesSection from '@/app/admin/bookings/BookingServiceLinesSection';
@@ -10,6 +9,7 @@ import BoloTripCard, { CROWDED_TRIP_THRESHOLD } from '@/app/admin/components/Bol
 import type { BookingServiceLineFormInput } from '@/app/admin/bookings/booking-form.types';
 import { computeBookingFinancialSummary, computeServiceLineEconomics, classifyBoloLines } from '@/lib/services/costEngine';
 import { buildBoloRepartimentLines, computeBoloRepartiment } from '@/lib/services/repartimentService';
+import { applyDatePricing } from '@/lib/services/pricing/datePricingService';
 import { EQUIPMENT_RENTAL_TRANSPORT_KM, DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 import { SOUND_RENTAL } from '@/lib/constants/inventory';
 import {
@@ -25,9 +25,9 @@ import {
 } from '@/lib/services/travelLaborCost';
 import { useBookingDistance } from '@/app/admin/bookings/useBookingDistance';
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
-import { formatCurrency, formatCurrencyExact, formatDateFull, formatNumber } from '@/lib/constants';
+import { formatCurrency, formatCurrencyExact, formatNumber } from '@/lib/constants';
 import { buildLeadBookingPrefillHref } from '@/lib/admin/leadWorkspaceHref';
-import { buildDossierCompositePdfHref } from '@/lib/admin/dossierWorkspaceHref';
+import { buildDossierListHref, buildDossierPreviewHref } from '@/lib/admin/dossierWorkspaceHref';
 
 /**
  * El BOLO dins la fitxa del lead (Fase 1.4 de docs/bolo-flux.md).
@@ -59,14 +59,6 @@ export interface BoloEconomia {
  transportMarginPct: number;
  orbitaTechIncome: number;
 }
-
-type DossierDraftResponse = {
- ok?: boolean;
- status?: 'created' | 'existing';
- id?: string;
- dossierId?: string;
- error?: string;
-};
 
 /**
  * Neteja de PRESENTACIÓ del detall del cost de ruta (#1359). El model
@@ -125,9 +117,7 @@ export default function LeadBoloSection({
  vehicleCostPerKm = DEFAULT_VEHICLE_COST_PER_KM,
  initialDistanceKm = null,
  initialTollsEur = null,
- initialPartnerPactValidatedAt = null,
  onEconomiaChange,
- onPactStateChange,
  compactEconomia = false,
 }: {
  leadId: string;
@@ -153,15 +143,10 @@ export default function LeadBoloSection({
  vehicleCostPerKm?: number;
  initialDistanceKm?: number | null;
  initialTollsEur?: number | null;
- /** Quan es va validar el pacte amb el partner (#1753); null = pendent. */
- initialPartnerPactValidatedAt?: string | null;
  onEconomiaChange?: (e: BoloEconomia | null) => void;
- /** Eleva l'estat del pacte al contenidor (#1753): el rail de marge el reflecteix. */
- onPactStateChange?: (s: { hasPartner: boolean; validated: boolean }) => void;
  compactEconomia?: boolean;
 }) {
  const toast = useToast();
- const router = useRouter();
  const [lines, setLines] = useState<BookingServiceLineFormInput[]>([]);
  // Cost intern de ruta (línies [travel-cost] amagades del #1342/#1343): fallback
  // quan encara no hi ha distància calculada en viu.
@@ -176,11 +161,7 @@ export default function LeadBoloSection({
  const [driverId, setDriverId] = useState('');
  const [loading, setLoading] = useState(true);
  const [saving, setSaving] = useState(false);
- const [creatingDossier, setCreatingDossier] = useState(false);
  const [dirty, setDirty] = useState(false);
- // Pacte amb partner (#1753): UNA acció de validació, persistida al Lead.
- const [pactValidatedAt, setPactValidatedAt] = useState<string | null>(initialPartnerPactValidatedAt);
- const [pactSaving, setPactSaving] = useState(false);
 
  useEffect(() => {
  let alive = true;
@@ -352,33 +333,13 @@ export default function LeadBoloSection({
  return names;
  }, [repartimentInputLines]);
  const repartiment = useMemo(() => computeBoloRepartiment(repartimentInputLines), [repartimentInputLines]);
- // Estat del pacte (#1753): hi ha partner si el repartiment té elements; el pacte
- // està CLAR si no hi ha partner o si el propietari l'ha validat explícitament.
  const hasPartner = repartiment.elements.length > 0;
- const pactClear = !hasPartner || Boolean(pactValidatedAt);
- useEffect(() => {
- onPactStateChange?.({ hasPartner, validated: Boolean(pactValidatedAt) });
- }, [hasPartner, pactValidatedAt, onPactStateChange]);
-
- // Persisteix la validació del pacte al Lead: una sola acció, un sol lloc.
- const savePactValidated = async (validated: boolean) => {
- setPactSaving(true);
- try {
- const res = await fetchWithCsrf(`/api/admin/leads/${leadId}`, {
- method: 'PATCH',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ partnerPactValidated: validated }),
- });
- if (!res.ok) throw new Error('No s\'ha pogut desar');
- setPactValidatedAt(validated ? new Date().toISOString() : null);
- toast.success(validated ? 'Pacte validat.' : 'Validació del pacte desfeta.');
- } catch (e) {
- console.error('[LeadBolo] validar pacte', e);
- toast.error('Error desant la validació del pacte.');
- } finally {
- setPactSaving(false);
- }
- };
+ const serviceEconomics = useMemo(() => computeServiceLineEconomics(economicLines, 0), [economicLines]);
+ const datePricing = useMemo(
+ () => applyDatePricing(serviceEconomics.revenue, documentContext.eventDate ?? null, 'ca'),
+ [documentContext.eventDate, serviceEconomics.revenue],
+ );
+ const seasonSurcharge = datePricing.surchargeEur;
 
  // Fulla d'economia del bolo (Fase 4 de docs/bolo-flux.md). La pasta NO viu al
  // configurador: cada línia porta el cost amagat i alimenta SOLA aquesta fulla.
@@ -390,10 +351,11 @@ export default function LeadBoloSection({
  // ownCostRatio = 0: un servei propi (DJ) NO imputa cost sobre el seu preu.
  // El cost real de l'equip propi (desgast + amortització + consumibles) ja
  // viu al cost fix operatiu; imputar a més un % seria comptar-lo dos cops.
- const { revenue: linesRevenue, cost } = computeServiceLineEconomics(allLines, 0);
+ const { revenue: linesRevenue, cost } = serviceEconomics;
  if (linesRevenue <= 0) return null;
- // El càrrec de desplaçament es REPERCUTEIX al client: suma al total facturable.
- const revenue = linesRevenue + travelCharge;
+ // El càrrec de desplaçament i el recàrrec de data es REPERCUTEIXEN al client.
+ // El recàrrec és comercial d'Òrbita: suma ingrés i marge, però no altera què cobra el partner.
+ const revenue = linesRevenue + seasonSurcharge + travelCharge;
  // Cost operatiu real (vegeu docs/bolo-flux.md):
  // - cost fix (desgast + amortització + consumibles) NOMÉS si el bolo porta
  // equip propi d'Òrbita (DJ o material propi); Masquerade sol → 0.
@@ -405,7 +367,7 @@ export default function LeadBoloSection({
  total: revenue,
  packPrice: 0, extrasTotal: 0, extraHours: 0, extraHourPrice: 0,
  distanceKm: Number(distanceKm) || 0, travelCost: effectiveTravelCost, travelRevenue: travelCharge,
- serviceLinesRevenue: linesRevenue, serviceLinesCost: cost + rentalTransport,
+ serviceLinesRevenue: linesRevenue + seasonSurcharge, serviceLinesCost: cost + rentalTransport,
  serviceLines: allLines,
  serviceLinesOwnCostRatio: 0,
  serviceLinesCostAdjustment: rentalTransport,
@@ -415,7 +377,7 @@ export default function LeadBoloSection({
  fixedOperationalCost: hasOwnEquipment ? PROFITABILITY_MODEL_DEFAULTS.fixedOperationalCost : 0,
  });
  return summary;
- }, [economicLines, visibleLines, source, vehicleCostPerKm, effectiveTravelCost, distanceKm, travelCharge]);
+ }, [economicLines, serviceEconomics, visibleLines, source, vehicleCostPerKm, effectiveTravelCost, distanceKm, travelCharge, seasonSurcharge]);
 
  // Eleva el net al contenidor (perquè visqui al hero de la fitxa, no enterrat a baix).
  useEffect(() => {
@@ -515,34 +477,8 @@ export default function LeadBoloSection({
  if (saved) window.location.assign(href);
  };
 
- const createDossierFromLead = async () => {
- setCreatingDossier(true);
- try {
- if (dirty) {
- const saved = await handleSave();
- if (!saved) return;
- }
- const res = await fetchWithCsrf('/api/admin/dossiers', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ leadId }),
- });
- const data = await res.json().catch(() => ({})) as DossierDraftResponse;
- const dossierId = data.dossierId ?? data.id;
- if (!res.ok || !dossierId) {
- throw new Error(data.error || 'No he pogut crear el dossier.');
- }
- toast.success(data.status === 'existing' ? 'Aquest lead ja tenia un dossier actiu.' : 'Dossier creat.');
- router.refresh();
- window.open(buildDossierCompositePdfHref(dossierId), '_blank', 'noopener,noreferrer');
- } catch (e) {
- console.error('[LeadBolo] crear dossier', e);
- toast.error(e instanceof Error ? e.message : 'Error creant el dossier.');
- } finally {
- setCreatingDossier(false);
- }
- };
-
+ const dossierHref = buildDossierListHref(leadId);
+ const dossierPreviewHref = buildDossierPreviewHref(leadId);
  const quoteHref = `/admin/presupuestos?leadId=${encodeURIComponent(leadId)}`;
  const bookingHref = buildLeadBookingPrefillHref(leadId);
 
@@ -609,12 +545,20 @@ export default function LeadBoloSection({
  <div className="ap-ledger-budget-sum">
  <div className="ap-ledger-budget-row">
  <span>Serveis</span>
- <strong>{formatCurrency(economia.total - travelCharge)}</strong>
+ <strong>{formatCurrency(serviceEconomics.revenue)}</strong>
  </div>
+ <span className="ap-ledger-budget-op" aria-hidden="true">+</span>
  <div className="ap-ledger-budget-row ap-ledger-budget-row--travel">
- <span>{transportLabel}</span>
- <strong>+{formatCurrency(travelCharge)}</strong>
+ <span aria-label={transportLabel}>{tollsValue > 0 ? <>Transport<em>inclou peatges {formatCurrency(tollsValue)}</em></> : transportLabel}</span>
+ <strong>{formatCurrency(travelCharge)}</strong>
  </div>
+ {seasonSurcharge > 0 && datePricing.appliedRule ? (
+ <div className="ap-ledger-budget-row ap-ledger-budget-row--season">
+ <span>{datePricing.appliedRule.label}<em>+{formatNumber(datePricing.surchargePct, { maximumFractionDigits: 0 })}% sobre serveis</em></span>
+ <strong>{formatCurrency(seasonSurcharge)}</strong>
+ </div>
+ ) : null}
+ <span className="ap-ledger-budget-op ap-ledger-budget-op--equals" aria-hidden="true">=</span>
  <div className="ap-ledger-budget-row ap-ledger-budget-row--total">
  <span>Total client</span>
  <strong>{formatCurrency(economia.total)}</strong>
@@ -623,50 +567,34 @@ export default function LeadBoloSection({
  </div>
  )}
 
+ <div className="ap-ledger-decision-row" data-has-collaborator={hasPartner ? 'true' : undefined}>
  {hasPartner && (
- <div id="lead-repartiment" className="ap-ledger-budget ap-ledger-budget--repartiment" data-validated={pactValidatedAt ? 'true' : undefined} aria-label="Pacte amb partner al lead">
+ <div id="lead-repartiment" className="ap-ledger-budget ap-ledger-budget--repartiment" aria-label="Cost col·laborador al lead">
  <div className="ap-ledger-econohead">
- <span>Pacte amb partner</span>
- <span className="ap-ledger-econonote">
- {pactValidatedAt
- ? `validat el ${formatDateFull(pactValidatedAt)} · la liquidació completa viu a la reserva`
- : 'import a validar amb el partner · la liquidació completa viu a la reserva'}
- </span>
- {/* UNA sola acció de validació (#1753): viu al bloc del pacte, no repartida. */}
- <span className="ap-ledger-pact-action">
- {pactValidatedAt ? (
- <button type="button" className="ap-btn ap-btn--xs" onClick={() => savePactValidated(false)} disabled={pactSaving} aria-busy={pactSaving}>
- Desfer validació
- </button>
- ) : (
- <button type="button" className="ap-btn ap-btn--primary ap-btn--xs" onClick={() => savePactValidated(true)} disabled={pactSaving} aria-busy={pactSaving}>
- Validar pacte
- </button>
- )}
- </span>
+ <span>Cost col·laborador</span>
+ <span className="ap-ledger-econonote">segons tarifa Òrbita · liquidació final a la reserva</span>
  </div>
- <RepartimentPanel repartiment={repartiment} names={repartimentNames} mode="preproposal" pactValidated={Boolean(pactValidatedAt)} />
+ <RepartimentPanel repartiment={repartiment} names={repartimentNames} mode="preproposal" />
  </div>
  )}
-
  <div className="ap-ledger-bolo-actions ap-ledger-bolo-actions--full">
  <span className="ap-ledger-bolo-next">
  <strong>Següent pas</strong>
- {/* El pas següent DEPÈN de l'estat del pacte (#1753): amb partner pendent,
- primer es valida; el dossier s'encén (primari) quan el pacte està clar. */}
- <em>{pactClear
- ? 'Dossier primer; pressupost i reserva quan el pacte ja està clar.'
- : 'Valida el pacte amb el partner; el dossier és el pas següent.'}</em>
+ <em>Dossier primer; pressupost i reserva quan el bolo està clar.</em>
  </span>
- <button type="button" className={pactClear ? 'ap-btn ap-btn--primary' : 'ap-btn'} onClick={createDossierFromLead} disabled={saving || creatingDossier} aria-busy={creatingDossier}>
- {creatingDossier ? 'Creant dossier...' : 'Crear dossier'}
- </button>
+ <a className="ap-btn ap-btn--primary" href={dossierHref} onClick={(event) => openBuilder(event, dossierHref)} aria-disabled={saving}>
+ Crear dossier
+ </a>
+ <a className="ap-btn" href={dossierPreviewHref} onClick={(event) => openBuilder(event, dossierPreviewHref)} aria-disabled={saving}>
+ Previsualitzar dossier
+ </a>
  <a className="ap-btn" href={quoteHref} onClick={(event) => openBuilder(event, quoteHref)} aria-disabled={saving}>
  Crear pressupost
  </a>
  <a className="ap-btn ap-btn--secondary" href={bookingHref} onClick={(event) => openBuilder(event, bookingHref)} aria-disabled={saving}>
  Crear reserva
  </a>
+ </div>
  </div>
  </section>
 

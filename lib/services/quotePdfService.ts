@@ -47,6 +47,12 @@ export interface QuoteData {
   seasonPct?: number;
   discount: number;
   discountReason: string;
+  /** Base imposable després de descompte, abans d'IVA. */
+  taxableBase?: number;
+  /** Percentatge d'IVA aplicat. 0 = sense IVA aplicat. */
+  vatRate?: number;
+  /** Import d'IVA aplicat. */
+  vatAmount?: number;
   total: number;
   clientName?: string;
   clientEmail?: string;
@@ -87,6 +93,8 @@ export async function generateQuotePDF(
       travelDetail: (km: number, billable: number, blocks: number) =>
         `${km.toFixed(1)} km totals · ${billable.toFixed(1)} km facturables · ${blocks} ${blocks === 1 ? 'tram' : 'trams'}`,
       discount: 'Descompte',
+      taxableBase: 'Base imposable',
+      vat: 'IVA',
       total: 'Total',
       validUntilPrefix: 'Validesa:',
       validUntilSuffix: 'dies',
@@ -95,7 +103,8 @@ export async function generateQuotePDF(
       ctaStep1: 'Accepta la proposta',
       ctaStep2: 'Reserva amb paga i senyal',
       ctaStep3: 'Esdeveniment assegurat',
-      disclaimer: 'Preus sense IVA.',
+      disclaimerNoVat: 'Preus sense IVA aplicat.',
+      disclaimerVat: 'Preus amb IVA desglossat.',
       contact: 'Contacte',
       conditions: 'Condicions',
       whyChooseUs: 'Per què escollir-nos',
@@ -120,6 +129,8 @@ export async function generateQuotePDF(
       travelDetail: (km: number, billable: number, blocks: number) =>
         `${km.toFixed(1)} km totales · ${billable.toFixed(1)} km facturables · ${blocks} ${blocks === 1 ? 'tramo' : 'tramos'}`,
       discount: 'Descuento',
+      taxableBase: 'Base imponible',
+      vat: 'IVA',
       total: 'Total',
       validUntilPrefix: 'Validez:',
       validUntilSuffix: 'días',
@@ -128,7 +139,8 @@ export async function generateQuotePDF(
       ctaStep1: 'Acepta la propuesta',
       ctaStep2: 'Reserva con señal',
       ctaStep3: 'Evento asegurado',
-      disclaimer: 'Precios sin IVA.',
+      disclaimerNoVat: 'Precios sin IVA aplicado.',
+      disclaimerVat: 'Precios con IVA desglosado.',
       contact: 'Contacto',
       conditions: 'Condiciones',
       whyChooseUs: 'Por qué elegirnos',
@@ -153,6 +165,8 @@ export async function generateQuotePDF(
       travelDetail: (km: number, billable: number, blocks: number) =>
         `${km.toFixed(1)} km total · ${billable.toFixed(1)} km billable · ${blocks} ${blocks === 1 ? 'block' : 'blocks'}`,
       discount: 'Discount',
+      taxableBase: 'Taxable base',
+      vat: 'VAT',
       total: 'Total',
       validUntilPrefix: 'Validity:',
       validUntilSuffix: 'days',
@@ -161,7 +175,8 @@ export async function generateQuotePDF(
       ctaStep1: 'Accept the quote',
       ctaStep2: 'Reserve with deposit',
       ctaStep3: 'Your event secured',
-      disclaimer: 'Prices excl. VAT.',
+      disclaimerNoVat: 'Prices with no VAT applied.',
+      disclaimerVat: 'Prices with VAT breakdown.',
       contact: 'Contact',
       conditions: 'Conditions',
       whyChooseUs: 'Why choose us',
@@ -388,13 +403,16 @@ export async function generateQuotePDF(
       ? Math.min(2, doc.splitTextToSize(data.discountReason.trim(), 120).length)
       : 0;
   const hasTravel = (data.travelCharge ?? 0) > 0;
+  const vatRate = Number.isFinite(data.vatRate) ? Math.max(0, data.vatRate ?? 0) : 0;
+  const vatAmount = Number.isFinite(data.vatAmount) ? Math.max(0, data.vatAmount ?? 0) : 0;
+  const hasVat = vatRate > 0 || vatAmount > 0;
   const travelDetailVisible = hasTravel
     && typeof data.travelKm === 'number'
     && typeof data.billableTravelKm === 'number'
     && typeof data.travelBlocks === 'number';
   const hasSeason = (data.seasonSurcharge ?? 0) > 0 && typeof data.seasonLabel === 'string';
   const seasonDetailVisible = hasSeason && typeof data.seasonPct === 'number';
-  const summaryRows = 2 + (hasSeason ? 1 : 0) + (hasTravel ? 1 : 0) + (data.discount > 0 ? 1 : 0);
+  const summaryRows = 2 + (hasSeason ? 1 : 0) + (hasTravel ? 1 : 0) + (data.discount > 0 ? 1 : 0) + (hasVat ? 2 : 0);
   const travelDetailGap = travelDetailVisible ? 4.2 : 0;
   const seasonDetailGap = seasonDetailVisible ? 4.2 : 0;
   const summaryTopPadding = 8;
@@ -478,6 +496,15 @@ export async function generateQuotePDF(
       priceY += 3.8 * reasonLines.length;
     }
   }
+  if (hasVat) {
+    priceY += summaryRowGap;
+    setStyleBody(doc);
+    doc.text(t.taxableBase, left + 4, priceY);
+    doc.text(formatPdfMoney(data.taxableBase ?? Math.max(0, data.total - vatAmount), locale), left + contentWidth - 4, priceY, { align: 'right' });
+    priceY += summaryRowGap;
+    doc.text(`${t.vat} ${vatRate}%`, left + 4, priceY);
+    doc.text(formatPdfMoney(vatAmount, locale), left + contentWidth - 4, priceY, { align: 'right' });
+  }
   priceY += 6;
   doc.setDrawColor(...border);
   doc.line(left + 4, priceY - 3, left + contentWidth - 4, priceY - 3);
@@ -497,7 +524,7 @@ export async function generateQuotePDF(
   // Disclaimer fora del quadre negre — visible en ivori
   setStyleCaption(doc);
   doc.setTextColor(...COLORS.textMuted);
-  doc.text(t.disclaimer, left + 4, y);
+  doc.text(hasVat ? t.disclaimerVat : t.disclaimerNoVat, left + 4, y);
   y += 5;
 
   // Les condicions són un resum opcional: no han d'obrir un full gairebé buit.

@@ -32,4 +32,21 @@ describe('PresupuestoPdfStudio customer search guard', () => {
     expect(sendBlock).toContain('throw new Error(readStudioMutationError(markSentData, "No s\'ha pogut marcar la proposta com enviada"));');
     expect(sendBlock).not.toMatch(/^\s*await fetchWithCsrf\(`\/api\/admin\/proposals\/\$\{targetProposalId\}\/send`, \{ method: 'POST' \}\);/m);
   });
+
+  it('permet seleccionar si el pressupost aplica IVA i desa els camps fiscals coherents', () => {
+    const start = source.indexOf('const [invoiceRequired');
+    const end = source.indexOf('async function buildPdf', start);
+    const fiscalBlock = source.slice(start, end);
+
+    expect(source).toContain("import { DEPOSIT_PERCENT, roundMoney, calcVatAmount, calcVatRate } from '@/lib/constants/pricing';");
+    expect(source).toContain('const [invoiceRequired, setInvoiceRequired] = useState(true);');
+    expect(source).toContain('<option value="invoice">Aplicar IVA {calcVatRate(true)}%</option>');
+    expect(source).toContain('<option value="no-invoice">Sense IVA aplicat</option>');
+    expect(fiscalBlock).toContain('const vatRate = useMemo(() => calcVatRate(invoiceRequired), [invoiceRequired]);');
+    expect(fiscalBlock).toContain('const vatAmount = useMemo(() => calcVatAmount(taxableBase, invoiceRequired), [taxableBase, invoiceRequired]);');
+    expect(fiscalBlock).toContain('vatRate,');
+    expect(fiscalBlock).toContain('vatAmount,');
+    expect(fiscalBlock).toContain('total,');
+    expect(fiscalBlock).not.toContain('VAT_RATE_INVOICE');
+  });
 });

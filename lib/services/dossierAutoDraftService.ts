@@ -68,6 +68,7 @@ export function composeDossierDraftFromLead(input: {
     travelKm: input.lead.distanceKm,
     travelTollsEur: input.lead.tollsEur,
     travelLocation: input.lead.travelLocation,
+    eventDate: input.lead.eventDate,
   });
 
   return {
@@ -145,6 +146,7 @@ export async function buildDossierHtmlForLeadPreview(
     travelKm: snapshot.travelKm ?? undefined,
     travelTollsEur: snapshot.travelTollsEur ?? undefined,
     location: snapshot.travelLocation ?? undefined,
+    eventDate: snapshot.eventDate ?? undefined,
     assetBaseUrl: options.assetBaseUrl,
   });
 

@@ -117,13 +117,6 @@ export async function updateLeadFromInput(id: string, input: LeadPatchInput): Pr
     body.eventDate = parsedDate;
   }
 
-  // Validació del pacte amb el partner (#1753): el client envia un boolean;
-  // la BD guarda QUAN es va validar (null = pendent).
-  if (typeof body.partnerPactValidated === 'boolean') {
-    body.partnerPactValidatedAt = body.partnerPactValidated ? new Date() : null;
-  }
-  delete body.partnerPactValidated;
-
   if (body.status === 'WON' && existing.status !== 'WON') {
     body.convertedAt = new Date();
   }
@@ -149,7 +142,6 @@ export async function updateLeadFromInput(id: string, input: LeadPatchInput): Pr
       eventAddress: true,
       distanceKm: true,
       tollsEur: true,
-      partnerPactValidatedAt: true,
       guestCount: true,
       budget: true,
       sourceCollaboratorId: true,

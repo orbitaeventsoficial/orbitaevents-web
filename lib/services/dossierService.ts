@@ -39,6 +39,7 @@ export type DossierLeadInitialData = {
   email: string;
   telefon: string;
   eventDesc: string;
+  eventDate: string | null;
   travelLocation: string;
   distanceKm: number | null;
   tollsEur: number | null;
@@ -55,6 +56,7 @@ export type DossierOutputTransport = {
   travelKm?: number;
   travelTollsEur?: number;
   travelLocation?: string;
+  eventDate?: string;
 };
 
 export type BuildDossierHtmlForDossierOptions = {
@@ -144,6 +146,7 @@ export async function getDossierLeadInitialData(leadId?: string | null): Promise
     email: lead.email,
     telefon: lead.phone ?? '',
     eventDesc: buildDossierLeadEventDesc(lead),
+    eventDate: formatLeadIsoDate(lead.eventDate) || null,
     travelLocation: buildDossierLeadTravelLocation(lead),
     distanceKm: lead.distanceKm ?? null,
     tollsEur: lead.tollsEur ?? null,
@@ -199,19 +202,21 @@ export async function resolveDossierTransportOutput(input: {
   let travelKm: number | undefined = snapshotTransport.travelKm;
   let travelTollsEur: number | undefined = snapshotTransport.travelTollsEur;
   let travelLocation: string | undefined = snapshotTransport.travelLocation;
+  let eventDate: string | undefined = snapshotTransport.eventDate;
   const fallbackLeadId = input.leadId ?? null;
 
-  if (fallbackLeadId && (travelKm == null || travelTollsEur == null || !travelLocation)) {
+  if (fallbackLeadId && (travelKm == null || travelTollsEur == null || !travelLocation || !eventDate)) {
     const lead = await prisma.lead.findUnique({
       where: { id: fallbackLeadId },
-      select: { distanceKm: true, tollsEur: true, eventLocation: true },
+      select: { distanceKm: true, tollsEur: true, eventLocation: true, eventDate: true },
     });
     if (travelKm == null && lead?.distanceKm != null && lead.distanceKm > 0) travelKm = lead.distanceKm;
     if (travelTollsEur == null && lead?.tollsEur != null && lead.tollsEur > 0) travelTollsEur = lead.tollsEur;
     if (!travelLocation && lead?.eventLocation) travelLocation = lead.eventLocation;
+    if (!eventDate && lead?.eventDate) eventDate = formatLeadIsoDate(lead.eventDate);
   }
 
-  return { travelKm, travelTollsEur, travelLocation };
+  return { travelKm, travelTollsEur, travelLocation, eventDate };
 }
 
 export async function getDossiersByLead(leadId: string) {
@@ -299,6 +304,7 @@ export async function buildDossierHtmlForDossier(id: string, options: BuildDossi
     travelKm: payload.transport.travelKm,
     travelTollsEur: payload.transport.travelTollsEur,
     location: payload.transport.travelLocation,
+    eventDate: payload.transport.eventDate,
     assetBaseUrl: options.assetBaseUrl,
   });
   return { ...payload, html };

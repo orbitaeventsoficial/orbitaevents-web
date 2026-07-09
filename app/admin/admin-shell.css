@@ -367,7 +367,7 @@ html.admin-mode .ax__brand {
   border-bottom: 1px solid var(--ax-hair-gold);
 }
 html.admin-mode .ax__logo {
-  display: block; width: 140px; height: 46px;
+  display: block; width: 140px; height: auto;
   object-fit: contain; object-position: left center;
   filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.42));
 }
@@ -452,7 +452,7 @@ html.admin-mode .ax__sidesub a.is-secondary.is-on {
 
 /* Botó d'acció primària: vora de llautó, fons fosc amb sheen */
 html.admin-mode .ax__add {
-  flex: 1; min-width: 0;
+  flex: 1.25 1 0; min-width: 0;
   display: inline-flex; align-items: center; justify-content: center; gap: var(--o-space-15);
   padding: var(--o-space-2) var(--o-space-25); border-radius: var(--o-space-25);
   border: 1px solid var(--ax-hair-gold);
@@ -481,7 +481,7 @@ html.admin-mode .ax__add:active { transform: translateY(0); }
 
 /* Botó d'accés directe a la safata d'entrada — posició primària al capdamunt */
 html.admin-mode .ax__inbox {
-  flex: 1; min-width: 0;
+  flex: .75 1 0; min-width: 0;
   display: inline-flex; align-items: center; justify-content: center; gap: var(--o-space-15);
   padding: var(--o-space-2) var(--o-space-25); border-radius: var(--o-space-25);
   border: 1px solid var(--ax-hair-gold);
@@ -552,12 +552,21 @@ html.admin-mode .ax__page { animation: none; }
   html.admin-mode .ax__side {
     position: relative; width: auto; min-height: 0;
     flex-direction: row; flex-wrap: wrap; align-items: center;
-    padding: var(--o-space-25) var(--o-space-35); gap: var(--o-space-25);
+    padding: var(--o-space-25) var(--o-space-35); gap: var(--o-space-2);
     border-right: 0; border-bottom: 1px solid var(--ax-line);
   }
   html.admin-mode .ax__brand { height: auto; padding: 0; border-bottom: 0; }
-  html.admin-mode .ax__logo { width: 118px; height: 38px; }
-  html.admin-mode .ax__sidenav { flex-direction: row; overflow-x: auto; flex: 1; min-height: 0; min-width: 0; }
+  html.admin-mode .ax__logo { width: 118px; height: auto; }
+  html.admin-mode .ax__sidenav {
+    flex: 1 0 100%;
+    width: 100%;
+    flex-direction: row;
+    gap: var(--o-space-1);
+    overflow-x: auto;
+    min-height: 0;
+    min-width: 0;
+    padding-bottom: 1px;
+  }
   html.admin-mode .ax__sidegroup { flex: 0 0 auto; }
   html.admin-mode .ax__sidegroup.is-active > .ax__sideitem::before {
     left: 10px; right: 10px; top: auto; bottom: -1px;
@@ -566,7 +575,7 @@ html.admin-mode .ax__page { animation: none; }
   html.admin-mode .ax__sidesub { display: none; }
   html.admin-mode .ax__sidetop,
   html.admin-mode .ax__sidefoot { display: none; }
-  html.admin-mode .ax__sideitem { min-height: 38px; font-size: 13.5px; }
+  html.admin-mode .ax__sideitem { min-height: 36px; padding-inline: var(--o-space-25); font-size: var(--o-text-sm); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1453,13 +1462,6 @@ html.admin-mode .ap-ledger-econohead {
 /* El títol no es trenca en columna estreta (#1752): si la nota no hi cap al
    costat, salta SENCERA a la línia de sota (flex-wrap), no esmicola el títol. */
 html.admin-mode .ap-ledger-econohead > span:first-child { white-space: nowrap; }
-/* UNA acció de validació del pacte (#1753): viu al head del bloc, alineada a la
-   dreta; a mòbil cau a la seva pròpia línia via el flex-wrap del head. */
-html.admin-mode .ap-ledger-pact-action { margin-left: auto; flex: 0 0 auto; }
-/* Pacte validat: la vora del bloc passa a to d'èxit — es veu d'un cop d'ull. */
-html.admin-mode .ap-ledger-budget--repartiment[data-validated="true"] {
-  border-color: color-mix(in oklab, var(--o-stage-won-strong) 38%, var(--line));
-}
 html.admin-mode .ap-ledger-econobadge {
   padding: 0.0625rem 0.375rem; border-radius: var(--o-r-xs);
   background: color-mix(in oklab, var(--gold) 12%, transparent);
@@ -1496,7 +1498,7 @@ html.admin-mode .ap-ledger-travel-note { font-size: var(--o-text-micro); color: 
 html.admin-mode .ap-ledger-budget {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(15rem, 19rem);
-  align-items: stretch;
+  align-items: start;
   gap: var(--o-space-3);
   margin-top: var(--o-space-3); padding: var(--o-space-3) var(--o-space-3) 0;
   border-top: 1px solid var(--line);
@@ -1504,12 +1506,30 @@ html.admin-mode .ap-ledger-budget {
 html.admin-mode .ap-ledger-budget--repartiment {
   display: flex;
   flex-direction: column;
+  align-self: start;
+  width: min(100%, 32rem);
   padding-bottom: var(--o-space-3);
   border: 1px solid color-mix(in oklab, var(--gold) 24%, var(--line));
   border-radius: var(--o-r-md);
   background:
     linear-gradient(180deg, color-mix(in oklab, var(--gold) 5%, transparent), transparent 40%),
     color-mix(in oklab, var(--panel) 88%, transparent);
+}
+html.admin-mode .ap-ledger-decision-row {
+  display: grid;
+  grid-template-columns: minmax(0, 32rem) minmax(15rem, 1fr);
+  align-items: center;
+  justify-content: center;
+  gap: var(--o-space-3);
+  margin: var(--o-space-3) var(--o-space-3) 0;
+}
+html.admin-mode .ap-ledger-decision-row:not([data-has-collaborator="true"]) {
+  grid-template-columns: minmax(0, 1fr);
+}
+html.admin-mode .ap-ledger-decision-row > .ap-ledger-budget--repartiment {
+  width: 100%;
+  margin-top: 0;
+  align-self: stretch;
 }
 
 /* ── DESPLAÇAMENT: peça de logística neta (rediseny #1377) ── */
@@ -1544,8 +1564,14 @@ html.admin-mode .ap-ledger-trip-grouplbl {
   font-family: var(--mono); font-size: var(--o-text-2xs); font-weight: var(--o-fw-bold);
   text-transform: uppercase; letter-spacing: 0.09em; color: var(--gold);
 }
-html.admin-mode .ap-ledger-trip-fields { display: flex; flex-wrap: wrap; gap: var(--o-space-2); }
-html.admin-mode .ap-ledger-trip-field { display: flex; flex-direction: column; gap: var(--o-space-1); flex: 1 1 6rem; min-width: 5rem; }
+html.admin-mode .ap-ledger-trip-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: var(--o-space-2);
+}
+html.admin-mode .ap-ledger-trip-field { display: flex; flex-direction: column; gap: var(--o-space-1); min-width: 0; }
+html.admin-mode .ap-ledger-trip-field--wide { grid-column: 1 / -1; }
 html.admin-mode .ap-ledger-trip-field > span {
   font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3);
 }
@@ -1680,32 +1706,86 @@ html.admin-mode .ap-ledger-trip-alarm {
 }
 /* La suma = panell destacat (or subtil): és la sortida clau del bolo abans de contractar. */
 html.admin-mode .ap-ledger-budget-sum {
-  display: flex; flex-direction: column; justify-content: center; gap: 0;
-  align-self: stretch;
+  display: grid;
+  grid-template-columns: minmax(0, 0.86fr) auto minmax(0, 1.14fr);
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--o-space-15) var(--o-space-2);
+  align-self: start;
   min-width: 0;
-  padding: var(--o-space-25) var(--o-space-3);
+  padding: var(--o-space-25);
   border: 1px solid color-mix(in oklab, var(--gold) 26%, var(--line));
   border-radius: var(--o-r-md);
   background:
     linear-gradient(180deg, color-mix(in oklab, var(--gold) 8%, transparent), transparent 55%),
     color-mix(in oklab, var(--gold) 5%, var(--panel));
 }
+html.admin-mode .ap-ledger-budget-op {
+  display: inline-grid;
+  width: 1.45rem;
+  height: 1.45rem;
+  place-items: center;
+  justify-self: center;
+  align-self: center;
+  border: 1px solid color-mix(in oklab, var(--gold) 34%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--gold) 8%, transparent);
+  color: var(--gold);
+  font-family: var(--ui);
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-bold);
+  line-height: 1;
+}
+html.admin-mode .ap-ledger-budget-op--equals {
+  display: none;
+  color: var(--t2);
+}
 html.admin-mode .ap-ledger-budget-row {
-  display: flex; align-items: baseline; justify-content: flex-start; gap: var(--o-space-25);
-  padding: var(--o-space-1) 0; font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t2);
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.08rem;
+  padding: 0;
+  text-align: center;
+  font-family: var(--mono); font-size: var(--o-text-xs); color: var(--t2);
 }
-html.admin-mode .ap-ledger-budget-row > span { display: flex; flex-direction: column; gap: 0.05rem; font-family: var(--ui); font-size: var(--o-text-sm); color: var(--t2); }
+html.admin-mode .ap-ledger-budget-row > span { display: flex; flex-direction: column; align-items: center; gap: 0.05rem; font-family: var(--ui); font-size: var(--o-text-sm); color: var(--t2); }
 html.admin-mode .ap-ledger-budget-row > span > em { font-style: normal; color: var(--t3); font-size: var(--o-text-micro); font-family: var(--mono); }
-/* Diners a l'ESQUERRA (#1359, ordre del propietari): l'import va primer (order:-1),
-   en columna alineada pels € (text-align:right dins min-width). El label el segueix. */
-html.admin-mode .ap-ledger-budget-row > strong { order: -1; flex: 0 0 auto; min-width: 4.8rem; text-align: right; color: var(--t); font-weight: var(--o-fw-bold); font-family: var(--ui); font-size: var(--o-text-lg); letter-spacing: 0; font-variant-numeric: tabular-nums; }
+html.admin-mode .ap-ledger-budget-row--travel > span > em { white-space: nowrap; }
+/* Diners a dalt: l'import mana i l'etiqueta queda a sota, com una mètrica compacta. */
+html.admin-mode .ap-ledger-budget-row > strong { order: -1; flex: 0 0 auto; min-width: 0; text-align: center; color: var(--t); font-weight: var(--o-fw-bold); font-family: var(--ui); font-size: var(--o-text-lg); letter-spacing: 0; font-variant-numeric: tabular-nums; }
 html.admin-mode .ap-ledger-budget-row--total {
-  margin-top: var(--o-space-15); padding-top: var(--o-space-2); border-top: 1px solid color-mix(in oklab, var(--gold) 22%, var(--line));
-}
+    grid-column: 1 / -1;
+    padding-top: var(--o-space-2);
+    border-top: 1px solid color-mix(in oklab, var(--gold) 22%, var(--line));
+  }
 html.admin-mode .ap-ledger-budget-row--total > span { font-family: var(--ui); font-size: var(--o-text-md); font-weight: var(--o-fw-semi); color: var(--t); }
 html.admin-mode .ap-ledger-budget-row--total > strong { font-size: var(--o-text-2xl); font-weight: var(--o-fw-xbold); color: var(--gold); line-height: 1; }
 html.admin-mode .ap-ledger-budget-row--travel > strong { color: var(--gold); }
-/* ── REPARTIMENT de la ruta: <details> plegable i discret (rediseny #1377) ── */
+html.admin-mode .ap-ledger-budget-row--season {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--o-space-2);
+    padding: var(--o-space-15) var(--o-space-2);
+    border: 1px solid color-mix(in oklab, var(--gold) 18%, var(--line));
+    border-radius: var(--o-r-sm);
+    background: color-mix(in oklab, var(--gold) 5%, transparent);
+    text-align: left;
+  }
+html.admin-mode .ap-ledger-budget-row--season > span {
+    align-items: flex-start;
+    text-align: left;
+  }
+html.admin-mode .ap-ledger-budget-row--season > strong {
+    order: 0;
+    color: var(--gold);
+    font-size: var(--o-text-md);
+  }
+  /* ── REPARTIMENT de la ruta: <details> plegable i discret (rediseny #1377) ── */
 html.admin-mode .ap-ledger-route-settlement {
   grid-column: 1 / -1;
   padding: 0;
@@ -1781,6 +1861,19 @@ html.admin-mode .ap-ledger-route-settlement-row > strong {
   font-weight: var(--o-fw-semi);
 }
 html.admin-mode .ap-ledger-bolo-actions--full { display: flex; flex-wrap: wrap; align-items: center; gap: var(--o-space-25); padding: var(--o-space-35); }
+html.admin-mode .ap-ledger-decision-row .ap-ledger-bolo-actions--full {
+  margin: 0;
+  padding: var(--o-space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--o-r-md);
+  background: color-mix(in oklab, var(--raised) 36%, transparent);
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+}
+html.admin-mode .ap-ledger-decision-row .ap-ledger-bolo-actions--full .ap-btn {
+  justify-content: center;
+}
 html.admin-mode .ap-ledger-bolo-next {
   display: flex;
   flex: 1 1 16rem;
@@ -1806,6 +1899,10 @@ html.admin-mode .ap-ledger-bolo-next em {
 }
 @media (max-width: 720px) {
   html.admin-mode .ap-ledger-budget { grid-template-columns: minmax(0, 1fr); }
+  html.admin-mode .ap-ledger-budget-sum { grid-template-columns: minmax(0, 0.86fr) auto minmax(0, 1.14fr); }
+  html.admin-mode .ap-ledger-decision-row { grid-template-columns: minmax(0, 1fr); }
+  html.admin-mode .ap-ledger-decision-row > .ap-ledger-budget--repartiment { align-self: start; }
+  html.admin-mode .ap-ledger-decision-row .ap-ledger-bolo-actions--full { justify-content: flex-start; }
   html.admin-mode .ap-ledger-trip-controls .ap-ledger-trip-grid { grid-template-columns: minmax(0, 1fr); }
   html.admin-mode .ap-ledger-bolo-actions--full .ap-btn { flex: 1 1 100%; justify-content: center; }
 }
@@ -1813,6 +1910,8 @@ html.admin-mode .ap-ledger-bolo-next em {
 /* Panell «Repartiment del bolo» a la fitxa de reserva (#1355): qui cobra què,
    per persona + element a element. Presentació del motor `computeBoloRepartiment`. */
 html.admin-mode .ap-rep { display: flex; flex-direction: column; gap: var(--o-space-3); font-family: var(--ui); }
+html.admin-mode .ap-ledger-budget--repartiment .ap-rep,
+html.admin-mode .ap-ledger-budget--repartiment .ap-rep-partner { width: 100%; }
 html.admin-mode .ap-rep-purpose {
   display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
   gap: var(--o-space-2);
@@ -1841,6 +1940,7 @@ html.admin-mode .ap-rep-person-amount { font-family: var(--display); font-size: 
 html.admin-mode .ap-rep-person[data-owner="true"] .ap-rep-person-amount { color: var(--gold); }
 html.admin-mode .ap-rep-person-sub { font-family: var(--mono); font-size: var(--o-text-micro); color: var(--t3); }
 html.admin-mode .ap-rep-partner { display: flex; flex-direction: column; gap: var(--o-space-2); }
+html.admin-mode .ap-ledger-budget--repartiment .ap-rep-partner-card { width: 100%; }
 html.admin-mode .ap-rep-formula-details {
   border: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
   border-radius: var(--o-r-sm);
@@ -1890,6 +1990,10 @@ html.admin-mode .ap-rep-partner-head::after {
   content: '+'; color: var(--t3); font-family: var(--mono); font-size: var(--o-text-xs);
 }
 html.admin-mode .ap-rep-partner-card[open] .ap-rep-partner-head::after { content: '-'; }
+html.admin-mode .ap-rep--preproposal .ap-rep-partner-head::after {
+  content: '';
+  display: none;
+}
 html.admin-mode .ap-rep-partner-line {
   display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2);
 }
@@ -1911,8 +2015,21 @@ html.admin-mode .ap-rep-partner-head > span > em {
   letter-spacing: 0;
 }
 html.admin-mode .ap-rep-partner-head > strong {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.08rem;
   font-family: var(--ui); font-size: var(--o-text-xl-2); font-weight: var(--o-fw-bold); color: var(--t);
   letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+html.admin-mode .ap-rep-partner-head > strong > em {
+  font-style: normal;
+  color: var(--t2);
+  font-size: var(--o-text-sm);
+  font-weight: var(--o-fw-semi);
+  line-height: var(--o-lh-tight);
 }
 html.admin-mode .ap-rep-partner-lines { display: grid; gap: var(--o-space-15); padding: 0 var(--o-space-35) var(--o-space-35); }
 html.admin-mode .ap-rep-partner-line {
@@ -3501,7 +3618,11 @@ html.admin-mode .ap-ledger-summary-net-lbl { font-family: var(--ui); font-size: 
 html.admin-mode .ap-ledger-summary-net-val { font-family: var(--ui); font-size: var(--o-text-2xl); font-weight: var(--o-fw-bold); line-height: 1; color: var(--t); letter-spacing: 0; font-variant-numeric: tabular-nums; }
 html.admin-mode .ap-ledger-summary-net[data-tone="rose"]  .ap-ledger-summary-net-val { color: var(--o-danger); }
 html.admin-mode .ap-ledger-summary-net[data-tone="amber"] .ap-ledger-summary-net-val { color: var(--o-warning); }
+html.admin-mode .ap-ledger-summary-net[data-tone="orange"] .ap-ledger-summary-net-val { color: var(--o-stage-new); }
 html.admin-mode .ap-ledger-summary-net-pct { font-family: var(--ui); font-size: var(--o-text-sm); color: var(--t2); line-height: var(--o-lh-snug); }
+html.admin-mode .ap-ledger-summary-net[data-tone="amber"] .ap-ledger-summary-net-pct { color: var(--o-warning); }
+html.admin-mode .ap-ledger-summary-net[data-tone="orange"] .ap-ledger-summary-net-pct { color: var(--o-stage-new); }
+html.admin-mode .ap-ledger-summary-net[data-tone="rose"] .ap-ledger-summary-net-pct { color: var(--o-danger); }
 html.admin-mode .ap-ledger-summary-rows { display: flex; flex-direction: column; }
 html.admin-mode .ap-ledger-summary-rows > div {
   display: flex; align-items: baseline; justify-content: space-between; gap: var(--o-space-2);
@@ -3532,15 +3653,12 @@ html.admin-mode .ap-ledger-summary-jump:hover {
   background: color-mix(in oklab, var(--gold) 9%, transparent);
   color: var(--gold-bright);
 }
-/* Pacte ja validat (#1753): el salt del rail passa a to d'èxit amb ✓. */
-html.admin-mode .ap-ledger-summary-jump--done { color: var(--o-stage-won-strong); }
-html.admin-mode .ap-ledger-summary-jump--done::after { content: '✓'; color: var(--o-stage-won-strong); }
-html.admin-mode .ap-ledger-summary-jump--done:hover {
-  background: color-mix(in oklab, var(--o-stage-won-strong) 9%, transparent);
-  color: var(--o-stage-won-strong);
-}
 @media (max-width: 900px) {
-  html.admin-mode .ap-ledger-zenith--railed { grid-template-columns: minmax(0, 1fr); }
+  html.admin-mode .ap-ledger-zenith--railed {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-items: start;
+  }
   /* Mòbil = pantalla de DECISIÓ (#1752, Manolo): el marge és el número que decideix
      si el bolo val la pena; puja davant del configurador, no enterrat al final. */
   html.admin-mode .ap-ledger-rail--summary { position: static; order: -1; }
@@ -3582,6 +3700,7 @@ html.admin-mode .ap-ledger-zenith-main {
   align-items: stretch;
   min-height: 0;
   overflow: visible;
+  padding: 0;
 }
 html.admin-mode .ap-ledger-zenith-main > .ap-ledger-boloside {
   flex: 1 1 auto;
@@ -3906,6 +4025,58 @@ html.admin-mode .ap-ledger-hint-inline { display: block; font-family: var(--ui);
 
 /* Barra d'accions del bolo (crear dossier / pressupost / reserva) */
 html.admin-mode .ap-ledger-bolo-actions { display: flex; flex-wrap: wrap; gap: 0.65rem; margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--line); }
+html.admin-mode .ap-ledger-zenith-main .ap-ledger-decision-row .ap-ledger-bolo-actions.ap-ledger-bolo-actions--full {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--o-space-2);
+  align-self: center;
+  margin: 0;
+  padding: var(--o-space-3);
+  border: 1px solid color-mix(in oklab, var(--gold) 30%, var(--line));
+  border-radius: var(--o-r-md);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--gold) 5%, transparent), transparent 46%),
+    color-mix(in oklab, var(--raised) 38%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--gold) 16%, transparent);
+}
+html.admin-mode .ap-ledger-zenith-main .ap-ledger-decision-row .ap-ledger-bolo-actions--full .ap-ledger-bolo-next {
+  flex: 0 0 auto;
+  min-width: 0;
+  align-items: center;
+  text-align: center;
+}
+html.admin-mode .ap-ledger-zenith-main .ap-ledger-decision-row .ap-ledger-bolo-actions--full .ap-ledger-bolo-next strong {
+  font-size: var(--o-text-md);
+}
+html.admin-mode .ap-ledger-zenith-main .ap-ledger-decision-row .ap-ledger-bolo-actions--full .ap-ledger-bolo-next em {
+  max-width: 16.5rem;
+  font-size: var(--o-text-sm);
+}
+html.admin-mode .ap-ledger-zenith-main .ap-ledger-decision-row .ap-ledger-bolo-actions--full .ap-btn {
+  width: min(100%, 20rem);
+  min-height: 2.45rem;
+  align-self: center;
+  justify-content: center;
+}
+@media (max-width: 720px) {
+  html.admin-mode .ap-ledger-zenith-main .ap-ledger-decision-row .ap-ledger-bolo-actions.ap-ledger-bolo-actions--full {
+    padding: var(--o-space-25);
+    align-items: stretch;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  html.admin-mode .ap-ledger-zenith-main .ap-ledger-decision-row .ap-ledger-bolo-actions--full .ap-ledger-bolo-next {
+    align-items: flex-start;
+    text-align: left;
+  }
+  html.admin-mode .ap-ledger-zenith-main .ap-ledger-decision-row .ap-ledger-bolo-actions--full .ap-btn {
+    width: 100%;
+  }
+}
 
 /* Forecast ponderat (Fase 1B) — «el pipeline ÉS el forecast». Diners ponderats en or. */
 html.admin-mode .ap-leads-metric b.ap-leads-metric-forecast { color: var(--gold); }

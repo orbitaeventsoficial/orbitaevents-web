@@ -1,9 +1,8 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockFetchWithCsrf, mockRouterRefresh, toastApi } = vi.hoisted(() => ({
+const { mockFetchWithCsrf, toastApi } = vi.hoisted(() => ({
   mockFetchWithCsrf: vi.fn(),
-  mockRouterRefresh: vi.fn(),
   toastApi: { success: vi.fn(), error: vi.fn(), warning: vi.fn(), info: vi.fn() },
 }));
 
@@ -13,10 +12,6 @@ vi.mock('@/lib/csrf', () => ({
 
 vi.mock('@/app/admin/components/ToastProvider', () => ({
   useToast: () => toastApi,
-}));
-
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({ refresh: mockRouterRefresh }),
 }));
 
 vi.mock('@/app/admin/bookings/BookingServiceLinesSection', () => ({
@@ -72,7 +67,7 @@ vi.mock('@/app/admin/components/BoloTripCard', () => ({
         <>
           <p>Total ruta {effectiveTravelCost}</p>
           {routeSummaryDensity === 'sentence'
-            ? <p>Inclou {routeSummaryItems.map((item) => item.label.toLowerCase()).join(', ')}.</p>
+            ? <p>Inclou {routeSummaryItems.map((item) => item.label.toLowerCase().replace('equip ruta', 'equip')).join(', ').replace(/, ([^,]*)$/, ' i $1')}. Detall de liquidació a la reserva.</p>
             : routeSummaryItems.map((item) => <p key={item.label}>{item.label}: {item.amount}</p>)}
         </>
       ) : (
@@ -111,7 +106,7 @@ describe('LeadBoloSection repartiment', () => {
     });
   });
 
-  it('mostra el pacte curt amb partner abans de formalitzar reserva', async () => {
+  it('mostra el cost col·laborador abans de formalitzar reserva', async () => {
     render(
       <LeadBoloSection
         leadId="lead-1"
@@ -120,15 +115,15 @@ describe('LeadBoloSection repartiment', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Pacte amb partner')).toBeInTheDocument();
+      expect(screen.getByText('Cost col·laborador')).toBeInTheDocument();
     });
 
-    const panel = screen.getByLabelText('Pacte amb partner al lead');
+    const panel = screen.getByLabelText('Cost col·laborador al lead');
     expect(panel).toHaveAttribute('id', 'lead-repartiment');
     expect(panel).toHaveClass('ap-ledger-budget--repartiment');
     // Microcopy útil (#1752, Manolo): la nota diu QUÈ és l'import i ON viu el
     // detall complet, no descriu l'estat de la UI.
-    expect(screen.getByText('import a validar amb el partner · la liquidació completa viu a la reserva')).toBeInTheDocument();
+    expect(screen.getByText('segons tarifa Òrbita · liquidació final a la reserva')).toBeInTheDocument();
     expect(panel.textContent).toContain('Masquerade');
     const partnerDetails = panel.querySelector('.ap-rep-partner-card') as HTMLDetailsElement | null;
     expect(partnerDetails?.tagName).toBe('DETAILS');
@@ -143,7 +138,7 @@ describe('LeadBoloSection repartiment', () => {
     expect(screen.queryByText('Net Òrbita')).not.toBeInTheDocument();
   });
 
-  it('manté ruta i dieta al pacte sense ensenyar auditoria interna al lead', async () => {
+  it('manté ruta i dieta al cost col·laborador sense ensenyar auditoria interna al lead', async () => {
     mockFetchWithCsrf.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
@@ -189,7 +184,7 @@ describe('LeadBoloSection repartiment', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Pacte amb partner')).toBeInTheDocument();
+      expect(screen.getByText('Cost col·laborador')).toBeInTheDocument();
     });
 
     expect(screen.queryByText('Transport client')).not.toBeInTheDocument();
@@ -200,7 +195,7 @@ describe('LeadBoloSection repartiment', () => {
     expect(screen.queryByText('Dieta desplaçament')).not.toBeInTheDocument();
     expect(screen.queryByText('Què cobra Masquerade')).not.toBeInTheDocument();
     expect(screen.getByText((text) => text.includes('Total ruta') && text.includes('340.22'))).toBeInTheDocument();
-    expect(screen.getByText('Inclou vehicle, equip ruta, dietes, peatges.')).toBeInTheDocument();
+    expect(screen.getByText('Inclou vehicle, equip, dietes i peatges. Detall de liquidació a la reserva.')).toBeInTheDocument();
     expect(screen.queryByText('Vehicle: 96.72')).not.toBeInTheDocument();
     expect(screen.queryByText('Equip ruta: 165')).not.toBeInTheDocument();
     expect(screen.queryByText('Dietes: 60')).not.toBeInTheDocument();
@@ -212,16 +207,16 @@ describe('LeadBoloSection repartiment', () => {
     expect(screen.getByText('tècnic inclòs')).toBeInTheDocument();
     expect(screen.getByText('-40 €')).toBeInTheDocument();
     expect(screen.getByText('Següent pas')).toBeInTheDocument();
-    // Amb partner PENDENT de validar (#1753), el dossier encara no és el pas primari.
-    expect(screen.getByRole('button', { name: 'Crear dossier' })).not.toHaveClass('ap-btn--primary');
-    expect(screen.getByRole('button', { name: 'Validar pacte' })).toHaveClass('ap-btn--primary');
+    expect(screen.getByRole('link', { name: 'Crear dossier' })).toHaveClass('ap-btn--primary');
+    expect(screen.queryByRole('button', { name: 'Validar pacte' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Desfer validació' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Crear reserva' })).not.toHaveClass('ap-btn--primary');
     expect(screen.queryByText('Operari Òrbita')).not.toBeInTheDocument();
     expect(screen.queryByText('Cost intern Òrbita')).not.toBeInTheDocument();
     expect(screen.queryByText('Benefici net Òrbita')).not.toBeInTheDocument();
   });
 
-  it('aplica el canvi de cotxe i conductor al pacte del partner', async () => {
+  it('aplica el canvi de cotxe i conductor al cost col·laborador', async () => {
     mockFetchWithCsrf.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
@@ -258,7 +253,7 @@ describe('LeadBoloSection repartiment', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Pacte amb partner')).toBeInTheDocument();
+      expect(screen.getByText('Cost col·laborador')).toBeInTheDocument();
     });
 
     expect(screen.getByText('temps 83 € + dieta 30 €')).toBeInTheDocument();
@@ -269,7 +264,7 @@ describe('LeadBoloSection repartiment', () => {
     await waitFor(() => {
       expect(screen.getByText('vehicle 90 € + temps 165 € + dieta 60 €')).toBeInTheDocument();
     });
-    expect(screen.getByLabelText('Pacte amb partner al lead').textContent).toContain('315');
+    expect(screen.getByLabelText('Cost col·laborador al lead').textContent).toContain('315');
   });
 
   it('no embruta la lectura curta quan hi ha ruta sense peatges informats', async () => {
@@ -282,65 +277,54 @@ describe('LeadBoloSection repartiment', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Pacte amb partner')).toBeInTheDocument();
+      expect(screen.getByText('Cost col·laborador')).toBeInTheDocument();
     });
 
     expect(screen.queryByText('peatges no informats')).not.toBeInTheDocument();
   });
 
-  it('crea el dossier directament des del lead i obre el PDF resultant', async () => {
-    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
-    mockFetchWithCsrf
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          internalTravelCost: 0,
-          lines: [
-            {
-              collaboratorId: 'masquerade',
-              kind: 'PROVIDER_SERVICE',
-              label: 'Bingo Musical (Masquerade)',
-              revenueAmount: 240,
-              costAmount: 160,
-              quantity: 1,
-              notes: null,
-            },
-          ],
-        }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ ok: true, status: 'created', dossierId: 'dos-1' }),
-      });
-
+  it('aplica el recàrrec de temporada al total client sense tocar la liquidació del col·laborador', async () => {
     render(
       <LeadBoloSection
         leadId="lead-1"
-        documentContext={{ name: 'Lead Andorra', eventLocation: 'Andorra' }}
+        documentContext={{ name: 'Lead Juliol', eventLocation: 'Cornellà', eventDate: '2026-07-17' }}
       />,
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Pacte amb partner')).toBeInTheDocument();
+      expect(screen.getByText('Cost col·laborador')).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Crear dossier' }));
-
-    await waitFor(() => {
-      expect(mockFetchWithCsrf).toHaveBeenCalledWith(
-        '/api/admin/dossiers',
-        expect.objectContaining({
-          method: 'POST',
-          body: JSON.stringify({ leadId: 'lead-1' }),
-        }),
-      );
-    });
-    expect(openSpy).toHaveBeenCalledWith('/api/admin/dossiers/dos-1/composite', '_blank', 'noopener,noreferrer');
-    expect(mockRouterRefresh).toHaveBeenCalledTimes(1);
-    openSpy.mockRestore();
+    const budget = screen.getByLabelText('Resum del pressupost');
+    expect(budget.textContent).toContain('Serveis');
+    expect(budget.textContent).toContain('240');
+    expect(budget.textContent).toContain('Recàrrec alta temporada');
+    expect(budget.textContent).toContain('+15% sobre serveis');
+    expect(budget.textContent).toContain('36');
+    expect(budget.textContent).toContain('Total client');
+    expect(budget.textContent).toContain('276');
+    expect(screen.getByLabelText('Cost col·laborador al lead').textContent).not.toContain('36');
   });
 
-  it('valida el pacte amb UNA acció i encén el dossier com a pas primari (#1753)', async () => {
+  it('obre accions solidàries amb el generador de dossiers des del lead', async () => {
+    mockFetchWithCsrf.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        internalTravelCost: 0,
+        lines: [
+          {
+            collaboratorId: 'masquerade',
+            kind: 'PROVIDER_SERVICE',
+            label: 'Bingo Musical (Masquerade)',
+            revenueAmount: 240,
+            costAmount: 160,
+            quantity: 1,
+            notes: null,
+          },
+        ],
+      }),
+    });
+
     render(
       <LeadBoloSection
         leadId="lead-1"
@@ -349,53 +333,40 @@ describe('LeadBoloSection repartiment', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Pacte amb partner')).toBeInTheDocument();
+      expect(screen.getByText('Cost col·laborador')).toBeInTheDocument();
     });
 
-    // Pendent: la validació és el pas manat; el dossier encara no és primari.
-    expect(screen.getByText('Valida el pacte amb el partner; el dossier és el pas següent.')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Crear dossier' })).not.toHaveClass('ap-btn--primary');
+    const dossierLink = screen.getByRole('link', { name: 'Crear dossier' });
+    const dossierPreviewLink = screen.getByRole('link', { name: 'Previsualitzar dossier' });
+    expect(dossierLink).toHaveAttribute('href', '/admin/dossiers?leadId=lead-1');
+    expect(dossierPreviewLink).toHaveAttribute('href', '/api/admin/leads/lead-1/dossier-preview');
+    dossierLink.addEventListener('click', (event) => event.preventDefault(), { once: true });
+    dossierPreviewLink.addEventListener('click', (event) => event.preventDefault(), { once: true });
+    fireEvent.click(dossierLink);
+    fireEvent.click(dossierPreviewLink);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Validar pacte' }));
-
-    await waitFor(() => {
-      expect(mockFetchWithCsrf).toHaveBeenCalledWith(
-        '/api/admin/leads/lead-1',
-        expect.objectContaining({
-          method: 'PATCH',
-          body: JSON.stringify({ partnerPactValidated: true }),
-        }),
-      );
-    });
-
-    // Validat: acció única resolta, dossier primari i estat visible al bloc.
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Desfer validació' })).toBeInTheDocument();
-    });
-    expect(screen.queryByRole('button', { name: 'Validar pacte' })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Crear dossier' })).toHaveClass('ap-btn--primary');
-    expect(screen.getByText('Dossier primer; pressupost i reserva quan el pacte ja està clar.')).toBeInTheDocument();
-    expect(screen.getByText((text) => text.startsWith('validat el '))).toBeInTheDocument();
+    expect(mockFetchWithCsrf).not.toHaveBeenCalledWith(
+      '/api/admin/dossiers',
+      expect.objectContaining({ method: 'POST' }),
+    );
   });
 
-  it('arrenca en estat validat quan el lead ja porta la validació persistida (#1753)', async () => {
+  it('manté el cost col·laborador com a lectura i no com a validació persistent (#1755)', async () => {
     render(
       <LeadBoloSection
         leadId="lead-1"
         documentContext={{ name: 'Lead Andorra', eventLocation: 'Andorra' }}
-        initialPartnerPactValidatedAt="2026-07-08T12:00:00.000Z"
       />,
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Pacte amb partner')).toBeInTheDocument();
+      expect(screen.getByText('Cost col·laborador')).toBeInTheDocument();
     });
 
-    expect(screen.getByRole('button', { name: 'Desfer validació' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Validar pacte' })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Crear dossier' })).toHaveClass('ap-btn--primary');
-    // La fila del partner no contradiu el head: amb pacte validat diu «import validat».
-    expect(screen.getByText('import validat')).toBeInTheDocument();
-    expect(screen.queryByText('import a validar')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Desfer validació' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Crear dossier' })).toHaveClass('ap-btn--primary');
+    expect(screen.getByText('Dossier primer; pressupost i reserva quan el bolo està clar.')).toBeInTheDocument();
+    expect(screen.getAllByText('tarifa Òrbita').length).toBeGreaterThan(0);
   });
 });

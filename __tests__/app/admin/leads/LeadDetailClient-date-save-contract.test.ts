@@ -28,11 +28,10 @@ describe('LeadDetailClient date save contract', () => {
   });
 
   it('el rail financer pot saltar al repartiment del lead', () => {
-    // El salt reflecteix l'estat del pacte (#1753): pendent → «Validar partner»,
-    // validat → «Pacte validat». (El literal antic «Validar pacte partner» era
-    // deriva: no existia al codi.)
+    // El pacte és lectura comercial, no una validació persistent (#1755).
     expect(detailSource).toContain('href="#lead-repartiment"');
-    expect(detailSource).toContain('Validar partner');
-    expect(detailSource).toContain('Pacte validat');
+    expect(detailSource).toContain('Veure cost col·laborador');
+    expect(detailSource).not.toContain('Pacte validat');
+    expect(detailSource).not.toContain('Validar partner');
   });
 });

@@ -9,7 +9,7 @@ import { computeBoloTransport } from '@/lib/services/travelLaborCost';
 import { applyDatePricing } from '@/lib/services/pricing/datePricingService';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_PDF_STUDIO_DEFAULTS } from '@/lib/constants/admin';
-import { DEPOSIT_PERCENT, VAT_RATE_INVOICE, roundMoney, calcVatAmount } from '@/lib/constants/pricing';
+import { DEPOSIT_PERCENT, roundMoney, calcVatAmount, calcVatRate } from '@/lib/constants/pricing';
 import { log } from '@/lib/logger';
 import SortableList from '@/app/admin/components/SortableList';
 import AiCopySuggestionsInline from '@/app/admin/components/AiCopySuggestionsInline';
@@ -109,6 +109,7 @@ export default function PresupuestoPdfStudio({
   const [autosaveTick, setAutosaveTick] = useState(0);
   const [allowBrandOverride, setAllowBrandOverride] = useState(false);
   const [docMode, setDocMode] = useState<DocMode>('quote');
+  const [invoiceRequired, setInvoiceRequired] = useState(true);
   // Contract-specific fields
   const [companyLegalName, setCompanyLegalName] = useState('');
   const [companyNIF, setCompanyNIF] = useState('');
@@ -293,7 +294,18 @@ export default function PresupuestoPdfStudio({
   );
   const seasonSurcharge = datePricing.surchargeEur;
 
+  const subtotal = useMemo(() => {
+    return Math.max(0, basePrice + seasonSurcharge + extrasPrice + travelCharge);
+  }, [basePrice, seasonSurcharge, extrasPrice, travelCharge]);
+  const discountSafe = useMemo(() => Math.max(0, discount), [discount]);
+  const taxableBase = useMemo(() => Math.max(0, subtotal - discountSafe), [subtotal, discountSafe]);
+  const vatRate = useMemo(() => calcVatRate(invoiceRequired), [invoiceRequired]);
+  const vatAmount = useMemo(() => calcVatAmount(taxableBase, invoiceRequired), [taxableBase, invoiceRequired]);
   const total = useMemo(() => {
+    return roundMoney(taxableBase + vatAmount);
+  }, [taxableBase, vatAmount]);
+
+  const commercialTotal = useMemo(() => {
     return Math.max(0, basePrice + seasonSurcharge + extrasPrice + travelCharge - Math.max(0, discount));
   }, [basePrice, seasonSurcharge, extrasPrice, travelCharge, discount]);
 
@@ -301,7 +313,7 @@ export default function PresupuestoPdfStudio({
     if (!profitabilityConfig) return null;
     return computeBookingFinancialSummary(
       {
-        total,
+        total: commercialTotal,
         packPrice: basePrice,
         extrasTotal: extrasPrice,
         extraHours: 0,
@@ -311,7 +323,7 @@ export default function PresupuestoPdfStudio({
       },
       profitabilityConfig,
     );
-  }, [profitabilityConfig, total, basePrice, extrasPrice, travelKm]);
+  }, [profitabilityConfig, commercialTotal, basePrice, extrasPrice, travelKm]);
   const commercialGuard = useMemo(
     () => buildProposalCommercialGuard(financialSummary),
     [financialSummary],
@@ -384,6 +396,7 @@ export default function PresupuestoPdfStudio({
       if (typeof draft.whyChooseUs === 'string') setWhyChooseUs(draft.whyChooseUs);
       if (typeof draft.discount === 'number') setDiscount(draft.discount);
       if (typeof draft.discountReason === 'string') setDiscountReason(draft.discountReason);
+      if (typeof draft.invoiceRequired === 'boolean') setInvoiceRequired(draft.invoiceRequired);
       if (Array.isArray(draft.selectedExtras)) {
         setSelectedExtras(draft.selectedExtras.filter((id): id is string => typeof id === 'string'));
       }
@@ -465,6 +478,13 @@ export default function PresupuestoPdfStudio({
           if (typeof snap.pricing.travelKm === 'number') setTravelKm(snap.pricing.travelKm);
           if (typeof snap.pricing.discount === 'number') setDiscount(snap.pricing.discount);
           if (snap.pricing.discountReason) setDiscountReason(snap.pricing.discountReason);
+          if (typeof snap.pricing.invoiceRequired === 'boolean') {
+            setInvoiceRequired(snap.pricing.invoiceRequired);
+          } else if (typeof data.proposal?.vatRate === 'number') {
+            setInvoiceRequired(data.proposal.vatRate > 0);
+          }
+        } else if (typeof data.proposal?.vatRate === 'number') {
+          setInvoiceRequired(data.proposal.vatRate > 0);
         }
 
         // Extras
@@ -532,6 +552,7 @@ export default function PresupuestoPdfStudio({
         whyChooseUs,
         discount,
         discountReason,
+        invoiceRequired,
         selectedExtras,
         customExtras,
         packName,
@@ -567,6 +588,7 @@ export default function PresupuestoPdfStudio({
     whyChooseUs,
     discount,
     discountReason,
+    invoiceRequired,
     selectedExtras,
     customExtras,
     packName,
@@ -759,6 +781,10 @@ export default function PresupuestoPdfStudio({
         seasonSurcharge,
         seasonLabel: datePricing.appliedRule?.label,
         seasonPct: datePricing.appliedRule ? datePricing.surchargePct : undefined,
+        invoiceRequired,
+        taxableBase,
+        vatRate,
+        vatAmount,
         discount,
         discountReason: discountReason.trim(),
         total,
@@ -806,19 +832,16 @@ export default function PresupuestoPdfStudio({
     seasonSurcharge,
     datePricing.appliedRule,
     datePricing.surchargePct,
+    invoiceRequired,
+    taxableBase,
+    vatRate,
+    vatAmount,
   ]);
 
   const saveProposalDraft = useCallback(async (
     status: 'DRAFT' | 'SENT' = 'DRAFT'
   ): Promise<string | null> => {
     if (!customerId || !selectedPack) return null;
-
-    const subtotal = Math.max(0, Number(basePrice) || 0) + seasonSurcharge + extrasPrice + travelCharge;
-    const discountSafe = Math.max(0, Number(discount) || 0);
-    const vatRate = VAT_RATE_INVOICE;
-    const baseAfterDiscount = Math.max(0, subtotal - discountSafe);
-    const vatAmount = calcVatAmount(baseAfterDiscount, true);
-    const finalTotal = roundMoney(baseAfterDiscount + vatAmount);
 
     const payload = {
       customerId,
@@ -831,7 +854,7 @@ export default function PresupuestoPdfStudio({
       discount: discountSafe,
       vatRate,
       vatAmount,
-      total: finalTotal,
+      total,
       snapshot: buildProposalSnapshot(),
     };
 
@@ -858,12 +881,16 @@ export default function PresupuestoPdfStudio({
     extrasPrice,
     travelCharge,
     discount,
+    discountSafe,
     locale,
     validityDays,
     buildProposalSnapshot,
     proposalId,
     leadId,
-    seasonSurcharge,
+    subtotal,
+    vatRate,
+    vatAmount,
+    total,
   ]);
 
   useEffect(() => {
@@ -962,6 +989,8 @@ export default function PresupuestoPdfStudio({
         seasonPct: datePricing.appliedRule ? datePricing.surchargePct : undefined,
         discount: Math.max(0, Number(discount) || 0),
         discountReason: discountReason.trim(),
+        vatRate,
+        vatAmount,
         total,
         clientContact: clientContact.trim() || undefined,
         clientName: clientName.trim() || studioText.defaultClientName,
@@ -985,13 +1014,7 @@ export default function PresupuestoPdfStudio({
 
   async function buildContract() {
     if (!selectedPack) return null;
-    const subtotal = Math.max(0, basePrice + seasonSurcharge + extrasPrice + travelCharge);
-    const discountSafe = Math.max(0, discount);
-    const vatRate = VAT_RATE_INVOICE;
-    const base = Math.max(0, subtotal - discountSafe);
-    const vatAmount = calcVatAmount(base, true);
-    const finalTotal = roundMoney(base + vatAmount);
-    const depositAmount = roundMoney(finalTotal * (depositPct / 100));
+    const depositAmount = roundMoney(total * (depositPct / 100));
     const eventDateObj = eventDate ? new Date(eventDate) : new Date();
     const now = new Date();
 
@@ -1036,7 +1059,7 @@ export default function PresupuestoPdfStudio({
       discount: discountSafe,
       vatRate,
       vatAmount,
-      total: finalTotal,
+      total,
       depositAmount,
       depositDueDate: depositDue,
       finalPaymentDue: finalDue,
@@ -1226,6 +1249,16 @@ export default function PresupuestoPdfStudio({
                 <option value="quote">Pressupost</option>
                 <option value="contract">Contracte</option>
               </select>
+            </label>
+            <label className="text-sm">
+              Factura / IVA
+              <select className={inputClass} value={invoiceRequired ? 'invoice' : 'no-invoice'} onChange={(e) => setInvoiceRequired(e.target.value === 'invoice')}>
+                <option value="invoice">Aplicar IVA {calcVatRate(true)}%</option>
+                <option value="no-invoice">Sense IVA aplicat</option>
+              </select>
+              <span className="mt-1 block text-xs">
+                Controla el càlcul fiscal del pressupost, el contracte i la proposta guardada.
+              </span>
             </label>
             <label className="text-sm">
               Idioma preferit del client
@@ -1564,6 +1597,9 @@ export default function PresupuestoPdfStudio({
         seasonLabel={datePricing.appliedRule?.label}
         seasonPct={datePricing.appliedRule ? datePricing.surchargePct : undefined}
         discount={discount}
+        taxableBase={taxableBase}
+        vatRate={vatRate}
+        vatAmount={vatAmount}
         total={total}
         directCost={financialSummary?.directCost}
         netMargin={financialSummary?.netMargin}

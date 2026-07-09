@@ -179,33 +179,6 @@ describe('updateLeadFromInput', () => {
     );
   });
 
-  it('mapa partnerPactValidated=true a partnerPactValidatedAt=Date (#1753)', async () => {
-    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', status: 'NEW', contactedAt: null });
-
-    await updateLeadFromInput('l1', { partnerPactValidated: true });
-
-    expect(mockPrisma.lead.update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({ partnerPactValidatedAt: expect.any(Date) }),
-      })
-    );
-    // El boolean del contracte HTTP no arriba mai a Prisma.
-    const data = mockPrisma.lead.update.mock.calls.at(-1)?.[0]?.data as Record<string, unknown>;
-    expect(data).not.toHaveProperty('partnerPactValidated');
-  });
-
-  it('mapa partnerPactValidated=false a partnerPactValidatedAt=null (desfer, #1753)', async () => {
-    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', status: 'NEW', contactedAt: null });
-
-    await updateLeadFromInput('l1', { partnerPactValidated: false });
-
-    expect(mockPrisma.lead.update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({ partnerPactValidatedAt: null }),
-      })
-    );
-  });
-
   it('desa sourceCollaboratorId i el propaga al booking vinculat', async () => {
     mockPrisma.lead.findUnique.mockResolvedValue({
       id: 'l1', status: 'NEW', contactedAt: null, customerId: null, booking: { id: 'b1' },

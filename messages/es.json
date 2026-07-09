@@ -7209,6 +7209,7 @@
       "travelBreakdownPeople": "{headcount} operarios en ruta · {hours} h",
       "travelBreakdownTolls": "Peajes de ruta",
       "travelBreakdownMeals": "Dietas de ruta larga",
+      "seasonDetail": "+{pct}% sobre {base} de servicios por la fecha del evento.",
       "vatNote": "Precios orientativos. El IVA y los ajustes finales se cierran en la propuesta definitiva."
     },
     "cta": {

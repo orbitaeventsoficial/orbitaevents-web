@@ -98,14 +98,17 @@ export default function BoloTripCard({
   const showTolls = typeof onTollsChange === 'function';
   const showAttribution = travelCollaborators.length > 0 && typeof onVehicleOwnerChange === 'function' && typeof onDriverChange === 'function';
   const hasRouteSettlement = effectiveTravelCost > 0 && routeSettlementLines.length > 0;
-  const routeCompactConcepts = routeSummaryItems.map((item) => item.label.toLowerCase()).join(', ');
+  const routeConcepts = routeSummaryItems.map((item) => item.label.toLowerCase().replace('equip ruta', 'equip'));
+  const routeCompactConcepts = routeConcepts.length
+    ? routeConcepts.join(', ').replace(/, ([^,]*)$/, ' i $1')
+    : 'vehicle i equip';
 
   return (
     <div className="ap-ledger-trip">
       <div className="ap-ledger-trip-head">
         <span className="ap-ledger-trip-title">Desplaçament</span>
         <span className="ap-ledger-trip-badge" data-alarm={tripCrowded ? 'true' : undefined}>
-          {km > 0 ? `${km} km · ${headcount} ${headcount === 1 ? 'persona' : 'persones'}` : 'sense ruta'}
+          {km > 0 ? `${formatNumber(km)} km · ${headcount} ${headcount === 1 ? 'persona' : 'persones'}` : 'sense ruta'}
         </span>
       </div>
       {tripCrowded && (
@@ -115,7 +118,7 @@ export default function BoloTripCard({
       )}
       <p className="ap-ledger-trip-note">
         {chargeableHours > 0
-          ? `La 1a hora de ruta va inclosa · es cobra el temps a partir d'aquí (${formatNumber(chargeableHours)} h de tripulació).`
+          ? `1a hora inclosa · ${formatNumber(chargeableHours)} h facturables de tripulació.`
           : 'Ruta curta: dins la 1a hora inclosa, no es cobra temps de tripulació.'}
       </p>
       <details
@@ -128,16 +131,16 @@ export default function BoloTripCard({
           <span>Ajustos de ruta</span>
           {/* Sempre-visible (#1752, Manolo): la pista «editar…» és UI que es descriu
               a si mateixa quan el bloc ja no es pot plegar; només queda el dat útil. */}
-          {showTolls && tollsEur
+          {!controlsAlwaysVisible && (showTolls && tollsEur
             ? <strong>peatges {tollsEur} €</strong>
-            : !controlsAlwaysVisible && <strong>editar km, equip i peatges</strong>}
+            : <strong>editar km, equip i peatges</strong>)}
         </summary>
         <div className="ap-ledger-trip-grid">
-          <div className="ap-ledger-trip-group">
+          <div className="ap-ledger-trip-group ap-ledger-trip-group--route">
             <span className="ap-ledger-trip-grouplbl">Ruta</span>
             <div className="ap-ledger-trip-fields">
               <label className="ap-ledger-trip-field">
-                <span>Km anada+tornada</span>
+                <span>Km anada + tornada</span>
                 <input
                   type="number" min={0} step={1} inputMode="numeric" className="adm-input"
                   value={distanceKm}
@@ -168,7 +171,7 @@ export default function BoloTripCard({
                 </div>
               )}
               {showTolls && (
-                <label className="ap-ledger-trip-field">
+                <label className="ap-ledger-trip-field ap-ledger-trip-field--wide">
                   <span>Peatges</span>
                   <input
                     type="number" min={0} step="0.01" inputMode="decimal" className="adm-input"
@@ -182,7 +185,7 @@ export default function BoloTripCard({
             </div>
           </div>
           {showAttribution && (
-            <div className="ap-ledger-trip-group">
+            <div className="ap-ledger-trip-group ap-ledger-trip-group--team">
               <span className="ap-ledger-trip-grouplbl">Equip</span>
               <div className="ap-ledger-trip-fields">
                 <label className="ap-ledger-trip-field">
@@ -220,10 +223,10 @@ export default function BoloTripCard({
           </div>
           <p>
             {routeSummaryDensity === 'sentence'
-              ? `Inclou ${routeCompactConcepts || 'vehicle i equip'}. El detall de liquidació queda per reserva.`
+              ? `Inclou ${routeCompactConcepts}. Detall de liquidació a la reserva.`
               : chargeableHours > 0
-                ? `${formatNumber(chargeableHours)} h facturables · ${routeCompactConcepts || 'ruta'}`
-                : `Ruta curta · ${routeCompactConcepts || 'vehicle i equip'} dins la base`}
+                ? `${formatNumber(chargeableHours)} h facturables · ${routeCompactConcepts}`
+                : `Ruta curta · ${routeCompactConcepts} dins la base`}
           </p>
           {routeSummaryDensity === 'items' && routeSummaryItems.length > 0 && (
             <div className="ap-ledger-route-compact-items">

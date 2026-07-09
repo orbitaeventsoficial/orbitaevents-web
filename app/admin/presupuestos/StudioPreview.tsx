@@ -27,6 +27,9 @@ export type StudioPreviewProps = {
   seasonLabel?: string;
   seasonPct?: number;
   discount: number;
+  taxableBase: number;
+  vatRate: number;
+  vatAmount: number;
   total: number;
   directCost?: number;
   netMargin?: number;
@@ -121,6 +124,14 @@ export default function StudioPreview(props: StudioPreviewProps) {
           <div className="flex items-center justify-between">
             <span>Descompte</span>
             <span>-{formatEUR(props.discount)}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span>Base imposable</span>
+            <span>{formatEUR(props.taxableBase)}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span>IVA {props.vatRate}%</span>
+            <span>{formatEUR(props.vatAmount)}</span>
           </div>
           <div className="mt-2 border-t pt-2 flex items-center justify-between text-base font-semibold">
             <span>Total</span>

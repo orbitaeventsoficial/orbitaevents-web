@@ -1,7 +1,7 @@
 'use client';
 
 // ─────────────────────────────────────────────────────────
-// ✅ TANCAT CHARLIE — validat pel propietari (2026-06-15)
+// ✅ TANCAT CHARLIE — revalidat pel propietari (2026-07-09, Canvi #1759)
 // Fitxa de lead (/admin/leads/[id]). Zenit: header ledger en
 // una sola pantalla (nom protagonista + rail de fets + marge
 // real via computeBookingFinancialSummary), bolo canònic
@@ -9,7 +9,8 @@
 // RESERVA (no al lead), històric comercial al peu. Helpers
 // monocapa (formatCurrency, buildLeadWhatsAppHref). A11y:
 // aria-label a inputs/botons d'icona. Patró de referència per
-// a la resta de fitxes de l'admin. Millorar sense reobrir.
+// a la resta de fitxes de l'admin. Zona protegida: millorar sense reobrir,
+// excepte ordre explícita del propietari o regressió demostrable.
 // ─────────────────────────────────────────────────────────
 
 import Link from 'next/link';
@@ -211,7 +212,7 @@ type ProposalItem = {
 type DossierItem = { id: string; nom: string; estat: string; mode: string | null; sentAt: string | null; sentTo?: string | null; createdAt: string };
 type LeadDocumentItem = { id: string; type: string; title: string; fileUrl: string; createdAt: string };
 
-export default function LeadDetailClient({ lead, proposals, dossiers, documents, vehicleCostPerKm, initialDistanceKm = null, initialTollsEur = null, initialPartnerPactValidatedAt = null, bookingEconomia = null }: {
+export default function LeadDetailClient({ lead, proposals, dossiers, documents, vehicleCostPerKm, initialDistanceKm = null, initialTollsEur = null, bookingEconomia = null }: {
  lead: LeadDetailData;
  proposals: ProposalItem[];
  dossiers: DossierItem[];
@@ -219,8 +220,6 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  vehicleCostPerKm: number;
  initialDistanceKm?: number | null;
  initialTollsEur?: number | null;
- /** Quan el propietari va validar el pacte amb el partner (#1753); null = pendent. */
- initialPartnerPactValidatedAt?: string | null;
  /** Economia REAL de la reserva vinculada (font canònica). Quan existeix, mana
  * sobre el `boloEcon` provisional del configurador (el lead amb reserva mostra
  * la veritat de la reserva, no el bolo). */
@@ -239,14 +238,6 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  const [savePending, setSavePending] = useState(false);
  // Economia del bolo elevada des de LeadBoloSection per al rail financer compacte.
  const [boloEcon, setBoloEcon] = useState<BoloEconomia | null>(null);
- // Estat del pacte partner elevat des de LeadBoloSection (#1753): el rail el reflecteix.
- const [pactState, setPactState] = useState<{ hasPartner: boolean; validated: boolean }>({
- hasPartner: false,
- validated: Boolean(initialPartnerPactValidatedAt),
- });
- const handlePactState = useCallback((s: { hasPartner: boolean; validated: boolean }) => {
- setPactState((prev) => (prev.hasPartner === s.hasPartner && prev.validated === s.validated ? prev : s));
- }, []);
  const handleEconomia = useCallback((e: BoloEconomia | null) => {
  setBoloEcon((prev) => {
  if (!prev && !e) return prev;
@@ -691,9 +682,7 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  vehicleCostPerKm={vehicleCostPerKm}
  initialDistanceKm={initialDistanceKm}
  initialTollsEur={initialTollsEur}
- initialPartnerPactValidatedAt={initialPartnerPactValidatedAt}
  onEconomiaChange={handleEconomia}
- onPactStateChange={handlePactState}
  compactEconomia
  />
  </main>
@@ -713,18 +702,14 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  <div><span>Producte propi</span><strong>{formatCurrency(econ.ownServiceMarginAmount)} net</strong></div>
  )}
  {econ.subcontractedCost > 0 && (
- <div><span>Partner</span><strong>{econ.subcontractedMarkupOk ? 'OK' : 'Revisar'} · {formatCurrency(econ.subcontractedMarkupAmount + econ.orbitaTechIncome)} marge</strong></div>
+ <div><span>Col·laborador</span><strong>{econ.subcontractedMarkupOk ? 'OK' : 'Revisar'} · {formatCurrency(econ.subcontractedMarkupAmount + econ.orbitaTechIncome)} marge</strong></div>
  )}
  {econ.travelCharge != null && (
  <div><span>Transport</span><strong>{formatCurrency(econ.travelCharge)} · {Math.abs(econ.transportMarginAmount) < 0.01 ? 'sense marge' : `${formatCurrency(econ.transportMarginAmount)} marge`}</strong></div>
  )}
  <div><span>Cost total estimat</span><strong>{formatCurrency(econ.directCost)}</strong></div>
  </div>
- {pactState.hasPartner && (
- pactState.validated
- ? <a className="ap-ledger-summary-jump ap-ledger-summary-jump--done" href="#lead-repartiment">Pacte validat</a>
- : <a className="ap-ledger-summary-jump" href="#lead-repartiment">Validar partner</a>
- )}
+ {econ.subcontractedCost > 0 && <a className="ap-ledger-summary-jump" href="#lead-repartiment">Veure cost col·laborador</a>}
  </>
  ) : (
  <p className="ap-ledger-econonote">Afegeix línies al bolo per veure el net estimat.</p>

@@ -34,6 +34,7 @@ export type DossierLineSnapshot = {
   travelKm: number | null;
   travelTollsEur: number | null;
   travelLocation: string | null;
+  eventDate: string | null;
 };
 
 function cleanText(value: unknown): string | undefined {
@@ -50,6 +51,13 @@ function cleanNumber(value: unknown): number | null {
   return typeof value === 'number' && Number.isFinite(value)
     ? Math.round(value * 100) / 100
     : null;
+}
+
+function cleanDate(value: unknown): string | null {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) return value.toISOString().slice(0, 10);
+  if (typeof value !== 'string' || !value.trim()) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString().slice(0, 10);
 }
 
 function cleanPricingTiers(value: unknown): ProductPricingTier[] | undefined {
@@ -139,6 +147,7 @@ export function buildDossierLineSnapshot(input: {
   travelKm?: number | null;
   travelTollsEur?: number | null;
   travelLocation?: string | null;
+  eventDate?: Date | string | null;
 }): DossierLineSnapshot {
   return {
     version: 1,
@@ -148,6 +157,7 @@ export function buildDossierLineSnapshot(input: {
     travelKm: cleanNumber(input.travelKm),
     travelTollsEur: cleanNumber(input.travelTollsEur),
     travelLocation: cleanText(input.travelLocation) ?? null,
+    eventDate: cleanDate(input.eventDate),
   };
 }
 
@@ -165,6 +175,7 @@ export function parseDossierLineSnapshot(value: unknown): DossierLineSnapshot | 
     travelKm: cleanNumber(raw.travelKm),
     travelTollsEur: cleanNumber(raw.travelTollsEur),
     travelLocation: cleanText(raw.travelLocation) ?? null,
+    eventDate: cleanDate(raw.eventDate),
   };
 }
 
@@ -195,12 +206,13 @@ export function hydrateDossierSnapshotProductImages(
   });
 }
 
-export function transportFromDossierLineSnapshot(value: unknown): { travelKm?: number; travelTollsEur?: number; travelLocation?: string } {
+export function transportFromDossierLineSnapshot(value: unknown): { travelKm?: number; travelTollsEur?: number; travelLocation?: string; eventDate?: string } {
   const snapshot = parseDossierLineSnapshot(value);
   if (!snapshot) return {};
   return {
     travelKm: snapshot.travelKm ?? undefined,
     travelTollsEur: snapshot.travelTollsEur ?? undefined,
     travelLocation: snapshot.travelLocation ?? undefined,
+    eventDate: snapshot.eventDate ?? undefined,
   };
 }

@@ -28796,6 +28796,22 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+### Canvi #1837 — 2026-07-09 — codex (FET)
+**Documents comercials: IVA seleccionable i recàrrec de temporada visible.**
+- Context: el `+ IVA` del pressupost s'aplicava sense control visible i el recàrrec d'alta temporada només estava cablejat al Studio de pressupostos, no al dossier ni al resum econòmic del lead.
+- `/admin/presupuestos`: nou selector `Factura / IVA`; `taxableBase`, `vatRate`, `vatAmount` i `total` governen preview, PDF, proposta desada i contracte. El marge comercial continua calculant-se sobre el total abans d'impostos.
+- Quote PDF: desglossa base imposable i IVA quan s'aplica; quan no s'aplica, manté el resum compacte i mostra copy de sense IVA aplicat.
+- `/admin/leads/[id]`: `applyDatePricing` entra al resum Manolo sobre els serveis del bolo, suma al `Total client` i al marge, però no altera la liquidació del col·laborador.
+- Dossiers: `DossierLineSnapshot` conserva `eventDate`; el builder HTML mostra el recàrrec de temporada dins la pàgina de proposta quan la data l'aplica, amb copy canònica a `messages/ca|es|en.json`.
+- Lead Manolo: queda fora la validació persistent de pacte partner; el bloc és lectura de `Cost col·laborador` i les accions `Crear dossier` / `Previsualitzar dossier` passen pel flux canònic de dossiers.
+- Validació tècnica: tests focals 82/82 OK; `npx tsc --noEmit --pretty false` OK; `pnpm build` OK.
+- Validació funcional: lead de juliol amb serveis 240 aplica `Recàrrec alta temporada` +15% i total client 276 sense tocar el cost col·laborador; dossier amb serveis 490 mostra línia de temporada; pressupost pot alternar IVA/sense IVA.
+- Validació humana/UX: impostos i temporada deixen de ser càlculs amagats; el client veu el criteri comercial abans de tancar pressupost i el partner no queda implicat en un recàrrec que és tarifa d'Òrbita.
+- `ADMIN_CHANGE_COUNTER` passa a `1837`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 # 10. Veredicte
 
 OrbitaEvents està en fase de **refinament seriós**.
