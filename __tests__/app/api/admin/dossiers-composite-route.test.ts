@@ -3,49 +3,24 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const {
   mockRequireAuth,
-  mockGetDossierById,
+  mockResolveDossierHtmlRenderPayload,
   mockResolveDossierTraceOrigin,
-  mockResolveDossierTransportOutput,
-  mockGetAnimacioProducts,
-  mockGetOrbitaProducts,
-  mockGetCollaboratorProducts,
-  mockCollaboratorToAnimacioProduct,
-  mockProductsFromSnapshot,
-  mockHydrateSnapshot,
   mockGeneratePdf,
   mockAdminLogCreate,
 } = vi.hoisted(() => ({
   mockRequireAuth: vi.fn(),
-  mockGetDossierById: vi.fn(),
+  mockResolveDossierHtmlRenderPayload: vi.fn(),
   mockResolveDossierTraceOrigin: vi.fn(),
-  mockResolveDossierTransportOutput: vi.fn(),
-  mockGetAnimacioProducts: vi.fn(),
-  mockGetOrbitaProducts: vi.fn(),
-  mockGetCollaboratorProducts: vi.fn(),
-  mockCollaboratorToAnimacioProduct: vi.fn(),
-  mockProductsFromSnapshot: vi.fn(),
-  mockHydrateSnapshot: vi.fn(),
   mockGeneratePdf: vi.fn(),
   mockAdminLogCreate: vi.fn(),
 }));
 
 vi.mock('@/lib/auth', () => ({ requireAuth: mockRequireAuth }));
-vi.mock('@/lib/constants/animacio-products-resolver', () => ({ getAnimacioProducts: mockGetAnimacioProducts }));
-vi.mock('@/lib/constants/dossier-copy', () => ({ getOrbitaDossierProducts: mockGetOrbitaProducts }));
 vi.mock('@/lib/services/dossierService', () => ({
-  getDossierById: mockGetDossierById,
+  resolveDossierHtmlRenderPayload: mockResolveDossierHtmlRenderPayload,
   resolveDossierTraceOrigin: mockResolveDossierTraceOrigin,
-  resolveDossierTransportOutput: mockResolveDossierTransportOutput,
 }));
 vi.mock('@/lib/services/dossierCompositePdfService', () => ({ generateDossierCompositePDF: mockGeneratePdf }));
-vi.mock('@/lib/services/collaboratorProductService', () => ({
-  getDossierCollaboratorProductsByIds: mockGetCollaboratorProducts,
-  collaboratorProductToAnimacioProduct: mockCollaboratorToAnimacioProduct,
-}));
-vi.mock('@/lib/services/dossierSnapshotService', () => ({
-  productsFromDossierLineSnapshot: mockProductsFromSnapshot,
-  hydrateDossierSnapshotProductImages: mockHydrateSnapshot,
-}));
 vi.mock('@/lib/prisma', () => ({ prisma: { adminLog: { create: mockAdminLogCreate } } }));
 
 import { GET } from '@/app/api/admin/dossiers/[id]/composite/route';
@@ -58,37 +33,38 @@ describe('GET /api/admin/dossiers/[id]/composite', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockRequireAuth.mockReturnValue(null);
-    mockGetDossierById.mockResolvedValue({
-      id: 'd1',
-      leadId: 'lead-1',
-      nom: 'Anna',
-      empresa: null,
-      telefon: null,
-      email: null,
-      eventDesc: 'Festa',
-      salutacio: null,
-      productIds: ['p1'],
-      lineSnapshot: null,
+    mockResolveDossierHtmlRenderPayload.mockResolvedValue({
+      dossier: {
+        id: 'd1',
+        leadId: 'lead-1',
+        nom: 'Anna',
+        empresa: null,
+        telefon: null,
+        email: null,
+        eventDesc: 'Festa',
+        salutacio: null,
+        productIds: ['p1'],
+        lineSnapshot: null,
+      },
+      clientInfo: { nom: 'Anna', eventDesc: 'Festa' },
+      products: [
+        { id: 'p1', nom: 'Bingo', durada: '1h', descripcio: ['Desc'], inclou: ['Equip'] },
+      ],
+      dossierCopy: {},
+      transport: {
+        travelKm: 422,
+        travelTollsEur: 18.5,
+        travelLocation: "l'Aldosa",
+      },
+      collaboratorDossierProducts: [],
+      dataSource: 'live_catalog',
     });
-    mockProductsFromSnapshot.mockReturnValue(null);
     mockResolveDossierTraceOrigin.mockResolvedValue({
       leadId: 'lead-1',
       leadName: 'Anna lead',
       customerId: 'cust-1',
       customerName: 'Anna client',
     });
-    mockResolveDossierTransportOutput.mockResolvedValue({
-      travelKm: 422,
-      travelTollsEur: 18.5,
-      travelLocation: "l'Aldosa",
-    });
-    mockGetAnimacioProducts.mockResolvedValue([
-      { id: 'p1', nom: 'Bingo', durada: '1h', descripcio: ['Desc'], inclou: ['Equip'] },
-    ]);
-    mockGetOrbitaProducts.mockResolvedValue([]);
-    mockGetCollaboratorProducts.mockResolvedValue([]);
-    mockCollaboratorToAnimacioProduct.mockImplementation((product: unknown) => product);
-    mockHydrateSnapshot.mockImplementation((products: unknown) => products);
     mockGeneratePdf.mockResolvedValue({
       output: () => new Uint8Array([1, 2, 3]).buffer,
     });
@@ -102,10 +78,7 @@ describe('GET /api/admin/dossiers/[id]/composite', () => {
 
     expect(res.status).toBe(200);
     expect(res.headers.get('Content-Type')).toBe('application/pdf');
-    expect(mockResolveDossierTransportOutput).toHaveBeenCalledWith({
-      lineSnapshot: null,
-      leadId: 'lead-1',
-    });
+    expect(mockResolveDossierHtmlRenderPayload).toHaveBeenCalledWith('d1');
     expect(mockGeneratePdf).toHaveBeenCalledWith(expect.objectContaining({
       transport: {
         travelKm: 422,

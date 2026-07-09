@@ -20,4 +20,13 @@ describe('DossierListActions backend errors', () => {
     expect(source).not.toContain("toast.error('Error restaurant el dossier');");
     expect(source).not.toContain("toast.error('Error eliminant el dossier');");
   });
+
+  it('obre la vista server del lead i conserva fallback server per dossiers sense lead', () => {
+    expect(source).toContain('buildDossierPreviewHref');
+    expect(source).toContain('buildDossierStoredPreviewHref');
+    expect(source).toContain('const href = leadId ? buildDossierPreviewHref(leadId) : buildDossierStoredPreviewHref(dossierId);');
+    expect(source).toContain("window.open(href, '_blank', 'noopener,noreferrer');");
+    expect(source).not.toContain('buildDossierHtml');
+    expect(source).not.toContain('URL.createObjectURL');
+  });
 });

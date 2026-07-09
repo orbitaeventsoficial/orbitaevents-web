@@ -42,6 +42,7 @@ interface PageProps {
     empresa?: string;
     eventDesc?: string;
     productIds?: string;
+    action?: string;
   };
 }
 
@@ -200,6 +201,7 @@ export default async function DossiersPage({ searchParams }: PageProps) {
           initialDistanceKm={leadInitialData?.distanceKm ?? null}
           initialTollsEur={leadInitialData?.tollsEur ?? null}
           initialProductIds={initialProductIds}
+          initialAction={searchParams?.action === 'preview' ? 'preview' : undefined}
         />
       </AdminSection>
 
@@ -246,22 +248,10 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                   </div>
                   <DossierListActions
                     dossierId={d.id}
+                    leadId={d.lead?.id ?? undefined}
                     email={d.email ?? undefined}
                     nom={d.nom}
-                    productIds={d.productIds}
-                    products={lookupProducts}
-                    snapshotProducts={snapshotProducts ?? undefined}
-                    dossierCopy={dossierCopy}
-                    clientInfo={{
-                      nom: d.nom,
-                      empresa: d.empresa ?? undefined,
-                      telefon: d.telefon ?? undefined,
-                      email: d.email ?? undefined,
-                      eventDesc: d.eventDesc ?? undefined,
-                      salutacio: d.salutacio ?? undefined,
-                    }}
                     alreadySent={!!d.sentAt}
-                    logoDataUri={logoDataUri}
                   />
                 </article>
               );
@@ -306,22 +296,10 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                   </div>
                   <DossierListActions
                     dossierId={d.id}
+                    leadId={d.lead?.id ?? undefined}
                     email={d.email ?? undefined}
                     nom={d.nom}
-                    productIds={d.productIds}
-                    products={lookupProducts}
-                    snapshotProducts={snapshotProducts ?? undefined}
-                    dossierCopy={dossierCopy}
-                    clientInfo={{
-                      nom: d.nom,
-                      empresa: d.empresa ?? undefined,
-                      telefon: d.telefon ?? undefined,
-                      email: d.email ?? undefined,
-                      eventDesc: d.eventDesc ?? undefined,
-                      salutacio: d.salutacio ?? undefined,
-                    }}
                     alreadySent={!!d.sentAt}
-                    logoDataUri={logoDataUri}
                     isDeleted
                   />
                 </article>

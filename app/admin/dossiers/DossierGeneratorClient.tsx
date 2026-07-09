@@ -10,6 +10,7 @@ import type { AnimacioProduct } from '@/lib/constants/animacio-products';
 import { DJ_EXTRA_HOUR_PRICE, DJ_FIRST_HOUR_PRICE } from '@/lib/constants/orbita-services';
 import { buildDossierHtml, type DossierCopy } from '@/lib/utils/dossier-html-builder';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildDossierPreviewHref } from '@/lib/admin/dossierWorkspaceHref';
 import { AdminSection } from '../components/AdminPage';
 import { computeDossierMarginGuard } from '@/lib/services/dossierMarginGuardService';
 import {
@@ -48,6 +49,7 @@ interface Props {
   initialDistanceKm?: number | null;
   initialTollsEur?: number | null;
   initialProductIds?: string;
+  initialAction?: 'preview';
 }
 
 type LeadResult = {
@@ -206,7 +208,7 @@ function buildEventDescription(data: ExtractedLeadData): string {
   return parts.join(' · ');
 }
 
-export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, leadId: initialLeadId, initialNom, initialEmail, initialTelefon, initialEmpresa, initialEventDesc, initialTravelLocation, initialDistanceKm, initialTollsEur, initialProductIds }: Props) {
+export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, leadId: initialLeadId, initialNom, initialEmail, initialTelefon, initialEmpresa, initialEventDesc, initialTravelLocation, initialDistanceKm, initialTollsEur, initialProductIds, initialAction }: Props) {
   const toast = useToast();
   const validProductIds = useMemo(() => new Set(products.map((p) => p.id)), [products]);
   const productProviderGroups = useMemo(() => (['orbita', 'masquerade', 'tino', 'altres'] as const)
@@ -247,6 +249,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
     () => buildDossierProductsForSelection(selectedProducts, selectedIds, djHours),
     [selectedProducts, selectedIds, djHours],
   );
+  const canGenerate = nom.trim().length > 0 && selectedProducts.length > 0;
   const selectedTotal = selectedProducts.reduce((sum, product) => sum + (dossierProductPriceValue(product, djHours) ?? 0), 0);
   const marginGuardLines = useMemo(() => selectedProducts.map((p) => productToDossierServiceLine(p, djHours)), [selectedProducts, djHours]);
   const marginGuard = useMemo(() => {
@@ -283,6 +286,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const customerSearchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const initialLeadSyncRef = useRef(false);
+  const initialActionRef = useRef(initialAction);
 
   const searchLeads = useCallback(async (q: string) => {
     if (q.length < 2) { setSearchResults([]); setShowResults(false); setLeadSearchError(''); return; }
@@ -393,6 +397,18 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
     initialLeadSyncRef.current = true;
     void syncProductsFromLead(initialLeadId);
   }, [initialLeadId, selectedIds.size, syncProductsFromLead]);
+
+  useEffect(() => {
+    if (initialActionRef.current !== 'preview' || !canGenerate) return;
+    initialActionRef.current = undefined;
+    if (initialLeadId && window.location.search.includes('action=preview')) {
+      const params = new URLSearchParams(window.location.search);
+      params.delete('action');
+      const query = params.toString();
+      window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`);
+    }
+    void previewDossier('same-tab');
+  }, [canGenerate, initialLeadId]);
 
   function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
     const q = e.target.value;
@@ -551,7 +567,36 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
     }
   }
 
-  function generate(mode: 'preview' | 'pdf' | 'download') {
+  async function previewDossier(target: 'new-tab' | 'same-tab' = 'new-tab') {
+    if (!nom.trim() || selectedProducts.length === 0) return;
+    if (!linkedLeadId) {
+      generate('preview', target);
+      return;
+    }
+
+    const pendingWindow = target === 'new-tab' ? window.open('about:blank', '_blank', 'noopener,noreferrer') : null;
+    if (pendingWindow) pendingWindow.opener = null;
+    setGenerating(true);
+    try {
+      await syncProductsToLead(linkedLeadId);
+      const href = buildDossierPreviewHref(linkedLeadId);
+      if (target === 'same-tab') {
+        window.location.assign(href);
+      } else if (pendingWindow) {
+        pendingWindow.location.href = href;
+      } else {
+        window.open(href, '_blank', 'noopener,noreferrer');
+      }
+    } catch (err) {
+      if (pendingWindow) pendingWindow.close();
+      console.error('[DossierGenerator] previewDossier error:', err);
+      toast.error(err instanceof Error ? err.message : 'No he pogut previsualitzar el dossier.');
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  function generate(mode: 'preview' | 'pdf' | 'download', target: 'new-tab' | 'same-tab' = 'new-tab') {
     if (!nom.trim()) return;
     setGenerating(true);
     try {
@@ -580,6 +625,8 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
         a.download = `dossier-${nom.trim().toLowerCase().replace(/[^a-z0-9àáèéíïòóúüç]+/gi, '-')}.html`;
         a.click();
         setTimeout(() => URL.revokeObjectURL(url), 5000);
+      } else if (target === 'same-tab') {
+        window.location.assign(url);
       } else {
         window.open(url, '_blank', 'noopener,noreferrer');
       }
@@ -667,8 +714,6 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
       setSaving(false);
     }
   }
-
-  const canGenerate = nom.trim().length > 0 && selectedProducts.length > 0;
 
   return (
     <div className="flex flex-col gap-6">
@@ -999,7 +1044,7 @@ export function DossierGeneratorClient({ products, dossierCopy, logoDataUri, lea
           </div>
 
           <div className="grid grid-cols-1 gap-2.5">
-            <button type="button" className="ap-btn" onClick={() => generate('preview')} disabled={!canGenerate || generating}>
+            <button type="button" className="ap-btn" onClick={() => void previewDossier()} disabled={!canGenerate || generating}>
               Previsualitzar
             </button>
             <button type="button" className="ap-btn ap-btn--primary" onClick={() => generate('pdf')} disabled={!canGenerate || generating}>

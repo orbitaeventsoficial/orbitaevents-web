@@ -5,9 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Eye, FileText, RotateCcw, Send, Trash2, XCircle } from 'lucide-react';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
-import type { AnimacioProduct } from '@/lib/constants/animacio-products';
-import { buildDossierHtml, type DossierClientInfo, type DossierCopy } from '@/lib/utils/dossier-html-builder';
-import { buildDossierCompositePdfHref } from '@/lib/admin/dossierWorkspaceHref';
+import { buildDossierCompositePdfHref, buildDossierPreviewHref, buildDossierStoredPreviewHref } from '@/lib/admin/dossierWorkspaceHref';
 
 const ACTIONS_WRAP = 'grid w-full grid-cols-2 gap-2 sm:grid-cols-4 md:flex md:w-auto md:flex-wrap md:items-center md:justify-end';
 const ACTION_BTN = 'ap-btn ap-btn--xs min-h-10 justify-center gap-1.5';
@@ -24,19 +22,14 @@ async function readDossierListActionError(response: Response, fallback: string):
 
 interface Props {
   dossierId: string;
+  leadId?: string;
   email?: string;
   nom: string;
-  productIds: string[];
-  products: AnimacioProduct[];
-  snapshotProducts?: AnimacioProduct[];
-  clientInfo: DossierClientInfo;
-  dossierCopy: DossierCopy;
   alreadySent: boolean;
-  logoDataUri?: string;
   isDeleted?: boolean;
 }
 
-export function DossierListActions({ dossierId, email, nom, productIds, products, snapshotProducts, clientInfo, dossierCopy, alreadySent, logoDataUri, isDeleted }: Props) {
+export function DossierListActions({ dossierId, leadId, email, nom, alreadySent, isDeleted }: Props) {
   const toast = useToast();
   const router = useRouter();
   const [sending, setSending] = useState(false);
@@ -45,21 +38,8 @@ export function DossierListActions({ dossierId, email, nom, productIds, products
   const [purging, setPurging] = useState(false);
 
   function preview() {
-    try {
-      const filteredProducts = snapshotProducts && snapshotProducts.length > 0
-        ? snapshotProducts
-        : products.filter((p) => productIds.includes(p.id));
-      const html = buildDossierHtml(clientInfo, filteredProducts, dossierCopy, {
-        logoDataUri,
-        locale: 'ca-ES',
-        assetBaseUrl: window.location.origin,
-      });
-      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-      window.open(URL.createObjectURL(blob), '_blank', 'noopener,noreferrer');
-    } catch (err) {
-      console.error('[DossierListActions] preview error:', err);
-      toast.error('No he pogut obrir la previsualització.');
-    }
+    const href = leadId ? buildDossierPreviewHref(leadId) : buildDossierStoredPreviewHref(dossierId);
+    window.open(href, '_blank', 'noopener,noreferrer');
   }
 
   function openCompositePdf() {

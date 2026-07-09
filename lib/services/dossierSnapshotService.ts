@@ -4,6 +4,10 @@
 
 import type { AnimacioProduct, DJPricingOption, ProductPricingTier } from '@/lib/constants/animacio-products';
 
+const OBSOLETE_DOSSIER_IMAGE_REPLACEMENTS = new Map<string, string>([
+  ['/img/collaborators/masquerade/bingo-musical-cover.jpg', '/img/collaborators/masquerade/bingo-musical.jpg'],
+]);
+
 export type DossierProductSnapshot = Pick<
   AnimacioProduct,
   | 'id'
@@ -181,6 +185,8 @@ export function hydrateDossierSnapshotProductImages(
   );
 
   return snapshotProducts.map((product) => {
+    const replacement = product.image ? OBSOLETE_DOSSIER_IMAGE_REPLACEMENTS.get(product.image) : undefined;
+    if (replacement) return { ...product, image: replacement };
     if (product.image) return product;
     const liveProduct = byId.get(product.id) ?? (
       product.sourceProductId ? bySourceProductId.get(product.sourceProductId) : undefined

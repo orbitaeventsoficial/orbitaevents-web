@@ -10,6 +10,7 @@ import { recordEmailSend } from '@/lib/services/emailTrackingService';
 import {
   collaboratorProductToAnimacioProduct,
   getDossierCollaboratorProductsByIds,
+  legacyDossierCollaboratorProductIdFor,
 } from '@/lib/services/collaboratorProductService';
 import {
   hydrateDossierSnapshotProductImages,
@@ -54,6 +55,13 @@ export type DossierOutputTransport = {
   travelKm?: number;
   travelTollsEur?: number;
   travelLocation?: string;
+};
+
+export type BuildDossierHtmlForDossierOptions = {
+  autoPrint?: boolean;
+  logoDataUri?: string;
+  locale?: string;
+  assetBaseUrl?: string;
 };
 
 function formatLeadIsoDate(date: Date | null): string {
@@ -232,6 +240,70 @@ export async function getDossierById(id: string) {
   return prisma.dossier.findUnique({ where: { id } });
 }
 
+export async function resolveDossierHtmlRenderPayload(id: string) {
+  const dossier = await prisma.dossier.findUnique({ where: { id } });
+  if (!dossier) return null;
+
+  const [allProducts, orbitaProducts, dossierCopy, collaboratorDossierProducts] = await Promise.all([
+    getAnimacioProducts('ca'),
+    getOrbitaDossierProducts('ca'),
+    getDossierCopy('ca'),
+    getDossierCollaboratorProductsByIds(dossier.productIds),
+  ]);
+  const collaboratorProducts = collaboratorDossierProducts.map(collaboratorProductToAnimacioProduct);
+  const resolvedLegacyProductIds = new Set(
+    collaboratorDossierProducts
+      .map(legacyDossierCollaboratorProductIdFor)
+      .filter((id): id is string => Boolean(id)),
+  );
+  const snapshotProducts = hydrateDossierSnapshotProductImages(
+    productsFromDossierLineSnapshot(dossier.lineSnapshot),
+    [...orbitaProducts, ...allProducts, ...collaboratorProducts],
+  );
+  const products = snapshotProducts ?? [
+    ...orbitaProducts.filter((p) => dossier.productIds.includes(p.id)),
+    ...allProducts.filter((p) => dossier.productIds.includes(p.id) && !resolvedLegacyProductIds.has(p.id)),
+    ...collaboratorProducts,
+  ];
+  const clientInfo: DossierClientInfo = {
+    nom: dossier.nom,
+    empresa: dossier.empresa ?? undefined,
+    telefon: dossier.telefon ?? undefined,
+    email: dossier.email ?? undefined,
+    eventDesc: dossier.eventDesc ?? undefined,
+    salutacio: dossier.salutacio ?? undefined,
+  };
+  const transport = await resolveDossierTransportOutput({
+    lineSnapshot: dossier.lineSnapshot,
+    leadId: dossier.leadId,
+  });
+
+  return {
+    dossier,
+    clientInfo,
+    products,
+    dossierCopy,
+    transport,
+    collaboratorDossierProducts,
+    dataSource: snapshotProducts ? 'snapshot' as const : 'live_catalog' as const,
+  };
+}
+
+export async function buildDossierHtmlForDossier(id: string, options: BuildDossierHtmlForDossierOptions = {}) {
+  const payload = await resolveDossierHtmlRenderPayload(id);
+  if (!payload) return null;
+  const html = buildDossierHtml(payload.clientInfo, payload.products, payload.dossierCopy, {
+    autoPrint: options.autoPrint,
+    logoDataUri: options.logoDataUri,
+    locale: options.locale ?? 'ca-ES',
+    travelKm: payload.transport.travelKm,
+    travelTollsEur: payload.transport.travelTollsEur,
+    location: payload.transport.travelLocation,
+    assetBaseUrl: options.assetBaseUrl,
+  });
+  return { ...payload, html };
+}
+
 export async function softDeleteDossier(id: string) {
   await prisma.$executeRaw`UPDATE "dossiers" SET "deletedAt" = NOW() WHERE id = ${id}`;
 }
@@ -271,51 +343,12 @@ export async function deleteDossier(id: string) {
 }
 
 export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; error?: string }> {
-  const dossier = await prisma.dossier.findUnique({ where: { id } });
-  if (!dossier) return { ok: false, error: 'Dossier no trobat' };
+  const render = await buildDossierHtmlForDossier(id, { locale: 'ca-ES' });
+  if (!render) return { ok: false, error: 'Dossier no trobat' };
+  const { dossier, html, products, dataSource } = render;
   if (!dossier.email) return { ok: false, error: 'El dossier no té email de destinatari' };
   const origin = await resolveDossierTraceOrigin(dossier.leadId);
-
-  const [allProducts, orbitaProducts, dossierCopy, collaboratorDossierProducts] = await Promise.all([
-    getAnimacioProducts('ca'),
-    getOrbitaDossierProducts('ca'),
-    getDossierCopy('ca'),
-    getDossierCollaboratorProductsByIds(dossier.productIds),
-  ]);
-  const collaboratorProducts = collaboratorDossierProducts.map(collaboratorProductToAnimacioProduct);
-  const snapshotProducts = hydrateDossierSnapshotProductImages(
-    productsFromDossierLineSnapshot(dossier.lineSnapshot),
-    [...orbitaProducts, ...allProducts, ...collaboratorProducts],
-  );
-  const products = snapshotProducts ?? [
-    ...orbitaProducts.filter((p) => dossier.productIds.includes(p.id)),
-    ...allProducts.filter((p) => dossier.productIds.includes(p.id)),
-    ...collaboratorProducts,
-  ];
   const recipientEmail = dossier.email!;
-  const clientInfo: DossierClientInfo = {
-    nom: dossier.nom,
-    empresa: dossier.empresa ?? undefined,
-    telefon: dossier.telefon ?? undefined,
-    email: recipientEmail,
-    eventDesc: dossier.eventDesc ?? undefined,
-    salutacio: dossier.salutacio ?? undefined,
-  };
-  // Desplaçament al dossier enviat (#1394): el generador ja passa `travelKm` en viu, però
-  // l'email no ho feia → la secció de desplaçament de la pàgina de proposta (que només es
-  // pinta si travelKm>0) quedava buida. El dossier no desa el km; si ve d'un lead, l'agafem
-  // del lead (font única) perquè la proposta surti sencera i el client decideixi conscient.
-  // Sense suma dels elements: el dossier és catàleg, no factura (#1396/#1397).
-  const { travelKm, travelTollsEur, travelLocation } = await resolveDossierTransportOutput({
-    lineSnapshot: dossier.lineSnapshot,
-    leadId: dossier.leadId,
-  });
-  const html = buildDossierHtml(clientInfo, products, dossierCopy, {
-    locale: 'ca-ES',
-    travelKm,
-    travelTollsEur,
-    location: travelLocation,
-  });
 
   const productsLabel = products.map((p) => p.nom).join(', ');
   const subject = `Dossier Òrbita Events — ${dossier.nom}`;
@@ -373,7 +406,7 @@ export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; err
       details: {
         documentType: 'DOSSIER',
         source: 'dossier_email_send',
-        dataSource: snapshotProducts ? 'snapshot' : 'live_catalog',
+        dataSource,
         dossierId: id,
         leadId: origin.leadId,
         leadName: origin.leadName,

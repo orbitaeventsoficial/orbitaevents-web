@@ -2,19 +2,8 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { requireAuth } from '@/lib/auth';
 import { NextResponse, type NextRequest } from 'next/server';
-import { getAnimacioProducts } from '@/lib/constants/animacio-products-resolver';
-import { getOrbitaDossierProducts } from '@/lib/constants/dossier-copy';
-import { getDossierById, resolveDossierTraceOrigin, resolveDossierTransportOutput } from '@/lib/services/dossierService';
+import { resolveDossierHtmlRenderPayload, resolveDossierTraceOrigin } from '@/lib/services/dossierService';
 import { generateDossierCompositePDF } from '@/lib/services/dossierCompositePdfService';
-import {
-  collaboratorProductToAnimacioProduct,
-  getDossierCollaboratorProductsByIds,
-} from '@/lib/services/collaboratorProductService';
-import type { DossierClientInfo } from '@/lib/utils/dossier-html-builder';
-import {
-  hydrateDossierSnapshotProductImages,
-  productsFromDossierLineSnapshot,
-} from '@/lib/services/dossierSnapshotService';
 import { DOCUMENT_ADMIN_LOG_ACTIONS, recordDocumentAdminLog } from '@/lib/services/documentAuditTrailService';
 
 function readLogoDataUri(): string | undefined {
@@ -31,35 +20,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   const auth = requireAuth(req);
   if (auth) return auth;
 
-  const dossier = await getDossierById(params.id);
-  if (!dossier) return NextResponse.json({ error: 'No trobat' }, { status: 404 });
-
-  const [legacyProducts, orbitaProducts, collaboratorProducts] = await Promise.all([
-    getAnimacioProducts('ca'),
-    getOrbitaDossierProducts('ca'),
-    getDossierCollaboratorProductsByIds(dossier.productIds),
-  ]);
-  const collaboratorCatalogProducts = collaboratorProducts.map(collaboratorProductToAnimacioProduct);
-  const snapshotProducts = hydrateDossierSnapshotProductImages(
-    productsFromDossierLineSnapshot(dossier.lineSnapshot),
-    [...orbitaProducts, ...legacyProducts, ...collaboratorCatalogProducts],
-  );
-  // Només productes propis d'animació aquí; els de col·laborador entren via
-  // `collaboratorProducts` (el generador ja els converteix). Evita duplicats.
-  const products = snapshotProducts ?? [...orbitaProducts, ...legacyProducts].filter((product) => dossier.productIds.includes(product.id));
-  const pdfCollaboratorProducts = snapshotProducts ? [] : collaboratorProducts;
-  const client: DossierClientInfo = {
-    nom: dossier.nom,
-    empresa: dossier.empresa ?? undefined,
-    telefon: dossier.telefon ?? undefined,
-    email: dossier.email ?? undefined,
-    eventDesc: dossier.eventDesc ?? undefined,
-    salutacio: dossier.salutacio ?? undefined,
-  };
-  const transport = await resolveDossierTransportOutput({
-    lineSnapshot: dossier.lineSnapshot,
-    leadId: dossier.leadId,
-  });
+  const render = await resolveDossierHtmlRenderPayload(params.id);
+  if (!render) return NextResponse.json({ error: 'No trobat' }, { status: 404 });
+  const { dossier, clientInfo, products, transport, dataSource } = render;
 
   // Extres opcionals via query: ?extras=Nom:preu,Nom2:preu2
   const extrasParam = req.nextUrl.searchParams.get('extras');
@@ -74,10 +37,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     .filter((extra): extra is { nom: string; preu: number } => extra !== null);
 
   const doc = await generateDossierCompositePDF({
-    client,
+    client: clientInfo,
     products,
     productIds: dossier.productIds,
-    collaboratorProducts: pdfCollaboratorProducts,
     extras,
     transport,
     locale: 'ca',
@@ -93,7 +55,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     details: {
       documentType: 'DOSSIER',
       source: 'dossier_composite_pdf',
-      dataSource: snapshotProducts ? 'snapshot' : 'live_catalog',
+      dataSource,
       dossierId: params.id,
       leadId: origin.leadId,
       leadName: origin.leadName,
@@ -103,7 +65,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       clientName: dossier.nom,
       productIds: dossier.productIds,
       productCount: products.length,
-      collaboratorProductCount: pdfCollaboratorProducts.length,
+      collaboratorProductCount: render.collaboratorDossierProducts.length,
       extrasCount: extras.length,
       travelKm: transport.travelKm ?? null,
       travelTollsEur: transport.travelTollsEur ?? null,

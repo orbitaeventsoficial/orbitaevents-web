@@ -18,9 +18,15 @@ describe('partner product seeds visibility', () => {
   });
 
   it('sembra Bingo Musical adult amb la portada editorial sense sostre dominant', () => {
-    expect(masqueradeSeed).toContain('BINGO_ADULT_IMG = `${IMG}/bingo-musical-cover.jpg`');
+    expect(masqueradeSeed).toContain('BINGO_ADULT_IMG = `${IMG}/bingo-musical.jpg`');
     expect(masqueradeSeed).toContain("name: 'Bingo Musical'");
     expect(masqueradeSeed).toContain('imageUrl: BINGO_ADULT_IMG');
+  });
+
+  it('sembra Animacio adults 1h amb imatge real propia del producte', () => {
+    expect(masqueradeSeed).toContain('ADULT_ANIMATION_IMG = `${IMG}/animacio-adults-1h.jpg`');
+    expect(masqueradeSeed).toContain("name: 'Animació adults 1h'");
+    expect(masqueradeSeed).toContain('imageUrl: ADULT_ANIMATION_IMG');
   });
 
   it('sembra els altaveus d Isma com a cost intern de booking, no com a dossier', () => {

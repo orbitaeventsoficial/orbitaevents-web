@@ -6,6 +6,7 @@ const {
   mockBuildHtml,
   mockGetDossierCollaboratorProductsByIds,
   mockCollaboratorProductToAnimacioProduct,
+  mockLegacyDossierCollaboratorProductIdFor,
 } = vi.hoisted(() => ({
   mockPrisma: {
     dossier: {
@@ -28,6 +29,7 @@ const {
   mockBuildHtml: vi.fn(),
   mockGetDossierCollaboratorProductsByIds: vi.fn(),
   mockCollaboratorProductToAnimacioProduct: vi.fn(),
+  mockLegacyDossierCollaboratorProductIdFor: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
@@ -36,6 +38,7 @@ vi.mock('@/lib/utils/dossier-html-builder', () => ({ buildDossierHtml: mockBuild
 vi.mock('@/lib/services/collaboratorProductService', () => ({
   getDossierCollaboratorProductsByIds: mockGetDossierCollaboratorProductsByIds,
   collaboratorProductToAnimacioProduct: mockCollaboratorProductToAnimacioProduct,
+  legacyDossierCollaboratorProductIdFor: mockLegacyDossierCollaboratorProductIdFor,
 }));
 vi.mock('@/lib/constants/animacio-products', () => ({
   ANIMACIO_PRODUCTS: [
@@ -89,6 +92,7 @@ import {
   getDossierById,
   getAllDossiers,
   getDossierLeadInitialData,
+  buildDossierHtmlForDossier,
   softDeleteDossier,
   restoreDossier,
   purgeDossier,
@@ -103,6 +107,11 @@ beforeEach(() => {
   mockBuildHtml.mockReturnValue('<html>dossier</html>');
   mockGetDossierCollaboratorProductsByIds.mockResolvedValue([]);
   mockCollaboratorProductToAnimacioProduct.mockImplementation((product: unknown) => product);
+  mockLegacyDossierCollaboratorProductIdFor.mockImplementation((product: { nom?: string }) => {
+    if (product?.nom === 'Bingo Musical') return 'bingo-musical';
+    if (product?.nom === 'Batalla Musical') return 'batalla-musical';
+    return null;
+  });
   mockPrisma.adminLog.create.mockResolvedValue({});
 });
 
@@ -247,6 +256,53 @@ describe('getDossierById', () => {
     mockPrisma.dossier.findUnique.mockResolvedValue(null);
     const result = await getDossierById('inexistent');
     expect(result).toBeNull();
+  });
+});
+
+describe('buildDossierHtmlForDossier', () => {
+  it('construeix la preview desada amb snapshot, transport i base absoluta d imatges', async () => {
+    mockPrisma.dossier.findUnique.mockResolvedValue({
+      ...mockDossier,
+      productIds: ['bingo-musical'],
+      lineSnapshot: {
+        version: 1,
+        products: [{
+          id: 'bingo-musical',
+          nom: 'Bingo Musical congelat',
+          descripcio: ['Text snapshot'],
+          inclou: ['Equip snapshot'],
+          image: '/img/collaborators/masquerade/bingo-musical.jpg',
+          priceFrom: 999,
+        }],
+        travelKm: 123,
+        travelTollsEur: 4.5,
+        travelLocation: 'Snapshot City',
+      },
+    });
+
+    const result = await buildDossierHtmlForDossier('dos-1', {
+      logoDataUri: 'data:image/svg+xml;base64,logo',
+      assetBaseUrl: 'http://localhost:3000',
+    });
+
+    expect(result?.html).toBe('<html>dossier</html>');
+    expect(mockBuildHtml).toHaveBeenCalledWith(
+      expect.objectContaining({ nom: 'Joan Pla' }),
+      [expect.objectContaining({
+        id: 'bingo-musical',
+        nom: 'Bingo Musical congelat',
+        image: '/img/collaborators/masquerade/bingo-musical.jpg',
+      })],
+      expect.anything(),
+      expect.objectContaining({
+        logoDataUri: 'data:image/svg+xml;base64,logo',
+        assetBaseUrl: 'http://localhost:3000',
+        travelKm: 123,
+        travelTollsEur: 4.5,
+        location: 'Snapshot City',
+      }),
+    );
+    expect(result?.dataSource).toBe('snapshot');
   });
 });
 
@@ -473,12 +529,16 @@ describe('sendDossierByEmail', () => {
     });
     mockPrisma.lead.findUnique
       .mockResolvedValueOnce({
+        distanceKm: 422,
+        tollsEur: 18.5,
+        eventLocation: "l'Aldosa",
+      })
+      .mockResolvedValueOnce({
         id: 'lead-1',
         name: 'Lead Joan',
         customerId: null,
         customer: null,
-      })
-      .mockResolvedValueOnce({ distanceKm: 422, tollsEur: 18.5, eventLocation: "l'Aldosa" });
+      });
     mockSendEmail.mockResolvedValue(undefined);
     mockPrisma.dossier.update.mockResolvedValue(mockDossier);
 

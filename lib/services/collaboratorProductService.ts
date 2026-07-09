@@ -62,6 +62,23 @@ export type DossierCollaboratorProduct = {
   dossierSortOrder?: number;
 };
 
+const DOSSIER_LEGACY_COLLABORATOR_ALIASES: ReadonlyArray<{ legacyId: string; name: string }> = [
+  { legacyId: 'bingo-musical', name: 'Bingo Musical' },
+  { legacyId: 'batalla-musical', name: 'Batalla Musical' },
+];
+
+const LEGACY_COLLABORATOR_ALIAS_BY_ID = new Map(
+  DOSSIER_LEGACY_COLLABORATOR_ALIASES.map((alias) => [alias.legacyId, alias.name]),
+);
+
+const LEGACY_COLLABORATOR_ALIAS_BY_NAME = new Map(
+  DOSSIER_LEGACY_COLLABORATOR_ALIASES.map((alias) => [alias.name.toLowerCase(), alias.legacyId]),
+);
+
+export function legacyDossierCollaboratorProductIdFor(product: Pick<DossierCollaboratorProduct, 'nom'>): string | null {
+  return LEGACY_COLLABORATOR_ALIAS_BY_NAME.get(product.nom.trim().toLowerCase()) ?? null;
+}
+
 /** Profit net (€) i markup d'un producte. % calculat sobre el cost del col·laborador. */
 export function computeProductMargin(costPrice: number, sellPrice: number) {
   const marginNet = sellPrice - costPrice;
@@ -250,11 +267,19 @@ export async function getDossierCollaboratorProductsByIds(productIds: string[]):
   const ids = productIds
     .map(parseDossierCollaboratorProductId)
     .filter((id): id is string => Boolean(id));
-  if (ids.length === 0) return [];
+  const legacyNames = productIds
+    .map((id) => LEGACY_COLLABORATOR_ALIAS_BY_ID.get(id))
+    .filter((name): name is string => Boolean(name));
+  if (ids.length === 0 && legacyNames.length === 0) return [];
+
+  const orFilters = [
+    ...(ids.length > 0 ? [{ id: { in: ids } }] : []),
+    ...legacyNames.map((name) => ({ name: { equals: name, mode: 'insensitive' as const } })),
+  ];
 
   const products = await prisma.collaboratorProduct.findMany({
     where: {
-      id: { in: ids },
+      OR: orFilters,
       isActive: true,
       visibleInDossier: true,
       collaborator: { isActive: true },
@@ -266,10 +291,21 @@ export async function getDossierCollaboratorProductsByIds(productIds: string[]):
   const byId = new Map(products
     .filter((product) => !isIncludedSoundRentalCatalogProduct(product))
     .map((product) => [product.id, collaboratorProductToDossierProduct(product)]));
+  const byLegacyId = new Map(
+    Array.from(byId.values())
+      .map((product) => [legacyDossierCollaboratorProductIdFor(product), product] as const)
+      .filter((entry): entry is readonly [string, DossierCollaboratorProduct] => Boolean(entry[0])),
+  );
 
-  return ids
-    .map((id) => byId.get(id))
+  const ordered = productIds
+    .map((productId) => {
+      const directId = parseDossierCollaboratorProductId(productId);
+      if (directId) return byId.get(directId);
+      return byLegacyId.get(productId);
+    })
     .filter((product): product is DossierCollaboratorProduct => Boolean(product));
+
+  return Array.from(new Map(ordered.map((product) => [product.id, product])).values());
 }
 
 export async function createCollaboratorProduct(collaboratorId: string, input: CollaboratorProductInput) {

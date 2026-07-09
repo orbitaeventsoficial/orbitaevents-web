@@ -14,7 +14,8 @@ const prisma = new PrismaClient();
 
 const COLLABORATOR_ID = 'carlos-lucas-fernandez';
 const IMG = '/img/collaborators/masquerade';
-const BINGO_ADULT_IMG = `${IMG}/bingo-musical-cover.jpg`;
+const ADULT_ANIMATION_IMG = `${IMG}/animacio-adults-1h.jpg`;
+const BINGO_ADULT_IMG = `${IMG}/bingo-musical.jpg`;
 const BINGO_KIDS_IMG = `${IMG}/bingo-musical-kids.jpg`;
 // Km inclosos canònics (font única: travelCost). Avui 20 km/sentit des de Granollers.
 const INCLUDED_KM = getIncludedTravelOneWayKm();
@@ -93,7 +94,7 @@ const PRODUCTS = [
     // helper canònic resellPrice (cost +20% arrodonit a múltiple de 5).
     costPrice: 160,
     sellPrice: productPrice(160),
-    imageUrl: null,
+    imageUrl: ADULT_ANIMATION_IMG,
     description: "Animació en directe pensada per al grup gran: conducció, jocs i dinàmiques participatives que mantenen el ritme de la festa sense parar-la. Un animador professional condueix l'estona perquè els adults s'hi impliquin i passin una bona estona.",
     includes: INCLUDES,
     sortOrder: 6,

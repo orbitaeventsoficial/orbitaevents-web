@@ -113,4 +113,16 @@ describe('dossierSnapshotService', () => {
     }));
     expect(hydrated?.[1].image).toBe('/img/snapshot.webp');
   });
+
+  it('substitueix imatges de snapshot que apunten a assets retirats', () => {
+    const hydrated = hydrateDossierSnapshotProductImages(
+      [{
+        ...product,
+        image: '/img/collaborators/masquerade/bingo-musical-cover.jpg',
+      }],
+      [],
+    );
+
+    expect(hydrated?.[0].image).toBe('/img/collaborators/masquerade/bingo-musical.jpg');
+  });
 });
