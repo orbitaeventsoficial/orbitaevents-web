@@ -138,6 +138,29 @@ describe('LeadBoloSection repartiment', () => {
     expect(screen.queryByText('Net Òrbita')).not.toBeInTheDocument();
   });
 
+  it('quan el lead ja és reserva, mostra lectura formalitzada i no editor', async () => {
+    render(
+      <LeadBoloSection
+        leadId="lead-1"
+        documentContext={{ name: 'Lead Andorra', eventLocation: 'Andorra' }}
+        formalizedBooking={{ href: '/admin/bookings/booking-1', reference: 'OE-2026-001' }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Bolo formalitzat')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('Bolo formalitzat a reserva')).toBeInTheDocument();
+    expect(screen.getByText('Bingo Musical (Masquerade)')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Obrir reserva OE-2026-001' })).toHaveAttribute('href', '/admin/bookings/booking-1');
+    expect(screen.queryByTestId('service-lines')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Desar bolo' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Crear dossier' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Crear pressupost' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Crear reserva' })).not.toBeInTheDocument();
+  });
+
   it('manté ruta i dieta al cost col·laborador sense ensenyar auditoria interna al lead', async () => {
     mockFetchWithCsrf.mockResolvedValueOnce({
       ok: true,

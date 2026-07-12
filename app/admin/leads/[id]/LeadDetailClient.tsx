@@ -17,6 +17,7 @@ import Link from 'next/link';
 import { useState, useTransition, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { buildLeadBookingPrefillHref, buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
 import { buildDossierCompositePdfHref } from '@/lib/admin/dossierWorkspaceHref';
 import { getDossierHistoryKindLabel, getLeadDocumentHistoryMeta } from '@/lib/admin/commercialDocumentHistory';
@@ -118,7 +119,7 @@ export type LeadDetailData = {
 
 function leadSummary(lead: LeadDetailData): string {
  if (lead.stage === 'perdut') return 'Lead perdut. Considera reengagement si el motiu era timing.';
- if (lead.stage === 'guanyat' && lead.booking) return 'Reserva activa. Gestiona cobraments i preparació.';
+ if (lead.stage === 'guanyat' && lead.booking) return `Reserva ${lead.booking.reference} formalitzada. Canvis operatius a la reserva.`;
  if (lead.stage === 'guanyat') return 'Crear reserva, contracte i pagament inicial.';
  if (lead.stage === 'contactat') return 'Enviar pressupost i fer seguiment en 48h.';
  return 'Contactar el client avui.';
@@ -239,6 +240,10 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  const [savePending, setSavePending] = useState(false);
  // Economia del bolo elevada des de LeadBoloSection per al rail financer compacte.
  const [boloEcon, setBoloEcon] = useState<BoloEconomia | null>(null);
+ const isFormalizedLead = Boolean(lead.booking);
+ const formalizedBooking = lead.booking
+ ? { href: buildBookingHref(lead.booking.id), reference: lead.booking.reference }
+ : null;
  const handleEconomia = useCallback((e: BoloEconomia | null) => {
  setBoloEcon((prev) => {
  if (!prev && !e) return prev;
@@ -360,6 +365,7 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  }, []);
 
  async function saveAssignedTo(name: string) {
+ if (isFormalizedLead) return;
  try {
  await fetchWithCsrf(`/api/admin/leads/${lead.id}`, {
  method: 'PATCH',
@@ -398,6 +404,7 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  }
 
  async function saveSourceCollaborator(id: string) {
+ if (isFormalizedLead) return;
  try {
  await fetchWithCsrf(`/api/admin/leads/${lead.id}`, {
  method: 'PATCH',
@@ -413,6 +420,10 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  }
 
  function startEdit(field: EditableField) {
+ if (isFormalizedLead) {
+ toast.info('Aquest lead ja és una reserva formalitzada. Edita les dades operatives des de la reserva.');
+ return;
+ }
  setEditField(field);
  setEditValue(fields[field]);
  }
@@ -623,7 +634,7 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  <button key={s} type="button" data-stage={s}
  className={s === stage ? 'is-on' : ''}
  aria-current={s === stage ? 'step' : undefined}
- disabled={pending || s === stage || (s === 'guanyat' && !!lead.booking)}
+ disabled={pending || s === stage || isFormalizedLead}
  onClick={() => moveLead(s)}
  >
  <span className="ap-leads-dot" data-stage={s} />{STAGE_LABEL[s]}
@@ -637,7 +648,7 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  <div className="ap-ledger-profitmanage" aria-label="Gestió del lead">
  <label className="ap-ledger-profitfield">
  <span>Responsable</span>
- <select className="adm-input" value={lead.owner ?? ''} onChange={(e) => saveAssignedTo(e.target.value)} aria-label="Responsable intern del lead">
+ <select className="adm-input" value={lead.owner ?? ''} onChange={(e) => saveAssignedTo(e.target.value)} disabled={isFormalizedLead} aria-label="Responsable intern del lead">
  <option value="">Sense assignar</option>
  {TEAM_MEMBERS.map((m) => (
  <option key={m} value={m}>{m}</option>
@@ -649,7 +660,7 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  </label>
  <label className="ap-ledger-profitfield">
  <span>Derivat per</span>
- <select className="adm-input" value={lead.sourceCollaboratorId ?? ''} onChange={(e) => saveSourceCollaborator(e.target.value)} aria-label="Col·laborador que ha derivat el bolo">
+ <select className="adm-input" value={lead.sourceCollaboratorId ?? ''} onChange={(e) => saveSourceCollaborator(e.target.value)} disabled={isFormalizedLead} aria-label="Col·laborador que ha derivat el bolo">
  <option value="">Client directe</option>
  {referrers.map((c) => (
  <option key={c.id} value={c.id}>{c.name}</option>
@@ -688,6 +699,7 @@ export default function LeadDetailClient({ lead, proposals, dossiers, documents,
  initialTollsEur={initialTollsEur}
  onEconomiaChange={handleEconomia}
  compactEconomia
+ formalizedBooking={formalizedBooking}
  />
  </main>
 

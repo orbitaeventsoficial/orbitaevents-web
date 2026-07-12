@@ -1,3 +1,26 @@
+## 2026-07-12 — Lead formalitzat: el lead deixa de ser editor operatiu de la reserva (Canvi #2020, codex)
+
+### Context
+El propietari rectifica el Tall C de pressupostos: no vol una solidaritat permanent lead-reserva que engreixi el programa. El criteri correcte és: Òrbita opera en lead mentre el bolo és comercial (dossiers, pressupostos, configuració); quan és ferm, passa a reserva i la reserva és el workspace operatiu. Un lead amb reserva pot quedar com a traça comercial, però no pot continuar semblant el lloc viu per editar el bolo.
+
+### Canvi
+- `app/admin/leads/[id]/LeadDetailClient.tsx`: quan el lead ja té reserva, el resum superior diu `Reserva {referència} formalitzada` i els canvis operatius apunten a la reserva.
+- La barra de fases i els controls d'edició operativa del lead queden bloquejats si ja existeix `lead.booking`; no es pot reobrir pipeline des del lead formalitzat.
+- `app/admin/leads/[id]/LeadBoloSection.tsx`: amb reserva vinculada renderitza lectura `Bolo formalitzat a reserva`, llista les línies visibles i mostra CTA canònic `Obrir reserva`, sense `BookingServiceLinesSection`, sense `Desar bolo` i sense accions de crear dossier/pressupost/reserva.
+- `lib/services/leadServiceLineService.ts`: `PUT /api/admin/leads/:id/service-lines` ja no fa proxy cap a `updateBookingDetail` si el lead té reserva; respon 409 amb `bookingId` i missatge clar per editar des de reserva.
+- Tests actualitzats per blindar el nou contracte de UI i servei.
+
+### Validació
+- Validació tècnica: focused Vitest OK (`LeadBoloSection-repartiment`, `LeadDetailClient-date-save-contract`, `leadServiceLineService`: 27 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK.
+- Validació funcional: el lead pre-reserva continua sent el lloc de treball del bolo; el lead ja formalitzat queda en lectura amb enllaç a reserva i l'endpoint de línies evita mutacions laterals sobre booking.
+- Validació humana/UX: l'operador no veu dues superfícies competint. Abans de fermar, treballa al lead; després de fermar, obre la reserva.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 2020.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ## 2026-07-12 — Pressupostos Tall B: el DRAFT hereta el bolo real del lead (Canvi #2019, codex)
 
 ### Context

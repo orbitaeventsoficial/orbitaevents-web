@@ -1,5 +1,4 @@
 import { prisma } from '@/lib/prisma';
-import { updateBookingDetail } from '@/lib/services/bookingRouteService';
 import { TRAVEL_COST_LINE_MARKER, withTravelHeadcountNote } from '@/lib/services/travelLaborCost';
 import { sanitizeRevenueAmount, sanitizeServiceLineCostAmount } from '@/lib/services/serviceLineCostRules';
 import { SOUND_RENTAL } from '@/lib/constants/inventory';
@@ -166,6 +165,15 @@ export async function replaceLeadServiceLines(
     select: { id: true, guestCount: true, booking: { select: { id: true } } },
   });
   if (!lead) return { status: 404, body: { error: 'Lead no trobat' } };
+  if (lead.booking) {
+    return {
+      status: 409,
+      body: {
+        error: 'Aquest lead ja és una reserva formalitzada. Edita el bolo des de la reserva.',
+        bookingId: lead.booking.id,
+      },
+    };
+  }
 
   // Km de ruta (mirall de Booking.distanceKm) per al càlcul de transport en viu (#1345).
   if (distanceKm !== undefined) {
@@ -205,14 +213,6 @@ export async function replaceLeadServiceLines(
       sortOrder: idx,
     });
     });
-
-  if (lead.booking) {
-    const bookingLines = clean.map(({ leadId: _leadId, ...line }) => line);
-    const result = await updateBookingDetail(lead.booking.id, { serviceLines: bookingLines });
-    if (result.status !== 200) return result;
-
-    return { status: 200, body: { ok: true, count: clean.length, bookingId: lead.booking.id } };
-  }
 
   await prisma.$transaction([
     prisma.leadServiceLine.deleteMany({ where: { leadId } }),

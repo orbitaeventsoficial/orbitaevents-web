@@ -33106,6 +33106,22 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `codex`
 - Tancat per: `codex`
 
+### Canvi #2020 — 2026-07-12 — codex (FET)
+**Lead formalitzat: el lead deixa de ser editor operatiu de la reserva.**
+- Context: el propietari rectifica el Tall C de la reforma de pressupostos. El criteri no és crear solidaritat permanent lead-reserva, sinó aprimar el programa: el lead és el workspace comercial viu fins que el bolo és ferm; quan es formalitza, la reserva és el workspace operatiu i el lead queda com a traça comercial.
+- Autorització explícita propietari: "jo opero en lead, sempre en lead, pressupostos, dossiers, tot ho opero en lead, i passa a reserva quan es ferm" després de preguntar si el lead podia convertir-se en reserva per estalviar capes. Tall acotat a fitxa lead, servei de línies lead i tests; no toca schema, migracions, crons, emails reals, publicacions ni dades de BD.
+- `app/admin/leads/[id]/LeadDetailClient.tsx`: quan existeix `lead.booking`, el resum superior parla de reserva formalitzada i la barra de fase/edició operativa deixa d'actuar des del lead.
+- `app/admin/leads/[id]/LeadBoloSection.tsx`: en mode formalitzat mostra `Bolo formalitzat a reserva`, línies visibles i CTA canònic `Obrir reserva`; ja no renderitza el configurador compartit, el botó `Desar bolo` ni les accions de crear dossier/pressupost/reserva.
+- `lib/services/leadServiceLineService.ts`: `replaceLeadServiceLines()` retorna 409 si el lead ja té reserva, en lloc de fer proxy cap a `updateBookingDetail`. La lectura (`GET`) continua servint les línies de booking perquè la traça sigui visible.
+- `__tests__/app/admin/leads/LeadBoloSection-repartiment.test.tsx`, `__tests__/app/admin/leads/LeadDetailClient-date-save-contract.test.ts` i `__tests__/lib/services/leadServiceLineService.test.ts`: cobertura del lead formalitzat com a lectura + bloqueig del proxy de mutació.
+- Validació tècnica: focused Vitest OK (`LeadBoloSection-repartiment`, `LeadDetailClient-date-save-contract`, `leadServiceLineService`: 27 tests); `node_modules\.bin\tsc.CMD --noEmit --pretty false` OK.
+- Validació funcional: el lead pre-reserva continua sent el lloc de configuració comercial; després de formalitzar, el lead no competeix amb booking i qualsevol intent de canviar línies via endpoint lead rep un conflicte clar amb `bookingId`.
+- Validació humana/UX: es redueix una capa falsa: lead = feina comercial abans de fermar; reserva = execució després de fermar.
+- `ADMIN_CHANGE_COUNTER` passa a `2020`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #2019 — 2026-07-12 — codex (FET)
 **Pressupostos Tall B: el DRAFT hereta el bolo real del lead.**
 - Context: el propietari detecta que l'editor de pressupostos reobria un bolo existent com si fos una venda nova per `Pack base`, barrejant preus i totals. El pressupost amb `leadId` ha de documentar les `LeadServiceLine`, no reconstruir-les des del catàleg.

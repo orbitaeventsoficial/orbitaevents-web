@@ -34,4 +34,11 @@ describe('LeadDetailClient date save contract', () => {
     expect(detailSource).not.toContain('Pacte validat');
     expect(detailSource).not.toContain('Validar partner');
   });
+
+  it('un lead formalitzat deixa de ser pipeline operatiu editable', () => {
+    expect(detailSource).toContain('const isFormalizedLead = Boolean(lead.booking);');
+    expect(detailSource).toContain('Reserva ${lead.booking.reference} formalitzada. Canvis operatius a la reserva.');
+    expect(detailSource).toContain('disabled={pending || s === stage || isFormalizedLead}');
+    expect(detailSource).toContain('Aquest lead ja és una reserva formalitzada. Edita les dades operatives des de la reserva.');
+  });
 });

@@ -170,20 +170,19 @@ describe('replaceLeadServiceLines', () => {
     expect(mockPrisma.leadServiceLine.createMany).not.toHaveBeenCalled();
   });
 
-  it('si el lead ja te reserva, delega al servei de booking perquè recalculi totals', async () => {
+  it('si el lead ja te reserva, rebutja editar el bolo des del lead', async () => {
     mockPrisma.lead.findUnique.mockResolvedValue({ id: 'lead1', booking: { id: 'booking-1' } });
 
     const r = await replaceLeadServiceLines('lead1', [
       { label: 'DJ extra', kind: 'DJ', revenueAmount: 120, quantity: 3 },
     ]);
 
-    expect(r.status).toBe(200);
-    expect(r.body).toMatchObject({ ok: true, count: 1, bookingId: 'booking-1' });
-    expect(mockUpdateBookingDetail).toHaveBeenCalledWith('booking-1', {
-      serviceLines: [
-        expect.objectContaining({ label: 'DJ extra', kind: 'DJ', revenueAmount: 120, quantity: 3 }),
-      ],
+    expect(r.status).toBe(409);
+    expect(r.body).toMatchObject({
+      bookingId: 'booking-1',
+      error: 'Aquest lead ja és una reserva formalitzada. Edita el bolo des de la reserva.',
     });
+    expect(mockUpdateBookingDetail).not.toHaveBeenCalled();
     expect(mockPrisma.$transaction).not.toHaveBeenCalled();
     expect(mockPrisma.leadServiceLine.createMany).not.toHaveBeenCalled();
   });

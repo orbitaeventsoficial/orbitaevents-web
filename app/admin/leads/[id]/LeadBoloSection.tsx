@@ -118,6 +118,7 @@ export default function LeadBoloSection({
  initialTollsEur = null,
  onEconomiaChange,
  compactEconomia = false,
+ formalizedBooking = null,
 }: {
  leadId: string;
  documentContext: {
@@ -144,6 +145,7 @@ export default function LeadBoloSection({
  initialTollsEur?: number | null;
  onEconomiaChange?: (e: BoloEconomia | null) => void;
  compactEconomia?: boolean;
+ formalizedBooking?: { href: string; reference: string } | null;
 }) {
  const toast = useToast();
  const [lines, setLines] = useState<BookingServiceLineFormInput[]>([]);
@@ -476,7 +478,16 @@ export default function LeadBoloSection({
  const dossierHref = buildDossierListHref(leadId);
  const dossierPreviewHref = buildDossierPreviewHref(leadId);
  const quoteHref = `/admin/presupuestos?leadId=${encodeURIComponent(leadId)}`;
- const bookingHref = buildLeadBookingPrefillHref(leadId);
+ const createBookingHref = buildLeadBookingPrefillHref(leadId);
+
+ const lineAmountLabel = (line: BookingServiceLineFormInput): string => {
+ const quantity = line.quantity || 1;
+ const amount = Number(line.revenueAmount || 0);
+ if (amount <= 0) return 'Inclòs';
+ return quantity > 1
+ ? `${quantity} x ${formatCurrency(amount)} = ${formatCurrency(amount * quantity)}`
+ : formatCurrency(amount);
+ };
 
  if (loading) {
  return (
@@ -484,6 +495,40 @@ export default function LeadBoloSection({
  <div className="ap-ledger-panelhead"><span>El bolo</span></div>
  <p className="ap-ledger-hint-inline">Carregant…</p>
  </section>
+ );
+ }
+
+ if (formalizedBooking) {
+ return (
+ <div className="ap-ledger-boloside">
+ <section className="ap-ledger-panel ap-ledger-panel--booking" aria-label="Bolo formalitzat">
+ <div className="ap-ledger-panelhead">
+ <span>Bolo formalitzat a reserva</span>
+ <a className="ap-btn ap-btn--primary" href={formalizedBooking.href}>Obrir reserva {formalizedBooking.reference}</a>
+ </div>
+ <p className="ap-ledger-summary">
+ Aquest lead ja ha passat a reserva ferma. Pressupostos i dossiers queden com a traça comercial; els canvis operatius del bolo es fan a la reserva.
+ </p>
+ {visibleLines.length > 0 ? (
+ <div className="ap-ledger-contract-list">
+ {visibleLines.map((line, index) => (
+ <div key={`${line.label}-${index}`} className="ap-ledger-contract-row">
+ <span>{line.label}</span>
+ <strong>{lineAmountLabel(line)}</strong>
+ </div>
+ ))}
+ {travelCharge > 0 && (
+ <div className="ap-ledger-contract-row">
+ <span>{transportLabel}</span>
+ <strong>{formatCurrency(travelCharge)}</strong>
+ </div>
+ )}
+ </div>
+ ) : (
+ <p className="ap-ledger-summary">La reserva no té línies de bolo visibles.</p>
+ )}
+ </section>
+ </div>
  );
  }
 
@@ -582,7 +627,7 @@ export default function LeadBoloSection({
  <a className="ap-btn" href={quoteHref} onClick={(event) => openBuilder(event, quoteHref)} aria-disabled={saving}>
  Crear pressupost
  </a>
- <a className="ap-btn ap-btn--secondary" href={bookingHref} onClick={(event) => openBuilder(event, bookingHref)} aria-disabled={saving}>
+ <a className="ap-btn ap-btn--secondary" href={createBookingHref} onClick={(event) => openBuilder(event, createBookingHref)} aria-disabled={saving}>
  Crear reserva
  </a>
  </div>

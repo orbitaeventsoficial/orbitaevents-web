@@ -15,6 +15,13 @@ Avís per l'altre agent: ...
 
 ## Bloc CODEX (Codex CLI)
 
+[codex] 2026-07-12 [ESTAT: tancat — #2020 lead workspace comercial -> reserva ferma]
+Perímetre tancat: pivot del Tall C segons criteri del propietari: no crear solidaritat permanent lead-reserva. El lead continua sent el workspace comercial viu fins que el bolo és ferm; quan existeix reserva, la fitxa de lead passa a lectura/traça i obre la reserva com a workspace operatiu.
+Últim canvi tancat: #2020.
+Validació #2020: focused Vitest OK (`LeadBoloSection-repartiment`, `LeadDetailClient-date-save-contract`, `leadServiceLineService`: 27 tests); `tsc --noEmit` OK; `qa:protocol` OK; admin-canon OK; `git diff --check` OK; `validate:core` OK (75 fitxers, 668 tests). `pnpm build` no executat perquè hi ha `next dev` viu a `:3000` (PID 20612) i build escriu `.next`.
+Proper pas previst: reprendre la neteja de pressupostos/lead només pel següent tall petit: revisar si `/admin/presupuestos` encara ofereix accions de proposta sobre leads ja formalitzats, sense tocar schema ni BD.
+Avís per l'altre agent: el perímetre de `app/admin/leads/**` i `lib/services/leadServiceLineService.ts` queda lliure; evita reintroduir proxy de mutació lead -> booking.
+
 [codex] 2026-07-12 [ESTAT: tancat — neteja worktree #2011-#2019]
 Perímetre tancat: deixar el working tree coherent després de detectar que els talls #2011 i #2013-#2017 estaven documentats però amb codi encara sense commit, i que #2019 tenia codi verificat però encara faltava protocol/counter. S'ha commitejat feina útil amb validació i sense esborrar res a cegues.
 Últim canvi tancat: #2019 (pressupost DRAFT amb lead hereta el bolo real del lead i congela snapshots enviats).
